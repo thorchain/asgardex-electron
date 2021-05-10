@@ -18,7 +18,11 @@ const { pools: midgardPoolsService } = midgardService
  */
 export const upgradeBnbRune$ = ({ poolAddresses, asset, amount, memo }: UpgradeRuneParams): UpgradeRuneTxState$ => {
   // Observable state of `UpgradeRuneTxState`
-  const { get$: getState$, get: getState, set: setState } = observableState<UpgradeRuneTxState>({
+  const {
+    get$: getState$,
+    get: getState,
+    set: setState
+  } = observableState<UpgradeRuneTxState>({
     ...INITIAL_UPGRADE_RUNE_STATE,
     status: RD.pending,
     steps: { current: 1, total: 3 }

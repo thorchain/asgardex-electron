@@ -107,12 +107,10 @@ export const PoolActionsHistoryTable: React.FC<Props> = ({
     [renderDetailColumn, intl]
   )
 
-  const columns: ColumnsType<PoolAction> = useMemo(() => [actionTypeColumn, detailColumn, dateColumn, linkColumn], [
-    actionTypeColumn,
-    detailColumn,
-    dateColumn,
-    linkColumn
-  ])
+  const columns: ColumnsType<PoolAction> = useMemo(
+    () => [actionTypeColumn, detailColumn, dateColumn, linkColumn],
+    [actionTypeColumn, detailColumn, dateColumn, linkColumn]
+  )
 
   const renderTable = useCallback(
     ({ total, actions }: PoolActionsHistoryPage, loading = false) => {

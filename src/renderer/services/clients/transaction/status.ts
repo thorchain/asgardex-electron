@@ -68,17 +68,16 @@ export const txStatusByClient$ = ({
  * @param txHash Transaction hash
  * @param chain Chain
  */
-export const txStatus$: (client$: XChainClient$) => (txHash: TxHash, assetAddres: O.Option<Address>) => TxLD = (
-  client$
-) => (txHash, assetAddress) =>
-  client$.pipe(
-    RxOp.switchMap((oClient) =>
-      FP.pipe(
-        oClient,
-        O.fold(
-          () => Rx.of(RD.initial),
-          (client) => txStatusByClient$({ client, txHash, assetAddress })
+export const txStatus$: (client$: XChainClient$) => (txHash: TxHash, assetAddres: O.Option<Address>) => TxLD =
+  (client$) => (txHash, assetAddress) =>
+    client$.pipe(
+      RxOp.switchMap((oClient) =>
+        FP.pipe(
+          oClient,
+          O.fold(
+            () => Rx.of(RD.initial),
+            (client) => txStatusByClient$({ client, txHash, assetAddress })
+          )
         )
       )
     )
-  )

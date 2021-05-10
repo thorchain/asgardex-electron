@@ -36,9 +36,10 @@ export const UpgradeView: React.FC<Props> = (): JSX.Element => {
   const network = useObservableState<Network>(network$, DEFAULT_NETWORK)
 
   // accept BNB.Rune only
-  const oRuneBnbAsset = useMemo(() => FP.pipe(assetFromString(asset), O.fromNullable, O.filter(isRuneBnbAsset)), [
-    asset
-  ])
+  const oRuneBnbAsset = useMemo(
+    () => FP.pipe(assetFromString(asset), O.fromNullable, O.filter(isRuneBnbAsset)),
+    [asset]
+  )
 
   const {
     balancesState$,

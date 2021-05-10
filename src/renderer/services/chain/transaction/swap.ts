@@ -32,7 +32,11 @@ export const swap$ = ({ poolAddress: poolAddresses, asset, amount, memo }: SwapT
 
   // Observable state of loading process
   // we start with progress of 25%
-  const { get$: getState$, get: getState, set: setState } = observableState<SwapState>({
+  const {
+    get$: getState$,
+    get: getState,
+    set: setState
+  } = observableState<SwapState>({
     ...INITIAL_SWAP_STATE,
     swap: RD.progress({ loaded: 25, total })
   })

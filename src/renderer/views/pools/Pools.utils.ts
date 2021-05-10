@@ -129,29 +129,29 @@ export const getBlocksLeftForPendingPoolAsString = (
  * Filters tableData array by passed active filter.
  * If oFilter is O.none will return tableData array without any changes
  */
-export const filterTableData = (oFilter: O.Option<PoolFilter> = O.none) => (
-  tableData: PoolTableRowData[]
-): PoolTableRowData[] => {
-  return FP.pipe(
-    oFilter,
-    O.map((filter) =>
-      FP.pipe(
-        tableData,
-        A.filterMap((tableRow) => {
-          if (filter === 'base') {
-            return isChainAsset(tableRow.pool.target) ? O.some(tableRow) : O.none
-          }
-          if (filter === 'usd') {
-            return isUSDAsset(tableRow.pool.target) ? O.some(tableRow) : O.none
-          }
-          const stringAsset = assetToString(tableRow.pool.target)
-          return stringAsset.includes(filter) ? O.some(tableRow) : O.none
-        })
-      )
-    ),
-    O.getOrElse(() => tableData)
-  )
-}
+export const filterTableData =
+  (oFilter: O.Option<PoolFilter> = O.none) =>
+  (tableData: PoolTableRowData[]): PoolTableRowData[] => {
+    return FP.pipe(
+      oFilter,
+      O.map((filter) =>
+        FP.pipe(
+          tableData,
+          A.filterMap((tableRow) => {
+            if (filter === 'base') {
+              return isChainAsset(tableRow.pool.target) ? O.some(tableRow) : O.none
+            }
+            if (filter === 'usd') {
+              return isUSDAsset(tableRow.pool.target) ? O.some(tableRow) : O.none
+            }
+            const stringAsset = assetToString(tableRow.pool.target)
+            return stringAsset.includes(filter) ? O.some(tableRow) : O.none
+          })
+        )
+      ),
+      O.getOrElse(() => tableData)
+    )
+  }
 
 /**
  * Helper to get min. amount for pool txs

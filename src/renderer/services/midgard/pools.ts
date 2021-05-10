@@ -93,9 +93,11 @@ const createPoolsService = (
 ): PoolsService => {
   const midgardDefaultApi$ = FP.pipe(byzantine$, liveData.map(getMidgardDefaultApi), RxOp.shareReplay(1))
 
-  const { get$: poolsFilters$, set: _setPoolsFilter, get: internalGetPoolsFilter } = observableState<
-    Record<string, O.Option<PoolFilter>>
-  >({})
+  const {
+    get$: poolsFilters$,
+    set: _setPoolsFilter,
+    get: internalGetPoolsFilter
+  } = observableState<Record<string, O.Option<PoolFilter>>>({})
 
   const setPoolsFilter = (poolKey: string, filterValue: O.Option<PoolFilter>) => {
     const currentState = internalGetPoolsFilter()
@@ -324,26 +326,24 @@ const createPoolsService = (
       Rx.combineLatest([poolAssets$, assetDetails$, poolDetails$, pricePools$]),
       RxOp.map((state) => RD.combine(...state)),
       RxOp.map(
-        RD.map(
-          ([poolAssets, assetDetails, poolDetails, pricePools]): PoolsState => {
-            const prevAsset = getSelectedPricePoolAsset()
-            const nullablePricePools = O.toNullable(pricePools)
-            if (nullablePricePools) {
-              const selectedPricePool = pricePoolSelector(nullablePricePools, prevAsset)
-              setSelectedPricePoolAsset(selectedPricePool.asset)
-            }
-            // Provide `PoolData` map (needed for pricing)
-            const poolsData = toPoolsData(poolDetails)
-
-            return {
-              poolAssets,
-              assetDetails,
-              poolsData,
-              poolDetails,
-              pricePools
-            }
+        RD.map(([poolAssets, assetDetails, poolDetails, pricePools]): PoolsState => {
+          const prevAsset = getSelectedPricePoolAsset()
+          const nullablePricePools = O.toNullable(pricePools)
+          if (nullablePricePools) {
+            const selectedPricePool = pricePoolSelector(nullablePricePools, prevAsset)
+            setSelectedPricePoolAsset(selectedPricePool.asset)
           }
-        )
+          // Provide `PoolData` map (needed for pricing)
+          const poolsData = toPoolsData(poolDetails)
+
+          return {
+            poolAssets,
+            assetDetails,
+            poolsData,
+            poolDetails,
+            pricePools
+          }
+        })
       ),
       RxOp.startWith(RD.pending),
       RxOp.catchError((error: Error) => Rx.of(RD.failure(error)))

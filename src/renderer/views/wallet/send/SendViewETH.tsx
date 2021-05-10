@@ -72,11 +72,10 @@ export const SendViewETH: React.FC<Props> = (props): JSX.Element => {
 
   const isLoading = useMemo(() => RD.isPending(sendTxState.status), [sendTxState.status])
 
-  const sendTxStatusMsg = useMemo(() => Helper.sendTxStatusMsg({ sendTxState, asset, intl }), [
-    asset,
-    intl,
-    sendTxState
-  ])
+  const sendTxStatusMsg = useMemo(
+    () => Helper.sendTxStatusMsg({ sendTxState, asset, intl }),
+    [asset, intl, sendTxState]
+  )
 
   /**
    * Custom send form used by ETH chain only

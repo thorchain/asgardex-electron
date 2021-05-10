@@ -234,12 +234,10 @@ export const TxsTable: React.FC<Props> = (props): JSX.Element => {
     [typeColumn, fromColumn, toColumn, amountColumn, dateColumn, linkColumn]
   )
 
-  const mobileColumns: ColumnsType<Tx> = useMemo(() => [typeColumn, amountColumn, dateColumn, linkColumn], [
-    typeColumn,
-    amountColumn,
-    dateColumn,
-    linkColumn
-  ])
+  const mobileColumns: ColumnsType<Tx> = useMemo(
+    () => [typeColumn, amountColumn, dateColumn, linkColumn],
+    [typeColumn, amountColumn, dateColumn, linkColumn]
+  )
 
   const renderTable = useCallback(
     ({ total, txs }: TxsPage, loading = false) => {

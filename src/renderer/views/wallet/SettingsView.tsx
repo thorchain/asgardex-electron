@@ -227,16 +227,17 @@ export const SettingsView: React.FC = (): JSX.Element => {
 
   const network = useObservableState<Network>(network$, DEFAULT_NETWORK)
 
-  const midgardEndpoint$ = useMemo(() => pipe(midgardService.apiEndpoint$, RxOp.map(RD.toOption)), [
-    midgardService.apiEndpoint$
-  ])
+  const midgardEndpoint$ = useMemo(
+    () => pipe(midgardService.apiEndpoint$, RxOp.map(RD.toOption)),
+    [midgardService.apiEndpoint$]
+  )
 
   const endpointUrl = useObservableState(midgardEndpoint$, O.none)
 
-  const clientUrl = useMemo(() => (onlineStatus === OnlineStatus.OFF ? O.none : endpointUrl), [
-    endpointUrl,
-    onlineStatus
-  ])
+  const clientUrl = useMemo(
+    () => (onlineStatus === OnlineStatus.OFF ? O.none : endpointUrl),
+    [endpointUrl, onlineStatus]
+  )
 
   const userAccounts$ = useMemo(
     () =>

@@ -12,9 +12,11 @@ import { observableState } from '../../helpers/stateHelper'
 import { network$ } from '../app/service'
 import { StoragePartialState, StorageState } from './types'
 
-const { get$: getStorageState$, get: getStorageState, set: setStorageState } = observableState<
-  StorageState<UserNodesStorage>
->(O.none)
+const {
+  get$: getStorageState$,
+  get: getStorageState,
+  set: setStorageState
+} = observableState<StorageState<UserNodesStorage>>(O.none)
 
 export const removeStorage = async () => {
   await window.apiUserNodesStorage.remove()

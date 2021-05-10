@@ -83,9 +83,10 @@ export const SendFormLTC: React.FC<Props> = (props): JSX.Element => {
 
   const prevFeesWithRatesRef = useRef<O.Option<FeesWithRates>>(O.none)
 
-  const oFeesWithRates: O.Option<FeesWithRates> = useMemo(() => FP.pipe(feesWithRatesRD, RD.toOption), [
-    feesWithRatesRD
-  ])
+  const oFeesWithRates: O.Option<FeesWithRates> = useMemo(
+    () => FP.pipe(feesWithRatesRD, RD.toOption),
+    [feesWithRatesRD]
+  )
 
   const [amountToSend, setAmountToSend] = useState<BaseAmount>(ZERO_BASE_AMOUNT)
 

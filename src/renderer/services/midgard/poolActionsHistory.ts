@@ -37,9 +37,11 @@ export const createPoolActionsHistoryService = (
 
   const { stream$: reloadActionsHistory$, trigger: reloadActionsHistory } = triggerStream()
 
-  const { get$: requestParam$, set: setRequestParams, get: getCurrentRequestParams } = observableState<
-    O.Option<LoadActionsParams>
-  >(O.none)
+  const {
+    get$: requestParam$,
+    set: setRequestParams,
+    get: getCurrentRequestParams
+  } = observableState<O.Option<LoadActionsParams>>(O.none)
 
   const getActions$ = ({
     itemsPerPage,

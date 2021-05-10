@@ -94,9 +94,10 @@ export const SendFormBTC: React.FC<Props> = (props): JSX.Element => {
     [feesWithRatesRD, selectedFeeOptionKey]
   )
 
-  const oFeesWithRates: O.Option<FeesWithRates> = useMemo(() => FP.pipe(feesWithRatesRD, RD.toOption), [
-    feesWithRatesRD
-  ])
+  const oFeesWithRates: O.Option<FeesWithRates> = useMemo(
+    () => FP.pipe(feesWithRatesRD, RD.toOption),
+    [feesWithRatesRD]
+  )
 
   const feesAvailable = useMemo(() => O.isSome(oFeesWithRates), [oFeesWithRates])
 

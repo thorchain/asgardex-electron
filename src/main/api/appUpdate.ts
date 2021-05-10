@@ -22,36 +22,33 @@ export const registerAppCheckUpdatedHandler = (isDev = false) => {
     }
   }
 
-  ipcMain.handle(
-    IPCMessages.APP_CHECK_FOR_UPDATE,
-    (): Promise<AppUpdateRD> => {
-      const cleanListeners = () => {
-        autoUpdater.removeAllListeners('update-available')
-        autoUpdater.removeAllListeners('update-not-available')
-      }
-
-      return new Promise((resolve) => {
-        autoUpdater.once('update-available', (info: { version: string }) => {
-          resolve(RD.success(O.some(info.version)))
-        })
-
-        autoUpdater.once('update-not-available', () => {
-          resolve(RD.success(O.none))
-        })
-
-        autoUpdater
-          .checkForUpdates()
-          .catch((e) => {
-            cleanListeners()
-            resolve(RD.failure(e))
-          })
-          .then((value) => {
-            cleanListeners()
-            return value
-          })
-      })
+  ipcMain.handle(IPCMessages.APP_CHECK_FOR_UPDATE, (): Promise<AppUpdateRD> => {
+    const cleanListeners = () => {
+      autoUpdater.removeAllListeners('update-available')
+      autoUpdater.removeAllListeners('update-not-available')
     }
-  )
+
+    return new Promise((resolve) => {
+      autoUpdater.once('update-available', (info: { version: string }) => {
+        resolve(RD.success(O.some(info.version)))
+      })
+
+      autoUpdater.once('update-not-available', () => {
+        resolve(RD.success(O.none))
+      })
+
+      autoUpdater
+        .checkForUpdates()
+        .catch((e) => {
+          cleanListeners()
+          resolve(RD.failure(e))
+        })
+        .then((value) => {
+          cleanListeners()
+          return value
+        })
+    })
+  })
 }
 
 export const checkForAppUpdates = (): Promise<AppUpdateRD> => {

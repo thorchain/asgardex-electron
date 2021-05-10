@@ -18,4 +18,7 @@ export const sequenceTRDFromArray = array.sequence(RD.remoteData)
 /**
  * Creation
  */
-export const rdFromOption = <L, A>(onNone: Lazy<L>) => (v: O.Option<A>) => RD.fromOption(v, onNone)
+export const rdFromOption =
+  <L, A>(onNone: Lazy<L>) =>
+  (v: O.Option<A>) =>
+    RD.fromOption(v, onNone)

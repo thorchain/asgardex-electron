@@ -13,30 +13,27 @@ import { loadTx$, loadTxs$ } from './common'
  * `Txs` state by given client
  * If a client is not available (e.g. by removing keystore), it returns an `initial` state
  */
-export const txsByClient$: (client$: XChainClient$) => (params: TxsParams) => TxsPageLD = (client$) => ({
-  asset,
-  limit,
-  offset,
-  walletAddress
-}) =>
-  client$.pipe(
-    RxOp.switchMap((oClient) =>
-      FP.pipe(
-        oClient,
-        O.fold(
-          () => Rx.of(RD.initial),
-          (client) =>
-            loadTxs$({
-              client,
-              asset,
-              limit,
-              offset,
-              walletAddress
-            })
+export const txsByClient$: (client$: XChainClient$) => (params: TxsParams) => TxsPageLD =
+  (client$) =>
+  ({ asset, limit, offset, walletAddress }) =>
+    client$.pipe(
+      RxOp.switchMap((oClient) =>
+        FP.pipe(
+          oClient,
+          O.fold(
+            () => Rx.of(RD.initial),
+            (client) =>
+              loadTxs$({
+                client,
+                asset,
+                limit,
+                offset,
+                walletAddress
+              })
+          )
         )
       )
     )
-  )
 /**
  * Gets data of a `Tx` by given client
  * If a client is not available, it returns an `initial` state

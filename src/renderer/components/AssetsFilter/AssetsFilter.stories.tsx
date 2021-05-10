@@ -11,9 +11,10 @@ import { PoolFilter } from '../../services/midgard/types'
 import { AssetsFilter } from './AssetsFilter'
 
 export const Default: Story<{ assets: string[] }> = ({ assets: stringAssets }) => {
-  const assets = useMemo(() => FP.pipe(stringAssets || [], A.filterMap(FP.flow(assetFromString, O.fromNullable))), [
-    stringAssets
-  ])
+  const assets = useMemo(
+    () => FP.pipe(stringAssets || [], A.filterMap(FP.flow(assetFromString, O.fromNullable))),
+    [stringAssets]
+  )
 
   const [filter, setFilter] = useState<O.Option<PoolFilter>>(O.none)
 

@@ -39,10 +39,7 @@ const loadBalances$ = ({
     O.alt(() => O.tryCatch(() => client.getAddress())),
     O.fold(
       // TODO (@Veado) i18n
-      () =>
-        Rx.of(
-          RD.failure<ApiError>({ errorId: ErrorId.GET_BALANCES, msg: 'Could not get address' })
-        ),
+      () => Rx.of(RD.failure<ApiError>({ errorId: ErrorId.GET_BALANCES, msg: 'Could not get address' })),
       (walletAddress) =>
         Rx.from(client.getBalance(walletAddress, assets)).pipe(
           map(RD.success),
@@ -54,9 +51,7 @@ const loadBalances$ = ({
             }))
           ),
           catchError((error: Error) =>
-            Rx.of(
-              RD.failure<ApiError>({ errorId: ErrorId.GET_BALANCES, msg: error?.message ?? '' })
-            )
+            Rx.of(RD.failure<ApiError>({ errorId: ErrorId.GET_BALANCES, msg: error?.message ?? '' }))
           ),
           startWith(RD.pending)
         )
@@ -99,22 +94,20 @@ export const balancesByAddress$: (
   client$: XChainClient$,
   trigger$: Rx.Observable<boolean>,
   assets?: Asset[]
-) => (address: string, walletType: WalletType) => WalletBalancesLD = (client$, trigger$, assets) => (
-  address,
-  walletType
-) =>
-  Rx.combineLatest([trigger$.pipe(debounceTime(300)), client$]).pipe(
-    RxOp.mergeMap(([_, oClient]) => {
-      return FP.pipe(
-        oClient,
-        O.fold(
-          // if a client is not available, "reset" state to "initial"
-          () => Rx.of(RD.initial),
-          // or start request and return state
-          (client) => loadBalances$({ client, address, walletType, assets })
+) => (address: string, walletType: WalletType) => WalletBalancesLD =
+  (client$, trigger$, assets) => (address, walletType) =>
+    Rx.combineLatest([trigger$.pipe(debounceTime(300)), client$]).pipe(
+      RxOp.mergeMap(([_, oClient]) => {
+        return FP.pipe(
+          oClient,
+          O.fold(
+            // if a client is not available, "reset" state to "initial"
+            () => Rx.of(RD.initial),
+            // or start request and return state
+            (client) => loadBalances$({ client, address, walletType, assets })
+          )
         )
-      )
-    }),
-    // cache it to avoid reloading data by every subscription
-    shareReplay(1)
-  )
+      }),
+      // cache it to avoid reloading data by every subscription
+      shareReplay(1)
+    )

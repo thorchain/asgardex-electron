@@ -145,12 +145,14 @@ export const Swap = ({
     [availableAssets, targetAssetProp]
   )
 
-  const oSourceAsset: O.Option<Asset> = useMemo(() => Utils.poolAssetDetailToAsset(oSourcePoolAsset), [
-    oSourcePoolAsset
-  ])
-  const oTargetAsset: O.Option<Asset> = useMemo(() => Utils.poolAssetDetailToAsset(oTargetPoolAsset), [
-    oTargetPoolAsset
-  ])
+  const oSourceAsset: O.Option<Asset> = useMemo(
+    () => Utils.poolAssetDetailToAsset(oSourcePoolAsset),
+    [oSourcePoolAsset]
+  )
+  const oTargetAsset: O.Option<Asset> = useMemo(
+    () => Utils.poolAssetDetailToAsset(oTargetPoolAsset),
+    [oTargetPoolAsset]
+  )
 
   const assetsToSwap: O.Option<{ source: Asset; target: Asset }> = useMemo(
     () => sequenceSOption({ source: oSourceAsset, target: oTargetAsset }),
@@ -158,10 +160,10 @@ export const Swap = ({
   )
 
   // `AssetWB` of source asset - which might be none (user has no balances for this asset or wallet is locked)
-  const oSourceAssetWB: O.Option<Balance> = useMemo(() => getWalletBalanceByAsset(walletBalances, oSourceAsset), [
-    walletBalances,
-    oSourceAsset
-  ])
+  const oSourceAssetWB: O.Option<Balance> = useMemo(
+    () => getWalletBalanceByAsset(walletBalances, oSourceAsset),
+    [walletBalances, oSourceAsset]
+  )
 
   // User balance for source asset
   const sourceAssetAmount: BaseAmount = useMemo(
@@ -191,13 +193,16 @@ export const Swap = ({
     [walletBalances, sourceChainAsset]
   )
 
-  const { state: swapState, reset: resetSwapState, subscribe: subscribeSwapState } = useSubscriptionState<SwapState>(
-    INITIAL_SWAP_STATE
-  )
+  const {
+    state: swapState,
+    reset: resetSwapState,
+    subscribe: subscribeSwapState
+  } = useSubscriptionState<SwapState>(INITIAL_SWAP_STATE)
 
-  const initialAmountToSwapMax1e8 = useMemo(() => baseAmount(0, sourceAssetAmountMax1e8.decimal), [
-    sourceAssetAmountMax1e8
-  ])
+  const initialAmountToSwapMax1e8 = useMemo(
+    () => baseAmount(0, sourceAssetAmountMax1e8.decimal),
+    [sourceAssetAmountMax1e8]
+  )
 
   const [
     /* max. 1e8 decimal */
@@ -207,10 +212,10 @@ export const Swap = ({
 
   const isZeroAmountToSwap = useMemo(() => amountToSwapMax1e8.amount().isZero(), [amountToSwapMax1e8])
 
-  const zeroSwapFees = useMemo(() => getZeroSwapFees({ inAsset: sourceAssetProp, outAsset: targetAssetProp }), [
-    sourceAssetProp,
-    targetAssetProp
-  ])
+  const zeroSwapFees = useMemo(
+    () => getZeroSwapFees({ inAsset: sourceAssetProp, outAsset: targetAssetProp }),
+    [sourceAssetProp, targetAssetProp]
+  )
 
   const oSwapParams: O.Option<SwapTxParams> = useMemo(() => {
     return FP.pipe(

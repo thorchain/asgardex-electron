@@ -50,10 +50,10 @@ export const PoolShare: React.FC<Props> = (props): JSX.Element => {
 
   const { asset } = assetWD
 
-  const totalDepositPrice = useMemo(() => baseAmount(runePrice.amount().plus(assetPrice.amount())), [
-    assetPrice,
-    runePrice
-  ])
+  const totalDepositPrice = useMemo(
+    () => baseAmount(runePrice.amount().plus(assetPrice.amount())),
+    [assetPrice, runePrice]
+  )
 
   const ref: RefObject<HTMLDivElement> = useRef(null)
 
@@ -116,11 +116,10 @@ export const PoolShare: React.FC<Props> = (props): JSX.Element => {
     ),
     [renderRedemptionCol, runeShare, runePrice, asset, assetShare, assetPrice]
   )
-  const renderRedemption = useMemo(() => (smallWidth ? renderRedemptionSmall : renderRedemptionLarge), [
-    renderRedemptionLarge,
-    renderRedemptionSmall,
-    smallWidth
-  ])
+  const renderRedemption = useMemo(
+    () => (smallWidth ? renderRedemptionSmall : renderRedemptionLarge),
+    [renderRedemptionLarge, renderRedemptionSmall, smallWidth]
+  )
 
   return (
     <Styled.PoolShareWrapper ref={ref}>

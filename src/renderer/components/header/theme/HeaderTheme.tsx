@@ -27,9 +27,10 @@ export const HeaderTheme: React.FC<Props> = (props): JSX.Element => {
     onPress()
   }, [toggleTheme, onPress])
 
-  const desktopView = useMemo(() => (isLightTheme ? <Styled.DayThemeIcon /> : <Styled.NightThemeIcon />), [
-    isLightTheme
-  ])
+  const desktopView = useMemo(
+    () => (isLightTheme ? <Styled.DayThemeIcon /> : <Styled.NightThemeIcon />),
+    [isLightTheme]
+  )
 
   const mobileView = useMemo(() => {
     const label = intl.formatMessage({ id: isLightTheme ? 'common.theme.light' : 'common.theme.dark' })

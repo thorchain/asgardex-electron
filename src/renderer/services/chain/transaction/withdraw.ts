@@ -33,7 +33,11 @@ export const symWithdraw$ = ({ memo, network }: SymWithdrawParams): WithdrawStat
   const total = O.some(100)
 
   // Observable state of to reflect status of all needed steps
-  const { get$: getState$, get: getState, set: setState } = observableState<WithdrawState>({
+  const {
+    get$: getState$,
+    get: getState,
+    set: setState
+  } = observableState<WithdrawState>({
     ...INITIAL_WITHDRAW_STATE,
     withdrawTx: RD.pending,
     // we start with  a small progress
@@ -98,13 +102,11 @@ export const symWithdraw$ = ({ memo, network }: SymWithdrawParams): WithdrawStat
               RxOp.map(() =>
                 FP.pipe(
                   oProgress,
-                  O.map(
-                    ({ loaded }): WithdrawState => {
-                      // From 75 to 97 we count progress with small steps, but stop it at 98
-                      const updatedLoaded = loaded >= 75 && loaded <= 97 ? loaded++ : loaded
-                      return { ...state, withdraw: RD.progress({ loaded: updatedLoaded, total }) }
-                    }
-                  ),
+                  O.map(({ loaded }): WithdrawState => {
+                    // From 75 to 97 we count progress with small steps, but stop it at 98
+                    const updatedLoaded = loaded >= 75 && loaded <= 97 ? loaded++ : loaded
+                    return { ...state, withdraw: RD.progress({ loaded: updatedLoaded, total }) }
+                  }),
                   O.getOrElse(() => state)
                 )
               )
@@ -135,7 +137,11 @@ export const asymWithdraw$ = ({ poolAddress, asset, memo, network }: AsymWithdra
   const total = O.some(100)
 
   // Observable state of to reflect status of all needed steps
-  const { get$: getState$, get: getState, set: setState } = observableState<WithdrawState>({
+  const {
+    get$: getState$,
+    get: getState,
+    set: setState
+  } = observableState<WithdrawState>({
     ...INITIAL_WITHDRAW_STATE,
     withdrawTx: RD.pending,
     // we start with  a small progress
@@ -210,13 +216,11 @@ export const asymWithdraw$ = ({ poolAddress, asset, memo, network }: AsymWithdra
               RxOp.map(() =>
                 FP.pipe(
                   oProgress,
-                  O.map(
-                    ({ loaded }): WithdrawState => {
-                      // From 75 to 97 we count progress with small steps, but stop it at 98
-                      const updatedLoaded = loaded >= 75 && loaded <= 97 ? loaded++ : loaded
-                      return { ...state, withdraw: RD.progress({ loaded: updatedLoaded, total }) }
-                    }
-                  ),
+                  O.map(({ loaded }): WithdrawState => {
+                    // From 75 to 97 we count progress with small steps, but stop it at 98
+                    const updatedLoaded = loaded >= 75 && loaded <= 97 ? loaded++ : loaded
+                    return { ...state, withdraw: RD.progress({ loaded: updatedLoaded, total }) }
+                  }),
                   O.getOrElse(() => state)
                 )
               )

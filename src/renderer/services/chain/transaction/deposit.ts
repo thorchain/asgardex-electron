@@ -44,7 +44,11 @@ export const asymDeposit$ = ({ poolAddress, asset, amount, memo }: AsymDepositPa
 
   // Observable state of loading process
   // we start with progress of 25%
-  const { get$: getState$, get: getState, set: setState } = observableState<AsymDepositState>({
+  const {
+    get$: getState$,
+    get: getState,
+    set: setState
+  } = observableState<AsymDepositState>({
     ...INITIAL_ASYM_DEPOSIT_STATE,
     deposit: RD.progress({ loaded: 25, total })
   })
@@ -120,13 +124,11 @@ export const asymDeposit$ = ({ poolAddress, asset, amount, memo }: AsymDepositPa
               RxOp.map(() =>
                 FP.pipe(
                   oProgress,
-                  O.map(
-                    ({ loaded }): AsymDepositState => {
-                      // From 75 to 97 we count progress with small steps, but stop it at 98
-                      const updatedLoaded = loaded >= 75 && loaded <= 97 ? loaded++ : loaded
-                      return { ...state, deposit: RD.progress({ loaded: updatedLoaded, total }) }
-                    }
-                  ),
+                  O.map(({ loaded }): AsymDepositState => {
+                    // From 75 to 97 we count progress with small steps, but stop it at 98
+                    const updatedLoaded = loaded >= 75 && loaded <= 97 ? loaded++ : loaded
+                    return { ...state, deposit: RD.progress({ loaded: updatedLoaded, total }) }
+                  }),
                   O.getOrElse(() => state)
                 )
               )
@@ -163,7 +165,11 @@ export const symDeposit$ = ({
   const total = O.some(100)
 
   // Observable state of to reflect status of all needed steps
-  const { get$: getState$, get: getState, set: setState } = observableState<SymDepositState>({
+  const {
+    get$: getState$,
+    get: getState,
+    set: setState
+  } = observableState<SymDepositState>({
     ...INITIAL_SYM_DEPOSIT_STATE,
     depositTxs: { rune: RD.pending, asset: RD.pending },
     // we start with  a small progress
@@ -286,13 +292,11 @@ export const symDeposit$ = ({
               RxOp.map(() =>
                 FP.pipe(
                   oProgress,
-                  O.map(
-                    ({ loaded }): SymDepositState => {
-                      // From 80 to 97 we count progress with small steps, but stop it at 98
-                      const updatedLoaded = loaded >= 80 && loaded <= 97 ? loaded++ : loaded
-                      return { ...state, deposit: RD.progress({ loaded: updatedLoaded, total }) }
-                    }
-                  ),
+                  O.map(({ loaded }): SymDepositState => {
+                    // From 80 to 97 we count progress with small steps, but stop it at 98
+                    const updatedLoaded = loaded >= 80 && loaded <= 97 ? loaded++ : loaded
+                    return { ...state, deposit: RD.progress({ loaded: updatedLoaded, total }) }
+                  }),
                   O.getOrElse(() => state)
                 )
               )
