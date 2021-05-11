@@ -20,7 +20,7 @@ export const poolFee$ = (asset: Asset): PoolFeeLD => {
   if (isRuneNativeAsset(asset)) {
     return FP.pipe(
       THOR.fees$(),
-      liveData.map((fees) => ({ amount: fees['fast'], asset: AssetRuneNative }))
+      liveData.map((fees) => ({ amount: fees.fast, asset: AssetRuneNative }))
     )
   } else {
     return FP.pipe(
