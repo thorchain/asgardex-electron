@@ -8,7 +8,9 @@ const pools: PoolsMessages = {
   'pools.blocksleft': 'Verbleibende Blocks',
   'pools.trades': 'Trades',
   'pools.pending': 'Bevorstehende',
-  'pools.available': 'Verfügbare'
+  'pools.available': 'Verfügbare',
+  'pools.halted.chain': '{chain} chain is halted for maintenance. - DE',
+  'pools.halted.chains': '{chains} chains are halted for maintenance. - DE'
 }
 
 export default pools

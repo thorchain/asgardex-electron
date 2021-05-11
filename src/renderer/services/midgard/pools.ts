@@ -60,7 +60,8 @@ import {
   PoolAddresses,
   InboundAddresses,
   GasRateLD,
-  PoolsState
+  PoolsState,
+  HaltedChainsLD
 } from './types'
 import {
   getPoolAddressesByChain,
@@ -486,6 +487,11 @@ const createPoolsService = (
     RxOp.shareReplay(1)
   )
 
+  const haltedChains$: HaltedChainsLD = FP.pipe(
+    inboundAddressesShared$,
+    liveData.map(A.filterMap((inboundAddress) => (inboundAddress.halted ? O.some(inboundAddress.chain) : O.none)))
+  )
+
   /**
    * Load pool addresses once
    * Use it whenever you do need latest data (e.g. for validation)
@@ -870,7 +876,8 @@ const createPoolsService = (
     poolsFilters$,
     setPoolsFilter,
     gasRateByChain$,
-    reloadGasRates
+    reloadGasRates,
+    haltedChains$
   }
 }
 

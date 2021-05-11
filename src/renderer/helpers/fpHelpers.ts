@@ -22,3 +22,12 @@ export const rdFromOption =
   <L, A>(onNone: Lazy<L>) =>
   (v: O.Option<A>) =>
     RD.fromOption(v, onNone)
+
+export const rdAltOnPending =
+  <L, A>(onPending: () => RD.RemoteData<L, A>) =>
+  (rd: RD.RemoteData<L, A>): RD.RemoteData<L, A> => {
+    if (RD.isPending(rd)) {
+      return onPending()
+    }
+    return rd
+  }

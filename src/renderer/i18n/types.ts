@@ -102,6 +102,8 @@ type PoolsMessageKey =
   | 'pools.trades'
   | 'pools.pending'
   | 'pools.available'
+  | 'pools.halted.chain'
+  | 'pools.halted.chains'
 
 export type PoolsMessages = { [key in PoolsMessageKey]: string }
 
