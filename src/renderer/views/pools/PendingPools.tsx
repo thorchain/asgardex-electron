@@ -26,7 +26,7 @@ import useInterval, { INACTIVE_INTERVAL } from '../../hooks/useInterval'
 import * as poolsRoutes from '../../routes/pools'
 import { DEFAULT_NETWORK } from '../../services/const'
 import { PendingPoolsState, PoolFilter, ThorchainLastblockRD } from '../../services/midgard/types'
-import { PoolTableRowData, PoolTableRowsData } from './Pools.types'
+import { PoolsComponentProps, PoolTableRowData, PoolTableRowsData } from './Pools.types'
 import { getBlocksLeftForPendingPoolAsString } from './Pools.utils'
 import { filterTableData } from './Pools.utils'
 import * as Shared from './PoolsOverview.shared'
@@ -35,7 +35,7 @@ import * as Styled from './PoolsOverview.style'
 
 const POOLS_KEY = 'pending'
 
-export const PendingPools: React.FC = (): JSX.Element => {
+export const PendingPools: React.FC<PoolsComponentProps> = (): JSX.Element => {
   const history = useHistory()
   const intl = useIntl()
 

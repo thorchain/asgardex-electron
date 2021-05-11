@@ -1,7 +1,13 @@
 import React, { useCallback, useMemo, useState } from 'react'
 
+import * as RD from '@devexperts/remote-data-ts'
+import { Chain } from '@xchainjs/xchain-util'
+import * as FP from 'fp-ts/function'
+import { useObservableState } from 'observable-hooks'
 import { useIntl } from 'react-intl'
+import * as RxOp from 'rxjs/operators'
 
+import { useMidgardContext } from '../../contexts/MidgardContext'
 import { ActivePools } from './ActivePools'
 import { PendingPools } from './PendingPools'
 import * as Styled from './PoolsOverview.style'
@@ -19,20 +25,28 @@ export const PoolsOverview: React.FC = (): JSX.Element => {
 
   const [activeTabKey, setActiveTabKey] = useState('active')
 
+  const {
+    service: {
+      pools: { haltedChains$ }
+    }
+  } = useMidgardContext()
+
+  const [haltedChains] = useObservableState(() => FP.pipe(haltedChains$, RxOp.map(RD.getOrElse((): Chain[] => []))), [])
+
   const tabs = useMemo(
     (): Tab[] => [
       {
         key: 'active',
         label: intl.formatMessage({ id: 'pools.available' }),
-        content: <ActivePools />
+        content: <ActivePools haltedChains={haltedChains} />
       },
       {
         key: 'pending',
         label: intl.formatMessage({ id: 'pools.pending' }),
-        content: <PendingPools />
+        content: <PendingPools haltedChains={haltedChains} />
       }
     ],
-    [intl]
+    [intl, haltedChains]
   )
 
   const renderTabBar = useCallback(

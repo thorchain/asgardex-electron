@@ -1,6 +1,6 @@
 import React, { useMemo } from 'react'
 
-import { Asset } from '@xchainjs/xchain-util'
+import { Asset, Chain } from '@xchainjs/xchain-util'
 import * as A from 'antd'
 import BigNumber from 'bignumber.js'
 import * as O from 'fp-ts/Option'
@@ -21,6 +21,7 @@ export type Props = {
   isLoading?: boolean
   HistoryView: React.ComponentType<{ poolAsset: Asset }>
   ChartView: React.ComponentType<{ isLoading?: boolean; priceRatio: BigNumber }>
+  haltedChains?: Chain[]
 }
 
 export const PoolDetails: React.FC<Props> = ({
@@ -32,14 +33,21 @@ export const PoolDetails: React.FC<Props> = ({
   poolStatsDetail,
   isLoading,
   HistoryView,
-  ChartView
+  ChartView,
+  haltedChains
 }) => {
   const price = useMemo(() => H.getPrice(poolDetail, priceRatio), [poolDetail, priceRatio])
   return (
     <Styled.Container>
       <Styled.TopContainer>
         <A.Col span={24}>
-          <PoolTitle asset={O.some(asset)} price={price} priceSymbol={priceSymbol} isLoading={isLoading} />
+          <PoolTitle
+            haltedChains={haltedChains}
+            asset={O.some(asset)}
+            price={price}
+            priceSymbol={priceSymbol}
+            isLoading={isLoading}
+          />
         </A.Col>
         <A.Col xs={24} md={8}>
           <PoolCards
