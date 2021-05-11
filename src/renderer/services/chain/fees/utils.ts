@@ -1,21 +1,38 @@
+import { getValueOfAsset1InAsset2, PoolData } from '@thorchain/asgardex-util'
 import { BTC_DECIMAL } from '@xchainjs/xchain-bitcoin'
 import { BCH_DECIMAL } from '@xchainjs/xchain-bitcoincash'
 import { ETH_DECIMAL } from '@xchainjs/xchain-ethereum'
 import { LTC_DECIMAL } from '@xchainjs/xchain-litecoin'
-import { Asset, AssetBCH, AssetBNB, AssetBTC, AssetETH, AssetLTC, baseAmount } from '@xchainjs/xchain-util'
+import {
+  Asset,
+  AssetBCH,
+  AssetBNB,
+  AssetBTC,
+  AssetETH,
+  AssetLTC,
+  baseAmount,
+  assetToString,
+  BaseAmount
+} from '@xchainjs/xchain-util'
 import BigNumber from 'bignumber.js'
+import * as FP from 'fp-ts/function'
 import * as O from 'fp-ts/lib/Option'
 
 import {
   BNB_DECIMAL,
+  convertBaseAmountDecimal,
   isBchAsset,
   isBtcAsset,
   isEthAsset,
   isEthTokenAsset,
-  isLtcAsset
+  isLtcAsset,
+  to1e8BaseAmount
 } from '../../../helpers/assetHelper'
 import { isBnbChain } from '../../../helpers/chainHelper'
+import { eqAsset } from '../../../helpers/fp/eq'
+import { sequenceTOption } from '../../../helpers/fpHelpers'
 import { AssetWithAmount } from '../../../types/asgardex'
+import { PoolsDataMap } from '../../midgard/types'
 
 /**
  *
@@ -72,4 +89,36 @@ export const getChainFeeByGasRate = ({
   } else {
     return O.none
   }
+}
+
+export const priceFeeAmountForAsset = ({
+  feeAmount,
+  feeAsset,
+  asset,
+  assetDecimal,
+  poolsData
+}: {
+  feeAmount: BaseAmount
+  feeAsset: Asset
+  asset: Asset
+  assetDecimal: number
+  poolsData: PoolsDataMap
+}): BaseAmount => {
+  // no pricing needed if both assets are the same
+  if (eqAsset.equals(feeAsset, asset)) return feeAmount
+
+  const oFeeAssetPoolData: O.Option<PoolData> = O.fromNullable(poolsData[assetToString(feeAsset)])
+  const oAssetPoolData: O.Option<PoolData> = O.fromNullable(poolsData[assetToString(asset)])
+
+  return FP.pipe(
+    sequenceTOption(oFeeAssetPoolData, oAssetPoolData),
+    O.map(([feeAssetPoolData, assetPoolData]) =>
+      // pool data are always 1e8 decimal based
+      // and we have to convert fees to 1e8, too
+      getValueOfAsset1InAsset2(to1e8BaseAmount(feeAmount), feeAssetPoolData, assetPoolData)
+    ),
+    // convert decimal back to sourceAssetDecimal
+    O.map((amount) => convertBaseAmountDecimal(amount, assetDecimal)),
+    O.getOrElse(() => baseAmount(0, assetDecimal))
+  )
 }
