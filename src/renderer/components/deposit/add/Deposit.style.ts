@@ -143,6 +143,6 @@ export const SubmitButton = styled(UIButton).attrs({
   round: 'true'
 })`
   min-width: 200px !important;
-  padding-left: 30px;
-  padding-right: 30px;
+  padding: 0 30px;
+  margin-bottom: 20px;
 `

@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
@@ -214,14 +215,13 @@ export const SymDeposit: React.FC<Props> = (props) => {
   )
 
   const oApproveParams: O.Option<ApproveParams> = useMemo(() => {
+    const oRouterAddress: O.Option<Address> = FP.pipe(
+      oPoolAddress,
+      O.chain(({ router }) => router)
+    )
+    const oTokenAddress: O.Option<string> = getEthTokenAddress(asset)
     return FP.pipe(
-      sequenceTOption(
-        getEthTokenAddress(asset),
-        FP.pipe(
-          oPoolAddress,
-          O.chain(({ router }) => router)
-        )
-      ),
+      sequenceTOption(oTokenAddress, oRouterAddress),
       O.map(([tokenAddress, routerAddress]) => ({
         spender: routerAddress,
         sender: tokenAddress
@@ -270,6 +270,7 @@ export const SymDeposit: React.FC<Props> = (props) => {
     RD.initial
   )
 
+  // Trigger reload of approve fees whenever `oApproveParams` has been changed
   useEffect(() => {
     approveFeesParamsUpdated(oApproveParams)
   }, [approveFeesParamsUpdated, oApproveParams])
@@ -728,38 +729,6 @@ export const SymDeposit: React.FC<Props> = (props) => {
     [oFundsCap]
   )
 
-  /**
-   * Disables form elements (input fields, slider)
-   */
-  const disabledForm = useMemo(
-    () =>
-      isBalanceError || fundsCapReached || disabled || assetBalance.amount().isZero() || runeBalance.amount().isZero(),
-    [assetBalance, disabled, fundsCapReached, isBalanceError, runeBalance]
-  )
-
-  /**
-   * Disables submit button
-   */
-  const disableSubmit = useMemo(
-    () =>
-      disabledForm ||
-      RD.isPending(depositFeesRD) ||
-      isThorchainFeeError ||
-      isAssetChainFeeError ||
-      isZeroAmountToDeposit ||
-      minRuneAmountError ||
-      minAssetAmountError,
-    [
-      depositFeesRD,
-      disabledForm,
-      isAssetChainFeeError,
-      isThorchainFeeError,
-      isZeroAmountToDeposit,
-      minAssetAmountError,
-      minRuneAmountError
-    ]
-  )
-
   const uiFeesRD: UIFeesRD = useMemo(
     () =>
       FP.pipe(
@@ -847,38 +816,51 @@ export const SymDeposit: React.FC<Props> = (props) => {
       RD.isSuccess(approveState) ||
       FP.pipe(
         isApprovedState,
-        RD.getOrElse(() => false)
+        // ignore other RD states and set to `true`
+        // to avoid switch between approve and submit button
+        // Submit button will still be disabled
+        RD.getOrElse(() => true)
       ),
     [approveState, isApprovedState, needApprovement]
   )
 
-  const checkApprovedStatus = useCallback(() => {
-    const oRouterAddress: O.Option<Address> = FP.pipe(
-      oPoolAddress,
-      O.chain(({ router }) => router)
-    )
-    // check approve status
-    FP.pipe(
-      sequenceTOption(
-        O.fromPredicate((v) => !!v)(needApprovement), // `None` if needApprovement is `false`, no request then
-        oRouterAddress,
-        getEthTokenAddress(asset)
-      ),
-      O.map(([_, routerAddress, tokenAddress]) =>
-        subscribeIsApprovedState(
-          isApprovedERC20Token$({
-            spender: routerAddress,
-            sender: tokenAddress
-          })
+  const checkApprovedStatus = useCallback(
+    (routerAddress: string) => {
+      const oNeedApprovement: O.Option<boolean> = FP.pipe(
+        needApprovement,
+        // `None` if needApprovement is `false`, no request then
+        O.fromPredicate((v) => !!v)
+      )
+
+      const oTokenAddress: O.Option<string> = getEthTokenAddress(asset)
+      // check approve status
+      FP.pipe(
+        sequenceTOption(oNeedApprovement, oTokenAddress),
+        O.map(([_, tokenAddress]) =>
+          subscribeIsApprovedState(
+            isApprovedERC20Token$({
+              spender: routerAddress,
+              sender: tokenAddress
+            })
+          )
         )
       )
+    },
+    [isApprovedERC20Token$, needApprovement, oPoolAddress, subscribeIsApprovedState]
+  )
+
+  // Run `checkApprovedStatus` whenever `oPoolAddress` has been changed
+  useEffect(() => {
+    FP.pipe(
+      oPoolAddress,
+      O.chain(({ router }) => router),
+      O.map(checkApprovedStatus)
     )
-  }, [asset, isApprovedERC20Token$, needApprovement, oPoolAddress, subscribeIsApprovedState])
+  }, [approveFeesParamsUpdated, oPoolAddress])
 
   useEffect(() => {
     if (!eqOAsset.equals(prevAsset.current, O.some(asset))) {
       prevAsset.current = O.some(asset)
-
       // reset deposit state
       resetDepositState()
       // set values to zero
@@ -887,8 +869,6 @@ export const SymDeposit: React.FC<Props> = (props) => {
       resetApproveState()
       // reset isApproved state
       resetIsApprovedState()
-      // check approved status
-      checkApprovedStatus()
       // reset fees
       prevDepositFees.current = O.none
       // reload fees
@@ -896,8 +876,6 @@ export const SymDeposit: React.FC<Props> = (props) => {
     }
   }, [
     asset,
-    checkApprovedStatus,
-    oPoolAddress,
     reloadShares,
     reloadFeesHandler,
     resetApproveState,
@@ -907,6 +885,39 @@ export const SymDeposit: React.FC<Props> = (props) => {
     changePercentHandler,
     minRuneAmountToDeposit
   ])
+
+  /**
+   * Disables form elements (input fields, slider)
+   */
+  const disabledForm = useMemo(
+    () =>
+      isBalanceError || fundsCapReached || disabled || assetBalance.amount().isZero() || runeBalance.amount().isZero(),
+    [assetBalance, disabled, fundsCapReached, isBalanceError, runeBalance]
+  )
+
+  /**
+   * Disables submit button
+   */
+  const disableSubmit = useMemo(
+    () =>
+      disabledForm ||
+      RD.isPending(depositFeesRD) ||
+      RD.isPending(approveState) ||
+      isThorchainFeeError ||
+      isAssetChainFeeError ||
+      isZeroAmountToDeposit ||
+      minRuneAmountError ||
+      minAssetAmountError,
+    [
+      depositFeesRD,
+      disabledForm,
+      isAssetChainFeeError,
+      isThorchainFeeError,
+      isZeroAmountToDeposit,
+      minAssetAmountError,
+      minRuneAmountError
+    ]
+  )
 
   return (
     <Styled.Container>
