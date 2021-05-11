@@ -42,9 +42,14 @@ const defaultProps: WitdrawProps = {
   fees$: (_: Asset) =>
     Rx.of(
       RD.success({
-        asset: AssetRuneNative,
-        inFee: assetToBase(assetAmount(0.2)),
-        outFee: assetToBase(assetAmount(0.6))
+        rune: {
+          inFee: assetToBase(assetAmount(0.2)),
+          outFee: assetToBase(assetAmount(0.6))
+        },
+        asset: {
+          asset: AssetBNB,
+          amount: assetToBase(assetAmount(0.000075))
+        }
       })
     ),
   network: 'testnet'

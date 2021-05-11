@@ -7,6 +7,7 @@ import { isChainAsset, max1e8BaseAmount } from '../../../helpers/assetHelper'
 import { priceFeeAmountForAsset } from '../../../services/chain/fees/utils'
 import { WithdrawFees } from '../../../services/chain/types'
 import { PoolsDataMap } from '../../../services/midgard/types'
+import { AssetWithAmount } from '../../../types/asgardex'
 
 export const getWithdrawAmounts = (
   runeShare: BaseAmount,
@@ -44,8 +45,7 @@ export const getAsymWithdrawAmount = ({
     baseAmount
   )
 
-export const sumWithdrawFees = ({ inFee, outFee }: Pick<WithdrawFees, 'inFee' | 'outFee'>): BaseAmount =>
-  inFee.plus(outFee)
+export const sumWithdrawFees = ({ inFee, outFee }: WithdrawFees): BaseAmount => inFee.plus(outFee)
 
 /**
  * Returns min. amount for asset to withdraw to cover outbound fees
@@ -56,13 +56,13 @@ export const minAssetAmountToWithdrawMax1e8 = ({
   assetDecimal,
   poolsData
 }: {
-  fees: Pick<WithdrawFees, 'outFee' | 'asset'>
+  fees: AssetWithAmount
   /* asset to withdraw */
   asset: Asset
   assetDecimal: number
   poolsData: PoolsDataMap
 }): BaseAmount => {
-  const { asset: feeAsset, outFee } = fees
+  const { asset: feeAsset, amount: outFee } = fees
 
   const outFeeInAsset = isChainAsset(asset)
     ? outFee

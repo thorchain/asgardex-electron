@@ -19,8 +19,9 @@ export const Container = styled('div')`
 export const AssetContainer = styled('div')`
   display: flex;
   flex-direction: row;
+  justify-content: center;
   height: 32px;
-  margin-bottom: 20px;
+  margin: 20px 0;
 
   &:last-child {
     margin: 0;
@@ -47,10 +48,16 @@ export const Drag = styled(BaseDrag)`
   justify-content: center;
 `
 
-export const OutputLabel = styled(UILabel).attrs({
-  weight: 'bold'
-})`
-  padding: 8px 0px 8px 10px;
+export const OutputLabel = styled(UILabel)`
+  font-family: 'MainFontBold';
+  padding: 0;
+  font-size: 17px;
+  line-height: 17px;
+
+  ${media.md`
+  font-size: 24px;
+  line-height: 24px;
+`}
 `
 export const FeesRow = styled(Row)`
   width: 100%;

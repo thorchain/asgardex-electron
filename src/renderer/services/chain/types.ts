@@ -186,22 +186,28 @@ export type SymDepositState$ = Rx.Observable<SymDepositState>
 
 export type SymDepositStateHandler = (p: SymDepositParams) => SymDepositState$
 
+export type WithdrawFees = {
+  /** Inbound tx fee */
+  inFee: BaseAmount
+  /** Outbound tx fee */
+  outFee: BaseAmount
+}
+export type WithdrawAssetFees = WithdrawFees & {
+  /** fee asset */
+  asset: Asset
+}
 /**
  * Withdraw fees
  */
-export type WithdrawFees = {
-  /** fee asset */
-  readonly asset: Asset
-  /** Inbound tx fee */
-  readonly inFee: BaseAmount
-  /** Outbound tx fee */
-  readonly outFee: BaseAmount
+export type SymWithdrawFees = {
+  rune: WithdrawFees
+  asset: AssetWithAmount
 }
 
-export type WithdrawFeesRD = RD.RemoteData<Error, WithdrawFees>
-export type WithdrawFeesLD = LiveData<Error, WithdrawFees>
+export type SymWithdrawFeesRD = RD.RemoteData<Error, SymWithdrawFees>
+export type SymWithdrawFeesLD = LiveData<Error, SymWithdrawFees>
 
-export type WithdrawFeesHandler = (asset: Asset) => WithdrawFeesLD
+export type SymWithdrawFeesHandler = (asset: Asset) => SymWithdrawFeesLD
 export type ReloadWithdrawFeesHandler = (asset: Asset) => void
 
 /**
