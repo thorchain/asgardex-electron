@@ -1,8 +1,8 @@
-import { Slider } from 'antd'
+import { Slider, SliderSingleProps } from 'antd'
 import styled from 'styled-components'
 import { palette } from 'styled-theme'
 
-export const SliderWrapper = styled(Slider)`
+export const SliderWrapper = styled(Slider)<SliderSingleProps & { error: boolean }>`
   color: inherit;
   margin-left: 0;
   margin-right: 0px;
@@ -14,11 +14,11 @@ export const SliderWrapper = styled(Slider)`
     &-slider {
       &-rail {
         height: 4px;
-        background: ${palette('gray', 1)};
+        background: palette('gray', 1);
       }
 
       &-track {
-        background: ${palette('gradient', 0)};
+        background: ${({ error }) => (error ? palette('error', 0) : palette('gradient', 0))};
       }
 
       &-handle {
@@ -26,7 +26,8 @@ export const SliderWrapper = styled(Slider)`
         height: 14px;
         margin-top: -6px;
         margin-left: -6px;
-        border: 3px solid ${palette('success', 0)};
+        border: 3px solid;
+        border-color: ${({ error }) => (error ? palette('error', 0) : palette('success', 0))};
         background: ${palette('background', 1)};
       }
 
@@ -60,7 +61,7 @@ export const SliderWrapper = styled(Slider)`
 
   &:hover {
     .ant-slider-track {
-      background: ${palette('primary', 0)};
+      background: ${({ error }) => (error ? palette('error', 0) : palette('primary', 0))};
     }
   }
 `

@@ -18,8 +18,9 @@ import { useMidgardContext } from '../../../contexts/MidgardContext'
 import { useWalletContext } from '../../../contexts/WalletContext'
 import { getAssetPoolPrice } from '../../../helpers/poolHelper'
 import * as ShareHelpers from '../../../helpers/poolShareHelper'
+import { liveData } from '../../../helpers/rx/liveData'
 import { DEFAULT_NETWORK } from '../../../services/const'
-import { PoolDetailRD, PoolShareRD, PoolShare } from '../../../services/midgard/types'
+import { PoolDetailRD, PoolShareRD, PoolShare, PoolsDataMap } from '../../../services/midgard/types'
 import { getBalanceByAsset } from '../../../services/wallet/util'
 import { AssetWithDecimal } from '../../../types/asgardex'
 import { PoolDetail } from '../../../types/generated/midgard'
@@ -35,7 +36,7 @@ export const WithdrawDepositView: React.FC<Props> = (props): JSX.Element => {
   const { decimal: assetDecimal } = assetWD
   const {
     service: {
-      pools: { selectedPricePoolAsset$, priceRatio$ },
+      pools: { selectedPricePoolAsset$, priceRatio$, poolsState$ },
       shares: { reloadShares }
     }
   } = useMidgardContext()
@@ -51,6 +52,15 @@ export const WithdrawDepositView: React.FC<Props> = (props): JSX.Element => {
         map((asset) => RD.fromOption(asset, () => Error(''))),
         // In case there is no asset for any reason set basic RUNE asset as alt value
         map(RD.alt((): RD.RemoteData<Error, Asset> => RD.success(AssetRuneNative)))
+      ),
+    RD.initial
+  )
+
+  const [poolsDataRD] = useObservableState(
+    () =>
+      FP.pipe(
+        poolsState$,
+        liveData.map(({ poolsData }) => poolsData)
       ),
     RD.initial
   )
@@ -124,6 +134,7 @@ export const WithdrawDepositView: React.FC<Props> = (props): JSX.Element => {
         reloadBalances={reloadBalancesAndShares}
         withdraw$={symWithdraw$}
         network={network}
+        poolsData={{}}
       />
     ),
     [
@@ -145,12 +156,14 @@ export const WithdrawDepositView: React.FC<Props> = (props): JSX.Element => {
       assetPrice,
       poolShare: { units: liquidityUnits },
       poolDetail,
-      selectedPriceAsset
+      selectedPriceAsset,
+      poolsData
     }: {
       assetPrice: BigNumber
       poolShare: PoolShare
       poolDetail: PoolDetail
       selectedPriceAsset: Asset
+      poolsData: PoolsDataMap
     }) => (
       <Withdraw
         assetPrice={assetPrice}
@@ -169,6 +182,7 @@ export const WithdrawDepositView: React.FC<Props> = (props): JSX.Element => {
         reloadBalances={reloadBalancesAndShares}
         withdraw$={symWithdraw$}
         network={network}
+        poolsData={poolsData}
       />
     ),
     [
@@ -187,17 +201,17 @@ export const WithdrawDepositView: React.FC<Props> = (props): JSX.Element => {
   )
 
   return FP.pipe(
-    RD.combine(assetPriceRD, poolShareRD, poolDetailRD, selectedPriceAssetRD),
+    RD.combine(assetPriceRD, poolShareRD, poolDetailRD, selectedPriceAssetRD, poolsDataRD),
     RD.fold(
       renderEmptyForm,
       renderEmptyForm,
       renderEmptyForm,
-      ([assetPrice, oPoolShare, poolDetail, selectedPriceAsset]) =>
+      ([assetPrice, oPoolShare, poolDetail, selectedPriceAsset, poolsData]) =>
         FP.pipe(
           oPoolShare,
           O.fold(
             () => renderEmptyForm(),
-            (poolShare) => renderWithdrawReady({ assetPrice, poolShare, poolDetail, selectedPriceAsset })
+            (poolShare) => renderWithdrawReady({ assetPrice, poolShare, poolDetail, selectedPriceAsset, poolsData })
           )
         )
     )

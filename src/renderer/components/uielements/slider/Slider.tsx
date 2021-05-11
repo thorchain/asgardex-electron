@@ -10,6 +10,7 @@ type CustomProps = {
   withLabel?: boolean
   labelPosition?: 'top' | 'bottom'
   useMiddleLabel?: boolean
+  error?: boolean
 }
 
 type Props = CustomProps & SliderSingleProps
@@ -21,6 +22,7 @@ export const Slider: React.FC<Props> = ({
   labelPosition,
   tooltipVisible,
   useMiddleLabel,
+  error = false,
   ...rest
 }): JSX.Element => {
   const ref = useRef()
@@ -45,6 +47,7 @@ export const Slider: React.FC<Props> = ({
         tooltipPlacement={tooltipPlacement}
         getTooltipPopupContainer={tooltipVisible ? getTooltipPopupContainer : undefined}
         tipFormatter={tipFormatter}
+        error={error}
         {...rest}
       />
       {withLabel && labelPosition !== 'top' && percentLabels}
