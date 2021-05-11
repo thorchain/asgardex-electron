@@ -72,22 +72,19 @@ const symWithdrawFee$: SymWithdrawFeesHandler = (initialAsset) =>
           runeFee: poolFee$(AssetRuneNative),
           assetFee: poolFee$(asset)
         }),
-        liveData.map(({ runeFee, assetFee }) => {
-          console.log('assetFee:', assetFee.asset)
-          return {
-            // outbound fee is 3x inbound fee
-            // see "ADD: Better Fees Handling #1381" (search for OutboundFee):
-            // Check issue description
-            // https://github.com/thorchain/asgardex-electron/issues/1381
-            // and following comment
-            // https://github.com/thorchain/asgardex-electron/issues/1381#issuecomment-827513798
-            rune: { inFee: runeFee.amount, outFee: runeFee.amount.times(3) },
-            asset: {
-              asset: assetFee.asset,
-              amount: assetFee.amount.times(3)
-            }
+        liveData.map(({ runeFee, assetFee }) => ({
+          // outbound fee is 3x inbound fee
+          // see "ADD: Better Fees Handling #1381" (search for OutboundFee):
+          // Check issue description
+          // https://github.com/thorchain/asgardex-electron/issues/1381
+          // and following comment
+          // https://github.com/thorchain/asgardex-electron/issues/1381#issuecomment-827513798
+          rune: { inFee: runeFee.amount, outFee: runeFee.amount.times(3) },
+          asset: {
+            asset: assetFee.asset,
+            amount: assetFee.amount.times(3)
           }
-        })
+        }))
       )
     })
   )
