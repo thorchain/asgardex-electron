@@ -110,8 +110,8 @@ const defaultProps: SymDepositProps = {
   fundsCap: O.none,
   poolsData: {
     [assetToString(AssetBNB)]: {
-      assetBalance: baseAmount(1),
-      runeBalance: baseAmount(20)
+      assetBalance: baseAmount(30),
+      runeBalance: baseAmount(10)
     }
   }
 }

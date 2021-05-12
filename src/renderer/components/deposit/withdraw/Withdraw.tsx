@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useCallback, useRef } from 'react'
+import React, { useState, useMemo, useCallback, useRef, useEffect } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
 import { getWithdrawMemo } from '@thorchain/asgardex-util'
@@ -8,6 +8,7 @@ import {
   baseAmount,
   BaseAmount,
   baseToAsset,
+  formatAssetAmount,
   formatAssetAmountCurrency
 } from '@xchainjs/xchain-util'
 import { Col } from 'antd'
@@ -29,10 +30,11 @@ import {
   WithdrawState,
   SymWithdrawStateHandler,
   ReloadWithdrawFeesHandler,
-  WithdrawFeesHandler,
-  WithdrawFeesRD,
-  WithdrawFees
+  SymWithdrawFeesHandler,
+  SymWithdrawFeesRD,
+  SymWithdrawFees
 } from '../../../services/chain/types'
+import { PoolsDataMap } from '../../../services/midgard/types'
 import { ValidatePasswordHandler } from '../../../services/wallet/types'
 import { AssetWithDecimal } from '../../../types/asgardex'
 import { PasswordModal } from '../../modal/password'
@@ -66,8 +68,9 @@ export type Props = {
   validatePassword$: ValidatePasswordHandler
   reloadBalances: FP.Lazy<void>
   withdraw$: SymWithdrawStateHandler
-  fees$: WithdrawFeesHandler
+  fees$: SymWithdrawFeesHandler
   network: Network
+  poolsData: PoolsDataMap
 }
 
 /**
@@ -90,13 +93,16 @@ export const Withdraw: React.FC<Props> = ({
   reloadFees,
   withdraw$,
   fees$,
-  network
+  network,
+  poolsData
 }) => {
   const intl = useIntl()
 
   const { asset, decimal: assetDecimal } = assetWD
 
   const [withdrawPercent, setWithdrawPercent] = useState(disabled ? 0 : 50)
+
+  const zeroWithdrawPercent = useMemo(() => withdrawPercent <= 0, [withdrawPercent])
 
   const {
     state: withdrawState,
@@ -112,7 +118,7 @@ export const Withdraw: React.FC<Props> = ({
     withdrawPercent
   )
 
-  const zeroWithdrawFees: WithdrawFees = useMemo(() => getZeroWithdrawFees(AssetRuneNative), [])
+  const zeroWithdrawFees: SymWithdrawFees = useMemo(() => getZeroWithdrawFees(AssetRuneNative), [])
 
   const assetPriceToWithdraw1e8 = useMemo(() => {
     // Prices are always `1e8` based,
@@ -122,12 +128,12 @@ export const Withdraw: React.FC<Props> = ({
     return baseAmount(priceBN, 8)
   }, [assetAmountToWithdraw, assetPrice])
 
-  const prevWithdrawFees = useRef<O.Option<WithdrawFees>>(O.none)
+  const prevWithdrawFees = useRef<O.Option<SymWithdrawFees>>(O.none)
 
-  const [withdrawFeesRD] = useObservableState<WithdrawFeesRD>(
+  const [withdrawFeesRD] = useObservableState<SymWithdrawFeesRD>(
     () =>
       FP.pipe(
-        fees$(AssetRuneNative),
+        fees$(asset),
         liveData.map((fees) => {
           // store every successfully loaded fees
           prevWithdrawFees.current = O.some(fees)
@@ -137,7 +143,7 @@ export const Withdraw: React.FC<Props> = ({
     RD.success(zeroWithdrawFees)
   )
 
-  const withdrawFees: WithdrawFees = useMemo(
+  const withdrawFees: SymWithdrawFees = useMemo(
     () =>
       FP.pipe(
         withdrawFeesRD,
@@ -148,20 +154,20 @@ export const Withdraw: React.FC<Props> = ({
     [withdrawFeesRD, zeroWithdrawFees]
   )
 
-  const isFeeError: boolean = useMemo(() => {
-    if (withdrawPercent <= 0) return false
+  const isInboundChainFeeError: boolean = useMemo(() => {
+    if (zeroWithdrawPercent) return false
 
     return FP.pipe(
       oRuneBalance,
       O.fold(
         () => true,
-        (balance) => FP.pipe(withdrawFees, Helper.sumWithdrawFees, balance.lt)
+        (balance) => FP.pipe(withdrawFees.rune, Helper.sumWithdrawFees, balance.lt)
       )
     )
-  }, [oRuneBalance, withdrawFees, withdrawPercent])
+  }, [oRuneBalance, withdrawFees.rune, zeroWithdrawPercent])
 
-  const renderFeeError = useMemo(() => {
-    if (!isFeeError) return <></>
+  const renderInboundChainFeeError = useMemo(() => {
+    if (!isInboundChainFeeError) return <></>
 
     const runeBalance = FP.pipe(
       oRuneBalance,
@@ -172,7 +178,7 @@ export const Withdraw: React.FC<Props> = ({
       { id: 'deposit.withdraw.error.feeNotCovered' },
       {
         fee: formatAssetAmountCurrency({
-          amount: baseToAsset(Helper.sumWithdrawFees(withdrawFees)),
+          amount: baseToAsset(Helper.sumWithdrawFees(withdrawFees.rune)),
           asset: AssetRuneNative,
           trimZeros: true
         }),
@@ -184,7 +190,24 @@ export const Withdraw: React.FC<Props> = ({
       }
     )
     return <Styled.FeeErrorLabel key="fee-error">{msg}</Styled.FeeErrorLabel>
-  }, [isFeeError, oRuneBalance, intl, withdrawFees])
+  }, [isInboundChainFeeError, oRuneBalance, intl, withdrawFees])
+
+  const minRuneAmountToWithdraw = useMemo(() => Helper.minRuneAmountToWithdraw(withdrawFees.rune), [withdrawFees.rune])
+
+  const minRuneAmountError = useMemo(
+    () => !zeroWithdrawPercent && minRuneAmountToWithdraw.gt(runeAmountToWithdraw),
+    [minRuneAmountToWithdraw, runeAmountToWithdraw, zeroWithdrawPercent]
+  )
+
+  const minAssetAmountToWithdrawMax1e8 = useMemo(
+    () => Helper.minAssetAmountToWithdrawMax1e8({ fees: withdrawFees.asset, asset, assetDecimal, poolsData }),
+    [asset, assetDecimal, poolsData, withdrawFees.asset]
+  )
+
+  const minAssetAmountError = useMemo(
+    () => !zeroWithdrawPercent && minAssetAmountToWithdrawMax1e8.gt(assetAmountToWithdraw),
+    [assetAmountToWithdraw, minAssetAmountToWithdrawMax1e8, zeroWithdrawPercent]
+  )
 
   // Withdraw start time
   const [withdrawStartTime, setWithdrawStartTime] = useState<number>(0)
@@ -313,42 +336,74 @@ export const Withdraw: React.FC<Props> = ({
     () =>
       FP.pipe(
         withdrawFeesRD,
-        RD.map((fees) => [{ asset: AssetRuneNative, amount: Helper.sumWithdrawFees(fees) }])
+        RD.map(({ rune: runeFees, asset: assetFees }) => [
+          { asset: AssetRuneNative, amount: Helper.sumWithdrawFees(runeFees) },
+          { asset: assetFees.asset, amount: assetFees.amount }
+        ])
       ),
     [withdrawFeesRD]
   )
 
   const reloadFeesHandler = useCallback(() => {
-    reloadFees(AssetRuneNative)
-  }, [reloadFees])
+    reloadFees(asset)
+  }, [reloadFees, asset])
 
-  const disabledForm = useMemo(() => withdrawPercent <= 0 || disabled, [withdrawPercent, disabled])
+  // Load fees by every `onMount`
+  useEffect(() => {
+    reloadFees(asset)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
+  const disabledSubmit = useMemo(
+    () => zeroWithdrawPercent || disabled || minAssetAmountError || minRuneAmountError || isInboundChainFeeError,
+    [zeroWithdrawPercent, disabled, minAssetAmountError, minRuneAmountError, isInboundChainFeeError]
+  )
 
   return (
     <Styled.Container>
       <Label weight="bold" textTransform="uppercase">
         {intl.formatMessage({ id: 'deposit.withdraw.sym.title' })}
       </Label>
-      <Label>{intl.formatMessage({ id: 'deposit.withdraw.choseText' })}</Label>
-
+      <Label>
+        {intl.formatMessage({ id: 'deposit.withdraw.choseText' })} (
+        <Styled.MinLabel error={minRuneAmountError || minAssetAmountError}>
+          {intl.formatMessage({ id: 'common.min' })}:
+        </Styled.MinLabel>
+        <Styled.MinLabel error={minRuneAmountError}>
+          {formatAssetAmountCurrency({
+            amount: getTwoSigfigAssetAmount(baseToAsset(minRuneAmountToWithdraw)),
+            asset: AssetRuneNative,
+            trimZeros: true
+          })}
+        </Styled.MinLabel>{' '}
+        /{' '}
+        <Styled.MinLabel error={minAssetAmountError}>
+          {formatAssetAmountCurrency({
+            amount: baseToAsset(minAssetAmountToWithdrawMax1e8),
+            asset,
+            trimZeros: true
+          })}
+        </Styled.MinLabel>
+        )
+      </Label>
       <Styled.Slider
-        key={'asset amount slider'}
+        key="asset amount slider"
         value={withdrawPercent}
         onChange={setWithdrawPercent}
         onAfterChange={reloadFeesHandler}
         disabled={disabled}
+        error={minRuneAmountError || minAssetAmountError}
       />
-      <Label weight={'bold'} textTransform={'uppercase'}>
+      <Label weight="bold" textTransform="uppercase">
         {intl.formatMessage({ id: 'deposit.withdraw.receiveText' })}
       </Label>
 
       <Styled.AssetContainer>
         <Styled.AssetIcon asset={AssetRuneNative} network={network} />
         <Styled.AssetLabel asset={AssetRuneNative} />
-        <Styled.OutputLabel weight={'bold'}>
-          {formatAssetAmountCurrency({
+        <Styled.OutputLabel>
+          {formatAssetAmount({
             amount: getTwoSigfigAssetAmount(baseToAsset(runeAmountToWithdraw)),
-            asset: AssetRuneNative,
             decimal: THORCHAIN_DECIMAL,
             trimZeros: true
           })}
@@ -367,10 +422,9 @@ export const Withdraw: React.FC<Props> = ({
       <Styled.AssetContainer>
         <Styled.AssetIcon asset={asset} network={network} />
         <Styled.AssetLabel asset={asset} />
-        <Styled.OutputLabel weight={'bold'}>
-          {formatAssetAmountCurrency({
+        <Styled.OutputLabel>
+          {formatAssetAmount({
             amount: getTwoSigfigAssetAmount(baseToAsset(assetAmountToWithdraw)),
-            asset,
             decimal: assetDecimal,
             trimZeros: true
           })}
@@ -391,13 +445,13 @@ export const Withdraw: React.FC<Props> = ({
           </Styled.FeeRow>
           <Styled.FeeErrorRow>
             <Col>
-              <>{renderFeeError}</>
+              <>{renderInboundChainFeeError}</>
             </Col>
           </Styled.FeeErrorRow>
         </Col>
       </Styled.FeesRow>
       <Styled.SubmitButtonWrapper>
-        <Styled.SubmitButton sizevalue="xnormal" onClick={() => setShowPasswordModal(true)} disabled={disabledForm}>
+        <Styled.SubmitButton sizevalue="xnormal" onClick={() => setShowPasswordModal(true)} disabled={disabledSubmit}>
           {intl.formatMessage({ id: 'common.withdraw' })}
         </Styled.SubmitButton>
       </Styled.SubmitButtonWrapper>

@@ -5,7 +5,6 @@ import { isRuneNativeAsset } from '../../../helpers/assetHelper'
 import { liveData } from '../../../helpers/rx/liveData'
 import { service as midgardService } from '../../midgard/service'
 import * as THOR from '../../thorchain'
-import { FeeOptionKeys } from '../const'
 import { PoolFeeLD } from '../types'
 import { getChainFeeByGasRate } from './utils'
 
@@ -21,7 +20,7 @@ export const poolFee$ = (asset: Asset): PoolFeeLD => {
   if (isRuneNativeAsset(asset)) {
     return FP.pipe(
       THOR.fees$(),
-      liveData.map((fees) => ({ amount: fees[FeeOptionKeys.SWAP], asset: AssetRuneNative }))
+      liveData.map((fees) => ({ amount: fees.fast, asset: AssetRuneNative }))
     )
   } else {
     return FP.pipe(
