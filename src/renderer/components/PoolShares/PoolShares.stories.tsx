@@ -6,6 +6,7 @@ import { assetAmount, AssetBNB, AssetBTC, assetToBase, bn } from '@xchainjs/xcha
 import { PoolShares as Component, Props as ComponentProps } from './PoolShares'
 
 const defaultProps: ComponentProps = {
+  haltedChains: [],
   data: [
     {
       asset: AssetBNB,
