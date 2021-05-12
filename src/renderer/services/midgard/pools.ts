@@ -463,6 +463,7 @@ const createPoolsService = (
           liveData.map(
             FP.flow(A.filterMap(({ chain, ...rest }) => (isChain(chain) ? O.some({ chain, ...rest }) : O.none)))
           ),
+
           RxOp.catchError((e: Error) => Rx.of(RD.failure(e))),
           RxOp.startWith(RD.pending)
         )
@@ -587,10 +588,10 @@ const createPoolsService = (
                 FP.pipe(
                   addresses,
                   A.map(({ chain, halted }) => ({ chain, halted })),
-                  // Valid chains only that ones which are NOT included to the halted arreay
+                  // Valid chains only that ones which are NOT included to the halted array
                   FP.not(A.elem(eqHaltedChain)({ chain, halted: true }))
                 ),
-              () => new Error(`Chain ${chain} is halted`)
+              () => new Error(`Trading for pools on ${chain} chain(s) is halted for maintenance.`)
             )
           )
       ),
