@@ -35,17 +35,17 @@ export const AppView: React.FC = (): JSX.Element => {
 
   const haltedChains = useObservableState(haltedChains$, RD.initial)
 
-  const prevHaltedInboundAddresses = useRef<HaltedChainsRD>(RD.initial)
+  const prevHaltedChains = useRef<HaltedChainsRD>(RD.initial)
 
   const renderHaltedChainsWarning = useMemo(
     () =>
       FP.pipe(
         haltedChains,
         RD.map((chains) => {
-          prevHaltedInboundAddresses.current = RD.success(chains)
+          prevHaltedChains.current = RD.success(chains)
           return chains
         }),
-        rdAltOnPending(() => prevHaltedInboundAddresses.current),
+        rdAltOnPending(() => prevHaltedChains.current),
         RD.toOption,
         O.chain(NEA.fromArray),
         O.map((chains) => (
