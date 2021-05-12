@@ -60,10 +60,10 @@ import { PoolAssetDetail, PoolAssetDetails, PoolAddress, PoolsDataMap } from '..
 import {
   ApiError,
   KeystoreState,
-  NonEmptyWalletBalances,
   TxHashLD,
   TxHashRD,
-  ValidatePasswordHandler
+  ValidatePasswordHandler,
+  BalancesState
 } from '../../services/wallet/types'
 import { hasImportedKeystore, isLocked } from '../../services/wallet/util'
 import { AssetWithDecimal } from '../../types/asgardex'
@@ -88,7 +88,7 @@ export type SwapProps = {
   poolAddress: O.Option<PoolAddress>
   swap$: SwapStateHandler
   poolsData: PoolsDataMap
-  walletBalances: O.Option<NonEmptyWalletBalances>
+  walletBalances: Pick<BalancesState, 'balances' | 'loading'>
   goToTransaction: (txHash: string) => void
   validatePassword$: ValidatePasswordHandler
   reloadFees: ReloadSwapFeesHandler
@@ -131,6 +131,8 @@ export const Swap = ({
   const intl = useIntl()
 
   const unlockedWallet = useMemo(() => isLocked(keystore) || !hasImportedKeystore(keystore), [keystore])
+
+  const { balances: oWalletBalances, loading: walletBalancesLoading } = walletBalances
 
   const { asset: sourceAssetProp, decimal: sourceAssetDecimal } = sourceAssetWD
   const { asset: targetAssetProp, decimal: targetAssetDecimal } = targetAssetWD
@@ -178,8 +180,8 @@ export const Swap = ({
 
   // `AssetWB` of source asset - which might be none (user has no balances for this asset or wallet is locked)
   const oSourceAssetWB: O.Option<Balance> = useMemo(
-    () => getWalletBalanceByAsset(walletBalances, oSourceAsset),
-    [walletBalances, oSourceAsset]
+    () => getWalletBalanceByAsset(oWalletBalances, oSourceAsset),
+    [oWalletBalances, oSourceAsset]
   )
 
   // User balance for source asset
@@ -203,11 +205,11 @@ export const Swap = ({
   const sourceChainAssetAmount: BaseAmount = useMemo(
     () =>
       FP.pipe(
-        getWalletBalanceByAsset(walletBalances, O.some(sourceChainAsset)),
+        getWalletBalanceByAsset(oWalletBalances, O.some(sourceChainAsset)),
         O.map(({ amount }) => amount),
         O.getOrElse(() => ZERO_BASE_AMOUNT)
       ),
-    [walletBalances, sourceChainAsset]
+    [oWalletBalances, sourceChainAsset]
   )
 
   const {
@@ -324,11 +326,35 @@ export const Swap = ({
     })
   }, [reloadFees, sourceAssetProp, targetAssetProp])
 
-  const [approveFeesRD, approveFeesParamsUpdated] = useObservableState<FeeRD, ApproveParams>((approveFeeParam$) => {
-    return approveFeeParam$.pipe(RxOp.switchMap(approveFee$))
+  const prevApproveFee = useRef<O.Option<BaseAmount>>(O.none)
+
+  const [approveFeeRD, approveFeeParamsUpdated] = useObservableState<FeeRD, ApproveParams>((approveFeeParam$) => {
+    return approveFeeParam$.pipe(
+      RxOp.switchMap((params) =>
+        FP.pipe(
+          approveFee$(params),
+          liveData.map((fee) => {
+            // store every successfully loaded fees
+            prevApproveFee.current = O.some(fee)
+            return fee
+          })
+        )
+      )
+    )
   }, RD.initial)
 
   const prevApproveParams = useRef<O.Option<ApproveParams>>(O.none)
+
+  const approveFee: BaseAmount = useMemo(
+    () =>
+      FP.pipe(
+        approveFeeRD,
+        RD.toOption,
+        O.alt(() => prevApproveFee.current),
+        O.getOrElse(() => ZERO_BASE_AMOUNT)
+      ),
+    [approveFeeRD]
+  )
 
   // whenever `oApproveParams` has been updated,
   // `approveFeesParamsUpdated` needs to be called to update `approveFeesRD`
@@ -343,9 +369,9 @@ export const Swap = ({
         return params
       }),
       // Trigger update for `approveFeesRD`
-      O.map(approveFeesParamsUpdated)
+      O.map(approveFeeParamsUpdated)
     )
-  }, [approveFeesParamsUpdated, oApproveParams, oPoolAddress])
+  }, [approveFeeParamsUpdated, oApproveParams, oPoolAddress])
 
   const reloadApproveFeesHandler = useCallback(() => {
     FP.pipe(oApproveParams, O.map(reloadApproveFee))
@@ -467,12 +493,12 @@ export const Swap = ({
   const allAssets = useMemo((): Asset[] => availableAssets.map(({ asset }) => asset), [availableAssets])
 
   const assetSymbolsInWallet: O.Option<string[]> = useMemo(
-    () => FP.pipe(walletBalances, O.map(A.map(({ asset }) => asset.symbol.toUpperCase()))),
-    [walletBalances]
+    () => FP.pipe(oWalletBalances, O.map(A.map(({ asset }) => asset.symbol.toUpperCase()))),
+    [oWalletBalances]
   )
 
   const allBalances = FP.pipe(
-    walletBalances,
+    oWalletBalances,
     O.map((balances) => filterWalletBalancesByAssets(balances, allAssets)),
     O.getOrElse(() => [] as WalletBalances)
   )
@@ -504,7 +530,7 @@ export const Swap = ({
 
   const balancesToSwapTo = useMemo((): WalletBalances => {
     const allBalances = FP.pipe(
-      walletBalances,
+      oWalletBalances,
       O.getOrElse((): WalletBalances => [])
     )
 
@@ -549,7 +575,7 @@ export const Swap = ({
       ),
       A.flatten
     )
-  }, [walletBalances, allAssets, assetsToSwap])
+  }, [oWalletBalances, allAssets, assetsToSwap])
 
   const [showPasswordModal, setShowPasswordModal] = useState(false)
 
@@ -740,8 +766,8 @@ export const Swap = ({
           { id: 'swap.errors.amount.balanceShouldCoverChainFee' },
           {
             balance: formatAssetAmountCurrency({
-              asset: sourceAssetProp,
-              amount: baseToAsset(sourceAssetAmount),
+              asset: getChainAsset(sourceAssetProp.chain),
+              amount: baseToAsset(sourceChainAssetAmount),
               trimZeros: true
             }),
             fee: formatAssetAmountCurrency({
@@ -753,7 +779,7 @@ export const Swap = ({
         )}
       </Styled.FeeErrorLabel>
     )
-  }, [sourceChainFeeError, swapFees, intl, sourceAssetProp, sourceAssetAmount])
+  }, [sourceChainFeeError, swapFees, intl, sourceAssetProp.chain, sourceChainAssetAmount])
 
   // Helper to price target fees into source asset
   const outFeeInTargetAsset: BaseAmount = useMemo(() => {
@@ -797,14 +823,63 @@ export const Swap = ({
     [swapFeesRD, targetAssetProp, outFeeInTargetAsset]
   )
 
-  const approveFees: UIFeesRD = useMemo(
+  const needApprovement = useMemo(() => {
+    // not needed for users with locked or not imported wallets
+    if (!hasImportedKeystore(keystore) || isLocked(keystore)) return false
+    // Other chains than ETH do not need an approvement
+    if (!isEthChain(sourceChainAsset.chain)) return false
+    // ETH does not need to be approved
+    if (isEthAsset(sourceAssetProp)) return false
+    // ERC20 token does need approvement only
+    return isEthTokenAsset(sourceAssetProp)
+  }, [keystore, sourceAssetProp, sourceChainAsset.chain])
+
+  const uiApproveFeesRD: UIFeesRD = useMemo(
     () =>
       FP.pipe(
-        approveFeesRD,
+        approveFeeRD,
         RD.map((approveFee) => [{ asset: getChainAsset(sourceAssetProp.chain), amount: approveFee }])
       ),
-    [approveFeesRD, sourceAssetProp.chain]
+    [approveFeeRD, sourceAssetProp.chain]
   )
+
+  const isApproveFeeError = useMemo(() => {
+    // ignore error check if we don't need to check allowance
+    if (!needApprovement) return false
+
+    return sourceChainAssetAmount.lt(approveFee)
+  }, [needApprovement, sourceChainAssetAmount, approveFee])
+
+  // sourceChainFeeErrorLabel
+
+  const approveFeeErrorLabel: JSX.Element = useMemo(() => {
+    if (
+      !isApproveFeeError ||
+      // Don't render error if walletBalances are still loading
+      walletBalancesLoading
+    )
+      return <></>
+
+    return (
+      <Styled.FeeErrorLabel key="sourceChainErrorLabel">
+        {intl.formatMessage(
+          { id: 'swap.errors.amount.balanceShouldCoverChainFee' },
+          {
+            balance: formatAssetAmountCurrency({
+              asset: getChainAsset(sourceAssetProp.chain),
+              amount: baseToAsset(sourceChainAssetAmount),
+              trimZeros: true
+            }),
+            fee: formatAssetAmountCurrency({
+              asset: getChainAsset(sourceAssetProp.chain),
+              trimZeros: true,
+              amount: baseToAsset(approveFee)
+            })
+          }
+        )}
+      </Styled.FeeErrorLabel>
+    )
+  }, [isApproveFeeError, walletBalancesLoading, intl, sourceAssetProp.chain, sourceChainAssetAmount, approveFee])
 
   const {
     state: approveState,
@@ -850,17 +925,6 @@ export const Swap = ({
     reset: resetIsApprovedState,
     subscribe: subscribeIsApprovedState
   } = useSubscriptionState<IsApprovedRD>(RD.success(true))
-
-  const needApprovement = useMemo(() => {
-    // not needed for users with locked or not imported wallets
-    if (!hasImportedKeystore(keystore) || isLocked(keystore)) return false
-    // Other chains than ETH do not need an approvement
-    if (!isEthChain(sourceChainAsset.chain)) return false
-    // ETH does not need to be approved
-    if (isEthAsset(sourceAssetProp)) return false
-    // ERC20 token does need approvement only
-    return isEthTokenAsset(sourceAssetProp)
-  }, [keystore, sourceAssetProp, sourceChainAsset.chain])
 
   const isApproved = useMemo(() => {
     if (!needApprovement) return true
@@ -972,21 +1036,27 @@ export const Swap = ({
       hasHaltedChain ||
       unlockedWallet ||
       isZeroAmountToSwap ||
-      O.isNone(walletBalances) ||
+      walletBalancesLoading ||
       sourceChainFeeError ||
       RD.isPending(swapFeesRD) ||
       RD.isPending(approveState) ||
       minAmountError,
     [
       hasHaltedChain,
-      approveState,
+      unlockedWallet,
       isZeroAmountToSwap,
-      minAmountError,
+      walletBalancesLoading,
       sourceChainFeeError,
       swapFeesRD,
-      unlockedWallet,
-      walletBalances
+      approveState,
+      minAmountError
     ]
+  )
+
+  const disableSubmitApprove = useMemo(
+    () => isApproveFeeError || walletBalancesLoading || hasHaltedChain,
+
+    [hasHaltedChain, isApproveFeeError, walletBalancesLoading]
   )
 
   return (
@@ -1081,13 +1151,14 @@ export const Swap = ({
               <Styled.SubmitButton
                 sizevalue="xnormal"
                 color="warning"
-                disabled={hasHaltedChain}
+                disabled={disableSubmitApprove}
                 onClick={onApprove}
                 loading={RD.isPending(approveState)}>
                 {intl.formatMessage({ id: 'common.approve' })}
               </Styled.SubmitButton>
 
-              {!RD.isInitial(approveFees) && <Fees fees={approveFees} reloadFees={reloadApproveFeesHandler} />}
+              {!RD.isInitial(uiApproveFeesRD) && <Fees fees={uiApproveFeesRD} reloadFees={reloadApproveFeesHandler} />}
+              {approveFeeErrorLabel}
               {renderApproveError}
             </>
           )
