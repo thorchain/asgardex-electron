@@ -1,4 +1,3 @@
-/* eslint-disable react-hooks/exhaustive-deps */
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
@@ -846,7 +845,7 @@ export const SymDeposit: React.FC<Props> = (props) => {
         )
       )
     },
-    [isApprovedERC20Token$, needApprovement, oPoolAddress, subscribeIsApprovedState]
+    [asset, isApprovedERC20Token$, needApprovement, subscribeIsApprovedState]
   )
 
   // Run `checkApprovedStatus` whenever `oPoolAddress` has been changed
@@ -856,7 +855,7 @@ export const SymDeposit: React.FC<Props> = (props) => {
       O.chain(({ router }) => router),
       O.map(checkApprovedStatus)
     )
-  }, [approveFeesParamsUpdated, oPoolAddress])
+  }, [checkApprovedStatus, oPoolAddress])
 
   useEffect(() => {
     if (!eqOAsset.equals(prevAsset.current, O.some(asset))) {
@@ -909,6 +908,7 @@ export const SymDeposit: React.FC<Props> = (props) => {
       minRuneAmountError ||
       minAssetAmountError,
     [
+      approveState,
       depositFeesRD,
       disabledForm,
       isAssetChainFeeError,
