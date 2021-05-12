@@ -9,6 +9,7 @@ import {
   baseAmount,
   BaseAmount,
   baseToAsset,
+  Chain,
   formatAssetAmountCurrency
 } from '@xchainjs/xchain-util'
 import { Col } from 'antd'
@@ -33,6 +34,7 @@ import {
 import { getChainAsset, isEthChain } from '../../../helpers/chainHelper'
 import { eqBaseAmount, eqOAsset } from '../../../helpers/fp/eq'
 import { sequenceSOption, sequenceTOption } from '../../../helpers/fpHelpers'
+import * as PoolHelpers from '../../../helpers/poolHelper'
 import { liveData, LiveData } from '../../../helpers/rx/liveData'
 import { FundsCap } from '../../../hooks/useFundsCap'
 import { useSubscriptionState } from '../../../hooks/useSubscriptionState'
@@ -93,6 +95,7 @@ export type Props = {
   isApprovedERC20Token$: (params: ApproveParams) => LiveData<ApiError, boolean>
   fundsCap: O.Option<FundsCap>
   poolsData: PoolsDataMap
+  haltedChains: Chain[]
 }
 
 type SelectedInput = 'asset' | 'rune' | 'none'
@@ -127,7 +130,8 @@ export const SymDeposit: React.FC<Props> = (props) => {
     reloadApproveFee,
     approveFee$,
     fundsCap: oFundsCap,
-    poolsData
+    poolsData,
+    haltedChains
   } = props
 
   const intl = useIntl()
@@ -143,6 +147,10 @@ export const SymDeposit: React.FC<Props> = (props) => {
       ),
     [assetDecimal, oAssetBalance]
   )
+
+  const isChainHalted = useMemo(() => PoolHelpers.isChainHalted(haltedChains), [haltedChains])
+
+  const haltedChain = useMemo(() => isChainHalted(asset.chain), [asset, isChainHalted])
 
   const assetBalanceMax1e8: BaseAmount = useMemo(() => max1e8BaseAmount(assetBalance), [assetBalance])
 
@@ -733,8 +741,13 @@ export const SymDeposit: React.FC<Props> = (props) => {
    */
   const disabledForm = useMemo(
     () =>
-      isBalanceError || fundsCapReached || disabled || assetBalance.amount().isZero() || runeBalance.amount().isZero(),
-    [assetBalance, disabled, fundsCapReached, isBalanceError, runeBalance]
+      haltedChain ||
+      isBalanceError ||
+      fundsCapReached ||
+      disabled ||
+      assetBalance.amount().isZero() ||
+      runeBalance.amount().isZero(),
+    [assetBalance, disabled, fundsCapReached, isBalanceError, runeBalance, haltedChain]
   )
 
   /**

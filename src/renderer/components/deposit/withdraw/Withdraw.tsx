@@ -8,6 +8,7 @@ import {
   baseAmount,
   BaseAmount,
   baseToAsset,
+  Chain,
   formatAssetAmountCurrency
 } from '@xchainjs/xchain-util'
 import { Col } from 'antd'
@@ -21,6 +22,7 @@ import { Network } from '../../../../shared/api/types'
 import { ZERO_BASE_AMOUNT } from '../../../const'
 import { getTwoSigfigAssetAmount, THORCHAIN_DECIMAL, to1e8BaseAmount } from '../../../helpers/assetHelper'
 import { eqAsset } from '../../../helpers/fp/eq'
+import * as PoolHelpers from '../../../helpers/poolHelper'
 import { liveData } from '../../../helpers/rx/liveData'
 import { useSubscriptionState } from '../../../hooks/useSubscriptionState'
 import { INITIAL_WITHDRAW_STATE } from '../../../services/chain/const'
@@ -68,6 +70,7 @@ export type Props = {
   withdraw$: SymWithdrawStateHandler
   fees$: WithdrawFeesHandler
   network: Network
+  haltedChains: Chain[]
 }
 
 /**
@@ -90,11 +93,16 @@ export const Withdraw: React.FC<Props> = ({
   reloadFees,
   withdraw$,
   fees$,
-  network
+  network,
+  haltedChains = []
 }) => {
   const intl = useIntl()
 
   const { asset, decimal: assetDecimal } = assetWD
+
+  const isChainHalted = useMemo(() => PoolHelpers.isChainHalted(haltedChains), [haltedChains])
+
+  const haltedChain = useMemo(() => isChainHalted(asset.chain), [asset, isChainHalted])
 
   const [withdrawPercent, setWithdrawPercent] = useState(disabled ? 0 : 50)
 
@@ -322,7 +330,10 @@ export const Withdraw: React.FC<Props> = ({
     reloadFees(AssetRuneNative)
   }, [reloadFees])
 
-  const disabledForm = useMemo(() => withdrawPercent <= 0 || disabled, [withdrawPercent, disabled])
+  const disabledForm = useMemo(
+    () => withdrawPercent <= 0 || disabled || haltedChain,
+    [withdrawPercent, disabled, haltedChain]
+  )
 
   return (
     <Styled.Container>
@@ -336,7 +347,7 @@ export const Withdraw: React.FC<Props> = ({
         value={withdrawPercent}
         onChange={setWithdrawPercent}
         onAfterChange={reloadFeesHandler}
-        disabled={disabled}
+        disabled={disabled || haltedChain}
       />
       <Label weight={'bold'} textTransform={'uppercase'}>
         {intl.formatMessage({ id: 'deposit.withdraw.receiveText' })}

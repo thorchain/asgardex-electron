@@ -30,6 +30,7 @@ const targetAsset: AssetWithDecimal = { asset: AssetBTC, decimal: BTC_DECIMAL }
 
 /* Mock all (default) data needed by `Swap` commponent */
 const defaultProps: SwapProps = {
+  haltedChains: [],
   keystore: O.none,
   availableAssets: [
     { asset: AssetBTC, assetPrice: bn('56851.67420275761') },

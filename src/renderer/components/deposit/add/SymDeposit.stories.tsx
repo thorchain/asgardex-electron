@@ -45,6 +45,7 @@ const balanceTOMO: WalletBalance = {
 }
 
 const defaultProps: SymDepositProps = {
+  haltedChains: [],
   asset: { asset: AssetBNB, decimal: BNB_DECIMAL },
   assetPrice: bn(2),
   runePrice: bn(1),

@@ -1,7 +1,7 @@
 import React, { useMemo } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
-import { Asset } from '@xchainjs/xchain-util'
+import { Asset, Chain } from '@xchainjs/xchain-util'
 import { Grid } from 'antd'
 import * as FP from 'fp-ts/function'
 import * as O from 'fp-ts/Option'
@@ -25,6 +25,7 @@ type Tab = {
 }
 
 export type Props = {
+  haltedChains: Chain[]
   asset: AssetWithDecimal
   shares: PoolSharesRD
   poolDetail: PoolDetailRD
@@ -34,13 +35,24 @@ export type Props = {
     smallWidth?: boolean
     poolDetail: PoolDetailRD
   }>
-  AsymDepositContent: React.ComponentType<{ asset: Asset; poolDetail: PoolDetailRD }>
+  AsymDepositContent: React.ComponentType<{ asset: Asset; poolDetail: PoolDetailRD; haltedChains: Chain[] }>
   SymDepositContent: React.ComponentType<{
+    haltedChains: Chain[]
     asset: AssetWithDecimal
     poolDetail: PoolDetailRD
   }>
-  WidthdrawContent: React.ComponentType<{ asset: AssetWithDecimal; poolShare: PoolShareRD; poolDetail: PoolDetailRD }>
-  AsymWidthdrawContent: React.ComponentType<{ asset: Asset; poolShare: PoolShareRD; poolDetail: PoolDetailRD }>
+  WidthdrawContent: React.ComponentType<{
+    asset: AssetWithDecimal
+    poolShare: PoolShareRD
+    poolDetail: PoolDetailRD
+    haltedChains: Chain[]
+  }>
+  AsymWidthdrawContent: React.ComponentType<{
+    asset: Asset
+    poolShare: PoolShareRD
+    poolDetail: PoolDetailRD
+    haltedChains: Chain[]
+  }>
   keystoreState: KeystoreState
 }
 
@@ -48,6 +60,7 @@ export const Deposit: React.FC<Props> = (props) => {
   const {
     asset: assetWD,
     ShareContent,
+    haltedChains,
     // TODO (@Veado) Temporary disabled #827
     // AsymDepositContent,
     SymDepositContent,
@@ -106,28 +119,35 @@ export const Deposit: React.FC<Props> = (props) => {
       //   key: 'deposit-asym',
       //   disabled: false,
       //   label: intl.formatMessage({ id: 'deposit.add.asym' }, { asset: asset.ticker }),
-      //   content: <AsymDepositContent asset={asset} />
+      //   content: <AsymDepositContent asset={asset} haltedChains={haltedChains} />
       // },
       {
         key: 'deposit-sym',
         disabled: false,
         label: intl.formatMessage({ id: 'deposit.add.sym' }),
-        content: <SymDepositContent poolDetail={poolDetailRD} asset={assetWD} />
+        content: <SymDepositContent poolDetail={poolDetailRD} asset={assetWD} haltedChains={haltedChains} />
       },
       {
         key: 'withdraw-sym',
         disabled: !hasSymPoolShare,
         label: intl.formatMessage({ id: 'deposit.withdraw.sym' }),
-        content: <WidthdrawContent poolDetail={poolDetailRD} asset={assetWD} poolShare={combinedPoolShare} />
+        content: (
+          <WidthdrawContent
+            poolDetail={poolDetailRD}
+            asset={assetWD}
+            poolShare={combinedPoolShare}
+            haltedChains={haltedChains}
+          />
+        )
       }
       // {
       //   key: 'withdraw-asym-asset',
       //   disabled: !hasAsymPoolShareAsset,
       //   label: intl.formatMessage({ id: 'deposit.withdraw.asym' }, { asset: asset.ticker }),
-      //   content: <AsymWidthdrawContent asset={asset} poolShare={asymPoolShareAsset} />
+      //   content: <AsymWidthdrawContent asset={asset} poolShare={asymPoolShareAsset} haltedChains={haltedChains} />
       // }
     ],
-    [intl, SymDepositContent, poolDetailRD, assetWD, hasSymPoolShare, WidthdrawContent, combinedPoolShare]
+    [intl, SymDepositContent, poolDetailRD, assetWD, hasSymPoolShare, WidthdrawContent, combinedPoolShare, haltedChains]
   )
 
   const alignTopShareContent: boolean = useMemo(
