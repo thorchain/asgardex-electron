@@ -285,6 +285,9 @@ export const ButtonWrapper = styled(Button)<Props>`
           -moz-background-size: 100% 3px;
           background-size: 100% 3px;
         `}
+        &:disabled {
+          color: ${(props) => getThemeValue(props.color, props.typevalue)?.text ?? ''};
+        }
       }
     }
 
