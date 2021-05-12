@@ -1,30 +1,17 @@
-import {
-  getDoubleSwapOutput,
-  getDoubleSwapSlip,
-  getSwapOutput,
-  getSwapSlip,
-  getValueOfAsset1InAsset2,
-  PoolData
-} from '@thorchain/asgardex-util'
-import { Asset, assetToString, bn, BaseAmount, baseAmount } from '@xchainjs/xchain-util'
+import { getDoubleSwapOutput, getDoubleSwapSlip, getSwapOutput, getSwapSlip } from '@thorchain/asgardex-util'
+import { Asset, assetToString, bn, BaseAmount } from '@xchainjs/xchain-util'
 import BigNumber from 'bignumber.js'
 import * as A from 'fp-ts/Array'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
 
 import { ZERO_BASE_AMOUNT, ZERO_BN } from '../../const'
-import {
-  convertBaseAmountDecimal,
-  isChainAsset,
-  isRuneNativeAsset,
-  max1e8BaseAmount,
-  to1e8BaseAmount
-} from '../../helpers/assetHelper'
+import { isChainAsset, isRuneNativeAsset, max1e8BaseAmount, to1e8BaseAmount } from '../../helpers/assetHelper'
 import { eqAsset } from '../../helpers/fp/eq'
 import { sequenceTOption } from '../../helpers/fpHelpers'
+import { priceFeeAmountForAsset } from '../../services/chain/fees/utils'
 import { SwapFees } from '../../services/chain/types'
 import { PoolAssetDetail, PoolAssetDetails, PoolsDataMap } from '../../services/midgard/types'
-import { AssetWithAmount } from '../../types/asgardex'
 import { SwapData } from './Swap.types'
 
 /**
@@ -167,38 +154,6 @@ export const poolAssetDetailToAsset = (oAsset: O.Option<PoolAssetDetail>): O.Opt
     O.map(({ asset }) => asset)
   )
 
-export const priceFeeAmountForInAsset = ({
-  fee,
-  inAsset,
-  inAssetDecimal,
-  poolsData
-}: {
-  fee: AssetWithAmount
-  inAsset: Asset
-  inAssetDecimal: number
-  poolsData: PoolsDataMap
-}): BaseAmount => {
-  const { asset: feeAsset, amount: feeAmount } = fee
-
-  // no pricing needed if both assets are the same
-  if (eqAsset.equals(feeAsset, inAsset)) return feeAmount
-
-  const oFeeAssetPoolData: O.Option<PoolData> = O.fromNullable(poolsData[assetToString(feeAsset)])
-  const oAssetPoolData: O.Option<PoolData> = O.fromNullable(poolsData[assetToString(inAsset)])
-
-  return FP.pipe(
-    sequenceTOption(oFeeAssetPoolData, oAssetPoolData),
-    O.map(([feeAssetPoolData, assetPoolData]) =>
-      // pool data are always 1e8 decimal based
-      // and we have to convert fees to 1e8, too
-      getValueOfAsset1InAsset2(to1e8BaseAmount(feeAmount), feeAssetPoolData, assetPoolData)
-    ),
-    // convert decimal back to sourceAssetDecimal
-    O.map((amount) => convertBaseAmountDecimal(amount, inAssetDecimal)),
-    O.getOrElse(() => baseAmount(0, inAssetDecimal))
-  )
-}
-
 export const calcRefundFee = (inboundFee: BaseAmount): BaseAmount => inboundFee.times(3)
 
 /**
@@ -224,17 +179,19 @@ export const minAmountToSwapMax1e8 = ({
 }): BaseAmount => {
   const { inFee, outFee } = swapFees
 
-  const inFeeInInboundAsset = priceFeeAmountForInAsset({
-    fee: inFee,
-    inAsset,
-    inAssetDecimal,
+  const inFeeInInboundAsset = priceFeeAmountForAsset({
+    feeAmount: inFee.amount,
+    feeAsset: inFee.asset,
+    asset: inAsset,
+    assetDecimal: inAssetDecimal,
     poolsData
   })
 
-  const outFeeInInboundAsset = priceFeeAmountForInAsset({
-    fee: outFee,
-    inAsset,
-    inAssetDecimal,
+  const outFeeInInboundAsset = priceFeeAmountForAsset({
+    feeAmount: outFee.amount,
+    feeAsset: outFee.asset,
+    asset: inAsset,
+    assetDecimal: inAssetDecimal,
     poolsData
   })
 

@@ -7,7 +7,7 @@ import {
   symDepositFees$,
   reloadAsymDepositFee,
   asymDepositFee$,
-  withdrawFee$,
+  symWithdrawFee$,
   reloadWithdrawFees,
   reloadSwapFees,
   swapFees$
@@ -34,7 +34,7 @@ export {
   symDepositFees$,
   reloadAsymDepositFee,
   asymDepositFee$,
-  withdrawFee$,
+  symWithdrawFee$,
   reloadWithdrawFees,
   symDepositTxMemo$,
   asymDepositTxMemo$,

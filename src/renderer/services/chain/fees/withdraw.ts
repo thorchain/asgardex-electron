@@ -1,4 +1,4 @@
-import { Asset } from '@xchainjs/xchain-util'
+import { Asset, AssetRuneNative } from '@xchainjs/xchain-util'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
 import * as RxOp from 'rxjs/operators'
@@ -10,7 +10,7 @@ import { liveData } from '../../../helpers/rx/liveData'
 import { observableState } from '../../../helpers/stateHelper'
 import { service as midgardService } from '../../midgard/service'
 import * as THOR from '../../thorchain'
-import { WithdrawFees, WithdrawFeesHandler } from '../types'
+import { SymWithdrawFees, SymWithdrawFeesHandler } from '../types'
 import { poolFee$ } from './common'
 
 const {
@@ -21,10 +21,15 @@ const {
  * Returns zero withdraw fees
  * by given asset to withdraw
  */
-const getZeroWithdrawFees = (asset: Asset): WithdrawFees => ({
-  asset,
-  inFee: ZERO_BASE_AMOUNT,
-  outFee: ZERO_BASE_AMOUNT
+const getZeroWithdrawFees = (asset: Asset): SymWithdrawFees => ({
+  rune: {
+    inFee: ZERO_BASE_AMOUNT,
+    outFee: ZERO_BASE_AMOUNT
+  },
+  asset: {
+    asset,
+    amount: ZERO_BASE_AMOUNT
+  }
 })
 
 // State to reload sym deposit fees
@@ -50,7 +55,7 @@ const reloadWithdrawFees = (asset: Asset) => {
   }
 }
 
-const withdrawFee$: WithdrawFeesHandler = (initialAsset) =>
+const symWithdrawFee$: SymWithdrawFeesHandler = (initialAsset) =>
   FP.pipe(
     reloadWithdrawFees$,
     RxOp.debounceTime(300),
@@ -63,20 +68,25 @@ const withdrawFee$: WithdrawFeesHandler = (initialAsset) =>
       )
 
       return FP.pipe(
-        poolFee$(asset),
-        liveData.map(({ asset: feeAsset, amount: feeAmount }) => ({
-          asset: feeAsset,
-          inFee: feeAmount,
+        liveData.sequenceS({
+          runeFee: poolFee$(AssetRuneNative),
+          assetFee: poolFee$(asset)
+        }),
+        liveData.map(({ runeFee, assetFee }) => ({
           // outbound fee is 3x inbound fee
           // see "ADD: Better Fees Handling #1381" (search for OutboundFee):
           // Check issue description
           // https://github.com/thorchain/asgardex-electron/issues/1381
           // and following comment
           // https://github.com/thorchain/asgardex-electron/issues/1381#issuecomment-827513798
-          outFee: feeAmount.times(3)
+          rune: { inFee: runeFee.amount, outFee: runeFee.amount.times(3) },
+          asset: {
+            asset: assetFee.asset,
+            amount: assetFee.amount.times(3)
+          }
         }))
       )
     })
   )
 
-export { reloadWithdrawFees, withdrawFee$, getZeroWithdrawFees }
+export { reloadWithdrawFees, symWithdrawFee$, getZeroWithdrawFees }

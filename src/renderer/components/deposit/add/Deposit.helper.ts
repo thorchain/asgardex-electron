@@ -1,6 +1,6 @@
 import * as RD from '@devexperts/remote-data-ts'
-import { getValueOfAsset1InAsset2, PoolData } from '@thorchain/asgardex-util'
-import { Asset, assetToString, baseAmount, BaseAmount } from '@xchainjs/xchain-util'
+import { PoolData } from '@thorchain/asgardex-util'
+import { Asset, baseAmount, BaseAmount } from '@xchainjs/xchain-util'
 import BigNumber from 'bignumber.js'
 import * as FP from 'fp-ts/function'
 import * as O from 'fp-ts/Option'
@@ -12,7 +12,7 @@ import {
   THORCHAIN_DECIMAL,
   to1e8BaseAmount
 } from '../../../helpers/assetHelper'
-import { sequenceTOption } from '../../../helpers/fpHelpers'
+import { priceFeeAmountForAsset } from '../../../services/chain/fees/utils'
 import { DepositAssetFees, DepositFees, SymDepositFeesRD } from '../../../services/chain/types'
 import { PoolsDataMap } from '../../../services/midgard/types'
 
@@ -141,36 +141,6 @@ export const getThorchainFees = (feesRD: SymDepositFeesRD): O.Option<DepositFees
     RD.toOption
   )
 
-export const priceFeeAmountForAsset = ({
-  feeAmount,
-  feeAsset,
-  asset,
-  assetDecimal,
-  poolsData
-}: {
-  feeAmount: BaseAmount
-  feeAsset: Asset
-  asset: Asset
-  assetDecimal: number
-  poolsData: PoolsDataMap
-}): BaseAmount => {
-  const oFeeAssetPoolData: O.Option<PoolData> = O.fromNullable(poolsData[assetToString(feeAsset)])
-  const oAssetPoolData: O.Option<PoolData> = O.fromNullable(poolsData[assetToString(asset)])
-
-  return FP.pipe(
-    sequenceTOption(oFeeAssetPoolData, oAssetPoolData),
-    O.map(([feeAssetPoolData, assetPoolData]) =>
-      // pool data are always 1e8 decimal based
-      // and we have to convert fees to 1e8, too
-      getValueOfAsset1InAsset2(to1e8BaseAmount(feeAmount), feeAssetPoolData, assetPoolData)
-    ),
-    // convert decimal back to sourceAssetDecimal
-    O.map((amount) => convertBaseAmountDecimal(amount, feeAmount.decimal)),
-    O.map((amount) => convertBaseAmountDecimal(amount, assetDecimal)),
-    O.getOrElse(() => baseAmount(0, assetDecimal))
-  )
-}
-
 export const minAssetAmountToDepositMax1e8 = ({
   fees,
   asset,
@@ -239,9 +209,7 @@ export const minRuneAmountToDeposit = ({ inFee, outFee, refundFee }: DepositFees
   return FP.pipe(
     // Over-estimate fee by 50%
     1.5,
-    feeToCover.times,
-    // transform decimal to be `max1e8`
-    max1e8BaseAmount
+    feeToCover.times
   )
 }
 
