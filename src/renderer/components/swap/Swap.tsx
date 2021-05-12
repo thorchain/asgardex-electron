@@ -324,10 +324,6 @@ export const Swap = ({
         prevApproveParams.current = O.some(params)
         return params
       }),
-      O.map((params) => {
-        console.log('oApproveParams:', params)
-        return params
-      }),
       // Trigger update for `approveFeesRD`
       O.map(approveFeesParamsUpdated)
     )
@@ -870,7 +866,6 @@ export const Swap = ({
     )
     const oTokenAddress: O.Option<string> = getEthTokenAddress(sourceAssetProp)
 
-    console.log('oNeedApprovement:', oNeedApprovement)
     // check approve status
     FP.pipe(
       sequenceTOption(oNeedApprovement, oRouterAddress, oTokenAddress),
@@ -907,29 +902,6 @@ export const Swap = ({
     resetSwapState,
     setAmountToSwapMax1e8
   ])
-
-  // const prevRouterAddress = useRef<O.Option<Address>>(O.none)
-
-  // // Run `checkApprovedStatus` whenever `oPoolAddress` has been changed
-  // useEffect(() => {
-  //   FP.pipe(
-  //     oPoolAddress,
-  //     O.chain(({ router }) => router),
-  //     // Do nothing if prev. and current router a the same
-  //     O.filter((router) => !eqOString.equals(O.some(router), prevRouterAddress.current)),
-  //     // update ref
-  //     O.map((router) => {
-  //       prevRouterAddress.current = O.some(router)
-  //       return router
-  //     }),
-  //     O.map((params) => {
-  //       console.log('oPoolAddress:', params)
-  //       return params
-  //     }),
-  //     // check allowance status
-  //     O.map(checkApprovedStatus)
-  //   )
-  // }, [checkApprovedStatus, oPoolAddress])
 
   /**
    * Callback whenever assets have been changed
