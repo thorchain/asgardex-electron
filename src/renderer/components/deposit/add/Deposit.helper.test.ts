@@ -190,14 +190,6 @@ describe('deposit/Deposit.helper', () => {
 
       // Prices
       // 1 BNB = 600 BUSD or 1 BUSD = 0,001666667 BNB
-      // Formula:
-      // 1.5 * (inboundFeeInBUSD + outboundFeeInBUSD)
-      // = 1.5 * (0.0001 * 600 + 0.0003 * 600)
-      // = 1.5 * (0.06 + 0,18) = 1.5 * 0.24
-      // = 0.36
-
-      // Prices
-      // 1 BNB = 600 BUSD or 1 BUSD = 0,001666667 BNB
       //
       // Formula (success):
       // inboundFeeInBUSD + outboundFeeInBUSD
