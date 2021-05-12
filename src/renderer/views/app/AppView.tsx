@@ -48,13 +48,13 @@ export const AppView: React.FC = (): JSX.Element => {
         rdAltOnPending(() => prevHaltedInboundAddresses.current),
         RD.toOption,
         O.chain(NEA.fromArray),
-        O.map((chains) => {
-          const message =
-            chains.length === 1
-              ? intl.formatMessage({ id: 'pools.halted.chain' }, { chain: chains[0] })
-              : intl.formatMessage({ id: 'pools.halted.chains' }, { chains: chains.join(', ') })
-          return <Styled.Alert key={'halted warning'} type="warning" message={message} />
-        }),
+        O.map((chains) => (
+          <Styled.Alert
+            key={'halted warning'}
+            type="warning"
+            message={intl.formatMessage({ id: 'pools.halted.chain' }, { chain: chains.join(', ') })}
+          />
+        )),
         O.getOrElse(() => <></>)
       ),
     [haltedChains, intl]
