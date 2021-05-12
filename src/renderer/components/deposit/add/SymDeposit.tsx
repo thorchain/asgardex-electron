@@ -267,13 +267,35 @@ export const SymDeposit: React.FC<Props> = (props) => {
     reloadFees(asset)
   }, [asset, reloadFees])
 
-  const approveFees$ = useMemo(() => approveFee$, [approveFee$])
+  const prevApproveFee = useRef<O.Option<BaseAmount>>(O.none)
 
-  const [approveFeesRD, approveFeesParamsUpdated] = useObservableState<FeeRD, ApproveParams>((approveFeeParam$) => {
-    return approveFeeParam$.pipe(RxOp.switchMap(approveFees$))
+  const [approveFeeRD, approveFeesParamsUpdated] = useObservableState<FeeRD, ApproveParams>((approveFeeParam$) => {
+    return approveFeeParam$.pipe(
+      RxOp.switchMap((params) =>
+        FP.pipe(
+          approveFee$(params),
+          liveData.map((fee) => {
+            // store every successfully loaded fees
+            prevApproveFee.current = O.some(fee)
+            return fee
+          })
+        )
+      )
+    )
   }, RD.initial)
 
   const prevApproveParams = useRef<O.Option<ApproveParams>>(O.none)
+
+  const approveFee: BaseAmount = useMemo(
+    () =>
+      FP.pipe(
+        approveFeeRD,
+        RD.toOption,
+        O.alt(() => prevApproveFee.current),
+        O.getOrElse(() => ZERO_BASE_AMOUNT)
+      ),
+    [approveFeeRD]
+  )
 
   // Update `approveFeesRD` whenever `oApproveParams` has been changed
   useEffect(() => {
@@ -588,7 +610,7 @@ export const SymDeposit: React.FC<Props> = (props) => {
     if (!isAssetChainFeeError || isBalanceError /* Don't render anything in case of fees or balance errors */)
       return <></>
 
-    return renderFeeError(Helper.minBalanceToDeposit(depositFees.asset), chainAssetBalance, asset)
+    return renderFeeError(Helper.minBalanceToDeposit(depositFees.asset), chainAssetBalance, getChainAsset(asset.chain))
   }, [isAssetChainFeeError, isBalanceError, renderFeeError, depositFees.asset, chainAssetBalance, asset])
 
   const txModalExtraContent = useMemo(() => {
@@ -745,6 +767,11 @@ export const SymDeposit: React.FC<Props> = (props) => {
     [oFundsCap]
   )
 
+  const inputOnBlur = useCallback(() => {
+    setSelectedInput('none')
+    reloadFeesHandler()
+  }, [reloadFeesHandler])
+
   const uiFeesRD: UIFeesRD = useMemo(
     () =>
       FP.pipe(
@@ -757,19 +784,47 @@ export const SymDeposit: React.FC<Props> = (props) => {
     [depositFeesRD, asset]
   )
 
-  const approveFees: UIFeesRD = useMemo(
+  const needApprovement = useMemo(() => {
+    // Other chains than ETH do not need an approvement
+    if (!isEthChain(asset.chain)) return false
+    // ETH does not need to be approved
+    if (isEthAsset(asset)) return false
+    // ERC20 token does need approvement only
+    return isEthTokenAsset(asset)
+  }, [asset])
+
+  const uiApproveFeesRD: UIFeesRD = useMemo(
     () =>
       FP.pipe(
-        approveFeesRD,
+        approveFeeRD,
         RD.map((approveFee) => [{ asset: getChainAsset(asset.chain), amount: approveFee }])
       ),
-    [approveFeesRD, asset.chain]
+    [approveFeeRD, asset.chain]
   )
 
-  const inputOnBlur = useCallback(() => {
-    setSelectedInput('none')
-    reloadFeesHandler()
-  }, [reloadFeesHandler])
+  const isApproveFeeError = useMemo(() => {
+    // ignore error check if we don't need to check allowance
+    if (!needApprovement) return false
+
+    return FP.pipe(
+      oChainAssetBalance,
+      O.fold(
+        () => true,
+        (balance) => FP.pipe(approveFee, balance.lt)
+      )
+    )
+  }, [needApprovement, oChainAssetBalance, approveFee])
+
+  const renderApproveFeeError = useMemo(() => {
+    if (
+      !isApproveFeeError ||
+      // Don't render anything if chainAssetBalance is not available (still loading)
+      O.isNone(oChainAssetBalance)
+    )
+      return <></>
+
+    return renderFeeError(approveFee, chainAssetBalance, getChainAsset(asset.chain))
+  }, [isApproveFeeError, oChainAssetBalance, renderFeeError, approveFee, chainAssetBalance, asset.chain])
 
   const {
     state: approveState,
@@ -816,15 +871,6 @@ export const SymDeposit: React.FC<Props> = (props) => {
     reset: resetIsApprovedState,
     subscribe: subscribeIsApprovedState
   } = useSubscriptionState<IsApprovedRD>(RD.success(true))
-
-  const needApprovement = useMemo(() => {
-    // Other chains than ETH do not need an approvement
-    if (!isEthChain(asset.chain)) return false
-    // ETH does not need to be approved
-    if (isEthAsset(asset)) return false
-    // ERC20 token does need approvement only
-    return isEthTokenAsset(asset)
-  }, [asset])
 
   const isApproved = useMemo(
     () =>
@@ -1040,10 +1086,12 @@ export const SymDeposit: React.FC<Props> = (props) => {
             sizevalue="xnormal"
             onClick={onApprove}
             loading={RD.isPending(approveState)}
-            color="warning">
+            color="warning"
+            disabled={isApproveFeeError}>
             {intl.formatMessage({ id: 'common.approve' })}
           </Styled.SubmitButton>
-          {!RD.isInitial(approveFees) && <Fees fees={approveFees} reloadFees={reloadApproveFeesHandler} />}
+          {!RD.isInitial(uiApproveFeesRD) && <Fees fees={uiApproveFeesRD} reloadFees={reloadApproveFeesHandler} />}
+          {renderApproveFeeError}
           {renderApproveError}
         </Styled.SubmitContainer>
       )}
