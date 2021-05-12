@@ -40,7 +40,7 @@ export const PoolTitle: React.FC<Props> = ({ asset: oAsset, price, priceSymbol, 
     [oAsset]
   )
 
-  const isChainHalted = useMemo(
+  const disableButton = useMemo(
     () =>
       FP.pipe(
         oAsset,
@@ -73,13 +73,13 @@ export const PoolTitle: React.FC<Props> = ({ asset: oAsset, price, priceSymbol, 
             return (
               <Styled.ButtonActions>
                 <ManageButton
-                  disabled={isChainHalted}
+                  disabled={disableButton}
                   asset={asset}
                   sizevalue={isDesktopView ? 'normal' : 'small'}
                   isTextView={isDesktopView}
                 />
                 <Button
-                  disabled={isChainHalted}
+                  disabled={disableButton}
                   round="true"
                   sizevalue={isDesktopView ? 'normal' : 'small'}
                   style={{ height: 30 }}
@@ -98,7 +98,7 @@ export const PoolTitle: React.FC<Props> = ({ asset: oAsset, price, priceSymbol, 
           }
         )
       ),
-    [history, intl, isDesktopView, oAsset, isChainHalted]
+    [history, intl, isDesktopView, oAsset, disableButton]
   )
 
   return (
