@@ -8,7 +8,8 @@ const pools: PoolsMessages = {
   'pools.blocksleft': 'Verbleibende Blocks',
   'pools.trades': 'Trades',
   'pools.pending': 'Bevorstehende',
-  'pools.available': 'Verfügbare'
+  'pools.available': 'Verfügbare',
+  'pools.halted.chain': 'Der Handel in Pools von {chain} Chain(s) ist gestoppt aufgrund von Wartungsarbeiten.'
 }
 
 export default pools

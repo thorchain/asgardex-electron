@@ -1,8 +1,10 @@
-import React, { useMemo } from 'react'
+import React, { useMemo, useRef } from 'react'
 
 import { SyncOutlined } from '@ant-design/icons'
 import * as RD from '@devexperts/remote-data-ts'
-import * as FP from 'fp-ts/lib/function'
+import * as FP from 'fp-ts/function'
+import * as NEA from 'fp-ts/NonEmptyArray'
+import * as O from 'fp-ts/Option'
 import { useObservableState } from 'observable-hooks'
 import { useIntl } from 'react-intl'
 
@@ -11,6 +13,8 @@ import { Header } from '../../components/header'
 import { Button } from '../../components/uielements/button'
 import { useMidgardContext } from '../../contexts/MidgardContext'
 import { envOrDefault } from '../../helpers/envHelper'
+import { rdAltOnPending } from '../../helpers/fpHelpers'
+import { HaltedChainsRD } from '../../services/midgard/types'
 import { View } from '../View'
 import { ViewRoutes } from '../ViewRoutes'
 import { AppUpdateView } from './AppUpdateView'
@@ -20,10 +24,41 @@ export const AppView: React.FC = (): JSX.Element => {
   const intl = useIntl()
 
   const {
-    service: { apiEndpoint$, reloadApiEndpoint }
+    service: {
+      apiEndpoint$,
+      reloadApiEndpoint,
+      pools: { haltedChains$ }
+    }
   } = useMidgardContext()
 
   const apiEndpoint = useObservableState(apiEndpoint$, RD.initial)
+
+  const haltedChains = useObservableState(haltedChains$, RD.initial)
+
+  const prevHaltedChains = useRef<HaltedChainsRD>(RD.initial)
+
+  const renderHaltedChainsWarning = useMemo(
+    () =>
+      FP.pipe(
+        haltedChains,
+        RD.map((chains) => {
+          prevHaltedChains.current = RD.success(chains)
+          return chains
+        }),
+        rdAltOnPending(() => prevHaltedChains.current),
+        RD.toOption,
+        O.chain(NEA.fromArray),
+        O.map((chains) => (
+          <Styled.Alert
+            key={'halted warning'}
+            type="warning"
+            message={intl.formatMessage({ id: 'pools.halted.chain' }, { chain: chains.join(', ') })}
+          />
+        )),
+        O.getOrElse(() => <></>)
+      ),
+    [haltedChains, intl]
+  )
 
   const renderMidgardAlert = useMemo(() => {
     const description = (
@@ -63,6 +98,7 @@ export const AppView: React.FC = (): JSX.Element => {
 
         <View>
           {renderMidgardError}
+          {renderHaltedChainsWarning}
           <ViewRoutes />
         </View>
         <Footer commitHash={envOrDefault($COMMIT_HASH, '')} isDev={$IS_DEV} />

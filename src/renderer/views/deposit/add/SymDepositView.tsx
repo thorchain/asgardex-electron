@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useMemo } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
-import { Asset, AssetRuneNative, assetToString, BaseAmount, bn, THORChain } from '@xchainjs/xchain-util'
+import { Asset, AssetRuneNative, assetToString, BaseAmount, bn, Chain, THORChain } from '@xchainjs/xchain-util'
 import BigNumber from 'bignumber.js'
 import * as FP from 'fp-ts/function'
 import * as O from 'fp-ts/lib/Option'
@@ -38,10 +38,11 @@ import { WalletBalances } from '../../../types/wallet'
 type Props = {
   asset: AssetWithDecimal
   poolDetail: PoolDetailRD
+  haltedChains: Chain[]
 }
 
 export const SymDepositView: React.FC<Props> = (props) => {
-  const { asset: assetWD, poolDetail: poolDetailRD } = props
+  const { asset: assetWD, poolDetail: poolDetailRD, haltedChains } = props
   const { asset } = assetWD
   const history = useHistory()
   const intl = useIntl()
@@ -198,6 +199,7 @@ export const SymDepositView: React.FC<Props> = (props) => {
           <Alert type="error" message={intl.formatMessage({ id: 'common.error' })} description={error.toString()} />
         )}
         <SymDeposit
+          haltedChains={haltedChains}
           validatePassword$={validatePassword$}
           viewRuneTx={viewRuneTx}
           viewAssetTx={viewAssetTx}
@@ -245,7 +247,8 @@ export const SymDepositView: React.FC<Props> = (props) => {
       symDeposit$,
       network,
       approveERC20Token$,
-      isApprovedERC20Token$
+      isApprovedERC20Token$,
+      haltedChains
     ]
   )
 
@@ -263,38 +266,37 @@ export const SymDepositView: React.FC<Props> = (props) => {
         )
 
         return (
-          <>
-            <SymDeposit
-              validatePassword$={validatePassword$}
-              viewRuneTx={viewRuneTx}
-              viewAssetTx={viewAssetTx}
-              poolData={toPoolData(poolDetail)}
-              onChangeAsset={onChangeAsset}
-              asset={assetWD}
-              assetPrice={assetPrice}
-              runePrice={runPrice}
-              assetBalance={assetBalance}
-              runeBalance={runeBalance}
-              chainAssetBalance={chainAssetBalance}
-              poolAddress={oPoolAddress}
-              memos={depositTxMemo}
-              fees$={symDepositFees$}
-              reloadFees={reloadSymDepositFees}
-              approveFee$={approveFee$}
-              reloadApproveFee={reloadApproveFee}
-              priceAsset={selectedPricePoolAsset}
-              reloadBalances={reloadBalances}
-              reloadShares={reloadShares}
-              reloadSelectedPoolDetail={reloadSelectedPoolDetail}
-              balances={filteredBalances}
-              deposit$={symDeposit$}
-              network={network}
-              approveERC20Token$={approveERC20Token$}
-              isApprovedERC20Token$={isApprovedERC20Token$}
-              fundsCap={fundsCap}
-              poolsData={poolsData}
-            />
-          </>
+          <SymDeposit
+            haltedChains={haltedChains}
+            validatePassword$={validatePassword$}
+            viewRuneTx={viewRuneTx}
+            viewAssetTx={viewAssetTx}
+            poolData={toPoolData(poolDetail)}
+            onChangeAsset={onChangeAsset}
+            asset={assetWD}
+            assetPrice={assetPrice}
+            runePrice={runPrice}
+            assetBalance={assetBalance}
+            runeBalance={runeBalance}
+            chainAssetBalance={chainAssetBalance}
+            poolAddress={oPoolAddress}
+            memos={depositTxMemo}
+            fees$={symDepositFees$}
+            reloadFees={reloadSymDepositFees}
+            approveFee$={approveFee$}
+            reloadApproveFee={reloadApproveFee}
+            priceAsset={selectedPricePoolAsset}
+            reloadBalances={reloadBalances}
+            reloadShares={reloadShares}
+            reloadSelectedPoolDetail={reloadSelectedPoolDetail}
+            balances={filteredBalances}
+            deposit$={symDeposit$}
+            network={network}
+            approveERC20Token$={approveERC20Token$}
+            isApprovedERC20Token$={isApprovedERC20Token$}
+            fundsCap={fundsCap}
+            poolsData={poolsData}
+          />
         )
       }
     )

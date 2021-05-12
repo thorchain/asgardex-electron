@@ -21,20 +21,20 @@ import { Table } from '../../components/uielements/table'
 import { useAppContext } from '../../contexts/AppContext'
 import { useMidgardContext } from '../../contexts/MidgardContext'
 import { ordBaseAmount } from '../../helpers/fp/ord'
-import { getPoolTableRowsData, RUNE_PRICE_POOL } from '../../helpers/poolHelper'
+import * as PoolHelpers from '../../helpers/poolHelper'
 import { useFundsCap } from '../../hooks/useFundsCap'
 import * as poolsRoutes from '../../routes/pools'
 import { SwapRouteParams } from '../../routes/pools/swap'
 import { DEFAULT_NETWORK } from '../../services/const'
 import { PoolFilter, PoolsState } from '../../services/midgard/types'
-import { PoolTableRowData, PoolTableRowsData } from './Pools.types'
+import { PoolsComponentProps, PoolTableRowData, PoolTableRowsData } from './Pools.types'
 import { filterTableData } from './Pools.utils'
 import * as Shared from './PoolsOverview.shared'
 import * as Styled from './PoolsOverview.style'
 
 const POOLS_KEY = 'active'
 
-export const ActivePools: React.FC = (): JSX.Element => {
+export const ActivePools: React.FC<PoolsComponentProps> = ({ haltedChains }): JSX.Element => {
   const history = useHistory()
   const intl = useIntl()
 
@@ -69,7 +69,7 @@ export const ActivePools: React.FC = (): JSX.Element => {
     reloadFundsCap()
   }, [reloadPools, reloadFundsCap])
 
-  const selectedPricePool = useObservableState(selectedPricePool$, RUNE_PRICE_POOL)
+  const selectedPricePool = useObservableState(selectedPricePool$, PoolHelpers.RUNE_PRICE_POOL)
 
   const getSwapPath = poolsRoutes.swap.path
   const clickSwapHandler = useCallback(
@@ -79,13 +79,21 @@ export const ActivePools: React.FC = (): JSX.Element => {
     [getSwapPath, history]
   )
 
+  const isChainHalted = useMemo(() => PoolHelpers.isChainHalted(haltedChains), [haltedChains])
+
   const renderBtnPoolsColumn = useCallback(
     (_: string, { pool }: PoolTableRowData) => (
       <Styled.TableAction>
-        <ManageButton asset={pool.target} sizevalue={isDesktopView ? 'normal' : 'small'} isTextView={isDesktopView} />
+        <ManageButton
+          disabled={isChainHalted(pool.target.chain)}
+          asset={pool.target}
+          sizevalue={isDesktopView ? 'normal' : 'small'}
+          isTextView={isDesktopView}
+        />
         <Button
           round="true"
           sizevalue={isDesktopView ? 'normal' : 'small'}
+          disabled={isChainHalted(pool.target.chain)}
           style={{ height: 30 }}
           onClick={(event) => {
             event.preventDefault()
@@ -98,7 +106,7 @@ export const ActivePools: React.FC = (): JSX.Element => {
       </Styled.TableAction>
     ),
 
-    [clickSwapHandler, intl, isDesktopView]
+    [clickSwapHandler, intl, isDesktopView, isChainHalted]
   )
 
   const btnPoolsColumn = useMemo(
@@ -208,7 +216,7 @@ export const ActivePools: React.FC = (): JSX.Element => {
         Shared.renderTableError(intl.formatMessage({ id: 'common.refresh' }), refreshHandler),
         // success state
         ({ poolDetails }: PoolsState): JSX.Element => {
-          const poolViewData = getPoolTableRowsData({
+          const poolViewData = PoolHelpers.getPoolTableRowsData({
             poolDetails,
             pricePoolData: selectedPricePool.poolData,
             network

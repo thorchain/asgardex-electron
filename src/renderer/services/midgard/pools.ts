@@ -12,7 +12,7 @@ import * as RxOp from 'rxjs/operators'
 import { ONE_BN, PRICE_POOLS_WHITELIST } from '../../const'
 import { isPricePoolAsset, midgardAssetFromString } from '../../helpers/assetHelper'
 import { isEnabledChain } from '../../helpers/chainHelper'
-import { eqAsset, eqOAsset, eqOPoolAddresses } from '../../helpers/fp/eq'
+import { eqAsset, eqOAsset, eqOPoolAddresses, eqHaltedChain } from '../../helpers/fp/eq'
 import { sequenceTOption } from '../../helpers/fpHelpers'
 import { LiveData, liveData } from '../../helpers/rx/liveData'
 import { observableState, triggerStream, TriggerStream$ } from '../../helpers/stateHelper'
@@ -60,7 +60,8 @@ import {
   PoolAddresses,
   InboundAddresses,
   GasRateLD,
-  PoolsState
+  PoolsState,
+  HaltedChainsLD
 } from './types'
 import {
   getPoolAddressesByChain,
@@ -462,6 +463,7 @@ const createPoolsService = (
           liveData.map(
             FP.flow(A.filterMap(({ chain, ...rest }) => (isChain(chain) ? O.some({ chain, ...rest }) : O.none)))
           ),
+
           RxOp.catchError((e: Error) => Rx.of(RD.failure(e))),
           RxOp.startWith(RD.pending)
         )
@@ -484,6 +486,11 @@ const createPoolsService = (
     RxOp.debounceTime(300),
     RxOp.switchMap((_) => loadInboundAddresses$()),
     RxOp.shareReplay(1)
+  )
+
+  const haltedChains$: HaltedChainsLD = FP.pipe(
+    inboundAddressesShared$,
+    liveData.map(A.filterMap((inboundAddress) => (inboundAddress.halted ? O.some(inboundAddress.chain) : O.none)))
   )
 
   /**
@@ -566,22 +573,38 @@ const createPoolsService = (
   /**
    * Validates pool address
    *
-   * @param poolAddresses Pool address to validate
+   * @param poolAddress Pool address to validate
    * @param chain Chain of pool to validate
    */
-  const validatePool$ = (poolAddresses: PoolAddress, chain: Chain): ValidatePoolLD =>
+  const validatePool$ = (poolAddress: PoolAddress, chain: Chain): ValidatePoolLD =>
     FP.pipe(
       poolAddresses$(),
+      liveData.chain(
+        (poolAddresses): PoolAddressesLD =>
+          FP.pipe(
+            poolAddresses,
+            liveData.fromPredicate(
+              (addresses) =>
+                FP.pipe(
+                  addresses,
+                  A.map(({ chain, halted }) => ({ chain, halted })),
+                  // Valid chains only that ones which are NOT included to the halted array
+                  FP.not(A.elem(eqHaltedChain)({ chain, halted: true }))
+                ),
+              () => new Error(`Trading for pools on ${chain} chain(s) is halted for maintenance.`)
+            )
+          )
+      ),
       liveData.map((addresses) => getPoolAddressesByChain(addresses, chain)),
       liveData.chain((oAddresses) =>
-        eqOPoolAddresses.equals(oAddresses, O.some(poolAddresses))
+        eqOPoolAddresses.equals(oAddresses, O.some(poolAddress))
           ? Rx.of(RD.success(true))
           : // TODO (@veado) Add i18n
             Rx.of(
               RD.failure(
                 Error(
-                  `Pool address ${poolAddresses.address} ${FP.pipe(
-                    poolAddresses.router,
+                  `Pool address ${poolAddress.address} ${FP.pipe(
+                    poolAddress.router,
                     O.map((poolAddress) => `and/or router address ${poolAddress} are not available`),
                     O.getOrElse(() => 'is not available')
                   )}`
@@ -870,7 +893,8 @@ const createPoolsService = (
     poolsFilters$,
     setPoolsFilter,
     gasRateByChain$,
-    reloadGasRates
+    reloadGasRates,
+    haltedChains$
   }
 }
 

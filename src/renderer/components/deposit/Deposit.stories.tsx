@@ -14,6 +14,7 @@ import { Default as AsymWidthdraw } from './withdraw/AsymWithdraw.stories'
 import { Default as Withdraw } from './withdraw/Withdraw.stories'
 
 const defaultProps: DepositProps = {
+  haltedChains: [],
   asset: { asset: AssetBNB, decimal: BNB_DECIMAL },
   poolDetail: RD.initial,
   shares: RD.success([

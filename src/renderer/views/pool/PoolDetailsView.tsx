@@ -1,9 +1,9 @@
 import React, { useCallback, useEffect, useMemo, useRef } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
-import { assetFromString } from '@xchainjs/xchain-util'
+import { assetFromString, Chain } from '@xchainjs/xchain-util'
+import * as FP from 'fp-ts/function'
 import * as O from 'fp-ts/Option'
-import * as FP from 'fp-ts/pipeable'
 import { useObservableState } from 'observable-hooks'
 import { useIntl } from 'react-intl'
 import { useParams } from 'react-router-dom'
@@ -41,7 +41,8 @@ export const PoolDetailsView: React.FC = () => {
         selectedPricePoolAssetSymbol$,
         poolStatsDetail$,
         poolEarningHistory$,
-        reloadSelectedPoolDetail
+        reloadSelectedPoolDetail,
+        haltedChains$
       },
       poolActionsHistory: { reloadActionsHistory, actions$ },
       setSelectedPoolAsset
@@ -51,6 +52,8 @@ export const PoolDetailsView: React.FC = () => {
   const intl = useIntl()
 
   const { asset } = useParams<PoolDetailRouteParams>()
+
+  const [haltedChains] = useObservableState(() => FP.pipe(haltedChains$, RxOp.map(RD.getOrElse((): Chain[] => []))), [])
 
   const oRouteAsset = useMemo(() => O.fromNullable(assetFromString(asset.toUpperCase())), [asset])
 
@@ -100,8 +103,8 @@ export const PoolDetailsView: React.FC = () => {
             FP.pipe(
               RD.combine(poolDetailRD, poolStatsDetailRD, poolEarningHistoryRD),
               RD.fold(
-                () => <PoolDetails asset={asset} {...defaultDetailsProps} />,
-                () => <PoolDetails asset={asset} {...prevProps.current} isLoading />,
+                () => <PoolDetails haltedChains={haltedChains} asset={asset} {...defaultDetailsProps} />,
+                () => <PoolDetails haltedChains={haltedChains} asset={asset} {...prevProps.current} isLoading />,
                 ({ message }: Error) => {
                   return <ErrorView title={message} />
                 },
@@ -116,7 +119,7 @@ export const PoolDetailsView: React.FC = () => {
                     ChartView: PoolChartView
                   }
 
-                  return <PoolDetails asset={asset} {...prevProps.current} />
+                  return <PoolDetails haltedChains={haltedChains} asset={asset} {...prevProps.current} />
                 }
               )
             )

@@ -3,6 +3,7 @@ import { Balance, Balances } from '@xchainjs/xchain-client'
 import { Asset, AssetAmount, BaseAmount, Chain } from '@xchainjs/xchain-util'
 import BigNumber from 'bignumber.js'
 import * as A from 'fp-ts/lib/Array'
+import * as B from 'fp-ts/lib/boolean'
 import * as Eq from 'fp-ts/lib/Eq'
 import * as N from 'fp-ts/lib/number'
 import * as O from 'fp-ts/lib/Option'
@@ -16,6 +17,8 @@ import { AssetWithAmount } from '../../types/asgardex'
 import { WalletBalance } from '../../types/wallet'
 
 const eqString = S.Eq
+
+const eqBoolean = B.Eq
 
 export const eqOString = O.getEq(eqString)
 
@@ -110,7 +113,8 @@ export const eqPoolShares = A.getEq(eqPoolShare)
 export const eqPoolAddresses = Eq.struct<PoolAddress>({
   chain: eqChain,
   address: eqString,
-  router: eqOString
+  router: eqOString,
+  halted: eqBoolean
 })
 
 export const eqOPoolAddresses = O.getEq(eqPoolAddresses)
@@ -146,3 +150,8 @@ export const eqDepositAssetFees = Eq.struct<DepositAssetFees>({
 })
 
 export const eqODepositAssetFees = O.getEq(eqDepositAssetFees)
+
+export const eqHaltedChain = Eq.struct({
+  chain: eqChain,
+  halted: eqBoolean
+})

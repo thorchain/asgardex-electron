@@ -5,6 +5,7 @@ import {
   AssetRuneNative,
   baseAmount,
   baseToAsset,
+  Chain,
   formatAssetAmountCurrency,
   formatBN
 } from '@xchainjs/xchain-util'
@@ -14,6 +15,7 @@ import * as FP from 'fp-ts/lib/function'
 import { useIntl } from 'react-intl'
 
 import { Network } from '../../../shared/api/types'
+import * as PoolHelpers from '../../helpers/poolHelper'
 import { AssetIcon } from '../uielements/assets/assetIcon'
 import { AssetLabel } from '../uielements/assets/assetLabel'
 import { Label } from '../uielements/label'
@@ -26,9 +28,10 @@ export type Props = {
   priceAsset: Asset | undefined
   network: Network
   goToStakeInfo: FP.Lazy<void>
+  haltedChains: Chain[]
 }
 
-export const PoolShares: React.FC<Props> = ({ data, priceAsset, goToStakeInfo, loading, network }) => {
+export const PoolShares: React.FC<Props> = ({ data, priceAsset, goToStakeInfo, loading, network, haltedChains }) => {
   const intl = useIntl()
 
   const isDesktopView = Grid.useBreakpoint()?.lg ?? false
@@ -117,13 +120,17 @@ export const PoolShares: React.FC<Props> = ({ data, priceAsset, goToStakeInfo, l
     []
   )
 
+  const isChainHalted = useMemo(() => PoolHelpers.isChainHalted(haltedChains), [haltedChains])
+
   const manageColumn: ColumnType<PoolShareTableRowData> = useMemo(
     () => ({
       title: '',
       align: 'right',
-      render: ({ asset }: PoolShareTableRowData) => <Styled.ManageButton asset={asset} isTextView={isDesktopView} />
+      render: ({ asset }: PoolShareTableRowData) => (
+        <Styled.ManageButton disabled={isChainHalted(asset.chain)} asset={asset} isTextView={isDesktopView} />
+      )
     }),
-    [isDesktopView]
+    [isDesktopView, isChainHalted]
   )
 
   const desktopColumns: ColumnsType<PoolShareTableRowData> = useMemo(

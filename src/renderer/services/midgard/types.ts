@@ -105,6 +105,9 @@ export type InboundAddress = Omit<InboundAddressesItem, 'chain'> & { chain: Chai
 export type InboundAddresses = InboundAddress[]
 export type InboundAddressesLD = LiveData<Error, InboundAddresses>
 
+export type HaltedChainsRD = RD.RemoteData<Error, Chain[]>
+export type HaltedChainsLD = LiveData<Error, Chain[]>
+
 export type GasRate = BigNumber
 export type GasRateLD = LiveData<Error, GasRate>
 /**
@@ -119,6 +122,7 @@ export type PoolAddress = {
   address: Address
   /** router address (optional) */
   router: O.Option<Address>
+  halted: boolean
 }
 export type PoolAddress$ = Rx.Observable<O.Option<PoolAddress>>
 export type PoolAddressRD = RD.RemoteData<Error, PoolAddress>
@@ -201,6 +205,7 @@ export type PoolsService = {
   setPoolsFilter: (poolKey: string, filter: O.Option<PoolFilter>) => void
   gasRateByChain$: (chain: Chain) => GasRateLD
   reloadGasRates: FP.Lazy<void>
+  haltedChains$: HaltedChainsLD
 }
 
 export type PoolShareType = DepositType | 'all'

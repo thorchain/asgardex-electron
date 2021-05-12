@@ -2,7 +2,7 @@ import React, { useCallback, useMemo, useRef, useEffect } from 'react'
 
 import { SyncOutlined } from '@ant-design/icons'
 import * as RD from '@devexperts/remote-data-ts'
-import { Asset } from '@xchainjs/xchain-util'
+import { Asset, Chain } from '@xchainjs/xchain-util'
 import * as A from 'fp-ts/Array'
 import * as FP from 'fp-ts/function'
 import * as O from 'fp-ts/Option'
@@ -35,7 +35,7 @@ export const PoolShareView: React.FC = (): JSX.Element => {
   const {
     // TODO (@asgardex-team) Improve loading of pool details - no need to load all data
     // @see https://github.com/thorchain/asgardex-electron/issues/1205
-    pools: { allPoolDetails$, selectedPricePool$, selectedPricePoolAsset$, reloadAllPools },
+    pools: { allPoolDetails$, selectedPricePool$, selectedPricePoolAsset$, reloadAllPools, haltedChains$ },
     reloadNetworkInfo,
     shares: { combineSharesByAddresses$ }
   } = midgardService
@@ -76,6 +76,7 @@ export const PoolShareView: React.FC = (): JSX.Element => {
     RD.initial
   )
 
+  const [haltedChains] = useObservableState(() => FP.pipe(haltedChains$, RxOp.map(RD.getOrElse((): Chain[] => []))), [])
   const poolDetailsRD = useObservableState(allPoolDetails$, RD.pending)
   const { poolData: pricePoolData } = useObservableState(selectedPricePool$, RUNE_PRICE_POOL)
   const oPriceAsset = useObservableState<O.Option<Asset>>(selectedPricePoolAsset$, O.none)
@@ -93,6 +94,7 @@ export const PoolShareView: React.FC = (): JSX.Element => {
       previousPoolShares.current = O.some(data)
       return (
         <PoolSharesTable
+          haltedChains={haltedChains}
           loading={loading}
           data={data}
           priceAsset={priceAsset}
@@ -101,7 +103,7 @@ export const PoolShareView: React.FC = (): JSX.Element => {
         />
       )
     },
-    [goToStakeInfo, priceAsset, network]
+    [goToStakeInfo, priceAsset, network, haltedChains]
   )
 
   const clickRefreshHandler = useCallback(() => {

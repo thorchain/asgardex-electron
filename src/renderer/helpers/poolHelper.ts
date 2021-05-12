@@ -1,6 +1,6 @@
 import { getValueOfAsset1InAsset2, getValueOfRuneInAsset, PoolData } from '@thorchain/asgardex-util'
 import { Balance } from '@xchainjs/xchain-client'
-import { bnOrZero, assetFromString, AssetRuneNative, BaseAmount } from '@xchainjs/xchain-util'
+import { bnOrZero, assetFromString, AssetRuneNative, BaseAmount, Chain } from '@xchainjs/xchain-util'
 import BigNumber from 'bignumber.js'
 import * as A from 'fp-ts/lib/Array'
 import * as Eq from 'fp-ts/lib/Eq'
@@ -16,6 +16,7 @@ import { PoolDetail } from '../types/generated/midgard'
 import { PoolTableRowData, PoolTableRowsData, PricePool } from '../views/pools/Pools.types'
 import { getPoolTableRowData } from '../views/pools/Pools.utils'
 import { isRuneNativeAsset } from './assetHelper'
+import { eqChain } from './fp/eq'
 import { ordBaseAmount } from './fp/ord'
 import { sequenceTOption, sequenceTOptionFromArray } from './fpHelpers'
 import { emptyString } from './stringHelper'
@@ -45,6 +46,7 @@ export const RUNE_POOL_ADDRESS: PoolAddress = {
   // For RuneNative a `MsgNativeTx` is used for pool txs,
   // no need for a pool address, just keep it empty
   address: emptyString,
+  halted: false,
   router: O.none
 }
 
@@ -145,3 +147,6 @@ export const getPoolPriceValue = (
     })
   )
 }
+
+const isChainElem = A.elem(eqChain)
+export const isChainHalted = (haltedChains: Chain[]) => (chain: Chain) => FP.pipe(haltedChains, isChainElem(chain))

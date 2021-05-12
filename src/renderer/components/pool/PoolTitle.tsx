@@ -2,13 +2,14 @@ import React, { useMemo } from 'react'
 
 import { SwapOutlined } from '@ant-design/icons'
 import { AssetRune } from '@xchainjs/xchain-thorchain'
-import { Asset, AssetAmount, assetToString } from '@xchainjs/xchain-util'
+import { Asset, AssetAmount, assetToString, Chain } from '@xchainjs/xchain-util'
 import { Grid } from 'antd'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
 import { useIntl } from 'react-intl'
 import { useHistory } from 'react-router-dom'
 
+import * as PoolHelpers from '../../helpers/poolHelper'
 import * as poolsRoutes from '../../routes/pools'
 import { ManageButton } from '../manageButton'
 import { Button } from '../uielements/button'
@@ -19,9 +20,10 @@ export type Props = {
   price: AssetAmount
   priceSymbol?: string
   isLoading?: boolean
+  haltedChains?: Chain[]
 }
 
-export const PoolTitle: React.FC<Props> = ({ asset: oAsset, price, priceSymbol }) => {
+export const PoolTitle: React.FC<Props> = ({ asset: oAsset, price, priceSymbol, haltedChains = [] }) => {
   const history = useHistory()
   const intl = useIntl()
   const isDesktopView = Grid.useBreakpoint()?.md ?? false
@@ -36,6 +38,17 @@ export const PoolTitle: React.FC<Props> = ({ asset: oAsset, price, priceSymbol }
         )
       ),
     [oAsset]
+  )
+
+  const disableButton = useMemo(
+    () =>
+      FP.pipe(
+        oAsset,
+        O.map(({ chain }) => chain),
+        O.map(PoolHelpers.isChainHalted(haltedChains)),
+        O.getOrElse(() => true)
+      ),
+    [haltedChains, oAsset]
   )
 
   const priceStr = useMemo(
@@ -59,8 +72,14 @@ export const PoolTitle: React.FC<Props> = ({ asset: oAsset, price, priceSymbol }
           (asset) => {
             return (
               <Styled.ButtonActions>
-                <ManageButton asset={asset} sizevalue={isDesktopView ? 'normal' : 'small'} isTextView={isDesktopView} />
+                <ManageButton
+                  disabled={disableButton}
+                  asset={asset}
+                  sizevalue={isDesktopView ? 'normal' : 'small'}
+                  isTextView={isDesktopView}
+                />
                 <Button
+                  disabled={disableButton}
                   round="true"
                   sizevalue={isDesktopView ? 'normal' : 'small'}
                   style={{ height: 30 }}
@@ -79,7 +98,7 @@ export const PoolTitle: React.FC<Props> = ({ asset: oAsset, price, priceSymbol }
           }
         )
       ),
-    [history, intl, isDesktopView, oAsset]
+    [history, intl, isDesktopView, oAsset, disableButton]
   )
 
   return (

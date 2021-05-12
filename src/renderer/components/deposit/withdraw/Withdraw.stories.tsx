@@ -21,6 +21,7 @@ import { WithdrawState$ } from '../../../services/chain/types'
 import { Withdraw, Props as WitdrawProps } from './Withdraw'
 
 const defaultProps: WitdrawProps = {
+  haltedChains: [],
   asset: { asset: AssetBNB, decimal: BNB_DECIMAL },
   runePrice: bn(1),
   assetPrice: bn(60.972),

@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useMemo } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
-import { assetFromString, THORChain } from '@xchainjs/xchain-util'
+import { assetFromString, Chain, THORChain } from '@xchainjs/xchain-util'
 import { Spin } from 'antd'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/Option'
@@ -41,10 +41,12 @@ export const DepositView: React.FC<Props> = () => {
     service: {
       setSelectedPoolAsset,
       selectedPoolAsset$,
-      pools: { reloadSelectedPoolDetail, selectedPoolDetail$ },
+      pools: { reloadSelectedPoolDetail, selectedPoolDetail$, haltedChains$ },
       shares: { shares$, reloadShares }
     }
   } = useMidgardContext()
+
+  const [haltedChains] = useObservableState(() => FP.pipe(haltedChains$, RxOp.map(RD.getOrElse((): Chain[] => []))), [])
 
   const { keystoreService, reloadBalancesByChain } = useWalletContext()
 
@@ -166,6 +168,7 @@ export const DepositView: React.FC<Props> = () => {
           ),
           (asset) => (
             <Deposit
+              haltedChains={haltedChains}
               poolDetail={poolDetailRD}
               asset={asset}
               shares={poolSharesRD}

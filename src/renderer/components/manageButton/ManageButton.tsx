@@ -13,8 +13,9 @@ type Props = {
   asset: Asset
   sizevalue?: ButtonSize
   isTextView: boolean
+  disabled?: boolean
 }
-export const ManageButton: React.FC<Props> = ({ className, asset, sizevalue = 'normal', isTextView }) => {
+export const ManageButton: React.FC<Props> = ({ disabled, className, asset, sizevalue = 'normal', isTextView }) => {
   const intl = useIntl()
   const history = useHistory()
 
@@ -29,6 +30,7 @@ export const ManageButton: React.FC<Props> = ({ className, asset, sizevalue = 'n
 
   return (
     <Button
+      disabled={disabled}
       round="true"
       typevalue="outline"
       sizevalue={sizevalue}

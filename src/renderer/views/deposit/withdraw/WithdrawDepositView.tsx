@@ -1,7 +1,7 @@
 import React, { useCallback, useMemo } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
-import { Asset, AssetRuneNative, BaseAmount, bn } from '@xchainjs/xchain-util'
+import { Asset, AssetRuneNative, BaseAmount, bn, Chain } from '@xchainjs/xchain-util'
 import BigNumber from 'bignumber.js'
 import * as FP from 'fp-ts/function'
 import * as O from 'fp-ts/lib/Option'
@@ -29,10 +29,11 @@ type Props = {
   asset: AssetWithDecimal
   poolShare: PoolShareRD
   poolDetail: PoolDetailRD
+  haltedChains: Chain[]
 }
 
 export const WithdrawDepositView: React.FC<Props> = (props): JSX.Element => {
-  const { asset: assetWD, poolShare: poolShareRD, poolDetail: poolDetailRD } = props
+  const { asset: assetWD, poolShare: poolShareRD, poolDetail: poolDetailRD, haltedChains } = props
   const { decimal: assetDecimal } = assetWD
   const {
     service: {
@@ -120,6 +121,7 @@ export const WithdrawDepositView: React.FC<Props> = (props): JSX.Element => {
   const renderEmptyForm = useCallback(
     () => (
       <Withdraw
+        haltedChains={haltedChains}
         fees$={symWithdrawFee$}
         assetPrice={ZERO_BN}
         runePrice={runePrice}
@@ -147,7 +149,8 @@ export const WithdrawDepositView: React.FC<Props> = (props): JSX.Element => {
       viewRuneTx,
       reloadBalancesAndShares,
       symWithdraw$,
-      network
+      network,
+      haltedChains
     ]
   )
 
@@ -166,6 +169,7 @@ export const WithdrawDepositView: React.FC<Props> = (props): JSX.Element => {
       poolsData: PoolsDataMap
     }) => (
       <Withdraw
+        haltedChains={haltedChains}
         assetPrice={assetPrice}
         runePrice={runePrice}
         runeBalance={runeBalance}
@@ -196,7 +200,8 @@ export const WithdrawDepositView: React.FC<Props> = (props): JSX.Element => {
       viewRuneTx,
       reloadBalancesAndShares,
       symWithdraw$,
-      network
+      network,
+      haltedChains
     ]
   )
 

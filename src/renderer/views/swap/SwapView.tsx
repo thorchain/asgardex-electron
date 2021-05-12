@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useMemo } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
-import { assetFromString, AssetRuneNative, bnOrZero } from '@xchainjs/xchain-util'
+import { assetFromString, AssetRuneNative, bnOrZero, Chain } from '@xchainjs/xchain-util'
 import { Spin } from 'antd'
 import * as FP from 'fp-ts/function'
 import * as O from 'fp-ts/lib/Option'
@@ -9,6 +9,7 @@ import { useObservableState } from 'observable-hooks'
 import { useIntl } from 'react-intl'
 import { useHistory, useParams } from 'react-router-dom'
 import * as Rx from 'rxjs'
+import * as RxOp from 'rxjs/operators'
 
 import { Network } from '../../../shared/api/types'
 import { ErrorView } from '../../components/shared/error/'
@@ -41,7 +42,7 @@ export const SwapView: React.FC<Props> = (_): JSX.Element => {
 
   const { service: midgardService } = useMidgardContext()
   const {
-    pools: { poolsState$, reloadPools, selectedPoolAddress$, reloadInboundAddresses },
+    pools: { poolsState$, reloadPools, selectedPoolAddress$, reloadInboundAddresses, haltedChains$ },
     setSelectedPoolAsset
   } = midgardService
   const { reloadSwapFees, swapFees$, getExplorerUrlByAsset$, addressByChain$, swap$, assetWithDecimal$ } =
@@ -52,6 +53,8 @@ export const SwapView: React.FC<Props> = (_): JSX.Element => {
     reloadBalancesByChain,
     keystoreService: { keystore$, validatePassword$ }
   } = useWalletContext()
+
+  const [haltedChains] = useObservableState(() => FP.pipe(haltedChains$, RxOp.map(RD.getOrElse((): Chain[] => []))), [])
 
   const { reloadApproveFee, approveFee$, approveERC20Token$, isApprovedERC20Token$ } = useEthereumContext()
 
@@ -210,6 +213,7 @@ export const SwapView: React.FC<Props> = (_): JSX.Element => {
 
               return (
                 <Swap
+                  haltedChains={haltedChains}
                   keystore={keystore}
                   validatePassword$={validatePassword$}
                   goToTransaction={goToTransaction}

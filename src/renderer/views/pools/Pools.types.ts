@@ -1,5 +1,5 @@
 import { PoolData } from '@thorchain/asgardex-util'
-import { BaseAmount, Asset } from '@xchainjs/xchain-util'
+import { BaseAmount, Asset, Chain } from '@xchainjs/xchain-util'
 import { NonEmptyArray } from 'fp-ts/lib/NonEmptyArray'
 
 // import { PoolDetailStatusEnum } from '../../types/generated/midgard'
@@ -36,4 +36,7 @@ export type PoolTableRowData = {
   network: Network
 }
 
+export type PoolsComponentProps = {
+  haltedChains: Chain[]
+}
 export type PoolTableRowsData = PoolTableRowData[]

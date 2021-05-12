@@ -13,7 +13,8 @@ import {
   formatAssetAmountCurrency,
   delay,
   assetAmount,
-  assetToBase
+  assetToBase,
+  Chain
 } from '@xchainjs/xchain-util'
 import BigNumber from 'bignumber.js'
 import * as A from 'fp-ts/Array'
@@ -37,6 +38,7 @@ import {
 import { getChainAsset, isEthChain } from '../../helpers/chainHelper'
 import { eqAsset, eqBaseAmount, eqChain, eqOAsset, eqOApproveParams } from '../../helpers/fp/eq'
 import { sequenceSOption, sequenceTOption } from '../../helpers/fpHelpers'
+import * as PoolHelpers from '../../helpers/poolHelper'
 import { liveData, LiveData } from '../../helpers/rx/liveData'
 import { filterWalletBalancesByAssets, getWalletBalanceByAsset } from '../../helpers/walletHelper'
 import { useSubscriptionState } from '../../hooks/useSubscriptionState'
@@ -100,6 +102,7 @@ export type SwapProps = {
   approveERC20Token$: (params: ApproveParams) => TxHashLD
   isApprovedERC20Token$: (params: ApproveParams) => LiveData<ApiError, boolean>
   importWalletHandler: FP.Lazy<void>
+  haltedChains: Chain[]
 }
 
 export const Swap = ({
@@ -122,7 +125,8 @@ export const Swap = ({
   approveERC20Token$,
   reloadApproveFee,
   approveFee$,
-  importWalletHandler
+  importWalletHandler,
+  haltedChains
 }: SwapProps) => {
   const intl = useIntl()
 
@@ -151,6 +155,20 @@ export const Swap = ({
   const oTargetAsset: O.Option<Asset> = useMemo(
     () => Utils.poolAssetDetailToAsset(oTargetPoolAsset),
     [oTargetPoolAsset]
+  )
+
+  const isChainHalted = useMemo(() => PoolHelpers.isChainHalted(haltedChains), [haltedChains])
+
+  const hasHaltedChain = useMemo(
+    () =>
+      FP.pipe(
+        sequenceTOption(oSourceAsset, oTargetAsset),
+        O.map(
+          ([{ chain: sourceChain }, { chain: targetChain }]) => isChainHalted(sourceChain) || isChainHalted(targetChain)
+        ),
+        O.getOrElse(() => true)
+      ),
+    [isChainHalted, oSourceAsset, oTargetAsset]
   )
 
   const assetsToSwap: O.Option<{ source: Asset; target: Asset }> = useMemo(
@@ -558,10 +576,17 @@ export const Swap = ({
         tooltipVisible={true}
         withLabel={true}
         tooltipPlacement={'top'}
-        disabled={unlockedWallet}
+        disabled={unlockedWallet || hasHaltedChain}
       />
     )
-  }, [unlockedWallet, amountToSwapMax1e8, sourceAssetAmountMax1e8, setAmountToSwapFromPercentValue, reloadFeesHandler])
+  }, [
+    unlockedWallet,
+    amountToSwapMax1e8,
+    sourceAssetAmountMax1e8,
+    setAmountToSwapFromPercentValue,
+    reloadFeesHandler,
+    hasHaltedChain
+  ])
 
   const extraTxModalContent = useMemo(() => {
     return FP.pipe(
@@ -944,6 +969,7 @@ export const Swap = ({
 
   const disableSubmit: boolean = useMemo(
     () =>
+      hasHaltedChain ||
       unlockedWallet ||
       isZeroAmountToSwap ||
       O.isNone(walletBalances) ||
@@ -951,7 +977,16 @@ export const Swap = ({
       RD.isPending(swapFeesRD) ||
       RD.isPending(approveState) ||
       minAmountError,
-    [approveState, isZeroAmountToSwap, minAmountError, sourceChainFeeError, swapFeesRD, unlockedWallet, walletBalances]
+    [
+      hasHaltedChain,
+      approveState,
+      isZeroAmountToSwap,
+      minAmountError,
+      sourceChainFeeError,
+      swapFeesRD,
+      unlockedWallet,
+      walletBalances
+    ]
   )
 
   return (
@@ -1046,6 +1081,7 @@ export const Swap = ({
               <Styled.SubmitButton
                 sizevalue="xnormal"
                 color="warning"
+                disabled={hasHaltedChain}
                 onClick={onApprove}
                 loading={RD.isPending(approveState)}>
                 {intl.formatMessage({ id: 'common.approve' })}
