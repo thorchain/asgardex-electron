@@ -43,7 +43,7 @@ describe('stake/Withdraw.helper', () => {
     })
   })
 
-  describe('minAssetAmountToDepositMax1e8', () => {
+  describe('minAssetAmountToWithdrawMax1e8', () => {
     const poolsData = {
       'BNB.BUSD-74E': {
         assetBalance: assetToBase(assetAmount(20)), // 1 BUSD = 0.05 RUNE
@@ -86,14 +86,14 @@ describe('stake/Withdraw.helper', () => {
     })
 
     it('witdhraw non chain asset (BNB.USD)', () => {
-      const depositAssetDecimal = 8
+      const withdrawAssetDecimal = 8
       const params = {
         fees: {
           asset: AssetBNB,
           amount: assetToBase(assetAmount(0.0003, BNB_DECIMAL))
         },
         asset: AssetBUSD74E,
-        assetDecimal: depositAssetDecimal,
+        assetDecimal: withdrawAssetDecimal,
         poolsData
       }
 
@@ -105,18 +105,18 @@ describe('stake/Withdraw.helper', () => {
       // 1,5 * 0.0003 * 600 = 0.27
 
       const result = minAssetAmountToWithdrawMax1e8(params)
-      expect(eqBaseAmount.equals(result, assetToBase(assetAmount(0.27, depositAssetDecimal)))).toBeTruthy()
+      expect(eqBaseAmount.equals(result, assetToBase(assetAmount(0.27, withdrawAssetDecimal)))).toBeTruthy()
     })
 
     it('withdraw ERC20 token asset (ETH.USDT)', () => {
-      const depositAssetDecimal = 7
+      const withdrawAssetDecimal = 7
       const params = {
         fees: {
           asset: AssetETH,
           amount: assetToBase(assetAmount(0.03, ETH_DECIMAL))
         },
         asset: AssetUSDTERC20,
-        assetDecimal: depositAssetDecimal,
+        assetDecimal: withdrawAssetDecimal,
         poolsData
       }
 
@@ -128,7 +128,7 @@ describe('stake/Withdraw.helper', () => {
       // 1.5 * 0.03 * 2000 = 90
 
       const result = minAssetAmountToWithdrawMax1e8(params)
-      expect(eqBaseAmount.equals(result, assetToBase(assetAmount(90, depositAssetDecimal)))).toBeTruthy()
+      expect(eqBaseAmount.equals(result, assetToBase(assetAmount(90, withdrawAssetDecimal)))).toBeTruthy()
     })
 
     describe('minRuneAmountToWithdraw', () => {
