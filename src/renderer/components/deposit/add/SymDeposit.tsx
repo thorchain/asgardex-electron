@@ -17,7 +17,6 @@ import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
 import { useObservableState } from 'observable-hooks'
 import { useIntl } from 'react-intl'
-import * as Rx from 'rxjs'
 import * as RxOp from 'rxjs/operators'
 
 import { Network } from '../../../../shared/api/types'
@@ -31,7 +30,7 @@ import {
   THORCHAIN_DECIMAL
 } from '../../../helpers/assetHelper'
 import { getChainAsset, isEthChain } from '../../../helpers/chainHelper'
-import { eqBaseAmount, eqOAsset } from '../../../helpers/fp/eq'
+import { eqBaseAmount, eqOAsset, eqODepositApproveParams, eqOString } from '../../../helpers/fp/eq'
 import { sequenceSOption, sequenceTOption } from '../../../helpers/fpHelpers'
 import { liveData, LiveData } from '../../../helpers/rx/liveData'
 import { FundsCap } from '../../../hooks/useFundsCap'
@@ -262,17 +261,27 @@ export const SymDeposit: React.FC<Props> = (props) => {
 
   const approveFees$ = useMemo(() => approveFee$, [approveFee$])
 
-  const [approveFeesRD, approveFeesParamsUpdated] = useObservableState<FeeRD, O.Option<ApproveParams>>(
-    (oApproveFeeParam$) => {
-      return oApproveFeeParam$.pipe(RxOp.switchMap(FP.flow(O.fold(() => Rx.of(RD.initial), approveFees$))))
-    },
-    RD.initial
-  )
+  const [approveFeesRD, approveFeesParamsUpdated] = useObservableState<FeeRD, ApproveParams>((approveFeeParam$) => {
+    return approveFeeParam$.pipe(RxOp.switchMap(approveFees$))
+  }, RD.initial)
 
-  // Trigger reload of approve fees whenever `oApproveParams` has been changed
+  const prevApproveParams = useRef<O.Option<ApproveParams>>(O.none)
+
+  // Update `approveFeesRD` whenever `oApproveParams` has been changed
   useEffect(() => {
-    approveFeesParamsUpdated(oApproveParams)
-  }, [approveFeesParamsUpdated, oApproveParams])
+    FP.pipe(
+      oApproveParams,
+      // Do nothing if prev. and current router a the same
+      O.filter((params) => !eqODepositApproveParams.equals(O.some(params), prevApproveParams.current)),
+      // update ref
+      O.map((params) => {
+        prevApproveParams.current = O.some(params)
+        return params
+      }),
+      // Trigger update for `approveFeesRD`
+      O.map(approveFeesParamsUpdated)
+    )
+  }, [approveFeesParamsUpdated, oApproveParams, oPoolAddress])
 
   const reloadApproveFeesHandler = useCallback(() => {
     FP.pipe(oApproveParams, O.map(reloadApproveFee))
@@ -848,11 +857,21 @@ export const SymDeposit: React.FC<Props> = (props) => {
     [asset, isApprovedERC20Token$, needApprovement, subscribeIsApprovedState]
   )
 
+  const prevRouterAddress = useRef<O.Option<Address>>(O.none)
+
   // Run `checkApprovedStatus` whenever `oPoolAddress` has been changed
   useEffect(() => {
     FP.pipe(
       oPoolAddress,
       O.chain(({ router }) => router),
+      // Do nothing if prev. and current router a the same
+      O.filter((router) => !eqOString.equals(O.some(router), prevRouterAddress.current)),
+      // update ref
+      O.map((router) => {
+        prevRouterAddress.current = O.some(router)
+        return router
+      }),
+      // check allowance status
       O.map(checkApprovedStatus)
     )
   }, [checkApprovedStatus, oPoolAddress])
