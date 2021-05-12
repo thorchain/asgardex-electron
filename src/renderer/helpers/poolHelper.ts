@@ -46,6 +46,7 @@ export const RUNE_POOL_ADDRESS: PoolAddress = {
   // For RuneNative a `MsgNativeTx` is used for pool txs,
   // no need for a pool address, just keep it empty
   address: emptyString,
+  halted: false,
   router: O.none
 }
 

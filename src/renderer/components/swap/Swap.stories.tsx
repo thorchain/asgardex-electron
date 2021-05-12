@@ -37,7 +37,7 @@ const defaultProps: SwapProps = {
     { asset: AssetRuneNative, assetPrice: ONE_BN }
   ],
   assets: { inAsset: sourceAsset, outAsset: targetAsset },
-  poolAddress: O.some({ chain: 'BNB', address: 'vault-address', router: O.some('router-address') }),
+  poolAddress: O.some({ chain: 'BNB', address: 'vault-address', router: O.some('router-address'), halted: false }),
   // mock successfull result of swap$
   swap$: (params) =>
     Rx.of(params).pipe(

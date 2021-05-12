@@ -97,7 +97,8 @@ export const eqPoolShares = A.getEq(eqPoolShare)
 export const eqPoolAddresses = Eq.getStructEq<PoolAddress>({
   chain: eqChain,
   address: Eq.eqString,
-  router: eqOString
+  router: eqOString,
+  halted: Eq.eqBoolean
 })
 
 export const eqOPoolAddresses = O.getEq(eqPoolAddresses)
@@ -125,3 +126,8 @@ export const eqDepositAssetFees = Eq.getStructEq<DepositAssetFees>({
 })
 
 export const eqODepositAssetFees = O.getEq(eqDepositAssetFees)
+
+export const eqHaltedChain = Eq.struct({
+  chain: eqChain,
+  halted: Eq.eqBoolean
+})

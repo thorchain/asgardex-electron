@@ -49,7 +49,7 @@ const total = 3
 const defaultProps: UpgradeProps = {
   runeAsset: AssetRune67C,
   runeNativeAddress: 'rune-native-address',
-  bnbPoolAddressRD: RD.success({ chain: 'BNB', address: 'bnb-pool-address', router: O.none }),
+  bnbPoolAddressRD: RD.success({ chain: 'BNB', address: 'bnb-pool-address', router: O.none, halted: false }),
   validatePassword$: mockValidatePassword$,
   fee: RD.success(baseAmount(37500)),
   upgrade$: (p: UpgradeRuneParams): UpgradeRuneTxState$ => {

@@ -398,6 +398,12 @@ export const Upgrade: React.FC<Props> = (props): JSX.Element => {
       {renderConfirmUpgradeModal}
       {FP.pipe(
         bnbPoolAddressRD,
+        RD.chain(
+          RD.fromPredicate(
+            FP.not(({ halted }) => halted),
+            () => new Error(intl.formatMessage({ id: 'pools.halted.chain' }, { chain: BNBChain }))
+          )
+        ),
         RD.fold(
           () => renderUpgradeStatus,
           () => renderUpgradeStatus,

@@ -177,14 +177,15 @@ export const getGasRateByChain = (
   )
 
 export const inboundToPoolAddresses = (
-  addresses: Pick<InboundAddress, 'chain' | 'address' | 'router'>[]
+  addresses: Pick<InboundAddress, 'chain' | 'address' | 'router' | 'halted'>[]
 ): PoolAddresses =>
   FP.pipe(
     addresses,
-    A.map(({ address, router, chain }) => ({
+    A.map(({ address, router, chain, halted }) => ({
       chain,
       address,
-      router: optionFromNullableString(router)
+      router: optionFromNullableString(router),
+      halted
     })),
     // Add "empty" rune "pool address" - we never had such pool, but do need it to calculate tx
     A.cons(RUNE_POOL_ADDRESS)

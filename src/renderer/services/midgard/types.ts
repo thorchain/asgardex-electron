@@ -122,6 +122,7 @@ export type PoolAddress = {
   address: Address
   /** router address (optional) */
   router: O.Option<Address>
+  halted: boolean
 }
 export type PoolAddress$ = Rx.Observable<O.Option<PoolAddress>>
 export type PoolAddressRD = RD.RemoteData<Error, PoolAddress>
