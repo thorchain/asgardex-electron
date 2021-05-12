@@ -229,9 +229,12 @@ export const Settings: React.FC<Props> = (props): JSX.Element => {
               {intl.formatMessage({ id: 'update.checkFailed' }, { error: message })}
             </Styled.ClientErrorLabel>
           ),
-          O.fold(FP.constNull, (version) => (
-            <Styled.Placeholder>{intl.formatMessage({ id: 'update.description' }, { version })}</Styled.Placeholder>
-          ))
+          O.fold(
+            () => <Styled.Placeholder>{intl.formatMessage({ id: 'update.noUpdate' })}</Styled.Placeholder>,
+            (version) => (
+              <Styled.Placeholder>{intl.formatMessage({ id: 'update.description' }, { version })}</Styled.Placeholder>
+            )
+          )
         )
       ),
     [appUpdateState, intl]

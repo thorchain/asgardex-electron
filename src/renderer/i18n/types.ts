@@ -85,7 +85,12 @@ export type CommonMessages = {
   [key in CommonMessageKey]: string
 }
 
-type UpdateMessagesKeys = 'update.description' | 'update.link' | 'update.checkFailed' | 'update.checkForUpdates'
+type UpdateMessagesKeys =
+  | 'update.description'
+  | 'update.link'
+  | 'update.checkFailed'
+  | 'update.checkForUpdates'
+  | 'update.noUpdate'
 
 export type UpdateMessages = { [key in UpdateMessagesKeys]: string }
 
