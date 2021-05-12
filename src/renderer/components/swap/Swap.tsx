@@ -23,7 +23,6 @@ import * as NEA from 'fp-ts/NonEmptyArray'
 import * as O from 'fp-ts/Option'
 import { useObservableState } from 'observable-hooks'
 import { useIntl } from 'react-intl'
-import * as Rx from 'rxjs'
 import * as RxOp from 'rxjs/operators'
 
 import { Network } from '../../../shared/api/types'
@@ -37,7 +36,7 @@ import {
   to1e8BaseAmount
 } from '../../helpers/assetHelper'
 import { getChainAsset, isEthChain } from '../../helpers/chainHelper'
-import { eqAsset, eqBaseAmount, eqChain, eqOAsset } from '../../helpers/fp/eq'
+import { eqAsset, eqBaseAmount, eqChain, eqOAsset, eqOApproveParams } from '../../helpers/fp/eq'
 import { sequenceSOption, sequenceTOption } from '../../helpers/fpHelpers'
 import * as PoolHelpers from '../../helpers/poolHelper'
 import { liveData, LiveData } from '../../helpers/rx/liveData'
@@ -270,14 +269,14 @@ export const Swap = ({
   }, [swapData.swapResult, targetAssetDecimal])
 
   const oApproveParams: O.Option<ApproveParams> = useMemo(() => {
+    const oRouterAddress: O.Option<Address> = FP.pipe(
+      oPoolAddress,
+      O.chain(({ router }) => router)
+    )
+    const oTokenAddress: O.Option<string> = getEthTokenAddress(sourceAssetProp)
+
     return FP.pipe(
-      sequenceTOption(
-        getEthTokenAddress(sourceAssetProp),
-        FP.pipe(
-          oPoolAddress,
-          O.chain(({ router }) => router)
-        )
-      ),
+      sequenceTOption(oTokenAddress, oRouterAddress),
       O.map(([tokenAddress, routerAddress]) => ({
         spender: routerAddress,
         sender: tokenAddress
@@ -325,18 +324,28 @@ export const Swap = ({
     })
   }, [reloadFees, sourceAssetProp, targetAssetProp])
 
-  const [approveFeesRD, approveFeesParamsUpdated] = useObservableState<FeeRD, O.Option<ApproveParams>>(
-    (oApproveFeeParam$) => {
-      return oApproveFeeParam$.pipe(RxOp.switchMap(FP.flow(O.fold(() => Rx.of(RD.initial), approveFee$))))
-    },
-    RD.initial
-  )
+  const [approveFeesRD, approveFeesParamsUpdated] = useObservableState<FeeRD, ApproveParams>((approveFeeParam$) => {
+    return approveFeeParam$.pipe(RxOp.switchMap(approveFee$))
+  }, RD.initial)
+
+  const prevApproveParams = useRef<O.Option<ApproveParams>>(O.none)
 
   // whenever `oApproveParams` has been updated,
   // `approveFeesParamsUpdated` needs to be called to update `approveFeesRD`
   useEffect(() => {
-    approveFeesParamsUpdated(oApproveParams)
-  }, [approveFeesParamsUpdated, oApproveParams])
+    FP.pipe(
+      oApproveParams,
+      // Do nothing if prev. and current router a the same
+      O.filter((params) => !eqOApproveParams.equals(O.some(params), prevApproveParams.current)),
+      // update ref
+      O.map((params) => {
+        prevApproveParams.current = O.some(params)
+        return params
+      }),
+      // Trigger update for `approveFeesRD`
+      O.map(approveFeesParamsUpdated)
+    )
+  }, [approveFeesParamsUpdated, oApproveParams, oPoolAddress])
 
   const reloadApproveFeesHandler = useCallback(() => {
     FP.pipe(oApproveParams, O.map(reloadApproveFee))
@@ -474,7 +483,7 @@ export const Swap = ({
       A.filter((balance) =>
         FP.pipe(
           assetSymbolsInWallet,
-          O.map((symbols) => symbols.includes(balance.asset.symbol)),
+          O.map((symbols) => symbols.includes(balance.asset.symbol.toUpperCase())),
           O.getOrElse((): boolean => false)
         )
       ),
@@ -797,26 +806,6 @@ export const Swap = ({
     [approveFeesRD, sourceAssetProp.chain]
   )
 
-  const isSwapDisabled: boolean = useMemo(
-    () =>
-      hasHaltedChain ||
-      unlockedWallet ||
-      isZeroAmountToSwap ||
-      O.isNone(walletBalances) ||
-      sourceChainFeeError ||
-      RD.isPending(swapFeesRD) ||
-      minAmountError,
-    [
-      isZeroAmountToSwap,
-      minAmountError,
-      sourceChainFeeError,
-      swapFeesRD,
-      unlockedWallet,
-      walletBalances,
-      hasHaltedChain
-    ]
-  )
-
   const {
     state: approveState,
     reset: resetApproveState,
@@ -882,7 +871,10 @@ export const Swap = ({
       RD.isSuccess(approveState) ||
       FP.pipe(
         isApprovedState,
-        RD.getOrElse(() => false)
+        // ignore other RD states and set to `true`
+        // to avoid switch between approve and submit button
+        // Submit button will still be disabled
+        RD.getOrElse(() => true)
       )
     )
   }, [approveState, isApprovedState, needApprovement])
@@ -898,6 +890,7 @@ export const Swap = ({
       O.fromPredicate((v) => !!v)
     )
     const oTokenAddress: O.Option<string> = getEthTokenAddress(sourceAssetProp)
+
     // check approve status
     FP.pipe(
       sequenceTOption(oNeedApprovement, oRouterAddress, oTokenAddress),
@@ -973,6 +966,28 @@ export const Swap = ({
       )
     )
   }, [assetsToSwap, onChangePath])
+
+  const disableSubmit: boolean = useMemo(
+    () =>
+      hasHaltedChain ||
+      unlockedWallet ||
+      isZeroAmountToSwap ||
+      O.isNone(walletBalances) ||
+      sourceChainFeeError ||
+      RD.isPending(swapFeesRD) ||
+      RD.isPending(approveState) ||
+      minAmountError,
+    [
+      hasHaltedChain,
+      approveState,
+      isZeroAmountToSwap,
+      minAmountError,
+      sourceChainFeeError,
+      swapFeesRD,
+      unlockedWallet,
+      walletBalances
+    ]
+  )
 
   return (
     <Styled.Container>
@@ -1055,7 +1070,7 @@ export const Swap = ({
                 color="success"
                 sizevalue="xnormal"
                 onClick={onSwapConfirmed}
-                disabled={isSwapDisabled}>
+                disabled={disableSubmit}>
                 {intl.formatMessage({ id: 'common.swap' })}
               </Styled.SubmitButton>
               {!RD.isInitial(uiFees) && <Fees fees={uiFees} reloadFees={reloadFeesHandler} />}
