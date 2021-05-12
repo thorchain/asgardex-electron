@@ -30,7 +30,7 @@ import {
   THORCHAIN_DECIMAL
 } from '../../../helpers/assetHelper'
 import { getChainAsset, isEthChain } from '../../../helpers/chainHelper'
-import { eqBaseAmount, eqOAsset, eqODepositApproveParams, eqOString } from '../../../helpers/fp/eq'
+import { eqBaseAmount, eqOAsset, eqOApproveParams, eqOString } from '../../../helpers/fp/eq'
 import { sequenceSOption, sequenceTOption } from '../../../helpers/fpHelpers'
 import { liveData, LiveData } from '../../../helpers/rx/liveData'
 import { FundsCap } from '../../../hooks/useFundsCap'
@@ -272,7 +272,7 @@ export const SymDeposit: React.FC<Props> = (props) => {
     FP.pipe(
       oApproveParams,
       // Do nothing if prev. and current router a the same
-      O.filter((params) => !eqODepositApproveParams.equals(O.some(params), prevApproveParams.current)),
+      O.filter((params) => !eqOApproveParams.equals(O.some(params), prevApproveParams.current)),
       // update ref
       O.map((params) => {
         prevApproveParams.current = O.some(params)

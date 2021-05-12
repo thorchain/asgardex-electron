@@ -120,13 +120,13 @@ export const eqSwapFeesParams = Eq.struct<SwapFeesParams>({
   outAsset: eqAsset
 })
 
-export const eqDepositApproveParams = Eq.struct<ApproveParams>({
+export const eqApproveParams = Eq.struct<ApproveParams>({
   spender: eqString,
   sender: eqString,
   amount: eqNullableBaseAmount
 })
 
-export const eqODepositApproveParams = O.getEq(eqDepositApproveParams)
+export const eqOApproveParams = O.getEq(eqApproveParams)
 
 export const eqOSwapFeesParams = O.getEq(eqSwapFeesParams)
 
