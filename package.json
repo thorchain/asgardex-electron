@@ -1,7 +1,7 @@
 {
   "name": "asgardex",
   "productName": "ASGARDEX",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "WALLET AND EXCHANGE CLIENT FOR THORCHAIN",
   "main": "index.js",
   "scripts": {
@@ -146,7 +146,7 @@
     "concurrently": "^6.1.0",
     "cross-env": "^7.0.3",
     "electron": "^12.0.7",
-    "electron-builder": "^22.11.1",
+    "electron-builder": "^22.11.2",
     "electron-devtools-installer": "^3.2.0",
     "electron-notarize": "^1.0.0",
     "eslint-config-prettier": "^8.3.0",
