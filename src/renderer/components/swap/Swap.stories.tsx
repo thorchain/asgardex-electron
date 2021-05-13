@@ -56,20 +56,23 @@ const defaultProps: SwapProps = {
       runeBalance: baseAmount(3000)
     }
   },
-  walletBalances: O.some([
-    {
-      asset: AssetRuneNative,
-      amount: assetToBase(assetAmount(100)),
-      walletType: 'keystore',
-      walletAddress: 'wallet-address-rune'
-    },
-    {
-      asset: AssetBTC,
-      amount: assetToBase(assetAmount(1)),
-      walletType: 'keystore',
-      walletAddress: 'wallet-address-btc'
-    }
-  ]),
+  walletBalances: {
+    balances: O.some([
+      {
+        asset: AssetRuneNative,
+        amount: assetToBase(assetAmount(100)),
+        walletType: 'keystore',
+        walletAddress: 'wallet-address-rune'
+      },
+      {
+        asset: AssetBTC,
+        amount: assetToBase(assetAmount(1)),
+        walletType: 'keystore',
+        walletAddress: 'wallet-address-btc'
+      }
+    ]),
+    loading: false
+  },
   goToTransaction: (txHash) => {
     console.log(txHash)
   },

@@ -109,7 +109,7 @@ export const SwapView: React.FC<Props> = (_): JSX.Element => {
 
   const targetAssetRD: AssetWithDecimalRD = useObservableState(targetAssetDecimal$, RD.initial)
 
-  const { balances } = useObservableState(balancesState$, INITIAL_BALANCES_STATE)
+  const balancesState = useObservableState(balancesState$, INITIAL_BALANCES_STATE)
 
   const selectedPoolAddress = useObservableState(selectedPoolAddress$, O.none)
 
@@ -221,7 +221,7 @@ export const SwapView: React.FC<Props> = (_): JSX.Element => {
                   poolAddress={selectedPoolAddress}
                   availableAssets={availableAssets}
                   poolsData={poolsData}
-                  walletBalances={balances}
+                  walletBalances={balancesState}
                   reloadFees={reloadSwapFees}
                   fees$={swapFees$}
                   reloadApproveFee={reloadApproveFee}
