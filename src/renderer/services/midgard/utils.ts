@@ -50,14 +50,26 @@ export const getPricePools = (pools: PoolDetails, whitelist?: PricePoolAssets): 
     : pools.filter((detail) => whitelist.find((asset) => detail?.asset === assetToString(asset)))
 
   const pricePools = poolDetails
-    .map((detail: PoolDetail) => {
+    .map((detail: PoolDetail): PricePool => {
       // Since we have filtered pools based on whitelist before ^,
       // we can type asset as `PricePoolAsset` now
       const asset = assetFromString(detail?.asset ?? '') as PricePoolAsset
+      // As we use BUSD asset in our price selector to determine USD values we need to simulate BUSD pool values to match real USD
+      if (isBUSDAsset(asset)) {
+        const busdPoolData = toPoolData(detail)
+        return {
+          asset,
+          poolData: {
+            assetBalance: baseAmount(busdPoolData.assetBalance.amount().times(bnOrZero(detail.assetPriceUSD))),
+            runeBalance: baseAmount(busdPoolData.runeBalance.amount())
+          }
+        }
+      }
+
       return {
         asset,
         poolData: toPoolData(detail)
-      } as PricePool
+      }
     })
     // sort by weights (high weight wins)
     .sort((a, b) => (CURRENCY_WHEIGHTS[assetToString(b.asset)] || 0) - (CURRENCY_WHEIGHTS[assetToString(a.asset)] || 0))

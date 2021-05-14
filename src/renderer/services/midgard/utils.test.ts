@@ -68,7 +68,7 @@ describe('services/midgard/utils/', () => {
   describe('getPricePools', () => {
     const tomob = { asset: 'BNB.TOMOB-1E1', assetDepth: '1', runeDepth: '11' } as PoolDetail
     const eth = { asset: 'ETH.ETH', assetDepth: '2', runeDepth: '22' } as PoolDetail
-    const BUSDBAF = { asset: 'BNB.BUSD-BAF', assetDepth: '3', runeDepth: '33' } as PoolDetail
+    const BUSDBAF = { asset: 'BNB.BUSD-BAF', assetDepth: '3', runeDepth: '33', assetPriceUSD: '2' } as PoolDetail
     const btc = { asset: 'BTC.BTC', assetDepth: '4', runeDepth: '44' } as PoolDetail
     const lok = { asset: 'BNB.LOK-3C0', assetDepth: '5', runeDepth: '5' } as PoolDetail
 
@@ -93,7 +93,8 @@ describe('services/midgard/utils/', () => {
       const busdPool = result[3]
       expect(busdPool.asset).toEqual(AssetBUSDBAF)
       expect(busdPool.poolData.runeBalance.amount().toNumber()).toEqual(33)
-      expect(busdPool.poolData.assetBalance.amount().toNumber()).toEqual(3)
+      // Check if BUSD value is corrected to the real USD value based on assetPriceUSD
+      expect(busdPool.poolData.assetBalance.amount().toNumber()).toEqual(6)
     })
 
     it('returns RUNE price and btc pools in a right order', () => {
