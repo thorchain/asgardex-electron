@@ -18,6 +18,7 @@ import * as FP from 'fp-ts/function'
 import { useIntl } from 'react-intl'
 
 import { ZERO_BN } from '../../../const'
+import { THORCHAIN_DECIMAL } from '../../../helpers/assetHelper'
 import { validateAddress, greaterThan, lessThanOrEqualTo } from '../../../helpers/form/validation'
 import { AddressValidation } from '../../../services/thorchain/types'
 import { Input, InputBigNumber } from '../../uielements/input'
@@ -114,7 +115,7 @@ export const Bond: React.FC<Props> = ({
                 validator: amountValidator
               }
             ]}>
-            <InputBigNumber disabled={isLoading} size="large" decimal={4} />
+            <InputBigNumber disabled={isLoading} size="large" decimal={THORCHAIN_DECIMAL} />
           </Form.Item>
           <Styled.MaxValue>
             {intl.formatMessage({ id: 'common.max' })}{' '}

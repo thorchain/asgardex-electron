@@ -5,6 +5,7 @@ import { Form } from 'antd'
 import BigNumber from 'bignumber.js'
 import { useIntl } from 'react-intl'
 
+import { THORCHAIN_DECIMAL } from '../../../helpers/assetHelper'
 import { Input, InputBigNumber } from '../../uielements/input'
 import * as Styled from './Forms.styles'
 
@@ -49,7 +50,7 @@ export const Custom: React.FC<Props> = ({ onFinish: onFinishProp, isLoading = fa
         <Styled.InputContainer>
           <Styled.InputLabel>{intl.formatMessage({ id: 'common.amount' })}</Styled.InputLabel>
           <Form.Item name="amount">
-            <InputBigNumber disabled={isLoading} size="large" decimal={4} />
+            <InputBigNumber disabled={isLoading} size="large" decimal={THORCHAIN_DECIMAL} />
           </Form.Item>
         </Styled.InputContainer>
       </div>
