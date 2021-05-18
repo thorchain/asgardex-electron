@@ -218,7 +218,7 @@ export const ActivePools: React.FC<PoolsComponentProps> = ({ haltedChains }): JS
         ({ poolDetails }: PoolsState): JSX.Element => {
           const poolViewData = PoolHelpers.getPoolTableRowsData({
             poolDetails,
-            pricePoolData: selectedPricePool.poolData,
+            pricePool: selectedPricePool,
             network
           })
           previousPools.current = O.some(poolViewData)

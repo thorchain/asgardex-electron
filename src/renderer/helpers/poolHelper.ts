@@ -3,7 +3,6 @@ import { Balance } from '@xchainjs/xchain-client'
 import { bnOrZero, assetFromString, AssetRuneNative, BaseAmount, Chain } from '@xchainjs/xchain-util'
 import BigNumber from 'bignumber.js'
 import * as A from 'fp-ts/lib/Array'
-import * as Eq from 'fp-ts/lib/Eq'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
 import * as Ord from 'fp-ts/lib/Ord'
@@ -16,7 +15,7 @@ import { PoolDetail } from '../types/generated/midgard'
 import { PoolTableRowData, PoolTableRowsData, PricePool } from '../views/pools/Pools.types'
 import { getPoolTableRowData } from '../views/pools/Pools.utils'
 import { isRuneNativeAsset } from './assetHelper'
-import { eqChain } from './fp/eq'
+import { eqChain, eqString } from './fp/eq'
 import { ordBaseAmount } from './fp/ord'
 import { sequenceTOption, sequenceTOptionFromArray } from './fpHelpers'
 import { emptyString } from './stringHelper'
@@ -24,7 +23,7 @@ import { emptyString } from './stringHelper'
 export const sortByDepth = (a: PoolTableRowData, b: PoolTableRowData) =>
   ordBaseAmount.compare(a.depthPrice, b.depthPrice)
 
-const ordByDepth = Ord.ord.contramap(ordBaseAmount, ({ depthPrice }: PoolTableRowData) => depthPrice)
+const ordByDepth = Ord.Contravariant.contramap(ordBaseAmount, ({ depthPrice }: PoolTableRowData) => depthPrice)
 
 /**
  * RUNE based `PricePool`
@@ -52,11 +51,11 @@ export const RUNE_POOL_ADDRESS: PoolAddress = {
 
 export const getPoolTableRowsData = ({
   poolDetails,
-  pricePoolData,
+  pricePool,
   network
 }: {
   poolDetails: PoolDetails
-  pricePoolData: PoolData
+  pricePool: PricePool
   network: Network
 }): PoolTableRowsData => {
   // get symbol of deepest pool
@@ -82,12 +81,12 @@ export const getPoolTableRowsData = ({
         sequenceTOption(oDeepestPoolSymbol, oPoolDetailSymbol),
         O.fold(
           () => false,
-          ([deepestPoolSymbol, poolDetailSymbol]) => Eq.eqString.equals(deepestPoolSymbol, poolDetailSymbol)
+          ([deepestPoolSymbol, poolDetailSymbol]) => eqString.equals(deepestPoolSymbol, poolDetailSymbol)
         )
       )
 
       return FP.pipe(
-        getPoolTableRowData({ poolDetail, pricePoolData, network }),
+        getPoolTableRowData({ poolDetail, pricePool, network }),
         O.map(
           (poolTableRowData) =>
             ({

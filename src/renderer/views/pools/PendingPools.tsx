@@ -212,7 +212,7 @@ export const PendingPools: React.FC<PoolsComponentProps> = (): JSX.Element => {
         ({ poolDetails }: PendingPoolsState): JSX.Element => {
           const poolViewData = getPoolTableRowsData({
             poolDetails,
-            pricePoolData: selectedPricePool.poolData,
+            pricePool: selectedPricePool,
             network
           })
           previousPools.current = some(poolViewData)

@@ -1,4 +1,4 @@
-import { PoolData, getValueOfAsset1InAsset2, getValueOfRuneInAsset } from '@thorchain/asgardex-util'
+import { getValueOfAsset1InAsset2, getValueOfRuneInAsset } from '@thorchain/asgardex-util'
 import {
   bnOrZero,
   baseAmount,
@@ -11,21 +11,33 @@ import {
   BaseAmount
 } from '@xchainjs/xchain-util'
 import * as A from 'fp-ts/Array'
-import { eqString } from 'fp-ts/lib/Eq'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
 
 import { Network } from '../../../shared/api/types'
 import { ONE_RUNE_BASE_AMOUNT } from '../../../shared/mock/amount'
 import { ZERO_BASE_AMOUNT } from '../../const'
-import { isBtcAsset, isChainAsset, isEthAsset, isUSDAsset, isEthTokenAsset } from '../../helpers/assetHelper'
+import {
+  isBtcAsset,
+  isChainAsset,
+  isEthAsset,
+  isUSDAsset,
+  isEthTokenAsset,
+  THORCHAIN_DECIMAL
+} from '../../helpers/assetHelper'
+import { eqString } from '../../helpers/fp/eq'
 import { sequenceTOption } from '../../helpers/fpHelpers'
-import { LastblockItems, PoolFilter } from '../../services/midgard/types'
+import { PoolFilter } from '../../services/midgard/types'
 import { toPoolData } from '../../services/midgard/utils'
-import { GetPoolsStatusEnum, Constants as ThorchainConstants, PoolDetail } from '../../types/generated/midgard'
-import { PoolTableRowData, Pool } from './Pools.types'
+import {
+  GetPoolsStatusEnum,
+  Constants as ThorchainConstants,
+  PoolDetail,
+  LastblockItem
+} from '../../types/generated/midgard'
+import { PoolTableRowData, Pool, PricePool } from './Pools.types'
 
-const stringToGetPoolsStatus = (str?: string): GetPoolsStatusEnum => {
+const stringToGetPoolsStatus = (str: string): GetPoolsStatusEnum => {
   switch (str) {
     case GetPoolsStatusEnum.Suspended: {
       return GetPoolsStatusEnum.Suspended
@@ -41,11 +53,11 @@ const stringToGetPoolsStatus = (str?: string): GetPoolsStatusEnum => {
 
 export const getPoolTableRowData = ({
   poolDetail,
-  pricePoolData,
+  pricePool,
   network
 }: {
   poolDetail: PoolDetail
-  pricePoolData: PoolData
+  pricePool: PricePool
   network: Network
 }): O.Option<PoolTableRowData> => {
   const oPoolDetailAsset = O.fromNullable(assetFromString(poolDetail.asset))
@@ -55,11 +67,15 @@ export const getPoolTableRowData = ({
     O.map((poolDetailAsset) => {
       const ticker = poolDetailAsset.ticker
 
+      const isUSDPrice = isUSDAsset(pricePool.asset)
       const poolData = toPoolData(poolDetail)
+      const pricePoolData = isUSDPrice ? poolDataFromUSDPrice(poolDetail) : pricePool.poolData
 
-      const poolPrice = getValueOfAsset1InAsset2(ONE_RUNE_BASE_AMOUNT, poolData, pricePoolData)
+      const usdPrice = assetToBase(assetAmount(bnOrZero(poolDetail.assetPriceUSD), THORCHAIN_DECIMAL))
+      const poolPrice = isUSDPrice ? usdPrice : getValueOfAsset1InAsset2(ONE_RUNE_BASE_AMOUNT, poolData, pricePoolData)
 
-      const depthAmount = baseAmount(bnOrZero(poolDetail?.runeDepth))
+      // `depthAmount` is one side only, but we do need to show depth of both sides (asset + rune depth)
+      const depthAmount = baseAmount(bnOrZero(poolDetail.runeDepth)).times(2)
       const depthPrice = getValueOfRuneInAsset(depthAmount, pricePoolData)
 
       const volumeAmount = baseAmount(bnOrZero(poolDetail.volume24h))
@@ -72,7 +88,7 @@ export const getPoolTableRowData = ({
       const transaction = ZERO_BASE_AMOUNT
       const transactionPrice = getValueOfRuneInAsset(transaction, pricePoolData)
 
-      const status = stringToGetPoolsStatus(poolDetail?.status)
+      const status = stringToGetPoolsStatus(poolDetail.status)
 
       const pool: Pool = {
         asset: AssetRuneNative,
@@ -95,14 +111,14 @@ export const getPoolTableRowData = ({
 
 export const getBlocksLeftForPendingPool = (
   constants: ThorchainConstants,
-  lastblocks: LastblockItems,
+  lastblocks: Array<Pick<LastblockItem, 'chain' | 'thorchain'>>,
   asset: Asset
 ): O.Option<number> => {
   const oNewPoolCycle: O.Option<number> = O.fromNullable(constants.int_64_values.PoolCycle)
   const oLastHeight = FP.pipe(
     lastblocks,
     A.findFirst((blockInfo) => eqString.equals(blockInfo.chain, asset.chain)),
-    O.map(({ thorchain }) => Number(thorchain))
+    O.map(({ thorchain }) => thorchain)
   )
 
   return FP.pipe(
@@ -113,7 +129,7 @@ export const getBlocksLeftForPendingPool = (
 
 export const getBlocksLeftForPendingPoolAsString = (
   constants: ThorchainConstants,
-  lastblocks: LastblockItems,
+  lastblocks: Array<Pick<LastblockItem, 'chain' | 'thorchain'>>,
   asset: Asset
 ): string => {
   return FP.pipe(
@@ -171,4 +187,12 @@ export const minPoolTxAmountUSD = (asset: Asset): BaseAmount => {
   else if (isEthTokenAsset(asset)) return value(100)
   // anything else $10
   else return value(10)
+}
+
+export const poolDataFromUSDPrice = (detail: Pick<PoolDetail, 'assetDepth' | 'runeDepth' | 'assetPriceUSD'>) => {
+  const poolData = toPoolData(detail)
+  return {
+    assetBalance: poolData.assetBalance.times(bnOrZero(detail.assetPriceUSD)),
+    runeBalance: poolData.runeBalance
+  }
 }

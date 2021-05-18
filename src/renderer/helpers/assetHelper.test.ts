@@ -14,7 +14,7 @@ import {
 import * as O from 'fp-ts/lib/Option'
 
 import { ERC20_TESTNET } from '../../shared/mock/assets'
-import { AssetBUSDBAF, AssetBUSDBD1, AssetUSDTERC20 } from '../const'
+import { AssetBUSDBAF, AssetUSDTERC20, PriceAssetUSD } from '../const'
 import {
   isBchAsset,
   isBnbAsset,
@@ -137,9 +137,8 @@ describe('helpers/assetHelper', () => {
   })
 
   describe('isPricePoolAsset', () => {
-    it('returns true for BUSDB', () => {
-      expect(isPricePoolAsset(AssetBUSDBAF)).toBeTruthy()
-      expect(isPricePoolAsset(AssetBUSDBD1)).toBeTruthy()
+    it('returns true for USD', () => {
+      expect(isPricePoolAsset(PriceAssetUSD)).toBeTruthy()
     })
     it('returns false for BNB', () => {
       expect(isPricePoolAsset(AssetBNB)).toBeFalsy()

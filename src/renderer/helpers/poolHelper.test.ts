@@ -8,6 +8,7 @@ import { ASSETS_TESTNET } from '../../shared/mock/assets'
 import { PoolDetails } from '../services/midgard/types'
 import { toPoolData } from '../services/midgard/utils'
 import { GetPoolsStatusEnum, PoolDetail } from '../types/generated/midgard'
+import { PricePool } from '../views/pools/Pools.types'
 import { getDeepestPool, getPoolPriceValue, getPoolTableRowsData } from './poolHelper'
 
 describe('helpers/poolHelper/', () => {
@@ -51,15 +52,18 @@ describe('helpers/poolHelper/', () => {
       { ...mockPoolDetail, asset: assetToString(ASSETS_TESTNET.FTM), status: GetPoolsStatusEnum.Staged }
     ]
 
-    const pricePoolData: PoolData = {
-      runeBalance: assetToBase(assetAmount(110)),
-      assetBalance: assetToBase(assetAmount(100))
+    const pricePool: PricePool = {
+      asset: ASSETS_TESTNET.FTM,
+      poolData: {
+        runeBalance: assetToBase(assetAmount(110)),
+        assetBalance: assetToBase(assetAmount(100))
+      }
     }
 
     it('returns data for pending pools', () => {
       const result = getPoolTableRowsData({
         poolDetails: pendingPoolDetails,
-        pricePoolData,
+        pricePool,
         network: 'testnet'
       })
       expect(result.length).toEqual(2)
@@ -73,7 +77,7 @@ describe('helpers/poolHelper/', () => {
     it('returns data for available pools', () => {
       const result = getPoolTableRowsData({
         poolDetails,
-        pricePoolData,
+        pricePool,
         network: 'testnet'
       })
       expect(result.length).toEqual(2)

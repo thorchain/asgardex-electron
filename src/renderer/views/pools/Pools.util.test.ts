@@ -1,4 +1,3 @@
-import { PoolData } from '@thorchain/asgardex-util'
 import {
   assetAmount,
   assetToBase,
@@ -20,7 +19,7 @@ import { eqBaseAmount } from '../../helpers/fp/eq'
 import { LastblockItems } from '../../services/midgard/types'
 import { Constants as ThorchainConstants, PoolDetail } from '../../types/generated/midgard'
 import { GetPoolsStatusEnum } from '../../types/generated/midgard'
-import { PoolTableRowData } from './Pools.types'
+import { PoolTableRowData, PricePool } from './Pools.types'
 import {
   getPoolTableRowData,
   getBlocksLeftForPendingPool,
@@ -39,9 +38,12 @@ describe('views/pools/utils', () => {
       status: GetPoolsStatusEnum.Staged
     } as PoolDetail
 
-    const pricePoolData: PoolData = {
-      runeBalance: assetToBase(assetAmount(10)),
-      assetBalance: assetToBase(assetAmount(100))
+    const pricePool: PricePool = {
+      asset: ASSETS_TESTNET.FTM,
+      poolData: {
+        runeBalance: assetToBase(assetAmount(10)),
+        assetBalance: assetToBase(assetAmount(100))
+      }
     }
 
     it('transforms data for a FTM pool', () => {
@@ -51,7 +53,7 @@ describe('views/pools/utils', () => {
           target: ASSETS_TESTNET.FTM
         },
         poolPrice: assetToBase(assetAmount(2)),
-        depthPrice: assetToBase(assetAmount(1000)),
+        depthPrice: assetToBase(assetAmount(2000)),
         volumePrice: assetToBase(assetAmount(1000)),
         transactionPrice: assetToBase(assetAmount(1000)),
         status: GetPoolsStatusEnum.Available,
@@ -62,7 +64,7 @@ describe('views/pools/utils', () => {
 
       const result = getPoolTableRowData({
         poolDetail: lokPoolDetail,
-        pricePoolData: pricePoolData,
+        pricePool,
         network: 'testnet'
       })
 
@@ -85,21 +87,21 @@ describe('views/pools/utils', () => {
     const constants = {
       int_64_values: { PoolCycle: 3001 }
     } as ThorchainConstants
-    const lastblock = [
+    const lastblocks = [
       {
-        thorchain: '2000',
+        thorchain: 2000,
         chain: BNBChain
       }
-    ] as LastblockItems
+    ]
     it('returns number of blocks left', () => {
-      const result = O.toNullable(getBlocksLeftForPendingPool(constants, lastblock, AssetBNB))
+      const result = O.toNullable(getBlocksLeftForPendingPool(constants, lastblocks, AssetBNB))
       expect(result).toEqual(1001)
     })
     it('returns None if NewPoolCycle is not available', () => {
       const constants2 = {
         int_64_values: {}
       } as ThorchainConstants
-      const result = getBlocksLeftForPendingPool(constants2, lastblock, AssetBNB)
+      const result = getBlocksLeftForPendingPool(constants2, lastblocks, AssetBNB)
       expect(result).toBeNone()
     })
     it('returns NOne if lastblock (thorchain) is not available', () => {
@@ -113,21 +115,21 @@ describe('views/pools/utils', () => {
     const constants = {
       int_64_values: { PoolCycle: 1234 }
     } as ThorchainConstants
-    const lastblock = [
+    const lastblocks = [
       {
-        thorchain: '1000',
+        thorchain: 1000,
         chain: BNBChain
       }
-    ] as LastblockItems
+    ]
     it('returns number of blocks left', () => {
-      const result = getBlocksLeftForPendingPoolAsString(constants, lastblock, AssetBNB)
+      const result = getBlocksLeftForPendingPoolAsString(constants, lastblocks, AssetBNB)
       expect(result).toEqual('234')
     })
     it('returns empty string if NewPoolCycle is not available', () => {
       const constants2 = {
         int_64_values: {}
       } as ThorchainConstants
-      const result = getBlocksLeftForPendingPoolAsString(constants2, lastblock, AssetBNB)
+      const result = getBlocksLeftForPendingPoolAsString(constants2, lastblocks, AssetBNB)
       expect(result).toEqual('')
     })
     it('returns empty string if lastblock (thorchain) is not available', () => {

@@ -3300,10 +3300,10 @@
   dependencies:
     polished "^3.6.3"
 
-"@thorchain/asgardex-util@^0.9.0":
-  version "0.9.0"
-  resolved "https://registry.yarnpkg.com/@thorchain/asgardex-util/-/asgardex-util-0.9.0.tgz#313423e957defab9156158986deed63569bedefa"
-  integrity sha512-3C/aGMOLyzlMHUmklBGhUX0L7XBIxZmhVU3zBiGBSFYrO8lBEleWrVJ09gUwHPW6RGf7D5n+t9Ch1kqbUItBlg==
+"@thorchain/asgardex-util@^0.9.1":
+  version "0.9.1"
+  resolved "https://registry.yarnpkg.com/@thorchain/asgardex-util/-/asgardex-util-0.9.1.tgz#06b75eb6642adae7c4924c37b23f1d5ab41bb33d"
+  integrity sha512-+w5jTojttZo0ku7t3cGsrnhymaeBnrWfhzypW1/TWL8Vup1XfHJmYrb60Iel2cftMJp4hlJF6ZmBwUJGbV0Ugg==
 
 "@types/anymatch@*":
   version "1.3.1"

@@ -1,26 +1,18 @@
 import * as RD from '@devexperts/remote-data-ts'
 import { PoolData } from '@thorchain/asgardex-util'
-import {
-  assetFromString,
-  bnOrZero,
-  baseAmount,
-  Asset,
-  assetToString,
-  Chain,
-  isValidBN,
-  bn
-} from '@xchainjs/xchain-util'
+import { assetFromString, bnOrZero, baseAmount, Asset, Chain, isValidBN, bn, BaseAmount } from '@xchainjs/xchain-util'
 import BigNumber from 'bignumber.js'
 import * as A from 'fp-ts/lib/Array'
 import * as FP from 'fp-ts/lib/function'
 import * as NEA from 'fp-ts/lib/NonEmptyArray'
 import * as O from 'fp-ts/lib/Option'
 
-import { CURRENCY_WHEIGHTS } from '../../const'
-import { isBUSDAsset } from '../../helpers/assetHelper'
+import { PriceAssetUSD, ZERO_BASE_AMOUNT } from '../../const'
+import { isBUSDAsset, THORCHAIN_DECIMAL } from '../../helpers/assetHelper'
 import { isMiniToken } from '../../helpers/binanceHelper'
-import { eqAsset, eqChain } from '../../helpers/fp/eq'
+import { eqAsset, eqChain, eqOAsset } from '../../helpers/fp/eq'
 import { optionFromNullableString } from '../../helpers/fp/from'
+import { ordPricePool } from '../../helpers/fp/ord'
 import { RUNE_POOL_ADDRESS, RUNE_PRICE_POOL } from '../../helpers/poolHelper'
 import { PoolDetail } from '../../types/generated/midgard'
 import { PricePoolAssets, PricePools, PricePoolAsset, PricePool } from '../../views/pools/Pools.types'
@@ -44,36 +36,48 @@ export const getAssetDetail = (assets: PoolAssetsDetail, ticker: string): O.Opti
     A.findFirst(({ asset }: PoolAssetDetail) => asset.ticker === ticker)
   )
 
-export const getPricePools = (pools: PoolDetails, whitelist?: PricePoolAssets): PricePools => {
-  const poolDetails = !whitelist
-    ? pools
-    : pools.filter((detail) => whitelist.find((asset) => detail?.asset === assetToString(asset)))
+/**
+ * Returns a list of price pools
+ *
+ * Note: It includes an USD "pseudo" price pool, which is for price selector needed only.
+ * USD prices won't be calculated by pools,
+ * because we get all USD prices from Midgard
+ * */
+export const getPricePools = (details: PoolDetails, whitelist: PricePoolAssets): PricePools => {
+  const findAssetInWhitelist = ({ asset }: { asset: string }) =>
+    whitelist.find((assetInList) => eqOAsset.equals(O.some(assetInList), O.fromNullable(assetFromString(asset))))
 
-  const pricePools = poolDetails
-    .map((detail: PoolDetail): PricePool => {
+  return FP.pipe(
+    details,
+    A.filterMap((detail) => {
+      const asset = findAssetInWhitelist(detail)
+      return asset ? O.some(detail) : O.none
+    }),
+    A.map((detail: PoolDetail): PricePool => {
       // Since we have filtered pools based on whitelist before ^,
       // we can type asset as `PricePoolAsset` now
-      const asset = assetFromString(detail?.asset ?? '') as PricePoolAsset
-      // As we use BUSD asset in our price selector to determine USD values we need to simulate BUSD pool values to match real USD
-      if (isBUSDAsset(asset)) {
-        const busdPoolData = toPoolData(detail)
-        return {
-          asset,
-          poolData: {
-            assetBalance: baseAmount(busdPoolData.assetBalance.amount().times(bnOrZero(detail.assetPriceUSD))),
-            runeBalance: baseAmount(busdPoolData.runeBalance.amount())
-          }
-        }
-      }
-
+      const asset = assetFromString(detail.asset) as PricePoolAsset
       return {
         asset,
         poolData: toPoolData(detail)
       }
-    })
-    // sort by weights (high weight wins)
-    .sort((a, b) => (CURRENCY_WHEIGHTS[assetToString(b.asset)] || 0) - (CURRENCY_WHEIGHTS[assetToString(a.asset)] || 0))
-  return [RUNE_PRICE_POOL, ...pricePools]
+    }),
+    //
+    A.append(RUNE_PRICE_POOL),
+    // "Empty" USD price pool - needed for price selector only.
+    // For price calculation we do use usd prices from Midgard only
+    A.append({
+      asset: PriceAssetUSD,
+      poolData: {
+        assetBalance: ZERO_BASE_AMOUNT,
+        runeBalance: ZERO_BASE_AMOUNT
+      }
+    }),
+    // sort by weights
+    NEA.sort(ordPricePool),
+    // reverse to start with hihger weight
+    NEA.reverse
+  )
 }
 
 /**
@@ -88,7 +92,7 @@ export const pricePoolSelector = (pools: PricePools, oAsset: O.Option<PricePoolA
   FP.pipe(
     oAsset,
     // (1) Check if `PricePool` is available in `PricePools`
-    O.mapNullable((asset) => pools.find((pool) => eqAsset.equals(pool.asset, asset))),
+    O.chainNullableK((asset) => pools.find((pool) => eqAsset.equals(pool.asset, asset))),
     // (2) If (1) fails, check if BUSDB pool is available in `PricePools`
     O.fold(() => O.fromNullable(pools.find((pool) => isBUSDAsset(pool.asset))), O.some),
     // (3) If (2) failes, return RUNE pool, which is always first entry in pools list
@@ -148,11 +152,18 @@ export const getBUSDPoolData = (poolDetails: PoolDetails): O.Option<PoolData> =>
   )
 
 /**
- * Transforms `PoolDetail` into `PoolData` (provided by `asgardex-util`)
+ * Converts a `BaseAmount` string into `PoolData` balance (always `1e8` decimal based)
  */
-export const toPoolData = (detail: Pick<PoolDetail, 'assetDepth' | 'runeDepth'>): PoolData => ({
-  assetBalance: baseAmount(bnOrZero(detail.assetDepth)),
-  runeBalance: baseAmount(bnOrZero(detail.runeDepth))
+export const toPoolBalance = (baseAmountString: string): BaseAmount => baseAmount(baseAmountString, THORCHAIN_DECIMAL)
+
+/**
+ * Transforms `PoolDetail` into `PoolData` (provided by `asgardex-util`)
+ *
+ * NOte: Balances of `PoolData` are always `1e8` based
+ */
+export const toPoolData = ({ assetDepth, runeDepth }: Pick<PoolDetail, 'assetDepth' | 'runeDepth'>): PoolData => ({
+  assetBalance: toPoolBalance(assetDepth),
+  runeBalance: toPoolBalance(runeDepth)
 })
 
 /**
@@ -200,7 +211,7 @@ export const inboundToPoolAddresses = (
       halted
     })),
     // Add "empty" rune "pool address" - we never had such pool, but do need it to calculate tx
-    A.cons(RUNE_POOL_ADDRESS)
+    A.prepend(RUNE_POOL_ADDRESS)
   )
 
 /**

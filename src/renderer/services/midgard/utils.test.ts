@@ -23,7 +23,7 @@ import {
   THREE_RUNE_BASE_AMOUNT,
   FOUR_RUNE_BASE_AMOUNT
 } from '../../../shared/mock/amount'
-import { PRICE_POOLS_WHITELIST, AssetBUSDBAF, ZERO_BN } from '../../const'
+import { PRICE_POOLS_WHITELIST, AssetBUSDBAF, ZERO_BN, PriceAssetUSD } from '../../const'
 import { eqAsset, eqPoolShare, eqPoolShares, eqOBigNumber } from '../../helpers/fp/eq'
 import { RUNE_POOL_ADDRESS, RUNE_PRICE_POOL } from '../../helpers/poolHelper'
 import { PoolDetail } from '../../types/generated/midgard'
@@ -74,6 +74,8 @@ describe('services/midgard/utils/', () => {
 
     it('returns list of price pools in a right order', () => {
       const result = getPricePools([tomob, eth, BUSDBAF, btc, lok], PRICE_POOLS_WHITELIST)
+      // Check length of price pools
+      expect(result.length).toEqual(4)
       // RUNE pool
       const pool0 = result[0]
       expect(pool0.asset).toEqual(AssetRuneNative)
@@ -84,36 +86,42 @@ describe('services/midgard/utils/', () => {
       expect(btcPool.asset).toEqual(AssetBTC)
       expect(btcPool.poolData.runeBalance.amount().toNumber()).toEqual(44)
       expect(btcPool.poolData.assetBalance.amount().toNumber()).toEqual(4)
-      // // ETH pool
+      // ETH pool
       const ethPool = result[2]
       expect(ethPool.asset).toEqual(AssetETH)
       expect(ethPool.poolData.runeBalance.amount().toNumber()).toEqual(22)
       expect(ethPool.poolData.assetBalance.amount().toNumber()).toEqual(2)
-      // // BUSDBAF pool
-      const busdPool = result[3]
-      expect(busdPool.asset).toEqual(AssetBUSDBAF)
-      expect(busdPool.poolData.runeBalance.amount().toNumber()).toEqual(33)
-      // Check if BUSD value is corrected to the real USD value based on assetPriceUSD
-      expect(busdPool.poolData.assetBalance.amount().toNumber()).toEqual(6)
+      // "USD pool"
+      const usdPool = result[3]
+      expect(usdPool.asset).toEqual(PriceAssetUSD)
+      // no balances in this pool, we will never use it
+      expect(usdPool.poolData.runeBalance.amount().toNumber()).toEqual(0)
+      expect(usdPool.poolData.assetBalance.amount().toNumber()).toEqual(0)
     })
 
-    it('returns RUNE price and btc pools in a right order', () => {
+    it('returns RUNE, USD, BTC price pools in a right order', () => {
       const result = getPricePools([tomob, lok, btc], PRICE_POOLS_WHITELIST)
-      expect(result.length).toEqual(2)
-      // RUNE pool
-      const pool0 = result[0]
-      expect(pool0.asset).toEqual(AssetRuneNative)
+      expect(result.length).toEqual(3)
+      // USD pool
+      const usdPool = result[2]
+      expect(usdPool.asset).toEqual(PriceAssetUSD)
       // BTC pool
       const btcPool = result[1]
       expect(btcPool.asset).toEqual(AssetBTC)
+      // RUNE pool
+      const runePool = result[0]
+      expect(runePool.asset).toEqual(AssetRuneNative)
     })
 
-    it('returns RUNE price pool only if another "price" pool is not available', () => {
+    it('returns RUNE, USD price pools only if other "price" pools are not available', () => {
       const result = getPricePools([tomob, lok], PRICE_POOLS_WHITELIST)
-      expect(result.length).toEqual(1)
+      expect(result.length).toEqual(2)
+      // USD pool
+      const usdPool = result[1]
+      expect(usdPool.asset).toEqual(PriceAssetUSD)
       // RUNE pool
-      const pool0 = result[0]
-      expect(pool0.asset).toEqual(AssetRuneNative)
+      const runePool = result[0]
+      expect(runePool.asset).toEqual(AssetRuneNative)
     })
   })
 
@@ -261,7 +269,7 @@ describe('services/midgard/utils/', () => {
       expect(inboundToPoolAddresses([])).toEqual([RUNE_POOL_ADDRESS])
     })
     it('adds two `PoolAddress`es', () => {
-      const result = inboundToPoolAddresses([{ chain: 'BNB', address: 'bnb-address', router: '' }])
+      const result = inboundToPoolAddresses([{ chain: 'BNB', address: 'bnb-address', router: '', halted: false }])
       expect(result.length).toEqual(2)
       // RUNE `PoolAddress`
       expect(result[0]).toEqual(RUNE_POOL_ADDRESS)
@@ -269,16 +277,17 @@ describe('services/midgard/utils/', () => {
       expect(result[1]).toEqual({
         chain: 'BNB',
         address: 'bnb-address',
-        router: O.none
+        router: O.none,
+        halted: false
       })
     })
   })
 
   describe('getPoolAddressesByChain', () => {
-    const bnbAddress: PoolAddress = { address: 'bnb pool address', chain: BNBChain, router: O.none }
-    const thorAddress: PoolAddress = { address: 'thor pool address', chain: THORChain, router: O.none }
-    const btcAddress: PoolAddress = { address: 'btc pool address', chain: BTCChain, router: O.none }
-    const ethAddress: PoolAddress = { address: '0xaddress', chain: ETHChain, router: O.some('0xrouter') }
+    const bnbAddress: PoolAddress = { address: 'bnb pool address', chain: BNBChain, router: O.none, halted: false }
+    const thorAddress: PoolAddress = { address: 'thor pool address', chain: THORChain, router: O.none, halted: false }
+    const btcAddress: PoolAddress = { address: 'btc pool address', chain: BTCChain, router: O.none, halted: false }
+    const ethAddress: PoolAddress = { address: '0xaddress', chain: ETHChain, router: O.some('0xrouter'), halted: false }
     const addresses = [bnbAddress, thorAddress, btcAddress, ethAddress]
 
     it('returns BNB pool address ', () => {

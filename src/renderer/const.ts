@@ -18,28 +18,28 @@ export const AssetBUSD74E: Asset = { chain: 'BNB', symbol: 'BUSD-74E', ticker: '
 // BUSD mainnet (neded for pricing)
 export const AssetBUSDBD1: Asset = { chain: 'BNB', symbol: 'BUSD-BD1', ticker: 'BUSD' }
 
-export const PRICE_ASSETS: PricePoolAssets = [
-  AssetRuneNative,
-  AssetETH,
-  AssetBTC,
-  AssetBUSDBAF,
-  AssetBUSDBD1,
-  AssetBUSD74E
-]
+// This asset does not and won't never exist in reality
+// It is used for pricing only.
+// Ignore usage of BNB chain, it's needed to satisfy constraints of `Asset.chain`
+export const PriceAssetUSD: Asset = {
+  chain: 'BNB' /* we can't leave it empty, we do need to enter a `Chain` here, just ignore it */,
+  symbol: 'USD-JUST-FOR-PRICING',
+  ticker: 'USD'
+}
+
+export const PRICE_ASSETS: PricePoolAssets = [AssetRuneNative, AssetETH, AssetBTC, PriceAssetUSD]
 
 // Weight of currencies needed for pricing
 // The higher the value the higher the weight
 export const CURRENCY_WHEIGHTS: PricePoolCurrencyWeights = {
-  [assetToString(AssetBUSDBAF)]: 0,
-  [assetToString(AssetBUSDBD1)]: 1,
-  [assetToString(AssetBUSD74E)]: 2,
-  [assetToString(AssetETH)]: 3,
-  [assetToString(AssetBTC)]: 4,
-  [assetToString(AssetRuneNative)]: 5
+  [assetToString(AssetRuneNative)]: 3,
+  [assetToString(AssetBTC)]: 2,
+  [assetToString(AssetETH)]: 1,
+  [assetToString(PriceAssetUSD)]: 0
 }
 
 // Whitelist of pools for pricing things
-export const PRICE_POOLS_WHITELIST: PricePoolAssets = [AssetBTC, AssetETH, AssetBUSDBAF, AssetBUSDBD1, AssetBUSD74E]
+export const PRICE_POOLS_WHITELIST: PricePoolAssets = [AssetBTC, AssetETH, PriceAssetUSD, AssetRuneNative]
 
 export const ZERO_BN = bn(0)
 
