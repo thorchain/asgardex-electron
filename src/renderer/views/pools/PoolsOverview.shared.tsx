@@ -22,8 +22,7 @@ export const assetColumn = (title: string): ColumnType<PoolTableRowData> => ({
   title,
   render: renderAssetColumn,
   sorter: sortAssetColumn,
-  sortDirections: ['descend', 'ascend'],
-  defaultSortOrder: 'descend'
+  sortDirections: ['descend', 'ascend']
 })
 
 const renderPoolColumn = ({ pool, network }: PoolTableRowData) => (
