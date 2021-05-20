@@ -1,4 +1,4 @@
-import { getValueOfAsset1InAsset2, getValueOfRuneInAsset, PoolData } from '@thorchain/asgardex-util'
+import { getValueOfAsset1InAsset2, getValueOfRuneInAsset } from '@thorchain/asgardex-util'
 import { Balance } from '@xchainjs/xchain-client'
 import { bnOrZero, assetFromString, AssetRuneNative, BaseAmount, Chain } from '@xchainjs/xchain-util'
 import BigNumber from 'bignumber.js'
@@ -13,8 +13,8 @@ import { PoolAddress, PoolDetails } from '../services/midgard/types'
 import { getPoolDetail, toPoolData } from '../services/midgard/utils'
 import { PoolDetail } from '../types/generated/midgard'
 import { PoolTableRowData, PoolTableRowsData, PricePool } from '../views/pools/Pools.types'
-import { getPoolTableRowData } from '../views/pools/Pools.utils'
-import { isRuneNativeAsset } from './assetHelper'
+import { getPoolTableRowData, poolDataFromUSDPrice } from '../views/pools/Pools.utils'
+import { isRuneNativeAsset, isUSDAsset } from './assetHelper'
 import { eqChain, eqString } from './fp/eq'
 import { ordBaseAmount } from './fp/ord'
 import { sequenceTOption, sequenceTOptionFromArray } from './fpHelpers'
@@ -129,17 +129,28 @@ export const getAssetPoolPrice = (runePrice: BigNumber) => (poolDetail: Pick<Poo
 export const getPoolPriceValue = (
   { asset, amount }: Balance,
   poolDetails: PoolDetails,
-  selectedPricePoolData: PoolData
+  pricePool: PricePool
 ): O.Option<BaseAmount> => {
+  console.log('pricePool:', pricePool.asset)
+  const isUSDPrice = isUSDAsset(pricePool.asset)
+
   return FP.pipe(
     getPoolDetail(poolDetails, asset),
-    O.map(toPoolData),
+    O.map((poolDetail) => {
+      const poolData = toPoolData(poolDetail)
+      const pricePoolData = isUSDPrice ? poolDataFromUSDPrice(poolDetail) : pricePool.poolData
+
+      return { poolData, pricePoolData }
+    }),
     // calculate value based on `pricePoolData`
-    O.map((poolData) => getValueOfAsset1InAsset2(amount, poolData, selectedPricePoolData)),
+    O.map(({ poolData, pricePoolData }) => {
+      return getValueOfAsset1InAsset2(amount, poolData, pricePoolData)
+    }),
+    // For rune we don't have poolDetails
     O.alt(() => {
       // Calculate RUNE values based on `pricePoolData`
       if (isRuneNativeAsset(asset)) {
-        return O.some(getValueOfRuneInAsset(amount, selectedPricePoolData))
+        return O.some(getValueOfRuneInAsset(amount, pricePool.poolData))
       }
       // In all other cases we don't have any price pool and no price
       return O.none

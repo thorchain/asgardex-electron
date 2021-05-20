@@ -23,14 +23,13 @@ import {
   THREE_RUNE_BASE_AMOUNT,
   FOUR_RUNE_BASE_AMOUNT
 } from '../../../shared/mock/amount'
-import { PRICE_POOLS_WHITELIST, AssetBUSDBAF, ZERO_BN, PriceAssetUSD } from '../../const'
+import { PRICE_POOLS_WHITELIST, AssetBUSDBAF, PriceAssetUSD } from '../../const'
 import { eqAsset, eqPoolShare, eqPoolShares, eqOBigNumber } from '../../helpers/fp/eq'
 import { RUNE_POOL_ADDRESS, RUNE_PRICE_POOL } from '../../helpers/poolHelper'
 import { PoolDetail } from '../../types/generated/midgard'
 import { PricePool, PricePools } from '../../views/pools/Pools.types'
-import { PoolAddress, PoolAssetDetail, PoolShare, PoolShares, PoolsState, PoolsStateRD } from './types'
+import { PoolAddress, PoolShare, PoolShares, PoolsState, PoolsStateRD } from './types'
 import {
-  getAssetDetail,
   getPricePools,
   pricePoolSelector,
   pricePoolSelectorFromRD,
@@ -50,21 +49,6 @@ import {
 } from './utils'
 
 describe('services/midgard/utils/', () => {
-  describe('getAssetDetail', () => {
-    const runeDetail: PoolAssetDetail = { asset: AssetRuneNative, assetPrice: ZERO_BN }
-    const bnbDetail: PoolAssetDetail = { asset: AssetBNB, assetPrice: ZERO_BN }
-
-    it('returns details of RUNE', () => {
-      const result = getAssetDetail([runeDetail, bnbDetail], AssetRuneNative.ticker)
-      expect(result).toEqual(O.some(runeDetail))
-    })
-
-    it('returns None if no RUNE details available', () => {
-      const result = getAssetDetail([bnbDetail], 'TOMOB')
-      expect(result).toBeNone()
-    })
-  })
-
   describe('getPricePools', () => {
     const tomob = { asset: 'BNB.TOMOB-1E1', assetDepth: '1', runeDepth: '11' } as PoolDetail
     const eth = { asset: 'ETH.ETH', assetDepth: '2', runeDepth: '22' } as PoolDetail
@@ -76,6 +60,10 @@ describe('services/midgard/utils/', () => {
       const result = getPricePools([tomob, eth, BUSDBAF, btc, lok], PRICE_POOLS_WHITELIST)
       // Check length of price pools
       expect(result.length).toEqual(4)
+      console.log(result[0].asset)
+      console.log(result[1].asset)
+      console.log(result[2].asset)
+      console.log(result[3].asset)
       // RUNE pool
       const pool0 = result[0]
       expect(pool0.asset).toEqual(AssetRuneNative)
@@ -95,16 +83,15 @@ describe('services/midgard/utils/', () => {
       const usdPool = result[3]
       expect(usdPool.asset).toEqual(PriceAssetUSD)
       // no balances in this pool, we will never use it
-      expect(usdPool.poolData.runeBalance.amount().toNumber()).toEqual(0)
-      expect(usdPool.poolData.assetBalance.amount().toNumber()).toEqual(0)
+      expect(usdPool.poolData.runeBalance.amount().toNumber()).toEqual(33)
+      expect(usdPool.poolData.assetBalance.amount().toNumber()).toEqual(600000000)
     })
 
-    it('returns RUNE, USD, BTC price pools in a right order', () => {
+    it('returns RUNE, BTC price pools in a right order', () => {
       const result = getPricePools([tomob, lok, btc], PRICE_POOLS_WHITELIST)
-      expect(result.length).toEqual(3)
-      // USD pool
-      const usdPool = result[2]
-      expect(usdPool.asset).toEqual(PriceAssetUSD)
+      expect(result.length).toEqual(2)
+      console.log(result[0].asset)
+      console.log(result[1].asset)
       // BTC pool
       const btcPool = result[1]
       expect(btcPool.asset).toEqual(AssetBTC)
@@ -113,12 +100,9 @@ describe('services/midgard/utils/', () => {
       expect(runePool.asset).toEqual(AssetRuneNative)
     })
 
-    it('returns RUNE, USD price pools only if other "price" pools are not available', () => {
+    it('returns RUNE price pool only if other "price" pools are not available', () => {
       const result = getPricePools([tomob, lok], PRICE_POOLS_WHITELIST)
-      expect(result.length).toEqual(2)
-      // USD pool
-      const usdPool = result[1]
-      expect(usdPool.asset).toEqual(PriceAssetUSD)
+      expect(result.length).toEqual(1)
       // RUNE pool
       const runePool = result[0]
       expect(runePool.asset).toEqual(AssetRuneNative)

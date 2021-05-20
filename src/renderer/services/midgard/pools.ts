@@ -10,7 +10,7 @@ import * as Rx from 'rxjs'
 import * as RxOp from 'rxjs/operators'
 
 import { ONE_BN, PRICE_POOLS_WHITELIST } from '../../const'
-import { isPricePoolAsset, midgardAssetFromString } from '../../helpers/assetHelper'
+import { isBUSDAsset, isPricePoolAsset, isUSDAsset, midgardAssetFromString } from '../../helpers/assetHelper'
 import { isEnabledChain } from '../../helpers/chainHelper'
 import { eqAsset, eqOAsset, eqOPoolAddresses, eqHaltedChain } from '../../helpers/fp/eq'
 import { sequenceTOption } from '../../helpers/fpHelpers'
@@ -557,12 +557,16 @@ const createPoolsService = (
    */
   const priceRatio$: Rx.Observable<BigNumber> = FP.pipe(
     Rx.combineLatest([FP.pipe(poolsState$, RxOp.map(RD.toOption)), selectedPricePoolAsset$]),
-    RxOp.map(([pools, selectedAsset]) => sequenceTOption(pools, selectedAsset)),
+    RxOp.map(([oPoolsState, oSelectedPriceAsset]) => sequenceTOption(oPoolsState, oSelectedPriceAsset)),
     RxOp.map(
-      O.chain(([pools, selectedAsset]) =>
+      O.chain(([{ assetDetails }, selectedPriceAsset]) =>
         FP.pipe(
-          pools.assetDetails,
-          A.findFirst(({ asset }) => eqAsset.equals(asset, selectedAsset))
+          assetDetails,
+          A.findFirst(({ asset }) => {
+            if (isUSDAsset(selectedPriceAsset)) return isBUSDAsset(asset)
+
+            return eqAsset.equals(asset, selectedPriceAsset)
+          })
         )
       )
     ),

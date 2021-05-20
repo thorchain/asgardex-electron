@@ -138,7 +138,7 @@ export const AssetsTableCollapsable: React.FC<Props> = (props): JSX.Element => {
 
   const renderPriceColumn = useCallback(
     (balance: Balance) => {
-      const oPrice = getPoolPriceValue(balance, poolDetails, pricePool.poolData)
+      const oPrice = getPoolPriceValue(balance, poolDetails, pricePool)
       const label = FP.pipe(
         oPrice,
         O.map((price) => {
@@ -154,7 +154,7 @@ export const AssetsTableCollapsable: React.FC<Props> = (props): JSX.Element => {
         </Styled.Label>
       )
     },
-    [poolDetails, pricePool.asset, pricePool.poolData]
+    [poolDetails, pricePool]
   )
 
   const priceColumn: ColumnType<Balance> = useMemo(
