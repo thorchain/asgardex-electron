@@ -61,10 +61,6 @@ describe('services/midgard/utils/', () => {
     it('returns list of price pools in a right order', () => {
       const result = getPricePools([bnb, eth, busd, btc, ltc], PRICE_POOLS_WHITELIST)
 
-      console.log(result.length)
-      console.log(result[0].asset)
-      console.log(result[1].asset)
-      console.log(result[3].asset)
       // RUNE pool
       const pool0 = result[0]
       expect(pool0.asset).toEqual(AssetRuneNative)

@@ -17,7 +17,7 @@ import * as FP from 'fp-ts/lib/function'
 import * as NEA from 'fp-ts/lib/NonEmptyArray'
 import * as O from 'fp-ts/lib/Option'
 
-import { isBUSDAsset, isUSDAsset, THORCHAIN_DECIMAL } from '../../helpers/assetHelper'
+import { isUSDAsset, THORCHAIN_DECIMAL } from '../../helpers/assetHelper'
 import { isMiniToken } from '../../helpers/binanceHelper'
 import { eqAsset, eqChain } from '../../helpers/fp/eq'
 import { optionFromNullableString } from '../../helpers/fp/from'
@@ -43,7 +43,10 @@ export const getPricePools = (details: PoolDetails, whitelist: PricePoolAssets):
   const oUSDPricePool: O.Option<PricePool> = FP.pipe(
     whitelist,
     A.filter(isUSDAsset),
-    (usdAssets) => details.filter((detail) => usdAssets.find((asset) => detail.asset === assetToString(asset))),
+    (usdAssets) =>
+      details.filter((detail) =>
+        usdAssets.find((asset) => detail.asset.toLowerCase() === assetToString(asset).toLowerCase())
+      ),
     getDeepestPool,
     O.chain((detail) =>
       FP.pipe(
@@ -107,8 +110,8 @@ export const pricePoolSelector = (pools: PricePools, oAsset: O.Option<PricePoolA
     oAsset,
     // (1) Check if `PricePool` is available in `PricePools`
     O.chainNullableK((asset) => pools.find((pool) => eqAsset.equals(pool.asset, asset))),
-    // (2) If (1) fails, check if BUSDB pool is available in `PricePools`
-    O.fold(() => O.fromNullable(pools.find((pool) => isBUSDAsset(pool.asset))), O.some),
+    // (2) If (1) fails, check if USD pool is available in `PricePools`
+    O.fold(() => O.fromNullable(pools.find((pool) => isUSDAsset(pool.asset))), O.some),
     // (3) If (2) failes, return RUNE pool, which is always first entry in pools list
     O.getOrElse(() => NEA.head(pools))
   )

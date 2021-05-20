@@ -15,7 +15,7 @@ import { getPoolDetail, toPoolData } from '../services/midgard/utils'
 import { PoolDetail } from '../types/generated/midgard'
 import { PoolTableRowData, PoolTableRowsData, PricePool } from '../views/pools/Pools.types'
 import { getPoolTableRowData } from '../views/pools/Pools.utils'
-import { isRuneNativeAsset } from './assetHelper'
+import { isRuneNativeAsset, to1e8BaseAmount } from './assetHelper'
 import { eqChain } from './fp/eq'
 import { ordBaseAmount } from './fp/ord'
 import { sequenceTOption, sequenceTOptionFromArray } from './fpHelpers'
@@ -132,15 +132,16 @@ export const getPoolPriceValue = (
   poolDetails: PoolDetails,
   selectedPricePoolData: PoolData
 ): O.Option<BaseAmount> => {
+  const amount1e8 = to1e8BaseAmount(amount)
   return FP.pipe(
     getPoolDetail(poolDetails, asset),
     O.map(toPoolData),
     // calculate value based on `pricePoolData`
-    O.map((poolData) => getValueOfAsset1InAsset2(amount, poolData, selectedPricePoolData)),
+    O.map((poolData) => getValueOfAsset1InAsset2(amount1e8, poolData, selectedPricePoolData)),
     O.alt(() => {
       // Calculate RUNE values based on `pricePoolData`
       if (isRuneNativeAsset(asset)) {
-        return O.some(getValueOfRuneInAsset(amount, selectedPricePoolData))
+        return O.some(getValueOfRuneInAsset(amount1e8, selectedPricePoolData))
       }
       // In all other cases we don't have any price pool and no price
       return O.none

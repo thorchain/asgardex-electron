@@ -6,7 +6,7 @@ import { useObservableState } from 'observable-hooks'
 import * as RxOp from 'rxjs/operators'
 
 import { useMidgardContext } from '../contexts/MidgardContext'
-import { isBUSDAsset } from '../helpers/assetHelper'
+import { isUSDAsset } from '../helpers/assetHelper'
 import { liveData } from '../helpers/rx/liveData'
 import { PricePool, PricePools } from '../views/pools/Pools.types'
 
@@ -31,7 +31,7 @@ export const usePricePools = () => {
 
   const usdPricePool: O.Option<PricePool> = FP.pipe(
     pricePools,
-    O.chain(FP.flow(A.findFirst(({ asset }: PricePool) => isBUSDAsset(asset))))
+    O.chain(FP.flow(A.findFirst(({ asset }: PricePool) => isUSDAsset(asset))))
   )
 
   return {
