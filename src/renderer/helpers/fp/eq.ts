@@ -16,7 +16,7 @@ import { ApiError } from '../../services/wallet/types'
 import { AssetWithAmount } from '../../types/asgardex'
 import { WalletBalance } from '../../types/wallet'
 
-const eqString = S.Eq
+export const eqString = S.Eq
 
 const eqBoolean = B.Eq
 

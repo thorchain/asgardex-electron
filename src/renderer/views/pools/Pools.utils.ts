@@ -1,6 +1,5 @@
 import { PoolData, getValueOfAsset1InAsset2, getValueOfRuneInAsset } from '@thorchain/asgardex-util'
 import {
-  bnOrZero,
   baseAmount,
   assetFromString,
   Asset,
@@ -11,14 +10,13 @@ import {
   BaseAmount
 } from '@xchainjs/xchain-util'
 import * as A from 'fp-ts/Array'
-import { eqString } from 'fp-ts/lib/Eq'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
 
 import { Network } from '../../../shared/api/types'
 import { ONE_RUNE_BASE_AMOUNT } from '../../../shared/mock/amount'
-import { ZERO_BASE_AMOUNT } from '../../const'
 import { isBtcAsset, isChainAsset, isEthAsset, isUSDAsset, isEthTokenAsset } from '../../helpers/assetHelper'
+import { eqString } from '../../helpers/fp/eq'
 import { sequenceTOption } from '../../helpers/fpHelpers'
 import { LastblockItems, PoolFilter } from '../../services/midgard/types'
 import { toPoolData } from '../../services/midgard/utils'
@@ -53,26 +51,18 @@ export const getPoolTableRowData = ({
   return FP.pipe(
     oPoolDetailAsset,
     O.map((poolDetailAsset) => {
-      const ticker = poolDetailAsset.ticker
-
       const poolData = toPoolData(poolDetail)
 
       const poolPrice = getValueOfAsset1InAsset2(ONE_RUNE_BASE_AMOUNT, poolData, pricePoolData)
 
-      const depthAmount = baseAmount(bnOrZero(poolDetail?.runeDepth))
+      const depthAmount = baseAmount(poolDetail.runeDepth)
       const depthPrice = getValueOfRuneInAsset(depthAmount, pricePoolData)
 
-      const volumeAmount = baseAmount(bnOrZero(poolDetail.volume24h))
+      // `depthAmount` is one side only, but we do need to show depth of both sides (asset + rune depth)
+      const volumeAmount = baseAmount(poolDetail.volume24h).times(2)
       const volumePrice = getValueOfRuneInAsset(volumeAmount, pricePoolData)
 
-      /**
-       * Mock it with fixed 0 as midgard v2 does not have data for it
-       * target result: baseAmount(bnOrZero(poolDetail?.poolTxAverage))
-       */
-      const transaction = ZERO_BASE_AMOUNT
-      const transactionPrice = getValueOfRuneInAsset(transaction, pricePoolData)
-
-      const status = stringToGetPoolsStatus(poolDetail?.status)
+      const status = stringToGetPoolsStatus(poolDetail.status)
 
       const pool: Pool = {
         asset: AssetRuneNative,
@@ -84,9 +74,8 @@ export const getPoolTableRowData = ({
         poolPrice,
         depthPrice,
         volumePrice,
-        transactionPrice,
         status,
-        key: ticker,
+        key: poolDetailAsset.ticker,
         network
       }
     })

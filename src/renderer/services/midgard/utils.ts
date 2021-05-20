@@ -38,12 +38,6 @@ import {
   InboundAddress
 } from './types'
 
-export const getAssetDetail = (assets: PoolAssetsDetail, ticker: string): O.Option<PoolAssetDetail> =>
-  FP.pipe(
-    assets,
-    A.findFirst(({ asset }: PoolAssetDetail) => asset.ticker === ticker)
-  )
-
 export const getPricePools = (pools: PoolDetails, whitelist?: PricePoolAssets): PricePools => {
   const poolDetails = !whitelist
     ? pools

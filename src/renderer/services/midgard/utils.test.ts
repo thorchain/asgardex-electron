@@ -23,14 +23,13 @@ import {
   THREE_RUNE_BASE_AMOUNT,
   FOUR_RUNE_BASE_AMOUNT
 } from '../../../shared/mock/amount'
-import { PRICE_POOLS_WHITELIST, AssetBUSDBAF, ZERO_BN } from '../../const'
+import { PRICE_POOLS_WHITELIST, AssetBUSDBAF } from '../../const'
 import { eqAsset, eqPoolShare, eqPoolShares, eqOBigNumber } from '../../helpers/fp/eq'
 import { RUNE_POOL_ADDRESS, RUNE_PRICE_POOL } from '../../helpers/poolHelper'
 import { PoolDetail } from '../../types/generated/midgard'
 import { PricePool, PricePools } from '../../views/pools/Pools.types'
-import { PoolAddress, PoolAssetDetail, PoolShare, PoolShares, PoolsState, PoolsStateRD } from './types'
+import { PoolAddress, PoolShare, PoolShares, PoolsState, PoolsStateRD } from './types'
 import {
-  getAssetDetail,
   getPricePools,
   pricePoolSelector,
   pricePoolSelectorFromRD,
@@ -50,21 +49,6 @@ import {
 } from './utils'
 
 describe('services/midgard/utils/', () => {
-  describe('getAssetDetail', () => {
-    const runeDetail: PoolAssetDetail = { asset: AssetRuneNative, assetPrice: ZERO_BN }
-    const bnbDetail: PoolAssetDetail = { asset: AssetBNB, assetPrice: ZERO_BN }
-
-    it('returns details of RUNE', () => {
-      const result = getAssetDetail([runeDetail, bnbDetail], AssetRuneNative.ticker)
-      expect(result).toEqual(O.some(runeDetail))
-    })
-
-    it('returns None if no RUNE details available', () => {
-      const result = getAssetDetail([bnbDetail], 'TOMOB')
-      expect(result).toBeNone()
-    })
-  })
-
   describe('getPricePools', () => {
     const tomob = { asset: 'BNB.TOMOB-1E1', assetDepth: '1', runeDepth: '11' } as PoolDetail
     const eth = { asset: 'ETH.ETH', assetDepth: '2', runeDepth: '22' } as PoolDetail
@@ -260,7 +244,7 @@ describe('services/midgard/utils/', () => {
       expect(inboundToPoolAddresses([])).toEqual([RUNE_POOL_ADDRESS])
     })
     it('adds two `PoolAddress`es', () => {
-      const result = inboundToPoolAddresses([{ chain: 'BNB', address: 'bnb-address', router: '' }])
+      const result = inboundToPoolAddresses([{ chain: 'BNB', address: 'bnb-address', router: '', halted: false }])
       expect(result.length).toEqual(2)
       // RUNE `PoolAddress`
       expect(result[0]).toEqual(RUNE_POOL_ADDRESS)
@@ -268,16 +252,17 @@ describe('services/midgard/utils/', () => {
       expect(result[1]).toEqual({
         chain: 'BNB',
         address: 'bnb-address',
-        router: O.none
+        router: O.none,
+        halted: false
       })
     })
   })
 
   describe('getPoolAddressesByChain', () => {
-    const bnbAddress: PoolAddress = { address: 'bnb pool address', chain: BNBChain, router: O.none }
-    const thorAddress: PoolAddress = { address: 'thor pool address', chain: THORChain, router: O.none }
-    const btcAddress: PoolAddress = { address: 'btc pool address', chain: BTCChain, router: O.none }
-    const ethAddress: PoolAddress = { address: '0xaddress', chain: ETHChain, router: O.some('0xrouter') }
+    const bnbAddress: PoolAddress = { address: 'bnb pool address', chain: BNBChain, router: O.none, halted: false }
+    const thorAddress: PoolAddress = { address: 'thor pool address', chain: THORChain, router: O.none, halted: false }
+    const btcAddress: PoolAddress = { address: 'btc pool address', chain: BTCChain, router: O.none, halted: false }
+    const ethAddress: PoolAddress = { address: '0xaddress', chain: ETHChain, router: O.some('0xrouter'), halted: false }
     const addresses = [bnbAddress, thorAddress, btcAddress, ethAddress]
 
     it('returns BNB pool address ', () => {

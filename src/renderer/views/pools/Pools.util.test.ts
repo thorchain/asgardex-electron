@@ -52,8 +52,7 @@ describe('views/pools/utils', () => {
         },
         poolPrice: assetToBase(assetAmount(2)),
         depthPrice: assetToBase(assetAmount(1000)),
-        volumePrice: assetToBase(assetAmount(1000)),
-        transactionPrice: assetToBase(assetAmount(1000)),
+        volumePrice: assetToBase(assetAmount(2000)),
         status: GetPoolsStatusEnum.Available,
         deepest: false,
         key: 'hi',
@@ -74,7 +73,6 @@ describe('views/pools/utils', () => {
           expect(data.pool).toEqual(expected.pool)
           expect(data.depthPrice.amount().toNumber()).toEqual(expected.depthPrice.amount().toNumber())
           expect(data.volumePrice.amount().toNumber()).toEqual(expected.volumePrice.amount().toNumber())
-          expect(data.transactionPrice.amount().toNumber()).toEqual(0)
           return true
         })
       )

@@ -28,7 +28,6 @@ export type PoolTableRowData = {
   pool: Pool
   depthPrice: BaseAmount
   volumePrice: BaseAmount
-  transactionPrice: BaseAmount
   poolPrice: BaseAmount
   status: GetPoolsStatusEnum
   deepest?: boolean

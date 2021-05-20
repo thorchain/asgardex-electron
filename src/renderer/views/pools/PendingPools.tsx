@@ -147,7 +147,7 @@ export const PendingPools: React.FC<PoolsComponentProps> = (): JSX.Element => {
       Shared.poolColumn(intl.formatMessage({ id: 'common.pool' })),
       Shared.assetColumn(intl.formatMessage({ id: 'common.asset' })),
       Shared.priceColumn(intl.formatMessage({ id: 'common.price' }), selectedPricePool.asset),
-      Shared.depthColumn(intl.formatMessage({ id: 'pools.depth' }), selectedPricePool.asset),
+      Shared.depthColumn(intl.formatMessage({ id: 'common.liquidity' }), selectedPricePool.asset),
       blockLeftColumn,
       btnPendingPoolsColumn
     ],
