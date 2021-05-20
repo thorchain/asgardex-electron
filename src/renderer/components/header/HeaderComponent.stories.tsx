@@ -1,6 +1,5 @@
 import React from 'react'
 
-import * as RD from '@devexperts/remote-data-ts'
 import { storiesOf } from '@storybook/react'
 import { AssetRuneNative } from '@xchainjs/xchain-util'
 import { none } from 'fp-ts/lib/Option'
@@ -21,7 +20,7 @@ storiesOf('Components/Header', module).add('default', () => {
     <HeaderComponent
       keystore={none}
       lockHandler={() => console.log('lockHandler')}
-      poolsState$={Rx.of(RD.pending)}
+      pricePools={O.none}
       setSelectedPricePool={() => console.log('setSelectedPricePool')}
       selectedPricePoolAsset$={Rx.of(O.some(AssetRuneNative))}
       locale={Locale.EN}

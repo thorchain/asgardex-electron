@@ -1,8 +1,8 @@
 import React, { useMemo, useState, useCallback, useRef } from 'react'
 
-import * as RD from '@devexperts/remote-data-ts'
 import { Row, Col, Tabs, Grid } from 'antd'
 import * as FP from 'fp-ts/function'
+import * as A from 'fp-ts/lib/Array'
 import * as O from 'fp-ts/lib/Option'
 import { useObservableState } from 'observable-hooks'
 import { useIntl } from 'react-intl'
@@ -21,10 +21,10 @@ import { ReactComponent as AsgardexLogo } from '../../assets/svg/logo-asgardex.s
 import { useThemeContext } from '../../contexts/ThemeContext'
 import * as poolsRoutes from '../../routes/pools'
 import * as walletRoutes from '../../routes/wallet'
-import { PoolsStateRD, SelectedPricePoolAsset } from '../../services/midgard/types'
+import { SelectedPricePoolAsset } from '../../services/midgard/types'
 import { KeystoreState } from '../../services/wallet/types'
 import { isLocked } from '../../services/wallet/util'
-import { PricePoolAsset, PricePoolAssets } from '../../views/pools/Pools.types'
+import { PricePoolAsset, PricePoolAssets, PricePools } from '../../views/pools/Pools.types'
 import { HeaderContainer, TabLink, HeaderDrawer, HeaderDrawerItem } from './HeaderComponent.style'
 import { HeaderLang } from './lang'
 import { HeaderLock } from './lock/'
@@ -51,7 +51,7 @@ type Props = {
   keystore: KeystoreState
   lockHandler: FP.Lazy<void>
   setSelectedPricePool: (asset: PricePoolAsset) => void
-  poolsState$: Observable<PoolsStateRD>
+  pricePools: O.Option<PricePools>
   selectedPricePoolAsset$: Observable<SelectedPricePoolAsset>
   locale: Locale
   changeLocale?: (locale: Locale) => void
@@ -67,7 +67,7 @@ type Props = {
 export const HeaderComponent: React.FC<Props> = (props): JSX.Element => {
   const {
     keystore,
-    poolsState$,
+    pricePools: oPricePools,
     selectedPricePoolAsset$,
     lockHandler,
     setSelectedPricePool,
@@ -89,7 +89,6 @@ export const HeaderComponent: React.FC<Props> = (props): JSX.Element => {
   const { theme$ } = useThemeContext()
   const theme = useObservableState(theme$)
 
-  const poolsRD = useObservableState(poolsState$, RD.pending)
   const selectedPricePoolAsset = useObservableState<SelectedPricePoolAsset>(selectedPricePoolAsset$, O.none)
 
   // store previous data to render it while reloading new data
@@ -97,15 +96,16 @@ export const HeaderComponent: React.FC<Props> = (props): JSX.Element => {
 
   // TODO (@Veado) Use `usePricePools` in parent view to provide pricePools
   const pricePoolAssets = useMemo(() => {
-    const pools = RD.toNullable(poolsRD)
-    if (!pools) {
-      return prevPricePoolAssets?.current ?? []
-    }
-    const pricePools = O.toNullable(pools.pricePools)
-    const assets = (pricePools && pricePools.map((pool) => pool.asset)) || []
-    prevPricePoolAssets.current = assets
-    return assets
-  }, [poolsRD])
+    return FP.pipe(
+      oPricePools,
+      O.map(A.map((pool) => pool.asset)),
+      O.map((assets) => {
+        prevPricePoolAssets.current = assets
+        return assets
+      }),
+      O.getOrElse(() => prevPricePoolAssets?.current ?? [])
+    )
+  }, [oPricePools])
 
   const hasPricePools = useMemo(() => pricePoolAssets.length > 0, [pricePoolAssets])
 
