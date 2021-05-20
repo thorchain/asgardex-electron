@@ -3,15 +3,15 @@ import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
 
 import * as API from '../../helpers/apiHelper'
-import { isBUSDAsset } from '../../helpers/assetHelper'
+import { isUSDAsset } from '../../helpers/assetHelper'
 import { OnlineStatus } from '../../services/app/types'
 import { PricePoolAsset } from '../../views/pools/Pools.types'
 
 export const toHeaderCurrencyLabel = (asset: PricePoolAsset): string => {
-  let ticker = asset.ticker
-  // special case BUSDB
-  if (isBUSDAsset(asset)) ticker = 'USD'
-  return `${currencySymbolByAsset(asset)} ${ticker}`
+  // special case USD* assets
+  const symbol = currencySymbolByAsset(asset)
+  const label = isUSDAsset(asset) ? 'USD' : asset.ticker
+  return `${symbol} ${label}`
 }
 
 export const headerNetStatusSubheadline = ({
