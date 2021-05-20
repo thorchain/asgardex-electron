@@ -18,9 +18,14 @@ import { ONE_RUNE_BASE_AMOUNT } from '../../../shared/mock/amount'
 import { isBtcAsset, isChainAsset, isEthAsset, isUSDAsset, isEthTokenAsset } from '../../helpers/assetHelper'
 import { eqString } from '../../helpers/fp/eq'
 import { sequenceTOption } from '../../helpers/fpHelpers'
-import { LastblockItems, PoolFilter } from '../../services/midgard/types'
+import { PoolFilter } from '../../services/midgard/types'
 import { toPoolData } from '../../services/midgard/utils'
-import { GetPoolsStatusEnum, Constants as ThorchainConstants, PoolDetail } from '../../types/generated/midgard'
+import {
+  GetPoolsStatusEnum,
+  Constants as ThorchainConstants,
+  PoolDetail,
+  LastblockItem
+} from '../../types/generated/midgard'
 import { PoolTableRowData, Pool } from './Pools.types'
 
 const stringToGetPoolsStatus = (str?: string): GetPoolsStatusEnum => {
@@ -55,11 +60,11 @@ export const getPoolTableRowData = ({
 
       const poolPrice = getValueOfAsset1InAsset2(ONE_RUNE_BASE_AMOUNT, poolData, pricePoolData)
 
-      const depthAmount = baseAmount(poolDetail.runeDepth)
+      // `depthAmount` is one side only, but we do need to show depth of both sides (asset + rune depth)
+      const depthAmount = baseAmount(poolDetail.runeDepth).times(2)
       const depthPrice = getValueOfRuneInAsset(depthAmount, pricePoolData)
 
-      // `depthAmount` is one side only, but we do need to show depth of both sides (asset + rune depth)
-      const volumeAmount = baseAmount(poolDetail.volume24h).times(2)
+      const volumeAmount = baseAmount(poolDetail.volume24h)
       const volumePrice = getValueOfRuneInAsset(volumeAmount, pricePoolData)
 
       const status = stringToGetPoolsStatus(poolDetail.status)
@@ -84,7 +89,7 @@ export const getPoolTableRowData = ({
 
 export const getBlocksLeftForPendingPool = (
   constants: ThorchainConstants,
-  lastblocks: LastblockItems,
+  lastblocks: Array<Pick<LastblockItem, 'chain' | 'thorchain'>>,
   asset: Asset
 ): O.Option<number> => {
   const oNewPoolCycle: O.Option<number> = O.fromNullable(constants.int_64_values.PoolCycle)
@@ -102,7 +107,7 @@ export const getBlocksLeftForPendingPool = (
 
 export const getBlocksLeftForPendingPoolAsString = (
   constants: ThorchainConstants,
-  lastblocks: LastblockItems,
+  lastblocks: Array<Pick<LastblockItem, 'chain' | 'thorchain'>>,
   asset: Asset
 ): string => {
   return FP.pipe(

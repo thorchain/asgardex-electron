@@ -8,7 +8,8 @@ import {
   assetToString,
   Chain,
   isValidBN,
-  bn
+  bn,
+  BaseAmount
 } from '@xchainjs/xchain-util'
 import BigNumber from 'bignumber.js'
 import * as A from 'fp-ts/lib/Array'
@@ -16,12 +17,12 @@ import * as FP from 'fp-ts/lib/function'
 import * as NEA from 'fp-ts/lib/NonEmptyArray'
 import * as O from 'fp-ts/lib/Option'
 
-import { CURRENCY_WHEIGHTS } from '../../const'
-import { isBUSDAsset } from '../../helpers/assetHelper'
+import { isUSDAsset, THORCHAIN_DECIMAL } from '../../helpers/assetHelper'
 import { isMiniToken } from '../../helpers/binanceHelper'
 import { eqAsset, eqChain } from '../../helpers/fp/eq'
 import { optionFromNullableString } from '../../helpers/fp/from'
-import { RUNE_POOL_ADDRESS, RUNE_PRICE_POOL } from '../../helpers/poolHelper'
+import { ordPricePool } from '../../helpers/fp/ord'
+import { getDeepestPool, RUNE_POOL_ADDRESS, RUNE_PRICE_POOL } from '../../helpers/poolHelper'
 import { PoolDetail } from '../../types/generated/midgard'
 import { PricePoolAssets, PricePools, PricePoolAsset, PricePool } from '../../views/pools/Pools.types'
 import {
@@ -38,24 +39,62 @@ import {
   InboundAddress
 } from './types'
 
-export const getPricePools = (pools: PoolDetails, whitelist?: PricePoolAssets): PricePools => {
-  const poolDetails = !whitelist
-    ? pools
-    : pools.filter((detail) => whitelist.find((asset) => detail?.asset === assetToString(asset)))
+export const getPricePools = (details: PoolDetails, whitelist: PricePoolAssets): PricePools => {
+  const oUSDPricePool: O.Option<PricePool> = FP.pipe(
+    whitelist,
+    A.filter(isUSDAsset),
+    (usdAssets) =>
+      details.filter((detail) =>
+        usdAssets.find((asset) => detail.asset.toLowerCase() === assetToString(asset).toLowerCase())
+      ),
+    getDeepestPool,
+    O.chain((detail) =>
+      FP.pipe(
+        assetFromString(detail.asset),
+        O.fromNullable,
+        O.map((asset) => ({
+          asset,
+          poolData: toPoolData(detail)
+        }))
+      )
+    )
+  )
 
-  const pricePools = poolDetails
-    .map((detail: PoolDetail) => {
-      // Since we have filtered pools based on whitelist before ^,
-      // we can type asset as `PricePoolAsset` now
-      const asset = assetFromString(detail?.asset ?? '') as PricePoolAsset
-      return {
-        asset,
-        poolData: toPoolData(detail)
-      } as PricePool
-    })
-    // sort by weights (high weight wins)
-    .sort((a, b) => (CURRENCY_WHEIGHTS[assetToString(b.asset)] || 0) - (CURRENCY_WHEIGHTS[assetToString(a.asset)] || 0))
-  return [RUNE_PRICE_POOL, ...pricePools]
+  const pricePoolAssets: PricePoolAssets = FP.pipe(whitelist, A.filter(FP.not(isUSDAsset)))
+
+  return FP.pipe(
+    details,
+    // filter details for using assets in whitelist only
+    A.filterMap((detail) => {
+      const asset = pricePoolAssets.find((asset) => detail.asset === assetToString(asset))
+      return asset ? O.some(detail) : O.none
+    }),
+    // Map `PoolDetail` -> `PricePool`
+    A.filterMap(
+      (detail: PoolDetail): O.Option<PricePool> =>
+        FP.pipe(
+          assetFromString(detail.asset),
+          O.fromNullable,
+          O.map((asset) => ({
+            asset,
+            poolData: toPoolData(detail)
+          }))
+        )
+    ),
+    // Add USD price pool (if available)
+    (pricePools) =>
+      FP.pipe(
+        oUSDPricePool,
+        O.map((usdPricePool) => [...pricePools, usdPricePool]),
+        O.getOrElse(() => pricePools)
+      ),
+    // Add RUNE price pool
+    A.append(RUNE_PRICE_POOL),
+    // sort by weights
+    NEA.sort(ordPricePool),
+    // reverse to start with hihger weight
+    NEA.reverse
+  )
 }
 
 /**
@@ -70,9 +109,9 @@ export const pricePoolSelector = (pools: PricePools, oAsset: O.Option<PricePoolA
   FP.pipe(
     oAsset,
     // (1) Check if `PricePool` is available in `PricePools`
-    O.mapNullable((asset) => pools.find((pool) => eqAsset.equals(pool.asset, asset))),
-    // (2) If (1) fails, check if BUSDB pool is available in `PricePools`
-    O.fold(() => O.fromNullable(pools.find((pool) => isBUSDAsset(pool.asset))), O.some),
+    O.chainNullableK((asset) => pools.find((pool) => eqAsset.equals(pool.asset, asset))),
+    // (2) If (1) fails, check if USD pool is available in `PricePools`
+    O.fold(() => O.fromNullable(pools.find((pool) => isUSDAsset(pool.asset))), O.some),
     // (3) If (2) failes, return RUNE pool, which is always first entry in pools list
     O.getOrElse(() => NEA.head(pools))
   )
@@ -113,28 +152,18 @@ export const toPoolsData = (poolDetails: Array<Pick<PoolDetail, 'asset' | 'asset
   poolDetails.reduce<PoolsDataMap>((acc, cur) => ({ ...acc, [cur.asset]: toPoolData(cur) }), {})
 
 /**
- * Helper to get PoolData of BUSD pool
+ * Converts a `BaseAmount` string into `PoolData` balance (always `1e8` decimal based)
  */
-export const getBUSDPoolData = (poolDetails: PoolDetails): O.Option<PoolData> =>
-  FP.pipe(
-    poolDetails,
-    A.findFirst(({ asset }) =>
-      FP.pipe(
-        asset,
-        assetFromString,
-        O.fromNullable,
-        O.fold(() => false, isBUSDAsset)
-      )
-    ),
-    O.map(toPoolData)
-  )
+export const toPoolBalance = (baseAmountString: string): BaseAmount => baseAmount(baseAmountString, THORCHAIN_DECIMAL)
 
 /**
  * Transforms `PoolDetail` into `PoolData` (provided by `asgardex-util`)
+ *
+ * Note: Balances of `PoolData` are always `1e8` based
  */
-export const toPoolData = (detail: Pick<PoolDetail, 'assetDepth' | 'runeDepth'>): PoolData => ({
-  assetBalance: baseAmount(bnOrZero(detail.assetDepth)),
-  runeBalance: baseAmount(bnOrZero(detail.runeDepth))
+export const toPoolData = ({ assetDepth, runeDepth }: Pick<PoolDetail, 'assetDepth' | 'runeDepth'>): PoolData => ({
+  assetBalance: toPoolBalance(assetDepth),
+  runeBalance: toPoolBalance(runeDepth)
 })
 
 /**

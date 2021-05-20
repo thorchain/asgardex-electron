@@ -1,8 +1,11 @@
-import { bn, baseAmount, AssetBTC, AssetRuneNative, AssetBNB } from '@xchainjs/xchain-util'
+import { PoolData } from '@thorchain/asgardex-util'
+import { bn, baseAmount, AssetBTC, AssetRuneNative, AssetBNB, AssetETH } from '@xchainjs/xchain-util'
 
 import { ASSETS_TESTNET } from '../../../shared/mock/assets'
+import { AssetUSDC, ZERO_BASE_AMOUNT } from '../../const'
 import { WalletBalance } from '../../types/wallet'
-import { ordBigNumber, ordBaseAmount, ordAsset, ordWalletBalanceByAsset } from './ord'
+import { PricePool } from '../../views/pools/Pools.types'
+import { ordBigNumber, ordBaseAmount, ordAsset, ordWalletBalanceByAsset, ordPricePool } from './ord'
 
 describe('helpers/fp/ord', () => {
   describe('ordBigNumber', () => {
@@ -57,6 +60,38 @@ describe('helpers/fp/ord', () => {
     })
     it('is equal', () => {
       expect(ordWalletBalanceByAsset.compare(a, a)).toEqual(0)
+    })
+  })
+
+  describe('ordPricePool', () => {
+    const poolData: PoolData = {
+      runeBalance: ZERO_BASE_AMOUNT,
+      assetBalance: ZERO_BASE_AMOUNT
+    }
+    const rune: PricePool = {
+      asset: AssetRuneNative,
+      poolData
+    }
+    const eth: PricePool = {
+      poolData,
+      asset: AssetETH
+    }
+    const btc: PricePool = {
+      poolData,
+      asset: AssetBTC
+    }
+    const usd: PricePool = {
+      poolData,
+      asset: AssetUSDC
+    }
+    it('rune > eth', () => {
+      expect(ordPricePool.compare(rune, eth)).toEqual(1)
+    })
+    it('eth < btc', () => {
+      expect(ordPricePool.compare(eth, btc)).toEqual(-1)
+    })
+    it('usd < btc', () => {
+      expect(ordPricePool.compare(usd, btc)).toEqual(-1)
     })
   })
 })

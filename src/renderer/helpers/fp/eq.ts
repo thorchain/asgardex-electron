@@ -1,4 +1,5 @@
 import * as RD from '@devexperts/remote-data-ts'
+import { PoolData } from '@thorchain/asgardex-util'
 import { Balance, Balances } from '@xchainjs/xchain-client'
 import { Asset, AssetAmount, BaseAmount, Chain } from '@xchainjs/xchain-util'
 import BigNumber from 'bignumber.js'
@@ -15,6 +16,7 @@ import { PoolAddress, PoolShare } from '../../services/midgard/types'
 import { ApiError } from '../../services/wallet/types'
 import { AssetWithAmount } from '../../types/asgardex'
 import { WalletBalance } from '../../types/wallet'
+import { PricePool } from '../../views/pools/Pools.types'
 
 export const eqString = S.Eq
 
@@ -154,4 +156,14 @@ export const eqODepositAssetFees = O.getEq(eqDepositAssetFees)
 export const eqHaltedChain = Eq.struct({
   chain: eqChain,
   halted: eqBoolean
+})
+
+export const eqPoolData = Eq.struct<PoolData>({
+  assetBalance: eqBaseAmount,
+  runeBalance: eqBaseAmount
+})
+
+export const eqPricePool = Eq.struct<PricePool>({
+  asset: eqAsset,
+  poolData: eqPoolData
 })
