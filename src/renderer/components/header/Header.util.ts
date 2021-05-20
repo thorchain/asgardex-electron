@@ -8,10 +8,10 @@ import { OnlineStatus } from '../../services/app/types'
 import { PricePoolAsset } from '../../views/pools/Pools.types'
 
 export const toHeaderCurrencyLabel = (asset: PricePoolAsset): string => {
-  let ticker = asset.ticker
-  // special case USD
-  if (isUSDAsset(asset)) ticker = 'USD'
-  return `${currencySymbolByAsset(asset)} ${ticker}`
+  // special case USD* assets
+  const symbol = currencySymbolByAsset(asset)
+  const label = isUSDAsset(asset) ? 'USD' : asset.ticker
+  return `${symbol} ${label}`
 }
 
 export const headerNetStatusSubheadline = ({
