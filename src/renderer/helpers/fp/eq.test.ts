@@ -6,6 +6,7 @@ import { ASSETS_TESTNET } from '../../../shared/mock/assets'
 import { PoolAddress, PoolShare } from '../../services/midgard/types'
 import { ApiError, ErrorId } from '../../services/wallet/types'
 import { AssetWithAmount } from '../../types/asgardex'
+import { PricePool } from '../../views/pools/Pools.types'
 import {
   eqAsset,
   eqBaseAmount,
@@ -22,7 +23,8 @@ import {
   eqPoolShare,
   eqPoolAddresses,
   eqONullableString,
-  eqAssetAmount
+  eqAssetAmount,
+  eqPricePool
 } from './eq'
 
 describe('helpers/fp/eq', () => {
@@ -327,12 +329,14 @@ describe('helpers/fp/eq', () => {
     const a: PoolAddress = {
       chain: 'BCH',
       address: 'addressA',
-      router: O.none
+      router: O.none,
+      halted: false
     }
     const b: PoolAddress = {
       chain: 'BNB',
       address: 'addressB',
-      router: O.some('routerB')
+      router: O.some('routerB'),
+      halted: false
     }
     it('is equal', () => {
       expect(eqPoolAddresses.equals(a, a)).toBeTruthy()
@@ -341,6 +345,39 @@ describe('helpers/fp/eq', () => {
     it('is not equal', () => {
       expect(eqPoolAddresses.equals(a, b)).toBeFalsy()
       expect(eqPoolAddresses.equals(b, a)).toBeFalsy()
+    })
+  })
+
+  describe('eqPricePool', () => {
+    const a: PricePool = {
+      asset: AssetRuneNative,
+      poolData: {
+        runeBalance: baseAmount(1),
+        assetBalance: baseAmount(1)
+      }
+    }
+    const b: PricePool = {
+      asset: AssetRuneNative,
+      poolData: {
+        runeBalance: baseAmount(2),
+        assetBalance: baseAmount(1)
+      }
+    }
+    const c: PricePool = {
+      asset: AssetBNB,
+      poolData: {
+        runeBalance: baseAmount(2),
+        assetBalance: baseAmount(1)
+      }
+    }
+
+    it('is equal', () => {
+      expect(eqPricePool.equals(a, a)).toBeTruthy()
+      expect(eqPricePool.equals(b, b)).toBeTruthy()
+    })
+    it('is not equal', () => {
+      expect(eqPricePool.equals(a, b)).toBeFalsy()
+      expect(eqPricePool.equals(b, c)).toBeFalsy()
     })
   })
 })

@@ -5,7 +5,6 @@ import * as A from 'fp-ts/Array'
 import * as FP from 'fp-ts/lib/function'
 import * as NEA from 'fp-ts/lib/NonEmptyArray'
 import * as O from 'fp-ts/Option'
-import { some } from 'fp-ts/Option'
 import * as Rx from 'rxjs'
 import * as RxOp from 'rxjs/operators'
 
@@ -317,7 +316,7 @@ const createPoolsService = (
       RxOp.map((poolDetailsRD) =>
         FP.pipe(
           poolDetailsRD,
-          RD.map((poolDetails) => some(getPricePools(poolDetails, PRICE_POOLS_WHITELIST)))
+          RD.map((poolDetails) => O.some(getPricePools(poolDetails, PRICE_POOLS_WHITELIST)))
         )
       ),
       RxOp.shareReplay(1)
@@ -435,7 +434,7 @@ const createPoolsService = (
    */
   const setSelectedPricePoolAsset = (asset: PricePoolAsset) => {
     localStorage.setItem(PRICE_POOL_KEY, assetToString(asset))
-    updateSelectedPricePoolAsset(some(asset))
+    updateSelectedPricePoolAsset(O.some(asset))
   }
 
   /**

@@ -12,19 +12,54 @@ import {
 
 import { PricePoolCurrencyWeights, PricePoolAssets } from './views/pools/Pools.types'
 
-// BUSD testnet (neded for pricing)
+//
+// All of following assets are needed for pricing USD
+//
+
+// BUSD testnet
 export const AssetBUSDBAF: Asset = { chain: 'BNB', symbol: 'BUSD-BAF', ticker: 'BUSD' }
 export const AssetBUSD74E: Asset = { chain: 'BNB', symbol: 'BUSD-74E', ticker: 'BUSD' }
-// BUSD mainnet (neded for pricing)
+// BUSD mainnet
 export const AssetBUSDBD1: Asset = { chain: 'BNB', symbol: 'BUSD-BD1', ticker: 'BUSD' }
+// BNB.USDT
+export const AssetUSDTDC8: Asset = { chain: 'BNB', symbol: 'USDT-DC8', ticker: 'USDT' }
+// ETH.USDT mainnet
+export const AssetUSDTDAC: Asset = {
+  chain: 'ETH',
+  symbol: 'USDT-0XDAC17F958D2EE523A2206206994597C13D831EC7',
+  ticker: 'USDT'
+}
+// ETH.USDT testnet
+export const AssetUSDT62E: Asset = {
+  chain: 'ETH',
+  symbol: 'USDT-0X62E273709DA575835C7F6AEF4A31140CA5B1D190',
+  ticker: 'USDT'
+}
+// ETH.USDC mainnet
+export const AssetUSDC: Asset = {
+  chain: 'ETH',
+  symbol: 'USDC-0XA0B86991C6218B36C1D19D4A2E9EB0CE3606EB48',
+  ticker: 'USDC'
+}
 
-export const PRICE_ASSETS: PricePoolAssets = [
-  AssetRuneNative,
-  AssetETH,
-  AssetBTC,
+// BNB.BUSD-BD1 - runeDepth: 111880 runePriceUsd: 13.32
+// BNB.BUSD-BAF - pool not found
+// BNB.BUSD-74E - pool not found
+// BNB.USDT-DC8 - pool not found
+// ETH.USDT-0XDAC17F958D2EE523A2206206994597C13D831EC7 - runeDepth: 135306 runePriceUsd: 13.29
+// ETH.USDC-0XA0B86991C6218B36C1D19D4A2E9EB0CE3606EB48 - runeDepth: 187480 runePriceUsd: 13.26
+// ETH.USDT-0X62E273709DA575835C7F6AEF4A31140CA5B1D190 - pool not found
+
+export const DEFAULT_PRICE_ASSETS: PricePoolAssets = [AssetRuneNative, AssetETH, AssetBTC]
+
+export const USD_PRICE_ASSETS: PricePoolAssets = [
   AssetBUSDBAF,
   AssetBUSDBD1,
-  AssetBUSD74E
+  AssetBUSD74E,
+  AssetUSDTDC8,
+  AssetUSDTDAC,
+  AssetUSDT62E,
+  AssetUSDC
 ]
 
 // Weight of currencies needed for pricing
@@ -33,13 +68,17 @@ export const CURRENCY_WHEIGHTS: PricePoolCurrencyWeights = {
   [assetToString(AssetBUSDBAF)]: 0,
   [assetToString(AssetBUSDBD1)]: 1,
   [assetToString(AssetBUSD74E)]: 2,
-  [assetToString(AssetETH)]: 3,
-  [assetToString(AssetBTC)]: 4,
-  [assetToString(AssetRuneNative)]: 5
+  [assetToString(AssetUSDTDC8)]: 3,
+  [assetToString(AssetUSDTDAC)]: 4,
+  [assetToString(AssetUSDT62E)]: 5,
+  [assetToString(AssetUSDC)]: 6,
+  [assetToString(AssetETH)]: 7,
+  [assetToString(AssetBTC)]: 8,
+  [assetToString(AssetRuneNative)]: 9
 }
 
 // Whitelist of pools for pricing things
-export const PRICE_POOLS_WHITELIST: PricePoolAssets = [AssetBTC, AssetETH, AssetBUSDBAF, AssetBUSDBD1, AssetBUSD74E]
+export const PRICE_POOLS_WHITELIST: PricePoolAssets = [...DEFAULT_PRICE_ASSETS, ...USD_PRICE_ASSETS]
 
 export const ZERO_BN = bn(0)
 

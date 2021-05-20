@@ -1,9 +1,16 @@
 import { Asset, assetToString, BaseAmount } from '@xchainjs/xchain-util'
 import BigNumber from 'bignumber.js'
+import * as N from 'fp-ts/lib/number'
 import * as Ord from 'fp-ts/lib/Ord'
+import * as S from 'fp-ts/lib/string'
 
+import { CURRENCY_WHEIGHTS } from '../../const'
 import { WalletBalance } from '../../types/wallet'
-import { eqBaseAmount, eqBigNumber, eqAsset } from './eq'
+import { PricePool } from '../../views/pools/Pools.types'
+import { eqBaseAmount, eqBigNumber, eqAsset, eqPricePool } from './eq'
+
+const ordString = S.Ord
+const ordNumber = N.Ord
 
 export const ordBigNumber: Ord.Ord<BigNumber> = {
   equals: eqBigNumber.equals,
@@ -21,7 +28,7 @@ export const ordBaseAmount: Ord.Ord<BaseAmount> = {
 export const ordAsset: Ord.Ord<Asset> = {
   equals: eqAsset.equals,
   // comparing by using`assetToString`
-  compare: (x, y) => Ord.ordString.compare(assetToString(x), assetToString(y))
+  compare: (x, y) => ordString.compare(assetToString(x), assetToString(y))
 }
 
 /**
@@ -30,5 +37,15 @@ export const ordAsset: Ord.Ord<Asset> = {
 export const ordWalletBalanceByAsset: Ord.Ord<WalletBalance> = {
   equals: (x, y) => eqAsset.equals(x.asset, y.asset),
   // comparing by using`assetToString`
-  compare: (x, y) => Ord.ordString.compare(assetToString(x.asset), assetToString(y.asset))
+  compare: (x, y) => ordString.compare(assetToString(x.asset), assetToString(y.asset))
+}
+
+/**
+ * Comparing PricePools
+ **/
+export const ordPricePool: Ord.Ord<PricePool> = {
+  equals: eqPricePool.equals,
+  // comparing by using`assetToString`
+  compare: ({ asset: assetA }, { asset: assetB }) =>
+    ordNumber.compare(CURRENCY_WHEIGHTS[assetToString(assetA)] || 0, CURRENCY_WHEIGHTS[assetToString(assetB)] || 0)
 }
