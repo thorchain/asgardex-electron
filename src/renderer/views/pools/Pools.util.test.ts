@@ -51,8 +51,8 @@ describe('views/pools/utils', () => {
           target: ASSETS_TESTNET.FTM
         },
         poolPrice: assetToBase(assetAmount(2)),
-        depthPrice: assetToBase(assetAmount(1000)),
-        volumePrice: assetToBase(assetAmount(2000)),
+        depthPrice: assetToBase(assetAmount(2000)),
+        volumePrice: assetToBase(assetAmount(1000)),
         status: GetPoolsStatusEnum.Available,
         deepest: false,
         key: 'hi',
@@ -71,8 +71,8 @@ describe('views/pools/utils', () => {
         O.map((data) => {
           expect(data.pool).toEqual(expected.pool)
           expect(data.pool).toEqual(expected.pool)
-          expect(data.depthPrice.amount().toNumber()).toEqual(expected.depthPrice.amount().toNumber())
-          expect(data.volumePrice.amount().toNumber()).toEqual(expected.volumePrice.amount().toNumber())
+          expect(data.depthPrice.eq(expected.depthPrice)).toBeTruthy()
+          expect(data.volumePrice.eq(expected.volumePrice)).toBeTruthy()
           return true
         })
       )
@@ -85,10 +85,10 @@ describe('views/pools/utils', () => {
     } as ThorchainConstants
     const lastblock = [
       {
-        thorchain: '2000',
+        thorchain: 2000,
         chain: BNBChain
       }
-    ] as LastblockItems
+    ]
     it('returns number of blocks left', () => {
       const result = O.toNullable(getBlocksLeftForPendingPool(constants, lastblock, AssetBNB))
       expect(result).toEqual(1001)
@@ -113,10 +113,10 @@ describe('views/pools/utils', () => {
     } as ThorchainConstants
     const lastblock = [
       {
-        thorchain: '1000',
+        thorchain: 1000,
         chain: BNBChain
       }
-    ] as LastblockItems
+    ]
     it('returns number of blocks left', () => {
       const result = getBlocksLeftForPendingPoolAsString(constants, lastblock, AssetBNB)
       expect(result).toEqual('234')
