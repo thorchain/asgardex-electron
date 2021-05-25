@@ -30,7 +30,7 @@ export const PoolCards: React.FC<Props> = ({
 }) => {
   const intl = useIntl()
 
-  const liquidity = useMemo(() => H.getDepth(poolDetail, priceRatio), [poolDetail, priceRatio])
+  const liquidity = useMemo(() => H.getLiquidity(poolDetail, priceRatio), [poolDetail, priceRatio])
   const volume = useMemo(() => H.getVolume(poolDetail, priceRatio), [poolDetail, priceRatio])
   const apy = useMemo(() => H.getAPY(poolDetail), [poolDetail])
 

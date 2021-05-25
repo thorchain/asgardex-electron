@@ -4,7 +4,7 @@ import * as O from 'fp-ts/Option'
 import { ZERO_ASSET_AMOUNT, ZERO_BN } from '../../const'
 import { eqAssetAmount, eqBigNumber } from '../../helpers/fp/eq'
 import {
-  getDepth,
+  getLiquidity,
   getVolume,
   getAPY,
   getPrice,
@@ -16,23 +16,23 @@ import {
 } from './PoolDetails.helpers'
 
 describe('PoolDetails.helpers', () => {
-  describe('getDepth', () => {
+  describe('getLiquidity', () => {
     it('should return zero value for incorrect data', () => {
-      expect(eqAssetAmount.equals(getDepth({ runeDepth: '' }), ZERO_ASSET_AMOUNT)).toBeTruthy()
-      expect(eqAssetAmount.equals(getDepth({ runeDepth: 'asdasd' }), ZERO_ASSET_AMOUNT)).toBeTruthy()
+      expect(eqAssetAmount.equals(getLiquidity({ runeDepth: '' }), ZERO_ASSET_AMOUNT)).toBeTruthy()
+      expect(eqAssetAmount.equals(getLiquidity({ runeDepth: 'asdasd' }), ZERO_ASSET_AMOUNT)).toBeTruthy()
     })
     it('should get depth correctly for default price ratio', () => {
       expect(
         eqAssetAmount.equals(
-          getDepth({ runeDepth: assetToBase(assetAmount(123)).amount().toString() }),
-          assetAmount(123)
+          getLiquidity({ runeDepth: assetToBase(assetAmount(100)).amount().toString() }),
+          assetAmount(200)
         )
       ).toBeTruthy()
 
       expect(
         eqAssetAmount.equals(
-          getDepth({ runeDepth: assetToBase(assetAmount(123.123123)).amount().toString() }),
-          assetAmount(123.123123)
+          getLiquidity({ runeDepth: assetToBase(assetAmount(123.123)).amount().toString() }),
+          assetAmount(246.246)
         )
       ).toBeTruthy()
     })
@@ -40,15 +40,15 @@ describe('PoolDetails.helpers', () => {
     it('should get depth correctly for provided price ratio', () => {
       expect(
         eqAssetAmount.equals(
-          getDepth({ runeDepth: assetToBase(assetAmount(123)).amount().toString() }, bn(2)),
-          assetAmount(246)
+          getLiquidity({ runeDepth: assetToBase(assetAmount(100)).amount().toString() }, bn(2)),
+          assetAmount(400)
         )
       ).toBeTruthy()
 
       expect(
         eqAssetAmount.equals(
-          getDepth({ runeDepth: assetToBase(assetAmount(100)).amount().toString() }, bn(2.5)),
-          assetAmount(250)
+          getLiquidity({ runeDepth: assetToBase(assetAmount(100)).amount().toString() }, bn(2.5)),
+          assetAmount(500)
         )
       ).toBeTruthy()
     })
