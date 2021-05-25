@@ -1,7 +1,8 @@
+import { Address } from '@xchainjs/xchain-client'
 import { Asset, AssetAmount, baseToAsset } from '@xchainjs/xchain-util'
-import * as A from 'fp-ts/lib/Array'
-import * as FP from 'fp-ts/lib/function'
-import * as O from 'fp-ts/lib/Option'
+import * as A from 'fp-ts/Array'
+import * as FP from 'fp-ts/function'
+import * as O from 'fp-ts/Option'
 
 import { WalletBalances } from '../services/clients'
 import { NonEmptyWalletBalances } from '../services/wallet/types'
@@ -37,13 +38,23 @@ export const getWalletBalanceByAsset = (
     )
   )
 
+export const getWalletAssetAmountFromBalances =
+  (isTargetWalletBalance: FP.Predicate<WalletBalance>) =>
+  (balances: WalletBalances): O.Option<AssetAmount> => {
+    return FP.pipe(
+      balances,
+      A.findFirst(isTargetWalletBalance),
+      O.map(({ amount }) => baseToAsset(amount))
+    )
+  }
+
 export const getAssetAmountFromBalances = (
   balances: WalletBalances,
-  isAsset: (asset: Asset) => boolean
+  isAsset: (asset: Asset, walletAddress: Address) => boolean
 ): O.Option<AssetAmount> =>
   FP.pipe(
     balances,
-    A.findFirst(({ asset }) => isAsset(asset)),
+    A.findFirst(({ asset, walletAddress }) => isAsset(asset, walletAddress)),
     O.map(({ amount }) => baseToAsset(amount))
   )
 

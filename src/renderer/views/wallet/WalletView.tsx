@@ -90,7 +90,7 @@ export const WalletView: React.FC = (): JSX.Element => {
           <Route path={walletRoutes.send.template} exact>
             <SendView />
           </Route>
-          <Route path={walletRoutes.upgradeBnbRune.template} exact>
+          <Route path={walletRoutes.upgradeRune.template} exact>
             <UpgradeView />
           </Route>
           <Route path={walletRoutes.assetDetail.template} exact>

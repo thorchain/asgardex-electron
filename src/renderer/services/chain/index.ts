@@ -18,7 +18,7 @@ import {
   swap$,
   asymDeposit$,
   symDeposit$,
-  upgradeBnbRune$,
+  upgradeRuneToNative$,
   symWithdraw$,
   asymWithdraw$,
   transfer$
@@ -50,7 +50,7 @@ export {
   swap$,
   asymDeposit$,
   symDeposit$,
-  upgradeBnbRune$,
+  upgradeRuneToNative$,
   symWithdraw$,
   asymWithdraw$,
   transfer$,

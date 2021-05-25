@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
-import { assetFromString, BNBChain, THORChain } from '@xchainjs/xchain-util'
+import { assetFromString, THORChain } from '@xchainjs/xchain-util'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/Option'
 import { useObservableState } from 'observable-hooks'
@@ -18,7 +18,7 @@ import { useBinanceContext } from '../../contexts/BinanceContext'
 import { useChainContext } from '../../contexts/ChainContext'
 import { useMidgardContext } from '../../contexts/MidgardContext'
 import { useWalletContext } from '../../contexts/WalletContext'
-import { isRuneBnbAsset } from '../../helpers/assetHelper'
+import { isRuneAsset } from '../../helpers/assetHelper'
 import { sequenceTOption } from '../../helpers/fpHelpers'
 import { liveData } from '../../helpers/rx/liveData'
 import { AssetDetailsParams } from '../../routes/wallet'
@@ -28,7 +28,7 @@ import { INITIAL_BALANCES_STATE } from '../../services/wallet/const'
 type Props = {}
 
 export const UpgradeView: React.FC<Props> = (): JSX.Element => {
-  const { asset } = useParams<AssetDetailsParams>()
+  const { asset, walletAddress } = useParams<AssetDetailsParams>()
 
   const intl = useIntl()
 
@@ -36,8 +36,8 @@ export const UpgradeView: React.FC<Props> = (): JSX.Element => {
   const network = useObservableState<Network>(network$, DEFAULT_NETWORK)
 
   // accept BNB.Rune only
-  const oRuneBnbAsset = useMemo(
-    () => FP.pipe(assetFromString(asset), O.fromNullable, O.filter(isRuneBnbAsset)),
+  const oRuneNonNativeAsset = useMemo(
+    () => FP.pipe(assetFromString(asset), O.fromNullable, O.filter(isRuneAsset)),
     [asset]
   )
 
@@ -52,7 +52,7 @@ export const UpgradeView: React.FC<Props> = (): JSX.Element => {
   const oGetExplorerTxUrl = useObservableState(getExplorerTxUrl$, O.none)
 
   const { fees$: bnbFees$, reloadFees: reloadBnbFees } = useBinanceContext()
-  const { addressByChain$, upgradeBnbRune$ } = useChainContext()
+  const { addressByChain$, upgradeRuneToNative$ } = useChainContext()
 
   const {
     service: {
@@ -68,7 +68,7 @@ export const UpgradeView: React.FC<Props> = (): JSX.Element => {
   const [upgradeFeeRD] = useObservableState(
     () =>
       FP.pipe(
-        oRuneBnbAsset,
+        oRuneNonNativeAsset,
         O.fold(
           // No subscription of `fees$ ` needed for other assets than BNB.RUNE
           () => Rx.EMPTY,
@@ -85,7 +85,7 @@ export const UpgradeView: React.FC<Props> = (): JSX.Element => {
   const [oRuneNativeAddress] = useObservableState(
     () =>
       FP.pipe(
-        oRuneBnbAsset,
+        oRuneNonNativeAsset,
         O.fold(
           () => Rx.of(O.none),
           // We do need rune native address to upgrade BNB.RUNE only
@@ -95,14 +95,14 @@ export const UpgradeView: React.FC<Props> = (): JSX.Element => {
     O.none
   )
 
-  const [bnbPoolAddressRD] = useObservableState(
+  const [targetPoolAddressRD] = useObservableState(
     () =>
       FP.pipe(
-        oRuneBnbAsset,
+        oRuneNonNativeAsset,
         O.fold(
           // No subscription of `poolAddresses$ ` needed for other assets than BNB.RUNE
           () => Rx.of(RD.failure(Error(intl.formatMessage({ id: 'wallet.errors.asset.notExist' }, { asset })))),
-          (_) => poolAddressesByChain$(BNBChain)
+          (asset) => poolAddressesByChain$(asset.chain)
         )
       ),
     RD.initial
@@ -110,7 +110,7 @@ export const UpgradeView: React.FC<Props> = (): JSX.Element => {
 
   const renderAssetError = useMemo(
     () =>
-      O.isNone(oRuneBnbAsset) ? (
+      O.isNone(oRuneNonNativeAsset) ? (
         <>
           <BackLink />
           <ErrorView
@@ -125,13 +125,13 @@ export const UpgradeView: React.FC<Props> = (): JSX.Element => {
       ) : (
         <></>
       ),
-    [asset, intl, oRuneBnbAsset]
+    [asset, intl, oRuneNonNativeAsset]
   )
 
   return FP.pipe(
     // Show an error by invalid or missing asset in route only
     // All other values should be immediately available by entering the `UpgradeView`
-    sequenceTOption(oRuneBnbAsset, oRuneNativeAddress, oGetExplorerTxUrl),
+    sequenceTOption(oRuneNonNativeAsset, oRuneNativeAddress, oGetExplorerTxUrl),
     O.fold(
       () => renderAssetError,
       ([runeBnbAsset, runeNativeAddress, getExplorerTxUrl]) => {
@@ -142,11 +142,12 @@ export const UpgradeView: React.FC<Props> = (): JSX.Element => {
           <>
             <BackLink />
             <Upgrade
+              walletAddress={walletAddress}
               runeAsset={runeBnbAsset}
               runeNativeAddress={runeNativeAddress}
-              bnbPoolAddressRD={bnbPoolAddressRD}
+              bnbPoolAddressRD={targetPoolAddressRD}
               validatePassword$={validatePassword$}
-              upgrade$={upgradeBnbRune$}
+              upgrade$={upgradeRuneToNative$}
               reloadFeeHandler={reloadBnbFees}
               fee={upgradeFeeRD}
               balances={oBalances}

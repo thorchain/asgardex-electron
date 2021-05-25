@@ -1,7 +1,7 @@
 import React, { useCallback, useMemo, useState } from 'react'
 
 import { Address } from '@xchainjs/xchain-client'
-import { Asset, AssetRuneNative, assetToString, BaseAmount } from '@xchainjs/xchain-util'
+import { Asset, AssetRuneNative, assetToBase, assetToString } from '@xchainjs/xchain-util'
 import { Row, Col, Grid } from 'antd'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
@@ -10,14 +10,14 @@ import { useHistory } from 'react-router-dom'
 
 import { Network } from '../../../../shared/api/types'
 import * as AssetHelper from '../../../helpers/assetHelper'
-import { eqAsset } from '../../../helpers/fp/eq'
-import { getWalletBalanceByAsset } from '../../../helpers/walletHelper'
+import { eqAsset, eqString } from '../../../helpers/fp/eq'
+import { sequenceTOption } from '../../../helpers/fpHelpers'
+import { getWalletAssetAmountFromBalances } from '../../../helpers/walletHelper'
 import * as walletRoutes from '../../../routes/wallet'
 import { GetExplorerTxUrl, TxsPageRD } from '../../../services/clients'
 import { MAX_ITEMS_PER_PAGE } from '../../../services/const'
 import { EMPTY_LOAD_TXS_HANDLER } from '../../../services/wallet/const'
 import { LoadTxsHandler, NonEmptyWalletBalances } from '../../../services/wallet/types'
-import { WalletBalance } from '../../../types/wallet'
 import { AssetInfo } from '../../uielements/assets/assetInfo'
 import { BackLink } from '../../uielements/backLink'
 import { Button, RefreshButton } from '../../uielements/button'
@@ -73,8 +73,8 @@ export const AssetDetails: React.FC<Props> = (props): JSX.Element => {
   const walletActionUpgradeRuneBnbClick = useCallback(() => {
     FP.pipe(
       oWalletAddress,
-      O.filter((_) => AssetHelper.isRuneBnbAsset(asset)),
-      O.map((walletAddress) => walletRoutes.upgradeBnbRune.path({ asset: assetToString(asset), walletAddress })),
+      O.filter((_) => AssetHelper.isRuneAsset(asset)),
+      O.map((walletAddress) => walletRoutes.upgradeRune.path({ asset: assetToString(asset), walletAddress })),
       O.map(history.push)
     )
   }, [oWalletAddress, history, asset])
@@ -100,41 +100,45 @@ export const AssetDetails: React.FC<Props> = (props): JSX.Element => {
   )
 
   const oRuneBnbAsset: O.Option<Asset> = useMemo(
-    () => FP.pipe(asset, O.fromPredicate(AssetHelper.isRuneBnbAsset)),
+    () => FP.pipe(asset, O.fromPredicate(AssetHelper.isRuneAsset)),
     [asset]
   )
 
-  const isRuneBnbAsset: boolean = useMemo(() => AssetHelper.isRuneBnbAsset(asset), [asset])
+  const isRuneBnbAsset: boolean = useMemo(() => AssetHelper.isRuneAsset(asset), [asset])
 
   const isRuneNativeAsset: boolean = useMemo(() => eqAsset.equals(asset, AssetRuneNative), [asset])
 
-  const oRuneBnbBalance: O.Option<WalletBalance> = useMemo(
-    () => getWalletBalanceByAsset(oBalances, oRuneBnbAsset),
-    [oRuneBnbAsset, oBalances]
-  )
-
-  const oRuneBnbAmount: O.Option<BaseAmount> = useMemo(
+  const getRuneBalance = useMemo(
     () =>
       FP.pipe(
-        oRuneBnbBalance,
-        O.map(({ amount }) => amount)
+        sequenceTOption(oRuneBnbAsset, oWalletAddress),
+        O.map(([asset, walletAddress]) =>
+          getWalletAssetAmountFromBalances(
+            (balance) => eqString.equals(balance.walletAddress, walletAddress) && eqAsset.equals(balance.asset, asset)
+          )
+        )
       ),
-    [oRuneBnbBalance]
+    [oRuneBnbAsset, oWalletAddress]
+  )
+
+  const oRuneBnbAmount = useMemo(
+    () => FP.pipe(getRuneBalance, O.ap(oBalances), O.flatten, O.map(assetToBase)),
+    [getRuneBalance, oBalances]
   )
 
   const actionColSpanDesktop = 12
   const actionColSpanMobile = 24
 
-  const runeUpgradeDisabled: boolean = useMemo(
-    () =>
+  const runeUpgradeDisabled: boolean = useMemo(() => {
+    return (
       isRuneBnbAsset &&
       FP.pipe(
         oRuneBnbAmount,
         O.map((amount) => amount.amount().isLessThan(0)),
         O.getOrElse<boolean>(() => true)
-      ),
-    [isRuneBnbAsset, oRuneBnbAmount]
-  )
+      )
+    )
+  }, [isRuneBnbAsset, oRuneBnbAmount])
 
   const walletInfo = useMemo(
     () =>

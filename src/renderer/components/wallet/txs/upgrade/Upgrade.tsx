@@ -21,10 +21,16 @@ import { useIntl } from 'react-intl'
 
 import { Network } from '../../../../../shared/api/types'
 import { ZERO_BASE_AMOUNT, ZERO_BN } from '../../../../const'
+import { convertBaseAmountDecimal } from '../../../../helpers/assetHelper'
 import { getChainAsset } from '../../../../helpers/chainHelper'
+import { eqAsset, eqString } from '../../../../helpers/fp/eq'
 import { sequenceTOption } from '../../../../helpers/fpHelpers'
 import { emptyString } from '../../../../helpers/stringHelper'
-import { getBnbAmountFromBalances, getRuneBnBAmountFromBalances } from '../../../../helpers/walletHelper'
+import {
+  // getBnbAmountFromBalances,
+  // getRuneBnBAmountFromBalances,
+  getWalletAssetAmountFromBalances
+} from '../../../../helpers/walletHelper'
 import { useSubscriptionState } from '../../../../hooks/useSubscriptionState'
 import { INITIAL_UPGRADE_RUNE_STATE } from '../../../../services/chain/const'
 import { UpgradeRuneParams, UpgradeRuneTxState, UpgradeRuneTxState$ } from '../../../../services/chain/types'
@@ -43,6 +49,7 @@ import * as CStyled from './Upgrade.styles'
 
 export type Props = {
   runeAsset: Asset
+  walletAddress: Address
   runeNativeAddress: Address
   bnbPoolAddressRD: PoolAddressRD
   validatePassword$: ValidatePasswordHandler
@@ -73,7 +80,8 @@ export const Upgrade: React.FC<Props> = (props): JSX.Element => {
     successActionHandler,
     reloadFeeHandler,
     reloadBalancesHandler,
-    network
+    network,
+    walletAddress
   } = props
 
   const intl = useIntl()
@@ -102,23 +110,51 @@ export const Upgrade: React.FC<Props> = (props): JSX.Element => {
     setAmountToUpgrade(ZERO_BASE_AMOUNT)
   }, [resetUpgradeTxState])
 
-  const oRuneBnbAmount: O.Option<BaseAmount> = useMemo(
-    () => FP.pipe(oBalances, O.chain(FP.flow(getRuneBnBAmountFromBalances, O.map(assetToBase)))),
-    [oBalances]
+  const getRuneBalance = useMemo(
+    () =>
+      getWalletAssetAmountFromBalances(
+        (balance) => eqString.equals(balance.walletAddress, walletAddress) && eqAsset.equals(balance.asset, runeAsset)
+      ),
+    [runeAsset, walletAddress]
   )
 
-  const oBnbAmount: O.Option<BaseAmount> = useMemo(
-    () => FP.pipe(oBalances, O.chain(FP.flow(getBnbAmountFromBalances, O.map(assetToBase)))),
-    [oBalances]
+  const getBaseAssetBalance = useMemo(
+    () =>
+      getWalletAssetAmountFromBalances(
+        (balance) =>
+          eqString.equals(balance.walletAddress, walletAddress) &&
+          eqAsset.equals(balance.asset, getChainAsset(runeAsset.chain))
+      ),
+    [runeAsset, walletAddress]
+  )
+
+  const oNonNativeRuneAmount: O.Option<BaseAmount> = useMemo(
+    () => FP.pipe(oBalances, O.chain(FP.flow(getRuneBalance, O.map(assetToBase)))),
+    [oBalances, getRuneBalance]
+  )
+
+  const targetAssetDecimal = useMemo(
+    () =>
+      FP.pipe(
+        oNonNativeRuneAmount,
+        O.map((amount) => amount.decimal),
+        O.getOrElse(() => 0)
+      ),
+    [oNonNativeRuneAmount]
+  )
+
+  const oBaseAssetAmount: O.Option<BaseAmount> = useMemo(
+    () => FP.pipe(oBalances, O.chain(FP.flow(getBaseAssetBalance, O.map(assetToBase)))),
+    [oBalances, getBaseAssetBalance]
   )
 
   const maxAmount: BaseAmount = useMemo(
     () =>
       FP.pipe(
-        oRuneBnbAmount,
+        oNonNativeRuneAmount,
         O.getOrElse(() => ZERO_BASE_AMOUNT)
       ),
-    [oRuneBnbAmount]
+    [oNonNativeRuneAmount]
   )
 
   useEffect(() => {
@@ -148,11 +184,11 @@ export const Upgrade: React.FC<Props> = (props): JSX.Element => {
       // we have to validate input before storing into the state
       amountValidator(undefined, value)
         .then(() => {
-          setAmountToUpgrade(assetToBase(assetAmount(value)))
+          setAmountToUpgrade(convertBaseAmountDecimal(assetToBase(assetAmount(value)), targetAssetDecimal))
         })
         .catch(() => {}) // do nothing, Ant' form does the job for us to show an error message
     },
-    [amountValidator]
+    [amountValidator, targetAssetDecimal]
   )
 
   const onSubmit = useCallback(() => setShowConfirmUpgradeModal(true), [])
@@ -182,20 +218,20 @@ export const Upgrade: React.FC<Props> = (props): JSX.Element => {
 
   const isFeeError = useMemo(() => {
     return FP.pipe(
-      sequenceTOption(oFee, oBnbAmount),
+      sequenceTOption(oFee, oBaseAssetAmount),
       O.fold(
         // Missing (or loading) fees does not mean we can't sent something. No error then.
         () => !O.isNone(oFee),
         ([fee, bnbAmount]) => bnbAmount.amount().isLessThan(fee.amount())
       )
     )
-  }, [oBnbAmount, oFee])
+  }, [oBaseAssetAmount, oFee])
 
   const renderFeeError = useMemo(() => {
     if (!isFeeError) return <></>
 
     return FP.pipe(
-      sequenceTOption(oFee, oBnbAmount),
+      sequenceTOption(oFee, oBaseAssetAmount),
       O.map(([fee, bnbAmount]) => {
         const msg = intl.formatMessage(
           { id: 'wallet.upgrade.feeError' },
@@ -221,7 +257,7 @@ export const Upgrade: React.FC<Props> = (props): JSX.Element => {
       }),
       O.getOrElse(() => <></>)
     )
-  }, [isFeeError, oFee, oBnbAmount, intl])
+  }, [isFeeError, oFee, oBaseAssetAmount, intl])
 
   const uiFeesRD: UIFeesRD = useMemo(
     () =>
@@ -284,11 +320,11 @@ export const Upgrade: React.FC<Props> = (props): JSX.Element => {
     () =>
       isFeeError ||
       FP.pipe(
-        oRuneBnbAmount,
+        oNonNativeRuneAmount,
         O.map((amount) => amount.amount().isLessThanOrEqualTo(0) || isLoading),
         O.getOrElse<boolean>(() => true)
       ),
-    [isFeeError, oRuneBnbAmount, isLoading]
+    [isFeeError, oNonNativeRuneAmount, isLoading]
   )
 
   const renderUpgradeForm = useMemo(
