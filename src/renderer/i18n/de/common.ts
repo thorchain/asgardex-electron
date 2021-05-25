@@ -42,6 +42,8 @@ const common: CommonMessages = {
   'common.viewTransaction': 'Transaktion ansehen',
   'common.fee': 'Gebühr',
   'common.fees': 'Gebühren',
+  'common.fee.estimated': 'Voraussichtliche Gebühr',
+  'common.fees.estimated': 'Voraussichtliche Gebühren',
   'common.max': 'Max',
   'common.min': 'Min',
   'common.search': 'Suche',

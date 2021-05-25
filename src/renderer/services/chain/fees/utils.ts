@@ -75,9 +75,9 @@ export const getChainFeeByGasRate = ({
       asset: AssetLTC
     })
   } else if (isEthAsset(asset)) {
-    // ETH = 1 * gasRate * 10^9 (GWEI) * 35000 (units)
+    // ETH = 1 * gasRate * 10^9 (GWEI) * 50000 (units)
     return O.some({
-      amount: baseAmount(gasRateGwei.multipliedBy(35000), ETH_DECIMAL),
+      amount: baseAmount(gasRateGwei.multipliedBy(50000), ETH_DECIMAL),
       asset: AssetETH
     })
   } else if (isEthTokenAsset(asset)) {
