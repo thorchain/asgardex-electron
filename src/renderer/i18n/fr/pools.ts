@@ -9,7 +9,7 @@ const pools: PoolsMessages = {
   'pools.trades': 'Transactions',
   'pools.pending': 'En attente',
   'pools.available': 'Disponible',
-  'pools.halted.chain': 'Trading for pools on {chain} chain(s) is halted for maintenance. - FR'
+  'pools.halted.chain': 'Le trading pour les pools de la chaîne {chain} est interrompu pour maintenance'
 }
 
 export default pools
