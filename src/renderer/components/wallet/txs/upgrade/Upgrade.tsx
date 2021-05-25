@@ -4,7 +4,6 @@ import * as RD from '@devexperts/remote-data-ts'
 import { getSwitchMemo } from '@thorchain/asgardex-util'
 import { Address } from '@xchainjs/xchain-client'
 import {
-  Asset,
   assetAmount,
   AssetBNB,
   assetToBase,
@@ -37,6 +36,7 @@ import { UpgradeRuneParams, UpgradeRuneTxState, UpgradeRuneTxState$ } from '../.
 import { FeeRD } from '../../../../services/chain/types'
 import { PoolAddressRD } from '../../../../services/midgard/types'
 import { NonEmptyWalletBalances, ValidatePasswordHandler } from '../../../../services/wallet/types'
+import { AssetWithDecimal } from '../../../../types/asgardex'
 import { PasswordModal } from '../../../modal/password'
 import { MaxBalanceButton } from '../../../uielements/button/MaxBalanceButton'
 import { ViewTxButton } from '../../../uielements/button/ViewTxButton'
@@ -48,7 +48,7 @@ import { validateTxAmountInput } from '../TxForm.util'
 import * as CStyled from './Upgrade.styles'
 
 export type Props = {
-  runeAsset: Asset
+  runeAsset: AssetWithDecimal
   walletAddress: Address
   runeNativeAddress: Address
   bnbPoolAddressRD: PoolAddressRD
@@ -113,7 +113,8 @@ export const Upgrade: React.FC<Props> = (props): JSX.Element => {
   const getRuneBalance = useMemo(
     () =>
       getWalletAssetAmountFromBalances(
-        (balance) => eqString.equals(balance.walletAddress, walletAddress) && eqAsset.equals(balance.asset, runeAsset)
+        (balance) =>
+          eqString.equals(balance.walletAddress, walletAddress) && eqAsset.equals(balance.asset, runeAsset.asset)
       ),
     [runeAsset, walletAddress]
   )
@@ -123,7 +124,7 @@ export const Upgrade: React.FC<Props> = (props): JSX.Element => {
       getWalletAssetAmountFromBalances(
         (balance) =>
           eqString.equals(balance.walletAddress, walletAddress) &&
-          eqAsset.equals(balance.asset, getChainAsset(runeAsset.chain))
+          eqAsset.equals(balance.asset, getChainAsset(runeAsset.asset.chain))
       ),
     [runeAsset, walletAddress]
   )
@@ -133,15 +134,7 @@ export const Upgrade: React.FC<Props> = (props): JSX.Element => {
     [oBalances, getRuneBalance]
   )
 
-  const targetAssetDecimal = useMemo(
-    () =>
-      FP.pipe(
-        oNonNativeRuneAmount,
-        O.map((amount) => amount.decimal),
-        O.getOrElse(() => 0)
-      ),
-    [oNonNativeRuneAmount]
-  )
+  // const targetAssetDecimal = useMemo(() => FP.pipe(runeAsset, ({ asset }) => asset.decimal), [oNonNativeRuneAmount])
 
   const oBaseAssetAmount: O.Option<BaseAmount> = useMemo(
     () => FP.pipe(oBalances, O.chain(FP.flow(getBaseAssetBalance, O.map(assetToBase)))),
@@ -184,11 +177,11 @@ export const Upgrade: React.FC<Props> = (props): JSX.Element => {
       // we have to validate input before storing into the state
       amountValidator(undefined, value)
         .then(() => {
-          setAmountToUpgrade(convertBaseAmountDecimal(assetToBase(assetAmount(value)), targetAssetDecimal))
+          setAmountToUpgrade(convertBaseAmountDecimal(assetToBase(assetAmount(value)), runeAsset.decimal))
         })
         .catch(() => {}) // do nothing, Ant' form does the job for us to show an error message
     },
-    [amountValidator, targetAssetDecimal]
+    [amountValidator, runeAsset]
   )
 
   const onSubmit = useCallback(() => setShowConfirmUpgradeModal(true), [])
@@ -203,7 +196,7 @@ export const Upgrade: React.FC<Props> = (props): JSX.Element => {
             upgrade$({
               poolAddresses,
               amount: amountToUpgrade,
-              asset: runeAsset,
+              asset: runeAsset.asset,
               memo: getSwitchMemo(runeNativeAddress)
             })
           )
@@ -263,16 +256,16 @@ export const Upgrade: React.FC<Props> = (props): JSX.Element => {
     () =>
       FP.pipe(
         feeRD,
-        RD.map((fee) => [{ asset: getChainAsset(runeAsset.chain), amount: fee }])
+        RD.map((fee) => [{ asset: getChainAsset(runeAsset.asset.chain), amount: fee }])
       ),
 
-    [feeRD, runeAsset.chain]
+    [feeRD, runeAsset.asset.chain]
   )
 
   const txStatusMsg = useMemo(() => {
     const stepDescriptions = [
       intl.formatMessage({ id: 'common.tx.healthCheck' }),
-      intl.formatMessage({ id: 'common.tx.sendingAsset' }, { assetTicker: runeAsset.ticker }),
+      intl.formatMessage({ id: 'common.tx.sendingAsset' }, { assetTicker: runeAsset.asset.ticker }),
       intl.formatMessage({ id: 'common.tx.checkResult' })
     ]
     const { steps, status } = upgradeTxState
@@ -290,7 +283,7 @@ export const Upgrade: React.FC<Props> = (props): JSX.Element => {
         () => emptyString
       )
     )
-  }, [intl, runeAsset.ticker, upgradeTxState])
+  }, [intl, runeAsset.asset.ticker, upgradeTxState])
 
   const renderErrorBtn = useMemo(
     () => <Styled.Button onClick={onErrorHandler}>{intl.formatMessage({ id: 'common.back' })}</Styled.Button>,
@@ -331,7 +324,7 @@ export const Upgrade: React.FC<Props> = (props): JSX.Element => {
     () => (
       <CStyled.FormWrapper>
         <CStyled.FormContainer>
-          <AccountSelector selectedAsset={runeAsset} walletBalances={[]} network={network} />
+          <AccountSelector selectedAsset={runeAsset.asset} walletBalances={[]} network={network} />
           <Styled.Form form={form} initialValues={INITIAL_FORM_VALUES} onFinish={onSubmit} labelCol={{ span: 24 }}>
             <Styled.SubForm>
               <Styled.CustomLabel size="big">{intl.formatMessage({ id: 'common.amount' })}</Styled.CustomLabel>
@@ -347,7 +340,7 @@ export const Upgrade: React.FC<Props> = (props): JSX.Element => {
                 <InputBigNumber size="large" disabled={isLoading} decimal={8} onChange={onChangeInput} />
               </Styled.FormItem>
               <MaxBalanceButton
-                balance={{ amount: maxAmount, asset: runeAsset }}
+                balance={{ amount: maxAmount, asset: runeAsset.asset }}
                 onClick={addMaxAmountHandler}
                 disabled={isLoading}
               />

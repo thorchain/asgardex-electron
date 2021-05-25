@@ -22,8 +22,10 @@ import { isRuneAsset } from '../../helpers/assetHelper'
 import { sequenceTOption } from '../../helpers/fpHelpers'
 import { liveData } from '../../helpers/rx/liveData'
 import { AssetDetailsParams } from '../../routes/wallet'
+// import { assetWithDecimal$ } from '../../services/chain'
 import { DEFAULT_NETWORK } from '../../services/const'
 import { INITIAL_BALANCES_STATE } from '../../services/wallet/const'
+import { AssetWithDecimal } from '../../types/asgardex'
 
 type Props = {}
 
@@ -35,11 +37,22 @@ export const UpgradeView: React.FC<Props> = (): JSX.Element => {
   const { network$ } = useAppContext()
   const network = useObservableState<Network>(network$, DEFAULT_NETWORK)
 
+  const { addressByChain$, upgradeRuneToNative$, assetWithDecimal$ } = useChainContext()
+
   // accept BNB.Rune only
-  const oRuneNonNativeAsset = useMemo(
-    () => FP.pipe(assetFromString(asset), O.fromNullable, O.filter(isRuneAsset)),
-    [asset]
+  const runeNonNativeAsset$ = useMemo(
+    () =>
+      FP.pipe(
+        assetFromString(asset),
+        O.fromNullable,
+        O.filter(isRuneAsset),
+        O.map((asset) => FP.pipe(assetWithDecimal$(asset, network), liveData.toOption$)),
+        O.getOrElse((): Rx.Observable<O.Option<AssetWithDecimal>> => Rx.EMPTY)
+      ),
+    [asset, network, assetWithDecimal$]
   )
+
+  const oRuneNonNativeAsset = useObservableState(runeNonNativeAsset$, O.none)
 
   const {
     balancesState$,
@@ -52,7 +65,6 @@ export const UpgradeView: React.FC<Props> = (): JSX.Element => {
   const oGetExplorerTxUrl = useObservableState(getExplorerTxUrl$, O.none)
 
   const { fees$: bnbFees$, reloadFees: reloadBnbFees } = useBinanceContext()
-  const { addressByChain$, upgradeRuneToNative$ } = useChainContext()
 
   const {
     service: {
@@ -102,7 +114,7 @@ export const UpgradeView: React.FC<Props> = (): JSX.Element => {
         O.fold(
           // No subscription of `poolAddresses$ ` needed for other assets than BNB.RUNE
           () => Rx.of(RD.failure(Error(intl.formatMessage({ id: 'wallet.errors.asset.notExist' }, { asset })))),
-          (asset) => poolAddressesByChain$(asset.chain)
+          ({ asset }) => poolAddressesByChain$(asset.chain)
         )
       ),
     RD.initial
@@ -152,7 +164,7 @@ export const UpgradeView: React.FC<Props> = (): JSX.Element => {
               fee={upgradeFeeRD}
               balances={oBalances}
               successActionHandler={successActionHandler}
-              reloadBalancesHandler={reloadBalancesByChain(runeBnbAsset.chain)}
+              reloadBalancesHandler={reloadBalancesByChain(runeBnbAsset.asset.chain)}
               network={network}
             />
           </>
