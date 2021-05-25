@@ -41,6 +41,8 @@ export type CommonMessageKey =
   | 'common.viewTransaction'
   | 'common.fee'
   | 'common.fees'
+  | 'common.fee.estimated'
+  | 'common.fees.estimated'
   | 'common.max'
   | 'common.min'
   | 'common.search'

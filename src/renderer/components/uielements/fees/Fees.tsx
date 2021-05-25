@@ -29,7 +29,7 @@ export const Fees: React.FC<Props> = ({ fees, reloadFees, disabled = false, clas
         fees,
         A.map(formatFee),
         A.reduceWithIndex(
-          intl.formatMessage({ id: fees.length > 1 ? 'common.fees' : 'common.fee' }),
+          intl.formatMessage({ id: fees.length > 1 ? 'common.fees.estimated' : 'common.fee.estimated' }),
           (index, acc, cur) => {
             return index === 0 ? `${acc}: ${cur}` : `${acc} + ${cur}`
           }

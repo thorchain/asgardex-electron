@@ -42,6 +42,8 @@ const common: CommonMessages = {
   'common.viewTransaction': 'Посмотреть транзакцию',
   'common.fee': 'Комиссия',
   'common.fees': 'Комиссии',
+  'common.fee.estimated': 'Estimated fee - RU',
+  'common.fees.estimated': 'Estimated fees - RU',
   'common.max': 'Макс.',
   'common.min': 'Мин',
   'common.search': 'Поиск',
