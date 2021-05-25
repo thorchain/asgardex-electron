@@ -6,8 +6,14 @@ import * as FP from 'fp-ts/pipeable'
 import { ZERO_ASSET_AMOUNT } from '../../const'
 import { EarningsHistoryItemPool, PoolDetail, PoolStatsDetail } from '../../types/generated/midgard/models'
 
-export const getDepth = (data: Pick<PoolDetail, 'runeDepth'>, priceRatio: BigNumber = bn(1)) =>
-  baseToAsset(baseAmount(bnOrZero(data.runeDepth).multipliedBy(priceRatio)))
+export const getLiquidity = (data: Pick<PoolDetail, 'runeDepth'>, priceRatio: BigNumber = bn(1)) =>
+  baseToAsset(
+    baseAmount(
+      bnOrZero(data.runeDepth)
+        .multipliedBy(2) /* liquidity = 2 * depth */
+        .multipliedBy(priceRatio)
+    )
+  )
 
 export const getVolume = (data: Pick<PoolDetail, 'volume24h'>, priceRatio: BigNumber = bn(1)) =>
   baseToAsset(baseAmount(bnOrZero(data.volume24h).multipliedBy(priceRatio)))
