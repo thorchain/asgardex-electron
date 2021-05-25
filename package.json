@@ -74,7 +74,7 @@
     "@types/electron-devtools-installer": "^2.2.0",
     "@xchainjs/xchain-binance": "^5.0.0",
     "@xchainjs/xchain-bitcoin": "^0.13.0",
-    "@xchainjs/xchain-bitcoincash": "^0.9.0",
+    "@xchainjs/xchain-bitcoincash": "^0.10.2",
     "@xchainjs/xchain-client": "^0.8.0",
     "@xchainjs/xchain-cosmos": "^0.12.0",
     "@xchainjs/xchain-crypto": "^0.2.3",
