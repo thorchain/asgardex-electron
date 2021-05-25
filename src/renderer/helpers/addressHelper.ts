@@ -50,7 +50,7 @@ export const getAddressPrefixLength = (chain: Chain, network: string): number =>
     case LTCChain:
       return getLitecoinPrefix(clientNetwork).length
     case BCHChain:
-      return getBCHPrefix(network).length
+      return getBCHPrefix().length
   }
 }
 
