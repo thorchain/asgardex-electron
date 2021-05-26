@@ -19,14 +19,5 @@ export const UpgradeETH: React.FC<CommonUpgradeProps> = (props) => {
     RD.initial
   )
 
-  return (
-    <Upgrade
-      fee={upgradeFeeRD}
-      reloadFeeHandler={() => {
-        console.log('reload eth fees')
-        reloadFees()
-      }}
-      {...props}
-    />
-  )
+  return <Upgrade fee={upgradeFeeRD} reloadFeeHandler={reloadFees} {...props} />
 }
