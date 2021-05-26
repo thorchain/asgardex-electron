@@ -70,7 +70,7 @@ export const AssetDetails: React.FC<Props> = (props): JSX.Element => {
     )
   }, [oWalletAddress, history])
 
-  const walletActionUpgradeRuneBnbClick = useCallback(() => {
+  const walletActionUpgradeNonNativeRuneClick = useCallback(() => {
     FP.pipe(
       oWalletAddress,
       O.filter((_) => AssetHelper.isRuneAsset(asset)),
@@ -99,29 +99,29 @@ export const AssetDetails: React.FC<Props> = (props): JSX.Element => {
     [loadTxsHandler]
   )
 
-  const oRuneBnbAsset: O.Option<Asset> = useMemo(
+  const oNoneNativeRuneAsset: O.Option<Asset> = useMemo(
     () => FP.pipe(asset, O.fromPredicate(AssetHelper.isRuneAsset)),
     [asset]
   )
 
-  const isRuneBnbAsset: boolean = useMemo(() => AssetHelper.isRuneAsset(asset), [asset])
+  const isNonNativeRuneAsset: boolean = useMemo(() => AssetHelper.isRuneAsset(asset), [asset])
 
   const isRuneNativeAsset: boolean = useMemo(() => eqAsset.equals(asset, AssetRuneNative), [asset])
 
   const getRuneBalance = useMemo(
     () =>
       FP.pipe(
-        sequenceTOption(oRuneBnbAsset, oWalletAddress),
+        sequenceTOption(oNoneNativeRuneAsset, oWalletAddress),
         O.map(([asset, walletAddress]) =>
           getWalletAssetAmountFromBalances(
             (balance) => eqString.equals(balance.walletAddress, walletAddress) && eqAsset.equals(balance.asset, asset)
           )
         )
       ),
-    [oRuneBnbAsset, oWalletAddress]
+    [oNoneNativeRuneAsset, oWalletAddress]
   )
 
-  const oRuneBnbAmount = useMemo(
+  const oNonNativeRuneAmount = useMemo(
     () => FP.pipe(getRuneBalance, O.ap(oBalances), O.flatten, O.map(assetToBase)),
     [getRuneBalance, oBalances]
   )
@@ -131,14 +131,14 @@ export const AssetDetails: React.FC<Props> = (props): JSX.Element => {
 
   const runeUpgradeDisabled: boolean = useMemo(() => {
     return (
-      isRuneBnbAsset &&
+      isNonNativeRuneAsset &&
       FP.pipe(
-        oRuneBnbAmount,
+        oNonNativeRuneAmount,
         O.map((amount) => amount.amount().isLessThan(0)),
         O.getOrElse<boolean>(() => true)
       )
     )
-  }, [isRuneBnbAsset, oRuneBnbAmount])
+  }, [isNonNativeRuneAsset, oNonNativeRuneAmount])
 
   const walletInfo = useMemo(
     () =>
@@ -179,7 +179,7 @@ export const AssetDetails: React.FC<Props> = (props): JSX.Element => {
               </Row>
             </Styled.ActionWrapper>
           </Styled.ActionCol>
-          {isRuneBnbAsset && (
+          {isNonNativeRuneAsset && (
             <Styled.ActionCol sm={{ span: actionColSpanMobile }} md={{ span: actionColSpanDesktop }}>
               <Styled.ActionWrapper>
                 <Row justify="center">
@@ -188,7 +188,7 @@ export const AssetDetails: React.FC<Props> = (props): JSX.Element => {
                     round="true"
                     sizevalue="xnormal"
                     color="warning"
-                    onClick={walletActionUpgradeRuneBnbClick}
+                    onClick={walletActionUpgradeNonNativeRuneClick}
                     disabled={runeUpgradeDisabled}>
                     {intl.formatMessage({ id: 'wallet.action.upgrade' })}
                   </Button>
