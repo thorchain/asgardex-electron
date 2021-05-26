@@ -1,7 +1,7 @@
 import React, { useCallback, useMemo, useState } from 'react'
 
 import { Address } from '@xchainjs/xchain-client'
-import { Asset, AssetRuneNative, assetToBase, assetToString } from '@xchainjs/xchain-util'
+import { Asset, AssetRuneNative, assetToBase, assetToString, BaseAmount } from '@xchainjs/xchain-util'
 import { Row, Col, Grid } from 'antd'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
@@ -121,7 +121,7 @@ export const AssetDetails: React.FC<Props> = (props): JSX.Element => {
     [oNoneNativeRuneAsset, oWalletAddress]
   )
 
-  const oNonNativeRuneAmount = useMemo(
+  const oNonNativeRuneAmount: O.Option<BaseAmount> = useMemo(
     () => FP.pipe(getNonNativeRuneBalance, O.ap(oBalances), O.flatten, O.map(assetToBase)),
     [getNonNativeRuneBalance, oBalances]
   )
