@@ -1,7 +1,8 @@
 import React, { useCallback, useEffect, useMemo } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
-import { assetFromString, BNBChain, ETHChain, THORChain } from '@xchainjs/xchain-util'
+import { Address } from '@xchainjs/xchain-client'
+import { Asset, assetFromString, BNBChain, ETHChain, THORChain } from '@xchainjs/xchain-util'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/Option'
 import { useObservableState } from 'observable-hooks'
@@ -19,8 +20,10 @@ import { useWalletContext } from '../../../contexts/WalletContext'
 import { isNonNativeRuneAsset } from '../../../helpers/assetHelper'
 import { sequenceTOption } from '../../../helpers/fpHelpers'
 import { AssetDetailsParams } from '../../../routes/wallet'
-import { AssetWithDecimalLD } from '../../../services/chain/types'
+import { AssetWithDecimalLD, AssetWithDecimalRD } from '../../../services/chain/types'
+import { GetExplorerTxUrl } from '../../../services/clients'
 import { DEFAULT_NETWORK } from '../../../services/const'
+import { PoolAddressRD } from '../../../services/midgard/types'
 import { INITIAL_BALANCES_STATE } from '../../../services/wallet/const'
 import { AssetWithDecimal } from '../../../types/asgardex'
 import { CommonUpgradeProps } from './types'
@@ -40,12 +43,12 @@ export const UpgradeView: React.FC<Props> = (): JSX.Element => {
   const { addressByChain$, upgradeRuneToNative$, assetWithDecimal$ } = useChainContext()
 
   // Accept [CHAIN].Rune only
-  const runeNonNativeAsset = useMemo(
+  const runeNonNativeAsset: O.Option<Asset> = useMemo(
     () => FP.pipe(assetFromString(asset), O.fromNullable, O.filter(isNonNativeRuneAsset)),
     [asset]
   )
 
-  const runeNonNativeAssetWithDecimal$ = useMemo(
+  const runeNonNativeAssetWithDecimal$: AssetWithDecimalLD = useMemo(
     () =>
       FP.pipe(
         runeNonNativeAsset,
@@ -55,7 +58,7 @@ export const UpgradeView: React.FC<Props> = (): JSX.Element => {
     [runeNonNativeAsset, network, assetWithDecimal$]
   )
 
-  const runeNonNativeAssetRD = useObservableState(runeNonNativeAssetWithDecimal$, RD.initial)
+  const runeNonNativeAssetRD: AssetWithDecimalRD = useObservableState(runeNonNativeAssetWithDecimal$, RD.initial)
 
   const {
     balancesState$,
@@ -65,7 +68,7 @@ export const UpgradeView: React.FC<Props> = (): JSX.Element => {
   } = useWalletContext()
   const { balances: oBalances } = useObservableState(balancesState$, INITIAL_BALANCES_STATE)
 
-  const oGetExplorerTxUrl = useObservableState(getExplorerTxUrl$, O.none)
+  const oGetExplorerTxUrl: O.Option<GetExplorerTxUrl> = useObservableState(getExplorerTxUrl$, O.none)
 
   const {
     service: {
@@ -78,9 +81,9 @@ export const UpgradeView: React.FC<Props> = (): JSX.Element => {
     reloadInboundAddresses()
   }, [reloadInboundAddresses])
 
-  const [oRuneNativeAddress] = useObservableState(() => addressByChain$(THORChain), O.none)
+  const [oRuneNativeAddress] = useObservableState<O.Option<Address>>(() => addressByChain$(THORChain), O.none)
 
-  const [targetPoolAddressRD] = useObservableState(
+  const [targetPoolAddressRD] = useObservableState<PoolAddressRD>(
     () =>
       FP.pipe(
         runeNonNativeAsset,
