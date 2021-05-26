@@ -13,7 +13,7 @@ import { useIntl } from 'react-intl'
 import { useHistory } from 'react-router-dom'
 
 import { Network } from '../../../../shared/api/types'
-import { isRuneAsset } from '../../../helpers/assetHelper'
+import { isNonNativeRuneAsset } from '../../../helpers/assetHelper'
 import { getPoolPriceValue } from '../../../helpers/poolHelper'
 import * as walletRoutes from '../../../routes/wallet'
 import { WalletBalancesRD } from '../../../services/clients'
@@ -97,27 +97,25 @@ export const AssetsTableCollapsable: React.FC<Props> = (props): JSX.Element => {
   const tickerColumn: ColumnType<WalletBalance> = useMemo(
     () => ({
       width: 80,
-      render: ({ asset, walletAddress }: WalletBalance) => {
-        return (
-          <Styled.BnbRuneTickerWrapper>
-            <Styled.Label nowrap>
-              <Styled.TickerLabel>{asset.ticker}</Styled.TickerLabel>
-              <Styled.ChainLabel>{asset.chain}</Styled.ChainLabel>
-            </Styled.Label>
-            {isRuneAsset(asset) && (
-              <Styled.UpgradeButton
-                onClick={(e) => {
-                  e.preventDefault()
-                  e.stopPropagation()
-                  setSelectedAsset(O.some(asset))
-                  history.push(walletRoutes.upgradeRune.path({ asset: assetToString(asset), walletAddress }))
-                }}>
-                {intl.formatMessage({ id: 'wallet.action.upgrade' })}
-              </Styled.UpgradeButton>
-            )}
-          </Styled.BnbRuneTickerWrapper>
-        )
-      }
+      render: ({ asset, walletAddress }: WalletBalance) => (
+        <Styled.BnbRuneTickerWrapper>
+          <Styled.Label nowrap>
+            <Styled.TickerLabel>{asset.ticker}</Styled.TickerLabel>
+            <Styled.ChainLabel>{asset.chain}</Styled.ChainLabel>
+          </Styled.Label>
+          {isNonNativeRuneAsset(asset) && (
+            <Styled.UpgradeButton
+              onClick={(e) => {
+                e.preventDefault()
+                e.stopPropagation()
+                setSelectedAsset(O.some(asset))
+                history.push(walletRoutes.upgradeRune.path({ asset: assetToString(asset), walletAddress }))
+              }}>
+              {intl.formatMessage({ id: 'wallet.action.upgrade' })}
+            </Styled.UpgradeButton>
+          )}
+        </Styled.BnbRuneTickerWrapper>
+      )
     }),
     [intl, history, setSelectedAsset]
   )

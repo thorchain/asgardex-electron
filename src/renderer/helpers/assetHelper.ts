@@ -61,7 +61,7 @@ export const isRuneEthAsset = (asset: Asset): boolean =>
   eqAsset.equals(asset, AssetRuneERC20Testnet) ||
   eqAsset.equals(asset, AssetRuneEthERC20)
 
-export const isRuneAsset = (asset: Asset): boolean => isRuneBnbAsset(asset) || isRuneEthAsset(asset)
+export const isNonNativeRuneAsset = (asset: Asset): boolean => isRuneBnbAsset(asset) || isRuneEthAsset(asset)
 
 /**
  * Check whether an asset is a LTC asset

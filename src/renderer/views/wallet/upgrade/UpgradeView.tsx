@@ -16,7 +16,7 @@ import { useAppContext } from '../../../contexts/AppContext'
 import { useChainContext } from '../../../contexts/ChainContext'
 import { useMidgardContext } from '../../../contexts/MidgardContext'
 import { useWalletContext } from '../../../contexts/WalletContext'
-import { isRuneAsset } from '../../../helpers/assetHelper'
+import { isNonNativeRuneAsset } from '../../../helpers/assetHelper'
 import { sequenceTOption } from '../../../helpers/fpHelpers'
 import { AssetDetailsParams } from '../../../routes/wallet'
 import { AssetWithDecimalLD } from '../../../services/chain/types'
@@ -41,7 +41,7 @@ export const UpgradeView: React.FC<Props> = (): JSX.Element => {
 
   // Accept [CHAIN].Rune only
   const runeNonNativeAsset = useMemo(
-    () => FP.pipe(assetFromString(asset), O.fromNullable, O.filter(isRuneAsset)),
+    () => FP.pipe(assetFromString(asset), O.fromNullable, O.filter(isNonNativeRuneAsset)),
     [asset]
   )
 

@@ -73,7 +73,7 @@ export const AssetDetails: React.FC<Props> = (props): JSX.Element => {
   const walletActionUpgradeNonNativeRuneClick = useCallback(() => {
     FP.pipe(
       oWalletAddress,
-      O.filter((_) => AssetHelper.isRuneAsset(asset)),
+      O.filter((_) => AssetHelper.isNonNativeRuneAsset(asset)),
       O.map((walletAddress) => walletRoutes.upgradeRune.path({ asset: assetToString(asset), walletAddress })),
       O.map(history.push)
     )
@@ -100,15 +100,15 @@ export const AssetDetails: React.FC<Props> = (props): JSX.Element => {
   )
 
   const oNoneNativeRuneAsset: O.Option<Asset> = useMemo(
-    () => FP.pipe(asset, O.fromPredicate(AssetHelper.isRuneAsset)),
+    () => FP.pipe(asset, O.fromPredicate(AssetHelper.isNonNativeRuneAsset)),
     [asset]
   )
 
-  const isNonNativeRuneAsset: boolean = useMemo(() => AssetHelper.isRuneAsset(asset), [asset])
+  const isNonNativeRuneAsset: boolean = useMemo(() => AssetHelper.isNonNativeRuneAsset(asset), [asset])
 
   const isRuneNativeAsset: boolean = useMemo(() => eqAsset.equals(asset, AssetRuneNative), [asset])
 
-  const getRuneBalance = useMemo(
+  const getNonNativeRuneBalance = useMemo(
     () =>
       FP.pipe(
         sequenceTOption(oNoneNativeRuneAsset, oWalletAddress),
@@ -122,8 +122,8 @@ export const AssetDetails: React.FC<Props> = (props): JSX.Element => {
   )
 
   const oNonNativeRuneAmount = useMemo(
-    () => FP.pipe(getRuneBalance, O.ap(oBalances), O.flatten, O.map(assetToBase)),
-    [getRuneBalance, oBalances]
+    () => FP.pipe(getNonNativeRuneBalance, O.ap(oBalances), O.flatten, O.map(assetToBase)),
+    [getNonNativeRuneBalance, oBalances]
   )
 
   const actionColSpanDesktop = 12
