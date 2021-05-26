@@ -15,7 +15,7 @@ import { getPoolDetail, toPoolData } from '../services/midgard/utils'
 import { PoolDetail } from '../types/generated/midgard'
 import { PoolTableRowData, PoolTableRowsData, PricePool } from '../views/pools/Pools.types'
 import { getPoolTableRowData } from '../views/pools/Pools.utils'
-import { isRuneNativeAsset, to1e8BaseAmount } from './assetHelper'
+import { isRuneNativeAsset, convertBaseAmountDecimal, to1e8BaseAmount } from './assetHelper'
 import { eqChain } from './fp/eq'
 import { ordBaseAmount } from './fp/ord'
 import { sequenceTOption, sequenceTOptionFromArray } from './fpHelpers'
@@ -132,6 +132,7 @@ export const getPoolPriceValue = (
   poolDetails: PoolDetails,
   selectedPricePoolData: PoolData
 ): O.Option<BaseAmount> => {
+  // convert to 1e8 decimal (as same decimal as pool data has)
   const amount1e8 = to1e8BaseAmount(amount)
   return FP.pipe(
     getPoolDetail(poolDetails, asset),
@@ -145,7 +146,9 @@ export const getPoolPriceValue = (
       }
       // In all other cases we don't have any price pool and no price
       return O.none
-    })
+    }),
+    // convert back to original decimal
+    O.map((price) => convertBaseAmountDecimal(price, amount.decimal))
   )
 }
 
