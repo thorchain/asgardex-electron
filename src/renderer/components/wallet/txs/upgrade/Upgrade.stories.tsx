@@ -54,7 +54,8 @@ const defaultProps: UpgradeProps = {
   },
   runeNativeAddress: 'rune-native-address',
   walletAddress: 'BNB.Rune address',
-  bnbPoolAddressRD: RD.success({ chain: 'BNB', address: 'bnb-pool-address', router: O.none, halted: false }),
+  reloadOnError: () => {},
+  targetPoolAddressRD: RD.success({ chain: 'BNB', address: 'bnb-pool-address', router: O.none, halted: false }),
   validatePassword$: mockValidatePassword$,
   fee: RD.success(baseAmount(37500)),
   upgrade$: (p: UpgradeRuneParams): UpgradeRuneTxState$ => {

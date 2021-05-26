@@ -77,7 +77,10 @@ export const createFeesService = <FeesParams>({
 
   return {
     fees$,
-    reloadFees,
+    reloadFees: () => {
+      console.log('reload at service')
+      reloadFees(undefined)
+    },
     reloadFees$
   }
 }
