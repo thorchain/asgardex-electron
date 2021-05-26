@@ -39,13 +39,12 @@ export const getWalletBalanceByAsset = (
 
 export const getWalletAssetAmountFromBalances =
   (isTargetWalletBalance: FP.Predicate<WalletBalance>) =>
-  (balances: WalletBalances): O.Option<AssetAmount> => {
-    return FP.pipe(
+  (balances: WalletBalances): O.Option<AssetAmount> =>
+    FP.pipe(
       balances,
       A.findFirst(isTargetWalletBalance),
       O.map(({ amount }) => baseToAsset(amount))
     )
-  }
 
 export const getAssetAmountFromBalances = (
   balances: WalletBalances,

@@ -100,7 +100,6 @@ export const send: Route<SendParams> = {
 export const upgradeRune: Route<AssetDetailsParams> = {
   template: `${assetDetail.template}/upgrade`,
   path: ({ asset: assetString, walletAddress }) => {
-    const _a = assetFromString
     // Validate asset string to accept BNB.Rune only
     const oAsset = FP.pipe(assetFromString(assetString), O.fromNullable, O.filter(isNonNativeRuneAsset))
     // Simple validation of address

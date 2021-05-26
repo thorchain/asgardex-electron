@@ -1,11 +1,11 @@
 import * as RD from '@devexperts/remote-data-ts'
 import { Address } from '@xchainjs/xchain-client'
+import * as FP from 'fp-ts/function'
 import * as O from 'fp-ts/lib/Option'
 import * as Rx from 'rxjs'
 import * as RxOp from 'rxjs/operators'
 
-import { getEthAssetAddress, isEthAsset } from '../../../helpers/assetHelper'
-import { isEthChain } from '../../../helpers/chainHelper'
+import { getEthAssetAddress, isRuneEthAsset } from '../../../helpers/assetHelper'
 import { liveData } from '../../../helpers/rx/liveData'
 import { observableState } from '../../../helpers/stateHelper'
 import { service as midgardService } from '../../midgard/service'
@@ -60,9 +60,12 @@ export const upgradeRuneToNative$ = ({
         steps: { current: 3, total: 3 }
       })
       // 3. check tx finality by polling its tx data
-      const assetAddress: O.Option<Address> =
-        isEthChain(asset.chain) && !isEthAsset(asset) ? getEthAssetAddress(asset) : O.none
-      return poolTxStatusByChain$({ txHash, chain: asset.chain, assetAddress: assetAddress })
+      const assetAddress: O.Option<Address> = FP.pipe(
+        asset,
+        O.fromPredicate(isRuneEthAsset),
+        O.chain(getEthAssetAddress)
+      )
+      return poolTxStatusByChain$({ txHash, chain: asset.chain, assetAddress })
     }),
     // Update state
     liveData.map(({ hash }) => setState({ ...getState(), status: RD.success(hash) })),
