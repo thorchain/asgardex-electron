@@ -12,6 +12,7 @@ import * as Rx from 'rxjs'
 
 import { Network } from '../../../../shared/api/types'
 import { ErrorView } from '../../../components/shared/error'
+import { LoadingView } from '../../../components/shared/loading'
 import { BackLink } from '../../../components/uielements/backLink'
 import { useAppContext } from '../../../contexts/AppContext'
 import { useChainContext } from '../../../contexts/ChainContext'
@@ -97,26 +98,17 @@ export const UpgradeView: React.FC<Props> = (): JSX.Element => {
   )
 
   const renderAssetError = useCallback(
-    () =>
-      FP.pipe(
-        runeNonNativeAssetRD,
-        RD.fold(
-          () => <>initial</>,
-          () => <>pending</>,
-          () => (
-            <ErrorView
-              title={intl.formatMessage(
-                { id: 'routes.invalid.asset' },
-                {
-                  asset
-                }
-              )}
-            />
-          ),
-          () => <>success</>
-        )
-      ),
-    [asset, intl, runeNonNativeAssetRD]
+    () => (
+      <ErrorView
+        title={intl.formatMessage(
+          { id: 'routes.invalid.asset' },
+          {
+            asset
+          }
+        )}
+      />
+    ),
+    [asset, intl]
   )
 
   const renderUpgradeComponent = useCallback(({ asset }: AssetWithDecimal, props: CommonUpgradeProps) => {
@@ -152,34 +144,31 @@ export const UpgradeView: React.FC<Props> = (): JSX.Element => {
         runeNonNativeAssetRD,
         RD.fold(
           () => <></>,
-          () => <>pending</>,
+          () => <LoadingView />,
           renderAssetError,
           (runeAsset) =>
             FP.pipe(
               // Show an error by invalid or missing asset in route only
               // All other values should be immediately available by entering the `UpgradeView`
               sequenceTOption(oRuneNativeAddress, oGetExplorerTxUrl),
-              O.fold(
-                () => <>no runeAsset</>,
-                ([runeNativeAddress, getExplorerTxUrl]) => {
-                  const successActionHandler = (txHash: string): Promise<void> =>
-                    FP.pipe(txHash, getExplorerTxUrl, window.apiUrl.openExternal)
+              O.fold(renderAssetError, ([runeNativeAddress, getExplorerTxUrl]) => {
+                const successActionHandler = (txHash: string): Promise<void> =>
+                  FP.pipe(txHash, getExplorerTxUrl, window.apiUrl.openExternal)
 
-                  return renderUpgradeComponent(runeAsset, {
-                    walletAddress,
-                    runeAsset,
-                    runeNativeAddress,
-                    targetPoolAddressRD,
-                    validatePassword$,
-                    upgrade$: upgradeRuneToNative$,
-                    balances: oBalances,
-                    successActionHandler,
-                    reloadBalancesHandler: reloadBalancesByChain(runeAsset.asset.chain),
-                    network,
-                    reloadOnError
-                  })
-                }
-              )
+                return renderUpgradeComponent(runeAsset, {
+                  walletAddress,
+                  runeAsset,
+                  runeNativeAddress,
+                  targetPoolAddressRD,
+                  validatePassword$,
+                  upgrade$: upgradeRuneToNative$,
+                  balances: oBalances,
+                  successActionHandler,
+                  reloadBalancesHandler: reloadBalancesByChain(runeAsset.asset.chain),
+                  network,
+                  reloadOnError
+                })
+              })
             )
         )
       )}
