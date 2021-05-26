@@ -38,6 +38,7 @@ const deposit: DepositMessages = {
   'deposit.poolDetails.volume24': 'Volume (24h) - FR',
   'deposit.poolDetails.volumeTotal': 'Volume (total) - FR',
   'deposit.poolDetails.earnings': 'Gains',
+  'deposit.poolDetails.ilpPaid': 'ILP paid - FR',
   'deposit.poolDetails.totalTx': 'Txs (total) - FR',
   'deposit.poolDetails.totalFees': 'Fees (total) - FR',
   'deposit.poolDetails.members': 'Membres',

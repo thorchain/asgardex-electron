@@ -1,10 +1,7 @@
 import { AssetAmount, assetAmount, baseAmount, baseToAsset, bn, bnOrZero } from '@xchainjs/xchain-util'
 import BigNumber from 'bignumber.js'
-import * as FP from 'fp-ts/function'
-import * as O from 'fp-ts/Option'
 
-import { ZERO_ASSET_AMOUNT } from '../../const'
-import { EarningsHistoryItemPool, PoolDetail, PoolStatsDetail } from '../../types/generated/midgard/models'
+import { PoolDetail, PoolStatsDetail } from '../../types/generated/midgard'
 
 export const getLiquidity = (data: Pick<PoolDetail, 'runeDepth'>, priceRatio: BigNumber = bn(1)) =>
   baseToAsset(
@@ -48,17 +45,10 @@ export const getMembers = (data: Pick<PoolStatsDetail, 'uniqueMemberCount'>) => 
 export const getFees = (data: Pick<PoolStatsDetail, 'totalFees'>, priceRatio: BigNumber = bn(1)) =>
   baseToAsset(baseAmount(bnOrZero(data.totalFees).multipliedBy(priceRatio)))
 
-export const getEarnings = (
-  oData: O.Option<Pick<EarningsHistoryItemPool, 'earnings'>>,
+export const getILPPaid = (
+  { impermanentLossProtectionPaid }: Pick<PoolStatsDetail, 'impermanentLossProtectionPaid'>,
   priceRatio: BigNumber = bn(1)
-) =>
-  FP.pipe(
-    oData,
-    O.fold(
-      () => ZERO_ASSET_AMOUNT,
-      (data) => baseToAsset(baseAmount(bnOrZero(data.earnings).multipliedBy(priceRatio)))
-    )
-  )
+) => baseToAsset(baseAmount(bnOrZero(impermanentLossProtectionPaid).multipliedBy(priceRatio)))
 
 export const getEmptyPoolDetail = (): PoolDetail => ({
   asset: 'asset',

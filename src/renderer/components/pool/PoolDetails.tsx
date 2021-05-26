@@ -27,7 +27,6 @@ export type Props = {
 export const PoolDetails: React.FC<Props> = ({
   asset,
   priceSymbol = '',
-  earningsHistory,
   priceRatio,
   poolDetail,
   poolStatsDetail,
@@ -54,7 +53,6 @@ export const PoolDetails: React.FC<Props> = ({
             poolStatsDetail={poolStatsDetail}
             priceRatio={priceRatio}
             poolDetail={poolDetail}
-            earningsHistory={earningsHistory}
             priceSymbol={priceSymbol}
             isLoading={isLoading}
           />

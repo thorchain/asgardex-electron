@@ -2,11 +2,10 @@ import React, { useCallback, useMemo } from 'react'
 
 import { AssetAmount, formatAssetAmount } from '@xchainjs/xchain-util'
 import BigNumber from 'bignumber.js'
-import * as O from 'fp-ts/Option'
 import { useIntl } from 'react-intl'
 
 import { abbreviateNumber } from '../../helpers/numberHelper'
-import { EarningsHistoryItemPool, PoolDetail, PoolStatsDetail } from '../../types/generated/midgard/models'
+import { PoolDetail, PoolStatsDetail } from '../../types/generated/midgard/models'
 import { PoolStatus } from '../uielements/poolStatus'
 import * as Styled from './PoolCards.style'
 import * as H from './PoolDetails.helpers'
@@ -14,7 +13,6 @@ import * as H from './PoolDetails.helpers'
 export type Props = {
   poolDetail: PoolDetail
   poolStatsDetail: PoolStatsDetail
-  earningsHistory: O.Option<EarningsHistoryItemPool>
   priceSymbol?: string
   isLoading?: boolean
   priceRatio: BigNumber
@@ -24,7 +22,6 @@ export const PoolCards: React.FC<Props> = ({
   poolStatsDetail,
   priceSymbol = '',
   poolDetail,
-  earningsHistory,
   priceRatio,
   isLoading
 }) => {
@@ -39,7 +36,7 @@ export const PoolCards: React.FC<Props> = ({
   const totalTx = useMemo(() => H.getTotalTx(poolStatsDetail), [poolStatsDetail])
   const members = useMemo(() => H.getMembers(poolStatsDetail), [poolStatsDetail])
 
-  const earnings = useMemo(() => H.getEarnings(earningsHistory), [earningsHistory])
+  const ilpPaid = useMemo(() => H.getILPPaid(poolStatsDetail, priceRatio), [poolStatsDetail, priceRatio])
 
   const getFullValue = useCallback(
     (amount: AssetAmount): string => `${priceSymbol} ${formatAssetAmount({ amount: amount, trimZeros: true })}`,
@@ -111,9 +108,9 @@ export const PoolCards: React.FC<Props> = ({
       <Styled.Col>
         <PoolStatus
           isLoading={isLoading}
-          fullValue={getFullValue(earnings)}
-          label={intl.formatMessage({ id: 'deposit.poolDetails.earnings' })}
-          displayValue={`${priceSymbol} ${abbreviateNumber(earnings.amount().toNumber(), 2)}`}
+          fullValue={getFullValue(ilpPaid)}
+          label={intl.formatMessage({ id: 'deposit.poolDetails.ilpPaid' })}
+          displayValue={`${priceSymbol} ${abbreviateNumber(ilpPaid.amount().toNumber(), 2)}`}
         />
       </Styled.Col>
     </Styled.Container>

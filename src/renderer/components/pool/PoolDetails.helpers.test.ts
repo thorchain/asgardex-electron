@@ -1,5 +1,4 @@
 import { assetAmount, assetToBase, bn } from '@xchainjs/xchain-util'
-import * as O from 'fp-ts/Option'
 
 import { ZERO_ASSET_AMOUNT, ZERO_BN } from '../../const'
 import { eqAssetAmount, eqBigNumber } from '../../helpers/fp/eq'
@@ -12,8 +11,8 @@ import {
   getTotalTx,
   getMembers,
   getFees,
-  getEarnings,
-  getVolumeTotal
+  getVolumeTotal,
+  getILPPaid
 } from './PoolDetails.helpers'
 
 describe('PoolDetails.helpers', () => {
@@ -264,43 +263,22 @@ describe('PoolDetails.helpers', () => {
     })
   })
 
-  describe('getEarnings', () => {
-    it('should return zero value for O.none', () => {
-      expect(eqAssetAmount.equals(getEarnings(O.none), ZERO_ASSET_AMOUNT)).toBeTruthy()
-    })
-    it('should return zero value for incorrect data', () => {
-      expect(eqAssetAmount.equals(getEarnings(O.some({ earnings: '' })), ZERO_ASSET_AMOUNT)).toBeTruthy()
-      expect(eqAssetAmount.equals(getEarnings(O.some({ earnings: 'asdasd' })), ZERO_ASSET_AMOUNT)).toBeTruthy()
-    })
-    it('should get earnings correctly for default price ratio', () => {
+  describe('ilpPaid', () => {
+    it('returns zero for incorrect data', () => {
+      expect(eqAssetAmount.equals(getILPPaid({ impermanentLossProtectionPaid: '' }), ZERO_ASSET_AMOUNT)).toBeTruthy()
       expect(
-        eqAssetAmount.equals(
-          getEarnings(O.some({ earnings: assetToBase(assetAmount(123)).amount().toString() })),
-          assetAmount(123)
-        )
+        eqAssetAmount.equals(getILPPaid({ impermanentLossProtectionPaid: 'asdasd' }), ZERO_ASSET_AMOUNT)
       ).toBeTruthy()
-
+    })
+    it('returns result using default price ratio', () => {
       expect(
-        eqAssetAmount.equals(
-          getEarnings(O.some({ earnings: assetToBase(assetAmount(123.123123)).amount().toString() })),
-          assetAmount(123.123123)
-        )
+        eqAssetAmount.equals(getILPPaid({ impermanentLossProtectionPaid: '100000000' }), assetAmount(1))
       ).toBeTruthy()
     })
 
     it('should get earnings correctly for provided price ratio', () => {
       expect(
-        eqAssetAmount.equals(
-          getEarnings(O.some({ earnings: assetToBase(assetAmount(123)).amount().toString() }), bn(2)),
-          assetAmount(246)
-        )
-      ).toBeTruthy()
-
-      expect(
-        eqAssetAmount.equals(
-          getEarnings(O.some({ earnings: assetToBase(assetAmount(100)).amount().toString() }), bn(2.5)),
-          assetAmount(250)
-        )
+        eqAssetAmount.equals(getILPPaid({ impermanentLossProtectionPaid: '100000000' }, bn(2)), assetAmount(2))
       ).toBeTruthy()
     })
   })

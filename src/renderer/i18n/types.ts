@@ -295,6 +295,7 @@ type DepositMessageKey =
   | 'deposit.poolDetails.volume24'
   | 'deposit.poolDetails.volumeTotal'
   | 'deposit.poolDetails.earnings'
+  | 'deposit.poolDetails.ilpPaid'
   | 'deposit.poolDetails.totalTx'
   | 'deposit.poolDetails.totalFees'
   | 'deposit.poolDetails.members'
