@@ -27,20 +27,19 @@ export const CoinInfoWrapper = styled.div`
 `
 
 export const CoinTitle = styled.p`
-  margin-bottom: 10px;
-  font-size: 32px;
+  margin-bottom: 0;
+  font-size: 36px;
   font-family: 'MainFontRegular';
   color: ${palette('text', 0)};
-  line-height: 38px;
+  line-height: 42px;
   text-transform: uppercase;
 `
 
 export const CoinSubtitle = styled.p`
   margin-bottom: 0px;
-  font-size: 24px;
+  font-size: 19px;
   font-family: 'MainFontRegular';
   color: ${palette('text', 2)};
-  line-height: 29px;
   text-transform: uppercase;
 `
 
