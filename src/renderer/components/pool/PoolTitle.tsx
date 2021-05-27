@@ -9,6 +9,7 @@ import * as O from 'fp-ts/lib/Option'
 import { useIntl } from 'react-intl'
 import { useHistory } from 'react-router-dom'
 
+import { Network } from '../../../shared/api/types'
 import * as PoolHelpers from '../../helpers/poolHelper'
 import * as poolsRoutes from '../../routes/pools'
 import { ManageButton } from '../manageButton'
@@ -21,9 +22,10 @@ export type Props = {
   priceSymbol?: string
   isLoading?: boolean
   haltedChains?: Chain[]
+  network: Network
 }
 
-export const PoolTitle: React.FC<Props> = ({ asset: oAsset, price, priceSymbol, haltedChains = [] }) => {
+export const PoolTitle: React.FC<Props> = ({ asset: oAsset, price, priceSymbol, haltedChains = [], network }) => {
   const history = useHistory()
   const intl = useIntl()
   const isDesktopView = Grid.useBreakpoint()?.md ?? false
@@ -33,11 +35,16 @@ export const PoolTitle: React.FC<Props> = ({ asset: oAsset, price, priceSymbol, 
       FP.pipe(
         oAsset,
         O.fold(
-          () => '--',
-          (asset) => `${asset.chain}.${asset.ticker}`
+          () => <>--</>,
+          (asset) => (
+            <>
+              <Styled.AssetIcon asset={asset} network={network} />
+              {asset.chain}.{asset.ticker}
+            </>
+          )
         )
       ),
-    [oAsset]
+    [oAsset, network]
   )
 
   const disableButton = useMemo(

@@ -14,8 +14,10 @@ import { PoolDetails, Props as PoolDetailProps } from '../../components/pool/Poo
 import { ErrorView } from '../../components/shared/error'
 import { RefreshButton } from '../../components/uielements/button'
 import { ONE_BN } from '../../const'
+import { useAppContext } from '../../contexts/AppContext'
 import { useMidgardContext } from '../../contexts/MidgardContext'
 import { PoolDetailRouteParams } from '../../routes/pools/detail'
+import { DEFAULT_NETWORK } from '../../services/const'
 import { PoolDetailRD, PoolEarningHistoryRD, PoolStatsDetailRD } from '../../services/midgard/types'
 import { PoolChartView } from './PoolChartView'
 import * as Styled from './PoolDetailsView.styles'
@@ -29,10 +31,12 @@ const defaultDetailsProps: TargetPoolDetailProps = {
   ChartView: PoolChartView,
   poolDetail: poolDetailMock,
   poolStatsDetail: poolStatsDetailMock,
-  earningsHistory: O.none
+  earningsHistory: O.none,
+  network: DEFAULT_NETWORK
 }
 
 export const PoolDetailsView: React.FC = () => {
+  const { network$ } = useAppContext()
   const {
     service: {
       pools: {
@@ -48,6 +52,8 @@ export const PoolDetailsView: React.FC = () => {
       setSelectedPoolAsset
     }
   } = useMidgardContext()
+
+  const network = useObservableState(network$, DEFAULT_NETWORK)
 
   const intl = useIntl()
 
@@ -110,6 +116,7 @@ export const PoolDetailsView: React.FC = () => {
                 },
                 ([poolDetail, poolStatsDetail, poolEarningHistory]) => {
                   prevProps.current = {
+                    network,
                     priceRatio,
                     poolDetail,
                     poolStatsDetail,

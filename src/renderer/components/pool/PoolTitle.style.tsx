@@ -2,6 +2,7 @@ import * as A from 'antd'
 import styled from 'styled-components'
 
 import { media } from '../../helpers/styleHelper'
+import { AssetIcon as AssetIconUI } from '../uielements/assets/assetIcon'
 import { Label } from '../uielements/label'
 
 export const Container = styled(A.Row)`
@@ -60,4 +61,8 @@ export const ButtonActions = styled.div`
   > :not(:first-child) {
     margin-left: 10px;
   }
+`
+
+export const AssetIcon = styled(AssetIconUI).attrs({ size: 'small' })`
+  margin-right: 10px;
 `
