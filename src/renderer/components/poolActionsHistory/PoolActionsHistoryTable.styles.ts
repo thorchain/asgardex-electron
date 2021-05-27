@@ -26,7 +26,10 @@ export const Table = styled(UITable)`
       & > td {
         height: auto;
         padding-top: 8px;
-        padding-bottom: 8px;
+        // Every TxDetail's pill needs additional margin-bottom: 5px
+        // for the case when they are placed by 2+ rows to have margins between
+        // each others. Here we subtract 5px from targeted 8px to center all items
+        padding-bottom: 3px;
       }
     }
   }
