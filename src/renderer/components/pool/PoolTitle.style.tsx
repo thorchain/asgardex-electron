@@ -2,7 +2,7 @@ import * as A from 'antd'
 import styled from 'styled-components'
 
 import { media } from '../../helpers/styleHelper'
-import { AssetIcon as AssetIconUI } from '../uielements/assets/assetIcon'
+import { AssetSelect as AssetSelectUI } from '../uielements/assets/assetSelect'
 import { Label } from '../uielements/label'
 
 export const Container = styled(A.Row)`
@@ -63,6 +63,11 @@ export const ButtonActions = styled.div`
   }
 `
 
-export const AssetIcon = styled(AssetIconUI).attrs({ size: 'small' })`
+export const AssetSelect = styled(AssetSelectUI)`
+  width: auto;
   margin-right: 10px;
+
+  & .label-wrapper {
+    padding: 0;
+  }
 `

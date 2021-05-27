@@ -36,12 +36,7 @@ export const PoolTitle: React.FC<Props> = ({ asset: oAsset, price, priceSymbol, 
         oAsset,
         O.fold(
           () => <>--</>,
-          (asset) => (
-            <>
-              <Styled.AssetIcon asset={asset} network={network} />
-              {asset.chain}.{asset.ticker}
-            </>
-          )
+          (asset) => <Styled.AssetSelect balances={[]} asset={asset} onSelect={FP.constVoid} network={network} />
         )
       ),
     [oAsset, network]
