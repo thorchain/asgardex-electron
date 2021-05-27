@@ -22,10 +22,10 @@ export const Price = styled(Label)`
   text-overflow: ellipsis;
   font-size: 27px;
   padding: 0;
-  padding-left: 15px;
+  margin-left: 15px;
   ${media.lg`
     font-size: 49px;
-    padding-left: 40px;
+    margin-left: 40px;
   `}
 `
 
