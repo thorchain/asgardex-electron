@@ -8,15 +8,25 @@ import { TxType as TxTypeUI } from '../uielements/txType'
 import { PoolActionsHistoryFilter } from './PoolActionsHistoryFilter'
 
 export const Table = styled(UITable)`
-  .ant-table-thead > tr {
-    & > th {
-      font-size: 14px;
-      font-family: 'MainFontRegular';
-      color: ${palette('text', 0)};
-      font-weight: 600;
-      &,
-      &:hover {
-        background: ${palette('background', 0)} !important;
+  .ant-table {
+    &-thead > tr {
+      & > th {
+        font-size: 14px;
+        font-family: 'MainFontRegular';
+        color: ${palette('text', 0)};
+        font-weight: 600;
+        &,
+        &:hover {
+          background: ${palette('background', 0)} !important;
+        }
+      }
+    }
+
+    &-tbody > tr {
+      & > td {
+        height: auto;
+        padding-top: 8px;
+        padding-bottom: 8px;
       }
     }
   }
