@@ -23,29 +23,6 @@ export const FilterButton = styled(ButtonUI)<ButtonProps & { active?: 'true' | '
     color: ${({ active }) => (active === 'true' ? palette('text', 1) : palette('text', 2))};
     border: none;
 
-    // use :before element instead of :after as :after is used by ant to make some transition effects
-    &:before {
-      content: ' ';
-      display: block;
-      position: absolute;
-      width: calc(100% - ${filterButtonBorderRadius}px);
-      height: 2px;
-      background: ${palette('primary', 0)};
-      bottom: -5px;
-      top: auto;
-      left: auto;
-      right: auto;
-      opacity: 0;
-    }
-
-    ${({ active }) =>
-      active === 'true' &&
-      `
-       &:before {
-        opacity: 1;
-       }
-    `}
-
     &.focused,
     &:hover,
     &:active,
