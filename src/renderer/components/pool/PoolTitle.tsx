@@ -67,7 +67,7 @@ export const PoolTitle: React.FC<Props> = ({ asset: oAsset, price, priceSymbol, 
           )
         )
       ),
-    [oAsset, network]
+    [oAsset, isDesktopView, network]
   )
 
   const disableButton = useMemo(
