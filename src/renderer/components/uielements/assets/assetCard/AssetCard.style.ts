@@ -105,7 +105,18 @@ export const SliderWrapper = styled.div`
   padding: 0 5px 20px 10px;
 `
 
-export const AssetLabel = styled(AssetLabelUI)`
-  padding-top: 10px;
+export const CardHeader = styled.div`
+  display: flex;
+  justify-content: space-between;
+  padding: 10px 11px 10px 0;
   border-bottom: 1px solid ${palette('gray', 0)};
+`
+
+export const BalanceLabel = styled(Label)`
+  width: auto;
+  padding: 0;
+`
+
+export const AssetLabel = styled(AssetLabelUI)`
+  padding: 0;
 `

@@ -1007,6 +1007,7 @@ export const SymDeposit: React.FC<Props> = (props) => {
       <Styled.CardsRow gutter={{ lg: 32 }}>
         <Col xs={24} xl={12}>
           <Styled.AssetCard
+            assetBalance={oAssetBalance}
             disabled={disabledForm}
             asset={asset}
             selectedAmount={assetAmountToDepositMax1e8}
@@ -1034,6 +1035,7 @@ export const SymDeposit: React.FC<Props> = (props) => {
         <Col xs={24} xl={12}>
           <>
             <Styled.AssetCard
+              assetBalance={oRuneBalance}
               disabled={disabledForm}
               asset={AssetRuneNative}
               selectedAmount={runeAmountToDeposit}

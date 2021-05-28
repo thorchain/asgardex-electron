@@ -2,6 +2,7 @@ import React from 'react'
 
 import { Meta, Story } from '@storybook/react'
 import { bn, AssetBNB, assetAmount, assetToBase, baseAmount, AssetBTC, AssetRuneNative } from '@xchainjs/xchain-util'
+import * as O from 'fp-ts/Option'
 
 import { ZERO_BASE_AMOUNT } from '../../../../const'
 import { WalletBalance } from '../../../../types/wallet'
@@ -27,6 +28,7 @@ const balances = [balanceBNB, balanceBTC, balanceRuneNative]
 
 const defaultProps: AssetCardProps = {
   title: 'Title here',
+  assetBalance: O.none,
   asset: AssetBNB,
   balances,
   selectedAmount: ZERO_BASE_AMOUNT,
