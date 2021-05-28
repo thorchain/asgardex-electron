@@ -1,20 +1,31 @@
-import React, { useCallback, useRef } from 'react'
+import React, { useCallback, useMemo, useRef } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
 import { currencySymbolByAsset } from '@xchainjs/xchain-util'
 import BigNumber from 'bignumber.js'
 import * as FP from 'fp-ts/function'
+import * as A from 'fp-ts/lib/Array'
 import * as O from 'fp-ts/Option'
 import { useObservableState } from 'observable-hooks'
+import * as Rx from 'rxjs'
 import * as RxOp from 'rxjs/operators'
 
 import { PoolDetailsChart } from '../../components/uielements/chart'
-import { ChartDetailsRD, ChartTimeFrame } from '../../components/uielements/chart/types'
+import { ChartDataType, ChartDetailsRD, ChartTimeFrame } from '../../components/uielements/chart/PoolDetailsChart.types'
 import { useMidgardContext } from '../../contexts/MidgardContext'
 import { liveData } from '../../helpers/rx/liveData'
 import { SelectedPricePoolAsset } from '../../services/midgard/types'
-import { GetDepthHistoryIntervalEnum, GetSwapHistoryIntervalEnum } from '../../types/generated/midgard'
-import { fromDepthHistoryItems, fromSwapHistoryItems, getEoDTime, getWeekAgoTime } from './PoolChartView.helper'
+import {
+  GetDepthHistoryIntervalEnum,
+  GetLiquidityHistoryIntervalEnum,
+  GetSwapHistoryIntervalEnum
+} from '../../types/generated/midgard'
+import {
+  getLiquidityFromHistoryItems,
+  getVolumeFromHistoryItems,
+  getEoDTime,
+  getWeekAgoTime
+} from './PoolChartView.helper'
 
 type Props = {
   priceRatio: BigNumber
@@ -23,7 +34,7 @@ type Props = {
 export const PoolChartView: React.FC<Props> = ({ priceRatio }) => {
   const {
     service: {
-      pools: { selectedPricePoolAsset$, getSwapHistory$, getDepthHistory$ }
+      pools: { selectedPricePoolAsset$, getSwapHistory$, getDepthHistory$, getPoolLiquidityHistory$ }
     }
   } = useMidgardContext()
 
@@ -33,10 +44,10 @@ export const PoolChartView: React.FC<Props> = ({ priceRatio }) => {
     O.fold(() => '', currencySymbolByAsset)
   )
 
-  type DataRequestParams = { timeFrame: ChartTimeFrame; dataType: string }
+  type DataRequestParams = { timeFrame: ChartTimeFrame; dataType: ChartDataType }
   const savedParams = useRef<DataRequestParams>({
     timeFrame: 'allTime',
-    dataType: 'Liquidity'
+    dataType: 'liquidity'
   })
 
   const curTime = getEoDTime()
@@ -49,18 +60,45 @@ export const PoolChartView: React.FC<Props> = ({ priceRatio }) => {
         RxOp.map((params) => (savedParams.current = { ...savedParams.current, ...params })),
         RxOp.switchMap((params) => {
           const requestParams = params.timeFrame === 'week' ? { from: weekAgoTime, to: curTime } : {}
-          return params.dataType === 'Liquidity'
-            ? getDepthHistory$({
-                ...requestParams,
-                interval: GetDepthHistoryIntervalEnum.Day
-              }).pipe(liveData.map(({ intervals }) => fromDepthHistoryItems(intervals, priceRatio)))
-            : getSwapHistory$({
-                ...requestParams,
-                interval: GetSwapHistoryIntervalEnum.Day
-              }).pipe(liveData.map(({ intervals }) => fromSwapHistoryItems(intervals, priceRatio)))
+          return Rx.iif(
+            () => params.dataType === 'liquidity',
+            // (1) get data for depth history
+            getDepthHistory$({
+              ...requestParams,
+              interval: GetDepthHistoryIntervalEnum.Day
+            }).pipe(liveData.map(({ intervals }) => getLiquidityFromHistoryItems(intervals))),
+            // (2) or get data for volume history
+            FP.pipe(
+              liveData.sequenceS({
+                swapHistory: getSwapHistory$({
+                  ...requestParams,
+                  interval: GetSwapHistoryIntervalEnum.Day
+                }),
+                liquidityHistory: getPoolLiquidityHistory$({
+                  ...requestParams,
+                  interval: GetLiquidityHistoryIntervalEnum.Day
+                })
+              }),
+              liveData.map(({ swapHistory, liquidityHistory }) =>
+                getVolumeFromHistoryItems({
+                  swapHistory: swapHistory.intervals,
+                  liquidityHistory: liquidityHistory.intervals
+                })
+              )
+            )
+          )
         })
       ),
     RD.initial
+  )
+
+  const chartDataRDPriced: ChartDetailsRD = useMemo(
+    () =>
+      FP.pipe(
+        chartDataRD,
+        RD.map(FP.flow(A.map((detail) => ({ ...detail, amount: detail.amount.times(priceRatio) }))))
+      ),
+    [chartDataRD, priceRatio]
   )
 
   const setTimeFrameCallback = useCallback(
@@ -71,7 +109,7 @@ export const PoolChartView: React.FC<Props> = ({ priceRatio }) => {
   )
 
   const setDataTypeCallback = useCallback(
-    (dataType: string) => {
+    (dataType: ChartDataType) => {
       updateChartData({ dataType })
     },
     [updateChartData]
@@ -79,11 +117,11 @@ export const PoolChartView: React.FC<Props> = ({ priceRatio }) => {
 
   return (
     <PoolDetailsChart
-      dataTypes={['Liquidity', 'Volume']}
+      dataTypes={['liquidity', 'volume']}
       selectedDataType={savedParams.current.dataType}
       setDataType={setDataTypeCallback}
-      chartDetails={chartDataRD}
-      chartType={savedParams.current.dataType === 'Liquidity' ? 'line' : 'bar'}
+      chartDetails={chartDataRDPriced}
+      chartType={savedParams.current.dataType === 'liquidity' ? 'line' : 'bar'}
       unit={unit}
       selectedTimeFrame={savedParams.current.timeFrame}
       setTimeFrame={setTimeFrameCallback}

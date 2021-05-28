@@ -193,7 +193,7 @@ export type PoolsService = {
   poolStatsDetail$: PoolStatsDetailLD
   poolLegacyDetail$: PoolLegacyDetailLD
   poolEarningHistory$: PoolEarningHistoryLD
-  poolLiquidityHistory$: (parmas: PoolLiquidityHistoryParams) => PoolLiquidityHistoryLD
+  getPoolLiquidityHistory$: (parmas: PoolLiquidityHistoryParams) => PoolLiquidityHistoryLD
   getSwapHistory$: (params: GetSwapHistoryParams) => SwapHistoryLD
   reloadSwapHistory: FP.Lazy<void>
   getDepthHistory$: (params: GetDepthHistoryParams) => DepthHistoryLD

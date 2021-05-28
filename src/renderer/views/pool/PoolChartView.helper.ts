@@ -1,11 +1,10 @@
 import { baseAmount, baseToAsset, bnOrZero } from '@xchainjs/xchain-util'
-import BigNumber from 'bignumber.js'
 import * as A from 'fp-ts/lib/Array'
 import * as FP from 'fp-ts/lib/function'
 import moment from 'moment'
 
-import { DepthHistoryItems, SwapHistoryItems } from '../../services/midgard/types'
-import { DepthHistoryItem, SwapHistoryItem } from '../../types/generated/midgard'
+import { ChartDetails } from '../../components/uielements/chart/PoolDetailsChart.types'
+import { DepthHistoryItem, LiquidityHistoryItem, SwapHistoryItem } from '../../types/generated/midgard'
 
 // Get end of date time
 export const getEoDTime = () => {
@@ -31,25 +30,51 @@ export const getWeekAgoTime = () => {
     .unix()
 }
 
-export const fromDepthHistoryItems = (items: DepthHistoryItems, priceRatio: BigNumber) =>
+type PartialDepthHistoryItem = Pick<DepthHistoryItem, 'startTime' | 'runeDepth'>
+
+export const getLiquidityFromHistoryItems = (depthHistory: PartialDepthHistoryItem[]): ChartDetails =>
   FP.pipe(
-    items,
-    A.map((interval: DepthHistoryItem) => ({
-      time: Number(interval.startTime),
-      // Note: `runeDepth` needs to be multiplied by 2 to get all depth of a pool
-      value: baseToAsset(baseAmount(bnOrZero(interval.runeDepth).multipliedBy(2).multipliedBy(priceRatio)))
-        .amount()
-        .toFixed(3)
-    }))
+    depthHistory,
+    A.map(({ startTime, runeDepth }: PartialDepthHistoryItem) => {
+      const amount = baseToAsset(
+        baseAmount(bnOrZero(runeDepth))
+          // Note: Pool depth = 2 x `runeDepth`
+          .times(2)
+      )
+
+      return {
+        time: Number(startTime),
+        amount
+      }
+    })
   )
 
-export const fromSwapHistoryItems = (items: SwapHistoryItems, priceRatio: BigNumber) =>
+type PartialSwapHistoryItem = Pick<SwapHistoryItem, 'startTime' | 'totalVolume'>
+type PartialLiquidityHistoryItem = Pick<LiquidityHistoryItem, 'addLiquidityVolume' | 'withdrawVolume'>
+
+export const getVolumeFromHistoryItems = ({
+  swapHistory,
+  liquidityHistory
+}: {
+  swapHistory: PartialSwapHistoryItem[]
+  liquidityHistory: PartialLiquidityHistoryItem[]
+}): ChartDetails =>
   FP.pipe(
-    items,
-    A.map((interval: SwapHistoryItem) => ({
-      time: Number(interval.startTime),
-      value: baseToAsset(baseAmount(bnOrZero(interval.totalVolume).multipliedBy(priceRatio)))
-        .amount()
-        .toFixed(3)
-    }))
+    A.zipWith(swapHistory, liquidityHistory, ({ startTime, totalVolume }, { addLiquidityVolume, withdrawVolume }) => ({
+      startTime,
+      totalVolume,
+      addLiquidityVolume,
+      withdrawVolume
+    })),
+    A.map(({ startTime, totalVolume, addLiquidityVolume, withdrawVolume }) => {
+      const amount = baseToAsset(
+        baseAmount(bnOrZero(totalVolume))
+          .plus(baseAmount(bnOrZero(addLiquidityVolume)))
+          .plus(baseAmount(bnOrZero(withdrawVolume)))
+      )
+      return {
+        time: Number(startTime),
+        amount
+      }
+    })
   )
