@@ -26,7 +26,6 @@ import { PriceDataIndex } from '../../../../services/midgard/types'
 import { WalletBalances } from '../../../../types/wallet'
 import { Label } from '../../label'
 import { Slider } from '../../slider'
-import { AssetLabel } from '../assetLabel'
 import { AssetMenu } from '../assetMenu'
 import * as Styled from './AssetCard.style'
 
@@ -169,7 +168,7 @@ export const AssetCard: React.FC<Props> = (props): JSX.Element => {
       <Dropdown overlay={renderMenu()} trigger={[]} visible={openDropdown}>
         <Styled.CardBorderWrapper error={minAmountError}>
           <Styled.CardHeader>
-            <AssetLabel asset={asset} />
+            <Styled.AssetLabel asset={asset} />
             {balanceLabel}
           </Styled.CardHeader>
           <Styled.CardTopRow>
