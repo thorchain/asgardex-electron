@@ -1,12 +1,11 @@
-import React, { useMemo } from 'react'
+import React, { useCallback, useMemo } from 'react'
 
-import { formatAssetAmount } from '@xchainjs/xchain-util'
+import { AssetAmount, formatAssetAmount } from '@xchainjs/xchain-util'
 import BigNumber from 'bignumber.js'
-import * as O from 'fp-ts/Option'
 import { useIntl } from 'react-intl'
 
 import { abbreviateNumber } from '../../helpers/numberHelper'
-import { EarningsHistoryItemPool, PoolDetail, PoolStatsDetail } from '../../types/generated/midgard/models'
+import { PoolDetail, PoolStatsDetail } from '../../types/generated/midgard/models'
 import { PoolStatus } from '../uielements/poolStatus'
 import * as Styled from './PoolCards.style'
 import * as H from './PoolDetails.helpers'
@@ -14,7 +13,6 @@ import * as H from './PoolDetails.helpers'
 export type Props = {
   poolDetail: PoolDetail
   poolStatsDetail: PoolStatsDetail
-  earningsHistory: O.Option<EarningsHistoryItemPool>
   priceSymbol?: string
   isLoading?: boolean
   priceRatio: BigNumber
@@ -24,74 +22,35 @@ export const PoolCards: React.FC<Props> = ({
   poolStatsDetail,
   priceSymbol = '',
   poolDetail,
-  earningsHistory,
   priceRatio,
   isLoading
 }) => {
   const intl = useIntl()
 
   const liquidity = useMemo(() => H.getLiquidity(poolDetail, priceRatio), [poolDetail, priceRatio])
-  const volume = useMemo(() => H.getVolume(poolDetail, priceRatio), [poolDetail, priceRatio])
+  const volume24 = useMemo(() => H.getVolume24(poolDetail, priceRatio), [poolDetail, priceRatio])
+  const volumeTotal = useMemo(() => H.getVolumeTotal(poolStatsDetail, priceRatio), [poolStatsDetail, priceRatio])
   const apy = useMemo(() => H.getAPY(poolDetail), [poolDetail])
 
   const fees = useMemo(() => H.getFees(poolStatsDetail, priceRatio), [poolStatsDetail, priceRatio])
   const totalTx = useMemo(() => H.getTotalTx(poolStatsDetail), [poolStatsDetail])
-  const totalSwaps = useMemo(() => H.getTotalSwaps(poolStatsDetail), [poolStatsDetail])
   const members = useMemo(() => H.getMembers(poolStatsDetail), [poolStatsDetail])
 
-  const earnings = useMemo(() => H.getEarnings(earningsHistory), [earningsHistory])
+  const ilpPaid = useMemo(() => H.getILPPaid(poolStatsDetail, priceRatio), [poolStatsDetail, priceRatio])
+
+  const getFullValue = useCallback(
+    (amount: AssetAmount): string => `${priceSymbol} ${formatAssetAmount({ amount: amount, trimZeros: true })}`,
+    [priceSymbol]
+  )
 
   return (
     <Styled.Container>
       <Styled.Col>
         <PoolStatus
           isLoading={isLoading}
-          fullValue={`${priceSymbol} ${formatAssetAmount({ amount: liquidity, trimZeros: true })}`}
+          fullValue={getFullValue(liquidity)}
           label={intl.formatMessage({ id: 'common.liquidity' })}
           displayValue={`${priceSymbol} ${abbreviateNumber(liquidity.amount().toNumber(), 2)}`}
-        />
-      </Styled.Col>
-
-      <Styled.Col>
-        <PoolStatus
-          isLoading={isLoading}
-          fullValue={`${priceSymbol} ${formatAssetAmount({ amount: volume, trimZeros: true })}`}
-          label={intl.formatMessage({ id: 'deposit.poolDetails.volume' })}
-          displayValue={`${priceSymbol} ${abbreviateNumber(volume.amount().toNumber(), 2)}`}
-        />
-      </Styled.Col>
-
-      <Styled.Col>
-        <PoolStatus
-          isLoading={isLoading}
-          fullValue={`${priceSymbol} ${formatAssetAmount({ amount: earnings, trimZeros: true })}`}
-          label={intl.formatMessage({ id: 'deposit.poolDetails.earnings' })}
-          displayValue={`${priceSymbol} ${abbreviateNumber(earnings.amount().toNumber(), 2)}`}
-        />
-      </Styled.Col>
-
-      <Styled.Col>
-        <PoolStatus
-          isLoading={isLoading}
-          fullValue={`${priceSymbol} ${formatAssetAmount({ amount: fees, trimZeros: true })}`}
-          label={intl.formatMessage({ id: 'common.fees' })}
-          displayValue={`${priceSymbol} ${abbreviateNumber(fees.amount().toNumber(), 2)}`}
-        />
-      </Styled.Col>
-
-      <Styled.Col>
-        <PoolStatus
-          isLoading={isLoading}
-          label={intl.formatMessage({ id: 'deposit.poolDetails.totalTx' })}
-          displayValue={abbreviateNumber(totalTx.toNumber())}
-        />
-      </Styled.Col>
-
-      <Styled.Col>
-        <PoolStatus
-          isLoading={isLoading}
-          label={intl.formatMessage({ id: 'deposit.poolDetails.totalSwaps' })}
-          displayValue={abbreviateNumber(totalSwaps.toNumber())}
         />
       </Styled.Col>
 
@@ -106,8 +65,52 @@ export const PoolCards: React.FC<Props> = ({
       <Styled.Col>
         <PoolStatus
           isLoading={isLoading}
+          fullValue={getFullValue(volumeTotal)}
+          label={intl.formatMessage({ id: 'deposit.poolDetails.volumeTotal' })}
+          displayValue={`${priceSymbol} ${abbreviateNumber(volumeTotal.amount().toNumber(), 2)}`}
+        />
+      </Styled.Col>
+
+      <Styled.Col>
+        <PoolStatus
+          isLoading={isLoading}
+          fullValue={getFullValue(volume24)}
+          label={intl.formatMessage({ id: 'deposit.poolDetails.volume24' })}
+          displayValue={`${priceSymbol} ${abbreviateNumber(volume24.amount().toNumber(), 2)}`}
+        />
+      </Styled.Col>
+
+      <Styled.Col>
+        <PoolStatus
+          isLoading={isLoading}
+          fullValue={getFullValue(fees)}
+          label={intl.formatMessage({ id: 'deposit.poolDetails.totalFees' })}
+          displayValue={`${priceSymbol} ${abbreviateNumber(fees.amount().toNumber(), 2)}`}
+        />
+      </Styled.Col>
+
+      <Styled.Col>
+        <PoolStatus
+          isLoading={isLoading}
+          label={intl.formatMessage({ id: 'deposit.poolDetails.totalTx' })}
+          displayValue={abbreviateNumber(totalTx.toNumber(), 3)}
+        />
+      </Styled.Col>
+
+      <Styled.Col>
+        <PoolStatus
+          isLoading={isLoading}
           label={intl.formatMessage({ id: 'deposit.poolDetails.apy' })}
-          displayValue={`${abbreviateNumber(apy.toNumber())} %`}
+          displayValue={`${abbreviateNumber(apy.toNumber(), 2)} %`}
+        />
+      </Styled.Col>
+
+      <Styled.Col>
+        <PoolStatus
+          isLoading={isLoading}
+          fullValue={getFullValue(ilpPaid)}
+          label={intl.formatMessage({ id: 'deposit.poolDetails.ilpPaid' })}
+          displayValue={`${priceSymbol} ${abbreviateNumber(ilpPaid.amount().toNumber(), 2)}`}
         />
       </Styled.Col>
     </Styled.Container>

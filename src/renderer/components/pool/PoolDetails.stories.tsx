@@ -4,16 +4,16 @@ import { storiesOf } from '@storybook/react'
 import { AssetETH } from '@xchainjs/xchain-util'
 import * as O from 'fp-ts/Option'
 
-import { poolDetailMock, poolStatsDetailMock } from '../../../shared/mock/pool'
 import { ONE_BN } from '../../const'
 import { PoolDetails } from './PoolDetails'
+import { getEmptyPoolDetail, getEmptyPoolStatsDetail } from './PoolDetails.helpers'
 
 export const PoolDetailsStory = () => {
   return (
     <PoolDetails
+      poolDetail={getEmptyPoolDetail()}
+      poolStatsDetail={getEmptyPoolStatsDetail()}
       network={'testnet'}
-      poolDetail={poolDetailMock}
-      poolStatsDetail={poolStatsDetailMock}
       earningsHistory={O.none}
       priceSymbol={'R'}
       asset={AssetETH}

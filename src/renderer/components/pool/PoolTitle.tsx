@@ -27,7 +27,14 @@ export type Props = {
   network: Network
 }
 
-export const PoolTitle: React.FC<Props> = ({ asset: oAsset, price, priceSymbol, haltedChains = [], network }) => {
+export const PoolTitle: React.FC<Props> = ({
+  asset: oAsset,
+  price,
+  priceSymbol,
+  haltedChains = [],
+  network,
+  isLoading
+}) => {
   const history = useHistory()
   const intl = useIntl()
   const isDesktopView = Grid.useBreakpoint()?.md ?? false
@@ -81,17 +88,17 @@ export const PoolTitle: React.FC<Props> = ({ asset: oAsset, price, priceSymbol, 
     [haltedChains, oAsset]
   )
 
-  const priceStr = useMemo(
-    () =>
-      FP.pipe(
-        oAsset,
-        O.fold(
-          () => '',
-          () => `${priceSymbol} ${formatAssetAmount({ amount: price, decimal: 3 })}`
-        )
-      ),
-    [oAsset, price, priceSymbol]
-  )
+  const priceStr = useMemo(() => {
+    if (isLoading) return loadingString
+
+    return FP.pipe(
+      oAsset,
+      O.fold(
+        () => '',
+        () => `${priceSymbol} ${formatAssetAmount({ amount: price, decimal: 3 })}`
+      )
+    )
+  }, [isLoading, oAsset, price, priceSymbol])
 
   const buttons = useMemo(
     () =>

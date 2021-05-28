@@ -9,8 +9,8 @@ import { useIntl } from 'react-intl'
 import { useParams } from 'react-router-dom'
 import * as RxOp from 'rxjs/operators'
 
-import { poolDetailMock, poolStatsDetailMock } from '../../../shared/mock/pool'
 import { PoolDetails, Props as PoolDetailProps } from '../../components/pool/PoolDetails'
+import { getEmptyPoolDetail, getEmptyPoolStatsDetail } from '../../components/pool/PoolDetails.helpers'
 import { ErrorView } from '../../components/shared/error'
 import { RefreshButton } from '../../components/uielements/button'
 import { ONE_BN } from '../../const'
@@ -29,8 +29,8 @@ const defaultDetailsProps: TargetPoolDetailProps = {
   priceRatio: ONE_BN,
   HistoryView: PoolHistory,
   ChartView: PoolChartView,
-  poolDetail: poolDetailMock,
-  poolStatsDetail: poolStatsDetailMock,
+  poolDetail: getEmptyPoolDetail(),
+  poolStatsDetail: getEmptyPoolStatsDetail(),
   earningsHistory: O.none,
   network: DEFAULT_NETWORK
 }
