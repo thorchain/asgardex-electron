@@ -39,6 +39,6 @@ export const UnlockIcon = styled(UnlockWarningIconUI)`
 `
 
 export const Label = styled(Text)`
-  text-transform: 'upercase';
+  text-transform: uppercase;
   color: ${palette('text', 0)};
 `
