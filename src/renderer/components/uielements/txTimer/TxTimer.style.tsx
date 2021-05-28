@@ -9,6 +9,7 @@ export const TxTimerWrapper = styled.div`
   border-radius: 50%;
   overflow: hidden;
   color: ${palette('gray', 0)};
+  text-transform: none;
 
   .timerchart-circular-progressbar {
     position: absolute;

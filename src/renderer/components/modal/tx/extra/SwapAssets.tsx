@@ -10,13 +10,13 @@ import * as SwapStyled from './SwapAssets.styles'
 export type Props = {
   source: C.AssetData
   target: C.AssetData
-  slip: BigNumber
+  slip?: BigNumber
   stepDescription: string
   network: Network
 }
 
 export const SwapAssets: React.FC<Props> = (props): JSX.Element => {
-  const { source, target, slip, stepDescription, network } = props
+  const { source, target, stepDescription, network, slip } = props
   return (
     <>
       <Styled.StepLabel>{stepDescription}</Styled.StepLabel>
@@ -27,7 +27,7 @@ export const SwapAssets: React.FC<Props> = (props): JSX.Element => {
           <Styled.AssetData asset={target.asset} amount={target.amount} network={network} />
         </Styled.AssetsContainer>
       </Styled.DataWrapper>
-      <SwapStyled.Trend amount={slip} />
+      {slip && <SwapStyled.Trend amount={slip} />}
     </>
   )
 }
