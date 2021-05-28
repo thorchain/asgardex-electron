@@ -5,6 +5,7 @@ import * as A from 'antd'
 import BigNumber from 'bignumber.js'
 import * as O from 'fp-ts/Option'
 
+import { Network } from '../../../shared/api/types'
 import { EarningsHistoryItemPool, PoolDetail, PoolStatsDetail } from '../../types/generated/midgard/models'
 import { PoolCards } from './PoolCards'
 import * as H from './PoolDetails.helpers'
@@ -22,6 +23,7 @@ export type Props = {
   HistoryView: React.ComponentType<{ poolAsset: Asset }>
   ChartView: React.ComponentType<{ isLoading?: boolean; priceRatio: BigNumber }>
   haltedChains?: Chain[]
+  network: Network
 }
 
 export const PoolDetails: React.FC<Props> = ({
@@ -34,7 +36,8 @@ export const PoolDetails: React.FC<Props> = ({
   isLoading,
   HistoryView,
   ChartView,
-  haltedChains
+  haltedChains,
+  network
 }) => {
   const price = useMemo(() => H.getPrice(poolDetail, priceRatio), [poolDetail, priceRatio])
   return (
@@ -42,6 +45,7 @@ export const PoolDetails: React.FC<Props> = ({
       <Styled.TopContainer>
         <A.Col span={24}>
           <PoolTitle
+            network={network}
             haltedChains={haltedChains}
             asset={O.some(asset)}
             price={price}

@@ -11,6 +11,7 @@ import { PoolDetails } from './PoolDetails'
 export const PoolDetailsStory = () => {
   return (
     <PoolDetails
+      network={'testnet'}
       poolDetail={poolDetailMock}
       poolStatsDetail={poolStatsDetailMock}
       earningsHistory={O.none}
