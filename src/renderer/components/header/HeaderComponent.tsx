@@ -1,5 +1,6 @@
 import React, { useMemo, useState, useCallback, useRef } from 'react'
 
+import { assetAmount, assetToBase } from '@xchainjs/xchain-util'
 import { Row, Col, Tabs, Grid } from 'antd'
 import * as FP from 'fp-ts/function'
 import * as A from 'fp-ts/lib/Array'
@@ -18,6 +19,7 @@ import { ReactComponent as MenuIcon } from '../../assets/svg/icon-menu.svg'
 import { ReactComponent as SwapIcon } from '../../assets/svg/icon-swap.svg'
 import { ReactComponent as WalletIcon } from '../../assets/svg/icon-wallet.svg'
 import { ReactComponent as AsgardexLogo } from '../../assets/svg/logo-asgardex.svg'
+import { AssetBUSDBD1 } from '../../const'
 import { useThemeContext } from '../../contexts/ThemeContext'
 import * as poolsRoutes from '../../routes/pools'
 import * as walletRoutes from '../../routes/wallet'
@@ -32,6 +34,7 @@ import { HeaderNetStatus } from './netstatus'
 import { HeaderNetworkSelector } from './network'
 import { HeaderPriceSelector } from './price'
 import { HeaderSettings } from './settings'
+import { HeaderStats } from './stats/HeaderStats'
 import { HeaderTheme } from './theme'
 
 enum TabKey {
@@ -94,7 +97,6 @@ export const HeaderComponent: React.FC<Props> = (props): JSX.Element => {
   // store previous data to render it while reloading new data
   const prevPricePoolAssets = useRef<PricePoolAssets>()
 
-  // TODO (@Veado) Use `usePricePools` in parent view to provide pricePools
   const pricePoolAssets = useMemo(() => {
     return FP.pipe(
       oPricePools,
@@ -112,6 +114,7 @@ export const HeaderComponent: React.FC<Props> = (props): JSX.Element => {
   const [menuVisible, setMenuVisible] = useState(false)
 
   const isDesktopView = Grid.useBreakpoint()?.lg ?? false
+  const isLargeDesktopView = Grid.useBreakpoint()?.xl ?? false
 
   const toggleMenu = useCallback(() => {
     setMenuVisible(!menuVisible)
@@ -154,7 +157,7 @@ export const HeaderComponent: React.FC<Props> = (props): JSX.Element => {
     [intl]
   )
 
-  const headerHeight = useMemo(() => size('headerHeight', '50px')({ theme }), [theme])
+  const headerHeight = useMemo(() => size('headerHeight', '70px')({ theme }), [theme])
 
   const tabs = useMemo(
     () =>
@@ -300,6 +303,15 @@ export const HeaderComponent: React.FC<Props> = (props): JSX.Element => {
                   <AsgardexLogo />
                   {renderHeaderNetStatus}
                   <HeaderTheme isDesktopView={isDesktopView} />
+                  {isLargeDesktopView && (
+                    <HeaderStats
+                      runePrice={assetAmount(14.08)}
+                      volume24={{
+                        asset: AssetBUSDBD1,
+                        amount: assetToBase(assetAmount('24000000'))
+                      }}
+                    />
+                  )}
                 </Row>
               </Col>
               <Col span="auto">

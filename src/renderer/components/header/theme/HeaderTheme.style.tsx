@@ -24,6 +24,6 @@ export const NightThemeIcon = styled(NightThemeIconUI)`
   }
 `
 export const Label = styled(Text)`
-  text-transform: 'upercase';
+  text-transform: uppercase;
   color: ${palette('text', 0)};
 `
