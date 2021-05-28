@@ -137,9 +137,9 @@ export const pricePoolSelectorFromRD = (
 export const getPoolDetail = (details: PoolDetails, asset: Asset): O.Option<PoolDetail> =>
   FP.pipe(
     details.find((detail: PoolDetail) => {
-      const { asset: detailAsset = '' } = detail
-      const detailTicker = assetFromString(detailAsset)
-      return detailTicker && eqAsset.equals(detailTicker, asset)
+      const { asset: detailAssetString = '' } = detail
+      const detailAsset = assetFromString(detailAssetString)
+      return detailAsset && eqAsset.equals(detailAsset, asset)
     }),
     O.fromNullable
   )

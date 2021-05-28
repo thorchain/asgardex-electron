@@ -7,6 +7,7 @@ export const Container = styled.div`
   display: flex;
 `
 
+const filterButtonBorderRadius = 15
 export const FilterButton = styled(ButtonUI)<ButtonProps & { active?: 'true' | 'false' }>`
   margin-right: 10px;
   &:last-child {
@@ -16,7 +17,7 @@ export const FilterButton = styled(ButtonUI)<ButtonProps & { active?: 'true' | '
   &.ant-btn {
     padding: 0 12px;
     min-width: 0;
-    border-radius: 15px;
+    border-radius: ${filterButtonBorderRadius}px;
     border: solid 1px ${palette('gray', 1)} !important;
     background: ${palette('gray', 0)};
     color: ${({ active }) => (active === 'true' ? palette('text', 1) : palette('text', 2))};

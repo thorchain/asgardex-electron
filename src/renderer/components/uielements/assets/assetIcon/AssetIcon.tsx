@@ -104,24 +104,24 @@ export const AssetIcon: React.FC<Props> = ({
 
   const renderPendingIcon = useCallback(() => {
     return (
-      <Styled.IconWrapper size={size}>
+      <Styled.IconWrapper size={size} className={'asd ' + className}>
         <LoadingOutlined />
       </Styled.IconWrapper>
     )
-  }, [size])
+  }, [size, className])
   const renderFallbackIcon = useCallback(() => {
     const { ticker } = asset
     const numbers = getIntFromName(ticker)
     const backgroundImage = `linear-gradient(45deg,${rainbowStop(numbers[0])},${rainbowStop(numbers[1])})`
 
     return (
-      <Styled.IconWrapper {...rest} size={size}>
+      <Styled.IconWrapper {...rest} className={className} size={size}>
         <Styled.IconFallback style={{ backgroundImage }} size={size}>
           {ticker}
         </Styled.IconFallback>
       </Styled.IconWrapper>
     )
-  }, [asset, size, rest])
+  }, [asset, size, rest, className])
 
   return RD.fold(() => <></>, renderPendingIcon, renderFallbackIcon, renderIcon)(remoteIconImage)
 }

@@ -13,6 +13,7 @@ export const PoolDetailsStory = () => {
     <PoolDetails
       poolDetail={getEmptyPoolDetail()}
       poolStatsDetail={getEmptyPoolStatsDetail()}
+      network={'testnet'}
       earningsHistory={O.none}
       priceSymbol={'R'}
       asset={AssetETH}
