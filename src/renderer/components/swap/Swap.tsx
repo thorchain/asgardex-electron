@@ -646,7 +646,6 @@ export const Swap = ({
             source={{ asset: sourceAsset, amount: amountToSwapMax1e8 }}
             target={{ asset: targetAsset, amount: swapResultAmountMax1e8 }}
             stepDescription={stepLabel}
-            slip={swapData.slip}
             network={network}
           />
         )
@@ -662,7 +661,6 @@ export const Swap = ({
     swapState.stepsTotal,
     amountToSwapMax1e8,
     swapResultAmountMax1e8,
-    swapData.slip,
     network
   ])
 
