@@ -13,7 +13,6 @@ import * as RxOp from 'rxjs/operators'
 import { PoolDetailsChart } from '../../components/uielements/chart'
 import { ChartDetailsRD, ChartTimeFrame } from '../../components/uielements/chart/types'
 import { useMidgardContext } from '../../contexts/MidgardContext'
-import { sequenceTRD } from '../../helpers/fpHelpers'
 import { liveData } from '../../helpers/rx/liveData'
 import { SelectedPricePoolAsset } from '../../services/midgard/types'
 import {
@@ -61,30 +60,33 @@ export const PoolChartView: React.FC<Props> = ({ priceRatio }) => {
         RxOp.map((params) => (savedParams.current = { ...savedParams.current, ...params })),
         RxOp.switchMap((params) => {
           const requestParams = params.timeFrame === 'week' ? { from: weekAgoTime, to: curTime } : {}
-          return params.dataType === 'Liquidity'
-            ? getDepthHistory$({
-                ...requestParams,
-                interval: GetDepthHistoryIntervalEnum.Day
-              }).pipe(liveData.map(({ intervals }) => getLiquidityFromHistoryItems(intervals)))
-            : Rx.combineLatest([
-                getSwapHistory$({
+          return Rx.iif(
+            () => params.dataType === 'Liquidity',
+            // (1) get data for depth history
+            getDepthHistory$({
+              ...requestParams,
+              interval: GetDepthHistoryIntervalEnum.Day
+            }).pipe(liveData.map(({ intervals }) => getLiquidityFromHistoryItems(intervals))),
+            // (2) or get data for volume history
+            FP.pipe(
+              liveData.sequenceS({
+                swapHistory: getSwapHistory$({
                   ...requestParams,
                   interval: GetSwapHistoryIntervalEnum.Day
                 }),
-                getPoolLiquidityHistory$({
+                liquidityHistory: getPoolLiquidityHistory$({
                   ...requestParams,
                   interval: GetLiquidityHistoryIntervalEnum.Day
                 })
-              ]).pipe(
-                RxOp.map(([swapHistoryRD, liquidityHistoryRD]) => sequenceTRD(swapHistoryRD, liquidityHistoryRD)),
-
-                liveData.map(([swapHistory, _liquidityHistory]) =>
-                  getVolumeFromHistoryItems({
-                    swapHistory: swapHistory.intervals,
-                    liquidityHistory: _liquidityHistory.intervals
-                  })
-                )
+              }),
+              liveData.map(({ swapHistory, liquidityHistory }) =>
+                getVolumeFromHistoryItems({
+                  swapHistory: swapHistory.intervals,
+                  liquidityHistory: liquidityHistory.intervals
+                })
               )
+            )
+          )
         })
       ),
     RD.initial
