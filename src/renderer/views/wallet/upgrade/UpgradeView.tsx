@@ -126,7 +126,7 @@ export const UpgradeView: React.FC<Props> = (): JSX.Element => {
 
   const reloadOnError = useCallback(() => {
     // Reload inbound addresses in case previously it was failed
-    FP.pipe(O.some(reloadInboundAddresses), O.ap(O.fromPredicate(RD.isFailure)(targetPoolAddressRD)))
+    FP.pipe(targetPoolAddressRD, O.fromPredicate(RD.isFailure), O.map(reloadInboundAddresses))
 
     // Reload chain's balances in case previously it was failed
     FP.pipe(

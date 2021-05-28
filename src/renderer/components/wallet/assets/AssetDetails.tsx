@@ -1,7 +1,7 @@
 import React, { useCallback, useMemo, useState } from 'react'
 
 import { Address } from '@xchainjs/xchain-client'
-import { Asset, AssetRuneNative, assetToBase, assetToString, BaseAmount } from '@xchainjs/xchain-util'
+import { Asset, AssetAmount, AssetRuneNative, assetToBase, assetToString, BaseAmount } from '@xchainjs/xchain-util'
 import { Row, Col, Grid } from 'antd'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
@@ -18,6 +18,7 @@ import { GetExplorerTxUrl, TxsPageRD } from '../../../services/clients'
 import { MAX_ITEMS_PER_PAGE } from '../../../services/const'
 import { EMPTY_LOAD_TXS_HANDLER } from '../../../services/wallet/const'
 import { LoadTxsHandler, NonEmptyWalletBalances } from '../../../services/wallet/types'
+import { WalletBalances } from '../../../types/wallet'
 import { AssetInfo } from '../../uielements/assets/assetInfo'
 import { BackLink } from '../../uielements/backLink'
 import { Button, RefreshButton } from '../../uielements/button'
@@ -70,14 +71,16 @@ export const AssetDetails: React.FC<Props> = (props): JSX.Element => {
     )
   }, [oWalletAddress, history])
 
+  const isNonNativeRuneAsset: boolean = useMemo(() => AssetHelper.isNonNativeRuneAsset(asset), [asset])
+
   const walletActionUpgradeNonNativeRuneClick = useCallback(() => {
     FP.pipe(
       oWalletAddress,
-      O.filter((_) => AssetHelper.isNonNativeRuneAsset(asset)),
+      O.filter((_) => isNonNativeRuneAsset),
       O.map((walletAddress) => walletRoutes.upgradeRune.path({ asset: assetToString(asset), walletAddress })),
       O.map(history.push)
     )
-  }, [oWalletAddress, history, asset])
+  }, [oWalletAddress, history, isNonNativeRuneAsset, asset])
 
   const refreshHandler = useCallback(() => {
     loadTxsHandler({ limit: MAX_ITEMS_PER_PAGE, offset: (currentPage - 1) * MAX_ITEMS_PER_PAGE })
@@ -104,11 +107,9 @@ export const AssetDetails: React.FC<Props> = (props): JSX.Element => {
     [asset]
   )
 
-  const isNonNativeRuneAsset: boolean = useMemo(() => AssetHelper.isNonNativeRuneAsset(asset), [asset])
-
   const isRuneNativeAsset: boolean = useMemo(() => eqAsset.equals(asset, AssetRuneNative), [asset])
 
-  const getNonNativeRuneBalance = useMemo(
+  const getNonNativeRuneBalance: O.Option<(balances: WalletBalances) => O.Option<AssetAmount>> = useMemo(
     () =>
       FP.pipe(
         sequenceTOption(oNoneNativeRuneAsset, oWalletAddress),
@@ -134,7 +135,7 @@ export const AssetDetails: React.FC<Props> = (props): JSX.Element => {
       isNonNativeRuneAsset &&
       FP.pipe(
         oNonNativeRuneAmount,
-        O.map((amount) => amount.amount().isLessThan(0)),
+        O.map((amount) => amount.lt(0)),
         O.getOrElse<boolean>(() => true)
       )
     )
