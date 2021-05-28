@@ -3,7 +3,6 @@ import { palette } from 'styled-theme'
 
 import { InputBigNumber as BaseInputBigNumber } from '../../input'
 import { Label } from '../../label'
-import { AssetLabel as AssetLabelUI } from '../assetLabel'
 import { AssetSelect as BaseAssetSelect } from '../assetSelect'
 
 const CONTAINER_SIDE_PADDING = 16
@@ -105,7 +104,14 @@ export const SliderWrapper = styled.div`
   padding: 0 5px 20px 10px;
 `
 
-export const AssetLabel = styled(AssetLabelUI)`
+export const CardHeader = styled.div`
+  display: flex;
+  justify-content: space-between;
+  padding-right: 11px;
   padding-top: 10px;
   border-bottom: 1px solid ${palette('gray', 0)};
+`
+
+export const BalanceLabel = styled(Label)`
+  width: auto;
 `

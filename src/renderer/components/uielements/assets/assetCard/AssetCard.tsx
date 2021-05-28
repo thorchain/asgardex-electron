@@ -15,6 +15,7 @@ import * as AU from '@xchainjs/xchain-util'
 import { Dropdown } from 'antd'
 import BigNumber from 'bignumber.js'
 import * as FP from 'fp-ts/lib/function'
+import * as O from 'fp-ts/Option'
 
 import { Network } from '../../../../../shared/api/types'
 import { ZERO_BASE_AMOUNT } from '../../../../const'
@@ -25,11 +26,13 @@ import { PriceDataIndex } from '../../../../services/midgard/types'
 import { WalletBalances } from '../../../../types/wallet'
 import { Label } from '../../label'
 import { Slider } from '../../slider'
+import { AssetLabel } from '../assetLabel'
 import { AssetMenu } from '../assetMenu'
 import * as Styled from './AssetCard.style'
 
 export type Props = {
   asset: Asset
+  assetBalance: O.Option<BaseAmount>
   balances: WalletBalances
   selectedAmount: BaseAmount
   maxAmount: BaseAmount
@@ -77,7 +80,8 @@ export const AssetCard: React.FC<Props> = (props): JSX.Element => {
     network,
     onAfterSliderChange,
     minAmountError = false,
-    minAmountLabel = ''
+    minAmountLabel = '',
+    assetBalance
   } = props
 
   const [openDropdown, setOpenDropdown] = useState(false)
@@ -147,13 +151,27 @@ export const AssetCard: React.FC<Props> = (props): JSX.Element => {
     })
   }, [price, priceAsset, selectedAmountBn])
 
+  const balanceLabel = useMemo(
+    () =>
+      FP.pipe(
+        assetBalance,
+        O.map((amount) => formatAssetAmountCurrency({ amount: baseToAsset(amount), decimal: 2, asset })),
+        O.map((formatted) => <Styled.BalanceLabel key={'balance label'}>{formatted}</Styled.BalanceLabel>),
+        O.toNullable
+      ),
+    [asset, assetBalance]
+  )
+
   return (
     <Styled.AssetCardWrapper ref={ref}>
       {!!title && <Label className="title-label">{title}</Label>}
 
       <Dropdown overlay={renderMenu()} trigger={[]} visible={openDropdown}>
         <Styled.CardBorderWrapper error={minAmountError}>
-          <Styled.AssetLabel asset={asset} />
+          <Styled.CardHeader>
+            <AssetLabel asset={asset} />
+            {balanceLabel}
+          </Styled.CardHeader>
           <Styled.CardTopRow>
             <Styled.AssetSelect
               minWidth={wrapperWidth}
