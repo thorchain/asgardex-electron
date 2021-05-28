@@ -756,7 +756,7 @@ const createPoolsService = (
       )
     )
 
-  const poolLiquidityHistory$ = (params: PoolLiquidityHistoryParams): PoolLiquidityHistoryLD =>
+  const getPoolLiquidityHistory$ = (params: PoolLiquidityHistoryParams): PoolLiquidityHistoryLD =>
     selectedPoolAsset$.pipe(
       RxOp.switchMap((selectedPoolAsset) =>
         FP.pipe(
@@ -881,7 +881,7 @@ const createPoolsService = (
     poolStatsDetail$,
     poolLegacyDetail$,
     poolEarningHistory$,
-    poolLiquidityHistory$,
+    getPoolLiquidityHistory$,
     getSwapHistory$,
     reloadSwapHistory,
     getDepthHistory$,

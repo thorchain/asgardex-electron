@@ -3,10 +3,10 @@ import BigNumber from 'bignumber.js'
 
 import { PoolDetail, PoolStatsDetail } from '../../types/generated/midgard'
 
-export const getLiquidity = (data: Pick<PoolDetail, 'runeDepth'>, priceRatio: BigNumber = bn(1)) =>
+export const getLiquidity = ({ runeDepth }: Pick<PoolDetail, 'runeDepth'>, priceRatio: BigNumber = bn(1)) =>
   baseToAsset(
     baseAmount(
-      bnOrZero(data.runeDepth)
+      bnOrZero(runeDepth)
         .multipliedBy(2) /* liquidity = 2 * depth */
         .multipliedBy(priceRatio)
     )

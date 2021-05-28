@@ -1,7 +1,8 @@
 import * as RD from '@devexperts/remote-data-ts'
+import { AssetAmount } from '@xchainjs/xchain-util'
 
 export type ChartDetail = {
-  value: string
+  amount: AssetAmount
   time: number
 }
 

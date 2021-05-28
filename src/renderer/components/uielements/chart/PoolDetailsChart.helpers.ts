@@ -84,7 +84,7 @@ export const getChartData = (chartValues: ChartDetails): PoolDetailsChartData =>
       return moment.unix(data.time).format('MMM DD')
     }) || []
 
-  const values: Array<number> = chartValues.map((data) => Number(data.value.split(',').join(''))) || []
+  const values: Array<number> = chartValues.map(({ amount }) => amount.amount().toNumber()) || []
 
   return {
     labels,
