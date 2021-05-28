@@ -3,7 +3,7 @@ import * as A from 'fp-ts/lib/Array'
 import * as FP from 'fp-ts/lib/function'
 import moment from 'moment'
 
-import { ChartDetails } from '../../components/uielements/chart/types'
+import { ChartDetails } from '../../components/uielements/chart/PoolDetailsChart.types'
 import { DepthHistoryItem, LiquidityHistoryItem, SwapHistoryItem } from '../../types/generated/midgard'
 
 // Get end of date time

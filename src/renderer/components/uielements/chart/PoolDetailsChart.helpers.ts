@@ -2,7 +2,13 @@ import { Theme } from '@thorchain/asgardex-theme'
 import moment from 'moment'
 
 import { abbreviateNumber } from '../../../helpers/numberHelper'
-import { ChartDetails, ChartOptionsParams, DisplayDataColor, DisplayDataParams, PoolDetailsChartData } from './types'
+import {
+  ChartDetails,
+  ChartOptionsParams,
+  DisplayDataColor,
+  DisplayDataParams,
+  PoolDetailsChartData
+} from './PoolDetailsChart.types'
 
 export const getChartColors = (theme: Theme, isLight: boolean): DisplayDataColor => ({
   text: theme.palette.text[0],

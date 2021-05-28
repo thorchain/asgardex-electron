@@ -9,6 +9,8 @@ export type ChartDetail = {
 export type ChartDetails = ChartDetail[]
 export type ChartDetailsRD = RD.RemoteData<Error, ChartDetails>
 
+export type ChartDataType = 'liquidity' | 'volume'
+
 export type ChartType = 'line' | 'bar'
 
 export type ChartTimeFrame = 'allTime' | 'week'

@@ -11,25 +11,23 @@ import { useIntl } from 'react-intl'
 import { useThemeContext } from '../../../contexts/ThemeContext'
 import { ErrorView } from '../../shared/error'
 import { getChartColors, getChartData, getChartOptions, getDisplayData } from './PoolDetailsChart.helpers'
+import * as Styled from './PoolDetailsChart.styles'
 import {
-  ChartContainer,
-  HeaderContainer,
-  TypeContainer,
-  TimeContainer,
-  HeaderToggle,
-  ChartWrapper,
-  BarChart,
-  LineChart
-} from './PoolDetailsChart.styles'
-import { ChartDetails, ChartDetailsRD, ChartTimeFrame, ChartType, PoolDetailsChartData } from './types'
+  ChartDataType,
+  ChartDetails,
+  ChartDetailsRD,
+  ChartTimeFrame,
+  ChartType,
+  PoolDetailsChartData
+} from './PoolDetailsChart.types'
 
 type Props = {
   chartDetails: ChartDetailsRD
   chartType: ChartType
   unit: string
-  dataTypes: string[]
-  selectedDataType: string
-  setDataType: (dataType: string) => void
+  dataTypes: ChartDataType[]
+  selectedDataType: ChartDataType
+  setDataType: (dataType: ChartDataType) => void
   selectedTimeFrame: ChartTimeFrame
   setTimeFrame: (timeFrame: ChartTimeFrame) => void
 }
@@ -63,9 +61,9 @@ export const PoolDetailsChart: React.FC<Props> = React.memo((props: Props): JSX.
       const options = getChartOptions({ unit, colors, isDesktopView })
 
       return chartType === 'bar' ? (
-        <BarChart data={data} options={options} />
+        <Styled.BarChart data={data} options={options} />
       ) : (
-        <LineChart data={data} options={options} />
+        <Styled.LineChart data={data} options={options} />
       )
     },
     [chartType, colors, isDesktopView, unit]
@@ -87,34 +85,34 @@ export const PoolDetailsChart: React.FC<Props> = React.memo((props: Props): JSX.
 
   const renderHeader = useMemo(
     () => (
-      <HeaderContainer>
-        <TypeContainer>
+      <Styled.HeaderContainer>
+        <Styled.TypeContainer>
           {dataTypes.map((dataType) => (
-            <HeaderToggle
+            <Styled.HeaderToggle
               primary={selectedDataType === dataType}
               key={`headerToggle${dataType}`}
               onClick={() => setDataType(dataType)}>
               {dataType}
-            </HeaderToggle>
+            </Styled.HeaderToggle>
           ))}
-        </TypeContainer>
-        <TimeContainer>
-          <HeaderToggle primary={selectedTimeFrame === 'week'} onClick={() => setTimeFrame('week')}>
+        </Styled.TypeContainer>
+        <Styled.TimeContainer>
+          <Styled.HeaderToggle primary={selectedTimeFrame === 'week'} onClick={() => setTimeFrame('week')}>
             {intl.formatMessage({ id: 'common.time.week' })}
-          </HeaderToggle>
-          <HeaderToggle primary={selectedTimeFrame === 'allTime'} onClick={() => setTimeFrame('allTime')}>
+          </Styled.HeaderToggle>
+          <Styled.HeaderToggle primary={selectedTimeFrame === 'allTime'} onClick={() => setTimeFrame('allTime')}>
             {intl.formatMessage({ id: 'common.time.all' })}
-          </HeaderToggle>
-        </TimeContainer>
-      </HeaderContainer>
+          </Styled.HeaderToggle>
+        </Styled.TimeContainer>
+      </Styled.HeaderContainer>
     ),
     [dataTypes, intl, selectedDataType, selectedTimeFrame, setDataType, setTimeFrame]
   )
 
   return (
-    <ChartContainer gradientStart={colors.backgroundGradientStart} gradientStop={colors.backgroundGradientStop}>
+    <Styled.ChartContainer gradientStart={colors.backgroundGradientStart} gradientStop={colors.backgroundGradientStop}>
       {renderHeader}
-      <ChartWrapper>{renderChart}</ChartWrapper>
-    </ChartContainer>
+      <Styled.ChartWrapper>{renderChart}</Styled.ChartWrapper>
+    </Styled.ChartContainer>
   )
 })

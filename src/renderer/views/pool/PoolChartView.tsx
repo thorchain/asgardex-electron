@@ -11,7 +11,7 @@ import * as Rx from 'rxjs'
 import * as RxOp from 'rxjs/operators'
 
 import { PoolDetailsChart } from '../../components/uielements/chart'
-import { ChartDetailsRD, ChartTimeFrame } from '../../components/uielements/chart/types'
+import { ChartDataType, ChartDetailsRD, ChartTimeFrame } from '../../components/uielements/chart/PoolDetailsChart.types'
 import { useMidgardContext } from '../../contexts/MidgardContext'
 import { liveData } from '../../helpers/rx/liveData'
 import { SelectedPricePoolAsset } from '../../services/midgard/types'
@@ -44,10 +44,10 @@ export const PoolChartView: React.FC<Props> = ({ priceRatio }) => {
     O.fold(() => '', currencySymbolByAsset)
   )
 
-  type DataRequestParams = { timeFrame: ChartTimeFrame; dataType: string }
+  type DataRequestParams = { timeFrame: ChartTimeFrame; dataType: ChartDataType }
   const savedParams = useRef<DataRequestParams>({
     timeFrame: 'allTime',
-    dataType: 'Liquidity'
+    dataType: 'liquidity'
   })
 
   const curTime = getEoDTime()
@@ -61,7 +61,7 @@ export const PoolChartView: React.FC<Props> = ({ priceRatio }) => {
         RxOp.switchMap((params) => {
           const requestParams = params.timeFrame === 'week' ? { from: weekAgoTime, to: curTime } : {}
           return Rx.iif(
-            () => params.dataType === 'Liquidity',
+            () => params.dataType === 'liquidity',
             // (1) get data for depth history
             getDepthHistory$({
               ...requestParams,
@@ -109,7 +109,7 @@ export const PoolChartView: React.FC<Props> = ({ priceRatio }) => {
   )
 
   const setDataTypeCallback = useCallback(
-    (dataType: string) => {
+    (dataType: ChartDataType) => {
       updateChartData({ dataType })
     },
     [updateChartData]
@@ -117,11 +117,11 @@ export const PoolChartView: React.FC<Props> = ({ priceRatio }) => {
 
   return (
     <PoolDetailsChart
-      dataTypes={['Liquidity', 'Volume']}
+      dataTypes={['liquidity', 'volume']}
       selectedDataType={savedParams.current.dataType}
       setDataType={setDataTypeCallback}
       chartDetails={chartDataRDPriced}
-      chartType={savedParams.current.dataType === 'Liquidity' ? 'line' : 'bar'}
+      chartType={savedParams.current.dataType === 'liquidity' ? 'line' : 'bar'}
       unit={unit}
       selectedTimeFrame={savedParams.current.timeFrame}
       setTimeFrame={setTimeFrameCallback}
