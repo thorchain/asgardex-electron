@@ -12,6 +12,8 @@ import {
   AssetLTC,
   AssetRune67C,
   AssetRuneB1A,
+  AssetRuneERC20,
+  AssetRuneERC20Testnet,
   AssetRuneNative,
   baseAmount,
   BaseAmount,
@@ -22,7 +24,7 @@ import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
 
 import { Network } from '../../shared/api/types'
-import { DEFAULT_PRICE_ASSETS, USD_PRICE_ASSETS } from '../const'
+import { AssetRuneEthERC20, DEFAULT_PRICE_ASSETS, USD_PRICE_ASSETS } from '../const'
 import { PricePoolAsset } from '../views/pools/Pools.types'
 import { getEthChecksumAddress } from './addressHelper'
 import { getChainAsset, isEthChain } from './chainHelper'
@@ -53,6 +55,13 @@ export const getBnbRuneAsset = (network: Network = 'testnet'): Asset => {
 
 export const isRuneBnbAsset = (asset: Asset): boolean =>
   eqAsset.equals(asset, AssetRune67C) || eqAsset.equals(asset, AssetRuneB1A)
+
+export const isRuneEthAsset = (asset: Asset): boolean =>
+  eqAsset.equals(asset, AssetRuneERC20) ||
+  eqAsset.equals(asset, AssetRuneERC20Testnet) ||
+  eqAsset.equals(asset, AssetRuneEthERC20)
+
+export const isNonNativeRuneAsset = (asset: Asset): boolean => isRuneBnbAsset(asset) || isRuneEthAsset(asset)
 
 /**
  * Check whether an asset is a LTC asset

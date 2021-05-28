@@ -53,5 +53,6 @@ export const assetWithDecimal$ = (asset: Asset, network: Network): AssetWithDeci
         decimal
       })
     ),
-    RxOp.catchError((error) => Rx.of(RD.failure(error?.msg ?? error.toString())))
+    RxOp.catchError((error) => Rx.of(RD.failure(error?.msg ?? error.toString()))),
+    RxOp.startWith(RD.pending)
   )

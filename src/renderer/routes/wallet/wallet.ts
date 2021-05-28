@@ -2,7 +2,7 @@ import { assetFromString, assetToString } from '@xchainjs/xchain-util'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
 
-import { isRuneBnbAsset } from '../../helpers/assetHelper'
+import { isNonNativeRuneAsset } from '../../helpers/assetHelper'
 import { sequenceTOption } from '../../helpers/fpHelpers'
 import { Route } from '../types'
 
@@ -97,11 +97,11 @@ export const send: Route<SendParams> = {
   }
 }
 
-export const upgradeBnbRune: Route<AssetDetailsParams> = {
+export const upgradeRune: Route<AssetDetailsParams> = {
   template: `${assetDetail.template}/upgrade`,
   path: ({ asset: assetString, walletAddress }) => {
     // Validate asset string to accept BNB.Rune only
-    const oAsset = FP.pipe(assetFromString(assetString), O.fromNullable, O.filter(isRuneBnbAsset))
+    const oAsset = FP.pipe(assetFromString(assetString), O.fromNullable, O.filter(isNonNativeRuneAsset))
     // Simple validation of address
     const oWalletAddress = FP.pipe(
       walletAddress,

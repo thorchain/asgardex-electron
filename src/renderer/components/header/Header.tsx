@@ -67,7 +67,7 @@ export const Header: React.FC = (): JSX.Element => {
   const oWalletRedirectPath: O.Option<string> = FP.pipe(
     useRouteMatch([
       walletRoutes.send.template,
-      walletRoutes.upgradeBnbRune.template,
+      walletRoutes.upgradeRune.template,
       walletRoutes.assetDetail.template,
       walletRoutes.bonds.template,
       walletRoutes.deposit.template

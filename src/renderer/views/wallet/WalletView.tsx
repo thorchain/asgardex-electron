@@ -24,7 +24,7 @@ import { PoolShareView } from './PoolShareView'
 import { SendView } from './send'
 import { SettingsView } from './SettingsView'
 import { UnlockView } from './UnlockView'
-import { UpgradeView } from './UpgradeView'
+import { UpgradeView } from './upgrade'
 import * as Styled from './WalletView.styles'
 
 export const WalletView: React.FC = (): JSX.Element => {
@@ -90,7 +90,7 @@ export const WalletView: React.FC = (): JSX.Element => {
           <Route path={walletRoutes.send.template} exact>
             <SendView />
           </Route>
-          <Route path={walletRoutes.upgradeBnbRune.template} exact>
+          <Route path={walletRoutes.upgradeRune.template} exact>
             <UpgradeView />
           </Route>
           <Route path={walletRoutes.assetDetail.template} exact>

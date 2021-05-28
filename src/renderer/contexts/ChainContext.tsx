@@ -23,7 +23,7 @@ import {
   swap$,
   asymDeposit$,
   symDeposit$,
-  upgradeBnbRune$,
+  upgradeRuneToNative$,
   symWithdraw$,
   asymWithdraw$,
   transfer$,
@@ -53,7 +53,7 @@ type ChainContextValue = {
   swap$: typeof swap$
   asymDeposit$: typeof asymDeposit$
   symDeposit$: typeof symDeposit$
-  upgradeBnbRune$: typeof upgradeBnbRune$
+  upgradeRuneToNative$: typeof upgradeRuneToNative$
   symWithdraw$: typeof symWithdraw$
   asymWithdraw$: typeof asymWithdraw$
   transfer$: typeof transfer$
@@ -83,7 +83,7 @@ const initialContext: ChainContextValue = {
   swap$,
   asymDeposit$,
   symDeposit$,
-  upgradeBnbRune$,
+  upgradeRuneToNative$,
   symWithdraw$,
   asymWithdraw$,
   transfer$,

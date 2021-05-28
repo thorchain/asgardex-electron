@@ -9,6 +9,7 @@ import * as Rx from 'rxjs'
 import * as RxOp from 'rxjs/operators'
 
 import { mockValidatePassword$ } from '../../../../../shared/mock/wallet'
+import { BNB_DECIMAL } from '../../../../helpers/assetHelper'
 import { INITIAL_UPGRADE_RUNE_STATE } from '../../../../services/chain/const'
 import { UpgradeRuneParams, UpgradeRuneTxState, UpgradeRuneTxState$ } from '../../../../services/chain/types'
 import { ErrorId } from '../../../../services/wallet/types'
@@ -47,9 +48,14 @@ const getBalances = (balances: WalletBalances) => NEA.fromArray<WalletBalance>(b
 const total = 3
 
 const defaultProps: UpgradeProps = {
-  runeAsset: AssetRune67C,
+  runeAsset: {
+    asset: AssetRune67C,
+    decimal: BNB_DECIMAL
+  },
   runeNativeAddress: 'rune-native-address',
-  bnbPoolAddressRD: RD.success({ chain: 'BNB', address: 'bnb-pool-address', router: O.none, halted: false }),
+  walletAddress: 'BNB.Rune address',
+  reloadOnError: () => {},
+  targetPoolAddressRD: RD.success({ chain: 'BNB', address: 'bnb-pool-address', router: O.none, halted: false }),
   validatePassword$: mockValidatePassword$,
   fee: RD.success(baseAmount(37500)),
   upgrade$: (p: UpgradeRuneParams): UpgradeRuneTxState$ => {

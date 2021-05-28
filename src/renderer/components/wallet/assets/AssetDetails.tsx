@@ -1,7 +1,7 @@
 import React, { useCallback, useMemo, useState } from 'react'
 
 import { Address } from '@xchainjs/xchain-client'
-import { Asset, AssetRuneNative, assetToString, BaseAmount } from '@xchainjs/xchain-util'
+import { Asset, AssetAmount, AssetRuneNative, assetToBase, assetToString, BaseAmount } from '@xchainjs/xchain-util'
 import { Row, Col, Grid } from 'antd'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
@@ -10,14 +10,15 @@ import { useHistory } from 'react-router-dom'
 
 import { Network } from '../../../../shared/api/types'
 import * as AssetHelper from '../../../helpers/assetHelper'
-import { eqAsset } from '../../../helpers/fp/eq'
-import { getWalletBalanceByAsset } from '../../../helpers/walletHelper'
+import { eqAsset, eqString } from '../../../helpers/fp/eq'
+import { sequenceTOption } from '../../../helpers/fpHelpers'
+import { getWalletAssetAmountFromBalances } from '../../../helpers/walletHelper'
 import * as walletRoutes from '../../../routes/wallet'
 import { GetExplorerTxUrl, TxsPageRD } from '../../../services/clients'
 import { MAX_ITEMS_PER_PAGE } from '../../../services/const'
 import { EMPTY_LOAD_TXS_HANDLER } from '../../../services/wallet/const'
 import { LoadTxsHandler, NonEmptyWalletBalances } from '../../../services/wallet/types'
-import { WalletBalance } from '../../../types/wallet'
+import { WalletBalances } from '../../../types/wallet'
 import { AssetInfo } from '../../uielements/assets/assetInfo'
 import { BackLink } from '../../uielements/backLink'
 import { Button, RefreshButton } from '../../uielements/button'
@@ -70,14 +71,16 @@ export const AssetDetails: React.FC<Props> = (props): JSX.Element => {
     )
   }, [oWalletAddress, history])
 
-  const walletActionUpgradeRuneBnbClick = useCallback(() => {
+  const isNonNativeRuneAsset: boolean = useMemo(() => AssetHelper.isNonNativeRuneAsset(asset), [asset])
+
+  const walletActionUpgradeNonNativeRuneClick = useCallback(() => {
     FP.pipe(
       oWalletAddress,
-      O.filter((_) => AssetHelper.isRuneBnbAsset(asset)),
-      O.map((walletAddress) => walletRoutes.upgradeBnbRune.path({ asset: assetToString(asset), walletAddress })),
+      O.filter((_) => isNonNativeRuneAsset),
+      O.map((walletAddress) => walletRoutes.upgradeRune.path({ asset: assetToString(asset), walletAddress })),
       O.map(history.push)
     )
-  }, [oWalletAddress, history, asset])
+  }, [oWalletAddress, history, isNonNativeRuneAsset, asset])
 
   const refreshHandler = useCallback(() => {
     loadTxsHandler({ limit: MAX_ITEMS_PER_PAGE, offset: (currentPage - 1) * MAX_ITEMS_PER_PAGE })
@@ -99,42 +102,44 @@ export const AssetDetails: React.FC<Props> = (props): JSX.Element => {
     [loadTxsHandler]
   )
 
-  const oRuneBnbAsset: O.Option<Asset> = useMemo(
-    () => FP.pipe(asset, O.fromPredicate(AssetHelper.isRuneBnbAsset)),
+  const oNoneNativeRuneAsset: O.Option<Asset> = useMemo(
+    () => FP.pipe(asset, O.fromPredicate(AssetHelper.isNonNativeRuneAsset)),
     [asset]
   )
 
-  const isRuneBnbAsset: boolean = useMemo(() => AssetHelper.isRuneBnbAsset(asset), [asset])
-
   const isRuneNativeAsset: boolean = useMemo(() => eqAsset.equals(asset, AssetRuneNative), [asset])
 
-  const oRuneBnbBalance: O.Option<WalletBalance> = useMemo(
-    () => getWalletBalanceByAsset(oBalances, oRuneBnbAsset),
-    [oRuneBnbAsset, oBalances]
-  )
-
-  const oRuneBnbAmount: O.Option<BaseAmount> = useMemo(
+  const getNonNativeRuneBalance: O.Option<(balances: WalletBalances) => O.Option<AssetAmount>> = useMemo(
     () =>
       FP.pipe(
-        oRuneBnbBalance,
-        O.map(({ amount }) => amount)
+        sequenceTOption(oNoneNativeRuneAsset, oWalletAddress),
+        O.map(([asset, walletAddress]) =>
+          getWalletAssetAmountFromBalances(
+            (balance) => eqString.equals(balance.walletAddress, walletAddress) && eqAsset.equals(balance.asset, asset)
+          )
+        )
       ),
-    [oRuneBnbBalance]
+    [oNoneNativeRuneAsset, oWalletAddress]
+  )
+
+  const oNonNativeRuneAmount: O.Option<BaseAmount> = useMemo(
+    () => FP.pipe(getNonNativeRuneBalance, O.ap(oBalances), O.flatten, O.map(assetToBase)),
+    [getNonNativeRuneBalance, oBalances]
   )
 
   const actionColSpanDesktop = 12
   const actionColSpanMobile = 24
 
-  const runeUpgradeDisabled: boolean = useMemo(
-    () =>
-      isRuneBnbAsset &&
+  const runeUpgradeDisabled: boolean = useMemo(() => {
+    return (
+      isNonNativeRuneAsset &&
       FP.pipe(
-        oRuneBnbAmount,
-        O.map((amount) => amount.amount().isLessThan(0)),
+        oNonNativeRuneAmount,
+        O.map((amount) => amount.lt(0)),
         O.getOrElse<boolean>(() => true)
-      ),
-    [isRuneBnbAsset, oRuneBnbAmount]
-  )
+      )
+    )
+  }, [isNonNativeRuneAsset, oNonNativeRuneAmount])
 
   const walletInfo = useMemo(
     () =>
@@ -175,7 +180,7 @@ export const AssetDetails: React.FC<Props> = (props): JSX.Element => {
               </Row>
             </Styled.ActionWrapper>
           </Styled.ActionCol>
-          {isRuneBnbAsset && (
+          {isNonNativeRuneAsset && (
             <Styled.ActionCol sm={{ span: actionColSpanMobile }} md={{ span: actionColSpanDesktop }}>
               <Styled.ActionWrapper>
                 <Row justify="center">
@@ -184,7 +189,7 @@ export const AssetDetails: React.FC<Props> = (props): JSX.Element => {
                     round="true"
                     sizevalue="xnormal"
                     color="warning"
-                    onClick={walletActionUpgradeRuneBnbClick}
+                    onClick={walletActionUpgradeNonNativeRuneClick}
                     disabled={runeUpgradeDisabled}>
                     {intl.formatMessage({ id: 'wallet.action.upgrade' })}
                   </Button>

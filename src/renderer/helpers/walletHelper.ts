@@ -1,12 +1,12 @@
 import { Asset, AssetAmount, baseToAsset } from '@xchainjs/xchain-util'
-import * as A from 'fp-ts/lib/Array'
-import * as FP from 'fp-ts/lib/function'
-import * as O from 'fp-ts/lib/Option'
+import * as A from 'fp-ts/Array'
+import * as FP from 'fp-ts/function'
+import * as O from 'fp-ts/Option'
 
 import { WalletBalances } from '../services/clients'
 import { NonEmptyWalletBalances } from '../services/wallet/types'
 import { WalletBalance } from '../types/wallet'
-import { isBnbAsset, isEthAsset, isLtcAsset, isRuneBnbAsset, isRuneNativeAsset } from './assetHelper'
+import { isBnbAsset, isEthAsset, isLtcAsset, isRuneNativeAsset } from './assetHelper'
 import { eqAsset } from './fp/eq'
 import { sequenceTOption } from './fpHelpers'
 
@@ -37,6 +37,15 @@ export const getWalletBalanceByAsset = (
     )
   )
 
+export const getWalletAssetAmountFromBalances =
+  (isTargetWalletBalance: FP.Predicate<WalletBalance>) =>
+  (balances: WalletBalances): O.Option<AssetAmount> =>
+    FP.pipe(
+      balances,
+      A.findFirst(isTargetWalletBalance),
+      O.map(({ amount }) => baseToAsset(amount))
+    )
+
 export const getAssetAmountFromBalances = (
   balances: WalletBalances,
   isAsset: (asset: Asset) => boolean
@@ -58,9 +67,6 @@ export const getLtcAmountFromBalances = (balances: WalletBalances): O.Option<Ass
 
 export const getRuneNativeAmountFromBalances = (balances: WalletBalances): O.Option<AssetAmount> =>
   getAssetAmountFromBalances(balances, isRuneNativeAsset)
-
-export const getRuneBnBAmountFromBalances = (balances: WalletBalances): O.Option<AssetAmount> =>
-  getAssetAmountFromBalances(balances, isRuneBnbAsset)
 
 export const filterWalletBalancesByAssets = (balances: NonEmptyWalletBalances, assets: Asset[]): WalletBalances => {
   return balances.filter((balance) => assets.findIndex((asset) => eqAsset.equals(asset, balance.asset)) >= 0)

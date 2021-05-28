@@ -13,7 +13,7 @@ import { useIntl } from 'react-intl'
 import { useHistory } from 'react-router-dom'
 
 import { Network } from '../../../../shared/api/types'
-import { isRuneBnbAsset } from '../../../helpers/assetHelper'
+import { isNonNativeRuneAsset } from '../../../helpers/assetHelper'
 import { getPoolPriceValue } from '../../../helpers/poolHelper'
 import * as walletRoutes from '../../../routes/wallet'
 import { WalletBalancesRD } from '../../../services/clients'
@@ -103,13 +103,13 @@ export const AssetsTableCollapsable: React.FC<Props> = (props): JSX.Element => {
             <Styled.TickerLabel>{asset.ticker}</Styled.TickerLabel>
             <Styled.ChainLabel>{asset.chain}</Styled.ChainLabel>
           </Styled.Label>
-          {isRuneBnbAsset(asset) && (
+          {isNonNativeRuneAsset(asset) && (
             <Styled.UpgradeButton
               onClick={(e) => {
                 e.preventDefault()
                 e.stopPropagation()
                 setSelectedAsset(O.some(asset))
-                history.push(walletRoutes.upgradeBnbRune.path({ asset: assetToString(asset), walletAddress }))
+                history.push(walletRoutes.upgradeRune.path({ asset: assetToString(asset), walletAddress }))
               }}>
               {intl.formatMessage({ id: 'wallet.action.upgrade' })}
             </Styled.UpgradeButton>
