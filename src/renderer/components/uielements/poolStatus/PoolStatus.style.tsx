@@ -53,6 +53,7 @@ export const Value = styled(Label).attrs({
   text-overflow: ellipsis;
   cursor: default;
   width: fit-content;
+  min-width: 100%;
 `
 
 export const Tooltip = styled(A.Tooltip).attrs({
