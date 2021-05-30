@@ -4,8 +4,11 @@ import styled from 'styled-components'
 const ITEM_GAP = '8px'
 
 export const Container = styled(A.Row)`
+  height: 100%;
   // Needed to compensate extra margin caused by last items of Col
-  margin-bottom: -${ITEM_GAP};
+  div:nth-last-child(-n + 2) {
+    margin-bottom: 0;
+  }
 `
 
 export const Col = styled(A.Col).attrs({
