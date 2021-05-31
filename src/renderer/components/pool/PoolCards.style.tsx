@@ -23,10 +23,6 @@ export const Col = styled(A.Col).attrs({
   // work with the Ant.Col width-value calculation strategy.
   padding-right: ${ITEM_GAP};
 
-  /* :nth-child(odd) {
-    padding-right: ${ITEM_GAP};
-  } */
-
   :nth-child(even) {
     // For smaller views: we do not have any padding-right since
     // are no elements to the right of the cards.
