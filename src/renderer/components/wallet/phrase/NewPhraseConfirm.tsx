@@ -1,7 +1,7 @@
 import React, { useCallback, useMemo, useState } from 'react'
 
 import { DeleteOutlined, RedoOutlined } from '@ant-design/icons'
-import { Col, Row, Button as AButton, Form } from 'antd'
+import { Col, Row, Button as AButton } from 'antd'
 import shuffleArray from 'lodash.shuffle'
 import { useIntl } from 'react-intl'
 import { useHistory } from 'react-router'
@@ -167,9 +167,12 @@ export const NewPhraseConfirm: React.FC<{ mnemonic: string; onConfirm: () => Pro
         </NewPhraseStyled.SectionTitle>
       </NewPhraseStyled.TitleContainer>
       <NewPhraseStyled.Form labelCol={{ span: 24 }} onFinish={handleFormSubmit}>
-        <Form.Item name="mnemonic" validateStatus={mnemonicError && 'error'} help={!!mnemonicError && mnemonicError}>
+        <NewPhraseStyled.FormItem
+          name="mnemonic"
+          validateStatus={mnemonicError && 'error'}
+          help={!!mnemonicError && mnemonicError}>
           <Phrase wordIcon={<DeleteOutlined />} words={sortedSelectedWords} onWordClick={handleRemoveWord} />
-        </Form.Item>
+        </NewPhraseStyled.FormItem>
 
         <PhraseStyled.EnterPhraseContainer
           label={
