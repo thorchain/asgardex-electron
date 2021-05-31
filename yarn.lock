@@ -4241,10 +4241,10 @@
   resolved "https://registry.yarnpkg.com/@xchainjs/xchain-binance/-/xchain-binance-5.0.0.tgz#353be7c9ae5e2a2b9c39fb0ca36708a0984caf72"
   integrity sha512-C8V1O6v8HQgcBZum9hrb8gB5STxhjWe3eC4Wk+sywznA/2GhEyOmSBauycGY8l0XR4zhS34ZnZabPBRcv00PzQ==
 
-"@xchainjs/xchain-bitcoin@^0.13.0":
-  version "0.13.0"
-  resolved "https://registry.yarnpkg.com/@xchainjs/xchain-bitcoin/-/xchain-bitcoin-0.13.0.tgz#ad4d8ab5d60dc3063c42bfd09ad16386702ad117"
-  integrity sha512-olcfxB5F/8gUjVzbFWrGVwPA5aJPrI9mgNzDqxmzXdao6BhYLmNuQ3EQieJ++Tqq05o3m39XneIgSXhUUH50zg==
+"@xchainjs/xchain-bitcoin@^0.15.0":
+  version "0.15.0"
+  resolved "https://registry.yarnpkg.com/@xchainjs/xchain-bitcoin/-/xchain-bitcoin-0.15.0.tgz#eee0cae23ee9a021e74bfa1d3182f0087a7695ee"
+  integrity sha512-gTFgQIH0ASmSfAannLPM6qAsnfopXRrysxitIKA3y3c0XP6wSd/a4871tZF9e9uEQeC7FMdaWvWTJFc5/sdNNA==
 
 "@xchainjs/xchain-bitcoincash@^0.10.2":
   version "0.10.2"
@@ -4275,10 +4275,10 @@
     hdkey "^2.0.1"
     uuid "^8.1.0"
 
-"@xchainjs/xchain-ethereum@^0.19.0":
-  version "0.19.0"
-  resolved "https://registry.yarnpkg.com/@xchainjs/xchain-ethereum/-/xchain-ethereum-0.19.0.tgz#d41e7a212e493e746c7419d4186d2a805db0cff5"
-  integrity sha512-5WL5Sdoyvm7VsJBd0hvdFCr8817fwZN09AgDjF84feaPAN6HsESOIsrJtkzk43VTWgJpJm1w3uHhZfTyRXW+4Q==
+"@xchainjs/xchain-ethereum@^0.21.0":
+  version "0.21.0"
+  resolved "https://registry.yarnpkg.com/@xchainjs/xchain-ethereum/-/xchain-ethereum-0.21.0.tgz#9b55e3d75179293f286668ed87bcdfa4927851bb"
+  integrity sha512-/RuG5+I36cXkOuYdUGVRTMl2uhSSHEpcdSEgzsXoBz3SaLvcMkwyJjf437jD45OqkPdOSa3yBz/rZlYwb4tunw==
 
 "@xchainjs/xchain-litecoin@^0.5.0":
   version "0.5.0"

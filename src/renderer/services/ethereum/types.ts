@@ -35,6 +35,7 @@ export type ApproveParams = {
   spender: Address
   sender: Address
   amount?: BaseAmount
+  walletIndex?: number
 }
 
 export type PollInTxFeeParams = {
