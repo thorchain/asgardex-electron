@@ -29,8 +29,14 @@ export const Form = styled(InnerForm)`
 `
 
 export const FormItem = styled(A.Form.Item)`
-  & .ant-form-item-explain-error {
-    text-transform: uppercase;
+  & .ant-form-item {
+    &-control {
+      margin-bottom: 32px;
+    }
+
+    &-explain-error {
+      text-transform: uppercase;
+    }
   }
 `
 
