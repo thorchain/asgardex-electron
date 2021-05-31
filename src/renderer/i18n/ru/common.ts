@@ -38,7 +38,7 @@ const common: CommonMessages = {
   'common.pools': 'Пулы',
   'common.pool': 'Пул',
   'common.price': 'Цена',
-  'common.price.rune': 'RUNE price - RU',
+  'common.price.rune': 'Стоимость RUNE',
   'common.transaction': 'Транзакция',
   'common.viewTransaction': 'Посмотреть транзакцию',
   'common.fee': 'Комиссия',
