@@ -16,7 +16,7 @@ export const Col = styled(A.Col).attrs({
 
   // For larger views, this removes the margin from the last row of items.
   :nth-last-child(-n + 2) {
-    ${media.lg`
+    ${media.md`
       margin-bottom: 0px;
     `}
   }
@@ -29,7 +29,7 @@ export const Col = styled(A.Col).attrs({
     // For smaller views: we do not have any padding-right since
     // are no elements to the right of the cards.
     padding-right: 0px;
-    ${media.lg`
+    ${media.md`
       // For larger views: we have padding-right since there are
       // elements to the right of the cards.
       padding-right: ${ITEM_GAP};
