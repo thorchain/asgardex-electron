@@ -41,7 +41,7 @@ export const PoolDetails: React.FC<Props> = ({
   const price = useMemo(() => H.getPrice(poolDetail, priceRatio), [poolDetail, priceRatio])
   return (
     <Styled.Container>
-      <Styled.TopContainer>
+      <Styled.Section>
         <A.Col span={24}>
           <PoolTitle
             network={network}
@@ -52,6 +52,8 @@ export const PoolDetails: React.FC<Props> = ({
             isLoading={isLoading}
           />
         </A.Col>
+      </Styled.Section>
+      <Styled.Section>
         <A.Col xs={24} md={8}>
           <PoolCards
             poolStatsDetail={poolStatsDetail}
@@ -61,13 +63,16 @@ export const PoolDetails: React.FC<Props> = ({
             isLoading={isLoading}
           />
         </A.Col>
+        <Styled.ColumnSpace />
         <A.Col xs={24} md={16}>
           <ChartView priceRatio={priceRatio} />
         </A.Col>
-      </Styled.TopContainer>
-      <A.Col span={24}>
-        <HistoryView poolAsset={asset} />
-      </A.Col>
+      </Styled.Section>
+      <Styled.Section>
+        <A.Col span={24}>
+          <HistoryView poolAsset={asset} />
+        </A.Col>
+      </Styled.Section>
     </Styled.Container>
   )
 }

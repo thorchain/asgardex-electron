@@ -9,7 +9,7 @@ export const Container = styled(A.Row)`
   justify-content: space-between;
   flex-flow: row;
   width: 100%;
-  padding: 20px 0 10px 0;
+  margin-top: 20px;
 `
 
 export const Price = styled(Label)`
