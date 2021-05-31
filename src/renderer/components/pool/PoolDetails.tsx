@@ -63,7 +63,6 @@ export const PoolDetails: React.FC<Props> = ({
             isLoading={isLoading}
           />
         </A.Col>
-        <Styled.ColumnSpace />
         <A.Col xs={24} md={16}>
           <ChartView priceRatio={priceRatio} />
         </A.Col>

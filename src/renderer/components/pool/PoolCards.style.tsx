@@ -14,9 +14,11 @@ export const Col = styled(A.Col).attrs({
 })`
   margin-bottom: ${ITEM_GAP};
 
-  // This removes the margin from the last row of items of Col
+  // For larger views, this removes the margin from the last row of items.
   :nth-last-child(-n + 2) {
-    margin-bottom: 0px;
+    ${media.lg`
+      margin-bottom: 0px;
+    `}
   }
 
   // Note: we use padding-right instead of margin-right to
