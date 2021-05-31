@@ -7,6 +7,7 @@ import * as O from 'fp-ts/Option'
 
 import {
   convertBaseAmountDecimal,
+  isBtcAsset,
   isChainAsset,
   max1e8BaseAmount,
   THORCHAIN_DECIMAL,
@@ -196,7 +197,15 @@ export const minAssetAmountToDepositMax1e8 = ({
     1.5,
     feeToCover.times,
     // transform decimal to be `max1e8`
-    max1e8BaseAmount
+    max1e8BaseAmount,
+    (amount) => {
+      // Add 10,000 Sats for BTC asset only for meaningful
+      // values to avoid data-blinking while data loading
+      if (isBtcAsset(asset) && amount.gt(0)) {
+        return amount.plus(10000)
+      }
+      return amount
+    }
   )
 }
 

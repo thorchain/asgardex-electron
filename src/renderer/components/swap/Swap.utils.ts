@@ -219,11 +219,13 @@ export const minAmountToSwapMax1e8 = ({
     feeToCover.times,
     // transform decimal to be `max1e8`
     max1e8BaseAmount,
-    (s) => {
-      if (isBtcAsset(inAsset)) {
-        return s.plus(10000)
+    (amount) => {
+      // Add 10,000 Sats for BTC asset only for meaningful
+      // values to avoid data-blinking while data loading
+      if (isBtcAsset(inAsset) && amount.gt(0)) {
+        return amount.plus(10000)
       }
-      return s
+      return amount
     }
   )
 }
