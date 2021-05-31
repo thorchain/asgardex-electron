@@ -42,6 +42,7 @@ const wallet: WalletMessages = {
   'wallet.create.copy.phrase': 'Copiez la phrase ci-dessous',
   'wallet.create.title': 'Créer un nouveau portefeuille',
   'wallet.create.enter.phrase': 'Entrez la phrase correctement',
+  'wallet.create.error.phrase': 'Save your phrase safely and enter it in a correct way - FR',
   'wallet.create.words.click': 'Cliquez sur le mot dans le bon ordre',
   'wallet.create.creating': 'Création du portefeuille',
   'wallet.create.error': "Erreur lors de la sauvegarde d'une phrase",

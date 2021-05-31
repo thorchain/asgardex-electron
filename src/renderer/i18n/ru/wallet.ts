@@ -42,6 +42,7 @@ const wallet: WalletMessages = {
   'wallet.create.title': 'Создать новый кошелек',
   'wallet.create.enter.phrase': 'Введите правильную фразу',
   'wallet.create.words.click': ' Выберите слова в правильном порядке',
+  'wallet.create.error.phrase': 'Сохраните вашу фразу в надежном месте и введите ее в правильном порядке',
   'wallet.create.creating': 'Создание кошелька',
   'wallet.create.error': 'Ошибка при сохранении фрразы',
   'wallet.receive.address.error': 'Нет доступных адресов для получения',

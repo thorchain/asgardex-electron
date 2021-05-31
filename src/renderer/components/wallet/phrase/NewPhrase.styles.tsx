@@ -28,6 +28,18 @@ export const Form = styled(InnerForm)`
   justify-content: space-between;
 `
 
+export const FormItem = styled(A.Form.Item)`
+  & .ant-form-item {
+    &-control {
+      margin-bottom: 32px;
+    }
+
+    &-explain-error {
+      text-transform: uppercase;
+    }
+  }
+`
+
 export const SubmitItem = styled(A.Form.Item)`
   display: flex;
   flex-direction: column;

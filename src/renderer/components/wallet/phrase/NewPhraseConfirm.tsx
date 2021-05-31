@@ -1,7 +1,7 @@
 import React, { useCallback, useMemo, useState } from 'react'
 
 import { DeleteOutlined, RedoOutlined } from '@ant-design/icons'
-import { Col, Row, Button as AButton, Form } from 'antd'
+import { Col, Row, Button as AButton } from 'antd'
 import shuffleArray from 'lodash.shuffle'
 import { useIntl } from 'react-intl'
 import { useHistory } from 'react-router'
@@ -63,6 +63,14 @@ export const NewPhraseConfirm: React.FC<{ mnemonic: string; onConfirm: () => Pro
   const intl = useIntl()
   const history = useHistory()
 
+  const updateWordList = useCallback(
+    (wordList: WordType[]) => {
+      setMnemonicError('')
+      setWordsList(wordList)
+    },
+    [setWordsList, setMnemonicError]
+  )
+
   const shuffledWords = useCallback<(array: WordType[]) => WordType[]>(shuffleArray, [])
 
   const init = useCallback(() => {
@@ -72,11 +80,11 @@ export const NewPhraseConfirm: React.FC<{ mnemonic: string; onConfirm: () => Pro
         const uniqueId = uuidv4()
         return { text: e, _id: uniqueId }
       })
-      setWordsList(res)
+      updateWordList(res)
       setShuffledWordsList(shuffledWords(res))
       setInitialized(true)
     }
-  }, [mnemonic, initialized, shuffledWords])
+  }, [mnemonic, initialized, shuffledWords, updateWordList])
 
   const sortedSelectedWords = useMemo(() => {
     return sortedSelected(wordsList, 'sequence')
@@ -88,8 +96,8 @@ export const NewPhraseConfirm: React.FC<{ mnemonic: string; onConfirm: () => Pro
   const isSelected = useCallback(isSelectedFactory(wordsList, '_id'), [wordsList])
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  const checkPhraseConfirmWords = useCallback(checkPhraseConfirmWordsFactory(setWordsList, setMnemonicError), [
-    setWordsList,
+  const checkPhraseConfirmWords = useCallback(checkPhraseConfirmWordsFactory(updateWordList, setMnemonicError), [
+    updateWordList,
     setMnemonicError
   ])
 
@@ -100,9 +108,9 @@ export const NewPhraseConfirm: React.FC<{ mnemonic: string; onConfirm: () => Pro
       delete e.sequence
       return e
     })
-    setWordsList(newWords)
-    setMnemonicError('')
-  }, [wordsList])
+    updateWordList(newWords)
+  }, [wordsList, updateWordList])
+
   const handleAddWord = useCallback(
     (id: string) => {
       const selects: WordType[] = sortedSelectedWords
@@ -115,10 +123,9 @@ export const NewPhraseConfirm: React.FC<{ mnemonic: string; onConfirm: () => Pro
         }
         return e
       })
-      setWordsList(newWords)
-      setMnemonicError('')
+      updateWordList(newWords)
     },
-    [sortedSelectedWords, wordsList]
+    [sortedSelectedWords, wordsList, updateWordList]
   )
   const handleRemoveWord = useCallback(
     (id: string) => {
@@ -130,10 +137,9 @@ export const NewPhraseConfirm: React.FC<{ mnemonic: string; onConfirm: () => Pro
         }
         return e
       })
-      setWordsList(newWords)
-      setMnemonicError('')
+      updateWordList(newWords)
     },
-    [wordsList]
+    [wordsList, updateWordList]
   )
   const handleFormSubmit = useCallback(() => {
     const checkwords = checkPhraseConfirmWords(wordsList, sortedSelectedWords)
@@ -147,7 +153,12 @@ export const NewPhraseConfirm: React.FC<{ mnemonic: string; onConfirm: () => Pro
           setMnemonicError(intl.formatMessage({ id: 'wallet.create.error' }))
         })
     }
+    // In case ALL words were entered in a wrong set error
+    else if (wordsList.length === sortedSelectedWords.length) {
+      setMnemonicError(intl.formatMessage({ id: 'wallet.create.error.phrase' }))
+    }
   }, [checkPhraseConfirmWords, onConfirm, wordsList, sortedSelectedWords, history, intl])
+
   return (
     <>
       <NewPhraseStyled.TitleContainer>
@@ -156,9 +167,12 @@ export const NewPhraseConfirm: React.FC<{ mnemonic: string; onConfirm: () => Pro
         </NewPhraseStyled.SectionTitle>
       </NewPhraseStyled.TitleContainer>
       <NewPhraseStyled.Form labelCol={{ span: 24 }} onFinish={handleFormSubmit}>
-        <Form.Item name="mnemonic" validateStatus={mnemonicError && 'error'} help={!!mnemonicError && mnemonicError}>
+        <NewPhraseStyled.FormItem
+          name="mnemonic"
+          validateStatus={mnemonicError && 'error'}
+          help={!!mnemonicError && mnemonicError}>
           <Phrase wordIcon={<DeleteOutlined />} words={sortedSelectedWords} onWordClick={handleRemoveWord} />
-        </Form.Item>
+        </NewPhraseStyled.FormItem>
 
         <PhraseStyled.EnterPhraseContainer
           label={
