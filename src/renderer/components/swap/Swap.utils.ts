@@ -6,7 +6,13 @@ import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
 
 import { ZERO_BASE_AMOUNT, ZERO_BN } from '../../const'
-import { isChainAsset, isRuneNativeAsset, max1e8BaseAmount, to1e8BaseAmount } from '../../helpers/assetHelper'
+import {
+  isBtcAsset,
+  isChainAsset,
+  isRuneNativeAsset,
+  max1e8BaseAmount,
+  to1e8BaseAmount
+} from '../../helpers/assetHelper'
 import { eqAsset } from '../../helpers/fp/eq'
 import { sequenceTOption } from '../../helpers/fpHelpers'
 import { priceFeeAmountForAsset } from '../../services/chain/fees/utils'
@@ -212,7 +218,13 @@ export const minAmountToSwapMax1e8 = ({
     1.5,
     feeToCover.times,
     // transform decimal to be `max1e8`
-    max1e8BaseAmount
+    max1e8BaseAmount,
+    (s) => {
+      if (isBtcAsset(inAsset)) {
+        return s.plus(10000)
+      }
+      return s
+    }
   )
 }
 
