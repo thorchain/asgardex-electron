@@ -38,6 +38,7 @@ const common: CommonMessages = {
   'common.pools': 'Pools',
   'common.pool': 'Pool',
   'common.price': 'Prix',
+  'common.price.rune': 'RUNE price - FR',
   'common.transaction': 'Transaction',
   'common.viewTransaction': 'Afficher la transaction',
   'common.fee': 'Frais',
@@ -80,7 +81,8 @@ const common: CommonMessages = {
   'common.time.week': 'Semaine',
   'common.time.all': 'Tout',
   'common.theme.light': 'Mode clair',
-  'common.theme.dark': 'Mode sombre'
+  'common.theme.dark': 'Mode sombre',
+  'common.volume24': 'Volume (24h) - FR'
 }
 
 export default common

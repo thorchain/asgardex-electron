@@ -9,10 +9,11 @@ export const Container = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 3px 7px;
+  padding: 3px 10px;
   background: ${palette('gray', 0)};
-  border-radius: 5px;
+  border-radius: 10px;
   margin-right: 10px;
+  min-width: 90px;
 
   &::last-child {
     margin-right: 0;
@@ -21,16 +22,19 @@ export const Container = styled.div`
 
 export const Label = styled(Text)`
   text-transform: uppercase;
+  font-family: 'MainFontBold';
   font-size: 12px;
   line-height: 14px;
   color: ${palette('text', 2)};
   width: auto;
   padding: 0;
   margin: 0;
+  margin-right: 5px;
 `
 
-export const SubLabel = styled(Text)`
+export const Title = styled(Text)`
   text-transform: uppercase;
+  font-family: 'MainFontRegular';
   font-size: 9px;
   line-height: 12px;
   color: ${palette('text', 2)};
