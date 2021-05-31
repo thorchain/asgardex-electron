@@ -9,7 +9,6 @@ import { Network } from '../../../shared/api/types'
 import { EarningsHistoryItemPool, PoolDetail, PoolStatsDetail } from '../../types/generated/midgard/models'
 import { PoolCards } from './PoolCards'
 import * as H from './PoolDetails.helpers'
-import * as Styled from './PoolDetails.style'
 import { PoolTitle } from './PoolTitle'
 
 export type Props = {
@@ -40,38 +39,32 @@ export const PoolDetails: React.FC<Props> = ({
 }) => {
   const price = useMemo(() => H.getPrice(poolDetail, priceRatio), [poolDetail, priceRatio])
   return (
-    <Styled.Container>
-      <Styled.Section>
-        <A.Col span={24}>
-          <PoolTitle
-            network={network}
-            haltedChains={haltedChains}
-            asset={O.some(asset)}
-            price={price}
-            priceSymbol={priceSymbol}
-            isLoading={isLoading}
-          />
-        </A.Col>
-      </Styled.Section>
-      <Styled.Section>
-        <A.Col xs={24} md={8}>
-          <PoolCards
-            poolStatsDetail={poolStatsDetail}
-            priceRatio={priceRatio}
-            poolDetail={poolDetail}
-            priceSymbol={priceSymbol}
-            isLoading={isLoading}
-          />
-        </A.Col>
-        <A.Col xs={24} md={16}>
-          <ChartView priceRatio={priceRatio} />
-        </A.Col>
-      </Styled.Section>
-      <Styled.Section>
-        <A.Col span={24}>
-          <HistoryView poolAsset={asset} />
-        </A.Col>
-      </Styled.Section>
-    </Styled.Container>
+    <A.Row gutter={[0, 8]}>
+      <A.Col span={24}>
+        <PoolTitle
+          network={network}
+          haltedChains={haltedChains}
+          asset={O.some(asset)}
+          price={price}
+          priceSymbol={priceSymbol}
+          isLoading={isLoading}
+        />
+      </A.Col>
+      <A.Col xs={24} md={8}>
+        <PoolCards
+          poolStatsDetail={poolStatsDetail}
+          priceRatio={priceRatio}
+          poolDetail={poolDetail}
+          priceSymbol={priceSymbol}
+          isLoading={isLoading}
+        />
+      </A.Col>
+      <A.Col xs={24} md={16}>
+        <ChartView priceRatio={priceRatio} />
+      </A.Col>
+      <A.Col span={24}>
+        <HistoryView poolAsset={asset} />
+      </A.Col>
+    </A.Row>
   )
 }
