@@ -20,7 +20,7 @@ import { ApproveParams, Client$, TransactionService, IsApprovedLD } from './type
 export const createTransactionService = (client$: Client$): TransactionService => {
   const common = C.createTransactionService(client$)
 
-  const runSendPoolTx$ = (client: EthClient, params: SendPoolTxParams): TxHashLD => {
+  const runSendPoolTx$ = (client: EthClient, { walletIndex, ...params }: SendPoolTxParams): TxHashLD => {
     // helper for failures
     const failure$ = (msg: string) =>
       Rx.of(
@@ -46,7 +46,7 @@ export const createTransactionService = (client$: Client$): TransactionService =
                 // Note:
                 // Amounts need to use `toFixed` to convert `BaseAmount` to `Bignumber`
                 // since `value` and `gasPrice` type is `Bignumber`
-                client.call<{ hash: TxHash }>(router, ethRouterABI, 'deposit', [
+                client.call<{ hash: TxHash }>(walletIndex, router, ethRouterABI, 'deposit', [
                   params.recipient,
                   address,
                   // Send `BaseAmount` w/o decimal and always round down for currencies
@@ -84,10 +84,11 @@ export const createTransactionService = (client$: Client$): TransactionService =
       )
     )
 
-  const runApproveERC20Token$ = (client: EthClient, params: ApproveParams): TxHashLD =>
+  const runApproveERC20Token$ = (client: EthClient, { walletIndex = 0, ...params }: ApproveParams): TxHashLD =>
     Rx.from(
       client.approve({
         ...params,
+        walletIndex,
         feeOptionKey: 'fast'
       })
     ).pipe(
