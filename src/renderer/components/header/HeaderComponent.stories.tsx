@@ -4,9 +4,9 @@ import { storiesOf } from '@storybook/react'
 import { AssetRuneNative } from '@xchainjs/xchain-util'
 import { none } from 'fp-ts/lib/Option'
 import * as O from 'fp-ts/lib/Option'
-import * as Rx from 'rxjs'
 
 import { Locale } from '../../../shared/i18n/types'
+import { RUNE_PRICE_POOL } from '../../helpers/poolHelper'
 import { HeaderComponent } from './HeaderComponent'
 
 const binanceUrl = O.some('https://testnet-dex.binance.org/api/v1')
@@ -22,7 +22,8 @@ storiesOf('Components/Header', module).add('default', () => {
       lockHandler={() => console.log('lockHandler')}
       pricePools={O.none}
       setSelectedPricePool={() => console.log('setSelectedPricePool')}
-      selectedPricePoolAsset$={Rx.of(O.some(AssetRuneNative))}
+      selectedPricePoolAsset={O.some(AssetRuneNative)}
+      selectedPricePool={RUNE_PRICE_POOL}
       locale={Locale.EN}
       binanceUrl={binanceUrl}
       midgardUrl={midgardUrl}

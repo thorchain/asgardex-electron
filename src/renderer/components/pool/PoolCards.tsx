@@ -75,7 +75,7 @@ export const PoolCards: React.FC<Props> = ({
         <PoolStatus
           isLoading={isLoading}
           fullValue={getFullValue(volume24)}
-          label={intl.formatMessage({ id: 'deposit.poolDetails.volume24' })}
+          label={intl.formatMessage({ id: 'common.volume24' })}
           displayValue={`${priceSymbol} ${abbreviateNumber(volume24.amount().toNumber(), 2)}`}
         />
       </Styled.Col>
