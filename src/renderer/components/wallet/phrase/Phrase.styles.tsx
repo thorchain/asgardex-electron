@@ -31,6 +31,8 @@ export const Button = styled(A.Button)<{ readOnly?: boolean }>`
       opacity: 1;
     }
   }
+
+  ${({ disabled }) => disabled && `opacity: 0.5;`}
 `
 
 export const EnterPhraseContainer = styled(A.Form.Item)`

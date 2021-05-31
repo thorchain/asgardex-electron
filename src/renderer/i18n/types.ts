@@ -154,6 +154,7 @@ type WalletMessageKey =
   | 'wallet.create.title'
   | 'wallet.create.creating'
   | 'wallet.create.error'
+  | 'wallet.create.error.phrase'
   | 'wallet.create.copy.phrase'
   | 'wallet.create.words.click'
   | 'wallet.create.enter.phrase'

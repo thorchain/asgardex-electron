@@ -44,6 +44,7 @@ const wallet: WalletMessages = {
   'wallet.create.words.click': 'Klicke die Wörter in der richtigen Reihenfolge',
   'wallet.create.creating': 'Erstelle eine Wallet ...',
   'wallet.create.error': 'Fehler beim Abspeichern der Phrase',
+  'wallet.create.error.phrase': 'Save your phrase safely and enter it in a correct way - DE',
   'wallet.receive.address.error': 'Keine Addresse für den Empfang vorhanden',
   'wallet.receive.address.errorQR': 'Error beim Rendern des QR Codes: {error}',
   'wallet.send.success': 'Transaktion war erfolgreich.',
