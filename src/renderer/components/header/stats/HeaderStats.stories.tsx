@@ -1,12 +1,12 @@
+import * as RD from '@devexperts/remote-data-ts'
 import { Meta, Story } from '@storybook/react'
 import { assetAmount, assetToBase } from '@xchainjs/xchain-util'
-import * as O from 'fp-ts/lib/Option'
 
 import { AssetBUSDBD1 } from '../../../const'
 import { HeaderStats as Component, Props as ComponentProps } from './HeaderStats'
 
 const defaultProps: ComponentProps = {
-  runePrice: O.some({
+  runePrice: RD.success({
     asset: AssetBUSDBD1,
     amount: assetToBase(assetAmount('14.08'))
   }),

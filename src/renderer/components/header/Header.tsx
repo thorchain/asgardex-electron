@@ -15,12 +15,12 @@ import { useLitecoinContext } from '../../contexts/LitecoinContext'
 import { useMidgardContext } from '../../contexts/MidgardContext'
 import { useThorchainContext } from '../../contexts/ThorchainContext'
 import { useWalletContext } from '../../contexts/WalletContext'
-import { RUNE_PRICE_POOL } from '../../helpers/poolHelper'
 import { usePricePools } from '../../hooks/usePricePools'
+import { useRunePrice } from '../../hooks/useRunePrice'
 import * as poolsRoutes from '../../routes/pools'
 import * as walletRoutes from '../../routes/wallet'
 import { DEFAULT_NETWORK } from '../../services/const'
-import { SelectedPricePool, SelectedPricePoolAsset } from '../../services/midgard/types'
+import { SelectedPricePoolAsset } from '../../services/midgard/types'
 import { HeaderComponent } from './HeaderComponent'
 
 export const Header: React.FC = (): JSX.Element => {
@@ -29,12 +29,13 @@ export const Header: React.FC = (): JSX.Element => {
   const keystore = useObservableState(keystoreService.keystore$, O.none)
   const { service: midgardService } = useMidgardContext()
   const {
-    pools: { setSelectedPricePoolAsset: setSelectedPricePool, selectedPricePoolAsset$, selectedPricePool$ },
+    pools: { setSelectedPricePoolAsset: setSelectedPricePool, selectedPricePoolAsset$ },
     apiEndpoint$
   } = midgardService
 
   const oSelectedPricePoolAsset = useObservableState<SelectedPricePoolAsset>(selectedPricePoolAsset$, O.none)
-  const selectedPricePool = useObservableState<SelectedPricePool>(selectedPricePool$, RUNE_PRICE_POOL)
+
+  const runePriceRD = useRunePrice()
 
   const pricePools = usePricePools()
 
@@ -125,7 +126,7 @@ export const Header: React.FC = (): JSX.Element => {
       lockHandler={lock}
       pricePools={pricePools}
       setSelectedPricePool={setSelectedPricePool}
-      selectedPricePool={selectedPricePool}
+      runePrice={runePriceRD}
       selectedPricePoolAsset={oSelectedPricePoolAsset}
       locale={currentLocale}
       changeLocale={changeLocale}
