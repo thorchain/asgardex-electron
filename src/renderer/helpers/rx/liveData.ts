@@ -10,6 +10,7 @@ import { sequenceS, sequenceT } from 'fp-ts/lib/Apply'
 import * as A from 'fp-ts/lib/Array'
 import { Filterable2 } from 'fp-ts/lib/Filterable'
 import { MonadThrow2 } from 'fp-ts/lib/MonadThrow'
+import { pipeable } from 'fp-ts/lib/pipeable'
 import * as O from 'fp-ts/Option'
 import { Observable } from 'rxjs'
 import * as RxOp from 'rxjs/operators'
@@ -37,6 +38,7 @@ export const instanceLiveData: MonadThrow2<URIType> & CoproductLeft<URIType> & F
 
 export const liveData = {
   ...instanceLiveData,
+  ...pipeable(instanceLiveData),
   sequenceS: sequenceS(instanceLiveData),
   sequenceT: sequenceT(instanceLiveData),
   sequenceArray: A.sequence(instanceLiveData),
