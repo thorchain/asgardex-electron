@@ -797,7 +797,7 @@ const createPoolsService = (
 
   const { stream$: reloadSwapHistory$, trigger: reloadSwapHistory } = triggerStream()
 
-  const getSwapHistory$ = (params: GetSwapHistoryParams): SwapHistoryLD =>
+  const getSelectedPoolSwapHistory$ = (params: GetSwapHistoryParams): SwapHistoryLD =>
     FP.pipe(
       Rx.combineLatest([selectedPoolAsset$, reloadSwapHistory$]),
       RxOp.filter(([oSelectedPoolAsset, _]) => O.isSome(oSelectedPoolAsset)),
@@ -882,7 +882,7 @@ const createPoolsService = (
     poolLegacyDetail$,
     poolEarningHistory$,
     getPoolLiquidityHistory$,
-    getSwapHistory$,
+    getSelectedPoolSwapHistory$,
     reloadSwapHistory,
     getDepthHistory$,
     reloadDepthHistory,
