@@ -222,8 +222,8 @@ export const minAmountToSwapMax1e8 = ({
     max1e8BaseAmount,
     // Zero amount is possible only in case there is not fees information loaded.
     // Just to avoid blinking min value filter out zero min amounts too.
-    E.fromPredicate((amont) => amont.eq(0) || !isUtxoAssetChain(inAsset), FP.identity),
-    // increase min value for meaningful UTXO assets' value
+    E.fromPredicate((amount) => amount.eq(0) || !isUtxoAssetChain(inAsset), FP.identity),
+    // increase min value by 10k satoshi (for meaningful UTXO assets' only)
     E.getOrElse((amount) => amount.plus(10000))
   )
 }
