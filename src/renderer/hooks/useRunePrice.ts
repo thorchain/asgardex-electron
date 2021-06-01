@@ -15,9 +15,14 @@ import { pricePoolSelector } from '../services/midgard/utils'
 export const useRunePrice = () => {
   const {
     service: {
-      pools: { poolsState$, selectedPricePoolAsset$ }
+      pools: { poolsState$, selectedPricePoolAsset$, reloadPools }
     }
   } = useMidgardContext()
+
+  const reloadRunePrice = () => {
+    // reload pools triggers changes of poolsState$, with it changes of `runePriceRD`
+    reloadPools()
+  }
 
   const [runePriceRD] = useObservableState<PriceRD>(
     () =>
@@ -45,5 +50,5 @@ export const useRunePrice = () => {
     RD.initial
   )
 
-  return runePriceRD
+  return { runePriceRD, reloadRunePrice }
 }
