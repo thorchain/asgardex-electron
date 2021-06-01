@@ -94,23 +94,22 @@ export const BondsTable: React.FC<Props> = ({ nodes, removeNode, network, goToNo
         columns={[nodeColumn, bondColumn, awardColumn, statusColumn, infoColumn, removeColumn]}
         dataSource={nodes.map((node) => ({ ...node, key: node.nodeAddress }))}
       />
-      {nodeToRemove && (
-        <ConfirmationModal
-          onClose={() => setNodeToRemove(null)}
-          onSuccess={() => {
-            removeNode(nodeToRemove)
-          }}
-          message={
-            <FormattedMessage
-              id="bonds.node.removeMessage"
-              defaultMessage="Are you sure you want to delete {node} node?"
-              values={{
-                node: <Styled.ConfirmationModalWalletText>{nodeToRemove}</Styled.ConfirmationModalWalletText>
-              }}
-            />
-          }
-        />
-      )}
+      <ConfirmationModal
+        visible={!!nodeToRemove}
+        onClose={() => setNodeToRemove(null)}
+        onSuccess={() => {
+          !!nodeToRemove && removeNode(nodeToRemove)
+        }}
+        message={
+          <FormattedMessage
+            id="bonds.node.removeMessage"
+            defaultMessage="Are you sure you want to delete {node} node?"
+            values={{
+              node: <Styled.ConfirmationModalWalletText>{nodeToRemove}</Styled.ConfirmationModalWalletText>
+            }}
+          />
+        }
+      />
     </>
   )
 }

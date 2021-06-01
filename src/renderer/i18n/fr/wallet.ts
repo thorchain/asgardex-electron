@@ -11,6 +11,9 @@ const wallet: WalletMessages = {
   'wallet.action.upgrade': 'Mise à jour',
   'wallet.action.receive': 'Recevoir du {asset}',
   'wallet.action.remove': 'Supprimer le portefeuille',
+  'wallet.action.remove.title': 'Are you sure you want to remove your wallet? - FR',
+  'wallet.action.remove.description':
+    'You cannot undo this action and will have to re-create your wallet from your seed phrase. - FR',
   'wallet.action.unlock': 'Déverrouiller',
   'wallet.action.connect': 'Connecter',
   'wallet.action.import': 'Importer',

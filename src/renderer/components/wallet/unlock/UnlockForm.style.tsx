@@ -80,3 +80,16 @@ export const Button = styled(BaseButton)`
     max-width: 180px;
   `}
 `
+
+export const ConfirmationModalTitleText = styled.span`
+  margin-bottom: 10px;
+  color: ${palette('text', 0)};
+  font-size: 24px !important;
+  font-weight: 600;
+  text-transform: none;
+`
+
+export const ConfirmationModalDescriptionText = styled.span`
+  font-size: 17px !important;
+  text-transform: none;
+`

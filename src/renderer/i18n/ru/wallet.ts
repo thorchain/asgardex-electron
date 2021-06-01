@@ -11,6 +11,9 @@ const wallet: WalletMessages = {
   'wallet.action.upgrade': 'Обновить',
   'wallet.action.receive': 'Получить {asset}',
   'wallet.action.remove': 'Удалить кошелек',
+  'wallet.action.remove.title': 'Are you sure you want to remove your wallet? - RU',
+  'wallet.action.remove.description':
+    'You cannot undo this action and will have to re-create your wallet from your seed phrase. - RU',
   'wallet.action.unlock': 'Разблокировать',
   'wallet.action.import': 'Импортировать',
   'wallet.action.create': 'Создать',
