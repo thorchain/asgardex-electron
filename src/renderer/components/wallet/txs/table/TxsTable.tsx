@@ -7,11 +7,9 @@ import { Grid, Col, Row } from 'antd'
 import { ColumnsType, ColumnType } from 'antd/lib/table'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
-import { ordString } from 'fp-ts/lib/Ord'
 import { useIntl, FormattedDate, FormattedTime } from 'react-intl'
 
 import { Network } from '../../../../../shared/api/types'
-import { ZERO_BN } from '../../../../const'
 import { TxsPageRD } from '../../../../services/clients'
 import { MAX_ITEMS_PER_PAGE } from '../../../../services/const'
 import { ApiError } from '../../../../services/wallet/types'
@@ -95,8 +93,7 @@ export const TxsTable: React.FC<Props> = (props): JSX.Element => {
       title: '',
       align: 'center',
       width: 60,
-      render: renderTypeColumn,
-      sortDirections: ['descend', 'ascend']
+      render: renderTypeColumn
     }),
     [renderTypeColumn]
   )
@@ -116,12 +113,9 @@ export const TxsTable: React.FC<Props> = (props): JSX.Element => {
       title: intl.formatMessage({ id: 'common.from' }),
       align: 'left',
       ellipsis: true,
-      render: renderFromColumn,
-      sorter: ({ from: fromA }: Tx, { from: fromB }: Tx) =>
-        // For simplicity we sort first item only
-        // TODO (@Veado) Play around to get a user-friendly sort option
-        ordString.compare(fromA[0]?.from ?? '', fromB[0]?.from ?? ''),
-      sortDirections: ['descend', 'ascend']
+      render: renderFromColumn
+      // TODO: (@asgdx-team) implement sorting when xchain-* libs are ready for that
+      // sortDirections: ['descend', 'ascend']
     }),
     [intl, renderFromColumn]
   )
@@ -141,12 +135,9 @@ export const TxsTable: React.FC<Props> = (props): JSX.Element => {
       title: intl.formatMessage({ id: 'common.to' }),
       align: 'left',
       ellipsis: true,
-      render: renderToColumn,
-      sorter: ({ to: toA }: Tx, { to: toB }: Tx) =>
-        // For simplicity we sort first item only
-        // TODO (@Veado) Play around to get a user-friendly sort option
-        ordString.compare(toA[0]?.to ?? '', toB[0]?.to ?? ''),
-      sortDirections: ['descend', 'ascend']
+      render: renderToColumn
+      // TODO: (@asgdx-team) implement sorting when xchain-* libs are ready for that
+      // sortDirections: ['descend', 'ascend']
     }),
     [intl, renderToColumn]
   )
@@ -180,10 +171,9 @@ export const TxsTable: React.FC<Props> = (props): JSX.Element => {
       title: intl.formatMessage({ id: 'common.date' }),
       align: 'left',
       width: isDesktopView ? 200 : 180,
-      render: renderDateColumn,
-      sorter: (a: Tx, b: Tx) => a.date.getTime() - b.date.getTime(),
-      sortDirections: ['descend', 'ascend'],
-      defaultSortOrder: 'descend'
+      render: renderDateColumn
+      // TODO: (@asgdx-team) implement sorting when xchain-* libs are ready for that
+      // sortDirections: ['descend', 'ascend']
     }),
     [intl, isDesktopView, renderDateColumn]
   )
@@ -204,12 +194,9 @@ export const TxsTable: React.FC<Props> = (props): JSX.Element => {
       title: intl.formatMessage({ id: 'common.amount' }),
       align: 'left',
       width: 200,
-      render: renderAmountColumn,
-      sorter: ({ to: toA }: Tx, { to: toB }: Tx) =>
-        // For simplicity we sort first item only
-        // TODO (@Veado) Play around to get a user-friendly sort option
-        (toA[0]?.amount.amount() ?? ZERO_BN).comparedTo(toB[0]?.amount.amount() ?? ZERO_BN),
-      sortDirections: ['descend', 'ascend']
+      render: renderAmountColumn
+      // TODO: (@asgdx-team) implement sorting when xchain-* libs are ready for that
+      // sortDirections: ['descend', 'ascend']
     }),
     [intl, renderAmountColumn]
   )
