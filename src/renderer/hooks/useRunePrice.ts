@@ -9,8 +9,8 @@ import * as RxOp from 'rxjs/operators'
 import { ONE_RUNE_BASE_AMOUNT } from '../../shared/mock/amount'
 import { useMidgardContext } from '../contexts/MidgardContext'
 import { sequenceTOption } from '../helpers/fpHelpers'
+import { PriceRD } from '../services/midgard/types'
 import { pricePoolSelector } from '../services/midgard/utils'
-import { RunePriceRD } from './useRunePrice.types'
 
 export const useRunePrice = () => {
   const {
@@ -19,7 +19,7 @@ export const useRunePrice = () => {
     }
   } = useMidgardContext()
 
-  const [runePriceRD] = useObservableState<RunePriceRD>(
+  const [runePriceRD] = useObservableState<PriceRD>(
     () =>
       Rx.combineLatest([poolsState$, selectedPricePoolAsset$]).pipe(
         RxOp.map(([poolsState, oSelectedPricePoolAsset]) =>
