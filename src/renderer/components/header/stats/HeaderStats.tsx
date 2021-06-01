@@ -58,18 +58,15 @@ export const HeaderStats: React.FC<Props> = (props): JSX.Element => {
         volume24PriceRD,
         RD.map(
           ({ asset, amount }) =>
-            `${currencySymbolByAsset(asset)} ${abbreviateNumber(
+            (prevVolume24PriceLabel.current /* store price label */ = `${currencySymbolByAsset(
+              asset
+            )} ${abbreviateNumber(
               baseToAsset(amount) /* show values as `AssetAmount`   */
                 .amount()
                 .toNumber(),
               2
-            )}`
+            )}`)
         ),
-        RD.map((label) => {
-          // store price label
-          prevVolume24PriceLabel.current = label
-          return label
-        }),
         RD.fold(
           () => prevVolume24PriceLabel.current,
           () => prevVolume24PriceLabel.current,
