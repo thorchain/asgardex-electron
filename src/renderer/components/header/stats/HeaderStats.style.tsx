@@ -20,12 +20,12 @@ export const Container = styled.div`
   }
 `
 
-export const Label = styled(Text)`
+export const Label = styled(Text)<{ loading: boolean }>`
   text-transform: uppercase;
   font-family: 'MainFontBold';
   font-size: 12px;
   line-height: 14px;
-  color: ${palette('text', 2)};
+  color: ${({ loading }) => (loading ? palette('gray', 2) : palette('text', 2))};
   width: auto;
   padding: 0;
   margin: 0;

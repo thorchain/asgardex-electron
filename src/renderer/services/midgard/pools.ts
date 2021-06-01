@@ -26,7 +26,7 @@ import {
   GetPoolStatsPeriodEnum,
   GetPoolStatsRequest
 } from '../../types/generated/midgard/apis'
-import { PricePool, PricePoolAsset, PricePools } from '../../views/pools/Pools.types'
+import { PricePool$, PricePoolAsset, PricePools } from '../../views/pools/Pools.types'
 import { ErrorId } from '../wallet/types'
 import {
   PoolAssetDetailsLD,
@@ -447,7 +447,7 @@ const createPoolsService = (
   /**
    * Selected price pool
    */
-  const selectedPricePool$: Rx.Observable<PricePool> = Rx.combineLatest([poolsState$, selectedPricePoolAsset$]).pipe(
+  const selectedPricePool$: PricePool$ = Rx.combineLatest([poolsState$, selectedPricePoolAsset$]).pipe(
     RxOp.map(([poolsState, selectedPricePoolAsset]) => pricePoolSelectorFromRD(poolsState, selectedPricePoolAsset))
   )
 

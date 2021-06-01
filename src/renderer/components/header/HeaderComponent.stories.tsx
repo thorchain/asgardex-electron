@@ -1,12 +1,12 @@
 import React from 'react'
 
+import * as RD from '@devexperts/remote-data-ts'
 import { storiesOf } from '@storybook/react'
 import { AssetRuneNative } from '@xchainjs/xchain-util'
 import { none } from 'fp-ts/lib/Option'
 import * as O from 'fp-ts/lib/Option'
 
 import { Locale } from '../../../shared/i18n/types'
-import { RUNE_PRICE_POOL } from '../../helpers/poolHelper'
 import { HeaderComponent } from './HeaderComponent'
 
 const binanceUrl = O.some('https://testnet-dex.binance.org/api/v1')
@@ -21,9 +21,9 @@ storiesOf('Components/Header', module).add('default', () => {
       keystore={none}
       lockHandler={() => console.log('lockHandler')}
       pricePools={O.none}
+      runePrice={RD.initial}
       setSelectedPricePool={() => console.log('setSelectedPricePool')}
       selectedPricePoolAsset={O.some(AssetRuneNative)}
-      selectedPricePool={RUNE_PRICE_POOL}
       locale={Locale.EN}
       binanceUrl={binanceUrl}
       midgardUrl={midgardUrl}

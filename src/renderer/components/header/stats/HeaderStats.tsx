@@ -1,5 +1,6 @@
 import React, { useMemo, useRef } from 'react'
 
+import * as RD from '@devexperts/remote-data-ts'
 import { baseToAsset, formatAssetAmountCurrency } from '@xchainjs/xchain-util'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
@@ -7,48 +8,56 @@ import { useIntl } from 'react-intl'
 
 import { isUSDAsset } from '../../../helpers/assetHelper'
 import { loadingString } from '../../../helpers/stringHelper'
+import { RunePriceRD } from '../../../hooks/useRunePrice.types'
 import { AssetWithAmount } from '../../../types/asgardex'
 import * as Styled from './HeaderStats.style'
 
 export type Props = {
-  runePrice: O.Option<AssetWithAmount>
+  runePrice: RunePriceRD
   volume24: AssetWithAmount
 }
 
 export const HeaderStats: React.FC<Props> = (props): JSX.Element => {
-  const { runePrice: oRunePrice } = props
+  const { runePrice: runePriceRD } = props
 
   const intl = useIntl()
-  const prevRunePriceLabel = useRef<O.Option<string>>(O.none)
+  const prevRunePriceLabel = useRef<string>(loadingString)
 
   const runePriceLabel = useMemo(
     () =>
       FP.pipe(
-        oRunePrice,
-        O.map(({ asset, amount }) =>
-          formatAssetAmountCurrency({
-            amount: baseToAsset(amount),
-            asset,
-            trimZeros: true,
-            decimal: isUSDAsset(asset) ? 2 : 6
-          })
-        ),
-        O.map((label) => {
-          // store price label
-          prevRunePriceLabel.current = O.some(label)
-          return label
-        }),
-        O.alt(() => prevRunePriceLabel.current),
-        O.getOrElse(() => loadingString)
+        runePriceRD,
+        RD.fold(
+          () => prevRunePriceLabel.current,
+          () => prevRunePriceLabel.current,
+          () => '--',
+          FP.flow(
+            O.map(({ asset, amount }) =>
+              formatAssetAmountCurrency({
+                amount: baseToAsset(amount),
+                asset,
+                trimZeros: true,
+                decimal: isUSDAsset(asset) ? 2 : 6
+              })
+            ),
+            O.map((label) => {
+              // store price label
+              prevRunePriceLabel.current = label
+              return label
+            }),
+            O.getOrElse(() => '')
+          )
+        )
       ),
-    [oRunePrice]
+
+    [runePriceRD]
   )
 
   return (
     <Styled.Wrapper>
       <Styled.Container>
         <Styled.Title>{intl.formatMessage({ id: 'common.price.rune' })}</Styled.Title>
-        <Styled.Label>{runePriceLabel}</Styled.Label>
+        <Styled.Label loading={RD.isPending(runePriceRD)}>{runePriceLabel}</Styled.Label>
       </Styled.Container>
       {/* <Styled.Container>
         <Styled.Title>{intl.formatMessage({ id: 'common.volume24' })}</Styled.Title>

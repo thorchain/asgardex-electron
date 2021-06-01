@@ -1,6 +1,5 @@
 import React, { useMemo, useState, useCallback, useRef } from 'react'
 
-import { getValueOfRuneInAsset } from '@thorchain/asgardex-util'
 import { assetAmount, assetToBase } from '@xchainjs/xchain-util'
 import { Row, Col, Tabs, Grid } from 'antd'
 import * as FP from 'fp-ts/function'
@@ -14,7 +13,6 @@ import { palette, size } from 'styled-theme'
 
 import { Network } from '../../../shared/api/types'
 import { Locale } from '../../../shared/i18n/types'
-import { ONE_RUNE_BASE_AMOUNT } from '../../../shared/mock/amount'
 import { ReactComponent as CloseIcon } from '../../assets/svg/icon-close.svg'
 import { ReactComponent as MenuIcon } from '../../assets/svg/icon-menu.svg'
 import { ReactComponent as SwapIcon } from '../../assets/svg/icon-swap.svg'
@@ -22,12 +20,12 @@ import { ReactComponent as WalletIcon } from '../../assets/svg/icon-wallet.svg'
 import { ReactComponent as AsgardexLogo } from '../../assets/svg/logo-asgardex.svg'
 import { AssetBUSDBD1 } from '../../const'
 import { useThemeContext } from '../../contexts/ThemeContext'
+import { RunePriceRD } from '../../hooks/useRunePrice.types'
 import * as poolsRoutes from '../../routes/pools'
 import * as walletRoutes from '../../routes/wallet'
-import { SelectedPricePool, SelectedPricePoolAsset } from '../../services/midgard/types'
+import { SelectedPricePoolAsset } from '../../services/midgard/types'
 import { KeystoreState } from '../../services/wallet/types'
 import { isLocked } from '../../services/wallet/util'
-import { AssetWithAmount } from '../../types/asgardex'
 import { PricePoolAsset, PricePoolAssets, PricePools } from '../../views/pools/Pools.types'
 import { HeaderContainer, TabLink, HeaderDrawer, HeaderDrawerItem } from './HeaderComponent.style'
 import { HeaderLang } from './lang'
@@ -57,8 +55,8 @@ type Props = {
   lockHandler: FP.Lazy<void>
   setSelectedPricePool: (asset: PricePoolAsset) => void
   pricePools: O.Option<PricePools>
+  runePrice: RunePriceRD
   selectedPricePoolAsset: SelectedPricePoolAsset
-  selectedPricePool: SelectedPricePool
   locale: Locale
   changeLocale?: (locale: Locale) => void
   selectedNetwork: Network
@@ -74,7 +72,7 @@ export const HeaderComponent: React.FC<Props> = (props): JSX.Element => {
   const {
     keystore,
     pricePools: oPricePools,
-    selectedPricePool,
+    runePrice: runePriceRD,
     selectedPricePoolAsset: oSelectedPricePoolAsset,
     lockHandler,
     setSelectedPricePool,
@@ -112,18 +110,6 @@ export const HeaderComponent: React.FC<Props> = (props): JSX.Element => {
   }, [oPricePools])
 
   const hasPricePools = useMemo(() => pricePoolAssets.length > 0, [pricePoolAssets])
-
-  const oRunePrice: O.Option<AssetWithAmount> = useMemo(
-    () =>
-      FP.pipe(
-        oSelectedPricePoolAsset,
-        O.map((pricePoolAsset) => ({
-          asset: pricePoolAsset,
-          amount: getValueOfRuneInAsset(ONE_RUNE_BASE_AMOUNT, selectedPricePool.poolData)
-        }))
-      ),
-    [oSelectedPricePoolAsset, selectedPricePool.poolData]
-  )
 
   const [menuVisible, setMenuVisible] = useState(false)
 
@@ -319,7 +305,7 @@ export const HeaderComponent: React.FC<Props> = (props): JSX.Element => {
                   <HeaderTheme isDesktopView={isDesktopView} />
                   {isLargeDesktopView && (
                     <HeaderStats
-                      runePrice={oRunePrice}
+                      runePrice={runePriceRD}
                       volume24={{
                         asset: AssetBUSDBD1,
                         amount: assetToBase(assetAmount('24000000'))
