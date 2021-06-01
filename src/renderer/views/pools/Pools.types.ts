@@ -5,7 +5,6 @@ import { NonEmptyArray } from 'fp-ts/lib/NonEmptyArray'
 import * as Rx from 'rxjs'
 
 import { Network } from '../../../shared/api/types'
-import { LiveData } from '../../helpers/rx/liveData'
 import { GetPoolsStatusEnum } from '../../types/generated/midgard'
 
 export type Pool = {
@@ -27,7 +26,6 @@ export type PricePool = {
 
 export type PricePool$ = Rx.Observable<PricePool>
 export type PricePoolRD = RD.RemoteData<Error, PricePool>
-export type PricePoolLD = LiveData<Error, PricePool>
 
 export type PricePools = NonEmptyArray<PricePool>
 
