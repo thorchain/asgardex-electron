@@ -22,7 +22,9 @@ storiesOf('Components/Header', module).add('default', () => {
       lockHandler={() => console.log('lockHandler')}
       pricePools={O.none}
       runePrice={RD.initial}
+      reloadRunePrice={() => console.log('reload rune price')}
       volume24Price={RD.initial}
+      reloadVolume24Price={() => console.log('reload volume24 price')}
       setSelectedPricePool={() => console.log('setSelectedPricePool')}
       selectedPricePoolAsset={O.some(AssetRuneNative)}
       locale={Locale.EN}

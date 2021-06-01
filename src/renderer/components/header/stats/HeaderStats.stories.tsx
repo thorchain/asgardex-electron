@@ -10,10 +10,12 @@ const defaultProps: ComponentProps = {
     asset: AssetBUSDBD1,
     amount: assetToBase(assetAmount('14.08'))
   }),
+  reloadRunePrice: () => console.log('reload rune price'),
   volume24Price: RD.success({
     asset: AssetBUSDBD1,
     amount: assetToBase(assetAmount('24000000'))
-  })
+  }),
+  reloadVolume24Price: () => console.log('reload volume24 price')
 }
 
 export const Default: Story = () => <Component {...defaultProps} />

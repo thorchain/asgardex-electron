@@ -36,8 +36,8 @@ export const Header: React.FC = (): JSX.Element => {
 
   const oSelectedPricePoolAsset = useObservableState<SelectedPricePoolAsset>(selectedPricePoolAsset$, O.none)
 
-  const runePriceRD = useRunePrice()
-  const volume24PriceRD = useVolume24Price()
+  const { runePriceRD, reloadRunePrice } = useRunePrice()
+  const { volume24PriceRD, reloadVolume24Price } = useVolume24Price()
 
   const pricePools = usePricePools()
 
@@ -129,7 +129,9 @@ export const Header: React.FC = (): JSX.Element => {
       pricePools={pricePools}
       setSelectedPricePool={setSelectedPricePool}
       runePrice={runePriceRD}
+      reloadRunePrice={reloadRunePrice}
       volume24Price={volume24PriceRD}
+      reloadVolume24Price={reloadVolume24Price}
       selectedPricePoolAsset={oSelectedPricePoolAsset}
       locale={currentLocale}
       changeLocale={changeLocale}
