@@ -45,7 +45,7 @@ export const HeaderStats: React.FC<Props> = (props): JSX.Element => {
               prevRunePriceLabel.current = label
               return label
             }),
-            O.getOrElse(() => '')
+            O.getOrElse(() => '--')
           )
         )
       ),
