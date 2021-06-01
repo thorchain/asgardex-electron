@@ -8,9 +8,9 @@ import * as O from 'fp-ts/Option'
 
 import { ZERO_BASE_AMOUNT, ZERO_BN } from '../../const'
 import {
-  isBtcAsset,
   isChainAsset,
   isRuneNativeAsset,
+  isUTXOSChainAsset,
   max1e8BaseAmount,
   to1e8BaseAmount
 } from '../../helpers/assetHelper'
@@ -221,7 +221,7 @@ export const minAmountToSwapMax1e8 = ({
     // transform decimal to be `max1e8`
     max1e8BaseAmount,
     // Filter as E.Left value all BTC values less then 10000 Sats
-    E.fromPredicate((amount) => !(isBtcAsset(inAsset) && amount.lt(10000)), FP.identity),
+    E.fromPredicate((amount) => !(isUTXOSChainAsset(inAsset) && amount.lt(10000)), FP.identity),
     // Set 10k Sats min value all BTC values less then 10000 Sats
     E.getOrElse((amount) => baseAmount(10000, amount.decimal))
   )
