@@ -1,15 +1,13 @@
-import { AssetAmount } from '@xchainjs/xchain-util'
+import { bn, AssetAmount } from '@xchainjs/xchain-util'
 import BigNumber from 'bignumber.js'
 import * as E from 'fp-ts/Either'
 import * as FP from 'fp-ts/lib/function'
 
-import { ZERO_ASSET_AMOUNT } from '../../../const'
 import { lessThanOrEqualTo, greaterThan, validateBN } from '../../../helpers/form/validation'
 
 export type TxAmountValidatorProps = {
   input: BigNumber
   maxAmount: AssetAmount
-  minAmount?: AssetAmount
   errors: {
     msg1: string
     msg2: string
@@ -17,12 +15,7 @@ export type TxAmountValidatorProps = {
   }
 }
 
-export const validateTxAmountInput = ({
-  input,
-  maxAmount,
-  errors,
-  minAmount = ZERO_ASSET_AMOUNT
-}: TxAmountValidatorProps): Promise<void> => {
+export const validateTxAmountInput = ({ input, maxAmount, errors }: TxAmountValidatorProps): Promise<void> => {
   const max = maxAmount.amount()
   // validate input
   return FP.pipe(
@@ -30,7 +23,7 @@ export const validateTxAmountInput = ({
     // valid number
     validateBN(errors.msg1),
     // input > 0
-    E.chain(greaterThan(minAmount.amount())(errors.msg2)),
+    E.chain(greaterThan(bn(0))(errors.msg2)),
     // input <= maxAmount
     E.chain(lessThanOrEqualTo(max)(errors.msg3)),
     // return Promise - needed by antd form

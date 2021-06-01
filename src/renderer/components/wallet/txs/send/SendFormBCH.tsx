@@ -7,7 +7,6 @@ import { FeeOptionKey } from '@xchainjs/xchain-client'
 import {
   assetAmount,
   AssetBCH,
-  AssetBTC,
   assetToBase,
   BaseAmount,
   baseAmount,
@@ -245,23 +244,13 @@ export const SendFormBCH: React.FC<Props> = (props): JSX.Element => {
 
   const amountValidator = useCallback(
     async (_: unknown, value: BigNumber) => {
-      // Prevent all txs less then 10k Sats
-      const min10KSats = baseToAsset(baseAmount(10000))
       // error messages
       const errors = {
         msg1: intl.formatMessage({ id: 'wallet.errors.amount.shouldBeNumber' }),
-        msg2: intl.formatMessage(
-          { id: 'wallet.errors.amount.shouldBeGreaterThan' },
-          {
-            amount: formatAssetAmountCurrency({
-              amount: min10KSats,
-              asset: AssetBTC
-            })
-          }
-        ),
+        msg2: intl.formatMessage({ id: 'wallet.errors.amount.shouldBeGreaterThan' }, { amount: '0' }),
         msg3: intl.formatMessage({ id: 'wallet.errors.amount.shouldBeLessThanBalanceAndFee' })
       }
-      return validateTxAmountInput({ input: value, maxAmount: baseToAsset(maxAmount), errors, minAmount: min10KSats })
+      return validateTxAmountInput({ input: value, maxAmount: baseToAsset(maxAmount), errors })
     },
     [intl, maxAmount]
   )
