@@ -27,7 +27,8 @@ import {
   DepthHistory,
   DepthHistoryItem,
   SwapHistoryItem,
-  InboundAddressesItem
+  InboundAddressesItem,
+  GetLiquidityHistoryRequest
 } from '../../types/generated/midgard'
 import { PricePools, PricePoolAsset, PricePool } from '../../views/pools/Pools.types'
 import { Memo } from '../chain/types'
@@ -88,6 +89,8 @@ export type SelectedPoolChain = O.Option<Chain>
 export type SelectedPricePoolAsset = O.Option<PricePoolAsset>
 
 export type SelectedPricePool = PricePool
+
+export type PriceRD = RD.RemoteData<Error, AssetWithAmount>
 
 export type LastblockItems = LastblockItem[]
 export type ThorchainLastblockRD = RD.RemoteData<Error, LastblockItems>
@@ -153,7 +156,7 @@ export type PoolLiquidityHistoryParams = {
 export type PoolLiquidityHistoryRD = RD.RemoteData<Error, LiquidityHistory>
 export type PoolLiquidityHistoryLD = LiveData<Error, LiquidityHistory>
 
-export type ApiGetSwapHistoryParams = { poolAsset: Asset } & Omit<GetSwapHistoryRequest, 'pool'>
+export type ApiGetSwapHistoryParams = { poolAsset?: Asset } & Omit<GetSwapHistoryRequest, 'pool'>
 export type GetSwapHistoryParams = Omit<ApiGetSwapHistoryParams, 'poolAsset'>
 export type SwapHistoryRD = RD.RemoteData<Error, SwapHistory>
 export type SwapHistoryLD = LiveData<Error, SwapHistory>
@@ -194,7 +197,9 @@ export type PoolsService = {
   poolLegacyDetail$: PoolLegacyDetailLD
   poolEarningHistory$: PoolEarningHistoryLD
   getPoolLiquidityHistory$: (parmas: PoolLiquidityHistoryParams) => PoolLiquidityHistoryLD
-  getSwapHistory$: (params: GetSwapHistoryParams) => SwapHistoryLD
+  getSelectedPoolSwapHistory$: (params: GetSwapHistoryParams) => SwapHistoryLD
+  apiGetSwapHistory$: (params: ApiGetSwapHistoryParams) => SwapHistoryLD
+  apiGetLiquidityHistory$: (params: GetLiquidityHistoryRequest) => PoolLiquidityHistoryLD
   reloadSwapHistory: FP.Lazy<void>
   getDepthHistory$: (params: GetDepthHistoryParams) => DepthHistoryLD
   reloadDepthHistory: FP.Lazy<void>

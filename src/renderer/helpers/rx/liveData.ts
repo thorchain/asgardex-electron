@@ -7,7 +7,7 @@ import {
   coproductMapLeft
 } from '@devexperts/utils/dist/typeclasses/product-left-coproduct-left/product-left-coproduct-left.utils'
 import { sequenceS, sequenceT } from 'fp-ts/lib/Apply'
-import { array } from 'fp-ts/lib/Array'
+import * as A from 'fp-ts/lib/Array'
 import { Filterable2 } from 'fp-ts/lib/Filterable'
 import { MonadThrow2 } from 'fp-ts/lib/MonadThrow'
 import { pipeable } from 'fp-ts/lib/pipeable'
@@ -41,7 +41,7 @@ export const liveData = {
   ...pipeable(instanceLiveData),
   sequenceS: sequenceS(instanceLiveData),
   sequenceT: sequenceT(instanceLiveData),
-  sequenceArray: array.sequence(instanceLiveData),
+  sequenceArray: A.sequence(instanceLiveData),
   combine: coproductMapLeft(instanceLiveData),
   mapLeft:
     <L, V, A>(f: (l: L) => V) =>

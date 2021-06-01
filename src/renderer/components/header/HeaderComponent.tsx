@@ -1,6 +1,5 @@
 import React, { useMemo, useState, useCallback, useRef } from 'react'
 
-import { assetAmount, assetToBase } from '@xchainjs/xchain-util'
 import { Row, Col, Tabs, Grid } from 'antd'
 import * as FP from 'fp-ts/function'
 import * as A from 'fp-ts/lib/Array'
@@ -18,12 +17,10 @@ import { ReactComponent as MenuIcon } from '../../assets/svg/icon-menu.svg'
 import { ReactComponent as SwapIcon } from '../../assets/svg/icon-swap.svg'
 import { ReactComponent as WalletIcon } from '../../assets/svg/icon-wallet.svg'
 import { ReactComponent as AsgardexLogo } from '../../assets/svg/logo-asgardex.svg'
-import { AssetBUSDBD1 } from '../../const'
 import { useThemeContext } from '../../contexts/ThemeContext'
-import { RunePriceRD } from '../../hooks/useRunePrice.types'
 import * as poolsRoutes from '../../routes/pools'
 import * as walletRoutes from '../../routes/wallet'
-import { SelectedPricePoolAsset } from '../../services/midgard/types'
+import { PriceRD, SelectedPricePoolAsset } from '../../services/midgard/types'
 import { KeystoreState } from '../../services/wallet/types'
 import { isLocked } from '../../services/wallet/util'
 import { PricePoolAsset, PricePoolAssets, PricePools } from '../../views/pools/Pools.types'
@@ -55,7 +52,8 @@ type Props = {
   lockHandler: FP.Lazy<void>
   setSelectedPricePool: (asset: PricePoolAsset) => void
   pricePools: O.Option<PricePools>
-  runePrice: RunePriceRD
+  runePrice: PriceRD
+  volume24Price: PriceRD
   selectedPricePoolAsset: SelectedPricePoolAsset
   locale: Locale
   changeLocale?: (locale: Locale) => void
@@ -73,6 +71,7 @@ export const HeaderComponent: React.FC<Props> = (props): JSX.Element => {
     keystore,
     pricePools: oPricePools,
     runePrice: runePriceRD,
+    volume24Price: volume24PriceRD,
     selectedPricePoolAsset: oSelectedPricePoolAsset,
     lockHandler,
     setSelectedPricePool,
@@ -303,15 +302,7 @@ export const HeaderComponent: React.FC<Props> = (props): JSX.Element => {
                   <AsgardexLogo />
                   {renderHeaderNetStatus}
                   <HeaderTheme isDesktopView={isDesktopView} />
-                  {isLargeDesktopView && (
-                    <HeaderStats
-                      runePrice={runePriceRD}
-                      volume24={{
-                        asset: AssetBUSDBD1,
-                        amount: assetToBase(assetAmount('24000000'))
-                      }}
-                    />
-                  )}
+                  {isLargeDesktopView && <HeaderStats runePrice={runePriceRD} volume24Price={volume24PriceRD} />}
                 </Row>
               </Col>
               <Col span="auto">

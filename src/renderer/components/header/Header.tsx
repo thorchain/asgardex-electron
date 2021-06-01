@@ -17,6 +17,7 @@ import { useThorchainContext } from '../../contexts/ThorchainContext'
 import { useWalletContext } from '../../contexts/WalletContext'
 import { usePricePools } from '../../hooks/usePricePools'
 import { useRunePrice } from '../../hooks/useRunePrice'
+import { useVolume24Price } from '../../hooks/useVolume24Price'
 import * as poolsRoutes from '../../routes/pools'
 import * as walletRoutes from '../../routes/wallet'
 import { DEFAULT_NETWORK } from '../../services/const'
@@ -36,6 +37,7 @@ export const Header: React.FC = (): JSX.Element => {
   const oSelectedPricePoolAsset = useObservableState<SelectedPricePoolAsset>(selectedPricePoolAsset$, O.none)
 
   const runePriceRD = useRunePrice()
+  const volume24PriceRD = useVolume24Price()
 
   const pricePools = usePricePools()
 
@@ -127,6 +129,7 @@ export const Header: React.FC = (): JSX.Element => {
       pricePools={pricePools}
       setSelectedPricePool={setSelectedPricePool}
       runePrice={runePriceRD}
+      volume24Price={volume24PriceRD}
       selectedPricePoolAsset={oSelectedPricePoolAsset}
       locale={currentLocale}
       changeLocale={changeLocale}

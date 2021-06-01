@@ -8,8 +8,8 @@ import * as O from 'fp-ts/lib/Option'
  * Sequence
  */
 
-export const sequenceTOption = sequenceT(O.option)
-export const sequenceTOptionFromArray = A.sequence(O.option)
+export const sequenceTOption = sequenceT(O.Apply)
+export const sequenceTOptionFromArray = A.sequence(O.Applicative)
 export const sequenceSOption = sequenceS(O.Applicative)
 
 export const sequenceTRD = sequenceT(RD.remoteData)

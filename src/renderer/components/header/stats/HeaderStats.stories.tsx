@@ -10,10 +10,10 @@ const defaultProps: ComponentProps = {
     asset: AssetBUSDBD1,
     amount: assetToBase(assetAmount('14.08'))
   }),
-  volume24: {
+  volume24Price: RD.success({
     asset: AssetBUSDBD1,
     amount: assetToBase(assetAmount('24000000'))
-  }
+  })
 }
 
 export const Default: Story = () => <Component {...defaultProps} />

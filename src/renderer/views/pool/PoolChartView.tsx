@@ -34,7 +34,7 @@ type Props = {
 export const PoolChartView: React.FC<Props> = ({ priceRatio }) => {
   const {
     service: {
-      pools: { selectedPricePoolAsset$, getSwapHistory$, getDepthHistory$, getPoolLiquidityHistory$ }
+      pools: { selectedPricePoolAsset$, getSelectedPoolSwapHistory$, getDepthHistory$, getPoolLiquidityHistory$ }
     }
   } = useMidgardContext()
 
@@ -70,7 +70,7 @@ export const PoolChartView: React.FC<Props> = ({ priceRatio }) => {
             // (2) or get data for volume history
             FP.pipe(
               liveData.sequenceS({
-                swapHistory: getSwapHistory$({
+                swapHistory: getSelectedPoolSwapHistory$({
                   ...requestParams,
                   interval: GetSwapHistoryIntervalEnum.Day
                 }),

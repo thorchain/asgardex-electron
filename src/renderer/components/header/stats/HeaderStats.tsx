@@ -1,25 +1,26 @@
 import React, { useMemo, useRef } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
-import { baseToAsset, formatAssetAmountCurrency } from '@xchainjs/xchain-util'
+import { baseToAsset, formatAssetAmountCurrency, currencySymbolByAsset } from '@xchainjs/xchain-util'
 import * as FP from 'fp-ts/lib/function'
 import { useIntl } from 'react-intl'
 
 import { isUSDAsset } from '../../../helpers/assetHelper'
+import { abbreviateNumber } from '../../../helpers/numberHelper'
 import { loadingString } from '../../../helpers/stringHelper'
-import { RunePriceRD } from '../../../hooks/useRunePrice.types'
-import { AssetWithAmount } from '../../../types/asgardex'
+import { PriceRD } from '../../../services/midgard/types'
 import * as Styled from './HeaderStats.style'
 
 export type Props = {
-  runePrice: RunePriceRD
-  volume24: AssetWithAmount
+  runePrice: PriceRD
+  volume24Price: PriceRD
 }
 
 export const HeaderStats: React.FC<Props> = (props): JSX.Element => {
-  const { runePrice: runePriceRD } = props
+  const { runePrice: runePriceRD, volume24Price: volume24PriceRD } = props
 
   const intl = useIntl()
+
   const prevRunePriceLabel = useRef<string>(loadingString)
 
   const runePriceLabel = useMemo(
@@ -49,6 +50,33 @@ export const HeaderStats: React.FC<Props> = (props): JSX.Element => {
 
     [runePriceRD]
   )
+  const prevVolume24PriceLabel = useRef<string>(loadingString)
+
+  const volume24PriceLabel = useMemo(
+    () =>
+      FP.pipe(
+        volume24PriceRD,
+        RD.map(
+          ({ asset, amount }) =>
+            (prevVolume24PriceLabel.current /* store price label */ = `${currencySymbolByAsset(
+              asset
+            )} ${abbreviateNumber(
+              baseToAsset(amount) /* show values as `AssetAmount`   */
+                .amount()
+                .toNumber(),
+              2
+            )}`)
+        ),
+        RD.fold(
+          () => prevVolume24PriceLabel.current,
+          () => prevVolume24PriceLabel.current,
+          () => '--',
+          FP.identity
+        )
+      ),
+
+    [volume24PriceRD]
+  )
 
   return (
     <Styled.Wrapper>
@@ -56,12 +84,10 @@ export const HeaderStats: React.FC<Props> = (props): JSX.Element => {
         <Styled.Title>{intl.formatMessage({ id: 'common.price.rune' })}</Styled.Title>
         <Styled.Label loading={RD.isPending(runePriceRD)}>{runePriceLabel}</Styled.Label>
       </Styled.Container>
-      {/* <Styled.Container>
+      <Styled.Container>
         <Styled.Title>{intl.formatMessage({ id: 'common.volume24' })}</Styled.Title>
-        <Styled.Label>
-          {formatAssetAmountCurrency({ amount: baseToAsset(volume24.amount), asset: volume24.asset, decimal: 0 })}
-        </Styled.Label>
-      </Styled.Container> */}
+        <Styled.Label loading={RD.isPending(volume24PriceRD)}>{volume24PriceLabel}</Styled.Label>
+      </Styled.Container>
     </Styled.Wrapper>
   )
 }

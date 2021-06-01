@@ -737,8 +737,8 @@ const createPoolsService = (
     RxOp.startWith(RD.pending)
   )
 
-  // Factory to get pool liquidity history from Midgard
-  const apiGetPoolLiquidityHistory$ = ({ from, to, ...request }: GetLiquidityHistoryRequest): PoolLiquidityHistoryLD =>
+  // Factory to get liquidity history from Midgard
+  const apiGetLiquidityHistory$ = ({ from, to, ...request }: GetLiquidityHistoryRequest): PoolLiquidityHistoryLD =>
     FP.pipe(
       Rx.combineLatest([midgardDefaultApi$, reloadPoolStatsDetail$]),
       RxOp.map(([api]) => api),
@@ -764,7 +764,7 @@ const createPoolsService = (
           O.fold(
             () => Rx.of(RD.initial),
             (asset) =>
-              apiGetPoolLiquidityHistory$({
+              apiGetLiquidityHistory$({
                 pool: assetToString(asset),
                 ...params
               })
@@ -777,12 +777,14 @@ const createPoolsService = (
   // Factory to get swap history from Midgard
   const apiGetSwapHistory$ = (params: ApiGetSwapHistoryParams): SwapHistoryLD => {
     const { poolAsset, from, to, ...otherParams } = params
+    const pool = FP.pipe(poolAsset, O.fromNullable, O.map(assetToString), O.toUndefined)
+
     return FP.pipe(
       midgardDefaultApi$,
       liveData.chain((api) =>
         FP.pipe(
           api.getSwapHistory({
-            pool: assetToString(poolAsset),
+            pool,
             from: O.toUndefined(roundToFiveMinutes(from)),
             to: O.toUndefined(roundToFiveMinutes(to)),
             ...otherParams
@@ -797,7 +799,7 @@ const createPoolsService = (
 
   const { stream$: reloadSwapHistory$, trigger: reloadSwapHistory } = triggerStream()
 
-  const getSwapHistory$ = (params: GetSwapHistoryParams): SwapHistoryLD =>
+  const getSelectedPoolSwapHistory$ = (params: GetSwapHistoryParams): SwapHistoryLD =>
     FP.pipe(
       Rx.combineLatest([selectedPoolAsset$, reloadSwapHistory$]),
       RxOp.filter(([oSelectedPoolAsset, _]) => O.isSome(oSelectedPoolAsset)),
@@ -882,7 +884,9 @@ const createPoolsService = (
     poolLegacyDetail$,
     poolEarningHistory$,
     getPoolLiquidityHistory$,
-    getSwapHistory$,
+    getSelectedPoolSwapHistory$,
+    apiGetSwapHistory$,
+    apiGetLiquidityHistory$,
     reloadSwapHistory,
     getDepthHistory$,
     reloadDepthHistory,
