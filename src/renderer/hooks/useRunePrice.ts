@@ -35,7 +35,8 @@ export const useRunePrice = () => {
                     amount: getValueOfRuneInAsset(ONE_RUNE_BASE_AMOUNT, poolData)
                   }
                 }),
-                (o) => RD.fromOption(o, () => Error('some error here'))
+                (oRunePrice) =>
+                  RD.fromOption(oRunePrice, () => Error('Could not get price for RUNE from selected price pool'))
               )
             )
           )
