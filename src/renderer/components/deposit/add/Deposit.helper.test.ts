@@ -143,21 +143,38 @@ describe('deposit/Deposit.helper', () => {
       }
     }
 
-    it('BTC.BTC amount less then 10k Sats should be rounded to 10k Sats', () => {
+    it(`UTXO assets' min amount should be over estimated with 10k Sats`, () => {
       const params = {
         fees: {
           asset: AssetBTC,
-          inFee: baseAmount(0, BTC_DECIMAL),
-          outFee: baseAmount(0, BTC_DECIMAL),
-          refundFee: baseAmount(0, BTC_DECIMAL)
+          inFee: assetToBase(assetAmount(0.0001, BTC_DECIMAL)),
+          outFee: assetToBase(assetAmount(0.0003, BTC_DECIMAL)),
+          refundFee: assetToBase(assetAmount(0.0003, BTC_DECIMAL))
         },
         asset: AssetBTC,
         assetDecimal: BTC_DECIMAL,
         poolsData
       }
 
+      // Prices
+      // All in BTC
+
+      // Formula (success):
+      // inboundFeeInBTC + outboundFeeInBTC
+      // 0.0001 + 0.0003 = 0.0004
+      //
+      // Formula (failure):
+      // inboundFeeInBTC + refundFeeInBTC
+      // 0.0001 + 0.0003 = 0.0004
+      //
+      // Formula (minValue):
+      // 1,5 * max(success, failure)
+      // 1,5 * max(0.0004, 0.0004) = 1,5 * 0.0004 = 0.0006
+      // AND as this is UTXO asset overestimate with 10k Satoshis => 0.0006 + 10k Satoshis = 0.0007
+
       const result = minAssetAmountToDepositMax1e8(params)
-      expect(eqBaseAmount.equals(result, baseAmount(10000, BTC_DECIMAL))).toBeTruthy()
+
+      expect(eqBaseAmount.equals(result, assetToBase(assetAmount(0.0007, BTC_DECIMAL)))).toBeTruthy()
     })
 
     it('deposit chain asset (BNB.BNB)', () => {
