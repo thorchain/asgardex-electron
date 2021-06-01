@@ -25,7 +25,7 @@ export const useRunePrice = () => {
         RxOp.map(([poolsState, oSelectedPricePoolAsset]) =>
           FP.pipe(
             poolsState,
-            RD.map(({ pricePools: oPricePools }) =>
+            RD.chain(({ pricePools: oPricePools }) =>
               FP.pipe(
                 sequenceTOption(oPricePools, oSelectedPricePoolAsset),
                 O.map(([pricePools, pricePoolAsset]) => {
@@ -34,7 +34,8 @@ export const useRunePrice = () => {
                     asset: pricePoolAsset,
                     amount: getValueOfRuneInAsset(ONE_RUNE_BASE_AMOUNT, poolData)
                   }
-                })
+                }),
+                (o) => RD.fromOption(o, () => Error('some error here'))
               )
             )
           )
