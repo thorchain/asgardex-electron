@@ -1,7 +1,9 @@
+import { BTC_DECIMAL } from '@xchainjs/xchain-bitcoin'
 import { ETH_DECIMAL } from '@xchainjs/xchain-ethereum'
 import {
   assetAmount,
   AssetBNB,
+  AssetBTC,
   AssetETH,
   AssetRuneNative,
   assetToBase,
@@ -533,6 +535,29 @@ describe('components/swap/utils', () => {
 
       const result = minAmountToSwapMax1e8(params)
       expect(eqBaseAmount.equals(result, assetToBase(assetAmount(30, inAssetDecimal)))).toBeTruthy()
+    })
+
+    it('BTC.BTC amount less then 10k Sats should be rounded to 10k Sats', () => {
+      const inAssetDecimal = BTC_DECIMAL
+      const params = {
+        swapFees: {
+          inFee: {
+            amount: assetToBase(assetAmount(0)),
+            asset: AssetBTC
+          },
+          outFee: {
+            amount: assetToBase(assetAmount(0)),
+            asset: AssetETH
+          }
+        },
+        inAsset: AssetBTC,
+        inAssetDecimal,
+        outAsset: AssetETH,
+        poolsData
+      }
+
+      const result = minAmountToSwapMax1e8(params)
+      expect(eqBaseAmount.equals(result, baseAmount(10000, inAssetDecimal))).toBeTruthy()
     })
   })
 })

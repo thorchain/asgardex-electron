@@ -1,7 +1,8 @@
 import * as RD from '@devexperts/remote-data-ts'
 import { PoolData } from '@thorchain/asgardex-util'
+import { BTC_DECIMAL } from '@xchainjs/xchain-bitcoin'
 import { ETH_DECIMAL } from '@xchainjs/xchain-ethereum'
-import { assetAmount, AssetBNB, AssetETH, assetToBase, baseAmount } from '@xchainjs/xchain-util'
+import { assetAmount, AssetBNB, AssetBTC, AssetETH, assetToBase, baseAmount } from '@xchainjs/xchain-util'
 import * as O from 'fp-ts/Option'
 
 import { AssetBUSD74E, AssetUSDTERC20 } from '../../../const'
@@ -141,6 +142,23 @@ describe('deposit/Deposit.helper', () => {
         runeBalance: assetToBase(assetAmount(100)) // 1 RUNE = 0.01 ETH
       }
     }
+
+    it('BTC.BTC amount less then 10k Sats should be rounded to 10k Sats', () => {
+      const params = {
+        fees: {
+          asset: AssetBTC,
+          inFee: baseAmount(0, BTC_DECIMAL),
+          outFee: baseAmount(0, BTC_DECIMAL),
+          refundFee: baseAmount(0, BTC_DECIMAL)
+        },
+        asset: AssetBTC,
+        assetDecimal: BTC_DECIMAL,
+        poolsData
+      }
+
+      const result = minAssetAmountToDepositMax1e8(params)
+      expect(eqBaseAmount.equals(result, baseAmount(10000, BTC_DECIMAL))).toBeTruthy()
+    })
 
     it('deposit chain asset (BNB.BNB)', () => {
       const params = {
