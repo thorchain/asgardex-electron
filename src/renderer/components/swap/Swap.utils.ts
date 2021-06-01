@@ -1,9 +1,10 @@
 import { getDoubleSwapOutput, getDoubleSwapSlip, getSwapOutput, getSwapSlip } from '@thorchain/asgardex-util'
-import { Asset, assetToString, bn, BaseAmount } from '@xchainjs/xchain-util'
+import { Asset, assetToString, bn, BaseAmount, baseAmount } from '@xchainjs/xchain-util'
 import BigNumber from 'bignumber.js'
 import * as A from 'fp-ts/Array'
-import * as FP from 'fp-ts/lib/function'
-import * as O from 'fp-ts/lib/Option'
+import * as E from 'fp-ts/Either'
+import * as FP from 'fp-ts/function'
+import * as O from 'fp-ts/Option'
 
 import { ZERO_BASE_AMOUNT, ZERO_BN } from '../../const'
 import {
@@ -219,14 +220,10 @@ export const minAmountToSwapMax1e8 = ({
     feeToCover.times,
     // transform decimal to be `max1e8`
     max1e8BaseAmount,
-    (amount) => {
-      // Add 10,000 Sats for BTC asset only for meaningful
-      // values to avoid data-blinking while data loading
-      if (isBtcAsset(inAsset) && amount.gt(0)) {
-        return amount.plus(10000)
-      }
-      return amount
-    }
+    // Filter as E.Left value all BTC values less then 10000 Sats
+    E.fromPredicate((amount) => !(isBtcAsset(inAsset) && amount.lt(10000)), FP.identity),
+    // Set 10k Sats min value all BTC values less then 10000 Sats
+    E.getOrElse((amount) => baseAmount(10000, amount.decimal))
   )
 }
 

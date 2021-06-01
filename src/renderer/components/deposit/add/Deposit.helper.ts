@@ -2,6 +2,7 @@ import * as RD from '@devexperts/remote-data-ts'
 import { PoolData } from '@thorchain/asgardex-util'
 import { Asset, baseAmount, BaseAmount } from '@xchainjs/xchain-util'
 import BigNumber from 'bignumber.js'
+import * as E from 'fp-ts/Either'
 import * as FP from 'fp-ts/function'
 import * as O from 'fp-ts/Option'
 
@@ -198,14 +199,10 @@ export const minAssetAmountToDepositMax1e8 = ({
     feeToCover.times,
     // transform decimal to be `max1e8`
     max1e8BaseAmount,
-    (amount) => {
-      // Add 10,000 Sats for BTC asset only for meaningful
-      // values to avoid data-blinking while data loading
-      if (isBtcAsset(asset) && amount.gt(0)) {
-        return amount.plus(10000)
-      }
-      return amount
-    }
+    // Filter as E.Left value all BTC values less then 10000 Sats
+    E.fromPredicate((amount) => !(isBtcAsset(asset) && amount.lt(10000)), FP.identity),
+    // Set 10k Sats min value all BTC values less then 10000 Sats
+    E.getOrElse((amount) => baseAmount(10000, amount.decimal))
   )
 }
 

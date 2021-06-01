@@ -245,6 +245,7 @@ export const SendFormBCH: React.FC<Props> = (props): JSX.Element => {
 
   const amountValidator = useCallback(
     async (_: unknown, value: BigNumber) => {
+      // Prevent all txs less then 10k Sats
       const min10KSats = baseToAsset(baseAmount(10000))
       // error messages
       const errors = {
