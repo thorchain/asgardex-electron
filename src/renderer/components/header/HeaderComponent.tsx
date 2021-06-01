@@ -1,5 +1,6 @@
 import React, { useMemo, useState, useCallback, useRef } from 'react'
 
+import { getValueOfRuneInAsset } from '@thorchain/asgardex-util'
 import { assetAmount, assetToBase } from '@xchainjs/xchain-util'
 import { Row, Col, Tabs, Grid } from 'antd'
 import * as FP from 'fp-ts/function'
@@ -9,11 +10,11 @@ import { useObservableState } from 'observable-hooks'
 import { useIntl } from 'react-intl'
 import { useRouteMatch, Link } from 'react-router-dom'
 import { useHistory } from 'react-router-dom'
-import { Observable } from 'rxjs'
 import { palette, size } from 'styled-theme'
 
 import { Network } from '../../../shared/api/types'
 import { Locale } from '../../../shared/i18n/types'
+import { ONE_RUNE_BASE_AMOUNT } from '../../../shared/mock/amount'
 import { ReactComponent as CloseIcon } from '../../assets/svg/icon-close.svg'
 import { ReactComponent as MenuIcon } from '../../assets/svg/icon-menu.svg'
 import { ReactComponent as SwapIcon } from '../../assets/svg/icon-swap.svg'
@@ -23,9 +24,10 @@ import { AssetBUSDBD1 } from '../../const'
 import { useThemeContext } from '../../contexts/ThemeContext'
 import * as poolsRoutes from '../../routes/pools'
 import * as walletRoutes from '../../routes/wallet'
-import { SelectedPricePoolAsset } from '../../services/midgard/types'
+import { SelectedPricePool, SelectedPricePoolAsset } from '../../services/midgard/types'
 import { KeystoreState } from '../../services/wallet/types'
 import { isLocked } from '../../services/wallet/util'
+import { AssetWithAmount } from '../../types/asgardex'
 import { PricePoolAsset, PricePoolAssets, PricePools } from '../../views/pools/Pools.types'
 import { HeaderContainer, TabLink, HeaderDrawer, HeaderDrawerItem } from './HeaderComponent.style'
 import { HeaderLang } from './lang'
@@ -55,7 +57,8 @@ type Props = {
   lockHandler: FP.Lazy<void>
   setSelectedPricePool: (asset: PricePoolAsset) => void
   pricePools: O.Option<PricePools>
-  selectedPricePoolAsset$: Observable<SelectedPricePoolAsset>
+  selectedPricePoolAsset: SelectedPricePoolAsset
+  selectedPricePool: SelectedPricePool
   locale: Locale
   changeLocale?: (locale: Locale) => void
   selectedNetwork: Network
@@ -71,7 +74,8 @@ export const HeaderComponent: React.FC<Props> = (props): JSX.Element => {
   const {
     keystore,
     pricePools: oPricePools,
-    selectedPricePoolAsset$,
+    selectedPricePool,
+    selectedPricePoolAsset: oSelectedPricePoolAsset,
     lockHandler,
     setSelectedPricePool,
     locale,
@@ -92,8 +96,6 @@ export const HeaderComponent: React.FC<Props> = (props): JSX.Element => {
   const { theme$ } = useThemeContext()
   const theme = useObservableState(theme$)
 
-  const selectedPricePoolAsset = useObservableState<SelectedPricePoolAsset>(selectedPricePoolAsset$, O.none)
-
   // store previous data to render it while reloading new data
   const prevPricePoolAssets = useRef<PricePoolAssets>()
 
@@ -110,6 +112,18 @@ export const HeaderComponent: React.FC<Props> = (props): JSX.Element => {
   }, [oPricePools])
 
   const hasPricePools = useMemo(() => pricePoolAssets.length > 0, [pricePoolAssets])
+
+  const oRunePrice: O.Option<AssetWithAmount> = useMemo(
+    () =>
+      FP.pipe(
+        oSelectedPricePoolAsset,
+        O.map((pricePoolAsset) => ({
+          asset: pricePoolAsset,
+          amount: getValueOfRuneInAsset(ONE_RUNE_BASE_AMOUNT, selectedPricePool.poolData)
+        }))
+      ),
+    [oSelectedPricePoolAsset, selectedPricePool.poolData]
+  )
 
   const [menuVisible, setMenuVisible] = useState(false)
 
@@ -218,12 +232,12 @@ export const HeaderComponent: React.FC<Props> = (props): JSX.Element => {
       <HeaderPriceSelector
         disabled={!hasPricePools}
         isDesktopView={isDesktopView}
-        selectedAsset={selectedPricePoolAsset}
+        selectedAsset={oSelectedPricePoolAsset}
         assets={pricePoolAssets}
         changeHandler={currencyChangeHandler}
       />
     ),
-    [hasPricePools, isDesktopView, selectedPricePoolAsset, pricePoolAssets, currencyChangeHandler]
+    [hasPricePools, isDesktopView, oSelectedPricePoolAsset, pricePoolAssets, currencyChangeHandler]
   )
 
   const renderHeaderLock = useMemo(
@@ -305,7 +319,7 @@ export const HeaderComponent: React.FC<Props> = (props): JSX.Element => {
                   <HeaderTheme isDesktopView={isDesktopView} />
                   {isLargeDesktopView && (
                     <HeaderStats
-                      runePrice={assetAmount(14.08)}
+                      runePrice={oRunePrice}
                       volume24={{
                         asset: AssetBUSDBD1,
                         amount: assetToBase(assetAmount('24000000'))

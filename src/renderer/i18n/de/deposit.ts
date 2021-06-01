@@ -35,7 +35,6 @@ const deposit: DepositMessages = {
   'deposit.poolDetails.allTimeVal': 'Gesamtzeit Volumen',
   'deposit.poolDetails.totalSwaps': 'Gesamtanzahl Swaps',
   'deposit.poolDetails.totalUsers': 'Gesamtanzahl User',
-  'deposit.poolDetails.volume24': 'Volumen (24h)',
   'deposit.poolDetails.volumeTotal': 'Volumen (Gesamt)',
   'deposit.poolDetails.earnings': 'Einnahmen',
   'deposit.poolDetails.ilpPaid': 'ILP Zahlungen',

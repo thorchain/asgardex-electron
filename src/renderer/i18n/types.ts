@@ -37,6 +37,7 @@ export type CommonMessageKey =
   | 'common.asset'
   | 'common.assets'
   | 'common.price'
+  | 'common.price.rune'
   | 'common.transaction'
   | 'common.viewTransaction'
   | 'common.fee'
@@ -82,6 +83,7 @@ export type CommonMessageKey =
   | 'common.time.all'
   | 'common.theme.light'
   | 'common.theme.dark'
+  | 'common.volume24'
 
 export type CommonMessages = {
   [key in CommonMessageKey]: string
@@ -293,7 +295,6 @@ type DepositMessageKey =
   | 'deposit.poolDetails.allTimeVal'
   | 'deposit.poolDetails.totalSwaps'
   | 'deposit.poolDetails.totalUsers'
-  | 'deposit.poolDetails.volume24'
   | 'deposit.poolDetails.volumeTotal'
   | 'deposit.poolDetails.earnings'
   | 'deposit.poolDetails.ilpPaid'
