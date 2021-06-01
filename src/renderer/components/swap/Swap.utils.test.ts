@@ -1,7 +1,9 @@
+import { BTC_DECIMAL } from '@xchainjs/xchain-bitcoin'
 import { ETH_DECIMAL } from '@xchainjs/xchain-ethereum'
 import {
   assetAmount,
   AssetBNB,
+  AssetBTC,
   AssetETH,
   AssetRuneNative,
   assetToBase,
@@ -336,6 +338,10 @@ describe('components/swap/utils', () => {
       'ETH.ETH': {
         assetBalance: assetToBase(assetAmount(1)), // 1 ETH = 100 RUNE (2000 USD)
         runeBalance: assetToBase(assetAmount(100)) // 1 RUNE = 0.01 ETH
+      },
+      'BTC.BTC': {
+        assetBalance: assetToBase(assetAmount(1)), // 1 BTC = 100 RUNE (2000 USD)
+        runeBalance: assetToBase(assetAmount(100)) // 1 RUNE = 0.01 BTC
       }
     }
 
@@ -533,6 +539,44 @@ describe('components/swap/utils', () => {
 
       const result = minAmountToSwapMax1e8(params)
       expect(eqBaseAmount.equals(result, assetToBase(assetAmount(30, inAssetDecimal)))).toBeTruthy()
+    })
+
+    it(`UTXO assets' min amount should be over estimated with 10k Sats`, () => {
+      const inAssetDecimal = BTC_DECIMAL
+      const params = {
+        swapFees: {
+          inFee: {
+            amount: assetToBase(assetAmount(0.0001)),
+            asset: AssetBTC
+          },
+          outFee: {
+            amount: assetToBase(assetAmount(0.01)),
+            asset: AssetETH
+          }
+        },
+        inAsset: AssetBTC,
+        inAssetDecimal,
+        outAsset: AssetETH,
+        poolsData
+      }
+      // Prices
+      // 1 ETH = 1 BTC or 1 BTC = 1 ETH
+      //
+      // Formula (success):
+      // inboundFeeInBTC + outboundFeeInBTC
+      // 0.0001 + (0.01 * 1) = 0.0001 + 1 = 0.0101
+      //
+      // Formula (failure):
+      // inboundFeeInBTC + refundFeeInBTC
+      // 0.0001 + (0.0003 * 1) = 0.0001 + 0.0003 = 0.0004
+      //
+      // Formula (minValue):
+      // 1,5 * max(success, failure)
+      // 1,5 * max(0.0101, 0.0004) = 1,5 * 0.0101 = 0.01515
+      // AND as this is UTXO asset overestimate with 10k Satoshis => 0.01515 + 10k Satoshis = 0.01525
+
+      const result = minAmountToSwapMax1e8(params)
+      expect(eqBaseAmount.equals(result, assetToBase(assetAmount(0.01525, inAssetDecimal)))).toBeTruthy()
     })
   })
 })

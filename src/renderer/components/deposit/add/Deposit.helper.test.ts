@@ -1,7 +1,8 @@
 import * as RD from '@devexperts/remote-data-ts'
 import { PoolData } from '@thorchain/asgardex-util'
+import { BTC_DECIMAL } from '@xchainjs/xchain-bitcoin'
 import { ETH_DECIMAL } from '@xchainjs/xchain-ethereum'
-import { assetAmount, AssetBNB, AssetETH, assetToBase, baseAmount } from '@xchainjs/xchain-util'
+import { assetAmount, AssetBNB, AssetBTC, AssetETH, assetToBase, baseAmount } from '@xchainjs/xchain-util'
 import * as O from 'fp-ts/Option'
 
 import { AssetBUSD74E, AssetUSDTERC20 } from '../../../const'
@@ -141,6 +142,40 @@ describe('deposit/Deposit.helper', () => {
         runeBalance: assetToBase(assetAmount(100)) // 1 RUNE = 0.01 ETH
       }
     }
+
+    it(`UTXO assets' min amount should be over estimated with 10k Sats`, () => {
+      const params = {
+        fees: {
+          asset: AssetBTC,
+          inFee: assetToBase(assetAmount(0.0001, BTC_DECIMAL)),
+          outFee: assetToBase(assetAmount(0.0003, BTC_DECIMAL)),
+          refundFee: assetToBase(assetAmount(0.0003, BTC_DECIMAL))
+        },
+        asset: AssetBTC,
+        assetDecimal: BTC_DECIMAL,
+        poolsData
+      }
+
+      // Prices
+      // All in BTC
+
+      // Formula (success):
+      // inboundFeeInBTC + outboundFeeInBTC
+      // 0.0001 + 0.0003 = 0.0004
+      //
+      // Formula (failure):
+      // inboundFeeInBTC + refundFeeInBTC
+      // 0.0001 + 0.0003 = 0.0004
+      //
+      // Formula (minValue):
+      // 1,5 * max(success, failure)
+      // 1,5 * max(0.0004, 0.0004) = 1,5 * 0.0004 = 0.0006
+      // AND as this is UTXO asset overestimate with 10k Satoshis => 0.0006 + 10k Satoshis = 0.0007
+
+      const result = minAssetAmountToDepositMax1e8(params)
+
+      expect(eqBaseAmount.equals(result, assetToBase(assetAmount(0.0007, BTC_DECIMAL)))).toBeTruthy()
+    })
 
     it('deposit chain asset (BNB.BNB)', () => {
       const params = {

@@ -2,11 +2,18 @@ import { getDoubleSwapOutput, getDoubleSwapSlip, getSwapOutput, getSwapSlip } fr
 import { Asset, assetToString, bn, BaseAmount } from '@xchainjs/xchain-util'
 import BigNumber from 'bignumber.js'
 import * as A from 'fp-ts/Array'
-import * as FP from 'fp-ts/lib/function'
-import * as O from 'fp-ts/lib/Option'
+import * as E from 'fp-ts/Either'
+import * as FP from 'fp-ts/function'
+import * as O from 'fp-ts/Option'
 
 import { ZERO_BASE_AMOUNT, ZERO_BN } from '../../const'
-import { isChainAsset, isRuneNativeAsset, max1e8BaseAmount, to1e8BaseAmount } from '../../helpers/assetHelper'
+import {
+  isChainAsset,
+  isRuneNativeAsset,
+  isUtxoAssetChain,
+  max1e8BaseAmount,
+  to1e8BaseAmount
+} from '../../helpers/assetHelper'
 import { eqAsset } from '../../helpers/fp/eq'
 import { sequenceTOption } from '../../helpers/fpHelpers'
 import { priceFeeAmountForAsset } from '../../services/chain/fees/utils'
@@ -212,7 +219,12 @@ export const minAmountToSwapMax1e8 = ({
     1.5,
     feeToCover.times,
     // transform decimal to be `max1e8`
-    max1e8BaseAmount
+    max1e8BaseAmount,
+    // Zero amount is possible only in case there is not fees information loaded.
+    // Just to avoid blinking min value filter out zero min amounts too.
+    E.fromPredicate((amount) => amount.eq(0) || !isUtxoAssetChain(inAsset), FP.identity),
+    // increase min value by 10k satoshi (for meaningful UTXO assets' only)
+    E.getOrElse((amount) => amount.plus(10000))
   )
 }
 

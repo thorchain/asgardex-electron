@@ -8,7 +8,15 @@ import {
   AssetLTC,
   Chain,
   isChain,
-  AssetBCH
+  AssetBCH,
+  BCHChain,
+  ETHChain,
+  BNBChain,
+  THORChain,
+  BTCChain,
+  CosmosChain,
+  LTCChain,
+  PolkadotChain
 } from '@xchainjs/xchain-util'
 
 import { ENABLED_CHAINS } from '../services/const'
@@ -17,21 +25,21 @@ import { eqChain } from './fp/eq'
 
 export const getChainAsset = (chain: Chain): Asset => {
   switch (chain) {
-    case 'BNB':
+    case BNBChain:
       return AssetBNB
-    case 'BTC':
+    case BTCChain:
       return AssetBTC
-    case 'ETH':
+    case ETHChain:
       return AssetETH
-    case 'THOR':
+    case THORChain:
       return AssetRuneNative
-    case 'GAIA':
+    case CosmosChain:
       return AssetAtom
-    case 'BCH':
+    case BCHChain:
       return AssetBCH
-    case 'LTC':
+    case LTCChain:
       return AssetLTC
-    case 'POLKA':
+    case PolkadotChain:
       throw Error('Polkadot is not supported yet')
   }
 }
@@ -39,22 +47,32 @@ export const getChainAsset = (chain: Chain): Asset => {
 /**
  * Check whether chain is BTC chain
  */
-export const isBtcChain = (chain: Chain): boolean => eqChain.equals(chain, 'BTC')
+export const isBtcChain = (chain: Chain): boolean => eqChain.equals(chain, BTCChain)
+
+/**
+ * Check whether chain is LTC chain
+ */
+export const isLtchain = (chain: Chain): boolean => eqChain.equals(chain, LTCChain)
 
 /**
  * Check whether chain is THOR chain
  */
-export const isThorChain = (chain: Chain): boolean => eqChain.equals(chain, 'THOR')
+export const isThorChain = (chain: Chain): boolean => eqChain.equals(chain, THORChain)
 
 /**
  * Check whether chain is BNB chain
  */
-export const isBnbChain = (chain: Chain): boolean => eqChain.equals(chain, 'BNB')
+export const isBnbChain = (chain: Chain): boolean => eqChain.equals(chain, BNBChain)
 
 /**
  * Check whether chain is ETH chain
  */
-export const isEthChain = (chain: Chain): boolean => eqChain.equals(chain, 'ETH')
+export const isEthChain = (chain: Chain): boolean => eqChain.equals(chain, ETHChain)
+
+/**
+ * Check whether chain is BCH chain
+ */
+export const isBchChain = (chain: Chain): boolean => eqChain.equals(chain, BCHChain)
 
 export const isEnabledChain = (chain: Chain) => ENABLED_CHAINS.includes(chain)
 

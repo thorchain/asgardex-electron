@@ -2,12 +2,14 @@ import * as RD from '@devexperts/remote-data-ts'
 import { PoolData } from '@thorchain/asgardex-util'
 import { Asset, baseAmount, BaseAmount } from '@xchainjs/xchain-util'
 import BigNumber from 'bignumber.js'
+import * as E from 'fp-ts/Either'
 import * as FP from 'fp-ts/function'
 import * as O from 'fp-ts/Option'
 
 import {
   convertBaseAmountDecimal,
   isChainAsset,
+  isUtxoAssetChain,
   max1e8BaseAmount,
   THORCHAIN_DECIMAL,
   to1e8BaseAmount
@@ -196,7 +198,12 @@ export const minAssetAmountToDepositMax1e8 = ({
     1.5,
     feeToCover.times,
     // transform decimal to be `max1e8`
-    max1e8BaseAmount
+    max1e8BaseAmount,
+    // Zero amount is possible only in case there is not fees information loaded.
+    // Just to avoid blinking min value filter out zero min amounts too.
+    E.fromPredicate((amount) => amount.eq(0) || !isUtxoAssetChain(asset), FP.identity),
+    // increase min value by 10k satoshi (for meaningful UTXO assets' only)
+    E.getOrElse((amount) => amount.plus(10000))
   )
 }
 
