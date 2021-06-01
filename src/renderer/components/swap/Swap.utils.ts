@@ -1,5 +1,5 @@
 import { getDoubleSwapOutput, getDoubleSwapSlip, getSwapOutput, getSwapSlip } from '@thorchain/asgardex-util'
-import { Asset, assetToString, bn, BaseAmount, baseAmount } from '@xchainjs/xchain-util'
+import { Asset, assetToString, bn, BaseAmount } from '@xchainjs/xchain-util'
 import BigNumber from 'bignumber.js'
 import * as A from 'fp-ts/Array'
 import * as E from 'fp-ts/Either'
@@ -10,7 +10,7 @@ import { ZERO_BASE_AMOUNT, ZERO_BN } from '../../const'
 import {
   isChainAsset,
   isRuneNativeAsset,
-  isUTXOSChainAsset,
+  isUtxoAssetChain,
   max1e8BaseAmount,
   to1e8BaseAmount
 } from '../../helpers/assetHelper'
@@ -220,10 +220,11 @@ export const minAmountToSwapMax1e8 = ({
     feeToCover.times,
     // transform decimal to be `max1e8`
     max1e8BaseAmount,
-    // Filter as E.Left value all BTC values less then 10000 Sats
-    E.fromPredicate((amount) => !(isUTXOSChainAsset(inAsset) && amount.lt(10000)), FP.identity),
-    // Set 10k Sats min value all BTC values less then 10000 Sats
-    E.getOrElse((amount) => baseAmount(10000, amount.decimal))
+    // Zero amount is possible only in case there is not fees information loaded.
+    // Just to avoid blinking min value filter out zero min amounts too.
+    E.fromPredicate((amont) => amont.eq(0) || !isUtxoAssetChain(inAsset), FP.identity),
+    // increase min value for meaningful UTXO assets' value
+    E.getOrElse((amount) => amount.plus(10000))
   )
 }
 

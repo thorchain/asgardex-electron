@@ -27,7 +27,7 @@ import { Network } from '../../shared/api/types'
 import { AssetRuneEthERC20, DEFAULT_PRICE_ASSETS, USD_PRICE_ASSETS } from '../const'
 import { PricePoolAsset } from '../views/pools/Pools.types'
 import { getEthChecksumAddress } from './addressHelper'
-import { getChainAsset, isBchChain, isBtcChain, isEthChain } from './chainHelper'
+import { getChainAsset, isBchChain, isBtcChain, isEthChain, isLtchain } from './chainHelper'
 import { eqAsset } from './fp/eq'
 
 /**
@@ -122,7 +122,7 @@ export const isChainAsset = (asset: Asset): boolean => eqAsset.equals(asset, get
 
 export const isUSDAsset = (asset: Asset): boolean => asset.ticker.includes('USD')
 
-export const isUTXOSChainAsset = ({ chain }: Asset) => isBtcChain(chain) || isBchChain(chain)
+export const isUtxoAssetChain = ({ chain }: Asset) => isBtcChain(chain) || isBchChain(chain) || isLtchain(chain)
 
 /**
  * Update ETH token (ERC20) addresses to be based on checksum addresses

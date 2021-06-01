@@ -9,7 +9,7 @@ import * as O from 'fp-ts/Option'
 import {
   convertBaseAmountDecimal,
   isChainAsset,
-  isUTXOSChainAsset,
+  isUtxoAssetChain,
   max1e8BaseAmount,
   THORCHAIN_DECIMAL,
   to1e8BaseAmount
@@ -199,10 +199,11 @@ export const minAssetAmountToDepositMax1e8 = ({
     feeToCover.times,
     // transform decimal to be `max1e8`
     max1e8BaseAmount,
-    // Filter as E.Left value all BTC values less then 10000 Sats
-    E.fromPredicate((amount) => !(isUTXOSChainAsset(asset) && amount.lt(10000)), FP.identity),
-    // Set 10k Sats min value all BTC values less then 10000 Sats
-    E.getOrElse((amount) => baseAmount(10000, amount.decimal))
+    // Zero amount is possible only in case there is not fees information loaded.
+    // Just to avoid blinking min value filter out zero min amounts too.
+    E.fromPredicate((amont) => amont.eq(0) || !isUtxoAssetChain(asset), FP.identity),
+    // increase min value for meaningful UTXO assets' value
+    E.getOrElse((amount) => amount.plus(10000))
   )
 }
 
