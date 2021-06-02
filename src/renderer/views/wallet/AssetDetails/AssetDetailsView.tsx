@@ -1,6 +1,5 @@
 import React, { useEffect, useMemo } from 'react'
 
-import * as RD from '@devexperts/remote-data-ts'
 import { Address } from '@xchainjs/xchain-client'
 import { Asset, assetFromString } from '@xchainjs/xchain-util'
 import * as FP from 'fp-ts/function'
@@ -10,16 +9,16 @@ import { useObservableState } from 'observable-hooks'
 import { useIntl } from 'react-intl'
 import { useParams } from 'react-router-dom'
 
-import { Network } from '../../../shared/api/types'
-import { ErrorView } from '../../components/shared/error'
-import { BackLink } from '../../components/uielements/backLink'
-import { AssetDetails } from '../../components/wallet/assets'
-import { useAppContext } from '../../contexts/AppContext'
-import { useWalletContext } from '../../contexts/WalletContext'
-import { sequenceTOption } from '../../helpers/fpHelpers'
-import { AssetDetailsParams } from '../../routes/wallet'
-import { DEFAULT_NETWORK } from '../../services/const'
-import { INITIAL_BALANCES_STATE } from '../../services/wallet/const'
+import { Network } from '../../../../shared/api/types'
+import { ErrorView } from '../../../components/shared/error'
+import { BackLink } from '../../../components/uielements/backLink'
+import { useAppContext } from '../../../contexts/AppContext'
+import { useWalletContext } from '../../../contexts/WalletContext'
+import { sequenceTOption } from '../../../helpers/fpHelpers'
+import { AssetDetailsParams } from '../../../routes/wallet'
+import { DEFAULT_NETWORK } from '../../../services/const'
+import { INITIAL_BALANCES_STATE } from '../../../services/wallet/const'
+import { AssetDetailsExternalHistoryView } from './AssetDetailsExternalHistoryView'
 
 export const AssetDetailsView: React.FC = (): JSX.Element => {
   const intl = useIntl()
@@ -41,18 +40,11 @@ export const AssetDetailsView: React.FC = (): JSX.Element => {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => setSelectedAsset(oRouteAsset), [])
 
-  const { getTxs$, balancesState$, loadTxs, reloadBalancesByChain, setSelectedAsset, getExplorerTxUrl$, resetTxsPage } =
-    useWalletContext()
+  const { balancesState$, reloadBalancesByChain, setSelectedAsset, getExplorerTxUrl$ } = useWalletContext()
 
-  const [txsRD] = useObservableState(() => getTxs$(oWalletAddress), RD.initial)
   const { balances: oBalances } = useObservableState(balancesState$, INITIAL_BALANCES_STATE)
 
   const getExplorerTxUrl = useObservableState(getExplorerTxUrl$, O.none)
-
-  useEffect(() => {
-    return () => resetTxsPage()
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
 
   /**
    * Need to filter balances only for appropriate wallet
@@ -98,11 +90,9 @@ export const AssetDetailsView: React.FC = (): JSX.Element => {
         O.fold(
           () => renderAssetError,
           (asset) => (
-            <AssetDetails
-              txsPageRD={txsRD}
+            <AssetDetailsExternalHistoryView
               balances={walletBalances}
               asset={asset}
-              loadTxsHandler={loadTxs}
               reloadBalancesHandler={reloadBalancesByChain(asset.chain)}
               getExplorerTxUrl={getExplorerTxUrl}
               walletAddress={oWalletAddress}
