@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo } from 'react'
+import React, { useCallback, useEffect, useMemo, useState } from 'react'
 
 import { Address } from '@xchainjs/xchain-client'
 import { Asset, assetFromString } from '@xchainjs/xchain-util'
@@ -19,11 +19,14 @@ import { AssetDetailsParams } from '../../../routes/wallet'
 import { DEFAULT_NETWORK } from '../../../services/const'
 import { INITIAL_BALANCES_STATE } from '../../../services/wallet/const'
 import { AssetDetailsExternalHistoryView } from './AssetDetailsExternalHistoryView'
+import { AssetDetailsInternalHistoryView } from './AssetDetailsInternalHistoryView'
 
 export const AssetDetailsView: React.FC = (): JSX.Element => {
   const intl = useIntl()
 
   const { asset: routeAsset, walletAddress } = useParams<AssetDetailsParams>()
+
+  const [historyType, _setHistoryType] = useState<'external' | 'internal'>('external')
 
   const oRouteAsset: O.Option<Asset> = useMemo(() => O.fromNullable(assetFromString(routeAsset)), [routeAsset])
   const oWalletAddress = useMemo(
@@ -83,6 +86,23 @@ export const AssetDetailsView: React.FC = (): JSX.Element => {
     [routeAsset, intl]
   )
 
+  const renderHistoryExtraContent = useCallback((_asset: Asset) => {
+    return null
+    // if (isRuneNativeAsset(asset) || isEthAsset(asset)) {
+    //   return (
+    //     <>
+    //       <button onClick={() => setHistoryType('external')}>set external</button>
+    //       <button onClick={() => setHistoryType('internal')}>set internal</button>
+    //     </>
+    //   )
+    // }
+  }, [])
+
+  const RenderView = useMemo(
+    () => (historyType === 'external' ? AssetDetailsExternalHistoryView : AssetDetailsInternalHistoryView),
+    [historyType]
+  )
+
   return (
     <>
       {FP.pipe(
@@ -90,7 +110,8 @@ export const AssetDetailsView: React.FC = (): JSX.Element => {
         O.fold(
           () => renderAssetError,
           (asset) => (
-            <AssetDetailsExternalHistoryView
+            <RenderView
+              historyExtraContent={renderHistoryExtraContent(asset)}
               balances={walletBalances}
               asset={asset}
               reloadBalancesHandler={reloadBalancesByChain(asset.chain)}

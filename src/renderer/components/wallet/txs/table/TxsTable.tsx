@@ -26,6 +26,7 @@ type Props = {
   network: Network
   chain: Chain
   walletAddress?: O.Option<Address>
+  historyExtraContent?: React.ReactNode
 }
 
 export const TxsTable: React.FC<Props> = (props): JSX.Element => {
@@ -35,7 +36,8 @@ export const TxsTable: React.FC<Props> = (props): JSX.Element => {
     changePaginationHandler,
     network,
     chain,
-    walletAddress: oWalletAddres = O.none
+    walletAddress: oWalletAddres = O.none,
+    historyExtraContent
   } = props
   const intl = useIntl()
   const isDesktopView = Grid.useBreakpoint()?.lg ?? false
@@ -231,6 +233,7 @@ export const TxsTable: React.FC<Props> = (props): JSX.Element => {
       const columns = isDesktopView ? desktopColumns : mobileColumns
       return (
         <>
+          {historyExtraContent}
           <Styled.Table columns={columns} dataSource={txs} loading={loading} rowKey="hash" />
           {total > 0 && (
             <Pagination
@@ -244,7 +247,7 @@ export const TxsTable: React.FC<Props> = (props): JSX.Element => {
         </>
       )
     },
-    [desktopColumns, isDesktopView, mobileColumns, changePaginationHandler]
+    [desktopColumns, isDesktopView, mobileColumns, changePaginationHandler, historyExtraContent]
   )
 
   const emptyTableData = useMemo((): TxsPage => ({ total: 0, txs: [] as Txs }), [])

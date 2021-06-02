@@ -14,4 +14,5 @@ export type CommonAssetDetailsProps = {
   reloadBalancesHandler?: FP.Lazy<void>
   walletAddress: O.Option<Address>
   network: Network
+  historyExtraContent?: React.ReactNode
 }

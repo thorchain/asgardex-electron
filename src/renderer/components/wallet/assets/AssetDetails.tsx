@@ -34,6 +34,7 @@ type Props = {
   loadTxsHandler?: LoadTxsHandler
   walletAddress?: O.Option<Address>
   network: Network
+  historyExtraContent?: React.ReactNode
 }
 
 export const AssetDetails: React.FC<Props> = (props): JSX.Element => {
@@ -45,7 +46,8 @@ export const AssetDetails: React.FC<Props> = (props): JSX.Element => {
     loadTxsHandler = EMPTY_LOAD_TXS_HANDLER,
     getExplorerTxUrl: oGetExplorerTxUrl = O.none,
     walletAddress: oWalletAddress = O.none,
-    network
+    network,
+    historyExtraContent
   } = props
 
   const [currentPage, setCurrentPage] = useState(1)
@@ -219,6 +221,7 @@ export const AssetDetails: React.FC<Props> = (props): JSX.Element => {
         </Col>
         <Col span={24}>
           <TxsTable
+            historyExtraContent={historyExtraContent}
             txsPageRD={txsPageRD}
             clickTxLinkHandler={clickTxLinkHandler}
             changePaginationHandler={onChangePagination}

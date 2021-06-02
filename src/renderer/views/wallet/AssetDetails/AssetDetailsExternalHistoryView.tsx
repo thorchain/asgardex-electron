@@ -15,7 +15,8 @@ import { CommonAssetDetailsProps } from './types'
 export const AssetDetailsExternalHistoryView: React.FC<CommonAssetDetailsProps> = ({
   walletAddress: oWalletAddress,
   network,
-  asset
+  asset,
+  historyExtraContent
 }) => {
   const { getTxs$, balancesState$, loadTxs, reloadBalancesByChain, getExplorerTxUrl$, resetTxsPage } =
     useWalletContext()
@@ -49,6 +50,7 @@ export const AssetDetailsExternalHistoryView: React.FC<CommonAssetDetailsProps> 
 
   return (
     <AssetDetails
+      historyExtraContent={historyExtraContent}
       txsPageRD={txsRD}
       balances={walletBalances}
       asset={asset}
