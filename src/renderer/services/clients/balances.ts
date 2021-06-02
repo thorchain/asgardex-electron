@@ -25,18 +25,21 @@ const loadBalances$ = ({
   client,
   address,
   walletType = 'keystore',
-  assets
+  assets,
+  /* TODO (@asgdx-team) Check if we still can use `0` as default by introducing HD wallets in the future */
+  walletIndex = 0
 }: {
   client: XChainClient
   walletType?: WalletType
   address?: Address
   assets?: Asset[]
+  walletIndex?: number
 }): WalletBalancesLD =>
   FP.pipe(
     address,
     O.fromNullable,
     // Try to use client address, if parameter `address` is undefined
-    O.alt(() => O.tryCatch(() => client.getAddress())),
+    O.alt(() => O.tryCatch(() => client.getAddress(walletIndex))),
     O.fold(
       // TODO (@Veado) i18n
       () => Rx.of(RD.failure<ApiError>({ errorId: ErrorId.GET_BALANCES, msg: 'Could not get address' })),
