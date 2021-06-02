@@ -4275,10 +4275,10 @@
     hdkey "^2.0.1"
     uuid "^8.1.0"
 
-"@xchainjs/xchain-ethereum@^0.21.1":
-  version "0.21.1"
-  resolved "https://registry.yarnpkg.com/@xchainjs/xchain-ethereum/-/xchain-ethereum-0.21.1.tgz#1fe571c76b0098f39190d1325007803402e369a5"
-  integrity sha512-lZ1wIhq01L+OILy7JmN95ob+IROdwFnUWhS6CSeX4qt0AxvdKc9abiCUNsf9knrkR/XL/ppxMsSLvNEfr3XmWA==
+"@xchainjs/xchain-ethereum@^0.21.2":
+  version "0.21.2"
+  resolved "https://registry.yarnpkg.com/@xchainjs/xchain-ethereum/-/xchain-ethereum-0.21.2.tgz#2e692cc0f6e9211dfe309fc27688665a52f1c1f7"
+  integrity sha512-pF7Xz+CUHQ1OgOENBHiK32U1coEJEkxKcsmya3AQhmNmSkV/XmExGjOM64wkb0WVGz1iSqsnysAf7J4IKMn4Qg==
 
 "@xchainjs/xchain-litecoin@^0.6.4":
   version "0.6.4"
