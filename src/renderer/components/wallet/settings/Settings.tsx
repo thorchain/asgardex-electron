@@ -316,7 +316,7 @@ export const Settings: React.FC<Props> = (props): JSX.Element => {
                     typevalue="outline"
                     round="true"
                     onClick={() => setShowRemoveWalletModal(true)}>
-                    {intl.formatMessage({ id: 'wallet.action.remove' })}
+                    {intl.formatMessage({ id: 'wallet.remove.label' })}
                   </Styled.Button>
                 </Styled.OptionCard>
               </Styled.WalletCol>

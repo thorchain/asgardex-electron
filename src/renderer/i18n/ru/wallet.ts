@@ -10,10 +10,7 @@ const wallet: WalletMessages = {
   'wallet.action.send': 'Отправить',
   'wallet.action.upgrade': 'Обновить',
   'wallet.action.receive': 'Получить {asset}',
-  'wallet.action.remove': 'Удалить кошелек',
-  'wallet.action.remove.title': 'Are you sure you want to remove your wallet? - RU',
-  'wallet.action.remove.description':
-    'You cannot undo this action and will have to re-create your wallet from your seed phrase. - RU',
+  'wallet.action.remove': 'Remove - RU',
   'wallet.action.unlock': 'Разблокировать',
   'wallet.action.import': 'Импортировать',
   'wallet.action.create': 'Создать',
@@ -50,6 +47,10 @@ const wallet: WalletMessages = {
   'wallet.create.error': 'Ошибка при сохранении фрразы',
   'wallet.receive.address.error': 'Нет доступных адресов для получения',
   'wallet.receive.address.errorQR': 'Ошибка при создании QR-кода: {error}',
+  'wallet.remove.label': 'Удалить кошелек',
+  'wallet.remove.label.title': 'Вы уверены, что хотите удалить кошелек?',
+  'wallet.remove.label.description':
+    'Вы не сможете отменить это действие и вам нужно будет пересоздать кошелек посредством секретной фразы',
   'wallet.send.success': 'Тразакция завершена',
   'wallet.send.fastest': 'Быстро',
   'wallet.send.fast': 'Быстро',

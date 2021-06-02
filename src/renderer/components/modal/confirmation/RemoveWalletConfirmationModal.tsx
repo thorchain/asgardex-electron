@@ -18,11 +18,13 @@ export const RemoveWalletConfirmationModal: React.FC<Props> = ({ visible, onClos
       visible={visible}
       onClose={onClose}
       onSuccess={onSuccess}
+      title={intl.formatMessage({ id: 'wallet.remove.label' })}
+      okText={intl.formatMessage({ id: 'wallet.action.remove' })}
       message={
         <Styled.Content>
-          <Styled.TitleText>{intl.formatMessage({ id: 'wallet.action.remove.title' })}</Styled.TitleText>
+          <Styled.TitleText>{intl.formatMessage({ id: 'wallet.remove.label.title' })}</Styled.TitleText>
           <Styled.DescriptionText>
-            {intl.formatMessage({ id: 'wallet.action.remove.description' })}
+            {intl.formatMessage({ id: 'wallet.remove.label.description' })}
           </Styled.DescriptionText>
         </Styled.Content>
       }

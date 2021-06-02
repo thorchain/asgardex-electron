@@ -146,7 +146,7 @@ export const UnlockForm: React.FC<Props> = (props): JSX.Element => {
                 typevalue="outline"
                 round="true"
                 onClick={showRemoveConfirm}>
-                {intl.formatMessage({ id: 'wallet.action.remove' })}
+                {intl.formatMessage({ id: 'wallet.remove.label' })}
               </Styled.Button>
               <Styled.Button round="true" size="large" type="primary" block htmlType="submit" disabled={!validPassword}>
                 {intl.formatMessage({ id: 'wallet.action.unlock' })}

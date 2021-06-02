@@ -9,6 +9,8 @@ type Props = {
   visible: boolean
   onSuccess: FP.Lazy<void>
   onClose: FP.Lazy<void>
+  title?: string
+  okText?: string
   message: React.ReactNode
   className?: string
 }
@@ -17,6 +19,8 @@ export const ConfirmationModal: React.FC<Props> = ({
   visible,
   onSuccess: onSuccessProp,
   onClose,
+  title,
+  okText,
   message,
   className
 }) => {
@@ -28,13 +32,13 @@ export const ConfirmationModal: React.FC<Props> = ({
   return (
     <Styled.Modal
       className={className}
-      title={intl.formatMessage({ id: 'common.modal.confirmTitle' })}
+      title={title || intl.formatMessage({ id: 'common.modal.confirmTitle' })}
       visible={visible}
       onOk={onSuccess}
       onCancel={onClose}
       maskClosable={false}
       closable={false}
-      okText={intl.formatMessage({ id: 'common.confirm' })}
+      okText={okText || intl.formatMessage({ id: 'common.confirm' })}
       okButtonProps={{ autoFocus: true }}
       cancelText={intl.formatMessage({ id: 'common.cancel' })}>
       {message}

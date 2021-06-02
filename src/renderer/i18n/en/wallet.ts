@@ -10,10 +10,7 @@ const wallet: WalletMessages = {
   'wallet.action.send': 'Send',
   'wallet.action.upgrade': 'upgrade',
   'wallet.action.receive': 'Receive {asset}',
-  'wallet.action.remove': 'Remove wallet',
-  'wallet.action.remove.title': 'Are you sure you want to remove your wallet?',
-  'wallet.action.remove.description':
-    'You cannot undo this action and will have to re-create your wallet from your seed phrase.',
+  'wallet.action.remove': 'Remove',
   'wallet.action.unlock': 'Unlock',
   'wallet.action.connect': 'Connect',
   'wallet.action.import': 'Import',
@@ -50,6 +47,10 @@ const wallet: WalletMessages = {
   'wallet.create.error': 'Error while saving a phrase',
   'wallet.receive.address.error': 'No address available to receive funds',
   'wallet.receive.address.errorQR': 'Error while rendering QR code: {error}',
+  'wallet.remove.label': 'Remove wallet',
+  'wallet.remove.label.title': 'Are you sure you want to remove your wallet?',
+  'wallet.remove.label.description':
+    'You cannot undo this action and will have to re-create your wallet from your seed phrase.',
   'wallet.send.success': 'Transaction succeeded.',
   'wallet.send.fastest': 'Fastest',
   'wallet.send.fast': 'Fast',
