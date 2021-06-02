@@ -26,7 +26,7 @@ type Props = {
   network: Network
   chain: Chain
   walletAddress?: O.Option<Address>
-  historyExtraContent?: React.ReactNode
+  historyExtraContent?: (isLoading: boolean) => React.ReactNode
 }
 
 export const TxsTable: React.FC<Props> = (props): JSX.Element => {
@@ -233,7 +233,7 @@ export const TxsTable: React.FC<Props> = (props): JSX.Element => {
       const columns = isDesktopView ? desktopColumns : mobileColumns
       return (
         <>
-          {historyExtraContent}
+          {historyExtraContent && historyExtraContent(loading)}
           <Styled.Table columns={columns} dataSource={txs} loading={loading} rowKey="hash" />
           {total > 0 && (
             <Pagination

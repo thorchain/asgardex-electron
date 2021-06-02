@@ -14,6 +14,7 @@ import { ErrorView } from '../../../components/shared/error'
 import { BackLink } from '../../../components/uielements/backLink'
 import { useAppContext } from '../../../contexts/AppContext'
 import { useWalletContext } from '../../../contexts/WalletContext'
+import { isEthAsset, isRuneNativeAsset } from '../../../helpers/assetHelper'
 import { sequenceTOption } from '../../../helpers/fpHelpers'
 import { AssetDetailsParams } from '../../../routes/wallet'
 import { DEFAULT_NETWORK } from '../../../services/const'
@@ -26,7 +27,7 @@ export const AssetDetailsView: React.FC = (): JSX.Element => {
 
   const { asset: routeAsset, walletAddress } = useParams<AssetDetailsParams>()
 
-  const [historyType, _setHistoryType] = useState<'external' | 'internal'>('external')
+  const [historyType, setHistoryType] = useState<'external' | 'internal'>('external')
 
   const oRouteAsset: O.Option<Asset> = useMemo(() => O.fromNullable(assetFromString(routeAsset)), [routeAsset])
   const oWalletAddress = useMemo(
@@ -86,17 +87,23 @@ export const AssetDetailsView: React.FC = (): JSX.Element => {
     [routeAsset, intl]
   )
 
-  const renderHistoryExtraContent = useCallback((_asset: Asset) => {
-    return null
-    // if (isRuneNativeAsset(asset) || isEthAsset(asset)) {
-    //   return (
-    //     <>
-    //       <button onClick={() => setHistoryType('external')}>set external</button>
-    //       <button onClick={() => setHistoryType('internal')}>set internal</button>
-    //     </>
-    //   )
-    // }
-  }, [])
+  const renderHistoryExtraContent = useCallback(
+    (asset: Asset) => (isLoading: boolean) => {
+      if (isRuneNativeAsset(asset) || isEthAsset(asset)) {
+        return (
+          <>
+            <button disabled={isLoading} onClick={() => setHistoryType('external')}>
+              external
+            </button>
+            <button disabled={isLoading} onClick={() => setHistoryType('internal')}>
+              internal
+            </button>
+          </>
+        )
+      }
+    },
+    []
+  )
 
   const RenderView = useMemo(
     () => (historyType === 'external' ? AssetDetailsExternalHistoryView : AssetDetailsInternalHistoryView),

@@ -34,7 +34,7 @@ type Props = {
   loadTxsHandler?: LoadTxsHandler
   walletAddress?: O.Option<Address>
   network: Network
-  historyExtraContent?: React.ReactNode
+  historyExtraContent?: (isLoading: boolean) => React.ReactNode
 }
 
 export const AssetDetails: React.FC<Props> = (props): JSX.Element => {

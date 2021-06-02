@@ -1,3 +1,5 @@
+import React from 'react'
+
 import { Address } from '@xchainjs/xchain-client'
 import { Asset } from '@xchainjs/xchain-util'
 import * as FP from 'fp-ts/function'
@@ -14,5 +16,5 @@ export type CommonAssetDetailsProps = {
   reloadBalancesHandler?: FP.Lazy<void>
   walletAddress: O.Option<Address>
   network: Network
-  historyExtraContent?: React.ReactNode
+  historyExtraContent?: (isLoading: boolean) => React.ReactNode
 }
