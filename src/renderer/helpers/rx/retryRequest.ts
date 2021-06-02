@@ -10,12 +10,15 @@ import * as RxOp from 'rxjs/operators'
 
 export const retryRequest =
   <T extends { status?: number } /* error type with possible status code */>({
-    maxRetryAttempts = 3,
+    maxRetry = 3,
     scalingDuration = 1000,
     excludedStatusCodes = []
   }: {
-    maxRetryAttempts?: number
+    /* max. amount to retry */
+    maxRetry?: number
+    /* in ms */
     scalingDuration?: number
+    /* status codes to ignore */
     excludedStatusCodes?: number[]
   } = {}) =>
   (attempts: Rx.Observable<T>) => {
@@ -23,13 +26,12 @@ export const retryRequest =
       RxOp.mergeMap((error, i) => {
         const retryAttempt = i + 1
 
-        if (retryAttempt > maxRetryAttempts || excludedStatusCodes.find((e) => e === error.status)) {
+        if (retryAttempt > maxRetry || excludedStatusCodes.find((e) => e === error.status)) {
           return Rx.throwError(error)
         }
-        console.log(`Attempt ${retryAttempt}: retrying in ${retryAttempt * scalingDuration}ms`)
-
-        return Rx.timer(retryAttempt * scalingDuration)
-      }),
-      RxOp.finalize(() => console.log('We are done!'))
+        const delay = retryAttempt * scalingDuration
+        // console.log(`Attempt ${retryAttempt}: retrying in ${delay}ms`)
+        return Rx.timer(delay)
+      })
     )
   }

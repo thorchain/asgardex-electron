@@ -20,7 +20,7 @@ export const createTransactionService = (client$: Client$): TransactionService =
       RxOp.switchMap((oClient) => (O.isSome(oClient) ? Rx.of(oClient.value) : Rx.EMPTY)),
       RxOp.switchMap((client) => Rx.from(client.deposit(params))),
       RxOp.map(RD.success),
-      RxOp.retryWhen(retryRequest()),
+      RxOp.retryWhen(retryRequest({ maxRetry: 3, scalingDuration: 1000 /* 1 sec. */ })),
       RxOp.catchError(
         (e): TxHashLD =>
           Rx.of(
