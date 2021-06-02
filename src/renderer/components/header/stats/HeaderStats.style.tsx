@@ -5,7 +5,7 @@ import { palette } from 'styled-theme'
 
 export const Wrapper = styled(A.Row)``
 
-export const Container = styled.div`
+export const Container = styled.div<{ clickable: boolean }>`
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -14,6 +14,8 @@ export const Container = styled.div`
   border-radius: 10px;
   margin-right: 10px;
   min-width: 90px;
+
+  cursor: ${({ clickable }) => (clickable ? 'pointer' : 'not-allowed')};
 
   &::last-child {
     margin-right: 0;

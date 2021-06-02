@@ -18,7 +18,8 @@ export const loadTxs$ = ({
   asset: oAsset,
   limit,
   offset,
-  walletAddress
+  walletAddress,
+  walletIndex
 }: {
   client: XChainClient
 } & TxsParams): TxsPageLD => {
@@ -28,7 +29,11 @@ export const loadTxs$ = ({
     O.toUndefined
   )
 
-  const address = FP.pipe(walletAddress, O.getOrElse(client.getAddress))
+  const address = FP.pipe(
+    walletAddress,
+    /* TODO (@asgdx-team) Make sure we use correct index by introducing HD wallets in the future */
+    O.getOrElse(() => client.getAddress(walletIndex))
+  )
 
   return Rx.from(
     client.getTransactions({

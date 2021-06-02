@@ -53,7 +53,9 @@ type Props = {
   setSelectedPricePool: (asset: PricePoolAsset) => void
   pricePools: O.Option<PricePools>
   runePrice: PriceRD
+  reloadRunePrice: FP.Lazy<void>
   volume24Price: PriceRD
+  reloadVolume24Price: FP.Lazy<void>
   selectedPricePoolAsset: SelectedPricePoolAsset
   locale: Locale
   changeLocale?: (locale: Locale) => void
@@ -71,7 +73,9 @@ export const HeaderComponent: React.FC<Props> = (props): JSX.Element => {
     keystore,
     pricePools: oPricePools,
     runePrice: runePriceRD,
+    reloadRunePrice,
     volume24Price: volume24PriceRD,
+    reloadVolume24Price,
     selectedPricePoolAsset: oSelectedPricePoolAsset,
     lockHandler,
     setSelectedPricePool,
@@ -302,7 +306,14 @@ export const HeaderComponent: React.FC<Props> = (props): JSX.Element => {
                   <AsgardexLogo />
                   {renderHeaderNetStatus}
                   <HeaderTheme isDesktopView={isDesktopView} />
-                  {isLargeDesktopView && <HeaderStats runePrice={runePriceRD} volume24Price={volume24PriceRD} />}
+                  {isLargeDesktopView && (
+                    <HeaderStats
+                      runePrice={runePriceRD}
+                      reloadRunePrice={reloadRunePrice}
+                      volume24Price={volume24PriceRD}
+                      reloadVolume24Price={reloadVolume24Price}
+                    />
+                  )}
                 </Row>
               </Col>
               <Col span="auto">

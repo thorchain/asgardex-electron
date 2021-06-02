@@ -8,26 +8,42 @@ import * as RxOp from 'rxjs/operators'
 
 import { useMidgardContext } from '../contexts/MidgardContext'
 import { sequenceTRD } from '../helpers/fpHelpers'
+import { triggerStream } from '../helpers/stateHelper'
 import { PriceRD } from '../services/midgard/types'
 import { AssetWithAmount } from '../types/asgardex'
 import { GetLiquidityHistoryIntervalEnum, GetSwapHistoryIntervalEnum } from '../types/generated/midgard'
 
+const { stream$: reloadHistory$, trigger: reloadHistory } = triggerStream()
+
 export const useVolume24Price = () => {
   const {
     service: {
-      pools: { poolsState$, selectedPricePool$, apiGetSwapHistory$, apiGetLiquidityHistory$ }
+      pools: { poolsState$, selectedPricePool$, apiGetSwapHistory$, apiGetLiquidityHistory$, reloadPools }
     }
   } = useMidgardContext()
+
+  const swapHistory$ = () =>
+    FP.pipe(
+      reloadHistory$,
+      RxOp.switchMap((_) => apiGetSwapHistory$({ interval: GetSwapHistoryIntervalEnum.Day, count: 1 }))
+    )
+
+  const liquidityHistory$ = () =>
+    FP.pipe(
+      reloadHistory$,
+      RxOp.switchMap((_) => apiGetLiquidityHistory$({ interval: GetLiquidityHistoryIntervalEnum.Day, count: 1 }))
+    )
+
+  const reloadVolume24Price = () => {
+    // reload of pools are needed to calculate prices properly
+    reloadPools()
+    reloadHistory()
+  }
 
   const [volume24PriceRD] = useObservableState<PriceRD>(
     () =>
       FP.pipe(
-        Rx.combineLatest([
-          apiGetSwapHistory$({ interval: GetSwapHistoryIntervalEnum.Day, count: 1 }),
-          apiGetLiquidityHistory$({ interval: GetLiquidityHistoryIntervalEnum.Day, count: 1 }),
-          poolsState$,
-          selectedPricePool$
-        ]),
+        Rx.combineLatest([swapHistory$(), liquidityHistory$(), poolsState$, selectedPricePool$]),
         RxOp.map(
           ([
             swapHistoryRD,
@@ -56,5 +72,5 @@ export const useVolume24Price = () => {
     RD.initial
   )
 
-  return volume24PriceRD
+  return { volume24PriceRD, reloadVolume24Price }
 }

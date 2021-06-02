@@ -35,7 +35,10 @@ export const resetTxsPage: ResetTxsPageHandler = () => setLoadTxsProps(INITIAL_L
 /**
  * Factory create a stream of `TxsPageRD` based on selected asset
  */
-export const getTxs$: (walletAddress: O.Option<string>) => TxsPageLD = (walletAddress = O.none) =>
+export const getTxs$: (walletAddress: O.Option<string>, walletIndex?: number) => TxsPageLD = (
+  walletAddress = O.none,
+  walletIndex = 0 /* TODO (@asgdx-team) Will we still use `0` as default by introducing HD wallets in the future */
+) =>
   Rx.combineLatest([selectedAsset$, loadTxsProps$]).pipe(
     RxOp.switchMap(([oAsset, { limit, offset }]) =>
       FP.pipe(
@@ -45,17 +48,17 @@ export const getTxs$: (walletAddress: O.Option<string>) => TxsPageLD = (walletAd
           (asset) => {
             switch (asset.chain) {
               case 'BNB':
-                return BNB.txs$({ asset: O.some(asset), limit, offset, walletAddress })
+                return BNB.txs$({ asset: O.some(asset), limit, offset, walletAddress, walletIndex })
               case 'BTC':
-                return BTC.txs$({ asset: O.none, limit, offset, walletAddress })
+                return BTC.txs$({ asset: O.none, limit, offset, walletAddress, walletIndex })
               case 'ETH':
-                return ETH.txs$({ asset: O.some(asset), limit, offset, walletAddress })
+                return ETH.txs$({ asset: O.some(asset), limit, offset, walletAddress, walletIndex })
               case 'THOR':
-                return THOR.txs$({ asset: O.none, limit, offset, walletAddress })
+                return THOR.txs$({ asset: O.none, limit, offset, walletAddress, walletIndex })
               case 'LTC':
-                return LTC.txs$({ asset: O.none, limit, offset, walletAddress })
+                return LTC.txs$({ asset: O.none, limit, offset, walletAddress, walletIndex })
               case 'BCH':
-                return BCH.txs$({ asset: O.none, limit, offset, walletAddress })
+                return BCH.txs$({ asset: O.none, limit, offset, walletAddress, walletIndex })
               default:
                 return Rx.of(
                   RD.failure<ApiError>({ errorId: ErrorId.GET_ASSET_TXS, msg: `Unsupported chain ${asset.chain}` })

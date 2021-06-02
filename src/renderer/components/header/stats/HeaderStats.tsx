@@ -1,4 +1,4 @@
-import React, { useMemo, useRef } from 'react'
+import React, { useCallback, useMemo, useRef } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
 import { baseToAsset, formatAssetAmountCurrency, currencySymbolByAsset } from '@xchainjs/xchain-util'
@@ -13,11 +13,13 @@ import * as Styled from './HeaderStats.style'
 
 export type Props = {
   runePrice: PriceRD
+  reloadRunePrice: FP.Lazy<void>
   volume24Price: PriceRD
+  reloadVolume24Price: FP.Lazy<void>
 }
 
 export const HeaderStats: React.FC<Props> = (props): JSX.Element => {
-  const { runePrice: runePriceRD, volume24Price: volume24PriceRD } = props
+  const { runePrice: runePriceRD, reloadRunePrice, volume24Price: volume24PriceRD, reloadVolume24Price } = props
 
   const intl = useIntl()
 
@@ -78,13 +80,25 @@ export const HeaderStats: React.FC<Props> = (props): JSX.Element => {
     [volume24PriceRD]
   )
 
+  const reloadVolume24PriceHandler = useCallback(() => {
+    if (!RD.isPending(volume24PriceRD)) {
+      reloadVolume24Price()
+    }
+  }, [reloadVolume24Price, volume24PriceRD])
+
+  const reloadRunePriceHandler = useCallback(() => {
+    if (!RD.isPending(runePriceRD)) {
+      reloadRunePrice()
+    }
+  }, [reloadRunePrice, runePriceRD])
+
   return (
     <Styled.Wrapper>
-      <Styled.Container>
+      <Styled.Container onClick={reloadRunePriceHandler} clickable={!RD.isPending(runePriceRD)}>
         <Styled.Title>{intl.formatMessage({ id: 'common.price.rune' })}</Styled.Title>
         <Styled.Label loading={RD.isPending(runePriceRD)}>{runePriceLabel}</Styled.Label>
       </Styled.Container>
-      <Styled.Container>
+      <Styled.Container onClick={reloadVolume24PriceHandler} clickable={!RD.isPending(volume24PriceRD)}>
         <Styled.Title>{intl.formatMessage({ id: 'common.volume24' })}</Styled.Title>
         <Styled.Label loading={RD.isPending(volume24PriceRD)}>{volume24PriceLabel}</Styled.Label>
       </Styled.Container>
