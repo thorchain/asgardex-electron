@@ -21,6 +21,7 @@ import { DEFAULT_NETWORK } from '../../../services/const'
 import { INITIAL_BALANCES_STATE } from '../../../services/wallet/const'
 import { AssetDetailsExternalHistoryView } from './AssetDetailsExternalHistoryView'
 import { AssetDetailsInternalHistoryView } from './AssetDetailsInternalHistoryView'
+import * as Styled from './AssetDetailsView.styles'
 
 export const AssetDetailsView: React.FC = (): JSX.Element => {
   const intl = useIntl()
@@ -91,18 +92,24 @@ export const AssetDetailsView: React.FC = (): JSX.Element => {
     (asset: Asset) => (isLoading: boolean) => {
       if (isRuneNativeAsset(asset) || isEthAsset(asset)) {
         return (
-          <>
-            <button disabled={isLoading} onClick={() => setHistoryType('external')}>
+          <Styled.HistoryExtraContent>
+            <Styled.HistoryTypeButton
+              active={historyType === 'external' ? 'true' : 'false'}
+              disabled={isLoading}
+              onClick={() => setHistoryType('external')}>
               external
-            </button>
-            <button disabled={isLoading} onClick={() => setHistoryType('internal')}>
+            </Styled.HistoryTypeButton>
+            <Styled.HistoryTypeButton
+              active={historyType === 'internal' ? 'true' : 'false'}
+              disabled={isLoading}
+              onClick={() => setHistoryType('internal')}>
               internal
-            </button>
-          </>
+            </Styled.HistoryTypeButton>
+          </Styled.HistoryExtraContent>
         )
       }
     },
-    []
+    [historyType, setHistoryType]
   )
 
   const RenderView = useMemo(
