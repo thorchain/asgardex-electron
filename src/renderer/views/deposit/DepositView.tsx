@@ -173,7 +173,7 @@ export const DepositView: React.FC<Props> = () => {
     RD.initial
   )
 
-  const _hasMissingDeposits: boolean = useMemo(
+  const _hasPendingAssets: boolean = useMemo(
     () =>
       FP.pipe(
         liquidityProvider,

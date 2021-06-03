@@ -94,8 +94,6 @@ export type LiquidityProvider = {
   assetAddress: O.Option<Address>
   pendingRune: BaseAmount
   pendingAsset: BaseAmount
-  runeDepositValue: BaseAmount
-  assetDepositValue: BaseAmount
 }
 
 export type LiquidityProvidersLD = LiveData<ApiError, LiquidityProvider[]>
@@ -147,8 +145,6 @@ const assetType = new t.Type(
 )
 
 export const LiquidityProviderIO = t.type({
-  // last_add_height: t.number,
-  // units: t.string,
   asset: assetType,
   rune_address: optionFromNullable(t.string),
   asset_address: optionFromNullable(t.string),

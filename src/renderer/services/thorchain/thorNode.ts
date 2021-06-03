@@ -148,9 +148,7 @@ const getLiquidityProviders = ({
             address: provider.rune_address,
             assetAddress: provider.asset_address,
             pendingRune: baseAmount(provider.pending_rune, THORCHAIN_DECIMAL),
-            pendingAsset: baseAmount(provider.pending_asset, assetDecimal),
-            runeDepositValue: baseAmount(provider.rune_deposit_value, THORCHAIN_DECIMAL),
-            assetDepositValue: baseAmount(provider.asset_deposit_value, assetDecimal)
+            pendingAsset: baseAmount(provider.pending_asset, assetDecimal)
           }))
         ),
         RxOp.catchError(
