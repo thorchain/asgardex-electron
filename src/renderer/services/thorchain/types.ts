@@ -1,11 +1,18 @@
 import * as RD from '@devexperts/remote-data-ts'
-import { TxHash } from '@xchainjs/xchain-client'
+import { Address, TxHash } from '@xchainjs/xchain-client'
 import { Client, DepositParam } from '@xchainjs/xchain-thorchain'
-import { Asset, BaseAmount } from '@xchainjs/xchain-util'
+import { Asset, assetFromString, BaseAmount, isValidAsset } from '@xchainjs/xchain-util'
+import * as E from 'fp-ts/Either'
+import * as FP from 'fp-ts/function'
+import * as O from 'fp-ts/Option'
 import * as t from 'io-ts'
+import { optionFromNullable } from 'io-ts-types/lib/optionFromNullable'
+import * as D from 'io-ts/Decoder'
 import * as Rx from 'rxjs'
 
+import { Network } from '../../../shared/api/types'
 import { LiveData } from '../../helpers/rx/liveData'
+import { AssetWithDecimal } from '../../types/asgardex'
 import * as C from '../clients'
 import { ApiError, TxHashLD } from '../wallet/types'
 
@@ -70,3 +77,79 @@ export type Mimir = t.TypeOf<typeof MimirIO>
 
 export type MimirLD = LiveData<Error, Mimir>
 export type MimirRD = RD.RemoteData<Error, Mimir>
+
+export type GetLiquidityProvidersParams = {
+  assetWithDecimal: AssetWithDecimal
+  network: Network
+}
+
+export type GetLiquidityProviderParams = GetLiquidityProvidersParams & {
+  runeAddress: O.Option<Address>
+  assetAddress: O.Option<Address>
+}
+
+export type LiquidityProvider = {
+  asset: Asset
+  address: O.Option<Address>
+  assetAddress: O.Option<Address>
+  pendingRune: BaseAmount
+  pendingAsset: BaseAmount
+}
+
+export type LiquidityProvidersLD = LiveData<ApiError, LiquidityProvider[]>
+export type LiquidityProviderLD = LiveData<ApiError, O.Option<LiquidityProvider>>
+export type LiquidityProviderRD = RD.RemoteData<ApiError, O.Option<LiquidityProvider>>
+
+const assetDecoder: D.Decoder<unknown, Asset> = FP.pipe(
+  D.string,
+  D.parse((stringAsset) =>
+    FP.pipe(
+      stringAsset,
+      assetFromString,
+      E.fromNullable(new Error('Invalid asset')),
+      E.fold((e) => D.failure(stringAsset, e.message), D.success)
+    )
+  )
+)
+
+/**
+ * Custom type validator to check if string is Asset instance
+ * After successful validation transforms string to Asset
+ */
+const assetType = new t.Type(
+  'asset type',
+  (input): input is Asset => {
+    if (typeof input === 'string') {
+      const asset = assetFromString(input)
+
+      if (asset) {
+        return isValidAsset(asset)
+      }
+    }
+    return false
+  },
+  (input, context) => {
+    if (typeof input === 'string') {
+      return FP.pipe(
+        assetFromString(input),
+        E.fromNullable(Error('Invalid asset')),
+        E.fold(
+          () => t.failure(input, context),
+          (asset) => t.success(asset)
+        )
+      )
+    }
+    return t.failure(input, context)
+  },
+  assetDecoder.decode
+)
+
+export const LiquidityProviderIO = t.type({
+  asset: assetType,
+  rune_address: optionFromNullable(t.string),
+  asset_address: optionFromNullable(t.string),
+  pending_rune: t.string,
+  pending_asset: t.string,
+  rune_deposit_value: t.string,
+  asset_deposit_value: t.string
+})
