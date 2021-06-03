@@ -121,7 +121,8 @@ const mimir$: MimirLD = FP.pipe(
       RxOp.map(RD.fromEither),
       RxOp.startWith(RD.pending)
     )
-  )
+  ),
+  RxOp.shareReplay(1)
 )
 
 export { getNodeInfo$, reloadNodesInfo, mimir$, reloadMimir }

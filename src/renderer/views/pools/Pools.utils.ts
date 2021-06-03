@@ -90,9 +90,10 @@ export const getPoolTableRowData = ({
 export const getBlocksLeftForPendingPool = (
   constants: ThorchainConstants,
   lastblocks: Array<Pick<LastblockItem, 'chain' | 'thorchain'>>,
-  asset: Asset
+  asset: Asset,
+  oNewPoolCycle: O.Option<number>
 ): O.Option<number> => {
-  const oNewPoolCycle: O.Option<number> = O.fromNullable(constants.int_64_values.PoolCycle)
+  // const oNewPoolCycle: O.Option<number> = O.fromNullable(constants.int_64_values.PoolCycle)
   const oLastHeight = FP.pipe(
     lastblocks,
     A.findFirst((blockInfo) => eqString.equals(blockInfo.chain, asset.chain)),
@@ -108,10 +109,11 @@ export const getBlocksLeftForPendingPool = (
 export const getBlocksLeftForPendingPoolAsString = (
   constants: ThorchainConstants,
   lastblocks: Array<Pick<LastblockItem, 'chain' | 'thorchain'>>,
-  asset: Asset
+  asset: Asset,
+  poolCycle: O.Option<number>
 ): string => {
   return FP.pipe(
-    getBlocksLeftForPendingPool(constants, lastblocks, asset),
+    getBlocksLeftForPendingPool(constants, lastblocks, asset, poolCycle),
     O.fold(
       () => '',
       (blocksLeft) => blocksLeft.toString()
