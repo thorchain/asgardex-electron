@@ -6,4 +6,4 @@ labels: 'enhancement'
 
 ## Description
 
-<!--- Please describe the enhancement you would like to see in a next version of ASGARDEX -->
+<!--- Please describe the enhancement you would like to see at the next version of ASGARDEX -->

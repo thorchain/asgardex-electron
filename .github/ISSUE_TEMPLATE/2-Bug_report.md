@@ -29,9 +29,9 @@ labels: 'bug'
 
 ## Possible Solution
 
-<!--- If you have ideas how to fix it, feel free to share these here -->
+<!--- If you have ideas how to fix it, feel free to share them here -->
 
-## Your Environment (for using a release version only)
+## Your Environment - Release Version (skip if not using a release version)
 
 <!--- Please include as many details as possible -->
 
@@ -41,7 +41,7 @@ labels: 'bug'
 <!--- required -->
 - Operating system and version:
 
-## Your Environment (for development locally only)
+## Your Environment - Development Version (skip if not using a development version)
 
 <!-- required -->
 
