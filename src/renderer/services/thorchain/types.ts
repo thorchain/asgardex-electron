@@ -105,8 +105,8 @@ const assetDecoder: D.Decoder<unknown, Asset> = FP.pipe(
     FP.pipe(
       stringAsset,
       assetFromString,
-      E.fromNullable(() => new Error('Invalid asset')),
-      E.fold(() => D.failure(stringAsset, ``), D.success)
+      E.fromNullable(new Error('Invalid asset')),
+      E.fold((e) => D.failure(stringAsset, e.message), D.success)
     )
   )
 )
