@@ -6,7 +6,6 @@ import * as E from 'fp-ts/Either'
 import * as FP from 'fp-ts/function'
 import * as O from 'fp-ts/Option'
 import * as t from 'io-ts'
-import { optionFromNullable } from 'io-ts-types/lib/optionFromNullable'
 import * as D from 'io-ts/Decoder'
 import * as Rx from 'rxjs'
 
@@ -143,15 +142,14 @@ const assetType = new t.Type(
   },
   assetDecoder.decode
 )
-// All fields are optionable as we dont know what exactly thor-api will send us
-// And in case if one of elements in a response array will fail validation io-ts will fail WHOLE response
+
 export const LiquidityProviderIO = t.type({
-  // last_add_height: optionFromNullable(t.number),
-  // units: optionFromNullable(t.string),
-  asset: optionFromNullable(assetType),
-  rune_address: optionFromNullable(t.string),
-  pending_rune: optionFromNullable(t.string),
-  pending_asset: optionFromNullable(t.string),
-  rune_deposit_value: optionFromNullable(t.string),
-  asset_deposit_value: optionFromNullable(t.string)
+  // last_add_height: t.number,
+  // units: t.string,
+  asset: assetType,
+  rune_address: t.string,
+  pending_rune: t.string,
+  pending_asset: t.string,
+  rune_deposit_value: t.string,
+  asset_deposit_value: t.string
 })

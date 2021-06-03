@@ -14,7 +14,6 @@ import * as RxOp from 'rxjs/operators'
 import { Network } from '../../../shared/api/types'
 import { THORCHAIN_DECIMAL } from '../../helpers/assetHelper'
 import { envOrDefault } from '../../helpers/envHelper'
-import { sequenceSOption } from '../../helpers/fpHelpers'
 import { liveData } from '../../helpers/rx/liveData'
 import { triggerStream } from '../../helpers/stateHelper'
 import { network$ } from '../app/service'
@@ -132,31 +131,22 @@ const getLiquidityProviders = ({ asset, network, assetDecimal }: GetLiquidityPro
         // We can not use something like t.array(LiquidityProviderIO) as in case if one of elements
         // fails validation the WHOLE array will be processed as failed-validation by io-ts.
         // So we need to validate each elemnt "by-hands" to avoid losing all data 'cuz of 1 element's fail
+
+        // First check - check if we have an array itself at the response
         RxOp.map(t.array(t.unknown).decode),
         RxOp.map(E.fold(() => [], FP.identity)),
+        // Secondly - check every response's element with LiquidityProviderIO codec and filter out every failed-validation-element
         RxOp.map(A.filterMap(FP.flow(LiquidityProviderIO.decode, O.fromEither))),
         RxOp.map(RD.success),
         liveData.map(
-          A.filterMap((provider) =>
-            FP.pipe(
-              sequenceSOption({
-                asset: provider.asset,
-                address: provider.rune_address,
-                pendingRune: provider.pending_rune,
-                pendingAsset: provider.pending_asset,
-                runeDepositValue: provider.rune_deposit_value,
-                assetDepositValue: provider.asset_deposit_value
-              }),
-              O.map(({ asset, address, pendingRune, pendingAsset, runeDepositValue, assetDepositValue }) => ({
-                asset,
-                address,
-                pendingRune: baseAmount(pendingRune, THORCHAIN_DECIMAL),
-                pendingAsset: baseAmount(pendingAsset, assetDecimal),
-                runeDepositValue: baseAmount(runeDepositValue, THORCHAIN_DECIMAL),
-                assetDepositValue: baseAmount(assetDepositValue, assetDecimal)
-              }))
-            )
-          )
+          A.map((provider) => ({
+            asset: provider.asset,
+            address: provider.rune_address,
+            pendingRune: baseAmount(provider.pending_rune, THORCHAIN_DECIMAL),
+            pendingAsset: baseAmount(provider.pending_asset, assetDecimal),
+            runeDepositValue: baseAmount(provider.rune_deposit_value, THORCHAIN_DECIMAL),
+            assetDepositValue: baseAmount(provider.asset_deposit_value, assetDecimal)
+          }))
         ),
         RxOp.catchError(
           (): LiquidityProvidersLD =>
