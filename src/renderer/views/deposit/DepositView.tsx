@@ -17,6 +17,7 @@ import { RefreshButton } from '../../components/uielements/button'
 import { useAppContext } from '../../contexts/AppContext'
 import { useChainContext } from '../../contexts/ChainContext'
 import { useMidgardContext } from '../../contexts/MidgardContext'
+import { useThorchainContext } from '../../contexts/ThorchainContext'
 import { useWalletContext } from '../../contexts/WalletContext'
 import { sequenceTOption } from '../../helpers/fpHelpers'
 import { DepositRouteParams } from '../../routes/pools/deposit'
@@ -35,6 +36,8 @@ export const DepositView: React.FC<Props> = () => {
   const intl = useIntl()
 
   const { network$ } = useAppContext()
+
+  const { getLiquidityProvider } = useThorchainContext()
 
   const { asset } = useParams<DepositRouteParams>()
   const {
@@ -142,6 +145,27 @@ export const DepositView: React.FC<Props> = () => {
   const keystoreState = useObservableState(keystoreService.keystore$, undefined)
 
   const poolDetailRD = useObservableState<PoolDetailRD>(selectedPoolDetail$, RD.initial)
+
+  const [provider] = useObservableState(
+    () =>
+      FP.pipe(
+        Rx.combineLatest([selectedPoolAsset$, network$, addressByChain$(THORChain)]),
+        RxOp.switchMap(([asset, network, address]) =>
+          FP.pipe(
+            sequenceTOption(asset, address),
+            O.fold(
+              (): any => Rx.EMPTY,
+              ([asset, address]) => getLiquidityProvider(asset, network)(address)
+            )
+          )
+        )
+      ),
+    [RD.initial]
+  )
+
+  useEffect(() => {
+    console.log(provider)
+  }, [provider])
 
   // Special case: `keystoreState` is `undefined` in first render loop
   // (see comment at its definition using `useObservableState`)

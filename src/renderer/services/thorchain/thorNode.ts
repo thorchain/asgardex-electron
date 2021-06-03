@@ -1,6 +1,7 @@
 import * as RD from '@devexperts/remote-data-ts'
 import { Address } from '@xchainjs/xchain-client'
-import { baseAmount } from '@xchainjs/xchain-util'
+import { Asset, assetToString, baseAmount } from '@xchainjs/xchain-util'
+import * as A from 'fp-ts/Array'
 import * as FP from 'fp-ts/function'
 import * as E from 'fp-ts/lib/Either'
 import { Errors } from 'io-ts'
@@ -12,11 +13,11 @@ import * as RxOp from 'rxjs/operators'
 import { Network } from '../../../shared/api/types'
 import { THORCHAIN_DECIMAL } from '../../helpers/assetHelper'
 import { envOrDefault } from '../../helpers/envHelper'
-import { liveData } from '../../helpers/rx/liveData'
+import { LiveData, liveData } from '../../helpers/rx/liveData'
 import { triggerStream } from '../../helpers/stateHelper'
 import { network$ } from '../app/service'
-import { ErrorId } from '../wallet/types'
-import { MimirIO, Mimir, MimirLD, NodeInfoLD, NodeStatus, ThorNodeApiUrlLD } from './types'
+import { ApiError, ErrorId } from '../wallet/types'
+import { MimirIO, Mimir, MimirLD, NodeInfoLD, NodeStatus, ThorNodeApiUrlLD, LiquidityProvidersIO } from './types'
 
 // Tmp type as ThorNodeApi does not provide valid swagger spec yet
 // TODO remove after https://github.com/thorchain/asgardex-electron/issues/763
@@ -103,6 +104,57 @@ const getNodeInfo$ = (node: Address, network: Network): NodeInfoLD =>
     RxOp.startWith(RD.pending)
   )
 
+const { stream$: reloadLiquidityProviders$, trigger: reloadLiquidityProviders } = triggerStream()
+
+type LiquidityProvider = {
+  asset: Asset
+  address?: Address
+  pendingRune: string
+  pendingAsset: string
+  runeDepositValue: string
+  assetDepositValue: string
+}
+
+type LiquidityProviderLD = LiveData<ApiError, LiquidityProvider[]>
+
+const getLiquidityProviders = (asset: Asset, network: Network): LiquidityProviderLD => {
+  const poolString = assetToString(asset)
+  return FP.pipe(
+    reloadLiquidityProviders$,
+    RxOp.switchMap(() => thorNodeApiAddress$(network)),
+    liveData.chain((api) =>
+      FP.pipe(
+        api,
+        (thorApi) => RxAjax.ajax.getJSON(`${thorApi}/pool/${poolString}/liquidity_providers`),
+        RxOp.map(LiquidityProvidersIO.decode),
+        RxOp.switchMap(liveData.fromEither),
+        liveData.map(
+          A.map((dto) => ({
+            asset: dto.asset,
+            address: dto.rune_address,
+            pendingRune: dto.pending_rune,
+            pendingAsset: dto.pending_asset,
+            runeDepositValue: dto.rune_deposit_value,
+            assetDepositValue: dto.asset_deposit_value
+          }))
+        ),
+        liveData.mapLeft(() => ({
+          errorId: ErrorId.GET_LIQUIDITY_PROVIDERS,
+          msg: `Failed to load info for ${poolString} pool`
+        }))
+      )
+    ),
+
+    RxOp.startWith(RD.pending)
+  )
+}
+
+const getLiquidityProvider = (asset: Asset, network: Network) => (walletAddress: Address) =>
+  FP.pipe(
+    getLiquidityProviders(asset, network),
+    liveData.map(A.findFirst((provider) => provider.address === walletAddress))
+  )
+
 const { stream$: reloadMimir$, trigger: reloadMimir } = triggerStream()
 
 const mimir$: MimirLD = FP.pipe(
@@ -124,4 +176,4 @@ const mimir$: MimirLD = FP.pipe(
   )
 )
 
-export { getNodeInfo$, reloadNodesInfo, mimir$, reloadMimir }
+export { getNodeInfo$, reloadNodesInfo, mimir$, reloadMimir, getLiquidityProvider, reloadLiquidityProviders }
