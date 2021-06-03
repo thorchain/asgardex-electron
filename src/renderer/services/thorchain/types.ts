@@ -11,6 +11,7 @@ import * as Rx from 'rxjs'
 
 import { Network } from '../../../shared/api/types'
 import { LiveData } from '../../helpers/rx/liveData'
+import { AssetWithDecimal } from '../../types/asgardex'
 import * as C from '../clients'
 import { ApiError, TxHashLD } from '../wallet/types'
 
@@ -77,9 +78,8 @@ export type MimirLD = LiveData<Error, Mimir>
 export type MimirRD = RD.RemoteData<Error, Mimir>
 
 export type GetLiquidityProvidersParams = {
-  asset: Asset
+  assetWithDecimal: AssetWithDecimal
   network: Network
-  assetDecimal: number
 }
 
 export type GetLiquidityProviderParams = GetLiquidityProvidersParams & {

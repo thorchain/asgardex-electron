@@ -163,8 +163,8 @@ export const DepositView: React.FC<Props> = () => {
             sequenceTOption(RD.toOption(assetWithDecimalRD), oAddress),
             O.fold(
               (): LiquidityProviderLD => Rx.EMPTY,
-              ([{ asset, decimal }, address]) =>
-                getLiquidityProvider({ asset, network, walletAddress: address, assetDecimal: decimal })
+              ([assetWithDecimal, address]) =>
+                getLiquidityProvider({ assetWithDecimal, network, walletAddress: address })
             )
           )
         )

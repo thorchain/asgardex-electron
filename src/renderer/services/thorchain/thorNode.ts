@@ -119,7 +119,10 @@ const getNodeInfo$ = (node: Address, network: Network): NodeInfoLD =>
 
 const { stream$: reloadLiquidityProviders$, trigger: reloadLiquidityProviders } = triggerStream()
 
-const getLiquidityProviders = ({ asset, network, assetDecimal }: GetLiquidityProvidersParams): LiquidityProvidersLD => {
+const getLiquidityProviders = ({
+  assetWithDecimal: { asset, decimal: assetDecimal },
+  network
+}: GetLiquidityProvidersParams): LiquidityProvidersLD => {
   const poolString = assetToString(asset)
   return FP.pipe(
     reloadLiquidityProviders$,
@@ -165,16 +168,14 @@ const getLiquidityProviders = ({ asset, network, assetDecimal }: GetLiquidityPro
 }
 
 const getLiquidityProvider = ({
-  asset,
+  assetWithDecimal,
   network,
-  assetDecimal,
   walletAddress
 }: GetLiquidityProviderParams): LiquidityProviderLD =>
   FP.pipe(
     getLiquidityProviders({
-      asset,
-      network,
-      assetDecimal
+      assetWithDecimal,
+      network
     }),
     liveData.map(A.findFirst((provider) => provider.address === walletAddress))
   )
