@@ -50,7 +50,7 @@ const wallet: WalletMessages = {
   'wallet.remove.label': 'Remove wallet',
   'wallet.remove.label.title': 'Are you sure you want to remove your wallet?',
   'wallet.remove.label.description':
-    'You cannot undo this action and will have to re-create your wallet from your seed phrase.',
+    'You will need to provide your phrase to re-create your wallet. Please ensure you have your phrase saved at a safe place before you proceed.',
   'wallet.send.success': 'Transaction succeeded.',
   'wallet.send.fastest': 'Fastest',
   'wallet.send.fast': 'Fast',
