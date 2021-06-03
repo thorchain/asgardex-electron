@@ -14,6 +14,7 @@ import * as RxOp from 'rxjs/operators'
 import { Network } from '../../../shared/api/types'
 import { THORCHAIN_DECIMAL } from '../../helpers/assetHelper'
 import { envOrDefault } from '../../helpers/envHelper'
+import { eqOString } from '../../helpers/fp/eq'
 import { liveData } from '../../helpers/rx/liveData'
 import { triggerStream } from '../../helpers/stateHelper'
 import { network$ } from '../app/service'
@@ -145,6 +146,7 @@ const getLiquidityProviders = ({
           A.map((provider) => ({
             asset: provider.asset,
             address: provider.rune_address,
+            assetAddress: provider.asset_address,
             pendingRune: baseAmount(provider.pending_rune, THORCHAIN_DECIMAL),
             pendingAsset: baseAmount(provider.pending_asset, assetDecimal),
             runeDepositValue: baseAmount(provider.rune_deposit_value, THORCHAIN_DECIMAL),
@@ -170,14 +172,20 @@ const getLiquidityProviders = ({
 const getLiquidityProvider = ({
   assetWithDecimal,
   network,
-  walletAddress
+  runeAddress,
+  assetAddress
 }: GetLiquidityProviderParams): LiquidityProviderLD =>
   FP.pipe(
     getLiquidityProviders({
       assetWithDecimal,
       network
     }),
-    liveData.map(A.findFirst((provider) => provider.address === walletAddress))
+    liveData.map(
+      A.findFirst(
+        (provider) =>
+          eqOString.equals(provider.address, runeAddress) && eqOString.equals(provider.assetAddress, assetAddress)
+      )
+    )
   )
 
 const { stream$: reloadMimir$, trigger: reloadMimir } = triggerStream()

@@ -6,6 +6,7 @@ import * as E from 'fp-ts/Either'
 import * as FP from 'fp-ts/function'
 import * as O from 'fp-ts/Option'
 import * as t from 'io-ts'
+import { optionFromNullable } from 'io-ts-types/lib/optionFromNullable'
 import * as D from 'io-ts/Decoder'
 import * as Rx from 'rxjs'
 
@@ -83,12 +84,14 @@ export type GetLiquidityProvidersParams = {
 }
 
 export type GetLiquidityProviderParams = GetLiquidityProvidersParams & {
-  walletAddress: Address
+  runeAddress: O.Option<Address>
+  assetAddress: O.Option<Address>
 }
 
 export type LiquidityProvider = {
   asset: Asset
-  address: Address
+  address: O.Option<Address>
+  assetAddress: O.Option<Address>
   pendingRune: BaseAmount
   pendingAsset: BaseAmount
   runeDepositValue: BaseAmount
@@ -147,7 +150,8 @@ export const LiquidityProviderIO = t.type({
   // last_add_height: t.number,
   // units: t.string,
   asset: assetType,
-  rune_address: t.string,
+  rune_address: optionFromNullable(t.string),
+  asset_address: optionFromNullable(t.string),
   pending_rune: t.string,
   pending_asset: t.string,
   rune_deposit_value: t.string,
