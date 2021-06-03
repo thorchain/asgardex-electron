@@ -8,6 +8,7 @@ import { ConfirmationModal } from './ConfirmationModal'
 export const Default: Story = () => {
   return (
     <ConfirmationModal
+      visible
       onClose={() => console.log('close')}
       onSuccess={() => console.log('success')}
       message={'Confirmation action text here'}

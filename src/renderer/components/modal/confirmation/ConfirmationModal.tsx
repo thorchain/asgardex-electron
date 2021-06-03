@@ -6,13 +6,24 @@ import { useIntl } from 'react-intl'
 import * as Styled from './ConfirmationModal.styles'
 
 type Props = {
+  visible: boolean
   onSuccess: FP.Lazy<void>
   onClose: FP.Lazy<void>
+  title?: string
+  okText?: string
   message: React.ReactNode
   className?: string
 }
 
-export const ConfirmationModal: React.FC<Props> = ({ onSuccess: onSuccessProp, onClose, message, className }) => {
+export const ConfirmationModal: React.FC<Props> = ({
+  visible,
+  onSuccess: onSuccessProp,
+  onClose,
+  title,
+  okText,
+  message,
+  className
+}) => {
   const intl = useIntl()
   const onSuccess = useCallback(() => {
     onSuccessProp()
@@ -21,13 +32,13 @@ export const ConfirmationModal: React.FC<Props> = ({ onSuccess: onSuccessProp, o
   return (
     <Styled.Modal
       className={className}
-      title={intl.formatMessage({ id: 'common.modal.confirmTitle' })}
-      visible={true}
+      title={title || intl.formatMessage({ id: 'common.modal.confirmTitle' })}
+      visible={visible}
       onOk={onSuccess}
       onCancel={onClose}
       maskClosable={false}
       closable={false}
-      okText={intl.formatMessage({ id: 'common.confirm' })}
+      okText={okText || intl.formatMessage({ id: 'common.confirm' })}
       okButtonProps={{ autoFocus: true }}
       cancelText={intl.formatMessage({ id: 'common.cancel' })}>
       {message}

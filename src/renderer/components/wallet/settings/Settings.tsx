@@ -13,6 +13,7 @@ import { ReactComponent as UnlockOutlined } from '../../../assets/svg/icon-unloc
 import { LedgerAddressParams } from '../../../services/chain/types'
 import { ValidatePasswordHandler } from '../../../services/wallet/types'
 import { UserAccountType } from '../../../types/wallet'
+import { RemoveWalletConfirmationModal } from '../../modal/confirmation/RemoveWalletConfirmationModal'
 import { PasswordModal } from '../../modal/password'
 import { AddressEllipsis } from '../../uielements/addressEllipsis'
 import { PhraseCopyModal } from '../phrase'
@@ -64,6 +65,7 @@ export const Settings: React.FC<Props> = (props): JSX.Element => {
 
   const [showPhraseModal, setShowPhraseModal] = useState(false)
   const [showPasswordModal, setShowPasswordModal] = useState(false)
+  const [showRemoveWalletModal, setShowRemoveWalletModal] = useState(false)
 
   const removeWallet = useCallback(() => {
     removeKeystore()
@@ -258,6 +260,11 @@ export const Settings: React.FC<Props> = (props): JSX.Element => {
           }}
         />
       )}
+      <RemoveWalletConfirmationModal
+        visible={showRemoveWalletModal}
+        onClose={() => setShowRemoveWalletModal(false)}
+        onSuccess={removeWallet}
+      />
       <Row>
         <Col span={24}>
           <Styled.TitleWrapper>
@@ -308,8 +315,8 @@ export const Settings: React.FC<Props> = (props): JSX.Element => {
                     color="error"
                     typevalue="outline"
                     round="true"
-                    onClick={removeWallet}>
-                    {intl.formatMessage({ id: 'wallet.action.remove' })}
+                    onClick={() => setShowRemoveWalletModal(true)}>
+                    {intl.formatMessage({ id: 'wallet.remove.label' })}
                   </Styled.Button>
                 </Styled.OptionCard>
               </Styled.WalletCol>

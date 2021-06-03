@@ -1,6 +1,5 @@
 import React, { useCallback, useState, useEffect, useMemo } from 'react'
 
-import { Modal } from 'antd'
 import Form, { Rule } from 'antd/lib/form'
 import * as FP from 'fp-ts/function'
 import * as O from 'fp-ts/lib/Option'
@@ -16,6 +15,7 @@ import { RedirectRouteState } from '../../../routes/types'
 import * as walletRoutes from '../../../routes/wallet'
 import { KeystoreState } from '../../../services/wallet/types'
 import { isLocked, hasImportedKeystore } from '../../../services/wallet/util'
+import { RemoveWalletConfirmationModal } from '../../modal/confirmation/RemoveWalletConfirmationModal'
 import { BackLink } from '../../uielements/backLink'
 import { InputPassword } from '../../uielements/input'
 import * as Styled from './UnlockForm.style'
@@ -117,9 +117,7 @@ export const UnlockForm: React.FC<Props> = (props): JSX.Element => {
 
   return (
     <>
-      <Modal visible={showRemoveModal} onCancel={hideRemoveConfirm} onOk={onOkHandlder}>
-        {intl.formatMessage({ id: 'wallet.action.remove' })}
-      </Modal>
+      <RemoveWalletConfirmationModal visible={showRemoveModal} onClose={hideRemoveConfirm} onSuccess={onOkHandlder} />
       <Styled.Header>
         <BackLink style={{ position: 'absolute', top: 0, left: 0 }} />
         <Styled.Text>{intl.formatMessage({ id: 'wallet.unlock.title' })}</Styled.Text>
@@ -148,7 +146,7 @@ export const UnlockForm: React.FC<Props> = (props): JSX.Element => {
                 typevalue="outline"
                 round="true"
                 onClick={showRemoveConfirm}>
-                {intl.formatMessage({ id: 'wallet.action.remove' })}
+                {intl.formatMessage({ id: 'wallet.remove.label' })}
               </Styled.Button>
               <Styled.Button round="true" size="large" type="primary" block htmlType="submit" disabled={!validPassword}>
                 {intl.formatMessage({ id: 'wallet.action.unlock' })}
