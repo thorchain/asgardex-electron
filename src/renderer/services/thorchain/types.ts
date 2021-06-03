@@ -112,7 +112,7 @@ const assetDecoder: D.Decoder<unknown, Asset> = FP.pipe(
 )
 
 /**
- * Custom type validator to check if string is Asset instanse
+ * Custom type validator to check if string is Asset instance
  * After successful validation transforms string to Asset
  */
 const assetType = new t.Type(
