@@ -25,6 +25,8 @@ const deposit: DepositMessages = {
   'deposit.add.error.nobalances': 'No balances',
   'deposit.add.error.nobalance1': "You don't have any balance of {asset} in your wallet to deposit.",
   'deposit.add.error.nobalance2': "You don't have any balances of {asset1} and {asset2} in your wallet to deposit.",
+  'deposit.add.pendingAssets.title': 'Pending assets',
+  'deposit.add.pendingAssets.description': 'TODO @veado ADD description',
   'deposit.bond.state.error': 'Bond error',
   'deposit.unbond.state.error': 'Unbond error',
   'deposit.leave.state.error': 'Leave error',

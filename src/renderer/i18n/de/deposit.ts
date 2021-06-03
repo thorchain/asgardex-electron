@@ -26,6 +26,8 @@ const deposit: DepositMessages = {
   'deposit.add.error.nobalances': 'Kein Guthaben',
   'deposit.add.error.nobalance1': 'Du verfügst über kein Guthaben, um {asset} hinzuzufügen.',
   'deposit.add.error.nobalance2': 'Du verfügst über keine Guthaben, um {asset1} und {asset2} hinzuzufügen.',
+  'deposit.add.pendingAssets.title': 'Ausstehende Assets',
+  'deposit.add.pendingAssets.description': 'TODO @veado ADD description',
   'deposit.bond.state.error': 'Bond Fehler',
   'deposit.unbond.state.error': 'Unbond Fehler',
   'deposit.leave.state.error': 'Fehler beim Verlassen',

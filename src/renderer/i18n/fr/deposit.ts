@@ -26,6 +26,8 @@ const deposit: DepositMessages = {
   'deposit.add.error.nobalances': 'Aucun solde',
   'deposit.add.error.nobalance1': "Vous n'avez pas de {asset} dans votre portefeuille pour le dépot.",
   'deposit.add.error.nobalance2': "Vous n'avez pas de {asset1} et de {asset2} dans votre portefeuille pour le dépot.",
+  'deposit.add.pendingAssets.title': 'Pending assets - FR',
+  'deposit.add.pendingAssets.description': 'TODO @veado ADD description',
   'deposit.bond.state.error': 'Erreur de caution',
   'deposit.unbond.state.error': 'Erreur de retrait',
   'deposit.leave.state.error': 'Erreur de sortie',

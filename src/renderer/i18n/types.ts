@@ -289,6 +289,8 @@ type DepositMessageKey =
   | 'deposit.add.error.nobalances'
   | 'deposit.add.error.nobalance1'
   | 'deposit.add.error.nobalance2'
+  | 'deposit.add.pendingAssets.title'
+  | 'deposit.add.pendingAssets.description'
   | 'deposit.bond.state.error'
   | 'deposit.unbond.state.error'
   | 'deposit.leave.state.error'

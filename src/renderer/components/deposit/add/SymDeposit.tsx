@@ -52,6 +52,7 @@ import {
 } from '../../../services/chain/types'
 import { ApproveFeeHandler, ApproveParams, IsApprovedRD, LoadApproveFeeHandler } from '../../../services/ethereum/types'
 import { PoolAddress, PoolsDataMap } from '../../../services/midgard/types'
+import { LiquidityProviderRD } from '../../../services/thorchain/types'
 import { ApiError, TxHashLD, TxHashRD, ValidatePasswordHandler } from '../../../services/wallet/types'
 import { AssetWithDecimal } from '../../../types/asgardex'
 import { WalletBalances } from '../../../types/wallet'
@@ -95,6 +96,7 @@ export type Props = {
   fundsCap: O.Option<FundsCap>
   poolsData: PoolsDataMap
   haltedChains: Chain[]
+  liquidityProvider: LiquidityProviderRD
 }
 
 type SelectedInput = 'asset' | 'rune' | 'none'
@@ -130,7 +132,8 @@ export const SymDeposit: React.FC<Props> = (props) => {
     approveFee$,
     fundsCap: oFundsCap,
     poolsData,
-    haltedChains
+    haltedChains,
+    liquidityProvider: liquidityProviderRD
   } = props
 
   const intl = useIntl()
@@ -433,7 +436,7 @@ export const SymDeposit: React.FC<Props> = (props) => {
 
     const title = intl.formatMessage({ id: 'deposit.add.error.nobalances' })
 
-    return <Styled.BalanceAlert type="warning" message={title} description={msg} />
+    return <Styled.Alert type="warning" message={title} description={msg} />
   }, [asset.ticker, hasAssetBalance, hasRuneBalance, intl])
 
   const runeAmountChangeHandler = useCallback(
@@ -911,6 +914,25 @@ export const SymDeposit: React.FC<Props> = (props) => {
     [asset, isApprovedERC20Token$, needApprovement, subscribeIsApprovedState]
   )
 
+  const hasPendingAssets: boolean = useMemo(
+    () =>
+      FP.pipe(
+        liquidityProviderRD,
+        RD.toOption,
+        O.flatten,
+        O.map(({ pendingRune, pendingAsset }) => pendingRune.gt(0) || pendingAsset.gt(0)),
+        O.getOrElse((): boolean => false),
+        // TODO @Veado Remove it, just for debugging
+        () => true
+      ),
+    [liquidityProviderRD]
+  )
+  const renderPendingAssets = useMemo(() => {
+    const title = intl.formatMessage({ id: 'deposit.add.pendingAssets.title' })
+    const description = intl.formatMessage({ id: 'deposit.add.pendingAssets.description' })
+    return <Styled.Alert type="warning" message={title} description={description} />
+  }, [intl])
+
   const prevRouterAddress = useRef<O.Option<Address>>(O.none)
 
   // Run `checkApprovedStatus` whenever `oPoolAddress` has been changed
@@ -968,8 +990,9 @@ export const SymDeposit: React.FC<Props> = (props) => {
       fundsCapReached ||
       disabled ||
       assetBalance.amount().isZero() ||
-      runeBalance.amount().isZero(),
-    [assetBalance, disabled, fundsCapReached, isBalanceError, runeBalance, haltedChain]
+      runeBalance.amount().isZero() ||
+      hasPendingAssets,
+    [haltedChain, isBalanceError, fundsCapReached, disabled, assetBalance, runeBalance, hasPendingAssets]
   )
 
   /**
@@ -999,10 +1022,15 @@ export const SymDeposit: React.FC<Props> = (props) => {
 
   return (
     <Styled.Container>
+      {hasPendingAssets && (
+        <Styled.AlertRow>
+          <Col xs={24}>{renderPendingAssets}</Col>
+        </Styled.AlertRow>
+      )}
       {showBalanceError && (
-        <Styled.BalanceErrorRow>
-          <Col xs={24}>{showBalanceError && renderBalanceError}</Col>
-        </Styled.BalanceErrorRow>
+        <Styled.AlertRow>
+          <Col xs={24}>{renderBalanceError}</Col>
+        </Styled.AlertRow>
       )}
       <Styled.CardsRow gutter={{ lg: 32 }}>
         <Col xs={24} xl={12}>
@@ -1063,7 +1091,7 @@ export const SymDeposit: React.FC<Props> = (props) => {
           <Styled.FeesRow gutter={{ lg: 32 }}>
             <Col xs={24} xl={12}>
               <Styled.FeeRow>
-                <Fees fees={uiFeesRD} reloadFees={reloadFeesHandler} />
+                <Fees fees={uiFeesRD} reloadFees={reloadFeesHandler} disabled={disabledForm} />
               </Styled.FeeRow>
               <Styled.FeeErrorRow>
                 <Col>

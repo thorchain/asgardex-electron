@@ -30,6 +30,7 @@ import { SymDepositMemo } from '../../../services/chain/types'
 import { DEFAULT_NETWORK } from '../../../services/const'
 import { PoolAddress, PoolAssetsRD, PoolDetailRD } from '../../../services/midgard/types'
 import { toPoolData } from '../../../services/midgard/utils'
+import { LiquidityProviderRD } from '../../../services/thorchain/types'
 import { INITIAL_BALANCES_STATE } from '../../../services/wallet/const'
 import { getBalanceByAsset } from '../../../services/wallet/util'
 import { AssetWithDecimal } from '../../../types/asgardex'
@@ -39,10 +40,11 @@ type Props = {
   asset: AssetWithDecimal
   poolDetail: PoolDetailRD
   haltedChains: Chain[]
+  liquidityProvider: LiquidityProviderRD
 }
 
 export const SymDepositView: React.FC<Props> = (props) => {
-  const { asset: assetWD, poolDetail: poolDetailRD, haltedChains } = props
+  const { asset: assetWD, poolDetail: poolDetailRD, haltedChains, liquidityProvider: liquidityProviderRD } = props
   const { asset } = assetWD
   const history = useHistory()
   const intl = useIntl()
@@ -229,6 +231,7 @@ export const SymDepositView: React.FC<Props> = (props) => {
           balances={[]}
           fundsCap={O.none}
           poolsData={{}}
+          liquidityProvider={RD.initial}
         />
       </>
     ),
@@ -296,6 +299,7 @@ export const SymDepositView: React.FC<Props> = (props) => {
             isApprovedERC20Token$={isApprovedERC20Token$}
             fundsCap={fundsCap}
             poolsData={poolsData}
+            liquidityProvider={liquidityProviderRD}
           />
         )
       }

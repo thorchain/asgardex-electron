@@ -25,16 +25,16 @@ export const CardsRow = styled(Row).attrs({
   width: 100%;
 `
 
-export const BalanceErrorRow = styled(Row)`
+export const AlertRow = styled(Row)`
   width: 100%;
-  padding: 20px 0px;
+  padding: 0 0 20px 0;
 
   ${media.xl`
-    padding: 20px;
+    padding: 0 20px 20px 20px;
 `}
 `
 
-export const BalanceAlert = styled(UIAlert)`
+export const Alert = styled(UIAlert)`
   width: 100%;
   margin-right: 20px;
 `

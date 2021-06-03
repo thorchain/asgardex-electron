@@ -173,19 +173,6 @@ export const DepositView: React.FC<Props> = () => {
     RD.initial
   )
 
-  const _hasPendingAssets: boolean = useMemo(
-    () =>
-      FP.pipe(
-        liquidityProvider,
-        RD.toOption,
-        (s) => s,
-        O.flatten,
-        O.map(({ pendingRune, pendingAsset }) => pendingRune.gt(0) || pendingAsset.gt(0)),
-        O.getOrElse((): boolean => false)
-      ),
-    [liquidityProvider]
-  )
-
   // Special case: `keystoreState` is `undefined` in first render loop
   // (see comment at its definition using `useObservableState`)
   if (keystoreState === undefined) {
@@ -215,6 +202,7 @@ export const DepositView: React.FC<Props> = () => {
               poolDetail={poolDetailRD}
               asset={asset}
               shares={poolSharesRD}
+              liquidityProvider={liquidityProvider}
               keystoreState={keystoreState}
               ShareContent={ShareView}
               SymDepositContent={SymDepositView}

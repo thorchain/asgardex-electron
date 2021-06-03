@@ -25,6 +25,8 @@ const deposit: DepositMessages = {
   'deposit.add.error.nobalances': 'Нет средств',
   'deposit.add.error.nobalance1': 'У вас нет средств на балансе {asset} в кошелке для вклада',
   'deposit.add.error.nobalance2': 'У вас нет средств на балансах {asset1} и {asset2} в кошельке для вклада',
+  'deposit.add.pendingAssets.title': 'Pending assets - RU',
+  'deposit.add.pendingAssets.description': 'TODO @veado ADD description',
   'deposit.bond.state.error': 'Ошибка при кладе',
   'deposit.unbond.state.error': 'Ошибка при выводе',
   'deposit.leave.state.error': 'Ошибка при выходе',
