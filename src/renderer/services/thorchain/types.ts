@@ -1,13 +1,16 @@
 import * as RD from '@devexperts/remote-data-ts'
-import { TxHash } from '@xchainjs/xchain-client'
+import { Address, TxHash } from '@xchainjs/xchain-client'
 import { Client, DepositParam } from '@xchainjs/xchain-thorchain'
 import { Asset, assetFromString, BaseAmount, isValidAsset } from '@xchainjs/xchain-util'
 import * as E from 'fp-ts/Either'
 import * as FP from 'fp-ts/function'
+import * as O from 'fp-ts/Option'
 import * as t from 'io-ts'
+import { optionFromNullable } from 'io-ts-types/lib/optionFromNullable'
 import * as D from 'io-ts/Decoder'
 import * as Rx from 'rxjs'
 
+import { Network } from '../../../shared/api/types'
 import { LiveData } from '../../helpers/rx/liveData'
 import * as C from '../clients'
 import { ApiError, TxHashLD } from '../wallet/types'
@@ -74,6 +77,29 @@ export type Mimir = t.TypeOf<typeof MimirIO>
 export type MimirLD = LiveData<Error, Mimir>
 export type MimirRD = RD.RemoteData<Error, Mimir>
 
+export type GetLiquidityProvidersParams = {
+  asset: Asset
+  network: Network
+  assetDecimal: number
+}
+
+export type GetLiquidityProviderParams = GetLiquidityProvidersParams & {
+  walletAddress: Address
+}
+
+export type LiquidityProvider = {
+  asset: Asset
+  address: Address
+  pendingRune: BaseAmount
+  pendingAsset: BaseAmount
+  runeDepositValue: BaseAmount
+  assetDepositValue: BaseAmount
+}
+
+export type LiquidityProvidersLD = LiveData<ApiError, LiquidityProvider[]>
+export type LiquidityProviderLD = LiveData<ApiError, O.Option<LiquidityProvider>>
+export type LiquidityProviderRD = RD.RemoteData<ApiError, O.Option<LiquidityProvider>>
+
 const assetDecoder: D.Decoder<unknown, Asset> = FP.pipe(
   D.string,
   D.parse((stringAsset) =>
@@ -86,6 +112,10 @@ const assetDecoder: D.Decoder<unknown, Asset> = FP.pipe(
   )
 )
 
+/**
+ * Custom type validator to check if string is Asset instanse
+ * After successful validation transforms string to Asset
+ */
 const assetType = new t.Type(
   'asset type',
   (input): input is Asset => {
@@ -113,16 +143,15 @@ const assetType = new t.Type(
   },
   assetDecoder.decode
 )
-
+// All fields are optionable as we dont know what exactly thor-api will send us
+// And in case if one of elements in a response array will fail validation io-ts will fail WHOLE response
 export const LiquidityProviderIO = t.type({
-  // last_add_height: t.number,
-  // units: t.string,
-  asset: assetType,
-  rune_address: t.union([t.string, t.undefined]),
-  pending_rune: t.string,
-  pending_asset: t.string,
-  rune_deposit_value: t.string,
-  asset_deposit_value: t.string
+  // last_add_height: optionFromNullable(t.number),
+  // units: optionFromNullable(t.string),
+  asset: optionFromNullable(assetType),
+  rune_address: optionFromNullable(t.string),
+  pending_rune: optionFromNullable(t.string),
+  pending_asset: optionFromNullable(t.string),
+  rune_deposit_value: optionFromNullable(t.string),
+  asset_deposit_value: optionFromNullable(t.string)
 })
-
-export const LiquidityProvidersIO = t.array(LiquidityProviderIO)
