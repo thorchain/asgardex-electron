@@ -172,7 +172,7 @@ export const DepositView: React.FC<Props> = () => {
     RD.initial
   )
 
-  const hasMissingDeposits: boolean = useMemo(
+  const _hasMissingDeposits: boolean = useMemo(
     () =>
       FP.pipe(
         liquidityProvider,
@@ -184,10 +184,6 @@ export const DepositView: React.FC<Props> = () => {
       ),
     [liquidityProvider]
   )
-
-  useEffect(() => {
-    console.log('hasMissingDeposits - ', hasMissingDeposits)
-  }, [hasMissingDeposits])
 
   // Special case: `keystoreState` is `undefined` in first render loop
   // (see comment at its definition using `useObservableState`)
