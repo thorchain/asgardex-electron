@@ -70,7 +70,8 @@ export type ThorNodeApiUrlLD = LiveData<ApiError, string>
 
 // Note: Currently we are interested in `MAXIMUMLIQUIDITYRUNE` only
 export const MimirIO = t.type({
-  'mimir//MAXIMUMLIQUIDITYRUNE': t.union([t.number, t.undefined])
+  'mimir//MAXIMUMLIQUIDITYRUNE': t.union([t.number, t.undefined]),
+  'mimir//POOLCYCLE': t.union([t.number, t.undefined])
 })
 
 export type Mimir = t.TypeOf<typeof MimirIO>

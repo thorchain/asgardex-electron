@@ -20,12 +20,7 @@ import { eqString } from '../../helpers/fp/eq'
 import { sequenceTOption } from '../../helpers/fpHelpers'
 import { PoolFilter } from '../../services/midgard/types'
 import { toPoolData } from '../../services/midgard/utils'
-import {
-  GetPoolsStatusEnum,
-  Constants as ThorchainConstants,
-  PoolDetail,
-  LastblockItem
-} from '../../types/generated/midgard'
+import { GetPoolsStatusEnum, PoolDetail, LastblockItem } from '../../types/generated/midgard'
 import { PoolTableRowData, Pool } from './Pools.types'
 
 const stringToGetPoolsStatus = (str?: string): GetPoolsStatusEnum => {
@@ -88,11 +83,10 @@ export const getPoolTableRowData = ({
 }
 
 export const getBlocksLeftForPendingPool = (
-  constants: ThorchainConstants,
   lastblocks: Array<Pick<LastblockItem, 'chain' | 'thorchain'>>,
-  asset: Asset
+  asset: Asset,
+  oNewPoolCycle: O.Option<number>
 ): O.Option<number> => {
-  const oNewPoolCycle: O.Option<number> = O.fromNullable(constants.int_64_values.PoolCycle)
   const oLastHeight = FP.pipe(
     lastblocks,
     A.findFirst((blockInfo) => eqString.equals(blockInfo.chain, asset.chain)),
@@ -106,12 +100,12 @@ export const getBlocksLeftForPendingPool = (
 }
 
 export const getBlocksLeftForPendingPoolAsString = (
-  constants: ThorchainConstants,
   lastblocks: Array<Pick<LastblockItem, 'chain' | 'thorchain'>>,
-  asset: Asset
+  asset: Asset,
+  poolCycle: O.Option<number>
 ): string => {
   return FP.pipe(
-    getBlocksLeftForPendingPool(constants, lastblocks, asset),
+    getBlocksLeftForPendingPool(lastblocks, asset, poolCycle),
     O.fold(
       () => '',
       (blocksLeft) => blocksLeft.toString()
