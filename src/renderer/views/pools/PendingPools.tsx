@@ -19,15 +19,14 @@ import { FundsCap } from '../../components/pool'
 import { Table } from '../../components/uielements/table'
 import { useAppContext } from '../../contexts/AppContext'
 import { useMidgardContext } from '../../contexts/MidgardContext'
-import { useThorchainContext } from '../../contexts/ThorchainContext'
 import { sequenceTRD } from '../../helpers/fpHelpers'
 import { getPoolTableRowsData, RUNE_PRICE_POOL } from '../../helpers/poolHelper'
 import { useFundsCap } from '../../hooks/useFundsCap'
 import useInterval, { INACTIVE_INTERVAL } from '../../hooks/useInterval'
+import { usePoolCycle } from '../../hooks/usePoolCycle'
 import * as poolsRoutes from '../../routes/pools'
 import { DEFAULT_NETWORK } from '../../services/const'
 import { PendingPoolsState, PoolFilter, ThorchainLastblockRD } from '../../services/midgard/types'
-import { MimirRD } from '../../services/thorchain/types'
 import { PoolsComponentProps, PoolTableRowData, PoolTableRowsData } from './Pools.types'
 import { getBlocksLeftForPendingPoolAsString } from './Pools.utils'
 import { filterTableData } from './Pools.utils'
@@ -45,8 +44,6 @@ export const PendingPools: React.FC<PoolsComponentProps> = (): JSX.Element => {
   const network = useObservableState<Network>(network$, DEFAULT_NETWORK)
 
   const { service: midgardService } = useMidgardContext()
-
-  const { mimir$, reloadMimir } = useThorchainContext()
 
   const {
     thorchainLastblockState$,
@@ -66,16 +63,20 @@ export const PendingPools: React.FC<PoolsComponentProps> = (): JSX.Element => {
   // store previous data of pending pools to render these while reloading
   const previousPools = useRef<Option<PoolTableRowsData>>(none)
 
+  const [poolCycle, reloadPpoolCycle] = usePoolCycle()
+
+  const oNewPoolCycle = useMemo(() => FP.pipe(poolCycle, RD.toOption), [poolCycle])
+
   const refreshHandler = useCallback(() => {
     reloadPendingPools()
     reloadFundsCap()
-    reloadMimir()
-  }, [reloadFundsCap, reloadPendingPools, reloadMimir])
+    reloadPpoolCycle()
+  }, [reloadFundsCap, reloadPendingPools, reloadPpoolCycle])
 
   const pendingCountdownHandler = useCallback(() => {
     reloadThorchainLastblock()
-    reloadMimir()
-  }, [reloadThorchainLastblock, reloadMimir])
+    reloadPpoolCycle()
+  }, [reloadThorchainLastblock, reloadPpoolCycle])
 
   const pendingCountdownInterval = useMemo(() => {
     const pendingPools = RD.toNullable(poolsRD)
@@ -84,18 +85,6 @@ export const PendingPools: React.FC<PoolsComponentProps> = (): JSX.Element => {
   }, [poolsRD])
 
   useInterval(pendingCountdownHandler, pendingCountdownInterval)
-
-  const mimir = useObservableState<MimirRD>(mimir$, RD.initial)
-
-  const oNewPoolCycle = useMemo(
-    () =>
-      FP.pipe(
-        mimir,
-        RD.toOption,
-        O.chain(({ 'mimir//POOLCYCLE': newPoolCycle }) => O.fromNullable(newPoolCycle))
-      ),
-    [mimir]
-  )
 
   const selectedPricePool = useObservableState(selectedPricePool$, RUNE_PRICE_POOL)
 

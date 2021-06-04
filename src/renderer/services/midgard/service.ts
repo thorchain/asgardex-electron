@@ -118,12 +118,17 @@ const apiGetThorchainConstants$ = FP.pipe(
   )
 )
 
+const { stream$: reloadThorchainConstants$, trigger: reloadThorchainConstants } = triggerStream()
+
 /**
  * Provides data of `ThorchainConstants`
  */
-const thorchainConstantsState$: ThorchainConstantsLD = apiGetThorchainConstants$.pipe(
+const thorchainConstantsState$: ThorchainConstantsLD = FP.pipe(
+  reloadThorchainConstants$,
+  RxOp.switchMap(() => apiGetThorchainConstants$),
   RxOp.startWith(RD.pending),
   RxOp.retry(MIDGARD_MAX_RETRY),
+  RxOp.catchError(() => Rx.of(RD.failure(Error('')))),
   RxOp.shareReplay(1)
 )
 
@@ -206,6 +211,7 @@ export type MidgardService = {
 export const service = {
   networkInfo$,
   reloadNetworkInfo,
+  reloadThorchainConstants,
   thorchainConstantsState$,
   thorchainLastblockState$,
   nativeTxFee$,

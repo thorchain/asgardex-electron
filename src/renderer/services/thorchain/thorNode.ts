@@ -189,8 +189,10 @@ const getLiquidityProvider = ({
 const { stream$: reloadMimir$, trigger: reloadMimir } = triggerStream()
 
 const mimir$: MimirLD = FP.pipe(
-  Rx.combineLatest([network$, reloadMimir$]),
-  RxOp.switchMap(([network, _]) => thorNodeApiAddress$(network)),
+  reloadMimir$,
+  RxOp.debounceTime(300),
+  RxOp.switchMap(() => network$),
+  RxOp.switchMap((network) => thorNodeApiAddress$(network)),
   // ApiError -> Error
   liveData.mapLeft(({ msg }) => Error(msg)),
   liveData.chain((thorApi) =>
