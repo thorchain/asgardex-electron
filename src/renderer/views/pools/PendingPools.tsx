@@ -19,7 +19,6 @@ import { FundsCap } from '../../components/pool'
 import { Table } from '../../components/uielements/table'
 import { useAppContext } from '../../contexts/AppContext'
 import { useMidgardContext } from '../../contexts/MidgardContext'
-import { sequenceTRD } from '../../helpers/fpHelpers'
 import { getPoolTableRowsData, RUNE_PRICE_POOL } from '../../helpers/poolHelper'
 import { useFundsCap } from '../../hooks/useFundsCap'
 import useInterval, { INACTIVE_INTERVAL } from '../../hooks/useInterval'
@@ -47,14 +46,12 @@ export const PendingPools: React.FC<PoolsComponentProps> = (): JSX.Element => {
 
   const {
     thorchainLastblockState$,
-    thorchainConstantsState$,
     pools: { pendingPoolsState$, reloadPendingPools, selectedPricePool$, poolsFilters$, setPoolsFilter },
     reloadThorchainLastblock
   } = midgardService
 
   const poolsRD = useObservableState(pendingPoolsState$, RD.pending)
   const thorchainLastblockRD: ThorchainLastblockRD = useObservableState(thorchainLastblockState$, RD.pending)
-  const thorchainConstantsRD = useObservableState(thorchainConstantsState$, RD.pending)
 
   const { reload: reloadFundsCap, data: fundsCapRD } = useFundsCap()
 
@@ -123,10 +120,8 @@ export const PendingPools: React.FC<PoolsComponentProps> = (): JSX.Element => {
       const { deepest, pool } = record
 
       const blocksLeft: string = FP.pipe(
-        sequenceTRD(thorchainLastblockRD, thorchainConstantsRD),
-        RD.map(([lastblockItems, constants]) =>
-          getBlocksLeftForPendingPoolAsString(constants, lastblockItems, pool.target, oNewPoolCycle)
-        ),
+        thorchainLastblockRD,
+        RD.map((lastblockItems) => getBlocksLeftForPendingPoolAsString(lastblockItems, pool.target, oNewPoolCycle)),
         RD.getOrElse(() => '--')
       )
 
@@ -136,7 +131,7 @@ export const PendingPools: React.FC<PoolsComponentProps> = (): JSX.Element => {
         </TableAction>
       )
     },
-    [thorchainLastblockRD, thorchainConstantsRD, oNewPoolCycle]
+    [thorchainLastblockRD, oNewPoolCycle]
   )
 
   const blockLeftColumn = useMemo(

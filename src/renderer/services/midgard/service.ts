@@ -128,8 +128,8 @@ const thorchainConstantsState$: ThorchainConstantsLD = FP.pipe(
   RxOp.switchMap(() => apiGetThorchainConstants$),
   RxOp.startWith(RD.pending),
   RxOp.retry(MIDGARD_MAX_RETRY),
-  RxOp.catchError(() => Rx.of(RD.failure(Error('')))),
-  RxOp.shareReplay(1)
+  RxOp.shareReplay(1),
+  RxOp.catchError(() => Rx.of(RD.failure(Error('Failed to load Thorchain constants'))))
 )
 
 const nativeTxFee$: NativeFeeLD = thorchainConstantsState$.pipe(
