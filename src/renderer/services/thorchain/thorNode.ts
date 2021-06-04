@@ -207,7 +207,9 @@ const mimir$: MimirLD = FP.pipe(
       RxOp.startWith(RD.pending)
     )
   ),
-  RxOp.shareReplay(1)
+  // Cache results before catching errors in other case we will cache error only in case of any error
+  RxOp.shareReplay(1),
+  RxOp.catchError((e) => Rx.of(RD.failure(Error(`Failed loading mimir: ${JSON.stringify(e)}`))))
 )
 
 export { getNodeInfo$, reloadNodesInfo, mimir$, reloadMimir, getLiquidityProvider, reloadLiquidityProviders }

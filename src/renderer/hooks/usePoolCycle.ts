@@ -1,24 +1,25 @@
 import { useCallback, useEffect, useMemo } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
-import { eqNumber } from 'fp-ts/Eq'
 import * as FP from 'fp-ts/function'
+import * as N from 'fp-ts/number'
 import * as O from 'fp-ts/Option'
 import { useObservableState } from 'observable-hooks'
-import * as Rx from 'rxjs'
 import * as RxOp from 'rxjs/operators'
 
 import { useMidgardContext } from '../contexts/MidgardContext'
 import { useThorchainContext } from '../contexts/ThorchainContext'
+import { eqApiError } from '../helpers/fp/eq'
 import { LiveData, liveData } from '../helpers/rx/liveData'
 import { observableState } from '../helpers/stateHelper'
+import { ApiError, ErrorId } from '../services/wallet/types'
 
-type Data = RD.RemoteData<Error, number>
+type PoolCycleRD = RD.RemoteData<ApiError, number>
 
-const _eq = RD.getEq({ equals: () => true }, eqNumber)
+const eqPoolCycle = RD.getEq<ApiError, number>(eqApiError, N.Eq)
 
-export const usePoolCycle = (): [Data, FP.Lazy<void>] => {
-  const { get$: poolCycleState$, set: setPoolCycleState } = useMemo(() => observableState<Data>(RD.initial), [])
+export const usePoolCycle = (): [PoolCycleRD, FP.Lazy<void>] => {
+  const { get$: poolCycleState$, set: setPoolCycleState } = useMemo(() => observableState<PoolCycleRD>(RD.initial), [])
   const { mimir$, reloadMimir } = useThorchainContext()
   const {
     service: { thorchainConstantsState$, reloadThorchainConstants }
@@ -34,43 +35,37 @@ export const usePoolCycle = (): [Data, FP.Lazy<void>] => {
   )
 
   const getPoolCycleFromMidgard = useCallback(() => {
-    console.log('get form midgard')
     reloadThorchainConstants()
     return poolCycleFromMidgardConstants$
   }, [reloadThorchainConstants, poolCycleFromMidgardConstants$])
 
   const getPoolCycleFromMimir = useCallback(() => {
-    console.log('get form mimir')
     reloadMimir()
     return mimir$
   }, [reloadMimir, mimir$])
 
   const getData = useCallback(() => {
-    console.log('get pool cycle data')
     FP.pipe(
       getPoolCycleFromMimir(),
       liveData.map(({ 'mimir//POOLCYCLE': newPoolCycle }) => O.fromNullable(newPoolCycle)),
-      RxOp.catchError(() => FP.pipe(getPoolCycleFromMidgard(), liveData.map(O.some))),
+      liveData.chainOnError(() => FP.pipe(getPoolCycleFromMidgard(), liveData.map(O.some))),
       liveData.chain(O.fold(getPoolCycleFromMidgard, (poolCycle) => liveData.of(poolCycle))),
-      RxOp.catchError(() => Rx.of(RD.failure(Error('unable to load'))))
+      liveData.mapLeft(() => ({
+        errorId: ErrorId.GET_MIMIR,
+        msg: 'Unable to load pool cylce'
+      }))
     ).subscribe(setPoolCycleState)
   }, [getPoolCycleFromMimir, setPoolCycleState, getPoolCycleFromMidgard])
 
   const [data] = useObservableState(
-    () =>
-      FP.pipe(
-        poolCycleState$,
-        RxOp.shareReplay(1)
-        // RxOp.distinctUntilChanged((a, b) => eq.equals(a, b))
-      ),
+    () => FP.pipe(poolCycleState$, RxOp.shareReplay(1), RxOp.distinctUntilChanged(eqPoolCycle.equals)),
     RD.initial
   )
 
   useEffect(() => {
     getData()
-    // eslint-disable-next-line
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
-  console.log('data - ', data)
   return [data, getData]
 }
