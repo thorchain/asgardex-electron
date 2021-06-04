@@ -60,15 +60,15 @@ export const PendingPools: React.FC<PoolsComponentProps> = (): JSX.Element => {
   // store previous data of pending pools to render these while reloading
   const previousPools = useRef<Option<PoolTableRowsData>>(none)
 
-  const { data: poolCycle, getData: reloadPpoolCycle } = usePoolCycle()
+  const { data: poolCycle, getData: reloadPoolCycle } = usePoolCycle()
 
   const oNewPoolCycle = useMemo(() => FP.pipe(poolCycle, RD.toOption), [poolCycle])
 
   const refreshHandler = useCallback(() => {
     reloadPendingPools()
     reloadFundsCap()
-    reloadPpoolCycle()
-  }, [reloadFundsCap, reloadPendingPools, reloadPpoolCycle])
+    reloadPoolCycle()
+  }, [reloadFundsCap, reloadPendingPools, reloadPoolCycle])
 
   const pendingCountdownHandler = useCallback(() => {
     reloadThorchainLastblock()
