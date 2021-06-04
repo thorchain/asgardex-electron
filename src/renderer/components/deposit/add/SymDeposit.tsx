@@ -52,7 +52,7 @@ import {
 } from '../../../services/chain/types'
 import { ApproveFeeHandler, ApproveParams, IsApprovedRD, LoadApproveFeeHandler } from '../../../services/ethereum/types'
 import { PoolAddress, PoolsDataMap } from '../../../services/midgard/types'
-import { LiquidityProviderRD } from '../../../services/thorchain/types'
+import { PendingAssets, PendingAssetsRD } from '../../../services/thorchain/types'
 import { ApiError, TxHashLD, TxHashRD, ValidatePasswordHandler } from '../../../services/wallet/types'
 import { AssetWithDecimal } from '../../../types/asgardex'
 import { WalletBalances } from '../../../types/wallet'
@@ -64,6 +64,7 @@ import { Fees, UIFeesRD } from '../../uielements/fees'
 import { formatFee } from '../../uielements/fees/Fees.helper'
 import * as Helper from './Deposit.helper'
 import * as Styled from './Deposit.style'
+import { PendingAssets as PendingAssetsUI } from './Deposit.subcomponents'
 
 export type Props = {
   asset: AssetWithDecimal
@@ -96,7 +97,7 @@ export type Props = {
   fundsCap: O.Option<FundsCap>
   poolsData: PoolsDataMap
   haltedChains: Chain[]
-  liquidityProvider: LiquidityProviderRD
+  pendingAssets: PendingAssetsRD
 }
 
 type SelectedInput = 'asset' | 'rune' | 'none'
@@ -133,7 +134,7 @@ export const SymDeposit: React.FC<Props> = (props) => {
     fundsCap: oFundsCap,
     poolsData,
     haltedChains,
-    liquidityProvider: liquidityProviderRD
+    pendingAssets: pendingAssetsRD
   } = props
 
   const intl = useIntl()
@@ -917,21 +918,36 @@ export const SymDeposit: React.FC<Props> = (props) => {
   const hasPendingAssets: boolean = useMemo(
     () =>
       FP.pipe(
-        liquidityProviderRD,
+        pendingAssetsRD,
         RD.toOption,
-        O.flatten,
-        O.map(({ pendingRune, pendingAsset }) => pendingRune.gt(0) || pendingAsset.gt(0)),
-        O.getOrElse((): boolean => false),
+        O.map((pendingAssets): boolean => pendingAssets.length > 0),
+        O.getOrElse((): boolean => false)
         // TODO @Veado Remove it, just for debugging
-        () => true
+        // () => true
       ),
-    [liquidityProviderRD]
+    [pendingAssetsRD]
   )
+
+  const prevPendingAssets = useRef<PendingAssets>([])
+
   const renderPendingAssets = useMemo(() => {
-    const title = intl.formatMessage({ id: 'deposit.add.pendingAssets.title' })
-    const description = intl.formatMessage({ id: 'deposit.add.pendingAssets.description' })
-    return <Styled.Alert type="warning" message={title} description={description} />
-  }, [intl])
+    const render = (pendingAssets: PendingAssets, loading: boolean) =>
+      pendingAssets.length > 0 && <PendingAssetsUI network={network} assets={pendingAssets} loading={loading} />
+
+    return FP.pipe(
+      pendingAssetsRD,
+      RD.fold(
+        () => <></>,
+        () => render(prevPendingAssets.current, true),
+        () => <></>,
+        (pendingAssets) => {
+          prevPendingAssets.current = pendingAssets
+          console.log('pendingAssets:', pendingAssets)
+          return render(pendingAssets, false)
+        }
+      )
+    )
+  }, [network, pendingAssetsRD])
 
   const prevRouterAddress = useRef<O.Option<Address>>(O.none)
 
@@ -1022,6 +1038,8 @@ export const SymDeposit: React.FC<Props> = (props) => {
 
   return (
     <Styled.Container>
+      <div>hasPendingAssets {hasPendingAssets.toString()}</div>
+      <div>pendingAssetsRD {JSON.stringify(pendingAssetsRD)}</div>
       {hasPendingAssets && (
         <Styled.AlertRow>
           <Col xs={24}>{renderPendingAssets}</Col>

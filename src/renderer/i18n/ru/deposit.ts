@@ -25,8 +25,12 @@ const deposit: DepositMessages = {
   'deposit.add.error.nobalances': 'Нет средств',
   'deposit.add.error.nobalance1': 'У вас нет средств на балансе {asset} в кошелке для вклада',
   'deposit.add.error.nobalance2': 'У вас нет средств на балансах {asset1} и {asset2} в кошельке для вклада',
-  'deposit.add.pendingAssets.title': 'Pending assets - RU',
-  'deposit.add.pendingAssets.description': 'TODO @veado ADD description',
+  'deposit.add.pendingAssets.title': 'Pending assets found - RU',
+  'deposit.add.pendingAssets.description':
+    'Transactions of an asset pair might take different time by running on different blockchains. Following assets are successful sent, but transaction of the another asset has not been successful listed yet: - RU',
+  'deposit.add.pendingAssets.recoveryDescription':
+    "That's why THORChain does not listed you as a pool member. In case of failures of transactions for the other asset, you are able to withdraw pending assets by using the Recovery Tool of ASDGARDEX web at https://testnet.asgard.exchange/deposit-sym-recovery. This feature is currently not available in ASGARDEX desktop. - RU",
+  'deposit.add.pendingAssets.recoveryTitle': 'Open Recovery Tool - RU',
   'deposit.bond.state.error': 'Ошибка при кладе',
   'deposit.unbond.state.error': 'Ошибка при выводе',
   'deposit.leave.state.error': 'Ошибка при выходе',

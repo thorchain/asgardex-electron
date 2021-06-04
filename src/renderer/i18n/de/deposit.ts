@@ -26,8 +26,12 @@ const deposit: DepositMessages = {
   'deposit.add.error.nobalances': 'Kein Guthaben',
   'deposit.add.error.nobalance1': 'Du verfügst über kein Guthaben, um {asset} hinzuzufügen.',
   'deposit.add.error.nobalance2': 'Du verfügst über keine Guthaben, um {asset1} und {asset2} hinzuzufügen.',
-  'deposit.add.pendingAssets.title': 'Ausstehende Assets',
-  'deposit.add.pendingAssets.description': 'TODO @veado ADD description',
+  'deposit.add.pendingAssets.title': 'Pending Assets gefunden',
+  'deposit.add.pendingAssets.description':
+    'Die Transaktionen für das Einzahlen eines Assetpaares können aufgrund unterschiedlicher Blockchains unterschiedliche Zeit benötigen. Folgende Assets wurden überwiesen, jedoch als "Pending" markiert, da die Transaktion des anderen Assets noch aussteht.',
+  'deposit.add.pendingAssets.recoveryDescription':
+    'THORChain hat Dich darum noch nicht Poolteilnehmer gelistet. Falls beim Einzahlen eine Transaktion eines des Asset Paares fehlschlug, können die bereits eingezahlten, auf "Pending" gesetzten Assets über das Recovery Tool der ASDGARDEX Webapp unter https://testnet.asgard.exchange/deposit-sym-recovery zurücküberwiesen werden. Dieses Feature steht derzeit noch nicht in der ASGARDEX Desktop Anwendung zur Verfügung.',
+  'deposit.add.pendingAssets.recoveryTitle': 'Öffne Recovery Tool',
   'deposit.bond.state.error': 'Bond Fehler',
   'deposit.unbond.state.error': 'Unbond Fehler',
   'deposit.leave.state.error': 'Fehler beim Verlassen',

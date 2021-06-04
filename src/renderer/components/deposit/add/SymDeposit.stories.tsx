@@ -115,7 +115,7 @@ const defaultProps: SymDepositProps = {
       runeBalance: baseAmount(10)
     }
   },
-  liquidityProvider: RD.initial
+  pendingAssets: RD.initial
 }
 
 export const Default: Story = () => <SymDeposit {...defaultProps} />

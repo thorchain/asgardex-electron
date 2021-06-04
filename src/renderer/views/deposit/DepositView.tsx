@@ -149,29 +149,36 @@ export const DepositView: React.FC<Props> = () => {
 
   const poolDetailRD = useObservableState<PoolDetailRD>(selectedPoolDetail$, RD.initial)
 
-  const [liquidityProvider] = useObservableState<LiquidityProviderRD>(
-    () =>
-      FP.pipe(
-        Rx.combineLatest([
-          network$,
-          // We should look for THORChain's wallet at the response of liqudity_providers endpoint
-          addressByChain$(THORChain),
-          address$,
-          assetWithDecimalLD
-        ]),
-        RxOp.switchMap(([network, oAddress, oAssetAddress, assetWithDecimalRD]) =>
-          FP.pipe(
-            sequenceTOption(RD.toOption(assetWithDecimalRD)),
-            O.fold(
-              (): LiquidityProviderLD => Rx.EMPTY,
-              ([assetWithDecimal]) =>
-                getLiquidityProvider({ assetWithDecimal, network, runeAddress: oAddress, assetAddress: oAssetAddress })
-            )
+  const [liquidityProvider] = useObservableState<LiquidityProviderRD>(() => {
+    console.log('liquidityProvider +++')
+    return FP.pipe(
+      Rx.combineLatest([
+        network$,
+        // We should look for THORChain's wallet at the response of liqudity_providers endpoint
+        addressByChain$(THORChain),
+        address$,
+        assetWithDecimalLD
+      ]),
+      RxOp.map((v) => {
+        console.log('liquidityProvider:', v)
+        return v
+      }),
+      RxOp.switchMap(([network, oAddress, oAssetAddress, assetWithDecimalRD]) => {
+        console.log('network:', network)
+        console.log('oAddress:', oAddress)
+        console.log('oAssetAddress:', oAssetAddress)
+        console.log('assetWithDecimalRD:', assetWithDecimalRD)
+        return FP.pipe(
+          RD.toOption(assetWithDecimalRD),
+          O.fold(
+            (): LiquidityProviderLD => Rx.EMPTY,
+            (assetWithDecimal) =>
+              getLiquidityProvider({ assetWithDecimal, network, runeAddress: oAddress, assetAddress: oAssetAddress })
           )
         )
-      ),
-    RD.initial
-  )
+      })
+    )
+  }, RD.initial)
 
   // Special case: `keystoreState` is `undefined` in first render loop
   // (see comment at its definition using `useObservableState`)
