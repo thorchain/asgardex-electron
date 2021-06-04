@@ -20,8 +20,8 @@ type PoolCycleLD = LiveData<ApiError, number>
 const eqPoolCycle = RD.getEq<ApiError, number>(eqApiError, N.Eq)
 
 export const usePoolCycle = (): {
-  data: PoolCycleRD
-  getData: FP.Lazy<void>
+  poolCycle: PoolCycleRD
+  reloadPoolCycle: FP.Lazy<void>
 } => {
   const { mimir$, reloadMimir } = useThorchainContext()
   const {
@@ -75,5 +75,5 @@ export const usePoolCycle = (): {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
-  return useMemo(() => ({ data, getData }), [data, getData])
+  return { poolCycle: data, reloadPoolCycle: getData }
 }

@@ -60,7 +60,7 @@ export const PendingPools: React.FC<PoolsComponentProps> = (): JSX.Element => {
   // store previous data of pending pools to render these while reloading
   const previousPools = useRef<Option<PoolTableRowsData>>(none)
 
-  const { data: poolCycle, getData: reloadPoolCycle } = usePoolCycle()
+  const { poolCycle, reloadPoolCycle } = usePoolCycle()
 
   const oNewPoolCycle = useMemo(() => FP.pipe(poolCycle, RD.toOption), [poolCycle])
 
