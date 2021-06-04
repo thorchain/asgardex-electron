@@ -5,6 +5,7 @@ import * as FP from 'fp-ts/function'
 import * as N from 'fp-ts/number'
 import * as O from 'fp-ts/Option'
 import { useObservableState } from 'observable-hooks'
+import * as Rx from 'rxjs'
 import * as RxOp from 'rxjs/operators'
 
 import { useMidgardContext } from '../contexts/MidgardContext'
@@ -47,12 +48,19 @@ export const usePoolCycle = (): [PoolCycleRD, FP.Lazy<void>] => {
   const getData = useCallback(() => {
     FP.pipe(
       getPoolCycleFromMimir(),
-      liveData.map(({ 'mimir//POOLCYCLE': newPoolCycle }) => O.fromNullable(newPoolCycle)),
-      liveData.chainOnError(() => FP.pipe(getPoolCycleFromMidgard(), liveData.map(O.some))),
-      liveData.chain(O.fold(getPoolCycleFromMidgard, (poolCycle) => liveData.of(poolCycle))),
+      liveData.chain(({ 'mimir//POOLCYCLE': newPoolCycle }) =>
+        FP.pipe(
+          O.fromNullable(newPoolCycle),
+          O.fold(
+            (): LiveData<Error, number> => Rx.of(RD.failure(Error(`No POOLCYCLE at the mimir's response`))),
+            (poolCycle) => liveData.of(poolCycle)
+          )
+        )
+      ),
+      liveData.chainOnError(getPoolCycleFromMidgard),
       liveData.mapLeft(() => ({
         errorId: ErrorId.GET_MIMIR,
-        msg: 'Unable to load pool cylce'
+        msg: 'Unable to load pool cycle'
       }))
     ).subscribe(setPoolCycleState)
   }, [getPoolCycleFromMimir, setPoolCycleState, getPoolCycleFromMidgard])
