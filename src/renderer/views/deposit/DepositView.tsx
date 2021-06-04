@@ -17,11 +17,13 @@ import { RefreshButton } from '../../components/uielements/button'
 import { useAppContext } from '../../contexts/AppContext'
 import { useChainContext } from '../../contexts/ChainContext'
 import { useMidgardContext } from '../../contexts/MidgardContext'
+import { useThorchainContext } from '../../contexts/ThorchainContext'
 import { useWalletContext } from '../../contexts/WalletContext'
 import { sequenceTOption } from '../../helpers/fpHelpers'
 import { DepositRouteParams } from '../../routes/pools/deposit'
-import { AssetWithDecimalRD } from '../../services/chain/types'
+import { AssetWithDecimalLD, AssetWithDecimalRD } from '../../services/chain/types'
 import { PoolDetailRD, PoolSharesLD, PoolSharesRD } from '../../services/midgard/types'
+import { LiquidityProviderRD, LiquidityProviderLD } from '../../services/thorchain/types'
 import { AsymDepositView } from './add/AsymDepositView'
 import { SymDepositView } from './add/SymDepositView'
 import * as Styled from './DepositView.styles'
@@ -35,6 +37,8 @@ export const DepositView: React.FC<Props> = () => {
   const intl = useIntl()
 
   const { network$ } = useAppContext()
+
+  const { getLiquidityProvider } = useThorchainContext()
 
   const { asset } = useParams<DepositRouteParams>()
   const {
@@ -64,7 +68,7 @@ export const DepositView: React.FC<Props> = () => {
     }
   }, [oRouteAsset, setSelectedPoolAsset])
 
-  const [assetRD] = useObservableState<AssetWithDecimalRD>(
+  const assetWithDecimalLD: AssetWithDecimalLD = useMemo(
     () =>
       FP.pipe(
         Rx.combineLatest([selectedPoolAsset$, network$]),
@@ -78,8 +82,10 @@ export const DepositView: React.FC<Props> = () => {
           )
         )
       ),
-    RD.initial
+    [selectedPoolAsset$, network$, assetWithDecimal$]
   )
+
+  const assetRD = useObservableState<AssetWithDecimalRD>(assetWithDecimalLD, RD.initial)
 
   const oSelectedAsset = useMemo(() => RD.toOption(assetRD), [assetRD])
 
@@ -142,6 +148,43 @@ export const DepositView: React.FC<Props> = () => {
   const keystoreState = useObservableState(keystoreService.keystore$, undefined)
 
   const poolDetailRD = useObservableState<PoolDetailRD>(selectedPoolDetail$, RD.initial)
+
+  const [liquidityProvider] = useObservableState<LiquidityProviderRD>(
+    () =>
+      FP.pipe(
+        Rx.combineLatest([
+          network$,
+          // We should look for THORChain's wallet at the response of liqudity_providers endpoint
+          addressByChain$(THORChain),
+          address$,
+          assetWithDecimalLD
+        ]),
+        RxOp.switchMap(([network, oAddress, oAssetAddress, assetWithDecimalRD]) =>
+          FP.pipe(
+            sequenceTOption(RD.toOption(assetWithDecimalRD)),
+            O.fold(
+              (): LiquidityProviderLD => Rx.EMPTY,
+              ([assetWithDecimal]) =>
+                getLiquidityProvider({ assetWithDecimal, network, runeAddress: oAddress, assetAddress: oAssetAddress })
+            )
+          )
+        )
+      ),
+    RD.initial
+  )
+
+  const _hasPendingAssets: boolean = useMemo(
+    () =>
+      FP.pipe(
+        liquidityProvider,
+        RD.toOption,
+        (s) => s,
+        O.flatten,
+        O.map(({ pendingRune, pendingAsset }) => pendingRune.gt(0) || pendingAsset.gt(0)),
+        O.getOrElse((): boolean => false)
+      ),
+    [liquidityProvider]
+  )
 
   // Special case: `keystoreState` is `undefined` in first render loop
   // (see comment at its definition using `useObservableState`)
