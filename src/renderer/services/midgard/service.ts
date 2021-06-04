@@ -125,6 +125,7 @@ const { stream$: reloadThorchainConstants$, trigger: reloadThorchainConstants } 
  */
 const thorchainConstantsState$: ThorchainConstantsLD = FP.pipe(
   reloadThorchainConstants$,
+  RxOp.debounceTime(300),
   RxOp.switchMap(() => apiGetThorchainConstants$),
   RxOp.startWith(RD.pending),
   RxOp.retry(MIDGARD_MAX_RETRY),

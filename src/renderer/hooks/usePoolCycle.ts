@@ -12,68 +12,68 @@ import { useMidgardContext } from '../contexts/MidgardContext'
 import { useThorchainContext } from '../contexts/ThorchainContext'
 import { eqApiError } from '../helpers/fp/eq'
 import { LiveData, liveData } from '../helpers/rx/liveData'
-import { observableState } from '../helpers/stateHelper'
 import { ApiError, ErrorId } from '../services/wallet/types'
 
 type PoolCycleRD = RD.RemoteData<ApiError, number>
+type PoolCycleLD = LiveData<ApiError, number>
 
 const eqPoolCycle = RD.getEq<ApiError, number>(eqApiError, N.Eq)
 
-export const usePoolCycle = (): [PoolCycleRD, FP.Lazy<void>] => {
-  const { get$: poolCycleState$, set: setPoolCycleState } = useMemo(() => observableState<PoolCycleRD>(RD.initial), [])
+export const usePoolCycle = (): {
+  data: PoolCycleRD
+  getData: FP.Lazy<void>
+} => {
   const { mimir$, reloadMimir } = useThorchainContext()
   const {
     service: { thorchainConstantsState$, reloadThorchainConstants }
   } = useMidgardContext()
 
-  const poolCycleFromMidgardConstants$: LiveData<Error, number> = useMemo(
+  const midgardConstantsPoolCycle$: PoolCycleLD = useMemo(
     () =>
       FP.pipe(
         thorchainConstantsState$,
-        liveData.map(({ int_64_values }) => int_64_values.PoolCycle)
+        liveData.map(({ int_64_values }) => int_64_values.PoolCycle),
+        liveData.mapLeft(() => ({ errorId: ErrorId.GET_POOL_CYCLE, msg: 'Unable to load pool cycle from Midgard' }))
       ),
     [thorchainConstantsState$]
   )
 
-  const getPoolCycleFromMidgard = useCallback(() => {
-    reloadThorchainConstants()
-    return poolCycleFromMidgardConstants$
-  }, [reloadThorchainConstants, poolCycleFromMidgardConstants$])
-
-  const getPoolCycleFromMimir = useCallback(() => {
-    reloadMimir()
-    return mimir$
-  }, [reloadMimir, mimir$])
+  const mimirPoolCycle$: PoolCycleLD = useMemo(
+    () =>
+      FP.pipe(
+        mimir$,
+        liveData.map(({ 'mimir//POOLCYCLE': poolCycle }) => O.fromNullable(poolCycle)),
+        liveData.chain(liveData.fromOption(() => Error('Unable to load pool cycle from Mimir'))),
+        liveData.mapLeft(({ message }) => ({ errorId: ErrorId.GET_POOL_CYCLE, msg: message }))
+      ),
+    [mimir$]
+  )
 
   const getData = useCallback(() => {
-    FP.pipe(
-      getPoolCycleFromMimir(),
-      liveData.chain(({ 'mimir//POOLCYCLE': newPoolCycle }) =>
-        FP.pipe(
-          O.fromNullable(newPoolCycle),
-          O.fold(
-            (): LiveData<Error, number> => Rx.of(RD.failure(Error(`No POOLCYCLE at the mimir's response`))),
-            (poolCycle) => liveData.of(poolCycle)
-          )
-        )
-      ),
-      liveData.chainOnError(getPoolCycleFromMidgard),
-      liveData.mapLeft(() => ({
-        errorId: ErrorId.GET_MIMIR,
-        msg: 'Unable to load pool cycle'
-      }))
-    ).subscribe(setPoolCycleState)
-  }, [getPoolCycleFromMimir, setPoolCycleState, getPoolCycleFromMidgard])
+    reloadMimir()
+    reloadThorchainConstants()
+  }, [reloadThorchainConstants, reloadMimir])
 
   const [data] = useObservableState(
-    () => FP.pipe(poolCycleState$, RxOp.shareReplay(1), RxOp.distinctUntilChanged(eqPoolCycle.equals)),
+    () =>
+      FP.pipe(
+        Rx.combineLatest([midgardConstantsPoolCycle$, mimirPoolCycle$]),
+        RxOp.map(([mimirPoolCycleRD, midgardPoolCycleRD]) =>
+          FP.pipe(
+            mimirPoolCycleRD,
+            RD.alt(() => midgardPoolCycleRD)
+          )
+        ),
+        RxOp.distinctUntilChanged(eqPoolCycle.equals)
+      ),
     RD.initial
   )
 
+  // Reload data on mount
   useEffect(() => {
     getData()
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
-  return [data, getData]
+  return useMemo(() => ({ data, getData }), [data, getData])
 }

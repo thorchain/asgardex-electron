@@ -104,7 +104,7 @@ export enum ErrorId {
   VALIDATE_NODE = 'VALIDATE_NODE',
   VALIDATE_RESULT = 'VALIDATE_RESULT',
   GET_ACTIONS = 'GET_ACTIONS',
-  GET_MIMIR = 'GET_MIMIR'
+  GET_POOL_CYCLE = 'GET_POOL_CYCLE'
 }
 
 export type ChainBalancesService = {
