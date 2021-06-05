@@ -40,7 +40,11 @@ export const AlertRow = styled(Row)`
 
 export const Alert = styled(UIAlert)`
   width: 100%;
+  margin: 0;
+
+  ${media.xl`
   margin-right: 20px;
+`}
 `
 
 export const BalanceErrorLabel = styled(UILabel).attrs({
