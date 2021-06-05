@@ -189,7 +189,8 @@ const getLiquidityProvider = ({
     liveData.map(
       A.findFirst(
         (provider) =>
-          eqOString.equals(provider.runeAddress, runeAddress) && eqOString.equals(provider.assetAddress, assetAddress)
+          eqOString.equals(provider.runeAddress, O.some(runeAddress)) &&
+          eqOString.equals(provider.assetAddress, O.some(assetAddress))
       )
     )
   )

@@ -44,7 +44,6 @@ export const DepositView: React.FC<Props> = () => {
   const {
     service: {
       setSelectedPoolAsset,
-      selectedPoolAsset$,
       pools: { reloadSelectedPoolDetail, selectedPoolDetail$, haltedChains$ },
       shares: { shares$, reloadShares }
     }
@@ -71,35 +70,35 @@ export const DepositView: React.FC<Props> = () => {
   const assetWithDecimalLD: AssetWithDecimalLD = useMemo(
     () =>
       FP.pipe(
-        Rx.combineLatest([selectedPoolAsset$, network$]),
-        RxOp.switchMap(([oAsset, network]) =>
+        network$,
+        RxOp.switchMap((network) =>
           FP.pipe(
-            oAsset,
+            oRouteAsset,
             O.fold(
-              () => Rx.of(RD.initial),
+              () => Rx.EMPTY,
               (asset) => assetWithDecimal$(asset, network)
             )
           )
         )
       ),
-    [selectedPoolAsset$, network$, assetWithDecimal$]
+    [network$, oRouteAsset, assetWithDecimal$]
   )
 
-  const assetRD = useObservableState<AssetWithDecimalRD>(assetWithDecimalLD, RD.initial)
+  const assetWithDecimalRD = useObservableState<AssetWithDecimalRD>(assetWithDecimalLD, RD.initial)
 
-  const oSelectedAsset = useMemo(() => RD.toOption(assetRD), [assetRD])
+  const oSelectedAssetWithDecimal = useMemo(() => RD.toOption(assetWithDecimalRD), [assetWithDecimalRD])
 
   const address$ = useMemo(
     () =>
       FP.pipe(
-        oSelectedAsset,
+        oRouteAsset,
         O.fold(
           () => Rx.EMPTY,
-          ({ asset }) => addressByChain$(asset.chain)
+          (asset) => addressByChain$(asset.chain)
         )
       ),
 
-    [addressByChain$, oSelectedAsset]
+    [addressByChain$, oRouteAsset]
   )
   const oAssetWalletAddress = useObservableState(address$, O.none)
 
@@ -119,20 +118,26 @@ export const DepositView: React.FC<Props> = () => {
   const poolSharesRD = useObservableState<PoolSharesRD>(poolShares$, RD.initial)
 
   const refreshButtonDisabled = useMemo(
-    () => FP.pipe(poolSharesRD, RD.toOption, (oPoolShares) => sequenceTOption(oPoolShares, oSelectedAsset), O.isNone),
-    [poolSharesRD, oSelectedAsset]
+    () =>
+      FP.pipe(
+        poolSharesRD,
+        RD.toOption,
+        (oPoolShares) => sequenceTOption(oPoolShares, oSelectedAssetWithDecimal),
+        O.isNone
+      ),
+    [poolSharesRD, oSelectedAssetWithDecimal]
   )
 
   const reloadChainAndRuneBalances = useCallback(() => {
     FP.pipe(
-      oSelectedAsset,
+      oSelectedAssetWithDecimal,
       O.map(({ asset: { chain } }) => {
         reloadBalancesByChain(chain)()
         reloadBalancesByChain(THORChain)()
         return true
       })
     )
-  }, [oSelectedAsset, reloadBalancesByChain])
+  }, [oSelectedAssetWithDecimal, reloadBalancesByChain])
 
   const reloadHandler = useCallback(() => {
     reloadChainAndRuneBalances()
@@ -150,30 +155,20 @@ export const DepositView: React.FC<Props> = () => {
   const poolDetailRD = useObservableState<PoolDetailRD>(selectedPoolDetail$, RD.initial)
 
   const [liquidityProvider] = useObservableState<LiquidityProviderRD>(() => {
-    console.log('liquidityProvider +++')
-    return FP.pipe(
-      Rx.combineLatest([
-        network$,
-        // We should look for THORChain's wallet at the response of liqudity_providers endpoint
-        addressByChain$(THORChain),
-        address$,
-        assetWithDecimalLD
-      ]),
-      RxOp.map((v) => {
-        console.log('liquidityProvider:', v)
-        return v
-      }),
-      RxOp.switchMap(([network, oAddress, oAssetAddress, assetWithDecimalRD]) => {
-        console.log('network:', network)
-        console.log('oAddress:', oAddress)
-        console.log('oAssetAddress:', oAssetAddress)
-        console.log('assetWithDecimalRD:', assetWithDecimalRD)
+    return Rx.combineLatest([
+      network$,
+      // We should look for THORChain's wallet at the response of liqudity_providers endpoint
+      address$,
+      addressByChain$(THORChain),
+      assetWithDecimalLD
+    ]).pipe(
+      RxOp.switchMap(([network, oAssetAddress, oRuneAddress, assetWithDecimalRD]) => {
         return FP.pipe(
-          RD.toOption(assetWithDecimalRD),
+          sequenceTOption(oRuneAddress, oAssetAddress, RD.toOption(assetWithDecimalRD)),
           O.fold(
-            (): LiquidityProviderLD => Rx.EMPTY,
-            (assetWithDecimal) =>
-              getLiquidityProvider({ assetWithDecimal, network, runeAddress: oAddress, assetAddress: oAssetAddress })
+            (): LiquidityProviderLD => Rx.of(RD.initial),
+            ([runeAddress, assetAddress, assetWithDecimal]) =>
+              getLiquidityProvider({ assetWithDecimal, network, runeAddress, assetAddress })
           )
         )
       })
@@ -193,7 +188,7 @@ export const DepositView: React.FC<Props> = () => {
         <RefreshButton disabled={refreshButtonDisabled} clickHandler={reloadHandler} />
       </Styled.TopControlsContainer>
       {FP.pipe(
-        assetRD,
+        assetWithDecimalRD,
         RD.fold(
           () => <></>,
           () => <Spin size="large" />,

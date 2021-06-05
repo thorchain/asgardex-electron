@@ -287,7 +287,6 @@ export const SymDepositView: React.FC<Props> = (props) => {
 
         return (
           <>
-            <div>liquidityProviderRD {JSON.stringify(liquidityProviderRD)}</div>
             <SymDeposit
               haltedChains={haltedChains}
               validatePassword$={validatePassword$}

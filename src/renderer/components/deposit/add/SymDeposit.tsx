@@ -1038,8 +1038,6 @@ export const SymDeposit: React.FC<Props> = (props) => {
 
   return (
     <Styled.Container>
-      <div>hasPendingAssets {hasPendingAssets.toString()}</div>
-      <div>pendingAssetsRD {JSON.stringify(pendingAssetsRD)}</div>
       {hasPendingAssets && (
         <Styled.AlertRow>
           <Col xs={24}>{renderPendingAssets}</Col>

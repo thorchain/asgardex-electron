@@ -84,8 +84,8 @@ export type GetLiquidityProvidersParams = {
 }
 
 export type GetLiquidityProviderParams = GetLiquidityProvidersParams & {
-  runeAddress: O.Option<Address>
-  assetAddress: O.Option<Address>
+  runeAddress: Address
+  assetAddress: Address
 }
 
 export type PendingAssets = AssetWithAmount[]
