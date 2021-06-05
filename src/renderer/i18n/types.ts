@@ -84,6 +84,7 @@ export type CommonMessageKey =
   | 'common.theme.light'
   | 'common.theme.dark'
   | 'common.volume24'
+  | 'common.informationMore'
 
 export type CommonMessages = {
   [key in CommonMessageKey]: string

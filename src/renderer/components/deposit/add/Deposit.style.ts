@@ -1,3 +1,4 @@
+import { CaretRightOutlined } from '@ant-design/icons/lib'
 import { Row } from 'antd'
 import styled from 'styled-components'
 import { palette } from 'styled-theme'
@@ -150,7 +151,7 @@ export const SubmitButton = styled(UIButton).attrs({
   margin-bottom: 20px;
 `
 
-export const AssetContainer = styled('div')`
+export const PendingAssetContainer = styled('div')`
   display: flex;
   flex-direction: row;
   justify-content: center;
@@ -166,13 +167,13 @@ export const AssetContainer = styled('div')`
   }
 `
 
-export const AssetIcon = styled(UIAssetIcon).attrs({ size: 'small' })`
+export const PendingAssetIcon = styled(UIAssetIcon).attrs({ size: 'small' })`
   margin-right: 5px;
 `
-export const AssetLabel = styled(UIAssetLabel)`
+export const PendingAssetLabel = styled(UIAssetLabel)`
   padding: 0px;
 `
-export const AssetAmountLabel = styled(UILabel)`
+export const PendingAssetAmountLabel = styled(UILabel)`
   font-family: 'MainFontBold';
   padding: 0;
   font-size: 17px;
@@ -184,11 +185,33 @@ export const AssetAmountLabel = styled(UILabel)`
 `}
 `
 
+export const RecoveryInfoButton = styled(UIButton).attrs({
+  typevalue: 'transparent'
+})<{ selected: boolean }>`
+  &.ant-btn {
+    display: inline-flex;
+    color: inherit;
+  }
+  padding-left: 0px;
+`
+export const RecoveryInfoButtonIcon = styled(CaretRightOutlined)<{ selected: boolean }>`
+  transform: ${({ selected }) => (selected ? 'rotateZ(90deg)' : 'rotateZ(0)')};
+  color: ${palette('primary', 0)};
+`
+
+export const RecoveryInfoButtonLabel = styled(UILabel)`
+  font-family: 'MainFontBold';
+  text-transform: uppercase;
+  font-size: 12px;
+  line-height: 15px;
+  padding-right: 5px;
+`
+
 export const RecoveryDescription = styled(UILabel)`
   font-family: 'MainFontRegular';
   text-transform: uppercase;
   font-size: 12px;
-  line-height: 15px;
+  line-height: 17px;
 `
 
 export const OpenRecoveryToolIcon = styled(UIExternalLinkIcon)`

@@ -21,17 +21,17 @@ const AssetIconAmount: React.FC<AssetIconAmountProps> = (props): JSX.Element => 
     loading
   } = props
   return (
-    <Styled.AssetContainer>
-      <Styled.AssetIcon asset={asset} network={network} />
-      <Styled.AssetLabel asset={asset} />
-      <Styled.AssetAmountLabel loading={loading}>
+    <Styled.PendingAssetContainer>
+      <Styled.PendingAssetIcon asset={asset} network={network} />
+      <Styled.PendingAssetLabel asset={asset} />
+      <Styled.PendingAssetAmountLabel loading={loading}>
         {formatAssetAmount({
           amount: baseToAsset(amount),
           decimal: amount.decimal,
           trimZeros: true
         })}
-      </Styled.AssetAmountLabel>
-    </Styled.AssetContainer>
+      </Styled.PendingAssetAmountLabel>
+    </Styled.PendingAssetContainer>
   )
 }
 
@@ -46,27 +46,30 @@ export const PendingAssets: React.FC<PendingAssetsProps> = (props): JSX.Element 
 
   const intl = useIntl()
 
-  const [collapsed, setCollapsed] = useState(true)
+  const [collapsed, setCollapsed] = useState(false)
 
   const subContent = (
     <>
-      {assets.map((assetWB, index) => (
-        <AssetIconAmount
-          network={network}
-          assetWB={assetWB}
-          loading={loading}
-          key={`${assetToString(assetWB.asset)}-${index}`}
-        />
-      ))}
-      <Styled.RecoveryDescription onClick={() => setCollapsed((v) => !v)}>More information</Styled.RecoveryDescription>
+      <Styled.RecoveryInfoButton selected={collapsed} onClick={() => setCollapsed((v) => !v)}>
+        <Styled.RecoveryInfoButtonLabel>
+          {intl.formatMessage({ id: 'common.informationMore' })}
+        </Styled.RecoveryInfoButtonLabel>
+        <Styled.RecoveryInfoButtonIcon selected={collapsed} />
+      </Styled.RecoveryInfoButton>
       <>
         {collapsed ? (
-          <></>
-        ) : (
           <>
             <Styled.RecoveryDescription>
               {intl.formatMessage({ id: 'deposit.add.pendingAssets.description' })}
             </Styled.RecoveryDescription>
+            {assets.map((assetWB, index) => (
+              <AssetIconAmount
+                network={network}
+                assetWB={assetWB}
+                loading={loading}
+                key={`${assetToString(assetWB.asset)}-${index}`}
+              />
+            ))}
             <Styled.RecoveryDescription>
               {intl.formatMessage({ id: 'deposit.add.pendingAssets.recoveryDescription' })}
             </Styled.RecoveryDescription>
@@ -75,6 +78,8 @@ export const PendingAssets: React.FC<PendingAssetsProps> = (props): JSX.Element 
               <Styled.OpenRecoveryToolIcon />
             </Button>
           </>
+        ) : (
+          <></>
         )}
       </>
     </>
