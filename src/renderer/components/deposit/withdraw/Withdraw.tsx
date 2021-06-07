@@ -380,10 +380,10 @@ export const Withdraw: React.FC<Props> = ({
       </Label>
       <Label>
         {intl.formatMessage({ id: 'deposit.withdraw.choseText' })} (
-        <Styled.MinLabel error={minRuneAmountError || minAssetAmountError}>
+        <Styled.MinLabel color={minRuneAmountError || minAssetAmountError ? 'error' : 'normal'}>
           {intl.formatMessage({ id: 'common.min' })}:
         </Styled.MinLabel>
-        <Styled.MinLabel error={minRuneAmountError}>
+        <Styled.MinLabel color={minRuneAmountError ? 'error' : 'normal'}>
           {formatAssetAmountCurrency({
             amount: getTwoSigfigAssetAmount(baseToAsset(minRuneAmountToWithdraw)),
             asset: AssetRuneNative,
@@ -391,7 +391,7 @@ export const Withdraw: React.FC<Props> = ({
           })}
         </Styled.MinLabel>{' '}
         /{' '}
-        <Styled.MinLabel error={minAssetAmountError}>
+        <Styled.MinLabel color={minAssetAmountError ? 'error' : 'normal'}>
           {formatAssetAmountCurrency({
             amount: baseToAsset(minAssetAmountToWithdrawMax1e8),
             asset,
