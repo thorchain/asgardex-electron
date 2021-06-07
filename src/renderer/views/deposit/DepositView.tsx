@@ -44,6 +44,7 @@ export const DepositView: React.FC<Props> = () => {
   const {
     service: {
       setSelectedPoolAsset,
+      selectedPoolAsset$,
       pools: { reloadSelectedPoolDetail, selectedPoolDetail$, haltedChains$ },
       shares: { shares$, reloadShares }
     }
@@ -70,18 +71,18 @@ export const DepositView: React.FC<Props> = () => {
   const assetWithDecimalLD: AssetWithDecimalLD = useMemo(
     () =>
       FP.pipe(
-        network$,
-        RxOp.switchMap((network) =>
+        Rx.combineLatest([network$, selectedPoolAsset$]),
+        RxOp.switchMap(([network, oSelectedPoolAsset]) =>
           FP.pipe(
-            oRouteAsset,
+            oSelectedPoolAsset,
             O.fold(
-              () => Rx.EMPTY,
+              () => Rx.of(RD.initial),
               (asset) => assetWithDecimal$(asset, network)
             )
           )
         )
       ),
-    [network$, oRouteAsset, assetWithDecimal$]
+    [network$, selectedPoolAsset$, assetWithDecimal$]
   )
 
   const assetWithDecimalRD = useObservableState<AssetWithDecimalRD>(assetWithDecimalLD, RD.initial)
@@ -91,14 +92,16 @@ export const DepositView: React.FC<Props> = () => {
   const address$ = useMemo(
     () =>
       FP.pipe(
-        oRouteAsset,
-        O.fold(
-          () => Rx.EMPTY,
-          (asset) => addressByChain$(asset.chain)
+        selectedPoolAsset$,
+        RxOp.switchMap(
+          O.fold(
+            () => Rx.of(O.none),
+            (asset) => addressByChain$(asset.chain)
+          )
         )
       ),
 
-    [addressByChain$, oRouteAsset]
+    [addressByChain$, selectedPoolAsset$]
   )
   const oAssetWalletAddress = useObservableState(address$, O.none)
 
