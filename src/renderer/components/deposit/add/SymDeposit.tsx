@@ -98,6 +98,7 @@ export type Props = {
   poolsData: PoolsDataMap
   haltedChains: Chain[]
   pendingAssets: PendingAssetsRD
+  openRecoveryTool: FP.Lazy<void>
 }
 
 type SelectedInput = 'asset' | 'rune' | 'none'
@@ -134,7 +135,8 @@ export const SymDeposit: React.FC<Props> = (props) => {
     fundsCap: oFundsCap,
     poolsData,
     haltedChains,
-    pendingAssets: pendingAssetsRD
+    pendingAssets: pendingAssetsRD,
+    openRecoveryTool
   } = props
 
   const intl = useIntl()
@@ -932,7 +934,14 @@ export const SymDeposit: React.FC<Props> = (props) => {
 
   const renderPendingAssets = useMemo(() => {
     const render = (pendingAssets: PendingAssets, loading: boolean) =>
-      pendingAssets.length > 0 && <PendingAssetsUI network={network} assets={pendingAssets} loading={loading} />
+      pendingAssets.length > 0 && (
+        <PendingAssetsUI
+          network={network}
+          assets={pendingAssets}
+          loading={loading}
+          onClickRecovery={openRecoveryTool}
+        />
+      )
 
     return FP.pipe(
       pendingAssetsRD,
@@ -947,7 +956,7 @@ export const SymDeposit: React.FC<Props> = (props) => {
         }
       )
     )
-  }, [network, pendingAssetsRD])
+  }, [network, openRecoveryTool, pendingAssetsRD])
 
   const prevRouterAddress = useRef<O.Option<Address>>(O.none)
 

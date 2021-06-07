@@ -211,6 +211,14 @@ export const SymDepositView: React.FC<Props> = (props) => {
     [liquidityProviderRD]
   )
 
+  const openRecoveryTool = useCallback((): Promise<void> => {
+    const url =
+      network === 'testnet'
+        ? `https://testnet.asgard.exchange/deposit-sym-recovery/`
+        : `https://asgard.exchange/deposit-sym-recovery/`
+    return window.apiUrl.openExternal(url)
+  }, [network])
+
   const renderDisabledAddDeposit = useCallback(
     (error?: Error) => (
       <>
@@ -249,11 +257,13 @@ export const SymDepositView: React.FC<Props> = (props) => {
           fundsCap={O.none}
           poolsData={{}}
           pendingAssets={RD.initial}
+          openRecoveryTool={openRecoveryTool}
         />
       </>
     ),
     [
       intl,
+      haltedChains,
       validatePassword$,
       viewRuneTx,
       viewAssetTx,
@@ -268,7 +278,7 @@ export const SymDepositView: React.FC<Props> = (props) => {
       network,
       approveERC20Token$,
       isApprovedERC20Token$,
-      haltedChains
+      openRecoveryTool
     ]
   )
 
@@ -318,6 +328,7 @@ export const SymDepositView: React.FC<Props> = (props) => {
               fundsCap={fundsCap}
               poolsData={poolsData}
               pendingAssets={pendingAssetsRD}
+              openRecoveryTool={openRecoveryTool}
             />
           </>
         )

@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
 
 import { assetToString, baseToAsset, formatAssetAmount } from '@xchainjs/xchain-util'
+import * as FP from 'fp-ts/lib/function'
 import { useIntl } from 'react-intl'
 
 import { Network } from '../../../../shared/api/types'
@@ -39,10 +40,11 @@ type PendingAssetsProps = {
   network: Network
   assets: AssetWithAmount[]
   loading: boolean
+  onClickRecovery: FP.Lazy<void>
 }
 
 export const PendingAssets: React.FC<PendingAssetsProps> = (props): JSX.Element => {
-  const { assets, network, loading } = props
+  const { assets, network, loading, onClickRecovery } = props
 
   const intl = useIntl()
 
@@ -73,7 +75,7 @@ export const PendingAssets: React.FC<PendingAssetsProps> = (props): JSX.Element 
             <Styled.RecoveryDescription>
               {intl.formatMessage({ id: 'deposit.add.pendingAssets.recoveryDescription' })}
             </Styled.RecoveryDescription>
-            <Button onClick={() => console.log('action')} typevalue="outline" color="warning">
+            <Button onClick={onClickRecovery} typevalue="outline" color="warning">
               {intl.formatMessage({ id: 'deposit.add.pendingAssets.recoveryTitle' })}
               <Styled.OpenRecoveryToolIcon />
             </Button>

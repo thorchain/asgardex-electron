@@ -38,7 +38,7 @@ export const DepositView: React.FC<Props> = () => {
 
   const { network$ } = useAppContext()
 
-  const { getLiquidityProvider } = useThorchainContext()
+  const { getLiquidityProvider, reloadLiquidityProviders } = useThorchainContext()
 
   const { asset } = useParams<DepositRouteParams>()
   const {
@@ -146,7 +146,8 @@ export const DepositView: React.FC<Props> = () => {
     reloadChainAndRuneBalances()
     reloadShares()
     reloadSelectedPoolDetail()
-  }, [reloadChainAndRuneBalances, reloadSelectedPoolDetail, reloadShares])
+    reloadLiquidityProviders()
+  }, [reloadChainAndRuneBalances, reloadLiquidityProviders, reloadSelectedPoolDetail, reloadShares])
 
   // Important note:
   // DON'T use `INITIAL_KEYSTORE_STATE` as default value for `keystoreState`
