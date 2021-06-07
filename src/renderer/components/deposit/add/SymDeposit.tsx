@@ -924,8 +924,6 @@ export const SymDeposit: React.FC<Props> = (props) => {
         RD.toOption,
         O.map((pendingAssets): boolean => pendingAssets.length > 0),
         O.getOrElse((): boolean => false)
-        // TODO @Veado Remove it, just for debugging
-        // () => true
       ),
     [pendingAssetsRD]
   )
@@ -951,7 +949,6 @@ export const SymDeposit: React.FC<Props> = (props) => {
         () => <></>,
         (pendingAssets) => {
           prevPendingAssets.current = pendingAssets
-          console.log('pendingAssets:', pendingAssets)
           return render(pendingAssets, false)
         }
       )
