@@ -9,6 +9,7 @@ import { useIntl } from 'react-intl'
 
 import { PoolDetailRD, PoolShareRD, PoolSharesRD } from '../../services/midgard/types'
 import { getSharesByAssetAndType, combineSharesByAsset } from '../../services/midgard/utils'
+import { LiquidityProviderRD } from '../../services/thorchain/types'
 import { KeystoreState } from '../../services/wallet/types'
 import { hasImportedKeystore, isLocked } from '../../services/wallet/util'
 import { AssetWithDecimal } from '../../types/asgardex'
@@ -40,6 +41,7 @@ export type Props = {
     haltedChains: Chain[]
     asset: AssetWithDecimal
     poolDetail: PoolDetailRD
+    liquidityProvider: LiquidityProviderRD
   }>
   WidthdrawContent: React.ComponentType<{
     asset: AssetWithDecimal
@@ -54,6 +56,7 @@ export type Props = {
     haltedChains: Chain[]
   }>
   keystoreState: KeystoreState
+  liquidityProvider: LiquidityProviderRD
 }
 
 export const Deposit: React.FC<Props> = (props) => {
@@ -69,9 +72,10 @@ export const Deposit: React.FC<Props> = (props) => {
     // AsymWidthdrawContent,
     keystoreState,
     shares: poolSharesRD,
-    poolDetail: poolDetailRD
+    poolDetail: poolDetailRD,
     // TODO (@asgdx-team) Think how to handle different wallets
     // walletAddress: Address
+    liquidityProvider: liquidityProviderRD
   } = props
 
   const { asset } = assetWD
@@ -127,7 +131,14 @@ export const Deposit: React.FC<Props> = (props) => {
         key: 'deposit-sym',
         disabled: false,
         label: intl.formatMessage({ id: 'deposit.add.sym' }),
-        content: <SymDepositContent poolDetail={poolDetailRD} asset={assetWD} haltedChains={haltedChains} />
+        content: (
+          <SymDepositContent
+            poolDetail={poolDetailRD}
+            asset={assetWD}
+            haltedChains={haltedChains}
+            liquidityProvider={liquidityProviderRD}
+          />
+        )
       },
       {
         key: 'withdraw-sym',
@@ -149,7 +160,17 @@ export const Deposit: React.FC<Props> = (props) => {
       //   content: <AsymWidthdrawContent asset={asset} poolShare={asymPoolShareAsset} haltedChains={haltedChains} />
       // }
     ],
-    [intl, SymDepositContent, poolDetailRD, assetWD, hasSymPoolShare, WidthdrawContent, combinedPoolShare, haltedChains]
+    [
+      intl,
+      SymDepositContent,
+      poolDetailRD,
+      assetWD,
+      haltedChains,
+      liquidityProviderRD,
+      hasSymPoolShare,
+      WidthdrawContent,
+      combinedPoolShare
+    ]
   )
 
   const alignTopShareContent: boolean = useMemo(

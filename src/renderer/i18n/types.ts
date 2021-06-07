@@ -84,6 +84,7 @@ export type CommonMessageKey =
   | 'common.theme.light'
   | 'common.theme.dark'
   | 'common.volume24'
+  | 'common.informationMore'
 
 export type CommonMessages = {
   [key in CommonMessageKey]: string
@@ -289,6 +290,10 @@ type DepositMessageKey =
   | 'deposit.add.error.nobalances'
   | 'deposit.add.error.nobalance1'
   | 'deposit.add.error.nobalance2'
+  | 'deposit.add.pendingAssets.title'
+  | 'deposit.add.pendingAssets.description'
+  | 'deposit.add.pendingAssets.recoveryTitle'
+  | 'deposit.add.pendingAssets.recoveryDescription'
   | 'deposit.bond.state.error'
   | 'deposit.unbond.state.error'
   | 'deposit.leave.state.error'

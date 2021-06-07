@@ -114,7 +114,9 @@ const defaultProps: SymDepositProps = {
       assetBalance: baseAmount(30),
       runeBalance: baseAmount(10)
     }
-  }
+  },
+  pendingAssets: RD.initial,
+  openRecoveryTool: () => console.log('openRecoveryTool')
 }
 
 export const Default: Story = () => <SymDeposit {...defaultProps} />

@@ -26,6 +26,12 @@ const deposit: DepositMessages = {
   'deposit.add.error.nobalances': 'Aucun solde',
   'deposit.add.error.nobalance1': "Vous n'avez pas de {asset} dans votre portefeuille pour le dépot.",
   'deposit.add.error.nobalance2': "Vous n'avez pas de {asset1} et de {asset2} dans votre portefeuille pour le dépot.",
+  'deposit.add.pendingAssets.title': 'Pending assets found - FR',
+  'deposit.add.pendingAssets.description':
+    'Following assets have been successfully sent, but the transaction of the other asset side has not been finalized or it was failed - FR:',
+  'deposit.add.pendingAssets.recoveryDescription':
+    'Please note: Transactions of an asset pair might take different time by running on different blockchains. In case of failures, you have a way to withdraw pending assets using the Recovery Tool of ASDGARDEX web at https://testnet.asgard.exchange/deposit-sym-recovery. This feature is currently not available in ASGARDEX desktop. - FR',
+  'deposit.add.pendingAssets.recoveryTitle': 'Open Recovery Tool - FR',
   'deposit.bond.state.error': 'Erreur de caution',
   'deposit.unbond.state.error': 'Erreur de retrait',
   'deposit.leave.state.error': 'Erreur de sortie',

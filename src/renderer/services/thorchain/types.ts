@@ -12,7 +12,7 @@ import * as Rx from 'rxjs'
 
 import { Network } from '../../../shared/api/types'
 import { LiveData } from '../../helpers/rx/liveData'
-import { AssetWithDecimal } from '../../types/asgardex'
+import { AssetWithAmount, AssetWithDecimal } from '../../types/asgardex'
 import * as C from '../clients'
 import { ApiError, TxHashLD } from '../wallet/types'
 
@@ -85,16 +85,19 @@ export type GetLiquidityProvidersParams = {
 }
 
 export type GetLiquidityProviderParams = GetLiquidityProvidersParams & {
-  runeAddress: O.Option<Address>
-  assetAddress: O.Option<Address>
+  runeAddress: Address
+  assetAddress: Address
 }
 
+export type PendingAssets = AssetWithAmount[]
+export type PendingAssetsRD = RD.RemoteData<ApiError, PendingAssets>
+
 export type LiquidityProvider = {
-  asset: Asset
-  address: O.Option<Address>
+  runeAddress: O.Option<Address>
   assetAddress: O.Option<Address>
-  pendingRune: BaseAmount
-  pendingAsset: BaseAmount
+
+  pendingRune: O.Option<AssetWithAmount>
+  pendingAsset: O.Option<AssetWithAmount>
 }
 
 export type LiquidityProvidersLD = LiveData<ApiError, LiquidityProvider[]>
@@ -150,7 +153,5 @@ export const LiquidityProviderIO = t.type({
   rune_address: optionFromNullable(t.string),
   asset_address: optionFromNullable(t.string),
   pending_rune: t.string,
-  pending_asset: t.string,
-  rune_deposit_value: t.string,
-  asset_deposit_value: t.string
+  pending_asset: t.string
 })

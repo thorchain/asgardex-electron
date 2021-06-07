@@ -1,6 +1,6 @@
 import * as RD from '@devexperts/remote-data-ts'
 import { Address } from '@xchainjs/xchain-client'
-import { assetToString, baseAmount } from '@xchainjs/xchain-util'
+import { AssetRuneNative, assetToString, baseAmount } from '@xchainjs/xchain-util'
 import * as A from 'fp-ts/Array'
 import * as E from 'fp-ts/Either'
 import * as FP from 'fp-ts/function'
@@ -30,7 +30,8 @@ import {
   LiquidityProvidersLD,
   LiquidityProviderLD,
   GetLiquidityProvidersParams,
-  GetLiquidityProviderParams
+  GetLiquidityProviderParams,
+  LiquidityProvider
 } from './types'
 
 // Tmp type as ThorNodeApi does not provide valid swagger spec yet
@@ -143,13 +144,20 @@ const getLiquidityProviders = ({
         RxOp.map(A.filterMap(FP.flow(LiquidityProviderIO.decode, O.fromEither))),
         RxOp.map(RD.success),
         liveData.map(
-          A.map((provider) => ({
-            asset: provider.asset,
-            address: provider.rune_address,
-            assetAddress: provider.asset_address,
-            pendingRune: baseAmount(provider.pending_rune, THORCHAIN_DECIMAL),
-            pendingAsset: baseAmount(provider.pending_asset, assetDecimal)
-          }))
+          A.map((provider): LiquidityProvider => {
+            const pendingRuneAmount = baseAmount(provider.pending_rune, THORCHAIN_DECIMAL)
+            const pendingAssetAmount = baseAmount(provider.pending_asset, assetDecimal)
+            return {
+              runeAddress: provider.rune_address,
+              assetAddress: provider.asset_address,
+              pendingRune: pendingRuneAmount.gt(0)
+                ? O.some({ asset: AssetRuneNative, amount: pendingRuneAmount })
+                : O.none,
+              pendingAsset: pendingAssetAmount.gt(0)
+                ? O.some({ asset: provider.asset, amount: pendingAssetAmount })
+                : O.none
+            }
+          })
         ),
         RxOp.catchError(
           (): LiquidityProvidersLD =>
@@ -181,7 +189,8 @@ const getLiquidityProvider = ({
     liveData.map(
       A.findFirst(
         (provider) =>
-          eqOString.equals(provider.address, runeAddress) && eqOString.equals(provider.assetAddress, assetAddress)
+          eqOString.equals(provider.runeAddress, O.some(runeAddress)) &&
+          eqOString.equals(provider.assetAddress, O.some(assetAddress))
       )
     )
   )

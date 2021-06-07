@@ -25,6 +25,12 @@ const deposit: DepositMessages = {
   'deposit.add.error.nobalances': 'Нет средств',
   'deposit.add.error.nobalance1': 'У вас нет средств на балансе {asset} в кошелке для вклада',
   'deposit.add.error.nobalance2': 'У вас нет средств на балансах {asset1} и {asset2} в кошельке для вклада',
+  'deposit.add.pendingAssets.title': 'Обнаружены ожидающие ассеты',
+  'deposit.add.pendingAssets.description':
+    'Эти ассеты были успешно отправлены, но транзакция для другого ассета не была завершена или возникла ошибка, при ее отправке:',
+  'deposit.add.pendingAssets.recoveryDescription':
+    'Обратите внимение: Транзакции для разных пар ассетов могут занимать разное время, так как запущены на разных блок-чейнах. В случае ошибки, у вас есть возможность изъять ожидающие ассеты с помощью утилиты возврата ASDGARDEX-веб на https://testnet.asgard.exchange/deposit-sym-recovery. Эта функция пока недоступна  в ПК версии ASGARDEX.',
+  'deposit.add.pendingAssets.recoveryTitle': 'Открыть утилиту для возврата',
   'deposit.bond.state.error': 'Ошибка при кладе',
   'deposit.unbond.state.error': 'Ошибка при выводе',
   'deposit.leave.state.error': 'Ошибка при выходе',
