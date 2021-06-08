@@ -5,19 +5,19 @@ import * as FP from 'fp-ts/lib/function'
 import { useIntl } from 'react-intl'
 
 import { Network } from '../../../../shared/api/types'
-import { AssetWithAmount } from '../../../types/asgardex'
+import { AssetsWithAmount1e8, AssetWithAmount1e8 } from '../../../types/asgardex'
 import { Button } from '../../uielements/button'
 import * as Styled from './Deposit.style'
 
 type AssetIconAmountProps = {
-  assetWB: AssetWithAmount
+  assetWA: AssetWithAmount1e8
   network: Network
   loading: boolean
 }
 
 const AssetIconAmount: React.FC<AssetIconAmountProps> = (props): JSX.Element => {
   const {
-    assetWB: { asset, amount },
+    assetWA: { asset, amount1e8 },
     network,
     loading
   } = props
@@ -27,8 +27,7 @@ const AssetIconAmount: React.FC<AssetIconAmountProps> = (props): JSX.Element => 
       <Styled.PendingAssetLabel asset={asset} />
       <Styled.PendingAssetAmountLabel loading={loading}>
         {formatAssetAmount({
-          amount: baseToAsset(amount),
-          decimal: amount.decimal,
+          amount: baseToAsset(amount1e8),
           trimZeros: true
         })}
       </Styled.PendingAssetAmountLabel>
@@ -38,7 +37,7 @@ const AssetIconAmount: React.FC<AssetIconAmountProps> = (props): JSX.Element => 
 
 type PendingAssetsProps = {
   network: Network
-  assets: AssetWithAmount[]
+  assets: AssetsWithAmount1e8
   loading: boolean
   onClickRecovery: FP.Lazy<void>
 }
@@ -67,7 +66,7 @@ export const PendingAssets: React.FC<PendingAssetsProps> = (props): JSX.Element 
             {assets.map((assetWB, index) => (
               <AssetIconAmount
                 network={network}
-                assetWB={assetWB}
+                assetWA={assetWB}
                 loading={loading}
                 key={`${assetToString(assetWB.asset)}-${index}`}
               />
