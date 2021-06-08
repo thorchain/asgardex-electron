@@ -40,11 +40,11 @@ export const BondsView: React.FC = (): JSX.Element => {
     [oClient]
   )
 
-  const goToNode = useCallback(
-    (node: Address) =>
+  const goToExplorerNodeAddress = useCallback(
+    (address: Address) =>
       FP.pipe(
         oClient,
-        O.map((client) => client.getExplorerNodeUrl(node)),
+        O.map((client) => client.getExplorerAddressUrl(address)),
         O.map(window.apiUrl.openExternal)
       ),
     [oClient]
@@ -111,7 +111,7 @@ export const BondsView: React.FC = (): JSX.Element => {
       addressValidation={validateAddress}
       nodes={nodesInfo}
       removeNode={removeNodeByAddress}
-      goToNode={goToNode}
+      goToNode={goToExplorerNodeAddress}
       network={network}
       addNode={addNodeAddress}
     />

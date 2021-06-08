@@ -80,7 +80,7 @@
     "@xchainjs/xchain-crypto": "^0.2.4",
     "@xchainjs/xchain-ethereum": "^0.21.4",
     "@xchainjs/xchain-litecoin": "^0.6.5",
-    "@xchainjs/xchain-thorchain": "^0.15.2",
+    "@xchainjs/xchain-thorchain": "^0.16.0",
     "@xchainjs/xchain-util": "^0.2.8",
     "antd": "^4.15.4",
     "axios": "^0.21.1",

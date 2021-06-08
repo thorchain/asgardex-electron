@@ -23,7 +23,8 @@ const EXTERNALS_WHITELIST = [
   'ltc.bitaps.com',
   'www.blockchain.com',
   'testnet.asgard.exchange',
-  'asgard.exchange'
+  'asgard.exchange',
+  'viewblock.io'
 ]
 
 const openExternal = (target: string) => {
