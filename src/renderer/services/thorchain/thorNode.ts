@@ -185,13 +185,10 @@ const getLiquidityProvider = ({
       network
     }),
     liveData.map(
-      FP.flow(
-        A.findFirst(
-          (provider) =>
-            eqOString.equals(provider.runeAddress, O.some(runeAddress)) &&
-            eqOString.equals(provider.assetAddress, O.some(assetAddress))
-        ),
-        O.map((v) => v)
+      A.findFirst(
+        (provider) =>
+          eqOString.equals(provider.runeAddress, O.some(runeAddress)) &&
+          eqOString.equals(provider.assetAddress, O.some(assetAddress))
       )
     )
   )
