@@ -4,6 +4,7 @@ import * as RD from '@devexperts/remote-data-ts'
 import { Asset, AssetRuneNative, assetToString, BaseAmount, bn, Chain, THORChain } from '@xchainjs/xchain-util'
 import BigNumber from 'bignumber.js'
 import * as FP from 'fp-ts/function'
+import * as A from 'fp-ts/lib/Array'
 import * as O from 'fp-ts/lib/Option'
 import { useObservableState } from 'observable-hooks'
 import { useIntl } from 'react-intl'
@@ -30,6 +31,7 @@ import { SymDepositMemo } from '../../../services/chain/types'
 import { DEFAULT_NETWORK } from '../../../services/const'
 import { PoolAddress, PoolAssetsRD, PoolDetailRD } from '../../../services/midgard/types'
 import { toPoolData } from '../../../services/midgard/utils'
+import { LiquidityProviderRD, PendingAssetsRD, PendingAssets } from '../../../services/thorchain/types'
 import { INITIAL_BALANCES_STATE } from '../../../services/wallet/const'
 import { getBalanceByAsset } from '../../../services/wallet/util'
 import { AssetWithDecimal } from '../../../types/asgardex'
@@ -39,10 +41,11 @@ type Props = {
   asset: AssetWithDecimal
   poolDetail: PoolDetailRD
   haltedChains: Chain[]
+  liquidityProvider: LiquidityProviderRD
 }
 
 export const SymDepositView: React.FC<Props> = (props) => {
-  const { asset: assetWD, poolDetail: poolDetailRD, haltedChains } = props
+  const { asset: assetWD, poolDetail: poolDetailRD, haltedChains, liquidityProvider: liquidityProviderRD } = props
   const { asset } = assetWD
   const history = useHistory()
   const intl = useIntl()
@@ -192,6 +195,30 @@ export const SymDepositView: React.FC<Props> = (props) => {
     [fundsCapRD]
   )
 
+  const pendingAssetsRD: PendingAssetsRD = useMemo(
+    () =>
+      FP.pipe(
+        liquidityProviderRD,
+        RD.map((oLiquidityProvider) =>
+          FP.pipe(
+            oLiquidityProvider,
+            O.map(({ pendingAsset, pendingRune }) => [pendingAsset, pendingRune]),
+            O.map(A.filterMap(FP.identity)),
+            O.getOrElse<PendingAssets>(() => [])
+          )
+        )
+      ),
+    [liquidityProviderRD]
+  )
+
+  const openRecoveryTool = useCallback((): Promise<void> => {
+    const url =
+      network === 'testnet'
+        ? `https://testnet.asgard.exchange/deposit-sym-recovery/`
+        : `https://asgard.exchange/deposit-sym-recovery/`
+    return window.apiUrl.openExternal(url)
+  }, [network])
+
   const renderDisabledAddDeposit = useCallback(
     (error?: Error) => (
       <>
@@ -229,11 +256,14 @@ export const SymDepositView: React.FC<Props> = (props) => {
           balances={[]}
           fundsCap={O.none}
           poolsData={{}}
+          pendingAssets={RD.initial}
+          openRecoveryTool={openRecoveryTool}
         />
       </>
     ),
     [
       intl,
+      haltedChains,
       validatePassword$,
       viewRuneTx,
       viewAssetTx,
@@ -248,7 +278,7 @@ export const SymDepositView: React.FC<Props> = (props) => {
       network,
       approveERC20Token$,
       isApprovedERC20Token$,
-      haltedChains
+      openRecoveryTool
     ]
   )
 
@@ -266,37 +296,41 @@ export const SymDepositView: React.FC<Props> = (props) => {
         )
 
         return (
-          <SymDeposit
-            haltedChains={haltedChains}
-            validatePassword$={validatePassword$}
-            viewRuneTx={viewRuneTx}
-            viewAssetTx={viewAssetTx}
-            poolData={toPoolData(poolDetail)}
-            onChangeAsset={onChangeAsset}
-            asset={assetWD}
-            assetPrice={assetPrice}
-            runePrice={runPrice}
-            assetBalance={assetBalance}
-            runeBalance={runeBalance}
-            chainAssetBalance={chainAssetBalance}
-            poolAddress={oPoolAddress}
-            memos={depositTxMemo}
-            fees$={symDepositFees$}
-            reloadFees={reloadSymDepositFees}
-            approveFee$={approveFee$}
-            reloadApproveFee={reloadApproveFee}
-            priceAsset={selectedPricePoolAsset}
-            reloadBalances={reloadBalances}
-            reloadShares={reloadShares}
-            reloadSelectedPoolDetail={reloadSelectedPoolDetail}
-            balances={filteredBalances}
-            deposit$={symDeposit$}
-            network={network}
-            approveERC20Token$={approveERC20Token$}
-            isApprovedERC20Token$={isApprovedERC20Token$}
-            fundsCap={fundsCap}
-            poolsData={poolsData}
-          />
+          <>
+            <SymDeposit
+              haltedChains={haltedChains}
+              validatePassword$={validatePassword$}
+              viewRuneTx={viewRuneTx}
+              viewAssetTx={viewAssetTx}
+              poolData={toPoolData(poolDetail)}
+              onChangeAsset={onChangeAsset}
+              asset={assetWD}
+              assetPrice={assetPrice}
+              runePrice={runPrice}
+              assetBalance={assetBalance}
+              runeBalance={runeBalance}
+              chainAssetBalance={chainAssetBalance}
+              poolAddress={oPoolAddress}
+              memos={depositTxMemo}
+              fees$={symDepositFees$}
+              reloadFees={reloadSymDepositFees}
+              approveFee$={approveFee$}
+              reloadApproveFee={reloadApproveFee}
+              priceAsset={selectedPricePoolAsset}
+              reloadBalances={reloadBalances}
+              reloadShares={reloadShares}
+              reloadSelectedPoolDetail={reloadSelectedPoolDetail}
+              balances={filteredBalances}
+              deposit$={symDeposit$}
+              network={network}
+              approveERC20Token$={approveERC20Token$}
+              isApprovedERC20Token$={isApprovedERC20Token$}
+              fundsCap={fundsCap}
+              poolsData={poolsData}
+              pendingAssets={pendingAssetsRD}
+              openRecoveryTool={openRecoveryTool}
+            />
+          </>
         )
       }
     )

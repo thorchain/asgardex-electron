@@ -12,10 +12,10 @@ import { Filterable2 } from 'fp-ts/lib/Filterable'
 import { MonadThrow2 } from 'fp-ts/lib/MonadThrow'
 import { pipeable } from 'fp-ts/lib/pipeable'
 import * as O from 'fp-ts/Option'
-import { Observable } from 'rxjs'
+import * as Rx from 'rxjs'
 import * as RxOp from 'rxjs/operators'
 
-export type LiveData<E, A> = Observable<RD.RemoteData<E, A>>
+export type LiveData<E, A> = Rx.Observable<RD.RemoteData<E, A>>
 
 export const URI = '//LiveData'
 export type URIType = typeof URI
@@ -50,7 +50,7 @@ export const liveData = {
   /**
    * LiveData<L,A> => Observable<Option<A>>
    */
-  toOption$: <L, A>(fla: LiveData<L, A>): Observable<O.Option<A>> => fla.pipe(RxOp.map(RD.toOption)),
+  toOption$: <L, A>(fla: LiveData<L, A>): Rx.Observable<O.Option<A>> => fla.pipe(RxOp.map(RD.toOption)),
   /**
    *  1. Maps inner value of LiveData<L, A> with fab => LiveData<L, B>
    *  2. LiveData<L,A> => Observable<Option<A>>
@@ -58,7 +58,7 @@ export const liveData = {
    */
   toOptionMap$:
     <L, A, B>(fab: (fa: A) => B) =>
-    (fla: LiveData<L, A>): Observable<O.Option<B>> =>
+    (fla: LiveData<L, A>): Rx.Observable<O.Option<B>> =>
       fla.pipe(RxOp.map(RD.map(fab)), RxOp.map(RD.toOption)),
   altOnError:
     <L, A>(f: (l: L) => A) =>
@@ -70,6 +70,19 @@ export const liveData = {
             () => RD.pending,
             (e) => RD.success(f(e)),
             (val) => RD.success(val)
+          )
+        )
+      ),
+  chainOnError:
+    <L, A>(f: (l: L) => LiveData<L, A>) =>
+    (fla: LiveData<L, A>) =>
+      fla.pipe(
+        RxOp.switchMap(
+          RD.fold(
+            () => Rx.of(RD.initial),
+            () => Rx.of(RD.pending),
+            f,
+            (val) => Rx.of(RD.success(val))
           )
         )
       )

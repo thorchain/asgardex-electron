@@ -17,11 +17,13 @@ import { RefreshButton } from '../../components/uielements/button'
 import { useAppContext } from '../../contexts/AppContext'
 import { useChainContext } from '../../contexts/ChainContext'
 import { useMidgardContext } from '../../contexts/MidgardContext'
+import { useThorchainContext } from '../../contexts/ThorchainContext'
 import { useWalletContext } from '../../contexts/WalletContext'
 import { sequenceTOption } from '../../helpers/fpHelpers'
 import { DepositRouteParams } from '../../routes/pools/deposit'
-import { AssetWithDecimalRD } from '../../services/chain/types'
+import { AssetWithDecimalLD, AssetWithDecimalRD } from '../../services/chain/types'
 import { PoolDetailRD, PoolSharesLD, PoolSharesRD } from '../../services/midgard/types'
+import { LiquidityProviderRD, LiquidityProviderLD } from '../../services/thorchain/types'
 import { AsymDepositView } from './add/AsymDepositView'
 import { SymDepositView } from './add/SymDepositView'
 import * as Styled from './DepositView.styles'
@@ -35,6 +37,8 @@ export const DepositView: React.FC<Props> = () => {
   const intl = useIntl()
 
   const { network$ } = useAppContext()
+
+  const { getLiquidityProvider, reloadLiquidityProviders } = useThorchainContext()
 
   const { asset } = useParams<DepositRouteParams>()
   const {
@@ -64,13 +68,13 @@ export const DepositView: React.FC<Props> = () => {
     }
   }, [oRouteAsset, setSelectedPoolAsset])
 
-  const [assetRD] = useObservableState<AssetWithDecimalRD>(
+  const assetWithDecimalLD: AssetWithDecimalLD = useMemo(
     () =>
       FP.pipe(
-        Rx.combineLatest([selectedPoolAsset$, network$]),
-        RxOp.switchMap(([oAsset, network]) =>
+        Rx.combineLatest([network$, selectedPoolAsset$]),
+        RxOp.switchMap(([network, oSelectedPoolAsset]) =>
           FP.pipe(
-            oAsset,
+            oSelectedPoolAsset,
             O.fold(
               () => Rx.of(RD.initial),
               (asset) => assetWithDecimal$(asset, network)
@@ -78,22 +82,26 @@ export const DepositView: React.FC<Props> = () => {
           )
         )
       ),
-    RD.initial
+    [network$, selectedPoolAsset$, assetWithDecimal$]
   )
 
-  const oSelectedAsset = useMemo(() => RD.toOption(assetRD), [assetRD])
+  const assetWithDecimalRD = useObservableState<AssetWithDecimalRD>(assetWithDecimalLD, RD.initial)
+
+  const oSelectedAssetWithDecimal = useMemo(() => RD.toOption(assetWithDecimalRD), [assetWithDecimalRD])
 
   const address$ = useMemo(
     () =>
       FP.pipe(
-        oSelectedAsset,
-        O.fold(
-          () => Rx.EMPTY,
-          ({ asset }) => addressByChain$(asset.chain)
+        selectedPoolAsset$,
+        RxOp.switchMap(
+          O.fold(
+            () => Rx.of(O.none),
+            (asset) => addressByChain$(asset.chain)
+          )
         )
       ),
 
-    [addressByChain$, oSelectedAsset]
+    [addressByChain$, selectedPoolAsset$]
   )
   const oAssetWalletAddress = useObservableState(address$, O.none)
 
@@ -113,26 +121,33 @@ export const DepositView: React.FC<Props> = () => {
   const poolSharesRD = useObservableState<PoolSharesRD>(poolShares$, RD.initial)
 
   const refreshButtonDisabled = useMemo(
-    () => FP.pipe(poolSharesRD, RD.toOption, (oPoolShares) => sequenceTOption(oPoolShares, oSelectedAsset), O.isNone),
-    [poolSharesRD, oSelectedAsset]
+    () =>
+      FP.pipe(
+        poolSharesRD,
+        RD.toOption,
+        (oPoolShares) => sequenceTOption(oPoolShares, oSelectedAssetWithDecimal),
+        O.isNone
+      ),
+    [poolSharesRD, oSelectedAssetWithDecimal]
   )
 
   const reloadChainAndRuneBalances = useCallback(() => {
     FP.pipe(
-      oSelectedAsset,
+      oSelectedAssetWithDecimal,
       O.map(({ asset: { chain } }) => {
         reloadBalancesByChain(chain)()
         reloadBalancesByChain(THORChain)()
         return true
       })
     )
-  }, [oSelectedAsset, reloadBalancesByChain])
+  }, [oSelectedAssetWithDecimal, reloadBalancesByChain])
 
   const reloadHandler = useCallback(() => {
     reloadChainAndRuneBalances()
     reloadShares()
     reloadSelectedPoolDetail()
-  }, [reloadChainAndRuneBalances, reloadSelectedPoolDetail, reloadShares])
+    reloadLiquidityProviders()
+  }, [reloadChainAndRuneBalances, reloadLiquidityProviders, reloadSelectedPoolDetail, reloadShares])
 
   // Important note:
   // DON'T use `INITIAL_KEYSTORE_STATE` as default value for `keystoreState`
@@ -142,6 +157,27 @@ export const DepositView: React.FC<Props> = () => {
   const keystoreState = useObservableState(keystoreService.keystore$, undefined)
 
   const poolDetailRD = useObservableState<PoolDetailRD>(selectedPoolDetail$, RD.initial)
+
+  const [liquidityProvider] = useObservableState<LiquidityProviderRD>(() => {
+    return Rx.combineLatest([
+      network$,
+      // We should look for THORChain's wallet at the response of liqudity_providers endpoint
+      address$,
+      addressByChain$(THORChain),
+      assetWithDecimalLD
+    ]).pipe(
+      RxOp.switchMap(([network, oAssetAddress, oRuneAddress, assetWithDecimalRD]) => {
+        return FP.pipe(
+          sequenceTOption(oRuneAddress, oAssetAddress, RD.toOption(assetWithDecimalRD)),
+          O.fold(
+            (): LiquidityProviderLD => Rx.of(RD.initial),
+            ([runeAddress, assetAddress, assetWithDecimal]) =>
+              getLiquidityProvider({ assetWithDecimal, network, runeAddress, assetAddress })
+          )
+        )
+      })
+    )
+  }, RD.initial)
 
   // Special case: `keystoreState` is `undefined` in first render loop
   // (see comment at its definition using `useObservableState`)
@@ -156,7 +192,7 @@ export const DepositView: React.FC<Props> = () => {
         <RefreshButton disabled={refreshButtonDisabled} clickHandler={reloadHandler} />
       </Styled.TopControlsContainer>
       {FP.pipe(
-        assetRD,
+        assetWithDecimalRD,
         RD.fold(
           () => <></>,
           () => <Spin size="large" />,
@@ -172,6 +208,7 @@ export const DepositView: React.FC<Props> = () => {
               poolDetail={poolDetailRD}
               asset={asset}
               shares={poolSharesRD}
+              liquidityProvider={liquidityProvider}
               keystoreState={keystoreState}
               ShareContent={ShareView}
               SymDepositContent={SymDepositView}

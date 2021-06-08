@@ -96,11 +96,11 @@ export const HeaderStats: React.FC<Props> = (props): JSX.Element => {
     <Styled.Wrapper>
       <Styled.Container onClick={reloadRunePriceHandler} clickable={!RD.isPending(runePriceRD)}>
         <Styled.Title>{intl.formatMessage({ id: 'common.price.rune' })}</Styled.Title>
-        <Styled.Label loading={RD.isPending(runePriceRD)}>{runePriceLabel}</Styled.Label>
+        <Styled.Label loading={RD.isPending(runePriceRD) ? 'true' : 'false'}>{runePriceLabel}</Styled.Label>
       </Styled.Container>
       <Styled.Container onClick={reloadVolume24PriceHandler} clickable={!RD.isPending(volume24PriceRD)}>
         <Styled.Title>{intl.formatMessage({ id: 'common.volume24' })}</Styled.Title>
-        <Styled.Label loading={RD.isPending(volume24PriceRD)}>{volume24PriceLabel}</Styled.Label>
+        <Styled.Label loading={RD.isPending(volume24PriceRD) ? 'true' : 'false'}>{volume24PriceLabel}</Styled.Label>
       </Styled.Container>
     </Styled.Wrapper>
   )

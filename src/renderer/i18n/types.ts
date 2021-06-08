@@ -84,6 +84,7 @@ export type CommonMessageKey =
   | 'common.theme.light'
   | 'common.theme.dark'
   | 'common.volume24'
+  | 'common.informationMore'
 
 export type CommonMessages = {
   [key in CommonMessageKey]: string
@@ -162,6 +163,9 @@ type WalletMessageKey =
   | 'wallet.create.enter.phrase'
   | 'wallet.receive.address.error'
   | 'wallet.receive.address.errorQR'
+  | 'wallet.remove.label'
+  | 'wallet.remove.label.title'
+  | 'wallet.remove.label.description'
   | 'wallet.send.success'
   | 'wallet.send.fastest'
   | 'wallet.send.fast'
@@ -286,6 +290,10 @@ type DepositMessageKey =
   | 'deposit.add.error.nobalances'
   | 'deposit.add.error.nobalance1'
   | 'deposit.add.error.nobalance2'
+  | 'deposit.add.pendingAssets.title'
+  | 'deposit.add.pendingAssets.description'
+  | 'deposit.add.pendingAssets.recoveryTitle'
+  | 'deposit.add.pendingAssets.recoveryDescription'
   | 'deposit.bond.state.error'
   | 'deposit.unbond.state.error'
   | 'deposit.leave.state.error'

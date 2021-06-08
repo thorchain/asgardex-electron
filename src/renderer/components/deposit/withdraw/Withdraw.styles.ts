@@ -16,8 +16,9 @@ export const Container = styled('div')`
   }
 `
 
-export const MinLabel = styled.span<{ error?: boolean }>`
-  color: ${({ error }) => (error ? 'red' : 'black')};
+export const MinLabel = styled(UILabel)`
+  padding: 0;
+  display: inline;
 `
 
 export const AssetContainer = styled('div')`

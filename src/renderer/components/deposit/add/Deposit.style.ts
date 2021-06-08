@@ -1,3 +1,4 @@
+import { CaretRightOutlined } from '@ant-design/icons/lib'
 import { Row } from 'antd'
 import styled from 'styled-components'
 import { palette } from 'styled-theme'
@@ -5,8 +6,11 @@ import { palette } from 'styled-theme'
 import { media } from '../../../helpers/styleHelper'
 import { Alert as UIAlert } from '../../uielements/alert'
 import { AssetCard as UIAssetCard } from '../../uielements/assets/assetCard'
+import { AssetIcon as UIAssetIcon } from '../../uielements/assets/assetIcon'
+import { AssetLabel as UIAssetLabel } from '../../uielements/assets/assetLabel'
 import { Button as UIButton } from '../../uielements/button'
 import { ViewTxButton as UIViewTxButton } from '../../uielements/button'
+import { ExternalLinkIcon as UIExternalLinkIcon } from '../../uielements/common/Common.style'
 import { Label as UILabel } from '../../uielements/label'
 
 export const Container = styled.div`
@@ -25,18 +29,22 @@ export const CardsRow = styled(Row).attrs({
   width: 100%;
 `
 
-export const BalanceErrorRow = styled(Row)`
+export const AlertRow = styled(Row)`
   width: 100%;
-  padding: 20px 0px;
+  padding: 0 0 20px 0;
 
   ${media.xl`
-    padding: 20px;
+    padding: 0 20px 20px 20px;
 `}
 `
 
-export const BalanceAlert = styled(UIAlert)`
+export const Alert = styled(UIAlert)`
   width: 100%;
+  margin: 0;
+
+  ${media.xl`
   margin-right: 20px;
+`}
 `
 
 export const BalanceErrorLabel = styled(UILabel).attrs({
@@ -145,4 +153,74 @@ export const SubmitButton = styled(UIButton).attrs({
   min-width: 200px !important;
   padding: 0 30px;
   margin-bottom: 20px;
+`
+
+export const PendingAssetContainer = styled('div')`
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  height: 32px;
+  margin: 10px 0;
+
+  &:last-child {
+    margin: 0;
+  }
+
+  > div:first-child {
+    margin-right: 10px;
+  }
+`
+
+export const PendingAssetIcon = styled(UIAssetIcon).attrs({ size: 'small' })`
+  margin-right: 5px;
+`
+export const PendingAssetLabel = styled(UIAssetLabel)`
+  padding: 0px;
+`
+export const PendingAssetAmountLabel = styled(UILabel)`
+  font-family: 'MainFontBold';
+  padding: 0;
+  font-size: 17px;
+  line-height: 17px;
+
+  ${media.md`
+  font-size: 24px;
+  line-height: 24px;
+`}
+`
+
+export const RecoveryInfoButton = styled(UIButton).attrs({
+  typevalue: 'transparent'
+})<{ selected: boolean }>`
+  &.ant-btn {
+    display: inline-flex;
+    color: inherit;
+  }
+  padding-left: 0px;
+`
+export const RecoveryInfoButtonIcon = styled(CaretRightOutlined)<{ selected: boolean }>`
+  transform: ${({ selected }) => (selected ? 'rotateZ(90deg)' : 'rotateZ(0)')};
+  color: ${palette('primary', 0)};
+`
+
+export const RecoveryInfoButtonLabel = styled(UILabel)`
+  font-family: 'MainFontBold';
+  text-transform: uppercase;
+  font-size: 12px;
+  line-height: 15px;
+  padding-right: 5px;
+`
+
+export const RecoveryDescription = styled(UILabel)`
+  font-family: 'MainFontRegular';
+  text-transform: uppercase;
+  font-size: 12px;
+  line-height: 17px;
+`
+
+export const OpenRecoveryToolIcon = styled(UIExternalLinkIcon)`
+  svg {
+    margin-left: 10px;
+    color: inherit;
+  }
 `

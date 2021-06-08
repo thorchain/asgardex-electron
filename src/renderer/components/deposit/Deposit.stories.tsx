@@ -42,7 +42,8 @@ const defaultProps: DepositProps = {
   AsymDepositContent: AsymDeposit,
   WidthdrawContent: Withdraw,
   AsymWidthdrawContent: AsymWidthdraw,
-  keystoreState: O.some(O.some({ phrase: 'phrase' }))
+  keystoreState: O.some(O.some({ phrase: 'phrase' })),
+  liquidityProvider: RD.initial
 }
 
 export const Default: Story = () => <Deposit {...defaultProps} />

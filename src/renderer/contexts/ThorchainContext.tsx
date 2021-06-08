@@ -19,7 +19,9 @@ import {
   explorerUrl$,
   getExplorerTxUrl$,
   mimir$,
-  reloadMimir
+  reloadMimir,
+  getLiquidityProvider,
+  reloadLiquidityProviders
 } from '../services/thorchain'
 
 export type ThorchainContextValue = {
@@ -42,6 +44,8 @@ export type ThorchainContextValue = {
   reloadNodesInfo: typeof reloadNodesInfo
   mimir$: typeof mimir$
   reloadMimir: typeof reloadMimir
+  getLiquidityProvider: typeof getLiquidityProvider
+  reloadLiquidityProviders: typeof reloadLiquidityProviders
 }
 
 const initialContext: ThorchainContextValue = {
@@ -63,7 +67,9 @@ const initialContext: ThorchainContextValue = {
   reloadNodesInfo,
   getExplorerTxUrl$,
   mimir$,
-  reloadMimir
+  reloadMimir,
+  getLiquidityProvider: getLiquidityProvider,
+  reloadLiquidityProviders: reloadLiquidityProviders
 }
 
 const ThorchainContext = createContext<ThorchainContextValue | null>(null)

@@ -4,6 +4,7 @@ import * as O from 'fp-ts/Option'
 import * as Rx from 'rxjs'
 import * as RxOp from 'rxjs/operators'
 
+import { retryRequest } from '../../helpers/rx/retryRequest'
 import * as C from '../clients'
 import { TxHashLD, ErrorId } from '../wallet/types'
 import { Client$ } from './types'
@@ -19,6 +20,7 @@ export const createTransactionService = (client$: Client$): TransactionService =
       RxOp.switchMap((oClient) => (O.isSome(oClient) ? Rx.of(oClient.value) : Rx.EMPTY)),
       RxOp.switchMap((client) => Rx.from(client.deposit(params))),
       RxOp.map(RD.success),
+      RxOp.retryWhen(retryRequest({ maxRetry: 3, scalingDuration: 1000 /* 1 sec. */ })),
       RxOp.catchError(
         (e): TxHashLD =>
           Rx.of(

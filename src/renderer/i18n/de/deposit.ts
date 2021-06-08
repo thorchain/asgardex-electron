@@ -26,6 +26,12 @@ const deposit: DepositMessages = {
   'deposit.add.error.nobalances': 'Kein Guthaben',
   'deposit.add.error.nobalance1': 'Du verfügst über kein Guthaben, um {asset} hinzuzufügen.',
   'deposit.add.error.nobalance2': 'Du verfügst über keine Guthaben, um {asset1} und {asset2} hinzuzufügen.',
+  'deposit.add.pendingAssets.title': 'Pending Assets gefunden',
+  'deposit.add.pendingAssets.description':
+    'Folgende Assets wurden erfolgreich überwiesen, jedoch als "Pending" markiert, da die Transaktion des anderen Assets noch aussteht.',
+  'deposit.add.pendingAssets.recoveryDescription':
+    'Bitte beachte: Die Transaktionen der Assetpaare können aufgrund unterschiedlicher Blockchains unterschiedliche Zeit benötigen. Falls die Transaktion eines der Assets fehlgeschlagen sein sollte, kannst Du die bereits eingezahlten, auf "Pending" gesetzten Assets über das Recovery Tool der ASDGARDEX Webapp unter https://testnet.asgard.exchange/deposit-sym-recovery zurücküberweisen. Dieses Feature ist derzeit noch nicht in ASGARDEX Desktop verfügbar.',
+  'deposit.add.pendingAssets.recoveryTitle': 'Öffne Recovery Tool',
   'deposit.bond.state.error': 'Bond Fehler',
   'deposit.unbond.state.error': 'Unbond Fehler',
   'deposit.leave.state.error': 'Fehler beim Verlassen',

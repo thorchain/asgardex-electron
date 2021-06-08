@@ -466,7 +466,8 @@ const createPoolsService = (
           RxOp.catchError((e: Error) => Rx.of(RD.failure(e))),
           RxOp.startWith(RD.pending)
         )
-      })
+      }),
+      RxOp.catchError((e: Error) => Rx.of(RD.failure(e)))
     )
 
   // Trigger to reload pool addresses (`inbound_addresses`)

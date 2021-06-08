@@ -21,7 +21,9 @@ const EXTERNALS_WHITELIST = [
   'ropsten.etherscan.io',
   'tltc.bitaps.com',
   'ltc.bitaps.com',
-  'www.blockchain.com'
+  'www.blockchain.com',
+  'testnet.asgard.exchange',
+  'asgard.exchange'
 ]
 
 const openExternal = (target: string) => {

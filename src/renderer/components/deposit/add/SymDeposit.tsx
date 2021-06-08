@@ -52,6 +52,7 @@ import {
 } from '../../../services/chain/types'
 import { ApproveFeeHandler, ApproveParams, IsApprovedRD, LoadApproveFeeHandler } from '../../../services/ethereum/types'
 import { PoolAddress, PoolsDataMap } from '../../../services/midgard/types'
+import { PendingAssets, PendingAssetsRD } from '../../../services/thorchain/types'
 import { ApiError, TxHashLD, TxHashRD, ValidatePasswordHandler } from '../../../services/wallet/types'
 import { AssetWithDecimal } from '../../../types/asgardex'
 import { WalletBalances } from '../../../types/wallet'
@@ -63,6 +64,7 @@ import { Fees, UIFeesRD } from '../../uielements/fees'
 import { formatFee } from '../../uielements/fees/Fees.helper'
 import * as Helper from './Deposit.helper'
 import * as Styled from './Deposit.style'
+import { PendingAssets as PendingAssetsUI } from './Deposit.subcomponents'
 
 export type Props = {
   asset: AssetWithDecimal
@@ -95,6 +97,8 @@ export type Props = {
   fundsCap: O.Option<FundsCap>
   poolsData: PoolsDataMap
   haltedChains: Chain[]
+  pendingAssets: PendingAssetsRD
+  openRecoveryTool: FP.Lazy<void>
 }
 
 type SelectedInput = 'asset' | 'rune' | 'none'
@@ -130,7 +134,9 @@ export const SymDeposit: React.FC<Props> = (props) => {
     approveFee$,
     fundsCap: oFundsCap,
     poolsData,
-    haltedChains
+    haltedChains,
+    pendingAssets: pendingAssetsRD,
+    openRecoveryTool
   } = props
 
   const intl = useIntl()
@@ -433,7 +439,7 @@ export const SymDeposit: React.FC<Props> = (props) => {
 
     const title = intl.formatMessage({ id: 'deposit.add.error.nobalances' })
 
-    return <Styled.BalanceAlert type="warning" message={title} description={msg} />
+    return <Styled.Alert type="warning" message={title} description={msg} />
   }, [asset.ticker, hasAssetBalance, hasRuneBalance, intl])
 
   const runeAmountChangeHandler = useCallback(
@@ -911,6 +917,44 @@ export const SymDeposit: React.FC<Props> = (props) => {
     [asset, isApprovedERC20Token$, needApprovement, subscribeIsApprovedState]
   )
 
+  const hasPendingAssets: boolean = useMemo(
+    () =>
+      FP.pipe(
+        pendingAssetsRD,
+        RD.toOption,
+        O.map((pendingAssets): boolean => pendingAssets.length > 0),
+        O.getOrElse((): boolean => false)
+      ),
+    [pendingAssetsRD]
+  )
+
+  const prevPendingAssets = useRef<PendingAssets>([])
+
+  const renderPendingAssets = useMemo(() => {
+    const render = (pendingAssets: PendingAssets, loading: boolean) =>
+      pendingAssets.length > 0 && (
+        <PendingAssetsUI
+          network={network}
+          assets={pendingAssets}
+          loading={loading}
+          onClickRecovery={openRecoveryTool}
+        />
+      )
+
+    return FP.pipe(
+      pendingAssetsRD,
+      RD.fold(
+        () => <></>,
+        () => render(prevPendingAssets.current, true),
+        () => <></>,
+        (pendingAssets) => {
+          prevPendingAssets.current = pendingAssets
+          return render(pendingAssets, false)
+        }
+      )
+    )
+  }, [network, openRecoveryTool, pendingAssetsRD])
+
   const prevRouterAddress = useRef<O.Option<Address>>(O.none)
 
   // Run `checkApprovedStatus` whenever `oPoolAddress` has been changed
@@ -968,8 +1012,9 @@ export const SymDeposit: React.FC<Props> = (props) => {
       fundsCapReached ||
       disabled ||
       assetBalance.amount().isZero() ||
-      runeBalance.amount().isZero(),
-    [assetBalance, disabled, fundsCapReached, isBalanceError, runeBalance, haltedChain]
+      runeBalance.amount().isZero() ||
+      hasPendingAssets,
+    [haltedChain, isBalanceError, fundsCapReached, disabled, assetBalance, runeBalance, hasPendingAssets]
   )
 
   /**
@@ -999,10 +1044,15 @@ export const SymDeposit: React.FC<Props> = (props) => {
 
   return (
     <Styled.Container>
+      {hasPendingAssets && (
+        <Styled.AlertRow>
+          <Col xs={24}>{renderPendingAssets}</Col>
+        </Styled.AlertRow>
+      )}
       {showBalanceError && (
-        <Styled.BalanceErrorRow>
-          <Col xs={24}>{showBalanceError && renderBalanceError}</Col>
-        </Styled.BalanceErrorRow>
+        <Styled.AlertRow>
+          <Col xs={24}>{renderBalanceError}</Col>
+        </Styled.AlertRow>
       )}
       <Styled.CardsRow gutter={{ lg: 32 }}>
         <Col xs={24} xl={12}>
@@ -1063,7 +1113,7 @@ export const SymDeposit: React.FC<Props> = (props) => {
           <Styled.FeesRow gutter={{ lg: 32 }}>
             <Col xs={24} xl={12}>
               <Styled.FeeRow>
-                <Fees fees={uiFeesRD} reloadFees={reloadFeesHandler} />
+                <Fees fees={uiFeesRD} reloadFees={reloadFeesHandler} disabled={disabledForm} />
               </Styled.FeeRow>
               <Styled.FeeErrorRow>
                 <Col>
