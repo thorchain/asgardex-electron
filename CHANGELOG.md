@@ -1,3 +1,10 @@
+# 0.3.1 (2021-06-08)
+
+## Fix
+
+- Use `viewblock` as default explorer [#1517](https://github.com/thorchain/asgardex-electron/pull/1517)
+- Fix url of `Recovery tool` [#1523](https://github.com/thorchain/asgardex-electron/pull/1523)
+
 # 0.3.0 (2021-06-07)
 
 ## Feature
