@@ -14,10 +14,24 @@ export type AssetWithAmount = {
   amount: BaseAmount
 }
 
+/**
+ * Assets with 1e8 decimal,
+ * mostly for data of THORChain,
+ * which uses 1e8 decimal for all assets
+ */
+export type AssetWithAmount1e8 = {
+  asset: Asset
+  amount1e8: BaseAmount
+}
+
+export type AssetsWithAmount1e8 = AssetWithAmount1e8[]
+
 export type AssetWithDecimal = {
   asset: Asset
   decimal: number
 }
+
+export type AssetsWithDecimal = AssetWithDecimal[]
 
 export type DepositType = 'sym' | 'asym'
 export type WithdrawType = 'sym' | 'asym'

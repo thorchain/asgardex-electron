@@ -164,15 +164,14 @@ export const DepositView: React.FC<Props> = () => {
       // We should look for THORChain's wallet at the response of liqudity_providers endpoint
       address$,
       addressByChain$(THORChain),
-      assetWithDecimalLD
+      selectedPoolAsset$
     ]).pipe(
-      RxOp.switchMap(([network, oAssetAddress, oRuneAddress, assetWithDecimalRD]) => {
+      RxOp.switchMap(([network, oAssetAddress, oRuneAddress, oSelectedPoolAsset]) => {
         return FP.pipe(
-          sequenceTOption(oRuneAddress, oAssetAddress, RD.toOption(assetWithDecimalRD)),
+          sequenceTOption(oRuneAddress, oAssetAddress, oSelectedPoolAsset),
           O.fold(
             (): LiquidityProviderLD => Rx.of(RD.initial),
-            ([runeAddress, assetAddress, assetWithDecimal]) =>
-              getLiquidityProvider({ assetWithDecimal, network, runeAddress, assetAddress })
+            ([runeAddress, assetAddress, asset]) => getLiquidityProvider({ asset, network, runeAddress, assetAddress })
           )
         )
       })

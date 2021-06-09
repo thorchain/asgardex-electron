@@ -121,10 +121,7 @@ const getNodeInfo$ = (node: Address, network: Network): NodeInfoLD =>
 
 const { stream$: reloadLiquidityProviders$, trigger: reloadLiquidityProviders } = triggerStream()
 
-const getLiquidityProviders = ({
-  assetWithDecimal: { asset, decimal: assetDecimal },
-  network
-}: GetLiquidityProvidersParams): LiquidityProvidersLD => {
+const getLiquidityProviders = ({ asset, network }: GetLiquidityProvidersParams): LiquidityProvidersLD => {
   const poolString = assetToString(asset)
   return FP.pipe(
     reloadLiquidityProviders$,
@@ -146,15 +143,16 @@ const getLiquidityProviders = ({
         liveData.map(
           A.map((provider): LiquidityProvider => {
             const pendingRuneAmount = baseAmount(provider.pending_rune, THORCHAIN_DECIMAL)
-            const pendingAssetAmount = baseAmount(provider.pending_asset, assetDecimal)
+            /* 1e8 decimal by default, which is default decimal for ALL accets at THORChain  */
+            const pendingAssetAmount = baseAmount(provider.pending_asset, THORCHAIN_DECIMAL)
             return {
               runeAddress: provider.rune_address,
               assetAddress: provider.asset_address,
               pendingRune: pendingRuneAmount.gt(0)
-                ? O.some({ asset: AssetRuneNative, amount: pendingRuneAmount })
+                ? O.some({ asset: AssetRuneNative, amount1e8: pendingRuneAmount })
                 : O.none,
               pendingAsset: pendingAssetAmount.gt(0)
-                ? O.some({ asset: provider.asset, amount: pendingAssetAmount })
+                ? O.some({ asset: provider.asset, amount1e8: pendingAssetAmount })
                 : O.none
             }
           })
@@ -176,14 +174,14 @@ const getLiquidityProviders = ({
 }
 
 const getLiquidityProvider = ({
-  assetWithDecimal,
+  asset,
   network,
   runeAddress,
   assetAddress
 }: GetLiquidityProviderParams): LiquidityProviderLD =>
   FP.pipe(
     getLiquidityProviders({
-      assetWithDecimal,
+      asset,
       network
     }),
     liveData.map(
