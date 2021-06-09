@@ -3,7 +3,7 @@ import * as E from 'fp-ts/lib/Either'
 import * as O from 'fp-ts/lib/Option'
 
 import { ClientState } from '../clients/types'
-import { getClient, hasClient, getClientStateForViews, getClientNetwork } from './utils'
+import { getClient, hasClient, getClientStateForViews, toClientNetwork } from './utils'
 
 // Mocking non default class exports
 // https://jestjs.io/docs/en/es6-class-mocks#mocking-non-default-class-exports
@@ -75,13 +75,10 @@ describe('services/utils/', () => {
 
   describe('getClientNetwork', () => {
     it('for testnet', () => {
-      expect(getClientNetwork('testnet')).toEqual('testnet')
+      expect(toClientNetwork('testnet')).toEqual('testnet')
     })
     it('for mainnent', () => {
-      expect(getClientNetwork('mainnet')).toEqual('mainnet')
-    })
-    it('returns mainnet for chaosnet', () => {
-      expect(getClientNetwork('chaosnet')).toEqual('mainnet')
+      expect(toClientNetwork('mainnet')).toEqual('mainnet')
     })
   })
 })

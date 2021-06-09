@@ -1,5 +1,3 @@
-import * as A from 'fp-ts/lib/Array'
-
 import { envOrDefault } from '../renderer/helpers/envHelper'
 import { StoreFilesContent, UserNodesStorage } from './api/types'
 import { Locale } from './i18n/types'
@@ -21,9 +19,8 @@ const USER_NODES_STORAGE_VERSION = '1'
 
 export const USER_NODES_STORAGE_DEFAULT: UserNodesStorage = {
   version: USER_NODES_STORAGE_VERSION,
-  mainnet: A.empty,
-  chaosnet: A.empty,
-  testnet: A.empty
+  mainnet: [],
+  testnet: []
 }
 
 // increase it by `1` if you want to ignore previous version of `common` storage
