@@ -63,7 +63,8 @@ export const TxsTable: React.FC<Props> = (props): JSX.Element => {
       const selfAddress = FP.pipe(
         oWalletAddres,
         O.chain((walletAddress) =>
-          walletAddress === address
+          // TODO: question here about lowercase-casting
+          walletAddress.toLowerCase() === address.toLowerCase()
             ? O.some(<Styled.OwnText key={key}>{intl.formatMessage({ id: 'common.address.self' })}</Styled.OwnText>)
             : O.none
         )
@@ -85,7 +86,7 @@ export const TxsTable: React.FC<Props> = (props): JSX.Element => {
       case 'transfer':
         return <Styled.TransferIcon />
       default:
-        return <></>
+        return <>s</>
     }
   }, [])
 

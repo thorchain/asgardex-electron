@@ -35,8 +35,9 @@ export const resetTxsPage: ResetTxsPageHandler = () => setLoadTxsProps(INITIAL_L
 /**
  * Factory create a stream of `TxsPageRD` based on selected asset
  */
-export const getTxs$: (walletAddress: O.Option<string>, walletIndex?: number) => TxsPageLD = (
+export const getTxs$: (walletAddress: O.Option<string>, internal?: boolean, walletIndex?: number) => TxsPageLD = (
   walletAddress = O.none,
+  internal = false,
   walletIndex = 0 /* TODO (@asgdx-team) Will we still use `0` as default by introducing HD wallets in the future */
 ) =>
   Rx.combineLatest([selectedAsset$, loadTxsProps$]).pipe(
@@ -52,7 +53,7 @@ export const getTxs$: (walletAddress: O.Option<string>, walletIndex?: number) =>
               case 'BTC':
                 return BTC.txs$({ asset: O.none, limit, offset, walletAddress, walletIndex })
               case 'ETH':
-                return ETH.txs$({ asset: O.some(asset), limit, offset, walletAddress, walletIndex })
+                return ETH.txs$({ asset: O.some(asset), limit, offset, walletAddress, walletIndex, internal })
               case 'THOR':
                 return THOR.txs$({ asset: O.none, limit, offset, walletAddress, walletIndex })
               case 'LTC':

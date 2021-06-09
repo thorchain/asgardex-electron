@@ -31,6 +31,8 @@ export const createFeesService = ({ client$, chain }: { client$: Client$; chain:
           O.fold(
             () => Rx.of(RD.initial),
             (client) =>
+              // eslint-disable-next-line
+              // @ts-ignore
               Rx.combineLatest([client.estimateCall(address, abi, func, params), client.estimateGasPrices()]).pipe(
                 RxOp.map(
                   ([gasLimit, gasPrices]) =>

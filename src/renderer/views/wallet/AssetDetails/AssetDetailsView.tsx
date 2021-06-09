@@ -14,7 +14,7 @@ import { ErrorView } from '../../../components/shared/error'
 import { BackLink } from '../../../components/uielements/backLink'
 import { useAppContext } from '../../../contexts/AppContext'
 import { useWalletContext } from '../../../contexts/WalletContext'
-import { isEthAsset, isRuneNativeAsset } from '../../../helpers/assetHelper'
+import { isEthAsset, isEthTokenAsset, isRuneNativeAsset } from '../../../helpers/assetHelper'
 import { sequenceTOption } from '../../../helpers/fpHelpers'
 import { AssetDetailsParams } from '../../../routes/wallet'
 import { DEFAULT_NETWORK } from '../../../services/const'
@@ -90,7 +90,7 @@ export const AssetDetailsView: React.FC = (): JSX.Element => {
 
   const renderHistoryExtraContent = useCallback(
     (asset: Asset) => (isLoading: boolean) => {
-      if (isRuneNativeAsset(asset) || isEthAsset(asset)) {
+      if (isRuneNativeAsset(asset) || isEthAsset(asset) || isEthTokenAsset(asset)) {
         return (
           <Styled.HistoryExtraContent>
             <Styled.HistoryTypeButton

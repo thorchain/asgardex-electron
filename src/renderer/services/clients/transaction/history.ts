@@ -15,7 +15,7 @@ import { loadTx$, loadTxs$ } from './common'
  */
 export const txsByClient$: (client$: XChainClient$) => (params: TxsParams) => TxsPageLD =
   (client$) =>
-  ({ asset, limit, offset, walletAddress, walletIndex }) =>
+  ({ asset, limit, offset, walletAddress, walletIndex, internal }) =>
     client$.pipe(
       RxOp.switchMap((oClient) =>
         FP.pipe(
@@ -29,7 +29,8 @@ export const txsByClient$: (client$: XChainClient$) => (params: TxsParams) => Tx
                 limit,
                 offset,
                 walletAddress,
-                walletIndex
+                walletIndex,
+                internal
               })
           )
         )

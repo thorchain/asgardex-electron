@@ -36,9 +36,15 @@ export type FeesLD = LiveData<Error, Fees>
 export type LoadTxsParams = {
   limit: number
   offset: number
+  internal?: boolean
 }
 
-export type TxsParams = { asset: O.Option<Asset>; walletAddress: O.Option<string>; walletIndex: number } & LoadTxsParams
+export type TxsParams = {
+  asset: O.Option<Asset>
+  walletAddress: O.Option<string>
+  walletIndex: number
+  internal?: boolean
+} & LoadTxsParams
 
 export type TxsPageRD = RD.RemoteData<ApiError, TxsPage>
 export type TxsPageLD = LiveData<ApiError, TxsPage>
