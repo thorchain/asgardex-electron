@@ -14,7 +14,7 @@ import { clientNetwork$ } from '../app/service'
 import * as C from '../clients'
 import { Address$, ExplorerUrl$, GetExplorerTxUrl$, GetExplorerAddressUrl$ } from '../clients/types'
 import { ClientStateForViews } from '../clients/types'
-import { getClient, getClientNetwork, getClientStateForViews } from '../clients/utils'
+import { getClient, toClientNetwork, getClientStateForViews } from '../clients/utils'
 import { keystoreService } from '../wallet/keystore'
 import { getPhrase } from '../wallet/util'
 import { ClientState, ClientState$, Client$ } from './types'
@@ -115,7 +115,7 @@ const getDecimal = async (asset: Asset, network: Network): Promise<number> => {
     O.fromNullable,
     O.fold(
       async () => {
-        const ethNetwork = getClientNetwork(network)
+        const ethNetwork = toClientNetwork(network)
         const provider = new EtherscanProvider(ethNetwork, ETHERSCAN_API_KEY)
         try {
           const decimal = await ETH.getDecimal(asset, provider)

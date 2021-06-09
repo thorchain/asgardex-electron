@@ -39,6 +39,9 @@ export const HeaderNetworkSelector: React.FC<Props> = ({
     [changeNetwork]
   )
 
+  // TODO asgdx-team: Remove `networkLabel` if we go live with mainnet
+  const networkLabel = (network: Network) => (network === 'mainnet' ? 'chaosnet' : 'testnet')
+
   const menu = useMemo(
     () => (
       <Menu onClick={changeNetworkHandler}>
@@ -46,7 +49,8 @@ export const HeaderNetworkSelector: React.FC<Props> = ({
           return (
             <HeaderDropdownMenuItem key={network}>
               <HeaderDropdownMenuItemText>
-                <Styled.NetworkLabel network={network} />
+                {/* TODO asgdx-team: Revert it back to `network` if we go live with mainnet */}
+                <Styled.NetworkLabel network={networkLabel(network)} />
               </HeaderDropdownMenuItemText>
             </HeaderDropdownMenuItem>
           )
@@ -58,13 +62,13 @@ export const HeaderNetworkSelector: React.FC<Props> = ({
 
   return (
     <HeaderDropdownWrapper>
-      {/* TODO (@asgdx-team) Disable chaosnet for next testnet release */}
       <Dropdown overlay={menu} trigger={['click']} placement="bottomCenter">
         <HeaderDropdownContentWrapper>
           {!isDesktopView && <HeaderDropdownTitle>{intl.formatMessage({ id: 'common.network' })}</HeaderDropdownTitle>}
           <Styled.Row>
             <HeaderDropdownMenuItemText>
-              <Styled.NetworkLabel network={selectedNetwork} />
+              {/* TODO asgdx-team: Revert it back to `network` if we go live with mainnet */}
+              <Styled.NetworkLabel network={networkLabel(selectedNetwork)} />
             </HeaderDropdownMenuItemText>
             <DownIcon />
           </Styled.Row>

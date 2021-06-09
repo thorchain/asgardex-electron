@@ -2,10 +2,11 @@ import * as A from 'antd'
 import styled from 'styled-components'
 import { palette } from 'styled-theme'
 
-import { Network } from '../../../../shared/api/types'
 import { Label as LabelUI } from '../../uielements/label'
 
-type LabelProps = { network: Network }
+// TODO asgdx-team: Revert changes to use `network: Network` as props when we go live with mainnet
+// type LabelProps = { network: Network }
+type LabelProps = { network: 'chaosnet' | 'testnet' }
 
 export const NetworkLabel = styled(LabelUI).attrs<LabelProps>(({ network }) => ({
   children: network,
@@ -19,6 +20,7 @@ export const NetworkLabel = styled(LabelUI).attrs<LabelProps>(({ network }) => (
   color: ${({ network }) => {
     switch (network) {
       case 'chaosnet':
+        // TODO @asgdx-team: Change it to (primary, '0') if we go live with mainnet
         return palette('warning', 0)
       case 'testnet':
         return palette('error', 0)
