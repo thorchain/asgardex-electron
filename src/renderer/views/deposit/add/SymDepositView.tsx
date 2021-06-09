@@ -14,7 +14,7 @@ import * as RxOp from 'rxjs/operators'
 import { Network } from '../../../../shared/api/types'
 import { SymDeposit } from '../../../components/deposit/add'
 import { Alert } from '../../../components/uielements/alert'
-import { ZERO_BN, ZERO_POOL_DATA } from '../../../const'
+import { RECOVERY_TOOL_URL, ZERO_BN, ZERO_POOL_DATA } from '../../../const'
 import { useAppContext } from '../../../contexts/AppContext'
 import { useChainContext } from '../../../contexts/ChainContext'
 import { useEthereumContext } from '../../../contexts/EthereumContext'
@@ -211,13 +211,10 @@ export const SymDepositView: React.FC<Props> = (props) => {
     [liquidityProviderRD]
   )
 
-  const openRecoveryTool = useCallback((): Promise<void> => {
-    const url =
-      network === 'testnet'
-        ? `https://testnet.asgard.exchange/deposit-sym-recovery/`
-        : `https://asgard.exchange/deposit-sym-recovery/`
-    return window.apiUrl.openExternal(url)
-  }, [network])
+  const openRecoveryTool = useCallback(
+    (): Promise<void> => window.apiUrl.openExternal(RECOVERY_TOOL_URL[network]),
+    [network]
+  )
 
   const renderDisabledAddDeposit = useCallback(
     (error?: Error) => (

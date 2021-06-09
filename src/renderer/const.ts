@@ -10,6 +10,7 @@ import {
   AssetRuneNative
 } from '@xchainjs/xchain-util'
 
+import { Network } from '../shared/api/types'
 import { PricePoolCurrencyWeights, PricePoolAssets } from './views/pools/Pools.types'
 
 //
@@ -142,3 +143,11 @@ export const ZERO_ASSET_AMOUNT = assetAmount(ZERO_BN)
 export const ZERO_BASE_AMOUNT = baseAmount(ZERO_BN)
 
 export const ZERO_POOL_DATA: PoolData = { runeBalance: ZERO_BASE_AMOUNT, assetBalance: ZERO_BASE_AMOUNT }
+
+export const RECOVERY_TOOL_URL: Record<Network, string> = {
+  testnet: 'https://testnet.asgard.exchange/deposit-sym-recovery/',
+  mainnet: 'https://app.asgard.exchange/deposit-sym-recovery/',
+  get chaosnet() {
+    return this.mainnet
+  }
+}

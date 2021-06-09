@@ -23,7 +23,7 @@ const EXTERNALS_WHITELIST = [
   'ltc.bitaps.com',
   'www.blockchain.com',
   'testnet.asgard.exchange',
-  'asgard.exchange',
+  'app.asgard.exchange',
   'viewblock.io'
 ]
 

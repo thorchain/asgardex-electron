@@ -30,7 +30,7 @@ const deposit: DepositMessages = {
   'deposit.add.pendingAssets.description':
     'Following assets have been successfully sent, but the transaction of the other asset side has not been finalized or it was failed - FR:',
   'deposit.add.pendingAssets.recoveryDescription':
-    'Please note: Transactions of an asset pair might take different time by running on different blockchains. In case of failures, you have a way to withdraw pending assets using the Recovery Tool of ASDGARDEX web at https://testnet.asgard.exchange/deposit-sym-recovery. This feature is currently not available in ASGARDEX desktop. - FR',
+    'Please note: Transactions of an asset pair might take different time by running on different blockchains. In case of failures, you have a way to withdraw pending assets using the Recovery Tool of ASDGARDEX web at {url}. This feature is currently not available in ASGARDEX desktop. - FR',
   'deposit.add.pendingAssets.recoveryTitle': 'Open Recovery Tool - FR',
   'deposit.bond.state.error': 'Erreur de caution',
   'deposit.unbond.state.error': 'Erreur de retrait',
