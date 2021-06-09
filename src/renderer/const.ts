@@ -146,8 +146,5 @@ export const ZERO_POOL_DATA: PoolData = { runeBalance: ZERO_BASE_AMOUNT, assetBa
 
 export const RECOVERY_TOOL_URL: Record<Network, string> = {
   testnet: 'https://testnet.asgard.exchange/deposit-sym-recovery/',
-  mainnet: 'https://app.asgard.exchange/deposit-sym-recovery/',
-  get chaosnet() {
-    return this.mainnet
-  }
+  mainnet: 'https://app.asgard.exchange/deposit-sym-recovery/'
 }
