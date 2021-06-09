@@ -2,11 +2,11 @@ import React, { useState } from 'react'
 
 import { assetToString, baseToAsset, formatAssetAmount } from '@xchainjs/xchain-util'
 import * as FP from 'fp-ts/lib/function'
-import { useIntl } from 'react-intl'
+import { FormattedMessage, useIntl } from 'react-intl'
 
 import { Network } from '../../../../shared/api/types'
-import { AssetsWithAmount1e8, AssetWithAmount1e8 } from '../../../types/asgardex'
-import { Button } from '../../uielements/button'
+import { RECOVERY_TOOL_URL } from '../../../const'
+import { AssetWithAmount1e8, AssetsWithAmount1e8 } from '../../../types/asgardex'
 import * as Styled from './Deposit.style'
 
 type AssetIconAmountProps = {
@@ -72,12 +72,21 @@ export const PendingAssets: React.FC<PendingAssetsProps> = (props): JSX.Element 
               />
             ))}
             <Styled.RecoveryDescription>
-              {intl.formatMessage({ id: 'deposit.add.pendingAssets.recoveryDescription' })}
+              <FormattedMessage
+                id="deposit.add.pendingAssets.recoveryDescription"
+                values={{
+                  url: (
+                    <Styled.RecoveryDescriptionLink onClick={onClickRecovery}>
+                      {RECOVERY_TOOL_URL[network]}
+                    </Styled.RecoveryDescriptionLink>
+                  )
+                }}
+              />
             </Styled.RecoveryDescription>
-            <Button onClick={onClickRecovery} typevalue="outline" color="warning">
+            <Styled.RecoveryOpenButton onClick={onClickRecovery}>
               {intl.formatMessage({ id: 'deposit.add.pendingAssets.recoveryTitle' })}
               <Styled.OpenRecoveryToolIcon />
-            </Button>
+            </Styled.RecoveryOpenButton>
           </>
         ) : (
           <></>

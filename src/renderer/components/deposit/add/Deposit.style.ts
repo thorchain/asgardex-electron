@@ -216,6 +216,24 @@ export const RecoveryDescription = styled(UILabel)`
   text-transform: uppercase;
   font-size: 12px;
   line-height: 17px;
+  padding-bottom: 10px;
+`
+
+export const RecoveryDescriptionLink = styled.span`
+  text-transform: uppercase;
+  color: inherit;
+  text-decoration: underline;
+  cursor: pointer;
+  &:hover {
+    color: ${palette('primary', 0)};
+  }
+`
+
+export const RecoveryOpenButton = styled(UIButton).attrs({
+  typevalue: 'outline',
+  color: 'warning'
+})`
+  margin: 10px 0;
 `
 
 export const OpenRecoveryToolIcon = styled(UIExternalLinkIcon)`
