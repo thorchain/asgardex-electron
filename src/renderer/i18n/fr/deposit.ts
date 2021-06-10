@@ -30,7 +30,7 @@ const deposit: DepositMessages = {
   'deposit.add.pendingAssets.description':
     "Les actifs suivants ont été envoyés avec succès, mais la transaction de l'autre actif n'a pas été finalisée ou a échoué",
   'deposit.add.pendingAssets.recoveryDescription':
-      "Remarque : les transactions d'une paire d'actifs peuvent prendre un temps différent en s'exécutant sur différentes blockchains. En cas d'échec, vous disposez d'un moyen de retirer les actifs en attente à l'aide de l'outil de récupération du site Web ASDGARDEX à l'adresse {url}. Cette fonctionnalité n'est actuellement pas disponible avec ASGARDEX Dekstop.",
+    "Remarque : les transactions d'une paire d'actifs peuvent prendre un temps différent en s'exécutant sur différentes blockchains. En cas d'échec, vous disposez d'un moyen de retirer les actifs en attente à l'aide de l'outil de récupération du site Web ASDGARDEX à l'adresse {url}. Cette fonctionnalité n'est actuellement pas disponible avec ASGARDEX Dekstop.",
   'deposit.add.pendingAssets.recoveryTitle': "Ouvrir l'outil de récupération",
   'deposit.bond.state.error': 'Erreur de caution',
   'deposit.unbond.state.error': 'Erreur de retrait',
