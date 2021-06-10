@@ -41,13 +41,22 @@ export const AssetDetailsView: React.FC = (): JSX.Element => {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => setSelectedAsset(oRouteAsset), [])
 
-  const { getTxs$, balancesState$, loadTxs, reloadBalancesByChain, setSelectedAsset, getExplorerTxUrl$, resetTxsPage } =
-    useWalletContext()
+  const {
+    getTxs$,
+    balancesState$,
+    loadTxs,
+    reloadBalancesByChain,
+    setSelectedAsset,
+    getExplorerTxUrl$,
+    getExplorerAddressUrl$,
+    resetTxsPage
+  } = useWalletContext()
 
   const [txsRD] = useObservableState(() => getTxs$(oWalletAddress), RD.initial)
   const { balances: oBalances } = useObservableState(balancesState$, INITIAL_BALANCES_STATE)
 
   const getExplorerTxUrl = useObservableState(getExplorerTxUrl$, O.none)
+  const getExplorerAddressUrl = useObservableState(getExplorerAddressUrl$, O.none)
 
   useEffect(() => {
     return () => resetTxsPage()
@@ -105,6 +114,7 @@ export const AssetDetailsView: React.FC = (): JSX.Element => {
               loadTxsHandler={loadTxs}
               reloadBalancesHandler={reloadBalancesByChain(asset.chain)}
               getExplorerTxUrl={getExplorerTxUrl}
+              getExplorerAddressUrl={getExplorerAddressUrl}
               walletAddress={oWalletAddress}
               network={network}
             />
