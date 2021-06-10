@@ -35,7 +35,7 @@ const wallet: WalletMessages = {
   'wallet.phrase.error.valueRequired': 'Value for phrase is required',
   'wallet.phrase.error.invalid': 'Invalid phrase',
   'wallet.phrase.error.import': 'Error while importing phrase',
-  'wallet.txs.last90days': 'Transactions for last 90 days',
+  'wallet.txs.history': 'Transaction history',
   'wallet.empty.phrase.import': 'Import an existing wallet with funds on it',
   'wallet.empty.phrase.create': 'Create a new wallet, add funds to it',
   'wallet.create.copy.phrase': 'Copy phrase below',

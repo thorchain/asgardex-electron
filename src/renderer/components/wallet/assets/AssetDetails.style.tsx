@@ -3,6 +3,7 @@ import styled from 'styled-components'
 import { palette } from 'styled-theme'
 
 import { media } from '../../../helpers/styleHelper'
+import { ExternalLinkIcon as ExternalLinkIconUI } from '../../uielements/common/Common.style'
 import { Headline } from '../../uielements/headline'
 import { Label as UILabel } from '../../uielements/label'
 
@@ -53,6 +54,13 @@ export const TableHeadline = styled(Headline)`
   padding: 40px 0 20px 0;
   width: 100%;
   text-align: ${({ isDesktop }: TableHeadlineProps) => (isDesktop ? 'left' : 'center')};
+`
+
+export const TableHeadlineLinkIcon = styled(ExternalLinkIconUI)`
+  margin-left: 10px;
+  svg {
+    color: inherit;
+  }
 `
 
 export const UpgradeFeeErrorLabel = styled(UILabel).attrs({

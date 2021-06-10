@@ -32,7 +32,7 @@ const wallet: WalletMessages = {
   'wallet.imports.error.instance': 'Не удалось создать экземпляр Клиента',
   'wallet.imports.error.keystore.load': 'Недопустимый Keystore',
   'wallet.imports.error.keystore.import': 'Неверный пароль',
-  'wallet.txs.last90days': 'Транзакции за последние 90 дней',
+  'wallet.txs.history': 'Transation history - RU',
   'wallet.phrase.error.valueRequired': 'Необходимо значение для фразы',
   'wallet.phrase.error.invalid': 'Неверная фраза',
   'wallet.phrase.error.import': 'Ошибка при импорте фразы',

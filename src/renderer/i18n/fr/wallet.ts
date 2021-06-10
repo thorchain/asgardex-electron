@@ -36,7 +36,7 @@ const wallet: WalletMessages = {
   'wallet.phrase.error.valueRequired': 'La phrase de récupération est requise',
   'wallet.phrase.error.invalid': 'Phrase de récupération incorrecte',
   'wallet.phrase.error.import': "Erreur lors de l'importation de la phrase de récupération",
-  'wallet.txs.last90days': 'Transactions des 90 derniers jours',
+  'wallet.txs.history': 'Transaction history - FR',
   'wallet.empty.phrase.import': 'Importez un portefeuille existant contenant des fonds',
   'wallet.empty.phrase.create': "Créez un nouveau portefeuille, et l'alimenter en fonds",
   'wallet.create.copy.phrase': 'Copiez la phrase ci-dessous',
