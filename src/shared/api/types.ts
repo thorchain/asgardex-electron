@@ -65,7 +65,7 @@ export type ApiUrl = {
   openExternal: (url: string) => Promise<void>
 }
 
-export type Network = 'testnet' | 'chaosnet' | 'mainnet'
+export type Network = 'testnet' | 'mainnet'
 
 export enum LedgerErrorId {
   NO_DEVICE,

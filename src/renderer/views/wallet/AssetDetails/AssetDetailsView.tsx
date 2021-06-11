@@ -45,11 +45,13 @@ export const AssetDetailsView: React.FC = (): JSX.Element => {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => setSelectedAsset(oRouteAsset), [])
 
-  const { balancesState$, reloadBalancesByChain, setSelectedAsset, getExplorerTxUrl$ } = useWalletContext()
+  const { balancesState$, reloadBalancesByChain, setSelectedAsset, getExplorerTxUrl$, getExplorerAddressUrl$ } =
+    useWalletContext()
 
   const { balances: oBalances } = useObservableState(balancesState$, INITIAL_BALANCES_STATE)
 
   const getExplorerTxUrl = useObservableState(getExplorerTxUrl$, O.none)
+  const getExplorerAddressUrl = useObservableState(getExplorerAddressUrl$, O.none)
 
   /**
    * Need to filter balances only for appropriate wallet
@@ -125,6 +127,7 @@ export const AssetDetailsView: React.FC = (): JSX.Element => {
           () => renderAssetError,
           (asset) => (
             <RenderView
+              getExplorerAddressUrl={getExplorerAddressUrl}
               historyExtraContent={renderHistoryExtraContent(asset)}
               balances={walletBalances}
               asset={asset}

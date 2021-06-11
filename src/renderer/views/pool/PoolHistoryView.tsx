@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useMemo, useRef } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
 import * as Client from '@xchainjs/xchain-client'
-import { getDefaultExplorerTxUrl } from '@xchainjs/xchain-thorchain'
+import { getExplorerTxUrl, getDefaultExplorerUrls } from '@xchainjs/xchain-thorchain'
 import { Asset, assetToString } from '@xchainjs/xchain-util'
 import * as FP from 'fp-ts/function'
 import * as O from 'fp-ts/Option'
@@ -101,7 +101,11 @@ export const PoolHistory: React.FC<Props> = ({ className, poolAsset }) => {
     (txId: string) => {
       FP.pipe(
         oExplorerUrl,
-        O.alt(() => O.some((txId: string) => getDefaultExplorerTxUrl(clientNetwork, txId))),
+        O.alt(() =>
+          O.some((txId: string) =>
+            getExplorerTxUrl({ urls: getDefaultExplorerUrls(), network: clientNetwork, txID: txId })
+          )
+        ),
         O.ap(O.some(txId)),
         O.map(window.apiUrl.openExternal)
       )

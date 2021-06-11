@@ -25,7 +25,6 @@ import { INITIAL_BALANCES_STATE } from './const'
 import {
   ChainBalances$,
   ChainBalance$,
-  ChainBalance,
   BalancesService,
   ChainBalancesService,
   BalancesState$,
@@ -230,38 +229,6 @@ export const createBalancesService = ({
     }))
   )
 
-  const btcLedgerChainBalance$: ChainBalance$ = FP.pipe(
-    BTC.ledgerAddress$,
-    RxOp.switchMap((addressRd) =>
-      FP.pipe(
-        addressRd,
-        RD.map((address) => BTC.getBalanceByAddress$(address, 'ledger')),
-        RD.map(
-          RxOp.map<WalletBalancesRD, ChainBalance>((balances) => ({
-            walletType: 'ledger',
-            chain: BTCChain,
-            walletAddress: FP.pipe(addressRd, RD.toOption),
-            balances
-          }))
-        ),
-        RD.getOrElse(() =>
-          Rx.of<ChainBalance>({
-            walletType: 'ledger',
-            chain: BTCChain,
-            walletAddress: O.none,
-            balances: RD.initial
-          })
-        )
-      )
-    ),
-    RxOp.shareReplay(1)
-  )
-
-  const btcLedgerBalance$ = FP.pipe(
-    btcLedgerChainBalance$,
-    RxOp.map((ledgerBalances) => ledgerBalances.balances)
-  )
-
   const ethBalances$ = getChainBalance$('ETH')
 
   /**
@@ -282,7 +249,7 @@ export const createBalancesService = ({
   const chainBalances$: ChainBalances$ = Rx.combineLatest(
     filterEnabledChains({
       THOR: [thorChainBalance$],
-      BTC: [btcChainBalance$, btcLedgerChainBalance$],
+      BTC: [btcChainBalance$],
       BCH: [bchChainBalance$],
       ETH: [ethChainBalance$],
       BNB: [bnbChainBalance$],
@@ -304,7 +271,7 @@ export const createBalancesService = ({
   const balancesState$: BalancesState$ = Rx.combineLatest(
     filterEnabledChains({
       THOR: [getChainBalance$(THORChain)],
-      BTC: [getChainBalance$(BTCChain), btcLedgerBalance$],
+      BTC: [getChainBalance$(BTCChain)],
       BCH: [getChainBalance$(BCHChain)],
       ETH: [ethBalances$],
       BNB: [getChainBalance$(BNBChain)],

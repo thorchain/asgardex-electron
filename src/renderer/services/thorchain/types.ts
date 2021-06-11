@@ -12,7 +12,7 @@ import * as Rx from 'rxjs'
 
 import { Network } from '../../../shared/api/types'
 import { LiveData } from '../../helpers/rx/liveData'
-import { AssetWithAmount, AssetWithDecimal } from '../../types/asgardex'
+import { AssetsWithAmount1e8, AssetWithAmount1e8 } from '../../types/asgardex'
 import * as C from '../clients'
 import { ApiError, TxHashLD } from '../wallet/types'
 
@@ -80,7 +80,7 @@ export type MimirLD = LiveData<Error, Mimir>
 export type MimirRD = RD.RemoteData<Error, Mimir>
 
 export type GetLiquidityProvidersParams = {
-  assetWithDecimal: AssetWithDecimal
+  asset: Asset
   network: Network
 }
 
@@ -89,15 +89,16 @@ export type GetLiquidityProviderParams = GetLiquidityProvidersParams & {
   assetAddress: Address
 }
 
-export type PendingAssets = AssetWithAmount[]
+export type PendingAsset = AssetWithAmount1e8
+export type PendingAssets = AssetsWithAmount1e8
 export type PendingAssetsRD = RD.RemoteData<ApiError, PendingAssets>
 
 export type LiquidityProvider = {
   runeAddress: O.Option<Address>
   assetAddress: O.Option<Address>
 
-  pendingRune: O.Option<AssetWithAmount>
-  pendingAsset: O.Option<AssetWithAmount>
+  pendingRune: O.Option<PendingAsset>
+  pendingAsset: O.Option<PendingAsset>
 }
 
 export type LiquidityProvidersLD = LiveData<ApiError, LiquidityProvider[]>

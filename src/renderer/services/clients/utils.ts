@@ -30,7 +30,6 @@ export const getClientStateForViews = <C>(clientState: ClientState<C>): ClientSt
   )
 
 /**
- * Helper to transform `Network` (ASGDX) -> `Client.Network` (xchain-client)
- * Note In case of 'chaosnet' + 'mainnet` we stick on `mainnet`
+ * Helper to type cast `Network` (ASGDX) -> `Client.Network` (xchain-client)
  */
-export const getClientNetwork = (network: Network): Client.Network => (network === 'testnet' ? 'testnet' : 'mainnet')
+export const toClientNetwork = (network: Network): Client.Network => network

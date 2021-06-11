@@ -33,7 +33,6 @@ export const HeaderStats: React.FC<Props> = (props): JSX.Element => {
           formatAssetAmountCurrency({
             amount: baseToAsset(amount),
             asset,
-            trimZeros: true,
             decimal: isUSDAsset(asset) ? 2 : 6
           })
         ),

@@ -5,15 +5,8 @@ import { OnlineStatus } from './types'
 
 describe('services/app/service/', () => {
   describe('network$', () => {
-    it('returns chaosnet by default', () => {
+    it('returns mainnet by default', () => {
       runObservable(({ expectObservable }) => {
-        expectObservable(network$).toBe('a', { a: 'chaosnet' })
-      })
-    })
-
-    it('returns mainnet ', () => {
-      runObservable(({ expectObservable }) => {
-        changeNetwork('mainnet')
         expectObservable(network$).toBe('a', { a: 'mainnet' })
       })
     })

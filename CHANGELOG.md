@@ -1,3 +1,32 @@
+# 0.3.3 (2021-06-10)
+
+## Fix
+
+- Update to latest `xchain-bitcoin` to fix BTC balances [#1537](https://github.com/thorchain/asgardex-electron/pull/1537)
+
+# 0.3.2 (2021-06-10)
+
+## Fix
+
+- Fix BTC balances [#1533](https://github.com/thorchain/asgardex-electron/pull/1533)
+- Fix RUNE price format [#1531](https://github.com/thorchain/asgardex-electron/pull/1531)
+
+## Update
+
+- Update translation FR [#1530](https://github.com/thorchain/asgardex-electron/pull/1530)
+
+# 0.3.1 (2021-06-09)
+
+## Fix
+
+- Use `viewblock` as default explorer [#1517](https://github.com/thorchain/asgardex-electron/pull/1517)
+- Fix url of `Recovery tool` [#1523](https://github.com/thorchain/asgardex-electron/pull/1523)
+
+## (Internal) change
+
+- Get rid of chaosnet in type Network in favour of using mainnet only [#1524](https://github.com/thorchain/asgardex-electron/pull/1524)
+- Refactor pending asset data handling [#1515](https://github.com/thorchain/asgardex-electron/pull/1515)
+
 # 0.3.0 (2021-06-07)
 
 ## Feature

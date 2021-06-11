@@ -151,7 +151,7 @@ type WalletMessageKey =
   | 'wallet.phrase.error.valueRequired'
   | 'wallet.phrase.error.invalid'
   | 'wallet.phrase.error.import'
-  | 'wallet.txs.last90days'
+  | 'wallet.txs.history'
   | 'wallet.empty.phrase.import'
   | 'wallet.empty.phrase.create'
   | 'wallet.create.title'

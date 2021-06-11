@@ -14,7 +14,7 @@ import * as RxOp from 'rxjs/operators'
 import { Network } from '../../../../shared/api/types'
 import { SymDeposit } from '../../../components/deposit/add'
 import { Alert } from '../../../components/uielements/alert'
-import { ZERO_BN, ZERO_POOL_DATA } from '../../../const'
+import { RECOVERY_TOOL_URL, ZERO_BN, ZERO_POOL_DATA } from '../../../const'
 import { useAppContext } from '../../../contexts/AppContext'
 import { useChainContext } from '../../../contexts/ChainContext'
 import { useEthereumContext } from '../../../contexts/EthereumContext'
@@ -31,10 +31,10 @@ import { SymDepositMemo } from '../../../services/chain/types'
 import { DEFAULT_NETWORK } from '../../../services/const'
 import { PoolAddress, PoolAssetsRD, PoolDetailRD } from '../../../services/midgard/types'
 import { toPoolData } from '../../../services/midgard/utils'
-import { LiquidityProviderRD, PendingAssetsRD, PendingAssets } from '../../../services/thorchain/types'
+import { LiquidityProviderRD, PendingAssetsRD } from '../../../services/thorchain/types'
 import { INITIAL_BALANCES_STATE } from '../../../services/wallet/const'
 import { getBalanceByAsset } from '../../../services/wallet/util'
-import { AssetWithDecimal } from '../../../types/asgardex'
+import { AssetsWithAmount1e8, AssetWithDecimal } from '../../../types/asgardex'
 import { WalletBalances } from '../../../types/wallet'
 
 type Props = {
@@ -204,20 +204,17 @@ export const SymDepositView: React.FC<Props> = (props) => {
             oLiquidityProvider,
             O.map(({ pendingAsset, pendingRune }) => [pendingAsset, pendingRune]),
             O.map(A.filterMap(FP.identity)),
-            O.getOrElse<PendingAssets>(() => [])
+            O.getOrElse<AssetsWithAmount1e8>(() => [])
           )
         )
       ),
     [liquidityProviderRD]
   )
 
-  const openRecoveryTool = useCallback((): Promise<void> => {
-    const url =
-      network === 'testnet'
-        ? `https://testnet.asgard.exchange/deposit-sym-recovery/`
-        : `https://asgard.exchange/deposit-sym-recovery/`
-    return window.apiUrl.openExternal(url)
-  }, [network])
+  const openRecoveryTool = useCallback(
+    (): Promise<void> => window.apiUrl.openExternal(RECOVERY_TOOL_URL[network]),
+    [network]
+  )
 
   const renderDisabledAddDeposit = useCallback(
     (error?: Error) => (
