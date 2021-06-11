@@ -1,6 +1,6 @@
 import * as RD from '@devexperts/remote-data-ts'
 import { Address, TxHash, XChainClient } from '@xchainjs/xchain-client'
-import { TxsPage, Fees } from '@xchainjs/xchain-client'
+import { Fees, TxFrom, TxTo, TxType } from '@xchainjs/xchain-client'
 import { Asset } from '@xchainjs/xchain-util'
 import * as E from 'fp-ts/lib/Either'
 import { getEitherM } from 'fp-ts/lib/EitherT'
@@ -10,6 +10,7 @@ import * as Rx from 'rxjs'
 
 import { LiveData } from '../../helpers/rx/liveData'
 import { WalletBalance } from '../../types/wallet'
+import { TxType as MidgardTxType } from '../midgard/types'
 import { ApiError, TxLD } from '../wallet/types'
 import { TxHashLD } from '../wallet/types'
 /**
@@ -45,6 +46,22 @@ export type TxsParams = {
   walletIndex: number
   internal?: boolean
 } & LoadTxsParams
+
+export type Tx = {
+  asset: Asset // asset
+  from: TxFrom[] // list of "from" txs. BNC will have one `TxFrom` only, `BTC` might have many transactions going "in" (based on UTXO)
+  to: TxTo[] // list of "to" transactions. BNC will have one `TxTo` only, `BTC` might have many transactions going "out" (based on UTXO)
+  date: Date // timestamp of tx
+  type: TxType | MidgardTxType // type
+  hash: string // Tx hash
+}
+
+export type Txs = Tx[]
+
+export type TxsPage = {
+  total: number
+  txs: Txs
+}
 
 export type TxsPageRD = RD.RemoteData<ApiError, TxsPage>
 export type TxsPageLD = LiveData<ApiError, TxsPage>

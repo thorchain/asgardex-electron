@@ -1,16 +1,18 @@
 import React, { useMemo, useCallback, useRef } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
-import { Address, Tx, Txs, TxsPage } from '@xchainjs/xchain-client'
+import { Address } from '@xchainjs/xchain-client'
 import { baseToAsset, Chain, formatAssetAmount } from '@xchainjs/xchain-util'
 import { Grid, Col, Row } from 'antd'
 import { ColumnsType, ColumnType } from 'antd/lib/table'
-import * as FP from 'fp-ts/lib/function'
-import * as O from 'fp-ts/lib/Option'
+import * as A from 'fp-ts/Array'
+import * as FP from 'fp-ts/function'
+import * as NEA from 'fp-ts/NonEmptyArray'
+import * as O from 'fp-ts/Option'
 import { useIntl, FormattedDate, FormattedTime } from 'react-intl'
 
 import { Network } from '../../../../../shared/api/types'
-import { TxsPageRD } from '../../../../services/clients'
+import { TxsPage, TxsPageRD, Tx, Txs } from '../../../../services/clients'
 import { MAX_ITEMS_PER_PAGE } from '../../../../services/const'
 import { ApiError } from '../../../../services/wallet/types'
 import { ErrorView } from '../../../shared/error'
@@ -85,8 +87,15 @@ export const TxsTable: React.FC<Props> = (props): JSX.Element => {
     switch (type) {
       case 'transfer':
         return <Styled.TransferIcon />
+      case 'DEPOSIT':
+      case 'WITHDRAW':
+      case 'SWAP':
+      case 'DONATE':
+      case 'REFUND':
+      case 'SWITCH':
+        return <Styled.TxType type={type} />
       default:
-        return <>s</>
+        return <></>
     }
   }, [])
 
@@ -182,12 +191,33 @@ export const TxsTable: React.FC<Props> = (props): JSX.Element => {
   )
 
   const renderAmountColumn = useCallback(
-    (_, { to }: Tx) =>
-      to.map(({ amount, to }, index) => {
-        const key = `${to}-${index}`
-        const text = formatAssetAmount({ amount: baseToAsset(amount), trimZeros: true })
-        return renderTextWithBreak(text, key)
-      }),
+    (_, { to, from }: Tx) =>
+      // to.map(({ amount, to }, index) => {
+      //   const key = `${to}-${index}`
+      //   const text = formatAssetAmount({ amount: baseToAsset(amount), trimZeros: true })
+      //   return renderTextWithBreak(text, key)
+      // }),
+      FP.pipe(
+        to,
+        A.filter(({ amount }) => amount.gt(0)),
+        NEA.fromArray,
+        O.alt(() =>
+          O.some(
+            FP.pipe(
+              from,
+              A.map(({ from, amount }) => ({ to: from, amount }))
+            )
+          )
+        ),
+        O.map(
+          A.mapWithIndex((index, { amount, to }) => {
+            const key = `${to}-${index}`
+            const text = formatAssetAmount({ amount: baseToAsset(amount), trimZeros: true })
+            return renderTextWithBreak(text, key)
+          })
+        ),
+        O.getOrElse(() => [<></>])
+      ),
     [renderTextWithBreak]
   )
 

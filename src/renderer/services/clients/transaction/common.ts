@@ -45,9 +45,6 @@ export const loadTxs$ = ({
       internal
     })
   ).pipe(
-    RxOp.tap((s) => {
-      console.log('stream value ', s)
-    }),
     RxOp.map(RD.success),
     RxOp.catchError((error) =>
       Rx.of(RD.failure<ApiError>({ errorId: ErrorId.GET_ASSET_TXS, msg: error?.message ?? error.toString() }))
