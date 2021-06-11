@@ -75,6 +75,8 @@ import { CommonAssetDetailsProps } from './types'
 // }
 
 const compareAssetsByStringValues = (a: Asset) => (b: Asset) =>
+  // Midgard always provides addresses in Upper-case which does not match to our stored address
+  // so we have to compare asset's string casted to a single case
   eqString.equals(assetToString(a).toLowerCase(), assetToString(b).toLowerCase())
 
 const filterValuesByAsset = (asset: Asset) => (txs: Tx[]) => {
@@ -228,7 +230,7 @@ export const AssetDetailsInternalHistoryView: React.FC<CommonAssetDetailsProps> 
     (params: LoadTxsParams) => {
       FP.pipe(
         walletAddress,
-        O.map((walletAddress) => {
+        O.map((walletAddress) =>
           loadActionsHistory({
             // Need to transform to the uppercase as Midgard is case-sensetive and expects assets to be uppercased
             asset: assetToString(asset).toUpperCase(),
@@ -236,7 +238,7 @@ export const AssetDetailsInternalHistoryView: React.FC<CommonAssetDetailsProps> 
             itemsPerPage: params.limit,
             page: Math.trunc(params.offset / params.limit)
           })
-        })
+        )
       )
     },
     [loadActionsHistory, asset, walletAddress]
@@ -248,6 +250,7 @@ export const AssetDetailsInternalHistoryView: React.FC<CommonAssetDetailsProps> 
       offset: 0
     })
     return () => resetActionsData()
+    // load data on mount
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 

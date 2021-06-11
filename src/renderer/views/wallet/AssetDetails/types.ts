@@ -17,5 +17,5 @@ export type CommonAssetDetailsProps = {
   walletAddress: O.Option<Address>
   network: Network
   historyExtraContent?: (isLoading: boolean) => React.ReactNode
-  getExplorerAddressUrl: any
+  getExplorerAddressUrl?: O.Option<GetExplorerTxUrl>
 }
