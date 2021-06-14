@@ -1,0 +1,36 @@
+
+out of gas in location: Has; gasWanted: 10000000, gasUsed: 10000177: out of gas
+https://thornode.thorchain.info/txs/1A2DC8431765DE344FB1DD961C164D45F4A62890856759BB827E08FD14F26D1C
+
+
+out of gas in location: ReadPerByte; gasWanted: 10000000, gasUsed: 10006851: out of gas
+https://thornode.thorchain.info/txs/1C7B6E4D5D97FF57E6F492D73373C4AE073571191A20B6D92FDC6A9266209365
+
+
+out of gas in location: WritePerByte; gasWanted: 10000000, gasUsed: 10069818: out of gas
+https://thornode.thorchain.info/txs/6C28A4D0B4280C9854254F4943966E48077BF496938342C96776770FA9A14EDD
+
+
+out of gas in location: WritePerByte; gasWanted: 10000000, gasUsed: 10051636: out of gas
+https://thornode.thorchain.info/txs/B5DA5A54235C8666E5543375D6848FE44B9ED3CE8F2AAF12E2AC8F8AFAD12186
+
+
+out of gas in location: Has; gasWanted: 10000000, gasUsed: 10000109: out of gas
+https://thornode.thorchain.info/txs/E0222A4C9747E842174E631BC00E8D57BFF11EE91890B697D07AE68CD4AF9B06
+
+
+out of gas in location: WritePerByte; gasWanted: 10000000, gasUsed: 10073131: out of gas
+https://thornode.thorchain.info/txs/9D5995DC032280F7925D1A7817BA1F6015A281C0C20494744FEE87B4502230D0
+
+
+
+
+gas used: 9572706
+gas wanted: 10000000
+https://thornode.thorchain.info/txs/6E085DFCF9B2C2EA8556FDC39ABF6FE9AC6F772F5D9CA85CA5508E7242F37195
+
+
+gas used: 9285183
+gas wanted: 10000000
+
+https://thornode.thorchain.info/txs/0838E974F64287992EEB63269BAE7076B2DD2D31638632F1CC297B95F82CE334
