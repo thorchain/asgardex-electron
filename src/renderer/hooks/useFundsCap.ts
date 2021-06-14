@@ -1,5 +1,5 @@
 import * as RD from '@devexperts/remote-data-ts'
-import { baseAmount, BaseAmount, bn } from '@xchainjs/xchain-util'
+import { assetAmount, assetToBase, baseAmount, BaseAmount, bn } from '@xchainjs/xchain-util'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
 import { useObservableState } from 'observable-hooks'
@@ -12,7 +12,7 @@ import { THORCHAIN_DECIMAL } from '../helpers/assetHelper'
 import { sequenceTRD } from '../helpers/fpHelpers'
 import { liveData } from '../helpers/rx/liveData'
 
-export const MAX_LIQUIDITY_RUNE_PERCENT = 0.9 // 90 %
+export const LIQUIDITY_RUNE_BUFFER: BaseAmount = assetToBase(assetAmount('100000', THORCHAIN_DECIMAL)) // 100k
 
 export type FundsCap = {
   reached: boolean
@@ -46,9 +46,8 @@ export const useFundsCap = (): { data: FundsCapRD; reload: FP.Lazy<void> } => {
             O.map(bn),
             O.map((maxLiquidityRuneBN) => {
               const reached = maxLiquidityRuneBN
-                .multipliedBy(MAX_LIQUIDITY_RUNE_PERCENT)
+                .minus(LIQUIDITY_RUNE_BUFFER.amount())
                 .isLessThanOrEqualTo(bn(totalPooledRune))
-
               return {
                 reached,
                 pooledRuneAmount: baseAmount(totalPooledRune, THORCHAIN_DECIMAL),
