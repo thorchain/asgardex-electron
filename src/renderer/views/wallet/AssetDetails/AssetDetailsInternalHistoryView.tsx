@@ -1,7 +1,6 @@
 import React, { useCallback, useEffect, useMemo } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
-// import { Address } from '@xchainjs/xchain-client'
 import { Asset, assetToString } from '@xchainjs/xchain-util'
 import * as A from 'fp-ts/Array'
 import * as FP from 'fp-ts/function'
@@ -9,70 +8,16 @@ import * as NEA from 'fp-ts/NonEmptyArray'
 import * as O from 'fp-ts/Option'
 import { useObservableState } from 'observable-hooks'
 import { useIntl } from 'react-intl'
-// import * as Rx from 'rxjs'
-// import * as RxOp from 'rxjs/operators'
 
-// import { ONE_RUNE_BASE_AMOUNT } from '../../../../shared/mock/amount'
 import { AssetDetails } from '../../../components/wallet/assets'
 import { ZERO_BASE_AMOUNT } from '../../../const'
-// import { useChainContext } from '../../../contexts/ChainContext'
 import { useMidgardContext } from '../../../contexts/MidgardContext'
 import { useThorchainContext } from '../../../contexts/ThorchainContext'
-// import { isRuneNativeAsset } from '../../../helpers/assetHelper'
 import { eqString } from '../../../helpers/fp/eq'
 import { liveData } from '../../../helpers/rx/liveData'
 import { GetExplorerTxUrl, LoadTxsParams, TxsPageRD } from '../../../services/clients'
-// import { ENABLED_CHAINS } from '../../../services/const'
-// import { useWalletContext } from '../../../contexts/WalletContext'
-// import { LoadTxsHandler } from '../../../services/wallet/types'
 import { Tx } from '../../../services/midgard/types'
 import { CommonAssetDetailsProps } from './types'
-
-// export const AssetDetailsInternalHistoryView: React.FC<CommonAssetDetailsProps> = ({
-//   walletAddress: oWalletAddress,
-//   network,
-//   asset,
-//   historyExtraContent,
-//   balances: walletBalances,
-//   getExplorerTxUrl
-// }) => {
-//   const { getTxs$, loadTxs: load, reloadBalancesByChain, resetTxsPage } = useWalletContext()
-//
-//   const [txsRD] = useObservableState(() => getTxs$(oWalletAddress, true), RD.initial)
-//
-//   useEffect(() => {
-//     return () => resetTxsPage()
-//     // eslint-disable-next-line react-hooks/exhaustive-deps
-//   }, [])
-//
-//   useEffect(() => {
-//     console.log('txsRD - ', txsRD)
-//   }, [txsRD])
-//
-//   const loadTxs: LoadTxsHandler = useCallback(
-//     (params) => {
-//       load({
-//         ...params,
-//         internal: true
-//       })
-//     },
-//     [load]
-//   )
-//
-//   return (
-//     <AssetDetails
-//       historyExtraContent={historyExtraContent}
-//       txsPageRD={txsRD}
-//       balances={walletBalances}
-//       asset={asset}
-//       loadTxsHandler={loadTxs}
-//       reloadBalancesHandler={reloadBalancesByChain(asset.chain)}
-//       getExplorerTxUrl={getExplorerTxUrl}
-//       walletAddress={oWalletAddress}
-//       network={network}
-//     />
-//   )
-// }
 
 const compareAssetsByStringValues = (a: Asset) => (b: Asset) =>
   // Midgard always provides addresses in Upper-case which does not match to our stored address
@@ -94,13 +39,11 @@ const filterValuesByAsset = (asset: Asset) => (txs: Tx[]) => {
 }
 
 export const AssetDetailsInternalHistoryView: React.FC<CommonAssetDetailsProps> = ({
-  // walletAddress: oWalletAddress,
   walletAddress,
   network,
   asset,
   historyExtraContent,
   balances: walletBalances,
-  // getExplorerTxUrl,
   reloadBalancesHandler
 }) => {
   const {
@@ -159,10 +102,11 @@ export const AssetDetailsInternalHistoryView: React.FC<CommonAssetDetailsProps> 
                   O.chain((tx) =>
                     isIncomingTx
                       ? O.some(tx)
-                      : O.some([
+                      : // For incoming tx we need only "poolLabel" and value will be passed via "from" values
+                        O.some([
                           {
                             amount: ZERO_BASE_AMOUNT,
-                            to: isIncomingTx ? poolLabel : selfLabel
+                            to: poolLabel
                           }
                         ])
                   ),
@@ -194,7 +138,8 @@ export const AssetDetailsInternalHistoryView: React.FC<CommonAssetDetailsProps> 
                   O.chain((tx) =>
                     !isIncomingTx
                       ? O.some(tx)
-                      : O.some([
+                      : // For outgoing tx we need only "selfLabel" and value will be passed via "to" values
+                        O.some([
                           {
                             amount: ZERO_BASE_AMOUNT,
                             from: selfLabel
