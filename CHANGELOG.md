@@ -1,3 +1,14 @@
+# 0.3.4 (2021-06-14)
+
+## Update
+
+- Update cap [#1544](https://github.com/thorchain/asgardex-electron/pull/1544)
+
+## Fix
+
+- Fix LTC address validation [#1544](https://github.com/thorchain/asgardex-electron/pull/1544)
+- Fix withdraw error "out of gas" [#1546](https://github.com/thorchain/asgardex-electron/pull/1546) by using latest `xchain-thorchain@0.16.1`
+
 # 0.3.3 (2021-06-10)
 
 ## Fix
