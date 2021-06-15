@@ -1,5 +1,4 @@
-import { CaretRightOutlined, EyeInvisibleOutlined } from '@ant-design/icons'
-import { QrcodeOutlined as QrcodeOutlinedIcon } from '@ant-design/icons/lib'
+import { CaretRightOutlined, EyeInvisibleOutlined, QrcodeOutlined as QrcodeOutlinedIcon } from '@ant-design/icons'
 import * as A from 'antd'
 import styled from 'styled-components'
 import { palette } from 'styled-theme'
