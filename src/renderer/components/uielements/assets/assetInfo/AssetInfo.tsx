@@ -29,13 +29,13 @@ type Props = {
 }
 
 export const AssetInfo: React.FC<Props> = (props): JSX.Element => {
-  const { assetsWB = O.none, asset: oAsset, walletInfo = O.none, network } = props
+  const { assetsWB = O.none, asset: oAsset, walletInfo: oWalletInfo = O.none, network } = props
 
   const isDesktopView = Grid.useBreakpoint()?.lg ?? false
 
   const previousBalance = useRef<O.Option<AssetAmount>>(O.none)
 
-  const [showQrModal, setShowQrModal] = useState(false)
+  const [showQRModal, setShowQRModal] = useState<O.Option<Address>>(O.none)
 
   const renderAssetIcon = useMemo(
     () =>
@@ -80,7 +80,7 @@ export const AssetInfo: React.FC<Props> = (props): JSX.Element => {
   const renderAddress = useCallback(
     (additionalContent: JSX.Element | null = null) =>
       FP.pipe(
-        sequenceSOption({ walletInfo, oAsset }),
+        sequenceSOption({ walletInfo: oWalletInfo, oAsset }),
         O.map(({ walletInfo: { address, network }, oAsset: asset }) => (
           <Styled.AddressContainer key={'addres info'}>
             <Styled.AddressEllipsis enableCopy network={network} chain={asset.chain} address={address} />
@@ -89,34 +89,38 @@ export const AssetInfo: React.FC<Props> = (props): JSX.Element => {
         )),
         O.getOrElse(() => <></>)
       ),
-    [walletInfo, oAsset]
+    [oWalletInfo, oAsset]
   )
 
-  const addressControls = useMemo(
-    () => renderAddress(<Styled.QrcodeOutlined onClick={() => setShowQrModal(true)} />),
-    [renderAddress, setShowQrModal]
-  )
+  const renderQRIcon = useMemo(() => {
+    const oAddress = () =>
+      FP.pipe(
+        oWalletInfo,
+        O.map(({ address }) => address)
+      )
 
-  const closeQrModal = useCallback(() => setShowQrModal(false), [setShowQrModal])
+    return renderAddress(<Styled.QrcodeOutlined onClick={() => setShowQRModal(oAddress)} />)
+  }, [oWalletInfo, renderAddress])
+
+  const closeQrModal = useCallback(() => setShowQRModal(O.none), [setShowQRModal])
 
   const renderQRCodeModal = useMemo(() => {
-    const oShowQrModal = showQrModal ? O.some('') : O.none
     return FP.pipe(
-      sequenceTOption(oAsset, walletInfo, oShowQrModal),
-      O.map(([asset, { address }, _]) => (
+      sequenceTOption(oAsset, showQRModal),
+      O.map(([asset, address]) => (
         <QRCodeModal
           key="qr-modal"
           asset={asset}
           address={address}
           network={network}
-          visible={showQrModal}
+          visible={true}
           onCancel={closeQrModal}
           onOk={closeQrModal}
         />
       )),
       O.getOrElse(() => <></>)
     )
-  }, [showQrModal, oAsset, walletInfo, network, closeQrModal])
+  }, [showQRModal, oAsset, network, closeQrModal])
 
   return (
     <Styled.Card bordered={false} bodyStyle={{ display: 'flex', flexDirection: 'row' }}>
@@ -139,14 +143,14 @@ export const AssetInfo: React.FC<Props> = (props): JSX.Element => {
         </Styled.CoinSubtitle>
         {!isDesktopView && (
           <Styled.InfoContainer>
-            {addressControls}
+            {renderQRIcon}
             <Styled.CoinPrice>{renderBalance}</Styled.CoinPrice>
           </Styled.InfoContainer>
         )}
       </Styled.CoinInfoWrapper>
       {isDesktopView && (
         <Styled.InfoContainer>
-          {addressControls}
+          {renderQRIcon}
           <Styled.CoinPrice>{renderBalance}</Styled.CoinPrice>
         </Styled.InfoContainer>
       )}
