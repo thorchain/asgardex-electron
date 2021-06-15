@@ -14,6 +14,7 @@ import { useHistory } from 'react-router-dom'
 
 import { Network } from '../../../../shared/api/types'
 import { isNonNativeRuneAsset } from '../../../helpers/assetHelper'
+import { getChainAsset } from '../../../helpers/chainHelper'
 import { getPoolPriceValue } from '../../../helpers/poolHelper'
 import * as walletRoutes from '../../../routes/wallet'
 import { WalletBalancesRD } from '../../../services/clients'
@@ -23,6 +24,7 @@ import { WalletBalance, WalletBalances } from '../../../types/wallet'
 import { PricePool } from '../../../views/pools/Pools.types'
 import { ErrorView } from '../../shared/error/'
 import { AssetIcon } from '../../uielements/assets/assetIcon'
+import { QRCodeModal } from '../../uielements/qrCodeModal/QRCodeModal'
 import * as Styled from './AssetsTableCollapsable.style'
 
 const { Panel } = Collapse
@@ -49,6 +51,8 @@ export const AssetsTableCollapsable: React.FC<Props> = (props): JSX.Element => {
   const intl = useIntl()
   const history = useHistory()
   const screenMap: ScreenMap = Grid.useBreakpoint()
+
+  const [showQRModal, setShowQRModal] = useState<O.Option<{ asset: Asset; address: Address }>>(O.none)
 
   // State to store open panel keys
   const [openPanelKeys, setOpenPanelKeys] = useState<string[]>()
@@ -292,6 +296,13 @@ export const AssetsTableCollapsable: React.FC<Props> = (props): JSX.Element => {
                   event.stopPropagation()
                 }}>
                 <Styled.CopyLabel copyable={{ text: walletAddress }} />
+                <Styled.QRCodeIcon
+                  onClick={(event) => {
+                    event.preventDefault()
+                    event.stopPropagation()
+                    setShowQRModal(O.some({ asset: getChainAsset(chain), address: walletAddress }))
+                  }}
+                />
               </Styled.CopyLabelContainer>
             </Styled.HeaderAddress>
           </Col>
@@ -339,6 +350,26 @@ export const AssetsTableCollapsable: React.FC<Props> = (props): JSX.Element => {
     setCollapseChangedByUser(true)
   }, [])
 
+  const closeQrModal = useCallback(() => setShowQRModal(O.none), [setShowQRModal])
+
+  const renderQRCodeModal = useMemo(() => {
+    return FP.pipe(
+      showQRModal,
+      O.map(({ asset, address }) => (
+        <QRCodeModal
+          key="qr-modal"
+          asset={asset}
+          address={address}
+          network={network}
+          visible={true}
+          onCancel={closeQrModal}
+          onOk={closeQrModal}
+        />
+      )),
+      O.getOrElse(() => <></>)
+    )
+  }, [showQRModal, network, closeQrModal])
+
   return (
     <Styled.Collapse
       expandIcon={({ isActive }) => <Styled.ExpandIcon rotate={isActive ? 90 : 0} />}
@@ -348,6 +379,7 @@ export const AssetsTableCollapsable: React.FC<Props> = (props): JSX.Element => {
       onChange={onChangeCollpaseHandler}
       ghost>
       {chainBalances.map(renderPanel)}
+      {renderQRCodeModal}
     </Styled.Collapse>
   )
 }
