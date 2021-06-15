@@ -5,14 +5,13 @@ import { Asset, formatAssetAmount, assetToString, AssetAmount } from '@xchainjs/
 import { Grid } from 'antd'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
-import { useIntl } from 'react-intl'
 
 import { Network } from '../../../../../shared/api/types'
 import { sequenceSOption, sequenceTOption } from '../../../../helpers/fpHelpers'
 import { loadingString, emptyString } from '../../../../helpers/stringHelper'
 import { getAssetAmountByAsset } from '../../../../helpers/walletHelper'
 import { NonEmptyWalletBalances } from '../../../../services/wallet/types'
-import { QrCode } from '../../qrCode'
+import { QRCodeModal } from '../../qrCodeModal/QRCodeModal'
 import { AssetIcon } from '../assetIcon'
 import * as Styled from './AssetInfo.style'
 
@@ -37,8 +36,6 @@ export const AssetInfo: React.FC<Props> = (props): JSX.Element => {
   const previousBalance = useRef<O.Option<AssetAmount>>(O.none)
 
   const [showQrModal, setShowQrModal] = useState(false)
-
-  const intl = useIntl()
 
   const renderAssetIcon = useMemo(
     () =>
@@ -100,45 +97,30 @@ export const AssetInfo: React.FC<Props> = (props): JSX.Element => {
     [renderAddress, setShowQrModal]
   )
 
-  const assetString = useMemo(
-    () =>
-      FP.pipe(
-        oAsset,
-        O.map(({ ticker }) => ticker),
-        O.getOrElse(() => '')
-      ),
-    [oAsset]
-  )
-
   const closeQrModal = useCallback(() => setShowQrModal(false), [setShowQrModal])
 
-  const qrCodeModal = useMemo(
-    () =>
-      FP.pipe(
-        walletInfo,
-        O.map(({ address }) =>
-          !showQrModal ? (
-            <></>
-          ) : (
-            <Styled.QrCodeModal
-              key="qr code modal"
-              title={intl.formatMessage({ id: 'wallet.action.receive' }, { asset: assetString })}
-              visible={showQrModal}
-              onCancel={closeQrModal}
-              onOk={closeQrModal}>
-              <QrCode text={address} qrError={intl.formatMessage({ id: 'wallet.receive.address.errorQR' })} />
-              {renderAddress()}
-            </Styled.QrCodeModal>
-          )
-        ),
-        O.getOrElse(() => <></>)
-      ),
-    [showQrModal, closeQrModal, walletInfo, assetString, intl, renderAddress]
-  )
+  const renderQRCodeModal = useMemo(() => {
+    const oShowQrModal = showQrModal ? O.some('') : O.none
+    return FP.pipe(
+      sequenceTOption(oAsset, walletInfo, oShowQrModal),
+      O.map(([asset, { address }, _]) => (
+        <QRCodeModal
+          key="qr-modal"
+          asset={asset}
+          address={address}
+          network={network}
+          visible={showQrModal}
+          onCancel={closeQrModal}
+          onOk={closeQrModal}
+        />
+      )),
+      O.getOrElse(() => <></>)
+    )
+  }, [showQrModal, oAsset, walletInfo, network, closeQrModal])
 
   return (
     <Styled.Card bordered={false} bodyStyle={{ display: 'flex', flexDirection: 'row' }}>
-      {qrCodeModal}
+      {renderQRCodeModal}
       {renderAssetIcon}
       <Styled.CoinInfoWrapper>
         <Styled.CoinTitle>

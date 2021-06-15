@@ -1,8 +1,8 @@
-import { Modal } from 'antd'
+import * as A from 'antd'
 import styled from 'styled-components'
 import { palette } from 'styled-theme'
 
-export const ModalWrapper = styled(Modal)`
+export const Modal = styled(A.Modal)`
   text-transform: uppercase;
   border-color: ${palette('gray', 0)};
 
@@ -12,13 +12,14 @@ export const ModalWrapper = styled(Modal)`
     background: ${palette('gradient', 0)};
     border: none;
     text-transform: uppercase;
+    font-family: 'MainFontRegular';
     letter-spacing: 1.5px;
     .ant-modal-title {
       color: ${palette('text', 3)};
     }
   }
   .ant-modal-body {
-    padding: 46px 32px;
+    padding: 30px;
     color: ${palette('text', 2)};
     background: ${palette('background', 1)};
     border-color: ${palette('gray', 0)};
@@ -53,6 +54,8 @@ export const ModalWrapper = styled(Modal)`
 
   .ok-ant-btn,
   .cancel-ant-btn {
+    font-family: 'MainFontRegular';
+    text-transform: uppercase;
     flex-grow: 1;
     height: 100%;
     border: none;

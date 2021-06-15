@@ -2,12 +2,12 @@ import React from 'react'
 
 import { Story } from '@storybook/react'
 
-import { QrCode } from './qrCode'
+import { QRCode } from './QRCode'
 
 export const Default: Story<{
   text: string
 }> = ({ text }) => {
-  return <QrCode text={text} qrError={'error for qr generation'} />
+  return <QRCode text={text} qrError={'error for qr generation'} />
 }
 
 Default.args = {
@@ -16,5 +16,5 @@ Default.args = {
 
 export default {
   title: 'QrCode',
-  component: QrCode
+  component: QRCode
 }
