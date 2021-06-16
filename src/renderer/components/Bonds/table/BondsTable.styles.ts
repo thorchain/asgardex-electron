@@ -28,6 +28,8 @@ export const Table = styled(UITable)`
 
   .ant-table-tbody > tr > td {
     border: none;
+    padding: 10px 15px;
+    height: auto;
   }
 `
 
@@ -55,6 +57,8 @@ export const InfoArrow = styled(AIcons.ArrowUpOutlined)`
 export const TextLabel = styled(UILabel).attrs({ textTransform: 'uppercase' })`
   color: inherit;
   font-size: 16px;
+  font-family: 'MainFontRegular';
+  padding: 0;
 `
 
 export const DeleteButton = styled(UIButton).attrs({ typevalue: 'transparent' })`
