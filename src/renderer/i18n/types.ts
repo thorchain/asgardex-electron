@@ -207,7 +207,6 @@ type BondsMessageKey =
   | 'bonds.status.standby'
   | 'bonds.status.disabled'
   | 'bonds.status.unknown'
-  | 'bonds.info'
   | 'bonds.node.add'
   | 'bonds.node.enterMessage'
   | 'bonds.node.removeMessage'

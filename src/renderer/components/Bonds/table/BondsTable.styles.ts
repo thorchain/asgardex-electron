@@ -28,8 +28,12 @@ export const Table = styled(UITable)`
 
   .ant-table-tbody > tr > td {
     border: none;
-    padding: 10px 15px;
+    padding: 10px 0 10px 15px;
     height: auto;
+
+    &:last-child {
+      padding-right: 15px;
+    }
   }
 `
 
@@ -38,15 +42,6 @@ export const AddressEllipsis = styled(UIAddressEllipsis)`
   font-size: 16px;
   color: ${palette('text', 1)};
   text-transform: none;
-`
-
-export const InfoButton = styled(UIButton).attrs({
-  typevalue: 'transparent'
-})`
-  &.ant-btn {
-    display: inline-flex;
-    color: inherit;
-  }
 `
 
 export const InfoArrow = styled(AIcons.ArrowUpOutlined)`
