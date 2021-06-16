@@ -20,7 +20,7 @@ export const Tabs = styled(A.Tabs)`
 export const TabButtonsContainer = styled.div`
   display: flex;
   flex-direction: column;
-  ${media.sm`
+  ${media.md`
     flex-direction: row;
   `}
   margin-bottom: 10px;
@@ -71,6 +71,4 @@ export const BlockLeftLabel = styled(UILabel)`
 export const Label = styled(UILabel)`
   font-size: 16px;
 `
-export const AssetsFilter = styled(AssetsFilterUI)`
-  margin-bottom: 20px;
-`
+export const AssetsFilter = styled(AssetsFilterUI)``
