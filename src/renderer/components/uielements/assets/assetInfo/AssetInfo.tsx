@@ -80,8 +80,8 @@ export const AssetInfo: React.FC<Props> = (props): JSX.Element => {
   const renderAddress = useCallback(
     (additionalContent: JSX.Element | null = null) =>
       FP.pipe(
-        sequenceSOption({ walletInfo: oWalletInfo, oAsset }),
-        O.map(({ walletInfo: { address, network }, oAsset: asset }) => (
+        sequenceSOption({ walletInfo: oWalletInfo, asset: oAsset }),
+        O.map(({ walletInfo: { address, network }, asset }) => (
           <Styled.AddressContainer key={'addres info'}>
             <Styled.AddressEllipsis enableCopy network={network} chain={asset.chain} address={address} />
             {additionalContent}
