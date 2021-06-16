@@ -24,7 +24,14 @@ import { emptyString } from './stringHelper'
 export const sortByDepth = (a: PoolTableRowData, b: PoolTableRowData) =>
   ordBaseAmount.compare(a.depthPrice, b.depthPrice)
 
-const ordByDepth = Ord.ord.contramap(ordBaseAmount, ({ depthPrice }: PoolTableRowData) => depthPrice)
+const ordByDepth = Ord.Contravariant.contramap(ordBaseAmount, ({ depthPrice }: PoolTableRowData) => depthPrice)
+
+/**
+ * RUNE based `PoolData`
+ * Note: We don't have a "RUNE" pool in THORChain,
+ * but do need such thing for pricing
+ */
+export const RUNE_POOL_DATA: PoolData = { assetBalance: ONE_RUNE_BASE_AMOUNT, runeBalance: ONE_RUNE_BASE_AMOUNT }
 
 /**
  * RUNE based `PricePool`
@@ -33,7 +40,7 @@ const ordByDepth = Ord.ord.contramap(ordBaseAmount, ({ depthPrice }: PoolTableRo
  */
 export const RUNE_PRICE_POOL: PricePool = {
   asset: AssetRuneNative,
-  poolData: { assetBalance: ONE_RUNE_BASE_AMOUNT, runeBalance: ONE_RUNE_BASE_AMOUNT }
+  poolData: RUNE_POOL_DATA
 }
 
 /**
