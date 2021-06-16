@@ -2,7 +2,7 @@ import React, { useCallback, useMemo, useState } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
 import { Address } from '@xchainjs/xchain-client'
-import { Chain } from '@xchainjs/xchain-util'
+import { Asset, Chain } from '@xchainjs/xchain-util'
 import { Row, Col, List } from 'antd'
 import * as FP from 'fp-ts/function'
 import * as O from 'fp-ts/lib/Option'
@@ -10,12 +10,13 @@ import { useIntl } from 'react-intl'
 
 import { Network } from '../../../../shared/api/types'
 import { ReactComponent as UnlockOutlined } from '../../../assets/svg/icon-unlock-warning.svg'
+import { getChainAsset } from '../../../helpers/chainHelper'
 import { LedgerAddressParams } from '../../../services/chain/types'
 import { ValidatePasswordHandler } from '../../../services/wallet/types'
 import { UserAccountType } from '../../../types/wallet'
 import { RemoveWalletConfirmationModal } from '../../modal/confirmation/RemoveWalletConfirmationModal'
 import { PasswordModal } from '../../modal/password'
-import { AddressEllipsis } from '../../uielements/addressEllipsis'
+import { QRCodeModal } from '../../uielements/qrCodeModal/QRCodeModal'
 import { PhraseCopyModal } from '../phrase'
 import * as Styled from './Settings.style'
 
@@ -99,20 +100,37 @@ export const Settings: React.FC<Props> = (props): JSX.Element => {
     [oPhrase]
   )
 
-  const renderAddressWithBreak = useCallback(
-    (chain: Chain, address: Address, linkIcon: React.ReactElement) => (
-      <Styled.Text>
-        <AddressEllipsis
-          className="setting-address"
+  const [showQRModal, setShowQRModal] = useState<O.Option<{ asset: Asset; address: Address }>>(O.none)
+
+  const closeQrModal = useCallback(() => setShowQRModal(O.none), [setShowQRModal])
+
+  const renderQRCodeModal = useMemo(() => {
+    return FP.pipe(
+      showQRModal,
+      O.map(({ asset, address }) => (
+        <QRCodeModal
+          key="qr-modal"
+          asset={asset}
           address={address}
-          chain={chain}
           network={selectedNetwork}
-          enableCopy={true}
-          linkIcon={linkIcon}
+          visible={true}
+          onCancel={closeQrModal}
+          onOk={closeQrModal}
         />
-      </Styled.Text>
+      )),
+      O.getOrElse(() => <></>)
+    )
+  }, [showQRModal, selectedNetwork, closeQrModal])
+
+  const renderAddress = useCallback(
+    (chain: Chain, address: Address) => (
+      <Styled.AddressContainer>
+        <Styled.AddressEllipsis address={address} chain={chain} network={selectedNetwork} enableCopy={true} />
+        <Styled.QRCodeIcon onClick={() => setShowQRModal(O.some({ asset: getChainAsset(chain), address }))} />
+        <Styled.AddressLinkIcon onClick={() => clickAddressLinkHandler(chain, address)} />
+      </Styled.AddressContainer>
     ),
-    [selectedNetwork]
+    [clickAddressLinkHandler, selectedNetwork]
   )
 
   const accounts = useMemo(
@@ -120,7 +138,7 @@ export const Settings: React.FC<Props> = (props): JSX.Element => {
       FP.pipe(
         userAccounts,
         O.map((accounts) => (
-          <Col key={'accounts'} sm={{ span: 24 }} md={{ span: 12 }}>
+          <Col key={'accounts'} sm={{ span: 24 }} lg={{ span: 12 }}>
             <Styled.Subtitle>{intl.formatMessage({ id: 'setting.account.management' })}</Styled.Subtitle>
             <Styled.AccountCard>
               <List
@@ -131,26 +149,14 @@ export const Settings: React.FC<Props> = (props): JSX.Element => {
                     {item.accounts.map((acc, j) => (
                       <Styled.ChainContent key={j}>
                         <Styled.AccountPlaceholder>{acc.name}</Styled.AccountPlaceholder>
-                        <Styled.AccountContent>
-                          <Styled.AccountAddress>
-                            <label>
-                              {renderAddressWithBreak(
-                                item.chainName,
-                                acc.address,
-                                <Styled.AddressLinkIcon
-                                  onClick={() => clickAddressLinkHandler(item.chainName, acc.address)}
-                                />
-                              )}
-                            </label>
-                          </Styled.AccountAddress>
-                          {/* Hide `removeDevice` for all chains temporarily
+                        {renderAddress(item.chainName, acc.address)}
+                        {/* Hide `removeDevice` for all chains temporarily
                           {acc.type === 'external' && (
                             <Button type="link" danger onClick={() => removeDevice(item.chainName)}>
                               <StopOutlined />
                             </Button>
                           )}
                           */}
-                        </Styled.AccountContent>
                       </Styled.ChainContent>
                     ))}
                     {/* Hide `addDevice` for all chains temporarily
@@ -170,7 +176,7 @@ export const Settings: React.FC<Props> = (props): JSX.Element => {
         )),
         O.getOrElse(() => <></>)
       ),
-    [clickAddressLinkHandler, renderAddressWithBreak, intl, userAccounts]
+    [renderAddress, intl, userAccounts]
   )
 
   const onSuccessPassword = useCallback(() => {
@@ -265,6 +271,7 @@ export const Settings: React.FC<Props> = (props): JSX.Element => {
         onClose={() => setShowRemoveWalletModal(false)}
         onSuccess={removeWallet}
       />
+      {renderQRCodeModal}
       <Row>
         <Col span={24}>
           <Styled.TitleWrapper>
@@ -274,7 +281,7 @@ export const Settings: React.FC<Props> = (props): JSX.Element => {
         </Col>
       </Row>
       <Styled.Row gutter={[16, 16]}>
-        <Col sm={{ span: 24 }} md={{ span: 12 }}>
+        <Col sm={{ span: 24 }} lg={{ span: 12 }}>
           <Styled.Subtitle>{intl.formatMessage({ id: 'setting.wallet.management' })}</Styled.Subtitle>
           <Styled.Card>
             <Row>

@@ -12,6 +12,7 @@ export const AddressContainer = styled.div`
 `
 
 export const Address = styled.span`
+  font-family: 'MainFontRegular';
   color: ${palette('text', 2)};
 `
 

@@ -1,0 +1,1 @@
+export { QRCodeModal } from './QRCodeModal'

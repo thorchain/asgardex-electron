@@ -2,7 +2,7 @@ import React from 'react'
 
 import { ModalProps } from 'antd/lib/modal'
 
-import { ModalWrapper } from './Modal.style'
+import * as Styled from './Modal.style'
 
 interface Props extends ModalProps {
   className?: string
@@ -11,12 +11,12 @@ interface Props extends ModalProps {
 
 export const Modal: React.FC<Props> = ({ className = '', children, okButtonProps, ...rest }): JSX.Element => {
   return (
-    <ModalWrapper
+    <Styled.Modal
       className={`modal-wrapper ${className}`}
       okButtonProps={{ ...okButtonProps, className: 'ok-ant-btn' }}
       cancelButtonProps={{ className: 'cancel-ant-btn' }}
       {...rest}>
       {children}
-    </ModalWrapper>
+    </Styled.Modal>
   )
 }

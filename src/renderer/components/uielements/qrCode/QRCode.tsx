@@ -1,32 +1,30 @@
 import React, { useEffect, useRef, useState } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
-import { Grid, Spin } from 'antd'
+import { Spin } from 'antd'
 import * as FP from 'fp-ts/function'
 import * as O from 'fp-ts/Option'
-import QRCode from 'qrcode'
+import QRCodeLib from 'qrcode'
 import * as ReactDom from 'react-dom'
 import { useIntl } from 'react-intl'
 
-import * as Styled from './qrCode.styles'
+import * as Styled from './QRCode.styles'
 
 type Props = {
   text: string
   qrError: string
 }
-export const QrCode: React.FC<Props> = ({ text, qrError }) => {
+export const QRCode: React.FC<Props> = ({ text, qrError }) => {
   const canvasContainer = useRef<HTMLDivElement>(null)
   const intl = useIntl()
 
   const [canvasRd, setCanvasRd] = useState<RD.RemoteData<string, HTMLCanvasElement>>(RD.initial)
 
-  const isDesktopView = Grid.useBreakpoint()?.md ?? false
-
   useEffect(() => {
     setCanvasRd(RD.pending)
 
     const timeout = setTimeout(() => {
-      QRCode.toCanvas(text, { errorCorrectionLevel: 'H', scale: 6 }, (err, canvas) => {
+      QRCodeLib.toCanvas(text, { errorCorrectionLevel: 'H', scale: 6 }, (err, canvas) => {
         if (err) {
           setCanvasRd(RD.failure(qrError))
         } else {
@@ -64,5 +62,5 @@ export const QrCode: React.FC<Props> = ({ text, qrError }) => {
     )
   }, [canvasRd])
 
-  return <Styled.QRWrapper smallView={!isDesktopView} ref={canvasContainer} />
+  return <Styled.QRWrapper ref={canvasContainer} />
 }

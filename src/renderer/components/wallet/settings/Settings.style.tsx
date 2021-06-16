@@ -1,8 +1,9 @@
-import { SelectOutlined } from '@ant-design/icons'
+import { QrcodeOutlined as QrcodeOutlinedIcon } from '@ant-design/icons'
 import * as A from 'antd'
 import styled from 'styled-components'
 import { palette } from 'styled-theme'
 
+import { AddressEllipsis as AddressEllipsisUI } from '../../uielements/addressEllipsis'
 import { Button as UIButton } from '../../uielements/button'
 import { ExternalLinkIcon as ExternalLinkIconUI } from '../../uielements/common/Common.style'
 import { Label as UILabel } from '../../uielements/label'
@@ -111,7 +112,7 @@ export const UpdatesButton = styled(Button).attrs({
 
 export const ExternalLinkIcon = styled(ExternalLinkIconUI)`
   margin-left: 10px;
-
+  color: ${palette('primary', 0)};
   svg {
     color: inherit;
   }
@@ -178,8 +179,9 @@ export const ChainName = styled(UILabel)`
 `
 
 export const ChainContent = styled.div`
-  margin-left: 30px;
   width: 100%;
+  overflow: hidden;
+  margin: 0 30px;
 `
 
 export const AccountPlaceholder = styled(UILabel)`
@@ -196,16 +198,7 @@ export const AccountContent = styled(UILabel)`
   align-items: center;
   padding: 0px;
   color: ${palette('text', 1)};
-`
-
-export const AccountAddress = styled(UILabel)`
-  display: inline-block;
-  padding: 0px;
-  white-space: nowrap;
-  overflow: hidden;
-  font-family: 'MainFontRegular';
-  font-size: 16px;
-  text-overflow: ellipsis;
+  background-color: red;
 `
 
 export const DeviceText = styled(UILabel)`
@@ -227,16 +220,6 @@ export const ActionMenuItem = styled(A.Menu.Item)`
   }
 `
 
-export const CopyLabel = styled(A.Typography.Text)`
-  text-transform: uppercase;
-  font-family: 'MainFontRegular';
-  color: ${palette('primary', 0)};
-  /* icon */
-  svg {
-    color: ${palette('primary', 0)};
-  }
-`
-
 export const Tooltip = styled(A.Tooltip).attrs({
   placement: 'bottom',
   overlayStyle: {
@@ -245,23 +228,62 @@ export const Tooltip = styled(A.Tooltip).attrs({
   }
 })``
 
-export const AddressLinkIcon = styled(SelectOutlined)`
-  margin-left: 10px;
-  svg {
-    height: 16px;
-    width: 16px;
-    transform: scale(-1, 1) translateX(5px);
-    color: ${palette('text', 1)};
-  }
+export const AddressContainer = styled.div`
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  flex: 1;
 `
+const ICON_SIZE = 16
 
-export const Text = styled(A.Typography.Text)`
+export const AddressEllipsis = styled(AddressEllipsisUI)`
   font-size: 16px;
   text-transform: lowercase;
   font-family: 'MainFontRegular';
   color: ${palette('text', 1)};
+  max-width: 100%;
+  overflow: hidden;
+  &:only-child {
+    margin: auto;
+  }
+  & svg {
+    height: ${ICON_SIZE}px;
+    width: ${ICON_SIZE}px;
+  }
+`
 
-  .setting-address > div {
-    margin-right: 60px;
+export const AddressLinkIcon = styled(ExternalLinkIconUI)`
+  margin-left: 15px;
+  height: ${ICON_SIZE}px;
+  width: ${ICON_SIZE}px;
+  color: ${palette('primary', 0)};
+  svg {
+    color: inherit;
+    height: ${ICON_SIZE}px;
+    width: ${ICON_SIZE}px;
+  }
+`
+
+export const CopyLabel = styled(A.Typography.Text)`
+  text-transform: uppercase;
+  height: ${ICON_SIZE}px;
+  width: ${ICON_SIZE}px;
+  font-family: 'MainFontRegular';
+  /* icon */
+  svg {
+    color: inherit;
+  }
+`
+
+export const QRCodeIcon = styled(QrcodeOutlinedIcon)`
+  margin-left: 5px;
+  cursor: pointer;
+  color: ${palette('primary', 0)};
+  height: ${ICON_SIZE}px;
+  width: ${ICON_SIZE}px;
+
+  & svg {
+    height: ${ICON_SIZE}px;
+    width: ${ICON_SIZE}px;
   }
 `
