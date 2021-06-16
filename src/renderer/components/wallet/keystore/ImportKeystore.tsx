@@ -101,11 +101,11 @@ export const ImportKeystore: React.FC<Props> = (props): JSX.Element => {
         {renderLoadError}
         {renderImportError}
         <Spin spinning={RD.isPending(importKeystoreState)} tip={intl.formatMessage({ id: 'common.loading' })}>
-          <Styled.KeystoreLabel>{intl.formatMessage({ id: 'wallet.imports.keystore.select' })}</Styled.KeystoreLabel>
           <Form.Item>
-            <Styled.KeystoreButton typevalue={'outline'} onClick={uploadKeystore}>
+            <Styled.Title>{intl.formatMessage({ id: 'wallet.imports.keystore.title' })}</Styled.Title>
+            <Styled.KeystoreButton onClick={uploadKeystore}>
               {RD.isSuccess(loadKeystoreState) ? <CheckCircleTwoTone twoToneColor="#50e3c2" /> : <UploadOutlined />}
-              {intl.formatMessage({ id: 'wallet.imports.keystore.upload' })}
+              {intl.formatMessage({ id: 'wallet.imports.keystore.select' })}
             </Styled.KeystoreButton>
           </Form.Item>
           <Styled.PasswordContainer>
@@ -119,9 +119,9 @@ export const ImportKeystore: React.FC<Props> = (props): JSX.Element => {
           </Styled.PasswordContainer>
         </Spin>
         <Form.Item style={{ display: 'grid', justifyContent: 'flex-end' }}>
-          <Styled.ImportButton disabled={!RD.isSuccess(loadKeystoreState) || RD.isPending(importKeystoreState)}>
+          <Styled.SubmitButton disabled={!RD.isSuccess(loadKeystoreState) || RD.isPending(importKeystoreState)}>
             {intl.formatMessage({ id: 'wallet.action.import' })}
-          </Styled.ImportButton>
+          </Styled.SubmitButton>
         </Form.Item>
       </Styled.Form>
     </>

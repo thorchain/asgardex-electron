@@ -22,7 +22,7 @@ export const ImportsView: React.FC = (): JSX.Element => {
   const { keystoreService } = useWalletContext()
   const { importKeystore$, loadKeystore$ } = keystoreService
 
-  const [activeTab, setActiveTab] = useState(TabKey.PHRASE)
+  const [activeTab, setActiveTab] = useState(TabKey.KEYSTORE)
 
   const items = useMemo(
     () => [
@@ -39,7 +39,7 @@ export const ImportsView: React.FC = (): JSX.Element => {
         key: TabKey.PHRASE,
         label: (
           <span onClick={() => history.push(walletRoutes.imports.phrase.template)}>
-            {intl.formatMessage({ id: 'wallet.imports.phrase' })}
+            {intl.formatMessage({ id: 'common.phrase' })}
           </span>
         ),
         content: <ImportPhrase />

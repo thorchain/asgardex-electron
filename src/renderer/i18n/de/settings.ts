@@ -6,7 +6,7 @@ const settings: SettingMessages = {
   'setting.client': 'Client',
   'setting.account.management': 'Kontoführung',
   'setting.export': 'Exportiere Keystore',
-  'setting.lock': 'Sprren',
+  'setting.lock': 'Sperren',
   'setting.view.phrase': 'Phrase ansehen',
   'setting.midgard': 'Midgard',
   'setting.version': 'Version',
