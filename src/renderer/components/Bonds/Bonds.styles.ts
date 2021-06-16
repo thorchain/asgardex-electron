@@ -25,7 +25,7 @@ export const Form = styled(InnerForm)`
 
 export const InputContainer = styled('div')`
   width: 100%;
-  max-width: 500px;
+  max-width: 630px;
   margin-right: 20px;
 `
 

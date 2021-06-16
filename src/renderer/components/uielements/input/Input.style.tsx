@@ -24,7 +24,7 @@ const fontSettings: FontSettings = {
 const sizes: Record<NonNullable<SizeType>, string> = {
   small: '20px',
   middle: '25px',
-  large: '32px'
+  large: '38px'
 }
 
 const colors: Colors = {
