@@ -7,12 +7,14 @@ import {
   baseToAsset,
   formatAssetAmountCurrency,
   baseAmount,
-  AssetRuneNative
+  AssetRuneNative,
+  formatAssetAmount
 } from '@xchainjs/xchain-util'
 import { Col } from 'antd'
 import BigNumber from 'bignumber.js'
 import { useIntl } from 'react-intl'
 
+import { THORCHAIN_DECIMAL } from '../../../helpers/assetHelper'
 import { AssetWithDecimal } from '../../../types/asgardex'
 import * as Styled from './PoolShare.style'
 import { PoolShareCard } from './PoolShareCard'
@@ -121,6 +123,13 @@ export const PoolShare: React.FC<Props> = (props): JSX.Element => {
     [renderRedemptionLarge, renderRedemptionSmall, smallWidth]
   )
 
+  const depositUnitsFormatted = useMemo(() => {
+    // Convert `depositUnits` to `AssetAmount`
+    const amount = baseToAsset(baseAmount(depositUnits, THORCHAIN_DECIMAL))
+    // and format it
+    return formatAssetAmount({ amount, decimal: 2 })
+  }, [depositUnits])
+
   return (
     <Styled.PoolShareWrapper ref={ref}>
       <PoolShareCard title={intl.formatMessage({ id: 'deposit.share.title' })}>
@@ -129,7 +138,7 @@ export const PoolShare: React.FC<Props> = (props): JSX.Element => {
             <Styled.LabelSecondary textTransform="uppercase">
               {intl.formatMessage({ id: 'deposit.share.units' })}
             </Styled.LabelSecondary>
-            <Styled.LabelPrimary loading={loading}>{`${formatBN(depositUnits, 0)}`}</Styled.LabelPrimary>
+            <Styled.LabelPrimary loading={loading}>{depositUnitsFormatted}</Styled.LabelPrimary>
           </Col>
           <Col span={smallWidth ? 24 : 12}>
             <Styled.LabelSecondary textTransform="uppercase">

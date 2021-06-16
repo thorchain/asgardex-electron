@@ -4,8 +4,8 @@ import * as RD from '@devexperts/remote-data-ts'
 import { getValueOfAsset1InAsset2, getValueOfRuneInAsset } from '@thorchain/asgardex-util'
 import { Asset, BaseAmount } from '@xchainjs/xchain-util'
 import { Spin } from 'antd'
+import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
-import * as FP from 'fp-ts/pipeable'
 import { useObservableState } from 'observable-hooks'
 import { useIntl } from 'react-intl'
 
@@ -71,7 +71,7 @@ export const ShareView: React.FC<Props> = ({
           poolShare={poolShare}
           depositUnits={units}
           shares={{ rune: runeShare, asset: assetShare }}
-          priceAsset={FP.pipe(oPriceAsset, O.toUndefined)}
+          priceAsset={O.toUndefined(oPriceAsset)}
           loading={false}
           assetPrice={assetPrice}
           runePrice={runePrice}

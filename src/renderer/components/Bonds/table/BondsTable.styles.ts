@@ -28,6 +28,12 @@ export const Table = styled(UITable)`
 
   .ant-table-tbody > tr > td {
     border: none;
+    padding: 10px 0 10px 15px;
+    height: auto;
+
+    &:last-child {
+      padding-right: 15px;
+    }
   }
 `
 
@@ -38,15 +44,6 @@ export const AddressEllipsis = styled(UIAddressEllipsis)`
   text-transform: none;
 `
 
-export const InfoButton = styled(UIButton).attrs({
-  typevalue: 'transparent'
-})`
-  &.ant-btn {
-    display: inline-flex;
-    color: inherit;
-  }
-`
-
 export const InfoArrow = styled(AIcons.ArrowUpOutlined)`
   transform: rotateZ(45deg);
   color: ${palette('primary', 0)};
@@ -55,6 +52,8 @@ export const InfoArrow = styled(AIcons.ArrowUpOutlined)`
 export const TextLabel = styled(UILabel).attrs({ textTransform: 'uppercase' })`
   color: inherit;
   font-size: 16px;
+  font-family: 'MainFontRegular';
+  padding: 0;
 `
 
 export const DeleteButton = styled(UIButton).attrs({ typevalue: 'transparent' })`

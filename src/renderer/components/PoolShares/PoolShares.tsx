@@ -27,11 +27,11 @@ export type Props = {
   loading: boolean
   priceAsset: Asset | undefined
   network: Network
-  goToStakeInfo: FP.Lazy<void>
+  openShareInfo: FP.Lazy<void>
   haltedChains: Chain[]
 }
 
-export const PoolShares: React.FC<Props> = ({ data, priceAsset, goToStakeInfo, loading, network, haltedChains }) => {
+export const PoolShares: React.FC<Props> = ({ data, priceAsset, openShareInfo, loading, network, haltedChains }) => {
   const intl = useIntl()
 
   const isDesktopView = Grid.useBreakpoint()?.lg ?? false
@@ -146,7 +146,7 @@ export const PoolShares: React.FC<Props> = ({ data, priceAsset, goToStakeInfo, l
   const renderAnalyticsInfo = useMemo(() => {
     return network !== 'testnet' ? (
       <>
-        <Styled.InfoButton onClick={goToStakeInfo}>
+        <Styled.InfoButton onClick={openShareInfo}>
           <Styled.TextLabel>{intl.formatMessage({ id: 'common.analytics' })}</Styled.TextLabel> <Styled.InfoArrow />
         </Styled.InfoButton>
         <Styled.InfoDescription>runeyield.info</Styled.InfoDescription>
@@ -154,7 +154,7 @@ export const PoolShares: React.FC<Props> = ({ data, priceAsset, goToStakeInfo, l
     ) : (
       <></>
     )
-  }, [goToStakeInfo, intl, network])
+  }, [openShareInfo, intl, network])
 
   return (
     <Styled.Container>

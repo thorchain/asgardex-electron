@@ -113,6 +113,7 @@ export const ImportPhrase: React.FC = (): JSX.Element => {
             name="phrase"
             rules={[{ required: true, validator: phraseValidator }]}
             validateTrigger={['onSubmit', 'onChange']}>
+            <Styled.Title>{intl.formatMessage({ id: 'wallet.imports.phrase.title' })}</Styled.Title>
             <InputTextArea
               color="primary"
               typevalue="normal"
@@ -143,9 +144,9 @@ export const ImportPhrase: React.FC = (): JSX.Element => {
           </Styled.PasswordContainer>
         </Spin>
         <Form.Item style={{ display: 'grid', justifyContent: 'flex-end' }}>
-          <Styled.ImportButton disabled={!validPhrase || importing}>
+          <Styled.SubmitButton disabled={!validPhrase || importing}>
             {intl.formatMessage({ id: 'wallet.action.import' })}
-          </Styled.ImportButton>
+          </Styled.SubmitButton>
         </Form.Item>
       </Form>
     </>

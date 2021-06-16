@@ -4,7 +4,6 @@ const bonds: BondsMessages = {
   'bonds.node': 'Node',
   'bonds.bond': 'Anleihe',
   'bonds.award': 'Prämie',
-  'bonds.info': 'Info',
   'bonds.status': 'Status',
   'bonds.status.active': 'aktiv',
   'bonds.status.standby': 'einsatzbereit',

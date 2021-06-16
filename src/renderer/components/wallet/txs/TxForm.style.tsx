@@ -18,7 +18,7 @@ export const Form = styled(InnerForm)`
 `
 
 export const SubForm = styled.div`
-  max-width: 500px;
+  max-width: 630px;
 `
 
 export const FormItem = styled(A.Form.Item)`

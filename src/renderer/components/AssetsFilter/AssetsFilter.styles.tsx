@@ -1,10 +1,16 @@
 import styled from 'styled-components'
 import { palette } from 'styled-theme'
 
+import { media } from '../../helpers/styleHelper'
 import { Button as ButtonUI, ButtonProps } from '../uielements/button'
 
 export const Container = styled.div`
   display: flex;
+  justify-content: center;
+
+  ${media.md`
+  justify-content: left;
+`}
 `
 
 const filterButtonBorderRadius = 15

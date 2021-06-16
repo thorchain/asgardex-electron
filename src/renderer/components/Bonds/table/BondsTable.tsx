@@ -8,6 +8,7 @@ import { FormattedMessage, useIntl } from 'react-intl'
 
 import { Network } from '../../../../shared/api/types'
 import { ConfirmationModal } from '../../modal/confirmation'
+import { ExternalLinkIcon } from '../../uielements/common/Common.style'
 import { Node } from '../types'
 import * as Styled from './BondsTable.styles'
 import * as H from './helpers'
@@ -26,7 +27,6 @@ export const BondsTable: React.FC<Props> = ({ nodes, removeNode, network, goToNo
   const nodeColumn: ColumnType<Node> = useMemo(
     () => ({
       key: 'node',
-      width: 200,
       render: (_, { nodeAddress }) => <H.NodeAddress network={network} address={nodeAddress} />,
       title: intl.formatMessage({ id: 'bonds.node' }),
       align: 'left'
@@ -37,6 +37,7 @@ export const BondsTable: React.FC<Props> = ({ nodes, removeNode, network, goToNo
   const bondColumn: ColumnType<Node> = useMemo(
     () => ({
       key: 'bond',
+      width: 150,
       title: intl.formatMessage({ id: 'bonds.bond' }),
       render: (_, { data }) => <H.BondValue data={data} />,
       align: 'right'
@@ -47,6 +48,7 @@ export const BondsTable: React.FC<Props> = ({ nodes, removeNode, network, goToNo
   const awardColumn: ColumnType<Node> = useMemo(
     () => ({
       key: 'award',
+      width: 150,
       title: intl.formatMessage({ id: 'bonds.award' }),
       align: 'right',
       render: (_, { data }) => <H.AwardValue data={data} />
@@ -56,7 +58,7 @@ export const BondsTable: React.FC<Props> = ({ nodes, removeNode, network, goToNo
   const statusColumn: ColumnType<Node> = useMemo(
     () => ({
       key: 'status',
-      width: 150,
+      width: 100,
       title: intl.formatMessage({ id: 'bonds.status' }),
       render: (_, { data }) => <H.Status data={data} />,
       responsive: ['sm'],
@@ -67,9 +69,9 @@ export const BondsTable: React.FC<Props> = ({ nodes, removeNode, network, goToNo
   const infoColumn: ColumnType<Node> = useMemo(
     () => ({
       key: 'info',
-      width: 200,
-      title: 'THORChain.net',
-      render: (_, { nodeAddress }) => <H.Info goToNode={() => goToNode(nodeAddress)} />,
+      width: 40,
+      title: '',
+      render: (_, { nodeAddress }) => <ExternalLinkIcon onClick={() => goToNode(nodeAddress)} />,
       responsive: ['md'],
       align: 'center'
     }),
@@ -124,7 +126,7 @@ export const BondsTable: React.FC<Props> = ({ nodes, removeNode, network, goToNo
     <>
       <Styled.Table
         className={className}
-        columns={[nodeColumn, bondColumn, awardColumn, statusColumn, infoColumn, removeColumn]}
+        columns={[removeColumn, nodeColumn, bondColumn, awardColumn, statusColumn, infoColumn]}
         dataSource={nodes.map((node) => ({ ...node, key: node.nodeAddress }))}
       />
       <ConfirmationModal {...removeConfirmationProps} />

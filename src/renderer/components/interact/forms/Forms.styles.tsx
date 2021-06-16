@@ -21,7 +21,7 @@ export const SubmitButtonContainer = styled(A.Form.Item).attrs({
   ${media.sm`
     width: auto;
     align-self: flex-end;
-    
+
     & .ant-form-item-control-input-content {
       display: flex;
       flex-direction: column;
@@ -45,7 +45,7 @@ export const InputContainer = styled('div')`
   margin-bottom: 10px;
   ${media.sm`
     margin-bottom: 20px;
-    max-width: 500px;
+    max-width: 630px;
   `}
 
   &:last-child {

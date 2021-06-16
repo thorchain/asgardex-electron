@@ -95,15 +95,6 @@ export const Status: React.FC<{ data: NodeDataRD }> = ({ data }) => {
   )
 }
 
-export const Info: React.FC<{ goToNode: () => void }> = ({ goToNode }) => {
-  const intl = useIntl()
-  return (
-    <Styled.InfoButton onClick={goToNode}>
-      <Styled.TextLabel>{intl.formatMessage({ id: 'bonds.info' })}</Styled.TextLabel> <Styled.InfoArrow />
-    </Styled.InfoButton>
-  )
-}
-
 export const Delete: React.FC<{ deleteNode: () => void }> = ({ deleteNode }) => (
   <Styled.DeleteButton onClick={deleteNode}>
     <StopOutlined />
