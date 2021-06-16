@@ -2,6 +2,8 @@ import React, { useCallback, useMemo, useRef, useEffect } from 'react'
 
 import { SyncOutlined } from '@ant-design/icons'
 import * as RD from '@devexperts/remote-data-ts'
+import { Address } from '@xchainjs/xchain-client'
+import { THORChain } from '@xchainjs/xchain-thorchain'
 import { Asset, Chain } from '@xchainjs/xchain-util'
 import * as A from 'fp-ts/Array'
 import * as FP from 'fp-ts/function'
@@ -20,6 +22,7 @@ import { useAppContext } from '../../contexts/AppContext'
 import { useChainContext } from '../../contexts/ChainContext'
 import { useMidgardContext } from '../../contexts/MidgardContext'
 import { isThorChain } from '../../helpers/chainHelper'
+import { sequenceTOption } from '../../helpers/fpHelpers'
 import { RUNE_PRICE_POOL } from '../../helpers/poolHelper'
 import { DEFAULT_NETWORK, ENABLED_CHAINS } from '../../services/const'
 import { PoolSharesRD } from '../../services/midgard/types'
@@ -46,6 +49,8 @@ export const PoolShareView: React.FC = (): JSX.Element => {
     reloadAllPools()
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
+
+  const [oRuneNativeAddress] = useObservableState<O.Option<Address>>(() => addressByChain$(THORChain), O.none)
 
   const [poolSharesRD]: [PoolSharesRD, unknown] = useObservableState(
     () =>
@@ -85,9 +90,15 @@ export const PoolShareView: React.FC = (): JSX.Element => {
   // store previous data of pools to render these while reloading
   const previousPoolShares = useRef<O.Option<PoolShareTableRowData[]>>(O.none)
 
-  const goToStakeInfo = useCallback(() => {
-    window.apiUrl.openExternal(`https://runeyield.info`)
-  }, [])
+  const openExternalShareInfo = useCallback(() => {
+    // `app.runeyield.info` does not support testnet, we ignore it here
+    const oMainnet = O.fromPredicate<Network>(() => network === 'mainnet')(network)
+    return FP.pipe(
+      sequenceTOption(oRuneNativeAddress, oMainnet),
+      O.map(([thorAddress, _]) => `https://app.runeyield.info/dashboard?thor=${thorAddress}`),
+      O.map(window.apiUrl.openExternal)
+    )
+  }, [network, oRuneNativeAddress])
 
   const renderPoolSharesTable = useCallback(
     (data: PoolShareTableRowData[], loading: boolean) => {
@@ -98,12 +109,12 @@ export const PoolShareView: React.FC = (): JSX.Element => {
           loading={loading}
           data={data}
           priceAsset={priceAsset}
-          goToStakeInfo={goToStakeInfo}
+          openShareInfo={openExternalShareInfo}
           network={network}
         />
       )
     },
-    [goToStakeInfo, priceAsset, network, haltedChains]
+    [openExternalShareInfo, priceAsset, network, haltedChains]
   )
 
   const clickRefreshHandler = useCallback(() => {
