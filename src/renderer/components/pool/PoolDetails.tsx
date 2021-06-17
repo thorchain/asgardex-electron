@@ -7,6 +7,7 @@ import * as O from 'fp-ts/Option'
 
 import { Network } from '../../../shared/api/types'
 import { EarningsHistoryItemPool, PoolDetail, PoolStatsDetail } from '../../types/generated/midgard/models'
+import { stringToGetPoolsStatus } from '../../views/pools/Pools.utils'
 import { PoolCards } from './PoolCards'
 import * as H from './PoolDetails.helpers'
 import { PoolTitle } from './PoolTitle'
@@ -48,6 +49,7 @@ export const PoolDetails: React.FC<Props> = ({
           price={price}
           priceSymbol={priceSymbol}
           isLoading={isLoading}
+          status={stringToGetPoolsStatus(poolDetail.status)}
         />
       </A.Col>
       <A.Col xs={24} md={8}>

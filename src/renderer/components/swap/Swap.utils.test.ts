@@ -465,7 +465,7 @@ describe('components/swap/utils', () => {
       expect(eqBaseAmount.equals(result, assetToBase(assetAmount(120, inAssetDecimal)))).toBeTruthy()
     })
 
-    it.only('chain asset -> chain asset (different chains): BNB.BNB -> ETH.ETH', () => {
+    it('chain asset -> chain asset (different chains): BNB.BNB -> ETH.ETH', () => {
       const inAssetDecimal = BNB_DECIMAL
       const params = {
         swapFees: {
@@ -537,7 +537,6 @@ describe('components/swap/utils', () => {
       // 1,5 * max(1.02, 0.08) = 1,5 * 1.02 = 4,53
 
       const result = minAmountToSwapMax1e8(params)
-      console.log(result.amount().toString())
       expect(eqBaseAmount.equals(result, assetToBase(assetAmount(1.53, inAssetDecimal)))).toBeTruthy()
     })
 
