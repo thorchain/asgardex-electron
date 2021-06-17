@@ -15,7 +15,7 @@ import * as O from 'fp-ts/lib/Option'
 
 import { ASSETS_TESTNET } from '../../../shared/mock/assets'
 import { AssetBUSD74E, AssetUSDTERC20, ZERO_BASE_AMOUNT } from '../../const'
-import { BNB_DECIMAL } from '../../helpers/assetHelper'
+import { BNB_DECIMAL, THORCHAIN_DECIMAL } from '../../helpers/assetHelper'
 import { eqBaseAmount } from '../../helpers/fp/eq'
 import { PoolsDataMap } from '../../services/midgard/types'
 import {
@@ -322,7 +322,7 @@ describe('components/swap/utils', () => {
   })
 
   describe('minAmountToSwapMax1e8', () => {
-    const poolsData = {
+    const poolsData: PoolsDataMap = {
       'BNB.BUSD-74E': {
         assetBalance: assetToBase(assetAmount(20)), // 1 BUSD = 0.05 RUNE
         runeBalance: assetToBase(assetAmount(1)) // 1 RUNE = 20 BUSD
@@ -465,7 +465,7 @@ describe('components/swap/utils', () => {
       expect(eqBaseAmount.equals(result, assetToBase(assetAmount(120, inAssetDecimal)))).toBeTruthy()
     })
 
-    it('chain asset -> chain asset (different chains): BNB.BNB -> ETH.ETH', () => {
+    it.only('chain asset -> chain asset (different chains): BNB.BNB -> ETH.ETH', () => {
       const inAssetDecimal = BNB_DECIMAL
       const params = {
         swapFees: {
@@ -474,7 +474,7 @@ describe('components/swap/utils', () => {
             asset: AssetBNB
           },
           outFee: {
-            amount: assetToBase(assetAmount(0.01)),
+            amount: assetToBase(assetAmount(0.01, ETH_DECIMAL)),
             asset: AssetETH
           }
         },
@@ -492,14 +492,53 @@ describe('components/swap/utils', () => {
       //
       // Formula (failure):
       // inboundFeeInBNB + refundFeeInBNB
-      // 0.0001 + (0.0003 * 3.33) = 0.0001 + 0,000999 = 0.001099
+      // 0.0001 + 0.0003 = 0.0004
       //
       // Formula (minValue):
       // 1,5 * max(success, failure)
-      // 1,5 * max(0.03343, 0.001099) = 1,5 * 0.03343 = 0.0501
+      // 1,5 * max(0.03343, 0.0004) = 1,5 * 0.03343 = 0.0501
 
       const result = minAmountToSwapMax1e8(params)
       expect(eqBaseAmount.equals(result, assetToBase(assetAmount(0.05015, inAssetDecimal)))).toBeTruthy()
+    })
+
+    it('chain asset -> non chain asset (different chains): THOR.RUNE -> ETH.USDT)', () => {
+      const inAssetDecimal = THORCHAIN_DECIMAL
+      const params = {
+        swapFees: {
+          inFee: {
+            amount: assetToBase(assetAmount(0.02, THORCHAIN_DECIMAL)),
+            asset: AssetRuneNative
+          },
+          outFee: {
+            amount: assetToBase(assetAmount(0.01, ETH_DECIMAL)),
+            asset: AssetETH
+          }
+        },
+        inAsset: AssetRuneNative,
+        inAssetDecimal,
+        outAsset: AssetUSDTERC20,
+        poolsData
+      }
+      // Prices
+      // 1 ETH = 100 RUNE
+      // 1 RUNE = 0.01 ETH
+      //
+      // Formula (success):
+      // inboundFeeInRUNE + outboundFeeInRUNE
+      // 0.02 + 0.01 * 100 = 0.02 + 1 = 1.02
+      //
+      // Formula (failure):
+      // inboundFeeInRUNE + refundFeeInRUNE
+      // 0.02 + 0.06 = 0.08
+      //
+      // Formula (minValue):
+      // 1,5 * max(success, failure)
+      // 1,5 * max(1.02, 0.08) = 1,5 * 1.02 = 4,53
+
+      const result = minAmountToSwapMax1e8(params)
+      console.log(result.amount().toString())
+      expect(eqBaseAmount.equals(result, assetToBase(assetAmount(1.53, inAssetDecimal)))).toBeTruthy()
     })
 
     it('non chain asset -> non chain asset (different chains): BNB.BUSD -> ETH.USDT', () => {
@@ -530,12 +569,12 @@ describe('components/swap/utils', () => {
       // (0.01 * 2000) = 20
       //
       // Formula (failure):
-      // refundFeeInBUSD
-      // 0.0003 * 600 = 0.18
+      // inboundFeeInBUSD + refundFeeInBUSD
+      // (0.0001 * 600) + (0.0003 * 600) = 0.06 + 0.18 = 0.24
       //
       // Formula (minValue):
       // 1,5 * max(success, failure)
-      // 1,5 * max(10, 18) = 1,5 * 20 = 30
+      // 1,5 * max(20, 0.24) = 1,5 * 20 = 30
 
       const result = minAmountToSwapMax1e8(params)
       expect(eqBaseAmount.equals(result, assetToBase(assetAmount(30, inAssetDecimal)))).toBeTruthy()
