@@ -26,7 +26,8 @@ import {
   getBlocksLeftForPendingPool,
   getBlocksLeftForPendingPoolAsString,
   filterTableData,
-  minPoolTxAmountUSD
+  minPoolTxAmountUSD,
+  stringToGetPoolsStatus
 } from './Pools.utils'
 
 describe('views/pools/utils', () => {
@@ -124,126 +125,152 @@ describe('views/pools/utils', () => {
       expect(result).toEqual('')
     })
   })
-})
 
-describe('filterTableData', () => {
-  const tableData = [
-    {
-      pool: {
-        asset: AssetRuneNative,
-        target: AssetBNB
+  describe('filterTableData', () => {
+    const tableData = [
+      {
+        pool: {
+          asset: AssetRuneNative,
+          target: AssetBNB
+        }
+      },
+      {
+        pool: {
+          asset: AssetRuneNative,
+          target: AssetLTC
+        }
+      },
+      {
+        pool: {
+          asset: AssetRuneNative,
+          target: AssetBTC
+        }
+      },
+      {
+        pool: {
+          asset: AssetRuneNative,
+          target: AssetBCH
+        }
+      },
+      {
+        pool: {
+          asset: AssetRuneNative,
+          target: ASSETS_TESTNET.BUSD
+        }
+      },
+      {
+        pool: {
+          asset: AssetRuneNative,
+          target: ERC20_TESTNET.USDT
+        }
+      },
+      {
+        pool: {
+          asset: AssetRuneNative,
+          target: ERC20_TESTNET.RUNE
+        }
+      },
+      {
+        pool: {
+          asset: AssetRuneNative,
+          target: ERC20_TESTNET.USDT
+        }
+      },
+      {
+        pool: {
+          asset: AssetRuneNative,
+          target: AssetETH
+        }
       }
-    },
-    {
-      pool: {
-        asset: AssetRuneNative,
-        target: AssetLTC
-      }
-    },
-    {
-      pool: {
-        asset: AssetRuneNative,
-        target: AssetBTC
-      }
-    },
-    {
-      pool: {
-        asset: AssetRuneNative,
-        target: AssetBCH
-      }
-    },
-    {
-      pool: {
-        asset: AssetRuneNative,
-        target: ASSETS_TESTNET.BUSD
-      }
-    },
-    {
-      pool: {
-        asset: AssetRuneNative,
-        target: ERC20_TESTNET.USDT
-      }
-    },
-    {
-      pool: {
-        asset: AssetRuneNative,
-        target: ERC20_TESTNET.RUNE
-      }
-    },
-    {
-      pool: {
-        asset: AssetRuneNative,
-        target: ERC20_TESTNET.USDT
-      }
-    },
-    {
-      pool: {
-        asset: AssetRuneNative,
-        target: AssetETH
-      }
-    }
-  ] as PoolTableRowData[]
+    ] as PoolTableRowData[]
 
-  it('should not filter anything', () => {
-    expect(filterTableData()(tableData)).toEqual(tableData)
-    expect(filterTableData(O.none)(tableData)).toEqual(tableData)
+    it('should not filter anything', () => {
+      expect(filterTableData()(tableData)).toEqual(tableData)
+      expect(filterTableData(O.none)(tableData)).toEqual(tableData)
+    })
+
+    it('should return only chain-based pools', () => {
+      expect(filterTableData(O.some('base'))(tableData)).toEqual([
+        tableData[0],
+        tableData[1],
+        tableData[2],
+        tableData[3],
+        tableData[8]
+      ])
+    })
+
+    it('should return BNB assets', () => {
+      expect(filterTableData(O.some(BNBChain))(tableData)).toEqual([tableData[0], tableData[4]])
+    })
+
+    it('should return ETH assets', () => {
+      expect(filterTableData(O.some(ETHChain))(tableData)).toEqual([
+        tableData[5],
+        tableData[6],
+        tableData[7],
+        tableData[8]
+      ])
+    })
+
+    it('should return USD assets', () => {
+      expect(filterTableData(O.some('usd'))(tableData)).toEqual([tableData[4], tableData[5], tableData[7]])
+    })
   })
 
-  it('should return only chain-based pools', () => {
-    expect(filterTableData(O.some('base'))(tableData)).toEqual([
-      tableData[0],
-      tableData[1],
-      tableData[2],
-      tableData[3],
-      tableData[8]
-    ])
+  describe('minPoolTxAmount', () => {
+    it('$200 for BTC', () => {
+      const result = minPoolTxAmountUSD(AssetBTC)
+      expect(eqBaseAmount.equals(result, assetToBase(assetAmount(200, 8)))).toBeTruthy()
+    })
+    it('$50 for ETH', () => {
+      const result = minPoolTxAmountUSD(AssetETH)
+      expect(eqBaseAmount.equals(result, assetToBase(assetAmount(50, 8)))).toBeTruthy()
+    })
+    it('$100 for ERC20', () => {
+      const result = minPoolTxAmountUSD(AssetUSDTERC20)
+      expect(eqBaseAmount.equals(result, assetToBase(assetAmount(100, 8)))).toBeTruthy()
+    })
+    it('$10 for others (BNB)', () => {
+      const result = minPoolTxAmountUSD(AssetBNB)
+      expect(eqBaseAmount.equals(result, assetToBase(assetAmount(10, 8)))).toBeTruthy()
+    })
+    it('$10 for others (LTC)', () => {
+      const result = minPoolTxAmountUSD(AssetLTC)
+      expect(eqBaseAmount.equals(result, assetToBase(assetAmount(10, 8)))).toBeTruthy()
+    })
+    it('$10 for others (BCH)', () => {
+      const result = minPoolTxAmountUSD(AssetBCH)
+      expect(eqBaseAmount.equals(result, assetToBase(assetAmount(10, 8)))).toBeTruthy()
+    })
+    it('$10 for others (RUNE)', () => {
+      const result = minPoolTxAmountUSD(AssetRuneNative)
+      expect(eqBaseAmount.equals(result, assetToBase(assetAmount(10, 8)))).toBeTruthy()
+    })
   })
 
-  it('should return BNB assets', () => {
-    expect(filterTableData(O.some(BNBChain))(tableData)).toEqual([tableData[0], tableData[4]])
-  })
+  describe('stringToGetPoolsStatus', () => {
+    it('suspended', () => {
+      const status = 'suspended'
+      const result = stringToGetPoolsStatus(status)
+      expect(result).toEqual(GetPoolsStatusEnum.Suspended)
+    })
 
-  it('should return ETH assets', () => {
-    expect(filterTableData(O.some(ETHChain))(tableData)).toEqual([
-      tableData[5],
-      tableData[6],
-      tableData[7],
-      tableData[8]
-    ])
-  })
+    it('available', () => {
+      const status = 'available'
+      const result = stringToGetPoolsStatus(status)
+      expect(result).toEqual(GetPoolsStatusEnum.Available)
+    })
 
-  it('should return USD assets', () => {
-    expect(filterTableData(O.some('usd'))(tableData)).toEqual([tableData[4], tableData[5], tableData[7]])
-  })
-})
+    it('staged', () => {
+      const status = 'staged'
+      const result = stringToGetPoolsStatus(status)
+      expect(result).toEqual(GetPoolsStatusEnum.Staged)
+    })
 
-describe('minPoolTxAmount', () => {
-  it('$200 for BTC', () => {
-    const result = minPoolTxAmountUSD(AssetBTC)
-    expect(eqBaseAmount.equals(result, assetToBase(assetAmount(200, 8)))).toBeTruthy()
-  })
-  it('$50 for ETH', () => {
-    const result = minPoolTxAmountUSD(AssetETH)
-    expect(eqBaseAmount.equals(result, assetToBase(assetAmount(50, 8)))).toBeTruthy()
-  })
-  it('$100 for ERC20', () => {
-    const result = minPoolTxAmountUSD(AssetUSDTERC20)
-    expect(eqBaseAmount.equals(result, assetToBase(assetAmount(100, 8)))).toBeTruthy()
-  })
-  it('$10 for others (BNB)', () => {
-    const result = minPoolTxAmountUSD(AssetBNB)
-    expect(eqBaseAmount.equals(result, assetToBase(assetAmount(10, 8)))).toBeTruthy()
-  })
-  it('$10 for others (LTC)', () => {
-    const result = minPoolTxAmountUSD(AssetLTC)
-    expect(eqBaseAmount.equals(result, assetToBase(assetAmount(10, 8)))).toBeTruthy()
-  })
-  it('$10 for others (BCH)', () => {
-    const result = minPoolTxAmountUSD(AssetBCH)
-    expect(eqBaseAmount.equals(result, assetToBase(assetAmount(10, 8)))).toBeTruthy()
-  })
-  it('$10 for others (RUNE)', () => {
-    const result = minPoolTxAmountUSD(AssetRuneNative)
-    expect(eqBaseAmount.equals(result, assetToBase(assetAmount(10, 8)))).toBeTruthy()
+    it('suspended for others', () => {
+      const status = 'other'
+      const result = stringToGetPoolsStatus(status)
+      expect(result).toEqual(GetPoolsStatusEnum.Suspended)
+    })
   })
 })
