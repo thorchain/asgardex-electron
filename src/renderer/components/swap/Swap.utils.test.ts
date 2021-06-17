@@ -465,7 +465,7 @@ describe('components/swap/utils', () => {
       expect(eqBaseAmount.equals(result, assetToBase(assetAmount(120, inAssetDecimal)))).toBeTruthy()
     })
 
-    it.only('chain asset -> chain asset (different chains): BNB.BNB -> ETH.ETH', () => {
+    it('chain asset -> chain asset (different chains): BNB.BNB -> ETH.ETH', () => {
       const inAssetDecimal = BNB_DECIMAL
       const params = {
         swapFees: {

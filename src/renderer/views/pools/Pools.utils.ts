@@ -23,8 +23,8 @@ import { toPoolData } from '../../services/midgard/utils'
 import { GetPoolsStatusEnum, PoolDetail, LastblockItem } from '../../types/generated/midgard'
 import { PoolTableRowData, Pool } from './Pools.types'
 
-const stringToGetPoolsStatus = (str?: string): GetPoolsStatusEnum => {
-  switch (str) {
+export const stringToGetPoolsStatus = (status: string): GetPoolsStatusEnum => {
+  switch (status) {
     case GetPoolsStatusEnum.Suspended: {
       return GetPoolsStatusEnum.Suspended
     }

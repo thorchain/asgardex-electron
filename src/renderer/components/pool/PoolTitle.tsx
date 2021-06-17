@@ -13,6 +13,7 @@ import { Network } from '../../../shared/api/types'
 import * as PoolHelpers from '../../helpers/poolHelper'
 import { loadingString } from '../../helpers/stringHelper'
 import * as poolsRoutes from '../../routes/pools'
+import { GetPoolsStatusEnum } from '../../types/generated/midgard'
 import { ManageButton } from '../manageButton'
 import { AssetIcon } from '../uielements/assets/assetIcon'
 import { Button } from '../uielements/button'
@@ -25,6 +26,7 @@ export type Props = {
   isLoading?: boolean
   haltedChains?: Chain[]
   network: Network
+  status: GetPoolsStatusEnum
 }
 
 export const PoolTitle: React.FC<Props> = ({
@@ -33,7 +35,8 @@ export const PoolTitle: React.FC<Props> = ({
   priceSymbol,
   haltedChains = [],
   network,
-  isLoading
+  isLoading,
+  status
 }) => {
   const history = useHistory()
   const intl = useIntl()
@@ -115,27 +118,29 @@ export const PoolTitle: React.FC<Props> = ({
                   sizevalue={isDesktopView ? 'normal' : 'small'}
                   isTextView={isDesktopView}
                 />
-                <Button
-                  disabled={disableButton}
-                  round="true"
-                  sizevalue={isDesktopView ? 'normal' : 'small'}
-                  style={{ height: 30 }}
-                  onClick={(event) => {
-                    event.preventDefault()
-                    event.stopPropagation()
-                    history.push(
-                      poolsRoutes.swap.path({ source: assetToString(asset), target: assetToString(AssetRune) })
-                    )
-                  }}>
-                  <SwapOutlined />
-                  {isDesktopView && intl.formatMessage({ id: 'common.swap' })}
-                </Button>
+                {status === GetPoolsStatusEnum.Available && (
+                  <Button
+                    disabled={disableButton}
+                    round="true"
+                    sizevalue={isDesktopView ? 'normal' : 'small'}
+                    style={{ height: 30 }}
+                    onClick={(event) => {
+                      event.preventDefault()
+                      event.stopPropagation()
+                      history.push(
+                        poolsRoutes.swap.path({ source: assetToString(asset), target: assetToString(AssetRune) })
+                      )
+                    }}>
+                    <SwapOutlined />
+                    {isDesktopView && intl.formatMessage({ id: 'common.swap' })}
+                  </Button>
+                )}
               </Styled.ButtonActions>
             )
           }
         )
       ),
-    [history, intl, isDesktopView, oAsset, disableButton]
+    [oAsset, disableButton, isDesktopView, status, intl, history]
   )
 
   return (
