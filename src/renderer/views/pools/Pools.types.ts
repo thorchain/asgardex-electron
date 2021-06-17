@@ -18,8 +18,8 @@ export type PricePoolCurrencyWeights = Record<string, number>
 
 // TODO (@asgdx-team) Move all PricePool* types into `src/renderer/services/midgard/types.ts`
 export type PricePool = {
-  asset: PricePoolAsset
-  poolData: PoolData
+  readonly asset: PricePoolAsset
+  readonly poolData: PoolData
 }
 
 export type PricePools = NonEmptyArray<PricePool>

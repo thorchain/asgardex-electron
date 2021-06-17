@@ -26,11 +26,13 @@ import {
   isEthAsset,
   isEthTokenAsset,
   isLtcAsset,
+  isRuneNativeAsset,
   to1e8BaseAmount
 } from '../../../helpers/assetHelper'
 import { isBnbChain } from '../../../helpers/chainHelper'
 import { eqAsset } from '../../../helpers/fp/eq'
 import { sequenceTOption } from '../../../helpers/fpHelpers'
+import { RUNE_POOL_DATA } from '../../../helpers/poolHelper'
 import { AssetWithAmount } from '../../../types/asgardex'
 import { PoolsDataMap } from '../../midgard/types'
 
@@ -91,6 +93,13 @@ export const getChainFeeByGasRate = ({
   }
 }
 
+export const getPoolData = (poolsData: PoolsDataMap, asset: Asset): O.Option<PoolData> =>
+  FP.pipe(
+    poolsData[assetToString(asset)],
+    O.fromNullable,
+    O.alt(() => (isRuneNativeAsset(asset) ? O.some(RUNE_POOL_DATA) : O.none))
+  )
+
 export const priceFeeAmountForAsset = ({
   feeAmount,
   feeAsset,
@@ -107,8 +116,8 @@ export const priceFeeAmountForAsset = ({
   // no pricing needed if both assets are the same
   if (eqAsset.equals(feeAsset, asset)) return feeAmount
 
-  const oFeeAssetPoolData: O.Option<PoolData> = O.fromNullable(poolsData[assetToString(feeAsset)])
-  const oAssetPoolData: O.Option<PoolData> = O.fromNullable(poolsData[assetToString(asset)])
+  const oFeeAssetPoolData: O.Option<PoolData> = getPoolData(poolsData, feeAsset)
+  const oAssetPoolData: O.Option<PoolData> = getPoolData(poolsData, asset)
 
   return FP.pipe(
     sequenceTOption(oFeeAssetPoolData, oAssetPoolData),
