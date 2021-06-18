@@ -19,7 +19,8 @@ export const loadTxs$ = ({
   limit,
   offset,
   walletAddress,
-  walletIndex
+  walletIndex,
+  internal
 }: {
   client: XChainClient
 } & TxsParams): TxsPageLD => {
@@ -40,7 +41,8 @@ export const loadTxs$ = ({
       asset: txAsset,
       address,
       limit,
-      offset
+      offset,
+      internal
     })
   ).pipe(
     RxOp.map(RD.success),

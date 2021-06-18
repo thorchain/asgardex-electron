@@ -1,6 +1,5 @@
-import React, { useEffect, useMemo } from 'react'
+import React, { useCallback, useEffect, useMemo, useState } from 'react'
 
-import * as RD from '@devexperts/remote-data-ts'
 import { Address } from '@xchainjs/xchain-client'
 import { Asset, assetFromString } from '@xchainjs/xchain-util'
 import * as FP from 'fp-ts/function'
@@ -10,21 +9,26 @@ import { useObservableState } from 'observable-hooks'
 import { useIntl } from 'react-intl'
 import { useParams } from 'react-router-dom'
 
-import { Network } from '../../../shared/api/types'
-import { ErrorView } from '../../components/shared/error'
-import { BackLink } from '../../components/uielements/backLink'
-import { AssetDetails } from '../../components/wallet/assets'
-import { useAppContext } from '../../contexts/AppContext'
-import { useWalletContext } from '../../contexts/WalletContext'
-import { sequenceTOption } from '../../helpers/fpHelpers'
-import { AssetDetailsParams } from '../../routes/wallet'
-import { DEFAULT_NETWORK } from '../../services/const'
-import { INITIAL_BALANCES_STATE } from '../../services/wallet/const'
+import { Network } from '../../../../shared/api/types'
+import { ErrorView } from '../../../components/shared/error'
+import { BackLink } from '../../../components/uielements/backLink'
+import { useAppContext } from '../../../contexts/AppContext'
+import { useWalletContext } from '../../../contexts/WalletContext'
+import { isEthAsset, isEthTokenAsset, isNonNativeRuneAsset, isRuneNativeAsset } from '../../../helpers/assetHelper'
+import { sequenceTOption } from '../../../helpers/fpHelpers'
+import { AssetDetailsParams } from '../../../routes/wallet'
+import { DEFAULT_NETWORK } from '../../../services/const'
+import { INITIAL_BALANCES_STATE } from '../../../services/wallet/const'
+import { AssetDetailsExternalHistoryView } from './AssetDetailsExternalHistoryView'
+import { AssetDetailsInternalHistoryView } from './AssetDetailsInternalHistoryView'
+import * as Styled from './AssetDetailsView.styles'
 
 export const AssetDetailsView: React.FC = (): JSX.Element => {
   const intl = useIntl()
 
   const { asset: routeAsset, walletAddress } = useParams<AssetDetailsParams>()
+
+  const [historyType, setHistoryType] = useState<'external' | 'internal'>('external')
 
   const oRouteAsset: O.Option<Asset> = useMemo(() => O.fromNullable(assetFromString(routeAsset)), [routeAsset])
   const oWalletAddress = useMemo(
@@ -41,27 +45,13 @@ export const AssetDetailsView: React.FC = (): JSX.Element => {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => setSelectedAsset(oRouteAsset), [])
 
-  const {
-    getTxs$,
-    balancesState$,
-    loadTxs,
-    reloadBalancesByChain,
-    setSelectedAsset,
-    getExplorerTxUrl$,
-    getExplorerAddressUrl$,
-    resetTxsPage
-  } = useWalletContext()
+  const { balancesState$, reloadBalancesByChain, setSelectedAsset, getExplorerTxUrl$, getExplorerAddressUrl$ } =
+    useWalletContext()
 
-  const [txsRD] = useObservableState(() => getTxs$(oWalletAddress), RD.initial)
   const { balances: oBalances } = useObservableState(balancesState$, INITIAL_BALANCES_STATE)
 
   const getExplorerTxUrl = useObservableState(getExplorerTxUrl$, O.none)
   const getExplorerAddressUrl = useObservableState(getExplorerAddressUrl$, O.none)
-
-  useEffect(() => {
-    return () => resetTxsPage()
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
 
   /**
    * Need to filter balances only for appropriate wallet
@@ -100,6 +90,35 @@ export const AssetDetailsView: React.FC = (): JSX.Element => {
     [routeAsset, intl]
   )
 
+  const renderHistoryExtraContent = useCallback(
+    (asset: Asset) => (isLoading: boolean) => {
+      if (!isNonNativeRuneAsset(asset) && (isRuneNativeAsset(asset) || isEthAsset(asset) || isEthTokenAsset(asset))) {
+        return (
+          <Styled.HistoryExtraContent>
+            <Styled.HistoryTypeButton
+              active={historyType === 'external' ? 'true' : 'false'}
+              disabled={isLoading}
+              onClick={() => setHistoryType('external')}>
+              external
+            </Styled.HistoryTypeButton>
+            <Styled.HistoryTypeButton
+              active={historyType === 'internal' ? 'true' : 'false'}
+              disabled={isLoading}
+              onClick={() => setHistoryType('internal')}>
+              pool txs
+            </Styled.HistoryTypeButton>
+          </Styled.HistoryExtraContent>
+        )
+      }
+    },
+    [historyType, setHistoryType]
+  )
+
+  const RenderView = useMemo(
+    () => (historyType === 'external' ? AssetDetailsExternalHistoryView : AssetDetailsInternalHistoryView),
+    [historyType]
+  )
+
   return (
     <>
       {FP.pipe(
@@ -107,14 +126,13 @@ export const AssetDetailsView: React.FC = (): JSX.Element => {
         O.fold(
           () => renderAssetError,
           (asset) => (
-            <AssetDetails
-              txsPageRD={txsRD}
+            <RenderView
+              getExplorerAddressUrl={getExplorerAddressUrl}
+              historyExtraContent={renderHistoryExtraContent(asset)}
               balances={walletBalances}
               asset={asset}
-              loadTxsHandler={loadTxs}
               reloadBalancesHandler={reloadBalancesByChain(asset.chain)}
               getExplorerTxUrl={getExplorerTxUrl}
-              getExplorerAddressUrl={getExplorerAddressUrl}
               walletAddress={oWalletAddress}
               network={network}
             />
