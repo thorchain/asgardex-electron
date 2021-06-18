@@ -109,11 +109,11 @@ export const ImportPhrase: React.FC = (): JSX.Element => {
         labelCol={{ span: 24 }}
         style={{ width: '100%', padding: 30, paddingTop: 15 }}>
         <Spin spinning={importing} tip={intl.formatMessage({ id: 'common.loading' })}>
+          <Styled.Title>{intl.formatMessage({ id: 'wallet.imports.phrase.title' })}</Styled.Title>
           <Form.Item
             name="phrase"
             rules={[{ required: true, validator: phraseValidator }]}
             validateTrigger={['onSubmit', 'onChange']}>
-            <Styled.Title>{intl.formatMessage({ id: 'wallet.imports.phrase.title' })}</Styled.Title>
             <InputTextArea
               color="primary"
               typevalue="normal"
