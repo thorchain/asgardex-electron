@@ -11,6 +11,8 @@ export const Table = styled(UITable)`
     font-family: 'MainFontRegular';
     border: none;
     color: ${palette('gray', 2)};
+    // Disable hover effect (as long as we don't have sorting for txs tables)
+    pointer-events: none;
   }
 
   .ant-table-tbody > tr > td {
