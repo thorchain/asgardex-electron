@@ -7,7 +7,7 @@ jobs:
     name: Unit tests
     strategy:
       matrix:
-        node-version: [14]
+        node-version: [14.17]
 
     runs-on: ubuntu-latest
 
@@ -44,7 +44,7 @@ jobs:
     name: ESLint
     strategy:
       matrix:
-        node-version: [14]
+        node-version: [14.17]
 
     runs-on: ubuntu-latest
 
@@ -80,7 +80,7 @@ jobs:
     name: Production build
     strategy:
       matrix:
-        node-version: [14]
+        node-version: [14.17]
 
     runs-on: ubuntu-latest
 

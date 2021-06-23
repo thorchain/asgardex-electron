@@ -2,6 +2,8 @@ export type TextAlignment = 'left' | 'center' | 'right' | 'justify'
 
 export type Size = 'tiny' | 'small' | 'normal' | 'big' | 'large'
 
+export type Weight = 'light' | 'bold' | 'normal'
+
 export type Color =
   | 'primary'
   | 'success'
