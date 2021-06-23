@@ -30,7 +30,7 @@ _(in alphabetical order)_
 
 ## Install
 
-It's recommended to use a Node version as same as Electron is running with (currently: [`Electron v9.1.2` / Node `12.14.1`](https://github.com/electron/releases#releases))
+It's recommended to use a Node version as same as Electron is running with (currently: [`Electron v13.1.4` / Node `14.17`](https://github.com/electron/releases#releases))
 
 ```bash
 git clone https://github.com/thorchain/asgardex-electron.git asgardex
@@ -56,7 +56,7 @@ yarn prebuild
 yarn dev
 ```
 
-In case Node@12 might run into memory issues locally set `--max-old-space-size` as follow:
+In case Node might run into memory issues locally set `--max-old-space-size` as follow:
 
 ```
 export NODE_OPTIONS="--max-old-space-size=4096"
