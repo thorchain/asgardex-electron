@@ -16,7 +16,6 @@ import {
   PoolDetail,
   Health,
   PoolStatsDetail,
-  PoolLegacyDetail,
   LiquidityHistory,
   GetLiquidityHistoryIntervalEnum,
   SwapHistory,
@@ -137,9 +136,6 @@ export type PoolAddressesLD = LiveData<Error, PoolAddresses>
 export type PoolStatsDetailRD = RD.RemoteData<Error, PoolStatsDetail>
 export type PoolStatsDetailLD = LiveData<Error, PoolStatsDetail>
 
-export type PoolLegacyDetailRD = RD.RemoteData<Error, PoolLegacyDetail>
-export type PoolLegacyDetailLD = LiveData<Error, PoolLegacyDetail>
-
 export type EarningsHistoryRD = RD.RemoteData<Error, EarningsHistory>
 export type EarningsHistoryLD = LiveData<Error, EarningsHistory>
 
@@ -194,7 +190,6 @@ export type PoolsService = {
   reloadSelectedPoolDetail: (delay?: number) => void
   reloadPoolStatsDetail: FP.Lazy<void>
   poolStatsDetail$: PoolStatsDetailLD
-  poolLegacyDetail$: PoolLegacyDetailLD
   poolEarningHistory$: PoolEarningHistoryLD
   getPoolLiquidityHistory$: (parmas: PoolLiquidityHistoryParams) => PoolLiquidityHistoryLD
   getSelectedPoolSwapHistory$: (params: GetSwapHistoryParams) => SwapHistoryLD

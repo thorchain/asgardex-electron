@@ -22,7 +22,6 @@ import {
   GetLiquidityHistoryRequest,
   GetPoolsRequest,
   GetPoolsStatusEnum,
-  GetPoolStatsLegacyRequest,
   GetPoolStatsPeriodEnum,
   GetPoolStatsRequest
 } from '../../types/generated/midgard/apis'
@@ -43,7 +42,6 @@ import {
   PoolAddress,
   PoolFilter,
   PoolStatsDetailLD,
-  PoolLegacyDetailLD,
   PoolLiquidityHistoryLD,
   PoolLiquidityHistoryParams,
   PoolDetailLD,
@@ -660,37 +658,6 @@ const createPoolsService = (
     RxOp.startWith(RD.pending)
   )
 
-  // Factory to get pool legacy detail from Midgard
-  const apiGetPoolLegacyDetail$ = (request: GetPoolStatsLegacyRequest): PoolLegacyDetailLD =>
-    FP.pipe(
-      midgardDefaultApi$,
-      liveData.chain((api) =>
-        FP.pipe(
-          api.getPoolStatsLegacy(request),
-          RxOp.map(RD.success),
-          RxOp.startWith(RD.pending),
-          RxOp.catchError((e: Error) => Rx.of(RD.failure(e)))
-        )
-      )
-    )
-
-  const poolLegacyDetail$: PoolLegacyDetailLD = Rx.combineLatest([selectedPoolAsset$, reloadSelectedPoolDetail$]).pipe(
-    RxOp.map(([oSelectedPoolAsset]) => oSelectedPoolAsset),
-    RxOp.switchMap((selectedPoolAsset) => {
-      return FP.pipe(
-        selectedPoolAsset,
-        O.fold(
-          () => Rx.of(RD.initial),
-          (asset) =>
-            apiGetPoolLegacyDetail$({
-              asset: assetToString(asset)
-            })
-        )
-      )
-    }),
-    RxOp.startWith(RD.pending)
-  )
-
   // Factory to get earning history
   const apiGetEarningHistory$ = ({ from, to, ...request }: GetEarningsHistoryRequest): EarningsHistoryLD =>
     FP.pipe(
@@ -882,7 +849,6 @@ const createPoolsService = (
     reloadSelectedPoolDetail: (delayTime = 0) => _reloadSelectedPoolDetail(delayTime),
     reloadPoolStatsDetail,
     poolStatsDetail$,
-    poolLegacyDetail$,
     poolEarningHistory$,
     getPoolLiquidityHistory$,
     getSelectedPoolSwapHistory$,
