@@ -1,7 +1,7 @@
 import React from 'react'
 
 import { withKnobs, radios } from '@storybook/addon-knobs'
-import { RadiosTypeOptionsProp } from '@storybook/addon-knobs/dist/ts3.9/components/types'
+import { RadiosTypeOptionsProp } from '@storybook/addon-knobs/dist/components/types'
 import { storiesOf } from '@storybook/react'
 import { AssetBNB, AssetRuneNative } from '@xchainjs/xchain-util'
 

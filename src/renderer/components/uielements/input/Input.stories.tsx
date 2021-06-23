@@ -1,7 +1,7 @@
 import React from 'react'
 
 import { text, radios, withKnobs } from '@storybook/addon-knobs'
-import { RadiosTypeOptionsProp } from '@storybook/addon-knobs/dist/ts3.9/components/types'
+import { RadiosTypeOptionsProp } from '@storybook/addon-knobs/dist/components/types'
 import { storiesOf } from '@storybook/react'
 import { Row } from 'antd'
 import { SizeType } from 'antd/lib/config-provider/SizeContext'

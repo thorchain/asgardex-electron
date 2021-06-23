@@ -2,7 +2,7 @@ import React from 'react'
 
 import { ArrowRightOutlined } from '@ant-design/icons'
 import { text, radios, boolean } from '@storybook/addon-knobs'
-import { RadiosTypeOptionsProp } from '@storybook/addon-knobs/dist/ts3.9/components/types'
+import { RadiosTypeOptionsProp } from '@storybook/addon-knobs/dist/components/types'
 import { storiesOf } from '@storybook/react'
 import { Row } from 'antd'
 import styled from 'styled-components'
