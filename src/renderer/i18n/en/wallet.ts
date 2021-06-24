@@ -10,7 +10,7 @@ const wallet: WalletMessages = {
   'wallet.action.send': 'Send',
   'wallet.action.upgrade': 'upgrade',
   'wallet.action.receive': 'Receive {asset}',
-  'wallet.action.remove': 'Remove',
+  'wallet.action.forget': 'Forget',
   'wallet.action.unlock': 'Unlock',
   'wallet.action.connect': 'Connect',
   'wallet.action.import': 'Import',
@@ -48,7 +48,7 @@ const wallet: WalletMessages = {
   'wallet.receive.address.error': 'No address available to receive funds',
   'wallet.receive.address.errorQR': 'Error while rendering QR code: {error}',
   'wallet.remove.label': 'Forget wallet',
-  'wallet.remove.label.title': 'Are you sure you want to remove your wallet?',
+  'wallet.remove.label.title': 'Are you sure you want to forget your wallet?',
   'wallet.remove.label.description':
     'You will need to provide your phrase to re-create your wallet. Please ensure you have your phrase saved at a safe place before you proceed.',
   'wallet.send.success': 'Transaction succeeded.',

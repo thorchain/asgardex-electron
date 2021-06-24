@@ -10,7 +10,7 @@ const wallet: WalletMessages = {
   'wallet.action.send': 'Senden',
   'wallet.action.upgrade': 'Upgrade',
   'wallet.action.receive': 'Empfangen {asset}',
-  'wallet.action.remove': 'Entfernen',
+  'wallet.action.forget': 'Entfernen',
   'wallet.action.unlock': 'Entsperren',
   'wallet.action.import': 'Importieren',
   'wallet.action.create': 'Erstellen',
