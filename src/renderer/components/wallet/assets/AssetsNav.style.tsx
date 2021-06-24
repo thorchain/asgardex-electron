@@ -22,10 +22,23 @@ export const Menu = styled(MenuUI)`
   align-items: center;
   border-bottom: 1px solid ${palette('gray', 1)};
 
+  &.ant-menu-horizontal .ant-menu-item,
+  &.ant-menu-horizontal > .ant-menu-item::after {
+    transition: none;
+  }
+
+  &.ant-menu-horizontal:not(.ant-menu-dark) > .ant-menu-item-active,
   &.ant-menu-horizontal:not(.ant-menu-dark) > .ant-menu-item:active,
   &.ant-menu-horizontal:not(.ant-menu-dark) > .ant-menu-item:hover,
   &.ant-menu-horizontal:not(.ant-menu-dark) > .ant-menu-item-selected {
     border-bottom: 2px solid ${palette('primary', 0)};
+  }
+
+  &.ant-menu-horizontal:not(.ant-menu-dark) > .ant-menu-item:hover::after,
+  &.ant-menu-horizontal:not(.ant-menu-dark) > .ant-menu-item-active::after,
+  &.ant-menu-horizontal:not(.ant-menu-dark) > .ant-menu-item-open::after,
+  &.ant-menu-horizontal:not(.ant-menu-dark) > .ant-menu-item-selected::after {
+    border-bottom: none;
   }
 
   ${commonItemStyles}
