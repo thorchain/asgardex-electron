@@ -40,6 +40,7 @@ export const AmountLabel = styled(UILabel).attrs({
   textTransform: 'uppercase',
   weight: '600'
 })`
+  font-family: 'MainFontRegular';
   padding-left: 10px;
 `
 
@@ -49,6 +50,7 @@ export const PriceLabel = styled(UILabel).attrs({
   color: 'light'
 })`
   padding-left: 10px;
+  font-family: 'MainFontRegular';
 `
 
 export const Col = styled(ACol)`

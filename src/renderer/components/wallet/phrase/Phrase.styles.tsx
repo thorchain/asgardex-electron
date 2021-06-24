@@ -58,7 +58,7 @@ export const PasswordItem = styled(A.Form.Item)`
 `
 
 export const SubmitButton = styled(UIButton).attrs({
-  sizevalue: 'xnormal',
+  sizevalue: 'normal',
   type: 'primary',
   htmlType: 'submit',
   round: 'true'
