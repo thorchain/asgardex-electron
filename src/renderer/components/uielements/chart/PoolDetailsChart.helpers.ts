@@ -81,6 +81,20 @@ export const getChartOptions = ({ unit, colors, isDesktopView }: ChartOptionsPar
   plugins: {
     legend: {
       display: false
+    },
+    tooltip: {
+      titleFont: { family: 'MainFontRegular', size: 16 },
+      bodyFont: { family: 'MainFontRegular', size: 14 },
+      callbacks: {
+        label: (context) => {
+          const label = Number(context.dataset.data[context.dataIndex]) || 0
+          // if greater than 100M
+          if (label > 100000000) {
+            return `${unit}${abbreviateNumber(label, 0)}`
+          }
+          return `${unit}${new Intl.NumberFormat().format(Math.floor(label))}`
+        }
+      }
     }
   },
   animation: {

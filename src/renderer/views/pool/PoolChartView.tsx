@@ -20,12 +20,7 @@ import {
   GetLiquidityHistoryIntervalEnum,
   GetSwapHistoryIntervalEnum
 } from '../../types/generated/midgard'
-import {
-  getLiquidityFromHistoryItems,
-  getVolumeFromHistoryItems,
-  getEoDTime,
-  getWeekAgoTime
-} from './PoolChartView.helper'
+import { getLiquidityFromHistoryItems, getVolumeFromHistoryItems } from './PoolChartView.helper'
 
 type Props = {
   priceRatio: BigNumber
@@ -50,8 +45,6 @@ export const PoolChartView: React.FC<Props> = ({ priceRatio }) => {
     dataType: 'liquidity'
   })
 
-  const curTime = getEoDTime()
-  const weekAgoTime = getWeekAgoTime()
   const [chartDataRD, updateChartData] = useObservableState<ChartDetailsRD, Partial<DataRequestParams>>(
     (params$) =>
       FP.pipe(
@@ -59,7 +52,7 @@ export const PoolChartView: React.FC<Props> = ({ priceRatio }) => {
         RxOp.startWith(savedParams),
         RxOp.map((params) => (savedParams.current = { ...savedParams.current, ...params })),
         RxOp.switchMap((params) => {
-          const requestParams = params.timeFrame === 'week' ? { from: weekAgoTime, to: curTime } : {}
+          const requestParams = params.timeFrame === 'week' ? { count: 7 } : {}
           return Rx.iif(
             () => params.dataType === 'liquidity',
             // (1) get data for depth history

@@ -1,34 +1,9 @@
 import { baseAmount, baseToAsset, bnOrZero } from '@xchainjs/xchain-util'
 import * as A from 'fp-ts/lib/Array'
 import * as FP from 'fp-ts/lib/function'
-import moment from 'moment'
 
 import { ChartDetails } from '../../components/uielements/chart/PoolDetailsChart.types'
 import { DepthHistoryItem, LiquidityHistoryItem, SwapHistoryItem } from '../../types/generated/midgard'
-
-// Get end of date time
-export const getEoDTime = () => {
-  return moment()
-    .set({
-      hour: 23,
-      minute: 59,
-      second: 59,
-      millisecond: 999
-    })
-    .unix()
-}
-
-export const getWeekAgoTime = () => {
-  return moment()
-    .subtract(7, 'days')
-    .set({
-      hour: 23,
-      minute: 59,
-      second: 59,
-      millisecond: 999
-    })
-    .unix()
-}
 
 type PartialDepthHistoryItem = Pick<DepthHistoryItem, 'startTime' | 'runeDepth'>
 
