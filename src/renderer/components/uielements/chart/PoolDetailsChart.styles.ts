@@ -1,14 +1,14 @@
 import { transparentize } from 'polished'
-import { Line, Bar } from 'react-chartjs-2'
-import * as Chart from 'react-chartjs-2'
+import { Line, Bar, Chart } from 'react-chartjs-2'
 import styled from 'styled-components'
 import { palette } from 'styled-theme'
 
 import { media } from '../../../helpers/styleHelper'
 
 // https://www.chartjs.org/docs/latest/general/fonts.html#missing-fonts
-Chart.defaults.global.defaultFontSize = 14
-Chart.defaults.global.defaultFontStyle = 'normal'
+Chart.defaults.font.size = 12
+Chart.defaults.font.style = 'normal'
+Chart.defaults.font.family = 'MainFontRegular'
 
 type HeaderToggleProps = {
   primary?: boolean
@@ -98,12 +98,14 @@ export const ChartWrapper = styled.div`
   align-items: center;
 `
 
-export const LineChart = styled(Line)`
+export const LineChart = styled(Line).attrs({
+  type: 'line'
+})`
   width: 100%;
-  font-family: 'Exo 2';
 `
 
-export const BarChart = styled(Bar)`
+export const BarChart = styled(Bar).attrs({
+  type: 'bar'
+})`
   width: 100%;
-  font-family: 'Exo 2';
 `

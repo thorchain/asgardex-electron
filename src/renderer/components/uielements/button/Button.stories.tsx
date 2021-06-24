@@ -2,24 +2,13 @@ import React from 'react'
 
 import { ArrowRightOutlined } from '@ant-design/icons'
 import { text, radios, boolean } from '@storybook/addon-knobs'
+import { RadiosTypeOptionsProp } from '@storybook/addon-knobs/dist/components/types'
 import { storiesOf } from '@storybook/react'
 import { Row } from 'antd'
 import styled from 'styled-components'
 
 import { Button } from './Button'
 import { ButtonSize, ButtonColor, ButtonType } from './Button.types'
-
-type SizeOption = {
-  [key in ButtonSize]: ButtonSize
-}
-
-type ColorOption = {
-  [key in ButtonColor]: ButtonColor
-}
-
-type TypeOption = {
-  [key in ButtonType]: ButtonType
-}
 
 const StoryWrapper = styled.div`
   div.ant-row {
@@ -150,21 +139,21 @@ storiesOf('Components/button/Button', module)
   })
   .add('properties', () => {
     const buttonText = text('Button Text', 'button')
-    const sizeOptions: SizeOption = {
+    const sizeOptions: RadiosTypeOptionsProp<ButtonSize> = {
       small: 'small',
       normal: 'normal',
       xnormal: 'xnormal',
       big: 'big'
     }
 
-    const colorOptions: ColorOption = {
+    const colorOptions: RadiosTypeOptionsProp<ButtonColor> = {
       primary: 'primary',
       success: 'success',
       warning: 'warning',
       error: 'error'
     }
 
-    const typeOptions: TypeOption = {
+    const typeOptions: RadiosTypeOptionsProp<ButtonType> = {
       default: 'default',
       outline: 'outline',
       normal: 'normal',

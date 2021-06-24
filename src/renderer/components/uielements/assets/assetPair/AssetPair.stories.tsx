@@ -1,13 +1,14 @@
 import React from 'react'
 
 import { withKnobs, radios } from '@storybook/addon-knobs'
+import { RadiosTypeOptionsProp } from '@storybook/addon-knobs/dist/components/types'
 import { storiesOf } from '@storybook/react'
 import { AssetBNB, AssetRuneNative } from '@xchainjs/xchain-util'
 
 import { Size as CoinSize } from '../assetIcon/AssetIcon.types'
 import { AssetPair } from './AssetPair'
 
-const sizeOptions: Record<CoinSize, CoinSize> = {
+const sizeOptions: RadiosTypeOptionsProp<CoinSize> = {
   small: 'small',
   big: 'big',
   normal: 'normal',

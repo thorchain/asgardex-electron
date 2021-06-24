@@ -22,5 +22,15 @@ module.exports = {
     })
 
     return webpackConfig
-  }
+  },
+  /** Use `react-docgen` temporary as a workaround to fix
+   * ```
+   * 70% sealing React Docgen Typescript Plugin/home/jk/Wrk/thorchain/repos/asgardex-electron/node_modules/react-docgen-typescript/lib/parser.js:442
+   *          var trimmedText = (tag.text || '').trim();
+   * ```
+   * @see https://github.com/styleguidist/react-docgen-typescript/issues/356#issuecomment-850400428
+   */
+   typescript: {
+    reactDocgen: 'react-docgen'
+  },
 }

@@ -1,18 +1,13 @@
 import React from 'react'
 
 import { text, radios, withKnobs } from '@storybook/addon-knobs'
+import { RadiosTypeOptionsProp } from '@storybook/addon-knobs/dist/components/types'
 import { storiesOf } from '@storybook/react'
 import { Row } from 'antd'
 import { SizeType } from 'antd/lib/config-provider/SizeContext'
 
 import { Input, InputPassword, InputTextArea } from './Input.style'
 import { Color } from './Input.types'
-
-type ColorOptions = {
-  [key in Color]: Color
-}
-
-type SizeOptions = Record<NonNullable<SizeType>, NonNullable<SizeType>>
 
 storiesOf('Components/Input', module)
   .addDecorator(withKnobs)
@@ -40,8 +35,13 @@ storiesOf('Components/Input', module)
   })
   .add('properties', () => {
     const inputText = text('Input Text', 'text')
-    const sizeOptions: SizeOptions = { small: 'small', middle: 'middle', large: 'large' }
-    const colorOptions: ColorOptions = { primary: 'primary', success: 'success', warning: 'warning', error: 'error' }
+    const sizeOptions: RadiosTypeOptionsProp<SizeType> = { small: 'small', middle: 'middle', large: 'large' }
+    const colorOptions: RadiosTypeOptionsProp<Color> = {
+      primary: 'primary',
+      success: 'success',
+      warning: 'warning',
+      error: 'error'
+    }
 
     const size = radios('size', sizeOptions, 'middle')
     const color = radios('color', colorOptions, 'primary')

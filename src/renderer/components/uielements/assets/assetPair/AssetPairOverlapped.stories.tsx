@@ -1,6 +1,7 @@
 import React from 'react'
 
 import { radios, withKnobs } from '@storybook/addon-knobs'
+import { RadiosTypeOptionsProp } from '@storybook/addon-knobs/dist/components/types'
 import { storiesOf } from '@storybook/react'
 import { AssetBNB, AssetRuneNative } from '@xchainjs/xchain-util'
 
@@ -8,9 +9,7 @@ import { ASSETS_MAINNET } from '../../../../../shared/mock/assets'
 import { Size } from '../assetIcon/AssetIcon.types'
 import { AssetPairOverlapped } from './AssetPairOverlapped'
 
-type SizeOptions = Record<Size, Size>
-
-const sizeOptions: SizeOptions = {
+const sizeOptions: RadiosTypeOptionsProp<Size> = {
   small: 'small',
   big: 'big',
   normal: 'normal',

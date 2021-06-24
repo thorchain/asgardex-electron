@@ -1,6 +1,7 @@
 import React from 'react'
 
 import { radios } from '@storybook/addon-knobs'
+import { RadiosTypeOptionsProp } from '@storybook/addon-knobs/dist/components/types'
 import { storiesOf } from '@storybook/react'
 import { AssetBCH, AssetBNB, AssetBTC, AssetETH, AssetRuneNative } from '@xchainjs/xchain-util'
 
@@ -8,12 +9,8 @@ import { ASSETS_MAINNET, ASSETS_TESTNET, ERC20_MAINNET, ERC20_TESTNET } from '..
 import { AssetIcon } from './AssetIcon'
 import { Size } from './AssetIcon.types'
 
-type SizeOptions = {
-  [key in Size]: Size
-}
-
 storiesOf('Components/assets/AssetIcon', module).add('default', () => {
-  const sizeOptions: SizeOptions = {
+  const sizeOptions: RadiosTypeOptionsProp<Size> = {
     small: 'small',
     normal: 'normal',
     large: 'large',

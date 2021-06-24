@@ -1,34 +1,23 @@
 import React from 'react'
 
 import { text, radios } from '@storybook/addon-knobs'
+import { RadiosTypeOptionsProp } from '@storybook/addon-knobs/dist/components/types'
 import { storiesOf } from '@storybook/react'
 
 import { Label } from './Label'
-import { Color, Size } from './Label.types'
-
-type SizeOptions = {
-  [key in Size]: Size
-}
-
-type WeightOptions = {
-  [key: string]: string
-}
-
-type ColorOptions = {
-  [key in Color]: Color
-}
+import { Color, Size, Weight } from './Label.types'
 
 storiesOf('Components/Label', module).add('properties', () => {
   const labelText = text('Label Text', 'This is Label Text!')
 
-  const sizeOptions: SizeOptions = {
+  const sizeOptions: RadiosTypeOptionsProp<Size> = {
     tiny: 'tiny',
     small: 'small',
     normal: 'normal',
     big: 'big',
     large: 'large'
   }
-  const colorOptions: ColorOptions = {
+  const colorOptions: RadiosTypeOptionsProp<Color> = {
     primary: 'primary',
     success: 'success',
     warning: 'warning',
@@ -40,7 +29,7 @@ storiesOf('Components/Label', module).add('properties', () => {
     gray: 'gray',
     white: 'white'
   }
-  const weightOptions: WeightOptions = {
+  const weightOptions: RadiosTypeOptionsProp<Weight> = {
     light: 'light',
     bold: 'bold',
     normal: 'normal'
