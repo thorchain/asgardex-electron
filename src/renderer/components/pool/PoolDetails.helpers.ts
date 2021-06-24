@@ -59,7 +59,9 @@ export const getEmptyPoolDetail = (): PoolDetail => ({
   runeDepth: '0',
   status: '',
   units: '0',
-  volume24h: ''
+  volume24h: '',
+  liquidityUnits: '0',
+  synthUnits: '0'
 })
 
 export const getEmptyPoolStatsDetail = (): PoolStatsDetail => ({
@@ -93,5 +95,7 @@ export const getEmptyPoolStatsDetail = (): PoolStatsDetail => ({
   withdrawCount: '0',
   withdrawRuneVolume: '0',
   withdrawVolume: '0',
-  impermanentLossProtectionPaid: '0'
+  impermanentLossProtectionPaid: '0',
+  liquidityUnits: '0',
+  synthUnits: '0'
 })
