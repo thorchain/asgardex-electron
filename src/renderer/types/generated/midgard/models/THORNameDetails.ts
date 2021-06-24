@@ -12,22 +12,30 @@
  */
 
 import {
-    EarningsHistoryItem,
+    THORNameEntry,
 } from './';
 
 /**
  * @export
- * @interface EarningsHistory
+ * @interface THORNameDetails
  */
-export interface EarningsHistory {
+export interface THORNameDetails {
     /**
-     * @type {Array<EarningsHistoryItem>}
-     * @memberof EarningsHistory
+     * List details of all chains and their addresses for a given THORName
+     * @type {Array<THORNameEntry>}
+     * @memberof THORNameDetails
      */
-    intervals: Array<EarningsHistoryItem>;
+    entries: Array<THORNameEntry>;
     /**
-     * @type {EarningsHistoryItem}
-     * @memberof EarningsHistory
+     * Int64, THORChain block height in which THORName expires
+     * @type {string}
+     * @memberof THORNameDetails
      */
-    meta: EarningsHistoryItem;
+    expire: string;
+    /**
+     * owner\'s THOR address
+     * @type {string}
+     * @memberof THORNameDetails
+     */
+    owner: string;
 }
