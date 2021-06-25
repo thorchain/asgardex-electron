@@ -6,7 +6,6 @@ import { AssetRuneNative } from '@xchainjs/xchain-util'
 import { none } from 'fp-ts/lib/Option'
 import * as O from 'fp-ts/lib/Option'
 
-import { Locale } from '../../../shared/i18n/types'
 import { HeaderComponent } from './HeaderComponent'
 
 const binanceUrl = O.some('https://testnet-dex.binance.org/api/v1')
@@ -27,7 +26,6 @@ storiesOf('Components/Header', module).add('default', () => {
       reloadVolume24Price={() => console.log('reload volume24 price')}
       setSelectedPricePool={() => console.log('setSelectedPricePool')}
       selectedPricePoolAsset={O.some(AssetRuneNative)}
-      locale={Locale.EN}
       binanceUrl={binanceUrl}
       midgardUrl={midgardUrl}
       bitcoinUrl={bitcoinUrl}

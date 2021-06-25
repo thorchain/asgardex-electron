@@ -11,7 +11,6 @@ import { useHistory } from 'react-router-dom'
 import { palette, size } from 'styled-theme'
 
 import { Network } from '../../../shared/api/types'
-import { Locale } from '../../../shared/i18n/types'
 import { ReactComponent as CloseIcon } from '../../assets/svg/icon-close.svg'
 import { ReactComponent as MenuIcon } from '../../assets/svg/icon-menu.svg'
 import { ReactComponent as SwapIcon } from '../../assets/svg/icon-swap.svg'
@@ -24,8 +23,7 @@ import { PriceRD, SelectedPricePoolAsset } from '../../services/midgard/types'
 import { KeystoreState } from '../../services/wallet/types'
 import { isLocked } from '../../services/wallet/util'
 import { PricePoolAsset, PricePoolAssets, PricePools } from '../../views/pools/Pools.types'
-import { HeaderContainer, TabLink, HeaderDrawer, HeaderDrawerItem } from './HeaderComponent.style'
-import { HeaderLang } from './lang'
+import * as Styled from './HeaderComponent.style'
 import { HeaderLock } from './lock/'
 import { HeaderNetStatus } from './netstatus'
 import { HeaderNetworkSelector } from './network'
@@ -57,8 +55,6 @@ type Props = {
   volume24Price: PriceRD
   reloadVolume24Price: FP.Lazy<void>
   selectedPricePoolAsset: SelectedPricePoolAsset
-  locale: Locale
-  changeLocale?: (locale: Locale) => void
   selectedNetwork: Network
   changeNetwork: (network: Network) => void
   midgardUrl: O.Option<string>
@@ -79,8 +75,6 @@ export const HeaderComponent: React.FC<Props> = (props): JSX.Element => {
     selectedPricePoolAsset: oSelectedPricePoolAsset,
     lockHandler,
     setSelectedPricePool,
-    locale,
-    changeLocale,
     midgardUrl,
     binanceUrl,
     bitcoinUrl,
@@ -168,12 +162,12 @@ export const HeaderComponent: React.FC<Props> = (props): JSX.Element => {
         <Tabs.TabPane
           key={key}
           tab={
-            <TabLink to={path} selected={activeKey === key}>
+            <Styled.TabLink to={path} selected={activeKey === key}>
               <Row align="middle" style={{ height: headerHeight }}>
                 <Icon style={{ paddingRight: '5px' }} />
                 {label}
               </Row>
-            </TabLink>
+            </Styled.TabLink>
           }
         />
       )),
@@ -184,10 +178,10 @@ export const HeaderComponent: React.FC<Props> = (props): JSX.Element => {
     () =>
       items.map(({ label, key, path, icon: Icon }) => (
         <Link key={key} to={path} onClick={closeMenu}>
-          <HeaderDrawerItem selected={activeKey === key}>
+          <Styled.HeaderDrawerItem selected={activeKey === key}>
             <Icon style={{ marginLeft: '12px', marginRight: '12px' }} />
             {label}
-          </HeaderDrawerItem>
+          </Styled.HeaderDrawerItem>
         </Link>
       )),
     [closeMenu, items, activeKey]
@@ -237,11 +231,6 @@ export const HeaderComponent: React.FC<Props> = (props): JSX.Element => {
   const renderHeaderSettings = useMemo(
     () => <HeaderSettings isDesktopView={isDesktopView} onPress={clickSettingsHandler} />,
     [isDesktopView, clickSettingsHandler]
-  )
-
-  const renderHeaderLang = useMemo(
-    () => <HeaderLang isDesktopView={isDesktopView} locale={locale} changeLocale={changeLocale} />,
-    [changeLocale, isDesktopView, locale]
   )
 
   const renderHeaderNetwork = useMemo(
@@ -297,7 +286,7 @@ export const HeaderComponent: React.FC<Props> = (props): JSX.Element => {
 
   return (
     <>
-      <HeaderContainer>
+      <Styled.HeaderContainer>
         <Row justify="space-between" align="middle" style={{ height: headerHeight }} ref={setHeaderRef}>
           {isDesktopView && (
             <>
@@ -317,13 +306,12 @@ export const HeaderComponent: React.FC<Props> = (props): JSX.Element => {
                 </Row>
               </Col>
               <Col span="auto">
-                <Row justify="center" align="bottom" style={{ height: headerHeight }}>
+                <Styled.TabsWrapper>
                   <Tabs activeKey={activeKey}>{tabs}</Tabs>
-                </Row>
+                </Styled.TabsWrapper>
               </Col>
               <Col>
                 <Row align="middle">
-                  {renderHeaderLang}
                   {renderHeaderCurrency}
                   {renderHeaderLock}
                   {renderHeaderNetwork}
@@ -352,7 +340,7 @@ export const HeaderComponent: React.FC<Props> = (props): JSX.Element => {
           )}
         </Row>
         {!isDesktopView && (
-          <HeaderDrawer
+          <Styled.HeaderDrawer
             style={{
               marginTop: getHeaderBottomPosition(),
               backgroundColor: 'transparent',
@@ -367,18 +355,17 @@ export const HeaderComponent: React.FC<Props> = (props): JSX.Element => {
             visible={menuVisible}
             key="top">
             {links}
-            <HeaderDrawerItem>{renderHeaderLang}</HeaderDrawerItem>
-            <HeaderDrawerItem>{renderHeaderCurrency}</HeaderDrawerItem>
-            <HeaderDrawerItem>{renderHeaderNetwork}</HeaderDrawerItem>
-            <HeaderDrawerItem>
+            <Styled.HeaderDrawerItem>{renderHeaderCurrency}</Styled.HeaderDrawerItem>
+            <Styled.HeaderDrawerItem>{renderHeaderNetwork}</Styled.HeaderDrawerItem>
+            <Styled.HeaderDrawerItem>
               <HeaderTheme isDesktopView={isDesktopView} />
-            </HeaderDrawerItem>
-            <HeaderDrawerItem>{renderHeaderLock}</HeaderDrawerItem>
-            <HeaderDrawerItem>{renderHeaderSettings}</HeaderDrawerItem>
+            </Styled.HeaderDrawerItem>
+            <Styled.HeaderDrawerItem>{renderHeaderLock}</Styled.HeaderDrawerItem>
+            <Styled.HeaderDrawerItem>{renderHeaderSettings}</Styled.HeaderDrawerItem>
             {renderHeaderNetStatus}
-          </HeaderDrawer>
+          </Styled.HeaderDrawer>
         )}
-      </HeaderContainer>
+      </Styled.HeaderContainer>
     </>
   )
 }

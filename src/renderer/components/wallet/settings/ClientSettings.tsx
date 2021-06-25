@@ -1,15 +1,23 @@
-import React, { useMemo } from 'react'
+import React, { useCallback, useMemo } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
+import { Row, Dropdown } from 'antd'
+import { MenuProps } from 'antd/lib/menu'
 import * as FP from 'fp-ts/function'
 import * as O from 'fp-ts/lib/Option'
 import { useIntl } from 'react-intl'
 
+import { Locale } from '../../../../shared/i18n/types'
+import { ReactComponent as DownIcon } from '../../../assets/svg/icon-down.svg'
+import { LOCALES } from '../../../i18n'
 import { OnlineStatus } from '../../../services/app/types'
+import { Menu } from '../../shared/menu'
 import * as Styled from './ClientSettings.style'
 
 export type Props = {
   version: string
+  locale: Locale
+  changeLocale: (locale: Locale) => void
   onlineStatus: OnlineStatus
   appUpdateState: RD.RemoteData<Error, O.Option<string>>
   checkForUpdates: FP.Lazy<void>
@@ -17,8 +25,54 @@ export type Props = {
 }
 
 export const ClientSettings: React.FC<Props> = (props): JSX.Element => {
+  const {
+    appUpdateState = RD.initial,
+    onlineStatus,
+    checkForUpdates,
+    goToReleasePage = FP.constVoid,
+    version,
+    changeLocale,
+    locale
+  } = props
+
   const intl = useIntl()
-  const { appUpdateState = RD.initial, onlineStatus, checkForUpdates, goToReleasePage = FP.constVoid, version } = props
+
+  const changeLang: MenuProps['onClick'] = useCallback(
+    ({ key }) => {
+      changeLocale(key as Locale)
+    },
+    [changeLocale]
+  )
+
+  const langMenu = useMemo(
+    () => (
+      <Menu onClick={changeLang}>
+        {LOCALES.map((locale: Locale) => {
+          return (
+            <Styled.MenuItem key={locale}>
+              <Styled.MenuItemText strong>{locale}</Styled.MenuItemText>
+            </Styled.MenuItem>
+          )
+        })}
+      </Menu>
+    ),
+    [changeLang]
+  )
+
+  const renderLangMenu = useMemo(
+    () => (
+      <Dropdown overlay={langMenu} trigger={['click']} placement="bottomCenter">
+        <Styled.DropdownContentWrapper>
+          <Row style={{ alignItems: 'center' }}>
+            <Styled.MenuItemText strong>{locale}</Styled.MenuItemText>
+            <DownIcon />
+          </Row>
+        </Styled.DropdownContentWrapper>
+      </Dropdown>
+    ),
+    [langMenu, locale]
+  )
+
   const onlineStatusColor = onlineStatus === OnlineStatus.ON ? 'green' : 'red'
 
   const checkUpdatesProps = useMemo(() => {
@@ -95,6 +149,10 @@ export const ClientSettings: React.FC<Props> = (props): JSX.Element => {
             })}
           </Styled.Label>
         </Styled.ConnectionSubSection>
+      </Styled.Section>
+      <Styled.Section>
+        <Styled.Title>{intl.formatMessage({ id: 'setting.language' })}</Styled.Title>
+        {renderLangMenu}
       </Styled.Section>
 
       <Styled.Section>

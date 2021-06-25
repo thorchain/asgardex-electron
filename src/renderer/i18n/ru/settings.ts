@@ -8,8 +8,9 @@ const settings: SettingMessages = {
   'setting.export': 'Экспортировать Keystore',
   'setting.lock': 'Заблокировать',
   'setting.view.phrase': 'Показать фразу',
-  'setting.internet': 'Internet - RU',
+  'setting.language': 'Language - RU',
   'setting.version': 'Версия',
+  'setting.internet': 'Internet - RU',
   'setting.connected': 'Connected - RU',
   'setting.notconnected': 'Нет соединения',
   'setting.add.device': 'Добавить устройство'
