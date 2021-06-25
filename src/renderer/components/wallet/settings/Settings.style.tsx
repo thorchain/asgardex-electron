@@ -95,21 +95,6 @@ export const Button = styled(UIButton)`
   }
 `
 
-export const UpdatesButton = styled(Button).attrs({
-  sizevalue: 'xnormal',
-  color: 'primary',
-  typevalue: 'outline',
-  round: 'true'
-})`
-  &:not(:last-child) {
-    margin-bottom: 10px;
-  }
-
-  .ant-btn-loading-icon {
-    margin-right: 10px;
-  }
-`
-
 export const ExternalLinkIcon = styled(ExternalLinkIconUI)`
   margin-left: 10px;
   color: ${palette('primary', 0)};
@@ -124,23 +109,6 @@ export const Placeholder = styled(UILabel)`
   color: ${palette('text', 2)};
   font-family: 'MainFontRegular';
   font-size: 14px;
-  text-transform: uppercase;
-`
-
-export const ClientLabel = styled(UILabel)`
-  display: block;
-  padding-top: 0px;
-  color: ${palette('text', 1)};
-  font-family: 'MainFontRegular';
-  font-size: 16px;
-`
-
-export const ClientErrorLabel = styled(ClientLabel)`
-  color: ${palette('error', 1)};
-`
-
-export const ClientButton = styled(UILabel)`
-  font-family: 'MainFontRegular';
   text-transform: uppercase;
 `
 

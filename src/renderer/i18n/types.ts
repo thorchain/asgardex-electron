@@ -237,9 +237,10 @@ type SettingMessageKey =
   | 'setting.export'
   | 'setting.lock'
   | 'setting.view.phrase'
-  | 'setting.midgard'
+  | 'setting.internet'
   | 'setting.version'
   | 'setting.notconnected'
+  | 'setting.connected'
   | 'setting.add.device'
 
 export type SettingMessages = { [key in SettingMessageKey]: string }

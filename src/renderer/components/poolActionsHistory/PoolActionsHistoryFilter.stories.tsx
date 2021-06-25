@@ -17,6 +17,6 @@ export const Filter: Story = () => {
 }
 
 export default {
-  title: 'PoolActionsHistory/Filter',
+  title: 'Components/PoolActionsHistoryFilter',
   component: PoolActionsHistoryFilter
 }
