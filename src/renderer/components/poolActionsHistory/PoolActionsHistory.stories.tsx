@@ -159,6 +159,6 @@ History.args = {
 
 export default {
   component: PoolActionsHistory,
-  title: 'PoolActionsHistory',
+  title: 'Components/PoolActionsHistory',
   argTypes
 }

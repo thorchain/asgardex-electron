@@ -8,10 +8,11 @@ const settings: SettingMessages = {
   'setting.export': 'Exportiere Keystore',
   'setting.lock': 'Sperren',
   'setting.view.phrase': 'Phrase ansehen',
-  'setting.midgard': 'Midgard',
+  'setting.internet': 'Internet',
   'setting.version': 'Version',
+  'setting.connected': 'Online',
   'setting.notconnected': 'Offline',
-  'setting.add.device': 'ADD DEVICE'
+  'setting.add.device': 'Gerät hinzufügen'
 }
 
 export default settings

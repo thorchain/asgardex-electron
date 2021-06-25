@@ -1,12 +1,13 @@
 import { Meta, Story } from '@storybook/react'
 import { Network } from '@xchainjs/xchain-client'
+import * as FP from 'fp-ts/lib/function'
 
 import { HeaderNetworkSelector } from './HeaderNetworkSelector'
 
 export const Default: Story<{
   network: Network
   isDesktopView: boolean
-  changeNetwork: () => void
+  changeNetwork: FP.Lazy<void>
 }> = ({ network, isDesktopView, changeNetwork }) => {
   return <HeaderNetworkSelector selectedNetwork={network} changeNetwork={changeNetwork} isDesktopView={isDesktopView} />
 }

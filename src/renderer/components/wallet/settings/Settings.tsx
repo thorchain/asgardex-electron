@@ -1,6 +1,5 @@
 import React, { useCallback, useMemo, useState } from 'react'
 
-import * as RD from '@devexperts/remote-data-ts'
 import { Address } from '@xchainjs/xchain-client'
 import { Asset, Chain } from '@xchainjs/xchain-util'
 import { Row, Col, List } from 'antd'
@@ -11,7 +10,6 @@ import { useIntl } from 'react-intl'
 import { Network } from '../../../../shared/api/types'
 import { ReactComponent as UnlockOutlined } from '../../../assets/svg/icon-unlock-warning.svg'
 import { getChainAsset } from '../../../helpers/chainHelper'
-import { LedgerAddressParams } from '../../../services/chain/types'
 import { ValidatePasswordHandler } from '../../../services/wallet/types'
 import { UserAccountType } from '../../../types/wallet'
 import { RemoveWalletConfirmationModal } from '../../modal/confirmation/RemoveWalletConfirmationModal'
@@ -22,28 +20,20 @@ import * as Styled from './Settings.style'
 
 type Props = {
   selectedNetwork: Network
-  apiVersion?: string
-  clientUrl: O.Option<string>
   userAccounts?: O.Option<UserAccountType[]>
   runeNativeAddress: string
   lockWallet?: () => void
   removeKeystore?: () => void
   exportKeystore?: (runeNativeAddress: string, selectedNetwork: Network) => void
-  retrieveLedgerAddress: ({ chain, network }: LedgerAddressParams) => void
-  removeLedgerAddress: (chain: Chain) => void
   phrase?: O.Option<string>
   clickAddressLinkHandler: (chain: Chain, address: Address) => void
   validatePassword$: ValidatePasswordHandler
-  appUpdateState: RD.RemoteData<Error, O.Option<string>>
-  checkForUpdates: () => void
-  goToReleasePage: (version: string) => void
+  ClientSettingsView: React.ComponentType<{}>
 }
 
 export const Settings: React.FC<Props> = (props): JSX.Element => {
   const intl = useIntl()
   const {
-    apiVersion = '',
-    clientUrl,
     selectedNetwork,
     userAccounts = O.none,
     runeNativeAddress = '',
@@ -59,9 +49,7 @@ export const Settings: React.FC<Props> = (props): JSX.Element => {
     phrase: oPhrase = O.none,
     clickAddressLinkHandler,
     validatePassword$,
-    appUpdateState = RD.initial,
-    checkForUpdates,
-    goToReleasePage = FP.constVoid
+    ClientSettingsView
   } = props
 
   const [showPhraseModal, setShowPhraseModal] = useState(false)
@@ -71,24 +59,6 @@ export const Settings: React.FC<Props> = (props): JSX.Element => {
   const removeWallet = useCallback(() => {
     removeKeystore()
   }, [removeKeystore])
-
-  /* Hide `addDevice` for all chains temporarily
-  const addDevice = useCallback(
-    (chain: Chain) => {
-      retrieveLedgerAddress({ chain, network: selectedNetwork })
-    },
-    [retrieveLedgerAddress, selectedNetwork]
-  )
-  */
-
-  /* Hide `removeDevice` for all chains temporarily
-  const removeDevice = useCallback(
-    (chain: Chain) => {
-      removeLedgerAddress(chain)
-    },
-    [removeLedgerAddress]
-  )
-  */
 
   const phrase = useMemo(
     () =>
@@ -150,24 +120,8 @@ export const Settings: React.FC<Props> = (props): JSX.Element => {
                       <Styled.ChainContent key={j}>
                         <Styled.AccountPlaceholder>{acc.name}</Styled.AccountPlaceholder>
                         {renderAddress(item.chainName, acc.address)}
-                        {/* Hide `removeDevice` for all chains temporarily
-                          {acc.type === 'external' && (
-                            <Button type="link" danger onClick={() => removeDevice(item.chainName)}>
-                              <StopOutlined />
-                            </Button>
-                          )}
-                          */}
                       </Styled.ChainContent>
                     ))}
-                    {/* Hide `addDevice` for all chains temporarily
-                    <Styled.Button
-                      onClick={() => addDevice(item.chainName)}
-                      typevalue="transparent"
-                      style={{ margin: '10px 0 15px 12px', boxShadow: 'none' }}>
-                      <PlusCircleFilled />
-                      {intl.formatMessage({ id: 'setting.add.device' })}
-                    </Styled.Button>
-                    */}
                   </Styled.ListItem>
                 )}
               />
@@ -183,70 +137,6 @@ export const Settings: React.FC<Props> = (props): JSX.Element => {
     setShowPasswordModal(false)
     setShowPhraseModal(true)
   }, [setShowPasswordModal, setShowPhraseModal])
-
-  const checkUpdatesProps = useMemo(() => {
-    const commonProps = {
-      onClick: checkForUpdates,
-      children: <>{intl.formatMessage({ id: 'update.checkForUpdates' })}</>
-    }
-
-    return FP.pipe(
-      appUpdateState,
-      RD.fold(
-        () => commonProps,
-        () => ({
-          ...commonProps,
-          loading: true,
-          disabled: true
-        }),
-        () => ({
-          ...commonProps
-        }),
-        (oVersion) => ({
-          ...commonProps,
-          ...FP.pipe(
-            oVersion,
-            O.fold(
-              () => ({
-                onClick: checkForUpdates
-              }),
-              (version) => ({
-                onClick: () => goToReleasePage(version),
-                children: (
-                  <>
-                    {intl.formatMessage({ id: 'update.link' })} <Styled.ExternalLinkIcon />
-                  </>
-                )
-              })
-            )
-          )
-        })
-      )
-    )
-  }, [appUpdateState, checkForUpdates, goToReleasePage, intl])
-
-  const versionUpdateResult = useMemo(
-    () =>
-      FP.pipe(
-        appUpdateState,
-        RD.fold(
-          FP.constNull,
-          FP.constNull,
-          ({ message }) => (
-            <Styled.ClientErrorLabel>
-              {intl.formatMessage({ id: 'update.checkFailed' }, { error: message })}
-            </Styled.ClientErrorLabel>
-          ),
-          O.fold(
-            () => <Styled.Placeholder>{intl.formatMessage({ id: 'update.noUpdate' })}</Styled.Placeholder>,
-            (version) => (
-              <Styled.Placeholder>{intl.formatMessage({ id: 'update.description' }, { version })}</Styled.Placeholder>
-            )
-          )
-        )
-      ),
-    [appUpdateState, intl]
-  )
 
   return (
     <>
@@ -333,19 +223,7 @@ export const Settings: React.FC<Props> = (props): JSX.Element => {
           <Styled.Card>
             <Row>
               <Col span={24}>
-                <Styled.Placeholder>{intl.formatMessage({ id: 'setting.midgard' })}</Styled.Placeholder>
-
-                <Styled.ClientLabel>
-                  {FP.pipe(
-                    clientUrl,
-                    O.getOrElse(() => intl.formatMessage({ id: 'setting.notconnected' }))
-                  )}
-                </Styled.ClientLabel>
-
-                <Styled.Placeholder>{intl.formatMessage({ id: 'setting.version' })}</Styled.Placeholder>
-                <Styled.ClientLabel>v{apiVersion}</Styled.ClientLabel>
-                <Styled.UpdatesButton {...checkUpdatesProps} />
-                {versionUpdateResult}
+                <ClientSettingsView />
               </Col>
             </Row>
           </Styled.Card>
