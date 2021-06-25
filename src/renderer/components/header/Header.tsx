@@ -1,4 +1,4 @@
-import React, { useEffect, useCallback } from 'react'
+import React, { useCallback } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
 import * as FP from 'fp-ts/lib/function'
@@ -10,7 +10,6 @@ import { Network } from '../../../shared/api/types'
 import { useAppContext } from '../../contexts/AppContext'
 import { useBinanceContext } from '../../contexts/BinanceContext'
 import { useBitcoinContext } from '../../contexts/BitcoinContext'
-import { useI18nContext } from '../../contexts/I18nContext'
 import { useLitecoinContext } from '../../contexts/LitecoinContext'
 import { useMidgardContext } from '../../contexts/MidgardContext'
 import { useThorchainContext } from '../../contexts/ThorchainContext'
@@ -58,9 +57,6 @@ export const Header: React.FC = (): JSX.Element => {
 
   const litecoinUrl$ = useLitecoinContext().explorerUrl$
   const litecoinUrl = useObservableState(litecoinUrl$, O.none)
-
-  const { changeLocale, locale$, initialLocale } = useI18nContext()
-  const currentLocale = useObservableState(locale$, initialLocale)
 
   const history = useHistory()
 
@@ -115,11 +111,6 @@ export const Header: React.FC = (): JSX.Element => {
     [changeNetwork, history.replace, oPoolRedirectPath, oWalletRedirectPath]
   )
 
-  useEffect(() => {
-    // Required to update the electron native menu according to the selected locale
-    window.apiLang.update(currentLocale)
-  }, [currentLocale])
-
   return (
     <HeaderComponent
       selectedNetwork={network}
@@ -133,8 +124,6 @@ export const Header: React.FC = (): JSX.Element => {
       volume24Price={volume24PriceRD}
       reloadVolume24Price={reloadVolume24Price}
       selectedPricePoolAsset={oSelectedPricePoolAsset}
-      locale={currentLocale}
-      changeLocale={changeLocale}
       binanceUrl={binanceUrl}
       bitcoinUrl={bitcoinUrl}
       litecoinUrl={litecoinUrl}

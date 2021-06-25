@@ -1,7 +1,10 @@
+import { Row } from 'antd'
+import Text from 'antd/lib/typography/Text'
 import styled from 'styled-components'
 import { palette } from 'styled-theme'
 
 import { ConnectionStatus as UIConnectionStatus } from '../../shared/icons'
+import { Menu } from '../../shared/menu'
 import { Button as UIButton } from '../../uielements/button'
 import { ExternalLinkIcon as ExternalLinkIconUI } from '../../uielements/common/Common.style'
 import { Label as UILabel } from '../../uielements/label'
@@ -35,6 +38,26 @@ export const Label = styled(UILabel)`
 
 export const ErrorLabel = styled(Label)`
   color: ${palette('error', 1)};
+`
+export const MenuItem = styled(Menu.Item)`
+  display: flex;
+  align-items: center;
+  padding: 8px 10px;
+`
+
+export const DropdownContentWrapper = styled(Row)`
+  justify-content: space-between;
+  padding-right: 0;
+  align-items: center;
+  width: 100%;
+  cursor: pointer;
+`
+
+export const MenuItemText = styled(Text)`
+  text-transform: uppercase;
+  font-family: 'MainFontBold';
+  color: ${palette('text', 0)};
+  font-size: 18px;
 `
 
 export const UpdatesButton = styled(UIButton).attrs({

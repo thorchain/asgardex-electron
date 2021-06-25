@@ -6,7 +6,7 @@ import { palette, size } from 'styled-theme'
 import { media } from '../../helpers/styleHelper'
 
 export const HeaderContainer = styled(Layout.Header)`
-  height: ${size('headerHeight', '50px')};
+  height: ${size('headerHeight', '70px')};
   width: 100vw;
   background-color: ${palette('background', 0)};
 
@@ -64,6 +64,13 @@ export const HeaderContainer = styled(Layout.Header)`
   ${media.lg`
     padding: 0 20px;
   `}
+`
+
+export const TabsWrapper = styled(Row).attrs({
+  justify: 'center',
+  align: 'bottom'
+})`
+  height: ${size('headerHeight', '70px')};
 `
 
 type TabLinkProps = {

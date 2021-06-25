@@ -1,1 +1,0 @@
-export { HeaderLang } from './HeaderLang'

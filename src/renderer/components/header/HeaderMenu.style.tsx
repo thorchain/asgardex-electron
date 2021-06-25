@@ -39,7 +39,7 @@ export const HeaderDropdownContentWrapper = styled(Row)`
 
   ${media.lg`
     padding-right: 0;
-    padding-left: 10px;
+    padding-left: 0;
   `}
 `
 

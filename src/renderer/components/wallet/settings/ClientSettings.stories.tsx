@@ -4,6 +4,7 @@ import { Meta, Story } from '@storybook/react'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
 
+import { Locale } from '../../../../shared/i18n/types'
 import { getMockRDValueFactory, RDStatus, rdStatusOptions } from '../../../../shared/mock/rdByStatus'
 import { OnlineStatus } from '../../../services/app/types'
 import { ClientSettings as Component } from './ClientSettings'
@@ -13,9 +14,10 @@ type StoryArgs = {
   updateDataRD: RDStatus
   checkForUpdates: FP.Lazy<void>
   goToReleasePage: (version: string) => void
+  changeLocale: (locale: Locale) => void
 }
 
-const Template: Story<StoryArgs> = ({ onlineStatus, updateDataRD, checkForUpdates, goToReleasePage }) => {
+const Template: Story<StoryArgs> = ({ onlineStatus, updateDataRD, checkForUpdates, goToReleasePage, changeLocale }) => {
   const appUpdateState = getMockRDValueFactory<Error, O.Option<string>>(
     () => O.some('2.0.0'),
     () => Error('Error while checking for updates ')
@@ -28,6 +30,8 @@ const Template: Story<StoryArgs> = ({ onlineStatus, updateDataRD, checkForUpdate
       appUpdateState={appUpdateState}
       checkForUpdates={checkForUpdates}
       goToReleasePage={goToReleasePage}
+      locale={Locale.EN}
+      changeLocale={changeLocale}
     />
   )
 }
