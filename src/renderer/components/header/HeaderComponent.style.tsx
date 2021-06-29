@@ -1,8 +1,11 @@
 import { Layout, Row, Drawer } from 'antd'
+import Text from 'antd/lib/typography/Text'
 import { Link } from 'react-router-dom'
 import styled from 'styled-components'
 import { palette, size } from 'styled-theme'
 
+import { Network } from '../../../shared/api/types'
+import { ReactComponent as UIAsgardexLogo } from '../../assets/svg/logo-asgardex.svg'
 import { media } from '../../helpers/styleHelper'
 
 export const HeaderContainer = styled(Layout.Header)`
@@ -66,6 +69,35 @@ export const HeaderContainer = styled(Layout.Header)`
   `}
 `
 
+export const AsgardexLogo = styled(UIAsgardexLogo)`
+  margin-top: 8px;
+`
+
+export const NetworkLabel = styled(Text)<{ network: Network }>`
+  position: absolute;
+  right: 19px;
+  bottom: -13px;
+  text-transform: uppercase;
+  padding: 0;
+  font-family: 'MainFontRegular';
+  font-size: 12px;
+
+  color: ${({ network }) => {
+    switch (network) {
+      case 'mainnet':
+        return palette('primary', 0)
+      case 'testnet':
+        return palette('warning', 0)
+      default:
+        return palette('text', 2)
+    }
+  }};
+`
+
+export const LogoWrapper = styled.div`
+  position: relative;
+  height: ${size('headerHeight', '70px')};
+`
 export const TabsWrapper = styled(Row).attrs({
   justify: 'center',
   align: 'bottom'

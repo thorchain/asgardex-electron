@@ -8,9 +8,12 @@ import { useAppContext } from '../../contexts/AppContext'
 import { useI18nContext } from '../../contexts/I18nContext'
 import { envOrDefault } from '../../helpers/envHelper'
 import { useAppUpdate } from '../../hooks/useAppUpdate'
+import { useNetwork } from '../../hooks/useNetwork'
 import { OnlineStatus } from '../../services/app/types'
 
 export const ClientSettingsView: React.FC = (): JSX.Element => {
+  const { network, changeNetwork } = useNetwork()
+
   const { appUpdater, checkForUpdates } = useAppUpdate()
 
   const { changeLocale, locale$, initialLocale } = useI18nContext()
@@ -34,6 +37,8 @@ export const ClientSettingsView: React.FC = (): JSX.Element => {
     <ClientSettings
       locale={currentLocale}
       changeLocale={changeLocale}
+      network={network}
+      changeNetwork={changeNetwork}
       version={envOrDefault($VERSION, '-')}
       onlineStatus={onlineStatus}
       appUpdateState={appUpdater}
