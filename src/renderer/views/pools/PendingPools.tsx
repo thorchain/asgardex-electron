@@ -26,8 +26,9 @@ import { usePoolCycle } from '../../hooks/usePoolCycle'
 import * as poolsRoutes from '../../routes/pools'
 import { DEFAULT_NETWORK } from '../../services/const'
 import { PendingPoolsState, PoolFilter, ThorchainLastblockRD } from '../../services/midgard/types'
+import { PoolDetail } from '../../types/generated/midgard'
 import { PoolsComponentProps, PoolTableRowData, PoolTableRowsData } from './Pools.types'
-import { getBlocksLeftForPendingPoolAsString } from './Pools.utils'
+import { getBlocksLeftForPendingPoolAsString, isEmptyPool } from './Pools.utils'
 import { filterTableData } from './Pools.utils'
 import * as Shared from './PoolsOverview.shared'
 import { TableAction, BlockLeftLabel } from './PoolsOverview.style'
@@ -211,8 +212,10 @@ export const PendingPools: React.FC<PoolsComponentProps> = (): JSX.Element => {
         Shared.renderTableError(intl.formatMessage({ id: 'common.refresh' }), refreshHandler),
         // success state
         ({ poolDetails }: PendingPoolsState): JSX.Element => {
+          // filter out empty pools
+          const poolDetailsFiltered = A.filter<PoolDetail>(FP.not(isEmptyPool))(poolDetails)
           const poolViewData = getPoolTableRowsData({
-            poolDetails,
+            poolDetails: poolDetailsFiltered,
             pricePoolData: selectedPricePool.poolData,
             network
           })
