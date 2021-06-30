@@ -275,7 +275,7 @@ describe('views/pools/utils', () => {
     })
   })
 
-  describe.only('isEmptyPool', () => {
+  describe('isEmptyPool', () => {
     it('empty if assetDepth and runeDepth are zero', () => {
       expect(isEmptyPool({ assetDepth: '0', runeDepth: '0' })).toBeTruthy()
     })
