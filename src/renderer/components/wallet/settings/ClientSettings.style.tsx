@@ -4,7 +4,6 @@ import styled from 'styled-components'
 import { palette } from 'styled-theme'
 
 import { Network } from '../../../../shared/api/types'
-import { ConnectionStatus as UIConnectionStatus } from '../../shared/icons'
 import { Menu } from '../../shared/menu'
 import { Button as UIButton } from '../../uielements/button'
 import { ExternalLinkIcon as ExternalLinkIconUI } from '../../uielements/common/Common.style'
@@ -103,22 +102,11 @@ export const ExternalLinkIcon = styled(ExternalLinkIconUI)`
   }
 `
 
-export const ConnectionStatus = styled(UIConnectionStatus)`
-  margin-right: 10px;
-`
-
-export const ConnectionSubSection = styled.div`
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  justify-content: center;
-  padding-bottom: 10px;
-`
-
 export const NetworkLabel = styled(Text)<{ network: Network }>`
   text-transform: uppercase;
   padding: 0;
   font-size: 16px;
+  font-family: 'MainFontRegular';
 
   color: ${({ network }) => {
     switch (network) {

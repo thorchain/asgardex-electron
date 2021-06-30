@@ -19,7 +19,6 @@ type StoryArgs = {
 }
 
 const Template: Story<StoryArgs> = ({
-  onlineStatus,
   changeNetwork,
   updateDataRD,
   checkForUpdates,
@@ -36,7 +35,6 @@ const Template: Story<StoryArgs> = ({
       version={'1.0.0'}
       network="testnet"
       changeNetwork={changeNetwork}
-      onlineStatus={onlineStatus}
       appUpdateState={appUpdateState}
       checkForUpdates={checkForUpdates}
       goToReleasePage={goToReleasePage}
@@ -53,9 +51,6 @@ const meta: Meta<StoryArgs> = {
   component: Component,
   title: 'Components/ClientSettings',
   argTypes: {
-    onlineStatus: {
-      control: { type: 'radio', options: [OnlineStatus.OFF, OnlineStatus.ON] }
-    },
     updateDataRD: {
       control: {
         type: 'select',

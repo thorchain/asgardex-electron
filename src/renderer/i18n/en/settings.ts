@@ -10,7 +10,6 @@ const settings: SettingMessages = {
   'setting.view.phrase': 'View Phrase',
   'setting.version': 'Version',
   'setting.language': 'Language',
-  'setting.internet': 'Internet',
   'setting.connected': 'Connected',
   'setting.notconnected': 'Not connected',
   'setting.add.device': 'ADD DEVICE'
