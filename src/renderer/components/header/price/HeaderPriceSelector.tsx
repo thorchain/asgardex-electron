@@ -15,9 +15,9 @@ import {
   HeaderDropdownMenuItem,
   HeaderDropdownContentWrapper,
   HeaderDropdownMenuItemText,
-  HeaderDropdownTitle,
-  HeaderDropdownWrapper
+  HeaderDropdownTitle
 } from '../HeaderMenu.style'
+import * as Styled from './HeaderPriceSelector.style'
 
 type Props = {
   isDesktopView: boolean
@@ -60,7 +60,7 @@ export const HeaderPriceSelector: React.FC<Props> = (props): JSX.Element => {
   )
 
   return (
-    <HeaderDropdownWrapper>
+    <Styled.Wrapper>
       <Dropdown disabled={disabled} overlay={menu} trigger={['click']} placement="bottomCenter">
         <HeaderDropdownContentWrapper>
           {!isDesktopView && <HeaderDropdownTitle>Currency</HeaderDropdownTitle>}
@@ -70,6 +70,6 @@ export const HeaderPriceSelector: React.FC<Props> = (props): JSX.Element => {
           </Row>
         </HeaderDropdownContentWrapper>
       </Dropdown>
-    </HeaderDropdownWrapper>
+    </Styled.Wrapper>
   )
 }
