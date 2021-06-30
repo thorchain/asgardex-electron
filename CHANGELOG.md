@@ -1,3 +1,18 @@
+# 0.3.6 (2021-06-30)
+
+## Fix
+
+- [Pools] Hide empty pending pools [#1599](https://github.com/thorchain/asgardex-electron/issues/1599)
+- [UI] Fix misc. UI issues [#1566](https://github.com/thorchain/asgardex-electron/issues/1566), [#1568](https://github.com/thorchain/asgardex-electron/issues/1568), [#1581](https://github.com/thorchain/asgardex-electron/issues/1581), [#1582](https://github.com/thorchain/asgardex-electron/issues/1582)
+
+## Update
+
+- Update dependencies (`Electron@13.x` etc.) [#1565](https://github.com/thorchain/asgardex-electron/issues/1565)
+
+## (Internal) changes
+
+- Update to latest Midgard 2.2.2 [#1586](https://github.com/thorchain/asgardex-electron/issues/1586)
+
 # 0.3.5 (2021-06-22)
 
 ## Feature
