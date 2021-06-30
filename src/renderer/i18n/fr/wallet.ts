@@ -6,7 +6,6 @@ const wallet: WalletMessages = {
   'wallet.nav.poolshares': 'Parts',
   'wallet.column.name': 'Nom',
   'wallet.column.ticker': 'Ticker',
-  'wallet.column.balance': 'Solde',
   'wallet.action.send': 'Envoyer',
   'wallet.action.upgrade': 'Mise à jour',
   'wallet.action.receive': 'Recevoir du {asset}',

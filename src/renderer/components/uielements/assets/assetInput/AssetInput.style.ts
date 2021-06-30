@@ -20,13 +20,15 @@ export const AssetInputWrapper = styled.div`
     align-items: center;
 
     .asset-input-title {
-      font-size: 11px;
+      font-size: 12px;
+      font-family: 'MainFontRegular';
       letter-spacing: 1px;
       margin-bottom: 2px;
     }
 
     .asset-input-header-label {
-      font-size: 11px;
+      font-size: 12px;
+      font-family: 'MainFontRegular';
       color: ${palette('success', 1)};
       letter-spacing: 1px;
       margin-bottom: 2px;

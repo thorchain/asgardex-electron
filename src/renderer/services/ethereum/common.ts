@@ -17,7 +17,7 @@ import { ClientStateForViews } from '../clients/types'
 import { getClient, toClientNetwork, getClientStateForViews } from '../clients/utils'
 import { keystoreService } from '../wallet/keystore'
 import { getPhrase } from '../wallet/util'
-import { ClientState, ClientState$, Client$ } from './types'
+import { Client$, ClientState, ClientState$ } from './types'
 
 const ETHERSCAN_API_KEY = envOrDefault(process.env.REACT_APP_ETHERSCAN_API_KEY, '')
 const INFURA_PROJECT_ID = envOrDefault(process.env.REACT_APP_INFURA_PROJECT_ID, '')

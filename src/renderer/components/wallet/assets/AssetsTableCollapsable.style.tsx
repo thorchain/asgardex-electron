@@ -55,7 +55,7 @@ export const TickerLabel = styled(UILabel).attrs({
 
 export const ChainLabel = styled(TickerLabel)`
   color: ${palette('gray', 2)};
-  font-size: 10px;
+  font-size: 12px;
   font-weight: 500;
 `
 

@@ -127,8 +127,8 @@ export const eqSwapFeesParams = Eq.struct<SwapFeesParams>({
 })
 
 export const eqApproveParams = Eq.struct<ApproveParams>({
-  spender: eqString,
-  sender: eqString,
+  spenderAddress: eqString,
+  contractAddress: eqString,
   amount: eqNullableBaseAmount
 })
 

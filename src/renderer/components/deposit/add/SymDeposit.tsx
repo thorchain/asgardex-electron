@@ -235,8 +235,8 @@ export const SymDeposit: React.FC<Props> = (props) => {
     return FP.pipe(
       sequenceTOption(oTokenAddress, oRouterAddress),
       O.map(([tokenAddress, routerAddress]) => ({
-        spender: routerAddress,
-        sender: tokenAddress
+        spenderAddress: routerAddress,
+        contractAddress: tokenAddress
       }))
     )
   }, [oPoolAddress, asset])
@@ -849,8 +849,8 @@ export const SymDeposit: React.FC<Props> = (props) => {
       O.map(([routerAddress, tokenAddress]) =>
         subscribeApproveState(
           approveERC20Token$({
-            spender: routerAddress,
-            sender: tokenAddress
+            spenderAddress: routerAddress,
+            contractAddress: tokenAddress
           })
         )
       )
@@ -907,8 +907,8 @@ export const SymDeposit: React.FC<Props> = (props) => {
         O.map(([_, tokenAddress]) =>
           subscribeIsApprovedState(
             isApprovedERC20Token$({
-              spender: routerAddress,
-              sender: tokenAddress
+              spenderAddress: routerAddress,
+              contractAddress: tokenAddress
             })
           )
         )

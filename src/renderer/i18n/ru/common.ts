@@ -83,7 +83,9 @@ const common: CommonMessages = {
   'common.theme.light': 'Светлая тема',
   'common.theme.dark': 'Темная тема',
   'common.volume24': 'Количество (24ч)',
-  'common.informationMore': 'More information - RU'
+  'common.informationMore': 'More information - RU',
+  'common.balance': 'Баланс',
+  'common.balance.loading': 'Loading balance - RU'
 }
 
 export default common

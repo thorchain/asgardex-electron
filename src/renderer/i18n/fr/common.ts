@@ -83,7 +83,9 @@ const common: CommonMessages = {
   'common.theme.light': 'Mode clair',
   'common.theme.dark': 'Mode sombre',
   'common.volume24': 'Volume (24h)',
-  'common.informationMore': "Plus d'information"
+  'common.informationMore': "Plus d'information",
+  'common.balance': 'Solde',
+  'common.balance.loading': 'Loading balance ...'
 }
 
 export default common

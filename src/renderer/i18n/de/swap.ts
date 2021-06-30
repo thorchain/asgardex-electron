@@ -2,11 +2,12 @@ import { SwapMessages } from '../types'
 
 const swap: SwapMessages = {
   'swap.state.pending': 'Tauschen',
-  'swap.state.error': 'Tausch error',
+  'swap.state.error': 'Error beim Tauschen',
   'swap.state.success': 'Erfolgreich getauscht',
   'swap.input': 'Eingabe',
-  'swap.balance': 'Guthaben',
   'swap.output': 'Ausgabe',
+  'swap.approve.checking': 'Überpüfe Tauscherlaubnis für {asset} ...',
+  'swap.approve.error': 'Error beim Überpüfen der Tauscherlaubnis für {asset}: {error}',
   'swap.errors.amount.balanceShouldCoverChainFee':
     'Transaktionsgebühr in Höhe von {fee} ist nicht über Dein Guthaben {balance} gedeckt.',
   'swap.errors.amount.outputShouldCoverChainFee':

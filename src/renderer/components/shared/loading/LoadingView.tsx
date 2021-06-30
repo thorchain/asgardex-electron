@@ -1,19 +1,20 @@
 import React from 'react'
 
-import { Spin } from 'antd'
+import { SpinSize } from 'antd/lib/spin'
 import { useIntl } from 'react-intl'
 
 import * as Styled from './LoadingView.styles'
 
 type LoadingViewProps = {
-  text?: string
+  label?: string
+  size?: SpinSize
 }
 
-export const LoadingView: React.FC<LoadingViewProps> = ({ text }) => {
+export const LoadingView: React.FC<LoadingViewProps> = ({ label, size = 'default' }) => {
   const intl = useIntl()
   return (
     <Styled.Space>
-      <Spin size="large" tip={text || intl.formatMessage({ id: 'common.loading' })} />
+      <Styled.Spin size={size} tip={label || intl.formatMessage({ id: 'common.loading' })} />
     </Styled.Space>
   )
 }

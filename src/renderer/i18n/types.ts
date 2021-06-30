@@ -85,6 +85,8 @@ export type CommonMessageKey =
   | 'common.theme.dark'
   | 'common.volume24'
   | 'common.informationMore'
+  | 'common.balance'
+  | 'common.balance.loading'
 
 export type CommonMessages = {
   [key in CommonMessageKey]: string
@@ -122,7 +124,6 @@ type WalletMessageKey =
   | 'wallet.nav.poolshares'
   | 'wallet.column.name'
   | 'wallet.column.ticker'
-  | 'wallet.column.balance'
   | 'wallet.action.send'
   | 'wallet.action.upgrade'
   | 'wallet.action.receive'
@@ -251,11 +252,12 @@ export type MidgardMessages = { [key in MidgardMessageKey]: string }
 
 type SwapMessageKey =
   | 'swap.input'
-  | 'swap.balance'
   | 'swap.output'
   | 'swap.state.pending'
   | 'swap.state.success'
   | 'swap.state.error'
+  | 'swap.approve.checking'
+  | 'swap.approve.error'
   | 'swap.errors.asset.missingSourceAsset'
   | 'swap.errors.asset.missingTargetAsset'
   | 'swap.errors.amount.balanceShouldCoverChainFee'

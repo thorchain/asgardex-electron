@@ -102,8 +102,8 @@ export const ValueItemContainer = styled('div')`
     &>*:first-child {
       margin-right: 25px;
       min-width: 60%;
-   `}
-  }
+    }
+  `}
 `
 
 export const SliderContainer = styled('div')`
@@ -122,11 +122,12 @@ export const InValueContainer = styled('div')`
 
 export const InValueTitle = styled(UILabel).attrs({
   color: 'gray',
-  textTransform: 'uppercase',
-  size: 'small'
+  textTransform: 'uppercase'
 })`
+font-family: 'MainFontRegular'
   margin-right: 10px;
   padding: 0;
+  font-size: 12px;
 `
 
 export const InValueLabel = styled(UILabel).attrs({

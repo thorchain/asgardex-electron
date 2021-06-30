@@ -5,8 +5,9 @@ const swap: SwapMessages = {
   'swap.state.success': 'Обмен совершён',
   'swap.state.error': 'Ошибка при обмене',
   'swap.input': 'Отдаете',
-  'swap.balance': 'Баланс',
   'swap.output': 'Получаете',
+  'swap.approve.checking': 'Checking allowance to swap {asset} ... - RU',
+  'swap.approve.error': 'Error while checking allowance to swap {asset}: {error} - RU',
   'swap.errors.amount.balanceShouldCoverChainFee':
     'Комиссия транзакции {fee} дожна покрываться вашим балансом (сейчас {balance}).',
   'swap.errors.amount.outputShouldCoverChainFee':

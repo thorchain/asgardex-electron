@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
 import { getSwapMemo, getValueOfAsset1InAsset2, PoolData } from '@thorchain/asgardex-util'
-import { Address, Balance } from '@xchainjs/xchain-client'
+import { Address } from '@xchainjs/xchain-client'
 import {
   Asset,
   assetToString,
@@ -67,11 +67,12 @@ import {
 } from '../../services/wallet/types'
 import { hasImportedKeystore, isLocked } from '../../services/wallet/util'
 import { AssetWithDecimal } from '../../types/asgardex'
-import { WalletBalances } from '../../types/wallet'
+import { WalletBalance, WalletBalances } from '../../types/wallet'
 import { CurrencyInfo } from '../currency'
 import { PasswordModal } from '../modal/password'
 import { TxModal } from '../modal/tx'
 import { SwapAssets } from '../modal/tx/extra'
+import { LoadingView } from '../shared/loading'
 import { ViewTxButton } from '../uielements/button'
 import { Fees, UIFeesRD } from '../uielements/fees'
 import { Slider } from '../uielements/slider'
@@ -179,7 +180,7 @@ export const Swap = ({
   )
 
   // `AssetWB` of source asset - which might be none (user has no balances for this asset or wallet is locked)
-  const oSourceAssetWB: O.Option<Balance> = useMemo(
+  const oSourceAssetWB: O.Option<WalletBalance> = useMemo(
     () => getWalletBalanceByAsset(oWalletBalances, oSourceAsset),
     [oWalletBalances, oSourceAsset]
   )
@@ -280,8 +281,8 @@ export const Swap = ({
     return FP.pipe(
       sequenceTOption(oTokenAddress, oRouterAddress),
       O.map(([tokenAddress, routerAddress]) => ({
-        spender: routerAddress,
-        sender: tokenAddress
+        spenderAddress: routerAddress,
+        contractAddress: tokenAddress
       }))
     )
   }, [oPoolAddress, sourceAssetProp])
@@ -859,7 +860,7 @@ export const Swap = ({
       return <></>
 
     return (
-      <Styled.FeeErrorLabel key="sourceChainErrorLabel">
+      <Styled.FeeErrorLabel>
         {intl.formatMessage(
           { id: 'swap.errors.amount.balanceShouldCoverChainFee' },
           {
@@ -895,8 +896,8 @@ export const Swap = ({
       O.map(([routerAddress, tokenAddress]) =>
         subscribeApproveState(
           approveERC20Token$({
-            spender: routerAddress,
-            sender: tokenAddress
+            contractAddress: tokenAddress,
+            spenderAddress: routerAddress
           })
         )
       )
@@ -910,7 +911,7 @@ export const Swap = ({
         RD.fold(
           () => <></>,
           () => <></>,
-          (error) => <Styled.ErrorLabel key="approveErrorLabel">{error.msg}</Styled.ErrorLabel>,
+          (error) => <Styled.ErrorLabel>{error.msg}</Styled.ErrorLabel>,
           () => <></>
         )
       ),
@@ -922,12 +923,10 @@ export const Swap = ({
     state: isApprovedState,
     reset: resetIsApprovedState,
     subscribe: subscribeIsApprovedState
-  } = useSubscriptionState<IsApprovedRD>(RD.success(true))
+  } = useSubscriptionState<IsApprovedRD>(RD.initial)
 
   const isApproved = useMemo(() => {
     if (!needApprovement) return true
-    // ignore initial + loading states for `isApprovedState`
-    if (RD.isInitial(isApprovedState) || RD.isPending(isApprovedState)) return true
 
     return (
       RD.isSuccess(approveState) ||
@@ -940,6 +939,12 @@ export const Swap = ({
       )
     )
   }, [approveState, isApprovedState, needApprovement])
+
+  const checkIsApproved = useMemo(() => {
+    if (!needApprovement) return false
+    // ignore initial + loading states for `isApprovedState`
+    return RD.isPending(isApprovedState)
+  }, [isApprovedState, needApprovement])
 
   const checkApprovedStatus = useCallback(() => {
     const oRouterAddress: O.Option<Address> = FP.pipe(
@@ -959,21 +964,47 @@ export const Swap = ({
       O.map(([_, routerAddress, tokenAddress]) =>
         subscribeIsApprovedState(
           isApprovedERC20Token$({
-            spender: routerAddress,
-            sender: tokenAddress
+            contractAddress: tokenAddress,
+            spenderAddress: routerAddress
           })
         )
       )
     )
   }, [isApprovedERC20Token$, needApprovement, oPoolAddress, sourceAssetProp, subscribeIsApprovedState])
 
+  const checkIsApprovedError = useMemo(() => {
+    // ignore error check if we don't need to check allowance
+    if (!needApprovement) return false
+
+    return RD.isFailure(isApprovedState)
+  }, [needApprovement, isApprovedState])
+
+  const renderIsApprovedError = useMemo(() => {
+    if (!checkIsApprovedError) return <></>
+
+    return FP.pipe(
+      isApprovedState,
+
+      RD.fold(
+        () => <></>,
+        () => <></>,
+        (error) => (
+          <Styled.ErrorLabel align="center">
+            {intl.formatMessage({ id: 'swap.approve.error' }, { asset: sourceAssetProp.ticker, error: error.msg })}
+          </Styled.ErrorLabel>
+        ),
+        (_) => <></>
+      )
+    )
+  }, [checkIsApprovedError, intl, isApprovedState, sourceAssetProp.ticker])
+
   const reset = useCallback(() => {
     // reset swap state
     resetSwapState()
-    // reset approve state
-    resetApproveState()
     // reset isApproved state
     resetIsApprovedState()
+    // reset approve state
+    resetApproveState()
     // zero amount to swap
     setAmountToSwapMax1e8(initialAmountToSwapMax1e8)
     // check approved status
@@ -1052,9 +1083,9 @@ export const Swap = ({
   )
 
   const disableSubmitApprove = useMemo(
-    () => isApproveFeeError || walletBalancesLoading || hasHaltedChain,
+    () => checkIsApprovedError || isApproveFeeError || walletBalancesLoading || hasHaltedChain,
 
-    [hasHaltedChain, isApproveFeeError, walletBalancesLoading]
+    [hasHaltedChain, checkIsApprovedError, isApproveFeeError, walletBalancesLoading]
   )
 
   return (
@@ -1104,13 +1135,13 @@ export const Swap = ({
           </Styled.ValueItemContainer>
           {minAmountLabel}
 
-          <Styled.ValueItemContainer className={'valueItemContainer-percent'}>
+          <Styled.ValueItemContainer className="valueItemContainer-percent">
             <Styled.SliderContainer>{renderSlider}</Styled.SliderContainer>
             <Styled.SwapOutlined onClick={onSwitchAssets} />
           </Styled.ValueItemContainer>
-          <Styled.ValueItemContainer className={'valueItemContainer-in'}>
+          <Styled.ValueItemContainer className="valueItemContainer-in">
             <Styled.InValueContainer>
-              <Styled.InValueTitle>{intl.formatMessage({ id: 'swap.output' })}:</Styled.InValueTitle>
+              <Styled.InValueTitle>{intl.formatMessage({ id: 'swap.output' })}</Styled.InValueTitle>
               <Styled.InValueLabel>{swapResultLabel}</Styled.InValueLabel>
             </Styled.InValueContainer>
             {FP.pipe(
@@ -1130,6 +1161,21 @@ export const Swap = ({
           </Styled.ValueItemContainer>
         </Styled.FormContainer>
       </Styled.ContentContainer>
+      {(walletBalancesLoading || checkIsApproved) && (
+        <LoadingView
+          label={
+            // We show only one loading state at time
+            // Order matters: Show states with shortest loading time before others
+            // (approve state takes just a short time to load, but needs to be displayed)
+            checkIsApproved
+              ? intl.formatMessage({ id: 'swap.approve.checking' }, { asset: sourceAssetProp.ticker })
+              : walletBalancesLoading
+              ? intl.formatMessage({ id: 'common.balance.loading' })
+              : undefined
+          }
+        />
+      )}
+      {renderIsApprovedError}
       <Styled.SubmitContainer>
         {!isLocked(keystore) ? (
           isApproved ? (
@@ -1146,6 +1192,7 @@ export const Swap = ({
             </>
           ) : (
             <>
+              {approveFeeErrorLabel}
               <Styled.SubmitButton
                 sizevalue="xnormal"
                 color="warning"
@@ -1156,7 +1203,7 @@ export const Swap = ({
               </Styled.SubmitButton>
 
               {!RD.isInitial(uiApproveFeesRD) && <Fees fees={uiApproveFeesRD} reloadFees={reloadApproveFeesHandler} />}
-              {approveFeeErrorLabel}
+
               {renderApproveError}
             </>
           )
