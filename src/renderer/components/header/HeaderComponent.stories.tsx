@@ -17,6 +17,7 @@ const litecoinUrl = O.some('https://blockstream.info')
 storiesOf('Components/Header', module).add('default', () => {
   return (
     <HeaderComponent
+      network="mainnet"
       keystore={none}
       lockHandler={() => console.log('lockHandler')}
       pricePools={O.none}
@@ -31,8 +32,6 @@ storiesOf('Components/Header', module).add('default', () => {
       bitcoinUrl={bitcoinUrl}
       thorchainUrl={thorchainUrl}
       litecoinUrl={litecoinUrl}
-      selectedNetwork={'mainnet'}
-      changeNetwork={(network) => console.log('set network to', network)}
     />
   )
 })

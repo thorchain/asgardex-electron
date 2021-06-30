@@ -10,7 +10,6 @@ const settings: SettingMessages = {
   'setting.view.phrase': 'Afficher la phrase de récupération',
   'setting.language': 'Language - FR',
   'setting.version': 'Version',
-  'setting.internet': 'Internet - FR',
   'setting.connected': 'Connected - FR',
   'setting.notconnected': 'Déconnecté',
   'setting.add.device': 'AJOUTER UN PÉRIPHÉRIQUE'

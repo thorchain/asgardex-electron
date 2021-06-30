@@ -6,7 +6,7 @@ import * as O from 'fp-ts/lib/Option'
 
 import { Locale } from '../../../../shared/i18n/types'
 import { getMockRDValueFactory, RDStatus, rdStatusOptions } from '../../../../shared/mock/rdByStatus'
-import { OnlineStatus } from '../../../services/app/types'
+import { ChangeNetworkHandler, OnlineStatus } from '../../../services/app/types'
 import { ClientSettings as Component } from './ClientSettings'
 
 type StoryArgs = {
@@ -15,9 +15,16 @@ type StoryArgs = {
   checkForUpdates: FP.Lazy<void>
   goToReleasePage: (version: string) => void
   changeLocale: (locale: Locale) => void
+  changeNetwork: ChangeNetworkHandler
 }
 
-const Template: Story<StoryArgs> = ({ onlineStatus, updateDataRD, checkForUpdates, goToReleasePage, changeLocale }) => {
+const Template: Story<StoryArgs> = ({
+  changeNetwork,
+  updateDataRD,
+  checkForUpdates,
+  goToReleasePage,
+  changeLocale
+}) => {
   const appUpdateState = getMockRDValueFactory<Error, O.Option<string>>(
     () => O.some('2.0.0'),
     () => Error('Error while checking for updates ')
@@ -26,7 +33,8 @@ const Template: Story<StoryArgs> = ({ onlineStatus, updateDataRD, checkForUpdate
   return (
     <Component
       version={'1.0.0'}
-      onlineStatus={onlineStatus}
+      network="testnet"
+      changeNetwork={changeNetwork}
       appUpdateState={appUpdateState}
       checkForUpdates={checkForUpdates}
       goToReleasePage={goToReleasePage}
@@ -43,14 +51,14 @@ const meta: Meta<StoryArgs> = {
   component: Component,
   title: 'Components/ClientSettings',
   argTypes: {
-    onlineStatus: {
-      control: { type: 'radio', options: [OnlineStatus.OFF, OnlineStatus.ON] }
-    },
     updateDataRD: {
       control: {
         type: 'select',
         options: rdStatusOptions
       }
+    },
+    changeNetwor: {
+      action: 'changeNetwor'
     },
     checkForUpdates: {
       action: 'checkForUpdates'

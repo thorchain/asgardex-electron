@@ -7,4 +7,6 @@ export enum OnlineStatus {
   OFF = 'offline'
 }
 
+export type ChangeNetworkHandler = (network: Network) => void
+
 export type Network$ = Rx.Observable<Network>

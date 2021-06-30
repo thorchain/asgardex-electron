@@ -7,10 +7,11 @@ import * as FP from 'fp-ts/function'
 import * as O from 'fp-ts/lib/Option'
 import { useIntl } from 'react-intl'
 
+import { Network } from '../../../../shared/api/types'
 import { Locale } from '../../../../shared/i18n/types'
 import { ReactComponent as DownIcon } from '../../../assets/svg/icon-down.svg'
 import { LOCALES } from '../../../i18n'
-import { OnlineStatus } from '../../../services/app/types'
+import { AVAILABLE_NETWORKS } from '../../../services/const'
 import { Menu } from '../../shared/menu'
 import * as Styled from './ClientSettings.style'
 
@@ -18,7 +19,8 @@ export type Props = {
   version: string
   locale: Locale
   changeLocale: (locale: Locale) => void
-  onlineStatus: OnlineStatus
+  network: Network
+  changeNetwork: (network: Network) => void
   appUpdateState: RD.RemoteData<Error, O.Option<string>>
   checkForUpdates: FP.Lazy<void>
   goToReleasePage: (version: string) => void
@@ -27,7 +29,8 @@ export type Props = {
 export const ClientSettings: React.FC<Props> = (props): JSX.Element => {
   const {
     appUpdateState = RD.initial,
-    onlineStatus,
+    changeNetwork = FP.constVoid,
+    network,
     checkForUpdates,
     goToReleasePage = FP.constVoid,
     version,
@@ -47,13 +50,11 @@ export const ClientSettings: React.FC<Props> = (props): JSX.Element => {
   const langMenu = useMemo(
     () => (
       <Menu onClick={changeLang}>
-        {LOCALES.map((locale: Locale) => {
-          return (
-            <Styled.MenuItem key={locale}>
-              <Styled.MenuItemText strong>{locale}</Styled.MenuItemText>
-            </Styled.MenuItem>
-          )
-        })}
+        {LOCALES.map((locale: Locale) => (
+          <Styled.MenuItem key={locale}>
+            <Styled.MenuItemText>{locale}</Styled.MenuItemText>
+          </Styled.MenuItem>
+        ))}
       </Menu>
     ),
     [changeLang]
@@ -64,7 +65,7 @@ export const ClientSettings: React.FC<Props> = (props): JSX.Element => {
       <Dropdown overlay={langMenu} trigger={['click']} placement="bottomCenter">
         <Styled.DropdownContentWrapper>
           <Row style={{ alignItems: 'center' }}>
-            <Styled.MenuItemText strong>{locale}</Styled.MenuItemText>
+            <Styled.MenuItemText>{locale}</Styled.MenuItemText>
             <DownIcon />
           </Row>
         </Styled.DropdownContentWrapper>
@@ -73,7 +74,46 @@ export const ClientSettings: React.FC<Props> = (props): JSX.Element => {
     [langMenu, locale]
   )
 
-  const onlineStatusColor = onlineStatus === OnlineStatus.ON ? 'green' : 'red'
+  const changeNetworkHandler: MenuProps['onClick'] = useCallback(
+    ({ key }) => {
+      changeNetwork(key as Network)
+    },
+    [changeNetwork]
+  )
+
+  // TODO asgdx-team: Remove `networkLabel` if we go live with mainnet
+  const networkLabel = (network: Network) => (network === 'mainnet' ? 'chaosnet' : 'testnet')
+
+  const networkMenu = useMemo(
+    () => (
+      <Menu onClick={changeNetworkHandler}>
+        {AVAILABLE_NETWORKS.map((network: Network) => (
+          <Styled.MenuItem key={network}>
+            <Styled.MenuItemText>
+              {/* TODO @asgdx-team: Revert it back to `network` if we go live with mainnet */}
+              <Styled.NetworkLabel network={network}>{networkLabel(network)}</Styled.NetworkLabel>
+            </Styled.MenuItemText>
+          </Styled.MenuItem>
+        ))}
+      </Menu>
+    ),
+    [changeNetworkHandler]
+  )
+
+  const renderNetworkMenu = useMemo(
+    () => (
+      <Dropdown overlay={networkMenu} trigger={['click']} placement="bottomCenter">
+        <Styled.DropdownContentWrapper>
+          <Row style={{ alignItems: 'center' }}>
+            {/* TODO asgdx-team: Revert it back to `network` if we go live with mainnet */}
+            <Styled.NetworkLabel network={network}>{networkLabel(network)}</Styled.NetworkLabel>
+            <DownIcon />
+          </Row>
+        </Styled.DropdownContentWrapper>
+      </Dropdown>
+    ),
+    [networkMenu, network]
+  )
 
   const checkUpdatesProps = useMemo(() => {
     const commonProps = {
@@ -138,17 +178,10 @@ export const ClientSettings: React.FC<Props> = (props): JSX.Element => {
   )
 
   return (
-    <div>
+    <>
       <Styled.Section>
-        <Styled.Title>{intl.formatMessage({ id: 'setting.internet' })}</Styled.Title>
-        <Styled.ConnectionSubSection>
-          <Styled.ConnectionStatus color={onlineStatusColor} />
-          <Styled.Label>
-            {intl.formatMessage({
-              id: onlineStatus === OnlineStatus.ON ? 'setting.connected' : 'setting.notconnected'
-            })}
-          </Styled.Label>
-        </Styled.ConnectionSubSection>
+        <Styled.Title>{intl.formatMessage({ id: 'common.network' })}</Styled.Title>
+        {renderNetworkMenu}
       </Styled.Section>
       <Styled.Section>
         <Styled.Title>{intl.formatMessage({ id: 'setting.language' })}</Styled.Title>
@@ -161,6 +194,6 @@ export const ClientSettings: React.FC<Props> = (props): JSX.Element => {
         <Styled.UpdatesButton {...checkUpdatesProps} />
         {renderVersionUpdateResult}
       </Styled.Section>
-    </div>
+    </>
   )
 }

@@ -10,7 +10,6 @@ const settings: SettingMessages = {
   'setting.view.phrase': 'Phrase ansehen',
   'setting.version': 'Version',
   'setting.language': 'Sprache',
-  'setting.internet': 'Internet',
   'setting.connected': 'Online',
   'setting.notconnected': 'Offline',
   'setting.add.device': 'Gerät hinzufügen'

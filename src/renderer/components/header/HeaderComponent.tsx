@@ -1,6 +1,6 @@
 import React, { useMemo, useState, useCallback, useRef } from 'react'
 
-import { Row, Col, Tabs, Grid } from 'antd'
+import { Row, Col, Tabs, Grid, Space } from 'antd'
 import * as FP from 'fp-ts/function'
 import * as A from 'fp-ts/lib/Array'
 import * as O from 'fp-ts/lib/Option'
@@ -15,7 +15,6 @@ import { ReactComponent as CloseIcon } from '../../assets/svg/icon-close.svg'
 import { ReactComponent as MenuIcon } from '../../assets/svg/icon-menu.svg'
 import { ReactComponent as SwapIcon } from '../../assets/svg/icon-swap.svg'
 import { ReactComponent as WalletIcon } from '../../assets/svg/icon-wallet.svg'
-import { ReactComponent as AsgardexLogo } from '../../assets/svg/logo-asgardex.svg'
 import { useThemeContext } from '../../contexts/ThemeContext'
 import * as poolsRoutes from '../../routes/pools'
 import * as walletRoutes from '../../routes/wallet'
@@ -26,7 +25,6 @@ import { PricePoolAsset, PricePoolAssets, PricePools } from '../../views/pools/P
 import * as Styled from './HeaderComponent.style'
 import { HeaderLock } from './lock/'
 import { HeaderNetStatus } from './netstatus'
-import { HeaderNetworkSelector } from './network'
 import { HeaderPriceSelector } from './price'
 import { HeaderSettings } from './settings'
 import { HeaderStats } from './stats/HeaderStats'
@@ -47,6 +45,7 @@ type Tab = {
 
 type Props = {
   keystore: KeystoreState
+  network: Network
   lockHandler: FP.Lazy<void>
   setSelectedPricePool: (asset: PricePoolAsset) => void
   pricePools: O.Option<PricePools>
@@ -55,8 +54,6 @@ type Props = {
   volume24Price: PriceRD
   reloadVolume24Price: FP.Lazy<void>
   selectedPricePoolAsset: SelectedPricePoolAsset
-  selectedNetwork: Network
-  changeNetwork: (network: Network) => void
   midgardUrl: O.Option<string>
   binanceUrl: O.Option<string>
   bitcoinUrl: O.Option<string>
@@ -67,6 +64,7 @@ type Props = {
 export const HeaderComponent: React.FC<Props> = (props): JSX.Element => {
   const {
     keystore,
+    network,
     pricePools: oPricePools,
     runePrice: runePriceRD,
     reloadRunePrice,
@@ -79,9 +77,7 @@ export const HeaderComponent: React.FC<Props> = (props): JSX.Element => {
     binanceUrl,
     bitcoinUrl,
     thorchainUrl,
-    litecoinUrl,
-    selectedNetwork,
-    changeNetwork
+    litecoinUrl
   } = props
 
   const intl = useIntl()
@@ -233,17 +229,6 @@ export const HeaderComponent: React.FC<Props> = (props): JSX.Element => {
     [isDesktopView, clickSettingsHandler]
   )
 
-  const renderHeaderNetwork = useMemo(
-    () => (
-      <HeaderNetworkSelector
-        isDesktopView={isDesktopView}
-        selectedNetwork={selectedNetwork}
-        changeNetwork={changeNetwork}
-      />
-    ),
-    [selectedNetwork, changeNetwork, isDesktopView]
-  )
-
   const renderHeaderNetStatus = useMemo(
     () => (
       <HeaderNetStatus
@@ -284,6 +269,18 @@ export const HeaderComponent: React.FC<Props> = (props): JSX.Element => {
     [headerHeight]
   )
 
+  // TODO asgdx-team: Remove `networkLabel` if we go live with mainnet
+  const networkLabel = (network: Network) => (network === 'mainnet' ? 'chaosnet' : 'testnet')
+
+  const renderLogo = useMemo(
+    () => (
+      <Styled.LogoWrapper>
+        <Styled.AsgardexLogo />
+        <Styled.NetworkLabel network={network}>{networkLabel(network)}</Styled.NetworkLabel>
+      </Styled.LogoWrapper>
+    ),
+    [network]
+  )
   return (
     <>
       <Styled.HeaderContainer>
@@ -292,9 +289,7 @@ export const HeaderComponent: React.FC<Props> = (props): JSX.Element => {
             <>
               <Col>
                 <Row justify="space-between" align="middle" style={{ height: headerHeight }}>
-                  <AsgardexLogo />
-                  {renderHeaderNetStatus}
-                  <HeaderTheme isDesktopView={isDesktopView} />
+                  {renderLogo}
                   {isLargeDesktopView && (
                     <HeaderStats
                       runePrice={runePriceRD}
@@ -306,15 +301,19 @@ export const HeaderComponent: React.FC<Props> = (props): JSX.Element => {
                 </Row>
               </Col>
               <Col span="auto">
-                <Styled.TabsWrapper>
-                  <Tabs activeKey={activeKey}>{tabs}</Tabs>
-                </Styled.TabsWrapper>
+                <Space size={isLargeDesktopView ? 130 : 0}>
+                  <Styled.TabsWrapper>
+                    <Tabs activeKey={activeKey}>{tabs}</Tabs>
+                  </Styled.TabsWrapper>
+                  <div></div>
+                </Space>
               </Col>
               <Col>
                 <Row align="middle">
+                  {renderHeaderNetStatus}
+                  <HeaderTheme isDesktopView={isDesktopView} />
                   {renderHeaderCurrency}
                   {renderHeaderLock}
-                  {renderHeaderNetwork}
                   {renderHeaderSettings}
                 </Row>
               </Col>
@@ -324,7 +323,7 @@ export const HeaderComponent: React.FC<Props> = (props): JSX.Element => {
             <>
               <Col>
                 <Row align="middle" style={{ height: headerHeight }}>
-                  <AsgardexLogo />
+                  {renderLogo}
                 </Row>
               </Col>
               <Col>
@@ -356,7 +355,6 @@ export const HeaderComponent: React.FC<Props> = (props): JSX.Element => {
             key="top">
             {links}
             <Styled.HeaderDrawerItem>{renderHeaderCurrency}</Styled.HeaderDrawerItem>
-            <Styled.HeaderDrawerItem>{renderHeaderNetwork}</Styled.HeaderDrawerItem>
             <Styled.HeaderDrawerItem>
               <HeaderTheme isDesktopView={isDesktopView} />
             </Styled.HeaderDrawerItem>

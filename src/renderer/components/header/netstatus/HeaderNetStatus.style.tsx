@@ -7,7 +7,6 @@ import { Menu } from '../../shared/menu'
 import { Label } from '../../uielements/label'
 
 export const Wrapper = styled(Row)`
-  margin-bottom: 5px;
   /* id defined in svg */
   #down_icon {
     cursor: pointer;

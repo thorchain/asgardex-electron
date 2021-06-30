@@ -239,7 +239,6 @@ type SettingMessageKey =
   | 'setting.view.phrase'
   | 'setting.version'
   | 'setting.language'
-  | 'setting.internet'
   | 'setting.notconnected'
   | 'setting.connected'
   | 'setting.add.device'

@@ -4,21 +4,18 @@ import { useObservableState } from 'observable-hooks'
 
 import { ExternalUrl } from '../../../shared/const'
 import { ClientSettings } from '../../components/wallet/settings/ClientSettings'
-import { useAppContext } from '../../contexts/AppContext'
 import { useI18nContext } from '../../contexts/I18nContext'
 import { envOrDefault } from '../../helpers/envHelper'
 import { useAppUpdate } from '../../hooks/useAppUpdate'
-import { OnlineStatus } from '../../services/app/types'
+import { useNetwork } from '../../hooks/useNetwork'
 
 export const ClientSettingsView: React.FC = (): JSX.Element => {
+  const { network, changeNetwork } = useNetwork()
+
   const { appUpdater, checkForUpdates } = useAppUpdate()
 
   const { changeLocale, locale$, initialLocale } = useI18nContext()
   const currentLocale = useObservableState(locale$, initialLocale)
-
-  const { onlineStatus$ } = useAppContext()
-
-  const onlineStatus = useObservableState<OnlineStatus>(onlineStatus$, OnlineStatus.OFF)
 
   const goToReleasePage = useCallback(
     (version: string) => window.apiUrl.openExternal(`${ExternalUrl.GITHUB_RELEASE}${version}`),
@@ -34,8 +31,9 @@ export const ClientSettingsView: React.FC = (): JSX.Element => {
     <ClientSettings
       locale={currentLocale}
       changeLocale={changeLocale}
+      network={network}
+      changeNetwork={changeNetwork}
       version={envOrDefault($VERSION, '-')}
-      onlineStatus={onlineStatus}
       appUpdateState={appUpdater}
       checkForUpdates={checkForUpdates}
       goToReleasePage={goToReleasePage}

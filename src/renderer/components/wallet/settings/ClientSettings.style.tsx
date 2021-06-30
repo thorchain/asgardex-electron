@@ -3,7 +3,7 @@ import Text from 'antd/lib/typography/Text'
 import styled from 'styled-components'
 import { palette } from 'styled-theme'
 
-import { ConnectionStatus as UIConnectionStatus } from '../../shared/icons'
+import { Network } from '../../../../shared/api/types'
 import { Menu } from '../../shared/menu'
 import { Button as UIButton } from '../../uielements/button'
 import { ExternalLinkIcon as ExternalLinkIconUI } from '../../uielements/common/Common.style'
@@ -14,7 +14,7 @@ export const Section = styled.div`
   flex-direction: column;
   justify-content: space-between;
   align-items: flex-start;
-  margin-bottom: 10px;
+  margin-bottom: 20px;
 `
 
 export const Title = styled(UILabel)`
@@ -55,9 +55,9 @@ export const DropdownContentWrapper = styled(Row)`
 
 export const MenuItemText = styled(Text)`
   text-transform: uppercase;
-  font-family: 'MainFontBold';
-  color: ${palette('text', 0)};
-  font-size: 18px;
+  font-family: 'MainFontRegular';
+  color: ${palette('text', 1)};
+  font-size: 16px;
 `
 
 export const UpdatesButton = styled(UIButton).attrs({
@@ -102,14 +102,20 @@ export const ExternalLinkIcon = styled(ExternalLinkIconUI)`
   }
 `
 
-export const ConnectionStatus = styled(UIConnectionStatus)`
-  margin-right: 10px;
-`
+export const NetworkLabel = styled(Text)<{ network: Network }>`
+  text-transform: uppercase;
+  padding: 0;
+  font-size: 16px;
+  font-family: 'MainFontRegular';
 
-export const ConnectionSubSection = styled.div`
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  justify-content: center;
-  padding-bottom: 10px;
+  color: ${({ network }) => {
+    switch (network) {
+      case 'mainnet':
+        return palette('primary', 0)
+      case 'testnet':
+        return palette('warning', 0)
+      default:
+        return palette('text', 2)
+    }
+  }};
 `
