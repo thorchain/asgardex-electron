@@ -7,7 +7,8 @@ import {
   assetToString,
   assetToBase,
   assetAmount,
-  BaseAmount
+  BaseAmount,
+  bnOrZero
 } from '@xchainjs/xchain-util'
 import * as A from 'fp-ts/Array'
 import * as FP from 'fp-ts/lib/function'
@@ -160,3 +161,6 @@ export const minPoolTxAmountUSD = (asset: Asset): BaseAmount => {
   // anything else $10
   else return value(10)
 }
+
+export const isEmptyPool = ({ assetDepth, runeDepth }: Pick<PoolDetail, 'assetDepth' | 'runeDepth'>): boolean =>
+  bnOrZero(assetDepth).isZero() || bnOrZero(runeDepth).isZero()

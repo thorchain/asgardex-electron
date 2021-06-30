@@ -27,7 +27,8 @@ import {
   getBlocksLeftForPendingPoolAsString,
   filterTableData,
   minPoolTxAmountUSD,
-  stringToGetPoolsStatus
+  stringToGetPoolsStatus,
+  isEmptyPool
 } from './Pools.utils'
 
 describe('views/pools/utils', () => {
@@ -271,6 +272,21 @@ describe('views/pools/utils', () => {
       const status = 'other'
       const result = stringToGetPoolsStatus(status)
       expect(result).toEqual(GetPoolsStatusEnum.Suspended)
+    })
+  })
+
+  describe('isEmptyPool', () => {
+    it('empty if assetDepth and runeDepth are zero', () => {
+      expect(isEmptyPool({ assetDepth: '0', runeDepth: '0' })).toBeTruthy()
+    })
+    it('empty if assetDepth is zero', () => {
+      expect(isEmptyPool({ assetDepth: '0', runeDepth: '100' })).toBeTruthy()
+    })
+    it('empty if runeDepth is zero', () => {
+      expect(isEmptyPool({ assetDepth: '100', runeDepth: '0' })).toBeTruthy()
+    })
+    it('not empty if assetDepth and runeDepth are NOT zero', () => {
+      expect(isEmptyPool({ assetDepth: '100', runeDepth: '200' })).toBeFalsy()
     })
   })
 })

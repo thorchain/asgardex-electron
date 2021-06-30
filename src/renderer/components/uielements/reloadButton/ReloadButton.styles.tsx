@@ -5,13 +5,22 @@ import styled from 'styled-components'
 
 import { Button as UIButton, ButtonProps as UIButtonProps } from '../../uielements/button'
 
+const ContentWrapper = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+`
+
+const ChildrenWrapper = styled.span`
+  padding-left: 10px;
+`
 export const ReloadButton = styled(UIButton).attrs<UIButtonProps>(({ children }) => ({
   typevalue: 'outline',
   children: (
-    <>
+    <ContentWrapper>
       <SyncOutlined />
-      {children && <span>{children}</span>}
-    </>
+      {children && <ChildrenWrapper>{children}</ChildrenWrapper>}
+    </ContentWrapper>
   )
 }))`
   &.ant-btn {
