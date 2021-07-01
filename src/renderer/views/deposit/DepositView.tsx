@@ -194,7 +194,11 @@ export const DepositView: React.FC<Props> = () => {
         assetWithDecimalRD,
         RD.fold(
           () => <></>,
-          () => <Spin size="large" />,
+          () => (
+            <Styled.Container>
+              <Spin size="large" />
+            </Styled.Container>
+          ),
           (error) => (
             <ErrorView
               title={intl.formatMessage({ id: 'common.error' })}

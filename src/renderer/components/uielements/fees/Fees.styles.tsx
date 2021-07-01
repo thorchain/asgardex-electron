@@ -27,6 +27,9 @@ export const Container = styled('div')`
 `
 
 export const FeeLabel = styled(UILabel)<{ isError?: boolean; isLoading?: boolean }>`
+  text-transform: uppercase;
+  font-size: 12px;
+  font-family: 'MainFontRegular';
   color: ${({ isError, isLoading }) =>
     isError ? palette('error', 0) : isLoading ? palette('gray', 2) : palette('text', 0)};
 `

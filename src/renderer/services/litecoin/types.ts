@@ -1,5 +1,5 @@
 import * as RD from '@devexperts/remote-data-ts'
-import { FeesWithRates } from '@xchainjs/xchain-bitcoin'
+import { FeesWithRates } from '@xchainjs/xchain-client'
 import { Client } from '@xchainjs/xchain-litecoin'
 import { Asset, BaseAmount } from '@xchainjs/xchain-util'
 

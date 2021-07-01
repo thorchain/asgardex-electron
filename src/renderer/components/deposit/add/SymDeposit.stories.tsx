@@ -49,6 +49,7 @@ const defaultProps: SymDepositProps = {
   asset: { asset: AssetBNB, decimal: BNB_DECIMAL },
   assetPrice: bn(2),
   runePrice: bn(1),
+  walletBalancesLoading: false,
   assetBalance: O.some(assetToBase(assetAmount(200))),
   runeBalance: O.some(assetToBase(assetAmount(100))),
   chainAssetBalance: O.some(assetToBase(assetAmount(55))),
@@ -133,6 +134,15 @@ export const BalanceError: Story = () => {
   return <SymDeposit {...props} />
 }
 BalanceError.storyName = 'balance error'
+
+export const BalanceLoading: Story = () => {
+  const props: SymDepositProps = {
+    ...defaultProps,
+    walletBalancesLoading: true
+  }
+  return <SymDeposit {...props} />
+}
+BalanceError.storyName = 'balance loading'
 
 export const FeeError: Story = () => {
   const props: SymDepositProps = {

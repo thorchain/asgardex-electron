@@ -2,9 +2,8 @@ import React, { useMemo } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
 import { Story, Meta } from '@storybook/react'
-import { FeeRates } from '@xchainjs/xchain-bitcoin'
 import { BTC_DECIMAL } from '@xchainjs/xchain-bitcoin'
-import { Fees } from '@xchainjs/xchain-client'
+import { FeeRates, Fees } from '@xchainjs/xchain-client'
 import {
   assetAmount,
   AssetBNB,

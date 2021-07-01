@@ -56,6 +56,8 @@ const common: CommonMessages = {
   'common.withdraw': 'Withdraw',
   'common.liquidity': 'Liquidity',
   'common.approve': 'Approve',
+  'common.approve.checking': 'Checking allowance for {asset}',
+  'common.approve.error': 'Error while checking allowance for {asset}: {error}',
   'common.step': 'Step {current}/{total}',
   'common.done': 'Done',
   'common.thorAddress': 'THORAddress',
@@ -83,7 +85,9 @@ const common: CommonMessages = {
   'common.theme.light': 'Day mode',
   'common.theme.dark': 'Night mode',
   'common.volume24': 'Volume (24h)',
-  'common.informationMore': 'More information'
+  'common.informationMore': 'More information',
+  'common.balance': 'Balance',
+  'common.balance.loading': 'Loading balance'
 }
 
 export default common

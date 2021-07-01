@@ -108,7 +108,10 @@ export const SymDepositView: React.FC<Props> = (props) => {
   const runPrice = useObservableState(priceRatio$, bn(1))
   const [selectedPricePoolAsset] = useObservableState(() => FP.pipe(selectedPricePoolAsset$, RxOp.map(O.toUndefined)))
 
-  const { balances: walletBalances } = useObservableState(balancesState$, INITIAL_BALANCES_STATE)
+  const { balances: walletBalances, loading: walletBalancesLoading } = useObservableState(
+    balancesState$,
+    INITIAL_BALANCES_STATE
+  )
 
   const assetBalance: O.Option<BaseAmount> = useMemo(
     () =>
@@ -232,6 +235,7 @@ export const SymDepositView: React.FC<Props> = (props) => {
           assetPrice={ZERO_BN}
           runePrice={ZERO_BN}
           assetBalance={O.none}
+          walletBalancesLoading={false}
           runeBalance={O.none}
           chainAssetBalance={O.none}
           fees$={symDepositFees$}
@@ -304,6 +308,7 @@ export const SymDepositView: React.FC<Props> = (props) => {
               asset={assetWD}
               assetPrice={assetPrice}
               runePrice={runPrice}
+              walletBalancesLoading={walletBalancesLoading}
               assetBalance={assetBalance}
               runeBalance={runeBalance}
               chainAssetBalance={chainAssetBalance}

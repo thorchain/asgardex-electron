@@ -1,9 +1,8 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
-import { FeeOptionKey } from '@xchainjs/xchain-client'
+import { FeeOptionKey, FeesWithRates } from '@xchainjs/xchain-client'
 import { LTC_DECIMAL } from '@xchainjs/xchain-litecoin'
-import { FeesWithRates } from '@xchainjs/xchain-litecoin/lib/types/client-types'
 import {
   assetAmount,
   AssetLTC,

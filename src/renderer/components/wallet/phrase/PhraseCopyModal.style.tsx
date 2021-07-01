@@ -45,6 +45,7 @@ export const Item = styled.div`
   min-width: 120px;
   text-align: center;
   text-transform: lowercase;
+  font-size: 14px;
 `
 
 export const Number = styled.div`

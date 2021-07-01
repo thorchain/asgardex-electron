@@ -61,7 +61,6 @@ import { TxModal } from '../../modal/tx'
 import { DepositAssets } from '../../modal/tx/extra'
 import { ViewTxButton } from '../../uielements/button'
 import { Fees, UIFeesRD } from '../../uielements/fees'
-import { formatFee } from '../../uielements/fees/Fees.helper'
 import * as Helper from './Deposit.helper'
 import * as Styled from './Deposit.style'
 import { PendingAssets as PendingAssetsUI } from './Deposit.subcomponents'
@@ -69,6 +68,7 @@ import { PendingAssets as PendingAssetsUI } from './Deposit.subcomponents'
 export type Props = {
   asset: AssetWithDecimal
   assetPrice: BigNumber
+  walletBalancesLoading: boolean
   assetBalance: O.Option<BaseAmount>
   runePrice: BigNumber
   runeBalance: O.Option<BaseAmount>
@@ -107,6 +107,7 @@ export const SymDeposit: React.FC<Props> = (props) => {
   const {
     asset: { asset, decimal: assetDecimal },
     assetPrice,
+    walletBalancesLoading,
     assetBalance: oAssetBalance,
     runePrice,
     runeBalance: oRuneBalance,
@@ -235,8 +236,8 @@ export const SymDeposit: React.FC<Props> = (props) => {
     return FP.pipe(
       sequenceTOption(oTokenAddress, oRouterAddress),
       O.map(([tokenAddress, routerAddress]) => ({
-        spender: routerAddress,
-        sender: tokenAddress
+        spenderAddress: routerAddress,
+        contractAddress: tokenAddress
       }))
     )
   }, [oPoolAddress, asset])
@@ -569,12 +570,16 @@ export const SymDeposit: React.FC<Props> = (props) => {
       const msg = intl.formatMessage(
         { id: 'deposit.add.error.chainFeeNotCovered' },
         {
-          fee: formatFee({ amount: fee, asset }),
+          fee: formatAssetAmountCurrency({
+            asset: getChainAsset(asset.chain),
+            trimZeros: true,
+            amount: baseToAsset(fee)
+          }),
           balance: formatAssetAmountCurrency({ amount: baseToAsset(amount), asset, trimZeros: true })
         }
       )
 
-      return <Styled.FeeErrorLabel>{msg}</Styled.FeeErrorLabel>
+      return <Styled.ErrorLabel>{msg}</Styled.ErrorLabel>
     },
     [intl]
   )
@@ -825,12 +830,22 @@ export const SymDeposit: React.FC<Props> = (props) => {
     if (
       !isApproveFeeError ||
       // Don't render anything if chainAssetBalance is not available (still loading)
-      O.isNone(oChainAssetBalance)
+      O.isNone(oChainAssetBalance) ||
+      // Don't render error if walletBalances are still loading
+      walletBalancesLoading
     )
       return <></>
 
     return renderFeeError(approveFee, chainAssetBalance, getChainAsset(asset.chain))
-  }, [isApproveFeeError, oChainAssetBalance, renderFeeError, approveFee, chainAssetBalance, asset.chain])
+  }, [
+    isApproveFeeError,
+    oChainAssetBalance,
+    walletBalancesLoading,
+    renderFeeError,
+    approveFee,
+    chainAssetBalance,
+    asset.chain
+  ])
 
   const {
     state: approveState,
@@ -849,8 +864,8 @@ export const SymDeposit: React.FC<Props> = (props) => {
       O.map(([routerAddress, tokenAddress]) =>
         subscribeApproveState(
           approveERC20Token$({
-            spender: routerAddress,
-            sender: tokenAddress
+            contractAddress: tokenAddress,
+            spenderAddress: routerAddress
           })
         )
       )
@@ -864,7 +879,7 @@ export const SymDeposit: React.FC<Props> = (props) => {
         RD.fold(
           () => <></>,
           () => <></>,
-          (error) => <Styled.ErrorLabel key="approveErrorLabel">{error.msg}</Styled.ErrorLabel>,
+          (error) => <Styled.ErrorLabel>{error.msg}</Styled.ErrorLabel>,
           () => <></>
         )
       ),
@@ -876,7 +891,7 @@ export const SymDeposit: React.FC<Props> = (props) => {
     state: isApprovedState,
     reset: resetIsApprovedState,
     subscribe: subscribeIsApprovedState
-  } = useSubscriptionState<IsApprovedRD>(RD.success(true))
+  } = useSubscriptionState<IsApprovedRD>(RD.initial)
 
   const isApproved = useMemo(
     () =>
@@ -891,6 +906,12 @@ export const SymDeposit: React.FC<Props> = (props) => {
       ),
     [approveState, isApprovedState, needApprovement]
   )
+
+  const checkIsApproved = useMemo(() => {
+    if (!needApprovement) return false
+    // ignore initial + loading states for `isApprovedState`
+    return RD.isPending(isApprovedState)
+  }, [isApprovedState, needApprovement])
 
   const checkApprovedStatus = useCallback(
     (routerAddress: string) => {
@@ -907,8 +928,8 @@ export const SymDeposit: React.FC<Props> = (props) => {
         O.map(([_, tokenAddress]) =>
           subscribeIsApprovedState(
             isApprovedERC20Token$({
-              spender: routerAddress,
-              sender: tokenAddress
+              contractAddress: tokenAddress,
+              spenderAddress: routerAddress
             })
           )
         )
@@ -916,6 +937,32 @@ export const SymDeposit: React.FC<Props> = (props) => {
     },
     [asset, isApprovedERC20Token$, needApprovement, subscribeIsApprovedState]
   )
+
+  const checkIsApprovedError = useMemo(() => {
+    // ignore error check if we don't need to check allowance
+    if (!needApprovement) return false
+
+    return RD.isFailure(isApprovedState)
+  }, [needApprovement, isApprovedState])
+
+  const renderIsApprovedError = useMemo(() => {
+    if (!checkIsApprovedError) return <></>
+
+    return FP.pipe(
+      isApprovedState,
+
+      RD.fold(
+        () => <></>,
+        () => <></>,
+        (error) => (
+          <Styled.ErrorLabel align="center">
+            {intl.formatMessage({ id: 'common.approve.error' }, { asset: asset.ticker, error: error.msg })}
+          </Styled.ErrorLabel>
+        ),
+        (_) => <></>
+      )
+    )
+  }, [checkIsApprovedError, intl, isApprovedState, asset])
 
   const hasPendingAssets: boolean = useMemo(
     () =>
@@ -981,10 +1028,10 @@ export const SymDeposit: React.FC<Props> = (props) => {
       resetDepositState()
       // set values to zero
       changePercentHandler(0)
-      // reset approve state
-      resetApproveState()
       // reset isApproved state
       resetIsApprovedState()
+      // reset approve state
+      resetApproveState()
       // reset fees
       prevDepositFees.current = O.none
       // reload fees
@@ -1025,6 +1072,7 @@ export const SymDeposit: React.FC<Props> = (props) => {
       disabledForm ||
       RD.isPending(depositFeesRD) ||
       RD.isPending(approveState) ||
+      walletBalancesLoading ||
       isThorchainFeeError ||
       isAssetChainFeeError ||
       isZeroAmountToDeposit ||
@@ -1038,8 +1086,15 @@ export const SymDeposit: React.FC<Props> = (props) => {
       isThorchainFeeError,
       isZeroAmountToDeposit,
       minAssetAmountError,
-      minRuneAmountError
+      minRuneAmountError,
+      walletBalancesLoading
     ]
+  )
+
+  const disableSubmitApprove = useMemo(
+    () => checkIsApprovedError || isApproveFeeError || walletBalancesLoading,
+
+    [checkIsApprovedError, isApproveFeeError, walletBalancesLoading]
   )
 
   return (
@@ -1107,46 +1162,48 @@ export const SymDeposit: React.FC<Props> = (props) => {
           </>
         </Col>
       </Styled.CardsRow>
-
-      {isApproved ? (
-        <>
-          <Styled.FeesRow gutter={{ lg: 32 }}>
-            <Col xs={24} xl={12}>
-              <Styled.FeeRow>
-                <Fees fees={uiFeesRD} reloadFees={reloadFeesHandler} disabled={disabledForm} />
-              </Styled.FeeRow>
-              <Styled.FeeErrorRow>
-                <Col>
-                  <>
-                    {renderAssetChainFeeError}
-                    {renderThorchainFeeError}
-                  </>
-                </Col>
-              </Styled.FeeErrorRow>
-            </Col>
-          </Styled.FeesRow>
-
-          <Styled.SubmitButtonWrapper>
+      <Styled.SubmitContainer>
+        {renderIsApprovedError}
+        {(walletBalancesLoading || checkIsApproved) && (
+          <Styled.LoadingView
+            label={
+              // We show only one loading state at time
+              // Order matters: Show states with shortest loading time before others
+              // (approve state takes just a short time to load, but needs to be displayed)
+              checkIsApproved
+                ? intl.formatMessage({ id: 'common.approve.checking' }, { asset: asset.ticker })
+                : walletBalancesLoading
+                ? intl.formatMessage({ id: 'common.balance.loading' })
+                : undefined
+            }
+          />
+        )}
+        {isApproved ? (
+          <>
+            {renderAssetChainFeeError}
+            {renderThorchainFeeError}
             <Styled.SubmitButton sizevalue="xnormal" onClick={confirmDepositHandler} disabled={disableSubmit}>
               {intl.formatMessage({ id: 'common.add' })}
             </Styled.SubmitButton>
-          </Styled.SubmitButtonWrapper>
-        </>
-      ) : (
-        <Styled.SubmitContainer>
-          <Styled.SubmitButton
-            sizevalue="xnormal"
-            onClick={onApprove}
-            loading={RD.isPending(approveState)}
-            color="warning"
-            disabled={isApproveFeeError}>
-            {intl.formatMessage({ id: 'common.approve' })}
-          </Styled.SubmitButton>
-          {!RD.isInitial(uiApproveFeesRD) && <Fees fees={uiApproveFeesRD} reloadFees={reloadApproveFeesHandler} />}
-          {renderApproveFeeError}
-          {renderApproveError}
-        </Styled.SubmitContainer>
-      )}
+            <Fees fees={uiFeesRD} reloadFees={reloadFeesHandler} disabled={disabledForm} />
+          </>
+        ) : (
+          <>
+            {renderApproveFeeError}
+            {renderApproveError}
+            <Styled.SubmitButton
+              sizevalue="xnormal"
+              color="warning"
+              disabled={disableSubmitApprove}
+              onClick={onApprove}
+              loading={RD.isPending(approveState)}>
+              {intl.formatMessage({ id: 'common.approve' })}
+            </Styled.SubmitButton>
+
+            {!RD.isInitial(uiApproveFeesRD) && <Fees fees={uiApproveFeesRD} reloadFees={reloadApproveFeesHandler} />}
+          </>
+        )}
+      </Styled.SubmitContainer>
       {showPasswordModal && (
         <PasswordModal
           onSuccess={onSucceedPasswordModal}

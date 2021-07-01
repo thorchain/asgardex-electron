@@ -5,7 +5,6 @@ const swap: SwapMessages = {
   'swap.state.success': 'Successful swap',
   'swap.state.error': 'Swap error',
   'swap.input': 'Input',
-  'swap.balance': 'Balance',
   'swap.output': 'Output',
   'swap.errors.amount.balanceShouldCoverChainFee':
     'Transaction fee {fee} needs to be covered by your balance (currently {balance}).',

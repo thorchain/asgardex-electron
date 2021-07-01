@@ -31,7 +31,10 @@ export const createFeesService = ({ client$, chain }: { client$: Client$; chain:
           O.fold(
             () => Rx.of(RD.initial),
             (client) =>
-              Rx.combineLatest([client.estimateCall(address, abi, func, params), client.estimateGasPrices()]).pipe(
+              Rx.combineLatest([
+                client.estimateCall({ contractAddress: address, abi, funcName: func, funcParams: params }),
+                client.estimateGasPrices()
+              ]).pipe(
                 RxOp.map(
                   ([gasLimit, gasPrices]) =>
                     ({
@@ -85,7 +88,7 @@ export const createFeesService = ({ client$, chain }: { client$: Client$; chain:
   /**
    * Fees for approve Tx
    **/
-  const approveTxFee$ = ({ spender, sender, amount }: ApproveParams): FeeLD =>
+  const approveTxFee$ = ({ spenderAddress, contractAddress, amount }: ApproveParams): FeeLD =>
     client$.pipe(
       RxOp.switchMap((oClient) =>
         FP.pipe(
@@ -93,7 +96,10 @@ export const createFeesService = ({ client$, chain }: { client$: Client$; chain:
           O.fold(
             () => Rx.of(RD.initial),
             (client) =>
-              Rx.combineLatest([client.estimateApprove({ spender, sender, amount }), client.estimateGasPrices()]).pipe(
+              Rx.combineLatest([
+                client.estimateApprove({ contractAddress, spenderAddress, amount }),
+                client.estimateGasPrices()
+              ]).pipe(
                 RxOp.map(([gasLimit, gasPrices]) => getFee({ gasPrice: gasPrices.fast, gasLimit })),
                 RxOp.map(RD.success),
                 RxOp.catchError((_) => Rx.of(RD.success(getDefaultFees().fast))),

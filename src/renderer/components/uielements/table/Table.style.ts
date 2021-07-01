@@ -22,7 +22,7 @@ export const TableWrapper = styled(Table)`
     }
 
     .ant-table-column-title {
-      padding-top: 6px;
+      padding-right: 4px;
     }
   }
 

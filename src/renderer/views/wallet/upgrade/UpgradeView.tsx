@@ -144,7 +144,7 @@ export const UpgradeView: React.FC<Props> = (): JSX.Element => {
         runeNonNativeAssetRD,
         RD.fold(
           () => <></>,
-          () => <LoadingView />,
+          () => <LoadingView size="large" />,
           renderAssetError,
           (runeAsset) =>
             FP.pipe(

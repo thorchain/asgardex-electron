@@ -11,6 +11,8 @@ export const AppWrapper = styled.div`
   background: ${palette('background', 3)};
   padding: 0;
 
+  font-family: 'MainFontRegular';
+
   a {
     transition: none;
   }
@@ -23,6 +25,9 @@ export const AppWrapper = styled.div`
     &-table-thead > tr > th,
     &-table-tbody > tr > td {
       transition: none;
+    }
+    &-spin-dot-item {
+      background-color: ${palette('primary', 0)};
     }
   }
 `

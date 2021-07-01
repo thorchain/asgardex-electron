@@ -1,6 +1,6 @@
 import * as RD from '@devexperts/remote-data-ts'
-import { FeeOptionKey } from '@xchainjs/xchain-client'
-import { Address, Client, FeesParams, FeesWithGasPricesAndLimits } from '@xchainjs/xchain-ethereum'
+import { FeeOptionKey, XChainClient } from '@xchainjs/xchain-client'
+import { Address, EthereumClient, FeesParams, FeesWithGasPricesAndLimits } from '@xchainjs/xchain-ethereum'
 import { Asset, BaseAmount } from '@xchainjs/xchain-util'
 import { BigNumber, ethers } from 'ethers'
 
@@ -9,6 +9,7 @@ import { FeeLD, SendPoolTxParams } from '../chain/types'
 import * as C from '../clients'
 import { ApiError, TxHashLD } from '../wallet/types'
 
+export type Client = XChainClient & EthereumClient
 export type Client$ = C.Client$<Client>
 
 export type ClientState = C.ClientState<Client>
@@ -32,18 +33,16 @@ export type SendTxParams = {
 }
 
 export type ApproveParams = {
-  spender: Address
-  sender: Address
+  contractAddress: Address
+  spenderAddress: Address
   amount?: BaseAmount
-  walletIndex?: number
 }
 
 export type PollInTxFeeParams = {
   address: Address
   abi: ethers.ContractInterface
   func: string
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  params: Array<any>
+  params: Array<unknown>
 }
 
 export type IsApprovedRD = RD.RemoteData<ApiError, boolean>

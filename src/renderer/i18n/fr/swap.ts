@@ -5,7 +5,6 @@ const swap: SwapMessages = {
   'swap.state.success': 'Échange réussi',
   'swap.state.error': "Erreur lors de l'échange",
   'swap.input': 'Entrée',
-  'swap.balance': 'Solde',
   'swap.output': 'Sortie',
   'swap.errors.amount.balanceShouldCoverChainFee':
     '{fee} de frais de transaction doivent être couverts par votre solde (actuellement {balance}).',

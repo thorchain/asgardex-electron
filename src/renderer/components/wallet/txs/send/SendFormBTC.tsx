@@ -2,8 +2,7 @@ import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
 import { BTC_DECIMAL } from '@xchainjs/xchain-bitcoin'
-import { FeesWithRates } from '@xchainjs/xchain-bitcoin/lib/types/client-types'
-import { FeeOptionKey } from '@xchainjs/xchain-client'
+import { FeeOptionKey, FeesWithRates } from '@xchainjs/xchain-client'
 import {
   assetAmount,
   AssetBTC,

@@ -102,8 +102,8 @@ export const ValueItemContainer = styled('div')`
     &>*:first-child {
       margin-right: 25px;
       min-width: 60%;
-   `}
-  }
+    }
+  `}
 `
 
 export const SliderContainer = styled('div')`
@@ -122,11 +122,12 @@ export const InValueContainer = styled('div')`
 
 export const InValueTitle = styled(UILabel).attrs({
   color: 'gray',
-  textTransform: 'uppercase',
-  size: 'small'
+  textTransform: 'uppercase'
 })`
+font-family: 'MainFontRegular'
   margin-right: 10px;
   padding: 0;
+  font-size: 12px;
 `
 
 export const InValueLabel = styled(UILabel).attrs({
@@ -153,10 +154,6 @@ export const ErrorLabel = styled(UILabel)`
   font-family: 'MainFontRegular';
   text-transform: uppercase;
   color: ${palette('error', 0)};
-  text-align: center;
-`
-
-export const FeeErrorLabel = styled(ErrorLabel)`
   text-align: center;
 `
 
@@ -189,7 +186,6 @@ export const SubmitButton = styled(UIButton).attrs({
   round: 'true'
 })`
   min-width: 200px !important;
-  margin-bottom: 30px;
-  padding-left: 30px;
-  padding-right: 30px;
+  padding: 0 30px;
+  margin: 30px 0;
 `

@@ -2,9 +2,9 @@ import React from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
 import { Meta, Story } from '@storybook/react'
-import { FeeRates, validateAddress } from '@xchainjs/xchain-bitcoin'
+import { validateAddress } from '@xchainjs/xchain-bitcoin'
 import { BTC_DECIMAL } from '@xchainjs/xchain-bitcoin'
-import { Fees } from '@xchainjs/xchain-client'
+import { FeeRates, Fees } from '@xchainjs/xchain-client'
 import {
   assetAmount,
   AssetBTC,

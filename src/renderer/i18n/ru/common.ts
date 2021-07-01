@@ -56,6 +56,8 @@ const common: CommonMessages = {
   'common.liquidity': 'Ликвиидиность',
   'common.withdraw': 'Изъятие',
   'common.approve': 'Подвердить',
+  'common.approve.checking': 'Checking allowance for {asset} - RU',
+  'common.approve.error': 'Error while checking allowance for {asset}: {error} - RU',
   'common.step': 'Шаг {current}/{total}',
   'common.done': 'Готово',
   'common.thorAddress': 'THOR Адрес',
@@ -83,7 +85,9 @@ const common: CommonMessages = {
   'common.theme.light': 'Светлая тема',
   'common.theme.dark': 'Темная тема',
   'common.volume24': 'Количество (24ч)',
-  'common.informationMore': 'More information - RU'
+  'common.informationMore': 'More information - RU',
+  'common.balance': 'Баланс',
+  'common.balance.loading': 'Loading balance - RU'
 }
 
 export default common

@@ -1,6 +1,6 @@
 import * as RD from '@devexperts/remote-data-ts'
 import { TxHash } from '@xchainjs/xchain-client'
-import { Client as EthClient, ETHAddress } from '@xchainjs/xchain-ethereum'
+import { ETHAddress } from '@xchainjs/xchain-ethereum'
 import { baseAmount } from '@xchainjs/xchain-util'
 import BigNumber from 'bignumber.js'
 import * as FP from 'fp-ts/lib/function'
@@ -15,7 +15,7 @@ import { SendPoolTxParams } from '../chain/types'
 import * as C from '../clients'
 import { ethRouterABI } from '../const'
 import { ApiError, ErrorId, TxHashLD } from '../wallet/types'
-import { ApproveParams, Client$, TransactionService, IsApprovedLD } from './types'
+import { ApproveParams, Client$, Client as EthClient, TransactionService, IsApprovedLD } from './types'
 
 export const createTransactionService = (client$: Client$): TransactionService => {
   const common = C.createTransactionService(client$)
@@ -46,20 +46,26 @@ export const createTransactionService = (client$: Client$): TransactionService =
                 // Note:
                 // Amounts need to use `toFixed` to convert `BaseAmount` to `Bignumber`
                 // since `value` and `gasPrice` type is `Bignumber`
-                client.call<{ hash: TxHash }>(walletIndex, router, ethRouterABI, 'deposit', [
-                  params.recipient,
-                  address,
-                  // Send `BaseAmount` w/o decimal and always round down for currencies
-                  amount.amount().toFixed(0, BigNumber.ROUND_DOWN),
-                  params.memo,
-                  isETHAddress
-                    ? {
-                        // Send `BaseAmount` w/o decimal and always round down for currencies
-                        value: params.amount.amount().toFixed(0, BigNumber.ROUND_DOWN),
-                        gasPrice
-                      }
-                    : { gasPrice }
-                ])
+                client.call<{ hash: TxHash }>({
+                  walletIndex,
+                  contractAddress: router,
+                  abi: ethRouterABI,
+                  funcName: 'deposit',
+                  funcParams: [
+                    params.recipient,
+                    address,
+                    // Send `BaseAmount` w/o decimal and always round down for currencies
+                    amount.amount().toFixed(0, BigNumber.ROUND_DOWN),
+                    params.memo,
+                    isETHAddress
+                      ? {
+                          // Send `BaseAmount` w/o decimal and always round down for currencies
+                          value: params.amount.amount().toFixed(0, BigNumber.ROUND_DOWN),
+                          gasPrice
+                        }
+                      : { gasPrice }
+                  ]
+                })
               )
             }),
             RxOp.map((txResult) => txResult.hash),
@@ -84,16 +90,17 @@ export const createTransactionService = (client$: Client$): TransactionService =
       )
     )
 
-  const runApproveERC20Token$ = (client: EthClient, { walletIndex = 0, ...params }: ApproveParams): TxHashLD =>
+  const runApproveERC20Token$ = (client: EthClient, { ...params }: ApproveParams): TxHashLD =>
     Rx.from(
       client.approve({
         ...params,
-        walletIndex,
-        feeOptionKey: 'fast'
+        walletIndex: 0,
+        feeOptionKey: 'fast',
+        gasLimitFallback: '65000'
       })
     ).pipe(
       RxOp.switchMap((txResult) => Rx.from(txResult.wait(1))),
-      RxOp.map((txReceipt) => txReceipt.transactionHash),
+      RxOp.map(({ transactionHash }) => transactionHash),
       RxOp.map(RD.success),
       RxOp.catchError(
         (error): TxHashLD =>
@@ -120,8 +127,12 @@ export const createTransactionService = (client$: Client$): TransactionService =
       )
     )
 
-  const runIsApprovedERC20Token$ = (client: EthClient, params: ApproveParams): LiveData<ApiError, boolean> =>
-    Rx.from(client.isApproved(params.spender, params.sender, params.amount || baseAmount('1'))).pipe(
+  const runIsApprovedERC20Token$ = (
+    client: EthClient,
+    { contractAddress, spenderAddress, amount }: ApproveParams
+  ): LiveData<ApiError, boolean> =>
+    FP.pipe(
+      Rx.from(client.isApproved({ contractAddress, spenderAddress, amount })),
       RxOp.map(RD.success),
       RxOp.catchError(
         (error): LiveData<ApiError, boolean> =>
