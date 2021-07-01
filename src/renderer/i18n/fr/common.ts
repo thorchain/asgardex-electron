@@ -56,6 +56,8 @@ const common: CommonMessages = {
   'common.liquidity': 'Liquidité',
   'common.withdraw': 'Retrait',
   'common.approve': 'Approuver',
+  'common.approve.checking': 'Checking allowance for {asset} - FR',
+  'common.approve.error': 'Error while checking allowance for {asset}: {error} - FR',
   'common.step': 'Étape {current}/{total}',
   'common.done': 'Terminé',
   'common.thorAddress': 'Adresse THOR',
@@ -85,7 +87,7 @@ const common: CommonMessages = {
   'common.volume24': 'Volume (24h)',
   'common.informationMore': "Plus d'information",
   'common.balance': 'Solde',
-  'common.balance.loading': 'Loading balance ...'
+  'common.balance.loading': 'Loading balance - FR'
 }
 
 export default common

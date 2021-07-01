@@ -6,8 +6,6 @@ const swap: SwapMessages = {
   'swap.state.success': 'Erfolgreich getauscht',
   'swap.input': 'Eingabe',
   'swap.output': 'Ausgabe',
-  'swap.approve.checking': 'Überpüfe Tauscherlaubnis für {asset} ...',
-  'swap.approve.error': 'Error beim Überpüfen der Tauscherlaubnis für {asset}: {error}',
   'swap.errors.amount.balanceShouldCoverChainFee':
     'Transaktionsgebühr in Höhe von {fee} ist nicht über Dein Guthaben {balance} gedeckt.',
   'swap.errors.amount.outputShouldCoverChainFee':

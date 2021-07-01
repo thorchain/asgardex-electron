@@ -6,8 +6,6 @@ const swap: SwapMessages = {
   'swap.state.error': 'Swap error',
   'swap.input': 'Input',
   'swap.output': 'Output',
-  'swap.approve.checking': 'Checking allowance to swap {asset} ...',
-  'swap.approve.error': 'Error while checking allowance to swap {asset}: {error}',
   'swap.errors.amount.balanceShouldCoverChainFee':
     'Transaction fee {fee} needs to be covered by your balance (currently {balance}).',
   'swap.errors.amount.outputShouldCoverChainFee':

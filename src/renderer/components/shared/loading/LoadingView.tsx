@@ -8,12 +8,13 @@ import * as Styled from './LoadingView.styles'
 type LoadingViewProps = {
   label?: string
   size?: SpinSize
+  className?: string
 }
 
-export const LoadingView: React.FC<LoadingViewProps> = ({ label, size = 'default' }) => {
+export const LoadingView: React.FC<LoadingViewProps> = ({ label, size = 'default', className }) => {
   const intl = useIntl()
   return (
-    <Styled.Space>
+    <Styled.Space className={className}>
       <Styled.Spin size={size} tip={label || intl.formatMessage({ id: 'common.loading' })} />
     </Styled.Space>
   )

@@ -157,10 +157,6 @@ export const ErrorLabel = styled(UILabel)`
   text-align: center;
 `
 
-export const FeeErrorLabel = styled(ErrorLabel)`
-  text-align: center;
-`
-
 export const NoteLabel = styled(UILabel)`
   color: ${palette('text', 2)};
 `
@@ -190,7 +186,6 @@ export const SubmitButton = styled(UIButton).attrs({
   round: 'true'
 })`
   min-width: 200px !important;
+  padding: 0 30px;
   margin-bottom: 30px;
-  padding-left: 30px;
-  padding-right: 30px;
 `

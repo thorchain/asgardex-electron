@@ -56,6 +56,8 @@ const common: CommonMessages = {
   'common.liquidity': 'Liquidität',
   'common.withdraw': 'Auszahlen',
   'common.approve': 'Erlauben',
+  'common.approve.checking': 'Überpüfe Erlaubnis für {asset}',
+  'common.approve.error': 'Error beim Überpüfen der Erlaubnis für {asset}: {error}',
   'common.step': 'Schritt {current}/{total}',
   'common.done': 'Fertig',
   'common.thorAddress': 'THOR Addresse',
@@ -84,8 +86,8 @@ const common: CommonMessages = {
   'common.theme.dark': 'Nacht modus',
   'common.volume24': 'Volumen (24h)',
   'common.informationMore': 'Mehr Informationen',
-  'common.balance': 'Saldo',
-  'common.balance.loading': 'Lade Saldo ...'
+  'common.balance': 'Guthaben',
+  'common.balance.loading': 'Lade Guthaben'
 }
 
 export default common

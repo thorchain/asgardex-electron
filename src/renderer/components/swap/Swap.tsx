@@ -760,7 +760,7 @@ export const Swap = ({
     } = swapFees
 
     return (
-      <Styled.FeeErrorLabel key="sourceChainErrorLabel">
+      <Styled.ErrorLabel>
         {intl.formatMessage(
           { id: 'swap.errors.amount.balanceShouldCoverChainFee' },
           {
@@ -776,7 +776,7 @@ export const Swap = ({
             })
           }
         )}
-      </Styled.FeeErrorLabel>
+      </Styled.ErrorLabel>
     )
   }, [sourceChainFeeError, swapFees, intl, sourceAssetProp.chain, sourceChainAssetAmount])
 
@@ -849,9 +849,7 @@ export const Swap = ({
     return sourceChainAssetAmount.lt(approveFee)
   }, [needApprovement, sourceChainAssetAmount, approveFee])
 
-  // sourceChainFeeErrorLabel
-
-  const approveFeeErrorLabel: JSX.Element = useMemo(() => {
+  const renderApproveFeeError: JSX.Element = useMemo(() => {
     if (
       !isApproveFeeError ||
       // Don't render error if walletBalances are still loading
@@ -860,7 +858,7 @@ export const Swap = ({
       return <></>
 
     return (
-      <Styled.FeeErrorLabel>
+      <Styled.ErrorLabel>
         {intl.formatMessage(
           { id: 'swap.errors.amount.balanceShouldCoverChainFee' },
           {
@@ -876,7 +874,7 @@ export const Swap = ({
             })
           }
         )}
-      </Styled.FeeErrorLabel>
+      </Styled.ErrorLabel>
     )
   }, [isApproveFeeError, walletBalancesLoading, intl, sourceAssetProp.chain, sourceChainAssetAmount, approveFee])
 
@@ -925,10 +923,9 @@ export const Swap = ({
     subscribe: subscribeIsApprovedState
   } = useSubscriptionState<IsApprovedRD>(RD.initial)
 
-  const isApproved = useMemo(() => {
-    if (!needApprovement) return true
-
-    return (
+  const isApproved = useMemo(
+    () =>
+      !needApprovement ||
       RD.isSuccess(approveState) ||
       FP.pipe(
         isApprovedState,
@@ -936,9 +933,9 @@ export const Swap = ({
         // to avoid switch between approve and submit button
         // Submit button will still be disabled
         RD.getOrElse(() => true)
-      )
-    )
-  }, [approveState, isApprovedState, needApprovement])
+      ),
+    [approveState, isApprovedState, needApprovement]
+  )
 
   const checkIsApproved = useMemo(() => {
     if (!needApprovement) return false
@@ -990,7 +987,7 @@ export const Swap = ({
         () => <></>,
         (error) => (
           <Styled.ErrorLabel align="center">
-            {intl.formatMessage({ id: 'swap.approve.error' }, { asset: sourceAssetProp.ticker, error: error.msg })}
+            {intl.formatMessage({ id: 'common.approve.error' }, { asset: sourceAssetProp.ticker, error: error.msg })}
           </Styled.ErrorLabel>
         ),
         (_) => <></>
@@ -1083,9 +1080,9 @@ export const Swap = ({
   )
 
   const disableSubmitApprove = useMemo(
-    () => checkIsApprovedError || isApproveFeeError || walletBalancesLoading || hasHaltedChain,
+    () => checkIsApprovedError || isApproveFeeError || walletBalancesLoading,
 
-    [hasHaltedChain, checkIsApprovedError, isApproveFeeError, walletBalancesLoading]
+    [checkIsApprovedError, isApproveFeeError, walletBalancesLoading]
   )
 
   return (
@@ -1168,7 +1165,7 @@ export const Swap = ({
             // Order matters: Show states with shortest loading time before others
             // (approve state takes just a short time to load, but needs to be displayed)
             checkIsApproved
-              ? intl.formatMessage({ id: 'swap.approve.checking' }, { asset: sourceAssetProp.ticker })
+              ? intl.formatMessage({ id: 'common.approve.checking' }, { asset: sourceAssetProp.ticker })
               : walletBalancesLoading
               ? intl.formatMessage({ id: 'common.balance.loading' })
               : undefined
@@ -1192,7 +1189,8 @@ export const Swap = ({
             </>
           ) : (
             <>
-              {approveFeeErrorLabel}
+              {renderApproveFeeError}
+              {renderApproveError}
               <Styled.SubmitButton
                 sizevalue="xnormal"
                 color="warning"
@@ -1203,8 +1201,6 @@ export const Swap = ({
               </Styled.SubmitButton>
 
               {!RD.isInitial(uiApproveFeesRD) && <Fees fees={uiApproveFeesRD} reloadFees={reloadApproveFeesHandler} />}
-
-              {renderApproveError}
             </>
           )
         ) : (

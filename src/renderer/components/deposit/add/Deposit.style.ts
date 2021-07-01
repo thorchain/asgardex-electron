@@ -4,6 +4,7 @@ import styled from 'styled-components'
 import { palette } from 'styled-theme'
 
 import { media } from '../../../helpers/styleHelper'
+import { LoadingView as UILoadingView } from '../../shared/loading'
 import { Alert as UIAlert } from '../../uielements/alert'
 import { AssetCard as UIAssetCard } from '../../uielements/assets/assetCard'
 import { AssetIcon as UIAssetIcon } from '../../uielements/assets/assetIcon'
@@ -93,14 +94,6 @@ export const FeeLabel = styled(UILabel).attrs({
   min-width: 150px; /* needed for loader */
 `
 
-export const FeeErrorLabel = styled(UILabel).attrs({
-  color: 'error',
-  textTransform: 'uppercase'
-})`
-  font-family: 'MainFontRegular';
-  padding: 0;
-`
-
 export const ReloadFeeButton = styled(UIButton).attrs({
   typevalue: 'outline'
 })`
@@ -125,25 +118,23 @@ export const ViewTxButtonTop = styled(UIViewTxButton)`
 `
 
 export const ErrorLabel = styled(UILabel)`
-  margin-bottom: 14px;
+  margin-bottom: 20px;
   font-family: 'MainFontRegular';
   text-transform: uppercase;
   color: ${palette('error', 0)};
   text-align: center;
 `
 
-export const SubmitContainer = styled.div`
-  margin-top: 50px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
+export const LoadingView = styled(UILoadingView)`
+  margin-bottom: 20px;
 `
-export const SubmitButtonWrapper = styled.div`
+
+export const SubmitContainer = styled.div`
+  padding: 20px 0;
   display: flex;
   flex-direction: column;
-  justify-content: center;
+  justify-content: space-between;
   align-items: center;
-  padding: 20px 0;
 `
 
 export const SubmitButton = styled(UIButton).attrs({

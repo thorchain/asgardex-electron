@@ -6,8 +6,6 @@ const swap: SwapMessages = {
   'swap.state.error': "Erreur lors de l'échange",
   'swap.input': 'Entrée',
   'swap.output': 'Sortie',
-  'swap.approve.checking': 'Checking allowance to swap {asset} ... - FR',
-  'swap.approve.error': 'Error while checking allowance to swap {asset}: {error} - FR',
   'swap.errors.amount.balanceShouldCoverChainFee':
     '{fee} de frais de transaction doivent être couverts par votre solde (actuellement {balance}).',
   'swap.errors.amount.outputShouldCoverChainFee':
