@@ -1,6 +1,5 @@
 import * as RD from '@devexperts/remote-data-ts'
-import { FeeRate } from '@xchainjs/xchain-bitcoin'
-import { Address, TxParams } from '@xchainjs/xchain-client'
+import { Address, FeeRate, TxParams } from '@xchainjs/xchain-client'
 import { Keystore } from '@xchainjs/xchain-crypto'
 import { Chain } from '@xchainjs/xchain-util'
 import { Either } from 'fp-ts/lib/Either'

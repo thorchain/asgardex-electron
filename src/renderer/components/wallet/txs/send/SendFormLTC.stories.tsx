@@ -2,8 +2,7 @@ import React from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
 import { Meta, Story } from '@storybook/react'
-import { FeeRates } from '@xchainjs/xchain-bitcoin'
-import { Fees } from '@xchainjs/xchain-client'
+import { Fees, FeeRates } from '@xchainjs/xchain-client'
 import { LTC_DECIMAL } from '@xchainjs/xchain-litecoin'
 import {
   assetAmount,
