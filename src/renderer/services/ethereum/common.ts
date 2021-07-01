@@ -57,6 +57,7 @@ const clientState$: ClientState$ = Rx.combineLatest([keystoreService.keystore$, 
               })
               return O.some(right(client)) as ClientState
             } catch (error) {
+              console.error('Failed to create ETH client', error)
               return O.some(left(error))
             }
           })

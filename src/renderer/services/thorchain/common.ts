@@ -34,6 +34,7 @@ const clientState$ = Rx.combineLatest([keystoreService.keystore$, clientNetwork$
               })
               return O.some(right(client)) as ClientState
             } catch (error) {
+              console.error('Failed to create THOR client', error)
               return O.some(left(error)) as ClientState
             }
           })
