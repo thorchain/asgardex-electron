@@ -187,5 +187,5 @@ export const SubmitButton = styled(UIButton).attrs({
 })`
   min-width: 200px !important;
   padding: 0 30px;
-  margin-bottom: 30px;
+  margin: 30px 0;
 `

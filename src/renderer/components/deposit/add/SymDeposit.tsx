@@ -61,7 +61,6 @@ import { TxModal } from '../../modal/tx'
 import { DepositAssets } from '../../modal/tx/extra'
 import { ViewTxButton } from '../../uielements/button'
 import { Fees, UIFeesRD } from '../../uielements/fees'
-import { formatFee } from '../../uielements/fees/Fees.helper'
 import * as Helper from './Deposit.helper'
 import * as Styled from './Deposit.style'
 import { PendingAssets as PendingAssetsUI } from './Deposit.subcomponents'
@@ -571,7 +570,11 @@ export const SymDeposit: React.FC<Props> = (props) => {
       const msg = intl.formatMessage(
         { id: 'deposit.add.error.chainFeeNotCovered' },
         {
-          fee: formatFee({ amount: fee, asset }),
+          fee: formatAssetAmountCurrency({
+            asset: getChainAsset(asset.chain),
+            trimZeros: true,
+            amount: baseToAsset(fee)
+          }),
           balance: formatAssetAmountCurrency({ amount: baseToAsset(amount), asset, trimZeros: true })
         }
       )
