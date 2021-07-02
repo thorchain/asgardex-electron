@@ -53,6 +53,7 @@ const clientState$ = Rx.combineLatest([keystoreService.keystore$, clientNetwork$
               })
               return O.some(right(client))
             } catch (error) {
+              console.error('Failed to create BCH client', error)
               return O.some(left(error))
             }
           })
