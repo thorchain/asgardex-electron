@@ -6,6 +6,7 @@
 - [Swap] Fix: Error `cannot estimate gas; transaction may fail or may require manual gas limit` [#1594](https://github.com/thorchain/asgardex-electron/issues/1594)
 - [Swap/Deposit] Improve `approve` handling for ERC20 tokens [#1602](https://github.com/thorchain/asgardex-electron/pull/1602)
 - [Swap/Deposit] Better feedback for loading states [#1602](https://github.com/thorchain/asgardex-electron/pull/1602)
+- Revert upgrade `xchain-bitcoin|bitcoin-cash|litecoin` [#1606](https://github.com/thorchain/asgardex-electron/pull/1606) 
 
 ## (Internal) update
 
