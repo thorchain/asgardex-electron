@@ -2,10 +2,9 @@ import * as RD from '@devexperts/remote-data-ts'
 import { Address, TxHash, XChainClient } from '@xchainjs/xchain-client'
 import { TxsPage, Fees } from '@xchainjs/xchain-client'
 import { Asset } from '@xchainjs/xchain-util'
-import * as E from 'fp-ts/lib/Either'
 import { getEitherM } from 'fp-ts/lib/EitherT'
 import * as O from 'fp-ts/lib/Option'
-import { Option, option } from 'fp-ts/lib/Option'
+import { option } from 'fp-ts/lib/Option'
 import * as Rx from 'rxjs'
 
 import { LiveData } from '../../helpers/rx/liveData'
@@ -13,18 +12,21 @@ import { WalletBalance } from '../../types/wallet'
 import { ApiError, TxLD } from '../wallet/types'
 import { TxHashLD } from '../wallet/types'
 /**
- * Three States:
- * (1) None -> no client has been instantiated
- * (2) Some(Right) -> A client has been instantiated
- * (3) Some(Left) -> An error while trying to instantiate a client
+ * States:
+ * (1) `initial` -> no client has been instantiated
+ * (2) `pending -> A client is instantiated
+ * (3) `success -> A client has been successfully instantiated
+ * (4) `failure -> An error while trying to instantiate a client
  */
-export type ClientState<C> = Option<E.Either<Error, C>>
-export type ClientState$<C> = Rx.Observable<ClientState<C>>
+export type ClientState<C> = RD.RemoteData<Error, C>
+export type ClientState$<C> = LiveData<Error, C>
 
+// TODO (@veado) Remove Monad
 // Something like `EitherT<Option>` Monad
 export const ClientStateM = getEitherM(option)
 
-export type ClientStateForViews = 'notready' | 'ready' | 'error'
+// TODO (@veado) Remove view states
+export type ClientStateForViews = 'notready' | 'pending' | 'ready' | 'error'
 
 export type XChainClient$ = Rx.Observable<O.Option<XChainClient>>
 
