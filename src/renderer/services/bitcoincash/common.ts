@@ -64,7 +64,8 @@ const clientState$: ClientState$ = FP.pipe(
         )
       ).pipe(RxOp.startWith(RD.pending))
   ),
-  RxOp.startWith<ClientState>(RD.initial)
+  RxOp.startWith<ClientState>(RD.initial),
+  RxOp.shareReplay(1)
 )
 
 const client$: Observable<O.Option<BitcoinCashClient>> = clientState$.pipe(map(RD.toOption), shareReplay(1))
