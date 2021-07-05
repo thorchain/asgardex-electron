@@ -5,8 +5,6 @@ import * as FP from 'fp-ts/lib/function'
 import { Network } from '../../../shared/api/types'
 import { ClientStateForViews, ClientState } from './types'
 
-export const hasClient = <C>(clientState: ClientState<C>): boolean => FP.pipe(clientState, RD.isSuccess)
-
 // TODO (@veado) Remove view states
 export const getClientStateForViews = <C>(clientState: ClientState<C>): ClientStateForViews =>
   FP.pipe(
