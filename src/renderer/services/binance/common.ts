@@ -6,7 +6,6 @@ import * as Rx from 'rxjs'
 import { Observable } from 'rxjs'
 import * as RxOp from 'rxjs/operators'
 
-import { LiveData, liveData } from '../../helpers/rx/liveData'
 import { clientNetwork$ } from '../app/service'
 import * as C from '../clients'
 import { Address$, ExplorerUrl$, GetExplorerTxUrl$, GetExplorerAddressUrl$ } from '../clients/types'
@@ -15,35 +14,6 @@ import { getClientStateForViews } from '../clients/utils'
 import { keystoreService } from '../wallet/keystore'
 import { getPhrase } from '../wallet/util'
 import { ClientState, ClientState$, Client$ } from './types'
-
-/**
- * Helper to load and check flags of a Binance Account
- * We accept only accounts with `flags=0`
- *
- * Note: For accounts with zero balances, we can't check `flags` (because Binance API returns 404 in this case).
- * In this case we accept the account, because every new created account will have zero balances.
- */
-const getAccountFlags = async (client: Client, walletIndex: number): Promise<number> => {
-  const address = client.getAddress(walletIndex)
-  const data = await client.getBncClient().getAccount(address)
-
-  return data?.result?.flags ?? 0
-}
-
-/**
- * Helper to checks `flags` value of a Binance account
- */
-const checkAccountsFlags$ = (client: Client, walletIndex: number): LiveData<Error, Client> =>
-  FP.pipe(
-    Rx.from(getAccountFlags(client, walletIndex)),
-    RxOp.map((flag) =>
-      flag === 0 ? RD.success(client) : RD.failure<Error>(Error(`Invalid BNB account (flag id: ${flag}`))
-    ),
-    RxOp.startWith(RD.pending),
-    RxOp.catchError((error: Error) =>
-      Rx.of(RD.failure(Error(`Invalid account: ${error?.message ?? error.toString()}`)))
-    )
-  )
 
 /**
  * Stream to create an observable `BinanceClient` depending on existing phrase in keystore
@@ -61,7 +31,6 @@ const clientState$: ClientState$ = FP.pipe(
           getPhrase(keystore),
           O.map<string, ClientState>((phrase) => {
             try {
-              console.log('instantiate BNB client:', network, phrase)
               const client = new Client({ phrase, network })
               return RD.success(client)
             } catch (error) {
@@ -74,10 +43,6 @@ const clientState$: ClientState$ = FP.pipe(
         )
       ).pipe(RxOp.startWith(RD.pending))
   ),
-  // wait to have binance client fully instantiated
-  // TODO (@asgdx-team: Can be removed by using `xchain-binance@next`
-  RxOp.delay(500),
-  liveData.chain((client) => checkAccountsFlags$(client, 0)),
   RxOp.startWith<ClientState>(RD.initial),
   RxOp.shareReplay(1)
 )
