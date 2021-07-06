@@ -1,7 +1,7 @@
 import { balances$, reloadBalances, reloadBalances$, resetReloadBalances } from './balances'
 import {
   client$,
-  clientViewState$,
+  clientState$,
   address$,
   addressUI$,
   explorerUrl$,
@@ -16,10 +16,10 @@ const { txs$, tx$, txStatus$, subscribeTx, resetTx, sendTx, txRD$ } = createTran
 
 export {
   client$,
+  clientState$,
   explorerUrl$,
   getExplorerTxUrl$,
   getExplorerAddressUrl$,
-  clientViewState$,
   address$,
   addressUI$,
   reloadBalances,

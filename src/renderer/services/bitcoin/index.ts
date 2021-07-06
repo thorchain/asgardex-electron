@@ -1,7 +1,7 @@
 import { balances$, reloadBalances, getBalanceByAddress$, reloadBalances$, resetReloadBalances } from './balances'
 import {
   client$,
-  clientViewState$,
+  clientState$,
   address$,
   addressUI$,
   explorerUrl$,
@@ -19,10 +19,10 @@ const { ledgerAddress$, retrieveLedgerAddress, removeLedgerAddress, pushLedgerTx
 
 export {
   client$,
+  clientState$,
   explorerUrl$,
   getExplorerTxUrl$,
   getExplorerAddressUrl$,
-  clientViewState$,
   address$,
   addressUI$,
   reloadBalances,

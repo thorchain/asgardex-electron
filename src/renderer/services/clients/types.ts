@@ -2,9 +2,7 @@ import * as RD from '@devexperts/remote-data-ts'
 import { Address, TxHash, XChainClient } from '@xchainjs/xchain-client'
 import { TxsPage, Fees } from '@xchainjs/xchain-client'
 import { Asset } from '@xchainjs/xchain-util'
-import { getEitherM } from 'fp-ts/lib/EitherT'
 import * as O from 'fp-ts/lib/Option'
-import { option } from 'fp-ts/lib/Option'
 import * as Rx from 'rxjs'
 
 import { LiveData } from '../../helpers/rx/liveData'
@@ -20,13 +18,6 @@ import { TxHashLD } from '../wallet/types'
  */
 export type ClientState<C> = RD.RemoteData<Error, C>
 export type ClientState$<C> = LiveData<Error, C>
-
-// TODO (@veado) Remove Monad
-// Something like `EitherT<Option>` Monad
-export const ClientStateM = getEitherM(option)
-
-// TODO (@veado) Remove view states
-export type ClientStateForViews = 'notready' | 'pending' | 'ready' | 'error'
 
 export type XChainClient$ = Rx.Observable<O.Option<XChainClient>>
 

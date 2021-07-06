@@ -1,19 +1,21 @@
 import React, { useCallback, useState, useEffect, useMemo } from 'react'
 
+import * as RD from '@devexperts/remote-data-ts'
 import * as crypto from '@xchainjs/xchain-crypto'
-import { Form, Spin } from 'antd'
+import { Form } from 'antd'
 import { Rule } from 'antd/lib/form'
 import { Store } from 'antd/lib/form/interface'
 import Paragraph from 'antd/lib/typography/Paragraph'
+import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
-import { none, Option, some } from 'fp-ts/lib/Option'
 import { useObservableState } from 'observable-hooks'
 import { useIntl } from 'react-intl'
 import { useHistory } from 'react-router-dom'
 
-import { useBinanceContext } from '../../../contexts/BinanceContext'
 import { useWalletContext } from '../../../contexts/WalletContext'
+import { useKeystoreClientStates } from '../../../hooks/useKeystoreClientStates'
 import * as walletRoutes from '../../../routes/wallet'
+import { Spin } from '../../shared/loading'
 import { InputPassword, InputTextArea } from '../../uielements/input'
 import * as Styled from './Phrase.styles'
 
@@ -24,26 +26,35 @@ export const ImportPhrase: React.FC = (): JSX.Element => {
   const intl = useIntl()
 
   const { keystoreService } = useWalletContext()
-  const keystore = useObservableState(keystoreService.keystore$, none)
+  const keystore = useObservableState(keystoreService.keystore$, O.none)
 
-  const { clientViewState$ } = useBinanceContext()
-  const clientViewState = useObservableState(clientViewState$, 'notready')
+  const { clientStates } = useKeystoreClientStates()
+
   const [importing, setImporting] = useState(false)
-  const [importError, setImportError] = useState<Option<Error>>(none)
+  const [importError, setImportError] = useState<O.Option<Error>>(O.none)
 
   useEffect(() => {
-    if (clientViewState === 'error') {
-      setImporting(false)
-      setImportError(some(new Error('Could not create instance of BinanceClient')))
-    }
-    if (clientViewState === 'ready') {
-      // reset states
-      setImporting(false)
-      setImportError(none)
-      // redirect to wallets assets view
-      history.push(walletRoutes.assets.template)
-    }
-  }, [clientViewState, history, keystore])
+    FP.pipe(
+      clientStates,
+      RD.fold(
+        () => {
+          // reset states
+          setImportError(O.none)
+          setImporting(false)
+        },
+        () => {
+          setImporting(true)
+        },
+        (error) => {
+          setImportError(O.some(Error(`Could not create client: ${error?.message ?? error.toString()}`)))
+        },
+        (_) => {
+          // redirect to wallets assets view
+          history.push(walletRoutes.assets.template)
+        }
+      )
+    )
+  }, [clientStates, history, keystore])
 
   const [validPhrase, setValidPhrase] = useState(false)
 
@@ -61,12 +72,12 @@ export const ImportPhrase: React.FC = (): JSX.Element => {
 
   const submitForm = useCallback(
     ({ phrase: newPhrase, password }: Store) => {
-      setImportError(none)
+      setImportError(O.none)
       setImporting(true)
       keystoreService.addKeystore(newPhrase, password).catch((error) => {
         setImporting(false)
         // TODO(@Veado): i18n
-        setImportError(some(error))
+        setImportError(O.some(error))
       })
     },
     [keystoreService]
@@ -87,22 +98,25 @@ export const ImportPhrase: React.FC = (): JSX.Element => {
     [intl]
   )
 
-  const renderError = useMemo(
+  const renderImportError = useMemo(
     () =>
-      O.fold(
-        () => <></>,
-        (error: Error) => (
-          <Paragraph>
-            {intl.formatMessage({ id: 'wallet.phrase.error.import' })}: {error.toString()}
-          </Paragraph>
+      FP.pipe(
+        importError,
+        O.fold(
+          () => <></>,
+          (error: Error) => (
+            <Paragraph>
+              {intl.formatMessage({ id: 'wallet.phrase.error.import' })}: {error.toString()}
+            </Paragraph>
+          )
         )
-      )(importError),
+      ),
     [importError, intl]
   )
 
   return (
     <>
-      {renderError}
+      {renderImportError}
       <Form
         form={form}
         onFinish={submitForm}
