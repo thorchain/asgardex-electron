@@ -117,13 +117,11 @@ export const WalletView: React.FC = (): JSX.Element => {
   const renderWalletRoute = useCallback(
     // Redirect if  an user has not a phrase imported or wallet has been locked
     ({ location }: { location: H.Location }) => {
-      console.log('renderWalletRoute:', keystore)
       // Special case: keystore can be `undefined` (see comment at its definition using `useObservableState`)
       if (keystore === undefined) {
         return React.Fragment
       }
 
-      console.log('renderWalletRoute hasImportedKeystore:', hasImportedKeystore(keystore))
       if (!hasImportedKeystore(keystore)) {
         return (
           <Redirect
