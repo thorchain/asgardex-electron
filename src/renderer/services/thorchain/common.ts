@@ -1,50 +1,52 @@
+import * as RD from '@devexperts/remote-data-ts'
 import { Client } from '@xchainjs/xchain-thorchain'
-import { right, left } from 'fp-ts/lib/Either'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
 import * as Rx from 'rxjs'
-import { Observable, Observer } from 'rxjs'
-import { map, mergeMap, shareReplay } from 'rxjs/operators'
+import * as RxOp from 'rxjs/operators'
 
 import { clientNetwork$ } from '../app/service'
 import * as C from '../clients'
-import { getClient } from '../clients/utils'
 import { keystoreService } from '../wallet/keystore'
 import { getPhrase } from '../wallet/util'
-import { Client$, ClientState } from './types'
+import { Client$, ClientState, ClientState$ } from './types'
 
 /**
- * Stream to create an observable ThorchainClient depending on existing phrase in keystore
+ * Stream to create an observable `ThorchainClient` depending on existing phrase in keystore
  *
- * Whenever a phrase is added to keystore, a new ThorchainClient will be created.
- * By the other hand: Whenever a phrase is removed, the client will be set to `none`
- * A ThorchainClient will never be created if a phrase is not available
+ * Whenever a phrase has been added to keystore, a new `ThorchainClient` will be created.
+ * By the other hand: Whenever a phrase has been removed, `ClientState` is set to `initial`
+ * A `ThorchainClient` will never be created as long as no phrase is available
  */
-const clientState$ = Rx.combineLatest([keystoreService.keystore$, clientNetwork$]).pipe(
-  mergeMap(
-    ([keystore, network]) =>
-      new Observable((observer: Observer<ClientState>) => {
-        const client: ClientState = FP.pipe(
+const clientState$: ClientState$ = FP.pipe(
+  Rx.combineLatest([keystoreService.keystore$, clientNetwork$]),
+  RxOp.switchMap(
+    ([keystore, network]): ClientState$ =>
+      Rx.of(
+        FP.pipe(
           getPhrase(keystore),
-          O.chain((phrase) => {
+          O.map<string, ClientState>((phrase) => {
             try {
               const client = new Client({
                 network,
                 phrase
               })
-              return O.some(right(client)) as ClientState
+              return RD.success(client)
             } catch (error) {
-              console.error('Failed to create THOR client', error)
-              return O.some(left(error)) as ClientState
+              console.error('Failed to create BCH client', error)
+              return RD.failure(error)
             }
-          })
+          }),
+          // Set back to `initial` if no phrase is available (locked wallet)
+          O.getOrElse<ClientState>(() => RD.initial)
         )
-        observer.next(client)
-      })
-  )
+      ).pipe(RxOp.startWith(RD.pending))
+  ),
+  RxOp.startWith<ClientState>(RD.initial),
+  RxOp.shareReplay(1)
 )
 
-const client$: Client$ = clientState$.pipe(map(getClient), shareReplay(1))
+const client$: Client$ = clientState$.pipe(RxOp.map(RD.toOption), RxOp.shareReplay(1))
 
 /**
  * `Address`

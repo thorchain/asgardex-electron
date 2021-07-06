@@ -1,11 +1,11 @@
+import * as RD from '@devexperts/remote-data-ts'
 import { EtherscanProvider } from '@ethersproject/providers'
 import * as ETH from '@xchainjs/xchain-ethereum'
 import { Asset, assetToString } from '@xchainjs/xchain-util'
-import { right, left } from 'fp-ts/lib/Either'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
 import * as Rx from 'rxjs'
-import { Observable, Observer } from 'rxjs'
+import { Observable } from 'rxjs'
 import * as RxOp from 'rxjs/operators'
 
 import { Network } from '../../../shared/api/types'
@@ -14,7 +14,7 @@ import { clientNetwork$ } from '../app/service'
 import * as C from '../clients'
 import { Address$, ExplorerUrl$, GetExplorerTxUrl$, GetExplorerAddressUrl$ } from '../clients/types'
 import { ClientStateForViews } from '../clients/types'
-import { getClient, toClientNetwork, getClientStateForViews } from '../clients/utils'
+import { toClientNetwork, getClientStateForViews } from '../clients/utils'
 import { keystoreService } from '../wallet/keystore'
 import { getPhrase } from '../wallet/util'
 import { Client$, ClientState, ClientState$ } from './types'
@@ -27,19 +27,20 @@ const ETHPLORER_API_KEY = envOrDefault(process.env.REACT_APP_ETHPLORER_API_KEY, 
 const ETHPLORER_API_URL = envOrDefault(process.env.REACT_APP_ETHPLORER_API_URL, 'https://api.ethplorer.io')
 
 /**
- * Stream to create an observable EthereumClient depending on existing phrase in keystore
+ * Stream to create an observable `EthereumClient` depending on existing phrase in keystore
  *
- * Whenever a phrase has been added to keystore, a new EthereumClient will be created.
- * By the other hand: Whenever a phrase has been removed, the client is set to `none`
- * A EthereumClient will never be created as long as no phrase is available
+ * Whenever a phrase has been added to keystore, a new `EthereumClient` will be created.
+ * By the other hand: Whenever a phrase has been removed, `ClientState` is set to `initial`
+ * A `EthereumClient` will never be created as long as no phrase is available
  */
-const clientState$: ClientState$ = Rx.combineLatest([keystoreService.keystore$, clientNetwork$]).pipe(
+const clientState$: ClientState$ = FP.pipe(
+  Rx.combineLatest([keystoreService.keystore$, clientNetwork$]),
   RxOp.switchMap(
-    ([keystore, network]) =>
-      new Observable((observer: Observer<ClientState>) => {
-        const client: ClientState = FP.pipe(
+    ([keystore, network]): ClientState$ =>
+      Rx.of(
+        FP.pipe(
           getPhrase(keystore),
-          O.chain((phrase) => {
+          O.map<string, ClientState>((phrase) => {
             try {
               const infuraCreds: ETH.InfuraCreds | undefined = INFURA_PROJECT_ID
                 ? {
@@ -55,19 +56,22 @@ const clientState$: ClientState$ = Rx.combineLatest([keystoreService.keystore$, 
                 phrase,
                 infuraCreds
               })
-              return O.some(right(client)) as ClientState
+              return RD.success(client)
             } catch (error) {
-              console.error('Failed to create ETH client', error)
-              return O.some(left(error))
+              console.error('Failed to create BCH client', error)
+              return RD.failure(error)
             }
-          })
+          }),
+          // Set back to `initial` if no phrase is available (locked wallet)
+          O.getOrElse<ClientState>(() => RD.initial)
         )
-        observer.next(client)
-      }) as Observable<ClientState>
-  )
+      ).pipe(RxOp.startWith(RD.pending))
+  ),
+  RxOp.startWith<ClientState>(RD.initial),
+  RxOp.shareReplay(1)
 )
 
-const client$: Client$ = clientState$.pipe(RxOp.map(getClient), RxOp.shareReplay(1))
+const client$: Client$ = clientState$.pipe(RxOp.map(RD.toOption), RxOp.shareReplay(1))
 
 /**
  * Helper stream to provide "ready-to-go" state of latest `EthereumClient`, but w/o exposing the client

@@ -1,10 +1,11 @@
+import * as RD from '@devexperts/remote-data-ts'
 import { Client as BitcoinCashClient, ClientUrl, NodeAuth } from '@xchainjs/xchain-bitcoincash'
-import { right, left } from 'fp-ts/lib/Either'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
 import * as Rx from 'rxjs'
-import { Observable, Observer } from 'rxjs'
-import { map, mergeMap, shareReplay } from 'rxjs/operators'
+import { Observable } from 'rxjs'
+import * as RxOp from 'rxjs/operators'
+import { map, shareReplay } from 'rxjs/operators'
 
 import { envOrDefault } from '../../helpers/envHelper'
 import { clientNetwork$ } from '../app/service'
@@ -12,7 +13,7 @@ import * as C from '../clients'
 import { GetExplorerAddressUrl$ } from '../clients'
 import { keystoreService } from '../wallet/keystore'
 import { getPhrase } from '../wallet/util'
-import { ClientState } from './types'
+import { ClientState, ClientState$ } from './types'
 
 const HASKOIN_API_URL: ClientUrl = {
   testnet: envOrDefault(process.env.REACT_APP_HASKOIN_TESTNET_URL, 'https://api.haskoin.com/bchtest'),
@@ -30,19 +31,20 @@ const NODE_AUTH: NodeAuth = {
 }
 
 /**
- * Stream to create an observable BitcoinCashClient depending on existing phrase in keystore
+ * Stream to create an observable `BitcoinCashClient` depending on existing phrase in keystore
  *
- * Whenever a phrase has been added to keystore, a new BitcoinCashClient will be created.
- * By the other hand: Whenever a phrase has been removed, the client is set to `none`
- * A BitcoinCashClient will never be created as long as no phrase is available
+ * Whenever a phrase has been added to keystore, a new `BitcoinCashClient` will be created.
+ * By the other hand: Whenever a phrase has been removed, `ClientState` is set to `initial`
+ * A `BitcoinCashClient` will never be created as long as no phrase is available
  */
-const clientState$ = Rx.combineLatest([keystoreService.keystore$, clientNetwork$]).pipe(
-  mergeMap(
-    ([keystore, network]) =>
-      new Observable((observer: Observer<ClientState>) => {
-        const client: ClientState = FP.pipe(
+const clientState$: ClientState$ = FP.pipe(
+  Rx.combineLatest([keystoreService.keystore$, clientNetwork$]),
+  RxOp.switchMap(
+    ([keystore, network]): ClientState$ =>
+      Rx.of(
+        FP.pipe(
           getPhrase(keystore),
-          O.chain((phrase) => {
+          O.map<string, ClientState>((phrase) => {
             try {
               const client = new BitcoinCashClient({
                 network,
@@ -51,19 +53,22 @@ const clientState$ = Rx.combineLatest([keystoreService.keystore$, clientNetwork$
                 nodeAuth: NODE_AUTH,
                 phrase
               })
-              return O.some(right(client))
+              return RD.success(client)
             } catch (error) {
               console.error('Failed to create BCH client', error)
-              return O.some(left(error))
+              return RD.failure(error)
             }
-          })
+          }),
+          // Set back to `initial` if no phrase is available (locked wallet)
+          O.getOrElse<ClientState>(() => RD.initial)
         )
-        observer.next(client)
-      })
-  )
+      ).pipe(RxOp.startWith(RD.pending))
+  ),
+  RxOp.startWith<ClientState>(RD.initial),
+  RxOp.shareReplay(1)
 )
 
-const client$: Observable<O.Option<BitcoinCashClient>> = clientState$.pipe(map(C.getClient), shareReplay(1))
+const client$: Observable<O.Option<BitcoinCashClient>> = clientState$.pipe(map(RD.toOption), shareReplay(1))
 
 /**
  * Helper stream to provide "ready-to-go" state of latest `BitcoinCashClient`, but w/o exposing the client

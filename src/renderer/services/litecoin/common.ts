@@ -1,17 +1,16 @@
+import * as RD from '@devexperts/remote-data-ts'
 import { Client, NodeAuth } from '@xchainjs/xchain-litecoin'
 import * as FP from 'fp-ts/function'
-import { right, left } from 'fp-ts/lib/Either'
 import * as O from 'fp-ts/Option'
 import * as Rx from 'rxjs'
-import { Observable, Observer } from 'rxjs'
-import { map, mergeMap, shareReplay } from 'rxjs/operators'
+import * as RxOp from 'rxjs/operators'
 
 import { envOrDefault } from '../../helpers/envHelper'
 import { clientNetwork$ } from '../app/service'
 import * as C from '../clients'
 import { keystoreService } from '../wallet/keystore'
 import { getPhrase } from '../wallet/util'
-import { Client$, ClientState } from './types'
+import { Client$, ClientState$, ClientState } from './types'
 
 const LTC_NODE_TESTNET_URL = envOrDefault(
   process.env.REACT_APP_LTC_NODE_TESTNET_URL,
@@ -23,20 +22,22 @@ const NODE_AUTH: NodeAuth = {
   password: envOrDefault(process.env.REACT_APP_LTC_NODE_PASSWORD, 'password'),
   username: envOrDefault(process.env.REACT_APP_LTC_NODE_USERNAME, 'thorchain')
 }
+
 /**
- * Stream to create an observable LitecoinClient depending on existing phrase in keystore
+ * Stream to create an observable `LitecoinClient` depending on existing phrase in keystore
  *
- * Whenever a phrase is added to keystore, a new LitecoinClient will be created.
- * By the other hand: Whenever a phrase is removed, the client will be set to `none`
- * A LitecoinClient will never be created if a phrase is not available
+ * Whenever a phrase has been added to keystore, a new `LitecoinClient` will be created.
+ * By the other hand: Whenever a phrase has been removed, `ClientState` is set to `initial`
+ * A `LitecoinClient` will never be created as long as no phrase is available
  */
-const clientState$ = Rx.combineLatest([keystoreService.keystore$, clientNetwork$]).pipe(
-  mergeMap(
-    ([keystore, network]) =>
-      new Observable((observer: Observer<ClientState>) => {
-        const client: ClientState = FP.pipe(
+const clientState$: ClientState$ = FP.pipe(
+  Rx.combineLatest([keystoreService.keystore$, clientNetwork$]),
+  RxOp.switchMap(
+    ([keystore, network]): ClientState$ =>
+      Rx.of(
+        FP.pipe(
           getPhrase(keystore),
-          O.chain((phrase) => {
+          O.map<string, ClientState>((phrase) => {
             try {
               const nodeUrl = network === 'mainnet' ? LTC_NODE_MAINNET_URL : LTC_NODE_TESTNET_URL
               const client = new Client({
@@ -45,19 +46,22 @@ const clientState$ = Rx.combineLatest([keystoreService.keystore$, clientNetwork$
                 nodeUrl,
                 nodeAuth: NODE_AUTH
               })
-              return O.some(right(client)) as ClientState
+              return RD.success(client)
             } catch (error) {
               console.error('Failed to create LTC client', error)
-              return O.some(left(error)) as ClientState
+              return RD.failure(error)
             }
-          })
+          }),
+          // Set back to `initial` if no phrase is available (locked wallet)
+          O.getOrElse<ClientState>(() => RD.initial)
         )
-        observer.next(client)
-      })
-  )
+      ).pipe(RxOp.startWith(RD.pending))
+  ),
+  RxOp.startWith<ClientState>(RD.initial),
+  RxOp.shareReplay(1)
 )
 
-const client$: Client$ = clientState$.pipe(map(C.getClient), shareReplay(1))
+const client$: Client$ = clientState$.pipe(RxOp.map(RD.toOption), RxOp.shareReplay(1))
 
 /**
  * `Address`
