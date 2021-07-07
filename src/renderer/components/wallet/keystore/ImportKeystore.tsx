@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo } from 'react'
+import React, { useCallback, useMemo } from 'react'
 
 import { CheckCircleTwoTone, UploadOutlined } from '@ant-design/icons'
 import * as RD from '@devexperts/remote-data-ts'
@@ -7,11 +7,9 @@ import { Form } from 'antd'
 import { Store } from 'antd/lib/form/interface'
 import * as FP from 'fp-ts/lib/function'
 import { useIntl } from 'react-intl'
-import { useHistory } from 'react-router-dom'
 
 import { KeystoreClientStates } from '../../../hooks/useKeystoreClientStates'
 import { useSubscriptionState } from '../../../hooks/useSubscriptionState'
-import * as walletRoutes from '../../../routes/wallet'
 import { ImportKeystoreLD, LoadKeystoreLD } from '../../../services/wallet/types'
 import { Spin } from '../../shared/loading'
 import { InputPassword } from '../../uielements/input'
@@ -21,13 +19,11 @@ type Props = {
   clientStates: KeystoreClientStates
   importKeystore$: (keystore: Keystore, password: string) => ImportKeystoreLD
   loadKeystore$: () => LoadKeystoreLD
-  readyToRedirect: boolean
 }
 
 export const ImportKeystore: React.FC<Props> = (props): JSX.Element => {
-  const { importKeystore$, loadKeystore$, clientStates, readyToRedirect } = props
+  const { importKeystore$, loadKeystore$, clientStates } = props
 
-  const history = useHistory()
   const [form] = Form.useForm()
 
   const intl = useIntl()
@@ -39,13 +35,6 @@ export const ImportKeystore: React.FC<Props> = (props): JSX.Element => {
   const { state: importKeystoreState, subscribe: subscribeImportKeystoreState } = useSubscriptionState<
     RD.RemoteData<Error, void>
   >(RD.initial)
-
-  useEffect(() => {
-    if (readyToRedirect) {
-      // redirect to wallets assets view
-      history.push(walletRoutes.assets.path())
-    }
-  }, [history, readyToRedirect])
 
   const submitForm = useCallback(
     ({ password }: Store) => {

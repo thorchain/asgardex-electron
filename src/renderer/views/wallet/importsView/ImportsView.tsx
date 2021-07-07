@@ -9,6 +9,7 @@ import { ImportKeystore } from '../../../components/wallet/keystore'
 import { ImportPhrase } from '../../../components/wallet/phrase/'
 import { useWalletContext } from '../../../contexts/WalletContext'
 import { useKeystoreClientStates } from '../../../hooks/useKeystoreClientStates'
+import { useKeystoreRedirectAfterImport } from '../../../hooks/useKeystoreRedirectAfterImport'
 import * as walletRoutes from '../../../routes/wallet'
 import * as Styled from './ImportsView.style'
 
@@ -22,7 +23,9 @@ export const ImportsView: React.FC = (): JSX.Element => {
   const history = useHistory()
   const { keystoreService } = useWalletContext()
   const { importKeystore$, loadKeystore$, addKeystore } = keystoreService
-  const { clientStates, readyToRedirect } = useKeystoreClientStates()
+  const { clientStates } = useKeystoreClientStates()
+  // redirect to wallet assets view  whenever keystore have been imported and ALL clients are initialized
+  useKeystoreRedirectAfterImport()
 
   const [activeTab, setActiveTab] = useState(TabKey.KEYSTORE)
 
@@ -31,32 +34,25 @@ export const ImportsView: React.FC = (): JSX.Element => {
       {
         key: TabKey.KEYSTORE,
         label: (
-          <span onClick={() => history.push(walletRoutes.imports.keystore.template)}>
+          <span onClick={() => history.push(walletRoutes.imports.keystore.path())}>
             {intl.formatMessage({ id: 'common.keystore' })}
           </span>
         ),
         content: (
-          <ImportKeystore
-            loadKeystore$={loadKeystore$}
-            importKeystore$={importKeystore$}
-            clientStates={clientStates}
-            readyToRedirect={readyToRedirect}
-          />
+          <ImportKeystore loadKeystore$={loadKeystore$} importKeystore$={importKeystore$} clientStates={clientStates} />
         )
       },
       {
         key: TabKey.PHRASE,
         label: (
-          <span onClick={() => history.push(walletRoutes.imports.phrase.template)}>
+          <span onClick={() => history.push(walletRoutes.imports.phrase.path())}>
             {intl.formatMessage({ id: 'common.phrase' })}
           </span>
         ),
-        content: (
-          <ImportPhrase clientStates={clientStates} addKeystore={addKeystore} readyToRedirect={readyToRedirect} />
-        )
+        content: <ImportPhrase clientStates={clientStates} addKeystore={addKeystore} />
       }
     ],
-    [addKeystore, clientStates, history, importKeystore$, intl, loadKeystore$, readyToRedirect]
+    [addKeystore, clientStates, history, importKeystore$, intl, loadKeystore$]
   )
 
   /**

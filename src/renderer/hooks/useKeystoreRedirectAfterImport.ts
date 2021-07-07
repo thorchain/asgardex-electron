@@ -12,6 +12,14 @@ import { INITIAL_KEYSTORE_STATE } from '../services/wallet/const'
 import { hasImportedKeystore } from '../services/wallet/util'
 import { useKeystoreClientStates } from './useKeystoreClientStates'
 
+/**
+ * It redirects to wallet asset view
+ * whenever keystore have been imported
+ * and ALL clients have been initialized
+ *
+ * Use this hook in top level *views only (but not in components)
+ *
+ */
 export const useKeystoreRedirectAfterImport = (): void => {
   const history = useHistory()
   const { clientStates } = useKeystoreClientStates()
@@ -35,7 +43,7 @@ export const useKeystoreRedirectAfterImport = (): void => {
   useEffect(() => {
     if (readyToRedirect) {
       // redirect to wallets assets view
-      history.push(walletRoutes.assets.template)
+      history.push(walletRoutes.assets.path())
     }
   }, [history, readyToRedirect])
 }

@@ -8,12 +8,9 @@ import { Store } from 'antd/lib/form/interface'
 import Paragraph from 'antd/lib/typography/Paragraph'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
-// import { useObservableState } from 'observable-hooks'
 import { useIntl } from 'react-intl'
-import { useHistory } from 'react-router-dom'
 
 import { KeystoreClientStates } from '../../../hooks/useKeystoreClientStates'
-import * as walletRoutes from '../../../routes/wallet'
 import { Phrase } from '../../../services/wallet/types'
 import { Spin } from '../../shared/loading'
 import { InputPassword, InputTextArea } from '../../uielements/input'
@@ -22,12 +19,10 @@ import * as Styled from './Phrase.styles'
 type Props = {
   addKeystore: (phrase: Phrase, password: string) => Promise<void>
   clientStates: KeystoreClientStates
-  readyToRedirect: boolean
 }
 
 export const ImportPhrase: React.FC<Props> = (props): JSX.Element => {
-  const { addKeystore, clientStates, readyToRedirect } = props
-  const history = useHistory()
+  const { addKeystore, clientStates } = props
   const [form] = Form.useForm()
 
   const intl = useIntl()
@@ -53,13 +48,7 @@ export const ImportPhrase: React.FC<Props> = (props): JSX.Element => {
         (_) => {}
       )
     )
-  }, [clientStates, history])
-
-  useEffect(() => {
-    if (readyToRedirect) {
-      history.push(walletRoutes.assets.path())
-    }
-  }, [history, readyToRedirect])
+  }, [clientStates])
 
   const [validPhrase, setValidPhrase] = useState(false)
 

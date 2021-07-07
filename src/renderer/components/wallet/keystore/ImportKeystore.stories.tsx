@@ -13,7 +13,6 @@ export const StoryInitial: Story = () => (
   <ImportKeystore
     importKeystore$={importKeystoreInitial$}
     loadKeystore$={loadKeystoreInitial$}
-    readyToRedirect={false}
     clientStates={RD.initial}
   />
 )
