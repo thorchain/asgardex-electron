@@ -14,7 +14,7 @@ import {
 import * as O from 'fp-ts/lib/Option'
 
 import { ERC20_TESTNET } from '../../shared/mock/assets'
-import { AssetBUSDBAF, AssetBUSDBD1, AssetUSDTERC20 } from '../const'
+import { AssetBUSDBAF, AssetBUSDBD1, AssetUSDTERC20, AssetXRune, AssetXRuneTestnet } from '../const'
 import {
   isBchAsset,
   isBnbAsset,
@@ -33,7 +33,8 @@ import {
   isUSDAsset,
   max1e8BaseAmount,
   to1e8BaseAmount,
-  getTwoSigfigAssetAmount
+  getTwoSigfigAssetAmount,
+  isXRuneAsset
 } from './assetHelper'
 import { eqAsset, eqAssetAmount, eqBaseAmount } from './fp/eq'
 
@@ -53,12 +54,25 @@ describe('helpers/assetHelper', () => {
   })
 
   describe('isRuneNativeAsset', () => {
-    it('checks rune asset for testnet', () => {
+    it('checks rune native asset', () => {
       expect(isRuneNativeAsset(AssetRuneNative)).toBeTruthy()
     })
 
     it('returns false for any other asset than RUNE', () => {
       expect(isRuneNativeAsset(AssetBNB)).toBeFalsy()
+    })
+  })
+
+  describe('isXRuneAsset', () => {
+    it('checks XRUNE asset (mainnet)', () => {
+      expect(isXRuneAsset(AssetXRune)).toBeTruthy()
+    })
+    it('checks XRUNE asset (testnet)', () => {
+      expect(isXRuneAsset(AssetXRuneTestnet)).toBeTruthy()
+    })
+
+    it('returns false for any other asset than XRUNE', () => {
+      expect(isXRuneAsset(AssetBNB)).toBeFalsy()
     })
   })
 

@@ -7,7 +7,8 @@ import {
   Asset,
   assetToString,
   baseAmount,
-  AssetRuneNative
+  AssetRuneNative,
+  AssetRuneERC20Testnet
 } from '@xchainjs/xchain-util'
 
 import { Network } from '../shared/api/types'
@@ -16,17 +17,22 @@ import { PricePoolCurrencyWeights, PricePoolAssets } from './views/pools/Pools.t
 //
 // ERC 20 assets
 //
-
 export const AssetUSDTERC20: Asset = {
   chain: 'ETH',
   symbol: 'USDT-0xa3910454bf2cb59b8b3a401589a3bacc5ca42306',
   ticker: 'USDT'
 }
 
-export const AssetRuneEthERC20: Asset = {
+export const AssetXRune: Asset = {
   chain: 'ETH',
-  symbol: 'RUNE-0xd601c6A3a36721320573885A8d8420746dA3d7A0',
-  ticker: 'RUNE'
+  symbol: 'XRUNE-0x69fa0fee221ad11012bab0fdb45d444d3d2ce71c',
+  ticker: 'XRUNE'
+}
+
+export const AssetXRuneTestnet: Asset = {
+  chain: 'ETH',
+  symbol: 'XRUNE-0x0fE3ecd525D16fA09aA1FF177014dE5304c835E2',
+  ticker: 'XRUNE'
 }
 
 // ETH.THOR - for testnet only
@@ -63,7 +69,8 @@ export const AssetDAIERC20: Asset = {
 // This hardcode list is for testnet only
 export const ERC20Assets = [
   AssetUSDTERC20,
-  AssetRuneEthERC20,
+  AssetXRuneTestnet,
+  AssetRuneERC20Testnet,
   AssetThorERC20,
   AssetTKN8ERC20,
   AssetTKN18ERC20,

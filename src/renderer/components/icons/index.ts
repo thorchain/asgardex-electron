@@ -14,6 +14,7 @@ import marketIcon from '../../assets/svg/asset-market.svg'
 import refreshIcon from '../../assets/svg/asset-refresh.svg'
 import runeIcon from '../../assets/svg/asset-rune.svg'
 import userAvatarIcon from '../../assets/svg/asset-user.svg'
+import xRuneIcon from '../../assets/svg/asset-xrune.svg'
 import { ReactComponent as CurrencyIcon } from '../../assets/svg/currency-icon.svg'
 import blueArrowIcon from '../../assets/svg/icon-arrow-button.svg'
 import orbBlueIcon from '../../assets/svg/orb-blue.svg'
@@ -25,6 +26,7 @@ export {
   ethIcon,
   runeIcon,
   bnbRuneIcon,
+  xRuneIcon,
   CurrencyIcon,
   userAvatarIcon,
   arrowYellowIcon,

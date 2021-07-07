@@ -24,7 +24,7 @@ import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
 
 import { Network } from '../../shared/api/types'
-import { AssetRuneEthERC20, DEFAULT_PRICE_ASSETS, USD_PRICE_ASSETS } from '../const'
+import { AssetXRune, AssetXRuneTestnet, DEFAULT_PRICE_ASSETS, USD_PRICE_ASSETS } from '../const'
 import { PricePoolAsset } from '../views/pools/Pools.types'
 import { getEthChecksumAddress } from './addressHelper'
 import { getChainAsset, isBchChain, isBtcChain, isEthChain, isLtchain } from './chainHelper'
@@ -57,9 +57,7 @@ export const isRuneBnbAsset = (asset: Asset): boolean =>
   eqAsset.equals(asset, AssetRune67C) || eqAsset.equals(asset, AssetRuneB1A)
 
 export const isRuneEthAsset = (asset: Asset): boolean =>
-  eqAsset.equals(asset, AssetRuneERC20) ||
-  eqAsset.equals(asset, AssetRuneERC20Testnet) ||
-  eqAsset.equals(asset, AssetRuneEthERC20)
+  eqAsset.equals(asset, AssetRuneERC20) || eqAsset.equals(asset, AssetRuneERC20Testnet)
 
 export const isNonNativeRuneAsset = (asset: Asset): boolean => isRuneBnbAsset(asset) || isRuneEthAsset(asset)
 
@@ -87,6 +85,12 @@ export const isBtcAsset = (asset: Asset): boolean => eqAsset.equals(asset, Asset
  * Check whether an asset is an ETH asset
  */
 export const isEthAsset = (asset: Asset): boolean => eqAsset.equals(asset, AssetETH)
+
+/**
+ * Check whether an asset is XRune asset
+ */
+export const isXRuneAsset = (asset: Asset): boolean =>
+  eqAsset.equals(asset, AssetXRune) || eqAsset.equals(asset, AssetXRuneTestnet)
 
 /**
  * Get ethereum token address (as check sum address) from a given asset
