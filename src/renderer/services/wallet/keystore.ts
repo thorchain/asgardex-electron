@@ -19,7 +19,7 @@ const { get$: getKeystoreState$, set: setKeystoreState } = observableState<Keyst
 /**
  * Creates a keystore and saves it to disk
  */
-const addKeystore = async (phrase: Phrase, password: string) => {
+const addKeystore = async (phrase: Phrase, password: string): Promise<void> => {
   try {
     // remove previous keystore before adding a new one to trigger changes of `KeystoreState
     await keystoreService.removeKeystore()
@@ -41,8 +41,9 @@ const importKeystore$ = (keystore: CryptoKeystore, password: string): ImportKeys
   return FP.pipe(
     Rx.from(decryptFromKeystore(keystore, password)),
     // delay to give UI some time to render
-    RxOp.delay(300),
-    RxOp.switchMap((phrase) => addKeystore(phrase, password)),
+    RxOp.delay(200),
+    RxOp.switchMap((phrase) => Rx.from(addKeystore(phrase, password))),
+    RxOp.map((v) => v),
     RxOp.map(RD.success),
     RxOp.catchError((error) => Rx.of(RD.failure(new Error(`Could not decrypt phrase from keystore: ${error}`)))),
     RxOp.startWith(RD.pending)
@@ -69,8 +70,8 @@ const loadKeystore$ = (): LoadKeystoreLD => {
   return FP.pipe(
     Rx.from(window.apiKeystore.load()),
     // delay to give UI some time to render
-    RxOp.delay(300),
-    RxOp.map((keystore) => (keystore ? RD.success(keystore) : RD.initial)), // handle undeifined keystore in case when the user click cancel in openDialog
+    RxOp.delay(200),
+    RxOp.map((keystore) => (keystore ? RD.success(keystore) : RD.initial)), // handle undefined keystore in case when the user click cancel in openDialog
     RxOp.catchError((err) => Rx.of(RD.failure(err))),
     RxOp.startWith(RD.pending)
   )

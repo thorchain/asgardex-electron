@@ -6,11 +6,10 @@ import { Keystore } from '@xchainjs/xchain-crypto'
 import { Form } from 'antd'
 import { Store } from 'antd/lib/form/interface'
 import * as FP from 'fp-ts/lib/function'
-import * as O from 'fp-ts/lib/Option'
 import { useIntl } from 'react-intl'
 import { useHistory } from 'react-router-dom'
 
-import { useKeystoreClientStates } from '../../../hooks/useKeystoreClientStates'
+import { KeystoreClientStates } from '../../../hooks/useKeystoreClientStates'
 import { useSubscriptionState } from '../../../hooks/useSubscriptionState'
 import * as walletRoutes from '../../../routes/wallet'
 import { ImportKeystoreLD, LoadKeystoreLD } from '../../../services/wallet/types'
@@ -19,19 +18,19 @@ import { InputPassword } from '../../uielements/input'
 import * as Styled from './Keystore.styles'
 
 type Props = {
+  clientStates: KeystoreClientStates
   importKeystore$: (keystore: Keystore, password: string) => ImportKeystoreLD
   loadKeystore$: () => LoadKeystoreLD
+  readyToRedirect: boolean
 }
 
 export const ImportKeystore: React.FC<Props> = (props): JSX.Element => {
-  const { importKeystore$, loadKeystore$ } = props
+  const { importKeystore$, loadKeystore$, clientStates, readyToRedirect } = props
 
   const history = useHistory()
   const [form] = Form.useForm()
 
   const intl = useIntl()
-
-  const { clientStates } = useKeystoreClientStates()
 
   const { state: loadKeystoreState, subscribe: subscribeLoadKeystoreState } = useSubscriptionState<
     RD.RemoteData<Error, Keystore>
@@ -42,16 +41,11 @@ export const ImportKeystore: React.FC<Props> = (props): JSX.Element => {
   >(RD.initial)
 
   useEffect(() => {
-    FP.pipe(
-      clientStates,
-      RD.toOption,
-      O.map((_) => {
-        // redirect to wallets assets view
-        history.push(walletRoutes.assets.template)
-        return true
-      })
-    )
-  }, [clientStates, history])
+    if (readyToRedirect) {
+      // redirect to wallets assets view
+      history.push(walletRoutes.assets.path())
+    }
+  }, [history, readyToRedirect])
 
   const submitForm = useCallback(
     ({ password }: Store) => {

@@ -21,7 +21,7 @@ import { ClientState, ClientState$, Client$ } from './types'
  */
 const clientState$: ClientState$ = FP.pipe(
   Rx.combineLatest([keystoreService.keystore$, clientNetwork$]),
-  RxOp.mergeMap(
+  RxOp.switchMap(
     ([keystore, network]): ClientState$ =>
       Rx.of(
         FP.pipe(

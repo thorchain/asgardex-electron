@@ -29,6 +29,12 @@ export const AppWrapper = styled.div`
     &-spin-dot-item {
       background-color: ${palette('primary', 0)};
     }
+    &-form-item-explain {
+      text-transform: uppercase;
+    }
+    &-form-item-explain-error {
+      color: ${palette('error', 0)};
+    }
   }
 `
 
