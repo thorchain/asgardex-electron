@@ -10,7 +10,11 @@ const importKeystoreInitial$ = () => Rx.of(RD.initial)
 const loadKeystoreInitial$ = () => Rx.of(RD.initial)
 
 export const StoryInitial: Story = () => (
-  <ImportKeystore importKeystore$={importKeystoreInitial$} loadKeystore$={loadKeystoreInitial$} />
+  <ImportKeystore
+    importKeystore$={importKeystoreInitial$}
+    loadKeystore$={loadKeystoreInitial$}
+    clientStates={RD.initial}
+  />
 )
 StoryInitial.storyName = 'initial'
 

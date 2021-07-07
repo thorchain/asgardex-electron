@@ -3,7 +3,7 @@ import { BNBChain } from '@xchainjs/xchain-util'
 import { balances$, reloadBalances, reloadBalances$, resetReloadBalances } from './balances'
 import {
   client$,
-  clientViewState$,
+  clientState$,
   address$,
   explorerUrl$,
   getExplorerTxUrl$,
@@ -22,7 +22,7 @@ const { ledgerAddress$, retrieveLedgerAddress, removeLedgerAddress, ledgerTxRD$,
 
 export {
   client$,
-  clientViewState$,
+  clientState$,
   address$,
   addressUI$,
   reloadBalances,

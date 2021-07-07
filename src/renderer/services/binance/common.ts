@@ -3,14 +3,11 @@ import { Client } from '@xchainjs/xchain-binance'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
 import * as Rx from 'rxjs'
-import { Observable } from 'rxjs'
 import * as RxOp from 'rxjs/operators'
 
 import { clientNetwork$ } from '../app/service'
 import * as C from '../clients'
 import { Address$, ExplorerUrl$, GetExplorerTxUrl$, GetExplorerAddressUrl$ } from '../clients/types'
-import { ClientStateForViews } from '../clients/types'
-import { getClientStateForViews } from '../clients/utils'
 import { keystoreService } from '../wallet/keystore'
 import { getPhrase } from '../wallet/util'
 import { ClientState, ClientState$, Client$ } from './types'
@@ -24,7 +21,7 @@ import { ClientState, ClientState$, Client$ } from './types'
  */
 const clientState$: ClientState$ = FP.pipe(
   Rx.combineLatest([keystoreService.keystore$, clientNetwork$]),
-  RxOp.mergeMap(
+  RxOp.switchMap(
     ([keystore, network]): ClientState$ =>
       Rx.of(
         FP.pipe(
@@ -48,12 +45,6 @@ const clientState$: ClientState$ = FP.pipe(
 )
 
 const client$: Client$ = clientState$.pipe(RxOp.map(RD.toOption), RxOp.shareReplay(1))
-
-/**
- * Helper stream to provide "ready-to-go" state of latest `BinanceClient`, but w/o exposing the client
- * It's needed by views only.
- */
-const clientViewState$: Observable<ClientStateForViews> = clientState$.pipe(RxOp.map(getClientStateForViews))
 
 /**
  * Current `Address` depending on selected network
@@ -80,13 +71,4 @@ const getExplorerTxUrl$: GetExplorerTxUrl$ = C.getExplorerTxUrl$(client$)
  */
 const getExplorerAddressUrl$: GetExplorerAddressUrl$ = C.getExplorerAddressUrl$(client$)
 
-export {
-  client$,
-  clientState$,
-  clientViewState$,
-  address$,
-  addressUI$,
-  explorerUrl$,
-  getExplorerTxUrl$,
-  getExplorerAddressUrl$
-}
+export { client$, clientState$, address$, addressUI$, explorerUrl$, getExplorerTxUrl$, getExplorerAddressUrl$ }

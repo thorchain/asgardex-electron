@@ -5,7 +5,6 @@ import { Asset, assetToString } from '@xchainjs/xchain-util'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
 import * as Rx from 'rxjs'
-import { Observable } from 'rxjs'
 import * as RxOp from 'rxjs/operators'
 
 import { Network } from '../../../shared/api/types'
@@ -13,8 +12,7 @@ import { envOrDefault } from '../../helpers/envHelper'
 import { clientNetwork$ } from '../app/service'
 import * as C from '../clients'
 import { Address$, ExplorerUrl$, GetExplorerTxUrl$, GetExplorerAddressUrl$ } from '../clients/types'
-import { ClientStateForViews } from '../clients/types'
-import { toClientNetwork, getClientStateForViews } from '../clients/utils'
+import { toClientNetwork } from '../clients/utils'
 import { keystoreService } from '../wallet/keystore'
 import { getPhrase } from '../wallet/util'
 import { Client$, ClientState, ClientState$ } from './types'
@@ -72,12 +70,6 @@ const clientState$: ClientState$ = FP.pipe(
 )
 
 const client$: Client$ = clientState$.pipe(RxOp.map(RD.toOption), RxOp.shareReplay(1))
-
-/**
- * Helper stream to provide "ready-to-go" state of latest `EthereumClient`, but w/o exposing the client
- * It's needed by views only.
- */
-const clientViewState$: Observable<ClientStateForViews> = clientState$.pipe(RxOp.map(getClientStateForViews))
 
 /**
  * Current `Address` depending on selected network
@@ -139,7 +131,6 @@ const getDecimal = async (asset: Asset, network: Network): Promise<number> => {
 export {
   client$,
   clientState$,
-  clientViewState$,
   address$,
   addressUI$,
   explorerUrl$,

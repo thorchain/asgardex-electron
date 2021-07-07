@@ -1,5 +1,13 @@
 import { reloadBalances, balances$, reloadBalances$, resetReloadBalances } from './balances'
-import { client$, address$, addressUI$, explorerUrl$, getExplorerTxUrl$, getExplorerAddressUrl$ } from './common'
+import {
+  client$,
+  clientState$,
+  address$,
+  addressUI$,
+  explorerUrl$,
+  getExplorerTxUrl$,
+  getExplorerAddressUrl$
+} from './common'
 import { createFeesService } from './fees'
 import { createTransactionService } from './transaction'
 
@@ -7,10 +15,11 @@ const { txs$, tx$, txStatus$, subscribeTx, resetTx, sendTx, txRD$ } = createTran
 const { reloadFees, fees$, feesWithRates$, reloadFeesWithRates } = createFeesService(client$)
 
 export {
+  client$,
+  clientState$,
   address$,
   addressUI$,
   explorerUrl$,
-  client$,
   reloadBalances,
   balances$,
   reloadBalances$,

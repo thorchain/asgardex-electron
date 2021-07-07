@@ -1,9 +1,10 @@
 import React, { createContext, useContext } from 'react'
 
 import {
+  client$,
+  clientState$,
   address$,
   addressUI$,
-  client$,
   balances$,
   reloadBalances,
   txs$,
@@ -19,9 +20,10 @@ import {
 } from '../services/litecoin'
 
 export type LitecoinContextValue = {
+  client$: typeof client$
+  clientState$: typeof clientState$
   address$: typeof address$
   addressUI$: typeof addressUI$
-  client$: typeof client$
   reloadBalances: typeof reloadBalances
   balances$: typeof balances$
   txs$: typeof txs$
@@ -37,9 +39,10 @@ export type LitecoinContextValue = {
 }
 
 const initialContext: LitecoinContextValue = {
+  client$,
+  clientState$,
   address$,
   addressUI$,
-  client$,
   reloadBalances,
   balances$,
   txs$,

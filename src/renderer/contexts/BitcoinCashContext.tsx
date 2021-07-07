@@ -2,6 +2,7 @@ import React, { createContext, useContext } from 'react'
 
 import {
   client$,
+  clientState$,
   address$,
   addressUI$,
   balances$,
@@ -14,6 +15,7 @@ import {
 
 export type BitcoinCashContextValue = {
   client$: typeof client$
+  clientState$: typeof clientState$
   address$: typeof address$
   addressUI$: typeof addressUI$
   reloadBalances: typeof reloadBalances
@@ -26,6 +28,7 @@ export type BitcoinCashContextValue = {
 
 const initialContext: BitcoinCashContextValue = {
   client$,
+  clientState$,
   address$,
   addressUI$,
   reloadBalances,

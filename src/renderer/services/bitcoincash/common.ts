@@ -71,12 +71,6 @@ const clientState$: ClientState$ = FP.pipe(
 const client$: Observable<O.Option<BitcoinCashClient>> = clientState$.pipe(map(RD.toOption), shareReplay(1))
 
 /**
- * Helper stream to provide "ready-to-go" state of latest `BitcoinCashClient`, but w/o exposing the client
- * It's needed by views only.
- */
-const clientViewState$: Observable<C.ClientStateForViews> = clientState$.pipe(map(C.getClientStateForViews))
-
-/**
  * BCH `Address`
  */
 const address$: C.Address$ = C.address$(client$)
@@ -101,4 +95,4 @@ const getExplorerTxUrl$: C.GetExplorerTxUrl$ = C.getExplorerTxUrl$(client$)
  */
 const getExplorerAddressUrl$: GetExplorerAddressUrl$ = C.getExplorerAddressUrl$(client$)
 
-export { address$, addressUI$, client$, clientViewState$, explorerUrl$, getExplorerTxUrl$, getExplorerAddressUrl$ }
+export { client$, clientState$, address$, addressUI$, explorerUrl$, getExplorerTxUrl$, getExplorerAddressUrl$ }

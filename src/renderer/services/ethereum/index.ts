@@ -3,7 +3,7 @@ import { ETHChain } from '@xchainjs/xchain-util'
 import { reloadBalances, balances$, reloadBalances$, resetReloadBalances } from './balances'
 import {
   client$,
-  clientViewState$,
+  clientState$,
   address$,
   addressUI$,
   explorerUrl$,
@@ -32,7 +32,7 @@ const { reloadFees, fees$, poolInTxFees$, poolOutTxFee$, approveFee$, reloadAppr
 
 export {
   client$,
-  clientViewState$,
+  clientState$,
   address$,
   addressUI$,
   reloadBalances,

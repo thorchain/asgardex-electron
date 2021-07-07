@@ -1,5 +1,6 @@
 import * as A from 'antd'
 import styled from 'styled-components'
+import { palette } from 'styled-theme'
 
 import { Button } from '../../../components/uielements/button'
 import { InnerForm } from '../../shared/form/Form.style'
@@ -20,6 +21,13 @@ export const Title = styled(UILabel).attrs({
 })`
   width: 100%;
   margin-bottom: 10px;
+`
+
+export const ErrorLabel = styled(UILabel)`
+  margin-bottom: 20px;
+  text-transform: uppercase;
+  color: ${palette('error', 0)};
+  text-align: center;
 `
 
 export const KeystoreButton = styled(Button).attrs({

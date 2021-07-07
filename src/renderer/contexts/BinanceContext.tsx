@@ -2,7 +2,7 @@ import React, { createContext, useContext } from 'react'
 
 import {
   client$,
-  clientViewState$,
+  clientState$,
   subscribeTransfers,
   miniTickers$,
   txs$,
@@ -24,7 +24,7 @@ import {
 
 export type BinanceContextValue = {
   client$: typeof client$
-  clientViewState$: typeof clientViewState$
+  clientState$: typeof clientState$
   subscribeTransfers: typeof subscribeTransfers
   miniTickers$: typeof miniTickers$
   txs$: typeof txs$
@@ -46,7 +46,7 @@ export type BinanceContextValue = {
 
 const initialContext: BinanceContextValue = {
   client$,
-  clientViewState$,
+  clientState$,
   subscribeTransfers,
   miniTickers$,
   txs$,

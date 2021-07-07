@@ -2,7 +2,7 @@ import React, { createContext, useContext } from 'react'
 
 import {
   client$,
-  clientViewState$,
+  clientState$,
   txs$,
   resetTx,
   subscribeTx,
@@ -23,7 +23,7 @@ import {
 
 export type EthereumContextValue = {
   client$: typeof client$
-  clientViewState$: typeof clientViewState$
+  clientState$: typeof clientState$
   txs$: typeof txs$
   resetTx: typeof resetTx
   subscribeTx: typeof subscribeTx
@@ -44,7 +44,7 @@ export type EthereumContextValue = {
 
 const initialContext: EthereumContextValue = {
   client$,
-  clientViewState$,
+  clientState$,
   txs$,
   resetTx,
   subscribeTx,

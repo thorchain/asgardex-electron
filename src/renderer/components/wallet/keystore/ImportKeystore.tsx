@@ -1,38 +1,32 @@
-import React, { useCallback, useEffect, useMemo } from 'react'
+import React, { useCallback, useMemo } from 'react'
 
 import { CheckCircleTwoTone, UploadOutlined } from '@ant-design/icons'
 import * as RD from '@devexperts/remote-data-ts'
 import { Keystore } from '@xchainjs/xchain-crypto'
-import { Form, Spin } from 'antd'
+import { Form } from 'antd'
 import { Store } from 'antd/lib/form/interface'
-import Paragraph from 'antd/lib/typography/Paragraph'
 import * as FP from 'fp-ts/lib/function'
-import { useObservableState } from 'observable-hooks'
 import { useIntl } from 'react-intl'
-import { useHistory } from 'react-router-dom'
 
-import { useBinanceContext } from '../../../contexts/BinanceContext'
+import { KeystoreClientStates } from '../../../hooks/useKeystoreClientStates'
 import { useSubscriptionState } from '../../../hooks/useSubscriptionState'
-import * as walletRoutes from '../../../routes/wallet'
 import { ImportKeystoreLD, LoadKeystoreLD } from '../../../services/wallet/types'
+import { Spin } from '../../shared/loading'
 import { InputPassword } from '../../uielements/input'
 import * as Styled from './Keystore.styles'
 
 type Props = {
+  clientStates: KeystoreClientStates
   importKeystore$: (keystore: Keystore, password: string) => ImportKeystoreLD
   loadKeystore$: () => LoadKeystoreLD
 }
 
 export const ImportKeystore: React.FC<Props> = (props): JSX.Element => {
-  const { importKeystore$, loadKeystore$ } = props
+  const { importKeystore$, loadKeystore$, clientStates } = props
 
-  const history = useHistory()
   const [form] = Form.useForm()
 
   const intl = useIntl()
-
-  const { clientViewState$ } = useBinanceContext()
-  const clientViewState = useObservableState(clientViewState$, 'notready')
 
   const { state: loadKeystoreState, subscribe: subscribeLoadKeystoreState } = useSubscriptionState<
     RD.RemoteData<Error, Keystore>
@@ -41,12 +35,6 @@ export const ImportKeystore: React.FC<Props> = (props): JSX.Element => {
   const { state: importKeystoreState, subscribe: subscribeImportKeystoreState } = useSubscriptionState<
     RD.RemoteData<Error, void>
   >(RD.initial)
-
-  useEffect(() => {
-    if (clientViewState === 'ready') {
-      history.push(walletRoutes.assets.template)
-    }
-  }, [clientViewState, history, intl])
 
   const submitForm = useCallback(
     ({ password }: Store) => {
@@ -65,7 +53,7 @@ export const ImportKeystore: React.FC<Props> = (props): JSX.Element => {
     subscribeLoadKeystoreState(loadKeystore$())
   }
 
-  const renderError = useCallback((msg: string) => <Paragraph style={{ color: 'red' }}>{msg}</Paragraph>, [])
+  const renderError = useCallback((msg: string) => <Styled.ErrorLabel>{msg}</Styled.ErrorLabel>, [])
 
   const renderImportError = useMemo(
     () =>
@@ -95,12 +83,29 @@ export const ImportKeystore: React.FC<Props> = (props): JSX.Element => {
     [loadKeystoreState, intl, renderError]
   )
 
+  const renderClientError = useMemo(
+    () =>
+      FP.pipe(
+        clientStates,
+        RD.fold(
+          () => <></>,
+          () => <></>,
+          (error) => renderError(`Could not create client: ${error?.message ?? error.toString()}`),
+          () => <></>
+        )
+      ),
+    [clientStates, renderError]
+  )
+
   return (
     <>
       <Styled.Form form={form} onFinish={submitForm} labelCol={{ span: 24 }}>
         {renderLoadError}
         {renderImportError}
-        <Spin spinning={RD.isPending(importKeystoreState)} tip={intl.formatMessage({ id: 'common.loading' })}>
+        {renderClientError}
+        <Spin
+          spinning={RD.isPending(importKeystoreState) || RD.isPending(loadKeystoreState)}
+          tip={intl.formatMessage({ id: 'common.loading' })}>
           <Form.Item>
             <Styled.Title>{intl.formatMessage({ id: 'wallet.imports.keystore.title' })}</Styled.Title>
             <Styled.KeystoreButton onClick={uploadKeystore}>
