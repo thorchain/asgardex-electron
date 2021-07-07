@@ -15,12 +15,13 @@ import {
   isEthAsset,
   isLtcAsset,
   isRuneBnbAsset,
-  isRuneNativeAsset
+  isRuneNativeAsset,
+  isXRuneAsset
 } from '../../../../helpers/assetHelper'
 import { isBnbChain, isEthChain } from '../../../../helpers/chainHelper'
 import { getIntFromName, rainbowStop } from '../../../../helpers/colorHelpers'
 import { useRemoteImage } from '../../../../hooks/useRemoteImage'
-import { bnbIcon, btcIcon, ethIcon, runeIcon, bnbRuneIcon } from '../../../icons'
+import { bnbIcon, btcIcon, ethIcon, runeIcon, bnbRuneIcon, xRuneIcon } from '../../../icons'
 import * as Styled from './AssetIcon.style'
 import { Size } from './AssetIcon.types'
 
@@ -69,6 +70,10 @@ export const AssetIcon: React.FC<Props> = ({
     // BCH
     if (isBchAsset(asset)) {
       return `https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/bitcoincash/info/logo.png`
+    }
+
+    if (isXRuneAsset(asset)) {
+      return xRuneIcon
     }
 
     if (network !== 'testnet') {
