@@ -1,4 +1,4 @@
-import { isMiniToken, isBinanceChain } from './binanceHelper'
+import { isMiniToken } from './binanceHelper'
 
 describe('binanceHelper', () => {
   describe('isMiniToken', () => {
@@ -13,15 +13,6 @@ describe('binanceHelper', () => {
     })
     it('is false for empty symbol', () => {
       expect(isMiniToken({ symbol: '' })).toBeFalsy()
-    })
-  })
-
-  describe('isBinanceChain', () => {
-    it('is true`', () => {
-      expect(isBinanceChain({ chain: 'BNB' })).toBeTruthy()
-    })
-    it('is false for others', () => {
-      expect(isBinanceChain({ chain: 'ETH' })).toBeFalsy()
     })
   })
 })

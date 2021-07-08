@@ -1,4 +1,6 @@
 import * as RD from '@devexperts/remote-data-ts'
+import { ETHAddress } from '@xchainjs/xchain-ethereum'
+import { baseAmount } from '@xchainjs/xchain-util'
 import * as FP from 'fp-ts/function'
 import { useObservableState } from 'observable-hooks'
 
@@ -13,7 +15,11 @@ export const UpgradeETH: React.FC<CommonUpgradeProps> = (props) => {
   const [upgradeFeeRD] = useObservableState(
     () =>
       FP.pipe(
-        fees$(),
+        fees$({
+          asset: props.runeAsset.asset,
+          amount: baseAmount(1),
+          recipient: ETHAddress
+        }),
         liveData.map((fees) => fees.fast)
       ),
     RD.initial

@@ -9,7 +9,7 @@ import { getEthAssetAddress, isRuneEthAsset } from '../../../helpers/assetHelper
 import { liveData } from '../../../helpers/rx/liveData'
 import { observableState } from '../../../helpers/stateHelper'
 import { service as midgardService } from '../../midgard/service'
-import { INITIAL_UPGRADE_RUNE_STATE } from '../const'
+import { ChainTxFeeOption, INITIAL_UPGRADE_RUNE_STATE } from '../const'
 import { UpgradeRuneParams, UpgradeRuneTxState, UpgradeRuneTxState$ } from '../types'
 import { poolTxStatusByChain$, sendPoolTx$ } from './common'
 
@@ -19,7 +19,7 @@ const { pools: midgardPoolsService } = midgardService
  * Upgrade BNB.RUNE
  */
 export const upgradeRuneToNative$ = ({
-  poolAddresses,
+  poolAddress: poolAddresses,
   asset,
   amount,
   memo
@@ -50,7 +50,7 @@ export const upgradeRuneToNative$ = ({
         recipient: poolAddresses.address,
         amount,
         memo,
-        feeOptionKey: 'fast'
+        feeOption: ChainTxFeeOption.UPGRADE
       })
     }),
     liveData.chain((txHash) => {

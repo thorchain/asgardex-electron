@@ -1,4 +1,4 @@
-import { Chain } from '@xchainjs/xchain-util'
+import { BNBChain, BTCChain, Chain } from '@xchainjs/xchain-util'
 
 import { network$ } from '../app/service'
 import * as BNB from '../binance'
@@ -7,9 +7,9 @@ import { LedgerAddressParams } from './types'
 
 const retrieveLedgerAddress = ({ chain, network }: LedgerAddressParams): void => {
   switch (chain) {
-    case 'BTC':
+    case BTCChain:
       return BTC.retrieveLedgerAddress(network)
-    case 'BNB':
+    case BNBChain:
       return BNB.retrieveLedgerAddress(network)
     default:
       break
@@ -18,9 +18,9 @@ const retrieveLedgerAddress = ({ chain, network }: LedgerAddressParams): void =>
 
 const removeLedgerAddress = (chain: Chain): void => {
   switch (chain) {
-    case 'BTC':
+    case BTCChain:
       return BTC.removeLedgerAddress()
-    case 'BNB':
+    case BNBChain:
       return BNB.removeLedgerAddress()
     default:
       break

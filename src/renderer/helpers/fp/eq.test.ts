@@ -1,5 +1,16 @@
 import { Balance } from '@xchainjs/xchain-client'
-import { assetAmount, AssetBNB, AssetBTC, AssetRuneNative, baseAmount, bn, Chain } from '@xchainjs/xchain-util'
+import {
+  assetAmount,
+  AssetBNB,
+  AssetBTC,
+  AssetRuneNative,
+  baseAmount,
+  BCHChain,
+  bn,
+  BNBChain,
+  Chain,
+  THORChain
+} from '@xchainjs/xchain-util'
 import * as O from 'fp-ts/lib/Option'
 
 import { ASSETS_TESTNET } from '../../../shared/mock/assets'
@@ -70,25 +81,25 @@ describe('helpers/fp/eq', () => {
 
   describe('eqChain', () => {
     it('is equal', () => {
-      expect(eqChain.equals('THOR', 'THOR')).toBeTruthy()
+      expect(eqChain.equals(THORChain, THORChain)).toBeTruthy()
     })
     it('is not equal', () => {
-      expect(eqChain.equals('THOR', 'BNB')).toBeFalsy()
+      expect(eqChain.equals(THORChain, BNBChain)).toBeFalsy()
     })
   })
 
   describe('eqOChain', () => {
     it('same some(chain) are equal', () => {
-      const a: O.Option<Chain> = O.some('THOR')
+      const a: O.Option<Chain> = O.some(THORChain)
       expect(eqOChain.equals(a, a)).toBeTruthy()
     })
     it('different some(chain) are not equal', () => {
-      const a: O.Option<Chain> = O.some('THOR')
-      const b: O.Option<Chain> = O.some('BNB')
+      const a: O.Option<Chain> = O.some(THORChain)
+      const b: O.Option<Chain> = O.some(BNBChain)
       expect(eqOChain.equals(a, b)).toBeFalsy()
     })
     it('none/some are not equal', () => {
-      const b: O.Option<Chain> = O.some('BNB')
+      const b: O.Option<Chain> = O.some(BNBChain)
       expect(eqOChain.equals(O.none, b)).toBeFalsy()
     })
     it('none/none are equal', () => {
@@ -327,13 +338,13 @@ describe('helpers/fp/eq', () => {
   })
   describe('eqPoolAddresses', () => {
     const a: PoolAddress = {
-      chain: 'BCH',
+      chain: BCHChain,
       address: 'addressA',
       router: O.none,
       halted: false
     }
     const b: PoolAddress = {
-      chain: 'BNB',
+      chain: BNBChain,
       address: 'addressB',
       router: O.some('routerB'),
       halted: false

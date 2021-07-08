@@ -104,7 +104,7 @@ const miniTickers$ = ws$.pipe(
         // Since we have filtered messages out before,
         // we know that `data` is available here,
         // but we have to do a type cast again
-        map((event: WS.MiniTickersEvent) => event?.data as WS.MiniTickers)
+        map((event: WS.MiniTickersEvent) => event?.data as WS.MiniTicker[])
       )
   )
 )

@@ -1,4 +1,5 @@
 import * as RD from '@devexperts/remote-data-ts'
+import { BCHChain, BNBChain, BTCChain, ETHChain, LTCChain, THORChain } from '@xchainjs/xchain-util'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
 import * as Rx from 'rxjs'
@@ -49,17 +50,17 @@ export const getTxs$: (walletAddress: O.Option<string>, walletIndex?: number) =>
           () => Rx.of(RD.initial),
           (asset) => {
             switch (asset.chain) {
-              case 'BNB':
+              case BNBChain:
                 return BNB.txs$({ asset: O.some(asset), limit, offset, walletAddress, walletIndex })
-              case 'BTC':
+              case BTCChain:
                 return BTC.txs$({ asset: O.none, limit, offset, walletAddress, walletIndex })
-              case 'ETH':
+              case ETHChain:
                 return ETH.txs$({ asset: O.some(asset), limit, offset, walletAddress, walletIndex })
-              case 'THOR':
+              case THORChain:
                 return THOR.txs$({ asset: O.none, limit, offset, walletAddress, walletIndex })
-              case 'LTC':
+              case LTCChain:
                 return LTC.txs$({ asset: O.none, limit, offset, walletAddress, walletIndex })
-              case 'BCH':
+              case BCHChain:
                 return BCH.txs$({ asset: O.none, limit, offset, walletAddress, walletIndex })
               default:
                 return Rx.of(

@@ -65,7 +65,7 @@ export type TransactionService<T> = {
 
 /**
  *
- * FeesService<FeeParams>
+ * FeesService
  *
  * According to the XChainClient's interface
  * `Client.getFees` accept an object of `FeeParams`, which might be overriden by clients.
@@ -77,8 +77,7 @@ export type TransactionService<T> = {
  * @see https://github.com/xchainjs/xchainjs-lib/blob/master/packages/xchain-ethereum/src/types/client-types.ts
  */
 
-export type FeesService<T> = {
-  reloadFees: (_?: T) => void
-  fees$: (_?: T) => FeesLD
-  reloadFees$: Rx.Observable<T | undefined>
+export type FeesService = {
+  reloadFees: () => void
+  fees$: () => FeesLD
 }

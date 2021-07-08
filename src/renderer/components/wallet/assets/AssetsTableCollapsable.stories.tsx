@@ -2,7 +2,6 @@ import React from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
 import { Story } from '@storybook/react'
-import { THORChain } from '@xchainjs/xchain-thorchain'
 import {
   Asset,
   AssetBNB,
@@ -17,7 +16,8 @@ import {
   BTCChain,
   Chain,
   ETHChain,
-  LTCChain
+  LTCChain,
+  THORChain
 } from '@xchainjs/xchain-util'
 import * as A from 'fp-ts/Array'
 import * as FP from 'fp-ts/function'

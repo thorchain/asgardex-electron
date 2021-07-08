@@ -1,8 +1,8 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
-import { FeeOptionKey, Fees } from '@xchainjs/xchain-client'
-import { Address, FeesParams, validateAddress } from '@xchainjs/xchain-ethereum'
+import { FeeOption, Fees, TxParams } from '@xchainjs/xchain-client'
+import { Address, validateAddress } from '@xchainjs/xchain-ethereum'
 import {
   formatAssetAmountCurrency,
   bn,
@@ -37,7 +37,7 @@ import { Input, InputBigNumber } from '../../../uielements/input'
 import { AccountSelector } from '../../account'
 import * as Styled from '../TxForm.style'
 import { validateTxAmountInput } from '../TxForm.util'
-import { DEFAULT_FEE_OPTION_KEY } from './Send.const'
+import { DEFAULT_FEE_OPTION } from './Send.const'
 import { useChangeAssetHandler } from './Send.hooks'
 
 export type FormValues = {
@@ -53,7 +53,7 @@ export type Props = {
   isLoading: boolean
   sendTxStatusMsg: string
   fees: FeesRD
-  reloadFeesHandler: (params: FeesParams) => void
+  reloadFeesHandler: (params: TxParams) => void
   validatePassword$: ValidatePasswordHandler
   network: Network
 }
@@ -75,7 +75,7 @@ export const SendFormETH: React.FC<Props> = (props): JSX.Element => {
 
   const changeAssetHandler = useChangeAssetHandler()
 
-  const [selectedFeeOptionKey, setSelectedFeeOptionKey] = useState<FeeOptionKey>(DEFAULT_FEE_OPTION_KEY)
+  const [selectedFeeOption, setSelectedFeeOption] = useState<FeeOption>(DEFAULT_FEE_OPTION)
 
   const [amountToSend, setAmountToSend] = useState<O.Option<BaseAmount>>(O.none)
   const [sendAddress, setSendAddress] = useState<O.Option<Address>>(O.none)
@@ -101,9 +101,9 @@ export const SendFormETH: React.FC<Props> = (props): JSX.Element => {
     () =>
       FP.pipe(
         oFees,
-        O.map((fees) => fees[selectedFeeOptionKey])
+        O.map((fees) => fees[selectedFeeOption])
       ),
-    [oFees, selectedFeeOptionKey]
+    [oFees, selectedFeeOption]
   )
 
   const oEthAmount: O.Option<BaseAmount> = useMemo(() => {
@@ -153,21 +153,21 @@ export const SendFormETH: React.FC<Props> = (props): JSX.Element => {
     )
   }, [oEthAmount, intl, isFeeError])
 
-  const feeOptionsLabel: Record<FeeOptionKey, string> = useMemo(
+  const feeOptionsLabel: Record<FeeOption, string> = useMemo(
     () => ({
-      fast: intl.formatMessage({ id: 'wallet.send.fast' }),
-      fastest: intl.formatMessage({ id: 'wallet.send.fastest' }),
-      average: intl.formatMessage({ id: 'wallet.send.average' })
+      [FeeOption.Fast]: intl.formatMessage({ id: 'wallet.send.fast' }),
+      [FeeOption.Fastest]: intl.formatMessage({ id: 'wallet.send.fastest' }),
+      [FeeOption.Average]: intl.formatMessage({ id: 'wallet.send.average' })
     }),
     [intl]
   )
 
   const renderFeeOptions = useMemo(() => {
-    const onChangeHandler = (e: RadioChangeEvent) => setSelectedFeeOptionKey(e.target.value)
+    const onChangeHandler = (e: RadioChangeEvent) => setSelectedFeeOption(e.target.value)
     const disabled = !feesAvailable || isLoading
 
     return (
-      <StyledR.Radio.Group onChange={onChangeHandler} value={selectedFeeOptionKey} disabled={disabled}>
+      <StyledR.Radio.Group onChange={onChangeHandler} value={selectedFeeOption} disabled={disabled}>
         <StyledR.Radio value="fastest" key="fastest">
           <StyledR.RadioLabel disabled={disabled}>{feeOptionsLabel['fastest']}</StyledR.RadioLabel>
         </StyledR.Radio>
@@ -179,7 +179,7 @@ export const SendFormETH: React.FC<Props> = (props): JSX.Element => {
         </StyledR.Radio>
       </StyledR.Radio.Group>
     )
-  }, [feeOptionsLabel, feesAvailable, isLoading, selectedFeeOptionKey])
+  }, [feeOptionsLabel, feesAvailable, isLoading, selectedFeeOption])
 
   const addressValidator = useCallback(
     async (_: unknown, value: string) => {
@@ -287,13 +287,13 @@ export const SendFormETH: React.FC<Props> = (props): JSX.Element => {
           recipient,
           asset: balance.asset,
           amount,
-          feeOptionKey: selectedFeeOptionKey,
+          feeOption: selectedFeeOption,
           memo: form.getFieldValue('memo')
         })
         return true
       })
     )
-  }, [balance.asset, form, onSubmit, selectedFeeOptionKey, sendAddress, amountToSend])
+  }, [balance.asset, form, onSubmit, selectedFeeOption, sendAddress, amountToSend])
 
   const renderPwModal = useMemo(
     () =>
@@ -313,9 +313,9 @@ export const SendFormETH: React.FC<Props> = (props): JSX.Element => {
     () =>
       FP.pipe(
         feesRD,
-        RD.map((fees) => [{ asset: AssetETH, amount: fees[selectedFeeOptionKey] }])
+        RD.map((fees) => [{ asset: AssetETH, amount: fees[selectedFeeOption] }])
       ),
-    [feesRD, selectedFeeOptionKey]
+    [feesRD, selectedFeeOption]
   )
 
   const addMaxAmountHandler = useCallback(() => setAmountToSend(O.some(maxAmount)), [maxAmount])
@@ -336,7 +336,7 @@ export const SendFormETH: React.FC<Props> = (props): JSX.Element => {
               // default value for BigNumberInput
               amount: bn(0),
               // Default value for RadioGroup of feeOptions
-              fee: DEFAULT_FEE_OPTION_KEY
+              fee: DEFAULT_FEE_OPTION
             }}
             onFinish={() => setShowPwModal(true)}
             labelCol={{ span: 24 }}>

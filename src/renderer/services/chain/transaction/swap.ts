@@ -10,7 +10,7 @@ import { isEthChain } from '../../../helpers/chainHelper'
 import { liveData } from '../../../helpers/rx/liveData'
 import { observableState } from '../../../helpers/stateHelper'
 import { service as midgardService } from '../../midgard/service'
-import { INITIAL_SWAP_STATE, FeeOptionKeys } from '../const'
+import { INITIAL_SWAP_STATE, ChainTxFeeOption } from '../const'
 import { SwapTxParams, SwapState, SwapState$ } from '../types'
 import { sendPoolTx$, poolTxStatusByChain$ } from './common'
 
@@ -63,7 +63,7 @@ export const swap$ = ({ poolAddress: poolAddresses, asset, amount, memo }: SwapT
         recipient: poolAddresses.address, // emtpy string for RuneNative
         amount,
         memo,
-        feeOptionKey: FeeOptionKeys.SWAP
+        feeOption: ChainTxFeeOption.SWAP
       })
     }),
     liveData.chain((txHash) => {

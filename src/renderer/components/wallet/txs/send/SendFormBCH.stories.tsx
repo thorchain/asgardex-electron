@@ -3,7 +3,7 @@ import React from 'react'
 import * as RD from '@devexperts/remote-data-ts'
 import { Meta, Story } from '@storybook/react'
 import { BCH_DECIMAL } from '@xchainjs/xchain-bitcoincash'
-import { FeeRates, Fees } from '@xchainjs/xchain-client'
+import { FeeRates, Fees, FeeType } from '@xchainjs/xchain-client'
 import {
   assetAmount,
   AssetBCH,
@@ -31,7 +31,7 @@ const runeBalance: WalletBalance = {
 }
 
 const fees: Fees = {
-  type: 'base',
+  type: FeeType.FlatFee,
   fastest: baseAmount(3000),
   fast: baseAmount(2000),
   average: baseAmount(1000)
@@ -46,7 +46,7 @@ const rates: FeeRates = {
 const defaultProps: ComponentProps = {
   balances: [bchBalance, runeBalance],
   balance: bchBalance,
-  onSubmit: ({ recipient, amount, feeOptionKey, memo }: SendTxParams) =>
+  onSubmit: ({ recipient, amount, feeOption: feeOptionKey, memo }: SendTxParams) =>
     console.log(`to: ${recipient}, amount ${formatBaseAmount(amount)}, feeOptionKey: ${feeOptionKey}, memo: ${memo}`),
   isLoading: false,
   addressValidation: (_) => true,

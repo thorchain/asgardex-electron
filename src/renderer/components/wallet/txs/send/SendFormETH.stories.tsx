@@ -2,8 +2,8 @@ import React from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
 import { Meta, Story } from '@storybook/react'
-import { Fees } from '@xchainjs/xchain-client'
-import { ETH_DECIMAL, FeesParams } from '@xchainjs/xchain-ethereum'
+import { Fees, FeeType, TxParams } from '@xchainjs/xchain-client'
+import { ETH_DECIMAL } from '@xchainjs/xchain-ethereum'
 import { assetAmount, AssetETH, AssetRuneNative, assetToBase } from '@xchainjs/xchain-util'
 
 import { mockValidatePassword$ } from '../../../../../shared/mock/wallet'
@@ -26,7 +26,7 @@ const runeBalance: WalletBalance = {
 }
 
 const fees: Fees = {
-  type: 'byte',
+  type: FeeType.PerByte,
   fastest: assetToBase(assetAmount(0.002499, ETH_DECIMAL)),
   fast: assetToBase(assetAmount(0.002079, ETH_DECIMAL)),
   average: assetToBase(assetAmount(0.001848, ETH_DECIMAL))
@@ -36,7 +36,7 @@ const defaultProps: SendFormETHProps = {
   balances: [ethBalance, runeBalance],
   balance: ethBalance,
   fees: RD.success(fees),
-  reloadFeesHandler: (p: FeesParams) => console.log('reloadFeesHandler', p),
+  reloadFeesHandler: (p: TxParams) => console.log('reloadFeesHandler', p),
   validatePassword$: mockValidatePassword$,
   onSubmit: (p: SendTxParams) => {
     console.log('transfer$:', p)

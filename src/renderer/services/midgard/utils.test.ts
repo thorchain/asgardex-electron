@@ -8,11 +8,13 @@ import {
   AssetRuneNative,
   assetToBase,
   assetToString,
+  BCHChain,
   bn,
   BNBChain,
   BTCChain,
   Chain,
   ETHChain,
+  LTCChain,
   THORChain
 } from '@xchainjs/xchain-util'
 import * as FP from 'fp-ts/lib/function'
@@ -243,13 +245,13 @@ describe('services/midgard/utils/', () => {
       expect(inboundToPoolAddresses([])).toEqual([RUNE_POOL_ADDRESS])
     })
     it('adds two `PoolAddress`es', () => {
-      const result = inboundToPoolAddresses([{ chain: 'BNB', address: 'bnb-address', router: '', halted: false }])
+      const result = inboundToPoolAddresses([{ chain: BNBChain, address: 'bnb-address', router: '', halted: false }])
       expect(result.length).toEqual(2)
       // RUNE `PoolAddress`
       expect(result[0]).toEqual(RUNE_POOL_ADDRESS)
       // bnb `PoolAddress`
       expect(result[1]).toEqual({
-        chain: 'BNB',
+        chain: BNBChain,
         address: 'bnb-address',
         router: O.none,
         halted: false
@@ -440,27 +442,27 @@ describe('services/midgard/utils/', () => {
 
     describe('getGasRateByChain', () => {
       const data: { chain: Chain; gas_rate?: string }[] = [
-        { chain: 'BNB', gas_rate: '1' },
-        { chain: 'ETH', gas_rate: '2' },
-        { chain: 'BTC', gas_rate: '3' },
-        { chain: 'LTC' }, // no gas rate
-        { chain: 'BCH', gas_rate: 'invalid' } // invalid gas rate
+        { chain: BNBChain, gas_rate: '1' },
+        { chain: ETHChain, gas_rate: '2' },
+        { chain: BTCChain, gas_rate: '3' },
+        { chain: LTCChain }, // no gas rate
+        { chain: BCHChain, gas_rate: 'invalid' } // invalid gas rate
       ]
 
       it('gas rate for BNB', () => {
-        const result = getGasRateByChain(data, 'BNB')
+        const result = getGasRateByChain(data, BNBChain)
         expect(eqOBigNumber.equals(result, O.some(bn(1)))).toBeTruthy()
       })
       it('gas rate for ETH', () => {
-        const result = getGasRateByChain(data, 'ETH')
+        const result = getGasRateByChain(data, ETHChain)
         expect(eqOBigNumber.equals(result, O.some(bn(2)))).toBeTruthy()
       })
       it('none for missing gas rate (LTC)', () => {
-        const result = getGasRateByChain(data, 'LTC')
+        const result = getGasRateByChain(data, LTCChain)
         expect(result).toBeNone()
       })
       it('none for invalid gas rate (BCH)', () => {
-        const result = getGasRateByChain(data, 'BCH')
+        const result = getGasRateByChain(data, BCHChain)
         expect(result).toBeNone()
       })
     })

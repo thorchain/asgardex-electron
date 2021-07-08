@@ -2,7 +2,15 @@ import React from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
 import { Story, Meta } from '@storybook/react'
-import { assetAmount, AssetBNB, AssetRune67C, AssetRuneNative, assetToBase, baseAmount } from '@xchainjs/xchain-util'
+import {
+  assetAmount,
+  AssetBNB,
+  AssetRune67C,
+  AssetRuneNative,
+  assetToBase,
+  baseAmount,
+  BNBChain
+} from '@xchainjs/xchain-util'
 import * as NEA from 'fp-ts/lib/NonEmptyArray'
 import * as O from 'fp-ts/lib/Option'
 import * as Rx from 'rxjs'
@@ -55,7 +63,7 @@ const defaultProps: UpgradeProps = {
   runeNativeAddress: 'rune-native-address',
   walletAddress: 'BNB.Rune address',
   reloadOnError: () => {},
-  targetPoolAddressRD: RD.success({ chain: 'BNB', address: 'bnb-pool-address', router: O.none, halted: false }),
+  targetPoolAddressRD: RD.success({ chain: BNBChain, address: 'bnb-pool-address', router: O.none, halted: false }),
   validatePassword$: mockValidatePassword$,
   fee: RD.success(baseAmount(37500)),
   upgrade$: (p: UpgradeRuneParams): UpgradeRuneTxState$ => {

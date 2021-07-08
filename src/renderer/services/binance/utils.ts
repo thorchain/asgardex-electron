@@ -1,5 +1,5 @@
-import { Balances as BinanceBalances } from '@xchainjs/xchain-binance'
-import { Balances } from '@xchainjs/xchain-client'
+import { Balance as BinanceBalance } from '@xchainjs/xchain-binance'
+import { Balance } from '@xchainjs/xchain-client'
 import { assetAmount, bnOrZero, assetFromString, Asset, assetToBase, AssetBNB } from '@xchainjs/xchain-util'
 import * as A from 'fp-ts/lib/Array'
 import * as FP from 'fp-ts/lib/function'
@@ -18,7 +18,7 @@ export const bncSymbolToAsset = (symbol: string): O.Option<Asset> =>
  **/
 export const bncSymbolToAssetString = (symbol: string) => `${AssetBNB.chain}.${symbol}`
 
-type GetWalletBalances = (balances: BinanceBalances) => Balances
+type GetWalletBalances = (balances: BinanceBalance[]) => Balance[]
 export const getWalletBalances: GetWalletBalances = A.filterMap(({ symbol, free }) =>
   FP.pipe(
     bncSymbolToAsset(symbol),

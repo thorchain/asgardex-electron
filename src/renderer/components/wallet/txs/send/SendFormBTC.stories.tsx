@@ -4,7 +4,7 @@ import * as RD from '@devexperts/remote-data-ts'
 import { Meta, Story } from '@storybook/react'
 import { validateAddress } from '@xchainjs/xchain-bitcoin'
 import { BTC_DECIMAL } from '@xchainjs/xchain-bitcoin'
-import { FeeRates, Fees } from '@xchainjs/xchain-client'
+import { FeeRates, Fees, FeeType, Network } from '@xchainjs/xchain-client'
 import {
   assetAmount,
   AssetBTC,
@@ -32,7 +32,7 @@ const runeBalance: WalletBalance = {
 }
 
 const fees: Fees = {
-  type: 'base',
+  type: FeeType.FlatFee,
   fastest: baseAmount(3000),
   fast: baseAmount(2000),
   average: baseAmount(1000)
@@ -47,10 +47,10 @@ const rates: FeeRates = {
 const defaultProps: ComponentProps = {
   balances: [btcBalance, runeBalance],
   balance: btcBalance,
-  onSubmit: ({ recipient, amount, feeOptionKey, memo }: SendTxParams) =>
+  onSubmit: ({ recipient, amount, feeOption: feeOptionKey, memo }: SendTxParams) =>
     console.log(`to: ${recipient}, amount ${formatBaseAmount(amount)}, feeOptionKey: ${feeOptionKey}, memo: ${memo}`),
   isLoading: false,
-  addressValidation: (address) => validateAddress(address, 'mainnet'),
+  addressValidation: (address) => validateAddress(address, Network.Mainnet),
   feesWithRates: RD.success({ fees, rates }),
   reloadFeesHandler: () => console.log('reload fees'),
   validatePassword$: mockValidatePassword$,
