@@ -51,7 +51,7 @@ export const sendTx$ = ({ asset, recipient, amount, memo, feeOption = DEFAULT_FE
       )
 
     case ETHChain:
-      return ETH.sendTx({ asset, recipient, amount, memo, feeOption: feeOption })
+      return ETH.sendTx({ asset, recipient, amount, memo, feeOption })
 
     case THORChain: {
       return THOR.sendTx({ amount, asset, memo, recipient })
@@ -109,7 +109,7 @@ export const sendPoolTx$ = ({
       return THOR.sendPoolTx$({ amount, asset, memo })
 
     default:
-      return sendTx$({ asset, recipient, amount, memo, feeOption: feeOption })
+      return sendTx$({ asset, recipient, amount, memo, feeOption })
   }
 }
 
