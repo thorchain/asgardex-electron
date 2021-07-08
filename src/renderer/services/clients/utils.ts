@@ -5,4 +5,5 @@ import { Network } from '../../../shared/api/types'
 /**
  * Helper to type cast `Network` (ASGDX) -> `Client.Network` (xchain-client)
  */
-export const toClientNetwork = (network: Network): Client.Network => network
+export const toClientNetwork = (network: Network): Client.Network =>
+  network === 'mainnet' ? Client.Network.Mainnet : Client.Network.Testnet

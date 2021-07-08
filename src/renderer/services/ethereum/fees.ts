@@ -1,7 +1,7 @@
 import * as RD from '@devexperts/remote-data-ts'
-import { Fees } from '@xchainjs/xchain-client'
-import { getFee, getDefaultFees, FeesParams } from '@xchainjs/xchain-ethereum'
-import { Asset, Chain } from '@xchainjs/xchain-util'
+import { Fees, FeeType, TxParams } from '@xchainjs/xchain-client'
+import { getFee, getDefaultFees, ETHAddress } from '@xchainjs/xchain-ethereum'
+import { Asset, baseAmount } from '@xchainjs/xchain-util'
 import { ethers } from 'ethers'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/Option'
@@ -12,13 +12,33 @@ import { isEthAsset } from '../../helpers/assetHelper'
 import { observableState } from '../../helpers/stateHelper'
 import { FeeLD } from '../chain/types'
 import * as C from '../clients'
+import { FeesLD } from '../clients'
 import { FeesService, Client$, PollInTxFeeParams, ApproveParams, ApproveFeeHandler } from './types'
 
 export const ETH_OUT_TX_GAS_LIMIT = ethers.BigNumber.from('35609')
 export const ERC20_OUT_TX_GAS_LIMIT = ethers.BigNumber.from('49610')
 
-export const createFeesService = ({ client$, chain }: { client$: Client$; chain: Chain }): FeesService => {
-  const common = C.createFeesService<FeesParams>({ client$, chain })
+export const createFeesService = (client$: Client$): FeesService => {
+  const { get$: reloadFees$, set: reloadFees } = observableState<TxParams>({
+    amount: baseAmount(1),
+    recipient: ETHAddress
+  })
+
+  const fees$ = (params?: TxParams): FeesLD =>
+    Rx.combineLatest([reloadFees$, client$]).pipe(
+      RxOp.switchMap(([reloadFeesParams, oClient]) =>
+        FP.pipe(
+          oClient,
+          O.fold(
+            () => Rx.EMPTY,
+            (client) => Rx.from(client.getFees(reloadFeesParams || params))
+          )
+        )
+      ),
+      RxOp.map(RD.success),
+      RxOp.catchError((_) => Rx.of(RD.success(getDefaultFees()))),
+      RxOp.startWith(RD.pending)
+    )
 
   /**
    * Fees for sending txs into pool on Ethereum
@@ -38,7 +58,7 @@ export const createFeesService = ({ client$, chain }: { client$: Client$; chain:
                 RxOp.map(
                   ([gasLimit, gasPrices]) =>
                     ({
-                      type: 'byte',
+                      type: FeeType.PerByte,
                       average: getFee({ gasPrice: gasPrices.average, gasLimit }),
                       fast: getFee({ gasPrice: gasPrices.fast, gasLimit }),
                       fastest: getFee({ gasPrice: gasPrices.fastest, gasLimit })
@@ -128,7 +148,8 @@ export const createFeesService = ({ client$, chain }: { client$: Client$; chain:
   }
 
   return {
-    ...common,
+    fees$,
+    reloadFees,
     poolInTxFees$,
     poolOutTxFee$,
     approveFee$,

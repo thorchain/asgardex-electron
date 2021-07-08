@@ -1,13 +1,14 @@
 import React from 'react'
 
 import { Meta, Story } from '@storybook/react'
+import { BNBChain } from '@xchainjs/xchain-util'
 
 import { BNB_ADDRESS_MAINNET, BNB_ADDRESS_TESTNET } from '../../../../shared/mock/address'
 import { AddressEllipsis } from './index'
 
 const mainnetTemplate: Story = (args) => (
   <div style={{ width: args.width || 400 }}>
-    <AddressEllipsis address={BNB_ADDRESS_MAINNET} chain="BNB" network="mainnet" />
+    <AddressEllipsis address={BNB_ADDRESS_MAINNET} chain={BNBChain} network="mainnet" />
   </div>
 )
 
@@ -19,7 +20,7 @@ mainnet.args = {
 
 const testnetTemplate: Story = (args) => (
   <div style={{ width: args.width || 400 }}>
-    <AddressEllipsis address={BNB_ADDRESS_TESTNET} chain="BNB" network="testnet" />
+    <AddressEllipsis address={BNB_ADDRESS_TESTNET} chain={BNBChain} network="testnet" />
   </div>
 )
 

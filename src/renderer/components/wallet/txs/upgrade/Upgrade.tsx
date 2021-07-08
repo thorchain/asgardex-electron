@@ -2,7 +2,7 @@ import React, { useMemo, useCallback, useState, useEffect } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
 import { getSwitchMemo } from '@thorchain/asgardex-util'
-import { Address } from '@xchainjs/xchain-client'
+import { Address, TxParams } from '@xchainjs/xchain-client'
 import { assetAmount, assetToBase, BaseAmount, baseToAsset, formatAssetAmountCurrency } from '@xchainjs/xchain-util'
 import { Form } from 'antd'
 import BigNumber from 'bignumber.js'
@@ -44,7 +44,7 @@ export type Props = {
   fee: FeeRD
   upgrade$: (_: UpgradeRuneParams) => UpgradeRuneTxState$
   balances: O.Option<NonEmptyWalletBalances>
-  reloadFeeHandler: FP.Lazy<void>
+  reloadFeeHandler: (params: TxParams) => void
   successActionHandler: (txHash: string) => Promise<void>
   reloadBalancesHandler: FP.Lazy<void>
   network: Network
@@ -189,10 +189,10 @@ export const Upgrade: React.FC<Props> = (props): JSX.Element => {
       FP.pipe(
         targetPoolAddressRD,
         RD.toOption,
-        O.map((poolAddresses) => {
+        O.map((poolAddress) => {
           subscribeUpgradeTxState(
             upgrade$({
-              poolAddresses,
+              poolAddress,
               amount: amountToUpgrade,
               asset: runeAsset.asset,
               memo: getSwitchMemo(runeNativeAddress)
@@ -318,6 +318,19 @@ export const Upgrade: React.FC<Props> = (props): JSX.Element => {
     [isFeeError, oNonNativeRuneAmount, isLoading]
   )
 
+  const reloadFees = useCallback(() => {
+    FP.pipe(
+      targetPoolAddressRD,
+      RD.toOption,
+      O.map((poolAddress) => {
+        reloadFeeHandler({ asset: runeAsset.asset, amount: amountToUpgrade, recipient: poolAddress.address })
+        return true
+      })
+    )
+
+    return false
+  }, [targetPoolAddressRD, reloadFeeHandler, runeAsset.asset, amountToUpgrade])
+
   const renderUpgradeForm = useMemo(
     () => (
       <CStyled.FormWrapper>
@@ -343,7 +356,7 @@ export const Upgrade: React.FC<Props> = (props): JSX.Element => {
                 disabled={isLoading}
               />
 
-              <CStyled.Fees fees={uiFeesRD} reloadFees={reloadFeeHandler} disabled={isLoading} />
+              <CStyled.Fees fees={uiFeesRD} reloadFees={reloadFees} disabled={isLoading} />
               {renderFeeError}
             </Styled.SubForm>
             <Styled.SubmitContainer>
@@ -357,21 +370,21 @@ export const Upgrade: React.FC<Props> = (props): JSX.Element => {
       </CStyled.FormWrapper>
     ),
     [
-      addMaxAmountHandler,
-      amountValidator,
+      runeAsset.asset,
+      network,
       form,
-      intl,
-      isDisabled,
-      isLoading,
-      maxAmount,
-      onChangeInput,
       onSubmit,
-      reloadFeeHandler,
-      renderFeeError,
-      runeAsset,
-      txStatusMsg,
+      intl,
+      amountValidator,
+      isLoading,
+      onChangeInput,
+      maxAmount,
+      addMaxAmountHandler,
       uiFeesRD,
-      network
+      reloadFees,
+      renderFeeError,
+      txStatusMsg,
+      isDisabled
     ]
   )
 

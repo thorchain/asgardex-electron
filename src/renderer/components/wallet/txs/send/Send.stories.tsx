@@ -3,7 +3,7 @@ import React, { useMemo } from 'react'
 import * as RD from '@devexperts/remote-data-ts'
 import { Story, Meta } from '@storybook/react'
 import { BTC_DECIMAL } from '@xchainjs/xchain-bitcoin'
-import { FeeRates, Fees } from '@xchainjs/xchain-client'
+import { FeeRates, Fees, FeeType } from '@xchainjs/xchain-client'
 import {
   assetAmount,
   AssetBNB,
@@ -105,7 +105,7 @@ const getSendBalance = (component: SendForm) => {
 const balances: WalletBalances = [bnbAsset, runeAsset, btcBalance, ethBalance]
 
 const fees: Fees = {
-  type: 'base',
+  type: FeeType.FlatFee,
   fastest: baseAmount(3000),
   fast: baseAmount(2000),
   average: baseAmount(1000)

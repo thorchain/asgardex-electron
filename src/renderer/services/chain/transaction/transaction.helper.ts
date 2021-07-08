@@ -4,7 +4,19 @@ import { DECIMAL as COSMOS_DECIMAL } from '@xchainjs/xchain-cosmos'
 import { ETH_DECIMAL } from '@xchainjs/xchain-ethereum'
 import { LTC_DECIMAL } from '@xchainjs/xchain-litecoin'
 import { DECIMAL as THOR_DECIMAL } from '@xchainjs/xchain-thorchain'
-import { BaseAmount, baseAmount, Chain } from '@xchainjs/xchain-util'
+import {
+  BaseAmount,
+  baseAmount,
+  BCHChain,
+  BNBChain,
+  BTCChain,
+  Chain,
+  CosmosChain,
+  ETHChain,
+  LTCChain,
+  PolkadotChain,
+  THORChain
+} from '@xchainjs/xchain-util'
 
 import { Network } from '../../../../shared/api/types'
 import { BNB_DECIMAL } from '../../../helpers/assetHelper'
@@ -14,26 +26,26 @@ import { BNB_DECIMAL } from '../../../helpers/assetHelper'
  */
 export const smallestAmountToSent = (chain: Chain, _network: Network): BaseAmount => {
   switch (chain) {
-    case 'BNB':
+    case BNBChain:
       return baseAmount(1, BNB_DECIMAL)
-    case 'BTC':
+    case BTCChain:
       // 1000 satoshi
       return baseAmount(1000, BTC_DECIMAL)
-    case 'THOR':
+    case THORChain:
       // 0 thor
       return baseAmount(0, THOR_DECIMAL)
-    case 'ETH':
+    case ETHChain:
       // zero for ETH
       return baseAmount(0, ETH_DECIMAL)
-    case 'GAIA':
+    case CosmosChain:
       return baseAmount(1, COSMOS_DECIMAL)
-    case 'POLKA':
+    case PolkadotChain:
       // return baseAmount(1, getDecimalDot(getClientNetwork(network))
       throw Error('Polkadot is not supported yet')
-    case 'BCH':
+    case BCHChain:
       // 1000 satoshi
       return baseAmount(1000, BCH_DECIMAL)
-    case 'LTC':
+    case LTCChain:
       // 1000 satoshi
       return baseAmount(1000, LTC_DECIMAL)
   }

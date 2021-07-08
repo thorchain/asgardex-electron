@@ -64,7 +64,7 @@ export const SettingsView: React.FC = (): JSX.Element => {
           O.map(
             (address) =>
               ({
-                chainName: 'BNB',
+                chainName: BNBChain,
                 accounts: [
                   {
                     name: 'Main',
@@ -92,7 +92,7 @@ export const SettingsView: React.FC = (): JSX.Element => {
           O.map(
             (address) =>
               ({
-                chainName: 'ETH',
+                chainName: ETHChain,
                 accounts: [
                   {
                     name: 'Main',
@@ -116,7 +116,7 @@ export const SettingsView: React.FC = (): JSX.Element => {
           O.map(
             (address) =>
               ({
-                chainName: 'BTC',
+                chainName: BTCChain,
                 accounts: [
                   {
                     name: 'Main',

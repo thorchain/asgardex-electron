@@ -15,7 +15,7 @@ import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
 import * as Rx from 'rxjs'
 
-import { DEFAULT_FEE_OPTION_KEY } from '../../../components/wallet/txs/send/Send.const'
+import { DEFAULT_FEE_OPTION } from '../../../components/wallet/txs/send/Send.const'
 import { liveData } from '../../../helpers/rx/liveData'
 import * as BNB from '../../binance'
 import * as BTC from '../../bitcoin'
@@ -35,13 +35,7 @@ const txFailure$ = (msg: string) =>
     })
   )
 
-export const sendTx$ = ({
-  asset,
-  recipient,
-  amount,
-  memo,
-  feeOptionKey = DEFAULT_FEE_OPTION_KEY
-}: SendTxParams): TxHashLD => {
+export const sendTx$ = ({ asset, recipient, amount, memo, feeOption = DEFAULT_FEE_OPTION }: SendTxParams): TxHashLD => {
   switch (asset.chain) {
     case BNBChain:
       return BNB.sendTx({ recipient, amount, asset, memo })
@@ -53,11 +47,11 @@ export const sendTx$ = ({
           errorId: ErrorId.GET_FEES,
           msg: error?.message ?? error.toString()
         })),
-        liveData.chain(({ rates }) => BTC.sendTx({ recipient, amount, feeRate: rates[feeOptionKey], memo }))
+        liveData.chain(({ rates }) => BTC.sendTx({ recipient, amount, feeRate: rates[feeOption], memo }))
       )
 
     case ETHChain:
-      return ETH.sendTx({ asset, recipient, amount, memo, feeOptionKey })
+      return ETH.sendTx({ asset, recipient, amount, memo, feeOption: feeOption })
 
     case THORChain: {
       return THOR.sendTx({ amount, asset, memo, recipient })
@@ -77,7 +71,7 @@ export const sendTx$ = ({
           errorId: ErrorId.GET_FEES,
           msg: error?.message ?? error.toString()
         })),
-        liveData.chain(({ rates }) => BCH.sendTx({ recipient, amount, feeRate: rates[feeOptionKey], memo }))
+        liveData.chain(({ rates }) => BCH.sendTx({ recipient, amount, feeRate: rates[feeOption], memo }))
       )
     case LTCChain:
       return FP.pipe(
@@ -87,7 +81,7 @@ export const sendTx$ = ({
           msg: error?.message ?? error.toString()
         })),
         liveData.chain(({ rates }) => {
-          return LTC.sendTx({ recipient, amount, asset, memo, feeRate: rates[feeOptionKey] })
+          return LTC.sendTx({ recipient, amount, asset, memo, feeRate: rates[feeOption] })
         })
       )
   }
@@ -99,7 +93,7 @@ export const sendPoolTx$ = ({
   recipient,
   amount,
   memo,
-  feeOptionKey = DEFAULT_FEE_OPTION_KEY
+  feeOption = DEFAULT_FEE_OPTION
 }: SendPoolTxParams): TxHashLD => {
   switch (asset.chain) {
     case ETHChain:
@@ -115,7 +109,7 @@ export const sendPoolTx$ = ({
       return THOR.sendPoolTx$({ amount, asset, memo })
 
     default:
-      return sendTx$({ asset, recipient, amount, memo, feeOptionKey })
+      return sendTx$({ asset, recipient, amount, memo, feeOption: feeOption })
   }
 }
 

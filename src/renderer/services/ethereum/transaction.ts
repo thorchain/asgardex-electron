@@ -1,5 +1,5 @@
 import * as RD from '@devexperts/remote-data-ts'
-import { TxHash } from '@xchainjs/xchain-client'
+import { FeeOption, TxHash } from '@xchainjs/xchain-client'
 import { ETHAddress } from '@xchainjs/xchain-ethereum'
 import { baseAmount } from '@xchainjs/xchain-util'
 import BigNumber from 'bignumber.js'
@@ -95,7 +95,7 @@ export const createTransactionService = (client$: Client$): TransactionService =
       client.approve({
         ...params,
         walletIndex: 0,
-        feeOptionKey: 'fast',
+        feeOptionKey: FeeOption.Fast,
         gasLimitFallback: '65000'
       })
     ).pipe(

@@ -1,11 +1,11 @@
 import * as RD from '@devexperts/remote-data-ts'
-import { FeeOptionKey, XChainClient } from '@xchainjs/xchain-client'
-import { Address, EthereumClient, FeesParams, FeesWithGasPricesAndLimits } from '@xchainjs/xchain-ethereum'
+import { FeeOption, TxParams, XChainClient } from '@xchainjs/xchain-client'
+import { Address, EthereumClient, FeesWithGasPricesAndLimits } from '@xchainjs/xchain-ethereum'
 import { Asset, BaseAmount } from '@xchainjs/xchain-util'
 import { BigNumber, ethers } from 'ethers'
 
 import { LiveData } from '../../helpers/rx/liveData'
-import { FeeLD, SendPoolTxParams } from '../chain/types'
+import { FeeLD, FeesLD, SendPoolTxParams } from '../chain/types'
 import * as C from '../clients'
 import { ApiError, TxHashLD } from '../wallet/types'
 
@@ -27,7 +27,7 @@ export type SendTxParams = {
   recipient: Address
   amount: BaseAmount
   memo?: string
-  feeOptionKey?: FeeOptionKey
+  feeOption?: FeeOption
   gasLimit?: BigNumber
   gasPrice?: BaseAmount
 }
@@ -59,4 +59,6 @@ export type FeesService = {
   poolOutTxFee$: (asset: Asset) => C.FeesLD
   approveFee$: ApproveFeeHandler
   reloadApproveFee: LoadApproveFeeHandler
-} & C.FeesService<FeesParams>
+  reloadFees: (params: TxParams) => void
+  fees$: (params: TxParams) => FeesLD
+}

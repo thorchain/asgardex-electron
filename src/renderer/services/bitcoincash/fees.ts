@@ -13,7 +13,7 @@ import * as C from '../clients'
 import { Client$, FeesService, FeesWithRatesLD } from './types'
 
 export const createFeesService = (client$: Client$): FeesService => {
-  const baseFeesService = C.createFeesService<undefined>({ client$, chain: BCHChain })
+  const baseFeesService = C.createFeesService({ client$, chain: BCHChain })
 
   // state for reloading fees+rates
   const { get$: reloadFeesWithRates$, set: reloadFeesWithRates } = observableState<Memo | undefined>(undefined)

@@ -1,6 +1,6 @@
 import { getValueOfAsset1InAsset2, getValueOfRuneInAsset, PoolData } from '@thorchain/asgardex-util'
 import { Balance } from '@xchainjs/xchain-client'
-import { bnOrZero, assetFromString, AssetRuneNative, BaseAmount, Chain } from '@xchainjs/xchain-util'
+import { bnOrZero, assetFromString, AssetRuneNative, BaseAmount, Chain, THORChain } from '@xchainjs/xchain-util'
 import BigNumber from 'bignumber.js'
 import * as A from 'fp-ts/lib/Array'
 import * as Eq from 'fp-ts/lib/Eq'
@@ -49,7 +49,7 @@ export const RUNE_PRICE_POOL: PricePool = {
  * but do need such thing for handling pool txs
  */
 export const RUNE_POOL_ADDRESS: PoolAddress = {
-  chain: 'THOR',
+  chain: THORChain,
   // For RuneNative a `MsgNativeTx` is used for pool txs,
   // no need for a pool address, just keep it empty
   address: emptyString,
