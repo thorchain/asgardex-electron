@@ -49,8 +49,6 @@ export type GetExplorerAddressUrl = (address: string) => string
 
 export type GetExplorerTxUrl$ = Rx.Observable<O.Option<GetExplorerTxUrl>>
 
-export type GetExplorerAddressUrl$ = Rx.Observable<O.Option<GetExplorerAddressUrl>>
-
 export type Address$ = Rx.Observable<O.Option<Address>>
 
 export type TransactionService<T> = {
