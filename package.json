@@ -78,7 +78,7 @@
     "@xchainjs/xchain-client": "^0.10.1",
     "@xchainjs/xchain-cosmos": "^0.13.5",
     "@xchainjs/xchain-crypto": "^0.2.5",
-    "@xchainjs/xchain-ethereum": "^0.22.3",
+    "@xchainjs/xchain-ethereum": "^0.22.4",
     "@xchainjs/xchain-litecoin": "0.6.9",
     "@xchainjs/xchain-thorchain": "^0.17.3",
     "@xchainjs/xchain-util": "^0.3.0",
