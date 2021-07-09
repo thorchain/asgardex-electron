@@ -16,6 +16,8 @@ export const Result = styled(A.Result)`
   background-color: ${palette('background', 1)};
 
   .ant-result-title {
+    font-size: 17px;
+    text-transform: uppercase;
     color: ${palette('text', 0)};
   }
   .ant-result-subtitle {

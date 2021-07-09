@@ -1,7 +1,6 @@
 import React, { useCallback, useEffect, useMemo } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
-import { TxHash, XChainClient } from '@xchainjs/xchain-client'
 import { Asset, AssetRuneNative, assetToString, BaseAmount, bn, Chain, THORChain } from '@xchainjs/xchain-util'
 import BigNumber from 'bignumber.js'
 import * as FP from 'fp-ts/function'
@@ -27,6 +26,7 @@ import { getAssetPoolPrice } from '../../../helpers/poolHelper'
 import { liveData } from '../../../helpers/rx/liveData'
 import { filterWalletBalancesByAssets } from '../../../helpers/walletHelper'
 import { FundsCap, useFundsCap } from '../../../hooks/useFundsCap'
+import { useOpenExplorerTxUrl } from '../../../hooks/useOpenExplorerTxUrl'
 import * as poolsRoutes from '../../../routes/pools'
 import { SymDepositMemo } from '../../../services/chain/types'
 import { OpenExplorerTxUrl } from '../../../services/clients'
@@ -78,10 +78,7 @@ export const SymDepositView: React.FC<Props> = (props) => {
     }
   } = useMidgardContext()
 
-  const { symDepositFees$, symDeposit$, reloadSymDepositFees, symDepositTxMemo$, clientByChain$ } = useChainContext()
-
-  const [oAssetClient] = useObservableState<O.Option<XChainClient>>(() => clientByChain$(asset.chain), O.none)
-  const [oRuneClient] = useObservableState<O.Option<XChainClient>>(() => clientByChain$(THORChain), O.none)
+  const { symDepositFees$, symDeposit$, reloadSymDepositFees, symDepositTxMemo$ } = useChainContext()
 
   const [poolsDataRD] = useObservableState(
     () =>
@@ -167,29 +164,9 @@ export const SymDepositView: React.FC<Props> = (props) => {
     RD.map(getAssetPoolPrice(runPrice))
   )
 
-  const openExplorerTxUrl = useCallback(
-    (oClient: O.Option<XChainClient>, txHash: TxHash) =>
-      FP.pipe(
-        oClient,
-        O.map(async (client) => {
-          const url = client.getExplorerTxUrl(txHash)
-          await window.apiUrl.openExternal(url)
-          return true
-        }),
-        O.getOrElse<Promise<boolean>>(() => Promise.resolve(false))
-      ),
-    []
-  )
+  const openAssetExplorerTxUrl: OpenExplorerTxUrl = useOpenExplorerTxUrl(asset.chain)
 
-  const openAssetExplorerTxUrl: OpenExplorerTxUrl = useCallback(
-    (txHash: TxHash) => openExplorerTxUrl(oAssetClient, txHash),
-    [oAssetClient, openExplorerTxUrl]
-  )
-
-  const openRuneExplorerTxUrl: OpenExplorerTxUrl = useCallback(
-    (txHash: TxHash) => openExplorerTxUrl(oRuneClient, txHash),
-    [oRuneClient, openExplorerTxUrl]
-  )
+  const openRuneExplorerTxUrl: OpenExplorerTxUrl = useOpenExplorerTxUrl(THORChain)
 
   const fundsCap: O.Option<FundsCap> = useMemo(
     () =>

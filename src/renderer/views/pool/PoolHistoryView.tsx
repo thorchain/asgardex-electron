@@ -1,7 +1,6 @@
 import React, { useCallback, useEffect, useMemo, useRef } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
-import { TxHash, XChainClient } from '@xchainjs/xchain-client'
 import { Asset, assetToString, THORChain } from '@xchainjs/xchain-util'
 import * as FP from 'fp-ts/function'
 import * as O from 'fp-ts/Option'
@@ -11,9 +10,9 @@ import * as RxOp from 'rxjs/operators'
 import { PoolActionsHistory } from '../../components/poolActionsHistory'
 import { DEFAULT_PAGE_SIZE } from '../../components/poolActionsHistory/PoolActionsHistory.const'
 import { Filter } from '../../components/poolActionsHistory/types'
-import { useChainContext } from '../../contexts/ChainContext'
 import { useMidgardContext } from '../../contexts/MidgardContext'
 import { liveData } from '../../helpers/rx/liveData'
+import { useOpenExplorerTxUrl } from '../../hooks/useOpenExplorerTxUrl'
 import { OpenExplorerTxUrl } from '../../services/clients'
 import { DEFAULT_ACTIONS_HISTORY_REQUEST_PARAMS, LoadActionsParams } from '../../services/midgard/poolActionsHistory'
 import { PoolActionsHistoryPage, PoolActionsHistoryPageRD } from '../../services/midgard/types'
@@ -36,9 +35,6 @@ export const PoolHistory: React.FC<Props> = ({ className, poolAsset }) => {
       poolActionsHistory: { actions$, loadActionsHistory, requestParam$, resetActionsData }
     }
   } = useMidgardContext()
-
-  const { clientByChain$ } = useChainContext()
-  const [oRuneClient] = useObservableState<O.Option<XChainClient>>(() => clientByChain$(THORChain), O.none)
 
   const prevActionsPage = useRef<O.Option<PoolActionsHistoryPage>>(O.none)
 
@@ -91,19 +87,7 @@ export const PoolHistory: React.FC<Props> = ({ className, poolAsset }) => {
     [loadActionsHistory]
   )
 
-  const openRuneExplorerTxUrl: OpenExplorerTxUrl = useCallback(
-    (txHash: TxHash) =>
-      FP.pipe(
-        oRuneClient,
-        O.map(async (client) => {
-          const url = client.getExplorerTxUrl(txHash)
-          await window.apiUrl.openExternal(url)
-          return true
-        }),
-        O.getOrElse<Promise<boolean>>(() => Promise.resolve(false))
-      ),
-    [oRuneClient]
-  )
+  const openRuneExplorerTxUrl: OpenExplorerTxUrl = useOpenExplorerTxUrl(THORChain)
 
   return (
     <PoolActionsHistory

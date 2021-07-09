@@ -1,7 +1,6 @@
 import React, { useCallback, useMemo } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
-import { TxHash, XChainClient } from '@xchainjs/xchain-client'
 import { Asset, AssetRuneNative, BaseAmount, bn, Chain, THORChain } from '@xchainjs/xchain-util'
 import BigNumber from 'bignumber.js'
 import * as FP from 'fp-ts/function'
@@ -20,6 +19,7 @@ import { useWalletContext } from '../../../contexts/WalletContext'
 import { getAssetPoolPrice } from '../../../helpers/poolHelper'
 import * as ShareHelpers from '../../../helpers/poolShareHelper'
 import { liveData } from '../../../helpers/rx/liveData'
+import { useOpenExplorerTxUrl } from '../../../hooks/useOpenExplorerTxUrl'
 import { OpenExplorerTxUrl } from '../../../services/clients'
 import { DEFAULT_NETWORK } from '../../../services/const'
 import { PoolDetailRD, PoolShareRD, PoolShare, PoolsDataMap } from '../../../services/midgard/types'
@@ -44,9 +44,7 @@ export const WithdrawDepositView: React.FC<Props> = (props): JSX.Element => {
     }
   } = useMidgardContext()
 
-  const { symWithdrawFee$, reloadWithdrawFees, symWithdraw$, clientByChain$ } = useChainContext()
-
-  const [oRuneClient] = useObservableState<O.Option<XChainClient>>(() => clientByChain$(THORChain), O.none)
+  const { symWithdrawFee$, reloadWithdrawFees, symWithdraw$ } = useChainContext()
 
   const runePrice = useObservableState(priceRatio$, bn(1))
 
@@ -101,19 +99,7 @@ export const WithdrawDepositView: React.FC<Props> = (props): JSX.Element => {
     [balances]
   )
 
-  const openRuneExplorerTxUrl: OpenExplorerTxUrl = useCallback(
-    (txHash: TxHash) =>
-      FP.pipe(
-        oRuneClient,
-        O.map(async (client) => {
-          const url = client.getExplorerTxUrl(txHash)
-          await window.apiUrl.openExternal(url)
-          return true
-        }),
-        O.getOrElse<Promise<boolean>>(() => Promise.resolve(false))
-      ),
-    [oRuneClient]
-  )
+  const openRuneExplorerTxUrl: OpenExplorerTxUrl = useOpenExplorerTxUrl(THORChain)
 
   const { network$ } = useAppContext()
   const network = useObservableState<Network>(network$, DEFAULT_NETWORK)

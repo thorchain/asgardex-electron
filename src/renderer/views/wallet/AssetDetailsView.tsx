@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useMemo } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
-import { Address, TxHash, XChainClient } from '@xchainjs/xchain-client'
+import { Address, XChainClient } from '@xchainjs/xchain-client'
 import { Asset, assetFromString } from '@xchainjs/xchain-util'
 import * as FP from 'fp-ts/function'
 import * as O from 'fp-ts/lib/Option'
@@ -19,6 +19,7 @@ import { useAppContext } from '../../contexts/AppContext'
 import { useChainContext } from '../../contexts/ChainContext'
 import { useWalletContext } from '../../contexts/WalletContext'
 import { sequenceTOption } from '../../helpers/fpHelpers'
+import { useOpenExplorerTxUrl } from '../../hooks/useOpenExplorerTxUrl'
 import { AssetDetailsParams } from '../../routes/wallet'
 import { OpenExplorerTxUrl } from '../../services/clients'
 import { DEFAULT_NETWORK } from '../../services/const'
@@ -116,18 +117,13 @@ export const AssetDetailsView: React.FC = (): JSX.Element => {
     )
   }, [oClient, oWalletAddress])
 
-  const openExplorerTxUrlHandler: OpenExplorerTxUrl = useCallback(
-    (txHash: TxHash) =>
-      FP.pipe(
-        oClient,
-        O.map(async (client) => {
-          const url = client.getExplorerTxUrl(txHash)
-          await window.apiUrl.openExternal(url)
-          return true
-        }),
-        O.getOrElse<Promise<boolean>>(() => Promise.resolve(false))
-      ),
-    [oClient]
+  const openExplorerTxUrl: OpenExplorerTxUrl = FP.pipe(
+    oRouteAsset,
+    O.map(({ chain }) => chain),
+    O.map(useOpenExplorerTxUrl),
+    O.getOrElse<OpenExplorerTxUrl>(
+      () => (_) => Promise.reject(Error(`Can't open explorer url for route asset ${routeAsset}`))
+    )
   )
 
   return (
@@ -143,7 +139,7 @@ export const AssetDetailsView: React.FC = (): JSX.Element => {
               asset={asset}
               loadTxsHandler={loadTxs}
               reloadBalancesHandler={reloadBalancesByChain(asset.chain)}
-              openExplorerTxUrl={openExplorerTxUrlHandler}
+              openExplorerTxUrl={openExplorerTxUrl}
               openExplorerAddressUrl={openExplorerAddressUrlHandler}
               walletAddress={oWalletAddress}
               network={network}

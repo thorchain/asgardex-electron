@@ -1,6 +1,5 @@
 import React, { useCallback, useMemo } from 'react'
 
-import { TxHash } from '@xchainjs/xchain-client'
 import {
   Asset,
   assetFromString,
@@ -23,6 +22,7 @@ import { ErrorView } from '../../../components/shared/error/'
 import { BackLink } from '../../../components/uielements/backLink'
 import { useAppContext } from '../../../contexts/AppContext'
 import { useWalletContext } from '../../../contexts/WalletContext'
+import { useOpenExplorerTxUrl } from '../../../hooks/useOpenExplorerTxUrl'
 import { SendParams } from '../../../routes/wallet'
 import * as walletRoutes from '../../../routes/wallet'
 import { OpenExplorerTxUrl } from '../../../services/clients'
@@ -44,27 +44,19 @@ export const SendView: React.FC<Props> = (): JSX.Element => {
   const oSelectedAsset = useMemo(() => O.fromNullable(assetFromString(asset)), [asset])
 
   const {
-    client$,
     balancesState$,
     keystoreService: { validatePassword$ }
   } = useWalletContext()
 
   const { balances } = useObservableState(balancesState$, INITIAL_BALANCES_STATE)
-  const oClient = useObservableState(client$, O.none)
 
-  const openExplorerTxUrl: OpenExplorerTxUrl = useCallback(
-    (txHash: TxHash) =>
-      FP.pipe(
-        oClient,
-        O.map(async (client) => {
-          const url = client.getExplorerTxUrl(txHash)
-          await window.apiUrl.openExternal(url)
-          return true
-        }),
-        O.getOrElse<Promise<boolean>>(() => Promise.resolve(false))
-      ),
-
-    [oClient]
+  const openExplorerTxUrl: OpenExplorerTxUrl = FP.pipe(
+    oSelectedAsset,
+    O.map(({ chain }) => chain),
+    O.map(useOpenExplorerTxUrl),
+    O.getOrElse<OpenExplorerTxUrl>(
+      () => (_) => Promise.reject(Error(`Can't open explorer url for route asset ${oSelectedAsset}`))
+    )
   )
 
   const renderAssetError = useMemo(

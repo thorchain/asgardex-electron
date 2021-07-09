@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useMemo } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
-import { assetFromString, AssetRuneNative, bnOrZero, Chain } from '@xchainjs/xchain-util'
+import { assetFromString, AssetRuneNative, bnOrZero, Chain, THORChain } from '@xchainjs/xchain-util'
 import { Spin } from 'antd'
 import * as FP from 'fp-ts/function'
 import * as O from 'fp-ts/lib/Option'
@@ -128,14 +128,7 @@ export const SwapView: React.FC<Props> = (_): JSX.Element => {
   )
   const targetWalletAddress = useObservableState(address$, O.none)
 
-  const openExplorerTxUrl: OpenExplorerTxUrl = FP.pipe(
-    oRouteSource,
-    O.map(({ chain }) => chain),
-    O.map(useOpenExplorerTxUrl),
-    O.getOrElse<OpenExplorerTxUrl>(
-      () => (_) => Promise.reject(Error(`Can't open explorer url - source asset is missing in route`))
-    )
-  )
+  const openExplorerTxUrl: OpenExplorerTxUrl = useOpenExplorerTxUrl(THORChain)
 
   const renderError = useCallback(
     (e: Error) => (
