@@ -1,5 +1,6 @@
 import * as RD from '@devexperts/remote-data-ts'
 import { Story, Meta } from '@storybook/react'
+import { TxHash } from '@xchainjs/xchain-client'
 import {
   Asset,
   assetAmount,
@@ -30,7 +31,10 @@ const defaultProps: WitdrawProps = {
   reloadFees: () => console.log('reload fees'),
   shares: { rune: assetToBase(assetAmount(10, THORCHAIN_DECIMAL)), asset: assetToBase(assetAmount(30, BNB_DECIMAL)) },
   disabled: false,
-  viewRuneTx: (txHash: string) => console.log('view tx ', txHash),
+  openRuneExplorerTxUrl: (txHash: TxHash) => {
+    console.log(`Open RUNE explorer - tx hash ${txHash}`)
+    return Promise.resolve(true)
+  },
   // mock password validation
   // Password: "123"
   validatePassword$: mockValidatePassword$,

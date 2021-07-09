@@ -7,7 +7,7 @@ import * as RxOp from 'rxjs/operators'
 
 import { clientNetwork$ } from '../app/service'
 import * as C from '../clients'
-import { Address$, ExplorerUrl$, GetExplorerTxUrl$ } from '../clients/types'
+import { Address$, ExplorerUrl$ } from '../clients/types'
 import { keystoreService } from '../wallet/keystore'
 import { getPhrase } from '../wallet/util'
 import { ClientState, ClientState$, Client$ } from './types'
@@ -61,9 +61,4 @@ const addressUI$: Address$ = C.addressUI$(client$)
  */
 const explorerUrl$: ExplorerUrl$ = C.explorerUrl$(client$)
 
-/**
- * Explorer url depending on selected network
- */
-const getExplorerTxUrl$: GetExplorerTxUrl$ = C.getExplorerTxUrl$(client$)
-
-export { client$, clientState$, address$, addressUI$, explorerUrl$, getExplorerTxUrl$ }
+export { client$, clientState$, address$, addressUI$, explorerUrl$ }

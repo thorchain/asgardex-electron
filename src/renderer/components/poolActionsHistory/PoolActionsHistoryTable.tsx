@@ -18,7 +18,7 @@ import * as Styled from './PoolActionsHistoryTable.styles'
 import { Props } from './types'
 
 export const PoolActionsHistoryTable: React.FC<Props> = ({
-  goToTx,
+  openExplorerTxUrl: goToTx,
   changePaginationHandler,
   actionsPageRD,
   prevActionsPage = O.none,

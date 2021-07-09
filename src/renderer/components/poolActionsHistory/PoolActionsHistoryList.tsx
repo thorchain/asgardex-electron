@@ -45,7 +45,7 @@ export const PoolActionsHistoryList: React.FC<Props> = ({
   changePaginationHandler,
   actionsPageRD,
   prevActionsPage = O.none,
-  goToTx,
+  openExplorerTxUrl: goToTx,
   currentPage,
   currentFilter,
   setFilter,

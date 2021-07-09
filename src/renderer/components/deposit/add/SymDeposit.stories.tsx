@@ -2,6 +2,7 @@ import React from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
 import { Story, Meta } from '@storybook/react'
+import { TxHash } from '@xchainjs/xchain-client'
 import {
   bn,
   assetAmount,
@@ -84,11 +85,13 @@ const defaultProps: SymDepositProps = {
   reloadBalances: () => console.log('reloadBalances'),
   reloadShares: (delay = 0) => console.log('reloadShares ', delay),
   reloadSelectedPoolDetail: (delay = 0) => console.log('reloadSelectedPoolDetail ', delay),
-  viewAssetTx: (txHash) => {
-    console.log(txHash)
+  openAssetExplorerTxUrl: (txHash: TxHash) => {
+    console.log(`Open asset explorer - tx hash ${txHash}`)
+    return Promise.resolve(true)
   },
-  viewRuneTx: (txHash) => {
-    console.log(txHash)
+  openRuneExplorerTxUrl: (txHash: TxHash) => {
+    console.log(`Open RUNE explorer - tx hash ${txHash}`)
+    return Promise.resolve(true)
   },
   // mock password validation
   // Password: "123"

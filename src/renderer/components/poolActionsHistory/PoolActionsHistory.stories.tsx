@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react'
 
 import { Story } from '@storybook/react'
+import { TxHash } from '@xchainjs/xchain-client'
 import { assetAmount, AssetBNB, AssetBTC, AssetRuneNative, assetToBase } from '@xchainjs/xchain-util'
 
 import { getMockRDValueFactory, RDStatus, rdStatusOptions } from '../../../shared/mock/rdByStatus'
@@ -145,7 +146,10 @@ export const History: Story<{ dataStatus: RDStatus }> = ({ dataStatus }) => {
       availableFilters={['ALL', 'SWITCH', 'DEPOSIT', 'SWAP', 'WITHDRAW', 'DONATE', 'REFUND']}
       currentFilter={filter}
       setFilter={setFilter}
-      goToTx={console.log}
+      openExplorerTxUrl={(txHash: TxHash) => {
+        console.log(`Open explorer - tx hash ${txHash}`)
+        return Promise.resolve(true)
+      }}
       actionsPageRD={res}
       changePaginationHandler={setCurrentPage}
       currentPage={currentPage}

@@ -1,6 +1,7 @@
 import React, { useCallback, useEffect, useMemo } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
+import { TxHash, XChainClient } from '@xchainjs/xchain-client'
 import { Asset, AssetRuneNative, assetToString, BaseAmount, bn, Chain, THORChain } from '@xchainjs/xchain-util'
 import BigNumber from 'bignumber.js'
 import * as FP from 'fp-ts/function'
@@ -28,6 +29,7 @@ import { filterWalletBalancesByAssets } from '../../../helpers/walletHelper'
 import { FundsCap, useFundsCap } from '../../../hooks/useFundsCap'
 import * as poolsRoutes from '../../../routes/pools'
 import { SymDepositMemo } from '../../../services/chain/types'
+import { OpenExplorerTxUrl } from '../../../services/clients'
 import { DEFAULT_NETWORK } from '../../../services/const'
 import { PoolAddress, PoolAssetsRD, PoolDetailRD } from '../../../services/midgard/types'
 import { toPoolData } from '../../../services/midgard/utils'
@@ -76,8 +78,10 @@ export const SymDepositView: React.FC<Props> = (props) => {
     }
   } = useMidgardContext()
 
-  const { symDepositFees$, symDeposit$, reloadSymDepositFees, symDepositTxMemo$, getExplorerUrlByAsset$ } =
-    useChainContext()
+  const { symDepositFees$, symDeposit$, reloadSymDepositFees, symDepositTxMemo$, clientByChain$ } = useChainContext()
+
+  const [oAssetClient] = useObservableState<O.Option<XChainClient>>(() => clientByChain$(asset.chain), O.none)
+  const [oRuneClient] = useObservableState<O.Option<XChainClient>>(() => clientByChain$(THORChain), O.none)
 
   const [poolsDataRD] = useObservableState(
     () =>
@@ -163,30 +167,28 @@ export const SymDepositView: React.FC<Props> = (props) => {
     RD.map(getAssetPoolPrice(runPrice))
   )
 
-  const getAssetExplorerUrl$ = useMemo(() => getExplorerUrlByAsset$(asset), [asset, getExplorerUrlByAsset$])
-  const assetExplorerUrl = useObservableState(getAssetExplorerUrl$, O.none)
-
-  const viewAssetTx = useCallback(
-    (txHash: string) => {
+  const openExplorerTxUrl = useCallback(
+    (oClient: O.Option<XChainClient>, txHash: TxHash) =>
       FP.pipe(
-        assetExplorerUrl,
-        O.map((getExplorerUrl) => window.apiUrl.openExternal(getExplorerUrl(txHash)))
-      )
-    },
-    [assetExplorerUrl]
+        oClient,
+        O.map(async (client) => {
+          const url = client.getExplorerTxUrl(txHash)
+          await window.apiUrl.openExternal(url)
+          return true
+        }),
+        O.getOrElse<Promise<boolean>>(() => Promise.resolve(false))
+      ),
+    []
   )
 
-  const getRuneExplorerUrl$ = useMemo(() => getExplorerUrlByAsset$(AssetRuneNative), [getExplorerUrlByAsset$])
-  const runeExplorerUrl = useObservableState(getRuneExplorerUrl$, O.none)
+  const openAssetExplorerTxUrl: OpenExplorerTxUrl = useCallback(
+    (txHash: TxHash) => openExplorerTxUrl(oAssetClient, txHash),
+    [oAssetClient, openExplorerTxUrl]
+  )
 
-  const viewRuneTx = useCallback(
-    (txHash: string) => {
-      FP.pipe(
-        runeExplorerUrl,
-        O.map((getExplorerUrl) => window.apiUrl.openExternal(getExplorerUrl(txHash)))
-      )
-    },
-    [runeExplorerUrl]
+  const openRuneExplorerTxUrl: OpenExplorerTxUrl = useCallback(
+    (txHash: TxHash) => openExplorerTxUrl(oRuneClient, txHash),
+    [oRuneClient, openExplorerTxUrl]
   )
 
   const fundsCap: O.Option<FundsCap> = useMemo(
@@ -228,8 +230,8 @@ export const SymDepositView: React.FC<Props> = (props) => {
         <SymDeposit
           haltedChains={haltedChains}
           validatePassword$={validatePassword$}
-          viewRuneTx={viewRuneTx}
-          viewAssetTx={viewAssetTx}
+          openRuneExplorerTxUrl={openRuneExplorerTxUrl}
+          openAssetExplorerTxUrl={openAssetExplorerTxUrl}
           onChangeAsset={FP.constVoid}
           asset={assetWD}
           assetPrice={ZERO_BN}
@@ -266,8 +268,8 @@ export const SymDepositView: React.FC<Props> = (props) => {
       intl,
       haltedChains,
       validatePassword$,
-      viewRuneTx,
-      viewAssetTx,
+      openRuneExplorerTxUrl,
+      openAssetExplorerTxUrl,
       assetWD,
       symDepositFees$,
       approveFee$,
@@ -301,8 +303,8 @@ export const SymDepositView: React.FC<Props> = (props) => {
             <SymDeposit
               haltedChains={haltedChains}
               validatePassword$={validatePassword$}
-              viewRuneTx={viewRuneTx}
-              viewAssetTx={viewAssetTx}
+              openRuneExplorerTxUrl={openRuneExplorerTxUrl}
+              openAssetExplorerTxUrl={openAssetExplorerTxUrl}
               poolData={toPoolData(poolDetail)}
               onChangeAsset={onChangeAsset}
               asset={assetWD}

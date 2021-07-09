@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useMemo } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
-import { Address, XChainClient } from '@xchainjs/xchain-client'
+import { Address, TxHash, XChainClient } from '@xchainjs/xchain-client'
 import { Asset, assetFromString } from '@xchainjs/xchain-util'
 import * as FP from 'fp-ts/function'
 import * as O from 'fp-ts/lib/Option'
@@ -20,6 +20,7 @@ import { useChainContext } from '../../contexts/ChainContext'
 import { useWalletContext } from '../../contexts/WalletContext'
 import { sequenceTOption } from '../../helpers/fpHelpers'
 import { AssetDetailsParams } from '../../routes/wallet'
+import { OpenExplorerTxUrl } from '../../services/clients'
 import { DEFAULT_NETWORK } from '../../services/const'
 import { INITIAL_BALANCES_STATE } from '../../services/wallet/const'
 
@@ -45,13 +46,10 @@ export const AssetDetailsView: React.FC = (): JSX.Element => {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => setSelectedAsset(oRouteAsset), [])
 
-  const { getTxs$, balancesState$, loadTxs, reloadBalancesByChain, setSelectedAsset, getExplorerTxUrl$, resetTxsPage } =
-    useWalletContext()
+  const { getTxs$, balancesState$, loadTxs, reloadBalancesByChain, setSelectedAsset, resetTxsPage } = useWalletContext()
 
   const [txsRD] = useObservableState(() => getTxs$(oWalletAddress), RD.initial)
   const { balances: oBalances } = useObservableState(balancesState$, INITIAL_BALANCES_STATE)
-
-  const getExplorerTxUrl = useObservableState(getExplorerTxUrl$, O.none)
 
   useEffect(() => {
     return () => resetTxsPage()
@@ -110,13 +108,27 @@ export const AssetDetailsView: React.FC = (): JSX.Element => {
   const openExplorerAddressUrlHandler = useCallback(() => {
     FP.pipe(
       sequenceTOption(oClient, oWalletAddress),
-      O.map(([client, address]) => {
+      O.map(async ([client, address]) => {
         const url = client.getExplorerAddressUrl(address)
-        window.apiUrl.openExternal(url)
+        await window.apiUrl.openExternal(url)
         return true
       })
     )
   }, [oClient, oWalletAddress])
+
+  const openExplorerTxUrlHandler: OpenExplorerTxUrl = useCallback(
+    (txHash: TxHash) =>
+      FP.pipe(
+        oClient,
+        O.map(async (client) => {
+          const url = client.getExplorerTxUrl(txHash)
+          await window.apiUrl.openExternal(url)
+          return true
+        }),
+        O.getOrElse<Promise<boolean>>(() => Promise.resolve(false))
+      ),
+    [oClient]
+  )
 
   return (
     <>
@@ -131,7 +143,7 @@ export const AssetDetailsView: React.FC = (): JSX.Element => {
               asset={asset}
               loadTxsHandler={loadTxs}
               reloadBalancesHandler={reloadBalancesByChain(asset.chain)}
-              getExplorerTxUrl={getExplorerTxUrl}
+              openExplorerTxUrl={openExplorerTxUrlHandler}
               openExplorerAddressUrl={openExplorerAddressUrlHandler}
               walletAddress={oWalletAddress}
               network={network}

@@ -4,6 +4,7 @@ import * as O from 'fp-ts/lib/Option'
 import { none, Option, some } from 'fp-ts/lib/Option'
 
 import {
+  client$,
   reloadBalances,
   balancesState$,
   chainBalances$,
@@ -11,20 +12,19 @@ import {
   keystoreService,
   selectedAsset$,
   loadTxs,
-  getExplorerTxUrl$,
   getTxs$,
   setSelectedAsset,
   resetTxsPage
 } from '../services/wallet'
 
 type WalletContextValue = {
+  client$: typeof client$
   keystoreService: typeof keystoreService
   reloadBalances: typeof reloadBalances
   balancesState$: typeof balancesState$
   chainBalances$: typeof chainBalances$
   loadTxs: typeof loadTxs
   reloadBalancesByChain: typeof reloadBalancesByChain
-  getExplorerTxUrl$: typeof getExplorerTxUrl$
   selectedAsset$: typeof selectedAsset$
   getTxs$: typeof getTxs$
   setSelectedAsset: typeof setSelectedAsset
@@ -32,13 +32,13 @@ type WalletContextValue = {
 }
 
 const initialContext: WalletContextValue = {
+  client$,
   keystoreService,
   reloadBalances,
   reloadBalancesByChain,
   loadTxs,
   balancesState$,
   chainBalances$,
-  getExplorerTxUrl$,
   selectedAsset$,
   getTxs$,
   setSelectedAsset,

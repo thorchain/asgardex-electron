@@ -5,6 +5,7 @@ import * as FP from 'fp-ts/function'
 import * as O from 'fp-ts/lib/Option'
 import { useIntl } from 'react-intl'
 
+import { OpenExplorerTxUrl } from '../../../../services/clients'
 import { TxHashRD } from '../../../../services/wallet/types'
 import { ErrorView } from '../../../shared/error/'
 import { SuccessView } from '../../../shared/success/'
@@ -24,7 +25,7 @@ export type Props = {
   txRD: TxHashRD
   sendForm: JSX.Element
   inititalActionHandler?: FP.Lazy<void>
-  viewTxHandler?: (txHash: string) => Promise<void>
+  viewTxHandler: OpenExplorerTxUrl
   finishActionHandler?: FP.Lazy<void>
   errorActionHandler?: FP.Lazy<void>
 }

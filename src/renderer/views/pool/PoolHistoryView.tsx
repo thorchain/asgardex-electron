@@ -1,9 +1,8 @@
 import React, { useCallback, useEffect, useMemo, useRef } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
-import * as Client from '@xchainjs/xchain-client'
-import { getExplorerTxUrl, getDefaultExplorerUrls } from '@xchainjs/xchain-thorchain'
-import { Asset, assetToString } from '@xchainjs/xchain-util'
+import { TxHash, XChainClient } from '@xchainjs/xchain-client'
+import { Asset, assetToString, THORChain } from '@xchainjs/xchain-util'
 import * as FP from 'fp-ts/function'
 import * as O from 'fp-ts/Option'
 import { useObservableState } from 'observable-hooks'
@@ -12,11 +11,10 @@ import * as RxOp from 'rxjs/operators'
 import { PoolActionsHistory } from '../../components/poolActionsHistory'
 import { DEFAULT_PAGE_SIZE } from '../../components/poolActionsHistory/PoolActionsHistory.const'
 import { Filter } from '../../components/poolActionsHistory/types'
-import { useAppContext } from '../../contexts/AppContext'
+import { useChainContext } from '../../contexts/ChainContext'
 import { useMidgardContext } from '../../contexts/MidgardContext'
-import { useThorchainContext } from '../../contexts/ThorchainContext'
 import { liveData } from '../../helpers/rx/liveData'
-import { DEFAULT_CLIENT_NETWORK } from '../../services/const'
+import { OpenExplorerTxUrl } from '../../services/clients'
 import { DEFAULT_ACTIONS_HISTORY_REQUEST_PARAMS, LoadActionsParams } from '../../services/midgard/poolActionsHistory'
 import { PoolActionsHistoryPage, PoolActionsHistoryPageRD } from '../../services/midgard/types'
 
@@ -39,10 +37,8 @@ export const PoolHistory: React.FC<Props> = ({ className, poolAsset }) => {
     }
   } = useMidgardContext()
 
-  const { getExplorerTxUrl$ } = useThorchainContext()
-
-  const { clientNetwork$ } = useAppContext()
-  const clientNetwork = useObservableState<Client.Network>(clientNetwork$, DEFAULT_CLIENT_NETWORK)
+  const { clientByChain$ } = useChainContext()
+  const [oRuneClient] = useObservableState<O.Option<XChainClient>>(() => clientByChain$(THORChain), O.none)
 
   const prevActionsPage = useRef<O.Option<PoolActionsHistoryPage>>(O.none)
 
@@ -95,22 +91,18 @@ export const PoolHistory: React.FC<Props> = ({ className, poolAsset }) => {
     [loadActionsHistory]
   )
 
-  const oExplorerUrl = useObservableState(getExplorerTxUrl$, O.none)
-
-  const goToTx = useCallback(
-    (txId: string) => {
+  const openRuneExplorerTxUrl: OpenExplorerTxUrl = useCallback(
+    (txHash: TxHash) =>
       FP.pipe(
-        oExplorerUrl,
-        O.alt(() =>
-          O.some((txId: string) =>
-            getExplorerTxUrl({ urls: getDefaultExplorerUrls(), network: clientNetwork, txID: txId })
-          )
-        ),
-        O.ap(O.some(txId)),
-        O.map(window.apiUrl.openExternal)
-      )
-    },
-    [oExplorerUrl, clientNetwork]
+        oRuneClient,
+        O.map(async (client) => {
+          const url = client.getExplorerTxUrl(txHash)
+          await window.apiUrl.openExternal(url)
+          return true
+        }),
+        O.getOrElse<Promise<boolean>>(() => Promise.resolve(false))
+      ),
+    [oRuneClient]
   )
 
   return (
@@ -119,7 +111,7 @@ export const PoolHistory: React.FC<Props> = ({ className, poolAsset }) => {
       currentPage={requestParams.page + 1}
       actionsPageRD={historyPage}
       prevActionsPage={prevActionsPage.current}
-      goToTx={goToTx}
+      openExplorerTxUrl={openRuneExplorerTxUrl}
       changePaginationHandler={setCurrentPage}
       currentFilter={requestParams.type || 'ALL'}
       availableFilters={HISTORY_FILTERS}
