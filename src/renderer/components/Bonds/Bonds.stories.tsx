@@ -7,7 +7,8 @@ import { Address } from '@xchainjs/xchain-client'
 import { baseAmount } from '@xchainjs/xchain-util'
 
 import { getMockRDValueFactory, RDStatus } from '../../../shared/mock/rdByStatus'
-import { AddressValidation, NodeInfo } from '../../services/thorchain/types'
+import { AddressValidation } from '../../services/clients'
+import { NodeInfo } from '../../services/thorchain/types'
 import { ApiError, ErrorId } from '../../services/wallet/types'
 import { Bonds } from './Bonds'
 

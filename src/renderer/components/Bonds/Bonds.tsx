@@ -5,7 +5,8 @@ import { Form } from 'antd'
 import { useIntl } from 'react-intl'
 
 import { Network } from '../../../shared/api/types'
-import { AddressValidation } from '../../services/thorchain/types'
+import {} from '../../services/thorchain/types'
+import { AddressValidation } from '../../services/clients'
 import * as Styled from './Bonds.styles'
 import { Node } from './types'
 

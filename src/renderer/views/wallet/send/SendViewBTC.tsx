@@ -1,8 +1,7 @@
 import React, { useCallback, useMemo } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
-import { Client as BitcoinClient } from '@xchainjs/xchain-bitcoin'
-import { Asset } from '@xchainjs/xchain-util'
+import { Asset, BTCChain } from '@xchainjs/xchain-util'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/Option'
 import { useObservableState } from 'observable-hooks'
@@ -16,7 +15,8 @@ import { useBitcoinContext } from '../../../contexts/BitcoinContext'
 import { useChainContext } from '../../../contexts/ChainContext'
 import { getWalletBalanceByAsset } from '../../../helpers/walletHelper'
 import { useSubscriptionState } from '../../../hooks/useSubscriptionState'
-import { AddressValidation, FeesWithRatesLD } from '../../../services/bitcoin/types'
+import { useValidateAddress } from '../../../hooks/useValidateAddress'
+import { FeesWithRatesLD } from '../../../services/bitcoin/types'
 import { INITIAL_SEND_STATE } from '../../../services/chain/const'
 import { SendTxParams, SendTxState } from '../../../services/chain/types'
 import { OpenExplorerTxUrl, WalletBalances } from '../../../services/clients'
@@ -55,21 +55,12 @@ export const SendViewBTC: React.FC<Props> = (props): JSX.Element => {
     [subscribeSendTxState, transfer$]
   )
 
-  const { feesWithRates$, client$, reloadFeesWithRates } = useBitcoinContext()
+  const { feesWithRates$, reloadFeesWithRates } = useBitcoinContext()
 
   const feesWithRatesLD: FeesWithRatesLD = useMemo(() => feesWithRates$(), [feesWithRates$])
   const feesWithRatesRD = useObservableState(feesWithRatesLD, RD.initial)
 
-  const oClient = useObservableState<O.Option<BitcoinClient>>(client$, O.none)
-  const addressValidation = useMemo(
-    () =>
-      FP.pipe(
-        oClient,
-        O.map((c) => c.validateAddress),
-        O.getOrElse((): AddressValidation => (_: string) => true)
-      ),
-    [oClient]
-  )
+  const addressValidation = useValidateAddress(BTCChain)
 
   const isLoading = useMemo(() => RD.isPending(sendTxState.status), [sendTxState.status])
 

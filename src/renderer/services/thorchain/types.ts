@@ -30,8 +30,6 @@ export type SendTxParams = {
   memo?: string
 }
 
-export type AddressValidation = Client['validateAddress']
-
 export type TransactionService = {
   sendPoolTx$: (params: DepositParam) => TxHashLD
 } & C.TransactionService<SendTxParams>

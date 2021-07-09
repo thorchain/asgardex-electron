@@ -28,6 +28,4 @@ export type SendTxParams = {
   feeRate: number
 }
 
-export type AddressValidation = Client['validateAddress']
-
 export type TransactionService = C.TransactionService<SendTxParams>

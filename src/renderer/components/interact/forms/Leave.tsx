@@ -7,7 +7,7 @@ import * as FP from 'fp-ts/function'
 import { useIntl } from 'react-intl'
 
 import { validateAddress } from '../../../helpers/form/validation'
-import { AddressValidation } from '../../../services/thorchain/types'
+import { AddressValidation } from '../../../services/clients'
 import { Input } from '../../uielements/input'
 import * as Styled from './Forms.styles'
 

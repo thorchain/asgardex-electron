@@ -18,8 +18,6 @@ export type FeeRateLD = LiveData<Error, FeeRate>
 export type FeesWithRatesRD = RD.RemoteData<Error, FeesWithRates>
 export type FeesWithRatesLD = LiveData<Error, FeesWithRates>
 
-export type AddressValidation = Client['validateAddress']
-
 export type SendTxParams = {
   recipient: string // to address
   amount: BaseAmount

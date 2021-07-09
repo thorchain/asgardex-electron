@@ -11,7 +11,7 @@ import { useIntl } from 'react-intl'
 import { ZERO_BN } from '../../../const'
 import { THORCHAIN_DECIMAL } from '../../../helpers/assetHelper'
 import { validateAddress, greaterThan } from '../../../helpers/form/validation'
-import { AddressValidation } from '../../../services/thorchain/types'
+import { AddressValidation } from '../../../services/clients'
 import { Input, InputBigNumber } from '../../uielements/input'
 import * as Styled from './Forms.styles'
 

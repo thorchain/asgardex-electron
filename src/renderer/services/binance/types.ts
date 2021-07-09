@@ -17,8 +17,6 @@ export type ClientState$ = C.ClientState$<Client>
 
 export type TransferRD = RD.RemoteData<Error, Transfer>
 
-export type AddressValidation = Client['validateAddress']
-
 /**
  * Fees of Transfers
  * https://docs.binance.org/trading-spec.html#fees

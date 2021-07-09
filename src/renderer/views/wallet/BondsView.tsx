@@ -2,6 +2,7 @@ import React, { useCallback, useMemo, useRef } from 'react'
 
 import { Address } from '@xchainjs/xchain-client'
 import { Client as ThorchainClient } from '@xchainjs/xchain-thorchain'
+import { THORChain } from '@xchainjs/xchain-util'
 import * as A from 'fp-ts/Array'
 import * as FP from 'fp-ts/function'
 import * as NEA from 'fp-ts/NonEmptyArray'
@@ -15,7 +16,8 @@ import { Bonds } from '../../components/Bonds'
 import { useAppContext } from '../../contexts/AppContext'
 import { useThorchainContext } from '../../contexts/ThorchainContext'
 import { useUserNodesContext } from '../../contexts/UserNodesContext'
-import { AddressValidation } from '../../services/bitcoin/types'
+import { useValidateAddress } from '../../hooks/useValidateAddress'
+import { AddressValidation } from '../../services/clients'
 import { DEFAULT_NETWORK } from '../../services/const'
 import { NodeInfoLD, NodeDataRD } from '../../services/thorchain/types'
 
@@ -30,15 +32,7 @@ export const BondsView: React.FC = (): JSX.Element => {
 
   const oClient = useObservableState<O.Option<ThorchainClient>>(client$, O.none)
 
-  const validateAddress = useMemo(
-    () =>
-      FP.pipe(
-        oClient,
-        O.map((c) => c.validateAddress),
-        O.getOrElse((): AddressValidation => (_: string) => true)
-      ),
-    [oClient]
-  )
+  const validateAddress: AddressValidation = useValidateAddress(THORChain)
 
   const goToExplorerNodeAddress = useCallback(
     (address: Address) =>
