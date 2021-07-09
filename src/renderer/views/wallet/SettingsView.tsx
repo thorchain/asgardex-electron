@@ -1,18 +1,8 @@
 import React, { useMemo } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
-import { Address } from '@xchainjs/xchain-client'
-import {
-  BCHChain,
-  BNBChain,
-  BTCChain,
-  Chain,
-  CosmosChain,
-  ETHChain,
-  LTCChain,
-  PolkadotChain,
-  THORChain
-} from '@xchainjs/xchain-util'
+import { Address, XChainClient } from '@xchainjs/xchain-client'
+import { BCHChain, BNBChain, BTCChain, Chain, ETHChain, LTCChain, THORChain } from '@xchainjs/xchain-util'
 import { Col, Row } from 'antd'
 import * as FP from 'fp-ts/function'
 import * as A from 'fp-ts/lib/Array'
@@ -50,7 +40,7 @@ export const SettingsView: React.FC = (): JSX.Element => {
   const ltcContext = useLitecoinContext()
   const bchContext = useBitcoinCashContext()
 
-  const { getExplorerAddressByChain$ } = useChainContext()
+  const { clientByChain$ } = useChainContext()
 
   const phrase$ = useMemo(() => FP.pipe(keystore$, RxOp.map(getPhrase)), [keystore$])
   const phrase = useObservableState(phrase$, O.none)
@@ -234,41 +224,39 @@ export const SettingsView: React.FC = (): JSX.Element => {
   )
   const userAccounts = useObservableState(userAccounts$, O.none)
 
-  const getBNBExplorerAddressUrl = useObservableState(getExplorerAddressByChain$(BNBChain), O.none)
-  const getBTCExplorerAddressUrl = useObservableState(getExplorerAddressByChain$(BTCChain), O.none)
-  const getBCHExplorerAddressUrl = useObservableState(getExplorerAddressByChain$(BCHChain), O.none)
-  const getETHExplorerAddressUrl = useObservableState(getExplorerAddressByChain$(ETHChain), O.none)
-  const getTHORExplorerAddressUrl = useObservableState(getExplorerAddressByChain$(THORChain), O.none)
-  const getLTCExplorerAddressUrl = useObservableState(getExplorerAddressByChain$(LTCChain), O.none)
-  const getCosmosExplorerAddressUrl = useObservableState(getExplorerAddressByChain$(CosmosChain), O.none)
-  const getPolkadotExplorerAddressUrl = useObservableState(getExplorerAddressByChain$(PolkadotChain), O.none)
+  const oBNBClient = useObservableState(clientByChain$(BNBChain), O.none)
+  const oETHClient = useObservableState(clientByChain$(ETHChain), O.none)
+  const oBTCClient = useObservableState(clientByChain$(BTCChain), O.none)
+  const oBCHClient = useObservableState(clientByChain$(BCHChain), O.none)
+  const oTHORClient = useObservableState(clientByChain$(THORChain), O.none)
+  const oLTCClient = useObservableState(clientByChain$(LTCChain), O.none)
 
   const clickAddressLinkHandler = (chain: Chain, address: Address) => {
+    const openExplorerAddressUrl = (client: XChainClient) => {
+      const url = client.getExplorerAddressUrl(address)
+      window.apiUrl.openExternal(url)
+    }
     switch (chain) {
       case BNBChain:
-        FP.pipe(getBNBExplorerAddressUrl, O.ap(O.some(address)), O.map(window.apiUrl.openExternal))
+        FP.pipe(oBNBClient, O.map(openExplorerAddressUrl))
         break
       case BTCChain:
-        FP.pipe(getBTCExplorerAddressUrl, O.ap(O.some(address)), O.map(window.apiUrl.openExternal))
+        FP.pipe(oBTCClient, O.map(openExplorerAddressUrl))
         break
       case BCHChain:
-        FP.pipe(getBCHExplorerAddressUrl, O.ap(O.some(address)), O.map(window.apiUrl.openExternal))
+        FP.pipe(oBCHClient, O.map(openExplorerAddressUrl))
         break
       case ETHChain:
-        FP.pipe(getETHExplorerAddressUrl, O.ap(O.some(address)), O.map(window.apiUrl.openExternal))
+        FP.pipe(oETHClient, O.map(openExplorerAddressUrl))
         break
       case THORChain:
-        FP.pipe(getTHORExplorerAddressUrl, O.ap(O.some(address)), O.map(window.apiUrl.openExternal))
-        break
-      case CosmosChain:
-        FP.pipe(getCosmosExplorerAddressUrl, O.ap(O.some(address)), O.map(window.apiUrl.openExternal))
+        FP.pipe(oTHORClient, O.map(openExplorerAddressUrl))
         break
       case LTCChain:
-        FP.pipe(getLTCExplorerAddressUrl, O.ap(O.some(address)), O.map(window.apiUrl.openExternal))
+        FP.pipe(oLTCClient, O.map(openExplorerAddressUrl))
         break
-      case PolkadotChain:
-        FP.pipe(getPolkadotExplorerAddressUrl, O.ap(O.some(address)), O.map(window.apiUrl.openExternal))
-        break
+      default:
+        console.warn(`Chain ${chain} has not been implemented`)
     }
   }
 

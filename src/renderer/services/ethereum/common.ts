@@ -11,7 +11,7 @@ import { Network } from '../../../shared/api/types'
 import { envOrDefault } from '../../helpers/envHelper'
 import { clientNetwork$ } from '../app/service'
 import * as C from '../clients'
-import { Address$, ExplorerUrl$, GetExplorerTxUrl$, GetExplorerAddressUrl$ } from '../clients/types'
+import { Address$, ExplorerUrl$, GetExplorerTxUrl$ } from '../clients/types'
 import { toClientNetwork } from '../clients/utils'
 import { keystoreService } from '../wallet/keystore'
 import { getPhrase } from '../wallet/util'
@@ -92,11 +92,6 @@ const explorerUrl$: ExplorerUrl$ = C.explorerUrl$(client$)
 const getExplorerTxUrl$: GetExplorerTxUrl$ = C.getExplorerTxUrl$(client$)
 
 /**
- * Explorer url depending on selected network
- */
-const getExplorerAddressUrl$: GetExplorerAddressUrl$ = C.getExplorerAddressUrl$(client$)
-
-/**
  * Map to store decimal in memory
  *
  * to avoid unessary request for same data
@@ -105,7 +100,7 @@ const decimalMap: Map<string, number> = new Map()
 /**
  * Helper to get decimals for ERC20
  */
-const getDecimal = async (asset: Asset, network: Network): Promise<number> => {
+const getERC20Decimal = async (asset: Asset, network: Network): Promise<number> => {
   const assetString = assetToString(asset)
   return FP.pipe(
     decimalMap.get(assetString),
@@ -128,13 +123,4 @@ const getDecimal = async (asset: Asset, network: Network): Promise<number> => {
   )
 }
 
-export {
-  client$,
-  clientState$,
-  address$,
-  addressUI$,
-  explorerUrl$,
-  getExplorerTxUrl$,
-  getExplorerAddressUrl$,
-  getDecimal as getERC20Decimal
-}
+export { client$, clientState$, address$, addressUI$, explorerUrl$, getExplorerTxUrl$, getERC20Decimal }

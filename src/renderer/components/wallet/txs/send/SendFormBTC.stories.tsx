@@ -47,8 +47,8 @@ const rates: FeeRates = {
 const defaultProps: ComponentProps = {
   balances: [btcBalance, runeBalance],
   balance: btcBalance,
-  onSubmit: ({ recipient, amount, feeOption: feeOptionKey, memo }: SendTxParams) =>
-    console.log(`to: ${recipient}, amount ${formatBaseAmount(amount)}, feeOptionKey: ${feeOptionKey}, memo: ${memo}`),
+  onSubmit: ({ recipient, amount, feeOption, memo }: SendTxParams) =>
+    console.log(`to: ${recipient}, amount ${formatBaseAmount(amount)}, feeOptionKey: ${feeOption}, memo: ${memo}`),
   isLoading: false,
   addressValidation: (address) => validateAddress(address, Network.Mainnet),
   feesWithRates: RD.success({ fees, rates }),
