@@ -13,12 +13,11 @@ import { Network } from '../../../../shared/api/types'
 import { Send, SendFormETH } from '../../../components/wallet/txs/send/'
 import { useChainContext } from '../../../contexts/ChainContext'
 import { useEthereumContext } from '../../../contexts/EthereumContext'
-import { sequenceTOption } from '../../../helpers/fpHelpers'
 import { getWalletBalanceByAsset } from '../../../helpers/walletHelper'
 import { useSubscriptionState } from '../../../hooks/useSubscriptionState'
 import { INITIAL_SEND_STATE } from '../../../services/chain/const'
 import { SendTxParams, SendTxState } from '../../../services/chain/types'
-import { FeesRD, GetExplorerTxUrl, WalletBalances } from '../../../services/clients'
+import { FeesRD, OpenExplorerTxUrl, WalletBalances } from '../../../services/clients'
 import { NonEmptyWalletBalances, ValidatePasswordHandler } from '../../../services/wallet/types'
 import { WalletBalance } from '../../../types/wallet'
 import * as Helper from './SendView.helper'
@@ -26,13 +25,13 @@ import * as Helper from './SendView.helper'
 type Props = {
   asset: Asset
   balances: O.Option<NonEmptyWalletBalances>
-  getExplorerTxUrl: O.Option<GetExplorerTxUrl>
+  openExplorerTxUrl: OpenExplorerTxUrl
   network: Network
   validatePassword$: ValidatePasswordHandler
 }
 
 export const SendViewETH: React.FC<Props> = (props): JSX.Element => {
-  const { asset, balances: oBalances, getExplorerTxUrl: oGetExplorerTxUrl = O.none, validatePassword$, network } = props
+  const { asset, balances: oBalances, openExplorerTxUrl, validatePassword$, network } = props
 
   const intl = useIntl()
   const history = useHistory()
@@ -106,23 +105,18 @@ export const SendViewETH: React.FC<Props> = (props): JSX.Element => {
   }, [history, resetSendTxState])
 
   return FP.pipe(
-    sequenceTOption(oWalletBalance, oGetExplorerTxUrl),
+    oWalletBalance,
     O.fold(
       () => <></>,
-      ([walletBalance, getExplorerTxUrl]) => {
-        const viewTxHandler: (txHash: string) => Promise<void> = FP.flow(getExplorerTxUrl, window.apiUrl.openExternal)
-        return (
-          <>
-            <Send
-              txRD={sendTxState.status}
-              viewTxHandler={viewTxHandler}
-              finishActionHandler={finishActionHandler}
-              errorActionHandler={finishActionHandler}
-              sendForm={sendForm(walletBalance)}
-            />
-          </>
-        )
-      }
+      (walletBalance) => (
+        <Send
+          txRD={sendTxState.status}
+          viewTxHandler={openExplorerTxUrl}
+          finishActionHandler={finishActionHandler}
+          errorActionHandler={finishActionHandler}
+          sendForm={sendForm(walletBalance)}
+        />
+      )
     )
   )
 }

@@ -14,7 +14,7 @@ import { eqAsset, eqString } from '../../../helpers/fp/eq'
 import { sequenceTOption } from '../../../helpers/fpHelpers'
 import { getWalletAssetAmountFromBalances } from '../../../helpers/walletHelper'
 import * as walletRoutes from '../../../routes/wallet'
-import { GetExplorerTxUrl, TxsPageRD } from '../../../services/clients'
+import { OpenExplorerTxUrl, TxsPageRD } from '../../../services/clients'
 import { MAX_ITEMS_PER_PAGE } from '../../../services/const'
 import { EMPTY_LOAD_TXS_HANDLER } from '../../../services/wallet/const'
 import { LoadTxsHandler, NonEmptyWalletBalances } from '../../../services/wallet/types'
@@ -29,7 +29,7 @@ type Props = {
   txsPageRD: TxsPageRD
   balances: O.Option<NonEmptyWalletBalances>
   asset: Asset
-  getExplorerTxUrl?: O.Option<GetExplorerTxUrl>
+  openExplorerTxUrl: OpenExplorerTxUrl
   openExplorerAddressUrl?: FP.Lazy<void>
   reloadBalancesHandler?: FP.Lazy<void>
   loadTxsHandler?: LoadTxsHandler
@@ -44,7 +44,7 @@ export const AssetDetails: React.FC<Props> = (props): JSX.Element => {
     asset,
     reloadBalancesHandler = FP.constVoid,
     loadTxsHandler = EMPTY_LOAD_TXS_HANDLER,
-    getExplorerTxUrl: oGetExplorerTxUrl = O.none,
+    openExplorerTxUrl,
     openExplorerAddressUrl,
     walletAddress: oWalletAddress = O.none,
     network
@@ -88,13 +88,6 @@ export const AssetDetails: React.FC<Props> = (props): JSX.Element => {
     loadTxsHandler({ limit: MAX_ITEMS_PER_PAGE, offset: (currentPage - 1) * MAX_ITEMS_PER_PAGE })
     reloadBalancesHandler()
   }, [currentPage, loadTxsHandler, reloadBalancesHandler])
-
-  const clickTxLinkHandler = useCallback(
-    (txHash: string) => {
-      FP.pipe(oGetExplorerTxUrl, O.ap(O.some(txHash)), O.map(window.apiUrl.openExternal))
-    },
-    [oGetExplorerTxUrl]
-  )
 
   const onChangePagination = useCallback(
     (pageNo) => {
@@ -223,7 +216,7 @@ export const AssetDetails: React.FC<Props> = (props): JSX.Element => {
         <Col span={24}>
           <TxsTable
             txsPageRD={txsPageRD}
-            clickTxLinkHandler={clickTxLinkHandler}
+            clickTxLinkHandler={openExplorerTxUrl}
             changePaginationHandler={onChangePagination}
             chain={asset.chain}
             network={network}

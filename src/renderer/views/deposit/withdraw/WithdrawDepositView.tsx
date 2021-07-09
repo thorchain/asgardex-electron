@@ -1,7 +1,7 @@
 import React, { useCallback, useMemo } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
-import { Asset, AssetRuneNative, BaseAmount, bn, Chain } from '@xchainjs/xchain-util'
+import { Asset, AssetRuneNative, BaseAmount, bn, Chain, THORChain } from '@xchainjs/xchain-util'
 import BigNumber from 'bignumber.js'
 import * as FP from 'fp-ts/function'
 import * as O from 'fp-ts/lib/Option'
@@ -19,6 +19,8 @@ import { useWalletContext } from '../../../contexts/WalletContext'
 import { getAssetPoolPrice } from '../../../helpers/poolHelper'
 import * as ShareHelpers from '../../../helpers/poolShareHelper'
 import { liveData } from '../../../helpers/rx/liveData'
+import { useOpenExplorerTxUrl } from '../../../hooks/useOpenExplorerTxUrl'
+import { OpenExplorerTxUrl } from '../../../services/clients'
 import { DEFAULT_NETWORK } from '../../../services/const'
 import { PoolDetailRD, PoolShareRD, PoolShare, PoolsDataMap } from '../../../services/midgard/types'
 import { getBalanceByAsset } from '../../../services/wallet/util'
@@ -42,7 +44,7 @@ export const WithdrawDepositView: React.FC<Props> = (props): JSX.Element => {
     }
   } = useMidgardContext()
 
-  const { symWithdrawFee$, reloadWithdrawFees, symWithdraw$, getExplorerUrlByAsset$ } = useChainContext()
+  const { symWithdrawFee$, reloadWithdrawFees, symWithdraw$ } = useChainContext()
 
   const runePrice = useObservableState(priceRatio$, bn(1))
 
@@ -97,18 +99,7 @@ export const WithdrawDepositView: React.FC<Props> = (props): JSX.Element => {
     [balances]
   )
 
-  const getRuneExplorerUrl$ = useMemo(() => getExplorerUrlByAsset$(AssetRuneNative), [getExplorerUrlByAsset$])
-  const runeExplorerUrl = useObservableState(getRuneExplorerUrl$, O.none)
-
-  const viewRuneTx = useCallback(
-    (txHash: string) => {
-      FP.pipe(
-        runeExplorerUrl,
-        O.map((getExplorerUrl) => window.apiUrl.openExternal(getExplorerUrl(txHash)))
-      )
-    },
-    [runeExplorerUrl]
-  )
+  const openRuneExplorerTxUrl: OpenExplorerTxUrl = useOpenExplorerTxUrl(THORChain)
 
   const { network$ } = useAppContext()
   const network = useObservableState<Network>(network$, DEFAULT_NETWORK)
@@ -132,7 +123,7 @@ export const WithdrawDepositView: React.FC<Props> = (props): JSX.Element => {
         reloadFees={reloadWithdrawFees}
         disabled
         validatePassword$={validatePassword$}
-        viewRuneTx={viewRuneTx}
+        openRuneExplorerTxUrl={openRuneExplorerTxUrl}
         reloadBalances={reloadBalancesAndShares}
         withdraw$={symWithdraw$}
         network={network}
@@ -146,7 +137,7 @@ export const WithdrawDepositView: React.FC<Props> = (props): JSX.Element => {
       assetWD,
       reloadWithdrawFees,
       validatePassword$,
-      viewRuneTx,
+      openRuneExplorerTxUrl,
       reloadBalancesAndShares,
       symWithdraw$,
       network,
@@ -182,7 +173,7 @@ export const WithdrawDepositView: React.FC<Props> = (props): JSX.Element => {
         fees$={symWithdrawFee$}
         reloadFees={reloadWithdrawFees}
         validatePassword$={validatePassword$}
-        viewRuneTx={viewRuneTx}
+        openRuneExplorerTxUrl={openRuneExplorerTxUrl}
         reloadBalances={reloadBalancesAndShares}
         withdraw$={symWithdraw$}
         network={network}
@@ -197,7 +188,7 @@ export const WithdrawDepositView: React.FC<Props> = (props): JSX.Element => {
       symWithdrawFee$,
       reloadWithdrawFees,
       validatePassword$,
-      viewRuneTx,
+      openRuneExplorerTxUrl,
       reloadBalancesAndShares,
       symWithdraw$,
       network,

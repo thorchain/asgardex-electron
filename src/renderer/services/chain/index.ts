@@ -1,7 +1,6 @@
 import { addressByChain$, assetAddress$ } from './address'
 import { clientByChain$ } from './client'
 import { assetWithDecimal$ } from './decimal'
-import { getExplorerUrlByAsset$ } from './explorerUrl'
 import {
   reloadSymDepositFees,
   symDepositFees$,
@@ -44,7 +43,6 @@ export {
   removeAllLedgerAddress,
   reloadSwapFees,
   swapFees$,
-  getExplorerUrlByAsset$,
   assetAddress$,
   swap$,
   asymDeposit$,

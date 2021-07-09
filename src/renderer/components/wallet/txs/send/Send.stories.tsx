@@ -3,7 +3,7 @@ import React, { useMemo } from 'react'
 import * as RD from '@devexperts/remote-data-ts'
 import { Story, Meta } from '@storybook/react'
 import { BTC_DECIMAL } from '@xchainjs/xchain-bitcoin'
-import { FeeRates, Fees, FeeType } from '@xchainjs/xchain-client'
+import { FeeRates, Fees, FeeType, TxHash } from '@xchainjs/xchain-client'
 import {
   assetAmount,
   AssetBNB,
@@ -36,9 +36,9 @@ const defaultProps = {
   txRD: RD.initial,
   inititalActionHandler: () => console.log('initial action'),
   finishActionHandler: () => console.log('finish action'),
-  viewTxHandler: (txHash: string) => {
+  viewTxHandler: (txHash: TxHash) => {
     console.log(`view tx handler: ${txHash}`)
-    return Promise.resolve()
+    return Promise.resolve(true)
   },
   errorActionHandler: () => console.log('error action')
 }

@@ -26,8 +26,10 @@ import { getAssetPoolPrice } from '../../../helpers/poolHelper'
 import { liveData } from '../../../helpers/rx/liveData'
 import { filterWalletBalancesByAssets } from '../../../helpers/walletHelper'
 import { FundsCap, useFundsCap } from '../../../hooks/useFundsCap'
+import { useOpenExplorerTxUrl } from '../../../hooks/useOpenExplorerTxUrl'
 import * as poolsRoutes from '../../../routes/pools'
 import { SymDepositMemo } from '../../../services/chain/types'
+import { OpenExplorerTxUrl } from '../../../services/clients'
 import { DEFAULT_NETWORK } from '../../../services/const'
 import { PoolAddress, PoolAssetsRD, PoolDetailRD } from '../../../services/midgard/types'
 import { toPoolData } from '../../../services/midgard/utils'
@@ -76,8 +78,7 @@ export const SymDepositView: React.FC<Props> = (props) => {
     }
   } = useMidgardContext()
 
-  const { symDepositFees$, symDeposit$, reloadSymDepositFees, symDepositTxMemo$, getExplorerUrlByAsset$ } =
-    useChainContext()
+  const { symDepositFees$, symDeposit$, reloadSymDepositFees, symDepositTxMemo$ } = useChainContext()
 
   const [poolsDataRD] = useObservableState(
     () =>
@@ -163,31 +164,9 @@ export const SymDepositView: React.FC<Props> = (props) => {
     RD.map(getAssetPoolPrice(runPrice))
   )
 
-  const getAssetExplorerUrl$ = useMemo(() => getExplorerUrlByAsset$(asset), [asset, getExplorerUrlByAsset$])
-  const assetExplorerUrl = useObservableState(getAssetExplorerUrl$, O.none)
+  const openAssetExplorerTxUrl: OpenExplorerTxUrl = useOpenExplorerTxUrl(asset.chain)
 
-  const viewAssetTx = useCallback(
-    (txHash: string) => {
-      FP.pipe(
-        assetExplorerUrl,
-        O.map((getExplorerUrl) => window.apiUrl.openExternal(getExplorerUrl(txHash)))
-      )
-    },
-    [assetExplorerUrl]
-  )
-
-  const getRuneExplorerUrl$ = useMemo(() => getExplorerUrlByAsset$(AssetRuneNative), [getExplorerUrlByAsset$])
-  const runeExplorerUrl = useObservableState(getRuneExplorerUrl$, O.none)
-
-  const viewRuneTx = useCallback(
-    (txHash: string) => {
-      FP.pipe(
-        runeExplorerUrl,
-        O.map((getExplorerUrl) => window.apiUrl.openExternal(getExplorerUrl(txHash)))
-      )
-    },
-    [runeExplorerUrl]
-  )
+  const openRuneExplorerTxUrl: OpenExplorerTxUrl = useOpenExplorerTxUrl(THORChain)
 
   const fundsCap: O.Option<FundsCap> = useMemo(
     () =>
@@ -228,8 +207,8 @@ export const SymDepositView: React.FC<Props> = (props) => {
         <SymDeposit
           haltedChains={haltedChains}
           validatePassword$={validatePassword$}
-          viewRuneTx={viewRuneTx}
-          viewAssetTx={viewAssetTx}
+          openRuneExplorerTxUrl={openRuneExplorerTxUrl}
+          openAssetExplorerTxUrl={openAssetExplorerTxUrl}
           onChangeAsset={FP.constVoid}
           asset={assetWD}
           assetPrice={ZERO_BN}
@@ -266,8 +245,8 @@ export const SymDepositView: React.FC<Props> = (props) => {
       intl,
       haltedChains,
       validatePassword$,
-      viewRuneTx,
-      viewAssetTx,
+      openRuneExplorerTxUrl,
+      openAssetExplorerTxUrl,
       assetWD,
       symDepositFees$,
       approveFee$,
@@ -301,8 +280,8 @@ export const SymDepositView: React.FC<Props> = (props) => {
             <SymDeposit
               haltedChains={haltedChains}
               validatePassword$={validatePassword$}
-              viewRuneTx={viewRuneTx}
-              viewAssetTx={viewAssetTx}
+              openRuneExplorerTxUrl={openRuneExplorerTxUrl}
+              openAssetExplorerTxUrl={openAssetExplorerTxUrl}
               poolData={toPoolData(poolDetail)}
               onChangeAsset={onChangeAsset}
               asset={assetWD}

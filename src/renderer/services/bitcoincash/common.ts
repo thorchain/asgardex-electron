@@ -84,9 +84,4 @@ const addressUI$: C.Address$ = C.addressUI$(client$)
  */
 const explorerUrl$: C.ExplorerUrl$ = C.explorerUrl$(client$)
 
-/**
- * Explorer tx url
- */
-const getExplorerTxUrl$: C.GetExplorerTxUrl$ = C.getExplorerTxUrl$(client$)
-
-export { client$, clientState$, address$, addressUI$, explorerUrl$, getExplorerTxUrl$ }
+export { client$, clientState$, address$, addressUI$, explorerUrl$ }

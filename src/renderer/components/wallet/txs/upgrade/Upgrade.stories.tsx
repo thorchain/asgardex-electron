@@ -79,7 +79,7 @@ const defaultProps: UpgradeProps = {
   reloadFeeHandler: () => console.log('reload fee'),
   successActionHandler: (txHash) => {
     console.log('success handler ' + txHash)
-    return Promise.resolve(undefined)
+    return Promise.resolve(true)
   },
   reloadBalancesHandler: () => console.log('reload balances'),
   network: 'testnet'

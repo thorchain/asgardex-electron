@@ -22,8 +22,10 @@ import { ErrorView } from '../../../components/shared/error/'
 import { BackLink } from '../../../components/uielements/backLink'
 import { useAppContext } from '../../../contexts/AppContext'
 import { useWalletContext } from '../../../contexts/WalletContext'
+import { useOpenExplorerTxUrl } from '../../../hooks/useOpenExplorerTxUrl'
 import { SendParams } from '../../../routes/wallet'
 import * as walletRoutes from '../../../routes/wallet'
+import { OpenExplorerTxUrl } from '../../../services/clients'
 import { DEFAULT_NETWORK } from '../../../services/const'
 import { INITIAL_BALANCES_STATE } from '../../../services/wallet/const'
 import { SendViewBNB, SendViewBCH, SendViewBTC, SendViewETH } from './index'
@@ -43,12 +45,19 @@ export const SendView: React.FC<Props> = (): JSX.Element => {
 
   const {
     balancesState$,
-    getExplorerTxUrl$,
     keystoreService: { validatePassword$ }
   } = useWalletContext()
 
   const { balances } = useObservableState(balancesState$, INITIAL_BALANCES_STATE)
-  const getExplorerTxUrl = useObservableState(getExplorerTxUrl$, O.none)
+
+  const openExplorerTxUrl: OpenExplorerTxUrl = FP.pipe(
+    oSelectedAsset,
+    O.map(({ chain }) => chain),
+    O.map(useOpenExplorerTxUrl),
+    O.getOrElse<OpenExplorerTxUrl>(
+      () => (_) => Promise.reject(Error(`Can't open explorer url for route asset ${oSelectedAsset}`))
+    )
+  )
 
   const renderAssetError = useMemo(
     () => (
@@ -75,7 +84,7 @@ export const SendView: React.FC<Props> = (): JSX.Element => {
             <SendViewBNB
               asset={asset}
               balances={balances}
-              getExplorerTxUrl={getExplorerTxUrl}
+              openExplorerTxUrl={openExplorerTxUrl}
               validatePassword$={validatePassword$}
               network={network}
             />
@@ -85,7 +94,7 @@ export const SendView: React.FC<Props> = (): JSX.Element => {
             <SendViewBCH
               asset={asset}
               balances={balances}
-              getExplorerTxUrl={getExplorerTxUrl}
+              openExplorerTxUrl={openExplorerTxUrl}
               validatePassword$={validatePassword$}
               network={network}
             />
@@ -95,7 +104,7 @@ export const SendView: React.FC<Props> = (): JSX.Element => {
             <SendViewBTC
               asset={asset}
               balances={balances}
-              getExplorerTxUrl={getExplorerTxUrl}
+              openExplorerTxUrl={openExplorerTxUrl}
               validatePassword$={validatePassword$}
               network={network}
             />
@@ -105,7 +114,7 @@ export const SendView: React.FC<Props> = (): JSX.Element => {
             <SendViewETH
               asset={asset}
               balances={balances}
-              getExplorerTxUrl={getExplorerTxUrl}
+              openExplorerTxUrl={openExplorerTxUrl}
               validatePassword$={validatePassword$}
               network={network}
             />
@@ -115,7 +124,7 @@ export const SendView: React.FC<Props> = (): JSX.Element => {
             <SendViewTHOR
               asset={asset}
               balances={balances}
-              getExplorerTxUrl={getExplorerTxUrl}
+              openExplorerTxUrl={openExplorerTxUrl}
               validatePassword$={validatePassword$}
               network={network}
             />
@@ -125,7 +134,7 @@ export const SendView: React.FC<Props> = (): JSX.Element => {
             <SendViewLTC
               asset={asset}
               balances={balances}
-              getExplorerTxUrl={getExplorerTxUrl}
+              openExplorerTxUrl={openExplorerTxUrl}
               validatePassword$={validatePassword$}
               network={network}
             />
@@ -143,7 +152,7 @@ export const SendView: React.FC<Props> = (): JSX.Element => {
           )
       }
     },
-    [balances, getExplorerTxUrl, network, validatePassword$, intl]
+    [balances, openExplorerTxUrl, validatePassword$, network, intl]
   )
 
   return FP.pipe(

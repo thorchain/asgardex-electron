@@ -19,10 +19,10 @@ import { useChainContext } from '../../../contexts/ChainContext'
 import { useMidgardContext } from '../../../contexts/MidgardContext'
 import { useWalletContext } from '../../../contexts/WalletContext'
 import { isNonNativeRuneAsset } from '../../../helpers/assetHelper'
-import { sequenceTOption } from '../../../helpers/fpHelpers'
+import { useOpenExplorerTxUrl } from '../../../hooks/useOpenExplorerTxUrl'
 import { AssetDetailsParams } from '../../../routes/wallet'
 import { AssetWithDecimalLD, AssetWithDecimalRD } from '../../../services/chain/types'
-import { GetExplorerTxUrl } from '../../../services/clients'
+import { OpenExplorerTxUrl } from '../../../services/clients'
 import { DEFAULT_NETWORK } from '../../../services/const'
 import { PoolAddressRD } from '../../../services/midgard/types'
 import { INITIAL_BALANCES_STATE } from '../../../services/wallet/const'
@@ -63,13 +63,10 @@ export const UpgradeView: React.FC<Props> = (): JSX.Element => {
 
   const {
     balancesState$,
-    getExplorerTxUrl$,
     keystoreService: { validatePassword$ },
     reloadBalancesByChain
   } = useWalletContext()
   const { balances: oBalances } = useObservableState(balancesState$, INITIAL_BALANCES_STATE)
-
-  const oGetExplorerTxUrl: O.Option<GetExplorerTxUrl> = useObservableState(getExplorerTxUrl$, O.none)
 
   const {
     service: {
@@ -137,6 +134,13 @@ export const UpgradeView: React.FC<Props> = (): JSX.Element => {
     )
   }, [reloadInboundAddresses, reloadBalancesByChain, runeNonNativeAsset, oBalances, targetPoolAddressRD])
 
+  const openExplorerTxUrl: OpenExplorerTxUrl = FP.pipe(
+    runeNonNativeAsset,
+    O.map(({ chain }) => chain),
+    O.map(useOpenExplorerTxUrl),
+    O.getOrElse<OpenExplorerTxUrl>(() => (_) => Promise.reject(Error(`Can't open explorer url for asset ${asset}`)))
+  )
+
   return (
     <>
       <BackLink />
@@ -150,11 +154,8 @@ export const UpgradeView: React.FC<Props> = (): JSX.Element => {
             FP.pipe(
               // Show an error by invalid or missing asset in route only
               // All other values should be immediately available by entering the `UpgradeView`
-              sequenceTOption(oRuneNativeAddress, oGetExplorerTxUrl),
-              O.fold(renderAssetError, ([runeNativeAddress, getExplorerTxUrl]) => {
-                const successActionHandler = (txHash: string): Promise<void> =>
-                  FP.pipe(txHash, getExplorerTxUrl, window.apiUrl.openExternal)
-
+              oRuneNativeAddress,
+              O.fold(renderAssetError, (runeNativeAddress) => {
                 return renderUpgradeComponent(runeAsset, {
                   walletAddress,
                   runeAsset,
@@ -163,7 +164,7 @@ export const UpgradeView: React.FC<Props> = (): JSX.Element => {
                   validatePassword$,
                   upgrade$: upgradeRuneToNative$,
                   balances: oBalances,
-                  successActionHandler,
+                  successActionHandler: openExplorerTxUrl,
                   reloadBalancesHandler: reloadBalancesByChain(runeAsset.asset.chain),
                   network,
                   reloadOnError

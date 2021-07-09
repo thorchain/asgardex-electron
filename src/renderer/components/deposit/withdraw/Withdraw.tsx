@@ -36,6 +36,7 @@ import {
   SymWithdrawFeesRD,
   SymWithdrawFees
 } from '../../../services/chain/types'
+import { OpenExplorerTxUrl } from '../../../services/clients'
 import { PoolsDataMap } from '../../../services/midgard/types'
 import { ValidatePasswordHandler } from '../../../services/wallet/types'
 import { AssetWithDecimal } from '../../../types/asgardex'
@@ -66,7 +67,7 @@ export type Props = {
   shares: { rune: BaseAmount; asset: BaseAmount }
   /** Flag whether form has to be disabled or not */
   disabled?: boolean
-  viewRuneTx: (txHash: string) => void
+  openRuneExplorerTxUrl: OpenExplorerTxUrl
   validatePassword$: ValidatePasswordHandler
   reloadBalances: FP.Lazy<void>
   withdraw$: SymWithdrawStateHandler
@@ -90,7 +91,7 @@ export const Withdraw: React.FC<Props> = ({
   selectedPriceAsset,
   shares: { rune: runeShare, asset: assetShare },
   disabled,
-  viewRuneTx = (_) => {},
+  openRuneExplorerTxUrl,
   validatePassword$,
   reloadBalances = FP.constVoid,
   reloadFees,
@@ -293,7 +294,7 @@ export const Withdraw: React.FC<Props> = ({
         {FP.pipe(withdrawTx, RD.toOption, (oTxHash) => (
           <Styled.ViewTxButtonTop
             txHash={oTxHash}
-            onClick={viewRuneTx}
+            onClick={openRuneExplorerTxUrl}
             label={intl.formatMessage({ id: 'common.tx.view' }, { assetTicker: AssetRuneNative.ticker })}
           />
         ))}
@@ -312,7 +313,15 @@ export const Withdraw: React.FC<Props> = ({
         extra={txModalExtraContent}
       />
     )
-  }, [withdrawState, resetWithdrawState, onFinishTxModal, withdrawStartTime, txModalExtraContent, intl, viewRuneTx])
+  }, [
+    withdrawState,
+    resetWithdrawState,
+    onFinishTxModal,
+    withdrawStartTime,
+    txModalExtraContent,
+    intl,
+    openRuneExplorerTxUrl
+  ])
 
   const [showPasswordModal, setShowPasswordModal] = useState(false)
 

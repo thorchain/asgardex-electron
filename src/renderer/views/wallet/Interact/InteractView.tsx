@@ -1,9 +1,7 @@
-import React, { useCallback, useMemo } from 'react'
+import React from 'react'
 
-import { AssetRuneNative } from '@xchainjs/xchain-util'
+import { THORChain } from '@xchainjs/xchain-util'
 import { Col, Row } from 'antd'
-import * as FP from 'fp-ts/function'
-import * as O from 'fp-ts/Option'
 import { useObservableState } from 'observable-hooks'
 import { useParams } from 'react-router'
 
@@ -11,7 +9,7 @@ import { Network } from '../../../../shared/api/types'
 import { Interact } from '../../../components/interact'
 import { BackLink } from '../../../components/uielements/backLink'
 import { useAppContext } from '../../../contexts/AppContext'
-import { useChainContext } from '../../../contexts/ChainContext'
+import { useOpenExplorerTxUrl } from '../../../hooks/useOpenExplorerTxUrl'
 import * as walletRoutes from '../../../routes/wallet'
 import { DEFAULT_NETWORK } from '../../../services/const'
 import { BondView } from './BondView'
@@ -26,19 +24,7 @@ export const InteractView: React.FC = () => {
   const { network$ } = useAppContext()
   const network = useObservableState<Network>(network$, DEFAULT_NETWORK)
 
-  const { getExplorerUrlByAsset$ } = useChainContext()
-
-  const getRuneExplorerUrl$ = useMemo(() => getExplorerUrlByAsset$(AssetRuneNative), [getExplorerUrlByAsset$])
-  const runeExplorerUrl = useObservableState(getRuneExplorerUrl$, O.none)
-  const goToTransaction = useCallback(
-    (txHash: string) => {
-      FP.pipe(
-        runeExplorerUrl,
-        O.map((getExplorerUrl) => window.apiUrl.openExternal(getExplorerUrl(txHash)))
-      )
-    },
-    [runeExplorerUrl]
-  )
+  const openExplorerTxUrl = useOpenExplorerTxUrl(THORChain)
 
   return (
     <>
@@ -49,10 +35,10 @@ export const InteractView: React.FC = () => {
       </Row>
       <Styled.ContentContainer>
         <Interact
-          bondContent={<BondView walletAddress={walletAddress} goToTransaction={goToTransaction} />}
-          leaveContent={<LeaveView goToTransaction={goToTransaction} />}
-          unbondContent={<UnbondView goToTransaction={goToTransaction} />}
-          customContent={<CustomView goToTransaction={goToTransaction} />}
+          bondContent={<BondView walletAddress={walletAddress} goToTransaction={openExplorerTxUrl} />}
+          leaveContent={<LeaveView openExplorerTxUrl={openExplorerTxUrl} />}
+          unbondContent={<UnbondView openExplorerTxUrl={openExplorerTxUrl} />}
+          customContent={<CustomView openExplorerTxUrl={openExplorerTxUrl} />}
           network={network}
         />
       </Styled.ContentContainer>

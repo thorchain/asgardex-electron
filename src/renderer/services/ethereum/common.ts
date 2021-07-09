@@ -11,7 +11,7 @@ import { Network } from '../../../shared/api/types'
 import { envOrDefault } from '../../helpers/envHelper'
 import { clientNetwork$ } from '../app/service'
 import * as C from '../clients'
-import { Address$, ExplorerUrl$, GetExplorerTxUrl$ } from '../clients/types'
+import { Address$, ExplorerUrl$ } from '../clients/types'
 import { toClientNetwork } from '../clients/utils'
 import { keystoreService } from '../wallet/keystore'
 import { getPhrase } from '../wallet/util'
@@ -87,11 +87,6 @@ const addressUI$: Address$ = C.addressUI$(client$)
 const explorerUrl$: ExplorerUrl$ = C.explorerUrl$(client$)
 
 /**
- * Explorer url depending on selected network
- */
-const getExplorerTxUrl$: GetExplorerTxUrl$ = C.getExplorerTxUrl$(client$)
-
-/**
  * Map to store decimal in memory
  *
  * to avoid unessary request for same data
@@ -123,4 +118,4 @@ const getERC20Decimal = async (asset: Asset, network: Network): Promise<number> 
   )
 }
 
-export { client$, clientState$, address$, addressUI$, explorerUrl$, getExplorerTxUrl$, getERC20Decimal }
+export { client$, clientState$, address$, addressUI$, explorerUrl$, getERC20Decimal }

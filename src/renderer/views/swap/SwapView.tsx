@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useMemo } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
-import { assetFromString, AssetRuneNative, bnOrZero, Chain } from '@xchainjs/xchain-util'
+import { assetFromString, AssetRuneNative, bnOrZero, Chain, THORChain } from '@xchainjs/xchain-util'
 import { Spin } from 'antd'
 import * as FP from 'fp-ts/function'
 import * as O from 'fp-ts/lib/Option'
@@ -23,9 +23,11 @@ import { useWalletContext } from '../../contexts/WalletContext'
 import { isRuneNativeAsset } from '../../helpers/assetHelper'
 import { eqChain } from '../../helpers/fp/eq'
 import { sequenceTOption, sequenceTRD } from '../../helpers/fpHelpers'
+import { useOpenExplorerTxUrl } from '../../hooks/useOpenExplorerTxUrl'
 import { SwapRouteParams } from '../../routes/pools/swap'
 import * as walletRoutes from '../../routes/wallet'
 import { AssetWithDecimalLD, AssetWithDecimalRD } from '../../services/chain/types'
+import { OpenExplorerTxUrl } from '../../services/clients'
 import { DEFAULT_NETWORK } from '../../services/const'
 import { INITIAL_BALANCES_STATE } from '../../services/wallet/const'
 import * as Styled from './SwapView.styles'
@@ -45,8 +47,7 @@ export const SwapView: React.FC<Props> = (_): JSX.Element => {
     pools: { poolsState$, reloadPools, selectedPoolAddress$, reloadInboundAddresses, haltedChains$ },
     setSelectedPoolAsset
   } = midgardService
-  const { reloadSwapFees, swapFees$, getExplorerUrlByAsset$, addressByChain$, swap$, assetWithDecimal$ } =
-    useChainContext()
+  const { reloadSwapFees, swapFees$, addressByChain$, swap$, assetWithDecimal$ } = useChainContext()
 
   const {
     balancesState$,
@@ -127,21 +128,7 @@ export const SwapView: React.FC<Props> = (_): JSX.Element => {
   )
   const targetWalletAddress = useObservableState(address$, O.none)
 
-  const getExplorerUrl$ = useMemo(
-    () => getExplorerUrlByAsset$(assetFromString(source.toUpperCase())),
-    [source, getExplorerUrlByAsset$]
-  )
-  const explorerUrl = useObservableState(getExplorerUrl$, O.none)
-
-  const goToTransaction = useCallback(
-    (txHash: string) => {
-      FP.pipe(
-        explorerUrl,
-        O.map((getExplorerUrl) => window.apiUrl.openExternal(getExplorerUrl(txHash)))
-      )
-    },
-    [explorerUrl]
-  )
+  const openExplorerTxUrl: OpenExplorerTxUrl = useOpenExplorerTxUrl(THORChain)
 
   const renderError = useCallback(
     (e: Error) => (
@@ -216,7 +203,7 @@ export const SwapView: React.FC<Props> = (_): JSX.Element => {
                   haltedChains={haltedChains}
                   keystore={keystore}
                   validatePassword$={validatePassword$}
-                  goToTransaction={goToTransaction}
+                  goToTransaction={openExplorerTxUrl}
                   assets={{ inAsset: sourceAsset, outAsset: targetAsset }}
                   poolAddress={selectedPoolAddress}
                   availableAssets={availableAssets}

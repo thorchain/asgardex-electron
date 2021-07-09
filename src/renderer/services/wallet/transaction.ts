@@ -10,7 +10,7 @@ import * as BNB from '../binance'
 import * as BTC from '../bitcoin'
 import * as BCH from '../bitcoincash'
 import * as C from '../clients'
-import { ExplorerUrl$, GetExplorerTxUrl$, TxsPageLD, LoadTxsParams } from '../clients'
+import { ExplorerUrl$, TxsPageLD, LoadTxsParams } from '../clients'
 import * as ETH from '../ethereum'
 import * as LTC from '../litecoin'
 import * as THOR from '../thorchain'
@@ -19,8 +19,6 @@ import { INITIAL_LOAD_TXS_PROPS } from './const'
 import { ApiError, ErrorId, LoadTxsHandler, ResetTxsPageHandler } from './types'
 
 export const explorerUrl$: ExplorerUrl$ = C.explorerUrl$(client$)
-
-export const getExplorerTxUrl$: GetExplorerTxUrl$ = C.getExplorerTxUrl$(client$)
 
 /**
  * State of `LoadTxsProps`, which triggers reload of txs history

@@ -11,7 +11,6 @@ import {
   address$,
   addressUI$,
   explorerUrl$,
-  getExplorerTxUrl$,
   fees$,
   reloadFees,
   sendPoolTx$,
@@ -32,7 +31,6 @@ export type EthereumContextValue = {
   address$: typeof address$
   addressUI$: typeof addressUI$
   explorerUrl$: typeof explorerUrl$
-  getExplorerTxUrl$: typeof getExplorerTxUrl$
   fees$: typeof fees$
   reloadFees: typeof reloadFees
   sendPoolTx$: typeof sendPoolTx$
@@ -53,7 +51,6 @@ const initialContext: EthereumContextValue = {
   address$,
   addressUI$,
   explorerUrl$,
-  getExplorerTxUrl$,
   fees$,
   reloadFees,
   sendPoolTx$,

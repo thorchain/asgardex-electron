@@ -18,6 +18,8 @@ export const Result = styled(A.Result)`
   background-color: ${palette('background', 1)};
 
   .ant-result-title {
+    text-transform: uppercase;
+    font-size: 17px;
     color: ${palette('text', 0)};
   }
   .ant-result-subtitle {

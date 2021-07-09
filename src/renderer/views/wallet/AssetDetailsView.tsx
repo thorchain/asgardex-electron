@@ -19,7 +19,9 @@ import { useAppContext } from '../../contexts/AppContext'
 import { useChainContext } from '../../contexts/ChainContext'
 import { useWalletContext } from '../../contexts/WalletContext'
 import { sequenceTOption } from '../../helpers/fpHelpers'
+import { useOpenExplorerTxUrl } from '../../hooks/useOpenExplorerTxUrl'
 import { AssetDetailsParams } from '../../routes/wallet'
+import { OpenExplorerTxUrl } from '../../services/clients'
 import { DEFAULT_NETWORK } from '../../services/const'
 import { INITIAL_BALANCES_STATE } from '../../services/wallet/const'
 
@@ -45,13 +47,10 @@ export const AssetDetailsView: React.FC = (): JSX.Element => {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => setSelectedAsset(oRouteAsset), [])
 
-  const { getTxs$, balancesState$, loadTxs, reloadBalancesByChain, setSelectedAsset, getExplorerTxUrl$, resetTxsPage } =
-    useWalletContext()
+  const { getTxs$, balancesState$, loadTxs, reloadBalancesByChain, setSelectedAsset, resetTxsPage } = useWalletContext()
 
   const [txsRD] = useObservableState(() => getTxs$(oWalletAddress), RD.initial)
   const { balances: oBalances } = useObservableState(balancesState$, INITIAL_BALANCES_STATE)
-
-  const getExplorerTxUrl = useObservableState(getExplorerTxUrl$, O.none)
 
   useEffect(() => {
     return () => resetTxsPage()
@@ -110,13 +109,22 @@ export const AssetDetailsView: React.FC = (): JSX.Element => {
   const openExplorerAddressUrlHandler = useCallback(() => {
     FP.pipe(
       sequenceTOption(oClient, oWalletAddress),
-      O.map(([client, address]) => {
+      O.map(async ([client, address]) => {
         const url = client.getExplorerAddressUrl(address)
-        window.apiUrl.openExternal(url)
+        await window.apiUrl.openExternal(url)
         return true
       })
     )
   }, [oClient, oWalletAddress])
+
+  const openExplorerTxUrl: OpenExplorerTxUrl = FP.pipe(
+    oRouteAsset,
+    O.map(({ chain }) => chain),
+    O.map(useOpenExplorerTxUrl),
+    O.getOrElse<OpenExplorerTxUrl>(
+      () => (_) => Promise.reject(Error(`Can't open explorer url for route asset ${routeAsset}`))
+    )
+  )
 
   return (
     <>
@@ -131,7 +139,7 @@ export const AssetDetailsView: React.FC = (): JSX.Element => {
               asset={asset}
               loadTxsHandler={loadTxs}
               reloadBalancesHandler={reloadBalancesByChain(asset.chain)}
-              getExplorerTxUrl={getExplorerTxUrl}
+              openExplorerTxUrl={openExplorerTxUrl}
               openExplorerAddressUrl={openExplorerAddressUrlHandler}
               walletAddress={oWalletAddress}
               network={network}

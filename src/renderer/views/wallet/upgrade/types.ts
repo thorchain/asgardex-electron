@@ -4,6 +4,7 @@ import * as O from 'fp-ts/Option'
 
 import { Network } from '../../../../shared/api/types'
 import { UpgradeRuneParams, UpgradeRuneTxState$ } from '../../../services/chain/types'
+import { OpenExplorerTxUrl } from '../../../services/clients'
 import { PoolAddressRD } from '../../../services/midgard/types'
 import { NonEmptyWalletBalances, ValidatePasswordHandler } from '../../../services/wallet/types'
 import { AssetWithDecimal } from '../../../types/asgardex'
@@ -16,7 +17,7 @@ export type CommonUpgradeProps = {
   validatePassword$: ValidatePasswordHandler
   upgrade$: (_: UpgradeRuneParams) => UpgradeRuneTxState$
   balances: O.Option<NonEmptyWalletBalances>
-  successActionHandler: (txHash: string) => Promise<void>
+  successActionHandler: OpenExplorerTxUrl
   reloadBalancesHandler: FP.Lazy<void>
   network: Network
   reloadOnError: FP.Lazy<void>

@@ -1,6 +1,7 @@
 import React, { useCallback, useMemo } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
+import { TxHash } from '@xchainjs/xchain-client'
 import { baseAmount } from '@xchainjs/xchain-util'
 import * as FP from 'fp-ts/function'
 import * as O from 'fp-ts/Option'
@@ -16,10 +17,10 @@ import { AddressValidation, InteractState } from '../../../services/thorchain/ty
 import * as Styled from './InteractView.styles'
 
 type Props = {
-  goToTransaction: (txHash: string) => void
+  openExplorerTxUrl: (txHash: TxHash) => void
 }
 
-export const UnbondView: React.FC<Props> = ({ goToTransaction }) => {
+export const UnbondView: React.FC<Props> = ({ openExplorerTxUrl: goToTransaction }) => {
   const {
     state: interactState,
     reset: resetInteractState,

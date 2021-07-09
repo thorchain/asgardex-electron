@@ -13,13 +13,12 @@ import { Network } from '../../../../shared/api/types'
 import { Send, SendFormTHOR } from '../../../components/wallet/txs/send/'
 import { useChainContext } from '../../../contexts/ChainContext'
 import { useThorchainContext } from '../../../contexts/ThorchainContext'
-import { sequenceTOption } from '../../../helpers/fpHelpers'
 import { liveData } from '../../../helpers/rx/liveData'
 import { getWalletBalanceByAsset } from '../../../helpers/walletHelper'
 import { useSubscriptionState } from '../../../hooks/useSubscriptionState'
 import { INITIAL_SEND_STATE } from '../../../services/chain/const'
 import { FeeRD, SendTxParams, SendTxState } from '../../../services/chain/types'
-import { GetExplorerTxUrl, WalletBalances } from '../../../services/clients'
+import { OpenExplorerTxUrl, WalletBalances } from '../../../services/clients'
 import { AddressValidation } from '../../../services/thorchain/types'
 import { NonEmptyWalletBalances, ValidatePasswordHandler } from '../../../services/wallet/types'
 import { WalletBalance } from '../../../types/wallet'
@@ -28,13 +27,13 @@ import * as Helper from './SendView.helper'
 type Props = {
   asset: Asset
   balances: O.Option<NonEmptyWalletBalances>
-  getExplorerTxUrl: O.Option<GetExplorerTxUrl>
+  openExplorerTxUrl: OpenExplorerTxUrl
   validatePassword$: ValidatePasswordHandler
   network: Network
 }
 
 export const SendViewTHOR: React.FC<Props> = (props): JSX.Element => {
-  const { asset, balances: oBalances, getExplorerTxUrl: oGetExplorerTxUrl = O.none, validatePassword$, network } = props
+  const { asset, balances: oBalances, openExplorerTxUrl, validatePassword$, network } = props
 
   const intl = useIntl()
   const history = useHistory()
@@ -114,23 +113,18 @@ export const SendViewTHOR: React.FC<Props> = (props): JSX.Element => {
   }, [history, resetSendTxState])
 
   return FP.pipe(
-    sequenceTOption(oGetExplorerTxUrl, oWalletBalance),
+    oWalletBalance,
     O.fold(
       () => <></>,
-      ([getExplorerTxUrl, walletBalance]) => {
-        const viewTxHandler: (txHash: string) => Promise<void> = FP.flow(getExplorerTxUrl, window.apiUrl.openExternal)
-        return (
-          <>
-            <Send
-              txRD={sendTxState.status}
-              viewTxHandler={viewTxHandler}
-              finishActionHandler={finishActionHandler}
-              errorActionHandler={finishActionHandler}
-              sendForm={sendForm(walletBalance)}
-            />
-          </>
-        )
-      }
+      (walletBalance) => (
+        <Send
+          txRD={sendTxState.status}
+          viewTxHandler={openExplorerTxUrl}
+          finishActionHandler={finishActionHandler}
+          errorActionHandler={finishActionHandler}
+          sendForm={sendForm(walletBalance)}
+        />
+      )
     )
   )
 }

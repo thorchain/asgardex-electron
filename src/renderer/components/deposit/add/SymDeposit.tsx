@@ -50,6 +50,7 @@ import {
   SymDepositFeesHandler,
   SymDepositFeesRD
 } from '../../../services/chain/types'
+import { OpenExplorerTxUrl } from '../../../services/clients'
 import { ApproveFeeHandler, ApproveParams, IsApprovedRD, LoadApproveFeeHandler } from '../../../services/ethereum/types'
 import { PoolAddress, PoolsDataMap } from '../../../services/midgard/types'
 import { PendingAssets, PendingAssetsRD } from '../../../services/thorchain/types'
@@ -83,8 +84,8 @@ export type Props = {
   reloadBalances: FP.Lazy<void>
   reloadShares: (delay?: number) => void
   reloadSelectedPoolDetail: (delay?: number) => void
-  viewAssetTx: (txHash: string) => void
-  viewRuneTx: (txHash: string) => void
+  openAssetExplorerTxUrl: OpenExplorerTxUrl
+  openRuneExplorerTxUrl: OpenExplorerTxUrl
   validatePassword$: ValidatePasswordHandler
   balances: WalletBalances
   onChangeAsset: (asset: Asset) => void
@@ -114,8 +115,8 @@ export const SymDeposit: React.FC<Props> = (props) => {
     chainAssetBalance: oChainAssetBalance,
     memos: oMemos,
     poolAddress: oPoolAddress,
-    viewAssetTx = (_) => {},
-    viewRuneTx = (_) => {},
+    openAssetExplorerTxUrl,
+    openRuneExplorerTxUrl,
     validatePassword$,
     balances,
     priceAsset,
@@ -704,14 +705,14 @@ export const SymDeposit: React.FC<Props> = (props) => {
         {FP.pipe(symDepositTxs.asset, RD.toOption, (oTxHash) => (
           <Styled.ViewTxButtonTop
             txHash={oTxHash}
-            onClick={viewAssetTx}
+            onClick={openAssetExplorerTxUrl}
             label={intl.formatMessage({ id: 'common.tx.view' }, { assetTicker: asset.ticker })}
           />
         ))}
         {FP.pipe(symDepositTxs.rune, RD.toOption, (oTxHash) => (
           <ViewTxButton
             txHash={oTxHash}
-            onClick={viewRuneTx}
+            onClick={openRuneExplorerTxUrl}
             label={intl.formatMessage({ id: 'common.tx.view' }, { assetTicker: AssetRuneNative.ticker })}
           />
         ))}
@@ -737,9 +738,9 @@ export const SymDeposit: React.FC<Props> = (props) => {
     depositStartTime,
     txModalExtraContent,
     intl,
-    viewRuneTx,
-    viewAssetTx,
-    asset.ticker
+    openAssetExplorerTxUrl,
+    asset.ticker,
+    openRuneExplorerTxUrl
   ])
 
   const closePasswordModal = useCallback(() => {

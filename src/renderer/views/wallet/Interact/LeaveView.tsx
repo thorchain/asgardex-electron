@@ -1,6 +1,7 @@
 import React, { useCallback, useMemo } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
+import { TxHash } from '@xchainjs/xchain-client'
 import { baseAmount } from '@xchainjs/xchain-util'
 import * as FP from 'fp-ts/function'
 import * as O from 'fp-ts/Option'
@@ -16,10 +17,10 @@ import { AddressValidation, InteractState } from '../../../services/thorchain/ty
 import * as Styled from './InteractView.styles'
 
 type Props = {
-  goToTransaction: (txHash: string) => void
+  openExplorerTxUrl: (txHash: TxHash) => void
 }
 
-export const LeaveView: React.FC<Props> = ({ goToTransaction }) => {
+export const LeaveView: React.FC<Props> = ({ openExplorerTxUrl }) => {
   const {
     state: interactState,
     reset: resetInteractState,
@@ -87,7 +88,7 @@ export const LeaveView: React.FC<Props> = ({ goToTransaction }) => {
       ),
       (txHash) => (
         <Styled.SuccessView title={intl.formatMessage({ id: 'common.success' })}>
-          <Styled.ViewTxButton txHash={O.some(txHash)} onClick={goToTransaction} />
+          <Styled.ViewTxButton txHash={O.some(txHash)} onClick={openExplorerTxUrl} />
           <Button onClick={resetInteractState}>{intl.formatMessage({ id: 'common.back' })}</Button>
         </Styled.SuccessView>
       )
