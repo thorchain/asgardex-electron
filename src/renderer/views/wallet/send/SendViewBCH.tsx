@@ -1,8 +1,7 @@
 import React, { useCallback, useMemo } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
-import { Client as BitcoinCashClient } from '@xchainjs/xchain-bitcoincash'
-import { Asset } from '@xchainjs/xchain-util'
+import { Asset, BCHChain } from '@xchainjs/xchain-util'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/Option'
 import { useObservableState } from 'observable-hooks'
@@ -16,7 +15,7 @@ import { useBitcoinCashContext } from '../../../contexts/BitcoinCashContext'
 import { useChainContext } from '../../../contexts/ChainContext'
 import { getWalletBalanceByAsset } from '../../../helpers/walletHelper'
 import { useSubscriptionState } from '../../../hooks/useSubscriptionState'
-import { AddressValidation } from '../../../services/bitcoin/types'
+import { useValidateAddress } from '../../../hooks/useValidateAddress'
 import { FeesWithRatesLD } from '../../../services/bitcoincash/types'
 import { INITIAL_SEND_STATE } from '../../../services/chain/const'
 import { SendTxParams, SendTxState } from '../../../services/chain/types'
@@ -56,20 +55,11 @@ export const SendViewBCH: React.FC<Props> = (props): JSX.Element => {
     [subscribeSendTxState, transfer$]
   )
 
-  const { feesWithRates$, client$, reloadFeesWithRates } = useBitcoinCashContext()
+  const { feesWithRates$, reloadFeesWithRates } = useBitcoinCashContext()
 
   const feesWithRatesLD: FeesWithRatesLD = useMemo(() => feesWithRates$(), [feesWithRates$])
   const feesWithRatesRD = useObservableState(feesWithRatesLD, RD.initial)
-  const oClient = useObservableState<O.Option<BitcoinCashClient>>(client$, O.none)
-  const addressValidation = useMemo(
-    () =>
-      FP.pipe(
-        oClient,
-        O.map((c) => c.validateAddress),
-        O.getOrElse((): AddressValidation => (_: string) => true)
-      ),
-    [oClient]
-  )
+  const addressValidation = useValidateAddress(BCHChain)
 
   const isLoading = useMemo(() => RD.isPending(sendTxState.status), [sendTxState.status])
 

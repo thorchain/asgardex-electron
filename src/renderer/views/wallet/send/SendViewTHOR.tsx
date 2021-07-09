@@ -1,8 +1,7 @@
 import React, { useCallback, useMemo } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
-import { Client as ThorchainClient } from '@xchainjs/xchain-thorchain'
-import { Asset } from '@xchainjs/xchain-util'
+import { Asset, THORChain } from '@xchainjs/xchain-util'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/Option'
 import { useObservableState } from 'observable-hooks'
@@ -16,10 +15,10 @@ import { useThorchainContext } from '../../../contexts/ThorchainContext'
 import { liveData } from '../../../helpers/rx/liveData'
 import { getWalletBalanceByAsset } from '../../../helpers/walletHelper'
 import { useSubscriptionState } from '../../../hooks/useSubscriptionState'
+import { useValidateAddress } from '../../../hooks/useValidateAddress'
 import { INITIAL_SEND_STATE } from '../../../services/chain/const'
 import { FeeRD, SendTxParams, SendTxState } from '../../../services/chain/types'
 import { OpenExplorerTxUrl, WalletBalances } from '../../../services/clients'
-import { AddressValidation } from '../../../services/thorchain/types'
 import { NonEmptyWalletBalances, ValidatePasswordHandler } from '../../../services/wallet/types'
 import { WalletBalance } from '../../../types/wallet'
 import * as Helper from './SendView.helper'
@@ -54,9 +53,7 @@ export const SendViewTHOR: React.FC<Props> = (props): JSX.Element => {
     [subscribeSendTxState, transfer$]
   )
 
-  const { fees$, client$, reloadFees } = useThorchainContext()
-
-  const oClient = useObservableState<O.Option<ThorchainClient>>(client$, O.none)
+  const { fees$, reloadFees } = useThorchainContext()
 
   const [feeRD] = useObservableState<FeeRD>(
     () =>
@@ -67,15 +64,7 @@ export const SendViewTHOR: React.FC<Props> = (props): JSX.Element => {
     RD.initial
   )
 
-  const addressValidation = useMemo(
-    () =>
-      FP.pipe(
-        oClient,
-        O.map((c) => c.validateAddress),
-        O.getOrElse((): AddressValidation => (_: string) => true)
-      ),
-    [oClient]
-  )
+  const addressValidation = useValidateAddress(THORChain)
 
   const isLoading = useMemo(() => RD.isPending(sendTxState.status), [sendTxState.status])
 

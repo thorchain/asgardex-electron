@@ -1,8 +1,7 @@
 import React, { useCallback, useMemo } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
-import { Client as BinanceClient } from '@xchainjs/xchain-binance'
-import { Asset } from '@xchainjs/xchain-util'
+import { Asset, BNBChain } from '@xchainjs/xchain-util'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
 import { useObservableState } from 'observable-hooks'
@@ -17,7 +16,7 @@ import { useChainContext } from '../../../contexts/ChainContext'
 import { liveData } from '../../../helpers/rx/liveData'
 import { getWalletBalanceByAsset } from '../../../helpers/walletHelper'
 import { useSubscriptionState } from '../../../hooks/useSubscriptionState'
-import { AddressValidation } from '../../../services/binance/types'
+import { useValidateAddress } from '../../../hooks/useValidateAddress'
 import { INITIAL_SEND_STATE } from '../../../services/chain/const'
 import { FeeRD, SendTxParams, SendTxState } from '../../../services/chain/types'
 import { OpenExplorerTxUrl, WalletBalances } from '../../../services/clients'
@@ -56,7 +55,7 @@ export const SendViewBNB: React.FC<Props> = (props): JSX.Element => {
     [subscribeSendTxState, transfer$]
   )
 
-  const { fees$, client$, reloadFees } = useBinanceContext()
+  const { fees$, reloadFees } = useBinanceContext()
 
   const [feeRD] = useObservableState<FeeRD>(
     () =>
@@ -67,20 +66,10 @@ export const SendViewBNB: React.FC<Props> = (props): JSX.Element => {
     RD.initial
   )
 
-  const oClient = useObservableState<O.Option<BinanceClient>>(client$, O.none)
-
   /**
    * Address validation provided by BinanceClient
    */
-  const addressValidation = useMemo(
-    () =>
-      FP.pipe(
-        oClient,
-        O.map((client) => client.validateAddress),
-        O.getOrElse((): AddressValidation => (_: string) => true)
-      ),
-    [oClient]
-  )
+  const addressValidation = useValidateAddress(BNBChain)
 
   const isLoading = useMemo(() => RD.isPending(sendTxState.status), [sendTxState.status])
 

@@ -1,8 +1,7 @@
 import React, { useCallback, useMemo } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
-import { Client as LitecoinClient } from '@xchainjs/xchain-litecoin'
-import { Asset } from '@xchainjs/xchain-util'
+import { Asset, LTCChain } from '@xchainjs/xchain-util'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/Option'
 import { useObservableState } from 'observable-hooks'
@@ -16,10 +15,11 @@ import { useChainContext } from '../../../contexts/ChainContext'
 import { useLitecoinContext } from '../../../contexts/LitecoinContext'
 import { getWalletBalanceByAsset } from '../../../helpers/walletHelper'
 import { useSubscriptionState } from '../../../hooks/useSubscriptionState'
+import { useValidateAddress } from '../../../hooks/useValidateAddress'
 import { INITIAL_SEND_STATE } from '../../../services/chain/const'
 import { SendTxParams, SendTxState } from '../../../services/chain/types'
 import { OpenExplorerTxUrl, WalletBalances } from '../../../services/clients'
-import { AddressValidation, FeesWithRatesLD } from '../../../services/litecoin/types'
+import { FeesWithRatesLD } from '../../../services/litecoin/types'
 import { NonEmptyWalletBalances, ValidatePasswordHandler } from '../../../services/wallet/types'
 import { WalletBalance } from '../../../types/wallet'
 import * as Helper from './SendView.helper'
@@ -55,21 +55,12 @@ export const SendViewLTC: React.FC<Props> = (props): JSX.Element => {
     [subscribeSendTxState, transfer$]
   )
 
-  const { feesWithRates$, client$, reloadFeesWithRates } = useLitecoinContext()
+  const { feesWithRates$, reloadFeesWithRates } = useLitecoinContext()
 
   const feesWithRatesLD: FeesWithRatesLD = useMemo(() => feesWithRates$(), [feesWithRates$])
   const feesWithRatesRD = useObservableState(feesWithRatesLD, RD.initial)
 
-  const oClient = useObservableState<O.Option<LitecoinClient>>(client$, O.none)
-  const addressValidation = useMemo(
-    () =>
-      FP.pipe(
-        oClient,
-        O.map((c) => c.validateAddress),
-        O.getOrElse((): AddressValidation => (_: string) => true)
-      ),
-    [oClient]
-  )
+  const addressValidation = useValidateAddress(LTCChain)
 
   const isLoading = useMemo(() => RD.isPending(sendTxState.status), [sendTxState.status])
 

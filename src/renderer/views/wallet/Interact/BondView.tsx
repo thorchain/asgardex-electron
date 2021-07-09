@@ -1,7 +1,7 @@
 import React, { useCallback, useMemo } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
-import { AssetRuneNative, BaseAmount, baseToAsset } from '@xchainjs/xchain-util'
+import { AssetRuneNative, BaseAmount, baseToAsset, THORChain } from '@xchainjs/xchain-util'
 import * as A from 'fp-ts/Array'
 import * as FP from 'fp-ts/function'
 import * as O from 'fp-ts/Option'
@@ -16,8 +16,8 @@ import { useThorchainContext } from '../../../contexts/ThorchainContext'
 import { useWalletContext } from '../../../contexts/WalletContext'
 import { eqAsset } from '../../../helpers/fp/eq'
 import { useSubscriptionState } from '../../../hooks/useSubscriptionState'
+import { useValidateAddress } from '../../../hooks/useValidateAddress'
 import { INITIAL_INTERACT_STATE } from '../../../services/thorchain/const'
-import { AddressValidation } from '../../../services/thorchain/types'
 import { InteractState } from '../../../services/thorchain/types'
 import * as Styled from './InteractView.styles'
 
@@ -35,20 +35,10 @@ export const BondView: React.FC<Props> = ({ walletAddress, goToTransaction }) =>
     subscribe: subscribeInteractState
   } = useSubscriptionState<InteractState>(INITIAL_INTERACT_STATE)
 
-  const { interact$, client$ } = useThorchainContext()
+  const { interact$ } = useThorchainContext()
   const intl = useIntl()
 
-  const oClient = useObservableState(client$, O.none)
-
-  const addressValidation = useMemo(
-    () =>
-      FP.pipe(
-        oClient,
-        O.map((c) => c.validateAddress),
-        O.getOrElse((): AddressValidation => (_: string) => true)
-      ),
-    [oClient]
-  )
+  const addressValidation = useValidateAddress(THORChain)
 
   const [runeBalance] = useObservableState(
     () =>

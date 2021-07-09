@@ -2,18 +2,18 @@ import React, { useCallback, useMemo } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
 import { TxHash } from '@xchainjs/xchain-client'
-import { baseAmount } from '@xchainjs/xchain-util'
+import { baseAmount, THORChain } from '@xchainjs/xchain-util'
 import * as FP from 'fp-ts/function'
 import * as O from 'fp-ts/Option'
-import { useObservableState } from 'observable-hooks'
 import { useIntl } from 'react-intl'
 
 import { Unbond } from '../../../components/interact/forms/Unbond'
 import { Button } from '../../../components/uielements/button'
 import { useThorchainContext } from '../../../contexts/ThorchainContext'
 import { useSubscriptionState } from '../../../hooks/useSubscriptionState'
+import { useValidateAddress } from '../../../hooks/useValidateAddress'
 import { INITIAL_INTERACT_STATE } from '../../../services/thorchain/const'
-import { AddressValidation, InteractState } from '../../../services/thorchain/types'
+import { InteractState } from '../../../services/thorchain/types'
 import * as Styled from './InteractView.styles'
 
 type Props = {
@@ -27,20 +27,10 @@ export const UnbondView: React.FC<Props> = ({ openExplorerTxUrl: goToTransaction
     subscribe: subscribeInteractState
   } = useSubscriptionState<InteractState>(INITIAL_INTERACT_STATE)
 
-  const { interact$, client$ } = useThorchainContext()
+  const { interact$ } = useThorchainContext()
   const intl = useIntl()
 
-  const oClient = useObservableState(client$, O.none)
-
-  const addressValidation = useMemo(
-    () =>
-      FP.pipe(
-        oClient,
-        O.map((c) => c.validateAddress),
-        O.getOrElse((): AddressValidation => (_: string) => true)
-      ),
-    [oClient]
-  )
+  const addressValidation = useValidateAddress(THORChain)
 
   const unbondTx = useCallback(
     ({ memo }: { memo: string }) => {

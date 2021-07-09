@@ -2,7 +2,7 @@ import React from 'react'
 
 import { assetAmount } from '@xchainjs/xchain-util'
 
-import { AddressValidation } from '../../../services/thorchain/types'
+import { AddressValidation } from '../../../services/clients'
 import { Bond as BondView } from './Bond'
 import { Custom as CustomView } from './Custom'
 import { Leave as LeaveView } from './Leave'
