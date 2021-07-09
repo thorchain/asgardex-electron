@@ -1,5 +1,5 @@
 import * as RD from '@devexperts/remote-data-ts'
-import { FeeOptionKey } from '@xchainjs/xchain-client'
+import { FeeOption } from '@xchainjs/xchain-client'
 
 import {
   AsymDepositState,
@@ -14,13 +14,13 @@ import {
 export const MAX_SWAP_STEPS = 3
 
 /**
- * Default `FeeOptionKey`s for chain txs
+ * Default `FeeOption`s for chain txs
  */
-export const FeeOptionKeys: { [key in TxTypes]: FeeOptionKey } = {
-  SWAP: 'fast',
-  DEPOSIT: 'fast',
-  WITHDRAW: 'fast',
-  UPGRADE: 'fast'
+export const ChainTxFeeOption: { [key in TxTypes]: FeeOption } = {
+  SWAP: FeeOption.Fast,
+  DEPOSIT: FeeOption.Fast,
+  WITHDRAW: FeeOption.Fast,
+  UPGRADE: FeeOption.Fast
 }
 
 export const INITIAL_SWAP_STATE: SwapState = {

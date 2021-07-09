@@ -15,7 +15,7 @@ export type ClientState$ = C.ClientState$<Client>
 export type FeesWithRatesRD = RD.RemoteData<Error, FeesWithRates>
 export type FeesWithRatesLD = LiveData<Error, FeesWithRates>
 
-export type FeesService = C.FeesService<undefined> & {
+export type FeesService = C.FeesService & {
   feesWithRates$: (memo?: string) => FeesWithRatesLD
   reloadFeesWithRates: (memo?: Memo) => void
 }

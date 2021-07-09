@@ -18,7 +18,6 @@ import {
   reloadSwapFees,
   swapFees$,
   getExplorerUrlByAsset$,
-  getExplorerAddressByChain$,
   assetAddress$,
   swap$,
   asymDeposit$,
@@ -48,7 +47,6 @@ type ChainContextValue = {
   reloadSwapFees: typeof reloadSwapFees
   swapFees$: typeof swapFees$
   getExplorerUrlByAsset$: typeof getExplorerUrlByAsset$
-  getExplorerAddressByChain$: typeof getExplorerAddressByChain$
   assetAddress$: typeof assetAddress$
   swap$: typeof swap$
   asymDeposit$: typeof asymDeposit$
@@ -78,7 +76,6 @@ const initialContext: ChainContextValue = {
   reloadSwapFees,
   swapFees$,
   getExplorerUrlByAsset$,
-  getExplorerAddressByChain$,
   assetAddress$,
   swap$,
   asymDeposit$,

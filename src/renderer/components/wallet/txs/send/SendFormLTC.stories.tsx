@@ -2,7 +2,7 @@ import React from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
 import { Meta, Story } from '@storybook/react'
-import { Fees, FeeRates } from '@xchainjs/xchain-client'
+import { Fees, FeeRates, FeeType } from '@xchainjs/xchain-client'
 import { LTC_DECIMAL } from '@xchainjs/xchain-litecoin'
 import {
   assetAmount,
@@ -31,7 +31,7 @@ const runeBalance: WalletBalance = {
 }
 
 const fees: Fees = {
-  type: 'base',
+  type: FeeType.FlatFee,
   fastest: baseAmount(3000),
   fast: baseAmount(2000),
   average: baseAmount(1000)
@@ -46,8 +46,8 @@ const rates: FeeRates = {
 const defaultProps: ComponentProps = {
   balances: [ltcBalance, runeBalance],
   balance: ltcBalance,
-  onSubmit: ({ recipient, amount, feeOptionKey, memo }: SendTxParams) =>
-    console.log(`to: ${recipient}, amount ${formatBaseAmount(amount)}, feeOptionKey: ${feeOptionKey}, memo: ${memo}`),
+  onSubmit: ({ recipient, amount, feeOption, memo }: SendTxParams) =>
+    console.log(`to: ${recipient}, amount ${formatBaseAmount(amount)}, feeOptionKey: ${feeOption}, memo: ${memo}`),
   isLoading: false,
   addressValidation: (_) => true,
   feesWithRates: RD.success({ fees, rates }),

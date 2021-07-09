@@ -23,7 +23,7 @@ import * as O from 'fp-ts/Option'
 import * as Rx from 'rxjs'
 import * as RxOp from 'rxjs/operators'
 
-import { observableState } from '../../helpers/stateHelper'
+import { triggerStream } from '../../helpers/stateHelper'
 import { FeesLD, XChainClient$, FeesService } from './types'
 
 const getDefaultFeesByChain = (chain: Chain): Fees => {
@@ -39,8 +39,6 @@ const getDefaultFeesByChain = (chain: Chain): Fees => {
     case CosmosChain:
       return Cosmos.getDefaultFees()
     case PolkadotChain:
-      // TODO @asgdx-team: Handle network
-      // return Polkadot.getDefaultFees('testnet')
       throw Error('Polkadot is not supported yet')
     case BCHChain:
       return BCH.getDefaultFees()
@@ -49,24 +47,25 @@ const getDefaultFeesByChain = (chain: Chain): Fees => {
   }
 }
 
-export const createFeesService = <FeesParams>({
-  client$,
-  chain
-}: {
-  client$: XChainClient$
-  chain: Chain
-}): FeesService<FeesParams> => {
-  // state for reloading fees
-  const { get$: reloadFees$, set: reloadFees } = observableState<FeesParams | undefined>(undefined)
+/**
+ * Common `FeesService` for (almost) all `Client`s
+ * to provide `fees$` + `reloadFees`
+ *
+ * In some case you might to override it to accept custom params.
+ * See `src/renderer/services/ethereum/fees.ts` as an example
+ *
+ */
+export const createFeesService = ({ client$, chain }: { client$: XChainClient$; chain: Chain }): FeesService => {
+  const { stream$: reloadFees$, trigger: reloadFees } = triggerStream()
 
-  const fees$ = (params?: FeesParams): FeesLD =>
+  const fees$ = (): FeesLD =>
     Rx.combineLatest([reloadFees$, client$]).pipe(
-      RxOp.switchMap(([reloadFeesParams, oClient]) =>
+      RxOp.switchMap(([_, oClient]) =>
         FP.pipe(
           oClient,
           O.fold(
             () => Rx.EMPTY,
-            (client) => Rx.from(client.getFees(reloadFeesParams || params))
+            (client) => Rx.from(client.getFees())
           )
         )
       ),
@@ -77,7 +76,6 @@ export const createFeesService = <FeesParams>({
 
   return {
     fees$,
-    reloadFees,
-    reloadFees$
+    reloadFees
   }
 }

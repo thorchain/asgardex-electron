@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
 import { BTC_DECIMAL } from '@xchainjs/xchain-bitcoin'
-import { FeeOptionKey, FeesWithRates } from '@xchainjs/xchain-client'
+import { FeeOption, FeesWithRates } from '@xchainjs/xchain-client'
 import {
   assetAmount,
   AssetBCH,
@@ -35,7 +35,7 @@ import { Input, InputBigNumber } from '../../../uielements/input'
 import { AccountSelector } from '../../account'
 import * as Styled from '../TxForm.style'
 import { validateTxAmountInput } from '../TxForm.util'
-import { DEFAULT_FEE_OPTION_KEY } from './Send.const'
+import { DEFAULT_FEE_OPTION } from './Send.const'
 import { useChangeAssetHandler } from './Send.hooks'
 
 export type FormValues = {
@@ -78,7 +78,7 @@ export const SendFormBCH: React.FC<Props> = (props): JSX.Element => {
 
   const [amountToSend, setAmountToSend] = useState<BaseAmount>(ZERO_BASE_AMOUNT)
 
-  const [selectedFeeOptionKey, setSelectedFeeOptionKey] = useState<FeeOptionKey>(DEFAULT_FEE_OPTION_KEY)
+  const [selectedFeeOptionKey, setSelectedFeeOptionKey] = useState<FeeOption>(DEFAULT_FEE_OPTION)
 
   const [form] = Form.useForm<FormValues>()
 
@@ -165,11 +165,11 @@ export const SendFormBCH: React.FC<Props> = (props): JSX.Element => {
     )
   }, [balance.amount, intl, isFeeError])
 
-  const feeOptionsLabel: Record<FeeOptionKey, string> = useMemo(
+  const feeOptionsLabel: Record<FeeOption, string> = useMemo(
     () => ({
-      fast: intl.formatMessage({ id: 'wallet.send.fast' }),
-      fastest: intl.formatMessage({ id: 'wallet.send.fastest' }),
-      average: intl.formatMessage({ id: 'wallet.send.average' })
+      [FeeOption.Fast]: intl.formatMessage({ id: 'wallet.send.fast' }),
+      [FeeOption.Fastest]: intl.formatMessage({ id: 'wallet.send.fastest' }),
+      [FeeOption.Average]: intl.formatMessage({ id: 'wallet.send.average' })
     }),
     [intl]
   )
@@ -180,8 +180,8 @@ export const SendFormBCH: React.FC<Props> = (props): JSX.Element => {
       return (
         <StyledR.Radio.Group onChange={onChangeHandler} value={selectedFeeOptionKey} disabled={isLoading}>
           {Object.keys(rates).map((key) => (
-            <StyledR.Radio value={key as FeeOptionKey} key={key}>
-              <StyledR.RadioLabel>{feeOptionsLabel[key as FeeOptionKey]}</StyledR.RadioLabel>
+            <StyledR.Radio value={key as FeeOption} key={key}>
+              <StyledR.RadioLabel>{feeOptionsLabel[key as FeeOption]}</StyledR.RadioLabel>
             </StyledR.Radio>
           ))}
         </StyledR.Radio.Group>
@@ -265,7 +265,7 @@ export const SendFormBCH: React.FC<Props> = (props): JSX.Element => {
       recipient: form.getFieldValue('recipient'),
       asset: balance.asset,
       amount: assetToBase(assetAmount(form.getFieldValue('amount'))),
-      feeOptionKey: selectedFeeOptionKey,
+      feeOption: selectedFeeOptionKey,
       memo: form.getFieldValue('memo')
     })
   }, [selectedFeeOptionKey, onSubmit, form, balance])
@@ -341,7 +341,7 @@ export const SendFormBCH: React.FC<Props> = (props): JSX.Element => {
               // default value for BigNumberInput
               amount: bn(0),
               // Default value for RadioGroup of feeOptions
-              feeRate: DEFAULT_FEE_OPTION_KEY
+              feeRate: DEFAULT_FEE_OPTION
             }}
             onFinish={() => setShowPwModal(true)}
             labelCol={{ span: 24 }}>

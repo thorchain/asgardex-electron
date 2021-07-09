@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
-import { Address, Balance, Balances } from '@xchainjs/xchain-client'
+import { Address, Balance } from '@xchainjs/xchain-client'
 import { Asset, assetToString, baseToAsset, chainToString, formatAssetAmountCurrency } from '@xchainjs/xchain-util'
 import { Col, Collapse, Grid, Row } from 'antd'
 import { ScreenMap } from 'antd/lib/_util/responsiveObserve'
@@ -60,7 +60,7 @@ export const AssetsTableCollapsable: React.FC<Props> = (props): JSX.Element => {
   const [collapseChangedByUser, setCollapseChangedByUser] = useState(false)
 
   // store previous data of asset data to render these while reloading
-  const previousAssetsTableData = useRef<Balances[]>([])
+  const previousAssetsTableData = useRef<Balance[][]>([])
 
   const onRowHandler = useCallback(
     (oWalletAddress: O.Option<Address>) =>
@@ -207,7 +207,7 @@ export const AssetsTableCollapsable: React.FC<Props> = (props): JSX.Element => {
   }, [balanceColumn, iconColumn, priceColumn, screenMap, tickerColumn])
 
   const renderAssetsTable = useCallback(
-    (tableData: Balances, oWalletAddress: O.Option<Address>, loading = false) => {
+    (tableData: Balance[], oWalletAddress: O.Option<Address>, loading = false) => {
       return (
         <Styled.Table
           showHeader={false}

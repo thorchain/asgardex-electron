@@ -30,7 +30,7 @@ type Props = {
   balances: O.Option<NonEmptyWalletBalances>
   asset: Asset
   getExplorerTxUrl?: O.Option<GetExplorerTxUrl>
-  getExplorerAddressUrl?: O.Option<GetExplorerTxUrl>
+  openExplorerAddressUrl?: FP.Lazy<void>
   reloadBalancesHandler?: FP.Lazy<void>
   loadTxsHandler?: LoadTxsHandler
   walletAddress?: O.Option<Address>
@@ -45,7 +45,7 @@ export const AssetDetails: React.FC<Props> = (props): JSX.Element => {
     reloadBalancesHandler = FP.constVoid,
     loadTxsHandler = EMPTY_LOAD_TXS_HANDLER,
     getExplorerTxUrl: oGetExplorerTxUrl = O.none,
-    getExplorerAddressUrl: oGetExplorerAddressUrl = O.none,
+    openExplorerAddressUrl,
     walletAddress: oWalletAddress = O.none,
     network
   } = props
@@ -94,13 +94,6 @@ export const AssetDetails: React.FC<Props> = (props): JSX.Element => {
       FP.pipe(oGetExplorerTxUrl, O.ap(O.some(txHash)), O.map(window.apiUrl.openExternal))
     },
     [oGetExplorerTxUrl]
-  )
-
-  const clickAddressLinkHandler = useCallback(
-    (oAddress: O.Option<string>) => {
-      FP.pipe(oGetExplorerAddressUrl, O.ap(oAddress), O.map(window.apiUrl.openExternal))
-    },
-    [oGetExplorerAddressUrl]
   )
 
   const onChangePagination = useCallback(
@@ -224,7 +217,7 @@ export const AssetDetails: React.FC<Props> = (props): JSX.Element => {
         <Col span={24}>
           <Styled.TableHeadline isDesktop={isDesktopView}>
             {intl.formatMessage({ id: 'wallet.txs.history' })}{' '}
-            <Styled.TableHeadlineLinkIcon onClick={() => clickAddressLinkHandler(oWalletAddress)} />
+            <Styled.TableHeadlineLinkIcon onClick={openExplorerAddressUrl} />
           </Styled.TableHeadline>
         </Col>
         <Col span={24}>

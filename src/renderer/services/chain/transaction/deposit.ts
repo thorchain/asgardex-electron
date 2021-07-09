@@ -13,7 +13,7 @@ import { liveData } from '../../../helpers/rx/liveData'
 import { observableState } from '../../../helpers/stateHelper'
 import { service as midgardService } from '../../midgard/service'
 import { ApiError, ErrorId } from '../../wallet/types'
-import { FeeOptionKeys, INITIAL_ASYM_DEPOSIT_STATE, INITIAL_SYM_DEPOSIT_STATE } from '../const'
+import { ChainTxFeeOption, INITIAL_ASYM_DEPOSIT_STATE, INITIAL_SYM_DEPOSIT_STATE } from '../const'
 import {
   AsymDepositParams,
   AsymDepositState,
@@ -76,7 +76,7 @@ export const asymDeposit$ = ({ poolAddress, asset, amount, memo }: AsymDepositPa
         recipient: poolAddress.address,
         amount,
         memo,
-        feeOptionKey: FeeOptionKeys.DEPOSIT
+        feeOption: ChainTxFeeOption.DEPOSIT
       })
     }),
     liveData.chain((txHash) => {
@@ -195,7 +195,7 @@ export const symDeposit$ = ({
         recipient: poolAddresses.address,
         amount: amounts.asset,
         memo: memos.asset,
-        feeOptionKey: FeeOptionKeys.DEPOSIT
+        feeOption: ChainTxFeeOption.DEPOSIT
       })
     }),
     // Add failures of asset deposit tx to state
@@ -219,7 +219,7 @@ export const symDeposit$ = ({
         recipient: '', // no recipient for RUNE needed
         amount: amounts.rune,
         memo: memos.rune,
-        feeOptionKey: FeeOptionKeys.DEPOSIT
+        feeOption: ChainTxFeeOption.DEPOSIT
       })
     }),
     // Add failures of RUNE deposit tx to state

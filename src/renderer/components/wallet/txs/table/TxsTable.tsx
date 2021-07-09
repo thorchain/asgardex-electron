@@ -1,7 +1,7 @@
 import React, { useMemo, useCallback, useRef } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
-import { Address, Tx, Txs, TxsPage } from '@xchainjs/xchain-client'
+import { Address, Tx, TxsPage } from '@xchainjs/xchain-client'
 import { baseToAsset, Chain, formatAssetAmount } from '@xchainjs/xchain-util'
 import { Grid, Col, Row } from 'antd'
 import { ColumnsType, ColumnType } from 'antd/lib/table'
@@ -247,7 +247,7 @@ export const TxsTable: React.FC<Props> = (props): JSX.Element => {
     [desktopColumns, isDesktopView, mobileColumns, changePaginationHandler]
   )
 
-  const emptyTableData = useMemo((): TxsPage => ({ total: 0, txs: [] as Txs }), [])
+  const emptyTableData = useMemo((): TxsPage => ({ total: 0, txs: [] as Tx[] }), [])
 
   const renderContent = useMemo(
     () => (

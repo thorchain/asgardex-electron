@@ -11,7 +11,8 @@ import {
   assetToBase,
   assetToString,
   baseAmount,
-  bn
+  bn,
+  BNBChain
 } from '@xchainjs/xchain-util'
 import * as O from 'fp-ts/lib/Option'
 import * as Rx from 'rxjs'
@@ -37,7 +38,12 @@ const defaultProps: SwapProps = {
     { asset: AssetRuneNative, assetPrice: ONE_BN }
   ],
   assets: { inAsset: sourceAsset, outAsset: targetAsset },
-  poolAddress: O.some({ chain: 'BNB', address: 'vault-address', router: O.some('router-address'), halted: false }),
+  poolAddress: O.some({
+    chain: BNBChain,
+    address: 'vault-address',
+    router: O.some('router-address'),
+    halted: false
+  }),
   // mock successfull result of swap$
   swap$: (params) =>
     Rx.of(params).pipe(

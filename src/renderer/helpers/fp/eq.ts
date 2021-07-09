@@ -1,6 +1,6 @@
 import * as RD from '@devexperts/remote-data-ts'
 import { PoolData } from '@thorchain/asgardex-util'
-import { Balance, Balances } from '@xchainjs/xchain-client'
+import { Balance } from '@xchainjs/xchain-client'
 import { Asset, AssetAmount, BaseAmount, Chain } from '@xchainjs/xchain-util'
 import BigNumber from 'bignumber.js'
 import * as A from 'fp-ts/lib/Array'
@@ -93,9 +93,9 @@ export const eqBalances = A.getEq(eqBalance)
 export const eqAssetsWithAmount = A.getEq(eqAssetWithAmount)
 
 export const eqBalanceRD = RD.getEq<ApiError, Balance>(eqApiError, eqBalance)
-export const eqBalancesRD = RD.getEq<ApiError, Balances>(eqApiError, eqBalances)
+export const eqBalancesRD = RD.getEq<ApiError, Balance[]>(eqApiError, eqBalances)
 
-export const eqAssetsWithBalanceRD = RD.getEq<ApiError, Balances>(eqApiError, eqBalances)
+export const eqAssetsWithBalanceRD = RD.getEq<ApiError, Balance[]>(eqApiError, eqBalances)
 
 export const eqWalletBalance: Eq.Eq<WalletBalance> = {
   equals: (x, y) => eqBalance.equals(x, y) && x.walletAddress === y.walletAddress

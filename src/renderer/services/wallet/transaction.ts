@@ -1,4 +1,5 @@
 import * as RD from '@devexperts/remote-data-ts'
+import { BCHChain, BNBChain, BTCChain, ETHChain, LTCChain, THORChain } from '@xchainjs/xchain-util'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
 import * as Rx from 'rxjs'
@@ -9,7 +10,7 @@ import * as BNB from '../binance'
 import * as BTC from '../bitcoin'
 import * as BCH from '../bitcoincash'
 import * as C from '../clients'
-import { ExplorerUrl$, GetExplorerTxUrl$, TxsPageLD, LoadTxsParams, GetExplorerAddressUrl$ } from '../clients'
+import { ExplorerUrl$, GetExplorerTxUrl$, TxsPageLD, LoadTxsParams } from '../clients'
 import * as ETH from '../ethereum'
 import * as LTC from '../litecoin'
 import * as THOR from '../thorchain'
@@ -20,8 +21,6 @@ import { ApiError, ErrorId, LoadTxsHandler, ResetTxsPageHandler } from './types'
 export const explorerUrl$: ExplorerUrl$ = C.explorerUrl$(client$)
 
 export const getExplorerTxUrl$: GetExplorerTxUrl$ = C.getExplorerTxUrl$(client$)
-
-export const getExplorerAddressUrl$: GetExplorerAddressUrl$ = C.getExplorerAddressUrl$(client$)
 
 /**
  * State of `LoadTxsProps`, which triggers reload of txs history
@@ -49,17 +48,17 @@ export const getTxs$: (walletAddress: O.Option<string>, walletIndex?: number) =>
           () => Rx.of(RD.initial),
           (asset) => {
             switch (asset.chain) {
-              case 'BNB':
+              case BNBChain:
                 return BNB.txs$({ asset: O.some(asset), limit, offset, walletAddress, walletIndex })
-              case 'BTC':
+              case BTCChain:
                 return BTC.txs$({ asset: O.none, limit, offset, walletAddress, walletIndex })
-              case 'ETH':
+              case ETHChain:
                 return ETH.txs$({ asset: O.some(asset), limit, offset, walletAddress, walletIndex })
-              case 'THOR':
+              case THORChain:
                 return THOR.txs$({ asset: O.none, limit, offset, walletAddress, walletIndex })
-              case 'LTC':
+              case LTCChain:
                 return LTC.txs$({ asset: O.none, limit, offset, walletAddress, walletIndex })
-              case 'BCH':
+              case BCHChain:
                 return BCH.txs$({ asset: O.none, limit, offset, walletAddress, walletIndex })
               default:
                 return Rx.of(

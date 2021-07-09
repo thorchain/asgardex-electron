@@ -1,3 +1,3 @@
-import { FeeOptionKey } from '@xchainjs/xchain-client'
+import { FeeOption } from '@xchainjs/xchain-client'
 
-export const DEFAULT_FEE_OPTION_KEY: FeeOptionKey = 'fast'
+export const DEFAULT_FEE_OPTION: FeeOption = FeeOption.Fast

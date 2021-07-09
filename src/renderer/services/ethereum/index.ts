@@ -1,15 +1,5 @@
-import { ETHChain } from '@xchainjs/xchain-util'
-
 import { reloadBalances, balances$, reloadBalances$, resetReloadBalances } from './balances'
-import {
-  client$,
-  clientState$,
-  address$,
-  addressUI$,
-  explorerUrl$,
-  getExplorerTxUrl$,
-  getExplorerAddressUrl$
-} from './common'
+import { client$, clientState$, address$, addressUI$, explorerUrl$, getExplorerTxUrl$ } from './common'
 import { createFeesService } from './fees'
 import { createTransactionService } from './transaction'
 
@@ -25,10 +15,7 @@ const {
   approveERC20Token$,
   isApprovedERC20Token$
 } = createTransactionService(client$)
-const { reloadFees, fees$, poolInTxFees$, poolOutTxFee$, approveFee$, reloadApproveFee } = createFeesService({
-  client$,
-  chain: ETHChain
-})
+const { reloadFees, fees$, poolInTxFees$, poolOutTxFee$, approveFee$, reloadApproveFee } = createFeesService(client$)
 
 export {
   client$,
@@ -38,7 +25,6 @@ export {
   reloadBalances,
   explorerUrl$,
   getExplorerTxUrl$,
-  getExplorerAddressUrl$,
   balances$,
   reloadBalances$,
   resetReloadBalances,

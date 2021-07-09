@@ -1,5 +1,5 @@
-import { Balances } from '@xchainjs/xchain-binance'
-import { Asset, assetToBase, assetAmount } from '@xchainjs/xchain-util'
+import { Balance } from '@xchainjs/xchain-binance'
+import { Asset, assetToBase, assetAmount, BNBChain } from '@xchainjs/xchain-util'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
 
@@ -17,10 +17,10 @@ describe('services/binance/utils/', () => {
     it('creates a RUNE `Asset`', () => {
       const result = FP.pipe(
         bncSymbolToAsset('RUNE-B1A'),
-        O.getOrElse(() => ({ chain: 'BNB', symbol: 'invalid', ticker: 'invalid' } as Asset))
+        O.getOrElse(() => ({ chain: BNBChain, symbol: 'invalid', ticker: 'invalid' } as Asset))
       )
       expect(result).toEqual({
-        chain: 'BNB',
+        chain: BNBChain,
         symbol: 'RUNE-B1A',
         ticker: 'RUNE'
       })
@@ -29,7 +29,7 @@ describe('services/binance/utils/', () => {
 
   describe('getWalletBalances', () => {
     it('maps `BinanceBalances` -> `Balances`', () => {
-      const balances: Balances = [
+      const balances: Balance[] = [
         {
           free: '1',
           symbol: 'BNB',
@@ -56,7 +56,7 @@ describe('services/binance/utils/', () => {
 
       // check BNB balance
       expect(result[0].asset).toEqual({
-        chain: 'BNB',
+        chain: BNBChain,
         symbol: 'BNB',
         ticker: 'BNB'
       })
@@ -64,7 +64,7 @@ describe('services/binance/utils/', () => {
 
       // Check RUNE balance
       expect(result[1].asset).toEqual({
-        chain: 'BNB',
+        chain: BNBChain,
         symbol: 'RUNE-B1A',
         ticker: 'RUNE'
       })

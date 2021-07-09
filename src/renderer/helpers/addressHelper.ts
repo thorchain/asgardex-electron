@@ -1,7 +1,6 @@
 import { getPrefix as getBinancePrefix } from '@xchainjs/xchain-binance'
 import { getPrefix as getBitcoinPrefix } from '@xchainjs/xchain-bitcoin'
 import { getPrefix as getBCHPrefix } from '@xchainjs/xchain-bitcoincash'
-import * as Client from '@xchainjs/xchain-client'
 import { Address } from '@xchainjs/xchain-client'
 import { getPrefix as getCosmosPrefix } from '@xchainjs/xchain-cosmos'
 import { getPrefix as getEthereumPrefix } from '@xchainjs/xchain-ethereum'
@@ -22,6 +21,7 @@ import { ethers } from 'ethers'
 import * as O from 'fp-ts/lib/Option'
 
 import { Network } from '../../shared/api/types'
+import { toClientNetwork } from '../services/clients'
 
 export const truncateAddress = (addr: Address, chain: Chain, network: Network): string => {
   const first = addr.substr(0, Math.max(getAddressPrefixLength(chain, network) + 3, 6))
@@ -29,12 +29,11 @@ export const truncateAddress = (addr: Address, chain: Chain, network: Network): 
   return `${first}...${last}`
 }
 
-export const getAddressPrefixLength = (chain: Chain, network: string): number => {
-  // TODO (@asgdx-team) Extract it into a helper - we might need it at other places, too
-  const clientNetwork: Client.Network = network === 'testnet' ? 'testnet' : 'mainnet'
+export const getAddressPrefixLength = (chain: Chain, network: Network): number => {
+  const clientNetwork = toClientNetwork(network)
   switch (chain) {
     case BNBChain:
-      return getBinancePrefix(network).length
+      return getBinancePrefix(clientNetwork).length
     case BTCChain:
       return getBitcoinPrefix(clientNetwork).length
     case CosmosChain:
@@ -46,7 +45,7 @@ export const getAddressPrefixLength = (chain: Chain, network: string): number =>
       // return getPolkadotPrefix(network).length
       throw Error('Polkadot is not supported yet')
     case THORChain:
-      return getThorchainPrefix(network).length
+      return getThorchainPrefix(clientNetwork).length
     case LTCChain:
       return getLitecoinPrefix(clientNetwork).length
     case BCHChain:

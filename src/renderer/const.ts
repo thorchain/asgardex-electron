@@ -8,7 +8,9 @@ import {
   assetToString,
   baseAmount,
   AssetRuneNative,
-  AssetRuneERC20Testnet
+  AssetRuneERC20Testnet,
+  ETHChain,
+  BNBChain
 } from '@xchainjs/xchain-util'
 
 import { Network } from '../shared/api/types'
@@ -18,50 +20,50 @@ import { PricePoolCurrencyWeights, PricePoolAssets } from './views/pools/Pools.t
 // ERC 20 assets
 //
 export const AssetUSDTERC20: Asset = {
-  chain: 'ETH',
+  chain: ETHChain,
   symbol: 'USDT-0xa3910454bf2cb59b8b3a401589a3bacc5ca42306',
   ticker: 'USDT'
 }
 
 export const AssetXRune: Asset = {
-  chain: 'ETH',
+  chain: ETHChain,
   symbol: 'XRUNE-0x69fa0fee221ad11012bab0fdb45d444d3d2ce71c',
   ticker: 'XRUNE'
 }
 
 export const AssetXRuneTestnet: Asset = {
-  chain: 'ETH',
+  chain: ETHChain,
   symbol: 'XRUNE-0x0fE3ecd525D16fA09aA1FF177014dE5304c835E2',
   ticker: 'XRUNE'
 }
 
 // ETH.THOR - for testnet only
 export const AssetThorERC20: Asset = {
-  chain: 'ETH',
+  chain: ETHChain,
   symbol: 'THOR-0xA0b515c058F127a15Dd3326F490eBF47d215588e',
   ticker: 'THOR'
 }
 
 export const AssetTKN8ERC20: Asset = {
-  chain: 'ETH',
+  chain: ETHChain,
   symbol: 'TKN8-0x242aD49dAcd38aC23caF2ccc118482714206beD4',
   ticker: 'TKN8'
 }
 
 export const AssetTKN18ERC20: Asset = {
-  chain: 'ETH',
+  chain: ETHChain,
   symbol: 'TKN18-0x8E3f9E9b5B26AAaE9d31364d2a8e8a9dd2BE3B82',
   ticker: 'TKN18'
 }
 
 export const AssetWETHERC20: Asset = {
-  chain: 'ETH',
+  chain: ETHChain,
   symbol: 'WETH-0xbCA556c912754Bc8E7D4Aad20Ad69a1B1444F42d',
   ticker: 'WETH'
 }
 
 export const AssetDAIERC20: Asset = {
-  chain: 'ETH',
+  chain: ETHChain,
   symbol: 'DAI-0xad6d458402f60fd3bd25163575031acdce07538d',
   ticker: 'DAI'
 }
@@ -84,27 +86,27 @@ export const ETHAssets = [AssetETH, ...ERC20Assets]
 //
 
 // BUSD testnet
-export const AssetBUSDBAF: Asset = { chain: 'BNB', symbol: 'BUSD-BAF', ticker: 'BUSD' }
-export const AssetBUSD74E: Asset = { chain: 'BNB', symbol: 'BUSD-74E', ticker: 'BUSD' }
+export const AssetBUSDBAF: Asset = { chain: BNBChain, symbol: 'BUSD-BAF', ticker: 'BUSD' }
+export const AssetBUSD74E: Asset = { chain: BNBChain, symbol: 'BUSD-74E', ticker: 'BUSD' }
 // BUSD mainnet
-export const AssetBUSDBD1: Asset = { chain: 'BNB', symbol: 'BUSD-BD1', ticker: 'BUSD' }
+export const AssetBUSDBD1: Asset = { chain: BNBChain, symbol: 'BUSD-BD1', ticker: 'BUSD' }
 // BNB.USDT
-export const AssetUSDTDC8: Asset = { chain: 'BNB', symbol: 'USDT-DC8', ticker: 'USDT' }
+export const AssetUSDTDC8: Asset = { chain: BNBChain, symbol: 'USDT-DC8', ticker: 'USDT' }
 // ETH.USDT mainnet
 export const AssetUSDTDAC: Asset = {
-  chain: 'ETH',
+  chain: ETHChain,
   symbol: 'USDT-0xdAC17F958D2ee523a2206206994597C13D831ec7',
   ticker: 'USDT'
 }
 // ETH.USDT testnet
 export const AssetUSDT62E: Asset = {
-  chain: 'ETH',
+  chain: ETHChain,
   symbol: 'USDT-0x62e273709Da575835C7f6aEf4A31140Ca5b1D190',
   ticker: 'USDT'
 }
 // ETH.USDC mainnet
 export const AssetUSDC: Asset = {
-  chain: 'ETH',
+  chain: ETHChain,
   symbol: 'USDC-0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48',
   ticker: 'USDC'
 }

@@ -1,5 +1,5 @@
 import * as RD from '@devexperts/remote-data-ts'
-import { Address, FeeOptionKey, Fees, Tx } from '@xchainjs/xchain-client'
+import { Address, FeeOption, Fees, Tx } from '@xchainjs/xchain-client'
 import { Asset, BaseAmount, Chain } from '@xchainjs/xchain-util'
 import * as O from 'fp-ts/lib/Option'
 import * as Rx from 'rxjs'
@@ -78,7 +78,7 @@ export type SendTxParams = {
   recipient: Address
   amount: BaseAmount
   memo: Memo
-  feeOptionKey?: FeeOptionKey
+  feeOption?: FeeOption
   walletIndex?: number
 }
 
@@ -244,7 +244,7 @@ export type AsymWithdrawParams = {
 export type AsymWithdrawStateHandler = (p: AsymWithdrawParams) => WithdrawState$
 
 export type UpgradeRuneParams = {
-  readonly poolAddresses: PoolAddress
+  readonly poolAddress: PoolAddress
   readonly asset: Asset
   readonly amount: BaseAmount
   readonly memo: string

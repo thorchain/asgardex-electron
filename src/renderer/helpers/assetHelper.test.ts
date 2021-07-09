@@ -9,7 +9,8 @@ import {
   AssetRune67C,
   AssetRuneB1A,
   AssetRuneNative,
-  baseAmount
+  baseAmount,
+  BNBChain
 } from '@xchainjs/xchain-util'
 import * as O from 'fp-ts/lib/Option'
 
@@ -159,7 +160,7 @@ describe('helpers/assetHelper', () => {
       expect(isPricePoolAsset(AssetBNB)).toBeFalsy()
     })
     it('returns false for deprecated asset ', () => {
-      expect(isPricePoolAsset({ chain: 'BNB', symbol: 'RUNE-1AF', ticker: 'RUNE' })).toBeFalsy()
+      expect(isPricePoolAsset({ chain: BNBChain, symbol: 'RUNE-1AF', ticker: 'RUNE' })).toBeFalsy()
     })
   })
 

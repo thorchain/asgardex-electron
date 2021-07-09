@@ -37,7 +37,7 @@ export type TransferFees = {
   multi: AssetAmount
 }
 
-export type FeesService = C.FeesService<undefined>
+export type FeesService = C.FeesService
 
 export type LoadTxsProps = {
   limit: number

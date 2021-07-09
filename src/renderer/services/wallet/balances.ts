@@ -169,7 +169,7 @@ export const createBalancesService = ({
   /**
    * Transforms THOR balances into `ChainBalances`
    */
-  const thorChainBalance$: ChainBalance$ = Rx.combineLatest([THOR.addressUI$, getChainBalance$('THOR')]).pipe(
+  const thorChainBalance$: ChainBalance$ = Rx.combineLatest([THOR.addressUI$, getChainBalance$(THORChain)]).pipe(
     RxOp.map(([walletAddress, balances]) => ({
       walletType: 'keystore',
       chain: THORChain,
@@ -181,7 +181,7 @@ export const createBalancesService = ({
   /**
    * Transforms LTC balances into `ChainBalances`
    */
-  const litecoinBalance$: ChainBalance$ = Rx.combineLatest([LTC.addressUI$, getChainBalance$('LTC')]).pipe(
+  const litecoinBalance$: ChainBalance$ = Rx.combineLatest([LTC.addressUI$, getChainBalance$(LTCChain)]).pipe(
     RxOp.map(([walletAddress, balances]) => ({
       walletType: 'keystore',
       chain: LTCChain,
@@ -193,7 +193,7 @@ export const createBalancesService = ({
   /**
    * Transforms BCH balances into `ChainBalances`
    */
-  const bchChainBalance$: ChainBalance$ = Rx.combineLatest([BCH.addressUI$, getChainBalance$('BCH')]).pipe(
+  const bchChainBalance$: ChainBalance$ = Rx.combineLatest([BCH.addressUI$, getChainBalance$(BCHChain)]).pipe(
     RxOp.map(([walletAddress, balances]) => ({
       walletType: 'keystore',
       chain: BCHChain,
@@ -205,7 +205,7 @@ export const createBalancesService = ({
   /**
    * Transforms BNB balances into `ChainBalances`
    */
-  const bnbChainBalance$: ChainBalance$ = Rx.combineLatest([BNB.addressUI$, getChainBalance$('BNB'), network$]).pipe(
+  const bnbChainBalance$: ChainBalance$ = Rx.combineLatest([BNB.addressUI$, getChainBalance$(BNBChain), network$]).pipe(
     RxOp.map(([walletAddress, balances, network]) => ({
       walletType: 'keystore',
       chain: BNBChain,
@@ -220,7 +220,7 @@ export const createBalancesService = ({
   /**
    * Transforms BTC balances into `ChainBalance`
    */
-  const btcChainBalance$: ChainBalance$ = Rx.combineLatest([BTC.addressUI$, getChainBalance$('BTC')]).pipe(
+  const btcChainBalance$: ChainBalance$ = Rx.combineLatest([BTC.addressUI$, getChainBalance$(BTCChain)]).pipe(
     RxOp.map(([walletAddress, balances]) => ({
       walletType: 'keystore',
       chain: BTCChain,
@@ -229,7 +229,7 @@ export const createBalancesService = ({
     }))
   )
 
-  const ethBalances$ = getChainBalance$('ETH')
+  const ethBalances$ = getChainBalance$(ETHChain)
 
   /**
    * Transforms ETH data (address + `WalletBalance`) into `ChainBalance`
