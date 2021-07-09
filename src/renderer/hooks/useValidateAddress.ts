@@ -18,7 +18,8 @@ export const useValidateAddress = (chain: Chain): AddressValidation => {
       FP.pipe(
         oClient,
         O.map((client) => client.validateAddress(address)),
-        O.getOrElse<boolean>(() => false)
+        // In case client is not available (it should never happen), skip validation by returning always `true`
+        O.getOrElse<boolean>(() => true)
       ),
     [oClient]
   )
