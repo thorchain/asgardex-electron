@@ -13,6 +13,8 @@ const midgardUrl = O.some('https://54.0.0.27')
 const bitcoinUrl = O.some('https://blockstream.info')
 const thorchainUrl = O.some('https://thorchain.net')
 const litecoinUrl = O.some('https://blockstream.info')
+const ethereumUrl = O.some('https://etherscan.io/')
+const bitcoinCashUrl = O.some('https://www.blockchain.com')
 
 storiesOf('Components/Header', module).add('default', () => {
   return (
@@ -32,6 +34,8 @@ storiesOf('Components/Header', module).add('default', () => {
       bitcoinUrl={bitcoinUrl}
       thorchainUrl={thorchainUrl}
       litecoinUrl={litecoinUrl}
+      ethereumUrl={ethereumUrl}
+      bitcoinCashUrl={bitcoinCashUrl}
     />
   )
 })

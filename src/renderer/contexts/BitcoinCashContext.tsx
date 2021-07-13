@@ -10,7 +10,8 @@ import {
   reloadFees,
   fees$,
   reloadFeesWithRates,
-  feesWithRates$
+  feesWithRates$,
+  explorerUrl$
 } from '../services/bitcoincash'
 
 export type BitcoinCashContextValue = {
@@ -24,6 +25,7 @@ export type BitcoinCashContextValue = {
   reloadFeesWithRates: typeof reloadFeesWithRates
   feesWithRates$: typeof feesWithRates$
   reloadFees: typeof reloadFees
+  explorerUrl$: typeof explorerUrl$
 }
 
 const initialContext: BitcoinCashContextValue = {
@@ -36,7 +38,8 @@ const initialContext: BitcoinCashContextValue = {
   fees$,
   reloadFeesWithRates,
   feesWithRates$,
-  reloadFees
+  reloadFees,
+  explorerUrl$
 }
 
 const BitcoinCashContext = createContext<BitcoinCashContextValue | null>(null)

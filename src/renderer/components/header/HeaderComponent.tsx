@@ -59,6 +59,8 @@ type Props = {
   bitcoinUrl: O.Option<string>
   thorchainUrl: O.Option<string>
   litecoinUrl: O.Option<string>
+  ethereumUrl: O.Option<string>
+  bitcoinCashUrl: O.Option<string>
 }
 
 export const HeaderComponent: React.FC<Props> = (props): JSX.Element => {
@@ -77,7 +79,9 @@ export const HeaderComponent: React.FC<Props> = (props): JSX.Element => {
     binanceUrl,
     bitcoinUrl,
     thorchainUrl,
-    litecoinUrl
+    litecoinUrl,
+    ethereumUrl,
+    bitcoinCashUrl
   } = props
 
   const intl = useIntl()
@@ -238,9 +242,11 @@ export const HeaderComponent: React.FC<Props> = (props): JSX.Element => {
         bitcoinUrl={bitcoinUrl}
         thorchainUrl={thorchainUrl}
         litecoinUrl={litecoinUrl}
+        ethereumUrl={ethereumUrl}
+        bitcoinCashUrl={bitcoinCashUrl}
       />
     ),
-    [binanceUrl, bitcoinUrl, isDesktopView, midgardUrl, thorchainUrl, litecoinUrl]
+    [binanceUrl, bitcoinUrl, isDesktopView, midgardUrl, thorchainUrl, litecoinUrl, ethereumUrl, bitcoinCashUrl]
   )
 
   const iconStyle = { fontSize: '1.5em', marginRight: '20px' }

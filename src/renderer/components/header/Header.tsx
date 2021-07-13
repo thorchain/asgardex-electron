@@ -5,7 +5,9 @@ import * as O from 'fp-ts/lib/Option'
 import { useObservableState } from 'observable-hooks'
 
 import { useBinanceContext } from '../../contexts/BinanceContext'
+import { useBitcoinCashContext } from '../../contexts/BitcoinCashContext'
 import { useBitcoinContext } from '../../contexts/BitcoinContext'
+import { useEthereumContext } from '../../contexts/EthereumContext'
 import { useLitecoinContext } from '../../contexts/LitecoinContext'
 import { useMidgardContext } from '../../contexts/MidgardContext'
 import { useThorchainContext } from '../../contexts/ThorchainContext'
@@ -47,6 +49,12 @@ export const Header: React.FC = (): JSX.Element => {
   const { explorerUrl$: thorchainUrl$ } = useThorchainContext()
   const thorchainUrl = useObservableState(thorchainUrl$, O.none)
 
+  const { explorerUrl$: ethereumUrl$ } = useEthereumContext()
+  const ethereumUrl = useObservableState(ethereumUrl$, O.none)
+
+  const { explorerUrl$: bitcoinCashUrl$ } = useBitcoinCashContext()
+  const bitcoinCashUrl = useObservableState(bitcoinCashUrl$, O.none)
+
   const litecoinUrl$ = useLitecoinContext().explorerUrl$
   const litecoinUrl = useObservableState(litecoinUrl$, O.none)
 
@@ -66,6 +74,8 @@ export const Header: React.FC = (): JSX.Element => {
       bitcoinUrl={bitcoinUrl}
       litecoinUrl={litecoinUrl}
       thorchainUrl={thorchainUrl}
+      ethereumUrl={ethereumUrl}
+      bitcoinCashUrl={bitcoinCashUrl}
       midgardUrl={RD.toOption(midgardUrl)}
     />
   )

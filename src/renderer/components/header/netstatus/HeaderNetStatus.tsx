@@ -28,10 +28,13 @@ type Props = {
   bitcoinUrl: O.Option<string>
   thorchainUrl: O.Option<string>
   litecoinUrl: O.Option<string>
+  ethereumUrl: O.Option<string>
+  bitcoinCashUrl: O.Option<string>
 }
 
 export const HeaderNetStatus: React.FC<Props> = (props): JSX.Element => {
-  const { isDesktopView, midgardUrl, binanceUrl, bitcoinUrl, thorchainUrl, litecoinUrl } = props
+  const { isDesktopView, midgardUrl, binanceUrl, bitcoinUrl, thorchainUrl, litecoinUrl, ethereumUrl, bitcoinCashUrl } =
+    props
   const { onlineStatus$ } = useAppContext()
   const onlineStatus = useObservableState<OnlineStatus>(onlineStatus$, OnlineStatus.OFF)
   const intl = useIntl()
@@ -69,9 +72,21 @@ export const HeaderNetStatus: React.FC<Props> = (props): JSX.Element => {
         headline: 'Litecoin Chain',
         subheadline: headerNetStatusSubheadline({ url: litecoinUrl, onlineStatus, notConnectedTxt }),
         color: headerNetStatusColor({ url: litecoinUrl, onlineStatus })
+      },
+      {
+        key: 'ethereum',
+        headline: 'ethereum',
+        subheadline: headerNetStatusSubheadline({ url: ethereumUrl, onlineStatus, notConnectedTxt }),
+        color: headerNetStatusColor({ url: ethereumUrl, onlineStatus })
+      },
+      {
+        key: 'bitcoin cash',
+        headline: 'bitcoin cash',
+        subheadline: headerNetStatusSubheadline({ url: bitcoinCashUrl, onlineStatus, notConnectedTxt }),
+        color: headerNetStatusColor({ url: bitcoinCashUrl, onlineStatus })
       }
     ]
-  }, [binanceUrl, bitcoinUrl, intl, midgardUrl, onlineStatus, thorchainUrl, litecoinUrl])
+  }, [intl, midgardUrl, onlineStatus, thorchainUrl, bitcoinUrl, binanceUrl, litecoinUrl, ethereumUrl, bitcoinCashUrl])
 
   const desktopMenu = useMemo(() => {
     return (
