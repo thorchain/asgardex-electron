@@ -1,6 +1,6 @@
 import { Theme } from '@thorchain/asgardex-theme'
 import { ChartOptions } from 'chart.js'
-import moment from 'moment'
+import dayjs from 'dayjs'
 
 import { abbreviateNumber } from '../../../helpers/numberHelper'
 import {
@@ -65,7 +65,7 @@ export const getDisplayData =
 export const getChartData = (chartValues: ChartDetails): PoolDetailsChartData => {
   const labels: Array<string> =
     chartValues.map((data) => {
-      return moment.unix(data.time).format('MMM DD')
+      return dayjs.unix(data.time).format('MMM DD')
     }) || []
 
   const values: Array<number> = chartValues.map(({ amount }) => amount.amount().toNumber()) || []
