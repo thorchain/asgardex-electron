@@ -4403,10 +4403,10 @@
   resolved "https://registry.yarnpkg.com/@xchainjs/xchain-litecoin/-/xchain-litecoin-0.6.9.tgz#144484a44efee1bf55752376849a3ba871c9b8d5"
   integrity sha512-gsIBiaXlHFIbqOekQtVa0yUHS5G2D5hDhFu4C82HcJ+m9vtRXBjX+sWwWLUSN4rrPFpdYl2bnLqk+R3bqS8Gcw==
 
-"@xchainjs/xchain-thorchain@^0.17.3":
-  version "0.17.3"
-  resolved "https://registry.yarnpkg.com/@xchainjs/xchain-thorchain/-/xchain-thorchain-0.17.3.tgz#2514333b164ce44a2079a159a8e79a8e98c60e4c"
-  integrity sha512-slwNJKH5isZvtQeZ0RDm4LhPzwwqFY52sP0dH19hWkUlfx+XSk0uNU4lRGe+mfjaPBKZ3B1sxaYij/A+k5yGJg==
+"@xchainjs/xchain-thorchain@^0.17.4":
+  version "0.17.4"
+  resolved "https://registry.yarnpkg.com/@xchainjs/xchain-thorchain/-/xchain-thorchain-0.17.4.tgz#46f7aea8d7357aead203887397f6c6f16f99c128"
+  integrity sha512-0MM60jq8j7AYZp/RQPfW3QJCU781BROsm/aLUcH4NXqszdPcBh3NBzD7IYFdNjSFjWGs3UkoEJVXKLSpihGRPA==
 
 "@xchainjs/xchain-util@^0.3.0":
   version "0.3.0"
@@ -8363,10 +8363,10 @@ electron-updater@^4.3.9:
     lodash.isequal "^4.5.0"
     semver "^7.3.5"
 
-electron@^13.1.4:
-  version "13.1.4"
-  resolved "https://registry.yarnpkg.com/electron/-/electron-13.1.4.tgz#6d20d932a0651c3cba9f09a3d08cbaf5b69aa84b"
-  integrity sha512-4qhRZbRvGqHmMWsCG/kRVF4X8VIq9Nujgm+gXZLBSpiR6uUtMHy7ViBTQZl1PGf6O9Ppxhpr9Yz+k6Um9WoP3Q==
+electron@^13.1.6:
+  version "13.1.6"
+  resolved "https://registry.yarnpkg.com/electron/-/electron-13.1.6.tgz#6ecaf969255d62ce82cc0b5c948bf26e7dfb489b"
+  integrity sha512-XiB55/JTaQpDFQrD9pulYnOGwaWeMyRIub5ispvoE2bWBvM5zVMLptwMLb0m3KTMrfSkzhedZvOu7fwYvR7L7Q==
   dependencies:
     "@electron/get" "^1.0.1"
     "@types/node" "^14.6.2"
