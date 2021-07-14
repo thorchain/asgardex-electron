@@ -1,3 +1,21 @@
+# 0.3.9 (2021-07-14)
+
+## Add
+
+- [Asset] Add icon for XRUNE [#1616](https://github.com/thorchain/asgardex-electron/pull/1616)
+- [Header] Add missing explorer endpoints [#1572](https://github.com/thorchain/asgardex-electron/issues/1572)
+
+## Fix
+
+- [XRUNE] Fix currency symbol bug [#1630](https://github.com/thorchain/asgardex-electron/issues/1630)
+
+## (Internal) Updates
+
+- Upgrade to latest `xchain-*` packages (incl. misc. fixes after upgrade) [#1619](https://github.com/thorchain/asgardex-electron/pull/1619), [#1620](https://github.com/thorchain/asgardex-electron/issues/1620), [#1622](https://github.com/thorchain/asgardex-electron/issues/1622), [#1623](https://github.com/thorchain/asgardex-electron/issues/1623), [#1628](https://github.com/thorchain/asgardex-electron/pull/1628)
+- Upgrade to Electron@13.1.6 [#1628](https://github.com/thorchain/asgardex-electron/pull/1628)
+- [THORChain] Get data for ClientUrl from .env [#1632](https://github.com/thorchain/asgardex-electron/issues/1632)
+- Switch momentjs -> dayjs [##1304](https://github.com/thorchain/asgardex-electron/issues/#1304)
+
 # 0.3.8 (2021-07-03)
 
 ## Fix
