@@ -56,7 +56,7 @@ const clientState$: ClientState$ = FP.pipe(
               })
               return RD.success(client)
             } catch (error) {
-              console.error('Failed to create BCH client', error)
+              console.error('Failed to create ETH client', error)
               return RD.failure(error)
             }
           }),
