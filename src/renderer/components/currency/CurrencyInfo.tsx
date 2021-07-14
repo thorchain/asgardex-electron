@@ -1,10 +1,12 @@
-import React from 'react'
+import React, { useState, useMemo } from 'react'
 
-import { bn, assetAmount, formatAssetAmountCurrency } from '@xchainjs/xchain-util'
+import { assetAmount, formatAssetAmountCurrency } from '@xchainjs/xchain-util'
+import { Row, Dropdown } from 'antd'
 import BigNumber from 'bignumber.js'
 import * as O from 'fp-ts/lib/Option'
 import { pipe } from 'fp-ts/pipeable'
 
+import { ReactComponent as DownIcon } from '../../assets/svg/icon-down.svg'
 import { sequenceTOption } from '../../helpers/fpHelpers'
 import { PoolAssetDetail } from '../../services/midgard/types'
 import * as Styled from './CurrencyInfo.styles'
@@ -15,7 +17,44 @@ type CurrencyInfoProps = {
   slip?: BigNumber
 }
 
-export const CurrencyInfo = ({ to = O.none, from = O.none, slip = bn(0) }: CurrencyInfoProps) => {
+const SLIP_PERCENTAGES = [3, 5, 10]
+
+export const CurrencyInfo = ({ to = O.none, from = O.none }: CurrencyInfoProps) => {
+  const [slipSettingsVisible, setSlipSettingsVisible] = useState(false)
+  const [currentSlip, setCurrentSlip] = useState(SLIP_PERCENTAGES[1])
+
+  const slipSettings = useMemo(() => {
+    return (
+      <>
+        {SLIP_PERCENTAGES.map((slip) => (
+          <Row
+            style={{ alignItems: 'center' }}
+            key={slip}
+            onClick={() => {
+              setCurrentSlip(slip)
+              setSlipSettingsVisible(false)
+            }}>
+            <Styled.SlipLabel slip={`${slip}%`}>{slip}%</Styled.SlipLabel>
+          </Row>
+        ))}
+      </>
+    )
+  }, [])
+
+  const renderSlipSettings = useMemo(
+    () => (
+      <Dropdown overlay={slipSettings} trigger={['click']} placement="bottomCenter">
+        <Styled.DropdownContentWrapper>
+          <Row style={{ alignItems: 'center' }}>
+            <Styled.SlipLabel slip={`${currentSlip}%`}>{currentSlip}%</Styled.SlipLabel>
+            <DownIcon />
+          </Row>
+        </Styled.DropdownContentWrapper>
+      </Dropdown>
+    ),
+    [slipSettings, currentSlip]
+  )
+
   return pipe(
     sequenceTOption(from, to),
     O.map(([from, to]) => {
@@ -47,7 +86,19 @@ export const CurrencyInfo = ({ to = O.none, from = O.none, slip = bn(0) }: Curre
               trimZeros: true
             })}
           </div>
-          <div>slip: {slip.multipliedBy(100).toFormat(2)}%</div>
+          <div>
+            slip: {currentSlip}%{' '}
+            <Styled.SlipSettings
+              active={slipSettingsVisible}
+              onClick={() => setSlipSettingsVisible(!slipSettingsVisible)}
+            />
+            {slipSettingsVisible && (
+              <div>
+                <Styled.SlipToleranceText>slippage tolerance</Styled.SlipToleranceText>
+                {renderSlipSettings}
+              </div>
+            )}
+          </div>
         </Styled.Container>
       )
     }),
