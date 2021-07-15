@@ -1,6 +1,6 @@
 import * as Rx from 'rxjs'
 
-import { Network } from '../../../shared/api/types'
+import { Network, SlipTolerance } from '../../../shared/api/types'
 
 export enum OnlineStatus {
   ON = 'online',
@@ -10,3 +10,7 @@ export enum OnlineStatus {
 export type ChangeNetworkHandler = (network: Network) => void
 
 export type Network$ = Rx.Observable<Network>
+
+export type ChangeSlipToleranceHandler = (slip: SlipTolerance) => void
+
+export type SlipTolerance$ = Rx.Observable<SlipTolerance>
