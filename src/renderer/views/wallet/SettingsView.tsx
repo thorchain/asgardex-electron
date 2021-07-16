@@ -12,6 +12,7 @@ import * as Rx from 'rxjs'
 import * as RxOp from 'rxjs/operators'
 
 import { Network } from '../../../shared/api/types'
+import { Button } from '../../components/uielements/button'
 import { Settings } from '../../components/wallet/settings'
 import { useAppContext } from '../../contexts/AppContext'
 import { useBinanceContext } from '../../contexts/BinanceContext'
@@ -24,6 +25,7 @@ import { useThorchainContext } from '../../contexts/ThorchainContext'
 import { useWalletContext } from '../../contexts/WalletContext'
 import { filterEnabledChains } from '../../helpers/chainHelper'
 import { sequenceTOptionFromArray } from '../../helpers/fpHelpers'
+import { useLedger } from '../../hooks/useLedger'
 import { DEFAULT_NETWORK } from '../../services/const'
 import { getPhrase } from '../../services/wallet/util'
 import { UserAccountType } from '../../types/wallet'
@@ -260,22 +262,32 @@ export const SettingsView: React.FC = (): JSX.Element => {
     }
   }
 
+  const { getAddress: getLedgerAddress, address: ledgerAddressRD } = useLedger()
+
   return (
-    <Row>
-      <Col span={24}>
-        <Settings
-          selectedNetwork={network}
-          lockWallet={lock}
-          removeKeystore={removeKeystore}
-          exportKeystore={exportKeystore}
-          runeNativeAddress={runeNativeAddress}
-          userAccounts={userAccounts}
-          phrase={phrase}
-          clickAddressLinkHandler={clickAddressLinkHandler}
-          validatePassword$={validatePassword$}
-          ClientSettingsView={ClientSettingsView}
-        />
-      </Col>
-    </Row>
+    <>
+      <Row>
+        <Col>
+          <Button onClick={() => getLedgerAddress(THORChain)}>Get Ledger THOR address</Button>
+        </Col>
+        <Col>ledgerAddressRD: {JSON.stringify(ledgerAddressRD)}</Col>
+      </Row>
+      <Row>
+        <Col span={24}>
+          <Settings
+            selectedNetwork={network}
+            lockWallet={lock}
+            removeKeystore={removeKeystore}
+            exportKeystore={exportKeystore}
+            runeNativeAddress={runeNativeAddress}
+            userAccounts={userAccounts}
+            phrase={phrase}
+            clickAddressLinkHandler={clickAddressLinkHandler}
+            validatePassword$={validatePassword$}
+            ClientSettingsView={ClientSettingsView}
+          />
+        </Col>
+      </Row>
+    </>
   )
 }
