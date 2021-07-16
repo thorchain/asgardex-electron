@@ -255,6 +255,8 @@ export type MidgardMessages = { [key in MidgardMessageKey]: string }
 type SwapMessageKey =
   | 'swap.input'
   | 'swap.output'
+  | 'swap.slip.title'
+  | 'swap.slip.tolerance'
   | 'swap.state.pending'
   | 'swap.state.success'
   | 'swap.state.error'

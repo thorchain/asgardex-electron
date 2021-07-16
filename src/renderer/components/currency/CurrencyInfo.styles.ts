@@ -3,7 +3,7 @@ import Text from 'antd/lib/typography/Text'
 import styled from 'styled-components'
 import { palette } from 'styled-theme'
 
-import { ReactComponent as SlipSettingsIcon } from '../../assets/svg/icon-slip-settings.svg'
+import { ReactComponent as SlipSettingsIcon } from '../../assets/svg/icon-settings.svg'
 
 export const Container = styled('div')`
   display: flex;
@@ -43,7 +43,7 @@ export const DropdownContentWrapper = styled(Row)`
   cursor: pointer;
 `
 
-export const SlipLabel = styled(Text)<{ slip: String }>`
+export const SlipLabel = styled(Text)`
   text-transform: uppercase;
   padding: 0;
   font-size: 16px;
@@ -51,7 +51,7 @@ export const SlipLabel = styled(Text)<{ slip: String }>`
 `
 export const SlipSettings = styled(SlipSettingsIcon)<{ active: true | false }>`
   & path {
-    fill: ${({ active }) => (active === true ? palette('text', 2) : palette('gray', 2))};
+    fill: ${({ active }) => (active ? palette('text', 2) : palette('gray', 2))};
   }
 `
 export const SlipToleranceText = styled(Text)`

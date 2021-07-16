@@ -5,6 +5,7 @@ import { Row, Dropdown } from 'antd'
 import BigNumber from 'bignumber.js'
 import * as O from 'fp-ts/lib/Option'
 import { pipe } from 'fp-ts/pipeable'
+import { useIntl } from 'react-intl'
 
 import { SlipTolerance } from '../../../shared/api/types'
 import { ReactComponent as DownIcon } from '../../assets/svg/icon-down.svg'
@@ -21,14 +22,15 @@ type CurrencyInfoProps = {
   changeSlipTolerance: ChangeSlipToleranceHandler
 }
 
-const SLIP_PERCENTAGES = [3, 5, 10]
+const SLIP_PERCENTAGES: SlipTolerance[] = [3, 5, 10]
 
 export const CurrencyInfo = ({ to = O.none, from = O.none, slipTolerance, changeSlipTolerance }: CurrencyInfoProps) => {
   const [slipSettingsVisible, setSlipSettingsVisible] = useState(false)
+  const intl = useIntl()
 
   const changeSlipToleranceHandler = useCallback(
     (slipTolerance) => {
-      changeSlipTolerance(slipTolerance as SlipTolerance)
+      changeSlipTolerance(slipTolerance)
       setSlipSettingsVisible(false)
     },
     [changeSlipTolerance]
@@ -39,7 +41,7 @@ export const CurrencyInfo = ({ to = O.none, from = O.none, slipTolerance, change
       <>
         {SLIP_PERCENTAGES.map((slip) => (
           <Row style={{ alignItems: 'center' }} key={slip}>
-            <Styled.SlipLabel key={slip} onClick={() => changeSlipToleranceHandler(slip)} slip={`${slip}%`}>
+            <Styled.SlipLabel key={slip} onClick={() => changeSlipToleranceHandler(slip)}>
               {slip}%
             </Styled.SlipLabel>
           </Row>
@@ -51,11 +53,9 @@ export const CurrencyInfo = ({ to = O.none, from = O.none, slipTolerance, change
   const renderSlipSettings = useMemo(
     () => (
       <Dropdown overlay={slipSettings} trigger={['click']} placement="bottomCenter">
-        <Styled.DropdownContentWrapper>
-          <Row style={{ alignItems: 'center' }}>
-            <Styled.SlipLabel slip={`${slipTolerance}%`}>{slipTolerance}%</Styled.SlipLabel>
-            <DownIcon />
-          </Row>
+        <Styled.DropdownContentWrapper style={{ alignItems: 'center' }}>
+          <Styled.SlipLabel>{slipTolerance}%</Styled.SlipLabel>
+          <DownIcon />
         </Styled.DropdownContentWrapper>
       </Dropdown>
     ),
@@ -94,8 +94,8 @@ export const CurrencyInfo = ({ to = O.none, from = O.none, slipTolerance, change
             })}
           </div>
           <div>
-            <div style={{ display: 'flex', alignItems: 'center' }}>
-              slip: {slipTolerance}%&nbsp;
+            <div style={{ display: 'flex', alignItems: 'center', marginRight: '5px' }}>
+              {intl.formatMessage({ id: 'swap.slip.title' })}: {slipTolerance}%
               <Styled.SlipSettings
                 active={slipSettingsVisible}
                 onClick={() => setSlipSettingsVisible(!slipSettingsVisible)}
@@ -103,7 +103,7 @@ export const CurrencyInfo = ({ to = O.none, from = O.none, slipTolerance, change
             </div>
             {slipSettingsVisible && (
               <div>
-                <Styled.SlipToleranceText>slippage tolerance</Styled.SlipToleranceText>
+                <Styled.SlipToleranceText>{intl.formatMessage({ id: 'swap.slip.tolerance' })}</Styled.SlipToleranceText>
                 {renderSlipSettings}
               </div>
             )}
