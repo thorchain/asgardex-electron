@@ -12,6 +12,7 @@ import * as Rx from 'rxjs'
 import * as RxOp from 'rxjs/operators'
 
 import { Network, SlipTolerance } from '../../../shared/api/types'
+import { SLIP_TOLERANCE_KEY } from '../../components/currency/CurrencyInfo'
 import { ErrorView } from '../../components/shared/error/'
 import { Swap } from '../../components/swap'
 import { Button, RefreshButton } from '../../components/uielements/button'
@@ -41,7 +42,6 @@ export const SwapView: React.FC<Props> = (_): JSX.Element => {
 
   const { network$, slipTolerance$, changeSlipTolerance } = useAppContext()
   const network = useObservableState<Network>(network$, DEFAULT_NETWORK)
-  const slipTolerance = useObservableState<SlipTolerance>(slipTolerance$, DEFAULT_SLIP_TOLERANCE)
 
   const { service: midgardService } = useMidgardContext()
   const {
@@ -167,6 +167,20 @@ export const SwapView: React.FC<Props> = (_): JSX.Element => {
     reloadPools()
     reloadInboundAddresses()
   }, [reloadBalances, reloadInboundAddresses, reloadPools])
+
+  const getStoredSlipTolerance = (): SlipTolerance =>
+    FP.pipe(
+      localStorage.getItem(SLIP_TOLERANCE_KEY) as string,
+      O.fromNullable,
+      O.map((s) => {
+        const slipTolerance = +s as SlipTolerance
+        changeSlipTolerance(slipTolerance)
+        return slipTolerance
+      }),
+      O.getOrElse(() => DEFAULT_SLIP_TOLERANCE)
+    )
+
+  const slipTolerance = useObservableState<SlipTolerance>(slipTolerance$, getStoredSlipTolerance())
 
   const onChangePath = useCallback(
     (path) => {

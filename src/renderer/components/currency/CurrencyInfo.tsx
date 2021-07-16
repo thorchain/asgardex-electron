@@ -22,7 +22,8 @@ type CurrencyInfoProps = {
   changeSlipTolerance: ChangeSlipToleranceHandler
 }
 
-const SLIP_PERCENTAGES: SlipTolerance[] = [3, 5, 10]
+export const SLIP_PERCENTAGES: SlipTolerance[] = [3, 5, 10]
+export const SLIP_TOLERANCE_KEY = 'asgdx-slip-tolerance'
 
 export const CurrencyInfo = ({ to = O.none, from = O.none, slipTolerance, changeSlipTolerance }: CurrencyInfoProps) => {
   const [slipSettingsVisible, setSlipSettingsVisible] = useState(false)
@@ -30,6 +31,7 @@ export const CurrencyInfo = ({ to = O.none, from = O.none, slipTolerance, change
 
   const changeSlipToleranceHandler = useCallback(
     (slipTolerance) => {
+      localStorage.setItem(SLIP_TOLERANCE_KEY, slipTolerance)
       changeSlipTolerance(slipTolerance)
       setSlipSettingsVisible(false)
     },
