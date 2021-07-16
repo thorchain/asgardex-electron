@@ -9,5 +9,6 @@ export const apiHDWallet: ApiHDWallet = {
   getLedgerAddress: (chain: Chain, network: Network) =>
     ipcRenderer.invoke(IPCMessages.GET_LEDGER_ADDRESS, chain, network),
   sendTxInLedger: (chain: Chain, network: Network, txInfo: LedgerTxInfo) =>
-    ipcRenderer.invoke(IPCMessages.SEND_LEDGER_TX, chain, network, txInfo)
+    ipcRenderer.invoke(IPCMessages.SEND_LEDGER_TX, chain, network, txInfo),
+  getTransport: () => ipcRenderer.invoke(IPCMessages.GET_TRANSPORT)
 }

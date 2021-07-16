@@ -5,7 +5,7 @@
 import { Chain } from '@xchainjs/xchain-util'
 import * as E from 'fp-ts/Either'
 
-import { LedgerErrorId, LedgerTxInfo, Network } from '../../../shared/api/types'
+import { /* LedgerErrorId, */ LedgerTxInfo, Network } from '../../../shared/api/types'
 // import { LedgerBNCTxInfo, LedgerBTCTxInfo, LedgerErrorId, LedgerTxInfo, Network } from '../../../shared/api/types'
 // import { sendTx as sendBNCTx } from './binance'
 // import { sendTx as sendBTCTx } from './bitcoin'
@@ -15,9 +15,9 @@ export const sendTx = async (
   chain: Chain,
   network: Network,
   txInfo: LedgerTxInfo
-): Promise<E.Either<LedgerErrorId, string>> => {
+): Promise<E.Either<Error /* LedgerErrorId */, string>> => {
   const _disabled = { chain, network, txInfo }
-  return Promise.reject(Error('sendTx for Ledger is disabled temporary'))
+  return E.left(Error('sendTx for Ledger is disabled temporary'))
   // try {
   //   const transport = await TransportNodeHid.open('')
   //   let res: E.Either<LedgerErrorId, string>

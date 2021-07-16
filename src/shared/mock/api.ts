@@ -1,3 +1,4 @@
+import Transport from '@ledgerhq/hw-transport'
 import { Keystore } from '@xchainjs/xchain-crypto'
 import * as E from 'fp-ts/Either'
 
@@ -77,5 +78,6 @@ export const apiUrl: ApiUrl = {
 // Mock `apiHDWallet`
 export const apiHDWallet: ApiHDWallet = {
   getLedgerAddress: () => Promise.resolve(E.right('ledger_address')),
-  sendTxInLedger: () => Promise.resolve(E.right('tx_hash'))
+  sendTxInLedger: () => Promise.resolve(E.right('tx_hash')),
+  getTransport: () => Promise.resolve({} as Transport)
 }
