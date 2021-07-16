@@ -1,19 +1,30 @@
 import React, { createContext, useContext } from 'react'
 
-import { onlineStatus$, network$, changeNetwork, clientNetwork$ } from '../services/app/service'
-import { ChangeNetworkHandler } from '../services/app/types'
+import {
+  onlineStatus$,
+  network$,
+  changeNetwork,
+  clientNetwork$,
+  slipTolerance$,
+  changeSlipTolerance
+} from '../services/app/service'
+import { ChangeNetworkHandler, ChangeSlipToleranceHandler } from '../services/app/types'
 
 type AppContextValue = {
   onlineStatus$: typeof onlineStatus$
   network$: typeof network$
   changeNetwork: ChangeNetworkHandler
   clientNetwork$: typeof clientNetwork$
+  slipTolerance$: typeof slipTolerance$
+  changeSlipTolerance: ChangeSlipToleranceHandler
 }
 const initialContext: AppContextValue = {
   onlineStatus$,
   network$,
   changeNetwork,
-  clientNetwork$
+  clientNetwork$,
+  slipTolerance$,
+  changeSlipTolerance
 }
 
 const AppContext = createContext<AppContextValue | null>(null)

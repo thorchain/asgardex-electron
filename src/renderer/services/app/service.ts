@@ -3,11 +3,11 @@ import * as Rx from 'rxjs'
 import { startWith, mapTo, distinctUntilChanged } from 'rxjs/operators'
 import * as RxOp from 'rxjs/operators'
 
-import { Network } from '../../../shared/api/types'
+import { Network, SlipTolerance } from '../../../shared/api/types'
 import { observableState } from '../../helpers/stateHelper'
 import { toClientNetwork } from '../clients'
-import { DEFAULT_NETWORK } from '../const'
-import { Network$, OnlineStatus } from './types'
+import { DEFAULT_NETWORK, DEFAULT_SLIP_TOLERANCE } from '../const'
+import { Network$, SlipTolerance$, OnlineStatus } from './types'
 
 // Check online status
 // https://www.electronjs.org/docs/tutorial/online-offline-events
@@ -28,4 +28,23 @@ const network$: Network$ = getNetwork$.pipe(distinctUntilChanged())
 
 const clientNetwork$: Rx.Observable<Client.Network> = network$.pipe(RxOp.map(toClientNetwork))
 
-export { onlineStatus$, network$, changeNetwork, getCurrentNetworkState, clientNetwork$ }
+/**
+ * State of `Slip`
+ */
+const {
+  get$: getSlipTolerance$,
+  set: changeSlipTolerance,
+  get: getCurrentSlipToleranceState
+} = observableState<SlipTolerance>(DEFAULT_SLIP_TOLERANCE)
+const slipTolerance$: SlipTolerance$ = getSlipTolerance$.pipe(distinctUntilChanged())
+
+export {
+  onlineStatus$,
+  network$,
+  changeNetwork,
+  getCurrentNetworkState,
+  clientNetwork$,
+  slipTolerance$,
+  changeSlipTolerance,
+  getCurrentSlipToleranceState
+}

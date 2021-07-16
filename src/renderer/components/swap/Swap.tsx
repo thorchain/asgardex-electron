@@ -25,7 +25,7 @@ import { useObservableState } from 'observable-hooks'
 import { useIntl } from 'react-intl'
 import * as RxOp from 'rxjs/operators'
 
-import { Network } from '../../../shared/api/types'
+import { Network, SlipTolerance } from '../../../shared/api/types'
 import { ZERO_BASE_AMOUNT } from '../../const'
 import {
   getEthTokenAddress,
@@ -43,6 +43,7 @@ import { liveData, LiveData } from '../../helpers/rx/liveData'
 import { filterWalletBalancesByAssets, getWalletBalanceByAsset } from '../../helpers/walletHelper'
 import { useSubscriptionState } from '../../hooks/useSubscriptionState'
 import { swap } from '../../routes/pools'
+import { ChangeSlipToleranceHandler } from '../../services/app/types'
 import { INITIAL_SWAP_STATE } from '../../services/chain/const'
 import { getZeroSwapFees } from '../../services/chain/fees/swap'
 import {
@@ -100,6 +101,8 @@ export type SwapProps = {
   targetWalletAddress: O.Option<Address>
   onChangePath: (path: string) => void
   network: Network
+  slipTolerance: SlipTolerance
+  changeSlipTolerance: ChangeSlipToleranceHandler
   approveERC20Token$: (params: ApproveParams) => TxHashLD
   isApprovedERC20Token$: (params: ApproveParams) => LiveData<ApiError, boolean>
   importWalletHandler: FP.Lazy<void>
@@ -122,6 +125,8 @@ export const Swap = ({
   targetWalletAddress,
   onChangePath,
   network,
+  slipTolerance,
+  changeSlipTolerance,
   isApprovedERC20Token$,
   approveERC20Token$,
   reloadApproveFee,
@@ -1100,7 +1105,13 @@ export const Swap = ({
 
         <Styled.FormContainer>
           <Styled.CurrencyInfoContainer>
-            <CurrencyInfo slip={swapData.slip} from={oSourcePoolAsset} to={oTargetPoolAsset} />
+            <CurrencyInfo
+              slip={swapData.slip}
+              slipTolerance={slipTolerance}
+              changeSlipTolerance={changeSlipTolerance}
+              from={oSourcePoolAsset}
+              to={oTargetPoolAsset}
+            />
           </Styled.CurrencyInfoContainer>
 
           <Styled.ValueItemContainer className={'valueItemContainer-out'}>
