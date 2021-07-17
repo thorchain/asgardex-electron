@@ -19,6 +19,7 @@ import { FundsCap } from '../../components/pool'
 import { Table } from '../../components/uielements/table'
 import { useAppContext } from '../../contexts/AppContext'
 import { useMidgardContext } from '../../contexts/MidgardContext'
+import * as PoolHelpers from '../../helpers/poolHelper'
 import { getPoolTableRowsData, RUNE_PRICE_POOL } from '../../helpers/poolHelper'
 import { useFundsCap } from '../../hooks/useFundsCap'
 import useInterval, { INACTIVE_INTERVAL } from '../../hooks/useInterval'
@@ -36,7 +37,7 @@ import * as Styled from './PoolsOverview.style'
 
 const POOLS_KEY = 'pending'
 
-export const PendingPools: React.FC<PoolsComponentProps> = (): JSX.Element => {
+export const PendingPools: React.FC<PoolsComponentProps> = ({ haltedChains }): JSX.Element => {
   const history = useHistory()
   const intl = useIntl()
 
@@ -85,13 +86,15 @@ export const PendingPools: React.FC<PoolsComponentProps> = (): JSX.Element => {
 
   const selectedPricePool = useObservableState(selectedPricePool$, RUNE_PRICE_POOL)
 
+  const isChainHalted = useMemo(() => PoolHelpers.isChainHalted(haltedChains), [haltedChains])
+
   const renderBtnPoolsColumn = useCallback(
     (_: string, { pool }: PoolTableRowData) => (
       <TableAction>
-        <ManageButton asset={pool.target} isTextView={isDesktopView} />
+        <ManageButton asset={pool.target} isTextView={isDesktopView} disabled={isChainHalted(pool.target.chain)} />
       </TableAction>
     ),
-    [isDesktopView]
+    [isChainHalted, isDesktopView]
   )
 
   const btnPendingPoolsColumn = useMemo(
