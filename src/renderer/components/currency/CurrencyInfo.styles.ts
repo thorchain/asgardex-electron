@@ -49,11 +49,16 @@ export const SlipLabel = styled(Text)`
   font-size: 16px;
   font-family: 'MainFontRegular';
 `
+
 export const SlipSettings = styled(SlipSettingsIcon)<{ active: true | false }>`
   & path {
     fill: ${({ active }) => (active ? palette('text', 2) : palette('gray', 2))};
   }
 `
+export const SlipTolerancePercent = styled(Text)<{ limit: true | false }>`
+  color: ${({ limit }) => (limit ? palette('error', 0) : palette('gray', 2))};
+`
+
 export const SlipToleranceText = styled(Text)`
   color: palette('text', 2);
 `

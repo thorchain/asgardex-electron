@@ -97,7 +97,9 @@ export const CurrencyInfo = ({ to = O.none, from = O.none, slipTolerance, change
           </div>
           <div>
             <div style={{ display: 'flex', alignItems: 'center', marginRight: '5px' }}>
-              {intl.formatMessage({ id: 'swap.slip.title' })}: {slipTolerance}%
+              <Styled.SlipTolerancePercent limit={true}>
+                {intl.formatMessage({ id: 'swap.slip.title' })}: {slipTolerance}%
+              </Styled.SlipTolerancePercent>
               <Styled.SlipSettings
                 active={slipSettingsVisible}
                 onClick={() => setSlipSettingsVisible(!slipSettingsVisible)}
