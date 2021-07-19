@@ -99,6 +99,8 @@ const defaultProps: SwapProps = {
   targetWalletAddress: O.some('wallet-address'),
   onChangePath: (path) => console.log('change path', path),
   network: 'testnet',
+  slipTolerance: 5,
+  changeSlipTolerance: () => console.log('changeSlipTolerance'),
   approveERC20Token$: () => Rx.of(RD.success('txHash')),
   isApprovedERC20Token$: () => Rx.of(RD.success(true)),
   importWalletHandler: () => console.log('import wallet')

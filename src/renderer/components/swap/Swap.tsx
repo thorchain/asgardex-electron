@@ -43,6 +43,7 @@ import { liveData, LiveData } from '../../helpers/rx/liveData'
 import { filterWalletBalancesByAssets, getWalletBalanceByAsset } from '../../helpers/walletHelper'
 import { useSubscriptionState } from '../../hooks/useSubscriptionState'
 import { swap } from '../../routes/pools'
+import { ChangeSlipToleranceHandler } from '../../services/app/types'
 import { INITIAL_SWAP_STATE } from '../../services/chain/const'
 import { getZeroSwapFees } from '../../services/chain/fees/swap'
 import {
@@ -66,7 +67,7 @@ import {
   BalancesState
 } from '../../services/wallet/types'
 import { hasImportedKeystore, isLocked } from '../../services/wallet/util'
-import { AssetWithDecimal } from '../../types/asgardex'
+import { AssetWithDecimal, SlipTolerance } from '../../types/asgardex'
 import { WalletBalance, WalletBalances } from '../../types/wallet'
 import { CurrencyInfo } from '../currency'
 import { PasswordModal } from '../modal/password'
@@ -100,6 +101,8 @@ export type SwapProps = {
   targetWalletAddress: O.Option<Address>
   onChangePath: (path: string) => void
   network: Network
+  slipTolerance: SlipTolerance
+  changeSlipTolerance: ChangeSlipToleranceHandler
   approveERC20Token$: (params: ApproveParams) => TxHashLD
   isApprovedERC20Token$: (params: ApproveParams) => LiveData<ApiError, boolean>
   importWalletHandler: FP.Lazy<void>
@@ -122,6 +125,8 @@ export const Swap = ({
   targetWalletAddress,
   onChangePath,
   network,
+  slipTolerance,
+  changeSlipTolerance,
   isApprovedERC20Token$,
   approveERC20Token$,
   reloadApproveFee,
@@ -1100,7 +1105,13 @@ export const Swap = ({
 
         <Styled.FormContainer>
           <Styled.CurrencyInfoContainer>
-            <CurrencyInfo slip={swapData.slip} from={oSourcePoolAsset} to={oTargetPoolAsset} />
+            <CurrencyInfo
+              slip={swapData.slip}
+              slipTolerance={slipTolerance}
+              changeSlipTolerance={changeSlipTolerance}
+              from={oSourcePoolAsset}
+              to={oTargetPoolAsset}
+            />
           </Styled.CurrencyInfoContainer>
 
           <Styled.ValueItemContainer className={'valueItemContainer-out'}>

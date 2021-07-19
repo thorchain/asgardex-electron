@@ -12,6 +12,7 @@ import * as Rx from 'rxjs'
 import * as RxOp from 'rxjs/operators'
 
 import { Network } from '../../../shared/api/types'
+import { SLIP_TOLERANCE_KEY } from '../../components/currency/CurrencyInfo'
 import { ErrorView } from '../../components/shared/error/'
 import { Swap } from '../../components/swap'
 import { Button, RefreshButton } from '../../components/uielements/button'
@@ -28,8 +29,9 @@ import { SwapRouteParams } from '../../routes/pools/swap'
 import * as walletRoutes from '../../routes/wallet'
 import { AssetWithDecimalLD, AssetWithDecimalRD } from '../../services/chain/types'
 import { OpenExplorerTxUrl } from '../../services/clients'
-import { DEFAULT_NETWORK } from '../../services/const'
+import { DEFAULT_NETWORK, DEFAULT_SLIP_TOLERANCE } from '../../services/const'
 import { INITIAL_BALANCES_STATE } from '../../services/wallet/const'
+import { isSlipTolerance, SlipTolerance } from '../../types/asgardex'
 import * as Styled from './SwapView.styles'
 
 type Props = {}
@@ -39,7 +41,7 @@ export const SwapView: React.FC<Props> = (_): JSX.Element => {
   const intl = useIntl()
   const history = useHistory()
 
-  const { network$ } = useAppContext()
+  const { network$, slipTolerance$, changeSlipTolerance } = useAppContext()
   const network = useObservableState<Network>(network$, DEFAULT_NETWORK)
 
   const { service: midgardService } = useMidgardContext()
@@ -167,6 +169,21 @@ export const SwapView: React.FC<Props> = (_): JSX.Element => {
     reloadInboundAddresses()
   }, [reloadBalances, reloadInboundAddresses, reloadPools])
 
+  const getStoredSlipTolerance = (): SlipTolerance =>
+    FP.pipe(
+      localStorage.getItem(SLIP_TOLERANCE_KEY),
+      O.fromNullable,
+      O.map((s) => {
+        const itemAsInt = parseInt(s)
+        const slipTolerance = isSlipTolerance(itemAsInt) ? itemAsInt : DEFAULT_SLIP_TOLERANCE
+        changeSlipTolerance(slipTolerance)
+        return slipTolerance
+      }),
+      O.getOrElse(() => DEFAULT_SLIP_TOLERANCE)
+    )
+
+  const slipTolerance = useObservableState<SlipTolerance>(slipTolerance$, getStoredSlipTolerance())
+
   const onChangePath = useCallback(
     (path) => {
       history.replace(path)
@@ -218,6 +235,8 @@ export const SwapView: React.FC<Props> = (_): JSX.Element => {
                   reloadBalances={reloadBalances}
                   onChangePath={onChangePath}
                   network={network}
+                  slipTolerance={slipTolerance}
+                  changeSlipTolerance={changeSlipTolerance}
                   approveERC20Token$={approveERC20Token$}
                   isApprovedERC20Token$={isApprovedERC20Token$}
                   importWalletHandler={importWalletHandler}
