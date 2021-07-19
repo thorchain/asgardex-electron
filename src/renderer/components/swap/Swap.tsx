@@ -25,7 +25,7 @@ import { useObservableState } from 'observable-hooks'
 import { useIntl } from 'react-intl'
 import * as RxOp from 'rxjs/operators'
 
-import { Network, SlipTolerance } from '../../../shared/api/types'
+import { Network } from '../../../shared/api/types'
 import { ZERO_BASE_AMOUNT } from '../../const'
 import {
   getEthTokenAddress,
@@ -67,7 +67,7 @@ import {
   BalancesState
 } from '../../services/wallet/types'
 import { hasImportedKeystore, isLocked } from '../../services/wallet/util'
-import { AssetWithDecimal } from '../../types/asgardex'
+import { AssetWithDecimal, SlipTolerance } from '../../types/asgardex'
 import { WalletBalance, WalletBalances } from '../../types/wallet'
 import { CurrencyInfo } from '../currency'
 import { PasswordModal } from '../modal/password'

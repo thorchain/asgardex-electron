@@ -1,6 +1,7 @@
 import * as Rx from 'rxjs'
 
-import { Network, SlipTolerance } from '../../../shared/api/types'
+import { Network } from '../../../shared/api/types'
+import { SlipTolerance } from '../../types/asgardex'
 
 export enum OnlineStatus {
   ON = 'online',

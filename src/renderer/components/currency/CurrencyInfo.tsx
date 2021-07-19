@@ -7,11 +7,11 @@ import * as O from 'fp-ts/lib/Option'
 import { pipe } from 'fp-ts/pipeable'
 import { useIntl } from 'react-intl'
 
-import { SlipTolerance } from '../../../shared/api/types'
 import { ReactComponent as DownIcon } from '../../assets/svg/icon-down.svg'
 import { sequenceTOption } from '../../helpers/fpHelpers'
 import { ChangeSlipToleranceHandler } from '../../services/app/types'
 import { PoolAssetDetail } from '../../services/midgard/types'
+import { SlipTolerance } from '../../types/asgardex'
 import * as Styled from './CurrencyInfo.styles'
 
 type CurrencyInfoProps = {

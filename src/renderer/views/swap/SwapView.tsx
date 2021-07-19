@@ -11,7 +11,7 @@ import { useHistory, useParams } from 'react-router-dom'
 import * as Rx from 'rxjs'
 import * as RxOp from 'rxjs/operators'
 
-import { Network, SlipTolerance } from '../../../shared/api/types'
+import { Network } from '../../../shared/api/types'
 import { SLIP_TOLERANCE_KEY } from '../../components/currency/CurrencyInfo'
 import { ErrorView } from '../../components/shared/error/'
 import { Swap } from '../../components/swap'
@@ -31,6 +31,7 @@ import { AssetWithDecimalLD, AssetWithDecimalRD } from '../../services/chain/typ
 import { OpenExplorerTxUrl } from '../../services/clients'
 import { DEFAULT_NETWORK, DEFAULT_SLIP_TOLERANCE } from '../../services/const'
 import { INITIAL_BALANCES_STATE } from '../../services/wallet/const'
+import { isSlipTolerance, SlipTolerance } from '../../types/asgardex'
 import * as Styled from './SwapView.styles'
 
 type Props = {}
@@ -170,10 +171,11 @@ export const SwapView: React.FC<Props> = (_): JSX.Element => {
 
   const getStoredSlipTolerance = (): SlipTolerance =>
     FP.pipe(
-      localStorage.getItem(SLIP_TOLERANCE_KEY) as string,
+      localStorage.getItem(SLIP_TOLERANCE_KEY),
       O.fromNullable,
       O.map((s) => {
-        const slipTolerance = +s as SlipTolerance
+        const itemAsInt = parseInt(s)
+        const slipTolerance = isSlipTolerance(itemAsInt) ? itemAsInt : DEFAULT_SLIP_TOLERANCE
         changeSlipTolerance(slipTolerance)
         return slipTolerance
       }),

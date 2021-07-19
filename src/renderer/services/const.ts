@@ -1,8 +1,9 @@
 import * as Client from '@xchainjs/xchain-client'
 import { isChain, Chain } from '@xchainjs/xchain-util'
 
-import { Network, SlipTolerance } from '../../shared/api/types'
+import { Network } from '../../shared/api/types'
 import { envOrDefault } from '../helpers/envHelper'
+import { SlipTolerance } from '../types/asgardex'
 
 export const DEFAULT_NETWORK: Network = 'mainnet'
 export const DEFAULT_SLIP_TOLERANCE: SlipTolerance = 5

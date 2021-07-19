@@ -66,8 +66,6 @@ export type ApiUrl = {
 
 export type Network = 'testnet' | 'mainnet'
 
-export type SlipTolerance = 3 | 5 | 10
-
 export enum LedgerErrorId {
   NO_DEVICE,
   ALREADY_IN_USE,

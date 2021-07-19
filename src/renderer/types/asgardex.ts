@@ -68,3 +68,10 @@ export type TxStatus = {
 export type ChainValues<T> = {
   [k in Chain]?: T[]
 }
+
+export type SlipTolerance = 3 | 5 | 10
+
+export const isSlipTolerance = (value: SlipTolerance | number): value is SlipTolerance => {
+  const t: SlipTolerance[] = [3, 5, 10]
+  return t.includes(value as SlipTolerance)
+}
