@@ -8,9 +8,9 @@ const settings: SettingMessages = {
   'setting.export': 'Exporter la clé privée',
   'setting.lock': 'Verrouiller',
   'setting.view.phrase': 'Afficher la phrase de récupération',
-  'setting.language': 'Language - FR',
+  'setting.language': 'Langue',
   'setting.version': 'Version',
-  'setting.connected': 'Connected - FR',
+  'setting.connected': 'Connecté',
   'setting.notconnected': 'Déconnecté',
   'setting.add.device': 'AJOUTER UN PÉRIPHÉRIQUE'
 }
