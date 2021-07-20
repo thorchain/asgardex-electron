@@ -1,3 +1,3 @@
-import TransportWebUSB from '@ledgerhq/hw-transport-webusb'
+import TransportNodeHidSingleton from '@ledgerhq/hw-transport-node-hid-singleton'
 
-export const getTransport = async () => await TransportWebUSB.create()
+export const getTransport = async () => await TransportNodeHidSingleton.open()

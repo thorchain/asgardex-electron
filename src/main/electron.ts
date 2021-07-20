@@ -137,7 +137,7 @@ const initIPC = () => {
   )
   ipcMain.handle(IPCMessages.LOAD_KEYSTORE, () => loadKeystore())
   // Ledger
-  ipcMain.handle(IPCMessages.GET_LEDGER_ADDRESS, (_, chain: Chain, network: Network) =>
+  ipcMain.handle(IPCMessages.GET_LEDGER_ADDRESS, async (_, chain: Chain, network: Network) =>
     getLedgerAddress(chain, network)
   )
   ipcMain.handle(IPCMessages.SEND_LEDGER_TX, (_, chain: Chain, network: Network, txInfo: LedgerTxInfo) =>

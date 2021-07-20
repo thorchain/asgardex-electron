@@ -4,7 +4,7 @@ import * as Client from '@xchainjs/xchain-client'
 import { getPrefix } from '@xchainjs/xchain-thorchain'
 import * as E from 'fp-ts/Either'
 
-import { LedgerErrorId, Network } from '../../../shared/api/types'
+import { Network } from '../../../shared/api/types'
 import { getErrorId } from './utils'
 
 // TODO(@Veado) Move `toClientNetwork` from `renderer/services/clients` to `main/util` or so
@@ -17,14 +17,16 @@ export const getAddress = async (transport: Transport, network: Network) => {
   try {
     const app = new THORChainApp(transport)
     const clientNetwork = toClientNetwork(network)
-    const response = await app.getAddressAndPubKey(PATH, getPrefix(clientNetwork))
-    if (response.return_code !== 0x9000) {
-      // TODO(@Veado) get address from pubkey
-      return E.right('my-address')
-    } else {
-      return E.left(LedgerErrorId.UNKNOWN)
+    const prefix = getPrefix(clientNetwork)
+    console.log('clientNetwork:', clientNetwork)
+    console.log('prefix:', prefix)
+    const res = await app.getAddressAndPubKey(PATH, prefix)
+    console.log('response:', res)
+    if (!res.bech32_address || res.return_code !== 0x9000 /* ERROR_CODE.NoError */) {
+      return E.left(res.return_code.toString())
     }
+    return E.right(res.bech32_address)
   } catch (error) {
-    return E.left(getErrorId(error.toString()))
+    return E.left(getErrorId(error))
   }
 }
