@@ -1,6 +1,6 @@
 import React, { useState, useMemo, useCallback } from 'react'
 
-import { assetAmount, formatAssetAmountCurrency } from '@xchainjs/xchain-util'
+import { assetAmount, bn, formatAssetAmountCurrency } from '@xchainjs/xchain-util'
 import { Row, Dropdown } from 'antd'
 import BigNumber from 'bignumber.js'
 import * as O from 'fp-ts/lib/Option'
@@ -18,6 +18,7 @@ type CurrencyInfoProps = {
   from?: O.Option<PoolAssetDetail>
   to?: O.Option<PoolAssetDetail>
   slip?: BigNumber
+  isCausedSlippage: boolean
   slipTolerance: SlipTolerance
   changeSlipTolerance: ChangeSlipToleranceHandler
 }
@@ -25,7 +26,14 @@ type CurrencyInfoProps = {
 export const SLIP_PERCENTAGES: SlipTolerance[] = [3, 5, 10]
 export const SLIP_TOLERANCE_KEY = 'asgdx-slip-tolerance'
 
-export const CurrencyInfo = ({ to = O.none, from = O.none, slipTolerance, changeSlipTolerance }: CurrencyInfoProps) => {
+export const CurrencyInfo = ({
+  to = O.none,
+  from = O.none,
+  slip = bn(0),
+  isCausedSlippage,
+  slipTolerance,
+  changeSlipTolerance
+}: CurrencyInfoProps) => {
   const [slipSettingsVisible, setSlipSettingsVisible] = useState(false)
   const intl = useIntl()
 
@@ -97,8 +105,8 @@ export const CurrencyInfo = ({ to = O.none, from = O.none, slipTolerance, change
           </div>
           <div>
             <div style={{ display: 'flex', alignItems: 'center', marginRight: '5px' }}>
-              <Styled.SlipTolerancePercent limit={true}>
-                {intl.formatMessage({ id: 'swap.slip.title' })}: {slipTolerance}%
+              <Styled.SlipTolerancePercent isCausedSlippage={isCausedSlippage}>
+                {intl.formatMessage({ id: 'swap.slip.title' })}: {slip.toNumber().toFixed(2)}%
               </Styled.SlipTolerancePercent>
               <Styled.SlipSettings
                 active={slipSettingsVisible}

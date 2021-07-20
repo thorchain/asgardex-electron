@@ -55,8 +55,8 @@ export const SlipSettings = styled(SlipSettingsIcon)<{ active: true | false }>`
     fill: ${({ active }) => (active ? palette('text', 2) : palette('gray', 2))};
   }
 `
-export const SlipTolerancePercent = styled(Text)<{ limit: true | false }>`
-  color: ${({ limit }) => (limit ? palette('error', 0) : palette('gray', 2))};
+export const SlipTolerancePercent = styled(Text)<{ isCausedSlippage: true | false }>`
+  color: ${({ isCausedSlippage }) => (isCausedSlippage ? palette('error', 0) : palette('gray', 2))};
 `
 
 export const SlipToleranceText = styled(Text)`
