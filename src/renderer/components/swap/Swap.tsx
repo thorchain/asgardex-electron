@@ -275,10 +275,7 @@ export const Swap = ({
     return max1e8BaseAmount(swapResultAmount)
   }, [swapData.swapResult, targetAssetDecimal])
 
-  const isCausedSlippage = useMemo(() => {
-    const limitFromAmount = amountToSwapMax1e8.amount().multipliedBy((100 - slipTolerance) / 100)
-    return amountToSwapMax1e8.div(bn(100)).times(swapData.slip).gt(amountToSwapMax1e8.minus(limitFromAmount))
-  }, [amountToSwapMax1e8, swapData.slip, slipTolerance])
+  const isCausedSlippage = useMemo(() => swapData.slip > bn(slipTolerance), [swapData.slip, slipTolerance])
 
   const oApproveParams: O.Option<ApproveParams> = useMemo(() => {
     const oRouterAddress: O.Option<Address> = FP.pipe(
