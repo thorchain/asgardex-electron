@@ -1,6 +1,6 @@
 import * as Client from '@xchainjs/xchain-client'
 
-import { Network } from '../../../shared/api/types'
+import { Network } from '../api/types'
 
 /**
  * Helper to type cast `Network` (ASGDX) -> `Client.Network` (xchain-client)

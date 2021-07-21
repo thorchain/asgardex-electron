@@ -37,7 +37,7 @@ export type FeesService = C.FeesService & {
 
 export type LedgerService = {
   ledgerAddress$: LedgerAddressLD
-  retrieveLedgerAddress: (network: Network) => void
+  retrieveLedgerAddress: (network: Network, index: number) => void
   removeLedgerAddress: () => void
   ledgerTxRD$: LedgerTxHashLD
   pushLedgerTx: (network: Network, params: LedgerBTCTxInfo) => Rx.Subscription

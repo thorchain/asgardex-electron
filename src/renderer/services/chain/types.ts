@@ -86,8 +86,6 @@ export type SendPoolTxParams = SendTxParams & {
   router: O.Option<Address>
 }
 
-export type LedgerAddressParams = { chain: Chain; network: Network }
-
 /**
  * State to reflect status of a swap by doing different requests
  */

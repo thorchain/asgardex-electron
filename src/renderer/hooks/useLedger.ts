@@ -13,7 +13,7 @@ import { observableState } from '../helpers/stateHelper'
 import { DEFAULT_NETWORK } from '../services/const'
 import { LedgerAddressRD } from '../services/wallet/types'
 
-export const useLedger = () => {
+export const useLedger = (chain: Chain, index: number) => {
   const { network$ } = useAppContext()
   const network = useObservableState<Network>(network$, DEFAULT_NETWORK)
 
@@ -21,17 +21,14 @@ export const useLedger = () => {
 
   const addressRD = useObservableState(FP.pipe(address$, RxOp.shareReplay(1)), RD.initial)
 
-  const getAddress = useCallback(
-    (chain: Chain) => {
-      FP.pipe(
-        Rx.from(window.apiHDWallet.getLedgerAddress(chain, network)),
-        RxOp.map(RD.fromEither),
-        RxOp.startWith(RD.pending),
-        RxOp.catchError((error) => Rx.of(RD.failure(error)))
-      ).subscribe(setAddress)
-    },
-    [network, setAddress]
-  )
+  const getAddress = useCallback(() => {
+    FP.pipe(
+      Rx.from(window.apiHDWallet.getLedgerAddress({ chain, network, index })),
+      RxOp.map(RD.fromEither),
+      RxOp.startWith(RD.pending),
+      RxOp.catchError((error) => Rx.of(RD.failure(error)))
+    ).subscribe(setAddress)
+  }, [chain, index, network, setAddress])
 
   return {
     getAddress,

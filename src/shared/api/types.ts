@@ -1,5 +1,4 @@
 import * as RD from '@devexperts/remote-data-ts'
-import Transport from '@ledgerhq/hw-transport'
 import { Address, FeeRate, TxParams } from '@xchainjs/xchain-client'
 import { Keystore } from '@xchainjs/xchain-crypto'
 import { Chain } from '@xchainjs/xchain-util'
@@ -89,10 +88,15 @@ export type LedgerBTCTxInfo = Pick<TxParams, 'amount' | 'recipient'> & {
 
 export type LedgerTxInfo = LedgerBTCTxInfo | LedgerBNCTxInfo
 
+export type GetLedgerAddressParams = {
+  chain: Chain
+  network: Network
+  index: number
+}
+
 export type ApiHDWallet = {
-  getLedgerAddress: (chain: Chain, network: Network) => Promise<Either<LedgerErrorId, Address>>
+  getLedgerAddress: (args: GetLedgerAddressParams) => Promise<Either<LedgerErrorId, Address>>
   sendTxInLedger: (chain: Chain, network: Network, txInfo: LedgerTxInfo) => Promise<Either<LedgerErrorId, string>>
-  getTransport: () => Promise<Transport>
 }
 
 declare global {

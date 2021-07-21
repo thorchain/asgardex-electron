@@ -12,9 +12,9 @@ import { LedgerService } from './types'
 
 const { get$: ledgerAddress$, set: setLedgerAddressRD } = observableState<LedgerAddressRD>(RD.initial)
 
-const retrieveLedgerAddress = (network: Network) =>
+const retrieveLedgerAddress = (network: Network, index: number) =>
   FP.pipe(
-    Rx.from(window.apiHDWallet.getLedgerAddress(BNBChain, network)),
+    Rx.from(window.apiHDWallet.getLedgerAddress({ chain: BNBChain, network, index })),
     map(RD.fromEither),
     startWith(RD.pending),
     catchError((error) => Rx.of(RD.failure(error)))

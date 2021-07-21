@@ -9,7 +9,7 @@ import isDev from 'electron-is-dev'
 import log from 'electron-log'
 import { warn } from 'electron-log'
 
-import { LedgerTxInfo, Network, StoreFileName } from '../shared/api/types'
+import { GetLedgerAddressParams, LedgerTxInfo, Network, StoreFileName } from '../shared/api/types'
 import { DEFAULT_STORAGES } from '../shared/const'
 import { Locale } from '../shared/i18n/types'
 import { registerAppCheckUpdatedHandler } from './api/appUpdate'
@@ -137,9 +137,7 @@ const initIPC = () => {
   )
   ipcMain.handle(IPCMessages.LOAD_KEYSTORE, () => loadKeystore())
   // Ledger
-  ipcMain.handle(IPCMessages.GET_LEDGER_ADDRESS, async (_, chain: Chain, network: Network) =>
-    getLedgerAddress(chain, network)
-  )
+  ipcMain.handle(IPCMessages.GET_LEDGER_ADDRESS, async (_, args: GetLedgerAddressParams) => getLedgerAddress(args))
   ipcMain.handle(IPCMessages.SEND_LEDGER_TX, (_, chain: Chain, network: Network, txInfo: LedgerTxInfo) =>
     sendLedgerTx(chain, network, txInfo)
   )

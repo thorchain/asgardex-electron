@@ -262,15 +262,16 @@ export const SettingsView: React.FC = (): JSX.Element => {
     }
   }
 
-  const { getAddress: getLedgerAddress, address: ledgerAddressRD } = useLedger()
+  // TODO (@Veado) Let the user enter an index
+  const { getAddress: getTHORLedgerAddress, address: thorLedgerAddressRD } = useLedger(THORChain, 0)
 
   return (
     <>
       <Row>
         <Col>
-          <Button onClick={() => getLedgerAddress(THORChain)}>Get Ledger THOR address</Button>
+          <Button onClick={() => getTHORLedgerAddress()}>Get Ledger THOR address</Button>
         </Col>
-        <Col>ledgerAddressRD: {JSON.stringify(ledgerAddressRD)}</Col>
+        <Col>ledgerAddressRD: {JSON.stringify(thorLedgerAddressRD)}</Col>
       </Row>
       <Row>
         <Col span={24}>
