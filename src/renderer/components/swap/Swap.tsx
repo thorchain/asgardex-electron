@@ -14,8 +14,7 @@ import {
   delay,
   assetAmount,
   assetToBase,
-  Chain,
-  bn
+  Chain
 } from '@xchainjs/xchain-util'
 import BigNumber from 'bignumber.js'
 import * as A from 'fp-ts/Array'
@@ -275,7 +274,7 @@ export const Swap = ({
     return max1e8BaseAmount(swapResultAmount)
   }, [swapData.swapResult, targetAssetDecimal])
 
-  const isCausedSlippage = useMemo(() => swapData.slip > bn(slipTolerance), [swapData.slip, slipTolerance])
+  const isCausedSlippage = useMemo(() => swapData.slip.toNumber() > slipTolerance, [swapData.slip, slipTolerance])
 
   const oApproveParams: O.Option<ApproveParams> = useMemo(() => {
     const oRouterAddress: O.Option<Address> = FP.pipe(
