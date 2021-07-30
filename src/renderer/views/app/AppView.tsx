@@ -60,6 +60,17 @@ export const AppView: React.FC = (): JSX.Element => {
     [haltedChains, intl]
   )
 
+  const renderUpgradeWarning = useMemo(
+    () => (
+      <Styled.Alert
+        key={'upgrade_warning'}
+        type="warning"
+        message="Upgrade for ETH.RUNE and BNB.RUNE are disabled temporary for maintanence"
+      />
+    ),
+    []
+  )
+
   const renderMidgardAlert = useMemo(() => {
     const description = (
       <>
@@ -99,6 +110,7 @@ export const AppView: React.FC = (): JSX.Element => {
         <View>
           {renderMidgardError}
           {renderHaltedChainsWarning}
+          {renderUpgradeWarning}
           <ViewRoutes />
         </View>
         <Footer commitHash={envOrDefault($COMMIT_HASH, '')} isDev={$IS_DEV} />

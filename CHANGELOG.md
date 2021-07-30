@@ -1,3 +1,10 @@
+# 0.3.10 (2021-07-30)
+
+## Hotfix
+
+- [chaosnet] Disable Swap / Add / Withdraw for all pools temporary
+- [chaosnet] Disable upgrade of BNB.RUNE and ETH.RUNE temporary
+
 # 0.3.9 (2021-07-14)
 
 ## Add

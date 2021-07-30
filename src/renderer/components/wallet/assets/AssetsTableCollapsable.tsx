@@ -114,14 +114,16 @@ export const AssetsTableCollapsable: React.FC<Props> = (props): JSX.Element => {
                 e.stopPropagation()
                 setSelectedAsset(O.some(asset))
                 history.push(walletRoutes.upgradeRune.path({ asset: assetToString(asset), walletAddress }))
-              }}>
+              }}
+              // TODO @asgdx-team: Enable upgrade for BNB and/or ETH again when they are back to live
+              disabled={network !== 'testnet'}>
               {intl.formatMessage({ id: 'wallet.action.upgrade' })}
             </Styled.UpgradeButton>
           )}
         </Styled.BnbRuneTickerWrapper>
       )
     }),
-    [intl, history, setSelectedAsset]
+    [network, intl, setSelectedAsset, history]
   )
 
   const renderBalanceColumn = ({ asset, amount }: Balance) => {
