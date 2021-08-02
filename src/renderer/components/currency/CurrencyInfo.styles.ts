@@ -51,19 +51,19 @@ export const SlipLabel = styled(Text)`
   cursor: pointer;
 `
 
-export const SlipSettings = styled(SlipSettingsIcon)<{ active: true | false }>`
+export const SlipSettings = styled(SlipSettingsIcon)<{ $active: true | false }>`
   width: 17px;
   height: 17px;
   & path {
-    fill: ${({ active }) => (active ? palette('text', 2) : palette('gray', 2))};
+    fill: ${({ $active }) => ($active ? palette('text', 2) : palette('gray', 2))};
     &:hover {
       fill: ${palette('text', 0)};
     }
   }
 `
 
-export const SlipTolerancePercent = styled(Text)<{ isCausedSlippage: true | false }>`
-  color: ${({ isCausedSlippage }) => (isCausedSlippage ? palette('error', 0) : palette('gray', 2))};
+export const SlipTolerancePercent = styled(Text)<{ $isCausedSlippage: true | false }>`
+  color: ${({ $isCausedSlippage }) => ($isCausedSlippage ? palette('error', 0) : palette('gray', 2))};
 `
 
 export const SlipToleranceText = styled(Text)`

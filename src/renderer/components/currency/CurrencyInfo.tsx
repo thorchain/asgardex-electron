@@ -105,11 +105,11 @@ export const CurrencyInfo = ({
           </div>
           <div>
             <div style={{ display: 'flex', alignItems: 'center', marginRight: '5px' }}>
-              <Styled.SlipTolerancePercent isCausedSlippage={isCausedSlippage}>
+              <Styled.SlipTolerancePercent $isCausedSlippage={isCausedSlippage}>
                 {intl.formatMessage({ id: 'swap.slip.title' })}: {slip.toNumber().toFixed(2)}%
               </Styled.SlipTolerancePercent>
               <Styled.SlipSettings
-                active={slipSettingsVisible}
+                $active={slipSettingsVisible}
                 onClick={() => setSlipSettingsVisible(!slipSettingsVisible)}
               />
             </div>
