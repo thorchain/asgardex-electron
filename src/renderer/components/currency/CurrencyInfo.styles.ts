@@ -49,6 +49,10 @@ export const SlipLabel = styled(Text)`
   font-size: 16px;
   font-family: 'MainFontRegular';
   cursor: pointer;
+  color: ${palette('gray', 2)};
+  &:hover {
+    color: ${palette('text', 0)};
+  }
 `
 
 export const SlipSettings = styled(SlipSettingsIcon)<{ $active: true | false }>`
@@ -67,5 +71,5 @@ export const SlipTolerancePercent = styled(Text)<{ $isCausedSlippage: true | fal
 `
 
 export const SlipToleranceText = styled(Text)`
-  color: palette('text', 2);
+  color: ${palette('gray', 2)};
 `

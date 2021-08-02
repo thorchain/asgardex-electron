@@ -34,14 +34,14 @@ export const CurrencyInfo = ({
   slipTolerance,
   changeSlipTolerance
 }: CurrencyInfoProps) => {
-  const [slipSettingsVisible, setSlipSettingsVisible] = useState(false)
   const intl = useIntl()
+  const [slipDropdownVisible, setSlipDropdownVisible] = useState(false)
 
   const changeSlipToleranceHandler = useCallback(
     (slipTolerance) => {
       localStorage.setItem(SLIP_TOLERANCE_KEY, slipTolerance)
       changeSlipTolerance(slipTolerance)
-      setSlipSettingsVisible(false)
+      setSlipDropdownVisible(false)
     },
     [changeSlipTolerance]
   )
@@ -62,14 +62,19 @@ export const CurrencyInfo = ({
 
   const renderSlipSettings = useMemo(
     () => (
-      <Dropdown overlay={slipSettings} trigger={['click']} placement="bottomCenter">
-        <Styled.DropdownContentWrapper style={{ alignItems: 'center' }}>
+      <Dropdown
+        onVisibleChange={(visible) => setSlipDropdownVisible(visible)}
+        visible={slipDropdownVisible}
+        overlay={slipSettings}
+        trigger={['click']}
+        placement="bottomCenter">
+        <Styled.DropdownContentWrapper style={{ alignItems: 'center', width: '50px' }}>
           <Styled.SlipLabel>{slipTolerance}%</Styled.SlipLabel>
           <DownIcon />
         </Styled.DropdownContentWrapper>
       </Dropdown>
     ),
-    [slipSettings, slipTolerance]
+    [slipSettings, slipTolerance, slipDropdownVisible]
   )
 
   return pipe(
@@ -106,19 +111,13 @@ export const CurrencyInfo = ({
           <div>
             <div style={{ display: 'flex', alignItems: 'center', marginRight: '5px' }}>
               <Styled.SlipTolerancePercent $isCausedSlippage={isCausedSlippage}>
-                {intl.formatMessage({ id: 'swap.slip.title' })}: {slip.toNumber().toFixed(2)}%
+                {intl.formatMessage({ id: 'swap.slip.title' })}: {slip.toNumber().toFixed(0)}%
               </Styled.SlipTolerancePercent>
-              <Styled.SlipSettings
-                $active={slipSettingsVisible}
-                onClick={() => setSlipSettingsVisible(!slipSettingsVisible)}
-              />
             </div>
-            {slipSettingsVisible && (
-              <div>
-                <Styled.SlipToleranceText>{intl.formatMessage({ id: 'swap.slip.tolerance' })}</Styled.SlipToleranceText>
-                {renderSlipSettings}
-              </div>
-            )}
+            <div style={{ display: 'flex', flexDirection: 'column' }}>
+              <Styled.SlipToleranceText>{intl.formatMessage({ id: 'swap.slip.tolerance' })}:</Styled.SlipToleranceText>
+              {renderSlipSettings}
+            </div>
           </div>
         </Styled.Container>
       )
