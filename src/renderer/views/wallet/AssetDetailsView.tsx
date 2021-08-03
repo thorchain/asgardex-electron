@@ -18,7 +18,9 @@ import { AssetDetails } from '../../components/wallet/assets'
 import { useAppContext } from '../../contexts/AppContext'
 import { useChainContext } from '../../contexts/ChainContext'
 import { useWalletContext } from '../../contexts/WalletContext'
+import { disableRuneUpgrade, isRuneNativeAsset } from '../../helpers/assetHelper'
 import { sequenceTOption } from '../../helpers/fpHelpers'
+import { useMimirHalt } from '../../hooks/useMimirHalt'
 import { useOpenExplorerTxUrl } from '../../hooks/useOpenExplorerTxUrl'
 import { AssetDetailsParams } from '../../routes/wallet'
 import { OpenExplorerTxUrl } from '../../services/clients'
@@ -46,6 +48,18 @@ export const AssetDetailsView: React.FC = (): JSX.Element => {
   // Needed to get all data for this asset (transactions etc.)
   // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => setSelectedAsset(oRouteAsset), [])
+
+  const mimirHaltRD = useMimirHalt()
+
+  // get halt status from Mimir
+  const { haltThorChain, haltEthChain } = useMemo(
+    () =>
+      FP.pipe(
+        mimirHaltRD,
+        RD.getOrElse(() => ({ haltThorChain: true, haltEthChain: true }))
+      ),
+    [mimirHaltRD]
+  )
 
   const { getTxs$, balancesState$, loadTxs, reloadBalancesByChain, setSelectedAsset, resetTxsPage } = useWalletContext()
 
@@ -142,6 +156,8 @@ export const AssetDetailsView: React.FC = (): JSX.Element => {
               openExplorerTxUrl={openExplorerTxUrl}
               openExplorerAddressUrl={openExplorerAddressUrlHandler}
               walletAddress={oWalletAddress}
+              disableSend={isRuneNativeAsset(asset) && haltThorChain}
+              disableUpgrade={disableRuneUpgrade({ asset, haltThorChain, haltEthChain })}
               network={network}
             />
           )

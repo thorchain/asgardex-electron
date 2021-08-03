@@ -14,6 +14,7 @@ import { Button } from '../../components/uielements/button'
 import { useMidgardContext } from '../../contexts/MidgardContext'
 import { envOrDefault } from '../../helpers/envHelper'
 import { rdAltOnPending } from '../../helpers/fpHelpers'
+import { MimirHaltRD, useMimirHalt } from '../../hooks/useMimirHalt'
 import { HaltedChainsRD } from '../../services/midgard/types'
 import { View } from '../View'
 import { ViewRoutes } from '../ViewRoutes'
@@ -60,15 +61,34 @@ export const AppView: React.FC = (): JSX.Element => {
     [haltedChains, intl]
   )
 
+  const mimirHaltRD = useMimirHalt()
+
+  const prevMimirHalt = useRef<MimirHaltRD>(RD.initial)
+
   const renderUpgradeWarning = useMemo(
-    () => (
-      <Styled.Alert
-        key={'upgrade_warning'}
-        type="warning"
-        message="Upgrade for ETH.RUNE and BNB.RUNE are disabled temporary for maintanence"
-      />
-    ),
-    []
+    () =>
+      FP.pipe(
+        mimirHaltRD,
+        RD.map((mimirHalt) => {
+          prevMimirHalt.current = RD.success(mimirHalt)
+          return mimirHalt
+        }),
+        rdAltOnPending(() => prevMimirHalt.current),
+        RD.toOption,
+        O.map(({ haltThorChain, haltEthChain }) =>
+          haltThorChain || haltEthChain ? (
+            <Styled.Alert
+              key={'upgrade_warning'}
+              type="warning"
+              message="Upgrade for ETH.RUNE and/or BNB.RUNE are disabled temporary for maintanence"
+            />
+          ) : (
+            <></>
+          )
+        ),
+        O.getOrElse(() => <></>)
+      ),
+    [mimirHaltRD]
   )
 
   const renderMidgardAlert = useMemo(() => {

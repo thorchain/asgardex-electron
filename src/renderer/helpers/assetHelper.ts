@@ -221,3 +221,21 @@ export const getTwoSigfigAssetAmount = (amount: AssetAmount) => {
   const precisionCount = amountIntegerValue.gt(0) ? amountIntegerValue.toString().length + 2 : 2
   return assetAmount(amount.amount().toPrecision(precisionCount))
 }
+
+export const disableRuneUpgrade = ({
+  asset,
+  haltThorChain,
+  haltEthChain
+}: {
+  asset: Asset
+  haltThorChain: boolean
+  haltEthChain: boolean
+}) => {
+  if (isNonNativeRuneAsset(asset)) {
+    // BNB.RUNE + ETH.RUNE
+    if (haltThorChain) return true
+    // ETH.RUNE
+    if (isEthChain(asset.chain) && haltEthChain) return true
+  }
+  return false
+}
