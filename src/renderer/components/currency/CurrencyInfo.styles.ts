@@ -3,8 +3,6 @@ import Text from 'antd/lib/typography/Text'
 import styled from 'styled-components'
 import { palette } from 'styled-theme'
 
-import { ReactComponent as SlipSettingsIcon } from '../../assets/svg/icon-settings.svg'
-
 export const Container = styled('div')`
   display: flex;
   flex-direction: column;
@@ -52,17 +50,6 @@ export const SlipLabel = styled(Text)`
   color: ${palette('gray', 2)};
   &:hover {
     color: ${palette('text', 0)};
-  }
-`
-
-export const SlipSettings = styled(SlipSettingsIcon)<{ $active: true | false }>`
-  width: 17px;
-  height: 17px;
-  & path {
-    fill: ${({ $active }) => ($active ? palette('text', 2) : palette('gray', 2))};
-    &:hover {
-      fill: ${palette('text', 0)};
-    }
   }
 `
 
