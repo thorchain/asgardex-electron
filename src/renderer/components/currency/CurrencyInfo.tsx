@@ -110,7 +110,7 @@ export const CurrencyInfo = ({
           </div>
           <div>
             <div style={{ display: 'flex', alignItems: 'center', marginRight: '5px' }}>
-              <Styled.SlipTolerancePercent $isCausedSlippage={isCausedSlippage}>
+              <Styled.SlipTolerancePercent slippage={isCausedSlippage ? 'true' : 'false'}>
                 {intl.formatMessage({ id: 'swap.slip.title' })}: {slip.toNumber().toFixed(0)}%
               </Styled.SlipTolerancePercent>
             </div>

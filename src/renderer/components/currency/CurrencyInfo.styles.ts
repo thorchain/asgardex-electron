@@ -53,8 +53,8 @@ export const SlipLabel = styled(Text)`
   }
 `
 
-export const SlipTolerancePercent = styled(Text)<{ $isCausedSlippage: true | false }>`
-  color: ${({ $isCausedSlippage }) => ($isCausedSlippage ? palette('error', 0) : palette('gray', 2))};
+export const SlipTolerancePercent = styled(Text)<{ slippage: 'true' | 'false' }>`
+  color: ${(slippage) => (slippage === 'true' ? palette('error', 0) : palette('gray', 2))};
 `
 
 export const SlipToleranceText = styled(Text)`
