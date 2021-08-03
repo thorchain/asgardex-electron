@@ -257,16 +257,14 @@ export const Swap = ({
     )
   }, [amountToSwapMax1e8, assetsToSwap, oPoolAddress, sourceAssetDecimal, targetWalletAddress])
 
-  const swapData: SwapData = useMemo(
-    () =>
-      Utils.getSwapData({
-        amountToSwap: amountToSwapMax1e8,
-        sourceAsset: oSourceAsset,
-        targetAsset: oTargetAsset,
-        poolsData
-      }),
-    [amountToSwapMax1e8, oSourceAsset, oTargetAsset, poolsData]
-  )
+  const swapData: SwapData = useMemo(() => {
+    return Utils.getSwapData({
+      amountToSwap: amountToSwapMax1e8,
+      sourceAsset: oSourceAsset,
+      targetAsset: oTargetAsset,
+      poolsData
+    })
+  }, [amountToSwapMax1e8, oSourceAsset, oTargetAsset, poolsData])
 
   const swapResultAmountMax1e8: BaseAmount = useMemo(() => {
     // 1. Convert result to original decimal of target asset
@@ -275,6 +273,8 @@ export const Swap = ({
     // 2. But we still need to make sure it <= 1e8
     return max1e8BaseAmount(swapResultAmount)
   }, [swapData.swapResult, targetAssetDecimal])
+
+  const isCausedSlippage = useMemo(() => swapData.slip.toNumber() > slipTolerance, [swapData.slip, slipTolerance])
 
   const oApproveParams: O.Option<ApproveParams> = useMemo(() => {
     const oRouterAddress: O.Option<Address> = FP.pipe(
@@ -1071,7 +1071,8 @@ export const Swap = ({
       sourceChainFeeError ||
       RD.isPending(swapFeesRD) ||
       RD.isPending(approveState) ||
-      minAmountError,
+      minAmountError ||
+      isCausedSlippage,
     [
       hasHaltedChain,
       unlockedWallet,
@@ -1080,7 +1081,8 @@ export const Swap = ({
       sourceChainFeeError,
       swapFeesRD,
       approveState,
-      minAmountError
+      minAmountError,
+      isCausedSlippage
     ]
   )
 
@@ -1108,6 +1110,7 @@ export const Swap = ({
             <CurrencyInfo
               slip={swapData.slip}
               slipTolerance={slipTolerance}
+              isCausedSlippage={isCausedSlippage}
               changeSlipTolerance={changeSlipTolerance}
               from={oSourcePoolAsset}
               to={oTargetPoolAsset}
