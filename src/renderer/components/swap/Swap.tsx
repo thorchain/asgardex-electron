@@ -242,21 +242,6 @@ export const Swap = ({
     [sourceAssetProp, targetAssetProp]
   )
 
-  const oSwapParams: O.Option<SwapTxParams> = useMemo(() => {
-    return FP.pipe(
-      sequenceTOption(assetsToSwap, oPoolAddress, targetWalletAddress),
-      O.map(([{ source, target }, poolAddress, address]) => {
-        return {
-          poolAddress,
-          asset: source,
-          // Decimal needs to be converted back for using orginal decimal of source asset
-          amount: convertBaseAmountDecimal(amountToSwapMax1e8, sourceAssetDecimal),
-          memo: getSwapMemo({ asset: target, address })
-        }
-      })
-    )
-  }, [amountToSwapMax1e8, assetsToSwap, oPoolAddress, sourceAssetDecimal, targetWalletAddress])
-
   const swapData: SwapData = useMemo(
     () =>
       Utils.getSwapData({
@@ -275,6 +260,29 @@ export const Swap = ({
     // 2. But we still need to make sure it <= 1e8
     return max1e8BaseAmount(swapResultAmount)
   }, [swapData.swapResult, targetAssetDecimal])
+
+  const oSwapParams: O.Option<SwapTxParams> = useMemo(() => {
+    return FP.pipe(
+      sequenceTOption(assetsToSwap, oPoolAddress, targetWalletAddress),
+      O.map(([{ source, target }, poolAddress, address]) => {
+        return {
+          poolAddress,
+          asset: source,
+          // Decimal needs to be converted back for using orginal decimal of source asset
+          amount: convertBaseAmountDecimal(amountToSwapMax1e8, sourceAssetDecimal),
+          memo: getSwapMemo({ asset: target, address, limit: swapResultAmountMax1e8.times(1.0 - slipTolerance * 0.01) })
+        }
+      })
+    )
+  }, [
+    amountToSwapMax1e8,
+    assetsToSwap,
+    oPoolAddress,
+    sourceAssetDecimal,
+    targetWalletAddress,
+    swapResultAmountMax1e8,
+    slipTolerance
+  ])
 
   const oApproveParams: O.Option<ApproveParams> = useMemo(() => {
     const oRouterAddress: O.Option<Address> = FP.pipe(
