@@ -284,6 +284,8 @@ export const Swap = ({
     slipTolerance
   ])
 
+  const isCausedSlippage = useMemo(() => swapData.slip.toNumber() > slipTolerance, [swapData.slip, slipTolerance])
+
   const oApproveParams: O.Option<ApproveParams> = useMemo(() => {
     const oRouterAddress: O.Option<Address> = FP.pipe(
       oPoolAddress,
@@ -1079,7 +1081,8 @@ export const Swap = ({
       sourceChainFeeError ||
       RD.isPending(swapFeesRD) ||
       RD.isPending(approveState) ||
-      minAmountError,
+      minAmountError ||
+      isCausedSlippage,
     [
       hasHaltedChain,
       unlockedWallet,
@@ -1088,7 +1091,8 @@ export const Swap = ({
       sourceChainFeeError,
       swapFeesRD,
       approveState,
-      minAmountError
+      minAmountError,
+      isCausedSlippage
     ]
   )
 
@@ -1116,6 +1120,7 @@ export const Swap = ({
             <CurrencyInfo
               slip={swapData.slip}
               slipTolerance={slipTolerance}
+              isCausedSlippage={isCausedSlippage}
               changeSlipTolerance={changeSlipTolerance}
               from={oSourcePoolAsset}
               to={oTargetPoolAsset}
