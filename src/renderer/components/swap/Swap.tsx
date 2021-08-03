@@ -242,6 +242,25 @@ export const Swap = ({
     [sourceAssetProp, targetAssetProp]
   )
 
+  const swapData: SwapData = useMemo(
+    () =>
+      Utils.getSwapData({
+        amountToSwap: amountToSwapMax1e8,
+        sourceAsset: oSourceAsset,
+        targetAsset: oTargetAsset,
+        poolsData
+      }),
+    [amountToSwapMax1e8, oSourceAsset, oTargetAsset, poolsData]
+  )
+
+  const swapResultAmountMax1e8: BaseAmount = useMemo(() => {
+    // 1. Convert result to original decimal of target asset
+    // orignal decimal might be < 1e8
+    const swapResultAmount = convertBaseAmountDecimal(swapData.swapResult, targetAssetDecimal)
+    // 2. But we still need to make sure it <= 1e8
+    return max1e8BaseAmount(swapResultAmount)
+  }, [swapData.swapResult, targetAssetDecimal])
+
   const oSwapParams: O.Option<SwapTxParams> = useMemo(() => {
     return FP.pipe(
       sequenceTOption(assetsToSwap, oPoolAddress, targetWalletAddress),
@@ -251,28 +270,19 @@ export const Swap = ({
           asset: source,
           // Decimal needs to be converted back for using orginal decimal of source asset
           amount: convertBaseAmountDecimal(amountToSwapMax1e8, sourceAssetDecimal),
-          memo: getSwapMemo({ asset: target, address })
+          memo: getSwapMemo({ asset: target, address, limit: swapResultAmountMax1e8.times(1.0 - slipTolerance * 0.01) })
         }
       })
     )
-  }, [amountToSwapMax1e8, assetsToSwap, oPoolAddress, sourceAssetDecimal, targetWalletAddress])
-
-  const swapData: SwapData = useMemo(() => {
-    return Utils.getSwapData({
-      amountToSwap: amountToSwapMax1e8,
-      sourceAsset: oSourceAsset,
-      targetAsset: oTargetAsset,
-      poolsData
-    })
-  }, [amountToSwapMax1e8, oSourceAsset, oTargetAsset, poolsData])
-
-  const swapResultAmountMax1e8: BaseAmount = useMemo(() => {
-    // 1. Convert result to original decimal of target asset
-    // orignal decimal might be < 1e8
-    const swapResultAmount = convertBaseAmountDecimal(swapData.swapResult, targetAssetDecimal)
-    // 2. But we still need to make sure it <= 1e8
-    return max1e8BaseAmount(swapResultAmount)
-  }, [swapData.swapResult, targetAssetDecimal])
+  }, [
+    amountToSwapMax1e8,
+    assetsToSwap,
+    oPoolAddress,
+    sourceAssetDecimal,
+    targetWalletAddress,
+    swapResultAmountMax1e8,
+    slipTolerance
+  ])
 
   const isCausedSlippage = useMemo(() => swapData.slip.toNumber() > slipTolerance, [swapData.slip, slipTolerance])
 
