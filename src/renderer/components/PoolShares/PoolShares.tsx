@@ -16,7 +16,7 @@ import { useIntl } from 'react-intl'
 
 import { Network } from '../../../shared/api/types'
 import * as PoolHelpers from '../../helpers/poolHelper'
-import { MimirHalt } from '../../hooks/useMimirHalt'
+import { MimirHalt } from '../../services/thorchain/types'
 import { AssetIcon } from '../uielements/assets/assetIcon'
 import { AssetLabel } from '../uielements/assets/assetLabel'
 import { Label } from '../uielements/label'

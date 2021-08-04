@@ -8,16 +8,8 @@ import * as RxOp from 'rxjs/operators'
 
 import { useThorchainContext } from '../contexts/ThorchainContext'
 import { liveData } from '../helpers/rx/liveData'
-
-export type MimirHalt = { haltEthTrading: boolean; haltEthChain: boolean; haltThorChain: boolean; haltTrading: boolean }
-export type MimirHaltRD = RD.RemoteData<Error, MimirHalt>
-
-export const DEFAULT_MIMIR_HALT: MimirHalt = {
-  haltTrading: false,
-  haltThorChain: false,
-  haltEthTrading: false,
-  haltEthChain: false
-}
+import { DEFAULT_MIMIR_HALT } from '../services/thorchain/const'
+import { Mimir, MimirHaltRD, MimirHalt } from '../services/thorchain/types'
 
 /**
  * Hook to get halt status defined by `Mimir`
@@ -29,8 +21,9 @@ export const useMimirHalt = (): { mimirHaltRD: MimirHaltRD; mimirHalt: MimirHalt
 
   const [mimirHaltRD] = useObservableState<MimirHaltRD>(
     () =>
-      mimir$.pipe(
-        liveData.map((mimir) => ({
+      FP.pipe(
+        mimir$,
+        liveData.map<Mimir, MimirHalt>((mimir) => ({
           haltTrading: mimir['mimir//HALTTRADING'] === 1,
           haltThorChain: mimir['mimir//HALTTHORCHAIN'] === 1,
           haltEthChain: mimir['mimir//HALTETHCHAIN'] === 1,

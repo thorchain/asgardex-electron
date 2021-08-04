@@ -16,7 +16,9 @@ import { useMidgardContext } from '../../contexts/MidgardContext'
 import { isEthChain } from '../../helpers/chainHelper'
 import { envOrDefault } from '../../helpers/envHelper'
 import { rdAltOnPending } from '../../helpers/fpHelpers'
-import { DEFAULT_MIMIR_HALT, MimirHalt, MimirHaltRD, useMimirHalt } from '../../hooks/useMimirHalt'
+import { useMimirHalt } from '../../hooks/useMimirHalt'
+import { DEFAULT_MIMIR_HALT } from '../../services/thorchain/const'
+import { MimirHalt, MimirHaltRD } from '../../services/thorchain/types'
 import { View } from '../View'
 import { ViewRoutes } from '../ViewRoutes'
 import { AppUpdateView } from './AppUpdateView'
@@ -51,6 +53,12 @@ export const AppView: React.FC = (): JSX.Element => {
           prevMimirHalt.current = mimirHalt
           return { chains, mimirHalt }
         }),
+        rdAltOnPending<Error, { chains: Chain[]; mimirHalt: MimirHalt }>(() =>
+          RD.success({
+            chains: prevHaltedChains.current,
+            mimirHalt: prevMimirHalt.current
+          })
+        ),
         RD.toOption,
         O.map(({ chains, mimirHalt: { haltThorChain, haltTrading, haltEthChain, haltEthTrading } }) => {
           let msg = ''

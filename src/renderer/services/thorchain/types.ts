@@ -81,6 +81,9 @@ export type Mimir = t.TypeOf<typeof MimirIO>
 export type MimirLD = LiveData<Error, Mimir>
 export type MimirRD = RD.RemoteData<Error, Mimir>
 
+export type MimirHalt = { haltEthTrading: boolean; haltEthChain: boolean; haltThorChain: boolean; haltTrading: boolean }
+export type MimirHaltRD = RD.RemoteData<Error, MimirHalt>
+
 export type GetLiquidityProvidersParams = {
   asset: Asset
   network: Network

@@ -41,7 +41,6 @@ import { sequenceSOption, sequenceTOption } from '../../helpers/fpHelpers'
 import * as PoolHelpers from '../../helpers/poolHelper'
 import { liveData, LiveData } from '../../helpers/rx/liveData'
 import { filterWalletBalancesByAssets, getWalletBalanceByAsset } from '../../helpers/walletHelper'
-import { MimirHalt } from '../../hooks/useMimirHalt'
 import { useSubscriptionState } from '../../hooks/useSubscriptionState'
 import { swap } from '../../routes/pools'
 import { ChangeSlipToleranceHandler } from '../../services/app/types'
@@ -59,6 +58,7 @@ import {
 } from '../../services/chain/types'
 import { ApproveFeeHandler, ApproveParams, IsApprovedRD, LoadApproveFeeHandler } from '../../services/ethereum/types'
 import { PoolAssetDetail, PoolAssetDetails, PoolAddress, PoolsDataMap } from '../../services/midgard/types'
+import { MimirHalt } from '../../services/thorchain/types'
 import {
   ApiError,
   KeystoreState,

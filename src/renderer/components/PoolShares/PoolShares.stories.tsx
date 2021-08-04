@@ -3,7 +3,7 @@ import React from 'react'
 import { Meta, Story } from '@storybook/react'
 import { assetAmount, AssetBNB, AssetBTC, assetToBase, bn } from '@xchainjs/xchain-util'
 
-import { DEFAULT_MIMIR_HALT } from '../../hooks/useMimirHalt'
+import { DEFAULT_MIMIR_HALT } from '../../services/thorchain/const'
 import { PoolShares as Component, Props as ComponentProps } from './PoolShares'
 
 const defaultProps: ComponentProps = {
