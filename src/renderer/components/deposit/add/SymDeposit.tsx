@@ -36,6 +36,7 @@ import { sequenceSOption, sequenceTOption } from '../../../helpers/fpHelpers'
 import * as PoolHelpers from '../../../helpers/poolHelper'
 import { liveData, LiveData } from '../../../helpers/rx/liveData'
 import { FundsCap } from '../../../hooks/useFundsCap'
+import { MimirHalt } from '../../../hooks/useMimirHalt'
 import { useSubscriptionState } from '../../../hooks/useSubscriptionState'
 import { INITIAL_SYM_DEPOSIT_STATE } from '../../../services/chain/const'
 import { getZeroSymDepositFees } from '../../../services/chain/fees'
@@ -98,6 +99,7 @@ export type Props = {
   fundsCap: O.Option<FundsCap>
   poolsData: PoolsDataMap
   haltedChains: Chain[]
+  mimirHalt: MimirHalt
   pendingAssets: PendingAssetsRD
   openRecoveryTool: FP.Lazy<void>
 }
@@ -137,6 +139,7 @@ export const SymDeposit: React.FC<Props> = (props) => {
     fundsCap: oFundsCap,
     poolsData,
     haltedChains,
+    mimirHalt,
     pendingAssets: pendingAssetsRD,
     openRecoveryTool
   } = props
@@ -155,9 +158,19 @@ export const SymDeposit: React.FC<Props> = (props) => {
     [assetDecimal, oAssetBalance]
   )
 
-  const isChainHalted = useMemo(() => PoolHelpers.isChainHalted(haltedChains), [haltedChains])
+  const disableAllPoolActions = useMemo(
+    () => PoolHelpers.disableAllActions(haltedChains, mimirHalt),
+    [haltedChains, mimirHalt]
+  )
+  const disablePoolTradingActions = useMemo(
+    () => PoolHelpers.disableTradingActions(haltedChains, mimirHalt),
+    [haltedChains, mimirHalt]
+  )
 
-  const haltedChain = useMemo(() => isChainHalted(asset.chain), [asset, isChainHalted])
+  const disableDepositAction = useMemo(
+    () => disableAllPoolActions(asset.chain) || disablePoolTradingActions(asset.chain),
+    [asset.chain, disableAllPoolActions, disablePoolTradingActions]
+  )
 
   const assetBalanceMax1e8: BaseAmount = useMemo(() => max1e8BaseAmount(assetBalance), [assetBalance])
 
@@ -1055,14 +1068,14 @@ export const SymDeposit: React.FC<Props> = (props) => {
    */
   const disabledForm = useMemo(
     () =>
-      haltedChain ||
+      disableDepositAction ||
       isBalanceError ||
       fundsCapReached ||
       disabled ||
       assetBalance.amount().isZero() ||
       runeBalance.amount().isZero() ||
       hasPendingAssets,
-    [haltedChain, isBalanceError, fundsCapReached, disabled, assetBalance, runeBalance, hasPendingAssets]
+    [disableDepositAction, isBalanceError, fundsCapReached, disabled, assetBalance, runeBalance, hasPendingAssets]
   )
 
   /**

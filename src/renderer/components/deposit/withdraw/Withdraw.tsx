@@ -25,6 +25,7 @@ import { getTwoSigfigAssetAmount, THORCHAIN_DECIMAL, to1e8BaseAmount } from '../
 import { eqAsset } from '../../../helpers/fp/eq'
 import * as PoolHelpers from '../../../helpers/poolHelper'
 import { liveData } from '../../../helpers/rx/liveData'
+import { MimirHalt } from '../../../hooks/useMimirHalt'
 import { useSubscriptionState } from '../../../hooks/useSubscriptionState'
 import { INITIAL_WITHDRAW_STATE } from '../../../services/chain/const'
 import { getZeroWithdrawFees } from '../../../services/chain/fees'
@@ -75,6 +76,7 @@ export type Props = {
   network: Network
   poolsData: PoolsDataMap
   haltedChains: Chain[]
+  mimirHalt: MimirHalt
 }
 
 /**
@@ -99,15 +101,19 @@ export const Withdraw: React.FC<Props> = ({
   fees$,
   network,
   poolsData,
-  haltedChains
+  haltedChains,
+  mimirHalt
 }) => {
   const intl = useIntl()
 
   const { asset, decimal: assetDecimal } = assetWD
 
-  const isChainHalted = useMemo(() => PoolHelpers.isChainHalted(haltedChains), [haltedChains])
+  const disableAllPoolActions = useMemo(
+    () => PoolHelpers.disableAllActions(haltedChains, mimirHalt),
+    [haltedChains, mimirHalt]
+  )
 
-  const haltedChain = useMemo(() => isChainHalted(asset.chain), [asset, isChainHalted])
+  const disableWithdrawAction = useMemo(() => disableAllPoolActions(asset.chain), [asset, disableAllPoolActions])
 
   const [withdrawPercent, setWithdrawPercent] = useState(disabled ? 0 : 50)
 
@@ -373,13 +379,20 @@ export const Withdraw: React.FC<Props> = ({
 
   const disabledSubmit = useMemo(
     () =>
-      haltedChain ||
+      disableWithdrawAction ||
       zeroWithdrawPercent ||
       disabled ||
       minAssetAmountError ||
       minRuneAmountError ||
       isInboundChainFeeError,
-    [zeroWithdrawPercent, disabled, minAssetAmountError, minRuneAmountError, isInboundChainFeeError, haltedChain]
+    [
+      zeroWithdrawPercent,
+      disabled,
+      minAssetAmountError,
+      minRuneAmountError,
+      isInboundChainFeeError,
+      disableWithdrawAction
+    ]
   )
 
   return (
@@ -414,7 +427,7 @@ export const Withdraw: React.FC<Props> = ({
         value={withdrawPercent}
         onChange={setWithdrawPercent}
         onAfterChange={reloadFeesHandler}
-        disabled={disabled || haltedChain}
+        disabled={disabled || disableWithdrawAction}
         error={minRuneAmountError || minAssetAmountError}
       />
       <Label weight="bold" textTransform="uppercase">

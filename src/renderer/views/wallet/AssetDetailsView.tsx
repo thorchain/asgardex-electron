@@ -49,17 +49,9 @@ export const AssetDetailsView: React.FC = (): JSX.Element => {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => setSelectedAsset(oRouteAsset), [])
 
-  const mimirHaltRD = useMimirHalt()
-
-  // get halt status from Mimir
-  const { haltThorChain, haltEthChain } = useMemo(
-    () =>
-      FP.pipe(
-        mimirHaltRD,
-        RD.getOrElse(() => ({ haltThorChain: true, haltEthChain: true }))
-      ),
-    [mimirHaltRD]
-  )
+  const {
+    mimirHalt: { haltThorChain, haltEthChain }
+  } = useMimirHalt()
 
   const { getTxs$, balancesState$, loadTxs, reloadBalancesByChain, setSelectedAsset, resetTxsPage } = useWalletContext()
 
@@ -157,7 +149,11 @@ export const AssetDetailsView: React.FC = (): JSX.Element => {
               openExplorerAddressUrl={openExplorerAddressUrlHandler}
               walletAddress={oWalletAddress}
               disableSend={isRuneNativeAsset(asset) && haltThorChain}
-              disableUpgrade={disableRuneUpgrade({ asset, haltThorChain, haltEthChain })}
+              disableUpgrade={disableRuneUpgrade({
+                asset,
+                haltThorChain,
+                haltEthChain
+              })}
               network={network}
             />
           )

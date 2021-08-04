@@ -17,12 +17,14 @@ import * as RxOp from 'rxjs/operators'
 
 import { mockValidatePassword$ } from '../../../../shared/mock/wallet'
 import { BNB_DECIMAL, THORCHAIN_DECIMAL } from '../../../helpers/assetHelper'
+import { DEFAULT_MIMIR_HALT } from '../../../hooks/useMimirHalt'
 import { INITIAL_WITHDRAW_STATE } from '../../../services/chain/const'
 import { WithdrawState$ } from '../../../services/chain/types'
 import { Withdraw, Props as WitdrawProps } from './Withdraw'
 
 const defaultProps: WitdrawProps = {
   haltedChains: [],
+  mimirHalt: DEFAULT_MIMIR_HALT,
   asset: { asset: AssetBNB, decimal: BNB_DECIMAL },
   runePrice: bn(1),
   assetPrice: bn(60.972),

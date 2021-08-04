@@ -21,6 +21,7 @@ import * as RxOp from 'rxjs/operators'
 import { mockValidatePassword$ } from '../../../shared/mock/wallet'
 import { ONE_BN } from '../../const'
 import { THORCHAIN_DECIMAL } from '../../helpers/assetHelper'
+import { DEFAULT_MIMIR_HALT } from '../../hooks/useMimirHalt'
 import { INITIAL_SWAP_STATE } from '../../services/chain/const'
 import { SwapState } from '../../services/chain/types'
 import { AssetWithDecimal } from '../../types/asgardex'
@@ -32,6 +33,7 @@ const targetAsset: AssetWithDecimal = { asset: AssetBTC, decimal: BTC_DECIMAL }
 /* Mock all (default) data needed by `Swap` commponent */
 const defaultProps: SwapProps = {
   haltedChains: [],
+  mimirHalt: DEFAULT_MIMIR_HALT,
   keystore: O.none,
   availableAssets: [
     { asset: AssetBTC, assetPrice: bn('56851.67420275761') },

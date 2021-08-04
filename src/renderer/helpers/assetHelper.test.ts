@@ -288,10 +288,10 @@ describe('helpers/assetHelper', () => {
     it('disabled for BNB.RUNE + halted THORChain', () => {
       expect(disableRuneUpgrade({ asset: AssetRune67C, haltThorChain: true, haltEthChain: false })).toBeTruthy()
     })
-    it('ebabled for BNB.RUNE + halted ETH chain', () => {
+    it('enabled for BNB.RUNE + halted ETH chain', () => {
       expect(disableRuneUpgrade({ asset: AssetRune67C, haltThorChain: false, haltEthChain: true })).toBeFalsy()
     })
-    it('ebabled for BNB.RUNE + no halted chains', () => {
+    it('enabled for BNB.RUNE + no halted chains', () => {
       expect(disableRuneUpgrade({ asset: AssetRune67C, haltThorChain: false, haltEthChain: false })).toBeFalsy()
     })
     it('disabled for ETH.RUNE + halted ETH chain', () => {

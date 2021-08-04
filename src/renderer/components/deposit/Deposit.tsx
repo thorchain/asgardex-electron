@@ -7,6 +7,7 @@ import * as FP from 'fp-ts/function'
 import * as O from 'fp-ts/Option'
 import { useIntl } from 'react-intl'
 
+import { MimirHalt } from '../../hooks/useMimirHalt'
 import { PoolDetailRD, PoolShareRD, PoolSharesRD } from '../../services/midgard/types'
 import { getSharesByAssetAndType, combineSharesByAsset } from '../../services/midgard/utils'
 import { LiquidityProviderRD } from '../../services/thorchain/types'
@@ -27,6 +28,7 @@ type Tab = {
 
 export type Props = {
   haltedChains: Chain[]
+  mimirHalt: MimirHalt
   asset: AssetWithDecimal
   shares: PoolSharesRD
   poolDetail: PoolDetailRD
@@ -38,22 +40,25 @@ export type Props = {
   }>
   AsymDepositContent: React.ComponentType<{ asset: Asset; poolDetail: PoolDetailRD; haltedChains: Chain[] }>
   SymDepositContent: React.ComponentType<{
-    haltedChains: Chain[]
     asset: AssetWithDecimal
     poolDetail: PoolDetailRD
     liquidityProvider: LiquidityProviderRD
+    haltedChains: Chain[]
+    mimirHalt: MimirHalt
   }>
   WidthdrawContent: React.ComponentType<{
     asset: AssetWithDecimal
     poolShare: PoolShareRD
     poolDetail: PoolDetailRD
     haltedChains: Chain[]
+    mimirHalt: MimirHalt
   }>
   AsymWidthdrawContent: React.ComponentType<{
     asset: Asset
     poolShare: PoolShareRD
     poolDetail: PoolDetailRD
     haltedChains: Chain[]
+    mimirHalt: MimirHalt
   }>
   keystoreState: KeystoreState
   liquidityProvider: LiquidityProviderRD
@@ -64,6 +69,7 @@ export const Deposit: React.FC<Props> = (props) => {
     asset: assetWD,
     ShareContent,
     haltedChains,
+    mimirHalt,
     // TODO (@Veado) Temporary disabled #827
     // AsymDepositContent,
     SymDepositContent,
@@ -135,8 +141,9 @@ export const Deposit: React.FC<Props> = (props) => {
           <SymDepositContent
             poolDetail={poolDetailRD}
             asset={assetWD}
-            haltedChains={haltedChains}
             liquidityProvider={liquidityProviderRD}
+            haltedChains={haltedChains}
+            mimirHalt={mimirHalt}
           />
         )
       },
@@ -150,6 +157,7 @@ export const Deposit: React.FC<Props> = (props) => {
             asset={assetWD}
             poolShare={combinedPoolShare}
             haltedChains={haltedChains}
+            mimirHalt={mimirHalt}
           />
         )
       }
@@ -165,8 +173,9 @@ export const Deposit: React.FC<Props> = (props) => {
       SymDepositContent,
       poolDetailRD,
       assetWD,
-      haltedChains,
       liquidityProviderRD,
+      haltedChains,
+      mimirHalt,
       hasSymPoolShare,
       WidthdrawContent,
       combinedPoolShare

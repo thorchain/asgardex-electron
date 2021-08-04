@@ -60,7 +60,7 @@ export const AssetsView: React.FC = (): JSX.Element => {
 
   const poolDetails = RD.toNullable(poolsRD)?.poolDetails ?? []
 
-  const mimirHaltRD = useMimirHalt()
+  const { mimirHaltRD } = useMimirHalt()
 
   return (
     <AssetsTableCollapsable

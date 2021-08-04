@@ -22,6 +22,7 @@ import * as RxOp from 'rxjs/operators'
 import { mockValidatePassword$ } from '../../../../shared/mock/wallet'
 import { ZERO_BASE_AMOUNT } from '../../../const'
 import { BNB_DECIMAL } from '../../../helpers/assetHelper'
+import { DEFAULT_MIMIR_HALT } from '../../../hooks/useMimirHalt'
 import { INITIAL_SYM_DEPOSIT_STATE } from '../../../services/chain/const'
 import { SymDepositState } from '../../../services/chain/types'
 import { WalletBalance } from '../../../types/wallet'
@@ -47,6 +48,7 @@ const balanceTOMO: WalletBalance = {
 
 const defaultProps: SymDepositProps = {
   haltedChains: [],
+  mimirHalt: DEFAULT_MIMIR_HALT,
   asset: { asset: AssetBNB, decimal: BNB_DECIMAL },
   assetPrice: bn(2),
   runePrice: bn(1),

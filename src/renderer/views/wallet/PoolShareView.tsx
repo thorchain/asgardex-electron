@@ -23,6 +23,7 @@ import { useMidgardContext } from '../../contexts/MidgardContext'
 import { isThorChain } from '../../helpers/chainHelper'
 import { sequenceTOption } from '../../helpers/fpHelpers'
 import { RUNE_PRICE_POOL } from '../../helpers/poolHelper'
+import { useMimirHalt } from '../../hooks/useMimirHalt'
 import { DEFAULT_NETWORK, ENABLED_CHAINS } from '../../services/const'
 import { PoolSharesRD } from '../../services/midgard/types'
 import { getPoolShareTableData } from './PoolShareView.helper'
@@ -81,6 +82,7 @@ export const PoolShareView: React.FC = (): JSX.Element => {
   )
 
   const [haltedChains] = useObservableState(() => FP.pipe(haltedChains$, RxOp.map(RD.getOrElse((): Chain[] => []))), [])
+  const { mimirHalt } = useMimirHalt()
   const poolDetailsRD = useObservableState(allPoolDetails$, RD.pending)
   const { poolData: pricePoolData } = useObservableState(selectedPricePool$, RUNE_PRICE_POOL)
   const oPriceAsset = useObservableState<O.Option<Asset>>(selectedPricePoolAsset$, O.none)
@@ -105,6 +107,7 @@ export const PoolShareView: React.FC = (): JSX.Element => {
       return (
         <PoolSharesTable
           haltedChains={haltedChains}
+          mimirHalt={mimirHalt}
           loading={loading}
           data={data}
           priceAsset={priceAsset}
@@ -113,7 +116,7 @@ export const PoolShareView: React.FC = (): JSX.Element => {
         />
       )
     },
-    [openExternalShareInfo, priceAsset, network, haltedChains]
+    [haltedChains, mimirHalt, priceAsset, openExternalShareInfo, network]
   )
 
   const clickRefreshHandler = useCallback(() => {

@@ -24,6 +24,7 @@ import { useWalletContext } from '../../contexts/WalletContext'
 import { isRuneNativeAsset } from '../../helpers/assetHelper'
 import { eqChain } from '../../helpers/fp/eq'
 import { sequenceTOption, sequenceTRD } from '../../helpers/fpHelpers'
+import { useMimirHalt } from '../../hooks/useMimirHalt'
 import { useOpenExplorerTxUrl } from '../../hooks/useOpenExplorerTxUrl'
 import { SwapRouteParams } from '../../routes/pools/swap'
 import * as walletRoutes from '../../routes/wallet'
@@ -58,6 +59,7 @@ export const SwapView: React.FC<Props> = (_): JSX.Element => {
   } = useWalletContext()
 
   const [haltedChains] = useObservableState(() => FP.pipe(haltedChains$, RxOp.map(RD.getOrElse((): Chain[] => []))), [])
+  const { mimirHalt } = useMimirHalt()
 
   const { reloadApproveFee, approveFee$, approveERC20Token$, isApprovedERC20Token$ } = useEthereumContext()
 
@@ -218,6 +220,7 @@ export const SwapView: React.FC<Props> = (_): JSX.Element => {
               return (
                 <Swap
                   haltedChains={haltedChains}
+                  mimirHalt={mimirHalt}
                   keystore={keystore}
                   validatePassword$={validatePassword$}
                   goToTransaction={openExplorerTxUrl}

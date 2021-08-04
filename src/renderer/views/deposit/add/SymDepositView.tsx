@@ -26,6 +26,7 @@ import { getAssetPoolPrice } from '../../../helpers/poolHelper'
 import { liveData } from '../../../helpers/rx/liveData'
 import { filterWalletBalancesByAssets } from '../../../helpers/walletHelper'
 import { FundsCap, useFundsCap } from '../../../hooks/useFundsCap'
+import { MimirHalt } from '../../../hooks/useMimirHalt'
 import { useOpenExplorerTxUrl } from '../../../hooks/useOpenExplorerTxUrl'
 import * as poolsRoutes from '../../../routes/pools'
 import { SymDepositMemo } from '../../../services/chain/types'
@@ -43,11 +44,18 @@ type Props = {
   asset: AssetWithDecimal
   poolDetail: PoolDetailRD
   haltedChains: Chain[]
+  mimirHalt: MimirHalt
   liquidityProvider: LiquidityProviderRD
 }
 
 export const SymDepositView: React.FC<Props> = (props) => {
-  const { asset: assetWD, poolDetail: poolDetailRD, haltedChains, liquidityProvider: liquidityProviderRD } = props
+  const {
+    asset: assetWD,
+    poolDetail: poolDetailRD,
+    mimirHalt,
+    haltedChains,
+    liquidityProvider: liquidityProviderRD
+  } = props
   const { asset } = assetWD
   const history = useHistory()
   const intl = useIntl()
@@ -206,6 +214,7 @@ export const SymDepositView: React.FC<Props> = (props) => {
         )}
         <SymDeposit
           haltedChains={haltedChains}
+          mimirHalt={mimirHalt}
           validatePassword$={validatePassword$}
           openRuneExplorerTxUrl={openRuneExplorerTxUrl}
           openAssetExplorerTxUrl={openAssetExplorerTxUrl}
@@ -244,6 +253,7 @@ export const SymDepositView: React.FC<Props> = (props) => {
     [
       intl,
       haltedChains,
+      mimirHalt,
       validatePassword$,
       openRuneExplorerTxUrl,
       openAssetExplorerTxUrl,
@@ -279,6 +289,7 @@ export const SymDepositView: React.FC<Props> = (props) => {
           <>
             <SymDeposit
               haltedChains={haltedChains}
+              mimirHalt={mimirHalt}
               validatePassword$={validatePassword$}
               openRuneExplorerTxUrl={openRuneExplorerTxUrl}
               openAssetExplorerTxUrl={openAssetExplorerTxUrl}
