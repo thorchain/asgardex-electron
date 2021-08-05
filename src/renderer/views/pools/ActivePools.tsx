@@ -81,12 +81,12 @@ export const ActivePools: React.FC<PoolsComponentProps> = ({ haltedChains, mimir
 
   const renderBtnPoolsColumn = useCallback(
     (_: string, { pool }: PoolTableRowData) => {
-      const disablePool = PoolHelpers.disableAllActions(haltedChains, mimirHalt)
+      const disablePool = PoolHelpers.disableAllActions({ chain: pool.target.chain, haltedChains, mimirHalt })
 
       return (
         <Styled.TableAction>
           <ManageButton
-            disabled={disablePool(pool.target.chain)}
+            disabled={disablePool}
             asset={pool.target}
             sizevalue={isDesktopView ? 'normal' : 'small'}
             isTextView={isDesktopView}
@@ -94,7 +94,7 @@ export const ActivePools: React.FC<PoolsComponentProps> = ({ haltedChains, mimir
           <Button
             round="true"
             sizevalue={isDesktopView ? 'normal' : 'small'}
-            disabled={disablePool(pool.target.chain)}
+            disabled={disablePool}
             style={{ height: 30 }}
             onClick={(event) => {
               event.preventDefault()

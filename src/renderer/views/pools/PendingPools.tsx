@@ -88,10 +88,10 @@ export const PendingPools: React.FC<PoolsComponentProps> = ({ haltedChains, mimi
 
   const renderBtnPoolsColumn = useCallback(
     (_: string, { pool }: PoolTableRowData) => {
-      const disablePool = PoolHelpers.disableAllActions(haltedChains, mimirHalt)
+      const disablePool = PoolHelpers.disableAllActions({ chain: pool.target.chain, haltedChains, mimirHalt })
       return (
         <TableAction>
-          <ManageButton asset={pool.target} isTextView={isDesktopView} disabled={disablePool(pool.target.chain)} />
+          <ManageButton asset={pool.target} isTextView={isDesktopView} disabled={disablePool} />
         </TableAction>
       )
     },

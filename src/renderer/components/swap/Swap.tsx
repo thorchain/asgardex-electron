@@ -168,12 +168,12 @@ export const Swap = ({
     [oTargetPoolAsset]
   )
 
-  const disableAllPoolActions = useMemo(
-    () => PoolHelpers.disableAllActions(haltedChains, mimirHalt),
+  const disableAllPoolActions = useCallback(
+    (chain: Chain) => PoolHelpers.disableAllActions({ chain, haltedChains, mimirHalt }),
     [haltedChains, mimirHalt]
   )
-  const disableTradingPoolActions = useMemo(
-    () => PoolHelpers.disableTradingActions(haltedChains, mimirHalt),
+  const disableTradingPoolActions = useCallback(
+    (chain: Chain) => PoolHelpers.disableTradingActions({ chain, haltedChains, mimirHalt }),
     [haltedChains, mimirHalt]
   )
 

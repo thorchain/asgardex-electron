@@ -157,18 +157,11 @@ export const SymDeposit: React.FC<Props> = (props) => {
     [assetDecimal, oAssetBalance]
   )
 
-  const disableAllPoolActions = useMemo(
-    () => PoolHelpers.disableAllActions(haltedChains, mimirHalt),
-    [haltedChains, mimirHalt]
-  )
-  const disablePoolTradingActions = useMemo(
-    () => PoolHelpers.disableTradingActions(haltedChains, mimirHalt),
-    [haltedChains, mimirHalt]
-  )
-
   const disableDepositAction = useMemo(
-    () => disableAllPoolActions(asset.chain) || disablePoolTradingActions(asset.chain),
-    [asset.chain, disableAllPoolActions, disablePoolTradingActions]
+    () =>
+      PoolHelpers.disableAllActions({ chain: asset.chain, haltedChains, mimirHalt }) ||
+      PoolHelpers.disableTradingActions({ chain: asset.chain, haltedChains, mimirHalt }),
+    [asset.chain, haltedChains, mimirHalt]
   )
 
   const assetBalanceMax1e8: BaseAmount = useMemo(() => max1e8BaseAmount(assetBalance), [assetBalance])

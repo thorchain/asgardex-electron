@@ -166,31 +166,43 @@ const isChainElem = A.elem(eqChain)
 /**
  * Helper to check if all pool actions (`SWAP`, `ADD`, `WITHDRAW`) have to be disabled
  */
-export const disableAllActions =
-  (haltedChains: Chain[], { haltThorChain, haltEthChain }: MimirHalt) =>
-  (chain: Chain) => {
-    // 1. Check `haltThorChain` (provided by `mimir` endpoint) to disable all actions for all pools
-    if (haltThorChain) return true
+export const disableAllActions = ({
+  chain,
+  haltedChains,
+  mimirHalt: { haltThorChain, haltEthChain }
+}: {
+  chain: Chain
+  haltedChains: Chain[]
+  mimirHalt: Pick<MimirHalt, 'haltThorChain' | 'haltEthChain'>
+}) => {
+  // 1. Check `haltThorChain` (provided by `mimir` endpoint) to disable all actions for all pools
+  if (haltThorChain) return true
 
-    // 2. Check `haltEthChain` (provided by `mimir` endpoint) to disable all actions for ETH pools
-    if (isEthChain(chain) && haltEthChain) return true
+  // 2. Check `haltEthChain` (provided by `mimir` endpoint) to disable all actions for ETH pools
+  if (isEthChain(chain) && haltEthChain) return true
 
-    // 3. Check `haltedChains` (provided by `inbound_addresses` endpoint)
-    return FP.pipe(haltedChains, isChainElem(chain))
-  }
+  // 3. Check `chain` is included in `haltedChains` (provided by `inbound_addresses` endpoint)
+  return FP.pipe(haltedChains, isChainElem(chain))
+}
 
 /**
  * Helper to check if pool trading actions (`SWAP`, `ADD`) have to be disabled
  */
-export const disableTradingActions =
-  (haltedChains: Chain[], { haltTrading, haltEthTrading }: MimirHalt) =>
-  (chain: Chain) => {
-    // 1. Check `haltThorChain` (provided by `mimir` endpoint) to disable all actions for all pools
-    if (haltTrading) return true
+export const disableTradingActions = ({
+  chain,
+  haltedChains,
+  mimirHalt: { haltTrading, haltEthTrading }
+}: {
+  chain: Chain
+  haltedChains: Chain[]
+  mimirHalt: Pick<MimirHalt, 'haltTrading' | 'haltEthTrading'>
+}) => {
+  // 1. Check `haltTrading` (provided by `mimir` endpoint) to disable all actions for all pools
+  if (haltTrading) return true
 
-    // 2. Check `haltEthChain` (provided by `mimir` endpoint) to disable all actions for ETH pools
-    if (isEthChain(chain) && haltEthTrading) return true
+  // 2. Check `haltEthTrading` (provided by `mimir` endpoint) to disable all actions for ETH pools
+  if (isEthChain(chain) && haltEthTrading) return true
 
-    // 3. Check `haltedChains` (provided by `inbound_addresses` endpoint)
-    return FP.pipe(haltedChains, isChainElem(chain))
-  }
+  // 3. Check `chain` is included in `haltedChains` (provided by `inbound_addresses` endpoint)
+  return FP.pipe(haltedChains, isChainElem(chain))
+}

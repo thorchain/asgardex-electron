@@ -66,12 +66,12 @@ export const PoolDetailsView: React.FC = () => {
   const [haltedChains] = useObservableState(() => FP.pipe(haltedChains$, RxOp.map(RD.getOrElse((): Chain[] => []))), [])
   const { mimirHalt } = useMimirHalt()
 
-  const getDisableAllPoolActions = useMemo(
-    () => PoolHelpers.disableAllActions(haltedChains, mimirHalt),
+  const getDisableAllPoolActions = useCallback(
+    (chain: Chain) => PoolHelpers.disableAllActions({ chain, haltedChains, mimirHalt }),
     [haltedChains, mimirHalt]
   )
-  const getDisableTradingPoolAction = useMemo(
-    () => PoolHelpers.disableTradingActions(haltedChains, mimirHalt),
+  const getDisableTradingPoolAction = useCallback(
+    (chain: Chain) => PoolHelpers.disableTradingActions({ chain, haltedChains, mimirHalt }),
     [haltedChains, mimirHalt]
   )
 

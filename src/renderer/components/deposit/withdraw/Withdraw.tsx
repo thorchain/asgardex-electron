@@ -108,12 +108,11 @@ export const Withdraw: React.FC<Props> = ({
 
   const { asset, decimal: assetDecimal } = assetWD
 
-  const disableAllPoolActions = useMemo(
-    () => PoolHelpers.disableAllActions(haltedChains, mimirHalt),
-    [haltedChains, mimirHalt]
+  // Disable withdraw in case all pool actions are disabled
+  const disableWithdrawAction = useMemo(
+    () => PoolHelpers.disableAllActions({ chain: asset.chain, haltedChains, mimirHalt }),
+    [asset.chain, haltedChains, mimirHalt]
   )
-
-  const disableWithdrawAction = useMemo(() => disableAllPoolActions(asset.chain), [asset, disableAllPoolActions])
 
   const [withdrawPercent, setWithdrawPercent] = useState(disabled ? 0 : 50)
 
