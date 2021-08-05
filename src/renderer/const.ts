@@ -153,6 +153,8 @@ export const ZERO_BASE_AMOUNT = baseAmount(ZERO_BN)
 
 export const ZERO_POOL_DATA: PoolData = { runeBalance: ZERO_BASE_AMOUNT, assetBalance: ZERO_BASE_AMOUNT }
 
+export const ASGARDEX_SWAP_IDENTIFIER = '999'
+
 export const RECOVERY_TOOL_URL: Record<Network, string> = {
   testnet: 'https://testnet.asgard.exchange/deposit-sym-recovery/',
   mainnet: 'https://app.asgard.exchange/deposit-sym-recovery/'

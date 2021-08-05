@@ -28,7 +28,8 @@ import {
   poolAssetDetailToAsset,
   minBalanceToSwap,
   calcRefundFee,
-  minAmountToSwapMax1e8
+  minAmountToSwapMax1e8,
+  getSwapLimit
 } from './Swap.utils'
 
 describe('components/swap/utils', () => {
@@ -257,6 +258,39 @@ describe('components/swap/utils', () => {
 
       expect(slip.isEqualTo(bn('0.00332225913621262458'))).toBeTruthy()
       expect(eqBaseAmount.equals(swapResult, baseAmount('13245'))).toBeTruthy()
+    })
+  })
+
+  describe('getSwapLimit', () => {
+    it('100000000 * 10% slip = 90000000 => 90000999', () => {
+      const amount = baseAmount(100000000)
+      const slipTolerance = 10
+      const result = getSwapLimit(amount, slipTolerance)
+      expect(eqBaseAmount.equals(result, baseAmount(90000999))).toBeTruthy()
+    })
+    it('100000 * 5% slip = 95000 => 95999', () => {
+      const amount = baseAmount(100000)
+      const slipTolerance = 5
+      const result = getSwapLimit(amount, slipTolerance)
+      expect(eqBaseAmount.equals(result, baseAmount(95999))).toBeTruthy()
+    })
+    it('100000 * 3% slip = 97000 => 97999', () => {
+      const amount = baseAmount(100000)
+      const slipTolerance = 3
+      const result = getSwapLimit(amount, slipTolerance)
+      expect(eqBaseAmount.equals(result, baseAmount(97999))).toBeTruthy()
+    })
+    it('100 * 5% slip = 95 => 999', () => {
+      const amount = baseAmount(100)
+      const slipTolerance = 5
+      const result = getSwapLimit(amount, slipTolerance)
+      expect(eqBaseAmount.equals(result, baseAmount(999))).toBeTruthy()
+    })
+    it('1 * 5% slip = 0.05 => 999', () => {
+      const amount = baseAmount(1)
+      const slipTolerance = 5
+      const result = getSwapLimit(amount, slipTolerance)
+      expect(eqBaseAmount.equals(result, baseAmount(999))).toBeTruthy()
     })
   })
 
