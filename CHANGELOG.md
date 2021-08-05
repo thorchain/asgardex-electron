@@ -1,3 +1,11 @@
+# 0.3.11 (2021-08-06)
+
+## Add
+
+- [Swap] Add swap limit protection [#1647](https://github.com/thorchain/asgardex-electron/issues/1647)
+- [Swap] Add ASGARDEX identifier to swap memo [1615](https://github.com/thorchain/asgardex-electron/issues/1615)
+- [Mimir] Handle halt params of Mimir[#1645](https://github.com/thorchain/asgardex-electron/issues/1645)
+
 # 0.3.10 (2021-07-30)
 
 ## Hotfix
