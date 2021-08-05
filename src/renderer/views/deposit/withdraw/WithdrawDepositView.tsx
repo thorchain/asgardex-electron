@@ -23,6 +23,7 @@ import { useOpenExplorerTxUrl } from '../../../hooks/useOpenExplorerTxUrl'
 import { OpenExplorerTxUrl } from '../../../services/clients'
 import { DEFAULT_NETWORK } from '../../../services/const'
 import { PoolDetailRD, PoolShareRD, PoolShare, PoolsDataMap } from '../../../services/midgard/types'
+import { MimirHalt } from '../../../services/thorchain/types'
 import { getBalanceByAsset } from '../../../services/wallet/util'
 import { AssetWithDecimal } from '../../../types/asgardex'
 import { PoolDetail } from '../../../types/generated/midgard'
@@ -32,10 +33,11 @@ type Props = {
   poolShare: PoolShareRD
   poolDetail: PoolDetailRD
   haltedChains: Chain[]
+  mimirHalt: MimirHalt
 }
 
 export const WithdrawDepositView: React.FC<Props> = (props): JSX.Element => {
-  const { asset: assetWD, poolShare: poolShareRD, poolDetail: poolDetailRD, haltedChains } = props
+  const { asset: assetWD, poolShare: poolShareRD, poolDetail: poolDetailRD, haltedChains, mimirHalt } = props
   const { decimal: assetDecimal } = assetWD
   const {
     service: {
@@ -113,6 +115,7 @@ export const WithdrawDepositView: React.FC<Props> = (props): JSX.Element => {
     () => (
       <Withdraw
         haltedChains={haltedChains}
+        mimirHalt={mimirHalt}
         fees$={symWithdrawFee$}
         assetPrice={ZERO_BN}
         runePrice={runePrice}
@@ -131,6 +134,8 @@ export const WithdrawDepositView: React.FC<Props> = (props): JSX.Element => {
       />
     ),
     [
+      haltedChains,
+      mimirHalt,
       symWithdrawFee$,
       runePrice,
       runeBalance,
@@ -140,8 +145,7 @@ export const WithdrawDepositView: React.FC<Props> = (props): JSX.Element => {
       openRuneExplorerTxUrl,
       reloadBalancesAndShares,
       symWithdraw$,
-      network,
-      haltedChains
+      network
     ]
   )
 
@@ -161,6 +165,7 @@ export const WithdrawDepositView: React.FC<Props> = (props): JSX.Element => {
     }) => (
       <Withdraw
         haltedChains={haltedChains}
+        mimirHalt={mimirHalt}
         assetPrice={assetPrice}
         runePrice={runePrice}
         runeBalance={runeBalance}
@@ -181,6 +186,8 @@ export const WithdrawDepositView: React.FC<Props> = (props): JSX.Element => {
       />
     ),
     [
+      haltedChains,
+      mimirHalt,
       runePrice,
       runeBalance,
       assetDecimal,
@@ -191,8 +198,7 @@ export const WithdrawDepositView: React.FC<Props> = (props): JSX.Element => {
       openRuneExplorerTxUrl,
       reloadBalancesAndShares,
       symWithdraw$,
-      network,
-      haltedChains
+      network
     ]
   )
 

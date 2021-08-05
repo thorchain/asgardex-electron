@@ -24,6 +24,7 @@ import { ZERO_BASE_AMOUNT } from '../../../const'
 import { BNB_DECIMAL } from '../../../helpers/assetHelper'
 import { INITIAL_SYM_DEPOSIT_STATE } from '../../../services/chain/const'
 import { SymDepositState } from '../../../services/chain/types'
+import { DEFAULT_MIMIR_HALT } from '../../../services/thorchain/const'
 import { WalletBalance } from '../../../types/wallet'
 import { SymDeposit, Props as SymDepositProps } from './SymDeposit'
 
@@ -47,6 +48,7 @@ const balanceTOMO: WalletBalance = {
 
 const defaultProps: SymDepositProps = {
   haltedChains: [],
+  mimirHalt: DEFAULT_MIMIR_HALT,
   asset: { asset: AssetBNB, decimal: BNB_DECIMAL },
   assetPrice: bn(2),
   runePrice: bn(1),

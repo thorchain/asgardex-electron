@@ -3,6 +3,7 @@ import { BaseAmount, Asset, Chain } from '@xchainjs/xchain-util'
 import { NonEmptyArray } from 'fp-ts/lib/NonEmptyArray'
 
 import { Network } from '../../../shared/api/types'
+import { MimirHalt } from '../../services/thorchain/types'
 import { GetPoolsStatusEnum } from '../../types/generated/midgard'
 
 export type Pool = {
@@ -37,5 +38,6 @@ export type PoolTableRowData = {
 
 export type PoolsComponentProps = {
   haltedChains: Chain[]
+  mimirHalt: MimirHalt
 }
 export type PoolTableRowsData = PoolTableRowData[]

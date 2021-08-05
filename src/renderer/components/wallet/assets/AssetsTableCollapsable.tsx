@@ -13,12 +13,13 @@ import { useIntl } from 'react-intl'
 import { useHistory } from 'react-router-dom'
 
 import { Network } from '../../../../shared/api/types'
-import { isNonNativeRuneAsset } from '../../../helpers/assetHelper'
+import { disableRuneUpgrade, isNonNativeRuneAsset } from '../../../helpers/assetHelper'
 import { getChainAsset } from '../../../helpers/chainHelper'
 import { getPoolPriceValue } from '../../../helpers/poolHelper'
 import * as walletRoutes from '../../../routes/wallet'
 import { WalletBalancesRD } from '../../../services/clients'
 import { PoolDetails } from '../../../services/midgard/types'
+import { MimirHaltRD } from '../../../services/thorchain/types'
 import { ApiError, ChainBalance, ChainBalances } from '../../../services/wallet/types'
 import { WalletBalance, WalletBalances } from '../../../types/wallet'
 import { PricePool } from '../../../views/pools/Pools.types'
@@ -36,6 +37,7 @@ type Props = {
   selectAssetHandler?: (asset: Asset, walletAddress: string) => void
   setSelectedAsset?: (oAsset: O.Option<Asset>) => void
   network: Network
+  mimirHalt: MimirHaltRD
 }
 
 export const AssetsTableCollapsable: React.FC<Props> = (props): JSX.Element => {
@@ -45,6 +47,7 @@ export const AssetsTableCollapsable: React.FC<Props> = (props): JSX.Element => {
     poolDetails,
     selectAssetHandler = (_) => {},
     setSelectedAsset = () => {},
+    mimirHalt: mimirHaltRD,
     network
   } = props
 
@@ -62,9 +65,20 @@ export const AssetsTableCollapsable: React.FC<Props> = (props): JSX.Element => {
   // store previous data of asset data to render these while reloading
   const previousAssetsTableData = useRef<Balance[][]>([])
 
+  // get halt status from Mimir
+  const { haltThorChain, haltEthChain } = useMemo(
+    () =>
+      FP.pipe(
+        mimirHaltRD,
+        RD.getOrElse(() => ({ haltThorChain: true, haltEthChain: true }))
+      ),
+    [mimirHaltRD]
+  )
+
   const onRowHandler = useCallback(
     (oWalletAddress: O.Option<Address>) =>
       ({ asset }: Balance) => {
+        // Disable click for NativeRUNE if Thorchain is halted
         const onClick = FP.pipe(
           oWalletAddress,
           O.map((walletAddress) => () => selectAssetHandler(asset, walletAddress)),
@@ -101,29 +115,35 @@ export const AssetsTableCollapsable: React.FC<Props> = (props): JSX.Element => {
   const tickerColumn: ColumnType<WalletBalance> = useMemo(
     () => ({
       width: 80,
-      render: ({ asset, walletAddress }: WalletBalance) => (
-        <Styled.BnbRuneTickerWrapper>
-          <Styled.Label nowrap>
-            <Styled.TickerLabel>{asset.ticker}</Styled.TickerLabel>
-            <Styled.ChainLabel>{asset.chain}</Styled.ChainLabel>
-          </Styled.Label>
-          {isNonNativeRuneAsset(asset) && (
-            <Styled.UpgradeButton
-              onClick={(e) => {
-                e.preventDefault()
-                e.stopPropagation()
-                setSelectedAsset(O.some(asset))
-                history.push(walletRoutes.upgradeRune.path({ asset: assetToString(asset), walletAddress }))
-              }}
-              // TODO @asgdx-team: Enable upgrade for BNB and/or ETH again when they are back to live
-              disabled={network !== 'testnet'}>
-              {intl.formatMessage({ id: 'wallet.action.upgrade' })}
-            </Styled.UpgradeButton>
-          )}
-        </Styled.BnbRuneTickerWrapper>
-      )
+      render: ({ asset, walletAddress }: WalletBalance) => {
+        // Disable UPGRADE button if needed
+        const disableUpgradeButton = disableRuneUpgrade({ asset, haltThorChain, haltEthChain })
+
+        const onClickUpgradeButtonHandler = (e: React.MouseEvent<HTMLElement, MouseEvent>) => {
+          e.preventDefault()
+          e.stopPropagation()
+          setSelectedAsset(O.some(asset))
+          history.push(walletRoutes.upgradeRune.path({ asset: assetToString(asset), walletAddress }))
+        }
+
+        return (
+          <Styled.AssetTickerWrapper>
+            <Styled.Label nowrap>
+              <Styled.TickerLabel>{asset.ticker}</Styled.TickerLabel>
+              <Styled.ChainLabel>{asset.chain}</Styled.ChainLabel>
+            </Styled.Label>
+            {isNonNativeRuneAsset(asset) && (
+              <Styled.UpgradeButton
+                onClick={disableUpgradeButton ? undefined : onClickUpgradeButtonHandler}
+                disabled={disableUpgradeButton}>
+                {intl.formatMessage({ id: 'wallet.action.upgrade' })}
+              </Styled.UpgradeButton>
+            )}
+          </Styled.AssetTickerWrapper>
+        )
+      }
     }),
-    [network, intl, setSelectedAsset, history]
+    [haltThorChain, haltEthChain, intl, setSelectedAsset, history]
   )
 
   const renderBalanceColumn = ({ asset, amount }: Balance) => {

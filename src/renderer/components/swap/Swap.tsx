@@ -58,6 +58,7 @@ import {
 } from '../../services/chain/types'
 import { ApproveFeeHandler, ApproveParams, IsApprovedRD, LoadApproveFeeHandler } from '../../services/ethereum/types'
 import { PoolAssetDetail, PoolAssetDetails, PoolAddress, PoolsDataMap } from '../../services/midgard/types'
+import { MimirHalt } from '../../services/thorchain/types'
 import {
   ApiError,
   KeystoreState,
@@ -107,6 +108,7 @@ export type SwapProps = {
   isApprovedERC20Token$: (params: ApproveParams) => LiveData<ApiError, boolean>
   importWalletHandler: FP.Lazy<void>
   haltedChains: Chain[]
+  mimirHalt: MimirHalt
 }
 
 export const Swap = ({
@@ -132,7 +134,8 @@ export const Swap = ({
   reloadApproveFee,
   approveFee$,
   importWalletHandler,
-  haltedChains
+  haltedChains,
+  mimirHalt
 }: SwapProps) => {
   const intl = useIntl()
 
@@ -165,18 +168,29 @@ export const Swap = ({
     [oTargetPoolAsset]
   )
 
-  const isChainHalted = useMemo(() => PoolHelpers.isChainHalted(haltedChains), [haltedChains])
+  const disableAllPoolActions = useCallback(
+    (chain: Chain) => PoolHelpers.disableAllActions({ chain, haltedChains, mimirHalt }),
+    [haltedChains, mimirHalt]
+  )
+  const disableTradingPoolActions = useCallback(
+    (chain: Chain) => PoolHelpers.disableTradingActions({ chain, haltedChains, mimirHalt }),
+    [haltedChains, mimirHalt]
+  )
 
-  const hasHaltedChain = useMemo(
+  const disableSwapAction = useMemo(
     () =>
       FP.pipe(
         sequenceTOption(oSourceAsset, oTargetAsset),
         O.map(
-          ([{ chain: sourceChain }, { chain: targetChain }]) => isChainHalted(sourceChain) || isChainHalted(targetChain)
+          ([{ chain: sourceChain }, { chain: targetChain }]) =>
+            disableAllPoolActions(sourceChain) ||
+            disableTradingPoolActions(sourceChain) ||
+            disableAllPoolActions(targetChain) ||
+            disableTradingPoolActions(targetChain)
         ),
         O.getOrElse(() => true)
       ),
-    [isChainHalted, oSourceAsset, oTargetAsset]
+    [disableAllPoolActions, disableTradingPoolActions, oSourceAsset, oTargetAsset]
   )
 
   const assetsToSwap: O.Option<{ source: Asset; target: Asset }> = useMemo(
@@ -622,7 +636,7 @@ export const Swap = ({
         tooltipVisible={true}
         withLabel={true}
         tooltipPlacement={'top'}
-        disabled={unlockedWallet || hasHaltedChain}
+        disabled={unlockedWallet || disableSwapAction}
       />
     )
   }, [
@@ -631,7 +645,7 @@ export const Swap = ({
     sourceAssetAmountMax1e8,
     setAmountToSwapFromPercentValue,
     reloadFeesHandler,
-    hasHaltedChain
+    disableSwapAction
   ])
 
   const extraTxModalContent = useMemo(() => {
@@ -1078,7 +1092,7 @@ export const Swap = ({
 
   const disableSubmit: boolean = useMemo(
     () =>
-      hasHaltedChain ||
+      disableSwapAction ||
       unlockedWallet ||
       isZeroAmountToSwap ||
       walletBalancesLoading ||
@@ -1088,7 +1102,7 @@ export const Swap = ({
       minAmountError ||
       isCausedSlippage,
     [
-      hasHaltedChain,
+      disableSwapAction,
       unlockedWallet,
       isZeroAmountToSwap,
       walletBalancesLoading,

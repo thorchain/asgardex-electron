@@ -45,6 +45,8 @@ export const StoryBNB: BaseStory<never, JSX.Element> = () => (
     asset={AssetBNB}
     network="testnet"
     openExplorerTxUrl={openExplorerTxUrl}
+    disableSend={false}
+    disableUpgrade={false}
   />
 )
 StoryBNB.storyName = 'BNB'
@@ -56,9 +58,37 @@ export const StoryRuneTxSuccess: BaseStory<never, JSX.Element> = () => (
     asset={AssetRune67C}
     network="testnet"
     openExplorerTxUrl={openExplorerTxUrl}
+    disableSend={false}
+    disableUpgrade={false}
   />
 )
 StoryRuneTxSuccess.storyName = 'RUNE - tx success'
+
+export const StoryRuneNoSend: BaseStory<never, JSX.Element> = () => (
+  <AssetDetails
+    txsPageRD={RD.initial}
+    balances={balances}
+    asset={AssetRune67C}
+    network="testnet"
+    openExplorerTxUrl={openExplorerTxUrl}
+    disableSend={true}
+    disableUpgrade={false}
+  />
+)
+StoryRuneNoSend.storyName = 'RUNE - no send'
+
+export const StoryRuneNoUpgrade: BaseStory<never, JSX.Element> = () => (
+  <AssetDetails
+    txsPageRD={RD.initial}
+    balances={balances}
+    asset={AssetRune67C}
+    network="testnet"
+    openExplorerTxUrl={openExplorerTxUrl}
+    disableSend={false}
+    disableUpgrade={true}
+  />
+)
+StoryRuneNoUpgrade.storyName = 'RUNE - no upgrade'
 
 export const StoryRuneTxError: BaseStory<never, JSX.Element> = () => (
   <AssetDetails
@@ -67,6 +97,8 @@ export const StoryRuneTxError: BaseStory<never, JSX.Element> = () => (
     asset={AssetRune67C}
     network="testnet"
     openExplorerTxUrl={openExplorerTxUrl}
+    disableSend={false}
+    disableUpgrade={false}
   />
 )
 StoryRuneTxError.storyName = 'RUNE - tx error'
@@ -78,6 +110,8 @@ export const StoryRuneNoBalances: BaseStory<never, JSX.Element> = () => (
     asset={AssetRune67C}
     network="testnet"
     openExplorerTxUrl={openExplorerTxUrl}
+    disableSend={false}
+    disableUpgrade={false}
   />
 )
 StoryRuneNoBalances.storyName = 'RUNE - disabled - no balance'
@@ -89,6 +123,8 @@ export const StoryRuneFeeNotCovered: BaseStory<never, JSX.Element> = () => (
     asset={AssetRune67C}
     network="mainnet"
     openExplorerTxUrl={openExplorerTxUrl}
+    disableSend={false}
+    disableUpgrade={false}
   />
 )
 StoryRuneFeeNotCovered.storyName = 'RUNE - fee not covered'

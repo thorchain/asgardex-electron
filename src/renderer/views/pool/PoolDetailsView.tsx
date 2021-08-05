@@ -16,6 +16,8 @@ import { RefreshButton } from '../../components/uielements/button'
 import { ONE_BN } from '../../const'
 import { useAppContext } from '../../contexts/AppContext'
 import { useMidgardContext } from '../../contexts/MidgardContext'
+import * as PoolHelpers from '../../helpers/poolHelper'
+import { useMimirHalt } from '../../hooks/useMimirHalt'
 import { PoolDetailRouteParams } from '../../routes/pools/detail'
 import { DEFAULT_NETWORK } from '../../services/const'
 import { PoolDetailRD, PoolEarningHistoryRD, PoolStatsDetailRD } from '../../services/midgard/types'
@@ -32,7 +34,9 @@ const defaultDetailsProps: TargetPoolDetailProps = {
   poolDetail: getEmptyPoolDetail(),
   poolStatsDetail: getEmptyPoolStatsDetail(),
   earningsHistory: O.none,
-  network: DEFAULT_NETWORK
+  network: DEFAULT_NETWORK,
+  disableAllPoolActions: false,
+  disableTradingPoolAction: false
 }
 
 export const PoolDetailsView: React.FC = () => {
@@ -60,6 +64,16 @@ export const PoolDetailsView: React.FC = () => {
   const { asset } = useParams<PoolDetailRouteParams>()
 
   const [haltedChains] = useObservableState(() => FP.pipe(haltedChains$, RxOp.map(RD.getOrElse((): Chain[] => []))), [])
+  const { mimirHalt } = useMimirHalt()
+
+  const getDisableAllPoolActions = useCallback(
+    (chain: Chain) => PoolHelpers.disableAllActions({ chain, haltedChains, mimirHalt }),
+    [haltedChains, mimirHalt]
+  )
+  const getDisableTradingPoolAction = useCallback(
+    (chain: Chain) => PoolHelpers.disableTradingActions({ chain, haltedChains, mimirHalt }),
+    [haltedChains, mimirHalt]
+  )
 
   const oRouteAsset = useMemo(() => O.fromNullable(assetFromString(asset.toUpperCase())), [asset])
 
@@ -109,8 +123,8 @@ export const PoolDetailsView: React.FC = () => {
             FP.pipe(
               RD.combine(poolDetailRD, poolStatsDetailRD, poolEarningHistoryRD),
               RD.fold(
-                () => <PoolDetails haltedChains={haltedChains} asset={asset} {...defaultDetailsProps} />,
-                () => <PoolDetails haltedChains={haltedChains} asset={asset} {...prevProps.current} isLoading />,
+                () => <PoolDetails asset={asset} {...defaultDetailsProps} />,
+                () => <PoolDetails asset={asset} {...prevProps.current} isLoading />,
                 ({ message }: Error) => {
                   return <ErrorView title={message} />
                 },
@@ -123,10 +137,12 @@ export const PoolDetailsView: React.FC = () => {
                     earningsHistory: poolEarningHistory,
                     priceSymbol: O.toUndefined(priceSymbol),
                     HistoryView: PoolHistory,
-                    ChartView: PoolChartView
+                    ChartView: PoolChartView,
+                    disableAllPoolActions: getDisableAllPoolActions(asset.chain),
+                    disableTradingPoolAction: getDisableTradingPoolAction(asset.chain)
                   }
 
-                  return <PoolDetails haltedChains={haltedChains} asset={asset} {...prevProps.current} />
+                  return <PoolDetails asset={asset} {...prevProps.current} />
                 }
               )
             )

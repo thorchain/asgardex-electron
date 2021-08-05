@@ -1,7 +1,7 @@
 import React, { useCallback, useMemo, useState } from 'react'
 
 import { Address } from '@xchainjs/xchain-client'
-import { Asset, AssetAmount, AssetRuneNative, assetToBase, assetToString, BaseAmount } from '@xchainjs/xchain-util'
+import { Asset, AssetAmount, assetToBase, assetToString, BaseAmount } from '@xchainjs/xchain-util'
 import { Row, Col, Grid } from 'antd'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
@@ -34,6 +34,8 @@ type Props = {
   reloadBalancesHandler?: FP.Lazy<void>
   loadTxsHandler?: LoadTxsHandler
   walletAddress?: O.Option<Address>
+  disableSend: boolean
+  disableUpgrade: boolean
   network: Network
 }
 
@@ -47,6 +49,8 @@ export const AssetDetails: React.FC<Props> = (props): JSX.Element => {
     openExplorerTxUrl,
     openExplorerAddressUrl,
     walletAddress: oWalletAddress = O.none,
+    disableSend,
+    disableUpgrade,
     network
   } = props
 
@@ -102,8 +106,6 @@ export const AssetDetails: React.FC<Props> = (props): JSX.Element => {
     [asset]
   )
 
-  const isRuneNativeAsset: boolean = useMemo(() => eqAsset.equals(asset, AssetRuneNative), [asset])
-
   const getNonNativeRuneBalance: O.Option<(balances: WalletBalances) => O.Option<AssetAmount>> = useMemo(
     () =>
       FP.pipe(
@@ -127,14 +129,14 @@ export const AssetDetails: React.FC<Props> = (props): JSX.Element => {
 
   const runeUpgradeDisabled: boolean = useMemo(() => {
     return (
-      isNonNativeRuneAsset &&
+      disableUpgrade &&
       FP.pipe(
         oNonNativeRuneAmount,
         O.map((amount) => amount.lt(0)),
         O.getOrElse<boolean>(() => true)
       )
     )
-  }, [isNonNativeRuneAsset, oNonNativeRuneAmount])
+  }, [disableUpgrade, oNonNativeRuneAmount])
 
   const walletInfo = useMemo(
     () =>
@@ -169,7 +171,12 @@ export const AssetDetails: React.FC<Props> = (props): JSX.Element => {
           <Styled.ActionCol sm={{ span: actionColSpanMobile }} md={{ span: actionColSpanDesktop }}>
             <Styled.ActionWrapper>
               <Row justify="center">
-                <Button type="primary" round="true" sizevalue="xnormal" onClick={walletActionSendClick}>
+                <Button
+                  type="primary"
+                  round="true"
+                  sizevalue="xnormal"
+                  onClick={disableSend ? undefined : walletActionSendClick}
+                  disabled={disableSend}>
                   {intl.formatMessage({ id: 'wallet.action.send' })}
                 </Button>
               </Row>
@@ -184,7 +191,7 @@ export const AssetDetails: React.FC<Props> = (props): JSX.Element => {
                     round="true"
                     sizevalue="xnormal"
                     color="warning"
-                    onClick={walletActionUpgradeNonNativeRuneClick}
+                    onClick={runeUpgradeDisabled ? undefined : walletActionUpgradeNonNativeRuneClick}
                     disabled={runeUpgradeDisabled}>
                     {intl.formatMessage({ id: 'wallet.action.upgrade' })}
                   </Button>
@@ -192,11 +199,16 @@ export const AssetDetails: React.FC<Props> = (props): JSX.Element => {
               </Styled.ActionWrapper>
             </Styled.ActionCol>
           )}
-          {isRuneNativeAsset && (
+          {AssetHelper.isRuneNativeAsset(asset) && (
             <Styled.ActionCol sm={{ span: actionColSpanMobile }} md={{ span: actionColSpanDesktop }}>
               <Styled.ActionWrapper>
                 <Row justify="center">
-                  <Button typevalue="outline" round="true" sizevalue="xnormal" onClick={walletActionDepositClick}>
+                  <Button
+                    typevalue="outline"
+                    round="true"
+                    sizevalue="xnormal"
+                    onClick={disableSend ? undefined : walletActionDepositClick}
+                    disabled={disableSend}>
                     {intl.formatMessage({ id: 'wallet.action.deposit' })}
                   </Button>
                 </Row>

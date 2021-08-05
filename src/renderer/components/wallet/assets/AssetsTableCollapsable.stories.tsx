@@ -159,6 +159,7 @@ export const Default: Story<Partial<Record<Chain, RDStatus>>> = (args) => {
       poolDetails={[]}
       pricePool={RUNE_PRICE_POOL}
       network="testnet"
+      mimirHalt={RD.initial}
     />
   )
 }

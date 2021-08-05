@@ -20,6 +20,7 @@ import { useMidgardContext } from '../../contexts/MidgardContext'
 import { useThorchainContext } from '../../contexts/ThorchainContext'
 import { useWalletContext } from '../../contexts/WalletContext'
 import { sequenceTOption } from '../../helpers/fpHelpers'
+import { useMimirHalt } from '../../hooks/useMimirHalt'
 import { DepositRouteParams } from '../../routes/pools/deposit'
 import { AssetWithDecimalLD, AssetWithDecimalRD } from '../../services/chain/types'
 import { PoolDetailRD, PoolSharesLD, PoolSharesRD } from '../../services/midgard/types'
@@ -51,7 +52,7 @@ export const DepositView: React.FC<Props> = () => {
   } = useMidgardContext()
 
   const [haltedChains] = useObservableState(() => FP.pipe(haltedChains$, RxOp.map(RD.getOrElse((): Chain[] => []))), [])
-
+  const { mimirHalt } = useMimirHalt()
   const { keystoreService, reloadBalancesByChain } = useWalletContext()
 
   const { addressByChain$, assetWithDecimal$ } = useChainContext()
@@ -208,6 +209,7 @@ export const DepositView: React.FC<Props> = () => {
           (asset) => (
             <Deposit
               haltedChains={haltedChains}
+              mimirHalt={mimirHalt}
               poolDetail={poolDetailRD}
               asset={asset}
               shares={poolSharesRD}

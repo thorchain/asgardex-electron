@@ -66,16 +66,23 @@ export type NodeDataRD = RD.RemoteData<ApiError, NodeInfo>
 
 export type ThorNodeApiUrlLD = LiveData<ApiError, string>
 
-// Note: Currently we are interested in `MAXIMUMLIQUIDITYRUNE` only
+// https://thornode.thorchain.info/thorchain/mimir
 export const MimirIO = t.type({
   'mimir//MAXIMUMLIQUIDITYRUNE': t.union([t.number, t.undefined]),
-  'mimir//POOLCYCLE': t.union([t.number, t.undefined])
+  'mimir//POOLCYCLE': t.union([t.number, t.undefined]),
+  'mimir//HALTTRADING': t.union([t.number, t.undefined]),
+  'mimir//HALTTHORCHAIN': t.union([t.number, t.undefined]),
+  'mimir//HALTETHCHAIN': t.union([t.number, t.undefined]),
+  'mimir//HALTETHTRADING': t.union([t.number, t.undefined])
 })
 
 export type Mimir = t.TypeOf<typeof MimirIO>
 
 export type MimirLD = LiveData<Error, Mimir>
 export type MimirRD = RD.RemoteData<Error, Mimir>
+
+export type MimirHalt = { haltEthTrading: boolean; haltEthChain: boolean; haltThorChain: boolean; haltTrading: boolean }
+export type MimirHaltRD = RD.RemoteData<Error, MimirHalt>
 
 export type GetLiquidityProvidersParams = {
   asset: Asset

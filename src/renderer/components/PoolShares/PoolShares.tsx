@@ -16,6 +16,7 @@ import { useIntl } from 'react-intl'
 
 import { Network } from '../../../shared/api/types'
 import * as PoolHelpers from '../../helpers/poolHelper'
+import { MimirHalt } from '../../services/thorchain/types'
 import { AssetIcon } from '../uielements/assets/assetIcon'
 import { AssetLabel } from '../uielements/assets/assetLabel'
 import { Label } from '../uielements/label'
@@ -29,9 +30,18 @@ export type Props = {
   network: Network
   openShareInfo: FP.Lazy<void>
   haltedChains: Chain[]
+  mimirHalt: MimirHalt
 }
 
-export const PoolShares: React.FC<Props> = ({ data, priceAsset, openShareInfo, loading, network, haltedChains }) => {
+export const PoolShares: React.FC<Props> = ({
+  data,
+  priceAsset,
+  openShareInfo,
+  loading,
+  network,
+  haltedChains,
+  mimirHalt
+}) => {
   const intl = useIntl()
 
   const isDesktopView = Grid.useBreakpoint()?.lg ?? false
@@ -120,17 +130,16 @@ export const PoolShares: React.FC<Props> = ({ data, priceAsset, openShareInfo, l
     []
   )
 
-  const isChainHalted = useMemo(() => PoolHelpers.isChainHalted(haltedChains), [haltedChains])
-
   const manageColumn: ColumnType<PoolShareTableRowData> = useMemo(
     () => ({
       title: '',
       align: 'right',
-      render: ({ asset }: PoolShareTableRowData) => (
-        <Styled.ManageButton disabled={isChainHalted(asset.chain)} asset={asset} isTextView={isDesktopView} />
-      )
+      render: ({ asset }: PoolShareTableRowData) => {
+        const disablePool = PoolHelpers.disableAllActions({ chain: asset.chain, haltedChains, mimirHalt })
+        return <Styled.ManageButton disabled={disablePool} asset={asset} isTextView={isDesktopView} />
+      }
     }),
-    [isDesktopView, isChainHalted]
+    [haltedChains, mimirHalt, isDesktopView]
   )
 
   const desktopColumns: ColumnsType<PoolShareTableRowData> = useMemo(

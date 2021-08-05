@@ -13,6 +13,7 @@ import { useAppContext } from '../../contexts/AppContext'
 import { useMidgardContext } from '../../contexts/MidgardContext'
 import { useWalletContext } from '../../contexts/WalletContext'
 import { RUNE_PRICE_POOL } from '../../helpers/poolHelper'
+import { useMimirHalt } from '../../hooks/useMimirHalt'
 import * as walletRoutes from '../../routes/wallet'
 import { DEFAULT_NETWORK } from '../../services/const'
 import { ChainBalances } from '../../services/wallet/types'
@@ -59,6 +60,8 @@ export const AssetsView: React.FC = (): JSX.Element => {
 
   const poolDetails = RD.toNullable(poolsRD)?.poolDetails ?? []
 
+  const { mimirHaltRD } = useMimirHalt()
+
   return (
     <AssetsTableCollapsable
       chainBalances={chainBalances}
@@ -66,6 +69,7 @@ export const AssetsView: React.FC = (): JSX.Element => {
       poolDetails={poolDetails}
       selectAssetHandler={selectAssetHandler}
       setSelectedAsset={setSelectedAsset}
+      mimirHalt={mimirHaltRD}
       network={network}
     />
   )

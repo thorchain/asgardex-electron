@@ -2,7 +2,7 @@ import React, { useMemo } from 'react'
 
 import { SwapOutlined } from '@ant-design/icons'
 import { AssetRune } from '@xchainjs/xchain-thorchain'
-import { Asset, AssetAmount, assetToString, Chain, formatAssetAmount } from '@xchainjs/xchain-util'
+import { Asset, AssetAmount, assetToString, formatAssetAmount } from '@xchainjs/xchain-util'
 import { Grid } from 'antd'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
@@ -10,7 +10,6 @@ import { useIntl } from 'react-intl'
 import { useHistory } from 'react-router-dom'
 
 import { Network } from '../../../shared/api/types'
-import * as PoolHelpers from '../../helpers/poolHelper'
 import { loadingString } from '../../helpers/stringHelper'
 import * as poolsRoutes from '../../routes/pools'
 import { GetPoolsStatusEnum } from '../../types/generated/midgard'
@@ -24,7 +23,8 @@ export type Props = {
   price: AssetAmount
   priceSymbol?: string
   isLoading?: boolean
-  haltedChains?: Chain[]
+  disableTradingPoolAction: boolean
+  disableAllPoolActions: boolean
   network: Network
   status: GetPoolsStatusEnum
 }
@@ -33,7 +33,8 @@ export const PoolTitle: React.FC<Props> = ({
   asset: oAsset,
   price,
   priceSymbol,
-  haltedChains = [],
+  disableTradingPoolAction,
+  disableAllPoolActions,
   network,
   isLoading,
   status
@@ -80,17 +81,6 @@ export const PoolTitle: React.FC<Props> = ({
     [oAsset, isDesktopView, network]
   )
 
-  const disableButton = useMemo(
-    () =>
-      FP.pipe(
-        oAsset,
-        O.map(({ chain }) => chain),
-        O.map(PoolHelpers.isChainHalted(haltedChains)),
-        O.getOrElse(() => true)
-      ),
-    [haltedChains, oAsset]
-  )
-
   const priceStr = useMemo(() => {
     if (isLoading) return loadingString
 
@@ -113,14 +103,14 @@ export const PoolTitle: React.FC<Props> = ({
             return (
               <Styled.ButtonActions>
                 <ManageButton
-                  disabled={disableButton}
+                  disabled={disableAllPoolActions}
                   asset={asset}
                   sizevalue={isDesktopView ? 'normal' : 'small'}
                   isTextView={isDesktopView}
                 />
                 {status === GetPoolsStatusEnum.Available && (
                   <Button
-                    disabled={disableButton}
+                    disabled={disableAllPoolActions || disableTradingPoolAction}
                     round="true"
                     sizevalue={isDesktopView ? 'normal' : 'small'}
                     style={{ height: 30 }}
@@ -140,7 +130,7 @@ export const PoolTitle: React.FC<Props> = ({
           }
         )
       ),
-    [oAsset, disableButton, isDesktopView, status, intl, history]
+    [oAsset, disableAllPoolActions, isDesktopView, status, disableTradingPoolAction, intl, history]
   )
 
   return (

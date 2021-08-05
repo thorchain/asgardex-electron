@@ -195,8 +195,10 @@ const getLiquidityProvider = ({
 
 const { stream$: reloadMimir$, trigger: reloadMimir } = triggerStream()
 
+const mimirInterval$ = Rx.timer(0 /* no delay for first value */, 5 * 60 * 1000 /* others are delayed by 5 min  */)
+
 const mimir$: MimirLD = FP.pipe(
-  reloadMimir$,
+  Rx.combineLatest([reloadMimir$, mimirInterval$]),
   RxOp.debounceTime(300),
   RxOp.switchMap(() => network$),
   RxOp.switchMap((network) => thorNodeApiAddress$(network)),

@@ -38,6 +38,7 @@ import {
 } from '../../../services/chain/types'
 import { OpenExplorerTxUrl } from '../../../services/clients'
 import { PoolsDataMap } from '../../../services/midgard/types'
+import { MimirHalt } from '../../../services/thorchain/types'
 import { ValidatePasswordHandler } from '../../../services/wallet/types'
 import { AssetWithDecimal } from '../../../types/asgardex'
 import { PasswordModal } from '../../modal/password'
@@ -75,6 +76,7 @@ export type Props = {
   network: Network
   poolsData: PoolsDataMap
   haltedChains: Chain[]
+  mimirHalt: MimirHalt
 }
 
 /**
@@ -99,15 +101,18 @@ export const Withdraw: React.FC<Props> = ({
   fees$,
   network,
   poolsData,
-  haltedChains
+  haltedChains,
+  mimirHalt
 }) => {
   const intl = useIntl()
 
   const { asset, decimal: assetDecimal } = assetWD
 
-  const isChainHalted = useMemo(() => PoolHelpers.isChainHalted(haltedChains), [haltedChains])
-
-  const haltedChain = useMemo(() => isChainHalted(asset.chain), [asset, isChainHalted])
+  // Disable withdraw in case all pool actions are disabled
+  const disableWithdrawAction = useMemo(
+    () => PoolHelpers.disableAllActions({ chain: asset.chain, haltedChains, mimirHalt }),
+    [asset.chain, haltedChains, mimirHalt]
+  )
 
   const [withdrawPercent, setWithdrawPercent] = useState(disabled ? 0 : 50)
 
@@ -373,13 +378,20 @@ export const Withdraw: React.FC<Props> = ({
 
   const disabledSubmit = useMemo(
     () =>
-      haltedChain ||
+      disableWithdrawAction ||
       zeroWithdrawPercent ||
       disabled ||
       minAssetAmountError ||
       minRuneAmountError ||
       isInboundChainFeeError,
-    [zeroWithdrawPercent, disabled, minAssetAmountError, minRuneAmountError, isInboundChainFeeError, haltedChain]
+    [
+      zeroWithdrawPercent,
+      disabled,
+      minAssetAmountError,
+      minRuneAmountError,
+      isInboundChainFeeError,
+      disableWithdrawAction
+    ]
   )
 
   return (
@@ -414,7 +426,7 @@ export const Withdraw: React.FC<Props> = ({
         value={withdrawPercent}
         onChange={setWithdrawPercent}
         onAfterChange={reloadFeesHandler}
-        disabled={disabled || haltedChain}
+        disabled={disabled || disableWithdrawAction}
         error={minRuneAmountError || minAssetAmountError}
       />
       <Label weight="bold" textTransform="uppercase">

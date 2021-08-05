@@ -33,7 +33,7 @@ import { OpenExplorerTxUrl } from '../../../services/clients'
 import { DEFAULT_NETWORK } from '../../../services/const'
 import { PoolAddress, PoolAssetsRD, PoolDetailRD } from '../../../services/midgard/types'
 import { toPoolData } from '../../../services/midgard/utils'
-import { LiquidityProviderRD, PendingAssetsRD } from '../../../services/thorchain/types'
+import { LiquidityProviderRD, MimirHalt, PendingAssetsRD } from '../../../services/thorchain/types'
 import { INITIAL_BALANCES_STATE } from '../../../services/wallet/const'
 import { getBalanceByAsset } from '../../../services/wallet/util'
 import { AssetsWithAmount1e8, AssetWithDecimal } from '../../../types/asgardex'
@@ -43,11 +43,18 @@ type Props = {
   asset: AssetWithDecimal
   poolDetail: PoolDetailRD
   haltedChains: Chain[]
+  mimirHalt: MimirHalt
   liquidityProvider: LiquidityProviderRD
 }
 
 export const SymDepositView: React.FC<Props> = (props) => {
-  const { asset: assetWD, poolDetail: poolDetailRD, haltedChains, liquidityProvider: liquidityProviderRD } = props
+  const {
+    asset: assetWD,
+    poolDetail: poolDetailRD,
+    mimirHalt,
+    haltedChains,
+    liquidityProvider: liquidityProviderRD
+  } = props
   const { asset } = assetWD
   const history = useHistory()
   const intl = useIntl()
@@ -206,6 +213,7 @@ export const SymDepositView: React.FC<Props> = (props) => {
         )}
         <SymDeposit
           haltedChains={haltedChains}
+          mimirHalt={mimirHalt}
           validatePassword$={validatePassword$}
           openRuneExplorerTxUrl={openRuneExplorerTxUrl}
           openAssetExplorerTxUrl={openAssetExplorerTxUrl}
@@ -244,6 +252,7 @@ export const SymDepositView: React.FC<Props> = (props) => {
     [
       intl,
       haltedChains,
+      mimirHalt,
       validatePassword$,
       openRuneExplorerTxUrl,
       openAssetExplorerTxUrl,
@@ -279,6 +288,7 @@ export const SymDepositView: React.FC<Props> = (props) => {
           <>
             <SymDeposit
               haltedChains={haltedChains}
+              mimirHalt={mimirHalt}
               validatePassword$={validatePassword$}
               openRuneExplorerTxUrl={openRuneExplorerTxUrl}
               openAssetExplorerTxUrl={openAssetExplorerTxUrl}

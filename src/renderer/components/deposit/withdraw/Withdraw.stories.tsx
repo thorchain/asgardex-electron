@@ -19,10 +19,12 @@ import { mockValidatePassword$ } from '../../../../shared/mock/wallet'
 import { BNB_DECIMAL, THORCHAIN_DECIMAL } from '../../../helpers/assetHelper'
 import { INITIAL_WITHDRAW_STATE } from '../../../services/chain/const'
 import { WithdrawState$ } from '../../../services/chain/types'
+import { DEFAULT_MIMIR_HALT } from '../../../services/thorchain/const'
 import { Withdraw, Props as WitdrawProps } from './Withdraw'
 
 const defaultProps: WitdrawProps = {
   haltedChains: [],
+  mimirHalt: DEFAULT_MIMIR_HALT,
   asset: { asset: AssetBNB, decimal: BNB_DECIMAL },
   runePrice: bn(1),
   assetPrice: bn(60.972),
