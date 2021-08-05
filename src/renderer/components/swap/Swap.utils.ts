@@ -1,12 +1,12 @@
 import { getDoubleSwapOutput, getDoubleSwapSlip, getSwapOutput, getSwapSlip } from '@thorchain/asgardex-util'
-import { Asset, assetToString, bn, BaseAmount } from '@xchainjs/xchain-util'
+import { Asset, assetToString, bn, BaseAmount, baseAmount } from '@xchainjs/xchain-util'
 import BigNumber from 'bignumber.js'
 import * as A from 'fp-ts/Array'
 import * as E from 'fp-ts/Either'
 import * as FP from 'fp-ts/function'
 import * as O from 'fp-ts/Option'
 
-import { ZERO_BASE_AMOUNT, ZERO_BN } from '../../const'
+import { ASGARDEX_SWAP_IDENTIFIER, ZERO_BASE_AMOUNT, ZERO_BN } from '../../const'
 import {
   isChainAsset,
   isRuneNativeAsset,
@@ -19,6 +19,7 @@ import { sequenceTOption } from '../../helpers/fpHelpers'
 import { priceFeeAmountForAsset } from '../../services/chain/fees/utils'
 import { SwapFees } from '../../services/chain/types'
 import { PoolAssetDetail, PoolAssetDetails, PoolsDataMap } from '../../services/midgard/types'
+import { SlipTolerance } from '../../types/asgardex'
 import { SwapData } from './Swap.types'
 
 /**
@@ -147,6 +148,15 @@ export const getSwapData = ({
     }),
     O.getOrElse(() => DEFAULT_SWAP_DATA)
   )
+
+/**
+ * Returns `BaseAmount` with asgardex identifier counted into the limit
+ */
+export const getSwapLimit = (swapResultAmountMax1e8: BaseAmount, slipTolerance: SlipTolerance): BaseAmount => {
+  const swapLimit: BaseAmount = swapResultAmountMax1e8.times(1.0 - slipTolerance * 0.01)
+  const swapLimitWithIdentifier: number = +swapLimit.amount().toString().slice(0, -3).concat(ASGARDEX_SWAP_IDENTIFIER)
+  return baseAmount(bn(swapLimitWithIdentifier))
+}
 
 export const pickPoolAsset = (assets: PoolAssetDetails, asset: Asset): O.Option<PoolAssetDetail> =>
   FP.pipe(

@@ -26,7 +26,7 @@ import { useIntl } from 'react-intl'
 import * as RxOp from 'rxjs/operators'
 
 import { Network } from '../../../shared/api/types'
-import { ASGARDEX_SWAP_IDENTIFIER, ZERO_BASE_AMOUNT } from '../../const'
+import { ZERO_BASE_AMOUNT } from '../../const'
 import {
   getEthTokenAddress,
   isEthAsset,
@@ -270,9 +270,11 @@ export const Swap = ({
           asset: source,
           // Decimal needs to be converted back for using orginal decimal of source asset
           amount: convertBaseAmountDecimal(amountToSwapMax1e8, sourceAssetDecimal),
-          memo: getSwapMemo({ asset: target, address, limit: swapResultAmountMax1e8.times(1.0 - slipTolerance * 0.01) })
-            .slice(0, -3)
-            .concat(ASGARDEX_SWAP_IDENTIFIER)
+          memo: getSwapMemo({
+            asset: target,
+            address,
+            limit: Utils.getSwapLimit(swapResultAmountMax1e8, slipTolerance)
+          })
         }
       })
     )
