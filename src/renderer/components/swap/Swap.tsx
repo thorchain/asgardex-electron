@@ -270,7 +270,11 @@ export const Swap = ({
           asset: source,
           // Decimal needs to be converted back for using orginal decimal of source asset
           amount: convertBaseAmountDecimal(amountToSwapMax1e8, sourceAssetDecimal),
-          memo: getSwapMemo({ asset: target, address, limit: swapResultAmountMax1e8.times(1.0 - slipTolerance * 0.01) })
+          memo: getSwapMemo({
+            asset: target,
+            address,
+            limit: Utils.getSwapLimit(swapResultAmountMax1e8, slipTolerance)
+          })
         }
       })
     )
