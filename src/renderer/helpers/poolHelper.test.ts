@@ -18,7 +18,13 @@ import { ASSETS_TESTNET } from '../../shared/mock/assets'
 import { PoolDetails } from '../services/midgard/types'
 import { toPoolData } from '../services/midgard/utils'
 import { GetPoolsStatusEnum, PoolDetail } from '../types/generated/midgard'
-import { disableAllActions, getDeepestPool, getPoolPriceValue, getPoolTableRowsData } from './poolHelper'
+import {
+  disableAllActions,
+  disableTradingActions,
+  getDeepestPool,
+  getPoolPriceValue,
+  getPoolTableRowsData
+} from './poolHelper'
 
 describe('helpers/poolHelper/', () => {
   const mockPoolDetail: PoolDetail = {
@@ -183,7 +189,7 @@ describe('helpers/poolHelper/', () => {
       })
       expect(result).toBeTruthy()
     })
-    it('true for ETH if ETH trading is halted', () => {
+    it('true for ETH if ETH chain is halted', () => {
       const result = disableAllActions({
         chain: ETHChain,
         haltedChains,
@@ -191,7 +197,7 @@ describe('helpers/poolHelper/', () => {
       })
       expect(result).toBeTruthy()
     })
-    it('false for a chain, if it is not in halted list, but ETH trading is halted', () => {
+    it('false for a chain, if it is not in halted list, but ETH chain is halted', () => {
       const result = disableAllActions({
         chain: LTCChain,
         haltedChains,
@@ -220,6 +226,66 @@ describe('helpers/poolHelper/', () => {
         chain: LTCChain,
         haltedChains,
         mimirHalt: { haltThorChain: false, haltEthChain: false }
+      })
+      expect(result).toBeFalsy()
+    })
+  })
+
+  describe.only('disableTradingActions', () => {
+    const haltedChains = [ETHChain, BNBChain]
+    it('true for any chain if trading is halted', () => {
+      const result = disableTradingActions({
+        chain: BNBChain,
+        haltedChains,
+        mimirHalt: { haltTrading: true, haltEthTrading: false }
+      })
+      expect(result).toBeTruthy()
+    })
+    it('true if chain is not in halted list, but trading is halted', () => {
+      const result = disableTradingActions({
+        chain: LTCChain,
+        haltedChains,
+        mimirHalt: { haltTrading: true, haltEthTrading: false }
+      })
+      expect(result).toBeTruthy()
+    })
+    it('true for ETH if ETH trading is halted', () => {
+      const result = disableTradingActions({
+        chain: ETHChain,
+        haltedChains,
+        mimirHalt: { haltTrading: false, haltEthTrading: true }
+      })
+      expect(result).toBeTruthy()
+    })
+    it('false for a chain, if it is not in halted list, but ETH trading is halted', () => {
+      const result = disableTradingActions({
+        chain: LTCChain,
+        haltedChains,
+        mimirHalt: { haltTrading: false, haltEthTrading: true }
+      })
+      expect(result).toBeFalsy()
+    })
+    it('true if ETH is in halted list, but no mimir trading halt', () => {
+      const result = disableTradingActions({
+        chain: ETHChain,
+        haltedChains,
+        mimirHalt: { haltTrading: false, haltEthTrading: false }
+      })
+      expect(result).toBeTruthy()
+    })
+    it('true if BNB is in halted list, but no mimir trading halt', () => {
+      const result = disableTradingActions({
+        chain: BNBChain,
+        haltedChains,
+        mimirHalt: { haltTrading: false, haltEthTrading: false }
+      })
+      expect(result).toBeTruthy()
+    })
+    it('false if no mimir trading halt + chain is not in halted list', () => {
+      const result = disableTradingActions({
+        chain: LTCChain,
+        haltedChains,
+        mimirHalt: { haltTrading: false, haltEthTrading: false }
       })
       expect(result).toBeFalsy()
     })
