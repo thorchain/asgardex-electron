@@ -8,7 +8,7 @@ import * as O from 'fp-ts/Option'
 import * as Rx from 'rxjs'
 import * as RxOp from 'rxjs/operators'
 
-import { getEthAssetAddress } from '../../helpers/assetHelper'
+import { addressInERC20Blacklist, getEthAssetAddress } from '../../helpers/assetHelper'
 import { sequenceSOption } from '../../helpers/fpHelpers'
 import { LiveData } from '../../helpers/rx/liveData'
 import { SendPoolTxParams } from '../chain/types'
@@ -90,15 +90,27 @@ export const createTransactionService = (client$: Client$): TransactionService =
       )
     )
 
-  const runApproveERC20Token$ = (client: EthClient, { ...params }: ApproveParams): TxHashLD =>
-    Rx.from(
-      client.approve({
-        ...params,
-        walletIndex: 0,
-        feeOptionKey: FeeOption.Fast,
-        gasLimitFallback: '65000'
-      })
-    ).pipe(
+  const runApproveERC20Token$ = (client: EthClient, { ...params }: ApproveParams): TxHashLD => {
+    // check contract address before approving
+    const contractAddress = params.contractAddress
+    if (addressInERC20Blacklist(contractAddress))
+      return Rx.of(
+        RD.failure({
+          msg: `Contract address ${contractAddress} is black listed`,
+          errorId: ErrorId.APPROVE_TX
+        })
+      )
+
+    // send approve tx
+    return FP.pipe(
+      Rx.from(
+        client.approve({
+          ...params,
+          walletIndex: 0,
+          feeOptionKey: FeeOption.Fast,
+          gasLimitFallback: '65000'
+        })
+      ),
       RxOp.switchMap((txResult) => Rx.from(txResult.wait(1))),
       RxOp.map(({ transactionHash }) => transactionHash),
       RxOp.map(RD.success),
@@ -113,6 +125,7 @@ export const createTransactionService = (client$: Client$): TransactionService =
       ),
       RxOp.startWith(RD.pending)
     )
+  }
 
   const approveERC20Token$ = (params: ApproveParams): TxHashLD =>
     client$.pipe(

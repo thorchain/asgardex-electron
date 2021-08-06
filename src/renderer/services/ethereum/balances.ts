@@ -1,5 +1,9 @@
 import { Asset } from '@xchainjs/xchain-util'
+import * as A from 'fp-ts/lib/Array'
+import * as FP from 'fp-ts/lib/function'
 
+import { assetInERC20Blacklist } from '../../helpers/assetHelper'
+import { liveData } from '../../helpers/rx/liveData'
 import { observableState } from '../../helpers/stateHelper'
 import * as C from '../clients'
 import { client$ } from './common'
@@ -21,6 +25,10 @@ const reloadBalances = () => {
 
 // State of balances loaded by Client
 const balances$: (assets?: Asset[]) => C.WalletBalancesLD = (assets?: Asset[]) =>
-  C.balances$(client$, reloadBalances$, assets)
+  FP.pipe(
+    C.balances$(client$, reloadBalances$, assets),
+    // Filter out black listed assets
+    liveData.map(FP.flow(A.filter(({ asset }) => !assetInERC20Blacklist(asset))))
+  )
 
 export { reloadBalances, balances$, reloadBalances$, resetReloadBalances }

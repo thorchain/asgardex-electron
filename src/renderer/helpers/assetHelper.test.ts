@@ -16,7 +16,15 @@ import {
 import * as O from 'fp-ts/lib/Option'
 
 import { ERC20_TESTNET } from '../../shared/mock/assets'
-import { AssetBUSDBAF, AssetBUSDBD1, AssetUSDTERC20, AssetXRune, AssetXRuneTestnet } from '../const'
+import {
+  AssetBUSDBAF,
+  AssetBUSDBD1,
+  AssetUniH,
+  AssetUniHAddress,
+  AssetUSDTERC20,
+  AssetXRune,
+  AssetXRuneTestnet
+} from '../const'
 import {
   isBchAsset,
   isBnbAsset,
@@ -37,7 +45,9 @@ import {
   to1e8BaseAmount,
   getTwoSigfigAssetAmount,
   isXRuneAsset,
-  disableRuneUpgrade
+  disableRuneUpgrade,
+  assetInERC20Blacklist,
+  addressInERC20Blacklist
 } from './assetHelper'
 import { eqAsset, eqAssetAmount, eqBaseAmount } from './fp/eq'
 
@@ -150,6 +160,24 @@ describe('helpers/assetHelper', () => {
     })
     it('is returns None for non ETH assets', () => {
       expect(getEthAssetAddress(AssetRuneNative)).toBeNone()
+    })
+  })
+
+  describe('assetInERC20Blacklist', () => {
+    it('ETH (non black listed)', () => {
+      expect(assetInERC20Blacklist(AssetETH)).toBeFalsy()
+    })
+    it('UNIH (black listed)', () => {
+      expect(assetInERC20Blacklist(AssetUniH)).toBeTruthy()
+    })
+  })
+
+  describe('assetInERC20Blacklist', () => {
+    it('USDT (non black listed)', () => {
+      expect(addressInERC20Blacklist('0xdb99328b43b86037f80b43c3dbd203f00f056b75')).toBeFalsy()
+    })
+    it('UNIH (black listed)', () => {
+      expect(addressInERC20Blacklist(AssetUniHAddress)).toBeTruthy()
     })
   })
 

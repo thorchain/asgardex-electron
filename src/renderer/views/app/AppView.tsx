@@ -64,14 +64,14 @@ export const AppView: React.FC = (): JSX.Element => {
           let msg = ''
           // 1. Check THORCHain status provided by `mimir`
           if (haltThorChain) {
-            msg = 'THORChain is halted temporary for maintenance.'
+            msg = 'THORChain is halted temporarily.'
           } else if (haltTrading) {
-            msg = 'Trading for all pools is halted temporary for maintenance.'
+            msg = 'Trading for all pools is halted temporarily.'
           } else if (haltEthChain) {
             // 2. Check ETH status provided by `mimir`
-            msg = `ETH chain is halted temporary for maintenance.`
+            msg = `ETH chain is halted temporarily.`
           } else if (haltEthTrading) {
-            msg = `Trading for ETH is halted temporary for maintenance.`
+            msg = `Trading for ETH is halted temporarily.`
           }
           // Filter ETH chain out to avoid duplicated messages
           if (haltEthChain || haltEthTrading) chains = FP.pipe(chains, A.filter(FP.not(isEthChain)))
