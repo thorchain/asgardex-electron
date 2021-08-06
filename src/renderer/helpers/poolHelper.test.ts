@@ -231,7 +231,7 @@ describe('helpers/poolHelper/', () => {
     })
   })
 
-  describe.only('disableTradingActions', () => {
+  describe('disableTradingActions', () => {
     const haltedChains = [ETHChain, BNBChain]
     it('true for any chain if trading is halted', () => {
       const result = disableTradingActions({

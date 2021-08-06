@@ -81,6 +81,19 @@ export const ERC20Assets = [
 ]
 export const ETHAssets = [AssetETH, ...ERC20Assets]
 
+// UNIH (exploit contract)
+// https://etherscan.io/address/0x4bf5dc91E2555449293D7824028Eb8Fe5879B689
+export const AssetUniHAddress = '0x4bf5dc91E2555449293D7824028Eb8Fe5879B689'
+const AssetUniHSymbol = 'UNIH'
+export const AssetUniH: Asset = {
+  chain: ETHChain,
+  symbol: `${AssetUniHSymbol}-${AssetUniHAddress}`,
+  ticker: AssetUniHSymbol
+}
+
+// Black listed ERC20 assets
+export const ERC20BlackList = [AssetUniH]
+
 //
 // All of following assets are needed for pricing USD
 //
