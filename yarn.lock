@@ -2351,7 +2351,7 @@
     "@ledgerhq/errors" "^5.50.0"
     events "^3.3.0"
 
-"@ledgerhq/hw-transport@^6.1.0", "@ledgerhq/hw-transport@^6.2.0":
+"@ledgerhq/hw-transport@^6.2.0":
   version "6.2.0"
   resolved "https://registry.yarnpkg.com/@ledgerhq/hw-transport/-/hw-transport-6.2.0.tgz#b3bf21e6d8a0552bf67b0d0be5139c6b855ba5ca"
   integrity sha512-6Yz6Hm5fbjdNhbOFb86H6q4o92DHm9HaPXdavk7PM9VXTcdyz4d7BjIZxlVTmoa4+4nWjfere5o+psAl1WD+Ug==
@@ -3502,12 +3502,12 @@
   resolved "https://registry.yarnpkg.com/@thorchain/asgardex-util/-/asgardex-util-0.9.1.tgz#06b75eb6642adae7c4924c37b23f1d5ab41bb33d"
   integrity sha512-+w5jTojttZo0ku7t3cGsrnhymaeBnrWfhzypW1/TWL8Vup1XfHJmYrb60Iel2cftMJp4hlJF6ZmBwUJGbV0Ugg==
 
-"@thorchain/ledger-thorchain@^0.0.3":
-  version "0.0.3"
-  resolved "https://registry.yarnpkg.com/@thorchain/ledger-thorchain/-/ledger-thorchain-0.0.3.tgz#4ddfc755ba26910d57730d83e5e89e86f8d1281d"
-  integrity sha512-jYv20JLtuRSHSoZOoZgpsuozv2/W3KDSgwvnU3CHITHlt/VNgL9oc+emTv6RU6nJFj30BuOvuA3RAzhsjtjvtg==
+"@thorchain/ledger-thorchain@^0.1.0-alpha.1":
+  version "0.1.0-alpha.1"
+  resolved "https://registry.yarnpkg.com/@thorchain/ledger-thorchain/-/ledger-thorchain-0.1.0-alpha.1.tgz#2c0a81f264d868f9a616f50d12285ff3d2c4c3d1"
+  integrity sha512-eGlT4r5NciK8mGBqB9K9ZIEXQt3/Q7VkIFLRLI3jodziU8msiTMonv/NmyJUBVeRDsVVwbrptdoQI2Q/wE5MuQ==
   dependencies:
-    "@ledgerhq/hw-transport" "^6.1.0"
+    "@ledgerhq/hw-transport" "^6.2.0"
     bech32 "^2.0.0"
     ripemd160 "^2.0.2"
 

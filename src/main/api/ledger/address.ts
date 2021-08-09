@@ -6,7 +6,8 @@ import { LedgerErrorId, Network } from '../../../shared/api/types'
 import { getAddress as getTHORAddress } from './thorchain'
 import { getErrorId } from './utils'
 
-export const getAddress = async (chain: Chain, network: Network) => {
+// export const getAddress = async (chain: Chain, network: Network): Promise<E.Either<LedgerErrorId, string>> => {
+export const getAddress = async (chain: Chain, network: Network): Promise<E.Either<LedgerErrorId, string>> => {
   try {
     let res: E.Either<LedgerErrorId, string>
     const transport = await TransportNodeHidSingleton.open()
