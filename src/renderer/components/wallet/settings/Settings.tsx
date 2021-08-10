@@ -11,7 +11,7 @@ import { Network } from '../../../../shared/api/types'
 import { ReactComponent as PlusIcon } from '../../../assets/svg/icon-plus.svg'
 import { ReactComponent as RemoveIcon } from '../../../assets/svg/icon-remove.svg'
 import { ReactComponent as UnlockOutlined } from '../../../assets/svg/icon-unlock-warning.svg'
-import { getChainAsset } from '../../../helpers/chainHelper'
+import { getChainAsset, isThorChain } from '../../../helpers/chainHelper'
 import { ValidatePasswordHandler } from '../../../services/wallet/types'
 import { UserAccountType } from '../../../types/wallet'
 import { RemoveWalletConfirmationModal } from '../../modal/confirmation/RemoveWalletConfirmationModal'
@@ -74,7 +74,7 @@ export const Settings: React.FC<Props> = (props): JSX.Element => {
 
   const [showQRModal, setShowQRModal] = useState<O.Option<{ asset: Asset; address: Address }>>(O.none)
 
-  const [ledgerAdded] = useState(false)
+  const [ledgerAdded] = useState(true)
 
   const closeQrModal = useCallback(() => setShowQRModal(O.none), [setShowQRModal])
 
@@ -112,9 +112,7 @@ export const Settings: React.FC<Props> = (props): JSX.Element => {
     () => (
       <Styled.AddLedger>
         <PlusIcon />
-        <div style={{ marginLeft: '5px', textTransform: 'uppercase' }}>
-          {intl.formatMessage({ id: 'ledger.add.device' })}
-        </div>
+        <Styled.AddLedgerTextWrapper>{intl.formatMessage({ id: 'ledger.add.device' })}</Styled.AddLedgerTextWrapper>
       </Styled.AddLedger>
     ),
     [intl]
@@ -137,7 +135,7 @@ export const Settings: React.FC<Props> = (props): JSX.Element => {
                       <Styled.ChainContent key={j}>
                         <Styled.AccountPlaceholder>{acc.name}</Styled.AccountPlaceholder>
                         {renderAddress(item.chainName, acc.address)}
-                        {item.chainName.toLowerCase() === 'thor' && (
+                        {isThorChain(item.chainName) && (
                           <>
                             <Styled.AccountPlaceholder>Ledger</Styled.AccountPlaceholder>
                             {ledgerAdded ? renderAddress(item.chainName, acc.address, true) : renderAddLedger()}

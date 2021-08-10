@@ -264,3 +264,8 @@ export const AddLedger = styled.div`
   color: ${palette('primary', 0)};
   cursor: not-allowed;
 `
+
+export const AddLedgerTextWrapper = styled.div`
+  margin-left: 5px;
+  text-transform: uppercase;
+`
