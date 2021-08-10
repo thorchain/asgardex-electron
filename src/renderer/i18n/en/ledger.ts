@@ -1,6 +1,7 @@
 import { LedgerMessages } from '../types'
 
 const ledger: LedgerMessages = {
+  'ledger.add.device': 'Add ledger',
   'ledger.add.device.error.title': 'Add Ledger Device Error',
   'ledger.errors.no.device': 'No device connected',
   'ledger.errors.already.in.use': 'The device is used in other app',
