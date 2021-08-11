@@ -1,32 +1,26 @@
-// import TransportNodeHid from '@ledgerhq/hw-transport-node-hid'
-// import { BNBChain, BTCChain, Chain } from '@xchainjs/xchain-util'
-import { Chain } from '@xchainjs/xchain-util'
-// import * as E from 'fp-ts/Either'
+import TransportNodeHidSingleton from '@ledgerhq/hw-transport-node-hid-singleton'
+import { Chain, THORChain } from '@xchainjs/xchain-util'
+import * as E from 'fp-ts/Either'
 
-import { Network } from '../../../shared/api/types'
-// import { LedgerErrorId, Network } from '../../../shared/api/types'
-// import { getAddress as getBNBAddress } from './binance'
-// import { getAddress as getBTCAddress } from './bitcoin'
-// import { getErrorId } from './utils'
+import { LedgerErrorId, Network } from '../../../shared/api/types'
+import { getAddress as getTHORAddress } from './thorchain'
+import { getErrorId } from './utils'
 
-export const getAddress = async (chain: Chain, network: Network) => {
-  const _disabled = { chain, network }
-  // try {
-  //   const transport = await TransportNodeHid.open('')
-  //   let res: E.Either<LedgerErrorId, string>
-  //   switch (chain) {
-  //     case BNBChain:
-  //       res = await getBNBAddress(transport, network)
-  //       break
-  //     case BTCChain:
-  //       res = await getBTCAddress(transport, network)
-  //       break
-  //     default:
-  //       res = E.left(LedgerErrorId.NO_APP)
-  //   }
-  //   await transport.close()
-  //   return res
-  // } catch (error) {
-  //   return E.left(getErrorId(error.toString()))
-  // }
+// export const getAddress = async (chain: Chain, network: Network): Promise<E.Either<LedgerErrorId, string>> => {
+export const getAddress = async (chain: Chain, network: Network): Promise<E.Either<LedgerErrorId, string>> => {
+  try {
+    let res: E.Either<LedgerErrorId, string>
+    const transport = await TransportNodeHidSingleton.open()
+    switch (chain) {
+      case THORChain:
+        res = await getTHORAddress(transport, network)
+        break
+      default:
+        res = E.left(LedgerErrorId.NO_APP)
+    }
+    await transport.close()
+    return res
+  } catch (error) {
+    return E.left(getErrorId(error.toString()))
+  }
 }

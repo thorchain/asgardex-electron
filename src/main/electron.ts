@@ -15,7 +15,11 @@ import { Locale } from '../shared/i18n/types'
 import { registerAppCheckUpdatedHandler } from './api/appUpdate'
 import { getFileStoreService } from './api/fileStore'
 import { saveKeystore, removeKeystore, getKeystore, keystoreExist, exportKeystore, loadKeystore } from './api/keystore'
-import { getAddress, sendTx } from './api/ledger'
+import {
+  getAddress as getLedgerAddress,
+  sendTx as sendLedgerTx,
+  getTransport as getLedgerTransport
+} from './api/ledger'
 import IPCMessages from './ipc/messages'
 import { setMenu } from './menu'
 
@@ -121,7 +125,9 @@ const langChangeHandler = (locale: Locale) => {
 }
 
 const initIPC = () => {
+  // Lang
   ipcMain.on(IPCMessages.UPDATE_LANG, (_, locale: Locale) => langChangeHandler(locale))
+  // Keystore
   ipcMain.handle(IPCMessages.SAVE_KEYSTORE, (_, keystore: Keystore) => saveKeystore(keystore))
   ipcMain.handle(IPCMessages.REMOVE_KEYSTORE, () => removeKeystore())
   ipcMain.handle(IPCMessages.GET_KEYSTORE, () => getKeystore())
@@ -130,11 +136,15 @@ const initIPC = () => {
     exportKeystore(defaultFileName, keystore)
   )
   ipcMain.handle(IPCMessages.LOAD_KEYSTORE, () => loadKeystore())
-  ipcMain.handle(IPCMessages.GET_LEDGER_ADDRESS, (_, chain: Chain, network: Network) => getAddress(chain, network))
-  ipcMain.handle(IPCMessages.SEND_LEDGER_TX, (_, chain: Chain, network: Network, txInfo: LedgerTxInfo) =>
-    sendTx(chain, network, txInfo)
+  // Ledger
+  ipcMain.handle(IPCMessages.GET_LEDGER_ADDRESS, async (_, chain: Chain, network: Network) =>
+    getLedgerAddress(chain, network)
   )
-
+  ipcMain.handle(IPCMessages.SEND_LEDGER_TX, (_, chain: Chain, network: Network, txInfo: LedgerTxInfo) =>
+    sendLedgerTx(chain, network, txInfo)
+  )
+  ipcMain.handle(IPCMessages.GET_TRANSPORT, () => getLedgerTransport())
+  // Update
   registerAppCheckUpdatedHandler(IS_DEV)
   // Register all file-stored data services
   Object.entries(DEFAULT_STORAGES).forEach(([name, defaultValue]) => {

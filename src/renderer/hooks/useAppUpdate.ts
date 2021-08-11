@@ -15,11 +15,15 @@ export const useAppUpdate = () => {
   const resetAppUpdater = () => setAppUpdater(RD.initial)
 
   const checkForUpdates = useCallback(() => {
-    FP.pipe(
+    const subscription = FP.pipe(
       Rx.from(window.apiAppUpdate.checkForAppUpdates()),
       RxOp.catchError((e) => Rx.of(RD.failure(new Error(e.message)))),
       RxOp.startWith(RD.pending)
     ).subscribe(setAppUpdater)
+
+    return () => {
+      subscription.unsubscribe()
+    }
   }, [setAppUpdater])
 
   return {

@@ -1,5 +1,7 @@
 const path = require('path')
 
+const nodeExternals = require('webpack-node-externals')
+
 const common = (_ /* env */, argv) => ({
   output: {
     path: path.resolve(__dirname, 'public'),
@@ -38,7 +40,8 @@ const main = (env, arg) => {
     entry: {
       electron: './src/main/electron.ts'
     },
-    target: 'electron-main'
+    target: 'electron-main',
+    externals: [nodeExternals()]
   })
 }
 
