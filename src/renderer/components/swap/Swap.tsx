@@ -58,6 +58,7 @@ import {
 } from '../../services/chain/types'
 import { ApproveFeeHandler, ApproveParams, IsApprovedRD, LoadApproveFeeHandler } from '../../services/ethereum/types'
 import { PoolAssetDetail, PoolAssetDetails, PoolAddress, PoolsDataMap } from '../../services/midgard/types'
+import { MimirHalt } from '../../services/thorchain/types'
 import {
   ApiError,
   KeystoreState,
@@ -107,6 +108,7 @@ export type SwapProps = {
   isApprovedERC20Token$: (params: ApproveParams) => LiveData<ApiError, boolean>
   importWalletHandler: FP.Lazy<void>
   haltedChains: Chain[]
+  mimirHalt: MimirHalt
 }
 
 export const Swap = ({
@@ -132,7 +134,8 @@ export const Swap = ({
   reloadApproveFee,
   approveFee$,
   importWalletHandler,
-  haltedChains
+  haltedChains,
+  mimirHalt
 }: SwapProps) => {
   const intl = useIntl()
 
@@ -165,18 +168,29 @@ export const Swap = ({
     [oTargetPoolAsset]
   )
 
-  const isChainHalted = useMemo(() => PoolHelpers.isChainHalted(haltedChains), [haltedChains])
+  const disableAllPoolActions = useCallback(
+    (chain: Chain) => PoolHelpers.disableAllActions({ chain, haltedChains, mimirHalt }),
+    [haltedChains, mimirHalt]
+  )
+  const disableTradingPoolActions = useCallback(
+    (chain: Chain) => PoolHelpers.disableTradingActions({ chain, haltedChains, mimirHalt }),
+    [haltedChains, mimirHalt]
+  )
 
-  const hasHaltedChain = useMemo(
+  const disableSwapAction = useMemo(
     () =>
       FP.pipe(
         sequenceTOption(oSourceAsset, oTargetAsset),
         O.map(
-          ([{ chain: sourceChain }, { chain: targetChain }]) => isChainHalted(sourceChain) || isChainHalted(targetChain)
+          ([{ chain: sourceChain }, { chain: targetChain }]) =>
+            disableAllPoolActions(sourceChain) ||
+            disableTradingPoolActions(sourceChain) ||
+            disableAllPoolActions(targetChain) ||
+            disableTradingPoolActions(targetChain)
         ),
         O.getOrElse(() => true)
       ),
-    [isChainHalted, oSourceAsset, oTargetAsset]
+    [disableAllPoolActions, disableTradingPoolActions, oSourceAsset, oTargetAsset]
   )
 
   const assetsToSwap: O.Option<{ source: Asset; target: Asset }> = useMemo(
@@ -242,21 +256,6 @@ export const Swap = ({
     [sourceAssetProp, targetAssetProp]
   )
 
-  const oSwapParams: O.Option<SwapTxParams> = useMemo(() => {
-    return FP.pipe(
-      sequenceTOption(assetsToSwap, oPoolAddress, targetWalletAddress),
-      O.map(([{ source, target }, poolAddress, address]) => {
-        return {
-          poolAddress,
-          asset: source,
-          // Decimal needs to be converted back for using orginal decimal of source asset
-          amount: convertBaseAmountDecimal(amountToSwapMax1e8, sourceAssetDecimal),
-          memo: getSwapMemo({ asset: target, address })
-        }
-      })
-    )
-  }, [amountToSwapMax1e8, assetsToSwap, oPoolAddress, sourceAssetDecimal, targetWalletAddress])
-
   const swapData: SwapData = useMemo(
     () =>
       Utils.getSwapData({
@@ -275,6 +274,35 @@ export const Swap = ({
     // 2. But we still need to make sure it <= 1e8
     return max1e8BaseAmount(swapResultAmount)
   }, [swapData.swapResult, targetAssetDecimal])
+
+  const oSwapParams: O.Option<SwapTxParams> = useMemo(() => {
+    return FP.pipe(
+      sequenceTOption(assetsToSwap, oPoolAddress, targetWalletAddress),
+      O.map(([{ source, target }, poolAddress, address]) => {
+        return {
+          poolAddress,
+          asset: source,
+          // Decimal needs to be converted back for using orginal decimal of source asset
+          amount: convertBaseAmountDecimal(amountToSwapMax1e8, sourceAssetDecimal),
+          memo: getSwapMemo({
+            asset: target,
+            address,
+            limit: Utils.getSwapLimit(swapResultAmountMax1e8, slipTolerance)
+          })
+        }
+      })
+    )
+  }, [
+    amountToSwapMax1e8,
+    assetsToSwap,
+    oPoolAddress,
+    sourceAssetDecimal,
+    targetWalletAddress,
+    swapResultAmountMax1e8,
+    slipTolerance
+  ])
+
+  const isCausedSlippage = useMemo(() => swapData.slip.toNumber() > slipTolerance, [swapData.slip, slipTolerance])
 
   const oApproveParams: O.Option<ApproveParams> = useMemo(() => {
     const oRouterAddress: O.Option<Address> = FP.pipe(
@@ -608,7 +636,7 @@ export const Swap = ({
         tooltipVisible={true}
         withLabel={true}
         tooltipPlacement={'top'}
-        disabled={unlockedWallet || hasHaltedChain}
+        disabled={unlockedWallet || disableSwapAction}
       />
     )
   }, [
@@ -617,7 +645,7 @@ export const Swap = ({
     sourceAssetAmountMax1e8,
     setAmountToSwapFromPercentValue,
     reloadFeesHandler,
-    hasHaltedChain
+    disableSwapAction
   ])
 
   const extraTxModalContent = useMemo(() => {
@@ -1064,23 +1092,25 @@ export const Swap = ({
 
   const disableSubmit: boolean = useMemo(
     () =>
-      hasHaltedChain ||
+      disableSwapAction ||
       unlockedWallet ||
       isZeroAmountToSwap ||
       walletBalancesLoading ||
       sourceChainFeeError ||
       RD.isPending(swapFeesRD) ||
       RD.isPending(approveState) ||
-      minAmountError,
+      minAmountError ||
+      isCausedSlippage,
     [
-      hasHaltedChain,
+      disableSwapAction,
       unlockedWallet,
       isZeroAmountToSwap,
       walletBalancesLoading,
       sourceChainFeeError,
       swapFeesRD,
       approveState,
-      minAmountError
+      minAmountError,
+      isCausedSlippage
     ]
   )
 
@@ -1108,6 +1138,7 @@ export const Swap = ({
             <CurrencyInfo
               slip={swapData.slip}
               slipTolerance={slipTolerance}
+              isCausedSlippage={isCausedSlippage}
               changeSlipTolerance={changeSlipTolerance}
               from={oSourcePoolAsset}
               to={oTargetPoolAsset}

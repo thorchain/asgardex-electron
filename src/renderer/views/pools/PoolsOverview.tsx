@@ -8,6 +8,7 @@ import { useIntl } from 'react-intl'
 import * as RxOp from 'rxjs/operators'
 
 import { useMidgardContext } from '../../contexts/MidgardContext'
+import { useMimirHalt } from '../../hooks/useMimirHalt'
 import { ActivePools } from './ActivePools'
 import { PendingPools } from './PendingPools'
 import * as Styled from './PoolsOverview.style'
@@ -33,20 +34,22 @@ export const PoolsOverview: React.FC = (): JSX.Element => {
 
   const [haltedChains] = useObservableState(() => FP.pipe(haltedChains$, RxOp.map(RD.getOrElse((): Chain[] => []))), [])
 
+  const { mimirHalt } = useMimirHalt()
+
   const tabs = useMemo(
     (): Tab[] => [
       {
         key: 'active',
         label: intl.formatMessage({ id: 'pools.available' }),
-        content: <ActivePools haltedChains={haltedChains} />
+        content: <ActivePools haltedChains={haltedChains} mimirHalt={mimirHalt} />
       },
       {
         key: 'pending',
         label: intl.formatMessage({ id: 'pools.pending' }),
-        content: <PendingPools haltedChains={haltedChains} />
+        content: <PendingPools haltedChains={haltedChains} mimirHalt={mimirHalt} />
       }
     ],
-    [intl, haltedChains]
+    [intl, haltedChains, mimirHalt]
   )
 
   const renderTabBar = useCallback(

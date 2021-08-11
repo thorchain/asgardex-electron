@@ -81,6 +81,19 @@ export const ERC20Assets = [
 ]
 export const ETHAssets = [AssetETH, ...ERC20Assets]
 
+// UNIH (exploit contract)
+// https://etherscan.io/address/0x4bf5dc91E2555449293D7824028Eb8Fe5879B689
+export const AssetUniHAddress = '0x4bf5dc91E2555449293D7824028Eb8Fe5879B689'
+const AssetUniHSymbol = 'UNIH'
+export const AssetUniH: Asset = {
+  chain: ETHChain,
+  symbol: `${AssetUniHSymbol}-${AssetUniHAddress}`,
+  ticker: AssetUniHSymbol
+}
+
+// Black listed ERC20 assets
+export const ERC20BlackList = [AssetUniH]
+
 //
 // All of following assets are needed for pricing USD
 //
@@ -152,6 +165,8 @@ export const ZERO_ASSET_AMOUNT = assetAmount(ZERO_BN)
 export const ZERO_BASE_AMOUNT = baseAmount(ZERO_BN)
 
 export const ZERO_POOL_DATA: PoolData = { runeBalance: ZERO_BASE_AMOUNT, assetBalance: ZERO_BASE_AMOUNT }
+
+export const ASGARDEX_SWAP_IDENTIFIER = '999'
 
 export const RECOVERY_TOOL_URL: Record<Network, string> = {
   testnet: 'https://testnet.asgard.exchange/deposit-sym-recovery/',

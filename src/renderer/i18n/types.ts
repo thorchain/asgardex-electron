@@ -222,6 +222,7 @@ type PoolSharesMessageKey = 'poolshares.ownership'
 export type PoolSharesMessage = { [key in PoolSharesMessageKey]: string }
 
 type LedgerMessageKey =
+  | 'ledger.add.device'
   | 'ledger.add.device.error.title'
   | 'ledger.errors.no.device'
   | 'ledger.errors.already.in.use'

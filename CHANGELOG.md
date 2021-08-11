@@ -1,3 +1,19 @@
+# 0.3.11 (2021-08-10)
+
+## Add
+
+- [Swap] Add swap limit protection [#1647](https://github.com/thorchain/asgardex-electron/issues/1647)
+- [Swap] Add ASGARDEX identifier to swap memo [1615](https://github.com/thorchain/asgardex-electron/issues/1615)
+- [Mimir] Handle halt params of Mimir [#1645](https://github.com/thorchain/asgardex-electron/issues/1645)
+- [ERC20] Blacklist UNIH [#1652](https://github.com/thorchain/asgardex-electron/issues/1652)
+
+# 0.3.10 (2021-07-30)
+
+## Hotfix
+
+- [chaosnet] Disable Swap / Add / Withdraw for all pools temporary
+- [chaosnet] Disable upgrade of BNB.RUNE and ETH.RUNE temporary
+
 # 0.3.9 (2021-07-14)
 
 ## Add

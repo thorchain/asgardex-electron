@@ -26,6 +26,7 @@ import {
   GetPoolStatsRequest
 } from '../../types/generated/midgard/apis'
 import { PricePool, PricePoolAsset, PricePools } from '../../views/pools/Pools.types'
+import { network$ } from '../app/service'
 import { ErrorId } from '../wallet/types'
 import {
   PoolAssetDetailsLD,
@@ -478,7 +479,7 @@ const createPoolsService = (
    * It will be updated using a timer defined in `inboundAddressesInterval`
    * or by reloading of data possible by `reloadInboundAddresses`
    */
-  const inboundAddressesShared$ = FP.pipe(
+  const inboundAddressesShared$: InboundAddressesLD = FP.pipe(
     Rx.combineLatest([reloadInboundAddresses$, inboundAddressesInterval$]),
     // debounce it, reloadInboundAddresses might be called by UI many times
     RxOp.debounceTime(300),
@@ -487,8 +488,25 @@ const createPoolsService = (
   )
 
   const haltedChains$: HaltedChainsLD = FP.pipe(
-    inboundAddressesShared$,
-    liveData.map(A.filterMap((inboundAddress) => (inboundAddress.halted ? O.some(inboundAddress.chain) : O.none)))
+    // For chaosnet all chains are halted "hardcoded" temporary
+    // TODO @asgdx-team: Enable check using inboundAddressesShared$ only, no check for network needed then
+    // inboundAddressesShared$,
+    // liveData.map(A.filterMap((inboundAddress) => (inboundAddress.halted ? O.some(inboundAddress.chain) : O.none)))
+    Rx.combineLatest([network$, inboundAddressesShared$]),
+    RxOp.map(([network, inboundAddresses]) =>
+      FP.pipe(
+        inboundAddresses,
+        RD.map(
+          A.filterMap((inboundAddress) =>
+            network !== 'testnet'
+              ? O.some(inboundAddress.chain)
+              : inboundAddress.halted
+              ? O.some(inboundAddress.chain)
+              : O.none
+          )
+        )
+      )
+    )
   )
 
   /**

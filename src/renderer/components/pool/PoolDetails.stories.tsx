@@ -20,6 +20,8 @@ export const PoolDetailsStory = () => {
       priceRatio={ONE_BN}
       HistoryView={() => <>Actions History Here</>}
       ChartView={() => <>Pool Chart Here</>}
+      disableTradingPoolAction={false}
+      disableAllPoolActions={false}
     />
   )
 }

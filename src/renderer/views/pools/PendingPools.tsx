@@ -37,7 +37,7 @@ import * as Styled from './PoolsOverview.style'
 
 const POOLS_KEY = 'pending'
 
-export const PendingPools: React.FC<PoolsComponentProps> = ({ haltedChains }): JSX.Element => {
+export const PendingPools: React.FC<PoolsComponentProps> = ({ haltedChains, mimirHalt }): JSX.Element => {
   const history = useHistory()
   const intl = useIntl()
 
@@ -86,15 +86,16 @@ export const PendingPools: React.FC<PoolsComponentProps> = ({ haltedChains }): J
 
   const selectedPricePool = useObservableState(selectedPricePool$, RUNE_PRICE_POOL)
 
-  const isChainHalted = useMemo(() => PoolHelpers.isChainHalted(haltedChains), [haltedChains])
-
   const renderBtnPoolsColumn = useCallback(
-    (_: string, { pool }: PoolTableRowData) => (
-      <TableAction>
-        <ManageButton asset={pool.target} isTextView={isDesktopView} disabled={isChainHalted(pool.target.chain)} />
-      </TableAction>
-    ),
-    [isChainHalted, isDesktopView]
+    (_: string, { pool }: PoolTableRowData) => {
+      const disablePool = PoolHelpers.disableAllActions({ chain: pool.target.chain, haltedChains, mimirHalt })
+      return (
+        <TableAction>
+          <ManageButton asset={pool.target} isTextView={isDesktopView} disabled={disablePool} />
+        </TableAction>
+      )
+    },
+    [haltedChains, isDesktopView, mimirHalt]
   )
 
   const btnPendingPoolsColumn = useMemo(

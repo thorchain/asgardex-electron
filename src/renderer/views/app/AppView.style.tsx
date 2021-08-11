@@ -48,9 +48,14 @@ export const AppLayout = styled(A.Layout)`
 
 export const Alert = styled(UIAlert)`
   margin-bottom: 10px;
-
+  &:first-child {
+  }
   ${media.lg`
     margin-bottom: 40px;
+
+    &:first-child{
+      margin-bottom: 10px;
+    }
   `}
 `
 

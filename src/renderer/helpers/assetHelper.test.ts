@@ -8,6 +8,7 @@ import {
   AssetLTC,
   AssetRune67C,
   AssetRuneB1A,
+  AssetRuneERC20,
   AssetRuneNative,
   baseAmount,
   BNBChain
@@ -15,7 +16,15 @@ import {
 import * as O from 'fp-ts/lib/Option'
 
 import { ERC20_TESTNET } from '../../shared/mock/assets'
-import { AssetBUSDBAF, AssetBUSDBD1, AssetUSDTERC20, AssetXRune, AssetXRuneTestnet } from '../const'
+import {
+  AssetBUSDBAF,
+  AssetBUSDBD1,
+  AssetUniH,
+  AssetUniHAddress,
+  AssetUSDTERC20,
+  AssetXRune,
+  AssetXRuneTestnet
+} from '../const'
 import {
   isBchAsset,
   isBnbAsset,
@@ -35,7 +44,10 @@ import {
   max1e8BaseAmount,
   to1e8BaseAmount,
   getTwoSigfigAssetAmount,
-  isXRuneAsset
+  isXRuneAsset,
+  disableRuneUpgrade,
+  assetInERC20Blacklist,
+  addressInERC20Blacklist
 } from './assetHelper'
 import { eqAsset, eqAssetAmount, eqBaseAmount } from './fp/eq'
 
@@ -148,6 +160,24 @@ describe('helpers/assetHelper', () => {
     })
     it('is returns None for non ETH assets', () => {
       expect(getEthAssetAddress(AssetRuneNative)).toBeNone()
+    })
+  })
+
+  describe('assetInERC20Blacklist', () => {
+    it('ETH (non black listed)', () => {
+      expect(assetInERC20Blacklist(AssetETH)).toBeFalsy()
+    })
+    it('UNIH (black listed)', () => {
+      expect(assetInERC20Blacklist(AssetUniH)).toBeTruthy()
+    })
+  })
+
+  describe('assetInERC20Blacklist', () => {
+    it('USDT (non black listed)', () => {
+      expect(addressInERC20Blacklist('0xdb99328b43b86037f80b43c3dbd203f00f056b75')).toBeFalsy()
+    })
+    it('UNIH (black listed)', () => {
+      expect(addressInERC20Blacklist(AssetUniHAddress)).toBeTruthy()
     })
   })
 
@@ -279,6 +309,27 @@ describe('helpers/assetHelper', () => {
     it('returns two sigfig amount in case the value is less than 1', () => {
       const result = getTwoSigfigAssetAmount(assetAmount('0.0123'))
       expect(eqAssetAmount.equals(result, assetAmount('0.012'))).toBeTruthy()
+    })
+  })
+
+  describe('disableRuneUpgrade', () => {
+    it('disabled for BNB.RUNE + halted THORChain', () => {
+      expect(disableRuneUpgrade({ asset: AssetRune67C, haltThorChain: true, haltEthChain: false })).toBeTruthy()
+    })
+    it('enabled for BNB.RUNE + halted ETH chain', () => {
+      expect(disableRuneUpgrade({ asset: AssetRune67C, haltThorChain: false, haltEthChain: true })).toBeFalsy()
+    })
+    it('enabled for BNB.RUNE + no halted chains', () => {
+      expect(disableRuneUpgrade({ asset: AssetRune67C, haltThorChain: false, haltEthChain: false })).toBeFalsy()
+    })
+    it('disabled for ETH.RUNE + halted ETH chain', () => {
+      expect(disableRuneUpgrade({ asset: AssetRuneERC20, haltThorChain: false, haltEthChain: true })).toBeTruthy()
+    })
+    it('disabled for ETH.RUNE + halted THORChain', () => {
+      expect(disableRuneUpgrade({ asset: AssetRuneERC20, haltThorChain: true, haltEthChain: false })).toBeTruthy()
+    })
+    it('enable for ETH.RUNE + no halted chains', () => {
+      expect(disableRuneUpgrade({ asset: AssetRuneERC20, haltThorChain: false, haltEthChain: false })).toBeFalsy()
     })
   })
 })

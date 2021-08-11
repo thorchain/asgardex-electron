@@ -6,6 +6,7 @@ import { assetAmount, AssetBNB, AssetRuneNative, assetToBase, bn } from '@xchain
 import * as O from 'fp-ts/lib/Option'
 
 import { BNB_DECIMAL, THORCHAIN_DECIMAL } from '../../helpers/assetHelper'
+import { DEFAULT_MIMIR_HALT } from '../../services/thorchain/const'
 import { DefaultPoolShare } from '../uielements/poolShare/PoolShare.stories'
 import { Default as AsymDeposit } from './add/AsymDeposit.stories'
 import { Default as SymDeposit } from './add/SymDeposit.stories'
@@ -15,6 +16,7 @@ import { Default as Withdraw } from './withdraw/Withdraw.stories'
 
 const defaultProps: DepositProps = {
   haltedChains: [],
+  mimirHalt: DEFAULT_MIMIR_HALT,
   asset: { asset: AssetBNB, decimal: BNB_DECIMAL },
   poolDetail: RD.initial,
   shares: RD.success([

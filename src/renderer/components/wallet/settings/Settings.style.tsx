@@ -155,6 +155,7 @@ export const ChainContent = styled.div`
 export const AccountPlaceholder = styled(UILabel)`
   display: block;
   padding: 0px;
+  margin-top: 3px;
   color: ${palette('text', 2)};
   font-family: 'MainFontRegular';
   font-size: 12px;
@@ -254,4 +255,17 @@ export const QRCodeIcon = styled(QrcodeOutlinedIcon)`
     height: ${ICON_SIZE}px;
     width: ${ICON_SIZE}px;
   }
+`
+
+export const AddLedger = styled.div`
+  display: flex;
+  align-items: center;
+  margin: 4px 4px 4px 0px;
+  color: ${palette('primary', 0)};
+  cursor: not-allowed;
+`
+
+export const AddLedgerTextWrapper = styled.div`
+  margin-left: 5px;
+  text-transform: uppercase;
 `

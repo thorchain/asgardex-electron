@@ -121,7 +121,7 @@ export const QRCodeIcon = styled(QrcodeOutlinedIcon)`
   }
 `
 
-export const BnbRuneTickerWrapper = styled('div')`
+export const AssetTickerWrapper = styled('div')`
   display: flex;
   flex-direction: row;
   align-items: center;

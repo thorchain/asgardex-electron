@@ -3,8 +3,6 @@ import Text from 'antd/lib/typography/Text'
 import styled from 'styled-components'
 import { palette } from 'styled-theme'
 
-import { ReactComponent as SlipSettingsIcon } from '../../assets/svg/icon-settings.svg'
-
 export const Container = styled('div')`
   display: flex;
   flex-direction: column;
@@ -48,17 +46,17 @@ export const SlipLabel = styled(Text)`
   padding: 0;
   font-size: 16px;
   font-family: 'MainFontRegular';
-`
-
-export const SlipSettings = styled(SlipSettingsIcon)<{ active: true | false }>`
-  & path {
-    fill: ${({ active }) => (active ? palette('text', 2) : palette('gray', 2))};
+  cursor: pointer;
+  color: ${palette('gray', 2)};
+  &:hover {
+    color: ${palette('text', 0)};
   }
 `
-export const SlipTolerancePercent = styled(Text)<{ limit: true | false }>`
-  color: ${({ limit }) => (limit ? palette('error', 0) : palette('gray', 2))};
+
+export const SlipTolerancePercent = styled(Text)<{ slippage: 'true' | 'false' }>`
+  color: ${(slippage) => (slippage === 'true' ? palette('error', 0) : palette('gray', 2))};
 `
 
 export const SlipToleranceText = styled(Text)`
-  color: palette('text', 2);
+  color: ${palette('gray', 2)};
 `

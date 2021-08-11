@@ -34,7 +34,7 @@ import * as Styled from './PoolsOverview.style'
 
 const POOLS_KEY = 'active'
 
-export const ActivePools: React.FC<PoolsComponentProps> = ({ haltedChains }): JSX.Element => {
+export const ActivePools: React.FC<PoolsComponentProps> = ({ haltedChains, mimirHalt }): JSX.Element => {
   const history = useHistory()
   const intl = useIntl()
 
@@ -79,34 +79,42 @@ export const ActivePools: React.FC<PoolsComponentProps> = ({ haltedChains }): JS
     [getSwapPath, history]
   )
 
-  const isChainHalted = useMemo(() => PoolHelpers.isChainHalted(haltedChains), [haltedChains])
-
   const renderBtnPoolsColumn = useCallback(
-    (_: string, { pool }: PoolTableRowData) => (
-      <Styled.TableAction>
-        <ManageButton
-          disabled={isChainHalted(pool.target.chain)}
-          asset={pool.target}
-          sizevalue={isDesktopView ? 'normal' : 'small'}
-          isTextView={isDesktopView}
-        />
-        <Button
-          round="true"
-          sizevalue={isDesktopView ? 'normal' : 'small'}
-          disabled={isChainHalted(pool.target.chain)}
-          style={{ height: 30 }}
-          onClick={(event) => {
-            event.preventDefault()
-            event.stopPropagation()
-            clickSwapHandler({ source: assetToString(pool.asset), target: assetToString(pool.target) })
-          }}>
-          <SwapOutlined />
-          {isDesktopView && intl.formatMessage({ id: 'common.swap' })}
-        </Button>
-      </Styled.TableAction>
-    ),
+    (_: string, { pool }: PoolTableRowData) => {
+      const chain = pool.target.chain
+      const disableAllPoolActions = PoolHelpers.disableAllActions({ chain, haltedChains, mimirHalt })
+      const disableTradingPoolActions = PoolHelpers.disableTradingActions({
+        chain,
+        haltedChains,
+        mimirHalt
+      })
 
-    [clickSwapHandler, intl, isDesktopView, isChainHalted]
+      return (
+        <Styled.TableAction>
+          <ManageButton
+            disabled={disableAllPoolActions}
+            asset={pool.target}
+            sizevalue={isDesktopView ? 'normal' : 'small'}
+            isTextView={isDesktopView}
+          />
+          <Button
+            round="true"
+            sizevalue={isDesktopView ? 'normal' : 'small'}
+            disabled={disableAllPoolActions || disableTradingPoolActions}
+            style={{ height: 30 }}
+            onClick={(event) => {
+              event.preventDefault()
+              event.stopPropagation()
+              clickSwapHandler({ source: assetToString(pool.asset), target: assetToString(pool.target) })
+            }}>
+            <SwapOutlined />
+            {isDesktopView && intl.formatMessage({ id: 'common.swap' })}
+          </Button>
+        </Styled.TableAction>
+      )
+    },
+
+    [clickSwapHandler, intl, isDesktopView, haltedChains, mimirHalt]
   )
 
   const btnPoolsColumn = useMemo(

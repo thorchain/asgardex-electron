@@ -1,6 +1,6 @@
 import React, { useMemo } from 'react'
 
-import { Asset, Chain } from '@xchainjs/xchain-util'
+import { Asset } from '@xchainjs/xchain-util'
 import * as A from 'antd'
 import BigNumber from 'bignumber.js'
 import * as O from 'fp-ts/Option'
@@ -22,7 +22,8 @@ export type Props = {
   isLoading?: boolean
   HistoryView: React.ComponentType<{ poolAsset: Asset }>
   ChartView: React.ComponentType<{ isLoading?: boolean; priceRatio: BigNumber }>
-  haltedChains?: Chain[]
+  disableTradingPoolAction: boolean
+  disableAllPoolActions: boolean
   network: Network
 }
 
@@ -35,7 +36,8 @@ export const PoolDetails: React.FC<Props> = ({
   isLoading,
   HistoryView,
   ChartView,
-  haltedChains,
+  disableTradingPoolAction,
+  disableAllPoolActions,
   network
 }) => {
   const price = useMemo(() => H.getPrice(poolDetail, priceRatio), [poolDetail, priceRatio])
@@ -44,7 +46,8 @@ export const PoolDetails: React.FC<Props> = ({
       <A.Col span={24}>
         <PoolTitle
           network={network}
-          haltedChains={haltedChains}
+          disableAllPoolActions={disableAllPoolActions}
+          disableTradingPoolAction={disableTradingPoolAction}
           asset={O.some(asset)}
           price={price}
           priceSymbol={priceSymbol}
