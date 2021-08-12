@@ -47,7 +47,8 @@ import {
   isXRuneAsset,
   disableRuneUpgrade,
   assetInERC20Blacklist,
-  addressInERC20Blacklist
+  addressInERC20Blacklist,
+  assetInBinanceBlacklist
 } from './assetHelper'
 import { eqAsset, eqAssetAmount, eqBaseAmount } from './fp/eq'
 
@@ -170,14 +171,24 @@ describe('helpers/assetHelper', () => {
     it('UNIH (black listed)', () => {
       expect(assetInERC20Blacklist(AssetUniH)).toBeTruthy()
     })
-  })
 
-  describe('assetInERC20Blacklist', () => {
     it('USDT (non black listed)', () => {
       expect(addressInERC20Blacklist('0xdb99328b43b86037f80b43c3dbd203f00f056b75')).toBeFalsy()
     })
     it('UNIH (black listed)', () => {
       expect(addressInERC20Blacklist(AssetUniHAddress)).toBeTruthy()
+    })
+  })
+
+  describe('assetInBinanceBlacklist', () => {
+    it('RUNE-67C is black listed on mainnet', () => {
+      expect(assetInBinanceBlacklist('mainnet', AssetRune67C)).toBeTruthy()
+    })
+    it('RUNE-B1A is not black listed on mainnet', () => {
+      expect(assetInBinanceBlacklist('mainnet', AssetRuneB1A)).toBeFalsy()
+    })
+    it('RUNE-67C is not black listed on testnet', () => {
+      expect(assetInBinanceBlacklist('testnet', AssetRune67C)).toBeFalsy()
     })
   })
 

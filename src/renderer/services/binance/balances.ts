@@ -1,3 +1,9 @@
+import * as A from 'fp-ts/lib/Array'
+import * as FP from 'fp-ts/lib/function'
+
+import { Network } from '../../../shared/api/types'
+import { assetInBinanceBlacklist } from '../../helpers/assetHelper'
+import { liveData } from '../../helpers/rx/liveData'
 import { observableState } from '../../helpers/stateHelper'
 import * as C from '../clients'
 import { client$ } from './common'
@@ -18,6 +24,11 @@ const reloadBalances = () => {
 }
 
 // State of balances loaded by Client
-const balances$: C.WalletBalancesLD = C.balances$(client$, reloadBalances$)
+const balances$: (network: Network) => C.WalletBalancesLD = (network) =>
+  FP.pipe(
+    C.balances$(client$, reloadBalances$),
+    // Filter out black listed assets
+    liveData.map(FP.flow(A.filter(({ asset }) => !assetInBinanceBlacklist(network, asset))))
+  )
 
 export { balances$, reloadBalances, reloadBalances$, resetReloadBalances }

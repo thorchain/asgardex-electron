@@ -56,7 +56,10 @@ export const createBalancesService = ({
         return {
           reloadBalances: BNB.reloadBalances,
           resetReloadBalances: BNB.resetReloadBalances,
-          balances$: BNB.balances$,
+          balances$: FP.pipe(
+            network$,
+            RxOp.switchMap((network) => BNB.balances$(network))
+          ),
           reloadBalances$: BNB.reloadBalances$
         }
       case BTCChain:
