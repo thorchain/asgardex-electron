@@ -25,7 +25,14 @@ import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
 
 import { Network } from '../../shared/api/types'
-import { AssetXRune, AssetXRuneTestnet, DEFAULT_PRICE_ASSETS, ERC20BlackList, USD_PRICE_ASSETS } from '../const'
+import {
+  AssetXRune,
+  AssetXRuneTestnet,
+  BinanceBlackList,
+  DEFAULT_PRICE_ASSETS,
+  ERC20BlackList,
+  USD_PRICE_ASSETS
+} from '../const'
 import { PricePoolAsset } from '../views/pools/Pools.types'
 import { getEthChecksumAddress } from './addressHelper'
 import { getChainAsset, isBchChain, isBtcChain, isEthChain, isLtchain } from './chainHelper'
@@ -116,6 +123,17 @@ export const addressInERC20Blacklist = (address: Address): boolean => {
     O.isSome
   )
 }
+
+/**
+ * Check whether an asset is black listed for Binance or not
+ */
+export const assetInBinanceBlacklist = (network: Network, asset: Asset): boolean =>
+  FP.pipe(
+    BinanceBlackList[network],
+    A.findFirst((assetInList) => eqAsset.equals(assetInList, asset)),
+    O.isSome
+  )
+
 /**
  * Check whether an asset is XRune asset
  */
