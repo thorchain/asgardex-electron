@@ -63,17 +63,19 @@ const getNodeStatusByString = (stringStatus: string): NodeStatus => {
 
 const { stream$: reloadNodesInfo$, trigger: reloadNodesInfo } = triggerStream()
 
-const TESTNET_THORNODE_API = envOrDefault(
+// Note: We get data from `/thorchain` endpoint !!
+const TESTNET_THORNODE_API = `${envOrDefault(
   process.env.REACT_APP_TESTNET_THORNODE_API,
-  'https://testnet.thornode.thorchain.info/thorchain'
-)
+  'https://testnet.thornode.thorchain.info'
+)}/thorchain`
 
-const MAINNET_THORNODE_API = envOrDefault(
+// Note: We get data from `/thorchain` endpoint !!
+const MAINNET_THORNODE_API = `${envOrDefault(
   process.env.REACT_APP_MAINNET_THORNODE_API,
-  'https://thornode.thorchain.info/thorchain'
-)
+  'https://thornode.thorchain.info'
+)}/thorchain`
 
-const thorNodeApiAddress$ = (network: Network): ThorNodeApiUrlLD => {
+const thornodeApiUrl$ = (network: Network): ThorNodeApiUrlLD => {
   // option to set THORNode api url (for testnet + development only)
   if (network === 'testnet') {
     return Rx.of(RD.success(TESTNET_THORNODE_API))
@@ -85,10 +87,10 @@ const getNodeInfo$ = (node: Address, network: Network): NodeInfoLD =>
   FP.pipe(
     reloadNodesInfo$,
     RxOp.debounceTime(300),
-    RxOp.switchMap(() => thorNodeApiAddress$(network)),
-    liveData.chain((thorApi) =>
+    RxOp.switchMap(() => thornodeApiUrl$(network)),
+    liveData.chain((url) =>
       FP.pipe(
-        RxAjax.ajax(`${thorApi}/node/${node}`),
+        RxAjax.ajax(`${url}/node/${node}`),
         RxOp.map(({ response }) => response),
         RxOp.map(RD.success),
         RxOp.startWith(RD.pending),
@@ -125,11 +127,10 @@ const getLiquidityProviders = ({ asset, network }: GetLiquidityProvidersParams):
   const poolString = assetToString(asset)
   return FP.pipe(
     reloadLiquidityProviders$,
-    RxOp.switchMap(() => thorNodeApiAddress$(network)),
-    liveData.chain((api) =>
+    RxOp.switchMap(() => thornodeApiUrl$(network)),
+    liveData.chain((url) =>
       FP.pipe(
-        api,
-        (thorApi) => RxAjax.ajax.getJSON(`${thorApi}/pool/${poolString}/liquidity_providers`),
+        RxAjax.ajax.getJSON(`${url}/pool/${poolString}/liquidity_providers`),
         // We can not use something like t.array(LiquidityProviderIO) as in case if one of elements
         // fails validation the WHOLE array will be processed as failed-validation by io-ts.
         // So we need to validate each elemnt "by-hands" to avoid losing all data 'cuz of 1 element's fail
@@ -201,12 +202,12 @@ const mimir$: MimirLD = FP.pipe(
   Rx.combineLatest([reloadMimir$, mimirInterval$]),
   RxOp.debounceTime(300),
   RxOp.switchMap(() => network$),
-  RxOp.switchMap((network) => thorNodeApiAddress$(network)),
+  RxOp.switchMap((network) => thornodeApiUrl$(network)),
   // ApiError -> Error
   liveData.mapLeft(({ msg }) => Error(msg)),
-  liveData.chain((thorApi) =>
+  liveData.chain((url) =>
     FP.pipe(
-      RxAjax.ajax.getJSON<Mimir>(`${thorApi}/mimir`),
+      RxAjax.ajax.getJSON<Mimir>(`${url}/mimir`),
       RxOp.map((response) => MimirIO.decode(response)),
       RxOp.map((result) =>
         // Errors -> Error
