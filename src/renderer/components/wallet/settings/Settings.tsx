@@ -12,8 +12,7 @@ import { ReactComponent as PlusIcon } from '../../../assets/svg/icon-plus.svg'
 import { ReactComponent as RemoveIcon } from '../../../assets/svg/icon-remove.svg'
 import { ReactComponent as UnlockOutlined } from '../../../assets/svg/icon-unlock-warning.svg'
 import { getChainAsset, isThorChain } from '../../../helpers/chainHelper'
-import { ValidatePasswordHandler } from '../../../services/wallet/types'
-import { UserAccountType } from '../../../types/wallet'
+import { ValidatePasswordHandler, WalletAccounts } from '../../../services/wallet/types'
 import { RemoveWalletConfirmationModal } from '../../modal/confirmation/RemoveWalletConfirmationModal'
 import { PasswordModal } from '../../modal/password'
 import { QRCodeModal } from '../../uielements/qrCodeModal/QRCodeModal'
@@ -22,7 +21,7 @@ import * as Styled from './Settings.style'
 
 type Props = {
   selectedNetwork: Network
-  userAccounts?: O.Option<UserAccountType[]>
+  walletAccounts: O.Option<WalletAccounts>
   runeNativeAddress: string
   lockWallet?: () => void
   removeKeystore?: () => void
@@ -37,7 +36,7 @@ export const Settings: React.FC<Props> = (props): JSX.Element => {
   const intl = useIntl()
   const {
     selectedNetwork,
-    userAccounts = O.none,
+    walletAccounts,
     runeNativeAddress = '',
     lockWallet = () => {},
     removeKeystore = () => {},
@@ -121,7 +120,7 @@ export const Settings: React.FC<Props> = (props): JSX.Element => {
   const accounts = useMemo(
     () =>
       FP.pipe(
-        userAccounts,
+        walletAccounts,
         O.map((accounts) => (
           <Col key={'accounts'} sm={{ span: 24 }} lg={{ span: 12 }}>
             <Styled.Subtitle>{intl.formatMessage({ id: 'setting.account.management' })}</Styled.Subtitle>
@@ -130,15 +129,15 @@ export const Settings: React.FC<Props> = (props): JSX.Element => {
                 dataSource={accounts}
                 renderItem={(item, i: number) => (
                   <Styled.ListItem key={i}>
-                    <Styled.ChainName>{item.chainName}</Styled.ChainName>
+                    <Styled.ChainName>{item.chain}</Styled.ChainName>
                     {item.accounts.map((acc, j) => (
                       <Styled.ChainContent key={j}>
-                        <Styled.AccountPlaceholder>{acc.name}</Styled.AccountPlaceholder>
-                        {renderAddress(item.chainName, acc.address)}
-                        {isThorChain(item.chainName) && (
+                        <Styled.AccountPlaceholder>{acc.type}</Styled.AccountPlaceholder>
+                        {renderAddress(item.chain, acc.address)}
+                        {isThorChain(item.chain) && (
                           <>
                             <Styled.AccountPlaceholder>Ledger</Styled.AccountPlaceholder>
-                            {ledgerAdded ? renderAddress(item.chainName, acc.address, true) : renderAddLedger()}
+                            {ledgerAdded ? renderAddress(item.chain, acc.address, true) : renderAddLedger()}
                           </>
                         )}
                       </Styled.ChainContent>
@@ -151,7 +150,7 @@ export const Settings: React.FC<Props> = (props): JSX.Element => {
         )),
         O.getOrElse(() => <></>)
       ),
-    [ledgerAdded, renderAddress, renderAddLedger, intl, userAccounts]
+    [ledgerAdded, renderAddress, renderAddLedger, intl, walletAccounts]
   )
 
   const onSuccessPassword = useCallback(() => {
