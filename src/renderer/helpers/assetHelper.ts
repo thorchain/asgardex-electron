@@ -35,7 +35,7 @@ import {
 } from '../const'
 import { PricePoolAsset } from '../views/pools/Pools.types'
 import { getEthChecksumAddress } from './addressHelper'
-import { getChainAsset, isBchChain, isBtcChain, isEthChain, isLtchain } from './chainHelper'
+import { getChainAsset, isBchChain, isBtcChain, isEthChain, isLtcChain } from './chainHelper'
 import { eqAsset, eqString } from './fp/eq'
 import { sequenceTOption } from './fpHelpers'
 
@@ -174,7 +174,7 @@ export const isChainAsset = (asset: Asset): boolean => eqAsset.equals(asset, get
 
 export const isUSDAsset = (asset: Asset): boolean => asset.ticker.includes('USD')
 
-export const isUtxoAssetChain = ({ chain }: Asset) => isBtcChain(chain) || isBchChain(chain) || isLtchain(chain)
+export const isUtxoAssetChain = ({ chain }: Asset) => isBtcChain(chain) || isBchChain(chain) || isLtcChain(chain)
 
 /**
  * Update ETH token (ERC20) addresses to be based on checksum addresses

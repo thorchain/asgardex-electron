@@ -9,8 +9,12 @@ export const INITIAL_INTERACT_STATE: InteractState = {
 }
 
 export const DEFAULT_MIMIR_HALT: MimirHalt = {
-  haltTrading: false,
   haltThorChain: false,
+  haltTrading: false,
   haltEthTrading: false,
-  haltEthChain: false
+  haltBtcChain: false,
+  haltEthChain: false,
+  haltBchChain: false,
+  haltLtcChain: false,
+  haltBnbChain: false
 }
