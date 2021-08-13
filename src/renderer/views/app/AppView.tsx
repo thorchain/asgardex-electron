@@ -58,7 +58,6 @@ export const AppView: React.FC = (): JSX.Element => {
           })
         ),
         RD.toOption,
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
         O.map(
           ({
             chains,
