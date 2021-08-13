@@ -182,7 +182,6 @@ export const disableAllActions = ({
   if (isEthChain(chain) && haltEthChain) return true
 
   // 3. Check `chain` is included in `haltedChains` (provided by `inbound_addresses` endpoint)
-  console.log(haltedChains)
   return FP.pipe(haltedChains, isChainElem(chain))
 }
 
