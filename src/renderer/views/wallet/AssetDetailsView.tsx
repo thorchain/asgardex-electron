@@ -50,7 +50,7 @@ export const AssetDetailsView: React.FC = (): JSX.Element => {
   useEffect(() => setSelectedAsset(oRouteAsset), [])
 
   const {
-    mimirHalt: { haltThorChain, haltEthChain }
+    mimirHalt: { haltThorChain, haltEthChain, haltBnbChain }
   } = useMimirHalt()
 
   const { getTxs$, balancesState$, loadTxs, reloadBalancesByChain, setSelectedAsset, resetTxsPage } = useWalletContext()
@@ -152,7 +152,8 @@ export const AssetDetailsView: React.FC = (): JSX.Element => {
               disableUpgrade={disableRuneUpgrade({
                 asset,
                 haltThorChain,
-                haltEthChain
+                haltEthChain,
+                haltBnbChain
               })}
               network={network}
             />

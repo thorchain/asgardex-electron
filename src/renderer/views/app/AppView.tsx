@@ -2,9 +2,8 @@ import React, { useMemo, useRef } from 'react'
 
 import { SyncOutlined } from '@ant-design/icons'
 import * as RD from '@devexperts/remote-data-ts'
-import { Chain } from '@xchainjs/xchain-util'
+import { BCHChain, BNBChain, BTCChain, Chain, ETHChain, LTCChain } from '@xchainjs/xchain-util'
 import * as FP from 'fp-ts/function'
-import * as A from 'fp-ts/lib/Array'
 import * as O from 'fp-ts/Option'
 import { useObservableState } from 'observable-hooks'
 import { useIntl } from 'react-intl'
@@ -13,7 +12,6 @@ import { Footer } from '../../components/footer'
 import { Header } from '../../components/header'
 import { Button } from '../../components/uielements/button'
 import { useMidgardContext } from '../../contexts/MidgardContext'
-import { isEthChain } from '../../helpers/chainHelper'
 import { envOrDefault } from '../../helpers/envHelper'
 import { rdAltOnPending } from '../../helpers/fpHelpers'
 import { useMimirHalt } from '../../hooks/useMimirHalt'
@@ -60,28 +58,55 @@ export const AppView: React.FC = (): JSX.Element => {
           })
         ),
         RD.toOption,
-        O.map(({ chains, mimirHalt: { haltThorChain, haltTrading, haltEthChain, haltEthTrading } }) => {
-          let msg = ''
-          // 1. Check THORCHain status provided by `mimir`
-          if (haltThorChain) {
-            msg = 'THORChain is halted temporarily.'
-          } else if (haltTrading) {
-            msg = 'Trading for all pools is halted temporarily.'
-          } else if (haltEthChain) {
-            // 2. Check ETH status provided by `mimir`
-            msg = `ETH chain is halted temporarily.`
-          } else if (haltEthTrading) {
-            msg = `Trading for ETH is halted temporarily.`
-          }
-          // Filter ETH chain out to avoid duplicated messages
-          if (haltEthChain || haltEthTrading) chains = FP.pipe(chains, A.filter(FP.not(isEthChain)))
-          // 3. Check other status based on `inbound_addresses`
-          if (!haltThorChain && !haltTrading && chains.length) {
-            msg = `${msg} ${intl.formatMessage({ id: 'pools.halted.chain' }, { chain: chains.join(', ') })}`
-          }
+        O.map(
+          ({
+            chains,
+            mimirHalt: {
+              haltThorChain,
+              haltTrading,
+              haltEthTrading,
+              haltBtcChain,
+              haltEthChain,
+              haltBchChain,
+              haltLtcChain,
+              haltBnbChain
+            }
+          }) => {
+            let msg = ''
+            msg = haltEthTrading ? 'Trading for ETH is halted temporarily.' : msg
+            msg = haltTrading ? 'Trading for all pools is halted temporarily.' : msg
+            msg = haltThorChain ? 'THORChain is halted temporarily.' : msg
 
-          return msg ? <Styled.Alert key={'halted warning'} type="warning" message={msg} /> : <></>
-        }),
+            if (!haltThorChain && !haltTrading && chains.length) {
+              const chainsHaltState = [
+                {
+                  name: BTCChain,
+                  halted: haltBtcChain
+                },
+                {
+                  name: ETHChain,
+                  halted: haltEthChain
+                },
+                {
+                  name: BCHChain,
+                  halted: haltBchChain
+                },
+                {
+                  name: LTCChain,
+                  halted: haltLtcChain
+                },
+                {
+                  name: BNBChain,
+                  halted: haltBnbChain
+                }
+              ]
+              const haltedChains = chainsHaltState.filter((chain) => chain.halted).map((chain) => chain.name)
+              msg = `${msg} ${intl.formatMessage({ id: 'pools.halted.chain' }, { chain: haltedChains.join(', ') })}`
+            }
+
+            return msg ? <Styled.Alert key={'halted warning'} type="warning" message={msg} /> : <></>
+          }
+        ),
         O.getOrElse(() => <></>)
       ),
     [haltedChainsRD, intl, mimirHaltRD]

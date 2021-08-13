@@ -325,22 +325,45 @@ describe('helpers/assetHelper', () => {
 
   describe('disableRuneUpgrade', () => {
     it('disabled for BNB.RUNE + halted THORChain', () => {
-      expect(disableRuneUpgrade({ asset: AssetRune67C, haltThorChain: true, haltEthChain: false })).toBeTruthy()
+      expect(
+        disableRuneUpgrade({ asset: AssetRune67C, haltThorChain: true, haltEthChain: false, haltBnbChain: false })
+      ).toBeTruthy()
     })
     it('enabled for BNB.RUNE + halted ETH chain', () => {
-      expect(disableRuneUpgrade({ asset: AssetRune67C, haltThorChain: false, haltEthChain: true })).toBeFalsy()
+      expect(
+        disableRuneUpgrade({ asset: AssetRune67C, haltThorChain: false, haltEthChain: true, haltBnbChain: false })
+      ).toBeFalsy()
+    })
+
+    it('disabled for BNB.RUNE + halted BNB chain', () => {
+      expect(
+        disableRuneUpgrade({ asset: AssetRune67C, haltThorChain: false, haltEthChain: false, haltBnbChain: true })
+      ).toBeTruthy()
     })
     it('enabled for BNB.RUNE + no halted chains', () => {
-      expect(disableRuneUpgrade({ asset: AssetRune67C, haltThorChain: false, haltEthChain: false })).toBeFalsy()
+      expect(
+        disableRuneUpgrade({ asset: AssetRune67C, haltThorChain: false, haltEthChain: false, haltBnbChain: false })
+      ).toBeFalsy()
     })
     it('disabled for ETH.RUNE + halted ETH chain', () => {
-      expect(disableRuneUpgrade({ asset: AssetRuneERC20, haltThorChain: false, haltEthChain: true })).toBeTruthy()
+      expect(
+        disableRuneUpgrade({ asset: AssetRuneERC20, haltThorChain: false, haltEthChain: true, haltBnbChain: false })
+      ).toBeTruthy()
+    })
+    it('enabled for ETH.RUNE + halted BNB chain', () => {
+      expect(
+        disableRuneUpgrade({ asset: AssetRuneERC20, haltThorChain: false, haltEthChain: false, haltBnbChain: true })
+      ).toBeFalsy()
     })
     it('disabled for ETH.RUNE + halted THORChain', () => {
-      expect(disableRuneUpgrade({ asset: AssetRuneERC20, haltThorChain: true, haltEthChain: false })).toBeTruthy()
+      expect(
+        disableRuneUpgrade({ asset: AssetRuneERC20, haltThorChain: true, haltEthChain: false, haltBnbChain: false })
+      ).toBeTruthy()
     })
     it('enable for ETH.RUNE + no halted chains', () => {
-      expect(disableRuneUpgrade({ asset: AssetRuneERC20, haltThorChain: false, haltEthChain: false })).toBeFalsy()
+      expect(
+        disableRuneUpgrade({ asset: AssetRuneERC20, haltThorChain: false, haltEthChain: false, haltBnbChain: false })
+      ).toBeFalsy()
     })
   })
 })

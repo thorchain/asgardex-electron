@@ -73,7 +73,11 @@ export const MimirIO = t.type({
   'mimir//HALTTRADING': t.union([t.number, t.undefined]),
   'mimir//HALTTHORCHAIN': t.union([t.number, t.undefined]),
   'mimir//HALTETHCHAIN': t.union([t.number, t.undefined]),
-  'mimir//HALTETHTRADING': t.union([t.number, t.undefined])
+  'mimir//HALTETHTRADING': t.union([t.number, t.undefined]),
+  'mimir//HALTBTCCHAIN': t.union([t.number, t.undefined]),
+  'mimir//HALTBCHCHAIN': t.union([t.number, t.undefined]),
+  'mimir//HALTLTCCHAIN': t.union([t.number, t.undefined]),
+  'mimir//HALTBNBCHAIN': t.union([t.number, t.undefined])
 })
 
 export type Mimir = t.TypeOf<typeof MimirIO>
@@ -81,7 +85,18 @@ export type Mimir = t.TypeOf<typeof MimirIO>
 export type MimirLD = LiveData<Error, Mimir>
 export type MimirRD = RD.RemoteData<Error, Mimir>
 
-export type MimirHalt = { haltEthTrading: boolean; haltEthChain: boolean; haltThorChain: boolean; haltTrading: boolean }
+export type MimirHalt = MimirHaltChain & {
+  haltEthTrading: boolean
+  haltTrading: boolean
+}
+export type MimirHaltChain = {
+  haltThorChain: boolean
+  haltBtcChain: boolean
+  haltEthChain: boolean
+  haltBchChain: boolean
+  haltLtcChain: boolean
+  haltBnbChain: boolean
+}
 export type MimirHaltRD = RD.RemoteData<Error, MimirHalt>
 
 export type GetLiquidityProvidersParams = {

@@ -43,6 +43,7 @@ export const TabButton = styled(UIButton).attrs<TabButtonProps>(({ selected }) =
     span {
       border-bottom: 1px solid transparent;
       border-bottom-color: ${({ selected }) => selected && palette('primary', 0)};
+    }
   }
 `
 export const TabPane = styled(A.Tabs.TabPane)``

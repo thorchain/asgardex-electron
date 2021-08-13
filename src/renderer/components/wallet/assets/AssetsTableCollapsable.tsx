@@ -66,11 +66,11 @@ export const AssetsTableCollapsable: React.FC<Props> = (props): JSX.Element => {
   const previousAssetsTableData = useRef<Balance[][]>([])
 
   // get halt status from Mimir
-  const { haltThorChain, haltEthChain } = useMemo(
+  const { haltThorChain, haltEthChain, haltBnbChain } = useMemo(
     () =>
       FP.pipe(
         mimirHaltRD,
-        RD.getOrElse(() => ({ haltThorChain: true, haltEthChain: true }))
+        RD.getOrElse(() => ({ haltThorChain: true, haltEthChain: true, haltBnbChain: true }))
       ),
     [mimirHaltRD]
   )
@@ -117,7 +117,7 @@ export const AssetsTableCollapsable: React.FC<Props> = (props): JSX.Element => {
       width: 80,
       render: ({ asset, walletAddress }: WalletBalance) => {
         // Disable UPGRADE button if needed
-        const disableUpgradeButton = disableRuneUpgrade({ asset, haltThorChain, haltEthChain })
+        const disableUpgradeButton = disableRuneUpgrade({ asset, haltThorChain, haltEthChain, haltBnbChain })
 
         const onClickUpgradeButtonHandler = (e: React.MouseEvent<HTMLElement, MouseEvent>) => {
           e.preventDefault()
@@ -143,7 +143,7 @@ export const AssetsTableCollapsable: React.FC<Props> = (props): JSX.Element => {
         )
       }
     }),
-    [haltThorChain, haltEthChain, intl, setSelectedAsset, history]
+    [haltThorChain, haltEthChain, haltBnbChain, intl, setSelectedAsset, history]
   )
 
   const renderBalanceColumn = ({ asset, amount }: Balance) => {

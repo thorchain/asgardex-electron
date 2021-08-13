@@ -52,7 +52,7 @@ export const isBtcChain = (chain: Chain): boolean => eqChain.equals(chain, BTCCh
 /**
  * Check whether chain is LTC chain
  */
-export const isLtchain = (chain: Chain): boolean => eqChain.equals(chain, LTCChain)
+export const isLtcChain = (chain: Chain): boolean => eqChain.equals(chain, LTCChain)
 
 /**
  * Check whether chain is THOR chain
