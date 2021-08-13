@@ -85,20 +85,14 @@ export type Mimir = t.TypeOf<typeof MimirIO>
 export type MimirLD = LiveData<Error, Mimir>
 export type MimirRD = RD.RemoteData<Error, Mimir>
 
-export type MimirHalt = {
+export type MimirHalt = MimirHaltChain & {
   haltEthTrading: boolean
-  haltEthChain: boolean
-  haltThorChain: boolean
   haltTrading: boolean
-  haltBtcChain: boolean
-  haltBchChain: boolean
-  haltLtcChain: boolean
-  haltBnbChain: boolean
 }
 export type MimirHaltChain = {
-  haltEthChain: boolean
   haltThorChain: boolean
   haltBtcChain: boolean
+  haltEthChain: boolean
   haltBchChain: boolean
   haltLtcChain: boolean
   haltBnbChain: boolean
