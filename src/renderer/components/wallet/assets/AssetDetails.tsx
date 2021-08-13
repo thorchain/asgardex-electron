@@ -63,11 +63,11 @@ export const AssetDetails: React.FC<Props> = (props): JSX.Element => {
   const walletActionSendClick = useCallback(() => {
     const routeParams = FP.pipe(
       oWalletAddress,
-      O.map((walletAddress) => ({ asset: assetToString(asset), walletAddress, network })),
-      O.getOrElse(() => ({ asset: assetToString(asset), walletAddress: '', network }))
+      O.map((walletAddress) => ({ asset: assetToString(asset), walletAddress })),
+      O.getOrElse(() => ({ asset: assetToString(asset), walletAddress: '' }))
     )
     history.push(walletRoutes.send.path(routeParams))
-  }, [asset, history, oWalletAddress, network])
+  }, [asset, history, oWalletAddress])
 
   const walletActionDepositClick = useCallback(() => {
     FP.pipe(

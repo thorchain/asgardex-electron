@@ -83,16 +83,16 @@ describe('Wallet routes', () => {
       expect(assetDetail.template).toEqual('/wallet/assets/detail/:walletAddress/:asset')
     })
     it('returns path by given asset parameter', () => {
-      expect(assetDetail.path({ asset: 'BNB.BNB', walletAddress: 'walletAddress', network: 'mainnet' })).toEqual(
+      expect(assetDetail.path({ asset: 'BNB.BNB', walletAddress: 'walletAddress' })).toEqual(
         '/wallet/assets/detail/walletAddress/BNB.BNB'
       )
     })
     it('redirects to base path if asset is empty', () => {
-      expect(assetDetail.path({ asset: '', walletAddress: 'some wallet', network: 'testnet' })).toEqual(assets.path())
+      expect(assetDetail.path({ asset: '', walletAddress: 'some wallet' })).toEqual(assets.path())
     })
 
     it('redirects to base path if address is empty', () => {
-      expect(assetDetail.path({ asset: 'some asset', walletAddress: '', network: 'testnet' })).toEqual(assets.path())
+      expect(assetDetail.path({ asset: 'some asset', walletAddress: '' })).toEqual(assets.path())
     })
   })
 
@@ -101,16 +101,16 @@ describe('Wallet routes', () => {
       expect(send.template).toEqual('/wallet/assets/detail/:walletAddress/:asset/send')
     })
     it('path ', () => {
-      expect(send.path({ asset: 'BNB.BNB', walletAddress: 'walletAddress', network: 'mainnet' })).toEqual(
+      expect(send.path({ asset: 'BNB.BNB', walletAddress: 'walletAddress' })).toEqual(
         '/wallet/assets/detail/walletAddress/BNB.BNB/send'
       )
     })
     it('redirects to base path if asset is empty', () => {
-      expect(send.path({ asset: '', walletAddress: 'some wallet', network: 'testnet' })).toEqual(assets.path())
+      expect(send.path({ asset: '', walletAddress: 'some wallet' })).toEqual(assets.path())
     })
 
     it('redirects to base path if address is empty', () => {
-      expect(send.path({ asset: 'some asset', walletAddress: '', network: 'testnet' })).toEqual(assets.path())
+      expect(send.path({ asset: 'some asset', walletAddress: '' })).toEqual(assets.path())
     })
   })
 

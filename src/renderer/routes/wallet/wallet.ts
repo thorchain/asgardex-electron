@@ -72,7 +72,7 @@ export const bonds: Route<void> = {
   }
 }
 
-export type AssetDetailsParams = { asset: string; walletAddress: string; network: Network }
+export type AssetDetailsParams = { asset: string; walletAddress: string }
 export const assetDetail: Route<AssetDetailsParams> = {
   template: `${assets.template}/detail/:walletAddress/:asset`,
   path: ({ asset, walletAddress }) => {
@@ -85,12 +85,12 @@ export const assetDetail: Route<AssetDetailsParams> = {
   }
 }
 
-export type SendParams = { asset: string; walletAddress: string; network: Network }
+export type SendParams = { asset: string; walletAddress: string }
 export const send: Route<SendParams> = {
   template: `${assetDetail.template}/send`,
-  path: ({ asset, walletAddress, network }) => {
+  path: ({ asset, walletAddress }) => {
     if (asset && !!walletAddress) {
-      return `${assetDetail.path({ asset, walletAddress, network })}/send`
+      return `${assetDetail.path({ asset, walletAddress })}/send`
     } else {
       // Redirect to assets route if passed params are empty
       return assets.path()
@@ -98,7 +98,8 @@ export const send: Route<SendParams> = {
   }
 }
 
-export const upgradeRune: Route<AssetDetailsParams> = {
+export type AssetUpgradeDetailsParams = { asset: string; walletAddress: string; network: Network }
+export const upgradeRune: Route<AssetUpgradeDetailsParams> = {
   template: `${assetDetail.template}/upgrade`,
   path: ({ asset: assetString, walletAddress, network }) => {
     // Validate asset string to accept BNB.Rune only
@@ -117,8 +118,7 @@ export const upgradeRune: Route<AssetDetailsParams> = {
       O.fold(
         // Redirect to assets route if passed params are empty
         () => assets.path(),
-        ([asset, walletAddress]) =>
-          `${assetDetail.path({ asset: assetToString(asset), walletAddress, network })}/upgrade`
+        ([asset, walletAddress]) => `${assetDetail.path({ asset: assetToString(asset), walletAddress })}/upgrade`
       )
     )
   }
