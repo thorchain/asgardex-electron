@@ -335,9 +335,9 @@ describe('helpers/assetHelper', () => {
       ).toBeFalsy()
     })
 
-    it('enabled for BNB.RUNE + halted BNB chain', () => {
+    it('disabled for BNB.RUNE + halted BNB chain', () => {
       expect(
-        disableRuneUpgrade({ asset: AssetRune67C, haltThorChain: false, haltEthChain: true, haltBnbChain: true })
+        disableRuneUpgrade({ asset: AssetRune67C, haltThorChain: false, haltEthChain: false, haltBnbChain: true })
       ).toBeTruthy()
     })
     it('enabled for BNB.RUNE + no halted chains', () => {
