@@ -17,7 +17,7 @@ import * as Styled from './AccountSelector.style'
 type Props = {
   selectedAsset: Asset
   walletBalances: WalletBalances
-  onChange?: (asset: Asset, walletAddress: Address) => void
+  onChange?: (asset: Asset, walletAddress: Address, network: Network) => void
   size?: IconSize
   network: Network
 }
@@ -44,7 +44,7 @@ export const AccountSelector: React.FC<Props> = (props): JSX.Element => {
   const cellRenderer = useCallback(
     ({ asset, amount, walletAddress }: WalletBalance) => {
       const node = (
-        <Row align={'middle'} gutter={[8, 0]} onClick={() => onChange(asset, walletAddress)}>
+        <Row align={'middle'} gutter={[8, 0]} onClick={() => onChange(asset, walletAddress, network)}>
           <Col>
             <AssetData asset={asset} network={network} />
           </Col>

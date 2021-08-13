@@ -54,7 +54,7 @@ export const AssetIcon: React.FC<Props> = ({
       return runeIcon
     }
     // BNB RUNE
-    if (isRuneBnbAsset(asset)) {
+    if (isRuneBnbAsset(asset, network)) {
       return bnbRuneIcon
     }
     // BNB

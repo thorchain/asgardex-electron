@@ -45,8 +45,13 @@ export const UpgradeView: React.FC<Props> = (): JSX.Element => {
 
   // Accept [CHAIN].Rune only
   const runeNonNativeAsset: O.Option<Asset> = useMemo(
-    () => FP.pipe(assetFromString(asset), O.fromNullable, O.filter(isNonNativeRuneAsset)),
-    [asset]
+    () =>
+      FP.pipe(
+        assetFromString(asset),
+        O.fromNullable,
+        O.filter((asset) => isNonNativeRuneAsset(asset, network))
+      ),
+    [asset, network]
   )
 
   const runeNonNativeAssetWithDecimal$: AssetWithDecimalLD = useMemo(

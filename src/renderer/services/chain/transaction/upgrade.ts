@@ -22,7 +22,8 @@ export const upgradeRuneToNative$ = ({
   poolAddress: poolAddresses,
   asset,
   amount,
-  memo
+  memo,
+  network
 }: UpgradeRuneParams): UpgradeRuneTxState$ => {
   // Observable state of `UpgradeRuneTxState`
   const {
@@ -62,7 +63,7 @@ export const upgradeRuneToNative$ = ({
       // 3. check tx finality by polling its tx data
       const assetAddress: O.Option<Address> = FP.pipe(
         asset,
-        O.fromPredicate(isRuneEthAsset),
+        O.fromPredicate((asset) => isRuneEthAsset(asset, network)),
         O.chain(getEthAssetAddress)
       )
       return poolTxStatusByChain$({ txHash, chain: asset.chain, assetAddress })

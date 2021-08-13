@@ -161,7 +161,7 @@ export const SendView: React.FC<Props> = (): JSX.Element => {
       () => renderAssetError,
       (asset) => (
         <>
-          <BackLink path={walletRoutes.assetDetail.path({ asset: assetToString(asset), walletAddress })} />
+          <BackLink path={walletRoutes.assetDetail.path({ asset: assetToString(asset), walletAddress, network })} />
           {renderSendView(asset)}
         </>
       )

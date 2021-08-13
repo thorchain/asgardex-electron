@@ -54,8 +54,8 @@ export const AssetsView: React.FC = (): JSX.Element => {
 
   const selectAssetHandler = useCallback(
     (asset: Asset, walletAddress: string) =>
-      history.push(walletRoutes.assetDetail.path({ asset: assetToString(asset), walletAddress })),
-    [history]
+      history.push(walletRoutes.assetDetail.path({ asset: assetToString(asset), walletAddress, network })),
+    [history, network]
   )
 
   const poolDetails = RD.toNullable(poolsRD)?.poolDetails ?? []

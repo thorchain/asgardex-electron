@@ -2,6 +2,7 @@ import { assetFromString, assetToString } from '@xchainjs/xchain-util'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
 
+import { Network } from '../../../shared/api/types'
 import { isNonNativeRuneAsset } from '../../helpers/assetHelper'
 import { sequenceTOption } from '../../helpers/fpHelpers'
 import { Route } from '../types'
@@ -71,7 +72,7 @@ export const bonds: Route<void> = {
   }
 }
 
-export type AssetDetailsParams = { asset: string; walletAddress: string }
+export type AssetDetailsParams = { asset: string; walletAddress: string; network: Network }
 export const assetDetail: Route<AssetDetailsParams> = {
   template: `${assets.template}/detail/:walletAddress/:asset`,
   path: ({ asset, walletAddress }) => {
@@ -84,12 +85,12 @@ export const assetDetail: Route<AssetDetailsParams> = {
   }
 }
 
-export type SendParams = { asset: string; walletAddress: string }
+export type SendParams = { asset: string; walletAddress: string; network: Network }
 export const send: Route<SendParams> = {
   template: `${assetDetail.template}/send`,
-  path: ({ asset, walletAddress }) => {
+  path: ({ asset, walletAddress, network }) => {
     if (asset && !!walletAddress) {
-      return `${assetDetail.path({ asset, walletAddress })}/send`
+      return `${assetDetail.path({ asset, walletAddress, network })}/send`
     } else {
       // Redirect to assets route if passed params are empty
       return assets.path()
@@ -99,9 +100,13 @@ export const send: Route<SendParams> = {
 
 export const upgradeRune: Route<AssetDetailsParams> = {
   template: `${assetDetail.template}/upgrade`,
-  path: ({ asset: assetString, walletAddress }) => {
+  path: ({ asset: assetString, walletAddress, network }) => {
     // Validate asset string to accept BNB.Rune only
-    const oAsset = FP.pipe(assetFromString(assetString), O.fromNullable, O.filter(isNonNativeRuneAsset))
+    const oAsset = FP.pipe(
+      assetFromString(assetString),
+      O.fromNullable,
+      O.filter((asset) => isNonNativeRuneAsset(asset, network))
+    )
     // Simple validation of address
     const oWalletAddress = FP.pipe(
       walletAddress,
@@ -112,7 +117,8 @@ export const upgradeRune: Route<AssetDetailsParams> = {
       O.fold(
         // Redirect to assets route if passed params are empty
         () => assets.path(),
-        ([asset, walletAddress]) => `${assetDetail.path({ asset: assetToString(asset), walletAddress })}/upgrade`
+        ([asset, walletAddress]) =>
+          `${assetDetail.path({ asset: assetToString(asset), walletAddress, network })}/upgrade`
       )
     )
   }

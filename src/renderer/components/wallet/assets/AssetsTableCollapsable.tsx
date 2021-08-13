@@ -117,13 +117,13 @@ export const AssetsTableCollapsable: React.FC<Props> = (props): JSX.Element => {
       width: 80,
       render: ({ asset, walletAddress }: WalletBalance) => {
         // Disable UPGRADE button if needed
-        const disableUpgradeButton = disableRuneUpgrade({ asset, haltThorChain, haltEthChain, haltBnbChain })
+        const disableUpgradeButton = disableRuneUpgrade({ asset, haltThorChain, haltEthChain, haltBnbChain, network })
 
         const onClickUpgradeButtonHandler = (e: React.MouseEvent<HTMLElement, MouseEvent>) => {
           e.preventDefault()
           e.stopPropagation()
           setSelectedAsset(O.some(asset))
-          history.push(walletRoutes.upgradeRune.path({ asset: assetToString(asset), walletAddress }))
+          history.push(walletRoutes.upgradeRune.path({ asset: assetToString(asset), walletAddress, network }))
         }
 
         return (
@@ -132,7 +132,7 @@ export const AssetsTableCollapsable: React.FC<Props> = (props): JSX.Element => {
               <Styled.TickerLabel>{asset.ticker}</Styled.TickerLabel>
               <Styled.ChainLabel>{asset.chain}</Styled.ChainLabel>
             </Styled.Label>
-            {isNonNativeRuneAsset(asset) && (
+            {isNonNativeRuneAsset(asset, network) && (
               <Styled.UpgradeButton
                 onClick={disableUpgradeButton ? undefined : onClickUpgradeButtonHandler}
                 disabled={disableUpgradeButton}>
@@ -143,7 +143,7 @@ export const AssetsTableCollapsable: React.FC<Props> = (props): JSX.Element => {
         )
       }
     }),
-    [haltThorChain, haltEthChain, haltBnbChain, intl, setSelectedAsset, history]
+    [haltThorChain, haltEthChain, haltBnbChain, network, intl, setSelectedAsset, history]
   )
 
   const renderBalanceColumn = ({ asset, amount }: Balance) => {
