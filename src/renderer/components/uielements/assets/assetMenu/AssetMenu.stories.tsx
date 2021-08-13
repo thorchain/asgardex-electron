@@ -3,7 +3,7 @@ import React from 'react'
 import { Meta, Story } from '@storybook/react'
 import { AssetBNB, AssetBTC, AssetRuneNative, baseAmount, bn } from '@xchainjs/xchain-util'
 
-import { WalletBalance } from '../../../../types/wallet'
+import { WalletBalance } from '../../../../services/wallet/types'
 import { AssetMenu, Props as AssetMenuProps } from './AssetMenu'
 
 const priceIndex = {

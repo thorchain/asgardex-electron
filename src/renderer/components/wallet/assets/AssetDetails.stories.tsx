@@ -8,7 +8,7 @@ import * as NEA from 'fp-ts/lib/NonEmptyArray'
 
 import { ZERO_BASE_AMOUNT } from '../../../const'
 import { OpenExplorerTxUrl } from '../../../services/clients'
-import { WalletBalance, WalletBalances } from '../../../types/wallet'
+import { WalletBalance, WalletBalances } from '../../../services/wallet/types'
 import { AssetDetails } from './index'
 
 const bnbBalance: WalletBalance = {

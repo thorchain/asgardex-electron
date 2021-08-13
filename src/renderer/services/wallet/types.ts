@@ -48,14 +48,13 @@ export type KeystoreService = {
 }
 
 export type WalletType = 'keystore' | 'ledger'
-export type WalletAddress = { address: Address; type: WalletType }
-export type WalletAddressRD = RD.RemoteData<Error, WalletAddress>
+export type WalletAddress = { address: RD.RemoteData<Error, Address>; type: WalletType }
 export type WalletAddressLD = LiveData<Error, WalletAddress>
 export type WalletAddresses = WalletAddress[]
 
 export type WalletAccount = {
   chain: Chain
-  accounts: WalletAddressRD[]
+  accounts: WalletAddresses
 }
 
 export type WalletAccounts = WalletAccount[]

@@ -23,11 +23,11 @@ import { useEthereumContext } from '../../contexts/EthereumContext'
 import { useLitecoinContext } from '../../contexts/LitecoinContext'
 import { useThorchainContext } from '../../contexts/ThorchainContext'
 import { useWalletContext } from '../../contexts/WalletContext'
-import { filterEnabledChains } from '../../helpers/chainHelper'
+import { filterEnabledChains, isThorChain } from '../../helpers/chainHelper'
 import { sequenceTOptionFromArray } from '../../helpers/fpHelpers'
 import { useLedger } from '../../hooks/useLedger'
 import { DEFAULT_NETWORK } from '../../services/const'
-import { WalletAccount, WalletAddressRD } from '../../services/wallet/types'
+import { WalletAccount, WalletAddress } from '../../services/wallet/types'
 import { getPhrase } from '../../services/wallet/util'
 import { ClientSettingsView } from './CllientSettingsView'
 
@@ -50,10 +50,10 @@ export const SettingsView: React.FC = (): JSX.Element => {
           O.map((address) => ({
             chain: BNBChain,
             accounts: [
-              RD.success({
-                address,
+              {
+                address: RD.success(address),
                 type: 'keystore'
-              })
+              }
             ]
           }))
         )
@@ -70,10 +70,10 @@ export const SettingsView: React.FC = (): JSX.Element => {
           O.map((address) => ({
             chain: ETHChain,
             accounts: [
-              RD.success({
-                address,
+              {
+                address: RD.success(address),
                 type: 'keystore'
-              })
+              }
             ]
           }))
         )
@@ -90,10 +90,10 @@ export const SettingsView: React.FC = (): JSX.Element => {
           O.map((address) => ({
             chain: BTCChain,
             accounts: [
-              RD.success({
-                address,
+              {
+                address: RD.success(address),
                 type: 'keystore'
-              })
+              }
             ]
           }))
         )
@@ -102,7 +102,23 @@ export const SettingsView: React.FC = (): JSX.Element => {
   )
 
   const { address$: thorAddressUI$ } = useThorchainContext()
-  const { getAddress: getLedgerThorAddress, address: thorLedgerAddressRD } = useLedger()
+  const {
+    getAddress: getLedgerThorAddress,
+    address: thorLedgerAddressRD,
+    removeAddress: removeLedgerThorAddress
+  } = useLedger()
+
+  const addLedgerAddressHandler = (chain: Chain) => {
+    if (isThorChain(chain)) return getLedgerThorAddress(THORChain)
+
+    return FP.constVoid
+  }
+
+  const removeLedgerAddressHandler = (chain: Chain) => {
+    if (isThorChain(chain)) return removeLedgerThorAddress()
+
+    return FP.constVoid
+  }
 
   const oRuneNativeAddress = useObservableState(thorAddressUI$, O.none)
   const runeNativeAddress = FP.pipe(
@@ -110,18 +126,17 @@ export const SettingsView: React.FC = (): JSX.Element => {
     O.getOrElse(() => '')
   )
 
-  const thorLedgerAccount: WalletAddressRD = useMemo(
-    () =>
-      FP.pipe(
+  const thorLedgerAccount: WalletAddress = useMemo(
+    () => ({
+      type: 'ledger',
+      address: FP.pipe(
         thorLedgerAddressRD,
-        RD.mapLeft((errorID) => Error(`Could not get THOR address from Ledger ${errorID}`)),
-        RD.map((address) => ({
-          address,
-          type: 'ledger'
-        }))
-      ),
+        RD.mapLeft((errorID) => Error(`Could not get THOR address from Ledger ${errorID}`))
+      )
+    }),
     [thorLedgerAddressRD]
   )
+
   const thorAccount$: Rx.Observable<O.Option<WalletAccount>> = useMemo(
     () =>
       FP.pipe(
@@ -130,10 +145,10 @@ export const SettingsView: React.FC = (): JSX.Element => {
           O.map((address) => ({
             chain: THORChain,
             accounts: [
-              RD.success({
-                address,
-                type: 'keystore'
-              }),
+              {
+                type: 'keystore',
+                address: RD.success(address)
+              },
               thorLedgerAccount
             ]
           }))
@@ -151,10 +166,10 @@ export const SettingsView: React.FC = (): JSX.Element => {
           O.map((address) => ({
             chain: LTCChain,
             accounts: [
-              RD.success({
-                address,
-                type: 'ledger'
-              })
+              {
+                type: 'ledger',
+                address: RD.success(address)
+              }
             ]
           }))
         )
@@ -171,10 +186,10 @@ export const SettingsView: React.FC = (): JSX.Element => {
           O.map((address) => ({
             chain: BCHChain,
             accounts: [
-              RD.success({
-                address,
-                type: 'ledger'
-              })
+              {
+                type: 'ledger',
+                address: RD.success(address)
+              }
             ]
           }))
         )
@@ -256,8 +271,10 @@ export const SettingsView: React.FC = (): JSX.Element => {
             lockWallet={lock}
             removeKeystore={removeKeystore}
             exportKeystore={exportKeystore}
+            addLedgerAddress={addLedgerAddressHandler}
+            removeLedgerAddress={removeLedgerAddressHandler}
             runeNativeAddress={runeNativeAddress}
-            userAccounts={userAccounts}
+            walletAccounts={userAccounts}
             phrase={phrase}
             clickAddressLinkHandler={clickAddressLinkHandler}
             validatePassword$={validatePassword$}

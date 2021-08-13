@@ -19,6 +19,8 @@ export const useLedger = () => {
 
   const { get$: address$, set: setAddress } = useMemo(() => observableState<LedgerAddressRD>(RD.initial), [])
 
+  const removeAddress = () => setAddress(RD.initial)
+
   const addressRD = useObservableState(FP.pipe(address$, RxOp.shareReplay(1)), RD.initial)
 
   const getAddress = useCallback(
@@ -35,6 +37,7 @@ export const useLedger = () => {
 
   return {
     getAddress,
+    removeAddress,
     address: addressRD
   }
 }

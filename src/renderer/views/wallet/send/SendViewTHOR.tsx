@@ -19,8 +19,7 @@ import { useValidateAddress } from '../../../hooks/useValidateAddress'
 import { INITIAL_SEND_STATE } from '../../../services/chain/const'
 import { FeeRD, SendTxParams, SendTxState } from '../../../services/chain/types'
 import { OpenExplorerTxUrl, WalletBalances } from '../../../services/clients'
-import { NonEmptyWalletBalances, ValidatePasswordHandler } from '../../../services/wallet/types'
-import { WalletBalance } from '../../../types/wallet'
+import { NonEmptyWalletBalances, ValidatePasswordHandler, WalletBalance } from '../../../services/wallet/types'
 import * as Helper from './SendView.helper'
 
 type Props = {
@@ -81,7 +80,7 @@ export const SendViewTHOR: React.FC<Props> = (props): JSX.Element => {
       <SendFormTHOR
         balances={FP.pipe(
           oBalances,
-          O.getOrElse(() => [] as WalletBalances)
+          O.getOrElse<WalletBalances>(() => [])
         )}
         balance={balance}
         isLoading={isLoading}

@@ -5,7 +5,7 @@ import { bn, AssetBNB, assetAmount, assetToBase, baseAmount, AssetBTC, AssetRune
 import * as O from 'fp-ts/Option'
 
 import { ZERO_BASE_AMOUNT } from '../../../../const'
-import { WalletBalance } from '../../../../types/wallet'
+import { WalletBalance } from '../../../../services/wallet/types'
 import { AssetCard, Props as AssetCardProps } from './AssetCard'
 
 const balanceBNB: WalletBalance = {

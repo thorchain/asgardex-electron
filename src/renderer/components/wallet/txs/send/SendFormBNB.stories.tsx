@@ -15,7 +15,7 @@ import {
 
 import { mockValidatePassword$ } from '../../../../../shared/mock/wallet'
 import { SendTxParams } from '../../../../services/binance/types'
-import { WalletBalance } from '../../../../types/wallet'
+import { WalletBalance } from '../../../../services/wallet/types'
 import { SendFormBNB, Props as SendFormBNBProps } from './SendFormBNB'
 
 const bnbBalance: WalletBalance = {

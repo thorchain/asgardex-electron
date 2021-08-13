@@ -13,9 +13,8 @@ import * as S from 'fp-ts/lib/string'
 import { DepositAssetFees, DepositFees, SwapFeesParams } from '../../services/chain/types'
 import { ApproveParams } from '../../services/ethereum/types'
 import { PoolAddress, PoolShare } from '../../services/midgard/types'
-import { ApiError } from '../../services/wallet/types'
+import { ApiError, WalletBalance } from '../../services/wallet/types'
 import { AssetWithAmount } from '../../types/asgardex'
-import { WalletBalance } from '../../types/wallet'
 import { PricePool } from '../../views/pools/Pools.types'
 
 export const eqString = S.Eq

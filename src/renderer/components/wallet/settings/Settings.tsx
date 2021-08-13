@@ -1,7 +1,8 @@
 import React, { useCallback, useMemo, useState } from 'react'
 
+import * as RD from '@devexperts/remote-data-ts'
 import { Address } from '@xchainjs/xchain-client'
-import { Asset, Chain } from '@xchainjs/xchain-util'
+import { Asset, Chain, THORChain } from '@xchainjs/xchain-util'
 import { Row, Col, List } from 'antd'
 import * as FP from 'fp-ts/function'
 import * as O from 'fp-ts/lib/Option'
@@ -12,7 +13,7 @@ import { ReactComponent as PlusIcon } from '../../../assets/svg/icon-plus.svg'
 import { ReactComponent as RemoveIcon } from '../../../assets/svg/icon-remove.svg'
 import { ReactComponent as UnlockOutlined } from '../../../assets/svg/icon-unlock-warning.svg'
 import { getChainAsset, isThorChain } from '../../../helpers/chainHelper'
-import { ValidatePasswordHandler, WalletAccounts } from '../../../services/wallet/types'
+import { ValidatePasswordHandler, WalletAccounts, WalletAddress } from '../../../services/wallet/types'
 import { RemoveWalletConfirmationModal } from '../../modal/confirmation/RemoveWalletConfirmationModal'
 import { PasswordModal } from '../../modal/password'
 import { QRCodeModal } from '../../uielements/qrCodeModal/QRCodeModal'
@@ -23,10 +24,12 @@ type Props = {
   selectedNetwork: Network
   walletAccounts: O.Option<WalletAccounts>
   runeNativeAddress: string
-  lockWallet?: () => void
-  removeKeystore?: () => void
-  exportKeystore?: (runeNativeAddress: string, selectedNetwork: Network) => void
-  phrase?: O.Option<string>
+  lockWallet: FP.Lazy<void>
+  removeKeystore: FP.Lazy<void>
+  exportKeystore: (runeNativeAddress: string, selectedNetwork: Network) => void
+  removeLedgerAddress: (chain: Chain) => void
+  addLedgerAddress: (chain: Chain) => void
+  phrase: O.Option<string>
   clickAddressLinkHandler: (chain: Chain, address: Address) => void
   validatePassword$: ValidatePasswordHandler
   ClientSettingsView: React.ComponentType<{}>
@@ -41,13 +44,9 @@ export const Settings: React.FC<Props> = (props): JSX.Element => {
     lockWallet = () => {},
     removeKeystore = () => {},
     exportKeystore = () => {},
-    /* Hide `addDevice` for all chains temporarily
-    retrieveLedgerAddress,
-    */
-    /* Hide `removeDevice` for all chains temporarily
     removeLedgerAddress,
-    */
-    phrase: oPhrase = O.none,
+    addLedgerAddress,
+    phrase: oPhrase,
     clickAddressLinkHandler,
     validatePassword$,
     ClientSettingsView
@@ -96,25 +95,37 @@ export const Settings: React.FC<Props> = (props): JSX.Element => {
   }, [showQRModal, selectedNetwork, closeQrModal])
 
   const renderAddress = useCallback(
-    (chain: Chain, address: Address, isLedgerAddress = false) => (
+    (chain: Chain, { type, address: addressRD }: WalletAddress) => (
       <Styled.AddressContainer>
-        <Styled.AddressEllipsis address={address} chain={chain} network={selectedNetwork} enableCopy={true} />
-        <Styled.QRCodeIcon onClick={() => setShowQRModal(O.some({ asset: getChainAsset(chain), address }))} />
-        <Styled.AddressLinkIcon onClick={() => clickAddressLinkHandler(chain, address)} />
-        {isLedgerAddress && <RemoveIcon />}
+        {FP.pipe(
+          addressRD,
+          RD.fold(
+            () => <>...</>,
+            () => <>...</>,
+            (error) => <>{error.message}</>,
+            (address) => (
+              <>
+                <Styled.AddressEllipsis address={address} chain={chain} network={selectedNetwork} enableCopy={true} />
+                <Styled.QRCodeIcon onClick={() => setShowQRModal(O.some({ asset: getChainAsset(chain), address }))} />
+                <Styled.AddressLinkIcon onClick={() => clickAddressLinkHandler(chain, address)} />
+                {type === 'ledger' && <RemoveIcon onClick={() => removeLedgerAddress(chain)} />}
+              </>
+            )
+          )
+        )}
       </Styled.AddressContainer>
     ),
-    [clickAddressLinkHandler, selectedNetwork]
+    [clickAddressLinkHandler, removeLedgerAddress, selectedNetwork]
   )
 
   const renderAddLedger = useCallback(
-    () => (
-      <Styled.AddLedger>
+    (chain: Chain) => (
+      <Styled.AddLedger onClick={() => addLedgerAddress(chain)}>
         <PlusIcon />
         <Styled.AddLedgerTextWrapper>{intl.formatMessage({ id: 'ledger.add.device' })}</Styled.AddLedgerTextWrapper>
       </Styled.AddLedger>
     ),
-    [intl]
+    [addLedgerAddress, intl]
   )
 
   const accounts = useMemo(
@@ -127,21 +138,24 @@ export const Settings: React.FC<Props> = (props): JSX.Element => {
             <Styled.AccountCard>
               <List
                 dataSource={accounts}
-                renderItem={(item, i: number) => (
+                renderItem={({ chain, accounts }, i: number) => (
                   <Styled.ListItem key={i}>
-                    <Styled.ChainName>{item.chain}</Styled.ChainName>
-                    {item.accounts.map((acc, j) => (
-                      <Styled.ChainContent key={j}>
-                        <Styled.AccountPlaceholder>{acc.type}</Styled.AccountPlaceholder>
-                        {renderAddress(item.chain, acc.address)}
-                        {isThorChain(item.chain) && (
-                          <>
-                            <Styled.AccountPlaceholder>Ledger</Styled.AccountPlaceholder>
-                            {ledgerAdded ? renderAddress(item.chain, acc.address, true) : renderAddLedger()}
-                          </>
-                        )}
-                      </Styled.ChainContent>
-                    ))}
+                    <Styled.ChainName>{chain}</Styled.ChainName>
+                    {accounts.map((account, j) => {
+                      const { type } = account
+                      return (
+                        <Styled.ChainContent key={j}>
+                          <Styled.AccountPlaceholder>{type}</Styled.AccountPlaceholder>
+                          {renderAddress(chain, account)}
+                          {isThorChain(chain) && (
+                            <>
+                              <Styled.AccountPlaceholder>{type}</Styled.AccountPlaceholder>
+                              {ledgerAdded ? renderAddress(chain, account) : renderAddLedger(THORChain)}
+                            </>
+                          )}
+                        </Styled.ChainContent>
+                      )
+                    })}
                   </Styled.ListItem>
                 )}
               />

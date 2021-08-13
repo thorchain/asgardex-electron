@@ -20,8 +20,7 @@ import { FeesWithRatesLD } from '../../../services/bitcoin/types'
 import { INITIAL_SEND_STATE } from '../../../services/chain/const'
 import { SendTxParams, SendTxState } from '../../../services/chain/types'
 import { OpenExplorerTxUrl, WalletBalances } from '../../../services/clients'
-import { NonEmptyWalletBalances, ValidatePasswordHandler } from '../../../services/wallet/types'
-import { WalletBalance } from '../../../types/wallet'
+import { NonEmptyWalletBalances, ValidatePasswordHandler, WalletBalance } from '../../../services/wallet/types'
 import * as Helper from './SendView.helper'
 
 type Props = {
@@ -76,7 +75,7 @@ export const SendViewBTC: React.FC<Props> = (props): JSX.Element => {
       <SendFormBTC
         balances={FP.pipe(
           oBalances,
-          O.getOrElse(() => [] as WalletBalances)
+          O.getOrElse<WalletBalances>(() => [])
         )}
         balance={walletBalance}
         isLoading={isLoading}

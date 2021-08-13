@@ -9,7 +9,7 @@ import { assetAmount, AssetETH, AssetRuneNative, assetToBase } from '@xchainjs/x
 import { mockValidatePassword$ } from '../../../../../shared/mock/wallet'
 import { THORCHAIN_DECIMAL } from '../../../../helpers/assetHelper'
 import { SendTxParams } from '../../../../services/ethereum/types'
-import { WalletBalance } from '../../../../types/wallet'
+import { WalletBalance } from '../../../../services/wallet/types'
 import { SendFormETH } from './index'
 import { Props as SendFormETHProps } from './SendFormETH'
 
