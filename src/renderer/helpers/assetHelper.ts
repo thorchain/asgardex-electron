@@ -62,13 +62,14 @@ export const getBnbRuneAsset = (network: Network = 'testnet'): Asset => {
   return network === 'testnet' ? AssetRune67C : AssetRuneB1A
 }
 
-export const isRuneBnbAsset = (asset: Asset): boolean =>
-  eqAsset.equals(asset, AssetRune67C) || eqAsset.equals(asset, AssetRuneB1A)
+export const isRuneBnbAsset = (asset: Asset, network: Network): boolean =>
+  network === 'mainnet' ? eqAsset.equals(asset, AssetRuneB1A) : eqAsset.equals(asset, AssetRune67C)
 
-export const isRuneEthAsset = (asset: Asset): boolean =>
-  eqAsset.equals(asset, AssetRuneERC20) || eqAsset.equals(asset, AssetRuneERC20Testnet)
+export const isRuneEthAsset = (asset: Asset, network: Network): boolean =>
+  network === 'mainnet' ? eqAsset.equals(asset, AssetRuneERC20) : eqAsset.equals(asset, AssetRuneERC20Testnet)
 
-export const isNonNativeRuneAsset = (asset: Asset): boolean => isRuneBnbAsset(asset) || isRuneEthAsset(asset)
+export const isNonNativeRuneAsset = (asset: Asset, network: Network): boolean =>
+  isRuneBnbAsset(asset, network) || isRuneEthAsset(asset, network)
 
 /**
  * Check whether an asset is a LTC asset
@@ -274,14 +275,16 @@ export const disableRuneUpgrade = ({
   asset,
   haltThorChain,
   haltEthChain,
-  haltBnbChain
+  haltBnbChain,
+  network
 }: {
   asset: Asset
   haltThorChain: boolean
   haltEthChain: boolean
   haltBnbChain: boolean
+  network: Network
 }) => {
-  if (isNonNativeRuneAsset(asset)) {
+  if (isNonNativeRuneAsset(asset, network)) {
     // BNB.RUNE + ETH.RUNE
     if (haltThorChain) return true
     // ETH.RUNE

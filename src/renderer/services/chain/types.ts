@@ -248,6 +248,7 @@ export type UpgradeRuneParams = {
   readonly asset: Asset
   readonly amount: BaseAmount
   readonly memo: string
+  readonly network: Network
 }
 
 /**

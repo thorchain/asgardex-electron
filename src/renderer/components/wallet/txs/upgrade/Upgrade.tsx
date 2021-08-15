@@ -196,14 +196,15 @@ export const Upgrade: React.FC<Props> = (props): JSX.Element => {
               poolAddress,
               amount: amountToUpgrade,
               asset: runeAsset.asset,
-              memo: getSwitchMemo(runeNativeAddress)
+              memo: getSwitchMemo(runeNativeAddress),
+              network
             })
           )
           return true
         })
       ),
 
-    [runeNativeAddress, targetPoolAddressRD, upgrade$, amountToUpgrade, runeAsset, subscribeUpgradeTxState]
+    [runeNativeAddress, targetPoolAddressRD, upgrade$, amountToUpgrade, runeAsset, subscribeUpgradeTxState, network]
   )
 
   const oFee: O.Option<BaseAmount> = useMemo(() => FP.pipe(feeRD, RD.toOption), [feeRD])

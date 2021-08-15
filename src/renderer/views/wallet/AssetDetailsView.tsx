@@ -153,7 +153,8 @@ export const AssetDetailsView: React.FC = (): JSX.Element => {
                 asset,
                 haltThorChain,
                 haltEthChain,
-                haltBnbChain
+                haltBnbChain,
+                network
               })}
               network={network}
             />

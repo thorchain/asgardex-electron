@@ -77,16 +77,19 @@ export const AssetDetails: React.FC<Props> = (props): JSX.Element => {
     )
   }, [oWalletAddress, history])
 
-  const isNonNativeRuneAsset: boolean = useMemo(() => AssetHelper.isNonNativeRuneAsset(asset), [asset])
+  const isNonNativeRuneAsset: boolean = useMemo(
+    () => AssetHelper.isNonNativeRuneAsset(asset, network),
+    [asset, network]
+  )
 
   const walletActionUpgradeNonNativeRuneClick = useCallback(() => {
     FP.pipe(
       oWalletAddress,
       O.filter((_) => isNonNativeRuneAsset),
-      O.map((walletAddress) => walletRoutes.upgradeRune.path({ asset: assetToString(asset), walletAddress })),
+      O.map((walletAddress) => walletRoutes.upgradeRune.path({ asset: assetToString(asset), walletAddress, network })),
       O.map(history.push)
     )
-  }, [oWalletAddress, history, isNonNativeRuneAsset, asset])
+  }, [oWalletAddress, history, isNonNativeRuneAsset, asset, network])
 
   const refreshHandler = useCallback(() => {
     loadTxsHandler({ limit: MAX_ITEMS_PER_PAGE, offset: (currentPage - 1) * MAX_ITEMS_PER_PAGE })
@@ -102,8 +105,12 @@ export const AssetDetails: React.FC<Props> = (props): JSX.Element => {
   )
 
   const oNoneNativeRuneAsset: O.Option<Asset> = useMemo(
-    () => FP.pipe(asset, O.fromPredicate(AssetHelper.isNonNativeRuneAsset)),
-    [asset]
+    () =>
+      FP.pipe(
+        asset,
+        O.fromPredicate((asset) => AssetHelper.isNonNativeRuneAsset(asset, network))
+      ),
+    [asset, network]
   )
 
   const getNonNativeRuneBalance: O.Option<(balances: WalletBalances) => O.Option<AssetAmount>> = useMemo(
