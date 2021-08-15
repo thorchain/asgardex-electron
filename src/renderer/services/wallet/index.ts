@@ -2,6 +2,7 @@ import { network$ } from '../app/service'
 import { createBalancesService } from './balances'
 import { setSelectedAsset, selectedAsset$, client$ } from './common'
 import { keystoreService, removeKeystore } from './keystore'
+import { askLedgerAddressByChain$, getLedgerAddressByChain$, removeLedgerAddressByChain } from './ledger'
 import { getTxs$, loadTxs, explorerUrl$, resetTxsPage } from './transaction'
 
 const { reloadBalances, reloadBalancesByChain, balancesState$, chainBalances$ } = createBalancesService({
@@ -24,5 +25,8 @@ export {
   reloadBalances,
   reloadBalancesByChain,
   balancesState$,
-  chainBalances$
+  chainBalances$,
+  askLedgerAddressByChain$,
+  getLedgerAddressByChain$,
+  removeLedgerAddressByChain
 }

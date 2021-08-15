@@ -11,7 +11,6 @@ import {
   reloadSwapFees,
   swapFees$
 } from './fees'
-import { retrieveLedgerAddress, removeLedgerAddress, removeAllLedgerAddress } from './ledger'
 import { asymDepositTxMemo$, symDepositTxMemo$, getWithdrawMemo$ } from './memo'
 import {
   swap$,
@@ -38,9 +37,6 @@ export {
   symDepositTxMemo$,
   asymDepositTxMemo$,
   getWithdrawMemo$,
-  retrieveLedgerAddress,
-  removeLedgerAddress,
-  removeAllLedgerAddress,
   reloadSwapFees,
   swapFees$,
   assetAddress$,

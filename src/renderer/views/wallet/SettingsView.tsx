@@ -12,7 +12,6 @@ import * as Rx from 'rxjs'
 import * as RxOp from 'rxjs/operators'
 
 import { Network } from '../../../shared/api/types'
-import { Button } from '../../components/uielements/button'
 import { Settings } from '../../components/wallet/settings'
 import { useAppContext } from '../../contexts/AppContext'
 import { useBinanceContext } from '../../contexts/BinanceContext'
@@ -103,13 +102,13 @@ export const SettingsView: React.FC = (): JSX.Element => {
 
   const { address$: thorAddressUI$ } = useThorchainContext()
   const {
-    getAddress: getLedgerThorAddress,
+    askAddress: askLedgerThorAddress,
     address: thorLedgerAddressRD,
     removeAddress: removeLedgerThorAddress
-  } = useLedger()
+  } = useLedger(THORChain)
 
   const addLedgerAddressHandler = (chain: Chain) => {
-    if (isThorChain(chain)) return getLedgerThorAddress(THORChain)
+    if (isThorChain(chain)) return askLedgerThorAddress()
 
     return FP.constVoid
   }
@@ -167,7 +166,7 @@ export const SettingsView: React.FC = (): JSX.Element => {
             chain: LTCChain,
             accounts: [
               {
-                type: 'ledger',
+                type: 'keystore',
                 address: RD.success(address)
               }
             ]
@@ -187,7 +186,7 @@ export const SettingsView: React.FC = (): JSX.Element => {
             chain: BCHChain,
             accounts: [
               {
-                type: 'ledger',
+                type: 'keystore',
                 address: RD.success(address)
               }
             ]
@@ -199,7 +198,7 @@ export const SettingsView: React.FC = (): JSX.Element => {
 
   const network = useObservableState<Network>(network$, DEFAULT_NETWORK)
 
-  const userAccounts$ = useMemo(
+  const walletAccounts$ = useMemo(
     () =>
       FP.pipe(
         // combineLatest is for the future additional accounts
@@ -218,7 +217,7 @@ export const SettingsView: React.FC = (): JSX.Element => {
       ),
     [thorAccount$, bnbAccount$, ethAccount$, btcAccount$, bchAccount$, ltcAddress$]
   )
-  const userAccounts = useObservableState(userAccounts$, O.none)
+  const walletAccounts = useObservableState(walletAccounts$, O.none)
 
   const oBNBClient = useObservableState(clientByChain$(BNBChain), O.none)
   const oETHClient = useObservableState(clientByChain$(ETHChain), O.none)
@@ -259,12 +258,6 @@ export const SettingsView: React.FC = (): JSX.Element => {
   return (
     <>
       <Row>
-        <Col>
-          <Button onClick={() => getLedgerThorAddress(THORChain)}>Get Ledger THOR address</Button>
-        </Col>
-        <Col>ledgerAddressRD: {JSON.stringify(thorLedgerAddressRD)}</Col>
-      </Row>
-      <Row>
         <Col span={24}>
           <Settings
             selectedNetwork={network}
@@ -274,7 +267,7 @@ export const SettingsView: React.FC = (): JSX.Element => {
             addLedgerAddress={addLedgerAddressHandler}
             removeLedgerAddress={removeLedgerAddressHandler}
             runeNativeAddress={runeNativeAddress}
-            walletAccounts={userAccounts}
+            walletAccounts={walletAccounts}
             phrase={phrase}
             clickAddressLinkHandler={clickAddressLinkHandler}
             validatePassword$={validatePassword$}

@@ -35,10 +35,31 @@ import {
   eqPoolAddresses,
   eqONullableString,
   eqAssetAmount,
-  eqPricePool
+  eqPricePool,
+  eqOString
 } from './eq'
 
 describe('helpers/fp/eq', () => {
+  describe('eqOString', () => {
+    it('same some(string) are equal', () => {
+      const a = O.some('hello')
+      const b = O.some('hello')
+      expect(eqOString.equals(a, b)).toBeTruthy()
+    })
+    it('different some(asset) are not equal', () => {
+      const a = O.some('hellp')
+      const b = O.some('world')
+      expect(eqOString.equals(a, b)).toBeFalsy()
+    })
+    it('none/some are not equal', () => {
+      const b = O.some(AssetBNB)
+      expect(eqOString.equals(O.none, b)).toBeFalsy()
+    })
+    it('none/none are equal', () => {
+      expect(eqOString.equals(O.none, O.none)).toBeTruthy()
+    })
+  })
+
   describe('eqBigNumber', () => {
     it('is equal', () => {
       expect(eqBigNumber.equals(bn(1.01), bn(1.01))).toBeTruthy()
