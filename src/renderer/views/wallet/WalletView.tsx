@@ -1,18 +1,25 @@
 import React, { useCallback, useMemo } from 'react'
 
 import { Row } from 'antd'
+import * as FP from 'fp-ts/function'
+import * as O from 'fp-ts/lib/Option'
 import * as H from 'history'
 import { useObservableState } from 'observable-hooks'
 import { Switch, Route, Redirect } from 'react-router-dom'
+import * as RxOp from 'rxjs/operators'
 
+import { Network } from '../../../shared/api/types'
 import { RefreshButton } from '../../components/uielements/button/'
 import { AssetsNav } from '../../components/wallet/assets'
+import { useAppContext } from '../../contexts/AppContext'
 import { useMidgardContext } from '../../contexts/MidgardContext'
 import { useThorchainContext } from '../../contexts/ThorchainContext'
 import { useWalletContext } from '../../contexts/WalletContext'
 import { RedirectRouteState } from '../../routes/types'
 import * as walletRoutes from '../../routes/wallet'
+import { DEFAULT_NETWORK } from '../../services/const'
 import { hasImportedKeystore, isLocked } from '../../services/wallet/util'
+import { getPhrase } from '../../services/wallet/util'
 import { AssetDetailsView } from './AssetDetailsView'
 import { AssetsView } from './AssetsView'
 import { BondsView } from './BondsView'
@@ -25,10 +32,12 @@ import { SendView } from './send'
 import { SettingsView } from './SettingsView'
 import { UnlockView } from './UnlockView'
 import { UpgradeView } from './upgrade'
+import { WalletSettingsView } from './WalletSettingsView'
 import * as Styled from './WalletView.styles'
 
 export const WalletView: React.FC = (): JSX.Element => {
   const { keystoreService, reloadBalances } = useWalletContext()
+  const { keystore$, lock, removeKeystore, exportKeystore, validatePassword$ } = keystoreService
   const {
     service: {
       shares: { reloadCombineSharesByAddresses },
@@ -37,6 +46,19 @@ export const WalletView: React.FC = (): JSX.Element => {
     }
   } = useMidgardContext()
   const { reloadNodesInfo } = useThorchainContext()
+
+  const { network$ } = useAppContext()
+  const network = useObservableState<Network>(network$, DEFAULT_NETWORK)
+
+  const { address$: thorAddressUI$ } = useThorchainContext()
+  const oRuneNativeAddress = useObservableState(thorAddressUI$, O.none)
+  const runeNativeAddress = FP.pipe(
+    oRuneNativeAddress,
+    O.getOrElse(() => '')
+  )
+
+  const phrase$ = useMemo(() => FP.pipe(keystore$, RxOp.map(getPhrase)), [keystore$])
+  const phrase = useObservableState(phrase$, O.none)
 
   // Important note:
   // DON'T set `INITIAL_KEYSTORE_STATE` as default value
@@ -98,6 +120,15 @@ export const WalletView: React.FC = (): JSX.Element => {
           </Route>
           <Route path={walletRoutes.walletSettings.template} exact>
             <AssetsNav />
+            <WalletSettingsView
+              selectedNetwork={network}
+              runeNativeAddress={runeNativeAddress}
+              lockWallet={lock}
+              removeKeystore={removeKeystore}
+              exportKeystore={exportKeystore}
+              phrase={phrase}
+              validatePassword$={validatePassword$}
+            />
           </Route>
           <Route path={walletRoutes.history.template}>
             {reloadButton(poolActionsHistory.reloadActionsHistory)}
@@ -108,12 +139,19 @@ export const WalletView: React.FC = (): JSX.Element => {
       </>
     ),
     [
-      reloadAllPools,
-      reloadBalances,
       reloadButton,
-      reloadCombineSharesByAddresses,
+      reloadBalances,
       reloadNodesInfo,
-      poolActionsHistory.reloadActionsHistory
+      network,
+      runeNativeAddress,
+      lock,
+      removeKeystore,
+      exportKeystore,
+      phrase,
+      validatePassword$,
+      poolActionsHistory.reloadActionsHistory,
+      reloadCombineSharesByAddresses,
+      reloadAllPools
     ]
   )
 
