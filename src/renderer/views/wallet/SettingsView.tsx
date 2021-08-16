@@ -28,9 +28,10 @@ import { sequenceTOptionFromArray } from '../../helpers/fpHelpers'
 import { useLedger } from '../../hooks/useLedger'
 import { DEFAULT_NETWORK } from '../../services/const'
 import { ledgerErrorIdToI18n } from '../../services/wallet/ledger'
-import { WalletAccount, WalletAddress } from '../../services/wallet/types'
+import { WalletAddress } from '../../services/wallet/types'
 import { getPhrase } from '../../services/wallet/util'
 import { ClientSettingsView } from './CllientSettingsView'
+import { walletAccount$ } from './SettingsView.helper'
 
 export const SettingsView: React.FC = (): JSX.Element => {
   const intl = useIntl()
@@ -38,72 +39,20 @@ export const SettingsView: React.FC = (): JSX.Element => {
   const { keystore$, lock, removeKeystore, exportKeystore, validatePassword$ } = keystoreService
   const { network$ } = useAppContext()
 
+  const network = useObservableState<Network>(network$, DEFAULT_NETWORK)
+
   const { clientByChain$ } = useChainContext()
 
   const phrase$ = useMemo(() => FP.pipe(keystore$, RxOp.map(getPhrase)), [keystore$])
   const phrase = useObservableState(phrase$, O.none)
 
   const { addressUI$: bnbAddressUI$ } = useBinanceContext()
-  const bnbAccount$: Rx.Observable<O.Option<WalletAccount>> = useMemo(
-    () =>
-      FP.pipe(
-        bnbAddressUI$,
-        RxOp.map(
-          O.map((address) => ({
-            chain: BNBChain,
-            accounts: [
-              {
-                address: RD.success(address),
-                type: 'keystore'
-              }
-            ]
-          }))
-        )
-      ),
-    [bnbAddressUI$]
-  )
-
   const { addressUI$: ethAddressUI$ } = useEthereumContext()
-  const ethAccount$: Rx.Observable<O.Option<WalletAccount>> = useMemo(
-    () =>
-      FP.pipe(
-        ethAddressUI$,
-        RxOp.map(
-          O.map((address) => ({
-            chain: ETHChain,
-            accounts: [
-              {
-                address: RD.success(address),
-                type: 'keystore'
-              }
-            ]
-          }))
-        )
-      ),
-    [ethAddressUI$]
-  )
-
   const { addressUI$: btcAddressUI$ } = useBitcoinContext()
-  const btcAccount$: Rx.Observable<O.Option<WalletAccount>> = useMemo(
-    () =>
-      FP.pipe(
-        btcAddressUI$,
-        RxOp.map(
-          O.map((address) => ({
-            chain: BTCChain,
-            accounts: [
-              {
-                address: RD.success(address),
-                type: 'keystore'
-              }
-            ]
-          }))
-        )
-      ),
-    [btcAddressUI$]
-  )
-
   const { address$: thorAddressUI$ } = useThorchainContext()
+  const { addressUI$: ltcAddressUI$ } = useLitecoinContext()
+  const { addressUI$: bchAddressUI$ } = useBitcoinCashContext()
+
   const {
     askAddress: askLedgerThorAddress,
     address: thorLedgerAddressRD,
@@ -128,7 +77,7 @@ export const SettingsView: React.FC = (): JSX.Element => {
     O.getOrElse(() => '')
   )
 
-  const thorLedgerAccount: WalletAddress = useMemo(
+  const thorLedgerWalletAddress: WalletAddress = useMemo(
     () => ({
       type: 'ledger',
       address: FP.pipe(
@@ -139,87 +88,42 @@ export const SettingsView: React.FC = (): JSX.Element => {
     [intl, thorLedgerAddressRD]
   )
 
-  const thorAccount$: Rx.Observable<O.Option<WalletAccount>> = useMemo(
-    () =>
-      FP.pipe(
-        thorAddressUI$,
-        RxOp.map(
-          O.map((address) => ({
-            chain: THORChain,
-            accounts: [
-              {
-                type: 'keystore',
-                address: RD.success(address)
-              },
-              thorLedgerAccount
-            ]
-          }))
-        )
-      ),
-    [thorAddressUI$, thorLedgerAccount]
-  )
+  const walletAccounts$ = useMemo(() => {
+    const thorWalletAccount$ = walletAccount$({
+      addressUI$: thorAddressUI$,
+      ledgerAddress: thorLedgerWalletAddress,
+      chain: THORChain
+    })
+    const btcWalletAccount$ = walletAccount$({ addressUI$: btcAddressUI$, chain: BTCChain })
+    const ethWalletAccount$ = walletAccount$({ addressUI$: ethAddressUI$, chain: ETHChain })
+    const bnbWalletAccount$ = walletAccount$({ addressUI$: bnbAddressUI$, chain: BNBChain })
+    const bchWalletAccount$ = walletAccount$({ addressUI$: bchAddressUI$, chain: BCHChain })
+    const ltcWalletAccount$ = walletAccount$({ addressUI$: ltcAddressUI$, chain: LTCChain })
 
-  const { addressUI$: ltcAddressUI$ } = useLitecoinContext()
-  const ltcAddress$: Rx.Observable<O.Option<WalletAccount>> = useMemo(
-    () =>
-      FP.pipe(
-        ltcAddressUI$,
-        RxOp.map(
-          O.map((address) => ({
-            chain: LTCChain,
-            accounts: [
-              {
-                type: 'keystore',
-                address: RD.success(address)
-              }
-            ]
-          }))
-        )
+    return FP.pipe(
+      // combineLatest is for the future additional accounts
+      Rx.combineLatest(
+        filterEnabledChains({
+          THOR: [thorWalletAccount$],
+          BTC: [btcWalletAccount$],
+          ETH: [ethWalletAccount$],
+          BNB: [bnbWalletAccount$],
+          BCH: [bchWalletAccount$],
+          LTC: [ltcWalletAccount$]
+        })
       ),
-    [ltcAddressUI$]
-  )
-
-  const { addressUI$: bchAddressUI$ } = useBitcoinCashContext()
-  const bchAccount$: Rx.Observable<O.Option<WalletAccount>> = useMemo(
-    () =>
-      FP.pipe(
-        bchAddressUI$,
-        RxOp.map(
-          O.map((address) => ({
-            chain: BCHChain,
-            accounts: [
-              {
-                type: 'keystore',
-                address: RD.success(address)
-              }
-            ]
-          }))
-        )
-      ),
-    [bchAddressUI$]
-  )
-
-  const network = useObservableState<Network>(network$, DEFAULT_NETWORK)
-
-  const walletAccounts$ = useMemo(
-    () =>
-      FP.pipe(
-        // combineLatest is for the future additional accounts
-        Rx.combineLatest(
-          filterEnabledChains({
-            THOR: [thorAccount$],
-            BTC: [btcAccount$],
-            ETH: [ethAccount$],
-            BNB: [bnbAccount$],
-            BCH: [bchAccount$],
-            LTC: [ltcAddress$]
-          })
-        ),
-        RxOp.map(A.filter(O.isSome)),
-        RxOp.map(sequenceTOptionFromArray)
-      ),
-    [thorAccount$, bnbAccount$, ethAccount$, btcAccount$, bchAccount$, ltcAddress$]
-  )
+      RxOp.map(A.filter(O.isSome)),
+      RxOp.map(sequenceTOptionFromArray)
+    )
+  }, [
+    thorAddressUI$,
+    thorLedgerWalletAddress,
+    btcAddressUI$,
+    ethAddressUI$,
+    bnbAddressUI$,
+    bchAddressUI$,
+    ltcAddressUI$
+  ])
   const walletAccounts = useObservableState(walletAccounts$, O.none)
 
   const oBNBClient = useObservableState(clientByChain$(BNBChain), O.none)
