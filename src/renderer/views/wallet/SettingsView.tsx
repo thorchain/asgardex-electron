@@ -8,6 +8,7 @@ import * as FP from 'fp-ts/function'
 import * as A from 'fp-ts/lib/Array'
 import * as O from 'fp-ts/lib/Option'
 import { useObservableState } from 'observable-hooks'
+import { useIntl } from 'react-intl'
 import * as Rx from 'rxjs'
 import * as RxOp from 'rxjs/operators'
 
@@ -26,11 +27,13 @@ import { filterEnabledChains, isThorChain } from '../../helpers/chainHelper'
 import { sequenceTOptionFromArray } from '../../helpers/fpHelpers'
 import { useLedger } from '../../hooks/useLedger'
 import { DEFAULT_NETWORK } from '../../services/const'
+import { ledgerErrorIdToI18n } from '../../services/wallet/ledger'
 import { WalletAccount, WalletAddress } from '../../services/wallet/types'
 import { getPhrase } from '../../services/wallet/util'
 import { ClientSettingsView } from './CllientSettingsView'
 
 export const SettingsView: React.FC = (): JSX.Element => {
+  const intl = useIntl()
   const { keystoreService } = useWalletContext()
   const { keystore$, lock, removeKeystore, exportKeystore, validatePassword$ } = keystoreService
   const { network$ } = useAppContext()
@@ -130,10 +133,10 @@ export const SettingsView: React.FC = (): JSX.Element => {
       type: 'ledger',
       address: FP.pipe(
         thorLedgerAddressRD,
-        RD.mapLeft((errorID) => Error(`Could not get THOR address from Ledger ${errorID}`))
+        RD.mapLeft((errorId) => Error(ledgerErrorIdToI18n(errorId, intl)))
       )
     }),
-    [thorLedgerAddressRD]
+    [intl, thorLedgerAddressRD]
   )
 
   const thorAccount$: Rx.Observable<O.Option<WalletAccount>> = useMemo(

@@ -121,6 +121,7 @@ type PoolsMessageKey =
 export type PoolsMessages = { [key in PoolsMessageKey]: string }
 
 type WalletMessageKey =
+  | 'wallet.main.title'
   | 'wallet.nav.deposits'
   | 'wallet.nav.bonds'
   | 'wallet.nav.poolshares'
@@ -222,14 +223,14 @@ type PoolSharesMessageKey = 'poolshares.ownership'
 export type PoolSharesMessage = { [key in PoolSharesMessageKey]: string }
 
 type LedgerMessageKey =
+  | 'ledger.title'
   | 'ledger.add.device'
-  | 'ledger.add.device.error.title'
-  | 'ledger.errors.no.device'
-  | 'ledger.errors.already.in.use'
-  | 'ledger.errors.no.app'
-  | 'ledger.errors.wrong.app'
-  | 'ledger.errors.denied'
-  | 'ledger.errors.unknown'
+  | 'ledger.error.nodevice'
+  | 'ledger.error.inuse'
+  | 'ledger.error.noapp'
+  | 'ledger.error.wrongapp'
+  | 'ledger.error.denied'
+  | 'ledger.error.unknown'
 
 export type LedgerMessages = { [key in LedgerMessageKey]: string }
 

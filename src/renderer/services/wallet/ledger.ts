@@ -1,10 +1,11 @@
 import * as RD from '@devexperts/remote-data-ts'
 import { Chain, THORChain } from '@xchainjs/xchain-util'
 import * as FP from 'fp-ts/lib/function'
+import { IntlShape } from 'react-intl'
 import * as Rx from 'rxjs'
 import * as RxOp from 'rxjs/operators'
 
-import { Network } from '../../../shared/api/types'
+import { LedgerErrorId, Network } from '../../../shared/api/types'
 import { network$ } from '../app/service'
 import * as THOR from '../thorchain/ledger'
 import { LedgerAddressLD, LedgerAddressRD } from './types'
@@ -78,3 +79,21 @@ export const askLedgerAddressByChain$ = (chain: Chain, network: Network): Ledger
     RxOp.catchError((error) => Rx.of(RD.failure(error))),
     RxOp.startWith(RD.pending)
   )
+
+export const ledgerErrorIdToI18n = (errorId: LedgerErrorId, intl: IntlShape) => {
+  switch (errorId) {
+    case LedgerErrorId.NO_DEVICE:
+      return intl.formatMessage({ id: 'ledger.error.nodevice' })
+    case LedgerErrorId.ALREADY_IN_USE:
+      return intl.formatMessage({ id: 'ledger.error.inuse' })
+    case LedgerErrorId.NO_APP:
+      return intl.formatMessage({ id: 'ledger.error.noapp' })
+    case LedgerErrorId.WRONG_APP:
+      return intl.formatMessage({ id: 'ledger.error.wrongapp' })
+    case LedgerErrorId.DENIED:
+      return intl.formatMessage({ id: 'ledger.error.denied' })
+    // default is similar to LedgerErrorId.UNKNOWN
+    default:
+      return intl.formatMessage({ id: 'ledger.error.unknown' })
+  }
+}

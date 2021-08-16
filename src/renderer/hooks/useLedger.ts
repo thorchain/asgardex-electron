@@ -26,6 +26,9 @@ export const useLedger = (chain: Chain) => {
   )
 
   const askAddress = useCallback(() => {
+    // Note: Subscription is needed to get all values
+    // and to let `askLedgerAddressByChain` update state of `LedgerAddressRD`
+    // Check implementation of `askLedgerAddressByChain` in `src/renderer/services/wallet/ledger.ts`
     const sub = askLedgerAddressByChain$(chain, network).subscribe()
     return () => sub.unsubscribe()
   }, [askLedgerAddressByChain$, chain, network])

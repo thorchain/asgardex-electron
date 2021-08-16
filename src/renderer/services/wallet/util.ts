@@ -5,11 +5,12 @@ import * as O from 'fp-ts/lib/Option'
 import * as N from 'fp-ts/number'
 import * as Ord from 'fp-ts/Ord'
 import * as S from 'fp-ts/string'
+import { IntlShape } from 'react-intl'
 
 import { eqAsset } from '../../helpers/fp/eq'
 import { ordBaseAmount } from '../../helpers/fp/ord'
 import { WalletBalances } from '../clients'
-import { KeystoreState, KeystoreContent, Phrase, BalanceMonoid, WalletBalance } from './types'
+import { KeystoreState, KeystoreContent, Phrase, BalanceMonoid, WalletBalance, WalletType } from './types'
 
 export const getKeystoreContent = (state: KeystoreState): O.Option<KeystoreContent> =>
   FP.pipe(state, O.chain(FP.identity))
@@ -65,3 +66,14 @@ export const getBalanceByAsset =
       balances,
       A.findFirst((assetWithBalance) => eqAsset.equals(assetWithBalance.asset, asset))
     )
+
+export const walletTypeToI18n = (type: WalletType, intl: IntlShape) => {
+  switch (type) {
+    case 'ledger':
+      return intl.formatMessage({ id: 'ledger.title' })
+    case 'keystore':
+      return intl.formatMessage({ id: 'wallet.main.title' })
+    default:
+      return `Unknown ${type}`
+  }
+}

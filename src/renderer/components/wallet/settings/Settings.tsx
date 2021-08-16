@@ -12,6 +12,7 @@ import { Network } from '../../../../shared/api/types'
 import { ReactComponent as UnlockOutlined } from '../../../assets/svg/icon-unlock-warning.svg'
 import { getChainAsset } from '../../../helpers/chainHelper'
 import { ValidatePasswordHandler, WalletAccounts, WalletAddress } from '../../../services/wallet/types'
+import { walletTypeToI18n } from '../../../services/wallet/util'
 import { RemoveWalletConfirmationModal } from '../../modal/confirmation/RemoveWalletConfirmationModal'
 import { PasswordModal } from '../../modal/password'
 import { QRCodeModal } from '../../uielements/qrCodeModal/QRCodeModal'
@@ -147,7 +148,7 @@ export const Settings: React.FC<Props> = (props): JSX.Element => {
 
                       return (
                         <Styled.ChainContent key={j}>
-                          <Styled.AccountPlaceholder>{type}</Styled.AccountPlaceholder>
+                          <Styled.AccountPlaceholder>{walletTypeToI18n(type, intl)}</Styled.AccountPlaceholder>
                           {renderAddress(chain, account)}
                         </Styled.ChainContent>
                       )
