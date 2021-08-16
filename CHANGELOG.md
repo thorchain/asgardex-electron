@@ -1,3 +1,19 @@
+# 0.3.12 (2021-08-16)
+
+## Add
+
+- [mimir] Check `HALT{BCH|BNB|BTC|LTC}CHAIN` [#1656](https://github.com/thorchain/asgardex-electron/issues/1656)
+- [Binance] Blacklist `RUNE-67C` on mainnet [#1660](https://github.com/thorchain/asgardex-electron/issues/1660)
+
+## Fix
+
+- [thornode] Fix endpoint used by `services/thornode` [#1662](https://github.com/thorchain/asgardex-electron/issues/1662)
+
+## Internal
+
+- Update npm dependencies (10-08-2021) [#1658](https://github.com/thorchain/asgardex-electron/issues/1658)
+- `isRune...` helpers need to be depending on network [#1639](https://github.com/thorchain/asgardex-electron/pull/1639)
+
 # 0.3.11 (2021-08-10)
 
 ## Add
