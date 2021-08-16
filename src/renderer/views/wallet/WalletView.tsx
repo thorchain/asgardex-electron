@@ -96,6 +96,9 @@ export const WalletView: React.FC = (): JSX.Element => {
           <Route path={walletRoutes.assetDetail.template} exact>
             <AssetDetailsView />
           </Route>
+          <Route path={walletRoutes.walletSettings.template} exact>
+            <AssetsNav />
+          </Route>
           <Route path={walletRoutes.history.template}>
             {reloadButton(poolActionsHistory.reloadActionsHistory)}
             <AssetsNav />
