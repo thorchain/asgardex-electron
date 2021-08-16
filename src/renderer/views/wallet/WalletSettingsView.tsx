@@ -9,6 +9,7 @@ import * as O from 'fp-ts/lib/Option'
 import { useIntl } from 'react-intl'
 
 import { Network } from '../../../shared/api/types'
+import { ReactComponent as UnlockOutlined } from '../../assets/svg/icon-unlock-warning.svg'
 import { RemoveWalletConfirmationModal } from '../../components/modal/confirmation/RemoveWalletConfirmationModal'
 import { PasswordModal } from '../../components/modal/password'
 import { QRCodeModal } from '../../components/uielements/qrCodeModal/QRCodeModal'
@@ -215,7 +216,7 @@ export const WalletSettingsView: React.FC<Props> = (props): JSX.Element => {
               <Styled.WalletCol sm={{ span: 24 }} md={{ span: 12 }}>
                 <Styled.OptionCard bordered={false}>
                   <Styled.OptionLabel color="warning" size="big" onClick={lockWallet}>
-                    {intl.formatMessage({ id: 'setting.lock' })}
+                    {intl.formatMessage({ id: 'setting.lock' })} <UnlockOutlined />
                   </Styled.OptionLabel>
                 </Styled.OptionCard>
               </Styled.WalletCol>
