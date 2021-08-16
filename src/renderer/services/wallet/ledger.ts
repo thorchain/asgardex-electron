@@ -23,7 +23,7 @@ export const getLedgerAddressByChain$ = (chain: Chain): LedgerAddressLD => {
 }
 
 /**
- * Get ledger address from memory
+ * Removes ledger address from memory
  */
 export const removeLedgerAddressByChain = (chain: Chain): void => {
   switch (chain) {
@@ -42,9 +42,9 @@ const removeAllLedgerAddresses = (): void => {
 network$.subscribe(removeAllLedgerAddresses)
 
 /**
- * Get ledger address from memory
+ * Sets ledger address in `pending` state
  */
-const pendingLedgerAddressByChain = (chain: Chain): void => {
+const setPendingLedgerAddressByChain = (chain: Chain): void => {
   switch (chain) {
     case THORChain:
       return THOR.setLedgerAddressRD(RD.pending)
@@ -70,7 +70,7 @@ export const askLedgerAddressByChain$ = (chain: Chain, network: Network): Ledger
     // remove address from memory
     removeLedgerAddressByChain(chain),
     // set pending
-    () => pendingLedgerAddressByChain(chain),
+    () => setPendingLedgerAddressByChain(chain),
     // ask for ledger address
     () => Rx.from(window.apiHDWallet.getLedgerAddress(chain, network)),
     RxOp.map(RD.fromEither),

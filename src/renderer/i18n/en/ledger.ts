@@ -7,7 +7,7 @@ const ledger: LedgerMessages = {
   'ledger.error.inuse': 'The device is used in other app',
   'ledger.error.noapp': 'No ledger app opened. Please open appropriate app on the device.',
   'ledger.error.wrongapp': 'Opened other app on the device. Quit and open appropriate app.',
-  'ledger.error.denied': 'Usage of Ledger has bee denied',
+  'ledger.error.denied': 'Usage of Ledger has been denied',
   'ledger.error.unknown': 'Unknown Error'
 }
 
