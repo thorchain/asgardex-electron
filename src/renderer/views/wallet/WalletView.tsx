@@ -215,9 +215,6 @@ export const WalletView: React.FC = (): JSX.Element => {
           <Route path={walletRoutes.base.template} exact>
             <Redirect to={walletRoutes.assets.path()} />
           </Route>
-          <Route path={walletRoutes.settings.template} exact>
-            <SettingsView />
-          </Route>
           <Route path={walletRoutes.assets.template} exact>
             {reloadButton(reloadBalances)}
             <AssetsNav />
@@ -342,6 +339,9 @@ export const WalletView: React.FC = (): JSX.Element => {
       </Route>
       <Route path={walletRoutes.imports.base.template}>
         <ImportsView />
+      </Route>
+      <Route path={walletRoutes.settings.template} exact>
+        <SettingsView />
       </Route>
       <Route path={walletRoutes.base.template} render={renderWalletRoute} />
     </Switch>
