@@ -124,6 +124,13 @@ export const upgradeRune: Route<AssetUpgradeDetailsParams> = {
   }
 }
 
+export const walletSettings: Route<void> = {
+  template: `${base.template}/wallet-settings`,
+  path() {
+    return this.template
+  }
+}
+
 export const history: Route<void> = {
   template: `${base.template}/history`,
   path() {
