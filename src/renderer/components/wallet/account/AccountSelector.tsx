@@ -7,7 +7,7 @@ import { useIntl } from 'react-intl'
 
 import { Network } from '../../../../shared/api/types'
 import { WalletBalances } from '../../../services/clients'
-import { WalletBalance } from '../../../types/wallet'
+import { WalletBalance } from '../../../services/wallet/types'
 import { AssetData } from '../../uielements/assets/assetData'
 import { AssetIcon } from '../../uielements/assets/assetIcon'
 import { Size as IconSize } from '../../uielements/assets/assetIcon/AssetIcon.types'

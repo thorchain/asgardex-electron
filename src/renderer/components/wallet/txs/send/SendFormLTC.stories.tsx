@@ -15,7 +15,7 @@ import {
 
 import { mockValidatePassword$ } from '../../../../../shared/mock/wallet'
 import { SendTxParams } from '../../../../services/chain/types'
-import { WalletBalance } from '../../../../types/wallet'
+import { WalletBalance } from '../../../../services/wallet/types'
 import { SendFormLTC as Component, Props as ComponentProps } from './SendFormLTC'
 
 const ltcBalance: WalletBalance = {

@@ -18,8 +18,7 @@ import { useSubscriptionState } from '../../../hooks/useSubscriptionState'
 import { INITIAL_SEND_STATE } from '../../../services/chain/const'
 import { SendTxParams, SendTxState } from '../../../services/chain/types'
 import { FeesRD, OpenExplorerTxUrl, WalletBalances } from '../../../services/clients'
-import { NonEmptyWalletBalances, ValidatePasswordHandler } from '../../../services/wallet/types'
-import { WalletBalance } from '../../../types/wallet'
+import { NonEmptyWalletBalances, ValidatePasswordHandler, WalletBalance } from '../../../services/wallet/types'
 import * as Helper from './SendView.helper'
 
 type Props = {
@@ -85,7 +84,7 @@ export const SendViewETH: React.FC<Props> = (props): JSX.Element => {
         balance={walletBalance}
         balances={FP.pipe(
           oBalances,
-          O.getOrElse(() => [] as WalletBalances)
+          O.getOrElse<WalletBalances>(() => [])
         )}
         fees={feesRD}
         isLoading={isLoading}

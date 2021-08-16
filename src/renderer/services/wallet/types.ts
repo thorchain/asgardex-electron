@@ -1,5 +1,5 @@
 import * as RD from '@devexperts/remote-data-ts'
-import { Address, Tx, TxHash } from '@xchainjs/xchain-client'
+import { Address, Balance, Tx, TxHash } from '@xchainjs/xchain-client'
 import { Keystore } from '@xchainjs/xchain-crypto'
 import { Chain } from '@xchainjs/xchain-util'
 import { getMonoid } from 'fp-ts/Array'
@@ -10,10 +10,7 @@ import * as Rx from 'rxjs'
 
 import { LedgerErrorId, Network } from '../../../shared/api/types'
 import { LiveData } from '../../helpers/rx/liveData'
-import { WalletBalance } from '../../types/wallet'
 import { LoadTxsParams, WalletBalancesLD, WalletBalancesRD } from '../clients'
-
-export type WalletType = 'keystore' | 'ledger'
 
 export type Phrase = string
 
@@ -49,6 +46,21 @@ export type KeystoreService = {
    */
   validatePassword$: ValidatePasswordHandler
 }
+
+export type WalletType = 'keystore' | 'ledger'
+export type WalletAddress = { address: RD.RemoteData<Error, Address>; type: WalletType }
+export type WalletAddressLD = LiveData<Error, WalletAddress>
+export type WalletAddresses = WalletAddress[]
+
+export type WalletAccount = {
+  chain: Chain
+  accounts: WalletAddresses
+}
+
+export type WalletAccounts = WalletAccount[]
+
+export type WalletBalance = Balance & { walletAddress: Address }
+export type WalletBalances = WalletBalance[]
 
 /**
  * Wraps WalletBalancesRD into an object to provide extra information (`Address` + `Chain` + `WalletType`)

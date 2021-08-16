@@ -25,7 +25,7 @@ import { BNB_DECIMAL } from '../../../helpers/assetHelper'
 import { INITIAL_SYM_DEPOSIT_STATE } from '../../../services/chain/const'
 import { SymDepositState } from '../../../services/chain/types'
 import { DEFAULT_MIMIR_HALT } from '../../../services/thorchain/const'
-import { WalletBalance } from '../../../types/wallet'
+import { WalletBalance } from '../../../services/wallet/types'
 import { SymDeposit, Props as SymDepositProps } from './SymDeposit'
 
 const balanceBNB: WalletBalance = {

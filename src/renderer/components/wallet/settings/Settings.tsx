@@ -1,5 +1,6 @@
 import React, { useCallback, useMemo, useState } from 'react'
 
+import * as RD from '@devexperts/remote-data-ts'
 import { Address } from '@xchainjs/xchain-client'
 import { Asset, Chain } from '@xchainjs/xchain-util'
 import { Row, Col, List } from 'antd'
@@ -8,12 +9,10 @@ import * as O from 'fp-ts/lib/Option'
 import { useIntl } from 'react-intl'
 
 import { Network } from '../../../../shared/api/types'
-import { ReactComponent as PlusIcon } from '../../../assets/svg/icon-plus.svg'
-import { ReactComponent as RemoveIcon } from '../../../assets/svg/icon-remove.svg'
 import { ReactComponent as UnlockOutlined } from '../../../assets/svg/icon-unlock-warning.svg'
-import { getChainAsset, isThorChain } from '../../../helpers/chainHelper'
-import { ValidatePasswordHandler } from '../../../services/wallet/types'
-import { UserAccountType } from '../../../types/wallet'
+import { getChainAsset } from '../../../helpers/chainHelper'
+import { ValidatePasswordHandler, WalletAccounts, WalletAddress } from '../../../services/wallet/types'
+import { walletTypeToI18n } from '../../../services/wallet/util'
 import { RemoveWalletConfirmationModal } from '../../modal/confirmation/RemoveWalletConfirmationModal'
 import { PasswordModal } from '../../modal/password'
 import { QRCodeModal } from '../../uielements/qrCodeModal/QRCodeModal'
@@ -22,12 +21,14 @@ import * as Styled from './Settings.style'
 
 type Props = {
   selectedNetwork: Network
-  userAccounts?: O.Option<UserAccountType[]>
+  walletAccounts: O.Option<WalletAccounts>
   runeNativeAddress: string
-  lockWallet?: () => void
-  removeKeystore?: () => void
-  exportKeystore?: (runeNativeAddress: string, selectedNetwork: Network) => void
-  phrase?: O.Option<string>
+  lockWallet: FP.Lazy<void>
+  removeKeystore: FP.Lazy<void>
+  exportKeystore: (runeNativeAddress: string, selectedNetwork: Network) => void
+  removeLedgerAddress: (chain: Chain) => void
+  addLedgerAddress: (chain: Chain) => void
+  phrase: O.Option<string>
   clickAddressLinkHandler: (chain: Chain, address: Address) => void
   validatePassword$: ValidatePasswordHandler
   ClientSettingsView: React.ComponentType<{}>
@@ -37,18 +38,14 @@ export const Settings: React.FC<Props> = (props): JSX.Element => {
   const intl = useIntl()
   const {
     selectedNetwork,
-    userAccounts = O.none,
+    walletAccounts: oWalletAccounts,
     runeNativeAddress = '',
     lockWallet = () => {},
     removeKeystore = () => {},
     exportKeystore = () => {},
-    /* Hide `addDevice` for all chains temporarily
-    retrieveLedgerAddress,
-    */
-    /* Hide `removeDevice` for all chains temporarily
     removeLedgerAddress,
-    */
-    phrase: oPhrase = O.none,
+    addLedgerAddress,
+    phrase: oPhrase,
     clickAddressLinkHandler,
     validatePassword$,
     ClientSettingsView
@@ -74,8 +71,6 @@ export const Settings: React.FC<Props> = (props): JSX.Element => {
 
   const [showQRModal, setShowQRModal] = useState<O.Option<{ asset: Asset; address: Address }>>(O.none)
 
-  const [ledgerAdded] = useState(true)
-
   const closeQrModal = useCallback(() => setShowQRModal(O.none), [setShowQRModal])
 
   const renderQRCodeModal = useMemo(() => {
@@ -97,52 +92,67 @@ export const Settings: React.FC<Props> = (props): JSX.Element => {
   }, [showQRModal, selectedNetwork, closeQrModal])
 
   const renderAddress = useCallback(
-    (chain: Chain, address: Address, isLedgerAddress = false) => (
-      <Styled.AddressContainer>
-        <Styled.AddressEllipsis address={address} chain={chain} network={selectedNetwork} enableCopy={true} />
-        <Styled.QRCodeIcon onClick={() => setShowQRModal(O.some({ asset: getChainAsset(chain), address }))} />
-        <Styled.AddressLinkIcon onClick={() => clickAddressLinkHandler(chain, address)} />
-        {isLedgerAddress && <RemoveIcon />}
-      </Styled.AddressContainer>
-    ),
-    [clickAddressLinkHandler, selectedNetwork]
-  )
+    (chain: Chain, { type, address: addressRD }: WalletAddress) => {
+      // Render ADD LEDGER button
+      const renderAddLedger = (chain: Chain, loading: boolean) => (
+        <Styled.AddLedgerButton loading={loading} onClick={() => addLedgerAddress(chain)}>
+          <Styled.AddLedgerIcon /> {intl.formatMessage({ id: 'ledger.add.device' })}
+        </Styled.AddLedgerButton>
+      )
 
-  const renderAddLedger = useCallback(
-    () => (
-      <Styled.AddLedger>
-        <PlusIcon />
-        <Styled.AddLedgerTextWrapper>{intl.formatMessage({ id: 'ledger.add.device' })}</Styled.AddLedgerTextWrapper>
-      </Styled.AddLedger>
-    ),
-    [intl]
+      // Render addresses depending on its loading status
+      return (
+        <Styled.AddressContainer>
+          {FP.pipe(
+            addressRD,
+            RD.fold(
+              () => (type === 'ledger' ? renderAddLedger(chain, false) : <>...</>),
+              () => (type === 'ledger' ? renderAddLedger(chain, true) : <>...</>),
+              (error) => (
+                <div>
+                  <Styled.AddressError>{error.message}</Styled.AddressError>
+                  {type === 'ledger' && renderAddLedger(chain, false)}
+                </div>
+              ),
+              (address) => (
+                <>
+                  <Styled.AddressEllipsis address={address} chain={chain} network={selectedNetwork} enableCopy={true} />
+                  <Styled.QRCodeIcon onClick={() => setShowQRModal(O.some({ asset: getChainAsset(chain), address }))} />
+                  <Styled.AddressLinkIcon onClick={() => clickAddressLinkHandler(chain, address)} />
+                  {type === 'ledger' && <Styled.RemoveLedgerIcon onClick={() => removeLedgerAddress(chain)} />}
+                </>
+              )
+            )
+          )}
+        </Styled.AddressContainer>
+      )
+    },
+    [addLedgerAddress, clickAddressLinkHandler, intl, removeLedgerAddress, selectedNetwork]
   )
 
   const accounts = useMemo(
     () =>
       FP.pipe(
-        userAccounts,
-        O.map((accounts) => (
+        oWalletAccounts,
+        O.map((walletAccounts) => (
           <Col key={'accounts'} sm={{ span: 24 }} lg={{ span: 12 }}>
             <Styled.Subtitle>{intl.formatMessage({ id: 'setting.account.management' })}</Styled.Subtitle>
             <Styled.AccountCard>
               <List
-                dataSource={accounts}
-                renderItem={(item, i: number) => (
+                dataSource={walletAccounts}
+                renderItem={({ chain, accounts }, i: number) => (
                   <Styled.ListItem key={i}>
-                    <Styled.ChainName>{item.chainName}</Styled.ChainName>
-                    {item.accounts.map((acc, j) => (
-                      <Styled.ChainContent key={j}>
-                        <Styled.AccountPlaceholder>{acc.name}</Styled.AccountPlaceholder>
-                        {renderAddress(item.chainName, acc.address)}
-                        {isThorChain(item.chainName) && (
-                          <>
-                            <Styled.AccountPlaceholder>Ledger</Styled.AccountPlaceholder>
-                            {ledgerAdded ? renderAddress(item.chainName, acc.address, true) : renderAddLedger()}
-                          </>
-                        )}
-                      </Styled.ChainContent>
-                    ))}
+                    <Styled.ChainName>{chain}</Styled.ChainName>
+                    {accounts.map((account, j) => {
+                      const { type } = account
+
+                      return (
+                        <Styled.ChainContent key={j}>
+                          <Styled.AccountPlaceholder>{walletTypeToI18n(type, intl)}</Styled.AccountPlaceholder>
+                          {renderAddress(chain, account)}
+                        </Styled.ChainContent>
+                      )
+                    })}
                   </Styled.ListItem>
                 )}
               />
@@ -151,7 +161,7 @@ export const Settings: React.FC<Props> = (props): JSX.Element => {
         )),
         O.getOrElse(() => <></>)
       ),
-    [ledgerAdded, renderAddress, renderAddLedger, intl, userAccounts]
+    [renderAddress, intl, oWalletAccounts]
   )
 
   const onSuccessPassword = useCallback(() => {

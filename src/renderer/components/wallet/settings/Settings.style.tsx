@@ -1,8 +1,9 @@
-import { QrcodeOutlined as QrcodeOutlinedIcon } from '@ant-design/icons'
+import * as AIcon from '@ant-design/icons'
 import * as A from 'antd'
 import styled from 'styled-components'
 import { palette } from 'styled-theme'
 
+import { ReactComponent as RemoveIcon } from '../../../assets/svg/icon-remove.svg'
 import { AddressEllipsis as AddressEllipsisUI } from '../../uielements/addressEllipsis'
 import { Button as UIButton } from '../../uielements/button'
 import { ExternalLinkIcon as ExternalLinkIconUI } from '../../uielements/common/Common.style'
@@ -244,7 +245,7 @@ export const CopyLabel = styled(A.Typography.Text)`
   }
 `
 
-export const QRCodeIcon = styled(QrcodeOutlinedIcon)`
+export const QRCodeIcon = styled(AIcon.QrcodeOutlined)`
   margin-left: 5px;
   cursor: pointer;
   color: ${palette('primary', 0)};
@@ -257,15 +258,32 @@ export const QRCodeIcon = styled(QrcodeOutlinedIcon)`
   }
 `
 
-export const AddLedger = styled.div`
-  display: flex;
-  align-items: center;
-  margin: 4px 4px 4px 0px;
+export const AddressError = styled(UILabel)`
+  display: block;
+  padding: 0;
+  color: ${palette('error', 0)};
+  text-transform: uppercase;
+  font-family: 'MainFontRegular';
+  font-size: 14px;
+`
+
+export const AddLedgerButton = styled(UIButton).attrs({
+  typevalue: 'transparent'
+})`
+  padding-left: 0;
+  font-size: 17px;
+  cursor: pointer;
+`
+
+export const AddLedgerIcon = styled(AIcon.PlusCircleOutlined)`
   color: ${palette('primary', 0)};
-  cursor: not-allowed;
 `
 
 export const AddLedgerTextWrapper = styled.div`
   margin-left: 5px;
   text-transform: uppercase;
+`
+
+export const RemoveLedgerIcon = styled(RemoveIcon)`
+  cursor: pointer;
 `

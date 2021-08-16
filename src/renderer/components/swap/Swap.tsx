@@ -65,11 +65,12 @@ import {
   TxHashLD,
   TxHashRD,
   ValidatePasswordHandler,
-  BalancesState
+  BalancesState,
+  WalletBalance,
+  WalletBalances
 } from '../../services/wallet/types'
 import { hasImportedKeystore, isLocked } from '../../services/wallet/util'
 import { AssetWithDecimal, SlipTolerance } from '../../types/asgardex'
-import { WalletBalance, WalletBalances } from '../../types/wallet'
 import { CurrencyInfo } from '../currency'
 import { PasswordModal } from '../modal/password'
 import { TxModal } from '../modal/tx'

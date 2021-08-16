@@ -2,13 +2,15 @@ import { Asset, assetToString, baseAmount } from '@xchainjs/xchain-util'
 import * as A from 'fp-ts/Array'
 import * as FP from 'fp-ts/function'
 import * as O from 'fp-ts/lib/Option'
+import * as N from 'fp-ts/number'
 import * as Ord from 'fp-ts/Ord'
+import * as S from 'fp-ts/string'
+import { IntlShape } from 'react-intl'
 
 import { eqAsset } from '../../helpers/fp/eq'
 import { ordBaseAmount } from '../../helpers/fp/ord'
-import { WalletBalance } from '../../types/wallet'
 import { WalletBalances } from '../clients'
-import { KeystoreState, KeystoreContent, Phrase, BalanceMonoid } from './types'
+import { KeystoreState, KeystoreContent, Phrase, BalanceMonoid, WalletBalance, WalletType } from './types'
 
 export const getKeystoreContent = (state: KeystoreState): O.Option<KeystoreContent> =>
   FP.pipe(state, O.chain(FP.identity))
@@ -34,11 +36,11 @@ export const filterNullableBalances = (balances: WalletBalances) => {
 
 // We will compare asset strings and they automatically
 // be grouped by their chains in alphabetic order
-const byAsset = Ord.ord.contramap(Ord.ordString, (balance: WalletBalance) => assetToString(balance.asset))
+const byAsset = Ord.Contravariant.contramap(S.Ord, (balance: WalletBalance) => assetToString(balance.asset))
 
 export const sortBalances = (balances: WalletBalances, orders: string[]) => {
   const getBalanceIndex = (balance: WalletBalance) => orders.findIndex((ticker) => ticker === balance.asset.ticker)
-  const byTickersOrder = Ord.ord.contramap(Ord.ordNumber, getBalanceIndex)
+  const byTickersOrder = Ord.Contravariant.contramap(N.Ord, getBalanceIndex)
   return FP.pipe(
     balances,
     // split array for 2 parts: sortable assets and the rest
@@ -64,3 +66,14 @@ export const getBalanceByAsset =
       balances,
       A.findFirst((assetWithBalance) => eqAsset.equals(assetWithBalance.asset, asset))
     )
+
+export const walletTypeToI18n = (type: WalletType, intl: IntlShape) => {
+  switch (type) {
+    case 'ledger':
+      return intl.formatMessage({ id: 'ledger.title' })
+    case 'keystore':
+      return intl.formatMessage({ id: 'wallet.main.title' })
+    default:
+      return `Unknown ${type}`
+  }
+}

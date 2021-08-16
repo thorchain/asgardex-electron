@@ -6,8 +6,7 @@ import * as O from 'fp-ts/lib/Option'
 import * as Rx from 'rxjs'
 
 import { LiveData } from '../../helpers/rx/liveData'
-import { WalletBalance } from '../../types/wallet'
-import { ApiError, TxLD } from '../wallet/types'
+import { ApiError, TxLD, WalletBalance } from '../wallet/types'
 import { TxHashLD } from '../wallet/types'
 /**
  * States:

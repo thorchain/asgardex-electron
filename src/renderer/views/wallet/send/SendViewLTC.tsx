@@ -20,8 +20,7 @@ import { INITIAL_SEND_STATE } from '../../../services/chain/const'
 import { SendTxParams, SendTxState } from '../../../services/chain/types'
 import { OpenExplorerTxUrl, WalletBalances } from '../../../services/clients'
 import { FeesWithRatesLD } from '../../../services/litecoin/types'
-import { NonEmptyWalletBalances, ValidatePasswordHandler } from '../../../services/wallet/types'
-import { WalletBalance } from '../../../types/wallet'
+import { NonEmptyWalletBalances, ValidatePasswordHandler, WalletBalance } from '../../../services/wallet/types'
 import * as Helper from './SendView.helper'
 
 type Props = {
@@ -76,7 +75,7 @@ export const SendViewLTC: React.FC<Props> = (props): JSX.Element => {
       <SendFormLTC
         balances={FP.pipe(
           oBalances,
-          O.getOrElse(() => [] as WalletBalances)
+          O.getOrElse<WalletBalances>(() => [])
         )}
         balance={walletBalance}
         isLoading={isLoading}

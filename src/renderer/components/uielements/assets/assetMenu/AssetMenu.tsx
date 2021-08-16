@@ -6,7 +6,7 @@ import { Col, Row } from 'antd'
 import { Network } from '../../../../../shared/api/types'
 import { eqAsset } from '../../../../helpers/fp/eq'
 import { PriceDataIndex } from '../../../../services/midgard/types'
-import { WalletBalance, WalletBalances } from '../../../../types/wallet'
+import { WalletBalance, WalletBalances } from '../../../../services/wallet/types'
 import { FilterMenu } from '../../filterMenu'
 import { AssetData } from '../assetData/AssetData'
 

@@ -5,7 +5,7 @@ import * as Ord from 'fp-ts/lib/Ord'
 import * as S from 'fp-ts/lib/string'
 
 import { CURRENCY_WHEIGHTS } from '../../const'
-import { WalletBalance } from '../../types/wallet'
+import { WalletBalance } from '../../services/wallet/types'
 import { PricePool } from '../../views/pools/Pools.types'
 import { eqBaseAmount, eqBigNumber, eqAsset, eqPricePool } from './eq'
 

@@ -35,9 +35,9 @@ import { PoolAddress, PoolAssetsRD, PoolDetailRD } from '../../../services/midga
 import { toPoolData } from '../../../services/midgard/utils'
 import { LiquidityProviderRD, MimirHalt, PendingAssetsRD } from '../../../services/thorchain/types'
 import { INITIAL_BALANCES_STATE } from '../../../services/wallet/const'
+import { WalletBalances } from '../../../services/wallet/types'
 import { getBalanceByAsset } from '../../../services/wallet/util'
 import { AssetsWithAmount1e8, AssetWithDecimal } from '../../../types/asgardex'
-import { WalletBalances } from '../../../types/wallet'
 
 type Props = {
   asset: AssetWithDecimal
@@ -281,7 +281,7 @@ export const SymDepositView: React.FC<Props> = (props) => {
         const filteredBalances = FP.pipe(
           walletBalances,
           O.map((balances) => filterWalletBalancesByAssets(balances, poolAssets)),
-          O.getOrElse(() => [] as WalletBalances)
+          O.getOrElse<WalletBalances>(() => [])
         )
 
         return (
