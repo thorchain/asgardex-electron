@@ -61,7 +61,6 @@ export const WalletSettingsView: React.FC<Props> = (props): JSX.Element => {
 
   const [showPhraseModal, setShowPhraseModal] = useState(false)
   const [showPasswordModal, setShowPasswordModal] = useState(false)
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [showRemoveWalletModal, setShowRemoveWalletModal] = useState(false)
   const [showQRModal, setShowQRModal] = useState<O.Option<{ asset: Asset; address: Address }>>(O.none)
   const closeQrModal = useCallback(() => setShowQRModal(O.none), [setShowQRModal])
@@ -190,14 +189,6 @@ export const WalletSettingsView: React.FC<Props> = (props): JSX.Element => {
         onSuccess={removeWallet}
       />
       {renderQRCodeModal}
-      <Row>
-        <Col span={24}>
-          <Styled.TitleWrapper>
-            <Styled.Title>{intl.formatMessage({ id: 'setting.title' })}</Styled.Title>
-          </Styled.TitleWrapper>
-          <Styled.Divider />
-        </Col>
-      </Row>
       <Styled.Row gutter={[16, 16]}>
         <Col sm={{ span: 24 }} lg={{ span: 12 }}>
           <Styled.Subtitle>{intl.formatMessage({ id: 'setting.wallet.management' })}</Styled.Subtitle>
