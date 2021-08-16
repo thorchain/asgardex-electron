@@ -20,7 +20,6 @@ import {
 } from '@xchainjs/xchain-util'
 
 import { ENABLED_CHAINS } from '../services/const'
-import { ChainValues } from '../types/asgardex'
 import { eqChain } from './fp/eq'
 
 export const getChainAsset = (chain: Chain): Asset => {
@@ -75,6 +74,10 @@ export const isEthChain = (chain: Chain): boolean => eqChain.equals(chain, ETHCh
 export const isBchChain = (chain: Chain): boolean => eqChain.equals(chain, BCHChain)
 
 export const isEnabledChain = (chain: Chain) => ENABLED_CHAINS.includes(chain)
+
+type ChainValues<T> = {
+  [k in Chain]?: T[]
+}
 
 export const filterEnabledChains = <T>(values: ChainValues<T>): T[] => {
   const result: T[] = []
