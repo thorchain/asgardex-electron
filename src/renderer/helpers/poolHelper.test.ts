@@ -17,6 +17,7 @@ import * as O from 'fp-ts/lib/Option'
 import { ASSETS_TESTNET } from '../../shared/mock/assets'
 import { PoolDetails } from '../services/midgard/types'
 import { toPoolData } from '../services/midgard/utils'
+import { DEFAULT_MIMIR_HALT } from '../services/thorchain/const'
 import { GetPoolsStatusEnum, PoolDetail } from '../types/generated/midgard'
 import {
   disableAllActions,
@@ -177,7 +178,7 @@ describe('helpers/poolHelper/', () => {
       const result = disableAllActions({
         chain: BNBChain,
         haltedChains,
-        mimirHalt: { haltThorChain: true, haltEthChain: false }
+        mimirHalt: { ...DEFAULT_MIMIR_HALT, haltThorChain: true }
       })
       expect(result).toBeTruthy()
     })
@@ -185,7 +186,7 @@ describe('helpers/poolHelper/', () => {
       const result = disableAllActions({
         chain: LTCChain,
         haltedChains,
-        mimirHalt: { haltThorChain: true, haltEthChain: false }
+        mimirHalt: { ...DEFAULT_MIMIR_HALT, haltThorChain: true }
       })
       expect(result).toBeTruthy()
     })
@@ -193,7 +194,7 @@ describe('helpers/poolHelper/', () => {
       const result = disableAllActions({
         chain: ETHChain,
         haltedChains,
-        mimirHalt: { haltThorChain: false, haltEthChain: true }
+        mimirHalt: { ...DEFAULT_MIMIR_HALT, haltEthChain: true }
       })
       expect(result).toBeTruthy()
     })
@@ -201,7 +202,7 @@ describe('helpers/poolHelper/', () => {
       const result = disableAllActions({
         chain: LTCChain,
         haltedChains,
-        mimirHalt: { haltThorChain: false, haltEthChain: true }
+        mimirHalt: { ...DEFAULT_MIMIR_HALT, haltEthChain: true }
       })
       expect(result).toBeFalsy()
     })
@@ -209,7 +210,7 @@ describe('helpers/poolHelper/', () => {
       const result = disableAllActions({
         chain: ETHChain,
         haltedChains,
-        mimirHalt: { haltThorChain: false, haltEthChain: false }
+        mimirHalt: DEFAULT_MIMIR_HALT
       })
       expect(result).toBeTruthy()
     })
@@ -217,7 +218,7 @@ describe('helpers/poolHelper/', () => {
       const result = disableAllActions({
         chain: BNBChain,
         haltedChains,
-        mimirHalt: { haltThorChain: false, haltEthChain: false }
+        mimirHalt: DEFAULT_MIMIR_HALT
       })
       expect(result).toBeTruthy()
     })
@@ -225,7 +226,7 @@ describe('helpers/poolHelper/', () => {
       const result = disableAllActions({
         chain: LTCChain,
         haltedChains,
-        mimirHalt: { haltThorChain: false, haltEthChain: false }
+        mimirHalt: DEFAULT_MIMIR_HALT
       })
       expect(result).toBeFalsy()
     })
