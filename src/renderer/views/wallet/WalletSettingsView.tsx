@@ -13,10 +13,10 @@ import { RemoveWalletConfirmationModal } from '../../components/modal/confirmati
 import { PasswordModal } from '../../components/modal/password'
 import { QRCodeModal } from '../../components/uielements/qrCodeModal/QRCodeModal'
 import { PhraseCopyModal } from '../../components/wallet/phrase/PhraseCopyModal'
-import * as Styled from '../../components/wallet/settings/Settings.style'
 import { getChainAsset } from '../../helpers/chainHelper'
 import { ValidatePasswordHandler, WalletAccounts, WalletAddress } from '../../services/wallet/types'
 import { walletTypeToI18n } from '../../services/wallet/util'
+import * as Styled from './WalletSettingsView.styles'
 
 type Props = {
   selectedNetwork: Network
