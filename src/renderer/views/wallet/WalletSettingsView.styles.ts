@@ -9,6 +9,10 @@ import { Button as UIButton } from '../../components/uielements/button'
 import { ExternalLinkIcon as ExternalLinkIconUI } from '../../components/uielements/common/Common.style'
 import { Label as UILabel } from '../../components/uielements/label'
 
+export const ContainerWrapper = styled.div`
+  margin: 0px 8px 0px 8px;
+`
+
 export const TitleWrapper = styled.div`
   margin: 0px -8px;
   display: flex;

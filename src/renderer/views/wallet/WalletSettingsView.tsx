@@ -166,7 +166,7 @@ export const WalletSettingsView: React.FC<Props> = (props): JSX.Element => {
   )
 
   return (
-    <>
+    <Styled.ContainerWrapper>
       {showPasswordModal && (
         <PasswordModal
           validatePassword$={validatePassword$}
@@ -241,6 +241,6 @@ export const WalletSettingsView: React.FC<Props> = (props): JSX.Element => {
         </Col>
         {accounts}
       </Styled.Row>
-    </>
+    </Styled.ContainerWrapper>
   )
 }
