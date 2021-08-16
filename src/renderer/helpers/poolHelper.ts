@@ -17,7 +17,7 @@ import { PoolDetail } from '../types/generated/midgard'
 import { PoolTableRowData, PoolTableRowsData, PricePool } from '../views/pools/Pools.types'
 import { getPoolTableRowData } from '../views/pools/Pools.utils'
 import { isRuneNativeAsset, convertBaseAmountDecimal, to1e8BaseAmount } from './assetHelper'
-import { isEthChain } from './chainHelper'
+import { isBchChain, isBnbChain, isBtcChain, isEthChain, isLtcChain } from './chainHelper'
 import { eqChain } from './fp/eq'
 import { ordBaseAmount } from './fp/ord'
 import { sequenceTOption, sequenceTOptionFromArray } from './fpHelpers'
@@ -169,19 +169,31 @@ const isChainElem = A.elem(eqChain)
 export const disableAllActions = ({
   chain,
   haltedChains,
-  mimirHalt: { haltThorChain, haltEthChain }
+  mimirHalt: { haltThorChain, haltEthChain, haltBnbChain, haltLtcChain, haltBtcChain, haltBchChain }
 }: {
   chain: Chain
   haltedChains: Chain[]
   mimirHalt: MimirHaltChain
 }) => {
-  // 1. Check `haltThorChain` (provided by `mimir` endpoint) to disable all actions for all pools
+  // Check `haltThorChain` (provided by `mimir` endpoint) to disable all actions for all pools
   if (haltThorChain) return true
 
-  // 2. Check `haltEthChain` (provided by `mimir` endpoint) to disable all actions for ETH pools
+  // Check `haltBnbChain` (provided by `mimir` endpoint) to disable all actions for BNB pools
+  if (isBnbChain(chain) && haltBnbChain) return true
+
+  // Check `haltBtcChain` (provided by `mimir` endpoint) to disable all actions for BTC pools
+  if (isBtcChain(chain) && haltBtcChain) return true
+
+  // Check `haltBchChain` (provided by `mimir` endpoint) to disable all actions for BCH pools
+  if (isBchChain(chain) && haltBchChain) return true
+
+  // Check `haltLtcChain` (provided by `mimir` endpoint) to disable all actions for LTC pools
+  if (isLtcChain(chain) && haltLtcChain) return true
+
+  // Check `haltEthChain` (provided by `mimir` endpoint) to disable all actions for ETH pools
   if (isEthChain(chain) && haltEthChain) return true
 
-  // 3. Check `chain` is included in `haltedChains` (provided by `inbound_addresses` endpoint)
+  // Check `chain` is included in `haltedChains` (provided by `inbound_addresses` endpoint)
   return FP.pipe(haltedChains, isChainElem(chain))
 }
 
