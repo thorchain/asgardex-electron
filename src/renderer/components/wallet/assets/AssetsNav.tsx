@@ -25,35 +25,35 @@ type MenuType = {
 export const AssetsNav: React.FC = (): JSX.Element => {
   const intl = useIntl()
 
-  const menuItems = useMemo(
-    () =>
-      [
-        {
-          key: MenuKey.ASSETS,
-          label: intl.formatMessage({ id: 'common.assets' }),
-          path: walletRoutes.assets.path()
-        },
-        {
-          key: MenuKey.POOLSHARES,
-          label: intl.formatMessage({ id: 'wallet.nav.poolshares' }),
-          path: walletRoutes.poolShares.path()
-        },
-        {
-          key: MenuKey.BONDS,
-          label: intl.formatMessage({ id: 'wallet.nav.bonds' }),
-          path: walletRoutes.bonds.path()
-        },
-        {
-          key: MenuKey.HISTORY,
-          label: intl.formatMessage({ id: 'common.history' }),
-          path: walletRoutes.history.path()
-        },
-        {
-          key: MenuKey.WALLETSETTINGS,
-          label: 'settings',
-          path: walletRoutes.walletSettings.path()
-        }
-      ] as MenuType[],
+  const menuItems: MenuType[] = useMemo(
+    () => [
+      {
+        key: MenuKey.ASSETS,
+        label: intl.formatMessage({ id: 'common.assets' }),
+        path: walletRoutes.assets.path()
+      },
+      {
+        key: MenuKey.POOLSHARES,
+        label: intl.formatMessage({ id: 'wallet.nav.poolshares' }),
+        path: walletRoutes.poolShares.path()
+      },
+      {
+        key: MenuKey.BONDS,
+        label: intl.formatMessage({ id: 'wallet.nav.bonds' }),
+        path: walletRoutes.bonds.path()
+      },
+      {
+        key: MenuKey.HISTORY,
+        label: intl.formatMessage({ id: 'common.history' }),
+        path: walletRoutes.history.path()
+      }
+      // TODO (@asgdx-team) Disable temprorary for `v0.3.12`
+      // {
+      //   key: MenuKey.WALLETSETTINGS,
+      //   label: 'settings',
+      //   path: walletRoutes.walletSettings.path()
+      // }
+    ],
     [intl]
   )
 
