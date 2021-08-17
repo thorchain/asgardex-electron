@@ -47,7 +47,6 @@ import { InteractView } from './Interact'
 import { NoWalletView } from './NoWalletView'
 import { PoolShareView } from './PoolShareView'
 import { SendView } from './send'
-import { SettingsView } from './SettingsView'
 import { walletAccount$ } from './SettingsView.helper'
 import { UnlockView } from './UnlockView'
 import { UpgradeView } from './upgrade'
@@ -339,9 +338,6 @@ export const WalletView: React.FC = (): JSX.Element => {
       </Route>
       <Route path={walletRoutes.imports.base.template}>
         <ImportsView />
-      </Route>
-      <Route path={walletRoutes.settings.template} exact>
-        <SettingsView />
       </Route>
       <Route path={walletRoutes.base.template} render={renderWalletRoute} />
     </Switch>

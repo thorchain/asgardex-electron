@@ -36,13 +36,6 @@ export const locked: Route<RedirectUrl | void> = {
   }
 }
 
-export const settings: Route<void> = {
-  template: `${base.template}/settings`,
-  path() {
-    return this.template
-  }
-}
-
 export const assets: Route<void> = {
   template: `${base.template}/assets`,
   path() {

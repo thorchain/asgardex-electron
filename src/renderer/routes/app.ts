@@ -6,3 +6,10 @@ export const base: Route<void> = {
     return this.template
   }
 }
+
+export const settings: Route<void> = {
+  template: '/settings',
+  path() {
+    return this.template
+  }
+}

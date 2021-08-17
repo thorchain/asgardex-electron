@@ -16,6 +16,7 @@ import { ReactComponent as MenuIcon } from '../../assets/svg/icon-menu.svg'
 import { ReactComponent as SwapIcon } from '../../assets/svg/icon-swap.svg'
 import { ReactComponent as WalletIcon } from '../../assets/svg/icon-wallet.svg'
 import { useThemeContext } from '../../contexts/ThemeContext'
+import * as appRoutes from '../../routes/app'
 import * as poolsRoutes from '../../routes/pools'
 import * as walletRoutes from '../../routes/wallet'
 import { PriceRD, SelectedPricePoolAsset } from '../../services/midgard/types'
@@ -189,7 +190,7 @@ export const HeaderComponent: React.FC<Props> = (props): JSX.Element => {
 
   const clickSettingsHandler = useCallback(() => {
     closeMenu()
-    history.push(walletRoutes.settings.path())
+    history.push(appRoutes.settings.path())
   }, [closeMenu, history])
 
   const clickLockHandler = useCallback(() => {
