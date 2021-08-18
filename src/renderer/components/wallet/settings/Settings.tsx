@@ -27,13 +27,11 @@ export const Settings: React.FC<Props> = (props): JSX.Element => {
       </Row>
       <Styled.Row gutter={[16, 16]}>
         <Col sm={{ span: 24 }} lg={{ span: 12 }}>
-          <Styled.Card>
-            <Row>
-              <Col span={24}>
-                <ClientSettingsView />
-              </Col>
-            </Row>
-          </Styled.Card>
+          <Row>
+            <Col span={24}>
+              <ClientSettingsView />
+            </Col>
+          </Row>
         </Col>
       </Styled.Row>
     </>
