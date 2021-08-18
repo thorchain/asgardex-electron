@@ -13,8 +13,7 @@ type Props = {
 
 export const Settings: React.FC<Props> = (props): JSX.Element => {
   const intl = useIntl()
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const { selectedNetwork, ClientSettingsView } = props
+  const { ClientSettingsView } = props
 
   return (
     <>
@@ -26,16 +25,9 @@ export const Settings: React.FC<Props> = (props): JSX.Element => {
           <Styled.Divider />
         </Col>
       </Row>
-      <Styled.Row gutter={[16, 16]}>
-        <Col sm={{ span: 24 }} lg={{ span: 12 }}>
-          <Styled.Subtitle>{intl.formatMessage({ id: 'setting.client' })}</Styled.Subtitle>
-          <Styled.Card>
-            <Row>
-              <Col span={24}>
-                <ClientSettingsView />
-              </Col>
-            </Row>
-          </Styled.Card>
+      <Styled.Row>
+        <Col span={24}>
+          <ClientSettingsView />
         </Col>
       </Styled.Row>
     </>

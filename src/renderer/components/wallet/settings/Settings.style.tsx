@@ -5,7 +5,6 @@ import { palette } from 'styled-theme'
 import { Label as UILabel } from '../../uielements/label'
 
 export const TitleWrapper = styled.div`
-  margin: 0px -8px;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -38,12 +37,8 @@ export const Subtitle = styled(UILabel)`
 `
 
 export const Row = styled(A.Row)`
-  padding: 10px 30px;
   background-color: ${palette('background', 1)};
-
-  .ant-row {
-    margin: 0;
-  }
+  padding: 20px 0px 30px 40px;
 `
 
 export const Card = styled(A.Card)`
