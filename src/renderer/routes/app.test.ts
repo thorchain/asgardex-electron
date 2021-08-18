@@ -1,4 +1,4 @@
-import { base } from './app'
+import { base, settings } from './app'
 
 describe('App routes', () => {
   describe('base', () => {
@@ -7,6 +7,15 @@ describe('App routes', () => {
     })
     it('path', () => {
       expect(base.path()).toEqual('/')
+    })
+  })
+
+  describe('settings', () => {
+    it('template', () => {
+      expect(settings.template).toEqual('/settings')
+    })
+    it('path', () => {
+      expect(settings.path()).toEqual('/settings')
     })
   })
 })

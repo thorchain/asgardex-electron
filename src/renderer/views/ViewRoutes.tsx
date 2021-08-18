@@ -9,6 +9,7 @@ import * as walletRoutes from '../routes/wallet'
 import { NoContentView } from './NoContentView'
 import { PlaygroundView } from './playground/PlaygroundView'
 import { PoolsView } from './pools/PoolsView'
+import { SettingsView } from './wallet/SettingsView'
 import { WalletView } from './wallet/WalletView'
 
 export const ViewRoutes: React.FC<{}> = (): JSX.Element => {
@@ -22,6 +23,9 @@ export const ViewRoutes: React.FC<{}> = (): JSX.Element => {
       </Route>
       <Route path={walletRoutes.base.template}>
         <WalletView />
+      </Route>
+      <Route path={appRoutes.settings.template}>
+        <SettingsView />
       </Route>
       <Route path={playgroundRoutes.base.template}>
         <PlaygroundView />

@@ -1,16 +1,4 @@
-import {
-  base,
-  imports,
-  locked,
-  settings,
-  assets,
-  bonds,
-  assetDetail,
-  send,
-  upgradeRune,
-  poolShares,
-  history
-} from './wallet'
+import { base, imports, locked, assets, bonds, assetDetail, send, upgradeRune, poolShares, history } from './wallet'
 
 describe('Wallet routes', () => {
   describe('base routes', () => {
@@ -41,15 +29,6 @@ describe('Wallet routes', () => {
     })
     it('path', () => {
       expect(locked.path()).toEqual('/wallet/locked')
-    })
-  })
-
-  describe('settings route', () => {
-    it('template', () => {
-      expect(settings.template).toEqual('/wallet/settings')
-    })
-    it('path', () => {
-      expect(settings.path()).toEqual('/wallet/settings')
     })
   })
 
