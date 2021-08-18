@@ -4,10 +4,10 @@ import { Meta, Story } from '@storybook/react'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
 
-import { Locale } from '../../../../shared/i18n/types'
-import { getMockRDValueFactory, RDStatus, rdStatusOptions } from '../../../../shared/mock/rdByStatus'
-import { ChangeNetworkHandler, OnlineStatus } from '../../../services/app/types'
-import { ClientSettings as Component } from './ClientSettings'
+import { Locale } from '../../../shared/i18n/types'
+import { getMockRDValueFactory, RDStatus, rdStatusOptions } from '../../../shared/mock/rdByStatus'
+import { ChangeNetworkHandler, OnlineStatus } from '../../services/app/types'
+import { AppSettings as Component } from './AppSettings'
 
 type StoryArgs = {
   onlineStatus: OnlineStatus
@@ -49,7 +49,7 @@ Default.args = { onlineStatus: OnlineStatus.ON, updateDataRD: 'initial' }
 
 const meta: Meta<StoryArgs> = {
   component: Component,
-  title: 'Components/ClientSettings',
+  title: 'Components/AppSettings',
   argTypes: {
     updateDataRD: {
       control: {
