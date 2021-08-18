@@ -189,7 +189,7 @@ export const WalletSettingsView: React.FC<Props> = (props): JSX.Element => {
       {renderQRCodeModal}
       <Styled.Row gutter={[16, 16]}>
         <Styled.Subtitle>{intl.formatMessage({ id: 'setting.wallet.management' })}</Styled.Subtitle>
-        <Row>
+        <Row style={{ flex: 1, alignItems: 'center' }}>
           <Styled.WalletCol sm={{ span: 24 }} md={{ span: 12 }}>
             <Styled.OptionCard bordered={false}>
               <Styled.OptionLabel
@@ -234,7 +234,7 @@ export const WalletSettingsView: React.FC<Props> = (props): JSX.Element => {
           </Styled.WalletCol>
         </Row>
       </Styled.Row>
-      <Styled.Row>{accounts}</Styled.Row>
+      <Styled.Row gutter={[16, 16]}>{accounts}</Styled.Row>
     </Styled.ContainerWrapper>
   )
 }
