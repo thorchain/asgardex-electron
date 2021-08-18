@@ -121,6 +121,7 @@ export const ListItem = styled(A.List.Item)`
 `
 
 export const ChainName = styled(UILabel)`
+  margin-left: 5px;
   padding: 0px;
   text-transform: uppercase;
   font-weight: normal;
@@ -132,7 +133,7 @@ export const ChainName = styled(UILabel)`
 export const ChainContent = styled.div`
   width: 100%;
   overflow: hidden;
-  margin: 0 30px;
+  margin: 0 38px;
 `
 
 export const AccountPlaceholder = styled(UILabel)`

@@ -2,7 +2,7 @@ import React, { useCallback, useMemo, useState } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
 import { Address } from '@xchainjs/xchain-client'
-import { Asset, Chain } from '@xchainjs/xchain-util'
+import { Asset, AssetBCH, AssetBNB, AssetBTC, AssetETH, AssetLTC, AssetRuneNative, Chain } from '@xchainjs/xchain-util'
 import { List, Row } from 'antd'
 import * as FP from 'fp-ts/function'
 import * as O from 'fp-ts/lib/Option'
@@ -12,9 +12,18 @@ import { Network } from '../../../shared/api/types'
 import { ReactComponent as UnlockOutlined } from '../../assets/svg/icon-unlock-warning.svg'
 import { RemoveWalletConfirmationModal } from '../../components/modal/confirmation/RemoveWalletConfirmationModal'
 import { PasswordModal } from '../../components/modal/password'
+import { AssetIcon } from '../../components/uielements/assets/assetIcon/AssetIcon'
 import { QRCodeModal } from '../../components/uielements/qrCodeModal/QRCodeModal'
 import { PhraseCopyModal } from '../../components/wallet/phrase/PhraseCopyModal'
-import { getChainAsset } from '../../helpers/chainHelper'
+import {
+  getChainAsset,
+  isBchChain,
+  isBnbChain,
+  isBtcChain,
+  isEthChain,
+  isLtcChain,
+  isThorChain
+} from '../../helpers/chainHelper'
 import { ValidatePasswordHandler, WalletAccounts, WalletAddress } from '../../services/wallet/types'
 import { walletTypeToI18n } from '../../services/wallet/util'
 import * as Styled from './WalletSettingsView.styles'
@@ -131,7 +140,23 @@ export const WalletSettingsView: React.FC<Props> = (props): JSX.Element => {
     [addLedgerAddress, clickAddressLinkHandler, intl, removeLedgerAddress, selectedNetwork]
   )
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const assetFromChain = (chain: Chain) => {
+    if (isThorChain(chain)) {
+      return AssetRuneNative
+    } else if (isBtcChain(chain)) {
+      return AssetBTC
+    } else if (isEthChain(chain)) {
+      return AssetETH
+    } else if (isBnbChain(chain)) {
+      return AssetBNB
+    } else if (isLtcChain(chain)) {
+      return AssetLTC
+    } else if (isBchChain(chain)) {
+      return AssetBCH
+    }
+    return AssetRuneNative
+  }
+
   const accounts = useMemo(
     () =>
       FP.pipe(
@@ -143,7 +168,10 @@ export const WalletSettingsView: React.FC<Props> = (props): JSX.Element => {
               dataSource={walletAccounts}
               renderItem={({ chain, accounts }, i: number) => (
                 <Styled.ListItem key={i}>
-                  <Styled.ChainName>{chain}</Styled.ChainName>
+                  <div style={{ display: 'flex', alignItems: 'center' }}>
+                    <AssetIcon asset={assetFromChain(chain)} size={'small'} network="mainnet" />
+                    <Styled.ChainName>{chain}</Styled.ChainName>
+                  </div>
                   {accounts.map((account, j) => {
                     const { type } = account
                     return (
