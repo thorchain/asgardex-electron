@@ -178,7 +178,7 @@ export const ClientSettings: React.FC<Props> = (props): JSX.Element => {
   )
 
   return (
-    <>
+    <Styled.Container>
       <Styled.Section>
         <Styled.Title>{intl.formatMessage({ id: 'common.network' })}</Styled.Title>
         {renderNetworkMenu}
@@ -194,6 +194,6 @@ export const ClientSettings: React.FC<Props> = (props): JSX.Element => {
         <Styled.UpdatesButton {...checkUpdatesProps} />
         {renderVersionUpdateResult}
       </Styled.Section>
-    </>
+    </Styled.Container>
   )
 }

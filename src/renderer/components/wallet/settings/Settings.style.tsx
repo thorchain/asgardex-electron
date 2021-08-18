@@ -4,27 +4,19 @@ import { palette } from 'styled-theme'
 
 import { Label as UILabel } from '../../uielements/label'
 
-export const TitleWrapper = styled.div`
-  display: flex;
-  justify-content: center;
-  align-items: center;
+export const Container = styled.div`
+  padding: 20px 40px 30px 40px;
   background-color: ${palette('background', 1)};
-  min-height: 70px;
 `
 
 export const Title = styled(UILabel)`
   color: ${palette('text', 1)};
-  padding: 0 40px;
+  padding-bottom: 20px;
   text-transform: uppercase;
   font-family: 'MainFontRegular';
   font-weight: 600;
   font-size: 22px;
   line-height: 22px;
-`
-
-export const Divider = styled(A.Divider)`
-  margin: 0;
-  border-top: 1px solid ${palette('gray', 0)};
 `
 
 export const Subtitle = styled(UILabel)`
@@ -36,9 +28,8 @@ export const Subtitle = styled(UILabel)`
   font-size: 18px;
 `
 
-export const Row = styled(A.Row)`
-  background-color: ${palette('background', 1)};
-  padding: 20px 0px 30px 40px;
+export const CardContainer = styled.div`
+  width: 100%;
 `
 
 export const Card = styled(A.Card)`

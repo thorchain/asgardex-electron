@@ -3,7 +3,7 @@ import React, { useCallback, useMemo, useState } from 'react'
 import * as RD from '@devexperts/remote-data-ts'
 import { Address } from '@xchainjs/xchain-client'
 import { Asset, Chain } from '@xchainjs/xchain-util'
-import { List, Row } from 'antd'
+import { Col, List, Row } from 'antd'
 import * as FP from 'fp-ts/function'
 import * as O from 'fp-ts/lib/Option'
 import { useIntl } from 'react-intl'
@@ -137,29 +137,31 @@ export const WalletSettingsView: React.FC<Props> = (props): JSX.Element => {
       FP.pipe(
         oWalletAccounts,
         O.map((walletAccounts) => (
-          <>
+          <Col key={'accounts'} span={24}>
             <Styled.Subtitle>{intl.formatMessage({ id: 'setting.account.management' })}</Styled.Subtitle>
-            <List
-              dataSource={walletAccounts}
-              renderItem={({ chain, accounts }, i: number) => (
-                <Styled.ListItem key={i}>
-                  <div style={{ display: 'flex', alignItems: 'center' }}>
-                    <AssetIcon asset={getChainAsset(chain)} size={'small'} network="mainnet" />
-                    <Styled.ChainName>{chain}</Styled.ChainName>
-                  </div>
-                  {accounts.map((account, j) => {
-                    const { type } = account
-                    return (
-                      <Styled.ChainContent key={j}>
-                        <Styled.AccountPlaceholder>{walletTypeToI18n(type, intl)}</Styled.AccountPlaceholder>
-                        {renderAddress(chain, account)}
-                      </Styled.ChainContent>
-                    )
-                  })}
-                </Styled.ListItem>
-              )}
-            />
-          </>
+            <Styled.AccountCard>
+              <List
+                dataSource={walletAccounts}
+                renderItem={({ chain, accounts }, i: number) => (
+                  <Styled.ListItem key={i}>
+                    <Styled.AccountTitleWrapper>
+                      <AssetIcon asset={getChainAsset(chain)} size={'small'} network="mainnet" />
+                      <Styled.AccountTitle>{chain}</Styled.AccountTitle>
+                    </Styled.AccountTitleWrapper>
+                    {accounts.map((account, j) => {
+                      const { type } = account
+                      return (
+                        <Styled.AccountContent key={j}>
+                          <Styled.AccountPlaceholder>{walletTypeToI18n(type, intl)}</Styled.AccountPlaceholder>
+                          {renderAddress(chain, account)}
+                        </Styled.AccountContent>
+                      )
+                    })}
+                  </Styled.ListItem>
+                )}
+              />
+            </Styled.AccountCard>
+          </Col>
         )),
         O.getOrElse(() => <></>)
       ),
@@ -191,53 +193,57 @@ export const WalletSettingsView: React.FC<Props> = (props): JSX.Element => {
       />
       {renderQRCodeModal}
       <Styled.Row gutter={[16, 16]}>
-        <Styled.Subtitle>{intl.formatMessage({ id: 'setting.wallet.management' })}</Styled.Subtitle>
-        <Row style={{ flex: 1, alignItems: 'center' }}>
-          <Styled.WalletCol sm={{ span: 24 }} md={{ span: 12 }}>
-            <Styled.OptionCard bordered={false}>
-              <Styled.OptionLabel
-                color="primary"
-                size="big"
-                onClick={() => exportKeystore(runeNativeAddress, selectedNetwork)}>
-                {intl.formatMessage({ id: 'setting.export' })}
-              </Styled.OptionLabel>
-            </Styled.OptionCard>
-          </Styled.WalletCol>
-          <Styled.WalletCol sm={{ span: 24 }} md={{ span: 12 }}>
-            <Styled.OptionCard bordered={false}>
-              <Styled.OptionLabel color="warning" size="big" onClick={lockWallet}>
-                {intl.formatMessage({ id: 'setting.lock' })} <UnlockOutlined />
-              </Styled.OptionLabel>
-            </Styled.OptionCard>
-          </Styled.WalletCol>
-          <Styled.WalletCol sm={{ span: 24 }} md={{ span: 12 }}>
-            <Styled.OptionCard bordered={false}>
-              <Styled.Button
-                sizevalue="xnormal"
-                color="primary"
-                typevalue="outline"
-                round="true"
-                onClick={() => setShowPasswordModal(true)}
-                disabled={O.isNone(oPhrase) ? true : false}>
-                {intl.formatMessage({ id: 'setting.view.phrase' })}
-              </Styled.Button>
-            </Styled.OptionCard>
-          </Styled.WalletCol>
-          <Styled.WalletCol sm={{ span: 24 }} md={{ span: 12 }}>
-            <Styled.OptionCard bordered={false}>
-              <Styled.Button
-                sizevalue="xnormal"
-                color="error"
-                typevalue="outline"
-                round="true"
-                onClick={() => setShowRemoveWalletModal(true)}>
-                {intl.formatMessage({ id: 'wallet.remove.label' })}
-              </Styled.Button>
-            </Styled.OptionCard>
-          </Styled.WalletCol>
-        </Row>
+        <Col span={24}>
+          <Styled.Subtitle>{intl.formatMessage({ id: 'setting.wallet.management' })}</Styled.Subtitle>
+          <Styled.Card>
+            <Row style={{ flex: 1, alignItems: 'center' }}>
+              <Styled.WalletCol sm={{ span: 24 }} md={{ span: 12 }}>
+                <Styled.OptionCard bordered={false}>
+                  <Styled.OptionLabel
+                    color="primary"
+                    size="big"
+                    onClick={() => exportKeystore(runeNativeAddress, selectedNetwork)}>
+                    {intl.formatMessage({ id: 'setting.export' })}
+                  </Styled.OptionLabel>
+                </Styled.OptionCard>
+              </Styled.WalletCol>
+              <Styled.WalletCol sm={{ span: 24 }} md={{ span: 12 }}>
+                <Styled.OptionCard bordered={false}>
+                  <Styled.OptionLabel color="warning" size="big" onClick={lockWallet}>
+                    {intl.formatMessage({ id: 'setting.lock' })} <UnlockOutlined />
+                  </Styled.OptionLabel>
+                </Styled.OptionCard>
+              </Styled.WalletCol>
+              <Styled.WalletCol sm={{ span: 24 }} md={{ span: 12 }}>
+                <Styled.OptionCard bordered={false}>
+                  <Styled.Button
+                    sizevalue="xnormal"
+                    color="primary"
+                    typevalue="outline"
+                    round="true"
+                    onClick={() => setShowPasswordModal(true)}
+                    disabled={O.isNone(oPhrase) ? true : false}>
+                    {intl.formatMessage({ id: 'setting.view.phrase' })}
+                  </Styled.Button>
+                </Styled.OptionCard>
+              </Styled.WalletCol>
+              <Styled.WalletCol sm={{ span: 24 }} md={{ span: 12 }}>
+                <Styled.OptionCard bordered={false}>
+                  <Styled.Button
+                    sizevalue="xnormal"
+                    color="error"
+                    typevalue="outline"
+                    round="true"
+                    onClick={() => setShowRemoveWalletModal(true)}>
+                    {intl.formatMessage({ id: 'wallet.remove.label' })}
+                  </Styled.Button>
+                </Styled.OptionCard>
+              </Styled.WalletCol>
+            </Row>
+          </Styled.Card>
+        </Col>
+        {accounts}
       </Styled.Row>
-      <Styled.Row gutter={[16, 16]}>{accounts}</Styled.Row>
     </Styled.ContainerWrapper>
   )
 }

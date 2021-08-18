@@ -9,6 +9,10 @@ import { Button as UIButton } from '../../uielements/button'
 import { ExternalLinkIcon as ExternalLinkIconUI } from '../../uielements/common/Common.style'
 import { Label as UILabel } from '../../uielements/label'
 
+export const Container = styled.div`
+  padding: 20px;
+`
+
 export const Section = styled.div`
   display: flex;
   flex-direction: column;

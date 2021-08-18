@@ -10,7 +10,7 @@ import { ExternalLinkIcon as ExternalLinkIconUI } from '../../components/uieleme
 import { Label as UILabel } from '../../components/uielements/label'
 
 export const ContainerWrapper = styled.div`
-  margin: 0px 8px 0px 8px;
+  margin: 0px 8px;
 `
 
 export const TitleWrapper = styled.div`
@@ -47,7 +47,7 @@ export const Subtitle = styled(UILabel)`
 `
 
 export const Row = styled(A.Row)`
-  padding: 10px 30px;
+  padding: 10px 30px 40px 30px;
   background-color: ${palette('background', 1)};
 
   .ant-row {
@@ -60,6 +60,7 @@ export const WalletCol = styled(A.Col)`
 `
 
 export const Card = styled(A.Card)`
+  padding-top: 20px;
   border-radius: 5px;
   background-color: ${palette('background', 1)};
   border: 1px solid ${palette('gray', 0)};
@@ -114,14 +115,24 @@ export const AccountCard = styled(A.Card)`
 `
 
 export const ListItem = styled(A.List.Item)`
-  padding: 10px 20px 20px 0px;
+  padding: 40px;
   flex-direction: column;
   align-items: start;
-  border-bottom: none !important;
+
+  border-bottom: none;
+  border-bottom: 1px solid ${palette('gray', 0)};
+  .ant-list-item {
+    border-bottom: 1px solid ${palette('gray', 0)};
+  }
 `
 
-export const ChainName = styled(UILabel)`
-  margin-left: 5px;
+export const AccountTitleWrapper = styled.div`
+  display: flex;
+  align-items: center;
+`
+
+export const AccountTitle = styled(UILabel)`
+  margin-left: 10px;
   padding: 0px;
   text-transform: uppercase;
   font-weight: normal;
@@ -130,10 +141,10 @@ export const ChainName = styled(UILabel)`
   letter-spacing: 2px;
 `
 
-export const ChainContent = styled.div`
+export const AccountContent = styled.div`
   width: 100%;
   overflow: hidden;
-  margin: 0 38px;
+  margin: 0 40px;
 `
 
 export const AccountPlaceholder = styled(UILabel)`

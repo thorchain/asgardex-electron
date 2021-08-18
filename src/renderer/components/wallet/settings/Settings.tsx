@@ -1,6 +1,5 @@
 import React from 'react'
 
-import { Row, Col } from 'antd'
 import { useIntl } from 'react-intl'
 
 import { Network } from '../../../../shared/api/types'
@@ -16,20 +15,13 @@ export const Settings: React.FC<Props> = (props): JSX.Element => {
   const { ClientSettingsView } = props
 
   return (
-    <>
-      <Row>
-        <Col span={24}>
-          <Styled.TitleWrapper>
-            <Styled.Title>{intl.formatMessage({ id: 'setting.title' })}</Styled.Title>
-          </Styled.TitleWrapper>
-          <Styled.Divider />
-        </Col>
-      </Row>
-      <Styled.Row>
-        <Col span={24}>
+    <Styled.Container>
+      <Styled.Title>{intl.formatMessage({ id: 'setting.title' })}</Styled.Title>
+      <Styled.CardContainer>
+        <Styled.Card>
           <ClientSettingsView />
-        </Col>
-      </Styled.Row>
-    </>
+        </Styled.Card>
+      </Styled.CardContainer>
+    </Styled.Container>
   )
 }
