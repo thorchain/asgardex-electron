@@ -27,7 +27,6 @@ export const Settings: React.FC<Props> = (props): JSX.Element => {
       </Row>
       <Styled.Row gutter={[16, 16]}>
         <Col sm={{ span: 24 }} lg={{ span: 12 }}>
-          <Styled.Subtitle>{intl.formatMessage({ id: 'setting.client' })}</Styled.Subtitle>
           <Styled.Card>
             <Row>
               <Col span={24}>
