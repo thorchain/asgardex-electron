@@ -25,13 +25,9 @@ export const Settings: React.FC<Props> = (props): JSX.Element => {
           <Styled.Divider />
         </Col>
       </Row>
-      <Styled.Row gutter={[16, 16]}>
-        <Col sm={{ span: 24 }} lg={{ span: 12 }}>
-          <Row style={{ paddingTop: 20 }}>
-            <Col span={24}>
-              <ClientSettingsView />
-            </Col>
-          </Row>
+      <Styled.Row>
+        <Col span={24}>
+          <ClientSettingsView />
         </Col>
       </Styled.Row>
     </>
