@@ -114,18 +114,14 @@ export const AccountCard = styled(A.Card)`
 `
 
 export const ListItem = styled(A.List.Item)`
-  padding: 10px 20px;
+  padding: 10px 20px 20px 0px;
   flex-direction: column;
   align-items: start;
-  border: none;
-  border-bottom: 1px solid ${palette('gray', 0)};
-
-  .ant-list-item {
-    border-bottom: 1px solid ${palette('gray', 0)};
-  }
+  border-bottom: none !important;
 `
 
 export const ChainName = styled(UILabel)`
+  margin-left: 5px;
   padding: 0px;
   text-transform: uppercase;
   font-weight: normal;
@@ -137,7 +133,7 @@ export const ChainName = styled(UILabel)`
 export const ChainContent = styled.div`
   width: 100%;
   overflow: hidden;
-  margin: 0 30px;
+  margin: 0 38px;
 `
 
 export const AccountPlaceholder = styled(UILabel)`
