@@ -114,15 +114,10 @@ export const AccountCard = styled(A.Card)`
 `
 
 export const ListItem = styled(A.List.Item)`
-  padding: 10px 20px;
+  padding: 10px 20px 20px 0px;
   flex-direction: column;
   align-items: start;
-  border: none;
-  border-bottom: 1px solid ${palette('gray', 0)};
-
-  .ant-list-item {
-    border-bottom: 1px solid ${palette('gray', 0)};
-  }
+  border-bottom: none !important;
 `
 
 export const ChainName = styled(UILabel)`
