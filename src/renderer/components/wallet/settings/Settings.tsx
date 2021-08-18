@@ -13,8 +13,7 @@ type Props = {
 
 export const Settings: React.FC<Props> = (props): JSX.Element => {
   const intl = useIntl()
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const { selectedNetwork, ClientSettingsView } = props
+  const { ClientSettingsView } = props
 
   return (
     <>
