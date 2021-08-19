@@ -1,8 +1,15 @@
-import * as RD from '@devexperts/remote-data-ts'
-
+import { Network } from '../../../shared/api/types'
 import { observableState } from '../../helpers/stateHelper'
-import { LedgerAddressRD } from '../wallet/types'
+import { INITIAL_LEDGER_ADDRESS_MAP } from '../wallet/const'
+import { LedgerAddressMap, LedgerAddressRD } from '../wallet/types'
 
-const { get$: ledgerAddress$, set: setLedgerAddressRD } = observableState<LedgerAddressRD>(RD.initial)
+const {
+  get$: ledgerAddress$,
+  get: ledgerAddress,
+  set: setLedgerAddress
+} = observableState<LedgerAddressMap>(INITIAL_LEDGER_ADDRESS_MAP)
+
+const setLedgerAddressRD = (ledgerAddressRD: LedgerAddressRD, network: Network) =>
+  setLedgerAddress({ ...ledgerAddress(), [network]: ledgerAddressRD })
 
 export { ledgerAddress$, setLedgerAddressRD }

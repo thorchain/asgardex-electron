@@ -6,14 +6,13 @@ import * as Rx from 'rxjs'
 import * as RxOp from 'rxjs/operators'
 
 import { LedgerErrorId, Network } from '../../../shared/api/types'
-import { network$ } from '../app/service'
 import * as THOR from '../thorchain/ledger'
-import { LedgerAddressLD, LedgerAddressRD } from './types'
+import { LedgerAddressLD, LedgerAddressMap$, LedgerAddressRD } from './types'
 
 /**
  * Get ledger address from memory
  */
-export const getLedgerAddressByChain$ = (chain: Chain): LedgerAddressLD => {
+export const getLedgerAddressByChain$ = (chain: Chain): LedgerAddressMap$ => {
   switch (chain) {
     case THORChain:
       return THOR.ledgerAddress$
@@ -25,38 +24,39 @@ export const getLedgerAddressByChain$ = (chain: Chain): LedgerAddressLD => {
 /**
  * Removes ledger address from memory
  */
-export const removeLedgerAddressByChain = (chain: Chain): void => {
+export const removeLedgerAddressByChain = (chain: Chain, network: Network): void => {
   switch (chain) {
     case THORChain:
-      return THOR.setLedgerAddressRD(RD.initial)
+      return THOR.setLedgerAddressRD(RD.initial, network)
     default:
       throw Error(`Ledger has not been implemented for ${chain} yet`)
   }
 }
-
-const removeAllLedgerAddresses = (): void => {
-  removeLedgerAddressByChain(THORChain)
-}
-
-// Remove all Ledger addresses while changing the network
-network$.subscribe(removeAllLedgerAddresses)
 
 /**
  * Sets ledger address in `pending` state
  */
-const setPendingLedgerAddressByChain = (chain: Chain): void => {
+const setPendingLedgerAddressByChain = (chain: Chain, network: Network): void => {
   switch (chain) {
     case THORChain:
-      return THOR.setLedgerAddressRD(RD.pending)
+      return THOR.setLedgerAddressRD(RD.pending, network)
     default:
       throw Error(`Ledger has not been implemented for ${chain} yet`)
   }
 }
 
-const setLedgerAddressByChain = (chain: Chain, address: LedgerAddressRD) => {
+const setLedgerAddressByChain = ({
+  address,
+  chain,
+  network
+}: {
+  chain: Chain
+  address: LedgerAddressRD
+  network: Network
+}) => {
   switch (chain) {
     case THORChain:
-      return THOR.setLedgerAddressRD(address)
+      return THOR.setLedgerAddressRD(address, network)
     default:
       throw Error(`Ledger has not been implemented for ${chain} yet`)
   }
@@ -68,14 +68,14 @@ const setLedgerAddressByChain = (chain: Chain, address: LedgerAddressRD) => {
 export const askLedgerAddressByChain$ = (chain: Chain, network: Network): LedgerAddressLD =>
   FP.pipe(
     // remove address from memory
-    removeLedgerAddressByChain(chain),
+    removeLedgerAddressByChain(chain, network),
     // set pending
-    () => setPendingLedgerAddressByChain(chain),
+    () => setPendingLedgerAddressByChain(chain, network),
     // ask for ledger address
     () => Rx.from(window.apiHDWallet.getLedgerAddress(chain, network)),
     RxOp.map(RD.fromEither),
     // store address in memory
-    RxOp.tap((address: LedgerAddressRD) => setLedgerAddressByChain(chain, address)),
+    RxOp.tap((address: LedgerAddressRD) => setLedgerAddressByChain({ chain, address, network })),
     RxOp.catchError((error) => Rx.of(RD.failure(error))),
     RxOp.startWith(RD.pending)
   )

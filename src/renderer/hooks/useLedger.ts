@@ -18,10 +18,17 @@ export const useLedger = (chain: Chain) => {
 
   const { askLedgerAddressByChain$, getLedgerAddressByChain$, removeLedgerAddressByChain } = useWalletContext()
 
-  const removeAddress = useCallback(() => removeLedgerAddressByChain(chain), [chain, removeLedgerAddressByChain])
+  const removeAddress = useCallback(
+    () => removeLedgerAddressByChain(chain, network),
+    [chain, removeLedgerAddressByChain, network]
+  )
 
   const address = useObservableState<LedgerAddressRD>(
-    FP.pipe(getLedgerAddressByChain$(chain), RxOp.shareReplay(1)),
+    FP.pipe(
+      getLedgerAddressByChain$(chain),
+      RxOp.map((addressMap) => addressMap[network]),
+      RxOp.shareReplay(1)
+    ),
     RD.initial
   )
 

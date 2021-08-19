@@ -183,16 +183,16 @@ export const createBalancesService = ({
   )
 
   const thorLedgerChainBalance$: ChainBalance$ = FP.pipe(
-    THOR.ledgerAddress$,
-    RxOp.switchMap((addressRd) =>
+    Rx.combineLatest([THOR.ledgerAddress$, network$]),
+    RxOp.switchMap(([addressMap, network]) =>
       FP.pipe(
-        addressRd,
+        addressMap[network],
         RD.map((address) => THOR.getBalanceByAddress$(address, 'ledger')),
         RD.map(
           RxOp.map<WalletBalancesRD, ChainBalance>((balances) => ({
             walletType: 'ledger',
             chain: THORChain,
-            walletAddress: FP.pipe(addressRd, RD.toOption),
+            walletAddress: FP.pipe(addressMap[network], RD.toOption),
             balances
           }))
         ),

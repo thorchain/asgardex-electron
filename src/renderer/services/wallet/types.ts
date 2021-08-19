@@ -155,8 +155,11 @@ export type TxLD = LiveData<ApiError, Tx>
 /* RD/LD for sending transactions on different chains */
 export type TxHashRD = RD.RemoteData<ApiError, TxHash>
 export type TxHashLD = LiveData<ApiError, TxHash>
-export type LedgerTxHashRD = RD.RemoteData<LedgerApiError, string>
-export type LedgerTxHashLD = LiveData<LedgerApiError, string>
+export type LedgerTxHashRD = RD.RemoteData<LedgerApiError, TxHash>
+export type LedgerTxHashLD = LiveData<LedgerApiError, TxHash>
 
 export type LedgerAddressRD = RD.RemoteData<LedgerErrorId, Address>
 export type LedgerAddressLD = LiveData<LedgerErrorId, Address>
+
+export type LedgerAddressMap = Record<Network, LedgerAddressRD>
+export type LedgerAddressMap$ = Rx.Observable<LedgerAddressMap>
