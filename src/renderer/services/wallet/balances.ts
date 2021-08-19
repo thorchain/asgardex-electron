@@ -29,7 +29,8 @@ import {
   ChainBalancesService,
   BalancesState$,
   KeystoreState$,
-  KeystoreState
+  KeystoreState,
+  ChainBalance
 } from './types'
 import { sortBalances } from './util'
 import { hasImportedKeystore } from './util'
@@ -181,6 +182,33 @@ export const createBalancesService = ({
     }))
   )
 
+  const thorLedgerChainBalance$: ChainBalance$ = FP.pipe(
+    THOR.ledgerAddress$,
+    RxOp.switchMap((addressRd) =>
+      FP.pipe(
+        addressRd,
+        RD.map((address) => THOR.getBalanceByAddress$(address, 'ledger')),
+        RD.map(
+          RxOp.map<WalletBalancesRD, ChainBalance>((balances) => ({
+            walletType: 'ledger',
+            chain: THORChain,
+            walletAddress: FP.pipe(addressRd, RD.toOption),
+            balances
+          }))
+        ),
+        RD.getOrElse(() =>
+          Rx.of<ChainBalance>({
+            walletType: 'ledger',
+            chain: THORChain,
+            walletAddress: O.none,
+            balances: RD.initial
+          })
+        )
+      )
+    ),
+    RxOp.shareReplay(1)
+  )
+
   /**
    * Transforms LTC balances into `ChainBalances`
    */
@@ -251,7 +279,7 @@ export const createBalancesService = ({
    */
   const chainBalances$: ChainBalances$ = Rx.combineLatest(
     filterEnabledChains({
-      THOR: [thorChainBalance$],
+      THOR: [thorChainBalance$, thorLedgerChainBalance$],
       BTC: [btcChainBalance$],
       BCH: [bchChainBalance$],
       ETH: [ethChainBalance$],

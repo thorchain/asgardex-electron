@@ -21,6 +21,7 @@ import { WalletBalancesRD } from '../../../services/clients'
 import { PoolDetails } from '../../../services/midgard/types'
 import { MimirHaltRD } from '../../../services/thorchain/types'
 import { ApiError, ChainBalance, ChainBalances, WalletBalance, WalletBalances } from '../../../services/wallet/types'
+import { walletTypeToI18n } from '../../../services/wallet/util'
 import { PricePool } from '../../../views/pools/Pools.types'
 import { ErrorView } from '../../shared/error/'
 import { AssetIcon } from '../../uielements/assets/assetIcon'
@@ -273,7 +274,7 @@ export const AssetsTableCollapsable: React.FC<Props> = (props): JSX.Element => {
 
   // Panel
   const renderPanel = useCallback(
-    ({ chain, walletAddress: oWalletAddress, balances: balancesRD }: ChainBalance, key: number) => {
+    ({ chain, walletType, walletAddress: oWalletAddress, balances: balancesRD }: ChainBalance, key: number) => {
       /**
        * We need to push initial value to the ledger-based streams
        * 'cuz chainBalances$ stream is created by 'combineLatest'
@@ -306,7 +307,15 @@ export const AssetsTableCollapsable: React.FC<Props> = (props): JSX.Element => {
       const header = (
         <Styled.HeaderRow>
           <Col xs={14} md={6} lg={4}>
-            <Styled.HeaderLabel>{chainToString(chain)}</Styled.HeaderLabel>
+            <Styled.HeaderChainContainer>
+              <Styled.HeaderLabel>{chainToString(chain)}</Styled.HeaderLabel>
+              {
+                // show tag for NON keystore wallets only (e.g. Ledger)
+                walletType !== 'keystore' && (
+                  <Styled.HeaderWalletType>{walletTypeToI18n(walletType, intl)}</Styled.HeaderWalletType>
+                )
+              }
+            </Styled.HeaderChainContainer>
           </Col>
           <Col xs={0} md={12} lg={10}>
             <Styled.HeaderAddress>

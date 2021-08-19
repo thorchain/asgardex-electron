@@ -1,9 +1,10 @@
 import { THORChain } from '@xchainjs/xchain-util'
 
-import { reloadBalances, balances$, reloadBalances$, resetReloadBalances } from './balances'
+import { reloadBalances, balances$, getBalanceByAddress$, reloadBalances$, resetReloadBalances } from './balances'
 import { client$, clientState$, address$, addressUI$, explorerUrl$ } from './common'
 import { createFeesService } from './fees'
 import { createInteractService$ } from './interact'
+import { ledgerAddress$ } from './ledger'
 import {
   getNodeInfo$,
   reloadNodesInfo,
@@ -23,11 +24,13 @@ export {
   clientState$,
   address$,
   addressUI$,
+  ledgerAddress$,
   explorerUrl$,
   reloadBalances,
   reloadBalances$,
   resetReloadBalances,
   balances$,
+  getBalanceByAddress$,
   txs$,
   tx$,
   txStatus$,
