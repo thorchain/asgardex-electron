@@ -23,4 +23,7 @@ const reloadBalances = () => {
 // Currently in ASGDX `AssetRuneNative` is supported only. Remove asset list if we want to get balances of all assets at THORChain.
 const balances$: C.WalletBalancesLD = C.balances$(client$, reloadBalances$, [AssetRuneNative])
 
-export { balances$, reloadBalances, reloadBalances$, resetReloadBalances }
+// State of balances loaded by Client and Address
+const getBalanceByAddress$ = C.balancesByAddress$(client$, reloadBalances$)
+
+export { balances$, getBalanceByAddress$, reloadBalances, reloadBalances$, resetReloadBalances }

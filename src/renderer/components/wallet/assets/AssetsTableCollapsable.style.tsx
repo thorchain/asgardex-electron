@@ -25,11 +25,30 @@ export const HeaderRow = styled(A.Row)`
   color: ${palette('gray', 2)};
 `
 
+export const HeaderChainContainer = styled.div`
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+`
+
 export const HeaderLabel = styled(UILabel).attrs({
   textTransform: 'uppercase',
   size: 'normal'
 })`
+  width: auto;
+  margin-right: 10px;
   padding: 0;
+`
+
+export const HeaderWalletType = styled(UILabel).attrs({
+  textTransform: 'uppercase',
+  size: 'small'
+})`
+  padding: 0px 5px;
+  color: ${palette('color', 2)};
+  background: ${palette('gray', 1)};
+  border-radius: 5px;
+  width: auto;
 `
 
 export const HeaderAddress = styled(UILabel).attrs({
