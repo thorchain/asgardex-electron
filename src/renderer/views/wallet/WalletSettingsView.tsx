@@ -30,7 +30,7 @@ import { DEFAULT_NETWORK } from '../../services/const'
 import { ledgerErrorIdToI18n } from '../../services/wallet/ledger'
 import { WalletAddress } from '../../services/wallet/types'
 import { getPhrase } from '../../services/wallet/util'
-import { walletAccount$ } from './SettingsView.helper'
+import { walletAccount$ } from './WalletSettingsView.helper'
 
 export const WalletSettingsView: React.FC = (): JSX.Element => {
   const intl = useIntl()
