@@ -3,13 +3,13 @@ import React, { useCallback, useEffect } from 'react'
 import { useObservableState } from 'observable-hooks'
 
 import { ExternalUrl } from '../../../shared/const'
-import { ClientSettings } from '../../components/wallet/settings/ClientSettings'
+import { AppSettings } from '../../components/app/AppSettings'
 import { useI18nContext } from '../../contexts/I18nContext'
 import { envOrDefault } from '../../helpers/envHelper'
 import { useAppUpdate } from '../../hooks/useAppUpdate'
 import { useNetwork } from '../../hooks/useNetwork'
 
-export const ClientSettingsView: React.FC = (): JSX.Element => {
+export const AppSettingsView: React.FC = (): JSX.Element => {
   const { network, changeNetwork } = useNetwork()
 
   const { appUpdater, checkForUpdates } = useAppUpdate()
@@ -28,7 +28,7 @@ export const ClientSettingsView: React.FC = (): JSX.Element => {
   }, [currentLocale])
 
   return (
-    <ClientSettings
+    <AppSettings
       locale={currentLocale}
       changeLocale={changeLocale}
       network={network}

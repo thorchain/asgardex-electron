@@ -1,13 +1,43 @@
-import { Row } from 'antd'
+import * as A from 'antd'
 import Text from 'antd/lib/typography/Text'
 import styled from 'styled-components'
 import { palette } from 'styled-theme'
 
-import { Network } from '../../../../shared/api/types'
-import { Menu } from '../../shared/menu'
-import { Button as UIButton } from '../../uielements/button'
-import { ExternalLinkIcon as ExternalLinkIconUI } from '../../uielements/common/Common.style'
-import { Label as UILabel } from '../../uielements/label'
+import { Network } from '../../../shared/api/types'
+import { Menu } from '../shared/menu'
+import { Button as UIButton } from '../uielements/button'
+import { ExternalLinkIcon as ExternalLinkIconUI } from '../uielements/common/Common.style'
+import { Label as UILabel } from '../uielements/label'
+
+export const Container = styled.div`
+  margin-top: 50px;
+  padding: 20px 40px 30px 40px;
+  background-color: ${palette('background', 1)};
+`
+
+export const Title = styled(UILabel)`
+  color: ${palette('text', 1)};
+  padding-bottom: 20px;
+  text-transform: uppercase;
+  font-family: 'MainFontRegular';
+  font-weight: 600;
+  font-size: 22px;
+  line-height: 22px;
+`
+
+export const CardContainer = styled.div`
+  width: 100%;
+`
+
+export const Card = styled(A.Card)`
+  border-radius: 5px;
+  background-color: ${palette('background', 1)};
+  border: 1px solid ${palette('gray', 0)};
+`
+
+export const SectionsWrapper = styled.div`
+  padding: 20px;
+`
 
 export const Section = styled.div`
   display: flex;
@@ -17,7 +47,7 @@ export const Section = styled.div`
   margin-bottom: 20px;
 `
 
-export const Title = styled(UILabel)`
+export const SubTitle = styled(UILabel)`
   display: block;
   padding: 0px;
   margin-bottom: 5px;
@@ -45,7 +75,7 @@ export const MenuItem = styled(Menu.Item)`
   padding: 8px 10px;
 `
 
-export const DropdownContentWrapper = styled(Row)`
+export const DropdownContentWrapper = styled(A.Row)`
   justify-content: space-between;
   padding-right: 0;
   align-items: center;

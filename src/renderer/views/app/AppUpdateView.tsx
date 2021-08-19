@@ -5,7 +5,7 @@ import * as FP from 'fp-ts/function'
 import * as O from 'fp-ts/Option'
 
 import { ExternalUrl } from '../../../shared/const'
-import { AppUpdate, AppUpdateModalProps } from '../../components/AppUpdate'
+import { AppUpdate, AppUpdateModalProps } from '../../components/app'
 import { useAppUpdate } from '../../hooks/useAppUpdate'
 
 const ONE_HOUR_PERIOD = 1000 * 60 * 60

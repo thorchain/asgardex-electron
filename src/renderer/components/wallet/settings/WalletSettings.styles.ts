@@ -3,11 +3,11 @@ import * as A from 'antd'
 import styled from 'styled-components'
 import { palette } from 'styled-theme'
 
-import { ReactComponent as RemoveIcon } from '../../assets/svg/icon-remove.svg'
-import { AddressEllipsis as AddressEllipsisUI } from '../../components/uielements/addressEllipsis'
-import { Button as UIButton } from '../../components/uielements/button'
-import { ExternalLinkIcon as ExternalLinkIconUI } from '../../components/uielements/common/Common.style'
-import { Label as UILabel } from '../../components/uielements/label'
+import { ReactComponent as RemoveIcon } from '../../../assets/svg/icon-remove.svg'
+import { AddressEllipsis as AddressEllipsisUI } from '../../../components/uielements/addressEllipsis'
+import { Button as UIButton } from '../../../components/uielements/button'
+import { ExternalLinkIcon as ExternalLinkIconUI } from '../../../components/uielements/common/Common.style'
+import { Label as UILabel } from '../../../components/uielements/label'
 
 export const ContainerWrapper = styled.div`
   margin: 0px 8px;

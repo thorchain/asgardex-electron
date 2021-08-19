@@ -1,243 +1,178 @@
-import React, { useCallback, useMemo, useState } from 'react'
+/* eslint-disable react-hooks/exhaustive-deps */
+import React, { useMemo } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
-import { Address } from '@xchainjs/xchain-client'
-import { Asset, Chain } from '@xchainjs/xchain-util'
-import { List, Row } from 'antd'
+import { Address, XChainClient } from '@xchainjs/xchain-client'
+import { BCHChain, BNBChain, BTCChain, Chain, ETHChain, LTCChain, THORChain } from '@xchainjs/xchain-util'
 import * as FP from 'fp-ts/function'
+import * as A from 'fp-ts/lib/Array'
 import * as O from 'fp-ts/lib/Option'
+import { useObservableState } from 'observable-hooks'
 import { useIntl } from 'react-intl'
+import * as Rx from 'rxjs'
+import * as RxOp from 'rxjs/operators'
 
 import { Network } from '../../../shared/api/types'
-import { ReactComponent as UnlockOutlined } from '../../assets/svg/icon-unlock-warning.svg'
-import { RemoveWalletConfirmationModal } from '../../components/modal/confirmation/RemoveWalletConfirmationModal'
-import { PasswordModal } from '../../components/modal/password'
-import { AssetIcon } from '../../components/uielements/assets/assetIcon/AssetIcon'
-import { QRCodeModal } from '../../components/uielements/qrCodeModal/QRCodeModal'
-import { PhraseCopyModal } from '../../components/wallet/phrase/PhraseCopyModal'
-import { getChainAsset } from '../../helpers/chainHelper'
-import { ValidatePasswordHandler, WalletAccounts, WalletAddress } from '../../services/wallet/types'
-import { walletTypeToI18n } from '../../services/wallet/util'
-import * as Styled from './WalletSettingsView.styles'
+import { WalletSettings } from '../../components/wallet/settings/'
+import { useAppContext } from '../../contexts/AppContext'
+import { useBinanceContext } from '../../contexts/BinanceContext'
+import { useBitcoinCashContext } from '../../contexts/BitcoinCashContext'
+import { useBitcoinContext } from '../../contexts/BitcoinContext'
+import { useChainContext } from '../../contexts/ChainContext'
+import { useEthereumContext } from '../../contexts/EthereumContext'
+import { useLitecoinContext } from '../../contexts/LitecoinContext'
+import { useThorchainContext } from '../../contexts/ThorchainContext'
+import { useWalletContext } from '../../contexts/WalletContext'
+import { filterEnabledChains, isThorChain } from '../../helpers/chainHelper'
+import { sequenceTOptionFromArray } from '../../helpers/fpHelpers'
+import { useLedger } from '../../hooks/useLedger'
+import { DEFAULT_NETWORK } from '../../services/const'
+import { ledgerErrorIdToI18n } from '../../services/wallet/ledger'
+import { WalletAddress } from '../../services/wallet/types'
+import { getPhrase } from '../../services/wallet/util'
+import { walletAccount$ } from './WalletSettingsView.helper'
 
-type Props = {
-  selectedNetwork: Network
-  walletAccounts: O.Option<WalletAccounts>
-  runeNativeAddress: string
-  lockWallet: FP.Lazy<void>
-  removeKeystore: FP.Lazy<void>
-  exportKeystore: (runeNativeAddress: string, selectedNetwork: Network) => void
-  addLedgerAddress: (chain: Chain) => void
-  removeLedgerAddress: (chain: Chain) => void
-  phrase: O.Option<string>
-  clickAddressLinkHandler: (chain: Chain, address: Address) => void
-  validatePassword$: ValidatePasswordHandler
-}
-
-export const WalletSettingsView: React.FC<Props> = (props): JSX.Element => {
+export const WalletSettingsView: React.FC = (): JSX.Element => {
   const intl = useIntl()
+  const { keystoreService } = useWalletContext()
+  const { keystore$, lock, removeKeystore, exportKeystore, validatePassword$ } = keystoreService
+
+  const { network$ } = useAppContext()
+  const network = useObservableState<Network>(network$, DEFAULT_NETWORK)
+
+  const { address$: thorAddressUI$ } = useThorchainContext()
+  const { addressUI$: bnbAddressUI$ } = useBinanceContext()
+  const { addressUI$: ethAddressUI$ } = useEthereumContext()
+  const { addressUI$: btcAddressUI$ } = useBitcoinContext()
+  const { addressUI$: ltcAddressUI$ } = useLitecoinContext()
+  const { addressUI$: bchAddressUI$ } = useBitcoinCashContext()
+  const oRuneNativeAddress = useObservableState(thorAddressUI$, O.none)
+  const runeNativeAddress = FP.pipe(
+    oRuneNativeAddress,
+    O.getOrElse(() => '')
+  )
+
+  const phrase$ = useMemo(() => FP.pipe(keystore$, RxOp.map(getPhrase)), [keystore$])
+  const phrase = useObservableState(phrase$, O.none)
+
   const {
-    selectedNetwork,
-    walletAccounts: oWalletAccounts,
-    runeNativeAddress = '',
-    lockWallet = () => {},
-    removeKeystore = () => {},
-    exportKeystore = () => {},
-    addLedgerAddress,
-    removeLedgerAddress,
-    phrase: oPhrase,
-    clickAddressLinkHandler,
-    validatePassword$
-  } = props
+    askAddress: askLedgerThorAddress,
+    address: thorLedgerAddressRD,
+    removeAddress: removeLedgerThorAddress
+  } = useLedger(THORChain)
 
-  const phrase = useMemo(
-    () =>
-      FP.pipe(
-        oPhrase,
-        O.map((phrase) => phrase),
-        O.getOrElse(() => '')
-      ),
-    [oPhrase]
+  const addLedgerAddressHandler = (chain: Chain) => {
+    if (isThorChain(chain)) return askLedgerThorAddress()
+
+    return FP.constVoid
+  }
+
+  const removeLedgerAddressHandler = (chain: Chain) => {
+    if (isThorChain(chain)) return removeLedgerThorAddress()
+
+    return FP.constVoid
+  }
+
+  const { clientByChain$ } = useChainContext()
+
+  const oBNBClient = useObservableState(clientByChain$(BNBChain), O.none)
+  const oETHClient = useObservableState(clientByChain$(ETHChain), O.none)
+  const oBTCClient = useObservableState(clientByChain$(BTCChain), O.none)
+  const oBCHClient = useObservableState(clientByChain$(BCHChain), O.none)
+  const oTHORClient = useObservableState(clientByChain$(THORChain), O.none)
+  const oLTCClient = useObservableState(clientByChain$(LTCChain), O.none)
+
+  const clickAddressLinkHandler = (chain: Chain, address: Address) => {
+    const openExplorerAddressUrl = (client: XChainClient) => {
+      const url = client.getExplorerAddressUrl(address)
+      window.apiUrl.openExternal(url)
+    }
+    switch (chain) {
+      case BNBChain:
+        FP.pipe(oBNBClient, O.map(openExplorerAddressUrl))
+        break
+      case BTCChain:
+        FP.pipe(oBTCClient, O.map(openExplorerAddressUrl))
+        break
+      case BCHChain:
+        FP.pipe(oBCHClient, O.map(openExplorerAddressUrl))
+        break
+      case ETHChain:
+        FP.pipe(oETHClient, O.map(openExplorerAddressUrl))
+        break
+      case THORChain:
+        FP.pipe(oTHORClient, O.map(openExplorerAddressUrl))
+        break
+      case LTCChain:
+        FP.pipe(oLTCClient, O.map(openExplorerAddressUrl))
+        break
+      default:
+        console.warn(`Chain ${chain} has not been implemented`)
+    }
+  }
+
+  const thorLedgerWalletAddress: WalletAddress = useMemo(
+    () => ({
+      type: 'ledger',
+      address: FP.pipe(
+        thorLedgerAddressRD,
+        RD.mapLeft((errorId) => Error(ledgerErrorIdToI18n(errorId, intl)))
+      )
+    }),
+    [intl, thorLedgerAddressRD]
   )
 
-  const [showPhraseModal, setShowPhraseModal] = useState(false)
-  const [showPasswordModal, setShowPasswordModal] = useState(false)
-  const [showRemoveWalletModal, setShowRemoveWalletModal] = useState(false)
-  const [showQRModal, setShowQRModal] = useState<O.Option<{ asset: Asset; address: Address }>>(O.none)
-  const closeQrModal = useCallback(() => setShowQRModal(O.none), [setShowQRModal])
+  const walletAccounts$ = useMemo(() => {
+    const thorWalletAccount$ = walletAccount$({
+      addressUI$: thorAddressUI$,
+      ledgerAddress: thorLedgerWalletAddress,
+      chain: THORChain
+    })
+    const btcWalletAccount$ = walletAccount$({ addressUI$: btcAddressUI$, chain: BTCChain })
+    const ethWalletAccount$ = walletAccount$({ addressUI$: ethAddressUI$, chain: ETHChain })
+    const bnbWalletAccount$ = walletAccount$({ addressUI$: bnbAddressUI$, chain: BNBChain })
+    const bchWalletAccount$ = walletAccount$({ addressUI$: bchAddressUI$, chain: BCHChain })
+    const ltcWalletAccount$ = walletAccount$({ addressUI$: ltcAddressUI$, chain: LTCChain })
 
-  const removeWallet = useCallback(() => {
-    removeKeystore()
-  }, [removeKeystore])
-
-  const onSuccessPassword = useCallback(() => {
-    setShowPasswordModal(false)
-    setShowPhraseModal(true)
-  }, [setShowPasswordModal, setShowPhraseModal])
-
-  const renderQRCodeModal = useMemo(() => {
     return FP.pipe(
-      showQRModal,
-      O.map(({ asset, address }) => (
-        <QRCodeModal
-          key="qr-modal"
-          asset={asset}
-          address={address}
-          network={selectedNetwork}
-          visible={true}
-          onCancel={closeQrModal}
-          onOk={closeQrModal}
-        />
-      )),
-      O.getOrElse(() => <></>)
-    )
-  }, [showQRModal, selectedNetwork, closeQrModal])
-
-  const renderAddress = useCallback(
-    (chain: Chain, { type, address: addressRD }: WalletAddress) => {
-      // Render ADD LEDGER button
-      const renderAddLedger = (chain: Chain, loading: boolean) => (
-        <Styled.AddLedgerButton loading={loading} onClick={() => addLedgerAddress(chain)}>
-          <Styled.AddLedgerIcon /> {intl.formatMessage({ id: 'ledger.add.device' })}
-        </Styled.AddLedgerButton>
-      )
-
-      // Render addresses depending on its loading status
-      return (
-        <Styled.AddressContainer>
-          {FP.pipe(
-            addressRD,
-            RD.fold(
-              () => (type === 'ledger' ? renderAddLedger(chain, false) : <>...</>),
-              () => (type === 'ledger' ? renderAddLedger(chain, true) : <>...</>),
-              (error) => (
-                <div>
-                  <Styled.AddressError>{error.message}</Styled.AddressError>
-                  {type === 'ledger' && renderAddLedger(chain, false)}
-                </div>
-              ),
-              (address) => (
-                <>
-                  <Styled.AddressEllipsis address={address} chain={chain} network={selectedNetwork} enableCopy={true} />
-                  <Styled.QRCodeIcon onClick={() => setShowQRModal(O.some({ asset: getChainAsset(chain), address }))} />
-                  <Styled.AddressLinkIcon onClick={() => clickAddressLinkHandler(chain, address)} />
-                  {type === 'ledger' && <Styled.RemoveLedgerIcon onClick={() => removeLedgerAddress(chain)} />}
-                </>
-              )
-            )
-          )}
-        </Styled.AddressContainer>
-      )
-    },
-    [addLedgerAddress, clickAddressLinkHandler, intl, removeLedgerAddress, selectedNetwork]
-  )
-
-  const accounts = useMemo(
-    () =>
-      FP.pipe(
-        oWalletAccounts,
-        O.map((walletAccounts) => (
-          <>
-            <Styled.Subtitle>{intl.formatMessage({ id: 'setting.account.management' })}</Styled.Subtitle>
-            <List
-              dataSource={walletAccounts}
-              renderItem={({ chain, accounts }, i: number) => (
-                <Styled.ListItem key={i}>
-                  <div style={{ display: 'flex', alignItems: 'center' }}>
-                    <AssetIcon asset={getChainAsset(chain)} size={'small'} network="mainnet" />
-                    <Styled.ChainName>{chain}</Styled.ChainName>
-                  </div>
-                  {accounts.map((account, j) => {
-                    const { type } = account
-                    return (
-                      <Styled.ChainContent key={j}>
-                        <Styled.AccountPlaceholder>{walletTypeToI18n(type, intl)}</Styled.AccountPlaceholder>
-                        {renderAddress(chain, account)}
-                      </Styled.ChainContent>
-                    )
-                  })}
-                </Styled.ListItem>
-              )}
-            />
-          </>
-        )),
-        O.getOrElse(() => <></>)
+      // combineLatest is for the future additional accounts
+      Rx.combineLatest(
+        filterEnabledChains({
+          THOR: [thorWalletAccount$],
+          BTC: [btcWalletAccount$],
+          ETH: [ethWalletAccount$],
+          BNB: [bnbWalletAccount$],
+          BCH: [bchWalletAccount$],
+          LTC: [ltcWalletAccount$]
+        })
       ),
-    [renderAddress, intl, oWalletAccounts]
-  )
+      RxOp.map(A.filter(O.isSome)),
+      RxOp.map(sequenceTOptionFromArray)
+    )
+  }, [
+    thorAddressUI$,
+    thorLedgerWalletAddress,
+    btcAddressUI$,
+    ethAddressUI$,
+    bnbAddressUI$,
+    bchAddressUI$,
+    ltcAddressUI$
+  ])
+  const walletAccounts = useObservableState(walletAccounts$, O.none)
 
   return (
-    <Styled.ContainerWrapper>
-      {showPasswordModal && (
-        <PasswordModal
-          validatePassword$={validatePassword$}
-          onSuccess={onSuccessPassword}
-          onClose={() => setShowPasswordModal(false)}
-        />
-      )}
-      {showPhraseModal && (
-        <PhraseCopyModal
-          phrase={phrase}
-          visible={showPhraseModal}
-          onClose={() => {
-            setShowPhraseModal(false)
-          }}
-        />
-      )}
-      <RemoveWalletConfirmationModal
-        visible={showRemoveWalletModal}
-        onClose={() => setShowRemoveWalletModal(false)}
-        onSuccess={removeWallet}
-      />
-      {renderQRCodeModal}
-      <Styled.Row gutter={[16, 16]}>
-        <Styled.Subtitle>{intl.formatMessage({ id: 'setting.wallet.management' })}</Styled.Subtitle>
-        <Row style={{ flex: 1, alignItems: 'center' }}>
-          <Styled.WalletCol sm={{ span: 24 }} md={{ span: 12 }}>
-            <Styled.OptionCard bordered={false}>
-              <Styled.OptionLabel
-                color="primary"
-                size="big"
-                onClick={() => exportKeystore(runeNativeAddress, selectedNetwork)}>
-                {intl.formatMessage({ id: 'setting.export' })}
-              </Styled.OptionLabel>
-            </Styled.OptionCard>
-          </Styled.WalletCol>
-          <Styled.WalletCol sm={{ span: 24 }} md={{ span: 12 }}>
-            <Styled.OptionCard bordered={false}>
-              <Styled.OptionLabel color="warning" size="big" onClick={lockWallet}>
-                {intl.formatMessage({ id: 'setting.lock' })} <UnlockOutlined />
-              </Styled.OptionLabel>
-            </Styled.OptionCard>
-          </Styled.WalletCol>
-          <Styled.WalletCol sm={{ span: 24 }} md={{ span: 12 }}>
-            <Styled.OptionCard bordered={false}>
-              <Styled.Button
-                sizevalue="xnormal"
-                color="primary"
-                typevalue="outline"
-                round="true"
-                onClick={() => setShowPasswordModal(true)}
-                disabled={O.isNone(oPhrase) ? true : false}>
-                {intl.formatMessage({ id: 'setting.view.phrase' })}
-              </Styled.Button>
-            </Styled.OptionCard>
-          </Styled.WalletCol>
-          <Styled.WalletCol sm={{ span: 24 }} md={{ span: 12 }}>
-            <Styled.OptionCard bordered={false}>
-              <Styled.Button
-                sizevalue="xnormal"
-                color="error"
-                typevalue="outline"
-                round="true"
-                onClick={() => setShowRemoveWalletModal(true)}>
-                {intl.formatMessage({ id: 'wallet.remove.label' })}
-              </Styled.Button>
-            </Styled.OptionCard>
-          </Styled.WalletCol>
-        </Row>
-      </Styled.Row>
-      <Styled.Row gutter={[16, 16]}>{accounts}</Styled.Row>
-    </Styled.ContainerWrapper>
+    <WalletSettings
+      selectedNetwork={network}
+      runeNativeAddress={runeNativeAddress}
+      lockWallet={lock}
+      removeKeystore={removeKeystore}
+      exportKeystore={exportKeystore}
+      addLedgerAddress={addLedgerAddressHandler}
+      removeLedgerAddress={removeLedgerAddressHandler}
+      phrase={phrase}
+      walletAccounts={walletAccounts}
+      clickAddressLinkHandler={clickAddressLinkHandler}
+      validatePassword$={validatePassword$}
+    />
   )
 }

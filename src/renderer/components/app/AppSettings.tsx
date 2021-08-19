@@ -7,13 +7,13 @@ import * as FP from 'fp-ts/function'
 import * as O from 'fp-ts/lib/Option'
 import { useIntl } from 'react-intl'
 
-import { Network } from '../../../../shared/api/types'
-import { Locale } from '../../../../shared/i18n/types'
-import { ReactComponent as DownIcon } from '../../../assets/svg/icon-down.svg'
-import { LOCALES } from '../../../i18n'
-import { AVAILABLE_NETWORKS } from '../../../services/const'
-import { Menu } from '../../shared/menu'
-import * as Styled from './ClientSettings.style'
+import { Network } from '../../../shared/api/types'
+import { Locale } from '../../../shared/i18n/types'
+import { ReactComponent as DownIcon } from '../../assets/svg/icon-down.svg'
+import { LOCALES } from '../../i18n'
+import { AVAILABLE_NETWORKS } from '../../services/const'
+import { Menu } from '../shared/menu'
+import * as Styled from './AppSettings.style'
 
 export type Props = {
   version: string
@@ -26,7 +26,7 @@ export type Props = {
   goToReleasePage: (version: string) => void
 }
 
-export const ClientSettings: React.FC<Props> = (props): JSX.Element => {
+export const AppSettings: React.FC<Props> = (props): JSX.Element => {
   const {
     appUpdateState = RD.initial,
     changeNetwork = FP.constVoid,
@@ -178,22 +178,28 @@ export const ClientSettings: React.FC<Props> = (props): JSX.Element => {
   )
 
   return (
-    <>
-      <Styled.Section>
-        <Styled.Title>{intl.formatMessage({ id: 'common.network' })}</Styled.Title>
-        {renderNetworkMenu}
-      </Styled.Section>
-      <Styled.Section>
-        <Styled.Title>{intl.formatMessage({ id: 'setting.language' })}</Styled.Title>
-        {renderLangMenu}
-      </Styled.Section>
-
-      <Styled.Section>
-        <Styled.Title>{intl.formatMessage({ id: 'setting.version' })}</Styled.Title>
-        <Styled.Label>v{version}</Styled.Label>
-        <Styled.UpdatesButton {...checkUpdatesProps} />
-        {renderVersionUpdateResult}
-      </Styled.Section>
-    </>
+    <Styled.Container>
+      <Styled.Title>{intl.formatMessage({ id: 'setting.title' })}</Styled.Title>
+      <Styled.CardContainer>
+        <Styled.Card>
+          <Styled.SectionsWrapper>
+            <Styled.Section>
+              <Styled.SubTitle>{intl.formatMessage({ id: 'common.network' })}</Styled.SubTitle>
+              {renderNetworkMenu}
+            </Styled.Section>
+            <Styled.Section>
+              <Styled.SubTitle>{intl.formatMessage({ id: 'setting.language' })}</Styled.SubTitle>
+              {renderLangMenu}
+            </Styled.Section>
+            <Styled.Section>
+              <Styled.SubTitle>{intl.formatMessage({ id: 'setting.version' })}</Styled.SubTitle>
+              <Styled.Label>v{version}</Styled.Label>
+              <Styled.UpdatesButton {...checkUpdatesProps} />
+              {renderVersionUpdateResult}
+            </Styled.Section>
+          </Styled.SectionsWrapper>
+        </Styled.Card>
+      </Styled.CardContainer>
+    </Styled.Container>
   )
 }
