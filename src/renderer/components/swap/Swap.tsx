@@ -1121,6 +1121,20 @@ export const Swap = ({
     [checkIsApprovedError, isApproveFeeError, walletBalancesLoading]
   )
 
+  const maskAddress = (address: string) => {
+    return address.substring(0, 7) + '...' + address.slice(-3)
+  }
+
+  const maskedRecipientAddress: string = useMemo(
+    () =>
+      FP.pipe(
+        targetWalletAddress,
+        O.map((address) => maskAddress(address)),
+        O.getOrElse(() => '')
+      ),
+    [targetWalletAddress]
+  )
+
   return (
     <Styled.Container>
       <Styled.ContentContainer>
@@ -1201,7 +1215,7 @@ export const Swap = ({
           </Styled.ValueItemContainer>
           <Styled.InValueContainer>
             <Styled.InValueTitle>{intl.formatMessage({ id: 'swap.recipient' })}</Styled.InValueTitle>
-            <Styled.AddressCustomRecipient>tbnbsdfafdsfsf</Styled.AddressCustomRecipient>
+            <Styled.AddressCustomRecipient>{maskedRecipientAddress}</Styled.AddressCustomRecipient>
           </Styled.InValueContainer>
         </Styled.FormContainer>
       </Styled.ContentContainer>

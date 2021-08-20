@@ -13,7 +13,7 @@ const ICON_SIZE = 16
 
 export const AddressCustomRecipient = styled('div')`
   font-size: 16px;
-  text-transform: lowercase;
+  text-transform: uppercase;
   font-family: 'MainFontRegular';
   color: ${palette('text', 1)};
   max-width: 100%;
