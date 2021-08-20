@@ -1204,7 +1204,11 @@ export const Swap = ({
           </Styled.ValueItemContainer>
           <Styled.InValueContainer>
             <Styled.InValueTitle>{intl.formatMessage({ id: 'swap.recipient' })}</Styled.InValueTitle>
-            <CustomAddressInput clickAddressLinkHandler={clickAddressLinkHandler} oTargetAsset={oTargetAsset} />
+            <CustomAddressInput
+              clickAddressLinkHandler={clickAddressLinkHandler}
+              oTargetAsset={oTargetAsset}
+              oTargetWalletAddress={targetWalletAddress}
+            />
           </Styled.InValueContainer>
         </Styled.FormContainer>
       </Styled.ContentContainer>

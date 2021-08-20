@@ -12,10 +12,11 @@ import * as Styled from './CustomAddressInput.styles'
 
 type Props = {
   oTargetAsset: O.Option<Asset>
+  oTargetWalletAddress: O.Option<string>
   clickAddressLinkHandler: (chain: Chain, address: Address) => void
 }
 export const CustomAddressInput: React.FC<Props> = (props): JSX.Element => {
-  const { clickAddressLinkHandler, oTargetAsset } = props
+  const { clickAddressLinkHandler, oTargetAsset, oTargetWalletAddress } = props
   const chain = useMemo(
     () =>
       FP.pipe(
@@ -28,11 +29,25 @@ export const CustomAddressInput: React.FC<Props> = (props): JSX.Element => {
 
   const [editModeActive, setEditModeActive] = useState(false)
 
-  const [recipientAddress, setRecipientAddress] = useState('tbnb1231312313113212323')
-  const [editableRecipientAddress, setEditableRecipientAddress] = useState(recipientAddress)
+  const [recipientAddress, setRecipientAddress] = useState('')
+  const [editableRecipientAddress, setEditableRecipientAddress] = useState('')
   const maskedRecipientAddress = useMemo(
     () => recipientAddress.substring(0, 7) + '...' + recipientAddress.slice(-3),
     [recipientAddress]
+  )
+
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const targetAddress = useMemo(
+    () =>
+      FP.pipe(
+        oTargetWalletAddress,
+        O.map((address) => {
+          setRecipientAddress(address)
+          return address
+        }),
+        O.getOrElse(() => '')
+      ),
+    [oTargetWalletAddress]
   )
 
   const addressValidation: AddressValidation = useValidateAddress(BNBChain)
@@ -49,6 +64,11 @@ export const CustomAddressInput: React.FC<Props> = (props): JSX.Element => {
     [addressValidation]
   )
 
+  const activateEditing = () => {
+    setEditableRecipientAddress(recipientAddress)
+    setEditModeActive(true)
+  }
+
   const saveCustomAddress = () => {
     setRecipientAddress(editableRecipientAddress)
     setEditModeActive(false)
@@ -61,16 +81,16 @@ export const CustomAddressInput: React.FC<Props> = (props): JSX.Element => {
 
   const renderDefault = () => {
     return (
-      <div>
+      <>
         <Styled.AddressCustomRecipient>
           {maskedRecipientAddress}
           <div>
-            <Styled.EditAddressIcon onClick={() => setEditModeActive(true)} />
+            <Styled.EditAddressIcon onClick={() => activateEditing()} />
             <Styled.CopyLabel copyable={{ text: recipientAddress }} />
             <Styled.AddressLinkIcon onClick={() => clickAddressLinkHandler(chain, recipientAddress)} />
           </div>
         </Styled.AddressCustomRecipient>
-      </div>
+      </>
     )
   }
 
