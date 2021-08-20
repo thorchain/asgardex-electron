@@ -1199,6 +1199,10 @@ export const Swap = ({
               )
             )}
           </Styled.ValueItemContainer>
+          <Styled.InValueContainer>
+            <Styled.InValueTitle>recipient</Styled.InValueTitle>
+            <Styled.InValueLabel>tbnbsdfafdsfsf</Styled.InValueLabel>
+          </Styled.InValueContainer>
         </Styled.FormContainer>
       </Styled.ContentContainer>
       {(walletBalancesLoading || checkIsApproved) && (
