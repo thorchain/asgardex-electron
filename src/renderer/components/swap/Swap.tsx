@@ -1127,18 +1127,22 @@ export const Swap = ({
     return address.substring(0, 7) + '...' + address.slice(-3)
   }
 
-  const maskedRecipientAddress: string = useMemo(
+  const [recipientAddressEditable, setRecipientAddressEditable] = useState(false)
+  const [customRecipientAddress, setCustomRecipientAddress] = useState('')
+  const maskedRecipientAddress: string = useMemo(() => maskAddress(customRecipientAddress), [customRecipientAddress])
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const customRecipientAddress3 = useMemo(
     () =>
       FP.pipe(
         targetWalletAddress,
-        O.map((address) => maskAddress(address)),
+        O.map((address) => {
+          setCustomRecipientAddress(address)
+          return address
+        }),
         O.getOrElse(() => '')
       ),
     [targetWalletAddress]
   )
-
-  const [recipientAddressEditable, setRecipientAddressEditable] = useState(false)
-  const [customRecipientAddress, setCustomRecipientAddress] = useState('tbnb12313123123')
 
   return (
     <Styled.Container>
