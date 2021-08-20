@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useMemo } from 'react'
 
 import { EditOutlined, CopyOutlined, SelectOutlined, CheckCircleOutlined, CloseCircleOutlined } from '@ant-design/icons'
 import { Input } from 'antd'
@@ -10,8 +10,22 @@ export const CustomAddressInput = () => {
   const EDITABLE = 1
   const [state, setState] = useState(DEFAULT)
 
-  const [recipientAddress, setRecipientAddress] = useState('tbnb1231312313123')
-  const [maskedRecipientAddress] = useState('tbnb1...13123')
+  const [recipientAddress, setRecipientAddress] = useState('tbnb1231312313113212323')
+  const [editableRecipientAddress, setEditableRecipientAddress] = useState(recipientAddress)
+  const maskedRecipientAddress = useMemo(
+    () => recipientAddress.substring(0, 7) + '...' + recipientAddress.slice(-3),
+    [recipientAddress]
+  )
+
+  const saveCustomAddress = () => {
+    setRecipientAddress(editableRecipientAddress)
+    setState(DEFAULT)
+  }
+
+  const cancelEditCustomAddress = () => {
+    setEditableRecipientAddress(recipientAddress)
+    setState(DEFAULT)
+  }
 
   const renderDefault = () => {
     return (
@@ -31,9 +45,9 @@ export const CustomAddressInput = () => {
   const renderEditable = () => {
     return (
       <div>
-        <Input value={recipientAddress} onChange={(e) => setRecipientAddress(e.target.value)} />
-        <CheckCircleOutlined onClick={() => setState(DEFAULT)} />
-        <CloseCircleOutlined onClick={() => setState(DEFAULT)} />
+        <Input value={editableRecipientAddress} onChange={(e) => setEditableRecipientAddress(e.target.value)} />
+        <CheckCircleOutlined onClick={saveCustomAddress} />
+        <CloseCircleOutlined onClick={cancelEditCustomAddress} />
       </div>
     )
   }
