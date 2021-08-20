@@ -1,6 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 
-import { CheckCircleOutlined, CloseCircleOutlined, CopyOutlined, EditOutlined, SelectOutlined } from '@ant-design/icons'
 import * as RD from '@devexperts/remote-data-ts'
 import { getSwapMemo, getValueOfAsset1InAsset2, PoolData } from '@thorchain/asgardex-util'
 import { Address } from '@xchainjs/xchain-client'
@@ -17,7 +16,6 @@ import {
   assetToBase,
   Chain
 } from '@xchainjs/xchain-util'
-import { Input } from 'antd'
 import BigNumber from 'bignumber.js'
 import * as A from 'fp-ts/Array'
 import * as FP from 'fp-ts/function'
@@ -81,6 +79,7 @@ import { LoadingView } from '../shared/loading'
 import { ViewTxButton } from '../uielements/button'
 import { Fees, UIFeesRD } from '../uielements/fees'
 import { Slider } from '../uielements/slider'
+import { CustomAddressInput } from './CustomAddressInput'
 import * as Styled from './Swap.styles'
 import { SwapData } from './Swap.types'
 import * as Utils from './Swap.utils'
@@ -1123,27 +1122,6 @@ export const Swap = ({
     [checkIsApprovedError, isApproveFeeError, walletBalancesLoading]
   )
 
-  const maskAddress = (address: string) => {
-    return address.substring(0, 7) + '...' + address.slice(-3)
-  }
-
-  const [recipientAddressEditable, setRecipientAddressEditable] = useState(false)
-  const [customRecipientAddress, setCustomRecipientAddress] = useState('')
-  const maskedRecipientAddress: string = useMemo(() => maskAddress(customRecipientAddress), [customRecipientAddress])
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const customRecipientAddress3 = useMemo(
-    () =>
-      FP.pipe(
-        targetWalletAddress,
-        O.map((address) => {
-          setCustomRecipientAddress(address)
-          return address
-        }),
-        O.getOrElse(() => '')
-      ),
-    [targetWalletAddress]
-  )
-
   return (
     <Styled.Container>
       <Styled.ContentContainer>
@@ -1224,22 +1202,7 @@ export const Swap = ({
           </Styled.ValueItemContainer>
           <Styled.InValueContainer>
             <Styled.InValueTitle>{intl.formatMessage({ id: 'swap.recipient' })}</Styled.InValueTitle>
-            {recipientAddressEditable ? (
-              <div>
-                <Input value={customRecipientAddress} onChange={(e) => setCustomRecipientAddress(e.target.value)} />
-                <CheckCircleOutlined onClick={() => setRecipientAddressEditable(false)} />
-                <CloseCircleOutlined onClick={() => setRecipientAddressEditable(false)} />
-              </div>
-            ) : (
-              <Styled.AddressCustomRecipient>
-                {maskedRecipientAddress}
-                <div>
-                  <EditOutlined onClick={() => setRecipientAddressEditable(true)} />
-                  <CopyOutlined />
-                  <SelectOutlined />
-                </div>
-              </Styled.AddressCustomRecipient>
-            )}
+            <CustomAddressInput />
           </Styled.InValueContainer>
         </Styled.FormContainer>
       </Styled.ContentContainer>
