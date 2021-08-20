@@ -7,6 +7,7 @@ import * as O from 'fp-ts/lib/Option'
 import * as Rx from 'rxjs'
 import * as RxOp from 'rxjs/operators'
 
+import { Network } from '../../../shared/api/types'
 import { ETHAssets } from '../../const'
 import { getBnbRuneAsset } from '../../helpers/assetHelper'
 import { filterEnabledChains } from '../../helpers/chainHelper'
@@ -22,7 +23,6 @@ import * as ETH from '../ethereum'
 import * as LTC from '../litecoin'
 import * as THOR from '../thorchain'
 import { INITIAL_BALANCES_STATE } from './const'
-import { getLedgerAddress$ } from './ledger'
 import {
   ChainBalances$,
   ChainBalance$,
@@ -31,17 +31,20 @@ import {
   BalancesState$,
   KeystoreState$,
   KeystoreState,
-  ChainBalance
+  ChainBalance,
+  LedgerAddressLD
 } from './types'
 import { sortBalances } from './util'
 import { hasImportedKeystore } from './util'
 
 export const createBalancesService = ({
   keystore$,
-  network$
+  network$,
+  getLedgerAddress$
 }: {
   keystore$: KeystoreState$
   network$: Network$
+  getLedgerAddress$: (chain: Chain, network: Network) => LedgerAddressLD
 }): BalancesService => {
   const reloadBalances: FP.Lazy<void> = () => {
     BTC.reloadBalances()

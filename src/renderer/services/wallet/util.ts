@@ -7,6 +7,7 @@ import * as Ord from 'fp-ts/Ord'
 import * as S from 'fp-ts/string'
 import { IntlShape } from 'react-intl'
 
+import { LedgerErrorId } from '../../../shared/api/types'
 import { eqAsset } from '../../helpers/fp/eq'
 import { ordBaseAmount } from '../../helpers/fp/ord'
 import { WalletBalances } from '../clients'
@@ -75,5 +76,23 @@ export const walletTypeToI18n = (type: WalletType, intl: IntlShape) => {
       return intl.formatMessage({ id: 'wallet.main.title' })
     default:
       return `Unknown ${type}`
+  }
+}
+
+export const ledgerErrorIdToI18n = (errorId: LedgerErrorId, intl: IntlShape) => {
+  switch (errorId) {
+    case LedgerErrorId.NO_DEVICE:
+      return intl.formatMessage({ id: 'ledger.error.nodevice' })
+    case LedgerErrorId.ALREADY_IN_USE:
+      return intl.formatMessage({ id: 'ledger.error.inuse' })
+    case LedgerErrorId.NO_APP:
+      return intl.formatMessage({ id: 'ledger.error.noapp' })
+    case LedgerErrorId.WRONG_APP:
+      return intl.formatMessage({ id: 'ledger.error.wrongapp' })
+    case LedgerErrorId.DENIED:
+      return intl.formatMessage({ id: 'ledger.error.denied' })
+    // default is similar to LedgerErrorId.UNKNOWN
+    default:
+      return intl.formatMessage({ id: 'ledger.error.unknown' })
   }
 }

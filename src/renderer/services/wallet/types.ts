@@ -134,6 +134,13 @@ export type BalancesService = {
   dispose: FP.Lazy<void>
 }
 
+export type LedgerService = {
+  askLedgerAddress$: (chain: Chain, network: Network) => LedgerAddressLD
+  getLedgerAddress$: (chain: Chain, network: Network) => LedgerAddressLD
+  removeLedgerAddress: (chain: Chain, network: Network) => void
+  dispose: FP.Lazy<void>
+}
+
 // TODO(@Veado) Move type to clients/type
 
 export type ApiError = {

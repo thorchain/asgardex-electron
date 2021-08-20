@@ -2,13 +2,19 @@ import { network$ } from '../app/service'
 import { createBalancesService } from './balances'
 import { setSelectedAsset, selectedAsset$, client$ } from './common'
 import { keystoreService, removeKeystore } from './keystore'
-import { askLedgerAddress$, getLedgerAddress$, removeLedgerAddress } from './ledger'
+import { createLedgerService } from './ledger'
 import { getTxs$, loadTxs, explorerUrl$, resetTxsPage } from './transaction'
+
+const { askLedgerAddress$, getLedgerAddress$, removeLedgerAddress } = createLedgerService({
+  keystore$: keystoreService.keystore$
+})
 
 const { reloadBalances, reloadBalancesByChain, balancesState$, chainBalances$ } = createBalancesService({
   keystore$: keystoreService.keystore$,
-  network$
+  network$,
+  getLedgerAddress$
 })
+
 /**
  * Exports all functions and observables needed at UI level (provided by `WalletContext`)
  */
