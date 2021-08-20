@@ -124,7 +124,7 @@ export const InValueTitle = styled(UILabel).attrs({
   color: 'gray',
   textTransform: 'uppercase'
 })`
-font-family: 'MainFontRegular'
+  font-family: 'MainFontRegular';
   margin-right: 10px;
   padding: 0;
   font-size: 12px;
