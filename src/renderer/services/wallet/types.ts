@@ -142,7 +142,7 @@ export type ApiError = {
 }
 
 export type LedgerApiError = {
-  ledgerErrorId?: LedgerErrorId
+  ledgerErrorId: LedgerErrorId
   errorId: ErrorId
   msg: string
 }
@@ -163,3 +163,6 @@ export type LedgerAddressLD = LiveData<LedgerErrorId, Address>
 
 export type LedgerAddressMap = Record<Network, LedgerAddressRD>
 export type LedgerAddressMap$ = Rx.Observable<LedgerAddressMap>
+
+export type LedgerAddressesMap = Record<Chain, LedgerAddressMap>
+export type LedgerAddressesMap$ = Rx.Observable<LedgerAddressesMap>
