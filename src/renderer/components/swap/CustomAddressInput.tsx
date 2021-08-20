@@ -34,7 +34,7 @@ export const CustomAddressInput = () => {
           {maskedRecipientAddress}
           <div>
             <EditOutlined onClick={() => setState(EDITABLE)} />
-            <CopyOutlined />
+            <CopyOutlined onClick={() => navigator.clipboard.writeText('Copy this text to clipboard')} />
             <SelectOutlined />
           </div>
         </Styled.AddressCustomRecipient>
