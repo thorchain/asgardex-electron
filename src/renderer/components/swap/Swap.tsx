@@ -1,5 +1,6 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 
+import { CopyOutlined, EditOutlined, SelectOutlined } from '@ant-design/icons'
 import * as RD from '@devexperts/remote-data-ts'
 import { getSwapMemo, getValueOfAsset1InAsset2, PoolData } from '@thorchain/asgardex-util'
 import { Address } from '@xchainjs/xchain-client'
@@ -1215,7 +1216,14 @@ export const Swap = ({
           </Styled.ValueItemContainer>
           <Styled.InValueContainer>
             <Styled.InValueTitle>{intl.formatMessage({ id: 'swap.recipient' })}</Styled.InValueTitle>
-            <Styled.AddressCustomRecipient>{maskedRecipientAddress}</Styled.AddressCustomRecipient>
+            <Styled.AddressCustomRecipient>
+              {maskedRecipientAddress}
+              <div>
+                <EditOutlined />
+                <CopyOutlined />
+                <SelectOutlined />
+              </div>
+            </Styled.AddressCustomRecipient>
           </Styled.InValueContainer>
         </Styled.FormContainer>
       </Styled.ContentContainer>
