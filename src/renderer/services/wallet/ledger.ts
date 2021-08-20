@@ -1,81 +1,82 @@
 import * as RD from '@devexperts/remote-data-ts'
-import { Chain, THORChain } from '@xchainjs/xchain-util'
+import { Chain } from '@xchainjs/xchain-util'
 import * as FP from 'fp-ts/lib/function'
 import { IntlShape } from 'react-intl'
 import * as Rx from 'rxjs'
 import * as RxOp from 'rxjs/operators'
 
 import { LedgerErrorId, Network } from '../../../shared/api/types'
-import * as THOR from '../thorchain/ledger'
-import { LedgerAddressLD, LedgerAddressMap$, LedgerAddressRD } from './types'
+import { eqLedgerAddressMap } from '../../helpers/fp/eq'
+import { observableState } from '../../helpers/stateHelper'
+import { INITIAL_LEDGER_ADDRESSES_MAP } from './const'
+import { LedgerAddressesMap, LedgerAddressLD, LedgerAddressRD } from './types'
+
+// State of all added Ledger addresses
+const {
+  get$: ledgerAddresses$,
+  get: ledgerAddresses,
+  set: setLedgerAddresses
+} = observableState<LedgerAddressesMap>(INITIAL_LEDGER_ADDRESSES_MAP)
+
+const setLedgerAddressRD = ({
+  addressRD,
+  chain,
+  network
+}: {
+  addressRD: LedgerAddressRD
+  chain: Chain
+  network: Network
+}) => {
+  const addresses = ledgerAddresses()
+  // TODO(@asgdx-team) Let's think about to use `immer` or similar library for deep, immutable state changes
+  return setLedgerAddresses({ ...addresses, [chain]: { ...addresses[chain], [network]: addressRD } })
+}
 
 /**
  * Get ledger address from memory
  */
-export const getLedgerAddressByChain$ = (chain: Chain): LedgerAddressMap$ => {
-  switch (chain) {
-    case THORChain:
-      return THOR.ledgerAddress$
-    default:
-      throw Error(`Ledger has not been implemented for ${chain} yet`)
-  }
-}
+export const getLedgerAddress$ = (chain: Chain, network: Network): LedgerAddressLD =>
+  FP.pipe(
+    ledgerAddresses$,
+    RxOp.map((addressesMap) => addressesMap[chain]),
+    RxOp.distinctUntilChanged(eqLedgerAddressMap.equals),
+    RxOp.map((addressMap) => addressMap[network])
+  )
 
 /**
  * Removes ledger address from memory
  */
-export const removeLedgerAddressByChain = (chain: Chain, network: Network): void => {
-  switch (chain) {
-    case THORChain:
-      return THOR.setLedgerAddressRD(RD.initial, network)
-    default:
-      throw Error(`Ledger has not been implemented for ${chain} yet`)
-  }
-}
+export const removeLedgerAddress = (chain: Chain, network: Network): void =>
+  setLedgerAddressRD({
+    addressRD: RD.initial,
+    chain,
+    network
+  })
 
 /**
  * Sets ledger address in `pending` state
  */
-const setPendingLedgerAddressByChain = (chain: Chain, network: Network): void => {
-  switch (chain) {
-    case THORChain:
-      return THOR.setLedgerAddressRD(RD.pending, network)
-    default:
-      throw Error(`Ledger has not been implemented for ${chain} yet`)
-  }
-}
-
-const setLedgerAddressByChain = ({
-  address,
-  chain,
-  network
-}: {
-  chain: Chain
-  address: LedgerAddressRD
-  network: Network
-}) => {
-  switch (chain) {
-    case THORChain:
-      return THOR.setLedgerAddressRD(address, network)
-    default:
-      throw Error(`Ledger has not been implemented for ${chain} yet`)
-  }
-}
+const setPendingLedgerAddress = (chain: Chain, network: Network): void =>
+  setLedgerAddressRD({
+    addressRD: RD.pending,
+    chain,
+    network
+  })
 
 /**
  * Ask Ledger to get address from it
  */
-export const askLedgerAddressByChain$ = (chain: Chain, network: Network): LedgerAddressLD =>
+export const askLedgerAddress$ = (chain: Chain, network: Network): LedgerAddressLD =>
   FP.pipe(
     // remove address from memory
-    removeLedgerAddressByChain(chain, network),
+    removeLedgerAddress(chain, network),
     // set pending
-    () => setPendingLedgerAddressByChain(chain, network),
+    () => setPendingLedgerAddress(chain, network),
     // ask for ledger address
     () => Rx.from(window.apiHDWallet.getLedgerAddress(chain, network)),
     RxOp.map(RD.fromEither),
     // store address in memory
-    RxOp.tap((address: LedgerAddressRD) => setLedgerAddressByChain({ chain, address, network })),
+    RxOp.tap((addressRD: LedgerAddressRD) => setLedgerAddressRD({ chain, addressRD, network })),
     RxOp.catchError((error) => Rx.of(RD.failure(error))),
     RxOp.startWith(RD.pending)
   )

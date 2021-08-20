@@ -22,6 +22,7 @@ import * as ETH from '../ethereum'
 import * as LTC from '../litecoin'
 import * as THOR from '../thorchain'
 import { INITIAL_BALANCES_STATE } from './const'
+import { getLedgerAddress$ } from './ledger'
 import {
   ChainBalances$,
   ChainBalance$,
@@ -183,30 +184,37 @@ export const createBalancesService = ({
   )
 
   const thorLedgerChainBalance$: ChainBalance$ = FP.pipe(
-    Rx.combineLatest([THOR.ledgerAddress$, network$]),
-    RxOp.switchMap(([addressMap, network]) =>
+    network$,
+    RxOp.switchMap((network) => getLedgerAddress$(THORChain, network)),
+    RxOp.switchMap((addressRD) =>
       FP.pipe(
-        addressMap[network],
-        RD.map((address) => THOR.getBalanceByAddress$(address, 'ledger')),
-        RD.map(
-          RxOp.map<WalletBalancesRD, ChainBalance>((balances) => ({
-            walletType: 'ledger',
-            chain: THORChain,
-            walletAddress: FP.pipe(addressMap[network], RD.toOption),
-            balances
-          }))
-        ),
-        RD.getOrElse(() =>
-          Rx.of<ChainBalance>({
-            walletType: 'ledger',
-            chain: THORChain,
-            walletAddress: O.none,
-            balances: RD.initial
-          })
+        addressRD,
+        RD.toOption,
+        O.fold(
+          () =>
+            // In case we don't get an address,
+            // just return `ChainBalance` w/ initial (empty) balances
+            Rx.of<ChainBalance>({
+              walletType: 'ledger',
+              chain: THORChain,
+              walletAddress: O.none,
+              balances: RD.initial
+            }),
+          (address) =>
+            // Load balances by given Ledger address
+            // and put it's RD state into `balances` of `ChainBalance`
+            FP.pipe(
+              THOR.getBalanceByAddress$(address, 'ledger'),
+              RxOp.map<WalletBalancesRD, ChainBalance>((balances) => ({
+                walletType: 'ledger',
+                chain: THORChain,
+                walletAddress: O.some(address),
+                balances: balances
+              }))
+            )
         )
       )
-    ),
-    RxOp.shareReplay(1)
+    )
   )
 
   /**

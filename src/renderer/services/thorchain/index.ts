@@ -4,7 +4,6 @@ import { reloadBalances, balances$, getBalanceByAddress$, reloadBalances$, reset
 import { client$, clientState$, address$, addressUI$, explorerUrl$ } from './common'
 import { createFeesService } from './fees'
 import { createInteractService$ } from './interact'
-import { ledgerAddress$ } from './ledger'
 import {
   getNodeInfo$,
   reloadNodesInfo,
@@ -24,7 +23,6 @@ export {
   clientState$,
   address$,
   addressUI$,
-  ledgerAddress$,
   explorerUrl$,
   reloadBalances,
   reloadBalances$,
