@@ -1200,7 +1200,7 @@ export const Swap = ({
             )}
           </Styled.ValueItemContainer>
           <Styled.InValueContainer>
-            <Styled.InValueTitle>recipient</Styled.InValueTitle>
+            <Styled.InValueTitle>{intl.formatMessage({ id: 'swap.recipient' })}</Styled.InValueTitle>
             <Styled.AddressCustomRecipient>tbnbsdfafdsfsf</Styled.AddressCustomRecipient>
           </Styled.InValueContainer>
         </Styled.FormContainer>
