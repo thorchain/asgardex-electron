@@ -2,6 +2,8 @@ import * as A from 'antd'
 import styled from 'styled-components'
 import { palette } from 'styled-theme'
 
+import { ExternalLinkIcon as ExternalLinkIconUI } from '../../components/uielements/common/Common.style'
+
 const ICON_SIZE = 16
 
 export const AddressCustomRecipient = styled('div')`
@@ -28,5 +30,17 @@ export const CopyLabel = styled(A.Typography.Text)`
   color: ${palette('primary', 0)};
   svg {
     color: ${palette('primary', 0)};
+  }
+`
+
+export const AddressLinkIcon = styled(ExternalLinkIconUI)`
+  margin-left: 15px;
+  height: ${ICON_SIZE}px;
+  width: ${ICON_SIZE}px;
+  color: ${palette('primary', 0)};
+  svg {
+    color: inherit;
+    height: ${ICON_SIZE}px;
+    width: ${ICON_SIZE}px;
   }
 `

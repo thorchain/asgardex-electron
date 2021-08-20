@@ -1,7 +1,19 @@
 import React, { useCallback, useEffect, useMemo } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
-import { assetFromString, AssetRuneNative, bnOrZero, Chain, THORChain } from '@xchainjs/xchain-util'
+import { Address, XChainClient } from '@xchainjs/xchain-client'
+import {
+  assetFromString,
+  AssetRuneNative,
+  BCHChain,
+  BNBChain,
+  bnOrZero,
+  BTCChain,
+  Chain,
+  ETHChain,
+  LTCChain,
+  THORChain
+} from '@xchainjs/xchain-util'
 import { Spin } from 'antd'
 import * as FP from 'fp-ts/function'
 import * as O from 'fp-ts/lib/Option'
@@ -38,6 +50,44 @@ import * as Styled from './SwapView.styles'
 type Props = {}
 
 export const SwapView: React.FC<Props> = (_): JSX.Element => {
+  const { clientByChain$ } = useChainContext()
+
+  const oBNBClient = useObservableState(clientByChain$(BNBChain), O.none)
+  const oETHClient = useObservableState(clientByChain$(ETHChain), O.none)
+  const oBTCClient = useObservableState(clientByChain$(BTCChain), O.none)
+  const oBCHClient = useObservableState(clientByChain$(BCHChain), O.none)
+  const oTHORClient = useObservableState(clientByChain$(THORChain), O.none)
+  const oLTCClient = useObservableState(clientByChain$(LTCChain), O.none)
+
+  const clickAddressLinkHandler = (chain: Chain, address: Address) => {
+    const openExplorerAddressUrl = (client: XChainClient) => {
+      const url = client.getExplorerAddressUrl(address)
+      window.apiUrl.openExternal(url)
+    }
+    switch (chain) {
+      case BNBChain:
+        FP.pipe(oBNBClient, O.map(openExplorerAddressUrl))
+        break
+      case BTCChain:
+        FP.pipe(oBTCClient, O.map(openExplorerAddressUrl))
+        break
+      case BCHChain:
+        FP.pipe(oBCHClient, O.map(openExplorerAddressUrl))
+        break
+      case ETHChain:
+        FP.pipe(oETHClient, O.map(openExplorerAddressUrl))
+        break
+      case THORChain:
+        FP.pipe(oTHORClient, O.map(openExplorerAddressUrl))
+        break
+      case LTCChain:
+        FP.pipe(oLTCClient, O.map(openExplorerAddressUrl))
+        break
+      default:
+        console.warn(`Chain ${chain} has not been implemented`)
+    }
+  }
+
   const { source, target } = useParams<SwapRouteParams>()
   const intl = useIntl()
   const history = useHistory()
@@ -243,6 +293,7 @@ export const SwapView: React.FC<Props> = (_): JSX.Element => {
                   approveERC20Token$={approveERC20Token$}
                   isApprovedERC20Token$={isApprovedERC20Token$}
                   importWalletHandler={importWalletHandler}
+                  clickAddressLinkHandler={clickAddressLinkHandler}
                 />
               )
             }

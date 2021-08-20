@@ -111,6 +111,7 @@ export type SwapProps = {
   importWalletHandler: FP.Lazy<void>
   haltedChains: Chain[]
   mimirHalt: MimirHalt
+  clickAddressLinkHandler: (chain: Chain, address: Address) => void
 }
 
 export const Swap = ({
@@ -137,7 +138,8 @@ export const Swap = ({
   approveFee$,
   importWalletHandler,
   haltedChains,
-  mimirHalt
+  mimirHalt,
+  clickAddressLinkHandler
 }: SwapProps) => {
   const intl = useIntl()
 
@@ -1202,7 +1204,7 @@ export const Swap = ({
           </Styled.ValueItemContainer>
           <Styled.InValueContainer>
             <Styled.InValueTitle>{intl.formatMessage({ id: 'swap.recipient' })}</Styled.InValueTitle>
-            <CustomAddressInput />
+            <CustomAddressInput clickAddressLinkHandler={clickAddressLinkHandler} oTargetAsset={oTargetAsset} />
           </Styled.InValueContainer>
         </Styled.FormContainer>
       </Styled.ContentContainer>
