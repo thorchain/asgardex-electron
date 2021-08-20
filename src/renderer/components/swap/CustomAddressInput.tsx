@@ -14,7 +14,6 @@ type Props = {
   oTargetAsset: O.Option<Asset>
   clickAddressLinkHandler: (chain: Chain, address: Address) => void
 }
-
 export const CustomAddressInput: React.FC<Props> = (props): JSX.Element => {
   const { clickAddressLinkHandler, oTargetAsset } = props
   const chain = useMemo(
@@ -27,9 +26,7 @@ export const CustomAddressInput: React.FC<Props> = (props): JSX.Element => {
     [oTargetAsset]
   )
 
-  const DEFAULT = 0
-  const EDITABLE = 1
-  const [state, setState] = useState(DEFAULT)
+  const [editModeActive, setEditModeActive] = useState(false)
 
   const [recipientAddress, setRecipientAddress] = useState('tbnb1231312313113212323')
   const [editableRecipientAddress, setEditableRecipientAddress] = useState(recipientAddress)
@@ -54,12 +51,12 @@ export const CustomAddressInput: React.FC<Props> = (props): JSX.Element => {
 
   const saveCustomAddress = () => {
     setRecipientAddress(editableRecipientAddress)
-    setState(DEFAULT)
+    setEditModeActive(false)
   }
 
   const cancelEditCustomAddress = () => {
     setEditableRecipientAddress(recipientAddress)
-    setState(DEFAULT)
+    setEditModeActive(false)
   }
 
   const renderDefault = () => {
@@ -68,7 +65,7 @@ export const CustomAddressInput: React.FC<Props> = (props): JSX.Element => {
         <Styled.AddressCustomRecipient>
           {maskedRecipientAddress}
           <div>
-            <Styled.EditAddressIcon onClick={() => setState(EDITABLE)} />
+            <Styled.EditAddressIcon onClick={() => setEditModeActive(true)} />
             <Styled.CopyLabel copyable={{ text: recipientAddress }} />
             <Styled.AddressLinkIcon onClick={() => clickAddressLinkHandler(chain, recipientAddress)} />
           </div>
@@ -87,10 +84,5 @@ export const CustomAddressInput: React.FC<Props> = (props): JSX.Element => {
     )
   }
 
-  return (
-    <>
-      {state === DEFAULT && renderDefault()}
-      {state === EDITABLE && renderEditable()}
-    </>
-  )
+  return <>{editModeActive ? renderEditable() : renderDefault()}</>
 }
