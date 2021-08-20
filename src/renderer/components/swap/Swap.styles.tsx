@@ -9,6 +9,24 @@ import { Button as UIButton } from '../uielements/button'
 import { Drag as UIDrag } from '../uielements/drag'
 import { Label as UILabel } from '../uielements/label'
 
+const ICON_SIZE = 16
+
+export const AddressCustomRecipient = styled('div')`
+  font-size: 16px;
+  text-transform: lowercase;
+  font-family: 'MainFontRegular';
+  color: ${palette('text', 1)};
+  max-width: 100%;
+  overflow: hidden;
+  &:only-child {
+    margin: auto;
+  }
+  & svg {
+    height: ${ICON_SIZE}px;
+    width: ${ICON_SIZE}px;
+  }
+`
+
 export const Container = styled('div')`
   display: flex;
   flex-direction: column;
