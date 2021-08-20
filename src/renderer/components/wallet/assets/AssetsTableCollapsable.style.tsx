@@ -93,7 +93,7 @@ export const Collapse = styled(A.Collapse)`
   }
 
   &.ant-collapse > .ant-collapse-item > .ant-collapse-header .ant-collapse-arrow {
-    top: 10px;
+    top: 15px;
   }
 `
 
