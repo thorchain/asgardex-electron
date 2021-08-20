@@ -1,6 +1,6 @@
 import * as RD from '@devexperts/remote-data-ts'
 import { PoolData } from '@thorchain/asgardex-util'
-import { Balance } from '@xchainjs/xchain-client'
+import { Address, Balance } from '@xchainjs/xchain-client'
 import { Asset, AssetAmount, BaseAmount, Chain } from '@xchainjs/xchain-util'
 import BigNumber from 'bignumber.js'
 import * as A from 'fp-ts/lib/Array'
@@ -10,20 +10,23 @@ import * as N from 'fp-ts/lib/number'
 import * as O from 'fp-ts/lib/Option'
 import * as S from 'fp-ts/lib/string'
 
+import { LedgerErrorId } from '../../../shared/api/types'
 import { DepositAssetFees, DepositFees, SwapFeesParams } from '../../services/chain/types'
 import { ApproveParams } from '../../services/ethereum/types'
 import { PoolAddress, PoolShare } from '../../services/midgard/types'
-import { ApiError, WalletBalance } from '../../services/wallet/types'
+import { ApiError, LedgerAddressMap, WalletBalance } from '../../services/wallet/types'
 import { AssetWithAmount } from '../../types/asgardex'
 import { PricePool } from '../../views/pools/Pools.types'
 
 export const eqString = S.Eq
 
+export const eqNumber = N.Eq
+
 const eqBoolean = B.Eq
 
 export const eqOString = O.getEq(eqString)
 
-export const eqONumber = O.getEq(N.Eq)
+export const eqONumber = O.getEq(eqNumber)
 
 export const eqBigNumber: Eq.Eq<BigNumber> = {
   equals: (x, y) => x.isEqualTo(y)
@@ -165,4 +168,14 @@ export const eqPoolData = Eq.struct<PoolData>({
 export const eqPricePool = Eq.struct<PricePool>({
   asset: eqAsset,
   poolData: eqPoolData
+})
+
+export const eqLedgerErrorId = eqNumber
+export const eqAddress = eqString
+
+export const eqLedgerAddressRD = RD.getEq<LedgerErrorId, Address>(eqLedgerErrorId, eqAddress)
+
+export const eqLedgerAddressMap = Eq.struct<LedgerAddressMap>({
+  testnet: eqLedgerAddressRD,
+  mainnet: eqLedgerAddressRD
 })

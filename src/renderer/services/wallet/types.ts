@@ -134,6 +134,13 @@ export type BalancesService = {
   dispose: FP.Lazy<void>
 }
 
+export type LedgerService = {
+  askLedgerAddress$: (chain: Chain, network: Network) => LedgerAddressLD
+  getLedgerAddress$: (chain: Chain, network: Network) => LedgerAddressLD
+  removeLedgerAddress: (chain: Chain, network: Network) => void
+  dispose: FP.Lazy<void>
+}
+
 // TODO(@Veado) Move type to clients/type
 
 export type ApiError = {
@@ -142,7 +149,7 @@ export type ApiError = {
 }
 
 export type LedgerApiError = {
-  ledgerErrorId?: LedgerErrorId
+  ledgerErrorId: LedgerErrorId
   errorId: ErrorId
   msg: string
 }
@@ -155,8 +162,14 @@ export type TxLD = LiveData<ApiError, Tx>
 /* RD/LD for sending transactions on different chains */
 export type TxHashRD = RD.RemoteData<ApiError, TxHash>
 export type TxHashLD = LiveData<ApiError, TxHash>
-export type LedgerTxHashRD = RD.RemoteData<LedgerApiError, string>
-export type LedgerTxHashLD = LiveData<LedgerApiError, string>
+export type LedgerTxHashRD = RD.RemoteData<LedgerApiError, TxHash>
+export type LedgerTxHashLD = LiveData<LedgerApiError, TxHash>
 
 export type LedgerAddressRD = RD.RemoteData<LedgerErrorId, Address>
 export type LedgerAddressLD = LiveData<LedgerErrorId, Address>
+
+export type LedgerAddressMap = Record<Network, LedgerAddressRD>
+export type LedgerAddressMap$ = Rx.Observable<LedgerAddressMap>
+
+export type LedgerAddressesMap = Record<Chain, LedgerAddressMap>
+export type LedgerAddressesMap$ = Rx.Observable<LedgerAddressesMap>

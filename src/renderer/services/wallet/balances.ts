@@ -7,6 +7,7 @@ import * as O from 'fp-ts/lib/Option'
 import * as Rx from 'rxjs'
 import * as RxOp from 'rxjs/operators'
 
+import { Network } from '../../../shared/api/types'
 import { ETHAssets } from '../../const'
 import { getBnbRuneAsset } from '../../helpers/assetHelper'
 import { filterEnabledChains } from '../../helpers/chainHelper'
@@ -30,17 +31,20 @@ import {
   BalancesState$,
   KeystoreState$,
   KeystoreState,
-  ChainBalance
+  ChainBalance,
+  LedgerAddressLD
 } from './types'
 import { sortBalances } from './util'
 import { hasImportedKeystore } from './util'
 
 export const createBalancesService = ({
   keystore$,
-  network$
+  network$,
+  getLedgerAddress$
 }: {
   keystore$: KeystoreState$
   network$: Network$
+  getLedgerAddress$: (chain: Chain, network: Network) => LedgerAddressLD
 }): BalancesService => {
   const reloadBalances: FP.Lazy<void> = () => {
     BTC.reloadBalances()
@@ -183,30 +187,37 @@ export const createBalancesService = ({
   )
 
   const thorLedgerChainBalance$: ChainBalance$ = FP.pipe(
-    THOR.ledgerAddress$,
-    RxOp.switchMap((addressRd) =>
+    network$,
+    RxOp.switchMap((network) => getLedgerAddress$(THORChain, network)),
+    RxOp.switchMap((addressRD) =>
       FP.pipe(
-        addressRd,
-        RD.map((address) => THOR.getBalanceByAddress$(address, 'ledger')),
-        RD.map(
-          RxOp.map<WalletBalancesRD, ChainBalance>((balances) => ({
-            walletType: 'ledger',
-            chain: THORChain,
-            walletAddress: FP.pipe(addressRd, RD.toOption),
-            balances
-          }))
-        ),
-        RD.getOrElse(() =>
-          Rx.of<ChainBalance>({
-            walletType: 'ledger',
-            chain: THORChain,
-            walletAddress: O.none,
-            balances: RD.initial
-          })
+        addressRD,
+        RD.toOption,
+        O.fold(
+          () =>
+            // In case we don't get an address,
+            // just return `ChainBalance` w/ initial (empty) balances
+            Rx.of<ChainBalance>({
+              walletType: 'ledger',
+              chain: THORChain,
+              walletAddress: O.none,
+              balances: RD.initial
+            }),
+          (address) =>
+            // Load balances by given Ledger address
+            // and put it's RD state into `balances` of `ChainBalance`
+            FP.pipe(
+              THOR.getBalanceByAddress$(address, 'ledger'),
+              RxOp.map<WalletBalancesRD, ChainBalance>((balances) => ({
+                walletType: 'ledger',
+                chain: THORChain,
+                walletAddress: O.some(address),
+                balances: balances
+              }))
+            )
         )
       )
-    ),
-    RxOp.shareReplay(1)
+    )
   )
 
   /**

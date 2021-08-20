@@ -15,9 +15,9 @@ import {
   getTxs$,
   setSelectedAsset,
   resetTxsPage,
-  askLedgerAddressByChain$,
-  getLedgerAddressByChain$,
-  removeLedgerAddressByChain
+  askLedgerAddress$,
+  getLedgerAddress$,
+  removeLedgerAddress
 } from '../services/wallet'
 
 type WalletContextValue = {
@@ -32,9 +32,9 @@ type WalletContextValue = {
   getTxs$: typeof getTxs$
   setSelectedAsset: typeof setSelectedAsset
   resetTxsPage: typeof resetTxsPage
-  askLedgerAddressByChain$: typeof askLedgerAddressByChain$
-  getLedgerAddressByChain$: typeof getLedgerAddressByChain$
-  removeLedgerAddressByChain: typeof removeLedgerAddressByChain
+  askLedgerAddress$: typeof askLedgerAddress$
+  getLedgerAddress$: typeof getLedgerAddress$
+  removeLedgerAddress: typeof removeLedgerAddress
 }
 
 const initialContext: WalletContextValue = {
@@ -49,9 +49,9 @@ const initialContext: WalletContextValue = {
   getTxs$,
   setSelectedAsset,
   resetTxsPage,
-  askLedgerAddressByChain$,
-  getLedgerAddressByChain$,
-  removeLedgerAddressByChain
+  askLedgerAddress$,
+  getLedgerAddress$,
+  removeLedgerAddress
 }
 const WalletContext = createContext<Option<WalletContextValue>>(none)
 

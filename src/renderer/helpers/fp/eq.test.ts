@@ -1,3 +1,4 @@
+import * as RD from '@devexperts/remote-data-ts'
 import { Balance } from '@xchainjs/xchain-client'
 import {
   assetAmount,
@@ -13,9 +14,11 @@ import {
 } from '@xchainjs/xchain-util'
 import * as O from 'fp-ts/lib/Option'
 
+import { LedgerErrorId } from '../../../shared/api/types'
 import { ASSETS_TESTNET } from '../../../shared/mock/assets'
 import { PoolAddress, PoolShare } from '../../services/midgard/types'
-import { ApiError, ErrorId } from '../../services/wallet/types'
+import { INITIAL_LEDGER_ADDRESS_MAP } from '../../services/wallet/const'
+import { ApiError, ErrorId, LedgerAddressMap } from '../../services/wallet/types'
 import { AssetWithAmount } from '../../types/asgardex'
 import { PricePool } from '../../views/pools/Pools.types'
 import {
@@ -36,7 +39,8 @@ import {
   eqONullableString,
   eqAssetAmount,
   eqPricePool,
-  eqOString
+  eqOString,
+  eqLedgerAddressMap
 } from './eq'
 
 describe('helpers/fp/eq', () => {
@@ -47,12 +51,12 @@ describe('helpers/fp/eq', () => {
       expect(eqOString.equals(a, b)).toBeTruthy()
     })
     it('different some(asset) are not equal', () => {
-      const a = O.some('hellp')
+      const a = O.some('hello')
       const b = O.some('world')
       expect(eqOString.equals(a, b)).toBeFalsy()
     })
     it('none/some are not equal', () => {
-      const b = O.some(AssetBNB)
+      const b = O.some('hello')
       expect(eqOString.equals(O.none, b)).toBeFalsy()
     })
     it('none/none are equal', () => {
@@ -410,6 +414,30 @@ describe('helpers/fp/eq', () => {
     it('is not equal', () => {
       expect(eqPricePool.equals(a, b)).toBeFalsy()
       expect(eqPricePool.equals(b, c)).toBeFalsy()
+    })
+  })
+
+  describe('eqLedgerAddressMap', () => {
+    const a: LedgerAddressMap = INITIAL_LEDGER_ADDRESS_MAP
+    const b: LedgerAddressMap = {
+      ...INITIAL_LEDGER_ADDRESS_MAP,
+      mainnet: RD.pending
+    }
+    const c: LedgerAddressMap = {
+      ...INITIAL_LEDGER_ADDRESS_MAP,
+      testnet: RD.failure(LedgerErrorId.DENIED)
+    }
+
+    it('is equal', () => {
+      expect(eqLedgerAddressMap.equals(a, a)).toBeTruthy()
+      expect(eqLedgerAddressMap.equals(b, b)).toBeTruthy()
+      expect(eqLedgerAddressMap.equals(c, c)).toBeTruthy()
+    })
+    it('is not equal', () => {
+      expect(eqLedgerAddressMap.equals(a, b)).toBeFalsy()
+      expect(eqLedgerAddressMap.equals(b, a)).toBeFalsy()
+      expect(eqLedgerAddressMap.equals(a, c)).toBeFalsy()
+      expect(eqLedgerAddressMap.equals(c, b)).toBeFalsy()
     })
   })
 })

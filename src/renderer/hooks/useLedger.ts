@@ -16,12 +16,12 @@ export const useLedger = (chain: Chain) => {
   const { network$ } = useAppContext()
   const network = useObservableState<Network>(network$, DEFAULT_NETWORK)
 
-  const { askLedgerAddressByChain$, getLedgerAddressByChain$, removeLedgerAddressByChain } = useWalletContext()
+  const { askLedgerAddress$, getLedgerAddress$, removeLedgerAddress } = useWalletContext()
 
-  const removeAddress = useCallback(() => removeLedgerAddressByChain(chain), [chain, removeLedgerAddressByChain])
+  const removeAddress = useCallback(() => removeLedgerAddress(chain, network), [chain, removeLedgerAddress, network])
 
   const address = useObservableState<LedgerAddressRD>(
-    FP.pipe(getLedgerAddressByChain$(chain), RxOp.shareReplay(1)),
+    FP.pipe(getLedgerAddress$(chain, network), RxOp.shareReplay(1)),
     RD.initial
   )
 
@@ -29,9 +29,9 @@ export const useLedger = (chain: Chain) => {
     // Note: Subscription is needed to get all values
     // and to let `askLedgerAddressByChain` update state of `LedgerAddressRD`
     // Check implementation of `askLedgerAddressByChain` in `src/renderer/services/wallet/ledger.ts`
-    const sub = askLedgerAddressByChain$(chain, network).subscribe()
+    const sub = askLedgerAddress$(chain, network).subscribe()
     return () => sub.unsubscribe()
-  }, [askLedgerAddressByChain$, chain, network])
+  }, [askLedgerAddress$, chain, network])
 
   return {
     askAddress,
