@@ -1,3 +1,4 @@
+import { CheckCircleOutlined, CloseCircleOutlined, EditOutlined } from '@ant-design/icons'
 import * as A from 'antd'
 import styled from 'styled-components'
 import { palette } from 'styled-theme'
@@ -26,6 +27,8 @@ export const AddressCustomRecipient = styled('div')`
 `
 
 export const CopyLabel = styled(A.Typography.Text)`
+  margin: 5px 5px 5px -5px;
+  margin-left: -5px;
   text-transform: uppercase;
   color: ${palette('primary', 0)};
   svg {
@@ -34,7 +37,7 @@ export const CopyLabel = styled(A.Typography.Text)`
 `
 
 export const AddressLinkIcon = styled(ExternalLinkIconUI)`
-  margin-left: 15px;
+  margin: 5px;
   height: ${ICON_SIZE}px;
   width: ${ICON_SIZE}px;
   color: ${palette('primary', 0)};
@@ -43,4 +46,48 @@ export const AddressLinkIcon = styled(ExternalLinkIconUI)`
     height: ${ICON_SIZE}px;
     width: ${ICON_SIZE}px;
   }
+`
+
+export const EditAddressIcon = styled(EditOutlined)`
+  margin: 5px;
+  height: ${ICON_SIZE}px;
+  width: ${ICON_SIZE}px;
+  color: ${palette('primary', 0)};
+  svg {
+    color: inherit;
+    height: ${ICON_SIZE}px;
+    width: ${ICON_SIZE}px;
+  }
+`
+
+export const ConfirmEdit = styled(CheckCircleOutlined)`
+  margin: 5px;
+  height: ${ICON_SIZE}px;
+  width: ${ICON_SIZE}px;
+  color: ${palette('primary', 0)};
+  svg {
+    color: inherit;
+    height: ${ICON_SIZE}px;
+    width: ${ICON_SIZE}px;
+  }
+`
+
+export const CancelEdit = styled(CloseCircleOutlined)`
+  margin: 5px;
+  height: ${ICON_SIZE}px;
+  width: ${ICON_SIZE}px;
+  color: ${palette('error', 0)};
+  svg {
+    color: inherit;
+    height: ${ICON_SIZE}px;
+    width: ${ICON_SIZE}px;
+  }
+`
+
+export const EditableFormWrapper = styled('div')`
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  margin-top: 5px;
+  margin-right: 50px;
 `

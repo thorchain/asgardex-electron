@@ -1,9 +1,8 @@
 import React, { useState, useMemo, useCallback } from 'react'
 
-import { EditOutlined, CheckCircleOutlined, CloseCircleOutlined } from '@ant-design/icons'
 import { Address } from '@xchainjs/xchain-client'
 import { Asset, BNBChain, Chain, THORChain } from '@xchainjs/xchain-util'
-import { Form, Input } from 'antd'
+import { Input } from 'antd'
 import * as FP from 'fp-ts/function'
 import * as O from 'fp-ts/Option'
 
@@ -40,6 +39,7 @@ export const CustomAddressInput: React.FC<Props> = (props): JSX.Element => {
   )
 
   const addressValidation: AddressValidation = useValidateAddress(BNBChain)
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const addressValidator = useCallback(
     async (_: unknown, value: string) => {
       if (!value) {
@@ -68,7 +68,7 @@ export const CustomAddressInput: React.FC<Props> = (props): JSX.Element => {
         <Styled.AddressCustomRecipient>
           {maskedRecipientAddress}
           <div>
-            <EditOutlined onClick={() => setState(EDITABLE)} />
+            <Styled.EditAddressIcon onClick={() => setState(EDITABLE)} />
             <Styled.CopyLabel copyable={{ text: recipientAddress }} />
             <Styled.AddressLinkIcon onClick={() => clickAddressLinkHandler(chain, recipientAddress)} />
           </div>
@@ -79,13 +79,11 @@ export const CustomAddressInput: React.FC<Props> = (props): JSX.Element => {
 
   const renderEditable = () => {
     return (
-      <div>
-        <Form.Item rules={[{ required: true, validator: addressValidator }]} name="recipient">
-          <Input value={editableRecipientAddress} onChange={(e) => setEditableRecipientAddress(e.target.value)} />
-        </Form.Item>
-        <CheckCircleOutlined onClick={saveCustomAddress} />
-        <CloseCircleOutlined onClick={cancelEditCustomAddress} />
-      </div>
+      <Styled.EditableFormWrapper>
+        <Input value={editableRecipientAddress} onChange={(e) => setEditableRecipientAddress(e.target.value)} />
+        <Styled.ConfirmEdit style={{ margin: 5 }} onClick={saveCustomAddress} />
+        <Styled.CancelEdit style={{ margin: 5 }} onClick={cancelEditCustomAddress} />
+      </Styled.EditableFormWrapper>
     )
   }
 
