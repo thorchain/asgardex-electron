@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 
-import { CopyOutlined, EditOutlined, SelectOutlined } from '@ant-design/icons'
+import { CheckCircleOutlined, CloseCircleOutlined, CopyOutlined, EditOutlined, SelectOutlined } from '@ant-design/icons'
 import * as RD from '@devexperts/remote-data-ts'
 import { getSwapMemo, getValueOfAsset1InAsset2, PoolData } from '@thorchain/asgardex-util'
 import { Address } from '@xchainjs/xchain-client'
@@ -17,6 +17,7 @@ import {
   assetToBase,
   Chain
 } from '@xchainjs/xchain-util'
+import { Input } from 'antd'
 import BigNumber from 'bignumber.js'
 import * as A from 'fp-ts/Array'
 import * as FP from 'fp-ts/function'
@@ -1136,6 +1137,9 @@ export const Swap = ({
     [targetWalletAddress]
   )
 
+  const [recipientAddressEditable, setRecipientAddressEditable] = useState(false)
+  const [customRecipientAddress, setCustomRecipientAddress] = useState('tbnb12313123123')
+
   return (
     <Styled.Container>
       <Styled.ContentContainer>
@@ -1216,14 +1220,22 @@ export const Swap = ({
           </Styled.ValueItemContainer>
           <Styled.InValueContainer>
             <Styled.InValueTitle>{intl.formatMessage({ id: 'swap.recipient' })}</Styled.InValueTitle>
-            <Styled.AddressCustomRecipient>
-              {maskedRecipientAddress}
+            {recipientAddressEditable ? (
               <div>
-                <EditOutlined />
-                <CopyOutlined />
-                <SelectOutlined />
+                <Input value={customRecipientAddress} onChange={(e) => setCustomRecipientAddress(e.target.value)} />
+                <CheckCircleOutlined onClick={() => setRecipientAddressEditable(false)} />
+                <CloseCircleOutlined onClick={() => setRecipientAddressEditable(false)} />
               </div>
-            </Styled.AddressCustomRecipient>
+            ) : (
+              <Styled.AddressCustomRecipient>
+                {maskedRecipientAddress}
+                <div>
+                  <EditOutlined onClick={() => setRecipientAddressEditable(true)} />
+                  <CopyOutlined />
+                  <SelectOutlined />
+                </div>
+              </Styled.AddressCustomRecipient>
+            )}
           </Styled.InValueContainer>
         </Styled.FormContainer>
       </Styled.ContentContainer>
