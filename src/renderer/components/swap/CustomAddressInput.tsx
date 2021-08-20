@@ -1,6 +1,6 @@
 import React, { useState, useMemo } from 'react'
 
-import { EditOutlined, CopyOutlined, SelectOutlined, CheckCircleOutlined, CloseCircleOutlined } from '@ant-design/icons'
+import { EditOutlined, SelectOutlined, CheckCircleOutlined, CloseCircleOutlined } from '@ant-design/icons'
 import { Input } from 'antd'
 
 import * as Styled from './CustomAddressInput.styles'
@@ -34,7 +34,7 @@ export const CustomAddressInput = () => {
           {maskedRecipientAddress}
           <div>
             <EditOutlined onClick={() => setState(EDITABLE)} />
-            <CopyOutlined onClick={() => navigator.clipboard.writeText('Copy this text to clipboard')} />
+            <Styled.CopyLabel copyable={{ text: recipientAddress }} />
             <SelectOutlined />
           </div>
         </Styled.AddressCustomRecipient>
