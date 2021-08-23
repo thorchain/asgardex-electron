@@ -24,6 +24,7 @@ export const EditableAddress = ({
   onClickOpenAddress,
   addressValidator
 }: EditableAddressProps) => {
+  const RECIPIENT_FIELD = 'recipient'
   const intl = useIntl()
   const [editableAddress, setEditableAddress] = useState<O.Option<Address>>(O.none)
   const maskedRecipientAddress = useMemo(() => address.substring(0, 7) + '...' + address.slice(-3), [address])
@@ -61,22 +62,24 @@ export const EditableAddress = ({
     (editableAddress: Address) => {
       return (
         <Styled.EditableFormWrapper>
-          <Styled.AddressFormWrapper style={{ marginTop: '20px', flex: 7 }}>
+          <Styled.AddressFormWrapper>
             <InnerForm
               form={form}
               initialValues={{
                 recipient: editableAddress
               }}>
-              <Form.Item rules={[{ required: true, validator: validateAddress }]} name="recipient">
+              <Form.Item rules={[{ required: true, validator: validateAddress }]} name={RECIPIENT_FIELD}>
                 <Input />
               </Form.Item>
             </InnerForm>
           </Styled.AddressFormWrapper>
-          <Styled.AddressEditButtonsWrapper style={{ flex: 3 }}>
+          <Styled.AddressEditButtonsWrapper>
             <Styled.ConfirmEdit
               onClick={() => {
-                onChangeAddress(editableAddress)
-                setEditableAddress(O.fromNullable(null))
+                if (form.getFieldError(RECIPIENT_FIELD).length === 0) {
+                  onChangeAddress(editableAddress)
+                  setEditableAddress(O.fromNullable(null))
+                }
               }}
             />
             <Styled.CancelEdit onClick={() => setEditableAddress(O.fromNullable(null))} />
