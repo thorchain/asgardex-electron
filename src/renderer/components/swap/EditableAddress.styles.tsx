@@ -14,7 +14,7 @@ export const EditableFormWrapper = styled('div')`
 `
 
 export const AddressFormWrapper = styled('div')`
-  margin-top: 20px;
+  margin-top: 0px;
   flex: 7;
 `
 
@@ -38,6 +38,7 @@ export const AddressCustomRecipient = styled('div')`
 `
 
 export const AddressEditButtonsWrapper = styled('div')`
+  margin-top: -20px;
   flex: 3;
 `
 
