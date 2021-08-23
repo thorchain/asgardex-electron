@@ -8,21 +8,21 @@ import * as O from 'fp-ts/Option'
 import { useIntl } from 'react-intl'
 
 import { InnerForm } from '../shared/form'
-import * as Styled from './CustomAddressInput.styles'
+import * as Styled from './EditableAddress.styles'
 
-export type CustomAddressInputProps = {
+export type EditableAddressProps = {
   asset: Asset
   address: Address
   onClickOpenAddress: (address: Address) => void
   onChangeAddress: (address: Address) => void
   addressValidator: (address: Address) => boolean
 }
-export const CustomAddressInput = ({
+export const EditableAddress = ({
   address,
   onChangeAddress,
   onClickOpenAddress,
   addressValidator
-}: CustomAddressInputProps) => {
+}: EditableAddressProps) => {
   const intl = useIntl()
   const [editableAddress, setEditableAddress] = useState<O.Option<Address>>(O.none)
   const maskedRecipientAddress = useMemo(() => address.substring(0, 7) + '...' + address.slice(-3), [address])

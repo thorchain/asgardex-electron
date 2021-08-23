@@ -4,23 +4,23 @@ import { AssetBNB } from '@xchainjs/xchain-util'
 
 import { BNB_ADDRESS_TESTNET } from '../../../shared/mock/address'
 import { eqString } from '../../helpers/fp/eq'
-import { CustomAddressInput, CustomAddressInputProps } from './CustomAddressInput'
+import { EditableAddress, EditableAddressProps } from './EditableAddress'
 
 const bnbAddress = BNB_ADDRESS_TESTNET
 
-const defaultProps: CustomAddressInputProps = {
+const defaultProps: EditableAddressProps = {
   asset: AssetBNB,
   address: bnbAddress,
   onClickOpenAddress: () => console.log('open address in explorer'),
   onChangeAddress: () => console.log('address changed'),
   addressValidator: (address: Address) => eqString.equals(address, bnbAddress)
 }
-export const StoryDefault: Story = () => <CustomAddressInput {...defaultProps} />
+export const StoryDefault: Story = () => <EditableAddress {...defaultProps} />
 StoryDefault.storyName = 'default'
 
 const meta: Meta = {
-  component: CustomAddressInput,
-  title: 'Components/CustomAddressInput'
+  component: EditableAddress,
+  title: 'Components/EditableAddress'
 }
 
 export default meta

@@ -79,7 +79,7 @@ import { LoadingView } from '../shared/loading'
 import { ViewTxButton } from '../uielements/button'
 import { Fees, UIFeesRD } from '../uielements/fees'
 import { Slider } from '../uielements/slider'
-import { CustomAddressInput } from './CustomAddressInput'
+import { EditableAddress } from './EditableAddress'
 import * as Styled from './Swap.styles'
 import { SwapData } from './Swap.types'
 import * as Utils from './Swap.utils'
@@ -1133,7 +1133,7 @@ export const Swap = ({
       FP.pipe(
         sequenceTOption(oTargetAsset, targetWalletAddress),
         O.map(([asset, address]) => (
-          <CustomAddressInput
+          <EditableAddress
             key={address}
             asset={asset}
             address={customTargetWalletAddress === '' ? address : customTargetWalletAddress}
