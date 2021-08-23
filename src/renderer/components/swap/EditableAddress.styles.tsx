@@ -22,7 +22,6 @@ export const AddressCustomRecipient = styled('div')`
   display: flex;
   flex-direction: row;
   font-size: 16px;
-  text-transform: uppercase;
   font-family: 'MainFontRegular';
   color: ${palette('text', 1)};
   max-width: 100%;
