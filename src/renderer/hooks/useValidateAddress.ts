@@ -28,14 +28,13 @@ export const useValidateAddress = (chain: Chain): AddressValidation => {
   useEffect(() => chainUpdated(chain), [chain, chainUpdated])
 
   const validateAddress = useCallback(
-    (address: Address) => {
-      return FP.pipe(
+    (address: Address) =>
+      FP.pipe(
         oClient,
         O.map((client) => client.validateAddress(address)),
         // In case client is not available (it should never happen), skip validation by returning always `true`
         O.getOrElse<boolean>(() => true)
-      )
-    },
+      ),
     [oClient]
   )
 
