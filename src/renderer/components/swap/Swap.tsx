@@ -111,7 +111,7 @@ export type SwapProps = {
   importWalletHandler: FP.Lazy<void>
   haltedChains: Chain[]
   mimirHalt: MimirHalt
-  clickAddressLinkHandler: (chain: Chain, address: Address) => void
+  clickAddressLinkHandler: (address: Address) => void
   addressValidator: (address: Address) => boolean
 }
 
@@ -1126,16 +1126,6 @@ export const Swap = ({
     [checkIsApprovedError, isApproveFeeError, walletBalancesLoading]
   )
 
-  const onClickOpenAddress = useCallback(
-    (address) =>
-      FP.pipe(
-        oTargetAsset,
-        O.map((asset) => clickAddressLinkHandler(asset.chain, address)),
-        O.getOrElse(() => {})
-      ),
-    [clickAddressLinkHandler, oTargetAsset]
-  )
-
   const [customTargetWalletAddress, setCustomTargetWalletAddress] = useState('')
 
   const renderCustomAddressInput = useMemo(
@@ -1147,14 +1137,14 @@ export const Swap = ({
             key={address}
             asset={asset}
             address={customTargetWalletAddress === '' ? address : customTargetWalletAddress}
-            onClickOpenAddress={onClickOpenAddress}
+            onClickOpenAddress={() => clickAddressLinkHandler(address)}
             onChangeAddress={setCustomTargetWalletAddress}
             addressValidator={addressValidator}
           />
         )),
         O.getOrElse(() => <></>)
       ),
-    [customTargetWalletAddress, oTargetAsset, onClickOpenAddress, targetWalletAddress, addressValidator]
+    [oTargetAsset, targetWalletAddress, customTargetWalletAddress, addressValidator, clickAddressLinkHandler]
   )
 
   return (
