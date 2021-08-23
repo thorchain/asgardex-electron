@@ -4,6 +4,7 @@ import styled from 'styled-components'
 import { palette } from 'styled-theme'
 
 import { ExternalLinkIcon as ExternalLinkIconUI } from '../../components/uielements/common/Common.style'
+import { InnerForm } from '../shared/form'
 
 const ICON_SIZE = 16
 
@@ -24,6 +25,10 @@ export const AddressCustomRecipient = styled('div')`
     height: ${ICON_SIZE}px;
     width: ${ICON_SIZE}px;
   }
+`
+
+export const Form = styled(InnerForm)`
+  padding: 30px;
 `
 
 export const CopyLabel = styled(A.Typography.Text)`
@@ -85,9 +90,9 @@ export const CancelEdit = styled(CloseCircleOutlined)`
 `
 
 export const EditableFormWrapper = styled('div')`
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  margin-top: 5px;
-  margin-right: 50px;
+  /* display: flex; */
+  /* flex-direction: row; */
+  /* align-items: center; */
+  /* margin-top: 5px; */
+  /* margin-right: 50px; */
 `

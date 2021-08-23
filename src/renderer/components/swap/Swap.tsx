@@ -112,6 +112,7 @@ export type SwapProps = {
   haltedChains: Chain[]
   mimirHalt: MimirHalt
   clickAddressLinkHandler: (chain: Chain, address: Address) => void
+  addressValidator: (address: Address) => boolean
 }
 
 export const Swap = ({
@@ -139,7 +140,8 @@ export const Swap = ({
   importWalletHandler,
   haltedChains,
   mimirHalt,
-  clickAddressLinkHandler
+  clickAddressLinkHandler,
+  addressValidator
 }: SwapProps) => {
   const intl = useIntl()
 
@@ -1134,7 +1136,6 @@ export const Swap = ({
     [clickAddressLinkHandler, oTargetAsset]
   )
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [customTargetWalletAddress, setCustomTargetWalletAddress] = useState('')
 
   const renderCustomAddressInput = useMemo(
@@ -1148,12 +1149,12 @@ export const Swap = ({
             address={customTargetWalletAddress === '' ? address : customTargetWalletAddress}
             onClickOpenAddress={onClickOpenAddress}
             onChangeAddress={setCustomTargetWalletAddress}
-            // addressValidator={addressValidator}
+            addressValidator={addressValidator}
           />
         )),
         O.getOrElse(() => <></>)
       ),
-    [customTargetWalletAddress, oTargetAsset, onClickOpenAddress, targetWalletAddress]
+    [customTargetWalletAddress, oTargetAsset, onClickOpenAddress, targetWalletAddress, addressValidator]
   )
 
   return (

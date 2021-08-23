@@ -106,7 +106,8 @@ const defaultProps: SwapProps = {
   approveERC20Token$: () => Rx.of(RD.success('txHash')),
   isApprovedERC20Token$: () => Rx.of(RD.success(true)),
   importWalletHandler: () => console.log('import wallet'),
-  clickAddressLinkHandler: () => console.log('handle click on address')
+  clickAddressLinkHandler: () => console.log('handle click on address'),
+  addressValidator: () => true
 }
 
 export const StoryDefault: Story = () => <Swap {...defaultProps} />

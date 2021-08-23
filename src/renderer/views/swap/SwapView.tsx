@@ -38,6 +38,7 @@ import { eqChain } from '../../helpers/fp/eq'
 import { sequenceTOption, sequenceTRD } from '../../helpers/fpHelpers'
 import { useMimirHalt } from '../../hooks/useMimirHalt'
 import { useOpenExplorerTxUrl } from '../../hooks/useOpenExplorerTxUrl'
+import { useValidateAddress } from '../../hooks/useValidateAddress'
 import { SwapRouteParams } from '../../routes/pools/swap'
 import * as walletRoutes from '../../routes/wallet'
 import { AssetWithDecimalLD, AssetWithDecimalRD } from '../../services/chain/types'
@@ -247,6 +248,18 @@ export const SwapView: React.FC<Props> = (_): JSX.Element => {
     history.push(walletRoutes.base.path())
   }, [history])
 
+  const targetAssetChain = useMemo(
+    () =>
+      FP.pipe(
+        targetAssetRD,
+        RD.map(({ asset }) => asset.chain),
+        RD.getOrElse(() => THORChain)
+      ),
+    [targetAssetRD]
+  )
+  console.log(targetAssetChain)
+  const addressValidator = useValidateAddress(targetAssetChain)
+
   return (
     <>
       <Styled.TopControlsContainer>
@@ -294,6 +307,7 @@ export const SwapView: React.FC<Props> = (_): JSX.Element => {
                   isApprovedERC20Token$={isApprovedERC20Token$}
                   importWalletHandler={importWalletHandler}
                   clickAddressLinkHandler={clickAddressLinkHandler}
+                  addressValidator={addressValidator}
                 />
               )
             }
