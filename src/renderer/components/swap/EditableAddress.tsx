@@ -77,7 +77,7 @@ export const EditableAddress = ({
             <Styled.ConfirmEdit
               onClick={() => {
                 if (form.getFieldError(RECIPIENT_FIELD).length === 0) {
-                  onChangeAddress(editableAddress)
+                  onChangeAddress(form.getFieldValue(RECIPIENT_FIELD))
                   setEditableAddress(O.fromNullable(null))
                 }
               }}

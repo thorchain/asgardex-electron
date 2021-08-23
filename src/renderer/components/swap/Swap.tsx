@@ -1138,7 +1138,10 @@ export const Swap = ({
             asset={asset}
             address={address}
             onClickOpenAddress={(address) => clickAddressLinkHandler(address)}
-            onChangeAddress={(newAddress) => setTargetWalletAddress(O.some(newAddress))}
+            onChangeAddress={(newAddress) => {
+              console.log(newAddress)
+              setTargetWalletAddress(O.some(newAddress))
+            }}
             addressValidator={addressValidator}
           />
         )),
