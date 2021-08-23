@@ -7,6 +7,7 @@ import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/Option'
 import { useIntl } from 'react-intl'
 
+import { InnerForm } from '../shared/form'
 import * as Styled from './CustomAddressInput.styles'
 
 type Props = {
@@ -29,7 +30,6 @@ export const CustomAddressInput: React.FC<Props> = (props): JSX.Element => {
         return Promise.reject(intl.formatMessage({ id: 'wallet.errors.address.empty' }))
       }
       if (!addressValidator(value)) {
-        console.log(value)
         return Promise.reject(intl.formatMessage({ id: 'wallet.errors.address.invalid' }))
       }
     },
@@ -57,14 +57,18 @@ export const CustomAddressInput: React.FC<Props> = (props): JSX.Element => {
     (editableAddress: Address) => {
       return (
         <Styled.EditableFormWrapper>
-          <Styled.Form
-            form={form}
-            initialValues={{
-              recipient: editableAddress
-            }}>
-            <Form.Item rules={[{ required: true, validator: validateAddress }]} name="recipient">
-              <Input />
-            </Form.Item>
+          <Styled.AddressFormWrapper style={{ marginTop: '20px', flex: 7 }}>
+            <InnerForm
+              form={form}
+              initialValues={{
+                recipient: editableAddress
+              }}>
+              <Form.Item rules={[{ required: true, validator: validateAddress }]} name="recipient">
+                <Input />
+              </Form.Item>
+            </InnerForm>
+          </Styled.AddressFormWrapper>
+          <Styled.AddressEditButtonsWrapper style={{ flex: 3 }}>
             <Styled.ConfirmEdit
               onClick={() => {
                 onChangeAddress(editableAddress)
@@ -72,7 +76,7 @@ export const CustomAddressInput: React.FC<Props> = (props): JSX.Element => {
               }}
             />
             <Styled.CancelEdit onClick={() => setEditableAddress(O.fromNullable(null))} />
-          </Styled.Form>
+          </Styled.AddressEditButtonsWrapper>
         </Styled.EditableFormWrapper>
       )
     },

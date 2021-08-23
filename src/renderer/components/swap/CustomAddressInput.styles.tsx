@@ -4,9 +4,19 @@ import styled from 'styled-components'
 import { palette } from 'styled-theme'
 
 import { ExternalLinkIcon as ExternalLinkIconUI } from '../../components/uielements/common/Common.style'
-import { InnerForm } from '../shared/form'
 
 const ICON_SIZE = 16
+
+export const EditableFormWrapper = styled('div')`
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+`
+
+export const AddressFormWrapper = styled('div')`
+  margin-top: 20px;
+  flex: 7;
+`
 
 export const AddressCustomRecipient = styled('div')`
   display: flex;
@@ -27,8 +37,8 @@ export const AddressCustomRecipient = styled('div')`
   }
 `
 
-export const Form = styled(InnerForm)`
-  padding: 30px;
+export const AddressEditButtonsWrapper = styled('div')`
+  flex: 3;
 `
 
 export const CopyLabel = styled(A.Typography.Text)`
@@ -38,30 +48,6 @@ export const CopyLabel = styled(A.Typography.Text)`
   color: ${palette('primary', 0)};
   svg {
     color: ${palette('primary', 0)};
-  }
-`
-
-export const AddressLinkIcon = styled(ExternalLinkIconUI)`
-  margin: 5px;
-  height: ${ICON_SIZE}px;
-  width: ${ICON_SIZE}px;
-  color: ${palette('primary', 0)};
-  svg {
-    color: inherit;
-    height: ${ICON_SIZE}px;
-    width: ${ICON_SIZE}px;
-  }
-`
-
-export const EditAddressIcon = styled(EditOutlined)`
-  margin: 5px;
-  height: ${ICON_SIZE}px;
-  width: ${ICON_SIZE}px;
-  color: ${palette('primary', 0)};
-  svg {
-    color: inherit;
-    height: ${ICON_SIZE}px;
-    width: ${ICON_SIZE}px;
   }
 `
 
@@ -89,10 +75,26 @@ export const CancelEdit = styled(CloseCircleOutlined)`
   }
 `
 
-export const EditableFormWrapper = styled('div')`
-  /* display: flex; */
-  /* flex-direction: row; */
-  /* align-items: center; */
-  /* margin-top: 5px; */
-  /* margin-right: 50px; */
+export const AddressLinkIcon = styled(ExternalLinkIconUI)`
+  margin: 5px;
+  height: ${ICON_SIZE}px;
+  width: ${ICON_SIZE}px;
+  color: ${palette('primary', 0)};
+  svg {
+    color: inherit;
+    height: ${ICON_SIZE}px;
+    width: ${ICON_SIZE}px;
+  }
+`
+
+export const EditAddressIcon = styled(EditOutlined)`
+  margin: 5px;
+  height: ${ICON_SIZE}px;
+  width: ${ICON_SIZE}px;
+  color: ${palette('primary', 0)};
+  svg {
+    color: inherit;
+    height: ${ICON_SIZE}px;
+    width: ${ICON_SIZE}px;
+  }
 `
