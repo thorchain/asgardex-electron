@@ -1124,6 +1124,38 @@ export const Swap = ({
     [checkIsApprovedError, isApproveFeeError, walletBalancesLoading]
   )
 
+  const onClickOpenAddress = useCallback(
+    (address) =>
+      FP.pipe(
+        oTargetAsset,
+        O.map((asset) => clickAddressLinkHandler(asset.chain, address)),
+        O.getOrElse(() => {})
+      ),
+    [clickAddressLinkHandler, oTargetAsset]
+  )
+
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const [customTargetWalletAddress, setCustomTargetWalletAddress] = useState('')
+
+  const renderCustomAddressInput = useMemo(
+    () =>
+      FP.pipe(
+        sequenceTOption(oTargetAsset, targetWalletAddress),
+        O.map(([asset, address]) => (
+          <CustomAddressInput
+            key={address}
+            asset={asset}
+            address={address}
+            onClickOpenAddress={onClickOpenAddress}
+            onChangeAddress={setCustomTargetWalletAddress}
+            // addressValidator={addressValidator}
+          />
+        )),
+        O.getOrElse(() => <></>)
+      ),
+    [oTargetAsset, onClickOpenAddress, targetWalletAddress]
+  )
+
   return (
     <Styled.Container>
       <Styled.ContentContainer>
@@ -1204,11 +1236,7 @@ export const Swap = ({
           </Styled.ValueItemContainer>
           <Styled.InValueContainer>
             <Styled.InValueTitle>{intl.formatMessage({ id: 'swap.recipient' })}</Styled.InValueTitle>
-            <CustomAddressInput
-              clickAddressLinkHandler={clickAddressLinkHandler}
-              oTargetAsset={oTargetAsset}
-              oTargetWalletAddress={targetWalletAddress}
-            />
+            {renderCustomAddressInput}
           </Styled.InValueContainer>
         </Styled.FormContainer>
       </Styled.ContentContainer>

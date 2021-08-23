@@ -1,108 +1,69 @@
-import React, { useState, useMemo, useCallback } from 'react'
+import React, { useState, useMemo } from 'react'
 
+import { useCallback } from '@storybook/addons'
 import { Address } from '@xchainjs/xchain-client'
-import { Asset, BNBChain, Chain, THORChain } from '@xchainjs/xchain-util'
+import { Asset } from '@xchainjs/xchain-util'
 import { Input } from 'antd'
-import * as FP from 'fp-ts/function'
+import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/Option'
 
-import { useValidateAddress } from '../../hooks/useValidateAddress'
-import { AddressValidation } from '../../services/clients/types'
 import * as Styled from './CustomAddressInput.styles'
 
 type Props = {
-  oTargetAsset: O.Option<Asset>
-  oTargetWalletAddress: O.Option<string>
-  clickAddressLinkHandler: (chain: Chain, address: Address) => void
+  asset: Asset
+  address: Address
+  onClickOpenAddress: (address: Address) => void
+  onChangeAddress: (address: Address) => void
+  // addressValidator: (address: Address) => boolean
 }
 export const CustomAddressInput: React.FC<Props> = (props): JSX.Element => {
-  const { clickAddressLinkHandler, oTargetAsset, oTargetWalletAddress } = props
-  const chain = useMemo(
-    () =>
-      FP.pipe(
-        oTargetAsset,
-        O.map((asset) => asset.chain),
-        O.getOrElse(() => THORChain)
-      ),
-    [oTargetAsset]
-  )
+  const { address, onChangeAddress, onClickOpenAddress } = props
 
-  const [editModeActive, setEditModeActive] = useState(false)
+  const [editableAddress, setEditableAddress] = useState<O.Option<Address>>(O.none)
+  const maskedRecipientAddress = useMemo(() => address.substring(0, 7) + '...' + address.slice(-3), [address])
 
-  const [recipientAddress, setRecipientAddress] = useState('')
-  const [editableRecipientAddress, setEditableRecipientAddress] = useState('')
-  const maskedRecipientAddress = useMemo(
-    () => recipientAddress.substring(0, 7) + '...' + recipientAddress.slice(-3),
-    [recipientAddress]
-  )
-
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const targetAddress = useMemo(
-    () =>
-      FP.pipe(
-        oTargetWalletAddress,
-        O.map((address) => {
-          setRecipientAddress(address)
-          return address
-        }),
-        O.getOrElse(() => '')
-      ),
-    [oTargetWalletAddress]
-  )
-
-  const addressValidation: AddressValidation = useValidateAddress(BNBChain)
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const addressValidator = useCallback(
-    async (_: unknown, value: string) => {
-      if (!value) {
-        return Promise.reject('empty')
-      }
-      if (!addressValidation(value.toLowerCase())) {
-        return Promise.reject('invalid')
-      }
-    },
-    [addressValidation]
-  )
-
-  const activateEditing = () => {
-    setEditableRecipientAddress(recipientAddress)
-    setEditModeActive(true)
-  }
-
-  const saveCustomAddress = () => {
-    setRecipientAddress(editableRecipientAddress)
-    setEditModeActive(false)
-  }
-
-  const cancelEditCustomAddress = () => {
-    setEditableRecipientAddress(recipientAddress)
-    setEditModeActive(false)
-  }
-
-  const renderDefault = () => {
+  const renderDefault = useCallback(() => {
     return (
       <>
         <Styled.AddressCustomRecipient>
           {maskedRecipientAddress}
           <div>
-            <Styled.EditAddressIcon onClick={() => activateEditing()} />
-            <Styled.CopyLabel copyable={{ text: recipientAddress }} />
-            <Styled.AddressLinkIcon onClick={() => clickAddressLinkHandler(chain, recipientAddress)} />
+            <Styled.EditAddressIcon onClick={() => setEditableAddress(O.fromNullable(address))} />
+            <Styled.CopyLabel copyable={{ text: address }} />
+            <Styled.AddressLinkIcon onClick={() => onClickOpenAddress(address)} />
           </div>
         </Styled.AddressCustomRecipient>
       </>
     )
-  }
+  }, [address, maskedRecipientAddress, onClickOpenAddress])
 
-  const renderEditable = () => {
-    return (
-      <Styled.EditableFormWrapper>
-        <Input value={editableRecipientAddress} onChange={(e) => setEditableRecipientAddress(e.target.value)} />
-        <Styled.ConfirmEdit style={{ margin: 5 }} onClick={saveCustomAddress} />
-        <Styled.CancelEdit style={{ margin: 5 }} onClick={cancelEditCustomAddress} />
-      </Styled.EditableFormWrapper>
-    )
-  }
+  const renderEditable = useCallback(
+    (editableAddress: Address) => {
+      return (
+        <Styled.EditableFormWrapper>
+          <Input value={editableAddress} onChange={(e) => setEditableAddress(O.fromNullable(e.target.value))} />
+          <Styled.ConfirmEdit
+            onClick={() => {
+              onChangeAddress(editableAddress)
+              setEditableAddress(O.fromNullable(''))
+            }}
+          />
+          <Styled.CancelEdit onClick={() => setEditableAddress(O.fromNullable(''))} />
+        </Styled.EditableFormWrapper>
+      )
+    },
+    [onChangeAddress]
+  )
 
-  return <>{editModeActive ? renderEditable() : renderDefault()}</>
+  const viewToRender = useMemo(
+    () =>
+      FP.pipe(
+        editableAddress,
+        O.map((editableAddress) => renderEditable(editableAddress)),
+        O.getOrElse(() => renderDefault())
+      ),
+    [editableAddress, renderDefault, renderEditable]
+  )
+
+  return viewToRender
 }
