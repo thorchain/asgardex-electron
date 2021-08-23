@@ -1145,7 +1145,7 @@ export const Swap = ({
           <CustomAddressInput
             key={address}
             asset={asset}
-            address={address}
+            address={customTargetWalletAddress === '' ? address : customTargetWalletAddress}
             onClickOpenAddress={onClickOpenAddress}
             onChangeAddress={setCustomTargetWalletAddress}
             // addressValidator={addressValidator}
@@ -1153,7 +1153,7 @@ export const Swap = ({
         )),
         O.getOrElse(() => <></>)
       ),
-    [oTargetAsset, onClickOpenAddress, targetWalletAddress]
+    [customTargetWalletAddress, oTargetAsset, onClickOpenAddress, targetWalletAddress]
   )
 
   return (

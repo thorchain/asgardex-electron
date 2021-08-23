@@ -1,6 +1,5 @@
-import React, { useState, useMemo } from 'react'
+import React, { useState, useMemo, useCallback } from 'react'
 
-import { useCallback } from '@storybook/addons'
 import { Address } from '@xchainjs/xchain-client'
 import { Asset } from '@xchainjs/xchain-util'
 import { Input } from 'antd'
@@ -45,10 +44,10 @@ export const CustomAddressInput: React.FC<Props> = (props): JSX.Element => {
           <Styled.ConfirmEdit
             onClick={() => {
               onChangeAddress(editableAddress)
-              setEditableAddress(O.fromNullable(''))
+              setEditableAddress(O.fromNullable(null))
             }}
           />
-          <Styled.CancelEdit onClick={() => setEditableAddress(O.fromNullable(''))} />
+          <Styled.CancelEdit onClick={() => setEditableAddress(O.fromNullable(null))} />
         </Styled.EditableFormWrapper>
       )
     },
