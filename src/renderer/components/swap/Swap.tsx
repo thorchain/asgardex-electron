@@ -128,7 +128,7 @@ export const Swap = ({
   reloadFees,
   reloadBalances = FP.constVoid,
   fees$,
-  targetWalletAddress,
+  targetWalletAddress: initialTargetWalletAddress,
   onChangePath,
   network,
   slipTolerance,
@@ -146,6 +146,8 @@ export const Swap = ({
   const intl = useIntl()
 
   const unlockedWallet = useMemo(() => isLocked(keystore) || !hasImportedKeystore(keystore), [keystore])
+
+  const [targetWalletAddress, setTargetWalletAddress] = useState<O.Option<Address>>(initialTargetWalletAddress)
 
   const { balances: oWalletBalances, loading: walletBalancesLoading } = walletBalances
 
@@ -1126,8 +1128,6 @@ export const Swap = ({
     [checkIsApprovedError, isApproveFeeError, walletBalancesLoading]
   )
 
-  const [customTargetWalletAddress, setCustomTargetWalletAddress] = useState('')
-
   const renderCustomAddressInput = useMemo(
     () =>
       FP.pipe(
@@ -1136,15 +1136,15 @@ export const Swap = ({
           <EditableAddress
             key={address}
             asset={asset}
-            address={customTargetWalletAddress === '' ? address : customTargetWalletAddress}
-            onClickOpenAddress={() => clickAddressLinkHandler(address)}
-            onChangeAddress={setCustomTargetWalletAddress}
+            address={address}
+            onClickOpenAddress={(address) => clickAddressLinkHandler(address)}
+            onChangeAddress={(newAddress) => setTargetWalletAddress(O.some(newAddress))}
             addressValidator={addressValidator}
           />
         )),
         O.getOrElse(() => <></>)
       ),
-    [oTargetAsset, targetWalletAddress, customTargetWalletAddress, addressValidator, clickAddressLinkHandler]
+    [oTargetAsset, targetWalletAddress, addressValidator, clickAddressLinkHandler]
   )
 
   return (

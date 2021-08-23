@@ -7,6 +7,7 @@ import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/Option'
 import { useIntl } from 'react-intl'
 
+import { AddressValidation } from '../../services/clients'
 import { InnerForm } from '../shared/form'
 import * as Styled from './EditableAddress.styles'
 
@@ -15,7 +16,7 @@ export type EditableAddressProps = {
   address: Address
   onClickOpenAddress: (address: Address) => void
   onChangeAddress: (address: Address) => void
-  addressValidator: (address: Address) => boolean
+  addressValidator: AddressValidation
 }
 export const EditableAddress = ({
   address,
