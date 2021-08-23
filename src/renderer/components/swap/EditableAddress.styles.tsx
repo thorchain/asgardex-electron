@@ -44,7 +44,6 @@ export const AddressEditButtonsWrapper = styled('div')`
 export const CopyLabel = styled(A.Typography.Text)`
   margin: 5px 5px 5px -5px;
   margin-left: -5px;
-  text-transform: uppercase;
   color: ${palette('primary', 0)};
   svg {
     color: ${palette('primary', 0)};
