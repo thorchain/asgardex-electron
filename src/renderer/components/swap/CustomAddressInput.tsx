@@ -10,16 +10,19 @@ import { useIntl } from 'react-intl'
 import { InnerForm } from '../shared/form'
 import * as Styled from './CustomAddressInput.styles'
 
-type Props = {
+export type CustomAddressInputProps = {
   asset: Asset
   address: Address
   onClickOpenAddress: (address: Address) => void
   onChangeAddress: (address: Address) => void
   addressValidator: (address: Address) => boolean
 }
-export const CustomAddressInput: React.FC<Props> = (props): JSX.Element => {
-  const { address, onChangeAddress, onClickOpenAddress, addressValidator } = props
-
+export const CustomAddressInput = ({
+  address,
+  onChangeAddress,
+  onClickOpenAddress,
+  addressValidator
+}: CustomAddressInputProps) => {
   const intl = useIntl()
   const [editableAddress, setEditableAddress] = useState<O.Option<Address>>(O.none)
   const maskedRecipientAddress = useMemo(() => address.substring(0, 7) + '...' + address.slice(-3), [address])
