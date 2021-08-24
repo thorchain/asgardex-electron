@@ -1233,10 +1233,12 @@ export const Swap = ({
               )
             )}
           </Styled.ValueItemContainer>
-          <Styled.TargetAddressContainer>
-            <Styled.ValueTitle>{intl.formatMessage({ id: 'swap.recipient' })}</Styled.ValueTitle>
-            {renderCustomAddressInput}
-          </Styled.TargetAddressContainer>
+          {!unlockedWallet && (
+            <Styled.TargetAddressContainer>
+              <Styled.ValueTitle>{intl.formatMessage({ id: 'swap.recipient' })}</Styled.ValueTitle>
+              {renderCustomAddressInput}
+            </Styled.TargetAddressContainer>
+          )}
         </Styled.FormContainer>
       </Styled.ContentContainer>
       {(walletBalancesLoading || checkIsApproved) && (
