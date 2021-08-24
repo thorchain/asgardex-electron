@@ -105,7 +105,9 @@ const defaultProps: SwapProps = {
   changeSlipTolerance: () => console.log('changeSlipTolerance'),
   approveERC20Token$: () => Rx.of(RD.success('txHash')),
   isApprovedERC20Token$: () => Rx.of(RD.success(true)),
-  importWalletHandler: () => console.log('import wallet')
+  importWalletHandler: () => console.log('import wallet'),
+  clickAddressLinkHandler: () => console.log('handle click on address'),
+  addressValidator: () => true
 }
 
 export const StoryDefault: Story = () => <Swap {...defaultProps} />

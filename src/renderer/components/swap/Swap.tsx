@@ -56,6 +56,7 @@ import {
   SwapFees,
   FeeRD
 } from '../../services/chain/types'
+import { AddressValidation } from '../../services/clients'
 import { ApproveFeeHandler, ApproveParams, IsApprovedRD, LoadApproveFeeHandler } from '../../services/ethereum/types'
 import { PoolAssetDetail, PoolAssetDetails, PoolAddress, PoolsDataMap } from '../../services/midgard/types'
 import { MimirHalt } from '../../services/thorchain/types'
@@ -79,6 +80,7 @@ import { LoadingView } from '../shared/loading'
 import { ViewTxButton } from '../uielements/button'
 import { Fees, UIFeesRD } from '../uielements/fees'
 import { Slider } from '../uielements/slider'
+import { EditableAddress } from './EditableAddress'
 import * as Styled from './Swap.styles'
 import { SwapData } from './Swap.types'
 import * as Utils from './Swap.utils'
@@ -110,6 +112,8 @@ export type SwapProps = {
   importWalletHandler: FP.Lazy<void>
   haltedChains: Chain[]
   mimirHalt: MimirHalt
+  clickAddressLinkHandler: (address: Address) => void
+  addressValidator: AddressValidation
 }
 
 export const Swap = ({
@@ -125,7 +129,7 @@ export const Swap = ({
   reloadFees,
   reloadBalances = FP.constVoid,
   fees$,
-  targetWalletAddress,
+  targetWalletAddress: initialTargetWalletAddress,
   onChangePath,
   network,
   slipTolerance,
@@ -136,11 +140,15 @@ export const Swap = ({
   approveFee$,
   importWalletHandler,
   haltedChains,
-  mimirHalt
+  mimirHalt,
+  clickAddressLinkHandler,
+  addressValidator
 }: SwapProps) => {
   const intl = useIntl()
 
   const unlockedWallet = useMemo(() => isLocked(keystore) || !hasImportedKeystore(keystore), [keystore])
+
+  const [targetWalletAddress, setTargetWalletAddress] = useState<O.Option<Address>>(initialTargetWalletAddress)
 
   const { balances: oWalletBalances, loading: walletBalancesLoading } = walletBalances
 
@@ -178,6 +186,8 @@ export const Swap = ({
     [haltedChains, mimirHalt]
   )
 
+  const [customAddressEditActive, setCustomAddressEditActive] = useState(false)
+
   const disableSwapAction = useMemo(
     () =>
       FP.pipe(
@@ -187,11 +197,12 @@ export const Swap = ({
             disableAllPoolActions(sourceChain) ||
             disableTradingPoolActions(sourceChain) ||
             disableAllPoolActions(targetChain) ||
-            disableTradingPoolActions(targetChain)
+            disableTradingPoolActions(targetChain) ||
+            customAddressEditActive
         ),
         O.getOrElse(() => true)
       ),
-    [disableAllPoolActions, disableTradingPoolActions, oSourceAsset, oTargetAsset]
+    [customAddressEditActive, disableAllPoolActions, disableTradingPoolActions, oSourceAsset, oTargetAsset]
   )
 
   const assetsToSwap: O.Option<{ source: Asset; target: Asset }> = useMemo(
@@ -1121,6 +1132,29 @@ export const Swap = ({
     [checkIsApprovedError, isApproveFeeError, walletBalancesLoading]
   )
 
+  const renderCustomAddressInput = useMemo(
+    () =>
+      FP.pipe(
+        sequenceTOption(oTargetAsset, targetWalletAddress),
+        O.fold(
+          () => <></>,
+          ([asset, address]) => (
+            <EditableAddress
+              key={address}
+              asset={asset}
+              network={network}
+              address={address}
+              onClickOpenAddress={(address) => clickAddressLinkHandler(address)}
+              onChangeAddress={(newAddress) => setTargetWalletAddress(O.some(newAddress))}
+              onChangeEditableMode={(editModeActive) => setCustomAddressEditActive(editModeActive)}
+              addressValidator={addressValidator}
+            />
+          )
+        )
+      ),
+    [oTargetAsset, targetWalletAddress, network, addressValidator, clickAddressLinkHandler]
+  )
+
   return (
     <Styled.Container>
       <Styled.ContentContainer>
@@ -1181,7 +1215,7 @@ export const Swap = ({
           </Styled.ValueItemContainer>
           <Styled.ValueItemContainer className="valueItemContainer-in">
             <Styled.InValueContainer>
-              <Styled.InValueTitle>{intl.formatMessage({ id: 'swap.output' })}</Styled.InValueTitle>
+              <Styled.ValueTitle>{intl.formatMessage({ id: 'swap.output' })}</Styled.ValueTitle>
               <Styled.InValueLabel>{swapResultLabel}</Styled.InValueLabel>
             </Styled.InValueContainer>
             {FP.pipe(
@@ -1189,7 +1223,7 @@ export const Swap = ({
               O.fold(
                 () => <></>,
                 (asset) => (
-                  <Styled.AssetSelect
+                  <Styled.TargetAssetSelect
                     onSelect={setTargetAsset}
                     asset={asset}
                     balances={balancesToSwapTo}
@@ -1199,6 +1233,10 @@ export const Swap = ({
               )
             )}
           </Styled.ValueItemContainer>
+          <Styled.TargetAddressContainer>
+            <Styled.ValueTitle>{intl.formatMessage({ id: 'swap.recipient' })}</Styled.ValueTitle>
+            {renderCustomAddressInput}
+          </Styled.TargetAddressContainer>
         </Styled.FormContainer>
       </Styled.ContentContainer>
       {(walletBalancesLoading || checkIsApproved) && (

@@ -9,6 +9,27 @@ import { Button as UIButton } from '../uielements/button'
 import { Drag as UIDrag } from '../uielements/drag'
 import { Label as UILabel } from '../uielements/label'
 
+const ICON_SIZE = 16
+
+export const AddressCustomRecipient = styled('div')`
+  display: flex;
+  flex-direction: row;
+  font-size: 16px;
+  text-transform: uppercase;
+  font-family: 'MainFontRegular';
+  color: ${palette('text', 1)};
+  max-width: 100%;
+  margin-right: 5px;
+  overflow: hidden;
+  &:only-child {
+    margin: auto;
+  }
+  & svg {
+    height: ${ICON_SIZE}px;
+    width: ${ICON_SIZE}px;
+  }
+`
+
 export const Container = styled('div')`
   display: flex;
   flex-direction: column;
@@ -55,11 +76,11 @@ export const FormContainer = styled('div')`
 export const CurrencyInfoContainer = styled('div')`
   display: none;
   position: absolute;
-  top: 0;
+  top: 45px;
+  bottom: 95px;
   left: 100%;
   padding-left: 15px;
   align-items: center;
-  height: 100%;
   color: ${palette('gray', 1)};
   width: max-content;
 
@@ -101,7 +122,7 @@ export const ValueItemContainer = styled('div')`
 
     &>*:first-child {
       margin-right: 25px;
-      min-width: 60%;
+      min-width: 65%;
     }
   `}
 `
@@ -114,17 +135,23 @@ export const SliderContainer = styled('div')`
 export const InValueContainer = styled('div')`
   display: flex;
   flex-direction: row;
+  height: 100px;
 
   ${media.md`
     flex-direction: column;
   `}
 `
 
-export const InValueTitle = styled(UILabel).attrs({
+export const TargetAddressContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+`
+
+export const ValueTitle = styled(UILabel).attrs({
   color: 'gray',
   textTransform: 'uppercase'
 })`
-font-family: 'MainFontRegular'
+  font-family: 'MainFontRegular';
   margin-right: 10px;
   padding: 0;
   font-size: 12px;
@@ -167,7 +194,11 @@ export const MinAmountLabel = styled(UILabel)`
 `
 
 export const AssetSelect = styled(AssetSelectUI)`
-  justify-content: space-between;
+  /* justify-content: space-between; */
+`
+
+export const TargetAssetSelect = styled(AssetSelect)`
+  /* margin-top: 10px; */
 `
 
 export const FeeContainer = styled.div`
