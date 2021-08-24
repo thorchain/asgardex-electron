@@ -1,6 +1,6 @@
 import React from 'react'
 
-import { StatusWrapper, StatusDirection, NoWrapLabel } from './Status.style'
+import { StatusWrapper, StatusDirection, NoWrapLabel } from './Status.styles'
 
 type Props = {
   title?: string

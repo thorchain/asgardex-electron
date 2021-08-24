@@ -62,7 +62,7 @@ import { DepositAssets } from '../../modal/tx/extra'
 import { ViewTxButton } from '../../uielements/button'
 import { Fees, UIFeesRD } from '../../uielements/fees'
 import * as Helper from './Deposit.helper'
-import * as Styled from './Deposit.style'
+import * as Styled from './Deposit.styles'
 import { PendingAssets as PendingAssetsUI } from './Deposit.subcomponents'
 
 export type Props = {

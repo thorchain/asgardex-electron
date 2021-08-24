@@ -6,7 +6,7 @@ import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
 
 import { FundsCapRD } from '../../hooks/useFundsCap'
-import * as Styled from './FundsCap.style'
+import * as Styled from './FundsCap.styles'
 
 export type Props = {
   fundsCap: FundsCapRD

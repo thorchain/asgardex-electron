@@ -6,7 +6,7 @@ import { palette } from 'styled-theme'
 import { Network } from '../../../shared/api/types'
 import { Menu } from '../shared/menu'
 import { Button as UIButton } from '../uielements/button'
-import { ExternalLinkIcon as ExternalLinkIconUI } from '../uielements/common/Common.style'
+import { ExternalLinkIcon as ExternalLinkIconUI } from '../uielements/common/Common.styles'
 import { Label as UILabel } from '../uielements/label'
 
 export const Container = styled.div`

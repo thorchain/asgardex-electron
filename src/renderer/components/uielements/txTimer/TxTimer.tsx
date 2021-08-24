@@ -5,7 +5,7 @@ import { CircularProgressbar, buildStyles } from 'react-circular-progressbar'
 
 import useInterval, { INACTIVE_INTERVAL } from '../../../hooks/useInterval'
 import { RefundIcon } from '../../icons/timerIcons'
-import * as Styled from './TxTimer.style'
+import * as Styled from './TxTimer.styles'
 
 import 'react-circular-progressbar/dist/styles.css'
 

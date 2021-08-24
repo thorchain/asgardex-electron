@@ -5,7 +5,7 @@ import { Chain } from '@xchainjs/xchain-util'
 
 import { Network } from '../../../../shared/api/types'
 import { truncateAddress } from '../../../helpers/addressHelper'
-import * as Styled from './AddressEllipsis.style'
+import * as Styled from './AddressEllipsis.styles'
 
 /**
  * Custome address ellipsis component

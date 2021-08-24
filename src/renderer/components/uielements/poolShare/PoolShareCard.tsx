@@ -1,6 +1,6 @@
 import React from 'react'
 
-import * as Styled from './PoolShareCard.style'
+import * as Styled from './PoolShareCard.styles'
 
 type Props = {
   title: string

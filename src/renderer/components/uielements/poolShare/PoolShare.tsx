@@ -16,7 +16,7 @@ import { useIntl } from 'react-intl'
 
 import { THORCHAIN_DECIMAL } from '../../../helpers/assetHelper'
 import { AssetWithDecimal } from '../../../types/asgardex'
-import * as Styled from './PoolShare.style'
+import * as Styled from './PoolShare.styles'
 import { PoolShareCard } from './PoolShareCard'
 
 type Props = {

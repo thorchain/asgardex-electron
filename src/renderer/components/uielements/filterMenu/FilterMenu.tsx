@@ -6,7 +6,7 @@ import { useIntl } from 'react-intl'
 
 import { useClickOutside } from '../../../hooks/useOutsideClick'
 import { Input } from '../input'
-import { Menu, MenuItem } from './FilterMenu.style'
+import { Menu, MenuItem } from './FilterMenu.styles'
 
 type Props<T> = {
   asset?: string

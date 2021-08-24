@@ -2,8 +2,8 @@ import React from 'react'
 
 import { useIntl } from 'react-intl'
 
-import { HeaderIconWrapper } from '../HeaderIcon.style'
-import * as Styled from './HeaderSettings.style'
+import { HeaderIconWrapper } from '../HeaderIcon.styles'
+import * as Styled from './HeaderSettings.styles'
 
 type Props = {
   onPress?: () => void

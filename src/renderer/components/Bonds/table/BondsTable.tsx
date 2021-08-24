@@ -8,7 +8,7 @@ import { FormattedMessage, useIntl } from 'react-intl'
 
 import { Network } from '../../../../shared/api/types'
 import { ConfirmationModal } from '../../modal/confirmation'
-import { ExternalLinkIcon } from '../../uielements/common/Common.style'
+import { ExternalLinkIcon } from '../../uielements/common/Common.styles'
 import { Node } from '../types'
 import * as Styled from './BondsTable.styles'
 import * as H from './helpers'

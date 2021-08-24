@@ -2,7 +2,7 @@ import React from 'react'
 
 import { Asset } from '@xchainjs/xchain-util'
 
-import * as Styled from './AssetLabel.style'
+import * as Styled from './AssetLabel.styles'
 
 /**
  * AssetLabel - Component to show data of an asset:

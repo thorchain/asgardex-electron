@@ -16,8 +16,8 @@ import {
   HeaderDropdownContentWrapper,
   HeaderDropdownMenuItemText,
   HeaderDropdownTitle
-} from '../HeaderMenu.style'
-import * as Styled from './HeaderPriceSelector.style'
+} from '../HeaderMenu.styles'
+import * as Styled from './HeaderPriceSelector.styles'
 
 type Props = {
   isDesktopView: boolean

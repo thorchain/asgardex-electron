@@ -32,8 +32,8 @@ import { PoolsComponentProps, PoolTableRowData, PoolTableRowsData } from './Pool
 import { getBlocksLeftForPendingPoolAsString, isEmptyPool } from './Pools.utils'
 import { filterTableData } from './Pools.utils'
 import * as Shared from './PoolsOverview.shared'
-import { TableAction, BlockLeftLabel } from './PoolsOverview.style'
-import * as Styled from './PoolsOverview.style'
+import { TableAction, BlockLeftLabel } from './PoolsOverview.styles'
+import * as Styled from './PoolsOverview.styles'
 
 const POOLS_KEY = 'pending'
 

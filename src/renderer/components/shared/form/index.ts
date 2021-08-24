@@ -1,2 +1,2 @@
-export { InnerForm } from './Form.style'
-export { Radio, RadioLabel } from './Radio.style'
+export { InnerForm } from './Form.styles'
+export { Radio, RadioLabel } from './Radio.styles'

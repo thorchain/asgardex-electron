@@ -4,7 +4,7 @@ import { palette } from 'styled-theme'
 import { media } from '../../helpers/styleHelper'
 import { Alert as AlertUI } from '../uielements/alert'
 import { Button as ButtonUI } from '../uielements/button'
-import { ExternalLinkIcon as ExternalLinkIconUI } from '../uielements/common/Common.style'
+import { ExternalLinkIcon as ExternalLinkIconUI } from '../uielements/common/Common.styles'
 
 export const Success = styled(AlertUI).attrs({
   type: 'success'

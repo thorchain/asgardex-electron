@@ -7,7 +7,7 @@ import { FormattedMessage, useIntl } from 'react-intl'
 import { Network } from '../../../../shared/api/types'
 import { RECOVERY_TOOL_URL } from '../../../const'
 import { AssetWithAmount1e8, AssetsWithAmount1e8 } from '../../../types/asgardex'
-import * as Styled from './Deposit.style'
+import * as Styled from './Deposit.styles'
 
 type AssetIconAmountProps = {
   assetWA: AssetWithAmount1e8

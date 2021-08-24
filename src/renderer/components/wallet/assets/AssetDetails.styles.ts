@@ -3,7 +3,7 @@ import styled from 'styled-components'
 import { palette } from 'styled-theme'
 
 import { media } from '../../../helpers/styleHelper'
-import { ExternalLinkIcon as ExternalLinkIconUI } from '../../uielements/common/Common.style'
+import { ExternalLinkIcon as ExternalLinkIconUI } from '../../uielements/common/Common.styles'
 import { Headline } from '../../uielements/headline'
 import { Label as UILabel } from '../../uielements/label'
 

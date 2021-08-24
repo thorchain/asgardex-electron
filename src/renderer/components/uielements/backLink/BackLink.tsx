@@ -4,7 +4,7 @@ import { LeftOutlined } from '@ant-design/icons'
 import { useIntl } from 'react-intl'
 import { useHistory } from 'react-router-dom'
 
-import { BackLinkWrapper, ButtonText } from './BackLink.style'
+import { BackLinkWrapper, ButtonText } from './BackLink.styles'
 
 type Props = {
   label?: string

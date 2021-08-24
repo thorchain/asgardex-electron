@@ -3,7 +3,7 @@ import * as A from 'antd'
 import styled, { css } from 'styled-components'
 import { palette } from 'styled-theme'
 
-import { ExternalLinkIcon as ExternalLinkIconUI } from '../../components/uielements/common/Common.style'
+import { ExternalLinkIcon as ExternalLinkIconUI } from '../../components/uielements/common/Common.styles'
 import { InnerForm as UIInnerForm } from '../shared/form'
 import { Input as UIInput } from '../uielements/input'
 

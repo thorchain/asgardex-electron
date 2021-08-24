@@ -6,7 +6,11 @@ import BigNumber from 'bignumber.js'
 import { Network } from '../../../../../shared/api/types'
 import { Label } from '../../label'
 import { AssetIcon } from '../assetIcon'
-import { AssetSelectDataWrapper, AssetSelectDataWrapperType, AssetSelectDataWrapperSize } from './AssetSelectData.style'
+import {
+  AssetSelectDataWrapper,
+  AssetSelectDataWrapperType,
+  AssetSelectDataWrapperSize
+} from './AssetSelectData.styles'
 
 type Props = {
   asset: Asset

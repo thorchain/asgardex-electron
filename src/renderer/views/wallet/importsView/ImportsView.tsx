@@ -11,7 +11,7 @@ import { useWalletContext } from '../../../contexts/WalletContext'
 import { useKeystoreClientStates } from '../../../hooks/useKeystoreClientStates'
 import { useKeystoreRedirectAfterImport } from '../../../hooks/useKeystoreRedirectAfterImport'
 import * as walletRoutes from '../../../routes/wallet'
-import * as Styled from './ImportsView.style'
+import * as Styled from './ImportsView.styles'
 
 enum TabKey {
   PHRASE = 'phrase',

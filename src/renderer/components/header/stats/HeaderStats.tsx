@@ -9,7 +9,7 @@ import { isUSDAsset } from '../../../helpers/assetHelper'
 import { abbreviateNumber } from '../../../helpers/numberHelper'
 import { loadingString } from '../../../helpers/stringHelper'
 import { PriceRD } from '../../../services/midgard/types'
-import * as Styled from './HeaderStats.style'
+import * as Styled from './HeaderStats.styles'
 
 export type Props = {
   runePrice: PriceRD

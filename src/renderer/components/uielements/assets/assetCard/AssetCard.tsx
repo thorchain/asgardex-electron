@@ -27,7 +27,7 @@ import { WalletBalances } from '../../../../services/wallet/types'
 import { Label } from '../../label'
 import { Slider } from '../../slider'
 import { AssetMenu } from '../assetMenu'
-import * as Styled from './AssetCard.style'
+import * as Styled from './AssetCard.styles'
 
 export type Props = {
   asset: Asset

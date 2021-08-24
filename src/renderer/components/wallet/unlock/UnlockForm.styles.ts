@@ -4,7 +4,7 @@ import styled from 'styled-components'
 import { palette } from 'styled-theme'
 
 import { media } from '../../../helpers/styleHelper'
-import { InnerForm } from '../../shared/form/Form.style'
+import { InnerForm } from '../../shared/form/Form.styles'
 import { Button as BaseButton } from '../../uielements/button'
 
 export const Form = styled(InnerForm)`

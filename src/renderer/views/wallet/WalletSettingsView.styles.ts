@@ -6,7 +6,7 @@ import { palette } from 'styled-theme'
 import { ReactComponent as RemoveIcon } from '../../assets/svg/icon-remove.svg'
 import { AddressEllipsis as AddressEllipsisUI } from '../../components/uielements/addressEllipsis'
 import { Button as UIButton } from '../../components/uielements/button'
-import { ExternalLinkIcon as ExternalLinkIconUI } from '../../components/uielements/common/Common.style'
+import { ExternalLinkIcon as ExternalLinkIconUI } from '../../components/uielements/common/Common.styles'
 import { Label as UILabel } from '../../components/uielements/label'
 
 export const ContainerWrapper = styled.div`

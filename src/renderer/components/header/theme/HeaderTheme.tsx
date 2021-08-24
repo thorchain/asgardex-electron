@@ -7,7 +7,7 @@ import { useIntl } from 'react-intl'
 import * as RxOp from 'rxjs/operators'
 
 import { useThemeContext } from '../../../contexts/ThemeContext'
-import * as Styled from './HeaderTheme.style'
+import * as Styled from './HeaderTheme.styles'
 
 type Props = {
   onPress?: FP.Lazy<void>

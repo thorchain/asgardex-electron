@@ -5,7 +5,7 @@ import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
 import { useIntl } from 'react-intl'
 
-import * as Styled from './ViewTxButton.style'
+import * as Styled from './ViewTxButton.styles'
 
 type Props = {
   label?: string

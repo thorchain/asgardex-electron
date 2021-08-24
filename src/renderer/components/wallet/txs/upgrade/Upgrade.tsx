@@ -32,7 +32,7 @@ import { ViewTxButton } from '../../../uielements/button/ViewTxButton'
 import { UIFeesRD } from '../../../uielements/fees'
 import { InputBigNumber } from '../../../uielements/input/InputBigNumber'
 import { AccountSelector } from '../../account'
-import * as Styled from '../TxForm.style'
+import * as Styled from '../TxForm.styles'
 import { validateTxAmountInput } from '../TxForm.util'
 import * as CStyled from './Upgrade.styles'
 

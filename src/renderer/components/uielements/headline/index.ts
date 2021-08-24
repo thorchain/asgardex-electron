@@ -1,1 +1,1 @@
-export { Headline } from './Headline.style'
+export { Headline } from './Headline.styles'

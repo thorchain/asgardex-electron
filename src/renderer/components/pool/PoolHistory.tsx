@@ -2,7 +2,7 @@ import React from 'react'
 
 import * as A from 'antd'
 
-import * as Styled from './PoolHistory.style'
+import * as Styled from './PoolHistory.styles'
 
 export type Props = {
   isLoading?: boolean

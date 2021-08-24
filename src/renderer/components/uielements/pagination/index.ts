@@ -1,1 +1,1 @@
-export { Pagination } from './Pagination.styled'
+export { Pagination } from './Pagination.styles'

@@ -20,7 +20,7 @@ import { MimirHalt, MimirHaltRD } from '../../services/thorchain/types'
 import { View } from '../View'
 import { ViewRoutes } from '../ViewRoutes'
 import { AppUpdateView } from './AppUpdateView'
-import * as Styled from './AppView.style'
+import * as Styled from './AppView.styles'
 
 export const AppView: React.FC = (): JSX.Element => {
   const intl = useIntl()

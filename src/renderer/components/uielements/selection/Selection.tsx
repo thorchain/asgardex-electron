@@ -1,6 +1,6 @@
 import React from 'react'
 
-import { SelectionWrapper, Button } from './Selection.style'
+import { SelectionWrapper, Button } from './Selection.styles'
 
 type Props = {
   onSelect: (value: number) => void

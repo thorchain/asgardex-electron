@@ -1,6 +1,6 @@
 import React from 'react'
 
-import { ButtonWrapper } from './Button.style'
+import { ButtonWrapper } from './Button.styles'
 import { ButtonProps } from './Button.types'
 
 export const Button: React.ForwardRefExoticComponent<ButtonProps> = React.forwardRef<HTMLButtonElement, ButtonProps>(

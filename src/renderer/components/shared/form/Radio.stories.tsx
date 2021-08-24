@@ -2,7 +2,7 @@ import React from 'react'
 
 import { storiesOf } from '@storybook/react'
 
-import { Radio, RadioLabel } from './Radio.style'
+import { Radio, RadioLabel } from './Radio.styles'
 
 storiesOf('Components/shared/Radio', module)
   .add('default', () => {

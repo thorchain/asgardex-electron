@@ -10,7 +10,7 @@ import { TxHashRD } from '../../../../services/wallet/types'
 import { ErrorView } from '../../../shared/error/'
 import { SuccessView } from '../../../shared/success/'
 import { ViewTxButton } from '../../../uielements/button/ViewTxButton'
-import * as Styled from '../TxForm.style'
+import * as Styled from '../TxForm.styles'
 
 /**
  * Send is a generic component to display states of `TxRD` for any chain

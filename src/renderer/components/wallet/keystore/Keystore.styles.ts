@@ -3,7 +3,7 @@ import styled from 'styled-components'
 import { palette } from 'styled-theme'
 
 import { Button } from '../../../components/uielements/button'
-import { InnerForm } from '../../shared/form/Form.style'
+import { InnerForm } from '../../shared/form/Form.styles'
 import { Button as UIButton } from '../../uielements/button'
 import { Label as UILabel } from '../../uielements/label'
 

@@ -6,7 +6,7 @@ import { storiesOf } from '@storybook/react'
 import { Row } from 'antd'
 import { SizeType } from 'antd/lib/config-provider/SizeContext'
 
-import { Input, InputPassword, InputTextArea } from './Input.style'
+import { Input, InputPassword, InputTextArea } from './Input.styles'
 import { Color } from './Input.types'
 
 storiesOf('Components/Input', module)

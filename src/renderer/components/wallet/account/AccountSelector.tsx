@@ -12,7 +12,7 @@ import { AssetData } from '../../uielements/assets/assetData'
 import { AssetIcon } from '../../uielements/assets/assetIcon'
 import { Size as IconSize } from '../../uielements/assets/assetIcon/AssetIcon.types'
 import { FilterMenu } from '../../uielements/filterMenu'
-import * as Styled from './AccountSelector.style'
+import * as Styled from './AccountSelector.styles'
 
 type Props = {
   selectedAsset: Asset

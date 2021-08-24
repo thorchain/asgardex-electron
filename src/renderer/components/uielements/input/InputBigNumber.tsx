@@ -8,7 +8,7 @@ import * as O from 'fp-ts/lib/Option'
 
 import { ZERO_BN } from '../../../const'
 import { eqBigNumber } from '../../../helpers/fp/eq'
-import * as Styled from './Input.style'
+import * as Styled from './Input.styles'
 import { formatValue, unformatValue, validInputValue, VALUE_ZERO, EMPTY_INPUT, truncateByDecimals } from './Input.util'
 
 type Props = Omit<Styled.InputProps, 'value' | 'onChange'> & {

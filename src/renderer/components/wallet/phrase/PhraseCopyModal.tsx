@@ -4,7 +4,7 @@ import { CheckOutlined, CopyOutlined } from '@ant-design/icons'
 import * as FP from 'fp-ts/lib/function'
 import { useIntl } from 'react-intl'
 
-import * as Styled from './PhraseCopyModal.style'
+import * as Styled from './PhraseCopyModal.styles'
 
 type Props = {
   visible: boolean

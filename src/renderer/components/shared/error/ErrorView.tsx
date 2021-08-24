@@ -2,7 +2,7 @@ import React from 'react'
 
 import { ResultProps } from 'antd/lib/result'
 
-import * as Styled from './ErrorView.style'
+import * as Styled from './ErrorView.styles'
 
 type Props = Omit<ResultProps, 'icon'>
 

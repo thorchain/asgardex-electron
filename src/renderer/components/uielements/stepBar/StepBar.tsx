@@ -1,6 +1,6 @@
 import React from 'react'
 
-import * as Styled from './StepBar.style'
+import * as Styled from './StepBar.styles'
 
 export type Props = {
   size?: number
