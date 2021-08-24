@@ -2,7 +2,7 @@ import React, { useState, useMemo, useCallback } from 'react'
 
 import { Address } from '@xchainjs/xchain-client'
 import { Asset } from '@xchainjs/xchain-util'
-import { Form } from 'antd'
+import { Form, Tooltip } from 'antd'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/Option'
 import { useIntl } from 'react-intl'
@@ -58,7 +58,9 @@ export const EditableAddress = ({
     return (
       <>
         <Styled.AddressCustomRecipient>
-          {truncatedAddress}
+          <Tooltip overlayStyle={{ maxWidth: '100%', whiteSpace: 'nowrap' }} title={address}>
+            {truncatedAddress}
+          </Tooltip>
           <div>
             <Styled.EditAddressIcon onClick={() => setEditableAddress(O.fromNullable(address))} />
             <Styled.CopyLabel copyable={{ text: address }} />
