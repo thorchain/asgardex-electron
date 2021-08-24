@@ -1,6 +1,6 @@
 import { CheckCircleOutlined, CloseCircleOutlined, EditOutlined } from '@ant-design/icons'
 import * as A from 'antd'
-import styled from 'styled-components'
+import styled, { css } from 'styled-components'
 import { palette } from 'styled-theme'
 
 import { ExternalLinkIcon as ExternalLinkIconUI } from '../../components/uielements/common/Common.style'
@@ -75,7 +75,7 @@ export const CancelEdit = styled(CloseCircleOutlined)`
   }
 `
 
-export const AddressLinkIcon = styled(ExternalLinkIconUI)`
+const iconStyles = css`
   margin: 5px;
   height: ${ICON_SIZE}px;
   width: ${ICON_SIZE}px;
@@ -87,14 +87,10 @@ export const AddressLinkIcon = styled(ExternalLinkIconUI)`
   }
 `
 
+export const AddressLinkIcon = styled(ExternalLinkIconUI)`
+  ${iconStyles}
+`
+
 export const EditAddressIcon = styled(EditOutlined)`
-  margin: 5px;
-  height: ${ICON_SIZE}px;
-  width: ${ICON_SIZE}px;
-  color: ${palette('primary', 0)};
-  svg {
-    color: inherit;
-    height: ${ICON_SIZE}px;
-    width: ${ICON_SIZE}px;
-  }
+  ${iconStyles}
 `

@@ -43,7 +43,7 @@ export const EditableAddress = ({
 
   const [form] = Form.useForm<{ recipient: string }>()
 
-  const renderCustomAddress = useCallback(() => {
+  const renderAddress = useMemo(() => {
     return (
       <>
         <Styled.AddressCustomRecipient>
@@ -78,11 +78,11 @@ export const EditableAddress = ({
               onClick={() => {
                 if (form.getFieldError(RECIPIENT_FIELD).length === 0) {
                   onChangeAddress(form.getFieldValue(RECIPIENT_FIELD))
-                  setEditableAddress(O.fromNullable(null))
+                  setEditableAddress(O.none)
                 }
               }}
             />
-            <Styled.CancelEdit onClick={() => setEditableAddress(O.fromNullable(null))} />
+            <Styled.CancelEdit onClick={() => setEditableAddress(O.none)} />
           </Styled.AddressEditButtonsWrapper>
         </Styled.EditableFormWrapper>
       )
@@ -94,10 +94,10 @@ export const EditableAddress = ({
     () =>
       FP.pipe(
         editableAddress,
-        O.map((editableAddress) => renderEditableCustomAddress(editableAddress)),
-        O.getOrElse(() => renderCustomAddress())
+        O.map(renderEditableCustomAddress),
+        O.getOrElse(() => renderAddress)
       ),
-    [editableAddress, renderCustomAddress, renderEditableCustomAddress]
+    [editableAddress, renderAddress, renderEditableCustomAddress]
   )
 
   return renderCustomAddressInput

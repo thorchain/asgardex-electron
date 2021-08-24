@@ -56,6 +56,7 @@ import {
   SwapFees,
   FeeRD
 } from '../../services/chain/types'
+import { AddressValidation } from '../../services/clients'
 import { ApproveFeeHandler, ApproveParams, IsApprovedRD, LoadApproveFeeHandler } from '../../services/ethereum/types'
 import { PoolAssetDetail, PoolAssetDetails, PoolAddress, PoolsDataMap } from '../../services/midgard/types'
 import { MimirHalt } from '../../services/thorchain/types'
@@ -112,7 +113,7 @@ export type SwapProps = {
   haltedChains: Chain[]
   mimirHalt: MimirHalt
   clickAddressLinkHandler: (address: Address) => void
-  addressValidator: (address: Address) => boolean
+  addressValidator: AddressValidation
 }
 
 export const Swap = ({
@@ -1132,20 +1133,19 @@ export const Swap = ({
     () =>
       FP.pipe(
         sequenceTOption(oTargetAsset, targetWalletAddress),
-        O.map(([asset, address]) => (
-          <EditableAddress
-            key={address}
-            asset={asset}
-            address={address}
-            onClickOpenAddress={(address) => clickAddressLinkHandler(address)}
-            onChangeAddress={(newAddress) => {
-              console.log(newAddress)
-              setTargetWalletAddress(O.some(newAddress))
-            }}
-            addressValidator={addressValidator}
-          />
-        )),
-        O.getOrElse(() => <></>)
+        O.fold(
+          () => <></>,
+          ([asset, address]) => (
+            <EditableAddress
+              key={address}
+              asset={asset}
+              address={address}
+              onClickOpenAddress={(address) => clickAddressLinkHandler(address)}
+              onChangeAddress={(newAddress) => setTargetWalletAddress(O.some(newAddress))}
+              addressValidator={addressValidator}
+            />
+          )
+        )
       ),
     [oTargetAsset, targetWalletAddress, addressValidator, clickAddressLinkHandler]
   )
