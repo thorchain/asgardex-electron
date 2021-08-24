@@ -76,11 +76,11 @@ export const FormContainer = styled('div')`
 export const CurrencyInfoContainer = styled('div')`
   display: none;
   position: absolute;
-  top: 0;
+  top: 45px;
+  bottom: 95px;
   left: 100%;
   padding-left: 15px;
   align-items: center;
-  height: 100%;
   color: ${palette('gray', 1)};
   width: max-content;
 
@@ -122,7 +122,7 @@ export const ValueItemContainer = styled('div')`
 
     &>*:first-child {
       margin-right: 25px;
-      min-width: 60%;
+      min-width: 65%;
     }
   `}
 `
@@ -135,13 +135,19 @@ export const SliderContainer = styled('div')`
 export const InValueContainer = styled('div')`
   display: flex;
   flex-direction: row;
+  height: 100px;
 
   ${media.md`
     flex-direction: column;
   `}
 `
 
-export const InValueTitle = styled(UILabel).attrs({
+export const TargetAddressContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+`
+
+export const ValueTitle = styled(UILabel).attrs({
   color: 'gray',
   textTransform: 'uppercase'
 })`
@@ -188,7 +194,11 @@ export const MinAmountLabel = styled(UILabel)`
 `
 
 export const AssetSelect = styled(AssetSelectUI)`
-  justify-content: space-between;
+  /* justify-content: space-between; */
+`
+
+export const TargetAssetSelect = styled(AssetSelect)`
+  /* margin-top: 10px; */
 `
 
 export const FeeContainer = styled.div`

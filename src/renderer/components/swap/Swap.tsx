@@ -1215,7 +1215,7 @@ export const Swap = ({
           </Styled.ValueItemContainer>
           <Styled.ValueItemContainer className="valueItemContainer-in">
             <Styled.InValueContainer>
-              <Styled.InValueTitle>{intl.formatMessage({ id: 'swap.output' })}</Styled.InValueTitle>
+              <Styled.ValueTitle>{intl.formatMessage({ id: 'swap.output' })}</Styled.ValueTitle>
               <Styled.InValueLabel>{swapResultLabel}</Styled.InValueLabel>
             </Styled.InValueContainer>
             {FP.pipe(
@@ -1223,7 +1223,7 @@ export const Swap = ({
               O.fold(
                 () => <></>,
                 (asset) => (
-                  <Styled.AssetSelect
+                  <Styled.TargetAssetSelect
                     onSelect={setTargetAsset}
                     asset={asset}
                     balances={balancesToSwapTo}
@@ -1233,10 +1233,10 @@ export const Swap = ({
               )
             )}
           </Styled.ValueItemContainer>
-          <Styled.InValueContainer>
-            <Styled.InValueTitle>{intl.formatMessage({ id: 'swap.recipient' })}</Styled.InValueTitle>
+          <Styled.TargetAddressContainer>
+            <Styled.ValueTitle>{intl.formatMessage({ id: 'swap.recipient' })}</Styled.ValueTitle>
             {renderCustomAddressInput}
-          </Styled.InValueContainer>
+          </Styled.TargetAddressContainer>
         </Styled.FormContainer>
       </Styled.ContentContainer>
       {(walletBalancesLoading || checkIsApproved) && (

@@ -10,8 +10,6 @@ import { useIntl } from 'react-intl'
 import { Network } from '../../../shared/api/types'
 import { truncateAddress } from '../../helpers/addressHelper'
 import { AddressValidation } from '../../services/clients'
-import { InnerForm } from '../shared/form'
-import { Input } from '../uielements/input'
 import * as Styled from './EditableAddress.styles'
 
 export type EditableAddressProps = {
@@ -75,17 +73,15 @@ export const EditableAddress = ({
     (editableAddress: Address) => {
       return (
         <Styled.EditableFormWrapper>
-          <Styled.AddressFormWrapper>
-            <InnerForm
-              form={form}
-              initialValues={{
-                recipient: editableAddress
-              }}>
-              <Form.Item rules={[{ required: true, validator: validateAddress }]} name={RECIPIENT_FIELD}>
-                <Input color="primary" />
-              </Form.Item>
-            </InnerForm>
-          </Styled.AddressFormWrapper>
+          <Styled.InnerForm
+            form={form}
+            initialValues={{
+              recipient: editableAddress
+            }}>
+            <Form.Item rules={[{ required: true, validator: validateAddress }]} name={RECIPIENT_FIELD}>
+              <Styled.Input color="primary" />
+            </Form.Item>
+          </Styled.InnerForm>
           <Styled.AddressEditButtonsWrapper>
             <Styled.ConfirmEdit
               onClick={() => {

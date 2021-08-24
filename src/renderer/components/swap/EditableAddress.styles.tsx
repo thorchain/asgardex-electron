@@ -4,19 +4,26 @@ import styled, { css } from 'styled-components'
 import { palette } from 'styled-theme'
 
 import { ExternalLinkIcon as ExternalLinkIconUI } from '../../components/uielements/common/Common.style'
+import { InnerForm as UIInnerForm } from '../shared/form'
+import { Input as UIInput } from '../uielements/input'
 
 const ICON_SIZE = 16
 
+export const InnerForm = styled(UIInnerForm)`
+  flex-grow: 1;
+`
+export const Input = styled(UIInput)`
+  font-size: 16px;
+`
+
 export const EditableFormWrapper = styled('div')`
   display: flex;
-  flex-direction: row;
   align-items: center;
   margin-bottom: -30px;
 `
 
 export const AddressFormWrapper = styled('div')`
   margin-top: 0px;
-  flex: 7;
 `
 
 export const AddressCustomRecipient = styled('div')`
@@ -40,7 +47,9 @@ export const AddressCustomRecipient = styled('div')`
 
 export const AddressEditButtonsWrapper = styled('div')`
   margin-top: -20px;
-  flex: 3;
+  display: flex;
+  flex-direction: row;
+  width: 50px;
 `
 
 export const CopyLabel = styled(A.Typography.Text)`
@@ -50,6 +59,12 @@ export const CopyLabel = styled(A.Typography.Text)`
   svg {
     color: ${palette('primary', 0)};
   }
+`
+
+export const IconWrapper = styled.div`
+  display: flex;
+  width: 50px;
+  flex-direction: column;
 `
 
 const iconStyles = css`
