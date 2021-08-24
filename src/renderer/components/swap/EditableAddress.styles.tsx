@@ -22,10 +22,6 @@ export const EditableFormWrapper = styled('div')`
   margin-bottom: -30px;
 `
 
-export const AddressFormWrapper = styled('div')`
-  margin-top: 0px;
-`
-
 export const AddressCustomRecipient = styled('div')`
   display: flex;
   flex-direction: row;
@@ -59,12 +55,6 @@ export const CopyLabel = styled(A.Typography.Text)`
   svg {
     color: ${palette('primary', 0)};
   }
-`
-
-export const IconWrapper = styled.div`
-  display: flex;
-  width: 50px;
-  flex-direction: column;
 `
 
 const iconStyles = css`
