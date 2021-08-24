@@ -124,12 +124,14 @@ export const AppView: React.FC = (): JSX.Element => {
         }),
         rdAltOnPending(() => prevMimirHaltRD.current),
         RD.toOption,
-        O.map(({ haltThorChain, haltEthChain }) => {
+        O.map(({ haltThorChain, haltEthChain, haltBnbChain }) => {
           let msg = ''
-          if (haltThorChain) {
+          if (haltThorChain || (haltEthChain && haltBnbChain)) {
             msg = 'Upgrade for ETH.RUNE and BNB.RUNE are disabled temporary for maintenance'
           } else if (haltEthChain) {
             msg = 'Upgrade for ETH.RUNE is disabled temporary for maintenance'
+          } else if (haltBnbChain) {
+            msg = 'Upgrade for BNB.RUNE is disabled temporary for maintenance'
           }
           return msg ? <Styled.Alert key={'upgrade_warning'} type="warning" message={msg} /> : <></>
         }),
