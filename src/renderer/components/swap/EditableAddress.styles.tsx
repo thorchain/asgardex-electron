@@ -52,30 +52,6 @@ export const CopyLabel = styled(A.Typography.Text)`
   }
 `
 
-export const ConfirmEdit = styled(CheckCircleOutlined)`
-  margin: 5px;
-  height: ${ICON_SIZE}px;
-  width: ${ICON_SIZE}px;
-  color: ${palette('primary', 0)};
-  svg {
-    color: inherit;
-    height: ${ICON_SIZE}px;
-    width: ${ICON_SIZE}px;
-  }
-`
-
-export const CancelEdit = styled(CloseCircleOutlined)`
-  margin: 5px;
-  height: ${ICON_SIZE}px;
-  width: ${ICON_SIZE}px;
-  color: ${palette('error', 0)};
-  svg {
-    color: inherit;
-    height: ${ICON_SIZE}px;
-    width: ${ICON_SIZE}px;
-  }
-`
-
 const iconStyles = css`
   margin: 5px;
   height: ${ICON_SIZE}px;
@@ -94,4 +70,13 @@ export const AddressLinkIcon = styled(ExternalLinkIconUI)`
 
 export const EditAddressIcon = styled(EditOutlined)`
   ${iconStyles}
+`
+
+export const ConfirmEdit = styled(CheckCircleOutlined)`
+  ${iconStyles}
+`
+
+export const CancelEdit = styled(CloseCircleOutlined)`
+  ${iconStyles}
+  color: ${palette('error', 0)};
 `
