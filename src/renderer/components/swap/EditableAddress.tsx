@@ -7,6 +7,8 @@ import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/Option'
 import { useIntl } from 'react-intl'
 
+import { Network } from '../../../shared/api/types'
+import { truncateAddress } from '../../helpers/addressHelper'
 import { AddressValidation } from '../../services/clients'
 import { InnerForm } from '../shared/form'
 import * as Styled from './EditableAddress.styles'
@@ -14,20 +16,26 @@ import * as Styled from './EditableAddress.styles'
 export type EditableAddressProps = {
   asset: Asset
   address: Address
+  network: Network
   onClickOpenAddress: (address: Address) => void
   onChangeAddress: (address: Address) => void
   addressValidator: AddressValidation
 }
 export const EditableAddress = ({
+  asset,
   address,
   onChangeAddress,
   onClickOpenAddress,
-  addressValidator
+  addressValidator,
+  network
 }: EditableAddressProps) => {
   const RECIPIENT_FIELD = 'recipient'
   const intl = useIntl()
   const [editableAddress, setEditableAddress] = useState<O.Option<Address>>(O.none)
-  const maskedRecipientAddress = useMemo(() => address.substring(0, 7) + '...' + address.slice(-3), [address])
+  const truncatedAddress = useMemo(
+    () => truncateAddress(address, asset.chain, network),
+    [address, asset.chain, network]
+  )
 
   const validateAddress = useCallback(
     async (_: unknown, value: string) => {
@@ -47,7 +55,7 @@ export const EditableAddress = ({
     return (
       <>
         <Styled.AddressCustomRecipient>
-          {maskedRecipientAddress}
+          {truncatedAddress}
           <div>
             <Styled.EditAddressIcon onClick={() => setEditableAddress(O.fromNullable(address))} />
             <Styled.CopyLabel copyable={{ text: address }} />
@@ -56,9 +64,9 @@ export const EditableAddress = ({
         </Styled.AddressCustomRecipient>
       </>
     )
-  }, [address, maskedRecipientAddress, onClickOpenAddress])
+  }, [address, truncatedAddress, onClickOpenAddress])
 
-  const renderEditableCustomAddress = useCallback(
+  const renderEditableAddress = useCallback(
     (editableAddress: Address) => {
       return (
         <Styled.EditableFormWrapper>
@@ -94,10 +102,10 @@ export const EditableAddress = ({
     () =>
       FP.pipe(
         editableAddress,
-        O.map(renderEditableCustomAddress),
+        O.map(renderEditableAddress),
         O.getOrElse(() => renderAddress)
       ),
-    [editableAddress, renderAddress, renderEditableCustomAddress]
+    [editableAddress, renderAddress, renderEditableAddress]
   )
 
   return renderCustomAddressInput

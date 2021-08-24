@@ -11,6 +11,7 @@ const bnbAddress = BNB_ADDRESS_TESTNET
 const defaultProps: EditableAddressProps = {
   asset: AssetBNB,
   address: bnbAddress,
+  network: 'testnet',
   onClickOpenAddress: () => console.log('open address in explorer'),
   onChangeAddress: () => console.log('address changed'),
   addressValidator: (address: Address) => eqString.equals(address, bnbAddress)

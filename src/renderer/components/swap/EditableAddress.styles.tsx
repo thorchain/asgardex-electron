@@ -11,6 +11,7 @@ export const EditableFormWrapper = styled('div')`
   display: flex;
   flex-direction: row;
   align-items: center;
+  margin-bottom: -30px;
 `
 
 export const AddressFormWrapper = styled('div')`

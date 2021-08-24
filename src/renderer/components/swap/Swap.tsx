@@ -1139,6 +1139,7 @@ export const Swap = ({
             <EditableAddress
               key={address}
               asset={asset}
+              network={network}
               address={address}
               onClickOpenAddress={(address) => clickAddressLinkHandler(address)}
               onChangeAddress={(newAddress) => setTargetWalletAddress(O.some(newAddress))}
@@ -1147,7 +1148,7 @@ export const Swap = ({
           )
         )
       ),
-    [oTargetAsset, targetWalletAddress, addressValidator, clickAddressLinkHandler]
+    [oTargetAsset, targetWalletAddress, network, addressValidator, clickAddressLinkHandler]
   )
 
   return (
