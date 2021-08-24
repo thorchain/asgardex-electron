@@ -14,6 +14,7 @@ const defaultProps: EditableAddressProps = {
   network: 'testnet',
   onClickOpenAddress: () => console.log('open address in explorer'),
   onChangeAddress: () => console.log('address changed'),
+  onChangeEditableMode: () => console.log('edit mode changed'),
   addressValidator: (address: Address) => eqString.equals(address, bnbAddress)
 }
 export const StoryDefault: Story = () => <EditableAddress {...defaultProps} />

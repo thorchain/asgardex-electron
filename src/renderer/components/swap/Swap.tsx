@@ -186,6 +186,8 @@ export const Swap = ({
     [haltedChains, mimirHalt]
   )
 
+  const [customAddressEditActive, setCustomAddressEditActive] = useState(false)
+
   const disableSwapAction = useMemo(
     () =>
       FP.pipe(
@@ -195,11 +197,12 @@ export const Swap = ({
             disableAllPoolActions(sourceChain) ||
             disableTradingPoolActions(sourceChain) ||
             disableAllPoolActions(targetChain) ||
-            disableTradingPoolActions(targetChain)
+            disableTradingPoolActions(targetChain) ||
+            customAddressEditActive
         ),
         O.getOrElse(() => true)
       ),
-    [disableAllPoolActions, disableTradingPoolActions, oSourceAsset, oTargetAsset]
+    [customAddressEditActive, disableAllPoolActions, disableTradingPoolActions, oSourceAsset, oTargetAsset]
   )
 
   const assetsToSwap: O.Option<{ source: Asset; target: Asset }> = useMemo(
@@ -1143,6 +1146,7 @@ export const Swap = ({
               address={address}
               onClickOpenAddress={(address) => clickAddressLinkHandler(address)}
               onChangeAddress={(newAddress) => setTargetWalletAddress(O.some(newAddress))}
+              onChangeEditableMode={(editModeActive) => setCustomAddressEditActive(editModeActive)}
               addressValidator={addressValidator}
             />
           )

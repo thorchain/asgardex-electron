@@ -20,6 +20,7 @@ export type EditableAddressProps = {
   network: Network
   onClickOpenAddress: (address: Address) => void
   onChangeAddress: (address: Address) => void
+  onChangeEditableMode: (editModeActive: boolean) => void
   addressValidator: AddressValidation
 }
 export const EditableAddress = ({
@@ -27,6 +28,7 @@ export const EditableAddress = ({
   address,
   onChangeAddress,
   onClickOpenAddress,
+  onChangeEditableMode,
   addressValidator,
   network
 }: EditableAddressProps) => {
@@ -109,10 +111,16 @@ export const EditableAddress = ({
     () =>
       FP.pipe(
         editableAddress,
-        O.map(renderEditableAddress),
-        O.getOrElse(() => renderAddress)
+        O.map((address) => {
+          onChangeEditableMode(true)
+          return renderEditableAddress(address)
+        }),
+        O.getOrElse(() => {
+          onChangeEditableMode(false)
+          return renderAddress
+        })
       ),
-    [editableAddress, renderAddress, renderEditableAddress]
+    [editableAddress, onChangeEditableMode, renderAddress, renderEditableAddress]
   )
 
   return renderCustomAddressInput
