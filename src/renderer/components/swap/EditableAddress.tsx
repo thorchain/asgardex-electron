@@ -52,20 +52,43 @@ export const EditableAddress = ({
 
   const [form] = Form.useForm<{ recipient: string }>()
 
+  const confirmEditHandler = useCallback(() => {
+    if (form.getFieldError(RECIPIENT_FIELD).length === 0) {
+      onChangeAddress(form.getFieldValue(RECIPIENT_FIELD))
+      form.resetFields()
+      setEditableAddress(O.none)
+    }
+  }, [form, onChangeAddress])
+
+  const cancelEditHandler = useCallback(() => {
+    form.resetFields()
+    setEditableAddress(O.none)
+  }, [form])
+
+  const inputOnKeyDownHandler = useCallback(
+    (e) => {
+      if (e.key === 'Enter') {
+        confirmEditHandler()
+      }
+      if (e.key === 'Escape') {
+        cancelEditHandler()
+      }
+    },
+    [cancelEditHandler, confirmEditHandler]
+  )
+
   const renderAddress = useMemo(() => {
     return (
-      <>
-        <Styled.AddressCustomRecipient>
-          <Tooltip overlayStyle={{ maxWidth: '100%', whiteSpace: 'nowrap' }} title={address}>
-            {truncatedAddress}
-          </Tooltip>
-          <div>
-            <Styled.EditAddressIcon onClick={() => setEditableAddress(O.fromNullable(address))} />
-            <Styled.CopyLabel copyable={{ text: address }} />
-            <Styled.AddressLinkIcon onClick={() => onClickOpenAddress(address)} />
-          </div>
-        </Styled.AddressCustomRecipient>
-      </>
+      <Styled.AddressCustomRecipient>
+        <Tooltip overlayStyle={{ maxWidth: '100%', whiteSpace: 'nowrap' }} title={address}>
+          {truncatedAddress}
+        </Tooltip>
+        <div>
+          <Styled.EditAddressIcon onClick={() => setEditableAddress(O.fromNullable(address))} />
+          <Styled.CopyLabel copyable={{ text: address }} />
+          <Styled.AddressLinkIcon onClick={() => onClickOpenAddress(address)} />
+        </div>
+      </Styled.AddressCustomRecipient>
     )
   }, [address, truncatedAddress, onClickOpenAddress])
 
@@ -79,30 +102,17 @@ export const EditableAddress = ({
               recipient: editableAddress
             }}>
             <Form.Item rules={[{ required: true, validator: validateAddress }]} name={RECIPIENT_FIELD}>
-              <Styled.Input color="primary" />
+              <Styled.Input color="primary" onKeyDown={inputOnKeyDownHandler} />
             </Form.Item>
           </Styled.InnerForm>
           <Styled.AddressEditButtonsWrapper>
-            <Styled.ConfirmEdit
-              onClick={() => {
-                if (form.getFieldError(RECIPIENT_FIELD).length === 0) {
-                  onChangeAddress(form.getFieldValue(RECIPIENT_FIELD))
-                  form.resetFields()
-                  setEditableAddress(O.none)
-                }
-              }}
-            />
-            <Styled.CancelEdit
-              onClick={() => {
-                form.resetFields()
-                setEditableAddress(O.none)
-              }}
-            />
+            <Styled.ConfirmEdit onClick={confirmEditHandler} />
+            <Styled.CancelEdit onClick={cancelEditHandler} />
           </Styled.AddressEditButtonsWrapper>
         </Styled.EditableFormWrapper>
       )
     },
-    [form, onChangeAddress, validateAddress]
+    [cancelEditHandler, confirmEditHandler, form, inputOnKeyDownHandler, validateAddress]
   )
 
   const renderCustomAddressInput = useMemo(
