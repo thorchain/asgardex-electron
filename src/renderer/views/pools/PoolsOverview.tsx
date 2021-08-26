@@ -11,7 +11,7 @@ import { useMidgardContext } from '../../contexts/MidgardContext'
 import { useMimirHalt } from '../../hooks/useMimirHalt'
 import { ActivePools } from './ActivePools'
 import { PendingPools } from './PendingPools'
-import * as Styled from './PoolsOverview.style'
+import * as Styled from './PoolsOverview.styles'
 
 type TabKey = 'active' | 'pending'
 

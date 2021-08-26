@@ -11,7 +11,7 @@ import { AssetIcon as UIAssetIcon } from '../../uielements/assets/assetIcon'
 import { AssetLabel as UIAssetLabel } from '../../uielements/assets/assetLabel'
 import { Button as UIButton } from '../../uielements/button'
 import { ViewTxButton as UIViewTxButton } from '../../uielements/button'
-import { ExternalLinkIcon as UIExternalLinkIcon } from '../../uielements/common/Common.style'
+import { ExternalLinkIcon as UIExternalLinkIcon } from '../../uielements/common/Common.styles'
 import { Label as UILabel } from '../../uielements/label'
 
 export const Container = styled.div`

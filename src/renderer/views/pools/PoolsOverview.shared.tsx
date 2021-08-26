@@ -10,7 +10,7 @@ import { ReloadButton } from '../../components/uielements/reloadButton'
 import { ordBaseAmount } from '../../helpers/fp/ord'
 import { sortByDepth } from '../../helpers/poolHelper'
 import { PoolTableRowData } from './Pools.types'
-import * as Styled from './PoolsOverview.style'
+import * as Styled from './PoolsOverview.styles'
 
 const renderAssetColumn = ({ pool }: PoolTableRowData) => <AssetLabel asset={pool.target} />
 

@@ -18,7 +18,7 @@ import { isLocked, hasImportedKeystore } from '../../../services/wallet/util'
 import { RemoveWalletConfirmationModal } from '../../modal/confirmation/RemoveWalletConfirmationModal'
 import { BackLink } from '../../uielements/backLink'
 import { InputPassword } from '../../uielements/input'
-import * as Styled from './UnlockForm.style'
+import * as Styled from './UnlockForm.styles'
 
 type FormValues = {
   password: string

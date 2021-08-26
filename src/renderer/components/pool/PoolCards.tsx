@@ -7,7 +7,7 @@ import { useIntl } from 'react-intl'
 import { abbreviateNumber } from '../../helpers/numberHelper'
 import { PoolDetail, PoolStatsDetail } from '../../types/generated/midgard/models'
 import { PoolStatus } from '../uielements/poolStatus'
-import * as Styled from './PoolCards.style'
+import * as Styled from './PoolCards.styles'
 import * as H from './PoolDetails.helpers'
 
 export type Props = {

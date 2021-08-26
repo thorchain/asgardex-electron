@@ -15,9 +15,9 @@ import { MAX_ITEMS_PER_PAGE } from '../../../../services/const'
 import { ApiError } from '../../../../services/wallet/types'
 import { ErrorView } from '../../../shared/error'
 import { AddressEllipsis } from '../../../uielements/addressEllipsis'
-import * as CommonStyled from '../../../uielements/common/Common.style'
+import * as CommonStyled from '../../../uielements/common/Common.styles'
 import { Pagination } from '../../../uielements/pagination'
-import * as Styled from './TxsTable.style'
+import * as Styled from './TxsTable.styles'
 
 type Props = {
   txsPageRD: TxsPageRD

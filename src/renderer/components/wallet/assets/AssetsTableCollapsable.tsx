@@ -26,7 +26,7 @@ import { PricePool } from '../../../views/pools/Pools.types'
 import { ErrorView } from '../../shared/error/'
 import { AssetIcon } from '../../uielements/assets/assetIcon'
 import { QRCodeModal } from '../../uielements/qrCodeModal/QRCodeModal'
-import * as Styled from './AssetsTableCollapsable.style'
+import * as Styled from './AssetsTableCollapsable.styles'
 
 const { Panel } = Collapse
 

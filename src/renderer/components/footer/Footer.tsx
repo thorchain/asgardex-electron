@@ -8,7 +8,7 @@ import { ExternalUrl } from '../../../shared/const'
 import { ReactComponent as TelegramIcon } from '../../assets/svg/icon-telegram.svg'
 import { ReactComponent as ThorChainIcon } from '../../assets/svg/logo-thorchain.svg'
 import * as playgroundRoutes from '../../routes/playground'
-import { FooterContainer, FooterIconWrapper } from './Footer.style'
+import { FooterContainer, FooterIconWrapper } from './Footer.styles'
 
 type IconProps = {
   url: string

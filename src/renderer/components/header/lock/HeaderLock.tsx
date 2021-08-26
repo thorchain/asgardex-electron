@@ -5,8 +5,8 @@ import { useIntl } from 'react-intl'
 
 import { KeystoreState } from '../../../services/wallet/types'
 import * as WU from '../../../services/wallet/util'
-import { HeaderIconWrapper } from '../HeaderIcon.style'
-import * as Styled from './HeaderLock.style'
+import { HeaderIconWrapper } from '../HeaderIcon.styles'
+import * as Styled from './HeaderLock.styles'
 
 type Props = {
   keystore: KeystoreState

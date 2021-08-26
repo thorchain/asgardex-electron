@@ -11,8 +11,8 @@ import { OnlineStatus } from '../../../services/app/types'
 import { ConnectionStatus } from '../../shared/icons/ConnectionStatus'
 import { Menu } from '../../shared/menu/Menu'
 import { headerNetStatusSubheadline, headerNetStatusColor, HeaderNetStatusColor } from '../Header.util'
-import { HeaderDrawerItem } from '../HeaderComponent.style'
-import * as Styled from './HeaderNetStatus.style'
+import { HeaderDrawerItem } from '../HeaderComponent.styles'
+import * as Styled from './HeaderNetStatus.styles'
 
 type MenuItem = {
   key: string

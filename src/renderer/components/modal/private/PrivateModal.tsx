@@ -6,7 +6,7 @@ import { useIntl } from 'react-intl'
 
 import { Input } from '../../uielements/input'
 import { Label } from '../../uielements/label'
-import * as Styled from './PrivateModal.style'
+import * as Styled from './PrivateModal.styles'
 
 type Props = {
   visible: boolean

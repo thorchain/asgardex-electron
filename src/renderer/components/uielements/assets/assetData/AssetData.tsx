@@ -4,7 +4,7 @@ import { BaseAmount, formatAssetAmountCurrency, baseToAsset, baseAmount, Asset }
 
 import { Network } from '../../../../../shared/api/types'
 import { PricePoolAsset } from '../../../../views/pools/Pools.types'
-import * as Styled from './AssetData.style'
+import * as Styled from './AssetData.styles'
 
 /**
  * AssetData - Component to show data of an asset:

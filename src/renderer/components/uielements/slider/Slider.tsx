@@ -3,7 +3,7 @@ import React, { useCallback, useMemo, useRef } from 'react'
 import { SliderSingleProps } from 'antd/lib/slider'
 import { TooltipPlacement } from 'antd/lib/tooltip'
 
-import { SliderWrapper, SliderLabel } from './Slider.style'
+import { SliderWrapper, SliderLabel } from './Slider.styles'
 
 type CustomProps = {
   tooltipPlacement?: TooltipPlacement

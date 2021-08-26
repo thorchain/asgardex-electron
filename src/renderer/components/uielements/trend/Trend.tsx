@@ -4,7 +4,7 @@ import { ArrowUpOutlined, ArrowDownOutlined } from '@ant-design/icons'
 import { bn, isValidBN, formatBN } from '@xchainjs/xchain-util'
 import BigNumber from 'bignumber.js'
 
-import * as Styled from './Trend.style'
+import * as Styled from './Trend.styles'
 
 type Props = {
   amount?: BigNumber

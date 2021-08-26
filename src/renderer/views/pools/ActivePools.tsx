@@ -30,7 +30,7 @@ import { PoolFilter, PoolsState } from '../../services/midgard/types'
 import { PoolsComponentProps, PoolTableRowData, PoolTableRowsData } from './Pools.types'
 import { filterTableData } from './Pools.utils'
 import * as Shared from './PoolsOverview.shared'
-import * as Styled from './PoolsOverview.style'
+import * as Styled from './PoolsOverview.styles'
 
 const POOLS_KEY = 'active'
 

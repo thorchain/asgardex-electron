@@ -7,7 +7,7 @@ import { useIntl } from 'react-intl'
 import { ApiError } from '../../../services/wallet/types'
 import { ButtonProps as UIButtonProps } from '../../uielements/button'
 import { TxTimer } from '../../uielements/txTimer'
-import * as Styled from './TxModal.style'
+import * as Styled from './TxModal.styles'
 
 export type Props = {
   txRD: RD.RemoteData<ApiError, boolean>

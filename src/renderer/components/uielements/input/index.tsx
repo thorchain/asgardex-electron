@@ -1,2 +1,2 @@
-export { Input, InputPassword, InputTextArea, InputNumber } from './Input.style'
+export { Input, InputPassword, InputTextArea, InputNumber } from './Input.styles'
 export { InputBigNumber } from './InputBigNumber'

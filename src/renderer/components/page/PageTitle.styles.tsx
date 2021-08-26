@@ -1,6 +1,6 @@
 import styled from 'styled-components'
 
-import { Headline } from '../uielements/headline/Headline.style'
+import { Headline } from '../uielements/headline/Headline.styles'
 
 export const Container = styled('div')`
   position: relative;

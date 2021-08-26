@@ -13,7 +13,7 @@ import { getAssetAmountByAsset } from '../../../../helpers/walletHelper'
 import { NonEmptyWalletBalances } from '../../../../services/wallet/types'
 import { QRCodeModal } from '../../qrCodeModal/QRCodeModal'
 import { AssetIcon } from '../assetIcon'
-import * as Styled from './AssetInfo.style'
+import * as Styled from './AssetInfo.styles'
 
 type Props = {
   asset: O.Option<Asset>

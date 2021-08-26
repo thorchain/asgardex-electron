@@ -3,7 +3,7 @@ import React from 'react'
 
 import { TableProps } from 'antd/lib/table'
 
-import { TableWrapper } from './Table.style'
+import { TableWrapper } from './Table.styles'
 
 export type Props = {
   className?: string

@@ -11,7 +11,7 @@ import { WalletBalances } from '../../../../services/clients'
 import { PriceDataIndex } from '../../../../services/midgard/types'
 import { AssetData } from '../assetData'
 import { AssetMenu } from '../assetMenu'
-import * as Styled from './AssetSelect.style'
+import * as Styled from './AssetSelect.styles'
 
 type DropdownCarretProps = {
   open: boolean

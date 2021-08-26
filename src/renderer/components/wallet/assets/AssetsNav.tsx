@@ -5,7 +5,7 @@ import { useIntl } from 'react-intl'
 import { useRouteMatch, Link } from 'react-router-dom'
 
 import * as walletRoutes from '../../../routes/wallet'
-import * as Styled from './AssetsNav.style'
+import * as Styled from './AssetsNav.styles'
 
 enum MenuKey {
   ASSETS = 'assets',

@@ -22,7 +22,7 @@ import { isBnbChain, isEthChain } from '../../../../helpers/chainHelper'
 import { getIntFromName, rainbowStop } from '../../../../helpers/colorHelpers'
 import { useRemoteImage } from '../../../../hooks/useRemoteImage'
 import { bnbIcon, btcIcon, ethIcon, runeIcon, bnbRuneIcon, xRuneIcon } from '../../../icons'
-import * as Styled from './AssetIcon.style'
+import * as Styled from './AssetIcon.styles'
 import { Size } from './AssetIcon.types'
 
 type ComponentProps = {

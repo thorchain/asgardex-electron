@@ -5,7 +5,7 @@ import { Asset } from '@xchainjs/xchain-util'
 import { Network } from '../../../../../shared/api/types'
 import { AssetIcon } from '../assetIcon'
 import { Size as CoinSize } from '../assetIcon/AssetIcon.types'
-import * as Styled from './AssetPair.style'
+import * as Styled from './AssetPair.styles'
 
 type Props = {
   from: Asset

@@ -3,7 +3,7 @@ import React from 'react'
 import { InfoCircleOutlined } from '@ant-design/icons'
 import { AlertProps } from 'antd/lib/alert'
 
-import * as Styled from './Alert.style'
+import * as Styled from './Alert.styles'
 
 type Props = Omit<AlertProps, 'showIcon' | 'icon'>
 

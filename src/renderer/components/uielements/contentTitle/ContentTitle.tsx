@@ -1,6 +1,6 @@
 import React from 'react'
 
-import { ContentTitleWrapper } from './ContentTitle.style'
+import { ContentTitleWrapper } from './ContentTitle.styles'
 
 type Props = {
   className?: string

@@ -3,7 +3,7 @@ import React from 'react'
 import { SyncOutlined } from '@ant-design/icons'
 import styled from 'styled-components'
 
-import { Button as UIButton, ButtonProps as UIButtonProps } from '../../uielements/button'
+import { Button as UIButton, ButtonProps as UIButtonProps } from '../button'
 
 const ContentWrapper = styled.div`
   display: flex;

@@ -16,7 +16,7 @@ import { GetPoolsStatusEnum } from '../../types/generated/midgard'
 import { ManageButton } from '../manageButton'
 import { AssetIcon } from '../uielements/assets/assetIcon'
 import { Button } from '../uielements/button'
-import * as Styled from './PoolTitle.style'
+import * as Styled from './PoolTitle.styles'
 
 export type Props = {
   asset: O.Option<Asset>

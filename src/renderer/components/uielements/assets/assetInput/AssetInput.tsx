@@ -7,7 +7,7 @@ import * as FP from 'fp-ts/lib/function'
 import { FixmeType } from '../../../../types/asgardex'
 import { MaxBalanceButton } from '../../button/MaxBalanceButton'
 import { InputBigNumber } from '../../input'
-import { AssetInputWrapper } from './AssetInput.style'
+import { AssetInputWrapper } from './AssetInput.styles'
 import { AssetInputProps } from './AssetInput.types'
 
 type Props = {

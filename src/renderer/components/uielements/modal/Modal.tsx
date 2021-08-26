@@ -2,7 +2,7 @@ import React from 'react'
 
 import { ModalProps } from 'antd/lib/modal'
 
-import * as Styled from './Modal.style'
+import * as Styled from './Modal.styles'
 
 interface Props extends ModalProps {
   className?: string

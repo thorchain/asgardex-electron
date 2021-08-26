@@ -1,6 +1,6 @@
 import React from 'react'
 
-import * as Styled from './Label.style'
+import * as Styled from './Label.styles'
 
 export type ComponentProps = {
   className?: string

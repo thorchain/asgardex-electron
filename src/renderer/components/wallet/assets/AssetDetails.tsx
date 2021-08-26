@@ -22,7 +22,7 @@ import { AssetInfo } from '../../uielements/assets/assetInfo'
 import { BackLink } from '../../uielements/backLink'
 import { Button, RefreshButton } from '../../uielements/button'
 import { TxsTable } from '../txs/table/TxsTable'
-import * as Styled from './AssetDetails.style'
+import * as Styled from './AssetDetails.styles'
 
 type Props = {
   txsPageRD: TxsPageRD

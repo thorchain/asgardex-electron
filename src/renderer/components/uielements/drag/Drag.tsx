@@ -5,7 +5,7 @@ import Draggable, { ControlPosition, DraggableBounds, DraggableEvent, DraggableE
 
 import { Network } from '../../../../shared/api/types'
 import { AssetIcon } from '../assets/assetIcon'
-import * as Styled from './Drag.style'
+import * as Styled from './Drag.styles'
 
 type Props = {
   network: Network

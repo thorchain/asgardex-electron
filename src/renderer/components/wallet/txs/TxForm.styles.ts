@@ -3,7 +3,7 @@ import * as A from 'antd'
 import styled from 'styled-components'
 import { palette } from 'styled-theme'
 
-import { InnerForm } from '../../shared/form/Form.style'
+import { InnerForm } from '../../shared/form/Form.styles'
 import { Button as UIButton } from '../../uielements/button/Button'
 import { Fees as UIFees } from '../../uielements/fees'
 import { Label as UILabel } from '../../uielements/label'

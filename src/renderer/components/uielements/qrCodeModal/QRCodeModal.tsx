@@ -6,7 +6,7 @@ import { useIntl } from 'react-intl'
 
 import { Network } from '../../../../shared/api/types'
 import { QRCode } from '../qrCode/QRCode'
-import * as Styled from './QRCodeModal.style'
+import * as Styled from './QRCodeModal.styles'
 
 export type Props = {
   asset: Asset
