@@ -58,7 +58,7 @@ export const TxsTable: React.FC<Props> = (props): JSX.Element => {
   )
 
   const renderAddressWithBreak = useCallback(
-    (address: Address, key: string, toColumnFlag = false) => {
+    (address: Address, key: string) => {
       const selfAddress = FP.pipe(
         oWalletAddress,
         O.chain((walletAddress) =>
@@ -69,17 +69,11 @@ export const TxsTable: React.FC<Props> = (props): JSX.Element => {
       )
       return FP.pipe(
         selfAddress,
-        O.getOrElse(() => {
-          if (toColumnFlag && address === RESERVE_MODULE_ADDRESS) {
-            return <Styled.OwnText key={key}>{intl.formatMessage({ id: 'common.fee' })}</Styled.OwnText>
-          } else {
-            return (
-              <Styled.Text key={key}>
-                <AddressEllipsis address={address} chain={chain} network={network} />
-              </Styled.Text>
-            )
-          }
-        })
+        O.getOrElse(() => (
+          <Styled.Text key={key}>
+            <AddressEllipsis address={address} chain={chain} network={network} />
+          </Styled.Text>
+        ))
       )
     },
     [chain, network, oWalletAddress, intl]
@@ -131,9 +125,13 @@ export const TxsTable: React.FC<Props> = (props): JSX.Element => {
     (_, { to }: Tx) =>
       to.map(({ to }, index) => {
         const key = `${to}-${index}`
-        return renderAddressWithBreak(to, key, true)
+        // tag address as FEE in case of sending a tx to reserve module
+        if (to === RESERVE_MODULE_ADDRESS)
+          return <Styled.OwnText key={key}>{intl.formatMessage({ id: 'common.fee' })}</Styled.OwnText>
+
+        return renderAddressWithBreak(to, key)
       }),
-    [renderAddressWithBreak]
+    [intl, renderAddressWithBreak]
   )
 
   const toColumn: ColumnType<Tx> = useMemo(
