@@ -12,6 +12,7 @@ import { useIntl, FormattedDate, FormattedTime } from 'react-intl'
 import { Network } from '../../../../../shared/api/types'
 import { TxsPageRD } from '../../../../services/clients'
 import { MAX_ITEMS_PER_PAGE } from '../../../../services/const'
+import { RESERVE_MODULE_ADDRESS } from '../../../../services/thorchain/const'
 import { ApiError } from '../../../../services/wallet/types'
 import { ErrorView } from '../../../shared/error'
 import { AddressEllipsis } from '../../../uielements/addressEllipsis'
@@ -35,7 +36,7 @@ export const TxsTable: React.FC<Props> = (props): JSX.Element => {
     changePaginationHandler,
     network,
     chain,
-    walletAddress: oWalletAddres = O.none
+    walletAddress: oWalletAddress = O.none
   } = props
   const intl = useIntl()
   const isDesktopView = Grid.useBreakpoint()?.lg ?? false
@@ -59,7 +60,7 @@ export const TxsTable: React.FC<Props> = (props): JSX.Element => {
   const renderAddressWithBreak = useCallback(
     (address: Address, key: string) => {
       const selfAddress = FP.pipe(
-        oWalletAddres,
+        oWalletAddress,
         O.chain((walletAddress) =>
           walletAddress === address
             ? O.some(<Styled.OwnText key={key}>{intl.formatMessage({ id: 'common.address.self' })}</Styled.OwnText>)
@@ -75,7 +76,7 @@ export const TxsTable: React.FC<Props> = (props): JSX.Element => {
         ))
       )
     },
-    [chain, network, oWalletAddres, intl]
+    [chain, network, oWalletAddress, intl]
   )
 
   const renderTypeColumn = useCallback((_, { type }: Tx) => {
@@ -124,9 +125,13 @@ export const TxsTable: React.FC<Props> = (props): JSX.Element => {
     (_, { to }: Tx) =>
       to.map(({ to }, index) => {
         const key = `${to}-${index}`
+        // tag address as FEE in case of sending a tx to reserve module
+        if (to === RESERVE_MODULE_ADDRESS)
+          return <Styled.OwnText key={key}>{intl.formatMessage({ id: 'common.fee' })}</Styled.OwnText>
+
         return renderAddressWithBreak(to, key)
       }),
-    [renderAddressWithBreak]
+    [intl, renderAddressWithBreak]
   )
 
   const toColumn: ColumnType<Tx> = useMemo(
