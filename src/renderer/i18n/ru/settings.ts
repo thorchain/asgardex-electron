@@ -2,6 +2,7 @@ import { SettingMessages } from '../types'
 
 const settings: SettingMessages = {
   'setting.title': 'Настройки',
+  'setting.app.title': 'Глобальные настройки',
   'setting.wallet.management': 'Настройки Кошелька',
   'setting.client': 'Клиент',
   'setting.account.management': 'Настройки Аккаунта',
