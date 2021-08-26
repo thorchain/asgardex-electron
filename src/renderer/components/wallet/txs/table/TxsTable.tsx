@@ -12,6 +12,7 @@ import { useIntl, FormattedDate, FormattedTime } from 'react-intl'
 import { Network } from '../../../../../shared/api/types'
 import { TxsPageRD } from '../../../../services/clients'
 import { MAX_ITEMS_PER_PAGE } from '../../../../services/const'
+import { RESERVE_MODULE_ADDRESS } from '../../../../services/thorchain/const'
 import { ApiError } from '../../../../services/wallet/types'
 import { ErrorView } from '../../../shared/error'
 import { AddressEllipsis } from '../../../uielements/addressEllipsis'
@@ -37,7 +38,6 @@ export const TxsTable: React.FC<Props> = (props): JSX.Element => {
     chain,
     walletAddress: oWalletAddress = O.none
   } = props
-  const FEE_RESERVE_ADDRESS = 'thor1dheycdevq39qlkxs2a6wuuzyn4aqxhve4qxtxt'
   const intl = useIntl()
   const isDesktopView = Grid.useBreakpoint()?.lg ?? false
 
@@ -58,7 +58,7 @@ export const TxsTable: React.FC<Props> = (props): JSX.Element => {
   )
 
   const renderAddressWithBreak = useCallback(
-    (address: Address, key: string) => {
+    (address: Address, key: string, toColumnFlag = false) => {
       const selfAddress = FP.pipe(
         oWalletAddress,
         O.chain((walletAddress) =>
@@ -69,15 +69,17 @@ export const TxsTable: React.FC<Props> = (props): JSX.Element => {
       )
       return FP.pipe(
         selfAddress,
-        O.getOrElse(() => (
-          <Styled.Text key={key}>
-            {address === FEE_RESERVE_ADDRESS ? (
-              <Styled.OwnText key={key}>{intl.formatMessage({ id: 'common.fee' })}</Styled.OwnText>
-            ) : (
-              <AddressEllipsis address={address} chain={chain} network={network} />
-            )}
-          </Styled.Text>
-        ))
+        O.getOrElse(() => {
+          if (toColumnFlag && address === RESERVE_MODULE_ADDRESS) {
+            return <Styled.OwnText key={key}>{intl.formatMessage({ id: 'common.fee' })}</Styled.OwnText>
+          } else {
+            return (
+              <Styled.Text key={key}>
+                <AddressEllipsis address={address} chain={chain} network={network} />
+              </Styled.Text>
+            )
+          }
+        })
       )
     },
     [chain, network, oWalletAddress, intl]
@@ -129,7 +131,7 @@ export const TxsTable: React.FC<Props> = (props): JSX.Element => {
     (_, { to }: Tx) =>
       to.map(({ to }, index) => {
         const key = `${to}-${index}`
-        return renderAddressWithBreak(to, key)
+        return renderAddressWithBreak(to, key, true)
       }),
     [renderAddressWithBreak]
   )
