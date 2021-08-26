@@ -179,7 +179,7 @@ export const AppSettings: React.FC<Props> = (props): JSX.Element => {
 
   return (
     <Styled.Container>
-      <Styled.Title>{intl.formatMessage({ id: 'setting.title' })}</Styled.Title>
+      <Styled.Title>{intl.formatMessage({ id: 'setting.app.title' })}</Styled.Title>
       <Styled.CardContainer>
         <Styled.Card>
           <Styled.SectionsWrapper>
