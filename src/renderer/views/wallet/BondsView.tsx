@@ -17,7 +17,6 @@ import { useAppContext } from '../../contexts/AppContext'
 import { useThorchainContext } from '../../contexts/ThorchainContext'
 import { useUserNodesContext } from '../../contexts/UserNodesContext'
 import { useValidateAddress } from '../../hooks/useValidateAddress'
-import { AddressValidation } from '../../services/clients'
 import { DEFAULT_NETWORK } from '../../services/const'
 import { NodeInfoLD, NodeDataRD } from '../../services/thorchain/types'
 
@@ -32,7 +31,7 @@ export const BondsView: React.FC = (): JSX.Element => {
 
   const oClient = useObservableState<O.Option<ThorchainClient>>(client$, O.none)
 
-  const validateAddress: AddressValidation = useValidateAddress(THORChain)
+  const { validateAddress } = useValidateAddress(THORChain)
 
   const goToExplorerNodeAddress = useCallback(
     (address: Address) =>

@@ -30,7 +30,7 @@ export const UnbondView: React.FC<Props> = ({ openExplorerTxUrl: goToTransaction
   const { interact$ } = useThorchainContext()
   const intl = useIntl()
 
-  const addressValidation = useValidateAddress(THORChain)
+  const { validateAddress } = useValidateAddress(THORChain)
 
   const unbondTx = useCallback(
     ({ memo }: { memo: string }) => {
@@ -61,10 +61,10 @@ export const UnbondView: React.FC<Props> = ({ openExplorerTxUrl: goToTransaction
   return FP.pipe(
     interactState.txRD,
     RD.fold(
-      () => <Unbond addressValidation={addressValidation} onFinish={unbondTx} />,
+      () => <Unbond addressValidation={validateAddress} onFinish={unbondTx} />,
       () => (
         <Unbond
-          addressValidation={addressValidation}
+          addressValidation={validateAddress}
           isLoading={true}
           onFinish={FP.identity}
           loadingProgress={stepLabel}

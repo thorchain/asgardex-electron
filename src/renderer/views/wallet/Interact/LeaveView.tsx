@@ -30,7 +30,7 @@ export const LeaveView: React.FC<Props> = ({ openExplorerTxUrl }) => {
   const { interact$ } = useThorchainContext()
   const intl = useIntl()
 
-  const addressValidation = useValidateAddress(THORChain)
+  const { validateAddress } = useValidateAddress(THORChain)
 
   const leaveTx = useCallback(
     ({ memo }: { memo: string }) => {
@@ -62,10 +62,10 @@ export const LeaveView: React.FC<Props> = ({ openExplorerTxUrl }) => {
   return FP.pipe(
     interactState.txRD,
     RD.fold(
-      () => <Leave addressValidation={addressValidation} onFinish={leaveTx} />,
+      () => <Leave addressValidation={validateAddress} onFinish={leaveTx} />,
       () => (
         <Leave
-          addressValidation={addressValidation}
+          addressValidation={validateAddress}
           isLoading={true}
           onFinish={FP.identity}
           loadingProgress={stepLabel}

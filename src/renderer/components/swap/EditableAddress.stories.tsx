@@ -15,7 +15,7 @@ const defaultProps: EditableAddressProps = {
   onClickOpenAddress: () => console.log('open address in explorer'),
   onChangeAddress: () => console.log('address changed'),
   onChangeEditableMode: () => console.log('edit mode changed'),
-  addressValidator: (address: Address) => eqString.equals(address, bnbAddress)
+  addressValidator: (address: Address) => Promise.resolve(eqString.equals(address, bnbAddress))
 }
 export const StoryDefault: Story = () => <EditableAddress {...defaultProps} />
 StoryDefault.storyName = 'default'

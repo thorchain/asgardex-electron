@@ -4730,10 +4730,10 @@
   resolved "https://registry.yarnpkg.com/@webpack-cli/serve/-/serve-1.5.1.tgz#b5fde2f0f79c1e120307c415a4c1d5eb15a6f278"
   integrity sha512-4vSVUiOPJLmr45S8rMGy7WDvpWxfFxfP/Qx/cxZFCfvoypTYpPPL1X8VIZMe0WTA+Jr7blUxwUSEZNkjoMTgSw==
 
-"@xchainjs/xchain-binance@^5.2.6":
-  version "5.2.6"
-  resolved "https://registry.yarnpkg.com/@xchainjs/xchain-binance/-/xchain-binance-5.2.6.tgz#1eb666688b3e7843902cd596d85ed90dde2e5230"
-  integrity sha512-daXmT34NdM5IzGGVOd4JNpWIiCP9ofADttHoN9ku+8fKxJuoLFdfWyJtsddkiDn3pkixrCQW8b2+wBhv0xvMmw==
+"@xchainjs/xchain-binance@^5.3.0":
+  version "5.3.0"
+  resolved "https://registry.yarnpkg.com/@xchainjs/xchain-binance/-/xchain-binance-5.3.0.tgz#c8f03b06bc8bf8703a873bffed65450e6b0c7c4b"
+  integrity sha512-5uVce0juqaA8uvslxSWSBBpt9lC1q8W/dIrEwlnpvX/GnIfMpXfuBzRq5cqp9MpFELsdlQWcGFXXkhMxTyuPKg==
 
 "@xchainjs/xchain-bitcoin@0.15.11":
   version "0.15.11"

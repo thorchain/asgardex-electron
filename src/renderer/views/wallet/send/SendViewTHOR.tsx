@@ -63,7 +63,7 @@ export const SendViewTHOR: React.FC<Props> = (props): JSX.Element => {
     RD.initial
   )
 
-  const addressValidation = useValidateAddress(THORChain)
+  const { validateAddress } = useValidateAddress(THORChain)
 
   const isLoading = useMemo(() => RD.isPending(sendTxState.status), [sendTxState.status])
 
@@ -85,7 +85,7 @@ export const SendViewTHOR: React.FC<Props> = (props): JSX.Element => {
         balance={balance}
         isLoading={isLoading}
         onSubmit={onSend}
-        addressValidation={addressValidation}
+        addressValidation={validateAddress}
         fee={feeRD}
         reloadFeesHandler={reloadFees}
         validatePassword$={validatePassword$}
@@ -93,7 +93,7 @@ export const SendViewTHOR: React.FC<Props> = (props): JSX.Element => {
         network={network}
       />
     ),
-    [oBalances, isLoading, onSend, addressValidation, feeRD, reloadFees, validatePassword$, sendTxStatusMsg, network]
+    [oBalances, isLoading, onSend, validateAddress, feeRD, reloadFees, validatePassword$, sendTxStatusMsg, network]
   )
   const finishActionHandler = useCallback(() => {
     resetSendTxState()

@@ -8,10 +8,13 @@ import { useObservableState } from 'observable-hooks'
 import * as RxOp from 'rxjs/operators'
 
 import { useChainContext } from '../contexts/ChainContext'
+import { isBnbClient } from '../helpers/clientHelper'
 import { eqChain } from '../helpers/fp/eq'
-import { AddressValidation } from '../services/clients'
+import { AddressValidation, AddressValidationAsync } from '../services/clients'
 
-export const useValidateAddress = (chain: Chain): AddressValidation => {
+export const useValidateAddress = (
+  chain: Chain
+): { validateAddress: AddressValidation; validateSwapAddress: AddressValidationAsync } => {
   const { clientByChain$ } = useChainContext()
   const [oClient, chainUpdated] = useObservableState<O.Option<XChainClient>, Chain>(
     (chain$) =>
@@ -37,6 +40,30 @@ export const useValidateAddress = (chain: Chain): AddressValidation => {
       ),
     [oClient]
   )
+  const validateSwapAddress = useCallback(
+    async (address: Address) =>
+      FP.pipe(
+        oClient,
+        O.map(async (client) => {
+          const valid = client.validateAddress(address)
+          if (valid && isBnbClient(client)) {
+            try {
+              // check BNB account and block if flag !== 0
+              // See https://github.com/thorchain/asgardex-electron/issues/1611
+              // and https://docs.binance.org/changelog.html#apiv1accountaddress
+              const { flags } = await client.getAccount(address)
+              return flags === 0
+            } catch (e) {
+              return false
+            }
+          }
+          return valid
+        }),
+        // In case client is not available (it should never happen), skip validation by returning always `true`
+        O.getOrElse<Promise<boolean>>(() => Promise.resolve(true))
+      ),
+    [oClient]
+  )
 
-  return validateAddress
+  return { validateAddress, validateSwapAddress }
 }

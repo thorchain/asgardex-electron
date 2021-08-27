@@ -208,7 +208,7 @@ export const SwapView: React.FC<Props> = (_): JSX.Element => {
       ),
     [targetAssetRD]
   )
-  const addressValidator = useValidateAddress(targetAssetChain)
+  const { validateSwapAddress } = useValidateAddress(targetAssetChain)
   const openAddressUrl = useOpenAddressUrl(targetAssetChain)
 
   return (
@@ -258,7 +258,7 @@ export const SwapView: React.FC<Props> = (_): JSX.Element => {
                   isApprovedERC20Token$={isApprovedERC20Token$}
                   importWalletHandler={importWalletHandler}
                   clickAddressLinkHandler={openAddressUrl}
-                  addressValidator={addressValidator}
+                  addressValidator={validateSwapAddress}
                 />
               )
             }

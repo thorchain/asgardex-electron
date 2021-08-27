@@ -58,7 +58,7 @@ export const SendViewBCH: React.FC<Props> = (props): JSX.Element => {
 
   const feesWithRatesLD: FeesWithRatesLD = useMemo(() => feesWithRates$(), [feesWithRates$])
   const feesWithRatesRD = useObservableState(feesWithRatesLD, RD.initial)
-  const addressValidation = useValidateAddress(BCHChain)
+  const { validateAddress } = useValidateAddress(BCHChain)
 
   const isLoading = useMemo(() => RD.isPending(sendTxState.status), [sendTxState.status])
 
@@ -79,7 +79,7 @@ export const SendViewBCH: React.FC<Props> = (props): JSX.Element => {
         balance={walletBalance}
         isLoading={isLoading}
         onSubmit={onSend}
-        addressValidation={addressValidation}
+        addressValidation={validateAddress}
         feesWithRates={feesWithRatesRD}
         reloadFeesHandler={reloadFeesWithRates}
         validatePassword$={validatePassword$}
@@ -91,7 +91,7 @@ export const SendViewBCH: React.FC<Props> = (props): JSX.Element => {
       oBalances,
       isLoading,
       onSend,
-      addressValidation,
+      validateAddress,
       feesWithRatesRD,
       reloadFeesWithRates,
       validatePassword$,

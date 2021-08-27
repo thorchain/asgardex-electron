@@ -56,7 +56,7 @@ import {
   SwapFees,
   FeeRD
 } from '../../services/chain/types'
-import { AddressValidation } from '../../services/clients'
+import { AddressValidationAsync } from '../../services/clients'
 import { ApproveFeeHandler, ApproveParams, IsApprovedRD, LoadApproveFeeHandler } from '../../services/ethereum/types'
 import { PoolAssetDetail, PoolAssetDetails, PoolAddress, PoolsDataMap } from '../../services/midgard/types'
 import { MimirHalt } from '../../services/thorchain/types'
@@ -113,7 +113,7 @@ export type SwapProps = {
   haltedChains: Chain[]
   mimirHalt: MimirHalt
   clickAddressLinkHandler: (address: Address) => void
-  addressValidator: AddressValidation
+  addressValidator: AddressValidationAsync
 }
 
 export const Swap = ({
