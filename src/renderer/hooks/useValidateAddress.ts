@@ -10,11 +10,11 @@ import * as RxOp from 'rxjs/operators'
 import { useChainContext } from '../contexts/ChainContext'
 import { isBnbClient } from '../helpers/clientHelper'
 import { eqChain } from '../helpers/fp/eq'
-import { AddressValidation, LazyAddressValidation } from '../services/clients'
+import { AddressValidation, AddressValidationAsync } from '../services/clients'
 
 export const useValidateAddress = (
   chain: Chain
-): { validateAddress: AddressValidation; validateSwapAddress: LazyAddressValidation } => {
+): { validateAddress: AddressValidation; validateSwapAddress: AddressValidationAsync } => {
   const { clientByChain$ } = useChainContext()
   const [oClient, chainUpdated] = useObservableState<O.Option<XChainClient>, Chain>(
     (chain$) =>

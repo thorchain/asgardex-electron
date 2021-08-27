@@ -9,7 +9,7 @@ import { useIntl } from 'react-intl'
 
 import { Network } from '../../../shared/api/types'
 import { truncateAddress } from '../../helpers/addressHelper'
-import { LazyAddressValidation } from '../../services/clients'
+import { AddressValidationAsync } from '../../services/clients'
 import * as Styled from './EditableAddress.styles'
 
 export type EditableAddressProps = {
@@ -19,7 +19,7 @@ export type EditableAddressProps = {
   onClickOpenAddress: (address: Address) => void
   onChangeAddress: (address: Address) => void
   onChangeEditableMode: (editModeActive: boolean) => void
-  addressValidator: LazyAddressValidation
+  addressValidator: AddressValidationAsync
 }
 export const EditableAddress = ({
   asset,
