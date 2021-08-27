@@ -58,13 +58,15 @@ export const EditableAddress = ({
       onChangeAddress(form.getFieldValue(RECIPIENT_FIELD))
       form.resetFields()
       setEditableAddress(O.none)
+      onChangeEditableMode(false)
     }
-  }, [form, onChangeAddress])
+  }, [form, onChangeAddress, onChangeEditableMode])
 
   const cancelEditHandler = useCallback(() => {
     form.resetFields()
     setEditableAddress(O.none)
-  }, [form])
+    onChangeEditableMode(false)
+  }, [form, onChangeEditableMode])
 
   const inputOnKeyDownHandler = useCallback(
     (e) => {
@@ -85,13 +87,18 @@ export const EditableAddress = ({
           {truncatedAddress}
         </Tooltip>
         <div>
-          <Styled.EditAddressIcon onClick={() => setEditableAddress(O.fromNullable(address))} />
+          <Styled.EditAddressIcon
+            onClick={() => {
+              setEditableAddress(O.fromNullable(address))
+              onChangeEditableMode(true)
+            }}
+          />
           <Styled.CopyLabel copyable={{ text: address }} />
           <Styled.AddressLinkIcon onClick={() => onClickOpenAddress(address)} />
         </div>
       </Styled.AddressCustomRecipient>
     )
-  }, [address, truncatedAddress, onClickOpenAddress])
+  }, [address, truncatedAddress, onChangeEditableMode, onClickOpenAddress])
 
   const renderEditableAddress = useCallback(
     (editableAddress: Address) => {
@@ -116,21 +123,15 @@ export const EditableAddress = ({
     [cancelEditHandler, confirmEditHandler, form, inputOnKeyDownHandler, validateAddress]
   )
 
-  const renderCustomAddressInput = useMemo(
+  const renderCustomAddressInput = useCallback(
     () =>
       FP.pipe(
         editableAddress,
-        O.map((address) => {
-          onChangeEditableMode(true)
-          return renderEditableAddress(address)
-        }),
-        O.getOrElse(() => {
-          onChangeEditableMode(false)
-          return renderAddress
-        })
+        O.map((address) => renderEditableAddress(address)),
+        O.getOrElse(() => renderAddress)
       ),
-    [editableAddress, onChangeEditableMode, renderAddress, renderEditableAddress]
+    [editableAddress, renderAddress, renderEditableAddress]
   )
 
-  return renderCustomAddressInput
+  return renderCustomAddressInput()
 }
