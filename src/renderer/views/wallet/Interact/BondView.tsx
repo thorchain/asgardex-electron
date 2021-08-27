@@ -38,7 +38,7 @@ export const BondView: React.FC<Props> = ({ walletAddress, goToTransaction }) =>
   const { interact$ } = useThorchainContext()
   const intl = useIntl()
 
-  const addressValidation = useValidateAddress(THORChain)
+  const { validateAddress } = useValidateAddress(THORChain)
 
   const [runeBalance] = useObservableState(
     () =>
@@ -85,10 +85,10 @@ export const BondView: React.FC<Props> = ({ walletAddress, goToTransaction }) =>
   return FP.pipe(
     interactState.txRD,
     RD.fold(
-      () => <Bond addressValidation={addressValidation} max={runeBalance} onFinish={bondTx} />,
+      () => <Bond addressValidation={validateAddress} max={runeBalance} onFinish={bondTx} />,
       () => (
         <Bond
-          addressValidation={addressValidation}
+          addressValidation={validateAddress}
           isLoading={true}
           max={runeBalance}
           onFinish={FP.identity}

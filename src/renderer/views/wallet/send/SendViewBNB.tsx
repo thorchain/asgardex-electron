@@ -68,7 +68,7 @@ export const SendViewBNB: React.FC<Props> = (props): JSX.Element => {
   /**
    * Address validation provided by BinanceClient
    */
-  const addressValidation = useValidateAddress(BNBChain)
+  const { validateAddress } = useValidateAddress(BNBChain)
 
   const isLoading = useMemo(() => RD.isPending(sendTxState.status), [sendTxState.status])
 
@@ -90,7 +90,7 @@ export const SendViewBNB: React.FC<Props> = (props): JSX.Element => {
         balance={walletBalance}
         isLoading={isLoading}
         onSubmit={onSend}
-        addressValidation={addressValidation}
+        addressValidation={validateAddress}
         fee={feeRD}
         reloadFeesHandler={reloadFees}
         validatePassword$={validatePassword$}
@@ -98,7 +98,7 @@ export const SendViewBNB: React.FC<Props> = (props): JSX.Element => {
         network={network}
       />
     ),
-    [oBalances, isLoading, onSend, addressValidation, feeRD, reloadFees, validatePassword$, sendTxStatusMsg, network]
+    [oBalances, isLoading, onSend, validateAddress, feeRD, reloadFees, validatePassword$, sendTxStatusMsg, network]
   )
 
   const finishActionHandler = useCallback(() => {
