@@ -52,7 +52,6 @@ export const useValidateAddress = (
               // See https://github.com/thorchain/asgardex-electron/issues/1611
               // and https://docs.binance.org/changelog.html#apiv1accountaddress
               const { flags } = await client.getAccount(address)
-              console.log('flags:', flags)
               return flags === 0
             } catch (e) {
               return false
