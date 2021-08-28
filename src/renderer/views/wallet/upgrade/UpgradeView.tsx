@@ -49,14 +49,13 @@ export const UpgradeView: React.FC<Props> = (): JSX.Element => {
   const oRuneNonNativeAsset: O.Option<Asset> = FP.pipe(
     assetFromString(asset),
     O.fromNullable,
+    O.map((a) => {
+      console.log('network:', network)
+      console.log('asset:', a)
+      console.log('isNonNativeRuneAsset:', isNonNativeRuneAsset(a, network))
+      return a
+    }),
     O.filter((asset) => isNonNativeRuneAsset(asset, network))
-  )
-
-  const openExplorerTxUrl: OpenExplorerTxUrl = useOpenExplorerTxUrl(
-    FP.pipe(
-      oRuneNonNativeAsset,
-      O.map(({ chain }) => chain)
-    )
   )
 
   const [runeNonNativeAssetRD, updateRuneNonNativeAssetRD] = useObservableState<AssetWithDecimalRD, O.Option<Asset>>(
@@ -119,15 +118,16 @@ export const UpgradeView: React.FC<Props> = (): JSX.Element => {
     updateRuneNonNativeAssetRD(oRuneNonNativeAsset)
   }, [oRuneNonNativeAsset, updateRuneNonNativeAssetRD, updateTargetPoolAddressRD])
 
-  const renderAssetError = useCallback(
-    () => (
+  const renderDataError = useCallback(
+    (error: Error) => (
       <ErrorView
         title={intl.formatMessage(
-          { id: 'routes.invalid.asset' },
+          { id: 'wallet.upgrade.error.data' },
           {
             asset
           }
         )}
+        subTitle={error?.message ?? error.toString()}
       />
     ),
     [asset, intl]
@@ -159,35 +159,46 @@ export const UpgradeView: React.FC<Props> = (): JSX.Element => {
     )
   }, [reloadInboundAddresses, reloadBalancesByChain, oRuneNonNativeAsset, oBalances, targetPoolAddressRD])
 
+  const openExplorerTxUrl: OpenExplorerTxUrl = useOpenExplorerTxUrl(
+    FP.pipe(
+      oRuneNonNativeAsset,
+      O.map(({ chain }) => chain)
+    )
+  )
+
   return (
     <>
       <BackLink />
+      <div>runeNonNativeAssetRD {JSON.stringify(runeNonNativeAssetRD, null, 2)}</div>
       {FP.pipe(
         runeNonNativeAssetRD,
         RD.fold(
           () => <></>,
           () => <LoadingView size="large" />,
-          renderAssetError,
+          renderDataError,
           (runeAsset) =>
             FP.pipe(
-              // Show an error by invalid or missing asset in route only
+              // Show an error by invalid address
               // All other values should be immediately available by entering the `UpgradeView`
               oRuneNativeAddress,
-              O.fold(renderAssetError, (runeNativeAddress) => {
-                return renderUpgradeComponent(runeAsset, {
-                  walletAddress,
-                  runeAsset,
-                  runeNativeAddress,
-                  targetPoolAddressRD,
-                  validatePassword$,
-                  upgrade$: upgradeRuneToNative$,
-                  balances: oBalances,
-                  successActionHandler: openExplorerTxUrl,
-                  reloadBalancesHandler: reloadBalancesByChain(runeAsset.asset.chain),
-                  network,
-                  reloadOnError
-                })
-              })
+              O.fold(
+                () => renderDataError(Error('Could not get address from asset')),
+                (runeNativeAddress) => {
+                  return renderUpgradeComponent(runeAsset, {
+                    walletAddress,
+                    runeAsset,
+                    runeNativeAddress,
+                    targetPoolAddressRD,
+                    validatePassword$,
+                    upgrade$: upgradeRuneToNative$,
+                    balances: oBalances,
+                    successActionHandler: openExplorerTxUrl,
+                    reloadBalancesHandler: reloadBalancesByChain(runeAsset.asset.chain),
+                    network,
+                    reloadOnError
+                  })
+                }
+              )
             )
         )
       )}

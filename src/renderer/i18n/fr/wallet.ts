@@ -76,6 +76,7 @@ const wallet: WalletMessages = {
   'wallet.upgrade.pending': 'Mise à jour',
   'wallet.upgrade.success': 'Mise à jour réussie',
   'wallet.upgrade.error': 'Échec de la mise à jour',
+  'wallet.upgrade.error.data': 'Invalid data for asset {asset} - FR',
   'wallet.upgrade.error.loadPoolAddress': 'l’adresse de la pool {pool} n’a pas pu être chargée',
   'wallet.upgrade.feeError': 'Les frais supplémentaires {fee} ne sont pas couverts par votre solde {balance}',
   'wallet.validations.lessThen': 'Devrait être inférieur à {value}',
