@@ -1,3 +1,27 @@
+# 0.3.13 (2021-08-28)
+
+## Add
+
+[Settings] Split settings into application and wallet settings [1575](https://github.com/thorchain/asgardex-electron/issues/1575)
+
+[Swap] Allow swap to custom recipient [1683](https://github.com/thorchain/asgardex-electron/issues/1683)
+
+[Wallet] Tag fees in txs history of Rune Native [1698](https://github.com/thorchain/asgardex-electron/issues/1698)
+
+## Fix
+
+[Pools] Fix `disableAllActions` helper [1675](https://github.com/thorchain/asgardex-electron/pull/1675)
+
+[Upgrade] Add upgrade warning for `BNB.RUNE` [1690](https://github.com/thorchain/asgardex-electron/issues/1690)
+
+[Swap] Don't send swap transactions to `BNB` accounts with flags > 0 [1611](https://github.com/thorchain/asgardex-electron/issues/1611)
+
+## Internal
+
+Use consistent naming for styles files [1677](https://github.com/thorchain/asgardex-electron/issues/1677)
+
+SettingsView: Creation of `userAccounts` needs to be more DRY [417](https://github.com/thorchain/asgardex-electron/issues/417)
+
 # 0.3.12 (2021-08-16)
 
 ## Add
