@@ -37,7 +37,7 @@ export const PoolActionsHistoryView: React.FC<{ className?: string }> = ({ class
 
   const { addressByChain$ } = useChainContext()
 
-  const openExplorerTxUrl = useOpenExplorerTxUrl(THORChain)
+  const openExplorerTxUrl = useOpenExplorerTxUrl(O.some(THORChain))
 
   const addresses$ = useMemo<Rx.Observable<Address[]>>(
     () =>

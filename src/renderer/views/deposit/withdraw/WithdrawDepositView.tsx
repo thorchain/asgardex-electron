@@ -101,7 +101,7 @@ export const WithdrawDepositView: React.FC<Props> = (props): JSX.Element => {
     [balances]
   )
 
-  const openRuneExplorerTxUrl: OpenExplorerTxUrl = useOpenExplorerTxUrl(THORChain)
+  const openRuneExplorerTxUrl: OpenExplorerTxUrl = useOpenExplorerTxUrl(O.some(THORChain))
 
   const { network$ } = useAppContext()
   const network = useObservableState<Network>(network$, DEFAULT_NETWORK)
