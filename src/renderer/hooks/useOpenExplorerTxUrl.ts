@@ -5,13 +5,22 @@ import { Chain } from '@xchainjs/xchain-util'
 import * as FP from 'fp-ts/function'
 import * as O from 'fp-ts/Option'
 import { useObservableState } from 'observable-hooks'
+import * as Rx from 'rxjs'
 
 import { useChainContext } from '../contexts/ChainContext'
 import { OpenExplorerTxUrl } from '../services/clients'
 
-export const useOpenExplorerTxUrl = (chain: Chain): OpenExplorerTxUrl => {
+export const useOpenExplorerTxUrl = (oChain: O.Option<Chain>): OpenExplorerTxUrl => {
   const { clientByChain$ } = useChainContext()
-  const [oClient] = useObservableState<O.Option<XChainClient>>(() => clientByChain$(chain), O.none)
+
+  const [oClient] = useObservableState<O.Option<XChainClient>>(
+    () =>
+      FP.pipe(
+        oChain,
+        O.fold(() => Rx.EMPTY, clientByChain$)
+      ),
+    O.none
+  )
 
   const openExplorerTxUrl: OpenExplorerTxUrl = useCallback(
     (txHash: TxHash) =>

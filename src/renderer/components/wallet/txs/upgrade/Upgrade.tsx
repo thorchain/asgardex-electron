@@ -286,7 +286,7 @@ export const Upgrade: React.FC<Props> = (props): JSX.Element => {
   }, [intl, runeAsset.asset.ticker, upgradeTxState])
 
   const renderErrorBtn = useMemo(
-    () => <Styled.Button onClick={onErrorHandler}>{intl.formatMessage({ id: 'common.back' })}</Styled.Button>,
+    () => <Styled.Button onClick={onErrorHandler}>{intl.formatMessage({ id: 'common.retry' })}</Styled.Button>,
     [intl, onErrorHandler]
   )
 

@@ -123,12 +123,10 @@ export const AssetDetailsView: React.FC = (): JSX.Element => {
     )
   }, [oClient, oWalletAddress])
 
-  const openExplorerTxUrl: OpenExplorerTxUrl = FP.pipe(
-    oRouteAsset,
-    O.map(({ chain }) => chain),
-    O.map(useOpenExplorerTxUrl),
-    O.getOrElse<OpenExplorerTxUrl>(
-      () => (_) => Promise.reject(Error(`Can't open explorer url for route asset ${routeAsset}`))
+  const openExplorerTxUrl: OpenExplorerTxUrl = useOpenExplorerTxUrl(
+    FP.pipe(
+      oRouteAsset,
+      O.map(({ chain }) => chain)
     )
   )
 

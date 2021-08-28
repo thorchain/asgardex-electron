@@ -87,7 +87,7 @@ export const PoolHistory: React.FC<Props> = ({ className, poolAsset }) => {
     [loadActionsHistory]
   )
 
-  const openRuneExplorerTxUrl: OpenExplorerTxUrl = useOpenExplorerTxUrl(THORChain)
+  const openRuneExplorerTxUrl: OpenExplorerTxUrl = useOpenExplorerTxUrl(O.some(THORChain))
 
   return (
     <PoolActionsHistory

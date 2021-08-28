@@ -134,7 +134,7 @@ export const SwapView: React.FC<Props> = (_): JSX.Element => {
   )
   const targetWalletAddress = useObservableState(address$, O.none)
 
-  const openExplorerTxUrl: OpenExplorerTxUrl = useOpenExplorerTxUrl(THORChain)
+  const openExplorerTxUrl: OpenExplorerTxUrl = useOpenExplorerTxUrl(O.some(THORChain))
 
   const renderError = useCallback(
     (e: Error) => (
