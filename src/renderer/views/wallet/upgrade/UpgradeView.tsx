@@ -49,12 +49,6 @@ export const UpgradeView: React.FC<Props> = (): JSX.Element => {
   const oRuneNonNativeAsset: O.Option<Asset> = FP.pipe(
     assetFromString(asset),
     O.fromNullable,
-    O.map((a) => {
-      console.log('network:', network)
-      console.log('asset:', a)
-      console.log('isNonNativeRuneAsset:', isNonNativeRuneAsset(a, network))
-      return a
-    }),
     O.filter((asset) => isNonNativeRuneAsset(asset, network))
   )
 
