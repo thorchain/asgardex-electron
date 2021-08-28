@@ -194,6 +194,7 @@ type WalletMessageKey =
   | 'wallet.upgrade.pending'
   | 'wallet.upgrade.success'
   | 'wallet.upgrade.error'
+  | 'wallet.upgrade.error.data'
   | 'wallet.upgrade.error.loadPoolAddress'
   | 'wallet.upgrade.feeError'
   | 'wallet.validations.lessThen'

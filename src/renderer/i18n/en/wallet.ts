@@ -75,6 +75,7 @@ const wallet: WalletMessages = {
   'wallet.upgrade.pending': 'Upgrading',
   'wallet.upgrade.success': 'Successful upgrade',
   'wallet.upgrade.error': 'Upgrade error',
+  'wallet.upgrade.error.data': 'Invalid data for asset {asset}',
   'wallet.upgrade.error.loadPoolAddress': '{pool} pool address could not be loaded',
   'wallet.upgrade.feeError': 'Upgrade fee {fee} is not covered by your balance {balance}',
   'wallet.validations.lessThen': 'Should be less then {value}',

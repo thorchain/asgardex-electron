@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo } from 'react'
+import React, { useCallback, useEffect } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
 import { Address } from '@xchainjs/xchain-client'
@@ -9,6 +9,7 @@ import { useObservableState } from 'observable-hooks'
 import { useIntl } from 'react-intl'
 import { useParams } from 'react-router-dom'
 import * as Rx from 'rxjs'
+import * as RxOp from 'rxjs/operators'
 
 import { Network } from '../../../../shared/api/types'
 import { ErrorView } from '../../../components/shared/error'
@@ -19,6 +20,7 @@ import { useChainContext } from '../../../contexts/ChainContext'
 import { useMidgardContext } from '../../../contexts/MidgardContext'
 import { useWalletContext } from '../../../contexts/WalletContext'
 import { isNonNativeRuneAsset } from '../../../helpers/assetHelper'
+import { eqOAsset } from '../../../helpers/fp/eq'
 import { useOpenExplorerTxUrl } from '../../../hooks/useOpenExplorerTxUrl'
 import { AssetDetailsParams } from '../../../routes/wallet'
 import { AssetWithDecimalLD, AssetWithDecimalRD } from '../../../services/chain/types'
@@ -44,27 +46,27 @@ export const UpgradeView: React.FC<Props> = (): JSX.Element => {
   const { addressByChain$, upgradeRuneToNative$, assetWithDecimal$ } = useChainContext()
 
   // Accept [CHAIN].Rune only
-  const runeNonNativeAsset: O.Option<Asset> = useMemo(
-    () =>
-      FP.pipe(
-        assetFromString(asset),
-        O.fromNullable,
-        O.filter((asset) => isNonNativeRuneAsset(asset, network))
-      ),
-    [asset, network]
+  const oRuneNonNativeAsset: O.Option<Asset> = FP.pipe(
+    assetFromString(asset),
+    O.fromNullable,
+    O.filter((asset) => isNonNativeRuneAsset(asset, network))
   )
 
-  const runeNonNativeAssetWithDecimal$: AssetWithDecimalLD = useMemo(
-    () =>
+  const [runeNonNativeAssetRD, updateRuneNonNativeAssetRD] = useObservableState<AssetWithDecimalRD, O.Option<Asset>>(
+    (oRuneNonNativeAsset$) =>
       FP.pipe(
-        runeNonNativeAsset,
-        O.map((asset) => assetWithDecimal$(asset, network)),
-        O.getOrElse((): AssetWithDecimalLD => Rx.EMPTY)
+        oRuneNonNativeAsset$,
+        RxOp.distinctUntilChanged(eqOAsset.equals),
+        RxOp.switchMap((oAsset) =>
+          FP.pipe(
+            oAsset,
+            O.map((asset) => assetWithDecimal$(asset, network)),
+            O.getOrElse((): AssetWithDecimalLD => Rx.of(RD.initial))
+          )
+        )
       ),
-    [runeNonNativeAsset, network, assetWithDecimal$]
+    RD.initial
   )
-
-  const runeNonNativeAssetRD: AssetWithDecimalRD = useObservableState(runeNonNativeAssetWithDecimal$, RD.initial)
 
   const {
     balancesState$,
@@ -86,28 +88,40 @@ export const UpgradeView: React.FC<Props> = (): JSX.Element => {
 
   const [oRuneNativeAddress] = useObservableState<O.Option<Address>>(() => addressByChain$(THORChain), O.none)
 
-  const [targetPoolAddressRD] = useObservableState<PoolAddressRD>(
-    () =>
+  const [targetPoolAddressRD, updateTargetPoolAddressRD] = useObservableState<PoolAddressRD, O.Option<Asset>>(
+    (oRuneNonNativeAsset$) =>
       FP.pipe(
-        runeNonNativeAsset,
-        O.fold(
-          // No subscription of `poolAddresses$ ` needed for other assets than [CHAIN].RUNE
-          () => Rx.of(RD.failure(Error(intl.formatMessage({ id: 'wallet.errors.asset.notExist' }, { asset })))),
-          (asset) => poolAddressesByChain$(asset.chain)
+        oRuneNonNativeAsset$,
+        RxOp.distinctUntilChanged(eqOAsset.equals),
+        RxOp.switchMap(
+          FP.flow(
+            O.fold(
+              // No subscription of `poolAddresses$ ` needed for other assets than [CHAIN].RUNE
+              () => Rx.of(RD.failure(Error(intl.formatMessage({ id: 'wallet.errors.asset.notExist' }, { asset })))),
+              (asset) => poolAddressesByChain$(asset.chain)
+            )
+          )
         )
       ),
     RD.initial
   )
 
-  const renderAssetError = useCallback(
-    () => (
+  /** Effect to re-trigger calculations for useObservableState's */
+  useEffect(() => {
+    updateTargetPoolAddressRD(oRuneNonNativeAsset)
+    updateRuneNonNativeAssetRD(oRuneNonNativeAsset)
+  }, [oRuneNonNativeAsset, updateRuneNonNativeAssetRD, updateTargetPoolAddressRD])
+
+  const renderDataError = useCallback(
+    (error: Error) => (
       <ErrorView
         title={intl.formatMessage(
-          { id: 'routes.invalid.asset' },
+          { id: 'wallet.upgrade.error.data' },
           {
             asset
           }
         )}
+        subTitle={error?.message ?? error.toString()}
       />
     ),
     [asset, intl]
@@ -132,18 +146,18 @@ export const UpgradeView: React.FC<Props> = (): JSX.Element => {
 
     // Reload chain's balances in case previously it was failed
     FP.pipe(
-      runeNonNativeAsset,
+      oRuneNonNativeAsset,
       O.map(({ chain }) => chain),
       O.map(reloadBalancesByChain),
       O.ap(O.fromPredicate(O.isNone)(oBalances))
     )
-  }, [reloadInboundAddresses, reloadBalancesByChain, runeNonNativeAsset, oBalances, targetPoolAddressRD])
+  }, [reloadInboundAddresses, reloadBalancesByChain, oRuneNonNativeAsset, oBalances, targetPoolAddressRD])
 
-  const openExplorerTxUrl: OpenExplorerTxUrl = FP.pipe(
-    runeNonNativeAsset,
-    O.map(({ chain }) => chain),
-    O.map(useOpenExplorerTxUrl),
-    O.getOrElse<OpenExplorerTxUrl>(() => (_) => Promise.reject(Error(`Can't open explorer url for asset ${asset}`)))
+  const openExplorerTxUrl: OpenExplorerTxUrl = useOpenExplorerTxUrl(
+    FP.pipe(
+      oRuneNonNativeAsset,
+      O.map(({ chain }) => chain)
+    )
   )
 
   return (
@@ -154,27 +168,30 @@ export const UpgradeView: React.FC<Props> = (): JSX.Element => {
         RD.fold(
           () => <></>,
           () => <LoadingView size="large" />,
-          renderAssetError,
+          renderDataError,
           (runeAsset) =>
             FP.pipe(
-              // Show an error by invalid or missing asset in route only
+              // Show an error by invalid address
               // All other values should be immediately available by entering the `UpgradeView`
               oRuneNativeAddress,
-              O.fold(renderAssetError, (runeNativeAddress) => {
-                return renderUpgradeComponent(runeAsset, {
-                  walletAddress,
-                  runeAsset,
-                  runeNativeAddress,
-                  targetPoolAddressRD,
-                  validatePassword$,
-                  upgrade$: upgradeRuneToNative$,
-                  balances: oBalances,
-                  successActionHandler: openExplorerTxUrl,
-                  reloadBalancesHandler: reloadBalancesByChain(runeAsset.asset.chain),
-                  network,
-                  reloadOnError
-                })
-              })
+              O.fold(
+                () => renderDataError(Error('Could not get address from asset')),
+                (runeNativeAddress) => {
+                  return renderUpgradeComponent(runeAsset, {
+                    walletAddress,
+                    runeAsset,
+                    runeNativeAddress,
+                    targetPoolAddressRD,
+                    validatePassword$,
+                    upgrade$: upgradeRuneToNative$,
+                    balances: oBalances,
+                    successActionHandler: openExplorerTxUrl,
+                    reloadBalancesHandler: reloadBalancesByChain(runeAsset.asset.chain),
+                    network,
+                    reloadOnError
+                  })
+                }
+              )
             )
         )
       )}

@@ -50,12 +50,10 @@ export const SendView: React.FC<Props> = (): JSX.Element => {
 
   const { balances } = useObservableState(balancesState$, INITIAL_BALANCES_STATE)
 
-  const openExplorerTxUrl: OpenExplorerTxUrl = FP.pipe(
-    oSelectedAsset,
-    O.map(({ chain }) => chain),
-    O.map(useOpenExplorerTxUrl),
-    O.getOrElse<OpenExplorerTxUrl>(
-      () => (_) => Promise.reject(Error(`Can't open explorer url for route asset ${oSelectedAsset}`))
+  const openExplorerTxUrl: OpenExplorerTxUrl = useOpenExplorerTxUrl(
+    FP.pipe(
+      oSelectedAsset,
+      O.map(({ chain }) => chain)
     )
   )
 

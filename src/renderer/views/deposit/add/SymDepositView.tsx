@@ -171,9 +171,9 @@ export const SymDepositView: React.FC<Props> = (props) => {
     RD.map(getAssetPoolPrice(runPrice))
   )
 
-  const openAssetExplorerTxUrl: OpenExplorerTxUrl = useOpenExplorerTxUrl(asset.chain)
+  const openAssetExplorerTxUrl: OpenExplorerTxUrl = useOpenExplorerTxUrl(O.some(asset.chain))
 
-  const openRuneExplorerTxUrl: OpenExplorerTxUrl = useOpenExplorerTxUrl(THORChain)
+  const openRuneExplorerTxUrl: OpenExplorerTxUrl = useOpenExplorerTxUrl(O.some(THORChain))
 
   const fundsCap: O.Option<FundsCap> = useMemo(
     () =>

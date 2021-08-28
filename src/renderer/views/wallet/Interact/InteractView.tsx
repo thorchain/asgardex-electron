@@ -2,6 +2,7 @@ import React from 'react'
 
 import { THORChain } from '@xchainjs/xchain-util'
 import { Col, Row } from 'antd'
+import * as O from 'fp-ts/lib/Option'
 import { useObservableState } from 'observable-hooks'
 import { useParams } from 'react-router'
 
@@ -24,7 +25,7 @@ export const InteractView: React.FC = () => {
   const { network$ } = useAppContext()
   const network = useObservableState<Network>(network$, DEFAULT_NETWORK)
 
-  const openExplorerTxUrl = useOpenExplorerTxUrl(THORChain)
+  const openExplorerTxUrl = useOpenExplorerTxUrl(O.some(THORChain))
 
   return (
     <>
