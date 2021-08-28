@@ -169,7 +169,6 @@ export const UpgradeView: React.FC<Props> = (): JSX.Element => {
   return (
     <>
       <BackLink />
-      <div>runeNonNativeAssetRD {JSON.stringify(runeNonNativeAssetRD, null, 2)}</div>
       {FP.pipe(
         runeNonNativeAssetRD,
         RD.fold(
