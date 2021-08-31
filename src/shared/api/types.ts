@@ -1,7 +1,7 @@
 import * as RD from '@devexperts/remote-data-ts'
-import Transport from '@ledgerhq/hw-transport'
-import { Address, FeeRate, TxParams } from '@xchainjs/xchain-client'
+import { Address, FeeRate, TxHash, TxParams } from '@xchainjs/xchain-client'
 import { Keystore } from '@xchainjs/xchain-crypto'
+import { ClientUrl as THORClientUrl } from '@xchainjs/xchain-thorchain'
 import { Chain } from '@xchainjs/xchain-util'
 import { Either } from 'fp-ts/lib/Either'
 import * as O from 'fp-ts/Option'
@@ -72,12 +72,19 @@ export enum LedgerErrorId {
   ALREADY_IN_USE,
   NO_APP,
   WRONG_APP,
+  SIGN_FAILED,
+  SEND_TX_FAILED,
   DENIED,
   UNKNOWN
 }
 
-export type LedgerBNCTxInfo = TxParams & {
+export type LedgerBNBTxParams = TxParams & {
   sender: Address
+}
+
+export type LedgerTHORTxParams = TxParams & {
+  sender: Address
+  clientUrl: THORClientUrl
 }
 
 export type LedgerBTCTxInfo = Pick<TxParams, 'amount' | 'recipient'> & {
@@ -87,12 +94,14 @@ export type LedgerBTCTxInfo = Pick<TxParams, 'amount' | 'recipient'> & {
   nodeApiKey: string
 }
 
-export type LedgerTxInfo = LedgerBTCTxInfo | LedgerBNCTxInfo
+export type LedgerTxParams = LedgerTHORTxParams | LedgerBNBTxParams
+
+export type IPCLedgerAdddressParams = { chain: Chain; network: Network }
+export type IPCLedgerSendTxParams = { chain: Chain; network: Network; txParams: LedgerTxParams }
 
 export type ApiHDWallet = {
-  getLedgerAddress: (chain: Chain, network: Network) => Promise<Either<LedgerErrorId, Address>>
-  sendTxInLedger: (chain: Chain, network: Network, txInfo: LedgerTxInfo) => Promise<Either<LedgerErrorId, string>>
-  getTransport: () => Promise<Transport>
+  getLedgerAddress: (params: IPCLedgerAdddressParams) => Promise<Either<LedgerErrorId, Address>>
+  sendLedgerTx: (params: IPCLedgerSendTxParams) => Promise<Either<LedgerErrorId, TxHash>>
 }
 
 declare global {

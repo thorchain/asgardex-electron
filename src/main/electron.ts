@@ -1,7 +1,6 @@
 import { join } from 'path'
 
 import { Keystore } from '@xchainjs/xchain-crypto'
-import { Chain } from '@xchainjs/xchain-util'
 import { BrowserWindow, app, ipcMain, nativeImage } from 'electron'
 import electronDebug from 'electron-debug'
 // import installExtension, { REACT_DEVELOPER_TOOLS } from 'electron-devtools-installer'
@@ -9,17 +8,13 @@ import isDev from 'electron-is-dev'
 import log from 'electron-log'
 import { warn } from 'electron-log'
 
-import { LedgerTxInfo, Network, StoreFileName } from '../shared/api/types'
+import { IPCLedgerAdddressParams, IPCLedgerSendTxParams, StoreFileName } from '../shared/api/types'
 import { DEFAULT_STORAGES } from '../shared/const'
 import { Locale } from '../shared/i18n/types'
 import { registerAppCheckUpdatedHandler } from './api/appUpdate'
 import { getFileStoreService } from './api/fileStore'
 import { saveKeystore, removeKeystore, getKeystore, keystoreExist, exportKeystore, loadKeystore } from './api/keystore'
-import {
-  getAddress as getLedgerAddress,
-  sendTx as sendLedgerTx,
-  getTransport as getLedgerTransport
-} from './api/ledger'
+import { getAddress as getLedgerAddress, sendTx as sendLedgerTx } from './api/ledger'
 import IPCMessages from './ipc/messages'
 import { setMenu } from './menu'
 
@@ -137,13 +132,8 @@ const initIPC = () => {
   )
   ipcMain.handle(IPCMessages.LOAD_KEYSTORE, () => loadKeystore())
   // Ledger
-  ipcMain.handle(IPCMessages.GET_LEDGER_ADDRESS, async (_, chain: Chain, network: Network) =>
-    getLedgerAddress(chain, network)
-  )
-  ipcMain.handle(IPCMessages.SEND_LEDGER_TX, (_, chain: Chain, network: Network, txInfo: LedgerTxInfo) =>
-    sendLedgerTx(chain, network, txInfo)
-  )
-  ipcMain.handle(IPCMessages.GET_TRANSPORT, () => getLedgerTransport())
+  ipcMain.handle(IPCMessages.GET_LEDGER_ADDRESS, async (_, params: IPCLedgerAdddressParams) => getLedgerAddress(params))
+  ipcMain.handle(IPCMessages.SEND_LEDGER_TX, (_, params: IPCLedgerSendTxParams) => sendLedgerTx(params))
   // Update
   registerAppCheckUpdatedHandler(IS_DEV)
   // Register all file-stored data services

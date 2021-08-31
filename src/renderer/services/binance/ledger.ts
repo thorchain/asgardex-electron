@@ -4,7 +4,7 @@ import * as FP from 'fp-ts/lib/function'
 import * as Rx from 'rxjs'
 import { catchError, map, startWith, switchMap } from 'rxjs/operators'
 
-import { LedgerBNCTxInfo, Network } from '../../../shared/api/types'
+import { LedgerBNBTxParams, Network } from '../../../shared/api/types'
 import { liveData } from '../../helpers/rx/liveData'
 import { observableState } from '../../helpers/stateHelper'
 import { ErrorId, LedgerAddressRD, LedgerTxHashLD, LedgerTxHashRD } from '../wallet/types'
@@ -14,7 +14,7 @@ const { get$: ledgerAddress$, set: setLedgerAddressRD } = observableState<Ledger
 
 const retrieveLedgerAddress = (network: Network) =>
   FP.pipe(
-    Rx.from(window.apiHDWallet.getLedgerAddress(BNBChain, network)),
+    Rx.from(window.apiHDWallet.getLedgerAddress({ chain: BNBChain, network })),
     map(RD.fromEither),
     startWith(RD.pending),
     catchError((error) => Rx.of(RD.failure(error)))
@@ -22,9 +22,9 @@ const retrieveLedgerAddress = (network: Network) =>
 
 const { get$: ledgerTxRD$, set: setLedgerTxRD } = observableState<LedgerTxHashRD>(RD.initial)
 
-const ledgerTx$ = (network: Network, params: LedgerBNCTxInfo): LedgerTxHashLD =>
+const ledgerTx$ = (network: Network, params: LedgerBNBTxParams): LedgerTxHashLD =>
   FP.pipe(
-    Rx.from(window.apiHDWallet.sendTxInLedger(BNBChain, network, params)),
+    Rx.from(window.apiHDWallet.sendLedgerTx({ chain: BNBChain, network, txParams: params })),
     switchMap(liveData.fromEither),
     liveData.mapLeft((ledgerErrorId) => ({
       ledgerErrorId: ledgerErrorId,
@@ -34,7 +34,7 @@ const ledgerTx$ = (network: Network, params: LedgerBNCTxInfo): LedgerTxHashLD =>
     startWith(RD.pending)
   )
 
-const pushLedgerTx = (network: Network, params: LedgerBNCTxInfo): Rx.Subscription =>
+const pushLedgerTx = (network: Network, params: LedgerBNBTxParams): Rx.Subscription =>
   ledgerTx$(network, params).subscribe(setLedgerTxRD)
 
 export const createLedgerService = (): LedgerService => ({

@@ -1,5 +1,8 @@
 import { LedgerErrorId } from '../../../shared/api/types'
 
+// TODO (@asgdx-team) Should we remove it? Any ledger implementation should include its own `fromLedgerErrorType` (see ledger/thorchain/common`)
+// as an example.
+
 export const getErrorId = (message: string): LedgerErrorId => {
   if (message.includes('NoDevice') || message.includes('0x6804')) {
     return LedgerErrorId.NO_DEVICE

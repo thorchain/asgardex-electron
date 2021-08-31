@@ -1,39 +1,87 @@
-// Note: Disabled temporary due sign issues on macOS
-
-// import TransportNodeHid from '@ledgerhq/hw-transport-node-hid'
-// import { BNBChain, BTCChain, Chain } from '@xchainjs/xchain-util'
-import { Chain } from '@xchainjs/xchain-util'
+import TransportNodeHidSingleton from '@ledgerhq/hw-transport-node-hid-singleton'
+import { TxHash } from '@xchainjs/xchain-client'
+import { Chain, THORChain } from '@xchainjs/xchain-util'
 import * as E from 'fp-ts/Either'
 
-import { /* LedgerErrorId, */ LedgerTxInfo, Network } from '../../../shared/api/types'
-// import { LedgerBNCTxInfo, LedgerBTCTxInfo, LedgerErrorId, LedgerTxInfo, Network } from '../../../shared/api/types'
-// import { sendTx as sendBNCTx } from './binance'
-// import { sendTx as sendBTCTx } from './bitcoin'
-// import { getErrorId } from './utils'
+import { LedgerErrorId, LedgerTHORTxParams, LedgerTxParams, Network } from '../../../shared/api/types'
+import { sendTx as sendTHORTx } from './thorchain/transaction'
+import { getErrorId } from './utils'
 
-export const sendTx = async (
-  chain: Chain,
-  network: Network,
-  txInfo: LedgerTxInfo
-): Promise<E.Either<Error /* LedgerErrorId */, string>> => {
-  const _disabled = { chain, network, txInfo }
-  return E.left(Error('sendTx for Ledger is disabled temporary'))
-  // try {
-  //   const transport = await TransportNodeHid.open('')
-  //   let res: E.Either<LedgerErrorId, string>
-  //   switch (chain) {
-  //     case BNBChain:
-  //       res = await sendBNCTx(transport, network, txInfo as LedgerBNCTxInfo)
-  //       break
-  //     case BTCChain:
-  //       res = await sendBTCTx(transport, network, txInfo as LedgerBTCTxInfo)
-  //       break
-  //     default:
-  //       res = E.left(LedgerErrorId.NO_APP)
-  //   }
-  //   await transport.close()
-  //   return res
-  // } catch (error) {
-  //   return E.left(getErrorId(error.toString()))
-  // }
+export const sendTx = async ({
+  chain,
+  network,
+  txParams
+}: {
+  chain: Chain
+  network: Network
+  txParams: LedgerTxParams
+}): Promise<E.Either<LedgerErrorId, TxHash>> => {
+  try {
+    const transport = await TransportNodeHidSingleton.open()
+    let res: E.Either<LedgerErrorId, string>
+    switch (chain) {
+      case THORChain:
+        // TODO (@veado) create/use type guard for LedgerTHORTxParams
+        res = await sendTHORTx({ transport, network, txParams: txParams as LedgerTHORTxParams })
+        break
+      default:
+        res = E.left(LedgerErrorId.NO_APP)
+    }
+    await transport.close()
+    return res
+  } catch (error) {
+    return E.left(getErrorId(error.toString()))
+  }
 }
+
+// async signAndBroadcast(unsignedStdTx: StdTx, privkey: PrivKey, signer: AccAddress): Promise<BroadcastTxCommitResult> {
+//   this.setPrefix()
+
+//   let account: BaseAccount = (await auth.accountsAddressGet(this.sdk, signer)).data.result
+//   if (account.account_number === undefined) {
+//     account = BaseAccount.fromJSON((account as BaseAccountResponse).value)
+//   }
+
+//   const signedStdTx = auth.signStdTx(
+//     this.sdk,
+//     privkey,
+//     unsignedStdTx,
+//     account.account_number.toString(),
+//     account.sequence.toString(),
+//   )
+
+//   return (await auth.txsPost(this.sdk, signedStdTx, 'block')).data
+// }
+
+// export const signTx = async ({
+//   walletIndex = 0,
+//   amount,
+//   asset = AssetRuneNative,
+//   recipient,
+//   memo
+// }: TxParams): Promise<BroadcastTxCommitResult> => {
+
+//   getAddressAndPubKey
+//   const msg: Msg = [
+//     MsgSend.fromJSON({
+//       from_address: from,
+//       to_address: recipient,
+//       amount: [
+//         {
+//           amount: amount.toString(),
+//           denom: asset
+//         }
+//       ]
+//     })
+//   ]
+//   const signatures: StdTxSignature[] = []
+
+//   const unsignedStdTx = StdTx.fromJSON({
+//     msg,
+//     fee,
+//     signatures,
+//     memo
+//   })
+
+//   return Promise.reject(Error('no sign/broadcast'))
+// }

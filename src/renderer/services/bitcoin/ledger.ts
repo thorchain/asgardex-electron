@@ -14,7 +14,7 @@ const { get$: ledgerAddress$, set: setLedgerAddressRD } = observableState<Ledger
 
 const retrieveLedgerAddress = (network: Network) =>
   FP.pipe(
-    Rx.from(window.apiHDWallet.getLedgerAddress(BTCChain, network)),
+    Rx.from(window.apiHDWallet.getLedgerAddress({ chain: BTCChain, network })),
     map(RD.fromEither),
     startWith(RD.pending),
     catchError((error) => Rx.of(RD.failure(error)))
@@ -22,9 +22,9 @@ const retrieveLedgerAddress = (network: Network) =>
 
 const { get$: ledgerTxRD$, set: setLedgerTxRD } = observableState<LedgerTxHashRD>(RD.initial)
 
-const ledgerTx$ = (network: Network, params: LedgerBTCTxInfo): LedgerTxHashLD =>
+const ledgerTx$ = (network: Network, txParams: LedgerBTCTxInfo): LedgerTxHashLD =>
   FP.pipe(
-    Rx.from(window.apiHDWallet.sendTxInLedger(BTCChain, network, params)),
+    Rx.from(window.apiHDWallet.sendLedgerTx({ chain: BTCChain, network, txParams })),
     switchMap(liveData.fromEither),
     liveData.mapLeft((ledgerErrorId) => ({
       ledgerErrorId: ledgerErrorId,
