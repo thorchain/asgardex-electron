@@ -138,7 +138,7 @@ export const WalletSettingsView: React.FC = (): JSX.Element => {
         RD.mapLeft((errorId) => Error(ledgerErrorIdToI18n(errorId, intl)))
       )
     }),
-    [intl, thorLedgerAddressRD]
+    [intl, bnbLedgerAddressRD]
   )
 
   const walletAccounts$ = useMemo(() => {
