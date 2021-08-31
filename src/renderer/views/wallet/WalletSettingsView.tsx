@@ -23,7 +23,7 @@ import { useEthereumContext } from '../../contexts/EthereumContext'
 import { useLitecoinContext } from '../../contexts/LitecoinContext'
 import { useThorchainContext } from '../../contexts/ThorchainContext'
 import { useWalletContext } from '../../contexts/WalletContext'
-import { filterEnabledChains, isThorChain } from '../../helpers/chainHelper'
+import { filterEnabledChains, isBnbChain, isThorChain } from '../../helpers/chainHelper'
 import { sequenceTOptionFromArray } from '../../helpers/fpHelpers'
 import { useLedger } from '../../hooks/useLedger'
 import { DEFAULT_NETWORK } from '../../services/const'
@@ -61,14 +61,22 @@ export const WalletSettingsView: React.FC = (): JSX.Element => {
     removeAddress: removeLedgerThorAddress
   } = useLedger(THORChain)
 
+  const {
+    askAddress: askLedgerBnbAddress,
+    address: bnbLedgerAddressRD,
+    removeAddress: removeLedgerBnbAddress
+  } = useLedger(BNBChain)
+
   const addLedgerAddressHandler = (chain: Chain) => {
     if (isThorChain(chain)) return askLedgerThorAddress()
+    if (isBnbChain(chain)) return askLedgerBnbAddress()
 
     return FP.constVoid
   }
 
   const removeLedgerAddressHandler = (chain: Chain) => {
     if (isThorChain(chain)) return removeLedgerThorAddress()
+    if (isBnbChain(chain)) return removeLedgerBnbAddress()
 
     return FP.constVoid
   }
@@ -122,6 +130,17 @@ export const WalletSettingsView: React.FC = (): JSX.Element => {
     [intl, thorLedgerAddressRD]
   )
 
+  const bnbLedgerWalletAddress: WalletAddress = useMemo(
+    () => ({
+      type: 'ledger',
+      address: FP.pipe(
+        bnbLedgerAddressRD,
+        RD.mapLeft((errorId) => Error(ledgerErrorIdToI18n(errorId, intl)))
+      )
+    }),
+    [intl, bnbLedgerAddressRD]
+  )
+
   const walletAccounts$ = useMemo(() => {
     const thorWalletAccount$ = walletAccount$({
       addressUI$: thorAddressUI$,
@@ -130,7 +149,11 @@ export const WalletSettingsView: React.FC = (): JSX.Element => {
     })
     const btcWalletAccount$ = walletAccount$({ addressUI$: btcAddressUI$, chain: BTCChain })
     const ethWalletAccount$ = walletAccount$({ addressUI$: ethAddressUI$, chain: ETHChain })
-    const bnbWalletAccount$ = walletAccount$({ addressUI$: bnbAddressUI$, chain: BNBChain })
+    const bnbWalletAccount$ = walletAccount$({
+      addressUI$: bnbAddressUI$,
+      ledgerAddress: bnbLedgerWalletAddress,
+      chain: BNBChain
+    })
     const bchWalletAccount$ = walletAccount$({ addressUI$: bchAddressUI$, chain: BCHChain })
     const ltcWalletAccount$ = walletAccount$({ addressUI$: ltcAddressUI$, chain: LTCChain })
 
@@ -155,6 +178,7 @@ export const WalletSettingsView: React.FC = (): JSX.Element => {
     btcAddressUI$,
     ethAddressUI$,
     bnbAddressUI$,
+    bnbLedgerWalletAddress,
     bchAddressUI$,
     ltcAddressUI$
   ])
