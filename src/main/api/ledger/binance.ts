@@ -8,10 +8,9 @@ import { crypto } from '@binance-chain/javascript-sdk'
 import AppBNB from '@binance-chain/javascript-sdk/lib/ledger/ledger-app'
 import type Transport from '@ledgerhq/hw-transport'
 import { getDerivePath, getPrefix } from '@xchainjs/xchain-binance'
-import { Network } from '@xchainjs/xchain-client/lib/types'
 import * as E from 'fp-ts/Either'
 
-import { LedgerErrorId } from '../../../shared/api/types'
+import { LedgerErrorId, Network } from '../../../shared/api/types'
 import { toClientNetwork } from '../../../shared/utils/client'
 import { getErrorId } from './utils'
 
