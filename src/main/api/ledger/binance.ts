@@ -2,7 +2,7 @@
 
 import { crypto } from '@binance-chain/javascript-sdk'
 import AppBNB from '@binance-chain/javascript-sdk/lib/ledger/ledger-app'
-import TransportNodeHid from '@ledgerhq/hw-transport-node-hid'
+import type Transport from '@ledgerhq/hw-transport'
 // import { Client, getDerivePath } from '@xchainjs/xchain-binance'
 // import { TxHash } from '@xchainjs/xchain-client'
 // import { AssetBNB, baseToAsset } from '@xchainjs/xchain-util'
@@ -13,7 +13,7 @@ import * as E from 'fp-ts/Either'
 import { LedgerErrorId, Network } from '../../../shared/api/types'
 import { getErrorId } from './utils'
 
-export const getAddress = async (transport: TransportNodeHid, network: Network) => {
+export const getAddress = async (transport: Transport, network: Network) => {
   try {
     const app = new AppBNB(transport)
     const derive_path = getDerivePath(0)
