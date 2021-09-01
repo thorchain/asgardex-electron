@@ -261,7 +261,7 @@ export const createBalancesService = ({
   /**
    * BNB Ledger balances
    */
-  const bnbLedgerChainBalance$: ChainBalance$ = ledgerChainBalance$(THORChain, BNB.getBalanceByAddress$)
+  const bnbLedgerChainBalance$: ChainBalance$ = ledgerChainBalance$(BNBChain, BNB.getBalanceByAddress$)
 
   /**
    * Transforms BNB balances into `ChainBalances`
