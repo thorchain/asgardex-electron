@@ -1,6 +1,6 @@
 import { BNBChain } from '@xchainjs/xchain-util'
 
-import { balances$, reloadBalances, reloadBalances$, resetReloadBalances } from './balances'
+import { balances$, reloadBalances, reloadBalances$, resetReloadBalances, getBalanceByAddress$ } from './balances'
 import { client$, clientState$, address$, explorerUrl$, addressUI$ } from './common'
 import { createFeesService } from './fees'
 import { createLedgerService } from './ledger'
@@ -38,5 +38,6 @@ export {
   removeLedgerAddress,
   ledgerTxRD$,
   pushLedgerTx,
-  resetLedgerTx
+  resetLedgerTx,
+  getBalanceByAddress$
 }

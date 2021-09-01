@@ -1,4 +1,5 @@
 import * as RD from '@devexperts/remote-data-ts'
+import { Address } from '@xchainjs/xchain-client'
 import { AssetBNB, BCHChain, BNBChain, BTCChain, Chain, ETHChain, LTCChain, THORChain } from '@xchainjs/xchain-util'
 import * as A from 'fp-ts/lib/Array'
 import * as FP from 'fp-ts/lib/function'
@@ -32,7 +33,8 @@ import {
   KeystoreState$,
   KeystoreState,
   ChainBalance,
-  LedgerAddressLD
+  LedgerAddressLD,
+  WalletType
 } from './types'
 import { sortBalances } from './util'
 import { hasImportedKeystore } from './util'
@@ -186,39 +188,51 @@ export const createBalancesService = ({
     }))
   )
 
-  const thorLedgerChainBalance$: ChainBalance$ = FP.pipe(
-    network$,
-    RxOp.switchMap((network) => getLedgerAddress$(THORChain, network)),
-    RxOp.switchMap((addressRD) =>
-      FP.pipe(
-        addressRD,
-        RD.toOption,
-        O.fold(
-          () =>
-            // In case we don't get an address,
-            // just return `ChainBalance` w/ initial (empty) balances
-            Rx.of<ChainBalance>({
-              walletType: 'ledger',
-              chain: THORChain,
-              walletAddress: O.none,
-              balances: RD.initial
-            }),
-          (address) =>
-            // Load balances by given Ledger address
-            // and put it's RD state into `balances` of `ChainBalance`
-            FP.pipe(
-              THOR.getBalanceByAddress$(address, 'ledger'),
-              RxOp.map<WalletBalancesRD, ChainBalance>((balances) => ({
+  /**
+   * Factory to create a stream of ledger balances by given chain
+   */
+  const ledgerChainBalance$ = (
+    chain: Chain,
+    getBalanceByAddress$: (address: Address, walletType: WalletType) => WalletBalancesLD
+  ): ChainBalance$ =>
+    FP.pipe(
+      network$,
+      RxOp.switchMap((network) => getLedgerAddress$(chain, network)),
+      RxOp.switchMap((addressRD) =>
+        FP.pipe(
+          addressRD,
+          RD.toOption,
+          O.fold(
+            () =>
+              // In case we don't get an address,
+              // just return `ChainBalance` w/ initial (empty) balances
+              Rx.of<ChainBalance>({
                 walletType: 'ledger',
-                chain: THORChain,
-                walletAddress: O.some(address),
-                balances: balances
-              }))
-            )
+                chain,
+                walletAddress: O.none,
+                balances: RD.initial
+              }),
+            (address) =>
+              // Load balances by given Ledger address
+              // and put it's RD state into `balances` of `ChainBalance`
+              FP.pipe(
+                getBalanceByAddress$(address, 'ledger'),
+                RxOp.map<WalletBalancesRD, ChainBalance>((balances) => ({
+                  walletType: 'ledger',
+                  chain,
+                  walletAddress: O.some(address),
+                  balances: balances
+                }))
+              )
+          )
         )
       )
     )
-  )
+
+  /**
+   * THOR Ledger balances
+   */
+  const thorLedgerChainBalance$: ChainBalance$ = ledgerChainBalance$(THORChain, THOR.getBalanceByAddress$)
 
   /**
    * Transforms LTC balances into `ChainBalances`
@@ -243,6 +257,11 @@ export const createBalancesService = ({
       balances
     }))
   )
+
+  /**
+   * BNB Ledger balances
+   */
+  const bnbLedgerChainBalance$: ChainBalance$ = ledgerChainBalance$(BNBChain, BNB.getBalanceByAddress$)
 
   /**
    * Transforms BNB balances into `ChainBalances`
@@ -294,7 +313,7 @@ export const createBalancesService = ({
       BTC: [btcChainBalance$],
       BCH: [bchChainBalance$],
       ETH: [ethChainBalance$],
-      BNB: [bnbChainBalance$],
+      BNB: [bnbChainBalance$, bnbLedgerChainBalance$],
       LTC: [litecoinBalance$]
     })
   ).pipe(
