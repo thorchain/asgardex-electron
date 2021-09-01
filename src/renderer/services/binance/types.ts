@@ -13,6 +13,7 @@ import { ApiError, LedgerAddressLD, LedgerTxHashLD } from '../wallet/types'
 export type Client$ = C.Client$<Client>
 
 export type ClientState = C.ClientState<Client>
+export type ClientState$ = C.ClientState$<Client>
 
 export type TransferRD = RD.RemoteData<Error, Transfer>
 
