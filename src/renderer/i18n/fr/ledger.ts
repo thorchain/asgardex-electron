@@ -2,7 +2,7 @@ import { LedgerMessages } from '../types'
 
 const ledger: LedgerMessages = {
   'ledger.title': 'Ledger',
-  'ledger.add.device': 'Ajouter votre ledger',
+  'ledger.add.device': 'Ajoutez votre ledger',
   'ledger.error.nodevice': 'Aucun périphérique connecté',
   'ledger.error.inuse': 'Le périphérique est utilisé dans une autre application',
   'ledger.error.noapp':
