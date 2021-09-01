@@ -4,9 +4,9 @@ import { startWith, mapTo, distinctUntilChanged } from 'rxjs/operators'
 import * as RxOp from 'rxjs/operators'
 
 import { Network } from '../../../shared/api/types'
+import { toClientNetwork } from '../../../shared/utils/client'
 import { observableState } from '../../helpers/stateHelper'
 import { SlipTolerance } from '../../types/asgardex'
-import { toClientNetwork } from '../clients'
 import { DEFAULT_NETWORK, DEFAULT_SLIP_TOLERANCE } from '../const'
 import { Network$, SlipTolerance$, OnlineStatus } from './types'
 

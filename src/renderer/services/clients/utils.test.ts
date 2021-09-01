@@ -1,6 +1,6 @@
 import { Network } from '@xchainjs/xchain-client'
 
-import { toClientNetwork } from './utils'
+import { toClientNetwork } from '../../../shared/utils/client'
 
 describe('services/utils/', () => {
   describe('getClientNetwork', () => {
