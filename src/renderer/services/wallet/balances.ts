@@ -220,6 +220,40 @@ export const createBalancesService = ({
     )
   )
 
+  const bnbLedgerChainBalance$: ChainBalance$ = FP.pipe(
+    network$,
+    RxOp.switchMap((network) => getLedgerAddress$(BNBChain, network)),
+    RxOp.switchMap((addressRD) =>
+      FP.pipe(
+        addressRD,
+        RD.toOption,
+        O.fold(
+          () =>
+            // In case we don't get an address,
+            // just return `ChainBalance` w/ initial (empty) balances
+            Rx.of<ChainBalance>({
+              walletType: 'ledger',
+              chain: BNBChain,
+              walletAddress: O.none,
+              balances: RD.initial
+            }),
+          (address) =>
+            // Load balances by given Ledger address
+            // and put it's RD state into `balances` of `ChainBalance`
+            FP.pipe(
+              BNB.getBalanceByAddress$(address, 'ledger'),
+              RxOp.map<WalletBalancesRD, ChainBalance>((balances) => ({
+                walletType: 'ledger',
+                chain: BNBChain,
+                walletAddress: O.some(address),
+                balances: balances
+              }))
+            )
+        )
+      )
+    )
+  )
+
   /**
    * Transforms LTC balances into `ChainBalances`
    */
@@ -294,7 +328,7 @@ export const createBalancesService = ({
       BTC: [btcChainBalance$],
       BCH: [bchChainBalance$],
       ETH: [ethChainBalance$],
-      BNB: [bnbChainBalance$],
+      BNB: [bnbChainBalance$, bnbLedgerChainBalance$],
       LTC: [litecoinBalance$]
     })
   ).pipe(
