@@ -27,7 +27,7 @@ export const getAddress = async (transport: Transport, network: Network) => {
       const address = crypto.getAddressFromPublicKey(pk.toString('hex'), prefix)
       return E.right(address)
     } else {
-      return E.left(LedgerErrorId.UNKNOWN)
+      return E.left(LedgerErrorId.INVALID_PUBKEY)
     }
   } catch (error) {
     return E.left(getErrorId(error.toString()))

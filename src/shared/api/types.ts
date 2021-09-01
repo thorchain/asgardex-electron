@@ -73,6 +73,7 @@ export enum LedgerErrorId {
   NO_APP,
   WRONG_APP,
   DENIED,
+  INVALID_PUBKEY,
   UNKNOWN
 }
 
