@@ -6,11 +6,12 @@ import type Transport from '@ledgerhq/hw-transport'
 // import { Client, getDerivePath } from '@xchainjs/xchain-binance'
 // import { TxHash } from '@xchainjs/xchain-client'
 // import { AssetBNB, baseToAsset } from '@xchainjs/xchain-util'
-import { getDerivePath } from '@xchainjs/xchain-binance'
+import { getDerivePath, getPrefix } from '@xchainjs/xchain-binance'
+import { Network } from '@xchainjs/xchain-client/lib/types'
 import * as E from 'fp-ts/Either'
 
 // import { LedgerBNCTxInfo, LedgerErrorId, Network } from '../../../shared/api/types'
-import { LedgerErrorId, Network } from '../../../shared/api/types'
+import { LedgerErrorId } from '../../../shared/api/types'
 import { getErrorId } from './utils'
 
 export const getAddress = async (transport: Transport, network: Network) => {
@@ -20,7 +21,7 @@ export const getAddress = async (transport: Transport, network: Network) => {
     const { pk } = await app.getPublicKey(derive_path)
     if (pk) {
       // get address from pubkey
-      const address = crypto.getAddressFromPublicKey(pk.toString('hex'), network === 'testnet' ? 'tbnb' : 'bnb')
+      const address = crypto.getAddressFromPublicKey(pk.toString('hex'), getPrefix(network))
       return E.right(address)
     } else {
       return E.left(LedgerErrorId.UNKNOWN)
