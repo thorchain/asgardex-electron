@@ -1,17 +1,18 @@
 // Note: Disabled temporary due sign issues on macOS
 
-import { crypto } from '@binance-chain/javascript-sdk'
-import AppBNB from '@binance-chain/javascript-sdk/lib/ledger/ledger-app'
-import type Transport from '@ledgerhq/hw-transport'
 // import { Client, getDerivePath } from '@xchainjs/xchain-binance'
 // import { TxHash } from '@xchainjs/xchain-client'
 // import { AssetBNB, baseToAsset } from '@xchainjs/xchain-util'
+// import { LedgerBNCTxInfo, LedgerErrorId, Network } from '../../../shared/api/types'
+import { crypto } from '@binance-chain/javascript-sdk'
+import AppBNB from '@binance-chain/javascript-sdk/lib/ledger/ledger-app'
+import type Transport from '@ledgerhq/hw-transport'
 import { getDerivePath, getPrefix } from '@xchainjs/xchain-binance'
 import { Network } from '@xchainjs/xchain-client/lib/types'
 import * as E from 'fp-ts/Either'
 
-// import { LedgerBNCTxInfo, LedgerErrorId, Network } from '../../../shared/api/types'
 import { LedgerErrorId } from '../../../shared/api/types'
+import { toClientNetwork } from '../../../shared/utils/client'
 import { getErrorId } from './utils'
 
 export const getAddress = async (transport: Transport, network: Network) => {
@@ -19,9 +20,11 @@ export const getAddress = async (transport: Transport, network: Network) => {
     const app = new AppBNB(transport)
     const derive_path = getDerivePath(0)
     const { pk } = await app.getPublicKey(derive_path)
+    const clientNetwork = toClientNetwork(network)
+    const prefix = getPrefix(clientNetwork)
     if (pk) {
       // get address from pubkey
-      const address = crypto.getAddressFromPublicKey(pk.toString('hex'), getPrefix(network))
+      const address = crypto.getAddressFromPublicKey(pk.toString('hex'), prefix)
       return E.right(address)
     } else {
       return E.left(LedgerErrorId.UNKNOWN)
