@@ -1,32 +1,34 @@
 // Note: Disabled temporary due sign issues on macOS
 
-// import { crypto } from '@binance-chain/javascript-sdk'
-// import AppBNB from '@binance-chain/javascript-sdk/lib/ledger/ledger-app'
-// import TransportNodeHid from '@ledgerhq/hw-transport-node-hid'
+import { crypto } from '@binance-chain/javascript-sdk'
+import AppBNB from '@binance-chain/javascript-sdk/lib/ledger/ledger-app'
+import TransportNodeHid from '@ledgerhq/hw-transport-node-hid'
 // import { Client, getDerivePath } from '@xchainjs/xchain-binance'
 // import { TxHash } from '@xchainjs/xchain-client'
 // import { AssetBNB, baseToAsset } from '@xchainjs/xchain-util'
-// import * as E from 'fp-ts/Either'
+import { getDerivePath } from '@xchainjs/xchain-binance'
+import * as E from 'fp-ts/Either'
 
 // import { LedgerBNCTxInfo, LedgerErrorId, Network } from '../../../shared/api/types'
-// import { getErrorId } from './utils'
+import { LedgerErrorId, Network } from '../../../shared/api/types'
+import { getErrorId } from './utils'
 
-// export const getAddress = async (transport: TransportNodeHid, network: Network) => {
-//   try {
-//     const app = new AppBNB(transport)
-//     const derive_path = getDerivePath(0)
-//     const { pk } = await app.getPublicKey(derive_path)
-//     if (pk) {
-//       // get address from pubkey
-//       const address = crypto.getAddressFromPublicKey(pk.toString('hex'), network === 'testnet' ? 'tbnb' : 'bnb')
-//       return E.right(address)
-//     } else {
-//       return E.left(LedgerErrorId.UNKNOWN)
-//     }
-//   } catch (error) {
-//     return E.left(getErrorId(error.toString()))
-//   }
-// }
+export const getAddress = async (transport: TransportNodeHid, network: Network) => {
+  try {
+    const app = new AppBNB(transport)
+    const derive_path = getDerivePath(0)
+    const { pk } = await app.getPublicKey(derive_path)
+    if (pk) {
+      // get address from pubkey
+      const address = crypto.getAddressFromPublicKey(pk.toString('hex'), network === 'testnet' ? 'tbnb' : 'bnb')
+      return E.right(address)
+    } else {
+      return E.left(LedgerErrorId.UNKNOWN)
+    }
+  } catch (error) {
+    return E.left(getErrorId(error.toString()))
+  }
+}
 
 // export const sendTx = async (
 //   transport: TransportNodeHid,
