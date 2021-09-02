@@ -19,12 +19,14 @@ import { WalletBalance } from '../../../../services/wallet/types'
 import { SendFormBNB, Props as SendFormBNBProps } from './SendFormBNB'
 
 const bnbBalance: WalletBalance = {
+  walletType: 'keystore',
   asset: AssetBNB,
   amount: assetToBase(assetAmount(123)),
   walletAddress: 'AssetBNB wallet address'
 }
 
 const runeBalance: WalletBalance = {
+  walletType: 'keystore',
   asset: AssetRune67C,
   amount: assetToBase(assetAmount(234)),
   walletAddress: 'AssetRune67C wallet address'

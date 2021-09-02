@@ -12,6 +12,7 @@ storiesOf('Wallet/AccountSelector', module)
       <AccountSelector
         selectedAsset={ASSETS_MAINNET.BOLT}
         walletBalances={[AssetBNB, ASSETS_MAINNET.TOMO].map((asset) => ({
+          walletType: 'keystore',
           asset,
           amount: assetToBase(assetAmount(1)),
           walletAddress: `${assetToString(asset)} wallet`

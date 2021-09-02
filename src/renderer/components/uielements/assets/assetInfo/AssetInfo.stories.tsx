@@ -21,6 +21,7 @@ export const AssetInfoStory: Story<{
       asset={O.some(AssetRuneNative)}
       assetsWB={O.some([
         {
+          walletType: 'keystore',
           asset: AssetRuneNative,
           amount: assetToBase(assetAmount(balance)),
           walletAddress: ''

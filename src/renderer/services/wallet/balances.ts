@@ -32,7 +32,8 @@ import {
   KeystoreState$,
   KeystoreState,
   ChainBalance,
-  LedgerAddressLD
+  LedgerAddressLD,
+  WalletType
 } from './types'
 import { sortBalances } from './util'
 import { hasImportedKeystore } from './util'
@@ -46,16 +47,37 @@ export const createBalancesService = ({
   network$: Network$
   getLedgerAddress$: (chain: Chain, network: Network) => LedgerAddressLD
 }): BalancesService => {
+  // reload all balances
   const reloadBalances: FP.Lazy<void> = () => {
-    BTC.reloadBalances()
     BNB.reloadBalances()
+    BTC.reloadBalances()
+    BCH.reloadBalances()
     ETH.reloadBalances()
     THOR.reloadBalances()
     LTC.reloadBalances()
-    BCH.reloadBalances()
   }
 
-  const getServiceByChain = (chain: Chain): ChainBalancesService => {
+  // Returns lazy functions to reload balances by given chain
+  const reloadBalancesByChain = (chain: Chain) => {
+    switch (chain) {
+      case BNBChain:
+        return BNB.reloadBalances
+      case BTCChain:
+        return BTC.reloadBalances
+      case BCHChain:
+        return BCH.reloadBalances
+      case ETHChain:
+        return ETH.reloadBalances
+      case THORChain:
+        return THOR.reloadBalances
+      case LTCChain:
+        return LTC.reloadBalances
+      default:
+        return FP.constVoid
+    }
+  }
+
+  const getServiceByChain = (chain: Chain, walletType: WalletType): ChainBalancesService => {
     switch (chain) {
       case BNBChain:
         return {
@@ -63,7 +85,7 @@ export const createBalancesService = ({
           resetReloadBalances: BNB.resetReloadBalances,
           balances$: FP.pipe(
             network$,
-            RxOp.switchMap((network) => BNB.balances$(network))
+            RxOp.switchMap((network) => BNB.balances$(walletType, network))
           ),
           reloadBalances$: BNB.reloadBalances$
         }
@@ -71,14 +93,14 @@ export const createBalancesService = ({
         return {
           reloadBalances: BTC.reloadBalances,
           resetReloadBalances: BTC.resetReloadBalances,
-          balances$: BTC.balances$,
+          balances$: BTC.balances$(walletType),
           reloadBalances$: BTC.reloadBalances$
         }
       case BCHChain:
         return {
           reloadBalances: BCH.reloadBalances,
           resetReloadBalances: BCH.resetReloadBalances,
-          balances$: BCH.balances$,
+          balances$: BCH.balances$(walletType),
           reloadBalances$: BCH.reloadBalances$
         }
       case ETHChain:
@@ -87,7 +109,7 @@ export const createBalancesService = ({
           resetReloadBalances: ETH.resetReloadBalances,
           balances$: FP.pipe(
             network$,
-            RxOp.switchMap((network) => ETH.balances$(network === 'testnet' ? ETHAssets : undefined))
+            RxOp.switchMap((network) => ETH.balances$(walletType, network === 'testnet' ? ETHAssets : undefined))
           ),
           reloadBalances$: ETH.reloadBalances$
         }
@@ -95,14 +117,14 @@ export const createBalancesService = ({
         return {
           reloadBalances: THOR.reloadBalances,
           resetReloadBalances: THOR.resetReloadBalances,
-          balances$: THOR.balances$,
+          balances$: THOR.balances$(walletType),
           reloadBalances$: THOR.reloadBalances$
         }
       case LTCChain:
         return {
           reloadBalances: LTC.reloadBalances,
           resetReloadBalances: LTC.resetReloadBalances,
-          balances$: LTC.balances$,
+          balances$: LTC.balances$(walletType),
           reloadBalances$: LTC.reloadBalances$
         }
       default:
@@ -113,10 +135,6 @@ export const createBalancesService = ({
           reloadBalances$: Rx.EMPTY
         }
     }
-  }
-
-  const reloadBalancesByChain: (chain: Chain) => FP.Lazy<void> = (chain) => {
-    return getServiceByChain(chain).reloadBalances
   }
 
   /**
@@ -138,8 +156,8 @@ export const createBalancesService = ({
     }
   })
 
-  const getChainBalance$ = (chain: Chain): WalletBalancesLD => {
-    const chainService = getServiceByChain(chain)
+  const getChainBalance$ = (chain: Chain, walletType: WalletType): WalletBalancesLD => {
+    const chainService = getServiceByChain(chain, walletType)
     const reload$ = FP.pipe(
       chainService.reloadBalances$,
       RxOp.finalize(() => {
@@ -177,7 +195,10 @@ export const createBalancesService = ({
   /**
    * Transforms THOR balances into `ChainBalances`
    */
-  const thorChainBalance$: ChainBalance$ = Rx.combineLatest([THOR.addressUI$, getChainBalance$(THORChain)]).pipe(
+  const thorChainBalance$: ChainBalance$ = Rx.combineLatest([
+    THOR.addressUI$,
+    getChainBalance$(THORChain, 'keystore')
+  ]).pipe(
     RxOp.map(([walletAddress, balances]) => ({
       walletType: 'keystore',
       chain: THORChain,
@@ -212,7 +233,7 @@ export const createBalancesService = ({
                 walletType: 'ledger',
                 chain: THORChain,
                 walletAddress: O.some(address),
-                balances: balances
+                balances
               }))
             )
         )
@@ -223,7 +244,10 @@ export const createBalancesService = ({
   /**
    * Transforms LTC balances into `ChainBalances`
    */
-  const litecoinBalance$: ChainBalance$ = Rx.combineLatest([LTC.addressUI$, getChainBalance$(LTCChain)]).pipe(
+  const litecoinBalance$: ChainBalance$ = Rx.combineLatest([
+    LTC.addressUI$,
+    getChainBalance$(LTCChain, 'keystore')
+  ]).pipe(
     RxOp.map(([walletAddress, balances]) => ({
       walletType: 'keystore',
       chain: LTCChain,
@@ -235,7 +259,10 @@ export const createBalancesService = ({
   /**
    * Transforms BCH balances into `ChainBalances`
    */
-  const bchChainBalance$: ChainBalance$ = Rx.combineLatest([BCH.addressUI$, getChainBalance$(BCHChain)]).pipe(
+  const bchChainBalance$: ChainBalance$ = Rx.combineLatest([
+    BCH.addressUI$,
+    getChainBalance$(BCHChain, 'keystore')
+  ]).pipe(
     RxOp.map(([walletAddress, balances]) => ({
       walletType: 'keystore',
       chain: BCHChain,
@@ -247,7 +274,11 @@ export const createBalancesService = ({
   /**
    * Transforms BNB balances into `ChainBalances`
    */
-  const bnbChainBalance$: ChainBalance$ = Rx.combineLatest([BNB.addressUI$, getChainBalance$(BNBChain), network$]).pipe(
+  const bnbChainBalance$: ChainBalance$ = Rx.combineLatest([
+    BNB.addressUI$,
+    getChainBalance$(BNBChain, 'keystore'),
+    network$
+  ]).pipe(
     RxOp.map(([walletAddress, balances, network]) => ({
       walletType: 'keystore',
       chain: BNBChain,
@@ -262,7 +293,10 @@ export const createBalancesService = ({
   /**
    * Transforms BTC balances into `ChainBalance`
    */
-  const btcChainBalance$: ChainBalance$ = Rx.combineLatest([BTC.addressUI$, getChainBalance$(BTCChain)]).pipe(
+  const btcChainBalance$: ChainBalance$ = Rx.combineLatest([
+    BTC.addressUI$,
+    getChainBalance$(BTCChain, 'keystore')
+  ]).pipe(
     RxOp.map(([walletAddress, balances]) => ({
       walletType: 'keystore',
       chain: BTCChain,
@@ -271,7 +305,7 @@ export const createBalancesService = ({
     }))
   )
 
-  const ethBalances$ = getChainBalance$(ETHChain)
+  const ethBalances$ = getChainBalance$(ETHChain, 'keystore')
 
   /**
    * Transforms ETH data (address + `WalletBalance`) into `ChainBalance`
@@ -306,32 +340,31 @@ export const createBalancesService = ({
   /**
    * Transform a list of BalancesLD
    * into a "single" state of `BalancesState`
-   * to provide loading / error / data states in a single "state" object
+   * to provide loading / error / data states of nested `balances` in a single "state" object
    *
    * Note: Empty list of balances won't be included in `BalancesState`!!
    */
-  const balancesState$: BalancesState$ = Rx.combineLatest(
-    filterEnabledChains({
-      THOR: [getChainBalance$(THORChain)],
-      BTC: [getChainBalance$(BTCChain)],
-      BCH: [getChainBalance$(BCHChain)],
-      ETH: [ethBalances$],
-      BNB: [getChainBalance$(BNBChain)],
-      LTC: [getChainBalance$(LTCChain)]
-    })
-  ).pipe(
-    RxOp.map((balancesList) => ({
+  const balancesState$: BalancesState$ = FP.pipe(
+    chainBalances$,
+    RxOp.map((chainBalances) => ({
       balances: FP.pipe(
-        balancesList,
+        chainBalances,
         // filter results out
         // Transformation: RD<ApiError, WalletBalances>[]`-> `WalletBalances[]`
-        A.filterMap(RD.toOption),
+        A.filterMap(({ balances }) => RD.toOption(balances)),
         A.flatten,
         NEA.fromArray
       ),
-      loading: FP.pipe(balancesList, A.elem(eqBalancesRD)(RD.pending)),
+      loading: FP.pipe(
+        chainBalances,
+        // get list of balances
+        A.map(({ balances }) => balances),
+        A.elem(eqBalancesRD)(RD.pending)
+      ),
       errors: FP.pipe(
-        balancesList,
+        chainBalances,
+        // get list of balances
+        A.map(({ balances }) => balances),
         // filter errors out
         A.filter(RD.isFailure),
         // Transformation to get Errors out of RD:

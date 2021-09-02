@@ -16,6 +16,7 @@ export const sendTx = async ({
   network: Network
   txParams: LedgerTxParams
 }): Promise<E.Either<LedgerErrorId, TxHash>> => {
+  console.log('main sendTx:', network, txParams)
   try {
     const transport = await TransportNodeHidSingleton.open()
     let res: E.Either<LedgerErrorId, string>

@@ -2,6 +2,7 @@ import { AssetRuneNative } from '@xchainjs/xchain-util'
 
 import { observableState } from '../../helpers/stateHelper'
 import * as C from '../clients'
+import { WalletType } from '../wallet/types'
 import { client$ } from './common'
 
 /**
@@ -21,7 +22,8 @@ const reloadBalances = () => {
 
 // State of balances loaded by Client
 // Currently in ASGDX `AssetRuneNative` is supported only. Remove asset list if we want to get balances of all assets at THORChain.
-const balances$: C.WalletBalancesLD = C.balances$(client$, reloadBalances$, [AssetRuneNative])
+const balances$ = (walletType: WalletType): C.WalletBalancesLD =>
+  C.balances$({ client$, trigger$: reloadBalances$, assets: [AssetRuneNative], walletType })
 
 // State of balances loaded by Client and Address
 const getBalanceByAddress$ = C.balancesByAddress$(client$, reloadBalances$)

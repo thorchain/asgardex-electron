@@ -14,12 +14,14 @@ import { SendFormETH } from './index'
 import { Props as SendFormETHProps } from './SendFormETH'
 
 const ethBalance: WalletBalance = {
+  walletType: 'keystore',
   asset: AssetETH,
   amount: assetToBase(assetAmount(1.23, ETH_DECIMAL)),
   walletAddress: 'AssetETH wallet address'
 }
 
 const runeBalance: WalletBalance = {
+  walletType: 'keystore',
   asset: AssetRuneNative,
   amount: assetToBase(assetAmount(2, THORCHAIN_DECIMAL)),
   walletAddress: 'rune wallet address'

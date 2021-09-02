@@ -24,7 +24,7 @@ const { get$: ledgerTxRD$, set: setLedgerTxRD } = observableState<LedgerTxHashRD
 
 const ledgerTx$ = (network: Network, txParams: LedgerBTCTxInfo): LedgerTxHashLD =>
   FP.pipe(
-    Rx.from(window.apiHDWallet.sendLedgerTx({ chain: BTCChain, network, txParams })),
+    Rx.from(window.apiHDWallet.sendLedgerTx({ chain: BTCChain, network, ...txParams })),
     switchMap(liveData.fromEither),
     liveData.mapLeft((ledgerErrorId) => ({
       ledgerErrorId: ledgerErrorId,

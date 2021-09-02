@@ -132,8 +132,19 @@ const initIPC = () => {
   )
   ipcMain.handle(IPCMessages.LOAD_KEYSTORE, () => loadKeystore())
   // Ledger
-  ipcMain.handle(IPCMessages.GET_LEDGER_ADDRESS, async (_, params: IPCLedgerAdddressParams) => getLedgerAddress(params))
-  ipcMain.handle(IPCMessages.SEND_LEDGER_TX, (_, params: IPCLedgerSendTxParams) => sendLedgerTx(params))
+  ipcMain.handle(IPCMessages.GET_LEDGER_ADDRESS, async (_, params: IPCLedgerAdddressParams) => {
+    console.log('ipcMain.handle: GET_LEDGER_ADDRESS', params)
+    return getLedgerAddress(params)
+  })
+  ipcMain.handle(
+    IPCMessages.SEND_LEDGER_TX,
+    async (_, { chain, network, amount, recipient, memo, sender }: IPCLedgerSendTxParams) => {
+      // async (_, { chain, network }: IPCLedgerSendTxParams) => {
+      console.log('ipcMain.handle: SEND_LEDGER_TX', chain, network)
+      // return Promise.resolve('tx hash')
+      return sendLedgerTx({ chain, network, txParams: { amount, recipient, sender, memo } })
+    }
+  )
   // Update
   registerAppCheckUpdatedHandler(IS_DEV)
   // Register all file-stored data services

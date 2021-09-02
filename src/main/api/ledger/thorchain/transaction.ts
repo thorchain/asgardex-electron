@@ -2,7 +2,7 @@ import type Transport from '@ledgerhq/hw-transport'
 import THORChainApp, { extractSignatureFromTLV, LedgerErrorType } from '@thorchain/ledger-thorchain'
 import { TxHash } from '@xchainjs/xchain-client'
 import { CosmosSDKClient } from '@xchainjs/xchain-cosmos'
-import { DEFAULT_GAS_VALUE, getChainId, getPrefix } from '@xchainjs/xchain-thorchain'
+import { DEFAULT_GAS_VALUE, getChainId, getDenom, getPrefix } from '@xchainjs/xchain-thorchain'
 import { AssetRuneNative } from '@xchainjs/xchain-util'
 import { AccAddress, Msg, PubKeySecp256k1 } from 'cosmos-client'
 import { auth, StdTx } from 'cosmos-client/x/auth'
@@ -64,7 +64,7 @@ export const sendTx = async ({
         amount: [
           {
             amount: amount.toString(),
-            denom: asset
+            denom: getDenom(asset)
           }
         ]
       })

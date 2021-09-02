@@ -29,18 +29,21 @@ import { WalletBalance } from '../../../services/wallet/types'
 import { SymDeposit, Props as SymDepositProps } from './SymDeposit'
 
 const balanceBNB: WalletBalance = {
+  walletType: 'keystore',
   amount: assetToBase(assetAmount(1)),
   asset: AssetBNB,
   walletAddress: ''
 }
 
 const balanceBTC: WalletBalance = {
+  walletType: 'keystore',
   asset: AssetBTC,
   amount: assetToBase(assetAmount(2)),
   walletAddress: ''
 }
 
 const balanceTOMO: WalletBalance = {
+  walletType: 'keystore',
   asset: AssetETH,
   amount: assetToBase(assetAmount(3)),
   walletAddress: ''

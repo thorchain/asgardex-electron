@@ -41,11 +41,13 @@ const balances: Partial<Record<Chain, ChainBalances>> = {
       chain: BNBChain,
       balances: RD.success([
         {
+          walletType: 'keystore',
           amount: baseAmount('1000000'),
           asset: AssetBNB,
           walletAddress: 'BNB wallet address'
         },
         {
+          walletType: 'keystore',
           amount: baseAmount('300000000'),
           asset: AssetRune67C,
           walletAddress: 'BNB wallet address'
@@ -60,6 +62,7 @@ const balances: Partial<Record<Chain, ChainBalances>> = {
       chain: BTCChain,
       balances: RD.success([
         {
+          walletType: 'keystore',
           amount: baseAmount('1000000'),
           asset: AssetBTC,
           walletAddress: 'BNB wallet address'
@@ -74,6 +77,7 @@ const balances: Partial<Record<Chain, ChainBalances>> = {
       chain: ETHChain,
       balances: RD.success([
         {
+          walletType: 'keystore',
           amount: baseAmount('300000000'),
           asset: AssetETH,
           walletAddress: 'ETH wallet address'
@@ -88,6 +92,7 @@ const balances: Partial<Record<Chain, ChainBalances>> = {
       chain: THORChain,
       balances: RD.success([
         {
+          walletType: 'keystore',
           amount: baseAmount('1000000'),
           asset: AssetRuneNative,
           walletAddress: 'BNB wallet address'
@@ -102,6 +107,7 @@ const balances: Partial<Record<Chain, ChainBalances>> = {
       chain: LTCChain,
       balances: RD.success([
         {
+          walletType: 'keystore',
           amount: baseAmount('1000000'),
           asset: AssetLTC,
           walletAddress: 'LTC wallet address'

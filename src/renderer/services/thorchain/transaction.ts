@@ -56,8 +56,12 @@ export const createTransactionService = (client$: Client$, network$: Network$): 
       amount: params.amount,
       recipient: params.recipient
     }
+    console.log('service THOR sendLedgerTx:', network, txParams)
+    console.log('window.apiHDWallet:', window.apiHDWallet)
     return FP.pipe(
-      Rx.from(window.apiHDWallet.sendLedgerTx({ chain: THORChain, network, txParams })),
+      // Rx.from(window.apiHDWallet.sendLedgerTx({ chain: THORChain, network })),
+      Rx.from(window.apiHDWallet.sendLedgerTx({ chain: THORChain, network, ...txParams })),
+      RxOp.tap((r) => console.log('r:', r)),
       RxOp.switchMap(
         FP.flow(
           E.fold<LedgerErrorId, TxHash, TxHashLD>(
@@ -75,8 +79,9 @@ export const createTransactionService = (client$: Client$, network$: Network$): 
     )
   }
 
-  const sendTx = (params: SendTxParams) =>
-    FP.pipe(
+  const sendTx = (params: SendTxParams) => {
+    console.log('service THOR sendTx:', params)
+    return FP.pipe(
       Rx.combineLatest([client$, network$]),
       RxOp.switchMap(([oClient, network]) =>
         FP.pipe(
@@ -93,6 +98,7 @@ export const createTransactionService = (client$: Client$, network$: Network$): 
         return common.sendTx(params)
       })
     )
+  }
 
   return {
     ...common,

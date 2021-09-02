@@ -19,12 +19,14 @@ import { WalletBalance } from '../../../../services/wallet/types'
 import { SendFormBCH as Component, Props as ComponentProps } from './SendFormBCH'
 
 const bchBalance: WalletBalance = {
+  walletType: 'keystore',
   asset: AssetBCH,
   amount: assetToBase(assetAmount(1.23, BCH_DECIMAL)),
   walletAddress: 'btc wallet address'
 }
 
 const runeBalance: WalletBalance = {
+  walletType: 'keystore',
   asset: AssetRuneNative,
   amount: assetToBase(assetAmount(2, BCH_DECIMAL)),
   walletAddress: 'rune wallet address'
