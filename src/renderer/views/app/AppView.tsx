@@ -125,12 +125,10 @@ export const AppView: React.FC = (): JSX.Element => {
         rdAltOnPending(() => prevMimirHaltRD.current),
         RD.toOption,
         O.map(({ haltThorChain, haltEthChain, haltBnbChain }) => {
-          //
-
-          const mkMsg = (chainTx: string) => intl.formatMessage({ id: 'halt.chain.upgrade' }, { chain: chainTx })
+          const mkMsg = (chainTx: string) => intl.formatMessage({ id: 'halt.chain.upgrade' }, { chainTx: chainTx })
           const mkAlert = (msg: string) => <Styled.Alert key={'upgrade_warning'} type="warning" message={msg} />
 
-          if (haltThorChain || (haltEthChain && haltBnbChain)) return FP.pipe(mkMsg('ETH.RUNE and BNB.RUNE'), mkAlert)
+          if (haltThorChain || (haltEthChain && haltBnbChain)) return FP.pipe(mkMsg('ETH.RUNE, BNB.RUNE'), mkAlert)
           if (haltEthChain) return FP.pipe(mkMsg('ETH.RUNE'), mkAlert)
           if (haltBnbChain) return FP.pipe(mkMsg('BNB.RUNE'), mkAlert)
 

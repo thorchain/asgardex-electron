@@ -5,7 +5,7 @@ const halt: HaltMessages = {
   'halt.trading': 'Trading for all pools is halted temporarily.',
   'halt.trading.eth': 'Trading for ETH is halted temporarily.',
   'halt.chain': 'Trading for pools on {chain} chain(s) is halted temporarily.',
-  'halt.chain.upgrade': 'Upgrade for {chain} is disabled for maintenance temporarily.'
+  'halt.chain.upgrade': 'Upgrade for {chainTx} is disabled for maintenance temporarily.'
 }
 
 export default halt
