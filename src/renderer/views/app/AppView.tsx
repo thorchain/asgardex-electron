@@ -73,9 +73,9 @@ export const AppView: React.FC = (): JSX.Element => {
             }
           }) => {
             let msg = ''
-            msg = haltEthTrading ? 'Trading for ETH is halted temporarily.' : msg
-            msg = haltTrading ? 'Trading for all pools is halted temporarily.' : msg
-            msg = haltThorChain ? 'THORChain is halted temporarily.' : msg
+            msg = haltEthTrading ? intl.formatMessage({ id: 'halt.trading.eth' }) : msg
+            msg = haltTrading ? intl.formatMessage({ id: 'halt.trading' }) : msg
+            msg = haltThorChain ? intl.formatMessage({ id: 'halt.thorchain' }) : msg
 
             if (!haltThorChain && !haltTrading && chains.length) {
               const chainsHaltState = [
@@ -101,7 +101,7 @@ export const AppView: React.FC = (): JSX.Element => {
                 }
               ]
               const haltedChains = chainsHaltState.filter((chain) => chain.halted).map((chain) => chain.name)
-              msg = `${msg} ${intl.formatMessage({ id: 'pools.halted.chain' }, { chain: haltedChains.join(', ') })}`
+              msg = `${msg} ${intl.formatMessage({ id: 'halt.chain' }, { chain: haltedChains.join(', ') })}`
             }
 
             return msg ? <Styled.Alert key={'halted warning'} type="warning" message={msg} /> : <></>
@@ -125,18 +125,19 @@ export const AppView: React.FC = (): JSX.Element => {
         rdAltOnPending(() => prevMimirHaltRD.current),
         RD.toOption,
         O.map(({ haltThorChain, haltEthChain, haltBnbChain }) => {
-          const mkMsg = (chainTx: string) => `Upgrade for ${chainTx} is disabled for maintenance temporarily`
+          const mkMsg = (chains: string[]) =>
+            intl.formatMessage({ id: 'halt.chain.upgrade' }, { chains: chains.join(', ') })
           const mkAlert = (msg: string) => <Styled.Alert key={'upgrade_warning'} type="warning" message={msg} />
 
-          if (haltThorChain || (haltEthChain && haltBnbChain)) return FP.pipe(mkMsg('ETH.RUNE and BNB.RUNE'), mkAlert)
-          if (haltEthChain) return FP.pipe(mkMsg('ETH.RUNE'), mkAlert)
-          if (haltBnbChain) return FP.pipe(mkMsg('BNB.RUNE'), mkAlert)
+          if (haltThorChain || (haltEthChain && haltBnbChain)) return FP.pipe(mkMsg(['ETH.RUNE', 'BNB.RUNE']), mkAlert)
+          if (haltEthChain) return FP.pipe(mkMsg(['ETH.RUNE']), mkAlert)
+          if (haltBnbChain) return FP.pipe(mkMsg(['BNB.RUNE']), mkAlert)
 
           return <></>
         }),
         O.getOrElse(() => <></>)
       ),
-    [mimirHaltRD]
+    [intl, mimirHaltRD]
   )
 
   const renderMidgardAlert = useMemo(() => {

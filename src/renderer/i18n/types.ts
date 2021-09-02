@@ -116,7 +116,6 @@ type PoolsMessageKey =
   | 'pools.trades'
   | 'pools.pending'
   | 'pools.available'
-  | 'pools.halted.chain'
 
 export type PoolsMessages = { [key in PoolsMessageKey]: string }
 
@@ -337,6 +336,15 @@ type DepositMessageKey =
 
 export type DepositMessages = { [key in DepositMessageKey]: string }
 
+export type HaltMessageKey =
+  | 'halt.thorchain'
+  | 'halt.trading'
+  | 'halt.trading.eth'
+  | 'halt.chain'
+  | 'halt.chain.upgrade'
+
+export type HaltMessages = { [key in HaltMessageKey]: string }
+
 export type Messages = CommonMessages &
   RoutesMessages &
   PoolsMessages &
@@ -347,7 +355,8 @@ export type Messages = CommonMessages &
   LedgerMessages &
   BondsMessages &
   PoolSharesMessage &
-  UpdateMessages
+  UpdateMessages &
+  HaltMessages
 
 export type Translation = {
   locale: Locale
