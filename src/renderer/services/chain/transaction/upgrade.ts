@@ -46,6 +46,8 @@ export const upgradeRuneToNative$ = ({
       setState({ ...getState(), steps: { current: 2, total: 3 } })
       // 2. send upgrade tx
       return sendPoolTx$({
+        // TODO (@asgdx-team) Get walletType from props it if we want to provide upgrade from Ledger etc.
+        walletType: 'keystore',
         router: poolAddresses.router,
         asset,
         recipient: poolAddresses.address,

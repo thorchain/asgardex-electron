@@ -1,9 +1,10 @@
 import type Transport from '@ledgerhq/hw-transport'
 import THORChainApp, { extractSignatureFromTLV, LedgerErrorType } from '@thorchain/ledger-thorchain'
 import { TxHash } from '@xchainjs/xchain-client'
-import { Client as THORClient, DEFAULT_GAS_VALUE, getPrefix } from '@xchainjs/xchain-thorchain'
+import { CosmosSDKClient } from '@xchainjs/xchain-cosmos'
+import { DEFAULT_GAS_VALUE, getChainId, getPrefix } from '@xchainjs/xchain-thorchain'
 import { AssetRuneNative } from '@xchainjs/xchain-util'
-import { AccAddress, CosmosSDK, Msg, PubKeySecp256k1 } from 'cosmos-client'
+import { AccAddress, Msg, PubKeySecp256k1 } from 'cosmos-client'
 import { auth, StdTx } from 'cosmos-client/x/auth'
 import { MsgSend } from 'cosmos-client/x/bank'
 import * as E from 'fp-ts/Either'
@@ -21,15 +22,10 @@ export const sendTx = async ({
   network: Network
   txParams: LedgerTHORTxParams
 }): Promise<E.Either<LedgerErrorId, TxHash>> => {
-  const { recipient, amount, asset = AssetRuneNative, clientUrl, memo } = txParams
+  const { recipient, amount, asset = AssetRuneNative, nodeUrl, memo } = txParams
   try {
     const clientNetwork = toClientNetwork(network)
     const prefix = getPrefix(clientNetwork)
-
-    const client = new THORClient({
-      clientUrl,
-      network: clientNetwork
-    })
 
     const app = new THORChainApp(transport)
     // get address + public key
@@ -38,8 +34,13 @@ export const sendTx = async ({
       return E.left(fromLedgerErrorType(returnCode))
     }
 
+    const chainId = getChainId()
     // use cosmos sdk
-    const sdk: CosmosSDK = client.getCosmosClient().sdk
+    const sdk = new CosmosSDKClient({
+      server: nodeUrl.node,
+      chainId,
+      prefix: getPrefix(clientNetwork)
+    }).sdk
 
     // get signer address
     const signer = AccAddress.fromBech32(bech32Address)
@@ -83,8 +84,6 @@ export const sendTx = async ({
     })
 
     console.log('unsignedStdTx:', unsignedStdTx)
-
-    const chainId = client.getChainId()
 
     // Get bytes from StdTx to sign
     const signedStdTx = unsignedStdTx.getSignBytes(chainId, account_number.toString(), sequence.toString())

@@ -52,6 +52,8 @@ export const symWithdraw$ = ({ memo, network }: SymWithdrawParams): WithdrawStat
     liveData.chain((_) => {
       setState({ ...getState(), step: 2, withdraw: RD.progress({ loaded: 50, total }) })
       return sendPoolTx$({
+        // TODO(@asgdx-team) Get `walletType` from props if we want to support other than keystore (e.g. Ledger)
+        walletType: 'keystore',
         router: O.none, // no router for RUNE
         asset: AssetRuneNative,
         recipient: '', // empty for RUNE txs
@@ -165,6 +167,8 @@ export const asymWithdraw$ = ({ poolAddress, asset, memo, network }: AsymWithdra
     liveData.chain((_) => {
       setState({ ...getState(), step: 2, withdraw: RD.progress({ loaded: 50, total }) })
       return sendTx$({
+        // TODO(@asgdx-team) Get `walletType` from props if we want to support other than keystore (e.g. Ledger)
+        walletType: 'keystore',
         asset,
         recipient: poolAddress.address, // it will be empty string for RUNE
         amount: smallestAmountToSent(asset.chain, network),

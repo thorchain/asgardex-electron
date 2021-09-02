@@ -71,6 +71,8 @@ export const asymDeposit$ = ({ poolAddress, asset, amount, memo }: AsymDepositPa
       setState({ ...getState(), step: 2, deposit: RD.progress({ loaded: 50, total }) })
       // 2. send deposit tx
       return sendPoolTx$({
+        // TODO(@asgdx-team) Get `walletType` from props if we want to support other than keystore (e.g. Ledger)
+        walletType: 'keystore',
         router: poolAddress.router,
         asset,
         recipient: poolAddress.address,
@@ -190,6 +192,8 @@ export const symDeposit$ = ({
     liveData.chain<ApiError, SymDepositValidationResult, TxHash>((_) => {
       setState({ ...getState(), step: 2, deposit: RD.progress({ loaded: 40, total }) })
       return sendPoolTx$({
+        // TODO(@asgdx-team) Get `walletType` from props if we want to support other than keystore (e.g. Ledger)
+        walletType: 'keystore',
         router: poolAddresses.router,
         asset,
         recipient: poolAddresses.address,
@@ -214,6 +218,8 @@ export const symDeposit$ = ({
     liveData.chain<ApiError, TxHash, TxHash>((_) => {
       setState({ ...getState(), step: 3, deposit: RD.progress({ loaded: 60, total }) })
       return sendPoolTx$({
+        // TODO(@asgdx-team) Get `walletType` from props if we want to support other than keystore (e.g. Ledger)
+        walletType: 'keystore',
         router: O.none, // no router for RUNE
         asset: AssetRuneNative,
         recipient: '', // no recipient for RUNE needed

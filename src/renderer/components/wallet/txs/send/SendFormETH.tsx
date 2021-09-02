@@ -284,6 +284,8 @@ export const SendFormETH: React.FC<Props> = (props): JSX.Element => {
       sequenceTOption(amountToSend, sendAddress),
       O.map(([amount, recipient]) => {
         onSubmit({
+          // TODO(@asgdx-team) Get `walletType` from props if we want to support other than keystore (e.g. Ledger)
+          walletType: 'keystore',
           recipient,
           asset: balance.asset,
           amount,

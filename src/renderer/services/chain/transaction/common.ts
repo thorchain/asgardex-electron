@@ -35,7 +35,14 @@ const txFailure$ = (msg: string) =>
     })
   )
 
-export const sendTx$ = ({ asset, recipient, amount, memo, feeOption = DEFAULT_FEE_OPTION }: SendTxParams): TxHashLD => {
+export const sendTx$ = ({
+  walletType,
+  asset,
+  recipient,
+  amount,
+  memo,
+  feeOption = DEFAULT_FEE_OPTION
+}: SendTxParams): TxHashLD => {
   switch (asset.chain) {
     case BNBChain:
       return BNB.sendTx({ recipient, amount, asset, memo })
@@ -53,9 +60,8 @@ export const sendTx$ = ({ asset, recipient, amount, memo, feeOption = DEFAULT_FE
     case ETHChain:
       return ETH.sendTx({ asset, recipient, amount, memo, feeOption })
 
-    case THORChain: {
-      return THOR.sendTx({ amount, asset, memo, recipient })
-    }
+    case THORChain:
+      return THOR.sendTx({ walletType, amount, asset, memo, recipient })
 
     case CosmosChain:
       // not available yet
@@ -109,7 +115,8 @@ export const sendPoolTx$ = ({
       return THOR.sendPoolTx$({ amount, asset, memo })
 
     default:
-      return sendTx$({ asset, recipient, amount, memo, feeOption })
+      // TODO(@asgdx-team) Get `walletType` from props if we want to support other than keystore (e.g. Ledger)
+      return sendTx$({ walletType: 'keystore', asset, recipient, amount, memo, feeOption })
   }
 }
 

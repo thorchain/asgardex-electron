@@ -176,6 +176,9 @@ export const SendFormTHOR: React.FC<Props> = (props): JSX.Element => {
     setShowPwModal(false)
 
     onSubmit({
+      // TODO (@veado)
+      // FIXME (@veado) get wallet type from route or from props
+      walletType: 'ledger',
       recipient: form.getFieldValue('recipient'),
       asset: balance.asset,
       amount: amountToSend,
