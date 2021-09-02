@@ -6,9 +6,9 @@ const swap: SwapMessages = {
   'swap.state.error': "Erreur lors de l'échange",
   'swap.input': 'Entrée',
   'swap.output': 'Sortie',
-  'swap.recipient': 'Recipient - FR',
-  'swap.slip.title': 'Slip - FR',
-  'swap.slip.tolerance': 'Slippage tolerance - FR',
+  'swap.recipient': 'Destinataire',
+  'swap.slip.title': 'Slippage',
+  'swap.slip.tolerance': 'Tolérance de slippage',
   'swap.errors.amount.balanceShouldCoverChainFee':
     '{fee} de frais de transaction doivent être couverts par votre solde (actuellement {balance}).',
   'swap.errors.amount.outputShouldCoverChainFee':
