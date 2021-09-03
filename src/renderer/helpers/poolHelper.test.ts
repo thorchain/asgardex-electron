@@ -241,12 +241,8 @@ describe('helpers/poolHelper/', () => {
         chain: BNBChain,
         haltedChains,
         mimirHalt: {
-          haltTrading: true,
-          haltBtcTrading: false,
-          haltEthTrading: false,
-          haltBchTrading: false,
-          haltLtcTrading: false,
-          haltBnbTrading: false
+          ...DEFAULT_MIMIR_HALT,
+          haltTrading: true
         }
       })
       expect(result).toBeTruthy()
@@ -256,12 +252,8 @@ describe('helpers/poolHelper/', () => {
         chain: LTCChain,
         haltedChains,
         mimirHalt: {
-          haltTrading: true,
-          haltBtcTrading: false,
-          haltEthTrading: false,
-          haltBchTrading: false,
-          haltLtcTrading: false,
-          haltBnbTrading: false
+          ...DEFAULT_MIMIR_HALT,
+          haltTrading: true
         }
       })
       expect(result).toBeTruthy()
@@ -271,12 +263,8 @@ describe('helpers/poolHelper/', () => {
         chain: BTCChain,
         haltedChains,
         mimirHalt: {
-          haltTrading: false,
-          haltBtcTrading: true,
-          haltEthTrading: false,
-          haltBchTrading: false,
-          haltLtcTrading: false,
-          haltBnbTrading: false
+          ...DEFAULT_MIMIR_HALT,
+          haltBtcTrading: true
         }
       })
       expect(result).toBeTruthy()
@@ -286,12 +274,8 @@ describe('helpers/poolHelper/', () => {
         chain: ETHChain,
         haltedChains,
         mimirHalt: {
-          haltTrading: false,
-          haltBtcTrading: false,
-          haltEthTrading: true,
-          haltBchTrading: false,
-          haltLtcTrading: false,
-          haltBnbTrading: false
+          ...DEFAULT_MIMIR_HALT,
+          haltEthTrading: true
         }
       })
       expect(result).toBeTruthy()
@@ -301,12 +285,8 @@ describe('helpers/poolHelper/', () => {
         chain: BCHChain,
         haltedChains,
         mimirHalt: {
-          haltTrading: false,
-          haltBtcTrading: false,
-          haltEthTrading: false,
-          haltBchTrading: true,
-          haltLtcTrading: false,
-          haltBnbTrading: false
+          ...DEFAULT_MIMIR_HALT,
+          haltBchTrading: true
         }
       })
       expect(result).toBeTruthy()
@@ -316,12 +296,8 @@ describe('helpers/poolHelper/', () => {
         chain: LTCChain,
         haltedChains,
         mimirHalt: {
-          haltTrading: false,
-          haltBtcTrading: false,
-          haltEthTrading: false,
-          haltBchTrading: false,
-          haltLtcTrading: true,
-          haltBnbTrading: false
+          ...DEFAULT_MIMIR_HALT,
+          haltLtcTrading: true
         }
       })
       expect(result).toBeTruthy()
@@ -331,11 +307,7 @@ describe('helpers/poolHelper/', () => {
         chain: BNBChain,
         haltedChains,
         mimirHalt: {
-          haltTrading: false,
-          haltBtcTrading: false,
-          haltEthTrading: false,
-          haltBchTrading: false,
-          haltLtcTrading: false,
+          ...DEFAULT_MIMIR_HALT,
           haltBnbTrading: true
         }
       })
@@ -346,11 +318,10 @@ describe('helpers/poolHelper/', () => {
         chain: LTCChain,
         haltedChains,
         mimirHalt: {
-          haltTrading: false,
+          ...DEFAULT_MIMIR_HALT,
           haltBtcTrading: true,
           haltEthTrading: true,
           haltBchTrading: true,
-          haltLtcTrading: false,
           haltBnbTrading: true
         }
       })
@@ -361,12 +332,7 @@ describe('helpers/poolHelper/', () => {
         chain: ETHChain,
         haltedChains,
         mimirHalt: {
-          haltTrading: false,
-          haltBtcTrading: false,
-          haltEthTrading: false,
-          haltBchTrading: false,
-          haltLtcTrading: false,
-          haltBnbTrading: false
+          ...DEFAULT_MIMIR_HALT
         }
       })
       expect(result).toBeTruthy()
@@ -376,12 +342,7 @@ describe('helpers/poolHelper/', () => {
         chain: BNBChain,
         haltedChains,
         mimirHalt: {
-          haltTrading: false,
-          haltBtcTrading: false,
-          haltEthTrading: false,
-          haltBchTrading: false,
-          haltLtcTrading: false,
-          haltBnbTrading: false
+          ...DEFAULT_MIMIR_HALT
         }
       })
       expect(result).toBeTruthy()
@@ -391,12 +352,8 @@ describe('helpers/poolHelper/', () => {
         chain: LTCChain,
         haltedChains,
         mimirHalt: {
-          haltTrading: false,
-          haltBtcTrading: false,
-          haltEthTrading: true,
-          haltBchTrading: false,
-          haltLtcTrading: false,
-          haltBnbTrading: false
+          ...DEFAULT_MIMIR_HALT,
+          haltEthTrading: true
         }
       })
       expect(result).toBeFalsy()

@@ -12,7 +12,7 @@ import { Network } from '../../shared/api/types'
 import { ONE_RUNE_BASE_AMOUNT } from '../../shared/mock/amount'
 import { PoolAddress, PoolDetails } from '../services/midgard/types'
 import { getPoolDetail, toPoolData } from '../services/midgard/utils'
-import { MimirHalt, MimirHaltChain } from '../services/thorchain/types'
+import { MimirHaltTrading, MimirHaltChain } from '../services/thorchain/types'
 import { PoolDetail } from '../types/generated/midgard'
 import { PoolTableRowData, PoolTableRowsData, PricePool } from '../views/pools/Pools.types'
 import { getPoolTableRowData } from '../views/pools/Pools.utils'
@@ -207,16 +207,7 @@ export const disableTradingActions = ({
 }: {
   chain: Chain
   haltedChains: Chain[]
-  mimirHalt: Pick<
-    MimirHalt,
-    | 'haltTrading'
-    | 'haltBtcTrading'
-    | 'haltEthTrading'
-    | 'haltBchTrading'
-    | 'haltLtcTrading'
-    | 'haltBchTrading'
-    | 'haltBnbTrading'
-  >
+  mimirHalt: MimirHaltTrading
 }) => {
   // 1. Check `haltTrading` (provided by `mimir` endpoint) to disable all actions for all pools
   if (haltTrading) return true
