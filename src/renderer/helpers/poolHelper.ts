@@ -203,17 +203,30 @@ export const disableAllActions = ({
 export const disableTradingActions = ({
   chain,
   haltedChains,
-  mimirHalt: { haltTrading, haltEthTrading }
+  mimirHalt: { haltTrading, haltBtcTrading, haltEthTrading, haltBchTrading, haltLtcTrading, haltBnbTrading }
 }: {
   chain: Chain
   haltedChains: Chain[]
-  mimirHalt: Pick<MimirHalt, 'haltTrading' | 'haltEthTrading'>
+  mimirHalt: Pick<
+    MimirHalt,
+    | 'haltTrading'
+    | 'haltBtcTrading'
+    | 'haltEthTrading'
+    | 'haltBchTrading'
+    | 'haltLtcTrading'
+    | 'haltBchTrading'
+    | 'haltBnbTrading'
+  >
 }) => {
   // 1. Check `haltTrading` (provided by `mimir` endpoint) to disable all actions for all pools
   if (haltTrading) return true
 
-  // 2. Check `haltEthTrading` (provided by `mimir` endpoint) to disable all actions for ETH pools
+  // 2. Check if trading is disabled for chain to disable all actions for pool
+  if (isBtcChain(chain) && haltBtcTrading) return true
   if (isEthChain(chain) && haltEthTrading) return true
+  if (isBchChain(chain) && haltBchTrading) return true
+  if (isLtcChain(chain) && haltLtcTrading) return true
+  if (isBnbChain(chain) && haltBnbTrading) return true
 
   // 3. Check `chain` is included in `haltedChains` (provided by `inbound_addresses` endpoint)
   return FP.pipe(haltedChains, isChainElem(chain))

@@ -9,7 +9,9 @@ import {
   AssetBNB,
   ETHChain,
   BNBChain,
-  LTCChain
+  LTCChain,
+  BTCChain,
+  BCHChain
 } from '@xchainjs/xchain-util'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
@@ -238,7 +240,14 @@ describe('helpers/poolHelper/', () => {
       const result = disableTradingActions({
         chain: BNBChain,
         haltedChains,
-        mimirHalt: { haltTrading: true, haltEthTrading: false }
+        mimirHalt: {
+          haltTrading: true,
+          haltBtcTrading: false,
+          haltEthTrading: false,
+          haltBchTrading: false,
+          haltLtcTrading: false,
+          haltBnbTrading: false
+        }
       })
       expect(result).toBeTruthy()
     })
@@ -246,7 +255,29 @@ describe('helpers/poolHelper/', () => {
       const result = disableTradingActions({
         chain: LTCChain,
         haltedChains,
-        mimirHalt: { haltTrading: true, haltEthTrading: false }
+        mimirHalt: {
+          haltTrading: true,
+          haltBtcTrading: false,
+          haltEthTrading: false,
+          haltBchTrading: false,
+          haltLtcTrading: false,
+          haltBnbTrading: false
+        }
+      })
+      expect(result).toBeTruthy()
+    })
+    it('true for BTC if BTC trading is halted', () => {
+      const result = disableTradingActions({
+        chain: BTCChain,
+        haltedChains,
+        mimirHalt: {
+          haltTrading: false,
+          haltBtcTrading: true,
+          haltEthTrading: false,
+          haltBchTrading: false,
+          haltLtcTrading: false,
+          haltBnbTrading: false
+        }
       })
       expect(result).toBeTruthy()
     })
@@ -254,15 +285,74 @@ describe('helpers/poolHelper/', () => {
       const result = disableTradingActions({
         chain: ETHChain,
         haltedChains,
-        mimirHalt: { haltTrading: false, haltEthTrading: true }
+        mimirHalt: {
+          haltTrading: false,
+          haltBtcTrading: false,
+          haltEthTrading: true,
+          haltBchTrading: false,
+          haltLtcTrading: false,
+          haltBnbTrading: false
+        }
       })
       expect(result).toBeTruthy()
     })
-    it('false for a chain, if it is not in halted list, but ETH trading is halted', () => {
+    it('true for BCH if BCH trading is halted', () => {
+      const result = disableTradingActions({
+        chain: BCHChain,
+        haltedChains,
+        mimirHalt: {
+          haltTrading: false,
+          haltBtcTrading: false,
+          haltEthTrading: false,
+          haltBchTrading: true,
+          haltLtcTrading: false,
+          haltBnbTrading: false
+        }
+      })
+      expect(result).toBeTruthy()
+    })
+    it('true for LTC if LTC trading is halted', () => {
       const result = disableTradingActions({
         chain: LTCChain,
         haltedChains,
-        mimirHalt: { haltTrading: false, haltEthTrading: true }
+        mimirHalt: {
+          haltTrading: false,
+          haltBtcTrading: false,
+          haltEthTrading: false,
+          haltBchTrading: false,
+          haltLtcTrading: true,
+          haltBnbTrading: false
+        }
+      })
+      expect(result).toBeTruthy()
+    })
+    it('true for BNB if BNB trading is halted', () => {
+      const result = disableTradingActions({
+        chain: BNBChain,
+        haltedChains,
+        mimirHalt: {
+          haltTrading: false,
+          haltBtcTrading: false,
+          haltEthTrading: false,
+          haltBchTrading: false,
+          haltLtcTrading: false,
+          haltBnbTrading: true
+        }
+      })
+      expect(result).toBeTruthy()
+    })
+    it('false for a chain, if it is not in halted list, but other chains have trading halted', () => {
+      const result = disableTradingActions({
+        chain: LTCChain,
+        haltedChains,
+        mimirHalt: {
+          haltTrading: false,
+          haltBtcTrading: true,
+          haltEthTrading: true,
+          haltBchTrading: true,
+          haltLtcTrading: false,
+          haltBnbTrading: true
+        }
       })
       expect(result).toBeFalsy()
     })
@@ -270,7 +360,14 @@ describe('helpers/poolHelper/', () => {
       const result = disableTradingActions({
         chain: ETHChain,
         haltedChains,
-        mimirHalt: { haltTrading: false, haltEthTrading: false }
+        mimirHalt: {
+          haltTrading: false,
+          haltBtcTrading: false,
+          haltEthTrading: false,
+          haltBchTrading: false,
+          haltLtcTrading: false,
+          haltBnbTrading: false
+        }
       })
       expect(result).toBeTruthy()
     })
@@ -278,7 +375,14 @@ describe('helpers/poolHelper/', () => {
       const result = disableTradingActions({
         chain: BNBChain,
         haltedChains,
-        mimirHalt: { haltTrading: false, haltEthTrading: false }
+        mimirHalt: {
+          haltTrading: false,
+          haltBtcTrading: false,
+          haltEthTrading: false,
+          haltBchTrading: false,
+          haltLtcTrading: false,
+          haltBnbTrading: false
+        }
       })
       expect(result).toBeTruthy()
     })
@@ -286,7 +390,14 @@ describe('helpers/poolHelper/', () => {
       const result = disableTradingActions({
         chain: LTCChain,
         haltedChains,
-        mimirHalt: { haltTrading: false, haltEthTrading: false }
+        mimirHalt: {
+          haltTrading: false,
+          haltBtcTrading: false,
+          haltEthTrading: true,
+          haltBchTrading: false,
+          haltLtcTrading: false,
+          haltBnbTrading: false
+        }
       })
       expect(result).toBeFalsy()
     })
