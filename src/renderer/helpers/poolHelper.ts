@@ -12,7 +12,7 @@ import { Network } from '../../shared/api/types'
 import { ONE_RUNE_BASE_AMOUNT } from '../../shared/mock/amount'
 import { PoolAddress, PoolDetails } from '../services/midgard/types'
 import { getPoolDetail, toPoolData } from '../services/midgard/utils'
-import { MimirHalt, MimirHaltChain } from '../services/thorchain/types'
+import { MimirHaltTrading, MimirHaltChain } from '../services/thorchain/types'
 import { PoolDetail } from '../types/generated/midgard'
 import { PoolTableRowData, PoolTableRowsData, PricePool } from '../views/pools/Pools.types'
 import { getPoolTableRowData } from '../views/pools/Pools.utils'
@@ -203,17 +203,21 @@ export const disableAllActions = ({
 export const disableTradingActions = ({
   chain,
   haltedChains,
-  mimirHalt: { haltTrading, haltEthTrading }
+  mimirHalt: { haltTrading, haltBtcTrading, haltEthTrading, haltBchTrading, haltLtcTrading, haltBnbTrading }
 }: {
   chain: Chain
   haltedChains: Chain[]
-  mimirHalt: Pick<MimirHalt, 'haltTrading' | 'haltEthTrading'>
+  mimirHalt: MimirHaltTrading
 }) => {
   // 1. Check `haltTrading` (provided by `mimir` endpoint) to disable all actions for all pools
   if (haltTrading) return true
 
-  // 2. Check `haltEthTrading` (provided by `mimir` endpoint) to disable all actions for ETH pools
+  // 2. Check if trading is disabled for chain to disable all actions for pool
+  if (isBtcChain(chain) && haltBtcTrading) return true
   if (isEthChain(chain) && haltEthTrading) return true
+  if (isBchChain(chain) && haltBchTrading) return true
+  if (isLtcChain(chain) && haltLtcTrading) return true
+  if (isBnbChain(chain) && haltBnbTrading) return true
 
   // 3. Check `chain` is included in `haltedChains` (provided by `inbound_addresses` endpoint)
   return FP.pipe(haltedChains, isChainElem(chain))

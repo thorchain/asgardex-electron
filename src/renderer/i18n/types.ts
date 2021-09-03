@@ -339,8 +339,8 @@ export type DepositMessages = { [key in DepositMessageKey]: string }
 export type HaltMessageKey =
   | 'halt.thorchain'
   | 'halt.trading'
-  | 'halt.trading.eth'
   | 'halt.chain'
+  | 'halt.chain.trading'
   | 'halt.chain.upgrade'
 
 export type HaltMessages = { [key in HaltMessageKey]: string }

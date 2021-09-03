@@ -64,44 +64,64 @@ export const AppView: React.FC = (): JSX.Element => {
             mimirHalt: {
               haltThorChain,
               haltTrading,
-              haltEthTrading,
               haltBtcChain,
+              haltBtcTrading,
               haltEthChain,
+              haltEthTrading,
               haltBchChain,
+              haltBchTrading,
               haltLtcChain,
-              haltBnbChain
+              haltLtcTrading,
+              haltBnbChain,
+              haltBnbTrading
             }
           }) => {
             let msg = ''
-            msg = haltEthTrading ? intl.formatMessage({ id: 'halt.trading.eth' }) : msg
             msg = haltTrading ? intl.formatMessage({ id: 'halt.trading' }) : msg
             msg = haltThorChain ? intl.formatMessage({ id: 'halt.thorchain' }) : msg
 
             if (!haltThorChain && !haltTrading && chains.length) {
-              const chainsHaltState = [
+              const chainsState = [
                 {
                   name: BTCChain,
-                  halted: haltBtcChain
+                  haltedChain: haltBtcChain,
+                  haltedTrading: haltBtcTrading
                 },
                 {
                   name: ETHChain,
-                  halted: haltEthChain
+                  halted: haltEthChain,
+                  haltedTrading: haltEthTrading
                 },
                 {
                   name: BCHChain,
-                  halted: haltBchChain
+                  halted: haltBchChain,
+                  haltedTrading: haltBchTrading
                 },
                 {
                   name: LTCChain,
-                  halted: haltLtcChain
+                  halted: haltLtcChain,
+                  haltedTrading: haltLtcTrading
                 },
                 {
                   name: BNBChain,
-                  halted: haltBnbChain
+                  halted: haltBnbChain,
+                  haltedTrading: haltBnbTrading
                 }
               ]
-              const haltedChains = chainsHaltState.filter((chain) => chain.halted).map((chain) => chain.name)
-              msg = `${msg} ${intl.formatMessage({ id: 'halt.chain' }, { chain: haltedChains.join(', ') })}`
+              const haltedChains = chainsState.filter((chain) => chain.halted).map((chain) => chain.name)
+              msg =
+                haltedChains.length > 0
+                  ? `${msg} ${intl.formatMessage({ id: 'halt.chain' }, { chains: haltedChains.join(', ') })}`
+                  : `${msg}`
+
+              const haltedTradingChains = chainsState.filter((chain) => chain.haltedTrading).map((chain) => chain.name)
+              msg =
+                haltedTradingChains.length > 0
+                  ? `${msg} ${intl.formatMessage(
+                      { id: 'halt.chain.trading' },
+                      { chains: haltedTradingChains.join(', ') }
+                    )}`
+                  : `${msg}`
             }
 
             return msg ? <Styled.Alert key={'halted warning'} type="warning" message={msg} /> : <></>

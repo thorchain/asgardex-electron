@@ -9,7 +9,9 @@ import {
   AssetBNB,
   ETHChain,
   BNBChain,
-  LTCChain
+  LTCChain,
+  BTCChain,
+  BCHChain
 } from '@xchainjs/xchain-util'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
@@ -238,7 +240,10 @@ describe('helpers/poolHelper/', () => {
       const result = disableTradingActions({
         chain: BNBChain,
         haltedChains,
-        mimirHalt: { haltTrading: true, haltEthTrading: false }
+        mimirHalt: {
+          ...DEFAULT_MIMIR_HALT,
+          haltTrading: true
+        }
       })
       expect(result).toBeTruthy()
     })
@@ -246,7 +251,21 @@ describe('helpers/poolHelper/', () => {
       const result = disableTradingActions({
         chain: LTCChain,
         haltedChains,
-        mimirHalt: { haltTrading: true, haltEthTrading: false }
+        mimirHalt: {
+          ...DEFAULT_MIMIR_HALT,
+          haltTrading: true
+        }
+      })
+      expect(result).toBeTruthy()
+    })
+    it('true for BTC if BTC trading is halted', () => {
+      const result = disableTradingActions({
+        chain: BTCChain,
+        haltedChains,
+        mimirHalt: {
+          ...DEFAULT_MIMIR_HALT,
+          haltBtcTrading: true
+        }
       })
       expect(result).toBeTruthy()
     })
@@ -254,15 +273,57 @@ describe('helpers/poolHelper/', () => {
       const result = disableTradingActions({
         chain: ETHChain,
         haltedChains,
-        mimirHalt: { haltTrading: false, haltEthTrading: true }
+        mimirHalt: {
+          ...DEFAULT_MIMIR_HALT,
+          haltEthTrading: true
+        }
       })
       expect(result).toBeTruthy()
     })
-    it('false for a chain, if it is not in halted list, but ETH trading is halted', () => {
+    it('true for BCH if BCH trading is halted', () => {
+      const result = disableTradingActions({
+        chain: BCHChain,
+        haltedChains,
+        mimirHalt: {
+          ...DEFAULT_MIMIR_HALT,
+          haltBchTrading: true
+        }
+      })
+      expect(result).toBeTruthy()
+    })
+    it('true for LTC if LTC trading is halted', () => {
       const result = disableTradingActions({
         chain: LTCChain,
         haltedChains,
-        mimirHalt: { haltTrading: false, haltEthTrading: true }
+        mimirHalt: {
+          ...DEFAULT_MIMIR_HALT,
+          haltLtcTrading: true
+        }
+      })
+      expect(result).toBeTruthy()
+    })
+    it('true for BNB if BNB trading is halted', () => {
+      const result = disableTradingActions({
+        chain: BNBChain,
+        haltedChains,
+        mimirHalt: {
+          ...DEFAULT_MIMIR_HALT,
+          haltBnbTrading: true
+        }
+      })
+      expect(result).toBeTruthy()
+    })
+    it('false for a chain, if it is not in halted list, but other chains have trading halted', () => {
+      const result = disableTradingActions({
+        chain: LTCChain,
+        haltedChains,
+        mimirHalt: {
+          ...DEFAULT_MIMIR_HALT,
+          haltBtcTrading: true,
+          haltEthTrading: true,
+          haltBchTrading: true,
+          haltBnbTrading: true
+        }
       })
       expect(result).toBeFalsy()
     })
@@ -270,7 +331,9 @@ describe('helpers/poolHelper/', () => {
       const result = disableTradingActions({
         chain: ETHChain,
         haltedChains,
-        mimirHalt: { haltTrading: false, haltEthTrading: false }
+        mimirHalt: {
+          ...DEFAULT_MIMIR_HALT
+        }
       })
       expect(result).toBeTruthy()
     })
@@ -278,7 +341,9 @@ describe('helpers/poolHelper/', () => {
       const result = disableTradingActions({
         chain: BNBChain,
         haltedChains,
-        mimirHalt: { haltTrading: false, haltEthTrading: false }
+        mimirHalt: {
+          ...DEFAULT_MIMIR_HALT
+        }
       })
       expect(result).toBeTruthy()
     })
@@ -286,7 +351,10 @@ describe('helpers/poolHelper/', () => {
       const result = disableTradingActions({
         chain: LTCChain,
         haltedChains,
-        mimirHalt: { haltTrading: false, haltEthTrading: false }
+        mimirHalt: {
+          ...DEFAULT_MIMIR_HALT,
+          haltEthTrading: true
+        }
       })
       expect(result).toBeFalsy()
     })
