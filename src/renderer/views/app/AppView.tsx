@@ -109,12 +109,19 @@ export const AppView: React.FC = (): JSX.Element => {
                 }
               ]
               const haltedChains = chainsState.filter((chain) => chain.halted).map((chain) => chain.name)
+              msg =
+                haltedChains.length > 0
+                  ? `${msg} ${intl.formatMessage({ id: 'halt.chain' }, { chains: haltedChains.join(', ') })}`
+                  : `${msg}`
+
               const haltedTradingChains = chainsState.filter((chain) => chain.haltedTrading).map((chain) => chain.name)
-              msg = `${msg} ${intl.formatMessage({ id: 'halt.chain' }, { chains: haltedChains.join(', ') })}`
-              msg = `${msg} ${intl.formatMessage(
-                { id: 'halt.chain.trading' },
-                { chains: haltedTradingChains.join(', ') }
-              )}`
+              msg =
+                haltedTradingChains.length > 0
+                  ? `${msg} ${intl.formatMessage(
+                      { id: 'halt.chain.trading' },
+                      { chains: haltedTradingChains.join(', ') }
+                    )}`
+                  : `${msg}`
             }
 
             return msg ? <Styled.Alert key={'halted warning'} type="warning" message={msg} /> : <></>
