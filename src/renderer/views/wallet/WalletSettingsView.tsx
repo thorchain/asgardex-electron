@@ -119,7 +119,8 @@ export const WalletSettingsView: React.FC = (): JSX.Element => {
     }
   }
 
-  const thorLedgerWalletAddress: WalletAddress = useMemo(
+  // TODO (@asgdx-team) Disable temporary for `v0.3.14`
+  const _thorLedgerWalletAddress: WalletAddress = useMemo(
     () => ({
       type: 'ledger',
       address: FP.pipe(
@@ -130,7 +131,8 @@ export const WalletSettingsView: React.FC = (): JSX.Element => {
     [intl, thorLedgerAddressRD]
   )
 
-  const bnbLedgerWalletAddress: WalletAddress = useMemo(
+  // TODO (@asgdx-team) Disable temporary for `v0.3.14`
+  const _bnbLedgerWalletAddress: WalletAddress = useMemo(
     () => ({
       type: 'ledger',
       address: FP.pipe(
@@ -144,14 +146,16 @@ export const WalletSettingsView: React.FC = (): JSX.Element => {
   const walletAccounts$ = useMemo(() => {
     const thorWalletAccount$ = walletAccount$({
       addressUI$: thorAddressUI$,
-      ledgerAddress: thorLedgerWalletAddress,
+      // TODO (@asgdx-team) Disable temporary for `v0.3.14`
+      // ledgerAddress: thorLedgerWalletAddress,
       chain: THORChain
     })
     const btcWalletAccount$ = walletAccount$({ addressUI$: btcAddressUI$, chain: BTCChain })
     const ethWalletAccount$ = walletAccount$({ addressUI$: ethAddressUI$, chain: ETHChain })
     const bnbWalletAccount$ = walletAccount$({
       addressUI$: bnbAddressUI$,
-      ledgerAddress: bnbLedgerWalletAddress,
+      // TODO (@asgdx-team) Disable temporary for `v0.3.14`
+      // ledgerAddress: bnbLedgerWalletAddress,
       chain: BNBChain
     })
     const bchWalletAccount$ = walletAccount$({ addressUI$: bchAddressUI$, chain: BCHChain })
@@ -174,11 +178,13 @@ export const WalletSettingsView: React.FC = (): JSX.Element => {
     )
   }, [
     thorAddressUI$,
-    thorLedgerWalletAddress,
+    // TODO (@asgdx-team) Disable temporary for `v0.3.14`
+    // thorLedgerWalletAddress,
     btcAddressUI$,
     ethAddressUI$,
     bnbAddressUI$,
-    bnbLedgerWalletAddress,
+    // TODO (@asgdx-team) Disable temporary for `v0.3.14`
+    // bnbLedgerWalletAddress,
     bchAddressUI$,
     ltcAddressUI$
   ])
