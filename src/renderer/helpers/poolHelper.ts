@@ -166,10 +166,10 @@ const isChainElem = A.elem(eqChain)
 /**
  * Helper to check if all pool actions (`SWAP`, `ADD`, `WITHDRAW`) have to be disabled
  *
- * |                  | ADD | WITDRAW | SWAP |
- * |------------------|-----|---------|------|
- * | halt{chain}Chain | NO  | NO      | NO   |
- * | halt{chain}      | NO  | NO      | NO   |
+ * |                  | ADD | WITHDRAW | SWAP |
+ * |------------------|-----|----------|------|
+ * | halt{chain}Chain | NO  | NO       | NO   |
+ * | halt{chain}      | NO  | NO       | NO   |
  *
  */
 export const disableAllActions = ({
@@ -206,10 +206,10 @@ export const disableAllActions = ({
 /**
  * Helper to check if pool trading actions (`SWAP`, `ADD`) have to be disabled
  *
- * |                    | ADD | WITDRAW | SWAP |
- * |--------------------|-----|---------|------|
- * | halt{chain}Trading | NO  | YES     | NO   |
- * | halt{chain}        | NO  | NO      | NO   |
+ * |                    | ADD | WITHDRAW | SWAP |
+ * |--------------------|-----|----------|------|
+ * | halt{chain}Trading | NO  | YES      | NO   |
+ * | halt{chain}        | NO  | NO       | NO   |
  */
 export const disableTradingActions = ({
   chain,
@@ -237,10 +237,10 @@ export const disableTradingActions = ({
 /**
  * Helper to check if pool trading actions (`ADD`, `WITHDRAW`) have to be disabled
  *
- * |                | ADD | WITDRAW | SWAP |
- * |----------------|-----|---------|------|
- * | pauseLP{chain} | NO  | NO      | YES  |
- * | halt{chain}    | NO  | NO      | NO   |
+ * |                | ADD | WITHDRAW | SWAP |
+ * |----------------|-----|----------|------|
+ * | pauseLP{chain} | NO  | NO       | YES  |
+ * | halt{chain}    | NO  | NO       | NO   |
  */
 export const disablePoolActions = ({
   chain,

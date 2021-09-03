@@ -340,8 +340,10 @@ export type HaltMessageKey =
   | 'halt.thorchain'
   | 'halt.trading'
   | 'halt.chain'
+  | 'halt.chains'
   | 'halt.chain.trading'
   | 'halt.chain.upgrade'
+  | 'halt.chain.pause'
 
 export type HaltMessages = { [key in HaltMessageKey]: string }
 

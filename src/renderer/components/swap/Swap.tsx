@@ -182,7 +182,9 @@ export const Swap = ({
     [haltedChains, mimirHalt]
   )
   const disableTradingPoolActions = useCallback(
-    (chain: Chain) => PoolHelpers.disableTradingActions({ chain, haltedChains, mimirHalt }),
+    (chain: Chain) =>
+      PoolHelpers.disableTradingActions({ chain, haltedChains, mimirHalt }) ||
+      PoolHelpers.disablePoolActions({ chain, haltedChains, mimirHalt }),
     [haltedChains, mimirHalt]
   )
 

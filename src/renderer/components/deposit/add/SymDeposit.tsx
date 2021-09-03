@@ -159,7 +159,8 @@ export const SymDeposit: React.FC<Props> = (props) => {
   const disableDepositAction = useMemo(
     () =>
       PoolHelpers.disableAllActions({ chain: asset.chain, haltedChains, mimirHalt }) ||
-      PoolHelpers.disableTradingActions({ chain: asset.chain, haltedChains, mimirHalt }),
+      PoolHelpers.disableTradingActions({ chain: asset.chain, haltedChains, mimirHalt }) ||
+      PoolHelpers.disablePoolActions({ chain: asset.chain, haltedChains, mimirHalt }),
     [asset.chain, haltedChains, mimirHalt]
   )
 

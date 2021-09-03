@@ -83,7 +83,12 @@ export const ActivePools: React.FC<PoolsComponentProps> = ({ haltedChains, mimir
     (_: string, { pool }: PoolTableRowData) => {
       const chain = pool.target.chain
       const disableAllPoolActions = PoolHelpers.disableAllActions({ chain, haltedChains, mimirHalt })
-      const disableTradingPoolActions = PoolHelpers.disableTradingActions({
+      const disableTradingActions = PoolHelpers.disableTradingActions({
+        chain,
+        haltedChains,
+        mimirHalt
+      })
+      const disablePoolActions = PoolHelpers.disablePoolActions({
         chain,
         haltedChains,
         mimirHalt
@@ -92,7 +97,7 @@ export const ActivePools: React.FC<PoolsComponentProps> = ({ haltedChains, mimir
       return (
         <Styled.TableAction>
           <ManageButton
-            disabled={disableAllPoolActions}
+            disabled={disableAllPoolActions || disablePoolActions}
             asset={pool.target}
             sizevalue={isDesktopView ? 'normal' : 'small'}
             isTextView={isDesktopView}
@@ -100,7 +105,7 @@ export const ActivePools: React.FC<PoolsComponentProps> = ({ haltedChains, mimir
           <Button
             round="true"
             sizevalue={isDesktopView ? 'normal' : 'small'}
-            disabled={disableAllPoolActions || disableTradingPoolActions}
+            disabled={disableAllPoolActions || disableTradingActions}
             style={{ height: 30 }}
             onClick={(event) => {
               event.preventDefault()
