@@ -362,11 +362,10 @@ describe('helpers/poolHelper/', () => {
   })
 
   describe('disablePoolActions', () => {
-    const haltedChains = [ETHChain, BNBChain]
     it('true if trading is halted for this chain', () => {
       const result = disablePoolActions({
         chain: BNBChain,
-        haltedChains,
+        haltedChains: [ETHChain, BNBChain],
         mimirHalt: { ...DEFAULT_MIMIR_HALT }
       })
       expect(result).toBeTruthy()
