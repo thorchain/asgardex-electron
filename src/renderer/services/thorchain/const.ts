@@ -16,7 +16,12 @@ export const DEFAULT_MIMIR_HALT: MimirHalt = {
   haltEthChain: false,
   haltBchChain: false,
   haltLtcChain: false,
-  haltBnbChain: false
+  haltBnbChain: false,
+  pauseLpBnb: false,
+  pauseLpBch: false,
+  pauseLpBtc: false,
+  pauseLpEth: false,
+  pauseLpLtc: false
 }
 
 export const RESERVE_MODULE_ADDRESS = 'thor1dheycdevq39qlkxs2a6wuuzyn4aqxhve4qxtxt'

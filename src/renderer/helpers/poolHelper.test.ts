@@ -9,7 +9,9 @@ import {
   AssetBNB,
   ETHChain,
   BNBChain,
-  LTCChain
+  LTCChain,
+  BTCChain,
+  BCHChain
 } from '@xchainjs/xchain-util'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
@@ -21,6 +23,7 @@ import { DEFAULT_MIMIR_HALT } from '../services/thorchain/const'
 import { GetPoolsStatusEnum, PoolDetail } from '../types/generated/midgard'
 import {
   disableAllActions,
+  disablePoolActions,
   disableTradingActions,
   getDeepestPool,
   getPoolPriceValue,
@@ -289,6 +292,58 @@ describe('helpers/poolHelper/', () => {
         mimirHalt: { haltTrading: false, haltEthTrading: false }
       })
       expect(result).toBeFalsy()
+    })
+  })
+
+  describe.only('disablePoolActions', () => {
+    const haltedChains = [ETHChain, BNBChain]
+    it('true if trading is halted for this chain', () => {
+      const result = disablePoolActions({
+        chain: BNBChain,
+        haltedChains,
+        mimirHalt: { ...DEFAULT_MIMIR_HALT }
+      })
+      expect(result).toBeTruthy()
+    })
+    it('true if BNB chain is not in halted list, but paused', () => {
+      const result = disablePoolActions({
+        chain: BNBChain,
+        haltedChains: [],
+        mimirHalt: { ...DEFAULT_MIMIR_HALT, pauseLpBnb: true }
+      })
+      expect(result).toBeTruthy()
+    })
+    it('true if BTC chain is not in halted list, but paused', () => {
+      const result = disablePoolActions({
+        chain: BTCChain,
+        haltedChains: [],
+        mimirHalt: { ...DEFAULT_MIMIR_HALT, pauseLpBtc: true }
+      })
+      expect(result).toBeTruthy()
+    })
+    it('true if BCH chain is not in halted list, but paused', () => {
+      const result = disablePoolActions({
+        chain: BCHChain,
+        haltedChains: [],
+        mimirHalt: { ...DEFAULT_MIMIR_HALT, pauseLpBch: true }
+      })
+      expect(result).toBeTruthy()
+    })
+    it('true if ETH chain is not in halted list, but paused', () => {
+      const result = disablePoolActions({
+        chain: ETHChain,
+        haltedChains: [],
+        mimirHalt: { ...DEFAULT_MIMIR_HALT, pauseLpEth: true }
+      })
+      expect(result).toBeTruthy()
+    })
+    it('true if LTC chain is not in halted list, but paused', () => {
+      const result = disablePoolActions({
+        chain: LTCChain,
+        haltedChains: [],
+        mimirHalt: { ...DEFAULT_MIMIR_HALT, pauseLpLtc: true }
+      })
+      expect(result).toBeTruthy()
     })
   })
 })

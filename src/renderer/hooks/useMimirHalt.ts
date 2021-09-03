@@ -31,7 +31,12 @@ export const useMimirHalt = (): { mimirHaltRD: MimirHaltRD; mimirHalt: MimirHalt
           haltEthChain: mimir['mimir//HALTETHCHAIN'] === 1,
           haltBchChain: mimir['mimir//HALTBCHCHAIN'] === 1,
           haltLtcChain: mimir['mimir//HALTLTCCHAIN'] === 1,
-          haltBnbChain: mimir['mimir//HALTBNBCHAIN'] === 1
+          haltBnbChain: mimir['mimir//HALTBNBCHAIN'] === 1,
+          pauseLpBnb: mimir['mimir//PAUSELPBNB'] === 1,
+          pauseLpBch: mimir['mimir//PAUSELPBCH'] === 1,
+          pauseLpBtc: mimir['mimir//PAUSELPBTC'] === 1,
+          pauseLpEth: mimir['mimir//PAUSELPETH'] === 1,
+          pauseLpLtc: mimir['mimir//PAUSELPLTC'] === 1
         })),
         RxOp.shareReplay(1)
       ),
