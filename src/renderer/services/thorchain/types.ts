@@ -66,7 +66,11 @@ export type NodeDataRD = RD.RemoteData<ApiError, NodeInfo>
 
 export type ThorNodeApiUrlLD = LiveData<ApiError, string>
 
-// https://thornode.thorchain.info/thorchain/mimir
+/**
+ * IO type for mimir endpoints:
+ * mainnet: https://thornode.thorchain.info/thorchain/mimir
+ * testnet: https://testnet.thornode.thorchain.info/thorchain/mimir
+ */
 export const MimirIO = t.type({
   'mimir//MAXIMUMLIQUIDITYRUNE': t.union([t.number, t.undefined]),
   'mimir//POOLCYCLE': t.union([t.number, t.undefined]),
@@ -81,7 +85,12 @@ export const MimirIO = t.type({
   'mimir//HALTLTCCHAIN': t.union([t.number, t.undefined]),
   'mimir//HALTLTCTRADING': t.union([t.number, t.undefined]),
   'mimir//HALTBNBCHAIN': t.union([t.number, t.undefined]),
-  'mimir//HALTBNBTRADING': t.union([t.number, t.undefined])
+  'mimir//HALTBNBTRADING': t.union([t.number, t.undefined]),
+  'mimir//PAUSELPBNB': t.union([t.number, t.undefined]),
+  'mimir//PAUSELPBCH': t.union([t.number, t.undefined]),
+  'mimir//PAUSELPBTC': t.union([t.number, t.undefined]),
+  'mimir//PAUSELPETH': t.union([t.number, t.undefined]),
+  'mimir//PAUSELPLTC': t.union([t.number, t.undefined])
 })
 
 export type Mimir = t.TypeOf<typeof MimirIO>
@@ -89,7 +98,6 @@ export type Mimir = t.TypeOf<typeof MimirIO>
 export type MimirLD = LiveData<Error, Mimir>
 export type MimirRD = RD.RemoteData<Error, Mimir>
 
-export type MimirHalt = MimirHaltChain & MimirHaltTrading
 export type MimirHaltChain = {
   haltThorChain: boolean
   haltBtcChain: boolean
@@ -106,6 +114,16 @@ export type MimirHaltTrading = {
   haltLtcTrading: boolean
   haltBnbTrading: boolean
 }
+
+export type MimirPauseLP = {
+  pauseLpBnb: boolean
+  pauseLpBch: boolean
+  pauseLpBtc: boolean
+  pauseLpEth: boolean
+  pauseLpLtc: boolean
+}
+
+export type MimirHalt = MimirHaltChain & MimirHaltTrading & MimirPauseLP
 
 export type MimirHaltRD = RD.RemoteData<Error, MimirHalt>
 

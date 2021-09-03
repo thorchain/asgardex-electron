@@ -26,7 +26,6 @@ import {
   GetPoolStatsRequest
 } from '../../types/generated/midgard/apis'
 import { PricePool, PricePoolAsset, PricePools } from '../../views/pools/Pools.types'
-import { network$ } from '../app/service'
 import { ErrorId } from '../wallet/types'
 import {
   PoolAssetDetailsLD,
@@ -488,25 +487,8 @@ const createPoolsService = (
   )
 
   const haltedChains$: HaltedChainsLD = FP.pipe(
-    // For chaosnet all chains are halted "hardcoded" temporary
-    // TODO @asgdx-team: Enable check using inboundAddressesShared$ only, no check for network needed then
-    // inboundAddressesShared$,
-    // liveData.map(A.filterMap((inboundAddress) => (inboundAddress.halted ? O.some(inboundAddress.chain) : O.none)))
-    Rx.combineLatest([network$, inboundAddressesShared$]),
-    RxOp.map(([network, inboundAddresses]) =>
-      FP.pipe(
-        inboundAddresses,
-        RD.map(
-          A.filterMap((inboundAddress) =>
-            network !== 'testnet'
-              ? O.some(inboundAddress.chain)
-              : inboundAddress.halted
-              ? O.some(inboundAddress.chain)
-              : O.none
-          )
-        )
-      )
-    )
+    inboundAddressesShared$,
+    liveData.map(A.filterMap((inboundAddress) => (inboundAddress.halted ? O.some(inboundAddress.chain) : O.none)))
   )
 
   /**

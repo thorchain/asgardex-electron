@@ -12,7 +12,7 @@ import { Network } from '../../shared/api/types'
 import { ONE_RUNE_BASE_AMOUNT } from '../../shared/mock/amount'
 import { PoolAddress, PoolDetails } from '../services/midgard/types'
 import { getPoolDetail, toPoolData } from '../services/midgard/utils'
-import { MimirHaltTrading, MimirHaltChain } from '../services/thorchain/types'
+import { MimirHaltChain, MimirHaltTrading, MimirPauseLP } from '../services/thorchain/types'
 import { PoolDetail } from '../types/generated/midgard'
 import { PoolTableRowData, PoolTableRowsData, PricePool } from '../views/pools/Pools.types'
 import { getPoolTableRowData } from '../views/pools/Pools.utils'
@@ -165,6 +165,12 @@ const isChainElem = A.elem(eqChain)
 
 /**
  * Helper to check if all pool actions (`SWAP`, `ADD`, `WITHDRAW`) have to be disabled
+ *
+ * |                  | ADD | WITHDRAW | SWAP |
+ * |------------------|-----|----------|------|
+ * | halt{chain}Chain | NO  | NO       | NO   |
+ * | halt{chain}      | NO  | NO       | NO   |
+ *
  */
 export const disableAllActions = ({
   chain,
@@ -199,6 +205,11 @@ export const disableAllActions = ({
 
 /**
  * Helper to check if pool trading actions (`SWAP`, `ADD`) have to be disabled
+ *
+ * |                    | ADD | WITHDRAW | SWAP |
+ * |--------------------|-----|----------|------|
+ * | halt{chain}Trading | NO  | YES      | NO   |
+ * | halt{chain}        | NO  | NO       | NO   |
  */
 export const disableTradingActions = ({
   chain,
@@ -220,5 +231,33 @@ export const disableTradingActions = ({
   if (isBnbChain(chain) && haltBnbTrading) return true
 
   // 3. Check `chain` is included in `haltedChains` (provided by `inbound_addresses` endpoint)
+  return FP.pipe(haltedChains, isChainElem(chain))
+}
+
+/**
+ * Helper to check if pool trading actions (`ADD`, `WITHDRAW`) have to be disabled
+ *
+ * |                | ADD | WITHDRAW | SWAP |
+ * |----------------|-----|----------|------|
+ * | pauseLP{chain} | NO  | NO       | YES  |
+ * | halt{chain}    | NO  | NO       | NO   |
+ */
+export const disablePoolActions = ({
+  chain,
+  haltedChains,
+  mimirHalt: { pauseLpBnb, pauseLpBch, pauseLpBtc, pauseLpEth, pauseLpLtc }
+}: {
+  chain: Chain
+  haltedChains: Chain[]
+  mimirHalt: MimirPauseLP
+}) => {
+  // Check all `pauseLp{chain}` values (provided by `mimir` endpoint) to disable pool actions
+  if (isBnbChain(chain) && pauseLpBnb) return true
+  if (isBchChain(chain) && pauseLpBch) return true
+  if (isBtcChain(chain) && pauseLpBtc) return true
+  if (isEthChain(chain) && pauseLpEth) return true
+  if (isLtcChain(chain) && pauseLpLtc) return true
+
+  // Check `chain` is included in `haltedChains` (provided by `inbound_addresses` endpoint)
   return FP.pipe(haltedChains, isChainElem(chain))
 }

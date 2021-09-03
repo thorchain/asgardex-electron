@@ -4,6 +4,7 @@ import { SyncOutlined } from '@ant-design/icons'
 import * as RD from '@devexperts/remote-data-ts'
 import { BCHChain, BNBChain, BTCChain, Chain, ETHChain, LTCChain } from '@xchainjs/xchain-util'
 import * as FP from 'fp-ts/function'
+import * as A from 'fp-ts/lib/Array'
 import * as O from 'fp-ts/Option'
 import { useObservableState } from 'observable-hooks'
 import { useIntl } from 'react-intl'
@@ -13,6 +14,7 @@ import { Header } from '../../components/header'
 import { Button } from '../../components/uielements/button'
 import { useMidgardContext } from '../../contexts/MidgardContext'
 import { envOrDefault } from '../../helpers/envHelper'
+import { unionChains } from '../../helpers/fp/array'
 import { rdAltOnPending } from '../../helpers/fpHelpers'
 import { useMimirHalt } from '../../hooks/useMimirHalt'
 import { DEFAULT_MIMIR_HALT } from '../../services/thorchain/const'
@@ -22,6 +24,12 @@ import { ViewRoutes } from '../ViewRoutes'
 import { AppUpdateView } from './AppUpdateView'
 import * as Styled from './AppView.styles'
 
+type HaltedChainsState = {
+  chain: Chain
+  haltedChain: boolean
+  haltedTrading: boolean
+  pausedLP: boolean
+}
 export const AppView: React.FC = (): JSX.Element => {
   const intl = useIntl()
 
@@ -46,81 +54,110 @@ export const AppView: React.FC = (): JSX.Element => {
     () =>
       FP.pipe(
         RD.combine(haltedChainsRD, mimirHaltRD),
-        RD.map(([chains, mimirHalt]) => {
-          prevHaltedChains.current = chains
+        RD.map(([inboundHaltedChains, mimirHalt]) => {
+          prevHaltedChains.current = inboundHaltedChains
           prevMimirHalt.current = mimirHalt
-          return { chains, mimirHalt }
+          return { inboundHaltedChains, mimirHalt }
         }),
-        rdAltOnPending<Error, { chains: Chain[]; mimirHalt: MimirHalt }>(() =>
+        rdAltOnPending<Error, { inboundHaltedChains: Chain[]; mimirHalt: MimirHalt }>(() =>
           RD.success({
-            chains: prevHaltedChains.current,
+            inboundHaltedChains: prevHaltedChains.current,
             mimirHalt: prevMimirHalt.current
           })
         ),
         RD.toOption,
         O.map(
           ({
-            chains,
+            inboundHaltedChains,
             mimirHalt: {
               haltThorChain,
               haltTrading,
+              haltBnbChain,
+              haltBnbTrading,
+              pauseLpBnb,
               haltBtcChain,
               haltBtcTrading,
+              pauseLpBtc,
               haltEthChain,
               haltEthTrading,
+              pauseLpEth,
               haltBchChain,
               haltBchTrading,
+              pauseLpBch,
               haltLtcChain,
               haltLtcTrading,
-              haltBnbChain,
-              haltBnbTrading
+              pauseLpLtc
             }
           }) => {
             let msg = ''
             msg = haltTrading ? intl.formatMessage({ id: 'halt.trading' }) : msg
             msg = haltThorChain ? intl.formatMessage({ id: 'halt.thorchain' }) : msg
 
-            if (!haltThorChain && !haltTrading && chains.length) {
-              const chainsState = [
+            if (!haltThorChain && !haltTrading) {
+              const haltedChainsState: HaltedChainsState[] = [
                 {
-                  name: BTCChain,
+                  chain: BTCChain,
                   haltedChain: haltBtcChain,
-                  haltedTrading: haltBtcTrading
+                  haltedTrading: haltBtcTrading,
+                  pausedLP: pauseLpBtc
                 },
                 {
-                  name: ETHChain,
-                  halted: haltEthChain,
-                  haltedTrading: haltEthTrading
+                  chain: ETHChain,
+                  haltedChain: haltEthChain,
+                  haltedTrading: haltEthTrading,
+                  pausedLP: pauseLpEth
                 },
                 {
-                  name: BCHChain,
-                  halted: haltBchChain,
-                  haltedTrading: haltBchTrading
+                  chain: BCHChain,
+                  haltedChain: haltBchChain,
+                  haltedTrading: haltBchTrading,
+                  pausedLP: pauseLpBch
                 },
                 {
-                  name: LTCChain,
-                  halted: haltLtcChain,
-                  haltedTrading: haltLtcTrading
+                  chain: LTCChain,
+                  haltedChain: haltLtcChain,
+                  haltedTrading: haltLtcTrading,
+                  pausedLP: pauseLpLtc
                 },
                 {
-                  name: BNBChain,
-                  halted: haltBnbChain,
-                  haltedTrading: haltBnbTrading
+                  chain: BNBChain,
+                  haltedChain: haltBnbChain,
+                  haltedTrading: haltBnbTrading,
+                  pausedLP: pauseLpBnb
                 }
               ]
-              const haltedChains = chainsState.filter((chain) => chain.halted).map((chain) => chain.name)
+
+              const haltedChains = FP.pipe(
+                haltedChainsState,
+                A.filter(({ haltedChain }) => haltedChain),
+                A.map(({ chain }) => chain),
+                // merge chains of `inbound_addresses` and `mimir` endpoints
+                // by  removing duplicates
+                unionChains(inboundHaltedChains)
+              )
+
               msg =
-                haltedChains.length > 0
-                  ? `${msg} ${intl.formatMessage({ id: 'halt.chain' }, { chains: haltedChains.join(', ') })}`
+                haltedChains.length === 1
+                  ? `${msg} ${intl.formatMessage({ id: 'halt.chain' }, { chain: haltedChains[0] })}`
+                  : haltedChains.length > 1
+                  ? `${msg} ${intl.formatMessage({ id: 'halt.chains' }, { chains: haltedChains.join(', ') })}`
                   : `${msg}`
 
-              const haltedTradingChains = chainsState.filter((chain) => chain.haltedTrading).map((chain) => chain.name)
+              const haltedTradingChains = haltedChainsState
+                .filter(({ haltedTrading }) => haltedTrading)
+                .map(({ chain }) => chain)
               msg =
                 haltedTradingChains.length > 0
                   ? `${msg} ${intl.formatMessage(
                       { id: 'halt.chain.trading' },
                       { chains: haltedTradingChains.join(', ') }
                     )}`
+                  : `${msg}`
+
+              const pausedLPs = haltedChainsState.filter(({ pausedLP }) => pausedLP).map(({ chain }) => chain)
+              msg =
+                pausedLPs.length > 0
+                  ? `${msg} ${intl.formatMessage({ id: 'halt.chain.pause' }, { chains: pausedLPs.join(', ') })}`
                   : `${msg}`
             }
 

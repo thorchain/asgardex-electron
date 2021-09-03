@@ -23,6 +23,7 @@ import { DEFAULT_MIMIR_HALT } from '../services/thorchain/const'
 import { GetPoolsStatusEnum, PoolDetail } from '../types/generated/midgard'
 import {
   disableAllActions,
+  disablePoolActions,
   disableTradingActions,
   getDeepestPool,
   getPoolPriceValue,
@@ -357,6 +358,57 @@ describe('helpers/poolHelper/', () => {
         }
       })
       expect(result).toBeFalsy()
+    })
+  })
+
+  describe('disablePoolActions', () => {
+    it('true if trading is halted for this chain', () => {
+      const result = disablePoolActions({
+        chain: BNBChain,
+        haltedChains: [ETHChain, BNBChain],
+        mimirHalt: { ...DEFAULT_MIMIR_HALT }
+      })
+      expect(result).toBeTruthy()
+    })
+    it('true if BNB chain is not in halted list, but paused', () => {
+      const result = disablePoolActions({
+        chain: BNBChain,
+        haltedChains: [],
+        mimirHalt: { ...DEFAULT_MIMIR_HALT, pauseLpBnb: true }
+      })
+      expect(result).toBeTruthy()
+    })
+    it('true if BTC chain is not in halted list, but paused', () => {
+      const result = disablePoolActions({
+        chain: BTCChain,
+        haltedChains: [],
+        mimirHalt: { ...DEFAULT_MIMIR_HALT, pauseLpBtc: true }
+      })
+      expect(result).toBeTruthy()
+    })
+    it('true if BCH chain is not in halted list, but paused', () => {
+      const result = disablePoolActions({
+        chain: BCHChain,
+        haltedChains: [],
+        mimirHalt: { ...DEFAULT_MIMIR_HALT, pauseLpBch: true }
+      })
+      expect(result).toBeTruthy()
+    })
+    it('true if ETH chain is not in halted list, but paused', () => {
+      const result = disablePoolActions({
+        chain: ETHChain,
+        haltedChains: [],
+        mimirHalt: { ...DEFAULT_MIMIR_HALT, pauseLpEth: true }
+      })
+      expect(result).toBeTruthy()
+    })
+    it('true if LTC chain is not in halted list, but paused', () => {
+      const result = disablePoolActions({
+        chain: LTCChain,
+        haltedChains: [],
+        mimirHalt: { ...DEFAULT_MIMIR_HALT, pauseLpLtc: true }
+      })
+      expect(result).toBeTruthy()
     })
   })
 })
