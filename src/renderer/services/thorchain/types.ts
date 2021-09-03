@@ -79,9 +79,13 @@ export const MimirIO = t.type({
   'mimir//HALTETHCHAIN': t.union([t.number, t.undefined]),
   'mimir//HALTETHTRADING': t.union([t.number, t.undefined]),
   'mimir//HALTBTCCHAIN': t.union([t.number, t.undefined]),
+  'mimir//HALTBTCTRADING': t.union([t.number, t.undefined]),
   'mimir//HALTBCHCHAIN': t.union([t.number, t.undefined]),
+  'mimir//HALTBCHTRADING': t.union([t.number, t.undefined]),
   'mimir//HALTLTCCHAIN': t.union([t.number, t.undefined]),
+  'mimir//HALTLTCTRADING': t.union([t.number, t.undefined]),
   'mimir//HALTBNBCHAIN': t.union([t.number, t.undefined]),
+  'mimir//HALTBNBTRADING': t.union([t.number, t.undefined]),
   'mimir//PAUSELPBNB': t.union([t.number, t.undefined]),
   'mimir//PAUSELPBCH': t.union([t.number, t.undefined]),
   'mimir//PAUSELPBTC': t.union([t.number, t.undefined]),
@@ -102,6 +106,15 @@ export type MimirHaltChain = {
   haltLtcChain: boolean
   haltBnbChain: boolean
 }
+export type MimirHaltTrading = {
+  haltTrading: boolean
+  haltBtcTrading: boolean
+  haltEthTrading: boolean
+  haltBchTrading: boolean
+  haltLtcTrading: boolean
+  haltBnbTrading: boolean
+}
+
 export type MimirPauseLP = {
   pauseLpBnb: boolean
   pauseLpBch: boolean
@@ -110,11 +123,7 @@ export type MimirPauseLP = {
   pauseLpLtc: boolean
 }
 
-export type MimirHalt = MimirHaltChain &
-  MimirPauseLP & {
-    haltEthTrading: boolean
-    haltTrading: boolean
-  }
+export type MimirHalt = MimirHaltChain & MimirHaltTrading & MimirPauseLP
 
 export type MimirHaltRD = RD.RemoteData<Error, MimirHalt>
 

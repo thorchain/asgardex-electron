@@ -24,14 +24,21 @@ export const useMimirHalt = (): { mimirHaltRD: MimirHaltRD; mimirHalt: MimirHalt
       FP.pipe(
         mimir$,
         liveData.map<Mimir, MimirHalt>((mimir) => ({
-          haltTrading: mimir['mimir//HALTTRADING'] === 1,
-          haltThorChain: mimir['mimir//HALTTHORCHAIN'] === 1,
-          haltEthTrading: mimir['mimir//HALTETHTRADING'] === 1,
+          // HALT{chain}CHAIN
+          haltBnbChain: mimir['mimir//HALTBNBCHAIN'] === 1,
+          haltBchChain: mimir['mimir//HALTBCHCHAIN'] === 1,
           haltBtcChain: mimir['mimir//HALTBTCCHAIN'] === 1,
           haltEthChain: mimir['mimir//HALTETHCHAIN'] === 1,
-          haltBchChain: mimir['mimir//HALTBCHCHAIN'] === 1,
           haltLtcChain: mimir['mimir//HALTLTCCHAIN'] === 1,
-          haltBnbChain: mimir['mimir//HALTBNBCHAIN'] === 1,
+          haltThorChain: mimir['mimir//HALTTHORCHAIN'] === 1,
+          // HALT{chain}TRADING
+          haltTrading: mimir['mimir//HALTTRADING'] === 1,
+          haltBnbTrading: mimir['mimir//HALTBNBTRADING'] === 1,
+          haltBchTrading: mimir['mimir//HALTBCHTRADING'] === 1,
+          haltBtcTrading: mimir['mimir//HALTBTCTRADING'] === 1,
+          haltEthTrading: mimir['mimir//HALTETHTRADING'] === 1,
+          haltLtcTrading: mimir['mimir//HALTLTCTRADING'] === 1,
+          // PAUSELP{chain}
           pauseLpBnb: mimir['mimir//PAUSELPBNB'] === 1,
           pauseLpBch: mimir['mimir//PAUSELPBCH'] === 1,
           pauseLpBtc: mimir['mimir//PAUSELPBTC'] === 1,
