@@ -8,7 +8,6 @@ import * as Rx from 'rxjs'
 import * as RxOp from 'rxjs/operators'
 
 import { Network } from '../../../shared/api/types'
-import { toClientNetwork } from '../../../shared/utils/client'
 import { envOrDefault } from '../../helpers/envHelper'
 import { clientNetwork$ } from '../app/service'
 import * as C from '../clients'
@@ -102,7 +101,8 @@ const getERC20Decimal = async (asset: Asset, network: Network): Promise<number> 
     O.fromNullable,
     O.fold(
       async () => {
-        const ethNetwork = toClientNetwork(network)
+        // https://docs.ethers.io/v5/api/providers/api-providers/#EtherscanProvider
+        const ethNetwork = network === 'testnet' ? 'ropsten' : 'homestead'
         const provider = new EtherscanProvider(ethNetwork, ETHERSCAN_API_KEY)
         try {
           const decimal = await ETH.getDecimal(asset, provider)
