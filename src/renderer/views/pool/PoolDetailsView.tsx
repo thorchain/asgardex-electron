@@ -36,7 +36,8 @@ const defaultDetailsProps: TargetPoolDetailProps = {
   earningsHistory: O.none,
   network: DEFAULT_NETWORK,
   disableAllPoolActions: false,
-  disableTradingPoolAction: false
+  disableTradingPoolAction: false,
+  disablePoolActions: false
 }
 
 export const PoolDetailsView: React.FC = () => {
@@ -72,6 +73,10 @@ export const PoolDetailsView: React.FC = () => {
   )
   const getDisableTradingPoolAction = useCallback(
     (chain: Chain) => PoolHelpers.disableTradingActions({ chain, haltedChains, mimirHalt }),
+    [haltedChains, mimirHalt]
+  )
+  const getDisablePoolActions = useCallback(
+    (chain: Chain) => PoolHelpers.disablePoolActions({ chain, haltedChains, mimirHalt }),
     [haltedChains, mimirHalt]
   )
 
@@ -139,7 +144,8 @@ export const PoolDetailsView: React.FC = () => {
                     HistoryView: PoolHistory,
                     ChartView: PoolChartView,
                     disableAllPoolActions: getDisableAllPoolActions(asset.chain),
-                    disableTradingPoolAction: getDisableTradingPoolAction(asset.chain)
+                    disableTradingPoolAction: getDisableTradingPoolAction(asset.chain),
+                    disablePoolActions: getDisablePoolActions(asset.chain)
                   }
 
                   return <PoolDetails asset={asset} {...prevProps.current} />
