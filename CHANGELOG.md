@@ -11,6 +11,8 @@
 
 ## Fix
 
+. ETH.RUNE upgrade fails on testnet [#1730](https://github.com/thorchain/asgardex-electron/issues/1730)
+
 - [UpgradeView] Fix rendering hook issues [#1707](https://github.com/thorchain/asgardex-electron/pull/1707)
 
 ## Internal
