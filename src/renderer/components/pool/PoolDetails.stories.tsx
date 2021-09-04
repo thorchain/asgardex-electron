@@ -22,6 +22,7 @@ export const PoolDetailsStory = () => {
       ChartView={() => <>Pool Chart Here</>}
       disableTradingPoolAction={false}
       disableAllPoolActions={false}
+      disablePoolActions={false}
     />
   )
 }

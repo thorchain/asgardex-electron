@@ -25,6 +25,7 @@ export type Props = {
   isLoading?: boolean
   disableTradingPoolAction: boolean
   disableAllPoolActions: boolean
+  disablePoolActions: boolean
   network: Network
   status: GetPoolsStatusEnum
 }
@@ -35,6 +36,7 @@ export const PoolTitle: React.FC<Props> = ({
   priceSymbol,
   disableTradingPoolAction,
   disableAllPoolActions,
+  disablePoolActions,
   network,
   isLoading,
   status
@@ -103,7 +105,7 @@ export const PoolTitle: React.FC<Props> = ({
             return (
               <Styled.ButtonActions>
                 <ManageButton
-                  disabled={disableAllPoolActions}
+                  disabled={disableAllPoolActions || disablePoolActions}
                   asset={asset}
                   sizevalue={isDesktopView ? 'normal' : 'small'}
                   isTextView={isDesktopView}
@@ -130,7 +132,7 @@ export const PoolTitle: React.FC<Props> = ({
           }
         )
       ),
-    [oAsset, disableAllPoolActions, isDesktopView, status, disableTradingPoolAction, intl, history]
+    [oAsset, disableAllPoolActions, disablePoolActions, isDesktopView, status, disableTradingPoolAction, intl, history]
   )
 
   return (
