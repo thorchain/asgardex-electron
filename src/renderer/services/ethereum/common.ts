@@ -101,7 +101,8 @@ const getERC20Decimal = async (asset: Asset, network: Network): Promise<number> 
     O.fromNullable,
     O.fold(
       async () => {
-        const ethNetwork = network === 'testnet' ? 'ropsten' : undefined
+        // https://docs.ethers.io/v5/api/providers/api-providers/#EtherscanProvider
+        const ethNetwork = network === 'testnet' ? 'ropsten' : 'homestead'
         const provider = new EtherscanProvider(ethNetwork, ETHERSCAN_API_KEY)
         try {
           const decimal = await ETH.getDecimal(asset, provider)
