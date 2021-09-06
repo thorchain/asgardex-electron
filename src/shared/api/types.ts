@@ -75,6 +75,7 @@ export enum LedgerErrorId {
   SIGN_FAILED,
   SEND_TX_FAILED,
   DENIED,
+  INVALID_PUBKEY,
   UNKNOWN
 }
 

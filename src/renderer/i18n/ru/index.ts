@@ -2,6 +2,7 @@ import { Messages } from '../types'
 import bonds from './bonds'
 import common from './common'
 import deposit from './deposit'
+import halt from './halt'
 import ledger from './ledger'
 import midgard from './midgard'
 import pools from './pools'
@@ -24,5 +25,6 @@ export default {
   ...ledger,
   ...bonds,
   ...poolShares,
-  ...update
+  ...update,
+  ...halt
 } as Messages

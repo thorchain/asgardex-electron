@@ -12,7 +12,6 @@ import { envOrDefault } from '../../helpers/envHelper'
 import { clientNetwork$ } from '../app/service'
 import * as C from '../clients'
 import { Address$, ExplorerUrl$ } from '../clients/types'
-import { toClientNetwork } from '../clients/utils'
 import { keystoreService } from '../wallet/keystore'
 import { getPhrase } from '../wallet/util'
 import { Client$, ClientState, ClientState$ } from './types'
@@ -102,7 +101,8 @@ const getERC20Decimal = async (asset: Asset, network: Network): Promise<number> 
     O.fromNullable,
     O.fold(
       async () => {
-        const ethNetwork = toClientNetwork(network)
+        // https://docs.ethers.io/v5/api/providers/api-providers/#EtherscanProvider
+        const ethNetwork = network === 'testnet' ? 'ropsten' : 'homestead'
         const provider = new EtherscanProvider(ethNetwork, ETHERSCAN_API_KEY)
         try {
           const decimal = await ETH.getDecimal(asset, provider)

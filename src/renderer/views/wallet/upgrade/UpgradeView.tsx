@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect } from 'react'
+import React, { useCallback, useEffect, useMemo } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
 import { Address } from '@xchainjs/xchain-client'
@@ -46,18 +46,23 @@ export const UpgradeView: React.FC<Props> = (): JSX.Element => {
   const { addressByChain$, upgradeRuneToNative$, assetWithDecimal$ } = useChainContext()
 
   // Accept [CHAIN].Rune only
-  const oRuneNonNativeAsset: O.Option<Asset> = FP.pipe(
-    assetFromString(asset),
-    O.fromNullable,
-    O.filter((asset) => isNonNativeRuneAsset(asset, network))
+  const oRuneNonNativeAsset: O.Option<Asset> = useMemo(
+    () =>
+      FP.pipe(
+        assetFromString(asset),
+        O.fromNullable,
+        O.filter((asset) => isNonNativeRuneAsset(asset, network))
+      ),
+    [asset, network]
   )
 
   const [runeNonNativeAssetRD, updateRuneNonNativeAssetRD] = useObservableState<AssetWithDecimalRD, O.Option<Asset>>(
     (oRuneNonNativeAsset$) =>
       FP.pipe(
-        oRuneNonNativeAsset$,
-        RxOp.distinctUntilChanged(eqOAsset.equals),
-        RxOp.switchMap((oAsset) =>
+        // Note: network$ is needed to get latest network changes
+        // using `network` from `useObservableState` above  has no effect here
+        Rx.combineLatest([oRuneNonNativeAsset$, network$]),
+        RxOp.switchMap(([oAsset, network]) =>
           FP.pipe(
             oAsset,
             O.map((asset) => assetWithDecimal$(asset, network)),

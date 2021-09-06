@@ -24,6 +24,7 @@ export type Props = {
   ChartView: React.ComponentType<{ isLoading?: boolean; priceRatio: BigNumber }>
   disableTradingPoolAction: boolean
   disableAllPoolActions: boolean
+  disablePoolActions: boolean
   network: Network
 }
 
@@ -38,6 +39,7 @@ export const PoolDetails: React.FC<Props> = ({
   ChartView,
   disableTradingPoolAction,
   disableAllPoolActions,
+  disablePoolActions,
   network
 }) => {
   const price = useMemo(() => H.getPrice(poolDetail, priceRatio), [poolDetail, priceRatio])
@@ -48,6 +50,7 @@ export const PoolDetails: React.FC<Props> = ({
           network={network}
           disableAllPoolActions={disableAllPoolActions}
           disableTradingPoolAction={disableTradingPoolAction}
+          disablePoolActions={disablePoolActions}
           asset={O.some(asset)}
           price={price}
           priceSymbol={priceSymbol}

@@ -21,7 +21,7 @@ import { ethers } from 'ethers'
 import * as O from 'fp-ts/lib/Option'
 
 import { Network } from '../../shared/api/types'
-import { toClientNetwork } from '../services/clients'
+import { toClientNetwork } from '../../shared/utils/client'
 
 export const truncateAddress = (addr: Address, chain: Chain, network: Network): string => {
   const first = addr.substr(0, Math.max(getAddressPrefixLength(chain, network) + 3, 6))
