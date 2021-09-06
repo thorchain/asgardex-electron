@@ -29,7 +29,11 @@ export const sendTx = async ({
 
     const app = new THORChainApp(transport)
     // get address + public key
-    const { bech32Address, returnCode, compressedPk } = await app.showAddressAndPubKey(PATH, prefix)
+    console.log('sendTx:', network, txParams)
+    const { bech32Address, returnCode, compressedPk } = await app.getAddressAndPubKey(PATH, prefix)
+    console.log('sendTx bech32Address:', bech32Address)
+    console.log('sendTx returnCode:', returnCode)
+    console.log('sendTx compressedPk:', compressedPk)
     if (!bech32Address || !compressedPk || returnCode !== LedgerErrorType.NoErrors) {
       return E.left(fromLedgerErrorType(returnCode))
     }

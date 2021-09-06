@@ -1,4 +1,5 @@
 import * as RD from '@devexperts/remote-data-ts'
+import { TxParams } from '@xchainjs/xchain-client'
 import { BNBChain } from '@xchainjs/xchain-util'
 import * as FP from 'fp-ts/lib/function'
 import * as Rx from 'rxjs'
@@ -22,9 +23,21 @@ const retrieveLedgerAddress = (network: Network) =>
 
 const { get$: ledgerTxRD$, set: setLedgerTxRD } = observableState<LedgerTxHashRD>(RD.initial)
 
-const ledgerTx$ = (network: Network, params: LedgerBNBTxParams): LedgerTxHashLD =>
+const ledgerTx$ = (network: Network, params: TxParams): LedgerTxHashLD =>
   FP.pipe(
-    Rx.from(window.apiHDWallet.sendLedgerTx({ chain: BNBChain, network, ...params })),
+    Rx.from(
+      window.apiHDWallet.sendLedgerTx({
+        chain: BNBChain,
+        network,
+        txParams: {
+          walletIndex: params.walletIndex,
+          asset: params.asset,
+          amount: params.amount,
+          recipient: params.recipient,
+          memo: params.memo
+        }
+      })
+    ),
     switchMap(liveData.fromEither),
     liveData.mapLeft((ledgerErrorId) => ({
       ledgerErrorId: ledgerErrorId,

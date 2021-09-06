@@ -7,8 +7,11 @@ import electronDebug from 'electron-debug'
 import isDev from 'electron-is-dev'
 import log from 'electron-log'
 import { warn } from 'electron-log'
+import * as E from 'fp-ts/lib/Either'
+import * as FP from 'fp-ts/lib/function'
 
-import { IPCLedgerAdddressParams, IPCLedgerSendTxParams, StoreFileName } from '../shared/api/types'
+import { ipcLedgerSendTxParams } from '../shared/api/io'
+import { IPCLedgerAdddressParams, StoreFileName } from '../shared/api/types'
 import { DEFAULT_STORAGES } from '../shared/const'
 import { Locale } from '../shared/i18n/types'
 import { registerAppCheckUpdatedHandler } from './api/appUpdate'
@@ -136,15 +139,14 @@ const initIPC = () => {
     console.log('ipcMain.handle: GET_LEDGER_ADDRESS', params)
     return getLedgerAddress(params)
   })
-  ipcMain.handle(
-    IPCMessages.SEND_LEDGER_TX,
-    async (_, { chain, network, amount, recipient, memo, sender }: IPCLedgerSendTxParams) => {
-      // async (_, { chain, network }: IPCLedgerSendTxParams) => {
-      console.log('ipcMain.handle: SEND_LEDGER_TX', chain, network)
-      // return Promise.resolve('tx hash')
-      return sendLedgerTx({ chain, network, txParams: { amount, recipient, sender, memo } })
-    }
-  )
+  ipcMain.handle(IPCMessages.SEND_LEDGER_TX, async (_, params: unknown) => {
+    console.log('ipcMain.handle: SEND_LEDGER_TX', params)
+    console.log('ipcMain.handle: decode', ipcLedgerSendTxParams.decode(params))
+    return FP.pipe(
+      ipcLedgerSendTxParams.decode(params),
+      E.fold((e) => Promise.reject(e), sendLedgerTx)
+    )
+  })
   // Update
   registerAppCheckUpdatedHandler(IS_DEV)
   // Register all file-stored data services

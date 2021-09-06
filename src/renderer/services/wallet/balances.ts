@@ -241,7 +241,7 @@ export const createBalancesService = ({
                   walletType: 'ledger',
                   chain,
                   walletAddress: O.some(address),
-                  balances: balances
+                  balances
                 }))
               )
           )

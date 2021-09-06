@@ -8,7 +8,7 @@ import * as O from 'fp-ts/Option'
 import * as Rx from 'rxjs'
 import * as RxOp from 'rxjs/operators'
 
-import { LedgerErrorId, LedgerTHORTxParams, Network } from '../../../shared/api/types'
+import { LedgerErrorId, Network } from '../../../shared/api/types'
 import { retryRequest } from '../../helpers/rx/retryRequest'
 import { Network$ } from '../app/types'
 import * as C from '../clients'
@@ -49,18 +49,24 @@ export const createTransactionService = (client$: Client$, network$: Network$): 
     )
 
   const sendLedgerTx = ({ client, network, params }: { client: Client; network: Network; params: SendTxParams }) => {
-    const nodeUrl = client.getClientUrl()
-    const txParams: LedgerTHORTxParams = {
-      sender: '',
-      nodeUrl,
-      amount: params.amount,
-      recipient: params.recipient
-    }
-    console.log('service THOR sendLedgerTx:', network, txParams)
+    const _nodeUrl = client.getClientUrl()
+
+    console.log('service THOR sendLedgerTx:', network, params)
     console.log('window.apiHDWallet:', window.apiHDWallet)
     return FP.pipe(
-      // Rx.from(window.apiHDWallet.sendLedgerTx({ chain: THORChain, network })),
-      Rx.from(window.apiHDWallet.sendLedgerTx({ chain: THORChain, network, ...txParams })),
+      Rx.from(
+        window.apiHDWallet.sendLedgerTx({
+          chain: THORChain,
+          network,
+          txParams: {
+            walletIndex: undefined,
+            asset: params.asset,
+            amount: params.amount,
+            recipient: params.recipient,
+            memo: params.memo
+          }
+        })
+      ),
       RxOp.tap((r) => console.log('r:', r)),
       RxOp.switchMap(
         FP.flow(
