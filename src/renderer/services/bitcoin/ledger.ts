@@ -29,13 +29,10 @@ const ledgerTx$ = (network: Network, params: TxParams): LedgerTxHashLD =>
       window.apiHDWallet.sendLedgerTx({
         chain: BTCChain,
         network,
-        txParams: {
-          walletIndex: params.walletIndex,
-          asset: params.asset,
-          amount: params.amount,
-          recipient: params.recipient,
-          memo: params.memo
-        }
+        asset: params.asset,
+        amount: params.amount,
+        recipient: params.recipient,
+        memo: params.memo
       })
     ),
     switchMap(liveData.fromEither),

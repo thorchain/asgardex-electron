@@ -1,6 +1,6 @@
 import * as RD from '@devexperts/remote-data-ts'
 import { TxHash } from '@xchainjs/xchain-client'
-import { DepositParam, Client } from '@xchainjs/xchain-thorchain'
+import { DepositParam } from '@xchainjs/xchain-thorchain'
 import { THORChain } from '@xchainjs/xchain-util'
 import * as E from 'fp-ts/lib/Either'
 import * as FP from 'fp-ts/lib/function'
@@ -48,26 +48,18 @@ export const createTransactionService = (client$: Client$, network$: Network$): 
       RxOp.startWith(RD.pending)
     )
 
-  const sendLedgerTx = ({ client, network, params }: { client: Client; network: Network; params: SendTxParams }) => {
-    const _nodeUrl = client.getClientUrl()
-
-    console.log('service THOR sendLedgerTx:', network, params)
-    console.log('window.apiHDWallet:', window.apiHDWallet)
-    return FP.pipe(
+  const sendLedgerTx = ({ network, params }: { network: Network; params: SendTxParams }) =>
+    FP.pipe(
       Rx.from(
         window.apiHDWallet.sendLedgerTx({
           chain: THORChain,
           network,
-          txParams: {
-            walletIndex: undefined,
-            asset: params.asset,
-            amount: params.amount,
-            recipient: params.recipient,
-            memo: params.memo
-          }
+          asset: params.asset,
+          amount: params.amount,
+          recipient: params.recipient,
+          memo: params.memo
         })
       ),
-      RxOp.tap((r) => console.log('r:', r)),
       RxOp.switchMap(
         FP.flow(
           E.fold<LedgerErrorId, TxHash, TxHashLD>(
@@ -83,28 +75,16 @@ export const createTransactionService = (client$: Client$, network$: Network$): 
         )
       )
     )
-  }
 
-  const sendTx = (params: SendTxParams) => {
-    console.log('service THOR sendTx:', params)
-    return FP.pipe(
-      Rx.combineLatest([client$, network$]),
-      RxOp.switchMap(([oClient, network]) =>
-        FP.pipe(
-          oClient,
-          O.fold(
-            () => Rx.EMPTY,
-            (client) => Rx.of({ client, network })
-          )
-        )
-      ),
-      RxOp.switchMap(({ client, network }) => {
-        if (params.walletType === 'ledger') return sendLedgerTx({ client, network, params })
+  const sendTx = (params: SendTxParams) =>
+    FP.pipe(
+      network$,
+      RxOp.switchMap((network) => {
+        if (params.walletType === 'ledger') return sendLedgerTx({ network, params })
 
         return common.sendTx(params)
       })
     )
-  }
 
   return {
     ...common,

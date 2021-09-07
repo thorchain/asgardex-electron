@@ -56,20 +56,6 @@ export const baseAmountIO = new t.Type(
   (a: BaseAmount): BaseAmountEncoded => ({ amount: a.amount().toString(), decimal: a.decimal })
 )
 
-export const txParamsIO = t.type({
-  walletIndex: t.union([t.number, t.undefined]),
-  asset: t.union([assetIO, t.undefined]),
-  amount: baseAmountIO,
-  recipient: t.string,
-  memo: t.union([t.string, t.undefined])
-})
-
-/**
- * Similar to `TxParams
- * but used to encode / decode values to send it properly over `main` <-> `renderer` wire
- */
-export type TxParamsIO = t.TypeOf<typeof txParamsIO>
-
 export const chainIO = new t.Type(
   'ChainIO',
   isChain,
@@ -93,7 +79,10 @@ export const networkIO = new t.Type(
 export const ipcLedgerSendTxParams = t.type({
   chain: chainIO,
   network: networkIO,
-  txParams: txParamsIO
+  asset: t.union([assetIO, t.undefined]),
+  amount: baseAmountIO,
+  recipient: t.string,
+  memo: t.union([t.string, t.undefined])
 })
 
 export type IPCLedgerSendTxParams = t.TypeOf<typeof ipcLedgerSendTxParams>

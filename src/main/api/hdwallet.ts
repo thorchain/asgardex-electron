@@ -9,6 +9,7 @@ export const apiHDWallet: ApiHDWallet = {
   getLedgerAddress: (params: IPCLedgerAdddressParams) => ipcRenderer.invoke(IPCMessages.GET_LEDGER_ADDRESS, params),
   sendLedgerTx: (params: IPCLedgerSendTxParams) => {
     console.log('sendLedgerTx params', params)
+    // params need to be encoded
     const encoded = ipcLedgerSendTxParams.encode(params)
     console.log('sendLedgerTx encoded', encoded)
     return ipcRenderer.invoke(IPCMessages.SEND_LEDGER_TX, encoded)
