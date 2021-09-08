@@ -2,7 +2,7 @@ import type Transport from '@ledgerhq/hw-transport'
 import THORChainApp, { extractSignatureFromTLV, LedgerErrorType } from '@thorchain/ledger-thorchain'
 import { Address, TxHash } from '@xchainjs/xchain-client'
 import { BaseAccountResponse, CosmosSDKClient } from '@xchainjs/xchain-cosmos'
-import { DEFAULT_GAS_VALUE, getChainId, getDenom, getPrefix } from '@xchainjs/xchain-thorchain'
+import { DEFAULT_GAS_VALUE, getChainId, getDenom, getPrefix, registerCodecs } from '@xchainjs/xchain-thorchain'
 import { AssetRuneNative, BaseAmount } from '@xchainjs/xchain-util'
 import { AccAddress, Msg, PubKeySecp256k1 } from 'cosmos-client'
 import { auth, BaseAccount, StdTx } from 'cosmos-client/x/auth'
@@ -38,6 +38,7 @@ export const sendTx = async ({
     console.log('sendTx bech32Address:', bech32Address)
     console.log('sendTx returnCode:', returnCode)
     console.log('sendTx compressedPk:', compressedPk)
+    console.log('sendTx amount', amount.amount().toString())
     if (!bech32Address || !compressedPk || returnCode !== LedgerErrorType.NoErrors) {
       return E.left(fromLedgerErrorType(returnCode))
     }
@@ -57,12 +58,6 @@ export const sendTx = async ({
     const sdk = client.sdk
     console.log('sdk:', sdk)
 
-    // Don't ask why, but it seems we have to do another call before we can call `accountsAddressGet` later
-    const balances = await client.getBalance(bech32Address)
-    console.log('balance:', balances)
-
-    // await delay(500)
-
     // get signer address
     const signer = AccAddress.fromBech32(bech32Address)
 
@@ -76,6 +71,7 @@ export const sendTx = async ({
 
     // Cosmos API has been changed - result has another JSON structure now
     // Code is copied from xchain-cosmos -> SDKClient -> signAndBroadcast)
+    registerCodecs(prefix)
     let account: BaseAccount = (await auth.accountsAddressGet(sdk, signer)).data.result
     console.log('account:', account)
     if (account.account_number === undefined) {

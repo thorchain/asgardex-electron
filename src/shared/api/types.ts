@@ -7,7 +7,6 @@ import { Either } from 'fp-ts/lib/Either'
 import * as O from 'fp-ts/Option'
 
 import { Locale } from '../i18n/types'
-import { IPCLedgerSendTxParams } from './io'
 
 // A version number starting from `1` to avoid to load deprecated files
 export type StorageVersion = { version: string }
@@ -102,7 +101,9 @@ export type IPCLedgerAdddressParams = { chain: Chain; network: Network }
 
 export type ApiHDWallet = {
   getLedgerAddress: (params: IPCLedgerAdddressParams) => Promise<Either<LedgerErrorId, Address>>
-  sendLedgerTx: (params: IPCLedgerSendTxParams) => Promise<Either<LedgerErrorId, TxHash>>
+  sendLedgerTx: (
+    params: unknown /* will be de-/serialized by ipcLedgerSendTxParamsIO */
+  ) => Promise<Either<LedgerErrorId, TxHash>>
 }
 
 declare global {

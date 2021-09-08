@@ -10,7 +10,7 @@ import { warn } from 'electron-log'
 import * as E from 'fp-ts/lib/Either'
 import * as FP from 'fp-ts/lib/function'
 
-import { ipcLedgerSendTxParams } from '../shared/api/io'
+import { ipcLedgerSendTxParamsIO } from '../shared/api/io'
 import { IPCLedgerAdddressParams, StoreFileName } from '../shared/api/types'
 import { DEFAULT_STORAGES } from '../shared/const'
 import { Locale } from '../shared/i18n/types'
@@ -141,9 +141,9 @@ const initIPC = () => {
   })
   ipcMain.handle(IPCMessages.SEND_LEDGER_TX, async (_, params: unknown) => {
     console.log('ipcMain.handle: SEND_LEDGER_TX', params)
-    console.log('ipcMain.handle: decode', ipcLedgerSendTxParams.decode(params))
+    console.log('ipcMain.handle: decode', ipcLedgerSendTxParamsIO.decode(params))
     return FP.pipe(
-      ipcLedgerSendTxParams.decode(params),
+      ipcLedgerSendTxParamsIO.decode(params),
       E.fold((e) => Promise.reject(e), sendLedgerTx)
     )
   })

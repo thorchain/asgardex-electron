@@ -8,6 +8,7 @@ import * as O from 'fp-ts/Option'
 import * as Rx from 'rxjs'
 import * as RxOp from 'rxjs/operators'
 
+import { IPCLedgerSendTxParams, ipcLedgerSendTxParamsIO } from '../../../shared/api/io'
 import { LedgerErrorId, Network } from '../../../shared/api/types'
 import { retryRequest } from '../../helpers/rx/retryRequest'
 import { Network$ } from '../app/types'
@@ -48,18 +49,21 @@ export const createTransactionService = (client$: Client$, network$: Network$): 
       RxOp.startWith(RD.pending)
     )
 
-  const sendLedgerTx = ({ network, params }: { network: Network; params: SendTxParams }) =>
-    FP.pipe(
-      Rx.from(
-        window.apiHDWallet.sendLedgerTx({
-          chain: THORChain,
-          network,
-          asset: params.asset,
-          amount: params.amount,
-          recipient: params.recipient,
-          memo: params.memo
-        })
-      ),
+  const sendLedgerTx = ({ network, params }: { network: Network; params: SendTxParams }) => {
+    console.log('sendLedgerTx amount:', params.amount.amount().toString())
+
+    const sendLedgerTxParams: IPCLedgerSendTxParams = {
+      chain: THORChain,
+      network,
+      asset: params.asset,
+      amount: params.amount,
+      recipient: params.recipient,
+      memo: params.memo
+    }
+    const encoded = ipcLedgerSendTxParamsIO.encode(sendLedgerTxParams)
+
+    return FP.pipe(
+      Rx.from(window.apiHDWallet.sendLedgerTx(encoded)),
       RxOp.switchMap(
         FP.flow(
           E.fold<LedgerErrorId, TxHash, TxHashLD>(
@@ -75,6 +79,7 @@ export const createTransactionService = (client$: Client$, network$: Network$): 
         )
       )
     )
+  }
 
   const sendTx = (params: SendTxParams) =>
     FP.pipe(
