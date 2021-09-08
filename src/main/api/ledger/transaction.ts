@@ -15,7 +15,6 @@ export const sendTx = async ({
   amount,
   memo
 }: IPCLedgerSendTxParams): Promise<E.Either<LedgerErrorId, TxHash>> => {
-  console.log('main sendTx:', network)
   try {
     const transport = await TransportNodeHidSingleton.open()
     let res: E.Either<LedgerErrorId, string>

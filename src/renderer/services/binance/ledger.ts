@@ -31,26 +31,6 @@ const ledgerTx$ = (network: Network, params: TxParams): LedgerTxHashLD =>
     })
   )
 
-// FP.pipe(
-//   Rx.from(
-//     window.apiHDWallet.sendLedgerTx({
-//       chain: BNBChain,
-//       network,
-//       asset: params.asset,
-//       amount: params.amount,
-//       recipient: params.recipient,
-//       memo: params.memo
-//     })
-//   ),
-//   switchMap(liveData.fromEither),
-//   liveData.mapLeft((ledgerErrorId) => ({
-//     ledgerErrorId: ledgerErrorId,
-//     errorId: ErrorId.SEND_LEDGER_TX,
-//     msg: ''
-//   })),
-//   startWith(RD.pending)
-// )
-
 const pushLedgerTx = (network: Network, params: LedgerBNBTxParams): Rx.Subscription =>
   ledgerTx$(network, params).subscribe(setLedgerTxRD)
 

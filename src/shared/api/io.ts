@@ -29,10 +29,7 @@ export const assetIO = new t.Type(
   (input, context) =>
     FP.pipe(
       assetDecoder.decode(input),
-      E.fold(
-        () => t.failure(input, context),
-        (asset) => t.success(asset)
-      )
+      E.fold(() => t.failure(input, context), t.success)
     ),
   assetToString
 )

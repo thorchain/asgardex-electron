@@ -30,25 +30,6 @@ const ledgerTx$ = (network: Network, params: TxParams): LedgerTxHashLD =>
       msg: `Not implemented for BTC ${network} ${params}`
     })
   )
-// FP.pipe(
-//   Rx.from(
-//     window.apiHDWallet.sendLedgerTx({
-//       chain: BTCChain,
-//       network,
-//       asset: params.asset,
-//       amount: params.amount,
-//       recipient: params.recipient,
-//       memo: params.memo
-//     })
-//   ),
-//   switchMap(liveData.fromEither),
-//   liveData.mapLeft((ledgerErrorId) => ({
-//     ledgerErrorId: ledgerErrorId,
-//     errorId: ErrorId.SEND_LEDGER_TX,
-//     msg: ''
-//   })),
-//   startWith(RD.pending)
-// )
 
 const pushLedgerTx = (network: Network, params: LedgerBTCTxInfo): Rx.Subscription =>
   ledgerTx$(network, params).subscribe(setLedgerTxRD)

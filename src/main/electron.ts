@@ -138,6 +138,7 @@ const initIPC = () => {
   ipcMain.handle(IPCMessages.GET_LEDGER_ADDRESS, async (_, params: IPCLedgerAdddressParams) => getLedgerAddress(params))
   ipcMain.handle(IPCMessages.SEND_LEDGER_TX, async (_, params: unknown) => {
     return FP.pipe(
+      // params need to be decoded
       ipcLedgerSendTxParamsIO.decode(params),
       E.fold((e) => Promise.reject(e), sendLedgerTx)
     )

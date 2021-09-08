@@ -24,7 +24,6 @@ export const createTransactionService = (client$: Client$, network$: Network$): 
    */
   const sendPoolTx = (params: DepositParam): TxHashLD =>
     client$.pipe(
-      // RxOp.switchMap((oClient) => (O.isSome(oClient) ? Rx.of(oClient.value) : Rx.EMPTY)),
       RxOp.switchMap((oClient) =>
         FP.pipe(
           oClient,
