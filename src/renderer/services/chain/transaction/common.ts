@@ -43,7 +43,6 @@ export const sendTx$ = ({
   memo,
   feeOption = DEFAULT_FEE_OPTION
 }: SendTxParams): TxHashLD => {
-  console.log('sendTx$:', walletType, recipient, asset)
   switch (asset.chain) {
     case BNBChain:
       return BNB.sendTx({ recipient, amount, asset, memo })

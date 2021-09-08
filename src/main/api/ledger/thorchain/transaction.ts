@@ -11,8 +11,9 @@ import * as E from 'fp-ts/Either'
 
 import { LedgerErrorId, Network } from '../../../../shared/api/types'
 import { getClientUrl } from '../../../../shared/thorchain/client'
+import { toClientNetwork } from '../../../../shared/utils/client'
 import { getErrorId } from '../utils'
-import { fromLedgerErrorType, PATH, toClientNetwork } from './common'
+import { fromLedgerErrorType, PATH } from './common'
 
 export const sendTx = async ({
   transport,

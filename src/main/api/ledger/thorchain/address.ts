@@ -4,8 +4,9 @@ import { getPrefix } from '@xchainjs/xchain-thorchain'
 import * as E from 'fp-ts/Either'
 
 import { LedgerErrorId, Network } from '../../../../shared/api/types'
+import { toClientNetwork } from '../../../../shared/utils/client'
 import { getErrorId } from '../utils'
-import { fromLedgerErrorType, PATH, toClientNetwork } from './common'
+import { fromLedgerErrorType, PATH } from './common'
 
 export const getAddress = async (transport: Transport, network: Network): Promise<E.Either<LedgerErrorId, string>> => {
   try {
