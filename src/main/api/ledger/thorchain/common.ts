@@ -1,4 +1,5 @@
-import { LedgerErrorType } from '../../../../../../ledger-thorchain-js/lib'
+import { LedgerErrorType } from '@thorchain/ledger-thorchain'
+
 import { LedgerErrorId } from '../../../../shared/api/types'
 
 // TODO(@veado) Get path by using `xchain-thorchain`
