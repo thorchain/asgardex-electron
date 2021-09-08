@@ -50,8 +50,6 @@ export const createTransactionService = (client$: Client$, network$: Network$): 
     )
 
   const sendLedgerTx = ({ network, params }: { network: Network; params: SendTxParams }) => {
-    console.log('sendLedgerTx amount:', params.amount.amount().toString())
-
     const sendLedgerTxParams: IPCLedgerSendTxParams = {
       chain: THORChain,
       network,
@@ -77,7 +75,8 @@ export const createTransactionService = (client$: Client$, network$: Network$): 
             (txHash) => Rx.of(RD.success(txHash))
           )
         )
-      )
+      ),
+      RxOp.startWith(RD.pending)
     )
   }
 

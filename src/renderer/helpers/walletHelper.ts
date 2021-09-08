@@ -40,10 +40,8 @@ export const getWalletBalanceByAsset = (
 export const getWalletBalanceByAddress = (
   oWalletBalances: O.Option<NonEmptyWalletBalances>,
   address: Address
-): O.Option<WalletBalance> => {
-  console.log('address:', address)
-  console.log('oWalletBalances:', oWalletBalances)
-  return FP.pipe(
+): O.Option<WalletBalance> =>
+  FP.pipe(
     oWalletBalances,
     O.chain((walletBalances) =>
       FP.pipe(
@@ -52,7 +50,6 @@ export const getWalletBalanceByAddress = (
       )
     )
   )
-}
 
 export const getWalletAssetAmountFromBalances =
   (isTargetWalletBalance: FP.Predicate<WalletBalance>) =>

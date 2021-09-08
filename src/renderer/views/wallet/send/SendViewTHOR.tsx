@@ -50,7 +50,6 @@ export const SendViewTHOR: React.FC<Props> = (props): JSX.Element => {
 
   const onSend = useCallback(
     (params: SendTxParams) => {
-      console.log('onSend:', params)
       subscribeSendTxState(transfer$(params))
     },
     [subscribeSendTxState, transfer$]

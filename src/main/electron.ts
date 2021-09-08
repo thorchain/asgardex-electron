@@ -135,13 +135,8 @@ const initIPC = () => {
   )
   ipcMain.handle(IPCMessages.LOAD_KEYSTORE, () => loadKeystore())
   // Ledger
-  ipcMain.handle(IPCMessages.GET_LEDGER_ADDRESS, async (_, params: IPCLedgerAdddressParams) => {
-    console.log('ipcMain.handle: GET_LEDGER_ADDRESS', params)
-    return getLedgerAddress(params)
-  })
+  ipcMain.handle(IPCMessages.GET_LEDGER_ADDRESS, async (_, params: IPCLedgerAdddressParams) => getLedgerAddress(params))
   ipcMain.handle(IPCMessages.SEND_LEDGER_TX, async (_, params: unknown) => {
-    console.log('ipcMain.handle: SEND_LEDGER_TX', params)
-    console.log('ipcMain.handle: decode', ipcLedgerSendTxParamsIO.decode(params))
     return FP.pipe(
       ipcLedgerSendTxParamsIO.decode(params),
       E.fold((e) => Promise.reject(e), sendLedgerTx)
