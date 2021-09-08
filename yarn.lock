@@ -3769,10 +3769,10 @@
   resolved "https://registry.yarnpkg.com/@thorchain/asgardex-util/-/asgardex-util-0.9.1.tgz#06b75eb6642adae7c4924c37b23f1d5ab41bb33d"
   integrity sha512-+w5jTojttZo0ku7t3cGsrnhymaeBnrWfhzypW1/TWL8Vup1XfHJmYrb60Iel2cftMJp4hlJF6ZmBwUJGbV0Ugg==
 
-"@thorchain/ledger-thorchain@^0.1.0-alpha.1":
-  version "0.1.0-alpha.1"
-  resolved "https://registry.yarnpkg.com/@thorchain/ledger-thorchain/-/ledger-thorchain-0.1.0-alpha.1.tgz#2c0a81f264d868f9a616f50d12285ff3d2c4c3d1"
-  integrity sha512-eGlT4r5NciK8mGBqB9K9ZIEXQt3/Q7VkIFLRLI3jodziU8msiTMonv/NmyJUBVeRDsVVwbrptdoQI2Q/wE5MuQ==
+"@thorchain/ledger-thorchain@^0.1.0-alpha.2":
+  version "0.1.0-alpha.2"
+  resolved "https://registry.yarnpkg.com/@thorchain/ledger-thorchain/-/ledger-thorchain-0.1.0-alpha.2.tgz#b874b6476a4c4f94e2b83c8b47e1f07ffd4cd363"
+  integrity sha512-F04BKQlDzt5krS7XgXd4r0JMKL2kxDwM5w9b8EEPHotOTy1DumWnTDmsNDKZ/oGt8QxARHH/wAjb8tVgav39aQ==
   dependencies:
     "@ledgerhq/hw-transport" "^6.2.0"
     bech32 "^2.0.0"
@@ -4779,10 +4779,10 @@
   resolved "https://registry.yarnpkg.com/@xchainjs/xchain-litecoin/-/xchain-litecoin-0.6.9.tgz#144484a44efee1bf55752376849a3ba871c9b8d5"
   integrity sha512-gsIBiaXlHFIbqOekQtVa0yUHS5G2D5hDhFu4C82HcJ+m9vtRXBjX+sWwWLUSN4rrPFpdYl2bnLqk+R3bqS8Gcw==
 
-"@xchainjs/xchain-thorchain@^0.17.7":
-  version "0.17.7"
-  resolved "https://registry.yarnpkg.com/@xchainjs/xchain-thorchain/-/xchain-thorchain-0.17.7.tgz#dda98aa62001e5b14328b7525f99e8e5bd802120"
-  integrity sha512-+DJg0dQUAg1RbTj7EB+B8V7IhEmsIlRruRqCOHAVik04pC8JEvq1ZfEfrKkTiR02q7CeA6cPpr5dyJSbruluEg==
+"@xchainjs/xchain-thorchain@^0.18.0":
+  version "0.18.0"
+  resolved "https://registry.yarnpkg.com/@xchainjs/xchain-thorchain/-/xchain-thorchain-0.18.0.tgz#68c98609fc610eaea5d51a3bdcbea9923d4661c5"
+  integrity sha512-j5IyFcYinB8tWsppb6n+XQYF90BAFmyo9QpN6fLZuNvRPC3WGUXuIqteypwF4aaixhHNjy5FOjtPfEJ+EkZS7A==
 
 "@xchainjs/xchain-util@^0.3.1":
   version "0.3.1"
