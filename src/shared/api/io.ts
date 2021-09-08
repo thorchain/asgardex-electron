@@ -76,7 +76,7 @@ export const networkIO = new t.Type(
   t.identity
 )
 
-export const ipcLedgerSendTxParams = t.type({
+export const ipcLedgerSendTxParamsIO = t.type({
   chain: chainIO,
   network: networkIO,
   asset: t.union([assetIO, t.undefined]),
@@ -85,4 +85,4 @@ export const ipcLedgerSendTxParams = t.type({
   memo: t.union([t.string, t.undefined])
 })
 
-export type IPCLedgerSendTxParams = t.TypeOf<typeof ipcLedgerSendTxParams>
+export type IPCLedgerSendTxParams = t.TypeOf<typeof ipcLedgerSendTxParamsIO>
