@@ -230,7 +230,7 @@ export const SendFormBNB: React.FC<Props> = (props): JSX.Element => {
         <Styled.Col span={24}>
           <AccountSelector
             onChange={changeAssetHandler}
-            selectedAsset={balance.asset}
+            selectedWallet={balance}
             walletBalances={balances}
             network={network}
           />
