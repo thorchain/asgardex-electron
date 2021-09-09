@@ -57,7 +57,7 @@ export const deposit: Route<DepositParams> = {
   template: `${assets.template}/deposit/:walletType/:walletAddress`,
   path({ walletType, walletAddress }) {
     if (walletAddress) {
-      return `${base.template}/deposit/${walletType}/${walletAddress}`
+      return `${assets.template}/deposit/${walletType}/${walletAddress}`
     } else {
       // Redirect to assets route if passed param are invalid
       return assets.path()

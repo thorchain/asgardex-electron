@@ -75,7 +75,7 @@ describe('Wallet routes', () => {
     })
     it('returns path by given asset parameter', () => {
       expect(assetDetail.path({ walletType: 'keystore', asset: 'BNB.BNB', walletAddress: 'abc123' })).toEqual(
-        '/wallet/assets/keystore/abc123/BNB.BNB'
+        '/wallet/assets/detail/keystore/abc123/BNB.BNB'
       )
     })
     it('redirects to base path if asset is empty', () => {
@@ -159,15 +159,15 @@ describe('Wallet routes', () => {
 
   describe('deposit route', () => {
     it('template', () => {
-      expect(deposit.template).toEqual('/assets/deposit/:walletType/:walletAddress')
+      expect(deposit.template).toEqual('/wallet/assets/deposit/:walletType/:walletAddress')
     })
     it('path for keystore + any wallet address ', () => {
       expect(deposit.path({ walletType: 'keystore', walletAddress: 'abc123' })).toEqual(
-        '/assets/deposit/keystore/walletAddress/abc123'
+        '/wallet/assets/deposit/keystore/abc123'
       )
     })
     it('redirects for invalid values ', () => {
-      expect(deposit.path({ walletAddress: '', walletType: 'ledger' })).toEqual('/assets')
+      expect(deposit.path({ walletAddress: '', walletType: 'ledger' })).toEqual('/wallet/assets')
     })
   })
 })
