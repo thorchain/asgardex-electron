@@ -17,7 +17,7 @@ import * as walletRoutes from '../../../routes/wallet'
 import { OpenExplorerTxUrl, TxsPageRD } from '../../../services/clients'
 import { MAX_ITEMS_PER_PAGE } from '../../../services/const'
 import { EMPTY_LOAD_TXS_HANDLER } from '../../../services/wallet/const'
-import { LoadTxsHandler, NonEmptyWalletBalances, WalletBalances } from '../../../services/wallet/types'
+import { LoadTxsHandler, NonEmptyWalletBalances, WalletBalances, WalletType } from '../../../services/wallet/types'
 import { AssetInfo } from '../../uielements/assets/assetInfo'
 import { BackLink } from '../../uielements/backLink'
 import { Button, RefreshButton } from '../../uielements/button'
@@ -25,6 +25,7 @@ import { TxsTable } from '../txs/table/TxsTable'
 import * as Styled from './AssetDetails.styles'
 
 type Props = {
+  walletType: WalletType
   txsPageRD: TxsPageRD
   balances: O.Option<NonEmptyWalletBalances>
   asset: Asset
@@ -40,6 +41,7 @@ type Props = {
 
 export const AssetDetails: React.FC<Props> = (props): JSX.Element => {
   const {
+    walletType,
     txsPageRD,
     balances: oBalances,
     asset,
@@ -62,19 +64,19 @@ export const AssetDetails: React.FC<Props> = (props): JSX.Element => {
   const walletActionSendClick = useCallback(() => {
     const routeParams = FP.pipe(
       oWalletAddress,
-      O.map((walletAddress) => ({ asset: assetToString(asset), walletAddress })),
-      O.getOrElse(() => ({ asset: assetToString(asset), walletAddress: '' }))
+      O.map((walletAddress) => ({ asset: assetToString(asset), walletAddress, walletType })),
+      O.getOrElse(() => ({ asset: assetToString(asset), walletAddress: '', walletType }))
     )
     history.push(walletRoutes.send.path(routeParams))
-  }, [asset, history, oWalletAddress])
+  }, [asset, history, oWalletAddress, walletType])
 
   const walletActionDepositClick = useCallback(() => {
     FP.pipe(
       oWalletAddress,
-      O.map((walletAddress) => walletRoutes.deposit.path({ walletAddress })),
+      O.map((walletAddress) => walletRoutes.deposit.path({ walletType, walletAddress })),
       O.map(history.push)
     )
-  }, [oWalletAddress, history])
+  }, [oWalletAddress, history.push, walletType])
 
   const isNonNativeRuneAsset: boolean = useMemo(
     () => AssetHelper.isNonNativeRuneAsset(asset, network),
@@ -85,10 +87,12 @@ export const AssetDetails: React.FC<Props> = (props): JSX.Element => {
     FP.pipe(
       oWalletAddress,
       O.filter((_) => isNonNativeRuneAsset),
-      O.map((walletAddress) => walletRoutes.upgradeRune.path({ asset: assetToString(asset), walletAddress, network })),
+      O.map((walletAddress) =>
+        walletRoutes.upgradeRune.path({ asset: assetToString(asset), walletAddress, network, walletType })
+      ),
       O.map(history.push)
     )
-  }, [oWalletAddress, history, isNonNativeRuneAsset, asset, network])
+  }, [oWalletAddress, history.push, isNonNativeRuneAsset, asset, network, walletType])
 
   const refreshHandler = useCallback(() => {
     loadTxsHandler({ limit: MAX_ITEMS_PER_PAGE, offset: (currentPage - 1) * MAX_ITEMS_PER_PAGE })

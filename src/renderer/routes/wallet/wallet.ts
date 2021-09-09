@@ -1,3 +1,4 @@
+import { Address } from '@xchainjs/xchain-client'
 import { assetFromString, assetToString } from '@xchainjs/xchain-util'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
@@ -5,6 +6,7 @@ import * as O from 'fp-ts/lib/Option'
 import { Network } from '../../../shared/api/types'
 import { isNonNativeRuneAsset } from '../../helpers/assetHelper'
 import { sequenceTOption } from '../../helpers/fpHelpers'
+import { WalletType } from '../../services/wallet/types'
 import { Route } from '../types'
 
 export * as imports from './imports'
@@ -50,11 +52,16 @@ export const poolShares: Route<void> = {
   }
 }
 
-export type DepositParams = { walletAddress: string }
+export type DepositParams = { walletAddress: string; walletType: WalletType }
 export const deposit: Route<DepositParams> = {
-  template: `${base.template}/deposit/:walletAddress`,
-  path({ walletAddress }) {
-    return `${base.template}/deposit/${walletAddress}`
+  template: `${assets.template}/deposit/:walletType/:walletAddress`,
+  path({ walletType, walletAddress }) {
+    if (walletAddress) {
+      return `${assets.template}/deposit/${walletType}/${walletAddress}`
+    } else {
+      // Redirect to assets route if passed param are invalid
+      return assets.path()
+    }
   }
 }
 
@@ -65,12 +72,12 @@ export const bonds: Route<void> = {
   }
 }
 
-export type AssetDetailsParams = { asset: string; walletAddress: string }
+export type AssetDetailsParams = { asset: string; walletAddress: Address; walletType: WalletType }
 export const assetDetail: Route<AssetDetailsParams> = {
-  template: `${assets.template}/detail/:walletAddress/:asset`,
-  path: ({ asset, walletAddress }) => {
+  template: `${assets.template}/detail/:walletType/:walletAddress/:asset`,
+  path: ({ walletType, asset, walletAddress }) => {
     if (asset && !!walletAddress) {
-      return `${assets.template}/detail/${walletAddress}/${asset}`
+      return `${assets.template}/detail/${walletType}/${walletAddress}/${asset}`
     } else {
       // Redirect to assets route if passed param is empty
       return assets.path()
@@ -78,12 +85,12 @@ export const assetDetail: Route<AssetDetailsParams> = {
   }
 }
 
-export type SendParams = { asset: string; walletAddress: string }
+export type SendParams = { asset: string; walletAddress: string; walletType: WalletType }
 export const send: Route<SendParams> = {
   template: `${assetDetail.template}/send`,
-  path: ({ asset, walletAddress }) => {
+  path: ({ asset, walletAddress, walletType }) => {
     if (asset && !!walletAddress) {
-      return `${assetDetail.path({ asset, walletAddress })}/send`
+      return `${assetDetail.path({ walletType, asset, walletAddress })}/send`
     } else {
       // Redirect to assets route if passed params are empty
       return assets.path()
@@ -91,10 +98,15 @@ export const send: Route<SendParams> = {
   }
 }
 
-export type AssetUpgradeDetailsParams = { asset: string; walletAddress: string; network: Network }
+export type AssetUpgradeDetailsParams = {
+  asset: string
+  walletAddress: string
+  network: Network
+  walletType: WalletType
+}
 export const upgradeRune: Route<AssetUpgradeDetailsParams> = {
   template: `${assetDetail.template}/upgrade`,
-  path: ({ asset: assetString, walletAddress, network }) => {
+  path: ({ asset: assetString, walletAddress, network, walletType }) => {
     // Validate asset string to accept BNB.Rune only
     const oAsset = FP.pipe(
       assetFromString(assetString),
@@ -111,7 +123,8 @@ export const upgradeRune: Route<AssetUpgradeDetailsParams> = {
       O.fold(
         // Redirect to assets route if passed params are empty
         () => assets.path(),
-        ([asset, walletAddress]) => `${assetDetail.path({ asset: assetToString(asset), walletAddress })}/upgrade`
+        ([asset, walletAddress]) =>
+          `${assetDetail.path({ walletType, asset: assetToString(asset), walletAddress })}/upgrade`
       )
     )
   }

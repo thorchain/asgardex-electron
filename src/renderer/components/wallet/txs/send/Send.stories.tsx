@@ -24,7 +24,7 @@ import { RDStatus, getMockRDValueFactory } from '../../../../../shared/mock/rdBy
 import { mockValidatePassword$ } from '../../../../../shared/mock/wallet'
 import { SendTxParams } from '../../../../services/binance/types'
 import { WalletBalances } from '../../../../services/clients'
-import { ErrorId, TxHashRD, WalletBalance } from '../../../../services/wallet/types'
+import { ErrorId, TxHashRD, WalletBalance, WalletType } from '../../../../services/wallet/types'
 import { Send } from './Send'
 import { SendFormBNB } from './SendFormBNB'
 import { SendFormBTC } from './SendFormBTC'
@@ -122,6 +122,7 @@ const rates: FeeRates = {
 }
 
 const defaultComponentProps = {
+  walletType: 'keystore' as WalletType,
   balances,
   balance: bnbAsset,
   feesWithRates: RD.success({ fees, rates }),

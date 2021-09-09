@@ -19,14 +19,16 @@ import { useSubscriptionState } from '../../../hooks/useSubscriptionState'
 import { useValidateAddress } from '../../../hooks/useValidateAddress'
 import { INITIAL_INTERACT_STATE } from '../../../services/thorchain/const'
 import { InteractState } from '../../../services/thorchain/types'
+import { WalletType } from '../../../services/wallet/types'
 import * as Styled from './InteractView.styles'
 
 type Props = {
+  walletType: WalletType
   walletAddress: string
   goToTransaction: (txHash: string) => void
 }
 
-export const BondView: React.FC<Props> = ({ walletAddress, goToTransaction }) => {
+export const BondView: React.FC<Props> = ({ walletType, walletAddress, goToTransaction }) => {
   const { balancesState$ } = useWalletContext()
 
   const {
@@ -64,9 +66,9 @@ export const BondView: React.FC<Props> = ({ walletAddress, goToTransaction }) =>
 
   const bondTx = useCallback(
     ({ amount, memo }: { amount: BaseAmount; memo: string }) => {
-      subscribeInteractState(interact$({ amount, memo }))
+      subscribeInteractState(interact$({ walletType, amount, memo }))
     },
-    [interact$, subscribeInteractState]
+    [interact$, subscribeInteractState, walletType]
   )
 
   const stepLabels = useMemo(

@@ -25,7 +25,7 @@ import { sequenceTOption } from '../../../../helpers/fpHelpers'
 import { getBnbAmountFromBalances } from '../../../../helpers/walletHelper'
 import { FeeRD, SendTxParams } from '../../../../services/chain/types'
 import { AddressValidation, WalletBalances } from '../../../../services/clients'
-import { ValidatePasswordHandler } from '../../../../services/wallet/types'
+import { ValidatePasswordHandler, WalletType } from '../../../../services/wallet/types'
 import { WalletBalance } from '../../../../services/wallet/types'
 import { PasswordModal } from '../../../modal/password'
 import { MaxBalanceButton } from '../../../uielements/button/MaxBalanceButton'
@@ -43,6 +43,7 @@ export type FormValues = {
 }
 
 export type Props = {
+  walletType: WalletType
   balances: WalletBalances
   balance: WalletBalance
   onSubmit: (p: SendTxParams) => void
@@ -57,6 +58,7 @@ export type Props = {
 
 export const SendFormBNB: React.FC<Props> = (props): JSX.Element => {
   const {
+    walletType,
     balances,
     balance,
     onSubmit,
@@ -176,14 +178,13 @@ export const SendFormBNB: React.FC<Props> = (props): JSX.Element => {
     setShowPwModal(false)
 
     onSubmit({
-      // TODO(@asgdx-team) Get `walletType` from props if we want to support other than keystore (e.g. Ledger)
-      walletType: 'keystore',
+      walletType,
       recipient: form.getFieldValue('recipient'),
       asset: balance.asset,
       amount: amountToSend,
       memo: form.getFieldValue('memo')
     })
-  }, [onSubmit, form, balance.asset, amountToSend])
+  }, [onSubmit, walletType, form, balance.asset, amountToSend])
 
   const renderPwModal = useMemo(
     () =>

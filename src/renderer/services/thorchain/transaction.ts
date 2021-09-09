@@ -8,21 +8,69 @@ import * as O from 'fp-ts/Option'
 import * as Rx from 'rxjs'
 import * as RxOp from 'rxjs/operators'
 
-import { IPCLedgerSendTxParams, ipcLedgerSendTxParamsIO } from '../../../shared/api/io'
+import {
+  // IPCLedgerDepositTxParams,
+  // ipcLedgerDepositTxParamsIO,
+  IPCLedgerSendTxParams,
+  ipcLedgerSendTxParamsIO
+} from '../../../shared/api/io'
 import { LedgerErrorId, Network } from '../../../shared/api/types'
 import { retryRequest } from '../../helpers/rx/retryRequest'
 import { Network$ } from '../app/types'
 import * as C from '../clients'
-import { TxHashLD, ErrorId } from '../wallet/types'
+import { TxHashLD, ErrorId, WalletType } from '../wallet/types'
 import { Client$, SendTxParams } from './types'
 import { TransactionService } from './types'
 
 export const createTransactionService = (client$: Client$, network$: Network$): TransactionService => {
   const common = C.createTransactionService(client$)
+
+  // ------
+  // Will be enabled with another PR
+  // -----
+  // const depositLedgerTx = ({ network, params }: { network: Network; params: DepositParam }) => {
+  //   const depositLedgerTxParams: IPCLedgerDepositTxParams = {
+  //     chain: THORChain,
+  //     network,
+  //     asset: params.asset,
+  //     amount: params.amount,
+  //     memo: params.memo
+  //   }
+  //   const encoded = ipcLedgerDepositTxParamsIO.encode(depositLedgerTxParams)
+
+  //   return FP.pipe(
+  //     Rx.from(window.apiHDWallet.depositLedgerTx(encoded)),
+  //     RxOp.switchMap(
+  //       FP.flow(
+  //         E.fold<LedgerErrorId, TxHash, TxHashLD>(
+  //           (error) =>
+  //             Rx.of(
+  //               RD.failure({
+  //                 errorId: ErrorId.SEND_TX,
+  //                 msg: `Deposit Ledger tx failed. (error id: ${error})`
+  //               })
+  //             ),
+  //           (txHash) => Rx.of(RD.success(txHash))
+  //         )
+  //       )
+  //     ),
+  //     RxOp.startWith(RD.pending)
+  //   )
+  // }
+
+  const depositLedgerTx = (_: { network: Network; params: DepositParam }) => {
+    return Rx.of(
+      RD.failure({
+        errorId: ErrorId.SEND_LEDGER_TX,
+        msg: 'not implemented'
+      })
+    )
+  }
+
   /**
    * Sends a deposit request by given `DepositParam`
    */
-  const sendPoolTx = (params: DepositParam): TxHashLD =>
+  const depositTx = (params: DepositParam): TxHashLD =>
     client$.pipe(
       RxOp.switchMap((oClient) =>
         FP.pipe(
@@ -46,6 +94,16 @@ export const createTransactionService = (client$: Client$, network$: Network$): 
           )
       ),
       RxOp.startWith(RD.pending)
+    )
+
+  const sendPoolTx = ({ walletType, walletIndex, asset, amount, memo }: DepositParam & { walletType: WalletType }) =>
+    FP.pipe(
+      network$,
+      RxOp.switchMap((network) => {
+        if (walletType === 'ledger') return depositLedgerTx({ network, params: { walletIndex, asset, amount, memo } })
+
+        return depositTx({ walletIndex, asset, amount, memo })
+      })
     )
 
   const sendLedgerTx = ({ network, params }: { network: Network; params: SendTxParams }) => {

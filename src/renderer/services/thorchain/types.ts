@@ -30,10 +30,11 @@ export type SendTxParams = {
 }
 
 export type TransactionService = {
-  sendPoolTx$: (params: DepositParam) => TxHashLD
+  sendPoolTx$: (params: DepositParam & { walletType: WalletType }) => TxHashLD
 } & C.TransactionService<SendTxParams>
 
 export type InteractParams = {
+  readonly walletType: WalletType
   readonly amount: BaseAmount
   readonly memo: string
 }

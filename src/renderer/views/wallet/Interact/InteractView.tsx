@@ -20,7 +20,7 @@ import { LeaveView } from './LeaveView'
 import { UnbondView } from './UnbondView'
 
 export const InteractView: React.FC = () => {
-  const { walletAddress } = useParams<walletRoutes.DepositParams>()
+  const { walletAddress, walletType } = useParams<walletRoutes.DepositParams>()
 
   const { network$ } = useAppContext()
   const network = useObservableState<Network>(network$, DEFAULT_NETWORK)
@@ -36,10 +36,12 @@ export const InteractView: React.FC = () => {
       </Row>
       <Styled.ContentContainer>
         <Interact
-          bondContent={<BondView walletAddress={walletAddress} goToTransaction={openExplorerTxUrl} />}
-          leaveContent={<LeaveView openExplorerTxUrl={openExplorerTxUrl} />}
-          unbondContent={<UnbondView openExplorerTxUrl={openExplorerTxUrl} />}
-          customContent={<CustomView openExplorerTxUrl={openExplorerTxUrl} />}
+          bondContent={
+            <BondView walletType={walletType} walletAddress={walletAddress} goToTransaction={openExplorerTxUrl} />
+          }
+          leaveContent={<LeaveView walletType={walletType} openExplorerTxUrl={openExplorerTxUrl} />}
+          unbondContent={<UnbondView walletType={walletType} openExplorerTxUrl={openExplorerTxUrl} />}
+          customContent={<CustomView walletType={walletType} openExplorerTxUrl={openExplorerTxUrl} />}
           network={network}
         />
       </Styled.ContentContainer>

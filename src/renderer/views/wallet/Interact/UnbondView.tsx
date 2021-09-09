@@ -14,13 +14,15 @@ import { useSubscriptionState } from '../../../hooks/useSubscriptionState'
 import { useValidateAddress } from '../../../hooks/useValidateAddress'
 import { INITIAL_INTERACT_STATE } from '../../../services/thorchain/const'
 import { InteractState } from '../../../services/thorchain/types'
+import { WalletType } from '../../../services/wallet/types'
 import * as Styled from './InteractView.styles'
 
 type Props = {
+  walletType: WalletType
   openExplorerTxUrl: (txHash: TxHash) => void
 }
 
-export const UnbondView: React.FC<Props> = ({ openExplorerTxUrl: goToTransaction }) => {
+export const UnbondView: React.FC<Props> = ({ walletType, openExplorerTxUrl: goToTransaction }) => {
   const {
     state: interactState,
     reset: resetInteractState,
@@ -39,10 +41,10 @@ export const UnbondView: React.FC<Props> = ({ openExplorerTxUrl: goToTransaction
          * it does not matter which amount to send
          * @docs https://docs.thorchain.org/thornodes/leaving#unbonding
          */
-        interact$({ amount: baseAmount(1), memo })
+        interact$({ walletType, amount: baseAmount(1), memo })
       )
     },
-    [interact$, subscribeInteractState]
+    [interact$, subscribeInteractState, walletType]
   )
 
   const stepLabels = useMemo(

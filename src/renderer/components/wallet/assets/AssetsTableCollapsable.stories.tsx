@@ -2,6 +2,7 @@ import React from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
 import { Story } from '@storybook/react'
+import { Address } from '@xchainjs/xchain-client'
 import {
   Asset,
   AssetBNB,
@@ -31,7 +32,15 @@ import { AssetsTableCollapsable } from './index'
 
 const apiError: ApiError = { errorId: ErrorId.GET_BALANCES, msg: 'error message' }
 
-const selectAssetHandler = (asset: Asset) => console.log('asset selected ', assetToString(asset))
+const selectAssetHandler = ({
+  asset,
+  walletType,
+  walletAddress
+}: {
+  asset: Asset
+  walletAddress: Address
+  walletType: WalletType
+}) => console.log('selectAssetHandler params ', assetToString(asset), walletType, walletAddress)
 
 const balances: Partial<Record<Chain, ChainBalances>> = {
   [BNBChain]: [

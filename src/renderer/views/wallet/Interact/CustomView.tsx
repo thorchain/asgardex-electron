@@ -13,13 +13,15 @@ import { useThorchainContext } from '../../../contexts/ThorchainContext'
 import { useSubscriptionState } from '../../../hooks/useSubscriptionState'
 import { INITIAL_INTERACT_STATE } from '../../../services/thorchain/const'
 import { InteractState } from '../../../services/thorchain/types'
+import { WalletType } from '../../../services/wallet/types'
 import * as Styled from './InteractView.styles'
 
 type Props = {
+  walletType: WalletType
   openExplorerTxUrl: (txHash: TxHash) => void
 }
 
-export const CustomView: React.FC<Props> = ({ openExplorerTxUrl }) => {
+export const CustomView: React.FC<Props> = ({ walletType, openExplorerTxUrl }) => {
   const {
     state: interactState,
     reset: resetInteractState,
@@ -31,9 +33,9 @@ export const CustomView: React.FC<Props> = ({ openExplorerTxUrl }) => {
 
   const customTx = useCallback(
     ({ amount, memo }: { amount: BaseAmount; memo: string }) => {
-      subscribeInteractState(interact$({ amount, memo }))
+      subscribeInteractState(interact$({ walletType, amount, memo }))
     },
-    [interact$, subscribeInteractState]
+    [interact$, subscribeInteractState, walletType]
   )
   const stepLabels = useMemo(
     () => [intl.formatMessage({ id: 'common.tx.sending' }), intl.formatMessage({ id: 'common.tx.checkResult' })],

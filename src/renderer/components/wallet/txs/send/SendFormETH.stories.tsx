@@ -35,6 +35,7 @@ const fees: Fees = {
 }
 
 const defaultProps: SendFormETHProps = {
+  walletType: 'keystore',
   balances: [ethBalance, runeBalance],
   balance: ethBalance,
   fees: RD.success(fees),

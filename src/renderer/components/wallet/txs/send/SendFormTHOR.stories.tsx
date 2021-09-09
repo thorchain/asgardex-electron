@@ -25,6 +25,7 @@ const runeBalance: WalletBalance = {
 }
 
 const defaultProps: ComponentProps = {
+  walletType: 'keystore',
   balances: [runeBalance],
   balance: runeBalance,
   onSubmit: ({ recipient, amount, asset, memo }: SendTxParams) =>

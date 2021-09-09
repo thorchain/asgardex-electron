@@ -18,10 +18,16 @@ import { useSubscriptionState } from '../../../hooks/useSubscriptionState'
 import { INITIAL_SEND_STATE } from '../../../services/chain/const'
 import { SendTxParams, SendTxState } from '../../../services/chain/types'
 import { FeesRD, OpenExplorerTxUrl, WalletBalances } from '../../../services/clients'
-import { NonEmptyWalletBalances, ValidatePasswordHandler, WalletBalance } from '../../../services/wallet/types'
+import {
+  NonEmptyWalletBalances,
+  ValidatePasswordHandler,
+  WalletBalance,
+  WalletType
+} from '../../../services/wallet/types'
 import * as Helper from './SendView.helper'
 
 type Props = {
+  walletType: WalletType
   asset: Asset
   balances: O.Option<NonEmptyWalletBalances>
   openExplorerTxUrl: OpenExplorerTxUrl
@@ -30,7 +36,7 @@ type Props = {
 }
 
 export const SendViewETH: React.FC<Props> = (props): JSX.Element => {
-  const { asset, balances: oBalances, openExplorerTxUrl, validatePassword$, network } = props
+  const { walletType, asset, balances: oBalances, openExplorerTxUrl, validatePassword$, network } = props
 
   const intl = useIntl()
   const history = useHistory()
@@ -81,6 +87,7 @@ export const SendViewETH: React.FC<Props> = (props): JSX.Element => {
   const sendForm = useCallback(
     (walletBalance: WalletBalance) => (
       <SendFormETH
+        walletType={walletType}
         balance={walletBalance}
         balances={FP.pipe(
           oBalances,
@@ -95,7 +102,7 @@ export const SendViewETH: React.FC<Props> = (props): JSX.Element => {
         network={network}
       />
     ),
-    [oBalances, feesRD, isLoading, onSend, sendTxStatusMsg, reloadFees, validatePassword$, network]
+    [walletType, oBalances, feesRD, isLoading, onSend, sendTxStatusMsg, reloadFees, validatePassword$, network]
   )
 
   const finishActionHandler = useCallback(() => {

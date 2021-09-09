@@ -20,10 +20,16 @@ import { FeesWithRatesLD } from '../../../services/bitcoincash/types'
 import { INITIAL_SEND_STATE } from '../../../services/chain/const'
 import { SendTxParams, SendTxState } from '../../../services/chain/types'
 import { OpenExplorerTxUrl, WalletBalances } from '../../../services/clients'
-import { NonEmptyWalletBalances, ValidatePasswordHandler, WalletBalance } from '../../../services/wallet/types'
+import {
+  NonEmptyWalletBalances,
+  ValidatePasswordHandler,
+  WalletBalance,
+  WalletType
+} from '../../../services/wallet/types'
 import * as Helper from './SendView.helper'
 
 type Props = {
+  walletType: WalletType
   asset: Asset
   balances: O.Option<NonEmptyWalletBalances>
   openExplorerTxUrl: OpenExplorerTxUrl
@@ -32,7 +38,7 @@ type Props = {
 }
 
 export const SendViewBCH: React.FC<Props> = (props): JSX.Element => {
-  const { asset, balances: oBalances, openExplorerTxUrl, validatePassword$, network } = props
+  const { walletType, asset, balances: oBalances, openExplorerTxUrl, validatePassword$, network } = props
 
   const intl = useIntl()
   const history = useHistory()
@@ -72,6 +78,7 @@ export const SendViewBCH: React.FC<Props> = (props): JSX.Element => {
   const sendForm = useCallback(
     (walletBalance: WalletBalance) => (
       <SendFormBCH
+        walletType={walletType}
         balances={FP.pipe(
           oBalances,
           O.getOrElse(() => [] as WalletBalances)
@@ -88,6 +95,7 @@ export const SendViewBCH: React.FC<Props> = (props): JSX.Element => {
       />
     ),
     [
+      walletType,
       oBalances,
       isLoading,
       onSend,
