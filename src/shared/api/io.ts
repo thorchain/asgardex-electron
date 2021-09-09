@@ -83,3 +83,13 @@ export const ipcLedgerSendTxParamsIO = t.type({
 })
 
 export type IPCLedgerSendTxParams = t.TypeOf<typeof ipcLedgerSendTxParamsIO>
+
+export const ipcLedgerDepositTxParamsIO = t.type({
+  chain: chainIO,
+  network: networkIO,
+  asset: t.union([assetIO, t.undefined]),
+  amount: baseAmountIO,
+  memo: t.string
+})
+
+export type IPCLedgerDepositTxParams = t.TypeOf<typeof ipcLedgerDepositTxParamsIO>

@@ -10,14 +10,14 @@ import { warn } from 'electron-log'
 import * as E from 'fp-ts/lib/Either'
 import * as FP from 'fp-ts/lib/function'
 
-import { ipcLedgerSendTxParamsIO } from '../shared/api/io'
+import { ipcLedgerDepositTxParamsIO, ipcLedgerSendTxParamsIO } from '../shared/api/io'
 import { IPCLedgerAdddressParams, StoreFileName } from '../shared/api/types'
 import { DEFAULT_STORAGES } from '../shared/const'
 import { Locale } from '../shared/i18n/types'
 import { registerAppCheckUpdatedHandler } from './api/appUpdate'
 import { getFileStoreService } from './api/fileStore'
 import { saveKeystore, removeKeystore, getKeystore, keystoreExist, exportKeystore, loadKeystore } from './api/keystore'
-import { getAddress as getLedgerAddress, sendTx as sendLedgerTx } from './api/ledger'
+import { getAddress as getLedgerAddress, sendTx as sendLedgerTx, deposit as depositLedgerTx } from './api/ledger'
 import IPCMessages from './ipc/messages'
 import { setMenu } from './menu'
 
@@ -141,6 +141,13 @@ const initIPC = () => {
       // params need to be decoded
       ipcLedgerSendTxParamsIO.decode(params),
       E.fold((e) => Promise.reject(e), sendLedgerTx)
+    )
+  })
+  ipcMain.handle(IPCMessages.DEPOSIT_LEDGER_TX, async (_, params: unknown) => {
+    return FP.pipe(
+      // params need to be decoded
+      ipcLedgerDepositTxParamsIO.decode(params),
+      E.fold((e) => Promise.reject(e), depositLedgerTx)
     )
   })
   // Update

@@ -76,6 +76,7 @@ export enum LedgerErrorId {
   SEND_TX_FAILED,
   DENIED,
   INVALID_PUBKEY,
+  NOT_IMPLEMENTED,
   UNKNOWN
 }
 
@@ -103,6 +104,9 @@ export type ApiHDWallet = {
   getLedgerAddress: (params: IPCLedgerAdddressParams) => Promise<Either<LedgerErrorId, Address>>
   sendLedgerTx: (
     params: unknown /* will be de-/serialized by ipcLedgerSendTxParamsIO */
+  ) => Promise<Either<LedgerErrorId, TxHash>>
+  depositLedgerTx: (
+    params: unknown /* will be de-/serialized by ipcLedgerDepositTxParamsIO */
   ) => Promise<Either<LedgerErrorId, TxHash>>
 }
 

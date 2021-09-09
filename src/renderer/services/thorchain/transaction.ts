@@ -9,8 +9,8 @@ import * as Rx from 'rxjs'
 import * as RxOp from 'rxjs/operators'
 
 import {
-  // IPCLedgerDepositTxParams,
-  // ipcLedgerDepositTxParamsIO,
+  IPCLedgerDepositTxParams,
+  ipcLedgerDepositTxParamsIO,
   IPCLedgerSendTxParams,
   ipcLedgerSendTxParamsIO
 } from '../../../shared/api/io'
@@ -25,45 +25,33 @@ import { TransactionService } from './types'
 export const createTransactionService = (client$: Client$, network$: Network$): TransactionService => {
   const common = C.createTransactionService(client$)
 
-  // ------
-  // Will be enabled with another PR
-  // -----
-  // const depositLedgerTx = ({ network, params }: { network: Network; params: DepositParam }) => {
-  //   const depositLedgerTxParams: IPCLedgerDepositTxParams = {
-  //     chain: THORChain,
-  //     network,
-  //     asset: params.asset,
-  //     amount: params.amount,
-  //     memo: params.memo
-  //   }
-  //   const encoded = ipcLedgerDepositTxParamsIO.encode(depositLedgerTxParams)
+  const depositLedgerTx = ({ network, params }: { network: Network; params: DepositParam }) => {
+    const depositLedgerTxParams: IPCLedgerDepositTxParams = {
+      chain: THORChain,
+      network,
+      asset: params.asset,
+      amount: params.amount,
+      memo: params.memo
+    }
+    const encoded = ipcLedgerDepositTxParamsIO.encode(depositLedgerTxParams)
 
-  //   return FP.pipe(
-  //     Rx.from(window.apiHDWallet.depositLedgerTx(encoded)),
-  //     RxOp.switchMap(
-  //       FP.flow(
-  //         E.fold<LedgerErrorId, TxHash, TxHashLD>(
-  //           (error) =>
-  //             Rx.of(
-  //               RD.failure({
-  //                 errorId: ErrorId.SEND_TX,
-  //                 msg: `Deposit Ledger tx failed. (error id: ${error})`
-  //               })
-  //             ),
-  //           (txHash) => Rx.of(RD.success(txHash))
-  //         )
-  //       )
-  //     ),
-  //     RxOp.startWith(RD.pending)
-  //   )
-  // }
-
-  const depositLedgerTx = (_: { network: Network; params: DepositParam }) => {
-    return Rx.of(
-      RD.failure({
-        errorId: ErrorId.SEND_LEDGER_TX,
-        msg: 'not implemented'
-      })
+    return FP.pipe(
+      Rx.from(window.apiHDWallet.depositLedgerTx(encoded)),
+      RxOp.switchMap(
+        FP.flow(
+          E.fold<LedgerErrorId, TxHash, TxHashLD>(
+            (error) =>
+              Rx.of(
+                RD.failure({
+                  errorId: ErrorId.SEND_TX,
+                  msg: `Deposit Ledger tx failed. (error id: ${error})`
+                })
+              ),
+            (txHash) => Rx.of(RD.success(txHash))
+          )
+        )
+      ),
+      RxOp.startWith(RD.pending)
     )
   }
 

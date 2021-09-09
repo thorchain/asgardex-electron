@@ -162,6 +162,7 @@ export const AssetDetails: React.FC<Props> = (props): JSX.Element => {
 
   return (
     <>
+      <div>walletType {walletType}</div>
       <Row justify="space-between">
         <Col>
           <BackLink path={walletRoutes.assets.path()} />
