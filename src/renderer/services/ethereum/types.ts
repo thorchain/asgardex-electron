@@ -2,10 +2,11 @@ import * as RD from '@devexperts/remote-data-ts'
 import { FeeOption, TxParams, XChainClient } from '@xchainjs/xchain-client'
 import { Address, EthereumClient, FeesWithGasPricesAndLimits } from '@xchainjs/xchain-ethereum'
 import { Asset, BaseAmount } from '@xchainjs/xchain-util'
-import { BigNumber, ethers } from 'ethers'
+import { ethers } from 'ethers'
+import * as O from 'fp-ts/lib/Option'
 
 import { LiveData } from '../../helpers/rx/liveData'
-import { FeeLD, FeesLD, SendPoolTxParams } from '../chain/types'
+import { FeeLD, FeesLD, Memo } from '../chain/types'
 import * as C from '../clients'
 import { ApiError, TxHashLD } from '../wallet/types'
 
@@ -23,13 +24,16 @@ export type ApproveFeeHandler = (p: ApproveParams) => FeeLD
 export type LoadApproveFeeHandler = (p: ApproveParams) => void
 
 export type SendTxParams = {
-  asset?: Asset
+  asset: Asset
   recipient: Address
   amount: BaseAmount
-  memo?: string
+  memo: Memo
   feeOption?: FeeOption
-  gasLimit?: BigNumber
-  gasPrice?: BaseAmount
+  walletIndex?: number
+}
+
+export type SendPoolTxParams = SendTxParams & {
+  router: O.Option<Address>
 }
 
 export type ApproveParams = {

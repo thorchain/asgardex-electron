@@ -58,6 +58,8 @@ export const swap$ = ({ poolAddress: poolAddresses, asset, amount, memo }: SwapT
       setState({ ...getState(), step: 2, swapTx: RD.pending, swap: RD.progress({ loaded: 50, total }) })
       // 2. send swap tx
       return sendPoolTx$({
+        // TODO(@asgdx-team) Get `walletType` from props if we want to support other than keystore (e.g. Ledger)
+        walletType: 'keystore',
         router: poolAddresses.router, // emtpy string for RuneNative
         asset,
         recipient: poolAddresses.address, // emtpy string for RuneNative

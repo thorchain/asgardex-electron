@@ -11,11 +11,17 @@ import * as RxOp from 'rxjs/operators'
 import { addressInERC20Blacklist, getEthAssetAddress } from '../../helpers/assetHelper'
 import { sequenceSOption } from '../../helpers/fpHelpers'
 import { LiveData } from '../../helpers/rx/liveData'
-import { SendPoolTxParams } from '../chain/types'
 import * as C from '../clients'
 import { ethRouterABI } from '../const'
 import { ApiError, ErrorId, TxHashLD } from '../wallet/types'
-import { ApproveParams, Client$, Client as EthClient, TransactionService, IsApprovedLD } from './types'
+import {
+  ApproveParams,
+  Client$,
+  Client as EthClient,
+  TransactionService,
+  IsApprovedLD,
+  SendPoolTxParams
+} from './types'
 
 export const createTransactionService = (client$: Client$): TransactionService => {
   const common = C.createTransactionService(client$)

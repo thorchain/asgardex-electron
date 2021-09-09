@@ -33,18 +33,21 @@ const mockTxState$ = (states: UpgradeRuneTxState[]): UpgradeRuneTxState$ =>
   )
 
 const bnbBalance: WalletBalance = {
+  walletType: 'keystore',
   asset: AssetBNB,
   amount: assetToBase(assetAmount(1001)),
   walletAddress: 'BNB address'
 }
 
 const runeBnbBalance: WalletBalance = {
+  walletType: 'keystore',
   asset: AssetRune67C,
   amount: assetToBase(assetAmount(2002)),
   walletAddress: 'BNB.Rune address'
 }
 
 const runeNativeBalance: WalletBalance = {
+  walletType: 'keystore',
   asset: AssetRuneNative,
   amount: assetToBase(assetAmount(0)),
   walletAddress: 'Rune native address'

@@ -23,14 +23,14 @@ import { WalletBalancesLD, XChainClient$ } from './types'
  */
 const loadBalances$ = ({
   client,
+  walletType,
   address,
-  walletType = 'keystore',
   assets,
   /* TODO (@asgdx-team) Check if we still can use `0` as default by introducing HD wallets in the future */
   walletIndex = 0
 }: {
   client: XChainClient
-  walletType?: WalletType
+  walletType: WalletType
   address?: Address
   assets?: Asset[]
   walletIndex?: number
@@ -70,11 +70,17 @@ const loadBalances$ = ({
  *
  * If a client is not available (e.g. by removing keystore), it returns an `initial` state
  */
-export const balances$: (
-  client$: XChainClient$,
-  trigger$: Rx.Observable<boolean>,
+export const balances$: ({
+  walletType,
+  client$,
+  trigger$,
+  assets
+}: {
+  walletType: WalletType
+  client$: XChainClient$
+  trigger$: Rx.Observable<boolean>
   assets?: Asset[]
-) => WalletBalancesLD = (client$, trigger$, assets) =>
+}) => WalletBalancesLD = ({ walletType, client$, trigger$, assets }) =>
   Rx.combineLatest([trigger$.pipe(debounceTime(300)), client$]).pipe(
     RxOp.switchMap(([_, oClient]) => {
       return FP.pipe(
@@ -85,6 +91,7 @@ export const balances$: (
           // or start request and return state
           (client) =>
             loadBalances$({
+              walletType,
               client,
               assets
             })

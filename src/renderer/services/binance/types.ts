@@ -5,7 +5,7 @@ import { Asset, AssetAmount, BaseAmount } from '@xchainjs/xchain-util'
 import * as O from 'fp-ts/lib/Option'
 import * as Rx from 'rxjs'
 
-import { LedgerBNCTxInfo, Network } from '../../../shared/api/types'
+import { LedgerBNBTxParams, Network } from '../../../shared/api/types'
 import { LiveData } from '../../helpers/rx/liveData'
 import * as C from '../clients'
 import { ApiError, LedgerAddressLD, LedgerTxHashLD } from '../wallet/types'
@@ -60,6 +60,6 @@ export type LedgerService = {
   retrieveLedgerAddress: (network: Network) => void
   removeLedgerAddress: () => void
   ledgerTxRD$: LedgerTxHashLD
-  pushLedgerTx: (network: Network, params: LedgerBNCTxInfo) => Rx.Subscription
+  pushLedgerTx: (network: Network, params: LedgerBNBTxParams) => Rx.Subscription
   resetLedgerTx: () => void
 }

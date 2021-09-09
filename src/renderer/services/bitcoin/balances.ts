@@ -1,5 +1,6 @@
 import { observableState } from '../../helpers/stateHelper'
 import * as C from '../clients'
+import { WalletType } from '../wallet/types'
 import { client$ } from './common'
 
 /**
@@ -18,7 +19,8 @@ const reloadBalances = () => {
 }
 
 // State of balances loaded by Client
-const balances$: C.WalletBalancesLD = C.balances$(client$, reloadBalances$)
+const balances$ = (walletType: WalletType): C.WalletBalancesLD =>
+  C.balances$({ client$, trigger$: reloadBalances$, walletType })
 
 // State of balances loaded by Client and Address
 const getBalanceByAddress$ = C.balancesByAddress$(client$, reloadBalances$)

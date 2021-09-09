@@ -262,6 +262,8 @@ export const SendFormBCH: React.FC<Props> = (props): JSX.Element => {
     setShowPwModal(false)
 
     onSubmit({
+      // TODO(@asgdx-team) Get `walletType` from props if we want to support other than keystore (e.g. Ledger)
+      walletType: 'keystore',
       recipient: form.getFieldValue('recipient'),
       asset: balance.asset,
       amount: assetToBase(assetAmount(form.getFieldValue('amount'))),

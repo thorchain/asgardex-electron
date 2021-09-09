@@ -59,7 +59,7 @@ export type WalletAccount = {
 
 export type WalletAccounts = WalletAccount[]
 
-export type WalletBalance = Balance & { walletAddress: Address }
+export type WalletBalance = Balance & { walletAddress: Address; walletType: WalletType }
 export type WalletBalances = WalletBalance[]
 
 /**
@@ -104,11 +104,11 @@ export enum ErrorId {
   GET_FEES = 'GET_FEES',
   GET_ASSET_TXS = 'GET_ASSET_TXS',
   SEND_TX = 'SEND_TX',
+  SEND_LEDGER_TX = 'SEND_LEDGER_TX',
   APPROVE_TX = 'APPROVE_TX',
   POOL_TX = 'POOL_TX',
   GET_TX = 'GET_TX',
   GET_NODE_INFO = 'GET_NODE_INFO',
-  SEND_LEDGER_TX = 'SEND_LEDGER_TX',
   VALIDATE_POOL = 'VALIDATE_POOL',
   GET_NODE = 'GET_NODE',
   GET_LIQUIDITY_PROVIDERS = 'GET_LIQUIDITY_PROVIDERS',

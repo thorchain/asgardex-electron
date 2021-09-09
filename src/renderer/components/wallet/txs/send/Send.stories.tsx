@@ -43,30 +43,35 @@ const defaultProps = {
 }
 
 const bnbAsset: WalletBalance = {
+  walletType: 'keystore',
   asset: AssetBNB,
   amount: assetToBase(assetAmount(12.3)),
   walletAddress: 'AssetBNB wallet address'
 }
 
 const btcBalance: WalletBalance = {
+  walletType: 'keystore',
   asset: AssetBTC,
   amount: assetToBase(assetAmount(23.45, BTC_DECIMAL)),
   walletAddress: 'btc wallet address'
 }
 
 const runeAsset: WalletBalance = {
+  walletType: 'keystore',
   asset: AssetRune67C,
   amount: assetToBase(assetAmount(34.56)),
   walletAddress: 'AssetRune67C wallet address'
 }
 
 const ethBalance: WalletBalance = {
+  walletType: 'keystore',
   asset: AssetETH,
   amount: assetToBase(assetAmount(45.67)),
   walletAddress: 'AssetETH wallet address'
 }
 
 const ltcBalance: WalletBalance = {
+  walletType: 'keystore',
   asset: AssetLTC,
   amount: assetToBase(assetAmount(56.78)),
   walletAddress: 'AssetLTC wallet address'

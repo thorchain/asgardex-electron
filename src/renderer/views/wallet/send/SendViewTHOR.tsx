@@ -1,6 +1,7 @@
 import React, { useCallback, useMemo } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
+import { Address } from '@xchainjs/xchain-client'
 import { Asset, THORChain } from '@xchainjs/xchain-util'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/Option'
@@ -9,11 +10,12 @@ import { useIntl } from 'react-intl'
 import { useHistory } from 'react-router-dom'
 
 import { Network } from '../../../../shared/api/types'
+import { LoadingView } from '../../../components/shared/loading'
 import { Send, SendFormTHOR } from '../../../components/wallet/txs/send/'
 import { useChainContext } from '../../../contexts/ChainContext'
 import { useThorchainContext } from '../../../contexts/ThorchainContext'
 import { liveData } from '../../../helpers/rx/liveData'
-import { getWalletBalanceByAsset } from '../../../helpers/walletHelper'
+import { getWalletBalanceByAddress } from '../../../helpers/walletHelper'
 import { useSubscriptionState } from '../../../hooks/useSubscriptionState'
 import { useValidateAddress } from '../../../hooks/useValidateAddress'
 import { INITIAL_SEND_STATE } from '../../../services/chain/const'
@@ -23,6 +25,7 @@ import { NonEmptyWalletBalances, ValidatePasswordHandler, WalletBalance } from '
 import * as Helper from './SendView.helper'
 
 type Props = {
+  walletAddress: Address
   asset: Asset
   balances: O.Option<NonEmptyWalletBalances>
   openExplorerTxUrl: OpenExplorerTxUrl
@@ -31,12 +34,12 @@ type Props = {
 }
 
 export const SendViewTHOR: React.FC<Props> = (props): JSX.Element => {
-  const { asset, balances: oBalances, openExplorerTxUrl, validatePassword$, network } = props
+  const { walletAddress, asset, balances: oBalances, openExplorerTxUrl, validatePassword$, network } = props
 
   const intl = useIntl()
   const history = useHistory()
 
-  const oWalletBalance = useMemo(() => getWalletBalanceByAsset(oBalances, O.some(asset)), [oBalances, asset])
+  const oWalletBalance = useMemo(() => getWalletBalanceByAddress(oBalances, walletAddress), [oBalances, walletAddress])
 
   const { transfer$ } = useChainContext()
   const {
@@ -103,7 +106,7 @@ export const SendViewTHOR: React.FC<Props> = (props): JSX.Element => {
   return FP.pipe(
     oWalletBalance,
     O.fold(
-      () => <></>,
+      () => <LoadingView size="large" />,
       (walletBalance) => (
         <Send
           txRD={sendTxState.status}

@@ -19,12 +19,14 @@ import { WalletBalance } from '../../../../services/wallet/types'
 import { SendFormLTC as Component, Props as ComponentProps } from './SendFormLTC'
 
 const ltcBalance: WalletBalance = {
+  walletType: 'keystore',
   asset: AssetLTC,
   amount: assetToBase(assetAmount(1.23, LTC_DECIMAL)),
   walletAddress: 'btc wallet address'
 }
 
 const runeBalance: WalletBalance = {
+  walletType: 'keystore',
   asset: AssetRuneNative,
   amount: assetToBase(assetAmount(2, LTC_DECIMAL)),
   walletAddress: 'rune wallet address'

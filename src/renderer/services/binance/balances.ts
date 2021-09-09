@@ -6,6 +6,7 @@ import { assetInBinanceBlacklist } from '../../helpers/assetHelper'
 import { liveData } from '../../helpers/rx/liveData'
 import { observableState } from '../../helpers/stateHelper'
 import * as C from '../clients'
+import { WalletType } from '../wallet/types'
 import { client$ } from './common'
 
 /**
@@ -24,9 +25,9 @@ const reloadBalances = () => {
 }
 
 // State of balances loaded by Client
-const balances$: (network: Network) => C.WalletBalancesLD = (network) =>
+const balances$: (walletType: WalletType, network: Network) => C.WalletBalancesLD = (walletType, network) =>
   FP.pipe(
-    C.balances$(client$, reloadBalances$),
+    C.balances$({ client$, trigger$: reloadBalances$, walletType }),
     // Filter out black listed assets
     liveData.map(FP.flow(A.filter(({ asset }) => !assetInBinanceBlacklist(network, asset))))
   )

@@ -40,6 +40,7 @@ describe('helpers/fp/ord', () => {
   })
   describe('ordWalletBalanceByAsset', () => {
     const a: WalletBalance = {
+      walletType: 'keystore',
       amount: baseAmount('1'),
       asset: AssetRuneNative,
       walletAddress: ''

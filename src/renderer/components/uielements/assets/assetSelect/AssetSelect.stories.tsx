@@ -7,6 +7,7 @@ import { WalletBalance } from '../../../../services/wallet/types'
 import { AssetSelect, Props as AssetSelectProps } from './AssetSelect'
 
 const balanceBNB: WalletBalance = {
+  walletType: 'keystore',
   amount: baseAmount('1'),
   asset: AssetBNB,
   walletAddress: ''

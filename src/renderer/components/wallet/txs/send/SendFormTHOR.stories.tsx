@@ -18,6 +18,7 @@ import { WalletBalance } from '../../../../services/wallet/types'
 import { SendFormTHOR as Component, Props as ComponentProps } from './SendFormTHOR'
 
 const runeBalance: WalletBalance = {
+  walletType: 'keystore',
   asset: AssetRuneNative,
   amount: assetToBase(assetAmount(2)),
   walletAddress: 'rune wallet address'

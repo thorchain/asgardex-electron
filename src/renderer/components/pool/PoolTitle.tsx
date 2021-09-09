@@ -1,8 +1,7 @@
 import React, { useMemo } from 'react'
 
 import { SwapOutlined } from '@ant-design/icons'
-import { AssetRune } from '@xchainjs/xchain-thorchain'
-import { Asset, AssetAmount, assetToString, formatAssetAmount } from '@xchainjs/xchain-util'
+import { Asset, AssetAmount, AssetRuneNative, assetToString, formatAssetAmount } from '@xchainjs/xchain-util'
 import { Grid } from 'antd'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
@@ -120,7 +119,7 @@ export const PoolTitle: React.FC<Props> = ({
                       event.preventDefault()
                       event.stopPropagation()
                       history.push(
-                        poolsRoutes.swap.path({ source: assetToString(asset), target: assetToString(AssetRune) })
+                        poolsRoutes.swap.path({ source: assetToString(asset), target: assetToString(AssetRuneNative) })
                       )
                     }}>
                     <SwapOutlined />

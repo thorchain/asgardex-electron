@@ -9,7 +9,7 @@ import { LiveData } from '../../helpers/rx/liveData'
 import { AssetWithDecimal } from '../../types/asgardex'
 import { AssetWithAmount } from '../../types/asgardex'
 import { PoolAddress } from '../midgard/types'
-import { ApiError, TxHashRD } from '../wallet/types'
+import { ApiError, TxHashRD, WalletType } from '../wallet/types'
 
 export type TxTypes = 'DEPOSIT' | 'SWAP' | 'WITHDRAW' | 'UPGRADE'
 
@@ -74,6 +74,7 @@ export type SymDepositParams = {
 export type SendDepositTxParams = { chain: Chain; asset: Asset; poolAddress: string; amount: BaseAmount; memo: Memo }
 
 export type SendTxParams = {
+  walletType: WalletType
   asset: Asset
   recipient: Address
   amount: BaseAmount

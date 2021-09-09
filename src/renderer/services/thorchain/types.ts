@@ -1,20 +1,18 @@
 import * as RD from '@devexperts/remote-data-ts'
 import { Address, TxHash } from '@xchainjs/xchain-client'
 import { Client, DepositParam } from '@xchainjs/xchain-thorchain'
-import { Asset, assetFromString, BaseAmount, isValidAsset } from '@xchainjs/xchain-util'
-import * as E from 'fp-ts/Either'
-import * as FP from 'fp-ts/function'
+import { Asset, BaseAmount } from '@xchainjs/xchain-util'
 import * as O from 'fp-ts/Option'
 import * as t from 'io-ts'
 import { optionFromNullable } from 'io-ts-types/lib/optionFromNullable'
-import * as D from 'io-ts/Decoder'
 import * as Rx from 'rxjs'
 
+import { assetIO } from '../../../shared/api/io'
 import { Network } from '../../../shared/api/types'
 import { LiveData } from '../../helpers/rx/liveData'
 import { AssetsWithAmount1e8, AssetWithAmount1e8 } from '../../types/asgardex'
 import * as C from '../clients'
-import { ApiError, TxHashLD } from '../wallet/types'
+import { ApiError, TxHashLD, WalletType } from '../wallet/types'
 
 export type Client$ = C.Client$<Client>
 
@@ -24,6 +22,7 @@ export type ClientState$ = C.ClientState$<Client>
 export type FeesService = C.FeesService
 
 export type SendTxParams = {
+  walletType: WalletType
   recipient: string
   amount: BaseAmount
   asset: Asset
@@ -153,52 +152,8 @@ export type LiquidityProvidersLD = LiveData<ApiError, LiquidityProvider[]>
 export type LiquidityProviderLD = LiveData<ApiError, O.Option<LiquidityProvider>>
 export type LiquidityProviderRD = RD.RemoteData<ApiError, O.Option<LiquidityProvider>>
 
-const assetDecoder: D.Decoder<unknown, Asset> = FP.pipe(
-  D.string,
-  D.parse((stringAsset) =>
-    FP.pipe(
-      stringAsset,
-      assetFromString,
-      E.fromNullable(new Error('Invalid asset')),
-      E.fold((e) => D.failure(stringAsset, e.message), D.success)
-    )
-  )
-)
-
-/**
- * Custom type validator to check if string is Asset instance
- * After successful validation transforms string to Asset
- */
-const assetType = new t.Type(
-  'asset type',
-  (input): input is Asset => {
-    if (typeof input === 'string') {
-      const asset = assetFromString(input)
-
-      if (asset) {
-        return isValidAsset(asset)
-      }
-    }
-    return false
-  },
-  (input, context) => {
-    if (typeof input === 'string') {
-      return FP.pipe(
-        assetFromString(input),
-        E.fromNullable(Error('Invalid asset')),
-        E.fold(
-          () => t.failure(input, context),
-          (asset) => t.success(asset)
-        )
-      )
-    }
-    return t.failure(input, context)
-  },
-  assetDecoder.decode
-)
-
 export const LiquidityProviderIO = t.type({
-  asset: assetType,
+  asset: assetIO,
   rune_address: optionFromNullable(t.string),
   asset_address: optionFromNullable(t.string),
   pending_rune: t.string,

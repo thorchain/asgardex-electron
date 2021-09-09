@@ -120,6 +120,7 @@ export const SendView: React.FC<Props> = (): JSX.Element => {
         case THORChain:
           return (
             <SendViewTHOR
+              walletAddress={walletAddress}
               asset={asset}
               balances={balances}
               openExplorerTxUrl={openExplorerTxUrl}
@@ -150,7 +151,7 @@ export const SendView: React.FC<Props> = (): JSX.Element => {
           )
       }
     },
-    [balances, openExplorerTxUrl, validatePassword$, network, intl]
+    [balances, openExplorerTxUrl, validatePassword$, network, walletAddress, intl]
   )
 
   return FP.pipe(

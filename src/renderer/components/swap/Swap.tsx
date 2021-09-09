@@ -610,6 +610,7 @@ export const Swap = ({
               // And set available balance amount as Zero Value as user does not have any balances for this asset at all
               O.map((balance) => [
                 {
+                  walletType: balance.walletType,
                   asset: availableAsset,
                   walletAddress: balance.walletAddress,
                   amount: ZERO_BASE_AMOUNT

@@ -76,6 +76,8 @@ export const SendFormTHOR: React.FC<Props> = (props): JSX.Element => {
 
   const [form] = Form.useForm<FormValues>()
 
+  const walletType = useMemo(() => balance.walletType, [balance])
+
   const oRuneNativeAmount: O.Option<BaseAmount> = useMemo(() => {
     // return balance of current asset (if RuneNative)
     if (isRuneNativeAsset(balance.asset)) {
@@ -176,12 +178,13 @@ export const SendFormTHOR: React.FC<Props> = (props): JSX.Element => {
     setShowPwModal(false)
 
     onSubmit({
+      walletType,
       recipient: form.getFieldValue('recipient'),
       asset: balance.asset,
       amount: amountToSend,
       memo: form.getFieldValue('memo')
     })
-  }, [onSubmit, form, balance.asset, amountToSend])
+  }, [onSubmit, form, balance.asset, amountToSend, walletType])
 
   const renderPwModal = useMemo(
     () =>
@@ -221,8 +224,15 @@ export const SendFormTHOR: React.FC<Props> = (props): JSX.Element => {
 
   const addMaxAmountHandler = useCallback(() => setAmountToSend(maxAmount), [maxAmount])
 
+  const onFinishHandler = useCallback(() => {
+    if (walletType === 'keystore') setShowPwModal(true)
+
+    if (walletType === 'ledger') sendHandler()
+  }, [sendHandler, walletType])
+
   return (
     <>
+      <div>walletType: {walletType}</div>
       <Row>
         <Styled.Col span={24}>
           <AccountSelector
@@ -231,11 +241,7 @@ export const SendFormTHOR: React.FC<Props> = (props): JSX.Element => {
             walletBalances={balances}
             network={network}
           />
-          <Styled.Form
-            form={form}
-            initialValues={{ amount: bn(0) }}
-            onFinish={() => setShowPwModal(true)}
-            labelCol={{ span: 24 }}>
+          <Styled.Form form={form} initialValues={{ amount: bn(0) }} onFinish={onFinishHandler} labelCol={{ span: 24 }}>
             <Styled.SubForm>
               <Styled.CustomLabel size="big">{intl.formatMessage({ id: 'common.address' })}</Styled.CustomLabel>
               <Form.Item rules={[{ required: true, validator: addressValidator }]} name="recipient">

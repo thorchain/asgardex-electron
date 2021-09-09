@@ -1,3 +1,4 @@
+import { Address } from '@xchainjs/xchain-client'
 import { Asset, AssetAmount, baseToAsset } from '@xchainjs/xchain-util'
 import * as A from 'fp-ts/Array'
 import * as FP from 'fp-ts/function'
@@ -6,7 +7,7 @@ import * as O from 'fp-ts/Option'
 import { WalletBalances } from '../services/clients'
 import { NonEmptyWalletBalances, WalletBalance } from '../services/wallet/types'
 import { isBnbAsset, isEthAsset, isLtcAsset, isRuneNativeAsset } from './assetHelper'
-import { eqAsset } from './fp/eq'
+import { eqAddress, eqAsset } from './fp/eq'
 import { sequenceTOption } from './fpHelpers'
 
 /**
@@ -32,6 +33,20 @@ export const getWalletBalanceByAsset = (
       FP.pipe(
         walletBalances,
         A.findFirst(({ asset: assetInList }) => eqAsset.equals(assetInList, asset))
+      )
+    )
+  )
+
+export const getWalletBalanceByAddress = (
+  oWalletBalances: O.Option<NonEmptyWalletBalances>,
+  address: Address
+): O.Option<WalletBalance> =>
+  FP.pipe(
+    oWalletBalances,
+    O.chain((walletBalances) =>
+      FP.pipe(
+        walletBalances,
+        A.findFirst(({ walletAddress: addressInList }) => eqAddress.equals(addressInList, address))
       )
     )
   )

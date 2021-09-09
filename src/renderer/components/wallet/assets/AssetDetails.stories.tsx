@@ -12,18 +12,21 @@ import { WalletBalance, WalletBalances } from '../../../services/wallet/types'
 import { AssetDetails } from './index'
 
 const bnbBalance: WalletBalance = {
+  walletType: 'keystore',
   asset: AssetBNB,
   amount: assetToBase(assetAmount(1.1)),
   walletAddress: 'BNB address'
 }
 
 const runeBnbBalance: WalletBalance = {
+  walletType: 'keystore',
   asset: AssetRune67C,
   amount: assetToBase(assetAmount(2.2)),
   walletAddress: 'BNB.Rune address'
 }
 
 const runeNativeBalance: WalletBalance = {
+  walletType: 'keystore',
   asset: AssetRuneNative,
   amount: assetToBase(assetAmount(0)),
   walletAddress: 'Rune native address'
