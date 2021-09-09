@@ -13,7 +13,7 @@ import { liveData } from '../helpers/rx/liveData'
 
 export type KeystoreClientStates = RD.RemoteData<Error, boolean>
 
-export const useKeystoreClientStates = (): { clientStates: RD.RemoteData<Error, boolean> } => {
+export const useKeystoreClientStates = (): { clientStates: KeystoreClientStates } => {
   const { clientState$: bnbClientState$ } = useBinanceContext()
   const { clientState$: btcClientState$ } = useBitcoinContext()
   const { clientState$: bchClientState$ } = useBitcoinCashContext()
