@@ -71,7 +71,14 @@ export type SymDepositParams = {
   readonly memos: SymDepositMemo
 }
 
-export type SendDepositTxParams = { chain: Chain; asset: Asset; poolAddress: string; amount: BaseAmount; memo: Memo }
+export type SendDepositTxParams = {
+  walletType: WalletType
+  chain: Chain
+  asset: Asset
+  poolAddress: string
+  amount: BaseAmount
+  memo: Memo
+}
 
 export type SendTxParams = {
   walletType: WalletType

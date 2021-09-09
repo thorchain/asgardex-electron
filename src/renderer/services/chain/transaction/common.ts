@@ -94,6 +94,7 @@ export const sendTx$ = ({
 }
 
 export const sendPoolTx$ = ({
+  walletType,
   router,
   asset,
   recipient,
@@ -112,7 +113,7 @@ export const sendPoolTx$ = ({
       })
 
     case THORChain:
-      return THOR.sendPoolTx$({ amount, asset, memo })
+      return THOR.sendPoolTx$({ walletType, amount, asset, memo })
 
     default:
       // TODO(@asgdx-team) Get `walletType` from props if we want to support other than keystore (e.g. Ledger)

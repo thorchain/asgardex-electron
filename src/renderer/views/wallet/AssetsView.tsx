@@ -1,6 +1,7 @@
 import React, { useCallback } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
+import { Address } from '@xchainjs/xchain-client'
 import { Asset, assetToString } from '@xchainjs/xchain-util'
 import * as FP from 'fp-ts/lib/function'
 import { useObservableState } from 'observable-hooks'
@@ -16,7 +17,7 @@ import { RUNE_PRICE_POOL } from '../../helpers/poolHelper'
 import { useMimirHalt } from '../../hooks/useMimirHalt'
 import * as walletRoutes from '../../routes/wallet'
 import { DEFAULT_NETWORK } from '../../services/const'
-import { ChainBalances } from '../../services/wallet/types'
+import { ChainBalances, WalletType } from '../../services/wallet/types'
 
 export const AssetsView: React.FC = (): JSX.Element => {
   const history = useHistory()
@@ -53,8 +54,8 @@ export const AssetsView: React.FC = (): JSX.Element => {
   const selectedPricePool = useObservableState(selectedPricePool$, RUNE_PRICE_POOL)
 
   const selectAssetHandler = useCallback(
-    (asset: Asset, walletAddress: string) =>
-      history.push(walletRoutes.assetDetail.path({ asset: assetToString(asset), walletAddress })),
+    ({ asset, walletAddress, walletType }: { asset: Asset; walletAddress: Address; walletType: WalletType }) =>
+      history.push(walletRoutes.assetDetail.path({ asset: assetToString(asset), walletAddress, walletType })),
     [history]
   )
 

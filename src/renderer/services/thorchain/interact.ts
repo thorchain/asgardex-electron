@@ -10,7 +10,7 @@ import * as RxOp from 'rxjs/operators'
 import { liveData } from '../../helpers/rx/liveData'
 import { LiveData } from '../../helpers/rx/liveData'
 import { observableState } from '../../helpers/stateHelper'
-import { TxLD } from '../wallet/types'
+import { TxLD, WalletType } from '../wallet/types'
 import { ApiError } from '../wallet/types'
 import { INITIAL_INTERACT_STATE } from './const'
 import { InteractParams, InteractState, InteractState$ } from './types'
@@ -26,10 +26,10 @@ import { InteractParams, InteractState, InteractState$ } from './types'
  */
 export const createInteractService$ =
   (
-    sendTx$: (_: DepositParam) => LiveData<ApiError, string>,
+    depositTx$: (_: DepositParam & { walletType: WalletType }) => LiveData<ApiError, string>,
     getTxStatus: (txHash: string, assetAddress: O.Option<Address>) => TxLD
   ) =>
-  ({ amount, memo }: InteractParams): InteractState$ => {
+  ({ walletType, amount, memo }: InteractParams): InteractState$ => {
     // total of progress
     const total = O.some(100)
 
@@ -48,7 +48,8 @@ export const createInteractService$ =
     // and `InteractState` will be updated step by step
     const requests$ = FP.pipe(
       // 1. send deposit tx
-      sendTx$({
+      depositTx$({
+        walletType,
         asset: AssetRuneNative,
         amount,
         memo

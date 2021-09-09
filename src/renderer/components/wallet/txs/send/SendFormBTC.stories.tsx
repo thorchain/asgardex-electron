@@ -46,6 +46,7 @@ const rates: FeeRates = {
 }
 
 const defaultProps: ComponentProps = {
+  walletType: 'keystore',
   balances: [btcBalance, runeBalance],
   balance: btcBalance,
   onSubmit: ({ recipient, amount, feeOption, memo }: SendTxParams) =>

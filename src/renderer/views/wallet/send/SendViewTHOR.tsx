@@ -21,10 +21,16 @@ import { useValidateAddress } from '../../../hooks/useValidateAddress'
 import { INITIAL_SEND_STATE } from '../../../services/chain/const'
 import { FeeRD, SendTxParams, SendTxState } from '../../../services/chain/types'
 import { OpenExplorerTxUrl, WalletBalances } from '../../../services/clients'
-import { NonEmptyWalletBalances, ValidatePasswordHandler, WalletBalance } from '../../../services/wallet/types'
+import {
+  NonEmptyWalletBalances,
+  ValidatePasswordHandler,
+  WalletBalance,
+  WalletType
+} from '../../../services/wallet/types'
 import * as Helper from './SendView.helper'
 
 type Props = {
+  walletType: WalletType
   walletAddress: Address
   asset: Asset
   balances: O.Option<NonEmptyWalletBalances>
@@ -34,7 +40,7 @@ type Props = {
 }
 
 export const SendViewTHOR: React.FC<Props> = (props): JSX.Element => {
-  const { walletAddress, asset, balances: oBalances, openExplorerTxUrl, validatePassword$, network } = props
+  const { walletType, walletAddress, asset, balances: oBalances, openExplorerTxUrl, validatePassword$, network } = props
 
   const intl = useIntl()
   const history = useHistory()
@@ -81,6 +87,7 @@ export const SendViewTHOR: React.FC<Props> = (props): JSX.Element => {
   const sendForm = useCallback(
     (balance: WalletBalance) => (
       <SendFormTHOR
+        walletType={walletType}
         balances={FP.pipe(
           oBalances,
           O.getOrElse<WalletBalances>(() => [])
@@ -96,7 +103,18 @@ export const SendViewTHOR: React.FC<Props> = (props): JSX.Element => {
         network={network}
       />
     ),
-    [oBalances, isLoading, onSend, validateAddress, feeRD, reloadFees, validatePassword$, sendTxStatusMsg, network]
+    [
+      walletType,
+      oBalances,
+      isLoading,
+      onSend,
+      validateAddress,
+      feeRD,
+      reloadFees,
+      validatePassword$,
+      sendTxStatusMsg,
+      network
+    ]
   )
   const finishActionHandler = useCallback(() => {
     resetSendTxState()

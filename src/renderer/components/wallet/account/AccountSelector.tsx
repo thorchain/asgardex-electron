@@ -7,7 +7,7 @@ import { useIntl } from 'react-intl'
 
 import { Network } from '../../../../shared/api/types'
 import { WalletBalances } from '../../../services/clients'
-import { WalletBalance } from '../../../services/wallet/types'
+import { WalletBalance, WalletType } from '../../../services/wallet/types'
 import { AssetData } from '../../uielements/assets/assetData'
 import { AssetIcon } from '../../uielements/assets/assetIcon'
 import { Size as IconSize } from '../../uielements/assets/assetIcon/AssetIcon.types'
@@ -17,7 +17,7 @@ import * as Styled from './AccountSelector.styles'
 type Props = {
   selectedAsset: Asset
   walletBalances: WalletBalances
-  onChange?: (asset: Asset, walletAddress: Address) => void
+  onChange?: (params: { asset: Asset; walletAddress: Address; walletType: WalletType }) => void
   size?: IconSize
   network: Network
 }
@@ -42,9 +42,9 @@ export const AccountSelector: React.FC<Props> = (props): JSX.Element => {
   const enableDropdown = filteredWalletBalances.length > 0
 
   const cellRenderer = useCallback(
-    ({ asset, amount, walletAddress }: WalletBalance) => {
+    ({ asset, amount, walletAddress, walletType }: WalletBalance) => {
       const node = (
-        <Row align={'middle'} gutter={[8, 0]} onClick={() => onChange(asset, walletAddress)}>
+        <Row align={'middle'} gutter={[8, 0]} onClick={() => onChange({ asset, walletAddress, walletType })}>
           <Col>
             <AssetData asset={asset} network={network} />
           </Col>

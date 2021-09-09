@@ -14,13 +14,15 @@ import { useSubscriptionState } from '../../../hooks/useSubscriptionState'
 import { useValidateAddress } from '../../../hooks/useValidateAddress'
 import { INITIAL_INTERACT_STATE } from '../../../services/thorchain/const'
 import { InteractState } from '../../../services/thorchain/types'
+import { WalletType } from '../../../services/wallet/types'
 import * as Styled from './InteractView.styles'
 
 type Props = {
+  walletType: WalletType
   openExplorerTxUrl: (txHash: TxHash) => void
 }
 
-export const LeaveView: React.FC<Props> = ({ openExplorerTxUrl }) => {
+export const LeaveView: React.FC<Props> = ({ walletType, openExplorerTxUrl }) => {
   const {
     state: interactState,
     reset: resetInteractState,
@@ -40,10 +42,10 @@ export const LeaveView: React.FC<Props> = ({ openExplorerTxUrl }) => {
          * @docs https://docs.thorchain.org/thornodes/leaving#leaving
          */
 
-        interact$({ amount: baseAmount(1), memo })
+        interact$({ walletType, amount: baseAmount(1), memo })
       )
     },
-    [interact$, subscribeInteractState]
+    [interact$, subscribeInteractState, walletType]
   )
 
   const stepLabels = useMemo(
