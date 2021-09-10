@@ -31,6 +31,7 @@ import { MaxBalanceButton } from '../../../uielements/button/MaxBalanceButton'
 import { ViewTxButton } from '../../../uielements/button/ViewTxButton'
 import { UIFeesRD } from '../../../uielements/fees'
 import { InputBigNumber } from '../../../uielements/input/InputBigNumber'
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { AccountSelector } from '../../account'
 import * as Styled from '../TxForm.styles'
 import { validateTxAmountInput } from '../TxForm.util'
@@ -337,7 +338,16 @@ export const Upgrade: React.FC<Props> = (props): JSX.Element => {
     () => (
       <CStyled.FormWrapper>
         <CStyled.FormContainer>
-          <AccountSelector selectedAsset={runeAsset.asset} walletBalances={[]} network={network} />
+          <AccountSelector
+            selectedWallet={{
+              walletType: 'keystore',
+              amount: assetToBase(assetAmount(0)),
+              asset: runeAsset.asset,
+              walletAddress: ''
+            }}
+            walletBalances={[]}
+            network={network}
+          />
           <Styled.Form form={form} initialValues={INITIAL_FORM_VALUES} onFinish={onSubmit} labelCol={{ span: 24 }}>
             <Styled.SubForm>
               <Styled.CustomLabel size="big">{intl.formatMessage({ id: 'common.amount' })}</Styled.CustomLabel>

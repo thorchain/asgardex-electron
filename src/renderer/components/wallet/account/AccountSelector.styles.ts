@@ -10,6 +10,20 @@ export const Card = styled(A.Card)`
     padding: 20px 35px;
   }
 `
+export const LedgerWalletType = styled(UILabel).attrs({
+  textTransform: 'uppercase',
+  size: 'small'
+})`
+  margin: -45px 0px 0px 10px;
+  padding: 0px 5px;
+  color: ${palette('color', 2)};
+  background: ${palette('gray', 1)};
+  border-radius: 5px;
+  display: flex;
+  align-self: center;
+  height: 15px;
+  width: 50px;
+`
 
 export const AssetWrapper = styled.div`
   display: flex;

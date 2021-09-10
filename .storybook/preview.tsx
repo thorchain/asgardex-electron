@@ -5,7 +5,7 @@ import { BrowserRouter as Router, Route } from 'react-router-dom'
 
 import { AppProvider } from '../src/renderer/contexts/AppContext'
 import { ThemeProvider, themes } from '../src/renderer/contexts/ThemeContext'
-import * as Styled from '../src/renderer/views/app/AppView.style'
+import * as Styled from '../src/renderer/views/app/AppView.styles'
 import { Locale } from '../src/shared/i18n/types'
 import { IntlProvider } from 'react-intl'
 import { getMessagesByLocale } from '../src/renderer/i18n'

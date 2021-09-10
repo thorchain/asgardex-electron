@@ -4,13 +4,21 @@ import { storiesOf } from '@storybook/react'
 import { assetAmount, AssetBNB, assetToBase, assetToString } from '@xchainjs/xchain-util'
 
 import { ASSETS_MAINNET } from '../../../../shared/mock/assets'
+import { WalletBalance } from '../../../services/wallet/types'
 import { AccountSelector } from './index'
+
+const balanceBNB: WalletBalance = {
+  walletType: 'keystore',
+  amount: assetToBase(assetAmount(1)),
+  asset: AssetBNB,
+  walletAddress: ''
+}
 
 storiesOf('Wallet/AccountSelector', module)
   .add('default', () => {
     return (
       <AccountSelector
-        selectedAsset={ASSETS_MAINNET.BOLT}
+        selectedWallet={balanceBNB}
         walletBalances={[AssetBNB, ASSETS_MAINNET.TOMO].map((asset) => ({
           walletType: 'keystore',
           asset,
@@ -22,5 +30,5 @@ storiesOf('Wallet/AccountSelector', module)
     )
   })
   .add('w/o dropdown', () => {
-    return <AccountSelector selectedAsset={ASSETS_MAINNET.BOLT} walletBalances={[]} network="testnet" />
+    return <AccountSelector selectedWallet={balanceBNB} walletBalances={[]} network="testnet" />
   })
