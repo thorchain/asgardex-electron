@@ -3,9 +3,11 @@ import React, { useMemo, useState } from 'react'
 import { useIntl } from 'react-intl'
 
 import { Network } from '../../../shared/api/types'
+import { WalletType } from '../../services/wallet/types'
 import * as Styled from './Interact.styles'
 
 type Props = {
+  walletType: WalletType
   network: Network
   bondContent: JSX.Element
   unbondContent: JSX.Element
@@ -65,7 +67,10 @@ export const Interact: React.FC<Props> = ({ bondContent, unbondContent, leaveCon
       <Styled.Header>
         <Styled.AssetIcon network={network} />
         <div>
-          <Styled.HeaderTitle>{intl.formatMessage({ id: 'deposit.interact.title' })}</Styled.HeaderTitle>
+          <Styled.HeaderTitleWrapper>
+            <Styled.HeaderTitle>{intl.formatMessage({ id: 'deposit.interact.title' })}</Styled.HeaderTitle>
+            <Styled.HeaderWalletType>{intl.formatMessage({ id: 'ledger.title' })}</Styled.HeaderWalletType>
+          </Styled.HeaderTitleWrapper>
           <Styled.HeaderSubtitle>{intl.formatMessage({ id: 'deposit.interact.subtitle' })}</Styled.HeaderSubtitle>
         </div>
       </Styled.Header>

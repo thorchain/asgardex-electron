@@ -232,7 +232,6 @@ export const SendFormTHOR: React.FC<Props> = (props): JSX.Element => {
 
   return (
     <>
-      <div>walletType: {walletType}</div>
       <Row>
         <Styled.Col span={24}>
           <AccountSelector

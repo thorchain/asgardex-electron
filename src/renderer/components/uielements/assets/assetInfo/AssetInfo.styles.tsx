@@ -14,7 +14,7 @@ export const Card = styled(A.Card)`
   }
 `
 
-export const CoinInfoWrapper = styled.div`
+export const AssetInfoWrapper = styled.div`
   margin-left: 30px;
   flex-direction: column;
   width: 100%;
@@ -26,42 +26,47 @@ export const CoinInfoWrapper = styled.div`
   `}
 `
 
-export const CoinTitle = styled.p`
-  margin-bottom: 0;
+export const AssetTitleWrapper = styled.div`
+  display: flex;
+  align-items: center;
+  margin-top: 5px;
+`
+
+export const AssetTitle = styled(UILabel)`
+  padding: 0;
+  line-height: 100%;
   font-size: 36px;
   font-family: 'MainFontRegular';
   color: ${palette('text', 0)};
-  line-height: 42px;
   text-transform: uppercase;
+  width: auto;
 `
 
-export const CoinSubtitle = styled.p`
-  margin-bottom: 0px;
+export const AssetSubtitle = styled(UILabel)`
+  padding: 0;
   font-size: 19px;
   font-family: 'MainFontRegular';
   color: ${palette('text', 2)};
   text-transform: uppercase;
+  width: auto;
 `
 
-export const LedgerWalletType = styled(UILabel).attrs({
+export const WalletType = styled(UILabel).attrs({
   textTransform: 'uppercase',
   size: 'small'
 })`
-  margin: -30px -30px 0px 10px;
-  padding: 0px 5px;
+  padding: 1px 3px;
+  margin-left: 5px;
   color: ${palette('color', 2)};
   background: ${palette('gray', 1)};
   border-radius: 5px;
-  display: flex;
-  align-self: center;
-  height: 15px;
-  width: 50px;
+  width: auto;
 `
 
 export const InfoContainer = styled.div`
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
+  justify-content: space-around;
   margin: 10px 0 0 0;
 
   ${media.lg`
@@ -104,14 +109,13 @@ export const QrcodeOutlined = styled(AQrcodeOutlined)`
   }
 `
 
-export const CoinPrice = styled.p`
+export const AssetPrice = styled.p`
+  padding: 0;
   display: flex;
   align-items: flex-end;
   font-size: 32px;
   font-family: 'MainFontRegular';
-  font-weight: 300;
   color: ${palette('text', 0)};
-  line-height: 38px;
   text-transform: uppercase;
 
   ${media.lg`

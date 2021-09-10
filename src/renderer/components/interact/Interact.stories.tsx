@@ -5,6 +5,7 @@ import { Interact } from './Interact'
 
 export const Default = () => (
   <Interact
+    walletType="ledger"
     bondContent={<Bond />}
     unbondContent={<Unbond />}
     leaveContent={<Leave />}
