@@ -3,6 +3,7 @@ import * as A from 'antd'
 import styled from 'styled-components'
 import { palette } from 'styled-theme'
 
+import { Label as UILabel } from '../../../../components/uielements/label'
 import { media } from '../../../../helpers/styleHelper'
 import { AddressEllipsis as UIAddressEllipsis } from '../../addressEllipsis'
 
@@ -40,6 +41,21 @@ export const CoinSubtitle = styled.p`
   font-family: 'MainFontRegular';
   color: ${palette('text', 2)};
   text-transform: uppercase;
+`
+
+export const LedgerWalletType = styled(UILabel).attrs({
+  textTransform: 'uppercase',
+  size: 'small'
+})`
+  margin: -30px -30px 0px 10px;
+  padding: 0px 5px;
+  color: ${palette('color', 2)};
+  background: ${palette('gray', 1)};
+  border-radius: 5px;
+  display: flex;
+  align-self: center;
+  height: 15px;
+  width: 50px;
 `
 
 export const InfoContainer = styled.div`

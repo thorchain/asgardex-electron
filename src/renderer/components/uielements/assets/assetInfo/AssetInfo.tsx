@@ -10,7 +10,7 @@ import { Network } from '../../../../../shared/api/types'
 import { sequenceSOption, sequenceTOption } from '../../../../helpers/fpHelpers'
 import { loadingString, emptyString } from '../../../../helpers/stringHelper'
 import { getAssetAmountByAsset } from '../../../../helpers/walletHelper'
-import { NonEmptyWalletBalances } from '../../../../services/wallet/types'
+import { NonEmptyWalletBalances, WalletType } from '../../../../services/wallet/types'
 import { QRCodeModal } from '../../qrCodeModal/QRCodeModal'
 import { AssetIcon } from '../assetIcon'
 import * as Styled from './AssetInfo.styles'
@@ -24,6 +24,7 @@ type Props = {
   walletInfo?: O.Option<{
     address: Address
     network: Network
+    walletType: WalletType
   }>
   network: Network
 }
@@ -45,6 +46,17 @@ export const AssetInfo: React.FC<Props> = (props): JSX.Element => {
         O.getOrElse(() => <></>)
       ),
     [oAsset, network]
+  )
+
+  const renderLedgerWalletType = useMemo(
+    () =>
+      FP.pipe(
+        oWalletInfo,
+        O.filter((walletInfo) => walletInfo.walletType === 'ledger'),
+        O.map((walletInfo) => <Styled.LedgerWalletType key={walletInfo.address}>LEDGER</Styled.LedgerWalletType>),
+        O.getOrElse(() => <></>)
+      ),
+    [oWalletInfo]
   )
 
   const renderBalance = useMemo(
@@ -148,6 +160,7 @@ export const AssetInfo: React.FC<Props> = (props): JSX.Element => {
           </Styled.InfoContainer>
         )}
       </Styled.CoinInfoWrapper>
+      {renderLedgerWalletType}
       {isDesktopView && (
         <Styled.InfoContainer>
           {renderQRIcon}

@@ -16,7 +16,7 @@ export const AssetInfoStory: Story<{
       walletInfo={FP.pipe(
         address,
         O.fromPredicate((s) => !!s),
-        O.map((address) => ({ address, network: 'testnet' }))
+        O.map((address) => ({ address, network: 'testnet', walletType: 'keystore' }))
       )}
       asset={O.some(AssetRuneNative)}
       assetsWB={O.some([

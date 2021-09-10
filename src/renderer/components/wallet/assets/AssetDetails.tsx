@@ -154,10 +154,11 @@ export const AssetDetails: React.FC<Props> = (props): JSX.Element => {
         oWalletAddress,
         O.map((address) => ({
           address,
-          network
+          network,
+          walletType
         }))
       ),
-    [oWalletAddress, network]
+    [oWalletAddress, network, walletType]
   )
 
   return (

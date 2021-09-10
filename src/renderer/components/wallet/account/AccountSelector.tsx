@@ -15,7 +15,7 @@ import { FilterMenu } from '../../uielements/filterMenu'
 import * as Styled from './AccountSelector.styles'
 
 type Props = {
-  selectedAsset: Asset
+  selectedWallet: WalletBalance
   walletBalances: WalletBalances
   onChange?: (params: { asset: Asset; walletAddress: Address; walletType: WalletType }) => void
   size?: IconSize
@@ -28,16 +28,16 @@ const filterFunction = ({ asset }: WalletBalance, searchTerm: string) => {
 }
 
 export const AccountSelector: React.FC<Props> = (props): JSX.Element => {
-  const { selectedAsset, walletBalances, onChange = (_) => {}, size = 'large', network } = props
+  const { selectedWallet, walletBalances, onChange = (_) => {}, size = 'large', network } = props
 
   const intl = useIntl()
 
   const filteredWalletBalances = useMemo(
     () =>
       walletBalances.filter(
-        ({ asset, amount }) => asset.symbol !== selectedAsset.symbol && amount.amount().isGreaterThan(0)
+        ({ asset, amount }) => asset.symbol !== selectedWallet.asset.symbol && amount.amount().isGreaterThan(0)
       ),
-    [walletBalances, selectedAsset]
+    [selectedWallet.asset.symbol, walletBalances]
   )
   const enableDropdown = filteredWalletBalances.length > 0
 
@@ -73,10 +73,10 @@ export const AccountSelector: React.FC<Props> = (props): JSX.Element => {
   return (
     <Styled.Card bordered={false}>
       <Styled.AssetWrapper>
-        <AssetIcon asset={selectedAsset} size={size} network={network} />
+        <AssetIcon asset={selectedWallet.asset} size={size} network={network} />
         <Styled.AssetInfoWrapper>
-          <Styled.AssetTitle>{selectedAsset.ticker}</Styled.AssetTitle>
-          <Styled.AssetSubTitle>{selectedAsset.chain}</Styled.AssetSubTitle>
+          <Styled.AssetTitle>{selectedWallet.asset.ticker}</Styled.AssetTitle>
+          <Styled.AssetSubTitle>{selectedWallet.asset.chain}</Styled.AssetSubTitle>
 
           {enableDropdown && (
             <Dropdown overlay={menu} trigger={['click']}>
@@ -90,6 +90,7 @@ export const AccountSelector: React.FC<Props> = (props): JSX.Element => {
             </Dropdown>
           )}
         </Styled.AssetInfoWrapper>
+        {selectedWallet.walletType === 'ledger' && <Styled.LedgerWalletType>LEDGER</Styled.LedgerWalletType>}
       </Styled.AssetWrapper>
     </Styled.Card>
   )
