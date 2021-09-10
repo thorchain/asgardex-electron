@@ -5,6 +5,7 @@ import * as O from 'fp-ts/lib/Option'
 import * as Rx from 'rxjs'
 import * as RxOp from 'rxjs/operators'
 
+import { isError } from '../../../shared/api/guard'
 import { clientNetwork$ } from '../app/service'
 import * as C from '../clients'
 import { Address$, ExplorerUrl$ } from '../clients/types'
@@ -31,8 +32,7 @@ const clientState$: ClientState$ = FP.pipe(
               const client = new Client({ phrase, network })
               return RD.success(client)
             } catch (error) {
-              console.log('BNB ClientState error:', error)
-              return RD.failure<Error>(error)
+              return RD.failure<Error>(isError(error) ? error : new Error('Failed to create BNB client'))
             }
           }),
           // Set back to `initial` if no phrase is available (locked wallet)

@@ -6,6 +6,7 @@ import * as Rx from 'rxjs'
 import { Observable } from 'rxjs'
 import * as RxOp from 'rxjs/operators'
 
+import { isError } from '../../../shared/api/guard'
 import { clientNetwork$ } from '../app/service'
 import * as C from '../clients'
 import { keystoreService } from '../wallet/keystore'
@@ -35,7 +36,7 @@ const clientState$: ClientState$ = FP.pipe(
               return RD.success(client)
             } catch (error) {
               console.error('Failed to create BTC client', error)
-              return RD.failure(error)
+              return RD.failure<Error>(isError(error) ? error : new Error('Unknown error'))
             }
           }),
           // Set back to `initial` if no phrase is available (locked wallet)
