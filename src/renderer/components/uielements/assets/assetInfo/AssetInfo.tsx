@@ -5,6 +5,7 @@ import { Asset, formatAssetAmount, assetToString, AssetAmount } from '@xchainjs/
 import { Grid } from 'antd'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
+import { useIntl } from 'react-intl'
 
 import { Network } from '../../../../../shared/api/types'
 import { sequenceSOption, sequenceTOption } from '../../../../helpers/fpHelpers'
@@ -30,6 +31,7 @@ type Props = {
 }
 
 export const AssetInfo: React.FC<Props> = (props): JSX.Element => {
+  const intl = useIntl()
   const { assetsWB = O.none, asset: oAsset, walletInfo: oWalletInfo = O.none, network } = props
 
   const isDesktopView = Grid.useBreakpoint()?.lg ?? false
@@ -53,10 +55,12 @@ export const AssetInfo: React.FC<Props> = (props): JSX.Element => {
       FP.pipe(
         oWalletInfo,
         O.filter((walletInfo) => walletInfo.walletType === 'ledger'),
-        O.map((walletInfo) => <Styled.LedgerWalletType key={walletInfo.address}>LEDGER</Styled.LedgerWalletType>),
+        O.map((walletInfo) => (
+          <Styled.WalletType key={walletInfo.address}>{intl.formatMessage({ id: 'ledger.title' })}</Styled.WalletType>
+        )),
         O.getOrElse(() => <></>)
       ),
-    [oWalletInfo]
+    [intl, oWalletInfo]
   )
 
   const renderBalance = useMemo(
@@ -138,33 +142,35 @@ export const AssetInfo: React.FC<Props> = (props): JSX.Element => {
     <Styled.Card bordered={false} bodyStyle={{ display: 'flex', flexDirection: 'row' }}>
       {renderQRCodeModal}
       {renderAssetIcon}
-      <Styled.CoinInfoWrapper>
-        <Styled.CoinTitle>
+      <Styled.AssetInfoWrapper>
+        <Styled.AssetTitleWrapper>
+          <Styled.AssetTitle>
+            {FP.pipe(
+              oAsset,
+              O.map(({ ticker }) => ticker),
+              O.getOrElse(() => loadingString)
+            )}
+          </Styled.AssetTitle>
+          {renderLedgerWalletType}
+        </Styled.AssetTitleWrapper>
+        <Styled.AssetSubtitle>
           {FP.pipe(
             oAsset,
-            O.map(({ ticker }) => ticker),
+            O.map(({ chain }) => chain),
             O.getOrElse(() => loadingString)
           )}
-        </Styled.CoinTitle>
-        <Styled.CoinSubtitle>
-          {FP.pipe(
-            oAsset,
-            O.map((asset) => asset.chain),
-            O.getOrElse(() => loadingString)
-          )}
-        </Styled.CoinSubtitle>
+        </Styled.AssetSubtitle>
         {!isDesktopView && (
           <Styled.InfoContainer>
             {renderQRIcon}
-            <Styled.CoinPrice>{renderBalance}</Styled.CoinPrice>
+            <Styled.AssetPrice>{renderBalance}</Styled.AssetPrice>
           </Styled.InfoContainer>
         )}
-      </Styled.CoinInfoWrapper>
-      {renderLedgerWalletType}
+      </Styled.AssetInfoWrapper>
       {isDesktopView && (
         <Styled.InfoContainer>
           {renderQRIcon}
-          <Styled.CoinPrice>{renderBalance}</Styled.CoinPrice>
+          <Styled.AssetPrice>{renderBalance}</Styled.AssetPrice>
         </Styled.InfoContainer>
       )}
     </Styled.Card>

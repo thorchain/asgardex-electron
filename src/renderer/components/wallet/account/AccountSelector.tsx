@@ -90,7 +90,9 @@ export const AccountSelector: React.FC<Props> = (props): JSX.Element => {
             </Dropdown>
           )}
         </Styled.AssetInfoWrapper>
-        {selectedWallet.walletType === 'ledger' && <Styled.LedgerWalletType>LEDGER</Styled.LedgerWalletType>}
+        {selectedWallet.walletType === 'ledger' && (
+          <Styled.LedgerWalletType>{intl.formatMessage({ id: 'ledger.title' })}</Styled.LedgerWalletType>
+        )}
       </Styled.AssetWrapper>
     </Styled.Card>
   )
