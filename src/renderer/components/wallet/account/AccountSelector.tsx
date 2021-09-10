@@ -41,18 +41,6 @@ export const AccountSelector: React.FC<Props> = (props): JSX.Element => {
   )
   const enableDropdown = filteredWalletBalances.length > 0
 
-  const isLedgerWalletType = useMemo(
-    () =>
-      walletBalances.filter(
-        ({ asset, amount, walletType, walletAddress }) =>
-          walletAddress === selectedWallet.walletAddress &&
-          asset.symbol === selectedWallet.asset.symbol &&
-          amount.amount().isGreaterThan(0) &&
-          walletType === 'ledger'
-      ).length === 1,
-    [walletBalances, selectedWallet.walletAddress, selectedWallet.asset.symbol]
-  )
-
   const cellRenderer = useCallback(
     ({ asset, amount, walletAddress, walletType }: WalletBalance) => {
       const node = (
@@ -102,7 +90,7 @@ export const AccountSelector: React.FC<Props> = (props): JSX.Element => {
             </Dropdown>
           )}
         </Styled.AssetInfoWrapper>
-        {isLedgerWalletType && <Styled.LedgerWalletType>LEDGER</Styled.LedgerWalletType>}
+        {selectedWallet.walletType === 'ledger' && <Styled.LedgerWalletType>LEDGER</Styled.LedgerWalletType>}
       </Styled.AssetWrapper>
     </Styled.Card>
   )
