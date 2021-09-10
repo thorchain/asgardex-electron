@@ -113,8 +113,3 @@ jobs:
         env:
           NODE_OPTIONS: --max-old-space-size=4096
         run: yarn build
-
-      - name: Generate types build
-        env:
-          NODE_OPTIONS: --max-old-space-size=4096
-        run: yarn generate:types
