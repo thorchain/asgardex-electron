@@ -110,9 +110,15 @@ export const CurrencyInfo = ({
           </div>
           <div>
             <div style={{ display: 'flex', alignItems: 'center', marginRight: '5px' }}>
-              <Styled.SlipTolerancePercent slippage={isCausedSlippage ? 'true' : 'false'}>
-                {intl.formatMessage({ id: 'swap.slip.title' })}: {slip.toNumber().toFixed(0)}%
-              </Styled.SlipTolerancePercent>
+              {isCausedSlippage ? (
+                <Styled.SlipToleranceWarning>
+                  {intl.formatMessage({ id: 'swap.slip.title' })}: {slip.toNumber().toFixed(0)}%
+                </Styled.SlipToleranceWarning>
+              ) : (
+                <Styled.SlipToleranceText>
+                  {intl.formatMessage({ id: 'swap.slip.title' })}: {slip.toNumber().toFixed(0)}%
+                </Styled.SlipToleranceText>
+              )}
             </div>
             <div style={{ display: 'flex', flexDirection: 'column' }}>
               <Styled.SlipToleranceText>{intl.formatMessage({ id: 'swap.slip.tolerance' })}:</Styled.SlipToleranceText>

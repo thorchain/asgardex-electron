@@ -1,6 +1,6 @@
 import { AssetRuneNative, baseAmount, bn } from '@xchainjs/xchain-util'
 
-import { isAsset, isBaseAmount, isChain, isNetwork } from './guard'
+import { isAsset, isBaseAmount, isChain, isError, isNetwork } from './guard'
 
 describe('shared/guard', () => {
   describe('isAsset', () => {
@@ -54,6 +54,23 @@ describe('shared/guard', () => {
     })
     it('false for number ', () => {
       expect(isBaseAmount(2)).toBeFalsy()
+    })
+  })
+
+  describe('isError', () => {
+    it('true for object with message key', () => {
+      expect(isError(new Error('foo'))).toBeTruthy()
+    })
+    it('false for string', () => {
+      expect(isError('foo')).toBeFalsy()
+    })
+
+    it('false for object with message key', () => {
+      expect(isError({ message: 'message' })).toBeFalsy()
+    })
+
+    it('false for empty object', () => {
+      expect(isError({})).toBeFalsy()
     })
   })
 })

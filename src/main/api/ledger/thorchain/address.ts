@@ -3,6 +3,7 @@ import THORChainApp, { LedgerErrorType } from '@thorchain/ledger-thorchain'
 import { getPrefix } from '@xchainjs/xchain-thorchain'
 import * as E from 'fp-ts/Either'
 
+import { isError } from '../../../../shared/api/guard'
 import { LedgerErrorId, Network } from '../../../../shared/api/types'
 import { toClientNetwork } from '../../../../shared/utils/client'
 import { getErrorId } from '../utils'
@@ -19,6 +20,6 @@ export const getAddress = async (transport: Transport, network: Network): Promis
     }
     return E.right(bech32Address)
   } catch (error) {
-    return E.left(getErrorId(error))
+    return E.left(getErrorId(isError(error) ? error.message : ''))
   }
 }
