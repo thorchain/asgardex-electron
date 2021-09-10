@@ -15,7 +15,7 @@ export const Container = styled('div')`
   padding: 10px;
 
   ${media.sm`
-    padding: 30px 30px 150px;
+    padding: 35px 50px 150px 50px;
   `}
 `
 
@@ -40,28 +40,54 @@ export const AssetIcon = styled(UIAssetIcon).attrs({ asset: AssetRuneNative, siz
   `}
 `
 
-export const HeaderTitle = styled(UILabel).attrs({ weight: 'bold' })`
+export const HeaderTitleWrapper = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 10px;
+
+  ${media.sm`
+    justify-content: start;
+  `}
+`
+
+export const HeaderTitle = styled(UILabel)`
   text-transform: uppercase;
   font-size: 24px;
+  font-family: 'MainFontRegular';
+  color: ${palette('text', 0)};
   padding: 0;
   line-height: 1em;
-  margin-bottom: 10px;
   text-align: center;
+  width: auto;
 
   ${media.sm`
     font-size: 36px;
     text-align: left;
   `}
 `
-export const HeaderSubtitle = styled(UILabel).attrs({ weight: 'bold' })`
-  font-size: 18px;
+export const HeaderWalletType = styled(UILabel).attrs({
+  textTransform: 'uppercase',
+  size: 'small'
+})`
+  margin-left: 5px;
+  padding: 1px 3px;
+  color: ${palette('color', 2)};
+  background: ${palette('gray', 1)};
+  border-radius: 5px;
+  width: auto;
+`
+
+export const HeaderSubtitle = styled(UILabel)`
+  font-size: 16px;
   text-transform: uppercase;
+  color: ${palette('text', 2)};
   padding: 0;
   line-height: 1em;
   text-align: center;
 
   ${media.sm`
-    font-size: 24px;
+    font-size: 19px;
     text-align: left;
   `}
 `

@@ -18,13 +18,20 @@ export const SubmitButtonContainer = styled(A.Form.Item).attrs({
   shouldUpdate: true
 })`
   width: 100%;
+  margin-top: 30px;
+
+  & .ant-form-item-control-input-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
   ${media.sm`
     width: auto;
+    margin-top: 0px;
     align-self: flex-end;
 
     & .ant-form-item-control-input-content {
-      display: flex;
-      flex-direction: column;
       align-items: flex-end;
     }
   `}
@@ -32,9 +39,10 @@ export const SubmitButtonContainer = styled(A.Form.Item).attrs({
 
 export const SubmitButton = styled(UIButton).attrs({
   color: 'primary',
-  round: 'true'
+  round: 'true',
+  sizevalue: 'xnormal'
 })`
-  width: 100%;
+  width: auto;
 
   ${media.sm`
     width: auto;

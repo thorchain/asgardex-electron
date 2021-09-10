@@ -36,6 +36,7 @@ export const InteractView: React.FC = () => {
       </Row>
       <Styled.ContentContainer>
         <Interact
+          walletType={walletType}
           bondContent={
             <BondView walletType={walletType} walletAddress={walletAddress} goToTransaction={openExplorerTxUrl} />
           }
