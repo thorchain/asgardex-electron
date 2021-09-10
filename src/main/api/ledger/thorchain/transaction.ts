@@ -5,11 +5,11 @@ import { BaseAccountResponse, CosmosSDKClient } from '@xchainjs/xchain-cosmos'
 import {
   buildDepositTx,
   DEFAULT_GAS_VALUE,
-  getBalance,
   getChainId,
   getDenom,
   getDenomWithChain,
   getPrefix,
+  MsgNativeTx,
   msgNativeTxFromJson,
   registerCodecs
 } from '@xchainjs/xchain-thorchain'
@@ -25,6 +25,9 @@ import { toClientNetwork } from '../../../../shared/utils/client'
 import { getErrorId } from '../utils'
 import { fromLedgerErrorType, PATH } from './common'
 
+/**
+ * Sends `MsgSend` message using Ledger
+ */
 export const send = async ({
   transport,
   network,
@@ -52,12 +55,12 @@ export const send = async ({
     // Node endpoint for cosmos sdk client
     const hostURL = getClientUrl()[network].node
     const chainId = getChainId()
-    // use cosmos sdk
-    const sdk = new CosmosSDKClient({
+    // CosmosClient
+    const cosmosClient = new CosmosSDKClient({
       server: hostURL,
       chainId,
       prefix
-    }).sdk
+    })
 
     // get signer address
     const signer = AccAddress.fromBech32(bech32Address)
@@ -66,9 +69,9 @@ export const send = async ({
     // get account number + sequence from signer account
     let {
       data: { result: account }
-    } = await auth.accountsAddressGet(sdk, signer)
+    } = await auth.accountsAddressGet(cosmosClient.sdk, signer)
     // Note: Cosmos API has been changed - result has another JSON structure now !!
-    // Code is copied from xchain-cosmos -> SDKClient -> signAndBroadcast)
+    // Code is copied from xchain-cosmos -> SDKClient -> signAndBroadcast
     if (account.account_number === undefined) {
       account = BaseAccount.fromJSON((account as BaseAccountResponse).value)
     }
@@ -126,7 +129,7 @@ export const send = async ({
     // Send signed StdTx
     const {
       data: { txhash }
-    } = await auth.txsPost(sdk, stdTx, 'block')
+    } = await auth.txsPost(cosmosClient.sdk, stdTx, 'block')
 
     if (!txhash) {
       return E.left(LedgerErrorId.SEND_TX_FAILED)
@@ -138,6 +141,9 @@ export const send = async ({
   }
 }
 
+/**
+ * Sends `MsgDeposit` message using Ledger
+ */
 export const deposit = async ({
   transport,
   network,
@@ -170,13 +176,9 @@ export const deposit = async ({
       prefix
     })
 
-    const assetBalance = await getBalance({ address: bech32Address, assets: [AssetRuneNative], cosmosClient })
+    cosmosClient.setPrefix()
 
-    if (assetBalance.length === 0 || assetBalance[0].amount.lt(amount.plus(DEFAULT_GAS_VALUE))) {
-      throw new Error('insufficient funds')
-    }
-
-    const msgNativeTx = msgNativeTxFromJson({
+    const msgNativeTx: MsgNativeTx = msgNativeTxFromJson({
       coins: [
         {
           asset: getDenomWithChain(AssetRuneNative),
@@ -189,25 +191,18 @@ export const deposit = async ({
 
     const unsignedStdTx: StdTx = await buildDepositTx(msgNativeTx, hostURL)
 
-    registerCodecs(prefix)
-
-    // get signer address
-    const signer = AccAddress.fromBech32(bech32Address)
-
     // get account number + sequence from signer account
     let {
       data: { result: account }
-    } = await auth.accountsAddressGet(cosmosClient.sdk, signer)
+    } = await auth.accountsAddressGet(cosmosClient.sdk, msgNativeTx.signer)
     // Note: Cosmos API has been changed - result has another JSON structure now !!
-    // Code is copied from xchain-cosmos -> SDKClient -> signAndBroadcast)
+    // Code is copied from xchain-cosmos -> SDKClient -> signAndBroadcast
     if (account.account_number === undefined) {
       account = BaseAccount.fromJSON((account as BaseAccountResponse).value)
     }
     const { account_number, sequence } = account
-
     // Get bytes from StdTx to sign
     const signedStdTx = unsignedStdTx.getSignBytes(chainId, account_number.toString(), sequence.toString())
-
     // Sign StdTx
     const { signature } = await app.sign(PATH, signedStdTx.toString())
 
@@ -217,7 +212,6 @@ export const deposit = async ({
 
     // normalize signature
     const normalizeSignature: Buffer = extractSignatureFromTLV(signature)
-
     // create final StdTx
     const stdTx = new StdTx(
       unsignedStdTx.msg,
