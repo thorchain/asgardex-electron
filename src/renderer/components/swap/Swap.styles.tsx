@@ -6,7 +6,6 @@ import { media } from '../../helpers/styleHelper'
 import { AssetInput as AssetInputBase } from '../uielements/assets/assetInput'
 import { AssetSelect as AssetSelectUI } from '../uielements/assets/assetSelect'
 import { Button as UIButton } from '../uielements/button'
-import { Drag as UIDrag } from '../uielements/drag'
 import { Label as UILabel } from '../uielements/label'
 
 const ICON_SIZE = 16
@@ -170,10 +169,6 @@ export const AssetInput = styled(AssetInputBase)<{ hasError?: boolean }>`
   & .ant-input {
     border: none;
   }
-`
-
-export const Drag = styled(UIDrag)`
-  margin-bottom: 10px;
 `
 
 export const ErrorLabel = styled(UILabel)`

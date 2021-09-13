@@ -6,7 +6,6 @@ import { AssetIcon as AssetIconBase } from '../../uielements/assets/assetIcon'
 import { AssetLabel as AssetLabelUI } from '../../uielements/assets/assetLabel'
 import { ViewTxButton as UIViewTxButton } from '../../uielements/button'
 import { Button as UIButton } from '../../uielements/button'
-import { Drag as BaseDrag } from '../../uielements/drag'
 import { Label as UILabel } from '../../uielements/label'
 import { Slider as BaseSlider } from '../../uielements/slider'
 
@@ -47,11 +46,6 @@ export const Slider = styled(BaseSlider).attrs({
   withLabel: true,
   labelPosition: 'top'
 })``
-
-export const Drag = styled(BaseDrag)`
-  display: flex;
-  justify-content: center;
-`
 
 export const OutputLabel = styled(UILabel)`
   font-family: 'MainFontBold';
