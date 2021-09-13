@@ -10,6 +10,7 @@ import type Transport from '@ledgerhq/hw-transport'
 import { getDerivePath, getPrefix } from '@xchainjs/xchain-binance'
 import * as E from 'fp-ts/Either'
 
+import { isError } from '../../../shared/api/guard'
 import { LedgerErrorId, Network } from '../../../shared/api/types'
 import { toClientNetwork } from '../../../shared/utils/client'
 import { getErrorId } from './utils'
@@ -29,7 +30,7 @@ export const getAddress = async (transport: Transport, network: Network) => {
       return E.left(LedgerErrorId.INVALID_PUBKEY)
     }
   } catch (error) {
-    return E.left(getErrorId(error.toString()))
+    return E.left(getErrorId(isError(error) ? error.message : ''))
   }
 }
 

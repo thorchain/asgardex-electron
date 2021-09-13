@@ -3,6 +3,7 @@ import { TxHash } from '@xchainjs/xchain-client'
 import { THORChain } from '@xchainjs/xchain-util'
 import * as E from 'fp-ts/Either'
 
+import { isError } from '../../../shared/api/guard'
 import { IPCLedgerDepositTxParams, IPCLedgerSendTxParams } from '../../../shared/api/io'
 import { LedgerErrorId } from '../../../shared/api/types'
 import * as THOR from './thorchain/transaction'
@@ -28,7 +29,7 @@ export const sendTx = async ({
     await transport.close()
     return res
   } catch (error) {
-    return E.left(getErrorId(error.toString()))
+    return E.left(getErrorId(isError(error) ? error.message : ''))
   }
 }
 
@@ -51,6 +52,6 @@ export const deposit = async ({
     await transport.close()
     return res
   } catch (error) {
-    return E.left(getErrorId(error.toString()))
+    return E.left(getErrorId(isError(error) ? error.message : ''))
   }
 }

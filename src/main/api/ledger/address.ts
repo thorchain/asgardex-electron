@@ -3,6 +3,7 @@ import { Address } from '@xchainjs/xchain-client'
 import { BNBChain, THORChain } from '@xchainjs/xchain-util'
 import * as E from 'fp-ts/Either'
 
+import { isError } from '../../../shared/api/guard'
 import { IPCLedgerAdddressParams, LedgerErrorId } from '../../../shared/api/types'
 import { getAddress as getBNBAddress } from './binance'
 import { getAddress as getTHORAddress } from './thorchain/address'
@@ -28,6 +29,6 @@ export const getAddress = async ({
     await transport.close()
     return res
   } catch (error) {
-    return E.left(getErrorId(error.toString()))
+    return E.left(getErrorId(isError(error) ? error.message : ''))
   }
 }

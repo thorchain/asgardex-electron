@@ -19,6 +19,7 @@ import { auth, BaseAccount, StdTx } from 'cosmos-client/x/auth'
 import { MsgSend } from 'cosmos-client/x/bank'
 import * as E from 'fp-ts/Either'
 
+import { isError } from '../../../../shared/api/guard'
 import { LedgerErrorId, Network } from '../../../../shared/api/types'
 import { getClientUrl } from '../../../../shared/thorchain/client'
 import { toClientNetwork } from '../../../../shared/utils/client'
@@ -137,7 +138,7 @@ export const send = async ({
 
     return E.right(txhash)
   } catch (error) {
-    return E.left(getErrorId(error))
+    return E.left(getErrorId(isError(error) ? error.message : ''))
   }
 }
 
@@ -236,6 +237,6 @@ export const deposit = async ({
 
     return E.right(txhash)
   } catch (error) {
-    return E.left(getErrorId(error))
+    return E.left(getErrorId(isError(error) ? error.message : ''))
   }
 }

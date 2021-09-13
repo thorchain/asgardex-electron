@@ -6,6 +6,7 @@ import * as O from 'fp-ts/lib/Option'
 import * as Rx from 'rxjs'
 import * as RxOp from 'rxjs/operators'
 
+import { isError } from '../../../shared/api/guard'
 import { envOrDefault } from '../../helpers/envHelper'
 import { clientNetwork$ } from '../app/service'
 import * as C from '../clients'
@@ -51,8 +52,7 @@ const clientState$: ClientState$ = FP.pipe(
               })
               return RD.success(client)
             } catch (error) {
-              console.error('Failed to create THOR client', error)
-              return RD.failure(error)
+              return RD.failure<Error>(isError(error) ? error : new Error('Failed to create THOR client'))
             }
           }),
           // Set back to `initial` if no phrase is available (locked wallet)
