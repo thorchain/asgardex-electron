@@ -87,7 +87,7 @@ describe('shared/guard', () => {
     })
   })
 
-  describe('isLedgerWallet', () => {
+  describe('isKeystoreWallet', () => {
     it('false for "ledger"', () => {
       expect(isKeystoreWallet('ledger')).toBeFalsy()
     })
