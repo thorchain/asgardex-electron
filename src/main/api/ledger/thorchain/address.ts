@@ -3,9 +3,9 @@ import THORChainApp, { LedgerErrorType } from '@thorchain/ledger-thorchain'
 import { getPrefix } from '@xchainjs/xchain-thorchain'
 import * as E from 'fp-ts/Either'
 
-import { isError } from '../../../../shared/api/guard'
 import { LedgerErrorId, Network } from '../../../../shared/api/types'
 import { toClientNetwork } from '../../../../shared/utils/client'
+import { isError } from '../../../../shared/utils/guard'
 import { getErrorId } from '../utils'
 import { fromLedgerErrorType, PATH } from './common'
 

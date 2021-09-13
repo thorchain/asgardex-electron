@@ -10,9 +10,9 @@ import type Transport from '@ledgerhq/hw-transport'
 import { getDerivePath, getPrefix } from '@xchainjs/xchain-binance'
 import * as E from 'fp-ts/Either'
 
-import { isError } from '../../../shared/api/guard'
 import { LedgerErrorId, Network } from '../../../shared/api/types'
 import { toClientNetwork } from '../../../shared/utils/client'
+import { isError } from '../../../shared/utils/guard'
 import { getErrorId } from './utils'
 
 export const getAddress = async (transport: Transport, network: Network) => {

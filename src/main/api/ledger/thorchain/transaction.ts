@@ -19,10 +19,10 @@ import { auth, BaseAccount, StdTx } from 'cosmos-client/x/auth'
 import { MsgSend } from 'cosmos-client/x/bank'
 import * as E from 'fp-ts/Either'
 
-import { isError } from '../../../../shared/api/guard'
 import { LedgerErrorId, Network } from '../../../../shared/api/types'
 import { getClientUrl } from '../../../../shared/thorchain/client'
 import { toClientNetwork } from '../../../../shared/utils/client'
+import { isError } from '../../../../shared/utils/guard'
 import { getErrorId } from '../utils'
 import { fromLedgerErrorType, PATH } from './common'
 

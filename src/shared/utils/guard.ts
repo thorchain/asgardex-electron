@@ -5,7 +5,7 @@ import * as FP from 'fp-ts/lib/function'
 import * as IOG from 'io-ts/Guard'
 
 import { WalletType } from '../../renderer/services/wallet/types'
-import { Network } from './types'
+import { Network } from '../api/types'
 
 const nonEmptyStringGuard = FP.pipe(
   IOG.string,
@@ -21,6 +21,8 @@ export const isChain = (u: unknown): u is Chain => chainGuard.is(u)
 export const isNetwork = (u: unknown): u is Network => u === 'mainnet' || u === 'testnet'
 
 export const isWalletType = (u: unknown): u is WalletType => u === 'keystore' || u === 'ledger'
+export const isLedgerWallet = (walletType: WalletType): boolean => walletType === 'ledger'
+export const isKeystoreWallet = (walletType: WalletType): boolean => walletType === 'keystore'
 
 const assetGuard = IOG.struct({ symbol: nonEmptyStringGuard, ticker: nonEmptyStringGuard, chain: chainGuard })
 

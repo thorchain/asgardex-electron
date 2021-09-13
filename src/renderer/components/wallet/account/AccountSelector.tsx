@@ -6,6 +6,7 @@ import { Dropdown, Row, Col } from 'antd'
 import { useIntl } from 'react-intl'
 
 import { Network } from '../../../../shared/api/types'
+import { isLedgerWallet } from '../../../../shared/utils/guard'
 import { WalletBalances } from '../../../services/clients'
 import { WalletBalance, WalletType } from '../../../services/wallet/types'
 import { AssetData } from '../../uielements/assets/assetData'
@@ -90,7 +91,7 @@ export const AccountSelector: React.FC<Props> = (props): JSX.Element => {
             </Dropdown>
           )}
         </Styled.AssetInfoWrapper>
-        {selectedWallet.walletType === 'ledger' && (
+        {isLedgerWallet(selectedWallet.walletType) && (
           <Styled.LedgerWalletType>{intl.formatMessage({ id: 'ledger.title' })}</Styled.LedgerWalletType>
         )}
       </Styled.AssetWrapper>

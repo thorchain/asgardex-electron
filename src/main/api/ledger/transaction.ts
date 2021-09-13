@@ -3,9 +3,9 @@ import { TxHash } from '@xchainjs/xchain-client'
 import { THORChain } from '@xchainjs/xchain-util'
 import * as E from 'fp-ts/Either'
 
-import { isError } from '../../../shared/api/guard'
 import { IPCLedgerDepositTxParams, IPCLedgerSendTxParams } from '../../../shared/api/io'
 import { LedgerErrorId } from '../../../shared/api/types'
+import { isError } from '../../../shared/utils/guard'
 import * as THOR from './thorchain/transaction'
 import { getErrorId } from './utils'
 

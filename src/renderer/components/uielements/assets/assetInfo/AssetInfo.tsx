@@ -8,6 +8,7 @@ import * as O from 'fp-ts/lib/Option'
 import { useIntl } from 'react-intl'
 
 import { Network } from '../../../../../shared/api/types'
+import { isLedgerWallet } from '../../../../../shared/utils/guard'
 import { sequenceSOption, sequenceTOption } from '../../../../helpers/fpHelpers'
 import { loadingString, emptyString } from '../../../../helpers/stringHelper'
 import { getAssetAmountByAsset } from '../../../../helpers/walletHelper'
@@ -54,7 +55,7 @@ export const AssetInfo: React.FC<Props> = (props): JSX.Element => {
     () =>
       FP.pipe(
         oWalletInfo,
-        O.filter((walletInfo) => walletInfo.walletType === 'ledger'),
+        O.filter(({ walletType }) => isLedgerWallet(walletType)),
         O.map((walletInfo) => (
           <Styled.WalletType key={walletInfo.address}>{intl.formatMessage({ id: 'ledger.title' })}</Styled.WalletType>
         )),
