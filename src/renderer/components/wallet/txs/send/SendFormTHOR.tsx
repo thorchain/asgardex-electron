@@ -18,6 +18,7 @@ import * as O from 'fp-ts/lib/Option'
 import { useIntl } from 'react-intl'
 
 import { Network } from '../../../../../shared/api/types'
+import { isKeystoreWallet, isLedgerWallet } from '../../../../../shared/utils/guard'
 import { ZERO_BASE_AMOUNT } from '../../../../const'
 import { isRuneNativeAsset, THORCHAIN_DECIMAL } from '../../../../helpers/assetHelper'
 import { sequenceTOption } from '../../../../helpers/fpHelpers'
@@ -225,9 +226,9 @@ export const SendFormTHOR: React.FC<Props> = (props): JSX.Element => {
   const addMaxAmountHandler = useCallback(() => setAmountToSend(maxAmount), [maxAmount])
 
   const onFinishHandler = useCallback(() => {
-    if (walletType === 'keystore') setShowPwModal(true)
+    if (isKeystoreWallet(walletType)) setShowPwModal(true)
 
-    if (walletType === 'ledger') sendHandler()
+    if (isLedgerWallet(walletType)) sendHandler()
   }, [sendHandler, walletType])
 
   return (

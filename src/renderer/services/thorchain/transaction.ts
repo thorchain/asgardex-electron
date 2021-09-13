@@ -15,6 +15,7 @@ import {
   ipcLedgerSendTxParamsIO
 } from '../../../shared/api/io'
 import { LedgerErrorId, Network } from '../../../shared/api/types'
+import { isLedgerWallet } from '../../../shared/utils/guard'
 import { retryRequest } from '../../helpers/rx/retryRequest'
 import { Network$ } from '../app/types'
 import * as C from '../clients'
@@ -88,7 +89,8 @@ export const createTransactionService = (client$: Client$, network$: Network$): 
     FP.pipe(
       network$,
       RxOp.switchMap((network) => {
-        if (walletType === 'ledger') return depositLedgerTx({ network, params: { walletIndex, asset, amount, memo } })
+        if (isLedgerWallet(walletType))
+          return depositLedgerTx({ network, params: { walletIndex, asset, amount, memo } })
 
         return depositTx({ walletIndex, asset, amount, memo })
       })
@@ -129,7 +131,7 @@ export const createTransactionService = (client$: Client$, network$: Network$): 
     FP.pipe(
       network$,
       RxOp.switchMap((network) => {
-        if (params.walletType === 'ledger') return sendLedgerTx({ network, params })
+        if (isLedgerWallet(params.walletType)) return sendLedgerTx({ network, params })
 
         return common.sendTx(params)
       })

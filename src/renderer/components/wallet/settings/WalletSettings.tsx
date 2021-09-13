@@ -9,6 +9,7 @@ import * as O from 'fp-ts/lib/Option'
 import { useIntl } from 'react-intl'
 
 import { Network } from '../../../../shared/api/types'
+import { isLedgerWallet } from '../../../../shared/utils/guard'
 import { ReactComponent as UnlockOutlined } from '../../../assets/svg/icon-unlock-warning.svg'
 import { RemoveWalletConfirmationModal } from '../../../components/modal/confirmation/RemoveWalletConfirmationModal'
 import { PasswordModal } from '../../../components/modal/password'
@@ -94,7 +95,7 @@ export const WalletSettings: React.FC<Props> = (props): JSX.Element => {
   }, [showQRModal, selectedNetwork, closeQrModal])
 
   const renderAddress = useCallback(
-    (chain: Chain, { type, address: addressRD }: WalletAddress) => {
+    (chain: Chain, { type: walletType, address: addressRD }: WalletAddress) => {
       // Render ADD LEDGER button
       const renderAddLedger = (chain: Chain, loading: boolean) => (
         <Styled.AddLedgerButton loading={loading} onClick={() => addLedgerAddress(chain)}>
@@ -108,12 +109,12 @@ export const WalletSettings: React.FC<Props> = (props): JSX.Element => {
           {FP.pipe(
             addressRD,
             RD.fold(
-              () => (type === 'ledger' ? renderAddLedger(chain, false) : <>...</>),
-              () => (type === 'ledger' ? renderAddLedger(chain, true) : <>...</>),
+              () => (isLedgerWallet(walletType) ? renderAddLedger(chain, false) : <>...</>),
+              () => (isLedgerWallet(walletType) ? renderAddLedger(chain, true) : <>...</>),
               (error) => (
                 <div>
                   <Styled.AddressError>{error.message}</Styled.AddressError>
-                  {type === 'ledger' && renderAddLedger(chain, false)}
+                  {isLedgerWallet(walletType) && renderAddLedger(chain, false)}
                 </div>
               ),
               (address) => (
@@ -121,7 +122,7 @@ export const WalletSettings: React.FC<Props> = (props): JSX.Element => {
                   <Styled.AddressEllipsis address={address} chain={chain} network={selectedNetwork} enableCopy={true} />
                   <Styled.QRCodeIcon onClick={() => setShowQRModal(O.some({ asset: getChainAsset(chain), address }))} />
                   <Styled.AddressLinkIcon onClick={() => clickAddressLinkHandler(chain, address)} />
-                  {type === 'ledger' && <Styled.RemoveLedgerIcon onClick={() => removeLedgerAddress(chain)} />}
+                  {isLedgerWallet(walletType) && <Styled.RemoveLedgerIcon onClick={() => removeLedgerAddress(chain)} />}
                 </>
               )
             )
