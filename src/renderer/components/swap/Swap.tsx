@@ -12,9 +12,8 @@ import {
   formatAssetAmount,
   formatAssetAmountCurrency,
   delay,
-  assetAmount,
-  assetToBase,
-  Chain
+  Chain,
+  AssetRuneNative
 } from '@xchainjs/xchain-util'
 import BigNumber from 'bignumber.js'
 import * as A from 'fp-ts/Array'
@@ -146,7 +145,7 @@ export const Swap = ({
 }: SwapProps) => {
   const intl = useIntl()
 
-  const unlockedWallet = useMemo(() => isLocked(keystore) || !hasImportedKeystore(keystore), [keystore])
+  const unlockedWallet = useMemo(() => !isLocked(keystore) && hasImportedKeystore(keystore), [keystore])
 
   const [targetWalletAddress, setTargetWalletAddress] = useState<O.Option<Address>>(initialTargetWalletAddress)
 
@@ -501,11 +500,12 @@ export const Swap = ({
   // depends on users balances of source asset
   // Decimal always <= 1e8 based
   const maxAmountToSwapMax1e8: BaseAmount = useMemo(() => {
-    // make sure not logged in user can play around with swap
-    if (unlockedWallet) return assetToBase(assetAmount(Number.MAX_SAFE_INTEGER, sourceAssetAmountMax1e8.decimal))
-
+    if (unlockedWallet && sourceAssetAmountMax1e8.gt(swapFees.inFee.amount)) {
+      if (sourceChainAsset === AssetRuneNative) return sourceAssetAmountMax1e8.minus(swapFees.inFee.amount)
+      else return sourceAssetAmountMax1e8.minus(swapFees.inFee.amount.times(2))
+    }
     return sourceAssetAmountMax1e8
-  }, [unlockedWallet, sourceAssetAmountMax1e8])
+  }, [unlockedWallet, sourceAssetAmountMax1e8, swapFees.inFee.amount, sourceChainAsset])
 
   const setAmountToSwapMax1e8 = useCallback(
     (amountToSwap: BaseAmount) => {
@@ -632,14 +632,14 @@ export const Swap = ({
 
   const renderSlider = useMemo(() => {
     const percentage = unlockedWallet
-      ? 0
-      : amountToSwapMax1e8
+      ? amountToSwapMax1e8
           .amount()
           .dividedBy(sourceAssetAmountMax1e8.amount())
           .multipliedBy(100)
           // Remove decimal of `BigNumber`s used within `BaseAmount` and always round down for currencies
           .decimalPlaces(0, BigNumber.ROUND_DOWN)
           .toNumber()
+      : 0
     return (
       <Slider
         key={'swap percentage slider'}
@@ -649,7 +649,7 @@ export const Swap = ({
         tooltipVisible={true}
         withLabel={true}
         tooltipPlacement={'top'}
-        disabled={unlockedWallet || disableSwapAction}
+        disabled={!unlockedWallet || disableSwapAction}
       />
     )
   }, [
@@ -1106,7 +1106,7 @@ export const Swap = ({
   const disableSubmit: boolean = useMemo(
     () =>
       disableSwapAction ||
-      unlockedWallet ||
+      !unlockedWallet ||
       isZeroAmountToSwap ||
       walletBalancesLoading ||
       sourceChainFeeError ||
@@ -1191,7 +1191,7 @@ export const Swap = ({
               maxAmount={maxAmountToSwapMax1e8}
               hasError={minAmountError}
               asset={sourceAssetProp}
-              disabled={unlockedWallet}
+              disabled={!unlockedWallet}
             />
             {FP.pipe(
               oSourceAsset,
@@ -1234,7 +1234,7 @@ export const Swap = ({
               )
             )}
           </Styled.ValueItemContainer>
-          {!unlockedWallet && (
+          {unlockedWallet && (
             <Styled.TargetAddressContainer>
               <Styled.ValueTitle>{intl.formatMessage({ id: 'swap.recipient' })}</Styled.ValueTitle>
               {renderCustomAddressInput}
