@@ -8,7 +8,7 @@ import { NonEmptyArray } from 'fp-ts/lib/NonEmptyArray'
 import * as O from 'fp-ts/lib/Option'
 import * as Rx from 'rxjs'
 
-import { LedgerErrorId, Network } from '../../../shared/api/types'
+import { LedgerError, Network } from '../../../shared/api/types'
 import { LiveData } from '../../helpers/rx/liveData'
 import { LoadTxsParams, WalletBalancesLD, WalletBalancesRD } from '../clients'
 
@@ -149,12 +149,6 @@ export type ApiError = {
   msg: string
 }
 
-export type LedgerApiError = {
-  ledgerErrorId: LedgerErrorId
-  errorId: ErrorId
-  msg: string
-}
-
 export type NonEmptyApiErrors = NonEmptyArray<ApiError>
 
 export type TxRD = RD.RemoteData<ApiError, Tx>
@@ -163,11 +157,11 @@ export type TxLD = LiveData<ApiError, Tx>
 /* RD/LD for sending transactions on different chains */
 export type TxHashRD = RD.RemoteData<ApiError, TxHash>
 export type TxHashLD = LiveData<ApiError, TxHash>
-export type LedgerTxHashRD = RD.RemoteData<LedgerApiError, TxHash>
-export type LedgerTxHashLD = LiveData<LedgerApiError, TxHash>
+export type LedgerTxHashRD = RD.RemoteData<LedgerError, TxHash>
+export type LedgerTxHashLD = LiveData<LedgerError, TxHash>
 
-export type LedgerAddressRD = RD.RemoteData<LedgerErrorId, Address>
-export type LedgerAddressLD = LiveData<LedgerErrorId, Address>
+export type LedgerAddressRD = RD.RemoteData<LedgerError, Address>
+export type LedgerAddressLD = LiveData<LedgerError, Address>
 
 export type LedgerAddressMap = Record<Network, LedgerAddressRD>
 export type LedgerAddressMap$ = Rx.Observable<LedgerAddressMap>

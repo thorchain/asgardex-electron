@@ -5,9 +5,10 @@ import * as FP from 'fp-ts/lib/function'
 import * as Rx from 'rxjs'
 import { catchError, map, startWith } from 'rxjs/operators'
 
-import { LedgerBNBTxParams, LedgerErrorId, Network } from '../../../shared/api/types'
+import { LedgerBNBTxParams, LedgerError, LedgerErrorId, Network } from '../../../shared/api/types'
+import { isError } from '../../../shared/utils/guard'
 import { observableState } from '../../helpers/stateHelper'
-import { ErrorId, LedgerAddressRD, LedgerTxHashLD, LedgerTxHashRD } from '../wallet/types'
+import { LedgerAddressRD, LedgerTxHashLD, LedgerTxHashRD } from '../wallet/types'
 import { LedgerService } from './types'
 
 const { get$: ledgerAddress$, set: setLedgerAddressRD } = observableState<LedgerAddressRD>(RD.initial)
@@ -17,16 +18,22 @@ const retrieveLedgerAddress = (network: Network) =>
     Rx.from(window.apiHDWallet.getLedgerAddress({ chain: BNBChain, network })),
     map(RD.fromEither),
     startWith(RD.pending),
-    catchError((error) => Rx.of(RD.failure(error)))
-  ).subscribe(setLedgerAddressRD)
+    catchError((error) =>
+      Rx.of(
+        RD.failure<LedgerError>({
+          errorId: LedgerErrorId.GET_ADDRESS_FAILED,
+          msg: isError(error) ? error.toString() : `${error}`
+        })
+      )
+    )
+  ).subscribe((v) => setLedgerAddressRD(v))
 
 const { get$: ledgerTxRD$, set: setLedgerTxRD } = observableState<LedgerTxHashRD>(RD.initial)
 
 const ledgerTx$ = (network: Network, params: TxParams): LedgerTxHashLD =>
   Rx.of(
     RD.failure({
-      ledgerErrorId: LedgerErrorId.UNKNOWN,
-      errorId: ErrorId.SEND_TX,
+      errorId: LedgerErrorId.SEND_TX_FAILED,
       msg: `Not implemented for BNB ${network} ${params}`
     })
   )

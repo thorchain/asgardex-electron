@@ -124,7 +124,7 @@ export const WalletSettingsView: React.FC = (): JSX.Element => {
       type: 'ledger',
       address: FP.pipe(
         thorLedgerAddressRD,
-        RD.mapLeft((errorId) => Error(ledgerErrorIdToI18n(errorId, intl)))
+        RD.mapLeft(({ errorId, msg }) => Error(`${ledgerErrorIdToI18n(errorId, intl)} (${msg})`))
       )
     }),
     [intl, thorLedgerAddressRD]
@@ -135,7 +135,7 @@ export const WalletSettingsView: React.FC = (): JSX.Element => {
       type: 'ledger',
       address: FP.pipe(
         bnbLedgerAddressRD,
-        RD.mapLeft((errorId) => Error(ledgerErrorIdToI18n(errorId, intl)))
+        RD.mapLeft(({ errorId, msg }) => Error(`${ledgerErrorIdToI18n(errorId, intl)} (${msg})`))
       )
     }),
     [intl, bnbLedgerAddressRD]

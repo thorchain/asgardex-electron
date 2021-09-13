@@ -13,6 +13,20 @@ export const fromLedgerErrorType = (error: number): LedgerErrorId => {
       return LedgerErrorId.SIGN_FAILED
     case LedgerErrorType.AppDoesNotSeemToBeOpen:
       return LedgerErrorId.NO_APP
+    case LedgerErrorType.DataIsInvalid:
+    case LedgerErrorType.EmptyBuffer:
+    case LedgerErrorType.WrongLength:
+    case LedgerErrorType.OutputBufferTooSmall:
+      return LedgerErrorId.INVALID_DATA
+    case LedgerErrorType.TransactionRejected:
+      return LedgerErrorId.REJECTED
+    case LedgerErrorType.BadKeyHandle:
+      return LedgerErrorId.INVALID_PUBKEY
+    case LedgerErrorType.UnknownResponse:
+      return LedgerErrorId.INVALID_RESPONSE
+    case LedgerErrorType.U2FTimeout:
+    case LedgerErrorType.Timeout:
+      return LedgerErrorId.TIMEOUT
     default:
       return LedgerErrorId.UNKNOWN
   }

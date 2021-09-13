@@ -14,7 +14,7 @@ import {
   IPCLedgerSendTxParams,
   ipcLedgerSendTxParamsIO
 } from '../../../shared/api/io'
-import { LedgerErrorId, Network } from '../../../shared/api/types'
+import { LedgerError, Network } from '../../../shared/api/types'
 import { isLedgerWallet } from '../../../shared/utils/guard'
 import { retryRequest } from '../../helpers/rx/retryRequest'
 import { Network$ } from '../app/types'
@@ -40,12 +40,12 @@ export const createTransactionService = (client$: Client$, network$: Network$): 
       Rx.from(window.apiHDWallet.depositLedgerTx(encoded)),
       RxOp.switchMap(
         FP.flow(
-          E.fold<LedgerErrorId, TxHash, TxHashLD>(
-            (error) =>
+          E.fold<LedgerError, TxHash, TxHashLD>(
+            ({ msg }) =>
               Rx.of(
                 RD.failure({
-                  errorId: ErrorId.SEND_TX,
-                  msg: `Deposit Ledger tx failed. (error id: ${error})`
+                  errorId: ErrorId.DEPOSIT_LEDGER_TX_ERROR,
+                  msg: `Deposit Ledger THOR tx failed. (${msg})`
                 })
               ),
             (txHash) => Rx.of(RD.success(txHash))
@@ -111,12 +111,12 @@ export const createTransactionService = (client$: Client$, network$: Network$): 
       Rx.from(window.apiHDWallet.sendLedgerTx(encoded)),
       RxOp.switchMap(
         FP.flow(
-          E.fold<LedgerErrorId, TxHash, TxHashLD>(
-            (error) =>
+          E.fold<LedgerError, TxHash, TxHashLD>(
+            ({ msg }) =>
               Rx.of(
                 RD.failure({
-                  errorId: ErrorId.SEND_TX,
-                  msg: `Sending Ledger tx failed. (error id: ${error})`
+                  errorId: ErrorId.SEND_LEDGER_TX,
+                  msg: `Sending Ledger THOR tx failed. (${msg})`
                 })
               ),
             (txHash) => Rx.of(RD.success(txHash))

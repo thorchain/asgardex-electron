@@ -4,7 +4,8 @@ import * as FP from 'fp-ts/lib/function'
 import * as Rx from 'rxjs'
 import * as RxOp from 'rxjs/operators'
 
-import { Network } from '../../../shared/api/types'
+import { LedgerErrorId, Network } from '../../../shared/api/types'
+import { isError } from '../../../shared/utils/guard'
 import { eqLedgerAddressMap } from '../../helpers/fp/eq'
 import { observableState } from '../../helpers/stateHelper'
 import { INITIAL_LEDGER_ADDRESSES_MAP } from './const'
@@ -85,7 +86,14 @@ export const createLedgerService = ({ keystore$ }: { keystore$: KeystoreState$ }
       RxOp.map(RD.fromEither),
       // store address in memory
       RxOp.tap((addressRD: LedgerAddressRD) => setLedgerAddressRD({ chain, addressRD, network })),
-      RxOp.catchError((error) => Rx.of(RD.failure(error))),
+      RxOp.catchError((error) =>
+        Rx.of(
+          RD.failure({
+            errorId: LedgerErrorId.GET_ADDRESS_FAILED,
+            msg: isError(error) ? error.toString() : `${error}`
+          })
+        )
+      ),
       RxOp.startWith(RD.pending)
     )
 
