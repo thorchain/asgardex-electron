@@ -4,9 +4,9 @@ import { THORChain } from '@xchainjs/xchain-util'
 import * as E from 'fp-ts/Either'
 
 import { isError } from '../../../shared/api/guard'
-import { IPCLedgerSendTxParams } from '../../../shared/api/io'
+import { IPCLedgerDepositTxParams, IPCLedgerSendTxParams } from '../../../shared/api/io'
 import { LedgerErrorId } from '../../../shared/api/types'
-import { sendTx as sendTHORTx } from './thorchain/transaction'
+import * as THOR from './thorchain/transaction'
 import { getErrorId } from './utils'
 
 export const sendTx = async ({
@@ -21,10 +21,33 @@ export const sendTx = async ({
     let res: E.Either<LedgerErrorId, string>
     switch (chain) {
       case THORChain:
-        res = await sendTHORTx({ transport, network, recipient, amount, memo })
+        res = await THOR.send({ transport, network, recipient, amount, memo })
         break
       default:
-        res = E.left(LedgerErrorId.NO_APP)
+        res = E.left(LedgerErrorId.NOT_IMPLEMENTED)
+    }
+    await transport.close()
+    return res
+  } catch (error) {
+    return E.left(getErrorId(isError(error) ? error.message : ''))
+  }
+}
+
+export const deposit = async ({
+  chain,
+  network,
+  amount,
+  memo
+}: IPCLedgerDepositTxParams): Promise<E.Either<LedgerErrorId, TxHash>> => {
+  try {
+    const transport = await TransportNodeHidSingleton.open()
+    let res: E.Either<LedgerErrorId, string>
+    switch (chain) {
+      case THORChain:
+        res = await THOR.deposit({ transport, network, amount, memo })
+        break
+      default:
+        res = E.left(LedgerErrorId.NOT_IMPLEMENTED)
     }
     await transport.close()
     return res

@@ -1,6 +1,6 @@
 import { AssetRuneNative, baseAmount, bn } from '@xchainjs/xchain-util'
 
-import { isAsset, isBaseAmount, isChain, isError, isNetwork } from './guard'
+import { isAsset, isBaseAmount, isChain, isError, isNetwork, isWalletType } from './guard'
 
 describe('shared/guard', () => {
   describe('isAsset', () => {
@@ -52,8 +52,20 @@ describe('shared/guard', () => {
     it('false for string', () => {
       expect(isBaseAmount('123')).toBeFalsy()
     })
-    it('false for number ', () => {
+    it('false for number', () => {
       expect(isBaseAmount(2)).toBeFalsy()
+    })
+  })
+
+  describe('isWalletType', () => {
+    it('true for "ledger"', () => {
+      expect(isWalletType('ledger')).toBeTruthy()
+    })
+    it('true for "keystore"', () => {
+      expect(isWalletType('keystore')).toBeTruthy()
+    })
+    it('false for invalid string', () => {
+      expect(isWalletType('invalid')).toBeFalsy()
     })
   })
 

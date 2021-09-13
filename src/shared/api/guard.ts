@@ -4,6 +4,7 @@ import BigNumber from 'bignumber.js'
 import * as FP from 'fp-ts/lib/function'
 import * as IOG from 'io-ts/Guard'
 
+import { WalletType } from '../../renderer/services/wallet/types'
 import { Network } from './types'
 
 const nonEmptyStringGuard = FP.pipe(
@@ -18,6 +19,8 @@ const chainGuard: IOG.Guard<unknown, Chain> = {
 export const isChain = (u: unknown): u is Chain => chainGuard.is(u)
 
 export const isNetwork = (u: unknown): u is Network => u === 'mainnet' || u === 'testnet'
+
+export const isWalletType = (u: unknown): u is WalletType => u === 'keystore' || u === 'ledger'
 
 const assetGuard = IOG.struct({ symbol: nonEmptyStringGuard, ticker: nonEmptyStringGuard, chain: chainGuard })
 
