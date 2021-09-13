@@ -3,7 +3,7 @@ import * as Rx from 'rxjs'
 import { map, mergeMap, switchMap } from 'rxjs/operators'
 import { webSocket } from 'rxjs/webSocket'
 
-import { envOrDefault } from '../../helpers/envHelper'
+import { envOrDefault } from '../../../shared/utils/env'
 import { network$ } from '../app/service'
 
 const BINANCE_TESTNET_WS_URI = envOrDefault(
