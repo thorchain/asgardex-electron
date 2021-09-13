@@ -85,33 +85,31 @@ export const ledgerErrorIdToI18n = (errorId: LedgerErrorId, intl: IntlShape) => 
       return intl.formatMessage({ id: 'ledger.error.nodevice' })
     case LedgerErrorId.ALREADY_IN_USE:
       return intl.formatMessage({ id: 'ledger.error.inuse' })
-    case LedgerErrorId.APP_NOT_OPENED: //
+    case LedgerErrorId.APP_NOT_OPENED:
       return intl.formatMessage({ id: 'ledger.error.appnotopened' })
     case LedgerErrorId.NO_APP:
       return intl.formatMessage({ id: 'ledger.error.noapp' })
-    case LedgerErrorId.WRONG_APP:
-      return intl.formatMessage({ id: 'ledger.error.wrongapp' })
-    case LedgerErrorId.GET_ADDRESS_FAILED: //
+    case LedgerErrorId.GET_ADDRESS_FAILED:
       return intl.formatMessage({ id: 'ledger.error.getaddressfailed' })
-    case LedgerErrorId.SIGN_FAILED: //
+    case LedgerErrorId.SIGN_FAILED:
       return intl.formatMessage({ id: 'ledger.error.signfailed' })
-    case LedgerErrorId.SEND_TX_FAILED: //
+    case LedgerErrorId.SEND_TX_FAILED:
       return intl.formatMessage({ id: 'ledger.error.sendfailed' })
-    case LedgerErrorId.DEPOSIT_TX_FAILED: //
+    case LedgerErrorId.DEPOSIT_TX_FAILED:
       return intl.formatMessage({ id: 'ledger.error.deposit' })
     case LedgerErrorId.DENIED:
       return intl.formatMessage({ id: 'ledger.error.denied' })
-    case LedgerErrorId.INVALID_PUBKEY: //
+    case LedgerErrorId.INVALID_PUBKEY:
       return intl.formatMessage({ id: 'ledger.error.invalidpubkey' })
-    case LedgerErrorId.INVALID_DATA: //
+    case LedgerErrorId.INVALID_DATA:
       return intl.formatMessage({ id: 'ledger.error.invaliddata' })
-    case LedgerErrorId.REJECTED: //
+    case LedgerErrorId.REJECTED:
       return intl.formatMessage({ id: 'ledger.error.rejected' })
-    case LedgerErrorId.TIMEOUT: //
+    case LedgerErrorId.TIMEOUT:
       return intl.formatMessage({ id: 'ledger.error.timeout' })
-    case LedgerErrorId.INVALID_RESPONSE: //
+    case LedgerErrorId.INVALID_RESPONSE:
       return intl.formatMessage({ id: 'ledger.error.invalidresponse' })
-    case LedgerErrorId.NOT_IMPLEMENTED: //
+    case LedgerErrorId.NOT_IMPLEMENTED:
       return intl.formatMessage({ id: 'ledger.error.notimplemented' })
     // default is similar to LedgerErrorId.UNKNOWN
     default:

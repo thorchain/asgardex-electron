@@ -139,8 +139,8 @@ export const send = async ({
 
     if (!txhash) {
       return E.left({
-        errorId: LedgerErrorId.SEND_TX_FAILED,
-        msg: `Post to send 'MsgSend' failed`
+        errorId: LedgerErrorId.INVALID_RESPONSE,
+        msg: `Post request to send 'MsgSend' failed`
       })
     }
 
@@ -250,8 +250,8 @@ export const deposit = async ({
 
     if (!txhash) {
       return E.left({
-        errorId: LedgerErrorId.SEND_TX_FAILED,
-        msg: `Post to send 'MsgSend' failed`
+        errorId: LedgerErrorId.INVALID_RESPONSE,
+        msg: `Post request to send 'MsgDeposit' failed`
       })
     }
 
