@@ -1,6 +1,6 @@
-import { envOrDefault } from '../renderer/helpers/envHelper'
 import { StoreFilesContent, UserNodesStorage } from './api/types'
 import { Locale } from './i18n/types'
+import { envOrDefault } from './utils/env'
 
 export const IS_PRODUCTION = envOrDefault(process.env.NODE_ENV, '') === 'production'
 

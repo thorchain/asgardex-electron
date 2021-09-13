@@ -8,7 +8,7 @@ import { useIntl } from 'react-intl'
 import { useHistory, useLocation } from 'react-router-dom'
 
 import { IS_PRODUCTION } from '../../../../shared/const'
-import { envOrDefault } from '../../../helpers/envHelper'
+import { envOrDefault } from '../../../../shared/utils/env'
 import { getUrlSearchParam } from '../../../helpers/url.helper'
 import * as appRoutes from '../../../routes/app'
 import { RedirectRouteState } from '../../../routes/types'

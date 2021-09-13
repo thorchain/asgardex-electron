@@ -3,9 +3,9 @@ import React, { useCallback, useEffect } from 'react'
 import { useObservableState } from 'observable-hooks'
 
 import { ExternalUrl } from '../../../shared/const'
+import { envOrDefault } from '../../../shared/utils/env'
 import { AppSettings } from '../../components/app/AppSettings'
 import { useI18nContext } from '../../contexts/I18nContext'
-import { envOrDefault } from '../../helpers/envHelper'
 import { useAppUpdate } from '../../hooks/useAppUpdate'
 import { useNetwork } from '../../hooks/useNetwork'
 

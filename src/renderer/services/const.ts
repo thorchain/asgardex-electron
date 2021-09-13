@@ -2,7 +2,7 @@ import * as Client from '@xchainjs/xchain-client'
 import { isChain, Chain } from '@xchainjs/xchain-util'
 
 import { Network } from '../../shared/api/types'
-import { envOrDefault } from '../helpers/envHelper'
+import { envOrDefault } from '../../shared/utils/env'
 import { SlipTolerance } from '../types/asgardex'
 
 export const DEFAULT_NETWORK: Network = 'mainnet'
