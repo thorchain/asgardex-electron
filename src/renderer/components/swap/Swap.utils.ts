@@ -258,11 +258,7 @@ export const minBalanceToSwap = (swapFees: Pick<SwapFees, 'inFee'>): BaseAmount 
   return feeToCover.times(1.5)
 }
 
-export const maxAmountToSwapMax1e8 = (assetAmount: BaseAmount, swapFees: Pick<SwapFees, 'inFee'>): BaseAmount => {
-  const {
-    inFee: { amount: inFeeAmount }
-  } = swapFees
-
+export const maxAmountToSwapMax1e8 = (assetAmount: BaseAmount, inFeeAmount: BaseAmount): BaseAmount => {
   const estimatedFee = to1e8BaseAmount(inFeeAmount.times(1.5))
   const maxAmountToSwap = assetAmount.minus(estimatedFee)
   return maxAmountToSwap.gt(baseAmount(0)) ? maxAmountToSwap : baseAmount(0)
