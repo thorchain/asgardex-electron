@@ -265,5 +265,5 @@ export const maxAmountToSwapMax1e8 = (assetAmount: BaseAmount, swapFees: Pick<Sw
 
   const estimatedFee = to1e8BaseAmount(inFeeAmount.times(1.5))
   const maxAmountToSwap = assetAmount.minus(estimatedFee)
-  return maxAmountToSwap
+  return maxAmountToSwap.gt(baseAmount(0)) ? maxAmountToSwap : baseAmount(0)
 }

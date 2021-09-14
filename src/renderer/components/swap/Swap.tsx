@@ -33,7 +33,8 @@ import {
   isEthTokenAsset,
   max1e8BaseAmount,
   convertBaseAmountDecimal,
-  to1e8BaseAmount
+  to1e8BaseAmount,
+  isChainAsset
 } from '../../helpers/assetHelper'
 import { getChainAsset, isEthChain } from '../../helpers/chainHelper'
 import { eqAsset, eqBaseAmount, eqChain, eqOAsset, eqOApproveParams } from '../../helpers/fp/eq'
@@ -503,8 +504,13 @@ export const Swap = ({
   const maxAmountToSwapMax1e8: BaseAmount = useMemo(() => {
     if (lockedWallet) return assetToBase(assetAmount(Number.MAX_SAFE_INTEGER, sourceAssetAmountMax1e8.decimal))
 
-    return Utils.maxAmountToSwapMax1e8(sourceAssetAmountMax1e8, swapFees)
-  }, [lockedWallet, sourceAssetAmountMax1e8, swapFees])
+    // In case of chain asset
+    // We are substracting fee from source asset
+    // In other cases ERC20/BEP2
+    // max value of token can be allocated for swap
+    if (isChainAsset(sourceChainAsset)) return Utils.maxAmountToSwapMax1e8(sourceAssetAmountMax1e8, swapFees)
+    else return sourceAssetAmountMax1e8
+  }, [lockedWallet, sourceAssetAmountMax1e8, sourceChainAsset, swapFees])
 
   const setAmountToSwapMax1e8 = useCallback(
     (amountToSwap: BaseAmount) => {
