@@ -12,7 +12,9 @@ import {
   formatAssetAmount,
   formatAssetAmountCurrency,
   delay,
-  Chain
+  Chain,
+  assetToBase,
+  assetAmount
 } from '@xchainjs/xchain-util'
 import BigNumber from 'bignumber.js'
 import * as A from 'fp-ts/Array'
@@ -499,8 +501,10 @@ export const Swap = ({
   // depends on users balances of source asset
   // Decimal always <= 1e8 based
   const maxAmountToSwapMax1e8: BaseAmount = useMemo(() => {
+    if (lockedWallet) return assetToBase(assetAmount(Number.MAX_SAFE_INTEGER, sourceAssetAmountMax1e8.decimal))
+
     return Utils.maxAmountToSwapMax1e8(sourceAssetAmountMax1e8, swapFees)
-  }, [sourceAssetAmountMax1e8, swapFees])
+  }, [lockedWallet, sourceAssetAmountMax1e8, swapFees])
 
   const setAmountToSwapMax1e8 = useCallback(
     (amountToSwap: BaseAmount) => {
