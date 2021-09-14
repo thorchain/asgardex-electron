@@ -7,7 +7,7 @@ import { catchError, map, startWith } from 'rxjs/operators'
 
 import { LedgerBTCTxInfo, LedgerErrorId, Network } from '../../../shared/api/types'
 import { observableState } from '../../helpers/stateHelper'
-import { ErrorId, LedgerAddressRD, LedgerTxHashLD, LedgerTxHashRD } from '../wallet/types'
+import { LedgerAddressRD, LedgerTxHashLD, LedgerTxHashRD } from '../wallet/types'
 import { LedgerService } from './types'
 
 const { get$: ledgerAddress$, set: setLedgerAddressRD } = observableState<LedgerAddressRD>(RD.initial)
@@ -25,8 +25,7 @@ const { get$: ledgerTxRD$, set: setLedgerTxRD } = observableState<LedgerTxHashRD
 const ledgerTx$ = (network: Network, params: TxParams): LedgerTxHashLD =>
   Rx.of(
     RD.failure({
-      ledgerErrorId: LedgerErrorId.UNKNOWN,
-      errorId: ErrorId.SEND_TX,
+      errorId: LedgerErrorId.SEND_TX_FAILED,
       msg: `Not implemented for BTC ${network} ${params}`
     })
   )

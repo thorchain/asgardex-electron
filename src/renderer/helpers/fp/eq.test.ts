@@ -425,7 +425,7 @@ describe('helpers/fp/eq', () => {
     }
     const c: LedgerAddressMap = {
       ...INITIAL_LEDGER_ADDRESS_MAP,
-      testnet: RD.failure(LedgerErrorId.DENIED)
+      testnet: RD.failure({ errorId: LedgerErrorId.DENIED, msg: '' })
     }
 
     it('is equal', () => {

@@ -3,18 +3,17 @@ import { Address } from '@xchainjs/xchain-client'
 import { BNBChain, THORChain } from '@xchainjs/xchain-util'
 import * as E from 'fp-ts/Either'
 
-import { IPCLedgerAdddressParams, LedgerErrorId } from '../../../shared/api/types'
+import { IPCLedgerAdddressParams, LedgerError, LedgerErrorId } from '../../../shared/api/types'
 import { isError } from '../../../shared/utils/guard'
-import { getAddress as getBNBAddress } from './binance'
+import { getAddress as getBNBAddress } from './binance/address'
 import { getAddress as getTHORAddress } from './thorchain/address'
-import { getErrorId } from './utils'
 
 export const getAddress = async ({
   chain,
   network
-}: IPCLedgerAdddressParams): Promise<E.Either<LedgerErrorId, Address>> => {
+}: IPCLedgerAdddressParams): Promise<E.Either<LedgerError, Address>> => {
   try {
-    let res: E.Either<LedgerErrorId, Address>
+    let res: E.Either<LedgerError, Address>
     const transport = await TransportNodeHidSingleton.open()
     switch (chain) {
       case THORChain:
@@ -24,11 +23,17 @@ export const getAddress = async ({
         res = await getBNBAddress(transport, network)
         break
       default:
-        res = E.left(LedgerErrorId.NO_APP)
+        res = E.left({
+          errorId: LedgerErrorId.NOT_IMPLEMENTED,
+          msg: `getAddress for ${chain} has not been implemented`
+        })
     }
     await transport.close()
     return res
   } catch (error) {
-    return E.left(getErrorId(isError(error) ? error.message : ''))
+    return E.left({
+      errorId: LedgerErrorId.GET_ADDRESS_FAILED,
+      msg: isError(error) ? error?.message ?? error.toString() : `${error}`
+    })
   }
 }

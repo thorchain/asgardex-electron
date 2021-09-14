@@ -19,11 +19,10 @@ import { auth, BaseAccount, StdTx } from 'cosmos-client/x/auth'
 import { MsgSend } from 'cosmos-client/x/bank'
 import * as E from 'fp-ts/Either'
 
-import { LedgerErrorId, Network } from '../../../../shared/api/types'
+import { LedgerError, LedgerErrorId, Network } from '../../../../shared/api/types'
 import { getClientUrl } from '../../../../shared/thorchain/client'
 import { toClientNetwork } from '../../../../shared/utils/client'
 import { isError } from '../../../../shared/utils/guard'
-import { getErrorId } from '../utils'
 import { fromLedgerErrorType, PATH } from './common'
 
 /**
@@ -41,7 +40,7 @@ export const send = async ({
   network: Network
   recipient: Address
   memo?: string
-}): Promise<E.Either<LedgerErrorId, TxHash>> => {
+}): Promise<E.Either<LedgerError, TxHash>> => {
   try {
     const clientNetwork = toClientNetwork(network)
     const prefix = getPrefix(clientNetwork)
@@ -50,7 +49,10 @@ export const send = async ({
     // get address + public key
     const { bech32Address, returnCode, compressedPk } = await app.getAddressAndPubKey(PATH, prefix)
     if (!bech32Address || !compressedPk || returnCode !== LedgerErrorType.NoErrors) {
-      return E.left(fromLedgerErrorType(returnCode))
+      return E.left({
+        errorId: fromLedgerErrorType(returnCode),
+        msg: `Getting 'bech32Address' or 'compressedPk' from Ledger THORChainApp failed`
+      })
     }
 
     // Node endpoint for cosmos sdk client
@@ -108,7 +110,10 @@ export const send = async ({
     const { signature } = await app.sign(PATH, signedStdTx.toString())
 
     if (!signature) {
-      return E.left(LedgerErrorId.SIGN_FAILED)
+      return E.left({
+        errorId: LedgerErrorId.SIGN_FAILED,
+        msg: `Signing StdTx failed`
+      })
     }
 
     // normalize signature
@@ -133,12 +138,18 @@ export const send = async ({
     } = await auth.txsPost(cosmosClient.sdk, stdTx, 'block')
 
     if (!txhash) {
-      return E.left(LedgerErrorId.SEND_TX_FAILED)
+      return E.left({
+        errorId: LedgerErrorId.INVALID_RESPONSE,
+        msg: `Post request to send 'MsgSend' failed`
+      })
     }
 
     return E.right(txhash)
   } catch (error) {
-    return E.left(getErrorId(isError(error) ? error.message : ''))
+    return E.left({
+      errorId: LedgerErrorId.SEND_TX_FAILED,
+      msg: isError(error) ? error?.message ?? error.toString() : `${error}`
+    })
   }
 }
 
@@ -155,7 +166,7 @@ export const deposit = async ({
   amount: BaseAmount
   network: Network
   memo: string
-}): Promise<E.Either<LedgerErrorId, TxHash>> => {
+}): Promise<E.Either<LedgerError, TxHash>> => {
   try {
     const clientNetwork = toClientNetwork(network)
     const prefix = getPrefix(clientNetwork)
@@ -164,7 +175,10 @@ export const deposit = async ({
     // get address + public key
     const { bech32Address, returnCode, compressedPk } = await app.getAddressAndPubKey(PATH, prefix)
     if (!bech32Address || !compressedPk || returnCode !== LedgerErrorType.NoErrors) {
-      return E.left(fromLedgerErrorType(returnCode))
+      return E.left({
+        errorId: fromLedgerErrorType(returnCode),
+        msg: `Getting 'bech32Address' or 'compressedPk' from Ledger THORChainApp failed`
+      })
     }
 
     // Node endpoint for cosmos sdk client
@@ -208,7 +222,10 @@ export const deposit = async ({
     const { signature } = await app.sign(PATH, signedStdTx.toString())
 
     if (!signature) {
-      return E.left(LedgerErrorId.SIGN_FAILED)
+      return E.left({
+        errorId: LedgerErrorId.SIGN_FAILED,
+        msg: `Signing StdTx failed`
+      })
     }
 
     // normalize signature
@@ -232,11 +249,17 @@ export const deposit = async ({
     } = await auth.txsPost(cosmosClient.sdk, stdTx, 'block')
 
     if (!txhash) {
-      return E.left(LedgerErrorId.SEND_TX_FAILED)
+      return E.left({
+        errorId: LedgerErrorId.INVALID_RESPONSE,
+        msg: `Post request to send 'MsgDeposit' failed`
+      })
     }
 
     return E.right(txhash)
   } catch (error) {
-    return E.left(getErrorId(isError(error) ? error.message : ''))
+    return E.left({
+      errorId: LedgerErrorId.SEND_TX_FAILED,
+      msg: isError(error) ? error?.message ?? error.toString() : `${error}`
+    })
   }
 }

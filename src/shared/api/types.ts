@@ -68,16 +68,27 @@ export type ApiUrl = {
 export type Network = 'testnet' | 'mainnet'
 
 export enum LedgerErrorId {
-  NO_DEVICE,
-  ALREADY_IN_USE,
-  NO_APP,
-  WRONG_APP,
-  SIGN_FAILED,
-  SEND_TX_FAILED,
-  DENIED,
-  INVALID_PUBKEY,
-  NOT_IMPLEMENTED,
-  UNKNOWN
+  NO_DEVICE = 'NO_DEVICE',
+  ALREADY_IN_USE = 'ALREADY_IN_USE',
+  APP_NOT_OPENED = 'APP_NOT_OPENED',
+  NO_APP = 'NO_APP',
+  SIGN_FAILED = 'SIGN_FAILED',
+  SEND_TX_FAILED = 'SEND_TX_FAILED',
+  DEPOSIT_TX_FAILED = 'DEPOSIT_TX_FAILED',
+  DENIED = 'DENIED',
+  INVALID_PUBKEY = 'INVALID_PUBKEY',
+  INVALID_DATA = 'INVALID_DATA',
+  REJECTED = 'REJECTED',
+  TIMEOUT = 'TIMEOUT',
+  INVALID_RESPONSE = 'INVALID_RESPONSE',
+  NOT_IMPLEMENTED = 'NOT_IMPLEMENTED',
+  GET_ADDRESS_FAILED = 'GET_ADDRESS_FAILED',
+  UNKNOWN = 'UNKNOWN'
+}
+
+export type LedgerError = {
+  errorId: LedgerErrorId
+  msg: string
 }
 
 export type LedgerBNBTxParams = TxParams & {
@@ -101,13 +112,13 @@ export type LedgerTxParams = LedgerTHORTxParams | LedgerBNBTxParams
 export type IPCLedgerAdddressParams = { chain: Chain; network: Network }
 
 export type ApiHDWallet = {
-  getLedgerAddress: (params: IPCLedgerAdddressParams) => Promise<Either<LedgerErrorId, Address>>
+  getLedgerAddress: (params: IPCLedgerAdddressParams) => Promise<Either<LedgerError, Address>>
   sendLedgerTx: (
     params: unknown /* will be de-/serialized by ipcLedgerSendTxParamsIO */
-  ) => Promise<Either<LedgerErrorId, TxHash>>
+  ) => Promise<Either<LedgerError, TxHash>>
   depositLedgerTx: (
     params: unknown /* will be de-/serialized by ipcLedgerDepositTxParamsIO */
-  ) => Promise<Either<LedgerErrorId, TxHash>>
+  ) => Promise<Either<LedgerError, TxHash>>
 }
 
 declare global {

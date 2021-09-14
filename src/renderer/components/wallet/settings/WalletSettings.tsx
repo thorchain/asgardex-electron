@@ -113,7 +113,7 @@ export const WalletSettings: React.FC<Props> = (props): JSX.Element => {
               () => (isLedgerWallet(walletType) ? renderAddLedger(chain, true) : <>...</>),
               (error) => (
                 <div>
-                  <Styled.AddressError>{error.message}</Styled.AddressError>
+                  <Styled.AddressError>{error?.message ?? error.toString()}</Styled.AddressError>
                   {isLedgerWallet(walletType) && renderAddLedger(chain, false)}
                 </div>
               ),

@@ -10,7 +10,7 @@ import * as N from 'fp-ts/lib/number'
 import * as O from 'fp-ts/lib/Option'
 import * as S from 'fp-ts/lib/string'
 
-import { LedgerErrorId } from '../../../shared/api/types'
+import { LedgerError } from '../../../shared/api/types'
 import { DepositAssetFees, DepositFees, SwapFeesParams } from '../../services/chain/types'
 import { ApproveParams } from '../../services/ethereum/types'
 import { PoolAddress, PoolShare } from '../../services/midgard/types'
@@ -170,10 +170,15 @@ export const eqPricePool = Eq.struct<PricePool>({
   poolData: eqPoolData
 })
 
-export const eqLedgerErrorId = eqNumber
+export const eqLedgerErrorId = eqString
+const eqLedgerError = Eq.struct<LedgerError>({
+  errorId: eqLedgerErrorId,
+  msg: eqString
+})
+
 export const eqAddress = eqString
 
-export const eqLedgerAddressRD = RD.getEq<LedgerErrorId, Address>(eqLedgerErrorId, eqAddress)
+export const eqLedgerAddressRD = RD.getEq<LedgerError, Address>(eqLedgerError, eqAddress)
 
 export const eqLedgerAddressMap = Eq.struct<LedgerAddressMap>({
   testnet: eqLedgerAddressRD,

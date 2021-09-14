@@ -1,27 +1,31 @@
+import { crypto } from '@binance-chain/javascript-sdk'
+import AppBNB from '@binance-chain/javascript-sdk/lib/ledger/ledger-app'
 import type Transport from '@ledgerhq/hw-transport'
-import THORChainApp, { LedgerErrorType } from '@thorchain/ledger-thorchain'
+import { getDerivePath, getPrefix } from '@xchainjs/xchain-binance'
 import { Address } from '@xchainjs/xchain-client'
-import { getPrefix } from '@xchainjs/xchain-thorchain'
 import * as E from 'fp-ts/Either'
 
 import { LedgerError, LedgerErrorId, Network } from '../../../../shared/api/types'
 import { toClientNetwork } from '../../../../shared/utils/client'
 import { isError } from '../../../../shared/utils/guard'
-import { fromLedgerErrorType, PATH } from './common'
 
 export const getAddress = async (transport: Transport, network: Network): Promise<E.Either<LedgerError, Address>> => {
   try {
-    const app = new THORChainApp(transport)
+    const app = new AppBNB(transport)
+    const derive_path = getDerivePath(0)
+    const { pk } = await app.getPublicKey(derive_path)
     const clientNetwork = toClientNetwork(network)
     const prefix = getPrefix(clientNetwork)
-    const { bech32Address, returnCode } = await app.getAddressAndPubKey(PATH, prefix)
-    if (!bech32Address || returnCode !== LedgerErrorType.NoErrors) {
+    if (pk) {
+      // get address from pubkey
+      const address = crypto.getAddressFromPublicKey(pk.toString('hex'), prefix)
+      return E.right(address)
+    } else {
       return E.left({
-        errorId: fromLedgerErrorType(returnCode),
-        msg: `Getting 'bech32Address' from Ledger's THORChain App failed`
+        errorId: LedgerErrorId.INVALID_PUBKEY,
+        msg: `Could not get public key from Ledger's Binance App`
       })
     }
-    return E.right(bech32Address)
   } catch (error) {
     return E.left({
       errorId: LedgerErrorId.GET_ADDRESS_FAILED,
