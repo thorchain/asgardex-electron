@@ -25,7 +25,6 @@ export * from './Network';
 export * from './Node';
 export * from './ObservedChain';
 export * from './PoolDetail';
-export * from './PoolLegacyDetail';
 export * from './PoolStatsDetail';
 export * from './PreflightStatus';
 export * from './ProxiedNode';
