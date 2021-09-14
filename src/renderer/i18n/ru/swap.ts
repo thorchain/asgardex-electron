@@ -7,6 +7,7 @@ const swap: SwapMessages = {
   'swap.input': 'Отдаете',
   'swap.output': 'Получаете',
   'swap.recipient': 'Recipient - RU',
+  'swap.info.max.fee': 'Total asset balance substracted by estimated swap fees - RU',
   'swap.slip.title': 'Проскальзывание',
   'swap.slip.tolerance': 'Допуск по проскальзыванию',
   'swap.errors.amount.balanceShouldCoverChainFee':

@@ -17,3 +17,16 @@ export const Button = styled(UIButton)`
   min-width: auto !important;
   margin-right: 5px;
 `
+
+export const InfoLabel = styled.div`
+  width: 18px;
+  height: 18px;
+  margin: 3px;
+  border-radius: 9px;
+  font-size: 11px;
+  text-transform: lowercase;
+  border: 1.5px solid white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+`
