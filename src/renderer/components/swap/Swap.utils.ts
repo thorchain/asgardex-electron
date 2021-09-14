@@ -257,3 +257,13 @@ export const minBalanceToSwap = (swapFees: Pick<SwapFees, 'inFee'>): BaseAmount 
   // Over-estimate balance by 50%
   return feeToCover.times(1.5)
 }
+
+export const maxAmountToSwapMax1e8 = (assetAmount: BaseAmount, swapFees: Pick<SwapFees, 'inFee'>): BaseAmount => {
+  const {
+    inFee: { amount: inFeeAmount }
+  } = swapFees
+
+  const estimatedFee = to1e8BaseAmount(inFeeAmount.times(1.5))
+  const maxAmountToSwap = assetAmount.minus(estimatedFee)
+  return maxAmountToSwap
+}
