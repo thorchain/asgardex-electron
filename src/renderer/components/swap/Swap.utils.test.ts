@@ -29,7 +29,8 @@ import {
   minBalanceToSwap,
   calcRefundFee,
   minAmountToSwapMax1e8,
-  getSwapLimit
+  getSwapLimit,
+  maxAmountToSwapMax1e8
 } from './Swap.utils'
 
 describe('components/swap/utils', () => {
@@ -649,6 +650,35 @@ describe('components/swap/utils', () => {
 
       const result = minAmountToSwapMax1e8(params)
       expect(eqBaseAmount.equals(result, assetToBase(assetAmount(0.01525, inAssetDecimal)))).toBeTruthy()
+    })
+  })
+
+  describe('maxAmountToSwapMax1e8', () => {
+    it('returns max. balance to swap - with estimated fees', () => {
+      const params = {
+        inputBalanceAmount: baseAmount(1000),
+        inFeeAmount: baseAmount(100)
+      }
+      const result = maxAmountToSwapMax1e8(params.inputBalanceAmount, params.inFeeAmount)
+      expect(eqBaseAmount.equals(result, baseAmount(850))).toBeTruthy()
+    })
+
+    it('returns max. balance to swap - with 1e18 based estimated fees', () => {
+      const params = {
+        inputBalanceAmount: baseAmount(100),
+        inFeeAmount: baseAmount(100000000000, 18)
+      }
+      const result = maxAmountToSwapMax1e8(params.inputBalanceAmount, params.inFeeAmount)
+      expect(eqBaseAmount.equals(result, baseAmount(85))).toBeTruthy()
+    })
+
+    it('balance is less than fee - with 1e18 based estimated fees', () => {
+      const params = {
+        inputBalanceAmount: baseAmount(1),
+        inFeeAmount: baseAmount(100000000000, 18)
+      }
+      const result = maxAmountToSwapMax1e8(params.inputBalanceAmount, params.inFeeAmount)
+      expect(eqBaseAmount.equals(result, baseAmount(0))).toBeTruthy()
     })
   })
 })

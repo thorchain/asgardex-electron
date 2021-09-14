@@ -12,9 +12,9 @@ import {
   formatAssetAmount,
   formatAssetAmountCurrency,
   delay,
-  assetAmount,
+  Chain,
   assetToBase,
-  Chain
+  assetAmount
 } from '@xchainjs/xchain-util'
 import BigNumber from 'bignumber.js'
 import * as A from 'fp-ts/Array'
@@ -33,7 +33,8 @@ import {
   isEthTokenAsset,
   max1e8BaseAmount,
   convertBaseAmountDecimal,
-  to1e8BaseAmount
+  to1e8BaseAmount,
+  isChainAsset
 } from '../../helpers/assetHelper'
 import { getChainAsset, isEthChain } from '../../helpers/chainHelper'
 import { eqAsset, eqBaseAmount, eqChain, eqOAsset, eqOApproveParams } from '../../helpers/fp/eq'
@@ -146,7 +147,7 @@ export const Swap = ({
 }: SwapProps) => {
   const intl = useIntl()
 
-  const unlockedWallet = useMemo(() => isLocked(keystore) || !hasImportedKeystore(keystore), [keystore])
+  const lockedWallet = useMemo(() => isLocked(keystore) || !hasImportedKeystore(keystore), [keystore])
 
   const [targetWalletAddress, setTargetWalletAddress] = useState<O.Option<Address>>(initialTargetWalletAddress)
 
@@ -501,11 +502,16 @@ export const Swap = ({
   // depends on users balances of source asset
   // Decimal always <= 1e8 based
   const maxAmountToSwapMax1e8: BaseAmount = useMemo(() => {
-    // make sure not logged in user can play around with swap
-    if (unlockedWallet) return assetToBase(assetAmount(Number.MAX_SAFE_INTEGER, sourceAssetAmountMax1e8.decimal))
+    if (lockedWallet) return assetToBase(assetAmount(Number.MAX_SAFE_INTEGER, sourceAssetAmountMax1e8.decimal))
 
-    return sourceAssetAmountMax1e8
-  }, [unlockedWallet, sourceAssetAmountMax1e8])
+    // In case of chain asset
+    // We are substracting fee from source asset
+    // In other cases ERC20/BEP20
+    // max value of token can be allocated for swap
+    if (isChainAsset(sourceChainAsset))
+      return Utils.maxAmountToSwapMax1e8(sourceAssetAmountMax1e8, swapFees.inFee.amount)
+    else return sourceAssetAmountMax1e8
+  }, [lockedWallet, sourceAssetAmountMax1e8, sourceChainAsset, swapFees])
 
   const setAmountToSwapMax1e8 = useCallback(
     (amountToSwap: BaseAmount) => {
@@ -631,7 +637,7 @@ export const Swap = ({
   }, [setShowPasswordModal])
 
   const renderSlider = useMemo(() => {
-    const percentage = unlockedWallet
+    const percentage = lockedWallet
       ? 0
       : amountToSwapMax1e8
           .amount()
@@ -649,11 +655,11 @@ export const Swap = ({
         tooltipVisible={true}
         withLabel={true}
         tooltipPlacement={'top'}
-        disabled={unlockedWallet || disableSwapAction}
+        disabled={lockedWallet || disableSwapAction}
       />
     )
   }, [
-    unlockedWallet,
+    lockedWallet,
     amountToSwapMax1e8,
     sourceAssetAmountMax1e8,
     setAmountToSwapFromPercentValue,
@@ -1106,7 +1112,7 @@ export const Swap = ({
   const disableSubmit: boolean = useMemo(
     () =>
       disableSwapAction ||
-      unlockedWallet ||
+      lockedWallet ||
       isZeroAmountToSwap ||
       walletBalancesLoading ||
       sourceChainFeeError ||
@@ -1116,7 +1122,7 @@ export const Swap = ({
       isCausedSlippage,
     [
       disableSwapAction,
-      unlockedWallet,
+      lockedWallet,
       isZeroAmountToSwap,
       walletBalancesLoading,
       sourceChainFeeError,
@@ -1191,7 +1197,7 @@ export const Swap = ({
               maxAmount={maxAmountToSwapMax1e8}
               hasError={minAmountError}
               asset={sourceAssetProp}
-              disabled={unlockedWallet}
+              disabled={lockedWallet}
             />
             {FP.pipe(
               oSourceAsset,
@@ -1234,7 +1240,7 @@ export const Swap = ({
               )
             )}
           </Styled.ValueItemContainer>
-          {!unlockedWallet && (
+          {!lockedWallet && (
             <Styled.TargetAddressContainer>
               <Styled.ValueTitle>{intl.formatMessage({ id: 'swap.recipient' })}</Styled.ValueTitle>
               {renderCustomAddressInput}
