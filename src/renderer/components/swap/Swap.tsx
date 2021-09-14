@@ -506,7 +506,7 @@ export const Swap = ({
 
     // In case of chain asset
     // We are substracting fee from source asset
-    // In other cases ERC20/BEP2
+    // In other cases ERC20/BEP20
     // max value of token can be allocated for swap
     if (isChainAsset(sourceChainAsset)) return Utils.maxAmountToSwapMax1e8(sourceAssetAmountMax1e8, swapFees)
     else return sourceAssetAmountMax1e8
