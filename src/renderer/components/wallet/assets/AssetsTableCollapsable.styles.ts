@@ -5,6 +5,7 @@ import { palette } from 'styled-theme'
 
 import { Label as UILabel } from '../../../components/uielements/label'
 import { Button as UIButton } from '../../uielements/button'
+import { WalletTypeLabel as WalletTypeLabelUI } from '../../uielements/common/Common.styles'
 import { Table as UITable } from '../../uielements/table'
 
 export const Table = styled(UITable)`
@@ -38,17 +39,6 @@ export const HeaderLabel = styled(UILabel).attrs({
   width: auto;
   margin-right: 10px;
   padding: 0;
-`
-
-export const HeaderWalletType = styled(UILabel).attrs({
-  textTransform: 'uppercase',
-  size: 'small'
-})`
-  padding: 0px 5px;
-  color: ${palette('color', 2)};
-  background: ${palette('gray', 1)};
-  border-radius: 5px;
-  width: auto;
 `
 
 export const HeaderAddress = styled(UILabel).attrs({
@@ -155,4 +145,8 @@ export const UpgradeButton = styled(UIButton).attrs({
     min-width: auto;
     margin-left: 10px;
   }
+`
+
+export const WalletTypeLabel = styled(WalletTypeLabelUI)`
+  padding: 0px 5px;
 `

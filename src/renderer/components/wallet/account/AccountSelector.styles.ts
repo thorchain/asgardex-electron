@@ -2,6 +2,7 @@ import * as A from 'antd'
 import styled from 'styled-components'
 import { palette } from 'styled-theme'
 
+import { WalletTypeLabel as WalletTypeLabelUI } from '../../uielements/common/Common.styles'
 import { Label as UILabel } from '../../uielements/label'
 
 export const Card = styled(A.Card)`
@@ -9,20 +10,6 @@ export const Card = styled(A.Card)`
   .ant-card-body {
     padding: 20px 35px;
   }
-`
-export const LedgerWalletType = styled(UILabel).attrs({
-  textTransform: 'uppercase',
-  size: 'small'
-})`
-  margin: -45px 0px 0px 10px;
-  padding: 0px 5px;
-  color: ${palette('color', 2)};
-  background: ${palette('gray', 1)};
-  border-radius: 5px;
-  display: flex;
-  align-self: center;
-  height: 15px;
-  width: 50px;
 `
 
 export const AssetWrapper = styled.div`
@@ -62,4 +49,9 @@ export const Label = styled(UILabel).attrs({
 })`
   padding: 0;
   cursor: pointer;
+`
+
+export const WalletTypeLabel = styled(WalletTypeLabelUI)`
+  margin: -45px 0px 0px 10px;
+  padding: 0px 5px;
 `

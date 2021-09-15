@@ -13,6 +13,7 @@ import { useIntl } from 'react-intl'
 import { useHistory } from 'react-router-dom'
 
 import { Network } from '../../../../shared/api/types'
+import { isKeystoreWallet } from '../../../../shared/utils/guard'
 import { disableRuneUpgrade, isNonNativeRuneAsset } from '../../../helpers/assetHelper'
 import { getChainAsset } from '../../../helpers/chainHelper'
 import { getPoolPriceValue } from '../../../helpers/poolHelper'
@@ -348,8 +349,8 @@ export const AssetsTableCollapsable: React.FC<Props> = (props): JSX.Element => {
               <Styled.HeaderLabel>{chainToString(chain)}</Styled.HeaderLabel>
               {
                 // show tag for NON keystore wallets only (e.g. Ledger)
-                walletType !== 'keystore' && (
-                  <Styled.HeaderWalletType>{walletTypeToI18n(walletType, intl)}</Styled.HeaderWalletType>
+                !isKeystoreWallet(walletType) && (
+                  <Styled.WalletTypeLabel>{walletTypeToI18n(walletType, intl)}</Styled.WalletTypeLabel>
                 )
               }
             </Styled.HeaderChainContainer>

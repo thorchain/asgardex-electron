@@ -57,7 +57,9 @@ export const AssetInfo: React.FC<Props> = (props): JSX.Element => {
         oWalletInfo,
         O.filter(({ walletType }) => isLedgerWallet(walletType)),
         O.map((walletInfo) => (
-          <Styled.WalletType key={walletInfo.address}>{intl.formatMessage({ id: 'ledger.title' })}</Styled.WalletType>
+          <Styled.WalletTypeLabel key={walletInfo.address}>
+            {intl.formatMessage({ id: 'ledger.title' })}
+          </Styled.WalletTypeLabel>
         )),
         O.getOrElse(() => <></>)
       ),

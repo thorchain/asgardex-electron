@@ -6,6 +6,7 @@ import { palette } from 'styled-theme'
 import { Label as UILabel } from '../../../../components/uielements/label'
 import { media } from '../../../../helpers/styleHelper'
 import { AddressEllipsis as UIAddressEllipsis } from '../../addressEllipsis'
+import { WalletTypeLabel as WalletTypeLabelUI } from '../../common/Common.styles'
 
 export const Card = styled(A.Card)`
   .ant-card-body {
@@ -48,18 +49,6 @@ export const AssetSubtitle = styled(UILabel)`
   font-family: 'MainFontRegular';
   color: ${palette('text', 2)};
   text-transform: uppercase;
-  width: auto;
-`
-
-export const WalletType = styled(UILabel).attrs({
-  textTransform: 'uppercase',
-  size: 'small'
-})`
-  padding: 1px 3px;
-  margin-left: 5px;
-  color: ${palette('color', 2)};
-  background: ${palette('gray', 1)};
-  border-radius: 5px;
   width: auto;
 `
 
@@ -121,4 +110,9 @@ export const AssetPrice = styled.p`
   ${media.lg`
     margin: 0px;
   `}
+`
+
+export const WalletTypeLabel = styled(WalletTypeLabelUI)`
+  padding: 1px 3px;
+  margin-left: 5;
 `
