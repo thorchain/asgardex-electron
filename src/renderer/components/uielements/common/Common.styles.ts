@@ -20,6 +20,6 @@ export const WalletTypeLabel = styled(UILabel).attrs({
   color: ${palette('color', 2)};
   background: ${palette('gray', 1)};
   border-radius: 5px;
-  max-height: 15px;
+  padding: 1px 3px;
   width: auto;
 `
