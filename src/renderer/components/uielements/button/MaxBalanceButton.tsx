@@ -2,9 +2,10 @@ import React, { useCallback } from 'react'
 
 import { Balance } from '@xchainjs/xchain-client'
 import { BaseAmount, baseToAsset, formatAssetAmountCurrency } from '@xchainjs/xchain-util'
-import { Col, Row, Tooltip } from 'antd'
+import { Col, Row } from 'antd'
 import { useIntl } from 'react-intl'
 
+import { InfoIcon } from '../info'
 import { ButtonProps } from './Button.types'
 import * as Styled from './MaxBalanceButton.styles'
 
@@ -41,11 +42,7 @@ export const MaxBalanceButton: React.FC<Props> = (props): JSX.Element => {
           })}
         </Styled.Label>
       </Col>
-      {maxInfoText && (
-        <Tooltip overlayStyle={{ maxWidth: '100%', whiteSpace: 'nowrap', fontSize: 11 }} title={maxInfoText}>
-          <Styled.InfoLabel>i</Styled.InfoLabel>
-        </Tooltip>
-      )}
+      {maxInfoText && <InfoIcon tooltip={maxInfoText} />}
     </Row>
   )
 }
