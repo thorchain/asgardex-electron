@@ -2,6 +2,7 @@ import * as A from 'antd'
 import styled from 'styled-components'
 import { palette } from 'styled-theme'
 
+import { WalletTypeLabel as WalletTypeLabelUI } from '../../uielements/common/Common.styles'
 import { Label as UILabel } from '../../uielements/label'
 
 export const Card = styled(A.Card)`
@@ -48,4 +49,9 @@ export const Label = styled(UILabel).attrs({
 })`
   padding: 0;
   cursor: pointer;
+`
+
+export const WalletTypeLabel = styled(WalletTypeLabelUI)`
+  margin: -45px 0px 0px 10px;
+  padding: 0px 5px;
 `
