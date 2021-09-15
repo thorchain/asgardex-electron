@@ -1,5 +1,4 @@
 import styled from 'styled-components'
-import { palette } from 'styled-theme'
 
 import { Label as UILabel } from '../label'
 import { Button as UIButton } from './Button'
@@ -17,19 +16,4 @@ export const Button = styled(UIButton)`
   padding: 0px;
   min-width: auto !important;
   margin-right: 5px;
-`
-
-export const InfoLabel = styled.div`
-  width: 18px;
-  height: 18px;
-  margin: 3px;
-  border-radius: 9px;
-  font-size: 11px;
-  text-transform: lowercase;
-  border: 1px solid ${palette('primary', 0)};
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: ${palette('primary', 0)};
-  cursor: pointer;
 `
