@@ -1,3 +1,23 @@
+# 0.4.14 (2021-09-15)
+
+## Add
+
+- [Ledger] Support for Native RUNE to send transactions to another RUNE address and to interact with THORChain to send BOND, UNBOND, LEAVE or custom transactions [#1570](https://github.com/thorchain/asgardex-electron/issues/1570), [#1738](https://github.com/thorchain/asgardex-electron/issues/1738), [#1740](https://github.com/thorchain/asgardex-electron/issues/1740)
+
+## Fix
+
+. [Header] Rename Settings -> Global settings [#1733](https://github.com/thorchain/asgardex-electron/issues/1733)
+
+- MAX button ends with Insufficient funds #1754 [#1754](https://github.com/thorchain/asgardex-electron/issues/1754)
+- [AssetDetails] Fix position of ledger label in mobile view [#1747](https://github.com/thorchain/asgardex-electron/issues/1747)
+
+## Internal
+
+- Update npm dependencies [#1746](https://github.com/thorchain/asgardex-electron/issues/1746)
+- Remove Drag component and and all of its dependencies [#1752](https://github.com/thorchain/asgardex-electron/issues/1752)
+- [Midgard] Update to latest `Midgard@2.4.1` [#1725](https://github.com/thorchain/asgardex-electron/issues/1725)
+- [ENV] Remove INFURA_PROJECT_SECRET [#1741](https://github.com/thorchain/asgardex-electron/issues/1741)
+
 # 0.3.14 (2021-09-04)
 
 ## Add
