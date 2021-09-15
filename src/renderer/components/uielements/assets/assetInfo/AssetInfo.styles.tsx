@@ -51,18 +51,6 @@ export const AssetSubtitle = styled(UILabel)`
   width: auto;
 `
 
-export const WalletType = styled(UILabel).attrs({
-  textTransform: 'uppercase',
-  size: 'small'
-})`
-  padding: 1px 3px;
-  margin-left: 5px;
-  color: ${palette('color', 2)};
-  background: ${palette('gray', 1)};
-  border-radius: 5px;
-  width: auto;
-`
-
 export const InfoContainer = styled.div`
   display: flex;
   flex-direction: column;

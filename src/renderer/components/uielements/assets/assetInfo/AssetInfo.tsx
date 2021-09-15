@@ -13,6 +13,7 @@ import { sequenceSOption, sequenceTOption } from '../../../../helpers/fpHelpers'
 import { loadingString, emptyString } from '../../../../helpers/stringHelper'
 import { getAssetAmountByAsset } from '../../../../helpers/walletHelper'
 import { NonEmptyWalletBalances, WalletType } from '../../../../services/wallet/types'
+import { WalletTypeLabel } from '../../common/Common.styles'
 import { QRCodeModal } from '../../qrCodeModal/QRCodeModal'
 import { AssetIcon } from '../assetIcon'
 import * as Styled from './AssetInfo.styles'
@@ -57,7 +58,9 @@ export const AssetInfo: React.FC<Props> = (props): JSX.Element => {
         oWalletInfo,
         O.filter(({ walletType }) => isLedgerWallet(walletType)),
         O.map((walletInfo) => (
-          <Styled.WalletType key={walletInfo.address}>{intl.formatMessage({ id: 'ledger.title' })}</Styled.WalletType>
+          <WalletTypeLabel style={{ padding: '1px 3px', marginLeft: 5 }} key={walletInfo.address}>
+            {intl.formatMessage({ id: 'ledger.title' })}
+          </WalletTypeLabel>
         )),
         O.getOrElse(() => <></>)
       ),

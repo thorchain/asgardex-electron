@@ -40,17 +40,6 @@ export const HeaderLabel = styled(UILabel).attrs({
   padding: 0;
 `
 
-export const HeaderWalletType = styled(UILabel).attrs({
-  textTransform: 'uppercase',
-  size: 'small'
-})`
-  padding: 0px 5px;
-  color: ${palette('color', 2)};
-  background: ${palette('gray', 1)};
-  border-radius: 5px;
-  width: auto;
-`
-
 export const HeaderAddress = styled(UILabel).attrs({
   textTransform: 'none',
   color: 'gray',

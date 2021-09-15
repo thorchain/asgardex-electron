@@ -4,6 +4,7 @@ import { useIntl } from 'react-intl'
 
 import { Network } from '../../../shared/api/types'
 import { WalletType } from '../../services/wallet/types'
+import { WalletTypeLabel } from '../uielements/common/Common.styles'
 import * as Styled from './Interact.styles'
 
 type Props = {
@@ -69,7 +70,7 @@ export const Interact: React.FC<Props> = ({ bondContent, unbondContent, leaveCon
         <div>
           <Styled.HeaderTitleWrapper>
             <Styled.HeaderTitle>{intl.formatMessage({ id: 'deposit.interact.title' })}</Styled.HeaderTitle>
-            <Styled.HeaderWalletType>{intl.formatMessage({ id: 'ledger.title' })}</Styled.HeaderWalletType>
+            <WalletTypeLabel>{intl.formatMessage({ id: 'ledger.title' })}</WalletTypeLabel>
           </Styled.HeaderTitleWrapper>
           <Styled.HeaderSubtitle>{intl.formatMessage({ id: 'deposit.interact.subtitle' })}</Styled.HeaderSubtitle>
         </div>

@@ -12,6 +12,7 @@ import { WalletBalance, WalletType } from '../../../services/wallet/types'
 import { AssetData } from '../../uielements/assets/assetData'
 import { AssetIcon } from '../../uielements/assets/assetIcon'
 import { Size as IconSize } from '../../uielements/assets/assetIcon/AssetIcon.types'
+import { WalletTypeLabel } from '../../uielements/common/Common.styles'
 import { FilterMenu } from '../../uielements/filterMenu'
 import * as Styled from './AccountSelector.styles'
 
@@ -92,7 +93,9 @@ export const AccountSelector: React.FC<Props> = (props): JSX.Element => {
           )}
         </Styled.AssetInfoWrapper>
         {isLedgerWallet(selectedWallet.walletType) && (
-          <Styled.LedgerWalletType>{intl.formatMessage({ id: 'ledger.title' })}</Styled.LedgerWalletType>
+          <WalletTypeLabel style={{ margin: '-45px 0px 0px 10px', padding: '0px 5px' }}>
+            {intl.formatMessage({ id: 'ledger.title' })}
+          </WalletTypeLabel>
         )}
       </Styled.AssetWrapper>
     </Styled.Card>
