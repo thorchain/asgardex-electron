@@ -17,6 +17,7 @@ export const StoryDefault: Story = () => (
     maxAmount={baseAmount(1234600000)}
     asset={AssetBNB}
     onChange={onChange}
+    maxInfoText={'max balance = balance - swap fees'}
   />
 )
 StoryDefault.storyName = 'default'
@@ -28,6 +29,7 @@ export const StoryDecimal2: Story = () => (
     maxAmount={assetToBase(assetAmount(124, 2))}
     asset={AssetBNB}
     onChange={onChange}
+    maxInfoText={'max balance = balance - swap fees'}
   />
 )
 StoryDecimal2.storyName = 'decimal 2'

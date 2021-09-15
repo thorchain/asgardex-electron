@@ -10,14 +10,14 @@ import * as Styled from './MaxBalanceButton.styles'
 
 type ComponentProps = {
   balance: Balance
-  maxInfo?: boolean
+  maxInfoText?: string
   onClick?: (amount: BaseAmount) => void
 }
 
 export type Props = ComponentProps & Omit<ButtonProps, 'onClick'>
 
 export const MaxBalanceButton: React.FC<Props> = (props): JSX.Element => {
-  const { balance, onClick = (_) => {}, disabled = false, maxInfo = false, ...otherProps } = props
+  const { balance, onClick = (_) => {}, disabled = false, maxInfoText = '', ...otherProps } = props
   const { amount, asset } = balance
 
   const intl = useIntl()
@@ -41,10 +41,8 @@ export const MaxBalanceButton: React.FC<Props> = (props): JSX.Element => {
           })}
         </Styled.Label>
       </Col>
-      {maxInfo && (
-        <Tooltip
-          overlayStyle={{ maxWidth: '100%', whiteSpace: 'nowrap', fontSize: 11 }}
-          title={intl.formatMessage({ id: 'swap.info.max.fee' })}>
+      {maxInfoText && (
+        <Tooltip overlayStyle={{ maxWidth: '100%', whiteSpace: 'nowrap', fontSize: 11 }} title={maxInfoText}>
           <Styled.InfoLabel>i</Styled.InfoLabel>
         </Tooltip>
       )}
