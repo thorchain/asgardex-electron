@@ -113,6 +113,5 @@ export const AssetPrice = styled.p`
 `
 
 export const WalletTypeLabel = styled(WalletTypeLabelUI)`
-  padding: 1px 3px;
-  margin-left: 5;
+  margin-left: 10px;
 `

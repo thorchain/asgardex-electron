@@ -5,6 +5,7 @@ import { palette } from 'styled-theme'
 
 import { media } from '../../helpers/styleHelper'
 import { AssetIcon as UIAssetIcon } from '../uielements/assets/assetIcon'
+import { WalletTypeLabel as WalletTypeLabelUI } from '../uielements/common/Common.styles'
 import { Label as UILabel } from '../uielements/label'
 
 export const Container = styled('div')`
@@ -66,17 +67,6 @@ export const HeaderTitle = styled(UILabel)`
     text-align: left;
   `}
 `
-export const HeaderWalletType = styled(UILabel).attrs({
-  textTransform: 'uppercase',
-  size: 'small'
-})`
-  margin-left: 5px;
-  padding: 1px 3px;
-  color: ${palette('color', 2)};
-  background: ${palette('gray', 1)};
-  border-radius: 5px;
-  width: auto;
-`
 
 export const HeaderSubtitle = styled(UILabel)`
   font-size: 16px;
@@ -90,6 +80,10 @@ export const HeaderSubtitle = styled(UILabel)`
     font-size: 19px;
     text-align: left;
   `}
+`
+
+export const WalletTypeLabel = styled(WalletTypeLabelUI)`
+  margin-left: 10px;
 `
 
 export const FormWrapper = styled('div')`
