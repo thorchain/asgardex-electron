@@ -9,7 +9,7 @@ type Props = {
 export const InfoIcon: React.FC<Props> = ({ tooltip }) => {
   return (
     <Tooltip overlayStyle={{ maxWidth: '100%', whiteSpace: 'nowrap', fontSize: 11 }} title={tooltip}>
-      <Styled.InfoLabel>i</Styled.InfoLabel>
+      <Styled.InfoCircleOutlinedIcon />
     </Tooltip>
   )
 }

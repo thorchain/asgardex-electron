@@ -1,16 +1,11 @@
+import { InfoCircleOutlined } from '@ant-design/icons'
 import styled from 'styled-components'
 import { palette } from 'styled-theme'
 
-export const InfoLabel = styled.div`
-  width: 18px;
-  height: 18px;
-  margin: 3px;
-  border-radius: 9px;
-  font-size: 11px;
-  text-transform: lowercase;
-  border: 1.5px solid ${palette('text', 0)};
+export const InfoCircleOutlinedIcon = styled(InfoCircleOutlined)`
+  color: ${palette('primary', 0)};
   display: flex;
   align-items: center;
   justify-content: center;
-  color: ${palette('text', 0)};
+  margin: 3px;
 `
