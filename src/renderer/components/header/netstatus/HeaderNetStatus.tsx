@@ -24,17 +24,11 @@ type MenuItem = {
 type Props = {
   isDesktopView: boolean
   midgardUrl: O.Option<string>
-  binanceUrl: O.Option<string>
-  bitcoinUrl: O.Option<string>
   thorchainUrl: O.Option<string>
-  litecoinUrl: O.Option<string>
-  ethereumUrl: O.Option<string>
-  bitcoinCashUrl: O.Option<string>
 }
 
 export const HeaderNetStatus: React.FC<Props> = (props): JSX.Element => {
-  const { isDesktopView, midgardUrl, binanceUrl, bitcoinUrl, thorchainUrl, litecoinUrl, ethereumUrl, bitcoinCashUrl } =
-    props
+  const { isDesktopView, midgardUrl, thorchainUrl } = props
   const { onlineStatus$ } = useAppContext()
   const onlineStatus = useObservableState<OnlineStatus>(onlineStatus$, OnlineStatus.OFF)
   const intl = useIntl()
@@ -51,42 +45,12 @@ export const HeaderNetStatus: React.FC<Props> = (props): JSX.Element => {
       },
       {
         key: 'thorchain',
-        headline: 'Thorchain',
+        headline: 'Thorchain API',
         subheadline: headerNetStatusSubheadline({ url: thorchainUrl, onlineStatus, notConnectedTxt }),
         color: headerNetStatusColor({ url: thorchainUrl, onlineStatus })
-      },
-      {
-        key: 'bitcoin',
-        headline: 'Bitcoin',
-        subheadline: headerNetStatusSubheadline({ url: bitcoinUrl, onlineStatus, notConnectedTxt }),
-        color: headerNetStatusColor({ url: bitcoinUrl, onlineStatus })
-      },
-      {
-        key: 'binance',
-        headline: 'Binance Chain',
-        subheadline: headerNetStatusSubheadline({ url: binanceUrl, onlineStatus, notConnectedTxt }),
-        color: headerNetStatusColor({ url: binanceUrl, onlineStatus })
-      },
-      {
-        key: 'litecoin',
-        headline: 'Litecoin Chain',
-        subheadline: headerNetStatusSubheadline({ url: litecoinUrl, onlineStatus, notConnectedTxt }),
-        color: headerNetStatusColor({ url: litecoinUrl, onlineStatus })
-      },
-      {
-        key: 'ethereum',
-        headline: 'ethereum',
-        subheadline: headerNetStatusSubheadline({ url: ethereumUrl, onlineStatus, notConnectedTxt }),
-        color: headerNetStatusColor({ url: ethereumUrl, onlineStatus })
-      },
-      {
-        key: 'bitcoin cash',
-        headline: 'bitcoin cash',
-        subheadline: headerNetStatusSubheadline({ url: bitcoinCashUrl, onlineStatus, notConnectedTxt }),
-        color: headerNetStatusColor({ url: bitcoinCashUrl, onlineStatus })
       }
     ]
-  }, [intl, midgardUrl, onlineStatus, thorchainUrl, bitcoinUrl, binanceUrl, litecoinUrl, ethereumUrl, bitcoinCashUrl])
+  }, [intl, midgardUrl, onlineStatus, thorchainUrl])
 
   const desktopMenu = useMemo(() => {
     return (

@@ -56,12 +56,7 @@ type Props = {
   reloadVolume24Price: FP.Lazy<void>
   selectedPricePoolAsset: SelectedPricePoolAsset
   midgardUrl: O.Option<string>
-  binanceUrl: O.Option<string>
-  bitcoinUrl: O.Option<string>
   thorchainUrl: O.Option<string>
-  litecoinUrl: O.Option<string>
-  ethereumUrl: O.Option<string>
-  bitcoinCashUrl: O.Option<string>
 }
 
 export const HeaderComponent: React.FC<Props> = (props): JSX.Element => {
@@ -77,12 +72,7 @@ export const HeaderComponent: React.FC<Props> = (props): JSX.Element => {
     lockHandler,
     setSelectedPricePool,
     midgardUrl,
-    binanceUrl,
-    bitcoinUrl,
-    thorchainUrl,
-    litecoinUrl,
-    ethereumUrl,
-    bitcoinCashUrl
+    thorchainUrl
   } = props
 
   const intl = useIntl()
@@ -235,19 +225,8 @@ export const HeaderComponent: React.FC<Props> = (props): JSX.Element => {
   )
 
   const renderHeaderNetStatus = useMemo(
-    () => (
-      <HeaderNetStatus
-        isDesktopView={isDesktopView}
-        midgardUrl={midgardUrl}
-        binanceUrl={binanceUrl}
-        bitcoinUrl={bitcoinUrl}
-        thorchainUrl={thorchainUrl}
-        litecoinUrl={litecoinUrl}
-        ethereumUrl={ethereumUrl}
-        bitcoinCashUrl={bitcoinCashUrl}
-      />
-    ),
-    [binanceUrl, bitcoinUrl, isDesktopView, midgardUrl, thorchainUrl, litecoinUrl, ethereumUrl, bitcoinCashUrl]
+    () => <HeaderNetStatus isDesktopView={isDesktopView} midgardUrl={midgardUrl} thorchainUrl={thorchainUrl} />,
+    [isDesktopView, midgardUrl, thorchainUrl]
   )
 
   const iconStyle = { fontSize: '1.5em', marginRight: '20px' }
