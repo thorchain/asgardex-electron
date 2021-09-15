@@ -1198,6 +1198,7 @@ export const Swap = ({
               hasError={minAmountError}
               asset={sourceAssetProp}
               disabled={lockedWallet}
+              maxInfoText={intl.formatMessage({ id: 'swap.info.max.fee' })}
             />
             {FP.pipe(
               oSourceAsset,

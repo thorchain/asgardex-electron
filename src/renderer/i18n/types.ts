@@ -274,6 +274,7 @@ type SwapMessageKey =
   | 'swap.state.pending'
   | 'swap.state.success'
   | 'swap.state.error'
+  | 'swap.info.max.fee'
   | 'swap.errors.asset.missingSourceAsset'
   | 'swap.errors.asset.missingTargetAsset'
   | 'swap.errors.amount.balanceShouldCoverChainFee'

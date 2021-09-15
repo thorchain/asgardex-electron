@@ -17,7 +17,7 @@ const defaultProps: Props = {
     asset: AssetBNB,
     amount: assetToBase(assetAmount(1001))
   },
-
+  maxInfoText: '',
   onClick: (amount: BaseAmount) => console.log('amount', formatBaseAmount(amount))
 }
 

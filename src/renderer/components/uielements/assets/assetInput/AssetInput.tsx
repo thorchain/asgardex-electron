@@ -22,6 +22,7 @@ type Props = {
   onFocus?: FP.Lazy<void>
   disabled?: boolean
   className?: string
+  maxInfoText?: string
 }
 
 /**
@@ -42,6 +43,7 @@ export const AssetInput: React.FC<Props> = (props): JSX.Element => {
     disabled,
     inputProps = {},
     className = '',
+    maxInfoText = '',
     onChange,
     onBlur: onBlurHandler = FP.constVoid,
     onFocus: onFocusHandler = FP.constVoid,
@@ -70,6 +72,7 @@ export const AssetInput: React.FC<Props> = (props): JSX.Element => {
           balance={{ amount: maxAmount, asset }}
           onClick={() => onChangeHandler(maxAmount.amount())}
           disabled={disabled}
+          maxInfoText={maxInfoText}
         />
       </div>
       <div className="asset-input-content" ref={inputRef}>
