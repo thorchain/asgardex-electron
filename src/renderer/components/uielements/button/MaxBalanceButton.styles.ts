@@ -26,9 +26,10 @@ export const InfoLabel = styled.div`
   border-radius: 9px;
   font-size: 11px;
   text-transform: lowercase;
-  border: 1.5px solid ${palette('text', 0)};
+  border: 1px solid ${palette('primary', 0)};
   display: flex;
   align-items: center;
   justify-content: center;
-  color: ${palette('text', 0)};
+  color: ${palette('primary', 0)};
+  cursor: pointer;
 `
