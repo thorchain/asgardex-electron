@@ -121,7 +121,7 @@ export const ValueItemContainer = styled('div')`
 
     &>*:first-child {
       margin-right: 25px;
-      min-width: 65%;
+      min-width: 63%;
     }
   `}
 `
@@ -133,11 +133,12 @@ export const SliderContainer = styled('div')`
 
 export const InValueContainer = styled('div')`
   display: flex;
-  flex-direction: row;
+  flex-direction: column;
   height: 100px;
+  width: 100%;
 
   ${media.md`
-    flex-direction: column;
+    width: auto;
   `}
 `
 
@@ -169,6 +170,14 @@ export const AssetInput = styled(AssetInputBase)<{ hasError?: boolean }>`
   & .ant-input {
     border: none;
   }
+
+  margin-bottom: 50px;
+  width: 100%;
+
+  ${media.md`
+    margin-bottom: 0;
+    width: auto;
+  `}
 `
 
 export const ErrorLabel = styled(UILabel)`

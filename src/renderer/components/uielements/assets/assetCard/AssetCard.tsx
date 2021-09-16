@@ -24,7 +24,6 @@ import { ordWalletBalanceByAsset } from '../../../../helpers/fp/ord'
 import { useClickOutside } from '../../../../hooks/useOutsideClick'
 import { PriceDataIndex } from '../../../../services/midgard/types'
 import { WalletBalances } from '../../../../services/wallet/types'
-import { Label } from '../../label'
 import { Slider } from '../../slider'
 import { AssetMenu } from '../assetMenu'
 import * as Styled from './AssetCard.styles'
@@ -39,7 +38,6 @@ export type Props = {
   priceIndex?: PriceDataIndex
   priceAsset?: Asset
   slip?: number
-  title?: string
   searchDisable?: string[]
   percentValue?: number
   withSearch?: boolean
@@ -63,7 +61,6 @@ export const AssetCard: React.FC<Props> = (props): JSX.Element => {
     priceIndex,
     slip,
     priceAsset,
-    title = '',
     percentValue = NaN,
     withSearch = false,
     searchDisable = [],
@@ -163,8 +160,6 @@ export const AssetCard: React.FC<Props> = (props): JSX.Element => {
 
   return (
     <Styled.AssetCardWrapper ref={ref}>
-      {!!title && <Label className="title-label">{title}</Label>}
-
       <Dropdown overlay={renderMenu()} trigger={[]} visible={openDropdown}>
         <Styled.CardBorderWrapper error={minAmountError}>
           <Styled.CardHeader>
@@ -172,13 +167,7 @@ export const AssetCard: React.FC<Props> = (props): JSX.Element => {
             {balanceLabel}
           </Styled.CardHeader>
           <Styled.CardTopRow>
-            <Styled.AssetSelect
-              minWidth={wrapperWidth}
-              showAssetName={false}
-              balances={balances}
-              asset={asset}
-              onSelect={handleChangeAsset}
-              network={network}>
+            <Styled.AssetDataWrapper>
               <Styled.AssetData>
                 <Styled.InputBigNumber
                   disabled={disabled}
@@ -196,7 +185,15 @@ export const AssetCard: React.FC<Props> = (props): JSX.Element => {
                   )}
                 </Styled.AssetCardFooter>
               </Styled.AssetData>
-            </Styled.AssetSelect>
+              <Styled.AssetSelect
+                minWidth={wrapperWidth}
+                showAssetName={false}
+                balances={balances}
+                asset={asset}
+                onSelect={handleChangeAsset}
+                network={network}
+              />
+            </Styled.AssetDataWrapper>
           </Styled.CardTopRow>
         </Styled.CardBorderWrapper>
       </Dropdown>
