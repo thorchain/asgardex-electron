@@ -6,11 +6,11 @@ import * as FP from 'fp-ts/function'
 import { useIntl } from 'react-intl'
 
 import { ReactComponent as DownIcon } from '../../../assets/svg/icon-down.svg'
+import { InboundAddressRD } from '../../../services/midgard/types'
 import { MimirHaltRD } from '../../../services/thorchain/types'
 import { ConnectionStatus } from '../../shared/icons/ConnectionStatus'
 import { Menu } from '../../shared/menu/Menu'
 import { headerNetStatusSubheadline, headerNetStatusColor, HeaderNetStatusColor } from '../Header.util'
-import { InboundAddressRD } from '../HeaderComponent'
 import { HeaderDrawerItem } from '../HeaderComponent.styles'
 import * as Styled from './HeaderNetStatus.styles'
 
@@ -23,21 +23,18 @@ type MenuItem = {
 
 type Props = {
   isDesktopView: boolean
-  inboundAddress: InboundAddressRD
-  mimirHalt: MimirHaltRD
+  midgardStatus: InboundAddressRD
+  mimirStatus: MimirHaltRD
 }
 
 export const HeaderNetStatus: React.FC<Props> = (props): JSX.Element => {
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const { isDesktopView, inboundAddress: inboundAddressRD, mimirHalt: mimirHaltRD } = props
-  // const { onlineStatus$ } = useAppContext()
-  // const onlineStatus = useObservableState<OnlineStatus>(onlineStatus$, OnlineStatus.OFF)
+  const { isDesktopView, midgardStatus: midgardStatusRD, mimirStatus: mimirStatusRD } = props
   const intl = useIntl()
 
-  const onlineStatusX: boolean = useMemo(
+  const midgardStatus: boolean = useMemo(
     () =>
       FP.pipe(
-        inboundAddressRD,
+        midgardStatusRD,
         RD.fold(
           () => false,
           () => false,
@@ -45,14 +42,13 @@ export const HeaderNetStatus: React.FC<Props> = (props): JSX.Element => {
           () => true
         )
       ),
-
-    [inboundAddressRD]
+    [midgardStatusRD]
   )
 
-  const midgardStatusX: boolean = useMemo(
+  const thorchainStatus: boolean = useMemo(
     () =>
       FP.pipe(
-        mimirHaltRD,
+        mimirStatusRD,
         RD.fold(
           () => false,
           () => false,
@@ -60,36 +56,34 @@ export const HeaderNetStatus: React.FC<Props> = (props): JSX.Element => {
           () => true
         )
       ),
-    [mimirHaltRD]
+    [mimirStatusRD]
   )
 
   const menuItems = useMemo((): MenuItem[] => {
     const notConnectedTxt = intl.formatMessage({ id: 'setting.notconnected' })
-    console.log('online', onlineStatusX)
-    console.log('midgard', midgardStatusX)
     return [
       {
         key: 'midgard',
         headline: 'Midgard API',
         subheadline: headerNetStatusSubheadline({
           url: 'midgard.thorchain.info',
-          onlineStatus: onlineStatusX,
+          onlineStatus: midgardStatus,
           notConnectedTxt
         }),
-        color: headerNetStatusColor({ onlineStatus: onlineStatusX })
+        color: headerNetStatusColor({ onlineStatus: midgardStatus })
       },
       {
         key: 'thorchain',
         headline: 'Thorchain API',
         subheadline: headerNetStatusSubheadline({
           url: 'thornode.thorchain.info',
-          onlineStatus: midgardStatusX,
+          onlineStatus: thorchainStatus,
           notConnectedTxt
         }),
-        color: headerNetStatusColor({ onlineStatus: midgardStatusX })
+        color: headerNetStatusColor({ onlineStatus: thorchainStatus })
       }
     ]
-  }, [intl, midgardStatusX, onlineStatusX])
+  }, [intl, midgardStatus, thorchainStatus])
 
   const desktopMenu = useMemo(() => {
     return (
@@ -141,7 +135,7 @@ export const HeaderNetStatus: React.FC<Props> = (props): JSX.Element => {
             {/* eslint-disable-next-line jsx-a11y/anchor-is-valid */}
             <a className="ant-dropdown-link" onClick={(e) => e.preventDefault()}>
               <Row justify="space-between" align="middle">
-                <ConnectionStatus color={onlineStatusX && midgardStatusX ? 'green' : 'red'} />
+                <ConnectionStatus color={midgardStatus && thorchainStatus ? 'green' : 'red'} />
                 <DownIcon />
               </Row>
             </a>

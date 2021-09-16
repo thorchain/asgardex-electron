@@ -1,6 +1,5 @@
 import React, { useMemo, useState, useCallback, useRef } from 'react'
 
-import * as RD from '@devexperts/remote-data-ts'
 import { Row, Col, Tabs, Grid, Space } from 'antd'
 import * as FP from 'fp-ts/function'
 import * as A from 'fp-ts/lib/Array'
@@ -20,7 +19,7 @@ import { useThemeContext } from '../../contexts/ThemeContext'
 import * as appRoutes from '../../routes/app'
 import * as poolsRoutes from '../../routes/pools'
 import * as walletRoutes from '../../routes/wallet'
-import { InboundAddresses, PriceRD, SelectedPricePoolAsset } from '../../services/midgard/types'
+import { InboundAddressRD, PriceRD, SelectedPricePoolAsset } from '../../services/midgard/types'
 import { MimirHaltRD } from '../../services/thorchain/types'
 import { KeystoreState } from '../../services/wallet/types'
 import { isLocked } from '../../services/wallet/util'
@@ -45,12 +44,6 @@ type Tab = {
   path: string
   icon: typeof SwapIcon // all icon types are as same as `SwapIcon`
 }
-
-export type InboundAddressRD =
-  | RD.RemoteInitial
-  | RD.RemotePending
-  | RD.RemoteFailure<Error>
-  | RD.RemoteSuccess<InboundAddresses>
 
 type Props = {
   keystore: KeystoreState
@@ -233,7 +226,7 @@ export const HeaderComponent: React.FC<Props> = (props): JSX.Element => {
   )
 
   const renderHeaderNetStatus = useMemo(
-    () => <HeaderNetStatus isDesktopView={isDesktopView} inboundAddress={inboundAddressRD} mimirHalt={mimirHaltRD} />,
+    () => <HeaderNetStatus isDesktopView={isDesktopView} midgardStatus={inboundAddressRD} mimirStatus={mimirHaltRD} />,
     [inboundAddressRD, isDesktopView, mimirHaltRD]
   )
 

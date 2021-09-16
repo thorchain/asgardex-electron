@@ -6,18 +6,18 @@ import { storiesOf } from '@storybook/react'
 import { HeaderNetStatus } from './HeaderNetStatus'
 
 const inboundAddressRD = RD.initial
-const mimirRD = RD.initial
+const mimirHaltRD = RD.initial
 
 storiesOf('Components/HeaderNetStatus', module)
   .add('default', () => {
-    return <HeaderNetStatus isDesktopView={true} inboundAddress={inboundAddressRD} mimirHalt={mimirRD} />
+    return <HeaderNetStatus isDesktopView={true} midgardStatus={inboundAddressRD} mimirStatus={mimirHaltRD} />
   })
   .add('not connected', () => {
-    return <HeaderNetStatus isDesktopView={true} inboundAddress={inboundAddressRD} mimirHalt={mimirRD} />
+    return <HeaderNetStatus isDesktopView={true} midgardStatus={inboundAddressRD} mimirStatus={mimirHaltRD} />
   })
   .add('mobile', () => {
-    return <HeaderNetStatus isDesktopView={false} inboundAddress={inboundAddressRD} mimirHalt={mimirRD} />
+    return <HeaderNetStatus isDesktopView={false} midgardStatus={inboundAddressRD} mimirStatus={mimirHaltRD} />
   })
   .add('mobile - not connected', () => {
-    return <HeaderNetStatus isDesktopView={false} inboundAddress={inboundAddressRD} mimirHalt={mimirRD} />
+    return <HeaderNetStatus isDesktopView={false} midgardStatus={inboundAddressRD} mimirStatus={mimirHaltRD} />
   })

@@ -18,13 +18,7 @@ export const headerNetStatusSubheadline = ({
   url: string
   onlineStatus: boolean
   notConnectedTxt: string
-}) => {
-  if (onlineStatus === false) return notConnectedTxt
-  else return url
-}
+}) => (onlineStatus ? url : notConnectedTxt)
 
-export type HeaderNetStatusColor = 'green' | 'yellow' | 'red'
-export const headerNetStatusColor = ({ onlineStatus }: { onlineStatus: boolean }) => {
-  if (onlineStatus === false) return 'red'
-  return 'green'
-}
+export type HeaderNetStatusColor = 'green' | 'red'
+export const headerNetStatusColor = ({ onlineStatus }: { onlineStatus: boolean }) => (onlineStatus ? 'green' : 'red')
