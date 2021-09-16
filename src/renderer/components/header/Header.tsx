@@ -5,8 +5,8 @@ import * as O from 'fp-ts/lib/Option'
 import { useObservableState } from 'observable-hooks'
 
 import { useMidgardContext } from '../../contexts/MidgardContext'
-import { useThorchainContext } from '../../contexts/ThorchainContext'
 import { useWalletContext } from '../../contexts/WalletContext'
+import { useMimirHalt } from '../../hooks/useMimirHalt'
 import { useNetwork } from '../../hooks/useNetwork'
 import { usePricePools } from '../../hooks/usePricePools'
 import { useRunePrice } from '../../hooks/useRunePrice'
@@ -16,12 +16,12 @@ import { HeaderComponent } from './HeaderComponent'
 
 export const Header: React.FC = (): JSX.Element => {
   const { keystoreService } = useWalletContext()
+  const { mimirHaltRD } = useMimirHalt()
   const { lock } = keystoreService
   const keystore = useObservableState(keystoreService.keystore$, O.none)
   const { service: midgardService } = useMidgardContext()
   const {
-    pools: { setSelectedPricePoolAsset: setSelectedPricePool, selectedPricePoolAsset$, inboundAddressesShared$ },
-    apiEndpoint$
+    pools: { setSelectedPricePoolAsset: setSelectedPricePool, selectedPricePoolAsset$, inboundAddressesShared$ }
   } = midgardService
 
   const { network } = useNetwork()
@@ -33,11 +33,7 @@ export const Header: React.FC = (): JSX.Element => {
 
   const pricePools = usePricePools()
 
-  const midgardUrl = useObservableState(apiEndpoint$, RD.initial)
   const inboundAddresses = useObservableState(inboundAddressesShared$, RD.initial)
-
-  const { explorerUrl$: thorchainUrl$ } = useThorchainContext()
-  const thorchainUrl = useObservableState(thorchainUrl$, O.none)
 
   return (
     <HeaderComponent
@@ -51,9 +47,8 @@ export const Header: React.FC = (): JSX.Element => {
       volume24Price={volume24PriceRD}
       reloadVolume24Price={reloadVolume24Price}
       selectedPricePoolAsset={oSelectedPricePoolAsset}
-      midgardUrl={RD.toOption(midgardUrl)}
-      thorchainUrl={thorchainUrl}
       inboundAddresses={inboundAddresses}
+      mimirHalt={mimirHaltRD}
     />
   )
 }

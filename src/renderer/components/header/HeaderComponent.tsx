@@ -21,6 +21,7 @@ import * as appRoutes from '../../routes/app'
 import * as poolsRoutes from '../../routes/pools'
 import * as walletRoutes from '../../routes/wallet'
 import { InboundAddresses, PriceRD, SelectedPricePoolAsset } from '../../services/midgard/types'
+import { MimirHaltRD } from '../../services/thorchain/types'
 import { KeystoreState } from '../../services/wallet/types'
 import { isLocked } from '../../services/wallet/util'
 import { PricePoolAsset, PricePoolAssets, PricePools } from '../../views/pools/Pools.types'
@@ -62,9 +63,8 @@ type Props = {
   volume24Price: PriceRD
   reloadVolume24Price: FP.Lazy<void>
   selectedPricePoolAsset: SelectedPricePoolAsset
-  midgardUrl: O.Option<string>
-  thorchainUrl: O.Option<string>
   inboundAddresses: InboundAddressRD
+  mimirHalt: MimirHaltRD
 }
 
 export const HeaderComponent: React.FC<Props> = (props): JSX.Element => {
@@ -74,14 +74,13 @@ export const HeaderComponent: React.FC<Props> = (props): JSX.Element => {
     pricePools: oPricePools,
     runePrice: runePriceRD,
     inboundAddresses: inboundAddressRD,
+    mimirHalt: mimirHaltRD,
     reloadRunePrice,
     volume24Price: volume24PriceRD,
     reloadVolume24Price,
     selectedPricePoolAsset: oSelectedPricePoolAsset,
     lockHandler,
-    setSelectedPricePool,
-    midgardUrl,
-    thorchainUrl
+    setSelectedPricePool
   } = props
 
   const intl = useIntl()
@@ -234,15 +233,8 @@ export const HeaderComponent: React.FC<Props> = (props): JSX.Element => {
   )
 
   const renderHeaderNetStatus = useMemo(
-    () => (
-      <HeaderNetStatus
-        isDesktopView={isDesktopView}
-        midgardUrl={midgardUrl}
-        thorchainUrl={thorchainUrl}
-        inboundAddress={inboundAddressRD}
-      />
-    ),
-    [inboundAddressRD, isDesktopView, midgardUrl, thorchainUrl]
+    () => <HeaderNetStatus isDesktopView={isDesktopView} inboundAddress={inboundAddressRD} mimirHalt={mimirHaltRD} />,
+    [inboundAddressRD, isDesktopView, mimirHaltRD]
   )
 
   const iconStyle = { fontSize: '1.5em', marginRight: '20px' }

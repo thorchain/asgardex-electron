@@ -8,9 +8,6 @@ import * as O from 'fp-ts/lib/Option'
 
 import { HeaderComponent } from './HeaderComponent'
 
-const midgardUrl = O.some('https://54.0.0.27')
-const thorchainUrl = O.some('https://thorchain.net')
-
 storiesOf('Components/Header', module).add('default', () => {
   return (
     <HeaderComponent
@@ -24,9 +21,8 @@ storiesOf('Components/Header', module).add('default', () => {
       reloadVolume24Price={() => console.log('reload volume24 price')}
       setSelectedPricePool={() => console.log('setSelectedPricePool')}
       selectedPricePoolAsset={O.some(AssetRuneNative)}
-      midgardUrl={midgardUrl}
-      thorchainUrl={thorchainUrl}
       inboundAddresses={RD.initial}
+      mimirHalt={RD.initial}
     />
   )
 })

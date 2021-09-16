@@ -3,13 +3,10 @@ import React, { useMemo } from 'react'
 import * as RD from '@devexperts/remote-data-ts'
 import { Dropdown, Row, Col } from 'antd'
 import * as FP from 'fp-ts/function'
-import * as O from 'fp-ts/lib/Option'
-import { useObservableState } from 'observable-hooks'
 import { useIntl } from 'react-intl'
 
 import { ReactComponent as DownIcon } from '../../../assets/svg/icon-down.svg'
-import { useAppContext } from '../../../contexts/AppContext'
-import { OnlineStatus } from '../../../services/app/types'
+import { MimirHaltRD } from '../../../services/thorchain/types'
 import { ConnectionStatus } from '../../shared/icons/ConnectionStatus'
 import { Menu } from '../../shared/menu/Menu'
 import { headerNetStatusSubheadline, headerNetStatusColor, HeaderNetStatusColor } from '../Header.util'
@@ -26,35 +23,16 @@ type MenuItem = {
 
 type Props = {
   isDesktopView: boolean
-  midgardUrl: O.Option<string>
-  thorchainUrl: O.Option<string>
   inboundAddress: InboundAddressRD
+  mimirHalt: MimirHaltRD
 }
 
 export const HeaderNetStatus: React.FC<Props> = (props): JSX.Element => {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const { isDesktopView, midgardUrl, thorchainUrl, inboundAddress: inboundAddressRD } = props
-  const { onlineStatus$ } = useAppContext()
-  const onlineStatus = useObservableState<OnlineStatus>(onlineStatus$, OnlineStatus.OFF)
+  const { isDesktopView, inboundAddress: inboundAddressRD, mimirHalt: mimirHaltRD } = props
+  // const { onlineStatus$ } = useAppContext()
+  // const onlineStatus = useObservableState<OnlineStatus>(onlineStatus$, OnlineStatus.OFF)
   const intl = useIntl()
-
-  const menuItems = useMemo((): MenuItem[] => {
-    const notConnectedTxt = intl.formatMessage({ id: 'setting.notconnected' })
-    return [
-      {
-        key: 'midgard',
-        headline: 'Midgard API',
-        subheadline: headerNetStatusSubheadline({ url: midgardUrl, onlineStatus, notConnectedTxt }),
-        color: headerNetStatusColor({ url: midgardUrl, onlineStatus })
-      },
-      {
-        key: 'thorchain',
-        headline: 'Thorchain API',
-        subheadline: headerNetStatusSubheadline({ url: thorchainUrl, onlineStatus, notConnectedTxt }),
-        color: headerNetStatusColor({ url: thorchainUrl, onlineStatus })
-      }
-    ]
-  }, [intl, midgardUrl, onlineStatus, thorchainUrl])
 
   const onlineStatusX: boolean = useMemo(
     () =>
@@ -70,6 +48,48 @@ export const HeaderNetStatus: React.FC<Props> = (props): JSX.Element => {
 
     [inboundAddressRD]
   )
+
+  const midgardStatusX: boolean = useMemo(
+    () =>
+      FP.pipe(
+        mimirHaltRD,
+        RD.fold(
+          () => false,
+          () => false,
+          () => false,
+          () => true
+        )
+      ),
+    [mimirHaltRD]
+  )
+
+  const menuItems = useMemo((): MenuItem[] => {
+    const notConnectedTxt = intl.formatMessage({ id: 'setting.notconnected' })
+    console.log('online', onlineStatusX)
+    console.log('midgard', midgardStatusX)
+    return [
+      {
+        key: 'midgard',
+        headline: 'Midgard API',
+        subheadline: headerNetStatusSubheadline({
+          url: 'midgard.thorchain.info',
+          onlineStatus: onlineStatusX,
+          notConnectedTxt
+        }),
+        color: headerNetStatusColor({ onlineStatus: onlineStatusX })
+      },
+      {
+        key: 'thorchain',
+        headline: 'Thorchain API',
+        subheadline: headerNetStatusSubheadline({
+          url: 'thornode.thorchain.info',
+          onlineStatus: midgardStatusX,
+          notConnectedTxt
+        }),
+        color: headerNetStatusColor({ onlineStatus: midgardStatusX })
+      }
+    ]
+  }, [intl, midgardStatusX, onlineStatusX])
 
   const desktopMenu = useMemo(() => {
     return (
@@ -121,7 +141,7 @@ export const HeaderNetStatus: React.FC<Props> = (props): JSX.Element => {
             {/* eslint-disable-next-line jsx-a11y/anchor-is-valid */}
             <a className="ant-dropdown-link" onClick={(e) => e.preventDefault()}>
               <Row justify="space-between" align="middle">
-                <ConnectionStatus color={onlineStatusX ? 'green' : 'red'} />
+                <ConnectionStatus color={onlineStatusX && midgardStatusX ? 'green' : 'red'} />
                 <DownIcon />
               </Row>
             </a>
