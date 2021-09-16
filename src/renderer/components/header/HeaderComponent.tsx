@@ -1,5 +1,6 @@
 import React, { useMemo, useState, useCallback, useRef } from 'react'
 
+import * as RD from '@devexperts/remote-data-ts'
 import { Row, Col, Tabs, Grid, Space } from 'antd'
 import * as FP from 'fp-ts/function'
 import * as A from 'fp-ts/lib/Array'
@@ -19,7 +20,7 @@ import { useThemeContext } from '../../contexts/ThemeContext'
 import * as appRoutes from '../../routes/app'
 import * as poolsRoutes from '../../routes/pools'
 import * as walletRoutes from '../../routes/wallet'
-import { PriceRD, SelectedPricePoolAsset } from '../../services/midgard/types'
+import { InboundAddresses, PriceRD, SelectedPricePoolAsset } from '../../services/midgard/types'
 import { KeystoreState } from '../../services/wallet/types'
 import { isLocked } from '../../services/wallet/util'
 import { PricePoolAsset, PricePoolAssets, PricePools } from '../../views/pools/Pools.types'
@@ -44,6 +45,12 @@ type Tab = {
   icon: typeof SwapIcon // all icon types are as same as `SwapIcon`
 }
 
+export type InboundAddressRD =
+  | RD.RemoteInitial
+  | RD.RemotePending
+  | RD.RemoteFailure<Error>
+  | RD.RemoteSuccess<InboundAddresses>
+
 type Props = {
   keystore: KeystoreState
   network: Network
@@ -57,6 +64,7 @@ type Props = {
   selectedPricePoolAsset: SelectedPricePoolAsset
   midgardUrl: O.Option<string>
   thorchainUrl: O.Option<string>
+  inboundAddresses: InboundAddressRD
 }
 
 export const HeaderComponent: React.FC<Props> = (props): JSX.Element => {
@@ -65,6 +73,7 @@ export const HeaderComponent: React.FC<Props> = (props): JSX.Element => {
     network,
     pricePools: oPricePools,
     runePrice: runePriceRD,
+    inboundAddresses: inboundAddressRD,
     reloadRunePrice,
     volume24Price: volume24PriceRD,
     reloadVolume24Price,
@@ -225,8 +234,15 @@ export const HeaderComponent: React.FC<Props> = (props): JSX.Element => {
   )
 
   const renderHeaderNetStatus = useMemo(
-    () => <HeaderNetStatus isDesktopView={isDesktopView} midgardUrl={midgardUrl} thorchainUrl={thorchainUrl} />,
-    [isDesktopView, midgardUrl, thorchainUrl]
+    () => (
+      <HeaderNetStatus
+        isDesktopView={isDesktopView}
+        midgardUrl={midgardUrl}
+        thorchainUrl={thorchainUrl}
+        inboundAddress={inboundAddressRD}
+      />
+    ),
+    [inboundAddressRD, isDesktopView, midgardUrl, thorchainUrl]
   )
 
   const iconStyle = { fontSize: '1.5em', marginRight: '20px' }

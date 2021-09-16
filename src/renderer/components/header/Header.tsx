@@ -20,7 +20,7 @@ export const Header: React.FC = (): JSX.Element => {
   const keystore = useObservableState(keystoreService.keystore$, O.none)
   const { service: midgardService } = useMidgardContext()
   const {
-    pools: { setSelectedPricePoolAsset: setSelectedPricePool, selectedPricePoolAsset$ },
+    pools: { setSelectedPricePoolAsset: setSelectedPricePool, selectedPricePoolAsset$, inboundAddressesShared$ },
     apiEndpoint$
   } = midgardService
 
@@ -34,6 +34,7 @@ export const Header: React.FC = (): JSX.Element => {
   const pricePools = usePricePools()
 
   const midgardUrl = useObservableState(apiEndpoint$, RD.initial)
+  const inboundAddresses = useObservableState(inboundAddressesShared$, RD.initial)
 
   const { explorerUrl$: thorchainUrl$ } = useThorchainContext()
   const thorchainUrl = useObservableState(thorchainUrl$, O.none)
@@ -52,6 +53,7 @@ export const Header: React.FC = (): JSX.Element => {
       selectedPricePoolAsset={oSelectedPricePoolAsset}
       midgardUrl={RD.toOption(midgardUrl)}
       thorchainUrl={thorchainUrl}
+      inboundAddresses={inboundAddresses}
     />
   )
 }

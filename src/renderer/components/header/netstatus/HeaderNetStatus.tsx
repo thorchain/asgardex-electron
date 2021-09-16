@@ -1,6 +1,8 @@
 import React, { useMemo } from 'react'
 
+import * as RD from '@devexperts/remote-data-ts'
 import { Dropdown, Row, Col } from 'antd'
+import * as FP from 'fp-ts/function'
 import * as O from 'fp-ts/lib/Option'
 import { useObservableState } from 'observable-hooks'
 import { useIntl } from 'react-intl'
@@ -11,6 +13,7 @@ import { OnlineStatus } from '../../../services/app/types'
 import { ConnectionStatus } from '../../shared/icons/ConnectionStatus'
 import { Menu } from '../../shared/menu/Menu'
 import { headerNetStatusSubheadline, headerNetStatusColor, HeaderNetStatusColor } from '../Header.util'
+import { InboundAddressRD } from '../HeaderComponent'
 import { HeaderDrawerItem } from '../HeaderComponent.styles'
 import * as Styled from './HeaderNetStatus.styles'
 
@@ -25,14 +28,15 @@ type Props = {
   isDesktopView: boolean
   midgardUrl: O.Option<string>
   thorchainUrl: O.Option<string>
+  inboundAddress: InboundAddressRD
 }
 
 export const HeaderNetStatus: React.FC<Props> = (props): JSX.Element => {
-  const { isDesktopView, midgardUrl, thorchainUrl } = props
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const { isDesktopView, midgardUrl, thorchainUrl, inboundAddress: inboundAddressRD } = props
   const { onlineStatus$ } = useAppContext()
   const onlineStatus = useObservableState<OnlineStatus>(onlineStatus$, OnlineStatus.OFF)
   const intl = useIntl()
-  const onlineStatusColor = onlineStatus === OnlineStatus.ON ? 'green' : 'red'
 
   const menuItems = useMemo((): MenuItem[] => {
     const notConnectedTxt = intl.formatMessage({ id: 'setting.notconnected' })
@@ -51,6 +55,21 @@ export const HeaderNetStatus: React.FC<Props> = (props): JSX.Element => {
       }
     ]
   }, [intl, midgardUrl, onlineStatus, thorchainUrl])
+
+  const onlineStatusX: boolean = useMemo(
+    () =>
+      FP.pipe(
+        inboundAddressRD,
+        RD.fold(
+          () => false,
+          () => false,
+          () => false,
+          () => true
+        )
+      ),
+
+    [inboundAddressRD]
+  )
 
   const desktopMenu = useMemo(() => {
     return (
@@ -102,7 +121,7 @@ export const HeaderNetStatus: React.FC<Props> = (props): JSX.Element => {
             {/* eslint-disable-next-line jsx-a11y/anchor-is-valid */}
             <a className="ant-dropdown-link" onClick={(e) => e.preventDefault()}>
               <Row justify="space-between" align="middle">
-                <ConnectionStatus color={onlineStatusColor} />
+                <ConnectionStatus color={onlineStatusX ? 'green' : 'red'} />
                 <DownIcon />
               </Row>
             </a>

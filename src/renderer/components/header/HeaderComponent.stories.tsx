@@ -26,6 +26,7 @@ storiesOf('Components/Header', module).add('default', () => {
       selectedPricePoolAsset={O.some(AssetRuneNative)}
       midgardUrl={midgardUrl}
       thorchainUrl={thorchainUrl}
+      inboundAddresses={RD.initial}
     />
   )
 })

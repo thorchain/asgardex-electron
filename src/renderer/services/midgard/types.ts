@@ -206,6 +206,7 @@ export type PoolsService = {
   gasRateByChain$: (chain: Chain) => GasRateLD
   reloadGasRates: FP.Lazy<void>
   haltedChains$: HaltedChainsLD
+  inboundAddressesShared$: InboundAddressesLD
 }
 
 export type PoolShareType = DepositType | 'all'

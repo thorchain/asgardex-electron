@@ -856,6 +856,7 @@ const createPoolsService = (
     apiGetLiquidityHistory$,
     reloadSwapHistory,
     getDepthHistory$,
+    inboundAddressesShared$,
     reloadDepthHistory,
     priceRatio$,
     availableAssets$,
