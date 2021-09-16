@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from 'react'
+import React, { useCallback, useState, useMemo } from 'react'
 
 import { delay, Asset, assetToString } from '@xchainjs/xchain-util'
 import { Dropdown } from 'antd'
@@ -68,7 +68,7 @@ export const AssetSelect: React.FC<Props> = (props): JSX.Element => {
     [balances, onSelect]
   )
 
-  const renderMenu = useCallback(() => {
+  const renderMenu = useMemo(() => {
     const sortedBalanceData = balances.sort(ordWalletBalanceByAsset.compare)
     return (
       <Styled.AssetSelectMenuWrapper minWidth={minWidth}>
@@ -95,7 +95,7 @@ export const AssetSelect: React.FC<Props> = (props): JSX.Element => {
       className={`${className} ${openDropdown ? 'selected' : ''}`}
       disabled={disableButton}
       onClick={handleDropdownButtonClicked}>
-      <Dropdown overlay={renderMenu()} trigger={[]} visible={openDropdown}>
+      <Dropdown overlay={renderMenu} trigger={[]} visible={openDropdown} placement="bottomCenter">
         <>
           <AssetData noTicker={!showAssetName} className={'asset-data'} asset={asset} network={network} />
           <Styled.AssetDropdownButton>
