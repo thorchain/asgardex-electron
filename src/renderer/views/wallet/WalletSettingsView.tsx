@@ -130,8 +130,7 @@ export const WalletSettingsView: React.FC = (): JSX.Element => {
     [intl, thorLedgerAddressRD]
   )
 
-  // TODO (@asgdx-team) Disable temporary for `v0.4.0`
-  const _bnbLedgerWalletAddress: WalletAddress = useMemo(
+  const bnbLedgerWalletAddress: WalletAddress = useMemo(
     () => ({
       type: 'ledger',
       address: FP.pipe(
@@ -152,8 +151,7 @@ export const WalletSettingsView: React.FC = (): JSX.Element => {
     const ethWalletAccount$ = walletAccount$({ addressUI$: ethAddressUI$, chain: ETHChain })
     const bnbWalletAccount$ = walletAccount$({
       addressUI$: bnbAddressUI$,
-      // TODO (@asgdx-team) Disable temporary for `v0.4.0`
-      // ledgerAddress: bnbLedgerWalletAddress,
+      ledgerAddress: bnbLedgerWalletAddress,
       chain: BNBChain
     })
     const bchWalletAccount$ = walletAccount$({ addressUI$: bchAddressUI$, chain: BCHChain })
@@ -180,8 +178,7 @@ export const WalletSettingsView: React.FC = (): JSX.Element => {
     btcAddressUI$,
     ethAddressUI$,
     bnbAddressUI$,
-    // TODO (@asgdx-team) Disable temporary for `v0.4.0`
-    // bnbLedgerWalletAddress,
+    bnbLedgerWalletAddress,
     bchAddressUI$,
     ltcAddressUI$
   ])
