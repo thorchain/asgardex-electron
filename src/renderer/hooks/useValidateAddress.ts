@@ -54,7 +54,12 @@ export const useValidateAddress = (
               const { flags } = await client.getAccount(address)
               return flags === 0
             } catch (e) {
-              return false
+              // Previous call to `client.getAccount` might fail in following scenarios
+              // - An account has empty balances (Binance API will return "account not found" )
+              // - `public_key` of `Account` might not be available for any reason and `getAccount` will throw an error
+              // However, we can't get `flags` in this case, but we can still say it's a valid address
+              // because of `validateAddress` check before
+              return true
             }
           }
           return valid
