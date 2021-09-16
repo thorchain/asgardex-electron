@@ -1,27 +1,13 @@
 import styled from 'styled-components'
 import { palette } from 'styled-theme'
 
-import { InputBigNumber as BaseInputBigNumber } from '../../input'
+import { InputBigNumber as InputBigNumberUI } from '../../input'
 import { Label } from '../../label'
 import { AssetLabel as AssetLabelUI } from '../assetLabel'
-import { AssetSelect as BaseAssetSelect } from '../assetSelect'
-
-const CONTAINER_SIDE_PADDING = 16
+import { AssetSelect as AssetSelectUI } from '../assetSelect'
 
 export const AssetCardWrapper = styled.div`
   width: 100%;
-  .title-label {
-    font-style: italic;
-  }
-
-  .selection-wrapper {
-    width: auto;
-    margin-top: 10px;
-
-    .btn-wrapper {
-      width: 20%;
-    }
-  }
 `
 
 export const CardBorderWrapper = styled.div<{ error: boolean }>`
@@ -74,23 +60,18 @@ export const MinAmountLabel = styled(Label)`
   text-transform: uppercase;
 `
 
-export const AssetSelect = styled(BaseAssetSelect)`
+export const AssetDataWrapper = styled.div`
   width: 100%;
-
-  // we have to set padding to the children 'cause of ant
-  // calculates position based on parent's box-model
-  > * {
-    &:first-child {
-      padding-left: ${CONTAINER_SIDE_PADDING}px;
-    }
-
-    &:last-child {
-      padding-right: ${CONTAINER_SIDE_PADDING}px;
-    }
-  }
+  padding: 0 20px;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
 `
 
-export const InputBigNumber = styled(BaseInputBigNumber).attrs({
+export const AssetSelect = styled(AssetSelectUI)``
+
+export const InputBigNumber = styled(InputBigNumberUI).attrs({
   size: 'large'
 })`
   padding: 0;

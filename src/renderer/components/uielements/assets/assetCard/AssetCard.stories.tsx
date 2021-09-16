@@ -28,7 +28,6 @@ const balanceRuneNative: WalletBalance = {
 const balances = [balanceBNB, balanceBTC, balanceRuneNative]
 
 const defaultProps: AssetCardProps = {
-  title: 'Title here',
   assetBalance: O.none,
   asset: AssetBNB,
   balances,
