@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react'
+import React, { useMemo, useRef } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
 import { Dropdown, Row, Col } from 'antd'
@@ -6,6 +6,7 @@ import * as FP from 'fp-ts/function'
 import { useIntl } from 'react-intl'
 
 import { ReactComponent as DownIcon } from '../../../assets/svg/icon-down.svg'
+import { OnlineStatus } from '../../../services/app/types'
 import { InboundAddressRD } from '../../../services/midgard/types'
 import { MimirHaltRD } from '../../../services/thorchain/types'
 import { ConnectionStatus } from '../../shared/icons/ConnectionStatus'
@@ -31,36 +32,56 @@ export const HeaderNetStatus: React.FC<Props> = (props): JSX.Element => {
   const { isDesktopView, midgardStatus: midgardStatusRD, mimirStatus: mimirStatusRD } = props
   const intl = useIntl()
 
-  const midgardStatus: boolean = useMemo(
+  const prevMidgardStatus = useRef<OnlineStatus>(OnlineStatus.OFF)
+  const midgardStatus: OnlineStatus = useMemo(
     () =>
       FP.pipe(
         midgardStatusRD,
         RD.fold(
-          () => false,
-          () => false,
-          () => false,
-          () => true
+          () => prevMidgardStatus.current,
+          () => prevMidgardStatus.current,
+          () => {
+            prevMidgardStatus.current = OnlineStatus.OFF
+            return prevMidgardStatus.current
+          },
+          () => {
+            prevMidgardStatus.current = OnlineStatus.ON
+            return prevMidgardStatus.current
+          }
         )
       ),
     [midgardStatusRD]
   )
 
-  const thorchainStatus: boolean = useMemo(
+  const prevThorchainStatus = useRef<OnlineStatus>(OnlineStatus.OFF)
+  const thorchainStatus: OnlineStatus = useMemo(
     () =>
       FP.pipe(
         mimirStatusRD,
         RD.fold(
-          () => false,
-          () => false,
-          () => false,
-          () => true
+          () => prevThorchainStatus.current,
+          () => prevThorchainStatus.current,
+          () => {
+            prevMidgardStatus.current = OnlineStatus.OFF
+            return prevMidgardStatus.current
+          },
+          () => {
+            prevThorchainStatus.current = OnlineStatus.ON
+            return prevThorchainStatus.current
+          }
         )
       ),
     [mimirStatusRD]
   )
 
+  const isClientOnline = useMemo(
+    () => midgardStatus === OnlineStatus.ON && thorchainStatus === OnlineStatus.ON,
+    [midgardStatus, thorchainStatus]
+  )
+
   const menuItems = useMemo((): MenuItem[] => {
     const notConnectedTxt = intl.formatMessage({ id: 'setting.notconnected' })
+    console.log(midgardStatus, thorchainStatus)
     return [
       {
         key: 'midgard',
@@ -135,7 +156,7 @@ export const HeaderNetStatus: React.FC<Props> = (props): JSX.Element => {
             {/* eslint-disable-next-line jsx-a11y/anchor-is-valid */}
             <a className="ant-dropdown-link" onClick={(e) => e.preventDefault()}>
               <Row justify="space-between" align="middle">
-                <ConnectionStatus color={midgardStatus && thorchainStatus ? 'green' : 'red'} />
+                <ConnectionStatus color={isClientOnline ? 'green' : 'red'} />
                 <DownIcon />
               </Row>
             </a>
