@@ -81,7 +81,6 @@ export const HeaderNetStatus: React.FC<Props> = (props): JSX.Element => {
 
   const menuItems = useMemo((): MenuItem[] => {
     const notConnectedTxt = intl.formatMessage({ id: 'setting.notconnected' })
-    console.log(midgardStatus, thorchainStatus)
     return [
       {
         key: 'midgard',
