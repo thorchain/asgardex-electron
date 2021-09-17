@@ -39,6 +39,7 @@ const metaPendingAssets: Meta<PendingAssetsStoryArgs> = {
   title: 'Components/Deposit/PendingAssets',
   argTypes: {
     network: {
+      name: 'Network',
       control: {
         type: 'select',
         options: ['mainnet', 'testnet']
@@ -46,6 +47,7 @@ const metaPendingAssets: Meta<PendingAssetsStoryArgs> = {
       defaultValue: 'mainnet'
     },
     loading: {
+      name: 'Loading state',
       control: {
         type: 'boolean'
       },
