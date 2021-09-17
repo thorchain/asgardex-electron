@@ -1,8 +1,9 @@
 import { AssetBTC, AssetETH, AssetRuneNative } from '@xchainjs/xchain-util'
+import * as O from 'fp-ts/lib/Option'
 
 import { AssetBUSDBAF, AssetBUSDBD1 } from '../../const'
 import { OnlineStatus } from '../../services/app/types'
-import { toHeaderCurrencyLabel, headerNetStatusSubheadline, headerNetStatusColor, isClientOnline } from './Header.util'
+import { toHeaderCurrencyLabel, headerNetStatusSubheadline, headerNetStatusColor } from './Header.util'
 
 describe('header/util', () => {
   describe('toHeaderCurrencyItem', () => {
@@ -29,7 +30,7 @@ describe('header/util', () => {
   describe('headerNetStatusSubheadline', () => {
     it('if online status is true', () => {
       const result = headerNetStatusSubheadline({
-        url: 'localhost',
+        url: O.some('http://localhost'),
         onlineStatus: OnlineStatus.ON,
         notConnectedTxt: ''
       })
@@ -37,7 +38,7 @@ describe('header/util', () => {
     })
     it('if online status is false" ', () => {
       const result = headerNetStatusSubheadline({
-        url: 'localhost',
+        url: O.some('http://localhost'),
         onlineStatus: OnlineStatus.OFF,
         notConnectedTxt: 'not connected'
       })
@@ -67,30 +68,11 @@ describe('header/util', () => {
       })
       expect(result).toEqual('green')
     })
-    it('red', () => {
+    it('yellow', () => {
       const result = headerNetStatusColor({
         onlineStatus: OnlineStatus.OFF
       })
-      expect(result).toEqual('red')
-    })
-  })
-
-  describe('isClientOnline', () => {
-    it('midgard and thorchain are online', () => {
-      const result = isClientOnline(OnlineStatus.ON, OnlineStatus.ON)
-      expect(result).toBeTruthy()
-    })
-    it('midgard is offline and thorchain is online', () => {
-      const result = isClientOnline(OnlineStatus.OFF, OnlineStatus.ON)
-      expect(result).toBeFalsy()
-    })
-    it('midgard is online and thorchain is offline', () => {
-      const result = isClientOnline(OnlineStatus.ON, OnlineStatus.OFF)
-      expect(result).toBeFalsy()
-    })
-    it('midgard and thorchain are offline', () => {
-      const result = isClientOnline(OnlineStatus.OFF, OnlineStatus.OFF)
-      expect(result).toBeFalsy()
+      expect(result).toEqual('yellow')
     })
   })
 })

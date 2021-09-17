@@ -1,5 +1,8 @@
 import { currencySymbolByAsset } from '@xchainjs/xchain-util'
+import * as FP from 'fp-ts/lib/function'
+import * as O from 'fp-ts/lib/Option'
 
+import * as API from '../../helpers/apiHelper'
 import { isUSDAsset } from '../../helpers/assetHelper'
 import { OnlineStatus } from '../../services/app/types'
 import { PricePoolAsset } from '../../views/pools/Pools.types'
@@ -16,10 +19,17 @@ export const headerNetStatusSubheadline = ({
   onlineStatus,
   notConnectedTxt
 }: {
-  url: string
+  url: O.Option<string>
   onlineStatus: OnlineStatus
   notConnectedTxt: string
-}) => (onlineStatus === OnlineStatus.ON ? url : notConnectedTxt)
+}) => {
+  if (onlineStatus === OnlineStatus.OFF) return notConnectedTxt
+  return FP.pipe(
+    url,
+    O.chain(API.getHostnameFromUrl),
+    O.getOrElse(() => notConnectedTxt)
+  )
+}
 
 export type HeaderNetStatusColor = 'green' | 'yellow'
 export const headerNetStatusColor = ({ onlineStatus }: { onlineStatus: OnlineStatus }) =>

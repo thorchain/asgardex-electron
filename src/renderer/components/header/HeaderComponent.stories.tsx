@@ -23,6 +23,8 @@ storiesOf('Components/Header', module).add('default', () => {
       selectedPricePoolAsset={O.some(AssetRuneNative)}
       inboundAddresses={RD.initial}
       mimirHalt={RD.initial}
+      midgardUrl={RD.initial}
+      thorchainUrl={O.some('thorchain.info')}
     />
   )
 })

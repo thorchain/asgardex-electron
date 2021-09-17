@@ -5,6 +5,7 @@ import * as O from 'fp-ts/lib/Option'
 import { useObservableState } from 'observable-hooks'
 
 import { useMidgardContext } from '../../contexts/MidgardContext'
+import { useThorchainContext } from '../../contexts/ThorchainContext'
 import { useWalletContext } from '../../contexts/WalletContext'
 import { useMimirHalt } from '../../hooks/useMimirHalt'
 import { useNetwork } from '../../hooks/useNetwork'
@@ -21,7 +22,8 @@ export const Header: React.FC = (): JSX.Element => {
   const keystore = useObservableState(keystoreService.keystore$, O.none)
   const { service: midgardService } = useMidgardContext()
   const {
-    pools: { setSelectedPricePoolAsset: setSelectedPricePool, selectedPricePoolAsset$, inboundAddressesShared$ }
+    pools: { setSelectedPricePoolAsset: setSelectedPricePool, selectedPricePoolAsset$, inboundAddressesShared$ },
+    apiEndpoint$
   } = midgardService
 
   const { network } = useNetwork()
@@ -34,6 +36,11 @@ export const Header: React.FC = (): JSX.Element => {
   const pricePools = usePricePools()
 
   const inboundAddresses = useObservableState(inboundAddressesShared$, RD.initial)
+
+  const midgardUrlRD = useObservableState(apiEndpoint$, RD.initial)
+
+  const { explorerUrl$: thorchainUrl$ } = useThorchainContext()
+  const thorchainUrl = useObservableState(thorchainUrl$, O.none)
 
   return (
     <HeaderComponent
@@ -49,6 +56,8 @@ export const Header: React.FC = (): JSX.Element => {
       selectedPricePoolAsset={oSelectedPricePoolAsset}
       inboundAddresses={inboundAddresses}
       mimirHalt={mimirHaltRD}
+      midgardUrl={midgardUrlRD}
+      thorchainUrl={thorchainUrl}
     />
   )
 }

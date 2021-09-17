@@ -1,5 +1,6 @@
 import React, { useMemo, useState, useCallback, useRef } from 'react'
 
+import * as RD from '@devexperts/remote-data-ts'
 import { Row, Col, Tabs, Grid, Space } from 'antd'
 import * as FP from 'fp-ts/function'
 import * as A from 'fp-ts/lib/Array'
@@ -58,6 +59,8 @@ type Props = {
   selectedPricePoolAsset: SelectedPricePoolAsset
   inboundAddresses: InboundAddressRD
   mimirHalt: MimirHaltRD
+  midgardUrl: RD.RemoteData<Error, string>
+  thorchainUrl: O.Option<string>
 }
 
 export const HeaderComponent: React.FC<Props> = (props): JSX.Element => {
@@ -73,7 +76,9 @@ export const HeaderComponent: React.FC<Props> = (props): JSX.Element => {
     reloadVolume24Price,
     selectedPricePoolAsset: oSelectedPricePoolAsset,
     lockHandler,
-    setSelectedPricePool
+    setSelectedPricePool,
+    midgardUrl,
+    thorchainUrl
   } = props
 
   const intl = useIntl()
@@ -226,8 +231,16 @@ export const HeaderComponent: React.FC<Props> = (props): JSX.Element => {
   )
 
   const renderHeaderNetStatus = useMemo(
-    () => <HeaderNetStatus isDesktopView={isDesktopView} midgardStatus={inboundAddressRD} mimirStatus={mimirHaltRD} />,
-    [inboundAddressRD, isDesktopView, mimirHaltRD]
+    () => (
+      <HeaderNetStatus
+        isDesktopView={isDesktopView}
+        midgardStatus={inboundAddressRD}
+        mimirStatus={mimirHaltRD}
+        midgardUrl={midgardUrl}
+        thorchainUrl={thorchainUrl}
+      />
+    ),
+    [inboundAddressRD, isDesktopView, midgardUrl, mimirHaltRD, thorchainUrl]
   )
 
   const iconStyle = { fontSize: '1.5em', marginRight: '20px' }
