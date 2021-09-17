@@ -21,9 +21,9 @@ export const headerNetStatusSubheadline = ({
   notConnectedTxt: string
 }) => (onlineStatus === OnlineStatus.ON ? url : notConnectedTxt)
 
-export type HeaderNetStatusColor = 'green' | 'red'
+export type HeaderNetStatusColor = 'green' | 'yellow'
 export const headerNetStatusColor = ({ onlineStatus }: { onlineStatus: OnlineStatus }) =>
-  onlineStatus === OnlineStatus.ON ? 'green' : 'red'
+  onlineStatus === OnlineStatus.ON ? 'green' : 'yellow'
 
 export const isClientOnline = (midgardStatus: OnlineStatus, thorchainStatus: OnlineStatus) =>
   midgardStatus === OnlineStatus.ON && thorchainStatus === OnlineStatus.ON
