@@ -30,7 +30,7 @@ type Props = {
   midgardStatus: InboundAddressRD
   mimirStatus: MimirHaltRD
   midgardUrl: RD.RemoteData<Error, string>
-  thorchainUrl: O.Option<string>
+  thorchainUrl: string
 }
 
 export const HeaderNetStatus: React.FC<Props> = (props): JSX.Element => {
@@ -43,7 +43,6 @@ export const HeaderNetStatus: React.FC<Props> = (props): JSX.Element => {
   } = props
   const intl = useIntl()
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const midgardUrl = useMemo(() => {
     return FP.pipe(
       midgardUrlRD,
@@ -90,8 +89,8 @@ export const HeaderNetStatus: React.FC<Props> = (props): JSX.Element => {
           () => prevThorchainStatus.current,
           () => prevThorchainStatus.current,
           () => {
-            prevMidgardStatus.current = OnlineStatus.OFF
-            return prevMidgardStatus.current
+            prevThorchainStatus.current = OnlineStatus.OFF
+            return prevThorchainStatus.current
           },
           () => {
             prevThorchainStatus.current = OnlineStatus.ON
@@ -109,7 +108,7 @@ export const HeaderNetStatus: React.FC<Props> = (props): JSX.Element => {
         key: 'midgard',
         headline: 'Midgard API',
         subheadline: headerNetStatusSubheadline({
-          url: thorchainUrl,
+          url: O.some(midgardUrl),
           onlineStatus: midgardStatus,
           notConnectedTxt
         }),
@@ -119,14 +118,14 @@ export const HeaderNetStatus: React.FC<Props> = (props): JSX.Element => {
         key: 'thorchain',
         headline: 'Thorchain API',
         subheadline: headerNetStatusSubheadline({
-          url: thorchainUrl,
+          url: O.some(thorchainUrl),
           onlineStatus: thorchainStatus,
           notConnectedTxt
         }),
         color: headerNetStatusColor({ onlineStatus: thorchainStatus })
       }
     ]
-  }, [intl, midgardStatus, thorchainStatus, thorchainUrl])
+  }, [intl, midgardStatus, midgardUrl, thorchainStatus, thorchainUrl])
 
   const desktopMenu = useMemo(() => {
     return (

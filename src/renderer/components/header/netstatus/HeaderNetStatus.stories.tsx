@@ -2,7 +2,6 @@ import React from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
 import { storiesOf } from '@storybook/react'
-import * as O from 'fp-ts/lib/Option'
 
 import { HeaderNetStatus } from './HeaderNetStatus'
 
@@ -18,7 +17,7 @@ storiesOf('Components/HeaderNetStatus', module)
         midgardStatus={inboundAddressRD}
         mimirStatus={mimirHaltRD}
         midgardUrl={midgardUrl}
-        thorchainUrl={O.some('https://thorchain.info')}
+        thorchainUrl={'https://thorchain.info'}
       />
     )
   })
@@ -29,7 +28,7 @@ storiesOf('Components/HeaderNetStatus', module)
         midgardStatus={inboundAddressRD}
         mimirStatus={mimirHaltRD}
         midgardUrl={midgardUrl}
-        thorchainUrl={O.some('https://thorchain.info')}
+        thorchainUrl={'https://thorchain.info'}
       />
     )
   })
@@ -40,7 +39,7 @@ storiesOf('Components/HeaderNetStatus', module)
         midgardStatus={inboundAddressRD}
         mimirStatus={mimirHaltRD}
         midgardUrl={midgardUrl}
-        thorchainUrl={O.some('thorchain.info')}
+        thorchainUrl={'thorchain.info'}
       />
     )
   })
@@ -51,7 +50,7 @@ storiesOf('Components/HeaderNetStatus', module)
         midgardStatus={inboundAddressRD}
         mimirStatus={mimirHaltRD}
         midgardUrl={midgardUrl}
-        thorchainUrl={O.some('thorchain.info')}
+        thorchainUrl={'thorchain.info'}
       />
     )
   })

@@ -60,7 +60,7 @@ type Props = {
   inboundAddresses: InboundAddressRD
   mimirHalt: MimirHaltRD
   midgardUrl: RD.RemoteData<Error, string>
-  thorchainUrl: O.Option<string>
+  thorchainUrl: string
 }
 
 export const HeaderComponent: React.FC<Props> = (props): JSX.Element => {

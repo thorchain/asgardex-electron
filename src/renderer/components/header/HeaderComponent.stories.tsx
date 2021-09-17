@@ -24,7 +24,7 @@ storiesOf('Components/Header', module).add('default', () => {
       inboundAddresses={RD.initial}
       mimirHalt={RD.initial}
       midgardUrl={RD.initial}
-      thorchainUrl={O.some('thorchain.info')}
+      thorchainUrl={'thorchain.info'}
     />
   )
 })

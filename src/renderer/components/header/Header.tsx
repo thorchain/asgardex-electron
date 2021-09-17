@@ -4,8 +4,8 @@ import * as RD from '@devexperts/remote-data-ts'
 import * as O from 'fp-ts/lib/Option'
 import { useObservableState } from 'observable-hooks'
 
+import { getClientUrl } from '../../../shared/thorchain/client'
 import { useMidgardContext } from '../../contexts/MidgardContext'
-import { useThorchainContext } from '../../contexts/ThorchainContext'
 import { useWalletContext } from '../../contexts/WalletContext'
 import { useMimirHalt } from '../../hooks/useMimirHalt'
 import { useNetwork } from '../../hooks/useNetwork'
@@ -38,9 +38,7 @@ export const Header: React.FC = (): JSX.Element => {
   const inboundAddresses = useObservableState(inboundAddressesShared$, RD.initial)
 
   const midgardUrlRD = useObservableState(apiEndpoint$, RD.initial)
-
-  const { explorerUrl$: thorchainUrl$ } = useThorchainContext()
-  const thorchainUrl = useObservableState(thorchainUrl$, O.none)
+  const thorchainUrl = getClientUrl()[network].node
 
   return (
     <HeaderComponent
