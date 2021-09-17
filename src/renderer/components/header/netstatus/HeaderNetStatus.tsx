@@ -21,6 +21,7 @@ import * as Styled from './HeaderNetStatus.styles'
 type MenuItem = {
   key: string
   headline: string
+  url: string
   subheadline: string
   color: HeaderNetStatusColor
 }
@@ -107,6 +108,7 @@ export const HeaderNetStatus: React.FC<Props> = (props): JSX.Element => {
       {
         key: 'midgard',
         headline: 'Midgard API',
+        url: `${midgardUrl}/v2/doc`,
         subheadline: headerNetStatusSubheadline({
           url: O.some(midgardUrl),
           onlineStatus: midgardStatus,
@@ -117,6 +119,7 @@ export const HeaderNetStatus: React.FC<Props> = (props): JSX.Element => {
       {
         key: 'thorchain',
         headline: 'Thorchain API',
+        url: `${thorchainUrl}/thorchain/doc/`,
         subheadline: headerNetStatusSubheadline({
           url: O.some(thorchainUrl),
           onlineStatus: thorchainStatus,
@@ -131,9 +134,9 @@ export const HeaderNetStatus: React.FC<Props> = (props): JSX.Element => {
     return (
       <Menu>
         {menuItems.map((item) => {
-          const { headline, key, subheadline, color } = item
+          const { headline, key, subheadline, color, url } = item
           return (
-            <Menu.Item key={key}>
+            <Menu.Item key={key} onClick={() => window.apiUrl.openExternal(url)}>
               <Row align="middle">
                 <Col span={4}>
                   <ConnectionStatus color={color} />
