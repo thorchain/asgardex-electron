@@ -17,13 +17,15 @@ export const toHeaderCurrencyLabel = (asset: PricePoolAsset): string => {
 export const headerNetStatusSubheadline = ({
   url,
   onlineStatus,
+  clientStatus,
   notConnectedTxt
 }: {
   url: O.Option<string>
   onlineStatus: OnlineStatus
+  clientStatus: OnlineStatus
   notConnectedTxt: string
 }) => {
-  if (onlineStatus === OnlineStatus.OFF) return notConnectedTxt
+  if (onlineStatus === OnlineStatus.OFF || clientStatus === OnlineStatus.OFF) return notConnectedTxt
   return FP.pipe(
     url,
     O.chain(API.getHostnameFromUrl),
@@ -31,9 +33,29 @@ export const headerNetStatusSubheadline = ({
   )
 }
 
-export type HeaderNetStatusColor = 'green' | 'yellow'
-export const headerNetStatusColor = ({ onlineStatus }: { onlineStatus: OnlineStatus }) =>
-  onlineStatus === OnlineStatus.ON ? 'green' : 'yellow'
+export type HeaderNetStatusColor = 'green' | 'yellow' | 'red'
+export const headerNetStatusColor = ({
+  onlineStatus,
+  clientStatus
+}: {
+  onlineStatus: OnlineStatus
+  clientStatus: OnlineStatus
+}): HeaderNetStatusColor => {
+  if (onlineStatus === OnlineStatus.OFF) return 'red'
+  if (clientStatus === OnlineStatus.OFF) return 'yellow'
+  return 'green'
+}
 
-export const isClientOnline = (midgardStatus: OnlineStatus, thorchainStatus: OnlineStatus) =>
-  midgardStatus === OnlineStatus.ON && thorchainStatus === OnlineStatus.ON
+export const appOnlineStatusColor = ({
+  onlineStatus,
+  midgardStatus,
+  thorchainStatus
+}: {
+  onlineStatus: OnlineStatus
+  midgardStatus: OnlineStatus
+  thorchainStatus: OnlineStatus
+}): HeaderNetStatusColor => {
+  if (onlineStatus === OnlineStatus.OFF) return 'red'
+  if (midgardStatus === OnlineStatus.OFF || thorchainStatus === OnlineStatus.OFF) return 'yellow'
+  return 'green'
+}

@@ -56,10 +56,6 @@ export const HeaderNetStatus: React.FC<Props> = (props): JSX.Element => {
     )
   }, [midgardUrlRD])
 
-  const { onlineStatus$ } = useAppContext()
-  const onlineStatus = useObservableState<OnlineStatus>(onlineStatus$, OnlineStatus.OFF)
-  const onlineStatusColor = onlineStatus === OnlineStatus.ON ? 'green' : 'red'
-
   const prevMidgardStatus = useRef<OnlineStatus>(OnlineStatus.OFF)
   const midgardStatus: OnlineStatus = useMemo(
     () =>
@@ -102,6 +98,14 @@ export const HeaderNetStatus: React.FC<Props> = (props): JSX.Element => {
     [mimirStatusRD]
   )
 
+  const { onlineStatus$ } = useAppContext()
+  const onlineStatus = useObservableState<OnlineStatus>(onlineStatus$, OnlineStatus.OFF)
+  const appOnlineStatusColor = useMemo(() => {
+    if (onlineStatus === OnlineStatus.OFF) return 'red'
+    if (midgardStatus === OnlineStatus.OFF || thorchainStatus === OnlineStatus.OFF) return 'yellow'
+    return 'green'
+  }, [midgardStatus, onlineStatus, thorchainStatus])
+
   const menuItems = useMemo((): MenuItem[] => {
     const notConnectedTxt = intl.formatMessage({ id: 'setting.notconnected' })
     return [
@@ -111,10 +115,11 @@ export const HeaderNetStatus: React.FC<Props> = (props): JSX.Element => {
         url: `${midgardUrl}/v2/doc`,
         subheadline: headerNetStatusSubheadline({
           url: O.some(midgardUrl),
-          onlineStatus: midgardStatus,
+          onlineStatus: onlineStatus,
+          clientStatus: midgardStatus,
           notConnectedTxt
         }),
-        color: headerNetStatusColor({ onlineStatus: midgardStatus })
+        color: headerNetStatusColor({ onlineStatus: onlineStatus, clientStatus: midgardStatus })
       },
       {
         key: 'thorchain',
@@ -122,13 +127,14 @@ export const HeaderNetStatus: React.FC<Props> = (props): JSX.Element => {
         url: `${thorchainUrl}/thorchain/doc/`,
         subheadline: headerNetStatusSubheadline({
           url: O.some(thorchainUrl),
-          onlineStatus: thorchainStatus,
+          onlineStatus: onlineStatus,
+          clientStatus: thorchainStatus,
           notConnectedTxt
         }),
-        color: headerNetStatusColor({ onlineStatus: thorchainStatus })
+        color: headerNetStatusColor({ onlineStatus: onlineStatus, clientStatus: thorchainStatus })
       }
     ]
-  }, [intl, midgardStatus, midgardUrl, thorchainStatus, thorchainUrl])
+  }, [intl, midgardStatus, midgardUrl, onlineStatus, thorchainStatus, thorchainUrl])
 
   const desktopMenu = useMemo(() => {
     return (
@@ -180,7 +186,7 @@ export const HeaderNetStatus: React.FC<Props> = (props): JSX.Element => {
             {/* eslint-disable-next-line jsx-a11y/anchor-is-valid */}
             <a className="ant-dropdown-link" onClick={(e) => e.preventDefault()}>
               <Row justify="space-between" align="middle">
-                <ConnectionStatus color={onlineStatusColor} />
+                <ConnectionStatus color={appOnlineStatusColor} />
                 <DownIcon />
               </Row>
             </a>
