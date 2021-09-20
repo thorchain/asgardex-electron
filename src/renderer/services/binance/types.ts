@@ -8,7 +8,7 @@ import * as Rx from 'rxjs'
 import { LedgerBNBTxParams, Network } from '../../../shared/api/types'
 import { LiveData } from '../../helpers/rx/liveData'
 import * as C from '../clients'
-import { ApiError, LedgerAddressLD, LedgerTxHashLD } from '../wallet/types'
+import { ApiError, LedgerAddressLD, LedgerTxHashLD, WalletType } from '../wallet/types'
 
 export type Client$ = C.Client$<Client>
 
@@ -47,6 +47,8 @@ export type TxWithStateRD = RD.RemoteData<ApiError, TxWithState>
 export type TxWithStateLD = LiveData<ApiError, TxWithState>
 
 export type SendTxParams = {
+  walletType: WalletType
+  sender?: Address
   recipient: Address
   amount: BaseAmount
   asset: Asset
