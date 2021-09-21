@@ -15,7 +15,7 @@ import { SendFormBNB } from '../../../components/wallet/txs/send/'
 import { useBinanceContext } from '../../../contexts/BinanceContext'
 import { useChainContext } from '../../../contexts/ChainContext'
 import { liveData } from '../../../helpers/rx/liveData'
-import { getWalletBalanceByAddress } from '../../../helpers/walletHelper'
+import { getWalletBalanceByAddressAndAsset } from '../../../helpers/walletHelper'
 import { useSubscriptionState } from '../../../hooks/useSubscriptionState'
 import { useValidateAddress } from '../../../hooks/useValidateAddress'
 import { INITIAL_SEND_STATE } from '../../../services/chain/const'
@@ -45,7 +45,10 @@ export const SendViewBNB: React.FC<Props> = (props): JSX.Element => {
   const intl = useIntl()
   const history = useHistory()
 
-  const oWalletBalance = useMemo(() => getWalletBalanceByAddress(oBalances, walletAddress), [oBalances, walletAddress])
+  const oWalletBalance = useMemo(
+    () => getWalletBalanceByAddressAndAsset(oBalances, walletAddress, asset),
+    [asset, oBalances, walletAddress]
+  )
 
   const { transfer$ } = useChainContext()
 
