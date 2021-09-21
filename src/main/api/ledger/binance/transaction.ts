@@ -37,8 +37,7 @@ export const send = async ({
     const app = new LedgerApp(transport)
     const client = new Client({ network: clientNetwork })
 
-    const response = await app.showAddress(prefix, derivePath)
-    console.log(response)
+    await app.showAddress(prefix, derivePath)
     const bncClient = client.getBncClient()
     await bncClient.initChain()
 
@@ -65,8 +64,12 @@ export const send = async ({
       memo
     )
 
-    console.log(result)
-
+    if (result.length === 0 || result[0].hash === undefined) {
+      return E.left({
+        errorId: LedgerErrorId.INVALID_RESPONSE,
+        msg: `Binance client sent to send transaction`
+      })
+    }
     const txhash = result[0]['hash']
 
     if (!txhash) {
