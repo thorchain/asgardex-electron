@@ -21,7 +21,7 @@ import * as appRoutes from '../../routes/app'
 import * as poolsRoutes from '../../routes/pools'
 import * as walletRoutes from '../../routes/wallet'
 import { InboundAddressRD, PriceRD, SelectedPricePoolAsset } from '../../services/midgard/types'
-import { MimirHaltRD } from '../../services/thorchain/types'
+import { MimirRD } from '../../services/thorchain/types'
 import { KeystoreState } from '../../services/wallet/types'
 import { isLocked } from '../../services/wallet/util'
 import { PricePoolAsset, PricePoolAssets, PricePools } from '../../views/pools/Pools.types'
@@ -58,7 +58,7 @@ type Props = {
   reloadVolume24Price: FP.Lazy<void>
   selectedPricePoolAsset: SelectedPricePoolAsset
   inboundAddresses: InboundAddressRD
-  mimirHalt: MimirHaltRD
+  mimir: MimirRD
   midgardUrl: RD.RemoteData<Error, string>
   thorchainUrl: string
 }
@@ -70,7 +70,7 @@ export const HeaderComponent: React.FC<Props> = (props): JSX.Element => {
     pricePools: oPricePools,
     runePrice: runePriceRD,
     inboundAddresses: inboundAddressRD,
-    mimirHalt: mimirHaltRD,
+    mimir: mimirRD,
     reloadRunePrice,
     volume24Price: volume24PriceRD,
     reloadVolume24Price,
@@ -235,12 +235,12 @@ export const HeaderComponent: React.FC<Props> = (props): JSX.Element => {
       <HeaderNetStatus
         isDesktopView={isDesktopView}
         midgardStatus={inboundAddressRD}
-        mimirStatus={mimirHaltRD}
+        mimirStatus={mimirRD}
         midgardUrl={midgardUrl}
         thorchainUrl={thorchainUrl}
       />
     ),
-    [inboundAddressRD, isDesktopView, midgardUrl, mimirHaltRD, thorchainUrl]
+    [inboundAddressRD, isDesktopView, midgardUrl, mimirRD, thorchainUrl]
   )
 
   const iconStyle = { fontSize: '1.5em', marginRight: '20px' }
