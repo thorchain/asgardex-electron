@@ -1,6 +1,6 @@
 import LedgerApp from '@binance-chain/javascript-sdk/lib/ledger/ledger-app'
 import Transport from '@ledgerhq/hw-transport'
-import { Client, getDerivePath, getPrefix } from '@xchainjs/xchain-binance'
+import { Client, getDerivePath } from '@xchainjs/xchain-binance'
 import { Address, TxHash } from '@xchainjs/xchain-client'
 import { Asset, AssetBNB, BaseAmount, baseToAsset } from '@xchainjs/xchain-util'
 import * as E from 'fp-ts/lib/Either'
@@ -31,13 +31,11 @@ export const send = async ({
 }): Promise<E.Either<LedgerError, TxHash>> => {
   try {
     const clientNetwork = toClientNetwork(network)
-    const prefix = getPrefix(clientNetwork)
     const derivePath = getDerivePath(0)
 
     const app = new LedgerApp(transport)
     const client = new Client({ network: clientNetwork })
 
-    await app.showAddress(prefix, derivePath)
     const bncClient = client.getBncClient()
     await bncClient.initChain()
 
