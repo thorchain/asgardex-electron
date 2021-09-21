@@ -6,8 +6,8 @@ import { useObservableState } from 'observable-hooks'
 
 import { getClientUrl } from '../../../shared/thorchain/client'
 import { useMidgardContext } from '../../contexts/MidgardContext'
+import { useThorchainContext } from '../../contexts/ThorchainContext'
 import { useWalletContext } from '../../contexts/WalletContext'
-import { useMimirHalt } from '../../hooks/useMimirHalt'
 import { useNetwork } from '../../hooks/useNetwork'
 import { usePricePools } from '../../hooks/usePricePools'
 import { useRunePrice } from '../../hooks/useRunePrice'
@@ -17,9 +17,10 @@ import { HeaderComponent } from './HeaderComponent'
 
 export const Header: React.FC = (): JSX.Element => {
   const { keystoreService } = useWalletContext()
-  const { mimirHaltRD } = useMimirHalt()
+  const { mimir$ } = useThorchainContext()
   const { lock } = keystoreService
   const keystore = useObservableState(keystoreService.keystore$, O.none)
+  const mimir = useObservableState(mimir$, RD.initial)
   const { service: midgardService } = useMidgardContext()
   const {
     pools: { setSelectedPricePoolAsset: setSelectedPricePool, selectedPricePoolAsset$, inboundAddressesShared$ },
@@ -53,7 +54,7 @@ export const Header: React.FC = (): JSX.Element => {
       reloadVolume24Price={reloadVolume24Price}
       selectedPricePoolAsset={oSelectedPricePoolAsset}
       inboundAddresses={inboundAddresses}
-      mimirHalt={mimirHaltRD}
+      mimir={mimir}
       midgardUrl={midgardUrlRD}
       thorchainUrl={thorchainUrl}
     />

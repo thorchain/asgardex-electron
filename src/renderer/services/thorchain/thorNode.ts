@@ -199,10 +199,9 @@ const { stream$: reloadMimir$, trigger: reloadMimir } = triggerStream()
 const mimirInterval$ = Rx.timer(0 /* no delay for first value */, 5 * 60 * 1000 /* others are delayed by 5 min  */)
 
 const mimir$: MimirLD = FP.pipe(
-  Rx.combineLatest([reloadMimir$, mimirInterval$]),
+  Rx.combineLatest([reloadMimir$, mimirInterval$, network$]),
   RxOp.debounceTime(300),
-  RxOp.switchMap(() => network$),
-  RxOp.switchMap((network) => thornodeApiUrl$(network)),
+  RxOp.switchMap(([, , network]) => thornodeApiUrl$(network)),
   // ApiError -> Error
   liveData.mapLeft(({ msg }) => Error(msg)),
   liveData.chain((url) =>
@@ -214,12 +213,11 @@ const mimir$: MimirLD = FP.pipe(
         E.mapLeft((_: t.Errors) => Error(`Failed loading mimir ${PathReporter.report(result)}`))(result)
       ),
       RxOp.map(RD.fromEither),
+      RxOp.catchError((e) => Rx.of(RD.failure(Error(`Failed loading mimir: ${JSON.stringify(e)}`)))),
       RxOp.startWith(RD.pending)
     )
   ),
-  // Cache results before catching errors in other case we will cache error only in case of any error
-  RxOp.shareReplay(1),
-  RxOp.catchError((e) => Rx.of(RD.failure(Error(`Failed loading mimir: ${JSON.stringify(e)}`))))
+  RxOp.shareReplay(1)
 )
 
 export { getNodeInfo$, reloadNodesInfo, mimir$, reloadMimir, getLiquidityProvider, reloadLiquidityProviders }

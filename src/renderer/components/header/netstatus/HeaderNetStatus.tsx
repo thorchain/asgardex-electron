@@ -11,7 +11,7 @@ import { ReactComponent as DownIcon } from '../../../assets/svg/icon-down.svg'
 import { useAppContext } from '../../../contexts/AppContext'
 import { OnlineStatus } from '../../../services/app/types'
 import { InboundAddressRD } from '../../../services/midgard/types'
-import { MimirHaltRD } from '../../../services/thorchain/types'
+import { MimirRD } from '../../../services/thorchain/types'
 import { ConnectionStatus } from '../../shared/icons/ConnectionStatus'
 import { Menu } from '../../shared/menu/Menu'
 import { headerNetStatusSubheadline, headerNetStatusColor, HeaderNetStatusColor } from '../Header.util'
@@ -29,7 +29,7 @@ type MenuItem = {
 type Props = {
   isDesktopView: boolean
   midgardStatus: InboundAddressRD
-  mimirStatus: MimirHaltRD
+  mimirStatus: MimirRD
   midgardUrl: RD.RemoteData<Error, string>
   thorchainUrl: string
 }
