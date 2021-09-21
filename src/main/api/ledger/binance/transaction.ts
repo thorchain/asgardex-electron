@@ -52,7 +52,7 @@ export const send = async ({
     if (!sender) {
       return E.left({
         errorId: LedgerErrorId.GET_ADDRESS_FAILED,
-        msg: `Getting sender address failed`
+        msg: `Getting sender address using Ledger failed`
       })
     }
 
@@ -60,14 +60,14 @@ export const send = async ({
       sender,
       recipient,
       baseToAsset(amount).amount().toString(),
-      asset ? asset.symbol : AssetBNB.symbol,
+      asset?.symbol ?? AssetBNB.symbol,
       memo
     )
 
-    if (result.length === 0 || result[0].hash === undefined) {
+    if (result.length === 0 || !result[0].hash) {
       return E.left({
         errorId: LedgerErrorId.INVALID_RESPONSE,
-        msg: `Binance client failed to send transaction`
+        msg: `Binance client failed to send ${asset?.symbol ?? AssetBNB.symbol} transaction using Ledger`
       })
     }
     const txhash = result[0]['hash']
@@ -75,7 +75,7 @@ export const send = async ({
     if (!txhash) {
       return E.left({
         errorId: LedgerErrorId.INVALID_RESPONSE,
-        msg: `Post request to send 'MsgSend' failed`
+        msg: `Post request to send ${asset?.symbol ?? AssetBNB.symbol} transaction by using Ledger failed`
       })
     }
 

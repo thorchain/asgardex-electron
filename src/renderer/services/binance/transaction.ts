@@ -1,6 +1,6 @@
 import * as RD from '@devexperts/remote-data-ts'
 import { TxHash } from '@xchainjs/xchain-client'
-import { BNBChain } from '@xchainjs/xchain-util'
+import { AssetBNB, BNBChain } from '@xchainjs/xchain-util'
 import * as E from 'fp-ts/lib/Either'
 import * as FP from 'fp-ts/lib/function'
 import * as Rx from 'rxjs'
@@ -24,7 +24,7 @@ export const createTransactionService = (client$: Client$, network$: Network$): 
       network,
       asset: params.asset,
       amount: params.amount,
-      sender: params.sender ? params.sender : '',
+      sender: params.sender,
       recipient: params.recipient,
       memo: params.memo
     }
@@ -39,7 +39,7 @@ export const createTransactionService = (client$: Client$, network$: Network$): 
               Rx.of(
                 RD.failure({
                   errorId: ErrorId.SEND_LEDGER_TX,
-                  msg: `Sending Ledger BNB tx failed. (${msg})`
+                  msg: `Sending Ledger ${sendLedgerTxParams.asset?.symbol ?? AssetBNB.symbol} tx failed. (${msg})`
                 })
               ),
             (txHash) => Rx.of(RD.success(txHash))
