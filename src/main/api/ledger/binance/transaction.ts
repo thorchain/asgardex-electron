@@ -67,7 +67,7 @@ export const send = async ({
     if (result.length === 0 || result[0].hash === undefined) {
       return E.left({
         errorId: LedgerErrorId.INVALID_RESPONSE,
-        msg: `Binance client sent to send transaction`
+        msg: `Binance client failed to send transaction`
       })
     }
     const txhash = result[0]['hash']
