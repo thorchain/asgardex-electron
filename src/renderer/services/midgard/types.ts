@@ -71,6 +71,9 @@ export type PoolsState = {
   poolsData: PoolsDataMap
   pricePools: O.Option<PricePools>
 }
+
+export type InboundAddressRD = RD.RemoteData<Error, InboundAddresses>
+
 export type PoolsStateRD = RD.RemoteData<Error, PoolsState>
 export type PoolsStateLD = LiveData<Error, PoolsState>
 
@@ -206,6 +209,7 @@ export type PoolsService = {
   gasRateByChain$: (chain: Chain) => GasRateLD
   reloadGasRates: FP.Lazy<void>
   haltedChains$: HaltedChainsLD
+  inboundAddressesShared$: InboundAddressesLD
 }
 
 export type PoolShareType = DepositType | 'all'

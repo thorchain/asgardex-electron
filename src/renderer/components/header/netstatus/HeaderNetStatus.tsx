@@ -1,6 +1,8 @@
-import React, { useMemo } from 'react'
+import React, { useMemo, useRef } from 'react'
 
+import * as RD from '@devexperts/remote-data-ts'
 import { Dropdown, Row, Col } from 'antd'
+import * as FP from 'fp-ts/function'
 import * as O from 'fp-ts/lib/Option'
 import { useObservableState } from 'observable-hooks'
 import { useIntl } from 'react-intl'
@@ -8,6 +10,8 @@ import { useIntl } from 'react-intl'
 import { ReactComponent as DownIcon } from '../../../assets/svg/icon-down.svg'
 import { useAppContext } from '../../../contexts/AppContext'
 import { OnlineStatus } from '../../../services/app/types'
+import { InboundAddressRD } from '../../../services/midgard/types'
+import { MimirHaltRD } from '../../../services/thorchain/types'
 import { ConnectionStatus } from '../../shared/icons/ConnectionStatus'
 import { Menu } from '../../shared/menu/Menu'
 import { headerNetStatusSubheadline, headerNetStatusColor, HeaderNetStatusColor } from '../Header.util'
@@ -17,28 +21,90 @@ import * as Styled from './HeaderNetStatus.styles'
 type MenuItem = {
   key: string
   headline: string
+  url: string
   subheadline: string
   color: HeaderNetStatusColor
 }
 
 type Props = {
   isDesktopView: boolean
-  midgardUrl: O.Option<string>
-  binanceUrl: O.Option<string>
-  bitcoinUrl: O.Option<string>
-  thorchainUrl: O.Option<string>
-  litecoinUrl: O.Option<string>
-  ethereumUrl: O.Option<string>
-  bitcoinCashUrl: O.Option<string>
+  midgardStatus: InboundAddressRD
+  mimirStatus: MimirHaltRD
+  midgardUrl: RD.RemoteData<Error, string>
+  thorchainUrl: string
 }
 
 export const HeaderNetStatus: React.FC<Props> = (props): JSX.Element => {
-  const { isDesktopView, midgardUrl, binanceUrl, bitcoinUrl, thorchainUrl, litecoinUrl, ethereumUrl, bitcoinCashUrl } =
-    props
+  const {
+    isDesktopView,
+    midgardStatus: midgardStatusRD,
+    mimirStatus: mimirStatusRD,
+    midgardUrl: midgardUrlRD,
+    thorchainUrl
+  } = props
+  const intl = useIntl()
+
+  const midgardUrl = useMemo(() => {
+    return FP.pipe(
+      midgardUrlRD,
+      RD.fold(
+        () => '',
+        () => '',
+        () => '',
+        (url) => url
+      )
+    )
+  }, [midgardUrlRD])
+
+  const prevMidgardStatus = useRef<OnlineStatus>(OnlineStatus.OFF)
+  const midgardStatus: OnlineStatus = useMemo(
+    () =>
+      FP.pipe(
+        midgardStatusRD,
+        RD.fold(
+          () => prevMidgardStatus.current,
+          () => prevMidgardStatus.current,
+          () => {
+            prevMidgardStatus.current = OnlineStatus.OFF
+            return prevMidgardStatus.current
+          },
+          () => {
+            prevMidgardStatus.current = OnlineStatus.ON
+            return prevMidgardStatus.current
+          }
+        )
+      ),
+    [midgardStatusRD]
+  )
+
+  const prevThorchainStatus = useRef<OnlineStatus>(OnlineStatus.OFF)
+  const thorchainStatus: OnlineStatus = useMemo(
+    () =>
+      FP.pipe(
+        mimirStatusRD,
+        RD.fold(
+          () => prevThorchainStatus.current,
+          () => prevThorchainStatus.current,
+          () => {
+            prevThorchainStatus.current = OnlineStatus.OFF
+            return prevThorchainStatus.current
+          },
+          () => {
+            prevThorchainStatus.current = OnlineStatus.ON
+            return prevThorchainStatus.current
+          }
+        )
+      ),
+    [mimirStatusRD]
+  )
+
   const { onlineStatus$ } = useAppContext()
   const onlineStatus = useObservableState<OnlineStatus>(onlineStatus$, OnlineStatus.OFF)
-  const intl = useIntl()
-  const onlineStatusColor = onlineStatus === OnlineStatus.ON ? 'green' : 'red'
+  const appOnlineStatusColor = useMemo(() => {
+    if (onlineStatus === OnlineStatus.OFF) return 'red'
+    if (midgardStatus === OnlineStatus.OFF || thorchainStatus === OnlineStatus.OFF) return 'yellow'
+    return 'green'
+  }, [midgardStatus, onlineStatus, thorchainStatus])
 
   const menuItems = useMemo((): MenuItem[] => {
     const notConnectedTxt = intl.formatMessage({ id: 'setting.notconnected' })
@@ -46,55 +112,37 @@ export const HeaderNetStatus: React.FC<Props> = (props): JSX.Element => {
       {
         key: 'midgard',
         headline: 'Midgard API',
-        subheadline: headerNetStatusSubheadline({ url: midgardUrl, onlineStatus, notConnectedTxt }),
-        color: headerNetStatusColor({ url: midgardUrl, onlineStatus })
+        url: `${midgardUrl}/v2/doc`,
+        subheadline: headerNetStatusSubheadline({
+          url: O.some(midgardUrl),
+          onlineStatus: onlineStatus,
+          clientStatus: midgardStatus,
+          notConnectedTxt
+        }),
+        color: headerNetStatusColor({ onlineStatus: onlineStatus, clientStatus: midgardStatus })
       },
       {
         key: 'thorchain',
-        headline: 'Thorchain',
-        subheadline: headerNetStatusSubheadline({ url: thorchainUrl, onlineStatus, notConnectedTxt }),
-        color: headerNetStatusColor({ url: thorchainUrl, onlineStatus })
-      },
-      {
-        key: 'bitcoin',
-        headline: 'Bitcoin',
-        subheadline: headerNetStatusSubheadline({ url: bitcoinUrl, onlineStatus, notConnectedTxt }),
-        color: headerNetStatusColor({ url: bitcoinUrl, onlineStatus })
-      },
-      {
-        key: 'binance',
-        headline: 'Binance Chain',
-        subheadline: headerNetStatusSubheadline({ url: binanceUrl, onlineStatus, notConnectedTxt }),
-        color: headerNetStatusColor({ url: binanceUrl, onlineStatus })
-      },
-      {
-        key: 'litecoin',
-        headline: 'Litecoin Chain',
-        subheadline: headerNetStatusSubheadline({ url: litecoinUrl, onlineStatus, notConnectedTxt }),
-        color: headerNetStatusColor({ url: litecoinUrl, onlineStatus })
-      },
-      {
-        key: 'ethereum',
-        headline: 'ethereum',
-        subheadline: headerNetStatusSubheadline({ url: ethereumUrl, onlineStatus, notConnectedTxt }),
-        color: headerNetStatusColor({ url: ethereumUrl, onlineStatus })
-      },
-      {
-        key: 'bitcoin cash',
-        headline: 'bitcoin cash',
-        subheadline: headerNetStatusSubheadline({ url: bitcoinCashUrl, onlineStatus, notConnectedTxt }),
-        color: headerNetStatusColor({ url: bitcoinCashUrl, onlineStatus })
+        headline: 'Thorchain API',
+        url: `${thorchainUrl}/thorchain/doc/`,
+        subheadline: headerNetStatusSubheadline({
+          url: O.some(thorchainUrl),
+          onlineStatus: onlineStatus,
+          clientStatus: thorchainStatus,
+          notConnectedTxt
+        }),
+        color: headerNetStatusColor({ onlineStatus: onlineStatus, clientStatus: thorchainStatus })
       }
     ]
-  }, [intl, midgardUrl, onlineStatus, thorchainUrl, bitcoinUrl, binanceUrl, litecoinUrl, ethereumUrl, bitcoinCashUrl])
+  }, [intl, midgardStatus, midgardUrl, onlineStatus, thorchainStatus, thorchainUrl])
 
   const desktopMenu = useMemo(() => {
     return (
       <Menu>
         {menuItems.map((item) => {
-          const { headline, key, subheadline, color } = item
+          const { headline, key, subheadline, color, url } = item
           return (
-            <Menu.Item key={key}>
+            <Menu.Item key={key} onClick={() => window.apiUrl.openExternal(url)}>
               <Row align="middle">
                 <Col span={4}>
                   <ConnectionStatus color={color} />
@@ -138,7 +186,7 @@ export const HeaderNetStatus: React.FC<Props> = (props): JSX.Element => {
             {/* eslint-disable-next-line jsx-a11y/anchor-is-valid */}
             <a className="ant-dropdown-link" onClick={(e) => e.preventDefault()}>
               <Row justify="space-between" align="middle">
-                <ConnectionStatus color={onlineStatusColor} />
+                <ConnectionStatus color={appOnlineStatusColor} />
                 <DownIcon />
               </Row>
             </a>

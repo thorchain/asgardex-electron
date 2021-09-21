@@ -1,30 +1,23 @@
 import React from 'react'
 
+import * as RD from '@devexperts/remote-data-ts'
 import { storiesOf } from '@storybook/react'
-import * as O from 'fp-ts/lib/Option'
 
 import { HeaderNetStatus } from './HeaderNetStatus'
 
-const binanceUrl = O.some('https://testnet-dex.binance.org/api/v1')
-const midgardUrl = O.some('https://54.0.0.27')
-const bitcoinUrl = O.some('https://blockstream.info')
-const thorchainUrl = O.some('https://thorchain.net')
-const litecoinUrl = O.some('https://blockstream.info')
-const ethereumUrl = O.some('https://etherscan.io')
-const bitcoinCashUrl = O.some('https://www.blockchain.com')
+const inboundAddressRD = RD.initial
+const mimirHaltRD = RD.initial
+const midgardUrl = RD.initial
 
 storiesOf('Components/HeaderNetStatus', module)
   .add('default', () => {
     return (
       <HeaderNetStatus
         isDesktopView={true}
-        binanceUrl={binanceUrl}
+        midgardStatus={inboundAddressRD}
+        mimirStatus={mimirHaltRD}
         midgardUrl={midgardUrl}
-        bitcoinUrl={bitcoinUrl}
-        thorchainUrl={thorchainUrl}
-        litecoinUrl={litecoinUrl}
-        ethereumUrl={ethereumUrl}
-        bitcoinCashUrl={bitcoinCashUrl}
+        thorchainUrl={'https://thorchain.info'}
       />
     )
   })
@@ -32,13 +25,10 @@ storiesOf('Components/HeaderNetStatus', module)
     return (
       <HeaderNetStatus
         isDesktopView={true}
-        binanceUrl={O.none}
-        midgardUrl={O.none}
-        bitcoinUrl={O.none}
-        thorchainUrl={O.none}
-        litecoinUrl={O.none}
-        ethereumUrl={O.none}
-        bitcoinCashUrl={O.none}
+        midgardStatus={inboundAddressRD}
+        mimirStatus={mimirHaltRD}
+        midgardUrl={midgardUrl}
+        thorchainUrl={'https://thorchain.info'}
       />
     )
   })
@@ -46,13 +36,10 @@ storiesOf('Components/HeaderNetStatus', module)
     return (
       <HeaderNetStatus
         isDesktopView={false}
-        binanceUrl={binanceUrl}
+        midgardStatus={inboundAddressRD}
+        mimirStatus={mimirHaltRD}
         midgardUrl={midgardUrl}
-        bitcoinUrl={bitcoinUrl}
-        thorchainUrl={thorchainUrl}
-        litecoinUrl={litecoinUrl}
-        ethereumUrl={ethereumUrl}
-        bitcoinCashUrl={bitcoinCashUrl}
+        thorchainUrl={'thorchain.info'}
       />
     )
   })
@@ -60,13 +47,10 @@ storiesOf('Components/HeaderNetStatus', module)
     return (
       <HeaderNetStatus
         isDesktopView={false}
-        binanceUrl={O.none}
-        midgardUrl={O.none}
-        bitcoinUrl={O.none}
-        thorchainUrl={O.none}
-        litecoinUrl={O.none}
-        ethereumUrl={ethereumUrl}
-        bitcoinCashUrl={bitcoinCashUrl}
+        midgardStatus={inboundAddressRD}
+        mimirStatus={mimirHaltRD}
+        midgardUrl={midgardUrl}
+        thorchainUrl={'thorchain.info'}
       />
     )
   })

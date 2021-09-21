@@ -25,7 +25,11 @@ const EXTERNALS_WHITELIST = [
   'www.blockchain.com',
   'testnet.asgard.exchange',
   'app.asgard.exchange',
-  'viewblock.io'
+  'viewblock.io',
+  'midgard.thorchain.info',
+  'testnet.midgard.thorchain.info',
+  'thornode.thorchain.info',
+  'testnet.thornode.thorchain.info'
 ]
 
 const openExternal = (target: string) => {

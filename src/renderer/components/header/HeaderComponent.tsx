@@ -1,5 +1,6 @@
 import React, { useMemo, useState, useCallback, useRef } from 'react'
 
+import * as RD from '@devexperts/remote-data-ts'
 import { Row, Col, Tabs, Grid, Space } from 'antd'
 import * as FP from 'fp-ts/function'
 import * as A from 'fp-ts/lib/Array'
@@ -19,7 +20,8 @@ import { useThemeContext } from '../../contexts/ThemeContext'
 import * as appRoutes from '../../routes/app'
 import * as poolsRoutes from '../../routes/pools'
 import * as walletRoutes from '../../routes/wallet'
-import { PriceRD, SelectedPricePoolAsset } from '../../services/midgard/types'
+import { InboundAddressRD, PriceRD, SelectedPricePoolAsset } from '../../services/midgard/types'
+import { MimirHaltRD } from '../../services/thorchain/types'
 import { KeystoreState } from '../../services/wallet/types'
 import { isLocked } from '../../services/wallet/util'
 import { PricePoolAsset, PricePoolAssets, PricePools } from '../../views/pools/Pools.types'
@@ -55,13 +57,10 @@ type Props = {
   volume24Price: PriceRD
   reloadVolume24Price: FP.Lazy<void>
   selectedPricePoolAsset: SelectedPricePoolAsset
-  midgardUrl: O.Option<string>
-  binanceUrl: O.Option<string>
-  bitcoinUrl: O.Option<string>
-  thorchainUrl: O.Option<string>
-  litecoinUrl: O.Option<string>
-  ethereumUrl: O.Option<string>
-  bitcoinCashUrl: O.Option<string>
+  inboundAddresses: InboundAddressRD
+  mimirHalt: MimirHaltRD
+  midgardUrl: RD.RemoteData<Error, string>
+  thorchainUrl: string
 }
 
 export const HeaderComponent: React.FC<Props> = (props): JSX.Element => {
@@ -70,6 +69,8 @@ export const HeaderComponent: React.FC<Props> = (props): JSX.Element => {
     network,
     pricePools: oPricePools,
     runePrice: runePriceRD,
+    inboundAddresses: inboundAddressRD,
+    mimirHalt: mimirHaltRD,
     reloadRunePrice,
     volume24Price: volume24PriceRD,
     reloadVolume24Price,
@@ -77,12 +78,7 @@ export const HeaderComponent: React.FC<Props> = (props): JSX.Element => {
     lockHandler,
     setSelectedPricePool,
     midgardUrl,
-    binanceUrl,
-    bitcoinUrl,
-    thorchainUrl,
-    litecoinUrl,
-    ethereumUrl,
-    bitcoinCashUrl
+    thorchainUrl
   } = props
 
   const intl = useIntl()
@@ -238,16 +234,13 @@ export const HeaderComponent: React.FC<Props> = (props): JSX.Element => {
     () => (
       <HeaderNetStatus
         isDesktopView={isDesktopView}
+        midgardStatus={inboundAddressRD}
+        mimirStatus={mimirHaltRD}
         midgardUrl={midgardUrl}
-        binanceUrl={binanceUrl}
-        bitcoinUrl={bitcoinUrl}
         thorchainUrl={thorchainUrl}
-        litecoinUrl={litecoinUrl}
-        ethereumUrl={ethereumUrl}
-        bitcoinCashUrl={bitcoinCashUrl}
       />
     ),
-    [binanceUrl, bitcoinUrl, isDesktopView, midgardUrl, thorchainUrl, litecoinUrl, ethereumUrl, bitcoinCashUrl]
+    [inboundAddressRD, isDesktopView, midgardUrl, mimirHaltRD, thorchainUrl]
   )
 
   const iconStyle = { fontSize: '1.5em', marginRight: '20px' }
