@@ -10,7 +10,7 @@ import { toClientNetwork } from '../../../../shared/utils/client'
 import { isError } from '../../../../shared/utils/guard'
 
 /**
- * Sends `MsgSend` message using Ledger
+ * Sends Binance tx using Ledger
  */
 export const send = async ({
   transport,
