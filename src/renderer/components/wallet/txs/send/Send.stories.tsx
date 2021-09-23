@@ -3,7 +3,7 @@ import React, { useMemo } from 'react'
 import * as RD from '@devexperts/remote-data-ts'
 import { Story, Meta } from '@storybook/react'
 import { BTC_DECIMAL } from '@xchainjs/xchain-bitcoin'
-import { FeeRates, Fees, FeeType, TxHash } from '@xchainjs/xchain-client'
+import { Address, FeeRates, Fees, FeeType, TxHash } from '@xchainjs/xchain-client'
 import {
   assetAmount,
   AssetBNB,
@@ -123,6 +123,7 @@ const rates: FeeRates = {
 
 const defaultComponentProps = {
   walletType: 'keystore' as WalletType,
+  walletAddress: 'bnb-address' as Address,
   balances,
   balance: bnbAsset,
   feesWithRates: RD.success({ fees, rates }),

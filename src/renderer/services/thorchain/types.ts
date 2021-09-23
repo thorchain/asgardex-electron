@@ -23,6 +23,7 @@ export type FeesService = C.FeesService
 
 export type SendTxParams = {
   walletType: WalletType
+  sender?: string
   recipient: string
   amount: BaseAmount
   asset: Asset

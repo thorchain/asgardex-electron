@@ -19,6 +19,7 @@ import * as O from 'fp-ts/lib/Option'
 import { useIntl } from 'react-intl'
 
 import { Network } from '../../../../../shared/api/types'
+import { isKeystoreWallet, isLedgerWallet } from '../../../../../shared/utils/guard'
 import { ZERO_BASE_AMOUNT } from '../../../../const'
 import { isBnbAsset } from '../../../../helpers/assetHelper'
 import { sequenceTOption } from '../../../../helpers/fpHelpers'
@@ -46,6 +47,7 @@ export type Props = {
   walletType: WalletType
   balances: WalletBalances
   balance: WalletBalance
+  walletAddress: Address
   onSubmit: (p: SendTxParams) => void
   isLoading: boolean
   sendTxStatusMsg: string
@@ -61,6 +63,7 @@ export const SendFormBNB: React.FC<Props> = (props): JSX.Element => {
     walletType,
     balances,
     balance,
+    walletAddress,
     onSubmit,
     isLoading,
     sendTxStatusMsg,
@@ -179,12 +182,13 @@ export const SendFormBNB: React.FC<Props> = (props): JSX.Element => {
 
     onSubmit({
       walletType,
+      sender: walletAddress,
       recipient: form.getFieldValue('recipient'),
       asset: balance.asset,
       amount: amountToSend,
       memo: form.getFieldValue('memo')
     })
-  }, [onSubmit, walletType, form, balance.asset, amountToSend])
+  }, [onSubmit, walletType, walletAddress, form, balance.asset, amountToSend])
 
   const renderPwModal = useMemo(
     () =>
@@ -224,6 +228,12 @@ export const SendFormBNB: React.FC<Props> = (props): JSX.Element => {
 
   const addMaxAmountHandler = useCallback(() => setAmountToSend(maxAmount), [maxAmount])
 
+  const onFinishHandler = useCallback(() => {
+    if (isKeystoreWallet(walletType)) setShowPwModal(true)
+
+    if (isLedgerWallet(walletType)) sendHandler()
+  }, [sendHandler, walletType])
+
   return (
     <>
       <Row>
@@ -234,11 +244,7 @@ export const SendFormBNB: React.FC<Props> = (props): JSX.Element => {
             walletBalances={balances}
             network={network}
           />
-          <Styled.Form
-            form={form}
-            initialValues={{ amount: bn(0) }}
-            onFinish={() => setShowPwModal(true)}
-            labelCol={{ span: 24 }}>
+          <Styled.Form form={form} initialValues={{ amount: bn(0) }} onFinish={onFinishHandler} labelCol={{ span: 24 }}>
             <Styled.SubForm>
               <Styled.CustomLabel size="big">{intl.formatMessage({ id: 'common.address' })}</Styled.CustomLabel>
               <Form.Item rules={[{ required: true, validator: addressValidator }]} name="recipient">

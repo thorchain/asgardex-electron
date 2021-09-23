@@ -36,6 +36,7 @@ describe('shared/io', () => {
         network: 'mainnet',
         asset: AssetBNB,
         amount: baseAmount(10),
+        sender: 'address-abc',
         recipient: 'address-abc',
         memo: 'memo-abc'
       })
@@ -44,6 +45,7 @@ describe('shared/io', () => {
         network: 'mainnet',
         asset: 'BNB.BNB',
         amount: { amount: '10', decimal: 8 },
+        sender: 'address-abc',
         recipient: 'address-abc',
         memo: 'memo-abc'
       })
@@ -54,6 +56,7 @@ describe('shared/io', () => {
         network: 'mainnet',
         asset: 'BNB.BNB',
         amount: { amount: '10', decimal: 8 },
+        sender: 'address-abc',
         recipient: 'address-abc',
         memo: 'memo-abc'
       }

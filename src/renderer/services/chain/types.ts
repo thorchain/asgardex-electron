@@ -83,6 +83,7 @@ export type SendDepositTxParams = {
 export type SendTxParams = {
   walletType: WalletType
   asset: Asset
+  sender?: Address
   recipient: Address
   amount: BaseAmount
   memo: Memo

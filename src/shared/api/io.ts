@@ -76,9 +76,10 @@ export const networkIO = new t.Type(
 export const ipcLedgerSendTxParamsIO = t.type({
   chain: chainIO,
   network: networkIO,
+  sender: t.union([t.string, t.undefined]),
+  recipient: t.string,
   asset: t.union([assetIO, t.undefined]),
   amount: baseAmountIO,
-  recipient: t.string,
   memo: t.union([t.string, t.undefined])
 })
 

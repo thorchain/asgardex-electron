@@ -1,6 +1,7 @@
 import React, { useCallback, useMemo } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
+import { Address } from '@xchainjs/xchain-client'
 import { Asset, BNBChain } from '@xchainjs/xchain-util'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
@@ -14,7 +15,7 @@ import { SendFormBNB } from '../../../components/wallet/txs/send/'
 import { useBinanceContext } from '../../../contexts/BinanceContext'
 import { useChainContext } from '../../../contexts/ChainContext'
 import { liveData } from '../../../helpers/rx/liveData'
-import { getWalletBalanceByAsset } from '../../../helpers/walletHelper'
+import { getWalletBalanceByAddressAndAsset } from '../../../helpers/walletHelper'
 import { useSubscriptionState } from '../../../hooks/useSubscriptionState'
 import { useValidateAddress } from '../../../hooks/useValidateAddress'
 import { INITIAL_SEND_STATE } from '../../../services/chain/const'
@@ -30,6 +31,7 @@ import * as Helper from './SendView.helper'
 
 type Props = {
   walletType: WalletType
+  walletAddress: Address
   asset: Asset
   balances: O.Option<NonEmptyWalletBalances>
   openExplorerTxUrl: OpenExplorerTxUrl
@@ -38,12 +40,15 @@ type Props = {
 }
 
 export const SendViewBNB: React.FC<Props> = (props): JSX.Element => {
-  const { asset, balances: oBalances, openExplorerTxUrl, validatePassword$, network, walletType } = props
+  const { walletAddress, asset, balances: oBalances, openExplorerTxUrl, validatePassword$, network, walletType } = props
 
   const intl = useIntl()
   const history = useHistory()
 
-  const oWalletBalance = useMemo(() => getWalletBalanceByAsset(oBalances, O.some(asset)), [oBalances, asset])
+  const oWalletBalance = useMemo(
+    () => getWalletBalanceByAddressAndAsset(oBalances, walletAddress, asset),
+    [asset, oBalances, walletAddress]
+  )
 
   const { transfer$ } = useChainContext()
 
@@ -96,6 +101,7 @@ export const SendViewBNB: React.FC<Props> = (props): JSX.Element => {
         )}
         balance={walletBalance}
         isLoading={isLoading}
+        walletAddress={walletAddress}
         onSubmit={onSend}
         addressValidation={validateAddress}
         fee={feeRD}
@@ -109,6 +115,7 @@ export const SendViewBNB: React.FC<Props> = (props): JSX.Element => {
       walletType,
       oBalances,
       isLoading,
+      walletAddress,
       onSend,
       validateAddress,
       feeRD,

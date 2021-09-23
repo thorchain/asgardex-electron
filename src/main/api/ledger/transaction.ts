@@ -12,8 +12,10 @@ import * as THOR from './thorchain/transaction'
 export const sendTx = async ({
   chain,
   network,
+  sender,
   recipient,
   amount,
+  asset,
   memo
 }: IPCLedgerSendTxParams): Promise<E.Either<LedgerError, TxHash>> => {
   try {
@@ -24,7 +26,7 @@ export const sendTx = async ({
         res = await THOR.send({ transport, network, recipient, amount, memo })
         break
       case BNBChain:
-        res = await BNB.send()
+        res = await BNB.send({ transport, network, sender, recipient, amount, asset, memo })
         break
       default:
         res = E.left({

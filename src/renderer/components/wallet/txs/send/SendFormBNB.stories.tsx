@@ -34,6 +34,7 @@ const runeBalance: WalletBalance = {
 
 const defaultProps: SendFormBNBProps = {
   walletType: 'keystore',
+  walletAddress: 'bnb-address',
   balances: [bnbBalance, runeBalance],
   balance: bnbBalance,
   onSubmit: ({ recipient, amount, asset, memo }: SendTxParams) =>

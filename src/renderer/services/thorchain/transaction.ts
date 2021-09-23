@@ -102,6 +102,7 @@ export const createTransactionService = (client$: Client$, network$: Network$): 
       network,
       asset: params.asset,
       amount: params.amount,
+      sender: params.sender,
       recipient: params.recipient,
       memo: params.memo
     }

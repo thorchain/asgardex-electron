@@ -1,5 +1,6 @@
 import { BNBChain } from '@xchainjs/xchain-util'
 
+import { network$ } from '../app/service'
 import { balances$, reloadBalances, reloadBalances$, resetReloadBalances, getBalanceByAddress$ } from './balances'
 import { client$, clientState$, address$, explorerUrl$, addressUI$ } from './common'
 import { createFeesService } from './fees'
@@ -7,7 +8,7 @@ import { createLedgerService } from './ledger'
 import { createTransactionService } from './transaction'
 import { subscribeTransfers, miniTickers$ } from './ws'
 
-const { txs$, tx$, txStatus$, subscribeTx, resetTx, txRD$, sendTx } = createTransactionService(client$)
+const { txs$, tx$, txStatus$, subscribeTx, resetTx, txRD$, sendTx } = createTransactionService(client$, network$)
 const { reloadFees, fees$ } = createFeesService({ client$, chain: BNBChain })
 const { ledgerAddress$, retrieveLedgerAddress, removeLedgerAddress, ledgerTxRD$, pushLedgerTx, resetLedgerTx } =
   createLedgerService()
