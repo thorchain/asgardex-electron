@@ -20,6 +20,8 @@ import { PricePoolCurrencyWeights, PricePoolAssets } from './views/pools/Pools.t
 //
 // ERC 20 assets
 //
+
+// ETH.USDT - for testnet only
 export const AssetUSDTERC20: Asset = {
   chain: ETHChain,
   symbol: 'USDT-0xa3910454bf2cb59b8b3a401589a3bacc5ca42306',
@@ -34,8 +36,15 @@ export const AssetXRune: Asset = {
 
 export const AssetXRuneTestnet: Asset = {
   chain: ETHChain,
-  symbol: 'XRUNE-0x0fE3ecd525D16fA09aA1FF177014dE5304c835E2',
+  symbol: 'XRUNE-0x8626db1a4f9f3e1002eeb9a4f3c6d391436ffc23',
   ticker: 'XRUNE'
+}
+
+// ETH.UST
+export const AssetUST: Asset = {
+  chain: ETHChain,
+  symbol: 'UST-0x6cA13a4ab78dd7D657226b155873A04DB929A3A4',
+  ticker: 'UST'
 }
 
 // ETH.THOR - for testnet only
@@ -73,6 +82,7 @@ export const AssetDAIERC20: Asset = {
 export const ERC20Assets = [
   AssetUSDTERC20,
   AssetXRuneTestnet,
+  AssetUST,
   AssetRuneERC20Testnet,
   AssetThorERC20,
   AssetTKN8ERC20,
