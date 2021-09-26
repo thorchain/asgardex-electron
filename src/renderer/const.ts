@@ -18,8 +18,10 @@ import { Network } from '../shared/api/types'
 import { PricePoolCurrencyWeights, PricePoolAssets } from './views/pools/Pools.types'
 
 //
-// ERC 20 assets
+// ERC-20 assets
 //
+
+// ETH.USDT - testnet only
 export const AssetUSDTERC20: Asset = {
   chain: ETHChain,
   symbol: 'USDT-0xa3910454bf2cb59b8b3a401589a3bacc5ca42306',
@@ -34,35 +36,46 @@ export const AssetXRune: Asset = {
 
 export const AssetXRuneTestnet: Asset = {
   chain: ETHChain,
-  symbol: 'XRUNE-0x0fE3ecd525D16fA09aA1FF177014dE5304c835E2',
+  symbol: 'XRUNE-0x8626db1a4f9f3e1002eeb9a4f3c6d391436ffc23',
   ticker: 'XRUNE'
 }
 
-// ETH.THOR - for testnet only
+// ETH.UST - testnet only
+export const AssetUST: Asset = {
+  chain: ETHChain,
+  symbol: 'UST-0x6cA13a4ab78dd7D657226b155873A04DB929A3A4',
+  ticker: 'UST'
+}
+
+// ETH.THOR - testnet only
 export const AssetThorERC20: Asset = {
   chain: ETHChain,
   symbol: 'THOR-0xA0b515c058F127a15Dd3326F490eBF47d215588e',
   ticker: 'THOR'
 }
 
+// TKN8 - random test asset w/ 8 decimal (testnet only)
 export const AssetTKN8ERC20: Asset = {
   chain: ETHChain,
   symbol: 'TKN8-0x242aD49dAcd38aC23caF2ccc118482714206beD4',
   ticker: 'TKN8'
 }
 
+// TKN18 - random test asset w/ 18 decimal (testnet only)
 export const AssetTKN18ERC20: Asset = {
   chain: ETHChain,
   symbol: 'TKN18-0x8E3f9E9b5B26AAaE9d31364d2a8e8a9dd2BE3B82',
   ticker: 'TKN18'
 }
 
+// Wrapped Ether (WETH) - testnet only
 export const AssetWETHERC20: Asset = {
   chain: ETHChain,
   symbol: 'WETH-0xbCA556c912754Bc8E7D4Aad20Ad69a1B1444F42d',
   ticker: 'WETH'
 }
 
+// DAI - testnet only
 export const AssetDAIERC20: Asset = {
   chain: ETHChain,
   symbol: 'DAI-0xad6d458402f60fd3bd25163575031acdce07538d',
@@ -73,6 +86,7 @@ export const AssetDAIERC20: Asset = {
 export const ERC20Assets = [
   AssetUSDTERC20,
   AssetXRuneTestnet,
+  AssetUST,
   AssetRuneERC20Testnet,
   AssetThorERC20,
   AssetTKN8ERC20,
