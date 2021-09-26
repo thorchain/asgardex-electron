@@ -1,4 +1,10 @@
-# 0.4.14 (2021-09-15)
+# 0.4.1-alpha (2021-09-26)
+
+## Fix
+
+- Use latest `xchain-thorchain@0.19.1` to increase `gas` limit to `30m`
+
+# 0.4.0 (2021-09-15)
 
 ## Add
 
