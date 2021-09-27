@@ -9,10 +9,14 @@ import { LedgerError, LedgerErrorId, Network } from '../../../../shared/api/type
 import { toClientNetwork } from '../../../../shared/utils/client'
 import { isError } from '../../../../shared/utils/guard'
 
-export const getAddress = async (transport: Transport, network: Network): Promise<E.Either<LedgerError, Address>> => {
+export const getAddress = async (
+  transport: Transport,
+  network: Network,
+  walletIndex: number
+): Promise<E.Either<LedgerError, Address>> => {
   try {
     const app = new AppBNB(transport)
-    const derive_path = getDerivePath(0)
+    const derive_path = getDerivePath(walletIndex)
     const { pk } = await app.getPublicKey(derive_path)
     const clientNetwork = toClientNetwork(network)
     const prefix = getPrefix(clientNetwork)

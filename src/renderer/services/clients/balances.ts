@@ -74,13 +74,15 @@ export const balances$: ({
   walletType,
   client$,
   trigger$,
-  assets
+  assets,
+  walletIndex
 }: {
   walletType: WalletType
   client$: XChainClient$
   trigger$: Rx.Observable<boolean>
   assets?: Asset[]
-}) => WalletBalancesLD = ({ walletType, client$, trigger$, assets }) =>
+  walletIndex?: number
+}) => WalletBalancesLD = ({ walletType, client$, trigger$, assets, walletIndex }) =>
   Rx.combineLatest([trigger$.pipe(debounceTime(300)), client$]).pipe(
     RxOp.switchMap(([_, oClient]) => {
       return FP.pipe(
@@ -93,7 +95,8 @@ export const balances$: ({
             loadBalances$({
               walletType,
               client,
-              assets
+              assets,
+              walletIndex
             })
         )
       )

@@ -136,7 +136,7 @@ export type BalancesService = {
 }
 
 export type LedgerService = {
-  askLedgerAddress$: (chain: Chain, network: Network) => LedgerAddressLD
+  askLedgerAddress$: (chain: Chain, network: Network, walletIndex?: number) => LedgerAddressLD
   getLedgerAddress$: (chain: Chain, network: Network) => LedgerAddressLD
   removeLedgerAddress: (chain: Chain, network: Network) => void
   dispose: FP.Lazy<void>

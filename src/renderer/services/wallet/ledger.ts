@@ -75,14 +75,14 @@ export const createLedgerService = ({ keystore$ }: { keystore$: KeystoreState$ }
   /**
    * Ask Ledger to get address from it
    */
-  const askLedgerAddress$ = (chain: Chain, network: Network): LedgerAddressLD =>
+  const askLedgerAddress$ = (chain: Chain, network: Network, walletIndex = 0): LedgerAddressLD =>
     FP.pipe(
       // remove address from memory
       removeLedgerAddress(chain, network),
       // set pending
       () => setPendingLedgerAddress(chain, network),
       // ask for ledger address
-      () => Rx.from(window.apiHDWallet.getLedgerAddress({ chain, network })),
+      () => Rx.from(window.apiHDWallet.getLedgerAddress({ chain, network, walletIndex })),
       RxOp.map(RD.fromEither),
       // store address in memory
       RxOp.tap((addressRD: LedgerAddressRD) => setLedgerAddressRD({ chain, addressRD, network })),

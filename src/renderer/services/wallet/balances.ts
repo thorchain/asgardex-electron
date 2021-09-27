@@ -78,7 +78,7 @@ export const createBalancesService = ({
     }
   }
 
-  const getServiceByChain = (chain: Chain, walletType: WalletType): ChainBalancesService => {
+  const getServiceByChain = (chain: Chain, walletType: WalletType, walletIndex?: number): ChainBalancesService => {
     switch (chain) {
       case BNBChain:
         return {
@@ -86,7 +86,7 @@ export const createBalancesService = ({
           resetReloadBalances: BNB.resetReloadBalances,
           balances$: FP.pipe(
             network$,
-            RxOp.switchMap((network) => BNB.balances$(walletType, network))
+            RxOp.switchMap((network) => BNB.balances$(walletType, network, walletIndex))
           ),
           reloadBalances$: BNB.reloadBalances$
         }
@@ -157,8 +157,8 @@ export const createBalancesService = ({
     }
   })
 
-  const getChainBalance$ = (chain: Chain, walletType: WalletType): WalletBalancesLD => {
-    const chainService = getServiceByChain(chain, walletType)
+  const getChainBalance$ = (chain: Chain, walletType: WalletType, walletIndex?: number): WalletBalancesLD => {
+    const chainService = getServiceByChain(chain, walletType, walletIndex)
     const reload$ = FP.pipe(
       chainService.reloadBalances$,
       RxOp.finalize(() => {

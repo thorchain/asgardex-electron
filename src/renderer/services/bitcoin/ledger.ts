@@ -14,7 +14,7 @@ const { get$: ledgerAddress$, set: setLedgerAddressRD } = observableState<Ledger
 
 const retrieveLedgerAddress = (network: Network) =>
   FP.pipe(
-    Rx.from(window.apiHDWallet.getLedgerAddress({ chain: BTCChain, network })),
+    Rx.from(window.apiHDWallet.getLedgerAddress({ chain: BTCChain, network, walletIndex: 0 })),
     map(RD.fromEither),
     startWith(RD.pending),
     catchError((error) => Rx.of(RD.failure(error)))
