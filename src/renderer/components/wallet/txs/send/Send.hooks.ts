@@ -11,8 +11,18 @@ export const useChangeAssetHandler = () => {
   const history = useHistory()
 
   const handler = useCallback(
-    ({ asset, walletAddress, walletType }: { asset: Asset; walletAddress: Address; walletType: WalletType }) => {
-      const path = walletRoutes.send.path({ asset: assetToString(asset), walletAddress, walletType })
+    ({
+      asset,
+      walletAddress,
+      walletType,
+      walletIndex
+    }: {
+      asset: Asset
+      walletAddress: Address
+      walletType: WalletType
+      walletIndex: string
+    }) => {
+      const path = walletRoutes.send.path({ asset: assetToString(asset), walletAddress, walletType, walletIndex })
       history.push(path)
     },
     [history]

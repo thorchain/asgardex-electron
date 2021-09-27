@@ -59,7 +59,7 @@ export type WalletAccount = {
 
 export type WalletAccounts = WalletAccount[]
 
-export type WalletBalance = Balance & { walletAddress: Address; walletType: WalletType }
+export type WalletBalance = Balance & { walletAddress: Address; walletType: WalletType; walletIndex?: string }
 export type WalletBalances = WalletBalance[]
 
 /**
@@ -68,6 +68,7 @@ export type WalletBalances = WalletBalance[]
  */
 export type ChainBalance = {
   walletType: WalletType
+  walletIndex?: string
   walletAddress: O.Option<Address>
   chain: Chain
   balances: WalletBalancesRD

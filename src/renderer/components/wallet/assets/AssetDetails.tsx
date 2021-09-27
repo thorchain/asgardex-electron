@@ -26,6 +26,7 @@ import * as Styled from './AssetDetails.styles'
 
 type Props = {
   walletType: WalletType
+  walletIndex: string
   txsPageRD: TxsPageRD
   balances: O.Option<NonEmptyWalletBalances>
   asset: Asset
@@ -42,6 +43,7 @@ type Props = {
 export const AssetDetails: React.FC<Props> = (props): JSX.Element => {
   const {
     walletType,
+    walletIndex,
     txsPageRD,
     balances: oBalances,
     asset,
@@ -64,11 +66,11 @@ export const AssetDetails: React.FC<Props> = (props): JSX.Element => {
   const walletActionSendClick = useCallback(() => {
     const routeParams = FP.pipe(
       oWalletAddress,
-      O.map((walletAddress) => ({ asset: assetToString(asset), walletAddress, walletType })),
-      O.getOrElse(() => ({ asset: assetToString(asset), walletAddress: '', walletType }))
+      O.map((walletAddress) => ({ asset: assetToString(asset), walletAddress, walletType, walletIndex })),
+      O.getOrElse(() => ({ asset: assetToString(asset), walletAddress: '', walletType, walletIndex }))
     )
     history.push(walletRoutes.send.path(routeParams))
-  }, [asset, history, oWalletAddress, walletType])
+  }, [asset, history, oWalletAddress, walletIndex, walletType])
 
   const walletActionDepositClick = useCallback(() => {
     FP.pipe(
@@ -88,11 +90,11 @@ export const AssetDetails: React.FC<Props> = (props): JSX.Element => {
       oWalletAddress,
       O.filter((_) => isNonNativeRuneAsset),
       O.map((walletAddress) =>
-        walletRoutes.upgradeRune.path({ asset: assetToString(asset), walletAddress, network, walletType })
+        walletRoutes.upgradeRune.path({ asset: assetToString(asset), walletAddress, network, walletType, walletIndex })
       ),
       O.map(history.push)
     )
-  }, [oWalletAddress, history.push, isNonNativeRuneAsset, asset, network, walletType])
+  }, [oWalletAddress, history.push, isNonNativeRuneAsset, asset, network, walletType, walletIndex])
 
   const refreshHandler = useCallback(() => {
     loadTxsHandler({ limit: MAX_ITEMS_PER_PAGE, offset: (currentPage - 1) * MAX_ITEMS_PER_PAGE })

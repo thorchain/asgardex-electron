@@ -50,7 +50,8 @@ const loadBalances$ = ({
             A.map((balance) => ({
               ...balance,
               walletType,
-              walletAddress
+              walletAddress,
+              walletIndex: walletIndex.toString()
             }))
           ),
           catchError((error: Error) =>
