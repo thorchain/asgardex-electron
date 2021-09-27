@@ -1,8 +1,14 @@
-# 0.4.1-alpha (2021-09-26)
+# 0.4.1 (2021-09-26)
 
 ## Fix
 
-- Use latest `xchain-thorchain@0.19.1` to increase `gas` limit to `30m`
+- [Header] Improve API status [#1734](https://github.com/thorchain/asgardex-electron/issues/1734)
+- Update link to recovery tool [#1781](https://github.com/thorchain/asgardex-electron/pull/1781)
+- [AssetSelect] Make it more clickable [1776](https://github.com/thorchain/asgardex-electron/pull/1776)
+- [Swap] Ledger `BNB` address is marked as invalid [#1778](https://github.com/thorchain/asgardex-electron/issues/1778)
+- Fix reload of `mimir$` in case of offline mode [#1783](https://github.com/thorchain/asgardex-electron/pull/1783)
+- Fix `ERC20` assets for testnet [#1788](https://github.com/thorchain/asgardex-electron/issues/1788)
+- Fix withdraw issues by using latest `xchain-thorchain@0.19.2` [#1792](https://github.com/thorchain/asgardex-electron/pull/1792)
 
 # 0.4.0 (2021-09-15)
 
