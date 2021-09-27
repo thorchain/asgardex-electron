@@ -28,7 +28,7 @@ type Props = {
   lockWallet: FP.Lazy<void>
   removeKeystore: FP.Lazy<void>
   exportKeystore: (runeNativeAddress: string, selectedNetwork: Network) => void
-  addLedgerAddress: (chain: Chain, walletIndex: number) => void
+  addLedgerAddress: (chain: Chain, walletIndex?: number) => void
   removeLedgerAddress: (chain: Chain) => void
   phrase: O.Option<string>
   clickAddressLinkHandler: (chain: Chain, address: Address) => void
@@ -66,7 +66,6 @@ export const WalletSettings: React.FC<Props> = (props): JSX.Element => {
   const [showRemoveWalletModal, setShowRemoveWalletModal] = useState(false)
   const [showQRModal, setShowQRModal] = useState<O.Option<{ asset: Asset; address: Address }>>(O.none)
   const closeQrModal = useCallback(() => setShowQRModal(O.none), [setShowQRModal])
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [walletIndex, setWalletIndex] = useState<number>(0)
 
   const removeWallet = useCallback(() => {
@@ -101,12 +100,14 @@ export const WalletSettings: React.FC<Props> = (props): JSX.Element => {
       // Render ADD LEDGER button
       const renderAddLedger = (chain: Chain, loading: boolean) => (
         <div style={{ display: 'flex', flexDirection: 'row' }}>
-          <Styled.AddLedgerButton loading={loading} onClick={() => addLedgerAddress(chain, walletIndex)}>
+          <Styled.AddLedgerButton loading={loading} onClick={() => addLedgerAddress(chain)}>
             <Styled.AddLedgerIcon /> {intl.formatMessage({ id: 'ledger.add.device' })}
           </Styled.AddLedgerButton>
           {isBnbChain(chain) && (
             <InputNumber
               value={walletIndex.toString()}
+              pattern="[0-9.]+"
+              onChange={(value) => value && setWalletIndex(+value)}
               style={{ width: 60 }}
               onPressEnter={() => addLedgerAddress(chain, walletIndex)}
             />
