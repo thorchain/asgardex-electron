@@ -3,7 +3,7 @@ import React, { useCallback, useMemo, useState } from 'react'
 import * as RD from '@devexperts/remote-data-ts'
 import { Address } from '@xchainjs/xchain-client'
 import { Asset, Chain } from '@xchainjs/xchain-util'
-import { Col, InputNumber, List, Row } from 'antd'
+import { Col, List, Row } from 'antd'
 import * as FP from 'fp-ts/function'
 import * as O from 'fp-ts/lib/Option'
 import { useIntl } from 'react-intl'
@@ -97,22 +97,21 @@ export const WalletSettings: React.FC<Props> = (props): JSX.Element => {
 
   const renderAddress = useCallback(
     (chain: Chain, { type: walletType, address: addressRD }: WalletAddress) => {
-      // Render ADD LEDGER button
       const renderAddLedger = (chain: Chain, loading: boolean) => (
-        <div style={{ display: 'flex', flexDirection: 'row' }}>
+        <Styled.AddLedgerContainer>
           <Styled.AddLedgerButton loading={loading} onClick={() => addLedgerAddress(chain)}>
             <Styled.AddLedgerIcon /> {intl.formatMessage({ id: 'ledger.add.device' })}
           </Styled.AddLedgerButton>
           {isBnbChain(chain) && (
-            <InputNumber
+            <Styled.WalletIndexInput
               value={walletIndex.toString()}
               pattern="[0-9.]+"
-              onChange={(value) => value && setWalletIndex(+value)}
+              onChange={(value) => value !== null && +value >= 0 && setWalletIndex(+value)}
               style={{ width: 60 }}
               onPressEnter={() => addLedgerAddress(chain, walletIndex)}
             />
           )}
-        </div>
+        </Styled.AddLedgerContainer>
       )
 
       // Render addresses depending on its loading status
