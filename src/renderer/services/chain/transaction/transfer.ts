@@ -31,10 +31,6 @@ export const transfer$: SendTxStateHandler = (params, walletIndex) => {
   // All requests will be done in a sequence
   // to update `SendTxState` step by step
   const requests$ = sendTx$(params, walletIndex).pipe(
-    RxOp.tap((x) => {
-      console.log(x)
-      return x
-    }),
     liveData.chain((txHash) => {
       // Update state
       setState({
