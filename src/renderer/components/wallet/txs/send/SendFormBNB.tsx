@@ -48,7 +48,7 @@ export type Props = {
   balances: WalletBalances
   balance: WalletBalance
   walletAddress: Address
-  walletIndex: number
+  walletIndex?: string
   onSubmit: (p: SendTxParams) => void
   isLoading: boolean
   sendTxStatusMsg: string

@@ -26,7 +26,7 @@ export const useLedger = (chain: Chain) => {
   )
 
   const askAddress = useCallback(
-    (walletIndex?: number) => {
+    (walletIndex: string) => {
       // Note: Subscription is needed to get all values
       // and to let `askLedgerAddressByChain` update state of `LedgerAddressRD`
       // Check implementation of `askLedgerAddressByChain` in `src/renderer/services/wallet/ledger.ts`

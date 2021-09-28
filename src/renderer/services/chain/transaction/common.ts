@@ -43,11 +43,12 @@ export const sendTx$ = ({
   amount,
   memo,
   feeOption = DEFAULT_FEE_OPTION,
-  walletIndex
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  walletIndex = '0'
 }: SendTxParams): TxHashLD => {
   switch (asset.chain) {
     case BNBChain:
-      return BNB.sendTx({ walletType, sender, recipient, amount, asset, memo, walletIndex })
+      return BNB.sendTx({ walletType, sender, recipient, amount, asset, memo })
 
     case BTCChain:
       return FP.pipe(

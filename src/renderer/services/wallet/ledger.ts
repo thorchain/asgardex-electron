@@ -6,7 +6,6 @@ import * as RxOp from 'rxjs/operators'
 
 import { LedgerErrorId, Network } from '../../../shared/api/types'
 import { isError } from '../../../shared/utils/guard'
-import { eqLedgerAddressMap } from '../../helpers/fp/eq'
 import { observableState } from '../../helpers/stateHelper'
 import { INITIAL_LEDGER_ADDRESSES_MAP } from './const'
 import {
@@ -30,15 +29,26 @@ export const createLedgerService = ({ keystore$ }: { keystore$: KeystoreState$ }
   const setLedgerAddressRD = ({
     addressRD,
     chain,
-    network
+    network,
+    walletIndex = '0'
   }: {
     addressRD: LedgerAddressRD
     chain: Chain
     network: Network
+    walletIndex?: string
   }) => {
     const addresses = ledgerAddresses()
     // TODO(@asgdx-team) Let's think about to use `immer` or similar library for deep, immutable state changes
-    return setLedgerAddresses({ ...addresses, [chain]: { ...addresses[chain], [network]: addressRD } })
+    return setLedgerAddresses({
+      ...addresses,
+      [chain]: {
+        ...addresses[chain],
+        addresses: {
+          [network]: addressRD
+        },
+        walletIndex
+      }
+    })
   }
 
   /**
@@ -47,9 +57,16 @@ export const createLedgerService = ({ keystore$ }: { keystore$: KeystoreState$ }
   const getLedgerAddress$ = (chain: Chain, network: Network): LedgerAddressLD =>
     FP.pipe(
       ledgerAddresses$,
-      RxOp.map((addressesMap) => addressesMap[chain]),
-      RxOp.distinctUntilChanged(eqLedgerAddressMap.equals),
+      RxOp.map((addressesMap) => addressesMap[chain]['addresses']),
+      // TODO adjust
+      // RxOp.distinctUntilChanged(eqLedgerAddressMap.equals),
       RxOp.map((addressMap) => addressMap[network])
+    )
+
+  const getWalletIndex$ = (chain: Chain): Rx.Observable<string> =>
+    FP.pipe(
+      ledgerAddresses$,
+      RxOp.map((addressesMap) => addressesMap[chain]['walletIndex'])
     )
 
   /**
@@ -75,7 +92,7 @@ export const createLedgerService = ({ keystore$ }: { keystore$: KeystoreState$ }
   /**
    * Ask Ledger to get address from it
    */
-  const askLedgerAddress$ = (chain: Chain, network: Network, walletIndex = 0): LedgerAddressLD =>
+  const askLedgerAddress$ = (chain: Chain, network: Network, walletIndex = '0'): LedgerAddressLD =>
     FP.pipe(
       // remove address from memory
       removeLedgerAddress(chain, network),
@@ -85,7 +102,7 @@ export const createLedgerService = ({ keystore$ }: { keystore$: KeystoreState$ }
       () => Rx.from(window.apiHDWallet.getLedgerAddress({ chain, network, walletIndex })),
       RxOp.map(RD.fromEither),
       // store address in memory
-      RxOp.tap((addressRD: LedgerAddressRD) => setLedgerAddressRD({ chain, addressRD, network })),
+      RxOp.tap((addressRD: LedgerAddressRD) => setLedgerAddressRD({ chain, addressRD, network, walletIndex })),
       RxOp.catchError((error) =>
         Rx.of(
           RD.failure({
@@ -109,5 +126,5 @@ export const createLedgerService = ({ keystore$ }: { keystore$: KeystoreState$ }
     setLedgerAddresses(INITIAL_LEDGER_ADDRESSES_MAP)
   }
 
-  return { askLedgerAddress$, getLedgerAddress$, removeLedgerAddress, dispose }
+  return { askLedgerAddress$, getLedgerAddress$, removeLedgerAddress, getWalletIndex$, dispose }
 }

@@ -25,7 +25,7 @@ const reloadBalances = () => {
 }
 
 // State of balances loaded by Client
-const balances$: (walletType: WalletType, network: Network, walletIndex?: number) => C.WalletBalancesLD = (
+const balances$: (walletType: WalletType, network: Network, walletIndex: string) => C.WalletBalancesLD = (
   walletType,
   network,
   walletIndex

@@ -26,7 +26,7 @@ import {
 export const createTransactionService = (client$: Client$): TransactionService => {
   const common = C.createTransactionService(client$)
 
-  const runSendPoolTx$ = (client: EthClient, { walletIndex, ...params }: SendPoolTxParams): TxHashLD => {
+  const runSendPoolTx$ = (client: EthClient, { ...params }: SendPoolTxParams): TxHashLD => {
     // helper for failures
     const failure$ = (msg: string) =>
       Rx.of(
@@ -53,7 +53,6 @@ export const createTransactionService = (client$: Client$): TransactionService =
                 // Amounts need to use `toFixed` to convert `BaseAmount` to `Bignumber`
                 // since `value` and `gasPrice` type is `Bignumber`
                 client.call<{ hash: TxHash }>({
-                  walletIndex,
                   contractAddress: router,
                   abi: ethRouterABI,
                   funcName: 'deposit',

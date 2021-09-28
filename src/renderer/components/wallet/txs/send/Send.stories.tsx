@@ -124,7 +124,7 @@ const rates: FeeRates = {
 const defaultComponentProps = {
   walletType: 'keystore' as WalletType,
   walletAddress: 'bnb-address' as Address,
-  walletIndex: 0 as number,
+  walletIndex: '0' as string,
   balances,
   balance: bnbAsset,
   feesWithRates: RD.success({ fees, rates }),

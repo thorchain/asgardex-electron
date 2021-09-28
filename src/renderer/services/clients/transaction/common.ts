@@ -32,7 +32,7 @@ export const loadTxs$ = ({
   const address = FP.pipe(
     walletAddress,
     /* TODO (@asgdx-team) Make sure we use correct index by introducing HD wallets in the future */
-    O.getOrElse(() => client.getAddress(walletIndex))
+    O.getOrElse(() => client.getAddress(parseInt(walletIndex)))
   )
 
   return Rx.from(

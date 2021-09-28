@@ -27,19 +27,19 @@ const loadBalances$ = ({
   address,
   assets,
   /* TODO (@asgdx-team) Check if we still can use `0` as default by introducing HD wallets in the future */
-  walletIndex = 0
+  walletIndex = '0'
 }: {
   client: XChainClient
   walletType: WalletType
   address?: Address
   assets?: Asset[]
-  walletIndex?: number
+  walletIndex?: string
 }): WalletBalancesLD =>
   FP.pipe(
     address,
     O.fromNullable,
     // Try to use client address, if parameter `address` is undefined
-    O.alt(() => O.tryCatch(() => client.getAddress(walletIndex))),
+    O.alt(() => O.tryCatch(() => client.getAddress(parseInt(walletIndex)))),
     O.fold(
       // TODO (@Veado) i18n
       () => Rx.of(RD.failure<ApiError>({ errorId: ErrorId.GET_BALANCES, msg: 'Could not get address' })),
@@ -82,7 +82,7 @@ export const balances$: ({
   client$: XChainClient$
   trigger$: Rx.Observable<boolean>
   assets?: Asset[]
-  walletIndex?: number
+  walletIndex?: string
 }) => WalletBalancesLD = ({ walletType, client$, trigger$, assets, walletIndex }) =>
   Rx.combineLatest([trigger$.pipe(debounceTime(300)), client$]).pipe(
     RxOp.switchMap(([_, oClient]) => {

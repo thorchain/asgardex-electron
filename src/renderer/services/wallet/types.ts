@@ -137,8 +137,9 @@ export type BalancesService = {
 }
 
 export type LedgerService = {
-  askLedgerAddress$: (chain: Chain, network: Network, walletIndex?: number) => LedgerAddressLD
+  askLedgerAddress$: (chain: Chain, network: Network, walletIndex: string) => LedgerAddressLD
   getLedgerAddress$: (chain: Chain, network: Network) => LedgerAddressLD
+  getWalletIndex$: (chain: Chain) => Rx.Observable<string>
   removeLedgerAddress: (chain: Chain, network: Network) => void
   dispose: FP.Lazy<void>
 }
@@ -167,5 +168,11 @@ export type LedgerAddressLD = LiveData<LedgerError, Address>
 export type LedgerAddressMap = Record<Network, LedgerAddressRD>
 export type LedgerAddressMap$ = Rx.Observable<LedgerAddressMap>
 
-export type LedgerAddressesMap = Record<Chain, LedgerAddressMap>
+export type LedgerAddressesAndWalletIndexMap = {
+  addresses: LedgerAddressMap
+  walletIndex: string
+}
+export type LedgerAddressesAndWalletIndexMap$ = Rx.Observable<LedgerAddressesAndWalletIndexMap>
+
+export type LedgerAddressesMap = Record<Chain, LedgerAddressesAndWalletIndexMap>
 export type LedgerAddressesMap$ = Rx.Observable<LedgerAddressesMap>

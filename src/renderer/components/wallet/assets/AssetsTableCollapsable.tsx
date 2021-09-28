@@ -394,6 +394,7 @@ export const AssetsTableCollapsable: React.FC<Props> = (props): JSX.Element => {
           </Col>
         </Styled.HeaderRow>
       )
+      console.log(walletIndex)
       return (
         <Panel header={header} key={key}>
           {renderBalances({

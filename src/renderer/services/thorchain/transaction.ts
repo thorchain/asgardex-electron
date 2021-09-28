@@ -96,7 +96,15 @@ export const createTransactionService = (client$: Client$, network$: Network$): 
       })
     )
 
-  const sendLedgerTx = ({ network, params }: { network: Network; params: SendTxParams }) => {
+  const sendLedgerTx = ({
+    network,
+    params,
+    walletIndex = '0'
+  }: {
+    network: Network
+    params: SendTxParams
+    walletIndex?: string
+  }) => {
     const sendLedgerTxParams: IPCLedgerSendTxParams = {
       chain: THORChain,
       network,
@@ -105,7 +113,7 @@ export const createTransactionService = (client$: Client$, network$: Network$): 
       sender: params.sender,
       recipient: params.recipient,
       memo: params.memo,
-      walletIndex: 0
+      walletIndex
     }
     const encoded = ipcLedgerSendTxParamsIO.encode(sendLedgerTxParams)
 
