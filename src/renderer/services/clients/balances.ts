@@ -51,7 +51,7 @@ const loadBalances$ = ({
               ...balance,
               walletType,
               walletAddress,
-              walletIndex: walletIndex.toString()
+              walletIndex
             }))
           ),
           catchError((error: Error) =>

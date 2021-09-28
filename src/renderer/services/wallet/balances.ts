@@ -246,11 +246,7 @@ export const createBalancesService = ({
                   chain,
                   walletAddress: O.some(address),
                   balances
-                })),
-                RxOp.tap((x) => {
-                  console.log(x)
-                  return x
-                })
+                }))
               )
           )
         )

@@ -60,20 +60,12 @@ export const createLedgerService = ({ keystore$ }: { keystore$: KeystoreState$ }
       RxOp.map((addressesMap) => addressesMap[chain]['addresses']),
       // TODO adjust
       // RxOp.distinctUntilChanged(eqLedgerAddressMap.equals),
-      RxOp.tap((x) => {
-        console.log(x)
-        return x
-      }),
       RxOp.map((addressMap) => addressMap[network])
     )
 
   const getWalletIndex$ = (chain: Chain): Rx.Observable<string> =>
     FP.pipe(
       ledgerAddresses$,
-      RxOp.tap((x) => {
-        console.log(x)
-        return x
-      }),
       RxOp.map((addressesMap) => addressesMap[chain]['walletIndex'])
     )
 

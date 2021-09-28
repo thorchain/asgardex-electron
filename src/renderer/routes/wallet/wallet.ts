@@ -90,7 +90,6 @@ export const send: Route<SendParams> = {
   template: `${assetDetail.template}/send`,
   path: ({ asset, walletAddress, walletType, walletIndex }) => {
     if (asset && !!walletAddress) {
-      console.log(walletIndex)
       return `${assetDetail.path({ walletType, asset, walletAddress, walletIndex })}/send`
     } else {
       // Redirect to assets route if passed params are empty

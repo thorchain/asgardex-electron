@@ -51,7 +51,6 @@ export const SendViewBNB: React.FC<Props> = (props): JSX.Element => {
     walletType,
     walletIndex
   } = props
-  console.log('HERE', walletIndex)
 
   const intl = useIntl()
   const history = useHistory()

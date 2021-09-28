@@ -336,9 +336,6 @@ export const AssetsTableCollapsable: React.FC<Props> = (props): JSX.Element => {
        * not emitted at least once
        * @see btcLedgerChainBalance$'s getOrElse branch at src/renderer/services/wallet/balances.ts
        */
-      if (walletType === 'ledger') {
-        console.log(walletIndex)
-      }
       if (O.isNone(oWalletAddress) && RD.isInitial(balancesRD)) {
         return null
       }

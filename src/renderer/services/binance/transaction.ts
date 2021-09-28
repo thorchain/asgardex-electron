@@ -27,7 +27,6 @@ export const createTransactionService = (client$: Client$, network$: Network$): 
     params: SendTxParams
     walletIndex?: string
   }) => {
-    console.log(walletIndex)
     const sendLedgerTxParams: IPCLedgerSendTxParams = {
       chain: BNBChain,
       network,

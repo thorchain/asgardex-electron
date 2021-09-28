@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect } from 'react'
+import React, { useCallback } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
 import { Address } from '@xchainjs/xchain-client'
@@ -42,10 +42,6 @@ export const AssetsView: React.FC = (): JSX.Element => {
       ),
     [] as ChainBalances
   )
-
-  useEffect(() => {
-    console.log(chainBalances)
-  }, [chainBalances])
 
   const {
     service: {
