@@ -16,7 +16,7 @@ import { poolTxStatusByChain$, sendTx$ } from './common'
 /**
  * Send TX
  */
-export const transfer$: SendTxStateHandler = (params) => {
+export const transfer$: SendTxStateHandler = (params, walletIndex) => {
   // Observable state of `SendTxState`
   const {
     get$: getState$,
@@ -30,7 +30,12 @@ export const transfer$: SendTxStateHandler = (params) => {
 
   // All requests will be done in a sequence
   // to update `SendTxState` step by step
-  const requests$ = sendTx$(params).pipe(
+  console.log(params)
+  const requests$ = sendTx$(params, walletIndex).pipe(
+    RxOp.tap((x) => {
+      console.log(x)
+      return x
+    }),
     liveData.chain((txHash) => {
       // Update state
       setState({

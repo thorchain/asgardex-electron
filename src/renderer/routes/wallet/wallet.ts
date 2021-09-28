@@ -74,10 +74,10 @@ export const bonds: Route<void> = {
 
 export type AssetDetailsParams = { asset: string; walletAddress: Address; walletType: WalletType; walletIndex: string }
 export const assetDetail: Route<AssetDetailsParams> = {
-  template: `${assets.template}/detail/:walletType/:walletAddress/:asset`,
-  path: ({ walletType, asset, walletAddress }) => {
+  template: `${assets.template}/detail/:walletType/:walletAddress/:walletIndex/:asset`,
+  path: ({ walletType, asset, walletAddress, walletIndex }) => {
     if (asset && !!walletAddress) {
-      return `${assets.template}/detail/${walletType}/${walletAddress}/${asset}`
+      return `${assets.template}/detail/${walletType}/${walletAddress}/${walletIndex}/${asset}`
     } else {
       // Redirect to assets route if passed param is empty
       return assets.path()
@@ -90,6 +90,7 @@ export const send: Route<SendParams> = {
   template: `${assetDetail.template}/send`,
   path: ({ asset, walletAddress, walletType, walletIndex }) => {
     if (asset && !!walletAddress) {
+      console.log(walletIndex)
       return `${assetDetail.path({ walletType, asset, walletAddress, walletIndex })}/send`
     } else {
       // Redirect to assets route if passed params are empty

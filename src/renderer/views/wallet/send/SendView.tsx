@@ -36,6 +36,7 @@ type Props = {}
 
 export const SendView: React.FC<Props> = (): JSX.Element => {
   const { asset, walletAddress, walletType, walletIndex } = useParams<SendParams>()
+  console.log('here', walletIndex)
   const intl = useIntl()
 
   const { network$ } = useAppContext()

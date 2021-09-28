@@ -25,8 +25,9 @@ export const createTransactionService = (client$: Client$, network$: Network$): 
   }: {
     network: Network
     params: SendTxParams
-    walletIndex: string
+    walletIndex?: string
   }) => {
+    console.log(walletIndex)
     const sendLedgerTxParams: IPCLedgerSendTxParams = {
       chain: BNBChain,
       network,
@@ -58,11 +59,11 @@ export const createTransactionService = (client$: Client$, network$: Network$): 
       RxOp.startWith(RD.pending)
     )
   }
-  const sendTx = (params: SendTxParams, walletIndex = '0') =>
+  const sendTx = (params: SendTxParams, walletIndex?: string) =>
     FP.pipe(
       network$,
       RxOp.switchMap((network) => {
-        if (isLedgerWallet(params.walletType)) return sendLedgerTx({ network, params, walletIndex })
+        if (isLedgerWallet(params.walletType)) return sendLedgerTx({ network, walletIndex, params })
 
         return common.sendTx(params)
       })

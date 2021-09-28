@@ -27,7 +27,16 @@ export const sendTx = async ({
         res = await THOR.send({ transport, network, recipient, amount, memo })
         break
       case BNBChain:
-        res = await BNB.send({ transport, network, sender, recipient, amount, asset, memo, walletIndex })
+        res = await BNB.send({
+          transport,
+          network,
+          sender,
+          recipient,
+          amount,
+          asset,
+          memo,
+          walletIndex: walletIndex ? walletIndex : '0'
+        })
         break
       default:
         res = E.left({

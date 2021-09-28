@@ -35,7 +35,7 @@ export const createLedgerService = ({ keystore$ }: { keystore$: KeystoreState$ }
     addressRD: LedgerAddressRD
     chain: Chain
     network: Network
-    walletIndex?: string
+    walletIndex: string
   }) => {
     const addresses = ledgerAddresses()
     // TODO(@asgdx-team) Let's think about to use `immer` or similar library for deep, immutable state changes
@@ -46,7 +46,7 @@ export const createLedgerService = ({ keystore$ }: { keystore$: KeystoreState$ }
         addresses: {
           [network]: addressRD
         },
-        walletIndex
+        walletIndex: walletIndex
       }
     })
   }
@@ -60,12 +60,20 @@ export const createLedgerService = ({ keystore$ }: { keystore$: KeystoreState$ }
       RxOp.map((addressesMap) => addressesMap[chain]['addresses']),
       // TODO adjust
       // RxOp.distinctUntilChanged(eqLedgerAddressMap.equals),
+      RxOp.tap((x) => {
+        console.log(x)
+        return x
+      }),
       RxOp.map((addressMap) => addressMap[network])
     )
 
   const getWalletIndex$ = (chain: Chain): Rx.Observable<string> =>
     FP.pipe(
       ledgerAddresses$,
+      RxOp.tap((x) => {
+        console.log(x)
+        return x
+      }),
       RxOp.map((addressesMap) => addressesMap[chain]['walletIndex'])
     )
 
@@ -76,7 +84,8 @@ export const createLedgerService = ({ keystore$ }: { keystore$: KeystoreState$ }
     setLedgerAddressRD({
       addressRD: RD.initial,
       chain,
-      network
+      network,
+      walletIndex: '0'
     })
 
   /**
@@ -86,7 +95,8 @@ export const createLedgerService = ({ keystore$ }: { keystore$: KeystoreState$ }
     setLedgerAddressRD({
       addressRD: RD.pending,
       chain,
-      network
+      network,
+      walletIndex: '0'
     })
 
   /**

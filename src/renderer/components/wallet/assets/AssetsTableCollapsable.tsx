@@ -336,26 +336,36 @@ export const AssetsTableCollapsable: React.FC<Props> = (props): JSX.Element => {
        * not emitted at least once
        * @see btcLedgerChainBalance$'s getOrElse branch at src/renderer/services/wallet/balances.ts
        */
+      if (walletType === 'ledger') {
+        console.log(walletIndex)
+      }
       if (O.isNone(oWalletAddress) && RD.isInitial(balancesRD)) {
         return null
       }
+
+      const walletAddress = FP.pipe(
+        oWalletAddress,
+        O.getOrElse(() => intl.formatMessage({ id: 'wallet.errors.address.invalid' }))
+      )
+
       const assetsTxt = FP.pipe(
         balancesRD,
         RD.fold(
-          () => '',
-          () => intl.formatMessage({ id: 'common.loading' }),
-          (_: ApiError) => intl.formatMessage({ id: 'common.error' }),
+          () => {
+            return ''
+          },
+          () => {
+            return intl.formatMessage({ id: 'common.loading' })
+          },
+          (_: ApiError) => {
+            return intl.formatMessage({ id: 'common.error' })
+          },
           (balances) => {
             const length = balances.length
             const i18nKey = length === 1 ? 'common.asset' : 'common.assets'
             return `(${length} ${intl.formatMessage({ id: i18nKey })})`
           }
         )
-      )
-
-      const walletAddress = FP.pipe(
-        oWalletAddress,
-        O.getOrElse(() => intl.formatMessage({ id: 'wallet.errors.address.invalid' }))
       )
 
       const header = (
@@ -389,12 +399,12 @@ export const AssetsTableCollapsable: React.FC<Props> = (props): JSX.Element => {
             </Styled.HeaderAddress>
           </Col>
           <Col xs={10} md={6} lg={10}>
+            <div>{assetsTxt}</div>
             <Styled.HeaderLabel
               color={RD.isFailure(balancesRD) ? 'error' : 'gray'}>{`${assetsTxt}`}</Styled.HeaderLabel>
           </Col>
         </Styled.HeaderRow>
       )
-      console.log(walletIndex)
       return (
         <Panel header={header} key={key}>
           {renderBalances({

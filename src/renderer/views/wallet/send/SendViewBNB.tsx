@@ -51,6 +51,7 @@ export const SendViewBNB: React.FC<Props> = (props): JSX.Element => {
     walletType,
     walletIndex
   } = props
+  console.log('HERE', walletIndex)
 
   const intl = useIntl()
   const history = useHistory()
@@ -70,9 +71,9 @@ export const SendViewBNB: React.FC<Props> = (props): JSX.Element => {
 
   const onSend = useCallback(
     (params: SendTxParams) => {
-      subscribeSendTxState(transfer$(params))
+      subscribeSendTxState(transfer$(params, walletIndex))
     },
-    [subscribeSendTxState, transfer$]
+    [subscribeSendTxState, transfer$, walletIndex]
   )
 
   const { fees$, reloadFees } = useBinanceContext()
