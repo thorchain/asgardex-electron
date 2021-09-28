@@ -35,7 +35,7 @@ export const sendTx = async ({
           amount,
           asset,
           memo,
-          walletIndex
+          walletIndex: walletIndex ? walletIndex : '0'
         })
         break
       default:
