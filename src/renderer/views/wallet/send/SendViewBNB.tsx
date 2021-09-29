@@ -32,7 +32,7 @@ import * as Helper from './SendView.helper'
 type Props = {
   walletType: WalletType
   walletAddress: Address
-  walletIndex: string
+  walletIndex: number
   asset: Asset
   balances: O.Option<NonEmptyWalletBalances>
   openExplorerTxUrl: OpenExplorerTxUrl

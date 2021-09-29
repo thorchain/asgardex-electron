@@ -59,7 +59,7 @@ export type WalletAccount = {
 
 export type WalletAccounts = WalletAccount[]
 
-export type WalletBalance = Balance & { walletAddress: Address; walletType: WalletType; walletIndex?: string }
+export type WalletBalance = Balance & { walletAddress: Address; walletType: WalletType; walletIndex?: number }
 export type WalletBalances = WalletBalance[]
 
 /**
@@ -68,7 +68,7 @@ export type WalletBalances = WalletBalance[]
  */
 export type ChainBalance = {
   walletType: WalletType
-  walletIndex?: string
+  walletIndex?: number
   walletAddress: O.Option<Address>
   chain: Chain
   balances: WalletBalancesRD
@@ -137,9 +137,9 @@ export type BalancesService = {
 }
 
 export type LedgerService = {
-  askLedgerAddress$: (chain: Chain, network: Network, walletIndex: string) => LedgerAddressLD
+  askLedgerAddress$: (chain: Chain, network: Network, walletIndex: number) => LedgerAddressLD
   getLedgerAddress$: (chain: Chain, network: Network) => LedgerAddressLD
-  getWalletIndex$: (chain: Chain) => Rx.Observable<string>
+  getWalletIndex$: (chain: Chain) => Rx.Observable<number>
   removeLedgerAddress: (chain: Chain, network: Network) => void
   dispose: FP.Lazy<void>
 }
@@ -170,7 +170,7 @@ export type LedgerAddressMap$ = Rx.Observable<LedgerAddressMap>
 
 export type LedgerAddressesAndWalletIndexMap = {
   addresses: LedgerAddressMap
-  walletIndex: string
+  walletIndex: number
 }
 export type LedgerAddressesAndWalletIndexMap$ = Rx.Observable<LedgerAddressesAndWalletIndexMap>
 

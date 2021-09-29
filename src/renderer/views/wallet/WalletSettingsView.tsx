@@ -67,7 +67,7 @@ export const WalletSettingsView: React.FC = (): JSX.Element => {
     removeAddress: removeLedgerBnbAddress
   } = useLedger(BNBChain)
 
-  const addLedgerAddressHandler = (chain: Chain, walletIndex = '0') => {
+  const addLedgerAddressHandler = (chain: Chain, walletIndex = 0) => {
     if (isThorChain(chain)) return askLedgerThorAddress(walletIndex)
     if (isBnbChain(chain)) return askLedgerBnbAddress(walletIndex)
 

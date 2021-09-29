@@ -30,7 +30,7 @@ export type LoadTxsParams = {
   offset: number
 }
 
-export type TxsParams = { asset: O.Option<Asset>; walletAddress: O.Option<string>; walletIndex: string } & LoadTxsParams
+export type TxsParams = { asset: O.Option<Asset>; walletAddress: O.Option<string>; walletIndex: number } & LoadTxsParams
 
 export type TxsPageRD = RD.RemoteData<ApiError, TxsPage>
 export type TxsPageLD = LiveData<ApiError, TxsPage>
@@ -53,7 +53,7 @@ export type Address$ = Rx.Observable<O.Option<Address>>
 export type TransactionService<T> = {
   txRD$: TxHashLD
   subscribeTx: (_: T) => Rx.Subscription
-  sendTx: (_: T, walletIndex?: string) => TxHashLD
+  sendTx: (_: T, walletIndex?: number) => TxHashLD
   resetTx: () => void
   txs$: (_: TxsParams) => TxsPageLD
   tx$: (txHash: TxHash) => TxLD

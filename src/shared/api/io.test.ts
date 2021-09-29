@@ -39,7 +39,7 @@ describe('shared/io', () => {
         sender: 'address-abc',
         recipient: 'address-abc',
         memo: 'memo-abc',
-        walletIndex: '0'
+        walletIndex: 0
       })
       expect(encoded).toEqual({
         chain: 'BNB',
@@ -49,7 +49,7 @@ describe('shared/io', () => {
         sender: 'address-abc',
         recipient: 'address-abc',
         memo: 'memo-abc',
-        walletIndex: '0'
+        walletIndex: 0
       })
     })
     it('decode IPCLedgerSendTxParams', () => {
@@ -61,7 +61,7 @@ describe('shared/io', () => {
         sender: 'address-abc',
         recipient: 'address-abc',
         memo: 'memo-abc',
-        walletIndex: '0'
+        walletIndex: 0
       }
       const decoded = ipcLedgerSendTxParamsIO.decode(encoded)
       expect(E.isRight(decoded)).toBeTruthy()

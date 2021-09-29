@@ -20,9 +20,14 @@ export const useChangeAssetHandler = () => {
       asset: Asset
       walletAddress: Address
       walletType: WalletType
-      walletIndex: string
+      walletIndex: number
     }) => {
-      const path = walletRoutes.send.path({ asset: assetToString(asset), walletAddress, walletType, walletIndex })
+      const path = walletRoutes.send.path({
+        asset: assetToString(asset),
+        walletAddress,
+        walletType,
+        walletIndex: walletIndex.toString()
+      })
       history.push(path)
     },
     [history]

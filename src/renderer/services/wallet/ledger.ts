@@ -31,12 +31,12 @@ export const createLedgerService = ({ keystore$ }: { keystore$: KeystoreState$ }
     addressRD,
     chain,
     network,
-    walletIndex = '0'
+    walletIndex = 0
   }: {
     addressRD: LedgerAddressRD
     chain: Chain
     network: Network
-    walletIndex: string
+    walletIndex: number
   }) => {
     const addresses = ledgerAddresses()
     // TODO(@asgdx-team) Let's think about to use `immer` or similar library for deep, immutable state changes
@@ -58,15 +58,15 @@ export const createLedgerService = ({ keystore$ }: { keystore$: KeystoreState$ }
   const getLedgerAddress$ = (chain: Chain, network: Network): LedgerAddressLD =>
     FP.pipe(
       ledgerAddresses$,
-      RxOp.map((addressesMap) => addressesMap[chain]['addresses']),
+      RxOp.map((addressesMap) => addressesMap[chain].addresses),
       RxOp.distinctUntilChanged(eqLedgerAddressMap.equals),
       RxOp.map((addressMap) => addressMap[network])
     )
 
-  const getWalletIndex$ = (chain: Chain): Rx.Observable<string> =>
+  const getWalletIndex$ = (chain: Chain): Rx.Observable<number> =>
     FP.pipe(
       ledgerAddresses$,
-      RxOp.map((addressesMap) => addressesMap[chain]['walletIndex'])
+      RxOp.map((addressesMap) => addressesMap[chain].walletIndex)
     )
 
   /**
@@ -77,7 +77,7 @@ export const createLedgerService = ({ keystore$ }: { keystore$: KeystoreState$ }
       addressRD: RD.initial,
       chain,
       network,
-      walletIndex: '0'
+      walletIndex: 0
     })
 
   /**
@@ -88,13 +88,13 @@ export const createLedgerService = ({ keystore$ }: { keystore$: KeystoreState$ }
       addressRD: RD.pending,
       chain,
       network,
-      walletIndex: '0'
+      walletIndex: 0
     })
 
   /**
    * Ask Ledger to get address from it
    */
-  const askLedgerAddress$ = (chain: Chain, network: Network, walletIndex = '0'): LedgerAddressLD =>
+  const askLedgerAddress$ = (chain: Chain, network: Network, walletIndex = 0): LedgerAddressLD =>
     FP.pipe(
       // remove address from memory
       removeLedgerAddress(chain, network),

@@ -18,7 +18,7 @@ import * as Styled from './AccountSelector.styles'
 type Props = {
   selectedWallet: WalletBalance
   walletBalances: WalletBalances
-  onChange?: (params: { asset: Asset; walletAddress: Address; walletType: WalletType; walletIndex: string }) => void
+  onChange?: (params: { asset: Asset; walletAddress: Address; walletType: WalletType; walletIndex: number }) => void
   size?: IconSize
   network: Network
 }
@@ -48,7 +48,7 @@ export const AccountSelector: React.FC<Props> = (props): JSX.Element => {
         <Row
           align={'middle'}
           gutter={[8, 0]}
-          onClick={() => onChange({ asset, walletAddress, walletType, walletIndex: walletIndex ? walletIndex : '0' })}>
+          onClick={() => onChange({ asset, walletAddress, walletType, walletIndex: walletIndex ? walletIndex : 0 })}>
           <Col>
             <AssetData asset={asset} network={network} />
           </Col>

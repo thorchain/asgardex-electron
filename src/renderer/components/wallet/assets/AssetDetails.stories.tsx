@@ -44,7 +44,7 @@ const openExplorerTxUrl: OpenExplorerTxUrl = (txHash: TxHash) => {
 export const StoryBNB: BaseStory<never, JSX.Element> = () => (
   <AssetDetails
     walletType="keystore"
-    walletIndex="0"
+    walletIndex={0}
     txsPageRD={RD.initial}
     balances={balances}
     asset={AssetBNB}
@@ -59,7 +59,7 @@ StoryBNB.storyName = 'BNB'
 export const StoryRuneTxSuccess: BaseStory<never, JSX.Element> = () => (
   <AssetDetails
     walletType="keystore"
-    walletIndex="0"
+    walletIndex={0}
     txsPageRD={RD.initial}
     balances={balances}
     asset={AssetRune67C}
@@ -74,7 +74,7 @@ StoryRuneTxSuccess.storyName = 'RUNE - tx success'
 export const StoryRuneNoSend: BaseStory<never, JSX.Element> = () => (
   <AssetDetails
     walletType="keystore"
-    walletIndex="0"
+    walletIndex={0}
     txsPageRD={RD.initial}
     balances={balances}
     asset={AssetRune67C}
@@ -89,7 +89,7 @@ StoryRuneNoSend.storyName = 'RUNE - no send'
 export const StoryRuneNoUpgrade: BaseStory<never, JSX.Element> = () => (
   <AssetDetails
     walletType="keystore"
-    walletIndex="0"
+    walletIndex={0}
     txsPageRD={RD.initial}
     balances={balances}
     asset={AssetRune67C}
@@ -104,7 +104,7 @@ StoryRuneNoUpgrade.storyName = 'RUNE - no upgrade'
 export const StoryRuneTxError: BaseStory<never, JSX.Element> = () => (
   <AssetDetails
     walletType="keystore"
-    walletIndex="0"
+    walletIndex={0}
     txsPageRD={RD.initial}
     balances={balances}
     asset={AssetRune67C}
@@ -119,7 +119,7 @@ StoryRuneTxError.storyName = 'RUNE - tx error'
 export const StoryRuneNoBalances: BaseStory<never, JSX.Element> = () => (
   <AssetDetails
     walletType="keystore"
-    walletIndex="0"
+    walletIndex={0}
     txsPageRD={RD.initial}
     balances={getBalances([runeBalanceEmpty, bnbBalance])}
     asset={AssetRune67C}
@@ -134,7 +134,7 @@ StoryRuneNoBalances.storyName = 'RUNE - disabled - no balance'
 export const StoryRuneFeeNotCovered: BaseStory<never, JSX.Element> = () => (
   <AssetDetails
     walletType="keystore"
-    walletIndex="0"
+    walletIndex={0}
     txsPageRD={RD.initial}
     balances={getBalances([runeBnbBalance, bnbBalanceEmpty])}
     asset={AssetRune67C}

@@ -52,7 +52,7 @@ type Props = {
     asset: Asset
     walletAddress: Address
     walletType: WalletType
-    walletIndex: string
+    walletIndex: number
   }) => void
   setSelectedAsset?: (oAsset: O.Option<Asset>) => void
   network: Network
@@ -95,7 +95,7 @@ export const AssetsTableCollapsable: React.FC<Props> = (props): JSX.Element => {
   )
 
   const onRowHandler = useCallback(
-    (oWalletAddress: O.Option<Address>, walletType: WalletType, walletIndex: string) =>
+    (oWalletAddress: O.Option<Address>, walletType: WalletType, walletIndex: number) =>
       ({ asset }: Balance) => {
         // Disable click for NativeRUNE if Thorchain is halted
         const onClick = FP.pipe(
@@ -148,7 +148,7 @@ export const AssetsTableCollapsable: React.FC<Props> = (props): JSX.Element => {
               walletAddress,
               network,
               walletType,
-              walletIndex: walletIndex ? walletIndex : '0'
+              walletIndex: walletIndex ? walletIndex.toString() : '0'
             })
           )
         }
@@ -267,7 +267,7 @@ export const AssetsTableCollapsable: React.FC<Props> = (props): JSX.Element => {
       oWalletAddress: O.Option<Address>
       loading?: boolean
       walletType: WalletType
-      walletIndex: string
+      walletIndex: number
     }) => {
       return (
         <Styled.Table
@@ -295,7 +295,7 @@ export const AssetsTableCollapsable: React.FC<Props> = (props): JSX.Element => {
       index: number
       oWalletAddress: O.Option<Address>
       walletType: WalletType
-      walletIndex: string
+      walletIndex: number
     }) => {
       return FP.pipe(
         balancesRD,
@@ -348,15 +348,9 @@ export const AssetsTableCollapsable: React.FC<Props> = (props): JSX.Element => {
       const assetsTxt = FP.pipe(
         balancesRD,
         RD.fold(
-          () => {
-            return ''
-          },
-          () => {
-            return intl.formatMessage({ id: 'common.loading' })
-          },
-          (_: ApiError) => {
-            return intl.formatMessage({ id: 'common.error' })
-          },
+          () => '',
+          () => intl.formatMessage({ id: 'common.loading' }),
+          (_: ApiError) => intl.formatMessage({ id: 'common.error' }),
           (balances) => {
             const length = balances.length
             const i18nKey = length === 1 ? 'common.asset' : 'common.assets'
@@ -409,7 +403,7 @@ export const AssetsTableCollapsable: React.FC<Props> = (props): JSX.Element => {
             index: key,
             oWalletAddress,
             walletType,
-            walletIndex: walletIndex ? walletIndex : '0'
+            walletIndex: walletIndex ? walletIndex : 0
           })}
         </Panel>
       )

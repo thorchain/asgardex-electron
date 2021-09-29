@@ -88,7 +88,7 @@ export type SendTxParams = {
   amount: BaseAmount
   memo: Memo
   feeOption?: FeeOption
-  walletIndex?: string
+  walletIndex?: number
 }
 
 export type SendPoolTxParams = SendTxParams & {
@@ -295,4 +295,4 @@ export type SendTxState = {
 
 export type SendTxState$ = Rx.Observable<SendTxState>
 
-export type SendTxStateHandler = (p: SendTxParams, walletIndex?: string) => SendTxState$
+export type SendTxStateHandler = (p: SendTxParams, walletIndex?: number) => SendTxState$

@@ -48,7 +48,7 @@ export const createBalancesService = ({
   keystore$: KeystoreState$
   network$: Network$
   getLedgerAddress$: (chain: Chain, network: Network) => LedgerAddressLD
-  getWalletIndex$: (chain: Chain) => Rx.Observable<string>
+  getWalletIndex$: (chain: Chain) => Rx.Observable<number>
 }): BalancesService => {
   // reload all balances
   const reloadBalances: FP.Lazy<void> = () => {
@@ -80,7 +80,7 @@ export const createBalancesService = ({
     }
   }
 
-  const getServiceByChain = (chain: Chain, walletType: WalletType, walletIndex: string): ChainBalancesService => {
+  const getServiceByChain = (chain: Chain, walletType: WalletType, walletIndex: number): ChainBalancesService => {
     switch (chain) {
       case BNBChain:
         return {
@@ -159,7 +159,7 @@ export const createBalancesService = ({
     }
   })
 
-  const getChainBalance$ = (chain: Chain, walletType: WalletType, walletIndex = '0'): WalletBalancesLD => {
+  const getChainBalance$ = (chain: Chain, walletType: WalletType, walletIndex = 0): WalletBalancesLD => {
     const chainService = getServiceByChain(chain, walletType, walletIndex)
     const reload$ = FP.pipe(
       chainService.reloadBalances$,
@@ -230,7 +230,7 @@ export const createBalancesService = ({
               // just return `ChainBalance` w/ initial (empty) balances
               Rx.of<ChainBalance>({
                 walletType: 'ledger',
-                walletIndex: '0',
+                walletIndex: 0,
                 chain,
                 walletAddress: O.none,
                 balances: RD.initial
@@ -240,9 +240,9 @@ export const createBalancesService = ({
               // and put it's RD state into `balances` of `ChainBalance`
               FP.pipe(
                 Rx.combineLatest([getBalanceByAddress$(address, 'ledger'), getWalletIndex$(chain)]),
-                RxOp.map<[WalletBalancesRD, string], ChainBalance>(([balances, walletIndex]) => ({
+                RxOp.map<[WalletBalancesRD, number], ChainBalance>(([balances, walletIndex]) => ({
                   walletType: 'ledger',
-                  walletIndex: walletIndex.toString(),
+                  walletIndex,
                   chain,
                   walletAddress: O.some(address),
                   balances

@@ -63,10 +63,15 @@ export const AssetsView: React.FC = (): JSX.Element => {
       asset: Asset
       walletAddress: Address
       walletType: WalletType
-      walletIndex: string
+      walletIndex: number
     }) =>
       history.push(
-        walletRoutes.assetDetail.path({ asset: assetToString(asset), walletAddress, walletType, walletIndex })
+        walletRoutes.assetDetail.path({
+          asset: assetToString(asset),
+          walletAddress,
+          walletType,
+          walletIndex: walletIndex.toString()
+        })
       ),
     [history]
   )

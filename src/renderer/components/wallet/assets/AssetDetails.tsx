@@ -26,7 +26,7 @@ import * as Styled from './AssetDetails.styles'
 
 type Props = {
   walletType: WalletType
-  walletIndex: string
+  walletIndex: number
   txsPageRD: TxsPageRD
   balances: O.Option<NonEmptyWalletBalances>
   asset: Asset
@@ -66,8 +66,18 @@ export const AssetDetails: React.FC<Props> = (props): JSX.Element => {
   const walletActionSendClick = useCallback(() => {
     const routeParams = FP.pipe(
       oWalletAddress,
-      O.map((walletAddress) => ({ asset: assetToString(asset), walletAddress, walletType, walletIndex })),
-      O.getOrElse(() => ({ asset: assetToString(asset), walletAddress: '', walletType, walletIndex }))
+      O.map((walletAddress) => ({
+        asset: assetToString(asset),
+        walletAddress,
+        walletType,
+        walletIndex: walletIndex.toString()
+      })),
+      O.getOrElse(() => ({
+        asset: assetToString(asset),
+        walletAddress: '',
+        walletType,
+        walletIndex: walletIndex.toString()
+      }))
     )
     history.push(walletRoutes.send.path(routeParams))
   }, [asset, history, oWalletAddress, walletIndex, walletType])
@@ -90,7 +100,13 @@ export const AssetDetails: React.FC<Props> = (props): JSX.Element => {
       oWalletAddress,
       O.filter((_) => isNonNativeRuneAsset),
       O.map((walletAddress) =>
-        walletRoutes.upgradeRune.path({ asset: assetToString(asset), walletAddress, network, walletType, walletIndex })
+        walletRoutes.upgradeRune.path({
+          asset: assetToString(asset),
+          walletAddress,
+          network,
+          walletType,
+          walletIndex: walletIndex.toString()
+        })
       ),
       O.map(history.push)
     )

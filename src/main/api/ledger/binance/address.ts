@@ -12,11 +12,11 @@ import { isError } from '../../../../shared/utils/guard'
 export const getAddress = async (
   transport: Transport,
   network: Network,
-  walletIndex: string
+  walletIndex: number
 ): Promise<E.Either<LedgerError, Address>> => {
   try {
     const app = new AppBNB(transport)
-    const derive_path = getDerivePath(parseInt(walletIndex))
+    const derive_path = getDerivePath(walletIndex)
     const { pk } = await app.getPublicKey(derive_path)
     const clientNetwork = toClientNetwork(network)
     const prefix = getPrefix(clientNetwork)

@@ -28,7 +28,7 @@ type Props = {
   lockWallet: FP.Lazy<void>
   removeKeystore: FP.Lazy<void>
   exportKeystore: (runeNativeAddress: string, selectedNetwork: Network) => void
-  addLedgerAddress: (chain: Chain, walletIndex: string) => void
+  addLedgerAddress: (chain: Chain, walletIndex: number) => void
   removeLedgerAddress: (chain: Chain) => void
   phrase: O.Option<string>
   clickAddressLinkHandler: (chain: Chain, address: Address) => void
@@ -66,7 +66,7 @@ export const WalletSettings: React.FC<Props> = (props): JSX.Element => {
   const [showRemoveWalletModal, setShowRemoveWalletModal] = useState(false)
   const [showQRModal, setShowQRModal] = useState<O.Option<{ asset: Asset; address: Address }>>(O.none)
   const closeQrModal = useCallback(() => setShowQRModal(O.none), [setShowQRModal])
-  const [walletIndex, setWalletIndex] = useState<string>('0')
+  const [walletIndex, setWalletIndex] = useState<number>(0)
 
   const removeWallet = useCallback(() => {
     removeKeystore()
@@ -105,8 +105,8 @@ export const WalletSettings: React.FC<Props> = (props): JSX.Element => {
           {isBnbChain(chain) && (
             <Styled.WalletIndexInput
               value={walletIndex.toString()}
-              pattern="[0-9.]+"
-              onChange={(value) => value !== null && +value >= 0 && setWalletIndex(value.toString())}
+              pattern="[0-9]+"
+              onChange={(value) => value !== null && +value >= 0 && setWalletIndex(+value)}
               style={{ width: 60 }}
               onPressEnter={() => addLedgerAddress(chain, walletIndex)}
             />

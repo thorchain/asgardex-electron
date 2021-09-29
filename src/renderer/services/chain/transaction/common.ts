@@ -37,7 +37,7 @@ const txFailure$ = (msg: string) =>
 
 export const sendTx$ = (
   { walletType, asset, sender, recipient, amount, memo, feeOption = DEFAULT_FEE_OPTION }: SendTxParams,
-  walletIndex?: string
+  walletIndex?: number
 ): TxHashLD => {
   switch (asset.chain) {
     case BNBChain:

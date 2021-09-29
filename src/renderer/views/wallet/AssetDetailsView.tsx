@@ -139,7 +139,7 @@ export const AssetDetailsView: React.FC = (): JSX.Element => {
           (asset) => (
             <AssetDetails
               walletType={walletType}
-              walletIndex={walletIndex}
+              walletIndex={parseInt(walletIndex)}
               txsPageRD={txsRD}
               balances={walletBalances}
               asset={asset}

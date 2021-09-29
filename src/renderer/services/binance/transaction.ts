@@ -25,7 +25,7 @@ export const createTransactionService = (client$: Client$, network$: Network$): 
   }: {
     network: Network
     params: SendTxParams
-    walletIndex?: string
+    walletIndex?: number
   }) => {
     const sendLedgerTxParams: IPCLedgerSendTxParams = {
       chain: BNBChain,
@@ -35,7 +35,7 @@ export const createTransactionService = (client$: Client$, network$: Network$): 
       sender: params.sender,
       recipient: params.recipient,
       memo: params.memo,
-      walletIndex: walletIndex ? walletIndex : '0'
+      walletIndex: walletIndex ? walletIndex : 0
     }
     const encoded = ipcLedgerSendTxParamsIO.encode(sendLedgerTxParams)
 
@@ -58,7 +58,7 @@ export const createTransactionService = (client$: Client$, network$: Network$): 
       RxOp.startWith(RD.pending)
     )
   }
-  const sendTx = (params: SendTxParams, walletIndex?: string) =>
+  const sendTx = (params: SendTxParams, walletIndex?: number) =>
     FP.pipe(
       network$,
       RxOp.switchMap((network) => {
