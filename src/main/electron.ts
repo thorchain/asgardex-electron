@@ -96,9 +96,6 @@ const initMainWindow = async () => {
       // ^ https://www.electronjs.org/docs/tutorial/context-isolation
       // From Electron 12, it will be enabled by default.
       contextIsolation: true,
-      // Disable `remote` module
-      // https://www.electronjs.org/docs/tutorial/security#15-disable-the-remote-module
-      enableRemoteModule: false,
       // preload script
       preload: join(__dirname, IS_DEV ? '../../public/' : '../build/', 'preload.js')
     }
