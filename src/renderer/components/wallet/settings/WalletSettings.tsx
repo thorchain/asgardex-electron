@@ -19,6 +19,7 @@ import { PhraseCopyModal } from '../../../components/wallet/phrase/PhraseCopyMod
 import { getChainAsset, isBnbChain } from '../../../helpers/chainHelper'
 import { ValidatePasswordHandler, WalletAccounts, WalletAddress } from '../../../services/wallet/types'
 import { walletTypeToI18n } from '../../../services/wallet/util'
+import { InfoIcon } from '../../uielements/info'
 import * as Styled from './WalletSettings.styles'
 
 type Props = {
@@ -103,13 +104,17 @@ export const WalletSettings: React.FC<Props> = (props): JSX.Element => {
             <Styled.AddLedgerIcon /> {intl.formatMessage({ id: 'ledger.add.device' })}
           </Styled.AddLedgerButton>
           {isBnbChain(chain) && (
-            <Styled.WalletIndexInput
-              value={walletIndex.toString()}
-              pattern="[0-9]+"
-              onChange={(value) => value !== null && +value >= 0 && setWalletIndex(+value)}
-              style={{ width: 60 }}
-              onPressEnter={() => addLedgerAddress(chain, walletIndex)}
-            />
+            <>
+              <Styled.IndexLabel>{intl.formatMessage({ id: 'setting.wallet.index' })}</Styled.IndexLabel>
+              <Styled.WalletIndexInput
+                value={walletIndex.toString()}
+                pattern="[0-9]+"
+                onChange={(value) => value !== null && +value >= 0 && setWalletIndex(+value)}
+                style={{ width: 60 }}
+                onPressEnter={() => addLedgerAddress(chain, walletIndex)}
+              />
+              <InfoIcon tooltip={intl.formatMessage({ id: 'setting.wallet.index.info' })} />
+            </>
           )}
         </Styled.AddLedgerContainer>
       )

@@ -13,7 +13,9 @@ const settings: SettingMessages = {
   'setting.version': 'Версия',
   'setting.connected': 'Connected - RU',
   'setting.notconnected': 'Нет соединения',
-  'setting.add.device': 'Добавить устройство'
+  'setting.add.device': 'Добавить устройство',
+  'setting.wallet.index': 'INFO - RU',
+  'setting.wallet.index.info': 'Enter the index number of the Ledger address you want to use - RU'
 }
 
 export default settings

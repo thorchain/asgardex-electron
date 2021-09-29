@@ -258,6 +258,8 @@ type SettingMessageKey =
   | 'setting.notconnected'
   | 'setting.connected'
   | 'setting.add.device'
+  | 'setting.wallet.index'
+  | 'setting.wallet.index.info'
 
 export type SettingMessages = { [key in SettingMessageKey]: string }
 
