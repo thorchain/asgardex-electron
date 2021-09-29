@@ -34,6 +34,7 @@ const mockTxState$ = (states: UpgradeRuneTxState[]): UpgradeRuneTxState$ =>
 
 const bnbBalance: WalletBalance = {
   walletType: 'keystore',
+  walletIndex: 0,
   asset: AssetBNB,
   amount: assetToBase(assetAmount(1001)),
   walletAddress: 'BNB address'
@@ -41,6 +42,7 @@ const bnbBalance: WalletBalance = {
 
 const runeBnbBalance: WalletBalance = {
   walletType: 'keystore',
+  walletIndex: 0,
   asset: AssetRune67C,
   amount: assetToBase(assetAmount(2002)),
   walletAddress: 'BNB.Rune address'
@@ -48,6 +50,7 @@ const runeBnbBalance: WalletBalance = {
 
 const runeNativeBalance: WalletBalance = {
   walletType: 'keystore',
+  walletIndex: 0,
   asset: AssetRuneNative,
   amount: assetToBase(assetAmount(0)),
   walletAddress: 'Rune native address'
@@ -64,7 +67,9 @@ const defaultProps: UpgradeProps = {
     decimal: BNB_DECIMAL
   },
   runeNativeAddress: 'rune-native-address',
-  walletAddress: 'BNB.Rune address',
+  walletAddress: 'bnb12312312312123123123123',
+  walletType: 'keystore',
+  walletIndex: 0,
   reloadOnError: () => {},
   targetPoolAddressRD: RD.success({ chain: BNBChain, address: 'bnb-pool-address', router: O.none, halted: false }),
   validatePassword$: mockValidatePassword$,

@@ -36,7 +36,7 @@ import { UpgradeETH } from './UpgradeViewETH'
 type Props = {}
 
 export const UpgradeView: React.FC<Props> = (): JSX.Element => {
-  const { asset, walletAddress } = useParams<AssetDetailsParams>()
+  const { asset, walletAddress, walletType, walletIndex } = useParams<AssetDetailsParams>()
 
   const intl = useIntl()
 
@@ -184,6 +184,8 @@ export const UpgradeView: React.FC<Props> = (): JSX.Element => {
                 (runeNativeAddress) => {
                   return renderUpgradeComponent(runeAsset, {
                     walletAddress,
+                    walletType,
+                    walletIndex: parseInt(walletIndex),
                     runeAsset,
                     runeNativeAddress,
                     targetPoolAddressRD,

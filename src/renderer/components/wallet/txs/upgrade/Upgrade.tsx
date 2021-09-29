@@ -24,14 +24,13 @@ import { UpgradeRuneParams, UpgradeRuneTxState, UpgradeRuneTxState$ } from '../.
 import { FeeRD } from '../../../../services/chain/types'
 import { OpenExplorerTxUrl } from '../../../../services/clients'
 import { PoolAddressRD } from '../../../../services/midgard/types'
-import { NonEmptyWalletBalances, ValidatePasswordHandler } from '../../../../services/wallet/types'
+import { NonEmptyWalletBalances, ValidatePasswordHandler, WalletType } from '../../../../services/wallet/types'
 import { AssetWithDecimal } from '../../../../types/asgardex'
 import { PasswordModal } from '../../../modal/password'
 import { MaxBalanceButton } from '../../../uielements/button/MaxBalanceButton'
 import { ViewTxButton } from '../../../uielements/button/ViewTxButton'
 import { UIFeesRD } from '../../../uielements/fees'
 import { InputBigNumber } from '../../../uielements/input/InputBigNumber'
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { AccountSelector } from '../../account'
 import * as Styled from '../TxForm.styles'
 import { validateTxAmountInput } from '../TxForm.util'
@@ -39,7 +38,9 @@ import * as CStyled from './Upgrade.styles'
 
 export type Props = {
   runeAsset: AssetWithDecimal
-  walletAddress: Address
+  walletAddress: string
+  walletType: WalletType
+  walletIndex: number
   runeNativeAddress: Address
   targetPoolAddressRD: PoolAddressRD
   validatePassword$: ValidatePasswordHandler
@@ -73,6 +74,8 @@ export const Upgrade: React.FC<Props> = (props): JSX.Element => {
     reloadBalancesHandler,
     network,
     walletAddress,
+    walletType,
+    walletIndex,
     reloadOnError
   } = props
 
@@ -115,7 +118,8 @@ export const Upgrade: React.FC<Props> = (props): JSX.Element => {
     () =>
       getWalletAssetAmountFromBalances(
         (balance) =>
-          eqString.equals(balance.walletAddress, walletAddress) && eqAsset.equals(balance.asset, runeAsset.asset)
+          eqString.equals(balance.walletAddress, walletAddress.toString()) &&
+          eqAsset.equals(balance.asset, runeAsset.asset)
       ),
     [runeAsset, walletAddress]
   )
@@ -126,7 +130,8 @@ export const Upgrade: React.FC<Props> = (props): JSX.Element => {
     () =>
       getWalletAssetAmountFromBalances(
         (balance) =>
-          eqString.equals(balance.walletAddress, walletAddress) && eqAsset.equals(balance.asset, chainBaseAsset)
+          eqString.equals(balance.walletAddress, walletAddress.toString()) &&
+          eqAsset.equals(balance.asset, chainBaseAsset)
       ),
     [chainBaseAsset, walletAddress]
   )
@@ -198,14 +203,28 @@ export const Upgrade: React.FC<Props> = (props): JSX.Element => {
               amount: amountToUpgrade,
               asset: runeAsset.asset,
               memo: getSwitchMemo(runeNativeAddress),
-              network
+              network,
+              walletAddress,
+              walletIndex,
+              walletType
             })
           )
           return true
         })
       ),
 
-    [runeNativeAddress, targetPoolAddressRD, upgrade$, amountToUpgrade, runeAsset, subscribeUpgradeTxState, network]
+    [
+      targetPoolAddressRD,
+      subscribeUpgradeTxState,
+      upgrade$,
+      amountToUpgrade,
+      runeAsset.asset,
+      runeNativeAddress,
+      network,
+      walletAddress,
+      walletIndex,
+      walletType
+    ]
   )
 
   const oFee: O.Option<BaseAmount> = useMemo(() => FP.pipe(feeRD, RD.toOption), [feeRD])

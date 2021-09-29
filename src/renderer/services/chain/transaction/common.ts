@@ -90,7 +90,9 @@ export const sendTx$ = (
 }
 
 export const sendPoolTx$ = ({
+  sender,
   walletType,
+  walletIndex,
   router,
   asset,
   recipient,
@@ -113,7 +115,7 @@ export const sendPoolTx$ = ({
 
     default:
       // TODO(@asgdx-team) Get `walletType` from props if we want to support other than keystore (e.g. Ledger)
-      return sendTx$({ walletType: 'keystore', asset, recipient, amount, memo, feeOption })
+      return sendTx$({ sender, walletType, asset, recipient, amount, memo, feeOption, walletIndex })
   }
 }
 

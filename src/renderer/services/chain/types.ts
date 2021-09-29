@@ -253,6 +253,9 @@ export type AsymWithdrawParams = {
 export type AsymWithdrawStateHandler = (p: AsymWithdrawParams) => WithdrawState$
 
 export type UpgradeRuneParams = {
+  readonly walletAddress: string
+  readonly walletType: WalletType
+  readonly walletIndex: number
   readonly poolAddress: PoolAddress
   readonly asset: Asset
   readonly amount: BaseAmount
