@@ -240,7 +240,7 @@ export const createBalancesService = ({
               // and put it's RD state into `balances` of `ChainBalance`
               FP.pipe(
                 Rx.combineLatest([getBalanceByAddress$(address, 'ledger'), getWalletIndex$(chain)]),
-                RxOp.map<any, ChainBalance>(([balances, walletIndex]) => ({
+                RxOp.map<[WalletBalancesRD, string], ChainBalance>(([balances, walletIndex]) => ({
                   walletType: 'ledger',
                   walletIndex: walletIndex.toString(),
                   chain,

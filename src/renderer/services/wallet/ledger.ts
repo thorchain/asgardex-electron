@@ -6,6 +6,7 @@ import * as RxOp from 'rxjs/operators'
 
 import { LedgerErrorId, Network } from '../../../shared/api/types'
 import { isError } from '../../../shared/utils/guard'
+import { eqLedgerAddressMap } from '../../helpers/fp/eq'
 import { observableState } from '../../helpers/stateHelper'
 import { INITIAL_LEDGER_ADDRESSES_MAP } from './const'
 import {
@@ -42,8 +43,8 @@ export const createLedgerService = ({ keystore$ }: { keystore$: KeystoreState$ }
     return setLedgerAddresses({
       ...addresses,
       [chain]: {
-        ...addresses[chain],
         addresses: {
+          ...addresses[chain]['addresses'],
           [network]: addressRD
         },
         walletIndex: walletIndex
@@ -58,8 +59,7 @@ export const createLedgerService = ({ keystore$ }: { keystore$: KeystoreState$ }
     FP.pipe(
       ledgerAddresses$,
       RxOp.map((addressesMap) => addressesMap[chain]['addresses']),
-      // TODO adjust
-      // RxOp.distinctUntilChanged(eqLedgerAddressMap.equals),
+      RxOp.distinctUntilChanged(eqLedgerAddressMap.equals),
       RxOp.map((addressMap) => addressMap[network])
     )
 
