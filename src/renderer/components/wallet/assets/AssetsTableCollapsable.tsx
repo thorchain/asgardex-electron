@@ -390,7 +390,6 @@ export const AssetsTableCollapsable: React.FC<Props> = (props): JSX.Element => {
             </Styled.HeaderAddress>
           </Col>
           <Col xs={10} md={6} lg={10}>
-            <div>{assetsTxt}</div>
             <Styled.HeaderLabel
               color={RD.isFailure(balancesRD) ? 'error' : 'gray'}>{`${assetsTxt}`}</Styled.HeaderLabel>
           </Col>
