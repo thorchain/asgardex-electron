@@ -71,45 +71,53 @@ describe('Wallet routes', () => {
 
   describe('asset detail route', () => {
     it('template', () => {
-      expect(assetDetail.template).toEqual('/wallet/assets/detail/:walletType/:walletAddress/:asset')
+      expect(assetDetail.template).toEqual('/wallet/assets/detail/:walletType/:walletAddress/:walletIndex/:asset')
     })
     it('returns path by given asset parameter', () => {
-      expect(assetDetail.path({ walletType: 'keystore', asset: 'BNB.BNB', walletAddress: 'abc123' })).toEqual(
-        '/wallet/assets/detail/keystore/abc123/BNB.BNB'
-      )
+      expect(
+        assetDetail.path({ walletType: 'keystore', asset: 'BNB.BNB', walletAddress: 'abc123', walletIndex: '0' })
+      ).toEqual('/wallet/assets/detail/keystore/abc123/0/BNB.BNB')
     })
     it('redirects to base path if asset is empty', () => {
-      expect(assetDetail.path({ walletType: 'keystore', asset: '', walletAddress: 'abc123' })).toEqual(assets.path())
+      expect(
+        assetDetail.path({ walletType: 'keystore', asset: '', walletAddress: 'abc123', walletIndex: '0' })
+      ).toEqual(assets.path())
     })
 
     it('redirects to base path if address is empty', () => {
-      expect(assetDetail.path({ walletType: 'keystore', asset: 'some asset', walletAddress: '' })).toEqual(
-        assets.path()
-      )
+      expect(
+        assetDetail.path({ walletType: 'keystore', asset: 'some asset', walletAddress: '', walletIndex: '0' })
+      ).toEqual(assets.path())
     })
   })
 
   describe('send route', () => {
     it('template', () => {
-      expect(send.template).toEqual('/wallet/assets/detail/:walletType/:walletAddress/:asset/send')
+      expect(send.template).toEqual('/wallet/assets/detail/:walletType/:walletAddress/:walletIndex/:asset/send')
     })
     it('path ', () => {
-      expect(send.path({ asset: 'BNB.BNB', walletAddress: 'bnb123address', walletType: 'keystore' })).toEqual(
-        '/wallet/assets/detail/keystore/bnb123address/BNB.BNB/send'
-      )
+      expect(
+        send.path({ asset: 'BNB.BNB', walletAddress: 'bnb123address', walletType: 'keystore', walletIndex: '0' })
+      ).toEqual('/wallet/assets/detail/keystore/bnb123address/0/BNB.BNB/send')
     })
     it('redirects to base path if asset is empty', () => {
-      expect(send.path({ asset: '', walletAddress: 'some wallet', walletType: 'keystore' })).toEqual(assets.path())
+      expect(send.path({ asset: '', walletAddress: 'some wallet', walletType: 'keystore', walletIndex: '0' })).toEqual(
+        assets.path()
+      )
     })
 
     it('redirects to base path if address is empty', () => {
-      expect(send.path({ asset: 'some asset', walletAddress: '', walletType: 'keystore' })).toEqual(assets.path())
+      expect(send.path({ asset: 'some asset', walletAddress: '', walletType: 'keystore', walletIndex: '0' })).toEqual(
+        assets.path()
+      )
     })
   })
 
   describe('upgrade route', () => {
     it('template', () => {
-      expect(upgradeRune.template).toEqual('/wallet/assets/detail/:walletType/:walletAddress/:asset/upgrade')
+      expect(upgradeRune.template).toEqual(
+        '/wallet/assets/detail/:walletType/:walletAddress/:walletIndex/:asset/upgrade'
+      )
     })
     it('path for BNB.RUNE-67C ', () => {
       expect(
@@ -117,9 +125,10 @@ describe('Wallet routes', () => {
           asset: 'BNB.RUNE-67C',
           walletAddress: 'bnb123address',
           network: 'testnet',
-          walletType: 'keystore'
+          walletType: 'keystore',
+          walletIndex: '0'
         })
-      ).toEqual('/wallet/assets/detail/keystore/bnb123address/BNB.RUNE-67C/upgrade')
+      ).toEqual('/wallet/assets/detail/keystore/bnb123address/0/BNB.RUNE-67C/upgrade')
     })
     it('path for BNB.RUNE-B1A ', () => {
       expect(
@@ -127,9 +136,10 @@ describe('Wallet routes', () => {
           asset: 'BNB.RUNE-B1A',
           walletAddress: 'bnb123address',
           network: 'mainnet',
-          walletType: 'keystore'
+          walletType: 'keystore',
+          walletIndex: '0'
         })
-      ).toEqual('/wallet/assets/detail/keystore/bnb123address/BNB.RUNE-B1A/upgrade')
+      ).toEqual('/wallet/assets/detail/keystore/bnb123address/0/BNB.RUNE-B1A/upgrade')
     })
     it('redirects to base path for BNB assets ', () => {
       expect(
@@ -137,13 +147,20 @@ describe('Wallet routes', () => {
           asset: 'BNB.BNB',
           walletAddress: 'walletAddress',
           network: 'mainnet',
-          walletType: 'keystore'
+          walletType: 'keystore',
+          walletIndex: '0'
         })
       ).toEqual('/wallet/assets')
     })
     it('redirects to base path for empty addresses ', () => {
       expect(
-        upgradeRune.path({ asset: 'BNB.RUNE-67C', walletAddress: '', network: 'testnet', walletType: 'keystore' })
+        upgradeRune.path({
+          asset: 'BNB.RUNE-67C',
+          walletAddress: '',
+          network: 'testnet',
+          walletType: 'keystore',
+          walletIndex: '0'
+        })
       ).toEqual('/wallet/assets')
     })
   })

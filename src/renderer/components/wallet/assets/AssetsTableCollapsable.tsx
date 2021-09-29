@@ -46,11 +46,13 @@ type Props = {
   selectAssetHandler?: ({
     asset,
     walletAddress,
-    walletType
+    walletType,
+    walletIndex
   }: {
     asset: Asset
     walletAddress: Address
     walletType: WalletType
+    walletIndex: number
   }) => void
   setSelectedAsset?: (oAsset: O.Option<Asset>) => void
   network: Network
@@ -93,12 +95,12 @@ export const AssetsTableCollapsable: React.FC<Props> = (props): JSX.Element => {
   )
 
   const onRowHandler = useCallback(
-    (oWalletAddress: O.Option<Address>, walletType: WalletType) =>
+    (oWalletAddress: O.Option<Address>, walletType: WalletType, walletIndex: number) =>
       ({ asset }: Balance) => {
         // Disable click for NativeRUNE if Thorchain is halted
         const onClick = FP.pipe(
           oWalletAddress,
-          O.map((walletAddress) => () => selectAssetHandler({ asset, walletAddress, walletType })),
+          O.map((walletAddress) => () => selectAssetHandler({ asset, walletAddress, walletType, walletIndex })),
           // TODO(@Veado) Add error message / alert
           O.getOrElse(() => () => console.error('Unknown address'))
         )
@@ -132,7 +134,7 @@ export const AssetsTableCollapsable: React.FC<Props> = (props): JSX.Element => {
   const tickerColumn: ColumnType<WalletBalance> = useMemo(
     () => ({
       width: 80,
-      render: ({ asset, walletAddress, walletType }: WalletBalance) => {
+      render: ({ asset, walletAddress, walletType, walletIndex }: WalletBalance) => {
         // Disable UPGRADE button if needed
         const disableUpgradeButton = disableRuneUpgrade({ asset, haltThorChain, haltEthChain, haltBnbChain, network })
 
@@ -141,7 +143,13 @@ export const AssetsTableCollapsable: React.FC<Props> = (props): JSX.Element => {
           e.stopPropagation()
           setSelectedAsset(O.some(asset))
           history.push(
-            walletRoutes.upgradeRune.path({ asset: assetToString(asset), walletAddress, network, walletType })
+            walletRoutes.upgradeRune.path({
+              asset: assetToString(asset),
+              walletAddress,
+              network,
+              walletType,
+              walletIndex: walletIndex ? walletIndex.toString() : '0'
+            })
           )
         }
 
@@ -252,12 +260,14 @@ export const AssetsTableCollapsable: React.FC<Props> = (props): JSX.Element => {
       tableData,
       oWalletAddress,
       loading = false,
-      walletType
+      walletType,
+      walletIndex
     }: {
       tableData: Balance[]
       oWalletAddress: O.Option<Address>
       loading?: boolean
       walletType: WalletType
+      walletIndex: number
     }) => {
       return (
         <Styled.Table
@@ -265,7 +275,7 @@ export const AssetsTableCollapsable: React.FC<Props> = (props): JSX.Element => {
           dataSource={tableData}
           loading={loading}
           rowKey={({ asset }) => asset.symbol}
-          onRow={onRowHandler(oWalletAddress, walletType)}
+          onRow={onRowHandler(oWalletAddress, walletType, walletIndex)}
           columns={columns}
         />
       )
@@ -278,22 +288,24 @@ export const AssetsTableCollapsable: React.FC<Props> = (props): JSX.Element => {
       balancesRD,
       index,
       oWalletAddress,
-      walletType
+      walletType,
+      walletIndex
     }: {
       balancesRD: WalletBalancesRD
       index: number
       oWalletAddress: O.Option<Address>
       walletType: WalletType
+      walletIndex: number
     }) => {
       return FP.pipe(
         balancesRD,
         RD.fold(
           // initial state
-          () => renderAssetsTable({ tableData: [], oWalletAddress, loading: false, walletType }),
+          () => renderAssetsTable({ tableData: [], oWalletAddress, loading: false, walletType, walletIndex }),
           // loading state
           () => {
             const data = previousAssetsTableData.current[index] ?? []
-            return renderAssetsTable({ tableData: data, oWalletAddress, loading: true, walletType })
+            return renderAssetsTable({ tableData: data, oWalletAddress, loading: true, walletType, walletIndex })
           },
           // error state
           ({ msg }: ApiError) => {
@@ -303,7 +315,7 @@ export const AssetsTableCollapsable: React.FC<Props> = (props): JSX.Element => {
           (assetsWB) => {
             const prev = previousAssetsTableData.current
             prev[index] = assetsWB
-            return renderAssetsTable({ tableData: assetsWB, oWalletAddress, loading: false, walletType })
+            return renderAssetsTable({ tableData: assetsWB, oWalletAddress, loading: false, walletType, walletIndex })
           }
         )
       )
@@ -313,7 +325,10 @@ export const AssetsTableCollapsable: React.FC<Props> = (props): JSX.Element => {
 
   // Panel
   const renderPanel = useCallback(
-    ({ chain, walletType, walletAddress: oWalletAddress, balances: balancesRD }: ChainBalance, key: number) => {
+    (
+      { chain, walletType, walletIndex, walletAddress: oWalletAddress, balances: balancesRD }: ChainBalance,
+      key: number
+    ) => {
       /**
        * We need to push initial value to the ledger-based streams
        * 'cuz chainBalances$ stream is created by 'combineLatest'
@@ -324,6 +339,12 @@ export const AssetsTableCollapsable: React.FC<Props> = (props): JSX.Element => {
       if (O.isNone(oWalletAddress) && RD.isInitial(balancesRD)) {
         return null
       }
+
+      const walletAddress = FP.pipe(
+        oWalletAddress,
+        O.getOrElse(() => intl.formatMessage({ id: 'wallet.errors.address.invalid' }))
+      )
+
       const assetsTxt = FP.pipe(
         balancesRD,
         RD.fold(
@@ -336,11 +357,6 @@ export const AssetsTableCollapsable: React.FC<Props> = (props): JSX.Element => {
             return `(${length} ${intl.formatMessage({ id: i18nKey })})`
           }
         )
-      )
-
-      const walletAddress = FP.pipe(
-        oWalletAddress,
-        O.getOrElse(() => intl.formatMessage({ id: 'wallet.errors.address.invalid' }))
       )
 
       const header = (
@@ -381,7 +397,13 @@ export const AssetsTableCollapsable: React.FC<Props> = (props): JSX.Element => {
       )
       return (
         <Panel header={header} key={key}>
-          {renderBalances({ balancesRD, index: key, oWalletAddress, walletType })}
+          {renderBalances({
+            balancesRD,
+            index: key,
+            oWalletAddress,
+            walletType,
+            walletIndex: walletIndex ? walletIndex : 0
+          })}
         </Panel>
       )
     },

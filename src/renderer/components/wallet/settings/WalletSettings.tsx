@@ -16,7 +16,7 @@ import { PasswordModal } from '../../../components/modal/password'
 import { AssetIcon } from '../../../components/uielements/assets/assetIcon/AssetIcon'
 import { QRCodeModal } from '../../../components/uielements/qrCodeModal/QRCodeModal'
 import { PhraseCopyModal } from '../../../components/wallet/phrase/PhraseCopyModal'
-import { getChainAsset } from '../../../helpers/chainHelper'
+import { getChainAsset, isBnbChain } from '../../../helpers/chainHelper'
 import { ValidatePasswordHandler, WalletAccounts, WalletAddress } from '../../../services/wallet/types'
 import { walletTypeToI18n } from '../../../services/wallet/util'
 import * as Styled from './WalletSettings.styles'
@@ -28,7 +28,7 @@ type Props = {
   lockWallet: FP.Lazy<void>
   removeKeystore: FP.Lazy<void>
   exportKeystore: (runeNativeAddress: string, selectedNetwork: Network) => void
-  addLedgerAddress: (chain: Chain) => void
+  addLedgerAddress: (chain: Chain, walletIndex: number) => void
   removeLedgerAddress: (chain: Chain) => void
   phrase: O.Option<string>
   clickAddressLinkHandler: (chain: Chain, address: Address) => void
@@ -66,6 +66,7 @@ export const WalletSettings: React.FC<Props> = (props): JSX.Element => {
   const [showRemoveWalletModal, setShowRemoveWalletModal] = useState(false)
   const [showQRModal, setShowQRModal] = useState<O.Option<{ asset: Asset; address: Address }>>(O.none)
   const closeQrModal = useCallback(() => setShowQRModal(O.none), [setShowQRModal])
+  const [walletIndex, setWalletIndex] = useState<number>(0)
 
   const removeWallet = useCallback(() => {
     removeKeystore()
@@ -96,11 +97,21 @@ export const WalletSettings: React.FC<Props> = (props): JSX.Element => {
 
   const renderAddress = useCallback(
     (chain: Chain, { type: walletType, address: addressRD }: WalletAddress) => {
-      // Render ADD LEDGER button
       const renderAddLedger = (chain: Chain, loading: boolean) => (
-        <Styled.AddLedgerButton loading={loading} onClick={() => addLedgerAddress(chain)}>
-          <Styled.AddLedgerIcon /> {intl.formatMessage({ id: 'ledger.add.device' })}
-        </Styled.AddLedgerButton>
+        <Styled.AddLedgerContainer>
+          <Styled.AddLedgerButton loading={loading} onClick={() => addLedgerAddress(chain, walletIndex)}>
+            <Styled.AddLedgerIcon /> {intl.formatMessage({ id: 'ledger.add.device' })}
+          </Styled.AddLedgerButton>
+          {isBnbChain(chain) && (
+            <Styled.WalletIndexInput
+              value={walletIndex.toString()}
+              pattern="[0-9]+"
+              onChange={(value) => value !== null && +value >= 0 && setWalletIndex(+value)}
+              style={{ width: 60 }}
+              onPressEnter={() => addLedgerAddress(chain, walletIndex)}
+            />
+          )}
+        </Styled.AddLedgerContainer>
       )
 
       // Render addresses depending on its loading status
@@ -130,7 +141,7 @@ export const WalletSettings: React.FC<Props> = (props): JSX.Element => {
         </Styled.AddressContainer>
       )
     },
-    [addLedgerAddress, clickAddressLinkHandler, intl, removeLedgerAddress, selectedNetwork]
+    [addLedgerAddress, clickAddressLinkHandler, intl, removeLedgerAddress, selectedNetwork, walletIndex]
   )
 
   const accounts = useMemo(

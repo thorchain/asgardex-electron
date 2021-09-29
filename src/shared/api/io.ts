@@ -80,7 +80,8 @@ export const ipcLedgerSendTxParamsIO = t.type({
   recipient: t.string,
   asset: t.union([assetIO, t.undefined]),
   amount: baseAmountIO,
-  memo: t.union([t.string, t.undefined])
+  memo: t.union([t.string, t.undefined]),
+  walletIndex: t.union([t.number, t.undefined])
 })
 
 export type IPCLedgerSendTxParams = t.TypeOf<typeof ipcLedgerSendTxParamsIO>

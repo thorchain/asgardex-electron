@@ -59,7 +59,7 @@ export type TransactionService = C.TransactionService<SendTxParams>
 
 export type LedgerService = {
   ledgerAddress$: LedgerAddressLD
-  retrieveLedgerAddress: (network: Network) => void
+  retrieveLedgerAddress: (network: Network, walletIndex: number) => void
   removeLedgerAddress: () => void
   ledgerTxRD$: LedgerTxHashLD
   pushLedgerTx: (network: Network, params: LedgerBNBTxParams) => Rx.Subscription

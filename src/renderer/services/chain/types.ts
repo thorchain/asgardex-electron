@@ -295,4 +295,4 @@ export type SendTxState = {
 
 export type SendTxState$ = Rx.Observable<SendTxState>
 
-export type SendTxStateHandler = (p: SendTxParams) => SendTxState$
+export type SendTxStateHandler = (p: SendTxParams, walletIndex?: number) => SendTxState$

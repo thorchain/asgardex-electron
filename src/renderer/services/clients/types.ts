@@ -53,7 +53,7 @@ export type Address$ = Rx.Observable<O.Option<Address>>
 export type TransactionService<T> = {
   txRD$: TxHashLD
   subscribeTx: (_: T) => Rx.Subscription
-  sendTx: (_: T) => TxHashLD
+  sendTx: (_: T, walletIndex?: number) => TxHashLD
   resetTx: () => void
   txs$: (_: TxsParams) => TxsPageLD
   tx$: (txHash: TxHash) => TxLD

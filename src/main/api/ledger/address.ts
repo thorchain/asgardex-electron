@@ -10,7 +10,8 @@ import { getAddress as getTHORAddress } from './thorchain/address'
 
 export const getAddress = async ({
   chain,
-  network
+  network,
+  walletIndex = 0
 }: IPCLedgerAdddressParams): Promise<E.Either<LedgerError, Address>> => {
   try {
     let res: E.Either<LedgerError, Address>
@@ -20,7 +21,7 @@ export const getAddress = async ({
         res = await getTHORAddress(transport, network)
         break
       case BNBChain:
-        res = await getBNBAddress(transport, network)
+        res = await getBNBAddress(transport, network, walletIndex)
         break
       default:
         res = E.left({

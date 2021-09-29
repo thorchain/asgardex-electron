@@ -42,11 +42,13 @@ import { hasImportedKeystore } from './util'
 export const createBalancesService = ({
   keystore$,
   network$,
-  getLedgerAddress$
+  getLedgerAddress$,
+  getWalletIndex$
 }: {
   keystore$: KeystoreState$
   network$: Network$
   getLedgerAddress$: (chain: Chain, network: Network) => LedgerAddressLD
+  getWalletIndex$: (chain: Chain) => Rx.Observable<number>
 }): BalancesService => {
   // reload all balances
   const reloadBalances: FP.Lazy<void> = () => {
@@ -78,7 +80,7 @@ export const createBalancesService = ({
     }
   }
 
-  const getServiceByChain = (chain: Chain, walletType: WalletType): ChainBalancesService => {
+  const getServiceByChain = (chain: Chain, walletType: WalletType, walletIndex: number): ChainBalancesService => {
     switch (chain) {
       case BNBChain:
         return {
@@ -86,7 +88,7 @@ export const createBalancesService = ({
           resetReloadBalances: BNB.resetReloadBalances,
           balances$: FP.pipe(
             network$,
-            RxOp.switchMap((network) => BNB.balances$(walletType, network))
+            RxOp.switchMap((network) => BNB.balances$(walletType, network, walletIndex))
           ),
           reloadBalances$: BNB.reloadBalances$
         }
@@ -157,8 +159,8 @@ export const createBalancesService = ({
     }
   })
 
-  const getChainBalance$ = (chain: Chain, walletType: WalletType): WalletBalancesLD => {
-    const chainService = getServiceByChain(chain, walletType)
+  const getChainBalance$ = (chain: Chain, walletType: WalletType, walletIndex = 0): WalletBalancesLD => {
+    const chainService = getServiceByChain(chain, walletType, walletIndex)
     const reload$ = FP.pipe(
       chainService.reloadBalances$,
       RxOp.finalize(() => {
@@ -230,6 +232,7 @@ export const createBalancesService = ({
               // just return `ChainBalance` w/ initial (empty) balances
               Rx.of<ChainBalance>({
                 walletType: 'ledger',
+                walletIndex: 0,
                 chain,
                 walletAddress: O.none,
                 balances: RD.initial
@@ -238,9 +241,10 @@ export const createBalancesService = ({
               // Load balances by given Ledger address
               // and put it's RD state into `balances` of `ChainBalance`
               FP.pipe(
-                getBalanceByAddress$(address, 'ledger'),
-                RxOp.map<WalletBalancesRD, ChainBalance>((balances) => ({
+                Rx.combineLatest([getBalanceByAddress$(address, 'ledger'), getWalletIndex$(chain)]),
+                RxOp.map<[WalletBalancesRD, number], ChainBalance>(([balances, walletIndex]) => ({
                   walletType: 'ledger',
+                  walletIndex,
                   chain,
                   walletAddress: O.some(address),
                   balances

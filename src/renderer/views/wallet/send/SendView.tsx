@@ -35,7 +35,7 @@ import { SendViewTHOR } from './SendViewTHOR'
 type Props = {}
 
 export const SendView: React.FC<Props> = (): JSX.Element => {
-  const { asset, walletAddress, walletType } = useParams<SendParams>()
+  const { asset, walletAddress, walletType, walletIndex } = useParams<SendParams>()
   const intl = useIntl()
 
   const { network$ } = useAppContext()
@@ -82,6 +82,7 @@ export const SendView: React.FC<Props> = (): JSX.Element => {
             <SendViewBNB
               walletType={walletType}
               walletAddress={walletAddress}
+              walletIndex={parseInt(walletIndex)}
               asset={asset}
               balances={balances}
               openExplorerTxUrl={openExplorerTxUrl}
@@ -158,7 +159,7 @@ export const SendView: React.FC<Props> = (): JSX.Element => {
           )
       }
     },
-    [walletType, balances, openExplorerTxUrl, validatePassword$, network, walletAddress, intl]
+    [walletType, walletAddress, walletIndex, balances, openExplorerTxUrl, validatePassword$, network, intl]
   )
 
   return FP.pipe(
@@ -167,7 +168,14 @@ export const SendView: React.FC<Props> = (): JSX.Element => {
       () => renderAssetError,
       (asset) => (
         <>
-          <BackLink path={walletRoutes.assetDetail.path({ asset: assetToString(asset), walletAddress, walletType })} />
+          <BackLink
+            path={walletRoutes.assetDetail.path({
+              asset: assetToString(asset),
+              walletAddress,
+              walletType,
+              walletIndex: walletIndex ? walletIndex : '0'
+            })}
+          />
           {renderSendView(asset)}
         </>
       )

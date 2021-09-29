@@ -25,13 +25,16 @@ export const useLedger = (chain: Chain) => {
     RD.initial
   )
 
-  const askAddress = useCallback(() => {
-    // Note: Subscription is needed to get all values
-    // and to let `askLedgerAddressByChain` update state of `LedgerAddressRD`
-    // Check implementation of `askLedgerAddressByChain` in `src/renderer/services/wallet/ledger.ts`
-    const sub = askLedgerAddress$(chain, network).subscribe()
-    return () => sub.unsubscribe()
-  }, [askLedgerAddress$, chain, network])
+  const askAddress = useCallback(
+    (walletIndex: number) => {
+      // Note: Subscription is needed to get all values
+      // and to let `askLedgerAddressByChain` update state of `LedgerAddressRD`
+      // Check implementation of `askLedgerAddressByChain` in `src/renderer/services/wallet/ledger.ts`
+      const sub = askLedgerAddress$(chain, network, walletIndex).subscribe()
+      return () => sub.unsubscribe()
+    },
+    [askLedgerAddress$, chain, network]
+  )
 
   return {
     askAddress,

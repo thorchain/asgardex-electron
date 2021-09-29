@@ -19,7 +19,8 @@ export const send = async ({
   recipient,
   amount,
   asset,
-  memo
+  memo,
+  walletIndex = 0
 }: {
   transport: Transport
   amount: BaseAmount
@@ -28,11 +29,12 @@ export const send = async ({
   recipient: Address
   asset?: Asset
   memo?: string
+  walletIndex: number
 }): Promise<E.Either<LedgerError, TxHash>> => {
   try {
     const clientNetwork = toClientNetwork(network)
     const prefix = getPrefix(clientNetwork)
-    const derivePath = getDerivePath(0)
+    const derivePath = getDerivePath(walletIndex)
 
     const app = new LedgerApp(transport)
     const client = new Client({ network: clientNetwork })

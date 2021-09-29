@@ -18,7 +18,7 @@ import * as Styled from './AccountSelector.styles'
 type Props = {
   selectedWallet: WalletBalance
   walletBalances: WalletBalances
-  onChange?: (params: { asset: Asset; walletAddress: Address; walletType: WalletType }) => void
+  onChange?: (params: { asset: Asset; walletAddress: Address; walletType: WalletType; walletIndex: number }) => void
   size?: IconSize
   network: Network
 }
@@ -43,9 +43,12 @@ export const AccountSelector: React.FC<Props> = (props): JSX.Element => {
   const enableDropdown = filteredWalletBalances.length > 0
 
   const cellRenderer = useCallback(
-    ({ asset, amount, walletAddress, walletType }: WalletBalance) => {
+    ({ asset, amount, walletAddress, walletType, walletIndex }: WalletBalance) => {
       const node = (
-        <Row align={'middle'} gutter={[8, 0]} onClick={() => onChange({ asset, walletAddress, walletType })}>
+        <Row
+          align={'middle'}
+          gutter={[8, 0]}
+          onClick={() => onChange({ asset, walletAddress, walletType, walletIndex: walletIndex ? walletIndex : 0 })}>
           <Col>
             <AssetData asset={asset} network={network} />
           </Col>
@@ -55,7 +58,7 @@ export const AccountSelector: React.FC<Props> = (props): JSX.Element => {
 
       return { node, key: walletAddress + assetToString(asset) }
     },
-    [onChange, network]
+    [network, onChange]
   )
 
   const menu = useMemo(

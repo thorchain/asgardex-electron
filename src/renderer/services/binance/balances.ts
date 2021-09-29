@@ -25,9 +25,13 @@ const reloadBalances = () => {
 }
 
 // State of balances loaded by Client
-const balances$: (walletType: WalletType, network: Network) => C.WalletBalancesLD = (walletType, network) =>
+const balances$: (walletType: WalletType, network: Network, walletIndex: number) => C.WalletBalancesLD = (
+  walletType,
+  network,
+  walletIndex
+) =>
   FP.pipe(
-    C.balances$({ client$, trigger$: reloadBalances$, walletType }),
+    C.balances$({ client$, trigger$: reloadBalances$, walletType, walletIndex }),
     // Filter out black listed assets
     liveData.map(FP.flow(A.filter(({ asset }) => !assetInBinanceBlacklist(network, asset))))
   )

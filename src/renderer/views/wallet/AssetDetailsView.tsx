@@ -30,7 +30,7 @@ import { INITIAL_BALANCES_STATE } from '../../services/wallet/const'
 export const AssetDetailsView: React.FC = (): JSX.Element => {
   const intl = useIntl()
 
-  const { asset: routeAsset, walletAddress, walletType } = useParams<AssetDetailsParams>()
+  const { asset: routeAsset, walletAddress, walletType, walletIndex } = useParams<AssetDetailsParams>()
 
   const oRouteAsset: O.Option<Asset> = useMemo(() => O.fromNullable(assetFromString(routeAsset)), [routeAsset])
   const oWalletAddress = useMemo(
@@ -139,6 +139,7 @@ export const AssetDetailsView: React.FC = (): JSX.Element => {
           (asset) => (
             <AssetDetails
               walletType={walletType}
+              walletIndex={parseInt(walletIndex)}
               txsPageRD={txsRD}
               balances={walletBalances}
               asset={asset}

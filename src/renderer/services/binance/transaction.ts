@@ -18,7 +18,15 @@ import { TransactionService } from './types'
 export const createTransactionService = (client$: Client$, network$: Network$): TransactionService => {
   const common = C.createTransactionService(client$)
 
-  const sendLedgerTx = ({ network, params }: { network: Network; params: SendTxParams }) => {
+  const sendLedgerTx = ({
+    network,
+    params,
+    walletIndex
+  }: {
+    network: Network
+    params: SendTxParams
+    walletIndex?: number
+  }) => {
     const sendLedgerTxParams: IPCLedgerSendTxParams = {
       chain: BNBChain,
       network,
@@ -26,7 +34,8 @@ export const createTransactionService = (client$: Client$, network$: Network$): 
       amount: params.amount,
       sender: params.sender,
       recipient: params.recipient,
-      memo: params.memo
+      memo: params.memo,
+      walletIndex: walletIndex ? walletIndex : 0
     }
     const encoded = ipcLedgerSendTxParamsIO.encode(sendLedgerTxParams)
 
@@ -49,11 +58,11 @@ export const createTransactionService = (client$: Client$, network$: Network$): 
       RxOp.startWith(RD.pending)
     )
   }
-  const sendTx = (params: SendTxParams) =>
+  const sendTx = (params: SendTxParams, walletIndex?: number) =>
     FP.pipe(
       network$,
       RxOp.switchMap((network) => {
-        if (isLedgerWallet(params.walletType)) return sendLedgerTx({ network, params })
+        if (isLedgerWallet(params.walletType)) return sendLedgerTx({ network, walletIndex, params })
 
         return common.sendTx(params)
       })

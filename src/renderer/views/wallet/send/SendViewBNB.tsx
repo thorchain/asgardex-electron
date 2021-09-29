@@ -32,6 +32,7 @@ import * as Helper from './SendView.helper'
 type Props = {
   walletType: WalletType
   walletAddress: Address
+  walletIndex: number
   asset: Asset
   balances: O.Option<NonEmptyWalletBalances>
   openExplorerTxUrl: OpenExplorerTxUrl
@@ -40,7 +41,16 @@ type Props = {
 }
 
 export const SendViewBNB: React.FC<Props> = (props): JSX.Element => {
-  const { walletAddress, asset, balances: oBalances, openExplorerTxUrl, validatePassword$, network, walletType } = props
+  const {
+    walletAddress,
+    asset,
+    balances: oBalances,
+    openExplorerTxUrl,
+    validatePassword$,
+    network,
+    walletType,
+    walletIndex
+  } = props
 
   const intl = useIntl()
   const history = useHistory()
@@ -60,9 +70,9 @@ export const SendViewBNB: React.FC<Props> = (props): JSX.Element => {
 
   const onSend = useCallback(
     (params: SendTxParams) => {
-      subscribeSendTxState(transfer$(params))
+      subscribeSendTxState(transfer$(params, walletIndex))
     },
-    [subscribeSendTxState, transfer$]
+    [subscribeSendTxState, transfer$, walletIndex]
   )
 
   const { fees$, reloadFees } = useBinanceContext()
@@ -95,6 +105,7 @@ export const SendViewBNB: React.FC<Props> = (props): JSX.Element => {
     (walletBalance: WalletBalance) => (
       <SendFormBNB
         walletType={walletType}
+        walletIndex={walletIndex}
         balances={FP.pipe(
           oBalances,
           O.getOrElse<WalletBalances>(() => [])
@@ -113,6 +124,7 @@ export const SendViewBNB: React.FC<Props> = (props): JSX.Element => {
     ),
     [
       walletType,
+      walletIndex,
       oBalances,
       isLoading,
       walletAddress,

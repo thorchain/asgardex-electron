@@ -16,7 +16,8 @@ export const sendTx = async ({
   recipient,
   amount,
   asset,
-  memo
+  memo,
+  walletIndex
 }: IPCLedgerSendTxParams): Promise<E.Either<LedgerError, TxHash>> => {
   try {
     const transport = await TransportNodeHidSingleton.open()
@@ -26,7 +27,16 @@ export const sendTx = async ({
         res = await THOR.send({ transport, network, recipient, amount, memo })
         break
       case BNBChain:
-        res = await BNB.send({ transport, network, sender, recipient, amount, asset, memo })
+        res = await BNB.send({
+          transport,
+          network,
+          sender,
+          recipient,
+          amount,
+          asset,
+          memo,
+          walletIndex: walletIndex ? walletIndex : 0
+        })
         break
       default:
         res = E.left({

@@ -230,3 +230,13 @@ export const AddLedgerIcon = styled(AIcon.PlusCircleOutlined)`
 export const RemoveLedgerIcon = styled(RemoveIcon)`
   cursor: pointer;
 `
+
+export const AddLedgerContainer = styled('div')`
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+`
+
+export const WalletIndexInput = styled(A.InputNumber)`
+  width: 60;
+`

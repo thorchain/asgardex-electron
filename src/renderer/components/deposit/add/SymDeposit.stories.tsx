@@ -30,6 +30,7 @@ import { SymDeposit, Props as SymDepositProps } from './SymDeposit'
 
 const balanceBNB: WalletBalance = {
   walletType: 'keystore',
+  walletIndex: 0,
   amount: assetToBase(assetAmount(1)),
   asset: AssetBNB,
   walletAddress: ''
@@ -37,6 +38,7 @@ const balanceBNB: WalletBalance = {
 
 const balanceBTC: WalletBalance = {
   walletType: 'keystore',
+  walletIndex: 0,
   asset: AssetBTC,
   amount: assetToBase(assetAmount(2)),
   walletAddress: ''
@@ -44,6 +46,7 @@ const balanceBTC: WalletBalance = {
 
 const balanceTOMO: WalletBalance = {
   walletType: 'keystore',
+  walletIndex: 0,
   asset: AssetETH,
   amount: assetToBase(assetAmount(3)),
   walletAddress: ''
