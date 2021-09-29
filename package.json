@@ -98,7 +98,7 @@
     "electron-log": "^4.4.1",
     "electron-updater": "^4.3.9",
     "ethers": "^5.4.7",
-    "fp-ts": "2.10.5",
+    "fp-ts": "^2.11.4",
     "fp-ts-rxjs": "^0.6.15",
     "fs-extra": "^10.0.0",
     "io-ts": "^2.2.16",
@@ -117,7 +117,7 @@
     "rxjs": "^6.6.7",
     "styled-components": "^5.3.1",
     "styled-theme": "^0.3.3",
-    "typescript": "^4.4.2",
+    "typescript": "^4.4.3",
     "uuid": "^8.3.2",
     "wif": "^2.0.6"
   },
