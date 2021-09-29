@@ -143,17 +143,17 @@ export const createBalancesService = ({
    * to give to the user last balances he loaded without re-requesting
    * balances data which might be very expensive.
    */
-  let walletBalancesState: Partial<Record<Chain, WalletBalancesRD>> = {}
+  const walletBalancesState: Map<{ chain: Chain; walletType: WalletType }, WalletBalancesRD> = new Map()
 
   // Whenever network is changed, reset stored balances
   const networkSub = network$.subscribe(() => {
-    walletBalancesState = {}
+    walletBalancesState.clear()
   })
 
   // Whenever keystore has been removed, reset stored balances
   const keystoreSub = keystore$.subscribe((keystoreState: KeystoreState) => {
     if (!hasImportedKeystore(keystoreState)) {
-      walletBalancesState = {}
+      walletBalancesState.clear()
     }
   })
 
@@ -170,12 +170,14 @@ export const createBalancesService = ({
 
     return FP.pipe(
       reload$,
+      // chainService.reloadBalances$,
       RxOp.switchMap((shouldReloadData) => {
-        const savedResult = walletBalancesState[chain]
+        const savedResult = walletBalancesState.get({ chain, walletType })
         // For every new simple subscription return cached results if they exist
         if (!shouldReloadData && savedResult) {
           return Rx.of(savedResult)
         }
+
         // If there is no cached data for appropriate chain request for it
         // Re-request data ONLY for manual calling update trigger with `trigger`
         // value inside of trigger$ stream
@@ -184,7 +186,7 @@ export const createBalancesService = ({
           // For every successful load save results to the memory-based cache
           // to avoid unwanted data re-requesting.
           liveData.map((balances) => {
-            walletBalancesState[chain] = RD.success(balances)
+            walletBalancesState.set({ chain, walletType }, RD.success(balances))
             return balances
           }),
           RxOp.startWith(savedResult || RD.initial)
@@ -340,19 +342,21 @@ export const createBalancesService = ({
   /**
    * List of `ChainBalances` for all available chains (order is important)
    */
-  const chainBalances$: ChainBalances$ = Rx.combineLatest(
-    filterEnabledChains({
-      THOR: [thorChainBalance$, thorLedgerChainBalance$],
-      BTC: [btcChainBalance$],
-      BCH: [bchChainBalance$],
-      ETH: [ethChainBalance$],
-      BNB: [bnbChainBalance$, bnbLedgerChainBalance$],
-      LTC: [litecoinBalance$]
-    })
-  ).pipe(
+  const chainBalances$: ChainBalances$ = FP.pipe(
+    Rx.combineLatest(
+      filterEnabledChains({
+        THOR: [thorChainBalance$, thorLedgerChainBalance$],
+        BTC: [btcChainBalance$],
+        BCH: [bchChainBalance$],
+        ETH: [ethChainBalance$],
+        BNB: [bnbChainBalance$, bnbLedgerChainBalance$],
+        LTC: [litecoinBalance$]
+      })
+    ),
     // we ignore all `ChainBalances` with state of `initial` balances
     // (e.g. a not connected Ledger )
-    RxOp.map(A.filter(({ balances }) => !RD.isInitial(balances)))
+    RxOp.map(A.filter(({ balances }) => !RD.isInitial(balances))),
+    RxOp.shareReplay(1)
   )
 
   /**
@@ -402,7 +406,7 @@ export const createBalancesService = ({
   const dispose = () => {
     networkSub.unsubscribe()
     keystoreSub.unsubscribe()
-    walletBalancesState = {}
+    walletBalancesState.clear()
   }
 
   return {
