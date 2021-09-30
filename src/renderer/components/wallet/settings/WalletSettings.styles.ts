@@ -237,6 +237,15 @@ export const AddLedgerContainer = styled('div')`
   align-items: center;
 `
 
+export const IndexLabel = styled('div')`
+  color: ${palette('text', 2)};
+  text-transform: capitalize;
+`
+
 export const WalletIndexInput = styled(A.InputNumber)`
-  width: 60;
+  color: ${palette('text', 2)};
+  background-color: ${palette('background', 1)};
+  margin-left: 10px;
+  margin-right: 5px;
+  max-width: 45px;
 `
