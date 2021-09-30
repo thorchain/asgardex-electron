@@ -25,6 +25,7 @@ const EXTERNALS_WHITELIST = [
   'www.blockchain.com',
   'testnet.thorswap.finance',
   'testnet.thorswap.finance',
+  'testnet.asgard.exchange',
   'app.asgard.exchange',
   'viewblock.io',
   'midgard.thorchain.info',
