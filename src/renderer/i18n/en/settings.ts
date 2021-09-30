@@ -14,7 +14,7 @@ const settings: SettingMessages = {
   'setting.connected': 'Connected',
   'setting.notconnected': 'Not connected',
   'setting.add.device': 'ADD DEVICE',
-  'setting.wallet.index': 'INDEX',
+  'setting.wallet.index': 'Index',
   'setting.wallet.index.info': 'Enter the index number of the Ledger address you want to use'
 }
 

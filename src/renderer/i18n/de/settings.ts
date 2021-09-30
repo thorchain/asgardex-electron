@@ -14,8 +14,8 @@ const settings: SettingMessages = {
   'setting.connected': 'Online',
   'setting.notconnected': 'Offline',
   'setting.add.device': 'Gerät hinzufügen',
-  'setting.wallet.index': 'INDEX - DE',
-  'setting.wallet.index.info': 'Enter the index number of the Ledger address you want to use - DE'
+  'setting.wallet.index': 'Index',
+  'setting.wallet.index.info': 'Trage die Index Nummer der Ledger Addresse ein, die Du verwenden möchtest'
 }
 
 export default settings

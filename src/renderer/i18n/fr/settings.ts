@@ -14,7 +14,7 @@ const settings: SettingMessages = {
   'setting.connected': 'Connecté',
   'setting.notconnected': 'Déconnecté',
   'setting.add.device': 'AJOUTER UN PÉRIPHÉRIQUE',
-  'setting.wallet.index': 'INFO - FR',
+  'setting.wallet.index': 'Index - FR',
   'setting.wallet.index.info': 'Enter the index number of the Ledger address you want to use - FR'
 }
 
