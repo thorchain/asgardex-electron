@@ -52,5 +52,5 @@ export const Label = styled(UILabel).attrs({
 `
 
 export const WalletTypeLabel = styled(WalletTypeLabelUI)`
-  margin: -45px 0px 0px 10px;
+  margin: -20px 0px 0px 10px;
 `

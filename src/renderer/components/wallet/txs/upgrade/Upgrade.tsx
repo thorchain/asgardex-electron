@@ -11,6 +11,7 @@ import * as O from 'fp-ts/lib/Option'
 import { useIntl } from 'react-intl'
 
 import { Network } from '../../../../../shared/api/types'
+import { isLedgerWallet } from '../../../../../shared/utils/guard'
 import { ZERO_BASE_AMOUNT, ZERO_BN } from '../../../../const'
 import { convertBaseAmountDecimal } from '../../../../helpers/assetHelper'
 import { getChainAsset } from '../../../../helpers/chainHelper'
@@ -118,8 +119,7 @@ export const Upgrade: React.FC<Props> = (props): JSX.Element => {
     () =>
       getWalletAssetAmountFromBalances(
         (balance) =>
-          eqString.equals(balance.walletAddress, walletAddress.toString()) &&
-          eqAsset.equals(balance.asset, runeAsset.asset)
+          eqString.equals(balance.walletAddress, walletAddress) && eqAsset.equals(balance.asset, runeAsset.asset)
       ),
     [runeAsset, walletAddress]
   )
@@ -130,8 +130,7 @@ export const Upgrade: React.FC<Props> = (props): JSX.Element => {
     () =>
       getWalletAssetAmountFromBalances(
         (balance) =>
-          eqString.equals(balance.walletAddress, walletAddress.toString()) &&
-          eqAsset.equals(balance.asset, chainBaseAsset)
+          eqString.equals(balance.walletAddress, walletAddress) && eqAsset.equals(balance.asset, chainBaseAsset)
       ),
     [chainBaseAsset, walletAddress]
   )
@@ -189,8 +188,6 @@ export const Upgrade: React.FC<Props> = (props): JSX.Element => {
     [amountValidator, runeAsset]
   )
 
-  const onSubmit = useCallback(() => setShowConfirmUpgradeModal(true), [])
-
   const upgrade = useCallback(
     () =>
       FP.pipe(
@@ -226,6 +223,14 @@ export const Upgrade: React.FC<Props> = (props): JSX.Element => {
       walletType
     ]
   )
+
+  const onSubmit = useCallback(() => {
+    if (isLedgerWallet(walletType)) {
+      upgrade()
+    } else {
+      setShowConfirmUpgradeModal(true)
+    }
+  }, [upgrade, walletType])
 
   const oFee: O.Option<BaseAmount> = useMemo(() => FP.pipe(feeRD, RD.toOption), [feeRD])
 
@@ -359,7 +364,7 @@ export const Upgrade: React.FC<Props> = (props): JSX.Element => {
         <CStyled.FormContainer>
           <AccountSelector
             selectedWallet={{
-              walletType: 'keystore',
+              walletType,
               amount: assetToBase(assetAmount(0)),
               asset: runeAsset.asset,
               walletAddress: ''
@@ -401,6 +406,7 @@ export const Upgrade: React.FC<Props> = (props): JSX.Element => {
       </CStyled.FormWrapper>
     ),
     [
+      walletType,
       runeAsset.asset,
       network,
       form,
