@@ -6,12 +6,14 @@ import { Network } from '../../../../shared/api/types'
 import { UpgradeRuneParams, UpgradeRuneTxState$ } from '../../../services/chain/types'
 import { OpenExplorerTxUrl } from '../../../services/clients'
 import { PoolAddressRD } from '../../../services/midgard/types'
-import { NonEmptyWalletBalances, ValidatePasswordHandler } from '../../../services/wallet/types'
+import { NonEmptyWalletBalances, ValidatePasswordHandler, WalletType } from '../../../services/wallet/types'
 import { AssetWithDecimal } from '../../../types/asgardex'
 
 export type CommonUpgradeProps = {
   runeAsset: AssetWithDecimal
   walletAddress: Address
+  walletType: WalletType
+  walletIndex: number
   runeNativeAddress: Address
   targetPoolAddressRD: PoolAddressRD
   validatePassword$: ValidatePasswordHandler

@@ -11,6 +11,7 @@ import * as O from 'fp-ts/lib/Option'
 import { useIntl } from 'react-intl'
 
 import { Network } from '../../../../../shared/api/types'
+import { isLedgerWallet } from '../../../../../shared/utils/guard'
 import { ZERO_BASE_AMOUNT, ZERO_BN } from '../../../../const'
 import { convertBaseAmountDecimal } from '../../../../helpers/assetHelper'
 import { getChainAsset } from '../../../../helpers/chainHelper'
@@ -24,14 +25,13 @@ import { UpgradeRuneParams, UpgradeRuneTxState, UpgradeRuneTxState$ } from '../.
 import { FeeRD } from '../../../../services/chain/types'
 import { OpenExplorerTxUrl } from '../../../../services/clients'
 import { PoolAddressRD } from '../../../../services/midgard/types'
-import { NonEmptyWalletBalances, ValidatePasswordHandler } from '../../../../services/wallet/types'
+import { NonEmptyWalletBalances, ValidatePasswordHandler, WalletType } from '../../../../services/wallet/types'
 import { AssetWithDecimal } from '../../../../types/asgardex'
 import { PasswordModal } from '../../../modal/password'
 import { MaxBalanceButton } from '../../../uielements/button/MaxBalanceButton'
 import { ViewTxButton } from '../../../uielements/button/ViewTxButton'
 import { UIFeesRD } from '../../../uielements/fees'
 import { InputBigNumber } from '../../../uielements/input/InputBigNumber'
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { AccountSelector } from '../../account'
 import * as Styled from '../TxForm.styles'
 import { validateTxAmountInput } from '../TxForm.util'
@@ -39,7 +39,9 @@ import * as CStyled from './Upgrade.styles'
 
 export type Props = {
   runeAsset: AssetWithDecimal
-  walletAddress: Address
+  walletAddress: string
+  walletType: WalletType
+  walletIndex: number
   runeNativeAddress: Address
   targetPoolAddressRD: PoolAddressRD
   validatePassword$: ValidatePasswordHandler
@@ -73,6 +75,8 @@ export const Upgrade: React.FC<Props> = (props): JSX.Element => {
     reloadBalancesHandler,
     network,
     walletAddress,
+    walletType,
+    walletIndex,
     reloadOnError
   } = props
 
@@ -184,8 +188,6 @@ export const Upgrade: React.FC<Props> = (props): JSX.Element => {
     [amountValidator, runeAsset]
   )
 
-  const onSubmit = useCallback(() => setShowConfirmUpgradeModal(true), [])
-
   const upgrade = useCallback(
     () =>
       FP.pipe(
@@ -198,15 +200,37 @@ export const Upgrade: React.FC<Props> = (props): JSX.Element => {
               amount: amountToUpgrade,
               asset: runeAsset.asset,
               memo: getSwitchMemo(runeNativeAddress),
-              network
+              network,
+              walletAddress,
+              walletIndex,
+              walletType
             })
           )
           return true
         })
       ),
 
-    [runeNativeAddress, targetPoolAddressRD, upgrade$, amountToUpgrade, runeAsset, subscribeUpgradeTxState, network]
+    [
+      targetPoolAddressRD,
+      subscribeUpgradeTxState,
+      upgrade$,
+      amountToUpgrade,
+      runeAsset.asset,
+      runeNativeAddress,
+      network,
+      walletAddress,
+      walletIndex,
+      walletType
+    ]
   )
+
+  const onSubmit = useCallback(() => {
+    if (isLedgerWallet(walletType)) {
+      upgrade()
+    } else {
+      setShowConfirmUpgradeModal(true)
+    }
+  }, [upgrade, walletType])
 
   const oFee: O.Option<BaseAmount> = useMemo(() => FP.pipe(feeRD, RD.toOption), [feeRD])
 
@@ -340,7 +364,7 @@ export const Upgrade: React.FC<Props> = (props): JSX.Element => {
         <CStyled.FormContainer>
           <AccountSelector
             selectedWallet={{
-              walletType: 'keystore',
+              walletType,
               amount: assetToBase(assetAmount(0)),
               asset: runeAsset.asset,
               walletAddress: ''
@@ -382,6 +406,7 @@ export const Upgrade: React.FC<Props> = (props): JSX.Element => {
       </CStyled.FormWrapper>
     ),
     [
+      walletType,
       runeAsset.asset,
       network,
       form,
