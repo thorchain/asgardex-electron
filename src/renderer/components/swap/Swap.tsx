@@ -755,6 +755,17 @@ export const Swap = ({
       (id) => intl.formatMessage({ id })
     )
 
+    const onClickViewTxHandler = (txHash: string) =>
+      FP.pipe(
+        oSourceAsset,
+        O.map(({ chain }) => chain),
+        // Note: As long as we link to `viewblock` to open tx details in a browser,
+        // `0x` needs to be removed from tx hash in case of ETH
+        // @see https://github.com/thorchain/asgardex-electron/issues/1787#issuecomment-931934508
+        O.map((chain) => (isEthChain(chain) ? txHash.replace(/0x/i, '') : txHash)),
+        O.fold(FP.constVoid, goToTransaction)
+      )
+
     return (
       <TxModal
         title={txModalTitle}
@@ -762,12 +773,21 @@ export const Swap = ({
         onFinish={onFinishTxModal}
         startTime={swapStartTime}
         txRD={swap}
-        extraResult={<ViewTxButton txHash={RD.toOption(swapTx)} onClick={goToTransaction} />}
+        extraResult={<ViewTxButton txHash={RD.toOption(swapTx)} onClick={onClickViewTxHandler} />}
         timerValue={timerValue}
         extra={extraTxModalContent}
       />
     )
-  }, [extraTxModalContent, goToTransaction, intl, onFinishTxModal, resetSwapState, swapStartTime, swapState])
+  }, [
+    extraTxModalContent,
+    goToTransaction,
+    intl,
+    oSourceAsset,
+    onFinishTxModal,
+    resetSwapState,
+    swapStartTime,
+    swapState
+  ])
 
   const closePasswordModal = useCallback(() => {
     setShowPasswordModal(false)
