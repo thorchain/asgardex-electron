@@ -13,6 +13,7 @@ import * as RxOp from 'rxjs/operators'
 import { PoolActionsHistory } from '../../../components/poolActionsHistory'
 import { DEFAULT_PAGE_SIZE } from '../../../components/poolActionsHistory/PoolActionsHistory.const'
 import { Filter } from '../../../components/poolActionsHistory/types'
+import { WalletPoolActionsHistoryHeader } from '../../../components/poolActionsHistory/WalletPoolActionsHistoryHeader'
 import { useChainContext } from '../../../contexts/ChainContext'
 import { useMidgardContext } from '../../../contexts/MidgardContext'
 import { liveData } from '../../../helpers/rx/liveData'
@@ -99,17 +100,38 @@ export const PoolActionsHistoryView: React.FC<{ className?: string }> = ({ class
     [loadActionsHistory]
   )
 
+  const currentFilter = requestParams.type || 'ALL'
+
+  const openViewblockUrlHandler = useCallback(async () => {
+    // TODO (@asgdx-team): As part of #1811 - Get viewblock url using THORChain client
+    // const addressUrl = client.getExplorerAddressUrl(address)
+    // const addressUrl = url&txsType={type}
+    console.log('currentFilter', currentFilter)
+    return true
+  }, [currentFilter])
+
+  const headerContent = useMemo(
+    () => (
+      <WalletPoolActionsHistoryHeader
+        availableFilters={HISTORY_FILTERS}
+        currentFilter={currentFilter}
+        setFilter={setFilter}
+        openViewblockUrl={openViewblockUrlHandler}
+        disabled={!RD.isSuccess(historyPage)}
+      />
+    ),
+    [currentFilter, historyPage, openViewblockUrlHandler, setFilter]
+  )
+
   return (
     <PoolActionsHistory
+      headerContent={headerContent}
       className={className}
       currentPage={requestParams.page + 1}
       actionsPageRD={historyPage}
       prevActionsPage={prevActionsPage.current}
       openExplorerTxUrl={openExplorerTxUrl}
       changePaginationHandler={setCurrentPage}
-      currentFilter={requestParams.type || 'ALL'}
-      setFilter={setFilter}
-      availableFilters={HISTORY_FILTERS}
     />
   )
 }
