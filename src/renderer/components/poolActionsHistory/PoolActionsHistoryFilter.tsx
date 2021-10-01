@@ -6,7 +6,8 @@ import * as A from 'fp-ts/Array'
 import * as FP from 'fp-ts/function'
 import { useIntl } from 'react-intl'
 
-import { TxType } from '../uielements/txType'
+import { getTxTypeI18n } from '../../helpers/actionsHelper'
+import { TxType as TxTypeUI } from '../uielements/txType'
 import * as Styled from './PoolActionsHistoryFilter.styles'
 import { Filter } from './types'
 
@@ -46,7 +47,7 @@ export const PoolActionsHistoryFilter: React.FC<Props> = ({
         {FP.pipe(
           availableFilters,
           A.map((filter) => {
-            const content = filter === 'ALL' ? allItemContent : <TxType type={filter} />
+            const content = filter === 'ALL' ? allItemContent : <TxTypeUI type={filter} />
             return (
               <Menu.Item key={filter} onClick={() => onFilterChanged(filter)}>
                 <Styled.FilterItem>{content}</Styled.FilterItem>
@@ -61,7 +62,8 @@ export const PoolActionsHistoryFilter: React.FC<Props> = ({
   return (
     <Dropdown overlay={menu} trigger={['click']} disabled={disabled}>
       <Styled.FilterButton className={className}>
-        {intl.formatMessage({ id: 'common.filter' })} <CaretDownOutlined />{' '}
+        {currentFilter === 'ALL' ? intl.formatMessage({ id: 'common.all' }) : getTxTypeI18n(currentFilter, intl)}{' '}
+        <CaretDownOutlined />{' '}
       </Styled.FilterButton>
     </Dropdown>
   )
