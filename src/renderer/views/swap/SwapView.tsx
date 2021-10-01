@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useMemo } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
-import { assetFromString, AssetRuneNative, bnOrZero, Chain, THORChain } from '@xchainjs/xchain-util'
+import { Asset, assetFromString, AssetRuneNative, bnOrZero, Chain, THORChain } from '@xchainjs/xchain-util'
 import { Spin } from 'antd'
 import * as FP from 'fp-ts/function'
 import * as O from 'fp-ts/lib/Option'
@@ -69,8 +69,8 @@ export const SwapView: React.FC<Props> = (_): JSX.Element => {
 
   const poolsState = useObservableState(poolsState$, RD.initial)
 
-  const oRouteSource = useMemo(() => O.fromNullable(assetFromString(source.toUpperCase())), [source])
-  const oRouteTarget = useMemo(() => O.fromNullable(assetFromString(target.toUpperCase())), [target])
+  const oRouteSource: O.Option<Asset> = useMemo(() => O.fromNullable(assetFromString(source.toUpperCase())), [source])
+  const oRouteTarget: O.Option<Asset> = useMemo(() => O.fromNullable(assetFromString(target.toUpperCase())), [target])
 
   useEffect(() => {
     // Source asset is the asset of the pool we need to interact with
