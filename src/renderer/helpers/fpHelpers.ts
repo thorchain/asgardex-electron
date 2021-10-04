@@ -48,7 +48,8 @@ export const readFile: (path: string, encoding: string) => TE.TaskEither<Error, 
 >(fs.readFile)
 
 /**
- * Write a file. Iif the parent directory does not exist, it will be created.
+ * Writes a file.
+ * If the parent directory does not exist, it will be created.
  *
  * Borrowed from https://github.com/gcanti/fp-ts-node/blob/master/src/fs.ts
  * Note: `fp-ts-node` is not available on npm
