@@ -1,17 +1,22 @@
-import { assetFromString, ETHChain } from '@xchainjs/xchain-util'
+import { Asset, assetFromString, ETHChain } from '@xchainjs/xchain-util'
 import axios from 'axios'
 import * as A from 'fp-ts/lib/Array'
+import * as C from 'fp-ts/lib/Console'
 import * as E from 'fp-ts/lib/Either'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
 import * as TE from 'fp-ts/lib/TaskEither'
+import * as fs from 'fs-extra'
 import { failure } from 'io-ts/lib/PathReporter'
+import prettier from 'prettier'
 
-import { ERC20AssetWhiteList, ERC20Whitelist, erc20WhitelistIO } from '../src/renderer/services/thorchain/types'
+import { ERC20Whitelist, erc20WhitelistIO } from '../src/renderer/services/thorchain/types'
 
-const url = 'https://gitlab.com/thorchain/thornode/-/raw/develop/bifrost/pkg/chainclients/ethereum/token_list.json'
+const WHITELIST_URL =
+  'https://gitlab.com/thorchain/thornode/-/raw/develop/bifrost/pkg/chainclients/ethereum/token_list.json'
+const PATH = './src/renderer/types/generated/thorchain/erc20whitelist.ts'
 
-const transformList = ({ tokens }: Pick<ERC20Whitelist, 'tokens'>): ERC20AssetWhiteList =>
+const transformList = ({ tokens }: Pick<ERC20Whitelist, 'tokens'>): Asset[] =>
   FP.pipe(
     tokens,
     A.filterMap(({ address, symbol }) => FP.pipe(assetFromString(`${ETHChain}.${symbol}-${address}`), O.fromNullable))
@@ -20,7 +25,7 @@ const transformList = ({ tokens }: Pick<ERC20Whitelist, 'tokens'>): ERC20AssetWh
 const loadList = (): TE.TaskEither<Error, ERC20Whitelist> =>
   FP.pipe(
     TE.tryCatch(
-      () => axios.get<ERC20Whitelist>(url),
+      () => axios.get<ERC20Whitelist>(WHITELIST_URL),
       (e: unknown) => new Error(`${e}`)
     ),
     TE.chain((resp) =>
@@ -32,12 +37,61 @@ const loadList = (): TE.TaskEither<Error, ERC20Whitelist> =>
     )
   )
 
-const writeList = (list: ERC20AssetWhiteList) => {
-  // TODO write list to disk
-  console.log('write list', list)
-  return Promise.resolve()
+const writeList = (list: Asset[]): TE.TaskEither<Error, void> => {
+  const content = `
+/**
+ * ERC20Whitelist
+ *
+ * This file has been generated - don't edit.
+ *
+ */
+
+import { Asset, ETHChain } from '@xchainjs/xchain-util'
+
+export const ERC20Whitelist: Asset[] = ${JSON.stringify(list)}
+
+`.replace(/"chain":"ETH"/g, 'chain: ETHChain') // "ETH" _> ETHChain
+
+  return FP.pipe(
+    TE.tryCatch(
+      () => fs.writeFile(PATH, content),
+      (e: unknown) => {
+        console.log('error: ', e)
+        return new Error(`${e}`)
+      }
+    )
+  )
 }
 
-const main = async () => await FP.pipe(loadList(), TE.map(transformList), TE.map(writeList))()
+const formatList = () => {
+  return FP.pipe(
+    TE.tryCatch(
+      () => fs.readFile(PATH, 'utf8'),
+      (e: unknown) => {
+        console.log('error READ: ', e)
+        return new Error(`${e}`)
+      }
+    ),
+    TE.chain((content) =>
+      TE.tryCatch(
+        () => fs.writeFile(PATH, prettier.format(content, { filepath: PATH })),
+        (e: unknown) => {
+          console.log('error WRITE: ', e)
+          return new Error(`${e}`)
+        }
+      )
+    )
+  )
+}
+
+const main = async () =>
+  await FP.pipe(
+    loadList(),
+    TE.map(transformList),
+    TE.chain(writeList),
+    TE.chain(formatList),
+    TE.map(TE.rightIO(C.info('success '))),
+    TE.mapLeft(TE.leftIO(C.info('failure ')))
+  )()
 
 main()

@@ -181,5 +181,3 @@ export const erc20WhitelistIO = t.type({
 })
 
 export type ERC20Whitelist = t.TypeOf<typeof erc20WhitelistIO>
-
-export type ERC20AssetWhiteList = Asset[]
