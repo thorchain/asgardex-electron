@@ -215,24 +215,6 @@ export const SymDeposit: React.FC<Props> = (props) => {
     [oChainAssetBalance]
   )
 
-  const oDepositParams: O.Option<SymDepositParams> = useMemo(
-    () =>
-      FP.pipe(
-        sequenceSOption({ poolAddress: oPoolAddress, memos: oMemos }),
-        O.map(({ poolAddress, memos }) => ({
-          asset,
-          poolAddress,
-          amounts: {
-            rune: runeAmountToDeposit,
-            // Decimal needs to be converted back for using orginal decimal of this asset (provided by `assetBalance`)
-            asset: convertBaseAmountDecimal(assetAmountToDepositMax1e8, assetDecimal)
-          },
-          memos
-        }))
-      ),
-    [oPoolAddress, oMemos, asset, runeAmountToDeposit, assetAmountToDepositMax1e8, assetDecimal]
-  )
-
   const oApproveParams: O.Option<ApproveParams> = useMemo(() => {
     const oRouterAddress: O.Option<Address> = FP.pipe(
       oPoolAddress,
@@ -274,6 +256,28 @@ export const SymDeposit: React.FC<Props> = (props) => {
         O.getOrElse(() => zeroDepositFees)
       ),
     [depositFeesRD, zeroDepositFees]
+  )
+
+  const oThorchainFees = useMemo(() => Helper.getThorchainFees(depositFeesRD), [depositFeesRD])
+
+  const oDepositParams: O.Option<SymDepositParams> = useMemo(
+    () =>
+      FP.pipe(
+        sequenceSOption({ poolAddress: oPoolAddress, memos: oMemos, thorchainFees: oThorchainFees }),
+        O.map(({ poolAddress, memos, thorchainFees }) => {
+          return {
+            asset,
+            poolAddress,
+            amounts: {
+              rune: runeAmountToDeposit.minus(thorchainFees.inFee),
+              // Decimal needs to be converted back for using orginal decimal of this asset (provided by `assetBalance`)
+              asset: convertBaseAmountDecimal(assetAmountToDepositMax1e8, assetDecimal)
+            },
+            memos
+          }
+        })
+      ),
+    [oPoolAddress, oMemos, oThorchainFees, asset, runeAmountToDeposit, assetAmountToDepositMax1e8, assetDecimal]
   )
 
   const reloadFeesHandler = useCallback(() => {
