@@ -27,11 +27,13 @@ import { PoolsDataMap } from '../../../services/midgard/types'
 export const maxRuneAmountToDeposit = ({
   poolData,
   runeBalance,
-  assetBalance
+  assetBalance,
+  thorchainFees
 }: {
   poolData: PoolData
   runeBalance: BaseAmount
   assetBalance: BaseAmount
+  thorchainFees: DepositFees
 }): BaseAmount => {
   const { runeBalance: poolRuneBalance, assetBalance: poolAssetBalance } = poolData
   // asset balance needs to have `1e8` decimal to be in common with pool data (always `1e8`)
@@ -45,8 +47,9 @@ export const maxRuneAmountToDeposit = ({
       .toFixed(0, BigNumber.ROUND_DOWN),
     THORCHAIN_DECIMAL
   )
-
-  return maxRuneAmount.amount().isGreaterThan(runeBalance.amount()) ? runeBalance : maxRuneAmount
+  return maxRuneAmount.amount().isGreaterThan(runeBalance.amount())
+    ? runeBalance.minus(thorchainFees.inFee)
+    : maxRuneAmount
 }
 
 /**

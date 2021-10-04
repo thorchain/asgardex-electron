@@ -48,7 +48,8 @@ import {
   FeeRD,
   ReloadSymDepositFeesHandler,
   SymDepositFeesHandler,
-  SymDepositFeesRD
+  SymDepositFeesRD,
+  DepositFees
 } from '../../../services/chain/types'
 import { OpenExplorerTxUrl } from '../../../services/clients'
 import { ApproveFeeHandler, ApproveParams, IsApprovedRD, LoadApproveFeeHandler } from '../../../services/ethereum/types'
@@ -259,17 +260,28 @@ export const SymDeposit: React.FC<Props> = (props) => {
   )
 
   const oThorchainFees = useMemo(() => Helper.getThorchainFees(depositFeesRD), [depositFeesRD])
+  const thorchainFees: DepositFees = useMemo(
+    () =>
+      FP.pipe(
+        oThorchainFees,
+        O.fold(
+          () => zeroDepositFees.rune,
+          (thorchainFees) => thorchainFees
+        )
+      ),
+    [oThorchainFees, zeroDepositFees]
+  )
 
   const oDepositParams: O.Option<SymDepositParams> = useMemo(
     () =>
       FP.pipe(
-        sequenceSOption({ poolAddress: oPoolAddress, memos: oMemos, thorchainFees: oThorchainFees }),
-        O.map(({ poolAddress, memos, thorchainFees }) => {
+        sequenceSOption({ poolAddress: oPoolAddress, memos: oMemos }),
+        O.map(({ poolAddress, memos }) => {
           return {
             asset,
             poolAddress,
             amounts: {
-              rune: runeAmountToDeposit.minus(thorchainFees.inFee),
+              rune: runeAmountToDeposit,
               // Decimal needs to be converted back for using orginal decimal of this asset (provided by `assetBalance`)
               asset: convertBaseAmountDecimal(assetAmountToDepositMax1e8, assetDecimal)
             },
@@ -277,7 +289,7 @@ export const SymDeposit: React.FC<Props> = (props) => {
           }
         })
       ),
-    [oPoolAddress, oMemos, oThorchainFees, asset, runeAmountToDeposit, assetAmountToDepositMax1e8, assetDecimal]
+    [oPoolAddress, oMemos, asset, runeAmountToDeposit, assetAmountToDepositMax1e8, assetDecimal]
   )
 
   const reloadFeesHandler = useCallback(() => {
@@ -357,9 +369,9 @@ export const SymDeposit: React.FC<Props> = (props) => {
   }, [isZeroAmountToDeposit, minRuneAmountToDeposit, runeAmountToDeposit])
 
   const maxRuneAmountToDeposit = useMemo(
-    (): BaseAmount => Helper.maxRuneAmountToDeposit({ poolData, runeBalance, assetBalance }),
+    (): BaseAmount => Helper.maxRuneAmountToDeposit({ poolData, runeBalance, assetBalance, thorchainFees }),
 
-    [assetBalance, poolData, runeBalance]
+    [assetBalance, poolData, runeBalance, thorchainFees]
   )
 
   // Update `runeAmountToDeposit` if `maxRuneAmountToDeposit` has been updated
