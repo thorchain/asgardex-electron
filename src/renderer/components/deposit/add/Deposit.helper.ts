@@ -47,7 +47,9 @@ export const maxRuneAmountToDeposit = ({
       .toFixed(0, BigNumber.ROUND_DOWN),
     THORCHAIN_DECIMAL
   )
-  return maxRuneAmount.gte(runeBalance) ? runeBalance.minus(thorchainFee) : maxRuneAmount
+  return maxRuneAmount.gte(runeBalance) && !runeBalance.eq(baseAmount(0))
+    ? runeBalance.minus(thorchainFee)
+    : maxRuneAmount
 }
 
 /**
