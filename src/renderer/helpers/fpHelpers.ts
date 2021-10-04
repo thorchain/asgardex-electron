@@ -35,10 +35,6 @@ export const rdAltOnPending =
   }
 
 /**
- * @since 0.0.1
- */
-
-/**
  * Reads a file.
  *
  * Borrowed from https://github.com/gcanti/fp-ts-node/blob/master/src/fs.ts
