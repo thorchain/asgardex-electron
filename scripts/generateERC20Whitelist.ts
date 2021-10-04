@@ -1,5 +1,6 @@
 import { Asset, assetFromString, ETHChain } from '@xchainjs/xchain-util'
 import axios from 'axios'
+import chalk from 'chalk'
 import * as A from 'fp-ts/lib/Array'
 import * as C from 'fp-ts/lib/Console'
 import * as E from 'fp-ts/lib/Either'
@@ -14,6 +15,7 @@ import { ERC20Whitelist, erc20WhitelistIO } from '../src/renderer/services/thorc
 
 const WHITELIST_URL =
   'https://gitlab.com/thorchain/thornode/-/raw/develop/bifrost/pkg/chainclients/ethereum/token_list.json'
+
 const PATH = './src/renderer/types/generated/thorchain/erc20whitelist.ts'
 
 const transformList = ({ tokens }: Pick<ERC20Whitelist, 'tokens'>): Asset[] =>
@@ -55,10 +57,7 @@ export const ERC20Whitelist: Asset[] = ${JSON.stringify(list)}
   return FP.pipe(
     TE.tryCatch(
       () => fs.writeFile(PATH, content),
-      (e: unknown) => {
-        console.log('error: ', e)
-        return new Error(`${e}`)
-      }
+      (e: unknown) => new Error(`${e}`)
     )
   )
 }
@@ -67,18 +66,12 @@ const formatList = () => {
   return FP.pipe(
     TE.tryCatch(
       () => fs.readFile(PATH, 'utf8'),
-      (e: unknown) => {
-        console.log('error READ: ', e)
-        return new Error(`${e}`)
-      }
+      (e: unknown) => new Error(`${e}`)
     ),
     TE.chain((content) =>
       TE.tryCatch(
         () => fs.writeFile(PATH, prettier.format(content, { filepath: PATH })),
-        (e: unknown) => {
-          console.log('error WRITE: ', e)
-          return new Error(`${e}`)
-        }
+        (e: unknown) => new Error(`${e}`)
       )
     )
   )
@@ -90,8 +83,10 @@ const main = async () =>
     TE.map(transformList),
     TE.chain(writeList),
     TE.chain(formatList),
-    TE.map(TE.rightIO(C.info('success '))),
-    TE.mapLeft(TE.leftIO(C.info('failure ')))
+    // success output
+    TE.map(FP.flow(C.info(chalk.green.bold(`Whitelist has been generated successfully!`)), C.log(`Location: ${PATH}`))),
+    // error output
+    TE.mapLeft((error) => FP.pipe(error, C.error(chalk.red.bold(`Error while generating whitelist!`)), C.log(error)))
   )()
 
 main()
