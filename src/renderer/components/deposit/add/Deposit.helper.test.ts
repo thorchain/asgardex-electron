@@ -30,18 +30,23 @@ describe('deposit/Deposit.helper', () => {
   // user balances
   const runeBalance = baseAmount(10000)
   const assetBalance = baseAmount(20000)
+  const thorchainFees: DepositFees = {
+    inFee: baseAmount(1000),
+    outFee: baseAmount(1000),
+    refundFee: baseAmount(1000)
+  }
 
   describe('maxRuneAmountToDeposit', () => {
     it('is 10000', () => {
-      const result = maxRuneAmountToDeposit({ poolData, assetBalance, runeBalance })
-      expect(eqBaseAmount.equals(result, baseAmount(10000))).toBeTruthy()
+      const result = maxRuneAmountToDeposit({ poolData, assetBalance, runeBalance, thorchainFees })
+      expect(eqBaseAmount.equals(result, baseAmount(9000))).toBeTruthy()
     })
     it('is 5000', () => {
       const runeBalance = baseAmount(5000)
       const assetBalance = baseAmount(10000)
-      const result = maxRuneAmountToDeposit({ poolData, assetBalance, runeBalance })
+      const result = maxRuneAmountToDeposit({ poolData, assetBalance, runeBalance, thorchainFees })
 
-      expect(eqBaseAmount.equals(result, baseAmount(5000))).toBeTruthy()
+      expect(eqBaseAmount.equals(result, baseAmount(4000))).toBeTruthy()
     })
   })
 
