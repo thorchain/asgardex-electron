@@ -58,7 +58,13 @@ import {
   FeeRD
 } from '../../services/chain/types'
 import { AddressValidationAsync } from '../../services/clients'
-import { ApproveFeeHandler, ApproveParams, IsApprovedRD, LoadApproveFeeHandler } from '../../services/ethereum/types'
+import {
+  ApproveFeeHandler,
+  ApproveParams,
+  IsApprovedRD,
+  IsApproveParams,
+  LoadApproveFeeHandler
+} from '../../services/ethereum/types'
 import { PoolAssetDetail, PoolAssetDetails, PoolAddress, PoolsDataMap } from '../../services/midgard/types'
 import { MimirHalt } from '../../services/thorchain/types'
 import {
@@ -109,7 +115,7 @@ export type SwapProps = {
   slipTolerance: SlipTolerance
   changeSlipTolerance: ChangeSlipToleranceHandler
   approveERC20Token$: (params: ApproveParams) => TxHashLD
-  isApprovedERC20Token$: (params: ApproveParams) => LiveData<ApiError, boolean>
+  isApprovedERC20Token$: (params: IsApproveParams) => LiveData<ApiError, boolean>
   importWalletHandler: FP.Lazy<void>
   haltedChains: Chain[]
   mimirHalt: MimirHalt
@@ -327,11 +333,12 @@ export const Swap = ({
     return FP.pipe(
       sequenceTOption(oTokenAddress, oRouterAddress),
       O.map(([tokenAddress, routerAddress]) => ({
+        network,
         spenderAddress: routerAddress,
         contractAddress: tokenAddress
       }))
     )
-  }, [oPoolAddress, sourceAssetProp])
+  }, [network, oPoolAddress, sourceAssetProp])
 
   // Reload balances at `onMount`
   useEffect(() => {
@@ -966,6 +973,7 @@ export const Swap = ({
       O.map(([routerAddress, tokenAddress]) =>
         subscribeApproveState(
           approveERC20Token$({
+            network,
             contractAddress: tokenAddress,
             spenderAddress: routerAddress
           })

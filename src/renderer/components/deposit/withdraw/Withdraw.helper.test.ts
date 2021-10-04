@@ -1,7 +1,7 @@
 import { ETH_DECIMAL } from '@xchainjs/xchain-ethereum'
 import { assetAmount, AssetBNB, AssetETH, assetToBase, baseAmount } from '@xchainjs/xchain-util'
 
-import { AssetBUSD74E, AssetUSDTERC20, ZERO_BASE_AMOUNT } from '../../../const'
+import { AssetBUSD74E, AssetUSDTERC20Testnet, ZERO_BASE_AMOUNT } from '../../../const'
 import { BNB_DECIMAL, THORCHAIN_DECIMAL } from '../../../helpers/assetHelper'
 import { eqBaseAmount } from '../../../helpers/fp/eq'
 import {
@@ -115,7 +115,7 @@ describe('stake/Withdraw.helper', () => {
           asset: AssetETH,
           amount: assetToBase(assetAmount(0.03, ETH_DECIMAL))
         },
-        asset: AssetUSDTERC20,
+        asset: AssetUSDTERC20Testnet,
         assetDecimal: withdrawAssetDecimal,
         poolsData
       }

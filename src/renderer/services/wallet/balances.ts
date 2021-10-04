@@ -9,7 +9,6 @@ import * as Rx from 'rxjs'
 import * as RxOp from 'rxjs/operators'
 
 import { Network } from '../../../shared/api/types'
-import { ETHAssets } from '../../const'
 import { getBnbRuneAsset } from '../../helpers/assetHelper'
 import { filterEnabledChains } from '../../helpers/chainHelper'
 import { eqBalancesRD } from '../../helpers/fp/eq'
@@ -112,7 +111,7 @@ export const createBalancesService = ({
           resetReloadBalances: ETH.resetReloadBalances,
           balances$: FP.pipe(
             network$,
-            RxOp.switchMap((network) => ETH.balances$(walletType, network === 'testnet' ? ETHAssets : undefined))
+            RxOp.switchMap((network) => ETH.balances$({ walletType, network }))
           ),
           reloadBalances$: ETH.reloadBalances$
         }
