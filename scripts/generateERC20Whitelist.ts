@@ -1,16 +1,19 @@
 import { Asset, assetFromString, ETHChain } from '@xchainjs/xchain-util'
 import axios from 'axios'
 import chalk from 'chalk'
+import * as IO from 'fp-ts/IO'
 import * as A from 'fp-ts/lib/Array'
 import * as C from 'fp-ts/lib/Console'
 import * as E from 'fp-ts/lib/Either'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
 import * as TE from 'fp-ts/lib/TaskEither'
-import * as fs from 'fs-extra'
+import * as S from 'fp-ts/string'
+import * as T from 'fp-ts/Task'
 import { failure } from 'io-ts/lib/PathReporter'
 import prettier from 'prettier'
 
+import { writeFile, readFile } from '../src/renderer/helpers/fpHelpers'
 import { ERC20Whitelist, erc20WhitelistIO } from '../src/renderer/services/thorchain/types'
 
 const WHITELIST_URL =
@@ -39,8 +42,7 @@ const loadList = (): TE.TaskEither<Error, ERC20Whitelist> =>
     )
   )
 
-const writeList = (list: Asset[]): TE.TaskEither<Error, void> => {
-  const content = `
+const createTemplate = (list: Asset[]): string => `
 /**
  * ERC20Whitelist
  *
@@ -51,42 +53,45 @@ const writeList = (list: Asset[]): TE.TaskEither<Error, void> => {
 import { Asset, ETHChain } from '@xchainjs/xchain-util'
 
 export const ERC20Whitelist: Asset[] = ${JSON.stringify(list)}
+`
 
-`.replace(/"chain":"ETH"/g, 'chain: ETHChain') // "ETH" _> ETHChain
+const writeList = (list: Asset[]): TE.TaskEither<Error, void> =>
+  FP.pipe(
+    list,
+    createTemplate,
+    // "ETH" _> ETHChain
+    S.replace(/"chain":"ETH"/g, 'chain: ETHChain'),
+    (c) => writeFile(PATH, c)
+  )
 
-  return FP.pipe(
-    TE.tryCatch(
-      () => fs.writeFile(PATH, content),
-      (e: unknown) => new Error(`${e}`)
+const formatList = () =>
+  FP.pipe(
+    readFile(PATH, 'utf8'),
+    TE.chain((content) => writeFile(PATH, prettier.format(content, { filepath: PATH })))
+  )
+
+const onError = (e: Error): T.Task<void> =>
+  T.fromIO(
+    FP.pipe(
+      C.log(chalk.bold.red('Unexpected Error!')),
+      IO.chain(() => C.error(e))
     )
   )
-}
 
-const formatList = () => {
-  return FP.pipe(
-    TE.tryCatch(
-      () => fs.readFile(PATH, 'utf8'),
-      (e: unknown) => new Error(`${e}`)
-    ),
-    TE.chain((content) =>
-      TE.tryCatch(
-        () => fs.writeFile(PATH, prettier.format(content, { filepath: PATH })),
-        (e: unknown) => new Error(`${e}`)
-      )
+const onSuccess = (): T.Task<void> =>
+  T.fromIO(
+    FP.pipe(
+      C.info(chalk.green.bold(`Created whitelist successfully!`)),
+      IO.chain(() => C.log(`Location: ${PATH}`))
     )
   )
-}
 
-const main = async () =>
-  await FP.pipe(
-    loadList(),
-    TE.map(transformList),
-    TE.chain(writeList),
-    TE.chain(formatList),
-    // success output
-    TE.map(FP.flow(C.info(chalk.green.bold(`Whitelist has been generated successfully!`)), C.log(`Location: ${PATH}`))),
-    // error output
-    TE.mapLeft((error) => FP.pipe(error, C.error(chalk.red.bold(`Error while generating whitelist!`)), C.log(error)))
-  )()
+const main = FP.pipe(
+  loadList(),
+  TE.map(transformList),
+  TE.chain(writeList),
+  TE.chain(formatList),
+  TE.fold(onError, onSuccess)
+)
 
 main()
