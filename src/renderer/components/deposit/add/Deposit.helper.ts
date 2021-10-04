@@ -28,12 +28,12 @@ export const maxRuneAmountToDeposit = ({
   poolData,
   runeBalance,
   assetBalance,
-  thorchainFees
+  thorchainFee
 }: {
   poolData: PoolData
   runeBalance: BaseAmount
   assetBalance: BaseAmount
-  thorchainFees: DepositFees
+  thorchainFee: BaseAmount
 }): BaseAmount => {
   const { runeBalance: poolRuneBalance, assetBalance: poolAssetBalance } = poolData
   // asset balance needs to have `1e8` decimal to be in common with pool data (always `1e8`)
@@ -47,9 +47,7 @@ export const maxRuneAmountToDeposit = ({
       .toFixed(0, BigNumber.ROUND_DOWN),
     THORCHAIN_DECIMAL
   )
-  return maxRuneAmount.amount().isGreaterThan(runeBalance.amount())
-    ? runeBalance.minus(thorchainFees.inFee)
-    : maxRuneAmount
+  return maxRuneAmount.gte(runeBalance) ? runeBalance.minus(thorchainFee) : maxRuneAmount
 }
 
 /**

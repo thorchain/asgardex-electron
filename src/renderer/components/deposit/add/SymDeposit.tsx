@@ -48,8 +48,7 @@ import {
   FeeRD,
   ReloadSymDepositFeesHandler,
   SymDepositFeesHandler,
-  SymDepositFeesRD,
-  DepositFees
+  SymDepositFeesRD
 } from '../../../services/chain/types'
 import { OpenExplorerTxUrl } from '../../../services/clients'
 import { ApproveFeeHandler, ApproveParams, IsApprovedRD, LoadApproveFeeHandler } from '../../../services/ethereum/types'
@@ -259,17 +258,16 @@ export const SymDeposit: React.FC<Props> = (props) => {
     [depositFeesRD, zeroDepositFees]
   )
 
-  const oThorchainFees = useMemo(() => Helper.getThorchainFees(depositFeesRD), [depositFeesRD])
-  const thorchainFees: DepositFees = useMemo(
+  const thorchainFee: BaseAmount = useMemo(
     () =>
       FP.pipe(
-        oThorchainFees,
+        Helper.getThorchainFees(depositFeesRD),
         O.fold(
-          () => zeroDepositFees.rune,
-          (thorchainFees) => thorchainFees
+          () => zeroDepositFees.rune.inFee,
+          (thorchainFees) => thorchainFees.inFee
         )
       ),
-    [oThorchainFees, zeroDepositFees]
+    [depositFeesRD, zeroDepositFees.rune]
   )
 
   const oDepositParams: O.Option<SymDepositParams> = useMemo(
@@ -369,9 +367,9 @@ export const SymDeposit: React.FC<Props> = (props) => {
   }, [isZeroAmountToDeposit, minRuneAmountToDeposit, runeAmountToDeposit])
 
   const maxRuneAmountToDeposit = useMemo(
-    (): BaseAmount => Helper.maxRuneAmountToDeposit({ poolData, runeBalance, assetBalance, thorchainFees }),
+    (): BaseAmount => Helper.maxRuneAmountToDeposit({ poolData, runeBalance, assetBalance, thorchainFee }),
 
-    [assetBalance, poolData, runeBalance, thorchainFees]
+    [assetBalance, poolData, runeBalance, thorchainFee]
   )
 
   // Update `runeAmountToDeposit` if `maxRuneAmountToDeposit` has been updated
