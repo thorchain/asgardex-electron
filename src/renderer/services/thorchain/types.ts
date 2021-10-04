@@ -161,3 +161,23 @@ export const LiquidityProviderIO = t.type({
   pending_rune: t.string,
   pending_asset: t.string
 })
+
+export const erc20WhitelistTokenIO = t.type({
+  chainId: t.number,
+  address: t.string,
+  symbol: t.string,
+  name: t.string
+})
+
+export type ERC20WhitelistToken = t.TypeOf<typeof erc20WhitelistTokenIO>
+
+export const erc20WhitelistIO = t.type({
+  tokens: t.array(erc20WhitelistTokenIO),
+  version: t.type({
+    major: t.number,
+    minor: t.number,
+    patch: t.number
+  })
+})
+
+export type ERC20Whitelist = t.TypeOf<typeof erc20WhitelistIO>
