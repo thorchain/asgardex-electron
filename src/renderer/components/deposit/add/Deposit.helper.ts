@@ -6,6 +6,7 @@ import * as E from 'fp-ts/Either'
 import * as FP from 'fp-ts/function'
 import * as O from 'fp-ts/Option'
 
+import { ZERO_BASE_AMOUNT } from '../../../const'
 import {
   convertBaseAmountDecimal,
   isChainAsset,
@@ -47,7 +48,7 @@ export const maxRuneAmountToDeposit = ({
       .toFixed(0, BigNumber.ROUND_DOWN),
     THORCHAIN_DECIMAL
   )
-  return maxRuneAmount.gte(runeBalance) && !runeBalance.eq(baseAmount(0))
+  return maxRuneAmount.gte(runeBalance) && !runeBalance.eq(ZERO_BASE_AMOUNT)
     ? runeBalance.minus(thorchainFee)
     : maxRuneAmount
 }
