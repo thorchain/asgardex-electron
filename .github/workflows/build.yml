@@ -19,7 +19,7 @@ jobs:
       - name: Checkout git repo
         uses: actions/checkout@v2
 
-      - name: Install missing dependencies on Linux
+      - name: Install missing dependencies (on Linux only)
         run: sudo apt-get update && sudo apt-get install libudev-dev libusb-1.0-0-dev
         if: runner.os == 'Linux'
 
