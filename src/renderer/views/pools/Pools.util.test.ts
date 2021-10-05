@@ -15,7 +15,7 @@ import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
 
 import { ASSETS_TESTNET, ERC20_TESTNET } from '../../../shared/mock/assets'
-import { AssetUSDTERC20 } from '../../const'
+import { AssetUSDTERC20Testnet } from '../../const'
 import { eqBaseAmount } from '../../helpers/fp/eq'
 import { LastblockItems } from '../../services/midgard/types'
 import { PoolDetail } from '../../types/generated/midgard'
@@ -228,7 +228,7 @@ describe('views/pools/utils', () => {
       expect(eqBaseAmount.equals(result, assetToBase(assetAmount(50, 8)))).toBeTruthy()
     })
     it('$100 for ERC20', () => {
-      const result = minPoolTxAmountUSD(AssetUSDTERC20)
+      const result = minPoolTxAmountUSD(AssetUSDTERC20Testnet)
       expect(eqBaseAmount.equals(result, assetToBase(assetAmount(100, 8)))).toBeTruthy()
     })
     it('$10 for others (BNB)', () => {

@@ -25,14 +25,8 @@ import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
 
 import { Network } from '../../shared/api/types'
-import {
-  AssetXRune,
-  AssetXRuneTestnet,
-  BinanceBlackList,
-  DEFAULT_PRICE_ASSETS,
-  ERC20BlackList,
-  USD_PRICE_ASSETS
-} from '../const'
+import { AssetXRune, AssetXRuneTestnet, BinanceBlackList, DEFAULT_PRICE_ASSETS, USD_PRICE_ASSETS } from '../const'
+import { ERC20Whitelist } from '../types/generated/thorchain/erc20whitelist'
 import { PricePoolAsset } from '../views/pools/Pools.types'
 import { getEthChecksumAddress } from './addressHelper'
 import { getChainAsset, isBchChain, isBnbChain, isBtcChain, isEthChain, isLtcChain } from './chainHelper'
@@ -97,22 +91,32 @@ export const isBtcAsset = (asset: Asset): boolean => eqAsset.equals(asset, Asset
 export const isEthAsset = (asset: Asset): boolean => eqAsset.equals(asset, AssetETH)
 
 /**
- * Check whether an ERC20 asset is black listed or not
+ * Check whether an ERC20 asset is white listed or not
  */
-export const assetInERC20Blacklist = (asset: Asset): boolean =>
+export const assetInERC20Whitelist = (asset: Asset): boolean =>
   FP.pipe(
-    ERC20BlackList,
+    ERC20Whitelist,
     A.findFirst((assetInList) => eqAsset.equals(assetInList, asset)),
     O.isSome
   )
 
 /**
+ * Checks whether ETH/ERC20 asset is whitelisted or not
+ * based on following rules:
+ * (1) Check on `mainnet` only
+ * (2) Always accept ETH
+ * (3) ERC20 asset needs to be listed in `ERC20Whitelist`
+ */
+export const validAssetForETH = (asset: Asset /* ETH or ERC20 asset */, network: Network): boolean =>
+  network !== 'mainnet' /* (1) */ || isEthAsset(asset) /* (2) */ || assetInERC20Whitelist(asset)
+
+/**
  * Check whether an ERC20 address is black listed or not
  */
-export const addressInERC20Blacklist = (address: Address): boolean => {
+const addressInList = (address: Address, list: Asset[]): boolean => {
   const oChecksumAddress = getEthChecksumAddress(address)
   return FP.pipe(
-    ERC20BlackList,
+    list,
     A.findFirst(
       FP.flow(
         getEthTokenAddress,
@@ -124,6 +128,11 @@ export const addressInERC20Blacklist = (address: Address): boolean => {
     O.isSome
   )
 }
+
+/**
+ * Check whether an ERC20 address is white listed or not
+ */
+export const addressInERC20Whitelist = (address: Address): boolean => addressInList(address, ERC20Whitelist)
 
 /**
  * Check whether an asset is black listed for Binance or not

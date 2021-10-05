@@ -21,17 +21,26 @@ import { PricePoolCurrencyWeights, PricePoolAssets } from './views/pools/Pools.t
 // ERC-20 assets
 //
 
-// ETH.USDT - testnet only
+// ETH.USDT
 export const AssetUSDTERC20: Asset = {
+  chain: ETHChain,
+  symbol: 'USDT-0xdAC17F958D2ee523a2206206994597C13D831ec7',
+  ticker: 'USDT'
+}
+
+// ETH.USDT - testnet only
+export const AssetUSDTERC20Testnet: Asset = {
   chain: ETHChain,
   symbol: 'USDT-0xa3910454bf2cb59b8b3a401589a3bacc5ca42306',
   ticker: 'USDT'
 }
 
+export const AssetXRuneAddress = '0x69fa0fee221ad11012bab0fdb45d444d3d2ce71c'
+const AssetXRuneSymbol = 'XRUNE'
 export const AssetXRune: Asset = {
   chain: ETHChain,
-  symbol: 'XRUNE-0x69fa0fee221ad11012bab0fdb45d444d3d2ce71c',
-  ticker: 'XRUNE'
+  symbol: `${AssetXRuneSymbol}-${AssetXRuneAddress}`,
+  ticker: AssetXRuneSymbol
 }
 
 export const AssetXRuneTestnet: Asset = {
@@ -41,60 +50,60 @@ export const AssetXRuneTestnet: Asset = {
 }
 
 // ETH.UST - testnet only
-export const AssetUST: Asset = {
+export const AssetUSTERC20Testnet: Asset = {
   chain: ETHChain,
   symbol: 'UST-0x6cA13a4ab78dd7D657226b155873A04DB929A3A4',
   ticker: 'UST'
 }
 
 // ETH.THOR - testnet only
-export const AssetThorERC20: Asset = {
+export const AssetThorERC20Testnet: Asset = {
   chain: ETHChain,
   symbol: 'THOR-0xA0b515c058F127a15Dd3326F490eBF47d215588e',
   ticker: 'THOR'
 }
 
 // TKN8 - random test asset w/ 8 decimal (testnet only)
-export const AssetTKN8ERC20: Asset = {
+export const AssetTKN8ERC20Testnet: Asset = {
   chain: ETHChain,
   symbol: 'TKN8-0x242aD49dAcd38aC23caF2ccc118482714206beD4',
   ticker: 'TKN8'
 }
 
 // TKN18 - random test asset w/ 18 decimal (testnet only)
-export const AssetTKN18ERC20: Asset = {
+export const AssetTKN18ERC20Testnet: Asset = {
   chain: ETHChain,
   symbol: 'TKN18-0x8E3f9E9b5B26AAaE9d31364d2a8e8a9dd2BE3B82',
   ticker: 'TKN18'
 }
 
 // Wrapped Ether (WETH) - testnet only
-export const AssetWETHERC20: Asset = {
+export const AssetWETHERC20Testnet: Asset = {
   chain: ETHChain,
   symbol: 'WETH-0xbCA556c912754Bc8E7D4Aad20Ad69a1B1444F42d',
   ticker: 'WETH'
 }
 
 // DAI - testnet only
-export const AssetDAIERC20: Asset = {
+export const AssetDAIERC20Testnet: Asset = {
   chain: ETHChain,
   symbol: 'DAI-0xad6d458402f60fd3bd25163575031acdce07538d',
   ticker: 'DAI'
 }
 
 // This hardcode list is for testnet only
-export const ERC20Assets = [
-  AssetUSDTERC20,
+export const ERC20AssetsTestnet = [
+  AssetUSDTERC20Testnet,
   AssetXRuneTestnet,
-  AssetUST,
+  AssetUSTERC20Testnet,
   AssetRuneERC20Testnet,
-  AssetThorERC20,
-  AssetTKN8ERC20,
-  AssetTKN18ERC20,
-  AssetWETHERC20,
-  AssetDAIERC20
+  AssetThorERC20Testnet,
+  AssetTKN8ERC20Testnet,
+  AssetTKN18ERC20Testnet,
+  AssetWETHERC20Testnet,
+  AssetDAIERC20Testnet
 ]
-export const ETHAssets = [AssetETH, ...ERC20Assets]
+export const ETHAssetsTestnet = [AssetETH, ...ERC20AssetsTestnet]
 
 // UNIH (exploit contract)
 // https://etherscan.io/address/0x4bf5dc91E2555449293D7824028Eb8Fe5879B689
@@ -105,9 +114,6 @@ export const AssetUniH: Asset = {
   symbol: `${AssetUniHSymbol}-${AssetUniHAddress}`,
   ticker: AssetUniHSymbol
 }
-
-// Black listed ERC20 assets
-export const ERC20BlackList = [AssetUniH]
 
 // Black listed BNB assets
 // For now `RUNE-67C` is blacklisted on `mainnet` only, see https://explorer.binance.org/asset/RUNE-67C
@@ -152,7 +158,7 @@ export const USD_PRICE_ASSETS: PricePoolAssets = [
   AssetUSDTDC8,
   AssetUSDTDAC,
   AssetUSDT62E,
-  AssetUSDTERC20,
+  AssetUSDTERC20Testnet,
   AssetUSDC
 ]
 
@@ -165,7 +171,7 @@ export const CURRENCY_WHEIGHTS: PricePoolCurrencyWeights = {
   [assetToString(AssetUSDTDC8)]: 3,
   [assetToString(AssetUSDTDAC)]: 4,
   [assetToString(AssetUSDT62E)]: 5,
-  [assetToString(AssetUSDTERC20)]: 6,
+  [assetToString(AssetUSDTERC20Testnet)]: 6,
   [assetToString(AssetUSDC)]: 7,
   [assetToString(AssetETH)]: 8,
   [assetToString(AssetBTC)]: 9,

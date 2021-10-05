@@ -51,7 +51,13 @@ import {
   SymDepositFeesRD
 } from '../../../services/chain/types'
 import { OpenExplorerTxUrl } from '../../../services/clients'
-import { ApproveFeeHandler, ApproveParams, IsApprovedRD, LoadApproveFeeHandler } from '../../../services/ethereum/types'
+import {
+  ApproveFeeHandler,
+  ApproveParams,
+  IsApprovedRD,
+  IsApproveParams,
+  LoadApproveFeeHandler
+} from '../../../services/ethereum/types'
 import { PoolAddress, PoolsDataMap } from '../../../services/midgard/types'
 import { MimirHalt, PendingAssets, PendingAssetsRD } from '../../../services/thorchain/types'
 import { ApiError, TxHashLD, TxHashRD, ValidatePasswordHandler, WalletBalances } from '../../../services/wallet/types'
@@ -93,7 +99,7 @@ export type Props = {
   deposit$: SymDepositStateHandler
   network: Network
   approveERC20Token$: (params: ApproveParams) => TxHashLD
-  isApprovedERC20Token$: (params: ApproveParams) => LiveData<ApiError, boolean>
+  isApprovedERC20Token$: (params: IsApproveParams) => LiveData<ApiError, boolean>
   fundsCap: O.Option<FundsCap>
   poolsData: PoolsDataMap
   haltedChains: Chain[]
@@ -224,11 +230,12 @@ export const SymDeposit: React.FC<Props> = (props) => {
     return FP.pipe(
       sequenceTOption(oTokenAddress, oRouterAddress),
       O.map(([tokenAddress, routerAddress]) => ({
+        network,
         spenderAddress: routerAddress,
         contractAddress: tokenAddress
       }))
     )
-  }, [oPoolAddress, asset])
+  }, [oPoolAddress, asset, network])
 
   const zeroDepositFees: SymDepositFees = useMemo(() => getZeroSymDepositFees(asset), [asset])
 
@@ -884,6 +891,7 @@ export const SymDeposit: React.FC<Props> = (props) => {
       O.map(([routerAddress, tokenAddress]) =>
         subscribeApproveState(
           approveERC20Token$({
+            network,
             contractAddress: tokenAddress,
             spenderAddress: routerAddress
           })
