@@ -38,6 +38,12 @@ jobs:
         with:
           node-version: ${{ matrix.node-version }}
 
+      - name: Prepare installation of node-gyp (Windows only)
+        if: runner.os == 'windows'
+        run:
+          - npm i -g --production windows-build-tools
+          - yarn config set msvs_version 2015 --global
+
       - name: Install dependencies
         run: yarn install --frozen-lockfile
 
