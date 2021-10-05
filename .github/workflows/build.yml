@@ -38,13 +38,9 @@ jobs:
         with:
           node-version: ${{ matrix.node-version }}
 
-      - name: Install windows-build-tools (Windows only)
+      - name: Set msvs_version 2017 (Windows only)
         if: runner.os == 'windows'
-        run: npm i -g --production windows-build-tools
-
-      - name: Set msvs_version 2015 (Windows only)
-        if: runner.os == 'windows'
-        run: yarn config set msvs_version 2015 --global
+        run: yarn config set msvs_version 2017 --global
 
       - name: Install dependencies
         run: yarn install --frozen-lockfile
