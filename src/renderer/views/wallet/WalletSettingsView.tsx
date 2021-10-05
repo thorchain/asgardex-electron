@@ -119,7 +119,8 @@ export const WalletSettingsView: React.FC = (): JSX.Element => {
     }
   }
 
-  const thorLedgerWalletAddress: WalletAddress = useMemo(
+  // Disable TC Ledger temporarily #1822
+  const _thorLedgerWalletAddress: WalletAddress = useMemo(
     () => ({
       type: 'ledger',
       address: FP.pipe(
@@ -144,7 +145,8 @@ export const WalletSettingsView: React.FC = (): JSX.Element => {
   const walletAccounts$ = useMemo(() => {
     const thorWalletAccount$ = walletAccount$({
       addressUI$: thorAddressUI$,
-      ledgerAddress: thorLedgerWalletAddress,
+      // Disable TC Ledger temporarily #1822
+      // ledgerAddress: thorLedgerWalletAddress,
       chain: THORChain
     })
     const btcWalletAccount$ = walletAccount$({ addressUI$: btcAddressUI$, chain: BTCChain })
@@ -174,7 +176,8 @@ export const WalletSettingsView: React.FC = (): JSX.Element => {
     )
   }, [
     thorAddressUI$,
-    thorLedgerWalletAddress,
+    // Disable TC Ledger temporarily #1822
+    // thorLedgerWalletAddress,
     btcAddressUI$,
     ethAddressUI$,
     bnbAddressUI$,
