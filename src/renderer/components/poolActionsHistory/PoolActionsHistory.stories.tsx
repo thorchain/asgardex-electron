@@ -9,6 +9,7 @@ import { PoolActions } from '../../services/midgard/types'
 import { ErrorId } from '../../services/wallet/types'
 import { PoolActionsHistory } from './PoolActionsHistory'
 import { Filter } from './types'
+import { WalletPoolActionsHistoryHeader } from './WalletPoolActionsHistoryHeader'
 
 const actions: PoolActions = [
   {
@@ -141,11 +142,21 @@ export const History: Story<{ dataStatus: RDStatus }> = ({ dataStatus }) => {
   const res = useMemo(() => getResults(dataStatus), [dataStatus])
   const [currentPage, setCurrentPage] = useState(1)
   const [filter, setFilter] = useState<Filter>('ALL')
-  return (
-    <PoolActionsHistory
+  const HeaderContent = (
+    <WalletPoolActionsHistoryHeader
       availableFilters={['ALL', 'SWITCH', 'DEPOSIT', 'SWAP', 'WITHDRAW', 'DONATE', 'REFUND']}
       currentFilter={filter}
       setFilter={setFilter}
+      openViewblockUrl={() => {
+        console.log('open viewblock')
+        return Promise.resolve(true)
+      }}
+    />
+  )
+
+  return (
+    <PoolActionsHistory
+      headerContent={HeaderContent}
       openExplorerTxUrl={(txHash: TxHash) => {
         console.log(`Open explorer - tx hash ${txHash}`)
         return Promise.resolve(true)

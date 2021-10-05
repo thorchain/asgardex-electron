@@ -7,13 +7,6 @@ import { palette } from 'styled-theme'
 import { PoolAction } from '../../services/midgard/types'
 import { Button as UIButton } from '../uielements/button'
 import { TxType as TxTypeUI } from '../uielements/txType'
-import { PoolActionsHistoryFilter } from './PoolActionsHistoryFilter'
-
-export const ActionsFilter = styled(PoolActionsHistoryFilter)`
-  align-self: flex-end;
-  margin-right: 20px;
-  margin-bottom: 10px;
-`
 
 export const List = styled(A.List)`
   background: ${palette('background', 0)};

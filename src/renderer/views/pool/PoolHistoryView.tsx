@@ -9,6 +9,7 @@ import * as RxOp from 'rxjs/operators'
 
 import { PoolActionsHistory } from '../../components/poolActionsHistory'
 import { DEFAULT_PAGE_SIZE } from '../../components/poolActionsHistory/PoolActionsHistory.const'
+import { PoolActionsHistoryFilter } from '../../components/poolActionsHistory/PoolActionsHistoryFilter'
 import { Filter } from '../../components/poolActionsHistory/types'
 import { useMidgardContext } from '../../contexts/MidgardContext'
 import { liveData } from '../../helpers/rx/liveData'
@@ -87,19 +88,31 @@ export const PoolHistory: React.FC<Props> = ({ className, poolAsset }) => {
     [loadActionsHistory]
   )
 
+  const currentFilter = requestParams.type || 'ALL'
+
   const openRuneExplorerTxUrl: OpenExplorerTxUrl = useOpenExplorerTxUrl(O.some(THORChain))
+
+  const headerContent = useMemo(
+    () => (
+      <PoolActionsHistoryFilter
+        availableFilters={HISTORY_FILTERS}
+        currentFilter={currentFilter}
+        onFilterChanged={setFilter}
+        disabled={!RD.isSuccess(historyPage)}
+      />
+    ),
+    [currentFilter, historyPage, setFilter]
+  )
 
   return (
     <PoolActionsHistory
       className={className}
+      headerContent={headerContent}
       currentPage={requestParams.page + 1}
       actionsPageRD={historyPage}
       prevActionsPage={prevActionsPage.current}
       openExplorerTxUrl={openRuneExplorerTxUrl}
       changePaginationHandler={setCurrentPage}
-      currentFilter={requestParams.type || 'ALL'}
-      availableFilters={HISTORY_FILTERS}
-      setFilter={setFilter}
     />
   )
 }
