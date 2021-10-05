@@ -113,8 +113,6 @@ export const assetInERC20Blacklist = (asset: Asset): boolean =>
 export const assetInERC20Whitelist = (asset: Asset): boolean =>
   FP.pipe(
     ERC20Whitelist,
-    // add ETH asset
-    A.concat([AssetETH]),
     A.findFirst((assetInList) => eqAsset.equals(assetInList, asset)),
     O.isSome
   )

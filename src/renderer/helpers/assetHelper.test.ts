@@ -210,9 +210,6 @@ describe('helpers/assetHelper', () => {
   })
 
   describe('assetInERC20Whitelist', () => {
-    it('ETH (white listed)', () => {
-      expect(assetInERC20Whitelist(AssetETH)).toBeTruthy()
-    })
     it('UNIH (black listed)', () => {
       expect(assetInERC20Whitelist(AssetUniH)).toBeFalsy()
     })
