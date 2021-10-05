@@ -99,6 +99,8 @@ export const isEthAsset = (asset: Asset): boolean => eqAsset.equals(asset, Asset
 
 /**
  * Check whether an ERC20 asset is black listed or not
+ *
+ * @deprecated Use `assetInERC20Whitelist` only
  */
 export const assetInERC20Blacklist = (asset: Asset): boolean =>
   FP.pipe(
@@ -116,6 +118,16 @@ export const assetInERC20Whitelist = (asset: Asset): boolean =>
     A.findFirst((assetInList) => eqAsset.equals(assetInList, asset)),
     O.isSome
   )
+
+/**
+ * Checks whether ETH/ERC20 asset is whitelisted or not
+ * based on following rules:
+ * (1) Check on `mainnet` only
+ * (2) Always accept ETH
+ * (3) ERC20 asset needs to be listed in `ERC20Whitelist`
+ */
+export const validAssetForETH = (asset: Asset /* ETH or ERC20 asset */, network: Network): boolean =>
+  network !== 'mainnet' /* (1) */ || isEthAsset(asset) /* (2) */ || assetInERC20Whitelist(asset)
 
 /**
  * Check whether an ERC20 address is black listed or not

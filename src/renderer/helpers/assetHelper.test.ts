@@ -54,7 +54,8 @@ import {
   assetInBinanceBlacklist,
   isRuneEthAsset,
   assetInERC20Whitelist,
-  addressInERC20Whitelist
+  addressInERC20Whitelist,
+  validAssetForETH
 } from './assetHelper'
 import { eqAsset, eqAssetAmount, eqBaseAmount } from './fp/eq'
 
@@ -232,6 +233,30 @@ describe('helpers/assetHelper', () => {
     })
     it('UNIH (not white listed)', () => {
       expect(addressInERC20Whitelist(AssetUniHAddress)).toBeFalsy()
+    })
+  })
+
+  describe('validAssetForETH', () => {
+    it('ETH - mainnet', () => {
+      expect(validAssetForETH(AssetETH, 'mainnet')).toBeTruthy()
+    })
+    it('ETH - testnet', () => {
+      expect(validAssetForETH(AssetETH, 'testnet')).toBeTruthy()
+    })
+    it('XRUNE - mainnet', () => {
+      expect(validAssetForETH(AssetXRune, 'mainnet')).toBeTruthy()
+    })
+    it('XRUNE - testnet', () => {
+      expect(validAssetForETH(AssetXRune, 'testnet')).toBeTruthy()
+    })
+    it('XRUNTestnet - mainnet', () => {
+      expect(validAssetForETH(AssetXRuneTestnet, 'mainnet')).toBeFalsy()
+    })
+    it('XRUNTestnet - testnet', () => {
+      expect(validAssetForETH(AssetXRuneTestnet, 'testnet')).toBeTruthy()
+    })
+    it('UNIH - mainnet', () => {
+      expect(validAssetForETH(AssetUniH, 'mainnet')).toBeFalsy()
     })
   })
 
