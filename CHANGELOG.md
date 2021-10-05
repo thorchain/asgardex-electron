@@ -1,3 +1,29 @@
+# 0.4.2 (2021-10-05)
+
+## Add
+
+- [BNB] Support Ledger to send transactions [#1710](https://github.com/thorchain/asgardex-electron/issues/1710), [#1711](https://github.com/thorchain/asgardex-electron/issues/1711), [#1815](https://github.com/thorchain/asgardex-electron/issues/1815), [#1772](https://github.com/thorchain/asgardex-electron/issues/1772)
+- [Wallet] Show Ledger `BNB` balances [#1712](https://github.com/thorchain/asgardex-electron/issues/1712)
+- [ERC20] Whitelist assets [#1815](https://github.com/thorchain/asgardex-electron/issues/1815)
+
+## Update
+
+- Update `FR` translation [#1797](https://github.com/thorchain/asgardex-electron/pull/1797)
+- Disable Ledger THORChain temporarily [#1823](https://github.com/thorchain/asgardex-electron/pull/1823)
+
+## Fix
+
+- [Swap] Incorrect explorer link in SWAP dialog [#1787](https://github.com/thorchain/asgardex-electron/issues/1787)
+- Upgrading `BEP2.RUNE` via Ledger is not working [#1803](https://github.com/thorchain/asgardex-electron/issues/1803)
+- Link for recovering transactions doesn't work on testnet [#1804](https://github.com/thorchain/asgardex-electron/issues/1804)
+- [Wallet] Too many requests for same endpoint [#1785](https://github.com/thorchain/asgardex-electron/issues/1785)
+- [Send] Wrong selected asset [#1784](https://github.com/thorchain/asgardex-electron/issues/1784)
+- Insufficient funds when adding liquidity [#1805](https://github.com/thorchain/asgardex-electron/issues/1805)
+
+## Internal
+
+- Update npm dependencies (09-30-2021) - incl. latest Electron@15.x [#1800](https://github.com/thorchain/asgardex-electron/issues/1800)
+
 # 0.4.1 (2021-09-26)
 
 ## Fix
