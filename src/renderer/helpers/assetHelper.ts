@@ -25,14 +25,7 @@ import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
 
 import { Network } from '../../shared/api/types'
-import {
-  AssetXRune,
-  AssetXRuneTestnet,
-  BinanceBlackList,
-  DEFAULT_PRICE_ASSETS,
-  ERC20BlackList,
-  USD_PRICE_ASSETS
-} from '../const'
+import { AssetXRune, AssetXRuneTestnet, BinanceBlackList, DEFAULT_PRICE_ASSETS, USD_PRICE_ASSETS } from '../const'
 import { ERC20Whitelist } from '../types/generated/thorchain/erc20whitelist'
 import { PricePoolAsset } from '../views/pools/Pools.types'
 import { getEthChecksumAddress } from './addressHelper'
@@ -98,18 +91,6 @@ export const isBtcAsset = (asset: Asset): boolean => eqAsset.equals(asset, Asset
 export const isEthAsset = (asset: Asset): boolean => eqAsset.equals(asset, AssetETH)
 
 /**
- * Check whether an ERC20 asset is black listed or not
- *
- * @deprecated Use `assetInERC20Whitelist` only
- */
-export const assetInERC20Blacklist = (asset: Asset): boolean =>
-  FP.pipe(
-    ERC20BlackList,
-    A.findFirst((assetInList) => eqAsset.equals(assetInList, asset)),
-    O.isSome
-  )
-
-/**
  * Check whether an ERC20 asset is white listed or not
  */
 export const assetInERC20Whitelist = (asset: Asset): boolean =>
@@ -147,11 +128,6 @@ const addressInList = (address: Address, list: Asset[]): boolean => {
     O.isSome
   )
 }
-
-/**
- * Check whether an ERC20 address is black listed or not
- */
-export const addressInERC20Blacklist = (address: Address): boolean => addressInList(address, ERC20BlackList)
 
 /**
  * Check whether an ERC20 address is white listed or not

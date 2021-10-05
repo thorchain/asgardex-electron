@@ -49,8 +49,6 @@ import {
   getTwoSigfigAssetAmount,
   isXRuneAsset,
   disableRuneUpgrade,
-  assetInERC20Blacklist,
-  addressInERC20Blacklist,
   assetInBinanceBlacklist,
   isRuneEthAsset,
   assetInERC20Whitelist,
@@ -189,24 +187,6 @@ describe('helpers/assetHelper', () => {
     })
     it('is returns None for non ETH assets', () => {
       expect(getEthAssetAddress(AssetRuneNative)).toBeNone()
-    })
-  })
-
-  describe('assetInERC20Blacklist', () => {
-    it('ETH (non black listed)', () => {
-      expect(assetInERC20Blacklist(AssetETH)).toBeFalsy()
-    })
-    it('UNIH (black listed)', () => {
-      expect(assetInERC20Blacklist(AssetUniH)).toBeTruthy()
-    })
-  })
-
-  describe('addressInERC20Blacklist', () => {
-    it('USDT (non black listed)', () => {
-      expect(addressInERC20Blacklist('0xdb99328b43b86037f80b43c3dbd203f00f056b75')).toBeFalsy()
-    })
-    it('UNIH (black listed)', () => {
-      expect(addressInERC20Blacklist(AssetUniHAddress)).toBeTruthy()
     })
   })
 

@@ -115,9 +115,6 @@ export const AssetUniH: Asset = {
   ticker: AssetUniHSymbol
 }
 
-// Black listed ERC20 assets
-export const ERC20BlackList = [AssetUniH]
-
 // Black listed BNB assets
 // For now `RUNE-67C` is blacklisted on `mainnet` only, see https://explorer.binance.org/asset/RUNE-67C
 export const BinanceBlackList: Record<Network, Array<Asset>> = { mainnet: [AssetRune67C], testnet: [] }

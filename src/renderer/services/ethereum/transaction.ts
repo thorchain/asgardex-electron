@@ -8,7 +8,7 @@ import * as O from 'fp-ts/Option'
 import * as Rx from 'rxjs'
 import * as RxOp from 'rxjs/operators'
 
-import { addressInERC20Blacklist, addressInERC20Whitelist, getEthAssetAddress } from '../../helpers/assetHelper'
+import { addressInERC20Whitelist, getEthAssetAddress } from '../../helpers/assetHelper'
 import { sequenceSOption } from '../../helpers/fpHelpers'
 import { LiveData } from '../../helpers/rx/liveData'
 import * as C from '../clients'
@@ -99,10 +99,7 @@ export const createTransactionService = (client$: Client$): TransactionService =
   const runApproveERC20Token$ = (client: EthClient, { ...params }: ApproveParams): TxHashLD => {
     // check contract address before approving
     const contractAddress = params.contractAddress
-    if (
-      addressInERC20Blacklist(contractAddress) ||
-      (params.network === 'mainnet' && !addressInERC20Whitelist(contractAddress))
-    )
+    if (params.network === 'mainnet' && !addressInERC20Whitelist(contractAddress))
       return Rx.of(
         RD.failure({
           msg: `Contract address ${contractAddress} is black listed`,

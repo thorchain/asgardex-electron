@@ -4,7 +4,7 @@ import * as FP from 'fp-ts/lib/function'
 
 import { Network } from '../../../shared/api/types'
 import { ETHAssetsTestnet } from '../../const'
-import { assetInERC20Blacklist, validAssetForETH } from '../../helpers/assetHelper'
+import { validAssetForETH } from '../../helpers/assetHelper'
 import { liveData } from '../../helpers/rx/liveData'
 import { observableState } from '../../helpers/stateHelper'
 import * as C from '../clients'
@@ -36,8 +36,6 @@ const balances$: ({ walletType, network }: { walletType: WalletType; network: Ne
   const assets: Asset[] | undefined = network === 'testnet' ? ETHAssetsTestnet : undefined
   return FP.pipe(
     C.balances$({ client$, trigger$: reloadBalances$, assets, walletType }),
-    // Filter out black listed assets
-    liveData.map(FP.flow(A.filter(({ asset }) => !assetInERC20Blacklist(asset)))),
     // Filter assets based on ERC20Whitelist (mainnet only)
     liveData.map(FP.flow(A.filter(({ asset }) => validAssetForETH(asset, network))))
   )
