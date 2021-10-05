@@ -25,7 +25,7 @@ const addresses = [
 ]
 
 export const Default = () => (
-  <AccountAddressSelector addresses={addresses} network={'testnet'} selectedAddress={addresses[0]} />
+  <AccountAddressSelector addresses={addresses} network={'testnet'} selectedAddress={addresses[2]} />
 )
 
 export default {
