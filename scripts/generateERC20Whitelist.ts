@@ -13,7 +13,7 @@ import * as T from 'fp-ts/Task'
 import { failure } from 'io-ts/lib/PathReporter'
 import prettier from 'prettier'
 
-import { writeFile, readFile } from '../src/renderer/helpers/fpHelpers'
+import { writeFile, readFile } from '../src/main/utils/file'
 import { ERC20Whitelist, erc20WhitelistIO } from '../src/renderer/services/thorchain/types'
 
 const WHITELIST_URL =
