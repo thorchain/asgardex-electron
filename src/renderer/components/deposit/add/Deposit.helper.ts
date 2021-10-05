@@ -6,6 +6,7 @@ import * as E from 'fp-ts/Either'
 import * as FP from 'fp-ts/function'
 import * as O from 'fp-ts/Option'
 
+import { ZERO_BASE_AMOUNT } from '../../../const'
 import {
   convertBaseAmountDecimal,
   isChainAsset,
@@ -27,11 +28,13 @@ import { PoolsDataMap } from '../../../services/midgard/types'
 export const maxRuneAmountToDeposit = ({
   poolData,
   runeBalance,
-  assetBalance
+  assetBalance,
+  thorchainFee
 }: {
   poolData: PoolData
   runeBalance: BaseAmount
   assetBalance: BaseAmount
+  thorchainFee: BaseAmount
 }): BaseAmount => {
   const { runeBalance: poolRuneBalance, assetBalance: poolAssetBalance } = poolData
   // asset balance needs to have `1e8` decimal to be in common with pool data (always `1e8`)
@@ -45,8 +48,9 @@ export const maxRuneAmountToDeposit = ({
       .toFixed(0, BigNumber.ROUND_DOWN),
     THORCHAIN_DECIMAL
   )
-
-  return maxRuneAmount.amount().isGreaterThan(runeBalance.amount()) ? runeBalance : maxRuneAmount
+  return maxRuneAmount.gte(runeBalance) && !runeBalance.eq(ZERO_BASE_AMOUNT)
+    ? runeBalance.minus(thorchainFee)
+    : maxRuneAmount
 }
 
 /**

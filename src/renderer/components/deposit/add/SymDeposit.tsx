@@ -215,24 +215,6 @@ export const SymDeposit: React.FC<Props> = (props) => {
     [oChainAssetBalance]
   )
 
-  const oDepositParams: O.Option<SymDepositParams> = useMemo(
-    () =>
-      FP.pipe(
-        sequenceSOption({ poolAddress: oPoolAddress, memos: oMemos }),
-        O.map(({ poolAddress, memos }) => ({
-          asset,
-          poolAddress,
-          amounts: {
-            rune: runeAmountToDeposit,
-            // Decimal needs to be converted back for using orginal decimal of this asset (provided by `assetBalance`)
-            asset: convertBaseAmountDecimal(assetAmountToDepositMax1e8, assetDecimal)
-          },
-          memos
-        }))
-      ),
-    [oPoolAddress, oMemos, asset, runeAmountToDeposit, assetAmountToDepositMax1e8, assetDecimal]
-  )
-
   const oApproveParams: O.Option<ApproveParams> = useMemo(() => {
     const oRouterAddress: O.Option<Address> = FP.pipe(
       oPoolAddress,
@@ -274,6 +256,38 @@ export const SymDeposit: React.FC<Props> = (props) => {
         O.getOrElse(() => zeroDepositFees)
       ),
     [depositFeesRD, zeroDepositFees]
+  )
+
+  const thorchainFee: BaseAmount = useMemo(
+    () =>
+      FP.pipe(
+        Helper.getThorchainFees(depositFeesRD),
+        O.fold(
+          () => zeroDepositFees.rune.inFee,
+          (thorchainFees) => thorchainFees.inFee
+        )
+      ),
+    [depositFeesRD, zeroDepositFees.rune]
+  )
+
+  const oDepositParams: O.Option<SymDepositParams> = useMemo(
+    () =>
+      FP.pipe(
+        sequenceSOption({ poolAddress: oPoolAddress, memos: oMemos }),
+        O.map(({ poolAddress, memos }) => {
+          return {
+            asset,
+            poolAddress,
+            amounts: {
+              rune: runeAmountToDeposit,
+              // Decimal needs to be converted back for using orginal decimal of this asset (provided by `assetBalance`)
+              asset: convertBaseAmountDecimal(assetAmountToDepositMax1e8, assetDecimal)
+            },
+            memos
+          }
+        })
+      ),
+    [oPoolAddress, oMemos, asset, runeAmountToDeposit, assetAmountToDepositMax1e8, assetDecimal]
   )
 
   const reloadFeesHandler = useCallback(() => {
@@ -353,9 +367,9 @@ export const SymDeposit: React.FC<Props> = (props) => {
   }, [isZeroAmountToDeposit, minRuneAmountToDeposit, runeAmountToDeposit])
 
   const maxRuneAmountToDeposit = useMemo(
-    (): BaseAmount => Helper.maxRuneAmountToDeposit({ poolData, runeBalance, assetBalance }),
+    (): BaseAmount => Helper.maxRuneAmountToDeposit({ poolData, runeBalance, assetBalance, thorchainFee }),
 
-    [assetBalance, poolData, runeBalance]
+    [assetBalance, poolData, runeBalance, thorchainFee]
   )
 
   // Update `runeAmountToDeposit` if `maxRuneAmountToDeposit` has been updated
