@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react'
+import React, { useMemo } from 'react'
 
 import { Address } from '@xchainjs/xchain-client'
 import { Chain } from '@xchainjs/xchain-util'
@@ -27,23 +27,23 @@ type Props = {
   addresses: WalletAddress[]
   size?: IconSize
   network: Network
+  onChangeAddress: (address: Address) => void
 }
 
 export const AccountAddressSelector: React.FC<Props> = (props) => {
-  const { selectedAddress, addresses, size = 'small', network } = props
+  const { selectedAddress, addresses, size = 'small', network, onChangeAddress } = props
 
   const intl = useIntl()
-  const [chosenAddress, setChosenAddress] = useState(selectedAddress.walletAddress)
   const truncatedAddress = useMemo(
-    () => truncateAddress(chosenAddress, selectedAddress.chain, network),
-    [chosenAddress, network, selectedAddress.chain]
+    () => truncateAddress(selectedAddress.walletAddress, selectedAddress.chain, network),
+    [network, selectedAddress.chain, selectedAddress.walletAddress]
   )
 
   const menu = useMemo(
     () => (
       <Menu>
         {addresses.map(({ walletAddress, walletType, chain }) => (
-          <Menu.Item key={walletAddress} onClick={() => setChosenAddress(walletAddress)}>
+          <Menu.Item key={walletAddress} onClick={() => onChangeAddress(walletAddress)}>
             <Styled.MenuItemWrapper>
               <AssetIcon asset={getChainAsset(chain)} size={size} network={network} />
               <Styled.WalletAddress>{walletAddress}</Styled.WalletAddress>
@@ -53,7 +53,7 @@ export const AccountAddressSelector: React.FC<Props> = (props) => {
         ))}
       </Menu>
     ),
-    [addresses, intl, network, size]
+    [addresses, intl, network, onChangeAddress, size]
   )
 
   return (

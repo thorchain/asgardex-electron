@@ -25,7 +25,12 @@ const addresses = [
 ]
 
 export const Default = () => (
-  <AccountAddressSelector addresses={addresses} network={'testnet'} selectedAddress={addresses[2]} />
+  <AccountAddressSelector
+    addresses={addresses}
+    network={'testnet'}
+    selectedAddress={addresses[0]}
+    onChangeAddress={() => console.log('change index')}
+  />
 )
 
 export default {
