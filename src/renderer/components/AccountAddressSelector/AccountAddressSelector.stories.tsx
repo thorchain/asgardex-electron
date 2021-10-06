@@ -1,25 +1,24 @@
 import React from 'react'
 
-import { Address } from '@xchainjs/xchain-client'
+import { Meta } from '@storybook/react'
 import { BNBChain } from '@xchainjs/xchain-util'
 
-import { WalletType } from '../../services/wallet/types'
-import { AccountAddressSelector } from './AccountAddressSelector'
+import { AccountAddressSelector, WalletAddress } from './AccountAddressSelector'
 
-const addresses = [
+const addresses: WalletAddress[] = [
   {
-    walletAddress: 'bnb123123121' as Address,
-    walletType: 'ledger' as WalletType,
+    walletAddress: 'bnb123123121',
+    walletType: 'ledger',
     chain: BNBChain
   },
   {
-    walletAddress: 'bnb123123122' as Address,
-    walletType: 'ledger' as WalletType,
+    walletAddress: 'bnb123123122',
+    walletType: 'ledger',
     chain: BNBChain
   },
   {
-    walletAddress: 'bnb123123123' as Address,
-    walletType: 'keystore' as WalletType,
+    walletAddress: 'bnb123123123',
+    walletType: 'keystore',
     chain: BNBChain
   }
 ]
@@ -33,6 +32,9 @@ export const Default = () => (
   />
 )
 
-export default {
+const meta: Meta = {
+  component: AccountAddressSelector,
   title: 'AccountAddressSelector'
 }
+
+export default meta

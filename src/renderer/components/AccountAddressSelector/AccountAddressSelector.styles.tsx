@@ -46,10 +46,16 @@ export const CaretDownOutlined = styled(CaretDownOutlinedUI)`
   color: ${palette('primary', 0)};
 `
 
-export const MenuItemWrapper = styled.div`
+export const MenuItem = styled(MenuUI.Item)`
+  padding: 0;
+`
+
+export const MenuItemWrapper = styled.div<{ highlighted: boolean }>`
   display: flex;
   flex: row;
   align-items: center;
+  font-size: 12px;
+  background-color: ${(props) => (props.highlighted ? palette('background', 2) : palette('background', 0))};
 `
 
 export const Menu = styled(MenuUI)`

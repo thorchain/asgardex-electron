@@ -16,7 +16,7 @@ import { Size as IconSize } from '../uielements/assets/assetIcon/AssetIcon.types
 import { WalletTypeLabel } from '../uielements/common/Common.styles'
 import * as Styled from './AccountAddressSelector.styles'
 
-type WalletAddress = {
+export type WalletAddress = {
   walletAddress: Address
   walletType: WalletType
   chain: Chain
@@ -31,7 +31,7 @@ type Props = {
 }
 
 export const AccountAddressSelector: React.FC<Props> = (props) => {
-  const { selectedAddress, addresses, size = 'small', network, onChangeAddress } = props
+  const { selectedAddress, addresses, size = 'xsmall', network, onChangeAddress } = props
 
   const intl = useIntl()
   const truncatedAddress = useMemo(
@@ -43,17 +43,17 @@ export const AccountAddressSelector: React.FC<Props> = (props) => {
     () => (
       <Menu>
         {addresses.map(({ walletAddress, walletType, chain }) => (
-          <Menu.Item key={walletAddress} onClick={() => onChangeAddress(walletAddress)}>
-            <Styled.MenuItemWrapper>
+          <Styled.MenuItem key={walletAddress} onClick={() => onChangeAddress(walletAddress)}>
+            <Styled.MenuItemWrapper highlighted={selectedAddress.walletAddress === walletAddress}>
               <AssetIcon asset={getChainAsset(chain)} size={size} network={network} />
               <Styled.WalletAddress>{walletAddress}</Styled.WalletAddress>
               {isLedgerWallet(walletType) && <WalletTypeLabel>{walletTypeToI18n(walletType, intl)}</WalletTypeLabel>}
             </Styled.MenuItemWrapper>
-          </Menu.Item>
+          </Styled.MenuItem>
         ))}
       </Menu>
     ),
-    [addresses, intl, network, onChangeAddress, size]
+    [addresses, intl, network, onChangeAddress, selectedAddress.walletAddress, size]
   )
 
   return (
