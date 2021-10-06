@@ -127,7 +127,8 @@ const defaultProps: SymDepositProps = {
       runeBalance: baseAmount(10)
     }
   },
-  pendingAssets: RD.initial,
+  symPendingAssets: RD.initial,
+  asymLiqudityAssets: RD.initial,
   openRecoveryTool: () => console.log('openRecoveryTool')
 }
 

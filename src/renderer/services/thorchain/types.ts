@@ -153,6 +153,7 @@ export type LiquidityProvider = {
 export type LiquidityProvidersLD = LiveData<ApiError, LiquidityProvider[]>
 export type LiquidityProviderLD = LiveData<ApiError, O.Option<LiquidityProvider>>
 export type LiquidityProviderRD = RD.RemoteData<ApiError, O.Option<LiquidityProvider>>
+export type LiquidityProvidersRD = RD.RemoteData<ApiError, LiquidityProvider[]>
 
 export const LiquidityProviderIO = t.type({
   asset: assetIO,

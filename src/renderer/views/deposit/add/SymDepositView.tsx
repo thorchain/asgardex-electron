@@ -33,7 +33,12 @@ import { OpenExplorerTxUrl } from '../../../services/clients'
 import { DEFAULT_NETWORK } from '../../../services/const'
 import { PoolAddress, PoolAssetsRD, PoolDetailRD } from '../../../services/midgard/types'
 import { toPoolData } from '../../../services/midgard/utils'
-import { LiquidityProviderRD, MimirHalt, PendingAssetsRD } from '../../../services/thorchain/types'
+import {
+  LiquidityProviderRD,
+  LiquidityProvidersRD,
+  MimirHalt,
+  PendingAssetsRD
+} from '../../../services/thorchain/types'
 import { INITIAL_BALANCES_STATE } from '../../../services/wallet/const'
 import { WalletBalances } from '../../../services/wallet/types'
 import { getBalanceByAsset } from '../../../services/wallet/util'
@@ -44,7 +49,8 @@ type Props = {
   poolDetail: PoolDetailRD
   haltedChains: Chain[]
   mimirHalt: MimirHalt
-  liquidityProvider: LiquidityProviderRD
+  symLiquidityProvider: LiquidityProviderRD
+  asymLiquidityProviders: LiquidityProvidersRD
 }
 
 export const SymDepositView: React.FC<Props> = (props) => {
@@ -53,7 +59,8 @@ export const SymDepositView: React.FC<Props> = (props) => {
     poolDetail: poolDetailRD,
     mimirHalt,
     haltedChains,
-    liquidityProvider: liquidityProviderRD
+    symLiquidityProvider: symLiquidityProviderRD,
+    asymLiquidityProviders: _asymLiquidityProvidersRD
   } = props
   const { asset } = assetWD
   const history = useHistory()
@@ -184,10 +191,10 @@ export const SymDepositView: React.FC<Props> = (props) => {
     [fundsCapRD]
   )
 
-  const pendingAssetsRD: PendingAssetsRD = useMemo(
+  const symPendingAssetsRD: PendingAssetsRD = useMemo(
     () =>
       FP.pipe(
-        liquidityProviderRD,
+        symLiquidityProviderRD,
         RD.map((oLiquidityProvider) =>
           FP.pipe(
             oLiquidityProvider,
@@ -197,7 +204,15 @@ export const SymDepositView: React.FC<Props> = (props) => {
           )
         )
       ),
-    [liquidityProviderRD]
+    [symLiquidityProviderRD]
+  )
+
+  // TODO @veado Transform
+  const asymLiquidityAssetsRD: PendingAssetsRD = useMemo(
+    () => RD.success([]),
+    [
+      /* asymLiquidityProvidersRD */
+    ]
   )
 
   const openRecoveryTool = useCallback(
@@ -244,7 +259,8 @@ export const SymDepositView: React.FC<Props> = (props) => {
           balances={[]}
           fundsCap={O.none}
           poolsData={{}}
-          pendingAssets={RD.initial}
+          symPendingAssets={RD.initial}
+          asymLiqudityAssets={RD.initial}
           openRecoveryTool={openRecoveryTool}
         />
       </>
@@ -318,7 +334,8 @@ export const SymDepositView: React.FC<Props> = (props) => {
               isApprovedERC20Token$={isApprovedERC20Token$}
               fundsCap={fundsCap}
               poolsData={poolsData}
-              pendingAssets={pendingAssetsRD}
+              symPendingAssets={symPendingAssetsRD}
+              asymLiqudityAssets={asymLiquidityAssetsRD}
               openRecoveryTool={openRecoveryTool}
             />
           </>

@@ -10,7 +10,7 @@ import {
   reloadNodesInfo,
   mimir$,
   reloadMimir,
-  getLiquidityProvider,
+  getSymLiquidityProvider,
   reloadLiquidityProviders
 } from './thorNode'
 import { createTransactionService } from './transaction'
@@ -48,6 +48,6 @@ export {
   reloadNodesInfo,
   mimir$,
   reloadMimir,
-  getLiquidityProvider,
+  getSymLiquidityProvider,
   reloadLiquidityProviders
 }

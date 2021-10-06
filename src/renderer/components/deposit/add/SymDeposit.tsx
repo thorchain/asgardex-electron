@@ -104,7 +104,8 @@ export type Props = {
   poolsData: PoolsDataMap
   haltedChains: Chain[]
   mimirHalt: MimirHalt
-  pendingAssets: PendingAssetsRD
+  symPendingAssets: PendingAssetsRD
+  asymLiqudityAssets: PendingAssetsRD
   openRecoveryTool: FP.Lazy<void>
 }
 
@@ -144,7 +145,8 @@ export const SymDeposit: React.FC<Props> = (props) => {
     poolsData,
     haltedChains,
     mimirHalt,
-    pendingAssets: pendingAssetsRD,
+    symPendingAssets: symPendingAssetsRD,
+    asymLiqudityAssets: asymLiquidityAssetsRD,
     openRecoveryTool
   } = props
 
@@ -995,12 +997,23 @@ export const SymDeposit: React.FC<Props> = (props) => {
   const hasPendingAssets: boolean = useMemo(
     () =>
       FP.pipe(
-        pendingAssetsRD,
+        symPendingAssetsRD,
         RD.toOption,
         O.map((pendingAssets): boolean => pendingAssets.length > 0),
         O.getOrElse((): boolean => false)
       ),
-    [pendingAssetsRD]
+    [symPendingAssetsRD]
+  )
+
+  const hasAsymDeposits: boolean = useMemo(
+    () =>
+      FP.pipe(
+        asymLiquidityAssetsRD,
+        RD.toOption,
+        O.map((list): boolean => list.length > 0),
+        O.getOrElse((): boolean => false)
+      ),
+    [asymLiquidityAssetsRD]
   )
 
   const prevPendingAssets = useRef<PendingAssets>([])
@@ -1017,7 +1030,7 @@ export const SymDeposit: React.FC<Props> = (props) => {
       )
 
     return FP.pipe(
-      pendingAssetsRD,
+      symPendingAssetsRD,
       RD.fold(
         () => <></>,
         () => render(prevPendingAssets.current, true),
@@ -1028,7 +1041,10 @@ export const SymDeposit: React.FC<Props> = (props) => {
         }
       )
     )
-  }, [network, openRecoveryTool, pendingAssetsRD])
+  }, [network, openRecoveryTool, symPendingAssetsRD])
+
+  // TODO @veado REnder asym deposits
+  const renderAsymDeposits = <div>Asym. deposits</div>
 
   const prevRouterAddress = useRef<O.Option<Address>>(O.none)
 
@@ -1088,8 +1104,18 @@ export const SymDeposit: React.FC<Props> = (props) => {
       disabled ||
       assetBalance.amount().isZero() ||
       runeBalance.amount().isZero() ||
+      hasPendingAssets ||
+      hasAsymDeposits,
+    [
+      disableDepositAction,
+      isBalanceError,
+      fundsCapReached,
+      disabled,
+      assetBalance,
+      runeBalance,
       hasPendingAssets,
-    [disableDepositAction, isBalanceError, fundsCapReached, disabled, assetBalance, runeBalance, hasPendingAssets]
+      hasAsymDeposits
+    ]
   )
 
   /**
@@ -1127,9 +1153,15 @@ export const SymDeposit: React.FC<Props> = (props) => {
 
   return (
     <Styled.Container>
+      <div>pendingAssetsRD {JSON.stringify(symPendingAssetsRD, null, 2)}</div>
       {hasPendingAssets && (
         <Styled.AlertRow>
           <Col xs={24}>{renderPendingAssets}</Col>
+        </Styled.AlertRow>
+      )}
+      {hasAsymDeposits && (
+        <Styled.AlertRow>
+          <Col xs={24}>{renderAsymDeposits}</Col>
         </Styled.AlertRow>
       )}
       {showBalanceError && (

@@ -142,7 +142,11 @@ const getLiquidityProviders = ({ asset, network }: GetLiquidityProvidersParams):
         RxOp.map(A.filterMap(FP.flow(LiquidityProviderIO.decode, O.fromEither))),
         RxOp.map(RD.success),
         liveData.map(
+          // transform LiquidityProviderIO -> LiquidityProvider
           A.map((provider): LiquidityProvider => {
+            console.log('provider -> ', poolString)
+            console.log('provider -> ', provider.rune_address)
+            console.log('provider -> ', provider)
             const pendingRuneAmount = baseAmount(provider.pending_rune, THORCHAIN_DECIMAL)
             /* 1e8 decimal by default, which is default decimal for ALL accets at THORChain  */
             const pendingAssetAmount = baseAmount(provider.pending_asset, THORCHAIN_DECIMAL)
@@ -174,7 +178,13 @@ const getLiquidityProviders = ({ asset, network }: GetLiquidityProvidersParams):
   )
 }
 
-const getLiquidityProvider = ({
+/**
+ * Gets liquidity provider data by given RUNE + asset address
+ *
+ * It checks sym. deposits only
+ *
+ *  */
+const getSymLiquidityProvider = ({
   asset,
   network,
   runeAddress,
@@ -220,4 +230,4 @@ const mimir$: MimirLD = FP.pipe(
   RxOp.shareReplay(1)
 )
 
-export { getNodeInfo$, reloadNodesInfo, mimir$, reloadMimir, getLiquidityProvider, reloadLiquidityProviders }
+export { getNodeInfo$, reloadNodesInfo, mimir$, reloadMimir, getSymLiquidityProvider, reloadLiquidityProviders }

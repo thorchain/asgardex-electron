@@ -39,7 +39,7 @@ export const DepositView: React.FC<Props> = () => {
 
   const { network$ } = useAppContext()
 
-  const { getLiquidityProvider, reloadLiquidityProviders } = useThorchainContext()
+  const { getSymLiquidityProvider, reloadLiquidityProviders } = useThorchainContext()
 
   const { asset } = useParams<DepositRouteParams>()
   const {
@@ -159,7 +159,7 @@ export const DepositView: React.FC<Props> = () => {
 
   const poolDetailRD = useObservableState<PoolDetailRD>(selectedPoolDetail$, RD.initial)
 
-  const [liquidityProvider] = useObservableState<LiquidityProviderRD>(() => {
+  const [symLiquidityProvider] = useObservableState<LiquidityProviderRD>(() => {
     return Rx.combineLatest([
       network$,
       // We should look for THORChain's wallet at the response of liqudity_providers endpoint
@@ -172,12 +172,16 @@ export const DepositView: React.FC<Props> = () => {
           sequenceTOption(oRuneAddress, oAssetAddress, oSelectedPoolAsset),
           O.fold(
             (): LiquidityProviderLD => Rx.of(RD.initial),
-            ([runeAddress, assetAddress, asset]) => getLiquidityProvider({ asset, network, runeAddress, assetAddress })
+            ([runeAddress, assetAddress, asset]) =>
+              getSymLiquidityProvider({ asset, network, runeAddress, assetAddress })
           )
         )
       })
     )
   }, RD.initial)
+
+  // TODO @veado Implement logic
+  const asymLiquidityProviders = RD.initial
 
   // Special case: `keystoreState` is `undefined` in first render loop
   // (see comment at its definition using `useObservableState`)
@@ -213,7 +217,8 @@ export const DepositView: React.FC<Props> = () => {
               poolDetail={poolDetailRD}
               asset={asset}
               shares={poolSharesRD}
-              liquidityProvider={liquidityProvider}
+              symLiquidityProvider={symLiquidityProvider}
+              asymLiquidityProviders={asymLiquidityProviders}
               keystoreState={keystoreState}
               ShareContent={ShareView}
               SymDepositContent={SymDepositView}
