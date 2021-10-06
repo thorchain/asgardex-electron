@@ -2,13 +2,14 @@ import React, { useMemo } from 'react'
 
 import { Address } from '@xchainjs/xchain-client'
 import { Chain } from '@xchainjs/xchain-util'
-import { Dropdown, Menu } from 'antd'
+import { Dropdown } from 'antd'
 import { useIntl } from 'react-intl'
 
 import { Network } from '../../../shared/api/types'
 import { isLedgerWallet } from '../../../shared/utils/guard'
 import { truncateAddress } from '../../helpers/addressHelper'
 import { getChainAsset } from '../../helpers/chainHelper'
+import { eqString } from '../../helpers/fp/eq'
 import { WalletType } from '../../services/wallet/types'
 import { walletTypeToI18n } from '../../services/wallet/util'
 import { AssetIcon } from '../uielements/assets/assetIcon/AssetIcon'
@@ -31,7 +32,7 @@ type Props = {
 }
 
 export const AccountAddressSelector: React.FC<Props> = (props) => {
-  const { selectedAddress, addresses, size = 'xsmall', network, onChangeAddress } = props
+  const { selectedAddress, addresses, size = 'small', network, onChangeAddress } = props
 
   const intl = useIntl()
   const truncatedAddress = useMemo(
@@ -41,17 +42,19 @@ export const AccountAddressSelector: React.FC<Props> = (props) => {
 
   const menu = useMemo(
     () => (
-      <Menu>
+      <Styled.Menu>
         {addresses.map(({ walletAddress, walletType, chain }) => (
           <Styled.MenuItem key={walletAddress} onClick={() => onChangeAddress(walletAddress)}>
-            <Styled.MenuItemWrapper highlighted={selectedAddress.walletAddress === walletAddress}>
-              <AssetIcon asset={getChainAsset(chain)} size={size} network={network} />
+            <Styled.MenuItemWrapper highlighted={eqString.equals(selectedAddress.walletAddress, walletAddress)}>
+              <Styled.AssetIcon asset={getChainAsset(chain)} size={size} network={network} />
               <Styled.WalletAddress>{walletAddress}</Styled.WalletAddress>
-              {isLedgerWallet(walletType) && <WalletTypeLabel>{walletTypeToI18n(walletType, intl)}</WalletTypeLabel>}
+              {isLedgerWallet(walletType) && (
+                <Styled.WalletTypeLabel>{walletTypeToI18n(walletType, intl)}</Styled.WalletTypeLabel>
+              )}
             </Styled.MenuItemWrapper>
           </Styled.MenuItem>
         ))}
-      </Menu>
+      </Styled.Menu>
     ),
     [addresses, intl, network, onChangeAddress, selectedAddress.walletAddress, size]
   )

@@ -3,6 +3,9 @@ import { Menu as MenuUI } from 'antd'
 import styled from 'styled-components'
 import { palette } from 'styled-theme'
 
+import { AssetIcon as AssetIconUI } from '../uielements/assets/assetIcon/AssetIcon'
+import { WalletTypeLabel as WalletTypeLabelUI } from '../uielements/common/Common.styles'
+
 export const DropdownSelectorWrapper = styled.div`
   display: flex;
   flex-direction: row;
@@ -46,28 +49,37 @@ export const CaretDownOutlined = styled(CaretDownOutlinedUI)`
   color: ${palette('primary', 0)};
 `
 
-export const MenuItem = styled(MenuUI.Item)`
-  padding: 0;
-`
-
-export const MenuItemWrapper = styled.div<{ highlighted: boolean }>`
-  display: flex;
-  flex: row;
-  align-items: center;
-  font-size: 12px;
-  background-color: ${(props) => (props.highlighted ? palette('background', 2) : palette('background', 0))};
-`
-
 export const Menu = styled(MenuUI)`
   background-color: ${palette('background', 0)};
   & .ant-dropdown-menu-item {
     &:hover,
     &:focus,
     &:active {
-      background: ${palette('background', 2)};
+      background: ${palette('background', 0)};
     }
     &-selected {
       background: ${palette('gray', 1)};
     }
   }
+`
+
+export const MenuItem = styled(MenuUI.Item)`
+  padding: 0;
+`
+
+export const MenuItemWrapper = styled.div<{ highlighted: boolean }>`
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  font-size: 12px;
+  margin-left: 5px;
+  background-color: ${(props) => (props.highlighted ? palette('background', 2) : palette('background', 0))};
+`
+
+export const AssetIcon = styled(AssetIconUI)`
+  margin: 3px;
+`
+
+export const WalletTypeLabel = styled(WalletTypeLabelUI)`
+  padding: -1px 2px;
 `
