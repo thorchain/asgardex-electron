@@ -1,3 +1,13 @@
+# 0.4.3 (2021-10-06)
+
+## Update
+
+- Enable Ledger THORChain after resolved certificate issues [#1823](https://github.com/thorchain/asgardex-electron/commit/ca53096f064a1f101a3864e6f734bca18c5a5ff4)
+
+## Fix
+
+- Use latest electron version with certificate related fixes [#1831](https://github.com/thorchain/asgardex-electron/pull/1831)
+
 # 0.4.2 (2021-10-05)
 
 ## Add
