@@ -46,7 +46,7 @@ export const AccountAddressSelector: React.FC<Props> = (props) => {
           <Menu.Item key={walletAddress} onClick={() => setChosenAddress(walletAddress)}>
             <Styled.MenuItemWrapper>
               <AssetIcon asset={getChainAsset(chain)} size={size} network={network} />
-              <Styled.WalletAddress style={{ margin: 5 }}>{walletAddress}</Styled.WalletAddress>
+              <Styled.WalletAddress>{walletAddress}</Styled.WalletAddress>
               {isLedgerWallet(walletType) && <WalletTypeLabel>{walletTypeToI18n(walletType, intl)}</WalletTypeLabel>}
             </Styled.MenuItemWrapper>
           </Menu.Item>
@@ -59,7 +59,7 @@ export const AccountAddressSelector: React.FC<Props> = (props) => {
   return (
     <Dropdown overlay={menu} trigger={['click']}>
       <Styled.DropdownSelectorWrapper>
-        <AssetIcon asset={getChainAsset(selectedAddress.chain)} size={size} network={network} />
+        <AssetIcon asset={getChainAsset(selectedAddress.chain)} size={'xsmall'} network={network} />
         <Styled.TruncatedAddress>{truncatedAddress}</Styled.TruncatedAddress>
         {isLedgerWallet(selectedAddress.walletType) && (
           <WalletTypeLabel>{walletTypeToI18n(selectedAddress.walletType, intl)}</WalletTypeLabel>

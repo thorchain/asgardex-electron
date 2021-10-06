@@ -1,7 +1,6 @@
 import React, { useCallback, useMemo } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
-import { BNBChain } from '@xchainjs/xchain-util'
 import { Row, Dropdown } from 'antd'
 import { MenuProps } from 'antd/lib/menu'
 import * as FP from 'fp-ts/function'
@@ -14,7 +13,6 @@ import { ReactComponent as DownIcon } from '../../assets/svg/icon-down.svg'
 import { LOCALES } from '../../i18n'
 import { AVAILABLE_NETWORKS } from '../../services/const'
 import { Menu } from '../shared/menu'
-import { AccountAddressSelector } from './../AccountAddressSelector/AccountAddressSelector'
 import * as Styled from './AppSettings.styles'
 
 export type Props = {
@@ -182,7 +180,6 @@ export const AppSettings: React.FC<Props> = (props): JSX.Element => {
   return (
     <Styled.Container>
       <Styled.Title>{intl.formatMessage({ id: 'setting.app.title' })}</Styled.Title>
-      <AccountAddressSelector addresses={[{ walletAddress: 'bnb123123', walletType: 'ledger', chain: BNBChain }]} />
       <Styled.CardContainer>
         <Styled.Card>
           <Styled.SectionsWrapper>
