@@ -128,7 +128,7 @@ const defaultProps: SymDepositProps = {
     }
   },
   symPendingAssets: RD.initial,
-  asymLiqudityAssets: RD.initial,
+  asymLiquidityProviders: RD.initial,
   openRecoveryTool: () => console.log('openRecoveryTool')
 }
 

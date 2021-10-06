@@ -24,7 +24,6 @@ import { useMimirHalt } from '../../hooks/useMimirHalt'
 import { DepositRouteParams } from '../../routes/pools/deposit'
 import { AssetWithDecimalLD, AssetWithDecimalRD } from '../../services/chain/types'
 import { PoolDetailRD, PoolSharesLD, PoolSharesRD } from '../../services/midgard/types'
-import { LiquidityProviderRD, LiquidityProviderLD } from '../../services/thorchain/types'
 import { AsymDepositView } from './add/AsymDepositView'
 import { SymDepositView } from './add/SymDepositView'
 import * as Styled from './DepositView.styles'
@@ -39,7 +38,7 @@ export const DepositView: React.FC<Props> = () => {
 
   const { network$ } = useAppContext()
 
-  const { getSymLiquidityProvider, reloadLiquidityProviders } = useThorchainContext()
+  const { reloadLiquidityProviders } = useThorchainContext()
 
   const { asset } = useParams<DepositRouteParams>()
   const {
@@ -105,7 +104,7 @@ export const DepositView: React.FC<Props> = () => {
     [addressByChain$, selectedPoolAsset$]
   )
   const oAssetWalletAddress = useObservableState(address$, O.none)
-
+  const [oRuneWalletAddress] = useObservableState(() => addressByChain$(THORChain), O.none)
   /**
    * We have to get a new shares$ stream for every new address
    * @description /src/renderer/services/midgard/shares.ts
@@ -159,29 +158,30 @@ export const DepositView: React.FC<Props> = () => {
 
   const poolDetailRD = useObservableState<PoolDetailRD>(selectedPoolDetail$, RD.initial)
 
-  const [symLiquidityProvider] = useObservableState<LiquidityProviderRD>(() => {
-    return Rx.combineLatest([
-      network$,
-      // We should look for THORChain's wallet at the response of liqudity_providers endpoint
-      address$,
-      addressByChain$(THORChain),
-      selectedPoolAsset$
-    ]).pipe(
-      RxOp.switchMap(([network, oAssetAddress, oRuneAddress, oSelectedPoolAsset]) => {
-        return FP.pipe(
-          sequenceTOption(oRuneAddress, oAssetAddress, oSelectedPoolAsset),
-          O.fold(
-            (): LiquidityProviderLD => Rx.of(RD.initial),
-            ([runeAddress, assetAddress, asset]) =>
-              getSymLiquidityProvider({ asset, network, runeAddress, assetAddress })
-          )
-        )
-      })
-    )
-  }, RD.initial)
+  // const { network } = useNetwork()
 
-  // TODO @veado Implement logic
-  const asymLiquidityProviders = RD.initial
+  // const { symLiquidityProvider } = useLiquidityProviders({ asset, network, assetAddress, runeAddress })
+
+  // const [symLiquidityProvider] = useObservableState<LiquidityProviderRD>(() => {
+  //   return Rx.combineLatest([
+  //     network$,
+  //     // We should look for THORChain's wallet at the response of liqudity_providers endpoint
+  //     address$,
+  //     addressByChain$(THORChain),
+  //     selectedPoolAsset$
+  //   ]).pipe(
+  //     RxOp.switchMap(([network, oAssetAddress, oRuneAddress, oSelectedPoolAsset]) => {
+  //       return FP.pipe(
+  //         sequenceTOption(oRuneAddress, oAssetAddress, oSelectedPoolAsset),
+  //         O.fold(
+  //           (): LiquidityProviderLD => Rx.of(RD.initial),
+  //           ([runeAddress, assetAddress, asset]) =>
+  //             getSymLiquidityProvider({ asset, network, runeAddress, assetAddress })
+  //         )
+  //       )
+  //     })
+  //   )
+  // }, RD.initial)
 
   // Special case: `keystoreState` is `undefined` in first render loop
   // (see comment at its definition using `useObservableState`)
@@ -196,37 +196,44 @@ export const DepositView: React.FC<Props> = () => {
         <RefreshButton disabled={refreshButtonDisabled} clickHandler={reloadHandler} />
       </Styled.TopControlsContainer>
       {FP.pipe(
-        assetWithDecimalRD,
-        RD.fold(
-          () => <></>,
-          () => (
-            <Styled.Container>
-              <Spin size="large" />
-            </Styled.Container>
-          ),
-          (error) => (
-            <ErrorView
-              title={intl.formatMessage({ id: 'common.error' })}
-              subTitle={error?.message ?? error.toString()}
-            />
-          ),
-          (asset) => (
-            <Deposit
-              haltedChains={haltedChains}
-              mimirHalt={mimirHalt}
-              poolDetail={poolDetailRD}
-              asset={asset}
-              shares={poolSharesRD}
-              symLiquidityProvider={symLiquidityProvider}
-              asymLiquidityProviders={asymLiquidityProviders}
-              keystoreState={keystoreState}
-              ShareContent={ShareView}
-              SymDepositContent={SymDepositView}
-              AsymDepositContent={AsymDepositView}
-              WidthdrawContent={WithdrawDepositView}
-              AsymWidthdrawContent={AsymWithdrawView}
-            />
-          )
+        sequenceTOption(oRuneWalletAddress, oAssetWalletAddress),
+        O.fold(
+          () => <ErrorView title={intl.formatMessage({ id: 'common.error' })} subTitle={'Could not get addresses'} />,
+          ([runeWalletAddress, assetWalletAddress]) =>
+            FP.pipe(
+              assetWithDecimalRD,
+              RD.fold(
+                () => <></>,
+                () => (
+                  <Styled.Container>
+                    <Spin size="large" />
+                  </Styled.Container>
+                ),
+                (error) => (
+                  <ErrorView
+                    title={intl.formatMessage({ id: 'common.error' })}
+                    subTitle={error?.message ?? error.toString()}
+                  />
+                ),
+                (asset) => (
+                  <Deposit
+                    haltedChains={haltedChains}
+                    mimirHalt={mimirHalt}
+                    poolDetail={poolDetailRD}
+                    asset={asset}
+                    shares={poolSharesRD}
+                    runeWalletAddress={runeWalletAddress}
+                    assetWalletAddress={assetWalletAddress}
+                    keystoreState={keystoreState}
+                    ShareContent={ShareView}
+                    SymDepositContent={SymDepositView}
+                    AsymDepositContent={AsymDepositView}
+                    WidthdrawContent={WithdrawDepositView}
+                    AsymWidthdrawContent={AsymWithdrawView}
+                  />
+                )
+              )
+            )
         )
       )}
     </>

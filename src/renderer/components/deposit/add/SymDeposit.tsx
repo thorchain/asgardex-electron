@@ -59,7 +59,7 @@ import {
   LoadApproveFeeHandler
 } from '../../../services/ethereum/types'
 import { PoolAddress, PoolsDataMap } from '../../../services/midgard/types'
-import { MimirHalt, PendingAssets, PendingAssetsRD } from '../../../services/thorchain/types'
+import { LiquidityProvidersRD, MimirHalt, PendingAssets, PendingAssetsRD } from '../../../services/thorchain/types'
 import { ApiError, TxHashLD, TxHashRD, ValidatePasswordHandler, WalletBalances } from '../../../services/wallet/types'
 import { AssetWithDecimal } from '../../../types/asgardex'
 import { PasswordModal } from '../../modal/password'
@@ -105,7 +105,7 @@ export type Props = {
   haltedChains: Chain[]
   mimirHalt: MimirHalt
   symPendingAssets: PendingAssetsRD
-  asymLiqudityAssets: PendingAssetsRD
+  asymLiquidityProviders: LiquidityProvidersRD
   openRecoveryTool: FP.Lazy<void>
 }
 
@@ -146,7 +146,7 @@ export const SymDeposit: React.FC<Props> = (props) => {
     haltedChains,
     mimirHalt,
     symPendingAssets: symPendingAssetsRD,
-    asymLiqudityAssets: asymLiquidityAssetsRD,
+    asymLiquidityProviders: asymLiquidityProvidersRD,
     openRecoveryTool
   } = props
 
@@ -1008,12 +1008,12 @@ export const SymDeposit: React.FC<Props> = (props) => {
   const hasAsymDeposits: boolean = useMemo(
     () =>
       FP.pipe(
-        asymLiquidityAssetsRD,
+        asymLiquidityProvidersRD,
         RD.toOption,
         O.map((list): boolean => list.length > 0),
         O.getOrElse((): boolean => false)
       ),
-    [asymLiquidityAssetsRD]
+    [asymLiquidityProvidersRD]
   )
 
   const prevPendingAssets = useRef<PendingAssets>([])
@@ -1044,7 +1044,7 @@ export const SymDeposit: React.FC<Props> = (props) => {
   }, [network, openRecoveryTool, symPendingAssetsRD])
 
   // TODO @veado REnder asym deposits
-  const renderAsymDeposits = <div>Asym. deposits</div>
+  const renderAsymDeposits = <pre>Asym. deposits {JSON.stringify(asymLiquidityProvidersRD, null, 2)}</pre>
 
   const prevRouterAddress = useRef<O.Option<Address>>(O.none)
 

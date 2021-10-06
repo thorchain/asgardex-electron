@@ -45,8 +45,8 @@ const defaultProps: DepositProps = {
   WidthdrawContent: Withdraw,
   AsymWidthdrawContent: AsymWidthdraw,
   keystoreState: O.some(O.some({ phrase: 'phrase' })),
-  symLiquidityProvider: RD.initial,
-  asymLiquidityProviders: RD.initial
+  runeWalletAddress: 'rune-wallet-address',
+  assetWalletAddress: 'asset-wallet-address'
 }
 
 export const Default: Story = () => <Deposit {...defaultProps} />
