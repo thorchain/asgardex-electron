@@ -16,8 +16,12 @@ export const useLedger = (chain: Chain) => {
   const { network$ } = useAppContext()
   const network = useObservableState<Network>(network$, DEFAULT_NETWORK)
 
-  const { askLedgerAddress$, getLedgerAddress$, removeLedgerAddress } = useWalletContext()
+  const { askLedgerAddress$, getLedgerAddress$, verifyLedgerAddress, removeLedgerAddress } = useWalletContext()
 
+  const verifyAddress = useCallback(
+    (walletIndex = 0) => verifyLedgerAddress(chain, network, walletIndex),
+    [chain, verifyLedgerAddress, network]
+  )
   const removeAddress = useCallback(() => removeLedgerAddress(chain, network), [chain, removeLedgerAddress, network])
 
   const address = useObservableState<LedgerAddressRD>(
@@ -38,6 +42,7 @@ export const useLedger = (chain: Chain) => {
 
   return {
     askAddress,
+    verifyAddress,
     removeAddress,
     address
   }

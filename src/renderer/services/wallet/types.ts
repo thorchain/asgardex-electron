@@ -140,6 +140,7 @@ export type LedgerService = {
   askLedgerAddress$: (chain: Chain, network: Network, walletIndex: number) => LedgerAddressLD
   getLedgerAddress$: (chain: Chain, network: Network) => LedgerAddressLD
   getWalletIndex$: (chain: Chain) => Rx.Observable<number>
+  verifyLedgerAddress: (chain: Chain, network: Network, walletIndex?: number) => void
   removeLedgerAddress: (chain: Chain, network: Network) => void
   dispose: FP.Lazy<void>
 }

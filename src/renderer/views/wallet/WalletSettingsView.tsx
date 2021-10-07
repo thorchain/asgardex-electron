@@ -57,12 +57,14 @@ export const WalletSettingsView: React.FC = (): JSX.Element => {
 
   const {
     askAddress: askLedgerThorAddress,
+    verifyAddress: verifyLedgerThorAddress,
     address: thorLedgerAddressRD,
     removeAddress: removeLedgerThorAddress
   } = useLedger(THORChain)
 
   const {
     askAddress: askLedgerBnbAddress,
+    verifyAddress: verifyLedgerBnbAddress,
     address: bnbLedgerAddressRD,
     removeAddress: removeLedgerBnbAddress
   } = useLedger(BNBChain)
@@ -70,6 +72,13 @@ export const WalletSettingsView: React.FC = (): JSX.Element => {
   const addLedgerAddressHandler = (chain: Chain, walletIndex = 0) => {
     if (isThorChain(chain)) return askLedgerThorAddress(walletIndex)
     if (isBnbChain(chain)) return askLedgerBnbAddress(walletIndex)
+
+    return FP.constVoid
+  }
+
+  const verifyLedgerAddressHandler = (chain: Chain, walletIndex = 0) => {
+    if (isThorChain(chain)) return verifyLedgerThorAddress()
+    if (isBnbChain(chain)) return verifyLedgerBnbAddress(walletIndex)
 
     return FP.constVoid
   }
@@ -192,6 +201,7 @@ export const WalletSettingsView: React.FC = (): JSX.Element => {
       removeKeystore={removeKeystore}
       exportKeystore={exportKeystore}
       addLedgerAddress={addLedgerAddressHandler}
+      verifyLedgerAddress={verifyLedgerAddressHandler}
       removeLedgerAddress={removeLedgerAddressHandler}
       phrase={phrase}
       walletAccounts={walletAccounts}

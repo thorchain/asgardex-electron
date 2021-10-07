@@ -37,3 +37,11 @@ export const getAddress = async (
     })
   }
 }
+
+export const verifyAddress = (transport: Transport, network: Network, walletIndex: number): void => {
+  const app = new AppBNB(transport)
+  const derive_path = getDerivePath(walletIndex)
+  const clientNetwork = toClientNetwork(network)
+  const prefix = getPrefix(clientNetwork)
+  app.showAddress(prefix, derive_path)
+}

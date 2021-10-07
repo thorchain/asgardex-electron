@@ -29,3 +29,10 @@ export const getAddress = async (transport: Transport, network: Network): Promis
     })
   }
 }
+
+export const verifyAddress = async (transport: Transport, network: Network) => {
+  const app = new THORChainApp(transport)
+  const clientNetwork = toClientNetwork(network)
+  const prefix = getPrefix(clientNetwork)
+  app.showAddressAndPubKey(PATH, prefix)
+}

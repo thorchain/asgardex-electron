@@ -1,4 +1,5 @@
 import * as AIcon from '@ant-design/icons'
+import { EyeOutlined as EyeOutlinedUI } from '@ant-design/icons'
 import * as A from 'antd'
 import styled from 'styled-components'
 import { palette } from 'styled-theme'
@@ -182,7 +183,7 @@ export const AddressEllipsis = styled(AddressEllipsisUI)`
 `
 
 export const AddressLinkIcon = styled(ExternalLinkIconUI)`
-  margin-left: 15px;
+  margin-left: 10px;
   height: ${ICON_SIZE}px;
   width: ${ICON_SIZE}px;
   color: ${palette('primary', 0)};
@@ -195,6 +196,18 @@ export const AddressLinkIcon = styled(ExternalLinkIconUI)`
 
 export const QRCodeIcon = styled(AIcon.QrcodeOutlined)`
   margin-left: 5px;
+  cursor: pointer;
+  color: ${palette('primary', 0)};
+  height: ${ICON_SIZE}px;
+  width: ${ICON_SIZE}px;
+
+  & svg {
+    height: ${ICON_SIZE}px;
+    width: ${ICON_SIZE}px;
+  }
+`
+
+export const EyeOutlined = styled(EyeOutlinedUI)`
   cursor: pointer;
   color: ${palette('primary', 0)};
   height: ${ICON_SIZE}px;
@@ -228,7 +241,10 @@ export const AddLedgerIcon = styled(AIcon.PlusCircleOutlined)`
 `
 
 export const RemoveLedgerIcon = styled(RemoveIcon)`
+  margin-left: 5px;
   cursor: pointer;
+  width: ${ICON_SIZE}px;
+  height: ${ICON_SIZE}px;
 `
 
 export const AddLedgerContainer = styled('div')`
