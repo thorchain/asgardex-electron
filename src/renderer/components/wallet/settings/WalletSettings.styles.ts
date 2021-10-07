@@ -182,7 +182,7 @@ export const AddressEllipsis = styled(AddressEllipsisUI)`
 `
 
 export const AddressLinkIcon = styled(ExternalLinkIconUI)`
-  margin-left: 15px;
+  margin-left: 10px;
   height: ${ICON_SIZE}px;
   width: ${ICON_SIZE}px;
   color: ${palette('primary', 0)};
@@ -229,6 +229,8 @@ export const AddLedgerIcon = styled(AIcon.PlusCircleOutlined)`
 
 export const RemoveLedgerIcon = styled(RemoveIcon)`
   cursor: pointer;
+  width: ${ICON_SIZE}px;
+  height: ${ICON_SIZE}px;
 `
 
 export const AddLedgerContainer = styled('div')`
