@@ -39,7 +39,6 @@ export const getAddress = async ({
   }
 }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const verifyLedgerAddress = async ({ chain, network, walletIndex = 0 }: IPCLedgerAdddressParams) => {
   const transport = await TransportNodeHidSingleton.open()
   switch (chain) {
