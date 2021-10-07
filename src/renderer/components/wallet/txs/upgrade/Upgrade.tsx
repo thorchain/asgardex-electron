@@ -23,7 +23,7 @@ import { useSubscriptionState } from '../../../../hooks/useSubscriptionState'
 import { INITIAL_UPGRADE_RUNE_STATE } from '../../../../services/chain/const'
 import { UpgradeRuneParams, UpgradeRuneTxState, UpgradeRuneTxState$ } from '../../../../services/chain/types'
 import { FeeRD } from '../../../../services/chain/types'
-import { OpenExplorerTxUrl } from '../../../../services/clients'
+import { AddressValidation, OpenExplorerTxUrl } from '../../../../services/clients'
 import { PoolAddressRD } from '../../../../services/midgard/types'
 import { NonEmptyWalletBalances, ValidatePasswordHandler, WalletType } from '../../../../services/wallet/types'
 import { AssetWithDecimal } from '../../../../types/asgardex'
@@ -31,6 +31,7 @@ import { PasswordModal } from '../../../modal/password'
 import { MaxBalanceButton } from '../../../uielements/button/MaxBalanceButton'
 import { ViewTxButton } from '../../../uielements/button/ViewTxButton'
 import { UIFeesRD } from '../../../uielements/fees'
+import { Input } from '../../../uielements/input'
 import { InputBigNumber } from '../../../uielements/input/InputBigNumber'
 import { AccountSelector } from '../../account'
 import * as Styled from '../TxForm.styles'
@@ -49,6 +50,7 @@ export type Props = {
   upgrade$: (_: UpgradeRuneParams) => UpgradeRuneTxState$
   balances: O.Option<NonEmptyWalletBalances>
   reloadFeeHandler: (params: TxParams) => void
+  addressValidation: AddressValidation
   successActionHandler: OpenExplorerTxUrl
   reloadBalancesHandler: FP.Lazy<void>
   network: Network
@@ -57,9 +59,8 @@ export type Props = {
 
 type FormValues = {
   amount: BigNumber
+  address: Address
 }
-
-const INITIAL_FORM_VALUES: FormValues = { amount: ZERO_BN }
 
 export const Upgrade: React.FC<Props> = (props): JSX.Element => {
   const {
@@ -72,6 +73,7 @@ export const Upgrade: React.FC<Props> = (props): JSX.Element => {
     balances: oBalances,
     successActionHandler,
     reloadFeeHandler,
+    addressValidation,
     reloadBalancesHandler,
     network,
     walletAddress,
@@ -199,7 +201,7 @@ export const Upgrade: React.FC<Props> = (props): JSX.Element => {
               poolAddress,
               amount: amountToUpgrade,
               asset: runeAsset.asset,
-              memo: getSwitchMemo(runeNativeAddress),
+              memo: getSwitchMemo(form.getFieldValue('address')),
               network,
               walletAddress,
               walletIndex,
@@ -216,7 +218,7 @@ export const Upgrade: React.FC<Props> = (props): JSX.Element => {
       upgrade$,
       amountToUpgrade,
       runeAsset.asset,
-      runeNativeAddress,
+      form,
       network,
       walletAddress,
       walletIndex,
@@ -358,6 +360,18 @@ export const Upgrade: React.FC<Props> = (props): JSX.Element => {
     return false
   }, [targetPoolAddressRD, reloadFeeHandler, runeAsset.asset, amountToUpgrade])
 
+  const addressValidator = useCallback(
+    async (_: unknown, value: string) => {
+      if (!value) {
+        return Promise.reject(intl.formatMessage({ id: 'wallet.errors.address.empty' }))
+      }
+      if (!addressValidation(value.toLowerCase())) {
+        return Promise.reject(intl.formatMessage({ id: 'wallet.errors.address.invalid' }))
+      }
+    },
+    [addressValidation, intl]
+  )
+
   const renderUpgradeForm = useMemo(
     () => (
       <CStyled.FormWrapper>
@@ -372,7 +386,11 @@ export const Upgrade: React.FC<Props> = (props): JSX.Element => {
             walletBalances={[]}
             network={network}
           />
-          <Styled.Form form={form} initialValues={INITIAL_FORM_VALUES} onFinish={onSubmit} labelCol={{ span: 24 }}>
+          <Styled.Form
+            form={form}
+            initialValues={{ amount: ZERO_BN, address: runeNativeAddress }}
+            onFinish={onSubmit}
+            labelCol={{ span: 24 }}>
             <Styled.SubForm>
               <Styled.CustomLabel size="big">{intl.formatMessage({ id: 'common.amount' })}</Styled.CustomLabel>
               <Styled.FormItem
@@ -392,6 +410,11 @@ export const Upgrade: React.FC<Props> = (props): JSX.Element => {
                 disabled={isLoading}
               />
 
+              <Styled.CustomLabel size="big">{intl.formatMessage({ id: 'common.address' })}</Styled.CustomLabel>
+              <Form.Item rules={[{ required: true, validator: addressValidator }]} name="address">
+                <Input color="primary" size="large" disabled={isLoading} />
+              </Form.Item>
+
               <CStyled.Fees fees={uiFeesRD} reloadFees={reloadFees} disabled={isLoading} />
               {renderFeeError}
             </Styled.SubForm>
@@ -410,6 +433,7 @@ export const Upgrade: React.FC<Props> = (props): JSX.Element => {
       runeAsset.asset,
       network,
       form,
+      runeNativeAddress,
       onSubmit,
       intl,
       amountValidator,
@@ -417,6 +441,7 @@ export const Upgrade: React.FC<Props> = (props): JSX.Element => {
       onChangeInput,
       maxAmount,
       addMaxAmountHandler,
+      addressValidator,
       uiFeesRD,
       reloadFees,
       renderFeeError,
@@ -477,7 +502,7 @@ export const Upgrade: React.FC<Props> = (props): JSX.Element => {
         targetPoolAddressRD,
         RD.chain(
           RD.fromPredicate(
-            FP.not(({ halted }) => halted),
+            ({ halted }) => !halted,
             () => new Error(intl.formatMessage({ id: 'pools.halted.chain' }, { chain: runeAsset.asset.chain }))
           )
         ),

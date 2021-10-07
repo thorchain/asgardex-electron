@@ -68,6 +68,7 @@ const defaultProps: UpgradeProps = {
   },
   runeNativeAddress: 'rune-native-address',
   walletAddress: 'bnb12312312312123123123123',
+  addressValidation: () => true,
   walletType: 'keystore',
   walletIndex: 0,
   reloadOnError: () => {},
