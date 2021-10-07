@@ -51,7 +51,13 @@ import {
   SymDepositFeesRD
 } from '../../../services/chain/types'
 import { OpenExplorerTxUrl } from '../../../services/clients'
-import { ApproveFeeHandler, ApproveParams, IsApprovedRD, LoadApproveFeeHandler } from '../../../services/ethereum/types'
+import {
+  ApproveFeeHandler,
+  ApproveParams,
+  IsApprovedRD,
+  IsApproveParams,
+  LoadApproveFeeHandler
+} from '../../../services/ethereum/types'
 import { PoolAddress, PoolsDataMap } from '../../../services/midgard/types'
 import { MimirHalt, PendingAssets, PendingAssetsRD } from '../../../services/thorchain/types'
 import { ApiError, TxHashLD, TxHashRD, ValidatePasswordHandler, WalletBalances } from '../../../services/wallet/types'
@@ -93,7 +99,7 @@ export type Props = {
   deposit$: SymDepositStateHandler
   network: Network
   approveERC20Token$: (params: ApproveParams) => TxHashLD
-  isApprovedERC20Token$: (params: ApproveParams) => LiveData<ApiError, boolean>
+  isApprovedERC20Token$: (params: IsApproveParams) => LiveData<ApiError, boolean>
   fundsCap: O.Option<FundsCap>
   poolsData: PoolsDataMap
   haltedChains: Chain[]
@@ -215,24 +221,6 @@ export const SymDeposit: React.FC<Props> = (props) => {
     [oChainAssetBalance]
   )
 
-  const oDepositParams: O.Option<SymDepositParams> = useMemo(
-    () =>
-      FP.pipe(
-        sequenceSOption({ poolAddress: oPoolAddress, memos: oMemos }),
-        O.map(({ poolAddress, memos }) => ({
-          asset,
-          poolAddress,
-          amounts: {
-            rune: runeAmountToDeposit,
-            // Decimal needs to be converted back for using orginal decimal of this asset (provided by `assetBalance`)
-            asset: convertBaseAmountDecimal(assetAmountToDepositMax1e8, assetDecimal)
-          },
-          memos
-        }))
-      ),
-    [oPoolAddress, oMemos, asset, runeAmountToDeposit, assetAmountToDepositMax1e8, assetDecimal]
-  )
-
   const oApproveParams: O.Option<ApproveParams> = useMemo(() => {
     const oRouterAddress: O.Option<Address> = FP.pipe(
       oPoolAddress,
@@ -242,11 +230,12 @@ export const SymDeposit: React.FC<Props> = (props) => {
     return FP.pipe(
       sequenceTOption(oTokenAddress, oRouterAddress),
       O.map(([tokenAddress, routerAddress]) => ({
+        network,
         spenderAddress: routerAddress,
         contractAddress: tokenAddress
       }))
     )
-  }, [oPoolAddress, asset])
+  }, [oPoolAddress, asset, network])
 
   const zeroDepositFees: SymDepositFees = useMemo(() => getZeroSymDepositFees(asset), [asset])
 
@@ -274,6 +263,38 @@ export const SymDeposit: React.FC<Props> = (props) => {
         O.getOrElse(() => zeroDepositFees)
       ),
     [depositFeesRD, zeroDepositFees]
+  )
+
+  const thorchainFee: BaseAmount = useMemo(
+    () =>
+      FP.pipe(
+        Helper.getThorchainFees(depositFeesRD),
+        O.fold(
+          () => zeroDepositFees.rune.inFee,
+          (thorchainFees) => thorchainFees.inFee
+        )
+      ),
+    [depositFeesRD, zeroDepositFees.rune]
+  )
+
+  const oDepositParams: O.Option<SymDepositParams> = useMemo(
+    () =>
+      FP.pipe(
+        sequenceSOption({ poolAddress: oPoolAddress, memos: oMemos }),
+        O.map(({ poolAddress, memos }) => {
+          return {
+            asset,
+            poolAddress,
+            amounts: {
+              rune: runeAmountToDeposit,
+              // Decimal needs to be converted back for using orginal decimal of this asset (provided by `assetBalance`)
+              asset: convertBaseAmountDecimal(assetAmountToDepositMax1e8, assetDecimal)
+            },
+            memos
+          }
+        })
+      ),
+    [oPoolAddress, oMemos, asset, runeAmountToDeposit, assetAmountToDepositMax1e8, assetDecimal]
   )
 
   const reloadFeesHandler = useCallback(() => {
@@ -353,9 +374,9 @@ export const SymDeposit: React.FC<Props> = (props) => {
   }, [isZeroAmountToDeposit, minRuneAmountToDeposit, runeAmountToDeposit])
 
   const maxRuneAmountToDeposit = useMemo(
-    (): BaseAmount => Helper.maxRuneAmountToDeposit({ poolData, runeBalance, assetBalance }),
+    (): BaseAmount => Helper.maxRuneAmountToDeposit({ poolData, runeBalance, assetBalance, thorchainFee }),
 
-    [assetBalance, poolData, runeBalance]
+    [assetBalance, poolData, runeBalance, thorchainFee]
   )
 
   // Update `runeAmountToDeposit` if `maxRuneAmountToDeposit` has been updated
@@ -870,6 +891,7 @@ export const SymDeposit: React.FC<Props> = (props) => {
       O.map(([routerAddress, tokenAddress]) =>
         subscribeApproveState(
           approveERC20Token$({
+            network,
             contractAddress: tokenAddress,
             spenderAddress: routerAddress
           })

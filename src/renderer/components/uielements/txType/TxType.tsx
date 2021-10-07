@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react'
+import React from 'react'
 
 import { useIntl } from 'react-intl'
 
@@ -7,7 +7,7 @@ import { ReactComponent as RefundIcon } from '../../../assets/svg/tx-refund.svg'
 import { ReactComponent as DepositIcon } from '../../../assets/svg/tx-stake.svg'
 import { ReactComponent as SwapIcon } from '../../../assets/svg/tx-swap.svg'
 import { ReactComponent as WithdrawIcon } from '../../../assets/svg/tx-withdraw.svg'
-import { CommonMessageKey } from '../../../i18n/types'
+import { getTxTypeI18n } from '../../../helpers/actionsHelper'
 import { TxType as MidgardTxType } from '../../../services/midgard/types'
 import * as Styled from './TxType.styles'
 
@@ -35,31 +35,13 @@ const getIcon = (type: MidgardTxType) => {
   }
 }
 
-const getTypeI18nKey = (type: MidgardTxType): CommonMessageKey | undefined => {
-  switch (type) {
-    case 'DEPOSIT':
-      return 'common.tx.type.deposit'
-    case 'WITHDRAW':
-      return 'common.tx.type.withdraw'
-    case 'SWAP':
-      return 'common.tx.type.swap'
-    case 'DONATE':
-      return 'common.tx.type.donate'
-    case 'REFUND':
-      return 'common.tx.type.refund'
-    case 'SWITCH':
-      return 'common.tx.type.upgrade'
-  }
-}
 export const TxType: React.FC<Props> = ({ type, className }) => {
   const intl = useIntl()
-
-  const typeKey = useMemo(() => getTypeI18nKey(type), [type])
 
   return (
     <Styled.Container className={className}>
       <Styled.IconContainer>{getIcon(type)}</Styled.IconContainer>
-      <Styled.Label>{typeKey ? intl.formatMessage({ id: typeKey }) : type}</Styled.Label>
+      <Styled.Label>{getTxTypeI18n(type, intl)}</Styled.Label>
     </Styled.Container>
   )
 }

@@ -2,10 +2,10 @@ import * as RD from '@devexperts/remote-data-ts'
 import { PoolData } from '@thorchain/asgardex-util'
 import { BTC_DECIMAL } from '@xchainjs/xchain-bitcoin'
 import { ETH_DECIMAL } from '@xchainjs/xchain-ethereum'
-import { assetAmount, AssetBNB, AssetBTC, AssetETH, assetToBase, baseAmount } from '@xchainjs/xchain-util'
+import { assetAmount, AssetBNB, AssetBTC, AssetETH, assetToBase, BaseAmount, baseAmount } from '@xchainjs/xchain-util'
 import * as O from 'fp-ts/Option'
 
-import { AssetBUSD74E, AssetUSDTERC20 } from '../../../const'
+import { AssetBUSD74E, AssetUSDTERC20Testnet } from '../../../const'
 import { BNB_DECIMAL, THORCHAIN_DECIMAL } from '../../../helpers/assetHelper'
 import { eqBaseAmount, eqODepositAssetFees, eqODepositFees } from '../../../helpers/fp/eq'
 import { DepositAssetFees, DepositFees, SymDepositFeesRD } from '../../../services/chain/types'
@@ -30,18 +30,19 @@ describe('deposit/Deposit.helper', () => {
   // user balances
   const runeBalance = baseAmount(10000)
   const assetBalance = baseAmount(20000)
+  const thorchainFee: BaseAmount = baseAmount(1000)
 
   describe('maxRuneAmountToDeposit', () => {
-    it('is 10000', () => {
-      const result = maxRuneAmountToDeposit({ poolData, assetBalance, runeBalance })
-      expect(eqBaseAmount.equals(result, baseAmount(10000))).toBeTruthy()
+    it('is 9000', () => {
+      const result = maxRuneAmountToDeposit({ poolData, assetBalance, runeBalance, thorchainFee })
+      expect(eqBaseAmount.equals(result, baseAmount(9000))).toBeTruthy()
     })
-    it('is 5000', () => {
+    it('is 4000', () => {
       const runeBalance = baseAmount(5000)
       const assetBalance = baseAmount(10000)
-      const result = maxRuneAmountToDeposit({ poolData, assetBalance, runeBalance })
+      const result = maxRuneAmountToDeposit({ poolData, assetBalance, runeBalance, thorchainFee })
 
-      expect(eqBaseAmount.equals(result, baseAmount(5000))).toBeTruthy()
+      expect(eqBaseAmount.equals(result, baseAmount(4000))).toBeTruthy()
     })
   })
 
@@ -251,7 +252,7 @@ describe('deposit/Deposit.helper', () => {
           outFee: assetToBase(assetAmount(0.03, ETH_DECIMAL)),
           refundFee: assetToBase(assetAmount(0.03, ETH_DECIMAL))
         },
-        asset: AssetUSDTERC20,
+        asset: AssetUSDTERC20Testnet,
         assetDecimal: depositAssetDecimal,
         poolsData
       }

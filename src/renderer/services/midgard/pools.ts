@@ -9,8 +9,8 @@ import * as Rx from 'rxjs'
 import * as RxOp from 'rxjs/operators'
 
 import { ONE_BN, PRICE_POOLS_WHITELIST } from '../../const'
-import { isPricePoolAsset, midgardAssetFromString } from '../../helpers/assetHelper'
-import { isEnabledChain } from '../../helpers/chainHelper'
+import { validAssetForETH, isPricePoolAsset, midgardAssetFromString } from '../../helpers/assetHelper'
+import { isEnabledChain, isEthChain } from '../../helpers/chainHelper'
 import { eqAsset, eqOAsset, eqOPoolAddresses, eqHaltedChain } from '../../helpers/fp/eq'
 import { sequenceTOption } from '../../helpers/fpHelpers'
 import { LiveData, liveData } from '../../helpers/rx/liveData'
@@ -26,6 +26,7 @@ import {
   GetPoolStatsRequest
 } from '../../types/generated/midgard/apis'
 import { PricePool, PricePoolAsset, PricePools } from '../../views/pools/Pools.types'
+import { network$ } from '../app/service'
 import { ErrorId } from '../wallet/types'
 import {
   PoolAssetDetailsLD,
@@ -300,11 +301,20 @@ const createPoolsService = (
    */
   const loadPoolsStateData$ = (): PoolsStateLD => {
     const poolAssets$: PoolAssetsLD = FP.pipe(
-      apiGetPoolsEnabled$,
-      // Filter out all unknown / invalid assets created from asset strings
-      liveData.map(A.filterMap(({ asset }) => FP.pipe(asset, assetFromString, O.fromNullable))),
-      // Filter pools by using enabled chains only (defined via ENV)
-      liveData.map(A.filter(({ chain }) => isEnabledChain(chain))),
+      Rx.combineLatest([apiGetPoolsEnabled$, network$]),
+      RxOp.switchMap(([pools, network]) =>
+        Rx.of(
+          FP.pipe(
+            pools,
+            // Filter out all unknown / invalid assets created from asset strings
+            RD.map(A.filterMap(({ asset }) => FP.pipe(asset, assetFromString, O.fromNullable))),
+            // Filter pools by using enabled chains only (defined via ENV)
+            RD.map(A.filter(({ chain }) => isEnabledChain(chain))),
+            // Filter pools based on ERC20Whitelist (mainnet + ETHChain only)
+            RD.map(A.filter((asset) => !isEthChain(asset.chain) || validAssetForETH(asset, network)))
+          )
+        )
+      ),
       RxOp.shareReplay(1)
     )
     const assetDetails$ = getAssetDetails$(poolAssets$, GetPoolsStatusEnum.Available)
@@ -363,11 +373,20 @@ const createPoolsService = (
    */
   const loadPendingPoolsStateData$ = (): PendingPoolsStateLD => {
     const poolAssets$: PoolAssetsLD = FP.pipe(
-      apiGetPoolsPending$,
-      // Filter out all unknown / invalid assets created from asset strings
-      liveData.map(A.filterMap(({ asset }) => FP.pipe(asset, assetFromString, O.fromNullable))),
-      // Filter pools by using enabled chains only (defined via ENV)
-      liveData.map(A.filter(({ chain }) => isEnabledChain(chain))),
+      Rx.combineLatest([apiGetPoolsPending$, network$]),
+      RxOp.switchMap(([pools, network]) =>
+        Rx.of(
+          FP.pipe(
+            pools,
+            // Filter out all unknown / invalid assets created from asset strings
+            RD.map(A.filterMap(({ asset }) => FP.pipe(asset, assetFromString, O.fromNullable))),
+            // Filter pools by using enabled chains only (defined via ENV)
+            RD.map(A.filter(({ chain }) => isEnabledChain(chain))),
+            // Filter pools based on ERC20Whitelist (mainnet + ETH only)
+            RD.map(A.filter((asset) => !isEthChain(asset.chain) || validAssetForETH(asset, network)))
+          )
+        )
+      ),
       RxOp.shareReplay(1)
     )
     const assetDetails$ = getAssetDetails$(poolAssets$, GetPoolsStatusEnum.Staged)

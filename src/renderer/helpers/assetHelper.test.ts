@@ -23,7 +23,9 @@ import {
   AssetUniH,
   AssetUniHAddress,
   AssetUSDTERC20,
+  AssetUSDTERC20Testnet,
   AssetXRune,
+  AssetXRuneAddress,
   AssetXRuneTestnet
 } from '../const'
 import {
@@ -47,10 +49,11 @@ import {
   getTwoSigfigAssetAmount,
   isXRuneAsset,
   disableRuneUpgrade,
-  assetInERC20Blacklist,
-  addressInERC20Blacklist,
   assetInBinanceBlacklist,
-  isRuneEthAsset
+  isRuneEthAsset,
+  assetInERC20Whitelist,
+  addressInERC20Whitelist,
+  validAssetForETH
 } from './assetHelper'
 import { eqAsset, eqAssetAmount, eqBaseAmount } from './fp/eq'
 
@@ -187,19 +190,53 @@ describe('helpers/assetHelper', () => {
     })
   })
 
-  describe('assetInERC20Blacklist', () => {
-    it('ETH (non black listed)', () => {
-      expect(assetInERC20Blacklist(AssetETH)).toBeFalsy()
-    })
+  describe('assetInERC20Whitelist', () => {
     it('UNIH (black listed)', () => {
-      expect(assetInERC20Blacklist(AssetUniH)).toBeTruthy()
+      expect(assetInERC20Whitelist(AssetUniH)).toBeFalsy()
     })
 
-    it('USDT (non black listed)', () => {
-      expect(addressInERC20Blacklist('0xdb99328b43b86037f80b43c3dbd203f00f056b75')).toBeFalsy()
+    it('USDT (white listed)', () => {
+      expect(assetInERC20Whitelist(AssetUSDTERC20)).toBeTruthy()
     })
-    it('UNIH (black listed)', () => {
-      expect(addressInERC20Blacklist(AssetUniHAddress)).toBeTruthy()
+
+    it('XRUNE (white listed)', () => {
+      expect(assetInERC20Whitelist(AssetXRune)).toBeTruthy()
+    })
+  })
+
+  describe('addressInERC20Whitelist', () => {
+    it('USDT (white listed)', () => {
+      expect(addressInERC20Whitelist('0xdAC17F958D2ee523a2206206994597C13D831ec7')).toBeTruthy()
+    })
+    it('XRUNE (white listed)', () => {
+      expect(addressInERC20Whitelist(AssetXRuneAddress)).toBeTruthy()
+    })
+    it('UNIH (not white listed)', () => {
+      expect(addressInERC20Whitelist(AssetUniHAddress)).toBeFalsy()
+    })
+  })
+
+  describe('validAssetForETH', () => {
+    it('ETH - mainnet', () => {
+      expect(validAssetForETH(AssetETH, 'mainnet')).toBeTruthy()
+    })
+    it('ETH - testnet', () => {
+      expect(validAssetForETH(AssetETH, 'testnet')).toBeTruthy()
+    })
+    it('XRUNE - mainnet', () => {
+      expect(validAssetForETH(AssetXRune, 'mainnet')).toBeTruthy()
+    })
+    it('XRUNE - testnet', () => {
+      expect(validAssetForETH(AssetXRune, 'testnet')).toBeTruthy()
+    })
+    it('XRUNTestnet - mainnet', () => {
+      expect(validAssetForETH(AssetXRuneTestnet, 'mainnet')).toBeFalsy()
+    })
+    it('XRUNTestnet - testnet', () => {
+      expect(validAssetForETH(AssetXRuneTestnet, 'testnet')).toBeTruthy()
+    })
+    it('UNIH - mainnet', () => {
+      expect(validAssetForETH(AssetUniH, 'mainnet')).toBeFalsy()
     })
   })
 
@@ -245,7 +282,7 @@ describe('helpers/assetHelper', () => {
       expect(isUSDAsset(AssetBUSDBAF)).toBeTruthy()
     })
     it('returns true for ERC20 USDT', () => {
-      expect(isUSDAsset(AssetUSDTERC20)).toBeTruthy()
+      expect(isUSDAsset(AssetUSDTERC20Testnet)).toBeTruthy()
     })
     it('returns false for RUNE Native', () => {
       expect(isUSDAsset(AssetRuneNative)).toBeFalsy()
@@ -259,7 +296,9 @@ describe('helpers/assetHelper', () => {
     })
     it('returns AssetUSDTERC20 for ERC20 USDT asset string ', () => {
       const asset = midgardAssetFromString('ETH.USDT-0x62e273709da575835c7f6aef4a31140ca5b1d190')
-      expect(asset).toEqual(O.some({ ...AssetUSDTERC20, symbol: 'USDT-0x62e273709Da575835C7f6aEf4A31140Ca5b1D190' }))
+      expect(asset).toEqual(
+        O.some({ ...AssetUSDTERC20Testnet, symbol: 'USDT-0x62e273709Da575835C7f6aEf4A31140Ca5b1D190' })
+      )
     })
     it('returns O.none for invalid asset strings', () => {
       const asset = midgardAssetFromString('invalid')
@@ -274,10 +313,10 @@ describe('helpers/assetHelper', () => {
     })
     it('updates invalid ERC20 USDT ', () => {
       const asset = updateEthChecksumAddress({
-        ...AssetUSDTERC20,
+        ...AssetUSDTERC20Testnet,
         symbol: 'USDT-0xA3910454BF2CB59B8B3A401589A3BACC5CA42306'
       })
-      expect(eqAsset.equals(asset, AssetUSDTERC20)).toBeTruthy()
+      expect(eqAsset.equals(asset, AssetUSDTERC20Testnet)).toBeTruthy()
     })
   })
 

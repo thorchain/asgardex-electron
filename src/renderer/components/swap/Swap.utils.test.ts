@@ -14,7 +14,7 @@ import {
 import * as O from 'fp-ts/lib/Option'
 
 import { ASSETS_TESTNET } from '../../../shared/mock/assets'
-import { AssetBUSD74E, AssetUSDTERC20, ZERO_BASE_AMOUNT } from '../../const'
+import { AssetBUSD74E, AssetUSDTERC20Testnet, ZERO_BASE_AMOUNT } from '../../const'
 import { BNB_DECIMAL, THORCHAIN_DECIMAL } from '../../helpers/assetHelper'
 import { eqBaseAmount } from '../../helpers/fp/eq'
 import { PoolsDataMap } from '../../services/midgard/types'
@@ -476,7 +476,7 @@ describe('components/swap/utils', () => {
             asset: AssetETH
           }
         },
-        inAsset: AssetUSDTERC20,
+        inAsset: AssetUSDTERC20Testnet,
         inAssetDecimal,
         outAsset: AssetETH,
         poolsData
@@ -552,7 +552,7 @@ describe('components/swap/utils', () => {
         },
         inAsset: AssetRuneNative,
         inAssetDecimal,
-        outAsset: AssetUSDTERC20,
+        outAsset: AssetUSDTERC20Testnet,
         poolsData
       }
       // Prices
@@ -590,7 +590,7 @@ describe('components/swap/utils', () => {
         },
         inAsset: AssetBUSD74E,
         inAssetDecimal,
-        outAsset: AssetUSDTERC20,
+        outAsset: AssetUSDTERC20Testnet,
         poolsData
       }
 

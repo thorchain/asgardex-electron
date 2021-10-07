@@ -62,6 +62,24 @@ In case Node might run into memory issues locally set `--max-old-space-size` as 
 export NODE_OPTIONS="--max-old-space-size=4096"
 ```
 
+### Generate types and endpoints for Midgard
+
+Whenever Midgard has been updated with a new release, run following script to auto-generate types and endpoints
+
+```bash
+generate:types
+```
+
+Generated files are based on Midgard's [swagger.json](https://midgard.thorchain.info/v2/swagger.json).
+
+### Generate ERC20 asset white list
+
+Whenever [THORChain ERC20 asset whitelist](https://gitlab.com/thorchain/thornode/-/blob/develop/bifrost/pkg/chainclients/ethereum/token_list.json) has been updated (usually with a [new release of THORNode](https://gitlab.com/thorchain/thornode/-/tags)), run following script to auto-generate this list for ASGARDEX
+
+```bash
+yarn generate:erc20whitelist
+```
+
 ### How to auto-unlock a locked wallet while hot-reloading the app (for development only, disabled in production build)
 
 Use `REACT_APP_WALLET_PASSWORD` to run the app by replacing `password` with your own password

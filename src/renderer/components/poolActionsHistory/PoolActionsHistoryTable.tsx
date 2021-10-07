@@ -6,7 +6,8 @@ import * as FP from 'fp-ts/function'
 import * as O from 'fp-ts/Option'
 import { useIntl } from 'react-intl'
 
-import { PoolActionsHistoryPage, PoolAction } from '../../services/midgard/types'
+import { OpenExplorerTxUrl } from '../../services/clients'
+import { PoolActionsHistoryPage, PoolAction, PoolActionsHistoryPageRD } from '../../services/midgard/types'
 import { ApiError } from '../../services/wallet/types'
 import { ErrorView } from '../shared/error'
 import * as CommonStyled from '../uielements/common/Common.styles'
@@ -15,17 +16,22 @@ import { TxDetail } from '../uielements/txDetail'
 import { DEFAULT_PAGE_SIZE } from './PoolActionsHistory.const'
 import * as H from './PoolActionsHistory.helper'
 import * as Styled from './PoolActionsHistoryTable.styles'
-import { Props } from './types'
+
+export type Props = {
+  currentPage: number
+  actionsPageRD: PoolActionsHistoryPageRD
+  prevActionsPage?: O.Option<PoolActionsHistoryPage>
+  openExplorerTxUrl: OpenExplorerTxUrl
+  changePaginationHandler: (page: number) => void
+  className?: string
+}
 
 export const PoolActionsHistoryTable: React.FC<Props> = ({
-  openExplorerTxUrl: goToTx,
+  openExplorerTxUrl,
   changePaginationHandler,
   actionsPageRD,
   prevActionsPage = O.none,
-  currentPage,
-  currentFilter,
-  setFilter,
-  availableFilters
+  currentPage
 }) => {
   const intl = useIntl()
 
@@ -34,18 +40,11 @@ export const PoolActionsHistoryTable: React.FC<Props> = ({
   const actionTypeColumn: ColumnType<PoolAction> = useMemo(
     () => ({
       key: 'txType',
-      title: (
-        <Styled.ActionsFilter
-          availableFilters={availableFilters}
-          currentFilter={currentFilter}
-          onFilterChanged={setFilter}
-        />
-      ),
       align: 'left',
       width: 180,
       render: renderActionTypeColumn
     }),
-    [renderActionTypeColumn, setFilter, currentFilter, availableFilters]
+    [renderActionTypeColumn]
   )
 
   const renderDateColumn = useCallback((_, { date }: PoolAction) => H.renderDate(date), [])
@@ -53,12 +52,11 @@ export const PoolActionsHistoryTable: React.FC<Props> = ({
   const dateColumn: ColumnType<PoolAction> = useMemo(
     () => ({
       key: 'timeStamp',
-      title: intl.formatMessage({ id: 'common.date' }),
       align: 'center',
       width: 150,
       render: renderDateColumn
     }),
-    [intl, renderDateColumn]
+    [renderDateColumn]
   )
 
   const renderLinkColumn = useCallback(
@@ -66,10 +64,10 @@ export const PoolActionsHistoryTable: React.FC<Props> = ({
       FP.pipe(
         action,
         H.getTxId,
-        O.map((txID) => <CommonStyled.ExternalLinkIcon key="external link" onClick={() => goToTx(txID)} />),
+        O.map((txID) => <CommonStyled.ExternalLinkIcon key="external link" onClick={() => openExplorerTxUrl(txID)} />),
         O.getOrElse(() => <></>)
       ),
-    [goToTx]
+    [openExplorerTxUrl]
   )
 
   const linkColumn: ColumnType<PoolAction> = useMemo(
@@ -77,7 +75,7 @@ export const PoolActionsHistoryTable: React.FC<Props> = ({
       key: 'txHash',
       title: intl.formatMessage({ id: 'common.detail' }),
       align: 'center',
-      width: 120,
+      width: 60,
       render: renderLinkColumn
     }),
     [renderLinkColumn, intl]
@@ -100,11 +98,10 @@ export const PoolActionsHistoryTable: React.FC<Props> = ({
   const detailColumn: ColumnType<PoolAction> = useMemo(
     () => ({
       key: 'txDetail',
-      title: intl.formatMessage({ id: 'common.detail' }),
       align: 'left',
       render: renderDetailColumn
     }),
-    [renderDetailColumn, intl]
+    [renderDetailColumn]
   )
 
   const columns: ColumnsType<PoolAction> = useMemo(
@@ -116,7 +113,13 @@ export const PoolActionsHistoryTable: React.FC<Props> = ({
     ({ total, actions }: PoolActionsHistoryPage, loading = false) => {
       return (
         <>
-          <Styled.Table columns={columns} dataSource={actions} loading={loading} rowKey={H.getRowKey} />
+          <Styled.Table
+            columns={columns}
+            dataSource={actions}
+            loading={loading}
+            rowKey={H.getRowKey}
+            showHeader={false}
+          />
           {total > 0 && (
             <Pagination
               current={currentPage}

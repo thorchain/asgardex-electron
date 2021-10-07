@@ -2,7 +2,9 @@ import { Asset } from '@xchainjs/xchain-util'
 import * as A from 'fp-ts/lib/Array'
 import * as FP from 'fp-ts/lib/function'
 
-import { assetInERC20Blacklist } from '../../helpers/assetHelper'
+import { Network } from '../../../shared/api/types'
+import { ETHAssetsTestnet } from '../../const'
+import { validAssetForETH } from '../../helpers/assetHelper'
 import { liveData } from '../../helpers/rx/liveData'
 import { observableState } from '../../helpers/stateHelper'
 import * as C from '../clients'
@@ -25,11 +27,18 @@ const reloadBalances = () => {
 }
 
 // State of balances loaded by Client
-const balances$: (walletType: WalletType, assets?: Asset[]) => C.WalletBalancesLD = (walletType, assets?: Asset[]) =>
-  FP.pipe(
+const balances$: ({ walletType, network }: { walletType: WalletType; network: Network }) => C.WalletBalancesLD = ({
+  walletType,
+  network
+}) => {
+  // For testnet we limit requests by using pre-defined assets only
+  // because `xchain-ethereum` does for each asset a single request
+  const assets: Asset[] | undefined = network === 'testnet' ? ETHAssetsTestnet : undefined
+  return FP.pipe(
     C.balances$({ client$, trigger$: reloadBalances$, assets, walletType }),
-    // Filter out black listed assets
-    liveData.map(FP.flow(A.filter(({ asset }) => !assetInERC20Blacklist(asset))))
+    // Filter assets based on ERC20Whitelist (mainnet only)
+    liveData.map(FP.flow(A.filter(({ asset }) => validAssetForETH(asset, network))))
   )
+}
 
 export { reloadBalances, balances$, reloadBalances$, resetReloadBalances }
