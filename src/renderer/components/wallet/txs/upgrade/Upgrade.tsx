@@ -201,7 +201,7 @@ export const Upgrade: React.FC<Props> = (props): JSX.Element => {
               poolAddress,
               amount: amountToUpgrade,
               asset: runeAsset.asset,
-              memo: getSwitchMemo(runeNativeAddress),
+              memo: getSwitchMemo(form.getFieldValue('address')),
               network,
               walletAddress,
               walletIndex,
@@ -218,7 +218,7 @@ export const Upgrade: React.FC<Props> = (props): JSX.Element => {
       upgrade$,
       amountToUpgrade,
       runeAsset.asset,
-      runeNativeAddress,
+      form,
       network,
       walletAddress,
       walletIndex,
@@ -502,7 +502,7 @@ export const Upgrade: React.FC<Props> = (props): JSX.Element => {
         targetPoolAddressRD,
         RD.chain(
           RD.fromPredicate(
-            FP.not(({ halted }) => halted),
+            ({ halted }) => !halted,
             () => new Error(intl.formatMessage({ id: 'pools.halted.chain' }, { chain: runeAsset.asset.chain }))
           )
         ),
