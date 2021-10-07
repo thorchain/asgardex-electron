@@ -3,6 +3,7 @@ import React, { useMemo } from 'react'
 import { Address } from '@xchainjs/xchain-client'
 import { Chain } from '@xchainjs/xchain-util'
 import { Dropdown } from 'antd'
+import * as FP from 'fp-ts/lib/function'
 import { useIntl } from 'react-intl'
 
 import { Network } from '../../../shared/api/types'
@@ -28,11 +29,11 @@ type Props = {
   addresses: WalletAddress[]
   size?: IconSize
   network: Network
-  onChangeAddress: (address: Address) => void
+  onChangeAddress?: (address: Address) => void
 }
 
 export const AccountAddressSelector: React.FC<Props> = (props) => {
-  const { selectedAddress, addresses, size = 'small', network, onChangeAddress } = props
+  const { selectedAddress, addresses, size = 'small', network, onChangeAddress = FP.constVoid } = props
 
   const intl = useIntl()
   const truncatedAddress = useMemo(

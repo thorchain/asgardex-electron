@@ -39,7 +39,7 @@ export const WalletAddress = styled.div`
 
 export const TruncatedAddress = styled.div`
   margin: 5px 15px 5px 10px;
-  font-size: 12px;
+  font-size: 14px;
   color: ${palette('primary', 0)};
 `
 
@@ -65,14 +65,15 @@ export const Menu = styled(MenuUI)`
 
 export const MenuItem = styled(MenuUI.Item)`
   padding: 0;
+  margin: 0;
 `
 
 export const MenuItemWrapper = styled.div<{ highlighted: boolean }>`
   display: flex;
   flex-direction: row;
   align-items: center;
-  font-size: 12px;
-  margin-left: 5px;
+  font-size: 14px;
+  padding: 5px;
   background-color: ${(props) => (props.highlighted ? palette('background', 2) : palette('background', 0))};
 `
 
@@ -81,5 +82,5 @@ export const AssetIcon = styled(AssetIconUI)`
 `
 
 export const WalletTypeLabel = styled(WalletTypeLabelUI)`
-  padding: -1px 2px;
+  line-height: 16px;
 `
