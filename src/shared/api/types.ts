@@ -113,6 +113,8 @@ export type IPCLedgerAdddressParams = { chain: Chain; network: Network; walletIn
 
 export type ApiHDWallet = {
   getLedgerAddress: (params: IPCLedgerAdddressParams) => Promise<Either<LedgerError, Address>>
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  verifyLedgerAddress: (params: IPCLedgerAdddressParams) => void
   sendLedgerTx: (
     params: unknown /* will be de-/serialized by ipcLedgerSendTxParamsIO */
   ) => Promise<Either<LedgerError, TxHash>>

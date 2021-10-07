@@ -30,6 +30,7 @@ type Props = {
   removeKeystore: FP.Lazy<void>
   exportKeystore: (runeNativeAddress: string, selectedNetwork: Network) => void
   addLedgerAddress: (chain: Chain, walletIndex: number) => void
+  verifyLedgerAddress: (chain: Chain) => void
   removeLedgerAddress: (chain: Chain) => void
   phrase: O.Option<string>
   clickAddressLinkHandler: (chain: Chain, address: Address) => void
@@ -46,6 +47,7 @@ export const WalletSettings: React.FC<Props> = (props): JSX.Element => {
     removeKeystore = () => {},
     exportKeystore = () => {},
     addLedgerAddress,
+    verifyLedgerAddress,
     removeLedgerAddress,
     phrase: oPhrase,
     clickAddressLinkHandler,
@@ -138,7 +140,7 @@ export const WalletSettings: React.FC<Props> = (props): JSX.Element => {
                   <Styled.AddressEllipsis address={address} chain={chain} network={selectedNetwork} enableCopy={true} />
                   <Styled.QRCodeIcon onClick={() => setShowQRModal(O.some({ asset: getChainAsset(chain), address }))} />
                   <Styled.AddressLinkIcon onClick={() => clickAddressLinkHandler(chain, address)} />
-                  {isLedgerWallet(walletType) && <Styled.EyeOutlined onClick={() => console.log('action')} />}
+                  {isLedgerWallet(walletType) && <Styled.EyeOutlined onClick={() => verifyLedgerAddress(chain)} />}
                   {isLedgerWallet(walletType) && <Styled.RemoveLedgerIcon onClick={() => removeLedgerAddress(chain)} />}
                 </>
               )
@@ -147,7 +149,15 @@ export const WalletSettings: React.FC<Props> = (props): JSX.Element => {
         </Styled.AddressContainer>
       )
     },
-    [addLedgerAddress, clickAddressLinkHandler, intl, removeLedgerAddress, selectedNetwork, walletIndex]
+    [
+      addLedgerAddress,
+      clickAddressLinkHandler,
+      intl,
+      removeLedgerAddress,
+      selectedNetwork,
+      verifyLedgerAddress,
+      walletIndex
+    ]
   )
 
   const accounts = useMemo(

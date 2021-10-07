@@ -63,6 +63,7 @@ export const WalletSettingsView: React.FC = (): JSX.Element => {
 
   const {
     askAddress: askLedgerBnbAddress,
+    verifyAddress: verifyLedgerBnbAddress,
     address: bnbLedgerAddressRD,
     removeAddress: removeLedgerBnbAddress
   } = useLedger(BNBChain)
@@ -70,6 +71,13 @@ export const WalletSettingsView: React.FC = (): JSX.Element => {
   const addLedgerAddressHandler = (chain: Chain, walletIndex = 0) => {
     if (isThorChain(chain)) return askLedgerThorAddress(walletIndex)
     if (isBnbChain(chain)) return askLedgerBnbAddress(walletIndex)
+
+    return FP.constVoid
+  }
+
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const verifyLedgerAddressHandler = (chain: Chain, walletIndex = 0) => {
+    if (isBnbChain(chain)) return verifyLedgerBnbAddress()
 
     return FP.constVoid
   }
@@ -192,6 +200,7 @@ export const WalletSettingsView: React.FC = (): JSX.Element => {
       removeKeystore={removeKeystore}
       exportKeystore={exportKeystore}
       addLedgerAddress={addLedgerAddressHandler}
+      verifyLedgerAddress={verifyLedgerAddressHandler}
       removeLedgerAddress={removeLedgerAddressHandler}
       phrase={phrase}
       walletAccounts={walletAccounts}
