@@ -1,7 +1,6 @@
 import React, { useCallback, useEffect, useMemo, useRef } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
-import { Address } from '@xchainjs/xchain-client'
 import { THORChain } from '@xchainjs/xchain-util'
 import * as A from 'fp-ts/Array'
 import * as FP from 'fp-ts/function'
@@ -16,9 +15,11 @@ import { Filter } from '../../../components/poolActionsHistory/types'
 import { WalletPoolActionsHistoryHeader } from '../../../components/poolActionsHistory/WalletPoolActionsHistoryHeader'
 import { useChainContext } from '../../../contexts/ChainContext'
 import { useMidgardContext } from '../../../contexts/MidgardContext'
+import { useWalletContext } from '../../../contexts/WalletContext'
 import { liveData } from '../../../helpers/rx/liveData'
 import { useNetwork } from '../../../hooks/useNetwork'
 import { useOpenExplorerTxUrl } from '../../../hooks/useOpenExplorerTxUrl'
+import { AddressWithChain } from '../../../services/clients'
 import { ENABLED_CHAINS } from '../../../services/const'
 import { DEFAULT_ACTIONS_HISTORY_REQUEST_PARAMS } from '../../../services/midgard/poolActionsHistory'
 import { PoolActionsHistoryPage } from '../../../services/midgard/types'
@@ -39,19 +40,43 @@ export const PoolActionsHistoryView: React.FC<{ className?: string }> = ({ class
     }
   } = useMidgardContext()
 
-  const { addressByChain$ } = useChainContext()
+  const { addressWithChain$ } = useChainContext()
 
   const openExplorerTxUrl = useOpenExplorerTxUrl(O.some(THORChain))
 
-  const addresses$ = useMemo<Rx.Observable<Address[]>>(
+  const keystoreAddresses$ = useMemo<Rx.Observable<AddressWithChain[]>>(
     () =>
       FP.pipe(
         ENABLED_CHAINS,
-        A.map(addressByChain$),
+        A.map(addressWithChain$),
         (addresses) => Rx.combineLatest(addresses),
         RxOp.map(A.filterMap(FP.identity))
       ),
-    [addressByChain$]
+    [addressWithChain$]
+  )
+
+  const { getLedgerAddressWithChain$ } = useWalletContext()
+
+  const ledgerAddresses$ = useMemo(
+    () =>
+      FP.pipe(
+        ENABLED_CHAINS,
+        A.map((chain) => getLedgerAddressWithChain$(chain, network)),
+        (addresses) => Rx.combineLatest(addresses),
+        // Accept `successfully` added addresses only
+        RxOp.map(A.filterMap(RD.toOption))
+      ),
+    [getLedgerAddressWithChain$, network]
+  )
+
+  // TODO (@veado) Combine two list + transform into `AccountAddressSelectorType`
+  const [_addresses] = useObservableState(
+    () =>
+      FP.pipe(
+        Rx.combineLatest([keystoreAddresses$, ledgerAddresses$]),
+        RxOp.switchMap((v) => v)
+      ),
+    []
   )
 
   useEffect(() => {
@@ -72,9 +97,10 @@ export const PoolActionsHistoryView: React.FC<{ className?: string }> = ({ class
   const [historyPage] = useObservableState(
     () =>
       FP.pipe(
-        addresses$,
-        RxOp.switchMap((addresses) => {
-          loadActionsHistory({ ...DEFAULT_REQUEST_PARAMS, addresses })
+        keystoreAddresses$,
+        RxOp.switchMap((_addresses) => {
+          // TODO (@veado) Use selected WalletAddress
+          loadActionsHistory({ ...DEFAULT_REQUEST_PARAMS })
           return actions$
         }),
         liveData.map((page) => {
@@ -116,6 +142,9 @@ export const PoolActionsHistoryView: React.FC<{ className?: string }> = ({ class
   const headerContent = useMemo(
     () => (
       <WalletPoolActionsHistoryHeader
+        // TODO @(veado) Add real data
+        addresses={[]}
+        selectedAddress={O.none}
         network={network}
         availableFilters={HISTORY_FILTERS}
         currentFilter={currentFilter}

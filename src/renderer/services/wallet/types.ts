@@ -10,7 +10,7 @@ import * as Rx from 'rxjs'
 
 import { LedgerError, Network } from '../../../shared/api/types'
 import { LiveData } from '../../helpers/rx/liveData'
-import { LoadTxsParams, WalletBalancesLD, WalletBalancesRD } from '../clients'
+import { LoadTxsParams, WalletBalancesLD, WalletBalancesRD, AddressWithChain } from '../clients'
 
 export type Phrase = string
 
@@ -139,6 +139,7 @@ export type BalancesService = {
 export type LedgerService = {
   askLedgerAddress$: (chain: Chain, network: Network, walletIndex: number) => LedgerAddressLD
   getLedgerAddress$: (chain: Chain, network: Network) => LedgerAddressLD
+  getLedgerAddressWithChain$: (chain: Chain, network: Network) => LedgerAddressWithChainLD
   getWalletIndex$: (chain: Chain) => Rx.Observable<number>
   removeLedgerAddress: (chain: Chain, network: Network) => void
   dispose: FP.Lazy<void>
@@ -164,6 +165,7 @@ export type LedgerTxHashLD = LiveData<LedgerError, TxHash>
 
 export type LedgerAddressRD = RD.RemoteData<LedgerError, Address>
 export type LedgerAddressLD = LiveData<LedgerError, Address>
+export type LedgerAddressWithChainLD = LiveData<LedgerError, AddressWithChain>
 
 export type LedgerAddressMap = Record<Network, LedgerAddressRD>
 export type LedgerAddressMap$ = Rx.Observable<LedgerAddressMap>

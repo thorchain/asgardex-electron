@@ -3,6 +3,7 @@ import { useMemo, useState } from 'react'
 import { Story } from '@storybook/react'
 import { TxHash } from '@xchainjs/xchain-client'
 import { assetAmount, AssetBNB, AssetBTC, AssetRuneNative, assetToBase } from '@xchainjs/xchain-util'
+import * as O from 'fp-ts/lib/Option'
 
 import { getMockRDValueFactory, RDStatus, rdStatusOptions } from '../../../shared/mock/rdByStatus'
 import { PoolActions } from '../../services/midgard/types'
@@ -144,6 +145,9 @@ export const History: Story<{ dataStatus: RDStatus }> = ({ dataStatus }) => {
   const [filter, setFilter] = useState<Filter>('ALL')
   const HeaderContent = (
     <WalletPoolActionsHistoryHeader
+      // TODO (@veado) Add mock data
+      addresses={[]}
+      selectedAddress={O.none}
       network="testnet"
       availableFilters={['ALL', 'SWITCH', 'DEPOSIT', 'SWAP', 'WITHDRAW', 'DONATE', 'REFUND']}
       currentFilter={filter}

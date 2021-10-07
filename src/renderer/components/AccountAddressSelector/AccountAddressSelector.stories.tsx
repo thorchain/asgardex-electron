@@ -2,10 +2,12 @@ import React from 'react'
 
 import { Meta } from '@storybook/react'
 import { BNBChain } from '@xchainjs/xchain-util'
+import * as O from 'fp-ts/lib/Option'
 
-import { AccountAddressSelector, WalletAddress } from './AccountAddressSelector'
+import { AccountAddressSelector } from './AccountAddressSelector'
+import { AccountAddressSelectorType } from './AccountAddressSelector.types'
 
-const addresses: WalletAddress[] = [
+const addresses: AccountAddressSelectorType[] = [
   {
     walletAddress: 'bnb123123121',
     walletType: 'ledger',
@@ -27,7 +29,7 @@ export const Default = () => (
   <AccountAddressSelector
     addresses={addresses}
     network={'testnet'}
-    selectedAddress={addresses[0]}
+    selectedAddress={O.some(addresses[0])}
     onChangeAddress={() => console.log('change index')}
   />
 )

@@ -1,7 +1,7 @@
 import * as RD from '@devexperts/remote-data-ts'
 import { Address, TxHash, XChainClient } from '@xchainjs/xchain-client'
 import { TxsPage, Fees } from '@xchainjs/xchain-client'
-import { Asset } from '@xchainjs/xchain-util'
+import { Asset, Chain } from '@xchainjs/xchain-util'
 import * as O from 'fp-ts/lib/Option'
 import * as Rx from 'rxjs'
 
@@ -49,6 +49,9 @@ export type AddressValidation = (address: Address) => boolean
 export type AddressValidationAsync = (address: Address) => Promise<boolean>
 
 export type Address$ = Rx.Observable<O.Option<Address>>
+
+export type AddressWithChain = { chain: Chain; address: Address }
+export type AddressWithChain$ = Rx.Observable<O.Option<AddressWithChain>>
 
 export type TransactionService<T> = {
   txRD$: TxHashLD

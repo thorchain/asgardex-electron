@@ -2,9 +2,11 @@ import React from 'react'
 // TODO (@asgdx-team) Will be removed after #1810
 // import { BCHChain, BNBChain, BTCChain, ETHChain, LTCChain, THORChain } from '@xchainjs/xchain-util'
 
+import * as O from 'fp-ts/lib/Option'
+
 import { Network } from '../../../shared/api/types'
-// TODO (@asgdx-team) Will be implemented after #1810
-// import { AccountAddressSelector, WalletAddress } from '../AccountAddressSelector'
+import { AccountAddressSelector } from '../AccountAddressSelector'
+import { AccountAddressSelectorType } from '../AccountAddressSelector/AccountAddressSelector.types'
 import * as Styled from './PoolActionsHistory.styles'
 import { PoolActionsHistoryFilter } from './PoolActionsHistoryFilter'
 import { Filter } from './types'
@@ -45,6 +47,8 @@ import { Filter } from './types'
 
 export type Props = {
   network: Network
+  addresses: AccountAddressSelectorType[]
+  selectedAddress: O.Option<AccountAddressSelectorType>
   availableFilters: Filter[]
   currentFilter: Filter
   setFilter: (filter: Filter) => void
@@ -53,7 +57,16 @@ export type Props = {
 }
 
 export const WalletPoolActionsHistoryHeader: React.FC<Props> = (props) => {
-  const { availableFilters, currentFilter, setFilter, openViewblockUrl, disabled = false } = props
+  const {
+    network,
+    addresses,
+    selectedAddress,
+    availableFilters,
+    currentFilter,
+    setFilter,
+    openViewblockUrl,
+    disabled = false
+  } = props
 
   return (
     <>
@@ -64,10 +77,7 @@ export const WalletPoolActionsHistoryHeader: React.FC<Props> = (props) => {
           onFilterChanged={setFilter}
           disabled={disabled}
         />
-        {/*
-        TODO (@asgdx-team) Will be implemented after #1810
-        <AccountAddressSelector addresses={addresses} network={network} selectedAddress={addresses[0]} />
-      */}
+        <AccountAddressSelector addresses={addresses} network={network} selectedAddress={selectedAddress} />
       </Styled.HeaderFilterContainer>
       <Styled.HeaderLinkContainer>
         <Styled.Headline onClick={openViewblockUrl}>
