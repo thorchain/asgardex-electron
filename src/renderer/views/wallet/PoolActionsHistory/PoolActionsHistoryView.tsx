@@ -17,6 +17,7 @@ import { WalletPoolActionsHistoryHeader } from '../../../components/poolActionsH
 import { useChainContext } from '../../../contexts/ChainContext'
 import { useMidgardContext } from '../../../contexts/MidgardContext'
 import { liveData } from '../../../helpers/rx/liveData'
+import { useNetwork } from '../../../hooks/useNetwork'
 import { useOpenExplorerTxUrl } from '../../../hooks/useOpenExplorerTxUrl'
 import { ENABLED_CHAINS } from '../../../services/const'
 import { DEFAULT_ACTIONS_HISTORY_REQUEST_PARAMS } from '../../../services/midgard/poolActionsHistory'
@@ -30,6 +31,8 @@ const DEFAULT_REQUEST_PARAMS = {
 const HISTORY_FILTERS: Filter[] = ['ALL', 'SWITCH', 'DEPOSIT', 'SWAP', 'WITHDRAW', 'DONATE', 'REFUND']
 
 export const PoolActionsHistoryView: React.FC<{ className?: string }> = ({ className }) => {
+  const { network } = useNetwork()
+
   const {
     service: {
       poolActionsHistory: { resetActionsData, requestParam$, loadActionsHistory, actions$ }
@@ -113,6 +116,7 @@ export const PoolActionsHistoryView: React.FC<{ className?: string }> = ({ class
   const headerContent = useMemo(
     () => (
       <WalletPoolActionsHistoryHeader
+        network={network}
         availableFilters={HISTORY_FILTERS}
         currentFilter={currentFilter}
         setFilter={setFilter}
@@ -120,7 +124,7 @@ export const PoolActionsHistoryView: React.FC<{ className?: string }> = ({ class
         disabled={!RD.isSuccess(historyPage)}
       />
     ),
-    [currentFilter, historyPage, openViewblockUrlHandler, setFilter]
+    [currentFilter, historyPage, network, openViewblockUrlHandler, setFilter]
   )
 
   return (

@@ -17,6 +17,7 @@ export const WalletTypeLabel = styled(UILabel).attrs({
   textTransform: 'uppercase',
   size: 'small'
 })`
+  font-family: 'MainFontRegular';
   color: ${palette('color', 2)};
   background: ${palette('gray', 1)};
   border-radius: 5px;
