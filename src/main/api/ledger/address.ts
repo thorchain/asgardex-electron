@@ -6,7 +6,7 @@ import * as E from 'fp-ts/Either'
 import { IPCLedgerAdddressParams, LedgerError, LedgerErrorId } from '../../../shared/api/types'
 import { isError } from '../../../shared/utils/guard'
 import { getAddress as getBNBAddress, verifyAddress as verifyBNBAddress } from './binance/address'
-import { getAddress as getTHORAddress } from './thorchain/address'
+import { getAddress as getTHORAddress, verifyAddress as verifyTHORAddress } from './thorchain/address'
 
 export const getAddress = async ({
   chain,
@@ -40,16 +40,12 @@ export const getAddress = async ({
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-export const verifyLedgerAddress = async ({
-  chain,
-  network,
-  walletIndex = 0
-}: IPCLedgerAdddressParams): Promise<any> => {
+export const verifyLedgerAddress = async ({ chain, network, walletIndex = 0 }: IPCLedgerAdddressParams) => {
   const transport = await TransportNodeHidSingleton.open()
   switch (chain) {
-    // case THORChain:
-    //   verifyTHORAddress(transport, network)
-    //   break
+    case THORChain:
+      verifyTHORAddress(transport, network)
+      break
     case BNBChain:
       verifyBNBAddress(transport, network, walletIndex)
       break

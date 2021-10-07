@@ -57,6 +57,7 @@ export const WalletSettingsView: React.FC = (): JSX.Element => {
 
   const {
     askAddress: askLedgerThorAddress,
+    verifyAddress: verifyLedgerThorAddress,
     address: thorLedgerAddressRD,
     removeAddress: removeLedgerThorAddress
   } = useLedger(THORChain)
@@ -77,6 +78,7 @@ export const WalletSettingsView: React.FC = (): JSX.Element => {
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const verifyLedgerAddressHandler = (chain: Chain, walletIndex = 0) => {
+    if (isThorChain(chain)) return verifyLedgerThorAddress()
     if (isBnbChain(chain)) return verifyLedgerBnbAddress()
 
     return FP.constVoid
