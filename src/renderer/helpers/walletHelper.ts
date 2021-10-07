@@ -4,6 +4,7 @@ import * as A from 'fp-ts/Array'
 import * as FP from 'fp-ts/function'
 import * as O from 'fp-ts/Option'
 
+import { ZERO_ASSET_AMOUNT } from '../const'
 import { WalletBalances } from '../services/clients'
 import { NonEmptyWalletBalances, WalletBalance } from '../services/wallet/types'
 import { isBnbAsset, isEthAsset, isLtcAsset, isRuneNativeAsset } from './assetHelper'
@@ -75,7 +76,8 @@ export const getWalletAssetAmountFromBalances =
     FP.pipe(
       balances,
       A.findFirst(isTargetWalletBalance),
-      O.map(({ amount }) => baseToAsset(amount))
+      O.map(({ amount }) => baseToAsset(amount)),
+      O.alt(() => O.some(ZERO_ASSET_AMOUNT))
     )
 
 export const getAssetAmountFromBalances = (
