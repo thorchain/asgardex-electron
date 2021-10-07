@@ -1,4 +1,5 @@
 import * as AIcon from '@ant-design/icons'
+import { EyeOutlined as EyeOutlinedUI } from '@ant-design/icons'
 import * as A from 'antd'
 import styled from 'styled-components'
 import { palette } from 'styled-theme'
@@ -206,6 +207,18 @@ export const QRCodeIcon = styled(AIcon.QrcodeOutlined)`
   }
 `
 
+export const EyeOutlined = styled(EyeOutlinedUI)`
+  cursor: pointer;
+  color: ${palette('primary', 0)};
+  height: ${ICON_SIZE}px;
+  width: ${ICON_SIZE}px;
+
+  & svg {
+    height: ${ICON_SIZE}px;
+    width: ${ICON_SIZE}px;
+  }
+`
+
 export const AddressError = styled(UILabel)`
   display: block;
   padding: 0;
@@ -228,6 +241,7 @@ export const AddLedgerIcon = styled(AIcon.PlusCircleOutlined)`
 `
 
 export const RemoveLedgerIcon = styled(RemoveIcon)`
+  margin-left: 5px;
   cursor: pointer;
   width: ${ICON_SIZE}px;
   height: ${ICON_SIZE}px;

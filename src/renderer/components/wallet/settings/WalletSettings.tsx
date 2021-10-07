@@ -138,6 +138,7 @@ export const WalletSettings: React.FC<Props> = (props): JSX.Element => {
                   <Styled.AddressEllipsis address={address} chain={chain} network={selectedNetwork} enableCopy={true} />
                   <Styled.QRCodeIcon onClick={() => setShowQRModal(O.some({ asset: getChainAsset(chain), address }))} />
                   <Styled.AddressLinkIcon onClick={() => clickAddressLinkHandler(chain, address)} />
+                  <Styled.EyeOutlined onClick={() => console.log('action')} />
                   {isLedgerWallet(walletType) && <Styled.RemoveLedgerIcon onClick={() => removeLedgerAddress(chain)} />}
                 </>
               )
