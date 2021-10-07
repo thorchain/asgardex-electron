@@ -22,6 +22,7 @@ import { useWalletContext } from '../../../contexts/WalletContext'
 import { isNonNativeRuneAsset } from '../../../helpers/assetHelper'
 import { eqOAsset } from '../../../helpers/fp/eq'
 import { useOpenExplorerTxUrl } from '../../../hooks/useOpenExplorerTxUrl'
+import { useValidateAddress } from '../../../hooks/useValidateAddress'
 import { AssetDetailsParams } from '../../../routes/wallet'
 import { AssetWithDecimalLD, AssetWithDecimalRD } from '../../../services/chain/types'
 import { OpenExplorerTxUrl } from '../../../services/clients'
@@ -42,6 +43,8 @@ export const UpgradeView: React.FC<Props> = (): JSX.Element => {
 
   const { network$ } = useAppContext()
   const network = useObservableState<Network>(network$, DEFAULT_NETWORK)
+
+  const { validateAddress } = useValidateAddress(THORChain)
 
   const { addressByChain$, upgradeRuneToNative$, assetWithDecimal$ } = useChainContext()
 
@@ -183,6 +186,7 @@ export const UpgradeView: React.FC<Props> = (): JSX.Element => {
                 () => renderDataError(Error('Could not get address from asset')),
                 (runeNativeAddress) => {
                   return renderUpgradeComponent(runeAsset, {
+                    addressValidation: validateAddress,
                     walletAddress,
                     walletType,
                     walletIndex: parseInt(walletIndex),
