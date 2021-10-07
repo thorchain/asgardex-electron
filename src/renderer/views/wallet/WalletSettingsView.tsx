@@ -76,10 +76,9 @@ export const WalletSettingsView: React.FC = (): JSX.Element => {
     return FP.constVoid
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const verifyLedgerAddressHandler = (chain: Chain, walletIndex = 0) => {
     if (isThorChain(chain)) return verifyLedgerThorAddress()
-    if (isBnbChain(chain)) return verifyLedgerBnbAddress()
+    if (isBnbChain(chain)) return verifyLedgerBnbAddress(walletIndex)
 
     return FP.constVoid
   }

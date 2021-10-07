@@ -69,8 +69,8 @@ export const createLedgerService = ({ keystore$ }: { keystore$: KeystoreState$ }
       RxOp.map((addressesMap) => addressesMap[chain].walletIndex)
     )
 
-  const verifyLedgerAddress = (chain: Chain, network: Network): void =>
-    window.apiHDWallet.verifyLedgerAddress({ chain, network })
+  const verifyLedgerAddress = (chain: Chain, network: Network, walletIndex = 0): void =>
+    window.apiHDWallet.verifyLedgerAddress({ chain, network, walletIndex })
 
   /**
    * Removes ledger address from memory
