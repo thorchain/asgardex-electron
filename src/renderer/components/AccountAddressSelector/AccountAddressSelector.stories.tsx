@@ -4,23 +4,23 @@ import { Meta } from '@storybook/react'
 import { BNBChain } from '@xchainjs/xchain-util'
 import * as O from 'fp-ts/lib/Option'
 
+import { WalletAddresses } from '../../../shared/wallet/types'
 import { AccountAddressSelector } from './AccountAddressSelector'
-import { AccountAddressSelectorType } from './AccountAddressSelector.types'
 
-const addresses: AccountAddressSelectorType[] = [
+const addresses: WalletAddresses = [
   {
-    walletAddress: 'bnb123123121',
-    walletType: 'ledger',
+    address: 'bnb123123121',
+    type: 'ledger',
     chain: BNBChain
   },
   {
-    walletAddress: 'bnb123123122',
-    walletType: 'ledger',
+    address: 'bnb123123122',
+    type: 'ledger',
     chain: BNBChain
   },
   {
-    walletAddress: 'bnb123123123',
-    walletType: 'keystore',
+    address: 'bnb123123123',
+    type: 'keystore',
     chain: BNBChain
   }
 ]

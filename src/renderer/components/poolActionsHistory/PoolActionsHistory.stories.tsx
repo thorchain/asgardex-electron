@@ -6,6 +6,7 @@ import { assetAmount, AssetBNB, AssetBTC, AssetRuneNative, assetToBase } from '@
 import * as O from 'fp-ts/lib/Option'
 
 import { getMockRDValueFactory, RDStatus, rdStatusOptions } from '../../../shared/mock/rdByStatus'
+import { WalletAddress } from '../../../shared/wallet/types'
 import { PoolActions } from '../../services/midgard/types'
 import { ErrorId } from '../../services/wallet/types'
 import { PoolActionsHistory } from './PoolActionsHistory'
@@ -152,6 +153,9 @@ export const History: Story<{ dataStatus: RDStatus }> = ({ dataStatus }) => {
       availableFilters={['ALL', 'SWITCH', 'DEPOSIT', 'SWAP', 'WITHDRAW', 'DONATE', 'REFUND']}
       currentFilter={filter}
       setFilter={setFilter}
+      onWalletAddressChanged={(address: WalletAddress) => {
+        console.log('selected address', address)
+      }}
       openViewblockUrl={() => {
         console.log('open viewblock')
         return Promise.resolve(true)

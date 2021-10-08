@@ -9,7 +9,7 @@ import { useObservableState } from 'observable-hooks'
 import * as Rx from 'rxjs'
 import * as RxOp from 'rxjs/operators'
 
-import { WalletAddress } from '../../../../shared/wallet/types'
+import { WalletAddress, WalletAddresses } from '../../../../shared/wallet/types'
 import { PoolActionsHistory } from '../../../components/poolActionsHistory'
 import { DEFAULT_PAGE_SIZE } from '../../../components/poolActionsHistory/PoolActionsHistory.const'
 import { Filter } from '../../../components/poolActionsHistory/types'
@@ -17,6 +17,7 @@ import { WalletPoolActionsHistoryHeader } from '../../../components/poolActionsH
 import { useChainContext } from '../../../contexts/ChainContext'
 import { useMidgardContext } from '../../../contexts/MidgardContext'
 import { useWalletContext } from '../../../contexts/WalletContext'
+import { eqString } from '../../../helpers/fp/eq'
 import { liveData } from '../../../helpers/rx/liveData'
 import { useNetwork } from '../../../hooks/useNetwork'
 import { useOpenExplorerTxUrl } from '../../../hooks/useOpenExplorerTxUrl'
@@ -44,7 +45,7 @@ export const PoolActionsHistoryView: React.FC<{ className?: string }> = ({ class
 
   const openExplorerTxUrl = useOpenExplorerTxUrl(O.some(THORChain))
 
-  const keystoreAddresses$ = useMemo<Rx.Observable<WalletAddress[]>>(
+  const keystoreAddresses$ = useMemo<Rx.Observable<WalletAddresses>>(
     () =>
       FP.pipe(
         ENABLED_CHAINS,
@@ -69,15 +70,14 @@ export const PoolActionsHistoryView: React.FC<{ className?: string }> = ({ class
     [getLedgerAddress$, network]
   )
 
-  // TODO (@veado) Combine two list + transform into `AccountAddressSelectorType`
-  const [_addresses] = useObservableState(
-    () =>
-      FP.pipe(
-        Rx.combineLatest([keystoreAddresses$, ledgerAddresses$]),
-        RxOp.switchMap((v) => v)
-      ),
-    []
+  // Combine addresses and update selected address
+  const addresses$ = useMemo(
+    () => FP.pipe(Rx.combineLatest([keystoreAddresses$, ledgerAddresses$]), RxOp.map(A.flatten)),
+    [keystoreAddresses$, ledgerAddresses$]
   )
+
+  // Combine addresses and update selected address
+  const addresses = useObservableState(addresses$, [])
 
   useEffect(() => {
     return () => {
@@ -97,10 +97,10 @@ export const PoolActionsHistoryView: React.FC<{ className?: string }> = ({ class
   const [historyPage] = useObservableState(
     () =>
       FP.pipe(
-        keystoreAddresses$,
-        RxOp.switchMap((_addresses) => {
+        addresses$,
+        RxOp.switchMap((addresses) => {
           // TODO (@veado) Use selected WalletAddress
-          loadActionsHistory({ ...DEFAULT_REQUEST_PARAMS })
+          loadActionsHistory({ ...DEFAULT_REQUEST_PARAMS, addresses: [addresses[0].address] })
           return actions$
         }),
         liveData.map((page) => {
@@ -129,7 +129,34 @@ export const PoolActionsHistoryView: React.FC<{ className?: string }> = ({ class
     [loadActionsHistory]
   )
 
-  const currentFilter = requestParams.type || 'ALL'
+  const setAddress = useCallback(
+    ({ address }: WalletAddress) => {
+      loadActionsHistory({
+        // For every new address reset all parameters to defaults and with a custom filter
+        ...DEFAULT_REQUEST_PARAMS,
+        addresses: [address]
+      })
+    },
+    [loadActionsHistory]
+  )
+
+  const currentFilter = useMemo(() => requestParams.type || 'ALL', [requestParams.type])
+
+  const oSelectedWalletAddress: O.Option<WalletAddress> = useMemo(
+    () =>
+      FP.pipe(
+        requestParams.addresses,
+        O.fromNullable,
+        O.chain(A.head),
+        O.chain((paramAddress) =>
+          FP.pipe(
+            addresses,
+            A.findFirst(({ address }) => eqString.equals(address, paramAddress))
+          )
+        )
+      ),
+    [addresses, requestParams.addresses]
+  )
 
   const openViewblockUrlHandler = useCallback(async () => {
     // TODO (@asgdx-team): As part of #1811 - Get viewblock url using THORChain client
@@ -142,29 +169,40 @@ export const PoolActionsHistoryView: React.FC<{ className?: string }> = ({ class
   const headerContent = useMemo(
     () => (
       <WalletPoolActionsHistoryHeader
-        // TODO @(veado) Add real data
-        addresses={[]}
-        selectedAddress={O.none}
+        addresses={addresses}
+        selectedAddress={oSelectedWalletAddress}
         network={network}
         availableFilters={HISTORY_FILTERS}
         currentFilter={currentFilter}
         setFilter={setFilter}
+        onWalletAddressChanged={setAddress}
         openViewblockUrl={openViewblockUrlHandler}
         disabled={!RD.isSuccess(historyPage)}
       />
     ),
-    [currentFilter, historyPage, network, openViewblockUrlHandler, setFilter]
+    [
+      addresses,
+      currentFilter,
+      historyPage,
+      network,
+      oSelectedWalletAddress,
+      openViewblockUrlHandler,
+      setAddress,
+      setFilter
+    ]
   )
 
   return (
-    <PoolActionsHistory
-      headerContent={headerContent}
-      className={className}
-      currentPage={requestParams.page + 1}
-      actionsPageRD={historyPage}
-      prevActionsPage={prevActionsPage.current}
-      openExplorerTxUrl={openExplorerTxUrl}
-      changePaginationHandler={setCurrentPage}
-    />
+    <>
+      <PoolActionsHistory
+        headerContent={headerContent}
+        className={className}
+        currentPage={requestParams.page + 1}
+        actionsPageRD={historyPage}
+        prevActionsPage={prevActionsPage.current}
+        openExplorerTxUrl={openExplorerTxUrl}
+        changePaginationHandler={setCurrentPage}
+      />
+    </>
   )
 }
