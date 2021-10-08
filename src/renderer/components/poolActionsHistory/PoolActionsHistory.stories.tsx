@@ -146,7 +146,7 @@ export const History: Story<{ dataStatus: RDStatus }> = ({ dataStatus }) => {
   const [filter, setFilter] = useState<Filter>('ALL')
   const HeaderContent = (
     <WalletPoolActionsHistoryHeader
-      addresses={addresses}
+      addresses={MOCK_WALLET_ADDRESSES}
       selectedAddress={O.none}
       network="testnet"
       availableFilters={['ALL', 'SWITCH', 'DEPOSIT', 'SWAP', 'WITHDRAW', 'DONATE', 'REFUND']}
