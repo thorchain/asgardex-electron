@@ -6,6 +6,7 @@ import { assetAmount, AssetBNB, AssetBTC, AssetRuneNative, assetToBase } from '@
 import * as O from 'fp-ts/lib/Option'
 
 import { getMockRDValueFactory, RDStatus, rdStatusOptions } from '../../../shared/mock/rdByStatus'
+import { MOCK_WALLET_ADDRESSES } from '../../../shared/mock/wallet'
 import { WalletAddress } from '../../../shared/wallet/types'
 import { PoolActions } from '../../services/midgard/types'
 import { ErrorId } from '../../services/wallet/types'
