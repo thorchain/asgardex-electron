@@ -25,9 +25,10 @@ import * as FP from 'fp-ts/function'
 import * as O from 'fp-ts/Option'
 
 import { getMockRDValueFactory, RDStatus } from '../../../../shared/mock/rdByStatus'
+import { WalletType } from '../../../../shared/wallet/types'
 import { RUNE_PRICE_POOL } from '../../../helpers/poolHelper'
 import { WalletBalances } from '../../../services/clients'
-import { ApiError, ChainBalances, ErrorId, WalletType } from '../../../services/wallet/types'
+import { ApiError, ChainBalances, ErrorId } from '../../../services/wallet/types'
 import { AssetsTableCollapsable } from './index'
 
 const apiError: ApiError = { errorId: ErrorId.GET_BALANCES, msg: 'error message' }

@@ -5,8 +5,9 @@ import { Asset } from '@xchainjs/xchain-util'
 import * as O from 'fp-ts/lib/Option'
 import * as Rx from 'rxjs'
 
+import { WalletAddress } from '../../../shared/wallet/types'
 import { LiveData } from '../../helpers/rx/liveData'
-import { ApiError, TxLD, WalletAddress, WalletBalance } from '../wallet/types'
+import { ApiError, TxLD, WalletBalance } from '../wallet/types'
 import { TxHashLD } from '../wallet/types'
 /**
  * States:

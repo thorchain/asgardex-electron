@@ -8,10 +8,11 @@ import * as S from 'fp-ts/string'
 import { IntlShape } from 'react-intl'
 
 import { LedgerErrorId } from '../../../shared/api/types'
+import { WalletType } from '../../../shared/wallet/types'
 import { eqAsset } from '../../helpers/fp/eq'
 import { ordBaseAmount } from '../../helpers/fp/ord'
 import { WalletBalances } from '../clients'
-import { KeystoreState, KeystoreContent, Phrase, BalanceMonoid, WalletBalance, WalletType } from './types'
+import { KeystoreState, KeystoreContent, Phrase, BalanceMonoid, WalletBalance } from './types'
 
 export const getKeystoreContent = (state: KeystoreState): O.Option<KeystoreContent> =>
   FP.pipe(state, O.chain(FP.identity))

@@ -9,6 +9,7 @@ import { useObservableState } from 'observable-hooks'
 import { useIntl } from 'react-intl'
 import * as RxOp from 'rxjs/operators'
 
+import { WalletType } from '../../../../shared/wallet/types'
 import { Bond } from '../../../components/interact/forms'
 import { Button } from '../../../components/uielements/button'
 import { ZERO_ASSET_AMOUNT } from '../../../const'
@@ -19,7 +20,6 @@ import { useSubscriptionState } from '../../../hooks/useSubscriptionState'
 import { useValidateAddress } from '../../../hooks/useValidateAddress'
 import { INITIAL_INTERACT_STATE } from '../../../services/thorchain/const'
 import { InteractState } from '../../../services/thorchain/types'
-import { WalletType } from '../../../services/wallet/types'
 import * as Styled from './InteractView.styles'
 
 type Props = {

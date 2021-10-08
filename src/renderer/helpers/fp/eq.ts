@@ -11,10 +11,11 @@ import * as O from 'fp-ts/lib/Option'
 import * as S from 'fp-ts/lib/string'
 
 import { LedgerError } from '../../../shared/api/types'
+import { WalletAddress } from '../../../shared/wallet/types'
 import { DepositAssetFees, DepositFees, SwapFeesParams } from '../../services/chain/types'
 import { ApproveParams } from '../../services/ethereum/types'
 import { PoolAddress, PoolShare } from '../../services/midgard/types'
-import { ApiError, LedgerAddressMap, WalletAddress, WalletBalance } from '../../services/wallet/types'
+import { ApiError, LedgerAddressMap, WalletBalance } from '../../services/wallet/types'
 import { AssetWithAmount } from '../../types/asgardex'
 import { PricePool } from '../../views/pools/Pools.types'
 

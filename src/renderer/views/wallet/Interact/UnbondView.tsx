@@ -7,6 +7,7 @@ import * as FP from 'fp-ts/function'
 import * as O from 'fp-ts/Option'
 import { useIntl } from 'react-intl'
 
+import { WalletType } from '../../../../shared/wallet/types'
 import { Unbond } from '../../../components/interact/forms/Unbond'
 import { Button } from '../../../components/uielements/button'
 import { useThorchainContext } from '../../../contexts/ThorchainContext'
@@ -14,7 +15,6 @@ import { useSubscriptionState } from '../../../hooks/useSubscriptionState'
 import { useValidateAddress } from '../../../hooks/useValidateAddress'
 import { INITIAL_INTERACT_STATE } from '../../../services/thorchain/const'
 import { InteractState } from '../../../services/thorchain/types'
-import { WalletType } from '../../../services/wallet/types'
 import * as Styled from './InteractView.styles'
 
 type Props = {

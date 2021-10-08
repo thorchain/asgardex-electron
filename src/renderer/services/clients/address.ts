@@ -4,10 +4,10 @@ import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
 import * as RxOp from 'rxjs/operators'
 
+import { WalletAddress } from '../../../shared/wallet/types'
 import { removeAddressPrefix } from '../../helpers/addressHelper'
 import { eqOString } from '../../helpers/fp/eq'
 import { WalletAddress$, XChainClient$ } from '../clients/types'
-import { WalletAddress } from '../wallet/types'
 
 export const addressUI$: (client$: XChainClient$, chain: Chain) => WalletAddress$ = (client$, chain) =>
   client$.pipe(

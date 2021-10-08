@@ -6,8 +6,8 @@ import { Chain } from '@xchainjs/xchain-util'
 import { Either } from 'fp-ts/lib/Either'
 import * as O from 'fp-ts/Option'
 
-import { WalletAddress } from '../../renderer/services/wallet/types'
 import { Locale } from '../i18n/types'
+import { WalletAddress } from '../wallet/types'
 
 // A version number starting from `1` to avoid to load deprecated files
 export type StorageVersion = { version: string }

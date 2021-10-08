@@ -9,6 +9,7 @@ import * as Rx from 'rxjs'
 import * as RxOp from 'rxjs/operators'
 
 import { Network } from '../../../shared/api/types'
+import { WalletType } from '../../../shared/wallet/types'
 import { getBnbRuneAsset } from '../../helpers/assetHelper'
 import { filterEnabledChains } from '../../helpers/chainHelper'
 import { eqBalancesRD } from '../../helpers/fp/eq'
@@ -33,8 +34,7 @@ import {
   KeystoreState$,
   KeystoreState,
   ChainBalance,
-  LedgerAddressLD,
-  WalletType
+  LedgerAddressLD
 } from './types'
 import { sortBalances } from './util'
 import { hasImportedKeystore } from './util'

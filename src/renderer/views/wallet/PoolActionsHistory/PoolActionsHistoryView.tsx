@@ -9,6 +9,7 @@ import { useObservableState } from 'observable-hooks'
 import * as Rx from 'rxjs'
 import * as RxOp from 'rxjs/operators'
 
+import { WalletAddress } from '../../../../shared/wallet/types'
 import { PoolActionsHistory } from '../../../components/poolActionsHistory'
 import { DEFAULT_PAGE_SIZE } from '../../../components/poolActionsHistory/PoolActionsHistory.const'
 import { Filter } from '../../../components/poolActionsHistory/types'
@@ -22,7 +23,6 @@ import { useOpenExplorerTxUrl } from '../../../hooks/useOpenExplorerTxUrl'
 import { ENABLED_CHAINS } from '../../../services/const'
 import { DEFAULT_ACTIONS_HISTORY_REQUEST_PARAMS } from '../../../services/midgard/poolActionsHistory'
 import { PoolActionsHistoryPage } from '../../../services/midgard/types'
-import { WalletAddress } from '../../../services/wallet/types'
 
 const DEFAULT_REQUEST_PARAMS = {
   ...DEFAULT_ACTIONS_HISTORY_REQUEST_PARAMS,

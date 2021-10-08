@@ -10,6 +10,7 @@ import { useIntl } from 'react-intl'
 import { useHistory } from 'react-router-dom'
 
 import { Network } from '../../../../shared/api/types'
+import { WalletType } from '../../../../shared/wallet/types'
 import { Send, SendFormETH } from '../../../components/wallet/txs/send/'
 import { useChainContext } from '../../../contexts/ChainContext'
 import { useEthereumContext } from '../../../contexts/EthereumContext'
@@ -18,12 +19,7 @@ import { useSubscriptionState } from '../../../hooks/useSubscriptionState'
 import { INITIAL_SEND_STATE } from '../../../services/chain/const'
 import { SendTxParams, SendTxState } from '../../../services/chain/types'
 import { FeesRD, OpenExplorerTxUrl, WalletBalances } from '../../../services/clients'
-import {
-  NonEmptyWalletBalances,
-  ValidatePasswordHandler,
-  WalletBalance,
-  WalletType
-} from '../../../services/wallet/types'
+import { NonEmptyWalletBalances, ValidatePasswordHandler, WalletBalance } from '../../../services/wallet/types'
 import * as Helper from './SendView.helper'
 
 type Props = {

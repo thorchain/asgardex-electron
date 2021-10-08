@@ -4,10 +4,10 @@ import { getPrefix } from '@xchainjs/xchain-thorchain'
 import { THORChain } from '@xchainjs/xchain-util'
 import * as E from 'fp-ts/Either'
 
-import { WalletAddress } from '../../../../renderer/services/wallet/types'
 import { LedgerError, LedgerErrorId, Network } from '../../../../shared/api/types'
 import { toClientNetwork } from '../../../../shared/utils/client'
 import { isError } from '../../../../shared/utils/guard'
+import { WalletAddress } from '../../../../shared/wallet/types'
 import { fromLedgerErrorType, PATH } from './common'
 
 export const getAddress = async (

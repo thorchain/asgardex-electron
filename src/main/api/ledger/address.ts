@@ -2,9 +2,9 @@ import TransportNodeHidSingleton from '@ledgerhq/hw-transport-node-hid-singleton
 import { BNBChain, THORChain } from '@xchainjs/xchain-util'
 import * as E from 'fp-ts/Either'
 
-import { WalletAddress } from '../../../renderer/services/wallet/types'
 import { IPCLedgerAdddressParams, LedgerError, LedgerErrorId } from '../../../shared/api/types'
 import { isError } from '../../../shared/utils/guard'
+import { WalletAddress } from '../../../shared/wallet/types'
 import { getAddress as getBNBAddress } from './binance/address'
 import { getAddress as getTHORAddress } from './thorchain/address'
 
