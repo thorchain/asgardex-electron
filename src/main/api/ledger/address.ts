@@ -1,8 +1,8 @@
 import TransportNodeHidSingleton from '@ledgerhq/hw-transport-node-hid-singleton'
-import { Address } from '@xchainjs/xchain-client'
 import { BNBChain, THORChain } from '@xchainjs/xchain-util'
 import * as E from 'fp-ts/Either'
 
+import { WalletAddress } from '../../../renderer/services/wallet/types'
 import { IPCLedgerAdddressParams, LedgerError, LedgerErrorId } from '../../../shared/api/types'
 import { isError } from '../../../shared/utils/guard'
 import { getAddress as getBNBAddress } from './binance/address'
@@ -12,9 +12,9 @@ export const getAddress = async ({
   chain,
   network,
   walletIndex = 0
-}: IPCLedgerAdddressParams): Promise<E.Either<LedgerError, Address>> => {
+}: IPCLedgerAdddressParams): Promise<E.Either<LedgerError, WalletAddress>> => {
   try {
-    let res: E.Either<LedgerError, Address>
+    let res: E.Either<LedgerError, WalletAddress>
     const transport = await TransportNodeHidSingleton.open()
     switch (chain) {
       case THORChain:

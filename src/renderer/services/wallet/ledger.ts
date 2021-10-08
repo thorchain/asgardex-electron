@@ -14,7 +14,6 @@ import {
   KeystoreState$,
   LedgerAddressesMap,
   LedgerAddressLD,
-  LedgerAddressWithChainLD,
   LedgerAddressRD,
   LedgerService
 } from './types'
@@ -63,9 +62,6 @@ export const createLedgerService = ({ keystore$ }: { keystore$: KeystoreState$ }
       RxOp.distinctUntilChanged(eqLedgerAddressMap.equals),
       RxOp.map((addressMap) => addressMap[network])
     )
-
-  const getLedgerAddressWithChain$ = (chain: Chain, network: Network): LedgerAddressWithChainLD =>
-    FP.pipe(getLedgerAddress$(chain, network), RxOp.map(RD.map((address) => ({ address, chain }))))
 
   const getWalletIndex$ = (chain: Chain): Rx.Observable<number> =>
     FP.pipe(
@@ -135,7 +131,6 @@ export const createLedgerService = ({ keystore$ }: { keystore$: KeystoreState$ }
   return {
     askLedgerAddress$,
     getLedgerAddress$,
-    getLedgerAddressWithChain$,
     removeLedgerAddress,
     getWalletIndex$,
     dispose

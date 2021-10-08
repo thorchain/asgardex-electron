@@ -10,7 +10,7 @@ import * as Rx from 'rxjs'
 
 import { LedgerError, Network } from '../../../shared/api/types'
 import { LiveData } from '../../helpers/rx/liveData'
-import { LoadTxsParams, WalletBalancesLD, WalletBalancesRD, AddressWithChain } from '../clients'
+import { LoadTxsParams, WalletBalancesLD, WalletBalancesRD } from '../clients'
 
 export type Phrase = string
 
@@ -48,13 +48,15 @@ export type KeystoreService = {
 }
 
 export type WalletType = 'keystore' | 'ledger'
-export type WalletAddress = { address: RD.RemoteData<Error, Address>; type: WalletType }
-export type WalletAddressLD = LiveData<Error, WalletAddress>
-export type WalletAddresses = WalletAddress[]
+
+export type WalletAddress = { address: Address; type: WalletType; chain: Chain }
+
+export type WalletAddressAsync = { address: RD.RemoteData<Error, WalletAddress>; type: WalletType }
+export type WalletAddressesAsync = WalletAddressAsync[]
 
 export type WalletAccount = {
   chain: Chain
-  accounts: WalletAddresses
+  accounts: WalletAddressesAsync
 }
 
 export type WalletAccounts = WalletAccount[]
@@ -139,7 +141,6 @@ export type BalancesService = {
 export type LedgerService = {
   askLedgerAddress$: (chain: Chain, network: Network, walletIndex: number) => LedgerAddressLD
   getLedgerAddress$: (chain: Chain, network: Network) => LedgerAddressLD
-  getLedgerAddressWithChain$: (chain: Chain, network: Network) => LedgerAddressWithChainLD
   getWalletIndex$: (chain: Chain) => Rx.Observable<number>
   removeLedgerAddress: (chain: Chain, network: Network) => void
   dispose: FP.Lazy<void>
@@ -163,9 +164,8 @@ export type TxHashLD = LiveData<ApiError, TxHash>
 export type LedgerTxHashRD = RD.RemoteData<LedgerError, TxHash>
 export type LedgerTxHashLD = LiveData<LedgerError, TxHash>
 
-export type LedgerAddressRD = RD.RemoteData<LedgerError, Address>
-export type LedgerAddressLD = LiveData<LedgerError, Address>
-export type LedgerAddressWithChainLD = LiveData<LedgerError, AddressWithChain>
+export type LedgerAddressRD = RD.RemoteData<LedgerError, WalletAddress>
+export type LedgerAddressLD = LiveData<LedgerError, WalletAddress>
 
 export type LedgerAddressMap = Record<Network, LedgerAddressRD>
 export type LedgerAddressMap$ = Rx.Observable<LedgerAddressMap>

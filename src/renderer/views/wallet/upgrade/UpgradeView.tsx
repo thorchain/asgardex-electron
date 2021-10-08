@@ -21,6 +21,7 @@ import { useMidgardContext } from '../../../contexts/MidgardContext'
 import { useWalletContext } from '../../../contexts/WalletContext'
 import { isNonNativeRuneAsset } from '../../../helpers/assetHelper'
 import { eqOAsset } from '../../../helpers/fp/eq'
+import { addressFromOptionalWalletAddress } from '../../../helpers/walletHelper'
 import { useOpenExplorerTxUrl } from '../../../hooks/useOpenExplorerTxUrl'
 import { useValidateAddress } from '../../../hooks/useValidateAddress'
 import { AssetDetailsParams } from '../../../routes/wallet'
@@ -94,7 +95,10 @@ export const UpgradeView: React.FC<Props> = (): JSX.Element => {
     reloadInboundAddresses()
   }, [reloadInboundAddresses])
 
-  const [oRuneNativeAddress] = useObservableState<O.Option<Address>>(() => addressByChain$(THORChain), O.none)
+  const [oRuneNativeAddress] = useObservableState<O.Option<Address>>(
+    () => FP.pipe(addressByChain$(THORChain), RxOp.map(addressFromOptionalWalletAddress)),
+    O.none
+  )
 
   const [targetPoolAddressRD, updateTargetPoolAddressRD] = useObservableState<PoolAddressRD, O.Option<Asset>>(
     (oRuneNonNativeAsset$) =>

@@ -24,6 +24,7 @@ import { useWalletContext } from '../../contexts/WalletContext'
 import { isRuneNativeAsset } from '../../helpers/assetHelper'
 import { eqChain } from '../../helpers/fp/eq'
 import { sequenceTOption, sequenceTRD } from '../../helpers/fpHelpers'
+import { addressFromOptionalWalletAddress } from '../../helpers/walletHelper'
 import { useMimirHalt } from '../../hooks/useMimirHalt'
 import { useOpenAddressUrl } from '../../hooks/useOpenAddressUrl'
 import { useOpenExplorerTxUrl } from '../../hooks/useOpenExplorerTxUrl'
@@ -120,19 +121,20 @@ export const SwapView: React.FC<Props> = (_): JSX.Element => {
 
   const selectedPoolAddress = useObservableState(selectedPoolAddress$, O.none)
 
-  const address$ = useMemo(
+  const targetWalletAddress$ = useMemo(
     () =>
       FP.pipe(
         oRouteTarget,
         O.fold(
           () => Rx.EMPTY,
           ({ chain }) => addressByChain$(chain)
-        )
+        ),
+        RxOp.map(addressFromOptionalWalletAddress)
       ),
 
     [addressByChain$, oRouteTarget]
   )
-  const targetWalletAddress = useObservableState(address$, O.none)
+  const targetWalletAddress = useObservableState(targetWalletAddress$, O.none)
 
   const openExplorerTxUrl: OpenExplorerTxUrl = useOpenExplorerTxUrl(O.some(THORChain))
 

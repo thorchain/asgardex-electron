@@ -19,10 +19,10 @@ import { useWalletContext } from '../../../contexts/WalletContext'
 import { liveData } from '../../../helpers/rx/liveData'
 import { useNetwork } from '../../../hooks/useNetwork'
 import { useOpenExplorerTxUrl } from '../../../hooks/useOpenExplorerTxUrl'
-import { AddressWithChain } from '../../../services/clients'
 import { ENABLED_CHAINS } from '../../../services/const'
 import { DEFAULT_ACTIONS_HISTORY_REQUEST_PARAMS } from '../../../services/midgard/poolActionsHistory'
 import { PoolActionsHistoryPage } from '../../../services/midgard/types'
+import { WalletAddress } from '../../../services/wallet/types'
 
 const DEFAULT_REQUEST_PARAMS = {
   ...DEFAULT_ACTIONS_HISTORY_REQUEST_PARAMS,
@@ -40,33 +40,33 @@ export const PoolActionsHistoryView: React.FC<{ className?: string }> = ({ class
     }
   } = useMidgardContext()
 
-  const { addressWithChain$ } = useChainContext()
+  const { addressByChain$ } = useChainContext()
 
   const openExplorerTxUrl = useOpenExplorerTxUrl(O.some(THORChain))
 
-  const keystoreAddresses$ = useMemo<Rx.Observable<AddressWithChain[]>>(
+  const keystoreAddresses$ = useMemo<Rx.Observable<WalletAddress[]>>(
     () =>
       FP.pipe(
         ENABLED_CHAINS,
-        A.map(addressWithChain$),
+        A.map(addressByChain$),
         (addresses) => Rx.combineLatest(addresses),
         RxOp.map(A.filterMap(FP.identity))
       ),
-    [addressWithChain$]
+    [addressByChain$]
   )
 
-  const { getLedgerAddressWithChain$ } = useWalletContext()
+  const { getLedgerAddress$ } = useWalletContext()
 
   const ledgerAddresses$ = useMemo(
     () =>
       FP.pipe(
         ENABLED_CHAINS,
-        A.map((chain) => getLedgerAddressWithChain$(chain, network)),
+        A.map((chain) => getLedgerAddress$(chain, network)),
         (addresses) => Rx.combineLatest(addresses),
         // Accept `successfully` added addresses only
         RxOp.map(A.filterMap(RD.toOption))
       ),
-    [getLedgerAddressWithChain$, network]
+    [getLedgerAddress$, network]
   )
 
   // TODO (@veado) Combine two list + transform into `AccountAddressSelectorType`

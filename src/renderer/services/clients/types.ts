@@ -1,12 +1,12 @@
 import * as RD from '@devexperts/remote-data-ts'
 import { Address, TxHash, XChainClient } from '@xchainjs/xchain-client'
 import { TxsPage, Fees } from '@xchainjs/xchain-client'
-import { Asset, Chain } from '@xchainjs/xchain-util'
+import { Asset } from '@xchainjs/xchain-util'
 import * as O from 'fp-ts/lib/Option'
 import * as Rx from 'rxjs'
 
 import { LiveData } from '../../helpers/rx/liveData'
-import { ApiError, TxLD, WalletBalance } from '../wallet/types'
+import { ApiError, TxLD, WalletAddress, WalletBalance } from '../wallet/types'
 import { TxHashLD } from '../wallet/types'
 /**
  * States:
@@ -48,10 +48,7 @@ export type OpenAddressUrl = (address: Address) => Promise<boolean>
 export type AddressValidation = (address: Address) => boolean
 export type AddressValidationAsync = (address: Address) => Promise<boolean>
 
-export type Address$ = Rx.Observable<O.Option<Address>>
-
-export type AddressWithChain = { chain: Chain; address: Address }
-export type AddressWithChain$ = Rx.Observable<O.Option<AddressWithChain>>
+export type WalletAddress$ = Rx.Observable<O.Option<WalletAddress>>
 
 export type TransactionService<T> = {
   txRD$: TxHashLD

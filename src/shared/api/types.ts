@@ -6,6 +6,7 @@ import { Chain } from '@xchainjs/xchain-util'
 import { Either } from 'fp-ts/lib/Either'
 import * as O from 'fp-ts/Option'
 
+import { WalletAddress } from '../../renderer/services/wallet/types'
 import { Locale } from '../i18n/types'
 
 // A version number starting from `1` to avoid to load deprecated files
@@ -112,7 +113,7 @@ export type LedgerTxParams = LedgerTHORTxParams | LedgerBNBTxParams
 export type IPCLedgerAdddressParams = { chain: Chain; network: Network; walletIndex?: number }
 
 export type ApiHDWallet = {
-  getLedgerAddress: (params: IPCLedgerAdddressParams) => Promise<Either<LedgerError, Address>>
+  getLedgerAddress: (params: IPCLedgerAdddressParams) => Promise<Either<LedgerError, WalletAddress>>
   sendLedgerTx: (
     params: unknown /* will be de-/serialized by ipcLedgerSendTxParamsIO */
   ) => Promise<Either<LedgerError, TxHash>>

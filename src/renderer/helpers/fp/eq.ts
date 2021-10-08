@@ -1,6 +1,6 @@
 import * as RD from '@devexperts/remote-data-ts'
 import { PoolData } from '@thorchain/asgardex-util'
-import { Address, Balance } from '@xchainjs/xchain-client'
+import { Balance } from '@xchainjs/xchain-client'
 import { Asset, AssetAmount, BaseAmount, Chain } from '@xchainjs/xchain-util'
 import BigNumber from 'bignumber.js'
 import * as A from 'fp-ts/lib/Array'
@@ -14,7 +14,7 @@ import { LedgerError } from '../../../shared/api/types'
 import { DepositAssetFees, DepositFees, SwapFeesParams } from '../../services/chain/types'
 import { ApproveParams } from '../../services/ethereum/types'
 import { PoolAddress, PoolShare } from '../../services/midgard/types'
-import { ApiError, LedgerAddressMap, WalletBalance } from '../../services/wallet/types'
+import { ApiError, LedgerAddressMap, WalletAddress, WalletBalance } from '../../services/wallet/types'
 import { AssetWithAmount } from '../../types/asgardex'
 import { PricePool } from '../../views/pools/Pools.types'
 
@@ -179,7 +179,13 @@ const eqLedgerError = Eq.struct<LedgerError>({
 
 export const eqAddress = eqString
 
-export const eqLedgerAddressRD = RD.getEq<LedgerError, Address>(eqLedgerError, eqAddress)
+export const eqWalletAddress = Eq.struct<WalletAddress>({
+  address: eqString,
+  type: eqString,
+  chain: eqChain
+})
+
+export const eqLedgerAddressRD = RD.getEq<LedgerError, WalletAddress>(eqLedgerError, eqWalletAddress)
 
 export const eqLedgerAddressMap = Eq.struct<LedgerAddressMap>({
   testnet: eqLedgerAddressRD,

@@ -6,7 +6,7 @@ import * as O from 'fp-ts/Option'
 
 import { ZERO_ASSET_AMOUNT } from '../const'
 import { WalletBalances } from '../services/clients'
-import { NonEmptyWalletBalances, WalletBalance } from '../services/wallet/types'
+import { NonEmptyWalletBalances, WalletAddress, WalletBalance } from '../services/wallet/types'
 import { isBnbAsset, isEthAsset, isLtcAsset, isRuneNativeAsset } from './assetHelper'
 import { eqAddress, eqAsset } from './fp/eq'
 import { sequenceTOption } from './fpHelpers'
@@ -105,3 +105,9 @@ export const getRuneNativeAmountFromBalances = (balances: WalletBalances): O.Opt
 export const filterWalletBalancesByAssets = (balances: NonEmptyWalletBalances, assets: Asset[]): WalletBalances => {
   return balances.filter((balance) => assets.findIndex((asset) => eqAsset.equals(asset, balance.asset)) >= 0)
 }
+
+export const addressFromWalletAddress = ({ address }: Pick<WalletAddress, 'address'>): Address => address
+
+export const addressFromOptionalWalletAddress = (
+  oWalletAddress: O.Option<Pick<WalletAddress, 'address'>>
+): O.Option<Address> => FP.pipe(oWalletAddress, O.map(addressFromWalletAddress))
