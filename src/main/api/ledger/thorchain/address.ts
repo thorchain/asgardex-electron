@@ -33,3 +33,10 @@ export const getAddress = async (
     })
   }
 }
+
+export const verifyAddress = async (transport: Transport, network: Network) => {
+  const app = new THORChainApp(transport)
+  const clientNetwork = toClientNetwork(network)
+  const prefix = getPrefix(clientNetwork)
+  app.showAddressAndPubKey(PATH, prefix)
+}

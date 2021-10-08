@@ -6,7 +6,7 @@ import { transition } from '../../../../settings/style-util'
 
 export const AssetSelectWrapper = styled.button`
   cursor: ${({ disabled }) => (disabled ? 'not-allowed' : 'pointer')};
-  padding: 5px 15px;
+  padding: 5px 10px;
   border: 0;
   background-color: ${palette('background', 0)};
   display: flex;

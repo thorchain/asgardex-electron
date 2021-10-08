@@ -114,6 +114,7 @@ export type IPCLedgerAdddressParams = { chain: Chain; network: Network; walletIn
 
 export type ApiHDWallet = {
   getLedgerAddress: (params: IPCLedgerAdddressParams) => Promise<Either<LedgerError, WalletAddress>>
+  verifyLedgerAddress: (params: IPCLedgerAdddressParams) => void
   sendLedgerTx: (
     params: unknown /* will be de-/serialized by ipcLedgerSendTxParamsIO */
   ) => Promise<Either<LedgerError, TxHash>>
