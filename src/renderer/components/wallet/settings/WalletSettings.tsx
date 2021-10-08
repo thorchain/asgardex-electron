@@ -173,9 +173,9 @@ export const WalletSettings: React.FC<Props> = (props): JSX.Element => {
   const [addressToVerify, setAddressToVerify] = useState('')
 
   const renderVerifyAddressModal = useCallback(
-    () => (
+    (ledgerAddress) => (
       <Modal
-        title={'Verify Ledger Address'}
+        title={intl.formatMessage({ id: 'wallet.ledger.verifyAddress.modal.title' })}
         visible={verifyAddressModalVisible}
         onOk={() => {
           setVerifyAddressModalVisible(false)
@@ -191,12 +191,15 @@ export const WalletSettings: React.FC<Props> = (props): JSX.Element => {
         okButtonProps={{ autoFocus: true }}
         cancelText={intl.formatMessage({ id: 'common.cancel' })}>
         <div style={{ textAlign: 'center' }}>
-          Verify address <b>{addressToVerify}</b>
-          <br /> on your device
+          {intl.formatMessage({ id: 'wallet.ledger.verifyAddress.modal.verifyAddress' })}
+          <br />
+          <b>{ledgerAddress}</b>
+          <br />
+          {intl.formatMessage({ id: 'wallet.ledger.verifyAddress.modal.onYourDevice' })}
         </div>
       </Modal>
     ),
-    [addressToVerify, intl, verifyAddressModalVisible]
+    [intl, verifyAddressModalVisible]
   )
 
   const accounts = useMemo(
@@ -205,7 +208,7 @@ export const WalletSettings: React.FC<Props> = (props): JSX.Element => {
         oWalletAccounts,
         O.map((walletAccounts) => (
           <Col key={'accounts'} span={24}>
-            {renderVerifyAddressModal()}
+            {renderVerifyAddressModal(addressToVerify)}
             <Styled.Subtitle>{intl.formatMessage({ id: 'setting.account.management' })}</Styled.Subtitle>
             <Styled.AccountCard>
               <List
@@ -233,7 +236,7 @@ export const WalletSettings: React.FC<Props> = (props): JSX.Element => {
         )),
         O.getOrElse(() => <></>)
       ),
-    [oWalletAccounts, renderVerifyAddressModal, intl, renderAddress]
+    [oWalletAccounts, renderVerifyAddressModal, addressToVerify, intl, renderAddress]
   )
 
   return (

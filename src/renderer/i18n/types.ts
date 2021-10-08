@@ -199,6 +199,9 @@ type WalletMessageKey =
   | 'wallet.validations.lessThen'
   | 'wallet.validations.graterThen'
   | 'wallet.validations.shouldNotBeEmpty'
+  | 'wallet.ledger.verifyAddress.modal.title'
+  | 'wallet.ledger.verifyAddress.modal.verifyAddress'
+  | 'wallet.ledger.verifyAddress.modal.onYourDevice'
 
 export type WalletMessages = { [key in WalletMessageKey]: string }
 
