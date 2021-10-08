@@ -15,14 +15,14 @@ import * as Rx from 'rxjs'
 import * as BNB from '../binance'
 import * as BTC from '../bitcoin'
 import * as BCH from '../bitcoincash'
-import { address$, Address$ } from '../clients'
+import { address$, WalletAddress$ } from '../clients'
 import * as ETH from '../ethereum'
 import * as LTC from '../litecoin'
 import * as THOR from '../thorchain'
 import { client$ } from './client'
 
 // TODO (@veado | @thatStrangeGuyThorchain) Think about returning `Address` of other wallets (Ledger), too
-const addressByChain$ = (chain: Chain): Address$ => {
+const addressByChain$ = (chain: Chain): WalletAddress$ => {
   switch (chain) {
     case BNBChain:
       return BNB.address$
@@ -48,6 +48,6 @@ const addressByChain$ = (chain: Chain): Address$ => {
 /**
  * Users wallet address for selected pool asset
  */
-const assetAddress$: Address$ = address$(client$)
+const assetAddress$ = (chain: Chain): WalletAddress$ => address$(client$, chain)
 
 export { assetAddress$, addressByChain$ }

@@ -1,15 +1,19 @@
 import type Transport from '@ledgerhq/hw-transport'
 import THORChainApp, { LedgerErrorType } from '@thorchain/ledger-thorchain'
-import { Address } from '@xchainjs/xchain-client'
 import { getPrefix } from '@xchainjs/xchain-thorchain'
+import { THORChain } from '@xchainjs/xchain-util'
 import * as E from 'fp-ts/Either'
 
 import { LedgerError, LedgerErrorId, Network } from '../../../../shared/api/types'
 import { toClientNetwork } from '../../../../shared/utils/client'
 import { isError } from '../../../../shared/utils/guard'
+import { WalletAddress } from '../../../../shared/wallet/types'
 import { fromLedgerErrorType, PATH } from './common'
 
-export const getAddress = async (transport: Transport, network: Network): Promise<E.Either<LedgerError, Address>> => {
+export const getAddress = async (
+  transport: Transport,
+  network: Network
+): Promise<E.Either<LedgerError, WalletAddress>> => {
   try {
     const app = new THORChainApp(transport)
     const clientNetwork = toClientNetwork(network)
@@ -21,7 +25,7 @@ export const getAddress = async (transport: Transport, network: Network): Promis
         msg: `Getting 'bech32Address' from Ledger's THORChain App failed`
       })
     }
-    return E.right(bech32Address)
+    return E.right({ address: bech32Address, chain: THORChain, type: 'ledger' })
   } catch (error) {
     return E.left({
       errorId: LedgerErrorId.GET_ADDRESS_FAILED,

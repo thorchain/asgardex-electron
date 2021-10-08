@@ -9,6 +9,7 @@ import * as O from 'fp-ts/lib/Option'
 import * as Rx from 'rxjs'
 
 import { LedgerError, Network } from '../../../shared/api/types'
+import { WalletAddress, WalletType } from '../../../shared/wallet/types'
 import { LiveData } from '../../helpers/rx/liveData'
 import { LoadTxsParams, WalletBalancesLD, WalletBalancesRD } from '../clients'
 
@@ -47,14 +48,12 @@ export type KeystoreService = {
   validatePassword$: ValidatePasswordHandler
 }
 
-export type WalletType = 'keystore' | 'ledger'
-export type WalletAddress = { address: RD.RemoteData<Error, Address>; type: WalletType }
-export type WalletAddressLD = LiveData<Error, WalletAddress>
-export type WalletAddresses = WalletAddress[]
+export type WalletAddressAsync = { address: RD.RemoteData<Error, WalletAddress>; type: WalletType }
+export type WalletAddressesAsync = WalletAddressAsync[]
 
 export type WalletAccount = {
   chain: Chain
-  accounts: WalletAddresses
+  accounts: WalletAddressesAsync
 }
 
 export type WalletAccounts = WalletAccount[]
@@ -163,8 +162,8 @@ export type TxHashLD = LiveData<ApiError, TxHash>
 export type LedgerTxHashRD = RD.RemoteData<LedgerError, TxHash>
 export type LedgerTxHashLD = LiveData<LedgerError, TxHash>
 
-export type LedgerAddressRD = RD.RemoteData<LedgerError, Address>
-export type LedgerAddressLD = LiveData<LedgerError, Address>
+export type LedgerAddressRD = RD.RemoteData<LedgerError, WalletAddress>
+export type LedgerAddressLD = LiveData<LedgerError, WalletAddress>
 
 export type LedgerAddressMap = Record<Network, LedgerAddressRD>
 export type LedgerAddressMap$ = Rx.Observable<LedgerAddressMap>

@@ -23,6 +23,7 @@ import { useMidgardContext } from '../../contexts/MidgardContext'
 import { isThorChain } from '../../helpers/chainHelper'
 import { sequenceTOption } from '../../helpers/fpHelpers'
 import { RUNE_PRICE_POOL } from '../../helpers/poolHelper'
+import { addressFromOptionalWalletAddress, addressFromWalletAddress } from '../../helpers/walletHelper'
 import { useMimirHalt } from '../../hooks/useMimirHalt'
 import { DEFAULT_NETWORK, ENABLED_CHAINS } from '../../services/const'
 import { PoolSharesRD } from '../../services/midgard/types'
@@ -50,13 +51,16 @@ export const PoolShareView: React.FC = (): JSX.Element => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
-  const [oRuneNativeAddress] = useObservableState<O.Option<Address>>(() => addressByChain$(THORChain), O.none)
+  const [oRuneNativeAddress] = useObservableState<O.Option<Address>>(
+    () => FP.pipe(addressByChain$(THORChain), RxOp.map(addressFromOptionalWalletAddress)),
+    O.none
+  )
 
   const [poolSharesRD]: [PoolSharesRD, unknown] = useObservableState(
     () =>
       FP.pipe(
         ENABLED_CHAINS,
-        A.filter(FP.not(isThorChain)),
+        A.filter((chain) => !isThorChain(chain)),
         A.map(addressByChain$),
         (addresses) => Rx.combineLatest(addresses),
         RxOp.switchMap(
@@ -70,6 +74,8 @@ export const PoolShareView: React.FC = (): JSX.Element => {
              * unwrap values to the plain Array<Address> at a single place
              */
             A.filterMap(FP.identity),
+            // grab `address` from `WalletAddress`
+            A.map(addressFromWalletAddress),
             /**
              * We have to get a new stake-stream for every new asset
              * @description /src/renderer/services/midgard/shares.ts

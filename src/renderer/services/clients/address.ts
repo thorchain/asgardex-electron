@@ -1,13 +1,15 @@
 import { Address } from '@xchainjs/xchain-client'
+import { Chain } from '@xchainjs/xchain-util'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
 import * as RxOp from 'rxjs/operators'
 
+import { WalletAddress } from '../../../shared/wallet/types'
 import { removeAddressPrefix } from '../../helpers/addressHelper'
 import { eqOString } from '../../helpers/fp/eq'
-import { Address$, XChainClient$ } from '../clients/types'
+import { WalletAddress$, XChainClient$ } from '../clients/types'
 
-export const addressUI$: (client$: XChainClient$) => Address$ = (client$) =>
+export const addressUI$: (client$: XChainClient$, chain: Chain) => WalletAddress$ = (client$, chain) =>
   client$.pipe(
     RxOp.map(
       O.chain((client) =>
@@ -20,8 +22,12 @@ export const addressUI$: (client$: XChainClient$) => Address$ = (client$) =>
       )
     ),
     RxOp.distinctUntilChanged(eqOString.equals),
+    RxOp.map(FP.flow(O.map<Address, WalletAddress>((address) => ({ address, chain, type: 'keystore' })))),
     RxOp.shareReplay(1)
   )
 
-export const address$: (client$: XChainClient$) => Address$ = (client$) =>
-  FP.pipe(addressUI$(client$), RxOp.map(O.map((address: Address) => removeAddressPrefix(address))))
+export const address$: (client$: XChainClient$, chain: Chain) => WalletAddress$ = (client$, chain) =>
+  FP.pipe(
+    addressUI$(client$, chain),
+    RxOp.map(O.map((wAddress: WalletAddress) => ({ ...wAddress, address: removeAddressPrefix(wAddress.address) })))
+  )

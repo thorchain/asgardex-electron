@@ -4,8 +4,8 @@ import BigNumber from 'bignumber.js'
 import * as FP from 'fp-ts/lib/function'
 import * as IOG from 'io-ts/Guard'
 
-import { WalletType } from '../../renderer/services/wallet/types'
 import { Network } from '../api/types'
+import { WalletType } from '../wallet/types'
 
 const nonEmptyStringGuard = FP.pipe(
   IOG.string,

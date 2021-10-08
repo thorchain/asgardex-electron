@@ -16,10 +16,11 @@ import {
 } from '../../../shared/api/io'
 import { LedgerError, Network } from '../../../shared/api/types'
 import { isLedgerWallet } from '../../../shared/utils/guard'
+import { WalletType } from '../../../shared/wallet/types'
 import { retryRequest } from '../../helpers/rx/retryRequest'
 import { Network$ } from '../app/types'
 import * as C from '../clients'
-import { TxHashLD, ErrorId, WalletType } from '../wallet/types'
+import { TxHashLD, ErrorId } from '../wallet/types'
 import { Client$, SendTxParams } from './types'
 import { TransactionService } from './types'
 

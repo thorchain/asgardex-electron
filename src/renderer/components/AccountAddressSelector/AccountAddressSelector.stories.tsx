@@ -1,33 +1,16 @@
 import React from 'react'
 
 import { Meta } from '@storybook/react'
-import { BNBChain } from '@xchainjs/xchain-util'
+import * as O from 'fp-ts/lib/Option'
 
-import { AccountAddressSelector, WalletAddress } from './AccountAddressSelector'
-
-const addresses: WalletAddress[] = [
-  {
-    walletAddress: 'bnb123123121',
-    walletType: 'ledger',
-    chain: BNBChain
-  },
-  {
-    walletAddress: 'bnb123123122',
-    walletType: 'ledger',
-    chain: BNBChain
-  },
-  {
-    walletAddress: 'bnb123123123',
-    walletType: 'keystore',
-    chain: BNBChain
-  }
-]
+import { MOCK_WALLET_ADDRESSES } from '../../../shared/mock/wallet'
+import { AccountAddressSelector } from './AccountAddressSelector'
 
 export const Default = () => (
   <AccountAddressSelector
-    addresses={addresses}
+    addresses={MOCK_WALLET_ADDRESSES}
     network={'testnet'}
-    selectedAddress={addresses[0]}
+    selectedAddress={O.some(MOCK_WALLET_ADDRESSES[0])}
     onChangeAddress={() => console.log('change index')}
   />
 )

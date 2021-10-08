@@ -8,8 +8,9 @@ import * as Rx from 'rxjs'
 import * as RxOp from 'rxjs/operators'
 import { catchError, startWith, map, shareReplay, debounceTime } from 'rxjs/operators'
 
+import { WalletType } from '../../../shared/wallet/types'
 import { liveData } from '../../helpers/rx/liveData'
-import { ApiError, ErrorId, WalletType } from '../wallet/types'
+import { ApiError, ErrorId } from '../wallet/types'
 import { WalletBalancesLD, XChainClient$ } from './types'
 
 /**

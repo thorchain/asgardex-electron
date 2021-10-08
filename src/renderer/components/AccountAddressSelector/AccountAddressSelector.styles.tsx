@@ -13,6 +13,7 @@ export const DropdownSelectorWrapper = styled.div`
   border: 1px solid ${palette('primary', 0)};
   border-radius: 5px;
   padding-left: 7px;
+  cursor: pointer;
 
   & .anticon-caret-down {
     transition: transform 0.3s;

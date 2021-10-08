@@ -1,5 +1,6 @@
 import * as RD from '@devexperts/remote-data-ts'
 import { Client as BitcoinCashClient, ClientUrl, NodeAuth } from '@xchainjs/xchain-bitcoincash'
+import { BCHChain } from '@xchainjs/xchain-util'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
 import * as Rx from 'rxjs'
@@ -72,12 +73,12 @@ const client$: Observable<O.Option<BitcoinCashClient>> = clientState$.pipe(map(R
 /**
  * BCH `Address`
  */
-const address$: C.Address$ = C.address$(client$)
+const address$: C.WalletAddress$ = C.address$(client$, BCHChain)
 
 /**
  * BCH `Address`
  */
-const addressUI$: C.Address$ = C.addressUI$(client$)
+const addressUI$: C.WalletAddress$ = C.addressUI$(client$, BCHChain)
 
 /**
  * Explorer url

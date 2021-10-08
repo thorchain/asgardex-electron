@@ -3,7 +3,7 @@ import React, { useMemo, useState } from 'react'
 import { useIntl } from 'react-intl'
 
 import { Network } from '../../../shared/api/types'
-import { WalletType } from '../../services/wallet/types'
+import { WalletType } from '../../../shared/wallet/types'
 import * as Styled from './Interact.styles'
 
 type Props = {

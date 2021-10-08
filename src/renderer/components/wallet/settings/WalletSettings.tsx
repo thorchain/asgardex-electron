@@ -17,7 +17,7 @@ import { AssetIcon } from '../../../components/uielements/assets/assetIcon/Asset
 import { QRCodeModal } from '../../../components/uielements/qrCodeModal/QRCodeModal'
 import { PhraseCopyModal } from '../../../components/wallet/phrase/PhraseCopyModal'
 import { getChainAsset, isBnbChain } from '../../../helpers/chainHelper'
-import { ValidatePasswordHandler, WalletAccounts, WalletAddress } from '../../../services/wallet/types'
+import { ValidatePasswordHandler, WalletAccounts, WalletAddressAsync } from '../../../services/wallet/types'
 import { walletTypeToI18n } from '../../../services/wallet/util'
 import { InfoIcon } from '../../uielements/info'
 import * as Styled from './WalletSettings.styles'
@@ -99,7 +99,7 @@ export const WalletSettings: React.FC<Props> = (props): JSX.Element => {
   }, [showQRModal, selectedNetwork, closeQrModal])
 
   const renderAddress = useCallback(
-    (chain: Chain, { type: walletType, address: addressRD }: WalletAddress) => {
+    (chain: Chain, { type: walletType, address: addressRD }: WalletAddressAsync) => {
       const renderAddLedger = (chain: Chain, loading: boolean) => (
         <Styled.AddLedgerContainer>
           <Styled.AddLedgerButton loading={loading} onClick={() => addLedgerAddress(chain, walletIndex)}>
@@ -135,7 +135,7 @@ export const WalletSettings: React.FC<Props> = (props): JSX.Element => {
                   {isLedgerWallet(walletType) && renderAddLedger(chain, false)}
                 </div>
               ),
-              (address) => (
+              ({ address }) => (
                 <>
                   <Styled.AddressEllipsis address={address} chain={chain} network={selectedNetwork} enableCopy={true} />
                   <Styled.QRCodeIcon onClick={() => setShowQRModal(O.some({ asset: getChainAsset(chain), address }))} />

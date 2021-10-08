@@ -3,8 +3,11 @@ import { useMemo, useState } from 'react'
 import { Story } from '@storybook/react'
 import { TxHash } from '@xchainjs/xchain-client'
 import { assetAmount, AssetBNB, AssetBTC, AssetRuneNative, assetToBase } from '@xchainjs/xchain-util'
+import * as O from 'fp-ts/lib/Option'
 
 import { getMockRDValueFactory, RDStatus, rdStatusOptions } from '../../../shared/mock/rdByStatus'
+import { MOCK_WALLET_ADDRESSES } from '../../../shared/mock/wallet'
+import { WalletAddress } from '../../../shared/wallet/types'
 import { PoolActions } from '../../services/midgard/types'
 import { ErrorId } from '../../services/wallet/types'
 import { PoolActionsHistory } from './PoolActionsHistory'
@@ -144,10 +147,15 @@ export const History: Story<{ dataStatus: RDStatus }> = ({ dataStatus }) => {
   const [filter, setFilter] = useState<Filter>('ALL')
   const HeaderContent = (
     <WalletPoolActionsHistoryHeader
+      addresses={MOCK_WALLET_ADDRESSES}
+      selectedAddress={O.none}
       network="testnet"
       availableFilters={['ALL', 'SWITCH', 'DEPOSIT', 'SWAP', 'WITHDRAW', 'DONATE', 'REFUND']}
       currentFilter={filter}
       setFilter={setFilter}
+      onWalletAddressChanged={(address: WalletAddress) => {
+        console.log('selected address', address)
+      }}
       openViewblockUrl={() => {
         console.log('open viewblock')
         return Promise.resolve(true)

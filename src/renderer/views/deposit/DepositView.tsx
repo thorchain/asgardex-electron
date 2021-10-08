@@ -114,7 +114,10 @@ export const DepositView: React.FC<Props> = () => {
     () =>
       FP.pipe(
         oAssetWalletAddress,
-        O.fold(() => Rx.EMPTY, shares$)
+        O.fold(
+          () => Rx.EMPTY,
+          ({ address }) => shares$(address)
+        )
       ),
     [oAssetWalletAddress, shares$]
   )
@@ -172,7 +175,8 @@ export const DepositView: React.FC<Props> = () => {
           sequenceTOption(oRuneAddress, oAssetAddress, oSelectedPoolAsset),
           O.fold(
             (): LiquidityProviderLD => Rx.of(RD.initial),
-            ([runeAddress, assetAddress, asset]) => getLiquidityProvider({ asset, network, runeAddress, assetAddress })
+            ([{ address: runeAddress }, { address: assetAddress }, asset]) =>
+              getLiquidityProvider({ asset, network, runeAddress, assetAddress })
           )
         )
       })

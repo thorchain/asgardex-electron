@@ -3,12 +3,12 @@ import * as A from 'fp-ts/lib/Array'
 import * as FP from 'fp-ts/lib/function'
 
 import { Network } from '../../../shared/api/types'
+import { WalletType } from '../../../shared/wallet/types'
 import { ETHAssetsTestnet } from '../../const'
 import { validAssetForETH } from '../../helpers/assetHelper'
 import { liveData } from '../../helpers/rx/liveData'
 import { observableState } from '../../helpers/stateHelper'
 import * as C from '../clients'
-import { WalletType } from '../wallet/types'
 import { client$ } from './common'
 
 /**

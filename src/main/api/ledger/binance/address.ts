@@ -2,18 +2,19 @@ import { crypto } from '@binance-chain/javascript-sdk'
 import AppBNB from '@binance-chain/javascript-sdk/lib/ledger/ledger-app'
 import type Transport from '@ledgerhq/hw-transport'
 import { getDerivePath, getPrefix } from '@xchainjs/xchain-binance'
-import { Address } from '@xchainjs/xchain-client'
+import { BNBChain } from '@xchainjs/xchain-util'
 import * as E from 'fp-ts/Either'
 
 import { LedgerError, LedgerErrorId, Network } from '../../../../shared/api/types'
 import { toClientNetwork } from '../../../../shared/utils/client'
 import { isError } from '../../../../shared/utils/guard'
+import { WalletAddress } from '../../../../shared/wallet/types'
 
 export const getAddress = async (
   transport: Transport,
   network: Network,
   walletIndex: number
-): Promise<E.Either<LedgerError, Address>> => {
+): Promise<E.Either<LedgerError, WalletAddress>> => {
   try {
     const app = new AppBNB(transport)
     const derive_path = getDerivePath(walletIndex)
@@ -23,7 +24,7 @@ export const getAddress = async (
     if (pk) {
       // get address from pubkey
       const address = crypto.getAddressFromPublicKey(pk.toString('hex'), prefix)
-      return E.right(address)
+      return E.right({ address, chain: BNBChain, type: 'ledger' })
     } else {
       return E.left({
         errorId: LedgerErrorId.INVALID_PUBKEY,

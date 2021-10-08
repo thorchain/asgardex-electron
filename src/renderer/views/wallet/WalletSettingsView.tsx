@@ -13,6 +13,7 @@ import * as Rx from 'rxjs'
 import * as RxOp from 'rxjs/operators'
 
 import { Network } from '../../../shared/api/types'
+import { WalletAddress } from '../../../shared/wallet/types'
 import { WalletSettings } from '../../components/wallet/settings/'
 import { useAppContext } from '../../contexts/AppContext'
 import { useBinanceContext } from '../../contexts/BinanceContext'
@@ -27,7 +28,7 @@ import { filterEnabledChains, isBnbChain, isThorChain } from '../../helpers/chai
 import { sequenceTOptionFromArray } from '../../helpers/fpHelpers'
 import { useLedger } from '../../hooks/useLedger'
 import { DEFAULT_NETWORK } from '../../services/const'
-import { WalletAddress } from '../../services/wallet/types'
+import { WalletAddressAsync } from '../../services/wallet/types'
 import { ledgerErrorIdToI18n } from '../../services/wallet/util'
 import { getPhrase } from '../../services/wallet/util'
 import { walletAccount$ } from './WalletSettingsView.helper'
@@ -46,10 +47,13 @@ export const WalletSettingsView: React.FC = (): JSX.Element => {
   const { addressUI$: btcAddressUI$ } = useBitcoinContext()
   const { addressUI$: ltcAddressUI$ } = useLitecoinContext()
   const { addressUI$: bchAddressUI$ } = useBitcoinCashContext()
-  const oRuneNativeAddress = useObservableState(thorAddressUI$, O.none)
+  const oRuneNativeAddress: O.Option<WalletAddress> = useObservableState(thorAddressUI$, O.none)
   const runeNativeAddress = FP.pipe(
     oRuneNativeAddress,
-    O.getOrElse(() => '')
+    O.fold(
+      () => '',
+      ({ address }) => address
+    )
   )
 
   const phrase$ = useMemo(() => FP.pipe(keystore$, RxOp.map(getPhrase)), [keystore$])
@@ -128,7 +132,7 @@ export const WalletSettingsView: React.FC = (): JSX.Element => {
     }
   }
 
-  const thorLedgerWalletAddress: WalletAddress = useMemo(
+  const thorLedgerWalletAddress: WalletAddressAsync = useMemo(
     () => ({
       type: 'ledger',
       address: FP.pipe(
@@ -139,7 +143,7 @@ export const WalletSettingsView: React.FC = (): JSX.Element => {
     [intl, thorLedgerAddressRD]
   )
 
-  const bnbLedgerWalletAddress: WalletAddress = useMemo(
+  const bnbLedgerWalletAddress: WalletAddressAsync = useMemo(
     () => ({
       type: 'ledger',
       address: FP.pipe(

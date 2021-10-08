@@ -7,6 +7,7 @@ import { Either } from 'fp-ts/lib/Either'
 import * as O from 'fp-ts/Option'
 
 import { Locale } from '../i18n/types'
+import { WalletAddress } from '../wallet/types'
 
 // A version number starting from `1` to avoid to load deprecated files
 export type StorageVersion = { version: string }
@@ -112,7 +113,7 @@ export type LedgerTxParams = LedgerTHORTxParams | LedgerBNBTxParams
 export type IPCLedgerAdddressParams = { chain: Chain; network: Network; walletIndex?: number }
 
 export type ApiHDWallet = {
-  getLedgerAddress: (params: IPCLedgerAdddressParams) => Promise<Either<LedgerError, Address>>
+  getLedgerAddress: (params: IPCLedgerAdddressParams) => Promise<Either<LedgerError, WalletAddress>>
   verifyLedgerAddress: (params: IPCLedgerAdddressParams) => void
   sendLedgerTx: (
     params: unknown /* will be de-/serialized by ipcLedgerSendTxParamsIO */

@@ -161,7 +161,10 @@ export const SymDepositView: React.FC<Props> = (props) => {
     reloadBalances()
   }, [reloadBalances])
 
-  const depositTxMemo: O.Option<SymDepositMemo> = useObservableState(symDepositTxMemo$, O.none)
+  const [depositTxMemo]: [O.Option<SymDepositMemo>, unknown] = useObservableState(
+    () => symDepositTxMemo$(asset.chain),
+    O.none
+  )
 
   const poolAssetsRD: PoolAssetsRD = useObservableState(availableAssets$, RD.initial)
 
