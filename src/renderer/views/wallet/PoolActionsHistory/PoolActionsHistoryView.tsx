@@ -99,8 +99,13 @@ export const PoolActionsHistoryView: React.FC<{ className?: string }> = ({ class
       FP.pipe(
         addresses$,
         RxOp.switchMap((addresses) => {
-          // TODO (@veado) Use selected WalletAddress
-          loadActionsHistory({ ...DEFAULT_REQUEST_PARAMS, addresses: [addresses[0].address] })
+          FP.pipe(
+            addresses,
+            // Get first address by default
+            A.head,
+            O.map(({ address }) => loadActionsHistory({ ...DEFAULT_REQUEST_PARAMS, addresses: [address] }))
+          )
+
           return actions$
         }),
         liveData.map((page) => {
