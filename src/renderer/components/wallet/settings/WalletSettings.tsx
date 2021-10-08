@@ -20,6 +20,7 @@ import { getChainAsset, isBnbChain } from '../../../helpers/chainHelper'
 import { ValidatePasswordHandler, WalletAccounts, WalletAddress } from '../../../services/wallet/types'
 import { walletTypeToI18n } from '../../../services/wallet/util'
 import { InfoIcon } from '../../uielements/info'
+import { Modal } from '../../uielements/modal'
 import * as Styled from './WalletSettings.styles'
 
 type Props = {
@@ -141,7 +142,13 @@ export const WalletSettings: React.FC<Props> = (props): JSX.Element => {
                   <Styled.QRCodeIcon onClick={() => setShowQRModal(O.some({ asset: getChainAsset(chain), address }))} />
                   <Styled.AddressLinkIcon onClick={() => clickAddressLinkHandler(chain, address)} />
                   {isLedgerWallet(walletType) && (
-                    <Styled.EyeOutlined onClick={() => verifyLedgerAddress(chain, walletIndex)} />
+                    <Styled.EyeOutlined
+                      onClick={() => {
+                        setAddressToVerify(address)
+                        verifyLedgerAddress(chain, walletIndex)
+                        setVerifyAddressModalVisible(true)
+                      }}
+                    />
                   )}
                   {isLedgerWallet(walletType) && <Styled.RemoveLedgerIcon onClick={() => removeLedgerAddress(chain)} />}
                 </>
@@ -162,12 +169,43 @@ export const WalletSettings: React.FC<Props> = (props): JSX.Element => {
     ]
   )
 
+  const [verifyAddressModalVisible, setVerifyAddressModalVisible] = useState(false)
+  const [addressToVerify, setAddressToVerify] = useState('')
+
+  const renderVerifyAddressModal = useCallback(
+    () => (
+      <Modal
+        title={'Verify Ledger Address'}
+        visible={verifyAddressModalVisible}
+        onOk={() => {
+          setVerifyAddressModalVisible(false)
+          setAddressToVerify('')
+        }}
+        onCancel={() => {
+          setVerifyAddressModalVisible(false)
+          setAddressToVerify('')
+        }}
+        maskClosable={false}
+        closable={true}
+        okText={intl.formatMessage({ id: 'common.confirm' })}
+        okButtonProps={{ autoFocus: true }}
+        cancelText={intl.formatMessage({ id: 'common.cancel' })}>
+        <div style={{ textAlign: 'center' }}>
+          Verify address <b>{addressToVerify}</b>
+          <br /> on your device
+        </div>
+      </Modal>
+    ),
+    [addressToVerify, intl, verifyAddressModalVisible]
+  )
+
   const accounts = useMemo(
     () =>
       FP.pipe(
         oWalletAccounts,
         O.map((walletAccounts) => (
           <Col key={'accounts'} span={24}>
+            {renderVerifyAddressModal()}
             <Styled.Subtitle>{intl.formatMessage({ id: 'setting.account.management' })}</Styled.Subtitle>
             <Styled.AccountCard>
               <List
@@ -195,7 +233,7 @@ export const WalletSettings: React.FC<Props> = (props): JSX.Element => {
         )),
         O.getOrElse(() => <></>)
       ),
-    [renderAddress, intl, oWalletAccounts]
+    [oWalletAccounts, renderVerifyAddressModal, intl, renderAddress]
   )
 
   return (
