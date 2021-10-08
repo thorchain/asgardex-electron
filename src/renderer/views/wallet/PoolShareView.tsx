@@ -63,7 +63,6 @@ export const PoolShareView: React.FC = (): JSX.Element => {
         A.filter((chain) => !isThorChain(chain)),
         A.map(addressByChain$),
         (addresses) => Rx.combineLatest(addresses),
-        // RxOp.map((v) => v),
         RxOp.switchMap(
           FP.flow(
             /**
