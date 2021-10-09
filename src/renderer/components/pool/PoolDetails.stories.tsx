@@ -1,16 +1,31 @@
 import React from 'react'
 
+import * as RD from '@devexperts/remote-data-ts'
 import { storiesOf } from '@storybook/react'
 import { AssetETH } from '@xchainjs/xchain-util'
 import * as O from 'fp-ts/Option'
 
 import { ONE_BN } from '../../const'
+import { UseMidgardHistoryActions } from '../../hooks/useMidgardHistoryActions'
 import { PoolDetails } from './PoolDetails'
 import { getEmptyPoolDetail, getEmptyPoolStatsDetail } from './PoolDetails.helpers'
+
+export const historyActions: Pick<
+  UseMidgardHistoryActions,
+  'loadHistory' | 'getRequestParams' | 'historyPage' | 'prevActionsPage' | 'setFilter' | 'setPage'
+> = {
+  getRequestParams: () => ({ itemsPerPage: 0, page: 0 }),
+  loadHistory: (params) => console.log('load history', params),
+  setFilter: (filter) => console.log('filter', filter),
+  setPage: (page) => console.log('page', page),
+  historyPage: RD.initial,
+  prevActionsPage: O.none
+}
 
 export const PoolDetailsStory = () => {
   return (
     <PoolDetails
+      historyActions={historyActions}
       poolDetail={getEmptyPoolDetail()}
       poolStatsDetail={getEmptyPoolStatsDetail()}
       network={'testnet'}

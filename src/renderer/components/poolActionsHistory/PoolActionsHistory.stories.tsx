@@ -8,13 +8,13 @@ import * as O from 'fp-ts/lib/Option'
 import { getMockRDValueFactory, RDStatus, rdStatusOptions } from '../../../shared/mock/rdByStatus'
 import { MOCK_WALLET_ADDRESSES } from '../../../shared/mock/wallet'
 import { WalletAddress } from '../../../shared/wallet/types'
-import { PoolActions } from '../../services/midgard/types'
+import { Actions } from '../../services/midgard/types'
 import { ErrorId } from '../../services/wallet/types'
 import { PoolActionsHistory } from './PoolActionsHistory'
 import { Filter } from './types'
 import { WalletPoolActionsHistoryHeader } from './WalletPoolActionsHistoryHeader'
 
-const actions: PoolActions = [
+const actions: Actions = [
   {
     date: new Date(Date.now()),
     /**
@@ -170,7 +170,7 @@ export const History: Story<{ dataStatus: RDStatus }> = ({ dataStatus }) => {
         console.log(`Open explorer - tx hash ${txHash}`)
         return Promise.resolve(true)
       }}
-      actionsPageRD={res}
+      historyPageRD={res}
       changePaginationHandler={setCurrentPage}
       currentPage={currentPage}
     />

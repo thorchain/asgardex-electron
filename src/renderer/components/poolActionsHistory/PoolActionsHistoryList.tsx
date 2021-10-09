@@ -5,7 +5,7 @@ import * as FP from 'fp-ts/function'
 import * as O from 'fp-ts/Option'
 
 import { OpenExplorerTxUrl } from '../../services/clients'
-import { PoolAction, PoolActionsHistoryPage, PoolActionsHistoryPageRD } from '../../services/midgard/types'
+import { Action, ActionsPage, ActionsPageRD } from '../../services/midgard/types'
 import { ErrorView } from '../shared/error'
 import { Pagination } from '../uielements/pagination'
 import { TxDetail } from '../uielements/txDetail'
@@ -13,7 +13,7 @@ import { DEFAULT_PAGE_SIZE } from './PoolActionsHistory.const'
 import * as H from './PoolActionsHistory.helper'
 import * as Styled from './PoolActionsHistoryList.styles'
 
-const renderItem = (goToTx: (txId: string) => void) => (action: PoolAction) => {
+const renderItem = (goToTx: (txId: string) => void) => (action: Action) => {
   const date = H.renderDate(action.date)
 
   const titleExtra = (
@@ -43,8 +43,8 @@ const renderItem = (goToTx: (txId: string) => void) => (action: PoolAction) => {
 
 type Props = {
   currentPage: number
-  actionsPageRD: PoolActionsHistoryPageRD
-  prevActionsPage?: O.Option<PoolActionsHistoryPage>
+  historyPageRD: ActionsPageRD
+  prevHistoryPage?: O.Option<ActionsPage>
   openExplorerTxUrl: OpenExplorerTxUrl
   changePaginationHandler: (page: number) => void
   className?: string
@@ -52,15 +52,15 @@ type Props = {
 
 export const PoolActionsHistoryList: React.FC<Props> = ({
   changePaginationHandler,
-  actionsPageRD,
-  prevActionsPage = O.none,
+  historyPageRD,
+  prevHistoryPage = O.none,
   openExplorerTxUrl: goToTx,
   currentPage,
   className
 }) => {
   const renderListItem = useMemo(() => renderItem(goToTx), [goToTx])
   const renderList = useCallback(
-    ({ total, actions }: PoolActionsHistoryPage, loading = false) => {
+    ({ total, actions }: ActionsPage, loading = false) => {
       return (
         <>
           <Styled.List loading={loading} itemLayout="vertical" dataSource={actions} renderItem={renderListItem} />
@@ -82,12 +82,12 @@ export const PoolActionsHistoryList: React.FC<Props> = ({
   return (
     <div className={className}>
       {FP.pipe(
-        actionsPageRD,
+        historyPageRD,
         RD.fold(
           () => renderList(H.emptyData, true),
           () => {
             const data = FP.pipe(
-              prevActionsPage,
+              prevHistoryPage,
               O.getOrElse(() => H.emptyData)
             )
             return renderList(data, true)

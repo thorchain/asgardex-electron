@@ -1,6 +1,6 @@
 import * as RD from '@devexperts/remote-data-ts'
 import { PoolData } from '@thorchain/asgardex-util'
-import { Address } from '@xchainjs/xchain-client'
+import { Address, TxHash } from '@xchainjs/xchain-client'
 import { Asset, BaseAmount, Chain } from '@xchainjs/xchain-util'
 import BigNumber from 'bignumber.js'
 import * as FP from 'fp-ts/lib/function'
@@ -260,7 +260,7 @@ export type TxType =
   // 'unknown' tx type to avoid filtering out any tx
   | 'UNKNOWN'
 
-export type PoolAction = {
+export type Action = {
   date: Date
   /**
    * Inbound transactions related to the action
@@ -275,17 +275,25 @@ export type PoolAction = {
   slip?: number
 }
 
-export type PoolActions = PoolAction[]
+export type Actions = Action[]
 
-export type PoolActionsHistoryPage = {
+export type ActionsPage = {
   total: number
-  actions: PoolActions
+  actions: Actions
 }
 
-export type PoolActionsHistoryPageRD = RD.RemoteData<ApiError, PoolActionsHistoryPage>
-
-export type PoolActionsHistoryPageLD = LiveData<ApiError, PoolActionsHistoryPage>
+export type ActionsPageRD = RD.RemoteData<ApiError, ActionsPage>
+export type ActionsPageLD = LiveData<ApiError, ActionsPage>
 
 export type PoolFilter = Chain | 'base' | 'usd'
 
 export type PoolFilters = PoolFilter[]
+
+export type LoadActionsParams = {
+  page: number
+  addresses?: Address[]
+  txid?: TxHash
+  asset?: string
+  type?: TxType | 'ALL'
+  itemsPerPage: number
+}

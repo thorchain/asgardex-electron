@@ -6,11 +6,11 @@ import * as FP from 'fp-ts/function'
 import * as O from 'fp-ts/Option'
 import { FormattedDate, FormattedTime } from 'react-intl'
 
-import { PoolAction, PoolActions, PoolActionsHistoryPage, Tx } from '../../services/midgard/types'
+import { Action, Actions, ActionsPage, Tx } from '../../services/midgard/types'
 import { AssetWithAmount } from '../../types/asgardex'
 import * as Styled from './PoolActionsHistory.styles'
 
-export const getTxId = (action: PoolAction): O.Option<TxHash> => {
+export const getTxId = (action: Action): O.Option<TxHash> => {
   return FP.pipe(
     action.in,
     A.head,
@@ -36,7 +36,7 @@ export const renderDate = (date: Date) => (
   </Styled.DateContainer>
 )
 
-export const getRowKey = (action: PoolAction) =>
+export const getRowKey = (action: Action) =>
   FP.pipe(
     action,
     getTxId,
@@ -44,4 +44,4 @@ export const getRowKey = (action: PoolAction) =>
     O.getOrElse(() => `${action.date.toString()}-${action.type}`)
   )
 
-export const emptyData: PoolActionsHistoryPage = { total: 0, actions: [] as PoolActions }
+export const emptyData: ActionsPage = { total: 0, actions: [] as Actions }
