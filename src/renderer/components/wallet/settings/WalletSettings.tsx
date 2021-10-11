@@ -194,7 +194,7 @@ export const WalletSettings: React.FC<Props> = (props): JSX.Element => {
                 setAddressToVerify(O.none)
               }}
               maskClosable={false}
-              closable={true}
+              closable={false}
               okText={intl.formatMessage({ id: 'common.confirm' })}
               okButtonProps={{ autoFocus: true }}
               cancelText={intl.formatMessage({ id: 'common.reject' })}>

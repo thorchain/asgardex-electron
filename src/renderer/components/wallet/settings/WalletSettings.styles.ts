@@ -270,5 +270,6 @@ export const AddressToVerifyLabel = styled.span`
   display: block;
   color: inherit;
   font-family: 'MainFontBold';
-  font-size: 14px;
+  font-size: 16px;
+  text-transform: none;
 `
