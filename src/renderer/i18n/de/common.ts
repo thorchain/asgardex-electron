@@ -24,7 +24,7 @@ const common: CommonMessages = {
   'common.submit': 'Abschicken',
   'common.confirm': 'Bestätigen',
   'common.cancel': 'Abbrechen',
-  'common.reject': 'Reject - DE',
+  'common.reject': 'Ablehnen',
   'common.next': 'Weiter',
   'common.finish': 'Beenden',
   'common.copy': 'Kopieren',
