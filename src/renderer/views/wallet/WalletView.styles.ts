@@ -1,8 +1,8 @@
 import styled from 'styled-components'
 
-import { PoolActionsHistoryView } from './PoolActionsHistory'
+import { WalletHistoryView as WalletHistoryViewUI } from './history'
 
-export const PoolActionsHistory = styled(PoolActionsHistoryView)`
+export const WalletHistoryView = styled(WalletHistoryViewUI)`
   padding-top: 10px;
 `
 export const WalletSettingsWrapper = styled.div`

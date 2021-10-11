@@ -17,19 +17,20 @@ import { ONE_BN } from '../../const'
 import { useAppContext } from '../../contexts/AppContext'
 import { useMidgardContext } from '../../contexts/MidgardContext'
 import * as PoolHelpers from '../../helpers/poolHelper'
+import { useMidgardHistoryActions } from '../../hooks/useMidgardHistoryActions'
 import { useMimirHalt } from '../../hooks/useMimirHalt'
 import { PoolDetailRouteParams } from '../../routes/pools/detail'
 import { DEFAULT_NETWORK } from '../../services/const'
 import { PoolDetailRD, PoolEarningHistoryRD, PoolStatsDetailRD } from '../../services/midgard/types'
 import { PoolChartView } from './PoolChartView'
 import * as Styled from './PoolDetailsView.styles'
-import { PoolHistory } from './PoolHistoryView'
+import { PoolHistoryView } from './PoolHistoryView'
 
-type TargetPoolDetailProps = Omit<PoolDetailProps, 'asset'>
+type TargetPoolDetailProps = Omit<PoolDetailProps, 'asset' | 'historyActions'>
 
 const defaultDetailsProps: TargetPoolDetailProps = {
   priceRatio: ONE_BN,
-  HistoryView: PoolHistory,
+  HistoryView: PoolHistoryView,
   ChartView: PoolChartView,
   poolDetail: getEmptyPoolDetail(),
   poolStatsDetail: getEmptyPoolStatsDetail(),
@@ -53,7 +54,6 @@ export const PoolDetailsView: React.FC = () => {
         reloadSelectedPoolDetail,
         haltedChains$
       },
-      poolActionsHistory: { reloadActionsHistory, actions$ },
       setSelectedPoolAsset
     }
   } = useMidgardContext()
@@ -96,7 +96,9 @@ export const PoolDetailsView: React.FC = () => {
 
   const priceRatio = useObservableState(priceRatio$, ONE_BN)
 
-  const [isHistoryLoading] = useObservableState(() => FP.pipe(actions$, RxOp.map(RD.isPending)), false)
+  const historyActions = useMidgardHistoryActions()
+
+  const { historyPage: historyPageRD, reloadHistory } = historyActions
 
   const poolDetailRD: PoolDetailRD = useObservableState(selectedPoolDetail$, RD.initial)
 
@@ -105,12 +107,12 @@ export const PoolDetailsView: React.FC = () => {
 
   const onRefreshData = useCallback(() => {
     reloadSelectedPoolDetail()
-    reloadActionsHistory()
-  }, [reloadSelectedPoolDetail, reloadActionsHistory])
+    reloadHistory()
+  }, [reloadHistory, reloadSelectedPoolDetail])
 
   const refreshButtonDisabled = useMemo(() => {
-    return isHistoryLoading || FP.pipe(poolDetailRD, RD.isPending)
-  }, [isHistoryLoading, poolDetailRD])
+    return FP.pipe(historyPageRD, RD.isPending) || FP.pipe(poolDetailRD, RD.isPending)
+  }, [historyPageRD, poolDetailRD])
 
   const prevProps = useRef<TargetPoolDetailProps>(defaultDetailsProps)
 
@@ -128,27 +130,28 @@ export const PoolDetailsView: React.FC = () => {
             FP.pipe(
               RD.combine(poolDetailRD, poolStatsDetailRD, poolEarningHistoryRD),
               RD.fold(
-                () => <PoolDetails asset={asset} {...defaultDetailsProps} />,
-                () => <PoolDetails asset={asset} {...prevProps.current} isLoading />,
+                () => <PoolDetails asset={asset} historyActions={historyActions} {...defaultDetailsProps} />,
+                () => <PoolDetails asset={asset} historyActions={historyActions} {...prevProps.current} isLoading />,
                 ({ message }: Error) => {
                   return <ErrorView title={message} />
                 },
                 ([poolDetail, poolStatsDetail, poolEarningHistory]) => {
                   prevProps.current = {
                     network,
+
                     priceRatio,
                     poolDetail,
                     poolStatsDetail,
                     earningsHistory: poolEarningHistory,
                     priceSymbol: O.toUndefined(priceSymbol),
-                    HistoryView: PoolHistory,
+                    HistoryView: PoolHistoryView,
                     ChartView: PoolChartView,
                     disableAllPoolActions: getDisableAllPoolActions(asset.chain),
                     disableTradingPoolAction: getDisableTradingPoolAction(asset.chain),
                     disablePoolActions: getDisablePoolActions(asset.chain)
                   }
 
-                  return <PoolDetails asset={asset} {...prevProps.current} />
+                  return <PoolDetails asset={asset} historyActions={historyActions} {...prevProps.current} />
                 }
               )
             )

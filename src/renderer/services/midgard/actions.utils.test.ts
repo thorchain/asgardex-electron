@@ -3,7 +3,7 @@ import * as O from 'fp-ts/Option'
 
 import { eqAssetsWithAmount, eqOAssetWithAmount } from '../../helpers/fp/eq'
 import { Coin, Transaction } from '../../types/generated/midgard/models'
-import { getRequestType, getTxType, mapCoin, mapTransaction } from './poolActionsHistory.utils'
+import { getRequestType, getTxType, mapCoin, mapTransaction } from './action.utils'
 
 describe('poolActionsHistory.utils', () => {
   const invalidCoin: Coin = {

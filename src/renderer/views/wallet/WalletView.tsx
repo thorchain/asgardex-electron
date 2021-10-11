@@ -1,5 +1,6 @@
 import React, { useCallback, useMemo } from 'react'
 
+import * as RD from '@devexperts/remote-data-ts'
 import { Row } from 'antd'
 import * as H from 'history'
 import { useObservableState } from 'observable-hooks'
@@ -10,6 +11,7 @@ import { AssetsNav } from '../../components/wallet/assets'
 import { useMidgardContext } from '../../contexts/MidgardContext'
 import { useThorchainContext } from '../../contexts/ThorchainContext'
 import { useWalletContext } from '../../contexts/WalletContext'
+import { useMidgardHistoryActions } from '../../hooks/useMidgardHistoryActions'
 import { RedirectRouteState } from '../../routes/types'
 import * as walletRoutes from '../../routes/wallet'
 import { hasImportedKeystore, isLocked } from '../../services/wallet/util'
@@ -32,11 +34,14 @@ export const WalletView: React.FC = (): JSX.Element => {
   const {
     service: {
       shares: { reloadCombineSharesByAddresses },
-      pools: { reloadAllPools },
-      poolActionsHistory
+      pools: { reloadAllPools }
     }
   } = useMidgardContext()
   const { reloadNodesInfo } = useThorchainContext()
+
+  const historyActions = useMidgardHistoryActions(10)
+
+  const { historyPage: historyPageRD, reloadHistory } = historyActions
 
   // Important note:
   // DON'T set `INITIAL_KEYSTORE_STATE` as default value
@@ -46,9 +51,9 @@ export const WalletView: React.FC = (): JSX.Element => {
   const keystore = useObservableState(keystoreService.keystore$, undefined)
 
   const reloadButton = useCallback(
-    (onClickHandler) => (
+    (onClickHandler, disabled = false) => (
       <Row justify="end" style={{ marginBottom: '20px' }}>
-        <RefreshButton clickHandler={onClickHandler} />
+        <RefreshButton clickHandler={onClickHandler} disabled={disabled} />
       </Row>
     ),
     []
@@ -100,9 +105,9 @@ export const WalletView: React.FC = (): JSX.Element => {
             </Styled.WalletSettingsWrapper>
           </Route>
           <Route path={walletRoutes.history.template}>
-            {reloadButton(poolActionsHistory.reloadActionsHistory)}
+            {reloadButton(reloadHistory, RD.isPending(historyPageRD))}
             <AssetsNav />
-            <Styled.PoolActionsHistory />
+            <Styled.WalletHistoryView historyActions={historyActions} />
           </Route>
         </Switch>
       </>
@@ -111,7 +116,9 @@ export const WalletView: React.FC = (): JSX.Element => {
       reloadButton,
       reloadBalances,
       reloadNodesInfo,
-      poolActionsHistory.reloadActionsHistory,
+      reloadHistory,
+      historyPageRD,
+      historyActions,
       reloadCombineSharesByAddresses,
       reloadAllPools
     ]

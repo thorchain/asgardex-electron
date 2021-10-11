@@ -2,10 +2,10 @@ import { AssetBNB, AssetBTC, AssetRuneNative, baseAmount } from '@xchainjs/xchai
 import * as O from 'fp-ts/Option'
 
 import { eqAssetsWithAmount } from '../../helpers/fp/eq'
-import { PoolAction, Tx } from '../../services/midgard/types'
+import { Action, Tx } from '../../services/midgard/types'
 import { getTxId, getValues, getRowKey } from './PoolActionsHistory.helper'
 
-const defaultPoolAction: PoolAction = {
+const defaultPoolAction: Action = {
   date: new Date(0),
   in: [],
   out: [],

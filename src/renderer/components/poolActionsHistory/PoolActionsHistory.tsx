@@ -6,7 +6,7 @@ import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/Option'
 
 import { OpenExplorerTxUrl } from '../../services/clients'
-import { PoolActionsHistoryPage, PoolActionsHistoryPageRD } from '../../services/midgard/types'
+import { ActionsPage, ActionsPageRD } from '../../services/midgard/types'
 import * as Styled from './PoolActionsHistory.styles'
 import { PoolActionsHistoryList } from './PoolActionsHistoryList'
 import { PoolActionsHistoryTable, Props as PoolActionsHistoryTableProps } from './PoolActionsHistoryTable'
@@ -14,8 +14,8 @@ import { PoolActionsHistoryTable, Props as PoolActionsHistoryTableProps } from '
 type Props = {
   headerContent?: React.ReactNode
   currentPage: number
-  actionsPageRD: PoolActionsHistoryPageRD
-  prevActionsPage?: O.Option<PoolActionsHistoryPage>
+  historyPageRD: ActionsPageRD
+  prevHistoryPage?: O.Option<ActionsPage>
   openExplorerTxUrl: OpenExplorerTxUrl
   changePaginationHandler: (page: number) => void
   className?: string
@@ -24,30 +24,30 @@ type Props = {
 export const PoolActionsHistory: React.FC<Props> = (props) => {
   const {
     headerContent: HeaderContent,
-    actionsPageRD,
+    historyPageRD,
     currentPage,
-    prevActionsPage,
+    prevHistoryPage,
     changePaginationHandler,
     openExplorerTxUrl
   } = props
   const isDesktopView = Grid.useBreakpoint()?.lg ?? false
   // store previous data of Txs to render these while reloading
-  const previousTxs = useRef<O.Option<PoolActionsHistoryPage>>(O.none)
+  const prevHistoryPageRef = useRef<O.Option<ActionsPage>>(O.none)
 
   useEffect(() => {
     FP.pipe(
-      actionsPageRD,
+      historyPageRD,
       RD.map((data) => {
-        previousTxs.current = O.some(data)
+        prevHistoryPageRef.current = O.some(data)
         return true
       })
     )
-  }, [actionsPageRD])
+  }, [historyPageRD])
 
   const tableProps: PoolActionsHistoryTableProps = {
     currentPage,
-    actionsPageRD,
-    prevActionsPage,
+    historyPageRD,
+    prevHistoryPage,
     openExplorerTxUrl,
     changePaginationHandler
   }
@@ -56,9 +56,9 @@ export const PoolActionsHistory: React.FC<Props> = (props) => {
     <>
       {HeaderContent && <Styled.Header>{HeaderContent}</Styled.Header>}
       {isDesktopView ? (
-        <PoolActionsHistoryTable prevActionsPage={previousTxs.current} {...tableProps} />
+        <PoolActionsHistoryTable prevHistoryPage={prevHistoryPageRef.current} {...tableProps} />
       ) : (
-        <PoolActionsHistoryList prevActionsPage={previousTxs.current} {...tableProps} />
+        <PoolActionsHistoryList prevHistoryPage={prevHistoryPageRef.current} {...tableProps} />
       )}
     </>
   )
