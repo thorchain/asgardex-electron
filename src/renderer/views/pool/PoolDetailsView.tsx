@@ -107,7 +107,6 @@ export const PoolDetailsView: React.FC = () => {
 
   const onRefreshData = useCallback(() => {
     reloadSelectedPoolDetail()
-    // TODO @veado Reload history
     reloadHistory()
   }, [reloadHistory, reloadSelectedPoolDetail])
 
