@@ -16,21 +16,18 @@ import { WalletPoolActionsHistoryHeader } from '../../../components/poolActionsH
 import { useChainContext } from '../../../contexts/ChainContext'
 import { useWalletContext } from '../../../contexts/WalletContext'
 import { eqString } from '../../../helpers/fp/eq'
-import { UseMidgardHistoryActions } from '../../../hooks/useMidgardHistoryActions'
 import { useNetwork } from '../../../hooks/useNetwork'
 import { useOpenExplorerTxUrl } from '../../../hooks/useOpenExplorerTxUrl'
 import { ENABLED_CHAINS } from '../../../services/const'
+import { WalletHistoryActions } from './WalletHistoryView.types'
 
 const HISTORY_FILTERS: Filter[] = ['ALL', 'SWITCH', 'DEPOSIT', 'SWAP', 'WITHDRAW', 'DONATE', 'REFUND']
 
 export type Props = {
   className?: string
-  historyActions: Pick<
-    UseMidgardHistoryActions,
-    'getRequestParams' | 'loadHistory' | 'historyPage' | 'prevActionsPage' | 'setFilter' | 'setAddress' | 'setPage'
-  >
+  historyActions: WalletHistoryActions
 }
-export const PoolActionsHistoryView: React.FC<Props> = ({ className, historyActions }) => {
+export const WalletHistoryView: React.FC<Props> = ({ className, historyActions }) => {
   const { network } = useNetwork()
 
   const { addressByChain$ } = useChainContext()

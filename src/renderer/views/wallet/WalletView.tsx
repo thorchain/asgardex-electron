@@ -107,7 +107,7 @@ export const WalletView: React.FC = (): JSX.Element => {
           <Route path={walletRoutes.history.template}>
             {reloadButton(reloadHistory, RD.isPending(historyPageRD))}
             <AssetsNav />
-            <Styled.PoolActionsHistory historyActions={historyActions} />
+            <Styled.WalletHistoryView historyActions={historyActions} />
           </Route>
         </Switch>
       </>

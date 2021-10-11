@@ -24,13 +24,13 @@ import { DEFAULT_NETWORK } from '../../services/const'
 import { PoolDetailRD, PoolEarningHistoryRD, PoolStatsDetailRD } from '../../services/midgard/types'
 import { PoolChartView } from './PoolChartView'
 import * as Styled from './PoolDetailsView.styles'
-import { PoolHistory } from './PoolHistoryView'
+import { PoolHistoryView } from './PoolHistoryView'
 
 type TargetPoolDetailProps = Omit<PoolDetailProps, 'asset' | 'historyActions'>
 
 const defaultDetailsProps: TargetPoolDetailProps = {
   priceRatio: ONE_BN,
-  HistoryView: PoolHistory,
+  HistoryView: PoolHistoryView,
   ChartView: PoolChartView,
   poolDetail: getEmptyPoolDetail(),
   poolStatsDetail: getEmptyPoolStatsDetail(),
@@ -145,7 +145,7 @@ export const PoolDetailsView: React.FC = () => {
                     poolStatsDetail,
                     earningsHistory: poolEarningHistory,
                     priceSymbol: O.toUndefined(priceSymbol),
-                    HistoryView: PoolHistory,
+                    HistoryView: PoolHistoryView,
                     ChartView: PoolChartView,
                     disableAllPoolActions: getDisableAllPoolActions(asset.chain),
                     disableTradingPoolAction: getDisableTradingPoolAction(asset.chain),

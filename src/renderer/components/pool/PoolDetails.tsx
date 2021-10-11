@@ -6,8 +6,8 @@ import BigNumber from 'bignumber.js'
 import * as O from 'fp-ts/Option'
 
 import { Network } from '../../../shared/api/types'
-import { UseMidgardHistoryActions } from '../../hooks/useMidgardHistoryActions'
 import { EarningsHistoryItemPool, PoolDetail, PoolStatsDetail } from '../../types/generated/midgard/models'
+import { PoolHistoryActions } from '../../views/pool/PoolHistoryView.types'
 import { stringToGetPoolsStatus } from '../../views/pools/Pools.utils'
 import { PoolCards } from './PoolCards'
 import * as H from './PoolDetails.helpers'
@@ -15,10 +15,7 @@ import { PoolTitle } from './PoolTitle'
 
 export type Props = {
   asset: Asset
-  historyActions: Pick<
-    UseMidgardHistoryActions,
-    'loadHistory' | 'getRequestParams' | 'historyPage' | 'prevActionsPage' | 'setFilter' | 'setPage'
-  >
+  historyActions: PoolHistoryActions
   poolStatsDetail: PoolStatsDetail
   poolDetail: PoolDetail
   priceRatio: BigNumber
@@ -27,10 +24,7 @@ export type Props = {
   isLoading?: boolean
   HistoryView: React.ComponentType<{
     poolAsset: Asset
-    historyActions: Pick<
-      UseMidgardHistoryActions,
-      'loadHistory' | 'getRequestParams' | 'historyPage' | 'prevActionsPage' | 'setFilter' | 'setPage'
-    >
+    historyActions: PoolHistoryActions
   }>
   ChartView: React.ComponentType<{ isLoading?: boolean; priceRatio: BigNumber }>
   disableTradingPoolAction: boolean

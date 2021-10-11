@@ -7,22 +7,19 @@ import * as O from 'fp-ts/Option'
 import { PoolActionsHistory } from '../../components/poolActionsHistory'
 import { PoolActionsHistoryFilter } from '../../components/poolActionsHistory/PoolActionsHistoryFilter'
 import { Filter } from '../../components/poolActionsHistory/types'
-import { UseMidgardHistoryActions } from '../../hooks/useMidgardHistoryActions'
 import { useOpenExplorerTxUrl } from '../../hooks/useOpenExplorerTxUrl'
 import { OpenExplorerTxUrl } from '../../services/clients'
+import { PoolHistoryActions } from './PoolHistoryView.types'
 
 type Props = {
   poolAsset: Asset
-  historyActions: Pick<
-    UseMidgardHistoryActions,
-    'loadHistory' | 'getRequestParams' | 'historyPage' | 'prevActionsPage' | 'setFilter' | 'setPage'
-  >
+  historyActions: PoolHistoryActions
   className?: string
 }
 
 const HISTORY_FILTERS: Filter[] = ['ALL', 'DEPOSIT', 'SWAP', 'WITHDRAW', 'DONATE', 'REFUND']
 
-export const PoolHistory: React.FC<Props> = ({ className, poolAsset, historyActions }) => {
+export const PoolHistoryView: React.FC<Props> = ({ className, poolAsset, historyActions }) => {
   const { loadHistory, getRequestParams, historyPage, prevActionsPage, setFilter, setPage } = historyActions
 
   const stringAsset = useMemo(() => assetToString(poolAsset), [poolAsset])
