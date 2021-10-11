@@ -32,7 +32,7 @@ export const WalletHistoryView: React.FC<Props> = ({ className, historyActions }
 
   const { addressByChain$ } = useChainContext()
 
-  const { getRequestParams, loadHistory, historyPage, prevActionsPage, setFilter, setAddress, setPage } = historyActions
+  const { requestParams, loadHistory, historyPage, prevHistoryPage, setFilter, setAddress, setPage } = historyActions
 
   const openExplorerTxUrl = useOpenExplorerTxUrl(O.some(THORChain))
 
@@ -86,12 +86,12 @@ export const WalletHistoryView: React.FC<Props> = ({ className, historyActions }
     []
   )
 
-  const currentFilter = useMemo(() => getRequestParams().type || 'ALL', [getRequestParams])
+  const currentFilter = useMemo(() => requestParams.type || 'ALL', [requestParams])
 
   const oSelectedWalletAddress: O.Option<WalletAddress> = useMemo(
     () =>
       FP.pipe(
-        getRequestParams().addresses,
+        requestParams.addresses,
         O.fromNullable,
         O.chain(A.head),
         O.chain((paramAddress) =>
@@ -101,7 +101,7 @@ export const WalletHistoryView: React.FC<Props> = ({ className, historyActions }
           )
         )
       ),
-    [addresses, getRequestParams]
+    [addresses, requestParams]
   )
 
   const openViewblockUrlHandler = useCallback(async () => {
@@ -142,9 +142,9 @@ export const WalletHistoryView: React.FC<Props> = ({ className, historyActions }
       <PoolActionsHistory
         headerContent={headerContent}
         className={className}
-        currentPage={getRequestParams().page + 1}
+        currentPage={requestParams.page + 1}
         historyPageRD={historyPage}
-        prevHistoryPage={prevActionsPage}
+        prevHistoryPage={prevHistoryPage}
         openExplorerTxUrl={openExplorerTxUrl}
         changePaginationHandler={setPage}
       />

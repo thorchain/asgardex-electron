@@ -23,7 +23,10 @@ export const useMidgardHistoryActions = (itemsPerPage = 10) => {
     }
   } = useMidgardContext()
 
-  const DEFAULT_REQUEST_PARAMS: LoadActionsParams = useMemo(
+  /**
+   * Initial request params
+   */
+  const initialRequestParams: LoadActionsParams = useMemo(
     () => ({
       page: 0,
       itemsPerPage
@@ -31,45 +34,62 @@ export const useMidgardHistoryActions = (itemsPerPage = 10) => {
     [itemsPerPage]
   )
 
+  /**
+   * Initial request params
+   * It needs to be memorized to point to same `ObservableState`
+   */
   const { requestParams$, setRequestParams, getRequestParams } = useMemo(() => {
-    const { get$, set, get } = observableState<LoadActionsParams>(DEFAULT_REQUEST_PARAMS)
-
+    const { get$, set, get } = observableState<LoadActionsParams>(initialRequestParams)
     return { requestParams$: get$, setRequestParams: set, getRequestParams: get }
-  }, [DEFAULT_REQUEST_PARAMS])
+  }, [initialRequestParams])
 
+  /**
+   * Request params
+   */
+  const requestParams = useObservableState<LoadActionsParams>(requestParams$, initialRequestParams)
+
+  /**
+   * Loads history
+   * Internally it just set new request params, which triggers a new request
+   */
   const loadHistory = useCallback(
-    (partialParams: Partial<LoadActionsParams>) => {
-      const params = FP.pipe(
-        getRequestParams(),
-        // Merge new (partial) params with previous params
-        (prevParams) => ({ ...prevParams, ...partialParams })
-      )
-
-      setRequestParams(params)
-    },
+    (partialParams: Partial<LoadActionsParams>) => setRequestParams({ ...getRequestParams(), ...partialParams }),
     [getRequestParams, setRequestParams]
   )
 
+  /**
+   * Reloads history
+   * It needs to be memorized to point to same `TriggerStream`
+   */
   const { reloadHistory$, reloadHistory } = useMemo(() => {
     const { stream$, trigger } = triggerStream()
     return { reloadHistory$: stream$, reloadHistory: trigger }
   }, [])
 
-  const prevActionsPage = useRef<O.Option<ActionsPage>>(O.none)
+  /**
+   * Previous history page
+   */
+  const prevHistoryPage = useRef<O.Option<ActionsPage>>(O.none)
 
+  /**
+   * Current history page
+   */
   const [historyPage]: [ActionsPageRD, unknown] = useObservableState<ActionsPageRD>(
     () =>
       FP.pipe(
         Rx.combineLatest([requestParams$, reloadHistory$]),
         RxOp.switchMap(([parameters]) => FP.pipe(parameters, getActions$)),
         liveData.map((page) => {
-          prevActionsPage.current = O.some(page)
+          prevHistoryPage.current = O.some(page)
           return page
         })
       ),
     RD.initial
   )
 
+  /**
+   * Sets history page no. to get history data
+   */
   const setPage = useCallback(
     (page: number) => {
       loadHistory({ page: page - 1 })
@@ -77,6 +97,9 @@ export const useMidgardHistoryActions = (itemsPerPage = 10) => {
     [loadHistory]
   )
 
+  /**
+   * Sets filter to get history data based on it
+   */
   const setFilter = useCallback(
     (filter: Filter) => {
       loadHistory({
@@ -87,6 +110,9 @@ export const useMidgardHistoryActions = (itemsPerPage = 10) => {
     [loadHistory]
   )
 
+  /**
+   * Sets address to get its history data
+   */
   const setAddress = useCallback(
     ({ address }: WalletAddress) => {
       loadHistory({
@@ -100,8 +126,8 @@ export const useMidgardHistoryActions = (itemsPerPage = 10) => {
   return {
     loadHistory,
     historyPage,
-    getRequestParams,
-    prevActionsPage: prevActionsPage.current,
+    requestParams,
+    prevHistoryPage: prevHistoryPage.current,
     reloadHistory,
     setPage,
     setFilter,

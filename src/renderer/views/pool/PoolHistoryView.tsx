@@ -20,7 +20,7 @@ type Props = {
 const HISTORY_FILTERS: Filter[] = ['ALL', 'DEPOSIT', 'SWAP', 'WITHDRAW', 'DONATE', 'REFUND']
 
 export const PoolHistoryView: React.FC<Props> = ({ className, poolAsset, historyActions }) => {
-  const { loadHistory, getRequestParams, historyPage, prevActionsPage, setFilter, setPage } = historyActions
+  const { loadHistory, requestParams, historyPage, prevHistoryPage, setFilter, setPage } = historyActions
 
   const stringAsset = useMemo(() => assetToString(poolAsset), [poolAsset])
 
@@ -28,7 +28,7 @@ export const PoolHistoryView: React.FC<Props> = ({ className, poolAsset, history
     loadHistory({ asset: stringAsset })
   }, [loadHistory, stringAsset])
 
-  const currentFilter = getRequestParams().type || 'ALL'
+  const currentFilter = requestParams.type || 'ALL'
 
   const openRuneExplorerTxUrl: OpenExplorerTxUrl = useOpenExplorerTxUrl(O.some(THORChain))
 
@@ -48,9 +48,9 @@ export const PoolHistoryView: React.FC<Props> = ({ className, poolAsset, history
     <PoolActionsHistory
       className={className}
       headerContent={headerContent}
-      currentPage={getRequestParams().page + 1}
+      currentPage={requestParams.page + 1}
       historyPageRD={historyPage}
-      prevHistoryPage={prevActionsPage}
+      prevHistoryPage={prevHistoryPage}
       openExplorerTxUrl={openRuneExplorerTxUrl}
       changePaginationHandler={setPage}
     />

@@ -2,5 +2,5 @@ import { UseMidgardHistoryActions } from '../../../hooks/useMidgardHistoryAction
 
 export type WalletHistoryActions = Pick<
   UseMidgardHistoryActions,
-  'getRequestParams' | 'loadHistory' | 'historyPage' | 'prevActionsPage' | 'setFilter' | 'setAddress' | 'setPage'
+  'requestParams' | 'loadHistory' | 'historyPage' | 'prevHistoryPage' | 'setFilter' | 'setAddress' | 'setPage'
 >
