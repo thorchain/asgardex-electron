@@ -23,6 +23,7 @@ export type CommonMessageKey =
   | 'common.submit'
   | 'common.confirm'
   | 'common.cancel'
+  | 'common.reject'
   | 'common.next'
   | 'common.finish'
   | 'common.copy'
@@ -200,8 +201,7 @@ type WalletMessageKey =
   | 'wallet.validations.graterThen'
   | 'wallet.validations.shouldNotBeEmpty'
   | 'wallet.ledger.verifyAddress.modal.title'
-  | 'wallet.ledger.verifyAddress.modal.verifyAddress'
-  | 'wallet.ledger.verifyAddress.modal.onYourDevice'
+  | 'wallet.ledger.verifyAddress.modal.description'
 
 export type WalletMessages = { [key in WalletMessageKey]: string }
 

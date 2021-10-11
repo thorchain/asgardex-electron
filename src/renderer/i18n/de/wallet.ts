@@ -85,8 +85,7 @@ const wallet: WalletMessages = {
   'wallet.validations.graterThen': 'Der eingegebene Betrag sollte höher als {amount} betragen',
   'wallet.validations.shouldNotBeEmpty': 'Der eingegebene Werte sollte nicht leer sein.',
   'wallet.ledger.verifyAddress.modal.title': 'Verify Ledger Address',
-  'wallet.ledger.verifyAddress.modal.verifyAddress': 'Verify address',
-  'wallet.ledger.verifyAddress.modal.onYourDevice': 'on your device'
+  'wallet.ledger.verifyAddress.modal.description': 'Überprüfe die Addresse {ledgerAddress} auf Deinem Ledger'
 }
 
 export default wallet

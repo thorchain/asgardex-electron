@@ -83,8 +83,7 @@ const wallet: WalletMessages = {
   'wallet.validations.graterThen': 'Должно быть больше, чем {value}',
   'wallet.validations.shouldNotBeEmpty': 'Не должно быть пустым',
   'wallet.ledger.verifyAddress.modal.title': 'Verify Ledger Address',
-  'wallet.ledger.verifyAddress.modal.verifyAddress': 'Verify address',
-  'wallet.ledger.verifyAddress.modal.onYourDevice': 'on your device'
+  'wallet.ledger.verifyAddress.modal.description': 'Verify address {ledgerAddress} on your device - RU'
 }
 
 export default wallet

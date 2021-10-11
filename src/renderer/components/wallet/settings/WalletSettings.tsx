@@ -2,11 +2,11 @@ import React, { useCallback, useMemo, useState } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
 import { Address } from '@xchainjs/xchain-client'
-import { Asset, Chain } from '@xchainjs/xchain-util'
+import { Asset, Chain, THORChain } from '@xchainjs/xchain-util'
 import { Col, List, Row } from 'antd'
 import * as FP from 'fp-ts/function'
 import * as O from 'fp-ts/lib/Option'
-import { useIntl } from 'react-intl'
+import { FormattedMessage, useIntl } from 'react-intl'
 
 import { Network } from '../../../../shared/api/types'
 import { isLedgerWallet } from '../../../../shared/utils/guard'
@@ -144,12 +144,15 @@ export const WalletSettings: React.FC<Props> = (props): JSX.Element => {
                   {isLedgerWallet(walletType) && (
                     <Styled.EyeOutlined
                       onClick={() => {
-                        setAddressToVerify(address)
+                        setAddressToVerify({
+                          address,
+                          chain
+                        })
                         verifyLedgerAddress(chain, walletIndex)
-                        setVerifyAddressModalVisible(true)
                       }}
                     />
                   )}
+
                   {isLedgerWallet(walletType) && <Styled.RemoveLedgerIcon onClick={() => removeLedgerAddress(chain)} />}
                 </>
               )
@@ -169,37 +172,46 @@ export const WalletSettings: React.FC<Props> = (props): JSX.Element => {
     ]
   )
 
-  const [verifyAddressModalVisible, setVerifyAddressModalVisible] = useState(false)
-  const [addressToVerify, setAddressToVerify] = useState('')
-
+  const DEFAULT_ADDRESS_TO_VERIFY = useMemo(() => {
+    return {
+      address: '',
+      chain: THORChain
+    }
+  }, [])
+  const [addressToVerify, setAddressToVerify] = useState(DEFAULT_ADDRESS_TO_VERIFY)
   const renderVerifyAddressModal = useCallback(
     (ledgerAddress) => (
       <Modal
         title={intl.formatMessage({ id: 'wallet.ledger.verifyAddress.modal.title' })}
-        visible={verifyAddressModalVisible}
-        onOk={() => {
-          setVerifyAddressModalVisible(false)
-          setAddressToVerify('')
-        }}
+        visible={addressToVerify.address !== ''}
+        onOk={() => setAddressToVerify(DEFAULT_ADDRESS_TO_VERIFY)}
         onCancel={() => {
-          setVerifyAddressModalVisible(false)
-          setAddressToVerify('')
+          setAddressToVerify(DEFAULT_ADDRESS_TO_VERIFY)
+          removeLedgerAddress(addressToVerify.chain)
         }}
         maskClosable={false}
         closable={true}
         okText={intl.formatMessage({ id: 'common.confirm' })}
         okButtonProps={{ autoFocus: true }}
-        cancelText={intl.formatMessage({ id: 'common.cancel' })}>
+        cancelText={intl.formatMessage({ id: 'common.reject' })}>
         <div style={{ textAlign: 'center' }}>
-          {intl.formatMessage({ id: 'wallet.ledger.verifyAddress.modal.verifyAddress' })}
-          <br />
-          <b>{ledgerAddress}</b>
-          <br />
-          {intl.formatMessage({ id: 'wallet.ledger.verifyAddress.modal.onYourDevice' })}
+          <FormattedMessage
+            id="wallet.ledger.verifyAddress.modal.description"
+            defaultMessage="Verify address {ledgerAddress} on your device"
+            values={{
+              ledgerAddress: (
+                <>
+                  <br />
+                  <b>{ledgerAddress.address}</b>
+                  <br />
+                </>
+              )
+            }}
+          />
         </div>
       </Modal>
     ),
-    [intl, verifyAddressModalVisible]
+    [DEFAULT_ADDRESS_TO_VERIFY, addressToVerify.address, addressToVerify.chain, intl, removeLedgerAddress]
   )
 
   const accounts = useMemo(
@@ -208,7 +220,6 @@ export const WalletSettings: React.FC<Props> = (props): JSX.Element => {
         oWalletAccounts,
         O.map((walletAccounts) => (
           <Col key={'accounts'} span={24}>
-            {renderVerifyAddressModal(addressToVerify)}
             <Styled.Subtitle>{intl.formatMessage({ id: 'setting.account.management' })}</Styled.Subtitle>
             <Styled.AccountCard>
               <List
@@ -236,7 +247,7 @@ export const WalletSettings: React.FC<Props> = (props): JSX.Element => {
         )),
         O.getOrElse(() => <></>)
       ),
-    [oWalletAccounts, renderVerifyAddressModal, addressToVerify, intl, renderAddress]
+    [oWalletAccounts, intl, renderAddress]
   )
 
   return (
@@ -265,6 +276,7 @@ export const WalletSettings: React.FC<Props> = (props): JSX.Element => {
       {renderQRCodeModal}
       <Styled.Row gutter={[16, 16]}>
         <Col span={24}>
+          {renderVerifyAddressModal(addressToVerify)}
           <Styled.Subtitle>{intl.formatMessage({ id: 'setting.wallet.management' })}</Styled.Subtitle>
           <Styled.Card>
             <Row style={{ flex: 1, alignItems: 'center' }}>
