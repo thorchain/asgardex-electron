@@ -6,7 +6,7 @@ import { Asset, Chain } from '@xchainjs/xchain-util'
 import { Col, List, Row } from 'antd'
 import * as FP from 'fp-ts/function'
 import * as O from 'fp-ts/lib/Option'
-import { useIntl } from 'react-intl'
+import { FormattedMessage, useIntl } from 'react-intl'
 
 import { Network } from '../../../../shared/api/types'
 import { isLedgerWallet } from '../../../../shared/utils/guard'
@@ -20,6 +20,7 @@ import { getChainAsset, isBnbChain } from '../../../helpers/chainHelper'
 import { ValidatePasswordHandler, WalletAccounts, WalletAddressAsync } from '../../../services/wallet/types'
 import { walletTypeToI18n } from '../../../services/wallet/util'
 import { InfoIcon } from '../../uielements/info'
+import { Modal } from '../../uielements/modal'
 import * as Styled from './WalletSettings.styles'
 
 type Props = {
@@ -36,6 +37,8 @@ type Props = {
   clickAddressLinkHandler: (chain: Chain, address: Address) => void
   validatePassword$: ValidatePasswordHandler
 }
+
+type AddressToVerify = O.Option<{ address: Address; chain: Chain }>
 
 export const WalletSettings: React.FC<Props> = (props): JSX.Element => {
   const intl = useIntl()
@@ -141,8 +144,19 @@ export const WalletSettings: React.FC<Props> = (props): JSX.Element => {
                   <Styled.QRCodeIcon onClick={() => setShowQRModal(O.some({ asset: getChainAsset(chain), address }))} />
                   <Styled.AddressLinkIcon onClick={() => clickAddressLinkHandler(chain, address)} />
                   {isLedgerWallet(walletType) && (
-                    <Styled.EyeOutlined onClick={() => verifyLedgerAddress(chain, walletIndex)} />
+                    <Styled.EyeOutlined
+                      onClick={() => {
+                        setAddressToVerify(
+                          O.some({
+                            address,
+                            chain
+                          })
+                        )
+                        verifyLedgerAddress(chain, walletIndex)
+                      }}
+                    />
                   )}
+
                   {isLedgerWallet(walletType) && <Styled.RemoveLedgerIcon onClick={() => removeLedgerAddress(chain)} />}
                 </>
               )
@@ -160,6 +174,43 @@ export const WalletSettings: React.FC<Props> = (props): JSX.Element => {
       verifyLedgerAddress,
       walletIndex
     ]
+  )
+
+  const [addressToVerify, setAddressToVerify] = useState<AddressToVerify>(O.none)
+
+  const renderVerifyAddressModal = useCallback(
+    (oAddress: AddressToVerify) =>
+      FP.pipe(
+        oAddress,
+        O.fold(
+          () => <></>,
+          ({ address, chain }) => (
+            <Modal
+              title={intl.formatMessage({ id: 'wallet.ledger.verifyAddress.modal.title' })}
+              visible={true}
+              onOk={() => setAddressToVerify(O.none)}
+              onCancel={() => {
+                removeLedgerAddress(chain)
+                setAddressToVerify(O.none)
+              }}
+              maskClosable={false}
+              closable={false}
+              okText={intl.formatMessage({ id: 'common.confirm' })}
+              okButtonProps={{ autoFocus: true }}
+              cancelText={intl.formatMessage({ id: 'common.reject' })}>
+              <div style={{ textAlign: 'center' }}>
+                <FormattedMessage
+                  id="wallet.ledger.verifyAddress.modal.description"
+                  values={{
+                    address: <Styled.AddressToVerifyLabel>{address}</Styled.AddressToVerifyLabel>
+                  }}
+                />
+              </div>
+            </Modal>
+          )
+        )
+      ),
+    [intl, removeLedgerAddress]
   )
 
   const accounts = useMemo(
@@ -195,7 +246,7 @@ export const WalletSettings: React.FC<Props> = (props): JSX.Element => {
         )),
         O.getOrElse(() => <></>)
       ),
-    [renderAddress, intl, oWalletAccounts]
+    [oWalletAccounts, intl, renderAddress]
   )
 
   return (
@@ -224,6 +275,7 @@ export const WalletSettings: React.FC<Props> = (props): JSX.Element => {
       {renderQRCodeModal}
       <Styled.Row gutter={[16, 16]}>
         <Col span={24}>
+          {renderVerifyAddressModal(addressToVerify)}
           <Styled.Subtitle>{intl.formatMessage({ id: 'setting.wallet.management' })}</Styled.Subtitle>
           <Styled.Card>
             <Row style={{ flex: 1, alignItems: 'center' }}>

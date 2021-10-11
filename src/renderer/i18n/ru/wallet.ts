@@ -81,7 +81,9 @@ const wallet: WalletMessages = {
   'wallet.upgrade.feeError': 'Комиссия для обновлния {fee} не покрывается вашим текущим балансом {balance}',
   'wallet.validations.lessThen': 'Должно быть меньше, чем {value}',
   'wallet.validations.graterThen': 'Должно быть больше, чем {value}',
-  'wallet.validations.shouldNotBeEmpty': 'Не должно быть пустым'
+  'wallet.validations.shouldNotBeEmpty': 'Не должно быть пустым',
+  'wallet.ledger.verifyAddress.modal.title': 'Verify Ledger Address',
+  'wallet.ledger.verifyAddress.modal.description': 'Verify address {address} on your device - RU'
 }
 
 export default wallet

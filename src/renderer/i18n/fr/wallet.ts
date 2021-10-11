@@ -81,7 +81,9 @@ const wallet: WalletMessages = {
   'wallet.upgrade.feeError': 'Les frais supplémentaires {fee} ne sont pas couverts par votre solde {balance}',
   'wallet.validations.lessThen': 'Devrait être inférieur à {value}',
   'wallet.validations.graterThen': 'Devrait être supérieur à {value}',
-  'wallet.validations.shouldNotBeEmpty': 'Ne devrait pas être vide'
+  'wallet.validations.shouldNotBeEmpty': 'Ne devrait pas être vide',
+  'wallet.ledger.verifyAddress.modal.title': 'Verify Ledger Address',
+  'wallet.ledger.verifyAddress.modal.description': 'Verify address {address} on your device - FR'
 }
 
 export default wallet
