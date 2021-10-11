@@ -2,7 +2,7 @@ import React, { useCallback, useMemo, useState } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
 import { Address } from '@xchainjs/xchain-client'
-import { Asset, Chain, THORChain } from '@xchainjs/xchain-util'
+import { Asset, Chain } from '@xchainjs/xchain-util'
 import { Col, List, Row } from 'antd'
 import * as FP from 'fp-ts/function'
 import * as O from 'fp-ts/lib/Option'
@@ -37,6 +37,8 @@ type Props = {
   clickAddressLinkHandler: (chain: Chain, address: Address) => void
   validatePassword$: ValidatePasswordHandler
 }
+
+type AddressToVerify = O.Option<{ address: Address; chain: Chain }>
 
 export const WalletSettings: React.FC<Props> = (props): JSX.Element => {
   const intl = useIntl()
@@ -144,10 +146,12 @@ export const WalletSettings: React.FC<Props> = (props): JSX.Element => {
                   {isLedgerWallet(walletType) && (
                     <Styled.EyeOutlined
                       onClick={() => {
-                        setAddressToVerify({
-                          address,
-                          chain
-                        })
+                        setAddressToVerify(
+                          O.some({
+                            address,
+                            chain
+                          })
+                        )
                         verifyLedgerAddress(chain, walletIndex)
                       }}
                     />
@@ -172,46 +176,41 @@ export const WalletSettings: React.FC<Props> = (props): JSX.Element => {
     ]
   )
 
-  const DEFAULT_ADDRESS_TO_VERIFY = useMemo(() => {
-    return {
-      address: '',
-      chain: THORChain
-    }
-  }, [])
-  const [addressToVerify, setAddressToVerify] = useState(DEFAULT_ADDRESS_TO_VERIFY)
+  const [addressToVerify, setAddressToVerify] = useState<AddressToVerify>(O.none)
+
   const renderVerifyAddressModal = useCallback(
-    (ledgerAddress) => (
-      <Modal
-        title={intl.formatMessage({ id: 'wallet.ledger.verifyAddress.modal.title' })}
-        visible={addressToVerify.address !== ''}
-        onOk={() => setAddressToVerify(DEFAULT_ADDRESS_TO_VERIFY)}
-        onCancel={() => {
-          setAddressToVerify(DEFAULT_ADDRESS_TO_VERIFY)
-          removeLedgerAddress(addressToVerify.chain)
-        }}
-        maskClosable={false}
-        closable={true}
-        okText={intl.formatMessage({ id: 'common.confirm' })}
-        okButtonProps={{ autoFocus: true }}
-        cancelText={intl.formatMessage({ id: 'common.reject' })}>
-        <div style={{ textAlign: 'center' }}>
-          <FormattedMessage
-            id="wallet.ledger.verifyAddress.modal.description"
-            defaultMessage="Verify address {ledgerAddress} on your device"
-            values={{
-              ledgerAddress: (
-                <>
-                  <br />
-                  <b>{ledgerAddress.address}</b>
-                  <br />
-                </>
-              )
-            }}
-          />
-        </div>
-      </Modal>
-    ),
-    [DEFAULT_ADDRESS_TO_VERIFY, addressToVerify.address, addressToVerify.chain, intl, removeLedgerAddress]
+    (oAddress: AddressToVerify) =>
+      FP.pipe(
+        oAddress,
+        O.fold(
+          () => <></>,
+          ({ address, chain }) => (
+            <Modal
+              title={intl.formatMessage({ id: 'wallet.ledger.verifyAddress.modal.title' })}
+              visible={true}
+              onOk={() => setAddressToVerify(O.none)}
+              onCancel={() => {
+                removeLedgerAddress(chain)
+                setAddressToVerify(O.none)
+              }}
+              maskClosable={false}
+              closable={true}
+              okText={intl.formatMessage({ id: 'common.confirm' })}
+              okButtonProps={{ autoFocus: true }}
+              cancelText={intl.formatMessage({ id: 'common.reject' })}>
+              <div style={{ textAlign: 'center' }}>
+                <FormattedMessage
+                  id="wallet.ledger.verifyAddress.modal.description"
+                  values={{
+                    address: <Styled.AddressToVerifyLabel>{address}</Styled.AddressToVerifyLabel>
+                  }}
+                />
+              </div>
+            </Modal>
+          )
+        )
+      ),
+    [intl, removeLedgerAddress]
   )
 
   const accounts = useMemo(

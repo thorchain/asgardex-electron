@@ -83,7 +83,7 @@ const wallet: WalletMessages = {
   'wallet.validations.graterThen': 'Devrait être supérieur à {value}',
   'wallet.validations.shouldNotBeEmpty': 'Ne devrait pas être vide',
   'wallet.ledger.verifyAddress.modal.title': 'Verify Ledger Address',
-  'wallet.ledger.verifyAddress.modal.description': 'Verify address {ledgerAddress} on your device - FR'
+  'wallet.ledger.verifyAddress.modal.description': 'Verify address {address} on your device - FR'
 }
 
 export default wallet

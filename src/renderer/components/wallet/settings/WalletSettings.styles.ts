@@ -265,3 +265,10 @@ export const WalletIndexInput = styled(A.InputNumber)`
   margin-right: 5px;
   max-width: 45px;
 `
+
+export const AddressToVerifyLabel = styled.span`
+  display: block;
+  color: inherit;
+  font-family: 'MainFontBold';
+  font-size: 14px;
+`
