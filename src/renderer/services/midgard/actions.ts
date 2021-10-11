@@ -34,7 +34,7 @@ export const createActionsService = (
             offset: itemsPerPage * page
           }),
           RxOp.catchError((): Rx.Observable<InlineResponse200> => Rx.of({ actions: [], count: '0' })),
-          RxOp.map(RD.success),
+          RxOp.switchMap((response) => Rx.of(RD.success(response))),
           liveData.map(({ actions, count }) => ({
             actions: FP.pipe(actions, A.map(mapAction)),
             total: parseInt(count, 10)
