@@ -7,7 +7,10 @@ import { palette } from 'styled-theme'
 import { ReactComponent as RemoveIcon } from '../../../assets/svg/icon-remove.svg'
 import { AddressEllipsis as AddressEllipsisUI } from '../../../components/uielements/addressEllipsis'
 import { Button as UIButton } from '../../../components/uielements/button'
-import { ExternalLinkIcon as ExternalLinkIconUI } from '../../../components/uielements/common/Common.styles'
+import {
+  ExternalLinkIcon as ExternalLinkIconUI,
+  WalletTypeLabel as WalletTypeLabelUI
+} from '../../../components/uielements/common/Common.styles'
 import { Label as UILabel } from '../../../components/uielements/label'
 
 export const ContainerWrapper = styled.div`
@@ -137,7 +140,7 @@ export const AccountTitle = styled(UILabel)`
   padding: 0px;
   text-transform: uppercase;
   font-weight: normal;
-  font-size: 18px;
+  font-size: 27px;
   line-height: 25px;
   letter-spacing: 2px;
 `
@@ -272,4 +275,8 @@ export const AddressToVerifyLabel = styled.span`
   font-family: 'MainFontBold';
   font-size: 16px;
   text-transform: none;
+`
+
+export const WalletTypeLabel = styled(WalletTypeLabelUI)`
+  margin: 15px 0px 0px 40px;
 `
