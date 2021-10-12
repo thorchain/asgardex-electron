@@ -4,6 +4,7 @@ import { TxHash } from '@xchainjs/xchain-client'
 import * as A from 'fp-ts/Array'
 import * as FP from 'fp-ts/function'
 import * as O from 'fp-ts/Option'
+import { GetRowKey } from 'rc-table/lib/interface'
 import { FormattedDate, FormattedTime } from 'react-intl'
 
 import { Action, Actions, ActionsPage, Tx } from '../../services/midgard/types'
@@ -36,12 +37,12 @@ export const renderDate = (date: Date) => (
   </Styled.DateContainer>
 )
 
-export const getRowKey = (action: Action) =>
+export const getRowKey: GetRowKey<Action> = (action, index) =>
   FP.pipe(
     action,
     getTxId,
-    O.map(FP.identity),
-    O.getOrElse(() => `${action.date.toString()}-${action.type}`)
+    O.map((txHash) => `${txHash}-${index}`),
+    O.getOrElse(() => `${action.date.toString()}-${action.type}-${index}`)
   )
 
 export const emptyData: ActionsPage = { total: 0, actions: [] as Actions }
