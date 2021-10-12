@@ -1,3 +1,21 @@
+# 0.4.4 (2021-10-12)
+
+## Add
+
+- [Ledger] Open modal to verify Ledger address [#1841](https://github.com/thorchain/asgardex-electron/pull/1841)
+- [Upgrade] Add recipient address field [#1836](https://github.com/thorchain/asgardex-electron/pull/1836)
+- [Wallet] Get history data depending on selected address [#1838](https://github.com/thorchain/asgardex-electron/pull/1838)
+
+## Fix
+
+- [Upgrade] Fix BNB fee warning [#1835](https://github.com/thorchain/asgardex-electron/pull/1835)
+- [Swap] Increase padding in order to show XRUNE asset properly [#1840](https://github.com/thorchain/asgardex-electron/pull/1840)
+
+## Internal
+
+- Introduce useMidgardHistoryActions hook [#1842](https://github.com/thorchain/asgardex-electron/pull/1842)
+- [History] Create custom component to select addresses [#1818](https://github.com/thorchain/asgardex-electron/pull/1818)
+
 # 0.4.3 (2021-10-06)
 
 ## Update
