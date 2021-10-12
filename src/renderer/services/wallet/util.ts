@@ -74,7 +74,7 @@ export const walletTypeToI18n = (type: WalletType, intl: IntlShape) => {
     case 'ledger':
       return intl.formatMessage({ id: 'ledger.title' })
     case 'keystore':
-      return intl.formatMessage({ id: 'wallet.main.title' })
+      return intl.formatMessage({ id: 'common.keystore' })
     default:
       return `Unknown ${type}`
   }
