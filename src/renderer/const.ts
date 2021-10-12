@@ -11,7 +11,14 @@ import {
   AssetRuneERC20Testnet,
   ETHChain,
   BNBChain,
-  AssetRune67C
+  AssetRune67C,
+  THORChain,
+  BTCChain,
+  LTCChain,
+  BCHChain,
+  Chain,
+  PolkadotChain,
+  CosmosChain
 } from '@xchainjs/xchain-util'
 
 import { Network } from '../shared/api/types'
@@ -162,9 +169,23 @@ export const USD_PRICE_ASSETS: PricePoolAssets = [
   AssetUSDC
 ]
 
+// Weight of chains
+// Needed for ordering chain related things (wallets, balances etc.)
+// The higher the value the higher the weight
+export const CHAIN_WEIGHTS: Record<Chain, number> = {
+  [THORChain]: 0,
+  [BTCChain]: 1,
+  [BCHChain]: 2,
+  [LTCChain]: 3,
+  [ETHChain]: 4,
+  [BNBChain]: 5,
+  [CosmosChain]: 6,
+  [PolkadotChain]: 7
+}
+
 // Weight of currencies needed for pricing
 // The higher the value the higher the weight
-export const CURRENCY_WHEIGHTS: PricePoolCurrencyWeights = {
+export const CURRENCY_WEIGHTS: PricePoolCurrencyWeights = {
   [assetToString(AssetBUSDBAF)]: 0,
   [assetToString(AssetBUSDBD1)]: 1,
   [assetToString(AssetBUSD74E)]: 2,

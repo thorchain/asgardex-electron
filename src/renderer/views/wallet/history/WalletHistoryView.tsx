@@ -16,6 +16,7 @@ import { WalletPoolActionsHistoryHeader } from '../../../components/poolActionsH
 import { useChainContext } from '../../../contexts/ChainContext'
 import { useWalletContext } from '../../../contexts/WalletContext'
 import { eqString } from '../../../helpers/fp/eq'
+import { ordWalletAddressByChain } from '../../../helpers/fp/ord'
 import { useNetwork } from '../../../hooks/useNetwork'
 import { useOpenExplorerTxUrl } from '../../../hooks/useOpenExplorerTxUrl'
 import { ENABLED_CHAINS } from '../../../services/const'
@@ -61,30 +62,26 @@ export const WalletHistoryView: React.FC<Props> = ({ className, historyActions }
     [getLedgerAddress$, network]
   )
 
-  // Combine addresses and update selected address
   const addresses$ = useMemo(
-    () => FP.pipe(Rx.combineLatest([keystoreAddresses$, ledgerAddresses$]), RxOp.map(A.flatten)),
-    [keystoreAddresses$, ledgerAddresses$]
-  )
-
-  // Reload history whenever addresses have been changed
-  const [addresses] = useObservableState(
     () =>
       FP.pipe(
-        addresses$,
-        RxOp.map((addresses) => {
+        Rx.combineLatest([keystoreAddresses$, ledgerAddresses$]),
+        RxOp.map(A.flatten),
+        RxOp.map(A.sort(ordWalletAddressByChain)),
+        RxOp.switchMap((addresses) => {
           FP.pipe(
             addresses,
             // Get first address by default
             A.head,
             O.map(({ address }) => loadHistory({ addresses: [address] }))
           )
-
-          return addresses
+          return Rx.of(addresses)
         })
       ),
-    []
+    [keystoreAddresses$, ledgerAddresses$, loadHistory]
   )
+
+  const addresses = useObservableState(addresses$, [])
 
   const currentFilter = useMemo(() => requestParams.type || 'ALL', [requestParams])
 
