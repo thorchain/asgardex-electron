@@ -2,7 +2,6 @@
 
 ## Add
 
-- [Ledger] Show address on Ledger by adding a new device [#1837](https://github.com/thorchain/asgardex-electron/pull/1837)
 - [Ledger] Open modal to verify Ledger address [#1841](https://github.com/thorchain/asgardex-electron/pull/1841)
 - [Upgrade] Add recipient address field [#1836](https://github.com/thorchain/asgardex-electron/pull/1836)
 - [Wallet] Get history data depending on selected address [#1838](https://github.com/thorchain/asgardex-electron/pull/1838)
