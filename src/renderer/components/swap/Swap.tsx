@@ -411,7 +411,7 @@ export const Swap = ({
   )
 
   // whenever `oApproveParams` has been updated,
-  // `approveFeesParamsUpdated` needs to be called to update `approveFeesRD`
+  // `approveFeeParamsUpdated` needs to be called to update `approveFeesRD`
   useEffect(() => {
     FP.pipe(
       oApproveParams,

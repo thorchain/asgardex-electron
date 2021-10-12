@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo } from 'react'
+import React, { useCallback } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
 import * as FP from 'fp-ts/function'
@@ -12,34 +12,6 @@ import { TxDetail } from '../uielements/txDetail'
 import { DEFAULT_PAGE_SIZE } from './PoolActionsHistory.const'
 import * as H from './PoolActionsHistory.helper'
 import * as Styled from './PoolActionsHistoryList.styles'
-
-const renderItem = (goToTx: (txId: string) => void) => (action: Action) => {
-  const date = H.renderDate(action.date)
-
-  const titleExtra = (
-    <>
-      {date}
-      {FP.pipe(
-        action,
-        H.getTxId,
-        O.map((id) => (
-          <Styled.GoToButton key="go" onClick={() => goToTx(id)}>
-            <Styled.InfoArrow />
-          </Styled.GoToButton>
-        )),
-        O.getOrElse(() => <></>)
-      )}
-    </>
-  )
-
-  return (
-    <Styled.ListItem key={H.getRowKey(action)}>
-      <Styled.Card title={<Styled.TxType type={action.type} />} extra={titleExtra}>
-        <TxDetail type={action.type} date={date} incomes={H.getValues(action.in)} outgos={H.getValues(action.out)} />
-      </Styled.Card>
-    </Styled.ListItem>
-  )
-}
 
 type Props = {
   currentPage: number
@@ -58,12 +30,44 @@ export const PoolActionsHistoryList: React.FC<Props> = ({
   currentPage,
   className
 }) => {
-  const renderListItem = useMemo(() => renderItem(goToTx), [goToTx])
+  const renderListItem = useCallback((action: Action, index: number, goToTx: OpenExplorerTxUrl) => {
+    const date = H.renderDate(action.date)
+
+    const titleExtra = (
+      <>
+        {date}
+        {FP.pipe(
+          action,
+          H.getTxId,
+          O.map((id) => (
+            <Styled.GoToButton key="go" onClick={() => goToTx(id)}>
+              <Styled.InfoArrow />
+            </Styled.GoToButton>
+          )),
+          O.getOrElse(() => <></>)
+        )}
+      </>
+    )
+
+    return (
+      <Styled.ListItem key={H.getRowKey(action, index)}>
+        <Styled.Card title={<Styled.TxType type={action.type} />} extra={titleExtra}>
+          <TxDetail type={action.type} date={date} incomes={H.getValues(action.in)} outgos={H.getValues(action.out)} />
+        </Styled.Card>
+      </Styled.ListItem>
+    )
+  }, [])
+
   const renderList = useCallback(
     ({ total, actions }: ActionsPage, loading = false) => {
       return (
         <>
-          <Styled.List loading={loading} itemLayout="vertical" dataSource={actions} renderItem={renderListItem} />
+          <Styled.List
+            loading={loading}
+            itemLayout="vertical"
+            dataSource={actions}
+            renderItem={(action, index) => renderListItem(action, index, goToTx)}
+          />
           {total > 0 && (
             <Pagination
               current={currentPage}
@@ -76,7 +80,7 @@ export const PoolActionsHistoryList: React.FC<Props> = ({
         </>
       )
     },
-    [changePaginationHandler, renderListItem, currentPage]
+    [currentPage, changePaginationHandler, renderListItem, goToTx]
   )
 
   return (
