@@ -40,7 +40,7 @@ export const AccountAddressSelector: React.FC<Props> = (props) => {
   const intl = useIntl()
 
   const menu = useMemo(() => {
-    const highlight = (address: WalletAddress) =>
+    const isSelected = (address: WalletAddress) =>
       FP.pipe(
         oSelectedAddress,
         O.fold(
@@ -55,13 +55,14 @@ export const AccountAddressSelector: React.FC<Props> = (props) => {
           addresses,
           A.map((walletAddress) => {
             const { address, type, chain } = walletAddress
+            const selected = isSelected(walletAddress)
             return (
               <Styled.MenuItem key={address} onClick={() => onChangeAddress(walletAddress)}>
-                <Styled.MenuItemWrapper key={address} highlighted={highlight(walletAddress)}>
+                <Styled.MenuItemWrapper key={address} selected={selected}>
                   <Styled.AssetIcon asset={getChainAsset(chain)} size={size} network={network} />
                   <Styled.WalletAddress>{address}</Styled.WalletAddress>
                   {isLedgerWallet(type) && (
-                    <Styled.WalletTypeLabel>{walletTypeToI18n(type, intl)}</Styled.WalletTypeLabel>
+                    <Styled.WalletTypeLabel selected={selected}>{walletTypeToI18n(type, intl)}</Styled.WalletTypeLabel>
                   )}
                 </Styled.MenuItemWrapper>
               </Styled.MenuItem>

@@ -277,6 +277,11 @@ export const AddressToVerifyLabel = styled.span`
   text-transform: none;
 `
 
+export const AccountAddressWrapper = styled.div`
+  margin-top: 10px;
+`
+
 export const WalletTypeLabel = styled(WalletTypeLabelUI)`
-  margin: 15px 0px 0px 40px;
+  margin-left: 40px;
+  display: inline-block;
 `

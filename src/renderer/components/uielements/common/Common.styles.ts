@@ -18,9 +18,11 @@ export const WalletTypeLabel = styled(UILabel).attrs({
   size: 'small'
 })`
   font-family: 'MainFontRegular';
-  color: ${palette('color', 2)};
-  background: ${palette('gray', 1)};
+  color: ${palette('text', 2)};
+
+  background: ${palette('gray', 0)};
+  text-shadow: 1px 1px 1px ${palette('background', 1)};
   border-radius: 5px;
-  padding: 1px 3px;
+  padding: 1px 7px;
   width: auto;
 `
