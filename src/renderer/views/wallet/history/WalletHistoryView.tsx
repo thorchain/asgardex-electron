@@ -18,24 +18,26 @@ import { useChainContext } from '../../../contexts/ChainContext'
 import { useWalletContext } from '../../../contexts/WalletContext'
 import { eqString } from '../../../helpers/fp/eq'
 import { ordWalletAddressByChain } from '../../../helpers/fp/ord'
+import { TriggerStream } from '../../../helpers/stateHelper'
+import { useMidgardHistoryActions } from '../../../hooks/useMidgardHistoryActions'
 import { useNetwork } from '../../../hooks/useNetwork'
 import { useOpenAddressUrl } from '../../../hooks/useOpenAddressUrl'
 import { useOpenExplorerTxUrl } from '../../../hooks/useOpenExplorerTxUrl'
 import { ENABLED_CHAINS } from '../../../services/const'
-import { WalletHistoryActions } from './WalletHistoryView.types'
 
 const HISTORY_FILTERS: Filter[] = ['ALL', 'SWITCH', 'DEPOSIT', 'SWAP', 'WITHDRAW', 'DONATE', 'REFUND']
 
 export type Props = {
   className?: string
-  historyActions: WalletHistoryActions
+  reloadHistory: TriggerStream
 }
-export const WalletHistoryView: React.FC<Props> = ({ className, historyActions }) => {
+export const WalletHistoryView: React.FC<Props> = ({ className, reloadHistory }) => {
   const { network } = useNetwork()
 
   const { addressByChain$ } = useChainContext()
 
-  const { requestParams, loadHistory, historyPage, prevHistoryPage, setFilter, setAddress, setPage } = historyActions
+  const { requestParams, loadHistory, historyPage, prevHistoryPage, setFilter, setAddress, setPage } =
+    useMidgardHistoryActions(10, reloadHistory)
 
   const openExplorerTxUrl = useOpenExplorerTxUrl(O.some(THORChain))
 
@@ -100,7 +102,7 @@ export const WalletHistoryView: React.FC<Props> = ({ className, historyActions }
           )
         )
       ),
-    [addresses, requestParams]
+    [addresses, requestParams.addresses]
   )
 
   const openAddressUrl = useOpenAddressUrl(THORChain)

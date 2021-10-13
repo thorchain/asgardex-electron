@@ -16,17 +16,17 @@ export const Menu = styled(A.Menu)`
     }
 
     &-selected {
-      background: ${palette('gray', 1)};
+      background: ${palette('background', 2)};
     }
   }
 `
 
 export const FilterButton = styled(Button).attrs({ typevalue: 'outline' })`
   & .anticon-caret-down {
-    transition: transform 0.3s;
-    transform: translateY(0px);
     width: 14px;
     height: 14px;
+    transition: transform 0.3s;
+    transform: translateY(0px);
     position: absolute !important;
     right: 7px;
 

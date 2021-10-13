@@ -6,14 +6,14 @@ import { palette } from 'styled-theme'
 import { AssetIcon as AssetIconUI } from '../uielements/assets/assetIcon/AssetIcon'
 import { WalletTypeLabel as WalletTypeLabelUI } from '../uielements/common/Common.styles'
 
-export const DropdownSelectorWrapper = styled.div`
+export const DropdownSelectorWrapper = styled.div<{ disabled: boolean }>`
   display: flex;
   flex-direction: row;
   align-items: center;
   border: 1px solid ${palette('primary', 0)};
   border-radius: 5px;
   padding-left: 7px;
-  cursor: pointer;
+  cursor: ${({ disabled }) => (disabled ? 'not-allowed' : 'pointer')};
 
   & .anticon-caret-down {
     transition: transform 0.3s;
@@ -52,14 +52,16 @@ export const CaretDownOutlined = styled(CaretDownOutlinedUI)`
 
 export const Menu = styled(MenuUI)`
   background-color: ${palette('background', 0)};
+
   & .ant-dropdown-menu-item {
     &:hover,
     &:focus,
     &:active {
-      background: ${palette('background', 0)};
+      background: ${palette('background', 2)};
     }
+
     &-selected {
-      background: ${palette('gray', 1)};
+      background: ${palette('background', 2)};
     }
   }
 `
@@ -75,7 +77,12 @@ export const MenuItemWrapper = styled.div<{ highlighted: boolean }>`
   align-items: center;
   font-size: 14px;
   padding: 5px;
-  background-color: ${(props) => (props.highlighted ? palette('background', 2) : palette('background', 0))};
+  background-color: ${(props) => (props.highlighted ? palette('background', 2) : 'inherit')};
+
+  &:hover,
+  &:active {
+    background-color: palette('background', 2);
+  }
 `
 
 export const AssetIcon = styled(AssetIconUI)`
