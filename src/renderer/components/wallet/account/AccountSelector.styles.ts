@@ -24,33 +24,35 @@ export const AssetInfoWrapper = styled.div`
   margin-left: 16px;
 `
 
-export const AssetTitle = styled.p`
-  margin-bottom: 0;
+export const AssetTitleWrapper = styled.div`
+  display: flex;
+  align-items: center;
+`
+export const AssetTitle = styled.div`
   font-size: 32px;
   font-family: 'MainFontRegular';
   color: ${palette('text', 0)};
-  line-height: 38px;
+  line-height: 34px;
   text-transform: uppercase;
 `
 
-export const AssetSubTitle = styled.p`
-  margin-bottom: 5px;
-  font-size: 18px;
+export const AssetSubTitle = styled.div`
+  font-size: 17px;
   font-family: 'MainFontRegular';
   color: ${palette('text', 2)};
-  line-height: 22px;
+  line-height: 21px;
   text-transform: uppercase;
 `
 
-export const Label = styled(UILabel).attrs({
+export const ChangeLabel = styled(UILabel).attrs({
   textTransform: 'uppercase',
   color: 'primary',
-  size: 'big'
+  size: 'normal'
 })`
   padding: 0;
   cursor: pointer;
 `
 
 export const WalletTypeLabel = styled(WalletTypeLabelUI)`
-  margin: -20px 0px 0px 10px;
+  margin-left: 10px;
 `

@@ -71,13 +71,13 @@ export const MenuItem = styled(MenuUI.Item)`
   margin: 0;
 `
 
-export const MenuItemWrapper = styled.div<{ highlighted: boolean }>`
+export const MenuItemWrapper = styled.div<{ selected: boolean }>`
   display: flex;
   flex-direction: row;
   align-items: center;
   font-size: 14px;
   padding: 5px;
-  background-color: ${(props) => (props.highlighted ? palette('background', 2) : 'inherit')};
+  background-color: ${({ selected }) => (selected ? palette('background', 2) : 'inherit')};
 
   &:hover,
   &:active {
@@ -89,6 +89,8 @@ export const AssetIcon = styled(AssetIconUI)`
   margin: 3px;
 `
 
-export const WalletTypeLabel = styled(WalletTypeLabelUI)`
-  line-height: 16px;
+export const WalletTypeLabel = styled(WalletTypeLabelUI)<{ selected: boolean }>`
+  line-height: 14px;
+
+  background: ${({ selected }) => (selected ? palette('gray', 1) : palette('gray', 0))};
 `

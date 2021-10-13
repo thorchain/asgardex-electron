@@ -5,6 +5,7 @@ import { palette } from 'styled-theme'
 
 import { Label as UILabel } from '../../../components/uielements/label'
 import { Button as UIButton } from '../../uielements/button'
+import { WalletTypeLabel as WalletTypeLabelUI } from '../../uielements/common/Common.styles'
 import { Table as UITable } from '../../uielements/table'
 
 export const Table = styled(UITable)`
@@ -144,4 +145,9 @@ export const UpgradeButton = styled(UIButton).attrs({
     min-width: auto;
     margin-left: 10px;
   }
+`
+
+export const WalletTypeLabel = styled(WalletTypeLabelUI)`
+  background: ${palette('gray', 1)};
+  padding: 0 5px;
 `

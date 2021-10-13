@@ -232,10 +232,10 @@ export const WalletSettings: React.FC<Props> = (props): JSX.Element => {
                     {accounts.map((account, j) => {
                       const { type } = account
                       return (
-                        <>
+                        <Styled.AccountAddressWrapper key={type}>
                           <Styled.WalletTypeLabel>{walletTypeToI18n(type, intl)}</Styled.WalletTypeLabel>
                           <Styled.AccountContent key={j}>{renderAddress(chain, account)}</Styled.AccountContent>
-                        </>
+                        </Styled.AccountAddressWrapper>
                       )
                     })}
                   </Styled.ListItem>
