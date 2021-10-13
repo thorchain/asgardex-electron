@@ -11,12 +11,12 @@ import { WalletAddress } from '../../shared/wallet/types'
 import { Filter } from '../components/poolActionsHistory/types'
 import { useMidgardContext } from '../contexts/MidgardContext'
 import { liveData } from '../helpers/rx/liveData'
-import { observableState, triggerStream } from '../helpers/stateHelper'
-import { LoadActionsParams, ActionsPageRD, ActionsPage } from '../services/midgard/types'
+import { observableState, triggerStream, TriggerStream } from '../helpers/stateHelper'
+import { LoadActionsParams, ActionsPage, ActionsPageRD } from '../services/midgard/types'
 
 export type UseMidgardHistoryActions = ReturnType<typeof useMidgardHistoryActions>
 
-export const useMidgardHistoryActions = (itemsPerPage = 10) => {
+export const useMidgardHistoryActions = (itemsPerPage = 10, reloadTrigger$?: TriggerStream) => {
   const {
     service: {
       actions: { getActions$ }
@@ -40,7 +40,11 @@ export const useMidgardHistoryActions = (itemsPerPage = 10) => {
    */
   const { requestParams$, setRequestParams, getRequestParams } = useMemo(() => {
     const { get$, set, get } = observableState<LoadActionsParams>(initialRequestParams)
-    return { requestParams$: get$, setRequestParams: set, getRequestParams: get }
+    return {
+      requestParams$: get$,
+      setRequestParams: set,
+      getRequestParams: get
+    }
   }, [initialRequestParams])
 
   /**
@@ -62,9 +66,9 @@ export const useMidgardHistoryActions = (itemsPerPage = 10) => {
    * It needs to be memorized to point to same `TriggerStream`
    */
   const { reloadHistory$, reloadHistory } = useMemo(() => {
-    const { stream$, trigger } = triggerStream()
+    const { stream$, trigger } = reloadTrigger$ || triggerStream()
     return { reloadHistory$: stream$, reloadHistory: trigger }
-  }, [])
+  }, [reloadTrigger$])
 
   /**
    * Previous history page
@@ -77,7 +81,12 @@ export const useMidgardHistoryActions = (itemsPerPage = 10) => {
   const [historyPage]: [ActionsPageRD, unknown] = useObservableState<ActionsPageRD>(
     () =>
       FP.pipe(
-        Rx.combineLatest([requestParams$, reloadHistory$]),
+        Rx.combineLatest([
+          requestParams$,
+          reloadHistory$.pipe(
+            RxOp.debounceTime(300) // debounce reload time
+          )
+        ]),
         RxOp.switchMap(([parameters]) => FP.pipe(parameters, getActions$)),
         liveData.map((page) => {
           prevHistoryPage.current = O.some(page)

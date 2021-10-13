@@ -24,6 +24,7 @@ type Props = {
   size?: IconSize
   network: Network
   onChangeAddress?: (address: WalletAddress) => void
+  disabled?: boolean
 }
 
 export const AccountAddressSelector: React.FC<Props> = (props) => {
@@ -32,7 +33,8 @@ export const AccountAddressSelector: React.FC<Props> = (props) => {
     addresses,
     size = 'small',
     network,
-    onChangeAddress = FP.constVoid
+    onChangeAddress = FP.constVoid,
+    disabled = false
   } = props
 
   const intl = useIntl()
@@ -86,8 +88,8 @@ export const AccountAddressSelector: React.FC<Props> = (props) => {
   )
 
   return (
-    <Dropdown overlay={menu} trigger={['click']}>
-      <Styled.DropdownSelectorWrapper>{renderSelectedAddress}</Styled.DropdownSelectorWrapper>
+    <Dropdown overlay={menu} trigger={['click']} disabled={disabled}>
+      <Styled.DropdownSelectorWrapper disabled={disabled}>{renderSelectedAddress}</Styled.DropdownSelectorWrapper>
     </Dropdown>
   )
 }

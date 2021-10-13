@@ -26,7 +26,7 @@ export const WalletPoolActionsHistoryHeader: React.FC<Props> = (props) => {
   const {
     network,
     addresses,
-    selectedAddress,
+    selectedAddress: oSelectedAddress,
     availableFilters,
     currentFilter,
     setFilter,
@@ -47,8 +47,9 @@ export const WalletPoolActionsHistoryHeader: React.FC<Props> = (props) => {
         <AccountAddressSelector
           addresses={addresses}
           network={network}
-          selectedAddress={selectedAddress}
+          selectedAddress={oSelectedAddress}
           onChangeAddress={onWalletAddressChanged}
+          disabled={disabled}
         />
       </Styled.FilterContainer>
       <Styled.LinkContainer>
