@@ -23,11 +23,10 @@ export const Menu = styled(A.Menu)`
 
 export const FilterButton = styled(Button).attrs({ typevalue: 'outline' })`
   & .anticon-caret-down {
-    margin: 0 !important;
     transition: transform 0.3s;
     transform: translateY(0px);
-    width: 20px;
-    height: 20px;
+    width: 14px;
+    height: 14px;
     position: absolute !important;
     right: 7px;
 

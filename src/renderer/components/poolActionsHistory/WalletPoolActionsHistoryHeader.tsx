@@ -1,13 +1,14 @@
 import React from 'react'
 
+import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
 
 import { Network } from '../../../shared/api/types'
 import { WalletAddress, WalletAddresses } from '../../../shared/wallet/types'
 import { AccountAddressSelector } from '../AccountAddressSelector'
-import * as Styled from './PoolActionsHistory.styles'
 import { PoolActionsHistoryFilter } from './PoolActionsHistoryFilter'
 import { Filter } from './types'
+import * as Styled from './WalletPoolActionsHistoryHeader.styles'
 
 export type Props = {
   network: Network
@@ -17,7 +18,7 @@ export type Props = {
   currentFilter: Filter
   setFilter: (filter: Filter) => void
   onWalletAddressChanged: (address: WalletAddress) => void
-  openViewblockUrl: () => Promise<boolean>
+  onClickAddressIcon: FP.Lazy<void>
   disabled?: boolean
 }
 
@@ -29,14 +30,14 @@ export const WalletPoolActionsHistoryHeader: React.FC<Props> = (props) => {
     availableFilters,
     currentFilter,
     setFilter,
-    openViewblockUrl,
+    onClickAddressIcon,
     onWalletAddressChanged,
     disabled = false
   } = props
 
   return (
     <>
-      <Styled.HeaderFilterContainer>
+      <Styled.FilterContainer>
         <PoolActionsHistoryFilter
           availableFilters={availableFilters}
           currentFilter={currentFilter}
@@ -49,12 +50,12 @@ export const WalletPoolActionsHistoryHeader: React.FC<Props> = (props) => {
           selectedAddress={selectedAddress}
           onChangeAddress={onWalletAddressChanged}
         />
-      </Styled.HeaderFilterContainer>
-      <Styled.HeaderLinkContainer>
-        <Styled.Headline onClick={openViewblockUrl}>
+      </Styled.FilterContainer>
+      <Styled.LinkContainer>
+        <Styled.Headline onClick={onClickAddressIcon}>
           viewblock <Styled.ExplorerLinkIcon />
         </Styled.Headline>
-      </Styled.HeaderLinkContainer>
+      </Styled.LinkContainer>
     </>
   )
 }

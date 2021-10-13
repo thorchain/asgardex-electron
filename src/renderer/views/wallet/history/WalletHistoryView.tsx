@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo } from 'react'
+import React, { useMemo, useCallback } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
 import { THORChain } from '@xchainjs/xchain-util'
@@ -11,6 +11,7 @@ import * as RxOp from 'rxjs/operators'
 
 import { WalletAddress, WalletAddresses } from '../../../../shared/wallet/types'
 import { PoolActionsHistory } from '../../../components/poolActionsHistory'
+import { historyFilterToViewblockFilter } from '../../../components/poolActionsHistory/PoolActionsHistory.helper'
 import { Filter } from '../../../components/poolActionsHistory/types'
 import { WalletPoolActionsHistoryHeader } from '../../../components/poolActionsHistory/WalletPoolActionsHistoryHeader'
 import { useChainContext } from '../../../contexts/ChainContext'
@@ -18,6 +19,7 @@ import { useWalletContext } from '../../../contexts/WalletContext'
 import { eqString } from '../../../helpers/fp/eq'
 import { ordWalletAddressByChain } from '../../../helpers/fp/ord'
 import { useNetwork } from '../../../hooks/useNetwork'
+import { useOpenAddressUrl } from '../../../hooks/useOpenAddressUrl'
 import { useOpenExplorerTxUrl } from '../../../hooks/useOpenExplorerTxUrl'
 import { ENABLED_CHAINS } from '../../../services/const'
 import { WalletHistoryActions } from './WalletHistoryView.types'
@@ -101,12 +103,19 @@ export const WalletHistoryView: React.FC<Props> = ({ className, historyActions }
     [addresses, requestParams]
   )
 
-  const openViewblockUrlHandler = useCallback(async () => {
-    // TODO (@asgdx-team): As part of #1811 - Get viewblock url using THORChain client
-    // const addressUrl = client.getExplorerAddressUrl(address)
-    // const addressUrl = url&txsType={type}
-    return true
-  }, [])
+  const openAddressUrl = useOpenAddressUrl(THORChain)
+
+  const openAddressUrlHandler = useCallback(() => {
+    FP.pipe(
+      oSelectedWalletAddress,
+      O.map(({ address }) => {
+        // add extra params for selected filter
+        const params = `txsType=${historyFilterToViewblockFilter(currentFilter)}`
+        openAddressUrl(address, params)
+        return true
+      })
+    )
+  }, [currentFilter, oSelectedWalletAddress, openAddressUrl])
 
   const headerContent = useMemo(
     () => (
@@ -118,7 +127,7 @@ export const WalletHistoryView: React.FC<Props> = ({ className, historyActions }
         currentFilter={currentFilter}
         setFilter={setFilter}
         onWalletAddressChanged={setAddress}
-        openViewblockUrl={openViewblockUrlHandler}
+        onClickAddressIcon={openAddressUrlHandler}
         disabled={!RD.isSuccess(historyPage)}
       />
     ),
@@ -128,7 +137,7 @@ export const WalletHistoryView: React.FC<Props> = ({ className, historyActions }
       historyPage,
       network,
       oSelectedWalletAddress,
-      openViewblockUrlHandler,
+      openAddressUrlHandler,
       setAddress,
       setFilter
     ]

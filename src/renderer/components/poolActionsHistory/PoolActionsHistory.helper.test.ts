@@ -3,7 +3,7 @@ import * as O from 'fp-ts/Option'
 
 import { eqAssetsWithAmount } from '../../helpers/fp/eq'
 import { Action, Tx } from '../../services/midgard/types'
-import { getTxId, getValues, getRowKey } from './PoolActionsHistory.helper'
+import { getTxId, getValues, getRowKey, historyFilterToViewblockFilter } from './PoolActionsHistory.helper'
 
 const defaultPoolAction: Action = {
   date: new Date(0),
@@ -185,6 +185,30 @@ describe('PoolActionsHistory.helper', () => {
     it('should return default value in case there is no txId (`action.date-action.type`)', () => {
       // Date(0) is a default date property value for defaultPoolAction
       expect(getRowKey(defaultPoolAction, 1)).toEqual(`${new Date(0)}-SWAP-1`)
+    })
+  })
+
+  describe('historyFilterToViewblockFilter', () => {
+    it('SWAP', () => {
+      expect(historyFilterToViewblockFilter('SWAP')).toEqual('swap')
+    })
+    it('DEPOSIT', () => {
+      expect(historyFilterToViewblockFilter('DEPOSIT')).toEqual('addLiquidity')
+    })
+    it('DONATE', () => {
+      expect(historyFilterToViewblockFilter('DONATE')).toEqual('donate')
+    })
+    it('REFUND', () => {
+      expect(historyFilterToViewblockFilter('REFUND')).toEqual('all')
+    })
+    it('SWITCH', () => {
+      expect(historyFilterToViewblockFilter('SWITCH')).toEqual('switch')
+    })
+    it('ALL', () => {
+      expect(historyFilterToViewblockFilter('ALL')).toEqual('all')
+    })
+    it('UNKNOWN', () => {
+      expect(historyFilterToViewblockFilter('UNKNOWN')).toEqual('all')
     })
   })
 })
