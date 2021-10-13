@@ -10,6 +10,7 @@ import { FormattedDate, FormattedTime } from 'react-intl'
 import { Action, Actions, ActionsPage, Tx } from '../../services/midgard/types'
 import { AssetWithAmount } from '../../types/asgardex'
 import * as Styled from './PoolActionsHistory.styles'
+import { Filter } from './types'
 
 export const getTxId = (action: Action): O.Option<TxHash> => {
   return FP.pipe(
@@ -46,3 +47,23 @@ export const getRowKey: GetRowKey<Action> = (action, index) =>
   )
 
 export const emptyData: ActionsPage = { total: 0, actions: [] as Actions }
+
+export const historyFilterToViewblockFilter = (filter: Filter) => {
+  switch (filter) {
+    case 'DEPOSIT':
+      return 'addLiquidity'
+    case 'SWAP':
+      return 'swap'
+    case 'WITHDRAW':
+      return 'withdrawLiquidity'
+    case 'DONATE':
+      return 'donate'
+    case 'SWITCH':
+      return 'switch'
+    // 'ALL' and others will be matched to viewblock's 'all'
+    case 'ALL':
+    case 'REFUND': // does not exist at viewblock
+    case 'UNKNOWN':
+      return 'all'
+  }
+}

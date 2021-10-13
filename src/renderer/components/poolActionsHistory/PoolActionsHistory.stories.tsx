@@ -156,9 +156,8 @@ export const History: Story<{ dataStatus: RDStatus }> = ({ dataStatus }) => {
       onWalletAddressChanged={(address: WalletAddress) => {
         console.log('selected address', address)
       }}
-      openViewblockUrl={() => {
-        console.log('open viewblock')
-        return Promise.resolve(true)
+      onClickAddressIcon={() => {
+        console.log('on click address icon')
       }}
     />
   )
