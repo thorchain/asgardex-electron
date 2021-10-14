@@ -155,6 +155,7 @@ export const ValueTitle = styled(UILabel).attrs({
   margin-right: 10px;
   padding: 0;
   font-size: 12px;
+  width: auto;
 `
 
 export const InValueLabel = styled(UILabel).attrs({

@@ -4,6 +4,7 @@ import * as NEA from 'fp-ts/lib/NonEmptyArray'
 import * as O from 'fp-ts/lib/Option'
 
 import { ASSETS_TESTNET } from '../../shared/mock/assets'
+import { WalletType } from '../../shared/wallet/types'
 import { NonEmptyWalletBalances } from '../services/wallet/types'
 import { eqWalletBalances } from './fp/eq'
 import {
@@ -11,24 +12,37 @@ import {
   getAssetAmountByAsset,
   getBnbAmountFromBalances,
   getLtcAmountFromBalances,
-  getWalletBalanceByAsset
+  getWalletBalanceByAsset,
+  getWalletByAddress
 } from './walletHelper'
 
 describe('walletHelper', () => {
   const RUNE_WB = {
     amount: baseAmount('12300000000'),
     asset: AssetRuneNative,
-    walletAddress: 'rune native wallet address'
+    walletAddress: 'rune native wallet address',
+    walletType: 'keystore' as WalletType
   }
   const BNB = O.fromNullable(assetFromString('BNB.BNB'))
   const BOLT_WB = {
     amount: baseAmount('23400000000'),
     asset: ASSETS_TESTNET.BOLT,
-    walletAddress: 'bolt wallet address'
+    walletAddress: 'bolt wallet address',
+    walletType: 'keystore' as WalletType
   }
-  const BNB_WB = { amount: baseAmount('45600000000'), asset: AssetBNB, walletAddress: 'bnb wallet address' }
+  const BNB_WB = {
+    amount: baseAmount('45600000000'),
+    asset: AssetBNB,
+    walletAddress: 'bnb wallet address',
+    walletType: 'keystore' as WalletType
+  }
 
-  const LTC_WB = { amount: baseAmount('45300000000'), asset: AssetLTC, walletAddress: 'ltc wallet address' }
+  const LTC_WB = {
+    amount: baseAmount('45300000000'),
+    asset: AssetLTC,
+    walletAddress: 'ltc wallet address',
+    walletType: 'keystore' as WalletType
+  }
 
   describe('amountByAsset', () => {
     it('returns amount of RUNE', () => {
@@ -114,6 +128,19 @@ describe('walletHelper', () => {
     it('returns empty array if no asset is available', () => {
       const result = filterWalletBalancesByAssets([RUNE_WB, BOLT_WB], [AssetLTC])
       expect(eqWalletBalances.equals(result, [])).toBeTruthy()
+    })
+  })
+
+  describe('getWalletByAddress', () => {
+    it('returns wallet of BNB', () => {
+      const balances: O.Option<NonEmptyWalletBalances> = NEA.fromArray([RUNE_WB, BOLT_WB, BNB_WB])
+      const result = O.toNullable(getWalletByAddress(balances, O.some(RUNE_WB.walletAddress)))
+      expect(result?.asset.symbol).toEqual('RUNE')
+    })
+    it('returns none if BNB is not available', () => {
+      const balances: O.Option<NonEmptyWalletBalances> = NEA.fromArray([BOLT_WB, BNB_WB])
+      const result = getWalletByAddress(balances, O.some(RUNE_WB.walletAddress))
+      expect(result).toBeNone()
     })
   })
 })

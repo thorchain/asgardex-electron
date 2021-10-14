@@ -41,7 +41,7 @@ import { eqAsset, eqBaseAmount, eqChain, eqOAsset, eqOApproveParams } from '../.
 import { sequenceSOption, sequenceTOption } from '../../helpers/fpHelpers'
 import * as PoolHelpers from '../../helpers/poolHelper'
 import { liveData, LiveData } from '../../helpers/rx/liveData'
-import { filterWalletBalancesByAssets, getWalletBalanceByAsset } from '../../helpers/walletHelper'
+import { filterWalletBalancesByAssets, getWalletBalanceByAsset, getWalletByAddress } from '../../helpers/walletHelper'
 import { useSubscriptionState } from '../../hooks/useSubscriptionState'
 import { swap } from '../../routes/pools'
 import { ChangeSlipToleranceHandler } from '../../services/app/types'
@@ -85,6 +85,7 @@ import { TxModal } from '../modal/tx'
 import { SwapAssets } from '../modal/tx/extra'
 import { LoadingView } from '../shared/loading'
 import { ViewTxButton } from '../uielements/button'
+import { WalletTypeLabel } from '../uielements/common/Common.styles'
 import { Fees, UIFeesRD } from '../uielements/fees'
 import { Slider } from '../uielements/slider'
 import { EditableAddress } from './EditableAddress'
@@ -1190,6 +1191,16 @@ export const Swap = ({
     [oTargetAsset, targetWalletAddress, network, addressValidator, clickAddressLinkHandler]
   )
 
+  const matchedWalletType: string = useMemo(
+    () =>
+      FP.pipe(
+        getWalletByAddress(oWalletBalances, targetWalletAddress),
+        O.map(({ walletType }) => walletType),
+        O.getOrElse(() => '')
+      ),
+    [oWalletBalances, targetWalletAddress]
+  )
+
   return (
     <Styled.Container>
       <Styled.ContentContainer>
@@ -1271,7 +1282,10 @@ export const Swap = ({
           </Styled.ValueItemContainer>
           {!lockedWallet && (
             <Styled.TargetAddressContainer>
-              <Styled.ValueTitle>{intl.formatMessage({ id: 'swap.recipient' })}</Styled.ValueTitle>
+              <div style={{ display: 'flex', flexDirection: 'row' }}>
+                <Styled.ValueTitle>{intl.formatMessage({ id: 'swap.recipient' })}</Styled.ValueTitle>
+                {matchedWalletType !== '' && <WalletTypeLabel>{matchedWalletType}</WalletTypeLabel>}
+              </div>
               {renderCustomAddressInput}
             </Styled.TargetAddressContainer>
           )}

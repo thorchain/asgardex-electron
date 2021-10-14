@@ -112,3 +112,17 @@ export const addressFromWalletAddress = ({ address }: Pick<WalletAddress, 'addre
 export const addressFromOptionalWalletAddress = (
   oWalletAddress: O.Option<Pick<WalletAddress, 'address'>>
 ): O.Option<Address> => FP.pipe(oWalletAddress, O.map(addressFromWalletAddress))
+
+export const getWalletByAddress = (
+  oWalletBalances: O.Option<NonEmptyWalletBalances>,
+  oAddress: O.Option<Address>
+): O.Option<WalletBalance> =>
+  FP.pipe(
+    sequenceTOption(oWalletBalances, oAddress),
+    O.chain(([walletBalances, address]) =>
+      FP.pipe(
+        walletBalances,
+        A.findFirst(({ walletAddress }) => eqAddress.equals(walletAddress, address))
+      )
+    )
+  )
