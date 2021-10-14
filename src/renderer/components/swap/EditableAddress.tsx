@@ -18,6 +18,7 @@ export type EditableAddressProps = {
   network: Network
   onClickOpenAddress: (address: Address) => void
   onChangeAddress: (address: Address) => void
+  onChangeEditableAddress: (address: Address) => void
   onChangeEditableMode: (editModeActive: boolean) => void
   addressValidator: AddressValidationAsync
 }
@@ -25,6 +26,7 @@ export const EditableAddress = ({
   asset,
   address,
   onChangeAddress,
+  onChangeEditableAddress,
   onClickOpenAddress,
   onChangeEditableMode,
   addressValidator,
@@ -56,11 +58,12 @@ export const EditableAddress = ({
   const confirmEditHandler = useCallback(() => {
     if (form.getFieldError(RECIPIENT_FIELD).length === 0) {
       onChangeAddress(form.getFieldValue(RECIPIENT_FIELD))
+      onChangeEditableAddress(form.getFieldValue(RECIPIENT_FIELD))
       form.resetFields()
       setEditableAddress(O.none)
       onChangeEditableMode(false)
     }
-  }, [form, onChangeAddress, onChangeEditableMode])
+  }, [form, onChangeEditableAddress, onChangeAddress, onChangeEditableMode])
 
   const cancelEditHandler = useCallback(() => {
     form.resetFields()
@@ -68,7 +71,7 @@ export const EditableAddress = ({
     onChangeEditableMode(false)
   }, [form, onChangeEditableMode])
 
-  const inputOnKeyDownHandler = useCallback(
+  const inputOnKeyUpHandler = useCallback(
     (e) => {
       if (e.key === 'Enter') {
         confirmEditHandler()
@@ -76,8 +79,9 @@ export const EditableAddress = ({
       if (e.key === 'Escape') {
         cancelEditHandler()
       }
+      onChangeEditableAddress(form.getFieldValue(RECIPIENT_FIELD))
     },
-    [cancelEditHandler, confirmEditHandler]
+    [cancelEditHandler, confirmEditHandler, form, onChangeEditableAddress]
   )
 
   const renderAddress = useMemo(() => {
@@ -110,7 +114,7 @@ export const EditableAddress = ({
               recipient: editableAddress
             }}>
             <Form.Item rules={[{ required: true, validator: validateAddress }]} name={RECIPIENT_FIELD}>
-              <Styled.Input color="primary" onKeyDown={inputOnKeyDownHandler} />
+              <Styled.Input color="primary" onKeyUp={inputOnKeyUpHandler} />
             </Form.Item>
           </Styled.InnerForm>
           <Styled.AddressEditButtonsWrapper>
@@ -120,7 +124,7 @@ export const EditableAddress = ({
         </Styled.EditableFormWrapper>
       )
     },
-    [cancelEditHandler, confirmEditHandler, form, inputOnKeyDownHandler, validateAddress]
+    [cancelEditHandler, confirmEditHandler, form, inputOnKeyUpHandler, validateAddress]
   )
 
   const renderCustomAddressInput = useCallback(

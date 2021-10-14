@@ -26,6 +26,7 @@ import { useIntl } from 'react-intl'
 import * as RxOp from 'rxjs/operators'
 
 import { Network } from '../../../shared/api/types'
+import { WalletType } from '../../../shared/wallet/types'
 import { ZERO_BASE_AMOUNT } from '../../const'
 import {
   getEthTokenAddress,
@@ -157,6 +158,8 @@ export const Swap = ({
   const lockedWallet = useMemo(() => isLocked(keystore) || !hasImportedKeystore(keystore), [keystore])
 
   const [targetWalletAddress, setTargetWalletAddress] = useState<O.Option<Address>>(initialTargetWalletAddress)
+  const [editableTargetWalletAddress, setEditableTargetWalletAddress] =
+    useState<O.Option<Address>>(initialTargetWalletAddress)
 
   const { balances: oWalletBalances, loading: walletBalancesLoading } = walletBalances
 
@@ -1182,6 +1185,7 @@ export const Swap = ({
               address={address}
               onClickOpenAddress={(address) => clickAddressLinkHandler(address)}
               onChangeAddress={(newAddress) => setTargetWalletAddress(O.some(newAddress))}
+              onChangeEditableAddress={(newAddress) => setEditableTargetWalletAddress(O.some(newAddress))}
               onChangeEditableMode={(editModeActive) => setCustomAddressEditActive(editModeActive)}
               addressValidator={addressValidator}
             />
@@ -1191,15 +1195,27 @@ export const Swap = ({
     [oTargetAsset, targetWalletAddress, network, addressValidator, clickAddressLinkHandler]
   )
 
-  const matchedWalletType: string = useMemo(
+  const oMatchedWalletType: O.Option<WalletType> = useMemo(
     () =>
       FP.pipe(
-        getWalletByAddress(oWalletBalances, targetWalletAddress),
-        O.map(({ walletType }) => walletType),
-        O.getOrElse(() => '')
+        sequenceTOption(oWalletBalances, editableTargetWalletAddress),
+        O.chain(([walletBalances, editableTargetWalletAddress]) =>
+          getWalletByAddress(walletBalances, editableTargetWalletAddress)
+        ),
+        O.map(({ walletType }) => walletType)
       ),
-    [oWalletBalances, targetWalletAddress]
+    [oWalletBalances, editableTargetWalletAddress]
   )
+
+  const renderWalletType = useMemo(() => {
+    return FP.pipe(
+      oMatchedWalletType,
+      O.fold(
+        () => <></>,
+        (matchedWalletType) => <WalletTypeLabel>{matchedWalletType}</WalletTypeLabel>
+      )
+    )
+  }, [oMatchedWalletType])
 
   return (
     <Styled.Container>
@@ -1284,7 +1300,7 @@ export const Swap = ({
             <Styled.TargetAddressContainer>
               <div style={{ display: 'flex', flexDirection: 'row' }}>
                 <Styled.ValueTitle>{intl.formatMessage({ id: 'swap.recipient' })}</Styled.ValueTitle>
-                {matchedWalletType !== '' && <WalletTypeLabel>{matchedWalletType}</WalletTypeLabel>}
+                {renderWalletType}
               </div>
               {renderCustomAddressInput}
             </Styled.TargetAddressContainer>
