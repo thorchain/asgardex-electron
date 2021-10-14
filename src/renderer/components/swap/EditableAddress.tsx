@@ -63,13 +63,14 @@ export const EditableAddress = ({
       setEditableAddress(O.none)
       onChangeEditableMode(false)
     }
-  }, [form, onChangeEditableAddress, onChangeAddress, onChangeEditableMode])
+  }, [form, onChangeAddress, onChangeEditableAddress, onChangeEditableMode])
 
   const cancelEditHandler = useCallback(() => {
     form.resetFields()
+    onChangeEditableAddress(address)
     setEditableAddress(O.none)
     onChangeEditableMode(false)
-  }, [form, onChangeEditableMode])
+  }, [address, form, onChangeEditableAddress, onChangeEditableMode])
 
   const inputOnKeyUpHandler = useCallback(
     (e) => {

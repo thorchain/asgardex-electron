@@ -1184,7 +1184,10 @@ export const Swap = ({
               network={network}
               address={address}
               onClickOpenAddress={(address) => clickAddressLinkHandler(address)}
-              onChangeAddress={(newAddress) => setTargetWalletAddress(O.some(newAddress))}
+              onChangeAddress={(newAddress) => {
+                setTargetWalletAddress(O.some(newAddress))
+                setEditableTargetWalletAddress(O.some(newAddress))
+              }}
               onChangeEditableAddress={(newAddress) => setEditableTargetWalletAddress(O.some(newAddress))}
               onChangeEditableMode={(editModeActive) => setCustomAddressEditActive(editModeActive)}
               addressValidator={addressValidator}
