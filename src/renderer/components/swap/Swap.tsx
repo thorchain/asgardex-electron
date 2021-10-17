@@ -16,6 +16,7 @@ import {
   assetToBase,
   assetAmount
 } from '@xchainjs/xchain-util'
+import { Row } from 'antd'
 import BigNumber from 'bignumber.js'
 import * as A from 'fp-ts/Array'
 import * as FP from 'fp-ts/function'
@@ -26,6 +27,7 @@ import { useIntl } from 'react-intl'
 import * as RxOp from 'rxjs/operators'
 
 import { Network } from '../../../shared/api/types'
+import { WalletType } from '../../../shared/wallet/types'
 import { ZERO_BASE_AMOUNT } from '../../const'
 import {
   getEthTokenAddress,
@@ -41,7 +43,7 @@ import { eqAsset, eqBaseAmount, eqChain, eqOAsset, eqOApproveParams } from '../.
 import { sequenceSOption, sequenceTOption } from '../../helpers/fpHelpers'
 import * as PoolHelpers from '../../helpers/poolHelper'
 import { liveData, LiveData } from '../../helpers/rx/liveData'
-import { filterWalletBalancesByAssets, getWalletBalanceByAsset } from '../../helpers/walletHelper'
+import { filterWalletBalancesByAssets, getWalletBalanceByAsset, getWalletByAddress } from '../../helpers/walletHelper'
 import { useSubscriptionState } from '../../hooks/useSubscriptionState'
 import { swap } from '../../routes/pools'
 import { ChangeSlipToleranceHandler } from '../../services/app/types'
@@ -85,6 +87,7 @@ import { TxModal } from '../modal/tx'
 import { SwapAssets } from '../modal/tx/extra'
 import { LoadingView } from '../shared/loading'
 import { ViewTxButton } from '../uielements/button'
+import { WalletTypeLabel } from '../uielements/common/Common.styles'
 import { Fees, UIFeesRD } from '../uielements/fees'
 import { Slider } from '../uielements/slider'
 import { EditableAddress } from './EditableAddress'
@@ -156,6 +159,8 @@ export const Swap = ({
   const lockedWallet = useMemo(() => isLocked(keystore) || !hasImportedKeystore(keystore), [keystore])
 
   const [targetWalletAddress, setTargetWalletAddress] = useState<O.Option<Address>>(initialTargetWalletAddress)
+  const [editableTargetWalletAddress, setEditableTargetWalletAddress] =
+    useState<O.Option<Address>>(initialTargetWalletAddress)
 
   const { balances: oWalletBalances, loading: walletBalancesLoading } = walletBalances
 
@@ -1180,7 +1185,11 @@ export const Swap = ({
               network={network}
               address={address}
               onClickOpenAddress={(address) => clickAddressLinkHandler(address)}
-              onChangeAddress={(newAddress) => setTargetWalletAddress(O.some(newAddress))}
+              onChangeAddress={(newAddress) => {
+                setTargetWalletAddress(O.some(newAddress))
+                setEditableTargetWalletAddress(O.some(newAddress))
+              }}
+              onChangeEditableAddress={(newAddress) => setEditableTargetWalletAddress(O.some(newAddress))}
               onChangeEditableMode={(editModeActive) => setCustomAddressEditActive(editModeActive)}
               addressValidator={addressValidator}
             />
@@ -1189,6 +1198,28 @@ export const Swap = ({
       ),
     [oTargetAsset, targetWalletAddress, network, addressValidator, clickAddressLinkHandler]
   )
+
+  const oMatchedWalletType: O.Option<WalletType> = useMemo(
+    () =>
+      FP.pipe(
+        sequenceTOption(oWalletBalances, editableTargetWalletAddress),
+        O.chain(([walletBalances, editableTargetWalletAddress]) =>
+          getWalletByAddress(walletBalances, editableTargetWalletAddress)
+        ),
+        O.map(({ walletType }) => walletType)
+      ),
+    [oWalletBalances, editableTargetWalletAddress]
+  )
+
+  const renderWalletType = useMemo(() => {
+    return FP.pipe(
+      oMatchedWalletType,
+      O.fold(
+        () => <></>,
+        (matchedWalletType) => <WalletTypeLabel>{matchedWalletType}</WalletTypeLabel>
+      )
+    )
+  }, [oMatchedWalletType])
 
   return (
     <Styled.Container>
@@ -1271,7 +1302,10 @@ export const Swap = ({
           </Styled.ValueItemContainer>
           {!lockedWallet && (
             <Styled.TargetAddressContainer>
-              <Styled.ValueTitle>{intl.formatMessage({ id: 'swap.recipient' })}</Styled.ValueTitle>
+              <Row>
+                <Styled.ValueTitle>{intl.formatMessage({ id: 'swap.recipient' })}</Styled.ValueTitle>
+                {renderWalletType}
+              </Row>
               {renderCustomAddressInput}
             </Styled.TargetAddressContainer>
           )}

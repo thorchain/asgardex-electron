@@ -14,6 +14,7 @@ const defaultProps: EditableAddressProps = {
   network: 'testnet',
   onClickOpenAddress: () => console.log('open address in explorer'),
   onChangeAddress: () => console.log('address changed'),
+  onChangeEditableAddress: () => console.log('address changed'),
   onChangeEditableMode: () => console.log('edit mode changed'),
   addressValidator: (address: Address) => Promise.resolve(eqString.equals(address, bnbAddress))
 }
