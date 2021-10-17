@@ -74,13 +74,15 @@ export const EditableAddress = ({
 
   const inputOnKeyUpHandler = useCallback(
     (e) => {
+      // Call callback before handling key - in other case result will be lost
+      onChangeEditableAddress(form.getFieldValue(RECIPIENT_FIELD))
+
       if (e.key === 'Enter') {
         confirmEditHandler()
       }
       if (e.key === 'Escape') {
         cancelEditHandler()
       }
-      onChangeEditableAddress(form.getFieldValue(RECIPIENT_FIELD))
     },
     [cancelEditHandler, confirmEditHandler, form, onChangeEditableAddress]
   )

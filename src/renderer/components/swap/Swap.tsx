@@ -16,6 +16,7 @@ import {
   assetToBase,
   assetAmount
 } from '@xchainjs/xchain-util'
+import { Row } from 'antd'
 import BigNumber from 'bignumber.js'
 import * as A from 'fp-ts/Array'
 import * as FP from 'fp-ts/function'
@@ -1301,10 +1302,10 @@ export const Swap = ({
           </Styled.ValueItemContainer>
           {!lockedWallet && (
             <Styled.TargetAddressContainer>
-              <div style={{ display: 'flex', flexDirection: 'row' }}>
+              <Row>
                 <Styled.ValueTitle>{intl.formatMessage({ id: 'swap.recipient' })}</Styled.ValueTitle>
                 {renderWalletType}
-              </div>
+              </Row>
               {renderCustomAddressInput}
             </Styled.TargetAddressContainer>
           )}

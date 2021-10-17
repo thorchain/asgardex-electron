@@ -146,7 +146,6 @@ export const TargetAddressContainer = styled.div`
   display: flex;
   flex-direction: column;
 `
-
 export const ValueTitle = styled(UILabel).attrs({
   color: 'gray',
   textTransform: 'uppercase'
