@@ -34,9 +34,9 @@ import { MaxBalanceButton } from '../../../uielements/button/MaxBalanceButton'
 import { UIFeesRD } from '../../../uielements/fees'
 import { Input, InputBigNumber } from '../../../uielements/input'
 import { AccountSelector } from '../../account'
+import * as H from '../TxForm.helpers'
 import * as Styled from '../TxForm.styles'
 import { validateTxAmountInput } from '../TxForm.util'
-import * as H from './Send.helpers'
 import { useChangeAssetHandler } from './Send.hooks'
 
 export type FormValues = {
