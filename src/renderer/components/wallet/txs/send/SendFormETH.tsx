@@ -25,7 +25,7 @@ import { WalletType } from '../../../../../shared/wallet/types'
 import { ZERO_BASE_AMOUNT, ZERO_BN } from '../../../../const'
 import { isEthAsset } from '../../../../helpers/assetHelper'
 import { sequenceTOption } from '../../../../helpers/fpHelpers'
-import { getEthAmountFromBalances } from '../../../../helpers/walletHelper'
+import { getEthAmountFromBalances, getWalletByAddress } from '../../../../helpers/walletHelper'
 import { SendTxParams } from '../../../../services/chain/types'
 import { FeesRD, WalletBalances } from '../../../../services/clients'
 import { ValidatePasswordHandler } from '../../../../services/wallet/types'
@@ -33,6 +33,7 @@ import { WalletBalance } from '../../../../services/wallet/types'
 import { PasswordModal } from '../../../modal/password'
 import * as StyledR from '../../../shared/form/Radio.styles'
 import { MaxBalanceButton } from '../../../uielements/button/MaxBalanceButton'
+import { WalletTypeLabel } from '../../../uielements/common/Common.styles'
 import { UIFeesRD } from '../../../uielements/fees'
 import { Input, InputBigNumber } from '../../../uielements/input'
 import { AccountSelector } from '../../account'
@@ -324,6 +325,35 @@ export const SendFormETH: React.FC<Props> = (props): JSX.Element => {
 
   const addMaxAmountHandler = useCallback(() => setAmountToSend(O.some(maxAmount)), [maxAmount])
 
+  const [recipientAddress, setRecipientAddress] = useState<Address>('')
+
+  const oMatchedWalletType: O.Option<WalletType> = useMemo(
+    () =>
+      FP.pipe(
+        getWalletByAddress(balances, recipientAddress),
+        O.map(({ walletType }) => walletType)
+      ),
+    [balances, recipientAddress]
+  )
+
+  const handleOnKeyUp = useCallback(() => {
+    setRecipientAddress(form.getFieldValue('recipient'))
+  }, [form])
+
+  const renderWalletType = useMemo(() => {
+    return FP.pipe(
+      oMatchedWalletType,
+      O.fold(
+        () => <></>,
+        (matchedWalletType) => (
+          <Styled.WalletTypeLabelWrapper>
+            <WalletTypeLabel>{matchedWalletType}</WalletTypeLabel>
+          </Styled.WalletTypeLabelWrapper>
+        )
+      )
+    )
+  }, [oMatchedWalletType])
+
   return (
     <>
       <Row>
@@ -345,7 +375,10 @@ export const SendFormETH: React.FC<Props> = (props): JSX.Element => {
             onFinish={() => setShowPwModal(true)}
             labelCol={{ span: 24 }}>
             <Styled.SubForm>
-              <Styled.CustomLabel size="big">{intl.formatMessage({ id: 'common.address' })}</Styled.CustomLabel>
+              <Styled.CustomLabel size="big">
+                {intl.formatMessage({ id: 'common.address' })}
+                {renderWalletType}
+              </Styled.CustomLabel>
               <Form.Item rules={[{ required: true, validator: addressValidator }]} name="recipient">
                 <Input
                   color="primary"
@@ -353,6 +386,7 @@ export const SendFormETH: React.FC<Props> = (props): JSX.Element => {
                   disabled={isLoading}
                   onBlur={reloadFees}
                   onChange={onChangeAddress}
+                  onKeyUp={handleOnKeyUp}
                 />
               </Form.Item>
               <Styled.CustomLabel size="big">{intl.formatMessage({ id: 'common.amount' })}</Styled.CustomLabel>

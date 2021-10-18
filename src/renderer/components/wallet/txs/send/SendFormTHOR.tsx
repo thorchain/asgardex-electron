@@ -1,6 +1,7 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
+import { Address } from '@xchainjs/xchain-client'
 import {
   formatAssetAmountCurrency,
   assetAmount,
@@ -23,13 +24,14 @@ import { WalletType } from '../../../../../shared/wallet/types'
 import { ZERO_BASE_AMOUNT } from '../../../../const'
 import { isRuneNativeAsset, THORCHAIN_DECIMAL } from '../../../../helpers/assetHelper'
 import { sequenceTOption } from '../../../../helpers/fpHelpers'
-import { getRuneNativeAmountFromBalances } from '../../../../helpers/walletHelper'
+import { getRuneNativeAmountFromBalances, getWalletByAddress } from '../../../../helpers/walletHelper'
 import { FeeRD, SendTxParams } from '../../../../services/chain/types'
 import { AddressValidation, WalletBalances } from '../../../../services/clients'
 import { ValidatePasswordHandler } from '../../../../services/wallet/types'
 import { WalletBalance } from '../../../../services/wallet/types'
 import { PasswordModal } from '../../../modal/password'
 import { MaxBalanceButton } from '../../../uielements/button/MaxBalanceButton'
+import { WalletTypeLabel } from '../../../uielements/common/Common.styles'
 import { UIFeesRD } from '../../../uielements/fees'
 import { Input, InputBigNumber } from '../../../uielements/input'
 import { AccountSelector } from '../../account'
@@ -232,6 +234,35 @@ export const SendFormTHOR: React.FC<Props> = (props): JSX.Element => {
     if (isLedgerWallet(walletType)) sendHandler()
   }, [sendHandler, walletType])
 
+  const [recipientAddress, setRecipientAddress] = useState<Address>('')
+
+  const oMatchedWalletType: O.Option<WalletType> = useMemo(
+    () =>
+      FP.pipe(
+        getWalletByAddress(balances, recipientAddress),
+        O.map(({ walletType }) => walletType)
+      ),
+    [balances, recipientAddress]
+  )
+
+  const handleOnKeyUp = useCallback(() => {
+    setRecipientAddress(form.getFieldValue('recipient'))
+  }, [form])
+
+  const renderWalletType = useMemo(() => {
+    return FP.pipe(
+      oMatchedWalletType,
+      O.fold(
+        () => <></>,
+        (matchedWalletType) => (
+          <Styled.WalletTypeLabelWrapper>
+            <WalletTypeLabel>{matchedWalletType}</WalletTypeLabel>
+          </Styled.WalletTypeLabelWrapper>
+        )
+      )
+    )
+  }, [oMatchedWalletType])
+
   return (
     <>
       <Row>
@@ -244,9 +275,12 @@ export const SendFormTHOR: React.FC<Props> = (props): JSX.Element => {
           />
           <Styled.Form form={form} initialValues={{ amount: bn(0) }} onFinish={onFinishHandler} labelCol={{ span: 24 }}>
             <Styled.SubForm>
-              <Styled.CustomLabel size="big">{intl.formatMessage({ id: 'common.address' })}</Styled.CustomLabel>
+              <Styled.CustomLabel size="big">
+                {intl.formatMessage({ id: 'common.address' })}
+                {renderWalletType}
+              </Styled.CustomLabel>
               <Form.Item rules={[{ required: true, validator: addressValidator }]} name="recipient">
-                <Input color="primary" size="large" disabled={isLoading} />
+                <Input color="primary" size="large" disabled={isLoading} onKeyUp={handleOnKeyUp} />
               </Form.Item>
               <Styled.CustomLabel size="big">{intl.formatMessage({ id: 'common.amount' })}</Styled.CustomLabel>
               <Styled.FormItem rules={[{ required: true, validator: amountValidator }]} name="amount">

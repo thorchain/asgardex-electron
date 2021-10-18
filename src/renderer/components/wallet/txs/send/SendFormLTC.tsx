@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
-import { FeeOption, FeesWithRates } from '@xchainjs/xchain-client'
+import { Address, FeeOption, FeesWithRates } from '@xchainjs/xchain-client'
 import { LTC_DECIMAL } from '@xchainjs/xchain-litecoin'
 import {
   assetAmount,
@@ -23,6 +23,7 @@ import { useIntl } from 'react-intl'
 import { Network } from '../../../../../shared/api/types'
 import { WalletType } from '../../../../../shared/wallet/types'
 import { ZERO_BASE_AMOUNT, ZERO_BN } from '../../../../const'
+import { getWalletByAddress } from '../../../../helpers/walletHelper'
 import { Memo, SendTxParams } from '../../../../services/chain/types'
 import { AddressValidation, WalletBalances } from '../../../../services/clients'
 import { FeesWithRatesRD } from '../../../../services/litecoin/types'
@@ -31,6 +32,7 @@ import { WalletBalance } from '../../../../services/wallet/types'
 import { PasswordModal } from '../../../modal/password'
 import * as StyledR from '../../../shared/form/Radio.styles'
 import { MaxBalanceButton } from '../../../uielements/button/MaxBalanceButton'
+import { WalletTypeLabel } from '../../../uielements/common/Common.styles'
 import { UIFeesRD } from '../../../uielements/fees'
 import { Input, InputBigNumber } from '../../../uielements/input'
 import { AccountSelector } from '../../account'
@@ -320,6 +322,35 @@ export const SendFormLTC: React.FC<Props> = (props): JSX.Element => {
     })
   }, [amountToSend, form])
 
+  const [recipientAddress, setRecipientAddress] = useState<Address>('')
+
+  const oMatchedWalletType: O.Option<WalletType> = useMemo(
+    () =>
+      FP.pipe(
+        getWalletByAddress(balances, recipientAddress),
+        O.map(({ walletType }) => walletType)
+      ),
+    [balances, recipientAddress]
+  )
+
+  const handleOnKeyUp = useCallback(() => {
+    setRecipientAddress(form.getFieldValue('recipient'))
+  }, [form])
+
+  const renderWalletType = useMemo(() => {
+    return FP.pipe(
+      oMatchedWalletType,
+      O.fold(
+        () => <></>,
+        (matchedWalletType) => (
+          <Styled.WalletTypeLabelWrapper>
+            <WalletTypeLabel>{matchedWalletType}</WalletTypeLabel>
+          </Styled.WalletTypeLabelWrapper>
+        )
+      )
+    )
+  }, [oMatchedWalletType])
+
   return (
     <>
       <Row>
@@ -341,9 +372,12 @@ export const SendFormLTC: React.FC<Props> = (props): JSX.Element => {
             onFinish={() => setShowPwModal(true)}
             labelCol={{ span: 24 }}>
             <Styled.SubForm>
-              <Styled.CustomLabel size="big">{intl.formatMessage({ id: 'common.address' })}</Styled.CustomLabel>
+              <Styled.CustomLabel size="big">
+                {intl.formatMessage({ id: 'common.address' })}
+                {renderWalletType}
+              </Styled.CustomLabel>
               <Form.Item rules={[{ required: true, validator: addressValidator }]} name="recipient">
-                <Input color="primary" size="large" disabled={isLoading} />
+                <Input color="primary" size="large" disabled={isLoading} onKeyUp={handleOnKeyUp} />
               </Form.Item>
               <Styled.CustomLabel size="big">{intl.formatMessage({ id: 'common.amount' })}</Styled.CustomLabel>
               <Styled.FormItem rules={[{ required: true, validator: amountValidator }]} name="amount">
