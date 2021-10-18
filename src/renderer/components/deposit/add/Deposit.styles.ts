@@ -146,7 +146,7 @@ export const SubmitButton = styled(UIButton).attrs({
   margin-bottom: 20px;
 `
 
-export const PendingAssetContainer = styled('div')`
+export const AssetWarningAssetContainer = styled('div')`
   display: flex;
   flex-direction: row;
   justify-content: center;
@@ -162,13 +162,13 @@ export const PendingAssetContainer = styled('div')`
   }
 `
 
-export const PendingAssetIcon = styled(UIAssetIcon).attrs({ size: 'small' })`
+export const AssetWarningAssetIcon = styled(UIAssetIcon).attrs({ size: 'small' })`
   margin-right: 5px;
 `
-export const PendingAssetLabel = styled(UIAssetLabel)`
+export const AssetWarningAssetLabel = styled(UIAssetLabel)`
   padding: 0px;
 `
-export const PendingAssetAmountLabel = styled(UILabel)`
+export const AssetWarningAmountLabel = styled(UILabel)`
   font-family: 'MainFontBold';
   padding: 0;
   font-size: 17px;
@@ -180,7 +180,7 @@ export const PendingAssetAmountLabel = styled(UILabel)`
 `}
 `
 
-export const RecoveryInfoButton = styled(UIButton).attrs({
+export const AssetWarningInfoButton = styled(UIButton).attrs({
   typevalue: 'transparent'
 })<{ selected: boolean }>`
   &.ant-btn {
@@ -189,12 +189,12 @@ export const RecoveryInfoButton = styled(UIButton).attrs({
   }
   padding-left: 0px;
 `
-export const RecoveryInfoButtonIcon = styled(CaretRightOutlined)<{ selected: boolean }>`
+export const AssetWarningInfoButtonIcon = styled(CaretRightOutlined)<{ selected: boolean }>`
   transform: ${({ selected }) => (selected ? 'rotateZ(90deg)' : 'rotateZ(0)')};
   color: ${palette('primary', 0)};
 `
 
-export const RecoveryInfoButtonLabel = styled(UILabel)`
+export const AssetWarningInfoButtonLabel = styled(UILabel)`
   font-family: 'MainFontBold';
   text-transform: uppercase;
   font-size: 12px;
@@ -202,7 +202,7 @@ export const RecoveryInfoButtonLabel = styled(UILabel)`
   padding-right: 5px;
 `
 
-export const RecoveryDescription = styled(UILabel)`
+export const AssetWarningDescription = styled(UILabel)`
   font-family: 'MainFontRegular';
   text-transform: uppercase;
   font-size: 12px;
@@ -210,7 +210,7 @@ export const RecoveryDescription = styled(UILabel)`
   padding-bottom: 10px;
 `
 
-export const RecoveryDescriptionLink = styled.span`
+export const AssetWarningDescriptionLink = styled.span`
   text-transform: uppercase;
   color: inherit;
   text-decoration: underline;
@@ -220,14 +220,14 @@ export const RecoveryDescriptionLink = styled.span`
   }
 `
 
-export const RecoveryOpenButton = styled(UIButton).attrs({
+export const WarningOpenExternalUrlButton = styled(UIButton).attrs({
   typevalue: 'outline',
   color: 'warning'
 })`
   margin: 10px 0;
 `
 
-export const OpenRecoveryToolIcon = styled(UIExternalLinkIcon)`
+export const AssetWarningOpenExternalUrlIcon = styled(UIExternalLinkIcon)`
   svg {
     margin-left: 10px;
     color: inherit;

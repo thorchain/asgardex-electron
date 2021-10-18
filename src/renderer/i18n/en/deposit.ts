@@ -31,6 +31,12 @@ const deposit: DepositMessages = {
   'deposit.add.pendingAssets.recoveryDescription':
     'Please note: Transactions of an asset pair might take different time by running on different blockchains. In case of failures, you have a way to withdraw pending assets using the Recovery Tool of THORSWap at {url}. This feature is currently not available in ASGARDEX desktop.',
   'deposit.add.pendingAssets.recoveryTitle': 'Open Recovery Tool',
+  'deposit.add.asymAssets.title': 'Asymmetrical deposit found',
+  'deposit.add.asymAssets.description':
+    'Adding an asset pair symmetrical has been disabled due a previous asymmetrical deposit of following asset(s):',
+  'deposit.add.asymAssets.recoveryDescription':
+    'Asymmetrical deposit is currently not supported in ASGARDEX desktop. However, you can use this feature in THORSwap to withdraw a previous asymmetrical deposit.',
+  'deposit.add.asymAssets.recoveryTitle': 'THORSwap',
   'deposit.bond.state.error': 'Bond error',
   'deposit.unbond.state.error': 'Unbond error',
   'deposit.leave.state.error': 'Leave error',

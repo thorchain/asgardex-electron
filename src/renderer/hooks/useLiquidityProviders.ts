@@ -11,7 +11,15 @@ import { useObservableState } from 'observable-hooks'
 import { Network } from '../../shared/api/types'
 import { useThorchainContext } from '../contexts/ThorchainContext'
 import { eqOString } from '../helpers/fp/eq'
-import { LiquidityProviderRD, LiquidityProvidersRD, PendingAssetsRD } from '../services/thorchain/types'
+import {
+  LiquidityProvider,
+  LiquidityProviderHasAsymAssets,
+  LiquidityProviderHasAsymAssetsRD,
+  LiquidityProviderRD,
+  LiquidityProvidersRD,
+  PendingAssetsRD
+} from '../services/thorchain/types'
+import { ApiError } from '../services/wallet/types'
 import { AssetsWithAmount1e8 } from '../types/asgardex'
 
 export const useLiquidityProviders = ({
@@ -76,18 +84,88 @@ export const useLiquidityProviders = ({
         providers,
         RD.map(
           A.filter(
-            (provider) => eqOString.equals(provider.runeAddress, O.some(runeAddress)) && O.isNone(provider.assetAddress)
-          )
-        ),
-        RD.map(
-          A.filter(
             (provider) =>
-              eqOString.equals(provider.assetAddress, O.some(assetAddress)) && O.isNone(provider.runeAddress)
+              // rune side
+              (eqOString.equals(provider.runeAddress, O.some(runeAddress)) && O.isNone(provider.assetAddress)) ||
+              // asset side
+              (eqOString.equals(provider.assetAddress, O.some(assetAddress)) && O.isNone(provider.runeAddress))
           )
         )
       ),
     [providers, runeAddress, assetAddress]
   )
 
-  return { symLiquidityProvider, symPendingAssets, asymLiquidityProviders }
+  /**
+   * Checks an asym. deposits asset
+   */
+  const hasAsymAssets: LiquidityProviderHasAsymAssetsRD = useMemo(
+    () =>
+      FP.pipe(
+        asymLiquidityProviders,
+        RD.map((providers) =>
+          FP.pipe(
+            providers,
+            A.reduce<LiquidityProvider, LiquidityProviderHasAsymAssets>(
+              { asset: false, rune: false },
+              (acc, provider) => ({
+                asset: O.isSome(provider.assetAddress) || acc.asset,
+                rune: O.isSome(provider.runeAddress) || acc.rune
+              })
+            )
+          )
+        )
+      ),
+    [asymLiquidityProviders]
+  )
+
+  /**
+   * Checks an asym. deposit asset
+   */
+  const hasAsymAsset: RD.RemoteData<ApiError, boolean> = useMemo(
+    () =>
+      FP.pipe(
+        providers,
+        RD.map(
+          FP.flow(
+            A.filter(
+              (provider) =>
+                eqOString.equals(provider.assetAddress, O.some(assetAddress)) && O.isNone(provider.runeAddress)
+            ),
+            A.head,
+            O.isSome
+          )
+        )
+      ),
+    [assetAddress, providers]
+  )
+
+  /**
+   * Checks an asym. deposit using RUNE
+   */
+  const hasAsymRune: RD.RemoteData<ApiError, boolean> = useMemo(
+    () =>
+      FP.pipe(
+        providers,
+        RD.map(
+          FP.flow(
+            A.filter(
+              (provider) =>
+                eqOString.equals(provider.runeAddress, O.some(runeAddress)) && O.isNone(provider.assetAddress)
+            ),
+            A.head,
+            O.isSome
+          )
+        )
+      ),
+    [providers, runeAddress]
+  )
+
+  return {
+    symLiquidityProvider,
+    symPendingAssets,
+    asymLiquidityProviders,
+    hasAsymAsset,
+    hasAsymRune,
+    hasAsymAssets
+  }
 }

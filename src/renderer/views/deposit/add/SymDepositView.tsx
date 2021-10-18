@@ -14,7 +14,7 @@ import * as RxOp from 'rxjs/operators'
 import { Network } from '../../../../shared/api/types'
 import { SymDeposit } from '../../../components/deposit/add'
 import { Alert } from '../../../components/uielements/alert'
-import { RECOVERY_TOOL_URL, ZERO_BN, ZERO_POOL_DATA } from '../../../const'
+import { ASYM_DEPOSIT_TOOL_URL, RECOVERY_TOOL_URL, ZERO_BN, ZERO_POOL_DATA } from '../../../const'
 import { useAppContext } from '../../../contexts/AppContext'
 import { useChainContext } from '../../../contexts/ChainContext'
 import { useEthereumContext } from '../../../contexts/EthereumContext'
@@ -190,7 +190,7 @@ export const SymDepositView: React.FC<Props> = (props) => {
     [fundsCapRD]
   )
 
-  const { symPendingAssets: symPendingAssetsRD, asymLiquidityProviders } = useLiquidityProviders({
+  const { symPendingAssets: symPendingAssetsRD, hasAsymAssets: hasAsymAssetsRD } = useLiquidityProviders({
     asset,
     network,
     runeAddress: runeWalletAddress,
@@ -199,6 +199,11 @@ export const SymDepositView: React.FC<Props> = (props) => {
 
   const openRecoveryTool = useCallback(
     (): Promise<void> => window.apiUrl.openExternal(RECOVERY_TOOL_URL[network]),
+    [network]
+  )
+
+  const openAsymDepositTool = useCallback(
+    (): Promise<void> => window.apiUrl.openExternal(ASYM_DEPOSIT_TOOL_URL[network]),
     [network]
   )
 
@@ -242,8 +247,9 @@ export const SymDepositView: React.FC<Props> = (props) => {
           fundsCap={O.none}
           poolsData={{}}
           symPendingAssets={RD.initial}
-          asymLiquidityProviders={RD.initial}
           openRecoveryTool={openRecoveryTool}
+          hasAsymAssets={RD.initial}
+          openAsymDepositTool={openAsymDepositTool}
         />
       </>
     ),
@@ -265,7 +271,8 @@ export const SymDepositView: React.FC<Props> = (props) => {
       network,
       approveERC20Token$,
       isApprovedERC20Token$,
-      openRecoveryTool
+      openRecoveryTool,
+      openAsymDepositTool
     ]
   )
 
@@ -317,8 +324,9 @@ export const SymDepositView: React.FC<Props> = (props) => {
               fundsCap={fundsCap}
               poolsData={poolsData}
               symPendingAssets={symPendingAssetsRD}
-              asymLiquidityProviders={asymLiquidityProviders}
               openRecoveryTool={openRecoveryTool}
+              hasAsymAssets={hasAsymAssetsRD}
+              openAsymDepositTool={openAsymDepositTool}
             />
           </>
         )

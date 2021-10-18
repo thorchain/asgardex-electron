@@ -6,7 +6,7 @@ import * as FP from 'fp-ts/lib/function'
 
 import { Network } from '../../../../shared/api/types'
 import { AssetWithAmount1e8, AssetsWithAmount1e8 } from '../../../types/asgardex'
-import { PendingAssets } from './Deposit.subcomponents'
+import { PendingAssetsWarning } from './PendingAssetsWarning'
 
 const bnbAsset: AssetWithAmount1e8 = {
   amount1e8: assetToBase(assetAmount(1)),
@@ -20,22 +20,22 @@ const btcAsset: AssetWithAmount1e8 = {
 
 const assets: AssetsWithAmount1e8 = [bnbAsset, btcAsset]
 
-type PendingAssetsStoryArgs = {
+type Args = {
   network: Network
   onClickRecovery: FP.Lazy<void>
   loading: boolean
 }
 
-const PendingAssetsTemplate: Story<PendingAssetsStoryArgs> = ({ network, loading, onClickRecovery }) => {
-  return <PendingAssets assets={assets} network={network} onClickRecovery={onClickRecovery} loading={loading} />
+const Template: Story<Args> = ({ network, loading, onClickRecovery }) => {
+  return <PendingAssetsWarning assets={assets} network={network} onClickRecovery={onClickRecovery} loading={loading} />
 }
 
-export const Default = PendingAssetsTemplate.bind({})
+export const Default = Template.bind({})
 
 Default.storyName = 'default'
 
-const metaPendingAssets: Meta<PendingAssetsStoryArgs> = {
-  component: PendingAssets,
+const meta: Meta<Args> = {
+  component: PendingAssetsWarning,
   title: 'Components/Deposit/PendingAssets',
   argTypes: {
     network: {
@@ -59,4 +59,4 @@ const metaPendingAssets: Meta<PendingAssetsStoryArgs> = {
   }
 }
 
-export default metaPendingAssets
+export default meta

@@ -161,31 +161,6 @@ export const DepositView: React.FC<Props> = () => {
 
   const poolDetailRD = useObservableState<PoolDetailRD>(selectedPoolDetail$, RD.initial)
 
-  // const { network } = useNetwork()
-
-  // const { symLiquidityProvider } = useLiquidityProviders({ asset, network, assetAddress, runeAddress })
-
-  // const [liquidityProvider] = useObservableState<LiquidityProviderRD>(() => {
-  //   return Rx.combineLatest([
-  //     network$,
-  //     // We should look for THORChain's wallet at the response of liqudity_providers endpoint
-  //     address$,
-  //     addressByChain$(THORChain),
-  //     selectedPoolAsset$
-  //   ]).pipe(
-  //     RxOp.switchMap(([network, oAssetAddress, oRuneAddress, oSelectedPoolAsset]) => {
-  //       return FP.pipe(
-  //         sequenceTOption(oRuneAddress, oAssetAddress, oSelectedPoolAsset),
-  //         O.fold(
-  //           (): LiquidityProviderLD => Rx.of(RD.initial),
-  //           ([{ address: runeAddress }, { address: assetAddress }, asset]) =>
-  //             getLiquidityProvider({ asset, network, runeAddress, assetAddress })
-  //         )
-  //       )
-  //     })
-  //   )
-  // }, RD.initial)
-
   // Special case: `keystoreState` is `undefined` in first render loop
   // (see comment at its definition using `useObservableState`)
   if (keystoreState === undefined) {
