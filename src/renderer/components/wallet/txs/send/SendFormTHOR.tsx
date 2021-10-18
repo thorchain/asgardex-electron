@@ -24,19 +24,19 @@ import { WalletType } from '../../../../../shared/wallet/types'
 import { ZERO_BASE_AMOUNT } from '../../../../const'
 import { isRuneNativeAsset, THORCHAIN_DECIMAL } from '../../../../helpers/assetHelper'
 import { sequenceTOption } from '../../../../helpers/fpHelpers'
-import { getRuneNativeAmountFromBalances, getWalletByAddress } from '../../../../helpers/walletHelper'
+import { getRuneNativeAmountFromBalances } from '../../../../helpers/walletHelper'
 import { FeeRD, SendTxParams } from '../../../../services/chain/types'
 import { AddressValidation, WalletBalances } from '../../../../services/clients'
 import { ValidatePasswordHandler } from '../../../../services/wallet/types'
 import { WalletBalance } from '../../../../services/wallet/types'
 import { PasswordModal } from '../../../modal/password'
 import { MaxBalanceButton } from '../../../uielements/button/MaxBalanceButton'
-import { WalletTypeLabel } from '../../../uielements/common/Common.styles'
 import { UIFeesRD } from '../../../uielements/fees'
 import { Input, InputBigNumber } from '../../../uielements/input'
 import { AccountSelector } from '../../account'
 import * as Styled from '../TxForm.styles'
 import { validateTxAmountInput } from '../TxForm.util'
+import { getMatchedWalletType, getRenderedWalletType } from './Send.helpers'
 import { useChangeAssetHandler } from './Send.hooks'
 
 export type FormValues = {
@@ -235,33 +235,16 @@ export const SendFormTHOR: React.FC<Props> = (props): JSX.Element => {
   }, [sendHandler, walletType])
 
   const [recipientAddress, setRecipientAddress] = useState<Address>('')
-
-  const oMatchedWalletType: O.Option<WalletType> = useMemo(
-    () =>
-      FP.pipe(
-        getWalletByAddress(balances, recipientAddress),
-        O.map(({ walletType }) => walletType)
-      ),
-    [balances, recipientAddress]
-  )
-
   const handleOnKeyUp = useCallback(() => {
     setRecipientAddress(form.getFieldValue('recipient'))
   }, [form])
 
-  const renderWalletType = useMemo(() => {
-    return FP.pipe(
-      oMatchedWalletType,
-      O.fold(
-        () => <></>,
-        (matchedWalletType) => (
-          <Styled.WalletTypeLabelWrapper>
-            <WalletTypeLabel>{matchedWalletType}</WalletTypeLabel>
-          </Styled.WalletTypeLabelWrapper>
-        )
-      )
-    )
-  }, [oMatchedWalletType])
+  const oMatchedWalletType: O.Option<WalletType> = useMemo(
+    () => getMatchedWalletType(balances, recipientAddress),
+    [balances, recipientAddress]
+  )
+
+  const renderWalletType = useMemo(() => getRenderedWalletType(oMatchedWalletType), [oMatchedWalletType])
 
   return (
     <>

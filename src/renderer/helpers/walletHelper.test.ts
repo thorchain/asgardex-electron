@@ -4,7 +4,7 @@ import * as NEA from 'fp-ts/lib/NonEmptyArray'
 import * as O from 'fp-ts/lib/Option'
 
 import { ASSETS_TESTNET } from '../../shared/mock/assets'
-import { NonEmptyWalletBalances, WalletBalance } from '../services/wallet/types'
+import { NonEmptyWalletBalances, WalletBalance, WalletBalances } from '../services/wallet/types'
 import { isRuneNativeAsset } from './assetHelper'
 import { eqWalletBalances } from './fp/eq'
 import {
@@ -133,13 +133,13 @@ describe('walletHelper', () => {
 
   describe('getWalletByAddress', () => {
     it('returns address of RUNE wallet', () => {
-      const balances: NonEmptyWalletBalances = NEA.fromReadonlyNonEmptyArray([RUNE_WB, BOLT_WB, BNB_WB])
+      const balances: WalletBalances = NEA.fromReadonlyNonEmptyArray([RUNE_WB, BOLT_WB, BNB_WB])
       const result = O.toNullable(getWalletByAddress(balances, RUNE_WB.walletAddress))
       expect(isRuneNativeAsset(result?.asset ?? AssetBNB /* BNB would fail */)).toBeTruthy()
       expect(result?.walletAddress).toEqual(RUNE_WB.walletAddress)
     })
     it('returns none if BNB wallet address is not available', () => {
-      const balances: NonEmptyWalletBalances = NEA.fromReadonlyNonEmptyArray([BOLT_WB, BNB_WB])
+      const balances: WalletBalances = NEA.fromReadonlyNonEmptyArray([BOLT_WB, BNB_WB])
       const result = getWalletByAddress(balances, RUNE_WB.walletAddress)
       expect(result).toBeNone()
     })
