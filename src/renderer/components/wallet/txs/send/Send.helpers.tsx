@@ -7,7 +7,7 @@ import { WalletBalances } from '../../../../services/clients'
 import { WalletTypeLabel } from '../../../uielements/common/Common.styles'
 import * as Styled from '../TxForm.styles'
 
-export const getRenderedWalletType = (oMatchedWalletType: O.Option<WalletType>) =>
+export const renderedWalletType = (oMatchedWalletType: O.Option<WalletType>) =>
   FP.pipe(
     oMatchedWalletType,
     O.fold(
@@ -20,7 +20,7 @@ export const getRenderedWalletType = (oMatchedWalletType: O.Option<WalletType>) 
     )
   )
 
-export const getMatchedWalletType = (balances: WalletBalances, recipientAddress: string): O.Option<WalletType> =>
+export const matchedWalletType = (balances: WalletBalances, recipientAddress: string): O.Option<WalletType> =>
   FP.pipe(
     getWalletByAddress(balances, recipientAddress),
     O.map(({ walletType }) => walletType)

@@ -37,7 +37,7 @@ import { AccountSelector } from '../../account'
 import * as Styled from '../TxForm.styles'
 import { validateTxAmountInput } from '../TxForm.util'
 import { DEFAULT_FEE_OPTION } from './Send.const'
-import { getMatchedWalletType, getRenderedWalletType } from './Send.helpers'
+import { matchedWalletType, renderedWalletType } from './Send.helpers'
 import { useChangeAssetHandler } from './Send.hooks'
 
 export type FormValues = {
@@ -336,11 +336,11 @@ export const SendFormBCH: React.FC<Props> = (props): JSX.Element => {
   }, [form])
 
   const oMatchedWalletType: O.Option<WalletType> = useMemo(
-    () => getMatchedWalletType(balances, recipientAddress),
+    () => matchedWalletType(balances, recipientAddress),
     [balances, recipientAddress]
   )
 
-  const renderWalletType = useMemo(() => getRenderedWalletType(oMatchedWalletType), [oMatchedWalletType])
+  const renderWalletType = useMemo(() => renderedWalletType(oMatchedWalletType), [oMatchedWalletType])
 
   return (
     <>

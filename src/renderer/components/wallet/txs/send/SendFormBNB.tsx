@@ -36,7 +36,7 @@ import { Input, InputBigNumber } from '../../../uielements/input'
 import { AccountSelector } from '../../account'
 import * as Styled from '../TxForm.styles'
 import { validateTxAmountInput } from '../TxForm.util'
-import { getMatchedWalletType, getRenderedWalletType } from './Send.helpers'
+import * as H from './Send.helpers'
 import { useChangeAssetHandler } from './Send.hooks'
 
 export type FormValues = {
@@ -245,11 +245,11 @@ export const SendFormBNB: React.FC<Props> = (props): JSX.Element => {
   }, [form])
 
   const oMatchedWalletType: O.Option<WalletType> = useMemo(
-    () => getMatchedWalletType(balances, recipientAddress),
+    () => H.matchedWalletType(balances, recipientAddress),
     [balances, recipientAddress]
   )
 
-  const renderWalletType = useMemo(() => getRenderedWalletType(oMatchedWalletType), [oMatchedWalletType])
+  const renderWalletType = useMemo(() => H.renderedWalletType(oMatchedWalletType), [oMatchedWalletType])
 
   return (
     <>
