@@ -36,6 +36,7 @@ import { Input, InputBigNumber } from '../../../uielements/input'
 import { AccountSelector } from '../../account'
 import * as Styled from '../TxForm.styles'
 import { validateTxAmountInput } from '../TxForm.util'
+import * as H from './Send.helpers'
 import { useChangeAssetHandler } from './Send.hooks'
 
 export type FormValues = {
@@ -238,6 +239,18 @@ export const SendFormBNB: React.FC<Props> = (props): JSX.Element => {
     if (isLedgerWallet(walletType)) sendHandler()
   }, [sendHandler, walletType])
 
+  const [recipientAddress, setRecipientAddress] = useState<Address>('')
+  const handleOnKeyUp = useCallback(() => {
+    setRecipientAddress(form.getFieldValue('recipient'))
+  }, [form])
+
+  const oMatchedWalletType: O.Option<WalletType> = useMemo(
+    () => H.matchedWalletType(balances, recipientAddress),
+    [balances, recipientAddress]
+  )
+
+  const renderWalletType = useMemo(() => H.renderedWalletType(oMatchedWalletType), [oMatchedWalletType])
+
   return (
     <>
       <Row>
@@ -250,9 +263,12 @@ export const SendFormBNB: React.FC<Props> = (props): JSX.Element => {
           />
           <Styled.Form form={form} initialValues={{ amount: bn(0) }} onFinish={onFinishHandler} labelCol={{ span: 24 }}>
             <Styled.SubForm>
-              <Styled.CustomLabel size="big">{intl.formatMessage({ id: 'common.address' })}</Styled.CustomLabel>
+              <Styled.CustomLabel size="big">
+                {intl.formatMessage({ id: 'common.address' })}
+                {renderWalletType}
+              </Styled.CustomLabel>
               <Form.Item rules={[{ required: true, validator: addressValidator }]} name="recipient">
-                <Input color="primary" size="large" disabled={isLoading} />
+                <Input color="primary" size="large" disabled={isLoading} onKeyUp={handleOnKeyUp} />
               </Form.Item>
               <Styled.CustomLabel size="big">{intl.formatMessage({ id: 'common.amount' })}</Styled.CustomLabel>
               <Styled.FormItem rules={[{ required: true, validator: amountValidator }]} name="amount">

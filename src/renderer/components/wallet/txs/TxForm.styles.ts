@@ -26,6 +26,9 @@ export const FormItem = styled(A.Form.Item)`
 `
 
 export const CustomLabel = styled(UILabel)`
+  display: flex;
+  flex-direction: row;
+  align-items: center;
   font-family: 'MainFontRegular';
   text-transform: uppercase;
   color: ${palette('text', 2)};
@@ -111,4 +114,8 @@ export const SubmitStatus = styled(UILabel).attrs({
   padding-right: 10px;
   font-family: 'MainFontRegular';
   text-transform: uppercase;
+`
+
+export const WalletTypeLabelWrapper = styled(`div`)`
+  margin-left: 5px;
 `
