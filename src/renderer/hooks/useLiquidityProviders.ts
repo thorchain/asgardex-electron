@@ -19,7 +19,6 @@ import {
   LiquidityProvidersRD,
   PendingAssetsRD
 } from '../services/thorchain/types'
-import { ApiError } from '../services/wallet/types'
 import { AssetsWithAmount1e8 } from '../types/asgardex'
 
 export const useLiquidityProviders = ({
@@ -118,54 +117,10 @@ export const useLiquidityProviders = ({
     [asymLiquidityProviders]
   )
 
-  /**
-   * Checks an asym. deposit asset
-   */
-  const hasAsymAsset: RD.RemoteData<ApiError, boolean> = useMemo(
-    () =>
-      FP.pipe(
-        providers,
-        RD.map(
-          FP.flow(
-            A.filter(
-              (provider) =>
-                eqOString.equals(provider.assetAddress, O.some(assetAddress)) && O.isNone(provider.runeAddress)
-            ),
-            A.head,
-            O.isSome
-          )
-        )
-      ),
-    [assetAddress, providers]
-  )
-
-  /**
-   * Checks an asym. deposit using RUNE
-   */
-  const hasAsymRune: RD.RemoteData<ApiError, boolean> = useMemo(
-    () =>
-      FP.pipe(
-        providers,
-        RD.map(
-          FP.flow(
-            A.filter(
-              (provider) =>
-                eqOString.equals(provider.runeAddress, O.some(runeAddress)) && O.isNone(provider.assetAddress)
-            ),
-            A.head,
-            O.isSome
-          )
-        )
-      ),
-    [providers, runeAddress]
-  )
-
   return {
     symLiquidityProvider,
     symPendingAssets,
     asymLiquidityProviders,
-    hasAsymAsset,
-    hasAsymRune,
     hasAsymAssets
   }
 }

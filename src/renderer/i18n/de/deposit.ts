@@ -34,7 +34,7 @@ const deposit: DepositMessages = {
   'deposit.add.pendingAssets.recoveryTitle': 'Öffne Recovery Tool',
   'deposit.add.asymAssets.title': 'Asymmetrisches Deposit gefunden',
   'deposit.add.asymAssets.description':
-    'Das Hinzufügen eines Assetpaares in den Pool ist nicht möglich, da Du bereits folgende folgende(s) Asset(s) zuvor asymmetrisch (einseitig) hinzugefügt hast:',
+    'Das Hinzufügen eines Assetpaares in den Pool ist nicht möglich, da Du bereits folgende(s) Asset(s) asymmetrisch (einseitig) hinzugefügt hast:',
   'deposit.add.asymAssets.recoveryDescription':
     'Asymmetrisches (einseitiges) Hinzufügen von Assets ist aktuell in ASGARDEX Desktop noch nicht möglich. Aber Du hast die Möglichkeit, dieses Feature zwischenzeitlich in THORSWap zu nutzen, um die zuvor asymmetrisch hinzugefügten Assets zurückzuüberweisen',
   'deposit.add.asymAssets.recoveryTitle': 'THORSwap',
