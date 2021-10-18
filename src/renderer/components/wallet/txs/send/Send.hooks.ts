@@ -4,8 +4,8 @@ import { Address } from '@xchainjs/xchain-client'
 import { Asset, assetToString } from '@xchainjs/xchain-util'
 import { useHistory } from 'react-router-dom'
 
+import { WalletType } from '../../../../../shared/wallet/types'
 import * as walletRoutes from '../../../../routes/wallet'
-import { WalletType } from '../../../../services/wallet/types'
 
 export const useChangeAssetHandler = () => {
   const history = useHistory()

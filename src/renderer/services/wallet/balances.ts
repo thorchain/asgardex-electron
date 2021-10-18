@@ -9,11 +9,13 @@ import * as Rx from 'rxjs'
 import * as RxOp from 'rxjs/operators'
 
 import { Network } from '../../../shared/api/types'
+import { WalletType } from '../../../shared/wallet/types'
 import { getBnbRuneAsset } from '../../helpers/assetHelper'
 import { filterEnabledChains } from '../../helpers/chainHelper'
 import { eqBalancesRD } from '../../helpers/fp/eq'
 import { sequenceTOptionFromArray } from '../../helpers/fpHelpers'
 import { liveData } from '../../helpers/rx/liveData'
+import { addressFromOptionalWalletAddress } from '../../helpers/walletHelper'
 import { Network$ } from '../app/types'
 import * as BNB from '../binance'
 import * as BTC from '../bitcoin'
@@ -32,8 +34,7 @@ import {
   KeystoreState$,
   KeystoreState,
   ChainBalance,
-  LedgerAddressLD,
-  WalletType
+  LedgerAddressLD
 } from './types'
 import { sortBalances } from './util'
 import { hasImportedKeystore } from './util'
@@ -203,10 +204,10 @@ export const createBalancesService = ({
     THOR.addressUI$,
     getChainBalance$(THORChain, 'keystore')
   ]).pipe(
-    RxOp.map(([walletAddress, balances]) => ({
+    RxOp.map(([oWalletAddress, balances]) => ({
       walletType: 'keystore',
       chain: THORChain,
-      walletAddress,
+      walletAddress: addressFromOptionalWalletAddress(oWalletAddress),
       balances
     }))
   )
@@ -236,7 +237,7 @@ export const createBalancesService = ({
                 walletAddress: O.none,
                 balances: RD.initial
               }),
-            (address) =>
+            ({ address }) =>
               // Load balances by given Ledger address
               // and put it's RD state into `balances` of `ChainBalance`
               FP.pipe(
@@ -266,10 +267,10 @@ export const createBalancesService = ({
     LTC.addressUI$,
     getChainBalance$(LTCChain, 'keystore')
   ]).pipe(
-    RxOp.map(([walletAddress, balances]) => ({
+    RxOp.map(([oWalletAddress, balances]) => ({
       walletType: 'keystore',
       chain: LTCChain,
-      walletAddress,
+      walletAddress: addressFromOptionalWalletAddress(oWalletAddress),
       balances
     }))
   )
@@ -281,10 +282,10 @@ export const createBalancesService = ({
     BCH.addressUI$,
     getChainBalance$(BCHChain, 'keystore')
   ]).pipe(
-    RxOp.map(([walletAddress, balances]) => ({
+    RxOp.map(([oWalletAddress, balances]) => ({
       walletType: 'keystore',
       chain: BCHChain,
-      walletAddress,
+      walletAddress: addressFromOptionalWalletAddress(oWalletAddress),
       balances
     }))
   )
@@ -302,10 +303,10 @@ export const createBalancesService = ({
     getChainBalance$(BNBChain, 'keystore'),
     network$
   ]).pipe(
-    RxOp.map(([walletAddress, balances, network]) => ({
+    RxOp.map(([oWalletAddress, balances, network]) => ({
       walletType: 'keystore',
       chain: BNBChain,
-      walletAddress,
+      walletAddress: addressFromOptionalWalletAddress(oWalletAddress),
       balances: FP.pipe(
         balances,
         RD.map((assets) => sortBalances(assets, [AssetBNB.ticker, getBnbRuneAsset(network).ticker]))
@@ -320,10 +321,10 @@ export const createBalancesService = ({
     BTC.addressUI$,
     getChainBalance$(BTCChain, 'keystore')
   ]).pipe(
-    RxOp.map(([walletAddress, balances]) => ({
+    RxOp.map(([oWalletAddress, balances]) => ({
       walletType: 'keystore',
       chain: BTCChain,
-      walletAddress,
+      walletAddress: addressFromOptionalWalletAddress(oWalletAddress),
       balances
     }))
   )
@@ -334,10 +335,10 @@ export const createBalancesService = ({
    * Transforms ETH data (address + `WalletBalance`) into `ChainBalance`
    */
   const ethChainBalance$: ChainBalance$ = Rx.combineLatest([ETH.addressUI$, ethBalances$]).pipe(
-    RxOp.map(([walletAddress, balances]) => ({
+    RxOp.map(([oWalletAddress, balances]) => ({
       walletType: 'keystore',
       chain: ETHChain,
-      walletAddress,
+      walletAddress: addressFromOptionalWalletAddress(oWalletAddress),
       balances
     }))
   )

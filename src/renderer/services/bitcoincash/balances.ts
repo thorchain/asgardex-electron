@@ -1,6 +1,6 @@
+import { WalletType } from '../../../shared/wallet/types'
 import { observableState } from '../../helpers/stateHelper'
 import * as C from '../clients'
-import { WalletType } from '../wallet/types'
 import { client$ } from './common'
 
 /**

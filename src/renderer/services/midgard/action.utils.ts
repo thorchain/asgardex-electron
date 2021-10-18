@@ -4,8 +4,8 @@ import * as FP from 'fp-ts/function'
 import * as O from 'fp-ts/Option'
 
 import { AssetWithAmount } from '../../types/asgardex'
-import { Action, Coin, Transaction } from '../../types/generated/midgard/models'
-import { PoolAction, Tx, TxType } from './types'
+import { Action as ActionAPI, Coin, Transaction } from '../../types/generated/midgard/models'
+import { Action, Tx, TxType } from './types'
 
 export const getTxType = (apiString: string): TxType => {
   const type = apiString.toUpperCase()
@@ -51,7 +51,7 @@ export const mapTransaction = (tx: Transaction): Tx => ({
   values: FP.pipe(tx.coins, A.filterMap(mapCoin))
 })
 
-export const mapAction = (action: Action): PoolAction => ({
+export const mapAction = (action: ActionAPI): Action => ({
   ...action,
   type: getTxType(action.type),
   // backend provides date in nanoseconds so we need to divide it by 1 000 000

@@ -24,6 +24,7 @@ const common: CommonMessages = {
   'common.submit': 'Submit',
   'common.confirm': 'Confirm',
   'common.cancel': 'Cancel',
+  'common.reject': 'Reject',
   'common.next': 'Next',
   'common.finish': 'Finish',
   'common.copy': 'Copy',

@@ -1,7 +1,7 @@
 import * as RD from '@devexperts/remote-data-ts'
 import { EtherscanProvider } from '@ethersproject/providers'
 import * as ETH from '@xchainjs/xchain-ethereum'
-import { Asset, assetToString } from '@xchainjs/xchain-util'
+import { Asset, assetToString, ETHChain } from '@xchainjs/xchain-util'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
 import * as Rx from 'rxjs'
@@ -12,7 +12,7 @@ import { envOrDefault } from '../../../shared/utils/env'
 import { isError } from '../../../shared/utils/guard'
 import { clientNetwork$ } from '../app/service'
 import * as C from '../clients'
-import { Address$, ExplorerUrl$ } from '../clients/types'
+import { WalletAddress$, ExplorerUrl$ } from '../clients/types'
 import { keystoreService } from '../wallet/keystore'
 import { getPhrase } from '../wallet/util'
 import { Client$, ClientState, ClientState$ } from './types'
@@ -73,12 +73,12 @@ const client$: Client$ = clientState$.pipe(RxOp.map(RD.toOption), RxOp.shareRepl
 /**
  * Current `Address` depending on selected network
  */
-const address$: Address$ = C.address$(client$)
+const address$: WalletAddress$ = C.address$(client$, ETHChain)
 
 /**
  * Current `Address` depending on selected network
  */
-const addressUI$: Address$ = C.addressUI$(client$)
+const addressUI$: WalletAddress$ = C.addressUI$(client$, ETHChain)
 
 /**
  * Explorer url depending on selected network

@@ -6,9 +6,10 @@ import * as O from 'fp-ts/lib/Option'
 import * as Rx from 'rxjs'
 
 import { LedgerBNBTxParams, Network } from '../../../shared/api/types'
+import { WalletType } from '../../../shared/wallet/types'
 import { LiveData } from '../../helpers/rx/liveData'
 import * as C from '../clients'
-import { ApiError, LedgerAddressLD, LedgerTxHashLD, WalletType } from '../wallet/types'
+import { ApiError, LedgerAddressLD, LedgerTxHashLD } from '../wallet/types'
 
 export type Client$ = C.Client$<Client>
 

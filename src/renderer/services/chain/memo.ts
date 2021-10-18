@@ -1,4 +1,5 @@
 import { getDepositMemo, getWithdrawMemo } from '@thorchain/asgardex-util'
+import { Chain } from '@xchainjs/xchain-util'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
 import * as Rx from 'rxjs'
@@ -14,20 +15,22 @@ import { SymDepositMemoRx, MemoRx } from './types'
 /**
  * Memo of symmetrical deposit txs
  */
-const symDepositTxMemo$: SymDepositMemoRx = Rx.combineLatest([selectedPoolAsset$, THOR.address$, assetAddress$]).pipe(
-  RxOp.map(([oPoolAsset, oRuneAddress, oAssetAddress]) =>
-    FP.pipe(
-      sequenceTOption(oPoolAsset, oRuneAddress, oAssetAddress),
-      // add address of base-chain wallet to memo
-      O.map(([poolAsset, runeAddress, assetAddress]) => ({
-        rune: getDepositMemo(poolAsset, assetAddress),
-        asset: getDepositMemo(poolAsset, runeAddress)
-      }))
+const symDepositTxMemo$ = (assetChain: Chain): SymDepositMemoRx =>
+  Rx.combineLatest([selectedPoolAsset$, THOR.address$, assetAddress$(assetChain)]).pipe(
+    RxOp.map(([oPoolAsset, oRuneAddress, oAssetAddress]) =>
+      FP.pipe(
+        sequenceTOption(oPoolAsset, oRuneAddress, oAssetAddress),
+        // add address of base-chain wallet to memo
+        O.map(([poolAsset, { address: runeAddress }, { address: assetAddress }]) => ({
+          rune: getDepositMemo(poolAsset, assetAddress),
+          asset: getDepositMemo(poolAsset, runeAddress)
+        }))
+      )
     )
   )
-)
 
-const symDepositAssetTxMemo$: MemoRx = symDepositTxMemo$.pipe(RxOp.map(FP.flow(O.map(({ asset }) => asset))))
+const symDepositAssetTxMemo$ = (assetChain: Chain): MemoRx =>
+  symDepositTxMemo$(assetChain).pipe(RxOp.map(FP.flow(O.map(({ asset }) => asset))))
 
 /**
  * Memo of asymmetrical deposit txs

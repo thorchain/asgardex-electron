@@ -7,6 +7,7 @@ import * as O from 'fp-ts/Option'
 
 import { Network } from '../../../shared/api/types'
 import { EarningsHistoryItemPool, PoolDetail, PoolStatsDetail } from '../../types/generated/midgard/models'
+import { PoolHistoryActions } from '../../views/pool/PoolHistoryView.types'
 import { stringToGetPoolsStatus } from '../../views/pools/Pools.utils'
 import { PoolCards } from './PoolCards'
 import * as H from './PoolDetails.helpers'
@@ -14,13 +15,17 @@ import { PoolTitle } from './PoolTitle'
 
 export type Props = {
   asset: Asset
+  historyActions: PoolHistoryActions
   poolStatsDetail: PoolStatsDetail
   poolDetail: PoolDetail
   priceRatio: BigNumber
   priceSymbol?: string
   earningsHistory: O.Option<EarningsHistoryItemPool>
   isLoading?: boolean
-  HistoryView: React.ComponentType<{ poolAsset: Asset }>
+  HistoryView: React.ComponentType<{
+    poolAsset: Asset
+    historyActions: PoolHistoryActions
+  }>
   ChartView: React.ComponentType<{ isLoading?: boolean; priceRatio: BigNumber }>
   disableTradingPoolAction: boolean
   disableAllPoolActions: boolean
@@ -30,6 +35,7 @@ export type Props = {
 
 export const PoolDetails: React.FC<Props> = ({
   asset,
+  historyActions,
   priceSymbol = '',
   priceRatio,
   poolDetail,
@@ -71,7 +77,7 @@ export const PoolDetails: React.FC<Props> = ({
         <ChartView priceRatio={priceRatio} />
       </A.Col>
       <A.Col span={24}>
-        <HistoryView poolAsset={asset} />
+        <HistoryView poolAsset={asset} historyActions={historyActions} />
       </A.Col>
     </A.Row>
   )

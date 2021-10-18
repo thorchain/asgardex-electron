@@ -113,7 +113,10 @@ export const DepositView: React.FC<Props> = () => {
     () =>
       FP.pipe(
         oAssetWalletAddress,
-        O.fold(() => Rx.EMPTY, shares$)
+        O.fold(
+          () => Rx.EMPTY,
+          ({ address }) => shares$(address)
+        )
       ),
     [oAssetWalletAddress, shares$]
   )
@@ -162,7 +165,7 @@ export const DepositView: React.FC<Props> = () => {
 
   // const { symLiquidityProvider } = useLiquidityProviders({ asset, network, assetAddress, runeAddress })
 
-  // const [symLiquidityProvider] = useObservableState<LiquidityProviderRD>(() => {
+  // const [liquidityProvider] = useObservableState<LiquidityProviderRD>(() => {
   //   return Rx.combineLatest([
   //     network$,
   //     // We should look for THORChain's wallet at the response of liqudity_providers endpoint
@@ -175,8 +178,8 @@ export const DepositView: React.FC<Props> = () => {
   //         sequenceTOption(oRuneAddress, oAssetAddress, oSelectedPoolAsset),
   //         O.fold(
   //           (): LiquidityProviderLD => Rx.of(RD.initial),
-  //           ([runeAddress, assetAddress, asset]) =>
-  //             getSymLiquidityProvider({ asset, network, runeAddress, assetAddress })
+  //           ([{ address: runeAddress }, { address: assetAddress }, asset]) =>
+  //             getLiquidityProvider({ asset, network, runeAddress, assetAddress })
   //         )
   //       )
   //     })
@@ -199,7 +202,7 @@ export const DepositView: React.FC<Props> = () => {
         sequenceTOption(oRuneWalletAddress, oAssetWalletAddress),
         O.fold(
           () => <ErrorView title={intl.formatMessage({ id: 'common.error' })} subTitle={'Could not get addresses'} />,
-          ([runeWalletAddress, assetWalletAddress]) =>
+          ([{ address: runeWalletAddress }, { address: assetWalletAddress }]) =>
             FP.pipe(
               assetWithDecimalRD,
               RD.fold(

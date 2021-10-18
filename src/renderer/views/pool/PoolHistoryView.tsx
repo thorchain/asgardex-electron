@@ -1,92 +1,32 @@
-import React, { useCallback, useEffect, useMemo, useRef } from 'react'
+import React, { useEffect, useMemo } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
 import { Asset, assetToString, THORChain } from '@xchainjs/xchain-util'
-import * as FP from 'fp-ts/function'
 import * as O from 'fp-ts/Option'
-import { useObservableState } from 'observable-hooks'
-import * as RxOp from 'rxjs/operators'
 
 import { PoolActionsHistory } from '../../components/poolActionsHistory'
-import { DEFAULT_PAGE_SIZE } from '../../components/poolActionsHistory/PoolActionsHistory.const'
 import { PoolActionsHistoryFilter } from '../../components/poolActionsHistory/PoolActionsHistoryFilter'
 import { Filter } from '../../components/poolActionsHistory/types'
-import { useMidgardContext } from '../../contexts/MidgardContext'
-import { liveData } from '../../helpers/rx/liveData'
 import { useOpenExplorerTxUrl } from '../../hooks/useOpenExplorerTxUrl'
 import { OpenExplorerTxUrl } from '../../services/clients'
-import { DEFAULT_ACTIONS_HISTORY_REQUEST_PARAMS, LoadActionsParams } from '../../services/midgard/poolActionsHistory'
-import { PoolActionsHistoryPage, PoolActionsHistoryPageRD } from '../../services/midgard/types'
+import { PoolHistoryActions } from './PoolHistoryView.types'
 
 type Props = {
   poolAsset: Asset
+  historyActions: PoolHistoryActions
   className?: string
-}
-
-const DEFAULT_REQUEST_PARAMS = {
-  ...DEFAULT_ACTIONS_HISTORY_REQUEST_PARAMS,
-  itemsPerPage: DEFAULT_PAGE_SIZE
 }
 
 const HISTORY_FILTERS: Filter[] = ['ALL', 'DEPOSIT', 'SWAP', 'WITHDRAW', 'DONATE', 'REFUND']
 
-export const PoolHistory: React.FC<Props> = ({ className, poolAsset }) => {
-  const {
-    service: {
-      poolActionsHistory: { actions$, loadActionsHistory, requestParam$, resetActionsData }
-    }
-  } = useMidgardContext()
-
-  const prevActionsPage = useRef<O.Option<PoolActionsHistoryPage>>(O.none)
-
-  const requestParams = useObservableState(
-    FP.pipe(requestParam$, RxOp.map(O.getOrElse((): LoadActionsParams => DEFAULT_REQUEST_PARAMS))),
-    DEFAULT_REQUEST_PARAMS
-  )
+export const PoolHistoryView: React.FC<Props> = ({ className, poolAsset, historyActions }) => {
+  const { loadHistory, requestParams, historyPage, prevHistoryPage, setFilter, setPage } = historyActions
 
   const stringAsset = useMemo(() => assetToString(poolAsset), [poolAsset])
 
   useEffect(() => {
-    loadActionsHistory({ ...DEFAULT_REQUEST_PARAMS, asset: stringAsset })
-  }, [loadActionsHistory, stringAsset])
-
-  const [historyPage] = useObservableState<PoolActionsHistoryPageRD>(
-    () =>
-      FP.pipe(
-        actions$,
-        liveData.map((page) => {
-          prevActionsPage.current = O.some(page)
-          return page
-        })
-      ),
-    RD.initial
-  )
-
-  useEffect(() => {
-    return () => {
-      resetActionsData()
-    }
-    // Call reset callback only on component unmount
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
-
-  const setCurrentPage = useCallback(
-    (page: number) => {
-      loadActionsHistory({ itemsPerPage: DEFAULT_PAGE_SIZE, page: page - 1 })
-    },
-    [loadActionsHistory]
-  )
-
-  const setFilter = useCallback(
-    (filter: Filter) => {
-      loadActionsHistory({
-        // For every new filter reset all parameters to defaults and with a custom filter
-        ...DEFAULT_REQUEST_PARAMS,
-        type: filter
-      })
-    },
-    [loadActionsHistory]
-  )
+    loadHistory({ asset: stringAsset })
+  }, [loadHistory, stringAsset])
 
   const currentFilter = requestParams.type || 'ALL'
 
@@ -109,10 +49,10 @@ export const PoolHistory: React.FC<Props> = ({ className, poolAsset }) => {
       className={className}
       headerContent={headerContent}
       currentPage={requestParams.page + 1}
-      actionsPageRD={historyPage}
-      prevActionsPage={prevActionsPage.current}
+      historyPageRD={historyPage}
+      prevHistoryPage={prevHistoryPage}
       openExplorerTxUrl={openRuneExplorerTxUrl}
-      changePaginationHandler={setCurrentPage}
+      changePaginationHandler={setPage}
     />
   )
 }

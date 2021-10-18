@@ -10,6 +10,7 @@ import { AssetsNav } from '../../components/wallet/assets'
 import { useMidgardContext } from '../../contexts/MidgardContext'
 import { useThorchainContext } from '../../contexts/ThorchainContext'
 import { useWalletContext } from '../../contexts/WalletContext'
+import { triggerStream } from '../../helpers/stateHelper'
 import { RedirectRouteState } from '../../routes/types'
 import * as walletRoutes from '../../routes/wallet'
 import { hasImportedKeystore, isLocked } from '../../services/wallet/util'
@@ -32,11 +33,12 @@ export const WalletView: React.FC = (): JSX.Element => {
   const {
     service: {
       shares: { reloadCombineSharesByAddresses },
-      pools: { reloadAllPools },
-      poolActionsHistory
+      pools: { reloadAllPools }
     }
   } = useMidgardContext()
   const { reloadNodesInfo } = useThorchainContext()
+
+  const reloadHistory = triggerStream()
 
   // Important note:
   // DON'T set `INITIAL_KEYSTORE_STATE` as default value
@@ -46,9 +48,9 @@ export const WalletView: React.FC = (): JSX.Element => {
   const keystore = useObservableState(keystoreService.keystore$, undefined)
 
   const reloadButton = useCallback(
-    (onClickHandler) => (
+    (onClickHandler, disabled = false) => (
       <Row justify="end" style={{ marginBottom: '20px' }}>
-        <RefreshButton clickHandler={onClickHandler} />
+        <RefreshButton clickHandler={onClickHandler} disabled={disabled} />
       </Row>
     ),
     []
@@ -100,21 +102,14 @@ export const WalletView: React.FC = (): JSX.Element => {
             </Styled.WalletSettingsWrapper>
           </Route>
           <Route path={walletRoutes.history.template}>
-            {reloadButton(poolActionsHistory.reloadActionsHistory)}
+            {reloadButton(reloadHistory.trigger)}
             <AssetsNav />
-            <Styled.PoolActionsHistory />
+            <Styled.WalletHistoryView reloadHistory={reloadHistory} />
           </Route>
         </Switch>
       </>
     ),
-    [
-      reloadButton,
-      reloadBalances,
-      reloadNodesInfo,
-      poolActionsHistory.reloadActionsHistory,
-      reloadCombineSharesByAddresses,
-      reloadAllPools
-    ]
+    [reloadButton, reloadBalances, reloadNodesInfo, reloadHistory, reloadCombineSharesByAddresses, reloadAllPools]
   )
 
   const renderWalletRoute = useCallback(

@@ -24,6 +24,7 @@ const common: CommonMessages = {
   'common.submit': 'Отправить',
   'common.confirm': 'Подтвердить',
   'common.cancel': 'Отменить',
+  'common.reject': 'Reject - RU',
   'common.next': 'Вперед',
   'common.finish': 'Закончить',
   'common.copy': 'Копировать',

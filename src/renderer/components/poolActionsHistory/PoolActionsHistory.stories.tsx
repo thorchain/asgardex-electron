@@ -3,15 +3,18 @@ import { useMemo, useState } from 'react'
 import { Story } from '@storybook/react'
 import { TxHash } from '@xchainjs/xchain-client'
 import { assetAmount, AssetBNB, AssetBTC, AssetRuneNative, assetToBase } from '@xchainjs/xchain-util'
+import * as O from 'fp-ts/lib/Option'
 
 import { getMockRDValueFactory, RDStatus, rdStatusOptions } from '../../../shared/mock/rdByStatus'
-import { PoolActions } from '../../services/midgard/types'
+import { MOCK_WALLET_ADDRESSES } from '../../../shared/mock/wallet'
+import { WalletAddress } from '../../../shared/wallet/types'
+import { Actions } from '../../services/midgard/types'
 import { ErrorId } from '../../services/wallet/types'
 import { PoolActionsHistory } from './PoolActionsHistory'
 import { Filter } from './types'
 import { WalletPoolActionsHistoryHeader } from './WalletPoolActionsHistoryHeader'
 
-const actions: PoolActions = [
+const actions: Actions = [
   {
     date: new Date(Date.now()),
     /**
@@ -144,12 +147,17 @@ export const History: Story<{ dataStatus: RDStatus }> = ({ dataStatus }) => {
   const [filter, setFilter] = useState<Filter>('ALL')
   const HeaderContent = (
     <WalletPoolActionsHistoryHeader
+      addresses={MOCK_WALLET_ADDRESSES}
+      selectedAddress={O.none}
+      network="testnet"
       availableFilters={['ALL', 'SWITCH', 'DEPOSIT', 'SWAP', 'WITHDRAW', 'DONATE', 'REFUND']}
       currentFilter={filter}
       setFilter={setFilter}
-      openViewblockUrl={() => {
-        console.log('open viewblock')
-        return Promise.resolve(true)
+      onWalletAddressChanged={(address: WalletAddress) => {
+        console.log('selected address', address)
+      }}
+      onClickAddressIcon={() => {
+        console.log('on click address icon')
       }}
     />
   )
@@ -161,7 +169,7 @@ export const History: Story<{ dataStatus: RDStatus }> = ({ dataStatus }) => {
         console.log(`Open explorer - tx hash ${txHash}`)
         return Promise.resolve(true)
       }}
-      actionsPageRD={res}
+      historyPageRD={res}
       changePaginationHandler={setCurrentPage}
       currentPage={currentPage}
     />

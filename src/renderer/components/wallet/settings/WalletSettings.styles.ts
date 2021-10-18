@@ -1,4 +1,5 @@
 import * as AIcon from '@ant-design/icons'
+import { EyeOutlined as EyeOutlinedUI } from '@ant-design/icons'
 import * as A from 'antd'
 import styled from 'styled-components'
 import { palette } from 'styled-theme'
@@ -6,7 +7,10 @@ import { palette } from 'styled-theme'
 import { ReactComponent as RemoveIcon } from '../../../assets/svg/icon-remove.svg'
 import { AddressEllipsis as AddressEllipsisUI } from '../../../components/uielements/addressEllipsis'
 import { Button as UIButton } from '../../../components/uielements/button'
-import { ExternalLinkIcon as ExternalLinkIconUI } from '../../../components/uielements/common/Common.styles'
+import {
+  ExternalLinkIcon as ExternalLinkIconUI,
+  WalletTypeLabel as WalletTypeLabelUI
+} from '../../../components/uielements/common/Common.styles'
 import { Label as UILabel } from '../../../components/uielements/label'
 
 export const ContainerWrapper = styled.div`
@@ -136,7 +140,7 @@ export const AccountTitle = styled(UILabel)`
   padding: 0px;
   text-transform: uppercase;
   font-weight: normal;
-  font-size: 18px;
+  font-size: 27px;
   line-height: 25px;
   letter-spacing: 2px;
 `
@@ -182,7 +186,7 @@ export const AddressEllipsis = styled(AddressEllipsisUI)`
 `
 
 export const AddressLinkIcon = styled(ExternalLinkIconUI)`
-  margin-left: 15px;
+  margin-left: 10px;
   height: ${ICON_SIZE}px;
   width: ${ICON_SIZE}px;
   color: ${palette('primary', 0)};
@@ -195,6 +199,18 @@ export const AddressLinkIcon = styled(ExternalLinkIconUI)`
 
 export const QRCodeIcon = styled(AIcon.QrcodeOutlined)`
   margin-left: 5px;
+  cursor: pointer;
+  color: ${palette('primary', 0)};
+  height: ${ICON_SIZE}px;
+  width: ${ICON_SIZE}px;
+
+  & svg {
+    height: ${ICON_SIZE}px;
+    width: ${ICON_SIZE}px;
+  }
+`
+
+export const EyeOutlined = styled(EyeOutlinedUI)`
   cursor: pointer;
   color: ${palette('primary', 0)};
   height: ${ICON_SIZE}px;
@@ -228,7 +244,10 @@ export const AddLedgerIcon = styled(AIcon.PlusCircleOutlined)`
 `
 
 export const RemoveLedgerIcon = styled(RemoveIcon)`
+  margin-left: 5px;
   cursor: pointer;
+  width: ${ICON_SIZE}px;
+  height: ${ICON_SIZE}px;
 `
 
 export const AddLedgerContainer = styled('div')`
@@ -248,4 +267,21 @@ export const WalletIndexInput = styled(A.InputNumber)`
   margin-left: 10px;
   margin-right: 5px;
   max-width: 45px;
+`
+
+export const AddressToVerifyLabel = styled.span`
+  display: block;
+  color: inherit;
+  font-family: 'MainFontBold';
+  font-size: 16px;
+  text-transform: none;
+`
+
+export const AccountAddressWrapper = styled.div`
+  margin-top: 10px;
+`
+
+export const WalletTypeLabel = styled(WalletTypeLabelUI)`
+  margin-left: 40px;
+  display: inline-block;
 `

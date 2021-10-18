@@ -7,7 +7,7 @@ import * as O from 'fp-ts/Option'
 import { useIntl } from 'react-intl'
 
 import { OpenExplorerTxUrl } from '../../services/clients'
-import { PoolActionsHistoryPage, PoolAction, PoolActionsHistoryPageRD } from '../../services/midgard/types'
+import { ActionsPage, Action, ActionsPageRD } from '../../services/midgard/types'
 import { ApiError } from '../../services/wallet/types'
 import { ErrorView } from '../shared/error'
 import * as CommonStyled from '../uielements/common/Common.styles'
@@ -19,8 +19,8 @@ import * as Styled from './PoolActionsHistoryTable.styles'
 
 export type Props = {
   currentPage: number
-  actionsPageRD: PoolActionsHistoryPageRD
-  prevActionsPage?: O.Option<PoolActionsHistoryPage>
+  historyPageRD: ActionsPageRD
+  prevHistoryPage?: O.Option<ActionsPage>
   openExplorerTxUrl: OpenExplorerTxUrl
   changePaginationHandler: (page: number) => void
   className?: string
@@ -29,15 +29,15 @@ export type Props = {
 export const PoolActionsHistoryTable: React.FC<Props> = ({
   openExplorerTxUrl,
   changePaginationHandler,
-  actionsPageRD,
-  prevActionsPage = O.none,
+  historyPageRD,
+  prevHistoryPage = O.none,
   currentPage
 }) => {
   const intl = useIntl()
 
-  const renderActionTypeColumn = useCallback((_, { type }: PoolAction) => <Styled.TxType type={type} />, [])
+  const renderActionTypeColumn = useCallback((_, { type }: Action) => <Styled.TxType type={type} />, [])
 
-  const actionTypeColumn: ColumnType<PoolAction> = useMemo(
+  const actionTypeColumn: ColumnType<Action> = useMemo(
     () => ({
       key: 'txType',
       align: 'left',
@@ -47,9 +47,9 @@ export const PoolActionsHistoryTable: React.FC<Props> = ({
     [renderActionTypeColumn]
   )
 
-  const renderDateColumn = useCallback((_, { date }: PoolAction) => H.renderDate(date), [])
+  const renderDateColumn = useCallback((_, { date }: Action) => H.renderDate(date), [])
 
-  const dateColumn: ColumnType<PoolAction> = useMemo(
+  const dateColumn: ColumnType<Action> = useMemo(
     () => ({
       key: 'timeStamp',
       align: 'center',
@@ -60,7 +60,7 @@ export const PoolActionsHistoryTable: React.FC<Props> = ({
   )
 
   const renderLinkColumn = useCallback(
-    (action: PoolAction) =>
+    (action: Action) =>
       FP.pipe(
         action,
         H.getTxId,
@@ -70,7 +70,7 @@ export const PoolActionsHistoryTable: React.FC<Props> = ({
     [openExplorerTxUrl]
   )
 
-  const linkColumn: ColumnType<PoolAction> = useMemo(
+  const linkColumn: ColumnType<Action> = useMemo(
     () => ({
       key: 'txHash',
       title: intl.formatMessage({ id: 'common.detail' }),
@@ -82,7 +82,7 @@ export const PoolActionsHistoryTable: React.FC<Props> = ({
   )
 
   const renderDetailColumn = useCallback(
-    (action: PoolAction) => (
+    (action: Action) => (
       <TxDetail
         type={action.type}
         date={H.renderDate(action.date)}
@@ -95,7 +95,7 @@ export const PoolActionsHistoryTable: React.FC<Props> = ({
     []
   )
 
-  const detailColumn: ColumnType<PoolAction> = useMemo(
+  const detailColumn: ColumnType<Action> = useMemo(
     () => ({
       key: 'txDetail',
       align: 'left',
@@ -104,13 +104,13 @@ export const PoolActionsHistoryTable: React.FC<Props> = ({
     [renderDetailColumn]
   )
 
-  const columns: ColumnsType<PoolAction> = useMemo(
+  const columns: ColumnsType<Action> = useMemo(
     () => [actionTypeColumn, detailColumn, dateColumn, linkColumn],
     [actionTypeColumn, detailColumn, dateColumn, linkColumn]
   )
 
   const renderTable = useCallback(
-    ({ total, actions }: PoolActionsHistoryPage, loading = false) => {
+    ({ total, actions }: ActionsPage, loading = false) => {
       return (
         <>
           <Styled.Table
@@ -142,16 +142,16 @@ export const PoolActionsHistoryTable: React.FC<Props> = ({
           () => renderTable(H.emptyData, true),
           () => {
             const data = FP.pipe(
-              prevActionsPage,
+              prevHistoryPage,
               O.getOrElse(() => H.emptyData)
             )
             return renderTable(data, true)
           },
           ({ msg }: ApiError) => <ErrorView title={msg} />,
           renderTable
-        )(actionsPageRD)}
+        )(historyPageRD)}
       </>
     ),
-    [actionsPageRD, renderTable, prevActionsPage]
+    [historyPageRD, renderTable, prevHistoryPage]
   )
 }

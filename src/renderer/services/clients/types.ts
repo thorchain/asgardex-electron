@@ -5,6 +5,7 @@ import { Asset } from '@xchainjs/xchain-util'
 import * as O from 'fp-ts/lib/Option'
 import * as Rx from 'rxjs'
 
+import { WalletAddress } from '../../../shared/wallet/types'
 import { LiveData } from '../../helpers/rx/liveData'
 import { ApiError, TxLD, WalletBalance } from '../wallet/types'
 import { TxHashLD } from '../wallet/types'
@@ -44,11 +45,11 @@ export type WalletBalancesLD = LiveData<ApiError, WalletBalances>
 
 export type ExplorerUrl$ = Rx.Observable<O.Option<string>>
 export type OpenExplorerTxUrl = (txHash: string) => Promise<boolean>
-export type OpenAddressUrl = (address: Address) => Promise<boolean>
+export type OpenAddressUrl = (address: Address, params?: string) => Promise<boolean>
 export type AddressValidation = (address: Address) => boolean
 export type AddressValidationAsync = (address: Address) => Promise<boolean>
 
-export type Address$ = Rx.Observable<O.Option<Address>>
+export type WalletAddress$ = Rx.Observable<O.Option<WalletAddress>>
 
 export type TransactionService<T> = {
   txRD$: TxHashLD

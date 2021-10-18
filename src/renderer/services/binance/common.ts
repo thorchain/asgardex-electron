@@ -1,5 +1,6 @@
 import * as RD from '@devexperts/remote-data-ts'
 import { Client } from '@xchainjs/xchain-binance'
+import { BNBChain } from '@xchainjs/xchain-util'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
 import * as Rx from 'rxjs'
@@ -8,7 +9,7 @@ import * as RxOp from 'rxjs/operators'
 import { isError } from '../../../shared/utils/guard'
 import { clientNetwork$ } from '../app/service'
 import * as C from '../clients'
-import { Address$, ExplorerUrl$ } from '../clients/types'
+import { WalletAddress$, ExplorerUrl$ } from '../clients/types'
 import { keystoreService } from '../wallet/keystore'
 import { getPhrase } from '../wallet/util'
 import { ClientState, ClientState$, Client$ } from './types'
@@ -49,12 +50,12 @@ const client$: Client$ = clientState$.pipe(RxOp.map(RD.toOption), RxOp.shareRepl
 /**
  * Current `Address` depending on selected network
  */
-const address$: Address$ = C.address$(client$)
+const address$: WalletAddress$ = C.address$(client$, BNBChain)
 
 /**
  * Current `Address` depending on selected network
  */
-const addressUI$: Address$ = C.addressUI$(client$)
+const addressUI$: WalletAddress$ = C.addressUI$(client$, BNBChain)
 
 /**
  * Explorer url depending on selected network

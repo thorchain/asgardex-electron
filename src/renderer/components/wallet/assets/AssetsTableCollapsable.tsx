@@ -14,6 +14,7 @@ import { useHistory } from 'react-router-dom'
 
 import { Network } from '../../../../shared/api/types'
 import { isKeystoreWallet } from '../../../../shared/utils/guard'
+import { WalletType } from '../../../../shared/wallet/types'
 import { disableRuneUpgrade, isNonNativeRuneAsset } from '../../../helpers/assetHelper'
 import { getChainAsset } from '../../../helpers/chainHelper'
 import { getPoolPriceValue } from '../../../helpers/poolHelper'
@@ -21,19 +22,11 @@ import * as walletRoutes from '../../../routes/wallet'
 import { WalletBalancesRD } from '../../../services/clients'
 import { PoolDetails } from '../../../services/midgard/types'
 import { MimirHaltRD } from '../../../services/thorchain/types'
-import {
-  ApiError,
-  ChainBalance,
-  ChainBalances,
-  WalletBalance,
-  WalletBalances,
-  WalletType
-} from '../../../services/wallet/types'
+import { ApiError, ChainBalance, ChainBalances, WalletBalance, WalletBalances } from '../../../services/wallet/types'
 import { walletTypeToI18n } from '../../../services/wallet/util'
 import { PricePool } from '../../../views/pools/Pools.types'
 import { ErrorView } from '../../shared/error/'
 import { AssetIcon } from '../../uielements/assets/assetIcon'
-import { WalletTypeLabel } from '../../uielements/common/Common.styles'
 import { QRCodeModal } from '../../uielements/qrCodeModal/QRCodeModal'
 import * as Styled from './AssetsTableCollapsable.styles'
 
@@ -366,7 +359,9 @@ export const AssetsTableCollapsable: React.FC<Props> = (props): JSX.Element => {
               <Styled.HeaderLabel>{chainToString(chain)}</Styled.HeaderLabel>
               {
                 // show tag for NON keystore wallets only (e.g. Ledger)
-                !isKeystoreWallet(walletType) && <WalletTypeLabel>{walletTypeToI18n(walletType, intl)}</WalletTypeLabel>
+                !isKeystoreWallet(walletType) && (
+                  <Styled.WalletTypeLabel>{walletTypeToI18n(walletType, intl)}</Styled.WalletTypeLabel>
+                )
               }
             </Styled.HeaderChainContainer>
           </Col>

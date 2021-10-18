@@ -10,6 +10,7 @@ import { useIntl } from 'react-intl'
 import { useHistory } from 'react-router-dom'
 
 import { Network } from '../../../../shared/api/types'
+import { WalletType } from '../../../../shared/wallet/types'
 import { Send } from '../../../components/wallet/txs/send/'
 import { SendFormBNB } from '../../../components/wallet/txs/send/'
 import { useBinanceContext } from '../../../contexts/BinanceContext'
@@ -21,12 +22,7 @@ import { useValidateAddress } from '../../../hooks/useValidateAddress'
 import { INITIAL_SEND_STATE } from '../../../services/chain/const'
 import { FeeRD, SendTxParams, SendTxState } from '../../../services/chain/types'
 import { OpenExplorerTxUrl, WalletBalances } from '../../../services/clients'
-import {
-  NonEmptyWalletBalances,
-  ValidatePasswordHandler,
-  WalletBalance,
-  WalletType
-} from '../../../services/wallet/types'
+import { NonEmptyWalletBalances, ValidatePasswordHandler, WalletBalance } from '../../../services/wallet/types'
 import * as Helper from './SendView.helper'
 
 type Props = {

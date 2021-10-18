@@ -5,25 +5,25 @@ import * as O from 'fp-ts/lib/Option'
 import * as Rx from 'rxjs'
 import * as RxOp from 'rxjs/operators'
 
-import { Address$ } from '../../services/clients'
-import { WalletAccount, WalletAddress } from '../../services/wallet/types'
+import { WalletAddress$ } from '../../services/clients'
+import { WalletAccount, WalletAddressAsync } from '../../services/wallet/types'
 
 export const walletAccount$ = ({
   addressUI$,
   ledgerAddress,
   chain
 }: {
-  addressUI$: Address$
-  ledgerAddress?: WalletAddress
+  addressUI$: WalletAddress$
+  ledgerAddress?: WalletAddressAsync
   chain: Chain
 }): Rx.Observable<O.Option<WalletAccount>> =>
   FP.pipe(
-    addressUI$,
+    addressUI$, // all `keystore` based
     RxOp.map(
-      O.map((address) => {
-        const keystoreAddress: WalletAddress = {
-          type: 'keystore',
-          address: RD.success(address)
+      O.map((walletAddress) => {
+        const keystoreAddress: WalletAddressAsync = {
+          type: walletAddress.type,
+          address: RD.success(walletAddress)
         }
         const accounts = ledgerAddress ? [keystoreAddress, ledgerAddress] : [keystoreAddress]
         return {

@@ -1,6 +1,6 @@
 import { useCallback } from 'react'
 
-import { TxHash, XChainClient } from '@xchainjs/xchain-client'
+import { Address, XChainClient } from '@xchainjs/xchain-client'
 import { Chain } from '@xchainjs/xchain-util'
 import * as FP from 'fp-ts/function'
 import * as O from 'fp-ts/Option'
@@ -14,11 +14,13 @@ export const useOpenAddressUrl = (chain: Chain): OpenAddressUrl => {
   const [oClient] = useObservableState<O.Option<XChainClient>>(() => clientByChain$(chain), O.none)
 
   const openAddressUrl: OpenExplorerTxUrl = useCallback(
-    (txHash: TxHash) =>
+    (address: Address, params = '') =>
       FP.pipe(
         oClient,
         O.map(async (client) => {
-          const url = client.getExplorerAddressUrl(txHash)
+          let url = client.getExplorerAddressUrl(address)
+          // add optional params if set before
+          url = params ? `${url}&${params}` : url
           await window.apiUrl.openExternal(url)
           return true
         }),

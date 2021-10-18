@@ -17,8 +17,8 @@ import { Configuration, DefaultApi } from '../../types/generated/midgard'
 import { network$ } from '../app/service'
 import { MIDGARD_MAX_RETRY } from '../const'
 import { ErrorId } from '../wallet/types'
+import { createActionsService } from './actions'
 import { selectedPoolAsset$, setSelectedPoolAsset } from './common'
-import { createPoolActionsHistoryService } from './poolActionsHistory'
 import { createPoolsService } from './pools'
 import { createSharesService } from './shares'
 import {
@@ -224,5 +224,5 @@ export const service = {
   pools: createPoolsService(byzantine$, getMidgardDefaultApi, selectedPoolAsset$),
   shares: createSharesService(byzantine$, getMidgardDefaultApi),
   validateNode$,
-  poolActionsHistory: createPoolActionsHistoryService(byzantine$, getMidgardDefaultApi)
+  actions: createActionsService(byzantine$, getMidgardDefaultApi)
 }

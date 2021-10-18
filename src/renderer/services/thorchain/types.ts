@@ -9,10 +9,11 @@ import * as Rx from 'rxjs'
 
 import { assetIO } from '../../../shared/api/io'
 import { Network } from '../../../shared/api/types'
+import { WalletType } from '../../../shared/wallet/types'
 import { LiveData } from '../../helpers/rx/liveData'
 import { AssetsWithAmount1e8, AssetWithAmount1e8 } from '../../types/asgardex'
 import * as C from '../clients'
-import { ApiError, TxHashLD, WalletType } from '../wallet/types'
+import { ApiError, TxHashLD } from '../wallet/types'
 
 export type Client$ = C.Client$<Client>
 

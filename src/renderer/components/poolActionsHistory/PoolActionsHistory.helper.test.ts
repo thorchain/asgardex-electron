@@ -2,10 +2,10 @@ import { AssetBNB, AssetBTC, AssetRuneNative, baseAmount } from '@xchainjs/xchai
 import * as O from 'fp-ts/Option'
 
 import { eqAssetsWithAmount } from '../../helpers/fp/eq'
-import { PoolAction, Tx } from '../../services/midgard/types'
-import { getTxId, getValues, getRowKey } from './PoolActionsHistory.helper'
+import { Action, Tx } from '../../services/midgard/types'
+import { getTxId, getValues, getRowKey, historyFilterToViewblockFilter } from './PoolActionsHistory.helper'
 
-const defaultPoolAction: PoolAction = {
+const defaultPoolAction: Action = {
   date: new Date(0),
   in: [],
   out: [],
@@ -131,51 +131,84 @@ describe('PoolActionsHistory.helper', () => {
   describe('getRowKey', () => {
     it('should return correct id if exists', () => {
       expect(
-        getRowKey({
-          ...defaultPoolAction,
-          in: [
-            {
-              ...defaultTx,
-              txID: 'inId'
-            }
-          ]
-        })
-      ).toEqual('inId')
+        getRowKey(
+          {
+            ...defaultPoolAction,
+            in: [
+              {
+                ...defaultTx,
+                txID: 'inId'
+              }
+            ]
+          },
+          1
+        )
+      ).toEqual('inId-1')
 
       expect(
-        getRowKey({
-          ...defaultPoolAction,
-          out: [
-            {
-              ...defaultTx,
-              txID: 'outId'
-            }
-          ]
-        })
-      ).toEqual('outId')
+        getRowKey(
+          {
+            ...defaultPoolAction,
+            out: [
+              {
+                ...defaultTx,
+                txID: 'outId'
+              }
+            ]
+          },
+          1
+        )
+      ).toEqual('outId-1')
 
       expect(
-        getRowKey({
-          ...defaultPoolAction,
-          in: [
-            {
-              ...defaultTx,
-              txID: 'inId'
-            }
-          ],
-          out: [
-            {
-              ...defaultTx,
-              txID: 'outId'
-            }
-          ]
-        })
-      ).toEqual('inId')
+        getRowKey(
+          {
+            ...defaultPoolAction,
+            in: [
+              {
+                ...defaultTx,
+                txID: 'inId'
+              }
+            ],
+            out: [
+              {
+                ...defaultTx,
+                txID: 'outId'
+              }
+            ]
+          },
+          1
+        )
+      ).toEqual('inId-1')
     })
 
     it('should return default value in case there is no txId (`action.date-action.type`)', () => {
       // Date(0) is a default date property value for defaultPoolAction
-      expect(getRowKey(defaultPoolAction)).toEqual(`${new Date(0)}-SWAP`)
+      expect(getRowKey(defaultPoolAction, 1)).toEqual(`${new Date(0)}-SWAP-1`)
+    })
+  })
+
+  describe('historyFilterToViewblockFilter', () => {
+    it('SWAP', () => {
+      expect(historyFilterToViewblockFilter('SWAP')).toEqual('swap')
+    })
+    it('DEPOSIT', () => {
+      expect(historyFilterToViewblockFilter('DEPOSIT')).toEqual('addLiquidity')
+    })
+    it('DONATE', () => {
+      expect(historyFilterToViewblockFilter('DONATE')).toEqual('donate')
+    })
+    it('REFUND', () => {
+      expect(historyFilterToViewblockFilter('REFUND')).toEqual('all')
+    })
+    it('SWITCH', () => {
+      expect(historyFilterToViewblockFilter('SWITCH')).toEqual('switch')
+    })
+    it('ALL', () => {
+      expect(historyFilterToViewblockFilter('ALL')).toEqual('all')
+    })
+    it('UNKNOWN', () => {
+      expect(historyFilterToViewblockFilter('UNKNOWN')).toEqual('all')
     })
   })
 })

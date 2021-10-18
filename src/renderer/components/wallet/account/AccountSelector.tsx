@@ -7,8 +7,9 @@ import { useIntl } from 'react-intl'
 
 import { Network } from '../../../../shared/api/types'
 import { isLedgerWallet } from '../../../../shared/utils/guard'
+import { WalletType } from '../../../../shared/wallet/types'
 import { WalletBalances } from '../../../services/clients'
-import { WalletBalance, WalletType } from '../../../services/wallet/types'
+import { WalletBalance } from '../../../services/wallet/types'
 import { AssetData } from '../../uielements/assets/assetData'
 import { AssetIcon } from '../../uielements/assets/assetIcon'
 import { Size as IconSize } from '../../uielements/assets/assetIcon/AssetIcon.types'
@@ -79,7 +80,12 @@ export const AccountSelector: React.FC<Props> = (props): JSX.Element => {
       <Styled.AssetWrapper>
         <AssetIcon asset={selectedWallet.asset} size={size} network={network} />
         <Styled.AssetInfoWrapper>
-          <Styled.AssetTitle>{selectedWallet.asset.ticker}</Styled.AssetTitle>
+          <Styled.AssetTitleWrapper>
+            <Styled.AssetTitle>{selectedWallet.asset.ticker}</Styled.AssetTitle>
+            {isLedgerWallet(selectedWallet.walletType) && (
+              <Styled.WalletTypeLabel>{intl.formatMessage({ id: 'ledger.title' })}</Styled.WalletTypeLabel>
+            )}
+          </Styled.AssetTitleWrapper>
           <Styled.AssetSubTitle>{selectedWallet.asset.chain}</Styled.AssetSubTitle>
 
           {enableDropdown && (
@@ -89,14 +95,11 @@ export const AccountSelector: React.FC<Props> = (props): JSX.Element => {
                   such as "Function components cannot be given refs"
               */}
               <div>
-                <Styled.Label>{intl.formatMessage({ id: 'common.change' })}</Styled.Label>
+                <Styled.ChangeLabel>{intl.formatMessage({ id: 'common.change' })}</Styled.ChangeLabel>
               </div>
             </Dropdown>
           )}
         </Styled.AssetInfoWrapper>
-        {isLedgerWallet(selectedWallet.walletType) && (
-          <Styled.WalletTypeLabel>{intl.formatMessage({ id: 'ledger.title' })}</Styled.WalletTypeLabel>
-        )}
       </Styled.AssetWrapper>
     </Styled.Card>
   )

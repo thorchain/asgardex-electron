@@ -3,7 +3,8 @@ import React, { useMemo, useState } from 'react'
 import { useIntl } from 'react-intl'
 
 import { Network } from '../../../shared/api/types'
-import { WalletType } from '../../services/wallet/types'
+import { isLedgerWallet } from '../../../shared/utils/guard'
+import { WalletType } from '../../../shared/wallet/types'
 import * as Styled from './Interact.styles'
 
 type Props = {
@@ -15,7 +16,14 @@ type Props = {
   customContent: JSX.Element
 }
 
-export const Interact: React.FC<Props> = ({ bondContent, unbondContent, leaveContent, customContent, network }) => {
+export const Interact: React.FC<Props> = ({
+  bondContent,
+  unbondContent,
+  leaveContent,
+  customContent,
+  network,
+  walletType
+}) => {
   const intl = useIntl()
 
   const tabs = useMemo(
@@ -69,7 +77,9 @@ export const Interact: React.FC<Props> = ({ bondContent, unbondContent, leaveCon
         <div>
           <Styled.HeaderTitleWrapper>
             <Styled.HeaderTitle>{intl.formatMessage({ id: 'deposit.interact.title' })}</Styled.HeaderTitle>
-            <Styled.WalletTypeLabel>{intl.formatMessage({ id: 'ledger.title' })}</Styled.WalletTypeLabel>
+            {isLedgerWallet(walletType) && (
+              <Styled.WalletTypeLabel>{intl.formatMessage({ id: 'ledger.title' })}</Styled.WalletTypeLabel>
+            )}
           </Styled.HeaderTitleWrapper>
           <Styled.HeaderSubtitle>{intl.formatMessage({ id: 'deposit.interact.subtitle' })}</Styled.HeaderSubtitle>
         </div>
