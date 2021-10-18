@@ -34,10 +34,10 @@ import { MaxBalanceButton } from '../../../uielements/button/MaxBalanceButton'
 import { UIFeesRD } from '../../../uielements/fees'
 import { Input, InputBigNumber } from '../../../uielements/input'
 import { AccountSelector } from '../../account'
+import { matchedWalletType, renderedWalletType } from '../TxForm.helpers'
 import * as Styled from '../TxForm.styles'
 import { validateTxAmountInput } from '../TxForm.util'
 import { DEFAULT_FEE_OPTION } from './Send.const'
-import { matchedWalletType, renderedWalletType } from './Send.helpers'
 import { useChangeAssetHandler } from './Send.hooks'
 
 export type FormValues = {

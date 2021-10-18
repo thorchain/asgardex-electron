@@ -24,9 +24,9 @@ import { useSubscriptionState } from '../../../../hooks/useSubscriptionState'
 import { INITIAL_UPGRADE_RUNE_STATE } from '../../../../services/chain/const'
 import { UpgradeRuneParams, UpgradeRuneTxState, UpgradeRuneTxState$ } from '../../../../services/chain/types'
 import { FeeRD } from '../../../../services/chain/types'
-import { AddressValidation, OpenExplorerTxUrl } from '../../../../services/clients'
+import { AddressValidation, OpenExplorerTxUrl, WalletBalances } from '../../../../services/clients'
 import { PoolAddressRD } from '../../../../services/midgard/types'
-import { NonEmptyWalletBalances, ValidatePasswordHandler } from '../../../../services/wallet/types'
+import { ValidatePasswordHandler } from '../../../../services/wallet/types'
 import { AssetWithDecimal } from '../../../../types/asgardex'
 import { PasswordModal } from '../../../modal/password'
 import { MaxBalanceButton } from '../../../uielements/button/MaxBalanceButton'
@@ -35,6 +35,7 @@ import { UIFeesRD } from '../../../uielements/fees'
 import { Input } from '../../../uielements/input'
 import { InputBigNumber } from '../../../uielements/input/InputBigNumber'
 import { AccountSelector } from '../../account'
+import * as H from '../TxForm.helpers'
 import * as Styled from '../TxForm.styles'
 import { validateTxAmountInput } from '../TxForm.util'
 import * as CStyled from './Upgrade.styles'
@@ -49,7 +50,7 @@ export type Props = {
   validatePassword$: ValidatePasswordHandler
   fee: FeeRD
   upgrade$: (_: UpgradeRuneParams) => UpgradeRuneTxState$
-  balances: O.Option<NonEmptyWalletBalances>
+  balances: O.Option<WalletBalances>
   reloadFeeHandler: (params: TxParams) => void
   addressValidation: AddressValidation
   successActionHandler: OpenExplorerTxUrl
@@ -373,6 +374,27 @@ export const Upgrade: React.FC<Props> = (props): JSX.Element => {
     [addressValidation, intl]
   )
 
+  const [recipientAddress, setRecipientAddress] = useState<Address>(runeNativeAddress)
+  const handleOnKeyUp = useCallback(() => {
+    setRecipientAddress(form.getFieldValue('address'))
+  }, [form])
+
+  const balances = useMemo(
+    () =>
+      FP.pipe(
+        oBalances,
+        O.getOrElse<WalletBalances>(() => [])
+      ),
+    [oBalances]
+  )
+
+  const oMatchedWalletType: O.Option<WalletType> = useMemo(
+    () => H.matchedWalletType(balances, recipientAddress),
+    [balances, recipientAddress]
+  )
+
+  const renderWalletType = useMemo(() => H.renderedWalletType(oMatchedWalletType), [oMatchedWalletType])
+
   const renderUpgradeForm = useMemo(
     () => (
       <CStyled.FormWrapper>
@@ -411,9 +433,12 @@ export const Upgrade: React.FC<Props> = (props): JSX.Element => {
                 disabled={isLoading}
               />
 
-              <Styled.CustomLabel size="big">{intl.formatMessage({ id: 'common.address' })}</Styled.CustomLabel>
+              <Styled.CustomLabel size="big">
+                {intl.formatMessage({ id: 'common.address' })}
+                {renderWalletType}
+              </Styled.CustomLabel>
               <Form.Item rules={[{ required: true, validator: addressValidator }]} name="address">
-                <Input color="primary" size="large" disabled={isLoading} />
+                <Input color="primary" size="large" disabled={isLoading} onKeyUp={handleOnKeyUp} />
               </Form.Item>
 
               <CStyled.Fees fees={uiFeesRD} reloadFees={reloadFees} disabled={isLoading} />
@@ -442,7 +467,9 @@ export const Upgrade: React.FC<Props> = (props): JSX.Element => {
       onChangeInput,
       maxAmount,
       addMaxAmountHandler,
+      renderWalletType,
       addressValidator,
+      handleOnKeyUp,
       uiFeesRD,
       reloadFees,
       renderFeeError,
