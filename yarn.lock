@@ -2331,7 +2331,7 @@
     "@ledgerhq/logs" "^6.10.0"
     node-hid "2.1.1"
 
-"@ledgerhq/hw-transport-node-hid-singleton@^6.6.0":
+"@ledgerhq/hw-transport-node-hid-singleton@^6.10.0":
   version "6.10.0"
   resolved "https://registry.yarnpkg.com/@ledgerhq/hw-transport-node-hid-singleton/-/hw-transport-node-hid-singleton-6.10.0.tgz#c567263de6a2181b2b24d057e807190fb37797f9"
   integrity sha512-PorxU253D3DDampayrOH8i7zZrqIExgtKIbVubhatM3eEQGNKYJ3qrmQpKiPymf/5X4yuWOzQGmXJE6pOlGfUw==
@@ -2389,7 +2389,7 @@
     "@ledgerhq/errors" "^5.50.0"
     events "^3.3.0"
 
-"@ledgerhq/hw-transport@^6.10.0", "@ledgerhq/hw-transport@^6.2.0", "@ledgerhq/hw-transport@^6.3.0":
+"@ledgerhq/hw-transport@^6.10.0", "@ledgerhq/hw-transport@^6.2.0":
   version "6.10.0"
   resolved "https://registry.yarnpkg.com/@ledgerhq/hw-transport/-/hw-transport-6.10.0.tgz#fb07670c6b1455417e0f0fb14369db86e3d6c5b9"
   integrity sha512-e8OvmDn2zs+stVJDdgyCDveMw3KWoCu2/sVw8bqsHQ8pJVNC2ee5KBPb0gxg7oaf8I5Qdv8jzjv3kJFpolNu5A==
