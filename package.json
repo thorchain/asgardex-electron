@@ -68,7 +68,7 @@
     "@devexperts/rx-utils": "^1.0.0-alpha.14",
     "@devexperts/utils": "^1.0.0-alpha.14",
     "@ledgerhq/hw-transport": "^6.10.0",
-    "@ledgerhq/hw-transport-node-hid-singleton": "^6.10.0",
+    "@ledgerhq/hw-transport-node-hid-singleton": "6.7.0",
     "@openapitools/openapi-generator-cli": "^2.4.12",
     "@psf/bitcoincashjs-lib": "^4.0.2",
     "@thorchain/asgardex-midgard": "^1.1.0",
