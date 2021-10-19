@@ -14,7 +14,6 @@ import * as RxOp from 'rxjs/operators'
 import { Network } from '../../../shared/api/types'
 import { envOrDefault } from '../../../shared/utils/env'
 import { THORCHAIN_DECIMAL } from '../../helpers/assetHelper'
-import { eqOString } from '../../helpers/fp/eq'
 import { liveData } from '../../helpers/rx/liveData'
 import { triggerStream } from '../../helpers/stateHelper'
 import { network$ } from '../app/service'
@@ -28,9 +27,7 @@ import {
   ThorNodeApiUrlLD,
   LiquidityProviderIO,
   LiquidityProvidersLD,
-  LiquidityProviderLD,
   GetLiquidityProvidersParams,
-  GetLiquidityProviderParams,
   LiquidityProvider
 } from './types'
 
@@ -142,6 +139,7 @@ const getLiquidityProviders = ({ asset, network }: GetLiquidityProvidersParams):
         RxOp.map(A.filterMap(FP.flow(LiquidityProviderIO.decode, O.fromEither))),
         RxOp.map(RD.success),
         liveData.map(
+          // transform LiquidityProviderIO -> LiquidityProvider
           A.map((provider): LiquidityProvider => {
             const pendingRuneAmount = baseAmount(provider.pending_rune, THORCHAIN_DECIMAL)
             /* 1e8 decimal by default, which is default decimal for ALL accets at THORChain  */
@@ -174,26 +172,6 @@ const getLiquidityProviders = ({ asset, network }: GetLiquidityProvidersParams):
   )
 }
 
-const getLiquidityProvider = ({
-  asset,
-  network,
-  runeAddress,
-  assetAddress
-}: GetLiquidityProviderParams): LiquidityProviderLD =>
-  FP.pipe(
-    getLiquidityProviders({
-      asset,
-      network
-    }),
-    liveData.map(
-      A.findFirst(
-        (provider) =>
-          eqOString.equals(provider.runeAddress, O.some(runeAddress)) &&
-          eqOString.equals(provider.assetAddress, O.some(assetAddress))
-      )
-    )
-  )
-
 const { stream$: reloadMimir$, trigger: reloadMimir } = triggerStream()
 
 const mimirInterval$ = Rx.timer(0 /* no delay for first value */, 5 * 60 * 1000 /* others are delayed by 5 min  */)
@@ -220,4 +198,4 @@ const mimir$: MimirLD = FP.pipe(
   RxOp.shareReplay(1)
 )
 
-export { getNodeInfo$, reloadNodesInfo, mimir$, reloadMimir, getLiquidityProvider, reloadLiquidityProviders }
+export { getNodeInfo$, reloadNodesInfo, mimir$, reloadMimir, getLiquidityProviders, reloadLiquidityProviders }

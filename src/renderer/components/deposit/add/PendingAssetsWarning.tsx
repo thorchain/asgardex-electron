@@ -22,16 +22,16 @@ const AssetIconAmount: React.FC<AssetIconAmountProps> = (props): JSX.Element => 
     loading
   } = props
   return (
-    <Styled.PendingAssetContainer>
-      <Styled.PendingAssetIcon asset={asset} network={network} />
-      <Styled.PendingAssetLabel asset={asset} />
-      <Styled.PendingAssetAmountLabel loading={loading}>
+    <Styled.AssetWarningAssetContainer>
+      <Styled.AssetWarningAssetIcon asset={asset} network={network} />
+      <Styled.AssetWarningAssetLabel asset={asset} />
+      <Styled.AssetWarningAmountLabel loading={loading}>
         {formatAssetAmount({
           amount: baseToAsset(amount1e8),
           trimZeros: true
         })}
-      </Styled.PendingAssetAmountLabel>
-    </Styled.PendingAssetContainer>
+      </Styled.AssetWarningAmountLabel>
+    </Styled.AssetWarningAssetContainer>
   )
 }
 
@@ -42,7 +42,7 @@ export type PendingAssetsProps = {
   onClickRecovery: FP.Lazy<void>
 }
 
-export const PendingAssets: React.FC<PendingAssetsProps> = (props): JSX.Element => {
+export const PendingAssetsWarning: React.FC<PendingAssetsProps> = (props): JSX.Element => {
   const { assets, network, loading, onClickRecovery } = props
 
   const intl = useIntl()
@@ -51,18 +51,18 @@ export const PendingAssets: React.FC<PendingAssetsProps> = (props): JSX.Element 
 
   const subContent = (
     <>
-      <Styled.RecoveryInfoButton selected={collapsed} onClick={() => setCollapsed((v) => !v)}>
-        <Styled.RecoveryInfoButtonLabel>
+      <Styled.AssetWarningInfoButton selected={collapsed} onClick={() => setCollapsed((v) => !v)}>
+        <Styled.AssetWarningInfoButtonLabel>
           {intl.formatMessage({ id: 'common.informationMore' })}
-        </Styled.RecoveryInfoButtonLabel>
-        <Styled.RecoveryInfoButtonIcon selected={collapsed} />
-      </Styled.RecoveryInfoButton>
+        </Styled.AssetWarningInfoButtonLabel>
+        <Styled.AssetWarningInfoButtonIcon selected={collapsed} />
+      </Styled.AssetWarningInfoButton>
       <>
-        {collapsed ? (
+        {collapsed && (
           <>
-            <Styled.RecoveryDescription>
+            <Styled.AssetWarningDescription>
               {intl.formatMessage({ id: 'deposit.add.pendingAssets.description' })}
-            </Styled.RecoveryDescription>
+            </Styled.AssetWarningDescription>
             {assets.map((assetWB, index) => (
               <AssetIconAmount
                 network={network}
@@ -71,25 +71,23 @@ export const PendingAssets: React.FC<PendingAssetsProps> = (props): JSX.Element 
                 key={`${assetToString(assetWB.asset)}-${index}`}
               />
             ))}
-            <Styled.RecoveryDescription>
+            <Styled.AssetWarningDescription>
               <FormattedMessage
                 id="deposit.add.pendingAssets.recoveryDescription"
                 values={{
                   url: (
-                    <Styled.RecoveryDescriptionLink onClick={onClickRecovery}>
+                    <Styled.AssetWarningDescriptionLink onClick={onClickRecovery}>
                       {RECOVERY_TOOL_URL[network]}
-                    </Styled.RecoveryDescriptionLink>
+                    </Styled.AssetWarningDescriptionLink>
                   )
                 }}
               />
-            </Styled.RecoveryDescription>
-            <Styled.RecoveryOpenButton onClick={onClickRecovery}>
+            </Styled.AssetWarningDescription>
+            <Styled.WarningOpenExternalUrlButton onClick={onClickRecovery}>
               {intl.formatMessage({ id: 'deposit.add.pendingAssets.recoveryTitle' })}
-              <Styled.OpenRecoveryToolIcon />
-            </Styled.RecoveryOpenButton>
+              <Styled.AssetWarningOpenExternalUrlIcon />
+            </Styled.WarningOpenExternalUrlButton>
           </>
-        ) : (
-          <></>
         )}
       </>
     </>

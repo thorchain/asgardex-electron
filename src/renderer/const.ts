@@ -218,3 +218,8 @@ export const RECOVERY_TOOL_URL: Record<Network, string> = {
   testnet: 'https://testnet.thorswap.finance/pending',
   mainnet: 'https://app.thorswap.finance/pending'
 }
+
+export const ASYM_DEPOSIT_TOOL_URL: Record<Network, string> = {
+  testnet: 'https://testnet.thorswap.finance/',
+  mainnet: 'https://app.thorswap.finance/'
+}

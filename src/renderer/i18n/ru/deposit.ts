@@ -31,6 +31,12 @@ const deposit: DepositMessages = {
   'deposit.add.pendingAssets.recoveryDescription':
     'Обратите внимение: Транзакции для разных пар ассетов могут занимать разное время, так как запущены на разных блок-чейнах. В случае ошибки, у вас есть возможность изъять ожидающие ассеты с помощью утилиты возврата THORSWap на {url}. Эта функция пока недоступна  в ПК версии ASGARDEX.',
   'deposit.add.pendingAssets.recoveryTitle': 'Открыть утилиту для возврата',
+  'deposit.add.asymAssets.title': 'Asymmetrical deposit found - RU',
+  'deposit.add.asymAssets.description':
+    'Adding an asset pair symmetrical has been disabled due a previous asymmetrical deposit of following asset(s): - RU',
+  'deposit.add.asymAssets.recoveryDescription':
+    'Asymmetrical deposit is currently not supported in ASGARDEX desktop. However, you can use this feature in THORSwap to withdraw a previous asymmetrical deposit. - RU',
+  'deposit.add.asymAssets.recoveryTitle': 'THORSwap  - RU',
   'deposit.bond.state.error': 'Ошибка при кладе',
   'deposit.unbond.state.error': 'Ошибка при выводе',
   'deposit.leave.state.error': 'Ошибка при выходе',

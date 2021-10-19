@@ -14,6 +14,7 @@ import {
 } from '@xchainjs/xchain-util'
 import { Col } from 'antd'
 import BigNumber from 'bignumber.js'
+import * as A from 'fp-ts/lib/Array'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
 import { useObservableState } from 'observable-hooks'
@@ -59,7 +60,13 @@ import {
   LoadApproveFeeHandler
 } from '../../../services/ethereum/types'
 import { PoolAddress, PoolsDataMap } from '../../../services/midgard/types'
-import { MimirHalt, PendingAssets, PendingAssetsRD } from '../../../services/thorchain/types'
+import {
+  LiquidityProviderHasAsymAssets,
+  LiquidityProviderHasAsymAssetsRD,
+  MimirHalt,
+  PendingAssets,
+  PendingAssetsRD
+} from '../../../services/thorchain/types'
 import { ApiError, TxHashLD, TxHashRD, ValidatePasswordHandler, WalletBalances } from '../../../services/wallet/types'
 import { AssetWithDecimal } from '../../../types/asgardex'
 import { PasswordModal } from '../../modal/password'
@@ -67,9 +74,10 @@ import { TxModal } from '../../modal/tx'
 import { DepositAssets } from '../../modal/tx/extra'
 import { ViewTxButton } from '../../uielements/button'
 import { Fees, UIFeesRD } from '../../uielements/fees'
+import { AsymAssetsWarning } from './AsymAssetsWarning'
 import * as Helper from './Deposit.helper'
 import * as Styled from './Deposit.styles'
-import { PendingAssets as PendingAssetsUI } from './Deposit.subcomponents'
+import { PendingAssetsWarning } from './PendingAssetsWarning'
 
 export type Props = {
   asset: AssetWithDecimal
@@ -104,8 +112,10 @@ export type Props = {
   poolsData: PoolsDataMap
   haltedChains: Chain[]
   mimirHalt: MimirHalt
-  pendingAssets: PendingAssetsRD
+  symPendingAssets: PendingAssetsRD
   openRecoveryTool: FP.Lazy<void>
+  hasAsymAssets: LiquidityProviderHasAsymAssetsRD
+  openAsymDepositTool: FP.Lazy<void>
 }
 
 type SelectedInput = 'asset' | 'rune' | 'none'
@@ -144,8 +154,10 @@ export const SymDeposit: React.FC<Props> = (props) => {
     poolsData,
     haltedChains,
     mimirHalt,
-    pendingAssets: pendingAssetsRD,
-    openRecoveryTool
+    symPendingAssets: symPendingAssetsRD,
+    openRecoveryTool,
+    hasAsymAssets: hasAsymAssetsRD,
+    openAsymDepositTool
   } = props
 
   const intl = useIntl()
@@ -995,20 +1007,31 @@ export const SymDeposit: React.FC<Props> = (props) => {
   const hasPendingAssets: boolean = useMemo(
     () =>
       FP.pipe(
-        pendingAssetsRD,
+        symPendingAssetsRD,
         RD.toOption,
         O.map((pendingAssets): boolean => pendingAssets.length > 0),
         O.getOrElse((): boolean => false)
       ),
-    [pendingAssetsRD]
+    [symPendingAssetsRD]
+  )
+
+  const hasAsymDeposits: boolean = useMemo(
+    () =>
+      FP.pipe(
+        hasAsymAssetsRD,
+        RD.toOption,
+        O.map(({ rune, asset }) => rune || asset),
+        O.getOrElse((): boolean => false)
+      ),
+    [hasAsymAssetsRD]
   )
 
   const prevPendingAssets = useRef<PendingAssets>([])
 
   const renderPendingAssets = useMemo(() => {
     const render = (pendingAssets: PendingAssets, loading: boolean) =>
-      pendingAssets.length > 0 && (
-        <PendingAssetsUI
+      pendingAssets.length && (
+        <PendingAssetsWarning
           network={network}
           assets={pendingAssets}
           loading={loading}
@@ -1017,7 +1040,7 @@ export const SymDeposit: React.FC<Props> = (props) => {
       )
 
     return FP.pipe(
-      pendingAssetsRD,
+      symPendingAssetsRD,
       RD.fold(
         () => <></>,
         () => render(prevPendingAssets.current, true),
@@ -1028,7 +1051,40 @@ export const SymDeposit: React.FC<Props> = (props) => {
         }
       )
     )
-  }, [network, openRecoveryTool, pendingAssetsRD])
+  }, [network, openRecoveryTool, symPendingAssetsRD])
+
+  const prevHasAsymAssets = useRef<LiquidityProviderHasAsymAssets>({ rune: false, asset: false })
+
+  const renderAsymDepositWarning = useMemo(() => {
+    const render = ({ rune, asset: hasAsset }: LiquidityProviderHasAsymAssets, loading: boolean) => {
+      const assets = FP.pipe(
+        // Add optional assets to list
+        [rune ? O.some(AssetRuneNative) : O.none, hasAsset ? O.some(asset) : O.none],
+        // filter `None` out from list
+        A.filterMap(FP.identity)
+      )
+      return (
+        <AsymAssetsWarning
+          network={network}
+          assets={assets}
+          loading={loading}
+          onClickOpenAsymTool={openAsymDepositTool}
+        />
+      )
+    }
+    return FP.pipe(
+      hasAsymAssetsRD,
+      RD.fold(
+        () => <></>,
+        () => render(prevHasAsymAssets.current, true),
+        () => <></>,
+        (hasAssets) => {
+          prevHasAsymAssets.current = hasAssets
+          return render(hasAssets, false)
+        }
+      )
+    )
+  }, [asset, hasAsymAssetsRD, network, openAsymDepositTool])
 
   const prevRouterAddress = useRef<O.Option<Address>>(O.none)
 
@@ -1088,8 +1144,18 @@ export const SymDeposit: React.FC<Props> = (props) => {
       disabled ||
       assetBalance.amount().isZero() ||
       runeBalance.amount().isZero() ||
+      hasPendingAssets ||
+      hasAsymDeposits,
+    [
+      disableDepositAction,
+      isBalanceError,
+      fundsCapReached,
+      disabled,
+      assetBalance,
+      runeBalance,
       hasPendingAssets,
-    [disableDepositAction, isBalanceError, fundsCapReached, disabled, assetBalance, runeBalance, hasPendingAssets]
+      hasAsymDeposits
+    ]
   )
 
   /**
@@ -1130,6 +1196,11 @@ export const SymDeposit: React.FC<Props> = (props) => {
       {hasPendingAssets && (
         <Styled.AlertRow>
           <Col xs={24}>{renderPendingAssets}</Col>
+        </Styled.AlertRow>
+      )}
+      {hasAsymDeposits && (
+        <Styled.AlertRow>
+          <Col xs={24}>{renderAsymDepositWarning}</Col>
         </Styled.AlertRow>
       )}
       {showBalanceError && (

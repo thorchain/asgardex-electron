@@ -1,6 +1,7 @@
 import React, { useMemo } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
+import { Address } from '@xchainjs/xchain-client'
 import { Asset, Chain } from '@xchainjs/xchain-util'
 import { Grid } from 'antd'
 import * as FP from 'fp-ts/function'
@@ -9,7 +10,7 @@ import { useIntl } from 'react-intl'
 
 import { PoolDetailRD, PoolShareRD, PoolSharesRD } from '../../services/midgard/types'
 import { getSharesByAssetAndType, combineSharesByAsset } from '../../services/midgard/utils'
-import { LiquidityProviderRD, MimirHalt } from '../../services/thorchain/types'
+import { MimirHalt } from '../../services/thorchain/types'
 import { KeystoreState } from '../../services/wallet/types'
 import { hasImportedKeystore, isLocked } from '../../services/wallet/util'
 import { AssetWithDecimal } from '../../types/asgardex'
@@ -41,7 +42,8 @@ export type Props = {
   SymDepositContent: React.ComponentType<{
     asset: AssetWithDecimal
     poolDetail: PoolDetailRD
-    liquidityProvider: LiquidityProviderRD
+    runeWalletAddress: Address
+    assetWalletAddress: Address
     haltedChains: Chain[]
     mimirHalt: MimirHalt
   }>
@@ -60,7 +62,8 @@ export type Props = {
     mimirHalt: MimirHalt
   }>
   keystoreState: KeystoreState
-  liquidityProvider: LiquidityProviderRD
+  runeWalletAddress: Address
+  assetWalletAddress: Address
 }
 
 export const Deposit: React.FC<Props> = (props) => {
@@ -80,7 +83,8 @@ export const Deposit: React.FC<Props> = (props) => {
     poolDetail: poolDetailRD,
     // TODO (@asgdx-team) Think how to handle different wallets
     // walletAddress: Address
-    liquidityProvider: liquidityProviderRD
+    runeWalletAddress,
+    assetWalletAddress
   } = props
 
   const { asset } = assetWD
@@ -140,7 +144,8 @@ export const Deposit: React.FC<Props> = (props) => {
           <SymDepositContent
             poolDetail={poolDetailRD}
             asset={assetWD}
-            liquidityProvider={liquidityProviderRD}
+            runeWalletAddress={runeWalletAddress}
+            assetWalletAddress={assetWalletAddress}
             haltedChains={haltedChains}
             mimirHalt={mimirHalt}
           />
@@ -172,7 +177,8 @@ export const Deposit: React.FC<Props> = (props) => {
       SymDepositContent,
       poolDetailRD,
       assetWD,
-      liquidityProviderRD,
+      runeWalletAddress,
+      assetWalletAddress,
       haltedChains,
       mimirHalt,
       hasSymPoolShare,

@@ -1,10 +1,10 @@
 import React, { useCallback, useEffect, useMemo } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
+import { Address } from '@xchainjs/xchain-client'
 import { Asset, AssetRuneNative, assetToString, BaseAmount, bn, Chain, THORChain } from '@xchainjs/xchain-util'
 import BigNumber from 'bignumber.js'
 import * as FP from 'fp-ts/function'
-import * as A from 'fp-ts/lib/Array'
 import * as O from 'fp-ts/lib/Option'
 import { useObservableState } from 'observable-hooks'
 import { useIntl } from 'react-intl'
@@ -14,7 +14,7 @@ import * as RxOp from 'rxjs/operators'
 import { Network } from '../../../../shared/api/types'
 import { SymDeposit } from '../../../components/deposit/add'
 import { Alert } from '../../../components/uielements/alert'
-import { RECOVERY_TOOL_URL, ZERO_BN, ZERO_POOL_DATA } from '../../../const'
+import { ASYM_DEPOSIT_TOOL_URL, RECOVERY_TOOL_URL, ZERO_BN, ZERO_POOL_DATA } from '../../../const'
 import { useAppContext } from '../../../contexts/AppContext'
 import { useChainContext } from '../../../contexts/ChainContext'
 import { useEthereumContext } from '../../../contexts/EthereumContext'
@@ -26,6 +26,7 @@ import { getAssetPoolPrice } from '../../../helpers/poolHelper'
 import { liveData } from '../../../helpers/rx/liveData'
 import { filterWalletBalancesByAssets } from '../../../helpers/walletHelper'
 import { FundsCap, useFundsCap } from '../../../hooks/useFundsCap'
+import { useLiquidityProviders } from '../../../hooks/useLiquidityProviders'
 import { useOpenExplorerTxUrl } from '../../../hooks/useOpenExplorerTxUrl'
 import * as poolsRoutes from '../../../routes/pools'
 import { SymDepositMemo } from '../../../services/chain/types'
@@ -33,18 +34,19 @@ import { OpenExplorerTxUrl } from '../../../services/clients'
 import { DEFAULT_NETWORK } from '../../../services/const'
 import { PoolAddress, PoolAssetsRD, PoolDetailRD } from '../../../services/midgard/types'
 import { toPoolData } from '../../../services/midgard/utils'
-import { LiquidityProviderRD, MimirHalt, PendingAssetsRD } from '../../../services/thorchain/types'
+import { MimirHalt } from '../../../services/thorchain/types'
 import { INITIAL_BALANCES_STATE } from '../../../services/wallet/const'
 import { WalletBalances } from '../../../services/wallet/types'
 import { getBalanceByAsset } from '../../../services/wallet/util'
-import { AssetsWithAmount1e8, AssetWithDecimal } from '../../../types/asgardex'
+import { AssetWithDecimal } from '../../../types/asgardex'
 
 type Props = {
   asset: AssetWithDecimal
   poolDetail: PoolDetailRD
   haltedChains: Chain[]
   mimirHalt: MimirHalt
-  liquidityProvider: LiquidityProviderRD
+  runeWalletAddress: Address
+  assetWalletAddress: Address
 }
 
 export const SymDepositView: React.FC<Props> = (props) => {
@@ -53,7 +55,8 @@ export const SymDepositView: React.FC<Props> = (props) => {
     poolDetail: poolDetailRD,
     mimirHalt,
     haltedChains,
-    liquidityProvider: liquidityProviderRD
+    runeWalletAddress,
+    assetWalletAddress
   } = props
   const { asset } = assetWD
   const history = useHistory()
@@ -187,24 +190,20 @@ export const SymDepositView: React.FC<Props> = (props) => {
     [fundsCapRD]
   )
 
-  const pendingAssetsRD: PendingAssetsRD = useMemo(
-    () =>
-      FP.pipe(
-        liquidityProviderRD,
-        RD.map((oLiquidityProvider) =>
-          FP.pipe(
-            oLiquidityProvider,
-            O.map(({ pendingAsset, pendingRune }) => [pendingAsset, pendingRune]),
-            O.map(A.filterMap(FP.identity)),
-            O.getOrElse<AssetsWithAmount1e8>(() => [])
-          )
-        )
-      ),
-    [liquidityProviderRD]
-  )
+  const { symPendingAssets: symPendingAssetsRD, hasAsymAssets: hasAsymAssetsRD } = useLiquidityProviders({
+    asset,
+    network,
+    runeAddress: runeWalletAddress,
+    assetAddress: assetWalletAddress
+  })
 
   const openRecoveryTool = useCallback(
     (): Promise<void> => window.apiUrl.openExternal(RECOVERY_TOOL_URL[network]),
+    [network]
+  )
+
+  const openAsymDepositTool = useCallback(
+    (): Promise<void> => window.apiUrl.openExternal(ASYM_DEPOSIT_TOOL_URL[network]),
     [network]
   )
 
@@ -247,8 +246,10 @@ export const SymDepositView: React.FC<Props> = (props) => {
           balances={[]}
           fundsCap={O.none}
           poolsData={{}}
-          pendingAssets={RD.initial}
+          symPendingAssets={RD.initial}
           openRecoveryTool={openRecoveryTool}
+          hasAsymAssets={RD.initial}
+          openAsymDepositTool={openAsymDepositTool}
         />
       </>
     ),
@@ -270,7 +271,8 @@ export const SymDepositView: React.FC<Props> = (props) => {
       network,
       approveERC20Token$,
       isApprovedERC20Token$,
-      openRecoveryTool
+      openRecoveryTool,
+      openAsymDepositTool
     ]
   )
 
@@ -321,8 +323,10 @@ export const SymDepositView: React.FC<Props> = (props) => {
               isApprovedERC20Token$={isApprovedERC20Token$}
               fundsCap={fundsCap}
               poolsData={poolsData}
-              pendingAssets={pendingAssetsRD}
+              symPendingAssets={symPendingAssetsRD}
               openRecoveryTool={openRecoveryTool}
+              hasAsymAssets={hasAsymAssetsRD}
+              openAsymDepositTool={openAsymDepositTool}
             />
           </>
         )
