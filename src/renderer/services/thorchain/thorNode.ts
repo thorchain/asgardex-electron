@@ -141,9 +141,6 @@ const getLiquidityProviders = ({ asset, network }: GetLiquidityProvidersParams):
         liveData.map(
           // transform LiquidityProviderIO -> LiquidityProvider
           A.map((provider): LiquidityProvider => {
-            console.log('provider -> ', poolString)
-            console.log('provider -> ', provider.rune_address)
-            console.log('provider -> ', provider)
             const pendingRuneAmount = baseAmount(provider.pending_rune, THORCHAIN_DECIMAL)
             /* 1e8 decimal by default, which is default decimal for ALL accets at THORChain  */
             const pendingAssetAmount = baseAmount(provider.pending_asset, THORCHAIN_DECIMAL)
