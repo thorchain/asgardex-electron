@@ -24,16 +24,18 @@ describe('Pools routes', () => {
 
   describe('Swap routes', () => {
     it('template', () => {
-      expect(swap.template).toEqual('/pools/swap/:source|:target')
+      expect(swap.template).toEqual('/pools/swap/:walletType/:source|:target')
     })
     it('returns path by given source/target parameters', () => {
-      expect(swap.path({ source: 'BNB', target: 'RUNE' })).toEqual('/pools/swap/bnb|rune')
+      expect(swap.path({ source: 'BNB', target: 'RUNE', walletType: 'keystore' })).toEqual(
+        '/pools/swap/keystore/bnb|rune'
+      )
     })
     it('redirects to base path if source is empty', () => {
-      expect(swap.path({ source: '', target: 'RUNE' })).toEqual('/pools/swap')
+      expect(swap.path({ source: '', target: 'RUNE', walletType: 'keystore' })).toEqual('/pools/swap')
     })
     it('redirects to base path if target is empty', () => {
-      expect(swap.path({ source: 'bnb', target: '' })).toEqual('/pools/swap')
+      expect(swap.path({ source: 'bnb', target: '', walletType: 'keystore' })).toEqual('/pools/swap')
     })
   })
 

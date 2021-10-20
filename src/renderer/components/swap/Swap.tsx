@@ -80,7 +80,7 @@ import {
   WalletBalances
 } from '../../services/wallet/types'
 import { hasImportedKeystore, isLocked } from '../../services/wallet/util'
-import { AssetWithDecimal, SlipTolerance } from '../../types/asgardex'
+import { AssetWithDecimal, AssetWithWalletType, SlipTolerance } from '../../types/asgardex'
 import { CurrencyInfo } from '../currency'
 import { PasswordModal } from '../modal/password'
 import { TxModal } from '../modal/tx'
@@ -92,7 +92,7 @@ import { Fees, UIFeesRD } from '../uielements/fees'
 import { Slider } from '../uielements/slider'
 import { EditableAddress } from './EditableAddress'
 import * as Styled from './Swap.styles'
-import { SwapData } from './Swap.types'
+import { AssetsToSwap, SwapData } from './Swap.types'
 import * as Utils from './Swap.utils'
 
 export type ConfirmSwapParams = { asset: Asset; amount: BaseAmount; memo: string }
@@ -101,6 +101,7 @@ export type SwapProps = {
   keystore: KeystoreState
   availableAssets: PoolAssetDetails
   assets: { inAsset: AssetWithDecimal; outAsset: AssetWithDecimal }
+  walletType: WalletType
   poolAddress: O.Option<PoolAddress>
   swap$: SwapStateHandler
   poolsData: PoolsDataMap
@@ -130,6 +131,7 @@ export const Swap = ({
   keystore,
   availableAssets,
   assets: { inAsset: sourceAssetWD, outAsset: targetAssetWD },
+  walletType,
   poolAddress: oPoolAddress,
   swap$,
   poolsData,
@@ -217,7 +219,7 @@ export const Swap = ({
     [customAddressEditActive, disableAllPoolActions, disableTradingPoolActions, oSourceAsset, oTargetAsset]
   )
 
-  const assetsToSwap: O.Option<{ source: Asset; target: Asset }> = useMemo(
+  const assetsToSwap: O.Option<AssetsToSwap> = useMemo(
     () => sequenceSOption({ source: oSourceAsset, target: oTargetAsset }),
     [oSourceAsset, oTargetAsset]
   )
@@ -226,15 +228,6 @@ export const Swap = ({
   const oSourceAssetWB: O.Option<WalletBalance> = useMemo(
     () => getWalletBalanceByAsset(oWalletBalances, oSourceAsset),
     [oWalletBalances, oSourceAsset]
-  )
-
-  const oSourceAssetWT: O.Option<WalletType> = useMemo(
-    () =>
-      FP.pipe(
-        oSourceAssetWB,
-        O.map(({ walletType }) => walletType)
-      ),
-    [oSourceAssetWB]
   )
 
   // User balance for source asset
@@ -449,7 +442,7 @@ export const Swap = ({
   const [swapStartTime, setSwapStartTime] = useState<number>(0)
 
   const setSourceAsset = useCallback(
-    async (asset: Asset) => {
+    async ({ asset, walletType }: AssetWithWalletType) => {
       // delay to avoid render issues while switching
       await delay(100)
 
@@ -459,7 +452,8 @@ export const Swap = ({
           onChangePath(
             swap.path({
               source: assetToString(asset),
-              target: assetToString(targetAsset)
+              target: assetToString(targetAsset),
+              walletType
             })
           )
         )
@@ -469,7 +463,7 @@ export const Swap = ({
   )
 
   const setTargetAsset = useCallback(
-    async (asset: Asset) => {
+    async ({ asset }: AssetWithWalletType) => {
       // delay to avoid render issues while switching
       await delay(100)
 
@@ -479,13 +473,14 @@ export const Swap = ({
           onChangePath(
             swap.path({
               source: assetToString(sourceAsset),
-              target: assetToString(asset)
+              target: assetToString(asset),
+              walletType // stick with current wallet type
             })
           )
         )
       )
     },
-    [onChangePath, oSourceAsset]
+    [oSourceAsset, onChangePath, walletType]
   )
 
   const minAmountToSwapMax1e8: BaseAmount = useMemo(
@@ -565,41 +560,24 @@ export const Swap = ({
 
   const allAssets = useMemo((): Asset[] => availableAssets.map(({ asset }) => asset), [availableAssets])
 
-  const assetSymbolsInWallet: O.Option<string[]> = useMemo(
-    () => FP.pipe(oWalletBalances, O.map(A.map(({ asset }) => asset.symbol.toUpperCase()))),
-    [oWalletBalances]
-  )
-
-  const allBalances = FP.pipe(
+  const allBalances: WalletBalances = FP.pipe(
     oWalletBalances,
     O.map((balances) => filterWalletBalancesByAssets(balances, allAssets)),
-    O.getOrElse(() => [] as WalletBalances)
+    O.getOrElse<WalletBalances>(() => [])
   )
 
   const balancesToSwapFrom = useMemo((): WalletBalances => {
-    const filteredBalances: WalletBalances = FP.pipe(
-      allBalances,
-      A.filter((balance) =>
-        FP.pipe(
-          assetSymbolsInWallet,
-          O.map((symbols) => symbols.includes(balance.asset.symbol.toUpperCase())),
-          O.getOrElse((): boolean => false)
-        )
-      ),
-      (balances) => (balances.length ? balances : allBalances)
-    )
-
     return FP.pipe(
       assetsToSwap,
       O.map(({ source, target }) =>
         FP.pipe(
-          filteredBalances,
+          allBalances,
           A.filter((balance) => !eqAsset.equals(balance.asset, source) && !eqAsset.equals(balance.asset, target))
         )
       ),
       O.getOrElse(() => allBalances)
     )
-  }, [assetsToSwap, assetSymbolsInWallet, allBalances])
+  }, [assetsToSwap, allBalances])
 
   const balancesToSwapTo = useMemo((): WalletBalances => {
     const allBalances = FP.pipe(
@@ -1144,7 +1122,8 @@ export const Swap = ({
         onChangePath(
           swap.path({
             target: assetToString(source),
-            source: assetToString(target)
+            source: assetToString(target),
+            walletType: 'keystore' // Switch to 'keystore by default
           })
         )
       )
@@ -1276,7 +1255,7 @@ export const Swap = ({
                   <Styled.AssetSelect
                     onSelect={setSourceAsset}
                     asset={asset}
-                    assetWalletType={O.toUndefined(oSourceAssetWT)}
+                    assetWalletType={walletType}
                     balances={balancesToSwapFrom}
                     network={network}
                   />

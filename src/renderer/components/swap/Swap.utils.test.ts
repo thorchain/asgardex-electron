@@ -11,13 +11,16 @@ import {
   baseAmount,
   bn
 } from '@xchainjs/xchain-util'
+import * as FP from 'fp-ts/lib/function'
+import * as NEA from 'fp-ts/lib/NonEmptyArray'
 import * as O from 'fp-ts/lib/Option'
 
 import { ASSETS_TESTNET } from '../../../shared/mock/assets'
 import { AssetBUSD74E, AssetUSDTERC20Testnet, ZERO_BASE_AMOUNT } from '../../const'
 import { BNB_DECIMAL, THORCHAIN_DECIMAL } from '../../helpers/assetHelper'
-import { eqBaseAmount } from '../../helpers/fp/eq'
+import { eqAsset, eqBaseAmount } from '../../helpers/fp/eq'
 import { PoolsDataMap } from '../../services/midgard/types'
+import { NonEmptyWalletBalances, WalletBalance } from '../../services/wallet/types'
 import {
   DEFAULT_SWAP_DATA,
   isRuneSwap,
@@ -30,7 +33,9 @@ import {
   calcRefundFee,
   minAmountToSwapMax1e8,
   getSwapLimit,
-  maxAmountToSwapMax1e8
+  maxAmountToSwapMax1e8,
+  assetsInWallet,
+  balancesToSwapFrom
 } from './Swap.utils'
 
 describe('components/swap/utils', () => {
@@ -679,6 +684,70 @@ describe('components/swap/utils', () => {
       }
       const result = maxAmountToSwapMax1e8(params.inputBalanceAmount, params.inFeeAmount)
       expect(eqBaseAmount.equals(result, baseAmount(0))).toBeTruthy()
+    })
+  })
+  describe('assetsInWallet', () => {
+    const a: WalletBalance = {
+      walletType: 'keystore',
+      amount: baseAmount('1'),
+      asset: AssetRuneNative,
+      walletAddress: ''
+    }
+    const b: WalletBalance = {
+      ...a,
+      asset: AssetBNB
+    }
+    const c: WalletBalance = {
+      ...a,
+      asset: AssetBTC
+    }
+    it('no assets for no balances', () => {
+      const result = assetsInWallet(O.none)
+      expect(result).toBeNone()
+    })
+
+    it('filter out assets', () => {
+      const balances: O.Option<NonEmptyWalletBalances> = NEA.fromArray([a, b, c])
+      const result = assetsInWallet(balances)
+
+      FP.pipe(
+        result,
+        O.fold(
+          () => fail('no assets'),
+          (assets) => {
+            expect(assets.length).toEqual(3)
+            expect(eqAsset.equals(assets[0], AssetRuneNative)).toBeTruthy()
+            expect(eqAsset.equals(assets[1], AssetBNB)).toBeTruthy()
+            expect(eqAsset.equals(assets[2], AssetBTC)).toBeTruthy()
+          }
+        )
+      )
+    })
+  })
+
+  describe('balancesToSwapFrom', () => {
+    const a: WalletBalance = {
+      walletType: 'keystore',
+      amount: baseAmount('1'),
+      asset: AssetRuneNative,
+      walletAddress: ''
+    }
+    const b: WalletBalance = {
+      ...a,
+      walletType: 'ledger',
+      amount: baseAmount('2')
+    }
+    const c: WalletBalance = {
+      ...a,
+      asset: AssetBNB
+    }
+
+    it('no assets for no balances', () => {
+      const result = balancesToSwapFrom({
+        assetsToSwap: O.some({ source: AssetBNB, target: AssetRuneNative }),
+        walletBalances: [a, b, c]
+      })
+      expect(result.length).toEqual(2)
     })
   })
 })

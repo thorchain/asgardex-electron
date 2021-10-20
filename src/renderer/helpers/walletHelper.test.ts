@@ -1,4 +1,12 @@
-import { baseAmount, assetFromString, AssetRuneNative, AssetBNB, AssetLTC } from '@xchainjs/xchain-util'
+import {
+  baseAmount,
+  assetToBase,
+  assetFromString,
+  AssetRuneNative,
+  AssetBNB,
+  AssetLTC,
+  assetAmount
+} from '@xchainjs/xchain-util'
 import * as FP from 'fp-ts/lib/function'
 import * as NEA from 'fp-ts/lib/NonEmptyArray'
 import * as O from 'fp-ts/lib/Option'
@@ -22,6 +30,11 @@ describe('walletHelper', () => {
     asset: AssetRuneNative,
     walletAddress: 'rune native wallet address',
     walletType: 'keystore'
+  }
+  const RUNE_LEDGER_WB: WalletBalance = {
+    ...RUNE_WB,
+    amount: assetToBase(assetAmount(23)),
+    walletType: 'ledger'
   }
   const BNB = O.fromNullable(assetFromString('BNB.BNB'))
   const BOLT_WB: WalletBalance = {
@@ -121,9 +134,17 @@ describe('walletHelper', () => {
   })
 
   describe('filterWalletBalancesByAssets', () => {
-    it('returns filted wallet balances by assets', () => {
-      const result = filterWalletBalancesByAssets([RUNE_WB, BOLT_WB, BNB_WB, LTC_WB], [AssetBNB, AssetLTC])
+    it('filters misc. assets', () => {
+      const result = filterWalletBalancesByAssets(
+        [RUNE_WB, RUNE_LEDGER_WB, BOLT_WB, BNB_WB, LTC_WB],
+        [AssetBNB, AssetLTC]
+      )
       expect(eqWalletBalances.equals(result, [BNB_WB, LTC_WB])).toBeTruthy()
+    })
+
+    it('filters rune keystore + ledger', () => {
+      const result = filterWalletBalancesByAssets([RUNE_WB, RUNE_LEDGER_WB, BOLT_WB, BNB_WB, LTC_WB], [AssetRuneNative])
+      expect(eqWalletBalances.equals(result, [RUNE_WB, RUNE_LEDGER_WB])).toBeTruthy()
     })
     it('returns empty array if no asset is available', () => {
       const result = filterWalletBalancesByAssets([RUNE_WB, BOLT_WB], [AssetLTC])

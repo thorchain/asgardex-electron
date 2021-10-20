@@ -119,7 +119,11 @@ export const PoolTitle: React.FC<Props> = ({
                       event.preventDefault()
                       event.stopPropagation()
                       history.push(
-                        poolsRoutes.swap.path({ source: assetToString(asset), target: assetToString(AssetRuneNative) })
+                        poolsRoutes.swap.path({
+                          source: assetToString(asset),
+                          target: assetToString(AssetRuneNative),
+                          walletType: 'keystore' // use keystore wallet by default
+                        })
                       )
                     }}>
                     <SwapOutlined />

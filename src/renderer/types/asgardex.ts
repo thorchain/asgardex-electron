@@ -1,6 +1,8 @@
 import { BaseAmount, Asset } from '@xchainjs/xchain-util'
 import { Option } from 'fp-ts/lib/Option'
 
+import { WalletType } from '../../shared/wallet/types'
+
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type FixmeType = any
 
@@ -12,6 +14,11 @@ export type Pair = {
 export type AssetWithAmount = {
   asset: Asset
   amount: BaseAmount
+}
+
+export type AssetWithWalletType = {
+  asset: Asset
+  walletType: WalletType
 }
 
 /**

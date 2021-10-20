@@ -4,6 +4,7 @@ import BigNumber from 'bignumber.js'
 import * as A from 'fp-ts/Array'
 import * as E from 'fp-ts/Either'
 import * as FP from 'fp-ts/function'
+import * as NEA from 'fp-ts/lib/NonEmptyArray'
 import * as O from 'fp-ts/Option'
 
 import { ASGARDEX_SWAP_IDENTIFIER, ZERO_BASE_AMOUNT, ZERO_BN } from '../../const'
@@ -19,9 +20,9 @@ import { sequenceTOption } from '../../helpers/fpHelpers'
 import { priceFeeAmountForAsset } from '../../services/chain/fees/utils'
 import { SwapFees } from '../../services/chain/types'
 import { PoolAssetDetail, PoolAssetDetails, PoolsDataMap } from '../../services/midgard/types'
+import { NonEmptyWalletBalances, WalletBalances } from '../../services/wallet/types'
 import { SlipTolerance } from '../../types/asgardex'
-import { SwapData } from './Swap.types'
-
+import { AssetsToSwap, SwapData } from './Swap.types'
 /**
  * @returns none - neither sourceAsset neither targetAsset is RUNE
  *          some(true) - targetAsset is RUNE
@@ -268,4 +269,40 @@ export const maxAmountToSwapMax1e8 = (assetAmountMax1e8: BaseAmount, feeAmount: 
   const estimatedFee = max1e8BaseAmount(feeAmount.times(1.5))
   const maxAmountToSwap = assetAmountMax1e8.minus(estimatedFee)
   return maxAmountToSwap.gt(baseAmount(0)) ? maxAmountToSwap : baseAmount(0)
+}
+
+export const assetsInWallet = (oWalletBalances: O.Option<NonEmptyWalletBalances>): O.Option<Asset[]> =>
+  FP.pipe(oWalletBalances, O.map(A.map(({ asset }) => asset)))
+
+export const balancesToSwapFrom = ({
+  assetsToSwap,
+  walletBalances
+}: {
+  assetsToSwap: O.Option<AssetsToSwap>
+  walletBalances: WalletBalances
+}): WalletBalances => {
+  const oWalletAssets = assetsInWallet(NEA.fromArray(walletBalances))
+
+  const filteredBalances: WalletBalances = FP.pipe(
+    walletBalances,
+    A.filter((balance) =>
+      FP.pipe(
+        oWalletAssets,
+        O.map((assets) => assets.includes(balance.asset)),
+        O.getOrElse((): boolean => false)
+      )
+    ),
+    (balances) => (balances.length ? balances : walletBalances)
+  )
+
+  return FP.pipe(
+    assetsToSwap,
+    O.map(({ source, target }) =>
+      FP.pipe(
+        filteredBalances,
+        A.filter((balance) => !eqAsset.equals(balance.asset, source) && !eqAsset.equals(balance.asset, target))
+      )
+    ),
+    O.getOrElse(() => walletBalances)
+  )
 }
