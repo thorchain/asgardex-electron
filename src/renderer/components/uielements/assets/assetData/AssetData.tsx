@@ -62,7 +62,6 @@ export const AssetData: React.FC<Props> = (props): JSX.Element => {
           {walletType && isLedgerWallet(walletType) && (
             <Styled.WalletTypeLabel>{walletTypeToI18n(walletType, intl)}</Styled.WalletTypeLabel>
           )}
-          <Styled.WalletTypeLabel>Ledger</Styled.WalletTypeLabel>
         </Styled.LabelContainer>
       )}
       {assetAmount && (

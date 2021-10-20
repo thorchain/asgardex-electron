@@ -46,13 +46,13 @@ export const AssetMenu: React.FC<Props> = (props): JSX.Element => {
   )
 
   const cellRenderer = useCallback(
-    ({ asset, amount }: WalletBalance) => {
+    ({ asset, amount, walletType }: WalletBalance) => {
       const price = baseAmount(priceIndex[asset.ticker])
       const key = assetToString(asset)
       const node = (
         <Row align={'middle'} gutter={[8, 0]} onClick={() => onSelect(key)}>
           <Col>
-            <AssetData asset={asset} price={price} network={network} />
+            <AssetData asset={asset} price={price} network={network} walletType={walletType} />
           </Col>
           <Col>{formatAssetAmountCurrency({ amount: baseToAsset(amount), asset, decimal: 3 })}</Col>
         </Row>

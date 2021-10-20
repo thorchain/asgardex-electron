@@ -42,7 +42,7 @@ Default.storyName = 'default'
 
 const meta: Meta<Args> = {
   component: AssetData,
-  title: 'Components/AssetData',
+  title: 'Components/Assets/AssetData',
   argTypes: {
     network: {
       name: 'Network',
