@@ -1,13 +1,14 @@
-import { Row, Col as ACol } from 'antd'
+import * as A from 'antd'
 import styled from 'styled-components'
 import { palette } from 'styled-theme'
 
+import { WalletTypeLabel as WalletTypeLabelUI } from '../../common/Common.styles'
 import { Label as UILabel } from '../../label'
 import { AssetIcon as UIAssetIcon } from '../assetIcon'
 
 export type AssetDataSize = 'small' | 'big'
 
-export const Wrapper = styled(Row).attrs({
+export const Wrapper = styled(A.Row).attrs({
   align: 'middle'
 })`
   padding: 5px 0px;
@@ -53,10 +54,29 @@ export const PriceLabel = styled(UILabel).attrs({
   font-family: 'MainFontRegular';
 `
 
-export const Col = styled(ACol)`
+export const Col = styled(A.Col)`
   margin-right: 8px;
 
   &:last-child {
     margin: 0;
   }
+`
+
+export const AssetIconContainer = styled.div`
+  display: flex;
+  align-items: center;
+  margin-right: 8px;
+  padding: 10px 0;
+
+  position: relative;
+`
+export const WalletTypeLabel = styled(WalletTypeLabelUI)`
+  font-size: 8px;
+  line-height: 12px;
+  margin-left: 10px;
+`
+export const LabelContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
 `

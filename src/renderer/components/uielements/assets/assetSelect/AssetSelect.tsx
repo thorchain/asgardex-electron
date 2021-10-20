@@ -5,6 +5,7 @@ import { Dropdown } from 'antd'
 import { useIntl } from 'react-intl'
 
 import { Network } from '../../../../../shared/api/types'
+import { WalletType } from '../../../../../shared/wallet/types'
 import { ordWalletBalanceByAsset } from '../../../../helpers/fp/ord'
 import { WalletBalances } from '../../../../services/clients'
 import { PriceDataIndex } from '../../../../services/midgard/types'
@@ -13,8 +14,9 @@ import { AssetMenu } from '../assetMenu'
 import * as Styled from './AssetSelect.styles'
 
 export type Props = {
-  balances: WalletBalances
   asset: Asset
+  assetWalletType?: WalletType
+  balances: WalletBalances
   priceIndex?: PriceDataIndex
   withSearch?: boolean
   searchDisable?: string[]
@@ -29,6 +31,7 @@ export type Props = {
 export const AssetSelect: React.FC<Props> = (props): JSX.Element => {
   const {
     asset,
+    assetWalletType,
     balances = [],
     priceIndex,
     withSearch = true,
@@ -97,7 +100,13 @@ export const AssetSelect: React.FC<Props> = (props): JSX.Element => {
       onClick={handleDropdownButtonClicked}>
       <Dropdown overlay={renderMenu} trigger={[]} visible={openDropdown} placement="bottomCenter">
         <>
-          <AssetData noTicker={!showAssetName} className={'asset-data'} asset={asset} network={network} />
+          <AssetData
+            noTicker={!showAssetName}
+            className={'asset-data'}
+            asset={asset}
+            walletType={assetWalletType}
+            network={network}
+          />
           <Styled.AssetDropdownButton>
             {!hideButton ? (
               <Styled.DropdownIconHolder>
