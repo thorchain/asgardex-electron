@@ -228,6 +228,15 @@ export const Swap = ({
     [oWalletBalances, oSourceAsset]
   )
 
+  const oSourceAssetWT: O.Option<WalletType> = useMemo(
+    () =>
+      FP.pipe(
+        oSourceAssetWB,
+        O.map(({ walletType }) => walletType)
+      ),
+    [oSourceAssetWB]
+  )
+
   // User balance for source asset
   const sourceAssetAmount: BaseAmount = useMemo(
     () =>
@@ -1267,6 +1276,7 @@ export const Swap = ({
                   <Styled.AssetSelect
                     onSelect={setSourceAsset}
                     asset={asset}
+                    assetWalletType={O.toUndefined(oSourceAssetWT)}
                     balances={balancesToSwapFrom}
                     network={network}
                   />
