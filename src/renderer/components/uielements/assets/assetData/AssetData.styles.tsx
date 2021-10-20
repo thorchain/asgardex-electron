@@ -71,18 +71,12 @@ export const AssetIconContainer = styled.div`
   position: relative;
 `
 export const WalletTypeLabel = styled(WalletTypeLabelUI)`
-  /* position: absolute;
-  bottom: 0;
-  left: 50%;
-  transform: translateX(-50%); */
   font-size: 8px;
   line-height: 12px;
-  /* align-self: flex-start; */
   margin-left: 10px;
 `
 export const LabelContainer = styled.div`
   display: flex;
   flex-direction: column;
-  /* align-items: center; */
   align-items: flex-start;
 `
