@@ -37,7 +37,7 @@ export const SendViewETH: React.FC<Props> = (props): JSX.Element => {
   const intl = useIntl()
   const history = useHistory()
 
-  const oWalletBalance = useMemo(() => getWalletBalanceByAsset(oBalances, O.some(asset)), [oBalances, asset])
+  const oWalletBalance = useMemo(() => getWalletBalanceByAsset(oBalances, asset), [oBalances, asset])
 
   const { transfer$ } = useChainContext()
 

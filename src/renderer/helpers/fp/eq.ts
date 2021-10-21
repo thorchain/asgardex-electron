@@ -1,6 +1,6 @@
 import * as RD from '@devexperts/remote-data-ts'
 import { PoolData } from '@thorchain/asgardex-util'
-import { Balance } from '@xchainjs/xchain-client'
+import { Address, Balance } from '@xchainjs/xchain-client'
 import { Asset, AssetAmount, BaseAmount, Chain } from '@xchainjs/xchain-util'
 import BigNumber from 'bignumber.js'
 import * as A from 'fp-ts/lib/Array'
@@ -11,7 +11,7 @@ import * as O from 'fp-ts/lib/Option'
 import * as S from 'fp-ts/lib/string'
 
 import { LedgerError } from '../../../shared/api/types'
-import { WalletAddress } from '../../../shared/wallet/types'
+import { WalletAddress, WalletType } from '../../../shared/wallet/types'
 import { DepositAssetFees, DepositFees, SwapFeesParams } from '../../services/chain/types'
 import { ApproveParams } from '../../services/ethereum/types'
 import { PoolAddress, PoolShare } from '../../services/midgard/types'
@@ -178,7 +178,9 @@ const eqLedgerError = Eq.struct<LedgerError>({
   msg: eqString
 })
 
-export const eqAddress = eqString
+export const eqWalletType: Eq.Eq<WalletType> = eqString
+
+export const eqAddress: Eq.Eq<Address> = eqString
 
 export const eqWalletAddress = Eq.struct<WalletAddress>({
   address: eqString,

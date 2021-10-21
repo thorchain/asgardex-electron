@@ -20,7 +20,7 @@ import { Row } from 'antd'
 import BigNumber from 'bignumber.js'
 import * as A from 'fp-ts/Array'
 import * as FP from 'fp-ts/function'
-import * as NEA from 'fp-ts/NonEmptyArray'
+import * as NEA from 'fp-ts/lib/NonEmptyArray'
 import * as O from 'fp-ts/Option'
 import { useObservableState } from 'observable-hooks'
 import { useIntl } from 'react-intl'
@@ -43,7 +43,12 @@ import { eqAsset, eqBaseAmount, eqChain, eqOAsset, eqOApproveParams } from '../.
 import { sequenceSOption, sequenceTOption } from '../../helpers/fpHelpers'
 import * as PoolHelpers from '../../helpers/poolHelper'
 import { liveData, LiveData } from '../../helpers/rx/liveData'
-import { filterWalletBalancesByAssets, getWalletBalanceByAsset, getWalletByAddress } from '../../helpers/walletHelper'
+import {
+  filterWalletBalancesByAssets,
+  getWalletBalanceByAsset,
+  getWalletBalanceByAssetAndWalletType,
+  getWalletByAddress
+} from '../../helpers/walletHelper'
 import { useSubscriptionState } from '../../hooks/useSubscriptionState'
 import { swap } from '../../routes/pools'
 import { ChangeSlipToleranceHandler } from '../../services/app/types'
@@ -191,6 +196,9 @@ export const Swap = ({
     [oTargetPoolAsset]
   )
 
+  const [useSourceAssetLedger, setUseSourceAssetLedger] = useState(false)
+  const [useTargetAssetLedger, setUseTargetAssetLedger] = useState(false)
+
   const disableAllPoolActions = useCallback(
     (chain: Chain) => PoolHelpers.disableAllActions({ chain, haltedChains, mimirHalt }),
     [haltedChains, mimirHalt]
@@ -224,10 +232,40 @@ export const Swap = ({
     [oSourceAsset, oTargetAsset]
   )
 
+  const allAssets = useMemo((): Asset[] => availableAssets.map(({ asset }) => asset), [availableAssets])
+
+  const allBalances: WalletBalances = FP.pipe(
+    oWalletBalances,
+    O.map((balances) => filterWalletBalancesByAssets(balances, allAssets)),
+    O.getOrElse<WalletBalances>(() => [])
+  )
+
+  const hasSourceAssetLedger = useMemo(
+    () =>
+      FP.pipe(
+        oSourceAsset,
+        O.map((asset) => Utils.hasSourceAssetLedger(asset, allBalances)),
+        O.getOrElse(() => false)
+      ),
+    [oSourceAsset, allBalances]
+  )
+
   // `AssetWB` of source asset - which might be none (user has no balances for this asset or wallet is locked)
   const oSourceAssetWB: O.Option<WalletBalance> = useMemo(
-    () => getWalletBalanceByAsset(oWalletBalances, oSourceAsset),
-    [oWalletBalances, oSourceAsset]
+    () =>
+      FP.pipe(
+        oSourceAsset,
+        O.chain((asset) => {
+          const walletType = useSourceAssetLedger ? 'ledger' : 'keystore'
+          const oWalletBalances = NEA.fromArray(allBalances)
+          return getWalletBalanceByAssetAndWalletType({
+            oWalletBalances,
+            asset,
+            walletType
+          })
+        })
+      ),
+    [oSourceAsset, useSourceAssetLedger, allBalances]
   )
 
   // User balance for source asset
@@ -251,11 +289,21 @@ export const Swap = ({
   const sourceChainAssetAmount: BaseAmount = useMemo(
     () =>
       FP.pipe(
-        getWalletBalanceByAsset(oWalletBalances, O.some(sourceChainAsset)),
+        getWalletBalanceByAsset(oWalletBalances, sourceChainAsset),
         O.map(({ amount }) => amount),
         O.getOrElse(() => ZERO_BASE_AMOUNT)
       ),
     [oWalletBalances, sourceChainAsset]
+  )
+
+  const hasTargetAssetLedger = useMemo(
+    () =>
+      FP.pipe(
+        oTargetAsset,
+        O.map((asset) => Utils.hasSourceAssetLedger(asset, allBalances)),
+        O.getOrElse(() => false)
+      ),
+    [oTargetAsset, allBalances]
   )
 
   const {
@@ -556,14 +604,6 @@ export const Swap = ({
       return setAmountToSwapMax1e8(baseAmount(amountFromPercentage, sourceAssetAmountMax1e8.decimal))
     },
     [maxAmountToSwapMax1e8, setAmountToSwapMax1e8, sourceAssetAmountMax1e8.decimal]
-  )
-
-  const allAssets = useMemo((): Asset[] => availableAssets.map(({ asset }) => asset), [availableAssets])
-
-  const allBalances: WalletBalances = FP.pipe(
-    oWalletBalances,
-    O.map((balances) => filterWalletBalancesByAssets(balances, allAssets)),
-    O.getOrElse<WalletBalances>(() => [])
   )
 
   const balancesToSwapFrom = useMemo((): WalletBalances => {
@@ -1209,8 +1249,23 @@ export const Swap = ({
     )
   }, [oMatchedWalletType])
 
+  useEffect(() => {
+    const walletType = useTargetAssetLedger ? 'ledger' : 'keystore'
+
+    const oWalletAddress = FP.pipe(
+      oTargetAsset,
+      O.chain((asset) => getWalletBalanceByAssetAndWalletType({ oWalletBalances, asset, walletType })),
+      O.map(({ walletAddress }) => walletAddress)
+    )
+
+    setTargetWalletAddress(oWalletAddress)
+    setEditableTargetWalletAddress(oWalletAddress)
+  }, [oTargetAsset, oWalletBalances, useTargetAssetLedger])
+
   return (
     <Styled.Container>
+      {/* <div>oSourceAssetWB: {JSON.stringify(oSourceAssetWB, null, 2)}</div>
+      <div>hasSourceAssetLedger: {JSON.stringify(hasSourceAssetLedger, null, 2)}</div> */}
       <Styled.ContentContainer>
         <Styled.Header>
           {FP.pipe(
@@ -1247,18 +1302,30 @@ export const Swap = ({
               disabled={lockedWallet}
               maxInfoText={intl.formatMessage({ id: 'swap.info.max.fee' })}
             />
+
             {FP.pipe(
               oSourceAsset,
               O.fold(
                 () => <></>,
                 (asset) => (
-                  <Styled.AssetSelect
-                    onSelect={setSourceAsset}
-                    asset={asset}
-                    assetWalletType={walletType}
-                    balances={balancesToSwapFrom}
-                    network={network}
-                  />
+                  <Styled.AssetSelectContainer>
+                    <Styled.AssetSelect
+                      onSelect={setSourceAsset}
+                      asset={asset}
+                      assetWalletType={walletType}
+                      balances={balancesToSwapFrom}
+                      network={network}
+                    />
+
+                    <Styled.CheckButton
+                      isChecked={useSourceAssetLedger}
+                      clickHandler={() => {
+                        setUseSourceAssetLedger(() => !useSourceAssetLedger)
+                      }}
+                      disabled={!hasSourceAssetLedger}>
+                      {intl.formatMessage({ id: 'ledger.title' })}
+                    </Styled.CheckButton>
+                  </Styled.AssetSelectContainer>
                 )
               )
             )}
@@ -1279,12 +1346,20 @@ export const Swap = ({
               O.fold(
                 () => <></>,
                 (asset) => (
-                  <Styled.TargetAssetSelect
-                    onSelect={setTargetAsset}
-                    asset={asset}
-                    balances={balancesToSwapTo}
-                    network={network}
-                  />
+                  <Styled.AssetSelectContainer>
+                    <Styled.TargetAssetSelect
+                      onSelect={setTargetAsset}
+                      asset={asset}
+                      balances={balancesToSwapTo}
+                      network={network}
+                    />
+                    <Styled.CheckButton
+                      isChecked={useTargetAssetLedger}
+                      clickHandler={() => setUseTargetAssetLedger(() => !useTargetAssetLedger)}
+                      disabled={!hasTargetAssetLedger}>
+                      {intl.formatMessage({ id: 'ledger.title' })}
+                    </Styled.CheckButton>
+                  </Styled.AssetSelectContainer>
                 )
               )
             )}

@@ -1,12 +1,4 @@
-import {
-  baseAmount,
-  assetToBase,
-  assetFromString,
-  AssetRuneNative,
-  AssetBNB,
-  AssetLTC,
-  assetAmount
-} from '@xchainjs/xchain-util'
+import { baseAmount, assetToBase, AssetRuneNative, AssetBNB, AssetLTC, assetAmount } from '@xchainjs/xchain-util'
 import * as FP from 'fp-ts/lib/function'
 import * as NEA from 'fp-ts/lib/NonEmptyArray'
 import * as O from 'fp-ts/lib/Option'
@@ -36,7 +28,6 @@ describe('walletHelper', () => {
     amount: assetToBase(assetAmount(23)),
     walletType: 'ledger'
   }
-  const BNB = O.fromNullable(assetFromString('BNB.BNB'))
   const BOLT_WB: WalletBalance = {
     amount: baseAmount('23400000000'),
     asset: ASSETS_TESTNET.BOLT,
@@ -81,18 +72,18 @@ describe('walletHelper', () => {
   describe('getWalletBalanceByAsset', () => {
     it('returns amount of BNB', () => {
       const balances: O.Option<NonEmptyWalletBalances> = NEA.fromArray([RUNE_WB, BOLT_WB, BNB_WB])
-      const result = O.toNullable(getWalletBalanceByAsset(balances, BNB))
+      const result = O.toNullable(getWalletBalanceByAsset(balances, AssetBNB))
       expect(result?.asset.symbol).toEqual('BNB')
       expect(result?.amount.amount().toString()).toEqual('45600000000')
     })
     it('returns none if BNB is not available', () => {
       const balances: O.Option<NonEmptyWalletBalances> = NEA.fromArray([RUNE_WB, BOLT_WB])
-      const result = getWalletBalanceByAsset(balances, BNB)
+      const result = getWalletBalanceByAsset(balances, AssetBNB)
       expect(result).toBeNone()
     })
     it('returns none for empty lists of `AssetWB`', () => {
       const balances: O.Option<NonEmptyWalletBalances> = NEA.fromArray([])
-      const result = getWalletBalanceByAsset(balances, BNB)
+      const result = getWalletBalanceByAsset(balances, AssetBNB)
       expect(result).toBeNone()
     })
   })

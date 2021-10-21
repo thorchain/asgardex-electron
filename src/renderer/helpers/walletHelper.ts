@@ -4,13 +4,12 @@ import * as A from 'fp-ts/Array'
 import * as FP from 'fp-ts/function'
 import * as O from 'fp-ts/Option'
 
-import { WalletAddress } from '../../shared/wallet/types'
+import { WalletAddress, WalletType } from '../../shared/wallet/types'
 import { ZERO_ASSET_AMOUNT } from '../const'
 import { WalletBalances } from '../services/clients'
 import { NonEmptyWalletBalances, WalletBalance } from '../services/wallet/types'
 import { isBnbAsset, isEthAsset, isLtcAsset, isRuneNativeAsset } from './assetHelper'
-import { eqAddress, eqAsset } from './fp/eq'
-import { sequenceTOption } from './fpHelpers'
+import { eqAddress, eqAsset, eqWalletType } from './fp/eq'
 
 /**
  * Tries to find an `AssetAmount` of an `Asset`
@@ -27,14 +26,36 @@ export const getAssetAmountByAsset = (balances: WalletBalances, assetToFind: Ass
 
 export const getWalletBalanceByAsset = (
   oWalletBalances: O.Option<NonEmptyWalletBalances>,
-  oAsset: O.Option<Asset>
+  asset: Asset
 ): O.Option<WalletBalance> =>
   FP.pipe(
-    sequenceTOption(oWalletBalances, oAsset),
-    O.chain(([walletBalances, asset]) =>
+    oWalletBalances,
+    O.chain((walletBalances) =>
       FP.pipe(
         walletBalances,
         A.findFirst(({ asset: assetInList }) => eqAsset.equals(assetInList, asset))
+      )
+    )
+  )
+
+export const getWalletBalanceByAssetAndWalletType = ({
+  oWalletBalances,
+  asset,
+  walletType
+}: {
+  oWalletBalances: O.Option<NonEmptyWalletBalances>
+  asset: Asset
+  walletType: WalletType
+}): O.Option<WalletBalance> =>
+  FP.pipe(
+    oWalletBalances,
+    O.chain((walletBalances) =>
+      FP.pipe(
+        walletBalances,
+        A.findFirst(
+          ({ asset: assetInList, walletType: balanceWalletType }) =>
+            eqAsset.equals(assetInList, asset) && eqWalletType.equals(walletType, balanceWalletType)
+        )
       )
     )
   )

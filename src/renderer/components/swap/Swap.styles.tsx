@@ -6,6 +6,7 @@ import { media } from '../../helpers/styleHelper'
 import { AssetInput as AssetInputBase } from '../uielements/assets/assetInput'
 import { AssetSelect as AssetSelectUI } from '../uielements/assets/assetSelect'
 import { Button as UIButton } from '../uielements/button'
+import { CheckButton as CheckButtonUI } from '../uielements/button/CheckButton'
 import { Label as UILabel } from '../uielements/label'
 
 const ICON_SIZE = 16
@@ -223,4 +224,16 @@ export const SubmitButton = styled(UIButton).attrs({
   min-width: 200px !important;
   padding: 0 30px;
   margin: 30px 0;
+`
+
+export const CheckButton = styled(CheckButtonUI)`
+  &.ant-btn {
+    font-size: 10px;
+  }
+`
+
+export const AssetSelectContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 `
