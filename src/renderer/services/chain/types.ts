@@ -122,6 +122,8 @@ export type SwapTxParams = {
   readonly asset: Asset
   readonly amount: BaseAmount
   readonly memo: string
+  readonly walletType: WalletType
+  readonly sender: Address
 }
 
 export type SwapStateHandler = (p: SwapTxParams) => SwapState$

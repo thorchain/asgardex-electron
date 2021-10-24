@@ -11,8 +11,6 @@ import {
   baseAmount,
   bn
 } from '@xchainjs/xchain-util'
-import * as FP from 'fp-ts/lib/function'
-import * as NEA from 'fp-ts/lib/NonEmptyArray'
 import * as O from 'fp-ts/lib/Option'
 
 import { ASSETS_TESTNET } from '../../../shared/mock/assets'
@@ -20,7 +18,7 @@ import { AssetBUSD74E, AssetUSDTERC20Testnet, ZERO_BASE_AMOUNT } from '../../con
 import { BNB_DECIMAL, THORCHAIN_DECIMAL } from '../../helpers/assetHelper'
 import { eqAsset, eqBaseAmount } from '../../helpers/fp/eq'
 import { PoolsDataMap } from '../../services/midgard/types'
-import { NonEmptyWalletBalances, WalletBalance } from '../../services/wallet/types'
+import { WalletBalance } from '../../services/wallet/types'
 import {
   DEFAULT_SWAP_DATA,
   isRuneSwap,
@@ -701,27 +699,18 @@ describe('components/swap/utils', () => {
       ...a,
       asset: AssetBTC
     }
-    it('no assets for no balances', () => {
-      const result = assetsInWallet(O.none)
-      expect(result).toBeNone()
+    it('empty list of assets for empty balances', () => {
+      const result = assetsInWallet([])
+      expect(result).toEqual([])
     })
 
     it('filter out assets', () => {
-      const balances: O.Option<NonEmptyWalletBalances> = NEA.fromArray([a, b, c])
-      const result = assetsInWallet(balances)
+      const assets = assetsInWallet([a, b, c])
 
-      FP.pipe(
-        result,
-        O.fold(
-          () => fail('no assets'),
-          (assets) => {
-            expect(assets.length).toEqual(3)
-            expect(eqAsset.equals(assets[0], AssetRuneNative)).toBeTruthy()
-            expect(eqAsset.equals(assets[1], AssetBNB)).toBeTruthy()
-            expect(eqAsset.equals(assets[2], AssetBTC)).toBeTruthy()
-          }
-        )
-      )
+      expect(assets.length).toEqual(3)
+      expect(eqAsset.equals(assets[0], AssetRuneNative)).toBeTruthy()
+      expect(eqAsset.equals(assets[1], AssetBNB)).toBeTruthy()
+      expect(eqAsset.equals(assets[2], AssetBTC)).toBeTruthy()
     })
   })
 

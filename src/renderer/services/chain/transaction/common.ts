@@ -102,6 +102,7 @@ export const sendPoolTx$ = ({
 }: SendPoolTxParams): TxHashLD => {
   switch (asset.chain) {
     case ETHChain:
+      // TODO(@asgdx-team) Support `walletType`to provide Ledger & Co.
       return ETH.sendPoolTx$({
         router,
         recipient,
@@ -114,7 +115,6 @@ export const sendPoolTx$ = ({
       return THOR.sendPoolTx$({ walletType, amount, asset, memo })
 
     default:
-      // TODO(@asgdx-team) Get `walletType` from props if we want to support other than keystore (e.g. Ledger)
       return sendTx$({ sender, walletType, asset, recipient, amount, memo, feeOption, walletIndex })
   }
 }

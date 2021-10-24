@@ -1,5 +1,5 @@
 import { getDoubleSwapOutput, getDoubleSwapSlip, getSwapOutput, getSwapSlip } from '@thorchain/asgardex-util'
-import { Asset, assetToString, bn, BaseAmount, baseAmount } from '@xchainjs/xchain-util'
+import { Asset, assetToString, bn, BaseAmount, baseAmount, Chain } from '@xchainjs/xchain-util'
 import BigNumber from 'bignumber.js'
 import * as A from 'fp-ts/Array'
 import * as E from 'fp-ts/Either'
@@ -15,7 +15,7 @@ import {
   max1e8BaseAmount,
   to1e8BaseAmount
 } from '../../helpers/assetHelper'
-import { eqAsset } from '../../helpers/fp/eq'
+import { eqAsset, eqChain } from '../../helpers/fp/eq'
 import { sequenceTOption } from '../../helpers/fpHelpers'
 import { priceFeeAmountForAsset } from '../../services/chain/fees/utils'
 import { SwapFees } from '../../services/chain/types'
@@ -303,12 +303,23 @@ export const balancesToSwapFrom = ({
   )
 }
 
-export const hasSourceAssetLedger = (asset: Asset, balances: WalletBalances): boolean =>
+export const hasLedgerInBalancesByAsset = (asset: Asset, balances: WalletBalances): boolean =>
   FP.pipe(
     balances,
     A.findFirst(
       ({ walletType, asset: balanceAsset }) => eqAsset.equals(asset, balanceAsset) && isLedgerWallet(walletType)
     ),
+    O.fold(
+      () => false,
+      () => true
+    )
+  )
+
+// TODO (@veado) Add a test
+export const hasLedgerInBalancesByChain = (chain: Chain, balances: WalletBalances): boolean =>
+  FP.pipe(
+    balances,
+    A.findFirst(({ walletType, asset }) => eqChain.equals(chain, asset.chain) && isLedgerWallet(walletType)),
     O.fold(
       () => false,
       () => true

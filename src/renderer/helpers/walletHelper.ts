@@ -1,5 +1,5 @@
 import { Address } from '@xchainjs/xchain-client'
-import { Asset, AssetAmount, baseToAsset } from '@xchainjs/xchain-util'
+import { Asset, AssetAmount, baseToAsset, Chain } from '@xchainjs/xchain-util'
 import * as A from 'fp-ts/Array'
 import * as FP from 'fp-ts/function'
 import * as O from 'fp-ts/Option'
@@ -9,7 +9,7 @@ import { ZERO_ASSET_AMOUNT } from '../const'
 import { WalletBalances } from '../services/clients'
 import { NonEmptyWalletBalances, WalletBalance } from '../services/wallet/types'
 import { isBnbAsset, isEthAsset, isLtcAsset, isRuneNativeAsset } from './assetHelper'
-import { eqAddress, eqAsset, eqWalletType } from './fp/eq'
+import { eqAddress, eqAsset, eqChain, eqWalletType } from './fp/eq'
 
 /**
  * Tries to find an `AssetAmount` of an `Asset`
@@ -133,6 +133,25 @@ export const addressFromWalletAddress = ({ address }: Pick<WalletAddress, 'addre
 export const addressFromOptionalWalletAddress = (
   oWalletAddress: O.Option<Pick<WalletAddress, 'address'>>
 ): O.Option<Address> => FP.pipe(oWalletAddress, O.map(addressFromWalletAddress))
+
+// TODO (@veado) Add tests
+export const getAddressFromBalancesByChain = ({
+  balances,
+  chain,
+  walletType
+}: {
+  balances: NonEmptyWalletBalances
+  chain: Chain
+  walletType: WalletType
+}): O.Option<Address> =>
+  FP.pipe(
+    balances,
+    A.findFirst(
+      ({ asset, walletType: balanceWalletType }) =>
+        eqChain.equals(chain, asset.chain) && eqWalletType.equals(walletType, balanceWalletType)
+    ),
+    O.map(({ walletAddress }) => walletAddress)
+  )
 
 export const getWalletByAddress = (walletBalances: WalletBalances, address: Address): O.Option<WalletBalance> =>
   FP.pipe(
