@@ -107,6 +107,7 @@ export const HeaderComponent: React.FC<Props> = (props): JSX.Element => {
 
   const [menuVisible, setMenuVisible] = useState(false)
 
+  const isSmallMobileView = Grid.useBreakpoint()?.xs ?? false
   const isDesktopView = Grid.useBreakpoint()?.lg ?? false
   const isLargeDesktopView = Grid.useBreakpoint()?.xl ?? false
 
@@ -324,16 +325,18 @@ export const HeaderComponent: React.FC<Props> = (props): JSX.Element => {
                   {renderLogo}
                 </Row>
               </Col>
-              <Col flex={1}>
-                <Row>
-                  <HeaderStats
-                    runePrice={runePriceRD}
-                    reloadRunePrice={reloadRunePrice}
-                    volume24Price={volume24PriceRD}
-                    reloadVolume24Price={reloadVolume24Price}
-                  />
-                </Row>
-              </Col>
+              {!isSmallMobileView && (
+                <Col flex={1}>
+                  <Row>
+                    <HeaderStats
+                      runePrice={runePriceRD}
+                      reloadRunePrice={reloadRunePrice}
+                      volume24Price={volume24PriceRD}
+                      reloadVolume24Price={reloadVolume24Price}
+                    />
+                  </Row>
+                </Col>
+              )}
               <Col>
                 <Row align="middle" style={{ height: headerHeight, cursor: 'pointer' }} onClick={toggleMenu}>
                   {menuVisible ? (
