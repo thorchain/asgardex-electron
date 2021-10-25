@@ -34,7 +34,7 @@ import * as Styled from './PoolsOverview.styles'
 
 const POOLS_KEY = 'active'
 
-export const ActivePools: React.FC<PoolsComponentProps> = ({ haltedChains, mimirHalt }): JSX.Element => {
+export const ActivePools: React.FC<PoolsComponentProps> = ({ haltedChains, mimirHalt, walletLocked }): JSX.Element => {
   const history = useHistory()
   const intl = useIntl()
 
@@ -96,7 +96,7 @@ export const ActivePools: React.FC<PoolsComponentProps> = ({ haltedChains, mimir
       return (
         <Styled.TableAction>
           <ManageButton
-            disabled={disableAllPoolActions || disablePoolActions}
+            disabled={disableAllPoolActions || disablePoolActions || walletLocked}
             asset={pool.target}
             sizevalue={isDesktopView ? 'normal' : 'small'}
             isTextView={isDesktopView}
@@ -122,7 +122,7 @@ export const ActivePools: React.FC<PoolsComponentProps> = ({ haltedChains, mimir
       )
     },
 
-    [clickSwapHandler, intl, isDesktopView, haltedChains, mimirHalt]
+    [haltedChains, mimirHalt, walletLocked, isDesktopView, intl, clickSwapHandler]
   )
 
   const btnPoolsColumn = useMemo(

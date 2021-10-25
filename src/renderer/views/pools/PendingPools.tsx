@@ -37,7 +37,7 @@ import * as Styled from './PoolsOverview.styles'
 
 const POOLS_KEY = 'pending'
 
-export const PendingPools: React.FC<PoolsComponentProps> = ({ haltedChains, mimirHalt }): JSX.Element => {
+export const PendingPools: React.FC<PoolsComponentProps> = ({ haltedChains, mimirHalt, walletLocked }): JSX.Element => {
   const history = useHistory()
   const intl = useIntl()
 
@@ -93,11 +93,11 @@ export const PendingPools: React.FC<PoolsComponentProps> = ({ haltedChains, mimi
         PoolHelpers.disablePoolActions({ chain: pool.target.chain, haltedChains, mimirHalt })
       return (
         <TableAction>
-          <ManageButton asset={pool.target} isTextView={isDesktopView} disabled={disablePool} />
+          <ManageButton asset={pool.target} isTextView={isDesktopView} disabled={disablePool || walletLocked} />
         </TableAction>
       )
     },
-    [haltedChains, isDesktopView, mimirHalt]
+    [haltedChains, isDesktopView, mimirHalt, walletLocked]
   )
 
   const btnPendingPoolsColumn = useMemo(

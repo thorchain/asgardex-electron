@@ -290,14 +290,12 @@ export const HeaderComponent: React.FC<Props> = (props): JSX.Element => {
               <Col>
                 <Row justify="space-between" align="middle" style={{ height: headerHeight }}>
                   {renderLogo}
-                  {isLargeDesktopView && (
-                    <HeaderStats
-                      runePrice={runePriceRD}
-                      reloadRunePrice={reloadRunePrice}
-                      volume24Price={volume24PriceRD}
-                      reloadVolume24Price={reloadVolume24Price}
-                    />
-                  )}
+                  <HeaderStats
+                    runePrice={runePriceRD}
+                    reloadRunePrice={reloadRunePrice}
+                    volume24Price={volume24PriceRD}
+                    reloadVolume24Price={reloadVolume24Price}
+                  />
                 </Row>
               </Col>
               <Col span="auto">
@@ -324,6 +322,16 @@ export const HeaderComponent: React.FC<Props> = (props): JSX.Element => {
               <Col>
                 <Row align="middle" style={{ height: headerHeight }}>
                   {renderLogo}
+                </Row>
+              </Col>
+              <Col flex={1}>
+                <Row>
+                  <HeaderStats
+                    runePrice={runePriceRD}
+                    reloadRunePrice={reloadRunePrice}
+                    volume24Price={volume24PriceRD}
+                    reloadVolume24Price={reloadVolume24Price}
+                  />
                 </Row>
               </Col>
               <Col>

@@ -22,7 +22,7 @@ import { WalletBalance } from '../../services/wallet/types'
 import {
   DEFAULT_SWAP_DATA,
   isRuneSwap,
-  getSlip,
+  getSlipPercent,
   getSwapResult,
   getSwapData,
   pickPoolAsset,
@@ -69,7 +69,7 @@ describe('components/swap/utils', () => {
 
     it('should return zero result if no poolData', () => {
       expect(
-        getSlip({
+        getSlipPercent({
           sourceAsset: AssetBNB,
           targetAsset: ASSETS_TESTNET.BOLT,
           amountToSwap: baseAmount(bn(123)),
@@ -77,7 +77,7 @@ describe('components/swap/utils', () => {
         })
       ).toEqual(bn(0))
       expect(
-        getSlip({
+        getSlipPercent({
           sourceAsset: AssetRuneNative,
           targetAsset: ASSETS_TESTNET.BOLT,
           amountToSwap: baseAmount(bn(123)),
@@ -85,7 +85,7 @@ describe('components/swap/utils', () => {
         })
       ).toEqual(bn(0))
       expect(
-        getSlip({
+        getSlipPercent({
           sourceAsset: AssetBNB,
           targetAsset: AssetRuneNative,
           amountToSwap: baseAmount(bn(123)),
@@ -96,40 +96,40 @@ describe('components/swap/utils', () => {
 
     it('should calculate slip when data enabled', () => {
       expect(
-        getSlip({
+        getSlipPercent({
           sourceAsset: AssetBNB,
           targetAsset: ASSETS_TESTNET.BOLT,
           amountToSwap: baseAmount(bn(1)),
           poolsData
         })
-      ).toEqual(bn('0.64285714285714285714'))
+      ).toEqual(bn('64.285714285714285714'))
 
       expect(
-        getSlip({
+        getSlipPercent({
           sourceAsset: ASSETS_TESTNET.BOLT,
           targetAsset: AssetBNB,
           amountToSwap: baseAmount(bn(1)),
           poolsData
         })
-      ).toEqual(bn('0.5'))
+      ).toEqual(bn('50.0'))
 
       expect(
-        getSlip({
+        getSlipPercent({
           sourceAsset: AssetRuneNative,
           targetAsset: AssetBNB,
           amountToSwap: baseAmount(bn(1)),
           poolsData
         })
-      ).toEqual(bn('0.33333333333333333333'))
+      ).toEqual(bn('33.333333333333333333'))
 
       expect(
-        getSlip({
+        getSlipPercent({
           sourceAsset: AssetBNB,
           targetAsset: AssetRuneNative,
           amountToSwap: baseAmount(bn(1)),
           poolsData
         })
-      ).toEqual(bn('0.25'))
+      ).toEqual(bn('50.0'))
     })
   })
 
@@ -260,7 +260,7 @@ describe('components/swap/utils', () => {
         poolsData
       })
 
-      expect(slip.isEqualTo(bn('0.00332225913621262458'))).toBeTruthy()
+      expect(slip.isEqualTo(bn('0.332225913621262458'))).toBeTruthy()
       expect(eqBaseAmount.equals(swapResult, baseAmount('13245'))).toBeTruthy()
     })
   })

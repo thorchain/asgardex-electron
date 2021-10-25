@@ -39,5 +39,6 @@ export type PoolTableRowData = {
 export type PoolsComponentProps = {
   haltedChains: Chain[]
   mimirHalt: MimirHalt
+  walletLocked: boolean
 }
 export type PoolTableRowsData = PoolTableRowData[]
