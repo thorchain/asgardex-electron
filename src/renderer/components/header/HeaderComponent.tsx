@@ -324,8 +324,8 @@ export const HeaderComponent: React.FC<Props> = (props): JSX.Element => {
                   {renderLogo}
                 </Row>
               </Col>
-              <Col>
-                <Row align="middle">
+              <Col flex={1}>
+                <Row>
                   <HeaderStats
                     runePrice={runePriceRD}
                     reloadRunePrice={reloadRunePrice}
