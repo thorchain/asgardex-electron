@@ -112,11 +112,11 @@ export const CurrencyInfo = ({
             <div style={{ display: 'flex', alignItems: 'center', marginRight: '5px' }}>
               {isCausedSlippage ? (
                 <Styled.SlipToleranceWarning>
-                  {intl.formatMessage({ id: 'swap.slip.title' })}: {slip.toNumber().toFixed(0)}%
+                  {intl.formatMessage({ id: 'swap.slip.title' })}: {slip.toFixed(2)}%
                 </Styled.SlipToleranceWarning>
               ) : (
                 <Styled.SlipToleranceText>
-                  {intl.formatMessage({ id: 'swap.slip.title' })}: {slip.toNumber().toFixed(0)}%
+                  {intl.formatMessage({ id: 'swap.slip.title' })}: {slip.toFixed(2)}%
                 </Styled.SlipToleranceText>
               )}
             </div>
