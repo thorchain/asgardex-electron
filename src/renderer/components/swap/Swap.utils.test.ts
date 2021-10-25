@@ -99,7 +99,7 @@ describe('components/swap/utils', () => {
           amountToSwap: baseAmount(bn(1)),
           poolsData
         })
-      ).toEqual(bn('0.64285714285714285714'))
+      ).toEqual(bn('64.285714285714285714'))
 
       expect(
         getSlip({
@@ -108,7 +108,7 @@ describe('components/swap/utils', () => {
           amountToSwap: baseAmount(bn(1)),
           poolsData
         })
-      ).toEqual(bn('0.5'))
+      ).toEqual(bn('50.0'))
 
       expect(
         getSlip({
@@ -117,7 +117,7 @@ describe('components/swap/utils', () => {
           amountToSwap: baseAmount(bn(1)),
           poolsData
         })
-      ).toEqual(bn('0.33333333333333333333'))
+      ).toEqual(bn('33.333333333333333333'))
 
       expect(
         getSlip({
@@ -126,7 +126,7 @@ describe('components/swap/utils', () => {
           amountToSwap: baseAmount(bn(1)),
           poolsData
         })
-      ).toEqual(bn('0.25'))
+      ).toEqual(bn('50.0'))
     })
   })
 
@@ -257,7 +257,7 @@ describe('components/swap/utils', () => {
         poolsData
       })
 
-      expect(slip.isEqualTo(bn('0.00332225913621262458'))).toBeTruthy()
+      expect(slip.isEqualTo(bn('0.332225913621262458'))).toBeTruthy()
       expect(eqBaseAmount.equals(swapResult, baseAmount('13245'))).toBeTruthy()
     })
   })

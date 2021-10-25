@@ -57,8 +57,9 @@ export const getSlip = ({
     isRuneSwap(sourceAsset, targetAsset),
     O.chain((toRune) =>
       FP.pipe(
-        O.fromNullable(poolsData[assetToString(targetAsset)]),
-        O.map((targetPoolData) => getSwapSlip(inputAmount, targetPoolData, toRune))
+        O.fromNullable(poolsData[assetToString(isRuneNativeAsset(targetAsset) ? sourceAsset : targetAsset)]),
+        O.map((targetPoolData) => getSwapSlip(inputAmount, targetPoolData, toRune)),
+        O.map((slip) => slip.times(100))
       )
     ),
     O.alt(() =>
@@ -67,7 +68,8 @@ export const getSlip = ({
           O.fromNullable(poolsData[assetToString(sourceAsset)]),
           O.fromNullable(poolsData[assetToString(targetAsset)])
         ),
-        O.map(([source, target]) => getDoubleSwapSlip(inputAmount, source, target))
+        O.map(([source, target]) => getDoubleSwapSlip(inputAmount, source, target)),
+        O.map((slip) => slip.times(100))
       )
     ),
     O.getOrElse(() => bn(0))
