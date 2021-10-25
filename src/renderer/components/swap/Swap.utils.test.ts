@@ -21,7 +21,7 @@ import { PoolsDataMap } from '../../services/midgard/types'
 import {
   DEFAULT_SWAP_DATA,
   isRuneSwap,
-  getSlip,
+  getSlipPercent,
   getSwapResult,
   getSwapData,
   pickPoolAsset,
@@ -66,7 +66,7 @@ describe('components/swap/utils', () => {
 
     it('should return zero result if no poolData', () => {
       expect(
-        getSlip({
+        getSlipPercent({
           sourceAsset: AssetBNB,
           targetAsset: ASSETS_TESTNET.BOLT,
           amountToSwap: baseAmount(bn(123)),
@@ -74,7 +74,7 @@ describe('components/swap/utils', () => {
         })
       ).toEqual(bn(0))
       expect(
-        getSlip({
+        getSlipPercent({
           sourceAsset: AssetRuneNative,
           targetAsset: ASSETS_TESTNET.BOLT,
           amountToSwap: baseAmount(bn(123)),
@@ -82,7 +82,7 @@ describe('components/swap/utils', () => {
         })
       ).toEqual(bn(0))
       expect(
-        getSlip({
+        getSlipPercent({
           sourceAsset: AssetBNB,
           targetAsset: AssetRuneNative,
           amountToSwap: baseAmount(bn(123)),
@@ -93,7 +93,7 @@ describe('components/swap/utils', () => {
 
     it('should calculate slip when data enabled', () => {
       expect(
-        getSlip({
+        getSlipPercent({
           sourceAsset: AssetBNB,
           targetAsset: ASSETS_TESTNET.BOLT,
           amountToSwap: baseAmount(bn(1)),
@@ -102,7 +102,7 @@ describe('components/swap/utils', () => {
       ).toEqual(bn('64.285714285714285714'))
 
       expect(
-        getSlip({
+        getSlipPercent({
           sourceAsset: ASSETS_TESTNET.BOLT,
           targetAsset: AssetBNB,
           amountToSwap: baseAmount(bn(1)),
@@ -111,7 +111,7 @@ describe('components/swap/utils', () => {
       ).toEqual(bn('50.0'))
 
       expect(
-        getSlip({
+        getSlipPercent({
           sourceAsset: AssetRuneNative,
           targetAsset: AssetBNB,
           amountToSwap: baseAmount(bn(1)),
@@ -120,7 +120,7 @@ describe('components/swap/utils', () => {
       ).toEqual(bn('33.333333333333333333'))
 
       expect(
-        getSlip({
+        getSlipPercent({
           sourceAsset: AssetBNB,
           targetAsset: AssetRuneNative,
           amountToSwap: baseAmount(bn(1)),
