@@ -715,28 +715,45 @@ describe('components/swap/utils', () => {
   })
 
   describe('balancesToSwapFrom', () => {
-    const a: WalletBalance = {
+    const runeBalance: WalletBalance = {
       walletType: 'keystore',
       amount: baseAmount('1'),
       asset: AssetRuneNative,
       walletAddress: ''
     }
-    const b: WalletBalance = {
-      ...a,
+    const runeBalanceLedger: WalletBalance = {
+      ...runeBalance,
       walletType: 'ledger',
       amount: baseAmount('2')
     }
-    const c: WalletBalance = {
-      ...a,
+    const bnbBalance: WalletBalance = {
+      ...runeBalance,
       asset: AssetBNB
     }
 
-    it('no assets for no balances', () => {
+    it('RUNE ledger + Keystore ', () => {
       const result = balancesToSwapFrom({
         assetsToSwap: O.some({ source: AssetBNB, target: AssetRuneNative }),
-        walletBalances: [a, b, c]
+        walletBalances: [runeBalance, runeBalanceLedger, bnbBalance]
       })
       expect(result.length).toEqual(2)
+      // Keystore THOR.RUNE
+      expect(result[0].walletType).toEqual('keystore')
+      expect(eqAsset.equals(result[0].asset, AssetRuneNative)).toBeTruthy()
+      // Ledger THOR.RUNE
+      expect(result[1].walletType).toEqual('ledger')
+      expect(eqAsset.equals(result[1].asset, AssetRuneNative)).toBeTruthy()
+    })
+
+    it('RUNE ledger + Keystore ', () => {
+      const result = balancesToSwapFrom({
+        assetsToSwap: O.some({ source: AssetRuneNative, target: AssetBNB }),
+        walletBalances: [runeBalance, runeBalanceLedger, bnbBalance]
+      })
+      expect(result.length).toEqual(1)
+      // Keystore BNB.BNB
+      expect(result[0].walletType).toEqual('keystore')
+      expect(eqAsset.equals(result[0].asset, AssetBNB)).toBeTruthy()
     })
   })
 })

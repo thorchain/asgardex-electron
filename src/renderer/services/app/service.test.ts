@@ -1,13 +1,14 @@
 import { map, withLatestFrom } from 'rxjs/operators'
 
+import { envOrDefault } from '../../../shared/utils/env'
 import { network$, changeNetwork, onlineStatus$ } from './service'
 import { OnlineStatus } from './types'
 
 describe('services/app/service/', () => {
   describe('network$', () => {
-    it('returns mainnet by default', () => {
+    it('gets default network from env', () => {
       runObservable(({ expectObservable }) => {
-        expectObservable(network$).toBe('a', { a: 'mainnet' })
+        expectObservable(network$).toBe('a', { a: envOrDefault(process.env.REACT_APP_DEFAULT_NETWORK, 'mainnet') })
       })
     })
 

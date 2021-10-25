@@ -293,10 +293,10 @@ export const balancesToSwapFrom = ({
 
   return FP.pipe(
     assetsToSwap,
-    O.map(({ source, target }) =>
+    O.map(({ source }) =>
       FP.pipe(
         filteredBalances,
-        A.filter((balance) => !eqAsset.equals(balance.asset, source) && !eqAsset.equals(balance.asset, target))
+        A.filter((balance) => !eqAsset.equals(balance.asset, source))
       )
     ),
     O.getOrElse(() => walletBalances)
