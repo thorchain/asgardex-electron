@@ -290,7 +290,7 @@ export const HeaderComponent: React.FC<Props> = (props): JSX.Element => {
               <Col>
                 <Row justify="space-between" align="middle" style={{ height: headerHeight }}>
                   {renderLogo}
-                  {isLargeDesktopView && (
+                  {isDesktopView && (
                     <HeaderStats
                       runePrice={runePriceRD}
                       reloadRunePrice={reloadRunePrice}
