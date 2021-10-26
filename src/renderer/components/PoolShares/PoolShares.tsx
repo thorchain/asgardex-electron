@@ -158,7 +158,7 @@ export const PoolShares: React.FC<Props> = ({
         <Styled.InfoButton onClick={openShareInfo}>
           <Styled.TextLabel>{intl.formatMessage({ id: 'common.analytics' })}</Styled.TextLabel> <Styled.InfoArrow />
         </Styled.InfoButton>
-        <Styled.InfoDescription>runeyield.info</Styled.InfoDescription>
+        <Styled.InfoDescription>thoryield.com</Styled.InfoDescription>
       </>
     ) : (
       <></>

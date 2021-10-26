@@ -98,11 +98,11 @@ export const PoolShareView: React.FC = (): JSX.Element => {
   const previousPoolShares = useRef<O.Option<PoolShareTableRowData[]>>(O.none)
 
   const openExternalShareInfo = useCallback(() => {
-    // `app.runeyield.info` does not support testnet, we ignore it here
+    // `thoryield.com` does not support testnet, we ignore it here
     const oMainnet = O.fromPredicate<Network>(() => network === 'mainnet')(network)
     return FP.pipe(
       sequenceTOption(oRuneNativeAddress, oMainnet),
-      O.map(([thorAddress, _]) => `https://app.runeyield.info/dashboard?thor=${thorAddress}`),
+      O.map(([thorAddress, _]) => `https://app.thoryield.com/dashboard?thor=${thorAddress}`),
       O.map(window.apiUrl.openExternal)
     )
   }, [network, oRuneNativeAddress])
