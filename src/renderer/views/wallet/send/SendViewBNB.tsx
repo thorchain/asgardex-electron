@@ -52,7 +52,11 @@ export const SendViewBNB: React.FC<Props> = (props): JSX.Element => {
   const history = useHistory()
 
   const oWalletBalance = useMemo(
-    () => getWalletBalanceByAddressAndAsset(oBalances, walletAddress, asset),
+    () =>
+      FP.pipe(
+        oBalances,
+        O.chain((balances) => getWalletBalanceByAddressAndAsset({ balances, address: walletAddress, asset }))
+      ),
     [asset, oBalances, walletAddress]
   )
 

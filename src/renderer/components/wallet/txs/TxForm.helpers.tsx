@@ -1,3 +1,4 @@
+import { Address } from '@xchainjs/xchain-client'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
 
@@ -20,7 +21,7 @@ export const renderedWalletType = (oMatchedWalletType: O.Option<WalletType>) =>
     )
   )
 
-export const matchedWalletType = (balances: WalletBalances, recipientAddress: string): O.Option<WalletType> =>
+export const matchedWalletType = (balances: WalletBalances, recipientAddress: Address): O.Option<WalletType> =>
   FP.pipe(
     getWalletByAddress(balances, recipientAddress),
     O.map(({ walletType }) => walletType)

@@ -48,7 +48,8 @@ import {
   getAddressFromBalancesByChain,
   getWalletBalanceByAsset,
   getWalletBalanceByAssetAndWalletType,
-  getWalletByAddress
+  getWalletByAddress,
+  isLedgerAddressInBalances
 } from '../../helpers/walletHelper'
 import { useSubscriptionState } from '../../hooks/useSubscriptionState'
 import { swap } from '../../routes/pools'
@@ -1225,6 +1226,25 @@ export const Swap = ({
     [checkIsApprovedError, isApproveFeeError, walletBalancesLoading]
   )
 
+  const onChangeTargetAddress = useCallback(
+    (address: Address) => {
+      // update state of target addresses
+      setTargetWalletAddress(O.some(address))
+      setEditableTargetWalletAddress(O.some(address))
+
+      const useLedger = FP.pipe(
+        oTargetAsset,
+        O.map((asset) => isLedgerAddressInBalances({ balances: allBalances, address, asset })),
+        O.getOrElse(() => false)
+      )
+
+      // whenever target address has been changed,
+      // update state of `useTargetAssetLedger`
+      setUseTargetAssetLedger(useLedger)
+    },
+    [allBalances, oTargetAsset]
+  )
+
   const renderCustomAddressInput = useMemo(
     () =>
       FP.pipe(
@@ -1238,10 +1258,7 @@ export const Swap = ({
               network={network}
               address={address}
               onClickOpenAddress={(address) => clickAddressLinkHandler(address)}
-              onChangeAddress={(newAddress) => {
-                setTargetWalletAddress(O.some(newAddress))
-                setEditableTargetWalletAddress(O.some(newAddress))
-              }}
+              onChangeAddress={onChangeTargetAddress}
               onChangeEditableAddress={(newAddress) => setEditableTargetWalletAddress(O.some(newAddress))}
               onChangeEditableMode={(editModeActive) => setCustomAddressEditActive(editModeActive)}
               addressValidator={addressValidator}
@@ -1249,7 +1266,7 @@ export const Swap = ({
           )
         )
       ),
-    [oTargetAsset, targetWalletAddress, network, addressValidator, clickAddressLinkHandler]
+    [oTargetAsset, targetWalletAddress, network, onChangeTargetAddress, addressValidator, clickAddressLinkHandler]
   )
 
   const renderTargetWalletType = useMemo(() => {
@@ -1278,6 +1295,11 @@ export const Swap = ({
 
     setTargetWalletAddress(oTargetWalletAddress)
     setEditableTargetWalletAddress(oTargetWalletAddress)
+
+    // FP.pipe(
+    //   oTargetWalletType,
+    //   O.map((walletType) => console.log('walletType:', walletType))
+    // )
   }, [oTargetAsset, oWalletBalances, useTargetAssetLedger])
 
   return (
@@ -1334,7 +1356,7 @@ export const Swap = ({
                     />
 
                     <Styled.CheckButton
-                      isChecked={useSourceAssetLedger}
+                      checked={useSourceAssetLedger}
                       clickHandler={() => {
                         setUseSourceAssetLedger(() => !useSourceAssetLedger)
                       }}
@@ -1370,7 +1392,7 @@ export const Swap = ({
                       network={network}
                     />
                     <Styled.CheckButton
-                      isChecked={useTargetAssetLedger}
+                      checked={useTargetAssetLedger}
                       clickHandler={() => setUseTargetAssetLedger(() => !useTargetAssetLedger)}
                       disabled={!hasTargetAssetLedger}>
                       {intl.formatMessage({ id: 'ledger.title' })}
