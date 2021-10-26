@@ -87,6 +87,7 @@ export type CommonMessageKey =
   | 'common.theme.light'
   | 'common.theme.dark'
   | 'common.volume24'
+  | 'common.volume24.description'
   | 'common.informationMore'
   | 'common.balance'
   | 'common.balance.loading'

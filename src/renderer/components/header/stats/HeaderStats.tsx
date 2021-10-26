@@ -2,7 +2,7 @@ import React, { useCallback, useMemo, useRef } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
 import { baseToAsset, formatAssetAmountCurrency, currencySymbolByAsset } from '@xchainjs/xchain-util'
-import { Grid } from 'antd'
+import { Grid, Tooltip } from 'antd'
 import * as FP from 'fp-ts/lib/function'
 import { useIntl } from 'react-intl'
 
@@ -101,10 +101,12 @@ export const HeaderStats: React.FC<Props> = (props): JSX.Element => {
         <Styled.Label loading={RD.isPending(runePriceRD) ? 'true' : 'false'}>{runePriceLabel}</Styled.Label>
       </Styled.Container>
       {!isSmallMobileView && (
-        <Styled.Container onClick={reloadVolume24PriceHandler} clickable={!RD.isPending(volume24PriceRD)}>
-          <Styled.Title>{intl.formatMessage({ id: 'common.volume24' })}</Styled.Title>
-          <Styled.Label loading={RD.isPending(volume24PriceRD) ? 'true' : 'false'}>{volume24PriceLabel}</Styled.Label>
-        </Styled.Container>
+        <Tooltip title={intl.formatMessage({ id: 'common.volume24.description' })}>
+          <Styled.Container onClick={reloadVolume24PriceHandler} clickable={!RD.isPending(volume24PriceRD)}>
+            <Styled.Title>{intl.formatMessage({ id: 'common.volume24' })}</Styled.Title>
+            <Styled.Label loading={RD.isPending(volume24PriceRD) ? 'true' : 'false'}>{volume24PriceLabel}</Styled.Label>
+          </Styled.Container>
+        </Tooltip>
       )}
     </Styled.Wrapper>
   )
