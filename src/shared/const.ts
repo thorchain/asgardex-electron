@@ -10,8 +10,8 @@ export enum ExternalUrl {
   TELEGRAM = 'https://t.me/thorchain_org',
   GITHUB = 'https://github.com/thorchain',
   GITHUB_REPO = `https://github.com/thorchain/asgardex-electron`,
-  GITHUB_RELEASE = `https://github.com/thorchain/asgardex-electron/releases/tag/v`,
-  TWITTER = 'https://twitter.com/thorchain_org'
+  GITHUB_RELEASE = `https://github.com/thorchain/asgardex-electron/releases`,
+  TWITTER = 'https://twitter.com/THORChain'
 }
 
 // increase it by `1` if you want to ignore previous version of `UserNodesStorage`
