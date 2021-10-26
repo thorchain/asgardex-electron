@@ -86,6 +86,7 @@ const common: CommonMessages = {
   'common.theme.light': 'Mode clair',
   'common.theme.dark': 'Mode sombre',
   'common.volume24': 'Volume (24h)',
+  'common.volume24.description': '24h volume of swaps, add liquidity and withdrawals - FR',
   'common.informationMore': "Plus d'information",
   'common.balance': 'Solde',
   'common.balance.loading': 'Chargement du solde'

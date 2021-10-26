@@ -86,6 +86,7 @@ const common: CommonMessages = {
   'common.theme.light': 'Tag modus',
   'common.theme.dark': 'Nacht modus',
   'common.volume24': 'Volumen (24h)',
+  'common.volume24.description': '24h Handlesvolumen von Swaps, Pooleinzahlungen und -abhebungen',
   'common.informationMore': 'Mehr Informationen',
   'common.balance': 'Guthaben',
   'common.balance.loading': 'Lade Guthaben'
