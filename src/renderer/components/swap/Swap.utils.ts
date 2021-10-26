@@ -316,7 +316,6 @@ export const hasLedgerInBalancesByAsset = (asset: Asset, balances: WalletBalance
     )
   )
 
-// TODO (@veado) Add a test
 export const hasLedgerInBalancesByChain = (chain: Chain, balances: WalletBalances): boolean =>
   FP.pipe(
     balances,

@@ -134,7 +134,6 @@ export const addressFromOptionalWalletAddress = (
   oWalletAddress: O.Option<Pick<WalletAddress, 'address'>>
 ): O.Option<Address> => FP.pipe(oWalletAddress, O.map(addressFromWalletAddress))
 
-// TODO (@veado) Add tests
 export const getAddressFromBalancesByChain = ({
   balances,
   chain,

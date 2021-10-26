@@ -9,7 +9,9 @@ import {
   assetToBase,
   assetToString,
   baseAmount,
-  bn
+  bn,
+  BTCChain,
+  THORChain
 } from '@xchainjs/xchain-util'
 import * as O from 'fp-ts/lib/Option'
 
@@ -17,6 +19,7 @@ import { ASSETS_TESTNET } from '../../../shared/mock/assets'
 import { AssetBUSD74E, AssetUSDTERC20Testnet, ZERO_BASE_AMOUNT } from '../../const'
 import { BNB_DECIMAL, THORCHAIN_DECIMAL } from '../../helpers/assetHelper'
 import { eqAsset, eqBaseAmount } from '../../helpers/fp/eq'
+import { mockWalletBalance } from '../../helpers/test/testWalletHelper'
 import { PoolsDataMap } from '../../services/midgard/types'
 import { WalletBalance } from '../../services/wallet/types'
 import {
@@ -33,7 +36,8 @@ import {
   getSwapLimit,
   maxAmountToSwapMax1e8,
   assetsInWallet,
-  balancesToSwapFrom
+  balancesToSwapFrom,
+  hasLedgerInBalancesByChain
 } from './Swap.utils'
 
 describe('components/swap/utils', () => {
@@ -715,21 +719,15 @@ describe('components/swap/utils', () => {
   })
 
   describe('balancesToSwapFrom', () => {
-    const runeBalance: WalletBalance = {
-      walletType: 'keystore',
-      amount: baseAmount('1'),
-      asset: AssetRuneNative,
-      walletAddress: ''
-    }
-    const runeBalanceLedger: WalletBalance = {
-      ...runeBalance,
+    const runeBalance = mockWalletBalance()
+    const runeBalanceLedger = mockWalletBalance({
       walletType: 'ledger',
-      amount: baseAmount('2')
-    }
-    const bnbBalance: WalletBalance = {
+      amount: baseAmount(2)
+    })
+    const bnbBalance = mockWalletBalance({
       ...runeBalance,
       asset: AssetBNB
-    }
+    })
 
     it('RUNE ledger + Keystore ', () => {
       const result = balancesToSwapFrom({
@@ -754,6 +752,29 @@ describe('components/swap/utils', () => {
       // Keystore BNB.BNB
       expect(result[0].walletType).toEqual('keystore')
       expect(eqAsset.equals(result[0].asset, AssetBNB)).toBeTruthy()
+    })
+  })
+
+  describe('hasLedgerInBalancesByChain', () => {
+    const runeBalance = mockWalletBalance()
+    const runeBalanceLedger = mockWalletBalance({
+      walletType: 'ledger',
+      amount: baseAmount(2)
+    })
+    const bnbBalance = mockWalletBalance({
+      ...runeBalance,
+      asset: AssetBNB
+    })
+
+    const balances = [runeBalance, runeBalanceLedger, bnbBalance]
+
+    it('has RUNE ledger ', () => {
+      const result = hasLedgerInBalancesByChain(THORChain, balances)
+      expect(result).toBeTruthy()
+    })
+    it('has not BTC ledger ', () => {
+      const result = hasLedgerInBalancesByChain(BTCChain, balances)
+      expect(result).toBeFalsy()
     })
   })
 })
