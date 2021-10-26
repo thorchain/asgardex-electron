@@ -108,7 +108,6 @@ export type SwapProps = {
   keystore: KeystoreState
   availableAssets: PoolAssetDetails
   assets: { inAsset: AssetWithDecimal; outAsset: AssetWithDecimal }
-  walletType: WalletType
   poolAddress: O.Option<PoolAddress>
   swap$: SwapStateHandler
   poolsData: PoolsDataMap
@@ -138,7 +137,6 @@ export const Swap = ({
   keystore,
   availableAssets,
   assets: { inAsset: sourceAssetWD, outAsset: targetAssetWD },
-  walletType,
   poolAddress: oPoolAddress,
   swap$,
   poolsData,
@@ -507,7 +505,7 @@ export const Swap = ({
   const [swapStartTime, setSwapStartTime] = useState<number>(0)
 
   const setSourceAsset = useCallback(
-    async ({ asset, walletType }: AssetWithWalletType) => {
+    async ({ asset }: AssetWithWalletType) => {
       // delay to avoid render issues while switching
       await delay(100)
 
@@ -517,8 +515,7 @@ export const Swap = ({
           onChangePath(
             swap.path({
               source: assetToString(asset),
-              target: assetToString(targetAsset),
-              walletType
+              target: assetToString(targetAsset)
             })
           )
         )
@@ -538,14 +535,13 @@ export const Swap = ({
           onChangePath(
             swap.path({
               source: assetToString(sourceAsset),
-              target: assetToString(asset),
-              walletType // stick with current wallet type
+              target: assetToString(asset)
             })
           )
         )
       )
     },
-    [oSourceAsset, onChangePath, walletType]
+    [oSourceAsset, onChangePath]
   )
 
   const minAmountToSwapMax1e8: BaseAmount = useMemo(
@@ -1188,8 +1184,7 @@ export const Swap = ({
         onChangePath(
           swap.path({
             target: assetToString(source),
-            source: assetToString(target),
-            walletType: 'keystore' // Switch to 'keystore by default
+            source: assetToString(target)
           })
         )
       )
@@ -1350,7 +1345,6 @@ export const Swap = ({
                     <Styled.AssetSelect
                       onSelect={setSourceAsset}
                       asset={asset}
-                      assetWalletType={walletType}
                       balances={balancesToSwapFrom}
                       network={network}
                     />

@@ -41,7 +41,7 @@ import * as Styled from './SwapView.styles'
 type Props = {}
 
 export const SwapView: React.FC<Props> = (_): JSX.Element => {
-  const { source, target, walletType } = useParams<SwapRouteParams>()
+  const { source, target } = useParams<SwapRouteParams>()
   const intl = useIntl()
   const history = useHistory()
 
@@ -241,7 +241,6 @@ export const SwapView: React.FC<Props> = (_): JSX.Element => {
                   validatePassword$={validatePassword$}
                   goToTransaction={openExplorerTxUrl}
                   assets={{ inAsset: sourceAsset, outAsset: targetAsset }}
-                  walletType={walletType}
                   poolAddress={selectedPoolAddress}
                   availableAssets={availableAssets}
                   poolsData={poolsData}

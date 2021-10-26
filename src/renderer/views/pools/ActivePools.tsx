@@ -111,8 +111,7 @@ export const ActivePools: React.FC<PoolsComponentProps> = ({ haltedChains, mimir
               event.stopPropagation()
               clickSwapHandler({
                 source: assetToString(pool.asset),
-                target: assetToString(pool.target),
-                walletType: 'keystore' /* select keystore wallet by default */
+                target: assetToString(pool.target)
               })
             }}>
             <SwapOutlined />

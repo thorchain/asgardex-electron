@@ -272,9 +272,6 @@ export const maxAmountToSwapMax1e8 = (assetAmountMax1e8: BaseAmount, feeAmount: 
   return maxAmountToSwap.gt(baseAmount(0)) ? maxAmountToSwap : baseAmount(0)
 }
 
-// export const assetsInWallet = (oWalletBalances: O.Option<NonEmptyWalletBalances>): O.Option<Asset[]> =>
-//   FP.pipe(oWalletBalances, O.map(A.map(({ asset }) => asset)))
-
 export const assetsInWallet: (_: WalletBalances) => Asset[] = FP.flow(A.map(({ asset }) => asset))
 
 export const balancesToSwapFrom = ({

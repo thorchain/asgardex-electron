@@ -40,7 +40,6 @@ const defaultProps: SwapProps = {
     { asset: AssetRuneNative, assetPrice: ONE_BN }
   ],
   assets: { inAsset: sourceAsset, outAsset: targetAsset },
-  walletType: 'keystore',
   poolAddress: O.some({
     chain: BNBChain,
     address: 'vault-address',
