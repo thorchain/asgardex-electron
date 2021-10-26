@@ -21,7 +21,6 @@ import { BNB_DECIMAL, THORCHAIN_DECIMAL } from '../../helpers/assetHelper'
 import { eqAsset, eqBaseAmount } from '../../helpers/fp/eq'
 import { mockWalletBalance } from '../../helpers/test/testWalletHelper'
 import { PoolsDataMap } from '../../services/midgard/types'
-import { WalletBalance } from '../../services/wallet/types'
 import {
   DEFAULT_SWAP_DATA,
   isRuneSwap,
@@ -689,20 +688,10 @@ describe('components/swap/utils', () => {
     })
   })
   describe('assetsInWallet', () => {
-    const a: WalletBalance = {
-      walletType: 'keystore',
-      amount: baseAmount('1'),
-      asset: AssetRuneNative,
-      walletAddress: ''
-    }
-    const b: WalletBalance = {
-      ...a,
-      asset: AssetBNB
-    }
-    const c: WalletBalance = {
-      ...a,
-      asset: AssetBTC
-    }
+    const a = mockWalletBalance()
+    const b = mockWalletBalance({ asset: AssetBNB })
+    const c = mockWalletBalance({ asset: AssetBTC })
+
     it('empty list of assets for empty balances', () => {
       const result = assetsInWallet([])
       expect(result).toEqual([])
