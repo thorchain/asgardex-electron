@@ -1,3 +1,40 @@
+# 0.5.0 (2021-10-27)
+
+## Add
+
+- [Swap] Enable Ledger in Swap [#1868](https://github.com/thorchain/asgardex-electron/pull/1868)
+- [Swap] Show address type for recipient [#1857](https://github.com/thorchain/asgardex-electron/pull/1857)
+- [Ledger] Add wallet index input for RUNE [#1889](https://github.com/thorchain/asgardex-electron/pull/1889)
+- [Send] Show address type for recipient [#1859](https://github.com/thorchain/asgardex-electron/pull/1859)
+- [Upgrade] Show address type for recipient [#1861](https://github.com/thorchain/asgardex-electron/pull/1861)
+- [AsymDeposit] Detect previous asymmetric deposit to disable asymmetric deposit [#1829](https://github.com/thorchain/asgardex-electron/pull/1829)
+- [CheckButton] Add CheckButton [#1869](https://github.com/thorchain/asgardex-electron/pull/1869)
+- [Wallet] Replace text with WalletType label in Settings [#1852](https://github.com/thorchain/asgardex-electron/pull/1852)
+- [WalletHistory] Add link to viewblock [#1854](https://github.com/thorchain/asgardex-electron/pull/1854)
+
+## Update
+
+- Improve WalletHistory [#1855](https://github.com/thorchain/asgardex-electron/pull/1855)
+- Tweak styles of WalletTypeLabel [#1856](https://github.com/thorchain/asgardex-electron/pull/1856)
+- Remove deprecated AssetPair components [#1865](https://github.com/thorchain/asgardex-electron/pull/1865)
+- Update AssetData|Menu|Select components to show wallet type [#1867](https://github.com/thorchain/asgardex-electron/pull/1867)
+- [Header] Make rune price visible for smaller window sizes [#1880](https://github.com/thorchain/asgardex-electron/pull/1880)
+- [Header] Tooltip to explain VOLUME (24h) [#1885](https://github.com/thorchain/asgardex-electron/pull/1885)
+
+## Fix
+
+- Fix missing ledger addresses in WalletHistory [#1853](https://github.com/thorchain/asgardex-electron/pull/1853)
+- Fix wallettype label [#1860](https://github.com/thorchain/asgardex-electron/pull/1860)
+- [Swap] Fix slip calculation and displaying [#1876](https://github.com/thorchain/asgardex-electron/pull/1876)
+- [Pools] Disable manage button while wallet locked [#1877](https://github.com/thorchain/asgardex-electron/pull/1877)
+- Fix 24h volume [#1883](https://github.com/thorchain/asgardex-electron/pull/1883)
+- Fix outdated links [#1884](https://github.com/thorchain/asgardex-electron/pull/1884)
+
+## Internal
+
+- Set testnet as default network in development mode [#1851](https://github.com/thorchain/asgardex-electron/pull/1851)
+- Update to latest npm dependencies (19-10-2021) [#1864](https://github.com/thorchain/asgardex-electron/pull/1864)
+
 # 0.4.4 (2021-10-12)
 
 ## Add
