@@ -181,6 +181,7 @@ const eqLedgerError = Eq.struct<LedgerError>({
 export const eqWalletType: Eq.Eq<WalletType> = eqString
 
 export const eqAddress: Eq.Eq<Address> = eqString
+export const eqOAddress: Eq.Eq<O.Option<Address>> = eqOString
 
 export const eqWalletAddress = Eq.struct<WalletAddress>({
   address: eqString,

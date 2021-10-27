@@ -54,13 +54,6 @@ export const createLedgerService = ({ keystore$ }: { keystore$: KeystoreState$ }
       RxOp.map((v) => v)
     )
 
-  // const getWalletIndex$ = (chain: Chain): Rx.Observable<number> =>
-  //   FP.pipe(
-  //     ledgerAddresses$,
-  //     // RxOp.map((addressesMap) => addressesMap[chain])
-  //     RxOp.map((addressesMap) => addressesMap[chain])
-  //   )
-
   const verifyLedgerAddress = (chain: Chain, network: Network, walletIndex = 0): void =>
     window.apiHDWallet.verifyLedgerAddress({ chain, network, walletIndex })
 
@@ -126,9 +119,6 @@ export const createLedgerService = ({ keystore$ }: { keystore$: KeystoreState$ }
     getLedgerAddress$,
     verifyLedgerAddress,
     removeLedgerAddress,
-
-    // getWalletIndex$,
-
     dispose
   }
 }
