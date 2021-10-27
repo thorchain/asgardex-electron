@@ -8,17 +8,19 @@ import { LedgerError, LedgerErrorId, Network } from '../../../../shared/api/type
 import { toClientNetwork } from '../../../../shared/utils/client'
 import { isError } from '../../../../shared/utils/guard'
 import { WalletAddress } from '../../../../shared/wallet/types'
-import { fromLedgerErrorType, PATH } from './common'
+import { fromLedgerErrorType, getDerivationPath } from './common'
 
 export const getAddress = async (
   transport: Transport,
-  network: Network
+  network: Network,
+  walletIndex: number
 ): Promise<E.Either<LedgerError, WalletAddress>> => {
   try {
     const app = new THORChainApp(transport)
     const clientNetwork = toClientNetwork(network)
     const prefix = getPrefix(clientNetwork)
-    const { bech32Address, returnCode } = await app.getAddressAndPubKey(PATH, prefix)
+    const path = getDerivationPath(walletIndex)
+    const { bech32Address, returnCode } = await app.getAddressAndPubKey(path, prefix)
     if (!bech32Address || returnCode !== LedgerErrorType.NoErrors) {
       return E.left({
         errorId: fromLedgerErrorType(returnCode),
@@ -34,9 +36,10 @@ export const getAddress = async (
   }
 }
 
-export const verifyAddress = async (transport: Transport, network: Network) => {
+export const verifyAddress = async (transport: Transport, network: Network, walletIndex: number) => {
   const app = new THORChainApp(transport)
   const clientNetwork = toClientNetwork(network)
   const prefix = getPrefix(clientNetwork)
-  app.showAddressAndPubKey(PATH, prefix)
+  const path = getDerivationPath(walletIndex)
+  app.showAddressAndPubKey(path, prefix)
 }

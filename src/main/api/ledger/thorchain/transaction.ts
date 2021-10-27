@@ -23,7 +23,7 @@ import { LedgerError, LedgerErrorId, Network } from '../../../../shared/api/type
 import { getClientUrl } from '../../../../shared/thorchain/client'
 import { toClientNetwork } from '../../../../shared/utils/client'
 import { isError } from '../../../../shared/utils/guard'
-import { fromLedgerErrorType, PATH } from './common'
+import { fromLedgerErrorType, getDerivationPath } from './common'
 
 /**
  * Sends `MsgSend` message using Ledger
@@ -33,21 +33,24 @@ export const send = async ({
   network,
   amount,
   memo,
-  recipient
+  recipient,
+  walletIndex
 }: {
   transport: Transport
   amount: BaseAmount
   network: Network
   recipient: Address
   memo?: string
+  walletIndex: number
 }): Promise<E.Either<LedgerError, TxHash>> => {
   try {
     const clientNetwork = toClientNetwork(network)
     const prefix = getPrefix(clientNetwork)
 
     const app = new THORChainApp(transport)
+    const path = getDerivationPath(walletIndex)
     // get address + public key
-    const { bech32Address, returnCode, compressedPk } = await app.getAddressAndPubKey(PATH, prefix)
+    const { bech32Address, returnCode, compressedPk } = await app.getAddressAndPubKey(path, prefix)
     if (!bech32Address || !compressedPk || returnCode !== LedgerErrorType.NoErrors) {
       return E.left({
         errorId: fromLedgerErrorType(returnCode),
@@ -107,7 +110,7 @@ export const send = async ({
     const signedStdTx = unsignedStdTx.getSignBytes(chainId, account_number.toString(), sequence.toString())
 
     // Sign StdTx
-    const { signature } = await app.sign(PATH, signedStdTx.toString())
+    const { signature } = await app.sign(path, signedStdTx.toString())
 
     if (!signature) {
       return E.left({
@@ -160,20 +163,23 @@ export const deposit = async ({
   transport,
   network,
   amount,
-  memo
+  memo,
+  walletIndex
 }: {
   transport: Transport
   amount: BaseAmount
   network: Network
   memo: string
+  walletIndex: number
 }): Promise<E.Either<LedgerError, TxHash>> => {
   try {
     const clientNetwork = toClientNetwork(network)
     const prefix = getPrefix(clientNetwork)
 
     const app = new THORChainApp(transport)
+    const path = getDerivationPath(walletIndex)
     // get address + public key
-    const { bech32Address, returnCode, compressedPk } = await app.getAddressAndPubKey(PATH, prefix)
+    const { bech32Address, returnCode, compressedPk } = await app.getAddressAndPubKey(path, prefix)
     if (!bech32Address || !compressedPk || returnCode !== LedgerErrorType.NoErrors) {
       return E.left({
         errorId: fromLedgerErrorType(returnCode),
@@ -219,7 +225,7 @@ export const deposit = async ({
     // Get bytes from StdTx to sign
     const signedStdTx = unsignedStdTx.getSignBytes(chainId, account_number.toString(), sequence.toString())
     // Sign StdTx
-    const { signature } = await app.sign(PATH, signedStdTx.toString())
+    const { signature } = await app.sign(path, signedStdTx.toString())
 
     if (!signature) {
       return E.left({

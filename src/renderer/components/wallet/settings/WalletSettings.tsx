@@ -2,7 +2,18 @@ import React, { useCallback, useMemo, useState } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
 import { Address } from '@xchainjs/xchain-client'
-import { Asset, Chain } from '@xchainjs/xchain-util'
+import {
+  Asset,
+  BCHChain,
+  BNBChain,
+  BTCChain,
+  Chain,
+  CosmosChain,
+  ETHChain,
+  LTCChain,
+  PolkadotChain,
+  THORChain
+} from '@xchainjs/xchain-util'
 import { Col, List, Row } from 'antd'
 import * as FP from 'fp-ts/function'
 import * as O from 'fp-ts/lib/Option'
@@ -16,7 +27,7 @@ import { PasswordModal } from '../../../components/modal/password'
 import { AssetIcon } from '../../../components/uielements/assets/assetIcon/AssetIcon'
 import { QRCodeModal } from '../../../components/uielements/qrCodeModal/QRCodeModal'
 import { PhraseCopyModal } from '../../../components/wallet/phrase/PhraseCopyModal'
-import { getChainAsset, isBnbChain } from '../../../helpers/chainHelper'
+import { getChainAsset, isBnbChain, isThorChain } from '../../../helpers/chainHelper'
 import { ValidatePasswordHandler, WalletAccounts, WalletAddressAsync } from '../../../services/wallet/types'
 import { walletTypeToI18n } from '../../../services/wallet/util'
 import { InfoIcon } from '../../uielements/info'
@@ -72,7 +83,16 @@ export const WalletSettings: React.FC<Props> = (props): JSX.Element => {
   const [showRemoveWalletModal, setShowRemoveWalletModal] = useState(false)
   const [showQRModal, setShowQRModal] = useState<O.Option<{ asset: Asset; address: Address }>>(O.none)
   const closeQrModal = useCallback(() => setShowQRModal(O.none), [setShowQRModal])
-  const [walletIndex, setWalletIndex] = useState<number>(0)
+  const [walletIndex, setWalletIndex] = useState<Record<Chain, number>>({
+    [BNBChain]: 0,
+    [BTCChain]: 0,
+    [BCHChain]: 0,
+    [LTCChain]: 0,
+    [THORChain]: 0,
+    [ETHChain]: 0,
+    [CosmosChain]: 0,
+    [PolkadotChain]: 0
+  })
 
   const removeWallet = useCallback(() => {
     removeKeystore()
@@ -105,18 +125,20 @@ export const WalletSettings: React.FC<Props> = (props): JSX.Element => {
     (chain: Chain, { type: walletType, address: addressRD }: WalletAddressAsync) => {
       const renderAddLedger = (chain: Chain, loading: boolean) => (
         <Styled.AddLedgerContainer>
-          <Styled.AddLedgerButton loading={loading} onClick={() => addLedgerAddress(chain, walletIndex)}>
+          <Styled.AddLedgerButton loading={loading} onClick={() => addLedgerAddress(chain, walletIndex[chain])}>
             <Styled.AddLedgerIcon /> {intl.formatMessage({ id: 'ledger.add.device' })}
           </Styled.AddLedgerButton>
-          {isBnbChain(chain) && (
+          {(isBnbChain(chain) || isThorChain(chain)) && (
             <>
               <Styled.IndexLabel>{intl.formatMessage({ id: 'setting.wallet.index' })}</Styled.IndexLabel>
               <Styled.WalletIndexInput
-                value={walletIndex.toString()}
+                value={walletIndex[chain].toString()}
                 pattern="[0-9]+"
-                onChange={(value) => value !== null && +value >= 0 && setWalletIndex(+value)}
+                onChange={(value) =>
+                  value !== null && +value >= 0 && setWalletIndex({ ...walletIndex, [chain]: +value })
+                }
                 style={{ width: 60 }}
-                onPressEnter={() => addLedgerAddress(chain, walletIndex)}
+                onPressEnter={() => addLedgerAddress(chain, walletIndex[chain])}
               />
               <InfoIcon tooltip={intl.formatMessage({ id: 'setting.wallet.index.info' })} />
             </>
@@ -152,7 +174,7 @@ export const WalletSettings: React.FC<Props> = (props): JSX.Element => {
                             chain
                           })
                         )
-                        verifyLedgerAddress(chain, walletIndex)
+                        verifyLedgerAddress(chain, walletIndex[chain])
                       }}
                     />
                   )}

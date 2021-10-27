@@ -81,7 +81,7 @@ export const WalletSettingsView: React.FC = (): JSX.Element => {
   }
 
   const verifyLedgerAddressHandler = (chain: Chain, walletIndex = 0) => {
-    if (isThorChain(chain)) return verifyLedgerThorAddress()
+    if (isThorChain(chain)) return verifyLedgerThorAddress(walletIndex)
     if (isBnbChain(chain)) return verifyLedgerBnbAddress(walletIndex)
 
     return FP.constVoid
