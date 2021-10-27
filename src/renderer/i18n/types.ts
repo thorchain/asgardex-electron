@@ -228,6 +228,8 @@ export type PoolSharesMessage = { [key in PoolSharesMessageKey]: string }
 
 type LedgerMessageKey =
   | 'ledger.title'
+  | 'ledger.title.sign'
+  | 'ledger.needsconnected'
   | 'ledger.add.device'
   | 'ledger.error.nodevice'
   | 'ledger.error.inuse'
@@ -287,6 +289,7 @@ type SwapMessageKey =
   | 'swap.errors.amount.outputShouldCoverChainFee'
   | 'swap.note.lockedWallet'
   | 'swap.note.nowallet'
+  | 'swap.ledger.sign'
 
 export type SwapMessages = { [key in SwapMessageKey]: string }
 

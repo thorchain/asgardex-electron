@@ -57,8 +57,8 @@ const meta: Meta<StoryArgs> = {
         options: rdStatusOptions
       }
     },
-    changeNetwor: {
-      action: 'changeNetwor'
+    changeNetwork: {
+      action: 'changeNetwork'
     },
     checkForUpdates: {
       action: 'checkForUpdates'

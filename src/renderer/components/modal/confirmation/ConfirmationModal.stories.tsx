@@ -1,28 +1,62 @@
 import React from 'react'
 
-// import { } from '@storybook/addon-controls'
 import { Meta, Story } from '@storybook/react'
 
 import { ConfirmationModal } from './ConfirmationModal'
 
-export const Default: Story = () => {
+type Args = {
+  title: string
+  message: string
+  okText: string
+  visible: boolean
+}
+
+const Template: Story<Args> = ({ title, message, okText, visible }) => {
   return (
     <ConfirmationModal
-      visible
-      onClose={() => console.log('close')}
-      onSuccess={() => console.log('success')}
-      message={'Confirmation action text here'}
+      title={title}
+      visible={visible}
+      onClose={() => console.log('onClose')}
+      onSuccess={() => console.log('onSuccess')}
+      message={message}
+      okText={okText}
     />
   )
 }
-Default.storyName = 'default'
 
-const meta: Meta = {
+export const Default = Template.bind({})
+
+const meta: Meta<Args> = {
   component: ConfirmationModal,
   title: 'Components/Modal/Confirmation',
   argTypes: {
-    asd: {
-      control: {}
+    title: {
+      name: 'Title',
+      control: {
+        type: 'text'
+      },
+      defaultValue: 'Title'
+    },
+    message: {
+      name: 'Message',
+      control: {
+        type: 'text'
+      },
+      defaultValue: 'Message description'
+    },
+    okText: {
+      name: 'Label Confirm',
+      control: {
+        type: 'text'
+      },
+      defaultValue: 'Ok'
+    },
+    visible: {
+      name: 'Show / hide',
+      control: {
+        type: 'boolean'
+      },
+      defaultValue: true
     }
   }
 }

@@ -17,7 +17,8 @@ const swap: SwapMessages = {
   'swap.note.lockedWallet': 'Для обмена необходимо разблокировать кошелек',
   'swap.note.nowallet': 'Для обмена создайте или импортируйте кошелек',
   'swap.errors.asset.missingSourceAsset': 'Исходный ассет не поддерживается',
-  'swap.errors.asset.missingTargetAsset': 'Конечный ассет не поддерживается'
+  'swap.errors.asset.missingTargetAsset': 'Конечный ассет не поддерживается',
+  'swap.ledger.sign': 'Click next to sign the swap transaction on your device. - RU'
 }
 
 export default swap

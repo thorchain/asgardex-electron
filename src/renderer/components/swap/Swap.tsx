@@ -89,6 +89,7 @@ import {
 import { hasImportedKeystore, isLocked } from '../../services/wallet/util'
 import { AssetWithDecimal, AssetWithWalletType, SlipTolerance } from '../../types/asgardex'
 import { CurrencyInfo } from '../currency'
+import { LedgerConfirmationModal } from '../modal/confirmation'
 import { PasswordModal } from '../modal/password'
 import { TxModal } from '../modal/tx'
 import { SwapAssets } from '../modal/tx/extra'
@@ -683,6 +684,7 @@ export const Swap = ({
   }, [oWalletBalances, allAssets, assetsToSwap])
 
   const [showPasswordModal, setShowPasswordModal] = useState(false)
+  const [showLedgerModal, setShowLedgerModal] = useState(false)
 
   const submitSwapTx = useCallback(() => {
     FP.pipe(
@@ -699,13 +701,12 @@ export const Swap = ({
   }, [oSwapParams, subscribeSwapState, swap$])
 
   const onSubmit = useCallback(() => {
-    // No PW needed for Ledger
     if (useSourceAssetLedger) {
-      submitSwapTx()
+      setShowLedgerModal(true)
     } else {
       setShowPasswordModal(true)
     }
-  }, [submitSwapTx, useSourceAssetLedger])
+  }, [setShowLedgerModal, useSourceAssetLedger])
 
   const renderSlider = useMemo(() => {
     const percentage = lockedWallet
@@ -860,21 +861,48 @@ export const Swap = ({
     swapState
   ])
 
-  const closePasswordModal = useCallback(() => {
-    setShowPasswordModal(false)
-  }, [setShowPasswordModal])
-
   const onClosePasswordModal = useCallback(() => {
-    // close password modal
-    closePasswordModal()
-  }, [closePasswordModal])
+    // close PW modal
+    setShowPasswordModal(false)
+  }, [])
 
   const onSucceedPasswordModal = useCallback(() => {
-    // close private modal
-    closePasswordModal()
-
+    // close PW modal
+    setShowPasswordModal(false)
+    // send tx
     submitSwapTx()
-  }, [closePasswordModal, submitSwapTx])
+  }, [submitSwapTx])
+
+  const onCloseLedgerModal = useCallback(() => {
+    // close modal
+    setShowLedgerModal(false)
+  }, [])
+
+  const onSucceedLedgerModal = useCallback(() => {
+    // close modal
+    setShowLedgerModal(false)
+    // sign + send tx
+    submitSwapTx()
+  }, [submitSwapTx])
+
+  const renderLedgerConfirmationModal = useMemo(
+    () =>
+      FP.pipe(
+        oSourceAsset,
+        O.map(({ chain }) => (
+          <LedgerConfirmationModal
+            key="leder-conf-modal"
+            onSuccess={onSucceedLedgerModal}
+            onClose={onCloseLedgerModal}
+            visible={showLedgerModal}
+            chain={chain}
+          />
+        )),
+        O.toNullable
+      ),
+
+    [oSourceAsset, onCloseLedgerModal, onSucceedLedgerModal, showLedgerModal]
+  )
 
   const sourceChainFeeError: boolean = useMemo(() => {
     // ignore error check by having zero amounts or min amount errors
@@ -1470,6 +1498,7 @@ export const Swap = ({
           validatePassword$={validatePassword$}
         />
       )}
+      {renderLedgerConfirmationModal}
       {renderTxModal}
     </Styled.Container>
   )

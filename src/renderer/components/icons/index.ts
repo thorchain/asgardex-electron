@@ -17,6 +17,7 @@ import userAvatarIcon from '../../assets/svg/asset-user.svg'
 import xRuneIcon from '../../assets/svg/asset-xrune.svg'
 import { ReactComponent as CurrencyIcon } from '../../assets/svg/currency-icon.svg'
 import blueArrowIcon from '../../assets/svg/icon-arrow-button.svg'
+import { ReactComponent as LedgerIcon } from '../../assets/svg/ledger.svg'
 import orbBlueIcon from '../../assets/svg/orb-blue.svg'
 import orbGreenIcon from '../../assets/svg/orb-green.svg'
 
@@ -40,5 +41,6 @@ export {
   dropdownIcon,
   blackArrowIcon,
   blueArrowIcon,
-  greyArrowIcon
+  greyArrowIcon,
+  LedgerIcon
 }
