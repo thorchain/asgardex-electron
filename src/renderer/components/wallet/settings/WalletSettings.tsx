@@ -83,7 +83,7 @@ export const WalletSettings: React.FC<Props> = (props): JSX.Element => {
   const [showRemoveWalletModal, setShowRemoveWalletModal] = useState(false)
   const [showQRModal, setShowQRModal] = useState<O.Option<{ asset: Asset; address: Address }>>(O.none)
   const closeQrModal = useCallback(() => setShowQRModal(O.none), [setShowQRModal])
-  const [walletIndex, setWalletIndex] = useState({
+  const [walletIndex, setWalletIndex] = useState<Record<Chain, number>>({
     [BNBChain]: 0,
     [BTCChain]: 0,
     [BCHChain]: 0,
