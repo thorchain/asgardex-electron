@@ -3,34 +3,28 @@ import React from 'react'
 import * as RD from '@devexperts/remote-data-ts'
 import { BaseStory } from '@storybook/addons'
 import { TxHash } from '@xchainjs/xchain-client'
-import { assetAmount, AssetBNB, AssetRune67C, AssetRuneNative, assetToBase } from '@xchainjs/xchain-util'
+import { assetAmount, AssetBNB, AssetRune67C, assetToBase } from '@xchainjs/xchain-util'
 import * as NEA from 'fp-ts/lib/NonEmptyArray'
 
 import { ZERO_BASE_AMOUNT } from '../../../const'
+import { mockWalletBalance } from '../../../helpers/test/testWalletHelper'
 import { OpenExplorerTxUrl } from '../../../services/clients'
 import { WalletBalance, WalletBalances } from '../../../services/wallet/types'
 import { AssetDetails } from './index'
 
-const bnbBalance: WalletBalance = {
-  walletType: 'keystore',
+const bnbBalance: WalletBalance = mockWalletBalance({
   asset: AssetBNB,
   amount: assetToBase(assetAmount(1.1)),
   walletAddress: 'BNB address'
-}
+})
 
-const runeBnbBalance: WalletBalance = {
-  walletType: 'keystore',
+const runeBnbBalance: WalletBalance = mockWalletBalance({
   asset: AssetRune67C,
   amount: assetToBase(assetAmount(2.2)),
   walletAddress: 'BNB.Rune address'
-}
+})
 
-const runeNativeBalance: WalletBalance = {
-  walletType: 'keystore',
-  asset: AssetRuneNative,
-  amount: assetToBase(assetAmount(0)),
-  walletAddress: 'Rune native address'
-}
+const runeNativeBalance: WalletBalance = mockWalletBalance()
 
 const runeBalanceEmpty: WalletBalance = { ...runeBnbBalance, amount: ZERO_BASE_AMOUNT }
 const bnbBalanceEmpty: WalletBalance = { ...bnbBalance, amount: ZERO_BASE_AMOUNT }

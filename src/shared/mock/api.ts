@@ -77,7 +77,8 @@ export const apiUrl: ApiUrl = {
 
 // Mock `apiHDWallet`
 export const apiHDWallet: ApiHDWallet = {
-  getLedgerAddress: ({ chain }) => Promise.resolve(E.right({ chain, address: 'ledger_address', type: 'ledger' })),
+  getLedgerAddress: ({ chain }) =>
+    Promise.resolve(E.right({ chain, address: 'ledger_address', type: 'ledger', walletIndex: 0 })),
   verifyLedgerAddress: FP.constVoid,
   sendLedgerTx: () => Promise.resolve(E.right('tx_hash')),
   depositLedgerTx: () => Promise.resolve(E.right('tx_hash'))

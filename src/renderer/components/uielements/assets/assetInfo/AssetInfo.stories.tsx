@@ -5,6 +5,7 @@ import { AssetRuneNative, assetToBase, assetAmount } from '@xchainjs/xchain-util
 import * as FP from 'fp-ts/function'
 import * as O from 'fp-ts/Option'
 
+import { mockWalletBalance } from '../../../../helpers/test/testWalletHelper'
 import { AssetInfo } from './AssetInfo'
 
 export const AssetInfoStory: Story<{
@@ -20,12 +21,9 @@ export const AssetInfoStory: Story<{
       )}
       asset={O.some(AssetRuneNative)}
       assetsWB={O.some([
-        {
-          walletType: 'keystore',
-          asset: AssetRuneNative,
-          amount: assetToBase(assetAmount(balance)),
-          walletAddress: ''
-        }
+        mockWalletBalance({
+          amount: assetToBase(assetAmount(balance))
+        })
       ])}
       network="testnet"
     />

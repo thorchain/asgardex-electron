@@ -185,7 +185,8 @@ export const eqAddress: Eq.Eq<Address> = eqString
 export const eqWalletAddress = Eq.struct<WalletAddress>({
   address: eqString,
   type: eqString,
-  chain: eqChain
+  chain: eqChain,
+  walletIndex: eqNumber
 })
 
 export const eqLedgerAddressRD = RD.getEq<LedgerError, WalletAddress>(eqLedgerError, eqWalletAddress)

@@ -41,13 +41,11 @@ import { hasImportedKeystore } from './util'
 export const createBalancesService = ({
   keystore$,
   network$,
-  getLedgerAddress$,
-  getWalletIndex$
+  getLedgerAddress$
 }: {
   keystore$: KeystoreState$
   network$: Network$
   getLedgerAddress$: GetLedgerAddressHandler
-  getWalletIndex$: (chain: Chain) => Rx.Observable<number>
 }): BalancesService => {
   // reload all balances
   const reloadBalances: FP.Lazy<void> = () => {
@@ -207,6 +205,7 @@ export const createBalancesService = ({
       walletType: 'keystore',
       chain: THORChain,
       walletAddress: addressFromOptionalWalletAddress(oWalletAddress),
+      walletIndex: 0, // Always 0 as long as we don't support HD wallets
       balances
     }))
   )
@@ -231,17 +230,17 @@ export const createBalancesService = ({
               // just return `ChainBalance` w/ initial (empty) balances
               Rx.of<ChainBalance>({
                 walletType: 'ledger',
-                walletIndex: 0,
                 chain,
                 walletAddress: O.none,
-                balances: RD.initial
+                balances: RD.initial,
+                walletIndex: 0
               }),
-            ({ address }) =>
+            ({ address, walletIndex }) =>
               // Load balances by given Ledger address
               // and put it's RD state into `balances` of `ChainBalance`
               FP.pipe(
-                Rx.combineLatest([getBalanceByAddress$(address, 'ledger'), getWalletIndex$(chain)]),
-                RxOp.map<[WalletBalancesRD, number], ChainBalance>(([balances, walletIndex]) => ({
+                getBalanceByAddress$(address, 'ledger'),
+                RxOp.map<WalletBalancesRD, ChainBalance>((balances) => ({
                   walletType: 'ledger',
                   walletIndex,
                   chain,
@@ -270,6 +269,7 @@ export const createBalancesService = ({
       walletType: 'keystore',
       chain: LTCChain,
       walletAddress: addressFromOptionalWalletAddress(oWalletAddress),
+      walletIndex: 0, // Always 0 as long as we don't support HD wallets
       balances
     }))
   )
@@ -285,6 +285,7 @@ export const createBalancesService = ({
       walletType: 'keystore',
       chain: BCHChain,
       walletAddress: addressFromOptionalWalletAddress(oWalletAddress),
+      walletIndex: 0, // Always 0 as long as we don't support HD wallets
       balances
     }))
   )
@@ -306,6 +307,7 @@ export const createBalancesService = ({
       walletType: 'keystore',
       chain: BNBChain,
       walletAddress: addressFromOptionalWalletAddress(oWalletAddress),
+      walletIndex: 0, // Always 0 as long as we don't support HD wallets
       balances: FP.pipe(
         balances,
         RD.map((assets) => sortBalances(assets, [AssetBNB.ticker, getBnbRuneAsset(network).ticker]))
@@ -324,6 +326,7 @@ export const createBalancesService = ({
       walletType: 'keystore',
       chain: BTCChain,
       walletAddress: addressFromOptionalWalletAddress(oWalletAddress),
+      walletIndex: 0, // Always 0 as long as we don't support HD wallets
       balances
     }))
   )
@@ -338,6 +341,7 @@ export const createBalancesService = ({
       walletType: 'keystore',
       chain: ETHChain,
       walletAddress: addressFromOptionalWalletAddress(oWalletAddress),
+      walletIndex: 0, // Always 0 as long as we don't support HD wallets
       balances
     }))
   )

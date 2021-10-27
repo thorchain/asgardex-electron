@@ -4,15 +4,14 @@ import { storiesOf } from '@storybook/react'
 import { assetAmount, AssetBNB, assetToBase, assetToString } from '@xchainjs/xchain-util'
 
 import { ASSETS_MAINNET } from '../../../../shared/mock/assets'
+import { mockWalletBalance } from '../../../helpers/test/testWalletHelper'
 import { WalletBalance } from '../../../services/wallet/types'
 import { AccountSelector } from './index'
 
-const balanceBNB: WalletBalance = {
-  walletType: 'keystore',
-  amount: assetToBase(assetAmount(1)),
+const balanceBNB: WalletBalance = mockWalletBalance({
   asset: AssetBNB,
-  walletAddress: ''
-}
+  walletAddress: 'bnb-ledger-address'
+})
 
 storiesOf('Wallet/AccountSelector', module)
   .add('default', () => {
@@ -23,7 +22,8 @@ storiesOf('Wallet/AccountSelector', module)
           walletType: 'keystore',
           asset,
           amount: assetToBase(assetAmount(1)),
-          walletAddress: `${assetToString(asset)} wallet`
+          walletAddress: `${assetToString(asset)} wallet`,
+          walletIndex: 0
         }))}
         network="testnet"
       />

@@ -58,7 +58,7 @@ export type WalletAccount = {
 
 export type WalletAccounts = WalletAccount[]
 
-export type WalletBalance = Balance & { walletAddress: Address; walletType: WalletType; walletIndex?: number }
+export type WalletBalance = Balance & { walletAddress: Address; walletType: WalletType; walletIndex: number }
 export type WalletBalances = WalletBalance[]
 
 /**
@@ -67,7 +67,7 @@ export type WalletBalances = WalletBalance[]
  */
 export type ChainBalance = {
   walletType: WalletType
-  walletIndex?: number
+  walletIndex: number
   walletAddress: O.Option<Address>
   chain: Chain
   balances: WalletBalancesRD
@@ -140,7 +140,7 @@ export type GetLedgerAddressHandler = (chain: Chain, network: Network) => Ledger
 export type LedgerService = {
   askLedgerAddress$: (chain: Chain, network: Network, walletIndex: number) => LedgerAddressLD
   getLedgerAddress$: GetLedgerAddressHandler
-  getWalletIndex$: (chain: Chain) => Rx.Observable<number>
+  // getWalletIndex$: (chain: Chain) => Rx.Observable<number>
   verifyLedgerAddress: (chain: Chain, network: Network, walletIndex?: number) => void
   removeLedgerAddress: (chain: Chain, network: Network) => void
   dispose: FP.Lazy<void>
@@ -170,11 +170,5 @@ export type LedgerAddressLD = LiveData<LedgerError, WalletAddress>
 export type LedgerAddressMap = Record<Network, LedgerAddressRD>
 export type LedgerAddressMap$ = Rx.Observable<LedgerAddressMap>
 
-export type LedgerAddressesAndWalletIndexMap = {
-  addresses: LedgerAddressMap
-  walletIndex: number
-}
-export type LedgerAddressesAndWalletIndexMap$ = Rx.Observable<LedgerAddressesAndWalletIndexMap>
-
-export type LedgerAddressesMap = Record<Chain, LedgerAddressesAndWalletIndexMap>
+export type LedgerAddressesMap = Record<Chain, LedgerAddressMap>
 export type LedgerAddressesMap$ = Rx.Observable<LedgerAddressesMap>

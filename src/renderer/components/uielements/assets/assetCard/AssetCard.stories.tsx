@@ -1,29 +1,25 @@
 import React from 'react'
 
 import { Meta, Story } from '@storybook/react'
-import { bn, AssetBNB, assetAmount, assetToBase, baseAmount, AssetBTC, AssetRuneNative } from '@xchainjs/xchain-util'
+import { bn, AssetBNB, assetAmount, assetToBase, AssetBTC } from '@xchainjs/xchain-util'
 import * as O from 'fp-ts/Option'
 
 import { ZERO_BASE_AMOUNT } from '../../../../const'
+import { mockWalletBalance } from '../../../../helpers/test/testWalletHelper'
 import { WalletBalance } from '../../../../services/wallet/types'
 import { AssetCard, Props as AssetCardProps } from './AssetCard'
 
-const balanceBNB: WalletBalance = {
-  walletType: 'keystore',
-  amount: baseAmount('1'),
+const balanceBNB: WalletBalance = mockWalletBalance({
   asset: AssetBNB,
-  walletAddress: ''
-}
+  walletAddress: 'bnb-address'
+})
 
-const balanceBTC: WalletBalance = {
-  ...balanceBNB,
-  asset: AssetBTC
-}
+const balanceBTC: WalletBalance = mockWalletBalance({
+  asset: AssetBTC,
+  walletAddress: 'btc-address'
+})
 
-const balanceRuneNative: WalletBalance = {
-  ...balanceBNB,
-  asset: AssetRuneNative
-}
+const balanceRuneNative: WalletBalance = mockWalletBalance()
 
 const balances = [balanceBNB, balanceBTC, balanceRuneNative]
 

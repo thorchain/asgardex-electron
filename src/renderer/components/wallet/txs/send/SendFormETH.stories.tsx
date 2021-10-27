@@ -4,28 +4,25 @@ import * as RD from '@devexperts/remote-data-ts'
 import { Meta, Story } from '@storybook/react'
 import { Fees, FeeType, TxParams } from '@xchainjs/xchain-client'
 import { ETH_DECIMAL } from '@xchainjs/xchain-ethereum'
-import { assetAmount, AssetETH, AssetRuneNative, assetToBase } from '@xchainjs/xchain-util'
+import { assetAmount, AssetETH, assetToBase } from '@xchainjs/xchain-util'
 
 import { mockValidatePassword$ } from '../../../../../shared/mock/wallet'
 import { THORCHAIN_DECIMAL } from '../../../../helpers/assetHelper'
+import { mockWalletBalance } from '../../../../helpers/test/testWalletHelper'
 import { SendTxParams } from '../../../../services/ethereum/types'
 import { WalletBalance } from '../../../../services/wallet/types'
 import { SendFormETH } from './index'
 import { Props as SendFormETHProps } from './SendFormETH'
 
-const ethBalance: WalletBalance = {
-  walletType: 'keystore',
+const ethBalance: WalletBalance = mockWalletBalance({
   asset: AssetETH,
   amount: assetToBase(assetAmount(1.23, ETH_DECIMAL)),
   walletAddress: 'AssetETH wallet address'
-}
+})
 
-const runeBalance: WalletBalance = {
-  walletType: 'keystore',
-  asset: AssetRuneNative,
-  amount: assetToBase(assetAmount(2, THORCHAIN_DECIMAL)),
-  walletAddress: 'rune wallet address'
-}
+const runeBalance: WalletBalance = mockWalletBalance({
+  amount: assetToBase(assetAmount(2, THORCHAIN_DECIMAL))
+})
 
 const fees: Fees = {
   type: FeeType.PerByte,

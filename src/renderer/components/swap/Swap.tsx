@@ -662,12 +662,13 @@ export const Swap = ({
               // same chain and use its walletAddress as this is a single common wallet
               A.findFirst(({ asset }) => eqChain.equals(asset.chain, availableAsset.chain)),
               // And set available balance amount as Zero Value as user does not have any balances for this asset at all
-              O.map((balance) => [
+              O.map(({ walletType, walletAddress, walletIndex }) => [
                 {
-                  walletType: balance.walletType,
+                  walletType,
                   asset: availableAsset,
-                  walletAddress: balance.walletAddress,
-                  amount: ZERO_BASE_AMOUNT
+                  walletAddress,
+                  amount: ZERO_BASE_AMOUNT,
+                  walletIndex
                 }
               ])
             )

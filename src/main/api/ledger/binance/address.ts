@@ -24,7 +24,7 @@ export const getAddress = async (
     if (pk) {
       // get address from pubkey
       const address = crypto.getAddressFromPublicKey(pk.toString('hex'), prefix)
-      return E.right({ address, chain: BNBChain, type: 'ledger' })
+      return E.right({ address, chain: BNBChain, type: 'ledger', walletIndex })
     } else {
       return E.left({
         errorId: LedgerErrorId.INVALID_PUBKEY,

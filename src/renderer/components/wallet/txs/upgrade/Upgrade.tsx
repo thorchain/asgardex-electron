@@ -404,7 +404,8 @@ export const Upgrade: React.FC<Props> = (props): JSX.Element => {
               walletType,
               amount: assetToBase(assetAmount(0)),
               asset: runeAsset.asset,
-              walletAddress: ''
+              walletAddress: '',
+              walletIndex
             }}
             walletBalances={[]}
             network={network}
@@ -457,6 +458,7 @@ export const Upgrade: React.FC<Props> = (props): JSX.Element => {
     [
       walletType,
       runeAsset.asset,
+      walletIndex,
       network,
       form,
       runeNativeAddress,
