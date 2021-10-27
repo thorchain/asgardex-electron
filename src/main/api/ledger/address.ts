@@ -18,7 +18,7 @@ export const getAddress = async ({
     const transport = await TransportNodeHidSingleton.open()
     switch (chain) {
       case THORChain:
-        res = await getTHORAddress(transport, network)
+        res = await getTHORAddress(transport, network, walletIndex)
         break
       case BNBChain:
         res = await getBNBAddress(transport, network, walletIndex)
@@ -43,7 +43,7 @@ export const verifyLedgerAddress = async ({ chain, network, walletIndex = 0 }: I
   const transport = await TransportNodeHidSingleton.open()
   switch (chain) {
     case THORChain:
-      verifyTHORAddress(transport, network)
+      verifyTHORAddress(transport, network, walletIndex)
       break
     case BNBChain:
       verifyBNBAddress(transport, network, walletIndex)
