@@ -71,12 +71,11 @@ export const ActivePools: React.FC<PoolsComponentProps> = ({ haltedChains, mimir
 
   const selectedPricePool = useObservableState(selectedPricePool$, PoolHelpers.RUNE_PRICE_POOL)
 
-  const getSwapPath = poolsRoutes.swap.path
   const clickSwapHandler = useCallback(
     (p: SwapRouteParams) => {
-      history.push(getSwapPath(p))
+      history.push(poolsRoutes.swap.path(p))
     },
-    [getSwapPath, history]
+    [history]
   )
 
   const renderBtnPoolsColumn = useCallback(
@@ -110,7 +109,10 @@ export const ActivePools: React.FC<PoolsComponentProps> = ({ haltedChains, mimir
             onClick={(event) => {
               event.preventDefault()
               event.stopPropagation()
-              clickSwapHandler({ source: assetToString(pool.asset), target: assetToString(pool.target) })
+              clickSwapHandler({
+                source: assetToString(pool.asset),
+                target: assetToString(pool.target)
+              })
             }}>
             <SwapOutlined />
             {isDesktopView && intl.formatMessage({ id: 'common.swap' })}

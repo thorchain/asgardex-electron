@@ -1,16 +1,17 @@
 import { Address } from '@xchainjs/xchain-client'
-import { Asset, AssetAmount, baseToAsset } from '@xchainjs/xchain-util'
+import { Asset, AssetAmount, baseToAsset, Chain } from '@xchainjs/xchain-util'
 import * as A from 'fp-ts/Array'
 import * as FP from 'fp-ts/function'
+import * as NEA from 'fp-ts/lib/NonEmptyArray'
 import * as O from 'fp-ts/Option'
 
-import { WalletAddress } from '../../shared/wallet/types'
+import { isLedgerWallet } from '../../shared/utils/guard'
+import { WalletAddress, WalletType } from '../../shared/wallet/types'
 import { ZERO_ASSET_AMOUNT } from '../const'
 import { WalletBalances } from '../services/clients'
 import { NonEmptyWalletBalances, WalletBalance } from '../services/wallet/types'
 import { isBnbAsset, isEthAsset, isLtcAsset, isRuneNativeAsset } from './assetHelper'
-import { eqAddress, eqAsset } from './fp/eq'
-import { sequenceTOption } from './fpHelpers'
+import { eqAddress, eqAsset, eqChain, eqWalletType } from './fp/eq'
 
 /**
  * Tries to find an `AssetAmount` of an `Asset`
@@ -27,35 +28,6 @@ export const getAssetAmountByAsset = (balances: WalletBalances, assetToFind: Ass
 
 export const getWalletBalanceByAsset = (
   oWalletBalances: O.Option<NonEmptyWalletBalances>,
-  oAsset: O.Option<Asset>
-): O.Option<WalletBalance> =>
-  FP.pipe(
-    sequenceTOption(oWalletBalances, oAsset),
-    O.chain(([walletBalances, asset]) =>
-      FP.pipe(
-        walletBalances,
-        A.findFirst(({ asset: assetInList }) => eqAsset.equals(assetInList, asset))
-      )
-    )
-  )
-
-export const getWalletBalanceByAddress = (
-  oWalletBalances: O.Option<NonEmptyWalletBalances>,
-  address: Address
-): O.Option<WalletBalance> =>
-  FP.pipe(
-    oWalletBalances,
-    O.chain((walletBalances) =>
-      FP.pipe(
-        walletBalances,
-        A.findFirst(({ walletAddress: addressInList }) => eqAddress.equals(addressInList, address))
-      )
-    )
-  )
-
-export const getWalletBalanceByAddressAndAsset = (
-  oWalletBalances: O.Option<NonEmptyWalletBalances>,
-  address: Address,
   asset: Asset
 ): O.Option<WalletBalance> =>
   FP.pipe(
@@ -63,11 +35,56 @@ export const getWalletBalanceByAddressAndAsset = (
     O.chain((walletBalances) =>
       FP.pipe(
         walletBalances,
+        A.findFirst(({ asset: assetInList }) => eqAsset.equals(assetInList, asset))
+      )
+    )
+  )
+
+export const getWalletBalanceByAssetAndWalletType = ({
+  oWalletBalances,
+  asset,
+  walletType
+}: {
+  oWalletBalances: O.Option<NonEmptyWalletBalances>
+  asset: Asset
+  walletType: WalletType
+}): O.Option<WalletBalance> =>
+  FP.pipe(
+    oWalletBalances,
+    O.chain((walletBalances) =>
+      FP.pipe(
+        walletBalances,
         A.findFirst(
-          ({ walletAddress: addressInList, asset: assetInList }) =>
-            eqAddress.equals(addressInList, address) && eqAddress.equals(assetInList.ticker, asset.ticker)
+          ({ asset: assetInList, walletType: balanceWalletType }) =>
+            eqAsset.equals(assetInList, asset) && eqWalletType.equals(walletType, balanceWalletType)
         )
       )
+    )
+  )
+
+export const getWalletBalanceByAddress = (
+  balances: NonEmptyWalletBalances,
+  address: Address
+): O.Option<WalletBalance> =>
+  FP.pipe(
+    balances,
+    A.findFirst(({ walletAddress: addressInList }) => eqAddress.equals(addressInList, address))
+  )
+
+export const getWalletBalanceByAddressAndAsset = ({
+  balances,
+  address,
+  asset
+}: {
+  balances: NonEmptyWalletBalances
+  address: Address
+  asset: Asset
+}): O.Option<WalletBalance> =>
+  FP.pipe(
+    balances,
+    A.findFirst(
+      ({ walletAddress: addressInList, asset: assetInList }) =>
+        eqAddress.equals(addressInList, address) && eqAddress.equals(assetInList.ticker, asset.ticker)
     )
   )
 
@@ -113,8 +130,44 @@ export const addressFromOptionalWalletAddress = (
   oWalletAddress: O.Option<Pick<WalletAddress, 'address'>>
 ): O.Option<Address> => FP.pipe(oWalletAddress, O.map(addressFromWalletAddress))
 
+export const getAddressFromBalancesByChain = ({
+  balances,
+  chain,
+  walletType
+}: {
+  balances: NonEmptyWalletBalances
+  chain: Chain
+  walletType: WalletType
+}): O.Option<Address> =>
+  FP.pipe(
+    balances,
+    A.findFirst(
+      ({ asset, walletType: balanceWalletType }) =>
+        eqChain.equals(chain, asset.chain) && eqWalletType.equals(walletType, balanceWalletType)
+    ),
+    O.map(({ walletAddress }) => walletAddress)
+  )
+
 export const getWalletByAddress = (walletBalances: WalletBalances, address: Address): O.Option<WalletBalance> =>
   FP.pipe(
     walletBalances,
     A.findFirst(({ walletAddress }) => eqAddress.equals(walletAddress, address))
+  )
+
+export const isLedgerAddressInBalances = ({
+  balances,
+  address,
+  asset
+}: {
+  balances: WalletBalances
+  address: Address
+  asset: Asset
+}): boolean =>
+  FP.pipe(
+    NEA.fromArray(balances),
+    O.chain((balances) => getWalletBalanceByAddressAndAsset({ balances, address, asset })),
+    O.fold(
+      () => false,
+      ({ walletType }) => isLedgerWallet(walletType)
+    )
   )

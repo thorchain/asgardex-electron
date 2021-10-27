@@ -9,14 +9,17 @@ import {
   assetToBase,
   assetToString,
   baseAmount,
-  bn
+  bn,
+  BTCChain,
+  THORChain
 } from '@xchainjs/xchain-util'
 import * as O from 'fp-ts/lib/Option'
 
 import { ASSETS_TESTNET } from '../../../shared/mock/assets'
 import { AssetBUSD74E, AssetUSDTERC20Testnet, ZERO_BASE_AMOUNT } from '../../const'
 import { BNB_DECIMAL, THORCHAIN_DECIMAL } from '../../helpers/assetHelper'
-import { eqBaseAmount } from '../../helpers/fp/eq'
+import { eqAsset, eqBaseAmount } from '../../helpers/fp/eq'
+import { mockWalletBalance } from '../../helpers/test/testWalletHelper'
 import { PoolsDataMap } from '../../services/midgard/types'
 import {
   DEFAULT_SWAP_DATA,
@@ -30,7 +33,10 @@ import {
   calcRefundFee,
   minAmountToSwapMax1e8,
   getSwapLimit,
-  maxAmountToSwapMax1e8
+  maxAmountToSwapMax1e8,
+  assetsInWallet,
+  balancesToSwapFrom,
+  hasLedgerInBalancesByChain
 } from './Swap.utils'
 
 describe('components/swap/utils', () => {
@@ -679,6 +685,85 @@ describe('components/swap/utils', () => {
       }
       const result = maxAmountToSwapMax1e8(params.inputBalanceAmount, params.inFeeAmount)
       expect(eqBaseAmount.equals(result, baseAmount(0))).toBeTruthy()
+    })
+  })
+  describe('assetsInWallet', () => {
+    const a = mockWalletBalance()
+    const b = mockWalletBalance({ asset: AssetBNB })
+    const c = mockWalletBalance({ asset: AssetBTC })
+
+    it('empty list of assets for empty balances', () => {
+      const result = assetsInWallet([])
+      expect(result).toEqual([])
+    })
+
+    it('filter out assets', () => {
+      const assets = assetsInWallet([a, b, c])
+
+      expect(assets.length).toEqual(3)
+      expect(eqAsset.equals(assets[0], AssetRuneNative)).toBeTruthy()
+      expect(eqAsset.equals(assets[1], AssetBNB)).toBeTruthy()
+      expect(eqAsset.equals(assets[2], AssetBTC)).toBeTruthy()
+    })
+  })
+
+  describe('balancesToSwapFrom', () => {
+    const runeBalance = mockWalletBalance()
+    const runeBalanceLedger = mockWalletBalance({
+      walletType: 'ledger',
+      amount: baseAmount(2)
+    })
+    const bnbBalance = mockWalletBalance({
+      ...runeBalance,
+      asset: AssetBNB
+    })
+
+    it('RUNE ledger + Keystore ', () => {
+      const result = balancesToSwapFrom({
+        assetsToSwap: O.some({ source: AssetBNB, target: AssetRuneNative }),
+        walletBalances: [runeBalance, runeBalanceLedger, bnbBalance]
+      })
+      expect(result.length).toEqual(2)
+      // Keystore THOR.RUNE
+      expect(result[0].walletType).toEqual('keystore')
+      expect(eqAsset.equals(result[0].asset, AssetRuneNative)).toBeTruthy()
+      // Ledger THOR.RUNE
+      expect(result[1].walletType).toEqual('ledger')
+      expect(eqAsset.equals(result[1].asset, AssetRuneNative)).toBeTruthy()
+    })
+
+    it('RUNE ledger + Keystore ', () => {
+      const result = balancesToSwapFrom({
+        assetsToSwap: O.some({ source: AssetRuneNative, target: AssetBNB }),
+        walletBalances: [runeBalance, runeBalanceLedger, bnbBalance]
+      })
+      expect(result.length).toEqual(1)
+      // Keystore BNB.BNB
+      expect(result[0].walletType).toEqual('keystore')
+      expect(eqAsset.equals(result[0].asset, AssetBNB)).toBeTruthy()
+    })
+  })
+
+  describe('hasLedgerInBalancesByChain', () => {
+    const runeBalance = mockWalletBalance()
+    const runeBalanceLedger = mockWalletBalance({
+      walletType: 'ledger',
+      amount: baseAmount(2)
+    })
+    const bnbBalance = mockWalletBalance({
+      ...runeBalance,
+      asset: AssetBNB
+    })
+
+    const balances = [runeBalance, runeBalanceLedger, bnbBalance]
+
+    it('has RUNE ledger ', () => {
+      const result = hasLedgerInBalancesByChain(THORChain, balances)
+      expect(result).toBeTruthy()
+    })
+    it('has not BTC ledger ', () => {
+      const result = hasLedgerInBalancesByChain(BTCChain, balances)
+      expect(result).toBeFalsy()
     })
   })
 })

@@ -41,7 +41,14 @@ export const SendViewTHOR: React.FC<Props> = (props): JSX.Element => {
   const intl = useIntl()
   const history = useHistory()
 
-  const oWalletBalance = useMemo(() => getWalletBalanceByAddress(oBalances, walletAddress), [oBalances, walletAddress])
+  const oWalletBalance = useMemo(
+    () =>
+      FP.pipe(
+        oBalances,
+        O.chain((balances) => getWalletBalanceByAddress(balances, walletAddress))
+      ),
+    [oBalances, walletAddress]
+  )
 
   const { transfer$ } = useChainContext()
   const {

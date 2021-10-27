@@ -14,7 +14,7 @@ type Args = {
 
 const Template: Story<Args> = ({ label, disabled, isChecked, onClicked }) => {
   return (
-    <CheckButton disabled={disabled} isChecked={isChecked} clickHandler={onClicked}>
+    <CheckButton disabled={disabled} checked={isChecked} clickHandler={onClicked}>
       {label}
     </CheckButton>
   )

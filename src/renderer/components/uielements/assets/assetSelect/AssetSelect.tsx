@@ -1,14 +1,19 @@
 import React, { useCallback, useState, useMemo } from 'react'
 
-import { delay, Asset, assetToString } from '@xchainjs/xchain-util'
+import { delay, Asset } from '@xchainjs/xchain-util'
 import { Dropdown } from 'antd'
+import * as A from 'fp-ts/lib/Array'
+import * as FP from 'fp-ts/lib/function'
+import * as O from 'fp-ts/lib/Option'
 import { useIntl } from 'react-intl'
 
 import { Network } from '../../../../../shared/api/types'
 import { WalletType } from '../../../../../shared/wallet/types'
+import { eqAsset, eqString } from '../../../../helpers/fp/eq'
 import { ordWalletBalanceByAsset } from '../../../../helpers/fp/ord'
 import { WalletBalances } from '../../../../services/clients'
 import { PriceDataIndex } from '../../../../services/midgard/types'
+import { AssetWithWalletType } from '../../../../types/asgardex'
 import { AssetData } from '../assetData'
 import { AssetMenu } from '../assetMenu'
 import * as Styled from './AssetSelect.styles'
@@ -20,7 +25,7 @@ export type Props = {
   priceIndex?: PriceDataIndex
   withSearch?: boolean
   searchDisable?: string[]
-  onSelect: (_: Asset) => void
+  onSelect: (_: AssetWithWalletType) => void
   className?: string
   minWidth?: number
   showAssetName?: boolean
@@ -36,7 +41,7 @@ export const AssetSelect: React.FC<Props> = (props): JSX.Element => {
     priceIndex,
     withSearch = true,
     searchDisable = [],
-    onSelect = (_: Asset) => {},
+    onSelect = (_: AssetWithWalletType) => {},
     className,
     minWidth,
     showAssetName = true,
@@ -58,15 +63,24 @@ export const AssetSelect: React.FC<Props> = (props): JSX.Element => {
   }
 
   const handleChangeAsset = useCallback(
-    async (assetId: string) => {
+    async ({ asset, walletType }) => {
       setOpenDropdown(false)
 
       // Wait for the dropdown to close
       await delay(500)
-      const changedAsset = balances.find((balance) => assetToString(balance.asset) === assetId)
-      if (changedAsset) {
-        onSelect(changedAsset.asset)
-      }
+
+      FP.pipe(
+        balances,
+        A.findFirst(
+          ({ asset: balanceAsset, walletType: balanceWalletType }) =>
+            eqAsset.equals(balanceAsset, asset) && eqString.equals(walletType, balanceWalletType)
+        ),
+        O.map(({ asset, walletType }) => {
+          onSelect({ asset, walletType })
+          return true
+        }),
+        O.getOrElse(() => false)
+      )
     },
     [balances, onSelect]
   )

@@ -20,7 +20,7 @@ import { Row } from 'antd'
 import BigNumber from 'bignumber.js'
 import * as A from 'fp-ts/Array'
 import * as FP from 'fp-ts/function'
-import * as NEA from 'fp-ts/NonEmptyArray'
+import * as NEA from 'fp-ts/lib/NonEmptyArray'
 import * as O from 'fp-ts/Option'
 import { useObservableState } from 'observable-hooks'
 import { useIntl } from 'react-intl'
@@ -43,7 +43,14 @@ import { eqAsset, eqBaseAmount, eqChain, eqOAsset, eqOApproveParams } from '../.
 import { sequenceSOption, sequenceTOption } from '../../helpers/fpHelpers'
 import * as PoolHelpers from '../../helpers/poolHelper'
 import { liveData, LiveData } from '../../helpers/rx/liveData'
-import { filterWalletBalancesByAssets, getWalletBalanceByAsset, getWalletByAddress } from '../../helpers/walletHelper'
+import {
+  filterWalletBalancesByAssets,
+  getAddressFromBalancesByChain,
+  getWalletBalanceByAsset,
+  getWalletBalanceByAssetAndWalletType,
+  getWalletByAddress,
+  isLedgerAddressInBalances
+} from '../../helpers/walletHelper'
 import { useSubscriptionState } from '../../hooks/useSubscriptionState'
 import { swap } from '../../routes/pools'
 import { ChangeSlipToleranceHandler } from '../../services/app/types'
@@ -80,7 +87,7 @@ import {
   WalletBalances
 } from '../../services/wallet/types'
 import { hasImportedKeystore, isLocked } from '../../services/wallet/util'
-import { AssetWithDecimal, SlipTolerance } from '../../types/asgardex'
+import { AssetWithDecimal, AssetWithWalletType, SlipTolerance } from '../../types/asgardex'
 import { CurrencyInfo } from '../currency'
 import { PasswordModal } from '../modal/password'
 import { TxModal } from '../modal/tx'
@@ -92,7 +99,7 @@ import { Fees, UIFeesRD } from '../uielements/fees'
 import { Slider } from '../uielements/slider'
 import { EditableAddress } from './EditableAddress'
 import * as Styled from './Swap.styles'
-import { SwapData } from './Swap.types'
+import { AssetsToSwap, SwapData } from './Swap.types'
 import * as Utils from './Swap.utils'
 
 export type ConfirmSwapParams = { asset: Asset; amount: BaseAmount; memo: string }
@@ -189,6 +196,9 @@ export const Swap = ({
     [oTargetPoolAsset]
   )
 
+  const [useSourceAssetLedger, setUseSourceAssetLedger] = useState(false)
+  const [useTargetAssetLedger, setUseTargetAssetLedger] = useState(false)
+
   const disableAllPoolActions = useCallback(
     (chain: Chain) => PoolHelpers.disableAllActions({ chain, haltedChains, mimirHalt }),
     [haltedChains, mimirHalt]
@@ -217,24 +227,57 @@ export const Swap = ({
     [customAddressEditActive, disableAllPoolActions, disableTradingPoolActions, oSourceAsset, oTargetAsset]
   )
 
-  const assetsToSwap: O.Option<{ source: Asset; target: Asset }> = useMemo(
+  const assetsToSwap: O.Option<AssetsToSwap> = useMemo(
     () => sequenceSOption({ source: oSourceAsset, target: oTargetAsset }),
     [oSourceAsset, oTargetAsset]
   )
 
-  // `AssetWB` of source asset - which might be none (user has no balances for this asset or wallet is locked)
-  const oSourceAssetWB: O.Option<WalletBalance> = useMemo(
-    () => getWalletBalanceByAsset(oWalletBalances, oSourceAsset),
-    [oWalletBalances, oSourceAsset]
+  const allAssets = useMemo((): Asset[] => availableAssets.map(({ asset }) => asset), [availableAssets])
+
+  const allBalances: WalletBalances = FP.pipe(
+    oWalletBalances,
+    O.map((balances) => filterWalletBalancesByAssets(balances, allAssets)),
+    O.getOrElse<WalletBalances>(() => [])
   )
 
-  const oSourceAssetWT: O.Option<WalletType> = useMemo(
+  const hasSourceAssetLedger = useMemo(
     () =>
       FP.pipe(
-        oSourceAssetWB,
+        oSourceAsset,
+        O.map((asset) => Utils.hasLedgerInBalancesByAsset(asset, allBalances)),
+        O.getOrElse(() => false)
+      ),
+    [oSourceAsset, allBalances]
+  )
+
+  const oTargetWalletType: O.Option<WalletType> = useMemo(
+    () =>
+      FP.pipe(
+        sequenceTOption(oWalletBalances, editableTargetWalletAddress),
+        O.chain(([walletBalances, editableTargetWalletAddress]) =>
+          getWalletByAddress(walletBalances, editableTargetWalletAddress)
+        ),
         O.map(({ walletType }) => walletType)
       ),
-    [oSourceAssetWB]
+    [oWalletBalances, editableTargetWalletAddress]
+  )
+
+  // `AssetWB` of source asset - which might be none (user has no balances for this asset or wallet is locked)
+  const oSourceAssetWB: O.Option<WalletBalance> = useMemo(
+    () =>
+      FP.pipe(
+        oSourceAsset,
+        O.chain((asset) => {
+          const walletType = useSourceAssetLedger ? 'ledger' : 'keystore'
+          const oWalletBalances = NEA.fromArray(allBalances)
+          return getWalletBalanceByAssetAndWalletType({
+            oWalletBalances,
+            asset,
+            walletType
+          })
+        })
+      ),
+    [oSourceAsset, useSourceAssetLedger, allBalances]
   )
 
   // User balance for source asset
@@ -258,11 +301,21 @@ export const Swap = ({
   const sourceChainAssetAmount: BaseAmount = useMemo(
     () =>
       FP.pipe(
-        getWalletBalanceByAsset(oWalletBalances, O.some(sourceChainAsset)),
+        getWalletBalanceByAsset(oWalletBalances, sourceChainAsset),
         O.map(({ amount }) => amount),
         O.getOrElse(() => ZERO_BASE_AMOUNT)
       ),
     [oWalletBalances, sourceChainAsset]
+  )
+
+  const hasTargetAssetLedger = useMemo(
+    () =>
+      FP.pipe(
+        oTargetAsset,
+        O.map(({ chain }) => Utils.hasLedgerInBalancesByChain(chain, allBalances)),
+        O.getOrElse(() => false)
+      ),
+    [oTargetAsset, allBalances]
   )
 
   const {
@@ -310,8 +363,8 @@ export const Swap = ({
 
   const oSwapParams: O.Option<SwapTxParams> = useMemo(() => {
     return FP.pipe(
-      sequenceTOption(assetsToSwap, oPoolAddress, targetWalletAddress),
-      O.map(([{ source, target }, poolAddress, address]) => {
+      sequenceTOption(assetsToSwap, oPoolAddress, targetWalletAddress, oSourceAssetWB),
+      O.map(([{ source, target }, poolAddress, address, { walletType, walletAddress }]) => {
         return {
           poolAddress,
           asset: source,
@@ -321,16 +374,19 @@ export const Swap = ({
             asset: target,
             address,
             limit: Utils.getSwapLimit(swapResultAmountMax1e8, slipTolerance)
-          })
+          }),
+          walletType,
+          sender: walletAddress
         }
       })
     )
   }, [
-    amountToSwapMax1e8,
     assetsToSwap,
     oPoolAddress,
-    sourceAssetDecimal,
     targetWalletAddress,
+    oSourceAssetWB,
+    amountToSwapMax1e8,
+    sourceAssetDecimal,
     swapResultAmountMax1e8,
     slipTolerance
   ])
@@ -449,7 +505,7 @@ export const Swap = ({
   const [swapStartTime, setSwapStartTime] = useState<number>(0)
 
   const setSourceAsset = useCallback(
-    async (asset: Asset) => {
+    async ({ asset }: AssetWithWalletType) => {
       // delay to avoid render issues while switching
       await delay(100)
 
@@ -469,7 +525,7 @@ export const Swap = ({
   )
 
   const setTargetAsset = useCallback(
-    async (asset: Asset) => {
+    async ({ asset }: AssetWithWalletType) => {
       // delay to avoid render issues while switching
       await delay(100)
 
@@ -485,7 +541,7 @@ export const Swap = ({
         )
       )
     },
-    [onChangePath, oSourceAsset]
+    [oSourceAsset, onChangePath]
   )
 
   const minAmountToSwapMax1e8: BaseAmount = useMemo(
@@ -563,43 +619,18 @@ export const Swap = ({
     [maxAmountToSwapMax1e8, setAmountToSwapMax1e8, sourceAssetAmountMax1e8.decimal]
   )
 
-  const allAssets = useMemo((): Asset[] => availableAssets.map(({ asset }) => asset), [availableAssets])
-
-  const assetSymbolsInWallet: O.Option<string[]> = useMemo(
-    () => FP.pipe(oWalletBalances, O.map(A.map(({ asset }) => asset.symbol.toUpperCase()))),
-    [oWalletBalances]
-  )
-
-  const allBalances = FP.pipe(
-    oWalletBalances,
-    O.map((balances) => filterWalletBalancesByAssets(balances, allAssets)),
-    O.getOrElse(() => [] as WalletBalances)
-  )
-
   const balancesToSwapFrom = useMemo((): WalletBalances => {
-    const filteredBalances: WalletBalances = FP.pipe(
-      allBalances,
-      A.filter((balance) =>
-        FP.pipe(
-          assetSymbolsInWallet,
-          O.map((symbols) => symbols.includes(balance.asset.symbol.toUpperCase())),
-          O.getOrElse((): boolean => false)
-        )
-      ),
-      (balances) => (balances.length ? balances : allBalances)
-    )
-
     return FP.pipe(
       assetsToSwap,
       O.map(({ source, target }) =>
         FP.pipe(
-          filteredBalances,
+          allBalances,
           A.filter((balance) => !eqAsset.equals(balance.asset, source) && !eqAsset.equals(balance.asset, target))
         )
       ),
       O.getOrElse(() => allBalances)
     )
-  }, [assetsToSwap, assetSymbolsInWallet, allBalances])
+  }, [assetsToSwap, allBalances])
 
   const balancesToSwapTo = useMemo((): WalletBalances => {
     const allBalances = FP.pipe(
@@ -653,9 +684,28 @@ export const Swap = ({
 
   const [showPasswordModal, setShowPasswordModal] = useState(false)
 
-  const onSwapConfirmed = useCallback(() => {
-    setShowPasswordModal(true)
-  }, [setShowPasswordModal])
+  const submitSwapTx = useCallback(() => {
+    FP.pipe(
+      oSwapParams,
+      O.map((swapParams) => {
+        // set start time
+        setSwapStartTime(Date.now())
+        // subscribe to swap$
+        subscribeSwapState(swap$(swapParams))
+
+        return true
+      })
+    )
+  }, [oSwapParams, subscribeSwapState, swap$])
+
+  const onSubmit = useCallback(() => {
+    // No PW needed for Ledger
+    if (useSourceAssetLedger) {
+      submitSwapTx()
+    } else {
+      setShowPasswordModal(true)
+    }
+  }, [submitSwapTx, useSourceAssetLedger])
 
   const renderSlider = useMemo(() => {
     const percentage = lockedWallet
@@ -823,18 +873,8 @@ export const Swap = ({
     // close private modal
     closePasswordModal()
 
-    FP.pipe(
-      oSwapParams,
-      O.map((swapParams) => {
-        // set start time
-        setSwapStartTime(Date.now())
-        // subscribe to swap$
-        subscribeSwapState(swap$(swapParams))
-
-        return true
-      })
-    )
-  }, [closePasswordModal, oSwapParams, subscribeSwapState, swap$])
+    submitSwapTx()
+  }, [closePasswordModal, submitSwapTx])
 
   const sourceChainFeeError: boolean = useMemo(() => {
     // ignore error check by having zero amounts or min amount errors
@@ -1181,6 +1221,25 @@ export const Swap = ({
     [checkIsApprovedError, isApproveFeeError, walletBalancesLoading]
   )
 
+  const onChangeTargetAddress = useCallback(
+    (address: Address) => {
+      // update state of target addresses
+      setTargetWalletAddress(O.some(address))
+      setEditableTargetWalletAddress(O.some(address))
+
+      const useLedger = FP.pipe(
+        oTargetAsset,
+        O.map((asset) => isLedgerAddressInBalances({ balances: allBalances, address, asset })),
+        O.getOrElse(() => false)
+      )
+
+      // whenever target address has been changed,
+      // update state of `useTargetAssetLedger`
+      setUseTargetAssetLedger(useLedger)
+    },
+    [allBalances, oTargetAsset]
+  )
+
   const renderCustomAddressInput = useMemo(
     () =>
       FP.pipe(
@@ -1194,10 +1253,7 @@ export const Swap = ({
               network={network}
               address={address}
               onClickOpenAddress={(address) => clickAddressLinkHandler(address)}
-              onChangeAddress={(newAddress) => {
-                setTargetWalletAddress(O.some(newAddress))
-                setEditableTargetWalletAddress(O.some(newAddress))
-              }}
+              onChangeAddress={onChangeTargetAddress}
               onChangeEditableAddress={(newAddress) => setEditableTargetWalletAddress(O.some(newAddress))}
               onChangeEditableMode={(editModeActive) => setCustomAddressEditActive(editModeActive)}
               addressValidator={addressValidator}
@@ -1205,30 +1261,41 @@ export const Swap = ({
           )
         )
       ),
-    [oTargetAsset, targetWalletAddress, network, addressValidator, clickAddressLinkHandler]
+    [oTargetAsset, targetWalletAddress, network, onChangeTargetAddress, addressValidator, clickAddressLinkHandler]
   )
 
-  const oMatchedWalletType: O.Option<WalletType> = useMemo(
-    () =>
-      FP.pipe(
-        sequenceTOption(oWalletBalances, editableTargetWalletAddress),
-        O.chain(([walletBalances, editableTargetWalletAddress]) =>
-          getWalletByAddress(walletBalances, editableTargetWalletAddress)
-        ),
-        O.map(({ walletType }) => walletType)
-      ),
-    [oWalletBalances, editableTargetWalletAddress]
-  )
-
-  const renderWalletType = useMemo(() => {
+  const renderTargetWalletType = useMemo(() => {
     return FP.pipe(
-      oMatchedWalletType,
+      oTargetWalletType,
       O.fold(
         () => <></>,
-        (matchedWalletType) => <WalletTypeLabel>{matchedWalletType}</WalletTypeLabel>
+        (walletType) => <WalletTypeLabel>{walletType}</WalletTypeLabel>
       )
     )
-  }, [oMatchedWalletType])
+  }, [oTargetWalletType])
+
+  /**
+   * Effect to update target address
+   * whenever walletType of the target changed
+   */
+  useEffect(() => {
+    const walletType = useTargetAssetLedger ? 'ledger' : 'keystore'
+
+    // For targets we don't care about if an user already has balances for the target asset,
+    // but a wallet for targte asset chain needs to be connected
+    const oTargetWalletAddress = FP.pipe(
+      sequenceTOption(oTargetAsset, oWalletBalances),
+      O.chain(([{ chain }, balances]) => getAddressFromBalancesByChain({ balances, chain, walletType }))
+    )
+
+    setTargetWalletAddress(oTargetWalletAddress)
+    setEditableTargetWalletAddress(oTargetWalletAddress)
+
+    // FP.pipe(
+    //   oTargetWalletType,
+    //   O.map((walletType) => console.log('walletType:', walletType))
+    // )
+  }, [oTargetAsset, oWalletBalances, useTargetAssetLedger])
 
   return (
     <Styled.Container>
@@ -1268,18 +1335,29 @@ export const Swap = ({
               disabled={lockedWallet}
               maxInfoText={intl.formatMessage({ id: 'swap.info.max.fee' })}
             />
+
             {FP.pipe(
               oSourceAsset,
               O.fold(
                 () => <></>,
                 (asset) => (
-                  <Styled.AssetSelect
-                    onSelect={setSourceAsset}
-                    asset={asset}
-                    assetWalletType={O.toUndefined(oSourceAssetWT)}
-                    balances={balancesToSwapFrom}
-                    network={network}
-                  />
+                  <Styled.AssetSelectContainer>
+                    <Styled.AssetSelect
+                      onSelect={setSourceAsset}
+                      asset={asset}
+                      balances={balancesToSwapFrom}
+                      network={network}
+                    />
+
+                    <Styled.CheckButton
+                      checked={useSourceAssetLedger}
+                      clickHandler={() => {
+                        setUseSourceAssetLedger(() => !useSourceAssetLedger)
+                      }}
+                      disabled={!hasSourceAssetLedger}>
+                      {intl.formatMessage({ id: 'ledger.title' })}
+                    </Styled.CheckButton>
+                  </Styled.AssetSelectContainer>
                 )
               )
             )}
@@ -1300,12 +1378,20 @@ export const Swap = ({
               O.fold(
                 () => <></>,
                 (asset) => (
-                  <Styled.TargetAssetSelect
-                    onSelect={setTargetAsset}
-                    asset={asset}
-                    balances={balancesToSwapTo}
-                    network={network}
-                  />
+                  <Styled.AssetSelectContainer>
+                    <Styled.TargetAssetSelect
+                      onSelect={setTargetAsset}
+                      asset={asset}
+                      balances={balancesToSwapTo}
+                      network={network}
+                    />
+                    <Styled.CheckButton
+                      checked={useTargetAssetLedger}
+                      clickHandler={() => setUseTargetAssetLedger(() => !useTargetAssetLedger)}
+                      disabled={!hasTargetAssetLedger}>
+                      {intl.formatMessage({ id: 'ledger.title' })}
+                    </Styled.CheckButton>
+                  </Styled.AssetSelectContainer>
                 )
               )
             )}
@@ -1314,7 +1400,7 @@ export const Swap = ({
             <Styled.TargetAddressContainer>
               <Row>
                 <Styled.ValueTitle>{intl.formatMessage({ id: 'swap.recipient' })}</Styled.ValueTitle>
-                {renderWalletType}
+                {renderTargetWalletType}
               </Row>
               {renderCustomAddressInput}
             </Styled.TargetAddressContainer>
@@ -1340,11 +1426,7 @@ export const Swap = ({
         {!isLocked(keystore) ? (
           isApproved ? (
             <>
-              <Styled.SubmitButton
-                color="success"
-                sizevalue="xnormal"
-                onClick={onSwapConfirmed}
-                disabled={disableSubmit}>
+              <Styled.SubmitButton color="success" sizevalue="xnormal" onClick={onSubmit} disabled={disableSubmit}>
                 {intl.formatMessage({ id: 'common.swap' })}
               </Styled.SubmitButton>
               {!RD.isInitial(uiFees) && <Fees fees={uiFees} reloadFees={reloadFeesHandler} />}

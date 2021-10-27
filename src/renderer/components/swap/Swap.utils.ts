@@ -1,11 +1,12 @@
 import { getDoubleSwapOutput, getDoubleSwapSlip, getSwapOutput, getSwapSlip } from '@thorchain/asgardex-util'
-import { Asset, assetToString, bn, BaseAmount, baseAmount } from '@xchainjs/xchain-util'
+import { Asset, assetToString, bn, BaseAmount, baseAmount, Chain } from '@xchainjs/xchain-util'
 import BigNumber from 'bignumber.js'
 import * as A from 'fp-ts/Array'
 import * as E from 'fp-ts/Either'
 import * as FP from 'fp-ts/function'
 import * as O from 'fp-ts/Option'
 
+import { isLedgerWallet } from '../../../shared/utils/guard'
 import { ASGARDEX_SWAP_IDENTIFIER, ZERO_BASE_AMOUNT, ZERO_BN } from '../../const'
 import {
   isChainAsset,
@@ -14,14 +15,14 @@ import {
   max1e8BaseAmount,
   to1e8BaseAmount
 } from '../../helpers/assetHelper'
-import { eqAsset } from '../../helpers/fp/eq'
+import { eqAsset, eqChain } from '../../helpers/fp/eq'
 import { sequenceTOption } from '../../helpers/fpHelpers'
 import { priceFeeAmountForAsset } from '../../services/chain/fees/utils'
 import { SwapFees } from '../../services/chain/types'
 import { PoolAssetDetail, PoolAssetDetails, PoolsDataMap } from '../../services/midgard/types'
+import { WalletBalances } from '../../services/wallet/types'
 import { SlipTolerance } from '../../types/asgardex'
-import { SwapData } from './Swap.types'
-
+import { AssetsToSwap, SwapData } from './Swap.types'
 /**
  * @returns none - neither sourceAsset neither targetAsset is RUNE
  *          some(true) - targetAsset is RUNE
@@ -270,3 +271,54 @@ export const maxAmountToSwapMax1e8 = (assetAmountMax1e8: BaseAmount, feeAmount: 
   const maxAmountToSwap = assetAmountMax1e8.minus(estimatedFee)
   return maxAmountToSwap.gt(baseAmount(0)) ? maxAmountToSwap : baseAmount(0)
 }
+
+export const assetsInWallet: (_: WalletBalances) => Asset[] = FP.flow(A.map(({ asset }) => asset))
+
+export const balancesToSwapFrom = ({
+  assetsToSwap,
+  walletBalances
+}: {
+  assetsToSwap: O.Option<AssetsToSwap>
+  walletBalances: WalletBalances
+}): WalletBalances => {
+  const walletAssets = assetsInWallet(walletBalances)
+
+  const filteredBalances: WalletBalances = FP.pipe(
+    walletBalances,
+    A.filter((balance) => walletAssets.includes(balance.asset)),
+    (balances) => (balances.length ? balances : walletBalances)
+  )
+
+  return FP.pipe(
+    assetsToSwap,
+    O.map(({ source }) =>
+      FP.pipe(
+        filteredBalances,
+        A.filter((balance) => !eqAsset.equals(balance.asset, source))
+      )
+    ),
+    O.getOrElse(() => walletBalances)
+  )
+}
+
+export const hasLedgerInBalancesByAsset = (asset: Asset, balances: WalletBalances): boolean =>
+  FP.pipe(
+    balances,
+    A.findFirst(
+      ({ walletType, asset: balanceAsset }) => eqAsset.equals(asset, balanceAsset) && isLedgerWallet(walletType)
+    ),
+    O.fold(
+      () => false,
+      () => true
+    )
+  )
+
+export const hasLedgerInBalancesByChain = (chain: Chain, balances: WalletBalances): boolean =>
+  FP.pipe(
+    balances,
+    A.findFirst(({ walletType, asset }) => eqChain.equals(chain, asset.chain) && isLedgerWallet(walletType)),
+    O.fold(
+      () => false,
+      () => true
+    )
+  )

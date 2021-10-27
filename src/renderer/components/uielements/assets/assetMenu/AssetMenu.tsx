@@ -7,6 +7,7 @@ import { Network } from '../../../../../shared/api/types'
 import { eqAsset } from '../../../../helpers/fp/eq'
 import { PriceDataIndex } from '../../../../services/midgard/types'
 import { WalletBalance, WalletBalances } from '../../../../services/wallet/types'
+import { AssetWithWalletType } from '../../../../types/asgardex'
 import { FilterMenu } from '../../filterMenu'
 import { AssetData } from '../assetData/AssetData'
 
@@ -21,7 +22,7 @@ export type Props = {
   priceIndex?: PriceDataIndex
   searchDisable: string[]
   withSearch: boolean
-  onSelect: (value: string) => void
+  onSelect: (value: AssetWithWalletType) => void
   closeMenu?: () => void
   searchPlaceholder?: string
   network: Network
@@ -35,7 +36,7 @@ export const AssetMenu: React.FC<Props> = (props): JSX.Element => {
     priceIndex = {},
     withSearch,
     searchDisable = [],
-    onSelect = () => {},
+    onSelect,
     closeMenu,
     network
   } = props
@@ -50,7 +51,7 @@ export const AssetMenu: React.FC<Props> = (props): JSX.Element => {
       const price = baseAmount(priceIndex[asset.ticker])
       const key = assetToString(asset)
       const node = (
-        <Row align={'middle'} gutter={[8, 0]} onClick={() => onSelect(key)}>
+        <Row align={'middle'} gutter={[8, 0]} onClick={() => onSelect({ asset, walletType })}>
           <Col>
             <AssetData asset={asset} price={price} network={network} walletType={walletType} />
           </Col>

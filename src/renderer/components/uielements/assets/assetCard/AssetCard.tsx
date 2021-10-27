@@ -24,6 +24,7 @@ import { ordWalletBalanceByAsset } from '../../../../helpers/fp/ord'
 import { useClickOutside } from '../../../../hooks/useOutsideClick'
 import { PriceDataIndex } from '../../../../services/midgard/types'
 import { WalletBalances } from '../../../../services/wallet/types'
+import { AssetWithWalletType } from '../../../../types/asgardex'
 import { Slider } from '../../slider'
 import { AssetMenu } from '../assetMenu'
 import * as Styled from './AssetCard.styles'
@@ -90,7 +91,7 @@ export const AssetCard: React.FC<Props> = (props): JSX.Element => {
   useClickOutside<HTMLDivElement>(ref, () => setOpenDropdown(false))
 
   const handleChangeAsset = useCallback(
-    (asset: string | Asset) => {
+    ({ asset }: AssetWithWalletType) => {
       const targetAsset = typeof asset === 'string' ? assetFromString(asset) : asset
       if (targetAsset) {
         onChangeAsset(targetAsset)
