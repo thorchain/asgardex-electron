@@ -103,4 +103,14 @@ export const ERC20Whitelist: Asset[] = [
     symbol: "AAVE-0x7Fc66500c84A76Ad7e9c93437bFc5Ac33E2DDaE9",
     ticker: "AAVE",
   },
+  {
+    chain: ETHChain,
+    symbol: "THOR-0xa5f2211B9b8170F694421f2046281775E8468044",
+    ticker: "THOR",
+  },
+  {
+    chain: ETHChain,
+    symbol: "FOX-0xc770eefad204b5180df6a14ee197d99d808ee52d",
+    ticker: "FOX",
+  },
 ];
