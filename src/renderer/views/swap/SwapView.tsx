@@ -22,7 +22,7 @@ import { useEthereumContext } from '../../contexts/EthereumContext'
 import { useMidgardContext } from '../../contexts/MidgardContext'
 import { useWalletContext } from '../../contexts/WalletContext'
 import { isRuneNativeAsset } from '../../helpers/assetHelper'
-import { eqChain } from '../../helpers/fp/eq'
+import { eqChain, eqOAsset } from '../../helpers/fp/eq'
 import { sequenceTOption, sequenceTRD } from '../../helpers/fpHelpers'
 import { liveData } from '../../helpers/rx/liveData'
 import { addressFromOptionalWalletAddress } from '../../helpers/walletHelper'
@@ -215,19 +215,29 @@ export const SwapView: React.FC<Props> = (_): JSX.Element => {
     [targetAssetRD]
   )
 
-  const [oTargetLedgerAddress]: [O.Option<Address>, unknown] = useObservableState(
-    () =>
+  const [oTargetLedgerAddress, routeTargetUpdated] = useObservableState<O.Option<Address>, O.Option<Asset>>(
+    (oRouteTarget$) =>
       FP.pipe(
-        oRouteTarget,
-        O.fold(
-          () => Rx.of(RD.initial),
-          ({ chain }) => getLedgerAddress$(chain, network)
-        ),
-        liveData.map(({ address }) => address),
-        RxOp.switchMap((rdAddress) => Rx.of(RD.toOption(rdAddress)))
+        oRouteTarget$,
+        RxOp.distinctUntilChanged(eqOAsset.equals),
+        RxOp.switchMap((oRouteTarget) =>
+          FP.pipe(
+            oRouteTarget,
+            O.fold(
+              () => Rx.of(RD.initial),
+              ({ chain }) => getLedgerAddress$(chain, network)
+            ),
+            liveData.map(({ address }) => address),
+            RxOp.switchMap((rdAddress) => Rx.of(RD.toOption(rdAddress)))
+          )
+        )
       ),
     O.none
   )
+
+  useEffect(() => {
+    routeTargetUpdated(oRouteTarget)
+  }, [oRouteTarget, routeTargetUpdated])
 
   const { validateSwapAddress } = useValidateAddress(targetAssetChain)
   const openAddressUrl = useOpenAddressUrl(targetAssetChain)
