@@ -17,7 +17,7 @@ type Props = {
 
 export const ConfirmationModal: React.FC<Props> = ({
   visible,
-  onSuccess: onSuccessProp,
+  onSuccess,
   onClose,
   title,
   okText,
@@ -25,16 +25,16 @@ export const ConfirmationModal: React.FC<Props> = ({
   className
 }) => {
   const intl = useIntl()
-  const onSuccess = useCallback(() => {
-    onSuccessProp()
+  const onOkHandler = useCallback(() => {
+    onSuccess()
     onClose()
-  }, [onSuccessProp, onClose])
+  }, [onSuccess, onClose])
   return (
     <Styled.Modal
       className={className}
       title={title || intl.formatMessage({ id: 'common.modal.confirmTitle' })}
       visible={visible}
-      onOk={onSuccess}
+      onOk={onOkHandler}
       onCancel={onClose}
       maskClosable={false}
       closable={false}

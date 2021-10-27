@@ -2,10 +2,9 @@ module.exports = {
   stories: ['../src/renderer/**/*.stories.@(ts|tsx)'],
   addons: [
     '@storybook/preset-create-react-app',
-    '@storybook/addon-actions',
     '@storybook/addon-controls',
-    '@storybook/addon-links',
     '@storybook/addon-viewport',
+    '@storybook/addon-actions',
     '@storybook/addon-knobs',
     '@react-theming/storybook-addon/register'
   ],
@@ -30,7 +29,7 @@ module.exports = {
    * ```
    * @see https://github.com/styleguidist/react-docgen-typescript/issues/356#issuecomment-850400428
    */
-   typescript: {
+  typescript: {
     reactDocgen: 'react-docgen'
-  },
+  }
 }
