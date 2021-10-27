@@ -1409,7 +1409,7 @@ export const Swap = ({
                     <Styled.CheckButton
                       checked={useTargetAssetLedger}
                       clickHandler={() => setUseTargetAssetLedger(() => !useTargetAssetLedger)}
-                      disabled={O.isSome(oTargetLedgerAddress)}>
+                      disabled={O.isNone(oTargetLedgerAddress)}>
                       {intl.formatMessage({ id: 'ledger.title' })}
                     </Styled.CheckButton>
                   </Styled.AssetSelectContainer>

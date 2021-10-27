@@ -218,10 +218,10 @@ export const SwapView: React.FC<Props> = (_): JSX.Element => {
   const [oTargetLedgerAddress]: [O.Option<Address>, unknown] = useObservableState(
     () =>
       FP.pipe(
-        RD.toOption(targetAssetRD),
+        oRouteTarget,
         O.fold(
           () => Rx.of(RD.initial),
-          ({ asset }) => getLedgerAddress$(asset.chain, network)
+          ({ chain }) => getLedgerAddress$(chain, network)
         ),
         liveData.map(({ address }) => address),
         RxOp.switchMap((rdAddress) => Rx.of(RD.toOption(rdAddress)))
