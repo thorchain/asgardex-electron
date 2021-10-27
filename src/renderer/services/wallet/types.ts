@@ -135,9 +135,11 @@ export type BalancesService = {
   dispose: FP.Lazy<void>
 }
 
+export type GetLedgerAddressHandler = (chain: Chain, network: Network) => LedgerAddressLD
+
 export type LedgerService = {
   askLedgerAddress$: (chain: Chain, network: Network, walletIndex: number) => LedgerAddressLD
-  getLedgerAddress$: (chain: Chain, network: Network) => LedgerAddressLD
+  getLedgerAddress$: GetLedgerAddressHandler
   getWalletIndex$: (chain: Chain) => Rx.Observable<number>
   verifyLedgerAddress: (chain: Chain, network: Network, walletIndex?: number) => void
   removeLedgerAddress: (chain: Chain, network: Network) => void

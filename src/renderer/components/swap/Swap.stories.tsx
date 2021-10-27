@@ -101,6 +101,7 @@ const defaultProps: SwapProps = {
     ),
   approveFee$: () => Rx.of(RD.success(baseAmount(10000000))),
   targetWalletAddress: O.some('wallet-address'),
+  targetLedgerAddress: O.some('ledger-address'),
   onChangePath: (path) => console.log('change path', path),
   network: 'testnet',
   slipTolerance: 5,

@@ -1,6 +1,7 @@
 import React, { useCallback, useEffect, useMemo } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
+import { Address } from '@xchainjs/xchain-client'
 import { Asset, assetFromString, AssetRuneNative, bnOrZero, Chain, THORChain } from '@xchainjs/xchain-util'
 import { Spin } from 'antd'
 import * as FP from 'fp-ts/function'
@@ -11,7 +12,6 @@ import { useHistory, useParams } from 'react-router-dom'
 import * as Rx from 'rxjs'
 import * as RxOp from 'rxjs/operators'
 
-import { Network } from '../../../shared/api/types'
 import { SLIP_TOLERANCE_KEY } from '../../components/currency/CurrencyInfo'
 import { ErrorView } from '../../components/shared/error/'
 import { Swap } from '../../components/swap'
@@ -24,8 +24,10 @@ import { useWalletContext } from '../../contexts/WalletContext'
 import { isRuneNativeAsset } from '../../helpers/assetHelper'
 import { eqChain } from '../../helpers/fp/eq'
 import { sequenceTOption, sequenceTRD } from '../../helpers/fpHelpers'
+import { liveData } from '../../helpers/rx/liveData'
 import { addressFromOptionalWalletAddress } from '../../helpers/walletHelper'
 import { useMimirHalt } from '../../hooks/useMimirHalt'
+import { useNetwork } from '../../hooks/useNetwork'
 import { useOpenAddressUrl } from '../../hooks/useOpenAddressUrl'
 import { useOpenExplorerTxUrl } from '../../hooks/useOpenExplorerTxUrl'
 import { useValidateAddress } from '../../hooks/useValidateAddress'
@@ -33,7 +35,7 @@ import { SwapRouteParams } from '../../routes/pools/swap'
 import * as walletRoutes from '../../routes/wallet'
 import { AssetWithDecimalLD, AssetWithDecimalRD } from '../../services/chain/types'
 import { OpenExplorerTxUrl } from '../../services/clients'
-import { DEFAULT_NETWORK, DEFAULT_SLIP_TOLERANCE } from '../../services/const'
+import { DEFAULT_SLIP_TOLERANCE } from '../../services/const'
 import { INITIAL_BALANCES_STATE } from '../../services/wallet/const'
 import { isSlipTolerance, SlipTolerance } from '../../types/asgardex'
 import * as Styled from './SwapView.styles'
@@ -45,8 +47,9 @@ export const SwapView: React.FC<Props> = (_): JSX.Element => {
   const intl = useIntl()
   const history = useHistory()
 
-  const { network$, slipTolerance$, changeSlipTolerance } = useAppContext()
-  const network = useObservableState<Network>(network$, DEFAULT_NETWORK)
+  const { slipTolerance$, changeSlipTolerance } = useAppContext()
+
+  const { network } = useNetwork()
 
   const { service: midgardService } = useMidgardContext()
   const {
@@ -58,6 +61,7 @@ export const SwapView: React.FC<Props> = (_): JSX.Element => {
   const {
     balancesState$,
     reloadBalancesByChain,
+    getLedgerAddress$,
     keystoreService: { keystore$, validatePassword$ }
   } = useWalletContext()
 
@@ -210,6 +214,21 @@ export const SwapView: React.FC<Props> = (_): JSX.Element => {
       ),
     [targetAssetRD]
   )
+
+  const [oTargetLedgerAddress]: [O.Option<Address>, unknown] = useObservableState(
+    () =>
+      FP.pipe(
+        RD.toOption(targetAssetRD),
+        O.fold(
+          () => Rx.of(RD.initial),
+          ({ asset }) => getLedgerAddress$(asset.chain, network)
+        ),
+        liveData.map(({ address }) => address),
+        RxOp.switchMap((rdAddress) => Rx.of(RD.toOption(rdAddress)))
+      ),
+    O.none
+  )
+
   const { validateSwapAddress } = useValidateAddress(targetAssetChain)
   const openAddressUrl = useOpenAddressUrl(targetAssetChain)
 
@@ -250,6 +269,7 @@ export const SwapView: React.FC<Props> = (_): JSX.Element => {
                   reloadApproveFee={reloadApproveFee}
                   approveFee$={approveFee$}
                   targetWalletAddress={targetWalletAddress}
+                  targetLedgerAddress={oTargetLedgerAddress}
                   swap$={swap$}
                   reloadBalances={reloadBalances}
                   onChangePath={onChangePath}

@@ -10,6 +10,7 @@ import { eqLedgerAddressMap } from '../../helpers/fp/eq'
 import { observableState } from '../../helpers/stateHelper'
 import { INITIAL_LEDGER_ADDRESSES_MAP } from './const'
 import {
+  GetLedgerAddressHandler,
   KeystoreState,
   KeystoreState$,
   LedgerAddressesMap,
@@ -55,12 +56,13 @@ export const createLedgerService = ({ keystore$ }: { keystore$: KeystoreState$ }
   /**
    * Get ledger address from memory
    */
-  const getLedgerAddress$ = (chain: Chain, network: Network): LedgerAddressLD =>
+  const getLedgerAddress$: GetLedgerAddressHandler = (chain, network) =>
     FP.pipe(
       ledgerAddresses$,
       RxOp.map((addressesMap) => addressesMap[chain].addresses),
       RxOp.distinctUntilChanged(eqLedgerAddressMap.equals),
-      RxOp.map((addressMap) => addressMap[network])
+      RxOp.map((addressMap) => addressMap[network]),
+      RxOp.map((v) => v)
     )
 
   const getWalletIndex$ = (chain: Chain): Rx.Observable<number> =>

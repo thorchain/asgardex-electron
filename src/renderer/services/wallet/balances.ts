@@ -8,7 +8,6 @@ import * as O from 'fp-ts/lib/Option'
 import * as Rx from 'rxjs'
 import * as RxOp from 'rxjs/operators'
 
-import { Network } from '../../../shared/api/types'
 import { WalletType } from '../../../shared/wallet/types'
 import { getBnbRuneAsset } from '../../helpers/assetHelper'
 import { filterEnabledChains } from '../../helpers/chainHelper'
@@ -34,7 +33,7 @@ import {
   KeystoreState$,
   KeystoreState,
   ChainBalance,
-  LedgerAddressLD
+  GetLedgerAddressHandler
 } from './types'
 import { sortBalances } from './util'
 import { hasImportedKeystore } from './util'
@@ -47,7 +46,7 @@ export const createBalancesService = ({
 }: {
   keystore$: KeystoreState$
   network$: Network$
-  getLedgerAddress$: (chain: Chain, network: Network) => LedgerAddressLD
+  getLedgerAddress$: GetLedgerAddressHandler
   getWalletIndex$: (chain: Chain) => Rx.Observable<number>
 }): BalancesService => {
   // reload all balances
