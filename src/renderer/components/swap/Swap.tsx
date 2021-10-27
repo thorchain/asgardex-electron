@@ -888,7 +888,7 @@ export const Swap = ({
   const renderLedgerConfirmationModal = useMemo(
     () =>
       FP.pipe(
-        oTargetAsset,
+        oSourceAsset,
         O.map(({ chain }) => (
           <LedgerConfirmationModal
             key="leder-conf-modal"
@@ -901,7 +901,7 @@ export const Swap = ({
         O.toNullable
       ),
 
-    [oTargetAsset, onCloseLedgerModal, onSucceedLedgerModal, showLedgerModal]
+    [oSourceAsset, onCloseLedgerModal, onSucceedLedgerModal, showLedgerModal]
   )
 
   const sourceChainFeeError: boolean = useMemo(() => {
