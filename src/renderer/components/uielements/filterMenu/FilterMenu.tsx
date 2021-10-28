@@ -5,8 +5,7 @@ import { MenuProps } from 'antd/lib/menu'
 import { useIntl } from 'react-intl'
 
 import { useClickOutside } from '../../../hooks/useOutsideClick'
-import { Input } from '../input'
-import { Menu, MenuItem } from './FilterMenu.styles'
+import * as Styled from './FilterMenu.styles'
 
 type Props<T> = {
   asset?: string
@@ -63,10 +62,10 @@ export const FilterMenu = <T extends unknown>(props: Props<T>): JSX.Element => {
 
   return (
     <div ref={ref}>
-      <Menu onClick={handleClick}>
+      <Styled.Menu onClick={handleClick}>
         {searchEnabled && (
-          <Menu.Item disabled key="_search">
-            <Input
+          <Styled.Menu.Item disabled key="_search">
+            <Styled.Input
               autoFocus
               value={searchTerm}
               onChange={handleSearchChanged}
@@ -75,19 +74,19 @@ export const FilterMenu = <T extends unknown>(props: Props<T>): JSX.Element => {
               typevalue="ghost"
               suffix={<SearchOutlined />}
             />
-          </Menu.Item>
+          </Styled.Menu.Item>
         )}
         {filteredData.map((item: T) => {
           const { key, node } = cellRenderer(item)
           const disableItem = disableItemFilter(item)
 
           return (
-            <MenuItem disabled={disableItem} key={key}>
+            <Styled.MenuItem disabled={disableItem} key={key}>
               {node}
-            </MenuItem>
+            </Styled.MenuItem>
           )
         })}
-      </Menu>
+      </Styled.Menu>
     </div>
   )
 }

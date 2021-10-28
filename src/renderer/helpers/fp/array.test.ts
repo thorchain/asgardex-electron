@@ -11,10 +11,14 @@ describe('helpers/fp/array', () => {
     })
   })
   describe('unionAssets', () => {
-    it('merges two lists of assets and removes duplicates', () => {
+    it('merges two different lists of assets and removes duplicates', () => {
       const assetsA = [AssetBNB, AssetETH, AssetBTC]
       const assetsB = [AssetBNB, AssetBTC, AssetLTC]
       expect(unionAssets(assetsA)(assetsB)).toEqual([AssetBNB, AssetBTC, AssetLTC, AssetETH])
+    })
+    it('removes duplicates from same list', () => {
+      const assets = [AssetBNB, AssetBNB, AssetETH, AssetETH]
+      expect(unionAssets(assets)(assets)).toEqual([AssetBNB, AssetETH])
     })
   })
 })

@@ -33,9 +33,6 @@ const defaultProps: AssetCardProps = {
   inputOnBlurHandler: () => console.log('onBlur'),
   onChangePercent: (percent) => console.log('percent', percent),
   price: bn(600),
-  priceIndex: {
-    RUNE: bn(1)
-  },
   percentValue: 55,
   maxAmount: assetToBase(assetAmount(10)),
   network: 'testnet'
