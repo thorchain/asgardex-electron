@@ -160,7 +160,7 @@ export const AppView: React.FC = (): JSX.Element => {
                 pausedLPs.length > 0
                   ? `${msg} ${intl.formatMessage({ id: 'halt.chain.pause' }, { chains: pausedLPs.join(', ') })}`
                   : pauseLp
-                  ? `${msg} hello`
+                  ? `${msg} ${intl.formatMessage({ id: 'halt.chain.pauseall' })}`
                   : `${msg}`
             }
 
