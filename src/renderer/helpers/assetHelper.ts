@@ -25,7 +25,14 @@ import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
 
 import { Network } from '../../shared/api/types'
-import { AssetXRune, AssetXRuneTestnet, BinanceBlackList, DEFAULT_PRICE_ASSETS, USD_PRICE_ASSETS } from '../const'
+import {
+  AssetFoxERC20,
+  AssetXRune,
+  AssetXRuneTestnet,
+  BinanceBlackList,
+  DEFAULT_PRICE_ASSETS,
+  USD_PRICE_ASSETS
+} from '../const'
 import { ERC20Whitelist } from '../types/generated/thorchain/erc20whitelist'
 import { PricePoolAsset } from '../views/pools/Pools.types'
 import { getEthChecksumAddress } from './addressHelper'
@@ -149,6 +156,11 @@ export const assetInBinanceBlacklist = (network: Network, asset: Asset): boolean
  */
 export const isXRuneAsset = (asset: Asset): boolean =>
   eqAsset.equals(asset, AssetXRune) || eqAsset.equals(asset, AssetXRuneTestnet)
+
+/**
+ * Check whether an asset is ETH.FOX asset
+ */
+export const isFoxERC20Asset = (asset: Asset): boolean => eqAsset.equals(asset, AssetFoxERC20)
 
 /**
  * Get ethereum token address (as check sum address) from a given asset

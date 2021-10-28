@@ -13,6 +13,7 @@ import {
   isBnbAsset,
   isBtcAsset,
   isEthAsset,
+  isFoxERC20Asset,
   isLtcAsset,
   isRuneBnbAsset,
   isRuneNativeAsset,
@@ -74,6 +75,10 @@ export const AssetIcon: React.FC<Props> = ({
 
     if (isXRuneAsset(asset)) {
       return xRuneIcon
+    }
+
+    if (isFoxERC20Asset(asset)) {
+      return 'https://assets.coincap.io/assets/icons/256/fox.png'
     }
 
     if (network !== 'testnet') {
