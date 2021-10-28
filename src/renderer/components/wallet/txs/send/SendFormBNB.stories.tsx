@@ -14,23 +14,22 @@ import {
 } from '@xchainjs/xchain-util'
 
 import { mockValidatePassword$ } from '../../../../../shared/mock/wallet'
+import { mockWalletBalance } from '../../../../helpers/test/testWalletHelper'
 import { SendTxParams } from '../../../../services/binance/types'
 import { WalletBalance } from '../../../../services/wallet/types'
 import { SendFormBNB, Props as SendFormBNBProps } from './SendFormBNB'
 
-const bnbBalance: WalletBalance = {
-  walletType: 'keystore',
+const bnbBalance: WalletBalance = mockWalletBalance({
   asset: AssetBNB,
   amount: assetToBase(assetAmount(123)),
   walletAddress: 'AssetBNB wallet address'
-}
+})
 
-const runeBalance: WalletBalance = {
-  walletType: 'keystore',
+const runeBalance: WalletBalance = mockWalletBalance({
   asset: AssetRune67C,
   amount: assetToBase(assetAmount(234)),
   walletAddress: 'AssetRune67C wallet address'
-}
+})
 
 const defaultProps: SendFormBNBProps = {
   walletType: 'keystore',

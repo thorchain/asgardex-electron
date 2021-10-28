@@ -27,7 +27,7 @@ export const getAddress = async (
         msg: `Getting 'bech32Address' from Ledger's THORChain App failed`
       })
     }
-    return E.right({ address: bech32Address, chain: THORChain, type: 'ledger' })
+    return E.right({ address: bech32Address, chain: THORChain, type: 'ledger', walletIndex })
   } catch (error) {
     return E.left({
       errorId: LedgerErrorId.GET_ADDRESS_FAILED,

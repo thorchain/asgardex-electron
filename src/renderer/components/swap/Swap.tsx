@@ -39,17 +39,14 @@ import {
   isChainAsset
 } from '../../helpers/assetHelper'
 import { getChainAsset, isEthChain } from '../../helpers/chainHelper'
-import { eqAsset, eqBaseAmount, eqChain, eqOAsset, eqOApproveParams } from '../../helpers/fp/eq'
+import { eqAsset, eqBaseAmount, eqChain, eqOAsset, eqOApproveParams, eqAddress, eqOAddress } from '../../helpers/fp/eq'
 import { sequenceSOption, sequenceTOption } from '../../helpers/fpHelpers'
 import * as PoolHelpers from '../../helpers/poolHelper'
 import { liveData, LiveData } from '../../helpers/rx/liveData'
 import {
   filterWalletBalancesByAssets,
-  getAddressFromBalancesByChain,
   getWalletBalanceByAsset,
-  getWalletBalanceByAssetAndWalletType,
-  getWalletByAddress,
-  isLedgerAddressInBalances
+  getWalletBalanceByAssetAndWalletType
 } from '../../helpers/walletHelper'
 import { useSubscriptionState } from '../../hooks/useSubscriptionState'
 import { swap } from '../../routes/pools'
@@ -132,6 +129,7 @@ export type SwapProps = {
   mimirHalt: MimirHalt
   clickAddressLinkHandler: (address: Address) => void
   addressValidator: AddressValidationAsync
+  targetLedgerAddress: O.Option<Address>
 }
 
 export const Swap = ({
@@ -147,7 +145,7 @@ export const Swap = ({
   reloadFees,
   reloadBalances = FP.constVoid,
   fees$,
-  targetWalletAddress: initialTargetWalletAddress,
+  targetWalletAddress: oInitialTargetWalletAddress,
   onChangePath,
   network,
   slipTolerance,
@@ -160,15 +158,16 @@ export const Swap = ({
   haltedChains,
   mimirHalt,
   clickAddressLinkHandler,
-  addressValidator
+  addressValidator,
+  targetLedgerAddress: oTargetLedgerAddress
 }: SwapProps) => {
   const intl = useIntl()
 
   const lockedWallet = useMemo(() => isLocked(keystore) || !hasImportedKeystore(keystore), [keystore])
 
-  const [targetWalletAddress, setTargetWalletAddress] = useState<O.Option<Address>>(initialTargetWalletAddress)
+  const [oTargetWalletAddress, setTargetWalletAddress] = useState<O.Option<Address>>(oInitialTargetWalletAddress)
   const [editableTargetWalletAddress, setEditableTargetWalletAddress] =
-    useState<O.Option<Address>>(initialTargetWalletAddress)
+    useState<O.Option<Address>>(oInitialTargetWalletAddress)
 
   const { balances: oWalletBalances, loading: walletBalancesLoading } = walletBalances
 
@@ -251,17 +250,18 @@ export const Swap = ({
     [oSourceAsset, allBalances]
   )
 
-  const oTargetWalletType: O.Option<WalletType> = useMemo(
-    () =>
-      FP.pipe(
-        sequenceTOption(oWalletBalances, editableTargetWalletAddress),
-        O.chain(([walletBalances, editableTargetWalletAddress]) =>
-          getWalletByAddress(walletBalances, editableTargetWalletAddress)
-        ),
-        O.map(({ walletType }) => walletType)
-      ),
-    [oWalletBalances, editableTargetWalletAddress]
-  )
+  const oTargetWalletType: O.Option<WalletType> = useMemo(() => {
+    // Check for Ledger
+    if (eqOAddress.equals(editableTargetWalletAddress, oTargetLedgerAddress)) {
+      return O.some('ledger')
+    }
+    // Check for keystore
+    if (eqOAddress.equals(editableTargetWalletAddress, oTargetWalletAddress)) {
+      return O.some('keystore')
+    }
+    // unknown type
+    return O.none
+  }, [editableTargetWalletAddress, oTargetLedgerAddress, oTargetWalletAddress])
 
   // `AssetWB` of source asset - which might be none (user has no balances for this asset or wallet is locked)
   const oSourceAssetWB: O.Option<WalletBalance> = useMemo(
@@ -309,16 +309,6 @@ export const Swap = ({
     [oWalletBalances, sourceChainAsset]
   )
 
-  const hasTargetAssetLedger = useMemo(
-    () =>
-      FP.pipe(
-        oTargetAsset,
-        O.map(({ chain }) => Utils.hasLedgerInBalancesByChain(chain, allBalances)),
-        O.getOrElse(() => false)
-      ),
-    [oTargetAsset, allBalances]
-  )
-
   const {
     state: swapState,
     reset: resetSwapState,
@@ -363,8 +353,9 @@ export const Swap = ({
   }, [swapData.swapResult, targetAssetDecimal])
 
   const oSwapParams: O.Option<SwapTxParams> = useMemo(() => {
+    const oAddress: O.Option<Address> = useTargetAssetLedger ? oTargetLedgerAddress : oTargetWalletAddress
     return FP.pipe(
-      sequenceTOption(assetsToSwap, oPoolAddress, targetWalletAddress, oSourceAssetWB),
+      sequenceTOption(assetsToSwap, oPoolAddress, oAddress, oSourceAssetWB),
       O.map(([{ source, target }, poolAddress, address, { walletType, walletAddress }]) => {
         return {
           poolAddress,
@@ -382,9 +373,11 @@ export const Swap = ({
       })
     )
   }, [
+    useTargetAssetLedger,
+    oTargetWalletAddress,
+    oTargetLedgerAddress,
     assetsToSwap,
     oPoolAddress,
-    targetWalletAddress,
     oSourceAssetWB,
     amountToSwapMax1e8,
     sourceAssetDecimal,
@@ -667,12 +660,13 @@ export const Swap = ({
               // same chain and use its walletAddress as this is a single common wallet
               A.findFirst(({ asset }) => eqChain.equals(asset.chain, availableAsset.chain)),
               // And set available balance amount as Zero Value as user does not have any balances for this asset at all
-              O.map((balance) => [
+              O.map(({ walletType, walletAddress, walletIndex }) => [
                 {
-                  walletType: balance.walletType,
+                  walletType,
                   asset: availableAsset,
-                  walletAddress: balance.walletAddress,
-                  amount: ZERO_BASE_AMOUNT
+                  walletAddress,
+                  amount: ZERO_BASE_AMOUNT,
+                  walletIndex
                 }
               ])
             )
@@ -1251,27 +1245,23 @@ export const Swap = ({
 
   const onChangeTargetAddress = useCallback(
     (address: Address) => {
-      // update state of target addresses
-      setTargetWalletAddress(O.some(address))
-      setEditableTargetWalletAddress(O.some(address))
-
       const useLedger = FP.pipe(
-        oTargetAsset,
-        O.map((asset) => isLedgerAddressInBalances({ balances: allBalances, address, asset })),
+        oTargetLedgerAddress,
+        O.map((ledgerAddress) => eqAddress.equals(ledgerAddress, address)),
         O.getOrElse(() => false)
       )
-
       // whenever target address has been changed,
       // update state of `useTargetAssetLedger`
+      // which will update `targetWalletAddress` / `setEditableTargetWalletAddress` within another `useEffect` handler
       setUseTargetAssetLedger(useLedger)
     },
-    [allBalances, oTargetAsset]
+    [oTargetLedgerAddress]
   )
 
   const renderCustomAddressInput = useMemo(
     () =>
       FP.pipe(
-        sequenceTOption(oTargetAsset, targetWalletAddress),
+        sequenceTOption(oTargetAsset, oTargetWalletAddress),
         O.fold(
           () => <></>,
           ([asset, address]) => (
@@ -1289,7 +1279,7 @@ export const Swap = ({
           )
         )
       ),
-    [oTargetAsset, targetWalletAddress, network, onChangeTargetAddress, addressValidator, clickAddressLinkHandler]
+    [oTargetAsset, oTargetWalletAddress, network, onChangeTargetAddress, addressValidator, clickAddressLinkHandler]
   )
 
   const renderTargetWalletType = useMemo(() => {
@@ -1307,23 +1297,10 @@ export const Swap = ({
    * whenever walletType of the target changed
    */
   useEffect(() => {
-    const walletType = useTargetAssetLedger ? 'ledger' : 'keystore'
-
-    // For targets we don't care about if an user already has balances for the target asset,
-    // but a wallet for targte asset chain needs to be connected
-    const oTargetWalletAddress = FP.pipe(
-      sequenceTOption(oTargetAsset, oWalletBalances),
-      O.chain(([{ chain }, balances]) => getAddressFromBalancesByChain({ balances, chain, walletType }))
-    )
-
-    setTargetWalletAddress(oTargetWalletAddress)
-    setEditableTargetWalletAddress(oTargetWalletAddress)
-
-    // FP.pipe(
-    //   oTargetWalletType,
-    //   O.map((walletType) => console.log('walletType:', walletType))
-    // )
-  }, [oTargetAsset, oWalletBalances, useTargetAssetLedger])
+    const oAddress = useTargetAssetLedger ? oTargetLedgerAddress : oInitialTargetWalletAddress
+    setTargetWalletAddress(oAddress)
+    setEditableTargetWalletAddress(oAddress)
+  }, [oInitialTargetWalletAddress, oTargetLedgerAddress, useTargetAssetLedger])
 
   return (
     <Styled.Container>
@@ -1416,7 +1393,7 @@ export const Swap = ({
                     <Styled.CheckButton
                       checked={useTargetAssetLedger}
                       clickHandler={() => setUseTargetAssetLedger(() => !useTargetAssetLedger)}
-                      disabled={!hasTargetAssetLedger}>
+                      disabled={O.isNone(oTargetLedgerAddress)}>
                       {intl.formatMessage({ id: 'ledger.title' })}
                     </Styled.CheckButton>
                   </Styled.AssetSelectContainer>

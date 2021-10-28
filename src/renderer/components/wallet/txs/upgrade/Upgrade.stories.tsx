@@ -2,15 +2,7 @@ import React from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
 import { Story, Meta } from '@storybook/react'
-import {
-  assetAmount,
-  AssetBNB,
-  AssetRune67C,
-  AssetRuneNative,
-  assetToBase,
-  baseAmount,
-  BNBChain
-} from '@xchainjs/xchain-util'
+import { assetAmount, AssetBNB, AssetRune67C, assetToBase, baseAmount, BNBChain } from '@xchainjs/xchain-util'
 import * as NEA from 'fp-ts/lib/NonEmptyArray'
 import * as O from 'fp-ts/lib/Option'
 import * as Rx from 'rxjs'
@@ -18,6 +10,7 @@ import * as RxOp from 'rxjs/operators'
 
 import { mockValidatePassword$ } from '../../../../../shared/mock/wallet'
 import { BNB_DECIMAL } from '../../../../helpers/assetHelper'
+import { mockWalletBalance } from '../../../../helpers/test/testWalletHelper'
 import { INITIAL_UPGRADE_RUNE_STATE } from '../../../../services/chain/const'
 import { UpgradeRuneParams, UpgradeRuneTxState, UpgradeRuneTxState$ } from '../../../../services/chain/types'
 import { ErrorId } from '../../../../services/wallet/types'
@@ -32,29 +25,21 @@ const mockTxState$ = (states: UpgradeRuneTxState[]): UpgradeRuneTxState$ =>
     RxOp.startWith(INITIAL_UPGRADE_RUNE_STATE)
   )
 
-const bnbBalance: WalletBalance = {
-  walletType: 'keystore',
-  walletIndex: 0,
+const bnbBalance: WalletBalance = mockWalletBalance({
   asset: AssetBNB,
   amount: assetToBase(assetAmount(1001)),
   walletAddress: 'BNB address'
-}
+})
 
-const runeBnbBalance: WalletBalance = {
-  walletType: 'keystore',
-  walletIndex: 0,
+const runeBnbBalance: WalletBalance = mockWalletBalance({
   asset: AssetRune67C,
   amount: assetToBase(assetAmount(2002)),
   walletAddress: 'BNB.Rune address'
-}
+})
 
-const runeNativeBalance: WalletBalance = {
-  walletType: 'keystore',
-  walletIndex: 0,
-  asset: AssetRuneNative,
-  amount: assetToBase(assetAmount(0)),
-  walletAddress: 'Rune native address'
-}
+const runeNativeBalance: WalletBalance = mockWalletBalance({
+  amount: assetToBase(assetAmount(0))
+})
 
 const getBalances = (balances: WalletBalances) => NEA.fromArray<WalletBalance>(balances)
 

@@ -1,12 +1,4 @@
-import {
-  assetToBase,
-  AssetRuneNative,
-  AssetBNB,
-  AssetLTC,
-  assetAmount,
-  BNBChain,
-  THORChain
-} from '@xchainjs/xchain-util'
+import { assetToBase, AssetRuneNative, AssetBNB, AssetLTC, assetAmount } from '@xchainjs/xchain-util'
 import * as FP from 'fp-ts/lib/function'
 import * as NEA from 'fp-ts/lib/NonEmptyArray'
 import * as O from 'fp-ts/lib/Option'
@@ -18,7 +10,6 @@ import { eqWalletBalances } from './fp/eq'
 import { mockWalletBalance } from './test/testWalletHelper'
 import {
   filterWalletBalancesByAssets,
-  getAddressFromBalancesByChain,
   getAssetAmountByAsset,
   getBnbAmountFromBalances,
   getLtcAmountFromBalances,
@@ -153,29 +144,6 @@ describe('walletHelper', () => {
     it('returns none if BNB wallet address is not available', () => {
       const balances: WalletBalances = NEA.fromReadonlyNonEmptyArray([BOLT_WB, BNB_WB])
       const result = getWalletByAddress(balances, RUNE_WB.walletAddress)
-      expect(result).toBeNone()
-    })
-  })
-
-  describe('getAddressFromBalancesByChain', () => {
-    it('address of BOLT keystore ', () => {
-      const balances = NEA.fromReadonlyNonEmptyArray([RUNE_WB, BOLT_WB, BNB_WB])
-      const result = getAddressFromBalancesByChain({ balances, chain: BNBChain, walletType: 'keystore' })
-      expect(O.toNullable(result)).toEqual('bolt-address')
-    })
-    it('address of THOR keystore ', () => {
-      const balances = NEA.fromReadonlyNonEmptyArray([RUNE_WB, BOLT_WB, BNB_WB])
-      const result = getAddressFromBalancesByChain({ balances, chain: THORChain, walletType: 'keystore' })
-      expect(O.toNullable(result)).toEqual('thor-address')
-    })
-    it('address of THOR ledger ', () => {
-      const balances = NEA.fromReadonlyNonEmptyArray([RUNE_WB, BOLT_WB, BNB_WB, RUNE_LEDGER_WB])
-      const result = getAddressFromBalancesByChain({ balances, chain: THORChain, walletType: 'ledger' })
-      expect(O.toNullable(result)).toEqual('thor-ledger-address')
-    })
-    it('no address of THOR ledger ', () => {
-      const balances = NEA.fromReadonlyNonEmptyArray([RUNE_WB, BNB_WB])
-      const result = getAddressFromBalancesByChain({ balances, chain: THORChain, walletType: 'ledger' })
       expect(result).toBeNone()
     })
   })

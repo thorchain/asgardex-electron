@@ -22,39 +22,14 @@ export const INITIAL_LOAD_TXS_PROPS: LoadTxsParams = {
 export const EMPTY_LOAD_TXS_HANDLER: LoadTxsHandler = (_: LoadTxsParams) => {}
 
 export const INITIAL_LEDGER_ADDRESS_MAP: LedgerAddressMap = { mainnet: RD.initial, testnet: RD.initial }
-export const INITIAL_WALLET_INDEX = 0
 
 export const INITIAL_LEDGER_ADDRESSES_MAP: LedgerAddressesMap = {
-  [Chain.Binance]: {
-    addresses: INITIAL_LEDGER_ADDRESS_MAP,
-    walletIndex: INITIAL_WALLET_INDEX
-  },
-  [Chain.Bitcoin]: {
-    addresses: INITIAL_LEDGER_ADDRESS_MAP,
-    walletIndex: INITIAL_WALLET_INDEX
-  },
-  [Chain.BitcoinCash]: {
-    addresses: INITIAL_LEDGER_ADDRESS_MAP,
-    walletIndex: INITIAL_WALLET_INDEX
-  },
-  [Chain.Ethereum]: {
-    addresses: INITIAL_LEDGER_ADDRESS_MAP,
-    walletIndex: INITIAL_WALLET_INDEX
-  },
-  [Chain.Cosmos]: {
-    addresses: INITIAL_LEDGER_ADDRESS_MAP,
-    walletIndex: INITIAL_WALLET_INDEX
-  },
-  [Chain.Polkadot]: {
-    addresses: INITIAL_LEDGER_ADDRESS_MAP,
-    walletIndex: INITIAL_WALLET_INDEX
-  },
-  [Chain.Litecoin]: {
-    addresses: INITIAL_LEDGER_ADDRESS_MAP,
-    walletIndex: INITIAL_WALLET_INDEX
-  },
-  [Chain.THORChain]: {
-    addresses: INITIAL_LEDGER_ADDRESS_MAP,
-    walletIndex: INITIAL_WALLET_INDEX
-  }
+  [Chain.Binance]: INITIAL_LEDGER_ADDRESS_MAP,
+  [Chain.Bitcoin]: INITIAL_LEDGER_ADDRESS_MAP,
+  [Chain.BitcoinCash]: INITIAL_LEDGER_ADDRESS_MAP,
+  [Chain.Ethereum]: INITIAL_LEDGER_ADDRESS_MAP,
+  [Chain.Cosmos]: INITIAL_LEDGER_ADDRESS_MAP,
+  [Chain.Polkadot]: INITIAL_LEDGER_ADDRESS_MAP,
+  [Chain.Litecoin]: INITIAL_LEDGER_ADDRESS_MAP,
+  [Chain.THORChain]: INITIAL_LEDGER_ADDRESS_MAP
 }

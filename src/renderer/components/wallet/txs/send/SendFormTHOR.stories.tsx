@@ -4,7 +4,6 @@ import * as RD from '@devexperts/remote-data-ts'
 import { Story, Meta } from '@storybook/react'
 import {
   assetAmount,
-  AssetRuneNative,
   assetToBase,
   assetToString,
   baseAmount,
@@ -13,16 +12,14 @@ import {
 } from '@xchainjs/xchain-util'
 
 import { mockValidatePassword$ } from '../../../../../shared/mock/wallet'
+import { mockWalletBalance } from '../../../../helpers/test/testWalletHelper'
 import { SendTxParams } from '../../../../services/binance/types'
 import { WalletBalance } from '../../../../services/wallet/types'
 import { SendFormTHOR as Component, Props as ComponentProps } from './SendFormTHOR'
 
-const runeBalance: WalletBalance = {
-  walletType: 'keystore',
-  asset: AssetRuneNative,
-  amount: assetToBase(assetAmount(2)),
-  walletAddress: 'rune wallet address'
-}
+const runeBalance: WalletBalance = mockWalletBalance({
+  amount: assetToBase(assetAmount(2))
+})
 
 const defaultProps: ComponentProps = {
   walletType: 'keystore',

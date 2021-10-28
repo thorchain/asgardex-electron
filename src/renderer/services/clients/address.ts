@@ -22,7 +22,16 @@ export const addressUI$: (client$: XChainClient$, chain: Chain) => WalletAddress
       )
     ),
     RxOp.distinctUntilChanged(eqOString.equals),
-    RxOp.map(FP.flow(O.map<Address, WalletAddress>((address) => ({ address, chain, type: 'keystore' })))),
+    RxOp.map(
+      FP.flow(
+        O.map<Address, WalletAddress>((address) => ({
+          address,
+          chain,
+          type: 'keystore',
+          walletIndex: 0 /* As long as we don't have HD wallets introduced, keystore will be always 0 */
+        }))
+      )
+    ),
     RxOp.shareReplay(1)
   )
 

@@ -23,6 +23,7 @@ import { BNB_TRANSFER_FEES } from '../../../../../shared/mock/fees'
 import { RDStatus, getMockRDValueFactory } from '../../../../../shared/mock/rdByStatus'
 import { mockValidatePassword$ } from '../../../../../shared/mock/wallet'
 import { WalletType } from '../../../../../shared/wallet/types'
+import { mockWalletBalance } from '../../../../helpers/test/testWalletHelper'
 import { SendTxParams } from '../../../../services/binance/types'
 import { WalletBalances } from '../../../../services/clients'
 import { ErrorId, TxHashRD, WalletBalance } from '../../../../services/wallet/types'
@@ -43,40 +44,35 @@ const defaultProps = {
   errorActionHandler: () => console.log('error action')
 }
 
-const bnbAsset: WalletBalance = {
-  walletType: 'keystore',
+const bnbAsset: WalletBalance = mockWalletBalance({
   asset: AssetBNB,
   amount: assetToBase(assetAmount(12.3)),
   walletAddress: 'AssetBNB wallet address'
-}
+})
 
-const btcBalance: WalletBalance = {
-  walletType: 'keystore',
+const btcBalance: WalletBalance = mockWalletBalance({
   asset: AssetBTC,
   amount: assetToBase(assetAmount(23.45, BTC_DECIMAL)),
   walletAddress: 'btc wallet address'
-}
+})
 
-const runeAsset: WalletBalance = {
-  walletType: 'keystore',
+const runeAsset: WalletBalance = mockWalletBalance({
   asset: AssetRune67C,
   amount: assetToBase(assetAmount(34.56)),
   walletAddress: 'AssetRune67C wallet address'
-}
+})
 
-const ethBalance: WalletBalance = {
-  walletType: 'keystore',
+const ethBalance: WalletBalance = mockWalletBalance({
   asset: AssetETH,
   amount: assetToBase(assetAmount(45.67)),
   walletAddress: 'AssetETH wallet address'
-}
+})
 
-const ltcBalance: WalletBalance = {
-  walletType: 'keystore',
+const ltcBalance: WalletBalance = mockWalletBalance({
   asset: AssetLTC,
   amount: assetToBase(assetAmount(56.78)),
   walletAddress: 'AssetLTC wallet address'
-}
+})
 
 const SendFormsComponents = {
   SendFormBNB: {

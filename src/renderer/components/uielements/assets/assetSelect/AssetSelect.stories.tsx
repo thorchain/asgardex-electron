@@ -1,31 +1,27 @@
 import React from 'react'
 
 import { Meta, Story } from '@storybook/react'
-import { AssetBNB, AssetBTC, AssetRuneNative, baseAmount, bn } from '@xchainjs/xchain-util'
+import { AssetBNB, AssetBTC, bn } from '@xchainjs/xchain-util'
 import * as FP from 'fp-ts/lib/function'
 
 import { Network } from '../../../../../shared/api/types'
 import { WalletType } from '../../../../../shared/wallet/types'
+import { mockWalletBalance } from '../../../../helpers/test/testWalletHelper'
 import { WalletBalance } from '../../../../services/wallet/types'
 import { AssetSelect } from './AssetSelect'
 
-const balanceBNB: WalletBalance = {
+const balanceBNB: WalletBalance = mockWalletBalance({
   walletType: 'ledger',
-  amount: baseAmount('1'),
   asset: AssetBNB,
-  walletAddress: ''
-}
+  walletAddress: 'bnb-ledger-address'
+})
 
-const balanceBTC: WalletBalance = {
-  ...balanceBNB,
-  asset: AssetBTC
-}
+const balanceBTC: WalletBalance = mockWalletBalance({
+  asset: AssetBTC,
+  walletAddress: 'btc-address'
+})
 
-const balanceRuneNative: WalletBalance = {
-  ...balanceBNB,
-  walletType: 'keystore',
-  asset: AssetRuneNative
-}
+const balanceRuneNative: WalletBalance = mockWalletBalance()
 
 const balances = [balanceBNB, balanceBTC, balanceRuneNative]
 

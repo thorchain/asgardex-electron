@@ -55,13 +55,15 @@ const balances: Partial<Record<Chain, ChainBalances>> = {
           walletType: 'keystore',
           amount: baseAmount('1000000'),
           asset: AssetBNB,
-          walletAddress: 'BNB wallet address'
+          walletAddress: 'BNB wallet address',
+          walletIndex: 0
         },
         {
           walletType: 'keystore',
           amount: baseAmount('300000000'),
           asset: AssetRune67C,
-          walletAddress: 'BNB wallet address'
+          walletAddress: 'BNB wallet address',
+          walletIndex: 0
         }
       ])
     }
@@ -77,7 +79,8 @@ const balances: Partial<Record<Chain, ChainBalances>> = {
           walletType: 'keystore',
           amount: baseAmount('1000000'),
           asset: AssetBTC,
-          walletAddress: 'BNB wallet address'
+          walletAddress: 'BNB wallet address',
+          walletIndex: 0
         }
       ])
     }
@@ -93,7 +96,8 @@ const balances: Partial<Record<Chain, ChainBalances>> = {
           walletType: 'keystore',
           amount: baseAmount('300000000'),
           asset: AssetETH,
-          walletAddress: 'ETH wallet address'
+          walletAddress: 'ETH wallet address',
+          walletIndex: 0
         }
       ])
     }
@@ -109,7 +113,8 @@ const balances: Partial<Record<Chain, ChainBalances>> = {
           walletType: 'keystore',
           amount: baseAmount('1000000'),
           asset: AssetRuneNative,
-          walletAddress: 'BNB wallet address'
+          walletAddress: 'BNB wallet address',
+          walletIndex: 0
         }
       ])
     }
@@ -125,7 +130,8 @@ const balances: Partial<Record<Chain, ChainBalances>> = {
           walletType: 'keystore',
           amount: baseAmount('1000000'),
           asset: AssetLTC,
-          walletAddress: 'LTC wallet address'
+          walletAddress: 'LTC wallet address',
+          walletIndex: 0
         }
       ])
     }

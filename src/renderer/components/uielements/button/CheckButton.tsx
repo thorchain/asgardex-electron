@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useEffect } from 'react'
+import React, { useState, useCallback } from 'react'
 
 import * as FP from 'fp-ts/function'
 
@@ -15,10 +15,6 @@ export const CheckButton: React.FC<Props> = (props): JSX.Element => {
   const { clickHandler = FP.constVoid, disabled, checked, className, children } = props
 
   const [isChecked, setChecked] = useState(checked)
-
-  useEffect(() => {
-    setChecked(checked)
-  }, [checked])
 
   const onClickHandler = useCallback(() => {
     setChecked(() => !isChecked)

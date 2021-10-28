@@ -319,7 +319,7 @@ export const AssetsTableCollapsable: React.FC<Props> = (props): JSX.Element => {
   // Panel
   const renderPanel = useCallback(
     (
-      { chain, walletType, walletIndex, walletAddress: oWalletAddress, balances: balancesRD }: ChainBalance,
+      { chain, walletType, walletAddress: oWalletAddress, balances: balancesRD, walletIndex }: ChainBalance,
       key: number
     ) => {
       /**
@@ -397,7 +397,7 @@ export const AssetsTableCollapsable: React.FC<Props> = (props): JSX.Element => {
             index: key,
             oWalletAddress,
             walletType,
-            walletIndex: walletIndex ? walletIndex : 0
+            walletIndex
           })}
         </Panel>
       )
