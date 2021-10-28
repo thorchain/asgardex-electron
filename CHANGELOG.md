@@ -1,4 +1,4 @@
-# 0.5.0 (2021-10-27)
+# 0.5.0 (2021-10-28)
 
 ## Add
 
@@ -20,6 +20,7 @@
 - Update AssetData|Menu|Select components to show wallet type [#1867](https://github.com/thorchain/asgardex-electron/pull/1867)
 - [Header] Make rune price visible for smaller window sizes [#1880](https://github.com/thorchain/asgardex-electron/pull/1880)
 - [Header] Tooltip to explain VOLUME (24h) [#1885](https://github.com/thorchain/asgardex-electron/pull/1885)
+- [ERC] Update whitelist (incl. icon support for ETH.THOR, ETH.FOX) [#1894](https://github.com/thorchain/asgardex-electron/issues/1894), [#1896](https://github.com/thorchain/asgardex-electron/issues/1896)
 
 ## Fix
 
