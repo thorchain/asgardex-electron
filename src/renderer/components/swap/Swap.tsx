@@ -1252,11 +1252,8 @@ export const Swap = ({
       )
       // whenever target address has been changed,
       // update state of `useTargetAssetLedger`
+      // which will update `targetWalletAddress` / `setEditableTargetWalletAddress` within another `useEffect` handler
       setUseTargetAssetLedger(useLedger)
-
-      // update state of target addresses
-      // setTargetWalletAddress(O.some(address))
-      // setEditableTargetWalletAddress(O.some(address))
     },
     [oTargetLedgerAddress]
   )
@@ -1307,8 +1304,6 @@ export const Swap = ({
 
   return (
     <Styled.Container>
-      <div>oTargetLedgerAddress {JSON.stringify(oTargetLedgerAddress, null, 2)}</div>
-      <div>oTargetWalletAddress {JSON.stringify(oTargetWalletAddress, null, 2)}</div>
       <Styled.ContentContainer>
         <Styled.Header>
           {FP.pipe(
