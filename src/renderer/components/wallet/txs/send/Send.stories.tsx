@@ -125,11 +125,13 @@ const defaultComponentProps = {
   balances,
   balance: bnbAsset,
   feesWithRates: RD.success({ fees, rates }),
-  onSubmit: ({ recipient, amount, asset, memo }: SendTxParams) =>
+  onSubmit: ({ recipient, amount, asset, memo, walletIndex, walletType }: SendTxParams) =>
     console.log(
       `to: ${recipient}, amount ${formatAssetAmount({ amount: baseToAsset(amount) })}, asset: ${assetToString(
         asset
-      )}, memo: ${memo}`
+      )}, memo: ${memo},
+      walletType: ${walletType},
+      walletIndex: ${walletIndex}`
     ),
 
   isLoading: false,

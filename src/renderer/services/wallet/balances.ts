@@ -93,14 +93,14 @@ export const createBalancesService = ({
         return {
           reloadBalances: BTC.reloadBalances,
           resetReloadBalances: BTC.resetReloadBalances,
-          balances$: BTC.balances$(walletType),
+          balances$: BTC.balances$(walletType, walletIndex),
           reloadBalances$: BTC.reloadBalances$
         }
       case BCHChain:
         return {
           reloadBalances: BCH.reloadBalances,
           resetReloadBalances: BCH.resetReloadBalances,
-          balances$: BCH.balances$(walletType),
+          balances$: BCH.balances$(walletType, walletIndex),
           reloadBalances$: BCH.reloadBalances$
         }
       case ETHChain:
@@ -109,7 +109,7 @@ export const createBalancesService = ({
           resetReloadBalances: ETH.resetReloadBalances,
           balances$: FP.pipe(
             network$,
-            RxOp.switchMap((network) => ETH.balances$({ walletType, network }))
+            RxOp.switchMap((network) => ETH.balances$({ walletType, network, walletIndex }))
           ),
           reloadBalances$: ETH.reloadBalances$
         }
@@ -117,14 +117,14 @@ export const createBalancesService = ({
         return {
           reloadBalances: THOR.reloadBalances,
           resetReloadBalances: THOR.resetReloadBalances,
-          balances$: THOR.balances$(walletType),
+          balances$: THOR.balances$(walletType, walletIndex),
           reloadBalances$: THOR.reloadBalances$
         }
       case LTCChain:
         return {
           reloadBalances: LTC.reloadBalances,
           resetReloadBalances: LTC.resetReloadBalances,
-          balances$: LTC.balances$(walletType),
+          balances$: LTC.balances$(walletType, walletIndex),
           reloadBalances$: LTC.reloadBalances$
         }
       default:
@@ -215,7 +215,15 @@ export const createBalancesService = ({
    */
   const ledgerChainBalance$ = (
     chain: Chain,
-    getBalanceByAddress$: (address: Address, walletType: WalletType) => WalletBalancesLD
+    getBalanceByAddress$: ({
+      address,
+      walletType,
+      walletIndex
+    }: {
+      address: Address
+      walletType: WalletType
+      walletIndex: number
+    }) => WalletBalancesLD
   ): ChainBalance$ =>
     FP.pipe(
       network$,
@@ -239,7 +247,7 @@ export const createBalancesService = ({
               // Load balances by given Ledger address
               // and put it's RD state into `balances` of `ChainBalance`
               FP.pipe(
-                getBalanceByAddress$(address, 'ledger'),
+                getBalanceByAddress$({ address, walletType: 'ledger', walletIndex }),
                 RxOp.map<WalletBalancesRD, ChainBalance>((balances) => ({
                   walletType: 'ledger',
                   walletIndex,

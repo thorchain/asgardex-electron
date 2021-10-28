@@ -54,6 +54,7 @@ export type SendTxParams = {
   amount: BaseAmount
   asset: Asset
   memo?: string
+  walletIndex: number
 }
 
 export type TransactionService = C.TransactionService<SendTxParams>

@@ -124,6 +124,7 @@ export type SwapTxParams = {
   readonly memo: string
   readonly walletType: WalletType
   readonly sender: Address
+  readonly walletIndex: number
 }
 
 export type SwapStateHandler = (p: SwapTxParams) => SwapState$

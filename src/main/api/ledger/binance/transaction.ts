@@ -20,7 +20,7 @@ export const send = async ({
   amount,
   asset,
   memo,
-  walletIndex = 0
+  walletIndex
 }: {
   transport: Transport
   amount: BaseAmount
@@ -34,7 +34,9 @@ export const send = async ({
   try {
     const clientNetwork = toClientNetwork(network)
     const prefix = getPrefix(clientNetwork)
+    console.log('walletIndex:', walletIndex)
     const derivePath = getDerivePath(walletIndex)
+    console.log('derivePath:', derivePath)
 
     const app = new LedgerApp(transport)
     const client = new Client({ network: clientNetwork })
