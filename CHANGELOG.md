@@ -1,3 +1,9 @@
+# 0.4.5 (2021-10-28)
+
+## Fix
+
+- [Mimir] Consider mimir//PAUSELP [#1902](https://github.com/thorchain/asgardex-electron/issues/1902)
+
 # 0.4.4 (2021-10-12)
 
 ## Add
