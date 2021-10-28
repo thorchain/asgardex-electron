@@ -245,13 +245,14 @@ export const disableTradingActions = ({
 export const disablePoolActions = ({
   chain,
   haltedChains,
-  mimirHalt: { pauseLpBnb, pauseLpBch, pauseLpBtc, pauseLpEth, pauseLpLtc }
+  mimirHalt: { pauseLp, pauseLpBnb, pauseLpBch, pauseLpBtc, pauseLpEth, pauseLpLtc }
 }: {
   chain: Chain
   haltedChains: Chain[]
   mimirHalt: MimirPauseLP
 }) => {
   // Check all `pauseLp{chain}` values (provided by `mimir` endpoint) to disable pool actions
+  if (pauseLp) return true
   if (isBnbChain(chain) && pauseLpBnb) return true
   if (isBchChain(chain) && pauseLpBch) return true
   if (isBtcChain(chain) && pauseLpBtc) return true

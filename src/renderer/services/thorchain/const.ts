@@ -21,6 +21,7 @@ export const DEFAULT_MIMIR_HALT: MimirHalt = {
   haltLtcTrading: false,
   haltBnbChain: false,
   haltBnbTrading: false,
+  pauseLp: false,
   pauseLpBnb: false,
   pauseLpBch: false,
   pauseLpBtc: false,
