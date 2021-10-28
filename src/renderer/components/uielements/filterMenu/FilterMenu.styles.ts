@@ -2,6 +2,8 @@ import { Menu as AntdMenu } from 'antd'
 import styled from 'styled-components'
 import { palette } from 'styled-theme'
 
+import { Input as InputUI } from '../input'
+
 const { Item } = AntdMenu
 // export const MenuItem = styled<MenuProps & MenuItemProps>(AntdMenu.Item)`
 export const MenuItem = styled(Item)`
@@ -37,4 +39,8 @@ export const Menu = styled(AntdMenu)`
       color: ${palette('text', 0)};
     }
   }
+`
+
+export const Input = styled(InputUI)`
+  width: 150px;
 `

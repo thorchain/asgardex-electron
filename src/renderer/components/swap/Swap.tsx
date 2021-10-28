@@ -39,7 +39,8 @@ import {
   isChainAsset
 } from '../../helpers/assetHelper'
 import { getChainAsset, isEthChain } from '../../helpers/chainHelper'
-import { eqAsset, eqBaseAmount, eqChain, eqOAsset, eqOApproveParams, eqAddress, eqOAddress } from '../../helpers/fp/eq'
+import { unionAssets } from '../../helpers/fp/array'
+import { eqAsset, eqBaseAmount, eqOAsset, eqOApproveParams, eqAddress, eqOAddress } from '../../helpers/fp/eq'
 import { sequenceSOption, sequenceTOption } from '../../helpers/fpHelpers'
 import * as PoolHelpers from '../../helpers/poolHelper'
 import { liveData, LiveData } from '../../helpers/rx/liveData'
@@ -84,7 +85,7 @@ import {
   WalletBalances
 } from '../../services/wallet/types'
 import { hasImportedKeystore, isLocked } from '../../services/wallet/util'
-import { AssetWithDecimal, AssetWithWalletType, SlipTolerance } from '../../types/asgardex'
+import { AssetWithDecimal, SlipTolerance } from '../../types/asgardex'
 import { CurrencyInfo } from '../currency'
 import { LedgerConfirmationModal } from '../modal/confirmation'
 import { PasswordModal } from '../modal/password'
@@ -499,7 +500,7 @@ export const Swap = ({
   const [swapStartTime, setSwapStartTime] = useState<number>(0)
 
   const setSourceAsset = useCallback(
-    async ({ asset }: AssetWithWalletType) => {
+    async (asset: Asset) => {
       // delay to avoid render issues while switching
       await delay(100)
 
@@ -519,7 +520,7 @@ export const Swap = ({
   )
 
   const setTargetAsset = useCallback(
-    async ({ asset }: AssetWithWalletType) => {
+    async (asset: Asset) => {
       // delay to avoid render issues while switching
       await delay(100)
 
@@ -613,69 +614,56 @@ export const Swap = ({
     [maxAmountToSwapMax1e8, setAmountToSwapMax1e8, sourceAssetAmountMax1e8.decimal]
   )
 
-  const balancesToSwapFrom = useMemo((): WalletBalances => {
-    return FP.pipe(
-      assetsToSwap,
-      O.map(({ source, target }) =>
-        FP.pipe(
-          allBalances,
-          A.filter((balance) => !eqAsset.equals(balance.asset, source) && !eqAsset.equals(balance.asset, target))
-        )
-      ),
-      O.getOrElse(() => allBalances)
-    )
-  }, [assetsToSwap, allBalances])
-
-  const balancesToSwapTo = useMemo((): WalletBalances => {
-    const allBalances = FP.pipe(
-      oWalletBalances,
-      O.getOrElse((): WalletBalances => [])
-    )
-
-    return FP.pipe(
-      allAssets,
-      A.filter((asset) =>
-        FP.pipe(
-          assetsToSwap,
-          O.map(({ source, target }) => !eqAsset.equals(asset, source) && !eqAsset.equals(asset, target)),
-          O.getOrElse((): boolean => false)
-        )
-      ),
-      A.filterMap((availableAsset) =>
-        FP.pipe(
-          allBalances,
-          // Looking for asset's balances. Possible duplications of assets caused by different WalletTypes
-          A.filter(({ asset }) => eqAsset.equals(asset, availableAsset)),
-          NEA.fromArray,
-          O.alt(() =>
-            /*
-             * !!! IMPORTANT NOTE !!!
-             * Right now this peace of code will work incorrectly in case
-             * of adding another wallet types (e.g. Ledger).
-             * TODO (@asgardex-team) play around with a way to handle different wallet-types
-             * */
-            FP.pipe(
-              allBalances,
-              // If there was not found any WalletBalance get the first asset with the
-              // same chain and use its walletAddress as this is a single common wallet
-              A.findFirst(({ asset }) => eqChain.equals(asset.chain, availableAsset.chain)),
-              // And set available balance amount as Zero Value as user does not have any balances for this asset at all
-              O.map(({ walletType, walletAddress, walletIndex }) => [
-                {
-                  walletType,
-                  asset: availableAsset,
-                  walletAddress,
-                  amount: ZERO_BASE_AMOUNT,
-                  walletIndex
-                }
-              ])
-            )
+  /**
+   * Selectable source assets to swap from.
+   *
+   * Based on users balances.
+   * Zero balances are ignored.
+   * Duplications of assets are merged.
+   */
+  const selectAbleSourceAssets: Asset[] = useMemo(
+    () =>
+      FP.pipe(
+        assetsToSwap,
+        O.map(({ source, target }) =>
+          FP.pipe(
+            allBalances,
+            // get asset
+            A.map(({ asset }) => asset),
+            // Ignore already selected source / target assets
+            A.filter((asset) => !eqAsset.equals(asset, source) && !eqAsset.equals(asset, target)),
+            // Merge duplications
+            (assets) => unionAssets(assets)(assets)
           )
-        )
+        ),
+        O.getOrElse<Asset[]>(() => [])
       ),
-      A.flatten
-    )
-  }, [oWalletBalances, allAssets, assetsToSwap])
+    [assetsToSwap, allBalances]
+  )
+
+  /**
+   * Selectable source assets to swap from.
+   *
+   * Based on available pool assets.
+   * Duplications of assets are merged.
+   */
+  const selectAbleTargetAssets = useMemo(
+    (): Asset[] =>
+      FP.pipe(
+        assetsToSwap,
+        O.map(({ source, target }) =>
+          FP.pipe(
+            allAssets,
+            // Ignore already selected source / target assets
+            A.filter((asset) => !eqAsset.equals(asset, source) && !eqAsset.equals(asset, target)),
+            // Merge duplications
+            (assets) => unionAssets(assets)(assets)
+          )
+        ),
+        O.getOrElse<Asset[]>(() => [])
+      ),
+    [allAssets, assetsToSwap]
+  )
 
   const [showPasswordModal, setShowPasswordModal] = useState(false)
   const [showLedgerModal, setShowLedgerModal] = useState(false)
@@ -1350,7 +1338,7 @@ export const Swap = ({
                     <Styled.AssetSelect
                       onSelect={setSourceAsset}
                       asset={asset}
-                      balances={balancesToSwapFrom}
+                      assets={selectAbleSourceAssets}
                       network={network}
                     />
 
@@ -1387,7 +1375,7 @@ export const Swap = ({
                     <Styled.TargetAssetSelect
                       onSelect={setTargetAsset}
                       asset={asset}
-                      balances={balancesToSwapTo}
+                      assets={selectAbleTargetAssets}
                       network={network}
                     />
                     <Styled.CheckButton

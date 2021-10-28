@@ -1,34 +1,11 @@
 import React from 'react'
 
 import { Meta, Story } from '@storybook/react'
-import { AssetBNB, AssetBTC, bn } from '@xchainjs/xchain-util'
+import { AssetBNB, AssetBTC, AssetRuneNative } from '@xchainjs/xchain-util'
 import * as FP from 'fp-ts/lib/function'
 
 import { Network } from '../../../../../shared/api/types'
-import { mockWalletBalance } from '../../../../helpers/test/testWalletHelper'
-import { WalletBalance } from '../../../../services/wallet/types'
 import { AssetMenu } from './AssetMenu'
-
-const priceIndex = {
-  RUNE: bn(1),
-  BNB: bn(2),
-  BTC: bn(3)
-}
-
-const balanceBNB: WalletBalance = mockWalletBalance({
-  walletType: 'ledger',
-  asset: AssetBNB,
-  walletAddress: 'bnb-ledger-address'
-})
-
-const balanceBTC: WalletBalance = mockWalletBalance({
-  asset: AssetBTC,
-  walletAddress: 'btc-address'
-})
-
-const balanceRuneNative: WalletBalance = mockWalletBalance()
-
-const balances = [balanceBNB, balanceBTC, balanceRuneNative]
 
 type Args = {
   withSearch: boolean
@@ -40,8 +17,7 @@ const Template: Story<Args> = ({ network, withSearch, onSelect }) => (
   <AssetMenu
     withSearch={withSearch}
     asset={AssetBNB}
-    balances={balances}
-    priceIndex={priceIndex}
+    assets={[AssetBNB, AssetBTC, AssetRuneNative]}
     onSelect={onSelect}
     searchDisable={[]}
     network={network}

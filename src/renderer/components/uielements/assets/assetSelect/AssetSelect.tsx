@@ -8,26 +8,19 @@ import * as O from 'fp-ts/lib/Option'
 import { useIntl } from 'react-intl'
 
 import { Network } from '../../../../../shared/api/types'
-import { WalletType } from '../../../../../shared/wallet/types'
-import { eqAsset, eqString } from '../../../../helpers/fp/eq'
-import { ordWalletBalanceByAsset } from '../../../../helpers/fp/ord'
-import { WalletBalances } from '../../../../services/clients'
-import { PriceDataIndex } from '../../../../services/midgard/types'
-import { AssetWithWalletType } from '../../../../types/asgardex'
+import { eqAsset } from '../../../../helpers/fp/eq'
+import { ordAsset } from '../../../../helpers/fp/ord'
 import { AssetData } from '../assetData'
 import { AssetMenu } from '../assetMenu'
 import * as Styled from './AssetSelect.styles'
 
 export type Props = {
   asset: Asset
-  assetWalletType?: WalletType
-  balances: WalletBalances
-  priceIndex?: PriceDataIndex
+  assets: Asset[]
   withSearch?: boolean
   searchDisable?: string[]
-  onSelect: (_: AssetWithWalletType) => void
+  onSelect: (_: Asset) => void
   className?: string
-  minWidth?: number
   showAssetName?: boolean
   disabled?: boolean
   network: Network
@@ -36,14 +29,11 @@ export type Props = {
 export const AssetSelect: React.FC<Props> = (props): JSX.Element => {
   const {
     asset,
-    assetWalletType,
-    balances = [],
-    priceIndex,
+    assets = [],
     withSearch = true,
     searchDisable = [],
-    onSelect = (_: AssetWithWalletType) => {},
+    onSelect = (_: Asset) => {},
     className,
-    minWidth,
     showAssetName = true,
     disabled = false,
     network
@@ -63,38 +53,34 @@ export const AssetSelect: React.FC<Props> = (props): JSX.Element => {
   }
 
   const handleChangeAsset = useCallback(
-    async ({ asset, walletType }) => {
+    async (asset) => {
       setOpenDropdown(false)
 
       // Wait for the dropdown to close
       await delay(500)
 
       FP.pipe(
-        balances,
-        A.findFirst(
-          ({ asset: balanceAsset, walletType: balanceWalletType }) =>
-            eqAsset.equals(balanceAsset, asset) && eqString.equals(walletType, balanceWalletType)
-        ),
-        O.map(({ asset, walletType }) => {
-          onSelect({ asset, walletType })
+        assets,
+        A.findFirst((assetToFilter) => eqAsset.equals(assetToFilter, asset)),
+        O.map((asset) => {
+          onSelect(asset)
           return true
         }),
         O.getOrElse(() => false)
       )
     },
-    [balances, onSelect]
+    [assets, onSelect]
   )
 
   const renderMenu = useMemo(() => {
-    const sortedBalanceData = balances.sort(ordWalletBalanceByAsset.compare)
+    const sortedAssets = assets.sort(ordAsset.compare)
     return (
-      <Styled.AssetSelectMenuWrapper minWidth={minWidth}>
+      <Styled.AssetSelectMenuWrapper>
         <AssetMenu
-          searchPlaceholder={intl.formatMessage({ id: 'common.searchAsset' })}
+          searchPlaceholder={intl.formatMessage({ id: 'common.search' })}
           closeMenu={closeMenu}
-          balances={sortedBalanceData}
+          assets={sortedAssets}
           asset={asset}
-          priceIndex={priceIndex}
           withSearch={withSearch}
           searchDisable={searchDisable}
           onSelect={handleChangeAsset}
@@ -102,9 +88,9 @@ export const AssetSelect: React.FC<Props> = (props): JSX.Element => {
         />
       </Styled.AssetSelectMenuWrapper>
     )
-  }, [balances, minWidth, intl, closeMenu, asset, priceIndex, withSearch, searchDisable, handleChangeAsset, network])
+  }, [assets, intl, closeMenu, asset, withSearch, searchDisable, handleChangeAsset, network])
 
-  const hideButton = balances.length === 0
+  const hideButton = !assets.length
   const disableButton = disabled || hideButton
 
   return (
@@ -114,19 +100,13 @@ export const AssetSelect: React.FC<Props> = (props): JSX.Element => {
       onClick={handleDropdownButtonClicked}>
       <Dropdown overlay={renderMenu} trigger={[]} visible={openDropdown} placement="bottomCenter">
         <>
-          <AssetData
-            noTicker={!showAssetName}
-            className={'asset-data'}
-            asset={asset}
-            walletType={assetWalletType}
-            network={network}
-          />
+          <AssetData noTicker={!showAssetName} className={'asset-data'} asset={asset} network={network} />
           <Styled.AssetDropdownButton>
-            {!hideButton ? (
+            {!hideButton && (
               <Styled.DropdownIconHolder>
                 <Styled.DropdownIcon open={openDropdown} disabled={disableButton} />
               </Styled.DropdownIconHolder>
-            ) : null}
+            )}
           </Styled.AssetDropdownButton>
         </>
       </Dropdown>

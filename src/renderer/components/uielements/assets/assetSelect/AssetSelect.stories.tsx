@@ -1,50 +1,25 @@
 import React from 'react'
 
 import { Meta, Story } from '@storybook/react'
-import { AssetBNB, AssetBTC, bn } from '@xchainjs/xchain-util'
+import { AssetBNB, AssetBTC, AssetRuneNative } from '@xchainjs/xchain-util'
 import * as FP from 'fp-ts/lib/function'
 
 import { Network } from '../../../../../shared/api/types'
-import { WalletType } from '../../../../../shared/wallet/types'
-import { mockWalletBalance } from '../../../../helpers/test/testWalletHelper'
-import { WalletBalance } from '../../../../services/wallet/types'
 import { AssetSelect } from './AssetSelect'
 
-const balanceBNB: WalletBalance = mockWalletBalance({
-  walletType: 'ledger',
-  asset: AssetBNB,
-  walletAddress: 'bnb-ledger-address'
-})
-
-const balanceBTC: WalletBalance = mockWalletBalance({
-  asset: AssetBTC,
-  walletAddress: 'btc-address'
-})
-
-const balanceRuneNative: WalletBalance = mockWalletBalance()
-
-const balances = [balanceBNB, balanceBTC, balanceRuneNative]
-
-const priceIndex = {
-  RUNE: bn(1),
-  BNB: bn(2),
-  BTC: bn(3)
-}
+const assets = [AssetBTC, AssetBNB, AssetRuneNative]
 
 type Args = {
   withSearch: boolean
   network: Network
-  assetWalletType: WalletType
   onSelect: FP.Lazy<void>
 }
 
-const Template: Story<Args> = ({ network, withSearch, assetWalletType, onSelect }) => (
+const Template: Story<Args> = ({ network, withSearch, onSelect }) => (
   <AssetSelect
     asset={AssetBNB}
-    assetWalletType={assetWalletType}
     withSearch={withSearch}
-    balances={balances}
-    priceIndex={priceIndex}
+    assets={assets}
     onSelect={onSelect}
     searchDisable={[]}
     network={network}
@@ -73,14 +48,6 @@ const meta: Meta = {
         type: 'boolean'
       },
       defaultValue: false
-    },
-    assetWalletType: {
-      name: 'asset wallet type',
-      control: {
-        type: 'select',
-        options: ['ledger', 'keystore']
-      },
-      defaultValue: 'ledger'
     },
     onSelect: {
       action: 'onSelect'

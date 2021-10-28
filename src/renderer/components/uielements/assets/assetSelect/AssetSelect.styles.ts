@@ -30,9 +30,8 @@ export const AssetSelectWrapper = styled.button`
       : ''};
 `
 
-export const AssetSelectMenuWrapper = styled.div<{ minWidth?: number }>`
+export const AssetSelectMenuWrapper = styled.div`
   margin-top: 15px;
-  min-width: ${({ minWidth }) => minWidth || 216}px;
 `
 
 export const DropdownIcon = styled(CaretDownOutlined)`
