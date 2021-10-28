@@ -42,7 +42,8 @@ describe('helpers/poolHelper/', () => {
     units: '0',
     volume24h: '0',
     liquidityUnits: '0',
-    synthUnits: '0'
+    synthUnits: '0',
+    synthSupply: '0'
   }
   const pool1: PoolDetail = { ...mockPoolDetail, status: GetPoolsStatusEnum.Staged, runeDepth: '1000' }
   const pool2: PoolDetail = { ...mockPoolDetail, status: GetPoolsStatusEnum.Available, runeDepth: '2000' }
@@ -370,11 +371,28 @@ describe('helpers/poolHelper/', () => {
       })
       expect(result).toBeTruthy()
     })
+
+    it('true if LP is paused', () => {
+      const result = disablePoolActions({
+        chain: BNBChain,
+        haltedChains: [ETHChain, BNBChain],
+        mimirHalt: { ...DEFAULT_MIMIR_HALT, pauseLp: true }
+      })
+      expect(result).toBeTruthy()
+    })
     it('true if BNB chain is not in halted list, but paused', () => {
       const result = disablePoolActions({
         chain: BNBChain,
         haltedChains: [],
         mimirHalt: { ...DEFAULT_MIMIR_HALT, pauseLpBnb: true }
+      })
+      expect(result).toBeTruthy()
+    })
+    it('true if BNB chain is not in halted list, but LP paused', () => {
+      const result = disablePoolActions({
+        chain: BNBChain,
+        haltedChains: [],
+        mimirHalt: { ...DEFAULT_MIMIR_HALT, pauseLp: true }
       })
       expect(result).toBeTruthy()
     })
@@ -386,11 +404,27 @@ describe('helpers/poolHelper/', () => {
       })
       expect(result).toBeTruthy()
     })
+    it('true if BTC chain is not in halted list, but LP paused', () => {
+      const result = disablePoolActions({
+        chain: BTCChain,
+        haltedChains: [],
+        mimirHalt: { ...DEFAULT_MIMIR_HALT, pauseLp: true }
+      })
+      expect(result).toBeTruthy()
+    })
     it('true if BCH chain is not in halted list, but paused', () => {
       const result = disablePoolActions({
         chain: BCHChain,
         haltedChains: [],
         mimirHalt: { ...DEFAULT_MIMIR_HALT, pauseLpBch: true }
+      })
+      expect(result).toBeTruthy()
+    })
+    it('true if BCH chain is not in halted list, but LP paused', () => {
+      const result = disablePoolActions({
+        chain: BCHChain,
+        haltedChains: [],
+        mimirHalt: { ...DEFAULT_MIMIR_HALT, pauseLp: true }
       })
       expect(result).toBeTruthy()
     })
@@ -402,11 +436,27 @@ describe('helpers/poolHelper/', () => {
       })
       expect(result).toBeTruthy()
     })
+    it('true if ETH chain is not in halted list, but LP paused', () => {
+      const result = disablePoolActions({
+        chain: ETHChain,
+        haltedChains: [],
+        mimirHalt: { ...DEFAULT_MIMIR_HALT, pauseLp: true }
+      })
+      expect(result).toBeTruthy()
+    })
     it('true if LTC chain is not in halted list, but paused', () => {
       const result = disablePoolActions({
         chain: LTCChain,
         haltedChains: [],
         mimirHalt: { ...DEFAULT_MIMIR_HALT, pauseLpLtc: true }
+      })
+      expect(result).toBeTruthy()
+    })
+    it('true if LTC chain is not in halted list, but LP paused', () => {
+      const result = disablePoolActions({
+        chain: LTCChain,
+        haltedChains: [],
+        mimirHalt: { ...DEFAULT_MIMIR_HALT, pauseLp: true }
       })
       expect(result).toBeTruthy()
     })
