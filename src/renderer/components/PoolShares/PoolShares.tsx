@@ -135,7 +135,9 @@ export const PoolShares: React.FC<Props> = ({
       title: '',
       align: 'right',
       render: ({ asset }: PoolShareTableRowData) => {
-        const disablePool = PoolHelpers.disableAllActions({ chain: asset.chain, haltedChains, mimirHalt })
+        const disablePool =
+          PoolHelpers.disableAllActions({ chain: asset.chain, haltedChains, mimirHalt }) ||
+          PoolHelpers.disablePoolActions({ chain: asset.chain, haltedChains, mimirHalt })
         return <Styled.ManageButton disabled={disablePool} asset={asset} isTextView={isDesktopView} />
       }
     }),
