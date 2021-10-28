@@ -8,6 +8,7 @@ const halt: HaltMessages = {
   'halt.chain.trading': 'Der Handel für {chains} Chain(s) wurde vorübergehend gestoppt.',
   'halt.chain.pause':
     'Liquidity-Aktivitäten (Hinzufügen/Entfernen) für {chains} Chain(s) wurde vorübergehend gestoppt.',
+  'halt.chain.pauseall': 'Liquidity-Aktivitäten (Hinzufügen/Entfernen) wurde für all Chains vorübergehend gestoppt.',
   'halt.chain.upgrade': 'Upgrade für {chains} ist vorübergehend deaktiviert.'
 }
 
