@@ -74,6 +74,7 @@ export const AppView: React.FC = (): JSX.Element => {
               haltTrading,
               haltBnbChain,
               haltBnbTrading,
+              pauseLp,
               pauseLpBnb,
               haltBtcChain,
               haltBtcTrading,
@@ -158,6 +159,8 @@ export const AppView: React.FC = (): JSX.Element => {
               msg =
                 pausedLPs.length > 0
                   ? `${msg} ${intl.formatMessage({ id: 'halt.chain.pause' }, { chains: pausedLPs.join(', ') })}`
+                  : pauseLp
+                  ? `${msg} ${intl.formatMessage({ id: 'halt.chain.pauseall' })}`
                   : `${msg}`
             }
 

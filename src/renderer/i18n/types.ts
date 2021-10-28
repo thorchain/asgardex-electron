@@ -368,6 +368,7 @@ export type HaltMessageKey =
   | 'halt.chain.trading'
   | 'halt.chain.upgrade'
   | 'halt.chain.pause'
+  | 'halt.chain.pauseall'
 
 export type HaltMessages = { [key in HaltMessageKey]: string }
 

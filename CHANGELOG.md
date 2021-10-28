@@ -1,4 +1,4 @@
-# 0.5.0 (2021-10-28)
+# 0.5.0 (2021-10-29)
 
 ## Add
 
@@ -35,6 +35,12 @@
 
 - Set testnet as default network in development mode [#1851](https://github.com/thorchain/asgardex-electron/pull/1851)
 - Update to latest npm dependencies (19-10-2021) [#1864](https://github.com/thorchain/asgardex-electron/pull/1864)
+
+# 0.4.5 (2021-10-28)
+
+## Fix
+
+- [Mimir] Consider mimir//PAUSELP [#1902](https://github.com/thorchain/asgardex-electron/issues/1902)
 
 # 0.4.4 (2021-10-12)
 

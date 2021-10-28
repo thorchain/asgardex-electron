@@ -39,6 +39,7 @@ export const useMimirHalt = (): { mimirHaltRD: MimirHaltRD; mimirHalt: MimirHalt
           haltEthTrading: mimir['mimir//HALTETHTRADING'] === 1,
           haltLtcTrading: mimir['mimir//HALTLTCTRADING'] === 1,
           // `PAUSELP{chain}` flags
+          pauseLp: mimir['mimir//PAUSELP'] === 1,
           pauseLpBnb: mimir['mimir//PAUSELPBNB'] === 1,
           pauseLpBch: mimir['mimir//PAUSELPBCH'] === 1,
           pauseLpBtc: mimir['mimir//PAUSELPBTC'] === 1,
