@@ -53,7 +53,7 @@ export const createLedgerService = ({ keystore$ }: { keystore$: KeystoreState$ }
       RxOp.map((addressMap) => addressMap[network])
     )
 
-  const verifyLedgerAddress = (chain: Chain, network: Network, walletIndex = 0): void =>
+  const verifyLedgerAddress = (chain: Chain, network: Network, walletIndex: number): void =>
     window.apiHDWallet.verifyLedgerAddress({ chain, network, walletIndex })
 
   /**

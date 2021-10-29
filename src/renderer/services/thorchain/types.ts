@@ -33,7 +33,12 @@ export type SendTxParams = {
 }
 
 export type TransactionService = {
-  sendPoolTx$: (params: DepositParam & { walletType: WalletType; walletIndex: number }) => TxHashLD
+  sendPoolTx$: (
+    params: DepositParam & {
+      walletType: WalletType
+      walletIndex: number /* override walletIndex of DepositParam to avoid 'undefined' */
+    }
+  ) => TxHashLD
 } & C.TransactionService<SendTxParams>
 
 export type InteractParams = {
