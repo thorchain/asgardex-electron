@@ -119,7 +119,7 @@ export const sendPoolTx$ = ({
       })
 
     case THORChain:
-      return THOR.sendPoolTx$({ walletType, amount, asset, memo })
+      return THOR.sendPoolTx$({ walletType, amount, asset, memo, walletIndex })
 
     default:
       return sendTx$({ sender, walletType, asset, recipient, amount, memo, feeOption, walletIndex })
