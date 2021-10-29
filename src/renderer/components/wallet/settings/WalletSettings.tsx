@@ -42,7 +42,7 @@ type Props = {
   removeKeystore: FP.Lazy<void>
   exportKeystore: (runeNativeAddress: string, selectedNetwork: Network) => void
   addLedgerAddress: (chain: Chain, walletIndex: number) => void
-  verifyLedgerAddress: (chain: Chain, walletIndex?: number) => void
+  verifyLedgerAddress: (chain: Chain, walletIndex: number) => void
   removeLedgerAddress: (chain: Chain) => void
   phrase: O.Option<string>
   clickAddressLinkHandler: (chain: Chain, address: Address) => void
@@ -83,7 +83,7 @@ export const WalletSettings: React.FC<Props> = (props): JSX.Element => {
   const [showRemoveWalletModal, setShowRemoveWalletModal] = useState(false)
   const [showQRModal, setShowQRModal] = useState<O.Option<{ asset: Asset; address: Address }>>(O.none)
   const closeQrModal = useCallback(() => setShowQRModal(O.none), [setShowQRModal])
-  const [walletIndex, setWalletIndex] = useState<Record<Chain, number>>({
+  const [walletIndexMap, setWalletIndexMap] = useState<Record<Chain, number>>({
     [BNBChain]: 0,
     [BTCChain]: 0,
     [BCHChain]: 0,
@@ -125,20 +125,18 @@ export const WalletSettings: React.FC<Props> = (props): JSX.Element => {
     (chain: Chain, { type: walletType, address: addressRD }: WalletAddressAsync) => {
       const renderAddLedger = (chain: Chain, loading: boolean) => (
         <Styled.AddLedgerContainer>
-          <Styled.AddLedgerButton loading={loading} onClick={() => addLedgerAddress(chain, walletIndex[chain])}>
+          <Styled.AddLedgerButton loading={loading} onClick={() => addLedgerAddress(chain, walletIndexMap[chain])}>
             <Styled.AddLedgerIcon /> {intl.formatMessage({ id: 'ledger.add.device' })}
           </Styled.AddLedgerButton>
           {(isBnbChain(chain) || isThorChain(chain)) && (
             <>
               <Styled.IndexLabel>{intl.formatMessage({ id: 'setting.wallet.index' })}</Styled.IndexLabel>
               <Styled.WalletIndexInput
-                value={walletIndex[chain].toString()}
+                value={walletIndexMap[chain].toString()}
                 pattern="[0-9]+"
-                onChange={(value) =>
-                  value !== null && +value >= 0 && setWalletIndex({ ...walletIndex, [chain]: +value })
-                }
+                onChange={(value) => value !== null && setWalletIndexMap({ ...walletIndexMap, [chain]: +value })}
                 style={{ width: 60 }}
-                onPressEnter={() => addLedgerAddress(chain, walletIndex[chain])}
+                onPressEnter={() => addLedgerAddress(chain, walletIndexMap[chain])}
               />
               <InfoIcon tooltip={intl.formatMessage({ id: 'setting.wallet.index.info' })} />
             </>
@@ -174,7 +172,7 @@ export const WalletSettings: React.FC<Props> = (props): JSX.Element => {
                             chain
                           })
                         )
-                        verifyLedgerAddress(chain, walletIndex[chain])
+                        verifyLedgerAddress(chain, walletIndexMap[chain])
                       }}
                     />
                   )}
@@ -194,7 +192,7 @@ export const WalletSettings: React.FC<Props> = (props): JSX.Element => {
       removeLedgerAddress,
       selectedNetwork,
       verifyLedgerAddress,
-      walletIndex
+      walletIndexMap
     ]
   )
 

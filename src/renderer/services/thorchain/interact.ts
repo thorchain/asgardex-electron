@@ -27,7 +27,12 @@ import { InteractParams, InteractState, InteractState$ } from './types'
  */
 export const createInteractService$ =
   (
-    depositTx$: (_: DepositParam & { walletType: WalletType; walletIndex: number }) => LiveData<ApiError, string>,
+    depositTx$: (
+      _: DepositParam & {
+        walletType: WalletType
+        walletIndex: number /* override walletIndex of DepositParam to avoid 'undefined' */
+      }
+    ) => LiveData<ApiError, string>,
     getTxStatus: (txHash: string, assetAddress: O.Option<Address>) => TxLD
   ) =>
   ({ walletType, walletIndex, amount, memo }: InteractParams): InteractState$ => {
