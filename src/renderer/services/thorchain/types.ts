@@ -89,6 +89,7 @@ export const MimirIO = t.type({
   'mimir//HALTLTCTRADING': t.union([t.number, t.undefined]),
   'mimir//HALTBNBCHAIN': t.union([t.number, t.undefined]),
   'mimir//HALTBNBTRADING': t.union([t.number, t.undefined]),
+  'mimir//PAUSELP': t.union([t.number, t.undefined]),
   'mimir//PAUSELPBNB': t.union([t.number, t.undefined]),
   'mimir//PAUSELPBCH': t.union([t.number, t.undefined]),
   'mimir//PAUSELPBTC': t.union([t.number, t.undefined]),
@@ -119,6 +120,7 @@ export type MimirHaltTrading = {
 }
 
 export type MimirPauseLP = {
+  pauseLp: boolean
   pauseLpBnb: boolean
   pauseLpBch: boolean
   pauseLpBtc: boolean
