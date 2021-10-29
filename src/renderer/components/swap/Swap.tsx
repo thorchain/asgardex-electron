@@ -1293,8 +1293,6 @@ export const Swap = ({
 
   return (
     <Styled.Container>
-      <div>oSourceAssetWB {JSON.stringify(oSourceAssetWB, null, 2)}</div>
-      <div>oSwapParams {JSON.stringify(oSwapParams, null, 2)}</div>
       <Styled.ContentContainer>
         <Styled.Header>
           {FP.pipe(

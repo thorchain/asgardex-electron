@@ -70,9 +70,9 @@ export const SendViewBNB: React.FC<Props> = (props): JSX.Element => {
 
   const onSend = useCallback(
     (params: SendTxParams) => {
-      subscribeSendTxState(transfer$(params, walletIndex))
+      subscribeSendTxState(transfer$(params))
     },
-    [subscribeSendTxState, transfer$, walletIndex]
+    [subscribeSendTxState, transfer$]
   )
 
   const { fees$, reloadFees } = useBinanceContext()

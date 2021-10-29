@@ -26,6 +26,7 @@ import * as Helper from './SendView.helper'
 
 type Props = {
   walletType: WalletType
+  walletIndex: number
   asset: Asset
   balances: O.Option<NonEmptyWalletBalances>
   openExplorerTxUrl: OpenExplorerTxUrl
@@ -34,7 +35,7 @@ type Props = {
 }
 
 export const SendViewLTC: React.FC<Props> = (props): JSX.Element => {
-  const { walletType, asset, balances: oBalances, openExplorerTxUrl, validatePassword$, network } = props
+  const { walletType, walletIndex, asset, balances: oBalances, openExplorerTxUrl, validatePassword$, network } = props
 
   const intl = useIntl()
   const history = useHistory()
@@ -76,6 +77,7 @@ export const SendViewLTC: React.FC<Props> = (props): JSX.Element => {
     (walletBalance: WalletBalance) => (
       <SendFormLTC
         walletType={walletType}
+        walletIndex={walletIndex}
         balances={FP.pipe(
           oBalances,
           O.getOrElse<WalletBalances>(() => [])
@@ -93,6 +95,7 @@ export const SendViewLTC: React.FC<Props> = (props): JSX.Element => {
     ),
     [
       walletType,
+      walletIndex,
       oBalances,
       isLoading,
       onSend,

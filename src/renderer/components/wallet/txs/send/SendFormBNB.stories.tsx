@@ -15,7 +15,7 @@ import {
 
 import { mockValidatePassword$ } from '../../../../../shared/mock/wallet'
 import { mockWalletBalance } from '../../../../helpers/test/testWalletHelper'
-import { SendTxParams } from '../../../../services/binance/types'
+import { SendTxParams } from '../../../../services/chain/types'
 import { WalletBalance } from '../../../../services/wallet/types'
 import { SendFormBNB, Props as SendFormBNBProps } from './SendFormBNB'
 
@@ -33,16 +33,17 @@ const runeBalance: WalletBalance = mockWalletBalance({
 
 const defaultProps: SendFormBNBProps = {
   walletType: 'keystore',
-  walletAddress: 'bnb-address',
   walletIndex: 0,
+  walletAddress: 'bnb-address',
   balances: [bnbBalance, runeBalance],
   balance: bnbBalance,
-  onSubmit: ({ recipient, amount, asset, memo }: SendTxParams) =>
+  onSubmit: ({ recipient, amount, asset, memo }: SendTxParams) => {
     console.log(
       `to: ${recipient}, amount ${formatAssetAmount({ amount: baseToAsset(amount) })}, asset: ${assetToString(
         asset
       )}, memo: ${memo}`
-    ),
+    )
+  },
 
   isLoading: false,
   addressValidation: (_: string) => true,

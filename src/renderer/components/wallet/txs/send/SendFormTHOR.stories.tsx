@@ -13,7 +13,7 @@ import {
 
 import { mockValidatePassword$ } from '../../../../../shared/mock/wallet'
 import { mockWalletBalance } from '../../../../helpers/test/testWalletHelper'
-import { SendTxParams } from '../../../../services/binance/types'
+import { SendTxParams } from '../../../../services/chain/types'
 import { WalletBalance } from '../../../../services/wallet/types'
 import { SendFormTHOR as Component, Props as ComponentProps } from './SendFormTHOR'
 
@@ -23,6 +23,7 @@ const runeBalance: WalletBalance = mockWalletBalance({
 
 const defaultProps: ComponentProps = {
   walletType: 'keystore',
+  walletIndex: 0,
   balances: [runeBalance],
   balance: runeBalance,
   onSubmit: ({ recipient, amount, asset, memo }: SendTxParams) =>

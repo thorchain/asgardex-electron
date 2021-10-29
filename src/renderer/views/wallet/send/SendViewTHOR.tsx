@@ -27,6 +27,7 @@ import * as Helper from './SendView.helper'
 
 type Props = {
   walletType: WalletType
+  walletIndex: number
   walletAddress: Address
   asset: Asset
   balances: O.Option<NonEmptyWalletBalances>
@@ -36,7 +37,16 @@ type Props = {
 }
 
 export const SendViewTHOR: React.FC<Props> = (props): JSX.Element => {
-  const { walletType, walletAddress, asset, balances: oBalances, openExplorerTxUrl, validatePassword$, network } = props
+  const {
+    walletType,
+    walletIndex,
+    walletAddress,
+    asset,
+    balances: oBalances,
+    openExplorerTxUrl,
+    validatePassword$,
+    network
+  } = props
 
   const intl = useIntl()
   const history = useHistory()
@@ -91,6 +101,7 @@ export const SendViewTHOR: React.FC<Props> = (props): JSX.Element => {
     (balance: WalletBalance) => (
       <SendFormTHOR
         walletType={walletType}
+        walletIndex={walletIndex}
         balances={FP.pipe(
           oBalances,
           O.getOrElse<WalletBalances>(() => [])
@@ -108,6 +119,7 @@ export const SendViewTHOR: React.FC<Props> = (props): JSX.Element => {
     ),
     [
       walletType,
+      walletIndex,
       oBalances,
       isLoading,
       onSend,

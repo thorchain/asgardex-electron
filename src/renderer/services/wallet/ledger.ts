@@ -50,8 +50,7 @@ export const createLedgerService = ({ keystore$ }: { keystore$: KeystoreState$ }
       ledgerAddresses$,
       RxOp.map((addressesMap) => addressesMap[chain]),
       RxOp.distinctUntilChanged(eqLedgerAddressMap.equals),
-      RxOp.map((addressMap) => addressMap[network]),
-      RxOp.map((v) => v)
+      RxOp.map((addressMap) => addressMap[network])
     )
 
   const verifyLedgerAddress = (chain: Chain, network: Network, walletIndex = 0): void =>

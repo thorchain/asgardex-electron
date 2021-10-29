@@ -351,7 +351,10 @@ export const Withdraw: React.FC<Props> = ({
     subscribeWithdrawState(
       withdraw$({
         network,
-        memo
+        memo,
+        // TODO (@asgdx-team) Get walletType|index from props when we introduce Ledger for withdrawing
+        walletType: 'keystore',
+        walletIndex: 0
       })
     )
   }, [closePasswordModal, subscribeWithdrawState, withdraw$, network, memo])

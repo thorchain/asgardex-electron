@@ -43,7 +43,6 @@ const importKeystore$ = (keystore: CryptoKeystore, password: string): ImportKeys
     // delay to give UI some time to render
     RxOp.delay(200),
     RxOp.switchMap((phrase) => Rx.from(addKeystore(phrase, password))),
-    RxOp.map((v) => v),
     RxOp.map(RD.success),
     RxOp.catchError((error) => Rx.of(RD.failure(new Error(`Could not decrypt phrase from keystore: ${error}`)))),
     RxOp.startWith(RD.pending)

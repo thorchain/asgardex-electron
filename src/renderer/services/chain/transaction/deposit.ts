@@ -38,7 +38,14 @@ const { pools: midgardPoolsService, validateNode$ } = midgardService
  * @returns AsymDepositState$ - Observable state to reflect loading status. It provides all data we do need to display status in `TxModul`
  *
  */
-export const asymDeposit$ = ({ poolAddress, asset, amount, memo }: AsymDepositParams): AsymDepositState$ => {
+export const asymDeposit$ = ({
+  poolAddress,
+  asset,
+  amount,
+  memo,
+  walletType,
+  walletIndex
+}: AsymDepositParams): AsymDepositState$ => {
   // total of progress
   const total = O.some(100)
 
@@ -71,8 +78,8 @@ export const asymDeposit$ = ({ poolAddress, asset, amount, memo }: AsymDepositPa
       setState({ ...getState(), step: 2, deposit: RD.progress({ loaded: 50, total }) })
       // 2. send deposit tx
       return sendPoolTx$({
-        // TODO(@asgdx-team) Get `walletType` from props if we want to support other than keystore (e.g. Ledger)
-        walletType: 'keystore',
+        walletType,
+        walletIndex,
         router: poolAddress.router,
         asset,
         recipient: poolAddress.address,
@@ -161,7 +168,9 @@ export const symDeposit$ = ({
   poolAddress: poolAddresses,
   asset,
   amounts,
-  memos
+  memos,
+  walletIndex,
+  walletType
 }: SymDepositParams): SymDepositState$ => {
   // total of progress
   const total = O.some(100)
@@ -193,7 +202,8 @@ export const symDeposit$ = ({
       setState({ ...getState(), step: 2, deposit: RD.progress({ loaded: 40, total }) })
       return sendPoolTx$({
         // TODO(@asgdx-team) Get `walletType` from props if we want to support other than keystore (e.g. Ledger)
-        walletType: 'keystore',
+        walletType,
+        walletIndex,
         router: poolAddresses.router,
         asset,
         recipient: poolAddresses.address,
@@ -218,8 +228,8 @@ export const symDeposit$ = ({
     liveData.chain<ApiError, TxHash, TxHash>((_) => {
       setState({ ...getState(), step: 3, deposit: RD.progress({ loaded: 60, total }) })
       return sendPoolTx$({
-        // TODO(@asgdx-team) Get `walletType` from props if we want to support other than keystore (e.g. Ledger)
-        walletType: 'keystore',
+        walletType,
+        walletIndex,
         router: O.none, // no router for RUNE
         asset: AssetRuneNative,
         recipient: '', // no recipient for RUNE needed
