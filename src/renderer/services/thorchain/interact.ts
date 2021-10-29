@@ -27,10 +27,10 @@ import { InteractParams, InteractState, InteractState$ } from './types'
  */
 export const createInteractService$ =
   (
-    depositTx$: (_: DepositParam & { walletType: WalletType }) => LiveData<ApiError, string>,
+    depositTx$: (_: DepositParam & { walletType: WalletType; walletIndex: number }) => LiveData<ApiError, string>,
     getTxStatus: (txHash: string, assetAddress: O.Option<Address>) => TxLD
   ) =>
-  ({ walletType, amount, memo }: InteractParams): InteractState$ => {
+  ({ walletType, walletIndex, amount, memo }: InteractParams): InteractState$ => {
     // total of progress
     const total = O.some(100)
 
@@ -51,6 +51,7 @@ export const createInteractService$ =
       // 1. send deposit tx
       depositTx$({
         walletType,
+        walletIndex,
         asset: AssetRuneNative,
         amount,
         memo

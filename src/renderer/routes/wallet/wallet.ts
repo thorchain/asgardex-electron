@@ -52,12 +52,12 @@ export const poolShares: Route<void> = {
   }
 }
 
-export type DepositParams = { walletAddress: string; walletType: WalletType }
+export type DepositParams = { walletAddress: string; walletType: WalletType; walletIndex: string }
 export const deposit: Route<DepositParams> = {
-  template: `${assets.template}/deposit/:walletType/:walletAddress`,
-  path({ walletType, walletAddress }) {
+  template: `${assets.template}/deposit/:walletType/:walletAddress/:walletIndex`,
+  path({ walletType, walletAddress, walletIndex }) {
     if (walletAddress) {
-      return `${assets.template}/deposit/${walletType}/${walletAddress}`
+      return `${assets.template}/deposit/${walletType}/${walletAddress}/${walletIndex}`
     } else {
       // Redirect to assets route if passed param are invalid
       return assets.path()

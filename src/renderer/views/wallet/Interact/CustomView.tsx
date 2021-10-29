@@ -18,10 +18,11 @@ import * as Styled from './InteractView.styles'
 
 type Props = {
   walletType: WalletType
+  walletIndex: number
   openExplorerTxUrl: (txHash: TxHash) => void
 }
 
-export const CustomView: React.FC<Props> = ({ walletType, openExplorerTxUrl }) => {
+export const CustomView: React.FC<Props> = ({ walletType, walletIndex, openExplorerTxUrl }) => {
   const {
     state: interactState,
     reset: resetInteractState,
@@ -33,9 +34,9 @@ export const CustomView: React.FC<Props> = ({ walletType, openExplorerTxUrl }) =
 
   const customTx = useCallback(
     ({ amount, memo }: { amount: BaseAmount; memo: string }) => {
-      subscribeInteractState(interact$({ walletType, amount, memo }))
+      subscribeInteractState(interact$({ walletType, walletIndex, amount, memo }))
     },
-    [interact$, subscribeInteractState, walletType]
+    [interact$, subscribeInteractState, walletIndex, walletType]
   )
   const stepLabels = useMemo(
     () => [intl.formatMessage({ id: 'common.tx.sending' }), intl.formatMessage({ id: 'common.tx.checkResult' })],

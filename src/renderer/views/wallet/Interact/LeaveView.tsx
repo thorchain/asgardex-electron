@@ -19,10 +19,11 @@ import * as Styled from './InteractView.styles'
 
 type Props = {
   walletType: WalletType
+  walletIndex: number
   openExplorerTxUrl: (txHash: TxHash) => void
 }
 
-export const LeaveView: React.FC<Props> = ({ walletType, openExplorerTxUrl }) => {
+export const LeaveView: React.FC<Props> = ({ walletType, walletIndex, openExplorerTxUrl }) => {
   const {
     state: interactState,
     reset: resetInteractState,
@@ -42,10 +43,10 @@ export const LeaveView: React.FC<Props> = ({ walletType, openExplorerTxUrl }) =>
          * @docs https://docs.thorchain.org/thornodes/leaving#leaving
          */
 
-        interact$({ walletType, amount: baseAmount(1), memo })
+        interact$({ walletType, walletIndex, amount: baseAmount(1), memo })
       )
     },
-    [interact$, subscribeInteractState, walletType]
+    [interact$, subscribeInteractState, walletIndex, walletType]
   )
 
   const stepLabels = useMemo(
