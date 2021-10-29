@@ -32,7 +32,8 @@ export const swap$ = ({
   amount,
   memo,
   walletType,
-  sender
+  sender,
+  walletIndex
 }: SwapTxParams): SwapState$ => {
   // total of progress
   const total = O.some(100)
@@ -72,7 +73,8 @@ export const swap$ = ({
         amount,
         memo,
         feeOption: ChainTxFeeOption.SWAP,
-        sender
+        sender,
+        walletIndex
       })
     }),
     liveData.chain((txHash) => {

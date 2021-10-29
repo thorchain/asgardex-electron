@@ -27,14 +27,13 @@ const loadBalances$ = ({
   walletType,
   address,
   assets,
-  /* TODO (@asgdx-team) Check if we still can use `0` as default by introducing HD wallets in the future */
-  walletIndex = 0
+  walletIndex
 }: {
   client: XChainClient
   walletType: WalletType
   address?: Address
   assets?: Asset[]
-  walletIndex?: number
+  walletIndex: number
 }): WalletBalancesLD =>
   FP.pipe(
     address,
@@ -83,7 +82,7 @@ export const balances$: ({
   client$: XChainClient$
   trigger$: Rx.Observable<boolean>
   assets?: Asset[]
-  walletIndex?: number
+  walletIndex: number
 }) => WalletBalancesLD = ({ walletType, client$, trigger$, assets, walletIndex }) =>
   Rx.combineLatest([trigger$.pipe(debounceTime(300)), client$]).pipe(
     RxOp.switchMap(([_, oClient]) => {
@@ -109,8 +108,17 @@ export const balancesByAddress$: (
   client$: XChainClient$,
   trigger$: Rx.Observable<boolean>,
   assets?: Asset[]
-) => (address: string, walletType: WalletType) => WalletBalancesLD =
-  (client$, trigger$, assets) => (address, walletType) =>
+) => ({
+  address,
+  walletType,
+  walletIndex
+}: {
+  address: string
+  walletType: WalletType
+  walletIndex: number
+}) => WalletBalancesLD =
+  (client$, trigger$, assets) =>
+  ({ address, walletType, walletIndex }) =>
     Rx.combineLatest([trigger$.pipe(debounceTime(300)), client$]).pipe(
       RxOp.mergeMap(([_, oClient]) => {
         return FP.pipe(
@@ -119,7 +127,7 @@ export const balancesByAddress$: (
             // if a client is not available, "reset" state to "initial"
             () => Rx.of(RD.initial),
             // or start request and return state
-            (client) => loadBalances$({ client, address, walletType, assets })
+            (client) => loadBalances$({ client, address, walletType, assets, walletIndex })
           )
         )
       }),

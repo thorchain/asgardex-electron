@@ -357,7 +357,7 @@ export const Swap = ({
     const oAddress: O.Option<Address> = useTargetAssetLedger ? oTargetLedgerAddress : oTargetWalletAddress
     return FP.pipe(
       sequenceTOption(assetsToSwap, oPoolAddress, oAddress, oSourceAssetWB),
-      O.map(([{ source, target }, poolAddress, address, { walletType, walletAddress }]) => {
+      O.map(([{ source, target }, poolAddress, address, { walletType, walletAddress, walletIndex }]) => {
         return {
           poolAddress,
           asset: source,
@@ -369,7 +369,8 @@ export const Swap = ({
             limit: Utils.getSwapLimit(swapResultAmountMax1e8, slipTolerance)
           }),
           walletType,
-          sender: walletAddress
+          sender: walletAddress,
+          walletIndex
         }
       })
     )

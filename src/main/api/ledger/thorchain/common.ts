@@ -3,7 +3,7 @@ import { LedgerErrorType } from '@thorchain/ledger-thorchain'
 import { LedgerErrorId } from '../../../../shared/api/types'
 
 // TODO(@veado) Get path by using `xchain-thorchain`
-export const getDerivationPath = (walletIndex = 0) => [44, 931, 0, 0, walletIndex]
+export const getDerivationPath = (walletIndex: number) => [44, 931, 0, 0, walletIndex]
 
 export const fromLedgerErrorType = (error: number): LedgerErrorId => {
   switch (error) {

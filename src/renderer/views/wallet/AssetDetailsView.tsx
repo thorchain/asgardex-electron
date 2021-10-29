@@ -30,7 +30,14 @@ import { INITIAL_BALANCES_STATE } from '../../services/wallet/const'
 export const AssetDetailsView: React.FC = (): JSX.Element => {
   const intl = useIntl()
 
-  const { asset: routeAsset, walletAddress, walletType, walletIndex } = useParams<AssetDetailsParams>()
+  const {
+    asset: routeAsset,
+    walletAddress,
+    walletType,
+    walletIndex: walletIndexRoute
+  } = useParams<AssetDetailsParams>()
+
+  const walletIndex = parseInt(walletIndexRoute)
 
   const oRouteAsset: O.Option<Asset> = useMemo(() => O.fromNullable(assetFromString(routeAsset)), [routeAsset])
   const oWalletAddress = useMemo(
@@ -55,7 +62,7 @@ export const AssetDetailsView: React.FC = (): JSX.Element => {
 
   const { getTxs$, balancesState$, loadTxs, reloadBalancesByChain, setSelectedAsset, resetTxsPage } = useWalletContext()
 
-  const [txsRD] = useObservableState(() => getTxs$(oWalletAddress), RD.initial)
+  const [txsRD] = useObservableState(() => getTxs$(oWalletAddress, walletIndex), RD.initial)
   const { balances: oBalances } = useObservableState(balancesState$, INITIAL_BALANCES_STATE)
 
   useEffect(() => {
@@ -139,7 +146,7 @@ export const AssetDetailsView: React.FC = (): JSX.Element => {
           (asset) => (
             <AssetDetails
               walletType={walletType}
-              walletIndex={parseInt(walletIndex)}
+              walletIndex={walletIndex}
               txsPageRD={txsRD}
               balances={walletBalances}
               asset={asset}

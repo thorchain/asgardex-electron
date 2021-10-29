@@ -24,11 +24,12 @@ import * as Styled from './InteractView.styles'
 
 type Props = {
   walletType: WalletType
+  walletIndex: number
   walletAddress: string
   goToTransaction: (txHash: string) => void
 }
 
-export const BondView: React.FC<Props> = ({ walletType, walletAddress, goToTransaction }) => {
+export const BondView: React.FC<Props> = ({ walletType, walletIndex, walletAddress, goToTransaction }) => {
   const { balancesState$ } = useWalletContext()
 
   const {
@@ -66,9 +67,9 @@ export const BondView: React.FC<Props> = ({ walletType, walletAddress, goToTrans
 
   const bondTx = useCallback(
     ({ amount, memo }: { amount: BaseAmount; memo: string }) => {
-      subscribeInteractState(interact$({ walletType, amount, memo }))
+      subscribeInteractState(interact$({ walletType, walletIndex, amount, memo }))
     },
-    [interact$, subscribeInteractState, walletType]
+    [interact$, subscribeInteractState, walletIndex, walletType]
   )
 
   const stepLabels = useMemo(

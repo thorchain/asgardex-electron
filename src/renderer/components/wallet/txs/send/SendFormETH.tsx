@@ -50,6 +50,7 @@ export type FormValues = {
 
 export type Props = {
   walletType: WalletType
+  walletIndex: number
   balances: WalletBalances
   balance: WalletBalance
   onSubmit: (p: SendTxParams) => void
@@ -64,6 +65,7 @@ export type Props = {
 export const SendFormETH: React.FC<Props> = (props): JSX.Element => {
   const {
     walletType,
+    walletIndex,
     balances,
     balance,
     onSubmit,
@@ -289,6 +291,7 @@ export const SendFormETH: React.FC<Props> = (props): JSX.Element => {
       O.map(([amount, recipient]) => {
         onSubmit({
           walletType,
+          walletIndex,
           recipient,
           asset: balance.asset,
           amount,
@@ -298,7 +301,7 @@ export const SendFormETH: React.FC<Props> = (props): JSX.Element => {
         return true
       })
     )
-  }, [amountToSend, sendAddress, onSubmit, walletType, balance.asset, selectedFeeOption, form])
+  }, [amountToSend, sendAddress, onSubmit, walletType, walletIndex, balance.asset, selectedFeeOption, form])
 
   const renderPwModal = useMemo(
     () =>

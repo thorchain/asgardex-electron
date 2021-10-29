@@ -50,8 +50,7 @@ export const createLedgerService = ({ keystore$ }: { keystore$: KeystoreState$ }
       ledgerAddresses$,
       RxOp.map((addressesMap) => addressesMap[chain]),
       RxOp.distinctUntilChanged(eqLedgerAddressMap.equals),
-      RxOp.map((addressMap) => addressMap[network]),
-      RxOp.map((v) => v)
+      RxOp.map((addressMap) => addressMap[network])
     )
 
   const verifyLedgerAddress = (chain: Chain, network: Network, walletIndex = 0): void =>
@@ -80,7 +79,7 @@ export const createLedgerService = ({ keystore$ }: { keystore$: KeystoreState$ }
   /**
    * Ask Ledger to get address from it
    */
-  const askLedgerAddress$ = (chain: Chain, network: Network, walletIndex = 0): LedgerAddressLD =>
+  const askLedgerAddress$ = (chain: Chain, network: Network, walletIndex: number): LedgerAddressLD =>
     FP.pipe(
       // remove address from memory
       removeLedgerAddress(chain, network),

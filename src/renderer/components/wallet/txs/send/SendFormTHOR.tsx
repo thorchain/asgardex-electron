@@ -47,6 +47,7 @@ export type FormValues = {
 
 export type Props = {
   walletType: WalletType
+  walletIndex: number
   balances: WalletBalances
   balance: WalletBalance
   onSubmit: (p: SendTxParams) => void
@@ -62,6 +63,7 @@ export type Props = {
 export const SendFormTHOR: React.FC<Props> = (props): JSX.Element => {
   const {
     walletType,
+    walletIndex,
     balances,
     balance,
     onSubmit,
@@ -183,12 +185,13 @@ export const SendFormTHOR: React.FC<Props> = (props): JSX.Element => {
 
     onSubmit({
       walletType,
+      walletIndex,
       recipient: form.getFieldValue('recipient'),
       asset: balance.asset,
       amount: amountToSend,
       memo: form.getFieldValue('memo')
     })
-  }, [onSubmit, form, balance.asset, amountToSend, walletType])
+  }, [onSubmit, form, balance.asset, amountToSend, walletType, walletIndex])
 
   const renderPwModal = useMemo(
     () =>

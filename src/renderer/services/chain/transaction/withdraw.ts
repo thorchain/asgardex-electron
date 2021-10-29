@@ -28,7 +28,7 @@ const { pools: midgardPoolsService, validateNode$ } = midgardService
  * @returns WithdrawState$ - Observable state to reflect loading status. It provides all data we do need to display status in `TxModal`
  *
  */
-export const symWithdraw$ = ({ memo, network }: SymWithdrawParams): WithdrawState$ => {
+export const symWithdraw$ = ({ memo, network, walletType, walletIndex }: SymWithdrawParams): WithdrawState$ => {
   // total of progress
   const total = O.some(100)
 
@@ -52,8 +52,8 @@ export const symWithdraw$ = ({ memo, network }: SymWithdrawParams): WithdrawStat
     liveData.chain((_) => {
       setState({ ...getState(), step: 2, withdraw: RD.progress({ loaded: 50, total }) })
       return sendPoolTx$({
-        // TODO(@asgdx-team) Get `walletType` from props if we want to support other than keystore (e.g. Ledger)
-        walletType: 'keystore',
+        walletType,
+        walletIndex,
         router: O.none, // no router for RUNE
         asset: AssetRuneNative,
         recipient: '', // empty for RUNE txs
@@ -134,7 +134,14 @@ export const symWithdraw$ = ({ memo, network }: SymWithdrawParams): WithdrawStat
  * @returns WithdrawState$ - Observable state to reflect loading status. It provides all data we do need to display status in `TxModal`
  *
  */
-export const asymWithdraw$ = ({ poolAddress, asset, memo, network }: AsymWithdrawParams): WithdrawState$ => {
+export const asymWithdraw$ = ({
+  poolAddress,
+  asset,
+  memo,
+  network,
+  walletIndex,
+  walletType
+}: AsymWithdrawParams): WithdrawState$ => {
   // total of progress
   const total = O.some(100)
 
@@ -167,8 +174,8 @@ export const asymWithdraw$ = ({ poolAddress, asset, memo, network }: AsymWithdra
     liveData.chain((_) => {
       setState({ ...getState(), step: 2, withdraw: RD.progress({ loaded: 50, total }) })
       return sendTx$({
-        // TODO(@asgdx-team) Get `walletType` from props if we want to support other than keystore (e.g. Ledger)
-        walletType: 'keystore',
+        walletType,
+        walletIndex,
         asset,
         recipient: poolAddress.address, // it will be empty string for RUNE
         amount: smallestAmountToSent(asset.chain, network),

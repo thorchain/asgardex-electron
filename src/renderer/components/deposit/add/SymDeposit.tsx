@@ -302,7 +302,10 @@ export const SymDeposit: React.FC<Props> = (props) => {
               // Decimal needs to be converted back for using orginal decimal of this asset (provided by `assetBalance`)
               asset: convertBaseAmountDecimal(assetAmountToDepositMax1e8, assetDecimal)
             },
-            memos
+            memos,
+            // TODO (@asgx-team) Get it from props when we will support Ledger for sym. deposit
+            walletType: 'keystore',
+            walletIndex: 0
           }
         })
       ),

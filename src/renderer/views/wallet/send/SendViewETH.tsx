@@ -24,6 +24,7 @@ import * as Helper from './SendView.helper'
 
 type Props = {
   walletType: WalletType
+  walletIndex: number
   asset: Asset
   balances: O.Option<NonEmptyWalletBalances>
   openExplorerTxUrl: OpenExplorerTxUrl
@@ -32,7 +33,7 @@ type Props = {
 }
 
 export const SendViewETH: React.FC<Props> = (props): JSX.Element => {
-  const { walletType, asset, balances: oBalances, openExplorerTxUrl, validatePassword$, network } = props
+  const { walletType, walletIndex, asset, balances: oBalances, openExplorerTxUrl, validatePassword$, network } = props
 
   const intl = useIntl()
   const history = useHistory()
@@ -84,6 +85,7 @@ export const SendViewETH: React.FC<Props> = (props): JSX.Element => {
     (walletBalance: WalletBalance) => (
       <SendFormETH
         walletType={walletType}
+        walletIndex={walletIndex}
         balance={walletBalance}
         balances={FP.pipe(
           oBalances,
@@ -98,7 +100,18 @@ export const SendViewETH: React.FC<Props> = (props): JSX.Element => {
         network={network}
       />
     ),
-    [walletType, oBalances, feesRD, isLoading, onSend, sendTxStatusMsg, reloadFees, validatePassword$, network]
+    [
+      walletType,
+      walletIndex,
+      oBalances,
+      feesRD,
+      isLoading,
+      onSend,
+      sendTxStatusMsg,
+      reloadFees,
+      validatePassword$,
+      network
+    ]
   )
 
   const finishActionHandler = useCallback(() => {

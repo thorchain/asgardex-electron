@@ -110,7 +110,7 @@ export type LedgerBTCTxInfo = Pick<TxParams, 'amount' | 'recipient'> & {
 
 export type LedgerTxParams = LedgerTHORTxParams | LedgerBNBTxParams
 
-export type IPCLedgerAdddressParams = { chain: Chain; network: Network; walletIndex?: number }
+export type IPCLedgerAdddressParams = { chain: Chain; network: Network; walletIndex: number }
 
 export type ApiHDWallet = {
   getLedgerAddress: (params: IPCLedgerAdddressParams) => Promise<Either<LedgerError, WalletAddress>>

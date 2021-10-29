@@ -176,15 +176,15 @@ describe('Wallet routes', () => {
 
   describe('deposit route', () => {
     it('template', () => {
-      expect(deposit.template).toEqual('/wallet/assets/deposit/:walletType/:walletAddress')
+      expect(deposit.template).toEqual('/wallet/assets/deposit/:walletType/:walletAddress/:walletIndex')
     })
     it('path for keystore + any wallet address ', () => {
-      expect(deposit.path({ walletType: 'keystore', walletAddress: 'abc123' })).toEqual(
-        '/wallet/assets/deposit/keystore/abc123'
+      expect(deposit.path({ walletType: 'keystore', walletAddress: 'abc123', walletIndex: '1' })).toEqual(
+        '/wallet/assets/deposit/keystore/abc123/1'
       )
     })
     it('redirects for invalid values ', () => {
-      expect(deposit.path({ walletAddress: '', walletType: 'ledger' })).toEqual('/wallet/assets')
+      expect(deposit.path({ walletAddress: '', walletType: 'ledger', walletIndex: '0' })).toEqual('/wallet/assets')
     })
   })
 })

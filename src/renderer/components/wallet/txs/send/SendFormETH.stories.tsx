@@ -9,7 +9,7 @@ import { assetAmount, AssetETH, assetToBase } from '@xchainjs/xchain-util'
 import { mockValidatePassword$ } from '../../../../../shared/mock/wallet'
 import { THORCHAIN_DECIMAL } from '../../../../helpers/assetHelper'
 import { mockWalletBalance } from '../../../../helpers/test/testWalletHelper'
-import { SendTxParams } from '../../../../services/ethereum/types'
+import { SendTxParams } from '../../../../services/chain/types'
 import { WalletBalance } from '../../../../services/wallet/types'
 import { SendFormETH } from './index'
 import { Props as SendFormETHProps } from './SendFormETH'
@@ -33,6 +33,7 @@ const fees: Fees = {
 
 const defaultProps: SendFormETHProps = {
   walletType: 'keystore',
+  walletIndex: 0,
   balances: [ethBalance, runeBalance],
   balance: ethBalance,
   fees: RD.success(fees),

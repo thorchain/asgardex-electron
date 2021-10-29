@@ -50,7 +50,7 @@ export type Props = {
   balances: WalletBalances
   balance: WalletBalance
   walletAddress: Address
-  walletIndex?: number
+  walletIndex: number
   onSubmit: (p: SendTxParams) => void
   isLoading: boolean
   sendTxStatusMsg: string
@@ -186,12 +186,12 @@ export const SendFormBNB: React.FC<Props> = (props): JSX.Element => {
 
     onSubmit({
       walletType,
+      walletIndex,
       sender: walletAddress,
       recipient: form.getFieldValue('recipient'),
       asset: balance.asset,
       amount: amountToSend,
-      memo: form.getFieldValue('memo'),
-      walletIndex: walletIndex
+      memo: form.getFieldValue('memo')
     })
   }, [onSubmit, walletType, walletAddress, form, balance.asset, amountToSend, walletIndex])
 

@@ -35,7 +35,9 @@ import { SendViewTHOR } from './SendViewTHOR'
 type Props = {}
 
 export const SendView: React.FC<Props> = (): JSX.Element => {
-  const { asset, walletAddress, walletType, walletIndex } = useParams<SendParams>()
+  const { asset, walletAddress, walletType, walletIndex: walletIndexRoute } = useParams<SendParams>()
+
+  const walletIndex = parseInt(walletIndexRoute)
   const intl = useIntl()
 
   const { network$ } = useAppContext()
@@ -82,7 +84,7 @@ export const SendView: React.FC<Props> = (): JSX.Element => {
             <SendViewBNB
               walletType={walletType}
               walletAddress={walletAddress}
-              walletIndex={parseInt(walletIndex)}
+              walletIndex={walletIndex}
               asset={asset}
               balances={balances}
               openExplorerTxUrl={openExplorerTxUrl}
@@ -94,6 +96,7 @@ export const SendView: React.FC<Props> = (): JSX.Element => {
           return (
             <SendViewBCH
               walletType={walletType}
+              walletIndex={walletIndex}
               asset={asset}
               balances={balances}
               openExplorerTxUrl={openExplorerTxUrl}
@@ -105,6 +108,7 @@ export const SendView: React.FC<Props> = (): JSX.Element => {
           return (
             <SendViewBTC
               walletType={walletType}
+              walletIndex={walletIndex}
               asset={asset}
               balances={balances}
               openExplorerTxUrl={openExplorerTxUrl}
@@ -116,6 +120,7 @@ export const SendView: React.FC<Props> = (): JSX.Element => {
           return (
             <SendViewETH
               walletType={walletType}
+              walletIndex={walletIndex}
               asset={asset}
               balances={balances}
               openExplorerTxUrl={openExplorerTxUrl}
@@ -127,6 +132,7 @@ export const SendView: React.FC<Props> = (): JSX.Element => {
           return (
             <SendViewTHOR
               walletType={walletType}
+              walletIndex={walletIndex}
               walletAddress={walletAddress}
               asset={asset}
               balances={balances}
@@ -139,6 +145,7 @@ export const SendView: React.FC<Props> = (): JSX.Element => {
           return (
             <SendViewLTC
               walletType={walletType}
+              walletIndex={walletIndex}
               asset={asset}
               balances={balances}
               openExplorerTxUrl={openExplorerTxUrl}
@@ -173,7 +180,7 @@ export const SendView: React.FC<Props> = (): JSX.Element => {
               asset: assetToString(asset),
               walletAddress,
               walletType,
-              walletIndex: walletIndex ? walletIndex : '0'
+              walletIndex: walletIndexRoute
             })}
           />
           {renderSendView(asset)}

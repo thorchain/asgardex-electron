@@ -61,6 +61,8 @@ export type AsymDepositParams = {
   readonly asset: Asset
   readonly amount: BaseAmount
   readonly memo: string
+  readonly walletIndex: number
+  readonly walletType: WalletType
 }
 
 export type SymDepositAmounts = { rune: BaseAmount; asset: BaseAmount }
@@ -70,6 +72,8 @@ export type SymDepositParams = {
   readonly asset: Asset
   readonly amounts: SymDepositAmounts
   readonly memos: SymDepositMemo
+  readonly walletIndex: number
+  readonly walletType: WalletType
 }
 
 export type SendDepositTxParams = {
@@ -89,7 +93,7 @@ export type SendTxParams = {
   amount: BaseAmount
   memo: Memo
   feeOption?: FeeOption
-  walletIndex?: number
+  walletIndex: number
 }
 
 export type SendPoolTxParams = SendTxParams & {
@@ -124,6 +128,7 @@ export type SwapTxParams = {
   readonly memo: string
   readonly walletType: WalletType
   readonly sender: Address
+  readonly walletIndex: number
 }
 
 export type SwapStateHandler = (p: SwapTxParams) => SwapState$
@@ -242,6 +247,8 @@ export type WithdrawState$ = Rx.Observable<WithdrawState>
 export type SymWithdrawParams = {
   readonly memo: Memo
   readonly network: Network
+  readonly walletType: WalletType
+  readonly walletIndex: number
 }
 
 export type SymWithdrawStateHandler = (p: SymWithdrawParams) => WithdrawState$
@@ -251,6 +258,8 @@ export type AsymWithdrawParams = {
   readonly asset: Asset
   readonly memo: Memo
   readonly network: Network
+  readonly walletType: WalletType
+  readonly walletIndex: number
 }
 
 export type AsymWithdrawStateHandler = (p: AsymWithdrawParams) => WithdrawState$
@@ -301,4 +310,4 @@ export type SendTxState = {
 
 export type SendTxState$ = Rx.Observable<SendTxState>
 
-export type SendTxStateHandler = (p: SendTxParams, walletIndex?: number) => SendTxState$
+export type SendTxStateHandler = (p: SendTxParams) => SendTxState$

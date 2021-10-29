@@ -86,10 +86,12 @@ export const AssetDetails: React.FC<Props> = (props): JSX.Element => {
   const walletActionDepositClick = useCallback(() => {
     FP.pipe(
       oWalletAddress,
-      O.map((walletAddress) => walletRoutes.deposit.path({ walletType, walletAddress })),
+      O.map((walletAddress) =>
+        walletRoutes.deposit.path({ walletType, walletAddress, walletIndex: walletIndex.toString() })
+      ),
       O.map(history.push)
     )
-  }, [oWalletAddress, history.push, walletType])
+  }, [oWalletAddress, history.push, walletType, walletIndex])
 
   const isNonNativeRuneAsset: boolean = useMemo(
     () => AssetHelper.isNonNativeRuneAsset(asset, network),

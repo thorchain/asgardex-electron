@@ -35,13 +35,19 @@ const txFailure$ = (msg: string) =>
     })
   )
 
-export const sendTx$ = (
-  { walletType, asset, sender, recipient, amount, memo, feeOption = DEFAULT_FEE_OPTION }: SendTxParams,
-  walletIndex?: number
-): TxHashLD => {
+export const sendTx$ = ({
+  walletType,
+  asset,
+  sender,
+  recipient,
+  amount,
+  memo,
+  feeOption = DEFAULT_FEE_OPTION,
+  walletIndex
+}: SendTxParams): TxHashLD => {
   switch (asset.chain) {
     case BNBChain:
-      return BNB.sendTx({ walletType, sender, recipient, amount, asset, memo }, walletIndex)
+      return BNB.sendTx({ walletType, sender, recipient, amount, asset, memo, walletIndex })
 
     case BTCChain:
       return FP.pipe(
@@ -50,14 +56,14 @@ export const sendTx$ = (
           errorId: ErrorId.GET_FEES,
           msg: error?.message ?? error.toString()
         })),
-        liveData.chain(({ rates }) => BTC.sendTx({ recipient, amount, feeRate: rates[feeOption], memo }))
+        liveData.chain(({ rates }) => BTC.sendTx({ recipient, amount, feeRate: rates[feeOption], memo, walletIndex }))
       )
 
     case ETHChain:
-      return ETH.sendTx({ asset, recipient, amount, memo, feeOption })
+      return ETH.sendTx({ asset, recipient, amount, memo, feeOption, walletIndex })
 
     case THORChain:
-      return THOR.sendTx({ walletType, amount, asset, memo, recipient })
+      return THOR.sendTx({ walletType, amount, asset, memo, recipient, walletIndex })
 
     case CosmosChain:
       // not available yet
@@ -73,7 +79,7 @@ export const sendTx$ = (
           errorId: ErrorId.GET_FEES,
           msg: error?.message ?? error.toString()
         })),
-        liveData.chain(({ rates }) => BCH.sendTx({ recipient, amount, feeRate: rates[feeOption], memo }))
+        liveData.chain(({ rates }) => BCH.sendTx({ recipient, amount, feeRate: rates[feeOption], memo, walletIndex }))
       )
     case LTCChain:
       return FP.pipe(
@@ -83,7 +89,7 @@ export const sendTx$ = (
           msg: error?.message ?? error.toString()
         })),
         liveData.chain(({ rates }) => {
-          return LTC.sendTx({ recipient, amount, asset, memo, feeRate: rates[feeOption] })
+          return LTC.sendTx({ recipient, amount, asset, memo, feeRate: rates[feeOption], walletIndex })
         })
       )
   }
@@ -108,11 +114,12 @@ export const sendPoolTx$ = ({
         recipient,
         asset,
         amount,
-        memo
+        memo,
+        walletIndex
       })
 
     case THORChain:
-      return THOR.sendPoolTx$({ walletType, amount, asset, memo })
+      return THOR.sendPoolTx$({ walletType, amount, asset, memo, walletIndex })
 
     default:
       return sendTx$({ sender, walletType, asset, recipient, amount, memo, feeOption, walletIndex })

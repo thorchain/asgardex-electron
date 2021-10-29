@@ -27,15 +27,20 @@ const reloadBalances = () => {
 }
 
 // State of balances loaded by Client
-const balances$: ({ walletType, network }: { walletType: WalletType; network: Network }) => C.WalletBalancesLD = ({
+const balances$: ({
   walletType,
-  network
-}) => {
+  network,
+  walletIndex
+}: {
+  walletType: WalletType
+  network: Network
+  walletIndex: number
+}) => C.WalletBalancesLD = ({ walletType, walletIndex, network }) => {
   // For testnet we limit requests by using pre-defined assets only
   // because `xchain-ethereum` does for each asset a single request
   const assets: Asset[] | undefined = network === 'testnet' ? ETHAssetsTestnet : undefined
   return FP.pipe(
-    C.balances$({ client$, trigger$: reloadBalances$, assets, walletType }),
+    C.balances$({ client$, trigger$: reloadBalances$, assets, walletType, walletIndex }),
     // Filter assets based on ERC20Whitelist (mainnet only)
     liveData.map(FP.flow(A.filter(({ asset }) => validAssetForETH(asset, network))))
   )

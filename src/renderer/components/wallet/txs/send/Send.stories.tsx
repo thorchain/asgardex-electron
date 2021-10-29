@@ -24,7 +24,7 @@ import { RDStatus, getMockRDValueFactory } from '../../../../../shared/mock/rdBy
 import { mockValidatePassword$ } from '../../../../../shared/mock/wallet'
 import { WalletType } from '../../../../../shared/wallet/types'
 import { mockWalletBalance } from '../../../../helpers/test/testWalletHelper'
-import { SendTxParams } from '../../../../services/binance/types'
+import { SendTxParams } from '../../../../services/chain/types'
 import { WalletBalances } from '../../../../services/clients'
 import { ErrorId, TxHashRD, WalletBalance } from '../../../../services/wallet/types'
 import { Send } from './Send'
@@ -125,12 +125,18 @@ const defaultComponentProps = {
   balances,
   balance: bnbAsset,
   feesWithRates: RD.success({ fees, rates }),
-  onSubmit: ({ recipient, amount, asset, memo }: SendTxParams) =>
-    console.log(
-      `to: ${recipient}, amount ${formatAssetAmount({ amount: baseToAsset(amount) })}, asset: ${assetToString(
-        asset
-      )}, memo: ${memo}`
-    ),
+  onSubmit: (p: SendTxParams) => {
+    const { recipient, amount, asset, memo, walletIndex, walletType, sender } = p
+    console.log(`
+      to: ${recipient},
+      amount ${formatAssetAmount({ amount: baseToAsset(amount) })},
+      asset: ${assetToString(asset)},
+      memo: ${memo},
+      sender: ${sender},
+      walletType: ${walletType},
+      walletIndex: ${walletIndex}
+      `)
+  },
 
   isLoading: false,
   addressValidation: (_: unknown) => true,

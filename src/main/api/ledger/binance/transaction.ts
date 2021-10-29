@@ -20,7 +20,7 @@ export const send = async ({
   amount,
   asset,
   memo,
-  walletIndex = 0
+  walletIndex
 }: {
   transport: Transport
   amount: BaseAmount
