@@ -156,7 +156,7 @@ export const createBalancesService = ({
     }
   })
 
-  const getChainBalance$ = (chain: Chain, walletType: WalletType, walletIndex = 0): WalletBalancesLD => {
+  const getChainBalance$ = (chain: Chain, walletType: WalletType, walletIndex: number): WalletBalancesLD => {
     const chainService = getServiceByChain(chain, walletType, walletIndex)
     const reload$ = FP.pipe(
       chainService.reloadBalances$,
@@ -199,13 +199,13 @@ export const createBalancesService = ({
    */
   const thorChainBalance$: ChainBalance$ = Rx.combineLatest([
     THOR.addressUI$,
-    getChainBalance$(THORChain, 'keystore')
+    getChainBalance$(THORChain, 'keystore', 0) // walletIndex=0 (as long as we don't support HD wallets for keystore)
   ]).pipe(
     RxOp.map(([oWalletAddress, balances]) => ({
       walletType: 'keystore',
       chain: THORChain,
       walletAddress: addressFromOptionalWalletAddress(oWalletAddress),
-      walletIndex: 0, // Always 0 as long as we don't support HD wallets
+      walletIndex: 0, // Always 0 as long as we don't support HD wallets for keystore
       balances
     }))
   )
@@ -271,13 +271,13 @@ export const createBalancesService = ({
    */
   const litecoinBalance$: ChainBalance$ = Rx.combineLatest([
     LTC.addressUI$,
-    getChainBalance$(LTCChain, 'keystore')
+    getChainBalance$(LTCChain, 'keystore', 0) // walletIndex=0 (as long as we don't support HD wallets for keystore)
   ]).pipe(
     RxOp.map(([oWalletAddress, balances]) => ({
       walletType: 'keystore',
       chain: LTCChain,
       walletAddress: addressFromOptionalWalletAddress(oWalletAddress),
-      walletIndex: 0, // Always 0 as long as we don't support HD wallets
+      walletIndex: 0, // Always 0 as long as we don't support HD wallets for keystore for keystore
       balances
     }))
   )
@@ -287,13 +287,13 @@ export const createBalancesService = ({
    */
   const bchChainBalance$: ChainBalance$ = Rx.combineLatest([
     BCH.addressUI$,
-    getChainBalance$(BCHChain, 'keystore')
+    getChainBalance$(BCHChain, 'keystore', 0) // walletIndex=0 (as long as we don't support HD wallets for keystore)
   ]).pipe(
     RxOp.map(([oWalletAddress, balances]) => ({
       walletType: 'keystore',
       chain: BCHChain,
       walletAddress: addressFromOptionalWalletAddress(oWalletAddress),
-      walletIndex: 0, // Always 0 as long as we don't support HD wallets
+      walletIndex: 0, // Always 0 as long as we don't support HD wallets for keystore
       balances
     }))
   )
@@ -308,14 +308,14 @@ export const createBalancesService = ({
    */
   const bnbChainBalance$: ChainBalance$ = Rx.combineLatest([
     BNB.addressUI$,
-    getChainBalance$(BNBChain, 'keystore'),
+    getChainBalance$(BNBChain, 'keystore', 0), // walletIndex=0 (as long as we don't support HD wallets for keystore)
     network$
   ]).pipe(
     RxOp.map(([oWalletAddress, balances, network]) => ({
       walletType: 'keystore',
       chain: BNBChain,
       walletAddress: addressFromOptionalWalletAddress(oWalletAddress),
-      walletIndex: 0, // Always 0 as long as we don't support HD wallets
+      walletIndex: 0, // Always 0 as long as we don't support HD wallets for keystore
       balances: FP.pipe(
         balances,
         RD.map((assets) => sortBalances(assets, [AssetBNB.ticker, getBnbRuneAsset(network).ticker]))
@@ -328,18 +328,18 @@ export const createBalancesService = ({
    */
   const btcChainBalance$: ChainBalance$ = Rx.combineLatest([
     BTC.addressUI$,
-    getChainBalance$(BTCChain, 'keystore')
+    getChainBalance$(BTCChain, 'keystore', 0) // walletIndex=0 (as long as we don't support HD wallets for keystore)
   ]).pipe(
     RxOp.map(([oWalletAddress, balances]) => ({
       walletType: 'keystore',
       chain: BTCChain,
       walletAddress: addressFromOptionalWalletAddress(oWalletAddress),
-      walletIndex: 0, // Always 0 as long as we don't support HD wallets
+      walletIndex: 0, // Always 0 as long as we don't support HD wallets for keystore
       balances
     }))
   )
 
-  const ethBalances$ = getChainBalance$(ETHChain, 'keystore')
+  const ethBalances$ = getChainBalance$(ETHChain, 'keystore', 0) // walletIndex=0 (as long as we don't support HD wallets for keystore)
 
   /**
    * Transforms ETH data (address + `WalletBalance`) into `ChainBalance`
@@ -349,7 +349,7 @@ export const createBalancesService = ({
       walletType: 'keystore',
       chain: ETHChain,
       walletAddress: addressFromOptionalWalletAddress(oWalletAddress),
-      walletIndex: 0, // Always 0 as long as we don't support HD wallets
+      walletIndex: 0, // Always 0 as long as we don't support HD wallets for keystore
       balances
     }))
   )

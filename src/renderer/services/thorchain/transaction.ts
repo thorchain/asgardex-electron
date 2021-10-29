@@ -27,7 +27,13 @@ import { TransactionService } from './types'
 export const createTransactionService = (client$: Client$, network$: Network$): TransactionService => {
   const common = C.createTransactionService(client$)
 
-  const depositLedgerTx = ({ network, params }: { network: Network; params: DepositParam }) => {
+  const depositLedgerTx = ({
+    network,
+    params
+  }: {
+    network: Network
+    params: DepositParam & { walletIndex: number /* override walletIndex of DepositParam to avoid 'undefined' */ }
+  }) => {
     const depositLedgerTxParams: IPCLedgerDepositTxParams = {
       chain: THORChain,
       network,
@@ -87,7 +93,16 @@ export const createTransactionService = (client$: Client$, network$: Network$): 
       RxOp.startWith(RD.pending)
     )
 
-  const sendPoolTx = ({ walletType, walletIndex, asset, amount, memo }: DepositParam & { walletType: WalletType }) =>
+  const sendPoolTx = ({
+    walletType,
+    walletIndex,
+    asset,
+    amount,
+    memo
+  }: DepositParam & {
+    walletType: WalletType
+    walletIndex: number /* override walletIndex of DepositParam to avoid 'undefined' */
+  }) =>
     FP.pipe(
       network$,
       RxOp.switchMap((network) => {

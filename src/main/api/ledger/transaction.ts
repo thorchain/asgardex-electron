@@ -17,7 +17,7 @@ export const sendTx = async ({
   amount,
   asset,
   memo,
-  walletIndex = 0
+  walletIndex
 }: IPCLedgerSendTxParams): Promise<E.Either<LedgerError, TxHash>> => {
   try {
     const transport = await TransportNodeHidSingleton.open()

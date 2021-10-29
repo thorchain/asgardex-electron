@@ -11,7 +11,7 @@ import { getAddress as getTHORAddress, verifyAddress as verifyTHORAddress } from
 export const getAddress = async ({
   chain,
   network,
-  walletIndex = 0
+  walletIndex
 }: IPCLedgerAdddressParams): Promise<E.Either<LedgerError, WalletAddress>> => {
   try {
     let res: E.Either<LedgerError, WalletAddress>
@@ -39,7 +39,7 @@ export const getAddress = async ({
   }
 }
 
-export const verifyLedgerAddress = async ({ chain, network, walletIndex = 0 }: IPCLedgerAdddressParams) => {
+export const verifyLedgerAddress = async ({ chain, network, walletIndex }: IPCLedgerAdddressParams) => {
   const transport = await TransportNodeHidSingleton.open()
   switch (chain) {
     case THORChain:

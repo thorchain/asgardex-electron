@@ -30,6 +30,7 @@
 - [Pools] Disable manage button while wallet locked [#1877](https://github.com/thorchain/asgardex-electron/pull/1877)
 - Fix 24h volume [#1883](https://github.com/thorchain/asgardex-electron/pull/1883)
 - Fix outdated links [#1884](https://github.com/thorchain/asgardex-electron/pull/1884)
+- [Ledger] walletIndex get lost while veryfiying address on device [#1908](https://github.com/thorchain/asgardex-electron/issues/1908)
 
 ## Internal
 
