@@ -1,7 +1,6 @@
 import React, { useCallback, useEffect, useMemo } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
-import { Address } from '@xchainjs/xchain-client'
 import { Asset, assetFromString, AssetRuneNative, bnOrZero, Chain, THORChain } from '@xchainjs/xchain-util'
 import { Spin } from 'antd'
 import * as FP from 'fp-ts/function'
@@ -22,9 +21,8 @@ import { useEthereumContext } from '../../contexts/EthereumContext'
 import { useMidgardContext } from '../../contexts/MidgardContext'
 import { useWalletContext } from '../../contexts/WalletContext'
 import { isRuneNativeAsset } from '../../helpers/assetHelper'
-import { eqChain, eqOAsset } from '../../helpers/fp/eq'
+import { eqChain } from '../../helpers/fp/eq'
 import { sequenceTOption, sequenceTRD } from '../../helpers/fpHelpers'
-import { liveData } from '../../helpers/rx/liveData'
 import { addressFromOptionalWalletAddress } from '../../helpers/walletHelper'
 import { useMimirHalt } from '../../hooks/useMimirHalt'
 import { useNetwork } from '../../hooks/useNetwork'
@@ -215,29 +213,21 @@ export const SwapView: React.FC<Props> = (_): JSX.Element => {
     [targetAssetRD]
   )
 
-  const [oTargetLedgerAddress, routeTargetUpdated] = useObservableState<O.Option<Address>, O.Option<Asset>>(
-    (oRouteTarget$) =>
+  const targetLedgerAddress$ = useMemo(
+    () =>
       FP.pipe(
-        oRouteTarget$,
-        RxOp.distinctUntilChanged(eqOAsset.equals),
-        RxOp.switchMap((oRouteTarget) =>
-          FP.pipe(
-            oRouteTarget,
-            O.fold(
-              () => Rx.of(RD.initial),
-              ({ chain }) => getLedgerAddress$(chain, network)
-            ),
-            liveData.map(({ address }) => address),
-            RxOp.switchMap((rdAddress) => Rx.of(RD.toOption(rdAddress)))
-          )
-        )
+        oTargetAsset,
+        O.fold(
+          () => Rx.EMPTY,
+          ({ chain }) => getLedgerAddress$(chain, network)
+        ),
+        RxOp.map((rdAddress) => RD.toOption(rdAddress)),
+        RxOp.map(addressFromOptionalWalletAddress)
       ),
-    O.none
-  )
 
-  useEffect(() => {
-    routeTargetUpdated(oTargetAsset)
-  }, [oTargetAsset, routeTargetUpdated])
+    [getLedgerAddress$, network, oTargetAsset]
+  )
+  const oTargetLedgerAddress = useObservableState(targetLedgerAddress$, O.none)
 
   const { validateSwapAddress } = useValidateAddress(targetAssetChain)
   const openAddressUrl = useOpenAddressUrl(targetAssetChain)
