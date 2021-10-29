@@ -238,6 +238,10 @@ export const SwapView: React.FC<Props> = (_): JSX.Element => {
         <Styled.BackLink />
         <RefreshButton clickHandler={reloadHandler} />
       </Styled.TopControlsContainer>
+      <div>SwapView-----------------</div>
+      <div>oTargetKeystoreAddress {JSON.stringify(oTargetKeystoreAddress, null, 2)}</div>
+      <div>oTargetLedgerAddress {JSON.stringify(oTargetLedgerAddress, null, 2)}</div>
+      <div>-------------------------</div>
       <Styled.ContentContainer>
         {FP.pipe(
           sequenceTRD(poolsState, sourceAssetRD, targetAssetRD),

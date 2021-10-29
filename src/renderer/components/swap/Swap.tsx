@@ -251,6 +251,8 @@ export const Swap = ({
     [oSourceAsset, allBalances]
   )
 
+  const hasTargetAssetLedger = useMemo(() => O.isSome(oTargetLedgerAddress), [oTargetLedgerAddress])
+
   const oTargetWalletType: O.Option<WalletType> = useMemo(() => {
     // Check for Ledger
     if (eqOAddress.equals(editableTargetWalletAddress, oTargetLedgerAddress)) {
@@ -1293,6 +1295,10 @@ export const Swap = ({
 
   return (
     <Styled.Container>
+      <div>Swap-----------------</div>
+      <div>hasTargetAssetLedger: {hasTargetAssetLedger.toString()}</div>
+      <div>oTargetLedgerAddress: {JSON.stringify(oTargetLedgerAddress)}</div>
+      <div>---------------------</div>
       <Styled.ContentContainer>
         <Styled.Header>
           {FP.pipe(
@@ -1382,7 +1388,7 @@ export const Swap = ({
                     <Styled.CheckButton
                       checked={useTargetAssetLedger}
                       clickHandler={() => setUseTargetAssetLedger(() => !useTargetAssetLedger)}
-                      disabled={O.isNone(oTargetLedgerAddress)}>
+                      disabled={!hasTargetAssetLedger}>
                       {intl.formatMessage({ id: 'ledger.title' })}
                     </Styled.CheckButton>
                   </Styled.AssetSelectContainer>
