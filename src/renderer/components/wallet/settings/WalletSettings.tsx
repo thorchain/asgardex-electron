@@ -293,7 +293,6 @@ export const WalletSettings: React.FC<Props> = (props): JSX.Element => {
         onSuccess={removeWallet}
       />
       {renderQRCodeModal}
-      <div>walletIndex {JSON.stringify(walletIndexMap, null, 2)}</div>
       <Styled.Row gutter={[16, 16]}>
         <Col span={24}>
           {renderVerifyAddressModal(addressToVerify)}
