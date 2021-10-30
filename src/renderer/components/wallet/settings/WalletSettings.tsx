@@ -1,18 +1,18 @@
-import React, { useCallback, useMemo, useState } from 'react'
+import React, { useCallback, useEffect, useMemo, useState } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
 import { Address } from '@xchainjs/xchain-client'
 import {
   Asset,
-  BCHChain,
   BNBChain,
-  BTCChain,
-  Chain,
-  CosmosChain,
+  THORChain,
   ETHChain,
-  LTCChain,
   PolkadotChain,
-  THORChain
+  BCHChain,
+  BTCChain,
+  LTCChain,
+  CosmosChain,
+  Chain
 } from '@xchainjs/xchain-util'
 import { Col, List, Row } from 'antd'
 import * as FP from 'fp-ts/function'
@@ -28,7 +28,12 @@ import { AssetIcon } from '../../../components/uielements/assets/assetIcon/Asset
 import { QRCodeModal } from '../../../components/uielements/qrCodeModal/QRCodeModal'
 import { PhraseCopyModal } from '../../../components/wallet/phrase/PhraseCopyModal'
 import { getChainAsset, isBnbChain, isThorChain } from '../../../helpers/chainHelper'
-import { ValidatePasswordHandler, WalletAccounts, WalletAddressAsync } from '../../../services/wallet/types'
+import {
+  LedgerAddressesMap,
+  ValidatePasswordHandler,
+  WalletAccounts,
+  WalletAddressAsync
+} from '../../../services/wallet/types'
 import { walletTypeToI18n } from '../../../services/wallet/util'
 import { InfoIcon } from '../../uielements/info'
 import { Modal } from '../../uielements/modal'
@@ -41,6 +46,7 @@ type Props = {
   lockWallet: FP.Lazy<void>
   removeKeystore: FP.Lazy<void>
   exportKeystore: (runeNativeAddress: string, selectedNetwork: Network) => void
+  ledgerAddresses: LedgerAddressesMap
   addLedgerAddress: (chain: Chain, walletIndex: number) => void
   verifyLedgerAddress: (chain: Chain, walletIndex: number) => void
   removeLedgerAddress: (chain: Chain) => void
@@ -60,6 +66,7 @@ export const WalletSettings: React.FC<Props> = (props): JSX.Element => {
     lockWallet = () => {},
     removeKeystore = () => {},
     exportKeystore = () => {},
+    ledgerAddresses,
     addLedgerAddress,
     verifyLedgerAddress,
     removeLedgerAddress,
@@ -83,16 +90,6 @@ export const WalletSettings: React.FC<Props> = (props): JSX.Element => {
   const [showRemoveWalletModal, setShowRemoveWalletModal] = useState(false)
   const [showQRModal, setShowQRModal] = useState<O.Option<{ asset: Asset; address: Address }>>(O.none)
   const closeQrModal = useCallback(() => setShowQRModal(O.none), [setShowQRModal])
-  const [walletIndexMap, setWalletIndexMap] = useState<Record<Chain, number>>({
-    [BNBChain]: 0,
-    [BTCChain]: 0,
-    [BCHChain]: 0,
-    [LTCChain]: 0,
-    [THORChain]: 0,
-    [ETHChain]: 0,
-    [CosmosChain]: 0,
-    [PolkadotChain]: 0
-  })
 
   const removeWallet = useCallback(() => {
     removeKeystore()
@@ -120,6 +117,34 @@ export const WalletSettings: React.FC<Props> = (props): JSX.Element => {
       O.getOrElse(() => <></>)
     )
   }, [showQRModal, selectedNetwork, closeQrModal])
+
+  const [walletIndexMap, setWalletIndexMap] = useState<Record<Chain, number>>({
+    [BNBChain]: 0,
+    [BTCChain]: 0,
+    [BCHChain]: 0,
+    [LTCChain]: 0,
+    [THORChain]: 0,
+    [ETHChain]: 0,
+    [CosmosChain]: 0,
+    [PolkadotChain]: 0
+  })
+
+  useEffect(
+    () =>
+      [BNBChain, THORChain].forEach((chain) => {
+        FP.pipe(
+          ledgerAddresses[chain][selectedNetwork],
+          RD.fold(
+            () => {},
+            () => {},
+            () => {},
+            (address) => setWalletIndexMap({ ...walletIndexMap, [chain]: address.walletIndex })
+          )
+        )
+      }),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [ledgerAddresses, selectedNetwork]
+  )
 
   const renderAddress = useCallback(
     (chain: Chain, { type: walletType, address: addressRD }: WalletAddressAsync) => {
