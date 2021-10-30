@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react'
+import React, { useCallback, useMemo, useState } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
 import { Address } from '@xchainjs/xchain-client'
@@ -28,12 +28,7 @@ import { AssetIcon } from '../../../components/uielements/assets/assetIcon/Asset
 import { QRCodeModal } from '../../../components/uielements/qrCodeModal/QRCodeModal'
 import { PhraseCopyModal } from '../../../components/wallet/phrase/PhraseCopyModal'
 import { getChainAsset, isBnbChain, isThorChain } from '../../../helpers/chainHelper'
-import {
-  LedgerAddressesMap,
-  ValidatePasswordHandler,
-  WalletAccounts,
-  WalletAddressAsync
-} from '../../../services/wallet/types'
+import { ValidatePasswordHandler, WalletAccounts, WalletAddressAsync } from '../../../services/wallet/types'
 import { walletTypeToI18n } from '../../../services/wallet/util'
 import { InfoIcon } from '../../uielements/info'
 import { Modal } from '../../uielements/modal'
@@ -46,7 +41,6 @@ type Props = {
   lockWallet: FP.Lazy<void>
   removeKeystore: FP.Lazy<void>
   exportKeystore: (runeNativeAddress: string, selectedNetwork: Network) => void
-  ledgerAddresses: LedgerAddressesMap
   addLedgerAddress: (chain: Chain, walletIndex: number) => void
   verifyLedgerAddress: (chain: Chain, walletIndex: number) => void
   removeLedgerAddress: (chain: Chain) => void
@@ -66,7 +60,6 @@ export const WalletSettings: React.FC<Props> = (props): JSX.Element => {
     lockWallet = () => {},
     removeKeystore = () => {},
     exportKeystore = () => {},
-    ledgerAddresses,
     addLedgerAddress,
     verifyLedgerAddress,
     removeLedgerAddress,
@@ -129,23 +122,6 @@ export const WalletSettings: React.FC<Props> = (props): JSX.Element => {
     [PolkadotChain]: 0
   })
 
-  useEffect(
-    () =>
-      [BNBChain, THORChain].forEach((chain) => {
-        FP.pipe(
-          ledgerAddresses[chain][selectedNetwork],
-          RD.fold(
-            () => {},
-            () => {},
-            () => {},
-            (address) => setWalletIndexMap({ ...walletIndexMap, [chain]: address.walletIndex })
-          )
-        )
-      }),
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [ledgerAddresses, selectedNetwork]
-  )
-
   const renderAddress = useCallback(
     (chain: Chain, { type: walletType, address: addressRD }: WalletAddressAsync) => {
       const renderAddLedger = (chain: Chain, loading: boolean) => (
@@ -157,7 +133,7 @@ export const WalletSettings: React.FC<Props> = (props): JSX.Element => {
             <>
               <Styled.IndexLabel>{intl.formatMessage({ id: 'setting.wallet.index' })}</Styled.IndexLabel>
               <Styled.WalletIndexInput
-                value={walletIndexMap[chain].toString()}
+                value="0"
                 pattern="[0-9]+"
                 onChange={(value) =>
                   value !== null && +value >= 0 && setWalletIndexMap({ ...walletIndexMap, [chain]: +value })
@@ -185,7 +161,7 @@ export const WalletSettings: React.FC<Props> = (props): JSX.Element => {
                   {isLedgerWallet(walletType) && renderAddLedger(chain, false)}
                 </div>
               ),
-              ({ address }) => (
+              ({ address, walletIndex }) => (
                 <>
                   <Styled.AddressEllipsis address={address} chain={chain} network={selectedNetwork} enableCopy={true} />
                   <Styled.QRCodeIcon onClick={() => setShowQRModal(O.some({ asset: getChainAsset(chain), address }))} />
@@ -199,7 +175,7 @@ export const WalletSettings: React.FC<Props> = (props): JSX.Element => {
                             chain
                           })
                         )
-                        verifyLedgerAddress(chain, walletIndexMap[chain])
+                        verifyLedgerAddress(chain, walletIndex)
                       }}
                     />
                   )}

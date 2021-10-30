@@ -28,18 +28,15 @@ import { filterEnabledChains, isBnbChain, isThorChain } from '../../helpers/chai
 import { sequenceTOptionFromArray } from '../../helpers/fpHelpers'
 import { useLedger } from '../../hooks/useLedger'
 import { DEFAULT_NETWORK } from '../../services/const'
-import { INITIAL_LEDGER_ADDRESSES_MAP } from '../../services/wallet/const'
-import { LedgerAddressesMap, WalletAddressAsync } from '../../services/wallet/types'
+import { WalletAddressAsync } from '../../services/wallet/types'
 import { ledgerErrorIdToI18n } from '../../services/wallet/util'
 import { getPhrase } from '../../services/wallet/util'
 import { walletAccount$ } from './WalletSettingsView.helper'
 
 export const WalletSettingsView: React.FC = (): JSX.Element => {
   const intl = useIntl()
-  const { keystoreService, ledgerAddresses$ } = useWalletContext()
+  const { keystoreService } = useWalletContext()
   const { keystore$, lock, removeKeystore, exportKeystore, validatePassword$ } = keystoreService
-
-  const ledgerAddresses = useObservableState<LedgerAddressesMap>(ledgerAddresses$, INITIAL_LEDGER_ADDRESSES_MAP)
 
   const { network$ } = useAppContext()
   const network = useObservableState<Network>(network$, DEFAULT_NETWORK)
@@ -207,7 +204,6 @@ export const WalletSettingsView: React.FC = (): JSX.Element => {
       lockWallet={lock}
       removeKeystore={removeKeystore}
       exportKeystore={exportKeystore}
-      ledgerAddresses={ledgerAddresses}
       addLedgerAddress={addLedgerAddressHandler}
       verifyLedgerAddress={verifyLedgerAddressHandler}
       removeLedgerAddress={removeLedgerAddressHandler}
