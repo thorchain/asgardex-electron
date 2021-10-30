@@ -134,7 +134,9 @@ export const WalletSettings: React.FC<Props> = (props): JSX.Element => {
               <Styled.WalletIndexInput
                 value={walletIndexMap[chain].toString()}
                 pattern="[0-9]+"
-                onChange={(value) => value !== null && setWalletIndexMap({ ...walletIndexMap, [chain]: +value })}
+                onChange={(value) =>
+                  value !== null && +value >= 0 && setWalletIndexMap({ ...walletIndexMap, [chain]: +value })
+                }
                 style={{ width: 60 }}
                 onPressEnter={() => addLedgerAddress(chain, walletIndexMap[chain])}
               />
