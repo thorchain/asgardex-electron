@@ -5,9 +5,10 @@ import { keystoreService, removeKeystore } from './keystore'
 import { createLedgerService } from './ledger'
 import { getTxs$, loadTxs, explorerUrl$, resetTxsPage } from './transaction'
 
-const { askLedgerAddress$, getLedgerAddress$, verifyLedgerAddress, removeLedgerAddress } = createLedgerService({
-  keystore$: keystoreService.keystore$
-})
+const { askLedgerAddress$, getLedgerAddress$, verifyLedgerAddress, removeLedgerAddress, ledgerAddresses$ } =
+  createLedgerService({
+    keystore$: keystoreService.keystore$
+  })
 
 const { reloadBalances, reloadBalancesByChain, balancesState$, chainBalances$ } = createBalancesService({
   keystore$: keystoreService.keystore$,
@@ -32,6 +33,7 @@ export {
   reloadBalancesByChain,
   balancesState$,
   chainBalances$,
+  ledgerAddresses$,
   askLedgerAddress$,
   getLedgerAddress$,
   verifyLedgerAddress,

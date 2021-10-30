@@ -114,6 +114,7 @@ export const createLedgerService = ({ keystore$ }: { keystore$: KeystoreState$ }
   }
 
   return {
+    ledgerAddresses$,
     askLedgerAddress$,
     getLedgerAddress$,
     verifyLedgerAddress,
