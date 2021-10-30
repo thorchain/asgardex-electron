@@ -138,6 +138,7 @@ export type BalancesService = {
 export type GetLedgerAddressHandler = (chain: Chain, network: Network) => LedgerAddressLD
 
 export type LedgerService = {
+  ledgerAddresses$: Rx.Observable<LedgerAddressesMap>
   askLedgerAddress$: (chain: Chain, network: Network, walletIndex: number) => LedgerAddressLD
   getLedgerAddress$: GetLedgerAddressHandler
   verifyLedgerAddress: (chain: Chain, network: Network, walletIndex: number) => void
