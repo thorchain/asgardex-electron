@@ -133,7 +133,7 @@ export const WalletSettings: React.FC<Props> = (props): JSX.Element => {
             <>
               <Styled.IndexLabel>{intl.formatMessage({ id: 'setting.wallet.index' })}</Styled.IndexLabel>
               <Styled.WalletIndexInput
-                value="0"
+                value={walletIndexMap[chain].toString()}
                 pattern="[0-9]+"
                 onChange={(value) =>
                   value !== null && +value >= 0 && setWalletIndexMap({ ...walletIndexMap, [chain]: +value })
