@@ -21,7 +21,7 @@
 - [Header] Make rune price visible for smaller window sizes [#1880](https://github.com/thorchain/asgardex-electron/pull/1880)
 - [Header] Tooltip to explain VOLUME (24h) [#1885](https://github.com/thorchain/asgardex-electron/pull/1885)
 - [ERC] Update whitelist (incl. icon support for ETH.THOR, ETH.FOX) [#1894](https://github.com/thorchain/asgardex-electron/issues/1894), [#1896](https://github.com/thorchain/asgardex-electron/issues/1896)
-- Use sync mode for broadcasting transactions to THORChain [x1919](https://github.com/thorchain/asgardex-electron/pull/1919)
+- Use sync mode for broadcasting transactions to THORChain [#1919](https://github.com/thorchain/asgardex-electron/pull/1919)
 
 ## Fix
 
@@ -31,7 +31,7 @@
 - [Pools] Disable manage button while wallet locked [#1877](https://github.com/thorchain/asgardex-electron/pull/1877)
 - Fix 24h volume [#1883](https://github.com/thorchain/asgardex-electron/pull/1883)
 - Fix outdated links [#1884](https://github.com/thorchain/asgardex-electron/pull/1884)
-- [Ledger] walletIndex get lost while veryfiying address on device [#1908](https://github.com/thorchain/asgardex-electron/issues/1908)
+- `walletIndex` gets lost [#1901](https://github.com/thorchain/asgardex-electron/pull/1901), [#1908](https://github.com/thorchain/asgardex-electron/issues/1908)
 
 ## Internal
 
