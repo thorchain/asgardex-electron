@@ -257,12 +257,12 @@ export const Swap = ({
       return O.some('ledger')
     }
     // Check for keystore
-    if (eqOAddress.equals(editableTargetWalletAddress, oTargetWalletAddress)) {
+    if (eqOAddress.equals(editableTargetWalletAddress, oInitialTargetWalletAddress)) {
       return O.some('keystore')
     }
     // unknown type
     return O.none
-  }, [editableTargetWalletAddress, oTargetLedgerAddress, oTargetWalletAddress])
+  }, [editableTargetWalletAddress, oInitialTargetWalletAddress, oTargetLedgerAddress])
 
   // `AssetWB` of source asset - which might be none (user has no balances for this asset or wallet is locked)
   const oSourceAssetWB: O.Option<WalletBalance> = useMemo(
@@ -1234,15 +1234,15 @@ export const Swap = ({
 
   const onChangeTargetAddress = useCallback(
     (address: Address) => {
-      const useLedger = FP.pipe(
+      setTargetWalletAddress(O.some(address))
+
+      // update state of `useTargetAssetLedger`
+      const isTargetLedgerAddress = FP.pipe(
         oTargetLedgerAddress,
         O.map((ledgerAddress) => eqAddress.equals(ledgerAddress, address)),
         O.getOrElse(() => false)
       )
-      // whenever target address has been changed,
-      // update state of `useTargetAssetLedger`
-      // which will update `targetWalletAddress` / `setEditableTargetWalletAddress` within another `useEffect` handler
-      setUseTargetAssetLedger(useLedger)
+      setUseTargetAssetLedger(isTargetLedgerAddress)
     },
     [oTargetLedgerAddress]
   )
@@ -1281,12 +1281,10 @@ export const Swap = ({
     )
   }, [oTargetWalletType])
 
-  /**
-   * Effect to update target address
-   * whenever walletType of the target changed
-   */
-  useEffect(() => {
-    const oAddress = useTargetAssetLedger ? oTargetLedgerAddress : oInitialTargetWalletAddress
+  const onClickUseTargetAssetLedger = useCallback(() => {
+    const useLedger = !useTargetAssetLedger
+    setUseTargetAssetLedger(useLedger)
+    const oAddress = useLedger ? oTargetLedgerAddress : oInitialTargetWalletAddress
     setTargetWalletAddress(oAddress)
     setEditableTargetWalletAddress(oAddress)
   }, [oInitialTargetWalletAddress, oTargetLedgerAddress, useTargetAssetLedger])
@@ -1381,7 +1379,7 @@ export const Swap = ({
                     />
                     <Styled.CheckButton
                       checked={useTargetAssetLedger}
-                      clickHandler={() => setUseTargetAssetLedger(() => !useTargetAssetLedger)}
+                      clickHandler={onClickUseTargetAssetLedger}
                       disabled={O.isNone(oTargetLedgerAddress)}>
                       {intl.formatMessage({ id: 'ledger.title' })}
                     </Styled.CheckButton>
