@@ -1,4 +1,4 @@
-# 0.5.0 (2021-10-29)
+# 0.5.0 (2021-10-31)
 
 ## Add
 
@@ -32,6 +32,7 @@
 - Fix 24h volume [#1883](https://github.com/thorchain/asgardex-electron/pull/1883)
 - Fix outdated links [#1884](https://github.com/thorchain/asgardex-electron/pull/1884)
 - `walletIndex` gets lost [#1901](https://github.com/thorchain/asgardex-electron/pull/1901), [#1908](https://github.com/thorchain/asgardex-electron/issues/1908)
+- [WalletSettings] Verifying Ledger address with walletIndex > 0 failed [#1912](https://github.com/thorchain/asgardex-electron/issues/1912)
 
 ## Internal
 
