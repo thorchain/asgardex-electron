@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react'
+import React, { useState, useCallback, useEffect } from 'react'
 
 import * as FP from 'fp-ts/function'
 
@@ -12,19 +12,25 @@ export type Props = {
 }
 
 export const CheckButton: React.FC<Props> = (props): JSX.Element => {
-  const { clickHandler = FP.constVoid, disabled, checked, className, children } = props
+  const { clickHandler = FP.constVoid, disabled, checked: checkedProp, className, children } = props
 
-  const [isChecked, setChecked] = useState(checked)
+  const [checked, setChecked] = useState(checkedProp)
+
+  // update internal state of `isChecked` whenever `checked` prop has been changed,
+  // internal state won't be updated in other case
+  useEffect(() => {
+    setChecked(checkedProp)
+  }, [checkedProp])
 
   const onClickHandler = useCallback(() => {
-    setChecked(() => !isChecked)
+    setChecked(() => !checked)
     clickHandler && clickHandler()
-  }, [isChecked, clickHandler])
+  }, [checked, clickHandler])
 
   return (
-    <Styled.Button onClick={onClickHandler} disabled={disabled} checked={isChecked} className={className}>
+    <Styled.Button onClick={onClickHandler} disabled={disabled} checked={checked} className={className}>
       <Styled.ContentWrapper>
-        <Styled.CheckCircleOutlined checked={isChecked} />
+        <Styled.CheckCircleOutlined checked={checked} />
         {children}
       </Styled.ContentWrapper>
     </Styled.Button>

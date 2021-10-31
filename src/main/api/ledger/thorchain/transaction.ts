@@ -138,7 +138,7 @@ export const send = async ({
     // Send signed StdTx
     const {
       data: { txhash }
-    } = await auth.txsPost(cosmosClient.sdk, stdTx, 'block')
+    } = await auth.txsPost(cosmosClient.sdk, stdTx, 'sync')
 
     if (!txhash) {
       return E.left({
@@ -252,7 +252,7 @@ export const deposit = async ({
     // Send signed StdTx
     const {
       data: { txhash }
-    } = await auth.txsPost(cosmosClient.sdk, stdTx, 'block')
+    } = await auth.txsPost(cosmosClient.sdk, stdTx, 'sync')
 
     if (!txhash) {
       return E.left({

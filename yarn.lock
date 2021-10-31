@@ -4501,10 +4501,10 @@
   resolved "https://registry.yarnpkg.com/@xchainjs/xchain-client/-/xchain-client-0.10.3.tgz#178fa21d0e59ba660b3bcd85c0b859e309f60d2a"
   integrity sha512-+RhRwOmlBZYnSsZJ4XchJM0bxTROUqKBo7/N4N3KWmmWG3MQ8kx8qENCEU8wSlqXoJt9fNOztQBlq/ypRijO6w==
 
-"@xchainjs/xchain-cosmos@^0.13.7":
-  version "0.13.7"
-  resolved "https://registry.yarnpkg.com/@xchainjs/xchain-cosmos/-/xchain-cosmos-0.13.7.tgz#f0e512d300d08886db1af0484f3c423ea6e6ff11"
-  integrity sha512-P1OQZjfa6B0/fyxjfawWVtsqyavtivGrDgJAKTfR2RlGjAjyhLZ4mlspNPn8tav970L3rjItqlYW4Oqihqdbzg==
+"@xchainjs/xchain-cosmos@^0.13.8":
+  version "0.13.8"
+  resolved "https://registry.yarnpkg.com/@xchainjs/xchain-cosmos/-/xchain-cosmos-0.13.8.tgz#9f8c5a263a40b54f4b3a861346f19d1eefc933b2"
+  integrity sha512-GCgXo90e4hDOuO7jD0EjnB9d10g+9L/h4q174x5SlpWkXhoboh4PSTGojdZfZh7OEoE2a+sEB099/RpUnt6CpA==
 
 "@xchainjs/xchain-crypto@^0.2.6":
   version "0.2.6"
@@ -4528,10 +4528,10 @@
   resolved "https://registry.yarnpkg.com/@xchainjs/xchain-litecoin/-/xchain-litecoin-0.6.10.tgz#13844b420619c2f1bedcee0ef208a1b3111a095c"
   integrity sha512-LTQVULn9chLGFAy4AfZvVeAko8PDPJ6lAB1xzTFXU2f54HjNJS6eL+DTNBtrt6HFGfL2MImaShmuFaHsIB1kJA==
 
-"@xchainjs/xchain-thorchain@^0.19.2":
-  version "0.19.2"
-  resolved "https://registry.yarnpkg.com/@xchainjs/xchain-thorchain/-/xchain-thorchain-0.19.2.tgz#c8a96b7c9f8d49c5f9f8d4839ed3b59d6d2982a9"
-  integrity sha512-FIxgzufyV4T7kajZpqmuqjV7HYFqHOh9Y4Wvb9Tr/kFK+m2zGj728z1Fo1WJmuXPU58ClSQ80O+q/FLrRQxhUA==
+"@xchainjs/xchain-thorchain@^0.19.3":
+  version "0.19.3"
+  resolved "https://registry.yarnpkg.com/@xchainjs/xchain-thorchain/-/xchain-thorchain-0.19.3.tgz#36df44be29799665855d7723207ec809f7caef7d"
+  integrity sha512-daiwjHCA0uhBueNw7FMGxmpVWAL8e6kX+Bx7wyXPUURIOx6YoklFEaw+Utc3ar96DqjtoV4ceHc0l+7Fr5RRuw==
 
 "@xchainjs/xchain-util@^0.3.1":
   version "0.3.1"
