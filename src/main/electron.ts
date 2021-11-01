@@ -7,6 +7,7 @@ import electronDebug from 'electron-debug'
 import isDev from 'electron-is-dev'
 import log from 'electron-log'
 import { warn } from 'electron-log'
+import windowStateKeeper from 'electron-window-state'
 import * as E from 'fp-ts/lib/Either'
 import * as FP from 'fp-ts/lib/function'
 
@@ -88,9 +89,16 @@ const setupDevEnv = async () => {
 }
 
 const initMainWindow = async () => {
+  const mainWindowState = windowStateKeeper({
+    defaultWidth: IS_DEV ? 1600 : 1200,
+    defaultHeight: IS_DEV ? 1000 : 800
+  })
+
   mainWindow = new BrowserWindow({
-    width: IS_DEV ? 1600 : 1200,
-    height: IS_DEV ? 1000 : 800,
+    x: mainWindowState.x,
+    y: mainWindowState.y,
+    width: mainWindowState.width,
+    height: mainWindowState.height,
     icon: nativeImage.createFromPath(APP_ICON),
     webPreferences: {
       // Disable Node.js integration
@@ -110,6 +118,7 @@ const initMainWindow = async () => {
     await setupDevEnv()
   }
 
+  mainWindowState.manage(mainWindow)
   mainWindow.on('closed', closeHandler)
   mainWindow.loadURL(BASE_URL)
   // hide menu at start, we need to wait for locale sent by `ipcRenderer`
