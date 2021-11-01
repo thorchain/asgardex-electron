@@ -31,20 +31,24 @@ export const getValues = (txs: Tx[]): AssetWithAmount[] =>
     A.flatten
   )
 
+export const CustomFormattedDate = (props: any) => (
+  <FormattedDateParts value={props.date}>
+    {(parts: any[]) => {
+      const day = parts.filter((part) => part.type === 'day')[0].value
+      const month = parts.filter((part) => part.type === 'month')[0].value
+      const year = parts.filter((part) => part.type === 'year')[0].value
+      return (
+        <>
+          {day}.{month}.{year}
+        </>
+      )
+    }}
+  </FormattedDateParts>
+)
+
 export const renderDate = (date: Date) => (
   <Styled.DateContainer>
-    <FormattedDateParts value={date}>
-      {(parts: any[]) => {
-        const day = parts.filter((part) => part.type === 'day')[0].value
-        const month = parts.filter((part) => part.type === 'month')[0].value
-        const year = parts.filter((part) => part.type === 'year')[0].value
-        return (
-          <>
-            {day}.{month}.{year}
-          </>
-        )
-      }}
-    </FormattedDateParts>
+    <CustomFormattedDate date={date} />
     &nbsp;
     <FormattedTime hour="2-digit" minute="2-digit" hour12={false} value={date} />
   </Styled.DateContainer>
