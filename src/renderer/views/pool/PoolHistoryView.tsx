@@ -1,14 +1,13 @@
-import React, { useEffect, useMemo } from 'react'
+import React, { useCallback, useEffect, useMemo } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
-import { Asset, assetToString, THORChain } from '@xchainjs/xchain-util'
-import * as O from 'fp-ts/Option'
+import { Network } from '@xchainjs/xchain-client'
+import { Asset, assetToString } from '@xchainjs/xchain-util'
 
 import { PoolActionsHistory } from '../../components/poolActionsHistory'
 import { PoolActionsHistoryFilter } from '../../components/poolActionsHistory/PoolActionsHistoryFilter'
 import { Filter } from '../../components/poolActionsHistory/types'
-import { useOpenExplorerTxUrl } from '../../hooks/useOpenExplorerTxUrl'
-import { OpenExplorerTxUrl } from '../../services/clients'
+import { useNetwork } from '../../hooks/useNetwork'
 import { PoolHistoryActions } from './PoolHistoryView.types'
 
 type Props = {
@@ -30,7 +29,18 @@ export const PoolHistoryView: React.FC<Props> = ({ className, poolAsset, history
 
   const currentFilter = requestParams.type || 'ALL'
 
-  const openRuneExplorerTxUrl: OpenExplorerTxUrl = useOpenExplorerTxUrl(O.some(THORChain))
+  const { network } = useNetwork()
+
+  const openRuneExplorerTxUrl = useCallback(
+    (txID: string) => {
+      const txUrl =
+        network === Network.Mainnet
+          ? `https://viewblock.io/thorchain/tx/${txID}`
+          : `https://viewblock.io/thorchain/tx/${txID}?network=testnet`
+      window.apiUrl.openExternal(txUrl)
+    },
+    [network]
+  )
 
   const headerContent = useMemo(
     () => (

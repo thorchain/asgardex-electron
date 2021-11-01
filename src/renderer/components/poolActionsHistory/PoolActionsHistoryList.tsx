@@ -4,7 +4,6 @@ import * as RD from '@devexperts/remote-data-ts'
 import * as FP from 'fp-ts/function'
 import * as O from 'fp-ts/Option'
 
-import { OpenExplorerTxUrl } from '../../services/clients'
 import { Action, ActionsPage, ActionsPageRD } from '../../services/midgard/types'
 import { ErrorView } from '../shared/error'
 import { Pagination } from '../uielements/pagination'
@@ -17,7 +16,7 @@ type Props = {
   currentPage: number
   historyPageRD: ActionsPageRD
   prevHistoryPage?: O.Option<ActionsPage>
-  openExplorerTxUrl: OpenExplorerTxUrl
+  openExplorerTxUrl: (txId: string) => void
   changePaginationHandler: (page: number) => void
   className?: string
 }
@@ -30,7 +29,7 @@ export const PoolActionsHistoryList: React.FC<Props> = ({
   currentPage,
   className
 }) => {
-  const renderListItem = useCallback((action: Action, index: number, goToTx: OpenExplorerTxUrl) => {
+  const renderListItem = useCallback((action: Action, index: number, goToTx: (txId: string) => void) => {
     const date = H.renderDate(action.date)
 
     const titleExtra = (

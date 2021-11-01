@@ -5,7 +5,6 @@ import { Grid } from 'antd'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/Option'
 
-import { OpenExplorerTxUrl } from '../../services/clients'
 import { ActionsPage, ActionsPageRD } from '../../services/midgard/types'
 import * as Styled from './PoolActionsHistory.styles'
 import { PoolActionsHistoryList } from './PoolActionsHistoryList'
@@ -16,7 +15,7 @@ type Props = {
   currentPage: number
   historyPageRD: ActionsPageRD
   prevHistoryPage?: O.Option<ActionsPage>
-  openExplorerTxUrl: OpenExplorerTxUrl
+  openExplorerTxUrl: (txId: string) => void
   changePaginationHandler: (page: number) => void
   className?: string
 }
