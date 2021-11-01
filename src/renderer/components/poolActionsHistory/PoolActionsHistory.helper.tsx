@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import React from 'react'
 
 import { TxHash } from '@xchainjs/xchain-client'
@@ -5,7 +6,7 @@ import * as A from 'fp-ts/Array'
 import * as FP from 'fp-ts/function'
 import * as O from 'fp-ts/Option'
 import { GetRowKey } from 'rc-table/lib/interface'
-import { FormattedDate, FormattedTime } from 'react-intl'
+import { FormattedDateParts, FormattedTime } from 'react-intl'
 
 import { Action, Actions, ActionsPage, Tx } from '../../services/midgard/types'
 import { AssetWithAmount } from '../../types/asgardex'
@@ -32,7 +33,18 @@ export const getValues = (txs: Tx[]): AssetWithAmount[] =>
 
 export const renderDate = (date: Date) => (
   <Styled.DateContainer>
-    <FormattedDate year={'numeric'} month={'2-digit'} day={'2-digit'} value={date} />
+    <FormattedDateParts value={date}>
+      {(parts: any[]) => {
+        const day = parts.filter((part) => part.type === 'day')[0].value
+        const month = parts.filter((part) => part.type === 'month')[0].value
+        const year = parts.filter((part) => part.type === 'year')[0].value
+        return (
+          <>
+            {day}.{month}.{year}
+          </>
+        )
+      }}
+    </FormattedDateParts>
     &nbsp;
     <FormattedTime hour="2-digit" minute="2-digit" hour12={false} value={date} />
   </Styled.DateContainer>
