@@ -31,15 +31,25 @@ export const getValues = (txs: Tx[]): AssetWithAmount[] =>
     A.flatten
   )
 
-export const CustomFormattedDate = (props: any) => (
-  <FormattedDateParts value={props.date}>
-    {(parts: any[]) => {
+export const CustomFormattedDate = ({ date }: { date: Date; mobileView?: boolean }) => (
+  <FormattedDateParts value={date}>
+    {(
+      parts: {
+        type: string
+        value: string
+      }[]
+    ) => {
       const day = parts.filter((part) => part.type === 'day')[0].value
       const month = parts.filter((part) => part.type === 'month')[0].value
       const year = parts.filter((part) => part.type === 'year')[0].value
+      const literals = parts.filter((part) => part.type === 'literal')
       return (
         <>
-          {day}.{month}.{year}
+          {day}
+          {literals[0].value}
+          {month}
+          {literals[1].value}
+          {year}
         </>
       )
     }}

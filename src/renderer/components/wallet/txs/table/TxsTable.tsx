@@ -153,12 +153,7 @@ export const TxsTable: React.FC<Props> = (props): JSX.Element => {
       <Row gutter={[8, 0]}>
         <Col>
           <Styled.Text>
-            <CustomFormattedDate
-              year={isDesktopView ? 'numeric' : '2-digit'}
-              month={isDesktopView ? '2-digit' : 'numeric'}
-              day={isDesktopView ? '2-digit' : 'numeric'}
-              value={date}
-            />
+            <CustomFormattedDate date={date} />
           </Styled.Text>
         </Col>
         <Col>
@@ -168,7 +163,7 @@ export const TxsTable: React.FC<Props> = (props): JSX.Element => {
         </Col>
       </Row>
     ),
-    [isDesktopView]
+    []
   )
 
   const dateColumn: ColumnType<Tx> = useMemo(
