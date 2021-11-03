@@ -7,13 +7,14 @@ import { Grid, Col, Row } from 'antd'
 import { ColumnsType, ColumnType } from 'antd/lib/table'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
-import { useIntl, FormattedDate, FormattedTime } from 'react-intl'
+import { useIntl, FormattedTime } from 'react-intl'
 
 import { Network } from '../../../../../shared/api/types'
 import { TxsPageRD } from '../../../../services/clients'
 import { MAX_ITEMS_PER_PAGE } from '../../../../services/const'
 import { RESERVE_MODULE_ADDRESS } from '../../../../services/thorchain/const'
 import { ApiError } from '../../../../services/wallet/types'
+import { CustomFormattedDate } from '../../../poolActionsHistory/PoolActionsHistory.helper'
 import { ErrorView } from '../../../shared/error'
 import { AddressEllipsis } from '../../../uielements/addressEllipsis'
 import * as CommonStyled from '../../../uielements/common/Common.styles'
@@ -152,12 +153,7 @@ export const TxsTable: React.FC<Props> = (props): JSX.Element => {
       <Row gutter={[8, 0]}>
         <Col>
           <Styled.Text>
-            <FormattedDate
-              year={isDesktopView ? 'numeric' : '2-digit'}
-              month={isDesktopView ? '2-digit' : 'numeric'}
-              day={isDesktopView ? '2-digit' : 'numeric'}
-              value={date}
-            />
+            <CustomFormattedDate date={date} />
           </Styled.Text>
         </Col>
         <Col>
@@ -167,7 +163,7 @@ export const TxsTable: React.FC<Props> = (props): JSX.Element => {
         </Col>
       </Row>
     ),
-    [isDesktopView]
+    []
   )
 
   const dateColumn: ColumnType<Tx> = useMemo(
