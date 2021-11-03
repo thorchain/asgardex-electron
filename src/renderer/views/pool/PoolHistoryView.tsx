@@ -1,13 +1,18 @@
-import React, { useEffect, useMemo } from 'react'
+import React, { useEffect, useMemo, useCallback } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
-import { Asset, assetToString, THORChain } from '@xchainjs/xchain-util'
+import { XChainClient, TxHash } from '@xchainjs/xchain-client'
+import { Client } from '@xchainjs/xchain-thorchain'
+import { Asset, assetToString } from '@xchainjs/xchain-util'
+import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/Option'
 
+import { toClientNetwork } from '../../../shared/utils/client'
 import { PoolActionsHistory } from '../../components/poolActionsHistory'
 import { PoolActionsHistoryFilter } from '../../components/poolActionsHistory/PoolActionsHistoryFilter'
 import { Filter } from '../../components/poolActionsHistory/types'
-import { useOpenExplorerTxUrl } from '../../hooks/useOpenExplorerTxUrl'
+import { useNetwork } from '../../hooks/useNetwork'
+import { openExplorerTxUrl } from '../../hooks/useOpenExplorerTxUrl'
 import { OpenExplorerTxUrl } from '../../services/clients'
 import { PoolHistoryActions } from './PoolHistoryView.types'
 
@@ -24,13 +29,33 @@ export const PoolHistoryView: React.FC<Props> = ({ className, poolAsset, history
 
   const stringAsset = useMemo(() => assetToString(poolAsset), [poolAsset])
 
+  const { network } = useNetwork()
+
   useEffect(() => {
     loadHistory({ asset: stringAsset })
   }, [loadHistory, stringAsset])
 
   const currentFilter = requestParams.type || 'ALL'
 
-  const openRuneExplorerTxUrl: OpenExplorerTxUrl = useOpenExplorerTxUrl(O.some(THORChain))
+  const thorChainClient: O.Option<XChainClient> = useMemo(
+    () => FP.pipe(O.tryCatch(() => new Client({ network: toClientNetwork(network) }))),
+    [network]
+  )
+
+  useEffect(() => {
+    // clean up client
+    return () => {
+      FP.pipe(
+        thorChainClient,
+        O.map((client) => client.purgeClient())
+      )
+    }
+  }, [network, thorChainClient])
+
+  const openExplorerTxUrlHandler: OpenExplorerTxUrl = useCallback(
+    (txHash: TxHash) => openExplorerTxUrl(thorChainClient, txHash),
+    [thorChainClient]
+  )
 
   const headerContent = useMemo(
     () => (
@@ -51,7 +76,7 @@ export const PoolHistoryView: React.FC<Props> = ({ className, poolAsset, history
       currentPage={requestParams.page + 1}
       historyPageRD={historyPage}
       prevHistoryPage={prevHistoryPage}
-      openExplorerTxUrl={openRuneExplorerTxUrl}
+      openExplorerTxUrl={openExplorerTxUrlHandler}
       changePaginationHandler={setPage}
     />
   )

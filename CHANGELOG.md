@@ -1,3 +1,14 @@
+# 0.5.1 (2021-XX-XX)
+
+## Add
+
+- Restore previous windows dimensions with next start of ASGDX [#1879](https://github.com/thorchain/asgardex-electron/issues/1879)
+
+## Fix
+
+- Format date [#1873](https://github.com/thorchain/asgardex-electron/issues/1873)
+- [PoolDetail] Make tx explorer accessible for locked / not imported wallet users [#1871](https://github.com/thorchain/asgardex-electron/issues/1871)
+
 # 0.5.0 (2021-10-31)
 
 ## Add

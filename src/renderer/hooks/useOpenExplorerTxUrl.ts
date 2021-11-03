@@ -12,6 +12,17 @@ import { useChainContext } from '../contexts/ChainContext'
 import { eqOChain } from '../helpers/fp/eq'
 import { OpenExplorerTxUrl } from '../services/clients'
 
+export const openExplorerTxUrl = (oClient: O.Option<XChainClient>, txHash: TxHash) =>
+  FP.pipe(
+    oClient,
+    O.map(async (client) => {
+      const url = client.getExplorerTxUrl(txHash)
+      await window.apiUrl.openExternal(url)
+      return true
+    }),
+    O.getOrElse<Promise<boolean>>(() => Promise.resolve(false))
+  )
+
 export const useOpenExplorerTxUrl = (oChain: O.Option<Chain>): OpenExplorerTxUrl => {
   const { clientByChain$ } = useChainContext()
 
@@ -29,19 +40,5 @@ export const useOpenExplorerTxUrl = (oChain: O.Option<Chain>): OpenExplorerTxUrl
   // to trigger `useObservableState` properly to get a client depending on chain
   useEffect(() => chainUpdated(oChain), [oChain, chainUpdated])
 
-  const openExplorerTxUrl: OpenExplorerTxUrl = useCallback(
-    (txHash: TxHash) =>
-      FP.pipe(
-        oClient,
-        O.map(async (client) => {
-          const url = client.getExplorerTxUrl(txHash)
-          await window.apiUrl.openExternal(url)
-          return true
-        }),
-        O.getOrElse<Promise<boolean>>(() => Promise.resolve(false))
-      ),
-    [oClient]
-  )
-
-  return openExplorerTxUrl
+  return useCallback((txHash: TxHash) => openExplorerTxUrl(oClient, txHash), [oClient])
 }
