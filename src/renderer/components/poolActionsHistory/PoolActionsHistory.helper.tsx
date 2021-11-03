@@ -5,7 +5,7 @@ import * as A from 'fp-ts/Array'
 import * as FP from 'fp-ts/function'
 import * as O from 'fp-ts/Option'
 import { GetRowKey } from 'rc-table/lib/interface'
-import { FormattedDate, FormattedTime } from 'react-intl'
+import { FormattedDateParts, FormattedTime } from 'react-intl'
 
 import { Action, Actions, ActionsPage, Tx } from '../../services/midgard/types'
 import { AssetWithAmount } from '../../types/asgardex'
@@ -30,9 +30,34 @@ export const getValues = (txs: Tx[]): AssetWithAmount[] =>
     A.flatten
   )
 
+export const CustomFormattedDate = ({ date }: { date: Date }) => (
+  <FormattedDateParts day="2-digit" month="2-digit" year="numeric" value={date}>
+    {(
+      parts: {
+        type: string
+        value: string
+      }[]
+    ) => {
+      const day = parts.filter((part) => part.type === 'day')[0].value
+      const month = parts.filter((part) => part.type === 'month')[0].value
+      const year = parts.filter((part) => part.type === 'year')[0].value
+      const literals = parts.filter((part) => part.type === 'literal')
+      return (
+        <>
+          {day}
+          {literals[0].value}
+          {month}
+          {literals[1].value}
+          {year}
+        </>
+      )
+    }}
+  </FormattedDateParts>
+)
+
 export const renderDate = (date: Date) => (
   <Styled.DateContainer>
-    <FormattedDate year={'numeric'} month={'2-digit'} day={'2-digit'} value={date} />
+    <CustomFormattedDate date={date} />
     &nbsp;
     <FormattedTime hour="2-digit" minute="2-digit" hour12={false} value={date} />
   </Styled.DateContainer>
