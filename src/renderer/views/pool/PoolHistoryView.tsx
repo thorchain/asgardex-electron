@@ -45,7 +45,6 @@ export const PoolHistoryView: React.FC<Props> = ({ className, poolAsset, history
   useEffect(() => {
     // clean up client
     return () => {
-      console.log('return')
       FP.pipe(
         thorChainClient,
         O.map((client) => client.purgeClient())
