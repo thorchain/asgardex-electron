@@ -40,10 +40,5 @@ export const useOpenExplorerTxUrl = (oChain: O.Option<Chain>): OpenExplorerTxUrl
   // to trigger `useObservableState` properly to get a client depending on chain
   useEffect(() => chainUpdated(oChain), [oChain, chainUpdated])
 
-  const _openExplorerTxUrl: OpenExplorerTxUrl = useCallback(
-    (txHash: TxHash) => openExplorerTxUrl(oClient, txHash),
-    [oClient]
-  )
-
-  return _openExplorerTxUrl
+  return useCallback((txHash: TxHash) => openExplorerTxUrl(oClient, txHash), [oClient])
 }
