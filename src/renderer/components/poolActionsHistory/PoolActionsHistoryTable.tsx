@@ -6,6 +6,7 @@ import * as FP from 'fp-ts/function'
 import * as O from 'fp-ts/Option'
 import { useIntl } from 'react-intl'
 
+import { OpenExplorerTxUrl } from '../../services/clients'
 import { ActionsPage, Action, ActionsPageRD } from '../../services/midgard/types'
 import { ApiError } from '../../services/wallet/types'
 import { ErrorView } from '../shared/error'
@@ -20,7 +21,7 @@ export type Props = {
   currentPage: number
   historyPageRD: ActionsPageRD
   prevHistoryPage?: O.Option<ActionsPage>
-  openExplorerTxUrl: (txId: string) => void
+  openExplorerTxUrl: OpenExplorerTxUrl
   changePaginationHandler: (page: number) => void
   className?: string
 }
