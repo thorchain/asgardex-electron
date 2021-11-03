@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import React from 'react'
 
 import { TxHash } from '@xchainjs/xchain-client'
@@ -31,8 +30,8 @@ export const getValues = (txs: Tx[]): AssetWithAmount[] =>
     A.flatten
   )
 
-export const CustomFormattedDate = ({ date }: { date: Date; mobileView?: boolean }) => (
-  <FormattedDateParts value={date}>
+export const CustomFormattedDate = ({ date }: { date: Date }) => (
+  <FormattedDateParts day="2-digit" month="2-digit" year="numeric" value={date}>
     {(
       parts: {
         type: string
