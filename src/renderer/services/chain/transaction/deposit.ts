@@ -170,7 +170,8 @@ export const symDeposit$ = ({
   amounts,
   memos,
   walletIndex,
-  walletType
+  runeWalletType,
+  assetWalletType
 }: SymDepositParams): SymDepositState$ => {
   // total of progress
   const total = O.some(100)
@@ -201,8 +202,7 @@ export const symDeposit$ = ({
     liveData.chain<ApiError, SymDepositValidationResult, TxHash>((_) => {
       setState({ ...getState(), step: 2, deposit: RD.progress({ loaded: 40, total }) })
       return sendPoolTx$({
-        // TODO(@asgdx-team) Get `walletType` from props if we want to support other than keystore (e.g. Ledger)
-        walletType,
+        walletType: assetWalletType,
         walletIndex,
         router: poolAddresses.router,
         asset,
@@ -228,7 +228,7 @@ export const symDeposit$ = ({
     liveData.chain<ApiError, TxHash, TxHash>((_) => {
       setState({ ...getState(), step: 3, deposit: RD.progress({ loaded: 60, total }) })
       return sendPoolTx$({
-        walletType,
+        walletType: runeWalletType,
         walletIndex,
         router: O.none, // no router for RUNE
         asset: AssetRuneNative,

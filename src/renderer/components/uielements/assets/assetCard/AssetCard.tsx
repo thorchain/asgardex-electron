@@ -13,9 +13,7 @@ import {
 import * as AU from '@xchainjs/xchain-util'
 import { Dropdown } from 'antd'
 import BigNumber from 'bignumber.js'
-import * as A from 'fp-ts/lib/Array'
 import * as FP from 'fp-ts/lib/function'
-import * as O from 'fp-ts/Option'
 import { useIntl } from 'react-intl'
 
 import { Network } from '../../../../../shared/api/types'
@@ -25,7 +23,6 @@ import { ZERO_BASE_AMOUNT } from '../../../../const'
 import { isBtcAsset } from '../../../../helpers/assetHelper'
 import { ordAsset } from '../../../../helpers/fp/ord'
 import { useClickOutside } from '../../../../hooks/useOutsideClick'
-import { WalletBalances } from '../../../../services/wallet/types'
 import { CheckButton } from '../../button/CheckButton'
 import { Slider } from '../../slider'
 import { AssetMenu } from '../assetMenu'
@@ -33,10 +30,10 @@ import * as Styled from './AssetCard.styles'
 
 export type Props = {
   asset: Asset
-  assetBalance: O.Option<BaseAmount>
   assetWalletType: WalletType
   walletTypeChanged: FP.Lazy<void>
-  balances: WalletBalances
+  assets: Asset[]
+  assetBalance: BaseAmount
   selectedAmount: BaseAmount
   maxAmount: BaseAmount
   price: BigNumber
@@ -62,7 +59,7 @@ export const AssetCard: React.FC<Props> = (props): JSX.Element => {
     asset,
     assetWalletType,
     walletTypeChanged,
-    balances = [],
+    assets = [],
     price = bn(0),
     slip,
     priceAsset,
@@ -82,7 +79,7 @@ export const AssetCard: React.FC<Props> = (props): JSX.Element => {
     onAfterSliderChange,
     minAmountError = false,
     minAmountLabel = '',
-    assetBalance: oAssetBalance
+    assetBalance
   } = props
 
   const intl = useIntl()
@@ -92,15 +89,6 @@ export const AssetCard: React.FC<Props> = (props): JSX.Element => {
 
   const selectedAmountBn = useMemo(() => baseToAsset(selectedAmount).amount(), [selectedAmount])
   const maxAmountBn = useMemo(() => baseToAsset(maxAmount).amount(), [maxAmount])
-
-  const assets = useMemo(
-    () =>
-      FP.pipe(
-        balances,
-        A.map(({ asset }) => asset)
-      ),
-    [balances]
-  )
 
   useClickOutside<HTMLDivElement>(ref, () => setOpenDropdown(false))
 
@@ -144,16 +132,10 @@ export const AssetCard: React.FC<Props> = (props): JSX.Element => {
     })
   }, [price, priceAsset, selectedAmountBn])
 
-  const balanceLabel = useMemo(
-    () =>
-      FP.pipe(
-        oAssetBalance,
-        O.getOrElse(() => ZERO_BASE_AMOUNT),
-        (amount) => formatAssetAmountCurrency({ amount: baseToAsset(amount), decimal: 2, asset }),
-        (formatted) => <Styled.BalanceLabel key={'balance label'}>{formatted}</Styled.BalanceLabel>
-      ),
-    [asset, oAssetBalance]
-  )
+  const balanceLabel = useMemo(() => {
+    const formatted = formatAssetAmountCurrency({ amount: baseToAsset(assetBalance), decimal: 2, asset })
+    return <Styled.BalanceLabel key={'balance label'}>{formatted}</Styled.BalanceLabel>
+  }, [asset, assetBalance])
 
   return (
     <Styled.AssetCardWrapper ref={ref}>

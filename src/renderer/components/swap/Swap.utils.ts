@@ -301,18 +301,6 @@ export const balancesToSwapFrom = ({
   )
 }
 
-export const hasLedgerInBalancesByAsset = (asset: Asset, balances: WalletBalances): boolean =>
-  FP.pipe(
-    balances,
-    A.findFirst(
-      ({ walletType, asset: balanceAsset }) => eqAsset.equals(asset, balanceAsset) && isLedgerWallet(walletType)
-    ),
-    O.fold(
-      () => false,
-      () => true
-    )
-  )
-
 export const hasLedgerInBalancesByChain = (chain: Chain, balances: WalletBalances): boolean =>
   FP.pipe(
     balances,

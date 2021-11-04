@@ -47,7 +47,8 @@ import { liveData, LiveData } from '../../helpers/rx/liveData'
 import {
   filterWalletBalancesByAssets,
   getWalletBalanceByAsset,
-  getWalletBalanceByAssetAndWalletType
+  getWalletBalanceByAssetAndWalletType,
+  hasLedgerInBalancesByAsset
 } from '../../helpers/walletHelper'
 import { useSubscriptionState } from '../../hooks/useSubscriptionState'
 import { swap } from '../../routes/pools'
@@ -235,17 +236,21 @@ export const Swap = ({
 
   const allAssets = useMemo((): Asset[] => availableAssets.map(({ asset }) => asset), [availableAssets])
 
-  const allBalances: WalletBalances = FP.pipe(
-    oWalletBalances,
-    O.map((balances) => filterWalletBalancesByAssets(balances, allAssets)),
-    O.getOrElse<WalletBalances>(() => [])
+  const allBalances: WalletBalances = useMemo(
+    () =>
+      FP.pipe(
+        oWalletBalances,
+        O.map((balances) => filterWalletBalancesByAssets(balances, allAssets)),
+        O.getOrElse<WalletBalances>(() => [])
+      ),
+    [allAssets, oWalletBalances]
   )
 
   const hasSourceAssetLedger = useMemo(
     () =>
       FP.pipe(
         oSourceAsset,
-        O.map((asset) => Utils.hasLedgerInBalancesByAsset(asset, allBalances)),
+        O.map((asset) => hasLedgerInBalancesByAsset(asset, allBalances)),
         O.getOrElse(() => false)
       ),
     [oSourceAsset, allBalances]
