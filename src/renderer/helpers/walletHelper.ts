@@ -4,6 +4,7 @@ import * as A from 'fp-ts/Array'
 import * as FP from 'fp-ts/function'
 import * as O from 'fp-ts/Option'
 
+import { isLedgerWallet } from '../../shared/utils/guard'
 import { WalletAddress, WalletType } from '../../shared/wallet/types'
 import { ZERO_ASSET_AMOUNT } from '../const'
 import { WalletBalances } from '../services/clients'
@@ -95,6 +96,19 @@ export const getWalletAssetAmountFromBalances =
       O.map(({ amount }) => baseToAsset(amount)),
       O.alt(() => O.some(ZERO_ASSET_AMOUNT))
     )
+
+// TODO (@asgdx-team) Add tests
+export const hasLedgerInBalancesByAsset = (asset: Asset, balances: WalletBalances): boolean =>
+  FP.pipe(
+    balances,
+    A.findFirst(
+      ({ walletType, asset: balanceAsset }) => eqAsset.equals(asset, balanceAsset) && isLedgerWallet(walletType)
+    ),
+    O.fold(
+      () => false,
+      () => true
+    )
+  )
 
 export const getAssetAmountFromBalances = (
   balances: WalletBalances,

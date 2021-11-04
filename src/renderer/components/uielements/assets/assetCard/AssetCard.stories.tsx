@@ -1,32 +1,15 @@
 import React from 'react'
 
 import { Meta, Story } from '@storybook/react'
-import { bn, AssetBNB, assetAmount, assetToBase, AssetBTC } from '@xchainjs/xchain-util'
-import * as O from 'fp-ts/Option'
+import { bn, AssetBNB, assetAmount, assetToBase, AssetBTC, AssetRuneNative } from '@xchainjs/xchain-util'
 
 import { ZERO_BASE_AMOUNT } from '../../../../const'
-import { mockWalletBalance } from '../../../../helpers/test/testWalletHelper'
-import { WalletBalance } from '../../../../services/wallet/types'
 import { AssetCard, Props as AssetCardProps } from './AssetCard'
 
-const balanceBNB: WalletBalance = mockWalletBalance({
-  asset: AssetBNB,
-  walletAddress: 'bnb-address'
-})
-
-const balanceBTC: WalletBalance = mockWalletBalance({
-  asset: AssetBTC,
-  walletAddress: 'btc-address'
-})
-
-const balanceRuneNative: WalletBalance = mockWalletBalance()
-
-const balances = [balanceBNB, balanceBTC, balanceRuneNative]
-
 const defaultProps: AssetCardProps = {
-  assetBalance: O.none,
+  assetBalance: assetToBase(assetAmount(12)),
   asset: AssetBNB,
-  balances,
+  assets: [AssetBNB, AssetBTC, AssetRuneNative],
   selectedAmount: ZERO_BASE_AMOUNT,
   onChangeAssetAmount: (value) => console.log('assetAmount', value),
   inputOnFocusHandler: () => console.log('onFocus'),
