@@ -22,46 +22,43 @@ import * as RxOp from 'rxjs/operators'
 import { mockValidatePassword$ } from '../../../../shared/mock/wallet'
 import { ZERO_BASE_AMOUNT } from '../../../const'
 import { BNB_DECIMAL } from '../../../helpers/assetHelper'
+import { mockWalletBalance } from '../../../helpers/test/testWalletHelper'
 import { INITIAL_SYM_DEPOSIT_STATE } from '../../../services/chain/const'
 import { SymDepositState } from '../../../services/chain/types'
 import { DEFAULT_MIMIR_HALT } from '../../../services/thorchain/const'
 import { WalletBalance } from '../../../services/wallet/types'
 import { SymDeposit, Props as SymDepositProps } from './SymDeposit'
 
-const balanceBNB: WalletBalance = {
-  walletType: 'keystore',
-  walletIndex: 0,
-  amount: assetToBase(assetAmount(1)),
-  asset: AssetBNB,
-  walletAddress: ''
-}
+const balanceRune: WalletBalance = mockWalletBalance({
+  amount: assetToBase(assetAmount(100))
+})
 
-const balanceBTC: WalletBalance = {
-  walletType: 'keystore',
-  walletIndex: 0,
+const balanceBNB: WalletBalance = mockWalletBalance({
+  amount: assetToBase(assetAmount(200)),
+  asset: AssetBNB,
+  walletAddress: 'bnb-address'
+})
+
+const balanceBTC: WalletBalance = mockWalletBalance({
   asset: AssetBTC,
   amount: assetToBase(assetAmount(2)),
-  walletAddress: ''
-}
+  walletAddress: 'btc-address'
+})
 
-const balanceTOMO: WalletBalance = {
-  walletType: 'keystore',
-  walletIndex: 0,
+const balanceTOMO: WalletBalance = mockWalletBalance({
   asset: AssetETH,
   amount: assetToBase(assetAmount(3)),
   walletAddress: ''
-}
+})
 
 const defaultProps: SymDepositProps = {
   haltedChains: [],
+  poolAssets: [AssetRuneNative, AssetBNB, AssetBTC],
+  walletBalances: { balances: O.some([balanceRune, balanceBNB, balanceBTC, balanceTOMO]), loading: false },
   mimirHalt: DEFAULT_MIMIR_HALT,
   asset: { asset: AssetBNB, decimal: BNB_DECIMAL },
   assetPrice: bn(2),
   runePrice: bn(1),
-  walletBalancesLoading: false,
-  assetBalance: O.some(assetToBase(assetAmount(200))),
-  runeBalance: O.some(assetToBase(assetAmount(100))),
-  chainAssetBalance: O.some(assetToBase(assetAmount(55))),
   onChangeAsset: (a: Asset) => console.log('change asset', a),
   reloadFees: () => console.log('reload fees'),
   fees$: () =>
@@ -87,7 +84,6 @@ const defaultProps: SymDepositProps = {
     runeBalance: baseAmount('2000')
   },
   priceAsset: AssetRuneNative,
-  balances: [balanceBNB, balanceBTC, balanceTOMO],
   poolAddress: O.none,
   memos: O.some({ rune: 'rune-memo', asset: 'asset-memo' }),
   reloadBalances: () => console.log('reloadBalances'),
@@ -140,9 +136,15 @@ Default.storyName = 'default'
 export const BalanceError: Story = () => {
   const props: SymDepositProps = {
     ...defaultProps,
-    assetBalance: O.some(ZERO_BASE_AMOUNT),
-    runeBalance: O.some(ZERO_BASE_AMOUNT),
-    chainAssetBalance: O.none
+    walletBalances: {
+      balances: O.some([
+        { ...balanceRune, balance: ZERO_BASE_AMOUNT },
+        { ...balanceBNB, balance: ZERO_BASE_AMOUNT },
+        balanceBTC,
+        balanceTOMO
+      ]),
+      loading: false
+    }
   }
   return <SymDeposit {...props} />
 }
@@ -151,7 +153,7 @@ BalanceError.storyName = 'balance error'
 export const BalanceLoading: Story = () => {
   const props: SymDepositProps = {
     ...defaultProps,
-    walletBalancesLoading: true
+    walletBalances: { balances: O.none, loading: true }
   }
   return <SymDeposit {...props} />
 }
@@ -176,9 +178,15 @@ export const FeeError: Story = () => {
           }
         })
       ),
-    assetBalance: O.some(assetToBase(assetAmount(0.5))),
-    runeBalance: O.some(assetToBase(assetAmount(0.6))),
-    chainAssetBalance: O.some(assetToBase(assetAmount(0.5)))
+    walletBalances: {
+      balances: O.some([
+        { ...balanceRune, balance: assetToBase(assetAmount(0.6)) },
+        { ...balanceBNB, balance: assetToBase(assetAmount(0.5)) },
+        balanceBTC,
+        balanceTOMO
+      ]),
+      loading: false
+    }
   }
   return <SymDeposit {...props} />
 }

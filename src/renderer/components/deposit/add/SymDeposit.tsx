@@ -16,6 +16,7 @@ import { Col } from 'antd'
 import BigNumber from 'bignumber.js'
 import * as A from 'fp-ts/lib/Array'
 import * as FP from 'fp-ts/lib/function'
+import * as NEA from 'fp-ts/lib/NonEmptyArray'
 import * as O from 'fp-ts/lib/Option'
 import { useObservableState } from 'observable-hooks'
 import { useIntl } from 'react-intl'
@@ -36,6 +37,7 @@ import { eqBaseAmount, eqOAsset, eqOApproveParams, eqOString } from '../../../he
 import { sequenceSOption, sequenceTOption } from '../../../helpers/fpHelpers'
 import * as PoolHelpers from '../../../helpers/poolHelper'
 import { liveData, LiveData } from '../../../helpers/rx/liveData'
+import * as WalletHelper from '../../../helpers/walletHelper'
 import { FundsCap } from '../../../hooks/useFundsCap'
 import { useSubscriptionState } from '../../../hooks/useSubscriptionState'
 import { INITIAL_SYM_DEPOSIT_STATE } from '../../../services/chain/const'
@@ -67,7 +69,15 @@ import {
   PendingAssets,
   PendingAssetsRD
 } from '../../../services/thorchain/types'
-import { ApiError, TxHashLD, TxHashRD, ValidatePasswordHandler, WalletBalances } from '../../../services/wallet/types'
+import {
+  ApiError,
+  BalancesState,
+  TxHashLD,
+  TxHashRD,
+  ValidatePasswordHandler,
+  WalletBalance,
+  WalletBalances
+} from '../../../services/wallet/types'
 import { AssetWithDecimal } from '../../../types/asgardex'
 import { PasswordModal } from '../../modal/password'
 import { TxModal } from '../../modal/tx'
@@ -82,11 +92,9 @@ import { PendingAssetsWarning } from './PendingAssetsWarning'
 export type Props = {
   asset: AssetWithDecimal
   assetPrice: BigNumber
-  walletBalancesLoading: boolean
-  assetBalance: O.Option<BaseAmount>
+  poolAssets: Asset[]
+  walletBalances: Pick<BalancesState, 'balances' | 'loading'>
   runePrice: BigNumber
-  runeBalance: O.Option<BaseAmount>
-  chainAssetBalance: O.Option<BaseAmount>
   poolAddress: O.Option<PoolAddress>
   memos: O.Option<SymDepositMemo>
   priceAsset?: Asset
@@ -100,7 +108,6 @@ export type Props = {
   openAssetExplorerTxUrl: OpenExplorerTxUrl
   openRuneExplorerTxUrl: OpenExplorerTxUrl
   validatePassword$: ValidatePasswordHandler
-  balances: WalletBalances
   onChangeAsset: (asset: Asset) => void
   disabled?: boolean
   poolData: PoolData
@@ -124,17 +131,14 @@ export const SymDeposit: React.FC<Props> = (props) => {
   const {
     asset: { asset, decimal: assetDecimal },
     assetPrice,
-    walletBalancesLoading,
-    assetBalance: oAssetBalance,
+    poolAssets,
+    walletBalances,
     runePrice,
-    runeBalance: oRuneBalance,
-    chainAssetBalance: oChainAssetBalance,
     memos: oMemos,
     poolAddress: oPoolAddress,
     openAssetExplorerTxUrl,
     openRuneExplorerTxUrl,
     validatePassword$,
-    balances,
     priceAsset,
     reloadFees,
     reloadBalances,
@@ -164,14 +168,61 @@ export const SymDeposit: React.FC<Props> = (props) => {
 
   const prevAsset = useRef<O.Option<Asset>>(O.none)
 
+  // TODO (@veado) Enable states when we update UI
+  const [useRuneLedger, _setRuneLedger] = useState(false)
+  const [useAssetLedger, _setUseAssetLedger] = useState(false)
+
+  const { balances: oWalletBalances, loading: walletBalancesLoading } = walletBalances
+
+  const poolBasedBalances: WalletBalances = useMemo(
+    () =>
+      FP.pipe(
+        oWalletBalances,
+        O.map((balances) => WalletHelper.filterWalletBalancesByAssets(balances, poolAssets)),
+        O.getOrElse<WalletBalances>(() => [])
+      ),
+    [oWalletBalances, poolAssets]
+  )
+
+  const poolBasedBalancesAssets = FP.pipe(
+    poolBasedBalances,
+    A.map(({ asset }) => asset)
+  )
+
+  const oRuneWB: O.Option<WalletBalance> = useMemo(() => {
+    const walletType = useRuneLedger ? 'ledger' : 'keystore'
+    const oWalletBalances = NEA.fromArray(poolBasedBalances)
+    return WalletHelper.getWalletBalanceByAssetAndWalletType({
+      oWalletBalances,
+      asset: AssetRuneNative,
+      walletType
+    })
+  }, [useRuneLedger, poolBasedBalances])
+
+  // TODO (@veado) Use it when we have UI updated
+  const _hasAssetLedger = useMemo(
+    () => WalletHelper.hasLedgerInBalancesByAsset(asset, poolBasedBalances),
+    [asset, poolBasedBalances]
+  )
+
+  const oAssetWB: O.Option<WalletBalance> = useMemo(() => {
+    const walletType = useAssetLedger ? 'ledger' : 'keystore'
+    return WalletHelper.getWalletBalanceByAssetAndWalletType({
+      oWalletBalances,
+      asset,
+      walletType
+    })
+  }, [asset, useAssetLedger, oWalletBalances])
+
   /** Asset balance based on original decimal */
   const assetBalance: BaseAmount = useMemo(
     () =>
       FP.pipe(
-        oAssetBalance,
+        oAssetWB,
+        O.map(({ amount }) => amount),
         O.getOrElse(() => baseAmount(0, assetDecimal))
       ),
-    [assetDecimal, oAssetBalance]
+    [assetDecimal, oAssetWB]
   )
 
   const disableDepositAction = useMemo(
@@ -218,11 +269,21 @@ export const SymDeposit: React.FC<Props> = (props) => {
   const runeBalance: BaseAmount = useMemo(
     () =>
       FP.pipe(
-        oRuneBalance,
+        oRuneWB,
+        O.map(({ amount }) => amount),
         O.getOrElse(() => ZERO_BASE_AMOUNT)
       ),
-    [oRuneBalance]
+    [oRuneWB]
   )
+
+  const oChainAssetBalance: O.Option<BaseAmount> = useMemo(() => {
+    const chainAsset = getChainAsset(asset.chain)
+    const walletType = useAssetLedger ? 'ledger' : 'keystore'
+    return FP.pipe(
+      WalletHelper.getWalletBalanceByAssetAndWalletType({ oWalletBalances, asset: chainAsset, walletType }),
+      O.map(({ amount }) => amount)
+    )
+  }, [asset.chain, oWalletBalances, useAssetLedger])
 
   const chainAssetBalance: BaseAmount = useMemo(
     () =>
@@ -304,7 +365,8 @@ export const SymDeposit: React.FC<Props> = (props) => {
             },
             memos,
             // TODO (@asgx-team) Get it from props when we will support Ledger for sym. deposit
-            walletType: 'keystore',
+            runeWalletType: 'keystore',
+            assetWalletType: 'keystore',
             walletIndex: 0
           }
         })
@@ -443,8 +505,8 @@ export const SymDeposit: React.FC<Props> = (props) => {
       // Note:
       // To avoid flickering of balance error for a short time at the beginning
       // We never show error if balances are not available
-      O.isSome(oAssetBalance) && isBalanceError,
-    [isBalanceError, oAssetBalance]
+      O.isSome(oAssetWB) && isBalanceError,
+    [isBalanceError, oAssetWB]
   )
 
   const renderBalanceError = useMemo(() => {
@@ -631,13 +693,13 @@ export const SymDeposit: React.FC<Props> = (props) => {
     if (isZeroAmountToDeposit) return false
 
     return FP.pipe(
-      oRuneBalance,
+      oRuneWB,
       O.fold(
         () => true,
-        (balance) => FP.pipe(depositFees.rune, Helper.minBalanceToDeposit, balance.lt)
+        ({ amount }) => FP.pipe(depositFees.rune, Helper.minBalanceToDeposit, amount.lt)
       )
     )
-  }, [isZeroAmountToDeposit, oRuneBalance, depositFees.rune])
+  }, [isZeroAmountToDeposit, oRuneWB, depositFees.rune])
 
   const renderThorchainFeeError = useMemo(() => {
     if (!isThorchainFeeError || isBalanceError /* Don't render anything in case of fees or balance errors */)
@@ -1214,7 +1276,7 @@ export const SymDeposit: React.FC<Props> = (props) => {
       <Styled.CardsRow gutter={{ lg: 32 }}>
         <Col xs={24} xl={12}>
           <Styled.AssetCard
-            assetBalance={oAssetBalance}
+            assetBalance={assetBalance}
             disabled={disabledForm}
             asset={asset}
             selectedAmount={assetAmountToDepositMax1e8}
@@ -1223,7 +1285,7 @@ export const SymDeposit: React.FC<Props> = (props) => {
             inputOnFocusHandler={() => setSelectedInput('asset')}
             inputOnBlurHandler={inputOnBlur}
             price={assetPrice}
-            balances={balances}
+            assets={poolBasedBalancesAssets}
             percentValue={percentValueToDeposit}
             onChangePercent={changePercentHandler}
             onChangeAsset={onChangeAssetHandler}
@@ -1242,7 +1304,7 @@ export const SymDeposit: React.FC<Props> = (props) => {
         <Col xs={24} xl={12}>
           <>
             <Styled.AssetCard
-              assetBalance={oRuneBalance}
+              assetBalance={runeBalance}
               disabled={disabledForm}
               asset={AssetRuneNative}
               selectedAmount={runeAmountToDeposit}
@@ -1253,7 +1315,7 @@ export const SymDeposit: React.FC<Props> = (props) => {
               price={runePrice}
               priceAsset={priceAsset}
               network={network}
-              balances={[]}
+              assets={[]}
               minAmountError={minRuneAmountError}
               minAmountLabel={`${intl.formatMessage({ id: 'common.min' })}: ${formatAssetAmountCurrency({
                 asset: AssetRuneNative,
