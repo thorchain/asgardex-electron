@@ -189,7 +189,6 @@ export const SymDeposit: React.FC<Props> = (props) => {
     A.map(({ asset }) => asset)
   )
 
-  // `AssetWB` of source asset - which might be none (user has no balances for this asset or wallet is locked)
   const oRuneWB: O.Option<WalletBalance> = useMemo(() => {
     const walletType = useRuneLedger ? 'ledger' : 'keystore'
     const oWalletBalances = NEA.fromArray(poolBasedBalances)
@@ -206,7 +205,6 @@ export const SymDeposit: React.FC<Props> = (props) => {
     [asset, poolBasedBalances]
   )
 
-  // `AssetWB` of source asset - which might be none (user has no balances for this asset or wallet is locked)
   const oAssetWB: O.Option<WalletBalance> = useMemo(() => {
     const walletType = useAssetLedger ? 'ledger' : 'keystore'
     return WalletHelper.getWalletBalanceByAssetAndWalletType({
