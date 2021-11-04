@@ -113,27 +113,20 @@ export const CurrencyInfo = ({
               {isCausedSlippage ? (
                 <Styled.SlipToleranceWarning>
                   {intl.formatMessage({ id: 'swap.slip.title' })}: {slip.toFixed(2)}%{' '}
-                  <Tooltip
-                    overlayStyle={{ fontSize: 11 }}
-                    title={intl.formatMessage({ id: 'swap.slip.tolerance.info' })}>
-                    <Styled.InfoCircleOutlinedIcon />
-                  </Tooltip>
                 </Styled.SlipToleranceWarning>
               ) : (
                 <Styled.SlipToleranceText>
                   {intl.formatMessage({ id: 'swap.slip.title' })}: {slip.toFixed(2)}%{' '}
-                  <Tooltip
-                    overlayStyle={{ fontSize: 11 }}
-                    title={intl.formatMessage({ id: 'swap.slip.tolerance.info' })}>
-                    <Styled.InfoCircleOutlinedIcon />
-                  </Tooltip>
                 </Styled.SlipToleranceText>
               )}
             </div>
-            <div style={{ display: 'flex', flexDirection: 'column' }}>
-              <Styled.SlipToleranceText>{intl.formatMessage({ id: 'swap.slip.tolerance' })}:</Styled.SlipToleranceText>
-              {renderSlipSettings}
-            </div>
+            <>
+              <Styled.SlipToleranceText>{intl.formatMessage({ id: 'swap.slip.tolerance' })}</Styled.SlipToleranceText>
+              <Tooltip overlayStyle={{ fontSize: 11 }} title={intl.formatMessage({ id: 'swap.slip.tolerance.info' })}>
+                <Styled.InfoCircleOutlinedIcon />
+              </Tooltip>
+            </>
+            <div style={{ display: 'flex', flexDirection: 'column' }}>{renderSlipSettings}</div>
           </div>
         </Styled.Container>
       )
