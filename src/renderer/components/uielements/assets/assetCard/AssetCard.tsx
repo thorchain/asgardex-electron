@@ -29,7 +29,8 @@ import * as Styled from './AssetCard.styles'
 
 export type Props = {
   asset: Asset
-  assetWalletType: WalletType
+  walletType: WalletType
+  walletTypeDisabled: boolean
   walletTypeChanged: FP.Lazy<void>
   assets: Asset[]
   assetBalance: BaseAmount
@@ -56,7 +57,8 @@ export type Props = {
 export const AssetCard: React.FC<Props> = (props): JSX.Element => {
   const {
     asset,
-    assetWalletType,
+    walletType,
+    walletTypeDisabled,
     walletTypeChanged,
     assets = [],
     price = bn(0),
@@ -172,9 +174,9 @@ export const AssetCard: React.FC<Props> = (props): JSX.Element => {
                   network={network}
                 />
                 <Styled.CheckButton
-                  checked={isLedgerWallet(assetWalletType)}
+                  checked={isLedgerWallet(walletType)}
                   clickHandler={walletTypeChanged}
-                  disabled={false}>
+                  disabled={walletTypeDisabled}>
                   {intl.formatMessage({ id: 'ledger.title' })}
                 </Styled.CheckButton>
               </Styled.AssetSelectContainer>
