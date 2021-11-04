@@ -10,6 +10,8 @@ const swap: SwapMessages = {
   'swap.info.max.fee': 'Total asset balance substracted by estimated swap fees - DE',
   'swap.slip.title': 'Slip',
   'swap.slip.tolerance': 'Sliptoleranz',
+  'swap.slip.tolerance.info':
+    'Je höher die Prozentangabe, je höher akzeptierst Du ein Slippage. Mehr Slippage bedeutet zugleich ein größerer Spielraum zur Abdeckung der geschätzten Gebühren, um fehlgeschlagene Swaps zu vermeiden.',
   'swap.errors.amount.balanceShouldCoverChainFee':
     'Transaktionsgebühr in Höhe von {fee} ist nicht über Dein Guthaben {balance} gedeckt.',
   'swap.errors.amount.outputShouldCoverChainFee':
