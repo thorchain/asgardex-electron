@@ -309,14 +309,12 @@ describe('components/swap/utils', () => {
       const amount = baseAmount(100)
       const slipTolerance = 5
       const result = getSwapLimit(amount, slipTolerance)
-      console.log(result.amount().toNumber())
       expect(eqBaseAmount.equals(result, baseAmount(999))).toBeTruthy()
     })
     it('1 * 5% slip = 0.05 => 999', () => {
       const amount = baseAmount(1)
       const slipTolerance = 5
       const result = getSwapLimit(amount, slipTolerance)
-      console.log(result.amount().toNumber())
       expect(eqBaseAmount.equals(result, baseAmount(999))).toBeTruthy()
     })
   })
