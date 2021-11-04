@@ -26,6 +26,8 @@ const balances = [balanceBNB, balanceBTC, balanceRuneNative]
 const defaultProps: AssetCardProps = {
   assetBalance: O.none,
   asset: AssetBNB,
+  assetWalletType: 'keystore',
+  walletTypeChanged: () => console.log('ledger'),
   balances,
   selectedAmount: ZERO_BASE_AMOUNT,
   onChangeAssetAmount: (value) => console.log('assetAmount', value),

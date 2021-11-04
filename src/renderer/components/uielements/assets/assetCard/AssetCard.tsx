@@ -16,13 +16,17 @@ import BigNumber from 'bignumber.js'
 import * as A from 'fp-ts/lib/Array'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/Option'
+import { useIntl } from 'react-intl'
 
 import { Network } from '../../../../../shared/api/types'
+import { isLedgerWallet } from '../../../../../shared/utils/guard'
+import { WalletType } from '../../../../../shared/wallet/types'
 import { ZERO_BASE_AMOUNT } from '../../../../const'
 import { isBtcAsset } from '../../../../helpers/assetHelper'
 import { ordAsset } from '../../../../helpers/fp/ord'
 import { useClickOutside } from '../../../../hooks/useOutsideClick'
 import { WalletBalances } from '../../../../services/wallet/types'
+import { CheckButton } from '../../button/CheckButton'
 import { Slider } from '../../slider'
 import { AssetMenu } from '../assetMenu'
 import * as Styled from './AssetCard.styles'
@@ -30,6 +34,8 @@ import * as Styled from './AssetCard.styles'
 export type Props = {
   asset: Asset
   assetBalance: O.Option<BaseAmount>
+  assetWalletType: WalletType
+  walletTypeChanged: FP.Lazy<void>
   balances: WalletBalances
   selectedAmount: BaseAmount
   maxAmount: BaseAmount
@@ -54,6 +60,8 @@ export type Props = {
 export const AssetCard: React.FC<Props> = (props): JSX.Element => {
   const {
     asset,
+    assetWalletType,
+    walletTypeChanged,
     balances = [],
     price = bn(0),
     slip,
@@ -76,6 +84,8 @@ export const AssetCard: React.FC<Props> = (props): JSX.Element => {
     minAmountLabel = '',
     assetBalance: oAssetBalance
   } = props
+
+  const intl = useIntl()
 
   const [openDropdown, setOpenDropdown] = useState(false)
   const ref: RefObject<HTMLDivElement> = useRef(null)
@@ -172,13 +182,21 @@ export const AssetCard: React.FC<Props> = (props): JSX.Element => {
                   )}
                 </Styled.AssetCardFooter>
               </Styled.AssetData>
-              <Styled.AssetSelect
-                showAssetName={false}
-                assets={assets}
-                asset={asset}
-                onSelect={handleChangeAsset}
-                network={network}
-              />
+              <Styled.AssetSelectContainer>
+                <Styled.AssetSelect
+                  showAssetName={false}
+                  assets={assets}
+                  asset={asset}
+                  onSelect={handleChangeAsset}
+                  network={network}
+                />
+                <CheckButton
+                  checked={isLedgerWallet(assetWalletType)}
+                  clickHandler={walletTypeChanged}
+                  disabled={false}>
+                  {intl.formatMessage({ id: 'ledger.title' })}
+                </CheckButton>
+              </Styled.AssetSelectContainer>
             </Styled.AssetDataWrapper>
           </Styled.CardTopRow>
         </Styled.CardBorderWrapper>
