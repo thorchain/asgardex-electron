@@ -287,6 +287,24 @@ describe('components/swap/utils', () => {
       const result = getSwapLimit(amount, slipTolerance)
       expect(eqBaseAmount.equals(result, baseAmount(96999))).toBeTruthy()
     })
+    it('10000000 * 10% slip = 900000 => 8999999', () => {
+      const amount = baseAmount(10000000)
+      const slipTolerance = 10
+      const result = getSwapLimit(amount, slipTolerance)
+      expect(eqBaseAmount.equals(result, baseAmount(8999999))).toBeTruthy()
+    })
+    it('1002111 * 10% slip = 901899 => 900999', () => {
+      const amount = baseAmount(1002111)
+      const slipTolerance = 10
+      const result = getSwapLimit(amount, slipTolerance)
+      expect(eqBaseAmount.equals(result, baseAmount(900999))).toBeTruthy()
+    })
+    it('1009888 * 10% slip = 908899 => 907999', () => {
+      const amount = baseAmount(1009888)
+      const slipTolerance = 10
+      const result = getSwapLimit(amount, slipTolerance)
+      expect(eqBaseAmount.equals(result, baseAmount(907999))).toBeTruthy()
+    })
   })
 
   describe('pickPoolAsset', () => {
