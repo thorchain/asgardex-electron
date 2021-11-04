@@ -10,6 +10,8 @@ const swap: SwapMessages = {
   'swap.info.max.fee': 'Total asset balance substracted by estimated swap fees - RU',
   'swap.slip.title': 'Проскальзывание',
   'swap.slip.tolerance': 'Допуск по проскальзыванию',
+  'swap.slip.tolerance.info':
+    'The higher the percentage, the more slippage you will accept. More slippage includes also a wider range for covering estimated fees to avoid aborted swaps. - RU',
   'swap.errors.amount.balanceShouldCoverChainFee':
     'Комиссия транзакции {fee} дожна покрываться вашим балансом (сейчас {balance}).',
   'swap.errors.amount.outputShouldCoverChainFee':

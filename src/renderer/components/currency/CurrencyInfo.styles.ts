@@ -1,3 +1,4 @@
+import { InfoCircleOutlined } from '@ant-design/icons'
 import { Row } from 'antd'
 import Text from 'antd/lib/typography/Text'
 import styled from 'styled-components'
@@ -59,4 +60,9 @@ export const SlipToleranceWarning = styled(Text)`
 
 export const SlipToleranceText = styled(Text)`
   color: ${palette('gray', 2)};
+`
+
+export const InfoCircleOutlinedIcon = styled(InfoCircleOutlined)`
+  color: ${palette('primary', 0)};
+  margin: 3px;
 `

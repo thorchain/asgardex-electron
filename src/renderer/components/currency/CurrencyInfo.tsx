@@ -1,7 +1,7 @@
 import React, { useState, useMemo, useCallback } from 'react'
 
 import { assetAmount, bn, formatAssetAmountCurrency } from '@xchainjs/xchain-util'
-import { Row, Dropdown } from 'antd'
+import { Row, Dropdown, Tooltip } from 'antd'
 import BigNumber from 'bignumber.js'
 import * as O from 'fp-ts/lib/Option'
 import { pipe } from 'fp-ts/pipeable'
@@ -112,18 +112,21 @@ export const CurrencyInfo = ({
             <div style={{ display: 'flex', alignItems: 'center', marginRight: '5px' }}>
               {isCausedSlippage ? (
                 <Styled.SlipToleranceWarning>
-                  {intl.formatMessage({ id: 'swap.slip.title' })}: {slip.toFixed(2)}%
+                  {intl.formatMessage({ id: 'swap.slip.title' })}: {slip.toFixed(2)}%{' '}
                 </Styled.SlipToleranceWarning>
               ) : (
                 <Styled.SlipToleranceText>
-                  {intl.formatMessage({ id: 'swap.slip.title' })}: {slip.toFixed(2)}%
+                  {intl.formatMessage({ id: 'swap.slip.title' })}: {slip.toFixed(2)}%{' '}
                 </Styled.SlipToleranceText>
               )}
             </div>
-            <div style={{ display: 'flex', flexDirection: 'column' }}>
-              <Styled.SlipToleranceText>{intl.formatMessage({ id: 'swap.slip.tolerance' })}:</Styled.SlipToleranceText>
-              {renderSlipSettings}
-            </div>
+            <>
+              <Styled.SlipToleranceText>{intl.formatMessage({ id: 'swap.slip.tolerance' })}</Styled.SlipToleranceText>
+              <Tooltip overlayStyle={{ fontSize: 11 }} title={intl.formatMessage({ id: 'swap.slip.tolerance.info' })}>
+                <Styled.InfoCircleOutlinedIcon />
+              </Tooltip>
+            </>
+            <div style={{ display: 'flex', flexDirection: 'column' }}>{renderSlipSettings}</div>
           </div>
         </Styled.Container>
       )

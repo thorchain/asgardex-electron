@@ -279,6 +279,7 @@ type SwapMessageKey =
   | 'swap.recipient'
   | 'swap.slip.title'
   | 'swap.slip.tolerance'
+  | 'swap.slip.tolerance.info'
   | 'swap.state.pending'
   | 'swap.state.success'
   | 'swap.state.error'
