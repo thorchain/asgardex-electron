@@ -9,6 +9,9 @@ import { AssetCard, Props as AssetCardProps } from './AssetCard'
 const defaultProps: AssetCardProps = {
   assetBalance: assetToBase(assetAmount(12)),
   asset: AssetBNB,
+  walletType: 'keystore',
+  walletTypeDisabled: false,
+  walletTypeChanged: () => console.log('ledger'),
   assets: [AssetBNB, AssetBTC, AssetRuneNative],
   selectedAmount: ZERO_BASE_AMOUNT,
   onChangeAssetAmount: (value) => console.log('assetAmount', value),

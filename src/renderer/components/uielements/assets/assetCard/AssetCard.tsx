@@ -14,8 +14,11 @@ import * as AU from '@xchainjs/xchain-util'
 import { Dropdown } from 'antd'
 import BigNumber from 'bignumber.js'
 import * as FP from 'fp-ts/lib/function'
+import { useIntl } from 'react-intl'
 
 import { Network } from '../../../../../shared/api/types'
+import { isLedgerWallet } from '../../../../../shared/utils/guard'
+import { WalletType } from '../../../../../shared/wallet/types'
 import { ZERO_BASE_AMOUNT } from '../../../../const'
 import { isBtcAsset } from '../../../../helpers/assetHelper'
 import { ordAsset } from '../../../../helpers/fp/ord'
@@ -26,6 +29,9 @@ import * as Styled from './AssetCard.styles'
 
 export type Props = {
   asset: Asset
+  walletType: WalletType
+  walletTypeDisabled: boolean
+  walletTypeChanged: FP.Lazy<void>
   assets: Asset[]
   assetBalance: BaseAmount
   selectedAmount: BaseAmount
@@ -51,6 +57,9 @@ export type Props = {
 export const AssetCard: React.FC<Props> = (props): JSX.Element => {
   const {
     asset,
+    walletType,
+    walletTypeDisabled,
+    walletTypeChanged,
     assets = [],
     price = bn(0),
     slip,
@@ -73,6 +82,8 @@ export const AssetCard: React.FC<Props> = (props): JSX.Element => {
     minAmountLabel = '',
     assetBalance
   } = props
+
+  const intl = useIntl()
 
   const [openDropdown, setOpenDropdown] = useState(false)
   const ref: RefObject<HTMLDivElement> = useRef(null)
@@ -154,13 +165,21 @@ export const AssetCard: React.FC<Props> = (props): JSX.Element => {
                   )}
                 </Styled.AssetCardFooter>
               </Styled.AssetData>
-              <Styled.AssetSelect
-                showAssetName={false}
-                assets={assets}
-                asset={asset}
-                onSelect={handleChangeAsset}
-                network={network}
-              />
+              <Styled.AssetSelectContainer>
+                <Styled.AssetSelect
+                  showAssetName={false}
+                  assets={assets}
+                  asset={asset}
+                  onSelect={handleChangeAsset}
+                  network={network}
+                />
+                <Styled.CheckButton
+                  checked={isLedgerWallet(walletType)}
+                  clickHandler={walletTypeChanged}
+                  disabled={walletTypeDisabled}>
+                  {intl.formatMessage({ id: 'ledger.title' })}
+                </Styled.CheckButton>
+              </Styled.AssetSelectContainer>
             </Styled.AssetDataWrapper>
           </Styled.CardTopRow>
         </Styled.CardBorderWrapper>
