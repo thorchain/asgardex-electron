@@ -157,7 +157,7 @@ export const getSwapData = ({
 export const getSwapLimit = (swapResultAmountMax1e8: BaseAmount, slipTolerance: SlipTolerance): BaseAmount => {
   const swapLimit: BaseAmount = swapResultAmountMax1e8.times(1.0 - slipTolerance * 0.01)
   const swapLimitWithIdentifier = +swapLimit.amount().toString().slice(0, -3).concat(ASGARDEX_SWAP_IDENTIFIER) - 1000
-  return baseAmount(bn(swapLimitWithIdentifier))
+  return baseAmount(bn(swapLimitWithIdentifier <= 999 ? 999 : swapLimitWithIdentifier))
 }
 
 export const pickPoolAsset = (assets: PoolAssetDetails, asset: Asset): O.Option<PoolAssetDetail> =>
