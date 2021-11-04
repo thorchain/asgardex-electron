@@ -1,6 +1,7 @@
 import styled from 'styled-components'
 import { palette } from 'styled-theme'
 
+import { CheckButton as CheckButtonUI } from '../../button/CheckButton'
 import { InputBigNumber as InputBigNumberUI } from '../../input'
 import { Label } from '../../label'
 import { AssetLabel as AssetLabelUI } from '../assetLabel'
@@ -107,4 +108,11 @@ export const AssetSelectContainer = styled.div`
   flex-direction: column;
   justify-content: center;
   align-items: center;
+`
+
+export const CheckButton = styled(CheckButtonUI)`
+  padding-top: 5px;
+  &.ant-btn {
+    font-size: 10px;
+  }
 `

@@ -23,7 +23,6 @@ import { ZERO_BASE_AMOUNT } from '../../../../const'
 import { isBtcAsset } from '../../../../helpers/assetHelper'
 import { ordAsset } from '../../../../helpers/fp/ord'
 import { useClickOutside } from '../../../../hooks/useOutsideClick'
-import { CheckButton } from '../../button/CheckButton'
 import { Slider } from '../../slider'
 import { AssetMenu } from '../assetMenu'
 import * as Styled from './AssetCard.styles'
@@ -172,12 +171,12 @@ export const AssetCard: React.FC<Props> = (props): JSX.Element => {
                   onSelect={handleChangeAsset}
                   network={network}
                 />
-                <CheckButton
+                <Styled.CheckButton
                   checked={isLedgerWallet(assetWalletType)}
                   clickHandler={walletTypeChanged}
                   disabled={false}>
                   {intl.formatMessage({ id: 'ledger.title' })}
-                </CheckButton>
+                </Styled.CheckButton>
               </Styled.AssetSelectContainer>
             </Styled.AssetDataWrapper>
           </Styled.CardTopRow>
