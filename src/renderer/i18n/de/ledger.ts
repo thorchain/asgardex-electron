@@ -20,7 +20,10 @@ const ledger: LedgerMessages = {
   'ledger.error.timeout': 'Zeitüberschreitung zum Ausführen einer Aktion mit dem Ledger',
   'ledger.error.notimplemented': 'Aktion für den Ledger nicht implementiert',
   'ledger.error.denied': 'Die Benutzung des Ledgers wurde verweigert',
-  'ledger.error.unknown': 'Unbekannter Fehler'
+  'ledger.error.unknown': 'Unbekannter Fehler',
+  'ledger.notsupported': 'Kein Ledger support für {chain}.',
+  'ledger.notaddedorzerobalances': 'Ledger für {chain} ist nicht verbunden oder hat kein Guthaben.',
+  'ledger.deposit.oneside': 'Ledger wird aktuell nur für eine Assetseite unterstützt.'
 }
 
 export default ledger

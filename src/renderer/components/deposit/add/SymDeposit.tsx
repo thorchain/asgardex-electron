@@ -10,6 +10,7 @@ import {
   BaseAmount,
   baseToAsset,
   Chain,
+  chainToString,
   formatAssetAmountCurrency,
   THORChain
 } from '@xchainjs/xchain-util'
@@ -222,26 +223,68 @@ export const SymDeposit: React.FC<Props> = (props) => {
   )
 
   const assetWalletTypeTooltip: WalletTypeTooltip = useMemo(() => {
+    // Different tooltips for different situations (order matters):
+    // 1. Check Ledger support for chain
+    // 2. Check if RUNE side is already using Ledger
+    // 3. Check if Ledger is not connected or has no balances
     if (!SUPPORTED_LEDGER_APPS.includes(asset.chain))
-      return { text: 'Ledger for {chain} is not supported.', color: 'primary' }
+      return {
+        text: intl.formatMessage(
+          { id: 'ledger.notsupported' },
+          {
+            chain: chainToString(asset.chain)
+          }
+        ),
+        color: 'warning'
+      }
 
-    if (!hasAssetLedger) return { text: 'Ledger {chain} has not been connected or zero balances', color: 'warning' }
+    if (useRuneLedger) return { text: intl.formatMessage({ id: 'ledger.deposit.oneside' }), color: 'warning' }
 
-    if (useRuneLedger) return { text: 'Ledger of one asset side is selectable only.', color: 'warning' }
+    if (!hasAssetLedger)
+      return {
+        text: intl.formatMessage(
+          { id: 'ledger.notaddedorzerobalances' },
+          {
+            chain: chainToString(THORChain)
+          }
+        ),
+        color: 'warning'
+      }
 
     return { text: '', color: 'primary' }
-  }, [asset.chain, hasAssetLedger, useRuneLedger])
+  }, [asset.chain, hasAssetLedger, intl, useRuneLedger])
 
   const runeWalletTypeTooltip: WalletTypeTooltip = useMemo(() => {
+    // Different tooltips for different situations (order matters):
+    // 1. Check Ledger support for chain
+    // 2. Check if asset side is already using Ledger
+    // 3. Check if Ledger is not connected or has no balances
     if (!SUPPORTED_LEDGER_APPS.includes(THORChain))
-      return { text: 'Ledger for {chain} is not supported.', color: 'primary' }
+      return {
+        text: intl.formatMessage(
+          { id: 'ledger.notsupported' },
+          {
+            chain: chainToString(THORChain)
+          }
+        ),
+        color: 'warning'
+      }
 
-    if (!hasRuneLedger) return { text: 'Ledger THOR has not been connected or zero balances', color: 'warning' }
+    if (useAssetLedger) return { text: intl.formatMessage({ id: 'ledger.deposit.oneside' }), color: 'warning' }
 
-    if (useAssetLedger) return { text: 'Ledger of one asset side is selectable only.', color: 'warning' }
+    if (!hasRuneLedger)
+      return {
+        text: intl.formatMessage(
+          { id: 'ledger.notaddedorzerobalances' },
+          {
+            chain: chainToString(THORChain)
+          }
+        ),
+        color: 'warning'
+      }
 
     return { text: '', color: 'primary' }
-  }, [hasRuneLedger, useAssetLedger])
+  }, [hasRuneLedger, intl, useAssetLedger])
 
   /** Asset balance based on original decimal */
   const assetBalance: BaseAmount = useMemo(

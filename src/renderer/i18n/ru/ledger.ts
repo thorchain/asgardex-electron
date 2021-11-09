@@ -22,7 +22,10 @@ const ledger: LedgerMessages = {
   'ledger.error.timeout': 'Тайм-аут для обработки действия на Ledger',
   'ledger.error.notimplemented': 'Действие не было выполнено с Ledger.',
   'ledger.error.denied': 'Вы отклонили запрос',
-  'ledger.error.unknown': 'Неизвестная ошибка'
+  'ledger.error.unknown': 'Неизвестная ошибка',
+  'ledger.notsupported': 'No Ledger support for {chain}. - RU',
+  'ledger.notaddedorzerobalances': 'Ledger {chain} has not been connected or has zero balances. - RU',
+  'ledger.deposit.oneside': 'Currently Ledger is supported for one asset side only. - RU'
 }
 
 export default ledger
