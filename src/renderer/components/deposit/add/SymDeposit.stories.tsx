@@ -53,7 +53,7 @@ const balanceTOMO: WalletBalance = mockWalletBalance({
 
 const defaultProps: SymDepositProps = {
   haltedChains: [],
-  poolAssets: [AssetRuneNative, AssetBNB, AssetBTC],
+  availableAssets: [AssetRuneNative, AssetBNB, AssetBTC],
   walletBalances: { balances: O.some([balanceRune, balanceBNB, balanceBTC, balanceTOMO]), loading: false },
   mimirHalt: DEFAULT_MIMIR_HALT,
   asset: { asset: AssetBNB, decimal: BNB_DECIMAL },

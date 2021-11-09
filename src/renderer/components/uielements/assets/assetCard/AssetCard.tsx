@@ -14,6 +14,7 @@ import * as AU from '@xchainjs/xchain-util'
 import { Dropdown } from 'antd'
 import BigNumber from 'bignumber.js'
 import * as FP from 'fp-ts/lib/function'
+import * as O from 'fp-ts/lib/Option'
 import { useIntl } from 'react-intl'
 
 import { Network } from '../../../../../shared/api/types'
@@ -31,7 +32,7 @@ import * as Styled from './AssetCard.styles'
 
 export type Props = {
   asset: Asset
-  walletType: WalletType
+  walletType: O.Option<WalletType>
   walletTypeDisabled: boolean
   walletTypeTooltip?: string
   walletTypeTooltipColor?: InfoIconStyled.Color
@@ -61,7 +62,7 @@ export type Props = {
 export const AssetCard: React.FC<Props> = (props): JSX.Element => {
   const {
     asset,
-    walletType,
+    walletType: oWalletType,
     walletTypeDisabled,
     onChangeWalletType,
     walletTypeTooltip,
@@ -179,14 +180,25 @@ export const AssetCard: React.FC<Props> = (props): JSX.Element => {
                   onSelect={handleChangeAsset}
                   network={network}
                 />
+
                 <Styled.WalletTypeContainer>
-                  <Styled.CheckButton
-                    checked={isLedgerWallet(walletType)}
-                    clickHandler={onChangeWalletType}
-                    disabled={walletTypeDisabled}>
-                    {intl.formatMessage({ id: 'ledger.title' })}
-                  </Styled.CheckButton>
-                  {walletTypeTooltip && <InfoIcon color={walletTypeTooltipColor} tooltip={walletTypeTooltip} />}
+                  {FP.pipe(
+                    oWalletType,
+                    O.fold(
+                      () => <></>,
+                      (walletType) => (
+                        <>
+                          <Styled.CheckButton
+                            checked={isLedgerWallet(walletType)}
+                            clickHandler={onChangeWalletType}
+                            disabled={walletTypeDisabled}>
+                            {intl.formatMessage({ id: 'ledger.title' })}
+                          </Styled.CheckButton>
+                          {walletTypeTooltip && <InfoIcon color={walletTypeTooltipColor} tooltip={walletTypeTooltip} />}
+                        </>
+                      )
+                    )
+                  )}
                 </Styled.WalletTypeContainer>
               </Styled.AssetSelectContainer>
             </Styled.AssetDataWrapper>

@@ -81,6 +81,7 @@ import {
   WalletBalances
 } from '../../../services/wallet/types'
 import { AssetWithDecimal } from '../../../types/asgardex'
+import { LedgerConfirmationModal } from '../../modal/confirmation'
 import { PasswordModal } from '../../modal/password'
 import { TxModal } from '../../modal/tx'
 import { DepositAssets } from '../../modal/tx/extra'
@@ -95,7 +96,7 @@ import { PendingAssetsWarning } from './PendingAssetsWarning'
 export type Props = {
   asset: AssetWithDecimal
   assetPrice: BigNumber
-  poolAssets: Asset[]
+  availableAssets: Asset[]
   walletBalances: Pick<BalancesState, 'balances' | 'loading'>
   runePrice: BigNumber
   poolAddress: O.Option<PoolAddress>
@@ -136,7 +137,7 @@ export const SymDeposit: React.FC<Props> = (props) => {
   const {
     asset: { asset, decimal: assetDecimal },
     assetPrice,
-    poolAssets,
+    availableAssets,
     walletBalances,
     runePrice,
     memos: oMemos,
@@ -182,10 +183,10 @@ export const SymDeposit: React.FC<Props> = (props) => {
     () =>
       FP.pipe(
         oWalletBalances,
-        O.map((balances) => WalletHelper.filterWalletBalancesByAssets(balances, poolAssets)),
+        O.map((balances) => WalletHelper.filterWalletBalancesByAssets(balances, availableAssets)),
         O.getOrElse<WalletBalances>(() => [])
       ),
-    [oWalletBalances, poolAssets]
+    [oWalletBalances, availableAssets]
   )
 
   const poolBasedBalancesAssets = FP.pipe(
@@ -205,12 +206,13 @@ export const SymDeposit: React.FC<Props> = (props) => {
 
   const oAssetWB: O.Option<WalletBalance> = useMemo(() => {
     const walletType = useAssetLedger ? 'ledger' : 'keystore'
+    const oWalletBalances = NEA.fromArray(poolBasedBalances)
     return WalletHelper.getWalletBalanceByAssetAndWalletType({
       oWalletBalances,
       asset,
       walletType
     })
-  }, [asset, useAssetLedger, oWalletBalances])
+  }, [asset, useAssetLedger, poolBasedBalances])
 
   const hasAssetLedger = useMemo(
     () => WalletHelper.hasLedgerInBalancesByAsset(asset, poolBasedBalances),
@@ -425,8 +427,8 @@ export const SymDeposit: React.FC<Props> = (props) => {
   const oDepositParams: O.Option<SymDepositParams> = useMemo(
     () =>
       FP.pipe(
-        sequenceSOption({ poolAddress: oPoolAddress, memos: oMemos }),
-        O.map(({ poolAddress, memos }) => {
+        sequenceSOption({ poolAddress: oPoolAddress, memos: oMemos, runeWB: oRuneWB, assetWB: oAssetWB }),
+        O.map(({ poolAddress, memos, runeWB, assetWB }) => {
           return {
             asset,
             poolAddress,
@@ -436,14 +438,16 @@ export const SymDeposit: React.FC<Props> = (props) => {
               asset: convertBaseAmountDecimal(assetAmountToDepositMax1e8, assetDecimal)
             },
             memos,
-            // TODO (@asgx-team) Get it from props when we will support Ledger for sym. deposit
-            runeWalletType: 'keystore',
-            assetWalletType: 'keystore',
-            walletIndex: 0
+            runeWalletType: runeWB.walletType,
+            runeWalletIndex: runeWB.walletIndex,
+            runeSender: runeWB.walletAddress,
+            assetWalletType: assetWB.walletType,
+            assetWalletIndex: assetWB.walletIndex,
+            assetSender: assetWB.walletAddress
           }
         })
       ),
-    [oPoolAddress, oMemos, asset, runeAmountToDeposit, assetAmountToDepositMax1e8, assetDecimal]
+    [oPoolAddress, oMemos, oRuneWB, oAssetWB, asset, runeAmountToDeposit, assetAmountToDepositMax1e8, assetDecimal]
   )
 
   const reloadFeesHandler = useCallback(() => {
@@ -736,10 +740,15 @@ export const SymDeposit: React.FC<Props> = (props) => {
   }, [reloadFeesHandler, selectedInput])
 
   const [showPasswordModal, setShowPasswordModal] = useState(false)
+  const [showLedgerModal, setShowLedgerModal] = useState(false)
 
-  const confirmDepositHandler = useCallback(() => {
-    setShowPasswordModal(true)
-  }, [setShowPasswordModal])
+  const onSubmit = useCallback(() => {
+    if (useAssetLedger || useRuneLedger) {
+      setShowLedgerModal(true)
+    } else {
+      setShowPasswordModal(true)
+    }
+  }, [useAssetLedger, useRuneLedger])
 
   const renderFeeError = useCallback(
     (fee: BaseAmount, amount: BaseAmount, asset: Asset) => {
@@ -927,10 +936,7 @@ export const SymDeposit: React.FC<Props> = (props) => {
     closePasswordModal()
   }, [closePasswordModal])
 
-  const onSucceedPasswordModal = useCallback(() => {
-    // close private modal
-    closePasswordModal()
-
+  const submitDepositTx = useCallback(() => {
     FP.pipe(
       oDepositParams,
       O.map((params) => {
@@ -942,7 +948,26 @@ export const SymDeposit: React.FC<Props> = (props) => {
         return true
       })
     )
-  }, [closePasswordModal, oDepositParams, subscribeDepositState, deposit$])
+  }, [oDepositParams, subscribeDepositState, deposit$])
+
+  const onSucceedPasswordModal = useCallback(() => {
+    // close private modal
+    closePasswordModal()
+    // submit tx
+    submitDepositTx()
+  }, [closePasswordModal, submitDepositTx])
+
+  const onCloseLedgerModal = useCallback(() => {
+    // close modal
+    setShowLedgerModal(false)
+  }, [])
+
+  const onSucceedLedgerModal = useCallback(() => {
+    // close modal
+    setShowLedgerModal(false)
+    // open Pw modal
+    setShowPasswordModal(true)
+  }, [])
 
   const fundsCapReached = useMemo(
     () =>
@@ -1348,7 +1373,7 @@ export const SymDeposit: React.FC<Props> = (props) => {
       <Styled.CardsRow gutter={{ lg: 32 }}>
         <Col xs={24} xl={12}>
           <Styled.AssetCard
-            walletType={useAssetLedger ? 'ledger' : 'keystore'}
+            walletType={Helper.getWalletType(asset.chain, useRuneLedger)}
             walletTypeTooltip={assetWalletTypeTooltip.text}
             walletTypeTooltipColor={assetWalletTypeTooltip.color}
             // Disable ledger selection if RUNE Ledger has been selected
@@ -1384,7 +1409,7 @@ export const SymDeposit: React.FC<Props> = (props) => {
         <Col xs={24} xl={12}>
           <>
             <Styled.AssetCard
-              walletType={useRuneLedger ? 'ledger' : 'keystore'}
+              walletType={Helper.getWalletType(THORChain, useRuneLedger)}
               walletTypeTooltip={runeWalletTypeTooltip.text}
               walletTypeTooltipColor={runeWalletTypeTooltip.color}
               // Disable ledger checkbox if asset ledger is used
@@ -1434,7 +1459,7 @@ export const SymDeposit: React.FC<Props> = (props) => {
           <>
             {renderAssetChainFeeError}
             {renderThorchainFeeError}
-            <Styled.SubmitButton sizevalue="xnormal" onClick={confirmDepositHandler} disabled={disableSubmit}>
+            <Styled.SubmitButton sizevalue="xnormal" onClick={onSubmit} disabled={disableSubmit}>
               {intl.formatMessage({ id: 'common.add' })}
             </Styled.SubmitButton>
             <Fees fees={uiFeesRD} reloadFees={reloadFeesHandler} disabled={disabledForm} />
@@ -1456,6 +1481,17 @@ export const SymDeposit: React.FC<Props> = (props) => {
           </>
         )}
       </Styled.SubmitContainer>
+
+      {showLedgerModal && (
+        <LedgerConfirmationModal
+          key="leder-conf-modal"
+          onSuccess={onSucceedLedgerModal}
+          onClose={onCloseLedgerModal}
+          visible={showLedgerModal}
+          chain={useRuneLedger ? THORChain : asset.chain}
+        />
+      )}
+
       {showPasswordModal && (
         <PasswordModal
           onSuccess={onSucceedPasswordModal}

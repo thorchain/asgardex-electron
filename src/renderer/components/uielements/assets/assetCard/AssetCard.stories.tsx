@@ -2,6 +2,8 @@ import React from 'react'
 
 import { Meta, Story } from '@storybook/react'
 import { bn, AssetBNB, assetAmount, assetToBase, AssetBTC, AssetRuneNative } from '@xchainjs/xchain-util'
+import * as FP from 'fp-ts/lib/function'
+import * as O from 'fp-ts/lib/Option'
 
 import { WalletType } from '../../../../../shared/wallet/types'
 import { ZERO_BASE_AMOUNT } from '../../../../const'
@@ -12,14 +14,17 @@ type Args = {
   tooltipColor: InfoIconStyled.Color
   tooltip: string
   walletTypeDisabled: boolean
-  walletType: WalletType
+  walletType: WalletType & 'none'
 }
 
 export const Default: Story<Args> = ({ walletTypeDisabled, tooltip, tooltipColor, walletType }) => {
   const props: AssetCardProps = {
     assetBalance: assetToBase(assetAmount(12)),
     asset: AssetBNB,
-    walletType,
+    walletType: FP.pipe(
+      walletType,
+      O.fromPredicate((value) => value !== 'none')
+    ),
     walletTypeDisabled,
     walletTypeTooltip: tooltip,
     walletTypeTooltipColor: tooltipColor,
@@ -48,7 +53,7 @@ const meta: Meta<Args> = {
     walletType: {
       control: {
         type: 'select',
-        options: ['keystore', 'ledger']
+        options: ['keystore', 'ledger', 'none']
       },
       defaultValue: 'keystore'
     },

@@ -169,9 +169,12 @@ export const symDeposit$ = ({
   asset,
   amounts,
   memos,
-  walletIndex,
   runeWalletType,
-  assetWalletType
+  runeWalletIndex,
+  runeSender,
+  assetWalletType,
+  assetWalletIndex,
+  assetSender
 }: SymDepositParams): SymDepositState$ => {
   // total of progress
   const total = O.some(100)
@@ -202,8 +205,9 @@ export const symDeposit$ = ({
     liveData.chain<ApiError, SymDepositValidationResult, TxHash>((_) => {
       setState({ ...getState(), step: 2, deposit: RD.progress({ loaded: 40, total }) })
       return sendPoolTx$({
+        sender: assetSender,
         walletType: assetWalletType,
-        walletIndex,
+        walletIndex: assetWalletIndex,
         router: poolAddresses.router,
         asset,
         recipient: poolAddresses.address,
@@ -228,8 +232,9 @@ export const symDeposit$ = ({
     liveData.chain<ApiError, TxHash, TxHash>((_) => {
       setState({ ...getState(), step: 3, deposit: RD.progress({ loaded: 60, total }) })
       return sendPoolTx$({
+        sender: runeSender,
         walletType: runeWalletType,
-        walletIndex,
+        walletIndex: runeWalletIndex,
         router: O.none, // no router for RUNE
         asset: AssetRuneNative,
         recipient: '', // no recipient for RUNE needed

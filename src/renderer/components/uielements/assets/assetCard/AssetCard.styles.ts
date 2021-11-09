@@ -111,7 +111,7 @@ export const AssetSelectContainer = styled.div`
 `
 
 export const WalletTypeContainer = styled.div`
-  padding-top: 5px;
+  height: 40px; // needed to keep height if its content is hidden
   display: flex;
   flex-direction: row;
   align-items: center;

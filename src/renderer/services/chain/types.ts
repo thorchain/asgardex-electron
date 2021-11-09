@@ -72,9 +72,12 @@ export type SymDepositParams = {
   readonly asset: Asset
   readonly amounts: SymDepositAmounts
   readonly memos: SymDepositMemo
-  readonly walletIndex: number
   readonly runeWalletType: WalletType
+  readonly runeWalletIndex: number
+  readonly runeSender: Address
+  readonly assetWalletIndex: number
   readonly assetWalletType: WalletType
+  readonly assetSender: Address
 }
 
 export type SendDepositTxParams = {
