@@ -110,8 +110,14 @@ export const AssetSelectContainer = styled.div`
   align-items: center;
 `
 
-export const CheckButton = styled(CheckButtonUI)`
+export const WalletTypeContainer = styled.div`
   padding-top: 5px;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+`
+
+export const CheckButton = styled(CheckButtonUI)`
   &.ant-btn {
     font-size: 10px;
   }

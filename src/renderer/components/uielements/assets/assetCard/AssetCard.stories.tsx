@@ -3,34 +3,75 @@ import React from 'react'
 import { Meta, Story } from '@storybook/react'
 import { bn, AssetBNB, assetAmount, assetToBase, AssetBTC, AssetRuneNative } from '@xchainjs/xchain-util'
 
+import { WalletType } from '../../../../../shared/wallet/types'
 import { ZERO_BASE_AMOUNT } from '../../../../const'
+import * as InfoIconStyled from './../../info/InfoIcon.styles'
 import { AssetCard, Props as AssetCardProps } from './AssetCard'
 
-const defaultProps: AssetCardProps = {
-  assetBalance: assetToBase(assetAmount(12)),
-  asset: AssetBNB,
-  walletType: 'keystore',
-  walletTypeDisabled: false,
-  walletTypeChanged: () => console.log('ledger'),
-  assets: [AssetBNB, AssetBTC, AssetRuneNative],
-  selectedAmount: ZERO_BASE_AMOUNT,
-  onChangeAssetAmount: (value) => console.log('assetAmount', value),
-  inputOnFocusHandler: () => console.log('onFocus'),
-  inputOnBlurHandler: () => console.log('onBlur'),
-  onChangePercent: (percent) => console.log('percent', percent),
-  price: bn(600),
-  percentValue: 55,
-  maxAmount: assetToBase(assetAmount(10)),
-  network: 'testnet'
+type Args = {
+  tooltipColor: InfoIconStyled.Color
+  tooltip: string
+  walletTypeDisabled: boolean
+  walletType: WalletType
 }
 
-export const Default: Story = () => <AssetCard {...defaultProps} />
+export const Default: Story<Args> = ({ walletTypeDisabled, tooltip, tooltipColor, walletType }) => {
+  const props: AssetCardProps = {
+    assetBalance: assetToBase(assetAmount(12)),
+    asset: AssetBNB,
+    walletType,
+    walletTypeDisabled,
+    walletTypeTooltip: tooltip,
+    walletTypeTooltipColor: tooltipColor,
+    onChangeWalletType: () => console.log('ledger'),
+    assets: [AssetBNB, AssetBTC, AssetRuneNative],
+    selectedAmount: ZERO_BASE_AMOUNT,
+    onChangeAssetAmount: (value) => console.log('assetAmount', value),
+    inputOnFocusHandler: () => console.log('onFocus'),
+    inputOnBlurHandler: () => console.log('onBlur'),
+    onChangePercent: (percent) => console.log('percent', percent),
+    price: bn(600),
+    percentValue: 55,
+    maxAmount: assetToBase(assetAmount(10)),
+    network: 'testnet'
+  }
+
+  return <AssetCard {...props} />
+}
 
 Default.storyName = 'default'
 
-const meta: Meta = {
+const meta: Meta<Args> = {
   component: AssetCard,
   title: 'Components/Assets/AssetCard',
+  argTypes: {
+    walletType: {
+      control: {
+        type: 'select',
+        options: ['keystore', 'ledger']
+      },
+      defaultValue: 'keystore'
+    },
+    tooltipColor: {
+      control: {
+        type: 'select',
+        options: ['primary', 'warning', 'error']
+      },
+      defaultValue: 'primary'
+    },
+    tooltip: {
+      control: {
+        type: 'text'
+      },
+      defaultValue: 'Tooltip example text'
+    },
+    walletTypeDisabled: {
+      control: {
+        type: 'boolean'
+      },
+      defaultValue: false
+    }
+  },
   decorators: [
     (S: Story) => (
       <div style={{ display: 'flex', padding: '20px' }}>
