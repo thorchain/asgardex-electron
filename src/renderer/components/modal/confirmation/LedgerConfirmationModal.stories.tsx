@@ -8,15 +8,18 @@ import { LedgerConfirmationModal } from './'
 type Args = {
   chain: Chain
   visible: boolean
+  description: string
 }
 
-const Template: Story<Args> = ({ chain, visible }) => {
+const Template: Story<Args> = ({ chain, visible, description }) => {
   return (
     <LedgerConfirmationModal
       visible={visible}
       onClose={() => console.log('onClose')}
       onSuccess={() => console.log('onSuccess')}
       chain={chain}
+      description={description}
+      network="mainnet"
     />
   )
 }
@@ -47,6 +50,12 @@ const meta: Meta<Args> = {
     },
     onSuccess: {
       action: 'onSuccess'
+    },
+    description: {
+      control: {
+        type: 'text'
+      },
+      defaultValue: 'Any description'
     }
   }
 }

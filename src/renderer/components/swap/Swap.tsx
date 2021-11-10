@@ -882,16 +882,18 @@ export const Swap = ({
         O.map(({ chain }) => (
           <LedgerConfirmationModal
             key="leder-conf-modal"
+            network={network}
             onSuccess={onSucceedLedgerModal}
             onClose={onCloseLedgerModal}
             visible={showLedgerModal}
             chain={chain}
+            description={intl.formatMessage({ id: 'swap.ledger.sign' })}
           />
         )),
         O.toNullable
       ),
 
-    [oSourceAsset, onCloseLedgerModal, onSucceedLedgerModal, showLedgerModal]
+    [intl, network, oSourceAsset, onCloseLedgerModal, onSucceedLedgerModal, showLedgerModal]
   )
 
   const sourceChainFeeError: boolean = useMemo(() => {

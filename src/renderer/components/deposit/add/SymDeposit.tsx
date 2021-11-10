@@ -1491,6 +1491,8 @@ export const SymDeposit: React.FC<Props> = (props) => {
           onClose={onCloseLedgerModal}
           visible={showLedgerModal}
           chain={useRuneLedger ? THORChain : asset.chain}
+          network={network}
+          description={intl.formatMessage({ id: 'deposit.ledger.sign' })}
         />
       )}
 

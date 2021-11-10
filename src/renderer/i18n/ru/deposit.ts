@@ -68,7 +68,8 @@ const deposit: DepositMessages = {
   'deposit.withdraw.fees': 'Комиссия транзакции: {thorMemo}, Исходящие комиссии: {thorOut} + {assetOut}',
   'deposit.withdraw.feeNote': 'Важно: {fee} BNB останется на вашем кошельке для покрытия комисий.',
   'deposit.withdraw.error.feeNotCovered':
-    'Комиссия транзакции {fee} должна покрываться вашим балансом (баланс: {balance})'
+    'Комиссия транзакции {fee} должна покрываться вашим балансом (баланс: {balance})',
+  'deposit.ledger.sign': 'Click next to sign the deposit transaction on your device. - RU'
 }
 
 export default deposit
