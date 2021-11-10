@@ -361,6 +361,7 @@ type DepositMessageKey =
   | 'deposit.withdraw.fees'
   | 'deposit.withdraw.feeNote'
   | 'deposit.withdraw.error.feeNotCovered'
+  | 'deposit.ledger.sign'
 
 export type DepositMessages = { [key in DepositMessageKey]: string }
 

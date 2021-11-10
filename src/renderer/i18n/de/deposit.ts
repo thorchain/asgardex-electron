@@ -69,7 +69,8 @@ const deposit: DepositMessages = {
   'deposit.withdraw.fees': 'Transaktionsgebühr: {thorMemo}, Auszahlungsgebühren: {thorOut} + {assetOut}',
   'deposit.withdraw.feeNote': 'Hinweis: {fee} werden für die Transaktionsgebühr in Deiner Wallet belassen',
   'deposit.withdraw.error.feeNotCovered':
-    'Transaktionsgebühr in Höhe von {fee} ist nicht über Dein Guthaben {balance} gedeckt.'
+    'Transaktionsgebühr in Höhe von {fee} ist nicht über Dein Guthaben {balance} gedeckt.',
+  'deposit.ledger.sign': 'Klick "Weiter" um die Deposit Transaktion mit Deinem Ledger zu unterzeichnen.'
 }
 
 export default deposit
