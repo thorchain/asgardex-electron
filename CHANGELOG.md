@@ -8,6 +8,7 @@
 ## Update
 
 - [Swap] Update slippage tolerance [#1929](https://github.com/thorchain/asgardex-electron/issues/1929)
+- Pimp Ledger confirmation modal [#1941](https://github.com/thorchain/asgardex-electron/pull/1941)
 
 ## Fix
 
