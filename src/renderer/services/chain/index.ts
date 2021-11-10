@@ -11,7 +11,6 @@ import {
   reloadSwapFees,
   swapFees$
 } from './fees'
-import { asymDepositTxMemo$, symDepositTxMemo$, getWithdrawMemo$ } from './memo'
 import {
   swap$,
   asymDeposit$,
@@ -34,9 +33,6 @@ export {
   asymDepositFee$,
   symWithdrawFee$,
   reloadWithdrawFees,
-  symDepositTxMemo$,
-  asymDepositTxMemo$,
-  getWithdrawMemo$,
   reloadSwapFees,
   swapFees$,
   assetAddress$,

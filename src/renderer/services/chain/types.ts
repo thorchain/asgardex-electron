@@ -31,7 +31,6 @@ export type Memo = string
 export type MemoRx = Rx.Observable<O.Option<Memo>>
 
 export type SymDepositMemo = { rune: Memo; asset: Memo }
-export type SymDepositMemoRx = Rx.Observable<O.Option<SymDepositMemo>>
 
 export type DepositFees = { inFee: BaseAmount; outFee: BaseAmount; refundFee: BaseAmount }
 export type DepositAssetFees = DepositFees & { asset: Asset }
