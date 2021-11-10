@@ -1,12 +1,13 @@
 import * as RD from '@devexperts/remote-data-ts'
 import { PoolData } from '@thorchain/asgardex-util'
-import { Asset, baseAmount, BaseAmount } from '@xchainjs/xchain-util'
+import { Asset, baseAmount, BaseAmount, Chain } from '@xchainjs/xchain-util'
 import BigNumber from 'bignumber.js'
 import * as E from 'fp-ts/Either'
 import * as FP from 'fp-ts/function'
+import * as A from 'fp-ts/lib/Array'
 import * as O from 'fp-ts/Option'
 
-import { ZERO_BASE_AMOUNT } from '../../../const'
+import { SUPPORTED_LEDGER_APPS, ZERO_BASE_AMOUNT } from '../../../const'
 import {
   convertBaseAmountDecimal,
   isChainAsset,
@@ -15,6 +16,7 @@ import {
   THORCHAIN_DECIMAL,
   to1e8BaseAmount
 } from '../../../helpers/assetHelper'
+import { eqChain } from '../../../helpers/fp/eq'
 import { priceFeeAmountForAsset } from '../../../services/chain/fees/utils'
 import { DepositAssetFees, DepositFees, SymDepositFeesRD } from '../../../services/chain/types'
 import { PoolsDataMap } from '../../../services/midgard/types'
@@ -240,3 +242,10 @@ export const minBalanceToDeposit = (fees: Pick<DepositFees, 'inFee' | 'refundFee
   // Over-estimate balance by 50%
   return feeToCover.times(1.5)
 }
+
+export const getWalletType = (chain: Chain, useLedger: boolean) =>
+  FP.pipe(
+    SUPPORTED_LEDGER_APPS,
+    A.findFirst((chainInList) => eqChain.equals(chainInList, chain)),
+    O.map((_) => (useLedger ? 'ledger' : 'keystore'))
+  )

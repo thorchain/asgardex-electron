@@ -14,6 +14,7 @@ import * as AU from '@xchainjs/xchain-util'
 import { Dropdown } from 'antd'
 import BigNumber from 'bignumber.js'
 import * as FP from 'fp-ts/lib/function'
+import * as O from 'fp-ts/lib/Option'
 import { useIntl } from 'react-intl'
 
 import { Network } from '../../../../../shared/api/types'
@@ -23,15 +24,19 @@ import { ZERO_BASE_AMOUNT } from '../../../../const'
 import { isBtcAsset } from '../../../../helpers/assetHelper'
 import { ordAsset } from '../../../../helpers/fp/ord'
 import { useClickOutside } from '../../../../hooks/useOutsideClick'
+import { InfoIcon } from '../../info'
+import * as InfoIconStyled from '../../info/InfoIcon.styles'
 import { Slider } from '../../slider'
 import { AssetMenu } from '../assetMenu'
 import * as Styled from './AssetCard.styles'
 
 export type Props = {
   asset: Asset
-  walletType: WalletType
+  walletType: O.Option<WalletType>
   walletTypeDisabled: boolean
-  walletTypeChanged: FP.Lazy<void>
+  walletTypeTooltip?: string
+  walletTypeTooltipColor?: InfoIconStyled.Color
+  onChangeWalletType: FP.Lazy<void>
   assets: Asset[]
   assetBalance: BaseAmount
   selectedAmount: BaseAmount
@@ -57,9 +62,11 @@ export type Props = {
 export const AssetCard: React.FC<Props> = (props): JSX.Element => {
   const {
     asset,
-    walletType,
+    walletType: oWalletType,
     walletTypeDisabled,
-    walletTypeChanged,
+    onChangeWalletType,
+    walletTypeTooltip,
+    walletTypeTooltipColor = 'primary',
     assets = [],
     price = bn(0),
     slip,
@@ -173,12 +180,26 @@ export const AssetCard: React.FC<Props> = (props): JSX.Element => {
                   onSelect={handleChangeAsset}
                   network={network}
                 />
-                <Styled.CheckButton
-                  checked={isLedgerWallet(walletType)}
-                  clickHandler={walletTypeChanged}
-                  disabled={walletTypeDisabled}>
-                  {intl.formatMessage({ id: 'ledger.title' })}
-                </Styled.CheckButton>
+
+                <Styled.WalletTypeContainer>
+                  {FP.pipe(
+                    oWalletType,
+                    O.fold(
+                      () => <></>,
+                      (walletType) => (
+                        <>
+                          <Styled.CheckButton
+                            checked={isLedgerWallet(walletType)}
+                            clickHandler={onChangeWalletType}
+                            disabled={walletTypeDisabled}>
+                            {intl.formatMessage({ id: 'ledger.title' })}
+                          </Styled.CheckButton>
+                          {walletTypeTooltip && <InfoIcon color={walletTypeTooltipColor} tooltip={walletTypeTooltip} />}
+                        </>
+                      )
+                    )
+                  )}
+                </Styled.WalletTypeContainer>
               </Styled.AssetSelectContainer>
             </Styled.AssetDataWrapper>
           </Styled.CardTopRow>

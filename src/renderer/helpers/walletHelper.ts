@@ -88,7 +88,7 @@ export const getWalletBalanceByAddressAndAsset = ({
   )
 
 export const getWalletAssetAmountFromBalances =
-  (isTargetWalletBalance: FP.Predicate<WalletBalance>) =>
+  (isTargetWalletBalance: (wb: WalletBalance) => boolean) =>
   (balances: WalletBalances): O.Option<AssetAmount> =>
     FP.pipe(
       balances,

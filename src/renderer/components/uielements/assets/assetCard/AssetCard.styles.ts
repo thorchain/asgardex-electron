@@ -110,8 +110,14 @@ export const AssetSelectContainer = styled.div`
   align-items: center;
 `
 
+export const WalletTypeContainer = styled.div`
+  height: 40px; // needed to keep height if its content is hidden
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+`
+
 export const CheckButton = styled(CheckButtonUI)`
-  padding-top: 5px;
   &.ant-btn {
     font-size: 10px;
   }

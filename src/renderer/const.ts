@@ -229,3 +229,6 @@ export const ASYM_DEPOSIT_TOOL_URL: Record<Network, string> = {
   testnet: 'https://testnet.thorswap.finance/',
   mainnet: 'https://app.thorswap.finance/'
 }
+
+// @asgdx-team: Extend list whenever another ledger app will be supported
+export const SUPPORTED_LEDGER_APPS: Chain[] = [THORChain, BNBChain]

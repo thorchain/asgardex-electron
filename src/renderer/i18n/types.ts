@@ -247,6 +247,9 @@ type LedgerMessageKey =
   | 'ledger.error.notimplemented'
   | 'ledger.error.denied'
   | 'ledger.error.unknown'
+  | 'ledger.notsupported'
+  | 'ledger.notaddedorzerobalances'
+  | 'ledger.deposit.oneside'
 
 export type LedgerMessages = { [key in LedgerMessageKey]: string }
 

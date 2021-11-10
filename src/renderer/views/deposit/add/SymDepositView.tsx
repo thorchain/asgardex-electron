@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useMemo } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
 import { Address } from '@xchainjs/xchain-client'
-import { Asset, assetToString, bn, Chain, THORChain } from '@xchainjs/xchain-util'
+import { Asset, AssetRuneNative, assetToString, bn, Chain, THORChain } from '@xchainjs/xchain-util'
 import BigNumber from 'bignumber.js'
 import * as FP from 'fp-ts/function'
 import * as O from 'fp-ts/lib/Option'
@@ -203,7 +203,7 @@ export const SymDepositView: React.FC<Props> = (props) => {
           network={network}
           approveERC20Token$={approveERC20Token$}
           isApprovedERC20Token$={isApprovedERC20Token$}
-          poolAssets={[]}
+          availableAssets={[]}
           fundsCap={O.none}
           poolsData={{}}
           symPendingAssets={RD.initial}
@@ -243,44 +243,49 @@ export const SymDepositView: React.FC<Props> = (props) => {
       renderDisabledAddDeposit,
       (_) => renderDisabledAddDeposit(),
       (error) => renderDisabledAddDeposit(error),
-      ([assetPrice, poolAssets, poolDetail, poolsData]) => (
-        <>
-          <SymDeposit
-            haltedChains={haltedChains}
-            mimirHalt={mimirHalt}
-            validatePassword$={validatePassword$}
-            openRuneExplorerTxUrl={openRuneExplorerTxUrl}
-            openAssetExplorerTxUrl={openAssetExplorerTxUrl}
-            poolData={toPoolData(poolDetail)}
-            onChangeAsset={onChangeAsset}
-            asset={assetWD}
-            assetPrice={assetPrice}
-            runePrice={runPrice}
-            walletBalances={balancesState}
-            poolAddress={oPoolAddress}
-            memos={depositTxMemo}
-            fees$={symDepositFees$}
-            reloadFees={reloadSymDepositFees}
-            approveFee$={approveFee$}
-            reloadApproveFee={reloadApproveFee}
-            priceAsset={selectedPricePoolAsset}
-            reloadBalances={reloadBalances}
-            reloadShares={reloadShares}
-            reloadSelectedPoolDetail={reloadSelectedPoolDetail}
-            poolAssets={poolAssets}
-            deposit$={symDeposit$}
-            network={network}
-            approveERC20Token$={approveERC20Token$}
-            isApprovedERC20Token$={isApprovedERC20Token$}
-            fundsCap={fundsCap}
-            poolsData={poolsData}
-            symPendingAssets={symPendingAssetsRD}
-            openRecoveryTool={openRecoveryTool}
-            hasAsymAssets={hasAsymAssetsRD}
-            openAsymDepositTool={openAsymDepositTool}
-          />
-        </>
-      )
+      ([assetPrice, poolAssets, poolDetail, poolsData]) => {
+        // Since RUNE is not part of pool assets, add it to the list of available assets
+        const availableAssets = [AssetRuneNative, ...poolAssets]
+
+        return (
+          <>
+            <SymDeposit
+              haltedChains={haltedChains}
+              mimirHalt={mimirHalt}
+              validatePassword$={validatePassword$}
+              openRuneExplorerTxUrl={openRuneExplorerTxUrl}
+              openAssetExplorerTxUrl={openAssetExplorerTxUrl}
+              poolData={toPoolData(poolDetail)}
+              onChangeAsset={onChangeAsset}
+              asset={assetWD}
+              assetPrice={assetPrice}
+              runePrice={runPrice}
+              walletBalances={balancesState}
+              poolAddress={oPoolAddress}
+              memos={depositTxMemo}
+              fees$={symDepositFees$}
+              reloadFees={reloadSymDepositFees}
+              approveFee$={approveFee$}
+              reloadApproveFee={reloadApproveFee}
+              priceAsset={selectedPricePoolAsset}
+              reloadBalances={reloadBalances}
+              reloadShares={reloadShares}
+              reloadSelectedPoolDetail={reloadSelectedPoolDetail}
+              availableAssets={availableAssets}
+              deposit$={symDeposit$}
+              network={network}
+              approveERC20Token$={approveERC20Token$}
+              isApprovedERC20Token$={isApprovedERC20Token$}
+              fundsCap={fundsCap}
+              poolsData={poolsData}
+              symPendingAssets={symPendingAssetsRD}
+              openRecoveryTool={openRecoveryTool}
+              hasAsymAssets={hasAsymAssetsRD}
+              openAsymDepositTool={openAsymDepositTool}
+            />
+          </>
+        )
+      }
     )
   )
 }
