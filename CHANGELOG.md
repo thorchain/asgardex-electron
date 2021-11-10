@@ -2,7 +2,12 @@
 
 ## Add
 
+- [Ledger] Add liquidity using Ledger [#1926](https://github.com/thorchain/asgardex-electron/pull/1926), [#1927](https://github.com/thorchain/asgardex-electron/issues/1927) [#1936](https://github.com/thorchain/asgardex-electron/issues/1936)
 - Restore previous windows dimensions with next start of ASGDX [#1879](https://github.com/thorchain/asgardex-electron/issues/1879)
+
+## Update
+
+- [Swap] Update slippage tolerance [#1929](https://github.com/thorchain/asgardex-electron/issues/1929)
 
 ## Fix
 

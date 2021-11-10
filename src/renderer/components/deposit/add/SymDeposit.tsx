@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
-import { PoolData } from '@thorchain/asgardex-util'
+import { getDepositMemo, PoolData } from '@thorchain/asgardex-util'
 import { Address } from '@xchainjs/xchain-client'
 import {
   Asset,
@@ -45,7 +45,6 @@ import { useSubscriptionState } from '../../../hooks/useSubscriptionState'
 import { INITIAL_SYM_DEPOSIT_STATE } from '../../../services/chain/const'
 import { getZeroSymDepositFees } from '../../../services/chain/fees'
 import {
-  SymDepositMemo,
   SymDepositState,
   SymDepositParams,
   SymDepositStateHandler,
@@ -100,7 +99,6 @@ export type Props = {
   walletBalances: Pick<BalancesState, 'balances' | 'loading'>
   runePrice: BigNumber
   poolAddress: O.Option<PoolAddress>
-  memos: O.Option<SymDepositMemo>
   priceAsset?: Asset
   reloadFees: ReloadSymDepositFeesHandler
   fees$: SymDepositFeesHandler
@@ -140,7 +138,6 @@ export const SymDeposit: React.FC<Props> = (props) => {
     availableAssets,
     walletBalances,
     runePrice,
-    memos: oMemos,
     poolAddress: oPoolAddress,
     openAssetExplorerTxUrl,
     openRuneExplorerTxUrl,
@@ -427,8 +424,10 @@ export const SymDeposit: React.FC<Props> = (props) => {
   const oDepositParams: O.Option<SymDepositParams> = useMemo(
     () =>
       FP.pipe(
-        sequenceSOption({ poolAddress: oPoolAddress, memos: oMemos, runeWB: oRuneWB, assetWB: oAssetWB }),
-        O.map(({ poolAddress, memos, runeWB, assetWB }) => {
+        sequenceSOption({ poolAddress: oPoolAddress, runeWB: oRuneWB, assetWB: oAssetWB }),
+        O.map(({ poolAddress, runeWB, assetWB }) => {
+          const assetAddress = assetWB.walletAddress
+          const runeAddress = runeWB.walletAddress
           return {
             asset,
             poolAddress,
@@ -437,17 +436,20 @@ export const SymDeposit: React.FC<Props> = (props) => {
               // Decimal needs to be converted back for using orginal decimal of this asset (provided by `assetBalance`)
               asset: convertBaseAmountDecimal(assetAmountToDepositMax1e8, assetDecimal)
             },
-            memos,
+            memos: {
+              asset: getDepositMemo(asset, assetAddress),
+              rune: getDepositMemo(asset, runeAddress)
+            },
             runeWalletType: runeWB.walletType,
             runeWalletIndex: runeWB.walletIndex,
-            runeSender: runeWB.walletAddress,
+            runeSender: runeAddress,
             assetWalletType: assetWB.walletType,
             assetWalletIndex: assetWB.walletIndex,
-            assetSender: assetWB.walletAddress
+            assetSender: assetAddress
           }
         })
       ),
-    [oPoolAddress, oMemos, oRuneWB, oAssetWB, asset, runeAmountToDeposit, assetAmountToDepositMax1e8, assetDecimal]
+    [oPoolAddress, oRuneWB, oAssetWB, asset, runeAmountToDeposit, assetAmountToDepositMax1e8, assetDecimal]
   )
 
   const reloadFeesHandler = useCallback(() => {

@@ -27,7 +27,6 @@ import { FundsCap, useFundsCap } from '../../../hooks/useFundsCap'
 import { useLiquidityProviders } from '../../../hooks/useLiquidityProviders'
 import { useOpenExplorerTxUrl } from '../../../hooks/useOpenExplorerTxUrl'
 import * as poolsRoutes from '../../../routes/pools'
-import { SymDepositMemo } from '../../../services/chain/types'
 import { OpenExplorerTxUrl } from '../../../services/clients'
 import { DEFAULT_NETWORK } from '../../../services/const'
 import { PoolAddress, PoolAssetsRD, PoolDetailRD } from '../../../services/midgard/types'
@@ -84,7 +83,7 @@ export const SymDepositView: React.FC<Props> = (props) => {
     }
   } = useMidgardContext()
 
-  const { symDepositFees$, symDeposit$, reloadSymDepositFees, symDepositTxMemo$ } = useChainContext()
+  const { symDepositFees$, symDeposit$, reloadSymDepositFees } = useChainContext()
 
   const [poolsDataRD] = useObservableState(
     () =>
@@ -126,11 +125,6 @@ export const SymDepositView: React.FC<Props> = (props) => {
     // reload balances, whenever sourceAsset and targetAsset have been changed (both are properties of `reloadBalances` )
     reloadBalances()
   }, [reloadBalances])
-
-  const [depositTxMemo]: [O.Option<SymDepositMemo>, unknown] = useObservableState(
-    () => symDepositTxMemo$(asset.chain),
-    O.none
-  )
 
   const poolAssetsRD: PoolAssetsRD = useObservableState(availableAssets$, RD.initial)
 
@@ -194,7 +188,6 @@ export const SymDepositView: React.FC<Props> = (props) => {
           priceAsset={selectedPricePoolAsset}
           disabled={true}
           poolAddress={O.none}
-          memos={O.none}
           reloadBalances={reloadBalances}
           reloadShares={reloadShares}
           reloadSelectedPoolDetail={reloadSelectedPoolDetail}
@@ -262,7 +255,6 @@ export const SymDepositView: React.FC<Props> = (props) => {
               runePrice={runPrice}
               walletBalances={balancesState}
               poolAddress={oPoolAddress}
-              memos={depositTxMemo}
               fees$={symDepositFees$}
               reloadFees={reloadSymDepositFees}
               approveFee$={approveFee$}
