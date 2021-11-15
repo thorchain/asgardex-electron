@@ -8,10 +8,8 @@ import * as O from 'fp-ts/lib/Option'
 import { BNB_DECIMAL, THORCHAIN_DECIMAL } from '../../helpers/assetHelper'
 import { DEFAULT_MIMIR_HALT } from '../../services/thorchain/const'
 import { DefaultPoolShare } from '../uielements/poolShare/PoolShare.stories'
-import { Default as AsymDeposit } from './add/AsymDeposit.stories'
 import { Default as SymDeposit } from './add/SymDeposit.stories'
 import { Deposit, Props as DepositProps } from './Deposit'
-import { Default as AsymWidthdraw } from './withdraw/AsymWithdraw.stories'
 import { Default as Withdraw } from './withdraw/Withdraw.stories'
 
 const defaultProps: DepositProps = {
@@ -41,9 +39,7 @@ const defaultProps: DepositProps = {
   ]),
   ShareContent: DefaultPoolShare,
   SymDepositContent: SymDeposit,
-  AsymDepositContent: AsymDeposit,
   WidthdrawContent: Withdraw,
-  AsymWidthdrawContent: AsymWidthdraw,
   keystoreState: O.some(O.some({ phrase: 'phrase' })),
   runeWalletAddress: 'rune-wallet-address',
   assetWalletAddress: 'asset-wallet-address'

@@ -2,7 +2,7 @@ import React, { useMemo } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
 import { Address } from '@xchainjs/xchain-client'
-import { Asset, Chain } from '@xchainjs/xchain-util'
+import { Chain } from '@xchainjs/xchain-util'
 import { Grid } from 'antd'
 import * as FP from 'fp-ts/function'
 import * as O from 'fp-ts/Option'
@@ -38,7 +38,8 @@ export type Props = {
     smallWidth?: boolean
     poolDetail: PoolDetailRD
   }>
-  AsymDepositContent: React.ComponentType<{ asset: Asset; poolDetail: PoolDetailRD; haltedChains: Chain[] }>
+  // TODO (@Veado) Temporary disabled #827
+  // AsymDepositContent: React.ComponentType<{ asset: Asset; poolDetail: PoolDetailRD; haltedChains: Chain[] }>
   SymDepositContent: React.ComponentType<{
     asset: AssetWithDecimal
     poolDetail: PoolDetailRD
@@ -54,13 +55,14 @@ export type Props = {
     haltedChains: Chain[]
     mimirHalt: MimirHalt
   }>
-  AsymWidthdrawContent: React.ComponentType<{
-    asset: Asset
-    poolShare: PoolShareRD
-    poolDetail: PoolDetailRD
-    haltedChains: Chain[]
-    mimirHalt: MimirHalt
-  }>
+  // TODO (@Veado) Temporary disabled #827
+  // AsymWidthdrawContent: React.ComponentType<{
+  //   asset: Asset
+  //   poolShare: PoolShareRD
+  //   poolDetail: PoolDetailRD
+  //   haltedChains: Chain[]
+  //   mimirHalt: MimirHalt
+  // }>
   keystoreState: KeystoreState
   runeWalletAddress: Address
   assetWalletAddress: Address

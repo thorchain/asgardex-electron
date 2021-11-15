@@ -12,7 +12,7 @@ import * as S from 'fp-ts/lib/string'
 
 import { LedgerError } from '../../../shared/api/types'
 import { WalletAddress, WalletType } from '../../../shared/wallet/types'
-import { DepositAssetFees, DepositFees, SwapFeesParams } from '../../services/chain/types'
+import { DepositAssetFees, DepositFees, SwapFeesParams, SymDepositAddresses } from '../../services/chain/types'
 import { ApproveParams } from '../../services/ethereum/types'
 import { PoolAddress, PoolShare } from '../../services/midgard/types'
 import { ApiError, LedgerAddressMap, WalletBalance } from '../../services/wallet/types'
@@ -190,9 +190,16 @@ export const eqWalletAddress = Eq.struct<WalletAddress>({
   walletIndex: eqNumber
 })
 
+export const eqOWalletAddress = O.getEq(eqWalletAddress)
+
 export const eqLedgerAddressRD = RD.getEq<LedgerError, WalletAddress>(eqLedgerError, eqWalletAddress)
 
 export const eqLedgerAddressMap = Eq.struct<LedgerAddressMap>({
   testnet: eqLedgerAddressRD,
   mainnet: eqLedgerAddressRD
+})
+
+export const eqSymDepositAddresses = Eq.struct<SymDepositAddresses>({
+  rune: eqOWalletAddress,
+  asset: eqOWalletAddress
 })
