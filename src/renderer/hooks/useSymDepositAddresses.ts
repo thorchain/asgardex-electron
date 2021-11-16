@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo } from 'react'
+import { useCallback, useMemo } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
 import { Asset, THORChain } from '@xchainjs/xchain-util'
@@ -9,10 +9,11 @@ import * as Rx from 'rxjs'
 import * as RxOp from 'rxjs/operators'
 
 import { isLedgerWallet } from '../../shared/utils/guard'
-import { WalletAddress, WalletType } from '../../shared/wallet/types'
+import { WalletType } from '../../shared/wallet/types'
 import { useChainContext } from '../contexts/ChainContext'
 import { useWalletContext } from '../contexts/WalletContext'
 import { INITIAL_SYM_DEPOSIT_ADDRESSES } from '../services/chain/const'
+import { SymDepositAddresses } from '../services/chain/types'
 import { LedgerAddressRD } from '../services/wallet/types'
 import { useLedger } from './useLedger'
 import { useNetwork } from './useNetwork'
@@ -22,7 +23,7 @@ import { useNetwork } from './useNetwork'
  *
  * As always: Use it at `view` level only (not in components)
  */
-export const useSymDepositAddresses = (who: string, oAsset: O.Option<Asset>) => {
+export const useSymDepositAddresses = (oAsset: O.Option<Asset>) => {
   const { network } = useNetwork()
 
   const { addressByChain$, symDepositAddresses$, setSymDepositAddresses } = useChainContext()
@@ -45,27 +46,25 @@ export const useSymDepositAddresses = (who: string, oAsset: O.Option<Asset>) => 
   )
 
   // Track both keystore addresses at once to update global state once at once
-  const [{ asset: assetKeystoreAddress, rune: runeKeystoreAddress }]: [
-    { asset: O.Option<WalletAddress>; rune: O.Option<WalletAddress> },
-    unknown
-  ] = useObservableState(
-    () =>
-      FP.pipe(
-        Rx.combineLatest([assetKeystoreAddress$, addressByChain$(THORChain)]),
-        RxOp.switchMap(([asset, rune]) =>
-          Rx.of({
-            asset,
-            rune
+  const [{ asset: assetKeystoreAddress, rune: runeKeystoreAddress }]: [SymDepositAddresses, unknown] =
+    useObservableState(
+      () =>
+        FP.pipe(
+          Rx.combineLatest([assetKeystoreAddress$, addressByChain$(THORChain)]),
+          RxOp.switchMap(([asset, rune]) =>
+            Rx.of({
+              asset,
+              rune
+            })
+          ),
+          // Since we are always "starting" with `keystore` addresses
+          // update global state once with it
+          RxOp.tap((addresses) => {
+            setSymDepositAddresses(addresses)
           })
         ),
-        // Since we are always "starting" with `keystore` addresses
-        // update global state once with it
-        RxOp.tap((addresses) => {
-          setSymDepositAddresses(addresses)
-        })
-      ),
-    { asset: O.none, rune: O.none }
-  )
+      INITIAL_SYM_DEPOSIT_ADDRESSES
+    )
 
   const assetLedgerAddressRD = useObservableState<LedgerAddressRD>(
     FP.pipe(
@@ -82,12 +81,6 @@ export const useSymDepositAddresses = (who: string, oAsset: O.Option<Asset>) => 
 
   const { address: runeLedgerAddressRD } = useLedger(THORChain)
   const runeLedgerAddress = RD.toOption(runeLedgerAddressRD)
-
-  // TODO (@veado) Remove it - for debugging only
-  useEffect(() => {
-    console.log('who RUNE', who)
-    console.log('symDepositAddresses', symDepositAddresses)
-  }, [who, assetKeystoreAddress, runeLedgerAddress, runeKeystoreAddress, symDepositAddresses])
 
   const setAssetWalletType = useCallback(
     (walletType: WalletType) => {

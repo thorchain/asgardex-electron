@@ -25,7 +25,7 @@ export const CheckButton: React.FC<Props> = (props): JSX.Element => {
   const onClickHandler = useCallback(() => {
     const newValue = !checked
     setChecked(() => newValue)
-    clickHandler && clickHandler(newValue)
+    clickHandler(newValue)
   }, [checked, clickHandler])
 
   return (

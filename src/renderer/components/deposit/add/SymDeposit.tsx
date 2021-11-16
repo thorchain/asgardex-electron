@@ -1387,7 +1387,7 @@ export const SymDeposit: React.FC<Props> = (props) => {
             // Disable ledger selection if RUNE Ledger has been selected
             walletTypeDisabled={!hasAssetLedger || useRuneLedger}
             onChangeWalletType={(walletType) => {
-              setUseAssetLedger(() => (isLedgerWallet(walletType) ? true : false))
+              setUseAssetLedger(() => isLedgerWallet(walletType))
               setAssetWalletType(walletType)
             }}
             assetBalance={assetBalance}
@@ -1424,7 +1424,7 @@ export const SymDeposit: React.FC<Props> = (props) => {
               // Disable ledger checkbox if asset ledger is used
               walletTypeDisabled={!hasRuneLedger || useAssetLedger}
               onChangeWalletType={(walletType) => {
-                setRuneLedger(() => (isLedgerWallet(walletType) ? true : false))
+                setRuneLedger(() => isLedgerWallet(walletType))
                 setRuneWalletType(walletType)
               }}
               assetBalance={runeBalance}

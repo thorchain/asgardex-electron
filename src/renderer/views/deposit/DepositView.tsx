@@ -90,7 +90,7 @@ export const DepositView: React.FC<Props> = () => {
 
   const {
     addresses: { rune: oRuneAddress, asset: oAssetAddress }
-  } = useSymDepositAddresses('DepositView', oRouteAsset)
+  } = useSymDepositAddresses(oRouteAsset)
   /**
    * We have to get a new shares$ stream for every new address
    * @description /src/renderer/services/midgard/shares.ts
