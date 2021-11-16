@@ -443,8 +443,8 @@ export const SymDeposit: React.FC<Props> = (props) => {
               asset: convertBaseAmountDecimal(assetAmountToDepositMax1e8, assetDecimal)
             },
             memos: {
-              asset: getDepositMemo(asset, assetAddress),
-              rune: getDepositMemo(asset, runeAddress)
+              asset: getDepositMemo(asset, runeAddress),
+              rune: getDepositMemo(asset, assetAddress)
             },
             runeWalletType: runeWB.walletType,
             runeWalletIndex: runeWB.walletIndex,
