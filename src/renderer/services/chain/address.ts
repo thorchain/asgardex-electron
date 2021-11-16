@@ -57,7 +57,7 @@ const assetAddress$ = (chain: Chain): WalletAddress$ => address$(client$, chain)
 
 /**
  * State of addresses used for sym. deposits
- * It will be set by view level (`DepositView` or `SymDeposit`)
+ * It will be set at view level (`DepositView` or `SymDepositView`)
  */
 const { get$: symDepositAddresses$, set: setSymDepositAddresses } =
   observableState<SymDepositAddresses>(INITIAL_SYM_DEPOSIT_ADDRESSES)

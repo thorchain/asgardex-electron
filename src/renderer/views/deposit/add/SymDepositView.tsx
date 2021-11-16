@@ -59,12 +59,6 @@ export const SymDepositView: React.FC<Props> = (props) => {
   const { network } = useNetwork()
 
   const { setAssetWalletType, setRuneWalletType } = useSymDepositAddresses('SymDV', O.some(asset))
-  const _setAssetWalletType = useCallback((_) => {
-    console.log('jj')
-  }, [])
-  const _setRuneWalletType = useCallback((_) => {
-    console.log('jj')
-  }, [])
 
   const onChangeAsset = useCallback(
     (asset: Asset) => {

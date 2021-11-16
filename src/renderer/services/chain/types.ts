@@ -31,11 +31,8 @@ export type Memo = string
 export type MemoRx = Rx.Observable<O.Option<Memo>>
 
 export type SymDepositMemo = { rune: Memo; asset: Memo }
+
 export type SymDepositAddresses = {
-  // keystoreRune: O.Option<Address>
-  // keystoreAsset: O.Option<Address>
-  // ledgerRune: O.Option<Address>
-  // ledgerAsset: O.Option<Address>
   asset: O.Option<WalletAddress>
   rune: O.Option<WalletAddress>
 }

@@ -64,10 +64,6 @@ export const INITIAL_SEND_STATE: SendTxState = {
 }
 
 export const INITIAL_SYM_DEPOSIT_ADDRESSES: SymDepositAddresses = {
-  // keystoreRune: O.none,
-  // keystoreAsset: O.none,
-  // ledgerRune: O.none,
-  // ledgerAsset: O.none
   asset: O.none,
   rune: O.none
 }

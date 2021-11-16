@@ -179,9 +179,6 @@ export const DepositView: React.FC<Props> = () => {
 
   return (
     <>
-      <div>oRuneAddress: {JSON.stringify(oRuneAddress, null, 2)}</div>
-      <div>oAssetAddress: {JSON.stringify(oAssetAddress, null, 2)}</div>
-
       {renderTopContent}
       {FP.pipe(
         sequenceTOption(oRuneAddress, oAssetAddress),
