@@ -16,11 +16,14 @@ import * as O from 'fp-ts/lib/Option'
 
 import { LedgerErrorId } from '../../../shared/api/types'
 import { ASSETS_TESTNET } from '../../../shared/mock/assets'
+import { WalletAddress } from '../../../shared/wallet/types'
+import { SymDepositAddresses } from '../../services/chain/types'
 import { PoolAddress, PoolShare } from '../../services/midgard/types'
 import { INITIAL_LEDGER_ADDRESS_MAP } from '../../services/wallet/const'
 import { ApiError, ErrorId, LedgerAddressMap } from '../../services/wallet/types'
 import { AssetWithAmount } from '../../types/asgardex'
 import { PricePool } from '../../views/pools/Pools.types'
+import { mockWalletAddress } from '../test/testWalletHelper'
 import {
   eqAsset,
   eqBaseAmount,
@@ -40,7 +43,10 @@ import {
   eqAssetAmount,
   eqPricePool,
   eqOString,
-  eqLedgerAddressMap
+  eqLedgerAddressMap,
+  eqWalletAddress,
+  eqOWalletAddress,
+  eqSymDepositAddresses
 } from './eq'
 
 describe('helpers/fp/eq', () => {
@@ -438,6 +444,67 @@ describe('helpers/fp/eq', () => {
       expect(eqLedgerAddressMap.equals(b, a)).toBeFalsy()
       expect(eqLedgerAddressMap.equals(a, c)).toBeFalsy()
       expect(eqLedgerAddressMap.equals(c, b)).toBeFalsy()
+    })
+  })
+
+  describe('eqWalletAddress', () => {
+    const a: WalletAddress = mockWalletAddress()
+
+    it('is equal', () => {
+      expect(eqWalletAddress.equals(a, a)).toBeTruthy()
+    })
+
+    it('is not equal', () => {
+      expect(eqWalletAddress.equals(a, { ...a, address: 'another' })).toBeFalsy()
+      expect(eqWalletAddress.equals(a, { ...a, type: 'ledger' })).toBeFalsy()
+      expect(eqWalletAddress.equals(a, { ...a, chain: BNBChain })).toBeFalsy()
+      expect(eqWalletAddress.equals(a, { ...a, walletIndex: 1 })).toBeFalsy()
+    })
+  })
+
+  describe('eqOWalletAddress', () => {
+    const a: WalletAddress = mockWalletAddress()
+
+    it('is equal', () => {
+      expect(eqOWalletAddress.equals(O.some(a), O.some(a))).toBeTruthy()
+      expect(eqOWalletAddress.equals(O.none, O.none)).toBeTruthy()
+    })
+
+    it('is not equal', () => {
+      expect(eqOWalletAddress.equals(O.some(a), O.some({ ...a, address: 'another' }))).toBeFalsy()
+      expect(eqOWalletAddress.equals(O.some(a), O.some({ ...a, type: 'ledger' }))).toBeFalsy()
+      expect(eqOWalletAddress.equals(O.some(a), O.some({ ...a, chain: BNBChain }))).toBeFalsy()
+      expect(eqOWalletAddress.equals(O.some(a), O.some({ ...a, walletIndex: 1 }))).toBeFalsy()
+    })
+  })
+
+  describe('eqSymDepositAddresses', () => {
+    const rune: WalletAddress = mockWalletAddress()
+    const oRune: O.Option<WalletAddress> = O.some(rune)
+    const asset: WalletAddress = mockWalletAddress({ chain: BNBChain })
+    const oAsset: O.Option<WalletAddress> = O.some(asset)
+    const addresses: SymDepositAddresses = { rune: oRune, asset: oAsset }
+
+    it('are equal', () => {
+      expect(eqSymDepositAddresses.equals(addresses, addresses)).toBeTruthy()
+    })
+
+    it('are not equal', () => {
+      expect(
+        eqSymDepositAddresses.equals(addresses, { asset: oAsset, rune: O.some({ ...rune, address: 'another' }) })
+      ).toBeFalsy()
+      expect(
+        eqSymDepositAddresses.equals(addresses, { asset: oAsset, rune: O.some({ ...rune, type: 'ledger' }) })
+      ).toBeFalsy()
+      expect(
+        eqSymDepositAddresses.equals(addresses, { asset: oAsset, rune: O.some({ ...rune, chain: BNBChain }) })
+      ).toBeFalsy()
+      expect(
+        eqSymDepositAddresses.equals(addresses, { asset: oAsset, rune: O.some({ ...rune, walletIndex: 1 }) })
+      ).toBeFalsy()
+      expect(eqSymDepositAddresses.equals(addresses, { asset: oAsset, rune: O.none })).toBeFalsy()
+      expect(eqSymDepositAddresses.equals(addresses, { asset: O.none, rune: oRune })).toBeFalsy()
+      expect(eqSymDepositAddresses.equals(addresses, { asset: O.none, rune: O.none })).toBeFalsy()
     })
   })
 })
