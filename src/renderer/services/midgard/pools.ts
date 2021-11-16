@@ -59,7 +59,8 @@ import {
   InboundAddresses,
   GasRateLD,
   PoolsState,
-  HaltedChainsLD
+  HaltedChainsLD,
+  SelectedPoolAsset
 } from './types'
 import {
   getPoolAddressesByChain,
@@ -88,7 +89,7 @@ const roundToFiveMinutes = roundUnixTimestampToMinutes(5)
 const createPoolsService = (
   byzantine$: LiveData<Error, string>,
   getMidgardDefaultApi: (basePath: string) => DefaultApi,
-  selectedPoolAsset$: Rx.Observable<O.Option<Asset>>
+  selectedPoolAsset$: Rx.Observable<SelectedPoolAsset>
 ): PoolsService => {
   const midgardDefaultApi$ = FP.pipe(byzantine$, liveData.map(getMidgardDefaultApi), RxOp.shareReplay(1))
 

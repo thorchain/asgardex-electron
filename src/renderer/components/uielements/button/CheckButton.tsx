@@ -5,7 +5,7 @@ import * as FP from 'fp-ts/function'
 import * as Styled from './CheckButton.styles'
 
 export type Props = {
-  clickHandler?: FP.Lazy<void>
+  clickHandler?: (checked: boolean) => void
   disabled?: boolean
   checked: boolean
   className?: string
@@ -23,8 +23,9 @@ export const CheckButton: React.FC<Props> = (props): JSX.Element => {
   }, [checkedProp])
 
   const onClickHandler = useCallback(() => {
-    setChecked(() => !checked)
-    clickHandler && clickHandler()
+    const newValue = !checked
+    setChecked(() => newValue)
+    clickHandler(newValue)
   }, [checked, clickHandler])
 
   return (

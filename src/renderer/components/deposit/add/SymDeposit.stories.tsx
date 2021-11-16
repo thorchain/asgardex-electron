@@ -20,6 +20,7 @@ import * as Rx from 'rxjs'
 import * as RxOp from 'rxjs/operators'
 
 import { mockValidatePassword$ } from '../../../../shared/mock/wallet'
+import { WalletType } from '../../../../shared/wallet/types'
 import { ZERO_BASE_AMOUNT } from '../../../const'
 import { BNB_DECIMAL } from '../../../helpers/assetHelper'
 import { mockWalletBalance } from '../../../helpers/test/testWalletHelper'
@@ -125,7 +126,9 @@ const defaultProps: SymDepositProps = {
   symPendingAssets: RD.initial,
   hasAsymAssets: RD.initial,
   openRecoveryTool: () => console.log('openRecoveryTool'),
-  openAsymDepositTool: () => console.log('openAsymDepositTool')
+  openAsymDepositTool: () => console.log('openAsymDepositTool'),
+  setAssetWalletType: (walletType: WalletType) => console.log('setAssetWalletType', walletType),
+  setRuneWalletType: (walletType: WalletType) => console.log('setRuneWalletType', walletType)
 }
 
 export const Default: Story = () => <SymDeposit {...defaultProps} />

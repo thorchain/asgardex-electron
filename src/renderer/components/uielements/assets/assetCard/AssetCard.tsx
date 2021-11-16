@@ -36,7 +36,7 @@ export type Props = {
   walletTypeDisabled: boolean
   walletTypeTooltip?: string
   walletTypeTooltipColor?: InfoIconStyled.Color
-  onChangeWalletType: FP.Lazy<void>
+  onChangeWalletType: (walletType: WalletType) => void
   assets: Asset[]
   assetBalance: BaseAmount
   selectedAmount: BaseAmount
@@ -190,7 +190,7 @@ export const AssetCard: React.FC<Props> = (props): JSX.Element => {
                         <>
                           <Styled.CheckButton
                             checked={isLedgerWallet(walletType)}
-                            clickHandler={onChangeWalletType}
+                            clickHandler={(checked) => onChangeWalletType(checked ? 'ledger' : 'keystore')}
                             disabled={walletTypeDisabled}>
                             {intl.formatMessage({ id: 'ledger.title' })}
                           </Styled.CheckButton>

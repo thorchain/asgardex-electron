@@ -11,11 +11,9 @@ import { useIntl } from 'react-intl'
 import { useHistory } from 'react-router'
 import * as RxOp from 'rxjs/operators'
 
-import { Network } from '../../../../shared/api/types'
 import { SymDeposit } from '../../../components/deposit/add'
 import { Alert } from '../../../components/uielements/alert'
 import { ASYM_DEPOSIT_TOOL_URL, RECOVERY_TOOL_URL, ZERO_BN, ZERO_POOL_DATA } from '../../../const'
-import { useAppContext } from '../../../contexts/AppContext'
 import { useChainContext } from '../../../contexts/ChainContext'
 import { useEthereumContext } from '../../../contexts/EthereumContext'
 import { useMidgardContext } from '../../../contexts/MidgardContext'
@@ -25,10 +23,11 @@ import { getAssetPoolPrice } from '../../../helpers/poolHelper'
 import { liveData } from '../../../helpers/rx/liveData'
 import { FundsCap, useFundsCap } from '../../../hooks/useFundsCap'
 import { useLiquidityProviders } from '../../../hooks/useLiquidityProviders'
+import { useNetwork } from '../../../hooks/useNetwork'
 import { useOpenExplorerTxUrl } from '../../../hooks/useOpenExplorerTxUrl'
+import { useSymDepositAddresses } from '../../../hooks/useSymDepositAddresses'
 import * as poolsRoutes from '../../../routes/pools'
 import { OpenExplorerTxUrl } from '../../../services/clients'
-import { DEFAULT_NETWORK } from '../../../services/const'
 import { PoolAddress, PoolAssetsRD, PoolDetailRD } from '../../../services/midgard/types'
 import { toPoolData } from '../../../services/midgard/utils'
 import { MimirHalt } from '../../../services/thorchain/types'
@@ -57,9 +56,9 @@ export const SymDepositView: React.FC<Props> = (props) => {
   const history = useHistory()
   const intl = useIntl()
 
-  const { network$ } = useAppContext()
+  const { network } = useNetwork()
 
-  const network = useObservableState<Network>(network$, DEFAULT_NETWORK)
+  const { setAssetWalletType, setRuneWalletType } = useSymDepositAddresses(O.some(asset))
 
   const onChangeAsset = useCallback(
     (asset: Asset) => {
@@ -203,6 +202,8 @@ export const SymDepositView: React.FC<Props> = (props) => {
           openRecoveryTool={openRecoveryTool}
           hasAsymAssets={RD.initial}
           openAsymDepositTool={openAsymDepositTool}
+          setAssetWalletType={setAssetWalletType}
+          setRuneWalletType={setRuneWalletType}
         />
       </>
     ),
@@ -226,7 +227,9 @@ export const SymDepositView: React.FC<Props> = (props) => {
       approveERC20Token$,
       isApprovedERC20Token$,
       openRecoveryTool,
-      openAsymDepositTool
+      openAsymDepositTool,
+      setAssetWalletType,
+      setRuneWalletType
     ]
   )
 
@@ -274,6 +277,8 @@ export const SymDepositView: React.FC<Props> = (props) => {
               openRecoveryTool={openRecoveryTool}
               hasAsymAssets={hasAsymAssetsRD}
               openAsymDepositTool={openAsymDepositTool}
+              setAssetWalletType={setAssetWalletType}
+              setRuneWalletType={setRuneWalletType}
             />
           </>
         )

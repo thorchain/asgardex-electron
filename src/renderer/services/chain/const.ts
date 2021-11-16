@@ -1,5 +1,6 @@
 import * as RD from '@devexperts/remote-data-ts'
 import { FeeOption } from '@xchainjs/xchain-client'
+import * as O from 'fp-ts/lib/Option'
 
 import {
   AsymDepositState,
@@ -8,7 +9,8 @@ import {
   WithdrawState,
   UpgradeRuneTxState,
   SendTxState,
-  TxTypes
+  TxTypes,
+  SymDepositAddresses
 } from './types'
 
 export const MAX_SWAP_STEPS = 3
@@ -59,4 +61,9 @@ export const INITIAL_UPGRADE_RUNE_STATE: UpgradeRuneTxState = {
 export const INITIAL_SEND_STATE: SendTxState = {
   steps: { current: 0, total: 2 },
   status: RD.initial
+}
+
+export const INITIAL_SYM_DEPOSIT_ADDRESSES: SymDepositAddresses = {
+  asset: O.none,
+  rune: O.none
 }

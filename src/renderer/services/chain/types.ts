@@ -5,7 +5,7 @@ import * as O from 'fp-ts/lib/Option'
 import * as Rx from 'rxjs'
 
 import { Network } from '../../../shared/api/types'
-import { WalletType } from '../../../shared/wallet/types'
+import { WalletType, WalletAddress } from '../../../shared/wallet/types'
 import { LiveData } from '../../helpers/rx/liveData'
 import { AssetWithDecimal } from '../../types/asgardex'
 import { AssetWithAmount } from '../../types/asgardex'
@@ -31,6 +31,11 @@ export type Memo = string
 export type MemoRx = Rx.Observable<O.Option<Memo>>
 
 export type SymDepositMemo = { rune: Memo; asset: Memo }
+
+export type SymDepositAddresses = {
+  asset: O.Option<WalletAddress>
+  rune: O.Option<WalletAddress>
+}
 
 export type DepositFees = { inFee: BaseAmount; outFee: BaseAmount; refundFee: BaseAmount }
 export type DepositAssetFees = DepositFees & { asset: Asset }

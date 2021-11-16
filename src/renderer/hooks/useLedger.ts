@@ -6,15 +6,12 @@ import * as FP from 'fp-ts/function'
 import { useObservableState } from 'observable-hooks'
 import * as RxOp from 'rxjs/operators'
 
-import { Network } from '../../shared/api/types'
-import { useAppContext } from '../contexts/AppContext'
 import { useWalletContext } from '../contexts/WalletContext'
-import { DEFAULT_NETWORK } from '../services/const'
 import { LedgerAddressRD } from '../services/wallet/types'
+import { useNetwork } from './useNetwork'
 
 export const useLedger = (chain: Chain) => {
-  const { network$ } = useAppContext()
-  const network = useObservableState<Network>(network$, DEFAULT_NETWORK)
+  const { network } = useNetwork()
 
   const { askLedgerAddress$, getLedgerAddress$, verifyLedgerAddress, removeLedgerAddress } = useWalletContext()
 
