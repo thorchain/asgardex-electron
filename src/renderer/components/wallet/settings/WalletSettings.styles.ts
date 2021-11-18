@@ -258,7 +258,8 @@ export const AddLedgerContainer = styled('div')`
 
 export const IndexLabel = styled('div')`
   color: ${palette('text', 2)};
-  text-transform: capitalize;
+  text-transform: uppercase;
+  font-size: 12px;
 `
 
 export const WalletIndexInput = styled(A.InputNumber)`

@@ -1,4 +1,5 @@
 import { SelectOutlined } from '@ant-design/icons'
+import { Tooltip as TooltipUI } from 'antd'
 import styled from 'styled-components'
 import { palette } from 'styled-theme'
 
@@ -26,3 +27,12 @@ export const WalletTypeLabel = styled(UILabel).attrs({
   padding: 1px 7px;
   width: auto;
 `
+
+export const Tooltip = styled(TooltipUI).attrs({
+  overlayStyle: {
+    fontSize: 11,
+    maxWidth: '330px',
+    fontFamily: 'MainFontRegular',
+    textTransform: 'uppercase'
+  }
+})``

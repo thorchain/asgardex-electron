@@ -240,7 +240,7 @@ export const SymDeposit: React.FC<Props> = (props) => {
             chain: chainToString(asset.chain)
           }
         ),
-        color: 'warning'
+        color: 'primary'
       }
 
     if (useRuneLedger) return { text: intl.formatMessage({ id: 'ledger.deposit.oneside' }), color: 'warning' }
@@ -253,7 +253,7 @@ export const SymDeposit: React.FC<Props> = (props) => {
             chain: chainToString(THORChain)
           }
         ),
-        color: 'warning'
+        color: 'primary'
       }
 
     return { text: '', color: 'primary' }
@@ -272,7 +272,7 @@ export const SymDeposit: React.FC<Props> = (props) => {
             chain: chainToString(THORChain)
           }
         ),
-        color: 'warning'
+        color: 'primary'
       }
 
     if (useAssetLedger) return { text: intl.formatMessage({ id: 'ledger.deposit.oneside' }), color: 'warning' }
@@ -285,7 +285,7 @@ export const SymDeposit: React.FC<Props> = (props) => {
             chain: chainToString(THORChain)
           }
         ),
-        color: 'warning'
+        color: 'primary'
       }
 
     return { text: '', color: 'primary' }

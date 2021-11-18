@@ -1,3 +1,4 @@
+import { Tooltip } from '../common/Common.styles'
 import * as Styled from './InfoIcon.styles'
 
 type Props = {
@@ -6,7 +7,7 @@ type Props = {
 }
 
 export const InfoIcon: React.FC<Props> = ({ tooltip, color = 'primary' }) => (
-  <Styled.Tooltip title={tooltip}>
+  <Tooltip title={tooltip}>
     <Styled.InfoCircleOutlinedIcon color={color} />
-  </Styled.Tooltip>
+  </Tooltip>
 )
