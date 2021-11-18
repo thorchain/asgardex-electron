@@ -1,10 +1,10 @@
 import React, { useState, useMemo, useCallback } from 'react'
 
 import { assetAmount, bn, formatAssetAmountCurrency } from '@xchainjs/xchain-util'
-import { Row, Dropdown, Tooltip } from 'antd'
+import { Row, Dropdown } from 'antd'
 import BigNumber from 'bignumber.js'
+import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
-import { pipe } from 'fp-ts/pipeable'
 import { useIntl } from 'react-intl'
 
 import { ReactComponent as DownIcon } from '../../assets/svg/icon-down.svg'
@@ -12,6 +12,7 @@ import { sequenceTOption } from '../../helpers/fpHelpers'
 import { ChangeSlipToleranceHandler } from '../../services/app/types'
 import { PoolAssetDetail } from '../../services/midgard/types'
 import { SlipTolerance } from '../../types/asgardex'
+import { InfoIcon } from '../uielements/info'
 import * as Styled from './CurrencyInfo.styles'
 
 type CurrencyInfoProps = {
@@ -77,7 +78,7 @@ export const CurrencyInfo = ({
     [slipSettings, slipTolerance, slipDropdownVisible]
   )
 
-  return pipe(
+  return FP.pipe(
     sequenceTOption(from, to),
     O.map(([from, to]) => {
       return (
@@ -120,12 +121,10 @@ export const CurrencyInfo = ({
                 </Styled.SlipToleranceText>
               )}
             </div>
-            <>
+            <div style={{ display: 'flex', alignItems: 'center' }}>
               <Styled.SlipToleranceText>{intl.formatMessage({ id: 'swap.slip.tolerance' })}</Styled.SlipToleranceText>
-              <Tooltip overlayStyle={{ fontSize: 11 }} title={intl.formatMessage({ id: 'swap.slip.tolerance.info' })}>
-                <Styled.InfoCircleOutlinedIcon />
-              </Tooltip>
-            </>
+              <InfoIcon tooltip={intl.formatMessage({ id: 'swap.slip.tolerance.info' })} />
+            </div>
             <div style={{ display: 'flex', flexDirection: 'column' }}>{renderSlipSettings}</div>
           </div>
         </Styled.Container>
