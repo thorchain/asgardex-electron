@@ -268,7 +268,7 @@ describe('components/swap/utils', () => {
     })
   })
 
-  describe.only('getSwapLimit', () => {
+  describe('getSwapLimit', () => {
     it('100000000 * 10% slip = 90000000 => 89999999', () => {
       const amount = baseAmount(100000000)
       const slipTolerance = 10
