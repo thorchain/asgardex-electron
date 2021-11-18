@@ -153,13 +153,17 @@ export const getSwapData = ({
 
 /**
  * Returns `BaseAmount` with asgardex identifier counted into the limit
+ * It's always `1e8` based (default by THORChain)
  */
-export const getSwapLimit = (swapResultAmountMax1e8: BaseAmount, slipTolerance: SlipTolerance): BaseAmount => {
+export const getSwapLimit1e8 = (swapResultAmountMax1e8: BaseAmount, slipTolerance: SlipTolerance): BaseAmount => {
   const swapLimit: BaseAmount = swapResultAmountMax1e8.times(1.0 - slipTolerance * 0.01)
+  const swapLimit1e8: BaseAmount = to1e8BaseAmount(swapLimit)
   const swapLimitWithIdentifier =
-    +swapLimit.amount().toString().slice(0, -3).concat(ASGARDEX_SWAP_IDENTIFIER.toString()) - 1000
+    +swapLimit1e8.amount().toString().slice(0, -3).concat(ASGARDEX_SWAP_IDENTIFIER.toString()) - 1000
+
   return baseAmount(
-    bn(swapLimitWithIdentifier <= ASGARDEX_SWAP_IDENTIFIER ? ASGARDEX_SWAP_IDENTIFIER : swapLimitWithIdentifier)
+    bn(swapLimitWithIdentifier <= ASGARDEX_SWAP_IDENTIFIER ? ASGARDEX_SWAP_IDENTIFIER : swapLimitWithIdentifier),
+    swapLimit1e8.decimal
   )
 }
 
