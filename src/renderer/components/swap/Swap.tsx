@@ -373,7 +373,7 @@ export const Swap = ({
           memo: getSwapMemo({
             asset: target,
             address,
-            limit: Utils.getSwapLimit(swapResultAmountMax1e8, slipTolerance)
+            limit: Utils.getSwapLimit1e8(swapResultAmountMax1e8, slipTolerance)
           }),
           walletType,
           sender: walletAddress,

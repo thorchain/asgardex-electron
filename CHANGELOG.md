@@ -3,6 +3,7 @@
 ## Add
 
 - [Ledger] Add liquidity using Ledger [#1926](https://github.com/thorchain/asgardex-electron/pull/1926), [#1927](https://github.com/thorchain/asgardex-electron/issues/1927) [#1936](https://github.com/thorchain/asgardex-electron/issues/1936)
+- [ADD] Update shares for Ledger [#1942](https://github.com/thorchain/asgardex-electron/pull/1942)
 - Restore previous windows dimensions with next start of ASGDX [#1879](https://github.com/thorchain/asgardex-electron/issues/1879)
 
 ## Update
@@ -14,6 +15,12 @@
 
 - Format date [#1873](https://github.com/thorchain/asgardex-electron/issues/1873)
 - [PoolDetail] Make tx explorer accessible for locked / not imported wallet users [#1871](https://github.com/thorchain/asgardex-electron/issues/1871)
+- Fix Tooltip styles [#1944](https://github.com/thorchain/asgardex-electron/pull/1944)
+- [Swap] Limits added to memo needs to be 1e8 [#1946](https://github.com/thorchain/asgardex-electron/issues/1946)
+
+## Internal
+
+- Test latest `eq` helpers [#1943](https://github.com/thorchain/asgardex-electron/pull/1943)
 
 # 0.5.0 (2021-10-31)
 
