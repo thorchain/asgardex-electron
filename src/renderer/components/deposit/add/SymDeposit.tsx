@@ -66,6 +66,8 @@ import {
 } from '../../../services/ethereum/types'
 import { PoolAddress, PoolsDataMap } from '../../../services/midgard/types'
 import {
+  LiquidityProviderAssetMismatch,
+  LiquidityProviderAssetMismatchRD,
   LiquidityProviderHasAsymAssets,
   LiquidityProviderHasAsymAssetsRD,
   MimirHalt,
@@ -126,6 +128,7 @@ export type Props = {
   symPendingAssets: PendingAssetsRD
   openRecoveryTool: FP.Lazy<void>
   hasAsymAssets: LiquidityProviderHasAsymAssetsRD
+  symAssetMismatch: LiquidityProviderAssetMismatchRD
   openAsymDepositTool: FP.Lazy<void>
   setAssetWalletType: (walletType: WalletType) => void
   setRuneWalletType: (walletType: WalletType) => void
@@ -168,6 +171,7 @@ export const SymDeposit: React.FC<Props> = (props) => {
     symPendingAssets: symPendingAssetsRD,
     openRecoveryTool,
     hasAsymAssets: hasAsymAssetsRD,
+    symAssetMismatch: symAssetMismatchRD,
     openAsymDepositTool,
     setAssetWalletType,
     setRuneWalletType
@@ -1256,6 +1260,35 @@ export const SymDeposit: React.FC<Props> = (props) => {
     )
   }, [asset, hasAsymAssetsRD, network, openAsymDepositTool])
 
+  const hasAssetMismatch: boolean = useMemo(
+    () => FP.pipe(RD.toOption(symAssetMismatchRD), O.flatten, O.isSome),
+    [symAssetMismatchRD]
+  )
+
+  const prevAssetMismatch = useRef<LiquidityProviderAssetMismatch>(O.none)
+
+  const renderAssetMismatch = useMemo(() => {
+    const render = (assetMismatch: LiquidityProviderAssetMismatch, loading: boolean) => (
+      <>
+        <div>loading {loading.toString()}</div>
+        <div>assetMismatch {JSON.stringify(assetMismatch, null, 2)}</div>
+      </>
+    )
+
+    return FP.pipe(
+      symAssetMismatchRD,
+      RD.fold(
+        () => <></>,
+        () => render(prevAssetMismatch.current, true),
+        () => <></>,
+        (assetMismatch) => {
+          prevAssetMismatch.current = assetMismatch
+          return render(assetMismatch, false)
+        }
+      )
+    )
+  }, [symAssetMismatchRD])
+
   const prevRouterAddress = useRef<O.Option<Address>>(O.none)
 
   // Run `checkApprovedStatus` whenever `oPoolAddress` has been changed
@@ -1315,7 +1348,8 @@ export const SymDeposit: React.FC<Props> = (props) => {
       assetBalance.amount().isZero() ||
       runeBalance.amount().isZero() ||
       hasPendingAssets ||
-      hasAsymDeposits,
+      hasAsymDeposits ||
+      hasAssetMismatch,
     [
       disableDepositAction,
       isBalanceError,
@@ -1324,7 +1358,8 @@ export const SymDeposit: React.FC<Props> = (props) => {
       assetBalance,
       runeBalance,
       hasPendingAssets,
-      hasAsymDeposits
+      hasAsymDeposits,
+      hasAssetMismatch
     ]
   )
 
@@ -1371,6 +1406,12 @@ export const SymDeposit: React.FC<Props> = (props) => {
       {hasAsymDeposits && (
         <Styled.AlertRow>
           <Col xs={24}>{renderAsymDepositWarning}</Col>
+        </Styled.AlertRow>
+      )}
+      <div>hasAssetMismatch {hasAssetMismatch.toString()}</div>
+      {hasAssetMismatch && (
+        <Styled.AlertRow>
+          <Col xs={24}>{renderAssetMismatch}</Col>
         </Styled.AlertRow>
       )}
       {showBalanceError && (

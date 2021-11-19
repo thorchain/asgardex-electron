@@ -168,6 +168,9 @@ export type LiquidityProvidersRD = RD.RemoteData<ApiError, LiquidityProvider[]>
 export type LiquidityProviderHasAsymAssets = { rune: boolean; asset: boolean }
 export type LiquidityProviderHasAsymAssetsRD = RD.RemoteData<ApiError, LiquidityProviderHasAsymAssets>
 
+export type LiquidityProviderAssetMismatch = O.Option<{ runeAddress: Address; assetAddress: Address }>
+export type LiquidityProviderAssetMismatchRD = RD.RemoteData<ApiError, LiquidityProviderAssetMismatch>
+
 export const LiquidityProviderIO = t.type({
   asset: assetIO,
   rune_address: optionFromNullable(t.string),

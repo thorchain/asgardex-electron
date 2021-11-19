@@ -125,6 +125,7 @@ const defaultProps: SymDepositProps = {
   },
   symPendingAssets: RD.initial,
   hasAsymAssets: RD.initial,
+  symAssetMismatch: RD.initial,
   openRecoveryTool: () => console.log('openRecoveryTool'),
   openAsymDepositTool: () => console.log('openAsymDepositTool'),
   setAssetWalletType: (walletType: WalletType) => console.log('setAssetWalletType', walletType),

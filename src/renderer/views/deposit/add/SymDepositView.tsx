@@ -146,7 +146,7 @@ export const SymDepositView: React.FC<Props> = (props) => {
     [fundsCapRD]
   )
 
-  const { symPendingAssets: symPendingAssetsRD, hasAsymAssets: hasAsymAssetsRD } = useLiquidityProviders({
+  const { symPendingAssets, hasAsymAssets, symAssetMismatch } = useLiquidityProviders({
     asset,
     network,
     runeAddress: runeWalletAddress,
@@ -201,6 +201,7 @@ export const SymDepositView: React.FC<Props> = (props) => {
           symPendingAssets={RD.initial}
           openRecoveryTool={openRecoveryTool}
           hasAsymAssets={RD.initial}
+          symAssetMismatch={RD.initial}
           openAsymDepositTool={openAsymDepositTool}
           setAssetWalletType={setAssetWalletType}
           setRuneWalletType={setRuneWalletType}
@@ -273,9 +274,10 @@ export const SymDepositView: React.FC<Props> = (props) => {
               isApprovedERC20Token$={isApprovedERC20Token$}
               fundsCap={fundsCap}
               poolsData={poolsData}
-              symPendingAssets={symPendingAssetsRD}
+              symPendingAssets={symPendingAssets}
               openRecoveryTool={openRecoveryTool}
-              hasAsymAssets={hasAsymAssetsRD}
+              hasAsymAssets={hasAsymAssets}
+              symAssetMismatch={symAssetMismatch}
               openAsymDepositTool={openAsymDepositTool}
               setAssetWalletType={setAssetWalletType}
               setRuneWalletType={setRuneWalletType}
