@@ -10,9 +10,11 @@ import { useObservableState } from 'observable-hooks'
 
 import { Network } from '../../shared/api/types'
 import { useThorchainContext } from '../contexts/ThorchainContext'
-import { eqOString } from '../helpers/fp/eq'
+import { eqAddress, eqOString } from '../helpers/fp/eq'
+import { sequenceTOption } from '../helpers/fpHelpers'
 import {
   LiquidityProvider,
+  LiquidityProviderAssetMismatchRD,
   LiquidityProviderHasAsymAssets,
   LiquidityProviderHasAsymAssetsRD,
   LiquidityProviderRD,
@@ -95,7 +97,7 @@ export const useLiquidityProviders = ({
   )
 
   /**
-   * Checks an asym. deposits asset
+   * Checks whether LP has already an asym. deposit or not
    */
   const hasAsymAssets: LiquidityProviderHasAsymAssetsRD = useMemo(
     () =>
@@ -117,10 +119,41 @@ export const useLiquidityProviders = ({
     [asymLiquidityProviders]
   )
 
+  /**
+   * Looking into LP data to check a possible asset missmatch
+   * That's RUNE or asset side has been already used with another pair
+   *
+   * Sym. deposits only
+   */
+  const symAssetMismatch: LiquidityProviderAssetMismatchRD = useMemo(
+    () =>
+      FP.pipe(
+        providers,
+        RD.map(
+          A.findFirstMap(({ runeAddress: oRuneAddress, assetAddress: oAssetAddress }) =>
+            FP.pipe(
+              sequenceTOption(oRuneAddress, oAssetAddress),
+              O.chain(([providerRuneAddress, providerAssetAddress]) =>
+                // check asset side for given RUNE address
+                (eqAddress.equals(providerRuneAddress, runeAddress) &&
+                  !eqAddress.equals(providerAssetAddress, assetAddress)) ||
+                // check rune side for given asset address
+                (eqAddress.equals(providerAssetAddress, assetAddress) &&
+                  !eqAddress.equals(providerRuneAddress, runeAddress))
+                  ? // If there is a missmatch, return this discovered pair (which is a previous deposit pair)
+                    O.some({ runeAddress: providerRuneAddress, assetAddress: providerAssetAddress })
+                  : O.none
+              )
+            )
+          )
+        )
+      ),
+    [assetAddress, providers, runeAddress]
+  )
+
   return {
-    symLiquidityProvider,
     symPendingAssets,
-    asymLiquidityProviders,
-    hasAsymAssets
+    hasAsymAssets,
+    symAssetMismatch
   }
 }
