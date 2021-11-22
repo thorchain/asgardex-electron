@@ -7,13 +7,15 @@ import * as O from 'fp-ts/Option'
 import { AppUpdateRD } from '../../shared/api/types'
 import IPCMessages from '../ipc/messages'
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 export const registerAppCheckUpdatedHandler = (isDev = false) => {
   autoUpdater.autoDownload = true
   autoUpdater.allowPrerelease = true
   autoUpdater.allowDowngrade = true
   autoUpdater.autoInstallOnAppQuit = true
 
-  if (isDev) {
+  // eslint-disable-next-line no-constant-condition
+  if (true) {
     autoUpdater.logger = {
       ...log,
       // Set custom info logger for better understanding in common debug-flow
