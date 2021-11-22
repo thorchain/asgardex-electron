@@ -8,9 +8,10 @@ import { AppUpdateRD } from '../../shared/api/types'
 import IPCMessages from '../ipc/messages'
 
 export const registerAppCheckUpdatedHandler = (isDev = false) => {
-  // Disable autoDownload
-  autoUpdater.autoDownload = false
+  autoUpdater.autoDownload = true
   autoUpdater.allowPrerelease = true
+  autoUpdater.allowDowngrade = true
+  autoUpdater.autoInstallOnAppQuit = true
 
   if (isDev) {
     autoUpdater.logger = {
@@ -35,6 +36,14 @@ export const registerAppCheckUpdatedHandler = (isDev = false) => {
 
       autoUpdater.once('update-not-available', () => {
         resolve(RD.success(O.none))
+      })
+
+      autoUpdater.once('download-progress', () => {
+        console.log('download in progress')
+      })
+
+      autoUpdater.once('update-downloaded', () => {
+        console.log('update downloaded')
       })
 
       autoUpdater
