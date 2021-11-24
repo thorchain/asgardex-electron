@@ -148,6 +148,7 @@ export const WalletHistoryView: React.FC<Props> = ({ className, reloadHistory })
   return (
     <>
       <PoolActionsHistory
+        network={network}
         headerContent={headerContent}
         className={className}
         currentPage={requestParams.page + 1}

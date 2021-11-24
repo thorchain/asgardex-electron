@@ -2,7 +2,7 @@ import styled from 'styled-components'
 import { palette } from 'styled-theme'
 
 import { media } from '../../../helpers/styleHelper'
-import { ContainerWithDelimeter } from '../containerWithDelimeter'
+import { AssetIcon as AssetIconUI } from '../assets/assetIcon'
 
 export const Container = styled.div`
   display: flex;
@@ -10,7 +10,9 @@ export const Container = styled.div`
   align-items: flex-start;
 `
 
-export const ValuesContainer = styled.span`
+export const ValuesContainer = styled.div`
+  display: flex;
+  flex-wrap: wrap;
   text-align: left;
   ${media.md`
     margin: 0 15px 0 0;
@@ -21,7 +23,39 @@ export const ValuesContainer = styled.span`
   }
 `
 
-export const InOutValeContainer = styled(ContainerWithDelimeter)`
+const CWD_SIDE_MARGIN = 10
+export const ContainerWithDelimeter = styled.div`
+  display: inline-block;
+  position: relative;
+  margin: 0 ${CWD_SIDE_MARGIN * 2}px 0 0;
+
+  &:after {
+    content: ' ';
+    height: 100%;
+    border-right: ${palette('gray', 2)} 1px solid;
+    position: absolute;
+    top: 0;
+    right: -${CWD_SIDE_MARGIN}px;
+  }
+
+  &:first-child {
+    margin-left: 0;
+  }
+
+  &:last-of-type {
+    margin-right: 0;
+    &:after {
+      content: none;
+      display: none;
+    }
+  }
+`
+
+export const InOutContainer = styled(ContainerWithDelimeter)`
+  display: flex;
+  /* align-items: center; */
+  /* flex-direction: columns; */
+  /* align-items: flex-start; */
   font-size: 12px;
   text-transform: uppercase;
   padding: 3px 5px;
@@ -33,6 +67,7 @@ export const InOutValeContainer = styled(ContainerWithDelimeter)`
   &:first-child {
     border-top-left-radius: 1.7rem;
     border-bottom-left-radius: 1.7rem;
+    align-self: flex-start;
   }
 
   &:last-child {
@@ -41,15 +76,31 @@ export const InOutValeContainer = styled(ContainerWithDelimeter)`
   }
 
   ${media.md`
-    font-size: 16px;
-    padding: 5px 20px;
+    font-size: 14px;
+    padding: 5px 10px;
     &:after {
       content: ' ';
     }
   `}
 `
 
-export const InOutValue = styled(ContainerWithDelimeter)``
+export const InOutValueContainer = styled.div`
+  display: flex;
+  align-items: center;
+`
+
+export const InOutValue = styled(ContainerWithDelimeter)`
+  white-space: nowrap;
+  padding: 0 5px 0 10px;
+
+  ${media.lg`
+  padding: 0;
+  `}
+`
+
+export const AssetIcon = styled(AssetIconUI)`
+  margin: 0 5px 0 10px;
+`
 
 export const InOutText = styled.span`
   font-size: 14px;
@@ -58,7 +109,8 @@ export const InOutText = styled.span`
   margin-right: 5px;
 
   &:first-child {
-    margin-right: 10px;
+    margin-right: 5px;
+    margin-left: 5px;
   }
   &:last-child {
     margin-left: 10px;
@@ -66,7 +118,8 @@ export const InOutText = styled.span`
 
   ${media.md`
    &:first-child {
-    margin-right: 15px;
+    margin-right: 10px;
+    margin-left: 5px;
     }
     &:last-child {
       margin-left: 15px;

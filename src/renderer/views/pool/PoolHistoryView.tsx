@@ -72,6 +72,7 @@ export const PoolHistoryView: React.FC<Props> = ({ className, poolAsset, history
   return (
     <PoolActionsHistory
       className={className}
+      network={network}
       headerContent={headerContent}
       currentPage={requestParams.page + 1}
       historyPageRD={historyPage}

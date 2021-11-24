@@ -172,6 +172,7 @@ export const History: Story<{ dataStatus: RDStatus }> = ({ dataStatus }) => {
       historyPageRD={res}
       changePaginationHandler={setCurrentPage}
       currentPage={currentPage}
+      network="testnet"
     />
   )
 }

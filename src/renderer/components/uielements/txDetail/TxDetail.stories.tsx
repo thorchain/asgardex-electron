@@ -37,6 +37,7 @@ export const Desktop: Story<{
   secondInAsset: string
   firstOutAsset: string
   secondOutAsset: string
+  isDesktopView: boolean
 }> = ({
   firstInValue,
   secondInValue,
@@ -45,10 +46,12 @@ export const Desktop: Story<{
   firstInAsset,
   secondInAsset,
   firstOutAsset,
-  secondOutAsset
+  secondOutAsset,
+  isDesktopView
 }) => {
   return (
     <TxDetail
+      network="mainnet"
       type={'SWAP'}
       date={<>12-12-3 1231</>}
       incomes={getValues(firstInAsset, secondInAsset, firstInValue, secondInValue)}
@@ -60,6 +63,7 @@ export const Desktop: Story<{
           amount: assetToBase(assetAmount(1))
         }
       ]}
+      isDesktopView={isDesktopView}
     />
   )
 }
@@ -104,9 +108,15 @@ const argTypes = {
       options: stringAssetsOrNone
     }
   },
-
   secondOutValue: {
     control: numberControlConfig
+  },
+  isDesktopView: {
+    name: 'isDesktopView',
+    control: {
+      type: 'boolean'
+    },
+    defaultValue: true
   }
 }
 
@@ -118,7 +128,8 @@ Desktop.args = {
   firstInAsset: stringAssetsOrNone[1],
   secondInAsset: stringAssetsOrNone[0],
   firstOutAsset: stringAssetsOrNone[2],
-  secondOutAsset: stringAssetsOrNone[0]
+  secondOutAsset: stringAssetsOrNone[0],
+  isDesktopView: true
 }
 
 export default {
