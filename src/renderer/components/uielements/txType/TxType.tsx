@@ -13,6 +13,7 @@ import * as Styled from './TxType.styles'
 
 type Props = {
   type: MidgardTxType
+  showTypeIcon: boolean
   className?: string
 }
 
@@ -35,12 +36,12 @@ const getIcon = (type: MidgardTxType) => {
   }
 }
 
-export const TxType: React.FC<Props> = ({ type, className }) => {
+export const TxType: React.FC<Props> = ({ type, showTypeIcon, className }) => {
   const intl = useIntl()
 
   return (
     <Styled.Container className={className}>
-      <Styled.IconContainer>{getIcon(type)}</Styled.IconContainer>
+      {showTypeIcon && <Styled.IconContainer>{getIcon(type)}</Styled.IconContainer>}
       <Styled.Label>{getTxTypeI18n(type, intl)}</Styled.Label>
     </Styled.Container>
   )

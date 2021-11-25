@@ -27,8 +27,8 @@ const mapType = (type: InputType): MidgardTxType => {
   }
 }
 
-export const Default: Story<{ type: InputType }> = ({ type }) => {
-  return <TxType type={mapType(type)} />
+export const Default: Story<{ type: InputType; showTypeIcon: boolean }> = ({ type, showTypeIcon }) => {
+  return <TxType type={mapType(type)} showTypeIcon={showTypeIcon} />
 }
 
 const argTypes = {
@@ -37,6 +37,12 @@ const argTypes = {
       type: 'select',
       options: types
     }
+  },
+  showTypeIcon: {
+    control: {
+      type: 'boolean'
+    },
+    defaultValue: true
   }
 }
 

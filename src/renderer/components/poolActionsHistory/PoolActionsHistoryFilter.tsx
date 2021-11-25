@@ -47,7 +47,7 @@ export const PoolActionsHistoryFilter: React.FC<Props> = ({
         {FP.pipe(
           availableFilters,
           A.map((filter) => {
-            const content = filter === 'ALL' ? allItemContent : <TxTypeUI type={filter} />
+            const content = filter === 'ALL' ? allItemContent : <TxTypeUI type={filter} showTypeIcon />
             return (
               <Menu.Item key={filter} onClick={() => onFilterChanged(filter)}>
                 <Styled.FilterItem>{content}</Styled.FilterItem>

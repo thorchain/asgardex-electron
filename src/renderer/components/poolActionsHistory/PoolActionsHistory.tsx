@@ -5,6 +5,7 @@ import { Grid } from 'antd'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/Option'
 
+import { Network } from '../../../shared/api/types'
 import { OpenExplorerTxUrl } from '../../services/clients'
 import { ActionsPage, ActionsPageRD } from '../../services/midgard/types'
 import * as Styled from './PoolActionsHistory.styles'
@@ -12,6 +13,7 @@ import { PoolActionsHistoryList } from './PoolActionsHistoryList'
 import { PoolActionsHistoryTable, Props as PoolActionsHistoryTableProps } from './PoolActionsHistoryTable'
 
 type Props = {
+  network: Network
   headerContent?: React.ReactNode
   currentPage: number
   historyPageRD: ActionsPageRD
@@ -23,6 +25,7 @@ type Props = {
 
 export const PoolActionsHistory: React.FC<Props> = (props) => {
   const {
+    network,
     headerContent: HeaderContent,
     historyPageRD,
     currentPage,
@@ -49,7 +52,8 @@ export const PoolActionsHistory: React.FC<Props> = (props) => {
     historyPageRD,
     prevHistoryPage,
     openExplorerTxUrl,
-    changePaginationHandler
+    changePaginationHandler,
+    network
   }
 
   return (

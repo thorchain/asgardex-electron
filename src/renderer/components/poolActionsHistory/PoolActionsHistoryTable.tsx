@@ -1,11 +1,13 @@
 import React, { useCallback, useMemo } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
+import { Grid } from 'antd'
 import { ColumnsType, ColumnType } from 'antd/lib/table'
 import * as FP from 'fp-ts/function'
 import * as O from 'fp-ts/Option'
 import { useIntl } from 'react-intl'
 
+import { Network } from '../../../shared/api/types'
 import { OpenExplorerTxUrl } from '../../services/clients'
 import { ActionsPage, Action, ActionsPageRD } from '../../services/midgard/types'
 import { ApiError } from '../../services/wallet/types'
@@ -18,6 +20,7 @@ import * as H from './PoolActionsHistory.helper'
 import * as Styled from './PoolActionsHistoryTable.styles'
 
 export type Props = {
+  network: Network
   currentPage: number
   historyPageRD: ActionsPageRD
   prevHistoryPage?: O.Option<ActionsPage>
@@ -27,6 +30,7 @@ export type Props = {
 }
 
 export const PoolActionsHistoryTable: React.FC<Props> = ({
+  network,
   openExplorerTxUrl,
   changePaginationHandler,
   historyPageRD,
@@ -35,16 +39,16 @@ export const PoolActionsHistoryTable: React.FC<Props> = ({
 }) => {
   const intl = useIntl()
 
-  const renderActionTypeColumn = useCallback((_, { type }: Action) => <Styled.TxType type={type} />, [])
+  const isDesktopView = Grid.useBreakpoint()?.lg ?? false
 
   const actionTypeColumn: ColumnType<Action> = useMemo(
     () => ({
       key: 'txType',
       align: 'left',
       width: 180,
-      render: renderActionTypeColumn
+      render: (_, { type }: Action) => <Styled.TxType type={type} showTypeIcon={isDesktopView} />
     }),
-    [renderActionTypeColumn]
+    [isDesktopView]
   )
 
   const renderDateColumn = useCallback((_, { date }: Action) => H.renderDate(date), [])
@@ -90,9 +94,11 @@ export const PoolActionsHistoryTable: React.FC<Props> = ({
         outgos={H.getValues(action.out)}
         fees={action.fees}
         slip={action.slip}
+        network={network}
+        isDesktopView={isDesktopView}
       />
     ),
-    []
+    [isDesktopView, network]
   )
 
   const detailColumn: ColumnType<Action> = useMemo(

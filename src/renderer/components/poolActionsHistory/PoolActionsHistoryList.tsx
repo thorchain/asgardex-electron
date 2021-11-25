@@ -1,9 +1,11 @@
 import React, { useCallback } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
+import { Grid } from 'antd'
 import * as FP from 'fp-ts/function'
 import * as O from 'fp-ts/Option'
 
+import { Network } from '../../../shared/api/types'
 import { OpenExplorerTxUrl } from '../../services/clients'
 import { Action, ActionsPage, ActionsPageRD } from '../../services/midgard/types'
 import { ErrorView } from '../shared/error'
@@ -14,6 +16,7 @@ import * as H from './PoolActionsHistory.helper'
 import * as Styled from './PoolActionsHistoryList.styles'
 
 type Props = {
+  network: Network
   currentPage: number
   historyPageRD: ActionsPageRD
   prevHistoryPage?: O.Option<ActionsPage>
@@ -23,6 +26,7 @@ type Props = {
 }
 
 export const PoolActionsHistoryList: React.FC<Props> = ({
+  network,
   changePaginationHandler,
   historyPageRD,
   prevHistoryPage = O.none,
@@ -30,33 +34,45 @@ export const PoolActionsHistoryList: React.FC<Props> = ({
   currentPage,
   className
 }) => {
-  const renderListItem = useCallback((action: Action, index: number, goToTx: OpenExplorerTxUrl) => {
-    const date = H.renderDate(action.date)
+  const isDesktopView = Grid.useBreakpoint()?.lg ?? false
 
-    const titleExtra = (
-      <>
-        {date}
-        {FP.pipe(
-          action,
-          H.getTxId,
-          O.map((id) => (
-            <Styled.GoToButton key="go" onClick={() => goToTx(id)}>
-              <Styled.InfoArrow />
-            </Styled.GoToButton>
-          )),
-          O.getOrElse(() => <></>)
-        )}
-      </>
-    )
+  const renderListItem = useCallback(
+    (action: Action, index: number, goToTx: OpenExplorerTxUrl) => {
+      const date = H.renderDate(action.date)
 
-    return (
-      <Styled.ListItem key={H.getRowKey(action, index)}>
-        <Styled.Card title={<Styled.TxType type={action.type} />} extra={titleExtra}>
-          <TxDetail type={action.type} date={date} incomes={H.getValues(action.in)} outgos={H.getValues(action.out)} />
-        </Styled.Card>
-      </Styled.ListItem>
-    )
-  }, [])
+      const titleExtra = (
+        <>
+          {date}
+          {FP.pipe(
+            action,
+            H.getTxId,
+            O.map((id) => (
+              <Styled.GoToButton key="go" onClick={() => goToTx(id)}>
+                <Styled.InfoArrow />
+              </Styled.GoToButton>
+            )),
+            O.getOrElse(() => <></>)
+          )}
+        </>
+      )
+
+      return (
+        <Styled.ListItem key={H.getRowKey(action, index)}>
+          <Styled.Card title={<Styled.TxType type={action.type} showTypeIcon={isDesktopView} />} extra={titleExtra}>
+            <TxDetail
+              type={action.type}
+              date={date}
+              incomes={H.getValues(action.in)}
+              outgos={H.getValues(action.out)}
+              network={network}
+              isDesktopView={isDesktopView}
+            />
+          </Styled.Card>
+        </Styled.ListItem>
+      )
+    },
+    [isDesktopView, network]
+  )
 
   const renderList = useCallback(
     ({ total, actions }: ActionsPage, loading = false) => {

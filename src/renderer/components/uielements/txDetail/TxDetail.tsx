@@ -7,36 +7,49 @@ import * as FP from 'fp-ts/function'
 import * as NEA from 'fp-ts/NonEmptyArray'
 import * as O from 'fp-ts/Option'
 
-import { ContainerWithDelimeter } from '../containerWithDelimeter'
 import { Fees } from '../fees'
 import * as Styled from './TxDetail.styles'
 import { ActionProps } from './types'
 
-export const TxDetail: React.FC<ActionProps> = ({ className, outgos, incomes, fees = [], slip }) => {
-  const incomeFormatted = useMemo(
+export const TxDetail: React.FC<ActionProps> = ({
+  className,
+  outgos,
+  incomes,
+  fees = [],
+  slip,
+  network,
+  isDesktopView
+}) => {
+  const renderIncomes = useMemo(
     () =>
       FP.pipe(
         incomes,
         A.mapWithIndex((index, { asset, amount }) => (
-          <Styled.InOutValue key={`in-${index}`}>
-            {formatAssetAmountCurrency({ trimZeros: true, amount: baseToAsset(amount), asset })}
-          </Styled.InOutValue>
+          <Styled.InOutValueContainer>
+            {isDesktopView && <Styled.AssetIcon size="xsmall" asset={asset} network={network} />}
+            <Styled.InOutValue key={`in-${index}`}>
+              {formatAssetAmountCurrency({ trimZeros: true, amount: baseToAsset(amount), asset })}
+            </Styled.InOutValue>
+          </Styled.InOutValueContainer>
         ))
       ),
-    [incomes]
+    [incomes, network, isDesktopView]
   )
 
-  const outgoFormatted = useMemo(
+  const renderOutgos = useMemo(
     () =>
       FP.pipe(
         outgos,
         A.mapWithIndex((index, { asset, amount }) => (
-          <Styled.InOutValue key={`out-${index}`}>
-            {formatAssetAmountCurrency({ trimZeros: true, amount: baseToAsset(amount), asset })}
-          </Styled.InOutValue>
+          <Styled.InOutValueContainer>
+            {isDesktopView && <Styled.AssetIcon size="xsmall" asset={asset} network={network} />}
+            <Styled.InOutValue key={`out-${index}`}>
+              {formatAssetAmountCurrency({ trimZeros: true, amount: baseToAsset(amount), asset })}
+            </Styled.InOutValue>
+          </Styled.InOutValueContainer>
         ))
       ),
-    [outgos]
+    [outgos, network, isDesktopView]
   )
 
   const feesComponent = useMemo(
@@ -46,9 +59,9 @@ export const TxDetail: React.FC<ActionProps> = ({ className, outgos, incomes, fe
         NEA.fromArray,
         O.map(RD.success),
         O.map((fees) => (
-          <ContainerWithDelimeter key="fees">
+          <Styled.ContainerWithDelimeter key="fees">
             <Fees fees={fees} />
-          </ContainerWithDelimeter>
+          </Styled.ContainerWithDelimeter>
         )),
         O.getOrElse(() => <></>)
       ),
@@ -58,19 +71,19 @@ export const TxDetail: React.FC<ActionProps> = ({ className, outgos, incomes, fe
   return (
     <Styled.Container className={className}>
       <Styled.ValuesContainer>
-        <Styled.InOutValeContainer>
+        <Styled.InOutContainer>
           <Styled.InOutText>in</Styled.InOutText>
-          {incomeFormatted}
-        </Styled.InOutValeContainer>
-        <Styled.InOutValeContainer>
-          {outgoFormatted}
+          {renderIncomes}
+        </Styled.InOutContainer>
+        <Styled.InOutContainer>
+          {renderOutgos}
           <Styled.InOutText>out</Styled.InOutText>
-        </Styled.InOutValeContainer>
+        </Styled.InOutContainer>
       </Styled.ValuesContainer>
 
       <Styled.AdditionalInfoContainer>
         {feesComponent}
-        {slip && <ContainerWithDelimeter>slip: {slip}%</ContainerWithDelimeter>}
+        {slip && <Styled.ContainerWithDelimeter>slip: {slip}%</Styled.ContainerWithDelimeter>}
       </Styled.AdditionalInfoContainer>
     </Styled.Container>
   )
