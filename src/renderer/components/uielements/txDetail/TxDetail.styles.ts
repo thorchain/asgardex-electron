@@ -53,9 +53,6 @@ export const ContainerWithDelimeter = styled.div`
 
 export const InOutContainer = styled(ContainerWithDelimeter)`
   display: flex;
-  /* align-items: center; */
-  /* flex-direction: columns; */
-  /* align-items: flex-start; */
   font-size: 12px;
   text-transform: uppercase;
   padding: 3px 5px;
