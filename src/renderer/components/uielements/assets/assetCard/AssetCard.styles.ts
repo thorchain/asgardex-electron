@@ -2,6 +2,7 @@ import styled from 'styled-components'
 import { palette } from 'styled-theme'
 
 import { CheckButton as CheckButtonUI } from '../../button/CheckButton'
+import { Tooltip as UITooltip } from '../../common/Common.styles'
 import { InputBigNumber as InputBigNumberUI } from '../../input'
 import { Label } from '../../label'
 import { AssetLabel as AssetLabelUI } from '../assetLabel'
@@ -87,12 +88,21 @@ export const SliderWrapper = styled.div`
   padding: 0 5px 20px 10px;
 `
 
-export const CardHeader = styled.div`
+export const Header = styled.div`
   display: flex;
   justify-content: space-between;
   padding: 10px 11px 10px 0;
   border-bottom: 1px solid ${palette('gray', 0)};
 `
+
+export const Tooltip = styled(UITooltip).attrs({
+  overlayStyle: {
+    textTransform: 'none',
+    fontSize: 14,
+    maxWidth: '400px',
+    fontFamily: 'MainFontRegular'
+  }
+})``
 
 export const BalanceLabel = styled(Label)`
   width: auto;
@@ -101,6 +111,7 @@ export const BalanceLabel = styled(Label)`
 
 export const AssetLabel = styled(AssetLabelUI)`
   padding: 0;
+  cursor: default;
 `
 
 export const AssetSelectContainer = styled.div`

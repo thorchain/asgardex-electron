@@ -5,6 +5,7 @@ import { bn, AssetBNB, assetAmount, assetToBase, AssetBTC, AssetRuneNative } fro
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
 
+import { BNB_ADDRESS_TESTNET } from '../../../../../shared/mock/address'
 import { WalletType } from '../../../../../shared/wallet/types'
 import { ZERO_BASE_AMOUNT } from '../../../../const'
 import * as InfoIconStyled from './../../info/InfoIcon.styles'
@@ -20,7 +21,7 @@ type Args = {
 export const Default: Story<Args> = ({ walletTypeDisabled, tooltip, tooltipColor, walletType }) => {
   const props: AssetCardProps = {
     assetBalance: assetToBase(assetAmount(12)),
-    asset: AssetBNB,
+    asset: { asset: AssetBNB, address: BNB_ADDRESS_TESTNET },
     walletType: FP.pipe(
       walletType,
       O.fromPredicate((value) => value !== 'none')

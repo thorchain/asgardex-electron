@@ -24,6 +24,7 @@ import { ZERO_BASE_AMOUNT } from '../../../../const'
 import { isBtcAsset } from '../../../../helpers/assetHelper'
 import { ordAsset } from '../../../../helpers/fp/ord'
 import { useClickOutside } from '../../../../hooks/useOutsideClick'
+import { AssetWithAddress } from '../../../../types/asgardex'
 import { InfoIcon } from '../../info'
 import * as InfoIconStyled from '../../info/InfoIcon.styles'
 import { Slider } from '../../slider'
@@ -31,7 +32,7 @@ import { AssetMenu } from '../assetMenu'
 import * as Styled from './AssetCard.styles'
 
 export type Props = {
-  asset: Asset
+  asset: AssetWithAddress
   walletType: O.Option<WalletType>
   walletTypeDisabled: boolean
   walletTypeTooltip?: string
@@ -61,7 +62,7 @@ export type Props = {
 
 export const AssetCard: React.FC<Props> = (props): JSX.Element => {
   const {
-    asset,
+    asset: assetWA,
     walletType: oWalletType,
     walletTypeDisabled,
     onChangeWalletType,
@@ -91,6 +92,8 @@ export const AssetCard: React.FC<Props> = (props): JSX.Element => {
   } = props
 
   const intl = useIntl()
+
+  const { asset, address: assetAddress } = assetWA
 
   const [openDropdown, setOpenDropdown] = useState(false)
   const ref: RefObject<HTMLDivElement> = useRef(null)
@@ -149,10 +152,12 @@ export const AssetCard: React.FC<Props> = (props): JSX.Element => {
     <Styled.AssetCardWrapper ref={ref}>
       <Dropdown overlay={renderMenu()} trigger={[]} visible={openDropdown}>
         <Styled.CardBorderWrapper error={minAmountError}>
-          <Styled.CardHeader>
-            <Styled.AssetLabel asset={asset} />
-            {balanceLabel}
-          </Styled.CardHeader>
+          <Styled.Tooltip title={assetAddress}>
+            <Styled.Header>
+              <Styled.AssetLabel asset={asset} />
+              {balanceLabel}
+            </Styled.Header>
+          </Styled.Tooltip>
           <Styled.CardTopRow>
             <Styled.AssetDataWrapper>
               <Styled.AssetData>
