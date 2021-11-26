@@ -12,7 +12,7 @@ type Args = {
   width: string
 }
 export const Template: Story<Args> = ({ size, width }) => (
-  <div style={{ width, backgroundColor: 'red' }}>
+  <div style={{ width }}>
     <Component asset={AssetBNB} size={size} address={BNB_ADDRESS_TESTNET} network="mainnet" />
   </div>
 )
