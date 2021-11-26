@@ -330,6 +330,8 @@ type DepositMessageKey =
   | 'deposit.add.asymAssets.description'
   | 'deposit.add.asymAssets.recoveryTitle'
   | 'deposit.add.asymAssets.recoveryDescription'
+  | 'deposit.add.assetMissmatch.title'
+  | 'deposit.add.assetMissmatch.description'
   | 'deposit.bond.state.error'
   | 'deposit.unbond.state.error'
   | 'deposit.leave.state.error'

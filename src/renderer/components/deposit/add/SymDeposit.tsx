@@ -91,6 +91,7 @@ import { DepositAssets } from '../../modal/tx/extra'
 import { ViewTxButton } from '../../uielements/button'
 import { Fees, UIFeesRD } from '../../uielements/fees'
 import * as InfoIconStyled from '../../uielements/info/InfoIcon.styles'
+import { AssetMissmatchWarning } from './AssetMissmatchWarning'
 import { AsymAssetsWarning } from './AsymAssetsWarning'
 import * as Helper from './Deposit.helper'
 import * as Styled from './Deposit.styles'
@@ -1268,26 +1269,36 @@ export const SymDeposit: React.FC<Props> = (props) => {
   const prevAssetMismatch = useRef<LiquidityProviderAssetMismatch>(O.none)
 
   const renderAssetMismatch = useMemo(() => {
-    const render = (assetMismatch: LiquidityProviderAssetMismatch, loading: boolean) => (
-      <>
-        <div>loading {loading.toString()}</div>
-        <div>assetMismatch {JSON.stringify(assetMismatch, null, 2)}</div>
-      </>
-    )
+    const render = (assetMismatch: LiquidityProviderAssetMismatch) =>
+      FP.pipe(
+        assetMismatch,
+        O.fold(
+          () => <></>,
+          ({ runeAddress, assetAddress }) => (
+            <AssetMissmatchWarning
+              assets={[
+                { asset: AssetRuneNative, address: runeAddress },
+                { asset, address: assetAddress }
+              ]}
+              network={network}
+            />
+          )
+        )
+      )
 
     return FP.pipe(
       symAssetMismatchRD,
       RD.fold(
         () => <></>,
-        () => render(prevAssetMismatch.current, true),
+        () => render(prevAssetMismatch.current),
         () => <></>,
         (assetMismatch) => {
           prevAssetMismatch.current = assetMismatch
-          return render(assetMismatch, false)
+          return render(assetMismatch)
         }
       )
     )
-  }, [symAssetMismatchRD])
+  }, [asset, network, symAssetMismatchRD])
 
   const prevRouterAddress = useRef<O.Option<Address>>(O.none)
 
@@ -1408,7 +1419,6 @@ export const SymDeposit: React.FC<Props> = (props) => {
           <Col xs={24}>{renderAsymDepositWarning}</Col>
         </Styled.AlertRow>
       )}
-      <div>hasAssetMismatch {hasAssetMismatch.toString()}</div>
       {hasAssetMismatch && (
         <Styled.AlertRow>
           <Col xs={24}>{renderAssetMismatch}</Col>

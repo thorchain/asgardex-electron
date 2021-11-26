@@ -1,3 +1,4 @@
+import { Address } from '@xchainjs/xchain-client'
 import { BaseAmount, Asset } from '@xchainjs/xchain-util'
 import { Option } from 'fp-ts/lib/Option'
 
@@ -15,6 +16,13 @@ export type AssetWithAmount = {
   asset: Asset
   amount: BaseAmount
 }
+
+export type AssetWithAddress = {
+  asset: Asset
+  address: Address
+}
+
+export type AssetsWithAddress = AssetWithAddress[]
 
 export type AssetWithWalletType = {
   asset: Asset

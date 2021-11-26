@@ -31,34 +31,32 @@ export const AsymAssetsWarning: React.FC<AsymAssetsWarningProps> = (props): JSX.
         </Styled.AssetWarningInfoButtonLabel>
         <Styled.AssetWarningInfoButtonIcon selected={collapsed} />
       </Styled.AssetWarningInfoButton>
-      <>
-        {collapsed && (
-          <>
-            <Styled.AssetWarningDescription>
-              {intl.formatMessage({ id: 'deposit.add.asymAssets.description' })}
-            </Styled.AssetWarningDescription>
-            {assets.map((asset) => (
-              <AssetData asset={asset} network={network} key={`${assetToString(asset)}`} />
-            ))}
-            <Styled.AssetWarningDescription>
-              <FormattedMessage
-                id="deposit.add.asymAssets.recoveryDescription"
-                values={{
-                  url: (
-                    <Styled.AssetWarningDescriptionLink onClick={onClickOpenAsymTool}>
-                      {ASYM_DEPOSIT_TOOL_URL[network]}
-                    </Styled.AssetWarningDescriptionLink>
-                  )
-                }}
-              />
-            </Styled.AssetWarningDescription>
-            <Styled.WarningOpenExternalUrlButton onClick={onClickOpenAsymTool}>
-              {intl.formatMessage({ id: 'deposit.add.asymAssets.recoveryTitle' })}
-              <Styled.AssetWarningOpenExternalUrlIcon />
-            </Styled.WarningOpenExternalUrlButton>
-          </>
-        )}
-      </>
+      {collapsed && (
+        <>
+          <Styled.AssetWarningDescription>
+            {intl.formatMessage({ id: 'deposit.add.asymAssets.description' })}
+          </Styled.AssetWarningDescription>
+          {assets.map((asset) => (
+            <AssetData asset={asset} network={network} key={`${assetToString(asset)}`} />
+          ))}
+          <Styled.AssetWarningDescription>
+            <FormattedMessage
+              id="deposit.add.asymAssets.recoveryDescription"
+              values={{
+                url: (
+                  <Styled.AssetWarningDescriptionLink onClick={onClickOpenAsymTool}>
+                    {ASYM_DEPOSIT_TOOL_URL[network]}
+                  </Styled.AssetWarningDescriptionLink>
+                )
+              }}
+            />
+          </Styled.AssetWarningDescription>
+          <Styled.WarningOpenExternalUrlButton onClick={onClickOpenAsymTool}>
+            {intl.formatMessage({ id: 'deposit.add.asymAssets.recoveryTitle' })}
+            <Styled.AssetWarningOpenExternalUrlIcon />
+          </Styled.WarningOpenExternalUrlButton>
+        </>
+      )}
     </>
   )
 

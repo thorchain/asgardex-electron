@@ -57,39 +57,38 @@ export const PendingAssetsWarning: React.FC<PendingAssetsProps> = (props): JSX.E
         </Styled.AssetWarningInfoButtonLabel>
         <Styled.AssetWarningInfoButtonIcon selected={collapsed} />
       </Styled.AssetWarningInfoButton>
-      <>
-        {collapsed && (
-          <>
-            <Styled.AssetWarningDescription>
-              {intl.formatMessage({ id: 'deposit.add.pendingAssets.description' })}
-            </Styled.AssetWarningDescription>
-            {assets.map((assetWB, index) => (
-              <AssetIconAmount
-                network={network}
-                assetWA={assetWB}
-                loading={loading}
-                key={`${assetToString(assetWB.asset)}-${index}`}
-              />
-            ))}
-            <Styled.AssetWarningDescription>
-              <FormattedMessage
-                id="deposit.add.pendingAssets.recoveryDescription"
-                values={{
-                  url: (
-                    <Styled.AssetWarningDescriptionLink onClick={onClickRecovery}>
-                      {RECOVERY_TOOL_URL[network]}
-                    </Styled.AssetWarningDescriptionLink>
-                  )
-                }}
-              />
-            </Styled.AssetWarningDescription>
-            <Styled.WarningOpenExternalUrlButton onClick={onClickRecovery}>
-              {intl.formatMessage({ id: 'deposit.add.pendingAssets.recoveryTitle' })}
-              <Styled.AssetWarningOpenExternalUrlIcon />
-            </Styled.WarningOpenExternalUrlButton>
-          </>
-        )}
-      </>
+
+      {collapsed && (
+        <>
+          <Styled.AssetWarningDescription>
+            {intl.formatMessage({ id: 'deposit.add.pendingAssets.description' })}
+          </Styled.AssetWarningDescription>
+          {assets.map((assetWB, index) => (
+            <AssetIconAmount
+              network={network}
+              assetWA={assetWB}
+              loading={loading}
+              key={`${assetToString(assetWB.asset)}-${index}`}
+            />
+          ))}
+          <Styled.AssetWarningDescription>
+            <FormattedMessage
+              id="deposit.add.pendingAssets.recoveryDescription"
+              values={{
+                url: (
+                  <Styled.AssetWarningDescriptionLink onClick={onClickRecovery}>
+                    {RECOVERY_TOOL_URL[network]}
+                  </Styled.AssetWarningDescriptionLink>
+                )
+              }}
+            />
+          </Styled.AssetWarningDescription>
+          <Styled.WarningOpenExternalUrlButton onClick={onClickRecovery}>
+            {intl.formatMessage({ id: 'deposit.add.pendingAssets.recoveryTitle' })}
+            <Styled.AssetWarningOpenExternalUrlIcon />
+          </Styled.WarningOpenExternalUrlButton>
+        </>
+      )}
     </>
   )
 

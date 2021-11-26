@@ -12,7 +12,7 @@ import * as Styled from './AddressEllipsis.styles'
  * Based on https://github.com/bluepeter/react-middle-ellipsis/
  */
 
-type Props = {
+export type Props = {
   address: Address
   chain: Chain
   network: Network

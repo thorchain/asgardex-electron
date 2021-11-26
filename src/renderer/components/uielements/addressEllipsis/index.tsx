@@ -1,1 +1,1 @@
-export { AddressEllipsis } from './AddressEllipsis'
+export * from './AddressEllipsis'
