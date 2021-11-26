@@ -83,8 +83,6 @@ export const Deposit: React.FC<Props> = (props) => {
     keystoreState,
     shares: poolSharesRD,
     poolDetail: poolDetailRD,
-    // TODO (@asgdx-team) Think how to handle different wallets
-    // walletAddress: Address
     runeWalletAddress,
     assetWalletAddress
   } = props

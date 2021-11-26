@@ -37,6 +37,9 @@ const deposit: DepositMessages = {
   'deposit.add.asymAssets.recoveryDescription':
     'Asymmetrical deposit is currently not supported in ASGARDEX desktop. However, you can use this feature in THORSwap to withdraw a previous asymmetrical deposit. - RU',
   'deposit.add.asymAssets.recoveryTitle': 'THORSwap  - RU',
+  'deposit.add.assetMissmatch.title': 'Asset missmatch found - RU',
+  'deposit.add.assetMissmatch.description':
+    'One of current selected asset side has been already used in a previous deposit, but with another asset. Check following addresses to see the previous deposit pair. - RU',
   'deposit.bond.state.error': 'Ошибка при кладе',
   'deposit.unbond.state.error': 'Ошибка при выводе',
   'deposit.leave.state.error': 'Ошибка при выходе',

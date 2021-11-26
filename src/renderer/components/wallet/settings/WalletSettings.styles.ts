@@ -165,9 +165,14 @@ export const AddressContainer = styled.div`
   display: flex;
   flex-direction: row;
   align-items: center;
-  flex: 1;
 `
 const ICON_SIZE = 16
+
+export const AddressWrapper = styled.div`
+  display: flex;
+  align-items: center;
+  width: 100%;
+`
 
 export const AddressEllipsis = styled(AddressEllipsisUI)`
   font-size: 16px;
@@ -280,6 +285,7 @@ export const AddressToVerifyLabel = styled.span`
 
 export const AccountAddressWrapper = styled.div`
   margin-top: 10px;
+  width: 100%;
 `
 
 export const WalletTypeLabel = styled(WalletTypeLabelUI)`
