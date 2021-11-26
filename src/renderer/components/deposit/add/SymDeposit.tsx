@@ -1276,7 +1276,7 @@ export const SymDeposit: React.FC<Props> = (props) => {
           () => <></>,
           ({ runeAddress, assetAddress }) => (
             <AssetMissmatchWarning
-              assetsWA={[
+              assets={[
                 { asset: AssetRuneNative, address: runeAddress },
                 { asset, address: assetAddress }
               ]}
