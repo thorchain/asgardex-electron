@@ -38,7 +38,7 @@ const deposit: DepositMessages = {
   'deposit.add.asymAssets.recoveryDescription':
     'Asymmetrisches (einseitiges) Hinzufügen von Assets ist aktuell in ASGARDEX Desktop noch nicht möglich. Aber Du hast die Möglichkeit, dieses Feature zwischenzeitlich in THORSWap zu nutzen, um die zuvor asymmetrisch hinzugefügten Assets zurückzuüberweisen',
   'deposit.add.asymAssets.recoveryTitle': 'THORSwap',
-  'deposit.add.assetMissmatch.title': 'Asset missmatch found - DE',
+  'deposit.add.assetMissmatch.title': 'Asset Diskrepanz',
   'deposit.add.assetMissmatch.description':
     'Eines der beiden Assets wurde bereits bei einem vorangegangenen Deposit verwendet, jedoch zusammen mit einem anderen Asset. Überprüfe die folgenden Addressen um zu sehen, um welches Assetpaar es sich beim vorherigen Deposit handelt.',
   'deposit.bond.state.error': 'Bond Fehler',
