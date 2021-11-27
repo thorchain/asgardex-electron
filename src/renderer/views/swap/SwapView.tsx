@@ -123,6 +123,21 @@ export const SwapView: React.FC<Props> = (_): JSX.Element => {
 
   const selectedPoolAddress = useObservableState(selectedPoolAddress$, O.none)
 
+  const sourceKeystoreAddress$ = useMemo(
+    () =>
+      FP.pipe(
+        oSourceAsset,
+        O.fold(
+          () => Rx.EMPTY,
+          ({ chain }) => addressByChain$(chain)
+        ),
+        RxOp.map(addressFromOptionalWalletAddress)
+      ),
+
+    [addressByChain$, oSourceAsset]
+  )
+  const oSourceKeystoreAddress = useObservableState(sourceKeystoreAddress$, O.none)
+
   const targetKeystoreAddress$ = useMemo(
     () =>
       FP.pipe(
@@ -213,6 +228,22 @@ export const SwapView: React.FC<Props> = (_): JSX.Element => {
     [targetAssetRD]
   )
 
+  const sourceLedgerAddress$ = useMemo(
+    () =>
+      FP.pipe(
+        oSourceAsset,
+        O.fold(
+          () => Rx.EMPTY,
+          ({ chain }) => getLedgerAddress$(chain, network)
+        ),
+        RxOp.map((rdAddress) => RD.toOption(rdAddress)),
+        RxOp.map(addressFromOptionalWalletAddress)
+      ),
+
+    [getLedgerAddress$, network, oSourceAsset]
+  )
+  const oSourceLedgerAddress = useObservableState(sourceLedgerAddress$, O.none)
+
   const targetLedgerAddress$ = useMemo(
     () =>
       FP.pipe(
@@ -260,6 +291,8 @@ export const SwapView: React.FC<Props> = (_): JSX.Element => {
                   validatePassword$={validatePassword$}
                   goToTransaction={openExplorerTxUrl}
                   assets={{ inAsset: sourceAsset, outAsset: targetAsset }}
+                  sourceWalletAddress={oSourceKeystoreAddress}
+                  sourceLedgerAddress={oSourceLedgerAddress}
                   poolAddress={selectedPoolAddress}
                   availableAssets={availableAssets}
                   poolsData={poolsData}

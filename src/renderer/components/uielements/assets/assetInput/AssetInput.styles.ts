@@ -2,8 +2,9 @@ import styled from 'styled-components'
 import { palette } from 'styled-theme'
 
 import { transition } from '../../../../settings/style-util'
+import { Tooltip as UITooltip } from '../../common/Common.styles'
 
-export const AssetInputWrapper = styled.div`
+export const Wrapper = styled.div`
   display: flex;
   flex-direction: column;
   min-width: 212px;
@@ -18,13 +19,6 @@ export const AssetInputWrapper = styled.div`
     display: flex;
     justify-content: space-between;
     align-items: center;
-
-    .asset-input-title {
-      font-size: 12px;
-      font-family: 'MainFontRegular';
-      letter-spacing: 1px;
-      margin-bottom: 2px;
-    }
 
     .asset-input-header-label {
       font-size: 12px;
@@ -49,3 +43,20 @@ export const AssetInputWrapper = styled.div`
     margin: 0;
   }
 `
+
+export const Title = styled.p`
+  font-size: 12px;
+  font-family: 'MainFontRegular';
+  letter-spacing: 1px;
+  margin-bottom: 2px;
+  cursor: default;
+`
+
+export const TitleTooltip = styled(UITooltip).attrs({
+  overlayStyle: {
+    textTransform: 'none',
+    fontSize: 14,
+    maxWidth: '400px',
+    fontFamily: 'MainFontRegular'
+  }
+})``

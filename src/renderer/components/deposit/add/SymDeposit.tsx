@@ -1277,8 +1277,8 @@ export const SymDeposit: React.FC<Props> = (props) => {
           ({ runeAddress, assetAddress }) => (
             <AssetMissmatchWarning
               assets={[
-                { asset: AssetRuneNative, address: runeAddress },
-                { asset, address: assetAddress }
+                { asset, address: assetAddress },
+                { asset: AssetRuneNative, address: runeAddress }
               ]}
               network={network}
             />
@@ -1443,7 +1443,14 @@ export const SymDeposit: React.FC<Props> = (props) => {
             }}
             assetBalance={assetBalance}
             disabled={disabledForm}
-            asset={asset}
+            asset={{
+              asset,
+              address: FP.pipe(
+                oAssetWB,
+                O.map(({ walletAddress }) => walletAddress),
+                O.getOrElse(() => '')
+              )
+            }}
             selectedAmount={assetAmountToDepositMax1e8}
             maxAmount={maxAssetAmountToDepositMax1e8}
             onChangeAssetAmount={assetAmountChangeHandler}
@@ -1480,7 +1487,14 @@ export const SymDeposit: React.FC<Props> = (props) => {
               }}
               assetBalance={runeBalance}
               disabled={disabledForm}
-              asset={AssetRuneNative}
+              asset={{
+                asset: AssetRuneNative,
+                address: FP.pipe(
+                  oRuneWB,
+                  O.map(({ walletAddress }) => walletAddress),
+                  O.getOrElse(() => '')
+                )
+              }}
               selectedAmount={runeAmountToDeposit}
               maxAmount={maxRuneAmountToDeposit}
               onChangeAssetAmount={runeAmountChangeHandler}

@@ -102,12 +102,12 @@ import * as Styled from './Swap.styles'
 import { AssetsToSwap, SwapData } from './Swap.types'
 import * as Utils from './Swap.utils'
 
-export type ConfirmSwapParams = { asset: Asset; amount: BaseAmount; memo: string }
-
 export type SwapProps = {
   keystore: KeystoreState
   availableAssets: PoolAssetDetails
   assets: { inAsset: AssetWithDecimal; outAsset: AssetWithDecimal }
+  sourceWalletAddress: O.Option<Address>
+  sourceLedgerAddress: O.Option<Address>
   poolAddress: O.Option<PoolAddress>
   swap$: SwapStateHandler
   poolsData: PoolsDataMap
@@ -120,6 +120,7 @@ export type SwapProps = {
   reloadApproveFee: LoadApproveFeeHandler
   approveFee$: ApproveFeeHandler
   targetWalletAddress: O.Option<Address>
+  targetLedgerAddress: O.Option<Address>
   onChangePath: (path: string) => void
   network: Network
   slipTolerance: SlipTolerance
@@ -131,13 +132,14 @@ export type SwapProps = {
   mimirHalt: MimirHalt
   clickAddressLinkHandler: (address: Address) => void
   addressValidator: AddressValidationAsync
-  targetLedgerAddress: O.Option<Address>
 }
 
 export const Swap = ({
   keystore,
   availableAssets,
   assets: { inAsset: sourceAssetWD, outAsset: targetAssetWD },
+  sourceWalletAddress: oInitialSourceWalletAddress,
+  sourceLedgerAddress: oSourceLedgerAddress,
   poolAddress: oPoolAddress,
   swap$,
   poolsData,
@@ -148,6 +150,7 @@ export const Swap = ({
   reloadBalances = FP.constVoid,
   fees$,
   targetWalletAddress: oInitialTargetWalletAddress,
+  targetLedgerAddress: oTargetLedgerAddress,
   onChangePath,
   network,
   slipTolerance,
@@ -160,12 +163,13 @@ export const Swap = ({
   haltedChains,
   mimirHalt,
   clickAddressLinkHandler,
-  addressValidator,
-  targetLedgerAddress: oTargetLedgerAddress
+  addressValidator
 }: SwapProps) => {
   const intl = useIntl()
 
   const lockedWallet = useMemo(() => isLocked(keystore) || !hasImportedKeystore(keystore), [keystore])
+
+  const [oSourceWalletAddress, setSourceWalletAddress] = useState<O.Option<Address>>(oInitialSourceWalletAddress)
 
   const [oTargetWalletAddress, setTargetWalletAddress] = useState<O.Option<Address>>(oInitialTargetWalletAddress)
   const [editableTargetWalletAddress, setEditableTargetWalletAddress] =
@@ -1290,6 +1294,13 @@ export const Swap = ({
     )
   }, [oTargetWalletType])
 
+  const onClickUseSourceAssetLedger = useCallback(() => {
+    const useLedger = !useSourceAssetLedger
+    setUseSourceAssetLedger(() => !useSourceAssetLedger)
+    const oAddress = useLedger ? oSourceLedgerAddress : oInitialSourceWalletAddress
+    setSourceWalletAddress(oAddress)
+  }, [oInitialSourceWalletAddress, oSourceLedgerAddress, useSourceAssetLedger])
+
   const onClickUseTargetAssetLedger = useCallback(() => {
     const useLedger = !useTargetAssetLedger
     setUseTargetAssetLedger(useLedger)
@@ -1327,6 +1338,10 @@ export const Swap = ({
             {/* Note: Input value is shown as AssetAmount */}
             <Styled.AssetInput
               title={intl.formatMessage({ id: 'swap.input' })}
+              titleTooltip={FP.pipe(
+                oSourceWalletAddress,
+                O.getOrElse(() => '')
+              )}
               onChange={setAmountToSwapMax1e8}
               onBlur={reloadFeesHandler}
               amount={amountToSwapMax1e8}
@@ -1352,9 +1367,7 @@ export const Swap = ({
 
                     <Styled.CheckButton
                       checked={useSourceAssetLedger}
-                      clickHandler={() => {
-                        setUseSourceAssetLedger(() => !useSourceAssetLedger)
-                      }}
+                      clickHandler={onClickUseSourceAssetLedger}
                       disabled={!hasSourceAssetLedger}>
                       {intl.formatMessage({ id: 'ledger.title' })}
                     </Styled.CheckButton>

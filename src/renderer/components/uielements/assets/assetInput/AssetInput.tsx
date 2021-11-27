@@ -7,11 +7,12 @@ import * as FP from 'fp-ts/lib/function'
 import { FixmeType } from '../../../../types/asgardex'
 import { MaxBalanceButton } from '../../button/MaxBalanceButton'
 import { InputBigNumber } from '../../input'
-import { AssetInputWrapper } from './AssetInput.styles'
+import * as Styled from './AssetInput.styles'
 import { AssetInputProps } from './AssetInput.types'
 
 type Props = {
   title: string
+  titleTooltip?: string
   status?: string
   amount: BaseAmount
   maxAmount: BaseAmount
@@ -36,6 +37,7 @@ type Props = {
 export const AssetInput: React.FC<Props> = (props): JSX.Element => {
   const {
     title,
+    titleTooltip = '',
     amount,
     maxAmount,
     asset,
@@ -64,9 +66,14 @@ export const AssetInput: React.FC<Props> = (props): JSX.Element => {
   }, [])
 
   return (
-    <AssetInputWrapper className={`assetInput-wrapper ${className}`} onClick={handleClickWrapper} {...otherProps}>
+    <Styled.Wrapper className={`assetInput-wrapper ${className}`} onClick={handleClickWrapper} {...otherProps}>
       <div className="asset-input-header">
-        <p className="asset-input-title">{title}</p>
+        {titleTooltip && (
+          <Styled.TitleTooltip title={titleTooltip}>
+            <Styled.Title>{title}</Styled.Title>
+          </Styled.TitleTooltip>
+        )}
+        {!titleTooltip && <Styled.Title>{title}</Styled.Title>}
         {status && <p className="asset-input-header-label">{status}</p>}
         <MaxBalanceButton
           balance={{ amount: maxAmount, asset }}
@@ -86,6 +93,6 @@ export const AssetInput: React.FC<Props> = (props): JSX.Element => {
           decimal={amount.decimal}
         />
       </div>
-    </AssetInputWrapper>
+    </Styled.Wrapper>
   )
 }

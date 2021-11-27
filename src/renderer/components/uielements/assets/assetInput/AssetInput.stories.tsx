@@ -25,6 +25,7 @@ StoryDefault.storyName = 'default'
 export const StoryDecimal2: Story = () => (
   <AssetInput
     title="amount"
+    titleTooltip="Title Tooltip"
     amount={assetToBase(assetAmount(123, 2))}
     maxAmount={assetToBase(assetAmount(124, 2))}
     asset={AssetBNB}
