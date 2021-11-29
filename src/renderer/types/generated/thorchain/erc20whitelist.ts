@@ -113,4 +113,9 @@ export const ERC20Whitelist: Asset[] = [
     symbol: "FOX-0xc770eefad204b5180df6a14ee197d99d808ee52d",
     ticker: "FOX",
   },
+  {
+    chain: ETHChain,
+    symbol: "TGT-0x108a850856db3f85d0269a2693d896b394c80325",
+    ticker: "TGT",
+  },
 ];
