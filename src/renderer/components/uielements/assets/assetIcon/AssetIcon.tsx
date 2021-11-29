@@ -17,12 +17,13 @@ import {
   isLtcAsset,
   isRuneBnbAsset,
   isRuneNativeAsset,
+  isTgtERC20Asset,
   isXRuneAsset
 } from '../../../../helpers/assetHelper'
 import { isBnbChain, isEthChain } from '../../../../helpers/chainHelper'
 import { getIntFromName, rainbowStop } from '../../../../helpers/colorHelpers'
 import { useRemoteImage } from '../../../../hooks/useRemoteImage'
-import { bnbIcon, btcIcon, ethIcon, runeIcon, bnbRuneIcon, xRuneIcon } from '../../../icons'
+import { bnbIcon, btcIcon, ethIcon, runeIcon, bnbRuneIcon, xRuneIcon, tgtIcon } from '../../../icons'
 import * as Styled from './AssetIcon.styles'
 import { Size } from './AssetIcon.types'
 
@@ -79,6 +80,10 @@ export const AssetIcon: React.FC<Props> = ({
 
     if (isFoxERC20Asset(asset)) {
       return 'https://assets.coincap.io/assets/icons/256/fox.png'
+    }
+
+    if (isTgtERC20Asset(asset)) {
+      return tgtIcon
     }
 
     if (network !== 'testnet') {

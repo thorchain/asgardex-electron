@@ -27,6 +27,8 @@ import * as O from 'fp-ts/lib/Option'
 import { Network } from '../../shared/api/types'
 import {
   AssetFoxERC20,
+  AssetTGTERC20,
+  AssetTGTERC20Testnet,
   AssetXRune,
   AssetXRuneTestnet,
   BinanceBlackList,
@@ -161,6 +163,12 @@ export const isXRuneAsset = (asset: Asset): boolean =>
  * Check whether an asset is ETH.FOX asset
  */
 export const isFoxERC20Asset = (asset: Asset): boolean => eqAsset.equals(asset, AssetFoxERC20)
+
+/**
+ * Check whether an asset is TGT asset
+ */
+export const isTgtERC20Asset = (asset: Asset): boolean =>
+  eqAsset.equals(asset, AssetTGTERC20) || eqAsset.equals(asset, AssetTGTERC20Testnet)
 
 /**
  * Get ethereum token address (as check sum address) from a given asset
