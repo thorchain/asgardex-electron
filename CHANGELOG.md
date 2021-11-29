@@ -2,12 +2,13 @@
 
 ## Add
 
-- [Ledger] Add liquidity using Ledger [#1926](https://github.com/thorchain/asgardex-electron/pull/1926), [#1927](https://github.com/thorchain/asgardex-electron/issues/1927) [#1936](https://github.com/thorchain/asgardex-electron/issues/1936)
+- [Ledger] Add liquidity using Ledger [#1926](https://github.com/thorchain/asgardex-electron/pull/1926), [#1927](https://github.com/thorchain/asgardex-electron/issues/1927) [#1936](https://github.com/thorchain/asgardex-electron/issues/1936), [#1962](https://github.com/thorchain/asgardex-electron/pull/1962)
 - [ADD] Update shares for Ledger [#1942](https://github.com/thorchain/asgardex-electron/pull/1942)
 - Restore previous windows dimensions with next start of ASGDX [#1879](https://github.com/thorchain/asgardex-electron/issues/1879)
 - Show asset icon in TxDetail (wallet history + pool details)[#1955](https://github.com/thorchain/asgardex-electron/pull/1955)
 - [ADD] Check asset mismatch for Ledger + keystore [#1938](https://github.com/thorchain/asgardex-electron/issues/1938)
 - Show ledger | keystore addresses in tooltips [#1959](https://github.com/thorchain/asgardex-electron/pull/1959)
+- Whitelist TGT token [#1960](https://github.com/thorchain/asgardex-electron/issues/1960)
 
 ## Update
 
