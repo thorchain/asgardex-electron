@@ -1300,6 +1300,32 @@ export const SymDeposit: React.FC<Props> = (props) => {
     )
   }, [asset, network, symAssetMismatchRD])
 
+  const resetEnteredAmounts = useCallback(() => {
+    setRuneAmountToDeposit(baseAmount(0, THORCHAIN_DECIMAL))
+    setAssetAmountToDepositMax1e8(initialAssetAmountToDepositMax1e8)
+    setPercentValueToDeposit(0)
+  }, [initialAssetAmountToDepositMax1e8, setAssetAmountToDepositMax1e8])
+
+  const onChangeRuneWalletType = useCallback(
+    (walletType) => {
+      setRuneLedger(() => isLedgerWallet(walletType))
+      setRuneWalletType(walletType)
+      resetEnteredAmounts()
+    },
+
+    [resetEnteredAmounts, setRuneWalletType]
+  )
+
+  const onChangeAssetWalletType = useCallback(
+    (walletType) => {
+      setUseAssetLedger(() => isLedgerWallet(walletType))
+      setAssetWalletType(walletType)
+
+      resetEnteredAmounts()
+    },
+    [resetEnteredAmounts, setAssetWalletType]
+  )
+
   const prevRouterAddress = useRef<O.Option<Address>>(O.none)
 
   // Run `checkApprovedStatus` whenever `oPoolAddress` has been changed
@@ -1437,10 +1463,7 @@ export const SymDeposit: React.FC<Props> = (props) => {
             walletTypeTooltipColor={assetWalletTypeTooltip.color}
             // Disable ledger selection if RUNE Ledger has been selected
             walletTypeDisabled={!hasAssetLedger || useRuneLedger}
-            onChangeWalletType={(walletType) => {
-              setUseAssetLedger(() => isLedgerWallet(walletType))
-              setAssetWalletType(walletType)
-            }}
+            onChangeWalletType={onChangeAssetWalletType}
             assetBalance={assetBalance}
             disabled={disabledForm}
             asset={{
@@ -1481,10 +1504,7 @@ export const SymDeposit: React.FC<Props> = (props) => {
               walletTypeTooltipColor={runeWalletTypeTooltip.color}
               // Disable ledger checkbox if asset ledger is used
               walletTypeDisabled={!hasRuneLedger || useAssetLedger}
-              onChangeWalletType={(walletType) => {
-                setRuneLedger(() => isLedgerWallet(walletType))
-                setRuneWalletType(walletType)
-              }}
+              onChangeWalletType={onChangeRuneWalletType}
               assetBalance={runeBalance}
               disabled={disabledForm}
               asset={{
