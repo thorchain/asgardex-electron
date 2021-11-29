@@ -62,6 +62,18 @@ export const AssetFoxERC20: Asset = {
   ticker: 'FOX'
 }
 
+export const AssetTGTERC20: Asset = {
+  chain: ETHChain,
+  symbol: 'TGT-0x108a850856db3f85d0269a2693d896b394c80325',
+  ticker: 'TGT'
+}
+
+export const AssetTGTERC20Testnet: Asset = {
+  chain: ETHChain,
+  symbol: 'TGT-0x73d6e26896981798526b6ead48d0fab76e205974',
+  ticker: 'TGT'
+}
+
 // ETH.UST - testnet only
 export const AssetUSTERC20Testnet: Asset = {
   chain: ETHChain,
@@ -114,7 +126,8 @@ export const ERC20AssetsTestnet = [
   AssetTKN8ERC20Testnet,
   AssetTKN18ERC20Testnet,
   AssetWETHERC20Testnet,
-  AssetDAIERC20Testnet
+  AssetDAIERC20Testnet,
+  AssetTGTERC20Testnet
 ]
 export const ETHAssetsTestnet = [AssetETH, ...ERC20AssetsTestnet]
 

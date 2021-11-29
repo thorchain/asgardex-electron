@@ -1,4 +1,5 @@
 // All icons used as <MysvgIcon> components
+import tgtIcon from '../../assets/png/asset-tgt.png'
 import blackArrowIcon from '../../assets/svg/asset-arrow-blacksmall.svg'
 import arrowDashIcon from '../../assets/svg/asset-arrow-green-dash.svg'
 import arrowGreenIcon from '../../assets/svg/asset-arrow-green.svg'
@@ -28,6 +29,7 @@ export {
   runeIcon,
   bnbRuneIcon,
   xRuneIcon,
+  tgtIcon,
   CurrencyIcon,
   userAvatarIcon,
   arrowYellowIcon,
