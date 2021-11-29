@@ -20,6 +20,8 @@ import { useObservableState } from 'observable-hooks'
 import { useIntl } from 'react-intl'
 
 import { Network } from '../../../../shared/api/types'
+import { isLedgerWallet } from '../../../../shared/utils/guard'
+import { WalletAddress } from '../../../../shared/wallet/types'
 import { ZERO_BASE_AMOUNT } from '../../../const'
 import { getTwoSigfigAssetAmount, THORCHAIN_DECIMAL, to1e8BaseAmount } from '../../../helpers/assetHelper'
 import { eqAsset } from '../../../helpers/fp/eq'
@@ -51,12 +53,14 @@ import * as Styled from './Withdraw.styles'
 
 export type Props = {
   asset: AssetWithDecimal
+  assetWalletAddress: WalletAddress
   /** Rune price (base amount) */
   runePrice: BigNumber
   /** Asset price (base amount) */
   assetPrice: BigNumber
   /** Wallet balance of Rune */
   runeBalance: O.Option<BaseAmount>
+  runeWalletAddress: WalletAddress
   /** Selected price asset */
   selectedPriceAsset: Asset
   /** Callback to reload fees */
@@ -87,7 +91,9 @@ export type Props = {
  * */
 export const Withdraw: React.FC<Props> = ({
   asset: assetWD,
+  assetWalletAddress,
   runePrice,
+  runeWalletAddress,
   assetPrice,
   runeBalance: oRuneBalance,
   selectedPriceAsset,
@@ -107,6 +113,9 @@ export const Withdraw: React.FC<Props> = ({
   const intl = useIntl()
 
   const { asset, decimal: assetDecimal } = assetWD
+
+  const { type: runeWalletType, address: runeAddress } = runeWalletAddress
+  const { type: assetWalletType, address: assetAddress } = assetWalletAddress
 
   // Disable withdraw in case all or pool actions are disabled
   const disableWithdrawAction = useMemo(
@@ -438,45 +447,69 @@ export const Withdraw: React.FC<Props> = ({
         {intl.formatMessage({ id: 'deposit.withdraw.receiveText' })}
       </Label>
 
-      <Styled.AssetContainer>
-        <Styled.AssetIcon asset={AssetRuneNative} network={network} />
-        <Styled.AssetLabel asset={AssetRuneNative} />
-        <Styled.OutputLabel>
-          {formatAssetAmount({
-            amount: getTwoSigfigAssetAmount(baseToAsset(runeAmountToWithdraw)),
-            decimal: THORCHAIN_DECIMAL,
-            trimZeros: true
-          })}
-          {/* show pricing if price asset is different only */}
-          {!eqAsset.equals(AssetRuneNative, selectedPriceAsset) &&
-            ` (${formatAssetAmountCurrency({
-              amount: getTwoSigfigAssetAmount(
-                baseToAsset(baseAmount(runeAmountToWithdraw.amount().times(runePrice), THORCHAIN_DECIMAL))
-              ),
-              asset: selectedPriceAsset,
+      <Styled.AssetOutputContainer>
+        <Styled.Tooltip title={runeAddress}>
+          <Styled.AssetContainer>
+            <Styled.AssetIcon asset={AssetRuneNative} network={network} />
+            <Styled.AssetLabel asset={AssetRuneNative} />
+            {isLedgerWallet(runeWalletType) && (
+              <Styled.WalletTypeLabel>{intl.formatMessage({ id: 'ledger.title' })}</Styled.WalletTypeLabel>
+            )}
+          </Styled.AssetContainer>
+        </Styled.Tooltip>
+        <Styled.OutputContainer>
+          <Styled.OutputLabel>
+            {formatAssetAmount({
+              amount: getTwoSigfigAssetAmount(baseToAsset(runeAmountToWithdraw)),
+              decimal: THORCHAIN_DECIMAL,
               trimZeros: true
-            })})`}
-        </Styled.OutputLabel>
-      </Styled.AssetContainer>
+            })}
+          </Styled.OutputLabel>
+          {/* show pricing if price asset is different only */}
+          {!eqAsset.equals(AssetRuneNative, selectedPriceAsset) && (
+            <Styled.OutputUSDLabel>
+              {formatAssetAmountCurrency({
+                amount: getTwoSigfigAssetAmount(
+                  baseToAsset(baseAmount(runeAmountToWithdraw.amount().times(runePrice), THORCHAIN_DECIMAL))
+                ),
+                asset: selectedPriceAsset,
+                trimZeros: true
+              })}
+            </Styled.OutputUSDLabel>
+          )}
+        </Styled.OutputContainer>
+      </Styled.AssetOutputContainer>
 
-      <Styled.AssetContainer>
-        <Styled.AssetIcon asset={asset} network={network} />
-        <Styled.AssetLabel asset={asset} />
-        <Styled.OutputLabel>
-          {formatAssetAmount({
-            amount: getTwoSigfigAssetAmount(baseToAsset(assetAmountToWithdraw)),
-            decimal: assetDecimal,
-            trimZeros: true
-          })}
-          {/* show pricing if price asset is different only */}
-          {!eqAsset.equals(asset, selectedPriceAsset) &&
-            ` (${formatAssetAmountCurrency({
-              amount: getTwoSigfigAssetAmount(baseToAsset(assetPriceToWithdraw1e8)),
-              asset: selectedPriceAsset,
+      <Styled.AssetOutputContainer>
+        <Styled.Tooltip title={assetAddress}>
+          <Styled.AssetContainer>
+            <Styled.AssetIcon asset={asset} network={network} />
+            <Styled.AssetLabel asset={asset} />
+            {isLedgerWallet(assetWalletType) && (
+              <Styled.WalletTypeLabel>{intl.formatMessage({ id: 'ledger.title' })}</Styled.WalletTypeLabel>
+            )}
+          </Styled.AssetContainer>
+        </Styled.Tooltip>
+        <Styled.OutputContainer>
+          <Styled.OutputLabel>
+            {formatAssetAmount({
+              amount: getTwoSigfigAssetAmount(baseToAsset(assetAmountToWithdraw)),
+              decimal: assetDecimal,
               trimZeros: true
-            })})`}
-        </Styled.OutputLabel>
-      </Styled.AssetContainer>
+            })}
+            {/* show pricing if price asset is different only */}
+            {!eqAsset.equals(asset, selectedPriceAsset) && (
+              <Styled.OutputUSDLabel>
+                {formatAssetAmountCurrency({
+                  amount: getTwoSigfigAssetAmount(baseToAsset(assetPriceToWithdraw1e8)),
+                  asset: selectedPriceAsset,
+                  trimZeros: true
+                })}
+              </Styled.OutputUSDLabel>
+            )}
+          </Styled.OutputLabel>
+        </Styled.OutputContainer>
+      </Styled.AssetOutputContainer>
 
       <Styled.FeesRow gutter={{ lg: 32 }}>
         <Col>

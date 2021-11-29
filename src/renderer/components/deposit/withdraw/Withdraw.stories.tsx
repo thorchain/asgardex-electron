@@ -9,14 +9,17 @@ import {
   assetToBase,
   assetToString,
   baseAmount,
-  bn
+  bn,
+  BNBChain
 } from '@xchainjs/xchain-util'
 import * as O from 'fp-ts/lib/Option'
 import * as Rx from 'rxjs'
 import * as RxOp from 'rxjs/operators'
 
+import { BNB_ADDRESS_TESTNET } from '../../../../shared/mock/address'
 import { mockValidatePassword$ } from '../../../../shared/mock/wallet'
 import { BNB_DECIMAL, THORCHAIN_DECIMAL } from '../../../helpers/assetHelper'
+import { mockWalletAddress } from '../../../helpers/test/testWalletHelper'
 import { INITIAL_WITHDRAW_STATE } from '../../../services/chain/const'
 import { WithdrawState$ } from '../../../services/chain/types'
 import { DEFAULT_MIMIR_HALT } from '../../../services/thorchain/const'
@@ -26,6 +29,8 @@ const defaultProps: WitdrawProps = {
   haltedChains: [],
   mimirHalt: DEFAULT_MIMIR_HALT,
   asset: { asset: AssetBNB, decimal: BNB_DECIMAL },
+  assetWalletAddress: mockWalletAddress({ address: BNB_ADDRESS_TESTNET, chain: BNBChain }),
+  runeWalletAddress: mockWalletAddress(),
   runePrice: bn(1),
   assetPrice: bn(60.972),
   runeBalance: O.some(assetToBase(assetAmount(100))),

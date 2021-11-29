@@ -1,7 +1,7 @@
 import React, { useCallback, useMemo } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
-import { Asset, AssetRuneNative, BaseAmount, bn, Chain, THORChain } from '@xchainjs/xchain-util'
+import { Asset, AssetRuneNative, BaseAmount, bn, THORChain } from '@xchainjs/xchain-util'
 import BigNumber from 'bignumber.js'
 import * as FP from 'fp-ts/function'
 import * as O from 'fp-ts/lib/Option'
@@ -22,22 +22,21 @@ import { liveData } from '../../../helpers/rx/liveData'
 import { useOpenExplorerTxUrl } from '../../../hooks/useOpenExplorerTxUrl'
 import { OpenExplorerTxUrl } from '../../../services/clients'
 import { DEFAULT_NETWORK } from '../../../services/const'
-import { PoolDetailRD, PoolShareRD, PoolShare, PoolsDataMap } from '../../../services/midgard/types'
-import { MimirHalt } from '../../../services/thorchain/types'
+import { PoolShare, PoolsDataMap } from '../../../services/midgard/types'
 import { getBalanceByAsset } from '../../../services/wallet/util'
-import { AssetWithDecimal } from '../../../types/asgardex'
 import { PoolDetail } from '../../../types/generated/midgard'
-
-type Props = {
-  asset: AssetWithDecimal
-  poolShare: PoolShareRD
-  poolDetail: PoolDetailRD
-  haltedChains: Chain[]
-  mimirHalt: MimirHalt
-}
+import { Props } from './WithdrawDepositView.types'
 
 export const WithdrawDepositView: React.FC<Props> = (props): JSX.Element => {
-  const { asset: assetWD, poolShare: poolShareRD, poolDetail: poolDetailRD, haltedChains, mimirHalt } = props
+  const {
+    asset: assetWD,
+    poolShare: poolShareRD,
+    poolDetail: poolDetailRD,
+    haltedChains,
+    mimirHalt,
+    assetWalletAddress,
+    runeWalletAddress
+  } = props
   const { decimal: assetDecimal } = assetWD
   const {
     service: {
@@ -47,7 +46,6 @@ export const WithdrawDepositView: React.FC<Props> = (props): JSX.Element => {
   } = useMidgardContext()
 
   const { symWithdrawFee$, reloadWithdrawFees, symWithdraw$ } = useChainContext()
-
   const runePrice = useObservableState(priceRatio$, bn(1))
 
   const [selectedPriceAssetRD]: [RD.RemoteData<Error, Asset>, unknown] = useObservableState(
@@ -118,7 +116,9 @@ export const WithdrawDepositView: React.FC<Props> = (props): JSX.Element => {
         mimirHalt={mimirHalt}
         fees$={symWithdrawFee$}
         assetPrice={ZERO_BN}
+        assetWalletAddress={assetWalletAddress}
         runePrice={runePrice}
+        runeWalletAddress={runeWalletAddress}
         runeBalance={runeBalance}
         selectedPriceAsset={AssetRuneNative}
         shares={{ rune: ZERO_BASE_AMOUNT, asset: ZERO_BASE_AMOUNT }}
@@ -137,7 +137,9 @@ export const WithdrawDepositView: React.FC<Props> = (props): JSX.Element => {
       haltedChains,
       mimirHalt,
       symWithdrawFee$,
+      assetWalletAddress,
       runePrice,
+      runeWalletAddress,
       runeBalance,
       assetWD,
       reloadWithdrawFees,
@@ -167,7 +169,9 @@ export const WithdrawDepositView: React.FC<Props> = (props): JSX.Element => {
         haltedChains={haltedChains}
         mimirHalt={mimirHalt}
         assetPrice={assetPrice}
+        assetWalletAddress={assetWalletAddress}
         runePrice={runePrice}
+        runeWalletAddress={runeWalletAddress}
         runeBalance={runeBalance}
         selectedPriceAsset={selectedPriceAsset}
         shares={{
@@ -188,7 +192,9 @@ export const WithdrawDepositView: React.FC<Props> = (props): JSX.Element => {
     [
       haltedChains,
       mimirHalt,
+      assetWalletAddress,
       runePrice,
+      runeWalletAddress,
       runeBalance,
       assetDecimal,
       assetWD,

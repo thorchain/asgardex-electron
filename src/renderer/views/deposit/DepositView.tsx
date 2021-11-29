@@ -89,7 +89,7 @@ export const DepositView: React.FC<Props> = () => {
   const oSelectedAssetWithDecimal = useMemo(() => RD.toOption(assetWithDecimalRD), [assetWithDecimalRD])
 
   const {
-    addresses: { rune: oRuneAddress, asset: oAssetAddress }
+    addresses: { rune: oRuneWalletAddress, asset: oAssetWalletAddress }
   } = useSymDepositAddresses(oRouteAsset)
   /**
    * We have to get a new shares$ stream for every new address
@@ -98,13 +98,13 @@ export const DepositView: React.FC<Props> = () => {
   const poolShares$: PoolSharesLD = useMemo(
     () =>
       FP.pipe(
-        oAssetAddress,
+        oAssetWalletAddress,
         O.fold(
           () => Rx.EMPTY,
           ({ address }) => shares$(address)
         )
       ),
-    [oAssetAddress, shares$]
+    [oAssetWalletAddress, shares$]
   )
 
   const poolSharesRD = useObservableState<PoolSharesRD>(poolShares$, RD.initial)
@@ -181,10 +181,10 @@ export const DepositView: React.FC<Props> = () => {
     <>
       {renderTopContent}
       {FP.pipe(
-        sequenceTOption(oRuneAddress, oAssetAddress),
+        sequenceTOption(oRuneWalletAddress, oAssetWalletAddress),
         O.fold(
           () => <ErrorView title={intl.formatMessage({ id: 'common.error' })} subTitle={'Could not get addresses'} />,
-          ([{ address: runeWalletAddress }, { address: assetWalletAddress }]) =>
+          ([runeWalletAddress, assetWalletAddress]) =>
             FP.pipe(
               assetWithDecimalRD,
               RD.fold(
