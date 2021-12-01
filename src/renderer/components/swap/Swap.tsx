@@ -14,8 +14,7 @@ import {
   delay,
   Chain,
   assetToBase,
-  assetAmount,
-  AssetRuneNative
+  assetAmount
 } from '@xchainjs/xchain-util'
 import { Row } from 'antd'
 import BigNumber from 'bignumber.js'
@@ -1437,14 +1436,6 @@ export const Swap = ({
         />
       )}
       {renderIsApprovedError}
-      <div>
-        memo:{' '}
-        {getSwapMemo({
-          asset: AssetRuneNative,
-          address: 'address',
-          limit: Utils.getSwapLimit1e8(swapResultAmountMax1e8, slipTolerance)
-        })}
-      </div>
       <Styled.SubmitContainer>
         {!isLocked(keystore) ? (
           isApproved ? (
