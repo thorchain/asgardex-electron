@@ -24,7 +24,7 @@ const defaultProps: DepositProps = {
       units: bn('300000000'),
       asset: AssetBNB,
       type: 'sym',
-      assetAddress: BNB_ADDRESS_TESTNET,
+      assetAddress: O.some(BNB_ADDRESS_TESTNET),
       runeAddress: O.some(RUNE_ADDRESS_TESTNET),
       assetAddedAmount: assetToBase(assetAmount(1.5, THORCHAIN_DECIMAL))
     },
@@ -32,7 +32,7 @@ const defaultProps: DepositProps = {
       units: bn('100000000'),
       asset: AssetBNB,
       type: 'asym',
-      assetAddress: BNB_ADDRESS_TESTNET,
+      assetAddress: O.some(BNB_ADDRESS_TESTNET),
       runeAddress: O.none,
       assetAddedAmount: assetToBase(assetAmount(1, THORCHAIN_DECIMAL))
     },
@@ -40,7 +40,7 @@ const defaultProps: DepositProps = {
       units: bn('200000000'),
       asset: AssetRuneNative,
       type: 'asym',
-      assetAddress: '',
+      assetAddress: O.none,
       runeAddress: O.some(RUNE_ADDRESS_TESTNET),
       assetAddedAmount: assetToBase(assetAmount(2, THORCHAIN_DECIMAL))
     }

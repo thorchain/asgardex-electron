@@ -222,7 +222,7 @@ export type PoolShareType = DepositType | 'all'
 export type PoolShare = {
   units: BigNumber
   asset: Asset
-  assetAddress: Address
+  assetAddress: O.Option<Address>
   runeAddress: O.Option<Address>
   assetAddedAmount: BaseAmount
   type: PoolShareType

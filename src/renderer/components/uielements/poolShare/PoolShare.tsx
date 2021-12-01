@@ -35,7 +35,7 @@ type Props = {
   assetPrice: BaseAmount
   poolShare: BigNumber
   depositUnits: BigNumber
-  addresses: { rune: O.Option<Address>; asset: Address }
+  addresses: { rune: O.Option<Address>; asset: O.Option<Address> }
   smallWidth?: boolean
   loading?: boolean
 }
@@ -43,7 +43,7 @@ type Props = {
 export const PoolShare: React.FC<Props> = (props): JSX.Element => {
   const {
     asset: assetWD,
-    addresses: { rune: oRuneAddress, asset: assetAddress },
+    addresses: { rune: oRuneAddress, asset: oAssetAddress },
     runePrice,
     loading,
     priceAsset,
@@ -60,6 +60,11 @@ export const PoolShare: React.FC<Props> = (props): JSX.Element => {
 
   const runeAddress = FP.pipe(
     oRuneAddress,
+    O.getOrElse(() => '')
+  )
+
+  const assetAddress = FP.pipe(
+    oAssetAddress,
     O.getOrElse(() => '')
   )
 

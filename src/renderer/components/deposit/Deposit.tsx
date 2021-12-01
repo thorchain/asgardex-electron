@@ -8,7 +8,7 @@ import * as O from 'fp-ts/Option'
 import { useIntl } from 'react-intl'
 
 import { WalletAddress } from '../../../shared/wallet/types'
-import { eqAddress, eqOAddress } from '../../helpers/fp/eq'
+import { eqOAddress } from '../../helpers/fp/eq'
 import { PoolDetailRD, PoolShareRD, PoolSharesRD } from '../../services/midgard/types'
 import { getSharesByAssetAndType } from '../../services/midgard/utils'
 import { MimirHalt } from '../../services/thorchain/types'
@@ -97,7 +97,7 @@ export const Deposit: React.FC<Props> = (props) => {
               ({ runeAddress, assetAddress }) =>
                 // use shares of current selected addresses only
                 eqOAddress.equals(runeAddress, O.some(runeWalletAddress.address)) &&
-                eqAddress.equals(assetAddress, assetWalletAddress.address)
+                eqOAddress.equals(assetAddress, O.some(assetWalletAddress.address))
             )
           )
         )

@@ -15,6 +15,7 @@ import {
 import * as O from 'fp-ts/lib/Option'
 
 import { LedgerErrorId } from '../../../shared/api/types'
+import { BNB_ADDRESS_TESTNET, RUNE_ADDRESS_TESTNET } from '../../../shared/mock/address'
 import { ASSETS_TESTNET } from '../../../shared/mock/assets'
 import { WalletAddress } from '../../../shared/wallet/types'
 import { SymDepositAddresses } from '../../services/chain/types'
@@ -312,6 +313,8 @@ describe('helpers/fp/eq', () => {
         type: 'asym',
         units: bn(1),
         asset: AssetRuneNative,
+        runeAddress: O.some(RUNE_ADDRESS_TESTNET),
+        assetAddress: O.none,
         assetAddedAmount: baseAmount(1)
       }
       expect(eqPoolShare.equals(a, a)).toBeTruthy()
@@ -321,6 +324,8 @@ describe('helpers/fp/eq', () => {
         type: 'asym',
         units: bn(1),
         asset: AssetRuneNative,
+        runeAddress: O.some(RUNE_ADDRESS_TESTNET),
+        assetAddress: O.none,
         assetAddedAmount: baseAmount(1)
       }
       // b = same as a, but another units
@@ -343,18 +348,24 @@ describe('helpers/fp/eq', () => {
       type: 'asym',
       units: bn(1),
       asset: AssetRuneNative,
+      runeAddress: O.some(RUNE_ADDRESS_TESTNET),
+      assetAddress: O.none,
       assetAddedAmount: baseAmount(1)
     }
     const b: PoolShare = {
       type: 'sym',
       units: bn(1),
       asset: AssetBNB,
+      assetAddress: O.some(BNB_ADDRESS_TESTNET),
+      runeAddress: O.some(RUNE_ADDRESS_TESTNET),
       assetAddedAmount: baseAmount(0.5)
     }
     const c: PoolShare = {
       type: 'all',
       units: bn(1),
       asset: AssetBTC,
+      assetAddress: O.some('btc-address'),
+      runeAddress: O.some(RUNE_ADDRESS_TESTNET),
       assetAddedAmount: baseAmount(1)
     }
     it('is equal', () => {

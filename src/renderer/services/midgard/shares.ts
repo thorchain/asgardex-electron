@@ -88,7 +88,7 @@ const createSharesService = (
               O.fromNullable,
               O.map((asset) => ({
                 type: !!runeAddress && !!assetAddress ? 'sym' : 'asym',
-                assetAddress,
+                assetAddress: optionFromNullableString(assetAddress),
                 runeAddress: optionFromNullableString(runeAddress),
                 asset,
                 units: bnOrZero(liquidityUnits),

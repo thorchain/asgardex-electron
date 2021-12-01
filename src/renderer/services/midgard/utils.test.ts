@@ -291,7 +291,7 @@ describe('services/midgard/utils/', () => {
       asset: AssetETH,
       assetAddedAmount: ONE_RUNE_BASE_AMOUNT,
       units: bn('100000000'),
-      assetAddress: 'eth-address',
+      assetAddress: O.some('eth-address'),
       runeAddress: O.some(RUNE_ADDRESS_TESTNET),
       type: 'sym'
     }
@@ -299,7 +299,7 @@ describe('services/midgard/utils/', () => {
       asset: AssetBNB,
       assetAddedAmount: TWO_RUNE_BASE_AMOUNT,
       units: bn('200000000'),
-      assetAddress: BNB_ADDRESS_TESTNET,
+      assetAddress: O.some(BNB_ADDRESS_TESTNET),
       runeAddress: O.some(RUNE_ADDRESS_TESTNET),
       type: 'sym'
     }
@@ -307,7 +307,7 @@ describe('services/midgard/utils/', () => {
       asset: AssetBNB,
       assetAddedAmount: THREE_RUNE_BASE_AMOUNT,
       units: bn('300000000'),
-      assetAddress: BNB_ADDRESS_TESTNET,
+      assetAddress: O.some(BNB_ADDRESS_TESTNET),
       runeAddress: O.none,
       type: 'asym'
     }
@@ -315,7 +315,7 @@ describe('services/midgard/utils/', () => {
       asset: AssetBTC,
       assetAddedAmount: FOUR_RUNE_BASE_AMOUNT,
       units: bn('400000000'),
-      assetAddress: 'btc-address',
+      assetAddress: O.some('btc-address'),
       runeAddress: O.none,
       type: 'asym'
     }
@@ -341,7 +341,7 @@ describe('services/midgard/utils/', () => {
                 asset: AssetBNB,
                 assetAddedAmount: assetToBase(assetAmount(5)),
                 units: bn('500000000'),
-                assetAddress: BNB_ADDRESS_TESTNET,
+                assetAddress: O.some(BNB_ADDRESS_TESTNET),
                 runeAddress: O.some(RUNE_ADDRESS_TESTNET),
                 type: 'all'
               })
@@ -355,7 +355,7 @@ describe('services/midgard/utils/', () => {
         expect(FP.pipe(result, O.toNullable)).toEqual({
           asset: AssetETH,
           units: bn('100000000'),
-          assetAddress: 'eth-address',
+          assetAddress: O.some('eth-address'),
           runeAddress: O.some(RUNE_ADDRESS_TESTNET),
           assetAddedAmount: ONE_RUNE_BASE_AMOUNT,
           type: 'all'
@@ -373,7 +373,7 @@ describe('services/midgard/utils/', () => {
             asset: AssetETH,
             assetAddedAmount: ONE_RUNE_BASE_AMOUNT,
             units: bn('100000000'),
-            assetAddress: 'eth-address',
+            assetAddress: O.some('eth-address'),
             runeAddress: O.some(RUNE_ADDRESS_TESTNET),
             type: 'all'
           },
@@ -381,14 +381,14 @@ describe('services/midgard/utils/', () => {
             asset: AssetBNB,
             assetAddedAmount: assetToBase(assetAmount(5)),
             units: bn('500000000'),
-            assetAddress: BNB_ADDRESS_TESTNET,
+            assetAddress: O.some(BNB_ADDRESS_TESTNET),
             runeAddress: O.some(RUNE_ADDRESS_TESTNET),
             type: 'all'
           },
           {
             asset: AssetBTC,
             assetAddedAmount: FOUR_RUNE_BASE_AMOUNT,
-            assetAddress: 'btc-address',
+            assetAddress: O.some('btc-address'),
             runeAddress: O.none,
             units: bn('400000000'),
             type: 'all'

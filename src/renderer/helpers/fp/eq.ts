@@ -114,7 +114,7 @@ export const eqPoolShare = Eq.struct<PoolShare>({
   assetAddedAmount: eqBaseAmount,
   units: eqBigNumber,
   type: eqString,
-  assetAddress: eqAddress,
+  assetAddress: eqOAddress,
   runeAddress: eqOAddress
 })
 
