@@ -8,8 +8,9 @@ import * as O from 'fp-ts/Option'
 import { useIntl } from 'react-intl'
 
 import { WalletAddress } from '../../../shared/wallet/types'
+import { eqAddress, eqOAddress } from '../../helpers/fp/eq'
 import { PoolDetailRD, PoolShareRD, PoolSharesRD } from '../../services/midgard/types'
-import { getSharesByAssetAndType, combineSharesByAsset } from '../../services/midgard/utils'
+import { getSharesByAssetAndType } from '../../services/midgard/utils'
 import { MimirHalt } from '../../services/thorchain/types'
 import { KeystoreState } from '../../services/wallet/types'
 import { hasImportedKeystore, isLocked } from '../../services/wallet/util'
@@ -84,13 +85,24 @@ export const Deposit: React.FC<Props> = (props) => {
   const walletIsImported = useMemo(() => hasImportedKeystore(keystoreState), [keystoreState])
   const walletIsLocked = useMemo(() => isLocked(keystoreState), [keystoreState])
 
-  const symPoolShare = useMemo(
+  const symPoolShare: PoolShareRD = useMemo(
     () =>
       FP.pipe(
         poolSharesRD,
-        RD.map((shares) => getSharesByAssetAndType({ shares, asset, type: 'sym' }))
+        RD.map((shares) => getSharesByAssetAndType({ shares, asset, type: 'sym' })),
+        RD.map((oPoolShare) =>
+          FP.pipe(
+            oPoolShare,
+            O.filter(
+              ({ runeAddress, assetAddress }) =>
+                // use shares of current selected addresses only
+                eqOAddress.equals(runeAddress, O.some(runeWalletAddress.address)) &&
+                eqAddress.equals(assetAddress, assetWalletAddress.address)
+            )
+          )
+        )
       ),
-    [asset, poolSharesRD]
+    [asset, assetWalletAddress, poolSharesRD, runeWalletAddress]
   )
 
   // TODO (@Veado) Temporary disabled #827
@@ -99,15 +111,6 @@ export const Deposit: React.FC<Props> = (props) => {
       FP.pipe(
         poolSharesRD,
         RD.map((shares) => getSharesByAssetAndType({ shares, asset, type: 'asym' }))
-      ),
-    [asset, poolSharesRD]
-  )
-
-  const combinedPoolShare = useMemo(
-    () =>
-      FP.pipe(
-        poolSharesRD,
-        RD.map((shares) => combineSharesByAsset(shares, asset))
       ),
     [asset, poolSharesRD]
   )
@@ -150,7 +153,7 @@ export const Deposit: React.FC<Props> = (props) => {
             asset={assetWD}
             runeWalletAddress={runeWalletAddress}
             assetWalletAddress={assetWalletAddress}
-            poolShare={combinedPoolShare}
+            poolShare={symPoolShare}
             haltedChains={haltedChains}
             mimirHalt={mimirHalt}
           />
@@ -174,22 +177,8 @@ export const Deposit: React.FC<Props> = (props) => {
       mimirHalt,
       hasSymPoolShare,
       WidthdrawContent,
-      combinedPoolShare
+      symPoolShare
     ]
-  )
-
-  const alignTopShareContent: boolean = useMemo(
-    () =>
-      FP.pipe(
-        symPoolShare,
-        RD.toOption,
-        O.flatten,
-        O.fold(
-          () => false,
-          () => true
-        )
-      ),
-    [symPoolShare]
   )
 
   return (
@@ -201,11 +190,11 @@ export const Deposit: React.FC<Props> = (props) => {
               <Styled.Tabs destroyInactiveTabPane tabs={tabs} centered={false} defaultActiveKey="deposit-sym" />
             </Styled.DepositContentCol>
             <Styled.ShareContentCol xs={24} xl={9}>
-              <Styled.ShareContentWrapper alignTop={alignTopShareContent}>
+              <Styled.ShareContentWrapper alignTop={hasSymPoolShare}>
                 <ShareContent
                   poolDetail={poolDetailRD}
                   asset={assetWD}
-                  poolShare={combinedPoolShare}
+                  poolShare={symPoolShare}
                   smallWidth={!isDesktopView}
                 />
               </Styled.ShareContentWrapper>

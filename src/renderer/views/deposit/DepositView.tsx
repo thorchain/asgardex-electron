@@ -98,13 +98,14 @@ export const DepositView: React.FC<Props> = () => {
   const poolShares$: PoolSharesLD = useMemo(
     () =>
       FP.pipe(
-        oAssetWalletAddress,
+        // re-load shares whenever selected asset or rune address has been changed
+        sequenceTOption(oAssetWalletAddress, oRuneWalletAddress),
         O.fold(
           () => Rx.EMPTY,
-          ({ address }) => shares$(address)
+          ([{ address }, _]) => shares$(address)
         )
       ),
-    [oAssetWalletAddress, shares$]
+    [oAssetWalletAddress, oRuneWalletAddress, shares$]
   )
 
   const poolSharesRD = useObservableState<PoolSharesRD>(poolShares$, RD.initial)

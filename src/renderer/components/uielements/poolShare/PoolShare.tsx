@@ -1,5 +1,6 @@
 import React, { RefObject, useCallback, useMemo, useRef } from 'react'
 
+import { Address } from '@xchainjs/xchain-client'
 import {
   formatBN,
   BaseAmount,
@@ -12,10 +13,13 @@ import {
 } from '@xchainjs/xchain-util'
 import { Col } from 'antd'
 import BigNumber from 'bignumber.js'
+import * as FP from 'fp-ts/lib/function'
+import * as O from 'fp-ts/lib/Option'
 import { useIntl } from 'react-intl'
 
 import { THORCHAIN_DECIMAL } from '../../../helpers/assetHelper'
 import { AssetWithDecimal } from '../../../types/asgardex'
+import { TooltipAddress } from '../common/Common.styles'
 import * as Styled from './PoolShare.styles'
 import { PoolShareCard } from './PoolShareCard'
 
@@ -31,6 +35,7 @@ type Props = {
   assetPrice: BaseAmount
   poolShare: BigNumber
   depositUnits: BigNumber
+  addresses: { rune: O.Option<Address>; asset: Address }
   smallWidth?: boolean
   loading?: boolean
 }
@@ -38,6 +43,7 @@ type Props = {
 export const PoolShare: React.FC<Props> = (props): JSX.Element => {
   const {
     asset: assetWD,
+    addresses: { rune: oRuneAddress, asset: assetAddress },
     runePrice,
     loading,
     priceAsset,
@@ -51,6 +57,11 @@ export const PoolShare: React.FC<Props> = (props): JSX.Element => {
   const intl = useIntl()
 
   const { asset } = assetWD
+
+  const runeAddress = FP.pipe(
+    oRuneAddress,
+    O.getOrElse(() => '')
+  )
 
   const totalDepositPrice = useMemo(
     () => baseAmount(runePrice.amount().plus(assetPrice.amount())),
@@ -78,45 +89,53 @@ export const PoolShare: React.FC<Props> = (props): JSX.Element => {
       <>
         <Styled.RedemptionHeader>
           <Styled.CardRow>
-            <Col span={12}>
-              <Styled.RedemptionAsset asset={AssetRuneNative} />
-            </Col>
-            <Col span={12}>
-              <Styled.RedemptionAsset asset={asset} />
-            </Col>
+            <TooltipAddress title={assetAddress}>
+              <Col span={12}>
+                <Styled.RedemptionAsset asset={asset} />
+              </Col>
+            </TooltipAddress>
+            <TooltipAddress title={runeAddress}>
+              <Col span={12}>
+                <Styled.RedemptionAsset asset={AssetRuneNative} />
+              </Col>
+            </TooltipAddress>
           </Styled.CardRow>
         </Styled.RedemptionHeader>
         <Styled.CardRow>
-          {renderRedemptionCol(runeShare, runePrice, AssetRuneNative)}
           {renderRedemptionCol(assetShare, assetPrice, asset)}
+          {renderRedemptionCol(runeShare, runePrice, AssetRuneNative)}
         </Styled.CardRow>
       </>
     ),
-    [asset, renderRedemptionCol, runeShare, runePrice, assetShare, assetPrice]
+    [runeAddress, assetAddress, asset, renderRedemptionCol, runeShare, runePrice, assetShare, assetPrice]
   )
 
   const renderRedemptionSmall = useMemo(
     () => (
       <>
         <Styled.RedemptionHeader>
-          <Styled.CardRow>
-            <Col span={24}>
-              <Styled.RedemptionAsset asset={AssetRuneNative} />
-            </Col>
-          </Styled.CardRow>
+          <TooltipAddress title={assetAddress}>
+            <Styled.CardRow>
+              <Col span={24}>
+                <Styled.RedemptionAsset asset={asset} />
+              </Col>
+            </Styled.CardRow>
+          </TooltipAddress>
         </Styled.RedemptionHeader>
         <Styled.CardRow>{renderRedemptionCol(runeShare, runePrice, AssetRuneNative)}</Styled.CardRow>
         <Styled.RedemptionHeader>
-          <Styled.CardRow>
-            <Col span={24}>
-              <Styled.RedemptionAsset asset={asset} />
-            </Col>
-          </Styled.CardRow>
+          <TooltipAddress title={runeAddress}>
+            <Styled.CardRow>
+              <Col span={24}>
+                <Styled.RedemptionAsset asset={AssetRuneNative} />
+              </Col>
+            </Styled.CardRow>
+          </TooltipAddress>
         </Styled.RedemptionHeader>
         <Styled.CardRow>{renderRedemptionCol(assetShare, assetPrice, asset)}</Styled.CardRow>
       </>
     ),
-    [renderRedemptionCol, runeShare, runePrice, asset, assetShare, assetPrice]
+    [runeAddress, renderRedemptionCol, runeShare, runePrice, assetAddress, asset, assetShare, assetPrice]
   )
   const renderRedemption = useMemo(
     () => (smallWidth ? renderRedemptionSmall : renderRedemptionLarge),

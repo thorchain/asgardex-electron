@@ -4,6 +4,7 @@ import * as RD from '@devexperts/remote-data-ts'
 import { getValueOfAsset1InAsset2, getValueOfRuneInAsset } from '@thorchain/asgardex-util'
 import { Asset, BaseAmount } from '@xchainjs/xchain-util'
 import { Spin } from 'antd'
+import BigNumber from 'bignumber.js'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
 import { useObservableState } from 'observable-hooks'
@@ -45,14 +46,14 @@ export const ShareView: React.FC<Props> = ({
   const { poolData: pricePoolData } = useObservableState(selectedPricePool$, RUNE_PRICE_POOL)
 
   const renderPoolShareReady = useCallback(
-    ({ units }: PoolShare, poolDetail: PoolDetail) => {
+    ({ units, runeAddress, assetAddress }: PoolShare, poolDetail: PoolDetail) => {
       const runeShare: BaseAmount = ShareHelpers.getRuneShare(units, poolDetail)
       const assetShare: BaseAmount = ShareHelpers.getAssetShare({
         liquidityUnits: units,
         detail: poolDetail,
         assetDecimal: assetWD.decimal
       })
-      const poolShare = ShareHelpers.getPoolShare(units, poolDetail)
+      const poolShare: BigNumber = ShareHelpers.getPoolShare(units, poolDetail)
 
       const poolData = toPoolData(poolDetail)
 
@@ -76,6 +77,7 @@ export const ShareView: React.FC<Props> = ({
           assetPrice={assetPrice}
           runePrice={runePrice}
           smallWidth={smallWidth}
+          addresses={{ rune: runeAddress, asset: assetAddress }}
         />
       )
     },
