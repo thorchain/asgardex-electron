@@ -2,10 +2,12 @@ import React from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
 import { Story, Meta } from '@storybook/react'
-import { assetAmount, AssetBNB, AssetRuneNative, assetToBase, bn } from '@xchainjs/xchain-util'
+import { assetAmount, AssetBNB, AssetRuneNative, assetToBase, bn, BNBChain } from '@xchainjs/xchain-util'
 import * as O from 'fp-ts/lib/Option'
 
+import { BNB_ADDRESS_TESTNET } from '../../../shared/mock/address'
 import { BNB_DECIMAL, THORCHAIN_DECIMAL } from '../../helpers/assetHelper'
+import { mockWalletAddress } from '../../helpers/test/testWalletHelper'
 import { DEFAULT_MIMIR_HALT } from '../../services/thorchain/const'
 import { DefaultPoolShare } from '../uielements/poolShare/PoolShare.stories'
 import { Default as SymDeposit } from './add/SymDeposit.stories'
@@ -41,8 +43,8 @@ const defaultProps: DepositProps = {
   SymDepositContent: SymDeposit,
   WidthdrawContent: Withdraw,
   keystoreState: O.some(O.some({ phrase: 'phrase' })),
-  runeWalletAddress: 'rune-wallet-address',
-  assetWalletAddress: 'asset-wallet-address'
+  runeWalletAddress: mockWalletAddress(),
+  assetWalletAddress: mockWalletAddress({ address: BNB_ADDRESS_TESTNET, chain: BNBChain })
 }
 
 export const Default: Story = () => <Deposit {...defaultProps} />

@@ -1,8 +1,7 @@
 import React, { useCallback, useEffect, useMemo } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
-import { Address } from '@xchainjs/xchain-client'
-import { Asset, AssetRuneNative, assetToString, bn, Chain, THORChain } from '@xchainjs/xchain-util'
+import { Asset, AssetRuneNative, assetToString, bn, THORChain } from '@xchainjs/xchain-util'
 import BigNumber from 'bignumber.js'
 import * as FP from 'fp-ts/function'
 import * as O from 'fp-ts/lib/Option'
@@ -28,20 +27,10 @@ import { useOpenExplorerTxUrl } from '../../../hooks/useOpenExplorerTxUrl'
 import { useSymDepositAddresses } from '../../../hooks/useSymDepositAddresses'
 import * as poolsRoutes from '../../../routes/pools'
 import { OpenExplorerTxUrl } from '../../../services/clients'
-import { PoolAddress, PoolAssetsRD, PoolDetailRD } from '../../../services/midgard/types'
+import { PoolAddress, PoolAssetsRD } from '../../../services/midgard/types'
 import { toPoolData } from '../../../services/midgard/utils'
-import { MimirHalt } from '../../../services/thorchain/types'
 import { INITIAL_BALANCES_STATE } from '../../../services/wallet/const'
-import { AssetWithDecimal } from '../../../types/asgardex'
-
-type Props = {
-  asset: AssetWithDecimal
-  poolDetail: PoolDetailRD
-  haltedChains: Chain[]
-  mimirHalt: MimirHalt
-  runeWalletAddress: Address
-  assetWalletAddress: Address
-}
+import { Props } from './SymDepositView.types'
 
 export const SymDepositView: React.FC<Props> = (props) => {
   const {

@@ -1,19 +1,21 @@
 import React, { useMemo } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
-import { Address } from '@xchainjs/xchain-client'
 import { Chain } from '@xchainjs/xchain-util'
 import { Grid } from 'antd'
 import * as FP from 'fp-ts/function'
 import * as O from 'fp-ts/Option'
 import { useIntl } from 'react-intl'
 
+import { WalletAddress } from '../../../shared/wallet/types'
 import { PoolDetailRD, PoolShareRD, PoolSharesRD } from '../../services/midgard/types'
 import { getSharesByAssetAndType, combineSharesByAsset } from '../../services/midgard/utils'
 import { MimirHalt } from '../../services/thorchain/types'
 import { KeystoreState } from '../../services/wallet/types'
 import { hasImportedKeystore, isLocked } from '../../services/wallet/util'
 import { AssetWithDecimal } from '../../types/asgardex'
+import { Props as SymDepositContentProps } from '../../views/deposit/add/SymDepositView.types'
+import { Props as WidthdrawContentProps } from '../../views/deposit/withdraw/WithdrawDepositView.types'
 import { AddWallet } from '../wallet/add'
 import * as Styled from './Deposit.styles'
 
@@ -40,21 +42,8 @@ export type Props = {
   }>
   // TODO (@Veado) Temporary disabled #827
   // AsymDepositContent: React.ComponentType<{ asset: Asset; poolDetail: PoolDetailRD; haltedChains: Chain[] }>
-  SymDepositContent: React.ComponentType<{
-    asset: AssetWithDecimal
-    poolDetail: PoolDetailRD
-    runeWalletAddress: Address
-    assetWalletAddress: Address
-    haltedChains: Chain[]
-    mimirHalt: MimirHalt
-  }>
-  WidthdrawContent: React.ComponentType<{
-    asset: AssetWithDecimal
-    poolShare: PoolShareRD
-    poolDetail: PoolDetailRD
-    haltedChains: Chain[]
-    mimirHalt: MimirHalt
-  }>
+  SymDepositContent: React.ComponentType<SymDepositContentProps>
+  WidthdrawContent: React.ComponentType<WidthdrawContentProps>
   // TODO (@Veado) Temporary disabled #827
   // AsymWidthdrawContent: React.ComponentType<{
   //   asset: Asset
@@ -64,8 +53,8 @@ export type Props = {
   //   mimirHalt: MimirHalt
   // }>
   keystoreState: KeystoreState
-  runeWalletAddress: Address
-  assetWalletAddress: Address
+  runeWalletAddress: WalletAddress
+  assetWalletAddress: WalletAddress
 }
 
 export const Deposit: React.FC<Props> = (props) => {
@@ -144,8 +133,8 @@ export const Deposit: React.FC<Props> = (props) => {
           <SymDepositContent
             poolDetail={poolDetailRD}
             asset={assetWD}
-            runeWalletAddress={runeWalletAddress}
-            assetWalletAddress={assetWalletAddress}
+            runeWalletAddress={runeWalletAddress.address}
+            assetWalletAddress={assetWalletAddress.address}
             haltedChains={haltedChains}
             mimirHalt={mimirHalt}
           />
@@ -159,6 +148,8 @@ export const Deposit: React.FC<Props> = (props) => {
           <WidthdrawContent
             poolDetail={poolDetailRD}
             asset={assetWD}
+            runeWalletAddress={runeWalletAddress}
+            assetWalletAddress={assetWalletAddress}
             poolShare={combinedPoolShare}
             haltedChains={haltedChains}
             mimirHalt={mimirHalt}
