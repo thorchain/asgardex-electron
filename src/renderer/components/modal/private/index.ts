@@ -1,1 +1,0 @@
-export { PrivateModal } from './PrivateModal'

@@ -85,7 +85,7 @@ import {
 } from '../../../services/wallet/types'
 import { AssetWithDecimal } from '../../../types/asgardex'
 import { LedgerConfirmationModal } from '../../modal/confirmation'
-import { PasswordModal } from '../../modal/password'
+import { WalletPasswordConfirmationModal } from '../../modal/confirmation'
 import { TxModal } from '../../modal/tx'
 import { DepositAssets } from '../../modal/tx/extra'
 import { ViewTxButton } from '../../uielements/button'
@@ -1590,7 +1590,7 @@ export const SymDeposit: React.FC<Props> = (props) => {
       )}
 
       {showPasswordModal && (
-        <PasswordModal
+        <WalletPasswordConfirmationModal
           onSuccess={onSucceedPasswordModal}
           onClose={onClosePasswordModal}
           validatePassword$={validatePassword$}

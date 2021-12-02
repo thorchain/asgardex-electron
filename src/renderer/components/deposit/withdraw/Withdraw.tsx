@@ -43,7 +43,7 @@ import { PoolsDataMap } from '../../../services/midgard/types'
 import { MimirHalt } from '../../../services/thorchain/types'
 import { ValidatePasswordHandler } from '../../../services/wallet/types'
 import { AssetWithDecimal } from '../../../types/asgardex'
-import { PasswordModal } from '../../modal/password'
+import { WalletPasswordConfirmationModal } from '../../modal/confirmation'
 import { TxModal } from '../../modal/tx'
 import { DepositAssets } from '../../modal/tx/extra'
 import { TooltipAddress } from '../../uielements/common/Common.styles'
@@ -530,7 +530,7 @@ export const Withdraw: React.FC<Props> = ({
         </Styled.SubmitButton>
       </Styled.SubmitButtonWrapper>
       {showPasswordModal && (
-        <PasswordModal
+        <WalletPasswordConfirmationModal
           onSuccess={onSucceedPasswordModal}
           onClose={onClosePasswordModal}
           validatePassword$={validatePassword$}

@@ -22,8 +22,8 @@ import { FormattedMessage, useIntl } from 'react-intl'
 import { Network } from '../../../../shared/api/types'
 import { isLedgerWallet } from '../../../../shared/utils/guard'
 import { ReactComponent as UnlockOutlined } from '../../../assets/svg/icon-unlock-warning.svg'
+import { WalletPasswordConfirmationModal } from '../../../components/modal/confirmation'
 import { RemoveWalletConfirmationModal } from '../../../components/modal/confirmation/RemoveWalletConfirmationModal'
-import { PasswordModal } from '../../../components/modal/password'
 import { AssetIcon } from '../../../components/uielements/assets/assetIcon/AssetIcon'
 import { QRCodeModal } from '../../../components/uielements/qrCodeModal/QRCodeModal'
 import { PhraseCopyModal } from '../../../components/wallet/phrase/PhraseCopyModal'
@@ -284,7 +284,7 @@ export const WalletSettings: React.FC<Props> = (props): JSX.Element => {
   return (
     <Styled.ContainerWrapper>
       {showPasswordModal && (
-        <PasswordModal
+        <WalletPasswordConfirmationModal
           validatePassword$={validatePassword$}
           onSuccess={onSuccessPassword}
           onClose={() => setShowPasswordModal(false)}
