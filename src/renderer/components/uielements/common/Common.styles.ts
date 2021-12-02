@@ -36,3 +36,12 @@ export const Tooltip = styled(A.Tooltip).attrs({
     textTransform: 'uppercase'
   }
 })``
+
+export const TooltipAddress = styled(A.Tooltip).attrs({
+  overlayStyle: {
+    textTransform: 'none',
+    fontSize: 14,
+    maxWidth: '400px',
+    fontFamily: 'MainFontRegular'
+  }
+})``

@@ -8,6 +8,7 @@ import * as Rx from 'rxjs'
 import * as RxOp from 'rxjs/operators'
 
 import { THORCHAIN_DECIMAL } from '../../helpers/assetHelper'
+import { optionFromNullableString } from '../../helpers/fp/from'
 import { liveData, LiveData } from '../../helpers/rx/liveData'
 import { triggerStream, observableState } from '../../helpers/stateHelper'
 import { MemberPool } from '../../types/generated/midgard'
@@ -87,6 +88,8 @@ const createSharesService = (
               O.fromNullable,
               O.map((asset) => ({
                 type: !!runeAddress && !!assetAddress ? 'sym' : 'asym',
+                assetAddress: optionFromNullableString(assetAddress),
+                runeAddress: optionFromNullableString(runeAddress),
                 asset,
                 units: bnOrZero(liquidityUnits),
                 // BaseAmount of added asset - Note: Thorchain treats all assets as 1e8 decimal based

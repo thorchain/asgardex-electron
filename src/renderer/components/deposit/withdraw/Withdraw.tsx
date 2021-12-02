@@ -46,6 +46,7 @@ import { AssetWithDecimal } from '../../../types/asgardex'
 import { PasswordModal } from '../../modal/password'
 import { TxModal } from '../../modal/tx'
 import { DepositAssets } from '../../modal/tx/extra'
+import { TooltipAddress } from '../../uielements/common/Common.styles'
 import { Fees, UIFeesRD } from '../../uielements/fees'
 import { Label } from '../../uielements/label'
 import * as Helper from './Withdraw.helper'
@@ -448,7 +449,7 @@ export const Withdraw: React.FC<Props> = ({
       </Label>
 
       <Styled.AssetOutputContainer>
-        <Styled.Tooltip title={runeAddress}>
+        <TooltipAddress title={runeAddress}>
           <Styled.AssetContainer>
             <Styled.AssetIcon asset={AssetRuneNative} network={network} />
             <Styled.AssetLabel asset={AssetRuneNative} />
@@ -456,7 +457,7 @@ export const Withdraw: React.FC<Props> = ({
               <Styled.WalletTypeLabel>{intl.formatMessage({ id: 'ledger.title' })}</Styled.WalletTypeLabel>
             )}
           </Styled.AssetContainer>
-        </Styled.Tooltip>
+        </TooltipAddress>
         <Styled.OutputContainer>
           <Styled.OutputLabel>
             {formatAssetAmount({
@@ -481,7 +482,7 @@ export const Withdraw: React.FC<Props> = ({
       </Styled.AssetOutputContainer>
 
       <Styled.AssetOutputContainer>
-        <Styled.Tooltip title={assetAddress}>
+        <TooltipAddress title={assetAddress}>
           <Styled.AssetContainer>
             <Styled.AssetIcon asset={asset} network={network} />
             <Styled.AssetLabel asset={asset} />
@@ -489,7 +490,7 @@ export const Withdraw: React.FC<Props> = ({
               <Styled.WalletTypeLabel>{intl.formatMessage({ id: 'ledger.title' })}</Styled.WalletTypeLabel>
             )}
           </Styled.AssetContainer>
-        </Styled.Tooltip>
+        </TooltipAddress>
         <Styled.OutputContainer>
           <Styled.OutputLabel>
             {formatAssetAmount({

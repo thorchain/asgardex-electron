@@ -5,7 +5,7 @@ import { Story, Meta } from '@storybook/react'
 import { assetAmount, AssetBNB, AssetRuneNative, assetToBase, bn, BNBChain } from '@xchainjs/xchain-util'
 import * as O from 'fp-ts/lib/Option'
 
-import { BNB_ADDRESS_TESTNET } from '../../../shared/mock/address'
+import { BNB_ADDRESS_TESTNET, RUNE_ADDRESS_TESTNET } from '../../../shared/mock/address'
 import { BNB_DECIMAL, THORCHAIN_DECIMAL } from '../../helpers/assetHelper'
 import { mockWalletAddress } from '../../helpers/test/testWalletHelper'
 import { DEFAULT_MIMIR_HALT } from '../../services/thorchain/const'
@@ -24,18 +24,24 @@ const defaultProps: DepositProps = {
       units: bn('300000000'),
       asset: AssetBNB,
       type: 'sym',
+      assetAddress: O.some(BNB_ADDRESS_TESTNET),
+      runeAddress: O.some(RUNE_ADDRESS_TESTNET),
       assetAddedAmount: assetToBase(assetAmount(1.5, THORCHAIN_DECIMAL))
     },
     {
       units: bn('100000000'),
       asset: AssetBNB,
       type: 'asym',
+      assetAddress: O.some(BNB_ADDRESS_TESTNET),
+      runeAddress: O.none,
       assetAddedAmount: assetToBase(assetAmount(1, THORCHAIN_DECIMAL))
     },
     {
       units: bn('200000000'),
       asset: AssetRuneNative,
       type: 'asym',
+      assetAddress: O.none,
+      runeAddress: O.some(RUNE_ADDRESS_TESTNET),
       assetAddedAmount: assetToBase(assetAmount(2, THORCHAIN_DECIMAL))
     }
   ]),

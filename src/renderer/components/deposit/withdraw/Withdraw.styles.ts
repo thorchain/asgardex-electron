@@ -6,7 +6,7 @@ import { AssetIcon as AssetIconBase } from '../../uielements/assets/assetIcon'
 import { AssetLabel as AssetLabelUI } from '../../uielements/assets/assetLabel'
 import { ViewTxButton as UIViewTxButton } from '../../uielements/button'
 import { Button as UIButton } from '../../uielements/button'
-import { WalletTypeLabel as WalletTypeLabelUI, Tooltip as UITooltip } from '../../uielements/common/Common.styles'
+import { WalletTypeLabel as WalletTypeLabelUI } from '../../uielements/common/Common.styles'
 import { Label as UILabel } from '../../uielements/label'
 import { Slider as BaseSlider } from '../../uielements/slider'
 
@@ -131,15 +131,6 @@ export const AssetLabel = styled(AssetLabelUI)`
   padding: 0px;
   margin: 0;
 `
-
-export const Tooltip = styled(UITooltip).attrs({
-  overlayStyle: {
-    textTransform: 'none',
-    fontSize: 14,
-    maxWidth: '400px',
-    fontFamily: 'MainFontRegular'
-  }
-})``
 
 export const WalletTypeLabel = styled(WalletTypeLabelUI)`
   font-size: 8px;

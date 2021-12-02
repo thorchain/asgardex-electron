@@ -25,6 +25,7 @@ import { isBtcAsset } from '../../../../helpers/assetHelper'
 import { ordAsset } from '../../../../helpers/fp/ord'
 import { useClickOutside } from '../../../../hooks/useOutsideClick'
 import { AssetWithAddress } from '../../../../types/asgardex'
+import { TooltipAddress } from '../../common/Common.styles'
 import { InfoIcon } from '../../info'
 import * as InfoIconStyled from '../../info/InfoIcon.styles'
 import { Slider } from '../../slider'
@@ -152,12 +153,12 @@ export const AssetCard: React.FC<Props> = (props): JSX.Element => {
     <Styled.AssetCardWrapper ref={ref}>
       <Dropdown overlay={renderMenu()} trigger={[]} visible={openDropdown}>
         <Styled.CardBorderWrapper error={minAmountError}>
-          <Styled.Tooltip title={assetAddress}>
+          <TooltipAddress title={assetAddress}>
             <Styled.Header>
               <Styled.AssetLabel asset={asset} />
               {balanceLabel}
             </Styled.Header>
-          </Styled.Tooltip>
+          </TooltipAddress>
           <Styled.CardTopRow>
             <Styled.AssetDataWrapper>
               <Styled.AssetData>

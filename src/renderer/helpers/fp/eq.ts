@@ -35,6 +35,9 @@ export const eqBigNumber: Eq.Eq<BigNumber> = {
 
 export const eqOBigNumber: Eq.Eq<O.Option<BigNumber>> = O.getEq(eqBigNumber)
 
+export const eqAddress: Eq.Eq<Address> = eqString
+export const eqOAddress: Eq.Eq<O.Option<Address>> = eqOString
+
 export const eqAsset: Eq.Eq<Asset> = {
   equals: (x, y) => eqString.equals(x.chain, y.chain) && eqString.equals(x.symbol.toUpperCase(), y.symbol.toUpperCase())
 }
@@ -110,7 +113,9 @@ export const eqPoolShare = Eq.struct<PoolShare>({
   asset: eqAsset,
   assetAddedAmount: eqBaseAmount,
   units: eqBigNumber,
-  type: eqString
+  type: eqString,
+  assetAddress: eqOAddress,
+  runeAddress: eqOAddress
 })
 
 export const eqPoolShares = A.getEq(eqPoolShare)
@@ -179,9 +184,6 @@ const eqLedgerError = Eq.struct<LedgerError>({
 })
 
 export const eqWalletType: Eq.Eq<WalletType> = eqString
-
-export const eqAddress: Eq.Eq<Address> = eqString
-export const eqOAddress: Eq.Eq<O.Option<Address>> = eqOString
 
 export const eqWalletAddress = Eq.struct<WalletAddress>({
   address: eqString,

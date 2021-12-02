@@ -258,6 +258,8 @@ export const combineSharesByAsset = (shares: PoolShares, asset: Asset): O.Option
             ...acc,
             units: cur.units.plus(acc.units),
             assetAddedAmount: baseAmount(cur.assetAddedAmount.amount().plus(acc.assetAddedAmount.amount())),
+            assetAddress: acc.assetAddress,
+            runeAddress: O.isSome(acc.runeAddress) ? acc.runeAddress : cur.runeAddress,
             type: 'all'
           })
         ),

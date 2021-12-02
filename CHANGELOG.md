@@ -3,6 +3,7 @@
 ## Add
 
 - [Ledger] Add liquidity using Ledger [#1926](https://github.com/thorchain/asgardex-electron/pull/1926), [#1927](https://github.com/thorchain/asgardex-electron/issues/1927) [#1936](https://github.com/thorchain/asgardex-electron/issues/1936), [#1962](https://github.com/thorchain/asgardex-electron/pull/1962)
+- [Ledger] Support Ledger for withdrawals [#1963](https://github.com/thorchain/asgardex-electron/pull/1963)
 - [ADD] Update shares for Ledger [#1942](https://github.com/thorchain/asgardex-electron/pull/1942)
 - Restore previous windows dimensions with next start of ASGDX [#1879](https://github.com/thorchain/asgardex-electron/issues/1879)
 - Show asset icon in TxDetail (wallet history + pool details)[#1955](https://github.com/thorchain/asgardex-electron/pull/1955)
@@ -21,6 +22,7 @@
 - [PoolDetail] Make tx explorer accessible for locked / not imported wallet users [#1871](https://github.com/thorchain/asgardex-electron/issues/1871)
 - Fix Tooltip styles [#1944](https://github.com/thorchain/asgardex-electron/pull/1944)
 - [Swap] Limits added to memo needs to be 1e8 [#1946](https://github.com/thorchain/asgardex-electron/issues/1946)
+- [PoolShare] Don't combine `asym` with `sym` shares in PoolShare [#1964](https://github.com/thorchain/asgardex-electron/pull/1964)
 
 ## Internal
 
