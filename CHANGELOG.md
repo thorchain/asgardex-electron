@@ -16,6 +16,10 @@
 - [Swap] Update slippage tolerance [#1929](https://github.com/thorchain/asgardex-electron/issues/1929)
 - Pimp Ledger confirmation modal [#1941](https://github.com/thorchain/asgardex-electron/pull/1941)
 
+## Remove
+
+- [RU] Remove language support for RU temporary [#1966](https://github.com/thorchain/asgardex-electron/issues/1966)
+
 ## Fix
 
 - Format date [#1873](https://github.com/thorchain/asgardex-electron/issues/1873)
