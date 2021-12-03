@@ -32,15 +32,15 @@ const deposit: DepositMessages = {
   'deposit.add.pendingAssets.recoveryDescription':
     "Remarque : les transactions d'une paire d'actifs peuvent prendre un temps différent en s'exécutant sur différentes blockchains. En cas d'échec, vous disposez d'un moyen de retirer les actifs en attente à l'aide de l'outil de récupération du site THORSWap à l'adresse {url}. Cette fonctionnalité n'est actuellement pas disponible avec ASGARDEX Dekstop.",
   'deposit.add.pendingAssets.recoveryTitle': "Ouvrir l'outil de récupération",
-  'deposit.add.asymAssets.title': 'Asymmetrical deposit found - FR',
+  'deposit.add.asymAssets.title': 'Dépôt asymétrique trouvé',
   'deposit.add.asymAssets.description':
-    'Adding an asset pair symmetrical has been disabled due a previous asymmetrical deposit of following asset(s): - FR',
+    "L'ajout symétrique d'une paire d'actifs a été désactivé en raison d'un précédent dépôt asymétrique des actifs suivants :",
   'deposit.add.asymAssets.recoveryDescription':
-    'Asymmetrical deposit is currently not supported in ASGARDEX desktop. However, you can use this feature in THORSwap to withdraw a previous asymmetrical deposit. - FR',
-  'deposit.add.asymAssets.recoveryTitle': 'THORSwap - FR',
-  'deposit.add.assetMissmatch.title': 'Asset missmatch found - FR',
+    "Le dépôt asymétrique n'est actuellement pas pris en charge dans ASGARDEX Dekstop. Cependant, vous pouvez utiliser cette fonctionnalité dans THORSwap pour retirer un précédent dépôt asymétrique.",
+  'deposit.add.asymAssets.recoveryTitle': 'THORSwap',
+  'deposit.add.assetMissmatch.title': "Non-concordance d'actifs trouvée",
   'deposit.add.assetMissmatch.description':
-    'One of current selected asset side has been already used in a previous deposit, but with another asset. Check following addresses to see the previous deposit pair. - FR',
+    "L'un des actifs actuellement sélectionné a déjà été utilisé dans un dépôt précédent, mais avec un autre actif. Vérifiez les adresses suivantes pour voir la paire de dépôt précédente.",
   'deposit.bond.state.error': 'Erreur de caution',
   'deposit.unbond.state.error': 'Erreur de retrait',
   'deposit.leave.state.error': 'Erreur de sortie',
@@ -73,8 +73,8 @@ const deposit: DepositMessages = {
     'Remarque: {fee} BNB seront laissés dans votre portefeuille pour les frais de transaction.',
   'deposit.withdraw.error.feeNotCovered':
     'Les frais de transaction {fee} doivent être couverts par votre solde (actuellement {balance}).',
-  'deposit.withdraw.ledger.sign': 'Click next to sign the withdraw transaction on your device. - FR',
-  'deposit.ledger.sign': 'Click next to sign the deposit transaction on your device. - FR'
+  'deposit.withdraw.ledger.sign': 'Cliquez pour signer la transaction de retrait sur votre appareil.',
+  'deposit.ledger.sign': 'Cliquez pour signer la transaction de dépôt sur votre appareil.'
 }
 
 export default deposit

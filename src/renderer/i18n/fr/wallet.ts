@@ -69,7 +69,7 @@ const wallet: WalletMessages = {
   'wallet.errors.fee.notCovered': 'Les frais ne sont pas couverts par votre solde de ({balance})',
   'wallet.errors.invalidChain': 'Chaîne non valide : {chain}',
   'wallet.password.confirmation.title': 'Confirmation du mot de passe',
-  'wallet.password.confirmation.description': 'Please enter your wallet password. - FR',
+  'wallet.password.confirmation.description': 'Veuillez saisir le mot de passe de votre portefeuille.',
   'wallet.password.confirmation.pending': 'Validation du mot de passe',
   'wallet.password.confirmation.error': 'Le mot de passe est erroné',
   'wallet.password.repeat': 'Répétez le mot de passe',
@@ -83,8 +83,8 @@ const wallet: WalletMessages = {
   'wallet.validations.lessThen': 'Devrait être inférieur à {value}',
   'wallet.validations.graterThen': 'Devrait être supérieur à {value}',
   'wallet.validations.shouldNotBeEmpty': 'Ne devrait pas être vide',
-  'wallet.ledger.verifyAddress.modal.title': 'Verify Ledger Address',
-  'wallet.ledger.verifyAddress.modal.description': 'Verify address {address} on your device - FR'
+  'wallet.ledger.verifyAddress.modal.title': "Vérification de l'adresse Ledger",
+  'wallet.ledger.verifyAddress.modal.description': "Vérifiez l'adresse {address} sur votre appareil"
 }
 
 export default wallet

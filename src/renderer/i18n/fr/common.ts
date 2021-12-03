@@ -24,7 +24,7 @@ const common: CommonMessages = {
   'common.submit': 'Valider',
   'common.confirm': 'Confirmer',
   'common.cancel': 'Annuler',
-  'common.reject': 'Reject - FR',
+  'common.reject': 'Rejeter',
   'common.next': 'Suivant',
   'common.finish': 'Finir',
   'common.copy': 'Copier',
@@ -86,7 +86,7 @@ const common: CommonMessages = {
   'common.theme.light': 'Mode clair',
   'common.theme.dark': 'Mode sombre',
   'common.volume24': 'Volume (24h)',
-  'common.volume24.description': '24h volume of swaps, add liquidity and withdrawals - FR',
+  'common.volume24.description': "Volume d'échanges, d'ajouts de liquidité, et de retraits, sur 24h",
   'common.informationMore': "Plus d'information",
   'common.balance': 'Solde',
   'common.balance.loading': 'Chargement du solde'

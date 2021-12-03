@@ -23,9 +23,9 @@ const ledger: LedgerMessages = {
   'ledger.error.notimplemented': "L'action n'a pas été implémentée pour Ledger",
   'ledger.error.denied': 'Vous avez refusé la demande',
   'ledger.error.unknown': 'Erreur inconnue',
-  'ledger.notsupported': 'No Ledger support for {chain}. - FR',
-  'ledger.notaddedorzerobalances': 'Ledger {chain} has not been connected or has zero balances. - FR',
-  'ledger.deposit.oneside': 'Currently Ledger is supported for one asset side only. - FR'
+  'ledger.notsupported': 'Pas de prise en charge de Ledger pour {chain}.',
+  'ledger.notaddedorzerobalances': "La chaîne {chaîne} n'a pas été connectée sur Ledger ou n'a aucun solde.",
+  'ledger.deposit.oneside': "Actuellement, Ledger ne prend en charge un actif que d'un seul côté."
 }
 
 export default ledger
