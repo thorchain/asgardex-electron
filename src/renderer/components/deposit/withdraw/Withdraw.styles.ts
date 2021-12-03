@@ -12,8 +12,21 @@ import { Slider as BaseSlider } from '../../uielements/slider'
 
 export const Container = styled('div')`
   .sliderLabel {
-    font-size: 18px;
+    font-size: 21px;
+    font-family: 'MainFontSemiBold';
   }
+`
+
+export const Title = styled(UILabel)`
+  text-transform: uppercase;
+  font-size: 16px;
+  font-family: 'MainFontSemiBold';
+`
+
+export const Description = styled(UILabel)`
+  text-transform: uppercase;
+  font-size: 14px;
+  font-family: 'MainFontRegular';
 `
 
 export const MinLabel = styled(UILabel)`
@@ -45,7 +58,9 @@ export const Slider = styled(BaseSlider).attrs({
   tooltipPlacement: 'bottom',
   withLabel: true,
   labelPosition: 'top'
-})``
+})`
+  margin-bottom: 40px;
+`
 
 export const OutputContainer = styled.div`
   display: flex;

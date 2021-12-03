@@ -360,10 +360,10 @@ type DepositMessageKey =
   | 'deposit.withdraw.success'
   | 'deposit.withdraw.error'
   | 'deposit.withdraw.choseText'
-  | 'deposit.withdraw.receiveText'
   | 'deposit.withdraw.fees'
   | 'deposit.withdraw.feeNote'
   | 'deposit.withdraw.error.feeNotCovered'
+  | 'deposit.withdraw.ledger.sign'
   | 'deposit.ledger.sign'
 
 export type DepositMessages = { [key in DepositMessageKey]: string }

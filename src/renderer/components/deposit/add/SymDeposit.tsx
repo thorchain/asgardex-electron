@@ -1579,7 +1579,6 @@ export const SymDeposit: React.FC<Props> = (props) => {
 
       {showLedgerModal && (
         <LedgerConfirmationModal
-          key="leder-conf-modal"
           onSuccess={onSucceedLedgerModal}
           onClose={onCloseLedgerModal}
           visible={showLedgerModal}

@@ -66,7 +66,7 @@ const common: CommonMessages = {
   'common.tx.sending': 'Sende Transaktion',
   'common.tx.sendingAsset': 'Sende {assetTicker} Transaktion',
   'common.tx.checkResult': 'Überprüfe Ergebnis',
-  'common.tx.view': 'Zeige {assetTicker} Transaktion',
+  'common.tx.view': '{assetTicker} Transaktion ansehen',
   'common.value': 'Wert',
   'common.modal.confirmTitle': 'Bestätige die Aktion',
   'common.manage': 'Manage',

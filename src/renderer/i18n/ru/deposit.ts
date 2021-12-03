@@ -67,11 +67,11 @@ const deposit: DepositMessages = {
   'deposit.withdraw.success': 'Успешно изъяли',
   'deposit.withdraw.error': 'Ошибка при изъятии',
   'deposit.withdraw.choseText': 'Выберите сколько вы хотите изять от 0% до 100%',
-  'deposit.withdraw.receiveText': 'Вы полчучите',
   'deposit.withdraw.fees': 'Комиссия транзакции: {thorMemo}, Исходящие комиссии: {thorOut} + {assetOut}',
   'deposit.withdraw.feeNote': 'Важно: {fee} BNB останется на вашем кошельке для покрытия комисий.',
   'deposit.withdraw.error.feeNotCovered':
     'Комиссия транзакции {fee} должна покрываться вашим балансом (баланс: {balance})',
+  'deposit.withdraw.ledger.sign': 'Click next to sign the withdraw transaction on your device. - RU',
   'deposit.ledger.sign': 'Click next to sign the deposit transaction on your device. - RU'
 }
 

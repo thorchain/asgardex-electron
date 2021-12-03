@@ -68,12 +68,12 @@ const deposit: DepositMessages = {
   'deposit.withdraw.success': 'Retrait réussi',
   'deposit.withdraw.error': 'Erreur de retrait',
   'deposit.withdraw.choseText': 'Choisissez de 0 à 100% la part du retrait.',
-  'deposit.withdraw.receiveText': 'Vous devriez recevoir.',
   'deposit.withdraw.fees': 'Frais de transaction : {thorMemo}, Frais de retrait : {thorOut} + {assetOut}',
   'deposit.withdraw.feeNote':
     'Remarque: {fee} BNB seront laissés dans votre portefeuille pour les frais de transaction.',
   'deposit.withdraw.error.feeNotCovered':
     'Les frais de transaction {fee} doivent être couverts par votre solde (actuellement {balance}).',
+  'deposit.withdraw.ledger.sign': 'Click next to sign the withdraw transaction on your device. - FR',
   'deposit.ledger.sign': 'Click next to sign the deposit transaction on your device. - FR'
 }
 

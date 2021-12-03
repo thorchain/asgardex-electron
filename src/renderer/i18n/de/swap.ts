@@ -9,7 +9,7 @@ const swap: SwapMessages = {
   'swap.recipient': 'Empfänger',
   'swap.info.max.fee': 'Total asset balance substracted by estimated swap fees - DE',
   'swap.slip.title': 'Slip',
-  'swap.slip.tolerance': 'Sliptoleranz',
+  'swap.slip.tolerance': 'Slippage-Toleranz',
   'swap.slip.tolerance.info':
     'Je höher die Prozentangabe, je höher akzeptierst Du ein Slippage. Mehr Slippage bedeutet zugleich ein größerer Spielraum zur Abdeckung der geschätzten Gebühren, um fehlgeschlagene Swaps zu vermeiden.',
   'swap.errors.amount.balanceShouldCoverChainFee':
@@ -20,7 +20,7 @@ const swap: SwapMessages = {
   'swap.note.nowallet': 'Erstelle oder importiere eine Wallet um zu Tauschen',
   'swap.errors.asset.missingSourceAsset': 'Ursprungs-Asset nicht vorhanden',
   'swap.errors.asset.missingTargetAsset': 'Ziel-Asset nicht vorhanden',
-  'swap.ledger.sign': 'Klick "Weiter" um die Swap Transaktion mit Deinem Ledger zu unterzeichnen.'
+  'swap.ledger.sign': 'Klick "Weiter", um die Swap Transaktion mit Deinem Ledger zu unterzeichnen.'
 }
 
 export default swap

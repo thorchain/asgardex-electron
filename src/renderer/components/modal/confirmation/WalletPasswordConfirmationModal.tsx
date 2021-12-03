@@ -63,7 +63,7 @@ const PasswordModal: React.FC<PasswordModalProps> = (props): JSX.Element => {
     // Note: We can't use `ConfirmationModal` here,
     // its `onOkHandler` does not support different `onOk` callbacks, but will always close the modal
     <Styled.Modal
-      title={intl.formatMessage({ id: 'wallet.password.confirmation' })}
+      title={intl.formatMessage({ id: 'wallet.password.confirmation.title' })}
       visible={visible}
       onOk={onOkCb}
       onCancel={onCancel}

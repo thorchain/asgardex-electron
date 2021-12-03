@@ -10,7 +10,8 @@ import {
   baseToAsset,
   formatAssetAmount,
   Chain,
-  formatAssetAmountCurrency
+  formatAssetAmountCurrency,
+  THORChain
 } from '@xchainjs/xchain-util'
 import { Col } from 'antd'
 import BigNumber from 'bignumber.js'
@@ -43,12 +44,11 @@ import { PoolsDataMap } from '../../../services/midgard/types'
 import { MimirHalt } from '../../../services/thorchain/types'
 import { ValidatePasswordHandler } from '../../../services/wallet/types'
 import { AssetWithDecimal } from '../../../types/asgardex'
-import { WalletPasswordConfirmationModal } from '../../modal/confirmation'
+import { LedgerConfirmationModal, WalletPasswordConfirmationModal } from '../../modal/confirmation'
 import { TxModal } from '../../modal/tx'
 import { DepositAssets } from '../../modal/tx/extra'
 import { TooltipAddress } from '../../uielements/common/Common.styles'
 import { Fees, UIFeesRD } from '../../uielements/fees'
-import { Label } from '../../uielements/label'
 import * as Helper from './Withdraw.helper'
 import * as Styled from './Withdraw.styles'
 
@@ -115,7 +115,7 @@ export const Withdraw: React.FC<Props> = ({
 
   const { asset, decimal: assetDecimal } = assetWD
 
-  const { type: runeWalletType, address: runeAddress } = runeWalletAddress
+  const { type: runeWalletType, address: runeAddress, walletIndex: runeWalletIndex } = runeWalletAddress
   const { type: assetWalletType, address: assetAddress } = assetWalletAddress
 
   // Disable withdraw in case all or pool actions are disabled
@@ -341,6 +341,15 @@ export const Withdraw: React.FC<Props> = ({
   ])
 
   const [showPasswordModal, setShowPasswordModal] = useState(false)
+  const [showLedgerModal, setShowLedgerModal] = useState(false)
+
+  const onSubmit = useCallback(() => {
+    if (isLedgerWallet(runeWalletType)) {
+      setShowLedgerModal(true)
+    } else {
+      setShowPasswordModal(true)
+    }
+  }, [runeWalletType])
 
   const closePasswordModal = useCallback(() => {
     setShowPasswordModal(false)
@@ -351,10 +360,7 @@ export const Withdraw: React.FC<Props> = ({
     closePasswordModal()
   }, [closePasswordModal])
 
-  const onSucceedPasswordModal = useCallback(() => {
-    // close private modal
-    closePasswordModal()
-
+  const submitWithdrawTx = useCallback(() => {
     // set start time
     setWithdrawStartTime(Date.now())
 
@@ -362,12 +368,25 @@ export const Withdraw: React.FC<Props> = ({
       withdraw$({
         network,
         memo,
-        // TODO (@asgdx-team) Get walletType|index from props when we introduce Ledger for withdrawing
-        walletType: 'keystore',
-        walletIndex: 0
+        walletType: runeWalletType,
+        walletIndex: runeWalletIndex
       })
     )
-  }, [closePasswordModal, subscribeWithdrawState, withdraw$, network, memo])
+  }, [subscribeWithdrawState, withdraw$, network, memo, runeWalletType, runeWalletIndex])
+
+  const onSucceedPasswordModal = useCallback(() => {
+    closePasswordModal()
+    submitWithdrawTx()
+  }, [closePasswordModal, submitWithdrawTx])
+
+  const onCloseLedgerModal = useCallback(() => {
+    setShowLedgerModal(false)
+  }, [])
+
+  const onSucceedLedgerModal = useCallback(() => {
+    setShowLedgerModal(false)
+    submitWithdrawTx()
+  }, [submitWithdrawTx])
 
   const uiFeesRD: UIFeesRD = useMemo(
     () =>
@@ -411,10 +430,8 @@ export const Withdraw: React.FC<Props> = ({
 
   return (
     <Styled.Container>
-      <Label weight="bold" textTransform="uppercase">
-        {intl.formatMessage({ id: 'deposit.withdraw.sym.title' })}
-      </Label>
-      <Label>
+      <Styled.Title>{intl.formatMessage({ id: 'deposit.withdraw.sym.title' })}</Styled.Title>
+      <Styled.Description>
         {intl.formatMessage({ id: 'deposit.withdraw.choseText' })} (
         <Styled.MinLabel color={minRuneAmountError || minAssetAmountError ? 'error' : 'normal'}>
           {intl.formatMessage({ id: 'common.min' })}:
@@ -435,7 +452,7 @@ export const Withdraw: React.FC<Props> = ({
           })}
         </Styled.MinLabel>
         )
-      </Label>
+      </Styled.Description>
       <Styled.Slider
         key="asset amount slider"
         value={withdrawPercent}
@@ -444,10 +461,6 @@ export const Withdraw: React.FC<Props> = ({
         disabled={disabled || disableWithdrawAction}
         error={minRuneAmountError || minAssetAmountError}
       />
-      <Label weight="bold" textTransform="uppercase">
-        {intl.formatMessage({ id: 'deposit.withdraw.receiveText' })}
-      </Label>
-
       <Styled.AssetOutputContainer>
         <TooltipAddress title={runeAddress}>
           <Styled.AssetContainer>
@@ -525,10 +538,23 @@ export const Withdraw: React.FC<Props> = ({
         </Col>
       </Styled.FeesRow>
       <Styled.SubmitButtonWrapper>
-        <Styled.SubmitButton sizevalue="xnormal" onClick={() => setShowPasswordModal(true)} disabled={disabledSubmit}>
+        <Styled.SubmitButton sizevalue="xnormal" onClick={onSubmit} disabled={disabledSubmit}>
           {intl.formatMessage({ id: 'common.withdraw' })}
         </Styled.SubmitButton>
       </Styled.SubmitButtonWrapper>
+
+      {showLedgerModal && (
+        <LedgerConfirmationModal
+          onSuccess={onSucceedLedgerModal}
+          onClose={onCloseLedgerModal}
+          visible={showLedgerModal}
+          // we always sent withdraw tx using THORCHain only
+          chain={THORChain}
+          network={network}
+          description={intl.formatMessage({ id: 'deposit.withdraw.ledger.sign' })}
+        />
+      )}
+
       {showPasswordModal && (
         <WalletPasswordConfirmationModal
           onSuccess={onSucceedPasswordModal}
