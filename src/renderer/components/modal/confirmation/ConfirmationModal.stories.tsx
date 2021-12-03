@@ -18,7 +18,7 @@ const Template: Story<Args> = ({ title, message, okText, visible }) => {
       visible={visible}
       onClose={() => console.log('onClose')}
       onSuccess={() => console.log('onSuccess')}
-      message={message}
+      content={message}
       okText={okText}
     />
   )

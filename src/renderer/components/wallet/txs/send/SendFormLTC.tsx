@@ -28,7 +28,7 @@ import { AddressValidation, WalletBalances } from '../../../../services/clients'
 import { FeesWithRatesRD } from '../../../../services/litecoin/types'
 import { ValidatePasswordHandler } from '../../../../services/wallet/types'
 import { WalletBalance } from '../../../../services/wallet/types'
-import { PasswordModal } from '../../../modal/password'
+import { WalletPasswordConfirmationModal } from '../../../modal/confirmation'
 import * as StyledR from '../../../shared/form/Radio.styles'
 import { MaxBalanceButton } from '../../../uielements/button/MaxBalanceButton'
 import { UIFeesRD } from '../../../uielements/fees'
@@ -278,7 +278,7 @@ export const SendFormLTC: React.FC<Props> = (props): JSX.Element => {
   const renderPwModal = useMemo(
     () =>
       showPwModal ? (
-        <PasswordModal
+        <WalletPasswordConfirmationModal
           onSuccess={sendHandler}
           onClose={() => setShowPwModal(false)}
           validatePassword$={validatePassword$}

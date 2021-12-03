@@ -29,7 +29,7 @@ import { FeeRD, SendTxParams } from '../../../../services/chain/types'
 import { AddressValidation, WalletBalances } from '../../../../services/clients'
 import { ValidatePasswordHandler } from '../../../../services/wallet/types'
 import { WalletBalance } from '../../../../services/wallet/types'
-import { PasswordModal } from '../../../modal/password'
+import { WalletPasswordConfirmationModal } from '../../../modal/confirmation'
 import { MaxBalanceButton } from '../../../uielements/button/MaxBalanceButton'
 import { UIFeesRD } from '../../../uielements/fees'
 import { Input, InputBigNumber } from '../../../uielements/input'
@@ -196,7 +196,7 @@ export const SendFormTHOR: React.FC<Props> = (props): JSX.Element => {
   const renderPwModal = useMemo(
     () =>
       showPwModal ? (
-        <PasswordModal
+        <WalletPasswordConfirmationModal
           onSuccess={sendHandler}
           onClose={() => setShowPwModal(false)}
           validatePassword$={validatePassword$}

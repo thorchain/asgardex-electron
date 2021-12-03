@@ -28,7 +28,7 @@ import { AddressValidation, OpenExplorerTxUrl, WalletBalances } from '../../../.
 import { PoolAddressRD } from '../../../../services/midgard/types'
 import { ValidatePasswordHandler } from '../../../../services/wallet/types'
 import { AssetWithDecimal } from '../../../../types/asgardex'
-import { PasswordModal } from '../../../modal/password'
+import { WalletPasswordConfirmationModal } from '../../../modal/confirmation'
 import { MaxBalanceButton } from '../../../uielements/button/MaxBalanceButton'
 import { ViewTxButton } from '../../../uielements/button/ViewTxButton'
 import { UIFeesRD } from '../../../uielements/fees'
@@ -489,7 +489,7 @@ export const Upgrade: React.FC<Props> = (props): JSX.Element => {
   const renderConfirmUpgradeModal = useMemo(
     () =>
       showConfirmUpgradeModal ? (
-        <PasswordModal
+        <WalletPasswordConfirmationModal
           onSuccess={upgradeConfirmationHandler}
           onClose={() => setShowConfirmUpgradeModal(false)}
           validatePassword$={validatePassword$}

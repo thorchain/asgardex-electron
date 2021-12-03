@@ -11,7 +11,7 @@ type Props = {
   onClose: FP.Lazy<void>
   title?: string
   okText?: string
-  message: React.ReactNode
+  content: React.ReactNode
   className?: string
 }
 
@@ -21,7 +21,7 @@ export const ConfirmationModal: React.FC<Props> = ({
   onClose,
   title,
   okText,
-  message,
+  content,
   className
 }) => {
   const intl = useIntl()
@@ -41,7 +41,7 @@ export const ConfirmationModal: React.FC<Props> = ({
       okText={okText || intl.formatMessage({ id: 'common.confirm' })}
       okButtonProps={{ autoFocus: true }}
       cancelText={intl.formatMessage({ id: 'common.cancel' })}>
-      {message}
+      {content}
     </Styled.Modal>
   )
 }

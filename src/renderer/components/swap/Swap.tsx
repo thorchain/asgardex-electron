@@ -88,8 +88,7 @@ import {
 import { hasImportedKeystore, isLocked } from '../../services/wallet/util'
 import { AssetWithDecimal, SlipTolerance } from '../../types/asgardex'
 import { CurrencyInfo } from '../currency'
-import { LedgerConfirmationModal } from '../modal/confirmation'
-import { PasswordModal } from '../modal/password'
+import { LedgerConfirmationModal, WalletPasswordConfirmationModal } from '../modal/confirmation'
 import { TxModal } from '../modal/tx'
 import { SwapAssets } from '../modal/tx/extra'
 import { LoadingView } from '../shared/loading'
@@ -1478,7 +1477,7 @@ export const Swap = ({
         )}
       </Styled.SubmitContainer>
       {showPasswordModal && (
-        <PasswordModal
+        <WalletPasswordConfirmationModal
           onSuccess={onSucceedPasswordModal}
           onClose={onClosePasswordModal}
           validatePassword$={validatePassword$}

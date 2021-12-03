@@ -95,7 +95,7 @@ export const BondsTable: React.FC<Props> = ({ nodes, removeNode, network, goToNo
     const commonProps = {
       onClose: () => setNodeToRemove(O.none),
       onSuccess: FP.constVoid,
-      message: (
+      content: (
         <FormattedMessage
           id="bonds.node.removeMessage"
           defaultMessage="Are you sure you want to delete {node} node?"

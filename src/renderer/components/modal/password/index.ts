@@ -1,1 +1,0 @@
-export { PasswordModal } from './PasswordModal'

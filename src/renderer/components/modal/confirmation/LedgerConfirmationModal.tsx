@@ -35,10 +35,10 @@ export const LedgerConfirmationModal: React.FC<Props> = ({
       onSuccess={onSuccess}
       title={intl.formatMessage({ id: 'ledger.title.sign' })}
       okText={intl.formatMessage({ id: 'common.next' })}
-      message={
+      content={
         <Styled.Content>
           <Styled.LedgerContainer>
-            <Styled.LedgerConnect></Styled.LedgerConnect>
+            <Styled.LedgerConnect />
             <Styled.AssetIcon asset={asset} network={network} size="small" />
           </Styled.LedgerContainer>
           <Styled.Description>
