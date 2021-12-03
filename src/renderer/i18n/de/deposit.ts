@@ -68,12 +68,12 @@ const deposit: DepositMessages = {
   'deposit.withdraw.success': 'Erfolgreich ausgezahlt',
   'deposit.withdraw.error': 'Error beim Auszahlen',
   'deposit.withdraw.choseText': 'Wähle einen Betrag zwischen 0 und 100% zum Auszahlen',
-  'deposit.withdraw.receiveText': 'Du solltest erhalten',
   'deposit.withdraw.fees': 'Transaktionsgebühr: {thorMemo}, Auszahlungsgebühren: {thorOut} + {assetOut}',
   'deposit.withdraw.feeNote': 'Hinweis: {fee} werden für die Transaktionsgebühr in Deiner Wallet belassen',
   'deposit.withdraw.error.feeNotCovered':
     'Transaktionsgebühr in Höhe von {fee} ist nicht über Dein Guthaben {balance} gedeckt.',
-  'deposit.ledger.sign': 'Klick "Weiter" um die Deposit Transaktion mit Deinem Ledger zu unterzeichnen.'
+  'deposit.withdraw.ledger.sign': 'Klick "Weiter", um die Auszahlungstransaktion mit Deinem Ledger zu signieren.',
+  'deposit.ledger.sign': 'Klick "Weiter", um die Einzahlungstransaktion mit Deinem Ledger zu signieren.'
 }
 
 export default deposit

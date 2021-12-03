@@ -67,11 +67,11 @@ const deposit: DepositMessages = {
   'deposit.withdraw.success': 'Successful withdraw',
   'deposit.withdraw.error': 'Withdraw error',
   'deposit.withdraw.choseText': 'Choose from 0 to 100% of how much to withdraw.',
-  'deposit.withdraw.receiveText': 'You should receive.',
   'deposit.withdraw.fees': 'Transaction fee: {thorMemo}, Outbounding fees: {thorOut} + {assetOut}',
   'deposit.withdraw.feeNote': 'Note: {fee} BNB will be left in your wallet for the transaction fees.',
   'deposit.withdraw.error.feeNotCovered':
     'Transaction fee {fee} needs to be covered by your balance (currently {balance}).',
+  'deposit.withdraw.ledger.sign': 'Click next to sign the withdraw transaction on your device.',
   'deposit.ledger.sign': 'Click next to sign the deposit transaction on your device.'
 }
 

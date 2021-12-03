@@ -1,14 +1,14 @@
-# 0.5.1 (2021-XX-XX)
+# 0.6.0 (2021-XX-XX)
 
 ## Add
 
-- [Ledger] Add liquidity using Ledger [#1926](https://github.com/thorchain/asgardex-electron/pull/1926), [#1927](https://github.com/thorchain/asgardex-electron/issues/1927) [#1936](https://github.com/thorchain/asgardex-electron/issues/1936), [#1962](https://github.com/thorchain/asgardex-electron/pull/1962)
-- [Ledger] Support Ledger for withdrawals [#1963](https://github.com/thorchain/asgardex-electron/pull/1963)
-- [ADD] Update shares for Ledger [#1942](https://github.com/thorchain/asgardex-electron/pull/1942)
+- [ADD] Add liquidity using Ledger [#1926](https://github.com/thorchain/asgardex-electron/pull/1926), [#1927](https://github.com/thorchain/asgardex-electron/issues/1927) [#1936](https://github.com/thorchain/asgardex-electron/issues/1936), [#1962](https://github.com/thorchain/asgardex-electron/pull/1962)
+- [Withdraw] Update UI to support Ledger [#1928](https://github.com/thorchain/asgardex-electron/issues/1928)
+- [Ledger] Update shares for Ledger in Withdraw / Deposit [#1942](https://github.com/thorchain/asgardex-electron/pull/1942)
 - Restore previous windows dimensions with next start of ASGDX [#1879](https://github.com/thorchain/asgardex-electron/issues/1879)
 - Show asset icon in TxDetail (wallet history + pool details)[#1955](https://github.com/thorchain/asgardex-electron/pull/1955)
 - [ADD] Check asset mismatch for Ledger + keystore [#1938](https://github.com/thorchain/asgardex-electron/issues/1938)
-- Show ledger | keystore addresses in tooltips [#1959](https://github.com/thorchain/asgardex-electron/pull/1959)
+- Show ledger or keystore addresses in tooltips [#1959](https://github.com/thorchain/asgardex-electron/pull/1959)
 - Whitelist TGT token [#1960](https://github.com/thorchain/asgardex-electron/issues/1960)
 
 ## Update
@@ -50,7 +50,7 @@
 - Update AssetData|Menu|Select components to show wallet type [#1867](https://github.com/thorchain/asgardex-electron/pull/1867)
 - [Header] Make rune price visible for smaller window sizes [#1880](https://github.com/thorchain/asgardex-electron/pull/1880)
 - [Header] Tooltip to explain VOLUME (24h) [#1885](https://github.com/thorchain/asgardex-electron/pull/1885)
-- [ERC] Update whitelist (incl. icon support for ETH.THOR, ETH.FOX) [#1894](https://github.com/thorchain/asgardex-electron/issues/1894), [#1896](https://github.com/thorchain/asgardex-electron/issues/1896)
+- [ERC20] Update whitelist (incl. icon support for ETH.THOR, ETH.FOX) [#1894](https://github.com/thorchain/asgardex-electron/issues/1894), [#1896](https://github.com/thorchain/asgardex-electron/issues/1896)
 - Use sync mode for broadcasting transactions to THORChain [#1919](https://github.com/thorchain/asgardex-electron/pull/1919)
 
 ## Fix
