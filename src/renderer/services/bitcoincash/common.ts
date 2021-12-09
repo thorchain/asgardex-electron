@@ -17,8 +17,8 @@ import { getPhrase } from '../wallet/util'
 import { ClientState, ClientState$ } from './types'
 
 const HASKOIN_API_URL: ClientUrl = {
-  testnet: envOrDefault(process.env.REACT_APP_HASKOIN_TESTNET_URL, 'https://api.haskoin.com/bchtest'),
-  mainnet: envOrDefault(process.env.REACT_APP_HASKOIN_MAINNET_URL, 'https://api.haskoin.com/bch')
+  testnet: envOrDefault(process.env.REACT_APP_HASKOIN_TESTNET_URL, 'https://haskoin.ninerealms.com/bchtest'),
+  mainnet: envOrDefault(process.env.REACT_APP_HASKOIN_MAINNET_URL, 'https://haskoin.ninerealms.com/bch')
 }
 
 const NODE_URL: ClientUrl = {
