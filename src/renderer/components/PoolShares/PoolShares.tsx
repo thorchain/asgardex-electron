@@ -143,8 +143,8 @@ export const PoolShares: React.FC<Props> = ({
   )
 
   const desktopColumns: ColumnsType<PoolShareTableRowData> = useMemo(
-    () => [iconColumn, poolColumn, ownershipColumn, valueColumn, assetColumn, runeColumn, manageColumn],
-    [iconColumn, poolColumn, ownershipColumn, valueColumn, assetColumn, runeColumn, manageColumn]
+    () => [iconColumn, poolColumn, ownershipColumn, assetColumn, runeColumn, valueColumn, manageColumn],
+    [iconColumn, poolColumn, ownershipColumn, assetColumn, runeColumn, valueColumn, manageColumn]
   )
 
   const mobileColumns: ColumnsType<PoolShareTableRowData> = useMemo(

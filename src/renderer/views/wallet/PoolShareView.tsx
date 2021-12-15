@@ -17,23 +17,24 @@ import { PoolShares as PoolSharesTable } from '../../components/PoolShares'
 import { PoolShareTableRowData } from '../../components/PoolShares/PoolShares.types'
 import { ErrorView } from '../../components/shared/error'
 import { Button } from '../../components/uielements/button'
-import { useAppContext } from '../../contexts/AppContext'
 import { useChainContext } from '../../contexts/ChainContext'
 import { useMidgardContext } from '../../contexts/MidgardContext'
+import { useWalletContext } from '../../contexts/WalletContext'
 import { isThorChain } from '../../helpers/chainHelper'
 import { sequenceTOption } from '../../helpers/fpHelpers'
 import { RUNE_PRICE_POOL } from '../../helpers/poolHelper'
 import { addressFromOptionalWalletAddress, addressFromWalletAddress } from '../../helpers/walletHelper'
 import { useMimirHalt } from '../../hooks/useMimirHalt'
-import { DEFAULT_NETWORK, ENABLED_CHAINS } from '../../services/const'
+import { useNetwork } from '../../hooks/useNetwork'
+import { WalletAddress$ } from '../../services/clients/types'
+import { ENABLED_CHAINS } from '../../services/const'
 import { PoolSharesRD } from '../../services/midgard/types'
 import { getPoolShareTableData } from './PoolShareView.helper'
 
 export const PoolShareView: React.FC = (): JSX.Element => {
   const intl = useIntl()
 
-  const { network$ } = useAppContext()
-  const network = useObservableState<Network>(network$, DEFAULT_NETWORK)
+  const { network } = useNetwork()
 
   const { service: midgardService } = useMidgardContext()
   const {
@@ -41,10 +42,12 @@ export const PoolShareView: React.FC = (): JSX.Element => {
     // @see https://github.com/thorchain/asgardex-electron/issues/1205
     pools: { allPoolDetails$, selectedPricePool$, selectedPricePoolAsset$, reloadAllPools, haltedChains$ },
     reloadNetworkInfo,
-    shares: { combineSharesByAddresses$ }
+    shares: { symSharesByAddresses$ }
   } = midgardService
 
   const { addressByChain$ } = useChainContext()
+
+  const { getLedgerAddress$ } = useWalletContext()
 
   useEffect(() => {
     reloadAllPools()
@@ -56,36 +59,48 @@ export const PoolShareView: React.FC = (): JSX.Element => {
     O.none
   )
 
-  const [poolSharesRD]: [PoolSharesRD, unknown] = useObservableState(
-    () =>
-      FP.pipe(
-        ENABLED_CHAINS,
-        A.filter((chain) => !isThorChain(chain)),
-        A.map(addressByChain$),
-        (addresses) => Rx.combineLatest(addresses),
-        RxOp.switchMap(
-          FP.flow(
-            /**
-             *
-             * At previous step we have Array<O.Option<Address>>.
-             * During the development not every chain address is O.some('stringAddress') but there
-             * might be O.none which so we can not use sequencing here as whole sequence might fail
-             * which is unacceptable. With filterMap(FP.identity) we filter up O.none values and
-             * unwrap values to the plain Array<Address> at a single place
-             */
-            A.filterMap(FP.identity),
-            // grab `address` from `WalletAddress`
-            A.map(addressFromWalletAddress),
-            /**
-             * We have to get a new stake-stream for every new asset
-             * @description /src/renderer/services/midgard/shares.ts
-             */
-            combineSharesByAddresses$
-          )
+  const [symSharesRD]: [PoolSharesRD, unknown] = useObservableState(() => {
+    // keystore addresses
+    const addresses$: WalletAddress$[] = FP.pipe(
+      ENABLED_CHAINS,
+      A.filter((chain) => !isThorChain(chain)),
+      A.map(addressByChain$)
+    )
+
+    // ledger addresses
+    const ledgerAddresses$: WalletAddress$[] = FP.pipe(
+      ENABLED_CHAINS,
+      A.filter((chain) => !isThorChain(chain)),
+      A.map((chain) => getLedgerAddress$(chain, network)),
+      // Transform `LedgerAddress` -> `Option<WalletAddress>`
+      A.map(RxOp.map(RD.toOption))
+    )
+
+    return FP.pipe(
+      Rx.combineLatest([...addresses$, ...ledgerAddresses$]),
+      RxOp.map((v) => v),
+      RxOp.switchMap(
+        FP.flow(
+          /**
+           *
+           * At previous step we have Array<O.Option<Address>>.
+           * During the development not every chain address is O.some('stringAddress') but there
+           * might be O.none which so we can not use sequencing here as whole sequence might fail
+           * which is unacceptable. With filterMap(FP.identity) we filter up O.none values and
+           * unwrap values to the plain Array<Address> at a single place
+           */
+          A.filterMap(FP.identity),
+          // grab `address` from `WalletAddress`
+          A.map(addressFromWalletAddress),
+          /**
+           * We have to get a new stake-stream for every new asset
+           * @description /src/renderer/services/midgard/shares.ts
+           */
+          symSharesByAddresses$
         )
-      ),
-    RD.initial
-  )
+      )
+    )
+  }, RD.initial)
 
   const [haltedChains] = useObservableState(() => FP.pipe(haltedChains$, RxOp.map(RD.getOrElse((): Chain[] => []))), [])
   const { mimirHalt } = useMimirHalt()
@@ -143,7 +158,7 @@ export const PoolShareView: React.FC = (): JSX.Element => {
   return useMemo(
     () =>
       FP.pipe(
-        RD.combine(poolSharesRD, poolDetailsRD),
+        RD.combine(symSharesRD, poolDetailsRD),
         RD.fold(
           // initial state
           () => renderPoolSharesTable([], false),
@@ -165,6 +180,6 @@ export const PoolShareView: React.FC = (): JSX.Element => {
           }
         )
       ),
-    [poolSharesRD, poolDetailsRD, renderPoolSharesTable, renderRefreshBtn, pricePoolData]
+    [symSharesRD, poolDetailsRD, renderPoolSharesTable, renderRefreshBtn, pricePoolData]
   )
 }

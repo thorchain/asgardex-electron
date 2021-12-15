@@ -248,7 +248,7 @@ export const SymDeposit: React.FC<Props> = (props) => {
         color: 'primary'
       }
 
-    if (useRuneLedger) return { text: intl.formatMessage({ id: 'ledger.deposit.oneside' }), color: 'warning' }
+    if (useRuneLedger) return { text: intl.formatMessage({ id: 'ledger.deposit.oneside' }), color: 'primary' }
 
     if (!hasAssetLedger)
       return {
@@ -280,7 +280,7 @@ export const SymDeposit: React.FC<Props> = (props) => {
         color: 'primary'
       }
 
-    if (useAssetLedger) return { text: intl.formatMessage({ id: 'ledger.deposit.oneside' }), color: 'warning' }
+    if (useAssetLedger) return { text: intl.formatMessage({ id: 'ledger.deposit.oneside' }), color: 'primary' }
 
     if (!hasRuneLedger)
       return {
