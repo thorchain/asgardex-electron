@@ -74,6 +74,7 @@ const wallet: WalletMessages = {
   'wallet.password.confirmation.error': 'Le mot de passe est erroné',
   'wallet.password.repeat': 'Répétez le mot de passe',
   'wallet.password.mismatch': 'Non-concordance des mots de passe',
+  'wallet.ledger.confirm': 'Click "next" to sign the transaction on your device. - FR',
   'wallet.upgrade.pending': 'Mise à jour',
   'wallet.upgrade.success': 'Mise à jour réussie',
   'wallet.upgrade.error': 'Échec de la mise à jour',

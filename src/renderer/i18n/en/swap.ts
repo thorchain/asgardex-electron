@@ -20,7 +20,7 @@ const swap: SwapMessages = {
   'swap.note.nowallet': 'Create or import a wallet to swap',
   'swap.errors.asset.missingSourceAsset': 'Missing source asset',
   'swap.errors.asset.missingTargetAsset': 'Missing target asset',
-  'swap.ledger.sign': 'Click next to sign the swap transaction on your device.'
+  'swap.ledger.sign': 'Click "next" to sign the swap transaction on your device.'
 }
 
 export default swap

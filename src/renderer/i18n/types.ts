@@ -181,6 +181,7 @@ type WalletMessageKey =
   | 'wallet.password.confirmation.error'
   | 'wallet.password.repeat'
   | 'wallet.password.mismatch'
+  | 'wallet.ledger.confirm'
   | 'wallet.errors.balancesFailed'
   | 'wallet.errors.asset.notExist'
   | 'wallet.errors.address.empty'
