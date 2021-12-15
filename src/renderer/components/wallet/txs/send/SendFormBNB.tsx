@@ -10,7 +10,8 @@ import {
   AssetBNB,
   assetToBase,
   BaseAmount,
-  baseAmount
+  baseAmount,
+  BNBChain
 } from '@xchainjs/xchain-util'
 import { Row, Form } from 'antd'
 import BigNumber from 'bignumber.js'
@@ -29,7 +30,7 @@ import { FeeRD, SendTxParams } from '../../../../services/chain/types'
 import { AddressValidation, WalletBalances } from '../../../../services/clients'
 import { ValidatePasswordHandler } from '../../../../services/wallet/types'
 import { WalletBalance } from '../../../../services/wallet/types'
-import { WalletPasswordConfirmationModal } from '../../../modal/confirmation'
+import { LedgerConfirmationModal, WalletPasswordConfirmationModal } from '../../../modal/confirmation'
 import { MaxBalanceButton } from '../../../uielements/button/MaxBalanceButton'
 import { UIFeesRD } from '../../../uielements/fees'
 import { Input, InputBigNumber } from '../../../uielements/input'
@@ -179,11 +180,10 @@ export const SendFormBNB: React.FC<Props> = (props): JSX.Element => {
 
   // State for visibility of Modal to confirm tx
   const [showPwModal, setShowPwModal] = useState(false)
+  // Ledger modal state
+  const [showLedgerModal, setShowLedgerModal] = useState(false)
 
   const sendHandler = useCallback(() => {
-    // close PW modal
-    setShowPwModal(false)
-
     onSubmit({
       walletType,
       walletIndex,
@@ -195,18 +195,41 @@ export const SendFormBNB: React.FC<Props> = (props): JSX.Element => {
     })
   }, [onSubmit, walletType, walletAddress, form, balance.asset, amountToSend, walletIndex])
 
+  const onClosePwModal = useCallback(() => {
+    setShowPwModal(false)
+    sendHandler()
+  }, [sendHandler])
+
   const renderPwModal = useMemo(
     () =>
       showPwModal ? (
         <WalletPasswordConfirmationModal
-          onSuccess={sendHandler}
+          onSuccess={onClosePwModal}
           onClose={() => setShowPwModal(false)}
           validatePassword$={validatePassword$}
         />
-      ) : (
-        <></>
-      ),
-    [sendHandler, showPwModal, validatePassword$]
+      ) : null,
+    [onClosePwModal, showPwModal, validatePassword$]
+  )
+
+  const onCloseLedgerModal = useCallback(() => {
+    setShowLedgerModal(false)
+    sendHandler()
+  }, [sendHandler])
+
+  const renderLedgerModal = useMemo(
+    () =>
+      showLedgerModal ? (
+        <LedgerConfirmationModal
+          network={network}
+          onSuccess={onCloseLedgerModal}
+          onClose={() => setShowLedgerModal(false)}
+          visible={showLedgerModal}
+          chain={BNBChain}
+          description={intl.formatMessage({ id: 'wallet.ledger.confirm' })}
+        />
+      ) : null,
+    [intl, network, onCloseLedgerModal, showLedgerModal]
   )
 
   const uiFeesRD: UIFeesRD = useMemo(
@@ -235,9 +258,8 @@ export const SendFormBNB: React.FC<Props> = (props): JSX.Element => {
 
   const onFinishHandler = useCallback(() => {
     if (isKeystoreWallet(walletType)) setShowPwModal(true)
-
-    if (isLedgerWallet(walletType)) sendHandler()
-  }, [sendHandler, walletType])
+    if (isLedgerWallet(walletType)) setShowLedgerModal(true)
+  }, [walletType])
 
   const [recipientAddress, setRecipientAddress] = useState<Address>('')
   const handleOnKeyUp = useCallback(() => {
@@ -296,6 +318,7 @@ export const SendFormBNB: React.FC<Props> = (props): JSX.Element => {
         </Styled.Col>
       </Row>
       {renderPwModal}
+      {renderLedgerModal}
     </>
   )
 }

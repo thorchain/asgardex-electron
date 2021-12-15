@@ -256,7 +256,6 @@ export const SendFormTHOR: React.FC<Props> = (props): JSX.Element => {
 
   const onFinishHandler = useCallback(() => {
     if (isKeystoreWallet(walletType)) setShowPwModal(true)
-
     if (isLedgerWallet(walletType)) setShowLedgerModal(true)
   }, [walletType])
 
