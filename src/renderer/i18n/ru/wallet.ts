@@ -73,6 +73,7 @@ const wallet: WalletMessages = {
   'wallet.password.confirmation.error': 'Неверный пароль',
   'wallet.password.repeat': 'Повторите парроль',
   'wallet.password.mismatch': 'Пароли не совпадают',
+  'wallet.ledger.confirm': 'Click "next" to sign the transaction on your device. - RU',
   'wallet.send.error': 'Ошибка при отправке',
   'wallet.upgrade.pending': 'Обновление',
   'wallet.upgrade.success': 'Успещно обновили',

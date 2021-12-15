@@ -10,7 +10,8 @@ import {
   AssetBNB,
   assetToBase,
   BaseAmount,
-  baseAmount
+  baseAmount,
+  BNBChain
 } from '@xchainjs/xchain-util'
 import { Row, Form } from 'antd'
 import BigNumber from 'bignumber.js'
@@ -29,7 +30,7 @@ import { FeeRD, SendTxParams } from '../../../../services/chain/types'
 import { AddressValidation, WalletBalances } from '../../../../services/clients'
 import { ValidatePasswordHandler } from '../../../../services/wallet/types'
 import { WalletBalance } from '../../../../services/wallet/types'
-import { WalletPasswordConfirmationModal } from '../../../modal/confirmation'
+import { LedgerConfirmationModal, WalletPasswordConfirmationModal } from '../../../modal/confirmation'
 import { MaxBalanceButton } from '../../../uielements/button/MaxBalanceButton'
 import { UIFeesRD } from '../../../uielements/fees'
 import { Input, InputBigNumber } from '../../../uielements/input'
@@ -177,13 +178,9 @@ export const SendFormBNB: React.FC<Props> = (props): JSX.Element => {
     [balance, intl, maxAmount]
   )
 
-  // State for visibility of Modal to confirm tx
-  const [showPwModal, setShowPwModal] = useState(false)
+  const [showConfirmationModal, setShowConfirmationModal] = useState(false)
 
   const sendHandler = useCallback(() => {
-    // close PW modal
-    setShowPwModal(false)
-
     onSubmit({
       walletType,
       walletIndex,
@@ -195,19 +192,38 @@ export const SendFormBNB: React.FC<Props> = (props): JSX.Element => {
     })
   }, [onSubmit, walletType, walletAddress, form, balance.asset, amountToSend, walletIndex])
 
-  const renderPwModal = useMemo(
-    () =>
-      showPwModal ? (
+  const renderConfirmationModal = useMemo(() => {
+    const onSuccessHandler = () => {
+      setShowConfirmationModal(false)
+      sendHandler()
+    }
+    const onCloseHandler = () => {
+      setShowConfirmationModal(false)
+    }
+
+    if (isLedgerWallet(walletType)) {
+      return (
+        <LedgerConfirmationModal
+          network={network}
+          onSuccess={onSuccessHandler}
+          onClose={onCloseHandler}
+          visible={showConfirmationModal}
+          chain={BNBChain}
+          description={intl.formatMessage({ id: 'wallet.ledger.confirm' })}
+        />
+      )
+    } else if (isKeystoreWallet(walletType)) {
+      return (
         <WalletPasswordConfirmationModal
-          onSuccess={sendHandler}
-          onClose={() => setShowPwModal(false)}
+          onSuccess={onSuccessHandler}
+          onClose={onCloseHandler}
           validatePassword$={validatePassword$}
         />
-      ) : (
-        <></>
-      ),
-    [sendHandler, showPwModal, validatePassword$]
-  )
+      )
+    } else {
+      return null
+    }
+  }, [intl, network, sendHandler, showConfirmationModal, validatePassword$, walletType])
 
   const uiFeesRD: UIFeesRD = useMemo(
     () =>
@@ -233,12 +249,6 @@ export const SendFormBNB: React.FC<Props> = (props): JSX.Element => {
 
   const addMaxAmountHandler = useCallback(() => setAmountToSend(maxAmount), [maxAmount])
 
-  const onFinishHandler = useCallback(() => {
-    if (isKeystoreWallet(walletType)) setShowPwModal(true)
-
-    if (isLedgerWallet(walletType)) sendHandler()
-  }, [sendHandler, walletType])
-
   const [recipientAddress, setRecipientAddress] = useState<Address>('')
   const handleOnKeyUp = useCallback(() => {
     setRecipientAddress(form.getFieldValue('recipient'))
@@ -261,7 +271,11 @@ export const SendFormBNB: React.FC<Props> = (props): JSX.Element => {
             walletBalances={balances}
             network={network}
           />
-          <Styled.Form form={form} initialValues={{ amount: bn(0) }} onFinish={onFinishHandler} labelCol={{ span: 24 }}>
+          <Styled.Form
+            form={form}
+            initialValues={{ amount: bn(0) }}
+            onFinish={() => setShowConfirmationModal(true)}
+            labelCol={{ span: 24 }}>
             <Styled.SubForm>
               <Styled.CustomLabel size="big">
                 {intl.formatMessage({ id: 'common.address' })}
@@ -295,7 +309,7 @@ export const SendFormBNB: React.FC<Props> = (props): JSX.Element => {
           </Styled.Form>
         </Styled.Col>
       </Row>
-      {renderPwModal}
+      {showConfirmationModal && renderConfirmationModal}
     </>
   )
 }
