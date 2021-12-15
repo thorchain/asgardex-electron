@@ -177,10 +177,7 @@ export const SendFormTHOR: React.FC<Props> = (props): JSX.Element => {
     [balance, intl, maxAmount]
   )
 
-  // State for visibility of Modal to confirm tx
-  const [showPwModal, setShowPwModal] = useState(false)
-  // Ledger modal state
-  const [showLedgerModal, setShowLedgerModal] = useState(false)
+  const [showConfirmationModal, setShowConfirmationModal] = useState(false)
 
   const sendHandler = useCallback(() => {
     onSubmit({
@@ -193,42 +190,38 @@ export const SendFormTHOR: React.FC<Props> = (props): JSX.Element => {
     })
   }, [onSubmit, form, balance.asset, amountToSend, walletType, walletIndex])
 
-  const onClosePwModal = useCallback(() => {
-    setShowPwModal(false)
-    sendHandler()
-  }, [sendHandler])
+  const renderConfirmationModal = useMemo(() => {
+    const onSuccessHandler = () => {
+      setShowConfirmationModal(false)
+      sendHandler()
+    }
+    const onCloseHandler = () => {
+      setShowConfirmationModal(false)
+    }
 
-  const renderPwModal = useMemo(
-    () =>
-      showPwModal ? (
+    if (isKeystoreWallet(walletType)) {
+      return (
         <WalletPasswordConfirmationModal
-          onSuccess={onClosePwModal}
-          onClose={() => setShowPwModal(false)}
+          onSuccess={onSuccessHandler}
+          onClose={onCloseHandler}
           validatePassword$={validatePassword$}
         />
-      ) : null,
-    [onClosePwModal, showPwModal, validatePassword$]
-  )
-
-  const onCloseLedgerModal = useCallback(() => {
-    setShowLedgerModal(false)
-    sendHandler()
-  }, [sendHandler])
-
-  const renderLedgerModal = useMemo(
-    () =>
-      showLedgerModal ? (
+      )
+    } else if (isLedgerWallet(walletType)) {
+      return (
         <LedgerConfirmationModal
           network={network}
-          onSuccess={onCloseLedgerModal}
-          onClose={() => setShowLedgerModal(false)}
-          visible={showLedgerModal}
+          onSuccess={onSuccessHandler}
+          onClose={onCloseHandler}
+          visible={showConfirmationModal}
           chain={THORChain}
           description={intl.formatMessage({ id: 'wallet.ledger.confirm' })}
         />
-      ) : null,
-    [intl, network, onCloseLedgerModal, showLedgerModal]
-  )
+      )
+    } else {
+      return null
+    }
+  }, [intl, network, sendHandler, showConfirmationModal, validatePassword$, walletType])
 
   const uiFeesRD: UIFeesRD = useMemo(
     () =>
@@ -254,11 +247,6 @@ export const SendFormTHOR: React.FC<Props> = (props): JSX.Element => {
 
   const addMaxAmountHandler = useCallback(() => setAmountToSend(maxAmount), [maxAmount])
 
-  const onFinishHandler = useCallback(() => {
-    if (isKeystoreWallet(walletType)) setShowPwModal(true)
-    if (isLedgerWallet(walletType)) setShowLedgerModal(true)
-  }, [walletType])
-
   const [recipientAddress, setRecipientAddress] = useState<Address>('')
   const handleOnKeyUp = useCallback(() => {
     setRecipientAddress(form.getFieldValue('recipient'))
@@ -281,7 +269,11 @@ export const SendFormTHOR: React.FC<Props> = (props): JSX.Element => {
             walletBalances={balances}
             network={network}
           />
-          <Styled.Form form={form} initialValues={{ amount: bn(0) }} onFinish={onFinishHandler} labelCol={{ span: 24 }}>
+          <Styled.Form
+            form={form}
+            initialValues={{ amount: bn(0) }}
+            onFinish={() => setShowConfirmationModal(true)}
+            labelCol={{ span: 24 }}>
             <Styled.SubForm>
               <Styled.CustomLabel size="big">
                 {intl.formatMessage({ id: 'common.address' })}
@@ -321,8 +313,7 @@ export const SendFormTHOR: React.FC<Props> = (props): JSX.Element => {
           </Styled.Form>
         </Styled.Col>
       </Row>
-      {renderPwModal}
-      {renderLedgerModal}
+      {showConfirmationModal && renderConfirmationModal}
     </>
   )
 }
