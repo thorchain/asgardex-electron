@@ -17,6 +17,7 @@
 - Pimp Ledger confirmation modal [#1941](https://github.com/thorchain/asgardex-electron/pull/1941)
 - Update FR translation by @Weyland2093 [#1972](https://github.com/thorchain/asgardex-electron/pull/1972)
 - Switch to haskoin.ninerealms.com [#1974](https://github.com/thorchain/asgardex-electron/issues/1974)
+- [Send] Show Ledger modal [#1979](https://github.com/thorchain/asgardex-electron/pull/1979)
 
 ## Remove
 
