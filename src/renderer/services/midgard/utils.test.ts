@@ -48,7 +48,8 @@ import {
   getPoolAssetDetail,
   getPoolAssetsDetail,
   inboundToPoolAddresses,
-  getGasRateByChain
+  getGasRateByChain,
+  getSymSharesByAddress
 } from './utils'
 
 describe('services/midgard/utils/', () => {
@@ -425,6 +426,27 @@ describe('services/midgard/utils/', () => {
           FP.pipe(
             oResult,
             O.map((result) => eqPoolShare.equals(result, bnbShares2)),
+            O.getOrElse(() => false)
+          )
+        ).toBeTruthy()
+      })
+    })
+
+    describe('getSymSharesByAddress', () => {
+      it('returns none for empty list', () => {
+        expect(getSymSharesByAddress([], BNB_ADDRESS_TESTNET)).toBeNone()
+      })
+
+      it('returns none for non existing address', () => {
+        expect(getSymSharesByAddress(shares, 'unknown-address')).toBeNone()
+      })
+
+      it('gets shares of BNB pools', () => {
+        const oResult = getSymSharesByAddress(shares, BNB_ADDRESS_TESTNET)
+        expect(
+          FP.pipe(
+            oResult,
+            O.map((result) => eqPoolShare.equals(result, bnbShares1)),
             O.getOrElse(() => false)
           )
         ).toBeTruthy()

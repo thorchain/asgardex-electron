@@ -1,5 +1,6 @@
 import * as RD from '@devexperts/remote-data-ts'
 import { PoolData } from '@thorchain/asgardex-util'
+import { Address } from '@xchainjs/xchain-client'
 import {
   assetFromString,
   bnOrZero,
@@ -19,7 +20,7 @@ import * as O from 'fp-ts/lib/Option'
 
 import { isUSDAsset, THORCHAIN_DECIMAL } from '../../helpers/assetHelper'
 import { isMiniToken } from '../../helpers/binanceHelper'
-import { eqAsset, eqChain } from '../../helpers/fp/eq'
+import { eqAsset, eqChain, eqOAddress } from '../../helpers/fp/eq'
 import { optionFromNullableString } from '../../helpers/fp/from'
 import { ordPricePool } from '../../helpers/fp/ord'
 import { getDeepestPool, RUNE_POOL_ADDRESS, RUNE_PRICE_POOL } from '../../helpers/poolHelper'
@@ -284,6 +285,19 @@ export const getSharesByAssetAndType = ({
   FP.pipe(
     shares,
     A.filter(({ asset: sharesAsset, type: sharesType }) => eqAsset.equals(asset, sharesAsset) && type === sharesType),
+    A.head
+  )
+
+/**
+ * Filters `sym` `Poolshare`'s by given asset `Address`
+ */
+export const getSymSharesByAddress = (shares: PoolShares, assetAddress: Address): O.Option<PoolShare> =>
+  FP.pipe(
+    shares,
+    A.filter(
+      ({ type, assetAddress: oAssetAddress }) =>
+        eqOAddress.equals(oAssetAddress, O.some(assetAddress)) && type === 'sym'
+    ),
     A.head
   )
 

@@ -14,7 +14,7 @@ import { triggerStream, observableState } from '../../helpers/stateHelper'
 import { MemberPool } from '../../types/generated/midgard'
 import { DefaultApi } from '../../types/generated/midgard/apis'
 import { PoolShare, PoolShareLD, PoolSharesLD } from './types'
-import { combineShares, combineSharesByAsset, getSharesByAssetAndType } from './utils'
+import { combineShares, combineSharesByAsset, getSharesByAssetAndType, getSymSharesByAddress } from './utils'
 
 const createSharesService = (
   byzantine$: LiveData<Error, string>,
@@ -111,6 +111,14 @@ const createSharesService = (
     shares$(address).pipe(liveData.map((shares) => getSharesByAssetAndType({ shares, asset, type: 'sym' })))
 
   /**
+   * `sym` share by given `Asset` address
+   *
+   * @param assetAddress Asset address
+   */
+  const symShareByAddress$ = (assetAddress: Address): PoolShareLD =>
+    shares$(assetAddress).pipe(liveData.map((shares) => getSymSharesByAddress(shares, assetAddress)))
+
+  /**
    * `asym` `Poolshare` of an `Asset`
    *
    * @param address
@@ -138,6 +146,20 @@ const createSharesService = (
   const loadCombineSharesByAddresses$ = (addresses: Address[]): PoolSharesLD =>
     FP.pipe(addresses, A.map(combineShares$), liveData.sequenceArray, liveData.map(A.flatten))
 
+  // `TriggerStream` to reload `symSharesByAddresses`
+  const { stream$: reloadSymSharesByAddresses$, trigger: reloadSymSharesByAddresses } = triggerStream()
+
+  // Loads sym. `PoolShare`'s by given addresses
+  const loadSymSharesByAddresses$ = (addresses: Address[]): PoolSharesLD =>
+    FP.pipe(addresses, A.map(symShareByAddress$), liveData.sequenceArray, liveData.map(A.filterMap(FP.identity)))
+
+  const symSharesByAddresses$ = (addresses: Address[]) =>
+    FP.pipe(
+      reloadSymSharesByAddresses$,
+      RxOp.debounceTime(300),
+      RxOp.switchMap(() => loadSymSharesByAddresses$(addresses))
+    )
+
   /**
    * Loads `PoolShare`'s by given `Address`es
    * and combines 'asym` + `sym` `Poolshare`'s into a single `Poolshare`
@@ -159,7 +181,9 @@ const createSharesService = (
     combineShares$,
     combineSharesByAsset$,
     combineSharesByAddresses$,
-    reloadCombineSharesByAddresses
+    reloadCombineSharesByAddresses,
+    symSharesByAddresses$,
+    reloadSymSharesByAddresses
   }
 }
 
