@@ -29,6 +29,7 @@
 - Fix Tooltip styles [#1944](https://github.com/thorchain/asgardex-electron/pull/1944)
 - [Swap] Limits added to memo needs to be 1e8 [#1946](https://github.com/thorchain/asgardex-electron/issues/1946)
 - [PoolShare] Don't combine `asym` with `sym` shares in PoolShare [#1964](https://github.com/thorchain/asgardex-electron/pull/1964)
+- [Send] Fix max value for sending ETH [#1978](https://github.com/thorchain/asgardex-electron/pull/1978)
 
 ## Internal
 

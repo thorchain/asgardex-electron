@@ -169,7 +169,12 @@ export const SendFormETH: React.FC<Props> = (props): JSX.Element => {
   )
 
   const renderFeeOptions = useMemo(() => {
-    const onChangeHandler = (e: RadioChangeEvent) => setSelectedFeeOption(e.target.value)
+    const onChangeHandler = (e: RadioChangeEvent) => {
+      // Change amount back to `none` (ZERO) whenever selected fee is changed
+      // Just to avoid using a previous `max` value, which can be invalid now
+      setAmountToSend(O.none)
+      setSelectedFeeOption(e.target.value)
+    }
     const disabled = !feesAvailable || isLoading
 
     return (
@@ -216,13 +221,19 @@ export const SendFormETH: React.FC<Props> = (props): JSX.Element => {
   }, [selectedFee, oEthAmount, balance])
 
   useEffect(() => {
-    // Whenever `amountToSend` has been updated, we put it back into input field
     FP.pipe(
       amountToSend,
-      O.map((amount) =>
-        form.setFieldsValue({
-          amount: baseToAsset(amount).amount()
-        })
+      O.fold(
+        // reset value to ZERO whenever amount is not set
+        () =>
+          form.setFieldsValue({
+            amount: ZERO_BN
+          }),
+        // Whenever `amountToSend` has been updated, we put it back into input field
+        (amount) =>
+          form.setFieldsValue({
+            amount: baseToAsset(amount).amount()
+          })
       )
     )
   }, [amountToSend, form])
