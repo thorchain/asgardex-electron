@@ -1,4 +1,4 @@
-# 0.6.0 (2021-XX-XX)
+# 0.6.0 (2021-12-16)
 
 ## Add
 
@@ -36,6 +36,7 @@
 ## Internal
 
 - Test latest `eq` helpers [#1943](https://github.com/thorchain/asgardex-electron/pull/1943)
+- Update misc. dependencies as part of preparing v0.6.0 [#1982](https://github.com/thorchain/asgardex-electron/pull/1982)
 
 # 0.5.0 (2021-10-31)
 

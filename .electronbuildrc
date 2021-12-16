@@ -10,7 +10,7 @@
     "output": "release"
   },
   "mac": {
-    "target": ["dmg", "zip"],
+    "target": ["dmg"],
     "category": "public.app-category.finance",
     "hardenedRuntime": true,
     "gatekeeperAssess": false,
