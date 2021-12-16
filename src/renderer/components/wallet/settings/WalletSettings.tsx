@@ -174,22 +174,25 @@ export const WalletSettings: React.FC<Props> = (props): JSX.Element => {
                       onClick={() => setShowQRModal(O.some({ asset: getChainAsset(chain), address }))}
                     />
                     <Styled.AddressLinkIcon onClick={() => clickAddressLinkHandler(chain, address)} />
-                  </Styled.AddressWrapper>
-                  {isLedgerWallet(walletType) && (
-                    <Styled.EyeOutlined
-                      onClick={() => {
-                        setAddressToVerify(
-                          O.some({
-                            address,
-                            chain
-                          })
-                        )
-                        verifyLedgerAddress(chain, walletIndex)
-                      }}
-                    />
-                  )}
 
-                  {isLedgerWallet(walletType) && <Styled.RemoveLedgerIcon onClick={() => removeLedgerAddress(chain)} />}
+                    {isLedgerWallet(walletType) && (
+                      <Styled.EyeOutlined
+                        onClick={() => {
+                          setAddressToVerify(
+                            O.some({
+                              address,
+                              chain
+                            })
+                          )
+                          verifyLedgerAddress(chain, walletIndex)
+                        }}
+                      />
+                    )}
+
+                    {isLedgerWallet(walletType) && (
+                      <Styled.RemoveLedgerIcon onClick={() => removeLedgerAddress(chain)} />
+                    )}
+                  </Styled.AddressWrapper>
                 </>
               )
             )
