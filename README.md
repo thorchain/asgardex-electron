@@ -30,7 +30,7 @@ _(in alphabetical order)_
 
 ## Install
 
-It's recommended to use a Node version as same as Electron is running with (currently: [`Electron v13.1.4` / Node `14.17`](https://github.com/electron/releases#releases))
+It's recommended to use a Node version as same as Electron is running with (currently: [`Electron v16.x` / Node `16.5.0`](https://github.com/electron/releases#releases))
 
 ```bash
 git clone https://github.com/thorchain/asgardex-electron.git asgardex
@@ -242,11 +242,11 @@ See the [docs and guides here](https://docs.thorchain.org)
 
 ## Contributing
 
-Please see the Contributing Guidelines here (_coming soon_).
+Everyone is welcome to contribute. Check [open issues](https://github.com/thorchain/asgardex-electron/issues) or create a new one to start your work and open a PR. Newcomers might want to check issues labeled as [good first issues](https://github.com/thorchain/asgardex-electron/labels/good%20first%20issue).
 
 ## Bug Reports
 
-Please see the Bug Report Process here (_coming soon_).
+Please use [bug report template](https://github.com/thorchain/asgardex-electron/issues/new?assignees=&labels=bug&template=2-Bug_report.md) to file any bugs.
 
 ## License
 
