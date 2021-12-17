@@ -4,11 +4,9 @@ For development ASGARDEX we follow [OneFlow approach](https://www.endoflineblog.
 
 ## TL;DR
 
-- Based on [OneFlow (Variation – develop + master)](https://www.endoflineblog.com/oneflow-a-git-branching-model-and-workflow#variation-develop-master)
 - `develop` branch for development
-- `master` includes always latest stable production build by fast-forwarding to tags of latest release or latest hotfix.
-- `release/{version}` branches are created from `develop`. It will be finalized by creating a new tag (semver based). (Possible) changes are merged back into `develop`. `master` will be fast-forwarded to this tag.
-- `hotfix/{version}` branches are created from `master` or from latest tag. It will be finalized by creating a new tag (semver based). Changes are merged back into `develop`. `master` will be fast-forwarded to this tag.
+- `release/{version}` branches are created from `develop`. It will be finalized by creating a new tag (semver based). Changes are merged back into `develop`.
+- `hotfix/{version}` branches are created from latest tag. It will be finalized by creating a new tag (semver based). Changes are merged back into `develop`.
 - Naming conventions for branches (`release/{version}` or `hotfix/{version}`) are important! These are needed to trigger actions for Electron builds (defined in `.github/workflows/build.yml`).
 
 ## Development
@@ -74,32 +72,11 @@ git branch -D release/v.0.0.5
 git push origin --delete release/v.0.0.5
 ```
 
-### Update `master` branch
-
-Update master by fast-forwarding to the latest tag
-
-Example:
-
-```
-git fetch
-git checkout master
-git merge --ff-only v0.0.5
-git push
-```
-
 ## Hotfix
 
 ### Create `hotfix` branch
 
-To create a hotfix branch (name it `hotfix/{version}`, checkout master (which always based on latest tag).
-
-Example:
-
-```
-git checkout -b hotfix/0.0.6 master
-```
-
-Or checkout latest tag.
+To create a hotfix branch (name it `hotfix/{version}`, checkout from latest `tag`.
 
 Example:
 
@@ -120,17 +97,4 @@ $ git checkout hotfix/0.0.6
 $ git checkout develop
 $ git merge --squash hotfix/0.0.6
 $ git branch -d hotfix/2.3.1
-```
-
-### Update `master` branch
-
-Update master by fast-forwarding to the latest tag
-
-Example:
-
-```
-git fetch
-git checkout master
-git merge --ff-only v0.0.6
-git push
 ```
