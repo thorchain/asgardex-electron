@@ -10,7 +10,7 @@ import IPCMessages from '../ipc/messages'
 export const registerAppCheckUpdatedHandler = (isDev = false) => {
   // Disable autoDownload
   autoUpdater.autoDownload = false
-  autoUpdater.allowPrerelease = true
+  autoUpdater.allowPrerelease = false
 
   if (isDev) {
     autoUpdater.logger = {
