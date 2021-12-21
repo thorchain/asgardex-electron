@@ -28,9 +28,10 @@ const EXTERNALS_WHITELIST = [
   'viewblock.io',
   'midgard.thorchain.info',
   'testnet.midgard.thorchain.info',
+  'stagenet.midgard.ninerealms.capital',
   'thornode.thorchain.info',
   'testnet.thornode.thorchain.info',
-  'https://stagenet-thornode.ninerealms.com'
+  'stagenet-thornode.ninerealms.com'
 ]
 
 const openExternal = (target: string) => {
