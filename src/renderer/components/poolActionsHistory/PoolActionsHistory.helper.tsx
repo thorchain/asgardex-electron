@@ -63,7 +63,7 @@ export const renderDate = (date: Date) => (
   </Styled.DateContainer>
 )
 
-export const getRowKey: GetRowKey<Action> = (action, index) =>
+export const getRowKey: GetRowKey<Action> = (action, index = Math.random()) =>
   FP.pipe(
     action,
     getTxId,
