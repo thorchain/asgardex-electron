@@ -14,6 +14,13 @@ module.exports = {
       // support hot reload of hooks
       webpackConfig.resolve.alias['react-dom'] = '@hot-loader/react-dom'
 
+      webpackConfig.resolve.fallback = {
+        stream: require.resolve('stream-browserify'),
+        crypto: require.resolve('crypto-browserify'),
+        os: require.resolve('os-browserify/browser'),
+        path: require.resolve('path-browserify')
+      }
+
       webpackConfig.optimization.minimizer = [
         // TerserPlugin
         // https://webpack.js.org/plugins/terser-webpack-plugin/#exclude
@@ -69,13 +76,24 @@ module.exports = {
           }
         })
       ]
-      return webpackConfig
+      return {
+        ...webpackConfig,
+        // Ignore invalid pathes to source maps (warning appears by introducing CRA 5)
+        // https://github.com/ant-design/ant-design/issues/33327#issuecomment-996482057
+        ignoreWarnings: [/Failed to parse source map/]
+      }
     },
     plugins: [
       new webpack.DefinePlugin({
         $COMMIT_HASH: JSON.stringify(new GitRevisionPlugin().commithash()),
         $VERSION: JSON.stringify(version),
         $IS_DEV: JSON.stringify(process.env.NODE_ENV !== 'production')
+      }),
+      new webpack.ProvidePlugin({
+        // fix `process` is not defined" error
+        process: 'process/browser',
+        // fix `Buffer` is not defined" error
+        Buffer: ['buffer', 'Buffer']
       })
     ]
   },

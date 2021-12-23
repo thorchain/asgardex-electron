@@ -9,7 +9,12 @@ const common = (_ /* env */, argv) => ({
   },
   devtool: argv.mode === 'production' ? false : 'source-map',
   resolve: {
-    extensions: ['.ts', '.js']
+    extensions: ['.ts', '.js'],
+    fallback: {
+      stream: require.resolve('stream-browserify'),
+      crypto: require.resolve('crypto-browserify'),
+      os: require.resolve('os-browserify/browser')
+    }
   },
   module: {
     rules: [

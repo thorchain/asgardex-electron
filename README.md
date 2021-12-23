@@ -100,6 +100,36 @@ REACT_APP_CHAINS_ENABLED=THOR,BNB,BTC,ETH,LTC
 
 Note: String of chains have to be as same as [definitions in xchain-util](https://github.com/xchainjs/xchainjs-lib/blob/master/packages/xchain-util/src/chain.const.ts)
 
+### How to fix build error: "Could not detect abi for version x.x.x and runtime electron."
+
+#### Example:
+
+```bash
+build native dependency from sources  name=usb-detection
+                                          version=4.13.0
+                                          platform=linux
+                                          arch=x64
+                                          napi=
+                                          reason=prebuild-install failed with error (run with env DEBUG=electron-builder to get more information)
+                                          error=asgardex-electron/node_modules/node-abi/index.js:36
+      throw new Error('Could not detect abi for version ' + target + ' and runtime ' + runtime + '.  Updating "node-abi" might help solve this issue if it is a new release of ' + runtime)
+      ^
+
+    Error: Could not detect abi for version 16.0.5 and runtime electron.  Updating "node-abi" might help solve this issue if it is a new release of electron
+
+```
+
+#### Fix
+
+- Remove `prebuild-install` and rebuilt native binaries again as follow:
+
+```bash
+rm -rf ./node_modules/prebuild-install
+yarn postinstall
+```
+
+(^ workaround based on https://github.com/electron-userland/electron-builder/issues/6352#issuecomment-951156910)
+
 ## Tests
 
 ### `unit`

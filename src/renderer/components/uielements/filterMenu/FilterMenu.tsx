@@ -19,6 +19,7 @@ type Props<T> = {
   closeMenu?: () => void
 }
 
+// eslint-disable-next-line @typescript-eslint/no-unnecessary-type-constraint
 export const FilterMenu = <T extends unknown>(props: Props<T>): JSX.Element => {
   const {
     onSelect = (_) => {},

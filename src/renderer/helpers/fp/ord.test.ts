@@ -3,8 +3,9 @@ import { bn, baseAmount, AssetBTC, AssetRuneNative, AssetBNB, AssetETH } from '@
 
 import { ASSETS_TESTNET } from '../../../shared/mock/assets'
 import { AssetUSDC, ZERO_BASE_AMOUNT } from '../../const'
-import { WalletBalance } from '../../types/wallet'
+import { WalletBalance } from '../../services/wallet/types'
 import { PricePool } from '../../views/pools/Pools.types'
+import { mockWalletBalance } from '../test/testWalletHelper'
 import { ordBigNumber, ordBaseAmount, ordAsset, ordWalletBalanceByAsset, ordPricePool } from './ord'
 
 describe('helpers/fp/ord', () => {
@@ -39,20 +40,14 @@ describe('helpers/fp/ord', () => {
     })
   })
   describe('ordWalletBalanceByAsset', () => {
-    const a: WalletBalance = {
-      walletType: 'keystore',
-      amount: baseAmount('1'),
-      asset: AssetRuneNative,
-      walletAddress: ''
-    }
-    const b: WalletBalance = {
-      ...a,
+    const a: WalletBalance = mockWalletBalance()
+    const b: WalletBalance = mockWalletBalance({
       asset: AssetBNB
-    }
-    const c: WalletBalance = {
-      ...a,
+    })
+    const c: WalletBalance = mockWalletBalance({
       asset: ASSETS_TESTNET.BOLT
-    }
+    })
+
     it('is less', () => {
       expect(ordWalletBalanceByAsset.compare(a, b)).toEqual(1)
     })
