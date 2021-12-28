@@ -35,8 +35,7 @@ import {
   ChainBalance,
   GetLedgerAddressHandler
 } from './types'
-import { sortBalances } from './util'
-import { hasImportedKeystore } from './util'
+import { sortBalances, hasImportedKeystore } from './util'
 
 export const createBalancesService = ({
   keystore$,

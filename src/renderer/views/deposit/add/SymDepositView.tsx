@@ -7,7 +7,7 @@ import * as FP from 'fp-ts/function'
 import * as O from 'fp-ts/lib/Option'
 import { useObservableState } from 'observable-hooks'
 import { useIntl } from 'react-intl'
-import { useHistory } from 'react-router'
+import { useHistory } from 'react-router-dom'
 import * as RxOp from 'rxjs/operators'
 
 import { SymDeposit } from '../../../components/deposit/add'

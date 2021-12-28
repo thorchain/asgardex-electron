@@ -9,8 +9,7 @@ import * as RxOp from 'rxjs/operators'
 import { observableState } from '../../helpers/stateHelper'
 import { Memo } from '../chain/types'
 import * as C from '../clients'
-import { Client$, FeesWithRatesRD } from './types'
-import { FeesService, FeesWithRatesLD } from './types'
+import { Client$, FeesWithRatesRD, FeesService, FeesWithRatesLD } from './types'
 
 export const createFeesService = (client$: Client$): FeesService => {
   const baseFeesService = C.createFeesService({ client$, chain: BTCChain })

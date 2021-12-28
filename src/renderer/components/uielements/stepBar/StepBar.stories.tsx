@@ -1,7 +1,6 @@
 import React from 'react'
 
-import { Meta, Story } from '@storybook/react'
-import { storiesOf } from '@storybook/react'
+import { Meta, Story, storiesOf } from '@storybook/react'
 
 import { StepBar, Props as StepBarProps } from './index'
 

@@ -3,7 +3,7 @@ import React, { useCallback } from 'react'
 import { PlusOutlined } from '@ant-design/icons'
 import { Asset, assetToString } from '@xchainjs/xchain-util'
 import { useIntl } from 'react-intl'
-import { useHistory } from 'react-router'
+import { useHistory } from 'react-router-dom'
 
 import * as poolsRoutes from '../../routes/pools'
 import { Button, ButtonSize } from '../uielements/button'

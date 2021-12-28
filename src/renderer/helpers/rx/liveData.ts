@@ -1,5 +1,4 @@
 import * as RD from '@devexperts/remote-data-ts'
-import { instanceObservable } from '@devexperts/rx-utils/dist/observable.utils'
 import { getLiveDataM } from '@devexperts/utils/dist/adt/live-data.utils'
 import { FoldableValue2 } from '@devexperts/utils/dist/typeclasses/foldable-value/foldable-value'
 import {
@@ -14,6 +13,8 @@ import { pipeable } from 'fp-ts/lib/pipeable'
 import * as O from 'fp-ts/Option'
 import * as Rx from 'rxjs'
 import * as RxOp from 'rxjs/operators'
+
+import { instanceObservable } from './observable-utils'
 
 export type LiveData<E, A> = Rx.Observable<RD.RemoteData<E, A>>
 

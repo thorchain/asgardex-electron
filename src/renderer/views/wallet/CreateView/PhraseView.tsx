@@ -1,6 +1,6 @@
 import React from 'react'
 
-import { Redirect, Route, RouteComponentProps, Switch, useHistory } from 'react-router'
+import { Redirect, Route, RouteComponentProps, Switch, useHistory } from 'react-router-dom'
 
 import { NewPhraseConfirm, NewPhraseGenerate } from '../../../components/wallet/phrase'
 import { PhraseInfo } from '../../../components/wallet/phrase/Phrase.types'

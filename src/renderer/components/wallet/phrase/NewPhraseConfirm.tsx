@@ -4,7 +4,7 @@ import { DeleteOutlined, RedoOutlined } from '@ant-design/icons'
 import { Col, Row, Button as AButton } from 'antd'
 import shuffleArray from 'lodash.shuffle'
 import { useIntl } from 'react-intl'
-import { useHistory } from 'react-router'
+import { useHistory } from 'react-router-dom'
 import { v4 as uuidv4 } from 'uuid'
 
 import { isSelectedFactory, sortedSelected } from '../../../helpers/array'

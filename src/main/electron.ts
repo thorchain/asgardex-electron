@@ -5,8 +5,7 @@ import { BrowserWindow, app, ipcMain, nativeImage } from 'electron'
 import electronDebug from 'electron-debug'
 // import installExtension, { REACT_DEVELOPER_TOOLS } from 'electron-devtools-installer'
 import isDev from 'electron-is-dev'
-import log from 'electron-log'
-import { warn } from 'electron-log'
+import log, { warn } from 'electron-log'
 import windowStateKeeper from 'electron-window-state'
 import * as E from 'fp-ts/lib/Either'
 import * as FP from 'fp-ts/lib/function'
@@ -60,34 +59,6 @@ electronDebug({ isEnabled: IS_DEV })
 
 let mainWindow: BrowserWindow | null = null
 
-const activateHandler = () => {
-  if (mainWindow === null) {
-    initMainWindow()
-  }
-}
-
-const allClosedHandler = () => {
-  if (process.platform !== 'darwin') {
-    app.quit()
-  }
-}
-
-const closeHandler = () => {
-  mainWindow = null
-}
-
-const setupDevEnv = async () => {
-  try {
-    // Disable `REACT_DEVELOPER_TOOLS` temporary
-    // It causes issues by using latest CRA 4
-    // https://github.com/facebook/create-react-app/issues/9893
-    // // TODO (@Veado / @ThatStrangeGuy) Bring it back once CRA 4 has been fixed
-    // await installExtension(REACT_DEVELOPER_TOOLS)
-  } catch (e) {
-    warn('unable to install devtools', e)
-  }
-}
-
 const initMainWindow = async () => {
   const mainWindowState = windowStateKeeper({
     defaultWidth: IS_DEV ? 1600 : 1200,
@@ -113,6 +84,22 @@ const initMainWindow = async () => {
       preload: join(__dirname, IS_DEV ? '../../public/' : '../build/', 'preload.js')
     }
   })
+
+  const closeHandler = () => {
+    mainWindow = null
+  }
+
+  const setupDevEnv = async () => {
+    try {
+      // Disable `REACT_DEVELOPER_TOOLS` temporary
+      // It causes issues by using latest CRA 4
+      // https://github.com/facebook/create-react-app/issues/9893
+      // // TODO (@Veado / @ThatStrangeGuy) Bring it back once CRA 4 has been fixed
+      // await installExtension(REACT_DEVELOPER_TOOLS)
+    } catch (e) {
+      warn('unable to install devtools', e)
+    }
+  }
 
   if (IS_DEV) {
     await setupDevEnv()
@@ -170,6 +157,18 @@ const initIPC = () => {
   Object.entries(DEFAULT_STORAGES).forEach(([name, defaultValue]) => {
     getFileStoreService(name as StoreFileName, defaultValue).registerIpcHandlersMain()
   })
+}
+
+const activateHandler = () => {
+  if (mainWindow === null) {
+    initMainWindow()
+  }
+}
+
+const allClosedHandler = () => {
+  if (process.platform !== 'darwin') {
+    app.quit()
+  }
 }
 
 const init = async () => {

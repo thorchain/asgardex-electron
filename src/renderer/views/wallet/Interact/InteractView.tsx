@@ -4,14 +4,14 @@ import { THORChain } from '@xchainjs/xchain-util'
 import { Col, Row } from 'antd'
 import * as O from 'fp-ts/lib/Option'
 import { useObservableState } from 'observable-hooks'
-import { useParams } from 'react-router'
+import { useParams } from 'react-router-dom'
 
 import { Network } from '../../../../shared/api/types'
 import { Interact } from '../../../components/interact'
 import { BackLink } from '../../../components/uielements/backLink'
 import { useAppContext } from '../../../contexts/AppContext'
 import { useOpenExplorerTxUrl } from '../../../hooks/useOpenExplorerTxUrl'
-import * as walletRoutes from '../../../routes/wallet'
+import type { DepositParams } from '../../../routes/wallet'
 import { DEFAULT_NETWORK } from '../../../services/const'
 import { BondView } from './BondView'
 import { CustomView } from './CustomView'
@@ -20,7 +20,7 @@ import { LeaveView } from './LeaveView'
 import { UnbondView } from './UnbondView'
 
 export const InteractView: React.FC = () => {
-  const { walletAddress, walletType, walletIndex: walletIndexRoute } = useParams<walletRoutes.DepositParams>()
+  const { walletAddress, walletType, walletIndex: walletIndexRoute } = useParams<DepositParams>()
 
   const walletIndex = parseInt(walletIndexRoute)
 

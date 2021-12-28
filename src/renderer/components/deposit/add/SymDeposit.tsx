@@ -84,8 +84,7 @@ import {
   WalletBalances
 } from '../../../services/wallet/types'
 import { AssetWithDecimal } from '../../../types/asgardex'
-import { LedgerConfirmationModal } from '../../modal/confirmation'
-import { WalletPasswordConfirmationModal } from '../../modal/confirmation'
+import { LedgerConfirmationModal, WalletPasswordConfirmationModal } from '../../modal/confirmation'
 import { TxModal } from '../../modal/tx'
 import { DepositAssets } from '../../modal/tx/extra'
 import { ViewTxButton } from '../../uielements/button'

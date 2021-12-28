@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react'
 
 import { useIntl } from 'react-intl'
-import { useHistory } from 'react-router'
+import { useHistory } from 'react-router-dom'
 
 import { PageTitle } from '../../../components/page'
 import { Tabs } from '../../../components/tabs'
@@ -22,7 +22,7 @@ export const CreateView = () => {
 
   const items = useMemo(
     () => [
-      /* Remove keystore option 
+      /* Remove keystore option
       {
         key: TabKey.KEYSTORE,
         label: (

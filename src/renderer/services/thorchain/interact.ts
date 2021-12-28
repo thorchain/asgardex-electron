@@ -8,11 +8,9 @@ import * as Rx from 'rxjs'
 import * as RxOp from 'rxjs/operators'
 
 import { WalletType } from '../../../shared/wallet/types'
-import { liveData } from '../../helpers/rx/liveData'
-import { LiveData } from '../../helpers/rx/liveData'
+import { liveData, LiveData } from '../../helpers/rx/liveData'
 import { observableState } from '../../helpers/stateHelper'
-import { TxLD } from '../wallet/types'
-import { ApiError } from '../wallet/types'
+import { TxLD, ApiError } from '../wallet/types'
 import { INITIAL_INTERACT_STATE } from './const'
 import { InteractParams, InteractState, InteractState$ } from './types'
 

@@ -2,9 +2,8 @@ import * as A from 'antd'
 import styled from 'styled-components'
 import { palette } from 'styled-theme'
 
-import { Button } from '../../../components/uielements/button'
+import { Button, Button as UIButton } from '../../../components/uielements/button'
 import { InnerForm } from '../../shared/form/Form.styles'
-import { Button as UIButton } from '../../uielements/button'
 import { Label as UILabel } from '../../uielements/label'
 
 export const Form = styled(InnerForm)`

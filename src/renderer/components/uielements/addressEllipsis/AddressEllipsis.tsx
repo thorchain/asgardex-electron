@@ -12,6 +12,42 @@ import * as Styled from './AddressEllipsis.styles'
  * Based on https://github.com/bluepeter/react-middle-ellipsis/
  */
 
+const ellipse = ({
+  parentNode,
+  txtNode,
+  chain,
+  network
+}: {
+  parentNode: HTMLElement
+  txtNode: HTMLElement
+  chain: Chain
+  network: Network
+}): boolean => {
+  const containerWidth = parentNode.offsetWidth
+  const txtWidth = txtNode.offsetWidth
+
+  if (txtWidth > containerWidth) {
+    const str = txtNode.textContent
+    if (str) {
+      const txtChars = str.length
+      const avgLetterSize = txtWidth / txtChars
+      const canFit = containerWidth / avgLetterSize
+      const delEachSide = (txtChars - canFit + 5) / 2
+
+      if (txtNode.textContent) {
+        txtNode.setAttribute('data-original', txtNode.textContent)
+      }
+
+      if (delEachSide) {
+        txtNode.textContent = truncateAddress(str, chain, network)
+        return true
+      }
+    }
+  }
+
+  return false
+}
+
 export type Props = {
   address: Address
   chain: Chain
@@ -79,40 +115,4 @@ export const AddressEllipsis: React.FC<Props> = (props): JSX.Element => {
       </Styled.AddressContainer>
     </Styled.Container>
   )
-}
-
-const ellipse = ({
-  parentNode,
-  txtNode,
-  chain,
-  network
-}: {
-  parentNode: HTMLElement
-  txtNode: HTMLElement
-  chain: Chain
-  network: Network
-}): boolean => {
-  const containerWidth = parentNode.offsetWidth
-  const txtWidth = txtNode.offsetWidth
-
-  if (txtWidth > containerWidth) {
-    const str = txtNode.textContent
-    if (str) {
-      const txtChars = str.length
-      const avgLetterSize = txtWidth / txtChars
-      const canFit = containerWidth / avgLetterSize
-      const delEachSide = (txtChars - canFit + 5) / 2
-
-      if (txtNode.textContent) {
-        txtNode.setAttribute('data-original', txtNode.textContent)
-      }
-
-      if (delEachSide) {
-        txtNode.textContent = truncateAddress(str, chain, network)
-        return true
-      }
-    }
-  }
-
-  return false
 }

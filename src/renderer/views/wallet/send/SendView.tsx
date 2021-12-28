@@ -15,7 +15,7 @@ import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/Option'
 import { useObservableState } from 'observable-hooks'
 import { useIntl } from 'react-intl'
-import { useParams } from 'react-router'
+import { useParams } from 'react-router-dom'
 
 import { Network } from '../../../../shared/api/types'
 import { ErrorView } from '../../../components/shared/error/'

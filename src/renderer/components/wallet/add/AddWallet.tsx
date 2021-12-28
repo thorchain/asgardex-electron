@@ -2,7 +2,7 @@ import React, { useCallback } from 'react'
 
 import { FolderAddOutlined, FolderOpenOutlined } from '@ant-design/icons/lib'
 import { useIntl } from 'react-intl'
-import { useHistory } from 'react-router'
+import { useHistory } from 'react-router-dom'
 
 import * as walletRoutes from '../../../routes/wallet'
 import { Button } from '../../uielements/button'

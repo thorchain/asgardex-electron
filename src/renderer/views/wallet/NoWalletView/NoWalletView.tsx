@@ -1,7 +1,7 @@
 import React, { useCallback } from 'react'
 
 import { useIntl } from 'react-intl'
-import { useHistory } from 'react-router'
+import { useHistory } from 'react-router-dom'
 
 import { Label } from '../../../components/uielements/label'
 import * as walletRoutes from '../../../routes/wallet'

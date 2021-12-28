@@ -1,14 +1,14 @@
 {
   "compilerOptions": {
-    "target": "es2019",
-    "lib": ["ESNext", "dom"],
+    "target": "ESNext",
+    "module": "CommonJS",
+    "lib": ["ESNext", "DOM"],
     "skipLibCheck": true,
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
     "strict": true,
-    "module": "CommonJS",
-    "moduleResolution": "node",
-    "outDir": "./public/",
+    "moduleResolution": "Node",
+    "outDir": "./build/",
     "pretty": true
   },
   "include": ["./src/main", "./src/shared"],

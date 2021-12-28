@@ -18,8 +18,7 @@ import { ASSETS_TESTNET, ERC20_TESTNET } from '../../../shared/mock/assets'
 import { AssetUSDTERC20Testnet } from '../../const'
 import { eqBaseAmount } from '../../helpers/fp/eq'
 import { LastblockItems } from '../../services/midgard/types'
-import { PoolDetail } from '../../types/generated/midgard'
-import { GetPoolsStatusEnum } from '../../types/generated/midgard'
+import { PoolDetail, GetPoolsStatusEnum } from '../../types/generated/midgard'
 import { PoolTableRowData } from './Pools.types'
 import {
   getPoolTableRowData,

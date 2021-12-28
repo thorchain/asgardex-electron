@@ -29,8 +29,7 @@ import { sequenceTOptionFromArray } from '../../helpers/fpHelpers'
 import { useLedger } from '../../hooks/useLedger'
 import { DEFAULT_NETWORK } from '../../services/const'
 import { WalletAddressAsync } from '../../services/wallet/types'
-import { ledgerErrorIdToI18n } from '../../services/wallet/util'
-import { getPhrase } from '../../services/wallet/util'
+import { ledgerErrorIdToI18n, getPhrase } from '../../services/wallet/util'
 import { walletAccount$ } from './WalletSettingsView.helper'
 
 export const WalletSettingsView: React.FC = (): JSX.Element => {

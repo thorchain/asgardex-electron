@@ -8,6 +8,9 @@ import { ApiKeystore } from '../../shared/api/types'
 import IPCMessages from '../ipc/messages'
 import { STORAGE_DIR } from './const'
 
+// key file path
+export const KEY_FILE = path.join(STORAGE_DIR, 'keystore.json')
+
 export const saveKeystore = async (keystore: Keystore) => {
   await fs.ensureFile(KEY_FILE)
   return fs.writeJSON(KEY_FILE, keystore)
@@ -39,9 +42,6 @@ export const loadKeystore = async () => {
     return Promise.reject(err)
   }
 }
-
-// key file path
-export const KEY_FILE = path.join(STORAGE_DIR, 'keystore.json')
 
 export const apiKeystore: ApiKeystore = {
   save: (keystore: Keystore) => ipcRenderer.invoke(IPCMessages.SAVE_KEYSTORE, keystore),

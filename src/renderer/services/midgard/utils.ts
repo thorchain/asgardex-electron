@@ -40,6 +40,21 @@ import {
   InboundAddress
 } from './types'
 
+/**
+ * Converts a `BaseAmount` string into `PoolData` balance (always `1e8` decimal based)
+ */
+export const toPoolBalance = (baseAmountString: string): BaseAmount => baseAmount(baseAmountString, THORCHAIN_DECIMAL)
+
+/**
+ * Transforms `PoolDetail` into `PoolData` (provided by `asgardex-util`)
+ *
+ * Note: Balances of `PoolData` are always `1e8` based
+ */
+export const toPoolData = ({ assetDepth, runeDepth }: Pick<PoolDetail, 'assetDepth' | 'runeDepth'>): PoolData => ({
+  assetBalance: toPoolBalance(assetDepth),
+  runeBalance: toPoolBalance(runeDepth)
+})
+
 export const getPricePools = (details: PoolDetails, whitelist: PricePoolAssets): PricePools => {
   const oUSDPricePool: O.Option<PricePool> = FP.pipe(
     whitelist,
@@ -151,21 +166,6 @@ export const getPoolDetail = (details: PoolDetails, asset: Asset): O.Option<Pool
  */
 export const toPoolsData = (poolDetails: Array<Pick<PoolDetail, 'asset' | 'assetDepth' | 'runeDepth'>>): PoolsDataMap =>
   poolDetails.reduce<PoolsDataMap>((acc, cur) => ({ ...acc, [cur.asset]: toPoolData(cur) }), {})
-
-/**
- * Converts a `BaseAmount` string into `PoolData` balance (always `1e8` decimal based)
- */
-export const toPoolBalance = (baseAmountString: string): BaseAmount => baseAmount(baseAmountString, THORCHAIN_DECIMAL)
-
-/**
- * Transforms `PoolDetail` into `PoolData` (provided by `asgardex-util`)
- *
- * Note: Balances of `PoolData` are always `1e8` based
- */
-export const toPoolData = ({ assetDepth, runeDepth }: Pick<PoolDetail, 'assetDepth' | 'runeDepth'>): PoolData => ({
-  assetBalance: toPoolBalance(assetDepth),
-  runeBalance: toPoolBalance(runeDepth)
-})
 
 /**
  * Filter out mini tokens from pool assets

@@ -122,6 +122,8 @@ export const WalletSettings: React.FC<Props> = (props): JSX.Element => {
     [PolkadotChain]: 0
   })
 
+  const [addressToVerify, setAddressToVerify] = useState<AddressToVerify>(O.none)
+
   const renderAddress = useCallback(
     (chain: Chain, { type: walletType, address: addressRD }: WalletAddressAsync) => {
       const renderAddLedger = (chain: Chain, loading: boolean) => (
@@ -210,8 +212,6 @@ export const WalletSettings: React.FC<Props> = (props): JSX.Element => {
       walletIndexMap
     ]
   )
-
-  const [addressToVerify, setAddressToVerify] = useState<AddressToVerify>(O.none)
 
   const renderVerifyAddressModal = useCallback(
     (oAddress: AddressToVerify) =>

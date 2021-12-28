@@ -1,6 +1,5 @@
 import * as RD from '@devexperts/remote-data-ts'
-import { Transfer, Client } from '@xchainjs/xchain-binance'
-import { Address } from '@xchainjs/xchain-binance'
+import { Transfer, Client, Address } from '@xchainjs/xchain-binance'
 import { Asset, AssetAmount, BaseAmount } from '@xchainjs/xchain-util'
 import * as O from 'fp-ts/lib/Option'
 import * as Rx from 'rxjs'

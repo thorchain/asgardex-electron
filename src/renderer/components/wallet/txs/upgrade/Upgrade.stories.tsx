@@ -13,8 +13,7 @@ import { BNB_DECIMAL } from '../../../../helpers/assetHelper'
 import { mockWalletBalance } from '../../../../helpers/test/testWalletHelper'
 import { INITIAL_UPGRADE_RUNE_STATE } from '../../../../services/chain/const'
 import { UpgradeRuneParams, UpgradeRuneTxState, UpgradeRuneTxState$ } from '../../../../services/chain/types'
-import { ErrorId } from '../../../../services/wallet/types'
-import { WalletBalances, WalletBalance } from '../../../../services/wallet/types'
+import { ErrorId, WalletBalances, WalletBalance } from '../../../../services/wallet/types'
 import { Upgrade, Props as UpgradeProps } from './Upgrade'
 
 const mockTxState$ = (states: UpgradeRuneTxState[]): UpgradeRuneTxState$ =>

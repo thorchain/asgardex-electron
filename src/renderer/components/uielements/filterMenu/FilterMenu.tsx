@@ -19,7 +19,7 @@ type Props<T> = {
   closeMenu?: () => void
 }
 
-export const FilterMenu = <T extends unknown>(props: Props<T>): JSX.Element => {
+export const FilterMenu = <T,>(props: Props<T>): JSX.Element => {
   const {
     onSelect = (_) => {},
     searchEnabled = false,
