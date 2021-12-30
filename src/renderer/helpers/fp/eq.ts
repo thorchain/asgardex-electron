@@ -198,6 +198,7 @@ export const eqLedgerAddressRD = RD.getEq<LedgerError, WalletAddress>(eqLedgerEr
 
 export const eqLedgerAddressMap = Eq.struct<LedgerAddressMap>({
   testnet: eqLedgerAddressRD,
+  stagenet: eqLedgerAddressRD,
   mainnet: eqLedgerAddressRD
 })
 

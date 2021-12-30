@@ -18,11 +18,13 @@ import { ClientState, ClientState$ } from './types'
 
 const HASKOIN_API_URL: ClientUrl = {
   testnet: envOrDefault(process.env.REACT_APP_HASKOIN_TESTNET_URL, 'https://haskoin.ninerealms.com/bchtest'),
+  stagenet: envOrDefault(process.env.REACT_APP_HASKOIN_STAGENET_URL, 'https://haskoin.ninerealms.com/bch'),
   mainnet: envOrDefault(process.env.REACT_APP_HASKOIN_MAINNET_URL, 'https://haskoin.ninerealms.com/bch')
 }
 
 const NODE_URL: ClientUrl = {
   testnet: envOrDefault(process.env.REACT_APP_BCH_NODE_TESTNET_URL, 'https://testnet.bch.thorchain.info'),
+  stagenet: envOrDefault(process.env.REACT_APP_BCH_NODE_STAGENET_URL, 'https://bch.thorchain.info'),
   mainnet: envOrDefault(process.env.REACT_APP_BCH_NODE_MAINNET_URL, 'https://bch.thorchain.info')
 }
 
