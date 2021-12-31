@@ -1,4 +1,4 @@
-import { assetToBase, AssetRuneNative, AssetBNB, AssetLTC, assetAmount } from '@xchainjs/xchain-util'
+import { assetToBase, AssetRuneNative, AssetBNB, AssetLTC, assetAmount, Chain } from '@xchainjs/xchain-util'
 import * as FP from 'fp-ts/lib/function'
 import * as NEA from 'fp-ts/lib/NonEmptyArray'
 import * as O from 'fp-ts/lib/Option'
@@ -16,7 +16,8 @@ import {
   getLtcAmountFromBalances,
   getWalletBalanceByAsset,
   getWalletByAddress,
-  hasLedgerInBalancesByAsset
+  hasLedgerInBalancesByAsset,
+  isEnabledWallet
 } from './walletHelper'
 
 describe('walletHelper', () => {
@@ -181,6 +182,15 @@ describe('walletHelper', () => {
       const balances: WalletBalances = NEA.fromReadonlyNonEmptyArray([RUNE_WB, BUSD_WB, BNB_WB])
       const result = hasLedgerInBalancesByAsset(AssetBUSD74E, balances)
       expect(result).toBeFalsy()
+    })
+  })
+
+  describe('isEnabledWallet', () => {
+    it('THOR stagenet ledger wallet -> false', () => {
+      expect(isEnabledWallet(Chain.THORChain, 'stagenet', 'ledger')).toBe(false)
+    })
+    it('All other wallets -> true', () => {
+      expect(isEnabledWallet(Chain.THORChain, 'mainnet', 'ledger')).toBe(true)
     })
   })
 })

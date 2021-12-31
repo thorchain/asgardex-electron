@@ -1,15 +1,18 @@
 import { Address } from '@xchainjs/xchain-client'
 import { Asset, AssetAmount, baseToAsset } from '@xchainjs/xchain-util'
+import { Chain } from '@xchainjs/xchain-util'
 import * as A from 'fp-ts/Array'
 import * as FP from 'fp-ts/function'
 import * as O from 'fp-ts/Option'
 
+import { Network } from '../../shared/api/types'
 import { isLedgerWallet } from '../../shared/utils/guard'
 import { WalletAddress, WalletType } from '../../shared/wallet/types'
 import { ZERO_ASSET_AMOUNT } from '../const'
 import { WalletBalances } from '../services/clients'
 import { NonEmptyWalletBalances, WalletBalance } from '../services/wallet/types'
 import { isBnbAsset, isEthAsset, isLtcAsset, isRuneNativeAsset } from './assetHelper'
+import { isThorChain } from './chainHelper'
 import { eqAddress, eqAsset, eqWalletType } from './fp/eq'
 
 /**
@@ -147,3 +150,9 @@ export const getWalletByAddress = (walletBalances: WalletBalances, address: Addr
     walletBalances,
     A.findFirst(({ walletAddress }) => eqAddress.equals(walletAddress, address))
   )
+
+export const isEnabledWallet = (chain: Chain, network: Network, walletType: WalletType) => {
+  // Disable THORChain ledger wallets in stagenet
+  if (isThorChain(chain) && network === 'stagenet' && isLedgerWallet(walletType)) return false
+  return true
+}
