@@ -32,7 +32,8 @@ const EXTERNALS_WHITELIST = [
   'stagenet-midgard.ninerealms.com',
   'thornode.thorchain.info',
   'testnet.thornode.thorchain.info',
-  'stagenet-thornode.ninerealms.com'
+  'stagenet-thornode.ninerealms.com',
+  'stagenet-rpc.ninerealms.com'
 ]
 
 const openExternal = (target: string) => {
