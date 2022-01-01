@@ -33,11 +33,14 @@ import {
 } from './types'
 
 const MIDGARD_TESTNET_URL = envOrDefault(
-  process.env.REACT_APP_MIDGARD_TESTNET_URL,
+  import.meta.env.REACT_APP_MIDGARD_TESTNET_URL,
   'https://testnet.midgard.thorchain.info'
 )
 
-const MIDGARD_MAINNET_URL = envOrDefault(process.env.REACT_APP_MIDGARD_MAINNET_URL, 'https://midgard.thorchain.info')
+const MIDGARD_MAINNET_URL = envOrDefault(
+  import.meta.env.REACT_APP_MIDGARD_MAINNET_URL,
+  'https://midgard.thorchain.info'
+)
 
 /**
  * Helper to get `DefaultApi` instance for Midgard using custom basePath

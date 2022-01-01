@@ -2,7 +2,7 @@ import * as A from 'antd'
 import styled from 'styled-components'
 import { palette } from 'styled-theme'
 
-import { Button, Button as UIButton } from '../../../components/uielements/button'
+import { Button as UIButton } from '../../../components/uielements/button'
 import { InnerForm } from '../../shared/form/Form.styles'
 import { Label as UILabel } from '../../uielements/label'
 
@@ -29,7 +29,7 @@ export const ErrorLabel = styled(UILabel)`
   text-align: center;
 `
 
-export const KeystoreButton = styled(Button).attrs({
+export const KeystoreButton = styled(UIButton).attrs({
   typevalue: 'outline'
 })`
   max-width: 100%;

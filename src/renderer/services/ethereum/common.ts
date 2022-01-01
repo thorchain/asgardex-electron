@@ -17,12 +17,12 @@ import { keystoreService } from '../wallet/keystore'
 import { getPhrase } from '../wallet/util'
 import { Client$, ClientState, ClientState$ } from './types'
 
-const ETHERSCAN_API_KEY = envOrDefault(process.env.REACT_APP_ETHERSCAN_API_KEY, '')
-const INFURA_PROJECT_ID = envOrDefault(process.env.REACT_APP_INFURA_PROJECT_ID, '')
-const INFURA_PROJECT_SECRET = envOrDefault(process.env.REACT_APP_INFURA_PROJECT_SECRET, '')
+const ETHERSCAN_API_KEY = envOrDefault(import.meta.env.REACT_APP_ETHERSCAN_API_KEY, '')
+const INFURA_PROJECT_ID = envOrDefault(import.meta.env.REACT_APP_INFURA_PROJECT_ID, '')
+const INFURA_PROJECT_SECRET = envOrDefault(import.meta.env.REACT_APP_INFURA_PROJECT_SECRET, '')
 
-const ETHPLORER_API_KEY = envOrDefault(process.env.REACT_APP_ETHPLORER_API_KEY, 'freekey')
-const ETHPLORER_API_URL = envOrDefault(process.env.REACT_APP_ETHPLORER_API_URL, 'https://api.ethplorer.io')
+const ETHPLORER_API_KEY = envOrDefault(import.meta.env.REACT_APP_ETHPLORER_API_KEY, 'freekey')
+const ETHPLORER_API_URL = envOrDefault(import.meta.env.REACT_APP_ETHPLORER_API_URL, 'https://api.ethplorer.io')
 
 /**
  * Stream to create an observable `EthereumClient` depending on existing phrase in keystore

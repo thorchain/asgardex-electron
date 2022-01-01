@@ -62,13 +62,13 @@ const { stream$: reloadNodesInfo$, trigger: reloadNodesInfo } = triggerStream()
 
 // Note: We get data from `/thorchain` endpoint !!
 const TESTNET_THORNODE_API = `${envOrDefault(
-  process.env.REACT_APP_TESTNET_THORNODE_API,
+  import.meta.env.REACT_APP_TESTNET_THORNODE_API,
   'https://testnet.thornode.thorchain.info'
 )}/thorchain`
 
 // Note: We get data from `/thorchain` endpoint !!
 const MAINNET_THORNODE_API = `${envOrDefault(
-  process.env.REACT_APP_MAINNET_THORNODE_API,
+  import.meta.env.REACT_APP_MAINNET_THORNODE_API,
   'https://thornode.thorchain.info'
 )}/thorchain`
 

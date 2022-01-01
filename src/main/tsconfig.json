@@ -1,0 +1,9 @@
+{
+  "extends": "../../tsconfig.json",
+  "compilerOptions": {
+    "baseUrl": "./"
+  },
+  "files": ["./index.ts"],
+  "include": ["../types", "../shared", "./**/*"],
+  "exclude": ["./preload.ts"]
+}

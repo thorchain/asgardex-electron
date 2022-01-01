@@ -50,7 +50,7 @@ export const UnlockForm: React.FC<Props> = (props): JSX.Element => {
   useEffect(() => {
     if (!IS_PRODUCTION) {
       const checkPassword = async () => {
-        const password = envOrDefault(process.env.REACT_APP_WALLET_PASSWORD, '')
+        const password = envOrDefault(import.meta.env.REACT_APP_WALLET_PASSWORD, '')
         if (password && keystore && hasImportedKeystore(keystore) && isLocked(keystore)) {
           await unlockHandler(keystore, password).catch((error) => {
             setUnlockError(some(error))

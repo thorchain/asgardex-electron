@@ -9,7 +9,7 @@ import * as O from 'fp-ts/Option'
 import { useObservableState } from 'observable-hooks'
 import { useIntl } from 'react-intl'
 
-// import { envOrDefault } from '../../../shared/utils/env'
+import { envOrDefault } from '../../../shared/utils/env'
 import { Footer } from '../../components/footer'
 import { Header } from '../../components/header'
 import { Button } from '../../components/uielements/button'
@@ -242,8 +242,7 @@ export const AppView: React.FC = (): JSX.Element => {
           {renderUpgradeWarning}
           <ViewRoutes />
         </View>
-        {/* <Footer commitHash={envOrDefault($COMMIT_HASH, '')} isDev={$IS_DEV} /> */}
-        <Footer commitHash="hello-commit-hash" isDev />
+        <Footer commitHash={envOrDefault($COMMIT_HASH, '')} isDev={import.meta.env.DEV} />
       </Styled.AppLayout>
     </Styled.AppWrapper>
   )

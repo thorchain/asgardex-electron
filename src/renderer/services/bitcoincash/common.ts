@@ -17,18 +17,18 @@ import { getPhrase } from '../wallet/util'
 import { ClientState, ClientState$ } from './types'
 
 const HASKOIN_API_URL: ClientUrl = {
-  testnet: envOrDefault(process.env.REACT_APP_HASKOIN_TESTNET_URL, 'https://haskoin.ninerealms.com/bchtest'),
-  mainnet: envOrDefault(process.env.REACT_APP_HASKOIN_MAINNET_URL, 'https://haskoin.ninerealms.com/bch')
+  testnet: envOrDefault(import.meta.env.REACT_APP_HASKOIN_TESTNET_URL, 'https://haskoin.ninerealms.com/bchtest'),
+  mainnet: envOrDefault(import.meta.env.REACT_APP_HASKOIN_MAINNET_URL, 'https://haskoin.ninerealms.com/bch')
 }
 
 const NODE_URL: ClientUrl = {
-  testnet: envOrDefault(process.env.REACT_APP_BCH_NODE_TESTNET_URL, 'https://testnet.bch.thorchain.info'),
-  mainnet: envOrDefault(process.env.REACT_APP_BCH_NODE_MAINNET_URL, 'https://bch.thorchain.info')
+  testnet: envOrDefault(import.meta.env.REACT_APP_BCH_NODE_TESTNET_URL, 'https://testnet.bch.thorchain.info'),
+  mainnet: envOrDefault(import.meta.env.REACT_APP_BCH_NODE_MAINNET_URL, 'https://bch.thorchain.info')
 }
 
 const NODE_AUTH: NodeAuth = {
-  password: envOrDefault(process.env.REACT_APP_BCH_NODE_PASSWORD, 'password'),
-  username: envOrDefault(process.env.REACT_APP_BCH_NODE_USERNAME, 'thorchain')
+  password: envOrDefault(import.meta.env.REACT_APP_BCH_NODE_PASSWORD, 'password'),
+  username: envOrDefault(import.meta.env.REACT_APP_BCH_NODE_USERNAME, 'thorchain')
 }
 
 /**

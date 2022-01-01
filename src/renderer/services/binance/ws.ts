@@ -7,11 +7,14 @@ import { envOrDefault } from '../../../shared/utils/env'
 import { network$ } from '../app/service'
 
 const BINANCE_TESTNET_WS_URI = envOrDefault(
-  process.env.REACT_APP_BINANCE_TESTNET_WS_URI,
+  import.meta.env.REACT_APP_BINANCE_TESTNET_WS_URI,
   'wss://testnet-dex.binance.org/api/ws'
 )
 
-const BINANCE_MAINET_WS_URI = envOrDefault(process.env.REACT_APP_BINANCE_MAINNET_WS_URI, 'wss://dex.binance.org/api/ws')
+const BINANCE_MAINET_WS_URI = envOrDefault(
+  import.meta.env.REACT_APP_BINANCE_MAINNET_WS_URI,
+  'wss://dex.binance.org/api/ws'
+)
 
 /**
  * Websocket endpoint depending on `Network`

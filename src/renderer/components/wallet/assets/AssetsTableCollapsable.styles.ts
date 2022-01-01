@@ -21,6 +21,7 @@ export const Table = styled(UITable)`
 `
 
 export const HeaderRow = styled(A.Row)`
+  width: 100%;
   font-size: 14px;
   font-family: 'MainFontRegular';
   color: ${palette('gray', 2)};

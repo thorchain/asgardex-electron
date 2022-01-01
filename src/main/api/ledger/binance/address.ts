@@ -1,3 +1,60 @@
+// // import { crypto } from '@binance-chain/javascript-sdk'
+// import AppBNB from '@binance-chain/javascript-sdk/lib/ledger/ledger-app'
+// import type Transport from '@ledgerhq/hw-transport'
+// import {
+//   getDerivePath
+//   // getPrefix
+// } from '@xchainjs/xchain-binance'
+// // import { BNBChain } from '@xchainjs/xchain-util'
+// import * as E from 'fp-ts/Either'
+
+// import { LedgerError, LedgerErrorId, Network } from '../../../../shared/api/types'
+// // import { toClientNetwork } from '../../../../shared/utils/client'
+// // import { isError } from '../../../../shared/utils/guard'
+// import { WalletAddress } from '../../../../shared/wallet/types'
+
+// export const getAddress = async (
+//   transport: Transport,
+//   network: Network,
+//   walletIndex: number
+// ): Promise<E.Either<LedgerError, WalletAddress>> => {
+//   try {
+//     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+//     // @ts-ignore
+//     // const AppBNB = await import('@binance-chain/javascript-sdk/lib/ledger/ledger-app')['default']
+
+//     const _app = new AppBNB(transport)
+//     const _derive_path = getDerivePath(walletIndex)
+//     // const { pk } = await app.getPublicKey(derive_path)
+//     // const { pk } = await app.getPublicKey(derive_path)
+//     // console.log('pk:', pk)
+//     // console.log('dp:', _derive_path)
+//     console.log('wi:', walletIndex)
+//     console.log('n:', network)
+//     //   const clientNetwork = toClientNetwork(network)
+//     //   const prefix = getPrefix(clientNetwork)
+//     //   if (pk) {
+//     //     // get address from pubkey
+//     //     const address = crypto.getAddressFromPublicKey(pk.toString('hex'), prefix)
+//     //     return E.right({ address, chain: BNBChain, type: 'ledger', walletIndex })
+//     //   } else {
+//     //     return E.left({
+//     //       errorId: LedgerErrorId.INVALID_PUBKEY,
+//     //       msg: `Could not get public key from Ledger's Binance App`
+//     //     })
+//     //   }
+//     return E.left({
+//       errorId: LedgerErrorId.GET_ADDRESS_FAILED,
+//       msg: 'msg'
+//     })
+//   } catch (error) {
+//     return E.left({
+//       errorId: LedgerErrorId.GET_ADDRESS_FAILED,
+//       msg: 'msg'
+//     })
+//   }
+// }
+
 import { crypto } from '@binance-chain/javascript-sdk'
 import AppBNB from '@binance-chain/javascript-sdk/lib/ledger/ledger-app'
 import type Transport from '@ledgerhq/hw-transport'

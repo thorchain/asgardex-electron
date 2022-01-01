@@ -8,12 +8,12 @@ export const getClientUrl = (): ClientUrl => {
   const { node: nodeMainnet, rpc: rpcMainnet } = getDefaultClientUrl()[Network.Mainnet]
   return {
     [Network.Testnet]: {
-      node: envOrDefault(process.env.REACT_APP_TESTNET_THORNODE_API, nodeTestnet),
-      rpc: envOrDefault(process.env.REACT_APP_TESTNET_THORNODE_RPC, rpcTestnet)
+      node: envOrDefault(import.meta.env.REACT_APP_TESTNET_THORNODE_API, nodeTestnet),
+      rpc: envOrDefault(import.meta.env.REACT_APP_TESTNET_THORNODE_RPC, rpcTestnet)
     },
     [Network.Mainnet]: {
-      node: envOrDefault(process.env.REACT_APP_MAINNET_THORNODE_API, nodeMainnet),
-      rpc: envOrDefault(process.env.REACT_APP_MAINNET_THORNODE_RPC, rpcMainnet)
+      node: envOrDefault(import.meta.env.REACT_APP_MAINNET_THORNODE_API, nodeMainnet),
+      rpc: envOrDefault(import.meta.env.REACT_APP_MAINNET_THORNODE_RPC, rpcMainnet)
     }
   }
 }

@@ -2,7 +2,7 @@
 <html lang="en">
   <head>
     <meta charset="utf-8" />
-    <link rel="icon" href="/assets/favicon.ico" />
+    <meta http-equiv="Content-Security-Policy" content="script-src 'self' blob: 'unsafe-inline'" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>ASGARDEX App</title>
   </head>
@@ -11,10 +11,10 @@
       window.global = window
     </script>
     <script type="module">
-      import process from 'process'
       import { Buffer } from 'buffer'
-      window.process = process
       window.Buffer = Buffer
+      import process from 'process'
+      window.process = process
     </script>
     <div id="root"></div>
     <script type="module" src="/index.tsx"></script>

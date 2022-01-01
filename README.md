@@ -13,7 +13,6 @@
 _(in alphabetical order)_
 
 - [Ant Design](https://github.com/ant-design/ant-design/)
-- [Create React App](https://github.com/facebook/create-react-app)
 - [ESLint](https://github.com/eslint/eslint)
 - [Electron](https://github.com/electron/electron/)
 - [fp-ts](https://gcanti.github.io/fp-ts/)
@@ -21,21 +20,23 @@ _(in alphabetical order)_
 - [Observable Hooks](https://observable-hooks.js.org/)
 - [Prettier](https://github.com/prettier/prettier)
 - [ReactJS](https://github.com/facebook/react/)
+- [RxJS](https://rxjs.dev/)
 - [Styled Components](https://styled-components.com/)
 - [Testcafe](https://github.com/DevExpress/testcafe)
 - [THORChain Byzantine Module](https://gitlab.com/thorchain/byzantine-module/)
-- [RxJS](https://rxjs.dev/)
 - [Typescript](https://github.com/microsoft/TypeScript)
+- [Vite](https://vitejs.dev)
+- [xchainjs](https://github.com/xchainjs/xchainjs-lib)
 - and others ...
 
 ## Install
 
-It's recommended to use a Node version as same as Electron is running with (currently: [`Electron v16.x` / Node `16.5.0`](https://github.com/electron/releases#releases))
+It's recommended to use a Node version as same as Electron is running with (currently: [`Electron v16.x` / Node `16.x`](https://github.com/electron/releases#releases)). It's recommened to install [nvm](https://github.com/nvm-sh/nvm) to run correct Node version for building ASGARDEX on your machine.
 
 ```bash
 git clone https://github.com/thorchain/asgardex-electron.git asgardex
 cd asgardex
-yarn
+npm i
 ```
 
 ## Environment variables
@@ -44,16 +45,10 @@ While environment variables are not required (defaults are set), you can configu
 
 ## Development
 
-- Build sources needed by [`main` process](https://www.electronjs.org/docs/glossary#main-process) (only once or whenever you change something in [`preload.ts`](./src/main/preload.ts) or [`electron.ts`](./src/main/electron.ts))
+- Build everything needed by [`main` process](https://www.electronjs.org/docs/glossary#main-process) and by [`renderer` process](https://www.electronjs.org/docs/glossary#renderer-process) to run application in `watch` mode
 
 ```bash
-yarn prebuild
-```
-
-- Build everything needed by [`renderer` process](https://www.electronjs.org/docs/glossary#renderer-process) and run application in `watch` mode
-
-```bash
-yarn dev
+npm run dev
 ```
 
 In case Node might run into memory issues locally set `--max-old-space-size` as follow:
@@ -77,7 +72,7 @@ Generated files are based on Midgard's [swagger.json](https://midgard.thorchain.
 Whenever [THORChain ERC20 asset whitelist](https://gitlab.com/thorchain/thornode/-/blob/develop/bifrost/pkg/chainclients/ethereum/token_list.json) has been updated (usually with a [new release of THORNode](https://gitlab.com/thorchain/thornode/-/tags)), run following script to auto-generate this list for ASGARDEX
 
 ```bash
-yarn generate:erc20whitelist
+npm run generate:erc20whitelist
 ```
 
 ### How to auto-unlock a locked wallet while hot-reloading the app (for development only, disabled in production build)
@@ -85,10 +80,10 @@ yarn generate:erc20whitelist
 Use `REACT_APP_WALLET_PASSWORD` to run the app by replacing `password` with your own password
 
 ```bash
-REACT_APP_WALLET_PASSWORD=password yarn dev
+REACT_APP_WALLET_PASSWORD=password npm run dev
 ```
 
-Or add to `REACT_APP_WALLET_PASSWORD=password` to `.env` file and run `yarn dev`
+Or add to `REACT_APP_WALLET_PASSWORD=password` to `.env` file and run `npm run dev`
 
 ### How to enable (more) chains for development
 
@@ -105,7 +100,7 @@ Note: String of chains have to be as same as [definitions in xchain-util](https:
 ### `unit`
 
 ```bash
-yarn test
+npm run test
 ```
 
 ### `e2e`
@@ -113,24 +108,16 @@ yarn test
 **Note:** e2e tests are disabled temporary (see #750)
 
 ```bash
-yarn test:e2e
+npm run test:e2e
 ```
 
 ### `lint`
 
 ```bash
-yarn lint
+npm run lint
 ```
 
 Note: `eslint` is provided by `react-scripts` located in `./node_modules/react-scripts/node_modules/` and don't need to be extra installed. If your editor has some issues to find `eslint`, you might point it to this location (see [VSCode settings file](.vscode/settings.json) as an example).
-
-### bundle analyze
-
-visualize the bundle map using `source-map-explorer`
-
-```bash
-yarn analyze
-```
 
 ### Auto updates
 
@@ -192,7 +179,7 @@ ASGARDEX follows [security recommendation made by Electron team](https://www.ele
 **Important note** for `macOS` users: Please follow guide of ["How to package `ASGARDEX` on macOS"](./PACKAGE_MACOS.md) before running following command.
 
 ```
-yarn package:electron
+npm run package:electron
 ```
 
 ## Keystore

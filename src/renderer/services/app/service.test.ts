@@ -8,7 +8,7 @@ describe('services/app/service/', () => {
   describe('network$', () => {
     it('gets default network from env', () => {
       runObservable(({ expectObservable }) => {
-        expectObservable(network$).toBe('a', { a: envOrDefault(process.env.REACT_APP_DEFAULT_NETWORK, 'mainnet') })
+        expectObservable(network$).toBe('a', { a: envOrDefault(import.meta.env.REACT_APP_DEFAULT_NETWORK, 'mainnet') })
       })
     })
 

@@ -1,8 +1,7 @@
 import { StoreFilesContent, UserNodesStorage } from './api/types'
 import { Locale } from './i18n/types'
-import { envOrDefault } from './utils/env'
 
-export const IS_PRODUCTION = envOrDefault(process.env.NODE_ENV, '') === 'production'
+export const IS_PRODUCTION = import.meta.env.PROD
 
 export enum ExternalUrl {
   WEBSITE = 'https://thorchain.org',

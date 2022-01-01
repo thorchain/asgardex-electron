@@ -15,14 +15,14 @@ import { getPhrase } from '../wallet/util'
 import { Client$, ClientState$, ClientState } from './types'
 
 const LTC_NODE_TESTNET_URL = envOrDefault(
-  process.env.REACT_APP_LTC_NODE_TESTNET_URL,
+  import.meta.env.REACT_APP_LTC_NODE_TESTNET_URL,
   'https://testnet.ltc.thorchain.info'
 )
-const LTC_NODE_MAINNET_URL = envOrDefault(process.env.REACT_APP_LTC_NODE_MAINNET_URL, 'https://ltc.thorchain.info')
+const LTC_NODE_MAINNET_URL = envOrDefault(import.meta.env.REACT_APP_LTC_NODE_MAINNET_URL, 'https://ltc.thorchain.info')
 
 const NODE_AUTH: NodeAuth = {
-  password: envOrDefault(process.env.REACT_APP_LTC_NODE_PASSWORD, 'password'),
-  username: envOrDefault(process.env.REACT_APP_LTC_NODE_USERNAME, 'thorchain')
+  password: envOrDefault(import.meta.env.REACT_APP_LTC_NODE_PASSWORD, 'password'),
+  username: envOrDefault(import.meta.env.REACT_APP_LTC_NODE_USERNAME, 'thorchain')
 }
 
 /**

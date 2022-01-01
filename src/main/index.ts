@@ -1,19 +1,23 @@
 import { join } from 'path'
 
-import { Keystore } from '@xchainjs/xchain-crypto'
+import type { Keystore } from '@xchainjs/xchain-crypto'
 import { BrowserWindow, app, ipcMain, nativeImage } from 'electron'
 import electronDebug from 'electron-debug'
-// import installExtension, { REACT_DEVELOPER_TOOLS } from 'electron-devtools-installer'
+import installExtension, { REACT_DEVELOPER_TOOLS } from 'electron-devtools-installer'
 import isDev from 'electron-is-dev'
 import log, { warn } from 'electron-log'
 import windowStateKeeper from 'electron-window-state'
-import * as E from 'fp-ts/lib/Either'
+import * as E from 'fp-ts/Either'
 import * as FP from 'fp-ts/lib/function'
 
 import { ipcLedgerDepositTxParamsIO, ipcLedgerSendTxParamsIO } from '../shared/api/io'
-import { IPCLedgerAdddressParams, StoreFileName } from '../shared/api/types'
+import type {
+  IPCLedgerAdddressParams,
+  // IPCLedgerAdddressParams,
+  StoreFileName
+} from '../shared/api/types'
 import { DEFAULT_STORAGES } from '../shared/const'
-import { Locale } from '../shared/i18n/types'
+import type { Locale } from '../shared/i18n/types'
 import { registerAppCheckUpdatedHandler } from './api/appUpdate'
 import { getFileStoreService } from './api/fileStore'
 import { saveKeystore, removeKeystore, getKeystore, keystoreExist, exportKeystore, loadKeystore } from './api/keystore'
@@ -26,17 +30,22 @@ import {
 import IPCMessages from './ipc/messages'
 import { setMenu } from './menu'
 
-export const IS_DEV = isDev && process.env.NODE_ENV !== 'production'
-export const PORT = process.env.PORT || 3000
+export const IS_DEV = isDev && import.meta.env.DEV
+console.log('IS_DEV:', IS_DEV)
 
-export const APP_ROOT = join(__dirname, '..', '..')
+const APP_ROOT = join(__dirname, '..')
 
-const BASE_URL_DEV = `http://localhost:${PORT}`
-const BASE_URL_PROD = `file://${join(__dirname, '../build/index.html')}`
-// use dev server for hot reload or file in production
-export const BASE_URL = IS_DEV ? BASE_URL_DEV : BASE_URL_PROD
-// Application icon
+console.log('APP_ROOT:', APP_ROOT)
+
+// // Application icon
 const APP_ICON = join(APP_ROOT, 'resources', process.platform.match('win32') ? 'icon.ico' : 'icon.png')
+
+console.log('APP_ICON:', APP_ICON)
+
+if (!app.requestSingleInstanceLock()) {
+  app.quit()
+  process.exit(0)
+}
 
 const initLogger = () => {
   log.transports.file.resolvePath = (variables: log.PathVariables) => {
@@ -57,6 +66,11 @@ log.debug(`Starting Electron main process`)
 // Enable keyboard shortcuts and optionally activate DevTools on each created `BrowserWindow`.
 electronDebug({ isEnabled: IS_DEV })
 
+if (!app.requestSingleInstanceLock()) {
+  app.quit()
+  process.exit(0)
+}
+
 let mainWindow: BrowserWindow | null = null
 
 const initMainWindow = async () => {
@@ -65,6 +79,10 @@ const initMainWindow = async () => {
     defaultHeight: IS_DEV ? 1000 : 800
   })
 
+  const preload = join(APP_ROOT, 'build', 'preload.cjs')
+
+  console.log('preload path:', preload)
+
   mainWindow = new BrowserWindow({
     x: mainWindowState.x,
     y: mainWindowState.y,
@@ -72,16 +90,7 @@ const initMainWindow = async () => {
     height: mainWindowState.height,
     icon: nativeImage.createFromPath(APP_ICON),
     webPreferences: {
-      // Disable Node.js integration
-      // This recommendation is the default behavior in Electron since 5.0.0.
-      // ^ https://www.electronjs.org/docs/tutorial/security#2-do-not-enable-nodejs-integration-for-remote-content
-      nodeIntegration: false,
-      // Context Isolation
-      // ^ https://www.electronjs.org/docs/tutorial/context-isolation
-      // From Electron 12, it will be enabled by default.
-      contextIsolation: true,
-      // preload script
-      preload: join(__dirname, IS_DEV ? '../../public/' : '../build/', 'preload.js')
+      preload
     }
   })
 
@@ -89,24 +98,22 @@ const initMainWindow = async () => {
     mainWindow = null
   }
 
-  const setupDevEnv = async () => {
-    try {
-      // Disable `REACT_DEVELOPER_TOOLS` temporary
-      // It causes issues by using latest CRA 4
-      // https://github.com/facebook/create-react-app/issues/9893
-      // // TODO (@Veado / @ThatStrangeGuy) Bring it back once CRA 4 has been fixed
-      // await installExtension(REACT_DEVELOPER_TOOLS)
-    } catch (e) {
-      warn('unable to install devtools', e)
-    }
-  }
-
-  if (IS_DEV) {
-    await setupDevEnv()
-  }
-
   mainWindowState.manage(mainWindow)
   mainWindow.on('closed', closeHandler)
+
+  const pkg = await import('../../package.json')
+  const HOST = pkg.env.HOST || '127.0.0.1'
+  const PORT = pkg.env.PORT || 3000
+  /**
+   * URL for main window.
+   * DEV: Vite dev server for development.
+   * PROD: `file://../../build/renderer/index.html`
+   */
+  const BASE_URL = IS_DEV
+    ? `http://${HOST}:${PORT}`
+    : // : new URL('../../build/renderer/index.html', 'file://' + __dirname).toString()
+      join(__dirname, './index.html')
+
   mainWindow.loadURL(BASE_URL)
   // hide menu at start, we need to wait for locale sent by `ipcRenderer`
   mainWindow.setMenuBarVisibility(false)
@@ -132,7 +139,6 @@ const initIPC = () => {
     exportKeystore(defaultFileName, keystore)
   )
   ipcMain.handle(IPCMessages.LOAD_KEYSTORE, () => loadKeystore())
-  // Ledger
   ipcMain.handle(IPCMessages.GET_LEDGER_ADDRESS, async (_, params: IPCLedgerAdddressParams) => getLedgerAddress(params))
   ipcMain.handle(IPCMessages.VERIFY_LEDGER_ADDRESS, async (_, params: IPCLedgerAdddressParams) =>
     verifyLedgerAddress(params)
@@ -176,6 +182,13 @@ const init = async () => {
   await initMainWindow()
   app.on('window-all-closed', allClosedHandler)
   app.on('activate', activateHandler)
+  if (IS_DEV) {
+    try {
+      await installExtension(REACT_DEVELOPER_TOOLS)
+    } catch (e) {
+      warn('unable to install devtools', e)
+    }
+  }
   initIPC()
 }
 
