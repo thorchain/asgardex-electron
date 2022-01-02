@@ -2,7 +2,6 @@
   "compilerOptions": {
     "target": "ESNext",
     "module": "ESNext",
-    "allowJs": true,
     "skipLibCheck": true,
     "skipDefaultLibCheck": true,
     "moduleResolution": "Node",
@@ -13,5 +12,3 @@
     "lib": ["ESNext"]
   }
 }
-
-// The 'import.meta' meta-property is only allowed when the '--module' option is 'es2020', 'es2022', 'esnext', 'system', 'node12', or 'nodenext'
