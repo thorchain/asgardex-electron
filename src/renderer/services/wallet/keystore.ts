@@ -16,13 +16,18 @@ import { hasImportedKeystore } from './util'
 
 const { get$: getKeystoreState$, set: setKeystoreState } = observableState<KeystoreState>(INITIAL_KEYSTORE_STATE)
 
+export const removeKeystore = async () => {
+  await window.apiKeystore.remove()
+  setKeystoreState(O.none)
+}
+
 /**
  * Creates a keystore and saves it to disk
  */
 const addKeystore = async (phrase: Phrase, password: string): Promise<void> => {
   try {
     // remove previous keystore before adding a new one to trigger changes of `KeystoreState
-    await keystoreService.removeKeystore()
+    await removeKeystore()
     const keystore: CryptoKeystore = await encryptToKeyStore(phrase, password)
     await window.apiKeystore.save(keystore)
     setKeystoreState(O.some(O.some({ phrase })))
@@ -30,11 +35,6 @@ const addKeystore = async (phrase: Phrase, password: string): Promise<void> => {
   } catch (error) {
     return Promise.reject(error)
   }
-}
-
-export const removeKeystore = async () => {
-  await window.apiKeystore.remove()
-  setKeystoreState(O.none)
 }
 
 const importKeystore$ = (keystore: CryptoKeystore, password: string): ImportKeystoreLD => {

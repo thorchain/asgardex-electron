@@ -1,5 +1,5 @@
 module.exports = {
-  preset: 'vite-jest',
+  preset: 'ts-jest/presets/default-esm',
   extensionsToTreatAsEsm: ['.ts', '.tsx'],
   testEnvironment: 'jsdom',
   globals: {
@@ -24,13 +24,11 @@ module.exports = {
   // collectCoverage: true,
   // collectCoverageFrom: ['<rootDir>/src/**/*.{ts,tsx}'],
   // coverageDirectory: '<rootDir>/coverage/',
-  // coveragePathIgnorePatterns: ['(tests/.*.mock).(jsx?|tsx?)$', '(.*).d.ts$'],
+  coveragePathIgnorePatterns: ['(tests/.*.mock).(jsx?|tsx?)$', '(.*).d.ts$'],
   moduleNameMapper: {
     // '.+\\.(css|styl|less|sass|scss|png|jpg|ttf|woff|woff2|svg)$': 'identity-obj-proxy',
-    // '^(\\.{1,2}/.*)\\.js$': '$1'
-    '\\.(css|sass|scss)$': 'identity-obj-proxy'
+    '^(\\.{1,2}/.*)\\.js$': '$1'
   },
-  transformIgnorePatterns: ['node_modules/(?!(antd)/)'],
   verbose: true,
   testTimeout: 10000
 }

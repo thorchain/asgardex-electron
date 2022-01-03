@@ -14,8 +14,8 @@
     "package:ci": "npm run postinstall && npm run build && npm run package:electron --publish always",
     "postinstall": "git config blame.ignoreRevsFile .git-blame-ignore-revs && node scripts/fix.sr25519.js && npm run force-rebuild-native-deps && electron-builder install-app-deps",
     "lint": "eslint \"{src,e2e,}/**/*.{ts,tsx}\" --fix",
-    "test": "NODE_OPTIONS=--experimental-vm-modules jest",
-    "test:watch": "NODE_OPTIONS=--experimental-vm-modules jest --watch",
+    "test": "NODE_OPTIONS=--experimental-vm-modules vite-jest",
+    "test:watch": "NODE_OPTIONS=--experimental-vm-modules vite-jest --watch",
     "//test:e2e": "npm run build && npm run test:cafe",
     "test:cafe": "cross-env NODE_ENV=production testcafe electron:./ ./e2e/**/*.e2e.ts",
     "generate:erc20whitelist": "./node_modules/.bin/ts-node --project tsconfig.scripts.json ./scripts/generateERC20Whitelist.ts",
@@ -169,6 +169,7 @@
     "ts-node": "^10.3.0",
     "typescript": "^4.5.4",
     "vite": "^2.7.10",
+    "vite-jest": "^0.1.4",
     "vite-plugin-commonjs-externals": "^0.1.1",
     "vite-plugin-svgr": "^0.6.0",
     "vite-tsconfig-paths": "^3.3.17"

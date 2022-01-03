@@ -5,10 +5,10 @@ import { useRemoteImage } from './useRemoteImage'
 
 const mockSetValue = jest.fn()
 
-jest.mock('react', () => ({
-  useState: (value: unknown) => [value, mockSetValue],
-  useEffect: (fn: () => void) => fn()
-}))
+// jest.mock('react', () => ({
+//   useState: (value: unknown) => [value, mockSetValue],
+//   useEffect: (fn: () => void) => fn()
+// }))
 
 describe('hooks/useRemoteImage', () => {
   const LOAD_FAILURE_SRC = 'fail'

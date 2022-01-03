@@ -17,6 +17,6 @@
     "isolatedModules": true,
     "types": ["vite-plugin-svgr/client", "jest"]
   },
-  "files": ["./index.ts"],
+  "files": ["./index.tsx"],
   "include": ["../types", "./**/*", "../shared", "../test/test-env.d.ts"]
 }
