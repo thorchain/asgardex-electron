@@ -1,5 +1,5 @@
 {
-  "extends": "../../tsconfig.json",
+  "extends": "./tsconfig.json",
   "compilerOptions": {
     "baseUrl": "./",
     "paths": {
@@ -12,11 +12,13 @@
     "esModuleInterop": false,
     "forceConsistentCasingInFileNames": true,
     "moduleResolution": "Node",
+    "target": "ESNext",
+    "module": "ESNext",
     "noEmit": true,
     "jsx": "react-jsx",
     "isolatedModules": true,
-    "types": ["vite-plugin-svgr/client", "jest"]
+    "types": ["vite-plugin-svgr/client", "jest", "@testing-library/jest-dom", "src/types/test-env"]
   },
-  "files": ["./index.ts"],
-  "include": ["../types", "./**/*", "../shared", "../test/test-env.d.ts"]
+  "include": ["src/types/**/*", "src/test/**/*", "src/renderer/**/*", "src/shared/**/*"],
+  "exclude": ["./node_modules"]
 }

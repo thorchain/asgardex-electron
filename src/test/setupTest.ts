@@ -5,48 +5,12 @@
 import '@testing-library/jest-dom/extend-expect'
 import { isLeft, Either } from 'fp-ts/lib/Either'
 import { Option, isNone } from 'fp-ts/lib/Option'
-import { RunHelpers } from 'rxjs/internal/testing/TestScheduler'
-import { TestScheduler } from 'rxjs/testing'
 
-import { ApiKeystore, ApiLang, ApiUrl, ApiHDWallet } from './shared/api/types'
-import * as mockApi from './shared/mock/api'
-
-type RunObservableCallback<T> = (helpers: RunHelpers) => T
-type RunObservable = <T>(callback: RunObservableCallback<T>) => T
-
-declare global {
-  const runObservable: RunObservable
-  // eslint-disable-next-line no-redeclare, @typescript-eslint/no-namespace
-  namespace NodeJS {
-    interface Global {
-      runObservable: RunObservable
-    }
-  }
-
-  interface Window {
-    apiHDWallet: ApiHDWallet
-    apiKeystore: ApiKeystore
-    apiLang: ApiLang
-    apiUrl: ApiUrl
-  }
-
-  // eslint-disable-next-line no-redeclare, @typescript-eslint/no-namespace
-  namespace jest {
-    interface Matchers<R> {
-      toBeNone(): R
-      toBeLeft(): R
-    }
-  }
-}
-
-// Wrapper around `testScheduler.run` to provide it globally
-global.runObservable = <T>(callback: RunObservableCallback<T>) => {
-  const ts = new TestScheduler((actual, expected) => expect(expected).toStrictEqual(actual))
-  return ts.run(callback)
-}
+import * as mockApi from '../shared/mock/api'
 
 // Mock "api" objects on `window` provided by main renderer
 // all can be overridden in tests if needed
+
 global.window.apiKeystore = { ...mockApi.apiKeystore }
 global.window.apiLang = { ...mockApi.apiLang }
 global.window.apiUrl = { ...mockApi.apiUrl }

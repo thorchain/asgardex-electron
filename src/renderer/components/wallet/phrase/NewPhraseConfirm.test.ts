@@ -1,3 +1,5 @@
+import { jest } from '@jest/globals'
+
 import { checkPhraseConfirmWordsFactory, WordType } from './NewPhraseConfirm'
 
 describe('wallet/NewMnemonicConfirm', () => {

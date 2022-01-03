@@ -1,4 +1,5 @@
 import * as RD from '@devexperts/remote-data-ts'
+import { jest } from '@jest/globals'
 
 import { useRemoteImage } from './useRemoteImage'
 

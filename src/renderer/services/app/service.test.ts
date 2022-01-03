@@ -1,6 +1,7 @@
 import { map, withLatestFrom } from 'rxjs/operators'
 
 import { envOrDefault } from '../../../shared/utils/env'
+import { runObservable } from '../../../test/util'
 import { network$, changeNetwork, onlineStatus$ } from './service'
 import { OnlineStatus } from './types'
 
