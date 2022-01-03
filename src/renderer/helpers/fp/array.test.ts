@@ -2,9 +2,9 @@ import { AssetBNB, AssetBTC, AssetETH, AssetLTC, BNBChain, BTCChain, ETHChain, L
 
 import { unionAssets, unionChains } from './array'
 
-describe('helpers/fp/array', () => {
-  describe('unionChains', () => {
-    it('merges two lists of chains and removes duplicates', () => {
+describe('vitesttest/helpers/fp/array', () => {
+  describe('unionChains vite', () => {
+    it('vite merges two lists of chains and removes duplicates', () => {
       const chainsA = [BNBChain, ETHChain, BTCChain]
       const chainsB = [BNBChain, BTCChain, LTCChain]
       expect(unionChains(chainsA)(chainsB)).toEqual([BNBChain, BTCChain, LTCChain, ETHChain])

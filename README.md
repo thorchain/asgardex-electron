@@ -16,7 +16,6 @@ _(in alphabetical order)_
 - [ESLint](https://github.com/eslint/eslint)
 - [Electron](https://github.com/electron/electron/)
 - [fp-ts](https://gcanti.github.io/fp-ts/)
-- [Jest](https://github.com/facebook/jest)
 - [Observable Hooks](https://observable-hooks.js.org/)
 - [Prettier](https://github.com/prettier/prettier)
 - [ReactJS](https://github.com/facebook/react/)
@@ -26,6 +25,7 @@ _(in alphabetical order)_
 - [THORChain Byzantine Module](https://gitlab.com/thorchain/byzantine-module/)
 - [Typescript](https://github.com/microsoft/TypeScript)
 - [Vite](https://vitejs.dev)
+- [Vitest](https://vitest.dev)
 - [xchainjs](https://github.com/xchainjs/xchainjs-lib)
 - and others ...
 
@@ -101,6 +101,8 @@ Note: String of chains have to be as same as [definitions in xchain-util](https:
 
 ```bash
 npm run test
+# watch mode
+npm run test:watch
 ```
 
 ### `e2e`

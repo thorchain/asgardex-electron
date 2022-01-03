@@ -1,4 +1,5 @@
 import { TestScheduler } from 'rxjs/testing'
+import { expect } from 'vitest'
 
 import { RunObservableCallback } from './types'
 

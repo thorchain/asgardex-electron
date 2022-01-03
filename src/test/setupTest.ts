@@ -1,10 +1,6 @@
-// jest-dom adds custom jest matchers for asserting on DOM nodes.
-// allows you to do things like:
-// expect(element).toHaveTextContent(/react/i)
-// learn more: https://github.com/testing-library/jest-dom
-import '@testing-library/jest-dom/extend-expect'
 import { isLeft, Either } from 'fp-ts/lib/Either'
 import { Option, isNone } from 'fp-ts/lib/Option'
+import { expect } from 'vitest'
 
 import * as mockApi from '../shared/mock/api'
 

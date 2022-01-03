@@ -15,8 +15,8 @@
     "noEmit": true,
     "jsx": "react-jsx",
     "isolatedModules": true,
-    "types": ["vite-plugin-svgr/client", "jest"]
+    "types": ["vite-plugin-svgr/client", "vitest/global"]
   },
   "files": ["./index.tsx"],
-  "include": ["../types", "./**/*", "../shared", "../test/test-env.d.ts"]
+  "include": ["../types", "./**/*", "../shared", "../test/types.ts"]
 }

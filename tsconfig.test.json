@@ -17,7 +17,7 @@
     "noEmit": true,
     "jsx": "react-jsx",
     "isolatedModules": true,
-    "types": ["vite-plugin-svgr/client", "jest", "@testing-library/jest-dom", "src/types/test-env"]
+    "types": ["vite-plugin-svgr/client", "vitest/global"]
   },
   "include": ["src/types/**/*", "src/test/**/*", "src/renderer/**/*", "src/shared/**/*"],
   "exclude": ["./node_modules"]

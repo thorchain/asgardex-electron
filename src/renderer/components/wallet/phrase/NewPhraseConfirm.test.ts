@@ -1,17 +1,18 @@
-import { jest } from '@jest/globals'
+import { vi } from 'vitest'
+import type { Mock } from 'vitest'
 
 import { checkPhraseConfirmWordsFactory, WordType } from './NewPhraseConfirm'
 
 describe('wallet/NewMnemonicConfirm', () => {
   let wordsMock: WordType[]
-  let setWordsList: jest.Mock
-  let setMnemonicError: jest.Mock
+  let setWordsList: Mock
+  let setMnemonicError: Mock
 
   beforeEach(() => {
     wordsMock = [{ _id: '1' }, { _id: '2' }, { _id: '3' }, { _id: '4' }, { _id: '5' }, { _id: '6' }] as WordType[]
 
-    setWordsList = jest.fn()
-    setMnemonicError = jest.fn()
+    setWordsList = vi.fn()
+    setMnemonicError = vi.fn()
   })
 
   it('should trigger error callback if not filled yet', () => {
