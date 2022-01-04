@@ -1,5 +1,5 @@
 import React from 'react'
-import { addDecorator } from '@storybook/react/dist/client/preview'
+import { addDecorator } from '@storybook/react'
 import { withThemes } from '@react-theming/storybook-addon'
 import { BrowserRouter as Router, Route } from 'react-router-dom'
 

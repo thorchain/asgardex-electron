@@ -23,9 +23,8 @@
     "generate:types:midgard": "TS_POST_PROCESS_FILE=./node_modules/.bin/prettier openapi-generator-cli generate -i https://testnet.midgard.thorchain.info/v2/swagger.json -g typescript-rxjs -o ./src/renderer/types/generated/midgard --reserved-words-mappings in=in --enable-post-process-file",
     "clean:types:midgard": "rm -rf ./src/renderer/types/generated/midgard",
     "clean:build": "rm -rf ./node_modules/.vite && rm -rf ./build/**/*",
-    "//TODO(@veado) 2": "Make storybook run",
-    "storybook": "start-storybook -p 9009 -s public",
-    "build-storybook": "build-storybook -s public",
+    "storybook": "start-storybook -p 9009",
+    "build-storybook": "build-storybook",
     "prepare": "husky install"
   },
   "repository": {
@@ -116,15 +115,16 @@
   },
   "devDependencies": {
     "@hot-loader/react-dom": "^17.0.1",
-    "@react-theming/storybook-addon": "^1.1.1",
-    "@storybook/addon-actions": "^6.3.12",
-    "@storybook/addon-backgrounds": "^6.3.12",
-    "@storybook/addon-controls": "^6.3.12",
+    "@mdx-js/react": "^1.6.22",
+    "@open-wc/webpack-import-meta-loader": "^0.4.7",
+    "@react-theming/storybook-addon": "^1.1.3",
+    "@storybook/addon-actions": "^6.4.9",
+    "@storybook/addon-backgrounds": "^6.4.9",
+    "@storybook/addon-controls": "^6.4.9",
     "@storybook/addon-knobs": "^6.3.1",
-    "@storybook/addon-viewport": "^6.3.12",
-    "@storybook/preset-create-react-app": "^3.2.0",
-    "@storybook/react": "6.1.21",
-    "@storybook/theming": "^6.3.12",
+    "@storybook/addon-viewport": "^6.4.9",
+    "@storybook/react": "6.4.9",
+    "@storybook/theming": "^6.4.9",
     "@testing-library/react": "^12.1.2",
     "@testing-library/react-hooks": "^7.0.2",
     "@testing-library/user-event": "^13.5.0",
@@ -160,6 +160,7 @@
     "lint-staged": "^11.2.3",
     "lodash.escaperegexp": "^4.1.2",
     "prettier": "^2.4.1",
+    "storybook-builder-vite": "^0.1.13",
     "testcafe": "^1.16.1",
     "testcafe-browser-provider-electron": "^0.0.16",
     "testcafe-react-selectors": "^4.1.5",
@@ -169,7 +170,7 @@
     "vite-plugin-commonjs-externals": "^0.1.1",
     "vite-plugin-svgr": "^0.6.0",
     "vite-tsconfig-paths": "^3.3.17",
-    "vitest": "^0.0.128"
+    "vitest": "^0.0.130"
   },
   "env": {
     "//": "Used in build scripts",
