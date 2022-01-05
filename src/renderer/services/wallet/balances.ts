@@ -1,6 +1,16 @@
 import * as RD from '@devexperts/remote-data-ts'
 import { Address } from '@xchainjs/xchain-client'
-import { AssetBNB, BCHChain, BNBChain, BTCChain, Chain, ETHChain, LTCChain, THORChain } from '@xchainjs/xchain-util'
+import {
+  AssetBNB,
+  BCHChain,
+  BNBChain,
+  BTCChain,
+  Chain,
+  DOGEChain,
+  ETHChain,
+  LTCChain,
+  THORChain
+} from '@xchainjs/xchain-util'
 import * as A from 'fp-ts/lib/Array'
 import * as FP from 'fp-ts/lib/function'
 import * as NEA from 'fp-ts/lib/NonEmptyArray'
@@ -72,6 +82,8 @@ export const createBalancesService = ({
         return THOR.reloadBalances
       case LTCChain:
         return LTC.reloadBalances
+      // TODO (@asgdx-team) Implement DOGE
+      case DOGEChain:
       default:
         return FP.constVoid
     }
@@ -127,6 +139,8 @@ export const createBalancesService = ({
           balances$: LTC.balances$(walletType, walletIndex),
           reloadBalances$: LTC.reloadBalances$
         }
+      // TODO (@asgdx-team) Implement DOGE
+      case DOGEChain:
       default:
         return {
           reloadBalances: FP.constVoid,

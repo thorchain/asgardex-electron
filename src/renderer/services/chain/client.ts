@@ -1,4 +1,4 @@
-import { BCHChain, BNBChain, BTCChain, Chain, ETHChain, LTCChain, THORChain } from '@xchainjs/xchain-util'
+import { BCHChain, BNBChain, BTCChain, Chain, DOGEChain, ETHChain, LTCChain, THORChain } from '@xchainjs/xchain-util'
 import * as O from 'fp-ts/lib/Option'
 import * as Rx from 'rxjs'
 import * as RxOp from 'rxjs/operators'
@@ -27,6 +27,9 @@ export const clientByChain$ = (chain: Chain): XChainClient$ => {
       return THOR.client$
     case LTCChain:
       return LTC.client$
+    case DOGEChain:
+      // TODO (@asgdx-team) Implement DOGE
+      return Rx.of(O.none)
     default:
       return Rx.of(O.none)
   }
