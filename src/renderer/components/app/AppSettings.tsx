@@ -82,7 +82,7 @@ export const AppSettings: React.FC<Props> = (props): JSX.Element => {
   )
 
   // TODO asgdx-team: Remove `networkLabel` if we go live with mainnet
-  const networkLabel = (network: Network) => (network === 'mainnet' ? 'chaosnet' : 'testnet')
+  const networkLabel = (network: Network) => (network === 'mainnet' ? 'chaosnet' : network)
 
   const networkMenu = useMemo(
     () => (

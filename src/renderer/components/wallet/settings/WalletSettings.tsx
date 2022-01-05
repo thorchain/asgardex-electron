@@ -28,6 +28,7 @@ import { AssetIcon } from '../../../components/uielements/assets/assetIcon/Asset
 import { QRCodeModal } from '../../../components/uielements/qrCodeModal/QRCodeModal'
 import { PhraseCopyModal } from '../../../components/wallet/phrase/PhraseCopyModal'
 import { getChainAsset, isBnbChain, isThorChain } from '../../../helpers/chainHelper'
+import { isEnabledWallet } from '../../../helpers/walletHelper'
 import { ValidatePasswordHandler, WalletAccounts, WalletAddressAsync } from '../../../services/wallet/types'
 import { walletTypeToI18n } from '../../../services/wallet/util'
 import { InfoIcon } from '../../uielements/info'
@@ -264,15 +265,17 @@ export const WalletSettings: React.FC<Props> = (props): JSX.Element => {
                       <AssetIcon asset={getChainAsset(chain)} size={'small'} network="mainnet" />
                       <Styled.AccountTitle>{chain}</Styled.AccountTitle>
                     </Styled.AccountTitleWrapper>
-                    {accounts.map((account, j) => {
-                      const { type } = account
-                      return (
-                        <Styled.AccountAddressWrapper key={type}>
-                          <Styled.WalletTypeLabel>{walletTypeToI18n(type, intl)}</Styled.WalletTypeLabel>
-                          <Styled.AccountContent key={j}>{renderAddress(chain, account)}</Styled.AccountContent>
-                        </Styled.AccountAddressWrapper>
-                      )
-                    })}
+                    {accounts
+                      .filter((account) => isEnabledWallet(chain, selectedNetwork, account.type))
+                      .map((account, j) => {
+                        const { type } = account
+                        return (
+                          <Styled.AccountAddressWrapper key={type}>
+                            <Styled.WalletTypeLabel>{walletTypeToI18n(type, intl)}</Styled.WalletTypeLabel>
+                            <Styled.AccountContent key={j}>{renderAddress(chain, account)}</Styled.AccountContent>
+                          </Styled.AccountAddressWrapper>
+                        )
+                      })}
                   </Styled.ListItem>
                 )}
               />
@@ -281,7 +284,7 @@ export const WalletSettings: React.FC<Props> = (props): JSX.Element => {
         )),
         O.getOrElse(() => <></>)
       ),
-    [oWalletAccounts, intl, renderAddress]
+    [oWalletAccounts, intl, renderAddress, selectedNetwork]
   )
 
   return (

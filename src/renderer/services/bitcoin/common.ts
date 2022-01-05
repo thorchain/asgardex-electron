@@ -1,5 +1,5 @@
 import * as RD from '@devexperts/remote-data-ts'
-import { Client as BitcoinClient } from '@xchainjs/xchain-bitcoin'
+import { Client as BitcoinClient, ClientUrl } from '@xchainjs/xchain-bitcoin'
 import { BTCChain } from '@xchainjs/xchain-util'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
@@ -7,12 +7,24 @@ import * as Rx from 'rxjs'
 import { Observable } from 'rxjs'
 import * as RxOp from 'rxjs/operators'
 
+import { envOrDefault } from '../../../shared/utils/env'
 import { isError } from '../../../shared/utils/guard'
 import { clientNetwork$ } from '../app/service'
 import * as C from '../clients'
 import { keystoreService } from '../wallet/keystore'
 import { getPhrase } from '../wallet/util'
 import { ClientState, ClientState$ } from './types'
+
+const APP_HASKOIN_MAINNET_URL = envOrDefault(
+  process.env.REACT_APP_HASKOIN_BTC_MAINNET_URL,
+  'https://api.haskoin.com/btc'
+)
+
+const HASKOIN_API_URL: ClientUrl = {
+  testnet: envOrDefault(process.env.REACT_APP_HASKOIN_BTC_TESTNET_URL, 'https://api.haskoin.com/btctest'),
+  stagenet: APP_HASKOIN_MAINNET_URL,
+  mainnet: APP_HASKOIN_MAINNET_URL
+}
 
 /**
  * Stream to create an observable BitcoinClient depending on existing phrase in keystore
@@ -32,7 +44,8 @@ const clientState$: ClientState$ = FP.pipe(
             try {
               const client = new BitcoinClient({
                 network,
-                phrase
+                phrase,
+                haskoinUrl: HASKOIN_API_URL
               })
               return RD.success(client)
             } catch (error) {

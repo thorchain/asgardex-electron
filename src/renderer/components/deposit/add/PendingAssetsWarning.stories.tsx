@@ -42,7 +42,7 @@ const meta: Meta<Args> = {
       name: 'Network',
       control: {
         type: 'select',
-        options: ['mainnet', 'testnet']
+        options: ['mainnet', 'stagenet', 'testnet']
       },
       defaultValue: 'mainnet'
     },
