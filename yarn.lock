@@ -4503,10 +4503,10 @@
   resolved "https://registry.yarnpkg.com/@xchainjs/xchain-binance/-/xchain-binance-5.4.0.tgz#2918c6895d985ed55ac3b5e919dea68b7eb4a679"
   integrity sha512-CGuoiih0w7hUKHWDrdY2YkHy1yS8RmU1rRUCpnsK4XbqdW3akPwFjpB09xF2cZ+H4ARGfcBdmfhAnTECa7JtyA==
 
-"@xchainjs/xchain-bitcoin@^0.16.0":
-  version "0.16.0"
-  resolved "https://registry.yarnpkg.com/@xchainjs/xchain-bitcoin/-/xchain-bitcoin-0.16.0.tgz#4ec3b3b1d15adf410f7475094f5815238d0de1b2"
-  integrity sha512-UCzUvQjoX9635QWm5LslrKKHZJA3I6pbmgMtI0bP6KJqkbKzaEbvM265BkeVc2NtFkboMJH31W8D5hzYhOCOdQ==
+"@xchainjs/xchain-bitcoin@^0.17.0":
+  version "0.17.0"
+  resolved "https://registry.yarnpkg.com/@xchainjs/xchain-bitcoin/-/xchain-bitcoin-0.17.0.tgz#32f1874aee75d734416ff90f28ef0f75e326605f"
+  integrity sha512-F3KnXhii3DdXvg/l6deTQ29skSGfZQGFpoWUq3gs8aIwaP82QrAkWBsWCeHkRoTX4qAFz/4Vefa89N1g9lgzRQ==
 
 "@xchainjs/xchain-bitcoincash@^0.12.0":
   version "0.12.0"
@@ -4537,10 +4537,10 @@
     hdkey "^2.0.1"
     uuid "^8.3.2"
 
-"@xchainjs/xchain-ethereum@^0.23.0":
-  version "0.23.0"
-  resolved "https://registry.yarnpkg.com/@xchainjs/xchain-ethereum/-/xchain-ethereum-0.23.0.tgz#32355917133cb2c7c72a9a2bd22b59ff77af297a"
-  integrity sha512-pRJOuf7cOjEwEH+k0xmTOilhz2DN3Q7wvMVCKkf0zpfpn48ZT5AEPGJEc9tNkgc2Uoy1fYpa3IK4AJrZjyYKIw==
+"@xchainjs/xchain-ethereum@^0.23.1":
+  version "0.23.1"
+  resolved "https://registry.yarnpkg.com/@xchainjs/xchain-ethereum/-/xchain-ethereum-0.23.1.tgz#d16a5f89f64225d0ae04109a9d92a52478da4d86"
+  integrity sha512-u56cQF2JOKL8CtAbcH4YpdLNvSK0QBCY49bj2jwO7EFrWhi+Npk2W2XKp8CNVg2PGOL3f/AlYiPEAX6yAHm9UQ==
 
 "@xchainjs/xchain-litecoin@^0.7.0":
   version "0.7.0"

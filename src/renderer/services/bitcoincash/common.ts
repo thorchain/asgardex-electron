@@ -16,10 +16,15 @@ import { keystoreService } from '../wallet/keystore'
 import { getPhrase } from '../wallet/util'
 import { ClientState, ClientState$ } from './types'
 
+const APP_HASKOIN_BCH_MAINNET_URL = envOrDefault(
+  process.env.REACT_APP_HASKOIN_BCH_MAINNET_URL,
+  'https://haskoin.ninerealms.com/bch'
+)
+
 const HASKOIN_API_URL: ClientUrl = {
-  testnet: envOrDefault(process.env.REACT_APP_HASKOIN_TESTNET_URL, 'https://haskoin.ninerealms.com/bchtest'),
-  stagenet: envOrDefault(process.env.REACT_APP_HASKOIN_STAGENET_URL, 'https://haskoin.ninerealms.com/bch'),
-  mainnet: envOrDefault(process.env.REACT_APP_HASKOIN_MAINNET_URL, 'https://haskoin.ninerealms.com/bch')
+  testnet: envOrDefault(process.env.REACT_APP_HASKOIN_BCH_TESTNET_URL, 'https://haskoin.ninerealms.com/bchtest'),
+  stagenet: APP_HASKOIN_BCH_MAINNET_URL,
+  mainnet: APP_HASKOIN_BCH_MAINNET_URL
 }
 
 const NODE_URL: ClientUrl = {
