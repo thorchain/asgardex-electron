@@ -37,10 +37,12 @@ const MIDGARD_TESTNET_URL = envOrDefault(
   'https://testnet.midgard.thorchain.info'
 )
 
-const MIDGARD_MAINNET_URL = envOrDefault(
-  import.meta.env.REACT_APP_MIDGARD_MAINNET_URL,
-  'https://midgard.thorchain.info'
+const MIDGARD_STAGENET_URL = envOrDefault(
+  process.env.REACT_APP_MIDGARD_STAGENET_URL,
+  'https://stagenet-midgard.ninerealms.com'
 )
+
+const MIDGARD_MAINNET_URL = envOrDefault(process.env.REACT_APP_MIDGARD_MAINNET_URL, 'https://midgard.thorchain.info')
 
 /**
  * Helper to get `DefaultApi` instance for Midgard using custom basePath
@@ -53,10 +55,22 @@ const { stream$: reloadByzantine$, trigger: reloadByzantine } = triggerStream()
 const nextByzantine$: (n: Network) => LiveData<Error, string> = fromPromise$<RD.RemoteData<Error, string>, Network>(
   (network: Network) => {
     // option to set Midgard url (for testnet + development only)
-    if (network === 'testnet') return Promise.resolve(RD.success(MIDGARD_TESTNET_URL))
+    let midgardURL
+    switch (network) {
+      case 'mainnet':
+        midgardURL = MIDGARD_MAINNET_URL
+        break
+      case 'stagenet':
+        midgardURL = MIDGARD_STAGENET_URL
+        break
+      case 'testnet':
+        midgardURL = MIDGARD_TESTNET_URL
+        break
+    }
+
     // Byzantine module is disabled temporary
     // return midgard(network, true).then(RD.success)
-    return Promise.resolve(RD.success(MIDGARD_MAINNET_URL))
+    return Promise.resolve(RD.success(midgardURL))
   },
   RD.pending,
   RD.failure

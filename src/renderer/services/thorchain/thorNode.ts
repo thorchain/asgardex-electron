@@ -67,6 +67,12 @@ const TESTNET_THORNODE_API = `${envOrDefault(
 )}/thorchain`
 
 // Note: We get data from `/thorchain` endpoint !!
+const STAGENET_THORNODE_API = `${envOrDefault(
+  process.env.REACT_APP_STAGENET_THORNODE_API,
+  'https://stagenet-thornode.ninerealms.com'
+)}/thorchain`
+
+// Note: We get data from `/thorchain` endpoint !!
 const MAINNET_THORNODE_API = `${envOrDefault(
   import.meta.env.REACT_APP_MAINNET_THORNODE_API,
   'https://thornode.thorchain.info'
@@ -74,10 +80,20 @@ const MAINNET_THORNODE_API = `${envOrDefault(
 
 const thornodeApiUrl$ = (network: Network): ThorNodeApiUrlLD => {
   // option to set THORNode api url (for testnet + development only)
-  if (network === 'testnet') {
-    return Rx.of(RD.success(TESTNET_THORNODE_API))
+  let thornodeApi
+  switch (network) {
+    case 'mainnet':
+      thornodeApi = MAINNET_THORNODE_API
+      break
+    case 'stagenet':
+      thornodeApi = STAGENET_THORNODE_API
+      break
+    case 'testnet':
+      thornodeApi = TESTNET_THORNODE_API
+      break
   }
-  return Rx.of(RD.success(MAINNET_THORNODE_API))
+
+  return Rx.of(RD.success(thornodeApi))
 }
 
 const getNodeInfo$ = (node: Address, network: Network): NodeInfoLD =>

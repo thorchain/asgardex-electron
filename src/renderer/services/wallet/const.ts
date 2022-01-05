@@ -21,7 +21,11 @@ export const INITIAL_LOAD_TXS_PROPS: LoadTxsParams = {
 
 export const EMPTY_LOAD_TXS_HANDLER: LoadTxsHandler = (_: LoadTxsParams) => {}
 
-export const INITIAL_LEDGER_ADDRESS_MAP: LedgerAddressMap = { mainnet: RD.initial, testnet: RD.initial }
+export const INITIAL_LEDGER_ADDRESS_MAP: LedgerAddressMap = {
+  mainnet: RD.initial,
+  stagenet: RD.initial,
+  testnet: RD.initial
+}
 
 export const INITIAL_LEDGER_ADDRESSES_MAP: LedgerAddressesMap = {
   [Chain.Binance]: INITIAL_LEDGER_ADDRESS_MAP,

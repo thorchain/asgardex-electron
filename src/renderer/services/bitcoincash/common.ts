@@ -16,14 +16,21 @@ import { keystoreService } from '../wallet/keystore'
 import { getPhrase } from '../wallet/util'
 import { ClientState, ClientState$ } from './types'
 
+const APP_HASKOIN_BCH_MAINNET_URL = envOrDefault(
+  process.env.REACT_APP_HASKOIN_BCH_MAINNET_URL,
+  'https://haskoin.ninerealms.com/bch'
+)
+
 const HASKOIN_API_URL: ClientUrl = {
-  testnet: envOrDefault(import.meta.env.REACT_APP_HASKOIN_TESTNET_URL, 'https://haskoin.ninerealms.com/bchtest'),
-  mainnet: envOrDefault(import.meta.env.REACT_APP_HASKOIN_MAINNET_URL, 'https://haskoin.ninerealms.com/bch')
+  testnet: envOrDefault(process.env.REACT_APP_HASKOIN_BCH_TESTNET_URL, 'https://haskoin.ninerealms.com/bchtest'),
+  stagenet: APP_HASKOIN_BCH_MAINNET_URL,
+  mainnet: APP_HASKOIN_BCH_MAINNET_URL
 }
 
 const NODE_URL: ClientUrl = {
-  testnet: envOrDefault(import.meta.env.REACT_APP_BCH_NODE_TESTNET_URL, 'https://testnet.bch.thorchain.info'),
-  mainnet: envOrDefault(import.meta.env.REACT_APP_BCH_NODE_MAINNET_URL, 'https://bch.thorchain.info')
+  testnet: envOrDefault(process.env.REACT_APP_BCH_NODE_TESTNET_URL, 'https://testnet.bch.thorchain.info'),
+  stagenet: envOrDefault(process.env.REACT_APP_BCH_NODE_MAINNET_URL, 'https://bch.thorchain.info'),
+  mainnet: envOrDefault(process.env.REACT_APP_BCH_NODE_MAINNET_URL, 'https://bch.thorchain.info')
 }
 
 const NODE_AUTH: NodeAuth = {

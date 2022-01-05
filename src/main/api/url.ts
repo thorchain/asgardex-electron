@@ -24,12 +24,16 @@ const EXTERNALS_WHITELIST = [
   'ltc.bitaps.com',
   'www.blockchain.com',
   'testnet.thorswap.finance',
-  'testnet.thorswap.finance',
+  'stagenet.thorswap.finance',
+  'app.thorswap.finance',
   'viewblock.io',
   'midgard.thorchain.info',
   'testnet.midgard.thorchain.info',
+  'stagenet-midgard.ninerealms.com',
   'thornode.thorchain.info',
-  'testnet.thornode.thorchain.info'
+  'testnet.thornode.thorchain.info',
+  'stagenet-thornode.ninerealms.com',
+  'stagenet-rpc.ninerealms.com'
 ]
 
 const openExternal = (target: string) => {

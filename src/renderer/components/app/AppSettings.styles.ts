@@ -142,6 +142,8 @@ export const NetworkLabel = styled(Text)<{ network: Network }>`
     switch (network) {
       case 'mainnet':
         return palette('primary', 0)
+      case 'stagenet':
+        return palette('danger', 1)
       case 'testnet':
         return palette('warning', 0)
       default:

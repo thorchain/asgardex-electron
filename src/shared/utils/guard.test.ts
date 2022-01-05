@@ -43,6 +43,9 @@ describe('shared/guard', () => {
     it('true for "mainnet"', () => {
       expect(isNetwork('mainnet')).toBeTruthy()
     })
+    it('true for "stagenet"', () => {
+      expect(isNetwork('stagenet')).toBeTruthy()
+    })
     it('true for testnet', () => {
       expect(isNetwork('testnet')).toBeTruthy()
     })

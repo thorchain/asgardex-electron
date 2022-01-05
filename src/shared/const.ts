@@ -19,6 +19,7 @@ const USER_NODES_STORAGE_VERSION = '1'
 export const USER_NODES_STORAGE_DEFAULT: UserNodesStorage = {
   version: USER_NODES_STORAGE_VERSION,
   mainnet: [],
+  stagenet: [],
   testnet: []
 }
 

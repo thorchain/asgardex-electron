@@ -18,7 +18,7 @@ const chainGuard: IOG.Guard<unknown, Chain> = {
 
 export const isChain = (u: unknown): u is Chain => chainGuard.is(u)
 
-export const isNetwork = (u: unknown): u is Network => u === 'mainnet' || u === 'testnet'
+export const isNetwork = (u: unknown): u is Network => u === 'mainnet' || u === 'stagenet' || u === 'testnet'
 
 export const isWalletType = (u: unknown): u is WalletType => u === 'keystore' || u === 'ledger'
 export const isLedgerWallet = (walletType: WalletType): boolean => walletType === 'ledger'

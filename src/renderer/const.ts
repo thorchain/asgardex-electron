@@ -143,7 +143,11 @@ export const AssetUniH: Asset = {
 
 // Black listed BNB assets
 // For now `RUNE-67C` is blacklisted on `mainnet` only, see https://explorer.binance.org/asset/RUNE-67C
-export const BinanceBlackList: Record<Network, Array<Asset>> = { mainnet: [AssetRune67C], testnet: [] }
+export const BinanceBlackList: Record<Network, Array<Asset>> = {
+  mainnet: [AssetRune67C],
+  stagenet: [AssetRune67C],
+  testnet: []
+}
 
 //
 // All of following assets are needed for pricing USD
@@ -235,11 +239,13 @@ export const ASGARDEX_SWAP_IDENTIFIER = 999
 
 export const RECOVERY_TOOL_URL: Record<Network, string> = {
   testnet: 'https://testnet.thorswap.finance/pending',
+  stagenet: 'https://stagenet.thorswap.finance/pending',
   mainnet: 'https://app.thorswap.finance/pending'
 }
 
 export const ASYM_DEPOSIT_TOOL_URL: Record<Network, string> = {
   testnet: 'https://testnet.thorswap.finance/',
+  stagenet: 'https://stagenet.thorswap.finance/',
   mainnet: 'https://app.thorswap.finance/'
 }
 
