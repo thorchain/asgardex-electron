@@ -12,6 +12,7 @@ import {
   isBchAsset,
   isBnbAsset,
   isBtcAsset,
+  isDogeAsset,
   isEthAsset,
   isFoxERC20Asset,
   isLtcAsset,
@@ -23,7 +24,7 @@ import {
 import { isBnbChain, isEthChain } from '../../../../helpers/chainHelper'
 import { getIntFromName, rainbowStop } from '../../../../helpers/colorHelpers'
 import { useRemoteImage } from '../../../../hooks/useRemoteImage'
-import { bnbIcon, btcIcon, ethIcon, runeIcon, bnbRuneIcon, xRuneIcon, tgtIcon } from '../../../icons'
+import { bnbIcon, btcIcon, dogeIcon, ethIcon, runeIcon, bnbRuneIcon, xRuneIcon, tgtIcon } from '../../../icons'
 import * as Styled from './AssetIcon.styles'
 import { Size } from './AssetIcon.types'
 
@@ -84,6 +85,11 @@ export const AssetIcon: React.FC<Props> = ({
 
     if (isTgtERC20Asset(asset)) {
       return tgtIcon
+    }
+
+    // DOGE
+    if (isDogeAsset(asset)) {
+      return dogeIcon
     }
 
     if (network !== 'testnet') {

@@ -13,6 +13,7 @@ import {
   BTCChain,
   Chain,
   CosmosChain,
+  DOGEChain,
   ETHChain,
   LTCChain,
   PolkadotChain,
@@ -40,6 +41,9 @@ const getDefaultFeesByChain = (chain: Chain): Fees => {
       return Cosmos.getDefaultFees()
     case PolkadotChain:
       throw Error('Polkadot is not supported yet')
+    case DOGEChain:
+      // TODO (@asgdx-team) Implement DOGE
+      throw Error('DOGE needs to be implemented')
     case BCHChain:
       return BCH.getDefaultFees()
     case LTCChain:

@@ -7,7 +7,8 @@ import {
   PolkadotChain,
   THORChain,
   BCHChain,
-  LTCChain
+  LTCChain,
+  DOGEChain
 } from '@xchainjs/xchain-util'
 import * as O from 'fp-ts/lib/Option'
 import * as Rx from 'rxjs'
@@ -47,6 +48,9 @@ const addressByChain$ = (chain: Chain): WalletAddress$ => {
       return BCH.address$
     case LTCChain:
       return LTC.address$
+    case DOGEChain:
+      // TODO (@asgdx-team) Implement DOGE
+      return Rx.of(O.none)
   }
 }
 

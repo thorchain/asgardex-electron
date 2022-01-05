@@ -12,7 +12,8 @@ import {
   BCHChain,
   LTCChain,
   Asset,
-  BTCChain
+  BTCChain,
+  DOGEChain
 } from '@xchainjs/xchain-util'
 import * as Rx from 'rxjs'
 import * as RxOp from 'rxjs/operators'
@@ -35,6 +36,10 @@ const getDecimal = (asset: Asset, network: Network): Promise<number> => {
     case PolkadotChain: {
       // return Promise.resolve(getDecimalDot(thorNetwork))
       return Promise.reject('Polkadot is not supported yet')
+    }
+    case DOGEChain: {
+      // TODO (@asgdx-team) Implement DOGE
+      return Promise.reject('DOGE needs to be implemented')
     }
     case CosmosChain:
       return Promise.resolve(COSMOS_DECIMAL)

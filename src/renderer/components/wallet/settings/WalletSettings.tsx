@@ -12,7 +12,8 @@ import {
   BTCChain,
   LTCChain,
   CosmosChain,
-  Chain
+  Chain,
+  DOGEChain
 } from '@xchainjs/xchain-util'
 import { Col, List, Row } from 'antd'
 import * as FP from 'fp-ts/function'
@@ -120,7 +121,8 @@ export const WalletSettings: React.FC<Props> = (props): JSX.Element => {
     [THORChain]: 0,
     [ETHChain]: 0,
     [CosmosChain]: 0,
-    [PolkadotChain]: 0
+    [PolkadotChain]: 0,
+    [DOGEChain]: 0
   })
 
   const renderAddress = useCallback(
