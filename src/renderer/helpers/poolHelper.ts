@@ -59,6 +59,16 @@ export const RUNE_POOL_ADDRESS: PoolAddress = {
   router: O.none
 }
 
+/**
+ * Filters a pool out with hightest value of RUNE
+ */
+export const getDeepestPool = (pools: PoolDetails): O.Option<PoolDetail> =>
+  pools.reduce((acc: O.Option<PoolDetail>, pool: PoolDetail) => {
+    const runeDepth = bnOrZero(pool.runeDepth)
+    const prev = O.toNullable(acc)
+    return runeDepth.isGreaterThanOrEqualTo(bnOrZero(prev?.runeDepth)) ? O.some(pool) : acc
+  }, O.none)
+
 export const getPoolTableRowsData = ({
   poolDetails,
   pricePoolData,
@@ -116,16 +126,6 @@ export const getPoolTableRowsData = ({
     A.reverse
   )
 }
-
-/**
- * Filters a pool out with hightest value of RUNE
- */
-export const getDeepestPool = (pools: PoolDetails): O.Option<PoolDetail> =>
-  pools.reduce((acc: O.Option<PoolDetail>, pool: PoolDetail) => {
-    const runeDepth = bnOrZero(pool.runeDepth)
-    const prev = O.toNullable(acc)
-    return runeDepth.isGreaterThanOrEqualTo(bnOrZero(prev?.runeDepth)) ? O.some(pool) : acc
-  }, O.none)
 
 /**
  * Converts Asset's pool price according to runePrice in selectedPriceAsset

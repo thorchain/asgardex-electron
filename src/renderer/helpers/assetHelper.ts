@@ -120,6 +120,15 @@ export const validAssetForETH = (asset: Asset /* ETH or ERC20 asset */, network:
   network !== 'mainnet' /* (1) */ || isEthAsset(asset) /* (2) */ || assetInERC20Whitelist(asset)
 
 /**
+ * Get ethereum token address (as check sum address) from a given asset
+ */
+export const getEthTokenAddress: (asset: Asset) => O.Option<Address> = FP.flow(
+  getTokenAddress,
+  O.fromNullable,
+  O.chain(getEthChecksumAddress)
+)
+
+/**
  * Check whether an ERC20 address is black listed or not
  */
 const addressInList = (address: Address, list: Asset[]): boolean => {
@@ -169,15 +178,6 @@ export const isFoxERC20Asset = (asset: Asset): boolean => eqAsset.equals(asset, 
  */
 export const isTgtERC20Asset = (asset: Asset): boolean =>
   eqAsset.equals(asset, AssetTGTERC20) || eqAsset.equals(asset, AssetTGTERC20Testnet)
-
-/**
- * Get ethereum token address (as check sum address) from a given asset
- */
-export const getEthTokenAddress: (asset: Asset) => O.Option<Address> = FP.flow(
-  getTokenAddress,
-  O.fromNullable,
-  O.chain(getEthChecksumAddress)
-)
 
 /**
  * Get address (as check sum address) from an ETH or ETH token asset

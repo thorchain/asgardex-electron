@@ -23,12 +23,6 @@ import * as O from 'fp-ts/lib/Option'
 import { Network } from '../../shared/api/types'
 import { toClientNetwork } from '../../shared/utils/client'
 
-export const truncateAddress = (addr: Address, chain: Chain, network: Network): string => {
-  const first = addr.substr(0, Math.max(getAddressPrefixLength(chain, network) + 3, 6))
-  const last = addr.substr(addr.length - 3, 3)
-  return `${first}...${last}`
-}
-
 export const getAddressPrefixLength = (chain: Chain, network: Network): number => {
   const clientNetwork = toClientNetwork(network)
   switch (chain) {
@@ -51,6 +45,12 @@ export const getAddressPrefixLength = (chain: Chain, network: Network): number =
     case BCHChain:
       return getBCHPrefix().length
   }
+}
+
+export const truncateAddress = (addr: Address, chain: Chain, network: Network): string => {
+  const first = addr.substr(0, Math.max(getAddressPrefixLength(chain, network) + 3, 6))
+  const last = addr.substr(addr.length - 3, 3)
+  return `${first}...${last}`
 }
 
 export const removeAddressPrefix = (address: Address): Address => {

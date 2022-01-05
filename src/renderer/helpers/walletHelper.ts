@@ -1,6 +1,5 @@
 import { Address } from '@xchainjs/xchain-client'
-import { Asset, AssetAmount, baseToAsset } from '@xchainjs/xchain-util'
-import { Chain } from '@xchainjs/xchain-util'
+import { Asset, AssetAmount, baseToAsset, Chain } from '@xchainjs/xchain-util'
 import * as A from 'fp-ts/Array'
 import * as FP from 'fp-ts/function'
 import * as O from 'fp-ts/Option'

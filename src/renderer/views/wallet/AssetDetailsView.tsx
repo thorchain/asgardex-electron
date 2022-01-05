@@ -51,16 +51,16 @@ export const AssetDetailsView: React.FC = (): JSX.Element => {
 
   const { clientByChain$ } = useChainContext()
 
-  // Set selected asset once
-  // Needed to get all data for this asset (transactions etc.)
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  useEffect(() => setSelectedAsset(oRouteAsset), [])
-
   const {
     mimirHalt: { haltThorChain, haltEthChain, haltBnbChain }
   } = useMimirHalt()
 
   const { getTxs$, balancesState$, loadTxs, reloadBalancesByChain, setSelectedAsset, resetTxsPage } = useWalletContext()
+
+  // Set selected asset once
+  // Needed to get all data for this asset (transactions etc.)
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  useEffect(() => setSelectedAsset(oRouteAsset), [])
 
   const [txsRD] = useObservableState(() => getTxs$(oWalletAddress, walletIndex), RD.initial)
   const { balances: oBalances } = useObservableState(balancesState$, INITIAL_BALANCES_STATE)

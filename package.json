@@ -10,7 +10,7 @@
     "force-rebuild-native-deps": "rm -rf node_modules/prebuild-install",
     "build": "npm run clean:build && node scripts/build.mjs",
     "package": "npm run build && npm run package:electron",
-    "package:electron": "electron-builder build -c.extraMetadata.main=build/main/index.cjs --config .electronbuildrc",
+    "package:electron": "electron-builder build -c.extraMetadata.main=build/index.cjs --config .electronbuildrc",
     "package:ci": "npm run postinstall && npm run build && npm run package:electron --publish always",
     "postinstall": "git config blame.ignoreRevsFile .git-blame-ignore-revs && node scripts/fix.sr25519.js && npm run force-rebuild-native-deps && electron-builder install-app-deps",
     "lint": "eslint \"{src,e2e,}/**/*.{ts,tsx}\" --fix",

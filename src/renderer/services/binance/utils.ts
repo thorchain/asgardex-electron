@@ -8,15 +8,15 @@ import * as O from 'fp-ts/lib/Option'
 import { BNB_DECIMAL } from '../../helpers/assetHelper'
 
 /**
+ * Converts a BinanceChain symbol to an `Asset` string
+ **/
+export const bncSymbolToAssetString = (symbol: string) => `${AssetBNB.chain}.${symbol}`
+
+/**
  * Converts a BinanceChain symbol to an `Asset`
  **/
 export const bncSymbolToAsset = (symbol: string): O.Option<Asset> =>
   O.fromNullable(assetFromString(bncSymbolToAssetString(symbol)))
-
-/**
- * Converts a BinanceChain symbol to an `Asset` string
- **/
-export const bncSymbolToAssetString = (symbol: string) => `${AssetBNB.chain}.${symbol}`
 
 type GetWalletBalances = (balances: BinanceBalance[]) => Balance[]
 export const getWalletBalances: GetWalletBalances = A.filterMap(({ symbol, free }) =>

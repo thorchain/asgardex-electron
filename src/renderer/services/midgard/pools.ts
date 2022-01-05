@@ -297,6 +297,20 @@ const createPoolsService = (
     RxOp.shareReplay(1)
   )
 
+  const {
+    get: getSelectedPricePoolAsset,
+    get$: selectedPricePoolAsset$,
+    set: updateSelectedPricePoolAsset
+  } = observableState<SelectedPricePoolAsset>(getStoredSelectedPricePoolAsset())
+
+  /**
+   * Update selected `PricePoolAsset`
+   */
+  const setSelectedPricePoolAsset = (asset: PricePoolAsset) => {
+    localStorage.setItem(PRICE_POOL_KEY, assetToString(asset))
+    updateSelectedPricePoolAsset(O.some(asset))
+  }
+
   /**
    * Loading queue to get all needed data for `PoolsState`
    */
@@ -440,20 +454,6 @@ const createPoolsService = (
     poolsState$,
     liveData.map((poolsState) => poolsState.poolAssets)
   )
-
-  const {
-    get: getSelectedPricePoolAsset,
-    get$: selectedPricePoolAsset$,
-    set: updateSelectedPricePoolAsset
-  } = observableState<SelectedPricePoolAsset>(getStoredSelectedPricePoolAsset())
-
-  /**
-   * Update selected `PricePoolAsset`
-   */
-  const setSelectedPricePoolAsset = (asset: PricePoolAsset) => {
-    localStorage.setItem(PRICE_POOL_KEY, assetToString(asset))
-    updateSelectedPricePoolAsset(O.some(asset))
-  }
 
   /**
    * Selected currency symbol
