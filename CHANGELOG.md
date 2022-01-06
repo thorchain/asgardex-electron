@@ -1,5 +1,14 @@
 # 0.6.1 (2021-12-XX)
 
+## Add
+
+- ADD: Stagenet [#1987](https://github.com/thorchain/asgardex-electron/issues/1987), [#2000](https://github.com/thorchain/asgardex-electron/pull/2000)
+- [Stagenet] Enable DOGE pool [#2003](https://github.com/thorchain/asgardex-electron/pull/2003)
+
+## Update
+
+- [Mimir] Update keys [#2004](https://github.com/thorchain/asgardex-electron/issues/2004)
+
 ## Fix
 
 - Link to release page is broken [#1983](https://github.com/thorchain/asgardex-electron/issues/1983)
