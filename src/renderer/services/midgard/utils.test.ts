@@ -27,7 +27,8 @@ import {
   THREE_RUNE_BASE_AMOUNT,
   FOUR_RUNE_BASE_AMOUNT
 } from '../../../shared/mock/amount'
-import { PRICE_POOLS_WHITELIST, AssetBUSDBAF, AssetUSDC, AssetUSDTDAC } from '../../const'
+import { PRICE_POOLS_WHITELIST, AssetBUSDBAF, AssetUSDC, AssetUSDTDAC, AssetBUSD74E } from '../../const'
+import { BNB_DECIMAL } from '../../helpers/assetHelper'
 import { eqAsset, eqPoolShare, eqPoolShares, eqOBigNumber } from '../../helpers/fp/eq'
 import { RUNE_POOL_ADDRESS, RUNE_PRICE_POOL } from '../../helpers/poolHelper'
 import { PoolDetail } from '../../types/generated/midgard'
@@ -288,7 +289,7 @@ describe('services/midgard/utils/', () => {
   })
 
   describe('pool share helpers', () => {
-    const ethShares: PoolShare = {
+    const ethShare: PoolShare = {
       asset: AssetETH,
       assetAddedAmount: ONE_RUNE_BASE_AMOUNT,
       units: bn('100000000'),
@@ -296,7 +297,7 @@ describe('services/midgard/utils/', () => {
       runeAddress: O.some(RUNE_ADDRESS_TESTNET),
       type: 'sym'
     }
-    const bnbShares1: PoolShare = {
+    const bnbShare1: PoolShare = {
       asset: AssetBNB,
       assetAddedAmount: TWO_RUNE_BASE_AMOUNT,
       units: bn('200000000'),
@@ -304,7 +305,7 @@ describe('services/midgard/utils/', () => {
       runeAddress: O.some(RUNE_ADDRESS_TESTNET),
       type: 'sym'
     }
-    const bnbShares2: PoolShare = {
+    const bnbShare2: PoolShare = {
       asset: AssetBNB,
       assetAddedAmount: THREE_RUNE_BASE_AMOUNT,
       units: bn('300000000'),
@@ -312,7 +313,15 @@ describe('services/midgard/utils/', () => {
       runeAddress: O.none,
       type: 'asym'
     }
-    const btcShares: PoolShare = {
+    const busdShare: PoolShare = {
+      asset: AssetBUSD74E,
+      assetAddedAmount: assetToBase(assetAmount(3, BNB_DECIMAL)),
+      units: bn('300000000'),
+      assetAddress: O.some(BNB_ADDRESS_TESTNET),
+      runeAddress: O.some(RUNE_ADDRESS_TESTNET),
+      type: 'sym'
+    }
+    const btcShare: PoolShare = {
       asset: AssetBTC,
       assetAddedAmount: FOUR_RUNE_BASE_AMOUNT,
       units: bn('400000000'),
@@ -320,7 +329,7 @@ describe('services/midgard/utils/', () => {
       runeAddress: O.none,
       type: 'asym'
     }
-    const shares: PoolShares = [ethShares, bnbShares1, bnbShares2, btcShares]
+    const shares: PoolShares = [ethShare, bnbShare1, bnbShare2, btcShare, busdShare]
 
     describe('combineSharesByAsset', () => {
       it('returns none for empty list', () => {
@@ -393,9 +402,18 @@ describe('services/midgard/utils/', () => {
             runeAddress: O.none,
             units: bn('400000000'),
             type: 'all'
+          },
+          {
+            asset: AssetBUSD74E,
+            assetAddedAmount: assetToBase(assetAmount(3, BNB_DECIMAL)),
+            units: bn('300000000'),
+            assetAddress: O.some(BNB_ADDRESS_TESTNET),
+            runeAddress: O.some(RUNE_ADDRESS_TESTNET),
+            type: 'all'
           }
         ]
         const result = combineShares(shares)
+        expect(result.length).toEqual(4)
         expect(eqPoolShares.equals(result, expected)).toBeTruthy()
       })
     })
@@ -414,7 +432,7 @@ describe('services/midgard/utils/', () => {
         expect(
           FP.pipe(
             oResult,
-            O.map((result) => eqPoolShare.equals(result, bnbShares1)),
+            O.map((result) => eqPoolShare.equals(result, bnbShare1)),
             O.getOrElse(() => false)
           )
         ).toBeTruthy()
@@ -425,7 +443,7 @@ describe('services/midgard/utils/', () => {
         expect(
           FP.pipe(
             oResult,
-            O.map((result) => eqPoolShare.equals(result, bnbShares2)),
+            O.map((result) => eqPoolShare.equals(result, bnbShare2)),
             O.getOrElse(() => false)
           )
         ).toBeTruthy()
@@ -434,22 +452,24 @@ describe('services/midgard/utils/', () => {
 
     describe('getSymSharesByAddress', () => {
       it('returns none for empty list', () => {
-        expect(getSymSharesByAddress([], BNB_ADDRESS_TESTNET)).toBeNone()
+        expect(getSymSharesByAddress([], BNB_ADDRESS_TESTNET)).toEqual([])
       })
 
       it('returns none for non existing address', () => {
-        expect(getSymSharesByAddress(shares, 'unknown-address')).toBeNone()
+        expect(getSymSharesByAddress(shares, 'unknown-address')).toEqual([])
       })
 
-      it('gets shares of BNB pools', () => {
-        const oResult = getSymSharesByAddress(shares, BNB_ADDRESS_TESTNET)
-        expect(
-          FP.pipe(
-            oResult,
-            O.map((result) => eqPoolShare.equals(result, bnbShares1)),
-            O.getOrElse(() => false)
-          )
-        ).toBeTruthy()
+      it('shares of BNB pools', () => {
+        const result = getSymSharesByAddress(shares, BNB_ADDRESS_TESTNET)
+        expect(result.length).toEqual(2)
+        expect(eqPoolShare.equals(result[0], bnbShare1)).toBeTruthy()
+        expect(eqPoolShare.equals(result[1], busdShare)).toBeTruthy()
+      })
+
+      it('shares of BTC pool', () => {
+        const result = getSymSharesByAddress(shares, 'eth-address')
+        expect(result.length).toEqual(1)
+        expect(eqPoolShare.equals(result[0], ethShare)).toBeTruthy()
       })
     })
 

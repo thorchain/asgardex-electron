@@ -291,14 +291,13 @@ export const getSharesByAssetAndType = ({
 /**
  * Filters `sym` `Poolshare`'s by given asset `Address`
  */
-export const getSymSharesByAddress = (shares: PoolShares, assetAddress: Address): O.Option<PoolShare> =>
+export const getSymSharesByAddress = (shares: PoolShares, assetAddress: Address): PoolShares =>
   FP.pipe(
     shares,
     A.filter(
       ({ type, assetAddress: oAssetAddress }) =>
         eqOAddress.equals(oAssetAddress, O.some(assetAddress)) && type === 'sym'
-    ),
-    A.head
+    )
   )
 
 export const getPoolAssetDetail = ({
