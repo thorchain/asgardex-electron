@@ -1,19 +1,20 @@
-# 0.6.1 (2021-12-XX)
+# 0.6.1 (2022-01-XX)
 
 ## Add
 
 - ADD: Stagenet [#1987](https://github.com/thorchain/asgardex-electron/issues/1987), [#2000](https://github.com/thorchain/asgardex-electron/pull/2000)
 - [Stagenet] Enable DOGE pool [#2003](https://github.com/thorchain/asgardex-electron/pull/2003)
-- [Mimir] Support `**DOGE**` flags [#2007](https://github.com/thorchain/asgardex-electron/pull/2007)
 
 ## Update
 
 - [Mimir] Update keys [#2004](https://github.com/thorchain/asgardex-electron/issues/2004)
+- [Mimir] Support `**DOGE**` flags [#2007](https://github.com/thorchain/asgardex-electron/pull/2007)
 
 ## Fix
 
 - Link to release page is broken [#1983](https://github.com/thorchain/asgardex-electron/issues/1983)
 - [Wallet] Icons to remove / show Ledger address are floating left [#1984](https://github.com/thorchain/asgardex-electron/issues/1984)
+- Second share not showing [#1995](https://github.com/thorchain/asgardex-electron/issues/1995)
 
 # 0.6.0 (2021-12-16)
 
