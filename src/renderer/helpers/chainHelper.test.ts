@@ -3,13 +3,25 @@ import {
   AssetBTC,
   AssetETH,
   AssetRuneNative,
+  BCHChain,
   BNBChain,
   BTCChain,
+  DOGEChain,
   ETHChain,
+  LTCChain,
   THORChain
 } from '@xchainjs/xchain-util'
 
-import { getChainAsset, isBtcChain, isThorChain } from './chainHelper'
+import {
+  getChainAsset,
+  isBchChain,
+  isBnbChain,
+  isBtcChain,
+  isDogeChain,
+  isEthChain,
+  isLtcChain,
+  isThorChain
+} from './chainHelper'
 
 describe('helpers/chainHelper', () => {
   describe('getChainAsset', () => {
@@ -27,21 +39,53 @@ describe('helpers/chainHelper', () => {
     })
   })
 
-  describe('isBtcChain', () => {
-    it('true for BTC chain', () => {
+  describe('is{XYZ}Chain', () => {
+    it('BTCChain -> true', () => {
       expect(isBtcChain(BTCChain)).toBeTruthy()
     })
-    it('false for other chains (e.g. ETH)', () => {
+    it('BTCChain -> false', () => {
       expect(isBtcChain(ETHChain)).toBeFalsy()
     })
-  })
-
-  describe('isThorChain', () => {
-    it('true for THOR chain', () => {
+    it('THORChain -> true', () => {
       expect(isThorChain(THORChain)).toBeTruthy()
     })
-    it('false for other chains (e.g. ETH)', () => {
+    it('THORChain -> false', () => {
       expect(isThorChain(ETHChain)).toBeFalsy()
+    })
+
+    it('LTCChain -> true', () => {
+      expect(isLtcChain(LTCChain)).toBeTruthy()
+    })
+    it('LTCChain -> false', () => {
+      expect(isLtcChain(ETHChain)).toBeFalsy()
+    })
+
+    it('BNBChain -> true', () => {
+      expect(isBnbChain(BNBChain)).toBeTruthy()
+    })
+    it('BNBChain -> false', () => {
+      expect(isBnbChain(ETHChain)).toBeFalsy()
+    })
+
+    it('BCHChain -> true', () => {
+      expect(isBchChain(BCHChain)).toBeTruthy()
+    })
+    it('BCHChain -> true', () => {
+      expect(isBchChain(ETHChain)).toBeFalsy()
+    })
+
+    it('ETHChain -> true', () => {
+      expect(isEthChain(ETHChain)).toBeTruthy()
+    })
+    it('ETHChain -> false', () => {
+      expect(isEthChain(BNBChain)).toBeFalsy()
+    })
+
+    it('DOGEChain -> true', () => {
+      expect(isDogeChain(DOGEChain)).toBeTruthy()
+    })
+    it('DOGEChain -> false', () => {
+      expect(isDogeChain(ETHChain)).toBeFalsy()
     })
   })
 })

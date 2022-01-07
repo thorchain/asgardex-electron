@@ -77,6 +77,11 @@ export const isEthChain = (chain: Chain): boolean => eqChain.equals(chain, ETHCh
  */
 export const isBchChain = (chain: Chain): boolean => eqChain.equals(chain, BCHChain)
 
+/**
+ * Check whether chain is DOGE chain
+ */
+export const isDogeChain = (chain: Chain): boolean => eqChain.equals(chain, DOGEChain)
+
 export const isEnabledChain = (chain: Chain) => ENABLED_CHAINS.includes(chain)
 
 type ChainValues<T> = {

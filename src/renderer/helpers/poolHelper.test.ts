@@ -11,7 +11,8 @@ import {
   BNBChain,
   LTCChain,
   BTCChain,
-  BCHChain
+  BCHChain,
+  DOGEChain
 } from '@xchainjs/xchain-util'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
@@ -304,6 +305,17 @@ describe('helpers/poolHelper/', () => {
       })
       expect(result).toBeTruthy()
     })
+    it('true for DOGE if DOGE trading is halted', () => {
+      const result = disableTradingActions({
+        chain: DOGEChain,
+        haltedChains,
+        mimirHalt: {
+          ...DEFAULT_MIMIR_HALT,
+          haltDogeTrading: true
+        }
+      })
+      expect(result).toBeTruthy()
+    })
     it('true for BNB if BNB trading is halted', () => {
       const result = disableTradingActions({
         chain: BNBChain,
@@ -455,6 +467,22 @@ describe('helpers/poolHelper/', () => {
     it('true if LTC chain is not in halted list, but LP paused', () => {
       const result = disablePoolActions({
         chain: LTCChain,
+        haltedChains: [],
+        mimirHalt: { ...DEFAULT_MIMIR_HALT, pauseLp: true }
+      })
+      expect(result).toBeTruthy()
+    })
+    it('true if DOGE chain is not in halted list, but paused', () => {
+      const result = disablePoolActions({
+        chain: DOGEChain,
+        haltedChains: [],
+        mimirHalt: { ...DEFAULT_MIMIR_HALT, pauseLpDoge: true }
+      })
+      expect(result).toBeTruthy()
+    })
+    it('true if DOGE chain is not in halted list, but LP paused', () => {
+      const result = disablePoolActions({
+        chain: DOGEChain,
         haltedChains: [],
         mimirHalt: { ...DEFAULT_MIMIR_HALT, pauseLp: true }
       })
