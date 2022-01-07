@@ -4,6 +4,7 @@
 
 - ADD: Stagenet [#1987](https://github.com/thorchain/asgardex-electron/issues/1987), [#2000](https://github.com/thorchain/asgardex-electron/pull/2000)
 - [Stagenet] Enable DOGE pool [#2003](https://github.com/thorchain/asgardex-electron/pull/2003)
+- [Mimir] Support `**DOGE**` flags [#2007](https://github.com/thorchain/asgardex-electron/pull/2007)
 
 ## Update
 
