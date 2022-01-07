@@ -70,7 +70,7 @@ describe('helpers/chainHelper', () => {
     it('BCHChain -> true', () => {
       expect(isBchChain(BCHChain)).toBeTruthy()
     })
-    it('BCHChain -> true', () => {
+    it('BCHChain -> false', () => {
       expect(isBchChain(ETHChain)).toBeFalsy()
     })
 
