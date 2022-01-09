@@ -9,6 +9,7 @@
 
 - [Mimir] Update keys [#2004](https://github.com/thorchain/asgardex-electron/issues/2004)
 - [Mimir] Support `**DOGE**` flags [#2007](https://github.com/thorchain/asgardex-electron/pull/2007)
+- Re-generate ERC20 whitelist [#2010](https://github.com/thorchain/asgardex-electron/issues/2010)
 
 ## Fix
 
