@@ -10,7 +10,10 @@ export const DEFAULT_NETWORK: Network =
 export const DEFAULT_SLIP_TOLERANCE: SlipTolerance = 5
 export const DEFAULT_CLIENT_NETWORK: Client.Network = Client.Network.Mainnet
 export const AVAILABLE_NETWORKS: Network[] = ['testnet', 'stagenet', 'mainnet']
-export const ENABLED_CHAINS: Chain[] = envOrDefault(process.env.REACT_APP_CHAINS_ENABLED, 'THOR,BNB,BTC,LTC,BCH,ETH')
+export const ENABLED_CHAINS: Chain[] = envOrDefault(
+  process.env.REACT_APP_CHAINS_ENABLED,
+  'THOR,BNB,BTC,LTC,BCH,ETH,DOGE'
+)
   .replace(/\s/g, '')
   .split(',')
   .filter(isChain)

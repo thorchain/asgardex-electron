@@ -1,0 +1,18 @@
+{
+  "pools": [
+    {
+      "assetAdded": "520706725",
+      "assetAddress": "tltc1qtephp596jhpwrawlp67junuk347zl2cwpucctk",
+      "assetPending": "0",
+      "assetWithdrawn": "0",
+      "dateFirstAdded": "1639584609",
+      "dateLastAdded": "1639584609",
+      "liquidityUnits": "65809863329",
+      "pool": "LTC.LTC",
+      "runeAdded": "603175614030",
+      "runeAddress": "tthor13gym97tmw3axj3hpewdggy2cr288d3qffr8skg",
+      "runePending": "0",
+      "runeWithdrawn": "0"
+    }
+  ]
+}

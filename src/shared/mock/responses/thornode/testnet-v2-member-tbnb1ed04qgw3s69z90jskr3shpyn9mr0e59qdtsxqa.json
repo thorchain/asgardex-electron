@@ -1,0 +1,18 @@
+{
+  "pools": [
+    {
+      "assetAdded": "6328599663",
+      "assetAddress": "tbnb1ed04qgw3s69z90jskr3shpyn9mr0e59qdtsxqa",
+      "assetPending": "0",
+      "assetWithdrawn": "1258037325",
+      "dateFirstAdded": "1638372738",
+      "dateLastAdded": "1638532749",
+      "liquidityUnits": "478328763",
+      "pool": "BNB.BUSD-74E",
+      "runeAdded": "880799435",
+      "runeAddress": "tthor1eyn0jq3ram6law773ut6ecfhnas962q5mmvdml",
+      "runePending": "0",
+      "runeWithdrawn": "183650789"
+    }
+  ]
+}
