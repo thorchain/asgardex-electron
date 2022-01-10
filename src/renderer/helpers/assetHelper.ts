@@ -7,6 +7,7 @@ import {
   AssetBCH,
   AssetBNB,
   AssetBTC,
+  AssetDOGE,
   AssetETH,
   assetFromString,
   AssetLTC,
@@ -98,6 +99,11 @@ export const isBtcAsset = (asset: Asset): boolean => eqAsset.equals(asset, Asset
  * Check whether an asset is an ETH asset
  */
 export const isEthAsset = (asset: Asset): boolean => eqAsset.equals(asset, AssetETH)
+
+/**
+ * Check whether an asset is a DOGE asset
+ */
+export const isDogeAsset = (asset: Asset): boolean => eqAsset.equals(asset, AssetDOGE)
 
 /**
  * Check whether an ERC20 asset is white listed or not

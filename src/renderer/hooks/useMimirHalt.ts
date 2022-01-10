@@ -24,27 +24,33 @@ export const useMimirHalt = (): { mimirHaltRD: MimirHaltRD; mimirHalt: MimirHalt
       FP.pipe(
         mimir$,
         liveData.map<Mimir, MimirHalt>((mimir) => ({
+          // TODO (@veado) Remove deprecated 'mimir://...' keys when THORNode v0.78.0 is out
           // `HALT{chain}CHAIN` flags
-          haltBnbChain: mimir['mimir//HALTBNBCHAIN'] === 1,
-          haltBchChain: mimir['mimir//HALTBCHCHAIN'] === 1,
-          haltBtcChain: mimir['mimir//HALTBTCCHAIN'] === 1,
-          haltEthChain: mimir['mimir//HALTETHCHAIN'] === 1,
-          haltLtcChain: mimir['mimir//HALTLTCCHAIN'] === 1,
-          haltThorChain: mimir['mimir//HALTTHORCHAIN'] === 1,
+          haltBnbChain: mimir.HALTBNBCHAIN === 1 || mimir['mimir//HALTBNBCHAIN'] === 1,
+          haltBchChain: mimir.HALTBCHCHAIN === 1 || mimir['mimir//HALTBCHCHAIN'] === 1,
+          haltBtcChain: mimir.HALTBTCCHAIN === 1 || mimir['mimir//HALTBTCCHAIN'] === 1,
+          haltEthChain: mimir.HALTETHCHAIN === 1 || mimir['mimir//HALTETHCHAIN'] === 1,
+          haltLtcChain: mimir.HALTLTCCHAIN === 1 || mimir['mimir//HALTLTCCHAIN'] === 1,
+          haltThorChain: mimir.HALTTHORCHAIN === 1 || mimir['mimir//HALTTHORCHAIN'] === 1,
+          // TODO (@veado) Revert hard-coded value in `develop`
+          haltDogeChain: true,
+          // haltDogeChain: mimir.HALTDOGECHAIN === 1,
           // `HALT{chain}TRADING` flags
-          haltTrading: mimir['mimir//HALTTRADING'] === 1,
-          haltBnbTrading: mimir['mimir//HALTBNBTRADING'] === 1,
-          haltBchTrading: mimir['mimir//HALTBCHTRADING'] === 1,
-          haltBtcTrading: mimir['mimir//HALTBTCTRADING'] === 1,
-          haltEthTrading: mimir['mimir//HALTETHTRADING'] === 1,
-          haltLtcTrading: mimir['mimir//HALTLTCTRADING'] === 1,
+          haltTrading: mimir.HALTTRADING === 1 || mimir['mimir//HALTTRADING'] === 1,
+          haltBnbTrading: mimir.HALTBNBTRADING === 1 || mimir['mimir//HALTBNBTRADING'] === 1,
+          haltBchTrading: mimir.HALTBCHTRADING === 1 || mimir['mimir//HALTBCHTRADING'] === 1,
+          haltBtcTrading: mimir.HALTBTCTRADING === 1 || mimir['mimir//HALTBTCTRADING'] === 1,
+          haltEthTrading: mimir.HALTETHTRADING === 1 || mimir['mimir//HALTETHTRADING'] === 1,
+          haltLtcTrading: mimir.HALTLTCTRADING === 1 || mimir['mimir//HALTLTCTRADING'] === 1,
+          haltDogeTrading: mimir.HALTDOGETRADING === 1,
           // `PAUSELP{chain}` flags
-          pauseLp: mimir['mimir//PAUSELP'] === 1,
-          pauseLpBnb: mimir['mimir//PAUSELPBNB'] === 1,
-          pauseLpBch: mimir['mimir//PAUSELPBCH'] === 1,
-          pauseLpBtc: mimir['mimir//PAUSELPBTC'] === 1,
-          pauseLpEth: mimir['mimir//PAUSELPETH'] === 1,
-          pauseLpLtc: mimir['mimir//PAUSELPLTC'] === 1
+          pauseLp: mimir.PAUSELP === 1 || mimir['mimir//PAUSELP'] === 1,
+          pauseLpBnb: mimir.PAUSELPBNB === 1 || mimir['mimir//PAUSELPBNB'] === 1,
+          pauseLpBch: mimir.PAUSELPBCH === 1 || mimir['mimir//PAUSELPBCH'] === 1,
+          pauseLpBtc: mimir.PAUSELPBTC === 1 || mimir['mimir//PAUSELPBTC'] === 1,
+          pauseLpEth: mimir.PAUSELPETH === 1 || mimir['mimir//PAUSELPETH'] === 1,
+          pauseLpLtc: mimir.PAUSELPLTC === 1 || mimir['mimir//PAUSELPLTC'] === 1,
+          pauseLpDoge: mimir.PAUSELPDOGE === 1
         })),
         RxOp.shareReplay(1)
       ),

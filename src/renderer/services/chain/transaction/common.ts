@@ -6,6 +6,7 @@ import {
   BTCChain,
   Chain,
   CosmosChain,
+  DOGEChain,
   ETHChain,
   LTCChain,
   PolkadotChain,
@@ -67,11 +68,16 @@ export const sendTx$ = ({
 
     case CosmosChain:
       // not available yet
-      return txFailure$(`Tx stuff has not been implemented for Cosmos yet`)
+      return txFailure$(`sendTx$ has not been implemented for Cosmos yet`)
 
     case PolkadotChain:
       // not available yet
-      return txFailure$(`Tx stuff has not been implemented for Polkadot yet`)
+      return txFailure$(`sendTx$ has not been implemented for Polkadot yet`)
+
+    case DOGEChain:
+      // TODO (@asgdx-team) Implement DOGE
+      return txFailure$(`sendTx$ has not been implemented for DOGE yet`)
+
     case BCHChain:
       return FP.pipe(
         BCH.feesWithRates$(memo),
@@ -149,6 +155,9 @@ export const txStatusByChain$ = ({ txHash, chain }: { txHash: TxHash; chain: Cha
       return txStatusFailure$(`txStatusByChain$ has not been implemented for Cosmos`)
     case PolkadotChain:
       return txStatusFailure$(`txStatusByChain$ has not been implemented for Polkadot`)
+    case DOGEChain:
+      // TODO (@asgdx-team) Implement DOGE
+      return txStatusFailure$(`txStatusByChain$ needs to be implemented for DOGE`)
     case BCHChain:
       return BCH.txStatus$(txHash, O.none)
     case LTCChain:

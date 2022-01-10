@@ -12,6 +12,7 @@ import {
   BTCChain,
   Chain,
   CosmosChain,
+  DOGEChain,
   ETHChain,
   LTCChain,
   PolkadotChain,
@@ -42,6 +43,9 @@ export const smallestAmountToSent = (chain: Chain, _network: Network): BaseAmoun
     case PolkadotChain:
       // return baseAmount(1, getDecimalDot(getClientNetwork(network))
       throw Error('Polkadot is not supported yet')
+    case DOGEChain:
+      // TODO (@asgdx-team) Implement DOGE
+      throw Error('DOGE needs to be implemented')
     case BCHChain:
       // 1000 satoshi
       return baseAmount(1000, BCH_DECIMAL)

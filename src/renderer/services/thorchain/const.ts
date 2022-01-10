@@ -21,12 +21,15 @@ export const DEFAULT_MIMIR_HALT: MimirHalt = {
   haltLtcTrading: false,
   haltBnbChain: false,
   haltBnbTrading: false,
+  haltDogeChain: false,
+  haltDogeTrading: false,
   pauseLp: false,
   pauseLpBnb: false,
   pauseLpBch: false,
   pauseLpBtc: false,
   pauseLpEth: false,
-  pauseLpLtc: false
+  pauseLpLtc: false,
+  pauseLpDoge: false
 }
 
 export const RESERVE_MODULE_ADDRESS = 'thor1dheycdevq39qlkxs2a6wuuzyn4aqxhve4qxtxt'

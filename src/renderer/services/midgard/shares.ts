@@ -115,7 +115,7 @@ const createSharesService = (
    *
    * @param assetAddress Asset address
    */
-  const symShareByAddress$ = (assetAddress: Address): PoolShareLD =>
+  const symShareByAddress$ = (assetAddress: Address): PoolSharesLD =>
     shares$(assetAddress).pipe(liveData.map((shares) => getSymSharesByAddress(shares, assetAddress)))
 
   /**
@@ -151,9 +151,9 @@ const createSharesService = (
 
   // Loads sym. `PoolShare`'s by given addresses
   const loadSymSharesByAddresses$ = (addresses: Address[]): PoolSharesLD =>
-    FP.pipe(addresses, A.map(symShareByAddress$), liveData.sequenceArray, liveData.map(A.filterMap(FP.identity)))
+    FP.pipe(addresses, A.map(symShareByAddress$), liveData.sequenceArray, liveData.map(A.flatten))
 
-  const symSharesByAddresses$ = (addresses: Address[]) =>
+  const symSharesByAddresses$ = (addresses: Address[]): PoolSharesLD =>
     FP.pipe(
       reloadSymSharesByAddresses$,
       RxOp.debounceTime(300),
@@ -166,7 +166,7 @@ const createSharesService = (
    *
    * Stream will be re-triggered by calling `reloadCombineSharesByAddresses`
    */
-  const combineSharesByAddresses$ = (addresses: Address[]) =>
+  const combineSharesByAddresses$ = (addresses: Address[]): PoolSharesLD =>
     FP.pipe(
       reloadCombineSharesByAddresses$,
       RxOp.debounceTime(300),

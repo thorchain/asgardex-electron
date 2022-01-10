@@ -81,6 +81,31 @@ export type ThorNodeApiUrlLD = LiveData<ApiError, string>
  * testnet: https://testnet.thornode.thorchain.info/thorchain/mimir
  */
 export const MimirIO = t.type({
+  MAXIMUMLIQUIDITYRUNE: t.union([t.number, t.undefined]),
+  POOLCYCLE: t.union([t.number, t.undefined]),
+  HALTTRADING: t.union([t.number, t.undefined]),
+  HALTTHORCHAIN: t.union([t.number, t.undefined]),
+  HALTETHCHAIN: t.union([t.number, t.undefined]),
+  HALTETHTRADING: t.union([t.number, t.undefined]),
+  HALTBTCCHAIN: t.union([t.number, t.undefined]),
+  HALTBTCTRADING: t.union([t.number, t.undefined]),
+  HALTBCHCHAIN: t.union([t.number, t.undefined]),
+  HALTBCHTRADING: t.union([t.number, t.undefined]),
+  HALTLTCCHAIN: t.union([t.number, t.undefined]),
+  HALTLTCTRADING: t.union([t.number, t.undefined]),
+  HALTBNBCHAIN: t.union([t.number, t.undefined]),
+  HALTBNBTRADING: t.union([t.number, t.undefined]),
+  HALTDOGECHAIN: t.union([t.number, t.undefined]),
+  HALTDOGETRADING: t.union([t.number, t.undefined]),
+  PAUSELP: t.union([t.number, t.undefined]),
+  PAUSELPBNB: t.union([t.number, t.undefined]),
+  PAUSELPBCH: t.union([t.number, t.undefined]),
+  PAUSELPBTC: t.union([t.number, t.undefined]),
+  PAUSELPETH: t.union([t.number, t.undefined]),
+  PAUSELPLTC: t.union([t.number, t.undefined]),
+  PAUSELPDOGE: t.union([t.number, t.undefined]),
+  // backwards compatibily
+  // TODO (@veado) Remove with a next release if THORNode v0.78.0 is finally out
   'mimir//MAXIMUMLIQUIDITYRUNE': t.union([t.number, t.undefined]),
   'mimir//POOLCYCLE': t.union([t.number, t.undefined]),
   'mimir//HALTTRADING': t.union([t.number, t.undefined]),
@@ -115,6 +140,7 @@ export type MimirHaltChain = {
   haltBchChain: boolean
   haltLtcChain: boolean
   haltBnbChain: boolean
+  haltDogeChain: boolean
 }
 export type MimirHaltTrading = {
   haltTrading: boolean
@@ -123,6 +149,7 @@ export type MimirHaltTrading = {
   haltBchTrading: boolean
   haltLtcTrading: boolean
   haltBnbTrading: boolean
+  haltDogeTrading: boolean
 }
 
 export type MimirPauseLP = {
@@ -132,6 +159,7 @@ export type MimirPauseLP = {
   pauseLpBtc: boolean
   pauseLpEth: boolean
   pauseLpLtc: boolean
+  pauseLpDoge: boolean
 }
 
 export type MimirHalt = MimirHaltChain & MimirHaltTrading & MimirPauseLP

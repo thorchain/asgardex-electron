@@ -16,7 +16,9 @@ import {
   BTCChain,
   CosmosChain,
   LTCChain,
-  PolkadotChain
+  PolkadotChain,
+  DOGEChain,
+  AssetDOGE
 } from '@xchainjs/xchain-util'
 
 import { ENABLED_CHAINS } from '../services/const'
@@ -38,6 +40,8 @@ export const getChainAsset = (chain: Chain): Asset => {
       return AssetBCH
     case LTCChain:
       return AssetLTC
+    case DOGEChain:
+      return AssetDOGE
     case PolkadotChain:
       throw Error('Polkadot is not supported yet')
   }
@@ -72,6 +76,11 @@ export const isEthChain = (chain: Chain): boolean => eqChain.equals(chain, ETHCh
  * Check whether chain is BCH chain
  */
 export const isBchChain = (chain: Chain): boolean => eqChain.equals(chain, BCHChain)
+
+/**
+ * Check whether chain is DOGE chain
+ */
+export const isDogeChain = (chain: Chain): boolean => eqChain.equals(chain, DOGEChain)
 
 export const isEnabledChain = (chain: Chain) => ENABLED_CHAINS.includes(chain)
 

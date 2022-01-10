@@ -12,7 +12,7 @@ export const DEFAULT_CLIENT_NETWORK: Client.Network = Client.Network.Mainnet
 export const AVAILABLE_NETWORKS: Network[] = ['testnet', 'stagenet', 'mainnet']
 export const ENABLED_CHAINS: Chain[] = envOrDefault(
   import.meta.env.REACT_APP_CHAINS_ENABLED,
-  'THOR,BNB,BTC,LTC,BCH,ETH'
+  'THOR,BNB,BTC,LTC,BCH,ETH,DOGE'
 )
   .replace(/\s/g, '')
   .split(',')
