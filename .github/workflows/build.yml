@@ -14,36 +14,26 @@ jobs:
       fail-fast: false
       matrix:
         os: [windows-latest, macOS-latest, ubuntu-latest]
-        node-version: [16.5.0]
     steps:
-      - name: Checkout git repo
+      - name: Checkout repo
         uses: actions/checkout@v2
 
       - name: Install missing dependencies (on Linux only)
         run: sudo apt-get update && sudo apt-get install libudev-dev libusb-1.0-0-dev
         if: runner.os == 'Linux'
 
-      - name: Get yarn cache
-        id: yarn-cache
-        run: echo "::set-output name=dir::$(yarn cache dir)"
-
-      - name: Cache node_modules
-        uses: actions/cache@v1
+      - uses: actions/setup-node@v2
         with:
-          path: ${{ steps.yarn-cache.outputs.dir }}
-          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
-          restore-keys: ${{ runner.os }}-yarn-
-
-      - uses: actions/setup-node@v1
-        with:
-          node-version: ${{ matrix.node-version }}
+          node-version-file: '.nvmrc'
+          cache: 'npm'
+          cache-dependency-path: '**/package-lock.json'
 
       - name: Install dependencies
-        run: yarn install --frozen-lockfile
+        run: npm ci
 
       - name: Publish Windows or Linux binaries
         if: runner.os != 'macOS'
-        run: yarn package:ci
+        run: npm run package:ci
         env:
           NODE_OPTIONS: --max-old-space-size=4096
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -53,7 +43,7 @@ jobs:
 
       - name: Publish macOS binaries
         if: runner.os == 'macOS'
-        run: yarn package:ci
+        run: npm run package:ci
         env:
           NODE_OPTIONS: --max-old-space-size=4096
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
