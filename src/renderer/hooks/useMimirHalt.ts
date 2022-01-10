@@ -32,9 +32,7 @@ export const useMimirHalt = (): { mimirHaltRD: MimirHaltRD; mimirHalt: MimirHalt
           haltEthChain: mimir.HALTETHCHAIN === 1 || mimir['mimir//HALTETHCHAIN'] === 1,
           haltLtcChain: mimir.HALTLTCCHAIN === 1 || mimir['mimir//HALTLTCCHAIN'] === 1,
           haltThorChain: mimir.HALTTHORCHAIN === 1 || mimir['mimir//HALTTHORCHAIN'] === 1,
-          // TODO (@veado) Revert hard-coded value in `develop`
-          haltDogeChain: true,
-          // haltDogeChain: mimir.HALTDOGECHAIN === 1,
+          haltDogeChain: mimir.HALTDOGECHAIN === 1,
           // `HALT{chain}TRADING` flags
           haltTrading: mimir.HALTTRADING === 1 || mimir['mimir//HALTTRADING'] === 1,
           haltBnbTrading: mimir.HALTBNBTRADING === 1 || mimir['mimir//HALTBNBTRADING'] === 1,
