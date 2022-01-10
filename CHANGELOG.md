@@ -1,4 +1,4 @@
-# 0.6.1 (2022-01-07)
+# 0.6.1 (2022-01-10)
 
 ## Add
 
@@ -9,7 +9,7 @@
 
 - [Mimir] Update keys [#2004](https://github.com/thorchain/asgardex-electron/issues/2004)
 - [Mimir] Support `**DOGE**` flags [#2007](https://github.com/thorchain/asgardex-electron/pull/2007)
-- Re-generate ERC20 whitelist [#2010](https://github.com/thorchain/asgardex-electron/issues/2010)
+- 1inch ERC20 whitelist [#2010](https://github.com/thorchain/asgardex-electron/issues/2010)
 
 ## Fix
 
