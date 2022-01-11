@@ -40,7 +40,7 @@ export default defineConfig({
       transformMixedEsModules: true
     },
     minify: process.env.NODE_ENV === 'production',
-    emptyOutDir: true,
+    emptyOutDir: false, // don't delete files from `main` build, which is running before
     rollupOptions: {
       external: ['electron', ...builtinModules],
       output: {

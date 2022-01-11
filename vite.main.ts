@@ -45,7 +45,7 @@ export default defineConfig(({ mode }) => ({
       formats: ['cjs']
     },
     minify: process.env.NODE_ENV === 'production',
-    emptyOutDir: true
+    emptyOutDir: true // remove prev. sources as vite.main.ts will be called first in build.mjs
   },
   optimizeDeps: {
     exclude: ['electron']

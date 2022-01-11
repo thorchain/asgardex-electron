@@ -3,7 +3,6 @@ import { join } from 'path'
 import type { Keystore } from '@xchainjs/xchain-crypto'
 import { BrowserWindow, app, ipcMain, nativeImage } from 'electron'
 import electronDebug from 'electron-debug'
-import installExtension, { REACT_DEVELOPER_TOOLS } from 'electron-devtools-installer'
 import isDev from 'electron-is-dev'
 import log, { warn } from 'electron-log'
 import windowStateKeeper from 'electron-window-state'
@@ -184,6 +183,7 @@ const init = async () => {
   app.on('activate', activateHandler)
   if (IS_DEV) {
     try {
+      const { default: installExtension, REACT_DEVELOPER_TOOLS } = await import('electron-devtools-installer')
       await installExtension(REACT_DEVELOPER_TOOLS)
     } catch (e) {
       warn('unable to install devtools', e)
