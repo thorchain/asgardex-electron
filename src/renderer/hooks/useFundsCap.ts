@@ -41,7 +41,7 @@ export const useFundsCap = (): { data: FundsCapRD; reload: FP.Lazy<void> } => {
         liveData.map(([mimir, { totalPooledRune }]) =>
           // TODO (@Veado) Extract logic into a helper function + test it
           FP.pipe(
-            mimir['mimir//MAXIMUMLIQUIDITYRUNE'],
+            mimir.MAXIMUMLIQUIDITYRUNE,
             O.fromNullable,
             O.map(bn),
             O.map((maxLiquidityRuneBN) => {
