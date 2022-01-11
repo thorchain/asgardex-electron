@@ -103,29 +103,7 @@ export const MimirIO = t.type({
   PAUSELPBTC: t.union([t.number, t.undefined]),
   PAUSELPETH: t.union([t.number, t.undefined]),
   PAUSELPLTC: t.union([t.number, t.undefined]),
-  PAUSELPDOGE: t.union([t.number, t.undefined]),
-  // backwards compatibily
-  // TODO (@veado) Remove with a next release if THORNode v0.78.0 is finally out
-  'mimir//MAXIMUMLIQUIDITYRUNE': t.union([t.number, t.undefined]),
-  'mimir//POOLCYCLE': t.union([t.number, t.undefined]),
-  'mimir//HALTTRADING': t.union([t.number, t.undefined]),
-  'mimir//HALTTHORCHAIN': t.union([t.number, t.undefined]),
-  'mimir//HALTETHCHAIN': t.union([t.number, t.undefined]),
-  'mimir//HALTETHTRADING': t.union([t.number, t.undefined]),
-  'mimir//HALTBTCCHAIN': t.union([t.number, t.undefined]),
-  'mimir//HALTBTCTRADING': t.union([t.number, t.undefined]),
-  'mimir//HALTBCHCHAIN': t.union([t.number, t.undefined]),
-  'mimir//HALTBCHTRADING': t.union([t.number, t.undefined]),
-  'mimir//HALTLTCCHAIN': t.union([t.number, t.undefined]),
-  'mimir//HALTLTCTRADING': t.union([t.number, t.undefined]),
-  'mimir//HALTBNBCHAIN': t.union([t.number, t.undefined]),
-  'mimir//HALTBNBTRADING': t.union([t.number, t.undefined]),
-  'mimir//PAUSELP': t.union([t.number, t.undefined]),
-  'mimir//PAUSELPBNB': t.union([t.number, t.undefined]),
-  'mimir//PAUSELPBCH': t.union([t.number, t.undefined]),
-  'mimir//PAUSELPBTC': t.union([t.number, t.undefined]),
-  'mimir//PAUSELPETH': t.union([t.number, t.undefined]),
-  'mimir//PAUSELPLTC': t.union([t.number, t.undefined])
+  PAUSELPDOGE: t.union([t.number, t.undefined])
 })
 
 export type Mimir = t.TypeOf<typeof MimirIO>

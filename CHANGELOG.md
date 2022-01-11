@@ -1,3 +1,9 @@
+# 0.6.2 (2022-01-11)
+
+## Fix
+
+- [Mimir] Deprecated 'mimir//MAXIMUMLIQUIDITYRUNE' leads to NO FUNDS CAP [#2013](https://github.com/thorchain/asgardex-electron/issues/2013)
+
 # 0.6.1 (2022-01-10)
 
 ## Add

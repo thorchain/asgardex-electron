@@ -42,7 +42,7 @@ export const usePoolCycle = (): {
     () =>
       FP.pipe(
         mimir$,
-        liveData.map(({ 'mimir//POOLCYCLE': poolCycle }) => O.fromNullable(poolCycle)),
+        liveData.map(({ POOLCYCLE: poolCycle }) => O.fromNullable(poolCycle)),
         liveData.chain(liveData.fromOption(() => Error('Unable to load pool cycle from Mimir'))),
         liveData.mapLeft(({ message }) => ({ errorId: ErrorId.GET_POOL_CYCLE, msg: message }))
       ),
