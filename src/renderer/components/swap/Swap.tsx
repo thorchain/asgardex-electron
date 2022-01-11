@@ -36,8 +36,7 @@ import {
   max1e8BaseAmount,
   convertBaseAmountDecimal,
   to1e8BaseAmount,
-  isChainAsset,
-  isDogeAsset
+  isChainAsset
 } from '../../helpers/assetHelper'
 import { getChainAsset, isEthChain } from '../../helpers/chainHelper'
 import { unionAssets } from '../../helpers/fp/array'
@@ -644,9 +643,6 @@ export const Swap = ({
             A.map(({ asset }) => asset),
             // Ignore already selected source / target assets
             A.filter((asset) => !eqAsset.equals(asset, source) && !eqAsset.equals(asset, target)),
-            // Ignore DOGE
-            // TODO (@asdx-team) Remove it as part of #2001 https://github.com/thorchain/asgardex-electron/issues/2001
-            A.filter((asset) => !isDogeAsset(asset)),
             // Merge duplications
             (assets) => unionAssets(assets)(assets)
           )
@@ -671,9 +667,6 @@ export const Swap = ({
             allAssets,
             // Ignore already selected source / target assets
             A.filter((asset) => !eqAsset.equals(asset, source) && !eqAsset.equals(asset, target)),
-            // Ignore DOGE
-            // TODO (@asdx-team) Remove it as part of #2001 https://github.com/thorchain/asgardex-electron/issues/2001
-            A.filter((asset) => !isDogeAsset(asset)),
             // Merge duplications
             (assets) => unionAssets(assets)(assets)
           )
