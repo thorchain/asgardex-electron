@@ -4,7 +4,7 @@
   "copyright": "Copyright © 2022 ${author}",
   "artifactName": "${productName}-${version}-${os}.${ext}",
   "afterSign": "./scripts/notarize.js",
-  "files": ["build", "resources/icon.png", "src/renderer/assets/svg/coin-*.svg"],
+  "files": ["build", "resources/icon.png"],
   "directories": {
     "buildResources": "resources",
     "output": "release"

@@ -64,6 +64,7 @@ log.debug(`Starting Electron main process`)
 
 // Enable keyboard shortcuts and optionally activate DevTools on each created `BrowserWindow`.
 electronDebug({ isEnabled: IS_DEV })
+// electronDebug({ isEnabled: true })
 
 if (!app.requestSingleInstanceLock()) {
   app.quit()
@@ -79,8 +80,6 @@ const initMainWindow = async () => {
   })
 
   const preload = join(APP_ROOT, 'build', 'preload.cjs')
-
-  console.log('preload path:', preload)
 
   mainWindow = new BrowserWindow({
     x: mainWindowState.x,
@@ -108,14 +107,19 @@ const initMainWindow = async () => {
    * DEV: Vite dev server for development.
    * PROD: `file://../../build/renderer/index.html`
    */
-  const BASE_URL = IS_DEV
+  const baseUrl = IS_DEV
     ? `http://${HOST}:${PORT}`
-    : // : new URL('../../build/renderer/index.html', 'file://' + __dirname).toString()
-      join(__dirname, './index.html')
+    : new URL('./build/renderer/index.html', 'file://' + __dirname).toString()
 
-  mainWindow.loadURL(BASE_URL)
-  // hide menu at start, we need to wait for locale sent by `ipcRenderer`
-  mainWindow.setMenuBarVisibility(false)
+  try {
+    await mainWindow.loadURL(baseUrl)
+
+    // hide menu at start, we need to wait for locale sent by `ipcRenderer`
+    // mainWindow.setMenuBarVisibility(false)
+    mainWindow.setMenuBarVisibility(true)
+  } catch (e) {
+    console.log('Loading baseUrl by mainWindow failed:', baseUrl, e)
+  }
 }
 
 const langChangeHandler = (locale: Locale) => {

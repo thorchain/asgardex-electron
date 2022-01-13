@@ -11,9 +11,8 @@ import { defineConfig } from 'vite'
 import commonjsExternals from 'vite-plugin-commonjs-externals'
 import tsconfigPaths from 'vite-tsconfig-paths'
 
+import { node } from './.electron-vendors.cache.json'
 import pkg from './package.json'
-
-// import { node } from './.electron-vendors.cache.json'
 
 const commonjsPackages = [
   'electron',
@@ -27,11 +26,11 @@ export default defineConfig(({ mode }) => ({
   root: join(__dirname, 'src/main/'),
   plugins: [tsconfigPaths({ projects: ['./tsconfig.json'] }), commonjsExternals({ externals: commonjsPackages })],
   build: {
-    // target: `node${node}`,
+    target: `node${node}`,
     sourcemap: mode === 'development',
     outDir: '../../build',
     rollupOptions: {
-      external: ['electron', 'electron-devtools-installer'],
+      external: [...builtinModules, 'electron', 'electron-devtools-installer'],
       output: {
         entryFileNames: '[name].cjs'
       }
