@@ -60,7 +60,7 @@ export const send = async ({
 
     // Node endpoint for cosmos sdk client
     const hostURL = getClientUrl()[network].node
-    const chainId = getChainId()
+    const chainId = getChainId(clientNetwork)
     // CosmosClient
     const cosmosClient = new CosmosSDKClient({
       server: hostURL,
@@ -189,7 +189,7 @@ export const deposit = async ({
 
     // Node endpoint for cosmos sdk client
     const hostURL = getClientUrl()[network].node
-    const chainId = getChainId()
+    const chainId = getChainId(clientNetwork)
     // use cosmos sdk
     const cosmosClient = new CosmosSDKClient({
       server: hostURL,
