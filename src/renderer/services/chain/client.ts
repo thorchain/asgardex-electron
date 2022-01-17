@@ -7,6 +7,7 @@ import * as BNC from '../binance'
 import * as BTC from '../bitcoin'
 import * as BCH from '../bitcoincash'
 import { XChainClient$ } from '../clients'
+import * as DOGE from '../doge'
 import * as ETH from '../ethereum'
 import * as LTC from '../litecoin'
 import { selectedPoolChain$ } from '../midgard/common'
@@ -28,8 +29,7 @@ export const clientByChain$ = (chain: Chain): XChainClient$ => {
     case LTCChain:
       return LTC.client$
     case DOGEChain:
-      // TODO (@asgdx-team) Implement DOGE
-      return Rx.of(O.none)
+      return DOGE.client$
     default:
       return Rx.of(O.none)
   }

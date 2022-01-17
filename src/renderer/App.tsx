@@ -7,6 +7,7 @@ import { BinanceProvider } from './contexts/BinanceContext'
 import { BitcoinCashProvider } from './contexts/BitcoinCashContext'
 import { BitcoinProvider } from './contexts/BitcoinContext'
 import { ChainProvider } from './contexts/ChainContext'
+import { DogeProvider } from './contexts/DogeContext'
 import { EthereumProvider } from './contexts/EthereumContext'
 import { I18nProvider } from './contexts/I18nContext'
 import { LitecoinProvider } from './contexts/LitecoinContext'
@@ -28,17 +29,19 @@ export const App: React.FC = (): JSX.Element => {
                 <LitecoinProvider>
                   <BitcoinCashProvider>
                     <EthereumProvider>
-                      <MidgardProvider>
-                        <UserNodesProvider>
-                          <I18nProvider>
-                            <Router>
-                              <ThemeProvider>
-                                <AppView />
-                              </ThemeProvider>
-                            </Router>
-                          </I18nProvider>
-                        </UserNodesProvider>
-                      </MidgardProvider>
+                      <DogeProvider>
+                        <MidgardProvider>
+                          <UserNodesProvider>
+                            <I18nProvider>
+                              <Router>
+                                <ThemeProvider>
+                                  <AppView />
+                                </ThemeProvider>
+                              </Router>
+                            </I18nProvider>
+                          </UserNodesProvider>
+                        </MidgardProvider>
+                      </DogeProvider>
                     </EthereumProvider>
                   </BitcoinCashProvider>
                 </LitecoinProvider>
