@@ -1,3 +1,3 @@
-import { client$, address$, explorerUrl$ } from './common'
+import { client$, clientState$, address$, addressUI$, explorerUrl$ } from './common'
 
-export { address$, explorerUrl$, client$ }
+export { address$, addressUI$, explorerUrl$, client$, clientState$ }
