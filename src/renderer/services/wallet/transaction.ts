@@ -1,5 +1,5 @@
 import * as RD from '@devexperts/remote-data-ts'
-import { BCHChain, BNBChain, BTCChain, ETHChain, LTCChain, THORChain } from '@xchainjs/xchain-util'
+import { BCHChain, BNBChain, BTCChain, DOGEChain, ETHChain, LTCChain, THORChain } from '@xchainjs/xchain-util'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
 import * as Rx from 'rxjs'
@@ -11,6 +11,7 @@ import * as BTC from '../bitcoin'
 import * as BCH from '../bitcoincash'
 import * as C from '../clients'
 import { ExplorerUrl$, TxsPageLD, LoadTxsParams } from '../clients'
+import * as DOGE from '../doge'
 import * as ETH from '../ethereum'
 import * as LTC from '../litecoin'
 import * as THOR from '../thorchain'
@@ -58,6 +59,8 @@ export const getTxs$: (walletAddress: O.Option<string>, walletIndex: number) => 
                 return LTC.txs$({ asset: O.none, limit, offset, walletAddress, walletIndex })
               case BCHChain:
                 return BCH.txs$({ asset: O.none, limit, offset, walletAddress, walletIndex })
+              case DOGEChain:
+                return DOGE.txs$({ asset: O.none, limit, offset, walletAddress, walletIndex })
               default:
                 return Rx.of(
                   RD.failure<ApiError>({ errorId: ErrorId.GET_ASSET_TXS, msg: `Unsupported chain ${asset.chain}` })

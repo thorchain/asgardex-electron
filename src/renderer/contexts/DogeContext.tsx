@@ -1,12 +1,28 @@
 import React, { createContext, useContext } from 'react'
 
-import { client$, clientState$, address$, addressUI$, explorerUrl$ } from '../services/doge'
+import {
+  client$,
+  clientState$,
+  address$,
+  addressUI$,
+  reloadBalances,
+  balances$,
+  txRD$,
+  subscribeTx,
+  resetTx,
+  explorerUrl$
+} from '../services/doge'
 
 export type DogeContextValue = {
   client$: typeof client$
   clientState$: typeof clientState$
   address$: typeof address$
   addressUI$: typeof addressUI$
+  reloadBalances: typeof reloadBalances
+  balances$: typeof balances$
+  txRD$: typeof txRD$
+  subscribeTx: typeof subscribeTx
+  resetTx: typeof resetTx
   explorerUrl$: typeof explorerUrl$
 }
 
@@ -15,7 +31,11 @@ const initialContext: DogeContextValue = {
   clientState$,
   address$,
   addressUI$,
-
+  reloadBalances,
+  balances$,
+  txRD$,
+  subscribeTx,
+  resetTx,
   explorerUrl$
 }
 

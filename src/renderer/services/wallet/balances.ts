@@ -30,6 +30,7 @@ import * as BNB from '../binance'
 import * as BTC from '../bitcoin'
 import * as BCH from '../bitcoincash'
 import { WalletBalancesLD, WalletBalancesRD } from '../clients'
+import * as DOGE from '../doge'
 import * as ETH from '../ethereum'
 import * as LTC from '../litecoin'
 import * as THOR from '../thorchain'
@@ -65,6 +66,7 @@ export const createBalancesService = ({
     ETH.reloadBalances()
     THOR.reloadBalances()
     LTC.reloadBalances()
+    DOGE.reloadBalances()
   }
 
   // Returns lazy functions to reload balances by given chain
@@ -82,8 +84,8 @@ export const createBalancesService = ({
         return THOR.reloadBalances
       case LTCChain:
         return LTC.reloadBalances
-      // TODO (@asgdx-team) Implement DOGE
       case DOGEChain:
+        return DOGE.reloadBalances
       default:
         return FP.constVoid
     }
@@ -139,8 +141,13 @@ export const createBalancesService = ({
           balances$: LTC.balances$(walletType, walletIndex),
           reloadBalances$: LTC.reloadBalances$
         }
-      // TODO (@asgdx-team) Implement DOGE
       case DOGEChain:
+        return {
+          reloadBalances: DOGE.reloadBalances,
+          resetReloadBalances: DOGE.resetReloadBalances,
+          balances$: DOGE.balances$(walletType, walletIndex),
+          reloadBalances$: DOGE.reloadBalances$
+        }
       default:
         return {
           reloadBalances: FP.constVoid,
@@ -353,6 +360,22 @@ export const createBalancesService = ({
     }))
   )
 
+  /**
+   * Transforms DOGE balances into `ChainBalance`
+   */
+  const dogeChainBalance$: ChainBalance$ = Rx.combineLatest([
+    DOGE.addressUI$,
+    getChainBalance$(DOGEChain, 'keystore', 0) // walletIndex=0 (as long as we don't support HD wallets for keystore)
+  ]).pipe(
+    RxOp.map(([oWalletAddress, balances]) => ({
+      walletType: 'keystore',
+      chain: DOGEChain,
+      walletAddress: addressFromOptionalWalletAddress(oWalletAddress),
+      walletIndex: 0, // Always 0 as long as we don't support HD wallets for keystore
+      balances
+    }))
+  )
+
   const ethBalances$ = getChainBalance$(ETHChain, 'keystore', 0) // walletIndex=0 (as long as we don't support HD wallets for keystore)
 
   /**
@@ -379,7 +402,8 @@ export const createBalancesService = ({
         BCH: [bchChainBalance$],
         ETH: [ethChainBalance$],
         BNB: [bnbChainBalance$, bnbLedgerChainBalance$],
-        LTC: [litecoinBalance$]
+        LTC: [litecoinBalance$],
+        DOGE: [dogeChainBalance$]
       })
     ),
     // we ignore all `ChainBalances` with state of `initial` balances
