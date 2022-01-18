@@ -10,7 +10,11 @@ import {
   txRD$,
   subscribeTx,
   resetTx,
-  explorerUrl$
+  explorerUrl$,
+  fees$,
+  reloadFees,
+  feesWithRates$,
+  reloadFeesWithRates
 } from '../services/doge'
 
 export type DogeContextValue = {
@@ -24,6 +28,10 @@ export type DogeContextValue = {
   subscribeTx: typeof subscribeTx
   resetTx: typeof resetTx
   explorerUrl$: typeof explorerUrl$
+  fees$: typeof fees$
+  reloadFees: typeof reloadFees
+  feesWithRates$: typeof feesWithRates$
+  reloadFeesWithRates: typeof reloadFeesWithRates
 }
 
 const initialContext: DogeContextValue = {
@@ -36,7 +44,11 @@ const initialContext: DogeContextValue = {
   txRD$,
   subscribeTx,
   resetTx,
-  explorerUrl$
+  explorerUrl$,
+  fees$,
+  reloadFees,
+  feesWithRates$,
+  reloadFeesWithRates
 }
 
 const DogeContext = createContext<DogeContextValue | null>(null)

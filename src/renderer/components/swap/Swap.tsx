@@ -263,11 +263,14 @@ export const Swap = ({
 
   const oTargetWalletType: O.Option<WalletType> = useMemo(() => {
     // Check for Ledger
-    if (eqOAddress.equals(editableTargetWalletAddress, oTargetLedgerAddress)) {
+    if (O.isSome(oTargetLedgerAddress) && eqOAddress.equals(editableTargetWalletAddress, oTargetLedgerAddress)) {
       return O.some('ledger')
     }
     // Check for keystore
-    if (eqOAddress.equals(editableTargetWalletAddress, oInitialTargetWalletAddress)) {
+    if (
+      O.isSome(oInitialTargetWalletAddress) &&
+      eqOAddress.equals(editableTargetWalletAddress, oInitialTargetWalletAddress)
+    ) {
       return O.some('keystore')
     }
     // unknown type
@@ -1420,6 +1423,7 @@ export const Swap = ({
           )}
         </Styled.FormContainer>
       </Styled.ContentContainer>
+
       {(walletBalancesLoading || checkIsApproved) && (
         <LoadingView
           label={

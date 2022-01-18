@@ -1,10 +1,9 @@
 import React, { useCallback, useMemo } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
-import { Address } from '@xchainjs/xchain-client'
-import { Asset, BNBChain } from '@xchainjs/xchain-util'
+import { Asset, DOGEChain } from '@xchainjs/xchain-util'
 import * as FP from 'fp-ts/lib/function'
-import * as O from 'fp-ts/lib/Option'
+import * as O from 'fp-ts/Option'
 import { useObservableState } from 'observable-hooks'
 import { useIntl } from 'react-intl'
 import { useHistory } from 'react-router-dom'
@@ -12,22 +11,21 @@ import { useHistory } from 'react-router-dom'
 import { Network } from '../../../../shared/api/types'
 import { WalletType } from '../../../../shared/wallet/types'
 import { Send } from '../../../components/wallet/txs/send'
-import { SendFormBNB } from '../../../components/wallet/txs/send'
-import { useBinanceContext } from '../../../contexts/BinanceContext'
+import { SendFormDOGE } from '../../../components/wallet/txs/send/'
 import { useChainContext } from '../../../contexts/ChainContext'
-import { liveData } from '../../../helpers/rx/liveData'
-import { getWalletBalanceByAddressAndAsset } from '../../../helpers/walletHelper'
+import { useDogeContext } from '../../../contexts/DogeContext'
+import { getWalletBalanceByAsset } from '../../../helpers/walletHelper'
 import { useSubscriptionState } from '../../../hooks/useSubscriptionState'
 import { useValidateAddress } from '../../../hooks/useValidateAddress'
 import { INITIAL_SEND_STATE } from '../../../services/chain/const'
-import { FeeRD, SendTxParams, SendTxState } from '../../../services/chain/types'
+import type { SendTxParams, SendTxState } from '../../../services/chain/types'
 import { OpenExplorerTxUrl, WalletBalances } from '../../../services/clients'
+import { FeesWithRatesLD } from '../../../services/doge/types'
 import { NonEmptyWalletBalances, ValidatePasswordHandler, WalletBalance } from '../../../services/wallet/types'
 import * as Helper from './SendView.helper'
 
 type Props = {
   walletType: WalletType
-  walletAddress: Address
   walletIndex: number
   asset: Asset
   balances: O.Option<NonEmptyWalletBalances>
@@ -36,29 +34,13 @@ type Props = {
   network: Network
 }
 
-export const SendViewBNB: React.FC<Props> = (props): JSX.Element => {
-  const {
-    walletAddress,
-    asset,
-    balances: oBalances,
-    openExplorerTxUrl,
-    validatePassword$,
-    network,
-    walletType,
-    walletIndex
-  } = props
+export const SendViewDOGE: React.FC<Props> = (props): JSX.Element => {
+  const { walletType, walletIndex, asset, balances: oBalances, openExplorerTxUrl, validatePassword$, network } = props
 
   const intl = useIntl()
   const history = useHistory()
 
-  const oWalletBalance = useMemo(
-    () =>
-      FP.pipe(
-        oBalances,
-        O.chain((balances) => getWalletBalanceByAddressAndAsset({ balances, address: walletAddress, asset }))
-      ),
-    [asset, oBalances, walletAddress]
-  )
+  const oWalletBalance = useMemo(() => getWalletBalanceByAsset(oBalances, asset), [oBalances, asset])
 
   const { transfer$ } = useChainContext()
 
@@ -75,21 +57,12 @@ export const SendViewBNB: React.FC<Props> = (props): JSX.Element => {
     [subscribeSendTxState, transfer$]
   )
 
-  const { fees$, reloadFees } = useBinanceContext()
+  const { feesWithRates$, reloadFeesWithRates } = useDogeContext()
 
-  const [feeRD] = useObservableState<FeeRD>(
-    () =>
-      FP.pipe(
-        fees$(),
-        liveData.map((fees) => fees.fast)
-      ),
-    RD.initial
-  )
+  const feesWithRatesLD: FeesWithRatesLD = useMemo(() => feesWithRates$(), [feesWithRates$])
+  const feesWithRatesRD = useObservableState(feesWithRatesLD, RD.initial)
 
-  /**
-   * Address validation provided by BinanceClient
-   */
-  const { validateAddress } = useValidateAddress(BNBChain)
+  const { validateAddress } = useValidateAddress(DOGEChain)
 
   const isLoading = useMemo(() => RD.isPending(sendTxState.status), [sendTxState.status])
 
@@ -97,13 +70,12 @@ export const SendViewBNB: React.FC<Props> = (props): JSX.Element => {
     () => Helper.sendTxStatusMsg({ sendTxState, asset, intl }),
     [asset, intl, sendTxState]
   )
-
   /**
-   * Custom send form used by BNB chain only
+   * Custom send form used by DOGE only
    */
   const sendForm = useCallback(
     (walletBalance: WalletBalance) => (
-      <SendFormBNB
+      <SendFormDOGE
         walletType={walletType}
         walletIndex={walletIndex}
         balances={FP.pipe(
@@ -112,11 +84,10 @@ export const SendViewBNB: React.FC<Props> = (props): JSX.Element => {
         )}
         balance={walletBalance}
         isLoading={isLoading}
-        walletAddress={walletAddress}
         onSubmit={onSend}
         addressValidation={validateAddress}
-        fee={feeRD}
-        reloadFeesHandler={reloadFees}
+        feesWithRates={feesWithRatesRD}
+        reloadFeesHandler={reloadFeesWithRates}
         validatePassword$={validatePassword$}
         sendTxStatusMsg={sendTxStatusMsg}
         network={network}
@@ -127,11 +98,10 @@ export const SendViewBNB: React.FC<Props> = (props): JSX.Element => {
       walletIndex,
       oBalances,
       isLoading,
-      walletAddress,
       onSend,
       validateAddress,
-      feeRD,
-      reloadFees,
+      feesWithRatesRD,
+      reloadFeesWithRates,
       validatePassword$,
       sendTxStatusMsg,
       network
@@ -152,7 +122,7 @@ export const SendViewBNB: React.FC<Props> = (props): JSX.Element => {
           txRD={sendTxState.status}
           viewTxHandler={openExplorerTxUrl}
           finishActionHandler={finishActionHandler}
-          errorActionHandler={finishActionHandler}
+          errorActionHandler={resetSendTxState}
           sendForm={sendForm(walletBalance)}
         />
       )

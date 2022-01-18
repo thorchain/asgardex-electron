@@ -2,6 +2,7 @@ import * as RD from '@devexperts/remote-data-ts'
 import { BTC_DECIMAL } from '@xchainjs/xchain-bitcoin'
 import { BCH_DECIMAL } from '@xchainjs/xchain-bitcoincash'
 import { DECIMAL as COSMOS_DECIMAL } from '@xchainjs/xchain-cosmos'
+import { DOGE_DECIMAL } from '@xchainjs/xchain-doge'
 import { LTC_DECIMAL } from '@xchainjs/xchain-litecoin'
 import {
   BNBChain,
@@ -37,10 +38,8 @@ const getDecimal = (asset: Asset, network: Network): Promise<number> => {
       // return Promise.resolve(getDecimalDot(thorNetwork))
       return Promise.reject('Polkadot is not supported yet')
     }
-    case DOGEChain: {
-      // TODO (@asgdx-team) Implement DOGE
-      return Promise.reject('DOGE needs to be implemented')
-    }
+    case DOGEChain:
+      return Promise.resolve(DOGE_DECIMAL)
     case CosmosChain:
       return Promise.resolve(COSMOS_DECIMAL)
     case BCHChain:
