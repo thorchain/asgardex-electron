@@ -1,3 +1,17 @@
+# 0.7.0 (2022-01-XX)
+
+## ADD
+
+- `DOGE` support [#2001](https://github.com/thorchain/asgardex-electron/issues/2001)
+
+## Fix
+
+- Fix `sRUNE` support on `stagenet` [#2018](https://github.com/thorchain/asgardex-electron/issues/2018)
+
+## Remove
+
+- Disable `testnet` for releases (production mode) [#2025](https://github.com/thorchain/asgardex-electron/issues/2025)
+
 # 0.6.2 (2022-01-11)
 
 ## Fix
