@@ -7,6 +7,7 @@ import {
   BCHChain,
   BNBChain,
   BTCChain,
+  DOGEChain,
   ETHChain,
   LTCChain,
   THORChain
@@ -28,9 +29,7 @@ import * as walletRoutes from '../../../routes/wallet'
 import { OpenExplorerTxUrl } from '../../../services/clients'
 import { DEFAULT_NETWORK } from '../../../services/const'
 import { INITIAL_BALANCES_STATE } from '../../../services/wallet/const'
-import { SendViewBNB, SendViewBCH, SendViewBTC, SendViewETH } from './index'
-import { SendViewLTC } from './SendViewLTC'
-import { SendViewTHOR } from './SendViewTHOR'
+import { SendViewBNB, SendViewBCH, SendViewBTC, SendViewETH, SendViewDOGE, SendViewTHOR, SendViewLTC } from './index'
 
 type Props = {}
 
@@ -144,6 +143,18 @@ export const SendView: React.FC<Props> = (): JSX.Element => {
         case LTCChain:
           return (
             <SendViewLTC
+              walletType={walletType}
+              walletIndex={walletIndex}
+              asset={asset}
+              balances={balances}
+              openExplorerTxUrl={openExplorerTxUrl}
+              validatePassword$={validatePassword$}
+              network={network}
+            />
+          )
+        case DOGEChain:
+          return (
+            <SendViewDOGE
               walletType={walletType}
               walletIndex={walletIndex}
               asset={asset}

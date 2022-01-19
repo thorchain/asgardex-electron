@@ -18,6 +18,7 @@ import * as BNB from '../binance'
 import * as BTC from '../bitcoin'
 import * as BCH from '../bitcoincash'
 import { address$, WalletAddress$ } from '../clients'
+import * as DOGE from '../doge'
 import * as ETH from '../ethereum'
 import * as LTC from '../litecoin'
 import * as THOR from '../thorchain'
@@ -49,8 +50,7 @@ const addressByChain$ = (chain: Chain): WalletAddress$ => {
     case LTCChain:
       return LTC.address$
     case DOGEChain:
-      // TODO (@asgdx-team) Implement DOGE
-      return Rx.of(O.none)
+      return DOGE.address$
   }
 }
 
