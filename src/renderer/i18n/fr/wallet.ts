@@ -21,7 +21,7 @@ const wallet: WalletMessages = {
   'wallet.unlock.label': 'Déverrouiller le portefeuille',
   'wallet.unlock.title': 'Déverrouiller votre portefeuille',
   'wallet.unlock.instruction': 'Veuillez déverrouiller votre portefeuille',
-  'wallet.unlock.phrase': 'Entrez votre phrase de récupération',
+  'wallet.unlock.password': 'Entrez votre phrase de récupération',
   'wallet.unlock.error':
     'Impossible de déverrouiller le portefeuille. Veuillez vérifier votre mot de passe et réessayez',
   'wallet.imports.label': 'Importer le portefeuille',
@@ -57,6 +57,8 @@ const wallet: WalletMessages = {
   'wallet.send.fastest': 'Très rapide',
   'wallet.send.fast': 'Rapide',
   'wallet.send.average': 'Normal',
+  'wallet.send.max.doge':
+    'Calculated max. value based on estimated fees, which might be incorrect for DOGE from time to time. In case of an "Balance Insufficient for transaction" error message check https://blockchair.com/dogecoin/transactions to get an average of latest fees and try to deduct it from your balance before sending a transaction. - FR',
   'wallet.errors.balancesFailed': 'Échec lors du chargement des soldes. {errorMsg} (API Id: {apiId})',
   'wallet.errors.asset.notExist': 'Aucun {asset}',
   'wallet.errors.address.empty': "L'adresse ne peut être vide",

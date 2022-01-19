@@ -119,3 +119,8 @@ export const SubmitStatus = styled(UILabel).attrs({
 export const WalletTypeLabelWrapper = styled(`div`)`
   margin-left: 5px;
 `
+
+export const MaxBalanceButtonContainer = styled.div`
+  display: flex;
+  align-items: center;
+`

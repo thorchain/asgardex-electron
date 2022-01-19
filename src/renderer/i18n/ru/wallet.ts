@@ -21,7 +21,7 @@ const wallet: WalletMessages = {
   'wallet.unlock.label': 'Разблокировать кошелёк',
   'wallet.unlock.title': 'Разблокировать ваш кошелек',
   'wallet.unlock.instruction': 'Пожалуйста разблокируйте ваш кошелек',
-  'wallet.unlock.phrase': 'Введите ваш пароль',
+  'wallet.unlock.password': 'Введите ваш пароль',
   'wallet.unlock.error': 'Не получилось разблокировать кошелек. Пожалуйста, проверьте пароль и попробуйте еще раз',
   'wallet.imports.label': 'импортировать кошелёк',
   'wallet.imports.phrase.title': 'Пожалуйста, введите фразу вашего кошелька с одинарным пробелом между словами',
@@ -55,6 +55,8 @@ const wallet: WalletMessages = {
   'wallet.send.fastest': 'Наибыстро',
   'wallet.send.fast': 'Быстро',
   'wallet.send.average': 'Среднее',
+  'wallet.send.max.doge':
+    'Calculated max. value based on estimated fees, which might be incorrect for DOGE from time to time. In case of an "Balance Insufficient for transaction" error message check https://blockchair.com/dogecoin/transactions to get an average of latest fees and try to deduct it from your balance before sending a transaction. - RU',
   'wallet.errors.balancesFailed': 'Нет загруженных балансов. {errorMsg} (АПИ Id: {apiId})',
   'wallet.errors.asset.notExist': 'Отсутсвует актив {asset}',
   'wallet.errors.address.empty': 'Адрес не может быть пустым',
@@ -63,7 +65,8 @@ const wallet: WalletMessages = {
   'wallet.errors.amount.shouldBeNumber': 'Количество должно быть числом',
   'wallet.errors.amount.shouldBeGreaterThan': 'Количество должно быть больше, чем {amount}',
   'wallet.errors.amount.shouldBeLessThanBalance': 'Количество должно быть меньше вашего баланса',
-  'wallet.errors.amount.shouldBeLessThanBalanceAndFee': 'Количество должно быть меньше, чем ваш баланс после вычета комиссии',
+  'wallet.errors.amount.shouldBeLessThanBalanceAndFee':
+    'Количество должно быть меньше, чем ваш баланс после вычета комиссии',
   'wallet.errors.fee.notCovered': 'Комиссия не покрывается вашим банаслом ({balance})',
   'wallet.errors.invalidChain': 'Неверная цепочка: {chain}',
   'wallet.password.confirmation.title': 'Подтверждение пароля',

@@ -125,7 +125,7 @@ export const UnlockForm: React.FC<Props> = (props): JSX.Element => {
       <Styled.Form form={form} onFinish={submitForm}>
         <Styled.Content>
           <div style={{ width: '100%' }}>
-            <Styled.Text>{intl.formatMessage({ id: 'wallet.unlock.phrase' })}</Styled.Text>
+            <Styled.Text>{intl.formatMessage({ id: 'wallet.unlock.password' })}</Styled.Text>
             <Styled.PasswordInput
               name="password"
               rules={[{ required: true, validator: passwordValidator }]}

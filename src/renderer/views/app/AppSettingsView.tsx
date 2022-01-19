@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect } from 'react'
+import React, { useCallback } from 'react'
 
 import { useObservableState } from 'observable-hooks'
 
@@ -21,11 +21,6 @@ export const AppSettingsView: React.FC = (): JSX.Element => {
     (version: string) => window.apiUrl.openExternal(`${ExternalUrl.GITHUB_RELEASE}${version}`),
     []
   )
-
-  useEffect(() => {
-    // Needed to update Electron native menu according to the selected locale
-    window.apiLang.update(currentLocale)
-  }, [currentLocale])
 
   return (
     <AppSettings
