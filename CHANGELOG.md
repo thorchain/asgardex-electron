@@ -1,12 +1,19 @@
 # 0.7.0 (2022-01-XX)
 
-## ADD
+## Add
 
 - `DOGE` support [#2001](https://github.com/thorchain/asgardex-electron/issues/2001)
+- Re-enable RU [#2033](https://github.com/thorchain/asgardex-electron/issues/2033)
+
+## Update
+
+- updating ru translation by @TreefeedXavier [#2032](https://github.com/thorchain/asgardex-electron/pull/2032)
 
 ## Fix
 
 - Fix `sRUNE` support on `stagenet` [#2018](https://github.com/thorchain/asgardex-electron/issues/2018)
+- Native menu does not appear before opening settings [#2029](https://github.com/thorchain/asgardex-electron/issues/2029)
+- Unlock screen: Wrong headline [#2031](https://github.com/thorchain/asgardex-electron/issues/2031)
 
 ## Remove
 
