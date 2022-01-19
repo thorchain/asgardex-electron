@@ -32,6 +32,7 @@ import { WalletPasswordConfirmationModal } from '../../../modal/confirmation'
 import * as StyledR from '../../../shared/form/Radio.styles'
 import { MaxBalanceButton } from '../../../uielements/button/MaxBalanceButton'
 import { UIFeesRD } from '../../../uielements/fees'
+import { InfoIcon } from '../../../uielements/info'
 import { Input, InputBigNumber } from '../../../uielements/input'
 import { AccountSelector } from '../../account'
 import * as H from '../TxForm.helpers'
@@ -389,11 +390,14 @@ export const SendFormDOGE: React.FC<Props> = (props): JSX.Element => {
                   onChange={onChangeInput}
                 />
               </Styled.FormItem>
-              <MaxBalanceButton
-                balance={{ amount: maxAmount, asset: AssetDOGE }}
-                onClick={addMaxAmountHandler}
-                disabled={isMaxButtonDisabled}
-              />
+              <Styled.MaxBalanceButtonContainer>
+                <MaxBalanceButton
+                  balance={{ amount: maxAmount, asset: AssetDOGE }}
+                  onClick={addMaxAmountHandler}
+                  disabled={isMaxButtonDisabled}
+                />
+                <InfoIcon color="warning" tooltip={intl.formatMessage({ id: 'wallet.send.max.doge' })} />
+              </Styled.MaxBalanceButtonContainer>
               <Styled.Fees fees={uiFeesRD} reloadFees={reloadFees} disabled={isLoading} />
               {renderFeeError}
               <Styled.CustomLabel size="big">{intl.formatMessage({ id: 'common.memo' })}</Styled.CustomLabel>

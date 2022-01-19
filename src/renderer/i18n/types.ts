@@ -175,6 +175,7 @@ type WalletMessageKey =
   | 'wallet.send.fastest'
   | 'wallet.send.fast'
   | 'wallet.send.average'
+  | 'wallet.send.max.doge'
   | 'wallet.password.confirmation.title'
   | 'wallet.password.confirmation.description'
   | 'wallet.password.confirmation.pending'
