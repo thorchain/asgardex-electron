@@ -142,7 +142,7 @@ type WalletMessageKey =
   | 'wallet.lock.label'
   | 'wallet.unlock.label'
   | 'wallet.unlock.title'
-  | 'wallet.unlock.phrase'
+  | 'wallet.unlock.password'
   | 'wallet.unlock.error'
   | 'wallet.imports.label'
   | 'wallet.imports.keystore.select'

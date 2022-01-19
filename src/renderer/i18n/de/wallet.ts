@@ -21,7 +21,7 @@ const wallet: WalletMessages = {
   'wallet.unlock.title': 'Entsperre Deine Wallet',
   'wallet.unlock.label': 'Wallet entsperren',
   'wallet.unlock.instruction': 'Bitte entsperre Deine Wallet',
-  'wallet.unlock.phrase': 'Bitte gebe Deine Phrase ein',
+  'wallet.unlock.password': 'Bitte gebe Dein Passwort ein',
   'wallet.unlock.error': 'Die Wallet konnte nicht entsperrt werden. Bitte überprüfe Dein Passwort und versuche es .',
   'wallet.imports.label': 'Wallet importieren',
   'wallet.imports.keystore.select': 'Keystore-Datei auswählen',

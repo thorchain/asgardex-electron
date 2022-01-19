@@ -21,7 +21,7 @@ const wallet: WalletMessages = {
   'wallet.unlock.label': 'Разблокировать кошелёк',
   'wallet.unlock.title': 'Разблокировать ваш кошелек',
   'wallet.unlock.instruction': 'Пожалуйста разблокируйте ваш кошелек',
-  'wallet.unlock.phrase': 'Введите ваш пароль',
+  'wallet.unlock.password': 'Введите ваш пароль',
   'wallet.unlock.error': 'Не получилось разблокировать кошелек. Пожалуйста, проверьте пароль и попробуйте еще раз',
   'wallet.imports.label': 'импортировать кошелёк',
   'wallet.imports.phrase.title': 'Пожалуйста, введите фразу вашего кошелька с одинарным пробелом между словами',

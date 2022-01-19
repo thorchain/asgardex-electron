@@ -21,7 +21,7 @@ const wallet: WalletMessages = {
   'wallet.unlock.label': 'Déverrouiller le portefeuille',
   'wallet.unlock.title': 'Déverrouiller votre portefeuille',
   'wallet.unlock.instruction': 'Veuillez déverrouiller votre portefeuille',
-  'wallet.unlock.phrase': 'Entrez votre phrase de récupération',
+  'wallet.unlock.password': 'Entrez votre phrase de récupération',
   'wallet.unlock.error':
     'Impossible de déverrouiller le portefeuille. Veuillez vérifier votre mot de passe et réessayez',
   'wallet.imports.label': 'Importer le portefeuille',
