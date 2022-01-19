@@ -1,13 +1,13 @@
-# 0.7.0 (2022-01-XX)
+# 0.7.0 (2022-01-19)
 
 ## Add
 
 - `DOGE` support [#2001](https://github.com/thorchain/asgardex-electron/issues/2001)
-- Re-enable RU [#2033](https://github.com/thorchain/asgardex-electron/issues/2033)
 
 ## Update
 
 - updating ru translation by @TreefeedXavier [#2032](https://github.com/thorchain/asgardex-electron/pull/2032)
+- Re-enable RU [#2033](https://github.com/thorchain/asgardex-electron/issues/2033)
 
 ## Fix
 
