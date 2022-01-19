@@ -2,13 +2,13 @@ import { PoolsMessages } from '../types'
 
 const pools: PoolsMessages = {
   'pools.depth': 'Глубина',
-  'pools.24hvol': 'Значение за 24ч',
-  'pools.avgsize': 'Ср. значени',
-  'pools.avgfee': 'Ср. Комиссия',
-  'pools.blocksleft': 'Осталось блоков',
-  'pools.trades': 'Сделки',
+  'pools.24hvol': 'объёмы за 24ч',
+  'pools.avgsize': 'ср. размер',
+  'pools.avgfee': 'ср. комиссия',
+  'pools.blocksleft': 'блоков осталось',
+  'pools.trades': 'Сделок',
   'pools.pending': 'В ожидании',
-  'pools.available': 'Доступные'
+  'pools.available': 'Доступны'
 }
 
 export default pools
