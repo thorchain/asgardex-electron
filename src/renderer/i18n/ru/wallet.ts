@@ -56,7 +56,7 @@ const wallet: WalletMessages = {
   'wallet.send.fast': 'Быстро',
   'wallet.send.average': 'Среднее',
   'wallet.send.max.doge':
-    'Calculated max. value based on estimated fees, which might be incorrect for DOGE from time to time. In case of an "Balance Insufficient for transaction" error message check https://blockchair.com/dogecoin/transactions to get an average of latest fees and try to deduct it from your balance before sending a transaction. - RU',
+    'Рассчитанное макс. значение основано на приблизительных комиссиях, которые могут быть иногда неточны для DOGE. В случае появления сообщения об ошибке "Недостаточно средств для проведения операции" проверьте https://blockchair.com/dogecoin/transactions, чтобы получить среднее значение последних сборов и вычесть его из баланса перед отправкой транзакции.',
   'wallet.errors.balancesFailed': 'Нет загруженных балансов. {errorMsg} (АПИ Id: {apiId})',
   'wallet.errors.asset.notExist': 'Отсутсвует актив {asset}',
   'wallet.errors.address.empty': 'Адрес не может быть пустым',

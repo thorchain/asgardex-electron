@@ -1,4 +1,4 @@
-name: Electron build
+name: Electron build - Linux
 
 on:
   push:
