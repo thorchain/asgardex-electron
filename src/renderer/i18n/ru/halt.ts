@@ -6,9 +6,9 @@ const halt: HaltMessages = {
   'halt.chain': 'Торговля для цепи {chain} приостановлена.',
   'halt.chains': 'Торговля для цепей {chains} приостановлена.',
   'halt.chain.trading': 'Торговля {chains} временно приостановлена.',
-  'halt.chain.pause': 'Liquidity activities (add/remove) for {chains} chain(s) have been disabled temporarily - RU.',
-  'halt.chain.pauseall': 'Liquidity activities (add/remove) for all chains have been disabled temporarily. - RU',
-  'halt.chain.upgrade': 'Обновление для {chains} временно приостановлено для поддержки.'
+  'halt.chain.pause': 'Операции с ликвидностью(добавление/вывод) для цепочки(ек) {chains} временно отключено.',
+  'halt.chain.pauseall': 'Операции с ликвидностью(добавление/вывод) для всех цепочек временно отключено.',
+  'halt.chain.upgrade': 'Обновление для {chains} временно приостановлено для обслуживания.'
 }
 
 export default halt
