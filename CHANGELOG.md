@@ -3,6 +3,7 @@
 ## Update
 
 - Use `haskoin.ninerealms.com` for `BTC` to get rid of `api.haskoin.com` [#2037](https://github.com/thorchain/asgardex-electron/issues/2037)
+- Get logoUrl from the ERC20 whitelist [#2041](https://github.com/thorchain/asgardex-electron/issues/2041)
 
 ## Fix
 
