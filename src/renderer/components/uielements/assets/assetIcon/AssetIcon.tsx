@@ -9,6 +9,7 @@ import * as O from 'fp-ts/lib/Option'
 import { Network } from '../../../../../shared/api/types'
 import {
   getEthTokenAddress,
+  iconUrlInERC20Whitelist,
   isBchAsset,
   isBnbAsset,
   isBtcAsset,
@@ -97,12 +98,21 @@ export const AssetIcon: React.FC<Props> = ({
         return `https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/binance/assets/${asset.symbol}/logo.png`
       }
 
+      // Since we've already checked ETH.ETH before,
+      // we know any asset is ERC20 here - no need to run expensive `isEthTokenAsset`
       if (isEthChain(asset.chain)) {
         return FP.pipe(
-          getEthTokenAddress(asset),
-          O.map(
-            (tokenAddress) =>
-              `https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/${tokenAddress}/logo.png`
+          // Try to get url from ERC20Whitelist first
+          iconUrlInERC20Whitelist(asset),
+          // Or use `trustwallet`
+          O.alt(() =>
+            FP.pipe(
+              getEthTokenAddress(asset),
+              O.map(
+                (tokenAddress) =>
+                  `https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/${tokenAddress}/logo.png`
+              )
+            )
           ),
           O.getOrElse(() => '')
         )

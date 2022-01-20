@@ -53,7 +53,8 @@ import {
   isRuneEthAsset,
   assetInERC20Whitelist,
   addressInERC20Whitelist,
-  validAssetForETH
+  validAssetForETH,
+  iconUrlInERC20Whitelist
 } from './assetHelper'
 import { eqAsset, eqAssetAmount, eqBaseAmount } from './fp/eq'
 
@@ -201,6 +202,18 @@ describe('helpers/assetHelper', () => {
 
     it('XRUNE (white listed)', () => {
       expect(assetInERC20Whitelist(AssetXRune)).toBeTruthy()
+    })
+  })
+
+  describe('iconUrlInERC20Whitelist', () => {
+    it('USDT', () => {
+      expect(iconUrlInERC20Whitelist(AssetUSDTERC20)).toEqual(
+        O.some('https://tokens.1inch.io/0xdac17f958d2ee523a2206206994597c13d831ec7.png')
+      )
+    })
+
+    it('XRUNE', () => {
+      expect(iconUrlInERC20Whitelist(AssetXRune)).toBeNone()
     })
   })
 

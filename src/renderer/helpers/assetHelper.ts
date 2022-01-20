@@ -36,7 +36,7 @@ import {
   DEFAULT_PRICE_ASSETS,
   USD_PRICE_ASSETS
 } from '../const'
-import { ERC20Whitelist } from '../types/generated/thorchain/erc20whitelist'
+import { ERC20_WHITELIST } from '../types/generated/thorchain/erc20whitelist'
 import { PricePoolAsset } from '../views/pools/Pools.types'
 import { getEthChecksumAddress } from './addressHelper'
 import { getChainAsset, isBchChain, isBnbChain, isBtcChain, isEthChain, isLtcChain } from './chainHelper'
@@ -110,9 +110,19 @@ export const isDogeAsset = (asset: Asset): boolean => eqAsset.equals(asset, Asse
  */
 export const assetInERC20Whitelist = (asset: Asset): boolean =>
   FP.pipe(
-    ERC20Whitelist,
-    A.findFirst((assetInList) => eqAsset.equals(assetInList, asset)),
+    ERC20_WHITELIST,
+    A.findFirst(({ asset: assetInList }) => eqAsset.equals(assetInList, asset)),
     O.isSome
+  )
+
+/**
+ * Get's icon url from white list
+ */
+export const iconUrlInERC20Whitelist = (asset: Asset): O.Option<string> =>
+  FP.pipe(
+    ERC20_WHITELIST,
+    A.findFirst(({ asset: assetInList }) => eqAsset.equals(assetInList, asset)),
+    O.chain(({ iconUrl }) => iconUrl)
   )
 
 /**
@@ -144,10 +154,14 @@ const addressInList = (address: Address, list: Asset[]): boolean => {
   )
 }
 
+const erc20WhiteListAssetOnly = FP.pipe(
+  ERC20_WHITELIST,
+  A.map(({ asset }) => asset)
+)
 /**
  * Check whether an ERC20 address is white listed or not
  */
-export const addressInERC20Whitelist = (address: Address): boolean => addressInList(address, ERC20Whitelist)
+export const addressInERC20Whitelist = (address: Address): boolean => addressInList(address, erc20WhiteListAssetOnly)
 
 /**
  * Check whether an asset is black listed for Binance or not
