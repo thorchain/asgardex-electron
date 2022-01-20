@@ -27,7 +27,6 @@ import * as O from 'fp-ts/lib/Option'
 
 import { Network } from '../../shared/api/types'
 import {
-  AssetFoxERC20,
   AssetTGTERC20,
   AssetTGTERC20Testnet,
   AssetXRune,
@@ -178,11 +177,6 @@ export const assetInBinanceBlacklist = (network: Network, asset: Asset): boolean
  */
 export const isXRuneAsset = (asset: Asset): boolean =>
   eqAsset.equals(asset, AssetXRune) || eqAsset.equals(asset, AssetXRuneTestnet)
-
-/**
- * Check whether an asset is ETH.FOX asset
- */
-export const isFoxERC20Asset = (asset: Asset): boolean => eqAsset.equals(asset, AssetFoxERC20)
 
 /**
  * Check whether an asset is TGT asset
