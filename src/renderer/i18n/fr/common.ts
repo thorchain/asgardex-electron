@@ -34,6 +34,7 @@ const common: CommonMessages = {
   'common.change': 'Modifier',
   'common.wallet': 'Portefeuille',
   'common.history': 'Historique',
+  'common.settings': 'Réglages',
   'common.assets': 'Actifs',
   'common.asset': 'Actif',
   'common.pools': 'Pools',

@@ -33,6 +33,7 @@ export type CommonMessageKey =
   | 'common.change'
   | 'common.wallet'
   | 'common.history'
+  | 'common.settings'
   | 'common.pool'
   | 'common.pools'
   | 'common.asset'
@@ -257,7 +258,6 @@ type LedgerMessageKey =
 export type LedgerMessages = { [key in LedgerMessageKey]: string }
 
 type SettingMessageKey =
-  | 'setting.title'
   | 'setting.app.title'
   | 'setting.wallet.management'
   | 'setting.client'
