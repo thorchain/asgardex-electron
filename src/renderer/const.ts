@@ -57,12 +57,6 @@ export const AssetXRuneTestnet: Asset = {
   ticker: 'XRUNE'
 }
 
-export const AssetFoxERC20: Asset = {
-  chain: ETHChain,
-  symbol: 'FOX-0xc770eefad204b5180df6a14ee197d99d808ee52d',
-  ticker: 'FOX'
-}
-
 export const AssetTGTERC20: Asset = {
   chain: ETHChain,
   symbol: 'TGT-0x108a850856db3f85d0269a2693d896b394c80325',

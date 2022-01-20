@@ -21,10 +21,18 @@ const WHITELIST_URL =
 
 const PATH = './src/renderer/types/generated/thorchain/erc20whitelist.ts'
 
-const transformList = ({ tokens }: Pick<ERC20Whitelist, 'tokens'>): Asset[] =>
+type AssetList = { asset: Asset; iconUrl: O.Option<string> }[]
+
+const transformList = ({ tokens }: Pick<ERC20Whitelist, 'tokens'>): AssetList =>
   FP.pipe(
     tokens,
-    A.filterMap(({ address, symbol }) => FP.pipe(assetFromString(`${ETHChain}.${symbol}-${address}`), O.fromNullable))
+    A.filterMap(({ address, symbol, logoURI }) =>
+      FP.pipe(
+        assetFromString(`${ETHChain}.${symbol}-${address}`),
+        O.fromNullable,
+        O.map((asset) => ({ asset, iconUrl: O.fromNullable(logoURI) }))
+      )
+    )
   )
 
 const loadList = (): TE.TaskEither<Error, ERC20Whitelist> =>
@@ -42,20 +50,37 @@ const loadList = (): TE.TaskEither<Error, ERC20Whitelist> =>
     )
   )
 
-const createTemplate = (list: Asset[]): string => `
-/**
- * ERC20Whitelist
- *
- * This file has been generated - don't edit.
- *
- */
+const createTemplate = (list: AssetList): string => {
+  const listAsString = FP.pipe(
+    list,
+    A.map(({ asset, iconUrl }) => {
+      const iconUrlString = FP.pipe(
+        iconUrl,
+        O.fold(
+          () => 'O.none',
+          (iconUrl) => `O.some('${iconUrl}')`
+        )
+      )
+      return `{asset: ${JSON.stringify(asset)}, iconUrl: ${iconUrlString}}`
+    })
+  )
 
-import { Asset, ETHChain } from '@xchainjs/xchain-util'
+  return `
+    /**
+     * ERC20_WHITELIST
+     *
+     * This file has been generated - don't edit.
+     *
+     */
 
-export const ERC20Whitelist: Asset[] = ${JSON.stringify(list)}
-`
+    import * as O from 'fp-ts/lib/Option'
+    import { Asset, ETHChain } from '@xchainjs/xchain-util'
 
-const writeList = (list: Asset[]): TE.TaskEither<Error, void> =>
+    export const ERC20_WHITELIST: { asset: Asset, iconUrl: O.Option<string> }[] = [${listAsString}]
+  `
+}
+
+const writeList = (list: AssetList): TE.TaskEither<Error, void> =>
   FP.pipe(
     list,
     createTemplate,
