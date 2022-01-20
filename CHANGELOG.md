@@ -4,6 +4,10 @@
 
 - Use `haskoin.ninerealms.com` for `BTC` to get rid of `api.haskoin.com` [#2037](https://github.com/thorchain/asgardex-electron/issues/2037)
 
+## Fix
+
+- Settings placeholder in Wallet area do not catch translation from i18 files [#2036](https://github.com/thorchain/asgardex-electron/issues/2036)
+
 # 0.7.0 (2022-01-19)
 
 ## Add
