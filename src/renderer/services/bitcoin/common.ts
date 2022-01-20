@@ -17,11 +17,11 @@ import { ClientState, ClientState$ } from './types'
 
 const APP_HASKOIN_MAINNET_URL = envOrDefault(
   process.env.REACT_APP_HASKOIN_BTC_MAINNET_URL,
-  'https://api.haskoin.com/btc'
+  'https://haskoin.ninerealms.com/btc'
 )
 
 const HASKOIN_API_URL: ClientUrl = {
-  testnet: envOrDefault(process.env.REACT_APP_HASKOIN_BTC_TESTNET_URL, 'https://api.haskoin.com/btctest'),
+  testnet: envOrDefault(process.env.REACT_APP_HASKOIN_BTC_TESTNET_URL, 'https://haskoin.ninerealms.com/btctest'),
   stagenet: APP_HASKOIN_MAINNET_URL,
   mainnet: APP_HASKOIN_MAINNET_URL
 }
