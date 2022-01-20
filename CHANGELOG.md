@@ -1,3 +1,9 @@
+# 0.7.1 (2022-01-xx)
+
+## Update
+
+- Use `haskoin.ninerealms.com` for `BTC` to get rid of `api.haskoin.com` [#2037](https://github.com/thorchain/asgardex-electron/issues/2037)
+
 # 0.7.0 (2022-01-19)
 
 ## Add
