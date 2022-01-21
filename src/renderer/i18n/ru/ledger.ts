@@ -3,8 +3,7 @@ import { LedgerMessages } from '../types'
 const ledger: LedgerMessages = {
   'ledger.title': 'Ledger',
   'ledger.title.sign': 'Подписать с помощью Ledger',
-  'ledger.needsconnected':
-    'Убедитесь, что ваш Ledger подключён и приложение "{chain}" запущено.',
+  'ledger.needsconnected': 'Убедитесь, что ваш Ledger подключён и приложение "{chain}" запущено.',
   'ledger.add.device': 'Добавить Ledger',
   'ledger.error.nodevice': 'Нет подключенных устройств',
   'ledger.error.inuse': 'Это устройство используется в другом приложении',

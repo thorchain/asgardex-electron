@@ -1,6 +1,7 @@
 import { BTC_DECIMAL } from '@xchainjs/xchain-bitcoin'
 import { BCH_DECIMAL } from '@xchainjs/xchain-bitcoincash'
 import { DECIMAL as COSMOS_DECIMAL } from '@xchainjs/xchain-cosmos'
+import { DOGE_DECIMAL } from '@xchainjs/xchain-doge'
 import { ETH_DECIMAL } from '@xchainjs/xchain-ethereum'
 import { LTC_DECIMAL } from '@xchainjs/xchain-litecoin'
 import { DECIMAL as THOR_DECIMAL } from '@xchainjs/xchain-thorchain'
@@ -44,8 +45,8 @@ export const smallestAmountToSent = (chain: Chain, _network: Network): BaseAmoun
       // return baseAmount(1, getDecimalDot(getClientNetwork(network))
       throw Error('Polkadot is not supported yet')
     case DOGEChain:
-      // TODO (@asgdx-team) Implement DOGE
-      throw Error('DOGE needs to be implemented')
+      // 1000 satoshi
+      return baseAmount(1000, DOGE_DECIMAL)
     case BCHChain:
       // 1000 satoshi
       return baseAmount(1000, BCH_DECIMAL)

@@ -1,3 +1,35 @@
+# 0.7.1 (2022-01-xx)
+
+## Update
+
+- Use `haskoin.ninerealms.com` for `BTC` to get rid of `api.haskoin.com` [#2037](https://github.com/thorchain/asgardex-electron/issues/2037)
+- Get logoUrl from the ERC20 whitelist [#2041](https://github.com/thorchain/asgardex-electron/issues/2041)
+
+## Fix
+
+- Settings placeholder in Wallet area do not catch translation from i18 files [#2036](https://github.com/thorchain/asgardex-electron/issues/2036)
+
+# 0.7.0 (2022-01-19)
+
+## Add
+
+- `DOGE` support [#2001](https://github.com/thorchain/asgardex-electron/issues/2001)
+
+## Update
+
+- updating ru translation by @TreefeedXavier [#2032](https://github.com/thorchain/asgardex-electron/pull/2032)
+- Re-enable RU [#2033](https://github.com/thorchain/asgardex-electron/issues/2033)
+
+## Fix
+
+- Fix `sRUNE` support on `stagenet` [#2018](https://github.com/thorchain/asgardex-electron/issues/2018)
+- Native menu does not appear before opening settings [#2029](https://github.com/thorchain/asgardex-electron/issues/2029)
+- Unlock screen: Wrong headline [#2031](https://github.com/thorchain/asgardex-electron/issues/2031)
+
+## Remove
+
+- Disable `testnet` for releases (production mode) [#2025](https://github.com/thorchain/asgardex-electron/issues/2025)
+
 # 0.6.2 (2022-01-11)
 
 ## Fix

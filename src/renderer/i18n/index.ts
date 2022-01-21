@@ -5,8 +5,7 @@ import fr from './fr'
 import ru from './ru'
 import { Messages } from './types'
 
-// RU is disabled temporary - some help from community is needed - see https://github.com/thorchain/asgardex-electron/issues/1966
-export const LOCALES = [Locale.EN, Locale.DE, Locale.FR /* Locale.RU */]
+export const LOCALES = [Locale.EN, Locale.DE, Locale.FR, Locale.RU]
 
 export const getLocaleFromString = (s: string): Locale => {
   switch (s) {

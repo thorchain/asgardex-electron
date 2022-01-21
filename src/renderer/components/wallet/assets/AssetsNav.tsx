@@ -50,7 +50,7 @@ export const AssetsNav: React.FC = (): JSX.Element => {
         },
         {
           key: MenuKey.WALLETSETTINGS,
-          label: 'settings',
+          label: intl.formatMessage({ id: 'common.settings' }),
           path: walletRoutes.walletSettings.path()
         }
       ] as MenuType[],

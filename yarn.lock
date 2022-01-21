@@ -4542,10 +4542,10 @@
     hdkey "^2.0.1"
     uuid "^8.3.2"
 
-"@xchainjs/xchain-doge@^0.1.0":
-  version "0.1.0"
-  resolved "https://registry.yarnpkg.com/@xchainjs/xchain-doge/-/xchain-doge-0.1.0.tgz#cb43579815909928c29b1306773234ac3a0ab90d"
-  integrity sha512-VuwxGEbq9KRC9EcA3BI9qMXml9oJ3YGe+jM6Tp6A7bctC97xIrgt9bIJwCoHyDea+Bjfy/lgYJJusaZBvM6iLQ==
+"@xchainjs/xchain-doge@^0.1.1":
+  version "0.1.1"
+  resolved "https://registry.yarnpkg.com/@xchainjs/xchain-doge/-/xchain-doge-0.1.1.tgz#bb9723bfbca7cc10f9ede2e741315076d7e69c39"
+  integrity sha512-QIBJd5RNhKAAUagi1IyJYB5NorbxojIHaA9wp+3o47R98o42Ov0Weg3RY1kedRiZlybtYWYY9po61ONc+3oqNQ==
 
 "@xchainjs/xchain-ethereum@^0.23.1":
   version "0.23.1"
@@ -4562,10 +4562,10 @@
   resolved "https://registry.yarnpkg.com/@xchainjs/xchain-thorchain/-/xchain-thorchain-0.20.1.tgz#623cbefeb5bd03e41fc768185e998af8e7caaa6d"
   integrity sha512-pU2ZhD2tk/7ljLa4D95s+WNa5D1rmW5ekYKkPgT7PeMZFrIFD/MbPVxq6oKpgNv3tiftim0rsRnYVMSoKB+uxQ==
 
-"@xchainjs/xchain-util@0.4.0-alpha":
-  version "0.4.0-alpha"
-  resolved "https://registry.yarnpkg.com/@xchainjs/xchain-util/-/xchain-util-0.4.0-alpha.tgz#373854463efcdfcd4fd32e99cbbe7dbdf861945c"
-  integrity sha512-1MR/p+V/Jh7r7NitS6EzD/mjROInOGSQYM5m8iLR29OkBTUuYnTWpgVjZ5Sv9D3Mni6iOJG6sNz5DntY7qIe8Q==
+"@xchainjs/xchain-util@0.4.0":
+  version "0.4.0"
+  resolved "https://registry.yarnpkg.com/@xchainjs/xchain-util/-/xchain-util-0.4.0.tgz#9c09a95ef6825d4dc381779a806218cf89a15ad9"
+  integrity sha512-3voTcfnuiiUtp1dDZ+hvh5Ov5r84zTIOXKfDZAGYcwNMBZOCiHU2PzlVAkJs3fYIdhPMrPfSbouU8JWM7LJ27g==
 
 "@xtuc/ieee754@^1.2.0":
   version "1.2.0"

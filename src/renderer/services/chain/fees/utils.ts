@@ -1,6 +1,7 @@
 import { getValueOfAsset1InAsset2, PoolData } from '@thorchain/asgardex-util'
 import { BTC_DECIMAL } from '@xchainjs/xchain-bitcoin'
 import { BCH_DECIMAL } from '@xchainjs/xchain-bitcoincash'
+import { DOGE_DECIMAL } from '@xchainjs/xchain-doge'
 import { ETH_DECIMAL } from '@xchainjs/xchain-ethereum'
 import { LTC_DECIMAL } from '@xchainjs/xchain-litecoin'
 import {
@@ -12,7 +13,8 @@ import {
   AssetLTC,
   baseAmount,
   assetToString,
-  BaseAmount
+  BaseAmount,
+  AssetDOGE
 } from '@xchainjs/xchain-util'
 import BigNumber from 'bignumber.js'
 import * as FP from 'fp-ts/function'
@@ -23,6 +25,7 @@ import {
   convertBaseAmountDecimal,
   isBchAsset,
   isBtcAsset,
+  isDogeAsset,
   isEthAsset,
   isEthTokenAsset,
   isLtcAsset,
@@ -59,22 +62,28 @@ export const getChainFeeByGasRate = ({
       asset: AssetBNB
     })
   } else if (isBtcAsset(asset)) {
-    // BTC/LTC/BCH = 1 * gasRate (sat/byte) * 250 (bytes)
+    // BTC = 1 * gasRate (sat/byte) * 250 (bytes)
     return O.some({
       amount: baseAmount(gasRate.multipliedBy(250), BTC_DECIMAL),
       asset: AssetBTC
     })
   } else if (isBchAsset(asset)) {
-    // BTC = 1 * gasRate (sat/byte) * 250 (bytes)
+    // BCH (similar to BTC) = 1 * gasRate (sat/byte) * 250 (bytes)
     return O.some({
       amount: baseAmount(gasRate.multipliedBy(250), BCH_DECIMAL),
       asset: AssetBCH
     })
   } else if (isLtcAsset(asset)) {
-    // LTC = 1 * gasRate (sat/byte) * 250 (bytes)
+    // LTC (similar to BTC)  = 1 * gasRate (sat/byte) * 250 (bytes)
     return O.some({
       amount: baseAmount(gasRate.multipliedBy(250), LTC_DECIMAL),
       asset: AssetLTC
+    })
+  } else if (isDogeAsset(asset)) {
+    // DOGE (similar to BTC)  = 1 * gasRate (sat/byte) * 250 (bytes)
+    return O.some({
+      amount: baseAmount(gasRate.multipliedBy(250), DOGE_DECIMAL),
+      asset: AssetDOGE
     })
   } else if (isEthAsset(asset)) {
     // ETH = 1 * gasRate * 10^9 (GWEI) * 50000 (units)

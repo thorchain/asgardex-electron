@@ -189,7 +189,8 @@ export const erc20WhitelistTokenIO = t.type({
   chainId: t.number,
   address: t.string,
   symbol: t.string,
-  name: t.string
+  name: t.string,
+  logoURI: t.union([t.string, t.undefined])
 })
 
 export type ERC20WhitelistToken = t.TypeOf<typeof erc20WhitelistTokenIO>
