@@ -33,6 +33,7 @@ export type CommonMessageKey =
   | 'common.change'
   | 'common.wallet'
   | 'common.history'
+  | 'common.settings'
   | 'common.pool'
   | 'common.pools'
   | 'common.asset'
@@ -142,7 +143,7 @@ type WalletMessageKey =
   | 'wallet.lock.label'
   | 'wallet.unlock.label'
   | 'wallet.unlock.title'
-  | 'wallet.unlock.phrase'
+  | 'wallet.unlock.password'
   | 'wallet.unlock.error'
   | 'wallet.imports.label'
   | 'wallet.imports.keystore.select'
@@ -175,6 +176,7 @@ type WalletMessageKey =
   | 'wallet.send.fastest'
   | 'wallet.send.fast'
   | 'wallet.send.average'
+  | 'wallet.send.max.doge'
   | 'wallet.password.confirmation.title'
   | 'wallet.password.confirmation.description'
   | 'wallet.password.confirmation.pending'
@@ -256,7 +258,6 @@ type LedgerMessageKey =
 export type LedgerMessages = { [key in LedgerMessageKey]: string }
 
 type SettingMessageKey =
-  | 'setting.title'
   | 'setting.app.title'
   | 'setting.wallet.management'
   | 'setting.client'

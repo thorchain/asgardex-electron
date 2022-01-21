@@ -176,7 +176,6 @@ export const AddressWrapper = styled.div`
 
 export const AddressEllipsis = styled(AddressEllipsisUI)`
   font-size: 16px;
-  text-transform: lowercase;
   font-family: 'MainFontRegular';
   color: ${palette('text', 1)};
   max-width: 100%;

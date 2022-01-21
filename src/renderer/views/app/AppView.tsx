@@ -1,4 +1,4 @@
-import React, { useMemo, useRef } from 'react'
+import React, { useEffect, useMemo, useRef } from 'react'
 
 import { SyncOutlined } from '@ant-design/icons'
 import * as RD from '@devexperts/remote-data-ts'
@@ -13,6 +13,7 @@ import { envOrDefault } from '../../../shared/utils/env'
 import { Footer } from '../../components/footer'
 import { Header } from '../../components/header'
 import { Button } from '../../components/uielements/button'
+import { useI18nContext } from '../../contexts/I18nContext'
 import { useMidgardContext } from '../../contexts/MidgardContext'
 import { unionChains } from '../../helpers/fp/array'
 import { rdAltOnPending } from '../../helpers/fpHelpers'
@@ -32,6 +33,14 @@ type HaltedChainsState = {
 }
 export const AppView: React.FC = (): JSX.Element => {
   const intl = useIntl()
+
+  const { locale$, initialLocale } = useI18nContext()
+  const currentLocale = useObservableState(locale$, initialLocale)
+
+  useEffect(() => {
+    // Needed to update Electron native menu according to the selected locale
+    window.apiLang.update(currentLocale)
+  }, [currentLocale])
 
   const {
     service: {

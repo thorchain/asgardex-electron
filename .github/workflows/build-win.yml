@@ -1,4 +1,4 @@
-name: Electron build
+name: Electron build - Windows
 
 on:
   push:
@@ -13,7 +13,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [windows-latest, macOS-latest, ubuntu-latest]
+        os: [windows-latest]
 
     steps:
       - name: Checkout git repo
@@ -24,33 +24,14 @@ jobs:
           node-version-file: '.nvmrc'
           cache: 'yarn'
 
-      - name: Install missing dependencies (on Linux only)
-        run: sudo apt-get update && sudo apt-get install libudev-dev libusb-1.0-0-dev
-        if: runner.os == 'Linux'
-
       - name: Install dependencies
         run: yarn install --frozen-lockfile
 
-      - name: Publish Windows or Linux binaries
-        if: runner.os != 'macOS'
+      - name: Publish Windows
         run: yarn package:ci
         env:
           NODE_OPTIONS: --max-old-space-size=4096
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          REACT_APP_BLOCKCHAIR_API_KEY: ${{ secrets.REACT_APP_BLOCKCHAIR_API_KEY }}
-          REACT_APP_ETHPLORER_API_KEY: ${{ secrets.REACT_APP_ETHPLORER_API_KEY }}
-          REACT_APP_ETHERSCAN_API_KEY: ${{ secrets.REACT_APP_ETHERSCAN_API_KEY }}
-
-      - name: Publish macOS binaries
-        if: runner.os == 'macOS'
-        run: yarn package:ci
-        env:
-          NODE_OPTIONS: --max-old-space-size=4096
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          CSC_LINK: ${{ secrets.MAC_CERTIFICATE }}
-          CSC_KEY_PASSWORD: ${{ secrets.MAC_CERTIFICATE_PASSWORD }}
-          SIGNING_APPLE_ID: ${{ secrets.SIGNING_APPLE_ID }}
-          SIGNING_APP_PASSWORD: ${{ secrets.SIGNING_APP_PASSWORD }}
           REACT_APP_BLOCKCHAIR_API_KEY: ${{ secrets.REACT_APP_BLOCKCHAIR_API_KEY }}
           REACT_APP_ETHPLORER_API_KEY: ${{ secrets.REACT_APP_ETHPLORER_API_KEY }}
           REACT_APP_ETHERSCAN_API_KEY: ${{ secrets.REACT_APP_ETHERSCAN_API_KEY }}

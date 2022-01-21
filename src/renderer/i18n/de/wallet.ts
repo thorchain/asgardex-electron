@@ -21,7 +21,7 @@ const wallet: WalletMessages = {
   'wallet.unlock.title': 'Entsperre Deine Wallet',
   'wallet.unlock.label': 'Wallet entsperren',
   'wallet.unlock.instruction': 'Bitte entsperre Deine Wallet',
-  'wallet.unlock.phrase': 'Bitte gebe Deine Phrase ein',
+  'wallet.unlock.password': 'Bitte gebe Dein Passwort ein',
   'wallet.unlock.error': 'Die Wallet konnte nicht entsperrt werden. Bitte überprüfe Dein Passwort und versuche es .',
   'wallet.imports.label': 'Wallet importieren',
   'wallet.imports.keystore.select': 'Keystore-Datei auswählen',
@@ -57,6 +57,8 @@ const wallet: WalletMessages = {
   'wallet.send.fastest': 'Am Schnellsten',
   'wallet.send.fast': 'Schnell',
   'wallet.send.average': 'Mittel',
+  'wallet.send.max.doge':
+    'Der berechnete max. Wert basiert auf geschätzte Gebühren, welche bei DOGE von Zeit zur Zeit inkorrekt sein können. Im Falle eines "Balance Insufficient for transaction" Fehler, gehe zu https://blockchair.com/dogecoin/transactions , um einen Durchschnittswert der aktuellen Gebühren zu erhalten und versuche diese von Deiner Balance abzuziehen, bevor Du die Transaktion versendest.',
   'wallet.errors.balancesFailed': 'Fehler beim Laden der Guthaben. {errorMsg} (API Id: {apiId})',
   'wallet.errors.asset.notExist': 'Asset ({asset}) existiert nicht',
   'wallet.errors.address.empty': 'Keine Addresse angegeben',

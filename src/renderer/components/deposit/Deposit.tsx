@@ -8,7 +8,7 @@ import * as O from 'fp-ts/Option'
 import { useIntl } from 'react-intl'
 
 import { WalletAddress } from '../../../shared/wallet/types'
-import { eqOAddress } from '../../helpers/fp/eq'
+import { eqAddress, eqOAddress } from '../../helpers/fp/eq'
 import { PoolDetailRD, PoolShareRD, PoolSharesRD } from '../../services/midgard/types'
 import { getSharesByAssetAndType } from '../../services/midgard/utils'
 import { MimirHalt } from '../../services/thorchain/types'
@@ -93,12 +93,20 @@ export const Deposit: React.FC<Props> = (props) => {
         RD.map((oPoolShare) =>
           FP.pipe(
             oPoolShare,
-            O.filter(
-              ({ runeAddress, assetAddress }) =>
-                // use shares of current selected addresses only
+            O.filter(({ runeAddress, assetAddress: oAssetAddress }) => {
+              // use shares of current selected addresses only
+              return (
                 eqOAddress.equals(runeAddress, O.some(runeWalletAddress.address)) &&
-                eqOAddress.equals(assetAddress, O.some(assetWalletAddress.address))
-            )
+                FP.pipe(
+                  oAssetAddress,
+                  O.map((assetAddress) =>
+                    // Midgard returns addresses in lowercase - it might be changed in the future
+                    eqAddress.equals(assetAddress.toLowerCase(), assetWalletAddress.address.toLowerCase())
+                  ),
+                  O.getOrElse<boolean>(() => false)
+                )
+              )
+            })
           )
         )
       ),

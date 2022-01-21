@@ -21,6 +21,7 @@ import { liveData } from '../../../helpers/rx/liveData'
 import * as BNB from '../../binance'
 import * as BTC from '../../bitcoin'
 import * as BCH from '../../bitcoincash'
+import * as DOGE from '../../doge'
 import * as ETH from '../../ethereum'
 import * as LTC from '../../litecoin'
 import * as THOR from '../../thorchain'
@@ -75,8 +76,15 @@ export const sendTx$ = ({
       return txFailure$(`sendTx$ has not been implemented for Polkadot yet`)
 
     case DOGEChain:
-      // TODO (@asgdx-team) Implement DOGE
-      return txFailure$(`sendTx$ has not been implemented for DOGE yet`)
+      return FP.pipe(
+        DOGE.feesWithRates$(memo),
+        // Error -> ApiError
+        liveData.mapLeft((error) => ({
+          errorId: ErrorId.GET_FEES,
+          msg: error?.message ?? error.toString()
+        })),
+        liveData.chain(({ rates }) => DOGE.sendTx({ recipient, amount, feeRate: rates[feeOption], memo, walletIndex }))
+      )
 
     case BCHChain:
       return FP.pipe(
@@ -156,8 +164,7 @@ export const txStatusByChain$ = ({ txHash, chain }: { txHash: TxHash; chain: Cha
     case PolkadotChain:
       return txStatusFailure$(`txStatusByChain$ has not been implemented for Polkadot`)
     case DOGEChain:
-      // TODO (@asgdx-team) Implement DOGE
-      return txStatusFailure$(`txStatusByChain$ needs to be implemented for DOGE`)
+      return DOGE.txStatus$(txHash, O.none)
     case BCHChain:
       return BCH.txStatus$(txHash, O.none)
     case LTCChain:
