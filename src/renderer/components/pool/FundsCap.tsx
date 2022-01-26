@@ -4,6 +4,7 @@ import * as RD from '@devexperts/remote-data-ts'
 import { AssetRuneNative, baseToAsset, formatAssetAmountCurrency } from '@xchainjs/xchain-util'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
+import { useIntl } from 'react-intl'
 
 import { FundsCapRD } from '../../hooks/useFundsCap'
 import * as Styled from './FundsCap.styles'
@@ -15,15 +16,16 @@ export type Props = {
 export const FundsCap: React.FC<Props> = (props): JSX.Element => {
   const { fundsCap: fundsCapRD } = props
 
+  const intl = useIntl()
+
   const label = useMemo(
     () =>
       FP.pipe(
         fundsCapRD,
         RD.fold(
-          () => '..',
           () => '...',
-          // TODO (@Veado) Add i18n
-          (_) => 'Error to get funds cap',
+          () => '...',
+          (_) => intl.formatMessage({ id: 'pools.fundscap.error' }),
           (oFundsCap) =>
             FP.pipe(
               oFundsCap,
@@ -39,7 +41,7 @@ export const FundsCap: React.FC<Props> = (props): JSX.Element => {
                     decimal: 0
                   })} pooled ${reached ? '- cap reached' : ''}`
               ),
-              O.getOrElse(() => 'No funds cap')
+              O.getOrElse(() => intl.formatMessage({ id: 'pools.fundscap.no' }))
             )
         )
       ),
