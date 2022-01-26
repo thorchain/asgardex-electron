@@ -5,6 +5,10 @@
 - Re-enable testnet for releases (production) [#2048](https://github.com/thorchain/asgardex-electron/issues/2048)
 - Update for RU translation (better translation and fix for typos) by @TreefeedXavier [#2046](https://github.com/thorchain/asgardex-electron/pull/2046)
 
+## Fix
+
+- [i18n] Translate pooled #2047
+
 # 0.7.1 (2022-01-21)
 
 ## Update
