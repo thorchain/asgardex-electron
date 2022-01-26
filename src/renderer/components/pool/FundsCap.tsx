@@ -39,13 +39,15 @@ export const FundsCap: React.FC<Props> = (props): JSX.Element => {
                     amount: baseToAsset(maxPooledRuneAmount),
                     asset: AssetRuneNative,
                     decimal: 0
-                  })} pooled ${reached ? '- cap reached' : ''}`
+                  })} ${intl.formatMessage({ id: 'pools.pooled' })} ${
+                    reached ? '- ' + +intl.formatMessage({ id: 'pools.pooled' }) : ''
+                  }`
               ),
               O.getOrElse(() => intl.formatMessage({ id: 'pools.fundscap.no' }))
             )
         )
       ),
-    [fundsCapRD]
+    [fundsCapRD, intl]
   )
 
   return <Styled.Container>{label}</Styled.Container>

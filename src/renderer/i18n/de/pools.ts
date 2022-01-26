@@ -11,7 +11,7 @@ const pools: PoolsMessages = {
   'pools.available': 'Verfügbare',
   'pools.pooled': 'angelegt',
   'pools.fundscap.reached': 'Obergrenze erreicht',
-  'pools.fundscap.no': 'Keine Obergrenze',
+  'pools.fundscap.no': 'Keine Anlagebeschränkung',
   'pools.fundscap.error': 'Error beim Laden der Anlagenbegrenzung'
 }
 
