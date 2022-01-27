@@ -8,7 +8,11 @@ const pools: PoolsMessages = {
   'pools.blocksleft': 'blocks left',
   'pools.trades': 'Trades',
   'pools.pending': 'Pending',
-  'pools.available': 'Available'
+  'pools.available': 'Available',
+  'pools.pooled': 'pooled',
+  'pools.fundscap.reached': 'cap reached',
+  'pools.fundscap.no': 'No funds cap',
+  'pools.fundscap.error': 'Error to get funds cap'
 }
 
 export default pools

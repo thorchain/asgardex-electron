@@ -8,7 +8,11 @@ const pools: PoolsMessages = {
   'pools.blocksleft': 'Verbleibende Blocks',
   'pools.trades': 'Trades',
   'pools.pending': 'Bevorstehende',
-  'pools.available': 'Verfügbare'
+  'pools.available': 'Verfügbare',
+  'pools.pooled': 'angelegt',
+  'pools.fundscap.reached': 'Obergrenze erreicht',
+  'pools.fundscap.no': 'Keine Anlagebeschränkung',
+  'pools.fundscap.error': 'Error beim Laden der Anlagenbegrenzung'
 }
 
 export default pools

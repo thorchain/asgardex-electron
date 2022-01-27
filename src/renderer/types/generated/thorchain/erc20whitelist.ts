@@ -11179,4 +11179,14 @@ export const ERC20_WHITELIST: { asset: Asset; iconUrl: O.Option<string> }[] = [
     },
     iconUrl: O.none,
   },
+  {
+    asset: {
+      chain: ETHChain,
+      symbol: "XDEFI-0x72b886d09c117654ab7da13a14d603001de0b777",
+      ticker: "XDEFI",
+    },
+    iconUrl: O.some(
+      "https://raw.githubusercontent.com/sushiswap/assets/master/blockchains/ethereum/assets/0x72B886d09C117654aB7dA13A14d603001dE0B777/logo.png"
+    ),
+  },
 ];
