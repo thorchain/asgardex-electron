@@ -119,6 +119,10 @@ type PoolsMessageKey =
   | 'pools.trades'
   | 'pools.pending'
   | 'pools.available'
+  | 'pools.pooled'
+  | 'pools.fundscap.reached'
+  | 'pools.fundscap.no'
+  | 'pools.fundscap.error'
 
 export type PoolsMessages = { [key in PoolsMessageKey]: string }
 
