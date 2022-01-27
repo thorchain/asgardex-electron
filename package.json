@@ -74,7 +74,7 @@
     "@psf/bitcoincashjs-lib": "^4.0.2",
     "@thorchain/asgardex-midgard": "^1.1.0",
     "@thorchain/asgardex-theme": "^0.1.1",
-    "@thorchain/asgardex-util": "^0.9.1",
+    "@thorchain/asgardex-util": "^0.10.0",
     "@thorchain/ledger-thorchain": "^0.1.0-alpha.2",
     "@types/electron-devtools-installer": "^2.2.0",
     "@xchainjs/xchain-binance": "^5.4.0",
