@@ -2,8 +2,10 @@
 
 ## Update
 
+- Shorten memos [#2052](https://github.com/thorchain/asgardex-electron/issues/2052)
 - Re-enable testnet for releases (production) [#2048](https://github.com/thorchain/asgardex-electron/issues/2048)
 - Update for RU translation (better translation and fix for typos) by @TreefeedXavier [#2046](https://github.com/thorchain/asgardex-electron/pull/2046)
+- Update ERC20 token list to include XDEFI token [#2040](https://github.com/thorchain/asgardex-electron/issues/2040)
 
 ## Fix
 
@@ -15,7 +17,6 @@
 
 - Use `haskoin.ninerealms.com` for `BTC` to get rid of `api.haskoin.com` [#2037](https://github.com/thorchain/asgardex-electron/issues/2037)
 - Get logoUrl from the ERC20 whitelist [#2041](https://github.com/thorchain/asgardex-electron/issues/2041)
-- Update ERC20 token list to include XDEFI token [#2040](https://github.com/thorchain/asgardex-electron/issues/2040)
 
 ## Fix
 
