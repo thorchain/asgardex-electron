@@ -33,14 +33,16 @@ import { PricePoolCurrencyWeights, PricePoolAssets } from './views/pools/Pools.t
 export const AssetUSDTERC20: Asset = {
   chain: ETHChain,
   symbol: 'USDT-0xdAC17F958D2ee523a2206206994597C13D831ec7',
-  ticker: 'USDT'
+  ticker: 'USDT',
+  synth: false
 }
 
 // ETH.USDT - testnet only
 export const AssetUSDTERC20Testnet: Asset = {
   chain: ETHChain,
   symbol: 'USDT-0xa3910454bf2cb59b8b3a401589a3bacc5ca42306',
-  ticker: 'USDT'
+  ticker: 'USDT',
+  synth: false
 }
 
 export const AssetXRuneAddress = '0x69fa0fee221ad11012bab0fdb45d444d3d2ce71c'
@@ -48,67 +50,77 @@ const AssetXRuneSymbol = 'XRUNE'
 export const AssetXRune: Asset = {
   chain: ETHChain,
   symbol: `${AssetXRuneSymbol}-${AssetXRuneAddress}`,
-  ticker: AssetXRuneSymbol
+  ticker: AssetXRuneSymbol,
+  synth: false
 }
 
 export const AssetXRuneTestnet: Asset = {
   chain: ETHChain,
   symbol: 'XRUNE-0x8626db1a4f9f3e1002eeb9a4f3c6d391436ffc23',
-  ticker: 'XRUNE'
+  ticker: 'XRUNE',
+  synth: false
 }
 
 export const AssetTGTERC20: Asset = {
   chain: ETHChain,
   symbol: 'TGT-0x108a850856db3f85d0269a2693d896b394c80325',
-  ticker: 'TGT'
+  ticker: 'TGT',
+  synth: false
 }
 
 export const AssetTGTERC20Testnet: Asset = {
   chain: ETHChain,
   symbol: 'TGT-0x73d6e26896981798526b6ead48d0fab76e205974',
-  ticker: 'TGT'
+  ticker: 'TGT',
+  synth: false
 }
 
 // ETH.UST - testnet only
 export const AssetUSTERC20Testnet: Asset = {
   chain: ETHChain,
   symbol: 'UST-0x6cA13a4ab78dd7D657226b155873A04DB929A3A4',
-  ticker: 'UST'
+  ticker: 'UST',
+  synth: false
 }
 
 // ETH.THOR - testnet only
 export const AssetThorERC20Testnet: Asset = {
   chain: ETHChain,
   symbol: 'THOR-0xA0b515c058F127a15Dd3326F490eBF47d215588e',
-  ticker: 'THOR'
+  ticker: 'THOR',
+  synth: false
 }
 
 // TKN8 - random test asset w/ 8 decimal (testnet only)
 export const AssetTKN8ERC20Testnet: Asset = {
   chain: ETHChain,
   symbol: 'TKN8-0x242aD49dAcd38aC23caF2ccc118482714206beD4',
-  ticker: 'TKN8'
+  ticker: 'TKN8',
+  synth: false
 }
 
 // TKN18 - random test asset w/ 18 decimal (testnet only)
 export const AssetTKN18ERC20Testnet: Asset = {
   chain: ETHChain,
   symbol: 'TKN18-0x8E3f9E9b5B26AAaE9d31364d2a8e8a9dd2BE3B82',
-  ticker: 'TKN18'
+  ticker: 'TKN18',
+  synth: false
 }
 
 // Wrapped Ether (WETH) - testnet only
 export const AssetWETHERC20Testnet: Asset = {
   chain: ETHChain,
   symbol: 'WETH-0xbCA556c912754Bc8E7D4Aad20Ad69a1B1444F42d',
-  ticker: 'WETH'
+  ticker: 'WETH',
+  synth: false
 }
 
 // DAI - testnet only
 export const AssetDAIERC20Testnet: Asset = {
   chain: ETHChain,
   symbol: 'DAI-0xad6d458402f60fd3bd25163575031acdce07538d',
-  ticker: 'DAI'
+  ticker: 'DAI',
+  synth: false
 }
 
 // This hardcode list is for testnet only
@@ -133,7 +145,8 @@ const AssetUniHSymbol = 'UNIH'
 export const AssetUniH: Asset = {
   chain: ETHChain,
   symbol: `${AssetUniHSymbol}-${AssetUniHAddress}`,
-  ticker: AssetUniHSymbol
+  ticker: AssetUniHSymbol,
+  synth: false
 }
 
 // Black listed BNB assets
@@ -149,29 +162,32 @@ export const BinanceBlackList: Record<Network, Array<Asset>> = {
 //
 
 // BUSD testnet
-export const AssetBUSDBAF: Asset = { chain: BNBChain, symbol: 'BUSD-BAF', ticker: 'BUSD' }
-export const AssetBUSD74E: Asset = { chain: BNBChain, symbol: 'BUSD-74E', ticker: 'BUSD' }
+export const AssetBUSDBAF: Asset = { chain: BNBChain, symbol: 'BUSD-BAF', ticker: 'BUSD', synth: false }
+export const AssetBUSD74E: Asset = { chain: BNBChain, symbol: 'BUSD-74E', ticker: 'BUSD', synth: false }
 // BUSD mainnet
-export const AssetBUSDBD1: Asset = { chain: BNBChain, symbol: 'BUSD-BD1', ticker: 'BUSD' }
+export const AssetBUSDBD1: Asset = { chain: BNBChain, symbol: 'BUSD-BD1', ticker: 'BUSD', synth: false }
 // BNB.USDT
-export const AssetUSDTDC8: Asset = { chain: BNBChain, symbol: 'USDT-DC8', ticker: 'USDT' }
+export const AssetUSDTDC8: Asset = { chain: BNBChain, symbol: 'USDT-DC8', ticker: 'USDT', synth: false }
 // ETH.USDT mainnet
 export const AssetUSDTDAC: Asset = {
   chain: ETHChain,
   symbol: 'USDT-0xdAC17F958D2ee523a2206206994597C13D831ec7',
-  ticker: 'USDT'
+  ticker: 'USDT',
+  synth: false
 }
 // ETH.USDT testnet
 export const AssetUSDT62E: Asset = {
   chain: ETHChain,
   symbol: 'USDT-0x62e273709Da575835C7f6aEf4A31140Ca5b1D190',
-  ticker: 'USDT'
+  ticker: 'USDT',
+  synth: false
 }
 // ETH.USDC mainnet
 export const AssetUSDC: Asset = {
   chain: ETHChain,
   symbol: 'USDC-0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48',
-  ticker: 'USDC'
+  ticker: 'USDC',
+  synth: false
 }
 
 export const DEFAULT_PRICE_ASSETS: PricePoolAssets = [AssetRuneNative, AssetETH, AssetBTC]

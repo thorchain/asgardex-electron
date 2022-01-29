@@ -28,6 +28,19 @@ export const WalletTypeLabel = styled(UILabel).attrs({
   width: auto;
 `
 
+export const AssetSynthLabel = styled(UILabel).attrs({
+  textTransform: 'uppercase',
+  size: 'small'
+})`
+  font-family: 'MainFontRegular';
+  color: ${palette('text', 3)};
+  /* text-shadow: 1px 1px 1px ${palette('gray', 2)}; */
+  background: ${palette('primary', 0)};
+  border-radius: 5px;
+  padding: 1px 7px;
+  width: auto;
+`
+
 export const Tooltip = styled(A.Tooltip).attrs({
   overlayStyle: {
     fontSize: 11,

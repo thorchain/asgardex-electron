@@ -1,4 +1,3 @@
-import { AssetAtom } from '@xchainjs/xchain-cosmos'
 import {
   Asset,
   AssetBNB,
@@ -35,7 +34,7 @@ export const getChainAsset = (chain: Chain): Asset => {
     case THORChain:
       return AssetRuneNative
     case CosmosChain:
-      return AssetAtom
+      throw Error('Cosmos is not supported yet')
     case BCHChain:
       return AssetBCH
     case LTCChain:
