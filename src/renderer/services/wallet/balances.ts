@@ -6,9 +6,12 @@ import {
   BNBChain,
   BTCChain,
   Chain,
+  CosmosChain,
   DOGEChain,
   ETHChain,
   LTCChain,
+  LUNAChain,
+  PolkadotChain,
   THORChain
 } from '@xchainjs/xchain-util'
 import * as A from 'fp-ts/lib/Array'
@@ -86,7 +89,12 @@ export const createBalancesService = ({
         return LTC.reloadBalances
       case DOGEChain:
         return DOGE.reloadBalances
-      default:
+      case CosmosChain:
+        return FP.constVoid
+      case PolkadotChain:
+        return FP.constVoid
+      // TODO (@veado) Support Terra
+      case LUNAChain:
         return FP.constVoid
     }
   }

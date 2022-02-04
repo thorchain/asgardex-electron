@@ -30,6 +30,7 @@ export const clientByChain$ = (chain: Chain): XChainClient$ => {
       return LTC.client$
     case DOGEChain:
       return DOGE.client$
+    // TODO (@veado) Add LUNA client
     default:
       return Rx.of(O.none)
   }
