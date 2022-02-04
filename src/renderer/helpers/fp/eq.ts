@@ -1,7 +1,7 @@
 import * as RD from '@devexperts/remote-data-ts'
 import { PoolData } from '@thorchain/asgardex-util'
 import { Address, Balance } from '@xchainjs/xchain-client'
-import { Asset, AssetAmount, BaseAmount, Chain } from '@xchainjs/xchain-util'
+import { Asset, AssetAmount, assetToString, BaseAmount, Chain } from '@xchainjs/xchain-util'
 import BigNumber from 'bignumber.js'
 import * as A from 'fp-ts/lib/Array'
 import * as B from 'fp-ts/lib/boolean'
@@ -39,7 +39,7 @@ export const eqAddress: Eq.Eq<Address> = eqString
 export const eqOAddress: Eq.Eq<O.Option<Address>> = eqOString
 
 export const eqAsset: Eq.Eq<Asset> = {
-  equals: (x, y) => eqString.equals(x.chain, y.chain) && eqString.equals(x.symbol.toUpperCase(), y.symbol.toUpperCase())
+  equals: (x, y) => eqString.equals(assetToString(x).toUpperCase(), assetToString(y).toUpperCase())
 }
 
 export const eqOAsset = O.getEq(eqAsset)

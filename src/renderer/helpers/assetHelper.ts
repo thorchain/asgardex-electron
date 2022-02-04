@@ -90,6 +90,11 @@ export const isBchAsset = (asset: Asset): boolean => eqAsset.equals(asset, Asset
 export const isBnbAsset = (asset: Asset): boolean => eqAsset.equals(asset, AssetBNB)
 
 /**
+ * Check whether an asset is a BNB synthetic asset
+ */
+export const isBnbAssetSynth = (asset: Asset): boolean => eqAsset.equals(asset, { ...AssetBNB, synth: true })
+
+/**
  * Check whether an asset is a BTC asset
  */
 export const isBtcAsset = (asset: Asset): boolean => eqAsset.equals(asset, AssetBTC)

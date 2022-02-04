@@ -2,7 +2,14 @@ import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
 import { Address, Balance } from '@xchainjs/xchain-client'
-import { Asset, assetToString, baseToAsset, chainToString, formatAssetAmountCurrency } from '@xchainjs/xchain-util'
+import {
+  Asset,
+  assetToString,
+  baseToAsset,
+  chainToString,
+  formatAssetAmountCurrency,
+  isSynthAsset
+} from '@xchainjs/xchain-util'
 import { Col, Collapse, Grid, Row } from 'antd'
 import { ScreenMap } from 'antd/lib/_util/responsiveObserve'
 import { ColumnType } from 'antd/lib/table'
@@ -150,7 +157,10 @@ export const AssetsTableCollapsable: React.FC<Props> = (props): JSX.Element => {
           <Styled.AssetTickerWrapper>
             <Styled.Label nowrap>
               <Styled.TickerLabel>{asset.ticker}</Styled.TickerLabel>
-              <Styled.ChainLabel>{asset.chain}</Styled.ChainLabel>
+              <Styled.ChainLabelWrapper>
+                {!isSynthAsset(asset) && <Styled.ChainLabel>{asset.chain}</Styled.ChainLabel>}
+                {isSynthAsset(asset) && <Styled.AssetSynthLabel>synth</Styled.AssetSynthLabel>}
+              </Styled.ChainLabelWrapper>
             </Styled.Label>
             {isNonNativeRuneAsset(asset, network) && (
               <Styled.UpgradeButton

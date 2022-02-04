@@ -5,7 +5,10 @@ import { palette } from 'styled-theme'
 
 import { Label as UILabel } from '../../../components/uielements/label'
 import { Button as UIButton } from '../../uielements/button'
-import { WalletTypeLabel as WalletTypeLabelUI } from '../../uielements/common/Common.styles'
+import {
+  WalletTypeLabel as WalletTypeLabelUI,
+  AssetSynthLabel as AssetSynthLabelUI
+} from '../../uielements/common/Common.styles'
 import { Table as UITable } from '../../uielements/table'
 
 export const Table = styled(UITable)`
@@ -60,6 +63,11 @@ export const TickerLabel = styled(UILabel).attrs({
   padding: 0px;
   font-size: 16px;
   line-height: 18px;
+`
+
+export const ChainLabelWrapper = styled.div`
+  display: flex;
+  align-items: center;
 `
 
 export const ChainLabel = styled(TickerLabel)`
@@ -150,4 +158,11 @@ export const UpgradeButton = styled(UIButton).attrs({
 export const WalletTypeLabel = styled(WalletTypeLabelUI)`
   background: ${palette('gray', 1)};
   padding: 0 5px;
+`
+
+export const AssetSynthLabel = styled(AssetSynthLabelUI)`
+  margin-top: 2px;
+  padding: 0 4px;
+  font-size: 10px;
+  line-height: 12px;
 `

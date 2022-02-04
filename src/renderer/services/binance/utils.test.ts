@@ -22,7 +22,8 @@ describe('services/binance/utils/', () => {
       expect(result).toEqual({
         chain: BNBChain,
         symbol: 'RUNE-B1A',
-        ticker: 'RUNE'
+        ticker: 'RUNE',
+        synth: false
       })
     })
   })
@@ -58,7 +59,8 @@ describe('services/binance/utils/', () => {
       expect(result[0].asset).toEqual({
         chain: BNBChain,
         symbol: 'BNB',
-        ticker: 'BNB'
+        ticker: 'BNB',
+        synth: false
       })
       expect(result[0].amount.amount()).toEqual(assetToBase(assetAmount(1)).amount())
 
@@ -66,7 +68,8 @@ describe('services/binance/utils/', () => {
       expect(result[1].asset).toEqual({
         chain: BNBChain,
         symbol: 'RUNE-B1A',
-        ticker: 'RUNE'
+        ticker: 'RUNE',
+        synth: false
       })
       expect(result[1].amount.amount()).toEqual(assetToBase(assetAmount(2)).amount())
     })

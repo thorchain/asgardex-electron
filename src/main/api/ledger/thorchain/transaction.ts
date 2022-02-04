@@ -7,13 +7,12 @@ import {
   DEFAULT_GAS_VALUE,
   getChainId,
   getDenom,
-  getDenomWithChain,
   getPrefix,
   MsgNativeTx,
   msgNativeTxFromJson,
   registerCodecs
 } from '@xchainjs/xchain-thorchain'
-import { AssetRuneNative, BaseAmount } from '@xchainjs/xchain-util'
+import { AssetRuneNative, assetToString, BaseAmount } from '@xchainjs/xchain-util'
 import { AccAddress, Msg, PubKeySecp256k1 } from 'cosmos-client'
 import { auth, BaseAccount, StdTx } from 'cosmos-client/x/auth'
 import { MsgSend } from 'cosmos-client/x/bank'
@@ -202,7 +201,7 @@ export const deposit = async ({
     const msgNativeTx: MsgNativeTx = msgNativeTxFromJson({
       coins: [
         {
-          asset: getDenomWithChain(AssetRuneNative),
+          asset: assetToString(AssetRuneNative),
           amount: amount.amount().toString()
         }
       ],
