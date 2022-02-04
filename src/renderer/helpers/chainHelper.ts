@@ -17,7 +17,9 @@ import {
   LTCChain,
   PolkadotChain,
   DOGEChain,
-  AssetDOGE
+  AssetDOGE,
+  LUNAChain,
+  AssetLUNA
 } from '@xchainjs/xchain-util'
 
 import { ENABLED_CHAINS } from '../services/const'
@@ -41,6 +43,8 @@ export const getChainAsset = (chain: Chain): Asset => {
       return AssetLTC
     case DOGEChain:
       return AssetDOGE
+    case LUNAChain:
+      return AssetLUNA
     case PolkadotChain:
       throw Error('Polkadot is not supported yet')
   }

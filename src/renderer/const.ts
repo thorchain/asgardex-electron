@@ -19,7 +19,8 @@ import {
   Chain,
   PolkadotChain,
   CosmosChain,
-  DOGEChain
+  DOGEChain,
+  LUNAChain
 } from '@xchainjs/xchain-util'
 
 import { Network } from '../shared/api/types'
@@ -215,7 +216,8 @@ export const CHAIN_WEIGHTS: Record<Chain, number> = {
   [BNBChain]: 5,
   [CosmosChain]: 6,
   [DOGEChain]: 7,
-  [PolkadotChain]: 8
+  [LUNAChain]: 8,
+  [PolkadotChain]: 9
 }
 
 // Weight of currencies needed for pricing

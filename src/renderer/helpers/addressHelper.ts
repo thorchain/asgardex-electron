@@ -3,7 +3,7 @@ import { getPrefix as getBitcoinPrefix } from '@xchainjs/xchain-bitcoin'
 import { getPrefix as getBCHPrefix } from '@xchainjs/xchain-bitcoincash'
 import { Address } from '@xchainjs/xchain-client'
 import { getPrefix as getCosmosPrefix } from '@xchainjs/xchain-cosmos'
-// import { getPrefix as getDogePrefix } from '@xchainjs/xchain-doge'
+import { getPrefix as getDogePrefix } from '@xchainjs/xchain-doge'
 import { getPrefix as getEthereumPrefix } from '@xchainjs/xchain-ethereum'
 import { getPrefix as getLitecoinPrefix } from '@xchainjs/xchain-litecoin'
 import { getPrefix as getThorchainPrefix } from '@xchainjs/xchain-thorchain'
@@ -17,7 +17,8 @@ import {
   THORChain,
   LTCChain,
   BCHChain,
-  DOGEChain
+  DOGEChain,
+  LUNAChain
 } from '@xchainjs/xchain-util'
 import { ethers } from 'ethers'
 import * as O from 'fp-ts/lib/Option'
@@ -42,18 +43,18 @@ export const getAddressPrefixLength = (chain: Chain, network: Network): number =
       return getCosmosPrefix().length
     case ETHChain:
       return getEthereumPrefix().length
-    case PolkadotChain:
-      throw Error('Polkadot is not supported yet')
     case DOGEChain:
-      // return getDogePrefix(clientNetwork).length
-      // TODO: Add `getPrefix` to xchain-doge
-      return network === 'testnet' ? 1 /* 'n'*/ : 0
+      return getDogePrefix(clientNetwork).length
     case THORChain:
       return getThorchainPrefix(clientNetwork).length
     case LTCChain:
       return getLitecoinPrefix(clientNetwork).length
     case BCHChain:
       return getBCHPrefix().length
+    case LUNAChain:
+      throw Error('LUNA is not supported yet')
+    case PolkadotChain:
+      throw Error('Polkadot is not supported yet')
   }
 }
 
