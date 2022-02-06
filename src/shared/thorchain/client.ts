@@ -1,5 +1,5 @@
 import { Network } from '@xchainjs/xchain-client'
-import { ClientUrl, getDefaultClientUrl } from '@xchainjs/xchain-thorchain'
+import { ChainIds, ClientUrl, getDefaultClientUrl } from '@xchainjs/xchain-thorchain'
 
 import { envOrDefault } from '../utils/env'
 
@@ -22,3 +22,9 @@ export const getClientUrl = (): ClientUrl => {
     }
   }
 }
+
+export const getChainIds = (): ChainIds => ({
+  [Network.Testnet]: 'thorchain-v1',
+  [Network.Stagenet]: 'thorchain-stagenet',
+  [Network.Mainnet]: 'thorchain'
+})
