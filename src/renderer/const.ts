@@ -20,7 +20,7 @@ import {
   PolkadotChain,
   CosmosChain,
   DOGEChain,
-  LUNAChain
+  TerraChain
 } from '@xchainjs/xchain-util'
 
 import { Network } from '../shared/api/types'
@@ -216,7 +216,7 @@ export const CHAIN_WEIGHTS: Record<Chain, number> = {
   [BNBChain]: 5,
   [CosmosChain]: 6,
   [DOGEChain]: 7,
-  [LUNAChain]: 8,
+  [TerraChain]: 8,
   [PolkadotChain]: 9
 }
 
@@ -264,4 +264,4 @@ export const ASYM_DEPOSIT_TOOL_URL: Record<Network, string> = {
 }
 
 // @asgdx-team: Extend list whenever another ledger app will be supported
-export const SUPPORTED_LEDGER_APPS: Chain[] = [THORChain, BNBChain]
+export const SUPPORTED_LEDGER_APPS: Chain[] = [THORChain, BNBChain, BTCChain]

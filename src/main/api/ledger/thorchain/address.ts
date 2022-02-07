@@ -36,7 +36,7 @@ export const getAddress = async (
   }
 }
 
-export const verifyAddress = async (transport: Transport, network: Network, walletIndex: number) => {
+export const verifyAddress = async (transport: Transport, network: Network, walletIndex: number): Promise<void> => {
   const app = new THORChainApp(transport)
   const clientNetwork = toClientNetwork(network)
   const prefix = getPrefix(clientNetwork)
