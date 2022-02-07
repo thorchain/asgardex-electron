@@ -1,6 +1,7 @@
 import React, { useCallback, useMemo } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
+import { Address } from '@xchainjs/xchain-client'
 import { Asset, BTCChain } from '@xchainjs/xchain-util'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/Option'
@@ -27,6 +28,7 @@ import * as Helper from './SendView.helper'
 type Props = {
   walletType: WalletType
   walletIndex: number
+  walletAddress: Address
   asset: Asset
   balances: O.Option<NonEmptyWalletBalances>
   openExplorerTxUrl: OpenExplorerTxUrl
@@ -35,7 +37,16 @@ type Props = {
 }
 
 export const SendViewBTC: React.FC<Props> = (props): JSX.Element => {
-  const { walletType, walletIndex, asset, balances: oBalances, openExplorerTxUrl, validatePassword$, network } = props
+  const {
+    walletType,
+    walletIndex,
+    walletAddress,
+    asset,
+    balances: oBalances,
+    openExplorerTxUrl,
+    validatePassword$,
+    network
+  } = props
 
   const intl = useIntl()
   const history = useHistory()
@@ -78,6 +89,7 @@ export const SendViewBTC: React.FC<Props> = (props): JSX.Element => {
       <SendFormBTC
         walletType={walletType}
         walletIndex={walletIndex}
+        walletAddress={walletAddress}
         balances={FP.pipe(
           oBalances,
           O.getOrElse<WalletBalances>(() => [])
@@ -96,6 +108,7 @@ export const SendViewBTC: React.FC<Props> = (props): JSX.Element => {
     [
       walletType,
       walletIndex,
+      walletAddress,
       oBalances,
       isLoading,
       onSend,
