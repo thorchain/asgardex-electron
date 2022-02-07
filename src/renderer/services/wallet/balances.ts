@@ -10,7 +10,7 @@ import {
   DOGEChain,
   ETHChain,
   LTCChain,
-  LUNAChain,
+  TerraChain,
   PolkadotChain,
   THORChain
 } from '@xchainjs/xchain-util'
@@ -94,7 +94,7 @@ export const createBalancesService = ({
       case PolkadotChain:
         return FP.constVoid
       // TODO (@veado) Support Terra
-      case LUNAChain:
+      case TerraChain:
         return FP.constVoid
     }
   }

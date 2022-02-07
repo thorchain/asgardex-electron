@@ -16,7 +16,7 @@ import {
   DOGEChain,
   ETHChain,
   LTCChain,
-  LUNAChain,
+  TerraChain,
   PolkadotChain,
   THORChain
 } from '@xchainjs/xchain-util'
@@ -54,7 +54,7 @@ export const smallestAmountToSent = (chain: Chain, _network: Network): BaseAmoun
     case LTCChain:
       // 1000 satoshi
       return baseAmount(1000, LTC_DECIMAL)
-    case LUNAChain:
+    case TerraChain:
       throw Error('Luna/Terra is not supported yet')
   }
 }

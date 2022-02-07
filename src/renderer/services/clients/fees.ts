@@ -17,7 +17,7 @@ import {
   DOGEChain,
   ETHChain,
   LTCChain,
-  LUNAChain,
+  TerraChain,
   PolkadotChain,
   THORChain
 } from '@xchainjs/xchain-util'
@@ -49,7 +49,7 @@ const getDefaultFeesByChain = (chain: Chain): Fees => {
       return BCH.getDefaultFees()
     case LTCChain:
       return Litecoin.getDefaultFees()
-    case LUNAChain:
+    case TerraChain:
       // Waiting for https://github.com/xchainjs/xchainjs-lib/issues/480
       throw Error('Luna/Terra is not supported yet')
   }
