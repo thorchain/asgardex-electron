@@ -9,7 +9,7 @@ import {
   DOGEChain,
   ETHChain,
   LTCChain,
-  LUNAChain,
+  TerraChain,
   PolkadotChain,
   THORChain
 } from '@xchainjs/xchain-util'
@@ -76,7 +76,7 @@ export const sendTx$ = ({
       // not available yet
       return txFailure$(`sendTx$ has not been implemented for Polkadot yet`)
 
-    case LUNAChain:
+    case TerraChain:
       // not available yet
       return txFailure$(`sendTx$ has not been implemented for Luna/Terra yet`)
 
@@ -168,7 +168,7 @@ export const txStatusByChain$ = ({ txHash, chain }: { txHash: TxHash; chain: Cha
       return txStatusFailure$(`txStatusByChain$ has not been implemented for Cosmos`)
     case PolkadotChain:
       return txStatusFailure$(`txStatusByChain$ has not been implemented for Polkadot`)
-    case LUNAChain:
+    case TerraChain:
       return txStatusFailure$(`txStatusByChain$ has not been implemented for Luna`)
     case DOGEChain:
       return DOGE.txStatus$(txHash, O.none)

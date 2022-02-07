@@ -15,7 +15,7 @@ import {
   Asset,
   BTCChain,
   DOGEChain,
-  LUNAChain
+  TerraChain
 } from '@xchainjs/xchain-util'
 import * as Rx from 'rxjs'
 import * as RxOp from 'rxjs/operators'
@@ -47,7 +47,7 @@ const getDecimal = (asset: Asset, network: Network): Promise<number> => {
       return Promise.resolve(BCH_DECIMAL)
     case LTCChain:
       return Promise.resolve(LTC_DECIMAL)
-    case LUNAChain:
+    case TerraChain:
       // Waiting for https://github.com/xchainjs/xchainjs-lib/issues/481
       return Promise.reject('Luna/Terra is not supported yet')
   }

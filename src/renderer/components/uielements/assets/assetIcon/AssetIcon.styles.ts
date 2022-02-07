@@ -35,7 +35,6 @@ export const borders: Sizes = {
 
 export const IconWrapper = styled.div<IconProps>`
   width: ${({ size }) => `${sizes[size]}px`};
-  /* min-width: ${({ size }) => `${sizes[size]}px`}; */
   height: ${({ size }) => `${sizes[size]}px`};
   border: ${({ isSynth, size }) => (isSynth ? `solid ${borders[size]}px` : `none`)};
   border-color: ${({ isSynth }) => (isSynth ? palette('primary', 0) : 'transparent')};
@@ -73,8 +72,8 @@ export const IconFallback = styled.div<IconProps>`
 
 export const Icon = styled.img<IconProps>`
   position: absolute;
-  left: 0;
-  top: 0;
+  left: ${({ size, isSynth }) => `${isSynth ? borders[size] : 0}px`};
+  top: ${({ size, isSynth }) => `${isSynth ? borders[size] : 0}px`};
   width: ${({ size, isSynth }) => `${sizes[size] - (isSynth ? 2 : 0) * borders[size]}px`};
   height: ${({ size, isSynth }) => `${sizes[size] - (isSynth ? 2 : 0) * borders[size]}px`};
   border-radius: 50%;

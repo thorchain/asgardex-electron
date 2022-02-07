@@ -18,7 +18,7 @@ import {
   LTCChain,
   BCHChain,
   DOGEChain,
-  LUNAChain
+  TerraChain
 } from '@xchainjs/xchain-util'
 import { ethers } from 'ethers'
 import * as O from 'fp-ts/lib/Option'
@@ -51,7 +51,7 @@ export const getAddressPrefixLength = (chain: Chain, network: Network): number =
       return getLitecoinPrefix(clientNetwork).length
     case BCHChain:
       return getBCHPrefix().length
-    case LUNAChain:
+    case TerraChain:
       throw Error('LUNA is not supported yet')
     case PolkadotChain:
       throw Error('Polkadot is not supported yet')

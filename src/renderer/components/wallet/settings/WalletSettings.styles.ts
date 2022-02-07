@@ -136,8 +136,8 @@ export const AccountTitleWrapper = styled.div`
 `
 
 export const AccountTitle = styled(UILabel)`
-  margin-left: 10px;
   padding: 0px;
+  padding-left: 15px;
   text-transform: uppercase;
   font-weight: normal;
   font-size: 27px;

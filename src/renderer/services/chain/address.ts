@@ -9,7 +9,7 @@ import {
   BCHChain,
   LTCChain,
   DOGEChain,
-  LUNAChain
+  TerraChain
 } from '@xchainjs/xchain-util'
 import * as O from 'fp-ts/lib/Option'
 import * as Rx from 'rxjs'
@@ -52,7 +52,7 @@ const addressByChain$ = (chain: Chain): WalletAddress$ => {
       return LTC.address$
     case DOGEChain:
       return DOGE.address$
-    case LUNAChain:
+    case TerraChain:
       // not supported yet
       return Rx.of(O.none)
   }

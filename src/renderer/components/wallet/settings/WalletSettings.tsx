@@ -14,7 +14,7 @@ import {
   CosmosChain,
   Chain,
   DOGEChain,
-  LUNAChain
+  TerraChain
 } from '@xchainjs/xchain-util'
 import { Col, List, Row } from 'antd'
 import * as FP from 'fp-ts/function'
@@ -29,7 +29,7 @@ import { RemoveWalletConfirmationModal } from '../../../components/modal/confirm
 import { AssetIcon } from '../../../components/uielements/assets/assetIcon/AssetIcon'
 import { QRCodeModal } from '../../../components/uielements/qrCodeModal/QRCodeModal'
 import { PhraseCopyModal } from '../../../components/wallet/phrase/PhraseCopyModal'
-import { getChainAsset, isBnbChain, isThorChain } from '../../../helpers/chainHelper'
+import { getChainAsset, isBnbChain, isBtcChain, isThorChain } from '../../../helpers/chainHelper'
 import { isEnabledWallet } from '../../../helpers/walletHelper'
 import { ValidatePasswordHandler, WalletAccounts, WalletAddressAsync } from '../../../services/wallet/types'
 import { walletTypeToI18n } from '../../../services/wallet/util'
@@ -124,7 +124,7 @@ export const WalletSettings: React.FC<Props> = (props): JSX.Element => {
     [CosmosChain]: 0,
     [PolkadotChain]: 0,
     [DOGEChain]: 0,
-    [LUNAChain]: 0
+    [TerraChain]: 0
   })
 
   const renderAddress = useCallback(
@@ -134,7 +134,7 @@ export const WalletSettings: React.FC<Props> = (props): JSX.Element => {
           <Styled.AddLedgerButton loading={loading} onClick={() => addLedgerAddress(chain, walletIndexMap[chain])}>
             <Styled.AddLedgerIcon /> {intl.formatMessage({ id: 'ledger.add.device' })}
           </Styled.AddLedgerButton>
-          {(isBnbChain(chain) || isThorChain(chain)) && (
+          {(isBnbChain(chain) || isThorChain(chain) || isBtcChain(chain)) && (
             <>
               <Styled.IndexLabel>{intl.formatMessage({ id: 'setting.wallet.index' })}</Styled.IndexLabel>
               <Styled.WalletIndexInput

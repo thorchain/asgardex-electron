@@ -18,7 +18,7 @@ import {
   PolkadotChain,
   DOGEChain,
   AssetDOGE,
-  LUNAChain,
+  TerraChain,
   AssetLUNA
 } from '@xchainjs/xchain-util'
 
@@ -43,7 +43,7 @@ export const getChainAsset = (chain: Chain): Asset => {
       return AssetLTC
     case DOGEChain:
       return AssetDOGE
-    case LUNAChain:
+    case TerraChain:
       return AssetLUNA
     case PolkadotChain:
       throw Error('Polkadot is not supported yet')
