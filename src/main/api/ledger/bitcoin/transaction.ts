@@ -1,43 +1,17 @@
 import AppBTC from '@ledgerhq/hw-app-btc'
 import { Transaction } from '@ledgerhq/hw-app-btc/lib/types'
 import Transport from '@ledgerhq/hw-transport'
-import { broadcastTx, buildTx, UTXO } from '@xchainjs/xchain-bitcoin'
+import { broadcastTx, buildTx } from '@xchainjs/xchain-bitcoin'
 import { Address, FeeRate, TxHash } from '@xchainjs/xchain-client'
 import { BaseAmount } from '@xchainjs/xchain-util'
-import axios from 'axios'
+import * as Bitcoin from 'bitcoinjs-lib'
 import * as E from 'fp-ts/lib/Either'
 
 import { LedgerError, LedgerErrorId, Network } from '../../../../shared/api/types'
-import { getHaskoinApiUrl, getSochainUrl, getBlockstreamUrl } from '../../../../shared/bitcoin/client'
+import { getHaskoinApiUrl, getSochainUrl } from '../../../../shared/bitcoin/client'
 import { toClientNetwork } from '../../../../shared/utils/client'
 import { isError } from '../../../../shared/utils/guard'
 import { getDerivationPath } from './common'
-
-type GetRawTxParams = {
-  haskoinUrl: string
-  txHash: TxHash
-}
-
-export const getRawTx = async ({ haskoinUrl, txHash }: GetRawTxParams): Promise<string> => {
-  const {
-    data: { result }
-  } = await axios.get<{
-    result: string
-  }>(`${haskoinUrl}/transaction/${txHash}/raw`)
-  return result
-}
-
-const rawTxMap: Map<TxHash, string> = new Map()
-
-const getRawTxFromCache = async ({ txHash, haskoinUrl }: GetRawTxParams): Promise<string> => {
-  if (rawTxMap.has(txHash)) {
-    return rawTxMap.get(txHash) || 'unknown'
-  } else {
-    const rawTx = await getRawTx({ txHash, haskoinUrl })
-    rawTxMap.set(txHash, rawTx)
-    return rawTx
-  }
-}
 
 /**
  * Sends BTC tx using Ledger
@@ -106,11 +80,25 @@ export const send = async ({
       network: clientNetwork,
       sochainUrl: getSochainUrl(),
       haskoinUrl,
-      spendPendingUTXO
+      spendPendingUTXO,
+      withTxHex: true
     })
 
-    const newTxUns = psbt.data.globalMap.unsignedTx
-    console.log('newTxUns:', newTxUns)
+    console.log('-----')
+    console.log('utxos.length', utxos.length)
+    console.log('-----')
+
+    const inputs: Array<[Transaction, number, string | null, number | null]> = utxos.map(({ txHex, hash, index }) => {
+      if (!txHex) {
+        throw Error(`Missing 'txHex' for UTXO (txHash ${hash})`)
+      }
+      const utxoTx = Bitcoin.Transaction.fromHex(txHex)
+      const splittedTx = app.splitTransaction(txHex, utxoTx.hasWitnesses())
+      return [splittedTx, index, null, null]
+    })
+
+    const associatedKeysets: string[] = inputs.map((_) => derivePath)
+
     const newTxHex = psbt.data.globalMap.unsignedTx.toBuffer().toString('hex')
     console.log('newTxHex:', newTxHex)
     const newTx: Transaction = app.splitTransaction(newTxHex, true)
@@ -118,40 +106,19 @@ export const send = async ({
     const outputScriptHex = app.serializeTransactionOutputs(newTx).toString('hex')
     console.log('outputScriptHex:', outputScriptHex)
 
-    console.log('-----')
-    console.log('utxos.length', utxos.length)
-    console.log('-----')
-
-    // get raw txs
-    const rawTxs = await Promise.all(utxos.map(({ hash }) => getRawTxFromCache({ txHash: hash, haskoinUrl })))
-
-    console.log('rawTxs.length', rawTxs.length)
-    console.log('-----')
-    // Merge UTXO + Transaction
-    const txs: Array<UTXO & { tx: Transaction }> = utxos.map((utxo, index) => ({
-      tx: app.splitTransaction(rawTxs[index], true),
-      ...utxo
-    }))
-
-    console.log('txs.length', txs.length)
-    console.log('txs[0]', txs[0])
-    console.log('txs[1]', txs[1])
-    console.log('-----')
-
     const txHex = await app.createPaymentTransactionNew({
-      inputs: txs.map((utxo) => {
-        return [utxo.tx, utxo.index, null, null]
-      }),
-      associatedKeysets: txs.map((_) => derivePath),
+      inputs,
+      associatedKeysets,
       outputScriptHex,
       segwit: true,
+      useTrustedInputForSegwit: true,
       additionals: ['bech32']
     })
 
     console.log('txHex:', txHex)
     console.log('-----')
 
-    const txHash = await broadcastTx({ network: clientNetwork, txHex, blockstreamUrl: getBlockstreamUrl() })
+    const txHash = await broadcastTx({ txHex, haskoinUrl })
 
     console.log('txHash:', txHash)
 
