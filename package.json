@@ -68,7 +68,7 @@
     "@devexperts/remote-data-ts": "^2.1.1",
     "@devexperts/rx-utils": "^1.0.0-alpha.14",
     "@devexperts/utils": "^1.0.0-alpha.14",
-    "@ledgerhq/hw-app-btc": "^6.24.1",
+    "@ledgerhq/hw-app-btc": "6.7.0",
     "@ledgerhq/hw-transport": "^6.24.1",
     "@ledgerhq/hw-transport-node-hid-singleton": "^6.24.1",
     "@openapitools/openapi-generator-cli": "^2.4.12",
