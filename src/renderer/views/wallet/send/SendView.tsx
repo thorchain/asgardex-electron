@@ -108,6 +108,7 @@ export const SendView: React.FC<Props> = (): JSX.Element => {
             <SendViewBTC
               walletType={walletType}
               walletIndex={walletIndex}
+              walletAddress={walletAddress}
               asset={asset}
               balances={balances}
               openExplorerTxUrl={openExplorerTxUrl}

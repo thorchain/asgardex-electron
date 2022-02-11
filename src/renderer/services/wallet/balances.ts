@@ -353,6 +353,11 @@ export const createBalancesService = ({
   )
 
   /**
+   * BNB Ledger balances
+   */
+  const btcLedgerChainBalance$: ChainBalance$ = ledgerChainBalance$(BTCChain, BTC.getBalanceByAddress$)
+
+  /**
    * Transforms BTC balances into `ChainBalance`
    */
   const btcChainBalance$: ChainBalance$ = Rx.combineLatest([
@@ -406,7 +411,7 @@ export const createBalancesService = ({
     Rx.combineLatest(
       filterEnabledChains({
         THOR: [thorChainBalance$, thorLedgerChainBalance$],
-        BTC: [btcChainBalance$],
+        BTC: [btcChainBalance$, btcLedgerChainBalance$],
         BCH: [bchChainBalance$],
         ETH: [ethChainBalance$],
         BNB: [bnbChainBalance$, bnbLedgerChainBalance$],

@@ -104,8 +104,6 @@ export type LedgerTHORTxParams = TxParams & {
 export type LedgerBTCTxInfo = Pick<TxParams, 'amount' | 'recipient'> & {
   feeRate: FeeRate
   sender: Address
-  nodeUrl: string
-  nodeApiKey: string
 }
 
 export type LedgerTxParams = LedgerTHORTxParams | LedgerBNBTxParams

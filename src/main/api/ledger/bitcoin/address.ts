@@ -17,8 +17,8 @@ export const getAddress = async (
   try {
     const app = new AppBTC(transport)
     const clientNetwork = toClientNetwork(network)
-    const derive_path = getDerivationPath(walletIndex, clientNetwork)
-    const { bitcoinAddress } = await app.getWalletPublicKey(derive_path, {
+    const derivePath = getDerivationPath(walletIndex, clientNetwork)
+    const { bitcoinAddress } = await app.getWalletPublicKey(derivePath, {
       format: 'bech32' // bech32 format with 84' paths
     })
     return E.right({ address: bitcoinAddress, chain: BTCChain, type: 'ledger', walletIndex })
@@ -35,8 +35,8 @@ export const getAddress = async (
 export const verifyAddress = async (transport: Transport, network: Network, walletIndex: number): Promise<void> => {
   const app = new AppBTC(transport)
   const clientNetwork = toClientNetwork(network)
-  const derive_path = getDerivationPath(walletIndex, clientNetwork)
-  const _ = await app.getWalletPublicKey(derive_path, {
+  const derivePath = getDerivationPath(walletIndex, clientNetwork)
+  const _ = await app.getWalletPublicKey(derivePath, {
     format: 'bech32', // bech32 format with 84' paths
     verify: true // confirm the address on the device
   })

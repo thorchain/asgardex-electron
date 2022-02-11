@@ -1,4 +1,8 @@
-# 0.7.2 (2022-xx-xx)
+# 0.8.0 (2022-xx-xx)
+
+## Add
+
+- [Ledger] Re-enable BTC Ledger support #2059
 
 ## Update
 
