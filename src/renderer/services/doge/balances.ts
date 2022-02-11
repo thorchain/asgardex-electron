@@ -23,6 +23,6 @@ const balances$ = (walletType: WalletType, walletIndex: number): C.WalletBalance
   C.balances$({ client$, trigger$: reloadBalances$, walletType, walletIndex })
 
 // State of balances loaded by Client and Address
-const getBalanceByAddress$ = C.balancesByAddress$(client$, reloadBalances$)
+const getBalanceByAddress$ = C.balancesByAddress$({ client$, trigger$: reloadBalances$ })
 
 export { balances$, reloadBalances, getBalanceByAddress$, reloadBalances$, resetReloadBalances }

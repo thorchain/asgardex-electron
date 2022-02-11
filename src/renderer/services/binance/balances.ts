@@ -36,6 +36,6 @@ const balances$: (walletType: WalletType, network: Network, walletIndex: number)
     liveData.map(FP.flow(A.filter(({ asset }) => !assetInBinanceBlacklist(network, asset))))
   )
 
-const getBalanceByAddress$ = C.balancesByAddress$(client$, reloadBalances$)
+const getBalanceByAddress$ = C.balancesByAddress$({ client$, trigger$: reloadBalances$ })
 
 export { balances$, reloadBalances, reloadBalances$, resetReloadBalances, getBalanceByAddress$ }
