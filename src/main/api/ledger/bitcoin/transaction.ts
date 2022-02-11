@@ -55,20 +55,6 @@ export const send = async ({
      */
     const spendPendingUTXO = !memo
 
-    console.log('memo:', memo)
-    console.log('amount:', amount.amount().toString())
-    console.log('feeRate:', feeRate)
-    console.log('recipient:', recipient)
-    console.log('sender:', sender)
-    console.log('network:', clientNetwork)
-    console.log('derivePath:', derivePath)
-    console.log('sochainUrl:', getSochainUrl())
-    console.log('haskoinUrl:', getHaskoinApiUrl()[network])
-    console.log('spendPendingUTXO:', spendPendingUTXO)
-    console.log('-----')
-    console.log('buildTx')
-    console.log('-----')
-
     const haskoinUrl = getHaskoinApiUrl()[network]
 
     const { psbt, utxos } = await buildTx({
@@ -84,10 +70,6 @@ export const send = async ({
       withTxHex: true
     })
 
-    console.log('-----')
-    console.log('utxos.length', utxos.length)
-    console.log('-----')
-
     const inputs: Array<[Transaction, number, string | null, number | null]> = utxos.map(({ txHex, hash, index }) => {
       if (!txHex) {
         throw Error(`Missing 'txHex' for UTXO (txHash ${hash})`)
@@ -100,11 +82,9 @@ export const send = async ({
     const associatedKeysets: string[] = inputs.map((_) => derivePath)
 
     const newTxHex = psbt.data.globalMap.unsignedTx.toBuffer().toString('hex')
-    console.log('newTxHex:', newTxHex)
     const newTx: Transaction = app.splitTransaction(newTxHex, true)
 
     const outputScriptHex = app.serializeTransactionOutputs(newTx).toString('hex')
-    console.log('outputScriptHex:', outputScriptHex)
 
     const txHex = await app.createPaymentTransactionNew({
       inputs,
@@ -114,13 +94,7 @@ export const send = async ({
       useTrustedInputForSegwit: true,
       additionals: ['bech32']
     })
-
-    console.log('txHex:', txHex)
-    console.log('-----')
-
     const txHash = await broadcastTx({ txHex, haskoinUrl })
-
-    console.log('txHash:', txHash)
 
     if (!txHash) {
       return E.left({
