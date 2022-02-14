@@ -38,7 +38,7 @@ import {
   to1e8BaseAmount,
   isChainAsset
 } from '../../helpers/assetHelper'
-import { getChainAsset, isEthChain } from '../../helpers/chainHelper'
+import { getChainAsset, isBtcChain, isEthChain } from '../../helpers/chainHelper'
 import { unionAssets } from '../../helpers/fp/array'
 import { eqAsset, eqBaseAmount, eqOAsset, eqOApproveParams, eqAddress, eqOAddress } from '../../helpers/fp/eq'
 import { sequenceSOption, sequenceTOption } from '../../helpers/fpHelpers'
@@ -366,21 +366,37 @@ export const Swap = ({
     return max1e8BaseAmount(swapResultAmount)
   }, [swapData.swapResult, targetAssetDecimal])
 
+  // Disable slippage selection temporary for Ledger/BTC (see https://github.com/thorchain/asgardex-electron/issues/2068)
+  const disableSlippage = useMemo(
+    () =>
+      FP.pipe(
+        oSourceAsset,
+        O.map(({ chain }) => isBtcChain(chain) && useSourceAssetLedger),
+        O.getOrElse(() => false)
+      ),
+    [useSourceAssetLedger, oSourceAsset]
+  )
+
   const oSwapParams: O.Option<SwapTxParams> = useMemo(() => {
     const oAddress: O.Option<Address> = useTargetAssetLedger ? oTargetLedgerAddress : oTargetWalletAddress
     return FP.pipe(
       sequenceTOption(assetsToSwap, oPoolAddress, oAddress, oSourceAssetWB),
       O.map(([{ source, target }, poolAddress, address, { walletType, walletAddress, walletIndex }]) => {
+        // Disable slippage protection temporary for Ledger/BTC (see https://github.com/thorchain/asgardex-electron/issues/2068)
+        const limit: BaseAmount | undefined = !disableSlippage
+          ? Utils.getSwapLimit1e8(swapResultAmountMax1e8, slipTolerance)
+          : undefined
+        const memo = getSwapMemo({
+          asset: target,
+          address,
+          limit
+        })
         return {
           poolAddress,
           asset: source,
           // Decimal needs to be converted back for using orginal decimal of source asset
           amount: convertBaseAmountDecimal(amountToSwapMax1e8, sourceAssetDecimal),
-          memo: getSwapMemo({
-            asset: target,
-            address,
-            limit: Utils.getSwapLimit1e8(swapResultAmountMax1e8, slipTolerance)
-          }),
+          memo,
           walletType,
           sender: walletAddress,
           walletIndex
@@ -389,15 +405,16 @@ export const Swap = ({
     )
   }, [
     useTargetAssetLedger,
-    oTargetWalletAddress,
     oTargetLedgerAddress,
+    oTargetWalletAddress,
     assetsToSwap,
     oPoolAddress,
     oSourceAssetWB,
-    amountToSwapMax1e8,
-    sourceAssetDecimal,
+    disableSlippage,
     swapResultAmountMax1e8,
-    slipTolerance
+    slipTolerance,
+    amountToSwapMax1e8,
+    sourceAssetDecimal
   ])
 
   const isCausedSlippage = useMemo(() => swapData.slip.toNumber() > slipTolerance, [swapData.slip, slipTolerance])
@@ -1333,6 +1350,8 @@ export const Swap = ({
               changeSlipTolerance={changeSlipTolerance}
               from={oSourcePoolAsset}
               to={oTargetPoolAsset}
+              disableSlippage={disableSlippage}
+              disableSlippageMsg={intl.formatMessage({ id: 'swap.slip.tolerance.btc-ledger-disabled.info' })}
             />
           </Styled.CurrencyInfoContainer>
 

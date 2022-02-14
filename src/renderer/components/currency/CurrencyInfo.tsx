@@ -22,6 +22,8 @@ type CurrencyInfoProps = {
   isCausedSlippage: boolean
   slipTolerance: SlipTolerance
   changeSlipTolerance: ChangeSlipToleranceHandler
+  disableSlippage: boolean
+  disableSlippageMsg: string
 }
 
 export const SLIP_PERCENTAGES: SlipTolerance[] = [3, 5, 10]
@@ -33,7 +35,9 @@ export const CurrencyInfo = ({
   slip = bn(0),
   isCausedSlippage,
   slipTolerance,
-  changeSlipTolerance
+  changeSlipTolerance,
+  disableSlippage = false,
+  disableSlippageMsg = ''
 }: CurrencyInfoProps) => {
   const intl = useIntl()
   const [slipDropdownVisible, setSlipDropdownVisible] = useState(false)
@@ -123,9 +127,13 @@ export const CurrencyInfo = ({
             </div>
             <div style={{ display: 'flex', alignItems: 'center' }}>
               <Styled.SlipToleranceText>{intl.formatMessage({ id: 'swap.slip.tolerance' })}</Styled.SlipToleranceText>
-              <InfoIcon tooltip={intl.formatMessage({ id: 'swap.slip.tolerance.info' })} />
+              {disableSlippage ? (
+                <InfoIcon tooltip={disableSlippageMsg} color="warning" />
+              ) : (
+                <InfoIcon tooltip={intl.formatMessage({ id: 'swap.slip.tolerance.info' })} />
+              )}
             </div>
-            <div style={{ display: 'flex', flexDirection: 'column' }}>{renderSlipSettings}</div>
+            {!disableSlippage && <div style={{ display: 'flex', flexDirection: 'column' }}>{renderSlipSettings}</div>}
           </div>
         </Styled.Container>
       )

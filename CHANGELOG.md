@@ -2,10 +2,12 @@
 
 ## Add
 
-- [Ledger] Re-enable BTC Ledger support #2059
+- [Ledger] BTC support [#2059](https://github.com/thorchain/asgardex-electron/issues/2059)
 
 ## Update
 
+- [Ledger] Disable selecting of slippage tolerance for Ledger/BTC temporary [#2068](https://github.com/thorchain/asgardex-electron/issues/2068)
+- [BTC] Support confirmed balances only #2066[](https://github.com/thorchain/asgardex-electron/pull/2066)
 - Shorten memos [#2052](https://github.com/thorchain/asgardex-electron/issues/2052)
 - Re-enable testnet for releases (production) [#2048](https://github.com/thorchain/asgardex-electron/issues/2048)
 - Update for RU translation (better translation and fix for typos) by @TreefeedXavier [#2046](https://github.com/thorchain/asgardex-electron/pull/2046)
