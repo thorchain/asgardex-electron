@@ -62,7 +62,7 @@ export const CustomView: React.FC<Props> = ({ walletType, walletIndex, openExplo
         </Styled.ErrorView>
       ),
       (txHash) => (
-        <Styled.SuccessView title={intl.formatMessage({ id: 'common.success' })}>
+        <Styled.SuccessView title={intl.formatMessage({ id: 'common.tx.success' })}>
           <Styled.ViewTxButton txHash={O.some(txHash)} onClick={openExplorerTxUrl} />
           <Button onClick={resetInteractState}>{intl.formatMessage({ id: 'common.back' })}</Button>
         </Styled.SuccessView>

@@ -30,7 +30,6 @@ const common: CommonMessages = {
   'common.copy': 'Copy',
   'common.loading': 'Loading...',
   'common.error': 'Error',
-  'common.success': 'Success',
   'common.change': 'Change',
   'common.wallet': 'Wallet',
   'common.history': 'History',
@@ -66,6 +65,9 @@ const common: CommonMessages = {
   'common.tx.healthCheck': 'Health check',
   'common.tx.sending': 'Send transaction',
   'common.tx.sendingAsset': 'Send {assetTicker} transaction',
+  'common.tx.success': 'Transaction has been sent successfully',
+  'common.tx.success-info':
+    'The transaction might take some time to be confirmed (up to several minutes depending on the chain)',
   'common.tx.checkResult': 'Check result',
   'common.tx.view': 'View {assetTicker} transaction',
   'common.modal.confirmTitle': 'Confirm action',

@@ -311,7 +311,7 @@ export type UpgradeRuneTxState$ = Rx.Observable<UpgradeRuneTxState>
  */
 export type SendTxState = {
   // State of steps (current step + total number of steps)
-  readonly steps: { current: number; readonly total: 2 }
+  readonly steps: { current: number; readonly total: 1 }
   // RD of all steps
   readonly status: TxHashRD
 }
