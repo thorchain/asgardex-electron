@@ -15,7 +15,7 @@ import { Send } from '../../../components/wallet/txs/send/'
 import { SendFormBTC } from '../../../components/wallet/txs/send/'
 import { useBitcoinContext } from '../../../contexts/BitcoinContext'
 import { useChainContext } from '../../../contexts/ChainContext'
-import { getWalletBalanceByAsset } from '../../../helpers/walletHelper'
+import { getWalletBalanceByAssetAndWalletType } from '../../../helpers/walletHelper'
 import { useSubscriptionState } from '../../../hooks/useSubscriptionState'
 import { useValidateAddress } from '../../../hooks/useValidateAddress'
 import { FeesWithRatesLD } from '../../../services/bitcoin/types'
@@ -51,7 +51,10 @@ export const SendViewBTC: React.FC<Props> = (props): JSX.Element => {
   const intl = useIntl()
   const history = useHistory()
 
-  const oWalletBalance = useMemo(() => getWalletBalanceByAsset(oBalances, asset), [oBalances, asset])
+  const oWalletBalance = useMemo(
+    () => getWalletBalanceByAssetAndWalletType({ oWalletBalances: oBalances, asset, walletType }),
+    [oBalances, asset, walletType]
+  )
 
   const { transfer$ } = useChainContext()
 
