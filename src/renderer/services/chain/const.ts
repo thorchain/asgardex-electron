@@ -59,7 +59,7 @@ export const INITIAL_UPGRADE_RUNE_STATE: UpgradeRuneTxState = {
 }
 
 export const INITIAL_SEND_STATE: SendTxState = {
-  steps: { current: 0, total: 2 },
+  steps: { current: 0, total: 1 },
   status: RD.initial
 }
 

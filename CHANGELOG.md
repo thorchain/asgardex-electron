@@ -6,6 +6,7 @@
 
 ## Update
 
+- [Send] Remove transaction confirmation check [#2072](https://github.com/thorchain/asgardex-electron/issues/2072)
 - [Ledger] Disable selecting of slippage tolerance for Ledger/BTC temporary [#2068](https://github.com/thorchain/asgardex-electron/issues/2068)
 - [BTC] Support confirmed balances only #2066[](https://github.com/thorchain/asgardex-electron/pull/2066)
 - Shorten memos [#2052](https://github.com/thorchain/asgardex-electron/issues/2052)

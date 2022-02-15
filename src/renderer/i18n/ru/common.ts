@@ -30,7 +30,6 @@ const common: CommonMessages = {
   'common.copy': 'Копировать',
   'common.loading': 'Загрузка...',
   'common.error': 'Ошибка',
-  'common.success': 'Успешно',
   'common.change': 'Сменить',
   'common.wallet': 'Кошелек',
   'common.history': 'История',
@@ -66,6 +65,9 @@ const common: CommonMessages = {
   'common.tx.healthCheck': 'Проверка сервера',
   'common.tx.sending': 'Отправка транзакиции',
   'common.tx.sendingAsset': 'Отправка транзакиции {assetTicker}',
+  'common.tx.success': 'Transaction has been sent successfully - RU',
+  'common.tx.success-info':
+    'The transaction might take some time to be confirmed (up to several minutes depending on the chain) - RU',
   'common.tx.checkResult': 'Проверка результата',
   'common.tx.view': 'Посмотреть {assetTicker} танзакцию',
   'common.modal.confirmTitle': 'Подтвердите действие',

@@ -76,7 +76,11 @@ export const Send: React.FC<Props> = (props): JSX.Element => {
           () => sendForm,
           (error) => <ErrorView title={error.msg} extra={renderErrorBtn} />,
           (hash) => (
-            <SuccessView title={intl.formatMessage({ id: 'common.success' })} extra={renderSuccessExtra(hash)} />
+            <SuccessView
+              title={intl.formatMessage({ id: 'common.tx.success' })}
+              subTitle={intl.formatMessage({ id: 'common.tx.success-info' })}
+              extra={renderSuccessExtra(hash)}
+            />
           )
         )
       )}
