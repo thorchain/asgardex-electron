@@ -65,7 +65,8 @@ const balances: Partial<Record<Chain, ChainBalances>> = {
           walletAddress: 'BNB wallet address',
           walletIndex: 0
         }
-      ])
+      ]),
+      balanceType: 'all'
     }
   ],
   [BTCChain]: [
@@ -82,7 +83,8 @@ const balances: Partial<Record<Chain, ChainBalances>> = {
           walletAddress: 'BNB wallet address',
           walletIndex: 0
         }
-      ])
+      ]),
+      balanceType: 'all'
     }
   ],
   [ETHChain]: [
@@ -99,7 +101,8 @@ const balances: Partial<Record<Chain, ChainBalances>> = {
           walletAddress: 'ETH wallet address',
           walletIndex: 0
         }
-      ])
+      ]),
+      balanceType: 'all'
     }
   ],
   [THORChain]: [
@@ -116,7 +119,8 @@ const balances: Partial<Record<Chain, ChainBalances>> = {
           walletAddress: 'BNB wallet address',
           walletIndex: 0
         }
-      ])
+      ]),
+      balanceType: 'all'
     }
   ],
   [LTCChain]: [
@@ -133,7 +137,8 @@ const balances: Partial<Record<Chain, ChainBalances>> = {
           walletAddress: 'LTC wallet address',
           walletIndex: 0
         }
-      ])
+      ]),
+      balanceType: 'all'
     }
   ]
 }

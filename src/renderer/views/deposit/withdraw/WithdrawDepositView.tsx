@@ -1,7 +1,7 @@
 import React, { useCallback, useMemo } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
-import { Asset, AssetRuneNative, BaseAmount, bn, THORChain } from '@xchainjs/xchain-util'
+import { Asset, AssetRuneNative, BaseAmount, bn, Chain, THORChain } from '@xchainjs/xchain-util'
 import BigNumber from 'bignumber.js'
 import * as FP from 'fp-ts/function'
 import * as O from 'fp-ts/lib/Option'
@@ -23,6 +23,7 @@ import { useOpenExplorerTxUrl } from '../../../hooks/useOpenExplorerTxUrl'
 import { OpenExplorerTxUrl } from '../../../services/clients'
 import { DEFAULT_NETWORK } from '../../../services/const'
 import { PoolShare, PoolsDataMap } from '../../../services/midgard/types'
+import { DEFAULT_BALANCES_FILTER } from '../../../services/wallet/const'
 import { getBalanceByAsset } from '../../../services/wallet/util'
 import { PoolDetail } from '../../../types/generated/midgard'
 import { Props } from './WithdrawDepositView.types'
@@ -83,7 +84,10 @@ export const WithdrawDepositView: React.FC<Props> = (props): JSX.Element => {
   const [balances] = useObservableState(
     () =>
       FP.pipe(
-        balancesState$,
+        balancesState$({
+          ...DEFAULT_BALANCES_FILTER,
+          [Chain.Bitcoin]: 'confirmed'
+        }),
         RxOp.map((state) => state.balances)
       ),
     O.none

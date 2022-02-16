@@ -34,7 +34,7 @@ import * as walletRoutes from '../../routes/wallet'
 import { AssetWithDecimalLD, AssetWithDecimalRD } from '../../services/chain/types'
 import { OpenExplorerTxUrl } from '../../services/clients'
 import { DEFAULT_SLIP_TOLERANCE } from '../../services/const'
-import { INITIAL_BALANCES_STATE } from '../../services/wallet/const'
+import { INITIAL_BALANCES_STATE, DEFAULT_BALANCES_FILTER } from '../../services/wallet/const'
 import { isSlipTolerance, SlipTolerance } from '../../types/asgardex'
 import * as Styled from './SwapView.styles'
 
@@ -119,7 +119,14 @@ export const SwapView: React.FC<Props> = (_): JSX.Element => {
 
   const targetAssetRD: AssetWithDecimalRD = useObservableState(targetAssetDecimal$, RD.initial)
 
-  const balancesState = useObservableState(balancesState$, INITIAL_BALANCES_STATE)
+  const [balancesState] = useObservableState(
+    () =>
+      balancesState$({
+        ...DEFAULT_BALANCES_FILTER,
+        [Chain.Bitcoin]: 'confirmed'
+      }),
+    INITIAL_BALANCES_STATE
+  )
 
   const selectedPoolAddress = useObservableState(selectedPoolAddress$, O.none)
 
