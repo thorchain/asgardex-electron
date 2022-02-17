@@ -66,7 +66,7 @@ const balances: Partial<Record<Chain, ChainBalances>> = {
           walletIndex: 0
         }
       ]),
-      balanceType: 'all'
+      balancesType: 'all'
     }
   ],
   [BTCChain]: [
@@ -84,7 +84,7 @@ const balances: Partial<Record<Chain, ChainBalances>> = {
           walletIndex: 0
         }
       ]),
-      balanceType: 'all'
+      balancesType: 'all'
     }
   ],
   [ETHChain]: [
@@ -102,7 +102,7 @@ const balances: Partial<Record<Chain, ChainBalances>> = {
           walletIndex: 0
         }
       ]),
-      balanceType: 'all'
+      balancesType: 'all'
     }
   ],
   [THORChain]: [
@@ -120,7 +120,7 @@ const balances: Partial<Record<Chain, ChainBalances>> = {
           walletIndex: 0
         }
       ]),
-      balanceType: 'all'
+      balancesType: 'all'
     }
   ],
   [LTCChain]: [
@@ -138,7 +138,7 @@ const balances: Partial<Record<Chain, ChainBalances>> = {
           walletIndex: 0
         }
       ]),
-      balanceType: 'all'
+      balancesType: 'all'
     }
   ]
 }

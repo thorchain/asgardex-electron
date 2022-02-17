@@ -71,7 +71,7 @@ export type ChainBalance = {
   walletAddress: O.Option<Address>
   chain: Chain
   balances: WalletBalancesRD
-  balanceType: WalletBalanceType
+  balancesType: WalletBalanceType
 }
 
 export type ChainBalance$ = Rx.Observable<ChainBalance>
