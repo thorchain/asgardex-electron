@@ -1,4 +1,4 @@
-import { WalletType } from '../../../shared/wallet/types'
+import { WalletBalanceType, WalletType } from '../../../shared/wallet/types'
 import { observableState } from '../../helpers/stateHelper'
 import * as C from '../clients'
 import { client$ } from './common'
@@ -19,28 +19,14 @@ const reloadBalances = () => {
 }
 
 // State of balances loaded by Client
-const balances$ = (walletType: WalletType, walletIndex: number): C.WalletBalancesLD =>
-  C.balances$({ client$, trigger$: reloadBalances$, walletType, walletIndex, walletBalanceType: 'all' })
-
-// State of balances loaded by Client
-const balancesConfirmed$ = (walletType: WalletType, walletIndex: number): C.WalletBalancesLD =>
-  C.balances$({ client$, trigger$: reloadBalances$, walletType, walletIndex, walletBalanceType: 'confirmed' })
+const balances$ = (
+  walletType: WalletType,
+  walletIndex: number,
+  walletBalanceType: WalletBalanceType
+): C.WalletBalancesLD => C.balances$({ client$, trigger$: reloadBalances$, walletType, walletIndex, walletBalanceType })
 
 // State of balances loaded by Client and Address
-const getBalanceByAddress$ = C.balancesByAddress$({ client$, trigger$: reloadBalances$, walletBalanceType: 'all' })
+const getBalanceByAddress$ = (walletBalanceType: WalletBalanceType) =>
+  C.balancesByAddress$({ client$, trigger$: reloadBalances$, walletBalanceType })
 
-const getBalanceConfirmedByAddress$ = C.balancesByAddress$({
-  client$,
-  trigger$: reloadBalances$,
-  walletBalanceType: 'confirmed'
-})
-
-export {
-  balances$,
-  balancesConfirmed$,
-  reloadBalances,
-  getBalanceByAddress$,
-  getBalanceConfirmedByAddress$,
-  reloadBalances$,
-  resetReloadBalances
-}
+export { balances$, reloadBalances, getBalanceByAddress$, reloadBalances$, resetReloadBalances }
