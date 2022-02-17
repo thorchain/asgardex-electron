@@ -29,7 +29,7 @@ import { AssetWithDecimalLD, AssetWithDecimalRD } from '../../../services/chain/
 import { OpenExplorerTxUrl } from '../../../services/clients'
 import { DEFAULT_NETWORK } from '../../../services/const'
 import { PoolAddressRD } from '../../../services/midgard/types'
-import { INITIAL_BALANCES_STATE } from '../../../services/wallet/const'
+import { DEFAULT_BALANCES_FILTER, INITIAL_BALANCES_STATE } from '../../../services/wallet/const'
 import { AssetWithDecimal } from '../../../types/asgardex'
 import { CommonUpgradeProps } from './types'
 import { UpgradeBNB } from './UpgradeViewBNB'
@@ -82,7 +82,11 @@ export const UpgradeView: React.FC<Props> = (): JSX.Element => {
     keystoreService: { validatePassword$ },
     reloadBalancesByChain
   } = useWalletContext()
-  const { balances: oBalances } = useObservableState(balancesState$, INITIAL_BALANCES_STATE)
+
+  const [{ balances: oBalances }] = useObservableState(
+    () => balancesState$(DEFAULT_BALANCES_FILTER),
+    INITIAL_BALANCES_STATE
+  )
 
   const {
     service: {

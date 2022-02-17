@@ -28,7 +28,7 @@ import { SendParams } from '../../../routes/wallet'
 import * as walletRoutes from '../../../routes/wallet'
 import { OpenExplorerTxUrl } from '../../../services/clients'
 import { DEFAULT_NETWORK } from '../../../services/const'
-import { INITIAL_BALANCES_STATE } from '../../../services/wallet/const'
+import { DEFAULT_BALANCES_FILTER, INITIAL_BALANCES_STATE } from '../../../services/wallet/const'
 import { SendViewBNB, SendViewBCH, SendViewBTC, SendViewETH, SendViewDOGE, SendViewTHOR, SendViewLTC } from './index'
 
 type Props = {}
@@ -49,7 +49,7 @@ export const SendView: React.FC<Props> = (): JSX.Element => {
     keystoreService: { validatePassword$ }
   } = useWalletContext()
 
-  const { balances } = useObservableState(balancesState$, INITIAL_BALANCES_STATE)
+  const [{ balances }] = useObservableState(() => balancesState$(DEFAULT_BALANCES_FILTER), INITIAL_BALANCES_STATE)
 
   const openExplorerTxUrl: OpenExplorerTxUrl = useOpenExplorerTxUrl(
     FP.pipe(

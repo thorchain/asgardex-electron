@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useMemo } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
-import { Asset, AssetRuneNative, assetToString, bn, THORChain } from '@xchainjs/xchain-util'
+import { Asset, AssetRuneNative, assetToString, bn, Chain, THORChain } from '@xchainjs/xchain-util'
 import BigNumber from 'bignumber.js'
 import * as FP from 'fp-ts/function'
 import * as O from 'fp-ts/lib/Option'
@@ -29,7 +29,7 @@ import * as poolsRoutes from '../../../routes/pools'
 import { OpenExplorerTxUrl } from '../../../services/clients'
 import { PoolAddress, PoolAssetsRD } from '../../../services/midgard/types'
 import { toPoolData } from '../../../services/midgard/utils'
-import { INITIAL_BALANCES_STATE } from '../../../services/wallet/const'
+import { DEFAULT_BALANCES_FILTER, INITIAL_BALANCES_STATE } from '../../../services/wallet/const'
 import { Props } from './SymDepositView.types'
 
 export const SymDepositView: React.FC<Props> = (props) => {
@@ -102,7 +102,14 @@ export const SymDepositView: React.FC<Props> = (props) => {
   const runPrice = useObservableState(priceRatio$, bn(1))
   const [selectedPricePoolAsset] = useObservableState(() => FP.pipe(selectedPricePoolAsset$, RxOp.map(O.toUndefined)))
 
-  const balancesState = useObservableState(balancesState$, INITIAL_BALANCES_STATE)
+  const [balancesState] = useObservableState(
+    () =>
+      balancesState$({
+        ...DEFAULT_BALANCES_FILTER,
+        [Chain.Bitcoin]: 'confirmed'
+      }),
+    INITIAL_BALANCES_STATE
+  )
 
   const reloadBalances = useCallback(() => {
     reloadBalancesByChain(assetWD.asset.chain)()

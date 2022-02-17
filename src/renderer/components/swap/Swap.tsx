@@ -613,7 +613,8 @@ export const Swap = ({
     // max value of token can be allocated for swap
     if (isChainAsset(sourceChainAsset))
       return Utils.maxAmountToSwapMax1e8(sourceAssetAmountMax1e8, swapFees.inFee.amount)
-    else return sourceAssetAmountMax1e8
+
+    return sourceAssetAmountMax1e8
   }, [lockedWallet, sourceAssetAmountMax1e8, sourceChainAsset, swapFees])
 
   const setAmountToSwapMax1e8 = useCallback(

@@ -9,7 +9,7 @@ import * as O from 'fp-ts/lib/Option'
 import * as Rx from 'rxjs'
 
 import { LedgerError, Network } from '../../../shared/api/types'
-import { WalletAddress, WalletType } from '../../../shared/wallet/types'
+import { WalletAddress, WalletBalanceType, WalletType } from '../../../shared/wallet/types'
 import { LiveData } from '../../helpers/rx/liveData'
 import { LoadTxsParams, WalletBalancesLD, WalletBalancesRD } from '../clients'
 
@@ -71,6 +71,7 @@ export type ChainBalance = {
   walletAddress: O.Option<Address>
   chain: Chain
   balances: WalletBalancesRD
+  balancesType: WalletBalanceType
 }
 
 export type ChainBalance$ = Rx.Observable<ChainBalance>
@@ -92,7 +93,8 @@ export type BalancesState = {
   loading: boolean
 }
 
-export type BalancesState$ = Rx.Observable<BalancesState>
+export type BalancesStateFilter = Record<Chain, WalletBalanceType>
+export type BalancesState$ = (filter: BalancesStateFilter) => Rx.Observable<BalancesState>
 
 export type LoadTxsHandler = (props: LoadTxsParams) => void
 export type ResetTxsPageHandler = FP.Lazy<void>

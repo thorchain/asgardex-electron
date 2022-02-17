@@ -3,6 +3,7 @@ import React, { useCallback } from 'react'
 import * as RD from '@devexperts/remote-data-ts'
 import { Address } from '@xchainjs/xchain-client'
 import { Asset, assetToString } from '@xchainjs/xchain-util'
+import * as A from 'fp-ts/lib/Array'
 import * as FP from 'fp-ts/lib/function'
 import { useObservableState } from 'observable-hooks'
 import { useHistory } from 'react-router-dom'
@@ -27,21 +28,27 @@ export const AssetsView: React.FC = (): JSX.Element => {
   const { network$ } = useAppContext()
   const network = useObservableState<Network>(network$, DEFAULT_NETWORK)
 
-  // accept balances > 0 only
   const [chainBalances] = useObservableState(
     () =>
-      chainBalances$.pipe(
-        RxOp.map((chainBalances) =>
-          chainBalances.map((chainBalance) => ({
-            ...chainBalance,
-            balances: FP.pipe(
-              chainBalance.balances,
-              RD.map((balances) => balances.filter((balance) => balance.amount.amount().isGreaterThan(0)))
-            )
-          }))
+      FP.pipe(
+        chainBalances$,
+        RxOp.map<ChainBalances, ChainBalances>((chainBalances) =>
+          FP.pipe(
+            chainBalances,
+            // we show all balances
+            A.filter(({ balancesType }) => balancesType === 'all'),
+            // accept balances > 0 only
+            A.map((chainBalance) => ({
+              ...chainBalance,
+              balances: FP.pipe(
+                chainBalance.balances,
+                RD.map((balances) => balances.filter((balance) => balance.amount.gt(0)))
+              )
+            }))
+          )
         )
       ),
-    [] as ChainBalances
+    []
   )
 
   const {

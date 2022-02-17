@@ -4,7 +4,14 @@ import * as O from 'fp-ts/lib/Option'
 
 import { LoadTxsParams } from '../clients'
 import { MAX_ITEMS_PER_PAGE } from '../const'
-import { BalancesState, KeystoreState, LedgerAddressesMap, LedgerAddressMap, LoadTxsHandler } from './types'
+import {
+  BalancesState,
+  BalancesStateFilter,
+  KeystoreState,
+  LedgerAddressesMap,
+  LedgerAddressMap,
+  LoadTxsHandler
+} from './types'
 
 export const INITIAL_KEYSTORE_STATE: KeystoreState = O.none
 
@@ -12,6 +19,19 @@ export const INITIAL_BALANCES_STATE: BalancesState = {
   balances: O.none,
   errors: O.none,
   loading: false
+}
+
+export const DEFAULT_BALANCES_FILTER: BalancesStateFilter = {
+  [Chain.Binance]: 'all',
+  [Chain.Bitcoin]: 'all',
+  [Chain.BitcoinCash]: 'all',
+  [Chain.Ethereum]: 'all',
+  [Chain.Cosmos]: 'all',
+  [Chain.Polkadot]: 'all',
+  [Chain.Litecoin]: 'all',
+  [Chain.THORChain]: 'all',
+  [Chain.Doge]: 'all',
+  [Chain.Terra]: 'all'
 }
 
 export const INITIAL_LOAD_TXS_PROPS: LoadTxsParams = {

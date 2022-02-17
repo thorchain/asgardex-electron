@@ -20,6 +20,7 @@ import { useSubscriptionState } from '../../../hooks/useSubscriptionState'
 import { useValidateAddress } from '../../../hooks/useValidateAddress'
 import { INITIAL_INTERACT_STATE } from '../../../services/thorchain/const'
 import { InteractState } from '../../../services/thorchain/types'
+import { DEFAULT_BALANCES_FILTER } from '../../../services/wallet/const'
 import * as Styled from './InteractView.styles'
 
 type Props = {
@@ -46,7 +47,7 @@ export const BondView: React.FC<Props> = ({ walletType, walletIndex, walletAddre
   const [runeBalance] = useObservableState(
     () =>
       FP.pipe(
-        balancesState$,
+        balancesState$(DEFAULT_BALANCES_FILTER),
         RxOp.map(({ balances }) => balances),
         RxOp.map(
           FP.flow(

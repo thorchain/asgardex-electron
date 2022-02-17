@@ -20,9 +20,27 @@ const reloadBalances = () => {
 
 // State of balances loaded by Client
 const balances$ = (walletType: WalletType, walletIndex: number): C.WalletBalancesLD =>
-  C.balances$({ client$, trigger$: reloadBalances$, walletType, walletIndex, confirmedOnly: true })
+  C.balances$({ client$, trigger$: reloadBalances$, walletType, walletIndex, walletBalanceType: 'all' })
+
+// State of balances loaded by Client
+const balancesConfirmed$ = (walletType: WalletType, walletIndex: number): C.WalletBalancesLD =>
+  C.balances$({ client$, trigger$: reloadBalances$, walletType, walletIndex, walletBalanceType: 'confirmed' })
 
 // State of balances loaded by Client and Address
-const getBalanceByAddress$ = C.balancesByAddress$({ client$, trigger$: reloadBalances$, confirmedOnly: true })
+const getBalanceByAddress$ = C.balancesByAddress$({ client$, trigger$: reloadBalances$, walletBalanceType: 'all' })
 
-export { balances$, reloadBalances, getBalanceByAddress$, reloadBalances$, resetReloadBalances }
+const getBalanceConfirmedByAddress$ = C.balancesByAddress$({
+  client$,
+  trigger$: reloadBalances$,
+  walletBalanceType: 'confirmed'
+})
+
+export {
+  balances$,
+  balancesConfirmed$,
+  reloadBalances,
+  getBalanceByAddress$,
+  getBalanceConfirmedByAddress$,
+  reloadBalances$,
+  resetReloadBalances
+}

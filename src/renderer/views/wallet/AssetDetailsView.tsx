@@ -25,7 +25,7 @@ import { useOpenExplorerTxUrl } from '../../hooks/useOpenExplorerTxUrl'
 import { AssetDetailsParams } from '../../routes/wallet'
 import { OpenExplorerTxUrl } from '../../services/clients'
 import { DEFAULT_NETWORK } from '../../services/const'
-import { INITIAL_BALANCES_STATE } from '../../services/wallet/const'
+import { DEFAULT_BALANCES_FILTER, INITIAL_BALANCES_STATE } from '../../services/wallet/const'
 
 export const AssetDetailsView: React.FC = (): JSX.Element => {
   const intl = useIntl()
@@ -63,7 +63,7 @@ export const AssetDetailsView: React.FC = (): JSX.Element => {
   const { getTxs$, balancesState$, loadTxs, reloadBalancesByChain, setSelectedAsset, resetTxsPage } = useWalletContext()
 
   const [txsRD] = useObservableState(() => getTxs$(oWalletAddress, walletIndex), RD.initial)
-  const { balances: oBalances } = useObservableState(balancesState$, INITIAL_BALANCES_STATE)
+  const { balances: oBalances } = useObservableState(balancesState$(DEFAULT_BALANCES_FILTER), INITIAL_BALANCES_STATE)
 
   useEffect(() => {
     return () => resetTxsPage()
