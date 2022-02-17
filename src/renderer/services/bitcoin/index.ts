@@ -1,13 +1,5 @@
 import { network$ } from '../app/service'
-import {
-  balances$,
-  balancesConfirmed$,
-  reloadBalances,
-  getBalanceByAddress$,
-  getBalanceConfirmedByAddress$,
-  reloadBalances$,
-  resetReloadBalances
-} from './balances'
+import { balances$, reloadBalances, getBalanceByAddress$, reloadBalances$, resetReloadBalances } from './balances'
 import { client$, clientState$, address$, addressUI$, explorerUrl$ } from './common'
 import { createFeesService } from './fees'
 import { createLedgerService } from './ledger'
@@ -28,9 +20,7 @@ export {
   reloadBalances$,
   resetReloadBalances,
   balances$,
-  balancesConfirmed$,
   getBalanceByAddress$,
-  getBalanceConfirmedByAddress$,
   reloadFees,
   fees$,
   reloadFeesWithRates,
