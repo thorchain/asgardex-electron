@@ -7,9 +7,7 @@ import {
   addressUI$,
   reloadBalances,
   balances$,
-  balancesConfirmed$,
   getBalanceByAddress$,
-  getBalanceConfirmedByAddress$,
   txRD$,
   reloadFees,
   fees$,
@@ -31,9 +29,7 @@ export type BitcoinContextValue = {
   addressUI$: typeof addressUI$
   reloadBalances: typeof reloadBalances
   balances$: typeof balances$
-  balancesConfirmed$: typeof balancesConfirmed$
   getBalanceByAddress$: typeof getBalanceByAddress$
-  getBalanceConfirmedByAddress$: typeof getBalanceConfirmedByAddress$
   reloadFees: typeof reloadFees
   fees$: typeof fees$
   reloadFeesWithRates: typeof reloadFeesWithRates
@@ -55,9 +51,7 @@ const initialContext: BitcoinContextValue = {
   addressUI$,
   reloadBalances,
   balances$,
-  balancesConfirmed$,
   getBalanceByAddress$,
-  getBalanceConfirmedByAddress$,
   reloadFees,
   fees$,
   reloadFeesWithRates,

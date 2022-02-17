@@ -126,10 +126,7 @@ export const createBalancesService = ({
         return {
           reloadBalances: BTC.reloadBalances,
           resetReloadBalances: BTC.resetReloadBalances,
-          balances$:
-            walletBalanceType === 'confirmed'
-              ? BTC.balancesConfirmed$(walletType, walletIndex)
-              : BTC.balances$(walletType, walletIndex),
+          balances$: BTC.balances$(walletType, walletIndex, walletBalanceType),
           reloadBalances$: BTC.reloadBalances$
         }
       case BCHChain:
@@ -225,7 +222,6 @@ export const createBalancesService = ({
 
     return FP.pipe(
       reload$,
-      // chainService.reloadBalances$,
       RxOp.switchMap((shouldReloadData) => {
         const savedResult = walletBalancesState.get({ chain, walletType, walletBalanceType })
         // For every new simple subscription return cached results if they exist
@@ -408,7 +404,7 @@ export const createBalancesService = ({
   const btcLedgerChainBalance$: ChainBalance$ = ledgerChainBalance$({
     chain: BTCChain,
     walletBalanceType: 'all',
-    getBalanceByAddress$: BTC.getBalanceByAddress$
+    getBalanceByAddress$: BTC.getBalanceByAddress$('all')
   })
   /**
    * BTC Ledger confirmed balances
@@ -416,7 +412,7 @@ export const createBalancesService = ({
   const btcLedgerChainBalanceConfirmed$: ChainBalance$ = ledgerChainBalance$({
     chain: BTCChain,
     walletBalanceType: 'confirmed',
-    getBalanceByAddress$: BTC.getBalanceByAddress$
+    getBalanceByAddress$: BTC.getBalanceByAddress$('confirmed')
   })
 
   /**
