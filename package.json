@@ -1,7 +1,7 @@
 {
   "name": "asgardex",
   "productName": "ASGARDEX",
-  "version": "0.8.0-alpha.6",
+  "version": "0.8.0-alpha.7",
   "description": "WALLET AND EXCHANGE CLIENT FOR THORCHAIN",
   "main": "index.js",
   "scripts": {
@@ -12,7 +12,8 @@
     "build": "cross-env CI=false PUBLIC_URL=./ craco build",
     "prebuild": "webpack --config webpack.main.js --mode production",
     "test": "craco test",
-    "package": "yarn build && yarn package:electron",
+    "rebuild": "electron-rebuild",
+    "package": "yarn rebuild && yarn build && yarn package:electron",
     "package:electron": "electron-builder build -c.extraMetadata.main=build/electron.js --config .electronbuildrc",
     "package:ci": "yarn postinstall && yarn build && yarn package:electron --publish always",
     "postinstall": "git config blame.ignoreRevsFile .git-blame-ignore-revs && node scripts/fix.sr25519.js && electron-builder install-app-deps",
@@ -160,6 +161,7 @@
     "electron-builder": "^22.14.13",
     "electron-devtools-installer": "^3.2.0",
     "electron-notarize": "^1.1.1",
+    "electron-rebuild": "^3.2.7",
     "eslint-config-prettier": "^8.3.0",
     "eslint-plugin-prettier": "^4.0.0",
     "git-revision-webpack-plugin": "^5.0.0",
