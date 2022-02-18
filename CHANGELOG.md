@@ -1,4 +1,4 @@
-# 0.8.0 (2022-02-17)
+# 0.8.0 (2022-02-18)
 
 ## Add
 
@@ -6,11 +6,9 @@
 
 ## Update
 
-- [Send] Fix out of gas for RUNE txs [2081](https://github.com/thorchain/asgardex-electron/issues/2081)
 - Handle (confirmed) BTC balances the better way [#2082](https://github.com/thorchain/asgardex-electron/pull/2082)
 - [Send] Remove transaction confirmation check [#2072](https://github.com/thorchain/asgardex-electron/issues/2072)
 - [Ledger] Disable selecting of slippage tolerance for Ledger/BTC temporary [#2068](https://github.com/thorchain/asgardex-electron/issues/2068)
-- [BTC] Support confirmed balances only [#2066](https://github.com/thorchain/asgardex-electron/pull/2066)
 - Shorten memos [#2052](https://github.com/thorchain/asgardex-electron/issues/2052)
 - Re-enable testnet for releases (production) [#2048](https://github.com/thorchain/asgardex-electron/issues/2048)
 - Update for RU translation (better translation and fix for typos) by @TreefeedXavier [#2046](https://github.com/thorchain/asgardex-electron/pull/2046)
@@ -18,7 +16,9 @@
 
 ## Fix
 
+- [Send] Fix out of gas for RUNE txs [2081](https://github.com/thorchain/asgardex-electron/issues/2081)
 - [i18n] Translate pooled [#2047](https://github.com/thorchain/asgardex-electron/issues/2047)
+- Pre-build of v0.8.0 throws exception on Windows [#2086](https://github.com/thorchain/asgardex-electron/issues/2086)
 - [BTC] Broadcasting a tx to Haskoin might end in 500 error [#2077](https://github.com/thorchain/asgardex-electron/issues/2077)
 
 # 0.7.1 (2022-01-21)
