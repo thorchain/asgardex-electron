@@ -8,6 +8,24 @@
 ![Test](https://github.com/thorchain/asgardex-electron/workflows/Test/badge.svg)
 ![Electron build](https://github.com/thorchain/asgardex-electron/workflows/Electron%20build/badge.svg)
 
+## Feature list
+
+|              | THOR               | BNB                  | BTC                | BCH                | DOGE               | LTC                | TERRA              |
+| ------------ | ------------------ | -------------------- | ------------------ | ------------------ | ------------------ | ------------------ | ------------------ |
+| Swap         | :heavy_check_mark: | - :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :white_check_mark: |
+| Sym Deposit  | :heavy_check_mark: | :heavy_check_mark:   | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :white_check_mark: |
+| Asym Deposit | :white_check_mark: | :white_check_mark:   | :white_check_mark: | :white_check_mark: | :white_check_mark: | :white_check_mark: | :white_check_mark: |
+| Synths       | :white_check_mark: | :white_check_mark:   | :white_check_mark: | :white_check_mark: | :white_check_mark: | :white_check_mark: | :white_check_mark: |
+| Keystore     | :heavy_check_mark: | :heavy_check_mark:   | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :white_check_mark: |
+| Ledger       | :heavy_check_mark: | :heavy_check_mark:   | :heavy_check_mark: | :white_check_mark: | :white_check_mark: | :white_check_mark: | :white_check_mark: |
+
+Symbols:
+:heavy_check_mark: implemented
+:white_check_mark: planned
+`:x:` - not planned
+
+| Languages | :de: | :fr: | :ru: | :us: |
+
 ## ASGARDEX uses following libraries, frameworks and more:
 
 _(in alphabetical order)_
