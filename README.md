@@ -12,53 +12,53 @@
 
 Symbols:
 :heavy_check_mark: implemented
-:white_large_square: planned
+:white_check_mark: planned
 :white_flag: not needed
 :x: won't be supported
 
 ### Wallet
 
-|              | THOR               | BNB                | BTC                | BCH                  | DOGE                 | LTC                  | TERRA                |
-| ------------ | ------------------ | ------------------ | ------------------ | -------------------- | -------------------- | -------------------- | -------------------- |
-| Keystore     | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark:   | :heavy_check_mark:   | :heavy_check_mark:   | :white_large_square: |
-| Ledger       | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :white_large_square: | :white_large_square: | :white_large_square: | :white_large_square: |
-| Send         | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark:   | :heavy_check_mark:   | :heavy_check_mark:   | :white_large_square: |
-| Send w/ memo | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark:   | :heavy_check_mark:   | :heavy_check_mark:   | :white_large_square: |
-| Receive      | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark:   | :heavy_check_mark:   | :heavy_check_mark:   | :white_large_square: |
-| Upgrade \*   | :heavy_check_mark: | :heavy_check_mark: | :white_flag:       | :white_flag:         | :white_flag:         | :white_flag:         | :white_flag:         |
-| Deposit      | :heavy_check_mark: | :white_flag:       | :white_flag:       | :white_flag:         | :white_flag:         | :white_flag:         | :white_flag:         |
-| Shares       | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark:   | :heavy_check_mark:   | :heavy_check_mark:   | :white_large_square: |
-| History      | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark:   | :heavy_check_mark:   | :heavy_check_mark:   | :white_large_square: |
+|              | THOR               | BNB                | BTC                | BCH                | DOGE               | LTC                | TERRA              |
+| ------------ | ------------------ | ------------------ | ------------------ | ------------------ | ------------------ | ------------------ | ------------------ |
+| Keystore     | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :white_check_mark: |
+| Ledger       | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :white_check_mark: | :white_check_mark: | :white_check_mark: | :white_check_mark: |
+| Send         | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :white_check_mark: |
+| Send w/ memo | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :white_check_mark: |
+| Receive      | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :white_check_mark: |
+| Upgrade \*   | :heavy_check_mark: | :heavy_check_mark: | :white_flag:       | :white_flag:       | :white_flag:       | :white_flag:       | :white_flag:       |
+| Deposit      | :heavy_check_mark: | :white_flag:       | :white_flag:       | :white_flag:       | :white_flag:       | :white_flag:       | :white_flag:       |
+| Shares       | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :white_check_mark: |
+| History      | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :white_check_mark: |
 
 (\*) Upgrade RUNE (BEP2) to RUNE (Native)
 
 ### Exchange
 
-|                | THOR                 | BNB                  | BTC                  | BCH                  | DOGE                 | LTC                  | TERRA                |
-| -------------- | -------------------- | -------------------- | -------------------- | -------------------- | -------------------- | -------------------- | -------------------- |
-| Pools overview | :heavy_check_mark:   | - :heavy_check_mark: | :heavy_check_mark:   | :heavy_check_mark:   | :heavy_check_mark:   | :heavy_check_mark:   | :white_large_square: |
-| Pool detail    | :heavy_check_mark:   | - :heavy_check_mark: | :heavy_check_mark:   | :heavy_check_mark:   | :heavy_check_mark:   | :heavy_check_mark:   | :white_large_square: |
-| Swap \*        | :heavy_check_mark:   | :heavy_check_mark:   | :heavy_check_mark:   | :heavy_check_mark:   | :heavy_check_mark:   | :heavy_check_mark:   | :white_large_square: |
-| Sym. Deposit   | :heavy_check_mark:   | :heavy_check_mark:   | :heavy_check_mark:   | :heavy_check_mark:   | :heavy_check_mark:   | :heavy_check_mark:   | :white_large_square: |
-| Asym. Deposit  | :white_large_square: | :white_large_square: | :white_large_square: | :white_large_square: | :white_large_square: | :white_large_square: | :white_large_square: |
-| Sym. Withdraw  | :heavy_check_mark:   | :heavy_check_mark:   | :heavy_check_mark:   | :heavy_check_mark:   | :heavy_check_mark:   | :heavy_check_mark:   | :white_large_square: |
-| Asym. Withdraw | :white_large_square: | :white_large_square: | :white_large_square: | :white_large_square: | :white_large_square: | :white_large_square: | :white_large_square: |
-| Recovery tool  | :white_large_square: | :white_large_square: | :white_large_square: | :white_large_square: | :white_large_square: | :white_large_square: | :white_large_square: |
-| Synths         | :white_large_square: | :white_large_square: | :white_large_square: | :white_large_square: | :white_large_square: | :white_large_square: | :white_large_square: |
+|                | THOR               | BNB                  | BTC                | BCH                | DOGE               | LTC                | TERRA              |
+| -------------- | ------------------ | -------------------- | ------------------ | ------------------ | ------------------ | ------------------ | ------------------ |
+| Pools overview | :heavy_check_mark: | - :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :white_check_mark: |
+| Pool detail    | :heavy_check_mark: | - :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :white_check_mark: |
+| Swap \*        | :heavy_check_mark: | :heavy_check_mark:   | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :white_check_mark: |
+| Sym. Deposit   | :heavy_check_mark: | :heavy_check_mark:   | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :white_check_mark: |
+| Asym. Deposit  | :white_check_mark: | :white_check_mark:   | :white_check_mark: | :white_check_mark: | :white_check_mark: | :white_check_mark: | :white_check_mark: |
+| Sym. Withdraw  | :heavy_check_mark: | :heavy_check_mark:   | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :white_check_mark: |
+| Asym. Withdraw | :white_check_mark: | :white_check_mark:   | :white_check_mark: | :white_check_mark: | :white_check_mark: | :white_check_mark: | :white_check_mark: |
+| Recovery tool  | :white_check_mark: | :white_check_mark:   | :white_check_mark: | :white_check_mark: | :white_check_mark: | :white_check_mark: | :white_check_mark: |
+| Synths         | :white_check_mark: | :white_check_mark:   | :white_check_mark: | :white_check_mark: | :white_check_mark: | :white_check_mark: | :white_check_mark: |
 
 ### THORNode
 
-| Overview (bonds/rewards) | BOND               | UNBOND             | LEAVE              |
-| ------------------------ | ------------------ | ------------------ | ------------------ | ------------------ | ------------------ | -------------------- |
-| :heavy_check_mark:       | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :white_large_square: |
+| Overview (bonds/rewards) | BOND               | UNBOND             | LEAVE              | Status             |
+| ------------------------ | ------------------ | ------------------ | ------------------ | ------------------ |
+| :heavy_check_mark:       | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :white_check_mark: |
 
 ### Languages
 
 _(in alphabetical order)_
 
-| :de:               | :fr:               | :ru:               | :us:               |
-| ------------------ | ------------------ | ------------------ | ------------------ |
-| :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: |
+| Languages | ENGLISH :us:       | FRENCH :fr:        | GERMAN :de:        | RUSSIAN :ru:       |
+| --------- | ------------------ | ------------------ | ------------------ | ------------------ |
+|           | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: |
 
 ### Misc.
 
