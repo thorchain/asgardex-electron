@@ -18,7 +18,7 @@ Symbols:
 
 ### Wallet
 
-|              | THOR               | BNB/BEP2           | BTC                | BCH                | DOGE               | ETH/ERC20          | LTC                | TERRA              |
+|              | THOR               | BNB / BEP2         | BTC                | BCH                | DOGE               | ETH / ERC20        | LTC                | TERRA              |
 | ------------ | ------------------ | ------------------ | ------------------ | ------------------ | ------------------ | ------------------ | ------------------ | ------------------ |
 | Keystore     | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :white_check_mark: |
 | Ledger       | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :white_check_mark: | :white_check_mark: | :heavy_check_mark: | :white_check_mark: | :white_check_mark: |
@@ -35,7 +35,7 @@ Symbols:
 
 ### Exchange
 
-|                | THOR               | BNB/BEP2           | BTC                | BCH                | DOGE               | ETH/ERC20          | LTC                | TERRA              |
+|                | THOR               | BNB / BEP2         | BTC                | BCH                | DOGE               | ETH / ERC20        | LTC                | TERRA              |
 | -------------- | ------------------ | ------------------ | ------------------ | ------------------ | ------------------ | ------------------ | ------------------ | ------------------ |
 | Pools overview | :white_flag:       | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :white_check_mark: |
 | Pool detail    | :white_flag:       | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :white_check_mark: |
