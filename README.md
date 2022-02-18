@@ -55,19 +55,15 @@ Symbols:
 
 ### Languages
 
-| Languages | ENGLISH :us:       | GERMAN :de:        | FRENCH :fr:        | RUSSIAN :ru:       |
-| --------- | ------------------ | ------------------ | ------------------ | ------------------ |
-|           | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: |
+| ENGLISH :us:       | GERMAN :de:        | FRENCH :fr:        | RUSSIAN :ru:       |
+| ------------------ | ------------------ | ------------------ | ------------------ |
+| :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: |
 
 ### Misc.
 
 - 100% open-source (built by the community)
 - Security first
 - No extra (affiliate) fees
-
-### Not planned
-
-- LP analytics - use https://thoryield.com/
 
 ## ASGARDEX uses following libraries, frameworks and more:
 
