@@ -10,21 +10,65 @@
 
 ## Feature list
 
-|              | THOR               | BNB                  | BTC                | BCH                | DOGE               | LTC                | TERRA              |
-| ------------ | ------------------ | -------------------- | ------------------ | ------------------ | ------------------ | ------------------ | ------------------ |
-| Swap         | :heavy_check_mark: | - :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :white_check_mark: |
-| Sym Deposit  | :heavy_check_mark: | :heavy_check_mark:   | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :white_check_mark: |
-| Asym Deposit | :white_check_mark: | :white_check_mark:   | :white_check_mark: | :white_check_mark: | :white_check_mark: | :white_check_mark: | :white_check_mark: |
-| Synths       | :white_check_mark: | :white_check_mark:   | :white_check_mark: | :white_check_mark: | :white_check_mark: | :white_check_mark: | :white_check_mark: |
-| Keystore     | :heavy_check_mark: | :heavy_check_mark:   | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :white_check_mark: |
-| Ledger       | :heavy_check_mark: | :heavy_check_mark:   | :heavy_check_mark: | :white_check_mark: | :white_check_mark: | :white_check_mark: | :white_check_mark: |
-
 Symbols:
 :heavy_check_mark: implemented
-:white_check_mark: planned
-`:x:` - not planned
+:white_large_square: planned
+:white_flag: not needed
+:x: won't be supported
 
-| Languages | :de: | :fr: | :ru: | :us: |
+### Wallet
+
+|              | THOR               | BNB                | BTC                | BCH                  | DOGE                 | LTC                  | TERRA                |
+| ------------ | ------------------ | ------------------ | ------------------ | -------------------- | -------------------- | -------------------- | -------------------- |
+| Keystore     | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark:   | :heavy_check_mark:   | :heavy_check_mark:   | :white_large_square: |
+| Ledger       | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :white_large_square: | :white_large_square: | :white_large_square: | :white_large_square: |
+| Send         | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark:   | :heavy_check_mark:   | :heavy_check_mark:   | :white_large_square: |
+| Send w/ memo | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark:   | :heavy_check_mark:   | :heavy_check_mark:   | :white_large_square: |
+| Receive      | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark:   | :heavy_check_mark:   | :heavy_check_mark:   | :white_large_square: |
+| Upgrade \*   | :heavy_check_mark: | :heavy_check_mark: | :white_flag:       | :white_flag:         | :white_flag:         | :white_flag:         | :white_flag:         |
+| Deposit      | :heavy_check_mark: | :white_flag:       | :white_flag:       | :white_flag:         | :white_flag:         | :white_flag:         | :white_flag:         |
+| Shares       | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark:   | :heavy_check_mark:   | :heavy_check_mark:   | :white_large_square: |
+| History      | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark:   | :heavy_check_mark:   | :heavy_check_mark:   | :white_large_square: |
+
+(\*) Upgrade RUNE (BEP2) to RUNE (Native)
+
+### Exchange
+
+|                | THOR                 | BNB                  | BTC                  | BCH                  | DOGE                 | LTC                  | TERRA                |
+| -------------- | -------------------- | -------------------- | -------------------- | -------------------- | -------------------- | -------------------- | -------------------- |
+| Pools overview | :heavy_check_mark:   | - :heavy_check_mark: | :heavy_check_mark:   | :heavy_check_mark:   | :heavy_check_mark:   | :heavy_check_mark:   | :white_large_square: |
+| Pool detail    | :heavy_check_mark:   | - :heavy_check_mark: | :heavy_check_mark:   | :heavy_check_mark:   | :heavy_check_mark:   | :heavy_check_mark:   | :white_large_square: |
+| Swap \*        | :heavy_check_mark:   | :heavy_check_mark:   | :heavy_check_mark:   | :heavy_check_mark:   | :heavy_check_mark:   | :heavy_check_mark:   | :white_large_square: |
+| Sym. Deposit   | :heavy_check_mark:   | :heavy_check_mark:   | :heavy_check_mark:   | :heavy_check_mark:   | :heavy_check_mark:   | :heavy_check_mark:   | :white_large_square: |
+| Asym. Deposit  | :white_large_square: | :white_large_square: | :white_large_square: | :white_large_square: | :white_large_square: | :white_large_square: | :white_large_square: |
+| Sym. Withdraw  | :heavy_check_mark:   | :heavy_check_mark:   | :heavy_check_mark:   | :heavy_check_mark:   | :heavy_check_mark:   | :heavy_check_mark:   | :white_large_square: |
+| Asym. Withdraw | :white_large_square: | :white_large_square: | :white_large_square: | :white_large_square: | :white_large_square: | :white_large_square: | :white_large_square: |
+| Recovery tool  | :white_large_square: | :white_large_square: | :white_large_square: | :white_large_square: | :white_large_square: | :white_large_square: | :white_large_square: |
+| Synths         | :white_large_square: | :white_large_square: | :white_large_square: | :white_large_square: | :white_large_square: | :white_large_square: | :white_large_square: |
+
+### THORNode
+
+| Overview (bonds/rewards) | BOND               | UNBOND             | LEAVE              |
+| ------------------------ | ------------------ | ------------------ | ------------------ | ------------------ | ------------------ | -------------------- |
+| :heavy_check_mark:       | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :white_large_square: |
+
+### Languages
+
+_(in alphabetical order)_
+
+| :de:               | :fr:               | :ru:               | :us:               |
+| ------------------ | ------------------ | ------------------ | ------------------ |
+| :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: |
+
+### Misc.
+
+- 100% open-source - build by the community
+- Security first
+- No extra (affiliate) fees
+
+### Not planned
+
+- LP analytics - use https://thoryield.com/
 
 ## ASGARDEX uses following libraries, frameworks and more:
 
