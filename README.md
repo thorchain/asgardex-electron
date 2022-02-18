@@ -29,6 +29,7 @@ Symbols:
 | Deposit      | :heavy_check_mark: | :white_flag:       | :white_flag:       | :white_flag:       | :white_flag:       | :white_flag:       | :white_flag:       |
 | Shares       | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :white_check_mark: |
 | History      | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :white_check_mark: |
+| Synths       | :white_check_mark: | :white_check_mark: | :white_check_mark: | :white_check_mark: | :white_check_mark: | :white_check_mark: | :white_check_mark: |
 
 (\*) Upgrade RUNE (BEP2) to RUNE (Native)
 
