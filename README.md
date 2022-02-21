@@ -8,6 +8,57 @@
 ![Test](https://github.com/thorchain/asgardex-electron/workflows/Test/badge.svg)
 ![Electron build](https://github.com/thorchain/asgardex-electron/workflows/Electron%20build/badge.svg)
 
+## Feature list
+
+Symbols:
+:heavy_check_mark: implemented
+:white_check_mark: planned
+`-` not needed
+
+### Wallet
+
+|              | THOR               | BNB / BEP2         | BTC                | BCH                | DOGE               | ETH / ERC20        | LTC                | TERRA              |
+| ------------ | ------------------ | ------------------ | ------------------ | ------------------ | ------------------ | ------------------ | ------------------ | ------------------ |
+| Keystore     | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :white_check_mark: |
+| Ledger       | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :white_check_mark: | :white_check_mark: | :white_check_mark: | :white_check_mark: | :white_check_mark: |
+| Send \*      | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :white_check_mark: |
+| Receive      | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :white_check_mark: |
+| Upgrade \*\* | :heavy_check_mark: | :heavy_check_mark: | -                  | -                  | -                  | -                  | -                  | -                  |
+| Deposit      | :heavy_check_mark: | -                  | -                  | -                  | -                  | -                  | -                  | -                  |
+| Shares       | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :white_check_mark: |
+| History      | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :white_check_mark: |
+| Synths       | :white_check_mark: | :white_check_mark: | :white_check_mark: | :white_check_mark: | :white_check_mark: | :white_check_mark: | :white_check_mark: | :white_check_mark: |
+
+(\*) With or without memo
+
+(\*\*) Upgrade RUNE (BEP2) to RUNE (Native)
+
+### Exchange
+
+|                | THOR               | BNB / BEP2         | BTC                | BCH                | DOGE               | ETH / ERC20        | LTC                | TERRA              |
+| -------------- | ------------------ | ------------------ | ------------------ | ------------------ | ------------------ | ------------------ | ------------------ | ------------------ |
+| Pools overview | -                  | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :white_check_mark: |
+| Pool detail    | -                  | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :white_check_mark: |
+| Swap           | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :white_check_mark: |
+| Deposit \*     | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :white_check_mark: |
+| Withdraw \*    | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :white_check_mark: |
+| Recovery tool  | :white_check_mark: | :white_check_mark: | :white_check_mark: | :white_check_mark: | :white_check_mark: | :white_check_mark: | :white_check_mark: | :white_check_mark: |
+| Synths         | :white_check_mark: | :white_check_mark: | :white_check_mark: | :white_check_mark: | :white_check_mark: | :white_check_mark: | :white_check_mark: | :white_check_mark: |
+
+(\*) Symmetrical deposit/withdraw only
+
+### THORNode
+
+| Overview           | Status             | BOND               | UNBOND             | LEAVE              |
+| ------------------ | ------------------ | ------------------ | ------------------ | ------------------ |
+| :heavy_check_mark: | :white_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: |
+
+### Languages
+
+| ENGLISH :us:       | GERMAN :de:        | FRENCH :fr:        | RUSSIAN :ru:       |
+| ------------------ | ------------------ | ------------------ | ------------------ |
+| :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: |
+
 ## ASGARDEX uses following libraries, frameworks and more:
 
 _(in alphabetical order)_
@@ -23,9 +74,10 @@ _(in alphabetical order)_
 - [ReactJS](https://github.com/facebook/react/)
 - [Styled Components](https://styled-components.com/)
 - [Testcafe](https://github.com/DevExpress/testcafe)
-- [THORChain Byzantine Module](https://gitlab.com/thorchain/byzantine-module/)
+- ~~[THORChain Byzantine Module](https://gitlab.com/thorchain/byzantine-module/)~~
 - [RxJS](https://rxjs.dev/)
 - [Typescript](https://github.com/microsoft/TypeScript)
+- [xchainjs-lib](https://github.com/xchainjs/xchainjs-lib/)
 - and others ...
 
 ## Install
