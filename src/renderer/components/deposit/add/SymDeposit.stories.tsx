@@ -97,6 +97,8 @@ const defaultProps: SymDepositProps = {
     console.log(`Open RUNE explorer - tx hash ${txHash}`)
     return Promise.resolve(true)
   },
+  getAssetExplorerTxUrl: (txHash: TxHash) => O.some(`url/asset-${txHash}`),
+  getRuneExplorerTxUrl: (txHash: TxHash) => O.some(`url/asset-${txHash}`),
   // mock password validation
   // Password: "123"
   validatePassword$: mockValidatePassword$,

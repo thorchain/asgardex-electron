@@ -42,7 +42,7 @@ const common: CommonMessages = {
   'common.price.rune': 'RUNE price',
   'common.transaction': 'Transaction',
   'common.viewTransaction': 'View transaction',
-  'common.copyTxHash': 'Copy transaction hash',
+  'common.copyTxUrl': 'Copy transaction url',
   'common.fee': 'Fee',
   'common.fees': 'Fees',
   'common.fee.estimated': 'Estimated fee',

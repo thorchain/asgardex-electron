@@ -23,7 +23,6 @@ import { sequenceTOption } from '../../helpers/fpHelpers'
 import { useMimirHalt } from '../../hooks/useMimirHalt'
 import { useOpenExplorerTxUrl } from '../../hooks/useOpenExplorerTxUrl'
 import { AssetDetailsParams } from '../../routes/wallet'
-import { OpenExplorerTxUrl } from '../../services/clients'
 import { DEFAULT_NETWORK } from '../../services/const'
 import { DEFAULT_BALANCES_FILTER, INITIAL_BALANCES_STATE } from '../../services/wallet/const'
 
@@ -130,7 +129,7 @@ export const AssetDetailsView: React.FC = (): JSX.Element => {
     )
   }, [oClient, oWalletAddress])
 
-  const openExplorerTxUrl: OpenExplorerTxUrl = useOpenExplorerTxUrl(
+  const { openExplorerTxUrl } = useOpenExplorerTxUrl(
     FP.pipe(
       oRouteAsset,
       O.map(({ chain }) => chain)

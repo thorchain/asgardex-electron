@@ -39,7 +39,7 @@ export const WalletHistoryView: React.FC<Props> = ({ className, reloadHistory })
   const { requestParams, loadHistory, historyPage, prevHistoryPage, setFilter, setAddress, setPage } =
     useMidgardHistoryActions(10, reloadHistory)
 
-  const openExplorerTxUrl = useOpenExplorerTxUrl(O.some(THORChain))
+  const { openExplorerTxUrl } = useOpenExplorerTxUrl(O.some(THORChain))
 
   const keystoreAddresses$ = useMemo<Rx.Observable<WalletAddresses>>(
     () =>

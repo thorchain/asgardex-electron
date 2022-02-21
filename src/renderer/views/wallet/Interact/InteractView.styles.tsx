@@ -39,6 +39,4 @@ export const ErrorView = styled(ErrorViewUI)`
   }
 `
 
-export const ViewTxButton = styled(ViewTxButtonUI)`
-  margin-bottom: 15px;
-`
+export const ViewTxButton = styled(ViewTxButtonUI)``

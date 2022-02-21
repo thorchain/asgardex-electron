@@ -5,12 +5,12 @@ import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
 import { useIntl } from 'react-intl'
 
-import { sequenceTOption } from '../../../helpers/fpHelpers'
+import { GetExplorerTxUrl } from '../../../services/clients'
 import * as Styled from './ViewTxButton.styles'
 
 type Props = {
   label?: string
-  copyable?: boolean
+  getExplorerTxUrl: GetExplorerTxUrl
   txHash: O.Option<TxHash>
   onClick: (txHash: string) => void
   className?: string
@@ -19,9 +19,9 @@ type Props = {
 export const ViewTxButton: React.FC<Props> = ({
   onClick,
   txHash: oTxHash,
+  getExplorerTxUrl,
   label,
-  className,
-  copyable = false
+  className
 }): JSX.Element => {
   const intl = useIntl()
 
@@ -40,10 +40,11 @@ export const ViewTxButton: React.FC<Props> = ({
       <Styled.CopyLabel
         copyable={
           FP.pipe(
-            sequenceTOption(O.fromNullable(copyable), oTxHash),
-            O.map(([_, txHash]) => ({
-              text: txHash,
-              tooltips: intl.formatMessage({ id: 'common.copyTxHash' })
+            oTxHash,
+            O.chain((txHash) => getExplorerTxUrl(txHash)),
+            O.map((url) => ({
+              text: url,
+              tooltips: intl.formatMessage({ id: 'common.copyTxUrl' })
             })),
             O.toUndefined
           ) || false

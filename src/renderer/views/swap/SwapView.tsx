@@ -32,7 +32,6 @@ import { useValidateAddress } from '../../hooks/useValidateAddress'
 import { SwapRouteParams } from '../../routes/pools/swap'
 import * as walletRoutes from '../../routes/wallet'
 import { AssetWithDecimalLD, AssetWithDecimalRD } from '../../services/chain/types'
-import { OpenExplorerTxUrl } from '../../services/clients'
 import { DEFAULT_SLIP_TOLERANCE } from '../../services/const'
 import { INITIAL_BALANCES_STATE, DEFAULT_BALANCES_FILTER } from '../../services/wallet/const'
 import { isSlipTolerance, SlipTolerance } from '../../types/asgardex'
@@ -160,7 +159,7 @@ export const SwapView: React.FC<Props> = (_): JSX.Element => {
   )
   const oTargetKeystoreAddress = useObservableState(targetKeystoreAddress$, O.none)
 
-  const openExplorerTxUrl: OpenExplorerTxUrl = useOpenExplorerTxUrl(O.some(THORChain))
+  const { openExplorerTxUrl, getExplorerTxUrl } = useOpenExplorerTxUrl(O.some(THORChain))
 
   const renderError = useCallback(
     (e: Error) => (
@@ -297,6 +296,7 @@ export const SwapView: React.FC<Props> = (_): JSX.Element => {
                   keystore={keystore}
                   validatePassword$={validatePassword$}
                   goToTransaction={openExplorerTxUrl}
+                  getExplorerTxUrl={getExplorerTxUrl}
                   assets={{ inAsset: sourceAsset, outAsset: targetAsset }}
                   sourceWalletAddress={oSourceKeystoreAddress}
                   sourceLedgerAddress={oSourceLedgerAddress}

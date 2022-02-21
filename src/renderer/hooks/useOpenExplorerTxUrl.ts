@@ -10,20 +10,27 @@ import * as RxOp from 'rxjs/operators'
 
 import { useChainContext } from '../contexts/ChainContext'
 import { eqOChain } from '../helpers/fp/eq'
-import { OpenExplorerTxUrl } from '../services/clients'
+import { GetExplorerTxUrl, OpenExplorerTxUrl } from '../services/clients'
 
-export const openExplorerTxUrl = (oClient: O.Option<XChainClient>, txHash: TxHash) =>
+const explorerTxUrl = (oClient: O.Option<XChainClient>, txHash: TxHash) =>
   FP.pipe(
     oClient,
-    O.map(async (client) => {
-      const url = client.getExplorerTxUrl(txHash)
+    O.map((client) => client.getExplorerTxUrl(txHash))
+  )
+
+export const openExplorerTxUrl = (oClient: O.Option<XChainClient>, txHash: TxHash): Promise<boolean> =>
+  FP.pipe(
+    explorerTxUrl(oClient, txHash),
+    O.map(async (url) => {
       await window.apiUrl.openExternal(url)
       return true
     }),
     O.getOrElse<Promise<boolean>>(() => Promise.resolve(false))
   )
 
-export const useOpenExplorerTxUrl = (oChain: O.Option<Chain>): OpenExplorerTxUrl => {
+export const useOpenExplorerTxUrl = (
+  oChain: O.Option<Chain>
+): { openExplorerTxUrl: OpenExplorerTxUrl; getExplorerTxUrl: GetExplorerTxUrl } => {
   const { clientByChain$ } = useChainContext()
 
   const [oClient, chainUpdated] = useObservableState<O.Option<XChainClient>, O.Option<Chain>>(
@@ -40,5 +47,8 @@ export const useOpenExplorerTxUrl = (oChain: O.Option<Chain>): OpenExplorerTxUrl
   // to trigger `useObservableState` properly to get a client depending on chain
   useEffect(() => chainUpdated(oChain), [oChain, chainUpdated])
 
-  return useCallback((txHash: TxHash) => openExplorerTxUrl(oClient, txHash), [oClient])
+  return {
+    openExplorerTxUrl: useCallback((txHash: TxHash) => openExplorerTxUrl(oClient, txHash), [oClient]),
+    getExplorerTxUrl: useCallback((txHash: TxHash) => explorerTxUrl(oClient, txHash), [oClient])
+  }
 }

@@ -56,7 +56,7 @@ import {
   SymDepositFeesHandler,
   SymDepositFeesRD
 } from '../../../services/chain/types'
-import { OpenExplorerTxUrl } from '../../../services/clients'
+import { GetExplorerTxUrl, OpenExplorerTxUrl } from '../../../services/clients'
 import {
   ApproveFeeHandler,
   ApproveParams,
@@ -114,6 +114,8 @@ export type Props = {
   reloadSelectedPoolDetail: (delay?: number) => void
   openAssetExplorerTxUrl: OpenExplorerTxUrl
   openRuneExplorerTxUrl: OpenExplorerTxUrl
+  getRuneExplorerTxUrl: GetExplorerTxUrl
+  getAssetExplorerTxUrl: GetExplorerTxUrl
   validatePassword$: ValidatePasswordHandler
   onChangeAsset: (asset: Asset) => void
   disabled?: boolean
@@ -149,6 +151,8 @@ export const SymDeposit: React.FC<Props> = (props) => {
     poolAddress: oPoolAddress,
     openAssetExplorerTxUrl,
     openRuneExplorerTxUrl,
+    getRuneExplorerTxUrl,
+    getAssetExplorerTxUrl,
     validatePassword$,
     priceAsset,
     reloadFees,
@@ -903,6 +907,7 @@ export const SymDeposit: React.FC<Props> = (props) => {
           <Styled.ViewTxButtonTop
             txHash={oTxHash}
             onClick={openAssetExplorerTxUrl}
+            getExplorerTxUrl={getAssetExplorerTxUrl}
             label={intl.formatMessage({ id: 'common.tx.view' }, { assetTicker: asset.ticker })}
           />
         ))}
@@ -910,6 +915,7 @@ export const SymDeposit: React.FC<Props> = (props) => {
           <ViewTxButton
             txHash={oTxHash}
             onClick={openRuneExplorerTxUrl}
+            getExplorerTxUrl={getRuneExplorerTxUrl}
             label={intl.formatMessage({ id: 'common.tx.view' }, { assetTicker: AssetRuneNative.ticker })}
           />
         ))}
@@ -936,8 +942,10 @@ export const SymDeposit: React.FC<Props> = (props) => {
     txModalExtraContent,
     intl,
     openAssetExplorerTxUrl,
+    getAssetExplorerTxUrl,
     asset.ticker,
-    openRuneExplorerTxUrl
+    openRuneExplorerTxUrl,
+    getRuneExplorerTxUrl
   ])
 
   const closePasswordModal = useCallback(() => {

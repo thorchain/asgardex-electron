@@ -9,20 +9,23 @@ import { useObservableState } from 'observable-hooks'
 import { useIntl } from 'react-intl'
 import { useHistory } from 'react-router-dom'
 
-import { Network } from '../../../../shared/api/types'
 import { WalletType } from '../../../../shared/wallet/types'
 import { Send } from '../../../components/wallet/txs/send'
 import { SendFormBNB } from '../../../components/wallet/txs/send'
 import { useBinanceContext } from '../../../contexts/BinanceContext'
 import { useChainContext } from '../../../contexts/ChainContext'
+import { useWalletContext } from '../../../contexts/WalletContext'
 import { liveData } from '../../../helpers/rx/liveData'
 import { getWalletBalanceByAddressAndAsset } from '../../../helpers/walletHelper'
+import { useNetwork } from '../../../hooks/useNetwork'
+import { useOpenExplorerTxUrl } from '../../../hooks/useOpenExplorerTxUrl'
 import { useSubscriptionState } from '../../../hooks/useSubscriptionState'
 import { useValidateAddress } from '../../../hooks/useValidateAddress'
 import { INITIAL_SEND_STATE } from '../../../services/chain/const'
 import { FeeRD, SendTxParams, SendTxState } from '../../../services/chain/types'
-import { OpenExplorerTxUrl, WalletBalances } from '../../../services/clients'
-import { NonEmptyWalletBalances, ValidatePasswordHandler, WalletBalance } from '../../../services/wallet/types'
+import { WalletBalances } from '../../../services/clients'
+import { DEFAULT_BALANCES_FILTER, INITIAL_BALANCES_STATE } from '../../../services/wallet/const'
+import { WalletBalance } from '../../../services/wallet/types'
 import * as Helper from './SendView.helper'
 
 type Props = {
@@ -30,26 +33,27 @@ type Props = {
   walletAddress: Address
   walletIndex: number
   asset: Asset
-  balances: O.Option<NonEmptyWalletBalances>
-  openExplorerTxUrl: OpenExplorerTxUrl
-  validatePassword$: ValidatePasswordHandler
-  network: Network
 }
 
 export const SendViewBNB: React.FC<Props> = (props): JSX.Element => {
-  const {
-    walletAddress,
-    asset,
-    balances: oBalances,
-    openExplorerTxUrl,
-    validatePassword$,
-    network,
-    walletType,
-    walletIndex
-  } = props
+  const { walletAddress, asset, walletType, walletIndex } = props
 
   const intl = useIntl()
   const history = useHistory()
+
+  const { network } = useNetwork()
+
+  const { openExplorerTxUrl, getExplorerTxUrl } = useOpenExplorerTxUrl(O.some(BNBChain))
+
+  const {
+    balancesState$,
+    keystoreService: { validatePassword$ }
+  } = useWalletContext()
+
+  const [{ balances: oBalances }] = useObservableState(
+    () => balancesState$(DEFAULT_BALANCES_FILTER),
+    INITIAL_BALANCES_STATE
+  )
 
   const oWalletBalance = useMemo(
     () =>
@@ -151,6 +155,7 @@ export const SendViewBNB: React.FC<Props> = (props): JSX.Element => {
         <Send
           txRD={sendTxState.status}
           viewTxHandler={openExplorerTxUrl}
+          getExplorerTxUrl={getExplorerTxUrl}
           finishActionHandler={finishActionHandler}
           errorActionHandler={finishActionHandler}
           sendForm={sendForm(walletBalance)}

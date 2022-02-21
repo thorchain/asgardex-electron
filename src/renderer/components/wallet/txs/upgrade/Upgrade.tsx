@@ -24,7 +24,7 @@ import { useSubscriptionState } from '../../../../hooks/useSubscriptionState'
 import { INITIAL_UPGRADE_RUNE_STATE } from '../../../../services/chain/const'
 import { UpgradeRuneParams, UpgradeRuneTxState, UpgradeRuneTxState$ } from '../../../../services/chain/types'
 import { FeeRD } from '../../../../services/chain/types'
-import { AddressValidation, OpenExplorerTxUrl, WalletBalances } from '../../../../services/clients'
+import { AddressValidation, GetExplorerTxUrl, OpenExplorerTxUrl, WalletBalances } from '../../../../services/clients'
 import { PoolAddressRD } from '../../../../services/midgard/types'
 import { ValidatePasswordHandler } from '../../../../services/wallet/types'
 import { AssetWithDecimal } from '../../../../types/asgardex'
@@ -54,6 +54,7 @@ export type Props = {
   reloadFeeHandler: (params: TxParams) => void
   addressValidation: AddressValidation
   successActionHandler: OpenExplorerTxUrl
+  getExplorerTxUrl: GetExplorerTxUrl
   reloadBalancesHandler: FP.Lazy<void>
   network: Network
   reloadOnError: FP.Lazy<void>
@@ -74,6 +75,7 @@ export const Upgrade: React.FC<Props> = (props): JSX.Element => {
     upgrade$,
     balances: oBalances,
     successActionHandler,
+    getExplorerTxUrl,
     reloadFeeHandler,
     addressValidation,
     reloadBalancesHandler,
@@ -327,11 +329,11 @@ export const Upgrade: React.FC<Props> = (props): JSX.Element => {
           <Styled.SuccessExtraButton onClick={onFinishHandler}>
             {intl.formatMessage({ id: 'common.back' })}
           </Styled.SuccessExtraButton>
-          <ViewTxButton txHash={O.some(txHash)} onClick={onClickHandler} />
+          <ViewTxButton txHash={O.some(txHash)} onClick={onClickHandler} getExplorerTxUrl={getExplorerTxUrl} />
         </Styled.SuccessExtraContainer>
       )
     },
-    [intl, onFinishHandler, successActionHandler]
+    [getExplorerTxUrl, intl, onFinishHandler, successActionHandler]
   )
 
   const addMaxAmountHandler = useCallback(() => setAmountToUpgrade(maxAmount), [maxAmount])

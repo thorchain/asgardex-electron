@@ -26,7 +26,6 @@ import { useOpenExplorerTxUrl } from '../../../hooks/useOpenExplorerTxUrl'
 import { useValidateAddress } from '../../../hooks/useValidateAddress'
 import { AssetDetailsParams } from '../../../routes/wallet'
 import { AssetWithDecimalLD, AssetWithDecimalRD } from '../../../services/chain/types'
-import { OpenExplorerTxUrl } from '../../../services/clients'
 import { DEFAULT_NETWORK } from '../../../services/const'
 import { PoolAddressRD } from '../../../services/midgard/types'
 import { DEFAULT_BALANCES_FILTER, INITIAL_BALANCES_STATE } from '../../../services/wallet/const'
@@ -169,7 +168,7 @@ export const UpgradeView: React.FC<Props> = (): JSX.Element => {
     )
   }, [reloadInboundAddresses, reloadBalancesByChain, oRuneNonNativeAsset, oBalances, targetPoolAddressRD])
 
-  const openExplorerTxUrl: OpenExplorerTxUrl = useOpenExplorerTxUrl(
+  const { openExplorerTxUrl, getExplorerTxUrl } = useOpenExplorerTxUrl(
     FP.pipe(
       oRuneNonNativeAsset,
       O.map(({ chain }) => chain)
@@ -205,6 +204,7 @@ export const UpgradeView: React.FC<Props> = (): JSX.Element => {
                     upgrade$: upgradeRuneToNative$,
                     balances: oBalances,
                     successActionHandler: openExplorerTxUrl,
+                    getExplorerTxUrl,
                     reloadBalancesHandler: reloadBalancesByChain(runeAsset.asset.chain),
                     network,
                     reloadOnError

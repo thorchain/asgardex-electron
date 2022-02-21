@@ -60,7 +60,11 @@ const extraContent = (): JSX.Element => (
 )
 
 const extraResult = (): JSX.Element => (
-  <ViewTxButton txHash={O.some('hash')} onClick={(txHash: TxHash) => console.log('txHash', txHash)} />
+  <ViewTxButton
+    txHash={O.some('hash')}
+    onClick={(txHash: TxHash) => console.log('txHash', txHash)}
+    getExplorerTxUrl={(txHash: TxHash) => O.some(`url/asset-${txHash}`)}
+  />
 )
 
 export const StoryExtra: Story = () => (

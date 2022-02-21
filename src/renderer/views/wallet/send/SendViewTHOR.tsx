@@ -9,20 +9,23 @@ import { useObservableState } from 'observable-hooks'
 import { useIntl } from 'react-intl'
 import { useHistory } from 'react-router-dom'
 
-import { Network } from '../../../../shared/api/types'
 import { WalletType } from '../../../../shared/wallet/types'
 import { LoadingView } from '../../../components/shared/loading'
 import { Send, SendFormTHOR } from '../../../components/wallet/txs/send/'
 import { useChainContext } from '../../../contexts/ChainContext'
 import { useThorchainContext } from '../../../contexts/ThorchainContext'
+import { useWalletContext } from '../../../contexts/WalletContext'
 import { liveData } from '../../../helpers/rx/liveData'
 import { getWalletBalanceByAddress } from '../../../helpers/walletHelper'
+import { useNetwork } from '../../../hooks/useNetwork'
+import { useOpenExplorerTxUrl } from '../../../hooks/useOpenExplorerTxUrl'
 import { useSubscriptionState } from '../../../hooks/useSubscriptionState'
 import { useValidateAddress } from '../../../hooks/useValidateAddress'
 import { INITIAL_SEND_STATE } from '../../../services/chain/const'
 import { FeeRD, SendTxParams, SendTxState } from '../../../services/chain/types'
-import { OpenExplorerTxUrl, WalletBalances } from '../../../services/clients'
-import { NonEmptyWalletBalances, ValidatePasswordHandler, WalletBalance } from '../../../services/wallet/types'
+import { WalletBalances } from '../../../services/clients'
+import { DEFAULT_BALANCES_FILTER, INITIAL_BALANCES_STATE } from '../../../services/wallet/const'
+import { WalletBalance } from '../../../services/wallet/types'
 import * as Helper from './SendView.helper'
 
 type Props = {
@@ -30,26 +33,26 @@ type Props = {
   walletIndex: number
   walletAddress: Address
   asset: Asset
-  balances: O.Option<NonEmptyWalletBalances>
-  openExplorerTxUrl: OpenExplorerTxUrl
-  validatePassword$: ValidatePasswordHandler
-  network: Network
 }
 
 export const SendViewTHOR: React.FC<Props> = (props): JSX.Element => {
-  const {
-    walletType,
-    walletIndex,
-    walletAddress,
-    asset,
-    balances: oBalances,
-    openExplorerTxUrl,
-    validatePassword$,
-    network
-  } = props
+  const { walletType, walletIndex, walletAddress, asset } = props
 
   const intl = useIntl()
   const history = useHistory()
+
+  const { network } = useNetwork()
+  const {
+    balancesState$,
+    keystoreService: { validatePassword$ }
+  } = useWalletContext()
+
+  const [{ balances: oBalances }] = useObservableState(
+    () => balancesState$(DEFAULT_BALANCES_FILTER),
+    INITIAL_BALANCES_STATE
+  )
+
+  const { openExplorerTxUrl, getExplorerTxUrl } = useOpenExplorerTxUrl(O.some(THORChain))
 
   const oWalletBalance = useMemo(
     () =>
@@ -144,6 +147,7 @@ export const SendViewTHOR: React.FC<Props> = (props): JSX.Element => {
         <Send
           txRD={sendTxState.status}
           viewTxHandler={openExplorerTxUrl}
+          getExplorerTxUrl={getExplorerTxUrl}
           finishActionHandler={finishActionHandler}
           errorActionHandler={finishActionHandler}
           sendForm={sendForm(walletBalance)}
