@@ -42,6 +42,7 @@ const common: CommonMessages = {
   'common.price.rune': 'Стоимость RUNE',
   'common.transaction': 'Транзакция',
   'common.viewTransaction': 'Посмотреть транзакцию',
+  'common.copyTxHash': 'Copy transaction hash - RU',
   'common.fee': 'Комиссия',
   'common.fees': 'Комиссии',
   'common.fee.estimated': 'Ориентировочная комиссия',

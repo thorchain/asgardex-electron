@@ -8,18 +8,36 @@ import { ViewTxButton } from './ViewTxButton'
 
 const onClick = (txHash: TxHash) => console.log('txHash', txHash)
 
-export const Default: Story = () => <ViewTxButton txHash={O.some('hash')} onClick={onClick} />
-Default.storyName = 'default'
+type Args = {
+  label: string
+  hasTxHash: boolean
+}
 
-export const Label: Story = () => <ViewTxButton label="click me" txHash={O.some('hash')} onClick={onClick} />
-Label.storyName = 'label'
+const Template: Story<Args> = ({ label, hasTxHash }) => (
+  <ViewTxButton label={label} txHash={hasTxHash ? O.some('hash') : O.none} onClick={onClick} />
+)
 
-export const Disabled: Story = () => <ViewTxButton txHash={O.none} onClick={onClick} />
-Disabled.storyName = 'disabled'
+export const Default = Template.bind({})
 
-const meta: Meta = {
+const meta: Meta<Args> = {
   component: ViewTxButton,
   title: 'Components/button/ViewTxButton',
+  argTypes: {
+    hasTxHash: {
+      name: 'Has tx hash',
+      control: {
+        type: 'boolean'
+      },
+      defaultValue: false
+    },
+    label: {
+      name: 'Label',
+      control: {
+        type: 'text'
+      },
+      defaultValue: 'See Transaction'
+    }
+  },
   decorators: [
     (S: Story) => (
       <div

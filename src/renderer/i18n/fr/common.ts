@@ -42,6 +42,7 @@ const common: CommonMessages = {
   'common.price.rune': 'Prix du Rune',
   'common.transaction': 'Transaction',
   'common.viewTransaction': 'Afficher la transaction',
+  'common.copyTxHash': 'Copy transaction hash - FR',
   'common.fee': 'Frais',
   'common.fees': 'Frais',
   'common.fee.estimated': 'Frais estimé',
