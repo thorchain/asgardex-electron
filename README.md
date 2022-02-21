@@ -29,7 +29,7 @@ Symbols:
 | History      | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :white_check_mark: |
 | Synths       | :white_check_mark: | :white_check_mark: | :white_check_mark: | :white_check_mark: | :white_check_mark: | :white_check_mark: | :white_check_mark: | :white_check_mark: |
 
-(\*) With or or without memo
+(\*) With or without memo
 
 (\*\*) Upgrade RUNE (BEP2) to RUNE (Native)
 
@@ -74,9 +74,10 @@ _(in alphabetical order)_
 - [ReactJS](https://github.com/facebook/react/)
 - [Styled Components](https://styled-components.com/)
 - [Testcafe](https://github.com/DevExpress/testcafe)
-- [THORChain Byzantine Module](https://gitlab.com/thorchain/byzantine-module/)
+- ~~[THORChain Byzantine Module](https://gitlab.com/thorchain/byzantine-module/)~~
 - [RxJS](https://rxjs.dev/)
 - [Typescript](https://github.com/microsoft/TypeScript)
+- [xchainjs-lib](https://github.com/xchainjs/xchainjs-lib/)
 - and others ...
 
 ## Install
