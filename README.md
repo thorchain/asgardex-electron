@@ -23,7 +23,7 @@ Symbols:
 | Ledger       | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :white_check_mark: | :white_check_mark: | :white_check_mark: | :white_check_mark: | :white_check_mark: |
 | Send \*      | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :white_check_mark: |
 | Receive      | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :white_check_mark: |
-| Upgrade \*\* | :heavy_check_mark: | :heavy_check_mark: | -                  | -                  | -                  | -                  | -                  | -                  |
+| Upgrade \*\* | :heavy_check_mark: | :heavy_check_mark: | -                  | -                  | -                  | :heavy_check_mark: | -                  | -                  |
 | Deposit      | :heavy_check_mark: | -                  | -                  | -                  | -                  | -                  | -                  | -                  |
 | Shares       | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :white_check_mark: |
 | History      | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :white_check_mark: |
@@ -31,7 +31,7 @@ Symbols:
 
 (\*) With or without memo
 
-(\*\*) Upgrade RUNE (BEP2) to RUNE (Native)
+(\*\*) Upgrade RUNE (BEP2) or RUNE (ERC20) to RUNE (Native)
 
 ### Exchange
 
