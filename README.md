@@ -59,6 +59,12 @@ Symbols:
 | ------------------ | ------------------ | ------------------ | ------------------ |
 | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: |
 
+### Misc.
+
+- 100% open-source (built by the community)
+- Security first
+- No extra (affiliate) fees
+
 ## ASGARDEX uses following libraries, frameworks and more:
 
 _(in alphabetical order)_
