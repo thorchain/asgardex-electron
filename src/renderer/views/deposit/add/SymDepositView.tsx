@@ -26,7 +26,6 @@ import { useNetwork } from '../../../hooks/useNetwork'
 import { useOpenExplorerTxUrl } from '../../../hooks/useOpenExplorerTxUrl'
 import { useSymDepositAddresses } from '../../../hooks/useSymDepositAddresses'
 import * as poolsRoutes from '../../../routes/pools'
-import { OpenExplorerTxUrl } from '../../../services/clients'
 import { PoolAddress, PoolAssetsRD } from '../../../services/midgard/types'
 import { toPoolData } from '../../../services/midgard/utils'
 import { DEFAULT_BALANCES_FILTER, INITIAL_BALANCES_STATE } from '../../../services/wallet/const'
@@ -129,9 +128,13 @@ export const SymDepositView: React.FC<Props> = (props) => {
     RD.map(getAssetPoolPrice(runPrice))
   )
 
-  const openAssetExplorerTxUrl: OpenExplorerTxUrl = useOpenExplorerTxUrl(O.some(asset.chain))
+  const { openExplorerTxUrl: openAssetExplorerTxUrl, getExplorerTxUrl: getAssetExplorerTxUrl } = useOpenExplorerTxUrl(
+    O.some(asset.chain)
+  )
 
-  const openRuneExplorerTxUrl: OpenExplorerTxUrl = useOpenExplorerTxUrl(O.some(THORChain))
+  const { openExplorerTxUrl: openRuneExplorerTxUrl, getExplorerTxUrl: getRuneExplorerTxUrl } = useOpenExplorerTxUrl(
+    O.some(THORChain)
+  )
 
   const fundsCap: O.Option<FundsCap> = useMemo(
     () =>
@@ -171,6 +174,8 @@ export const SymDepositView: React.FC<Props> = (props) => {
           validatePassword$={validatePassword$}
           openRuneExplorerTxUrl={openRuneExplorerTxUrl}
           openAssetExplorerTxUrl={openAssetExplorerTxUrl}
+          getRuneExplorerTxUrl={getRuneExplorerTxUrl}
+          getAssetExplorerTxUrl={getAssetExplorerTxUrl}
           onChangeAsset={FP.constVoid}
           asset={assetWD}
           assetPrice={ZERO_BN}
@@ -211,6 +216,8 @@ export const SymDepositView: React.FC<Props> = (props) => {
       validatePassword$,
       openRuneExplorerTxUrl,
       openAssetExplorerTxUrl,
+      getRuneExplorerTxUrl,
+      getAssetExplorerTxUrl,
       assetWD,
       balancesState,
       symDepositFees$,
@@ -248,6 +255,8 @@ export const SymDepositView: React.FC<Props> = (props) => {
               validatePassword$={validatePassword$}
               openRuneExplorerTxUrl={openRuneExplorerTxUrl}
               openAssetExplorerTxUrl={openAssetExplorerTxUrl}
+              getRuneExplorerTxUrl={getRuneExplorerTxUrl}
+              getAssetExplorerTxUrl={getAssetExplorerTxUrl}
               poolData={toPoolData(poolDetail)}
               onChangeAsset={onChangeAsset}
               asset={assetWD}

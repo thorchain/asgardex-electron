@@ -16,6 +16,7 @@ import { ZERO_ASSET_AMOUNT } from '../../../const'
 import { useThorchainContext } from '../../../contexts/ThorchainContext'
 import { useWalletContext } from '../../../contexts/WalletContext'
 import { eqAsset } from '../../../helpers/fp/eq'
+import { useOpenExplorerTxUrl } from '../../../hooks/useOpenExplorerTxUrl'
 import { useSubscriptionState } from '../../../hooks/useSubscriptionState'
 import { useValidateAddress } from '../../../hooks/useValidateAddress'
 import { INITIAL_INTERACT_STATE } from '../../../services/thorchain/const'
@@ -27,11 +28,12 @@ type Props = {
   walletType: WalletType
   walletIndex: number
   walletAddress: string
-  goToTransaction: (txHash: string) => void
 }
 
-export const BondView: React.FC<Props> = ({ walletType, walletIndex, walletAddress, goToTransaction }) => {
+export const BondView: React.FC<Props> = ({ walletType, walletIndex, walletAddress }) => {
   const { balancesState$ } = useWalletContext()
+
+  const { openExplorerTxUrl, getExplorerTxUrl } = useOpenExplorerTxUrl(O.some(THORChain))
 
   const {
     state: interactState,
@@ -106,7 +108,7 @@ export const BondView: React.FC<Props> = ({ walletType, walletIndex, walletAddre
       ),
       (txHash) => (
         <Styled.SuccessView title={intl.formatMessage({ id: 'common.tx.success' })}>
-          <Styled.ViewTxButton txHash={O.some(txHash)} onClick={goToTransaction} />
+          <Styled.ViewTxButton txHash={O.some(txHash)} onClick={openExplorerTxUrl} txUrl={getExplorerTxUrl(txHash)} />
           <Button onClick={resetInteractState}>{intl.formatMessage({ id: 'common.back' })}</Button>
         </Styled.SuccessView>
       )

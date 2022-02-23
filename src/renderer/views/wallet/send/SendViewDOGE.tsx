@@ -8,37 +8,49 @@ import { useObservableState } from 'observable-hooks'
 import { useIntl } from 'react-intl'
 import { useHistory } from 'react-router-dom'
 
-import { Network } from '../../../../shared/api/types'
 import { WalletType } from '../../../../shared/wallet/types'
 import { Send } from '../../../components/wallet/txs/send'
 import { SendFormDOGE } from '../../../components/wallet/txs/send/'
 import { useChainContext } from '../../../contexts/ChainContext'
 import { useDogeContext } from '../../../contexts/DogeContext'
+import { useWalletContext } from '../../../contexts/WalletContext'
 import { getWalletBalanceByAsset } from '../../../helpers/walletHelper'
+import { useNetwork } from '../../../hooks/useNetwork'
+import { useOpenExplorerTxUrl } from '../../../hooks/useOpenExplorerTxUrl'
 import { useSubscriptionState } from '../../../hooks/useSubscriptionState'
 import { useValidateAddress } from '../../../hooks/useValidateAddress'
 import { INITIAL_SEND_STATE } from '../../../services/chain/const'
 import type { SendTxParams, SendTxState } from '../../../services/chain/types'
-import { OpenExplorerTxUrl, WalletBalances } from '../../../services/clients'
+import { WalletBalances } from '../../../services/clients'
 import { FeesWithRatesLD } from '../../../services/doge/types'
-import { NonEmptyWalletBalances, ValidatePasswordHandler, WalletBalance } from '../../../services/wallet/types'
+import { DEFAULT_BALANCES_FILTER, INITIAL_BALANCES_STATE } from '../../../services/wallet/const'
+import { WalletBalance } from '../../../services/wallet/types'
 import * as Helper from './SendView.helper'
 
 type Props = {
   walletType: WalletType
   walletIndex: number
   asset: Asset
-  balances: O.Option<NonEmptyWalletBalances>
-  openExplorerTxUrl: OpenExplorerTxUrl
-  validatePassword$: ValidatePasswordHandler
-  network: Network
 }
 
 export const SendViewDOGE: React.FC<Props> = (props): JSX.Element => {
-  const { walletType, walletIndex, asset, balances: oBalances, openExplorerTxUrl, validatePassword$, network } = props
+  const { walletType, walletIndex, asset } = props
 
   const intl = useIntl()
   const history = useHistory()
+
+  const { network } = useNetwork()
+  const {
+    balancesState$,
+    keystoreService: { validatePassword$ }
+  } = useWalletContext()
+
+  const [{ balances: oBalances }] = useObservableState(
+    () => balancesState$(DEFAULT_BALANCES_FILTER),
+    INITIAL_BALANCES_STATE
+  )
+
+  const { openExplorerTxUrl, getExplorerTxUrl } = useOpenExplorerTxUrl(O.some(DOGEChain))
 
   const oWalletBalance = useMemo(() => getWalletBalanceByAsset(oBalances, asset), [oBalances, asset])
 
@@ -121,6 +133,7 @@ export const SendViewDOGE: React.FC<Props> = (props): JSX.Element => {
         <Send
           txRD={sendTxState.status}
           viewTxHandler={openExplorerTxUrl}
+          getExplorerTxUrl={getExplorerTxUrl}
           finishActionHandler={finishActionHandler}
           errorActionHandler={resetSendTxState}
           sendForm={sendForm(walletBalance)}

@@ -1,8 +1,6 @@
 import React from 'react'
 
-import { THORChain } from '@xchainjs/xchain-util'
 import { Col, Row } from 'antd'
-import * as O from 'fp-ts/lib/Option'
 import { useObservableState } from 'observable-hooks'
 import { useParams } from 'react-router'
 
@@ -10,7 +8,6 @@ import { Network } from '../../../../shared/api/types'
 import { Interact } from '../../../components/interact'
 import { BackLink } from '../../../components/uielements/backLink'
 import { useAppContext } from '../../../contexts/AppContext'
-import { useOpenExplorerTxUrl } from '../../../hooks/useOpenExplorerTxUrl'
 import * as walletRoutes from '../../../routes/wallet'
 import { DEFAULT_NETWORK } from '../../../services/const'
 import { BondView } from './BondView'
@@ -27,8 +24,6 @@ export const InteractView: React.FC = () => {
   const { network$ } = useAppContext()
   const network = useObservableState<Network>(network$, DEFAULT_NETWORK)
 
-  const openExplorerTxUrl = useOpenExplorerTxUrl(O.some(THORChain))
-
   return (
     <>
       <Row justify="space-between">
@@ -39,23 +34,10 @@ export const InteractView: React.FC = () => {
       <Styled.ContentContainer>
         <Interact
           walletType={walletType}
-          bondContent={
-            <BondView
-              walletType={walletType}
-              walletIndex={walletIndex}
-              walletAddress={walletAddress}
-              goToTransaction={openExplorerTxUrl}
-            />
-          }
-          leaveContent={
-            <LeaveView walletType={walletType} walletIndex={walletIndex} openExplorerTxUrl={openExplorerTxUrl} />
-          }
-          unbondContent={
-            <UnbondView walletType={walletType} walletIndex={walletIndex} openExplorerTxUrl={openExplorerTxUrl} />
-          }
-          customContent={
-            <CustomView walletType={walletType} walletIndex={walletIndex} openExplorerTxUrl={openExplorerTxUrl} />
-          }
+          bondContent={<BondView walletType={walletType} walletIndex={walletIndex} walletAddress={walletAddress} />}
+          leaveContent={<LeaveView walletType={walletType} walletIndex={walletIndex} />}
+          unbondContent={<UnbondView walletType={walletType} walletIndex={walletIndex} />}
+          customContent={<CustomView walletType={walletType} walletIndex={walletIndex} />}
           network={network}
         />
       </Styled.ContentContainer>

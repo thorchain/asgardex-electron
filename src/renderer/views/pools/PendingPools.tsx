@@ -7,7 +7,7 @@ import { ColumnsType } from 'antd/lib/table'
 import * as A from 'fp-ts/Array'
 import * as FP from 'fp-ts/function'
 import * as O from 'fp-ts/lib/Option'
-import { Option, none, some } from 'fp-ts/lib/Option'
+import * as P from 'fp-ts/lib/Predicate'
 import { useObservableState } from 'observable-hooks'
 import { useIntl } from 'react-intl'
 import { useHistory } from 'react-router-dom'
@@ -60,7 +60,7 @@ export const PendingPools: React.FC<PoolsComponentProps> = ({ haltedChains, mimi
   const isDesktopView = Grid.useBreakpoint()?.lg ?? false
 
   // store previous data of pending pools to render these while reloading
-  const previousPools = useRef<Option<PoolTableRowsData>>(none)
+  const previousPools = useRef<O.Option<PoolTableRowsData>>(O.none)
 
   const { poolCycle, reloadPoolCycle } = usePoolCycle()
 
@@ -219,13 +219,13 @@ export const PendingPools: React.FC<PoolsComponentProps> = ({ haltedChains, mimi
         // success state
         ({ poolDetails }: PendingPoolsState): JSX.Element => {
           // filter out empty pools
-          const poolDetailsFiltered = A.filter<PoolDetail>(FP.not(isEmptyPool))(poolDetails)
+          const poolDetailsFiltered = A.filter<PoolDetail>(P.not(isEmptyPool))(poolDetails)
           const poolViewData = getPoolTableRowsData({
             poolDetails: poolDetailsFiltered,
             pricePoolData: selectedPricePool.poolData,
             network
           })
-          previousPools.current = some(poolViewData)
+          previousPools.current = O.some(poolViewData)
           return renderPoolsTable(poolViewData)
         }
       )(poolsRD)}

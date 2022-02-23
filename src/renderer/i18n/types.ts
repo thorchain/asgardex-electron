@@ -41,6 +41,7 @@ export type CommonMessageKey =
   | 'common.price.rune'
   | 'common.transaction'
   | 'common.viewTransaction'
+  | 'common.copyTxUrl'
   | 'common.fee'
   | 'common.fees'
   | 'common.fee.estimated'

@@ -5,7 +5,7 @@ import * as FP from 'fp-ts/function'
 import * as O from 'fp-ts/lib/Option'
 import { useIntl } from 'react-intl'
 
-import { OpenExplorerTxUrl } from '../../../../services/clients'
+import { GetExplorerTxUrl, OpenExplorerTxUrl } from '../../../../services/clients'
 import { TxHashRD } from '../../../../services/wallet/types'
 import { ErrorView } from '../../../shared/error/'
 import { SuccessView } from '../../../shared/success/'
@@ -26,6 +26,7 @@ export type Props = {
   sendForm: JSX.Element
   inititalActionHandler?: FP.Lazy<void>
   viewTxHandler: OpenExplorerTxUrl
+  getExplorerTxUrl: GetExplorerTxUrl
   finishActionHandler?: FP.Lazy<void>
   errorActionHandler?: FP.Lazy<void>
 }
@@ -34,7 +35,8 @@ export const Send: React.FC<Props> = (props): JSX.Element => {
   const {
     txRD,
     inititalActionHandler = FP.constVoid,
-    viewTxHandler = async () => Promise.resolve(),
+    viewTxHandler,
+    getExplorerTxUrl,
     finishActionHandler = FP.constVoid,
     sendForm,
     errorActionHandler = FP.constVoid
@@ -55,16 +57,17 @@ export const Send: React.FC<Props> = (props): JSX.Element => {
   const renderSuccessExtra = useCallback(
     (txHash: string) => {
       const onClickHandler = () => viewTxHandler(txHash)
+      const txUrl = getExplorerTxUrl(txHash)
       return (
         <Styled.SuccessExtraContainer>
           <Styled.SuccessExtraButton onClick={finishActionHandler}>
             {intl.formatMessage({ id: 'common.back' })}
           </Styled.SuccessExtraButton>
-          <ViewTxButton txHash={O.some(txHash)} onClick={onClickHandler} />
+          <ViewTxButton txHash={O.some(txHash)} onClick={onClickHandler} txUrl={txUrl} />
         </Styled.SuccessExtraContainer>
       )
     },
-    [intl, finishActionHandler, viewTxHandler]
+    [finishActionHandler, intl, getExplorerTxUrl, viewTxHandler]
   )
 
   return (

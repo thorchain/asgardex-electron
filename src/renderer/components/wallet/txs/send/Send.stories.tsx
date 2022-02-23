@@ -17,6 +17,7 @@ import {
   baseToAsset,
   formatAssetAmount
 } from '@xchainjs/xchain-util'
+import * as O from 'fp-ts/lib/Option'
 
 import { Network } from '../../../../../shared/api/types'
 import { BNB_TRANSFER_FEES } from '../../../../../shared/mock/fees'
@@ -41,6 +42,7 @@ const defaultProps = {
     console.log(`view tx handler: ${txHash}`)
     return Promise.resolve(true)
   },
+  getExplorerTxUrl: (txHash: TxHash) => O.some(`url/asset-${txHash}`),
   errorActionHandler: () => console.log('error action')
 }
 

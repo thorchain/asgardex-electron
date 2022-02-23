@@ -20,7 +20,6 @@ import { getAssetPoolPrice } from '../../../helpers/poolHelper'
 import * as ShareHelpers from '../../../helpers/poolShareHelper'
 import { liveData } from '../../../helpers/rx/liveData'
 import { useOpenExplorerTxUrl } from '../../../hooks/useOpenExplorerTxUrl'
-import { OpenExplorerTxUrl } from '../../../services/clients'
 import { DEFAULT_NETWORK } from '../../../services/const'
 import { PoolShare, PoolsDataMap } from '../../../services/midgard/types'
 import { DEFAULT_BALANCES_FILTER } from '../../../services/wallet/const'
@@ -103,7 +102,9 @@ export const WithdrawDepositView: React.FC<Props> = (props): JSX.Element => {
     [balances]
   )
 
-  const openRuneExplorerTxUrl: OpenExplorerTxUrl = useOpenExplorerTxUrl(O.some(THORChain))
+  const { openExplorerTxUrl: openRuneExplorerTxUrl, getExplorerTxUrl: getRuneExplorerTxUrl } = useOpenExplorerTxUrl(
+    O.some(THORChain)
+  )
 
   const { network$ } = useAppContext()
   const network = useObservableState<Network>(network$, DEFAULT_NETWORK)
@@ -131,6 +132,7 @@ export const WithdrawDepositView: React.FC<Props> = (props): JSX.Element => {
         disabled
         validatePassword$={validatePassword$}
         openRuneExplorerTxUrl={openRuneExplorerTxUrl}
+        getRuneExplorerTxUrl={getRuneExplorerTxUrl}
         reloadBalances={reloadBalancesAndShares}
         withdraw$={symWithdraw$}
         network={network}
@@ -149,6 +151,7 @@ export const WithdrawDepositView: React.FC<Props> = (props): JSX.Element => {
       reloadWithdrawFees,
       validatePassword$,
       openRuneExplorerTxUrl,
+      getRuneExplorerTxUrl,
       reloadBalancesAndShares,
       symWithdraw$,
       network
@@ -187,6 +190,7 @@ export const WithdrawDepositView: React.FC<Props> = (props): JSX.Element => {
         reloadFees={reloadWithdrawFees}
         validatePassword$={validatePassword$}
         openRuneExplorerTxUrl={openRuneExplorerTxUrl}
+        getRuneExplorerTxUrl={getRuneExplorerTxUrl}
         reloadBalances={reloadBalancesAndShares}
         withdraw$={symWithdraw$}
         network={network}
@@ -206,6 +210,7 @@ export const WithdrawDepositView: React.FC<Props> = (props): JSX.Element => {
       reloadWithdrawFees,
       validatePassword$,
       openRuneExplorerTxUrl,
+      getRuneExplorerTxUrl,
       reloadBalancesAndShares,
       symWithdraw$,
       network

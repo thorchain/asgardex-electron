@@ -2,6 +2,7 @@ import React from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
 import { Story, Meta } from '@storybook/react'
+import { TxHash } from '@xchainjs/xchain-client'
 import { assetAmount, AssetBNB, AssetRune67C, assetToBase, baseAmount, BNBChain } from '@xchainjs/xchain-util'
 import * as NEA from 'fp-ts/lib/NonEmptyArray'
 import * as O from 'fp-ts/lib/Option'
@@ -75,6 +76,7 @@ const defaultProps: UpgradeProps = {
     console.log('success handler ' + txHash)
     return Promise.resolve(true)
   },
+  getExplorerTxUrl: (txHash: TxHash) => O.some(`url/asset-${txHash}`),
   reloadBalancesHandler: () => console.log('reload balances'),
   network: 'testnet'
 }

@@ -45,6 +45,7 @@ export type WalletBalancesLD = LiveData<ApiError, WalletBalances>
 
 export type ExplorerUrl$ = Rx.Observable<O.Option<string>>
 export type OpenExplorerTxUrl = (txHash: string) => Promise<boolean>
+export type GetExplorerTxUrl = (txHash: string) => O.Option<string>
 export type OpenAddressUrl = (address: Address, params?: string) => Promise<boolean>
 export type AddressValidation = (address: Address) => boolean
 export type AddressValidationAsync = (address: Address) => Promise<boolean>

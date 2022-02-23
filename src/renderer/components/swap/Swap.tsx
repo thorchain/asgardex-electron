@@ -65,7 +65,7 @@ import {
   SwapFees,
   FeeRD
 } from '../../services/chain/types'
-import { AddressValidationAsync } from '../../services/clients'
+import { AddressValidationAsync, GetExplorerTxUrl, OpenExplorerTxUrl } from '../../services/clients'
 import {
   ApproveFeeHandler,
   ApproveParams,
@@ -111,7 +111,8 @@ export type SwapProps = {
   swap$: SwapStateHandler
   poolsData: PoolsDataMap
   walletBalances: Pick<BalancesState, 'balances' | 'loading'>
-  goToTransaction: (txHash: string) => void
+  goToTransaction: OpenExplorerTxUrl
+  getExplorerTxUrl: GetExplorerTxUrl
   validatePassword$: ValidatePasswordHandler
   reloadFees: ReloadSwapFeesHandler
   reloadBalances: FP.Lazy<void>
@@ -143,7 +144,8 @@ export const Swap = ({
   swap$,
   poolsData,
   walletBalances,
-  goToTransaction = (_) => {},
+  goToTransaction,
+  getExplorerTxUrl,
   validatePassword$,
   reloadFees,
   reloadBalances = FP.constVoid,
@@ -841,16 +843,13 @@ export const Swap = ({
       (id) => intl.formatMessage({ id })
     )
 
-    const onClickViewTxHandler = (txHash: string) =>
-      FP.pipe(
-        oSourceAsset,
-        O.map(({ chain }) => chain),
-        // Note: As long as we link to `viewblock` to open tx details in a browser,
-        // `0x` needs to be removed from tx hash in case of ETH
-        // @see https://github.com/thorchain/asgardex-electron/issues/1787#issuecomment-931934508
-        O.map((chain) => (isEthChain(chain) ? txHash.replace(/0x/i, '') : txHash)),
-        O.fold(FP.constVoid, goToTransaction)
-      )
+    const oTxHash = FP.pipe(
+      sequenceTOption(oSourceAsset, RD.toOption(swapTx)),
+      // Note: As long as we link to `viewblock` to open tx details in a browser,
+      // `0x` needs to be removed from tx hash in case of ETH
+      // @see https://github.com/thorchain/asgardex-electron/issues/1787#issuecomment-931934508
+      O.map(([{ chain }, txHash]) => (isEthChain(chain) ? txHash.replace(/0x/i, '') : txHash))
+    )
 
     return (
       <TxModal
@@ -859,13 +858,20 @@ export const Swap = ({
         onFinish={onFinishTxModal}
         startTime={swapStartTime}
         txRD={swap}
-        extraResult={<ViewTxButton txHash={RD.toOption(swapTx)} onClick={onClickViewTxHandler} />}
+        extraResult={
+          <ViewTxButton
+            txHash={oTxHash}
+            onClick={goToTransaction}
+            txUrl={FP.pipe(oTxHash, O.chain(getExplorerTxUrl))}
+          />
+        }
         timerValue={timerValue}
         extra={extraTxModalContent}
       />
     )
   }, [
     extraTxModalContent,
+    getExplorerTxUrl,
     goToTransaction,
     intl,
     oSourceAsset,
