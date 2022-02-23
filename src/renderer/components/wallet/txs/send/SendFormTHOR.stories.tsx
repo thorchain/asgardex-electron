@@ -1,70 +1,109 @@
 import React from 'react'
 
-import * as RD from '@devexperts/remote-data-ts'
 import { Story, Meta } from '@storybook/react'
-import {
-  assetAmount,
-  assetToBase,
-  assetToString,
-  baseAmount,
-  baseToAsset,
-  formatAssetAmount
-} from '@xchainjs/xchain-util'
+import { TxHash } from '@xchainjs/xchain-client'
+import { assetAmount, assetToBase, BaseAmount, baseAmount } from '@xchainjs/xchain-util'
+import * as FP from 'fp-ts/lib/function'
+import * as O from 'fp-ts/lib/Option'
+import * as Rx from 'rxjs'
 
+import { getMockRDValueFactory, RDStatus } from '../../../../../shared/mock/rdByStatus'
 import { mockValidatePassword$ } from '../../../../../shared/mock/wallet'
+import { WalletType } from '../../../../../shared/wallet/types'
 import { mockWalletBalance } from '../../../../helpers/test/testWalletHelper'
-import { SendTxParams } from '../../../../services/chain/types'
-import { WalletBalance } from '../../../../services/wallet/types'
-import { SendFormTHOR as Component, Props as ComponentProps } from './SendFormTHOR'
+import { FeeRD, SendTxStateHandler } from '../../../../services/chain/types'
+import { ApiError, ErrorId, WalletBalance } from '../../../../services/wallet/types'
+import { SendFormTHOR as Component } from './SendFormTHOR'
 
-const runeBalance: WalletBalance = mockWalletBalance({
-  amount: assetToBase(assetAmount(2))
-})
-
-const defaultProps: ComponentProps = {
-  walletType: 'keystore',
-  walletIndex: 0,
-  balances: [runeBalance],
-  balance: runeBalance,
-  onSubmit: ({ recipient, amount, asset, memo }: SendTxParams) =>
-    console.log(
-      `to: ${recipient}, amount ${formatAssetAmount({ amount: baseToAsset(amount) })}, asset: ${assetToString(
-        asset
-      )}, memo: ${memo}`
-    ),
-  isLoading: false,
-  addressValidation: (_) => true,
-  fee: RD.success(baseAmount(1000)),
-  reloadFeesHandler: () => console.log('reload fees'),
-  validatePassword$: mockValidatePassword$,
-  sendTxStatusMsg: '',
-  network: 'testnet'
+type Args = {
+  txRDStatus: RDStatus
+  feeRDStatus: RDStatus
+  balance: string
+  validAddress: boolean
+  walletType: WalletType
 }
 
-export const Default: Story = () => <Component {...defaultProps} />
-Default.storyName = 'default'
+const Template: Story<Args> = ({ txRDStatus, feeRDStatus, balance, validAddress, walletType }) => {
+  const transfer$: SendTxStateHandler = (_) =>
+    Rx.of({
+      steps: { current: txRDStatus === 'initial' ? 0 : 1, total: 1 },
+      status: FP.pipe(
+        txRDStatus,
+        getMockRDValueFactory<ApiError, TxHash>(
+          () => 'tx-hash',
+          () => ({
+            msg: 'error message',
+            errorId: ErrorId.SEND_TX
+          })
+        )
+      )
+    })
 
-export const Pending: Story = () => {
-  const props: ComponentProps = { ...defaultProps, isLoading: true, sendTxStatusMsg: 'Step 1/2' }
-  return <Component {...props} />
+  const feeRD: FeeRD = FP.pipe(
+    feeRDStatus,
+    getMockRDValueFactory<Error, BaseAmount>(
+      () => baseAmount(375000),
+      () => Error('getting fees failed')
+    )
+  )
+
+  const runeBalance: WalletBalance = mockWalletBalance({
+    amount: assetToBase(assetAmount(balance))
+  })
+
+  return (
+    <Component
+      walletType={walletType}
+      walletIndex={0}
+      transfer$={transfer$}
+      balances={[runeBalance]}
+      balance={runeBalance}
+      addressValidation={(_: string) => validAddress}
+      fee={feeRD}
+      reloadFeesHandler={() => console.log('reload fees')}
+      validatePassword$={mockValidatePassword$}
+      network="testnet"
+      openExplorerTxUrl={(txHash: TxHash) => {
+        console.log(`Open explorer - tx hash ${txHash}`)
+        return Promise.resolve(true)
+      }}
+      getExplorerTxUrl={(txHash: TxHash) => O.some(`url/asset-${txHash}`)}
+    />
+  )
 }
-Pending.storyName = 'pending'
 
-export const NoFees: Story = () => {
-  const props: ComponentProps = { ...defaultProps, fee: RD.failure(Error('no fees')) }
-  return <Component {...props} />
-}
-NoFees.storyName = 'no fees'
+export const Default = Template.bind({})
 
-export const FeeNotCovered: Story = () => {
-  const props: ComponentProps = { ...defaultProps, balances: [{ ...runeBalance, amount: baseAmount(30) }] }
-  return <Component {...props} />
-}
-FeeNotCovered.storyName = 'fees not covered'
-
-const meta: Meta = {
+const meta: Meta<Args> = {
   component: Component,
-  title: 'Wallet/SendFormTHOR'
+  title: 'Wallet/SendFormTHOR',
+  argTypes: {
+    txRDStatus: {
+      name: 'txRDStatus',
+      control: { type: 'select', options: ['initial', 'pending', 'error', 'success'] },
+      defaultValue: 'success'
+    },
+    feeRDStatus: {
+      name: 'feeRD',
+      control: { type: 'select', options: ['initial', 'pending', 'error', 'success'] },
+      defaultValue: 'success'
+    },
+    walletType: {
+      name: 'wallet type',
+      control: { type: 'select', options: ['keystore', 'ledger'] },
+      defaultValue: 'keystore'
+    },
+    balance: {
+      name: 'BNB Balance',
+      control: { type: 'text' },
+      defaultValue: '2'
+    },
+    validAddress: {
+      name: 'valid address',
+      control: { type: 'boolean' },
+      defaultValue: true
+    }
+  }
 }
 
 export default meta

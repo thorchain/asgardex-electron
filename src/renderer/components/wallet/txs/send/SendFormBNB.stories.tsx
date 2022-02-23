@@ -38,6 +38,7 @@ const Template: Story<Args> = ({ txRDStatus, feeRDStatus, balance, validAddress,
         )
       )
     })
+
   const feeRD: FeeRD = FP.pipe(
     feeRDStatus,
     getMockRDValueFactory<Error, BaseAmount>(
