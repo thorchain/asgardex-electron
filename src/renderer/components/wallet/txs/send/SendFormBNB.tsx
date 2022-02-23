@@ -26,11 +26,16 @@ import { ZERO_BASE_AMOUNT } from '../../../../const'
 import { isBnbAsset } from '../../../../helpers/assetHelper'
 import { sequenceTOption } from '../../../../helpers/fpHelpers'
 import { getBnbAmountFromBalances } from '../../../../helpers/walletHelper'
-import { FeeRD, SendTxParams } from '../../../../services/chain/types'
-import { AddressValidation, WalletBalances } from '../../../../services/clients'
+import { useSubscriptionState } from '../../../../hooks/useSubscriptionState'
+import { INITIAL_SEND_STATE } from '../../../../services/chain/const'
+import { FeeRD, SendTxState, SendTxStateHandler } from '../../../../services/chain/types'
+import { AddressValidation, GetExplorerTxUrl, OpenExplorerTxUrl, WalletBalances } from '../../../../services/clients'
 import { ValidatePasswordHandler } from '../../../../services/wallet/types'
 import { WalletBalance } from '../../../../services/wallet/types'
 import { LedgerConfirmationModal, WalletPasswordConfirmationModal } from '../../../modal/confirmation'
+import { TxModal } from '../../../modal/tx'
+import { SendAsset } from '../../../modal/tx/extra/SendAsset'
+import { ViewTxButton } from '../../../uielements/button'
 import { MaxBalanceButton } from '../../../uielements/button/MaxBalanceButton'
 import { UIFeesRD } from '../../../uielements/fees'
 import { Input, InputBigNumber } from '../../../uielements/input'
@@ -52,9 +57,9 @@ export type Props = {
   balance: WalletBalance
   walletAddress: Address
   walletIndex: number
-  onSubmit: (p: SendTxParams) => void
-  isLoading: boolean
-  sendTxStatusMsg: string
+  transfer$: SendTxStateHandler
+  openExplorerTxUrl: OpenExplorerTxUrl
+  getExplorerTxUrl: GetExplorerTxUrl
   addressValidation: AddressValidation
   fee: FeeRD
   reloadFeesHandler: FP.Lazy<void>
@@ -69,9 +74,9 @@ export const SendFormBNB: React.FC<Props> = (props): JSX.Element => {
     balance,
     walletAddress,
     walletIndex,
-    onSubmit,
-    isLoading,
-    sendTxStatusMsg,
+    transfer$,
+    openExplorerTxUrl,
+    getExplorerTxUrl,
     addressValidation,
     fee: feeRD,
     reloadFeesHandler,
@@ -81,20 +86,30 @@ export const SendFormBNB: React.FC<Props> = (props): JSX.Element => {
 
   const intl = useIntl()
 
+  const { asset } = balance
+
   const changeAssetHandler = useChangeAssetHandler()
 
   const [amountToSend, setAmountToSend] = useState<BaseAmount>(ZERO_BASE_AMOUNT)
+
+  const {
+    state: sendTxState,
+    reset: resetSendTxState,
+    subscribe: subscribeSendTxState
+  } = useSubscriptionState<SendTxState>(INITIAL_SEND_STATE)
+
+  const isLoading = useMemo(() => RD.isPending(sendTxState.status), [sendTxState.status])
 
   const [form] = Form.useForm<FormValues>()
 
   const oBnbAmount: O.Option<BaseAmount> = useMemo(() => {
     // return balance of current asset (if BNB)
-    if (isBnbAsset(balance.asset)) {
+    if (isBnbAsset(asset)) {
       return O.some(balance.amount)
     }
     // or check list of other assets to get bnb balance
     return FP.pipe(balances, getBnbAmountFromBalances, O.map(assetToBase))
-  }, [balance, balances])
+  }, [asset, balance.amount, balances])
 
   const oFee: O.Option<BaseAmount> = useMemo(() => FP.pipe(feeRD, RD.toOption), [feeRD])
 
@@ -153,8 +168,8 @@ export const SendFormBNB: React.FC<Props> = (props): JSX.Element => {
         ([fee, bnbAmount]) => baseAmount(bnbAmount.amount().minus(fee.amount()))
       )
     )
-    return isBnbAsset(balance.asset) ? maxBnbAmount : balance.amount
-  }, [oFee, oBnbAmount, balance])
+    return isBnbAsset(asset) ? maxBnbAmount : balance.amount
+  }, [oFee, oBnbAmount, asset, balance.amount])
 
   useEffect(() => {
     // Whenever `amountToSend` has been updated, we put it back into input field
@@ -169,33 +184,37 @@ export const SendFormBNB: React.FC<Props> = (props): JSX.Element => {
       const errors = {
         msg1: intl.formatMessage({ id: 'wallet.errors.amount.shouldBeNumber' }),
         msg2: intl.formatMessage({ id: 'wallet.errors.amount.shouldBeGreaterThan' }, { amount: '0' }),
-        msg3: isBnbAsset(balance.asset)
+        msg3: isBnbAsset(asset)
           ? intl.formatMessage({ id: 'wallet.errors.amount.shouldBeLessThanBalanceAndFee' })
           : intl.formatMessage({ id: 'wallet.errors.amount.shouldBeLessThanBalance' })
       }
       return validateTxAmountInput({ input: value, maxAmount: baseToAsset(maxAmount), errors })
     },
-    [balance, intl, maxAmount]
+    [asset, intl, maxAmount]
   )
 
   const [showConfirmationModal, setShowConfirmationModal] = useState(false)
 
-  const sendHandler = useCallback(() => {
-    onSubmit({
-      walletType,
-      walletIndex,
-      sender: walletAddress,
-      recipient: form.getFieldValue('recipient'),
-      asset: balance.asset,
-      amount: amountToSend,
-      memo: form.getFieldValue('memo')
-    })
-  }, [onSubmit, walletType, walletAddress, form, balance.asset, amountToSend, walletIndex])
+  const submitSendTx = useCallback(() => {
+    setSendTxStartTime(Date.now())
+
+    subscribeSendTxState(
+      transfer$({
+        walletType,
+        walletIndex,
+        sender: walletAddress,
+        recipient: form.getFieldValue('recipient'),
+        asset,
+        amount: amountToSend,
+        memo: form.getFieldValue('memo')
+      })
+    )
+  }, [asset, subscribeSendTxState, transfer$, walletType, walletIndex, walletAddress, form, amountToSend])
 
   const renderConfirmationModal = useMemo(() => {
     const onSuccessHandler = () => {
       setShowConfirmationModal(false)
-      sendHandler()
+      submitSendTx()
     }
     const onCloseHandler = () => {
       setShowConfirmationModal(false)
@@ -223,7 +242,60 @@ export const SendFormBNB: React.FC<Props> = (props): JSX.Element => {
     } else {
       return null
     }
-  }, [intl, network, sendHandler, showConfirmationModal, validatePassword$, walletType])
+  }, [intl, network, submitSendTx, showConfirmationModal, validatePassword$, walletType])
+
+  const extraTxModalContent = useMemo(() => {
+    const { status } = sendTxState
+    const title = H.getSendTxDescription({ status, asset, intl })
+    return <SendAsset asset={{ asset, amount: amountToSend }} title={title} network={network} />
+  }, [intl, asset, sendTxState, amountToSend, network])
+
+  // Send tx start time
+  const [sendTxStartTime, setSendTxStartTime] = useState<number>(0)
+
+  const onFinishTxModal = useCallback(() => {
+    resetSendTxState()
+  }, [resetSendTxState])
+
+  const renderTxModal = useMemo(() => {
+    const { status } = sendTxState
+
+    // don't render TxModal in initial state
+    if (RD.isInitial(status)) return <></>
+
+    const oTxHash = RD.toOption(status)
+    const txRD = FP.pipe(
+      status,
+      RD.map((txHash) => !!txHash)
+    )
+    return (
+      <TxModal
+        title={intl.formatMessage({ id: 'common.tx.sending' })}
+        onClose={resetSendTxState}
+        onFinish={onFinishTxModal}
+        startTime={sendTxStartTime}
+        txRD={txRD}
+        extraResult={
+          <ViewTxButton
+            txHash={oTxHash}
+            onClick={openExplorerTxUrl}
+            txUrl={FP.pipe(oTxHash, O.chain(getExplorerTxUrl))}
+          />
+        }
+        timerValue={H.getSendTxTimerValue(status)}
+        extra={extraTxModalContent}
+      />
+    )
+  }, [
+    sendTxState,
+    resetSendTxState,
+    onFinishTxModal,
+    sendTxStartTime,
+    openExplorerTxUrl,
+    getExplorerTxUrl,
+    extraTxModalContent,
+    intl
+  ])
 
   const uiFeesRD: UIFeesRD = useMemo(
     () =>
@@ -265,12 +337,7 @@ export const SendFormBNB: React.FC<Props> = (props): JSX.Element => {
     <>
       <Row>
         <Styled.Col span={24}>
-          <AccountSelector
-            onChange={changeAssetHandler}
-            selectedWallet={balance}
-            walletBalances={balances}
-            network={network}
-          />
+          <AccountSelector onChange={changeAssetHandler} selectedWallet={balance} network={network} />
           <Styled.Form
             form={form}
             initialValues={{ amount: bn(0) }}
@@ -289,7 +356,7 @@ export const SendFormBNB: React.FC<Props> = (props): JSX.Element => {
                 <InputBigNumber min={0} size="large" disabled={isLoading} decimal={8} onChange={onChangeInput} />
               </Styled.FormItem>
               <MaxBalanceButton
-                balance={{ amount: maxAmount, asset: balance.asset }}
+                balance={{ amount: maxAmount, asset }}
                 onClick={addMaxAmountHandler}
                 disabled={isLoading}
               />
@@ -301,7 +368,6 @@ export const SendFormBNB: React.FC<Props> = (props): JSX.Element => {
               </Form.Item>
             </Styled.SubForm>
             <Styled.SubmitContainer>
-              <Styled.SubmitStatus>{sendTxStatusMsg}</Styled.SubmitStatus>
               <Styled.Button loading={isLoading} disabled={isFeeError} htmlType="submit">
                 {intl.formatMessage({ id: 'wallet.action.send' })}
               </Styled.Button>
@@ -310,6 +376,7 @@ export const SendFormBNB: React.FC<Props> = (props): JSX.Element => {
         </Styled.Col>
       </Row>
       {showConfirmationModal && renderConfirmationModal}
+      {renderTxModal}
     </>
   )
 }
