@@ -195,7 +195,7 @@ export const SendFormBNB: React.FC<Props> = (props): JSX.Element => {
 
   const [showConfirmationModal, setShowConfirmationModal] = useState(false)
 
-  const submitSendTx = useCallback(() => {
+  const submitTx = useCallback(() => {
     setSendTxStartTime(Date.now())
 
     subscribeSendTxState(
@@ -214,7 +214,7 @@ export const SendFormBNB: React.FC<Props> = (props): JSX.Element => {
   const renderConfirmationModal = useMemo(() => {
     const onSuccessHandler = () => {
       setShowConfirmationModal(false)
-      submitSendTx()
+      submitTx()
     }
     const onCloseHandler = () => {
       setShowConfirmationModal(false)
@@ -242,7 +242,7 @@ export const SendFormBNB: React.FC<Props> = (props): JSX.Element => {
     } else {
       return null
     }
-  }, [intl, network, submitSendTx, showConfirmationModal, validatePassword$, walletType])
+  }, [intl, network, submitTx, showConfirmationModal, validatePassword$, walletType])
 
   const extraTxModalContent = useMemo(() => {
     const { status } = sendTxState

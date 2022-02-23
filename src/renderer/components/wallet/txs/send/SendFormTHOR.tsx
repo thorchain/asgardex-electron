@@ -26,11 +26,16 @@ import { ZERO_BASE_AMOUNT } from '../../../../const'
 import { isRuneNativeAsset, THORCHAIN_DECIMAL } from '../../../../helpers/assetHelper'
 import { sequenceTOption } from '../../../../helpers/fpHelpers'
 import { getRuneNativeAmountFromBalances } from '../../../../helpers/walletHelper'
-import { FeeRD, SendTxParams } from '../../../../services/chain/types'
-import { AddressValidation, WalletBalances } from '../../../../services/clients'
+import { useSubscriptionState } from '../../../../hooks/useSubscriptionState'
+import { INITIAL_SEND_STATE } from '../../../../services/chain/const'
+import { FeeRD, SendTxState, SendTxStateHandler } from '../../../../services/chain/types'
+import { AddressValidation, GetExplorerTxUrl, OpenExplorerTxUrl, WalletBalances } from '../../../../services/clients'
 import { ValidatePasswordHandler } from '../../../../services/wallet/types'
 import { WalletBalance } from '../../../../services/wallet/types'
 import { LedgerConfirmationModal, WalletPasswordConfirmationModal } from '../../../modal/confirmation'
+import { TxModal } from '../../../modal/tx'
+import { SendAsset } from '../../../modal/tx/extra/SendAsset'
+import { ViewTxButton } from '../../../uielements/button'
 import { MaxBalanceButton } from '../../../uielements/button/MaxBalanceButton'
 import { UIFeesRD } from '../../../uielements/fees'
 import { Input, InputBigNumber } from '../../../uielements/input'
@@ -51,9 +56,9 @@ export type Props = {
   walletIndex: number
   balances: WalletBalances
   balance: WalletBalance
-  onSubmit: (p: SendTxParams) => void
-  isLoading: boolean
-  sendTxStatusMsg: string
+  transfer$: SendTxStateHandler
+  openExplorerTxUrl: OpenExplorerTxUrl
+  getExplorerTxUrl: GetExplorerTxUrl
   addressValidation: AddressValidation
   fee: FeeRD
   reloadFeesHandler: FP.Lazy<void>
@@ -67,9 +72,9 @@ export const SendFormTHOR: React.FC<Props> = (props): JSX.Element => {
     walletIndex,
     balances,
     balance,
-    onSubmit,
-    isLoading,
-    sendTxStatusMsg,
+    transfer$,
+    openExplorerTxUrl,
+    getExplorerTxUrl,
     addressValidation,
     fee: feeRD,
     reloadFeesHandler,
@@ -79,20 +84,30 @@ export const SendFormTHOR: React.FC<Props> = (props): JSX.Element => {
 
   const intl = useIntl()
 
+  const { asset } = balance
+
   const changeAssetHandler = useChangeAssetHandler()
 
   const [amountToSend, setAmountToSend] = useState<BaseAmount>(ZERO_BASE_AMOUNT)
+
+  const {
+    state: sendTxState,
+    reset: resetSendTxState,
+    subscribe: subscribeSendTxState
+  } = useSubscriptionState<SendTxState>(INITIAL_SEND_STATE)
+
+  const isLoading = useMemo(() => RD.isPending(sendTxState.status), [sendTxState.status])
 
   const [form] = Form.useForm<FormValues>()
 
   const oRuneNativeAmount: O.Option<BaseAmount> = useMemo(() => {
     // return balance of current asset (if RuneNative)
-    if (isRuneNativeAsset(balance.asset)) {
+    if (isRuneNativeAsset(asset)) {
       return O.some(balance.amount)
     }
     // or check list of other assets to get RuneNative balance
     return FP.pipe(balances, getRuneNativeAmountFromBalances, O.map(assetToBase))
-  }, [balance, balances])
+  }, [asset, balance.amount, balances])
 
   const oFee: O.Option<BaseAmount> = useMemo(() => FP.pipe(feeRD, RD.toOption), [feeRD])
 
@@ -152,8 +167,8 @@ export const SendFormTHOR: React.FC<Props> = (props): JSX.Element => {
         ([fee, runeAmount]) => baseAmount(runeAmount.amount().minus(fee.amount()), THORCHAIN_DECIMAL)
       )
     )
-    return isRuneNativeAsset(balance.asset) ? maxRuneAmount : balance.amount
-  }, [oFee, oRuneNativeAmount, balance.asset, balance.amount])
+    return isRuneNativeAsset(asset) ? maxRuneAmount : balance.amount
+  }, [oFee, oRuneNativeAmount, asset, balance.amount])
 
   useEffect(() => {
     // Whenever `amountToSend` has been updated, we put it back into input field
@@ -168,32 +183,39 @@ export const SendFormTHOR: React.FC<Props> = (props): JSX.Element => {
       const errors = {
         msg1: intl.formatMessage({ id: 'wallet.errors.amount.shouldBeNumber' }),
         msg2: intl.formatMessage({ id: 'wallet.errors.amount.shouldBeGreaterThan' }, { amount: '0' }),
-        msg3: isRuneNativeAsset(balance.asset)
+        msg3: isRuneNativeAsset(asset)
           ? intl.formatMessage({ id: 'wallet.errors.amount.shouldBeLessThanBalanceAndFee' })
           : intl.formatMessage({ id: 'wallet.errors.amount.shouldBeLessThanBalance' })
       }
       return validateTxAmountInput({ input: value, maxAmount: baseToAsset(maxAmount), errors })
     },
-    [balance, intl, maxAmount]
+    [asset, intl, maxAmount]
   )
 
-  const [showConfirmationModal, setShowConfirmationModal] = useState(false)
+  // Send tx start time
+  const [sendTxStartTime, setSendTxStartTime] = useState<number>(0)
 
-  const sendHandler = useCallback(() => {
-    onSubmit({
-      walletType,
-      walletIndex,
-      recipient: form.getFieldValue('recipient'),
-      asset: balance.asset,
-      amount: amountToSend,
-      memo: form.getFieldValue('memo')
-    })
-  }, [onSubmit, form, balance.asset, amountToSend, walletType, walletIndex])
+  const submitTx = useCallback(() => {
+    setSendTxStartTime(Date.now())
+
+    subscribeSendTxState(
+      transfer$({
+        walletType,
+        walletIndex,
+        recipient: form.getFieldValue('recipient'),
+        asset,
+        amount: amountToSend,
+        memo: form.getFieldValue('memo')
+      })
+    )
+  }, [subscribeSendTxState, transfer$, walletType, walletIndex, form, asset, amountToSend])
+
+  const [showConfirmationModal, setShowConfirmationModal] = useState(false)
 
   const renderConfirmationModal = useMemo(() => {
     const onSuccessHandler = () => {
       setShowConfirmationModal(false)
-      sendHandler()
+      submitTx()
     }
     const onCloseHandler = () => {
       setShowConfirmationModal(false)
@@ -221,7 +243,57 @@ export const SendFormTHOR: React.FC<Props> = (props): JSX.Element => {
     } else {
       return null
     }
-  }, [intl, network, sendHandler, showConfirmationModal, validatePassword$, walletType])
+  }, [intl, network, submitTx, showConfirmationModal, validatePassword$, walletType])
+
+  const extraTxModalContent = useMemo(() => {
+    const { status } = sendTxState
+    const title = H.getSendTxDescription({ status, asset, intl })
+    return <SendAsset asset={{ asset, amount: amountToSend }} title={title} network={network} />
+  }, [intl, asset, sendTxState, amountToSend, network])
+
+  const onFinishTxModal = useCallback(() => {
+    resetSendTxState()
+  }, [resetSendTxState])
+
+  const renderTxModal = useMemo(() => {
+    const { status } = sendTxState
+
+    // don't render TxModal in initial state
+    if (RD.isInitial(status)) return <></>
+
+    const oTxHash = RD.toOption(status)
+    const txRD = FP.pipe(
+      status,
+      RD.map((txHash) => !!txHash)
+    )
+    return (
+      <TxModal
+        title={intl.formatMessage({ id: 'common.tx.sending' })}
+        onClose={resetSendTxState}
+        onFinish={onFinishTxModal}
+        startTime={sendTxStartTime}
+        txRD={txRD}
+        extraResult={
+          <ViewTxButton
+            txHash={oTxHash}
+            onClick={openExplorerTxUrl}
+            txUrl={FP.pipe(oTxHash, O.chain(getExplorerTxUrl))}
+          />
+        }
+        timerValue={H.getSendTxTimerValue(status)}
+        extra={extraTxModalContent}
+      />
+    )
+  }, [
+    sendTxState,
+    resetSendTxState,
+    onFinishTxModal,
+    sendTxStartTime,
+    openExplorerTxUrl,
+    getExplorerTxUrl,
+    extraTxModalContent,
+    intl
+  ])
 
   const uiFeesRD: UIFeesRD = useMemo(
     () =>
@@ -263,12 +335,7 @@ export const SendFormTHOR: React.FC<Props> = (props): JSX.Element => {
     <>
       <Row>
         <Styled.Col span={24}>
-          <AccountSelector
-            onChange={changeAssetHandler}
-            selectedWallet={balance}
-            walletBalances={balances}
-            network={network}
-          />
+          <AccountSelector onChange={changeAssetHandler} selectedWallet={balance} network={network} />
           <Styled.Form
             form={form}
             initialValues={{ amount: bn(0) }}
@@ -293,7 +360,7 @@ export const SendFormTHOR: React.FC<Props> = (props): JSX.Element => {
                 />
               </Styled.FormItem>
               <MaxBalanceButton
-                balance={{ amount: maxAmount, asset: balance.asset }}
+                balance={{ amount: maxAmount, asset: asset }}
                 onClick={addMaxAmountHandler}
                 disabled={isLoading}
               />
@@ -305,7 +372,6 @@ export const SendFormTHOR: React.FC<Props> = (props): JSX.Element => {
               </Form.Item>
             </Styled.SubForm>
             <Styled.SubmitContainer>
-              <Styled.SubmitStatus>{sendTxStatusMsg}</Styled.SubmitStatus>
               <Styled.Button loading={isLoading} disabled={isFeeError} htmlType="submit">
                 {intl.formatMessage({ id: 'wallet.action.send' })}
               </Styled.Button>
@@ -314,6 +380,7 @@ export const SendFormTHOR: React.FC<Props> = (props): JSX.Element => {
         </Styled.Col>
       </Row>
       {showConfirmationModal && renderConfirmationModal}
+      {renderTxModal}
     </>
   )
 }
