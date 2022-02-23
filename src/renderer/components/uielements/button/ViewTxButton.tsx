@@ -32,8 +32,8 @@ export const ViewTxButton: React.FC<Props> = ({
   )
 
   return (
-    <Styled.Wrapper>
-      <Styled.ViewTxButton onClick={onClickHandler} disabled={O.isNone(oTxHash)} className={className}>
+    <Styled.Wrapper className={className}>
+      <Styled.ViewTxButton onClick={onClickHandler} disabled={O.isNone(oTxHash)}>
         {label || intl.formatMessage({ id: 'common.viewTransaction' })}
       </Styled.ViewTxButton>
       <Styled.CopyLabel
