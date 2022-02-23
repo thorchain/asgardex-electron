@@ -858,7 +858,13 @@ export const Swap = ({
         onFinish={onFinishTxModal}
         startTime={swapStartTime}
         txRD={swap}
-        extraResult={<ViewTxButton txHash={oTxHash} onClick={goToTransaction} getExplorerTxUrl={getExplorerTxUrl} />}
+        extraResult={
+          <ViewTxButton
+            txHash={oTxHash}
+            onClick={goToTransaction}
+            txUrl={FP.pipe(oTxHash, O.chain(getExplorerTxUrl))}
+          />
+        }
         timerValue={timerValue}
         extra={extraTxModalContent}
       />

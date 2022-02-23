@@ -28,8 +28,6 @@ export const ViewTxButton = styled(UIButton).attrs({
 const ICON_SIZE = 19
 
 export const CopyLabel = styled(A.Typography.Text)`
-  text-transform: uppercase;
-  color: ${palette('primary', 0)};
   svg {
     color: ${palette('primary', 0)};
     height: ${ICON_SIZE}px;

@@ -57,12 +57,13 @@ export const Send: React.FC<Props> = (props): JSX.Element => {
   const renderSuccessExtra = useCallback(
     (txHash: string) => {
       const onClickHandler = () => viewTxHandler(txHash)
+      const txUrl = getExplorerTxUrl(txHash)
       return (
         <Styled.SuccessExtraContainer>
           <Styled.SuccessExtraButton onClick={finishActionHandler}>
             {intl.formatMessage({ id: 'common.back' })}
           </Styled.SuccessExtraButton>
-          <ViewTxButton txHash={O.some(txHash)} onClick={onClickHandler} getExplorerTxUrl={getExplorerTxUrl} />
+          <ViewTxButton txHash={O.some(txHash)} onClick={onClickHandler} txUrl={txUrl} />
         </Styled.SuccessExtraContainer>
       )
     },

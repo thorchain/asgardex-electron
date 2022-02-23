@@ -5,13 +5,12 @@ import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
 import { useIntl } from 'react-intl'
 
-import { GetExplorerTxUrl } from '../../../services/clients'
 import * as Styled from './ViewTxButton.styles'
 
 type Props = {
   label?: string
-  getExplorerTxUrl: GetExplorerTxUrl
   txHash: O.Option<TxHash>
+  txUrl: O.Option<string>
   onClick: (txHash: string) => void
   className?: string
 }
@@ -19,7 +18,7 @@ type Props = {
 export const ViewTxButton: React.FC<Props> = ({
   onClick,
   txHash: oTxHash,
-  getExplorerTxUrl,
+  txUrl: oTxUrl,
   label,
   className
 }): JSX.Element => {
@@ -40,8 +39,7 @@ export const ViewTxButton: React.FC<Props> = ({
       <Styled.CopyLabel
         copyable={
           FP.pipe(
-            oTxHash,
-            O.chain((txHash) => getExplorerTxUrl(txHash)),
+            oTxUrl,
             O.map((url) => ({
               text: url,
               tooltips: intl.formatMessage({ id: 'common.copyTxUrl' })

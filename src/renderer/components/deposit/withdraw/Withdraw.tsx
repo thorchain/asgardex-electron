@@ -314,7 +314,7 @@ export const Withdraw: React.FC<Props> = ({
           <Styled.ViewTxButtonTop
             txHash={oTxHash}
             onClick={openRuneExplorerTxUrl}
-            getExplorerTxUrl={getRuneExplorerTxUrl}
+            txUrl={FP.pipe(oTxHash, O.chain(getRuneExplorerTxUrl))}
             label={intl.formatMessage({ id: 'common.tx.view' }, { assetTicker: AssetRuneNative.ticker })}
           />
         ))}

@@ -907,7 +907,7 @@ export const SymDeposit: React.FC<Props> = (props) => {
           <Styled.ViewTxButtonTop
             txHash={oTxHash}
             onClick={openAssetExplorerTxUrl}
-            getExplorerTxUrl={getAssetExplorerTxUrl}
+            txUrl={FP.pipe(oTxHash, O.chain(getAssetExplorerTxUrl))}
             label={intl.formatMessage({ id: 'common.tx.view' }, { assetTicker: asset.ticker })}
           />
         ))}
@@ -915,7 +915,7 @@ export const SymDeposit: React.FC<Props> = (props) => {
           <ViewTxButton
             txHash={oTxHash}
             onClick={openRuneExplorerTxUrl}
-            getExplorerTxUrl={getRuneExplorerTxUrl}
+            txUrl={FP.pipe(oTxHash, O.chain(getRuneExplorerTxUrl))}
             label={intl.formatMessage({ id: 'common.tx.view' }, { assetTicker: AssetRuneNative.ticker })}
           />
         ))}

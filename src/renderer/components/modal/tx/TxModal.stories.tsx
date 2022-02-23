@@ -63,7 +63,7 @@ const extraResult = (): JSX.Element => (
   <ViewTxButton
     txHash={O.some('hash')}
     onClick={(txHash: TxHash) => console.log('txHash', txHash)}
-    getExplorerTxUrl={(txHash: TxHash) => O.some(`url/asset-${txHash}`)}
+    txUrl={O.some(`http://txurl.example`)}
   />
 )
 

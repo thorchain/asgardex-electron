@@ -108,11 +108,7 @@ export const BondView: React.FC<Props> = ({ walletType, walletIndex, walletAddre
       ),
       (txHash) => (
         <Styled.SuccessView title={intl.formatMessage({ id: 'common.tx.success' })}>
-          <Styled.ViewTxButton
-            txHash={O.some(txHash)}
-            onClick={openExplorerTxUrl}
-            getExplorerTxUrl={getExplorerTxUrl}
-          />
+          <Styled.ViewTxButton txHash={O.some(txHash)} onClick={openExplorerTxUrl} txUrl={getExplorerTxUrl(txHash)} />
           <Button onClick={resetInteractState}>{intl.formatMessage({ id: 'common.back' })}</Button>
         </Styled.SuccessView>
       )
