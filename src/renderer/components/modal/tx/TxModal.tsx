@@ -54,6 +54,8 @@ export const TxModal: React.FC<Props> = (props): JSX.Element => {
       color: 'success',
       disabled: false,
       onClick: onClose,
+      sizevalue: 'xnormal',
+      round: 'true',
       children: <>{intl.formatMessage({ id: 'common.finish' })}</>
     }
 

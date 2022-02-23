@@ -18,7 +18,7 @@ import * as Styled from './AccountSelector.styles'
 
 type Props = {
   selectedWallet: WalletBalance
-  walletBalances: WalletBalances
+  walletBalances?: WalletBalances
   onChange?: (params: { asset: Asset; walletAddress: Address; walletType: WalletType; walletIndex: number }) => void
   size?: IconSize
   network: Network
@@ -30,7 +30,7 @@ const filterFunction = ({ asset }: WalletBalance, searchTerm: string) => {
 }
 
 export const AccountSelector: React.FC<Props> = (props): JSX.Element => {
-  const { selectedWallet, walletBalances, onChange = (_) => {}, size = 'large', network } = props
+  const { selectedWallet, walletBalances = [], onChange = (_) => {}, size = 'large', network } = props
 
   const intl = useIntl()
 

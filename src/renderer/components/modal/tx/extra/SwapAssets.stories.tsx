@@ -1,13 +1,12 @@
 import React from 'react'
 
 import { Story, Meta } from '@storybook/react'
-import { assetAmount, AssetBNB, AssetRuneNative, assetToBase, bn } from '@xchainjs/xchain-util'
+import { assetAmount, AssetBNB, AssetRuneNative, assetToBase } from '@xchainjs/xchain-util'
 
 import { SwapAssets, Props } from './SwapAssets'
 
 const defaultProps: Props = {
   stepDescription: 'step 1',
-  slip: bn(1),
   source: { asset: AssetRuneNative, amount: assetToBase(assetAmount(30)) },
   target: { asset: AssetBNB, amount: assetToBase(assetAmount(1)) },
   network: 'testnet'

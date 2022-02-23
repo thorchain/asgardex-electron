@@ -1,84 +1,116 @@
 import React from 'react'
 
-import * as RD from '@devexperts/remote-data-ts'
 import { Story, Meta } from '@storybook/react'
-import {
-  assetAmount,
-  AssetBNB,
-  AssetRune67C,
-  assetToBase,
-  assetToString,
-  baseAmount,
-  baseToAsset,
-  formatAssetAmount
-} from '@xchainjs/xchain-util'
+import { TxHash } from '@xchainjs/xchain-client'
+import { assetAmount, AssetBNB, AssetRune67C, assetToBase, BaseAmount, baseAmount } from '@xchainjs/xchain-util'
+import * as FP from 'fp-ts/lib/function'
+import * as O from 'fp-ts/lib/Option'
+import * as Rx from 'rxjs'
 
+import { getMockRDValueFactory, RDStatus } from '../../../../../shared/mock/rdByStatus'
 import { mockValidatePassword$ } from '../../../../../shared/mock/wallet'
+import { WalletType } from '../../../../../shared/wallet/types'
 import { mockWalletBalance } from '../../../../helpers/test/testWalletHelper'
-import { SendTxParams } from '../../../../services/chain/types'
-import { WalletBalance } from '../../../../services/wallet/types'
-import { SendFormBNB, Props as SendFormBNBProps } from './SendFormBNB'
+import { FeeRD, SendTxStateHandler } from '../../../../services/chain/types'
+import { ApiError, ErrorId, WalletBalance } from '../../../../services/wallet/types'
+import { SendFormBNB as Component } from './SendFormBNB'
 
-const bnbBalance: WalletBalance = mockWalletBalance({
-  asset: AssetBNB,
-  amount: assetToBase(assetAmount(123)),
-  walletAddress: 'AssetBNB wallet address'
-})
+type Args = {
+  txRDStatus: RDStatus
+  feeRDStatus: RDStatus
+  balance: string
+  validAddress: boolean
+  walletType: WalletType
+}
 
-const runeBalance: WalletBalance = mockWalletBalance({
-  asset: AssetRune67C,
-  amount: assetToBase(assetAmount(234)),
-  walletAddress: 'AssetRune67C wallet address'
-})
-
-const defaultProps: SendFormBNBProps = {
-  walletType: 'keystore',
-  walletIndex: 0,
-  walletAddress: 'bnb-address',
-  balances: [bnbBalance, runeBalance],
-  balance: bnbBalance,
-  onSubmit: ({ recipient, amount, asset, memo }: SendTxParams) => {
-    console.log(
-      `to: ${recipient}, amount ${formatAssetAmount({ amount: baseToAsset(amount) })}, asset: ${assetToString(
-        asset
-      )}, memo: ${memo}`
+const Template: Story<Args> = ({ txRDStatus, feeRDStatus, balance, validAddress, walletType }) => {
+  const transfer$: SendTxStateHandler = (_) =>
+    Rx.of({
+      steps: { current: txRDStatus === 'initial' ? 0 : 1, total: 1 },
+      status: FP.pipe(
+        txRDStatus,
+        getMockRDValueFactory<ApiError, TxHash>(
+          () => 'tx-hash',
+          () => ({
+            msg: 'error message',
+            errorId: ErrorId.SEND_TX
+          })
+        )
+      )
+    })
+  const feeRD: FeeRD = FP.pipe(
+    feeRDStatus,
+    getMockRDValueFactory<Error, BaseAmount>(
+      () => baseAmount(375000),
+      () => Error('getting fees failed')
     )
-  },
+  )
 
-  isLoading: false,
-  addressValidation: (_: string) => true,
-  fee: RD.success(baseAmount(37500)),
-  reloadFeesHandler: () => console.log('reload fees'),
-  validatePassword$: mockValidatePassword$,
-  sendTxStatusMsg: '',
-  network: 'testnet'
+  const bnbBalance: WalletBalance = mockWalletBalance({
+    asset: AssetBNB,
+    amount: assetToBase(assetAmount(balance)),
+    walletAddress: 'AssetBNB wallet address'
+  })
+
+  const runeBalance: WalletBalance = mockWalletBalance({
+    asset: AssetRune67C,
+    amount: assetToBase(assetAmount(234)),
+    walletAddress: 'AssetRune67C wallet address'
+  })
+  return (
+    <Component
+      walletType={walletType}
+      walletIndex={0}
+      walletAddress={'bnb-address'}
+      transfer$={transfer$}
+      balances={[bnbBalance, runeBalance]}
+      balance={bnbBalance}
+      addressValidation={(_: string) => validAddress}
+      fee={feeRD}
+      reloadFeesHandler={() => console.log('reload fees')}
+      validatePassword$={mockValidatePassword$}
+      network="testnet"
+      openExplorerTxUrl={(txHash: TxHash) => {
+        console.log(`Open explorer - tx hash ${txHash}`)
+        return Promise.resolve(true)
+      }}
+      getExplorerTxUrl={(txHash: TxHash) => O.some(`url/asset-${txHash}`)}
+    />
+  )
 }
 
-export const SendBnb: Story = () => <SendFormBNB {...defaultProps} />
+export const Default = Template.bind({})
 
-export const SendRune: Story = () => {
-  const props: SendFormBNBProps = { ...defaultProps, balance: runeBalance }
-  return <SendFormBNB {...props} />
-}
-
-export const Pending: Story = () => {
-  const props: SendFormBNBProps = { ...defaultProps, isLoading: true, sendTxStatusMsg: 'Step 1/2' }
-  return <SendFormBNB {...props} />
-}
-
-export const NoFees: Story = () => {
-  const props: SendFormBNBProps = { ...defaultProps, fee: RD.failure(Error('no fees')) }
-  return <SendFormBNB {...props} />
-}
-
-export const FeeNotCovered: Story = () => {
-  const props: SendFormBNBProps = { ...defaultProps, balances: [{ ...bnbBalance, amount: baseAmount(30) }] }
-  return <SendFormBNB {...props} />
-}
-
-const meta: Meta = {
-  component: SendFormBNB,
-  title: 'Wallet/SendFormBNB'
+const meta: Meta<Args> = {
+  component: Component,
+  title: 'Wallet/SendFormBNB',
+  argTypes: {
+    txRDStatus: {
+      name: 'txRDStatus',
+      control: { type: 'select', options: ['initial', 'pending', 'error', 'success'] },
+      defaultValue: 'success'
+    },
+    feeRDStatus: {
+      name: 'feeRD',
+      control: { type: 'select', options: ['initial', 'pending', 'error', 'success'] },
+      defaultValue: 'success'
+    },
+    walletType: {
+      name: 'wallet type',
+      control: { type: 'select', options: ['keystore', 'ledger'] },
+      defaultValue: 'keystore'
+    },
+    balance: {
+      name: 'BNB Balance',
+      control: { type: 'text' },
+      defaultValue: '2'
+    },
+    validAddress: {
+      name: 'valid address',
+      control: { type: 'boolean' },
+      defaultValue: true
+    }
+  }
 }
 
 export default meta

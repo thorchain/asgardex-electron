@@ -1,10 +1,12 @@
 import * as RD from '@devexperts/remote-data-ts'
 import * as FP from 'fp-ts/lib/function'
+import * as O from 'fp-ts/lib/Option'
 import * as Rx from 'rxjs'
 import * as RxOp from 'rxjs/operators'
 
 import { liveData } from '../../../helpers/rx/liveData'
 import { observableState } from '../../../helpers/stateHelper'
+import { ErrorId } from '../../wallet/types'
 import { INITIAL_SEND_STATE } from '../const'
 import { SendTxStateHandler, SendTxState } from '../types'
 import { sendTx$ } from './common'
@@ -13,6 +15,8 @@ import { sendTx$ } from './common'
  * Send TX
  */
 export const transfer$: SendTxStateHandler = (params) => {
+  // total of progress
+  const total = O.some(100)
   // Observable state of `SendTxState`
   const {
     get$: getState$,
@@ -20,7 +24,7 @@ export const transfer$: SendTxStateHandler = (params) => {
     set: setState
   } = observableState<SendTxState>({
     ...INITIAL_SEND_STATE,
-    status: RD.pending,
+    status: RD.progress({ loaded: 45, total }),
     steps: { current: 1, total: 1 }
   })
 
@@ -35,7 +39,13 @@ export const transfer$: SendTxStateHandler = (params) => {
     }),
     // handle errors
     RxOp.catchError((error) => {
-      setState({ ...getState(), status: RD.failure(error) })
+      setState({
+        ...getState(),
+        status: RD.failure({
+          errorId: ErrorId.SEND_TX,
+          msg: error?.msg ?? error.toString()
+        })
+      })
       return Rx.EMPTY
     })
   )
