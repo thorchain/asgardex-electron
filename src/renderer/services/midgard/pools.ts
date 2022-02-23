@@ -4,6 +4,7 @@ import BigNumber from 'bignumber.js'
 import * as A from 'fp-ts/Array'
 import * as FP from 'fp-ts/lib/function'
 import * as NEA from 'fp-ts/lib/NonEmptyArray'
+import * as P from 'fp-ts/lib/Predicate'
 import * as O from 'fp-ts/Option'
 import * as Rx from 'rxjs'
 import * as RxOp from 'rxjs/operators'
@@ -607,7 +608,7 @@ const createPoolsService = (
                   addresses,
                   A.map(({ chain, halted }) => ({ chain, halted })),
                   // Valid chains only that ones which are NOT included to the halted array
-                  FP.not(A.elem(eqHaltedChain)({ chain, halted: true }))
+                  P.not(A.elem(eqHaltedChain)({ chain, halted: true }))
                 ),
               () => new Error(`Trading for pools on ${chain} chain(s) is halted for maintenance.`)
             )

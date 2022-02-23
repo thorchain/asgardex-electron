@@ -24,6 +24,7 @@ import BigNumber from 'bignumber.js'
 import * as A from 'fp-ts/lib/Array'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
+import * as P from 'fp-ts/lib/Predicate'
 
 import { Network } from '../../shared/api/types'
 import {
@@ -236,7 +237,7 @@ export const updateEthChecksumAddress = (asset: Asset): Asset =>
     // ETH chain only
     O.fromPredicate(({ chain }) => isEthChain(chain)),
     // ETH asset only
-    O.chain(O.fromPredicate(FP.not(isEthAsset))),
+    O.chain(O.fromPredicate(P.not(isEthAsset))),
     // Get token address as checksum address
     O.chain(FP.flow(getTokenAddress, O.fromNullable)),
     // Update asset for using a checksum address

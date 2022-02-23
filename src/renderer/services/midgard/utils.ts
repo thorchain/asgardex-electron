@@ -17,6 +17,7 @@ import * as A from 'fp-ts/lib/Array'
 import * as FP from 'fp-ts/lib/function'
 import * as NEA from 'fp-ts/lib/NonEmptyArray'
 import * as O from 'fp-ts/lib/Option'
+import * as P from 'fp-ts/lib/Predicate'
 
 import { isUSDAsset, THORCHAIN_DECIMAL } from '../../helpers/assetHelper'
 import { isMiniToken } from '../../helpers/binanceHelper'
@@ -61,7 +62,7 @@ export const getPricePools = (details: PoolDetails, whitelist: PricePoolAssets):
     )
   )
 
-  const pricePoolAssets: PricePoolAssets = FP.pipe(whitelist, A.filter(FP.not(isUSDAsset)))
+  const pricePoolAssets: PricePoolAssets = FP.pipe(whitelist, A.filter(P.not(isUSDAsset)))
 
   return FP.pipe(
     details,
