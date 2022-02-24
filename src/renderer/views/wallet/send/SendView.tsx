@@ -80,7 +80,7 @@ export const SendView: React.FC<Props> = (): JSX.Element => {
         case LTCChain:
           return <SendViewLTC walletType={walletType} walletIndex={walletIndex} walletAddress={walletAddress} />
         case DOGEChain:
-          return <SendViewDOGE walletType={walletType} walletIndex={walletIndex} asset={asset} />
+          return <SendViewDOGE walletType={walletType} walletIndex={walletIndex} walletAddress={walletAddress} />
         default:
           return (
             <h1>

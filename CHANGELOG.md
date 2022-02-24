@@ -5,6 +5,10 @@
 - Feature list [#2092](https://github.com/thorchain/asgardex-electron/pull/2092)
 - [TxModal|Send] Add copy button [#1998](https://github.com/thorchain/asgardex-electron/issues/1998)
 
+## Update
+
+- [Send] Use TxModal [#2073](https://github.com/thorchain/asgardex-electron/issues/2073)
+
 # 0.8.0 (2022-02-18)
 
 ## Add
