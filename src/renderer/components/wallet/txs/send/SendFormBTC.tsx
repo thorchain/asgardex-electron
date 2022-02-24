@@ -277,6 +277,9 @@ export const SendFormBTC: React.FC<Props> = (props): JSX.Element => {
     [intl, maxAmount]
   )
 
+  // Send tx start time
+  const [sendTxStartTime, setSendTxStartTime] = useState<number>(0)
+
   const submitTx = useCallback(() => {
     setSendTxStartTime(Date.now())
 
@@ -328,9 +331,6 @@ export const SendFormBTC: React.FC<Props> = (props): JSX.Element => {
       return null
     }
   }, [intl, network, submitTx, showConfirmationModal, validatePassword$, walletType])
-
-  // Send tx start time
-  const [sendTxStartTime, setSendTxStartTime] = useState<number>(0)
 
   const renderTxModal = useMemo(
     () =>
