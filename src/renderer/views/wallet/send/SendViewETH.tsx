@@ -9,6 +9,7 @@ import * as O from 'fp-ts/lib/Option'
 import { useObservableState } from 'observable-hooks'
 
 import { WalletType } from '../../../../shared/wallet/types'
+import { LoadingView } from '../../../components/shared/loading'
 import { SendFormETH } from '../../../components/wallet/txs/send/'
 import { useChainContext } from '../../../contexts/ChainContext'
 import { useEthereumContext } from '../../../contexts/EthereumContext'
@@ -73,7 +74,7 @@ export const SendViewETH: React.FC<Props> = (props): JSX.Element => {
   return FP.pipe(
     oWalletBalance,
     O.fold(
-      () => <></>,
+      () => <LoadingView size="large" />,
       (walletBalance) => (
         <SendFormETH
           walletType={walletType}
