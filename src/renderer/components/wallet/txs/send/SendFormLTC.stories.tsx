@@ -1,102 +1,128 @@
-import React from 'react'
-
-import * as RD from '@devexperts/remote-data-ts'
 import { Meta, Story } from '@storybook/react'
-import { Fees, FeeRates, FeeType } from '@xchainjs/xchain-client'
+import { Fees, FeeRates, FeeType, Address, TxHash, FeesWithRates } from '@xchainjs/xchain-client'
 import { LTC_DECIMAL } from '@xchainjs/xchain-litecoin'
-import { assetAmount, AssetLTC, assetToBase, baseAmount, formatBaseAmount } from '@xchainjs/xchain-util'
+import { assetAmount, AssetLTC, assetToBase, baseAmount } from '@xchainjs/xchain-util'
+import * as FP from 'fp-ts/lib/function'
+import * as O from 'fp-ts/lib/Option'
+import * as Rx from 'rxjs'
 
+import { getMockRDValueFactory, RDStatus } from '../../../../../shared/mock/rdByStatus'
 import { mockValidatePassword$ } from '../../../../../shared/mock/wallet'
+import { WalletType } from '../../../../../shared/wallet/types'
 import { mockWalletBalance } from '../../../../helpers/test/testWalletHelper'
-import { SendTxParams } from '../../../../services/chain/types'
-import { WalletBalance } from '../../../../services/wallet/types'
-import { SendFormLTC as Component, Props as ComponentProps } from './SendFormLTC'
+import { SendTxStateHandler } from '../../../../services/chain/types'
+import { FeesWithRatesRD } from '../../../../services/litecoin/types'
+import { ApiError, ErrorId, WalletBalance } from '../../../../services/wallet/types'
+import { SendFormLTC as Component } from './SendFormLTC'
 
-const ltcBalance: WalletBalance = mockWalletBalance({
-  asset: AssetLTC,
-  amount: assetToBase(assetAmount(1.23, LTC_DECIMAL)),
-  walletAddress: 'ltc wallet address'
-})
-
-const runeBalance: WalletBalance = mockWalletBalance({
-  amount: assetToBase(assetAmount(2, LTC_DECIMAL))
-})
-
-const fees: Fees = {
-  type: FeeType.FlatFee,
-  fastest: baseAmount(3000),
-  fast: baseAmount(2000),
-  average: baseAmount(1000)
+type Args = {
+  txRDStatus: RDStatus
+  feeRDStatus: RDStatus
+  balance: string
+  validAddress: boolean
+  walletType: WalletType
 }
 
-const rates: FeeRates = {
-  fastest: 5,
-  fast: 3,
-  average: 2
-}
+const Template: Story<Args> = ({ txRDStatus, feeRDStatus, balance, validAddress, walletType }) => {
+  const transfer$: SendTxStateHandler = (_) =>
+    Rx.of({
+      steps: { current: txRDStatus === 'initial' ? 0 : 1, total: 1 },
+      status: FP.pipe(
+        txRDStatus,
+        getMockRDValueFactory<ApiError, TxHash>(
+          () => 'tx-hash',
+          () => ({
+            msg: 'error message',
+            errorId: ErrorId.SEND_TX
+          })
+        )
+      )
+    })
 
-const defaultProps: ComponentProps = {
-  walletType: 'keystore',
-  walletIndex: 0,
-  balances: [ltcBalance, runeBalance],
-  balance: ltcBalance,
-  onSubmit: ({ recipient, amount, feeOption, memo }: SendTxParams) =>
-    console.log(`to: ${recipient}, amount ${formatBaseAmount(amount)}, feeOptionKey: ${feeOption}, memo: ${memo}`),
-  isLoading: false,
-  addressValidation: (_) => true,
-  feesWithRates: RD.success({ fees, rates }),
-  reloadFeesHandler: () => console.log('reload fees'),
-  validatePassword$: mockValidatePassword$,
-  sendTxStatusMsg: '',
-  network: 'testnet'
-}
+  const ltcBalance: WalletBalance = mockWalletBalance({
+    asset: AssetLTC,
+    amount: assetToBase(assetAmount(balance, LTC_DECIMAL)),
+    walletAddress: 'ltc wallet address'
+  })
 
-export const Default: Story = () => <Component {...defaultProps} />
-Default.storyName = 'default'
+  const runeBalance: WalletBalance = mockWalletBalance({
+    amount: assetToBase(assetAmount(2, LTC_DECIMAL))
+  })
 
-export const Pending: Story = () => {
-  const props: ComponentProps = {
-    ...defaultProps,
-    isLoading: true,
-    sendTxStatusMsg: 'step 1 / 2'
+  const fees: Fees = {
+    type: FeeType.FlatFee,
+    fastest: baseAmount(3000),
+    fast: baseAmount(2000),
+    average: baseAmount(1000)
   }
-  return <Component {...props} />
-}
-Pending.storyName = 'pending'
 
-export const FeesInitial: Story = () => {
-  const props: ComponentProps = { ...defaultProps, feesWithRates: RD.initial }
-  return <Component {...props} />
-}
-FeesInitial.storyName = 'fees initial'
-
-export const FeesLoading: Story = () => {
-  const props: ComponentProps = { ...defaultProps, feesWithRates: RD.pending }
-  return <Component {...props} />
-}
-FeesLoading.storyName = 'fees loading'
-
-export const FeesFailure: Story = () => {
-  const props: ComponentProps = {
-    ...defaultProps,
-    feesWithRates: RD.failure(Error('Could not load fees and rates for any reason'))
+  const rates: FeeRates = {
+    fastest: 5,
+    fast: 3,
+    average: 2
   }
-  return <Component {...props} />
-}
-FeesFailure.storyName = 'fees failure'
 
-export const FeesNotCovered: Story = () => {
-  const props: ComponentProps = {
-    ...defaultProps,
-    balance: { ...ltcBalance, amount: baseAmount(1, LTC_DECIMAL) }
-  }
-  return <Component {...props} />
-}
-FeesNotCovered.storyName = 'fees not covered'
+  const feesWithRates: FeesWithRatesRD = FP.pipe(
+    feeRDStatus,
+    getMockRDValueFactory<Error, FeesWithRates>(
+      () => ({ fees, rates }),
+      () => Error('getting fees failed')
+    )
+  )
 
+  return (
+    <Component
+      walletType={walletType}
+      walletIndex={0}
+      walletAddress={'ltc-address'}
+      transfer$={transfer$}
+      balances={[ltcBalance, runeBalance]}
+      balance={ltcBalance}
+      addressValidation={(_: Address) => validAddress}
+      feesWithRates={feesWithRates}
+      reloadFeesHandler={() => console.log('reload fees')}
+      validatePassword$={mockValidatePassword$}
+      network="testnet"
+      openExplorerTxUrl={(txHash: TxHash) => {
+        console.log(`Open explorer - tx hash ${txHash}`)
+        return Promise.resolve(true)
+      }}
+      getExplorerTxUrl={(txHash: TxHash) => O.some(`url/asset-${txHash}`)}
+    />
+  )
+}
+
+export const Default = Template.bind({})
 const meta: Meta = {
   component: Component,
-  title: 'Wallet/SendFormLTC'
+  title: 'Wallet/SendFormLTC',
+  argTypes: {
+    txRDStatus: {
+      name: 'txRDStatus',
+      control: { type: 'select', options: ['pending', 'error', 'success'] },
+      defaultValue: 'success'
+    },
+    feeRDStatus: {
+      name: 'feeRD',
+      control: { type: 'select', options: ['initial', 'pending', 'error', 'success'] },
+      defaultValue: 'success'
+    },
+    walletType: {
+      name: 'wallet type',
+      control: { type: 'select', options: ['keystore', 'ledger'] },
+      defaultValue: 'keystore'
+    },
+    balance: {
+      name: 'LTC balance',
+      control: { type: 'text' },
+      defaultValue: '2'
+    },
+    validAddress: {
+      name: 'valid address',
+      control: { type: 'boolean' },
+      defaultValue: true
+    }
+  }
 }
 
 export default meta

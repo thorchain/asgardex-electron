@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
-import { BTC_DECIMAL } from '@xchainjs/xchain-bitcoin'
+import { BCH_DECIMAL } from '@xchainjs/xchain-bitcoincash'
 import { Address, FeeOption, FeesWithRates } from '@xchainjs/xchain-client'
 import {
   assetAmount,
@@ -40,7 +40,6 @@ import { matchedWalletType, renderedWalletType } from '../TxForm.helpers'
 import * as Styled from '../TxForm.styles'
 import { validateTxAmountInput } from '../TxForm.util'
 import { DEFAULT_FEE_OPTION } from './Send.const'
-import { useChangeAssetHandler } from './Send.hooks'
 import * as Shared from './Send.shared'
 
 export type FormValues = {
@@ -86,8 +85,6 @@ export const SendFormBCH: React.FC<Props> = (props): JSX.Element => {
   const intl = useIntl()
 
   const { asset } = balance
-
-  const changeAssetHandler = useChangeAssetHandler()
 
   const [amountToSend, setAmountToSend] = useState<BaseAmount>(ZERO_BASE_AMOUNT)
 
@@ -291,12 +288,22 @@ export const SendFormBCH: React.FC<Props> = (props): JSX.Element => {
         sender: walletAddress,
         recipient: form.getFieldValue('recipient'),
         asset,
-        amount: assetToBase(assetAmount(form.getFieldValue('amount'))),
+        amount: amountToSend,
         feeOption: selectedFeeOptionKey,
         memo: form.getFieldValue('memo')
       })
     )
-  }, [subscribeSendTxState, transfer$, walletType, walletIndex, walletAddress, form, asset, selectedFeeOptionKey])
+  }, [
+    subscribeSendTxState,
+    transfer$,
+    walletType,
+    walletIndex,
+    walletAddress,
+    form,
+    asset,
+    amountToSend,
+    selectedFeeOptionKey
+  ])
 
   // State for visibility of Modal to confirm tx
   const [showPwModal, setShowPwModal] = useState(false)
@@ -356,7 +363,7 @@ export const SendFormBCH: React.FC<Props> = (props): JSX.Element => {
       // we have to validate input before storing into the state
       amountValidator(undefined, value)
         .then(() => {
-          setAmountToSend(assetToBase(assetAmount(value)))
+          setAmountToSend(assetToBase(assetAmount(value, BCH_DECIMAL)))
         })
         .catch(() => {}) // do nothing, Ant' form does the job for us to show an error message
     },
@@ -398,12 +405,7 @@ export const SendFormBCH: React.FC<Props> = (props): JSX.Element => {
     <>
       <Row>
         <Styled.Col span={24}>
-          <AccountSelector
-            onChange={changeAssetHandler}
-            selectedWallet={balance}
-            walletBalances={balances}
-            network={network}
-          />
+          <AccountSelector selectedWallet={balance} network={network} />
           <Styled.Form
             form={form}
             initialValues={{
@@ -428,7 +430,7 @@ export const SendFormBCH: React.FC<Props> = (props): JSX.Element => {
                   min={0}
                   size="large"
                   disabled={isLoading}
-                  decimal={BTC_DECIMAL}
+                  decimal={BCH_DECIMAL}
                   onChange={onChangeInput}
                 />
               </Styled.FormItem>
