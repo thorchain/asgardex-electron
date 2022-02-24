@@ -11,7 +11,7 @@ export const TitleContainer = styled(A.Row).attrs({ justify: 'space-between' })`
 export const SectionTitle = styled(A.Typography.Text)`
   text-transform: uppercase;
   font-size: 16px;
-  color: ${palette('gray', 2)};
+  color: ${palette('text', 0)};
 
   // Copy to Clipboard and reset mnemonic phrase action icons
   // Keep them here together to avoid inconsistency

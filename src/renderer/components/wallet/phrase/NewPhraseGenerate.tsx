@@ -5,7 +5,7 @@ import Form, { Rule } from 'antd/lib/form'
 import { useIntl } from 'react-intl'
 
 import { Button, RefreshButton } from '../../uielements/button'
-import { InputPassword as Input } from '../../uielements/input'
+import { InputPassword } from '../../uielements/input'
 import { Phrase } from './index'
 import * as Styled from './NewPhrase.styles'
 import * as StyledPhrase from './Phrase.styles'
@@ -71,20 +71,15 @@ export const NewPhraseGenerate: React.FC<Props> = ({ onSubmit }: Props): JSX.Ele
       <Styled.Form form={form} onFinish={handleFormFinish} labelCol={{ span: 24 }}>
         <StyledPhrase.PasswordContainer>
           <StyledPhrase.PasswordItem name="password" validateTrigger={['onSubmit', 'onBlur']} rules={rules}>
-            <Input
-              size="large"
-              type="password"
-              placeholder={intl.formatMessage({ id: 'common.password' }).toUpperCase()}
-            />
+            <InputPassword size="large" placeholder={intl.formatMessage({ id: 'common.password' }).toUpperCase()} />
           </StyledPhrase.PasswordItem>
           <StyledPhrase.PasswordItem
             name="repeatPassword"
             dependencies={['password']}
             validateTrigger={['onSubmit', 'onBlur']}
             rules={rules}>
-            <Input
+            <InputPassword
               size="large"
-              type="password"
               placeholder={intl.formatMessage({ id: 'wallet.password.repeat' }).toUpperCase()}
             />
           </StyledPhrase.PasswordItem>
