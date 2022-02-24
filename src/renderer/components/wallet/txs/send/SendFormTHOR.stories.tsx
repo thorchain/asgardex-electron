@@ -80,7 +80,7 @@ const meta: Meta<Args> = {
   argTypes: {
     txRDStatus: {
       name: 'txRDStatus',
-      control: { type: 'select', options: ['initial', 'pending', 'error', 'success'] },
+      control: { type: 'select', options: ['pending', 'error', 'success'] },
       defaultValue: 'success'
     },
     feeRDStatus: {
