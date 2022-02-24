@@ -1,104 +1,132 @@
 import React from 'react'
 
-import * as RD from '@devexperts/remote-data-ts'
 import { Meta, Story } from '@storybook/react'
 import { BTC_DECIMAL } from '@xchainjs/xchain-bitcoin'
-import { Address, FeeRates, Fees, FeeType } from '@xchainjs/xchain-client'
-import { assetAmount, AssetBTC, assetToBase, baseAmount, formatBaseAmount } from '@xchainjs/xchain-util'
+import { Address, FeeRates, Fees, FeesWithRates, FeeType, TxHash } from '@xchainjs/xchain-client'
+import { assetAmount, AssetBTC, assetToBase, baseAmount } from '@xchainjs/xchain-util'
+import * as FP from 'fp-ts/lib/function'
+import * as O from 'fp-ts/lib/Option'
+import * as Rx from 'rxjs'
 
+import { getMockRDValueFactory, RDStatus } from '../../../../../shared/mock/rdByStatus'
 import { mockValidatePassword$ } from '../../../../../shared/mock/wallet'
+import { WalletType } from '../../../../../shared/wallet/types'
 import { THORCHAIN_DECIMAL } from '../../../../helpers/assetHelper'
 import { mockWalletBalance } from '../../../../helpers/test/testWalletHelper'
-import { SendTxParams } from '../../../../services/chain/types'
-import { WalletBalance } from '../../../../services/wallet/types'
-import { SendFormBTC as Component, Props as ComponentProps } from './SendFormBTC'
+import { FeesWithRatesRD } from '../../../../services/bitcoin/types'
+import { SendTxStateHandler } from '../../../../services/chain/types'
+import { ApiError, ErrorId, WalletBalance } from '../../../../services/wallet/types'
+import { SendFormBTC as Component } from './SendFormBTC'
 
-const btcBalance: WalletBalance = mockWalletBalance({
-  asset: AssetBTC,
-  amount: assetToBase(assetAmount(1.23, BTC_DECIMAL)),
-  walletAddress: 'btc wallet address'
-})
-
-const runeBalance: WalletBalance = mockWalletBalance({
-  amount: assetToBase(assetAmount(2, THORCHAIN_DECIMAL))
-})
-
-const fees: Fees = {
-  type: FeeType.FlatFee,
-  fastest: baseAmount(3000),
-  fast: baseAmount(2000),
-  average: baseAmount(1000)
+type Args = {
+  txRDStatus: RDStatus
+  feeRDStatus: RDStatus
+  balance: string
+  validAddress: boolean
+  walletType: WalletType
 }
 
-const rates: FeeRates = {
-  fastest: 5,
-  fast: 3,
-  average: 2
-}
+const Template: Story<Args> = ({ txRDStatus, feeRDStatus, balance, validAddress, walletType }) => {
+  const transfer$: SendTxStateHandler = (_) =>
+    Rx.of({
+      steps: { current: txRDStatus === 'initial' ? 0 : 1, total: 1 },
+      status: FP.pipe(
+        txRDStatus,
+        getMockRDValueFactory<ApiError, TxHash>(
+          () => 'tx-hash',
+          () => ({
+            msg: 'error message',
+            errorId: ErrorId.SEND_TX
+          })
+        )
+      )
+    })
 
-const defaultProps: ComponentProps = {
-  walletType: 'keystore',
-  walletIndex: 0,
-  walletAddress: 'btc-address',
-  balances: [btcBalance, runeBalance],
-  balance: btcBalance,
-  onSubmit: ({ recipient, amount, feeOption, memo }: SendTxParams) =>
-    console.log(`to: ${recipient}, amount ${formatBaseAmount(amount)}, feeOptionKey: ${feeOption}, memo: ${memo}`),
-  isLoading: false,
-  addressValidation: (_: Address) => true,
-  feesWithRates: RD.success({ fees, rates }),
-  reloadFeesHandler: () => console.log('reload fees'),
-  validatePassword$: mockValidatePassword$,
-  sendTxStatusMsg: '',
-  network: 'testnet'
-}
+  const btcBalance: WalletBalance = mockWalletBalance({
+    asset: AssetBTC,
+    amount: assetToBase(assetAmount(balance, BTC_DECIMAL)),
+    walletAddress: 'btc wallet address'
+  })
 
-export const Default: Story = () => <Component {...defaultProps} />
-Default.storyName = 'default'
+  const runeBalance: WalletBalance = mockWalletBalance({
+    amount: assetToBase(assetAmount(2, THORCHAIN_DECIMAL))
+  })
 
-export const Pending: Story = () => {
-  const props: ComponentProps = {
-    ...defaultProps,
-    isLoading: true,
-    sendTxStatusMsg: 'step 1 / 2'
+  const fees: Fees = {
+    type: FeeType.FlatFee,
+    fastest: baseAmount(3000),
+    fast: baseAmount(2000),
+    average: baseAmount(1000)
   }
-  return <Component {...props} />
-}
-Pending.storyName = 'pending'
 
-export const FeesInitial: Story = () => {
-  const props: ComponentProps = { ...defaultProps, feesWithRates: RD.initial }
-  return <Component {...props} />
-}
-FeesInitial.storyName = 'fees initial'
-
-export const FeesLoading: Story = () => {
-  const props: ComponentProps = { ...defaultProps, feesWithRates: RD.pending }
-  return <Component {...props} />
-}
-FeesLoading.storyName = 'fees loading'
-
-export const FeesFailure: Story = () => {
-  const props: ComponentProps = {
-    ...defaultProps,
-    feesWithRates: RD.failure(Error('Could not load fees and rates for any reason'))
+  const rates: FeeRates = {
+    fastest: 5,
+    fast: 3,
+    average: 2
   }
-  return <Component {...props} />
-}
-FeesFailure.storyName = 'fees failure'
 
-export const FeesNotCovered: Story = () => {
-  const props: ComponentProps = {
-    ...defaultProps,
-    balance: { ...btcBalance, amount: baseAmount(1, BTC_DECIMAL) }
-  }
-  return <Component {...props} />
-}
-FeesNotCovered.storyName = 'fees not covered'
+  const feesWithRates: FeesWithRatesRD = FP.pipe(
+    feeRDStatus,
+    getMockRDValueFactory<Error, FeesWithRates>(
+      () => ({ fees, rates }),
+      () => Error('getting fees failed')
+    )
+  )
 
-const meta: Meta = {
+  return (
+    <Component
+      walletType={walletType}
+      walletIndex={0}
+      walletAddress={'btc-address'}
+      transfer$={transfer$}
+      balances={[btcBalance, runeBalance]}
+      balance={btcBalance}
+      addressValidation={(_: Address) => validAddress}
+      feesWithRates={feesWithRates}
+      reloadFeesHandler={() => console.log('reload fees')}
+      validatePassword$={mockValidatePassword$}
+      network="testnet"
+      openExplorerTxUrl={(txHash: TxHash) => {
+        console.log(`Open explorer - tx hash ${txHash}`)
+        return Promise.resolve(true)
+      }}
+      getExplorerTxUrl={(txHash: TxHash) => O.some(`url/asset-${txHash}`)}
+    />
+  )
+}
+
+export const Default = Template.bind({})
+
+const meta: Meta<Args> = {
   component: Component,
-  title: 'Wallet/SendFormBTC'
+  title: 'Wallet/SendFormBTC',
+  argTypes: {
+    txRDStatus: {
+      name: 'txRDStatus',
+      control: { type: 'select', options: ['pending', 'error', 'success'] },
+      defaultValue: 'success'
+    },
+    feeRDStatus: {
+      name: 'feeRD',
+      control: { type: 'select', options: ['initial', 'pending', 'error', 'success'] },
+      defaultValue: 'success'
+    },
+    walletType: {
+      name: 'wallet type',
+      control: { type: 'select', options: ['keystore', 'ledger'] },
+      defaultValue: 'keystore'
+    },
+    balance: {
+      name: 'BTC Balance',
+      control: { type: 'text' },
+      defaultValue: '2'
+    },
+    validAddress: {
+      name: 'valid address',
+      control: { type: 'boolean' },
+      defaultValue: true
+    }
+  }
 }
 
 export default meta

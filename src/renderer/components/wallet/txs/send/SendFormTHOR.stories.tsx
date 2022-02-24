@@ -80,7 +80,7 @@ const meta: Meta<Args> = {
   argTypes: {
     txRDStatus: {
       name: 'txRDStatus',
-      control: { type: 'select', options: ['initial', 'pending', 'error', 'success'] },
+      control: { type: 'select', options: ['pending', 'error', 'success'] },
       defaultValue: 'success'
     },
     feeRDStatus: {
@@ -94,7 +94,7 @@ const meta: Meta<Args> = {
       defaultValue: 'keystore'
     },
     balance: {
-      name: 'BNB Balance',
+      name: 'RUNE Balance',
       control: { type: 'text' },
       defaultValue: '2'
     },

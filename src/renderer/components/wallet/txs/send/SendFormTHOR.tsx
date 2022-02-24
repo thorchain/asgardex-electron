@@ -33,9 +33,6 @@ import { AddressValidation, GetExplorerTxUrl, OpenExplorerTxUrl, WalletBalances 
 import { ValidatePasswordHandler } from '../../../../services/wallet/types'
 import { WalletBalance } from '../../../../services/wallet/types'
 import { LedgerConfirmationModal, WalletPasswordConfirmationModal } from '../../../modal/confirmation'
-import { TxModal } from '../../../modal/tx'
-import { SendAsset } from '../../../modal/tx/extra/SendAsset'
-import { ViewTxButton } from '../../../uielements/button'
 import { MaxBalanceButton } from '../../../uielements/button/MaxBalanceButton'
 import { UIFeesRD } from '../../../uielements/fees'
 import { Input, InputBigNumber } from '../../../uielements/input'
@@ -44,6 +41,7 @@ import * as H from '../TxForm.helpers'
 import * as Styled from '../TxForm.styles'
 import { validateTxAmountInput } from '../TxForm.util'
 import { useChangeAssetHandler } from './Send.hooks'
+import * as Shared from './Send.shared'
 
 export type FormValues = {
   recipient: string
@@ -245,55 +243,31 @@ export const SendFormTHOR: React.FC<Props> = (props): JSX.Element => {
     }
   }, [intl, network, submitTx, showConfirmationModal, validatePassword$, walletType])
 
-  const extraTxModalContent = useMemo(() => {
-    const { status } = sendTxState
-    const title = H.getSendTxDescription({ status, asset, intl })
-    return <SendAsset asset={{ asset, amount: amountToSend }} title={title} network={network} />
-  }, [intl, asset, sendTxState, amountToSend, network])
-
-  const onFinishTxModal = useCallback(() => {
-    resetSendTxState()
-  }, [resetSendTxState])
-
-  const renderTxModal = useMemo(() => {
-    const { status } = sendTxState
-
-    // don't render TxModal in initial state
-    if (RD.isInitial(status)) return <></>
-
-    const oTxHash = RD.toOption(status)
-    const txRD = FP.pipe(
-      status,
-      RD.map((txHash) => !!txHash)
-    )
-    return (
-      <TxModal
-        title={intl.formatMessage({ id: 'common.tx.sending' })}
-        onClose={resetSendTxState}
-        onFinish={onFinishTxModal}
-        startTime={sendTxStartTime}
-        txRD={txRD}
-        extraResult={
-          <ViewTxButton
-            txHash={oTxHash}
-            onClick={openExplorerTxUrl}
-            txUrl={FP.pipe(oTxHash, O.chain(getExplorerTxUrl))}
-          />
-        }
-        timerValue={H.getSendTxTimerValue(status)}
-        extra={extraTxModalContent}
-      />
-    )
-  }, [
-    sendTxState,
-    resetSendTxState,
-    onFinishTxModal,
-    sendTxStartTime,
-    openExplorerTxUrl,
-    getExplorerTxUrl,
-    extraTxModalContent,
-    intl
-  ])
+  const renderTxModal = useMemo(
+    () =>
+      Shared.renderTxModal({
+        asset,
+        amountToSend,
+        network,
+        sendTxState,
+        resetSendTxState,
+        sendTxStartTime,
+        openExplorerTxUrl,
+        getExplorerTxUrl,
+        intl
+      }),
+    [
+      asset,
+      amountToSend,
+      network,
+      sendTxState,
+      resetSendTxState,
+      sendTxStartTime,
+      openExplorerTxUrl,
+      getExplorerTxUrl,
+      intl
+    ]
+  )
 
   const uiFeesRD: UIFeesRD = useMemo(
     () =>

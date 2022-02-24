@@ -24,7 +24,7 @@ export const transfer$: SendTxStateHandler = (params) => {
     set: setState
   } = observableState<SendTxState>({
     ...INITIAL_SEND_STATE,
-    status: RD.progress({ loaded: 75, total }),
+    status: RD.progress({ loaded: 40, total }),
     steps: { current: 1, total: 1 }
   })
 
