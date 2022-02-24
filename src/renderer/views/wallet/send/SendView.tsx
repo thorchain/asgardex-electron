@@ -67,7 +67,14 @@ export const SendView: React.FC<Props> = (): JSX.Element => {
         case BTCChain:
           return <SendViewBTC walletType={walletType} walletIndex={walletIndex} walletAddress={walletAddress} />
         case ETHChain:
-          return <SendViewETH walletType={walletType} walletIndex={walletIndex} asset={asset} />
+          return (
+            <SendViewETH
+              walletType={walletType}
+              walletIndex={walletIndex}
+              walletAddress={walletAddress}
+              asset={asset}
+            />
+          )
         case THORChain:
           return <SendViewTHOR walletType={walletType} walletIndex={walletIndex} walletAddress={walletAddress} />
         case LTCChain:

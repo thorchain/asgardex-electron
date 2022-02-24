@@ -177,40 +177,17 @@ const getTxRdFromStatus = getMockRDValueFactory(
 type Args = {
   sendForm: SendForm
   txRDStatus: RDStatus
-  sendTxStatusMsg: string
 }
 
-export const Default: Story<Args> = ({ sendForm, txRDStatus, sendTxStatusMsg }) => {
+export const Default: Story<Args> = ({ sendForm, txRDStatus }) => {
   const Component = useMemo(() => getSendForm(sendForm), [sendForm])
   const balance = useMemo(() => getSendBalance(sendForm), [sendForm])
   const txRD: TxHashRD = useMemo(() => getTxRdFromStatus(txRDStatus), [txRDStatus])
-  const isLoading = useMemo(
-    () =>
-      RD.fold(
-        () => false,
-        () => true,
-        () => false,
-        () => false
-      )(txRD),
-    [txRD]
-  )
-  return (
-    <Send
-      {...defaultProps}
-      txRD={txRD}
-      sendForm={
-        <Component
-          {...defaultComponentProps}
-          sendTxStatusMsg={sendTxStatusMsg}
-          balance={balance}
-          isLoading={isLoading}
-        />
-      }
-    />
-  )
+
+  return <Send {...defaultProps} txRD={txRD} sendForm={<Component {...defaultComponentProps} balance={balance} />} />
 }
 
-Default.args = { sendForm: 'SendFormBNB', txRDStatus: 'initial', sendTxStatusMsg: '' }
+Default.args = { sendForm: 'SendFormBNB', txRDStatus: 'initial' }
 
 const meta: Meta<Args> = {
   component: Send,
@@ -222,10 +199,7 @@ const meta: Meta<Args> = {
         options: Object.keys(SendFormsComponents)
       }
     },
-    txRDStatus: { control: { type: 'select', options: ['initial', 'pending', 'error', 'success'] } },
-    sendTxStatusMsg: {
-      control: {}
-    }
+    txRDStatus: { control: { type: 'select', options: ['initial', 'pending', 'error', 'success'] } }
   }
 }
 

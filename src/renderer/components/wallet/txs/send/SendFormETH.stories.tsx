@@ -1,89 +1,116 @@
 import React from 'react'
 
-import * as RD from '@devexperts/remote-data-ts'
 import { Meta, Story } from '@storybook/react'
-import { Fees, FeeType, TxParams } from '@xchainjs/xchain-client'
+import { Fees, FeeType, TxHash } from '@xchainjs/xchain-client'
 import { ETH_DECIMAL } from '@xchainjs/xchain-ethereum'
 import { assetAmount, AssetETH, assetToBase } from '@xchainjs/xchain-util'
+import * as FP from 'fp-ts/lib/function'
+import * as O from 'fp-ts/lib/Option'
+import * as Rx from 'rxjs'
 
+import { getMockRDValueFactory, RDStatus } from '../../../../../shared/mock/rdByStatus'
 import { mockValidatePassword$ } from '../../../../../shared/mock/wallet'
+import { WalletType } from '../../../../../shared/wallet/types'
 import { THORCHAIN_DECIMAL } from '../../../../helpers/assetHelper'
 import { mockWalletBalance } from '../../../../helpers/test/testWalletHelper'
-import { SendTxParams } from '../../../../services/chain/types'
-import { WalletBalance } from '../../../../services/wallet/types'
-import { SendFormETH } from './index'
-import { Props as SendFormETHProps } from './SendFormETH'
+import { FeesRD, SendTxStateHandler } from '../../../../services/chain/types'
+import { ApiError, ErrorId, WalletBalance } from '../../../../services/wallet/types'
+import { SendFormETH as Component } from './SendFormETH'
 
-const ethBalance: WalletBalance = mockWalletBalance({
-  asset: AssetETH,
-  amount: assetToBase(assetAmount(1.23, ETH_DECIMAL)),
-  walletAddress: 'AssetETH wallet address'
-})
-
-const runeBalance: WalletBalance = mockWalletBalance({
-  amount: assetToBase(assetAmount(2, THORCHAIN_DECIMAL))
-})
-
-const fees: Fees = {
-  type: FeeType.PerByte,
-  fastest: assetToBase(assetAmount(0.002499, ETH_DECIMAL)),
-  fast: assetToBase(assetAmount(0.002079, ETH_DECIMAL)),
-  average: assetToBase(assetAmount(0.001848, ETH_DECIMAL))
+type Args = {
+  txRDStatus: RDStatus
+  feeRDStatus: RDStatus
+  balance: string
+  walletType: WalletType
 }
 
-const defaultProps: SendFormETHProps = {
-  walletType: 'keystore',
-  walletIndex: 0,
-  balances: [ethBalance, runeBalance],
-  balance: ethBalance,
-  fees: RD.success(fees),
-  reloadFeesHandler: (p: TxParams) => console.log('reloadFeesHandler', p),
-  validatePassword$: mockValidatePassword$,
-  onSubmit: (p: SendTxParams) => {
-    console.log('transfer$:', p)
-  },
-  isLoading: false,
-  sendTxStatusMsg: '',
-  network: 'testnet'
+const Template: Story<Args> = ({ txRDStatus, feeRDStatus, balance, walletType }) => {
+  const transfer$: SendTxStateHandler = (_) =>
+    Rx.of({
+      steps: { current: txRDStatus === 'initial' ? 0 : 1, total: 1 },
+      status: FP.pipe(
+        txRDStatus,
+        getMockRDValueFactory<ApiError, TxHash>(
+          () => 'tx-hash',
+          () => ({
+            msg: 'error message',
+            errorId: ErrorId.SEND_TX
+          })
+        )
+      )
+    })
+
+  const ethBalance: WalletBalance = mockWalletBalance({
+    asset: AssetETH,
+    amount: assetToBase(assetAmount(balance, ETH_DECIMAL)),
+    walletAddress: 'ETH wallet address'
+  })
+
+  const runeBalance: WalletBalance = mockWalletBalance({
+    amount: assetToBase(assetAmount(2, THORCHAIN_DECIMAL))
+  })
+
+  const feesRD: FeesRD = FP.pipe(
+    feeRDStatus,
+    getMockRDValueFactory<Error, Fees>(
+      () => ({
+        type: FeeType.PerByte,
+        fastest: assetToBase(assetAmount(0.002499, ETH_DECIMAL)),
+        fast: assetToBase(assetAmount(0.002079, ETH_DECIMAL)),
+        average: assetToBase(assetAmount(0.001848, ETH_DECIMAL))
+      }),
+      () => Error('getting fees failed')
+    )
+  )
+
+  return (
+    <Component
+      walletType={walletType}
+      walletIndex={0}
+      walletAddress={'bch-address'}
+      transfer$={transfer$}
+      balances={[ethBalance, runeBalance]}
+      balance={ethBalance}
+      fees={feesRD}
+      reloadFeesHandler={() => console.log('reload fees')}
+      validatePassword$={mockValidatePassword$}
+      network="testnet"
+      openExplorerTxUrl={(txHash: TxHash) => {
+        console.log(`Open explorer - tx hash ${txHash}`)
+        return Promise.resolve(true)
+      }}
+      getExplorerTxUrl={(txHash: TxHash) => O.some(`url/asset-${txHash}`)}
+    />
+  )
 }
 
-export const Default: Story = () => <SendFormETH {...defaultProps} />
-Default.storyName = 'default'
-
-export const Pending: Story = () => {
-  const props: SendFormETHProps = {
-    ...defaultProps,
-    isLoading: true,
-    sendTxStatusMsg: 'step 1 / 2'
-  }
-  return <SendFormETH {...props} />
-}
-Pending.storyName = 'pending'
-
-export const FeesInitial: Story = () => {
-  const props: SendFormETHProps = { ...defaultProps, fees: RD.initial }
-  return <SendFormETH {...props} />
-}
-FeesInitial.storyName = 'fees initial'
-
-export const FeesLoading: Story = () => {
-  const props: SendFormETHProps = { ...defaultProps, fees: RD.pending }
-  return <SendFormETH {...props} />
-}
-FeesLoading.storyName = 'fees loading'
-
-export const FeesFailure: Story = () => {
-  const props: SendFormETHProps = {
-    ...defaultProps,
-    fees: RD.failure(Error('Could not load fees for any reason'))
-  }
-  return <SendFormETH {...props} />
-}
-FeesFailure.storyName = 'fees failure'
+export const Default = Template.bind({})
 
 const meta: Meta = {
-  component: SendFormETH,
-  title: 'Wallet/SendFormETH'
+  component: Component,
+  title: 'Wallet/SendFormETH',
+  argTypes: {
+    txRDStatus: {
+      name: 'txRDStatus',
+      control: { type: 'select', options: ['pending', 'error', 'success'] },
+      defaultValue: 'success'
+    },
+    feeRDStatus: {
+      name: 'feeRD',
+      control: { type: 'select', options: ['initial', 'pending', 'error', 'success'] },
+      defaultValue: 'success'
+    },
+    walletType: {
+      name: 'wallet type',
+      control: { type: 'select', options: ['keystore', 'ledger'] },
+      defaultValue: 'keystore'
+    },
+    balance: {
+      name: 'ETH balance',
+      control: { type: 'text' },
+      defaultValue: '2'
+    }
+  }
 }
 
 export default meta
