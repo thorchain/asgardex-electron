@@ -42,7 +42,6 @@ import * as H from '../TxForm.helpers'
 import * as Styled from '../TxForm.styles'
 import { validateTxAmountInput } from '../TxForm.util'
 import { DEFAULT_FEE_OPTION } from './Send.const'
-import { useChangeAssetHandler } from './Send.hooks'
 import * as Shared from './Send.shared'
 
 export type FormValues = {
@@ -88,8 +87,6 @@ export const SendFormBTC: React.FC<Props> = (props): JSX.Element => {
   const intl = useIntl()
 
   const { asset } = balance
-
-  const changeAssetHandler = useChangeAssetHandler()
 
   const [amountToSend, setAmountToSend] = useState<BaseAmount>(ZERO_BASE_AMOUNT)
 
@@ -290,12 +287,22 @@ export const SendFormBTC: React.FC<Props> = (props): JSX.Element => {
         sender: walletAddress,
         recipient: form.getFieldValue('recipient'),
         asset: asset,
-        amount: assetToBase(assetAmount(form.getFieldValue('amount'))),
+        amount: amountToSend,
         feeOption: selectedFeeOption,
         memo: form.getFieldValue('memo')
       })
     )
-  }, [subscribeSendTxState, transfer$, walletType, walletIndex, walletAddress, form, asset, selectedFeeOption])
+  }, [
+    subscribeSendTxState,
+    transfer$,
+    walletType,
+    walletIndex,
+    walletAddress,
+    form,
+    asset,
+    amountToSend,
+    selectedFeeOption
+  ])
 
   const [showConfirmationModal, setShowConfirmationModal] = useState(false)
 
@@ -377,7 +384,7 @@ export const SendFormBTC: React.FC<Props> = (props): JSX.Element => {
       // we have to validate input before storing into the state
       amountValidator(undefined, value)
         .then(() => {
-          setAmountToSend(assetToBase(assetAmount(value)))
+          setAmountToSend(assetToBase(assetAmount(value, BTC_DECIMAL)))
         })
         .catch(() => {}) // do nothing, Ant' form does the job for us to show an error message
     },
@@ -415,12 +422,7 @@ export const SendFormBTC: React.FC<Props> = (props): JSX.Element => {
     <>
       <Row>
         <Styled.Col span={24}>
-          <AccountSelector
-            onChange={changeAssetHandler}
-            selectedWallet={balance}
-            walletBalances={balances}
-            network={network}
-          />
+          <AccountSelector selectedWallet={balance} network={network} />
           <Styled.Form
             form={form}
             initialValues={{

@@ -40,7 +40,6 @@ import { AccountSelector } from '../../account'
 import * as H from '../TxForm.helpers'
 import * as Styled from '../TxForm.styles'
 import { validateTxAmountInput } from '../TxForm.util'
-import { useChangeAssetHandler } from './Send.hooks'
 import * as Shared from './Send.shared'
 
 export type FormValues = {
@@ -83,8 +82,6 @@ export const SendFormTHOR: React.FC<Props> = (props): JSX.Element => {
   const intl = useIntl()
 
   const { asset } = balance
-
-  const changeAssetHandler = useChangeAssetHandler()
 
   const [amountToSend, setAmountToSend] = useState<BaseAmount>(ZERO_BASE_AMOUNT)
 
@@ -309,7 +306,7 @@ export const SendFormTHOR: React.FC<Props> = (props): JSX.Element => {
     <>
       <Row>
         <Styled.Col span={24}>
-          <AccountSelector onChange={changeAssetHandler} selectedWallet={balance} network={network} />
+          <AccountSelector selectedWallet={balance} network={network} />
           <Styled.Form
             form={form}
             initialValues={{ amount: bn(0) }}

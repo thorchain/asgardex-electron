@@ -23,7 +23,7 @@ import { Network } from '../../../../../shared/api/types'
 import { isKeystoreWallet, isLedgerWallet } from '../../../../../shared/utils/guard'
 import { WalletType } from '../../../../../shared/wallet/types'
 import { ZERO_BASE_AMOUNT } from '../../../../const'
-import { isBnbAsset } from '../../../../helpers/assetHelper'
+import { BNB_DECIMAL, isBnbAsset } from '../../../../helpers/assetHelper'
 import { sequenceTOption } from '../../../../helpers/fpHelpers'
 import { getBnbAmountFromBalances } from '../../../../helpers/walletHelper'
 import { useSubscriptionState } from '../../../../hooks/useSubscriptionState'
@@ -40,7 +40,6 @@ import { AccountSelector } from '../../account'
 import * as H from '../TxForm.helpers'
 import * as Styled from '../TxForm.styles'
 import { validateTxAmountInput } from '../TxForm.util'
-import { useChangeAssetHandler } from './Send.hooks'
 import * as Shared from './Send.shared'
 
 export type FormValues = {
@@ -85,8 +84,6 @@ export const SendFormBNB: React.FC<Props> = (props): JSX.Element => {
   const intl = useIntl()
 
   const { asset } = balance
-
-  const changeAssetHandler = useChangeAssetHandler()
 
   const [amountToSend, setAmountToSend] = useState<BaseAmount>(ZERO_BASE_AMOUNT)
 
@@ -286,7 +283,7 @@ export const SendFormBNB: React.FC<Props> = (props): JSX.Element => {
       // we have to validate input before storing into the state
       amountValidator(undefined, value)
         .then(() => {
-          setAmountToSend(assetToBase(assetAmount(value)))
+          setAmountToSend(assetToBase(assetAmount(value, BNB_DECIMAL)))
         })
         .catch(() => {}) // do nothing, Ant' form does the job for us to show an error message
     },
@@ -311,7 +308,7 @@ export const SendFormBNB: React.FC<Props> = (props): JSX.Element => {
     <>
       <Row>
         <Styled.Col span={24}>
-          <AccountSelector onChange={changeAssetHandler} selectedWallet={balance} network={network} />
+          <AccountSelector selectedWallet={balance} network={network} />
           <Styled.Form
             form={form}
             initialValues={{ amount: bn(0) }}
