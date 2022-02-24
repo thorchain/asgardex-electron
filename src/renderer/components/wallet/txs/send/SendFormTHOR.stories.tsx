@@ -94,7 +94,7 @@ const meta: Meta<Args> = {
       defaultValue: 'keystore'
     },
     balance: {
-      name: 'BNB Balance',
+      name: 'RUNE Balance',
       control: { type: 'text' },
       defaultValue: '2'
     },
