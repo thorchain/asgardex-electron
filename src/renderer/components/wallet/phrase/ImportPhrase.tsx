@@ -132,11 +132,7 @@ export const ImportPhrase: React.FC<Props> = (props): JSX.Element => {
           </Form.Item>
           <Styled.PasswordContainer>
             <Styled.PasswordItem name="password" validateTrigger={['onSubmit', 'onBlur']} rules={rules}>
-              <InputPassword
-                size="large"
-                type="password"
-                placeholder={intl.formatMessage({ id: 'common.password' }).toUpperCase()}
-              />
+              <InputPassword size="large" placeholder={intl.formatMessage({ id: 'common.password' }).toUpperCase()} />
             </Styled.PasswordItem>
             <Styled.PasswordItem
               name="repeatPassword"
@@ -145,7 +141,6 @@ export const ImportPhrase: React.FC<Props> = (props): JSX.Element => {
               rules={rules}>
               <InputPassword
                 size="large"
-                type="password"
                 placeholder={intl.formatMessage({ id: 'wallet.password.repeat' }).toUpperCase()}
               />
             </Styled.PasswordItem>

@@ -97,7 +97,9 @@ export const InputNumber = styled(A.InputNumber)<InputProps>`
   }
 `
 
-export const InputPassword = styled(A.Input.Password)<InputProps>`
+export const InputPassword = styled(A.Input.Password).attrs({
+  type: 'password'
+})<InputProps>`
   ${inputStyle}
   & .ant-input-password-icon {
     color: ${colors.primary};

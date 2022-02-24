@@ -78,6 +78,7 @@ export const SendViewBNB: React.FC<Props> = (props): JSX.Element => {
         <SendFormBNB
           walletType={walletType}
           walletIndex={walletIndex}
+          walletAddress={walletAddress}
           balances={FP.pipe(
             oBalances,
             O.getOrElse<WalletBalances>(() => [])
@@ -86,7 +87,6 @@ export const SendViewBNB: React.FC<Props> = (props): JSX.Element => {
           transfer$={transfer$}
           openExplorerTxUrl={openExplorerTxUrl}
           getExplorerTxUrl={getExplorerTxUrl}
-          walletAddress={walletAddress}
           addressValidation={validateAddress}
           fee={feeRD}
           reloadFeesHandler={reloadFees}

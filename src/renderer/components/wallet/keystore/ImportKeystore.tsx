@@ -115,11 +115,7 @@ export const ImportKeystore: React.FC<Props> = (props): JSX.Element => {
           </Form.Item>
           <Styled.PasswordContainer>
             <Styled.PasswordItem name="password">
-              <InputPassword
-                size="large"
-                type="password"
-                placeholder={intl.formatMessage({ id: 'common.password' }).toUpperCase()}
-              />
+              <InputPassword size="large" placeholder={intl.formatMessage({ id: 'common.password' }).toUpperCase()} />
             </Styled.PasswordItem>
           </Styled.PasswordContainer>
         </Spin>

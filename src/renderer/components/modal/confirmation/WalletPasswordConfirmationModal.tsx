@@ -7,7 +7,7 @@ import { useObservableState } from 'observable-hooks'
 import { useIntl } from 'react-intl'
 
 import { ValidatePasswordLD } from '../../../services/wallet/types'
-import { Input } from '../../uielements/input'
+import { InputPassword } from '../../uielements/input'
 import { Label } from '../../uielements/label'
 import * as Styled from './ConfirmationModal.styles'
 import * as CStyled from './WalletPasswordConfirmationModal.styles'
@@ -82,8 +82,7 @@ const PasswordModal: React.FC<PasswordModalProps> = (props): JSX.Element => {
             extra={
               validatingPassword ? `${intl.formatMessage({ id: 'wallet.password.confirmation.pending' })}...` : ''
             }>
-            <Input
-              type="password"
+            <InputPassword
               typevalue="normal"
               size="large"
               value={password}
