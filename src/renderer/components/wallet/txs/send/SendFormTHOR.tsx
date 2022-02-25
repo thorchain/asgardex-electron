@@ -8,7 +8,6 @@ import {
   bn,
   AssetRuneNative,
   assetToBase,
-  baseAmount,
   BaseAmount,
   baseToAsset,
   THORChain
@@ -159,7 +158,7 @@ export const SendFormTHOR: React.FC<Props> = (props): JSX.Element => {
       O.fold(
         // Set maxAmount to zero if we dont know anything about RuneNative and fee amounts
         () => ZERO_BASE_AMOUNT,
-        ([fee, runeAmount]) => baseAmount(runeAmount.amount().minus(fee.amount()), THORCHAIN_DECIMAL)
+        ([fee, runeAmount]) => runeAmount.minus(fee)
       )
     )
     return isRuneNativeAsset(asset) ? maxRuneAmount : balance.amount
@@ -224,7 +223,8 @@ export const SendFormTHOR: React.FC<Props> = (props): JSX.Element => {
           validatePassword$={validatePassword$}
         />
       )
-    } else if (isLedgerWallet(walletType)) {
+    }
+    if (isLedgerWallet(walletType)) {
       return (
         <LedgerConfirmationModal
           network={network}
@@ -235,9 +235,8 @@ export const SendFormTHOR: React.FC<Props> = (props): JSX.Element => {
           description={intl.formatMessage({ id: 'wallet.ledger.confirm' })}
         />
       )
-    } else {
-      return null
     }
+    return null
   }, [intl, network, submitTx, showConfirmationModal, validatePassword$, walletType])
 
   const renderTxModal = useMemo(
