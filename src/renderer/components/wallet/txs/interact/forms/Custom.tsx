@@ -5,8 +5,8 @@ import { Form } from 'antd'
 import BigNumber from 'bignumber.js'
 import { useIntl } from 'react-intl'
 
-import { THORCHAIN_DECIMAL } from '../../../helpers/assetHelper'
-import { Input, InputBigNumber } from '../../uielements/input'
+import { THORCHAIN_DECIMAL } from '../../../../../helpers/assetHelper'
+import { Input, InputBigNumber } from '../../../../uielements/input'
 import * as Styled from './Forms.styles'
 
 type FormValues = { memo: string; amount: BigNumber }

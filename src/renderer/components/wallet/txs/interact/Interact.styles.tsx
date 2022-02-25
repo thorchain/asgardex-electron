@@ -3,10 +3,10 @@ import * as A from 'antd'
 import styled from 'styled-components'
 import { palette } from 'styled-theme'
 
-import { media } from '../../helpers/styleHelper'
-import { AssetIcon as UIAssetIcon } from '../uielements/assets/assetIcon'
-import { WalletTypeLabel as WalletTypeLabelUI } from '../uielements/common/Common.styles'
-import { Label as UILabel } from '../uielements/label'
+import { media } from '../../../../helpers/styleHelper'
+import { AssetIcon as UIAssetIcon } from '../../../uielements/assets/assetIcon'
+import { WalletTypeLabel as WalletTypeLabelUI } from '../../../uielements/common/Common.styles'
+import { Label as UILabel } from '../../../uielements/label'
 
 export const Container = styled('div')`
   min-height: 100%;

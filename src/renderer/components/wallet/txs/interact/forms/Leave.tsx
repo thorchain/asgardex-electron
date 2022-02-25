@@ -1,29 +1,25 @@
 import React, { useCallback } from 'react'
 
-import { getUnbondMemo } from '@thorchain/asgardex-util'
-import { assetAmount, assetToBase, bnOrZero } from '@xchainjs/xchain-util'
+import { getLeaveMemo } from '@thorchain/asgardex-util'
 import { Form } from 'antd'
-import BigNumber from 'bignumber.js'
 import * as E from 'fp-ts/Either'
 import * as FP from 'fp-ts/function'
 import { useIntl } from 'react-intl'
 
-import { ZERO_BN } from '../../../const'
-import { THORCHAIN_DECIMAL } from '../../../helpers/assetHelper'
-import { validateAddress, greaterThan } from '../../../helpers/form/validation'
-import { AddressValidation } from '../../../services/clients'
-import { Input, InputBigNumber } from '../../uielements/input'
+import { validateAddress } from '../../../../../helpers/form/validation'
+import { AddressValidation } from '../../../../../services/clients'
+import { Input } from '../../../../uielements/input'
 import * as Styled from './Forms.styles'
 
-type FormValues = { thorAddress: string; amount: BigNumber }
+type FormValues = { thorAddress: string; isLoading?: boolean; loadingProgress?: string }
 
 type Props = {
-  onFinish: (unboundData: { memo: string }) => void
+  onFinish: (leaveData: { memo: string }) => void
   isLoading?: boolean
   loadingProgress?: string
   addressValidation: AddressValidation
 }
-export const Unbond: React.FC<Props> = ({
+export const Leave: React.FC<Props> = ({
   onFinish: onFinishProp,
   isLoading = false,
   loadingProgress,
@@ -33,26 +29,12 @@ export const Unbond: React.FC<Props> = ({
   const [form] = Form.useForm<FormValues>()
 
   const onFinish = useCallback(
-    ({ thorAddress, amount }: FormValues) => {
+    ({ thorAddress }: FormValues) => {
       onFinishProp({
-        memo: getUnbondMemo(thorAddress, assetToBase(assetAmount(amount)))
+        memo: getLeaveMemo(thorAddress)
       })
     },
     [onFinishProp]
-  )
-
-  const amountValidator = useCallback(
-    (_, value: string) => {
-      return FP.pipe(
-        bnOrZero(value),
-        greaterThan(ZERO_BN)(intl.formatMessage({ id: 'wallet.validations.graterThen' }, { value: 0 })),
-        E.fold(
-          (e) => Promise.reject(e),
-          () => Promise.resolve()
-        )
-      )
-    },
-    [intl]
   )
 
   const addressValidator = useCallback(
@@ -73,7 +55,7 @@ export const Unbond: React.FC<Props> = ({
   )
 
   return (
-    <Styled.Form form={form} onFinish={onFinish} initialValues={{ memo: '' }}>
+    <Styled.Form form={form} onFinish={onFinish} initialValues={{ thorAddress: '' }}>
       <div>
         <Styled.InputContainer>
           <Styled.InputLabel>{intl.formatMessage({ id: 'common.thorAddress' })}</Styled.InputLabel>
@@ -86,19 +68,6 @@ export const Unbond: React.FC<Props> = ({
               }
             ]}>
             <Input disabled={isLoading} size="large" />
-          </Form.Item>
-        </Styled.InputContainer>
-
-        <Styled.InputContainer>
-          <Styled.InputLabel>{intl.formatMessage({ id: 'common.amount' })}</Styled.InputLabel>
-          <Form.Item
-            name="amount"
-            rules={[
-              {
-                validator: amountValidator
-              }
-            ]}>
-            <InputBigNumber disabled={isLoading} size="large" decimal={THORCHAIN_DECIMAL} />
           </Form.Item>
         </Styled.InputContainer>
       </div>

@@ -2,10 +2,10 @@ import * as A from 'antd'
 import styled from 'styled-components'
 import { palette } from 'styled-theme'
 
-import { media } from '../../../helpers/styleHelper'
-import { InnerForm } from '../../shared/form'
-import { Button as UIButton } from '../../uielements/button'
-import { Label as UILabel } from '../../uielements/label'
+import { media } from '../../../../../helpers/styleHelper'
+import { InnerForm } from '../../../../shared/form'
+import { Button as UIButton } from '../../../../uielements/button'
+import { Label as UILabel } from '../../../../uielements/label'
 
 export const Form = styled(InnerForm)`
   display: flex;

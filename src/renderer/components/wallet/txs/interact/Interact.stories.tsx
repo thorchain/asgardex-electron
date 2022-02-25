@@ -1,12 +1,12 @@
 import React from 'react'
 
-import { Bond, Unbond, Leave, Custom } from './forms/Forms.stories'
+import { Unbond, Leave, Custom } from './forms/Forms.stories'
 import { Interact } from './Interact'
 
 export const Default = () => (
   <Interact
     walletType="ledger"
-    bondContent={<Bond />}
+    bondContent={<>Bond view</>}
     unbondContent={<Unbond />}
     leaveContent={<Leave />}
     customContent={<Custom />}

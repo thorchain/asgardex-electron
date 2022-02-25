@@ -1,28 +1,20 @@
-import React, { useCallback, useMemo } from 'react'
+import React, { useMemo } from 'react'
 
-import * as RD from '@devexperts/remote-data-ts'
-import { AssetRuneNative, BaseAmount, baseToAsset, THORChain } from '@xchainjs/xchain-util'
-import * as A from 'fp-ts/Array'
+import { THORChain } from '@xchainjs/xchain-util'
 import * as FP from 'fp-ts/function'
 import * as O from 'fp-ts/Option'
 import { useObservableState } from 'observable-hooks'
-import { useIntl } from 'react-intl'
-import * as RxOp from 'rxjs/operators'
 
 import { WalletType } from '../../../../shared/wallet/types'
-import { Bond } from '../../../components/interact/forms'
-import { Button } from '../../../components/uielements/button'
-import { ZERO_ASSET_AMOUNT } from '../../../const'
+import { LoadingView } from '../../../components/shared/loading'
+import { Bond } from '../../../components/wallet/txs/interact/forms'
 import { useThorchainContext } from '../../../contexts/ThorchainContext'
 import { useWalletContext } from '../../../contexts/WalletContext'
-import { eqAsset } from '../../../helpers/fp/eq'
+import { getWalletBalanceByAddress } from '../../../helpers/walletHelper'
+import { useNetwork } from '../../../hooks/useNetwork'
 import { useOpenExplorerTxUrl } from '../../../hooks/useOpenExplorerTxUrl'
-import { useSubscriptionState } from '../../../hooks/useSubscriptionState'
 import { useValidateAddress } from '../../../hooks/useValidateAddress'
-import { INITIAL_INTERACT_STATE } from '../../../services/thorchain/const'
-import { InteractState } from '../../../services/thorchain/types'
-import { DEFAULT_BALANCES_FILTER } from '../../../services/wallet/const'
-import * as Styled from './InteractView.styles'
+import { DEFAULT_BALANCES_FILTER, INITIAL_BALANCES_STATE } from '../../../services/wallet/const'
 
 type Props = {
   walletType: WalletType
@@ -30,87 +22,51 @@ type Props = {
   walletAddress: string
 }
 
-export const BondView: React.FC<Props> = ({ walletType, walletIndex, walletAddress }) => {
-  const { balancesState$ } = useWalletContext()
+export const BondView: React.FC<Props> = (props) => {
+  const { walletType, walletIndex, walletAddress } = props
+
+  const { network } = useNetwork()
+  const {
+    balancesState$,
+    keystoreService: { validatePassword$ }
+  } = useWalletContext()
+
+  const [{ balances: oBalances }] = useObservableState(
+    () => balancesState$(DEFAULT_BALANCES_FILTER),
+    INITIAL_BALANCES_STATE
+  )
 
   const { openExplorerTxUrl, getExplorerTxUrl } = useOpenExplorerTxUrl(O.some(THORChain))
 
-  const {
-    state: interactState,
-    reset: resetInteractState,
-    subscribe: subscribeInteractState
-  } = useSubscriptionState<InteractState>(INITIAL_INTERACT_STATE)
-
-  const { interact$ } = useThorchainContext()
-  const intl = useIntl()
-
   const { validateAddress } = useValidateAddress(THORChain)
 
-  const [runeBalance] = useObservableState(
+  const oWalletBalance = useMemo(
     () =>
       FP.pipe(
-        balancesState$(DEFAULT_BALANCES_FILTER),
-        RxOp.map(({ balances }) => balances),
-        RxOp.map(
-          FP.flow(
-            O.chain(
-              A.findFirst(
-                ({ walletAddress: balanceWalletAddress, asset }) =>
-                  balanceWalletAddress === walletAddress && eqAsset.equals(asset, AssetRuneNative)
-              )
-            ),
-            O.map(({ amount }) => amount),
-            O.map(baseToAsset),
-            O.getOrElse(() => ZERO_ASSET_AMOUNT)
-          )
-        )
+        oBalances,
+        O.chain((balances) => getWalletBalanceByAddress(balances, walletAddress))
       ),
-    ZERO_ASSET_AMOUNT
+    [oBalances, walletAddress]
   )
 
-  const bondTx = useCallback(
-    ({ amount, memo }: { amount: BaseAmount; memo: string }) => {
-      subscribeInteractState(interact$({ walletType, walletIndex, amount, memo }))
-    },
-    [interact$, subscribeInteractState, walletIndex, walletType]
-  )
-
-  const stepLabels = useMemo(
-    () => [intl.formatMessage({ id: 'common.tx.sending' }), intl.formatMessage({ id: 'common.tx.checkResult' })],
-    [intl]
-  )
-  const stepLabel = useMemo(
-    () =>
-      `${intl.formatMessage(
-        { id: 'common.step' },
-        { total: interactState.stepsTotal, current: interactState.step }
-      )}: ${stepLabels[interactState.step - 1]}...`,
-    [interactState, stepLabels, intl]
-  )
+  const { interact$ } = useThorchainContext()
 
   return FP.pipe(
-    interactState.txRD,
-    RD.fold(
-      () => <Bond addressValidation={validateAddress} max={runeBalance} onFinish={bondTx} />,
-      () => (
+    oWalletBalance,
+    O.fold(
+      () => <LoadingView size="large" />,
+      (walletBalance) => (
         <Bond
+          walletIndex={walletIndex}
+          walletType={walletType}
+          balance={walletBalance}
+          interact$={interact$}
+          openExplorerTxUrl={openExplorerTxUrl}
+          getExplorerTxUrl={getExplorerTxUrl}
           addressValidation={validateAddress}
-          isLoading={true}
-          max={runeBalance}
-          onFinish={FP.identity}
-          loadingProgress={stepLabel}
+          validatePassword$={validatePassword$}
+          network={network}
         />
-      ),
-      ({ msg }) => (
-        <Styled.ErrorView title={intl.formatMessage({ id: 'deposit.bond.state.error' })} subTitle={msg}>
-          <Button onClick={resetInteractState}>{intl.formatMessage({ id: 'common.back' })}</Button>
-        </Styled.ErrorView>
-      ),
-      (txHash) => (
-        <Styled.SuccessView title={intl.formatMessage({ id: 'common.tx.success' })}>
-          <Styled.ViewTxButton txHash={O.some(txHash)} onClick={openExplorerTxUrl} txUrl={getExplorerTxUrl(txHash)} />
-          <Button onClick={resetInteractState}>{intl.formatMessage({ id: 'common.back' })}</Button>
-        </Styled.SuccessView>
       )
     )
   )

@@ -1,5 +1,5 @@
 import * as RD from '@devexperts/remote-data-ts'
-import { Address, TxHash } from '@xchainjs/xchain-client'
+import { Address } from '@xchainjs/xchain-client'
 import { Client, DepositParam } from '@xchainjs/xchain-thorchain'
 import { Asset, BaseAmount } from '@xchainjs/xchain-util'
 import * as O from 'fp-ts/Option'
@@ -13,7 +13,7 @@ import { WalletType } from '../../../shared/wallet/types'
 import { LiveData } from '../../helpers/rx/liveData'
 import { AssetsWithAmount1e8, AssetWithAmount1e8 } from '../../types/asgardex'
 import * as C from '../clients'
-import { ApiError, TxHashLD } from '../wallet/types'
+import { ApiError, TxHashLD, TxHashRD } from '../wallet/types'
 
 export type Client$ = C.Client$<Client>
 
@@ -57,10 +57,12 @@ export type InteractState = {
   // Constant total amount of steps
   readonly stepsTotal: 2
   // RD of all requests
-  readonly txRD: RD.RemoteData<ApiError, TxHash>
+  readonly txRD: TxHashRD
 }
 
 export type InteractState$ = Rx.Observable<InteractState>
+
+export type InteractStateHandler = (p: InteractParams) => InteractState$
 
 export type NodeStatus = 'active' | 'standby' | 'disabled' | 'unknown'
 
