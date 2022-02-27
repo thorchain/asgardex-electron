@@ -2,8 +2,8 @@ import * as RD from '@devexperts/remote-data-ts'
 import * as FP from 'fp-ts/lib/function'
 import { IntlShape } from 'react-intl'
 
-import { emptyString } from '../../../../../helpers/stringHelper'
-import { InteractState } from '../../../../../services/thorchain/types'
+import { emptyString } from '../../../../helpers/stringHelper'
+import { InteractState } from '../../../../services/thorchain/types'
 
 export const getInteractiveDescription = ({ state, intl }: { state: InteractState; intl: IntlShape }): string => {
   const { step, stepsTotal, txRD } = state

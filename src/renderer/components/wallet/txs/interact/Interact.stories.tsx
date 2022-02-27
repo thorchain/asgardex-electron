@@ -1,19 +1,38 @@
 import React from 'react'
 
-import { Unbond, Leave, Custom } from './forms/Forms.stories'
-import { Interact } from './Interact'
+import { Meta, Story } from '@storybook/react'
 
-export const Default = () => (
-  <Interact
-    walletType="ledger"
-    bondContent={<>Bond view</>}
-    unbondContent={<Unbond />}
-    leaveContent={<Leave />}
-    customContent={<Custom />}
-    network="testnet"
-  />
+import { WalletType } from '../../../../../shared/wallet/types'
+import { Interact as Component } from './Interact'
+import { InteractType } from './Interact.types'
+
+type Args = {
+  interactType: InteractType
+  walletType: WalletType
+}
+
+const Template: Story<Args> = ({ interactType, walletType }) => (
+  <Component interactType={interactType} network="testnet" walletType={walletType} />
 )
 
-export default {
-  title: 'Wallet/Interact'
+export const Default = Template.bind({})
+
+const meta: Meta<Args> = {
+  component: Component,
+  title: 'Wallet/Interact',
+  argTypes: {
+    interactType: {
+      name: 'type',
+      control: { type: 'select', options: ['bond', 'unbond', 'leave', 'custom'] },
+      defaultValue: 'bond'
+    },
+
+    walletType: {
+      name: 'wallet type',
+      control: { type: 'select', options: ['keystore', 'ledger'] },
+      defaultValue: 'keystore'
+    }
+  }
 }
+
+export default meta

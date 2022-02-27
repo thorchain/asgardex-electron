@@ -87,7 +87,12 @@ export const AssetDetails: React.FC<Props> = (props): JSX.Element => {
     FP.pipe(
       oWalletAddress,
       O.map((walletAddress) =>
-        walletRoutes.deposit.path({ walletType, walletAddress, walletIndex: walletIndex.toString() })
+        walletRoutes.interact.path({
+          interactType: 'bond',
+          walletType,
+          walletAddress,
+          walletIndex: walletIndex.toString()
+        })
       ),
       O.map(history.push)
     )

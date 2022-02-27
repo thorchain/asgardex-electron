@@ -6,27 +6,25 @@ import { Network } from '../../../../../shared/api/types'
 import { isLedgerWallet } from '../../../../../shared/utils/guard'
 import { WalletType } from '../../../../../shared/wallet/types'
 import * as Styled from './Interact.styles'
+import { InteractType } from './Interact.types'
 
-type Props = {
-  walletType: WalletType
-  network: Network
-  bondContent: JSX.Element
-  unbondContent: JSX.Element
-  leaveContent: JSX.Element
-  customContent: JSX.Element
+type Tab = {
+  key: InteractType
+  label: (isActive: boolean) => JSX.Element
 }
 
-export const Interact: React.FC<Props> = ({
-  bondContent,
-  unbondContent,
-  leaveContent,
-  customContent,
-  network,
-  walletType
-}) => {
+type Tabs = Tab[]
+
+type Props = {
+  interactType: InteractType
+  walletType: WalletType
+  network: Network
+}
+
+export const Interact: React.FC<Props> = ({ interactType, network, walletType, children }) => {
   const intl = useIntl()
 
-  const tabs = useMemo(
+  const tabs: Tabs = useMemo(
     () => [
       {
         key: 'bond',
@@ -34,8 +32,7 @@ export const Interact: React.FC<Props> = ({
           <Styled.TabLabel isActive={isActive}>
             {intl.formatMessage({ id: 'deposit.interact.actions.bond' })}
           </Styled.TabLabel>
-        ),
-        content: bondContent
+        )
       },
       {
         key: 'unbond',
@@ -43,8 +40,7 @@ export const Interact: React.FC<Props> = ({
           <Styled.UnbondLabel isActive={isActive}>
             {intl.formatMessage({ id: 'deposit.interact.actions.unbond' })}
           </Styled.UnbondLabel>
-        ),
-        content: unbondContent
+        )
       },
       {
         key: 'leave',
@@ -52,23 +48,21 @@ export const Interact: React.FC<Props> = ({
           <Styled.LeaveLabel isActive={isActive}>
             {intl.formatMessage({ id: 'deposit.interact.actions.leave' })}
           </Styled.LeaveLabel>
-        ),
-        content: leaveContent
+        )
       },
       {
-        key: 'other',
+        key: 'custom',
         label: (isActive: boolean) => (
           <Styled.TabLabel isActive={isActive}>
             {intl.formatMessage({ id: 'deposit.interact.actions.custom' })}
           </Styled.TabLabel>
-        ),
-        content: customContent
+        )
       }
     ],
-    [intl, bondContent, unbondContent, leaveContent, customContent]
+    [intl]
   )
 
-  const [activeTabKey, setActiveTabKey] = useState(tabs[0].key)
+  const [selectedInteractiveType, setSelectedInteractiveType] = useState<InteractType>(interactType)
 
   return (
     <Styled.Container>
@@ -87,19 +81,19 @@ export const Interact: React.FC<Props> = ({
       <Styled.FormWrapper>
         <Styled.FormTitle>{intl.formatMessage({ id: 'deposit.interact.actions' })}</Styled.FormTitle>
         <Styled.Tabs
-          activeKey={activeTabKey}
+          activeKey={selectedInteractiveType}
           renderTabBar={() => (
             <Styled.TabButtonsContainer>
               {tabs.map((tab) => (
-                <Styled.TabButton key={tab.key} onClick={() => setActiveTabKey(tab.key)}>
-                  {tab.label(tab.key === activeTabKey)}
+                <Styled.TabButton key={tab.key} onClick={() => setSelectedInteractiveType(tab.key)}>
+                  {tab.label(tab.key === selectedInteractiveType)}
                 </Styled.TabButton>
               ))}
             </Styled.TabButtonsContainer>
           )}>
           {tabs.map((tab) => (
             <Styled.TabPane tab={tab.label} key={tab.key}>
-              {tab.content}
+              {children}
             </Styled.TabPane>
           ))}
         </Styled.Tabs>

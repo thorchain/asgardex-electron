@@ -5,6 +5,7 @@ import * as O from 'fp-ts/lib/Option'
 
 import { Network } from '../../../shared/api/types'
 import { WalletType } from '../../../shared/wallet/types'
+import { InteractType } from '../../components/wallet/txs/interact/Interact.types'
 import { isNonNativeRuneAsset } from '../../helpers/assetHelper'
 import { sequenceTOption } from '../../helpers/fpHelpers'
 import { Route } from '../types'
@@ -52,12 +53,17 @@ export const poolShares: Route<void> = {
   }
 }
 
-export type DepositParams = { walletAddress: string; walletType: WalletType; walletIndex: string }
-export const deposit: Route<DepositParams> = {
-  template: `${assets.template}/deposit/:walletType/:walletAddress/:walletIndex`,
-  path({ walletType, walletAddress, walletIndex }) {
+export type InteractParams = {
+  interactType: InteractType
+  walletAddress: string
+  walletType: WalletType
+  walletIndex: string
+}
+export const interact: Route<InteractParams> = {
+  template: `${assets.template}/interact/:interactType/:walletType/:walletAddress/:walletIndex`,
+  path({ interactType, walletType, walletAddress, walletIndex }) {
     if (walletAddress) {
-      return `${assets.template}/deposit/${walletType}/${walletAddress}/${walletIndex}`
+      return `${assets.template}/interact/${interactType}/${walletType}/${walletAddress}/${walletIndex}`
     } else {
       // Redirect to assets route if passed param are invalid
       return assets.path()

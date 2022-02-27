@@ -9,7 +9,7 @@ import {
   upgradeRune,
   poolShares,
   history,
-  deposit
+  interact
 } from './wallet'
 
 describe('Wallet routes', () => {
@@ -174,17 +174,39 @@ describe('Wallet routes', () => {
     })
   })
 
-  describe('deposit route', () => {
+  describe('interact route', () => {
     it('template', () => {
-      expect(deposit.template).toEqual('/wallet/assets/deposit/:walletType/:walletAddress/:walletIndex')
+      expect(interact.template).toEqual('/wallet/assets/interact/:interactType/:walletType/:walletAddress/:walletIndex')
     })
-    it('path for keystore + any wallet address ', () => {
-      expect(deposit.path({ walletType: 'keystore', walletAddress: 'abc123', walletIndex: '1' })).toEqual(
-        '/wallet/assets/deposit/keystore/abc123/1'
-      )
+    it('bond + keystore', () => {
+      expect(
+        interact.path({ interactType: 'bond', walletType: 'keystore', walletAddress: 'abc123', walletIndex: '0' })
+      ).toEqual('/wallet/assets/interact/bond/keystore/abc123/0')
+    })
+    it('bond + ledger + index 1', () => {
+      expect(
+        interact.path({ interactType: 'bond', walletType: 'ledger', walletAddress: 'abc123', walletIndex: '1' })
+      ).toEqual('/wallet/assets/interact/bond/ledger/abc123/1')
+    })
+    it('unbond', () => {
+      expect(
+        interact.path({ interactType: 'unbond', walletType: 'keystore', walletAddress: 'abc123', walletIndex: '0' })
+      ).toEqual('/wallet/assets/interact/unbond/keystore/abc123/0')
+    })
+    it('leave', () => {
+      expect(
+        interact.path({ interactType: 'leave', walletType: 'keystore', walletAddress: 'abc123', walletIndex: '0' })
+      ).toEqual('/wallet/assets/interact/leave/keystore/abc123/0')
+    })
+    it('custom', () => {
+      expect(
+        interact.path({ interactType: 'custom', walletType: 'keystore', walletAddress: 'abc123', walletIndex: '0' })
+      ).toEqual('/wallet/assets/interact/custom/keystore/abc123/0')
     })
     it('redirects for invalid values ', () => {
-      expect(deposit.path({ walletAddress: '', walletType: 'ledger', walletIndex: '0' })).toEqual('/wallet/assets')
+      expect(
+        interact.path({ interactType: 'bond', walletAddress: '', walletType: 'ledger', walletIndex: '0' })
+      ).toEqual('/wallet/assets')
     })
   })
 })
