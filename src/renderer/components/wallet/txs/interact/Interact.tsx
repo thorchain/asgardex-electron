@@ -84,9 +84,9 @@ export const Interact: React.FC<Props> = ({ interactType, network, walletType, c
           activeKey={selectedInteractiveType}
           renderTabBar={() => (
             <Styled.TabButtonsContainer>
-              {tabs.map((tab) => (
-                <Styled.TabButton key={tab.key} onClick={() => setSelectedInteractiveType(tab.key)}>
-                  {tab.label(tab.key === selectedInteractiveType)}
+              {tabs.map(({ key, label }) => (
+                <Styled.TabButton key={key} onClick={() => setSelectedInteractiveType(key)}>
+                  {label(key === selectedInteractiveType)}
                 </Styled.TabButton>
               ))}
             </Styled.TabButtonsContainer>

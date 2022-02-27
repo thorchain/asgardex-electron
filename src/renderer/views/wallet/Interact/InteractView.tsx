@@ -70,7 +70,7 @@ export const InteractView: React.FC = () => {
           O.fold(
             () => <LoadingView size="large" />,
             (walletBalance) => (
-              <Interact network={network} walletType={walletType}>
+              <Interact interactType={interactType} network={network} walletType={walletType}>
                 <InteractForm
                   interactType={interactType}
                   walletIndex={walletIndex}
