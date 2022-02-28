@@ -31,6 +31,7 @@ import { AssetWithDecimal } from '../../../../types/asgardex'
 import { WalletPasswordConfirmationModal } from '../../../modal/confirmation'
 import { MaxBalanceButton } from '../../../uielements/button/MaxBalanceButton'
 import { ViewTxButton } from '../../../uielements/button/ViewTxButton'
+import { WalletTypeSelector } from '../../../uielements/common/WalletTypeSelector'
 import { UIFeesRD } from '../../../uielements/fees'
 import { Input } from '../../../uielements/input'
 import { InputBigNumber } from '../../../uielements/input/InputBigNumber'
@@ -46,6 +47,7 @@ export type Props = {
   walletType: WalletType
   walletIndex: number
   runeNativeAddress: Address
+  runeNativeLedgerAddress: O.Option<Address>
   targetPoolAddressRD: PoolAddressRD
   validatePassword$: ValidatePasswordHandler
   fee: FeeRD
@@ -68,7 +70,8 @@ type FormValues = {
 export const Upgrade: React.FC<Props> = (props): JSX.Element => {
   const {
     runeAsset,
-    runeNativeAddress,
+    runeNativeAddress: initialRuneNativeAddress,
+    runeNativeLedgerAddress: oRuneNativeLedgerAddress,
     targetPoolAddressRD,
     validatePassword$,
     fee: feeRD,
@@ -91,6 +94,18 @@ export const Upgrade: React.FC<Props> = (props): JSX.Element => {
   const [form] = Form.useForm<FormValues>()
 
   const [amountToUpgrade, setAmountToUpgrade] = useState<BaseAmount>(ZERO_BASE_AMOUNT)
+
+  const [runeNativeAddress, setRuneNativeAddress] = useState<O.Option<Address>>(O.some(initialRuneNativeAddress))
+
+  const _hasRuneNativeLedgerAddress = useMemo(() => O.isSome(oRuneNativeLedgerAddress), [oRuneNativeLedgerAddress])
+
+  const [useRuneNativeLedgerAddress, setUseRuneNativeLedgerAddress] = useState(false)
+
+  const _toggleUseRuneNativeLedgerAddress = useCallback(() => {
+    const next = !useRuneNativeLedgerAddress
+    setRuneNativeAddress(next ? oRuneNativeLedgerAddress : O.none)
+    setUseRuneNativeLedgerAddress(next)
+  }, [oRuneNativeLedgerAddress, useRuneNativeLedgerAddress])
 
   // State for visibility of Modal to confirm upgrade
   const [showConfirmUpgradeModal, setShowConfirmUpgradeModal] = useState(false)
@@ -377,9 +392,8 @@ export const Upgrade: React.FC<Props> = (props): JSX.Element => {
     [addressValidation, intl]
   )
 
-  const [recipientAddress, setRecipientAddress] = useState<Address>(runeNativeAddress)
-  const handleOnKeyUp = useCallback(() => {
-    setRecipientAddress(form.getFieldValue('address'))
+  const onChangeTargetAddress = useCallback(() => {
+    setRuneNativeAddress(O.some(form.getFieldValue('address')))
   }, [form])
 
   const balances = useMemo(
@@ -390,13 +404,15 @@ export const Upgrade: React.FC<Props> = (props): JSX.Element => {
       ),
     [oBalances]
   )
-
-  const oMatchedWalletType: O.Option<WalletType> = useMemo(
-    () => H.matchedWalletType(balances, recipientAddress),
-    [balances, recipientAddress]
+  const selectedWalletType = useMemo(
+    () =>
+      FP.pipe(
+        runeNativeAddress,
+        O.chain((address) => H.matchedWalletType(balances, address)),
+        O.getOrElse<WalletType | 'custom'>(() => 'custom')
+      ),
+    [balances, runeNativeAddress]
   )
-
-  const renderWalletType = useMemo(() => H.renderedWalletType(oMatchedWalletType), [oMatchedWalletType])
 
   const renderUpgradeForm = useMemo(
     () => (
@@ -415,7 +431,7 @@ export const Upgrade: React.FC<Props> = (props): JSX.Element => {
           />
           <Styled.Form
             form={form}
-            initialValues={{ amount: ZERO_BN, address: runeNativeAddress }}
+            initialValues={{ amount: ZERO_BN, address: initialRuneNativeAddress }}
             onFinish={onSubmit}
             labelCol={{ span: 24 }}>
             <Styled.SubForm>
@@ -439,10 +455,14 @@ export const Upgrade: React.FC<Props> = (props): JSX.Element => {
 
               <Styled.CustomLabel size="big">
                 {intl.formatMessage({ id: 'common.address' })}
-                {renderWalletType}
+                <WalletTypeSelector
+                  selectedWalletType={selectedWalletType}
+                  walletTypes={['keystore', 'ledger', 'custom']}
+                  onChange={(t) => console.log('TODO Implement callback', t)}
+                />
               </Styled.CustomLabel>
               <Form.Item rules={[{ required: true, validator: addressValidator }]} name="address">
-                <Input color="primary" size="large" disabled={isLoading} onKeyUp={handleOnKeyUp} />
+                <Input color="primary" size="large" disabled={isLoading} onKeyUp={onChangeTargetAddress} />
               </Form.Item>
 
               <CStyled.Fees fees={uiFeesRD} reloadFees={reloadFees} disabled={isLoading} />
@@ -464,7 +484,7 @@ export const Upgrade: React.FC<Props> = (props): JSX.Element => {
       walletIndex,
       network,
       form,
-      runeNativeAddress,
+      initialRuneNativeAddress,
       onSubmit,
       intl,
       amountValidator,
@@ -472,9 +492,9 @@ export const Upgrade: React.FC<Props> = (props): JSX.Element => {
       onChangeInput,
       maxAmount,
       addMaxAmountHandler,
-      renderWalletType,
+      selectedWalletType,
       addressValidator,
-      handleOnKeyUp,
+      onChangeTargetAddress,
       uiFeesRD,
       reloadFees,
       renderFeeError,
