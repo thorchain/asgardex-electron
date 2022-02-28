@@ -3,11 +3,12 @@
 ## Add
 
 - Feature list [#2092](https://github.com/thorchain/asgardex-electron/pull/2092)
-- [TxModal|Send] Add copy button [#1998](https://github.com/thorchain/asgardex-electron/issues/1998)
+- [TxModal] Add copy button [#1998](https://github.com/thorchain/asgardex-electron/issues/1998)
 
 ## Update
 
-- [Send] Use TxModal [#2073](https://github.com/thorchain/asgardex-electron/issues/2073)
+- [Send] Use TxModal [#2096](https://github.com/thorchain/asgardex-electron/pull/2096), [#2097](https://github.com/thorchain/asgardex-electron/pull/2097), [#2098](https://github.com/thorchain/asgardex-electron/pull/2098), [#2099](https://github.com/thorchain/asgardex-electron/pull/2099), [#2100](https://github.com/thorchain/asgardex-electron/pull/2100), [#2101](https://github.com/thorchain/asgardex-electron/pull/2101), [#2102](https://github.com/thorchain/asgardex-electron/pull/2102)
+- [Interact] Use TxModal and other improvements [#2104](https://github.com/thorchain/asgardex-electron/pull/2104)
 
 # 0.8.0 (2022-02-18)
 
