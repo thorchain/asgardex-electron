@@ -265,7 +265,7 @@ export const Swap = ({
 
   const oTargetWalletType: O.Option<WalletType> = useMemo(() => {
     // Check for Ledger
-    if (O.isSome(oTargetLedgerAddress) && eqOAddress.equals(editableTargetWalletAddress, oTargetLedgerAddress)) {
+    if (hasTargetAssetLedger && eqOAddress.equals(editableTargetWalletAddress, oTargetLedgerAddress)) {
       return O.some('ledger')
     }
     // Check for keystore
@@ -277,7 +277,7 @@ export const Swap = ({
     }
     // unknown type
     return O.none
-  }, [editableTargetWalletAddress, oInitialTargetWalletAddress, oTargetLedgerAddress])
+  }, [editableTargetWalletAddress, hasTargetAssetLedger, oInitialTargetWalletAddress, oTargetLedgerAddress])
 
   // `AssetWB` of source asset - which might be none (user has no balances for this asset or wallet is locked)
   const oSourceAssetWB: O.Option<WalletBalance> = useMemo(
