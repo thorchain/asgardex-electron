@@ -118,14 +118,6 @@ export const TabLabel = styled('span')<{ isActive?: boolean }>`
   color: ${({ isActive }) => (isActive ? palette('primary', 0) : palette('text', 0))};
 `
 
-export const UnbondLabel = styled(TabLabel)`
-  color: ${palette('warning', 0)};
-`
-
-export const LeaveLabel = styled(TabLabel)`
-  color: ${palette('error', 0)};
-`
-
 export const TabButton = styled('button')`
   outline: none;
   padding: 0 10px;
