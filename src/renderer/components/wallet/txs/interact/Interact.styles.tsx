@@ -8,6 +8,7 @@ import { InnerForm } from '../../../shared/form'
 import { AssetIcon as UIAssetIcon } from '../../../uielements/assets/assetIcon'
 import { Button as UIButton } from '../../../uielements/button'
 import { WalletTypeLabel as WalletTypeLabelUI } from '../../../uielements/common/Common.styles'
+import { Fees as UIFees } from '../../../uielements/fees'
 import { Label as UILabel } from '../../../uielements/label'
 
 export const Container = styled('div')`
@@ -94,13 +95,6 @@ export const FormWrapper = styled('div')`
   flex-grow: 1;
 `
 
-export const FormTitle = styled(UILabel)`
-  text-transform: uppercase;
-  font-size: 16px;
-  padding: 0;
-  margin-bottom: 5px;
-`
-
 export const Tabs = styled(A.Tabs)`
   ${media.sm`
     flex-grow: 1;
@@ -118,7 +112,10 @@ export const TabButtonsContainer = styled('div')`
 `
 
 export const TabLabel = styled('span')<{ isActive?: boolean }>`
-  ${({ isActive }) => (isActive ? 'font-weight: bold; text-decoration: underline' : '')};
+  font-family: ${({ isActive }) => (isActive ? 'MainFontBold' : 'MainFontRegular')};
+  font-weight: ${({ isActive }) => (isActive ? 'bold' : 'normal')};
+  text-decoration: ${({ isActive }) => (isActive ? 'underline' : '')};
+  color: ${({ isActive }) => (isActive ? palette('primary', 0) : palette('text', 0))};
 `
 
 export const UnbondLabel = styled(TabLabel)`
@@ -137,7 +134,7 @@ export const TabButton = styled('button')`
   cursor: pointer;
   text-transform: uppercase;
   margin-right: 5px;
-  color: ${palette('primary', 0)};
+  color: ${palette('text', 0)};
   font-size: 16px;
 
   &:first-child {
@@ -157,6 +154,10 @@ export const Form = styled(InnerForm)`
   height: 100%;
   justify-content: space-between;
   flex-direction: column;
+`
+
+export const FormItem = styled(A.Form.Item)`
+  margin-bottom: 5px;
 `
 
 export const SubmitButtonContainer = styled(A.Form.Item).attrs({
@@ -195,15 +196,9 @@ export const SubmitButton = styled(UIButton).attrs({
 `
 
 export const InputContainer = styled('div')`
-  margin-bottom: 10px;
   ${media.sm`
-    margin-bottom: 20px;
     max-width: 630px;
   `}
-
-  &:last-child {
-    margin: 0;
-  }
 `
 
 export const InputLabel = styled(UILabel)`
@@ -211,4 +206,8 @@ export const InputLabel = styled(UILabel)`
   font-size: 16px;
   text-transform: uppercase;
   color: ${palette('gray', 2)};
+`
+
+export const Fees = styled(UIFees)`
+  padding-bottom: 20px;
 `

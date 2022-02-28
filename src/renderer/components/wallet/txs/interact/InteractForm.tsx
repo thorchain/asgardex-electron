@@ -2,7 +2,15 @@ import React, { useCallback, useEffect, useMemo, useState } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
 import { getBondMemo, getLeaveMemo, getUnbondMemo } from '@thorchain/asgardex-util'
-import { assetAmount, assetToBase, BaseAmount, baseToAsset, THORChain } from '@xchainjs/xchain-util'
+import {
+  assetAmount,
+  AssetRuneNative,
+  assetToBase,
+  BaseAmount,
+  baseToAsset,
+  formatAssetAmountCurrency,
+  THORChain
+} from '@xchainjs/xchain-util'
 import { Form } from 'antd'
 import BigNumber from 'bignumber.js'
 import * as E from 'fp-ts/Either'
@@ -17,6 +25,7 @@ import { ZERO_BASE_AMOUNT } from '../../../../const'
 import { THORCHAIN_DECIMAL } from '../../../../helpers/assetHelper'
 import { validateAddress } from '../../../../helpers/form/validation'
 import { useSubscriptionState } from '../../../../hooks/useSubscriptionState'
+import { FeeRD } from '../../../../services/chain/types'
 import { AddressValidation, GetExplorerTxUrl, OpenExplorerTxUrl } from '../../../../services/clients'
 import { INITIAL_INTERACT_STATE } from '../../../../services/thorchain/const'
 import { InteractState, InteractStateHandler } from '../../../../services/thorchain/types'
@@ -26,7 +35,9 @@ import { TxModal } from '../../../modal/tx'
 import { SendAsset } from '../../../modal/tx/extra/SendAsset'
 import { ViewTxButton } from '../../../uielements/button'
 import { MaxBalanceButton } from '../../../uielements/button/MaxBalanceButton'
+import { UIFeesRD } from '../../../uielements/fees'
 import { Input, InputBigNumber } from '../../../uielements/input'
+import { Label } from '../../../uielements/label'
 import { validateTxAmountInput } from '../TxForm.util'
 import * as H from './Interact.helpers'
 import * as Styled from './Interact.styles'
@@ -42,6 +53,8 @@ type Props = {
   interact$: InteractStateHandler
   openExplorerTxUrl: OpenExplorerTxUrl
   getExplorerTxUrl: GetExplorerTxUrl
+  fee: FeeRD
+  reloadFeesHandler: FP.Lazy<void>
   addressValidation: AddressValidation
   validatePassword$: ValidatePasswordHandler
   network: Network
@@ -56,6 +69,8 @@ export const InteractForm: React.FC<Props> = (props) => {
     openExplorerTxUrl,
     getExplorerTxUrl,
     addressValidation,
+    fee: feeRD,
+    reloadFeesHandler,
     validatePassword$,
     network
   } = props
@@ -86,7 +101,52 @@ export const InteractForm: React.FC<Props> = (props) => {
 
   const [form] = Form.useForm<FormValues>()
 
-  const maxAmount: BaseAmount = useMemo(() => balance.amount, [balance.amount])
+  const oFee: O.Option<BaseAmount> = useMemo(() => FP.pipe(feeRD, RD.toOption), [feeRD])
+
+  const isFeeError = useMemo(
+    () =>
+      FP.pipe(
+        oFee,
+        O.fold(
+          // Missing (or loading) fees does not mean we can't sent something. No error then.
+          () => !O.isNone(oFee),
+          (fee) => balance.amount.amount().isLessThan(fee.amount())
+        )
+      ),
+    [balance, oFee]
+  )
+
+  const renderFeeError = useMemo(
+    () => (
+      <Label size="big" color="error">
+        {intl.formatMessage(
+          { id: 'wallet.errors.fee.notCovered' },
+          {
+            balance: formatAssetAmountCurrency({
+              amount: baseToAsset(balance.amount),
+              asset: AssetRuneNative,
+              trimZeros: true
+            })
+          }
+        )}
+      </Label>
+    ),
+    [intl, balance.amount]
+  )
+
+  // max amount for RuneNative
+  const maxAmount: BaseAmount = useMemo(
+    () =>
+      FP.pipe(
+        oFee,
+        O.fold(
+          // Set maxAmount to zero if we dont know anything about fees
+          () => ZERO_BASE_AMOUNT,
+          (fee) => balance.amount.minus(fee)
+        )
+      ),
+    [oFee, balance.amount]
+  )
 
   const amountValidator = useCallback(
     async (_: unknown, value: BigNumber) => {
@@ -131,6 +191,7 @@ export const InteractForm: React.FC<Props> = (props) => {
       ),
     [addressValidation, intl]
   )
+
   // Send tx start time
   const [sendTxStartTime, setSendTxStartTime] = useState<number>(0)
 
@@ -144,7 +205,7 @@ export const InteractForm: React.FC<Props> = (props) => {
       case 'leave':
         return getLeaveMemo(thorAddress)
       case 'custom':
-        return getBondMemo(form.getFieldValue('memo'))
+        return form.getFieldValue('memo')
     }
   }, [_amountToSend, form, interactType])
 
@@ -257,6 +318,29 @@ export const InteractForm: React.FC<Props> = (props) => {
     network
   ])
 
+  const uiFeesRD: UIFeesRD = useMemo(
+    () =>
+      FP.pipe(
+        feeRD,
+        RD.map((fee) => [{ asset: AssetRuneNative, amount: fee }])
+      ),
+
+    [feeRD]
+  )
+
+  const submitLabel = useMemo(() => {
+    switch (interactType) {
+      case 'bond':
+        return intl.formatMessage({ id: 'deposit.interact.actions.bond' })
+      case 'unbond':
+        return intl.formatMessage({ id: 'deposit.interact.actions.unbond' })
+      case 'leave':
+        return intl.formatMessage({ id: 'deposit.interact.actions.leave' })
+      case 'custom':
+        return intl.formatMessage({ id: 'wallet.action.send' })
+    }
+  }, [interactType, intl])
+
   useEffect(() => {
     // Whenever `amountToSend` has been updated, we put it back into input field
     form.setFieldsValue({
@@ -266,12 +350,12 @@ export const InteractForm: React.FC<Props> = (props) => {
 
   return (
     <Styled.Form form={form} onFinish={() => setShowConfirmationModal(true)} initialValues={{ thorAddress: '' }}>
-      <div>
+      <>
         {/* Memo input (CUSTOM only) */}
         {interactType === 'custom' && (
           <Styled.InputContainer>
             <Styled.InputLabel>{intl.formatMessage({ id: 'common.memo' })}</Styled.InputLabel>
-            <Form.Item
+            <Styled.FormItem
               name="memo"
               rules={[
                 {
@@ -280,7 +364,7 @@ export const InteractForm: React.FC<Props> = (props) => {
                 }
               ]}>
               <Input disabled={isLoading} size="large" />
-            </Form.Item>
+            </Styled.FormItem>
           </Styled.InputContainer>
         )}
 
@@ -288,7 +372,7 @@ export const InteractForm: React.FC<Props> = (props) => {
         {(interactType === 'bond' || interactType === 'unbond' || interactType === 'leave') && (
           <Styled.InputContainer>
             <Styled.InputLabel>{intl.formatMessage({ id: 'common.thorAddress' })}</Styled.InputLabel>
-            <Form.Item
+            <Styled.FormItem
               name="thorAddress"
               rules={[
                 {
@@ -297,7 +381,7 @@ export const InteractForm: React.FC<Props> = (props) => {
                 }
               ]}>
               <Input disabled={isLoading} size="large" />
-            </Form.Item>
+            </Styled.FormItem>
           </Styled.InputContainer>
         )}
 
@@ -305,7 +389,7 @@ export const InteractForm: React.FC<Props> = (props) => {
         {(interactType === 'bond' || interactType === 'unbond' || interactType === 'custom') && (
           <Styled.InputContainer>
             <Styled.InputLabel>{intl.formatMessage({ id: 'common.amount' })}</Styled.InputLabel>
-            <Form.Item
+            <Styled.FormItem
               name="amount"
               rules={[
                 {
@@ -314,7 +398,7 @@ export const InteractForm: React.FC<Props> = (props) => {
                 }
               ]}>
               <InputBigNumber disabled={isLoading} size="large" decimal={THORCHAIN_DECIMAL} onChange={onChangeInput} />
-            </Form.Item>
+            </Styled.FormItem>
             {/* max. amount button (BOND/CUSTOM only) */}
             {(interactType === 'bond' || interactType === 'custom') && (
               <MaxBalanceButton
@@ -323,16 +407,18 @@ export const InteractForm: React.FC<Props> = (props) => {
                 disabled={isLoading}
               />
             )}
+            <Styled.Fees fees={uiFeesRD} reloadFees={reloadFeesHandler} disabled={isLoading} />
+            {isFeeError && renderFeeError}
           </Styled.InputContainer>
         )}
-      </div>
+      </>
 
       <Styled.SubmitButtonContainer>
         <Styled.SubmitButton
           loading={isLoading}
-          disabled={isLoading || !!form.getFieldsError().filter(({ errors }) => errors.length).length}
+          disabled={isLoading || !!form.getFieldsError().filter(({ errors }) => errors.length).length || isFeeError}
           htmlType="submit">
-          {intl.formatMessage({ id: 'wallet.action.send' })}
+          {submitLabel}
         </Styled.SubmitButton>
       </Styled.SubmitButtonContainer>
       {showConfirmationModal && renderConfirmationModal}

@@ -2,7 +2,7 @@ import React from 'react'
 
 import { Story, Meta } from '@storybook/react'
 import { TxHash } from '@xchainjs/xchain-client'
-import { assetAmount, assetToBase } from '@xchainjs/xchain-util'
+import { assetAmount, assetToBase, BaseAmount, baseAmount } from '@xchainjs/xchain-util'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
 import * as Rx from 'rxjs'
@@ -11,6 +11,7 @@ import { getMockRDValueFactory, RDStatus } from '../../../../../shared/mock/rdBy
 import { mockValidatePassword$ } from '../../../../../shared/mock/wallet'
 import { WalletType } from '../../../../../shared/wallet/types'
 import { mockWalletBalance } from '../../../../helpers/test/testWalletHelper'
+import { FeeRD } from '../../../../services/chain/types'
 import { InteractStateHandler } from '../../../../services/thorchain/types'
 import { ApiError, ErrorId, WalletBalance } from '../../../../services/wallet/types'
 import { InteractType } from './Interact.types'
@@ -25,7 +26,7 @@ type Args = {
   walletType: WalletType
 }
 
-const Template: Story<Args> = ({ interactType, txRDStatus, balance, validAddress, walletType }) => {
+const Template: Story<Args> = ({ interactType, txRDStatus, feeRDStatus, balance, validAddress, walletType }) => {
   const interact$: InteractStateHandler = (_) => {
     const getCurrentStep = () => {
       switch (txRDStatus) {
@@ -55,6 +56,14 @@ const Template: Story<Args> = ({ interactType, txRDStatus, balance, validAddress
     })
   }
 
+  const feeRD: FeeRD = FP.pipe(
+    feeRDStatus,
+    getMockRDValueFactory<Error, BaseAmount>(
+      () => baseAmount(2000000),
+      () => Error('getting fees failed')
+    )
+  )
+
   const runeBalance: WalletBalance = mockWalletBalance({
     amount: assetToBase(assetAmount(balance))
   })
@@ -67,6 +76,8 @@ const Template: Story<Args> = ({ interactType, txRDStatus, balance, validAddress
       interact$={interact$}
       balance={runeBalance}
       addressValidation={(_: string) => validAddress}
+      fee={feeRD}
+      reloadFeesHandler={() => console.log('reload fees')}
       validatePassword$={mockValidatePassword$}
       network="testnet"
       openExplorerTxUrl={(txHash: TxHash) => {

@@ -7,7 +7,6 @@ const deposit: DepositMessages = {
   'deposit.interact.actions.custom': 'Вручную',
   'deposit.interact.title': 'Вклад',
   'deposit.interact.subtitle': 'Взаимодействие с THORСhain',
-  'deposit.interact.actions': 'Доступные действия',
   'deposit.share.title': 'Ваша общая доля в пуле',
   'deposit.share.units': 'Единицы ликвидности',
   'deposit.share.poolshare': 'Доля в пуле',

@@ -12,7 +12,12 @@ type Args = {
 }
 
 const Template: Story<Args> = ({ interactType, walletType }) => (
-  <Component interactType={interactType} network="testnet" walletType={walletType} />
+  <Component
+    interactType={interactType}
+    interactTypeChanged={(type) => console.log('Interact type changed ', type)}
+    network="testnet"
+    walletType={walletType}
+  />
 )
 
 export const Default = Template.bind({})
