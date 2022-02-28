@@ -78,7 +78,7 @@ export const WalletView: React.FC = (): JSX.Element => {
             <AssetsNav />
             <PoolShareView />
           </Route>
-          <Route path={walletRoutes.deposit.template} exact>
+          <Route path={walletRoutes.interact.template} exact>
             <InteractView />
           </Route>
           <Route path={walletRoutes.bonds.template} exact>

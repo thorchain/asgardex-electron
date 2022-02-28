@@ -38,7 +38,7 @@ export const useNetwork = (): { network: Network; changeNetwork: ChangeNetworkHa
       walletRoutes.upgradeRune.template,
       walletRoutes.assetDetail.template,
       walletRoutes.bonds.template,
-      walletRoutes.deposit.template
+      walletRoutes.interact.template
     ]),
     O.fromNullable,
     O.map((_) => walletRoutes.base.path())

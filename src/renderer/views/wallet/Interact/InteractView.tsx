@@ -1,45 +1,137 @@
-import React from 'react'
+import React, { useCallback, useMemo } from 'react'
 
+import * as RD from '@devexperts/remote-data-ts'
+import { AssetRuneNative, assetToString, THORChain } from '@xchainjs/xchain-util'
 import { Col, Row } from 'antd'
+import * as FP from 'fp-ts/function'
+import * as O from 'fp-ts/Option'
 import { useObservableState } from 'observable-hooks'
 import { useParams } from 'react-router'
+import { useHistory } from 'react-router-dom'
 
-import { Network } from '../../../../shared/api/types'
-import { Interact } from '../../../components/interact'
+import { LoadingView } from '../../../components/shared/loading'
 import { BackLink } from '../../../components/uielements/backLink'
-import { useAppContext } from '../../../contexts/AppContext'
+import { Interact } from '../../../components/wallet/txs/interact'
+import { InteractType } from '../../../components/wallet/txs/interact/Interact.types'
+import { InteractForm } from '../../../components/wallet/txs/interact/InteractForm'
+import { useThorchainContext } from '../../../contexts/ThorchainContext'
+import { useWalletContext } from '../../../contexts/WalletContext'
+import { liveData } from '../../../helpers/rx/liveData'
+import { getWalletBalanceByAddress } from '../../../helpers/walletHelper'
+import { useNetwork } from '../../../hooks/useNetwork'
+import { useOpenExplorerTxUrl } from '../../../hooks/useOpenExplorerTxUrl'
+import { useValidateAddress } from '../../../hooks/useValidateAddress'
 import * as walletRoutes from '../../../routes/wallet'
-import { DEFAULT_NETWORK } from '../../../services/const'
-import { BondView } from './BondView'
-import { CustomView } from './CustomView'
+import { FeeRD } from '../../../services/chain/types'
+import { DEFAULT_BALANCES_FILTER, INITIAL_BALANCES_STATE } from '../../../services/wallet/const'
 import * as Styled from './InteractView.styles'
-import { LeaveView } from './LeaveView'
-import { UnbondView } from './UnbondView'
 
 export const InteractView: React.FC = () => {
-  const { walletAddress, walletType, walletIndex: walletIndexRoute } = useParams<walletRoutes.DepositParams>()
+  const {
+    interactType,
+    walletAddress,
+    walletType,
+    walletIndex: walletIndexRoute
+  } = useParams<walletRoutes.InteractParams>()
+
+  const history = useHistory()
 
   const walletIndex = parseInt(walletIndexRoute)
 
-  const { network$ } = useAppContext()
-  const network = useObservableState<Network>(network$, DEFAULT_NETWORK)
+  const { network } = useNetwork()
+  const {
+    balancesState$,
+    keystoreService: { validatePassword$ }
+  } = useWalletContext()
+
+  const [{ balances: oBalances }] = useObservableState(
+    () => balancesState$(DEFAULT_BALANCES_FILTER),
+    INITIAL_BALANCES_STATE
+  )
+
+  const { openExplorerTxUrl, getExplorerTxUrl } = useOpenExplorerTxUrl(O.some(THORChain))
+
+  const { validateAddress } = useValidateAddress(THORChain)
+
+  const oWalletBalance = useMemo(
+    () =>
+      FP.pipe(
+        oBalances,
+        O.chain((balances) => getWalletBalanceByAddress(balances, walletAddress))
+      ),
+    [oBalances, walletAddress]
+  )
+
+  const { interact$ } = useThorchainContext()
+
+  const { fees$, reloadFees } = useThorchainContext()
+
+  const [feeRD] = useObservableState<FeeRD>(
+    () =>
+      FP.pipe(
+        fees$(),
+        liveData.map((fees) => fees.fast)
+      ),
+    RD.initial
+  )
+
+  const interactTypeChanged = useCallback(
+    (type: InteractType) => {
+      history.push(
+        walletRoutes.interact.path({
+          interactType: type,
+          walletAddress,
+          walletType,
+          walletIndex: walletIndex.toString()
+        })
+      )
+    },
+    [history, walletAddress, walletIndex, walletType]
+  )
 
   return (
     <>
       <Row justify="space-between">
         <Col>
-          <BackLink />
+          <BackLink
+            path={walletRoutes.assetDetail.path({
+              asset: assetToString(AssetRuneNative),
+              walletAddress,
+              walletType,
+              walletIndex: walletIndexRoute
+            })}
+          />
         </Col>
       </Row>
       <Styled.ContentContainer>
-        <Interact
-          walletType={walletType}
-          bondContent={<BondView walletType={walletType} walletIndex={walletIndex} walletAddress={walletAddress} />}
-          leaveContent={<LeaveView walletType={walletType} walletIndex={walletIndex} />}
-          unbondContent={<UnbondView walletType={walletType} walletIndex={walletIndex} />}
-          customContent={<CustomView walletType={walletType} walletIndex={walletIndex} />}
-          network={network}
-        />
+        {FP.pipe(
+          oWalletBalance,
+          O.fold(
+            () => <LoadingView size="large" />,
+            (walletBalance) => (
+              <Interact
+                interactType={interactType}
+                interactTypeChanged={interactTypeChanged}
+                network={network}
+                walletType={walletType}>
+                <InteractForm
+                  interactType={interactType}
+                  walletIndex={walletIndex}
+                  walletType={walletType}
+                  balance={walletBalance}
+                  interact$={interact$}
+                  openExplorerTxUrl={openExplorerTxUrl}
+                  getExplorerTxUrl={getExplorerTxUrl}
+                  addressValidation={validateAddress}
+                  fee={feeRD}
+                  reloadFeesHandler={reloadFees}
+                  validatePassword$={validatePassword$}
+                  network={network}
+                />
+              </Interact>
+            )
+          )
+        )}
       </Styled.ContentContainer>
     </>
   )

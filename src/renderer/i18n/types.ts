@@ -310,7 +310,7 @@ export type SwapMessages = { [key in SwapMessageKey]: string }
 type DepositMessageKey =
   | 'deposit.interact.title'
   | 'deposit.interact.subtitle'
-  | 'deposit.interact.actions'
+  // Note: Never change last keys (bond, unbond, leave, custom) - they are mapped to `InteractTypes`
   | 'deposit.interact.actions.bond'
   | 'deposit.interact.actions.unbond'
   | 'deposit.interact.actions.leave'

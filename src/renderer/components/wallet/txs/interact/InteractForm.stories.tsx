@@ -11,11 +11,14 @@ import { getMockRDValueFactory, RDStatus } from '../../../../../shared/mock/rdBy
 import { mockValidatePassword$ } from '../../../../../shared/mock/wallet'
 import { WalletType } from '../../../../../shared/wallet/types'
 import { mockWalletBalance } from '../../../../helpers/test/testWalletHelper'
-import { FeeRD, SendTxStateHandler } from '../../../../services/chain/types'
+import { FeeRD } from '../../../../services/chain/types'
+import { InteractStateHandler } from '../../../../services/thorchain/types'
 import { ApiError, ErrorId, WalletBalance } from '../../../../services/wallet/types'
-import { SendFormTHOR as Component } from './SendFormTHOR'
+import { InteractType } from './Interact.types'
+import { InteractForm as Component } from './InteractForm'
 
 type Args = {
+  interactType: InteractType
   txRDStatus: RDStatus
   feeRDStatus: RDStatus
   balance: string
@@ -23,11 +26,24 @@ type Args = {
   walletType: WalletType
 }
 
-const Template: Story<Args> = ({ txRDStatus, feeRDStatus, balance, validAddress, walletType }) => {
-  const transfer$: SendTxStateHandler = (_) =>
-    Rx.of({
-      steps: { current: txRDStatus === 'initial' ? 0 : 1, total: 1 },
-      status: FP.pipe(
+const Template: Story<Args> = ({ interactType, txRDStatus, feeRDStatus, balance, validAddress, walletType }) => {
+  const interact$: InteractStateHandler = (_) => {
+    const getCurrentStep = () => {
+      switch (txRDStatus) {
+        case 'initial':
+          return 0
+        case 'pending':
+          return 1
+        case 'success':
+          return 2
+        case 'error':
+          return 2
+      }
+    }
+    return Rx.of({
+      step: getCurrentStep(),
+      stepsTotal: 2,
+      txRD: FP.pipe(
         txRDStatus,
         getMockRDValueFactory<ApiError, TxHash>(
           () => 'tx-hash',
@@ -38,6 +54,7 @@ const Template: Story<Args> = ({ txRDStatus, feeRDStatus, balance, validAddress,
         )
       )
     })
+  }
 
   const feeRD: FeeRD = FP.pipe(
     feeRDStatus,
@@ -53,10 +70,10 @@ const Template: Story<Args> = ({ txRDStatus, feeRDStatus, balance, validAddress,
 
   return (
     <Component
+      interactType={interactType}
       walletType={walletType}
       walletIndex={0}
-      transfer$={transfer$}
-      balances={[runeBalance]}
+      interact$={interact$}
       balance={runeBalance}
       addressValidation={(_: string) => validAddress}
       fee={feeRD}
@@ -76,8 +93,13 @@ export const Default = Template.bind({})
 
 const meta: Meta<Args> = {
   component: Component,
-  title: 'Wallet/SendFormTHOR',
+  title: 'Wallet/InteractForm',
   argTypes: {
+    interactType: {
+      name: 'type',
+      control: { type: 'select', options: ['bond', 'unbond', 'leave', 'custom'] },
+      defaultValue: 'bond'
+    },
     txRDStatus: {
       name: 'txRDStatus',
       control: { type: 'select', options: ['pending', 'error', 'success'] },
