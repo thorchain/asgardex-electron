@@ -437,7 +437,7 @@ export const Upgrade: React.FC<Props> = (props): JSX.Element => {
       FP.pipe(
         targetAddress,
         O.chain((address) => H.matchedWalletType(balances, address)),
-        O.getOrElse<WalletType | 'custom'>(() => 'custom')
+        O.getOrElse<SelectableWalletType>(() => 'custom')
       ),
     [balances, targetAddress]
   )

@@ -121,10 +121,6 @@ const Template: Story<Args> = ({ txRDStatus, feeRDStatus, balance, hasLedger, wa
         return Promise.resolve(true)
       }}
       getExplorerTxUrl={(txHash: TxHash) => O.some(`url/asset-${txHash}`)}
-      // openExplorerTxUrl={(txHash: TxHash) => {
-      //   console.log(`Open explorer - tx hash ${txHash}`)
-      //   return Promise.resolve(true)
-      // }}
       reloadBalancesHandler={() => console.log('reload balances')}
       network="testnet"
     />
