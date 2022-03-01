@@ -2,21 +2,32 @@ import React from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
 import { Story, Meta } from '@storybook/react'
-import { TxHash } from '@xchainjs/xchain-client'
-import { assetAmount, AssetBNB, AssetRune67C, assetToBase, baseAmount, BNBChain } from '@xchainjs/xchain-util'
+import { TxHash, TxParams } from '@xchainjs/xchain-client'
+import {
+  assetAmount,
+  AssetBNB,
+  AssetRune67C,
+  assetToBase,
+  BaseAmount,
+  baseAmount,
+  BNBChain
+} from '@xchainjs/xchain-util'
+import * as FP from 'fp-ts/lib/function'
 import * as NEA from 'fp-ts/lib/NonEmptyArray'
 import * as O from 'fp-ts/lib/Option'
 import * as Rx from 'rxjs'
 import * as RxOp from 'rxjs/operators'
 
+import { getMockRDValueFactory, RDStatus } from '../../../../../shared/mock/rdByStatus'
 import { mockValidatePassword$ } from '../../../../../shared/mock/wallet'
+import { WalletType } from '../../../../../shared/wallet/types'
 import { BNB_DECIMAL } from '../../../../helpers/assetHelper'
 import { mockWalletBalance } from '../../../../helpers/test/testWalletHelper'
 import { INITIAL_UPGRADE_RUNE_STATE } from '../../../../services/chain/const'
-import { UpgradeRuneParams, UpgradeRuneTxState, UpgradeRuneTxState$ } from '../../../../services/chain/types'
-import { ErrorId } from '../../../../services/wallet/types'
+import { FeeRD, UpgradeRuneParams, UpgradeRuneTxState, UpgradeRuneTxState$ } from '../../../../services/chain/types'
+import { ApiError, ErrorId } from '../../../../services/wallet/types'
 import { WalletBalances, WalletBalance } from '../../../../services/wallet/types'
-import { Upgrade, Props as UpgradeProps } from './Upgrade'
+import { Upgrade as Component } from './Upgrade'
 
 const mockTxState$ = (states: UpgradeRuneTxState[]): UpgradeRuneTxState$ =>
   Rx.interval(1000).pipe(
@@ -26,97 +37,133 @@ const mockTxState$ = (states: UpgradeRuneTxState[]): UpgradeRuneTxState$ =>
     RxOp.startWith(INITIAL_UPGRADE_RUNE_STATE)
   )
 
-const bnbBalance: WalletBalance = mockWalletBalance({
-  asset: AssetBNB,
-  amount: assetToBase(assetAmount(1001)),
-  walletAddress: 'BNB address'
-})
-
-const runeBnbBalance: WalletBalance = mockWalletBalance({
-  asset: AssetRune67C,
-  amount: assetToBase(assetAmount(2002)),
-  walletAddress: 'BNB.Rune address'
-})
-
-const runeNativeBalance: WalletBalance = mockWalletBalance({
-  amount: assetToBase(assetAmount(0))
-})
-
 const getBalances = (balances: WalletBalances) => NEA.fromArray<WalletBalance>(balances)
 
-// total steps
-const total = 3
+type Args = {
+  txRDStatus: RDStatus & 'animated'
+  feeRDStatus: RDStatus
+  balance: number
+  hasLedger: boolean
+  validAddress: boolean
+  walletType: WalletType
+}
 
-const defaultProps: UpgradeProps = {
-  runeAsset: {
+const Template: Story<Args> = ({ txRDStatus, feeRDStatus, balance, hasLedger, walletType, validAddress }) => {
+  const bnbBalance: WalletBalance = mockWalletBalance({
+    asset: AssetBNB,
+    amount: assetToBase(assetAmount(balance)),
+    walletAddress: 'BNB address'
+  })
+
+  const runeBnbBalance: WalletBalance = mockWalletBalance({
     asset: AssetRune67C,
-    decimal: BNB_DECIMAL
-  },
-  runeNativeAddress: 'rune-native-address',
-  walletAddress: 'bnb12312312312123123123123',
-  addressValidation: () => true,
-  walletType: 'keystore',
-  walletIndex: 0,
-  reloadOnError: () => {},
-  targetPoolAddressRD: RD.success({ chain: BNBChain, address: 'bnb-pool-address', router: O.none, halted: false }),
-  validatePassword$: mockValidatePassword$,
-  fee: RD.success(baseAmount(37500)),
-  upgrade$: (p: UpgradeRuneParams): UpgradeRuneTxState$ => {
+    amount: assetToBase(assetAmount(2002)),
+    walletAddress: 'BNB.Rune address'
+  })
+
+  const runeNativeBalance: WalletBalance = mockWalletBalance({
+    amount: assetToBase(assetAmount(0))
+  })
+
+  const feeRD: FeeRD = FP.pipe(
+    feeRDStatus,
+    getMockRDValueFactory<Error, BaseAmount>(
+      () => baseAmount(3750000),
+      () => Error('getting fees failed')
+    )
+  )
+
+  const upgrade$ = (p: UpgradeRuneParams): UpgradeRuneTxState$ => {
     console.log('upgrade$:', p)
-    return mockTxState$([
-      { steps: { current: 1, total }, status: RD.pending },
-      { steps: { current: 2, total }, status: RD.pending },
-      { steps: { current: 3, total }, status: RD.pending },
-      { steps: { current: 3, total }, status: RD.success('tx-hash') }
-    ])
-  },
-  balances: getBalances([bnbBalance, runeBnbBalance, runeNativeBalance]),
-  reloadFeeHandler: () => console.log('reload fee'),
-  successActionHandler: (txHash) => {
-    console.log('success handler ' + txHash)
-    return Promise.resolve(true)
-  },
-  getExplorerTxUrl: (txHash: TxHash) => O.some(`url/asset-${txHash}`),
-  reloadBalancesHandler: () => console.log('reload balances'),
-  network: 'testnet'
-}
 
-export const Default: Story = () => <Upgrade {...defaultProps} />
-Default.storyName = 'default'
-
-export const HealthCheckFailure: Story = () => {
-  const props: UpgradeProps = {
-    ...defaultProps,
-    upgrade$: (_: UpgradeRuneParams): UpgradeRuneTxState$ =>
-      mockTxState$([
-        {
-          steps: { current: 1, total },
-          status: RD.failure({ errorId: ErrorId.VALIDATE_POOL, msg: 'invalid pool address' })
-        }
+    const total = 3
+    if (txRDStatus === 'animated')
+      return mockTxState$([
+        { steps: { current: 1, total }, status: RD.pending },
+        { steps: { current: 2, total }, status: RD.pending },
+        { steps: { current: 3, total }, status: RD.pending },
+        { steps: { current: 3, total }, status: RD.success('tx-hash') }
       ])
-  }
-  return <Upgrade {...props} />
-}
-HealthCheckFailure.storyName = 'health check failure'
 
-export const NoFees: Story = () => {
-  const props: UpgradeProps = { ...defaultProps, fee: RD.failure(Error('no fees')) }
-  return <Upgrade {...props} />
-}
-NoFees.storyName = 'no fees'
-
-export const FeesNotCovered: Story = () => {
-  const props: UpgradeProps = {
-    ...defaultProps,
-    balances: getBalances([{ ...bnbBalance, amount: baseAmount(30) }, runeBnbBalance, runeNativeBalance])
+    return Rx.of({
+      steps: { current: txRDStatus === 'initial' ? 0 : 3, total },
+      status: FP.pipe(
+        txRDStatus,
+        getMockRDValueFactory<ApiError, TxHash>(
+          () => 'tx-hash',
+          () => ({ errorId: ErrorId.VALIDATE_POOL, msg: 'invalid pool address' })
+        )
+      )
+    })
   }
-  return <Upgrade {...props} />
+
+  return (
+    <Component
+      runeAsset={{
+        asset: AssetRune67C,
+        decimal: BNB_DECIMAL
+      }}
+      runeNativeAddress="rune-native-address"
+      runeNativeLedgerAddress={hasLedger ? O.some('rune-native-ledger-address') : O.none}
+      walletAddress="bnb-address"
+      addressValidation={(_: string) => validAddress}
+      walletType={walletType}
+      walletIndex={0}
+      reloadOnError={() => console.log('reload on error')}
+      targetPoolAddressRD={RD.success({ chain: BNBChain, address: 'bnb-pool-address', router: O.none, halted: false })}
+      validatePassword$={mockValidatePassword$}
+      fee={feeRD}
+      upgrade$={upgrade$}
+      balances={getBalances([bnbBalance, runeBnbBalance, runeNativeBalance])}
+      reloadFeeHandler={(p: TxParams) => console.log('reload fees ', p)}
+      successActionHandler={(txHash) => {
+        console.log('success handler ' + txHash)
+        return Promise.resolve(true)
+      }}
+      getExplorerTxUrl={(txHash: TxHash) => O.some(`url/asset-${txHash}`)}
+      reloadBalancesHandler={() => console.log('reload balances')}
+      network="testnet"
+    />
+  )
 }
-FeesNotCovered.storyName = 'fees not covered'
+
+export const Default = Template.bind({})
 
 const meta: Meta = {
-  component: Upgrade,
-  title: 'Wallet/Upgrade'
+  component: Component,
+  title: 'Wallet/Upgrade',
+  argTypes: {
+    txRDStatus: {
+      name: 'txRDStatus',
+      control: { type: 'select', options: ['pending', 'error', 'success', 'animated'] },
+      defaultValue: 'success'
+    },
+    feeRDStatus: {
+      name: 'feeRD',
+      control: { type: 'select', options: ['initial', 'pending', 'error', 'success'] },
+      defaultValue: 'success'
+    },
+    walletType: {
+      name: 'wallet type',
+      control: { type: 'select', options: ['keystore', 'ledger'] },
+      defaultValue: 'keystore'
+    },
+    balance: {
+      name: 'BNB.RUNE Balance',
+      control: { type: 'text' },
+      defaultValue: '1001'
+    },
+    hasLedger: {
+      name: 'has Ledger connected',
+      control: { type: 'boolean' },
+      defaultValue: true
+    },
+    validAddress: {
+      name: 'valid address',
+      control: { type: 'boolean' },
+      defaultValue: true
+    }
+  }
 }
 
 export default meta

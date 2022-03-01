@@ -94,6 +94,7 @@ export type CommonMessageKey =
   | 'common.informationMore'
   | 'common.balance'
   | 'common.balance.loading'
+  | 'common.custom'
 
 export type CommonMessages = {
   [key in CommonMessageKey]: string
@@ -310,11 +311,9 @@ export type SwapMessages = { [key in SwapMessageKey]: string }
 type DepositMessageKey =
   | 'deposit.interact.title'
   | 'deposit.interact.subtitle'
-  // Note: Never change last keys (bond, unbond, leave, custom) - they are mapped to `InteractTypes`
   | 'deposit.interact.actions.bond'
   | 'deposit.interact.actions.unbond'
   | 'deposit.interact.actions.leave'
-  | 'deposit.interact.actions.custom'
   | 'deposit.share.title'
   | 'deposit.share.units'
   | 'deposit.share.poolshare'

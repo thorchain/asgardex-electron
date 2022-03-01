@@ -93,7 +93,8 @@ const common: CommonMessages = {
   'common.volume24.description': '24h Handlesvolumen von Swaps, Pooleinzahlungen und -abhebungen',
   'common.informationMore': 'Mehr Informationen',
   'common.balance': 'Guthaben',
-  'common.balance.loading': 'Lade Guthaben'
+  'common.balance.loading': 'Lade Guthaben',
+  'common.custom': 'Benutzerdefiniert'
 }
 
 export default common

@@ -93,7 +93,8 @@ const common: CommonMessages = {
   'common.volume24.description': '24h volume of swaps, add liquidity and withdrawals',
   'common.informationMore': 'More information',
   'common.balance': 'Balance',
-  'common.balance.loading': 'Loading balance'
+  'common.balance.loading': 'Loading balance',
+  'common.custom': 'Custom'
 }
 
 export default common

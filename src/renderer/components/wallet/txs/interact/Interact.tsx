@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useMemo } from 'react'
 
 import { useIntl } from 'react-intl'
 
@@ -7,8 +7,6 @@ import { isLedgerWallet } from '../../../../../shared/utils/guard'
 import { WalletType } from '../../../../../shared/wallet/types'
 import * as Styled from './Interact.styles'
 import { InteractType } from './Interact.types'
-
-const TABS: InteractType[] = ['bond', 'unbond', 'leave', 'custom']
 
 type Props = {
   interactType: InteractType
@@ -19,6 +17,16 @@ type Props = {
 
 export const Interact: React.FC<Props> = ({ interactType, interactTypeChanged, network, walletType, children }) => {
   const intl = useIntl()
+
+  const tabs: Array<{ type: InteractType; label: string }> = useMemo(
+    () => [
+      { type: 'bond', label: intl.formatMessage({ id: 'deposit.interact.actions.bond' }) },
+      { type: 'unbond', label: intl.formatMessage({ id: 'deposit.interact.actions.unbond' }) },
+      { type: 'leave', label: intl.formatMessage({ id: 'deposit.interact.actions.leave' }) },
+      { type: 'custom', label: intl.formatMessage({ id: 'common.custom' }) }
+    ],
+    [intl]
+  )
 
   return (
     <Styled.Container>
@@ -39,17 +47,15 @@ export const Interact: React.FC<Props> = ({ interactType, interactTypeChanged, n
           activeKey={interactType}
           renderTabBar={() => (
             <Styled.TabButtonsContainer>
-              {TABS.map((type) => (
+              {tabs.map(({ type, label }) => (
                 <Styled.TabButton key={type} onClick={() => interactTypeChanged(type)}>
-                  <Styled.TabLabel isActive={type === interactType}>
-                    {intl.formatMessage({ id: `deposit.interact.actions.${type}` })}
-                  </Styled.TabLabel>
+                  <Styled.TabLabel isActive={type === interactType}>{label}</Styled.TabLabel>
                 </Styled.TabButton>
               ))}
             </Styled.TabButtonsContainer>
           )}>
-          {TABS.map((tab) => (
-            <Styled.TabPane key={tab}>{children}</Styled.TabPane>
+          {tabs.map(({ type }) => (
+            <Styled.TabPane key={type}>{children}</Styled.TabPane>
           ))}
         </Styled.Tabs>
       </Styled.FormWrapper>

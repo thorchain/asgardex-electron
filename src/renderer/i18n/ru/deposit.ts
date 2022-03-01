@@ -4,7 +4,6 @@ const deposit: DepositMessages = {
   'deposit.interact.actions.bond': 'Вложить',
   'deposit.interact.actions.unbond': 'Изъять',
   'deposit.interact.actions.leave': 'Выйти',
-  'deposit.interact.actions.custom': 'Вручную',
   'deposit.interact.title': 'Вклад',
   'deposit.interact.subtitle': 'Взаимодействие с THORСhain',
   'deposit.share.title': 'Ваша общая доля в пуле',

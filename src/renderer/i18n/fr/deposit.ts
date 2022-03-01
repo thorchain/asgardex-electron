@@ -6,7 +6,6 @@ const deposit: DepositMessages = {
   'deposit.interact.actions.bond': 'Caution',
   'deposit.interact.actions.unbond': 'Retrait',
   'deposit.interact.actions.leave': 'Quitter',
-  'deposit.interact.actions.custom': 'Personnaliser',
   'deposit.share.title': 'Votre part dans la pool',
   'deposit.share.units': 'Unités de liquidité',
   'deposit.share.total': 'Valeur totale',
