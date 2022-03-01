@@ -93,7 +93,8 @@ const common: CommonMessages = {
   'common.volume24.description': '24ч объём обменов, добавления ликвидности и вывода средств',
   'common.informationMore': 'Больше данных',
   'common.balance': 'Баланс',
-  'common.balance.loading': 'Загружаю баланс'
+  'common.balance.loading': 'Загружаю баланс',
+  'common.custom': 'Вручную'
 }
 
 export default common

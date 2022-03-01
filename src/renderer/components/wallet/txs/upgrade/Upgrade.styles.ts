@@ -4,6 +4,7 @@ import { palette } from 'styled-theme'
 import { ErrorView as UIErrorView } from '../../../shared/error'
 import { SuccessView as UISuccessView } from '../../../shared/success'
 import { Fees as UIFees } from '../../../uielements/fees'
+import { WalletTypeSelector as UIWalletTypeSelector } from '../../walletType/WalletTypeSelector'
 
 export const FormWrapper = styled.div`
   padding: 20px 30px;
@@ -26,5 +27,9 @@ export const ErrorView = styled(UIErrorView)`
 `
 
 export const Fees = styled(UIFees)`
-  padding: 20px 0 70px 0;
+  margin: 5px 0 70px 0;
+`
+
+export const WalletTypeSelector = styled(UIWalletTypeSelector)`
+  margin-left: 5px;
 `

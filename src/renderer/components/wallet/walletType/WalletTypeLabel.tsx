@@ -1,6 +1,6 @@
 import React from 'react'
 
-import * as Styled from './Common.styles'
+import * as Styled from '../../uielements/common/Common.styles'
 
 type Props = {
   className?: string

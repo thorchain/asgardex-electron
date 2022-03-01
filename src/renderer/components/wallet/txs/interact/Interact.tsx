@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useMemo } from 'react'
 
 import { useIntl } from 'react-intl'
 
@@ -19,6 +19,19 @@ type Props = {
 
 export const Interact: React.FC<Props> = ({ interactType, interactTypeChanged, network, walletType, children }) => {
   const intl = useIntl()
+
+  const tabLabel = useMemo(() => {
+    switch (interactType) {
+      case 'bond':
+        return intl.formatMessage({ id: 'deposit.interact.actions.bond' })
+      case 'unbond':
+        return intl.formatMessage({ id: 'deposit.interact.actions.unbond' })
+      case 'leave':
+        return intl.formatMessage({ id: 'deposit.interact.actions.leave' })
+      case 'custom':
+        return intl.formatMessage({ id: 'common.custom' })
+    }
+  }, [interactType, intl])
 
   return (
     <Styled.Container>
@@ -41,9 +54,7 @@ export const Interact: React.FC<Props> = ({ interactType, interactTypeChanged, n
             <Styled.TabButtonsContainer>
               {TABS.map((type) => (
                 <Styled.TabButton key={type} onClick={() => interactTypeChanged(type)}>
-                  <Styled.TabLabel isActive={type === interactType}>
-                    {intl.formatMessage({ id: `deposit.interact.actions.${type}` })}
-                  </Styled.TabLabel>
+                  <Styled.TabLabel isActive={type === interactType}>{tabLabel}</Styled.TabLabel>
                 </Styled.TabButton>
               ))}
             </Styled.TabButtonsContainer>

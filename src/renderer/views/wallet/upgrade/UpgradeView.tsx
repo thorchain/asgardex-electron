@@ -79,6 +79,7 @@ export const UpgradeView: React.FC<Props> = (): JSX.Element => {
   const {
     balancesState$,
     keystoreService: { validatePassword$ },
+    getLedgerAddress$,
     reloadBalancesByChain
   } = useWalletContext()
 
@@ -102,6 +103,18 @@ export const UpgradeView: React.FC<Props> = (): JSX.Element => {
     () => FP.pipe(addressByChain$(THORChain), RxOp.map(addressFromOptionalWalletAddress)),
     O.none
   )
+
+  const runeNativeLedgerAddress$ = useMemo(
+    () =>
+      FP.pipe(
+        getLedgerAddress$(THORChain, network),
+        RxOp.map((rdAddress) => RD.toOption(rdAddress)),
+        RxOp.map(addressFromOptionalWalletAddress)
+      ),
+
+    [getLedgerAddress$, network]
+  )
+  const oRuneNativeLedgerAddress = useObservableState(runeNativeLedgerAddress$, O.none)
 
   const [targetPoolAddressRD, updateTargetPoolAddressRD] = useObservableState<PoolAddressRD, O.Option<Asset>>(
     (oRuneNonNativeAsset$) =>
@@ -199,6 +212,7 @@ export const UpgradeView: React.FC<Props> = (): JSX.Element => {
                     walletIndex: parseInt(walletIndex),
                     runeAsset,
                     runeNativeAddress,
+                    runeNativeLedgerAddress: oRuneNativeLedgerAddress,
                     targetPoolAddressRD,
                     validatePassword$,
                     upgrade$: upgradeRuneToNative$,

@@ -12,7 +12,7 @@ const Template: Story<Args> = ({ selectedWalletType, walletTypes }) => (
   <div style={{ display: 'flex', alignItems: 'center', padding: '20px', backgroundColor: '#fff' }}>
     <Component
       selectedWalletType={selectedWalletType}
-      walletTypes={walletTypes}
+      walletTypes={walletTypes.map((t) => ({ label: t, type: t }))}
       onChange={(t) => console.log('onChanged:', t)}
     />
   </div>

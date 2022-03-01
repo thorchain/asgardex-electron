@@ -16,6 +16,7 @@ export type CommonUpgradeProps = {
   walletType: WalletType
   walletIndex: number
   runeNativeAddress: Address
+  runeNativeLedgerAddress: O.Option<Address>
   targetPoolAddressRD: PoolAddressRD
   addressValidation: AddressValidation
   validatePassword$: ValidatePasswordHandler
