@@ -1,14 +1,14 @@
 import React, { useCallback } from 'react'
 
-import Icon, { TwitterOutlined, GithubOutlined, BranchesOutlined, BugOutlined } from '@ant-design/icons'
+import Icon, { TwitterOutlined, BranchesOutlined, BugOutlined, GithubOutlined } from '@ant-design/icons'
 import { Row, Col, Grid } from 'antd'
 import { useHistory } from 'react-router-dom'
 
 import { ExternalUrl } from '../../../shared/const'
-import { ReactComponent as TelegramIcon } from '../../assets/svg/icon-telegram.svg'
+import { ReactComponent as DiscordIcon } from '../../assets/svg/discord.svg'
 import { ReactComponent as ThorChainIcon } from '../../assets/svg/logo-thorchain.svg'
 import * as playgroundRoutes from '../../routes/playground'
-import { FooterContainer, FooterIconWrapper } from './Footer.styles'
+import * as Styled from './Footer.styles'
 
 type IconProps = {
   url: string
@@ -23,7 +23,7 @@ const FooterIcon: React.FC<IconProps> = (props: IconProps): JSX.Element => {
     onClick(url)
   }, [url, onClick])
 
-  return <FooterIconWrapper onClick={clickHandler}>{children}</FooterIconWrapper>
+  return <Styled.IconWrapper onClick={clickHandler}>{children}</Styled.IconWrapper>
 }
 
 type Props = {
@@ -44,48 +44,41 @@ export const Footer: React.FC<Props> = (props): JSX.Element => {
   }, [])
 
   return (
-    <FooterContainer>
+    <Styled.Container>
       <Row justify="space-between" align="middle">
-        <Col span={24} md={4}>
+        <Col span={24} md={12}>
           <Row justify={screens.md ? 'start' : 'center'}>
             <FooterIcon url={ExternalUrl.WEBSITE} onClick={clickIconHandler}>
               <ThorChainIcon />
             </FooterIcon>
           </Row>
         </Col>
-        <Col span={24} md={14}>
-          {/* Disable buttons temporarily for the release (https://github.com/thorchain/asgardex-electron/pull/777) */}
-          {/* <FooterLinkWrapper justify="center">
-            <FooterLink to="/stats">{intl.formatMessage({ id: 'common.stats' })}</FooterLink>
-            <FooterLink to="/network">{intl.formatMessage({ id: 'common.network' })}</FooterLink>
-            <FooterLink to="/faqs">{intl.formatMessage({ id: 'common.faqs' })}</FooterLink>
-          </FooterLinkWrapper> */}
-        </Col>
-        <Col span={24} md={6}>
-          <Row justify={screens.md ? 'end' : 'center'}>
+        <Col span={24} md={12}>
+          <Row justify={screens.md ? 'end' : 'center'} style={{ marginTop: screens.md ? '0' : '10px' }}>
+            <FooterIcon url={ExternalUrl.GITHUB_REPO} onClick={clickIconHandler}>
+              <GithubOutlined />
+            </FooterIcon>
+            <FooterIcon url={ExternalUrl.DISCORD} onClick={clickIconHandler}>
+              <Icon component={DiscordIcon} />
+            </FooterIcon>
             <FooterIcon url={ExternalUrl.TWITTER} onClick={clickIconHandler}>
               <TwitterOutlined />
             </FooterIcon>
-            <FooterIcon url={ExternalUrl.TELEGRAM} onClick={clickIconHandler}>
-              <Icon component={TelegramIcon} />
-            </FooterIcon>
-            <FooterIcon url={ExternalUrl.GITHUB} onClick={clickIconHandler}>
-              <GithubOutlined />
-            </FooterIcon>
-            {commitHash && (
+            {/* hidden in production build */}
+            {isDev && commitHash && (
               <FooterIcon url={`${ExternalUrl.GITHUB_REPO}/commit/${commitHash}`} onClick={clickIconHandler}>
                 <BranchesOutlined />
               </FooterIcon>
             )}
-            {/* Just for debugging - is hidden in production build */}
+            {/* hidden in production build */}
             {isDev && (
-              <FooterIconWrapper onClick={gotoPlayground}>
+              <Styled.IconWrapper onClick={gotoPlayground}>
                 <BugOutlined />
-              </FooterIconWrapper>
+              </Styled.IconWrapper>
             )}
           </Row>
         </Col>
       </Row>
-    </FooterContainer>
+    </Styled.Container>
   )
 }

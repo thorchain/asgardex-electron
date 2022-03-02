@@ -22,7 +22,7 @@ const helpMenu: HelpMenuMessages = {
   'menu.help.title': 'Помощь',
   'menu.help.learn': 'Узнать больше...',
   'menu.help.docs': 'Документация',
-  'menu.help.telegram': 'Telegram',
+  'menu.help.discord': 'Discord',
   'menu.help.issues': 'Issues'
 }
 

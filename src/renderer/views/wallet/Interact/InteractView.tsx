@@ -103,7 +103,7 @@ export const InteractView: React.FC = () => {
           />
         </Col>
       </Row>
-      <Styled.ContentContainer>
+      <Styled.Container>
         {FP.pipe(
           oWalletBalance,
           O.fold(
@@ -132,7 +132,7 @@ export const InteractView: React.FC = () => {
             )
           )
         )}
-      </Styled.ContentContainer>
+      </Styled.Container>
     </>
   )
 }

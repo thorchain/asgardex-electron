@@ -35,9 +35,7 @@ export const TabButton = styled(UIButton).attrs<TabButtonProps>(({ selected }) =
   font-size: 16px !important;
   color: ${({ selected }) => palette('text', selected ? 1 : 0)} !important;
   border-radius: 0;
-  &:first-child {
-    padding-left: 0;
-  }
+  padding-left: 0;
 
   &.ant-btn {
     span {

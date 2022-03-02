@@ -5,8 +5,12 @@
   <img src="internals/img/asgardex-splash.png" width="100%" />
 </div>
 
+[![Version](https://img.shields.io/github/package-json/v/thorchain/asgardex-electron?color=xyz&filename=package.json&style=flat-square)](https://github.com/thorchain/asgardex-electron/releases)
 ![Test](https://github.com/thorchain/asgardex-electron/workflows/Test/badge.svg)
 ![Electron build](https://github.com/thorchain/asgardex-electron/workflows/Electron%20build/badge.svg)
+
+[![Discord](https://img.shields.io/badge/chat-on%20discord-7289da.svg)](https://discord.gg/pHcS67yX7Z)
+[![Follow on Twitter](https://img.shields.io/twitter/follow/asgardex?style=social)](https://twitter.com/asgardex)
 
 ## Feature list
 

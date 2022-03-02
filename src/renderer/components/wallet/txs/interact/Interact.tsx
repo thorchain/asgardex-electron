@@ -48,8 +48,8 @@ export const Interact: React.FC<Props> = ({ interactType, interactTypeChanged, n
           renderTabBar={() => (
             <Styled.TabButtonsContainer>
               {tabs.map(({ type, label }) => (
-                <Styled.TabButton key={type} onClick={() => interactTypeChanged(type)}>
-                  <Styled.TabLabel isActive={type === interactType}>{label}</Styled.TabLabel>
+                <Styled.TabButton key={type} onClick={() => interactTypeChanged(type)} selected={type === interactType}>
+                  {label}
                 </Styled.TabButton>
               ))}
             </Styled.TabButtonsContainer>

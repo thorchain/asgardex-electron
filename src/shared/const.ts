@@ -6,12 +6,11 @@ export const IS_PRODUCTION = envOrDefault(process.env.NODE_ENV, '') === 'product
 
 export enum ExternalUrl {
   WEBSITE = 'https://thorchain.org',
-  DOCS = 'https://docs.thorchain.org/',
-  TELEGRAM = 'https://t.me/thorchain_org',
-  GITHUB = 'https://github.com/thorchain',
+  DOCS = 'https://docs.thorchain.org',
+  DISCORD = 'https://discord.gg/pHcS67yX7Z',
   GITHUB_REPO = `https://github.com/thorchain/asgardex-electron`,
   GITHUB_RELEASE = `https://github.com/thorchain/asgardex-electron/releases/tag/v`,
-  TWITTER = 'https://twitter.com/THORChain'
+  TWITTER = 'https://twitter.com/asgardex'
 }
 
 // increase it by `1` if you want to ignore previous version of `UserNodesStorage`
