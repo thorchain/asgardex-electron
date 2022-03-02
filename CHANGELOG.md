@@ -16,6 +16,10 @@
 
 - [Wallet] New generated phrase might be greater than 12 words [#2054](https://github.com/thorchain/asgardex-electron/issues/2054)
 
+## Internal
+
+- Upgrade API types + endpoints to latest Midgard v2.5.15
+
 # 0.8.0 (2022-02-18)
 
 ## Add
