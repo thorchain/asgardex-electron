@@ -14,7 +14,7 @@ import * as S from 'fp-ts/lib/string'
 import { useIntl } from 'react-intl'
 
 import { Network } from '../../../../../shared/api/types'
-import { isLedgerWallet, isWalletType } from '../../../../../shared/utils/guard'
+import { isKeystoreWallet, isLedgerWallet, isWalletType } from '../../../../../shared/utils/guard'
 import { WalletType } from '../../../../../shared/wallet/types'
 import { ZERO_BASE_AMOUNT, ZERO_BN } from '../../../../const'
 import { convertBaseAmountDecimal } from '../../../../helpers/assetHelper'
@@ -31,7 +31,7 @@ import { AddressValidation, GetExplorerTxUrl, OpenExplorerTxUrl, WalletBalances 
 import { PoolAddressRD } from '../../../../services/midgard/types'
 import { ValidatePasswordHandler } from '../../../../services/wallet/types'
 import { AssetWithDecimal } from '../../../../types/asgardex'
-import { WalletPasswordConfirmationModal } from '../../../modal/confirmation'
+import { LedgerConfirmationModal, WalletPasswordConfirmationModal } from '../../../modal/confirmation'
 import { MaxBalanceButton } from '../../../uielements/button/MaxBalanceButton'
 import { ViewTxButton } from '../../../uielements/button/ViewTxButton'
 import { UIFeesRD } from '../../../uielements/fees'
@@ -135,7 +135,7 @@ export const Upgrade: React.FC<Props> = (props): JSX.Element => {
   }, [hasRuneNativeLedgerAddress, intl])
 
   // State for visibility of Modal to confirm upgrade
-  const [showConfirmUpgradeModal, setShowConfirmUpgradeModal] = useState(false)
+  const [showConfirmationModal, setShowConfirmationModal] = useState(false)
 
   const {
     state: upgradeTxState,
@@ -236,7 +236,7 @@ export const Upgrade: React.FC<Props> = (props): JSX.Element => {
     [amountValidator, runeAsset]
   )
 
-  const upgrade = useCallback(
+  const submitTx = useCallback(
     () =>
       FP.pipe(
         targetPoolAddressRD,
@@ -271,14 +271,6 @@ export const Upgrade: React.FC<Props> = (props): JSX.Element => {
       walletType
     ]
   )
-
-  const onSubmit = useCallback(() => {
-    if (isLedgerWallet(walletType)) {
-      upgrade()
-    } else {
-      setShowConfirmUpgradeModal(true)
-    }
-  }, [upgrade, walletType])
 
   const oFee: O.Option<BaseAmount> = useMemo(() => FP.pipe(feeRD, RD.toOption), [feeRD])
 
@@ -474,7 +466,7 @@ export const Upgrade: React.FC<Props> = (props): JSX.Element => {
           <Styled.Form
             form={form}
             initialValues={{ amount: ZERO_BN, address: initialRuneNativeAddress }}
-            onFinish={onSubmit}
+            onFinish={() => setShowConfirmationModal(true)}
             labelCol={{ span: 24 }}>
             <Styled.SubForm>
               <Styled.CustomLabel size="big">{intl.formatMessage({ id: 'common.amount' })}</Styled.CustomLabel>
@@ -527,7 +519,6 @@ export const Upgrade: React.FC<Props> = (props): JSX.Element => {
       network,
       form,
       initialRuneNativeAddress,
-      onSubmit,
       intl,
       amountValidator,
       isLoading,
@@ -547,25 +538,40 @@ export const Upgrade: React.FC<Props> = (props): JSX.Element => {
     ]
   )
 
-  const upgradeConfirmationHandler = useCallback(() => {
-    // close confirmation modal
-    setShowConfirmUpgradeModal(false)
-    upgrade()
-  }, [upgrade])
+  const renderConfirmationModal = useMemo(() => {
+    const onSuccessHandler = () => {
+      // close confirmation modal
+      setShowConfirmationModal(false)
+      submitTx()
+    }
+    const onCloseHandler = () => {
+      setShowConfirmationModal(false)
+    }
 
-  const renderConfirmUpgradeModal = useMemo(
-    () =>
-      showConfirmUpgradeModal ? (
+    if (isKeystoreWallet(walletType)) {
+      return (
         <WalletPasswordConfirmationModal
-          onSuccess={upgradeConfirmationHandler}
-          onClose={() => setShowConfirmUpgradeModal(false)}
+          onSuccess={onSuccessHandler}
+          onClose={onCloseHandler}
           validatePassword$={validatePassword$}
         />
-      ) : (
-        <></>
-      ),
-    [showConfirmUpgradeModal, upgradeConfirmationHandler, validatePassword$]
-  )
+      )
+    }
+
+    if (isLedgerWallet(walletType)) {
+      return (
+        <LedgerConfirmationModal
+          network={network}
+          onSuccess={onSuccessHandler}
+          onClose={onCloseHandler}
+          visible={showConfirmationModal}
+          chain={runeAsset.asset.chain}
+          description={intl.formatMessage({ id: 'wallet.ledger.confirm' })}
+        />
+      )
+    }
+    return null
+  }, [intl, network, runeAsset.asset.chain, showConfirmationModal, submitTx, validatePassword$, walletType])
 
   const renderUpgradeStatus = useMemo(
     () =>
@@ -594,7 +600,6 @@ export const Upgrade: React.FC<Props> = (props): JSX.Element => {
 
   return (
     <>
-      {renderConfirmUpgradeModal}
       {FP.pipe(
         targetPoolAddressRD,
         RD.chain(
@@ -618,6 +623,7 @@ export const Upgrade: React.FC<Props> = (props): JSX.Element => {
           (_) => renderUpgradeStatus
         )
       )}
+      {showConfirmationModal && renderConfirmationModal}
     </>
   )
 }
