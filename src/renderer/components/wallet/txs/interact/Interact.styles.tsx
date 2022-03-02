@@ -6,7 +6,7 @@ import { palette } from 'styled-theme'
 import { media } from '../../../../helpers/styleHelper'
 import { InnerForm } from '../../../shared/form'
 import { AssetIcon as UIAssetIcon } from '../../../uielements/assets/assetIcon'
-import { Button as UIButton } from '../../../uielements/button'
+import { Button as UIButton, ButtonProps as UIButtonProps } from '../../../uielements/button'
 import { WalletTypeLabel as WalletTypeLabelUI } from '../../../uielements/common/Common.styles'
 import { Fees as UIFees } from '../../../uielements/fees'
 import { Label as UILabel } from '../../../uielements/label'
@@ -111,23 +111,18 @@ export const TabButtonsContainer = styled('div')`
   margin-bottom: 15px;
 `
 
-export const TabLabel = styled('span')<{ isActive?: boolean }>`
-  font-family: ${({ isActive }) => (isActive ? 'MainFontBold' : 'MainFontRegular')};
-  font-weight: ${({ isActive }) => (isActive ? 'bold' : 'normal')};
-  text-decoration: ${({ isActive }) => (isActive ? 'underline' : '')};
-  color: ${({ isActive }) => (isActive ? palette('primary', 0) : palette('text', 0))};
-`
+type TabButtonProps = UIButtonProps & { selected: boolean }
 
-export const TabButton = styled('button')`
-  outline: none;
+export const TabButton = styled(UIButton).attrs<TabButtonProps>(({ selected }) => ({
+  typevalue: 'transparent',
+  weight: selected ? 'bold' : 'normal'
+}))<TabButtonProps>`
+  border: none !important;
   padding: 0 10px;
-  border: 0;
-  background: none;
-  cursor: pointer;
-  text-transform: uppercase;
-  margin-right: 5px;
-  color: ${palette('text', 0)};
-  font-size: 16px;
+  font-size: 16px !important;
+  color: ${({ selected }) => palette('text', selected ? 1 : 0)} !important;
+  border-radius: 0;
+  min-width: auto !important;
 
   &:first-child {
     padding-left: 0;
@@ -135,7 +130,13 @@ export const TabButton = styled('button')`
 
   &:last-child {
     padding-right: 0;
-    margin: 0;
+  }
+
+  &.ant-btn {
+    span {
+      border-bottom: 1px solid transparent;
+      border-bottom-color: ${({ selected }) => selected && palette('primary', 0)};
+    }
   }
 `
 

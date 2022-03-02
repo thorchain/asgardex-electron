@@ -20,9 +20,9 @@ const menu = (intl: IntlShape): MenuItemConstructorOptions => ({
       }
     },
     {
-      label: intl.formatMessage({ id: 'menu.help.telegram' }),
+      label: intl.formatMessage({ id: 'menu.help.discord' }),
       click() {
-        apiUrl.openExternal(ExternalUrl.TELEGRAM)
+        apiUrl.openExternal(ExternalUrl.DISCORD)
       }
     },
     {

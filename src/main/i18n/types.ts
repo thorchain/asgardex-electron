@@ -20,7 +20,7 @@ export type HelpMenuMessages = {
   'menu.help.title': string
   'menu.help.learn': string
   'menu.help.docs': string
-  'menu.help.telegram': string
+  'menu.help.discord': string
   'menu.help.issues': string
 }
 
