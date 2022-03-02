@@ -8,7 +8,7 @@ import * as Styled from './RefreshButton.styles'
 
 type Props = {
   label?: string
-  clickHandler?: FP.Lazy<void>
+  clickHandler?: React.MouseEventHandler<HTMLElement>
   disabled?: boolean
 }
 
