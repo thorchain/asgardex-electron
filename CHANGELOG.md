@@ -12,6 +12,10 @@
 - [Ledger] Rune upgrade: Add ledger tickbox to upgrade process [#2063](https://github.com/thorchain/asgardex-electron/issues/2063)
 - Update social links [#2109(https://github.com/thorchain/asgardex-electron/issues/2109)]
 
+## Fix
+
+- [Wallet] New generated phrase might be greater than 12 words [#2054](https://github.com/thorchain/asgardex-electron/issues/2054)
+
 # 0.8.0 (2022-02-18)
 
 ## Add
