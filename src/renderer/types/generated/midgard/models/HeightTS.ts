@@ -11,23 +11,21 @@
  * Do not edit the class manually.
  */
 
-import {
-    TVLHistoryItem,
-} from './';
-
 /**
  * @export
- * @interface TVLHistory
+ * @interface HeightTS
  */
-export interface TVLHistory {
+export interface HeightTS {
     /**
-     * @type {Array<TVLHistoryItem>}
-     * @memberof TVLHistory
+     * Block height
+     * @type {number}
+     * @memberof HeightTS
      */
-    intervals: Array<TVLHistoryItem>;
+    height: number;
     /**
-     * @type {TVLHistoryItem}
-     * @memberof TVLHistory
+     * Block timestamp (seconds since epoch)
+     * @type {number}
+     * @memberof HeightTS
      */
-    meta: TVLHistoryItem;
+    timestamp: number;
 }
