@@ -109,19 +109,18 @@ const Template: Story<Args> = ({ txRDStatus, feeRDStatus, balance, hasLedger, wa
       addressValidation={(_: string) => validAddress}
       walletType={walletType}
       walletIndex={0}
-      reloadOnError={() => console.log('reload on error')}
       targetPoolAddressRD={RD.success({ chain: BNBChain, address: 'bnb-pool-address', router: O.none, halted: false })}
       validatePassword$={mockValidatePassword$}
       fee={feeRD}
       upgrade$={upgrade$}
       balances={getBalances([bnbBalance, runeBnbBalance, runeNativeBalance])}
       reloadFeeHandler={(p: TxParams) => console.log('reload fees ', p)}
-      successActionHandler={(txHash) => {
-        console.log('success handler ' + txHash)
+      getExplorerTxUrl={(txHash: TxHash) => O.some(`url/asset-${txHash}`)}
+      reloadBalancesHandler={() => console.log(`reload balances`)}
+      openExplorerTxUrl={(txHash: TxHash) => {
+        console.log(`Open explorer - tx hash ${txHash}`)
         return Promise.resolve(true)
       }}
-      getExplorerTxUrl={(txHash: TxHash) => O.some(`url/asset-${txHash}`)}
-      reloadBalancesHandler={() => console.log('reload balances')}
       network="testnet"
     />
   )

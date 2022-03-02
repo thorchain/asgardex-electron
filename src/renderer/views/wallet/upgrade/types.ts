@@ -1,5 +1,5 @@
 import { Address } from '@xchainjs/xchain-client'
-import * as FP from 'fp-ts/function'
+import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/Option'
 
 import { Network } from '../../../../shared/api/types'
@@ -22,9 +22,8 @@ export type CommonUpgradeProps = {
   validatePassword$: ValidatePasswordHandler
   upgrade$: (_: UpgradeRuneParams) => UpgradeRuneTxState$
   balances: O.Option<NonEmptyWalletBalances>
-  successActionHandler: OpenExplorerTxUrl
-  getExplorerTxUrl: GetExplorerTxUrl
   reloadBalancesHandler: FP.Lazy<void>
+  getExplorerTxUrl: GetExplorerTxUrl
+  openExplorerTxUrl: OpenExplorerTxUrl
   network: Network
-  reloadOnError: FP.Lazy<void>
 }

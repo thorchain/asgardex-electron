@@ -168,19 +168,6 @@ export const UpgradeView: React.FC<Props> = (): JSX.Element => {
     }
   }, [])
 
-  const reloadOnError = useCallback(() => {
-    // Reload inbound addresses in case previously it was failed
-    FP.pipe(targetPoolAddressRD, O.fromPredicate(RD.isFailure), O.map(reloadInboundAddresses))
-
-    // Reload chain's balances in case previously it was failed
-    FP.pipe(
-      oRuneNonNativeAsset,
-      O.map(({ chain }) => chain),
-      O.map(reloadBalancesByChain),
-      O.ap(O.fromPredicate(O.isNone)(oBalances))
-    )
-  }, [reloadInboundAddresses, reloadBalancesByChain, oRuneNonNativeAsset, oBalances, targetPoolAddressRD])
-
   const { openExplorerTxUrl, getExplorerTxUrl } = useOpenExplorerTxUrl(
     FP.pipe(
       oRuneNonNativeAsset,
@@ -217,11 +204,10 @@ export const UpgradeView: React.FC<Props> = (): JSX.Element => {
                     validatePassword$,
                     upgrade$: upgradeRuneToNative$,
                     balances: oBalances,
-                    successActionHandler: openExplorerTxUrl,
+                    openExplorerTxUrl,
                     getExplorerTxUrl,
                     reloadBalancesHandler: reloadBalancesByChain(runeAsset.asset.chain),
-                    network,
-                    reloadOnError
+                    network
                   })
                 }
               )
