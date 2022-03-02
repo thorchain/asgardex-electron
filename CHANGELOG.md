@@ -11,6 +11,7 @@
 - [Interact] Use TxModal and other improvements [#2104](https://github.com/thorchain/asgardex-electron/pull/2104)
 - [Ledger] Rune upgrade: Add ledger tickbox to upgrade process [#2063](https://github.com/thorchain/asgardex-electron/issues/2063)
 - Update social links [#2109(https://github.com/thorchain/asgardex-electron/issues/2109)]
+- [Upgrade] Use TxModal [#2108](https://github.com/thorchain/asgardex-electron/issues/2108)
 
 ## Fix
 
@@ -18,7 +19,7 @@
 
 ## Internal
 
-- Upgrade API types + endpoints to latest Midgard v2.5.15
+- Upgrade API types + endpoints to latest Midgard v2.5.15 [#2112](https://github.com/thorchain/asgardex-electron/pull/2112)
 
 # 0.8.0 (2022-02-18)
 
