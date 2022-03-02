@@ -11,19 +11,17 @@ import { useIntl } from 'react-intl'
 import { useParams } from 'react-router-dom'
 import * as Rx from 'rxjs'
 
-import { Network } from '../../../shared/api/types'
 import { ErrorView } from '../../components/shared/error'
 import { BackLink } from '../../components/uielements/backLink'
 import { AssetDetails } from '../../components/wallet/assets'
-import { useAppContext } from '../../contexts/AppContext'
 import { useChainContext } from '../../contexts/ChainContext'
 import { useWalletContext } from '../../contexts/WalletContext'
 import { disableRuneUpgrade, isRuneNativeAsset } from '../../helpers/assetHelper'
 import { sequenceTOption } from '../../helpers/fpHelpers'
 import { useMimirHalt } from '../../hooks/useMimirHalt'
+import { useNetwork } from '../../hooks/useNetwork'
 import { useOpenExplorerTxUrl } from '../../hooks/useOpenExplorerTxUrl'
 import { AssetDetailsParams } from '../../routes/wallet'
-import { DEFAULT_NETWORK } from '../../services/const'
 import { DEFAULT_BALANCES_FILTER, INITIAL_BALANCES_STATE } from '../../services/wallet/const'
 
 export const AssetDetailsView: React.FC = (): JSX.Element => {
@@ -50,11 +48,6 @@ export const AssetDetailsView: React.FC = (): JSX.Element => {
 
   const { clientByChain$ } = useChainContext()
 
-  // Set selected asset once
-  // Needed to get all data for this asset (transactions etc.)
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  useEffect(() => setSelectedAsset(oRouteAsset), [])
-
   const {
     mimirHalt: { haltThorChain, haltEthChain, haltBnbChain }
   } = useMimirHalt()
@@ -62,10 +55,22 @@ export const AssetDetailsView: React.FC = (): JSX.Element => {
   const { getTxs$, balancesState$, loadTxs, reloadBalancesByChain, setSelectedAsset, resetTxsPage } = useWalletContext()
 
   const [txsRD] = useObservableState(() => getTxs$(oWalletAddress, walletIndex), RD.initial)
-  const { balances: oBalances } = useObservableState(balancesState$(DEFAULT_BALANCES_FILTER), INITIAL_BALANCES_STATE)
+
+  const [{ balances: oBalances }] = useObservableState(
+    () => balancesState$(DEFAULT_BALANCES_FILTER),
+    INITIAL_BALANCES_STATE
+  )
+
+  // Set selected asset once
+  // Needed to get all data for this asset (transactions etc.)
+  useEffect(() => {
+    setSelectedAsset(oRouteAsset)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   useEffect(() => {
     return () => resetTxsPage()
+
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
@@ -86,8 +91,7 @@ export const AssetDetailsView: React.FC = (): JSX.Element => {
     [oBalances, oWalletAddress]
   )
 
-  const { network$ } = useAppContext()
-  const network = useObservableState<Network>(network$, DEFAULT_NETWORK)
+  const { network } = useNetwork()
 
   const renderAssetError = useMemo(
     () => (
