@@ -2,12 +2,20 @@ import React, { useState, useCallback, useMemo } from 'react'
 
 import { generatePhrase } from '@xchainjs/xchain-crypto'
 import Form, { Rule } from 'antd/lib/form'
+import * as A from 'fp-ts/lib/Array'
+import * as FP from 'fp-ts/lib/function'
+import * as NEA from 'fp-ts/lib/NonEmptyArray'
+import * as S from 'fp-ts/lib/string'
+import { useObservableCallback, useSubscription } from 'observable-hooks'
 import { useIntl } from 'react-intl'
+// import * as Rx from 'rxjs'
+import * as RxOp from 'rxjs/operators'
 
 import { Button, RefreshButton } from '../../uielements/button'
 import { InputPassword } from '../../uielements/input'
 import { Phrase } from './index'
 import * as Styled from './NewPhrase.styles'
+import { WordType } from './NewPhraseConfirm'
 import * as StyledPhrase from './Phrase.styles'
 import { PhraseInfo } from './Phrase.types'
 
@@ -25,7 +33,24 @@ export const NewPhraseGenerate: React.FC<Props> = ({ onSubmit }: Props): JSX.Ele
 
   const [phrase, setPhrase] = useState(generatePhrase())
 
-  const phraseWords = useMemo(() => phrase.split(' ').map((word) => ({ text: word, _id: word })), [phrase])
+  const [clickRefreshButtonHandler, refreshButtonClicked$] = useObservableCallback<React.MouseEvent>((event$) =>
+    // Delay clicks to give `generatePhrase` some time to process w/o rendering issues
+    // see https://github.com/thorchain/asgardex-electron/issues/2054
+    event$.pipe(RxOp.debounceTime(100))
+  )
+
+  useSubscription(refreshButtonClicked$, () => setPhrase(generatePhrase()))
+
+  const phraseWords: WordType[] = useMemo(
+    () =>
+      FP.pipe(
+        phrase,
+        S.split(' '),
+        NEA.fromReadonlyNonEmptyArray,
+        A.mapWithIndex((index, word) => ({ text: word, _id: `${word}-${index.toString()}` }))
+      ),
+    [phrase]
+  )
 
   const [form] = Form.useForm<FormValues>()
 
@@ -65,7 +90,7 @@ export const NewPhraseGenerate: React.FC<Props> = ({ onSubmit }: Props): JSX.Ele
         <Styled.SectionTitle copyable={{ onCopy: copyPhraseToClipborad }}>
           {intl.formatMessage({ id: 'wallet.create.copy.phrase' })}
         </Styled.SectionTitle>
-        <RefreshButton clickHandler={() => setPhrase(generatePhrase())} />
+        <RefreshButton clickHandler={clickRefreshButtonHandler} />
       </Styled.TitleContainer>
       <Phrase words={phraseWords} readOnly={true} />
       <Styled.Form form={form} onFinish={handleFormFinish} labelCol={{ span: 24 }}>
