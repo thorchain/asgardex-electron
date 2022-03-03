@@ -90,7 +90,7 @@ export const WalletSettingsView: React.FC = (): JSX.Element => {
   } = useLedger(LTCChain)
 
   const addLedgerAddressHandler = (chain: Chain, walletIndex: number) => {
-    if (isThorChain(chain) && network !== 'stagenet') return askLedgerThorAddress(walletIndex)
+    if (isThorChain(chain)) return askLedgerThorAddress(walletIndex)
     if (isBnbChain(chain)) return askLedgerBnbAddress(walletIndex)
     if (isBtcChain(chain)) return askLedgerBtcAddress(walletIndex)
     if (isLtcChain(chain)) return askLedgerLtcAddress(walletIndex)
@@ -99,7 +99,7 @@ export const WalletSettingsView: React.FC = (): JSX.Element => {
   }
 
   const verifyLedgerAddressHandler = (chain: Chain, walletIndex: number) => {
-    if (isThorChain(chain) && network !== 'stagenet') return verifyLedgerThorAddress(walletIndex)
+    if (isThorChain(chain)) return verifyLedgerThorAddress(walletIndex)
     if (isBnbChain(chain)) return verifyLedgerBnbAddress(walletIndex)
     if (isBtcChain(chain)) return verifyLedgerBtcAddress(walletIndex)
     if (isLtcChain(chain)) return verifyLedgerLtcAddress(walletIndex)
@@ -108,7 +108,7 @@ export const WalletSettingsView: React.FC = (): JSX.Element => {
   }
 
   const removeLedgerAddressHandler = (chain: Chain) => {
-    if (isThorChain(chain) && network !== 'stagenet') return removeLedgerThorAddress()
+    if (isThorChain(chain)) return removeLedgerThorAddress()
     if (isBnbChain(chain)) return removeLedgerBnbAddress()
     if (isBtcChain(chain)) return removeLedgerBtcAddress()
     if (isLtcChain(chain)) return removeLedgerLtcAddress()
