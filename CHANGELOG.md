@@ -1,16 +1,16 @@
-# 0.8.1 (2022-xx-xx)
+# 0.8.1 (2022-03-03)
 
 ## Add
 
-- Feature list [#2092](https://github.com/thorchain/asgardex-electron/pull/2092)
 - [TxModal] Add copy button [#1998](https://github.com/thorchain/asgardex-electron/issues/1998)
+- Feature list [#2092](https://github.com/thorchain/asgardex-electron/pull/2092)
 
 ## Update
 
 - [Send] Use TxModal [#2096](https://github.com/thorchain/asgardex-electron/pull/2096), [#2097](https://github.com/thorchain/asgardex-electron/pull/2097), [#2098](https://github.com/thorchain/asgardex-electron/pull/2098), [#2099](https://github.com/thorchain/asgardex-electron/pull/2099), [#2100](https://github.com/thorchain/asgardex-electron/pull/2100), [#2101](https://github.com/thorchain/asgardex-electron/pull/2101), [#2102](https://github.com/thorchain/asgardex-electron/pull/2102)
 - [Interact] Use TxModal and other improvements [#2104](https://github.com/thorchain/asgardex-electron/pull/2104)
 - [Ledger] Rune upgrade: Add ledger tickbox to upgrade process [#2063](https://github.com/thorchain/asgardex-electron/issues/2063)
-- Update social links [#2109(https://github.com/thorchain/asgardex-electron/issues/2109)]
+- Update social links [#2109](https://github.com/thorchain/asgardex-electron/issues/2109)
 - [Upgrade] Use TxModal + LedgerConfirmationModal [#2108](https://github.com/thorchain/asgardex-electron/issues/2108)
 
 ## Fix
