@@ -1,4 +1,14 @@
-import { assetToBase, AssetRuneNative, AssetBNB, AssetLTC, assetAmount, Chain } from '@xchainjs/xchain-util'
+import {
+  assetToBase,
+  AssetRuneNative,
+  AssetBNB,
+  AssetLTC,
+  assetAmount,
+  LTCChain,
+  THORChain,
+  BTCChain,
+  BNBChain
+} from '@xchainjs/xchain-util'
 import * as FP from 'fp-ts/lib/function'
 import * as NEA from 'fp-ts/lib/NonEmptyArray'
 import * as O from 'fp-ts/lib/Option'
@@ -186,11 +196,31 @@ describe('walletHelper', () => {
   })
 
   describe('isEnabledWallet', () => {
-    it('THOR stagenet ledger wallet -> false', () => {
-      expect(isEnabledWallet(Chain.THORChain, 'stagenet', 'ledger')).toBe(false)
+    it('THOR ledger stagenet -> false', () => {
+      expect(isEnabledWallet(THORChain, 'stagenet', 'ledger')).toBeFalsy()
     })
-    it('All other wallets -> true', () => {
-      expect(isEnabledWallet(Chain.THORChain, 'mainnet', 'ledger')).toBe(true)
+    it('THOR ledger mainnet/testnet -> true', () => {
+      expect(isEnabledWallet(THORChain, 'mainnet', 'ledger')).toBeTruthy()
+      expect(isEnabledWallet(THORChain, 'testnet', 'ledger')).toBeTruthy()
+    })
+    it('LTC ledger testnet -> false', () => {
+      expect(isEnabledWallet(LTCChain, 'testnet', 'ledger')).toBeFalsy()
+    })
+    it('LTC ledger mainnet/stagenet -> true', () => {
+      expect(isEnabledWallet(LTCChain, 'mainnet', 'ledger')).toBeTruthy()
+      expect(isEnabledWallet(LTCChain, 'stagenet', 'ledger')).toBeTruthy()
+    })
+
+    it('BTC ledger -> true', () => {
+      expect(isEnabledWallet(BTCChain, 'mainnet', 'ledger')).toBeTruthy()
+      expect(isEnabledWallet(BTCChain, 'testnet', 'ledger')).toBeTruthy()
+      expect(isEnabledWallet(BTCChain, 'stagenet', 'ledger')).toBeTruthy()
+    })
+
+    it('BNB ledger -> true', () => {
+      expect(isEnabledWallet(BNBChain, 'mainnet', 'ledger')).toBeTruthy()
+      expect(isEnabledWallet(BNBChain, 'testnet', 'ledger')).toBeTruthy()
+      expect(isEnabledWallet(BNBChain, 'stagenet', 'ledger')).toBeTruthy()
     })
   })
 })

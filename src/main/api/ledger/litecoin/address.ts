@@ -18,10 +18,10 @@ export const getAddress = async (
     const app = new AppBTC(transport)
     const clientNetwork = toClientNetwork(network)
     const derivePath = getDerivationPath(walletIndex, clientNetwork)
-    const { bitcoinAddress } = await app.getWalletPublicKey(derivePath, {
+    const { bitcoinAddress: ltcAddress } = await app.getWalletPublicKey(derivePath, {
       format: 'bech32' // bech32 format with 84' paths
     })
-    return E.right({ address: bitcoinAddress, chain: LTCChain, type: 'ledger', walletIndex })
+    return E.right({ address: ltcAddress, chain: LTCChain, type: 'ledger', walletIndex })
   } catch (error) {
     return E.left({
       errorId: LedgerErrorId.GET_ADDRESS_FAILED,
