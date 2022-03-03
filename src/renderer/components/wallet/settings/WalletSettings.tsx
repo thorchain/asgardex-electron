@@ -29,7 +29,7 @@ import { RemoveWalletConfirmationModal } from '../../../components/modal/confirm
 import { AssetIcon } from '../../../components/uielements/assets/assetIcon/AssetIcon'
 import { QRCodeModal } from '../../../components/uielements/qrCodeModal/QRCodeModal'
 import { PhraseCopyModal } from '../../../components/wallet/phrase/PhraseCopyModal'
-import { getChainAsset, isBnbChain, isBtcChain, isThorChain } from '../../../helpers/chainHelper'
+import { getChainAsset, isBnbChain, isBtcChain, isLtcChain, isThorChain } from '../../../helpers/chainHelper'
 import { isEnabledWallet } from '../../../helpers/walletHelper'
 import { ValidatePasswordHandler, WalletAccounts, WalletAddressAsync } from '../../../services/wallet/types'
 import { walletTypeToI18n } from '../../../services/wallet/util'
@@ -38,7 +38,7 @@ import { Modal } from '../../uielements/modal'
 import * as Styled from './WalletSettings.styles'
 
 type Props = {
-  selectedNetwork: Network
+  network: Network
   walletAccounts: O.Option<WalletAccounts>
   runeNativeAddress: string
   lockWallet: FP.Lazy<void>
@@ -57,7 +57,7 @@ type AddressToVerify = O.Option<{ address: Address; chain: Chain }>
 export const WalletSettings: React.FC<Props> = (props): JSX.Element => {
   const intl = useIntl()
   const {
-    selectedNetwork,
+    network,
     walletAccounts: oWalletAccounts,
     runeNativeAddress = '',
     lockWallet = () => {},
@@ -104,7 +104,7 @@ export const WalletSettings: React.FC<Props> = (props): JSX.Element => {
           key="qr-modal"
           asset={asset}
           address={address}
-          network={selectedNetwork}
+          network={network}
           visible={true}
           onCancel={closeQrModal}
           onOk={closeQrModal}
@@ -112,7 +112,7 @@ export const WalletSettings: React.FC<Props> = (props): JSX.Element => {
       )),
       O.getOrElse(() => <></>)
     )
-  }, [showQRModal, selectedNetwork, closeQrModal])
+  }, [showQRModal, network, closeQrModal])
 
   const [walletIndexMap, setWalletIndexMap] = useState<Record<Chain, number>>({
     [BNBChain]: 0,
@@ -134,7 +134,7 @@ export const WalletSettings: React.FC<Props> = (props): JSX.Element => {
           <Styled.AddLedgerButton loading={loading} onClick={() => addLedgerAddress(chain, walletIndexMap[chain])}>
             <Styled.AddLedgerIcon /> {intl.formatMessage({ id: 'ledger.add.device' })}
           </Styled.AddLedgerButton>
-          {(isBnbChain(chain) || isThorChain(chain) || isBtcChain(chain)) && (
+          {(isBnbChain(chain) || isThorChain(chain) || isBtcChain(chain) || isLtcChain(chain)) && (
             <>
               <Styled.IndexLabel>{intl.formatMessage({ id: 'setting.wallet.index' })}</Styled.IndexLabel>
               <Styled.WalletIndexInput
@@ -169,12 +169,7 @@ export const WalletSettings: React.FC<Props> = (props): JSX.Element => {
               ({ address, walletIndex }) => (
                 <>
                   <Styled.AddressWrapper>
-                    <Styled.AddressEllipsis
-                      address={address}
-                      chain={chain}
-                      network={selectedNetwork}
-                      enableCopy={true}
-                    />
+                    <Styled.AddressEllipsis address={address} chain={chain} network={network} enableCopy={true} />
                     <Styled.QRCodeIcon
                       onClick={() => setShowQRModal(O.some({ asset: getChainAsset(chain), address }))}
                     />
@@ -205,15 +200,7 @@ export const WalletSettings: React.FC<Props> = (props): JSX.Element => {
         </Styled.AddressContainer>
       )
     },
-    [
-      addLedgerAddress,
-      clickAddressLinkHandler,
-      intl,
-      removeLedgerAddress,
-      selectedNetwork,
-      verifyLedgerAddress,
-      walletIndexMap
-    ]
+    [addLedgerAddress, clickAddressLinkHandler, intl, removeLedgerAddress, network, verifyLedgerAddress, walletIndexMap]
   )
 
   const [addressToVerify, setAddressToVerify] = useState<AddressToVerify>(O.none)
@@ -270,7 +257,7 @@ export const WalletSettings: React.FC<Props> = (props): JSX.Element => {
                       <Styled.AccountTitle>{chain}</Styled.AccountTitle>
                     </Styled.AccountTitleWrapper>
                     {accounts
-                      .filter((account) => isEnabledWallet(chain, selectedNetwork, account.type))
+                      .filter((account) => isEnabledWallet(chain, network, account.type))
                       .map((account, j) => {
                         const { type } = account
                         return (
@@ -288,7 +275,7 @@ export const WalletSettings: React.FC<Props> = (props): JSX.Element => {
         )),
         O.getOrElse(() => <></>)
       ),
-    [oWalletAccounts, intl, renderAddress, selectedNetwork]
+    [oWalletAccounts, intl, renderAddress, network]
   )
 
   return (
@@ -326,7 +313,7 @@ export const WalletSettings: React.FC<Props> = (props): JSX.Element => {
                   <Styled.OptionLabel
                     color="primary"
                     size="big"
-                    onClick={() => exportKeystore(runeNativeAddress, selectedNetwork)}>
+                    onClick={() => exportKeystore(runeNativeAddress, network)}>
                     {intl.formatMessage({ id: 'setting.export' })}
                   </Styled.OptionLabel>
                 </Styled.OptionCard>

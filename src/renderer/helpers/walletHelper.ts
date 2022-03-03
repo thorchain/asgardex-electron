@@ -12,7 +12,7 @@ import { ZERO_ASSET_AMOUNT } from '../const'
 import { WalletBalances } from '../services/clients'
 import { NonEmptyWalletBalances, WalletBalance } from '../services/wallet/types'
 import { isBnbAsset, isEthAsset, isLtcAsset, isRuneNativeAsset } from './assetHelper'
-import { isThorChain } from './chainHelper'
+import { isLtcChain, isThorChain } from './chainHelper'
 import { eqAddress, eqAsset, eqWalletType } from './fp/eq'
 
 /**
@@ -154,5 +154,8 @@ export const getWalletByAddress = (walletBalances: WalletBalances, address: Addr
 export const isEnabledWallet = (chain: Chain, network: Network, walletType: WalletType) => {
   // Disable THORChain ledger wallets in stagenet
   if (isThorChain(chain) && network === 'stagenet' && isLedgerWallet(walletType)) return false
+  // Disable LTC ledger wallets in testnet
+  // It seems Ledger can not derive LTC addresses on Testnet properly
+  if (isLtcChain(chain) && network === 'testnet' && isLedgerWallet(walletType)) return false
   return true
 }
