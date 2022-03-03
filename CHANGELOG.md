@@ -1,3 +1,9 @@
+# 0.9.0 (2022-03-xx)
+
+## Add
+
+- [Ledger] LTC support [#990](https://github.com/thorchain/asgardex-electron/issues/990)
+
 # 0.8.1 (2022-03-03)
 
 ## Add
