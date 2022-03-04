@@ -7,7 +7,7 @@ import * as Rx from 'rxjs'
 import { Observable } from 'rxjs'
 import * as RxOp from 'rxjs/operators'
 
-import { getSochainUrl } from '../../../../shared/api/sochain'
+import { getSochainUrl } from '../../../shared/api/sochain'
 import { getHaskoinApiUrl } from '../../../shared/bitcoin/client'
 import { isError } from '../../../shared/utils/guard'
 import { clientNetwork$ } from '../app/service'
