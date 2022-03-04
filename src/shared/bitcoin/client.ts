@@ -14,5 +14,3 @@ export const getHaskoinApiUrl = (): ClientUrl => {
     mainnet: APP_HASKOIN_MAINNET_URL
   }
 }
-
-export const getSochainUrl = (): string => envOrDefault(process.env.REACT_APP_SOCHAIN_URL, 'https://sochain.com/api/v2')

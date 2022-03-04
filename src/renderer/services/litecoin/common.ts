@@ -6,6 +6,7 @@ import * as O from 'fp-ts/Option'
 import * as Rx from 'rxjs'
 import * as RxOp from 'rxjs/operators'
 
+import { getSochainUrl } from '../../../../shared/api/sochain'
 import { envOrDefault } from '../../../shared/utils/env'
 import { isError } from '../../../shared/utils/guard'
 import { clientNetwork$ } from '../app/service'
@@ -46,7 +47,8 @@ const clientState$: ClientState$ = FP.pipe(
                 network,
                 phrase,
                 nodeUrl,
-                nodeAuth: NODE_AUTH
+                nodeAuth: NODE_AUTH,
+                sochainUrl: getSochainUrl()
               })
               return RD.success(client)
             } catch (error) {
