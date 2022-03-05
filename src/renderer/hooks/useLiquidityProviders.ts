@@ -1,4 +1,4 @@
-import { useMemo } from 'react'
+import { useEffect, useMemo } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
 import { Address } from '@xchainjs/xchain-client'
@@ -7,6 +7,7 @@ import * as A from 'fp-ts/lib/Array'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
 import { useObservableState } from 'observable-hooks'
+import * as RxOp from 'rxjs/operators'
 
 import { Network } from '../../shared/api/types'
 import { useThorchainContext } from '../contexts/ThorchainContext'
@@ -36,7 +37,19 @@ export const useLiquidityProviders = ({
 }) => {
   const { getLiquidityProviders } = useThorchainContext()
 
-  const [providers] = useObservableState(() => getLiquidityProviders({ asset, network }), RD.initial)
+  const [providers, networkUpdated] = useObservableState<LiquidityProvidersRD, Network>(
+    (network$) =>
+      FP.pipe(
+        network$,
+        RxOp.distinctUntilChanged(),
+        RxOp.switchMap((network) => getLiquidityProviders({ asset, network }))
+      ),
+    RD.initial
+  )
+
+  // `networkUpdated` needs to be called whenever network has been updated
+  // to update `useObservableState` properly to push latest `network` into `getLiquidityProviders`
+  useEffect(() => networkUpdated(network), [network, networkUpdated])
 
   /**
    * Gets liquidity provider data by given RUNE + asset address
