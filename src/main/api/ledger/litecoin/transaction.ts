@@ -84,13 +84,9 @@ export const send = async ({
       additionals: ['bech32']
     })
 
-    console.log('txHex:', txHex)
-
     const nodeUrl = getNodeUrl(network)
     const auth = getNodeAuth()
     const txHash = await broadcastTx({ txHex, nodeUrl, auth })
-
-    console.log('txHash:', txHash)
 
     if (!txHash) {
       return E.left({
