@@ -1,8 +1,12 @@
-# 0.9.0 (2022-03-xx)
+# 0.9.0 (2022-03-05)
 
 ## Add
 
-- [Ledger] LTC support [#990](https://github.com/thorchain/asgardex-electron/issues/990)
+- [Ledger] LTC support [#2118](https://github.com/thorchain/asgardex-electron/pull/2118), [#2119](https://github.com/thorchain/asgardex-electron/pull/2119)
+
+## Fix
+
+- Get correct LP by switching current `network` [2c8463e](https://github.com/thorchain/asgardex-electron/commit/2c8463e635a291b06896b28de8f7cf49868b6b06)
 
 # 0.8.1 (2022-03-03)
 
