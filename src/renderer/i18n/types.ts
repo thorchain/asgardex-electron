@@ -293,7 +293,7 @@ type SwapMessageKey =
   | 'swap.slip.title'
   | 'swap.slip.tolerance'
   | 'swap.slip.tolerance.info'
-  | 'swap.slip.tolerance.btc-ledger-disabled.info'
+  | 'swap.slip.tolerance.ledger-disabled.info'
   | 'swap.state.pending'
   | 'swap.state.success'
   | 'swap.state.error'

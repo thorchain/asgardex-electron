@@ -1,29 +1,19 @@
 import * as RD from '@devexperts/remote-data-ts'
-import { Client, NodeAuth } from '@xchainjs/xchain-litecoin'
+import { Client } from '@xchainjs/xchain-litecoin'
 import { LTCChain } from '@xchainjs/xchain-util'
 import * as FP from 'fp-ts/function'
 import * as O from 'fp-ts/Option'
 import * as Rx from 'rxjs'
 import * as RxOp from 'rxjs/operators'
 
-import { envOrDefault } from '../../../shared/utils/env'
+import { getSochainUrl } from '../../../shared/api/sochain'
+import { getNodeAuth, getNodeUrl } from '../../../shared/litecoin/client'
 import { isError } from '../../../shared/utils/guard'
 import { clientNetwork$ } from '../app/service'
 import * as C from '../clients'
 import { keystoreService } from '../wallet/keystore'
 import { getPhrase } from '../wallet/util'
 import { Client$, ClientState$, ClientState } from './types'
-
-const LTC_NODE_TESTNET_URL = envOrDefault(
-  process.env.REACT_APP_LTC_NODE_TESTNET_URL,
-  'https://testnet.ltc.thorchain.info'
-)
-const LTC_NODE_MAINNET_URL = envOrDefault(process.env.REACT_APP_LTC_NODE_MAINNET_URL, 'https://ltc.thorchain.info')
-
-const NODE_AUTH: NodeAuth = {
-  password: envOrDefault(process.env.REACT_APP_LTC_NODE_PASSWORD, 'password'),
-  username: envOrDefault(process.env.REACT_APP_LTC_NODE_USERNAME, 'thorchain')
-}
 
 /**
  * Stream to create an observable `LitecoinClient` depending on existing phrase in keystore
@@ -41,12 +31,12 @@ const clientState$: ClientState$ = FP.pipe(
           getPhrase(keystore),
           O.map<string, ClientState>((phrase) => {
             try {
-              const nodeUrl = network === 'mainnet' ? LTC_NODE_MAINNET_URL : LTC_NODE_TESTNET_URL
               const client = new Client({
                 network,
                 phrase,
-                nodeUrl,
-                nodeAuth: NODE_AUTH
+                nodeUrl: getNodeUrl(network),
+                nodeAuth: getNodeAuth(),
+                sochainUrl: getSochainUrl()
               })
               return RD.success(client)
             } catch (error) {

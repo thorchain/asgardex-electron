@@ -350,6 +350,15 @@ export const createBalancesService = ({
   )
 
   /**
+   * LTC Ledger balances
+   */
+  const ltcLedgerChainBalance$: ChainBalance$ = ledgerChainBalance$({
+    chain: LTCChain,
+    walletBalanceType: 'all',
+    getBalanceByAddress$: LTC.getBalanceByAddress$
+  })
+
+  /**
    * Transforms BCH balances into `ChainBalances`
    */
   const bchChainBalance$: ChainBalance$ = Rx.combineLatest([
@@ -496,12 +505,12 @@ export const createBalancesService = ({
     Rx.combineLatest(
       filterEnabledChains({
         THOR: [thorChainBalance$, thorLedgerChainBalance$],
-        // for BTC we store
+        // for BTC we store `confirmed` or `all` (confirmed + unconfirmed) balances
         BTC: [btcChainBalance$, btcChainBalanceConfirmed$, btcLedgerChainBalance$, btcLedgerChainBalanceConfirmed$],
         BCH: [bchChainBalance$],
         ETH: [ethChainBalance$],
         BNB: [bnbChainBalance$, bnbLedgerChainBalance$],
-        LTC: [ltcBalance$],
+        LTC: [ltcBalance$, ltcLedgerChainBalance$],
         DOGE: [dogeChainBalance$]
       })
     ),

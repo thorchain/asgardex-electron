@@ -12,8 +12,8 @@ const swap: SwapMessages = {
   'swap.slip.tolerance': 'Slippage tolerance',
   'swap.slip.tolerance.info':
     'The higher the percentage, the more slippage you will accept. More slippage includes also a wider range for covering estimated fees to avoid aborted swaps.',
-  'swap.slip.tolerance.btc-ledger-disabled.info':
-    'Selecting slippage tolerance has been disabled due technical issues with Ledger and BTC.',
+  'swap.slip.tolerance.ledger-disabled.info':
+    'Selecting slippage tolerance has been disabled due technical issues with Ledger.',
   'swap.errors.amount.balanceShouldCoverChainFee':
     'Transaction fee {fee} needs to be covered by your balance (currently {balance}).',
   'swap.errors.amount.outputShouldCoverChainFee':

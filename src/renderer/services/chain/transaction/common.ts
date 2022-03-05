@@ -110,7 +110,7 @@ export const sendTx$ = ({
           msg: error?.message ?? error.toString()
         })),
         liveData.chain(({ rates }) => {
-          return LTC.sendTx({ recipient, amount, asset, memo, feeRate: rates[feeOption], walletIndex })
+          return LTC.sendTx({ walletType, recipient, amount, feeRate: rates[feeOption], memo, walletIndex, sender })
         })
       )
   }

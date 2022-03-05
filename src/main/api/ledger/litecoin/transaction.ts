@@ -1,21 +1,21 @@
 import AppBTC from '@ledgerhq/hw-app-btc'
 import { Transaction } from '@ledgerhq/hw-app-btc/lib/types'
 import Transport from '@ledgerhq/hw-transport'
-import { broadcastTx, buildTx } from '@xchainjs/xchain-bitcoin'
 import { Address, FeeRate, TxHash } from '@xchainjs/xchain-client'
+import { broadcastTx, buildTx } from '@xchainjs/xchain-litecoin'
 import { BaseAmount } from '@xchainjs/xchain-util'
 import * as Bitcoin from 'bitcoinjs-lib'
 import * as E from 'fp-ts/lib/Either'
 
 import { getSochainUrl } from '../../../../shared/api/sochain'
 import { LedgerError, LedgerErrorId, Network } from '../../../../shared/api/types'
-import { getHaskoinApiUrl } from '../../../../shared/bitcoin/client'
+import { getNodeAuth, getNodeUrl } from '../../../../shared/litecoin/client'
 import { toClientNetwork } from '../../../../shared/utils/client'
 import { isError } from '../../../../shared/utils/guard'
 import { getDerivationPath } from './common'
 
 /**
- * Sends BTC tx using Ledger
+ * Sends LTC tx using Ledger
  */
 export const send = async ({
   transport,
@@ -48,16 +48,6 @@ export const send = async ({
     const clientNetwork = toClientNetwork(network)
     const derivePath = getDerivationPath(walletIndex, clientNetwork)
 
-    /**
-     * do not spend pending UTXOs when adding a memo
-     * https://github.com/xchainjs/xchainjs-lib/issues/330
-     *
-     * ^ Copied from `Client` (see https://github.com/xchainjs/xchainjs-lib/blob/27929b025151e3cf631862158f3f5f85dab68768/packages/xchain-bitcoin/src/client.ts#L303)
-     */
-    const spendPendingUTXO = !memo
-
-    const haskoinUrl = getHaskoinApiUrl()[network]
-
     const { psbt, utxos } = await buildTx({
       amount,
       recipient,
@@ -66,8 +56,6 @@ export const send = async ({
       sender,
       network: clientNetwork,
       sochainUrl: getSochainUrl(),
-      haskoinUrl,
-      spendPendingUTXO,
       withTxHex: true
     })
 
@@ -95,12 +83,15 @@ export const send = async ({
       useTrustedInputForSegwit: true,
       additionals: ['bech32']
     })
-    const txHash = await broadcastTx({ txHex, haskoinUrl })
+
+    const nodeUrl = getNodeUrl(network)
+    const auth = getNodeAuth()
+    const txHash = await broadcastTx({ txHex, nodeUrl, auth })
 
     if (!txHash) {
       return E.left({
         errorId: LedgerErrorId.INVALID_RESPONSE,
-        msg: `Post request to send BTC transaction using Ledger failed`
+        msg: `Post request to send LTC transaction using Ledger failed`
       })
     }
     return E.right(txHash)

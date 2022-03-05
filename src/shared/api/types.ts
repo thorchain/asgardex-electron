@@ -106,6 +106,11 @@ export type LedgerBTCTxInfo = Pick<TxParams, 'amount' | 'recipient'> & {
   sender: Address
 }
 
+export type LedgerLTCTxInfo = Pick<TxParams, 'amount' | 'recipient'> & {
+  feeRate: FeeRate
+  sender: Address
+}
+
 export type LedgerTxParams = LedgerTHORTxParams | LedgerBNBTxParams
 
 export type IPCLedgerAdddressParams = { chain: Chain; network: Network; walletIndex: number }

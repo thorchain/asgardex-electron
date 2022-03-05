@@ -4656,10 +4656,10 @@
   resolved "https://registry.yarnpkg.com/@xchainjs/xchain-ethereum/-/xchain-ethereum-0.23.3.tgz#086c987eb009564ca890445f1e51c0ca28584957"
   integrity sha512-E53jYeiqeU8Plcx/Pyd1wA556zZbMnawIiSWPXlX8H+JkM1ETPO7ajNiWnRlf3bj9Igrql+sYSbHZIEpSnmSoA==
 
-"@xchainjs/xchain-litecoin@^0.7.2":
-  version "0.7.2"
-  resolved "https://registry.yarnpkg.com/@xchainjs/xchain-litecoin/-/xchain-litecoin-0.7.2.tgz#3d1f6cbfd271f7214aa29f3488cc88e69858ab86"
-  integrity sha512-NSq1K1Wnmq1L7buRUICkF4GPw3cVQj2iALJa0ZQpradH6NM6UUf6BqFqIerjFZugiF2lxBQa+rqsqZ7vEAtfuQ==
+"@xchainjs/xchain-litecoin@^0.8.0-alpha.1":
+  version "0.8.0-alpha.1"
+  resolved "https://registry.yarnpkg.com/@xchainjs/xchain-litecoin/-/xchain-litecoin-0.8.0-alpha.1.tgz#8b77cf135ea1f2d95209eab3216d93cd207ccde4"
+  integrity sha512-p5idwYUi35WMwjZ7MaY2yU6zvXZgP0tD8bGMh8wdb3r8iTM9AaSmQsXstzgCIzREnbirf8KR07LLJ29OyNkWQA==
 
 "@xchainjs/xchain-terra@^0.1.0-alpha.2":
   version "0.1.0-alpha.2"

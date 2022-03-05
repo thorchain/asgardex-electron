@@ -12,8 +12,8 @@ const swap: SwapMessages = {
   'swap.slip.tolerance': 'Допуск по проскальзыванию',
   'swap.slip.tolerance.info':
     'Чем выше процент, тем большее проскальзывание вы допускаете. Большее проскальзывание включает также более широкий диапазон расчёта комиссий во избежание прерывания обмена.',
-  'swap.slip.tolerance.btc-ledger-disabled.info':
-    'Selecting slippage tolerance has been disabled due technical issues with Ledger and BTC. - RU',
+  'swap.slip.tolerance.ledger-disabled.info':
+    'Selecting slippage tolerance has been disabled due technical issues with Ledger. - RU',
   'swap.errors.amount.balanceShouldCoverChainFee':
     'Комиссия транзакции {fee} дожна покрываться вашим балансом (сейчас {balance}).',
   'swap.errors.amount.outputShouldCoverChainFee':
