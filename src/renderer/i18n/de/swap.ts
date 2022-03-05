@@ -12,8 +12,8 @@ const swap: SwapMessages = {
   'swap.slip.tolerance': 'Slippage-Toleranz',
   'swap.slip.tolerance.info':
     'Je höher die Prozentangabe, je höher akzeptierst Du ein Slippage. Mehr Slippage bedeutet zugleich ein größerer Spielraum zur Abdeckung der geschätzten Gebühren, um fehlgeschlagene Swaps zu vermeiden.',
-  'swap.slip.tolerance.btc-ledger-disabled.info':
-    'Das Auswählen der Slippage-Toleranz ist deaktiviert aufgrund technischer Probleme mit Ledger und BTC.',
+  'swap.slip.tolerance.ledger-disabled.info':
+    'Slippage-Toleranz ist deaktiviert aufgrund technischer Probleme mit Ledger.',
   'swap.errors.amount.balanceShouldCoverChainFee':
     'Transaktionsgebühr in Höhe von {fee} ist nicht über Dein Guthaben {balance} gedeckt.',
   'swap.errors.amount.outputShouldCoverChainFee':
