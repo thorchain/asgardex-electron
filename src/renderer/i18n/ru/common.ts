@@ -94,7 +94,8 @@ const common: CommonMessages = {
   'common.informationMore': 'Больше данных',
   'common.balance': 'Баланс',
   'common.balance.loading': 'Загружаю баланс',
-  'common.custom': 'Вручную'
+  'common.custom': 'Вручную',
+  'common.notsupported.fornetwork': 'Not supported for {network} - RU'
 }
 
 export default common

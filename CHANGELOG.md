@@ -1,5 +1,9 @@
 # 0.9.1 (2022-03-xx)
 
+## Add
+
+- [WalletSettings] Show info about not supported Ledger [#2124](https://github.com/thorchain/asgardex-electron/issues/2124)
+
 ## Fix
 
 - Value to send of `UNBOND` or `CUSTOM` deposit tx does not depends on balances [#2122](https://github.com/thorchain/asgardex-electron/issues/2122)

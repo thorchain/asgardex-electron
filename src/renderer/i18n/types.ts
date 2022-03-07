@@ -95,6 +95,7 @@ export type CommonMessageKey =
   | 'common.balance'
   | 'common.balance.loading'
   | 'common.custom'
+  | 'common.notsupported.fornetwork'
 
 export type CommonMessages = {
   [key in CommonMessageKey]: string

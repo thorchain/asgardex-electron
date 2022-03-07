@@ -18,6 +18,7 @@ import {
 } from '@xchainjs/xchain-util'
 import { Col, List, Row } from 'antd'
 import * as FP from 'fp-ts/function'
+import * as A from 'fp-ts/lib/Array'
 import * as O from 'fp-ts/lib/Option'
 import { FormattedMessage, useIntl } from 'react-intl'
 
@@ -33,6 +34,7 @@ import { getChainAsset, isBnbChain, isBtcChain, isLtcChain, isThorChain } from '
 import { isEnabledWallet } from '../../../helpers/walletHelper'
 import { ValidatePasswordHandler, WalletAccounts, WalletAddressAsync } from '../../../services/wallet/types'
 import { walletTypeToI18n } from '../../../services/wallet/util'
+import { AttentionIcon } from '../../icons'
 import { InfoIcon } from '../../uielements/info'
 import { Modal } from '../../uielements/modal'
 import * as Styled from './WalletSettings.styles'
@@ -256,17 +258,38 @@ export const WalletSettings: React.FC<Props> = (props): JSX.Element => {
                       <AssetIcon asset={getChainAsset(chain)} size={'small'} network="mainnet" />
                       <Styled.AccountTitle>{chain}</Styled.AccountTitle>
                     </Styled.AccountTitleWrapper>
-                    {accounts
-                      .filter((account) => isEnabledWallet(chain, network, account.type))
-                      .map((account, j) => {
+                    {/* supported Ledger */}
+                    {FP.pipe(
+                      accounts,
+                      A.filter(({ type }) => isEnabledWallet(chain, network, type)),
+                      A.mapWithIndex((index, account) => {
                         const { type } = account
                         return (
                           <Styled.AccountAddressWrapper key={type}>
                             <Styled.WalletTypeLabel>{walletTypeToI18n(type, intl)}</Styled.WalletTypeLabel>
-                            <Styled.AccountContent key={j}>{renderAddress(chain, account)}</Styled.AccountContent>
+                            <Styled.AccountContent key={index}>{renderAddress(chain, account)}</Styled.AccountContent>
                           </Styled.AccountAddressWrapper>
                         )
-                      })}
+                      })
+                    )}
+                    {/* unsupported Ledger */}
+                    {FP.pipe(
+                      accounts,
+                      A.filter(({ type }) => !isEnabledWallet(chain, network, type)),
+                      A.map((account) => {
+                        const { type } = account
+                        return (
+                          <Styled.AccountAddressWrapper key={type}>
+                            <Styled.WalletTypeLabel>{walletTypeToI18n(type, intl)}</Styled.WalletTypeLabel>
+
+                            <Styled.NotSupportedWrapper>
+                              <Styled.Icon component={AttentionIcon} />
+                              {intl.formatMessage({ id: 'common.notsupported.fornetwork' }, { network })}
+                            </Styled.NotSupportedWrapper>
+                          </Styled.AccountAddressWrapper>
+                        )
+                      })
+                    )}
                   </Styled.ListItem>
                 )}
               />
