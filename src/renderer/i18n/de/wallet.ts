@@ -66,6 +66,8 @@ const wallet: WalletMessages = {
   'wallet.errors.address.couldNotFind': 'Addresse vom {pool} Pool konnte nicht gefunden werden',
   'wallet.errors.amount.shouldBeNumber': 'Der eingegebene Wert sollte eine Nummer sein',
   'wallet.errors.amount.shouldBeGreaterThan': 'Der eingegebene Betrag sollte höher als {amount} betragen',
+  'wallet.errors.amount.shouldBeGreaterOrEqualThan':
+    'Der eingegebene Betrag sollte gleich oder höher als {amount} betragen',
   'wallet.errors.amount.shouldBeLessThanBalance': 'Der eingegebene Betrag sollte nicht höher als Dein Guthaben sein',
   'wallet.errors.amount.shouldBeLessThanBalanceAndFee':
     'Der eingegebene Wert sollte nicht höher als Dein Guthaben abzgl. Gebühren sein',

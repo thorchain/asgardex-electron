@@ -150,15 +150,39 @@ export const InteractForm: React.FC<Props> = (props) => {
 
   const amountValidator = useCallback(
     async (_: unknown, value: BigNumber) => {
-      // error messages
-      const errors = {
-        msg1: intl.formatMessage({ id: 'wallet.errors.amount.shouldBeNumber' }),
-        msg2: intl.formatMessage({ id: 'wallet.errors.amount.shouldBeGreaterThan' }, { amount: '0' }),
-        msg3: intl.formatMessage({ id: 'wallet.errors.amount.shouldBeLessThanBalance' })
+      switch (interactType) {
+        case 'bond':
+          // similar to any other form for sending any amount
+          return validateTxAmountInput({
+            input: value,
+            maxAmount: baseToAsset(maxAmount),
+            errors: {
+              msg1: intl.formatMessage({ id: 'wallet.errors.amount.shouldBeNumber' }),
+              msg2: intl.formatMessage({ id: 'wallet.errors.amount.shouldBeGreaterThan' }, { amount: '0' }),
+              msg3: intl.formatMessage({ id: 'wallet.errors.amount.shouldBeLessThanBalance' })
+            }
+          })
+        case 'unbond':
+          return H.validateUnboundAmountInput({
+            input: value,
+            errors: {
+              msg1: intl.formatMessage({ id: 'wallet.errors.amount.shouldBeNumber' }),
+              msg2: intl.formatMessage({ id: 'wallet.errors.amount.shouldBeGreaterThan' }, { amount: '0' })
+            }
+          })
+        case 'custom':
+          return H.validateCustomAmountInput({
+            input: value,
+            errors: {
+              msg1: intl.formatMessage({ id: 'wallet.errors.amount.shouldBeNumber' }),
+              msg2: intl.formatMessage({ id: 'wallet.errors.amount.shouldBeGreaterOrEqualThan' }, { amount: '0' })
+            }
+          })
+        case 'leave':
+          return Promise.resolve(true)
       }
-      return validateTxAmountInput({ input: value, maxAmount: baseToAsset(maxAmount), errors })
     },
-    [intl, maxAmount]
+    [interactType, intl, maxAmount]
   )
 
   const onChangeInput = useCallback(
