@@ -1,3 +1,9 @@
+# 0.9.1 (2022-03-xx)
+
+## Fix
+
+- Value to send of `UNBOND` or `CUSTOM` deposit tx does not depends on balances [#2122](https://github.com/thorchain/asgardex-electron/issues/2122)
+
 # 0.9.0 (2022-03-05)
 
 ## Add
