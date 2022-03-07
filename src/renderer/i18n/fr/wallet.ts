@@ -66,6 +66,7 @@ const wallet: WalletMessages = {
   'wallet.errors.address.couldNotFind': "Impossible de trouver l'adresse de la pool {pool}",
   'wallet.errors.amount.shouldBeNumber': 'Le montant doit être un nombre',
   'wallet.errors.amount.shouldBeGreaterThan': 'Le montant doit être supérieur à {amount}',
+  'wallet.errors.amount.shouldBeGreaterOrEqualThan': 'Amount should be equal or greater than {amount} - FR',
   'wallet.errors.amount.shouldBeLessThanBalance': 'Le montant doit être inférieur à votre solde',
   'wallet.errors.amount.shouldBeLessThanBalanceAndFee': 'Le montant doit être inférieur à votre solde moins les frais',
   'wallet.errors.fee.notCovered': 'Les frais ne sont pas couverts par votre solde de ({balance})',

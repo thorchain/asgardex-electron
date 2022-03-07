@@ -64,6 +64,7 @@ const wallet: WalletMessages = {
   'wallet.errors.address.couldNotFind': 'Не удалось найти адрес для пула {pool}',
   'wallet.errors.amount.shouldBeNumber': 'Количество должно быть числом',
   'wallet.errors.amount.shouldBeGreaterThan': 'Количество должно быть больше, чем {amount}',
+  'wallet.errors.amount.shouldBeGreaterOrEqualThan': 'Amount should be equal or greater than {amount} - RU',
   'wallet.errors.amount.shouldBeLessThanBalance': 'Количество должно быть меньше вашего баланса',
   'wallet.errors.amount.shouldBeLessThanBalanceAndFee':
     'Количество должно быть меньше, чем ваш баланс после вычета комиссии',

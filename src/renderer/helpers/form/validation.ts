@@ -20,6 +20,12 @@ export const greaterThan =
   (value: BigNumber): E.Either<string, BigNumber> =>
     FP.pipe(value, (valueBN) => (valueBN.isGreaterThan(max) ? E.right(value) : E.left(errorMsg)))
 
+export const greaterThanEqualTo =
+  (max: BigNumber) =>
+  (errorMsg: string) =>
+  (value: BigNumber): E.Either<string, BigNumber> =>
+    FP.pipe(value, (valueBN) => (valueBN.isGreaterThanOrEqualTo(max) ? E.right(value) : E.left(errorMsg)))
+
 export const validateAddress =
   <T extends (value: string) => boolean>(validator: T, emptyErrorMsg: string, invalidAddressMsg: string) =>
   (value: string): E.Either<string, string> => {

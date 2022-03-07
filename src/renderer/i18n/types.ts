@@ -198,6 +198,7 @@ type WalletMessageKey =
   | 'wallet.errors.address.couldNotFind'
   | 'wallet.errors.amount.shouldBeNumber'
   | 'wallet.errors.amount.shouldBeGreaterThan'
+  | 'wallet.errors.amount.shouldBeGreaterOrEqualThan'
   | 'wallet.errors.amount.shouldBeLessThanBalance'
   | 'wallet.errors.amount.shouldBeLessThanBalanceAndFee'
   | 'wallet.errors.fee.notCovered'
