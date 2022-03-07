@@ -94,7 +94,8 @@ const common: CommonMessages = {
   'common.informationMore': 'Mehr Informationen',
   'common.balance': 'Guthaben',
   'common.balance.loading': 'Lade Guthaben',
-  'common.custom': 'Benutzerdefiniert'
+  'common.custom': 'Benutzerdefiniert',
+  'common.notsupported.fornetwork': 'Nicht unterstützt für {network}'
 }
 
 export default common

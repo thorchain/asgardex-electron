@@ -1,4 +1,4 @@
-import * as AIcon from '@ant-design/icons'
+import AIcon, { QrcodeOutlined, PlusCircleOutlined } from '@ant-design/icons'
 import { EyeOutlined as EyeOutlinedUI } from '@ant-design/icons'
 import * as A from 'antd'
 import styled from 'styled-components'
@@ -201,7 +201,7 @@ export const AddressLinkIcon = styled(ExternalLinkIconUI)`
   }
 `
 
-export const QRCodeIcon = styled(AIcon.QrcodeOutlined)`
+export const QRCodeIcon = styled(QrcodeOutlined)`
   margin-left: 5px;
   cursor: pointer;
   color: ${palette('primary', 0)};
@@ -243,7 +243,7 @@ export const AddLedgerButton = styled(UIButton).attrs({
   cursor: pointer;
 `
 
-export const AddLedgerIcon = styled(AIcon.PlusCircleOutlined)`
+export const AddLedgerIcon = styled(PlusCircleOutlined)`
   color: ${palette('primary', 0)};
 `
 
@@ -290,4 +290,25 @@ export const AccountAddressWrapper = styled.div`
 export const WalletTypeLabel = styled(WalletTypeLabelUI)`
   margin-left: 40px;
   display: inline-block;
+`
+
+export const NotSupportedWrapper = styled('div')`
+  display: flex;
+  align-items: center;
+  margin-left: 40px;
+  padding-top: 5px;
+  color: ${palette('text', 2)};
+  text-transform: uppercase;
+  font-size: 12px;
+`
+
+export const Icon = styled(AIcon)`
+  display: inline-block;
+  margin-right: 5px;
+  svg {
+    width: 15px;
+    height: 15px;
+    stroke: ${palette('warning', 0)};
+    fill: none;
+  }
 `
