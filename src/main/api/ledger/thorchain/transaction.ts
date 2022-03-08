@@ -5,6 +5,7 @@ import { BaseAccountResponse, CosmosSDKClient } from '@xchainjs/xchain-cosmos'
 import {
   buildDepositTx,
   DEFAULT_GAS_VALUE,
+  getChainId,
   getDenom,
   getPrefix,
   MsgNativeTx,
@@ -18,7 +19,7 @@ import { MsgSend } from 'cosmos-client/x/bank'
 import * as E from 'fp-ts/Either'
 
 import { LedgerError, LedgerErrorId, Network } from '../../../../shared/api/types'
-import { getChainIds, getClientUrl } from '../../../../shared/thorchain/client'
+import { getClientUrl } from '../../../../shared/thorchain/client'
 import { toClientNetwork } from '../../../../shared/utils/client'
 import { isError } from '../../../../shared/utils/guard'
 import { fromLedgerErrorType, getDerivationPath } from './common'
@@ -57,11 +58,11 @@ export const send = async ({
     }
 
     // Node endpoint for cosmos sdk client
-    const hostURL = getClientUrl()[network].node
-    const chainId = getChainIds()[network]
+    const nodeUrl = getClientUrl()[network].node
+    const chainId = await getChainId(nodeUrl)
     // CosmosClient
     const cosmosClient = new CosmosSDKClient({
-      server: hostURL,
+      server: nodeUrl,
       chainId,
       prefix
     })
@@ -187,7 +188,7 @@ export const deposit = async ({
 
     // Node endpoint for cosmos sdk client
     const nodeUrl = getClientUrl()[network].node
-    const chainId = getChainIds()[network]
+    const chainId = await getChainId(nodeUrl)
     // use cosmos sdk
     const cosmosClient = new CosmosSDKClient({
       server: nodeUrl,
