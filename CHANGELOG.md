@@ -1,8 +1,9 @@
-# 0.9.1 (2022-03-xx)
+# 0.9.1 (2022-03-08)
 
 ## Add
 
-- [WalletSettings] Show info about not supported Ledger [#2124](https://github.com/thorchain/asgardex-electron/issues/2124)
+- [WalletSettings] Add info in case Ledger is not supported [#2125](https://github.com/thorchain/asgardex-electron/pull/2125)
+- Get chain id before initializing TC client [#2127](https://github.com/thorchain/asgardex-electron/pull/2127)
 
 ## Fix
 
