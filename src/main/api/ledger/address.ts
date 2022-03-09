@@ -1,5 +1,5 @@
 import TransportNodeHidSingleton from '@ledgerhq/hw-transport-node-hid-singleton'
-import { BNBChain, BTCChain, LTCChain, THORChain } from '@xchainjs/xchain-util'
+import { BCHChain, BNBChain, BTCChain, LTCChain, THORChain } from '@xchainjs/xchain-util'
 import * as E from 'fp-ts/Either'
 
 import { IPCLedgerAdddressParams, LedgerError, LedgerErrorId } from '../../../shared/api/types'
@@ -7,6 +7,7 @@ import { isError } from '../../../shared/utils/guard'
 import { WalletAddress } from '../../../shared/wallet/types'
 import { getAddress as getBNBAddress, verifyAddress as verifyBNBAddress } from './binance/address'
 import { getAddress as getBTCAddress, verifyAddress as verifyBTCAddress } from './bitcoin/address'
+import { getAddress as getBCHAddress, verifyAddress as verifyBCHAddress } from './bitcoincash/address'
 import { getAddress as getLTCAddress, verifyAddress as verifyLTCAddress } from './litecoin/address'
 import { getAddress as getTHORAddress, verifyAddress as verifyTHORAddress } from './thorchain/address'
 
@@ -30,6 +31,9 @@ export const getAddress = async ({
         break
       case LTCChain:
         res = await getLTCAddress(transport, network, walletIndex)
+        break
+      case BCHChain:
+        res = await getBCHAddress(transport, network, walletIndex)
         break
       default:
         res = E.left({
@@ -61,6 +65,9 @@ export const verifyLedgerAddress = async ({ chain, network, walletIndex }: IPCLe
       break
     case LTCChain:
       verifyLTCAddress(transport, network, walletIndex)
+      break
+    case BCHChain:
+      verifyBCHAddress(transport, network, walletIndex)
       break
   }
   await transport.close()

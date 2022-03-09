@@ -12,7 +12,7 @@ import { ZERO_ASSET_AMOUNT } from '../const'
 import { WalletBalances } from '../services/clients'
 import { NonEmptyWalletBalances, WalletBalance } from '../services/wallet/types'
 import { isBnbAsset, isEthAsset, isLtcAsset, isRuneNativeAsset } from './assetHelper'
-import { isLtcChain, isThorChain } from './chainHelper'
+import { isBchChain, isLtcChain, isThorChain } from './chainHelper'
 import { eqAddress, eqAsset, eqWalletType } from './fp/eq'
 
 /**
@@ -157,5 +157,7 @@ export const isEnabledWallet = (chain: Chain, network: Network, walletType: Wall
   // Disable LTC ledger wallets in testnet
   // It seems Ledger can not derive LTC addresses on Testnet properly
   if (isLtcChain(chain) && network === 'testnet' && isLedgerWallet(walletType)) return false
+  // Same for BCH - no Ledger support for `testnet`
+  if (isBchChain(chain) && network === 'testnet' && isLedgerWallet(walletType)) return false
   return true
 }

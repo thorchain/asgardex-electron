@@ -7,7 +7,8 @@ import {
   LTCChain,
   THORChain,
   BTCChain,
-  BNBChain
+  BNBChain,
+  BCHChain
 } from '@xchainjs/xchain-util'
 import * as FP from 'fp-ts/lib/function'
 import * as NEA from 'fp-ts/lib/NonEmptyArray'
@@ -210,7 +211,13 @@ describe('walletHelper', () => {
       expect(isEnabledWallet(LTCChain, 'mainnet', 'ledger')).toBeTruthy()
       expect(isEnabledWallet(LTCChain, 'stagenet', 'ledger')).toBeTruthy()
     })
-
+    it('BCH ledger testnet -> false', () => {
+      expect(isEnabledWallet(BCHChain, 'testnet', 'ledger')).toBeFalsy()
+    })
+    it('BCH ledger mainnet/stagenet -> true', () => {
+      expect(isEnabledWallet(BCHChain, 'mainnet', 'ledger')).toBeTruthy()
+      expect(isEnabledWallet(BCHChain, 'stagenet', 'ledger')).toBeTruthy()
+    })
     it('BTC ledger -> true', () => {
       expect(isEnabledWallet(BTCChain, 'mainnet', 'ledger')).toBeTruthy()
       expect(isEnabledWallet(BTCChain, 'testnet', 'ledger')).toBeTruthy()

@@ -1,3 +1,9 @@
+# 0.10.0 (2022-03-xx)
+
+## Add
+
+- [Ledger] BCH support [#2131](https://github.com/thorchain/asgardex-electron/issues/2131)
+
 # 0.9.1 (2022-03-08)
 
 ## Add
