@@ -18,14 +18,11 @@ export const getAddress = async (
     const app = new AppBTC(transport)
     const clientNetwork = toClientNetwork(network)
     const derivePath = getDerivationPath(walletIndex, clientNetwork)
-    console.log('clientNetwork:', clientNetwork)
-    console.log('derivePath:', derivePath)
     const { bitcoinAddress: bchAddress } = await app.getWalletPublicKey(derivePath, {
       // 'cashaddr' in case of Bitcoin Cash
       // @see https://github.com/LedgerHQ/ledgerjs/blob/master/packages/hw-app-btc/README.md#parameters-2
       format: 'cashaddr'
     })
-    console.log('bchAddress:', bchAddress)
     return E.right({ address: bchAddress, chain: BCHChain, type: 'ledger', walletIndex })
   } catch (error) {
     return E.left({
