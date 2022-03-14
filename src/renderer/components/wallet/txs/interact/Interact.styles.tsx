@@ -108,7 +108,7 @@ export const Tabs = styled(A.Tabs)`
 export const TabButtonsContainer = styled('div')`
   display: flex;
   flex-direction: row;
-  margin-bottom: 15px;
+  margin-bottom: 40px;
 `
 
 type TabButtonProps = UIButtonProps & { selected: boolean }
@@ -145,7 +145,6 @@ export const TabPane = styled(A.Tabs.TabPane)``
 export const Form = styled(InnerForm)`
   display: flex;
   height: 100%;
-  justify-content: space-between;
   flex-direction: column;
 `
 

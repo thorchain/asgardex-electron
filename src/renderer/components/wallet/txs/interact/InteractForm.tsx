@@ -227,13 +227,13 @@ export const InteractForm: React.FC<Props> = (props) => {
       case 'bond':
         return getBondMemo(thorAddress)
       case 'unbond':
-        return getUnbondMemo(thorAddress, _amountToSend)
+        return getUnbondMemo(thorAddress, assetToBase(assetAmount(form.getFieldValue('amount'), THORCHAIN_DECIMAL)))
       case 'leave':
         return getLeaveMemo(thorAddress)
       case 'custom':
         return form.getFieldValue('memo')
     }
-  }, [_amountToSend, form, interactType])
+  }, [form, interactType])
 
   const submitTx = useCallback(() => {
     setSendTxStartTime(Date.now())
@@ -250,24 +250,23 @@ export const InteractForm: React.FC<Props> = (props) => {
 
   const [showConfirmationModal, setShowConfirmationModal] = useState(false)
 
-  const resetForm = useCallback(() => {
+  const reset = useCallback(() => {
+    resetInteractState()
     setAmountToSend(ZERO_BASE_AMOUNT)
     form.setFieldsValue({
       thorAddress: '',
       memo: '',
       amount: ZERO_BN
     })
-  }, [form])
+  }, [form, resetInteractState])
 
   const renderConfirmationModal = useMemo(() => {
     const onSuccessHandler = () => {
       setShowConfirmationModal(false)
       submitTx()
-      resetForm()
     }
     const onCloseHandler = () => {
       setShowConfirmationModal(false)
-      resetForm()
     }
 
     if (isKeystoreWallet(walletType)) {
@@ -293,7 +292,7 @@ export const InteractForm: React.FC<Props> = (props) => {
       )
     }
     return <></>
-  }, [walletType, submitTx, resetForm, validatePassword$, network, showConfirmationModal, intl])
+  }, [walletType, submitTx, validatePassword$, network, showConfirmationModal, intl])
 
   const renderTxModal = useMemo(() => {
     const { txRD } = interactState
@@ -311,8 +310,8 @@ export const InteractForm: React.FC<Props> = (props) => {
     return (
       <TxModal
         title={intl.formatMessage({ id: 'common.tx.sending' })}
-        onClose={resetInteractState}
-        onFinish={resetInteractState}
+        onClose={reset}
+        onFinish={reset}
         startTime={sendTxStartTime}
         txRD={txRDasBoolean}
         extraResult={
@@ -338,32 +337,12 @@ export const InteractForm: React.FC<Props> = (props) => {
           <SendAsset
             asset={{ asset, amount: amountToSend }}
             network={network}
-            title={H.getInteractiveDescription({ state: interactState, intl })}
+            description={H.getInteractiveDescription({ state: interactState, intl })}
           />
         }
       />
     )
-  }, [
-    interactState,
-    intl,
-    resetInteractState,
-    sendTxStartTime,
-    openExplorerTxUrl,
-    getExplorerTxUrl,
-    asset,
-    amountToSend,
-    network
-  ])
-
-  const uiFeesRD: UIFeesRD = useMemo(
-    () =>
-      FP.pipe(
-        feeRD,
-        RD.map((fee) => [{ asset: AssetRuneNative, amount: fee }])
-      ),
-
-    [feeRD]
-  )
+  }, [interactState, intl, reset, sendTxStartTime, openExplorerTxUrl, getExplorerTxUrl, asset, amountToSend, network])
 
   const submitLabel = useMemo(() => {
     switch (interactType) {
@@ -377,6 +356,16 @@ export const InteractForm: React.FC<Props> = (props) => {
         return intl.formatMessage({ id: 'wallet.action.send' })
     }
   }, [interactType, intl])
+
+  const uiFeesRD: UIFeesRD = useMemo(
+    () =>
+      FP.pipe(
+        feeRD,
+        RD.map((fee) => [{ asset: AssetRuneNative, amount: fee }])
+      ),
+
+    [feeRD]
+  )
 
   useEffect(() => {
     // Whenever `amountToSend` has been updated, we put it back into input field
@@ -392,7 +381,7 @@ export const InteractForm: React.FC<Props> = (props) => {
         {interactType === 'custom' && (
           <Styled.InputContainer>
             <Styled.InputLabel>{intl.formatMessage({ id: 'common.memo' })}</Styled.InputLabel>
-            <Styled.FormItem
+            <Form.Item
               name="memo"
               rules={[
                 {
@@ -401,7 +390,7 @@ export const InteractForm: React.FC<Props> = (props) => {
                 }
               ]}>
               <Input disabled={isLoading} size="large" />
-            </Styled.FormItem>
+            </Form.Item>
           </Styled.InputContainer>
         )}
 
@@ -409,7 +398,7 @@ export const InteractForm: React.FC<Props> = (props) => {
         {(interactType === 'bond' || interactType === 'unbond' || interactType === 'leave') && (
           <Styled.InputContainer>
             <Styled.InputLabel>{intl.formatMessage({ id: 'common.thorAddress' })}</Styled.InputLabel>
-            <Styled.FormItem
+            <Form.Item
               name="thorAddress"
               rules={[
                 {
@@ -418,7 +407,7 @@ export const InteractForm: React.FC<Props> = (props) => {
                 }
               ]}>
               <Input disabled={isLoading} size="large" />
-            </Styled.FormItem>
+            </Form.Item>
           </Styled.InputContainer>
         )}
 
@@ -453,7 +442,7 @@ export const InteractForm: React.FC<Props> = (props) => {
       <Styled.SubmitButtonContainer>
         <Styled.SubmitButton
           loading={isLoading}
-          disabled={isLoading || !!form.getFieldsError().filter(({ errors }) => errors.length).length || isFeeError}
+          disabled={isLoading || !!form.getFieldsError().filter(({ errors }) => errors.length).length}
           htmlType="submit">
           {submitLabel}
         </Styled.SubmitButton>
