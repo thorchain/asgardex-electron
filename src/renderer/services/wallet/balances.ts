@@ -376,6 +376,15 @@ export const createBalancesService = ({
   )
 
   /**
+   * BCH Ledger balances
+   */
+  const bchLedgerChainBalance$: ChainBalance$ = ledgerChainBalance$({
+    chain: BCHChain,
+    walletBalanceType: 'all',
+    getBalanceByAddress$: BCH.getBalanceByAddress$
+  })
+
+  /**
    * BNB Ledger balances
    */
   const bnbLedgerChainBalance$: ChainBalance$ = ledgerChainBalance$({
@@ -507,7 +516,7 @@ export const createBalancesService = ({
         THOR: [thorChainBalance$, thorLedgerChainBalance$],
         // for BTC we store `confirmed` or `all` (confirmed + unconfirmed) balances
         BTC: [btcChainBalance$, btcChainBalanceConfirmed$, btcLedgerChainBalance$, btcLedgerChainBalanceConfirmed$],
-        BCH: [bchChainBalance$],
+        BCH: [bchChainBalance$, bchLedgerChainBalance$],
         ETH: [ethChainBalance$],
         BNB: [bnbChainBalance$, bnbLedgerChainBalance$],
         LTC: [ltcBalance$, ltcLedgerChainBalance$],

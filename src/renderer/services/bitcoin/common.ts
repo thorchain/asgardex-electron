@@ -7,8 +7,8 @@ import * as Rx from 'rxjs'
 import { Observable } from 'rxjs'
 import * as RxOp from 'rxjs/operators'
 
+import { getHaskoinBTCApiUrl } from '../../../shared/api/haskoin'
 import { getSochainUrl } from '../../../shared/api/sochain'
-import { getHaskoinApiUrl } from '../../../shared/bitcoin/client'
 import { isError } from '../../../shared/utils/guard'
 import { clientNetwork$ } from '../app/service'
 import * as C from '../clients'
@@ -35,7 +35,7 @@ const clientState$: ClientState$ = FP.pipe(
               const client = new BitcoinClient({
                 network,
                 phrase,
-                haskoinUrl: getHaskoinApiUrl(),
+                haskoinUrl: getHaskoinBTCApiUrl(),
                 sochainUrl: getSochainUrl()
               })
               return RD.success(client)

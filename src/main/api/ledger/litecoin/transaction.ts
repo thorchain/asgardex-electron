@@ -8,8 +8,8 @@ import * as Bitcoin from 'bitcoinjs-lib'
 import * as E from 'fp-ts/lib/Either'
 
 import { getSochainUrl } from '../../../../shared/api/sochain'
+import { getLTCNodeAuth, getLTCNodeUrl } from '../../../../shared/api/thornode'
 import { LedgerError, LedgerErrorId, Network } from '../../../../shared/api/types'
-import { getNodeAuth, getNodeUrl } from '../../../../shared/litecoin/client'
 import { toClientNetwork } from '../../../../shared/utils/client'
 import { isError } from '../../../../shared/utils/guard'
 import { getDerivationPath } from './common'
@@ -84,8 +84,8 @@ export const send = async ({
       additionals: ['bech32']
     })
 
-    const nodeUrl = getNodeUrl(network)
-    const auth = getNodeAuth()
+    const nodeUrl = getLTCNodeUrl(network)
+    const auth = getLTCNodeAuth()
     const txHash = await broadcastTx({ txHex, nodeUrl, auth })
 
     if (!txHash) {
