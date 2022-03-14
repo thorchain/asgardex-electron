@@ -479,7 +479,7 @@ export const Upgrade: React.FC<Props> = (props): JSX.Element => {
           <SendAsset
             asset={{ asset: runeAsset.asset, amount: amountToUpgrade }}
             network={network}
-            title={CH.getUpgradeDescription({ state: upgradeTxState, intl })}
+            description={CH.getUpgradeDescription({ state: upgradeTxState, intl })}
           />
         }
       />

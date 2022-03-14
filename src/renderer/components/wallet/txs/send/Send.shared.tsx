@@ -62,7 +62,7 @@ export const renderTxModal = ({
       extra={
         <SendAsset
           asset={{ asset, amount: amountToSend }}
-          title={H.getSendTxDescription({ status, asset, intl })}
+          description={H.getSendTxDescription({ status, asset, intl })}
           network={network}
         />
       }
