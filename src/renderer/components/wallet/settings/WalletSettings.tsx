@@ -35,6 +35,7 @@ import {
   isBchChain,
   isBnbChain,
   isBtcChain,
+  isDogeChain,
   isLtcChain,
   isThorChain
 } from '../../../helpers/chainHelper'
@@ -143,7 +144,12 @@ export const WalletSettings: React.FC<Props> = (props): JSX.Element => {
           <Styled.AddLedgerButton loading={loading} onClick={() => addLedgerAddress(chain, walletIndexMap[chain])}>
             <Styled.AddLedgerIcon /> {intl.formatMessage({ id: 'ledger.add.device' })}
           </Styled.AddLedgerButton>
-          {(isBnbChain(chain) || isThorChain(chain) || isBtcChain(chain) || isLtcChain(chain) || isBchChain(chain)) && (
+          {(isBnbChain(chain) ||
+            isThorChain(chain) ||
+            isBtcChain(chain) ||
+            isLtcChain(chain) ||
+            isBchChain(chain) ||
+            isDogeChain(chain)) && (
             <>
               <Styled.IndexLabel>{intl.formatMessage({ id: 'setting.wallet.index' })}</Styled.IndexLabel>
               <Styled.WalletIndexInput
