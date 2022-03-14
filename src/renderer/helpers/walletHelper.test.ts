@@ -8,7 +8,8 @@ import {
   THORChain,
   BTCChain,
   BNBChain,
-  BCHChain
+  BCHChain,
+  DOGEChain
 } from '@xchainjs/xchain-util'
 import * as FP from 'fp-ts/lib/function'
 import * as NEA from 'fp-ts/lib/NonEmptyArray'
@@ -228,6 +229,13 @@ describe('walletHelper', () => {
       expect(isEnabledWallet(BNBChain, 'mainnet', 'ledger')).toBeTruthy()
       expect(isEnabledWallet(BNBChain, 'testnet', 'ledger')).toBeTruthy()
       expect(isEnabledWallet(BNBChain, 'stagenet', 'ledger')).toBeTruthy()
+    })
+    it('DOGE ledger testnet', () => {
+      expect(isEnabledWallet(DOGEChain, 'testnet', 'ledger')).toBeFalsy()
+    })
+    it('DOGE ledger mainnet/stagenet', () => {
+      expect(isEnabledWallet(DOGEChain, 'mainnet', 'ledger')).toBeTruthy()
+      expect(isEnabledWallet(DOGEChain, 'stagenet', 'ledger')).toBeTruthy()
     })
   })
 })
