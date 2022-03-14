@@ -38,6 +38,7 @@ describe('views/pools/utils', () => {
       assetDepth: '11000000000',
       runeDepth: '10000000000',
       volume24h: '10000000000',
+      poolAPY: '0.02',
       status: GetPoolsStatusEnum.Staged
     } as PoolDetail
 
@@ -57,6 +58,7 @@ describe('views/pools/utils', () => {
         volumePrice: assetToBase(assetAmount(1000)),
         status: GetPoolsStatusEnum.Available,
         deepest: false,
+        apy: 2,
         key: 'hi',
         network: 'testnet'
       }
@@ -75,6 +77,7 @@ describe('views/pools/utils', () => {
           expect(data.pool).toEqual(expected.pool)
           expect(data.depthPrice.eq(expected.depthPrice)).toBeTruthy()
           expect(data.volumePrice.eq(expected.volumePrice)).toBeTruthy()
+          expect(data.apy).toEqual(expected.apy)
           return true
         })
       )

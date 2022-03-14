@@ -3,6 +3,7 @@ import { PoolsMessages } from '../types'
 const pools: PoolsMessages = {
   'pools.depth': 'Profondeur',
   'pools.24hvol': 'Volume sur 24h',
+  'pools.apy': 'APY - FR',
   'pools.avgsize': 'Taille moyenne',
   'pools.avgfee': 'Intérêts',
   'pools.blocksleft': 'Blocs restants',

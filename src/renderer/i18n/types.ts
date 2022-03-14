@@ -116,6 +116,7 @@ export type RoutesMessages = { [key in RoutesMessageKey]: string }
 
 type PoolsMessageKey =
   | 'pools.depth'
+  | 'pools.apy'
   | 'pools.24hvol'
   | 'pools.avgsize'
   | 'pools.avgfee'
