@@ -3,6 +3,7 @@
 ## Add
 
 - [Ledger] BCH support [#2131](https://github.com/thorchain/asgardex-electron/issues/2131)
+- [Pools] Show APY at pools overview [#2135](https://github.com/thorchain/asgardex-electron/issues/2135)
 
 ## Fix
 
