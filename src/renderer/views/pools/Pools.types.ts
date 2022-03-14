@@ -30,6 +30,7 @@ export type PoolTableRowData = {
   depthPrice: BaseAmount
   volumePrice: BaseAmount
   poolPrice: BaseAmount
+  apy: number
   status: GetPoolsStatusEnum
   deepest?: boolean
   key: string

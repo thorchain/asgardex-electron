@@ -2,7 +2,7 @@ import React, { useCallback, useMemo, useRef } from 'react'
 
 import { SwapOutlined } from '@ant-design/icons'
 import * as RD from '@devexperts/remote-data-ts'
-import { assetToString, baseToAsset, formatAssetAmountCurrency } from '@xchainjs/xchain-util'
+import { assetToString, baseToAsset, bn, formatAssetAmountCurrency, formatBN } from '@xchainjs/xchain-util'
 import { Grid } from 'antd'
 import { ColumnsType, ColumnType } from 'antd/lib/table'
 import * as A from 'fp-ts/Array'
@@ -20,7 +20,7 @@ import { Button } from '../../components/uielements/button'
 import { Table } from '../../components/uielements/table'
 import { useAppContext } from '../../contexts/AppContext'
 import { useMidgardContext } from '../../contexts/MidgardContext'
-import { ordBaseAmount } from '../../helpers/fp/ord'
+import { ordBaseAmount, ordNumber } from '../../helpers/fp/ord'
 import * as PoolHelpers from '../../helpers/poolHelper'
 import { useFundsCap } from '../../hooks/useFundsCap'
 import * as poolsRoutes from '../../routes/pools'
@@ -49,6 +49,7 @@ export const ActivePools: React.FC<PoolsComponentProps> = ({ haltedChains, mimir
   const poolsRD = useObservableState(poolsState$, RD.pending)
 
   const isDesktopView = Grid.useBreakpoint()?.lg ?? false
+  const isLargeScreen = Grid.useBreakpoint()?.xl ?? false
 
   // store previous data of pools to render these while reloading
   const previousPools = useRef<O.Option<PoolTableRowsData>>(O.none)
@@ -162,16 +163,43 @@ export const ActivePools: React.FC<PoolsComponentProps> = ({ haltedChains, mimir
     [intl, renderVolumeColumn, sortVolumeColumn]
   )
 
+  const renderAPYColumn = useCallback(
+    ({ apy }: PoolTableRowData) => (
+      <Styled.Label align="right" nowrap>
+        {formatBN(bn(apy), 2)}%
+      </Styled.Label>
+    ),
+    []
+  )
+
+  const sortAPYColumn = useCallback((a: PoolTableRowData, b: PoolTableRowData) => ordNumber.compare(a.apy, b.apy), [])
+  const apyColumn: ColumnType<PoolTableRowData> = useMemo(
+    () => ({
+      key: 'apy',
+      align: 'right',
+      title: intl.formatMessage({ id: 'pools.apy' }),
+      render: renderAPYColumn,
+      sorter: sortAPYColumn,
+      sortDirections: ['descend', 'ascend']
+    }),
+    [intl, renderAPYColumn, sortAPYColumn]
+  )
+
   const desktopPoolsColumns: ColumnsType<PoolTableRowData> = useMemo(
-    () => [
-      Shared.poolColumn(intl.formatMessage({ id: 'common.pool' })),
-      Shared.assetColumn(intl.formatMessage({ id: 'common.asset' })),
-      Shared.priceColumn(intl.formatMessage({ id: 'common.price' }), selectedPricePool.asset),
-      Shared.depthColumn(intl.formatMessage({ id: 'common.liquidity' }), selectedPricePool.asset),
-      volumeColumn,
-      btnPoolsColumn
-    ],
-    [intl, selectedPricePool.asset, volumeColumn, btnPoolsColumn]
+    () =>
+      FP.pipe(
+        [
+          O.some(Shared.poolColumn(intl.formatMessage({ id: 'common.pool' }))),
+          O.some(Shared.assetColumn(intl.formatMessage({ id: 'common.asset' }))),
+          O.some(Shared.priceColumn(intl.formatMessage({ id: 'common.price' }), selectedPricePool.asset)),
+          O.some(Shared.depthColumn(intl.formatMessage({ id: 'common.liquidity' }), selectedPricePool.asset)),
+          O.some(volumeColumn),
+          isLargeScreen ? O.some(apyColumn) : O.none,
+          O.some(btnPoolsColumn)
+        ],
+        A.filterMap(FP.identity)
+      ),
+    [intl, selectedPricePool.asset, isLargeScreen, volumeColumn, apyColumn, btnPoolsColumn]
   )
 
   const mobilePoolsColumns: ColumnsType<PoolTableRowData> = useMemo(
