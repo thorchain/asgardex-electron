@@ -21,7 +21,7 @@ import { useIntl } from 'react-intl'
 import { Network } from '../../../../../shared/api/types'
 import { isKeystoreWallet, isLedgerWallet } from '../../../../../shared/utils/guard'
 import { WalletType } from '../../../../../shared/wallet/types'
-import { ZERO_BASE_AMOUNT } from '../../../../const'
+import { ZERO_BASE_AMOUNT, ZERO_BN } from '../../../../const'
 import { THORCHAIN_DECIMAL } from '../../../../helpers/assetHelper'
 import { validateAddress } from '../../../../helpers/form/validation'
 import { useSubscriptionState } from '../../../../hooks/useSubscriptionState'
@@ -83,10 +83,10 @@ export const InteractForm: React.FC<Props> = (props) => {
   const amountToSend = useMemo(() => {
     switch (interactType) {
       case 'bond':
-      case 'unbond':
       case 'custom':
         return _amountToSend
       case 'leave':
+      case 'unbond':
         return ZERO_BASE_AMOUNT
     }
   }, [_amountToSend, interactType])
@@ -190,11 +190,13 @@ export const InteractForm: React.FC<Props> = (props) => {
       // we have to validate input before storing into the state
       amountValidator(undefined, value)
         .then(() => {
-          setAmountToSend(assetToBase(assetAmount(value, THORCHAIN_DECIMAL)))
+          if (interactType === 'bond' || interactType === 'custom') {
+            setAmountToSend(assetToBase(assetAmount(value, THORCHAIN_DECIMAL)))
+          }
         })
         .catch(() => {}) // do nothing, Ant' form does the job for us to show an error message
     },
-    [amountValidator]
+    [amountValidator, interactType]
   )
 
   const addMaxAmountHandler = useCallback(() => setAmountToSend(maxAmount), [maxAmount])
@@ -225,13 +227,13 @@ export const InteractForm: React.FC<Props> = (props) => {
       case 'bond':
         return getBondMemo(thorAddress)
       case 'unbond':
-        return getUnbondMemo(thorAddress, _amountToSend)
+        return getUnbondMemo(thorAddress, assetToBase(assetAmount(form.getFieldValue('amount'), THORCHAIN_DECIMAL)))
       case 'leave':
         return getLeaveMemo(thorAddress)
       case 'custom':
         return form.getFieldValue('memo')
     }
-  }, [_amountToSend, form, interactType])
+  }, [form, interactType])
 
   const submitTx = useCallback(() => {
     setSendTxStartTime(Date.now())
@@ -247,6 +249,16 @@ export const InteractForm: React.FC<Props> = (props) => {
   }, [subscribeInteractState, interact$, walletType, walletIndex, amountToSend, getMemo])
 
   const [showConfirmationModal, setShowConfirmationModal] = useState(false)
+
+  const reset = useCallback(() => {
+    resetInteractState()
+    setAmountToSend(ZERO_BASE_AMOUNT)
+    form.setFieldsValue({
+      thorAddress: '',
+      memo: '',
+      amount: ZERO_BN
+    })
+  }, [form, resetInteractState])
 
   const renderConfirmationModal = useMemo(() => {
     const onSuccessHandler = () => {
@@ -298,8 +310,8 @@ export const InteractForm: React.FC<Props> = (props) => {
     return (
       <TxModal
         title={intl.formatMessage({ id: 'common.tx.sending' })}
-        onClose={resetInteractState}
-        onFinish={resetInteractState}
+        onClose={reset}
+        onFinish={reset}
         startTime={sendTxStartTime}
         txRD={txRDasBoolean}
         extraResult={
@@ -325,32 +337,12 @@ export const InteractForm: React.FC<Props> = (props) => {
           <SendAsset
             asset={{ asset, amount: amountToSend }}
             network={network}
-            title={H.getInteractiveDescription({ state: interactState, intl })}
+            description={H.getInteractiveDescription({ state: interactState, intl })}
           />
         }
       />
     )
-  }, [
-    interactState,
-    intl,
-    resetInteractState,
-    sendTxStartTime,
-    openExplorerTxUrl,
-    getExplorerTxUrl,
-    asset,
-    amountToSend,
-    network
-  ])
-
-  const uiFeesRD: UIFeesRD = useMemo(
-    () =>
-      FP.pipe(
-        feeRD,
-        RD.map((fee) => [{ asset: AssetRuneNative, amount: fee }])
-      ),
-
-    [feeRD]
-  )
+  }, [interactState, intl, reset, sendTxStartTime, openExplorerTxUrl, getExplorerTxUrl, asset, amountToSend, network])
 
   const submitLabel = useMemo(() => {
     switch (interactType) {
@@ -364,6 +356,16 @@ export const InteractForm: React.FC<Props> = (props) => {
         return intl.formatMessage({ id: 'wallet.action.send' })
     }
   }, [interactType, intl])
+
+  const uiFeesRD: UIFeesRD = useMemo(
+    () =>
+      FP.pipe(
+        feeRD,
+        RD.map((fee) => [{ asset: AssetRuneNative, amount: fee }])
+      ),
+
+    [feeRD]
+  )
 
   useEffect(() => {
     // Whenever `amountToSend` has been updated, we put it back into input field
@@ -379,7 +381,7 @@ export const InteractForm: React.FC<Props> = (props) => {
         {interactType === 'custom' && (
           <Styled.InputContainer>
             <Styled.InputLabel>{intl.formatMessage({ id: 'common.memo' })}</Styled.InputLabel>
-            <Styled.FormItem
+            <Form.Item
               name="memo"
               rules={[
                 {
@@ -388,7 +390,7 @@ export const InteractForm: React.FC<Props> = (props) => {
                 }
               ]}>
               <Input disabled={isLoading} size="large" />
-            </Styled.FormItem>
+            </Form.Item>
           </Styled.InputContainer>
         )}
 
@@ -396,7 +398,7 @@ export const InteractForm: React.FC<Props> = (props) => {
         {(interactType === 'bond' || interactType === 'unbond' || interactType === 'leave') && (
           <Styled.InputContainer>
             <Styled.InputLabel>{intl.formatMessage({ id: 'common.thorAddress' })}</Styled.InputLabel>
-            <Styled.FormItem
+            <Form.Item
               name="thorAddress"
               rules={[
                 {
@@ -405,7 +407,7 @@ export const InteractForm: React.FC<Props> = (props) => {
                 }
               ]}>
               <Input disabled={isLoading} size="large" />
-            </Styled.FormItem>
+            </Form.Item>
           </Styled.InputContainer>
         )}
 
@@ -440,7 +442,7 @@ export const InteractForm: React.FC<Props> = (props) => {
       <Styled.SubmitButtonContainer>
         <Styled.SubmitButton
           loading={isLoading}
-          disabled={isLoading || !!form.getFieldsError().filter(({ errors }) => errors.length).length || isFeeError}
+          disabled={isLoading || !!form.getFieldsError().filter(({ errors }) => errors.length).length}
           htmlType="submit">
           {submitLabel}
         </Styled.SubmitButton>
