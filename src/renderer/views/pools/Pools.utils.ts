@@ -53,6 +53,8 @@ export const getPoolTableRowData = ({
     oPoolDetailAsset,
     O.map((poolDetailAsset) => {
       const poolData = toPoolData(poolDetail)
+      // convert string -> BN -> number - just for convenience
+      const apy = bnOrZero(poolDetail.poolAPY).multipliedBy(100).decimalPlaces(2).toNumber()
 
       const poolPrice = getValueOfAsset1InAsset2(ONE_RUNE_BASE_AMOUNT, poolData, pricePoolData)
 
@@ -77,7 +79,8 @@ export const getPoolTableRowData = ({
         volumePrice,
         status,
         key: poolDetailAsset.ticker,
-        network
+        network,
+        apy
       }
     })
   )

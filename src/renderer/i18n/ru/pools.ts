@@ -3,6 +3,7 @@ import { PoolsMessages } from '../types'
 const pools: PoolsMessages = {
   'pools.depth': 'Глубина',
   'pools.24hvol': 'объёмы за 24ч',
+  'pools.apy': 'APY - RU',
   'pools.avgsize': 'ср. размер',
   'pools.avgfee': 'ср. комиссия',
   'pools.blocksleft': 'блоков осталось',

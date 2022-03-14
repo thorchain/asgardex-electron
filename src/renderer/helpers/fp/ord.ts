@@ -10,8 +10,8 @@ import { WalletBalance } from '../../services/wallet/types'
 import { PricePool } from '../../views/pools/Pools.types'
 import { eqBaseAmount, eqBigNumber, eqAsset, eqPricePool, eqChain } from './eq'
 
-const ordString = S.Ord
-const ordNumber = N.Ord
+export const ordString = S.Ord
+export const ordNumber = N.Ord
 
 export const ordBigNumber: Ord.Ord<BigNumber> = {
   equals: eqBigNumber.equals,
