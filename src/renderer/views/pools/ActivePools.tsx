@@ -49,6 +49,7 @@ export const ActivePools: React.FC<PoolsComponentProps> = ({ haltedChains, mimir
   const poolsRD = useObservableState(poolsState$, RD.pending)
 
   const isDesktopView = Grid.useBreakpoint()?.lg ?? false
+  const isLargeScreen = Grid.useBreakpoint()?.xl ?? false
 
   // store previous data of pools to render these while reloading
   const previousPools = useRef<O.Option<PoolTableRowsData>>(O.none)
@@ -185,16 +186,20 @@ export const ActivePools: React.FC<PoolsComponentProps> = ({ haltedChains, mimir
   )
 
   const desktopPoolsColumns: ColumnsType<PoolTableRowData> = useMemo(
-    () => [
-      Shared.poolColumn(intl.formatMessage({ id: 'common.pool' })),
-      Shared.assetColumn(intl.formatMessage({ id: 'common.asset' })),
-      Shared.priceColumn(intl.formatMessage({ id: 'common.price' }), selectedPricePool.asset),
-      Shared.depthColumn(intl.formatMessage({ id: 'common.liquidity' }), selectedPricePool.asset),
-      volumeColumn,
-      apyColumn,
-      btnPoolsColumn
-    ],
-    [intl, selectedPricePool.asset, volumeColumn, apyColumn, btnPoolsColumn]
+    () =>
+      FP.pipe(
+        [
+          O.some(Shared.poolColumn(intl.formatMessage({ id: 'common.pool' }))),
+          O.some(Shared.assetColumn(intl.formatMessage({ id: 'common.asset' }))),
+          O.some(Shared.priceColumn(intl.formatMessage({ id: 'common.price' }), selectedPricePool.asset)),
+          O.some(Shared.depthColumn(intl.formatMessage({ id: 'common.liquidity' }), selectedPricePool.asset)),
+          O.some(volumeColumn),
+          isLargeScreen ? O.some(apyColumn) : O.none,
+          O.some(btnPoolsColumn)
+        ],
+        A.filterMap(FP.identity)
+      ),
+    [intl, selectedPricePool.asset, isLargeScreen, volumeColumn, apyColumn, btnPoolsColumn]
   )
 
   const mobilePoolsColumns: ColumnsType<PoolTableRowData> = useMemo(
