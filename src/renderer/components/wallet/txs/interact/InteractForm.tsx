@@ -21,7 +21,7 @@ import { useIntl } from 'react-intl'
 import { Network } from '../../../../../shared/api/types'
 import { isKeystoreWallet, isLedgerWallet } from '../../../../../shared/utils/guard'
 import { WalletType } from '../../../../../shared/wallet/types'
-import { ZERO_BASE_AMOUNT } from '../../../../const'
+import { ZERO_BASE_AMOUNT, ZERO_BN } from '../../../../const'
 import { THORCHAIN_DECIMAL } from '../../../../helpers/assetHelper'
 import { validateAddress } from '../../../../helpers/form/validation'
 import { useSubscriptionState } from '../../../../hooks/useSubscriptionState'
@@ -83,10 +83,10 @@ export const InteractForm: React.FC<Props> = (props) => {
   const amountToSend = useMemo(() => {
     switch (interactType) {
       case 'bond':
-      case 'unbond':
       case 'custom':
         return _amountToSend
       case 'leave':
+      case 'unbond':
         return ZERO_BASE_AMOUNT
     }
   }, [_amountToSend, interactType])
@@ -190,11 +190,13 @@ export const InteractForm: React.FC<Props> = (props) => {
       // we have to validate input before storing into the state
       amountValidator(undefined, value)
         .then(() => {
-          setAmountToSend(assetToBase(assetAmount(value, THORCHAIN_DECIMAL)))
+          if (interactType === 'bond' || interactType === 'custom') {
+            setAmountToSend(assetToBase(assetAmount(value, THORCHAIN_DECIMAL)))
+          }
         })
         .catch(() => {}) // do nothing, Ant' form does the job for us to show an error message
     },
-    [amountValidator]
+    [amountValidator, interactType]
   )
 
   const addMaxAmountHandler = useCallback(() => setAmountToSend(maxAmount), [maxAmount])
@@ -248,13 +250,24 @@ export const InteractForm: React.FC<Props> = (props) => {
 
   const [showConfirmationModal, setShowConfirmationModal] = useState(false)
 
+  const resetForm = useCallback(() => {
+    setAmountToSend(ZERO_BASE_AMOUNT)
+    form.setFieldsValue({
+      thorAddress: '',
+      memo: '',
+      amount: ZERO_BN
+    })
+  }, [form])
+
   const renderConfirmationModal = useMemo(() => {
     const onSuccessHandler = () => {
       setShowConfirmationModal(false)
       submitTx()
+      resetForm()
     }
     const onCloseHandler = () => {
       setShowConfirmationModal(false)
+      resetForm()
     }
 
     if (isKeystoreWallet(walletType)) {
@@ -280,7 +293,7 @@ export const InteractForm: React.FC<Props> = (props) => {
       )
     }
     return <></>
-  }, [walletType, submitTx, validatePassword$, network, showConfirmationModal, intl])
+  }, [walletType, submitTx, resetForm, validatePassword$, network, showConfirmationModal, intl])
 
   const renderTxModal = useMemo(() => {
     const { txRD } = interactState
