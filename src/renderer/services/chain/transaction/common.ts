@@ -90,7 +90,9 @@ export const sendTx$ = ({
           errorId: ErrorId.GET_FEES,
           msg: error?.message ?? error.toString()
         })),
-        liveData.chain(({ rates }) => DOGE.sendTx({ recipient, amount, feeRate: rates[feeOption], memo, walletIndex }))
+        liveData.chain(({ rates }) =>
+          DOGE.sendTx({ walletType, recipient, amount, feeRate: rates[feeOption], memo, walletIndex, sender })
+        )
       )
 
     case BCHChain:

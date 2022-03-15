@@ -1,8 +1,9 @@
 import * as RD from '@devexperts/remote-data-ts'
-import { FeeRate, FeesWithRates } from '@xchainjs/xchain-client'
+import { Address, FeeRate, FeesWithRates } from '@xchainjs/xchain-client'
 import { Client } from '@xchainjs/xchain-doge'
 import { BaseAmount } from '@xchainjs/xchain-util'
 
+import { WalletType } from '../../../shared/wallet/types'
 import { LiveData } from '../../helpers/rx/liveData'
 import { Memo } from '../chain/types'
 import * as C from '../clients'
@@ -19,7 +20,9 @@ export type FeesWithRatesRD = RD.RemoteData<Error, FeesWithRates>
 export type FeesWithRatesLD = LiveData<Error, FeesWithRates>
 
 export type SendTxParams = {
-  recipient: string // to address
+  walletType: WalletType
+  sender?: Address
+  recipient: string
   amount: BaseAmount
   feeRate: number
   memo?: string
