@@ -1,14 +1,18 @@
-# 0.10.0 (2022-03-xx)
+# 0.10.0 (2022-03-15)
 
 ## Add
 
-- [Ledger] BCH support [#2131](https://github.com/thorchain/asgardex-electron/issues/2131)
-- [Ledger] DOGE support [#2132](https://github.com/thorchain/asgardex-electron/issues/2132)
+- [Ledger] DOGE support [#2139](https://github.com/thorchain/asgardex-electron/pull/2139), [#2142](https://github.com/thorchain/asgardex-electron/pull/2142)
+
+## Update
+
 - [Pools] Show APY at pools overview [#2135](https://github.com/thorchain/asgardex-electron/issues/2135)
+- Update FR translation 15-03-2022 by @Weyland2093 [#2141](https://github.com/thorchain/asgardex-electron/pull/2141)
 
 ## Fix
 
 - [UNBOND] Send ZERO amount [#2134](https://github.com/thorchain/asgardex-electron/issues/2134)
+- Fix estimated fees for BTC [#2140](https://github.com/thorchain/asgardex-electron/pull/2140)
 
 # 0.9.1 (2022-03-08)
 
