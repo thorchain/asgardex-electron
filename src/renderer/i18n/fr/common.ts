@@ -42,7 +42,7 @@ const common: CommonMessages = {
   'common.price.rune': 'Prix du Rune',
   'common.transaction': 'Transaction',
   'common.viewTransaction': 'Afficher la transaction',
-  'common.copyTxUrl': 'Copy transaction url - FR',
+  'common.copyTxUrl': "Copier l'URL de la transaction",
   'common.fee': 'Frais',
   'common.fees': 'Frais',
   'common.fee.estimated': 'Frais estimé',
@@ -66,9 +66,9 @@ const common: CommonMessages = {
   'common.tx.healthCheck': 'Vérification',
   'common.tx.sending': 'Envoi de la transaction',
   'common.tx.sendingAsset': 'Envoi de la transaction {assetTicker}',
-  'common.tx.success': 'Transaction has been sent successfully - FR',
+  'common.tx.success': 'La transaction a été envoyée avec succès',
   'common.tx.success-info':
-    'The transaction might take some time to be confirmed (up to several minutes depending on the chain) - FR',
+    "La transaction peut prendre un certain temps pour être confirmée (jusqu'à plusieurs minutes selon la chaîne)",
   'common.tx.checkResult': 'Vérifier le résultat',
   'common.tx.view': 'Voir la transaction {assetTicker}',
   'common.modal.confirmTitle': "Confirmer l'action",
@@ -95,7 +95,7 @@ const common: CommonMessages = {
   'common.balance': 'Solde',
   'common.balance.loading': 'Chargement du solde',
   'common.custom': 'Personnaliser',
-  'common.notsupported.fornetwork': 'Not supported for {network} - FR'
+  'common.notsupported.fornetwork': 'Non pris en charge pour {network}'
 }
 
 export default common
