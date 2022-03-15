@@ -28,6 +28,7 @@ import { useWalletContext } from '../../contexts/WalletContext'
 import {
   filterEnabledChains,
   isBchChain,
+  isDogeChain,
   isBnbChain,
   isBtcChain,
   isLtcChain,
@@ -103,12 +104,20 @@ export const WalletSettingsView: React.FC = (): JSX.Element => {
     removeAddress: removeLedgerBchAddress
   } = useLedger(BCHChain)
 
+  const {
+    askAddress: askLedgerDOGEAddress,
+    verifyAddress: verifyLedgerDOGEAddress,
+    address: dogeLedgerAddressRD,
+    removeAddress: removeLedgerDOGEAddress
+  } = useLedger(DOGEChain)
+
   const addLedgerAddressHandler = (chain: Chain, walletIndex: number) => {
     if (isThorChain(chain)) return askLedgerThorAddress(walletIndex)
     if (isBnbChain(chain)) return askLedgerBnbAddress(walletIndex)
     if (isBtcChain(chain)) return askLedgerBtcAddress(walletIndex)
     if (isLtcChain(chain)) return askLedgerLtcAddress(walletIndex)
     if (isBchChain(chain)) return askLedgerBchAddress(walletIndex)
+    if (isDogeChain(chain)) return askLedgerDOGEAddress(walletIndex)
 
     return FP.constVoid
   }
@@ -119,6 +128,7 @@ export const WalletSettingsView: React.FC = (): JSX.Element => {
     if (isBtcChain(chain)) return verifyLedgerBtcAddress(walletIndex)
     if (isLtcChain(chain)) return verifyLedgerLtcAddress(walletIndex)
     if (isBchChain(chain)) return verifyLedgerBchAddress(walletIndex)
+    if (isDogeChain(chain)) return verifyLedgerDOGEAddress(walletIndex)
 
     return FP.constVoid
   }
@@ -129,6 +139,7 @@ export const WalletSettingsView: React.FC = (): JSX.Element => {
     if (isBtcChain(chain)) return removeLedgerBtcAddress()
     if (isLtcChain(chain)) return removeLedgerLtcAddress()
     if (isBchChain(chain)) return removeLedgerBchAddress()
+    if (isDogeChain(chain)) return removeLedgerDOGEAddress()
 
     return FP.constVoid
   }
@@ -231,6 +242,17 @@ export const WalletSettingsView: React.FC = (): JSX.Element => {
     [intl, bchLedgerAddressRD]
   )
 
+  const dogeLedgerWalletAddress: WalletAddressAsync = useMemo(
+    () => ({
+      type: 'ledger',
+      address: FP.pipe(
+        dogeLedgerAddressRD,
+        RD.mapLeft(({ errorId, msg }) => Error(`${ledgerErrorIdToI18n(errorId, intl)} (${msg})`))
+      )
+    }),
+    [intl, dogeLedgerAddressRD]
+  )
+
   const walletAccounts$ = useMemo(() => {
     const thorWalletAccount$ = walletAccount$({
       addressUI$: thorAddressUI$,
@@ -258,7 +280,11 @@ export const WalletSettingsView: React.FC = (): JSX.Element => {
       ledgerAddress: ltcLedgerWalletAddress,
       chain: LTCChain
     })
-    const dogeWalletAccount$ = walletAccount$({ addressUI$: dogeAddressUI$, chain: DOGEChain })
+    const dogeWalletAccount$ = walletAccount$({
+      addressUI$: dogeAddressUI$,
+      ledgerAddress: dogeLedgerWalletAddress,
+      chain: DOGEChain
+    })
 
     return FP.pipe(
       // combineLatest is for the future additional accounts
@@ -288,7 +314,8 @@ export const WalletSettingsView: React.FC = (): JSX.Element => {
     bchLedgerWalletAddress,
     ltcAddressUI$,
     ltcLedgerWalletAddress,
-    dogeAddressUI$
+    dogeAddressUI$,
+    dogeLedgerWalletAddress
   ])
   const walletAccounts = useObservableState(walletAccounts$, O.none)
 
