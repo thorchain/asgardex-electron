@@ -16,7 +16,7 @@ export const useLedger = (chain: Chain) => {
   const { askLedgerAddress$, getLedgerAddress$, verifyLedgerAddress, removeLedgerAddress } = useWalletContext()
 
   const verifyAddress = useCallback(
-    (walletIndex) => verifyLedgerAddress(chain, network, walletIndex),
+    async (walletIndex) => await verifyLedgerAddress({ chain, network, walletIndex }),
     [chain, verifyLedgerAddress, network]
   )
   const removeAddress = useCallback(() => removeLedgerAddress(chain, network), [chain, removeLedgerAddress, network])

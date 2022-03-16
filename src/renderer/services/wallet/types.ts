@@ -138,12 +138,17 @@ export type BalancesService = {
 }
 
 export type GetLedgerAddressHandler = (chain: Chain, network: Network) => LedgerAddressLD
+export type VerifyLedgerAddressHandler = (params: {
+  chain: Chain
+  network: Network
+  walletIndex: number
+}) => Promise<boolean>
 
 export type LedgerService = {
   ledgerAddresses$: Rx.Observable<LedgerAddressesMap>
   askLedgerAddress$: (chain: Chain, network: Network, walletIndex: number) => LedgerAddressLD
   getLedgerAddress$: GetLedgerAddressHandler
-  verifyLedgerAddress: (chain: Chain, network: Network, walletIndex: number) => void
+  verifyLedgerAddress: VerifyLedgerAddressHandler
   removeLedgerAddress: (chain: Chain, network: Network) => void
   dispose: FP.Lazy<void>
 }
