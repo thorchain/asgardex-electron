@@ -20,9 +20,9 @@ export const getAddress = async (
     const clientNetwork = toClientNetwork(network)
     const derivePath = getDerivationPath(walletIndex, clientNetwork)
     const { bitcoinAddress: bchAddress } = await app.getWalletPublicKey(derivePath, {
-      // 'cashaddr' in case of Bitcoin Cash
+      // legacy format with 44' paths
       // @see https://github.com/LedgerHQ/ledgerjs/blob/master/packages/hw-app-btc/README.md#parameters-2
-      format: 'cashaddr'
+      format: 'legacy'
     })
     return E.right({ address: bchAddress, chain: BCHChain, type: 'ledger', walletIndex })
   } catch (error) {
@@ -39,9 +39,9 @@ export const verifyAddress: VerifyAddressHandler = async ({ transport, network, 
   const clientNetwork = toClientNetwork(network)
   const derivePath = getDerivationPath(walletIndex, clientNetwork)
   const _ = await app.getWalletPublicKey(derivePath, {
-    // 'cashaddr' in case of Bitcoin Cash
+    // legacy format with 44' paths
     // @see https://github.com/LedgerHQ/ledgerjs/blob/master/packages/hw-app-btc/README.md#parameters-2
-    format: 'cashaddr',
+    format: 'legacy',
     verify: true // confirm the address on the device
   })
   return true

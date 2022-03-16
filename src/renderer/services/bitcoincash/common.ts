@@ -9,7 +9,6 @@ import * as RxOp from 'rxjs/operators'
 import { map, shareReplay } from 'rxjs/operators'
 
 import { getHaskoinBCHApiUrl } from '../../../shared/api/haskoin'
-import { getBCHNodeAuth, getBCHNodeUrl } from '../../../shared/api/thornode'
 import { isError } from '../../../shared/utils/guard'
 import { clientNetwork$ } from '../app/service'
 import * as C from '../clients'
@@ -36,8 +35,6 @@ const clientState$: ClientState$ = FP.pipe(
               const client = new BitcoinCashClient({
                 network,
                 haskoinUrl: getHaskoinBCHApiUrl(),
-                nodeUrl: getBCHNodeUrl(),
-                nodeAuth: getBCHNodeAuth(),
                 phrase
               })
               return RD.success(client)
