@@ -7,6 +7,7 @@ import { LedgerError, LedgerErrorId, Network } from '../../../../shared/api/type
 import { toClientNetwork } from '../../../../shared/utils/client'
 import { isError } from '../../../../shared/utils/guard'
 import { WalletAddress } from '../../../../shared/wallet/types'
+import { VerifyAddressHandler } from '../types'
 import { getDerivationPath } from './common'
 
 export const getAddress = async (
@@ -32,7 +33,7 @@ export const getAddress = async (
   }
 }
 
-export const verifyAddress = async (transport: Transport, network: Network, walletIndex: number): Promise<void> => {
+export const verifyAddress: VerifyAddressHandler = async ({ transport, network, walletIndex }) => {
   const app = new AppBTC(transport)
   const clientNetwork = toClientNetwork(network)
   const derivePath = getDerivationPath(walletIndex, clientNetwork)
@@ -40,4 +41,5 @@ export const verifyAddress = async (transport: Transport, network: Network, wall
     format: 'bech32', // bech32 format with 84' paths
     verify: true // confirm the address on the device
   })
+  return true
 }

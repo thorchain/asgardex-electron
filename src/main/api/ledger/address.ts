@@ -57,27 +57,30 @@ export const getAddress = async ({
 
 export const verifyLedgerAddress = async ({ chain, network, walletIndex }: IPCLedgerAdddressParams) => {
   const transport = await TransportNodeHidSingleton.open()
+  let result = false
   switch (chain) {
     case THORChain:
-      verifyTHORAddress(transport, network, walletIndex)
+      result = await verifyTHORAddress({ transport, network, walletIndex })
       break
     case BNBChain:
-      verifyBNBAddress(transport, network, walletIndex)
+      result = await verifyBNBAddress({ transport, network, walletIndex })
       break
     case BTCChain:
-      verifyBTCAddress(transport, network, walletIndex)
+      result = await verifyBTCAddress({ transport, network, walletIndex })
       break
     case LTCChain:
-      verifyLTCAddress(transport, network, walletIndex)
+      result = await verifyLTCAddress({ transport, network, walletIndex })
       break
     case BCHChain:
-      verifyBCHAddress(transport, network, walletIndex)
+      result = await verifyBCHAddress({ transport, network, walletIndex })
       break
     case DOGEChain:
-      verifyDOGEAddress(transport, network, walletIndex)
+      result = await verifyDOGEAddress({ transport, network, walletIndex })
       break
     default:
       throw Error(`verifyAddress for ${chain} has not been implemented`)
   }
   await transport.close()
+
+  return result
 }

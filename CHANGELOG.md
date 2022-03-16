@@ -1,3 +1,9 @@
+# 0.11.0 (2022-03-xx)
+
+## Fix
+
+- [Ledger] Remove address from memory after rejecting address on device [#2145](https://github.com/thorchain/asgardex-electron/issues/2145)
+
 # 0.10.0 (2022-03-15)
 
 ## Add
