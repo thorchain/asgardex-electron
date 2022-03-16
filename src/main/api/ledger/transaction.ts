@@ -1,6 +1,6 @@
 import TransportNodeHidSingleton from '@ledgerhq/hw-transport-node-hid-singleton'
 import { TxHash } from '@xchainjs/xchain-client'
-import { BNBChain, BTCChain, DOGEChain, LTCChain, THORChain } from '@xchainjs/xchain-util'
+import { BCHChain, BNBChain, BTCChain, DOGEChain, LTCChain, THORChain } from '@xchainjs/xchain-util'
 import * as E from 'fp-ts/Either'
 
 import { IPCLedgerDepositTxParams, IPCLedgerSendTxParams } from '../../../shared/api/io'
@@ -8,6 +8,7 @@ import { LedgerError, LedgerErrorId } from '../../../shared/api/types'
 import { isError } from '../../../shared/utils/guard'
 import * as BNB from './binance/transaction'
 import * as BTC from './bitcoin/transaction'
+import * as BCH from './bitcoincash/transaction'
 import * as DOGE from './doge/transaction'
 import * as LTC from './litecoin/transaction'
 import * as THOR from './thorchain/transaction'
@@ -72,6 +73,9 @@ export const sendTx = async ({
           memo,
           walletIndex
         })
+        break
+      case BCHChain:
+        res = await BCH.send({ transport, network, sender, recipient, amount, feeRate, memo, walletIndex })
         break
       case DOGEChain:
         res = await DOGE.send({

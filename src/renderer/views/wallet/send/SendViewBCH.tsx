@@ -71,7 +71,7 @@ export const SendViewBCH: React.FC<Props> = (props): JSX.Element => {
           walletAddress={walletAddress}
           balances={FP.pipe(
             oBalances,
-            O.getOrElse(() => [] as WalletBalances)
+            O.getOrElse<WalletBalances>(() => [])
           )}
           balance={walletBalance}
           transfer$={transfer$}

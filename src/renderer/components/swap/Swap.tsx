@@ -38,7 +38,7 @@ import {
   to1e8BaseAmount,
   isChainAsset
 } from '../../helpers/assetHelper'
-import { getChainAsset, isBtcChain, isDogeChain, isEthChain, isLtcChain } from '../../helpers/chainHelper'
+import { getChainAsset, isBchChain, isBtcChain, isDogeChain, isEthChain, isLtcChain } from '../../helpers/chainHelper'
 import { unionAssets } from '../../helpers/fp/array'
 import { eqAsset, eqBaseAmount, eqOAsset, eqOApproveParams, eqAddress, eqOAddress } from '../../helpers/fp/eq'
 import { sequenceSOption, sequenceTOption } from '../../helpers/fpHelpers'
@@ -373,7 +373,10 @@ export const Swap = ({
     () =>
       FP.pipe(
         oSourceAsset,
-        O.map(({ chain }) => (isBtcChain(chain) || isLtcChain(chain) || isDogeChain(chain)) && useSourceAssetLedger),
+        O.map(
+          ({ chain }) =>
+            (isBtcChain(chain) || isLtcChain(chain) || isBchChain(chain) || isDogeChain(chain)) && useSourceAssetLedger
+        ),
         O.getOrElse(() => false)
       ),
     [useSourceAssetLedger, oSourceAsset]

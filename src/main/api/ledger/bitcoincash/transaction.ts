@@ -1,21 +1,20 @@
 import AppBTC from '@ledgerhq/hw-app-btc'
 import { Transaction } from '@ledgerhq/hw-app-btc/lib/types'
 import Transport from '@ledgerhq/hw-transport'
+import { broadcastTx, buildTx } from '@xchainjs/xchain-bitcoincash'
 import { Address, FeeRate, TxHash } from '@xchainjs/xchain-client'
-import { broadcastTx, buildTx } from '@xchainjs/xchain-litecoin'
 import { BaseAmount } from '@xchainjs/xchain-util'
 import * as Bitcoin from 'bitcoinjs-lib'
 import * as E from 'fp-ts/lib/Either'
 
-import { getSochainUrl } from '../../../../shared/api/sochain'
-import { getLTCNodeAuth, getLTCNodeUrl } from '../../../../shared/api/thornode'
+import { getHaskoinBCHApiUrl } from '../../../../shared/api/haskoin'
 import { LedgerError, LedgerErrorId, Network } from '../../../../shared/api/types'
 import { toClientNetwork } from '../../../../shared/utils/client'
 import { isError } from '../../../../shared/utils/guard'
 import { getDerivationPath } from './common'
 
 /**
- * Sends LTC tx using Ledger
+ * Sends BCH tx using Ledger
  */
 export const send = async ({
   transport,
@@ -48,15 +47,16 @@ export const send = async ({
     const clientNetwork = toClientNetwork(network)
     const derivePath = getDerivationPath(walletIndex, clientNetwork)
 
-    const { psbt, utxos } = await buildTx({
+    const haskoinUrl = getHaskoinBCHApiUrl()[network]
+
+    const { builder, utxos } = await buildTx({
       amount,
       recipient,
       memo,
       feeRate,
       sender,
       network: clientNetwork,
-      sochainUrl: getSochainUrl(),
-      withTxHex: true
+      haskoinUrl
     })
 
     const inputs: Array<[Transaction, number, string | null, number | null]> = utxos.map(({ txHex, hash, index }) => {
@@ -70,28 +70,28 @@ export const send = async ({
 
     const associatedKeysets: string[] = inputs.map((_) => derivePath)
 
-    const newTxHex = psbt.data.globalMap.unsignedTx.toBuffer().toString('hex')
-    const newTx: Transaction = app.splitTransaction(newTxHex, true)
+    const newTxHex = builder.buildIncomplete().toHex()
 
+    const newTx: Transaction = app.splitTransaction(newTxHex)
     const outputScriptHex = app.serializeTransactionOutputs(newTx).toString('hex')
-
     const txHex = await app.createPaymentTransactionNew({
       inputs,
       associatedKeysets,
       outputScriptHex,
-      segwit: true,
-      useTrustedInputForSegwit: true,
-      additionals: ['bech32']
+      // 'abc' for BCH
+      // @see https://github.com/LedgerHQ/ledgerjs/tree/v6.7.0/packages/hw-app-btc#createpaymenttransactionnew
+      // Under the hood `hw-app-btc` uses `bip143` then
+      // @see https://github.com/LedgerHQ/ledgerjs/blob/90360f1b00a11af4e64a7fc9d980a153ee6f092a/packages/hw-app-btc/src/createTransaction.ts#L120-L123
+      additionals: ['abc'],
+      sigHashType: 0x41 // If not set, Ledger will throw LEDGER DEVICE: INVALID DATA RECEIVED (0X6A80)
     })
 
-    const nodeUrl = getLTCNodeUrl(network)
-    const auth = getLTCNodeAuth()
-    const txHash = await broadcastTx({ txHex, nodeUrl, auth })
+    const txHash = await broadcastTx({ txHex, haskoinUrl })
 
     if (!txHash) {
       return E.left({
         errorId: LedgerErrorId.INVALID_RESPONSE,
-        msg: `Post request to send LTC transaction using Ledger failed`
+        msg: `Post request to send BCH transaction using Ledger failed`
       })
     }
     return E.right(txHash)
