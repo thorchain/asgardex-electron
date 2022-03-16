@@ -4646,10 +4646,10 @@
     hdkey "^2.0.1"
     uuid "^8.3.2"
 
-"@xchainjs/xchain-doge@^0.1.2":
-  version "0.1.2"
-  resolved "https://registry.yarnpkg.com/@xchainjs/xchain-doge/-/xchain-doge-0.1.2.tgz#a44edf4857647fb88da82b4a63cb1e318946964f"
-  integrity sha512-c265GGnzI+4jM3aZWav0x4B115urE0armwlAYTHkDbgoax/sq9UFa6Ogpz1Czq6C79Th6NR6O79WjCfFCTlqsQ==
+"@xchainjs/xchain-doge@^0.2.0-alpha.1":
+  version "0.2.0-alpha.1"
+  resolved "https://registry.yarnpkg.com/@xchainjs/xchain-doge/-/xchain-doge-0.2.0-alpha.1.tgz#403c80fd45b581851e903869afaca8443199d3f1"
+  integrity sha512-p7vTPjrc8GY7dmqbQeOZC/kh+1XX2HlBSHqyuYQrbwNgZISigwS/+ZV5loV4MndvK5eHoDrnoAwUPw/EhWLZTA==
 
 "@xchainjs/xchain-ethereum@^0.23.3":
   version "0.23.3"

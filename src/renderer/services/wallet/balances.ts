@@ -483,6 +483,15 @@ export const createBalancesService = ({
     }))
   )
 
+  /**
+   * DOGE Ledger balances
+   */
+  const dogeLedgerChainBalance$: ChainBalance$ = ledgerChainBalance$({
+    chain: DOGEChain,
+    walletBalanceType: 'all',
+    getBalanceByAddress$: DOGE.getBalanceByAddress$
+  })
+
   const ethBalances$ = getChainBalance$({
     chain: ETHChain,
     walletType: 'keystore',
@@ -520,7 +529,7 @@ export const createBalancesService = ({
         ETH: [ethChainBalance$],
         BNB: [bnbChainBalance$, bnbLedgerChainBalance$],
         LTC: [ltcBalance$, ltcLedgerChainBalance$],
-        DOGE: [dogeChainBalance$]
+        DOGE: [dogeChainBalance$, dogeLedgerChainBalance$]
       })
     ),
     // we ignore all `ChainBalances` with state of `initial` balances
