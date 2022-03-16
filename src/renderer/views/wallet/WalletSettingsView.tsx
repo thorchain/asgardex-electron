@@ -122,7 +122,7 @@ export const WalletSettingsView: React.FC = (): JSX.Element => {
     return FP.constVoid
   }
 
-  const verifyLedgerAddressHandler = (chain: Chain, walletIndex: number) => {
+  const verifyLedgerAddressHandler = async (chain: Chain, walletIndex: number) => {
     if (isThorChain(chain)) return verifyLedgerThorAddress(walletIndex)
     if (isBnbChain(chain)) return verifyLedgerBnbAddress(walletIndex)
     if (isBtcChain(chain)) return verifyLedgerBtcAddress(walletIndex)
@@ -130,7 +130,7 @@ export const WalletSettingsView: React.FC = (): JSX.Element => {
     if (isBchChain(chain)) return verifyLedgerBchAddress(walletIndex)
     if (isDogeChain(chain)) return verifyLedgerDOGEAddress(walletIndex)
 
-    return FP.constVoid
+    return false
   }
 
   const removeLedgerAddressHandler = (chain: Chain) => {

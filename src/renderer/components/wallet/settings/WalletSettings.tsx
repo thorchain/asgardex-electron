@@ -55,7 +55,7 @@ type Props = {
   removeKeystore: FP.Lazy<void>
   exportKeystore: (runeNativeAddress: string, selectedNetwork: Network) => void
   addLedgerAddress: (chain: Chain, walletIndex: number) => void
-  verifyLedgerAddress: (chain: Chain, walletIndex: number) => void
+  verifyLedgerAddress: (chain: Chain, walletIndex: number) => Promise<boolean>
   removeLedgerAddress: (chain: Chain) => void
   phrase: O.Option<string>
   clickAddressLinkHandler: (chain: Chain, address: Address) => void
@@ -137,8 +137,33 @@ export const WalletSettings: React.FC<Props> = (props): JSX.Element => {
     [TerraChain]: 0
   })
 
+  const [addressToVerify, setAddressToVerify] = useState<AddressToVerify>(O.none)
+
+  const rejectLedgerAddress = useCallback(
+    (chain: Chain) => {
+      removeLedgerAddress(chain)
+      setAddressToVerify(O.none)
+    },
+    [removeLedgerAddress]
+  )
+
   const renderAddress = useCallback(
     (chain: Chain, { type: walletType, address: addressRD }: WalletAddressAsync) => {
+      const verifyLedgerAddressHandler = async (address: Address, walletIndex: number) => {
+        setAddressToVerify(
+          O.some({
+            address,
+            chain
+          })
+        )
+        try {
+          const result = await verifyLedgerAddress(chain, walletIndex)
+          !result ? rejectLedgerAddress(chain) : setAddressToVerify(O.none) /* close modal */
+        } catch (_) {
+          rejectLedgerAddress(chain)
+        }
+      }
+
       const renderAddLedger = (chain: Chain, loading: boolean) => (
         <Styled.AddLedgerContainer>
           <Styled.AddLedgerButton loading={loading} onClick={() => addLedgerAddress(chain, walletIndexMap[chain])}>
@@ -191,17 +216,7 @@ export const WalletSettings: React.FC<Props> = (props): JSX.Element => {
                     <Styled.AddressLinkIcon onClick={() => clickAddressLinkHandler(chain, address)} />
 
                     {isLedgerWallet(walletType) && (
-                      <Styled.EyeOutlined
-                        onClick={() => {
-                          setAddressToVerify(
-                            O.some({
-                              address,
-                              chain
-                            })
-                          )
-                          verifyLedgerAddress(chain, walletIndex)
-                        }}
-                      />
+                      <Styled.EyeOutlined onClick={() => verifyLedgerAddressHandler(address, walletIndex)} />
                     )}
 
                     {isLedgerWallet(walletType) && (
@@ -215,10 +230,17 @@ export const WalletSettings: React.FC<Props> = (props): JSX.Element => {
         </Styled.AddressContainer>
       )
     },
-    [addLedgerAddress, clickAddressLinkHandler, intl, removeLedgerAddress, network, verifyLedgerAddress, walletIndexMap]
+    [
+      verifyLedgerAddress,
+      rejectLedgerAddress,
+      intl,
+      walletIndexMap,
+      addLedgerAddress,
+      network,
+      clickAddressLinkHandler,
+      removeLedgerAddress
+    ]
   )
-
-  const [addressToVerify, setAddressToVerify] = useState<AddressToVerify>(O.none)
 
   const renderVerifyAddressModal = useCallback(
     (oAddress: AddressToVerify) =>
@@ -231,10 +253,7 @@ export const WalletSettings: React.FC<Props> = (props): JSX.Element => {
               title={intl.formatMessage({ id: 'wallet.ledger.verifyAddress.modal.title' })}
               visible={true}
               onOk={() => setAddressToVerify(O.none)}
-              onCancel={() => {
-                removeLedgerAddress(chain)
-                setAddressToVerify(O.none)
-              }}
+              onCancel={() => rejectLedgerAddress(chain)}
               maskClosable={false}
               closable={false}
               okText={intl.formatMessage({ id: 'common.confirm' })}
@@ -252,7 +271,7 @@ export const WalletSettings: React.FC<Props> = (props): JSX.Element => {
           )
         )
       ),
-    [intl, removeLedgerAddress]
+    [intl, rejectLedgerAddress]
   )
 
   const accounts = useMemo(

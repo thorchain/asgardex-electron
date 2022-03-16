@@ -1,6 +1,5 @@
 import { Keystore } from '@xchainjs/xchain-crypto'
 import * as E from 'fp-ts/Either'
-import * as FP from 'fp-ts/lib/function'
 
 import { ApiLang, ApiKeystore, ApiUrl, ApiHDWallet } from '../api/types'
 import { Locale } from '../i18n/types'
@@ -79,7 +78,7 @@ export const apiUrl: ApiUrl = {
 export const apiHDWallet: ApiHDWallet = {
   getLedgerAddress: ({ chain }) =>
     Promise.resolve(E.right({ chain, address: 'ledger_address', type: 'ledger', walletIndex: 0 })),
-  verifyLedgerAddress: FP.constVoid,
+  verifyLedgerAddress: () => Promise.resolve(true),
   sendLedgerTx: () => Promise.resolve(E.right('tx_hash')),
   depositLedgerTx: () => Promise.resolve(E.right('tx_hash'))
 }
