@@ -231,8 +231,7 @@ export const WalletSettingsView: React.FC = (): JSX.Element => {
     [intl, ltcLedgerAddressRD]
   )
 
-  // Disable BCH Ledger temporary (for ASGDX@0.10.0 only)
-  const _bchLedgerWalletAddress: WalletAddressAsync = useMemo(
+  const bchLedgerWalletAddress: WalletAddressAsync = useMemo(
     () => ({
       type: 'ledger',
       address: FP.pipe(
@@ -273,8 +272,7 @@ export const WalletSettingsView: React.FC = (): JSX.Element => {
     })
     const bchWalletAccount$ = walletAccount$({
       addressUI$: bchAddressUI$,
-      // Disable BCH Ledger temporary (for ASGDX@0.10.0 only)
-      // ledgerAddress: bchLedgerWalletAddress,
+      ledgerAddress: bchLedgerWalletAddress,
       chain: BCHChain
     })
     const ltcWalletAccount$ = walletAccount$({
@@ -313,8 +311,7 @@ export const WalletSettingsView: React.FC = (): JSX.Element => {
     bnbAddressUI$,
     bnbLedgerWalletAddress,
     bchAddressUI$,
-    // Disable BCH Ledger temporary (for ASGDX@0.10.0 only)
-    // bchLedgerWalletAddress,
+    bchLedgerWalletAddress,
     ltcAddressUI$,
     ltcLedgerWalletAddress,
     dogeAddressUI$,
