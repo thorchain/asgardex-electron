@@ -233,6 +233,7 @@ export const SendFormTHOR: React.FC<Props> = (props): JSX.Element => {
           visible={showConfirmationModal}
           chain={THORChain}
           description={intl.formatMessage({ id: 'wallet.ledger.confirm' })}
+          addresses={undefined}
         />
       )
     }

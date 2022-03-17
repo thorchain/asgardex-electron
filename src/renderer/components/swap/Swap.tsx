@@ -921,12 +921,30 @@ export const Swap = ({
             visible={showLedgerModal}
             chain={chain}
             description={intl.formatMessage({ id: 'swap.ledger.sign' })}
+            addresses={FP.pipe(
+              oSwapParams,
+              O.chain(({ poolAddress, sender }) => {
+                const recipient = poolAddress.address
+                if (useSourceAssetLedger) return O.some({ recipient, sender })
+                return O.none
+              }),
+              O.toUndefined
+            )}
           />
         )),
         O.toNullable
       ),
 
-    [intl, network, oSourceAsset, onCloseLedgerModal, onSucceedLedgerModal, showLedgerModal]
+    [
+      intl,
+      network,
+      oSourceAsset,
+      oSwapParams,
+      onCloseLedgerModal,
+      onSucceedLedgerModal,
+      showLedgerModal,
+      useSourceAssetLedger
+    ]
   )
 
   const sourceChainFeeError: boolean = useMemo(() => {

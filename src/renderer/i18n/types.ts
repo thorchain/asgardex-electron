@@ -264,6 +264,9 @@ type LedgerMessageKey =
   | 'ledger.notsupported'
   | 'ledger.notaddedorzerobalances'
   | 'ledger.deposit.oneside'
+  | 'ledger.legacyformat.note'
+  | 'ledger.legacyformat.show'
+  | 'ledger.legacyformat.hide'
 
 export type LedgerMessages = { [key in LedgerMessageKey]: string }
 

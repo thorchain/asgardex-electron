@@ -20,6 +20,10 @@ const Template: Story<Args> = ({ chain, visible, description }) => {
       chain={chain}
       description={description}
       network="mainnet"
+      addresses={{
+        sender: 'qpm2qsznhks23z7629mms6s4cwef74vcwvy22gdx6a',
+        recipient: 'qr95sy3j9xwd2ap32xkykttr4cvcu7as4y0qverfuy'
+      }}
     />
   )
 }
@@ -41,9 +45,9 @@ const meta: Meta<Args> = {
       name: 'Chain',
       control: {
         type: 'select',
-        options: ['BNB', 'BTC', 'ETH']
+        options: ['BNB', 'BCH', 'BTC', 'ETH']
       },
-      defaultValue: 'BNB'
+      defaultValue: 'BCH'
     },
     onClose: {
       action: 'onClose'

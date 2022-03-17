@@ -321,6 +321,7 @@ export const SendFormLTC: React.FC<Props> = (props): JSX.Element => {
           visible={showConfirmationModal}
           chain={LTCChain}
           description={intl.formatMessage({ id: 'wallet.ledger.confirm' })}
+          addresses={undefined}
         />
       )
     } else if (isKeystoreWallet(walletType)) {

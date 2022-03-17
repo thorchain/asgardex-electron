@@ -25,7 +25,10 @@ const ledger: LedgerMessages = {
   'ledger.error.unknown': 'Erreur inconnue',
   'ledger.notsupported': 'Pas de prise en charge de Ledger pour {chain}.',
   'ledger.notaddedorzerobalances': "La chaîne {chaîne} n'a pas été connectée sur Ledger ou n'a aucun solde.",
-  'ledger.deposit.oneside': "Actuellement, Ledger ne prend en charge un actif que d'un seul côté."
+  'ledger.deposit.oneside': "Actuellement, Ledger ne prend en charge un actif que d'un seul côté.",
+  'ledger.legacyformat.note': 'Ledger displays all output addresses in "legacy", but not in "CashAddr" format. - FR',
+  'ledger.legacyformat.show': 'Show addresses - FR',
+  'ledger.legacyformat.hide': 'Hide addresses - FR'
 }
 
 export default ledger

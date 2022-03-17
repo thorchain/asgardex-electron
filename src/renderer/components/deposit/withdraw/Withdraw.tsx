@@ -556,6 +556,7 @@ export const Withdraw: React.FC<Props> = ({
           chain={THORChain}
           network={network}
           description={intl.formatMessage({ id: 'deposit.withdraw.ledger.sign' })}
+          addresses={undefined}
         />
       )}
 

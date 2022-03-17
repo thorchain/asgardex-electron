@@ -1,8 +1,11 @@
+import AIcon, { CaretRightOutlined } from '@ant-design/icons'
 import styled from 'styled-components'
+import { palette } from 'styled-theme'
 
 import { ReactComponent as LedgerConnectUI } from '../../../assets/svg/ledger-device-connect.svg'
 import { media } from '../../../helpers/styleHelper'
 import { AssetIcon as AssetIconUI } from '../../uielements/assets/assetIcon/AssetIcon'
+import { Button } from '../../uielements/button'
 
 export const LedgerContainer = styled.div`
   position: relative;
@@ -36,8 +39,66 @@ export const Content = styled.div`
   display: flex;
   flex-direction: column;
 `
+
 export const Description = styled.p`
   font-family: 'MainFontRegular';
   font-size: 12;
   text-align: center;
+`
+
+export const NoteBCH = styled.p`
+  font-family: 'MainFontRegular';
+  font-size: 12;
+  text-align: center;
+`
+
+export const CashAddrConverterUrl = styled.span`
+  text-transform: uppercase;
+  color: inherit;
+  text-decoration: underline;
+  cursor: pointer;
+  &:hover {
+    color: ${palette('primary', 0)};
+  }
+`
+
+export const Icon = styled(AIcon)`
+  display: inline-block;
+  margin-right: 5px;
+  svg {
+    width: 17px;
+    height: 17px;
+    stroke: ${palette('warning', 0)};
+    fill: none;
+  }
+`
+export const AddressWrapper = styled.div`
+  display: flex;
+  flex-direction: column;
+  padding: 20px 0 0 0;
+`
+export const AddressContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  text-transform: none;
+  align-items: center;
+`
+
+export const AddressTitle = styled.p`
+  font-family: 'MainFontBold';
+  font-size: 12px;
+  color: inherit;
+  text-transform: uppercase;
+  padding: 0;
+  margin: 0;
+`
+
+export const CompareAddressButton = styled(Button)`
+  box-shadow: none;
+`
+
+export const ExpandIcon = styled(CaretRightOutlined)`
+  svg {
+    color: inherit;
+  }
 `
