@@ -3,6 +3,7 @@ import type Transport from '@ledgerhq/hw-transport'
 import THORChainApp, { extractSignatureFromTLV, LedgerErrorType } from '@thorchain/ledger-thorchain'
 import { Address, TxHash } from '@xchainjs/xchain-client'
 import { CosmosSDKClient } from '@xchainjs/xchain-cosmos'
+import { buildTransferTx, buildUnsignedTx } from '@xchainjs/xchain-thorchain'
 import {
   buildDepositTx,
   DEFAULT_GAS_VALUE,
@@ -10,10 +11,9 @@ import {
   getDenom,
   getPrefix,
   MsgNativeTx,
-  msgNativeTxFromJson,
-  registerCodecs
+  msgNativeTxFromJson
 } from '@xchainjs/xchain-thorchain'
-import { AssetRuneNative, assetToString, BaseAmount } from '@xchainjs/xchain-util'
+import { AssetRuneNative, BaseAmount } from '@xchainjs/xchain-util'
 import * as E from 'fp-ts/Either'
 
 import { LedgerError, LedgerErrorId, Network } from '../../../../shared/api/types'
@@ -65,45 +65,33 @@ export const send = async ({
       prefix
     })
 
+    const denom = getDenom(AssetRuneNative)
+
+    const txBody = await buildTransferTx({
+      fromAddress: bech32Address,
+      toAddress: recipient,
+      assetAmount: amount.amount().toString(),
+      assetDenom: denom,
+      memo: memo,
+      nodeUrl: nodeUrl,
+      chainId: chainId
+    })
+
     // get signer address
     const signer = cosmosclient.AccAddress.fromString(bech32Address)
-
-    registerCodecs()
 
     // get account number + sequence from signer account
     const account = await cosmosClient.getAccount(signer)
     const { account_number, sequence, pub_key } = account
 
-    const fee = new proto.cosmos.tx.v1beta1.Fee({
-      amount: [],
-      gas_limit: cosmosclient.Long.fromString(DEFAULT_GAS_VALUE)
+    const txBuilder = buildUnsignedTx({
+      cosmosSdk: cosmosClient.sdk,
+      txBody: txBody,
+      gasLimit: DEFAULT_GAS_VALUE,
+      sequence: sequence || cosmosclient.Long.ZERO,
+      signerPubkey: cosmosclient.codec.packAny(pub_key)
     })
 
-    const authInfo = new proto.cosmos.tx.v1beta1.AuthInfo({
-      signer_infos: [
-        {
-          public_key: cosmosclient.codec.packAny(pub_key),
-          mode_info: {
-            single: {
-              mode: proto.cosmos.tx.signing.v1beta1.SignMode.SIGN_MODE_DIRECT
-            }
-          },
-          sequence
-        }
-      ],
-      fee
-    })
-
-    const denom = getDenom(AssetRuneNative)
-
-    const txBody = cosmosClient.getUnsignedTxBody({
-      from: bech32Address,
-      to: recipient,
-      asset: denom,
-      amount: amount.amount.toString(),
-      memo
-    })
-    const txBuilder = new cosmosclient.TxBuilder(cosmosClient.sdk, txBody, authInfo)
     const signDocBytes = txBuilder.signDocBytes(account_number || 0)
 
     // Sign tx body
@@ -190,7 +178,7 @@ export const deposit = async ({
     const msgNativeTx: MsgNativeTx = msgNativeTxFromJson({
       coins: [
         {
-          asset: assetToString(AssetRuneNative),
+          asset: AssetRuneNative,
           amount: amount.amount().toString()
         }
       ],
