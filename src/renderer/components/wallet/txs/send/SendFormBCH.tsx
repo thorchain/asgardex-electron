@@ -324,6 +324,7 @@ export const SendFormBCH: React.FC<Props> = (props): JSX.Element => {
           visible={showConfirmationModal}
           chain={BCHChain}
           description={intl.formatMessage({ id: 'wallet.ledger.confirm' })}
+          addresses={O.some({ sender: walletAddress, recipient: form.getFieldValue('recipient') })}
         />
       )
     } else if (isKeystoreWallet(walletType)) {
@@ -337,7 +338,7 @@ export const SendFormBCH: React.FC<Props> = (props): JSX.Element => {
     } else {
       return null
     }
-  }, [walletType, submitTx, network, showConfirmationModal, intl, validatePassword$])
+  }, [walletType, submitTx, network, showConfirmationModal, intl, walletAddress, form, validatePassword$])
 
   const renderTxModal = useMemo(
     () =>

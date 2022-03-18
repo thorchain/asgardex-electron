@@ -95,7 +95,9 @@ const common: CommonMessages = {
   'common.balance': 'Balance',
   'common.balance.loading': 'Loading balance',
   'common.custom': 'Custom',
-  'common.notsupported.fornetwork': 'Not supported for {network}'
+  'common.notsupported.fornetwork': 'Not supported for {network}',
+  'common.recipient': 'Recipient',
+  'common.sender': 'Sender'
 }
 
 export default common

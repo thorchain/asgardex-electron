@@ -8,11 +8,11 @@ import * as NEA from 'fp-ts/lib/NonEmptyArray'
 import * as S from 'fp-ts/lib/string'
 import { useObservableCallback, useSubscription } from 'observable-hooks'
 import { useIntl } from 'react-intl'
-// import * as Rx from 'rxjs'
 import * as RxOp from 'rxjs/operators'
 
 import { Button, RefreshButton } from '../../uielements/button'
 import { InputPassword } from '../../uielements/input'
+import { CopyLabel } from '../../uielements/label'
 import { Phrase } from './index'
 import * as Styled from './NewPhrase.styles'
 import { WordType } from './NewPhraseConfirm'
@@ -81,15 +81,10 @@ export const NewPhraseGenerate: React.FC<Props> = ({ onSubmit }: Props): JSX.Ele
     [intl]
   )
 
-  const copyPhraseToClipborad = useCallback(() => {
-    navigator.clipboard.writeText(phrase)
-  }, [phrase])
   return (
     <>
       <Styled.TitleContainer justify="space-between">
-        <Styled.SectionTitle copyable={{ onCopy: copyPhraseToClipborad }}>
-          {intl.formatMessage({ id: 'wallet.create.copy.phrase' })}
-        </Styled.SectionTitle>
+        <CopyLabel textToCopy={phrase} label={intl.formatMessage({ id: 'wallet.create.copy.phrase' })} />
         <RefreshButton clickHandler={clickRefreshButtonHandler} />
       </Styled.TitleContainer>
       <Phrase words={phraseWords} readOnly={true} />
