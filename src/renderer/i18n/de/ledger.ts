@@ -25,8 +25,8 @@ const ledger: LedgerMessages = {
   'ledger.notaddedorzerobalances': 'Ledger für {chain} ist nicht verbunden oder hat kein Guthaben.',
   'ledger.deposit.oneside': 'Ledger wird aktuell nur für eine Assetseite unterstützt.',
   'ledger.legacyformat.note': 'Ledger zeigt alle Output Addressen im "Legacy", aber nicht im "CashAddr" Format an.',
-  'ledger.legacyformat.show': 'Addressformate zeigen',
-  'ledger.legacyformat.hide': 'Addressformate verbergen'
+  'ledger.legacyformat.show': 'Adressenformate zeigen',
+  'ledger.legacyformat.hide': 'Adressenformate verbergen'
 }
 
 export default ledger

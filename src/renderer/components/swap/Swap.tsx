@@ -921,7 +921,7 @@ export const Swap = ({
             visible={showLedgerModal}
             chain={chain}
             description={intl.formatMessage({ id: 'swap.ledger.sign' })}
-            bchAddresses={FP.pipe(
+            addresses={FP.pipe(
               oSwapParams,
               O.chain(({ poolAddress, sender }) => {
                 const recipient = poolAddress.address

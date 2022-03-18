@@ -419,7 +419,7 @@ export const Upgrade: React.FC<Props> = (props): JSX.Element => {
           visible={showConfirmationModal}
           chain={runeAsset.asset.chain}
           description={intl.formatMessage({ id: 'wallet.ledger.confirm' })}
-          bchAddresses={O.none}
+          addresses={O.none}
         />
       )
     }

@@ -8,13 +8,13 @@ import * as O from 'fp-ts/lib/Option'
 import { useIntl } from 'react-intl'
 
 import { Network } from '../../../../shared/api/types'
-import { getChainAsset } from '../../../helpers/chainHelper'
+import { getChainAsset, isBchChain } from '../../../helpers/chainHelper'
 import { AttentionIcon } from '../../icons'
 import { AddressEllipsis } from '../../uielements/addressEllipsis'
 import { ConfirmationModal } from './ConfirmationModal'
 import * as Styled from './LedgerConfirmationModal.styles'
 
-type BchAddresses = { sender: Address; recipient: Address }
+type Addresses = { sender: Address; recipient: Address }
 
 type Props = {
   visible: boolean
@@ -23,7 +23,7 @@ type Props = {
   onClose: FP.Lazy<void>
   chain: Chain
   description?: string
-  bchAddresses: O.Option<BchAddresses>
+  addresses: O.Option<Addresses>
 }
 
 export const LedgerConfirmationModal: React.FC<Props> = ({
@@ -33,18 +33,16 @@ export const LedgerConfirmationModal: React.FC<Props> = ({
   chain,
   network,
   description = '',
-  bchAddresses: oBchAddresses
+  addresses: oAddresses
 }) => {
   const intl = useIntl()
-
-  // const CASHADDR_CONVERTER_URL = 'https://www.bitcoin.com/tools/cash-address-converter'
 
   const asset = getChainAsset(chain)
 
   const [showAddresses, setShowAddresses] = useState(false)
 
   const renderBchAddresses = useCallback(
-    ({ sender, recipient }: BchAddresses) => {
+    ({ sender, recipient }: Addresses) => {
       const textToCopy = `${intl.formatMessage({ id: 'common.sender' })} (CashAddr)\n${
         isCashAddress(sender) ? sender : toCashAddress(sender)
       }\n${intl.formatMessage({ id: 'common.sender' })} (Legacy)\n${toLegacyAddress(sender)}\n${intl.formatMessage({
@@ -113,34 +111,35 @@ export const LedgerConfirmationModal: React.FC<Props> = ({
             {intl.formatMessage({ id: 'ledger.needsconnected' }, { chain: chainToString(chain) })}
           </Styled.Description>
           {description && <Styled.Description>{description}</Styled.Description>}
-          {FP.pipe(
-            oBchAddresses,
-            O.fold(
-              () => <></>,
-              (bchAddresses) => (
-                <>
-                  <Styled.NoteBCH>
-                    <Styled.Icon component={AttentionIcon} />
-                    {intl.formatMessage({ id: 'ledger.legacyformat.note' }, { url: 'ulr' })}
-                  </Styled.NoteBCH>
+          {isBchChain(chain) &&
+            FP.pipe(
+              oAddresses,
+              O.fold(
+                () => <></>,
+                (bchAddresses) => (
+                  <>
+                    <Styled.NoteBCH>
+                      <Styled.Icon component={AttentionIcon} />
+                      {intl.formatMessage({ id: 'ledger.legacyformat.note' }, { url: 'ulr' })}
+                    </Styled.NoteBCH>
 
-                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                    <Styled.CompareAddressButton
-                      typevalue="transparent"
-                      type="text"
-                      onClick={() => setShowAddresses((current) => !current)}>
-                      {intl.formatMessage({
-                        id: showAddresses ? 'ledger.legacyformat.hide' : 'ledger.legacyformat.show'
-                      })}
-                      <Styled.ExpandIcon rotate={showAddresses ? 270 : 90} />
-                    </Styled.CompareAddressButton>
-                  </div>
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                      <Styled.CompareAddressButton
+                        typevalue="transparent"
+                        type="text"
+                        onClick={() => setShowAddresses((current) => !current)}>
+                        {intl.formatMessage({
+                          id: showAddresses ? 'ledger.legacyformat.hide' : 'ledger.legacyformat.show'
+                        })}
+                        <Styled.ExpandIcon rotate={showAddresses ? 270 : 90} />
+                      </Styled.CompareAddressButton>
+                    </div>
 
-                  {showAddresses && renderBchAddresses(bchAddresses)}
-                </>
+                    {showAddresses && renderBchAddresses(bchAddresses)}
+                  </>
+                )
               )
-            )
-          )}
+            )}
         </Styled.Content>
       }
     />

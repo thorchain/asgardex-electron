@@ -1593,7 +1593,7 @@ export const SymDeposit: React.FC<Props> = (props) => {
           chain={useRuneLedger ? THORChain : asset.chain}
           network={network}
           description={intl.formatMessage({ id: 'deposit.ledger.sign' })}
-          bchAddresses={FP.pipe(
+          addresses={FP.pipe(
             oDepositParams,
             O.chain(({ poolAddress, runeSender, assetSender }) => {
               const recipient = poolAddress.address

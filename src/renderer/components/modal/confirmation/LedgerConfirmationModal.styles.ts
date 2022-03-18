@@ -53,16 +53,6 @@ export const NoteBCH = styled.p`
   text-align: center;
 `
 
-export const CashAddrConverterUrl = styled.span`
-  text-transform: uppercase;
-  color: inherit;
-  text-decoration: underline;
-  cursor: pointer;
-  &:hover {
-    color: ${palette('primary', 0)};
-  }
-`
-
 export const Icon = styled(AIcon)`
   display: inline-block;
   margin-right: 5px;
