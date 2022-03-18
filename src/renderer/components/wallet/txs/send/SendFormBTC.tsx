@@ -324,7 +324,7 @@ export const SendFormBTC: React.FC<Props> = (props): JSX.Element => {
           visible={showConfirmationModal}
           chain={BTCChain}
           description={intl.formatMessage({ id: 'wallet.ledger.confirm' })}
-          addresses={undefined}
+          bchAddresses={O.none}
         />
       )
     } else if (isKeystoreWallet(walletType)) {

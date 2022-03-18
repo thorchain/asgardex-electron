@@ -2,6 +2,7 @@ import React from 'react'
 
 import { Meta, Story } from '@storybook/react'
 import { Chain } from '@xchainjs/xchain-util'
+import * as O from 'fp-ts/lib/Option'
 
 import { LedgerConfirmationModal } from './'
 
@@ -20,10 +21,10 @@ const Template: Story<Args> = ({ chain, visible, description }) => {
       chain={chain}
       description={description}
       network="mainnet"
-      addresses={{
+      bchAddresses={O.some({
         sender: 'qpm2qsznhks23z7629mms6s4cwef74vcwvy22gdx6a',
         recipient: 'qr95sy3j9xwd2ap32xkykttr4cvcu7as4y0qverfuy'
-      }}
+      })}
     />
   )
 }
@@ -49,13 +50,8 @@ const meta: Meta<Args> = {
       },
       defaultValue: 'BCH'
     },
-    onClose: {
-      action: 'onClose'
-    },
-    onSuccess: {
-      action: 'onSuccess'
-    },
     description: {
+      name: 'Description',
       control: {
         type: 'text'
       },

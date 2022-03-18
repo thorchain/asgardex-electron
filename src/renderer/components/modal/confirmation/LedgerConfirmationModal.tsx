@@ -1,9 +1,10 @@
-import { useState } from 'react'
+import { useCallback, useState } from 'react'
 
-import { toLegacyAddress } from '@xchainjs/xchain-bitcoincash'
+import { isCashAddress, toCashAddress, toLegacyAddress } from '@xchainjs/xchain-bitcoincash'
 import { Address } from '@xchainjs/xchain-client'
 import { Chain, chainToString } from '@xchainjs/xchain-util'
 import * as FP from 'fp-ts/function'
+import * as O from 'fp-ts/lib/Option'
 import { useIntl } from 'react-intl'
 
 import { Network } from '../../../../shared/api/types'
@@ -13,6 +14,8 @@ import { AddressEllipsis } from '../../uielements/addressEllipsis'
 import { ConfirmationModal } from './ConfirmationModal'
 import * as Styled from './LedgerConfirmationModal.styles'
 
+type BchAddresses = { sender: Address; recipient: Address }
+
 type Props = {
   visible: boolean
   network: Network
@@ -20,7 +23,7 @@ type Props = {
   onClose: FP.Lazy<void>
   chain: Chain
   description?: string
-  addresses?: { sender: Address; recipient: Address }
+  bchAddresses: O.Option<BchAddresses>
 }
 
 export const LedgerConfirmationModal: React.FC<Props> = ({
@@ -30,7 +33,7 @@ export const LedgerConfirmationModal: React.FC<Props> = ({
   chain,
   network,
   description = '',
-  addresses
+  bchAddresses: oBchAddresses
 }) => {
   const intl = useIntl()
 
@@ -39,6 +42,59 @@ export const LedgerConfirmationModal: React.FC<Props> = ({
   const asset = getChainAsset(chain)
 
   const [showAddresses, setShowAddresses] = useState(false)
+
+  const renderBchAddresses = useCallback(
+    ({ sender, recipient }: BchAddresses) => {
+      const textToCopy = `${intl.formatMessage({ id: 'common.sender' })} (CashAddr)\n${
+        isCashAddress(sender) ? sender : toCashAddress(sender)
+      }\n${intl.formatMessage({ id: 'common.sender' })} (Legacy)\n${toLegacyAddress(sender)}\n${intl.formatMessage({
+        id: 'common.recipient'
+      })} (CashAddr)\n${isCashAddress(recipient) ? recipient : toCashAddress(recipient)}\n${intl.formatMessage({
+        id: 'common.recipient'
+      })} (Legacy)\n${toLegacyAddress(recipient)}`
+
+      return (
+        <>
+          {/* Sender */}
+          <Styled.AddressWrapper>
+            <Styled.AddressContainer>
+              <Styled.AddressTitle>{intl.formatMessage({ id: 'common.sender' })} (CashAddr)</Styled.AddressTitle>
+              <AddressEllipsis
+                network={network}
+                chain={chain}
+                address={isCashAddress(sender) ? sender : toCashAddress(sender)}
+                enableCopy
+              />
+            </Styled.AddressContainer>
+            <Styled.AddressContainer>
+              <Styled.AddressTitle>{intl.formatMessage({ id: 'common.sender' })} (Legacy)</Styled.AddressTitle>
+              <AddressEllipsis network={network} chain={chain} address={toLegacyAddress(sender)} enableCopy />
+            </Styled.AddressContainer>
+          </Styled.AddressWrapper>
+          {/* Recipient */}
+          <Styled.AddressWrapper>
+            <Styled.AddressContainer>
+              <Styled.AddressTitle>{intl.formatMessage({ id: 'common.recipient' })} (CashAddr)</Styled.AddressTitle>
+              <AddressEllipsis
+                network={network}
+                chain={chain}
+                address={isCashAddress(recipient) ? recipient : toCashAddress(recipient)}
+                enableCopy
+              />
+            </Styled.AddressContainer>
+            <Styled.AddressContainer>
+              <Styled.AddressTitle>{intl.formatMessage({ id: 'common.recipient' })} (Legacy)</Styled.AddressTitle>
+              <AddressEllipsis network={network} chain={chain} address={toLegacyAddress(recipient)} enableCopy />
+            </Styled.AddressContainer>
+          </Styled.AddressWrapper>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <Styled.CopyLabel label={'Copy all addresses'} textToCopy={textToCopy} />
+          </div>
+        </>
+      )
+    },
+    [chain, intl, network]
+  )
 
   return (
     <ConfirmationModal
@@ -57,74 +113,33 @@ export const LedgerConfirmationModal: React.FC<Props> = ({
             {intl.formatMessage({ id: 'ledger.needsconnected' }, { chain: chainToString(chain) })}
           </Styled.Description>
           {description && <Styled.Description>{description}</Styled.Description>}
-          {/* {isBchChain(chain) && (
-            <Styled.NoteBCH>
-              <Styled.Icon component={AttentionIcon} />
-              <FormattedMessage
-                id="ledger.legacyformat.note"
-                values={{
-                  url: (
-                    <Styled.CashAddrConverterUrl onClick={() => openUrl(CASHADDR_CONVERTER_URL)}>
-                      {CASHADDR_CONVERTER_URL}
-                    </Styled.CashAddrConverterUrl>
-                  )
-                }}
-              />
-            </Styled.NoteBCH>
-          )
-          } */}
-          {addresses && (
-            <>
-              <Styled.NoteBCH>
-                <Styled.Icon component={AttentionIcon} />
-                {intl.formatMessage({ id: 'ledger.legacyformat.note' }, { url: 'ulr' })}
-              </Styled.NoteBCH>
-
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                <Styled.CompareAddressButton
-                  typevalue="transparent"
-                  type="text"
-                  onClick={() => setShowAddresses((current) => !current)}>
-                  {intl.formatMessage({ id: showAddresses ? 'ledger.legacyformat.hide' : 'ledger.legacyformat.show' })}
-                  <Styled.ExpandIcon rotate={showAddresses ? 270 : 90} />
-                </Styled.CompareAddressButton>
-              </div>
-
-              {showAddresses && (
+          {FP.pipe(
+            oBchAddresses,
+            O.fold(
+              () => <></>,
+              (bchAddresses) => (
                 <>
-                  <Styled.AddressWrapper>
-                    <Styled.AddressContainer>
-                      <Styled.AddressTitle>Sender</Styled.AddressTitle>
-                      <AddressEllipsis network={network} chain={chain} address={addresses.sender} enableCopy />
-                    </Styled.AddressContainer>
-                    <Styled.AddressContainer>
-                      <Styled.AddressTitle>(Legacy)</Styled.AddressTitle>
-                      <AddressEllipsis
-                        network={network}
-                        chain={chain}
-                        address={toLegacyAddress(addresses.sender)}
-                        enableCopy
-                      />
-                    </Styled.AddressContainer>
-                  </Styled.AddressWrapper>
-                  <Styled.AddressWrapper>
-                    <Styled.AddressContainer>
-                      <Styled.AddressTitle>Recipient</Styled.AddressTitle>
-                      <AddressEllipsis network={network} chain={chain} address={addresses.recipient} enableCopy />
-                    </Styled.AddressContainer>
-                    <Styled.AddressContainer>
-                      <Styled.AddressTitle>(Legacy)</Styled.AddressTitle>
-                      <AddressEllipsis
-                        network={network}
-                        chain={chain}
-                        address={toLegacyAddress(addresses.recipient)}
-                        enableCopy
-                      />
-                    </Styled.AddressContainer>
-                  </Styled.AddressWrapper>{' '}
+                  <Styled.NoteBCH>
+                    <Styled.Icon component={AttentionIcon} />
+                    {intl.formatMessage({ id: 'ledger.legacyformat.note' }, { url: 'ulr' })}
+                  </Styled.NoteBCH>
+
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    <Styled.CompareAddressButton
+                      typevalue="transparent"
+                      type="text"
+                      onClick={() => setShowAddresses((current) => !current)}>
+                      {intl.formatMessage({
+                        id: showAddresses ? 'ledger.legacyformat.hide' : 'ledger.legacyformat.show'
+                      })}
+                      <Styled.ExpandIcon rotate={showAddresses ? 270 : 90} />
+                    </Styled.CompareAddressButton>
+                  </div>
+
+                  {showAddresses && renderBchAddresses(bchAddresses)}
                 </>
-              )}
-            </>
+              )
+            )
           )}
         </Styled.Content>
       }

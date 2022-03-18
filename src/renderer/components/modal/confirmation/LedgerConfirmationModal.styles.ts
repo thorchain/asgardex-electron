@@ -6,6 +6,7 @@ import { ReactComponent as LedgerConnectUI } from '../../../assets/svg/ledger-de
 import { media } from '../../../helpers/styleHelper'
 import { AssetIcon as AssetIconUI } from '../../uielements/assets/assetIcon/AssetIcon'
 import { Button } from '../../uielements/button'
+import { CopyLabel as CopyLabelUI } from '../../uielements/label'
 
 export const LedgerContainer = styled.div`
   position: relative;
@@ -86,7 +87,7 @@ export const AddressContainer = styled.div`
 
 export const AddressTitle = styled.p`
   font-family: 'MainFontBold';
-  font-size: 12px;
+  font-size: 10px;
   color: inherit;
   text-transform: uppercase;
   padding: 0;
@@ -101,4 +102,9 @@ export const ExpandIcon = styled(CaretRightOutlined)`
   svg {
     color: inherit;
   }
+`
+
+export const CopyLabel = styled(CopyLabelUI)`
+  padding-top: 20px;
+  font-size: 12px;
 `

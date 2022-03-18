@@ -921,14 +921,13 @@ export const Swap = ({
             visible={showLedgerModal}
             chain={chain}
             description={intl.formatMessage({ id: 'swap.ledger.sign' })}
-            addresses={FP.pipe(
+            bchAddresses={FP.pipe(
               oSwapParams,
               O.chain(({ poolAddress, sender }) => {
                 const recipient = poolAddress.address
                 if (useSourceAssetLedger) return O.some({ recipient, sender })
                 return O.none
-              }),
-              O.toUndefined
+              })
             )}
           />
         )),
@@ -1462,7 +1461,7 @@ export const Swap = ({
           {!lockedWallet && (
             <Styled.TargetAddressContainer>
               <Row>
-                <Styled.ValueTitle>{intl.formatMessage({ id: 'swap.recipient' })}</Styled.ValueTitle>
+                <Styled.ValueTitle>{intl.formatMessage({ id: 'common.recipient' })}</Styled.ValueTitle>
                 {renderTargetWalletType}
               </Row>
               {renderCustomAddressInput}

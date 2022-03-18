@@ -96,6 +96,8 @@ export type CommonMessageKey =
   | 'common.balance.loading'
   | 'common.custom'
   | 'common.notsupported.fornetwork'
+  | 'common.recipient'
+  | 'common.sender'
 
 export type CommonMessages = {
   [key in CommonMessageKey]: string
@@ -295,7 +297,6 @@ export type MidgardMessages = { [key in MidgardMessageKey]: string }
 type SwapMessageKey =
   | 'swap.input'
   | 'swap.output'
-  | 'swap.recipient'
   | 'swap.slip.title'
   | 'swap.slip.tolerance'
   | 'swap.slip.tolerance.info'
