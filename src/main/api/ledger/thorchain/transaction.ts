@@ -70,7 +70,7 @@ export const send = async ({
     const txBody = await buildTransferTx({
       fromAddress: bech32Address,
       toAddress: recipient,
-      assetAmount: amount.amount().toString(),
+      assetAmount: amount,
       assetDenom: denom,
       memo: memo,
       nodeUrl: nodeUrl,
