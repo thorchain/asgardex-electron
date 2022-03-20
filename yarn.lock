@@ -1369,7 +1369,7 @@
 
 "@cosmos-client/core@https://github.com/veado/cosmos-client-ts.git#patch/v0.45.1":
   version "0.45.1"
-  resolved "https://github.com/veado/cosmos-client-ts.git#4ba57f1d42628d9434dddb429bcfd66a2d58fe93"
+  resolved "https://github.com/veado/cosmos-client-ts.git#a3b57191c26f7461d291a5ef296bde523b52ae00"
   dependencies:
     axios "^0.23.0"
     bech32 "^1.1.4"
