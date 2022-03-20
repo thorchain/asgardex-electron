@@ -10,6 +10,7 @@ import {
   BaseAmount,
   baseAmount,
   baseToAsset,
+  BCHChain,
   bn,
   formatAssetAmountCurrency
 } from '@xchainjs/xchain-util'
@@ -21,6 +22,7 @@ import * as O from 'fp-ts/lib/Option'
 import { useIntl } from 'react-intl'
 
 import { Network } from '../../../../../shared/api/types'
+import { isKeystoreWallet, isLedgerWallet } from '../../../../../shared/utils/guard'
 import { WalletType } from '../../../../../shared/wallet/types'
 import { ZERO_BASE_AMOUNT, ZERO_BN } from '../../../../const'
 import { useSubscriptionState } from '../../../../hooks/useSubscriptionState'
@@ -30,7 +32,7 @@ import { FeeRD, Memo, SendTxState, SendTxStateHandler } from '../../../../servic
 import { AddressValidation, GetExplorerTxUrl, OpenExplorerTxUrl, WalletBalances } from '../../../../services/clients'
 import { ValidatePasswordHandler } from '../../../../services/wallet/types'
 import { WalletBalance } from '../../../../services/wallet/types'
-import { WalletPasswordConfirmationModal } from '../../../modal/confirmation'
+import { LedgerConfirmationModal, WalletPasswordConfirmationModal } from '../../../modal/confirmation'
 import * as StyledR from '../../../shared/form/Radio.styles'
 import { MaxBalanceButton } from '../../../uielements/button/MaxBalanceButton'
 import { UIFeesRD } from '../../../uielements/fees'
@@ -276,9 +278,6 @@ export const SendFormBCH: React.FC<Props> = (props): JSX.Element => {
   const [sendTxStartTime, setSendTxStartTime] = useState<number>(0)
 
   const submitTx = useCallback(() => {
-    // close PW modal
-    setShowPwModal(false)
-
     setSendTxStartTime(Date.now())
 
     subscribeSendTxState(
@@ -305,22 +304,41 @@ export const SendFormBCH: React.FC<Props> = (props): JSX.Element => {
     selectedFeeOptionKey
   ])
 
-  // State for visibility of Modal to confirm tx
-  const [showPwModal, setShowPwModal] = useState(false)
+  const [showConfirmationModal, setShowConfirmationModal] = useState(false)
 
-  const renderPwModal = useMemo(
-    () =>
-      showPwModal ? (
+  const renderConfirmationModal = useMemo(() => {
+    const onSuccessHandler = () => {
+      setShowConfirmationModal(false)
+      submitTx()
+    }
+    const onCloseHandler = () => {
+      setShowConfirmationModal(false)
+    }
+
+    if (isLedgerWallet(walletType)) {
+      return (
+        <LedgerConfirmationModal
+          network={network}
+          onSuccess={onSuccessHandler}
+          onClose={onCloseHandler}
+          visible={showConfirmationModal}
+          chain={BCHChain}
+          description={intl.formatMessage({ id: 'wallet.ledger.confirm' })}
+          addresses={O.some({ sender: walletAddress, recipient: form.getFieldValue('recipient') })}
+        />
+      )
+    } else if (isKeystoreWallet(walletType)) {
+      return (
         <WalletPasswordConfirmationModal
-          onSuccess={submitTx}
-          onClose={() => setShowPwModal(false)}
+          onSuccess={onSuccessHandler}
+          onClose={onCloseHandler}
           validatePassword$={validatePassword$}
         />
-      ) : (
-        <></>
-      ),
-    [submitTx, showPwModal, validatePassword$]
-  )
+      )
+    } else {
+      return null
+    }
+  }, [walletType, submitTx, network, showConfirmationModal, intl, walletAddress, form, validatePassword$])
 
   const renderTxModal = useMemo(
     () =>
@@ -414,7 +432,7 @@ export const SendFormBCH: React.FC<Props> = (props): JSX.Element => {
               // Default value for RadioGroup of feeOptions
               feeRate: DEFAULT_FEE_OPTION
             }}
-            onFinish={() => setShowPwModal(true)}
+            onFinish={() => setShowConfirmationModal(true)}
             labelCol={{ span: 24 }}>
             <Styled.SubForm>
               <Styled.CustomLabel size="big">
@@ -455,7 +473,7 @@ export const SendFormBCH: React.FC<Props> = (props): JSX.Element => {
           </Styled.Form>
         </Styled.Col>
       </Row>
-      {renderPwModal}
+      {showConfirmationModal && renderConfirmationModal}
       {renderTxModal}
     </>
   )

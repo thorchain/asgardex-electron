@@ -7,9 +7,9 @@ import { BaseAmount } from '@xchainjs/xchain-util'
 import * as Bitcoin from 'bitcoinjs-lib'
 import * as E from 'fp-ts/lib/Either'
 
+import { getHaskoinBTCApiUrl } from '../../../../shared/api/haskoin'
 import { getSochainUrl } from '../../../../shared/api/sochain'
 import { LedgerError, LedgerErrorId, Network } from '../../../../shared/api/types'
-import { getHaskoinApiUrl } from '../../../../shared/bitcoin/client'
 import { toClientNetwork } from '../../../../shared/utils/client'
 import { isError } from '../../../../shared/utils/guard'
 import { getDerivationPath } from './common'
@@ -56,7 +56,7 @@ export const send = async ({
      */
     const spendPendingUTXO = !memo
 
-    const haskoinUrl = getHaskoinApiUrl()[network]
+    const haskoinUrl = getHaskoinBTCApiUrl()[network]
 
     const { psbt, utxos } = await buildTx({
       amount,

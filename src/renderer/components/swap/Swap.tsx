@@ -38,7 +38,7 @@ import {
   to1e8BaseAmount,
   isChainAsset
 } from '../../helpers/assetHelper'
-import { getChainAsset, isBtcChain, isDogeChain, isEthChain, isLtcChain } from '../../helpers/chainHelper'
+import { getChainAsset, isBchChain, isBtcChain, isDogeChain, isEthChain, isLtcChain } from '../../helpers/chainHelper'
 import { unionAssets } from '../../helpers/fp/array'
 import { eqAsset, eqBaseAmount, eqOAsset, eqOApproveParams, eqAddress, eqOAddress } from '../../helpers/fp/eq'
 import { sequenceSOption, sequenceTOption } from '../../helpers/fpHelpers'
@@ -373,7 +373,10 @@ export const Swap = ({
     () =>
       FP.pipe(
         oSourceAsset,
-        O.map(({ chain }) => (isBtcChain(chain) || isLtcChain(chain) || isDogeChain(chain)) && useSourceAssetLedger),
+        O.map(
+          ({ chain }) =>
+            (isBtcChain(chain) || isLtcChain(chain) || isBchChain(chain) || isDogeChain(chain)) && useSourceAssetLedger
+        ),
         O.getOrElse(() => false)
       ),
     [useSourceAssetLedger, oSourceAsset]
@@ -918,12 +921,29 @@ export const Swap = ({
             visible={showLedgerModal}
             chain={chain}
             description={intl.formatMessage({ id: 'swap.ledger.sign' })}
+            addresses={FP.pipe(
+              oSwapParams,
+              O.chain(({ poolAddress, sender }) => {
+                const recipient = poolAddress.address
+                if (useSourceAssetLedger) return O.some({ recipient, sender })
+                return O.none
+              })
+            )}
           />
         )),
         O.toNullable
       ),
 
-    [intl, network, oSourceAsset, onCloseLedgerModal, onSucceedLedgerModal, showLedgerModal]
+    [
+      intl,
+      network,
+      oSourceAsset,
+      oSwapParams,
+      onCloseLedgerModal,
+      onSucceedLedgerModal,
+      showLedgerModal,
+      useSourceAssetLedger
+    ]
   )
 
   const sourceChainFeeError: boolean = useMemo(() => {
@@ -1441,7 +1461,7 @@ export const Swap = ({
           {!lockedWallet && (
             <Styled.TargetAddressContainer>
               <Row>
-                <Styled.ValueTitle>{intl.formatMessage({ id: 'swap.recipient' })}</Styled.ValueTitle>
+                <Styled.ValueTitle>{intl.formatMessage({ id: 'common.recipient' })}</Styled.ValueTitle>
                 {renderTargetWalletType}
               </Row>
               {renderCustomAddressInput}

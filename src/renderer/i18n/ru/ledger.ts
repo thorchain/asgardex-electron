@@ -24,7 +24,10 @@ const ledger: LedgerMessages = {
   'ledger.error.unknown': 'Неизвестная ошибка',
   'ledger.notsupported': 'Ledger не поддерживает {chain}.',
   'ledger.notaddedorzerobalances': 'Ledger {chain} не была подключена или имеет нулевой баланс.',
-  'ledger.deposit.oneside': 'Пока что Ledger поддерживается только для одностороннего добавления активов.'
+  'ledger.deposit.oneside': 'Пока что Ledger поддерживается только для одностороннего добавления активов.',
+  'ledger.legacyformat.note': 'Ledger displays all output addresses in "legacy", but not in "CashAddr" format. - RU',
+  'ledger.legacyformat.show': 'Show addresses - RU',
+  'ledger.legacyformat.hide': 'Hide addresses - RU'
 }
 
 export default ledger

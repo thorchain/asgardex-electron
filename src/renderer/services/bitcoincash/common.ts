@@ -1,5 +1,5 @@
 import * as RD from '@devexperts/remote-data-ts'
-import { Client as BitcoinCashClient, ClientUrl, NodeAuth } from '@xchainjs/xchain-bitcoincash'
+import { Client as BitcoinCashClient } from '@xchainjs/xchain-bitcoincash'
 import { BCHChain } from '@xchainjs/xchain-util'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
@@ -8,35 +8,13 @@ import { Observable } from 'rxjs'
 import * as RxOp from 'rxjs/operators'
 import { map, shareReplay } from 'rxjs/operators'
 
-import { envOrDefault } from '../../../shared/utils/env'
+import { getHaskoinBCHApiUrl } from '../../../shared/api/haskoin'
 import { isError } from '../../../shared/utils/guard'
 import { clientNetwork$ } from '../app/service'
 import * as C from '../clients'
 import { keystoreService } from '../wallet/keystore'
 import { getPhrase } from '../wallet/util'
 import { ClientState, ClientState$ } from './types'
-
-const APP_HASKOIN_BCH_MAINNET_URL = envOrDefault(
-  process.env.REACT_APP_HASKOIN_BCH_MAINNET_URL,
-  'https://haskoin.ninerealms.com/bch'
-)
-
-const HASKOIN_API_URL: ClientUrl = {
-  testnet: envOrDefault(process.env.REACT_APP_HASKOIN_BCH_TESTNET_URL, 'https://haskoin.ninerealms.com/bchtest'),
-  stagenet: APP_HASKOIN_BCH_MAINNET_URL,
-  mainnet: APP_HASKOIN_BCH_MAINNET_URL
-}
-
-const NODE_URL: ClientUrl = {
-  testnet: envOrDefault(process.env.REACT_APP_BCH_NODE_TESTNET_URL, 'https://testnet.bch.thorchain.info'),
-  stagenet: envOrDefault(process.env.REACT_APP_BCH_NODE_STAGENET_URL, 'https://bch.thorchain.info'),
-  mainnet: envOrDefault(process.env.REACT_APP_BCH_NODE_MAINNET_URL, 'https://bch.thorchain.info')
-}
-
-const NODE_AUTH: NodeAuth = {
-  password: envOrDefault(process.env.REACT_APP_BCH_NODE_PASSWORD, 'password'),
-  username: envOrDefault(process.env.REACT_APP_BCH_NODE_USERNAME, 'thorchain')
-}
 
 /**
  * Stream to create an observable `BitcoinCashClient` depending on existing phrase in keystore
@@ -56,9 +34,7 @@ const clientState$: ClientState$ = FP.pipe(
             try {
               const client = new BitcoinCashClient({
                 network,
-                haskoinUrl: HASKOIN_API_URL,
-                nodeUrl: NODE_URL,
-                nodeAuth: NODE_AUTH,
+                haskoinUrl: getHaskoinBCHApiUrl(),
                 phrase
               })
               return RD.success(client)

@@ -7,7 +7,7 @@ import * as Rx from 'rxjs'
 import * as RxOp from 'rxjs/operators'
 
 import { getSochainUrl } from '../../../shared/api/sochain'
-import { getNodeAuth, getNodeUrl } from '../../../shared/litecoin/client'
+import { getLTCNodeAuth, getLTCNodeUrl } from '../../../shared/api/thornode'
 import { isError } from '../../../shared/utils/guard'
 import { clientNetwork$ } from '../app/service'
 import * as C from '../clients'
@@ -34,8 +34,8 @@ const clientState$: ClientState$ = FP.pipe(
               const client = new Client({
                 network,
                 phrase,
-                nodeUrl: getNodeUrl(network),
-                nodeAuth: getNodeAuth(),
+                nodeUrl: getLTCNodeUrl(network),
+                nodeAuth: getLTCNodeAuth(),
                 sochainUrl: getSochainUrl()
               })
               return RD.success(client)

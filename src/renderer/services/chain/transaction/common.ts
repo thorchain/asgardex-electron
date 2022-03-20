@@ -102,7 +102,9 @@ export const sendTx$ = ({
           errorId: ErrorId.GET_FEES,
           msg: error?.message ?? error.toString()
         })),
-        liveData.chain(({ rates }) => BCH.sendTx({ recipient, amount, feeRate: rates[feeOption], memo, walletIndex }))
+        liveData.chain(({ rates }) =>
+          BCH.sendTx({ walletType, recipient, amount, feeRate: rates[feeOption], memo, walletIndex, sender })
+        )
       )
     case LTCChain:
       return FP.pipe(

@@ -96,6 +96,8 @@ export type CommonMessageKey =
   | 'common.balance.loading'
   | 'common.custom'
   | 'common.notsupported.fornetwork'
+  | 'common.recipient'
+  | 'common.sender'
 
 export type CommonMessages = {
   [key in CommonMessageKey]: string
@@ -264,6 +266,9 @@ type LedgerMessageKey =
   | 'ledger.notsupported'
   | 'ledger.notaddedorzerobalances'
   | 'ledger.deposit.oneside'
+  | 'ledger.legacyformat.note'
+  | 'ledger.legacyformat.show'
+  | 'ledger.legacyformat.hide'
 
 export type LedgerMessages = { [key in LedgerMessageKey]: string }
 
@@ -292,7 +297,6 @@ export type MidgardMessages = { [key in MidgardMessageKey]: string }
 type SwapMessageKey =
   | 'swap.input'
   | 'swap.output'
-  | 'swap.recipient'
   | 'swap.slip.title'
   | 'swap.slip.tolerance'
   | 'swap.slip.tolerance.info'

@@ -224,6 +224,7 @@ export const SendFormBNB: React.FC<Props> = (props): JSX.Element => {
           visible={showConfirmationModal}
           chain={BNBChain}
           description={intl.formatMessage({ id: 'wallet.ledger.confirm' })}
+          addresses={O.none}
         />
       )
     } else if (isKeystoreWallet(walletType)) {

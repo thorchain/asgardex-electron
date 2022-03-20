@@ -1,3 +1,13 @@
+# 0.11.0 (2022-03-19)
+
+## Add
+
+- [Ledger] BCH support [#2133](https://github.com/thorchain/asgardex-electron/pull/2133), [#2136](https://github.com/thorchain/asgardex-electron/pull/2136), [#2149](https://github.com/thorchain/asgardex-electron/pull/2149)
+
+## Fix
+
+- [Ledger] Remove address from memory after rejecting address on device [#2145](https://github.com/thorchain/asgardex-electron/issues/2145)
+
 # 0.10.0 (2022-03-15)
 
 ## Add

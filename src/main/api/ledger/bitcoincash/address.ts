@@ -7,6 +7,7 @@ import { LedgerError, LedgerErrorId, Network } from '../../../../shared/api/type
 import { toClientNetwork } from '../../../../shared/utils/client'
 import { isError } from '../../../../shared/utils/guard'
 import { WalletAddress } from '../../../../shared/wallet/types'
+import { VerifyAddressHandler } from '../types'
 import { getDerivationPath } from './common'
 
 export const getAddress = async (
@@ -19,7 +20,7 @@ export const getAddress = async (
     const clientNetwork = toClientNetwork(network)
     const derivePath = getDerivationPath(walletIndex, clientNetwork)
     const { bitcoinAddress: bchAddress } = await app.getWalletPublicKey(derivePath, {
-      // 'cashaddr' in case of Bitcoin Cash
+      // cashaddr in case of Bitcoin Cash
       // @see https://github.com/LedgerHQ/ledgerjs/blob/master/packages/hw-app-btc/README.md#parameters-2
       format: 'cashaddr'
     })
@@ -33,15 +34,15 @@ export const getAddress = async (
     })
   }
 }
-
-export const verifyAddress = async (transport: Transport, network: Network, walletIndex: number): Promise<void> => {
+export const verifyAddress: VerifyAddressHandler = async ({ transport, network, walletIndex }) => {
   const app = new AppBTC(transport)
   const clientNetwork = toClientNetwork(network)
   const derivePath = getDerivationPath(walletIndex, clientNetwork)
   const _ = await app.getWalletPublicKey(derivePath, {
-    // 'cashaddr' in case of Bitcoin Cash
+    // cashaddr in case of Bitcoin Cash
     // @see https://github.com/LedgerHQ/ledgerjs/blob/master/packages/hw-app-btc/README.md#parameters-2
     format: 'cashaddr',
     verify: true // confirm the address on the device
   })
+  return true
 }

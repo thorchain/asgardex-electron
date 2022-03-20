@@ -1,9 +1,9 @@
 import React from 'react'
 
-import { CheckOutlined, CopyOutlined } from '@ant-design/icons'
 import * as FP from 'fp-ts/lib/function'
 import { useIntl } from 'react-intl'
 
+import { CopyLabel } from '../../uielements/label'
 import * as Styled from './PhraseCopyModal.styles'
 
 type Props = {
@@ -23,23 +23,7 @@ export const PhraseCopyModal: React.FC<Props> = (props): JSX.Element => {
       visible={visible}
       onOk={onClose}
       onCancel={onClose}
-      footer={
-        <Styled.CopyLabel
-          copyable={{
-            text: phrase,
-            icon: [
-              <div key={1}>
-                {intl.formatMessage({ id: 'common.copy' })}
-                <CopyOutlined />
-              </div>,
-              <div key={2}>
-                {intl.formatMessage({ id: 'common.copy' })}
-                <CheckOutlined />
-              </div>
-            ]
-          }}
-        />
-      }>
+      footer={<CopyLabel label={intl.formatMessage({ id: 'common.copy' })} textToCopy={phrase} />}>
       <Styled.PhraseView>
         {phrase.split(' ').map((item, index) => (
           <Styled.Item key={index}>
