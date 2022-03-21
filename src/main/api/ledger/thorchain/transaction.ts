@@ -3,7 +3,7 @@ import type Transport from '@ledgerhq/hw-transport'
 import THORChainApp, { extractSignatureFromTLV, LedgerErrorType } from '@thorchain/ledger-thorchain'
 import { Address, TxHash } from '@xchainjs/xchain-client'
 import { CosmosSDKClient } from '@xchainjs/xchain-cosmos'
-import { buildTransferTx, buildUnsignedTx } from '@xchainjs/xchain-thorchain'
+import { buildTransferTx, buildUnsignedTx, registerSendCodecs } from '@xchainjs/xchain-thorchain'
 import {
   buildDepositTx,
   DEFAULT_GAS_VALUE,
@@ -58,6 +58,8 @@ export const send = async ({
     // Node endpoint for cosmos sdk client
     const nodeUrl = getClientUrl()[network].node
     const chainId = await getChainId(nodeUrl)
+
+    registerSendCodecs()
     // CosmosClient
     const cosmosClient = new CosmosSDKClient({
       server: nodeUrl,
@@ -72,13 +74,13 @@ export const send = async ({
       toAddress: recipient,
       assetAmount: amount,
       assetDenom: denom,
-      memo: memo,
-      nodeUrl: nodeUrl,
-      chainId: chainId
+      memo,
+      nodeUrl,
+      chainId
     })
 
     // get signer address
-    const signer = cosmosclient.AccAddress.fromString(bech32Address)
+    const signer: cosmosclient.AccAddress = cosmosclient.AccAddress.fromString(bech32Address)
 
     // get account number + sequence from signer account
     const account = await cosmosClient.getAccount(signer)
@@ -86,7 +88,7 @@ export const send = async ({
 
     const txBuilder = buildUnsignedTx({
       cosmosSdk: cosmosClient.sdk,
-      txBody: txBody,
+      txBody,
       gasLimit: DEFAULT_GAS_VALUE,
       sequence: sequence || cosmosclient.Long.ZERO,
       signerPubkey: cosmosclient.codec.packAny(pub_key)
@@ -173,8 +175,6 @@ export const deposit = async ({
       prefix
     })
 
-    cosmosClient.setPrefix()
-
     const msgNativeTx: MsgNativeTx = msgNativeTxFromJson({
       coins: [
         {
@@ -236,16 +236,16 @@ export const deposit = async ({
       mode: rest.tx.BroadcastTxMode.Block
     })
 
-    const txhash = res ? res.data?.tx_response?.txhash : null
+    const txHash = res ? res.data?.tx_response?.txhash : null
 
-    if (!txhash) {
+    if (!txHash) {
       return E.left({
         errorId: LedgerErrorId.INVALID_RESPONSE,
         msg: `Post request to send 'MsgDeposit' failed`
       })
     }
 
-    return E.right(txhash)
+    return E.right(txHash)
   } catch (error) {
     return E.left({
       errorId: LedgerErrorId.SEND_TX_FAILED,
