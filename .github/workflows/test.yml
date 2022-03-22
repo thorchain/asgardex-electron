@@ -1,6 +1,11 @@
 name: Test
 
-on: push
+# on: push
+
+on:
+  push:
+    branches:
+      - 'skip'
 
 jobs:
   test:
