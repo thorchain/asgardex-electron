@@ -55,6 +55,7 @@ export const send = async ({
       })
     }
 
+    const pubKey = new proto.cosmos.crypto.secp256k1.PubKey({ key: new Uint8Array(compressedPk) })
     // Node endpoint for cosmos sdk client
     const nodeUrl = getClientUrl()[network].node
     const chainId = await getChainId(nodeUrl)
@@ -80,18 +81,18 @@ export const send = async ({
     })
 
     // get signer address
-    const signer: cosmosclient.AccAddress = cosmosclient.AccAddress.fromString(bech32Address)
+    const signer: cosmosclient.AccAddress = cosmosclient.AccAddress.fromPublicKey(pubKey)
 
     // get account number + sequence from signer account
     const account = await cosmosClient.getAccount(signer)
-    const { account_number, sequence, pub_key } = account
+    const { account_number, sequence } = account
 
     const txBuilder = buildUnsignedTx({
       cosmosSdk: cosmosClient.sdk,
       txBody,
       gasLimit: DEFAULT_GAS_VALUE,
       sequence: sequence || cosmosclient.Long.ZERO,
-      signerPubkey: cosmosclient.codec.packAny(pub_key)
+      signerPubkey: cosmosclient.codec.packAny(pubKey)
     })
 
     const signDocBytes = txBuilder.signDocBytes(account_number || 0)
