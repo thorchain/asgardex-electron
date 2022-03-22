@@ -1,7 +1,9 @@
+import { proto, cosmosclient, rest } from '@cosmos-client/core'
 import type Transport from '@ledgerhq/hw-transport'
 import THORChainApp, { extractSignatureFromTLV, LedgerErrorType } from '@thorchain/ledger-thorchain'
 import { Address, TxHash } from '@xchainjs/xchain-client'
-import { BaseAccountResponse, CosmosSDKClient } from '@xchainjs/xchain-cosmos'
+import { CosmosSDKClient } from '@xchainjs/xchain-cosmos'
+import { buildTransferTx, buildUnsignedTx, registerSendCodecs } from '@xchainjs/xchain-thorchain'
 import {
   buildDepositTx,
   DEFAULT_GAS_VALUE,
@@ -9,13 +11,9 @@ import {
   getDenom,
   getPrefix,
   MsgNativeTx,
-  msgNativeTxFromJson,
-  registerCodecs
+  msgNativeTxFromJson
 } from '@xchainjs/xchain-thorchain'
-import { AssetRuneNative, assetToString, BaseAmount } from '@xchainjs/xchain-util'
-import { AccAddress, Msg, PubKeySecp256k1 } from 'cosmos-client'
-import { auth, BaseAccount, StdTx } from 'cosmos-client/x/auth'
-import { MsgSend } from 'cosmos-client/x/bank'
+import { AssetRuneNative, BaseAmount } from '@xchainjs/xchain-util'
 import * as E from 'fp-ts/Either'
 
 import { LedgerError, LedgerErrorId, Network } from '../../../../shared/api/types'
@@ -57,9 +55,12 @@ export const send = async ({
       })
     }
 
+    const pubKey = new proto.cosmos.crypto.secp256k1.PubKey({ key: new Uint8Array(compressedPk) })
     // Node endpoint for cosmos sdk client
     const nodeUrl = getClientUrl()[network].node
     const chainId = await getChainId(nodeUrl)
+
+    registerSendCodecs()
     // CosmosClient
     const cosmosClient = new CosmosSDKClient({
       server: nodeUrl,
@@ -67,77 +68,56 @@ export const send = async ({
       prefix
     })
 
-    // get signer address
-    const signer = AccAddress.fromBech32(bech32Address)
-
-    registerCodecs(prefix)
-    // get account number + sequence from signer account
-    let {
-      data: { result: account }
-    } = await auth.accountsAddressGet(cosmosClient.sdk, signer)
-    // Note: Cosmos API has been changed - result has another JSON structure now !!
-    // Code is copied from xchain-cosmos -> SDKClient -> signAndBroadcast
-    if (account.account_number === undefined) {
-      account = BaseAccount.fromJSON((account as BaseAccountResponse).value)
-    }
-    const { account_number, sequence } = account
     const denom = getDenom(AssetRuneNative)
-    // Create unsigned Msg
-    const unsignedMsg: Msg = MsgSend.fromJSON({
-      from_address: bech32Address,
-      to_address: recipient,
-      amount: [
-        {
-          amount: amount.amount().toString(),
-          denom
-        }
-      ]
+
+    const txBody = await buildTransferTx({
+      fromAddress: bech32Address,
+      toAddress: recipient,
+      assetAmount: amount,
+      assetDenom: denom,
+      memo,
+      nodeUrl,
+      chainId
     })
 
-    // Create unsigned StdTx
-    const unsignedStdTx = StdTx.fromJSON({
-      msg: [unsignedMsg],
-      fee: {
-        amount: [],
-        gas: DEFAULT_GAS_VALUE
-      },
-      signatures: [],
-      memo: memo || ''
+    // get signer address
+    const signer: cosmosclient.AccAddress = cosmosclient.AccAddress.fromPublicKey(pubKey)
+
+    // get account number + sequence from signer account
+    const account = await cosmosClient.getAccount(signer)
+    const { account_number, sequence } = account
+
+    const txBuilder = buildUnsignedTx({
+      cosmosSdk: cosmosClient.sdk,
+      txBody,
+      gasLimit: DEFAULT_GAS_VALUE,
+      sequence: sequence || cosmosclient.Long.ZERO,
+      signerPubkey: cosmosclient.codec.packAny(pubKey)
     })
 
-    // Get bytes from StdTx to sign
-    const signedStdTx = unsignedStdTx.getSignBytes(chainId, account_number.toString(), sequence.toString())
+    const signDocBytes = txBuilder.signDocBytes(account_number || 0)
 
-    // Sign StdTx
-    const { signature } = await app.sign(path, signedStdTx.toString())
+    // Sign tx body
+    const { signature } = await app.sign(path, signDocBytes.toString())
 
     if (!signature) {
       return E.left({
         errorId: LedgerErrorId.SIGN_FAILED,
-        msg: `Signing StdTx failed`
+        msg: `Signing tx failed`
       })
     }
 
     // normalize signature
     const normalizeSignature: Buffer = extractSignatureFromTLV(signature)
+    txBuilder.addSignature(normalizeSignature)
 
-    // create final StdTx
-    const stdTx = new StdTx(
-      unsignedStdTx.msg,
-      unsignedStdTx.fee,
-      [
-        {
-          pub_key: PubKeySecp256k1.fromBase64(compressedPk.toString('base64')),
-          signature: normalizeSignature.toString('base64')
-        }
-      ],
-      unsignedStdTx.memo
-    )
+    // Send signed tx
+    const res = await rest.tx.broadcastTx(cosmosClient.sdk, {
+      tx_bytes: txBuilder.txBytes(),
+      mode: rest.tx.BroadcastTxMode.Block
+    })
 
-    // Send signed StdTx
-    const {
-      data: { txhash }
-    } = await auth.txsPost(cosmosClient.sdk, stdTx, 'sync')
+    const txhash = res ? res.data?.tx_response?.txhash : null
 
     if (!txhash) {
       return E.left({
@@ -196,12 +176,10 @@ export const deposit = async ({
       prefix
     })
 
-    cosmosClient.setPrefix()
-
     const msgNativeTx: MsgNativeTx = msgNativeTxFromJson({
       coins: [
         {
-          asset: assetToString(AssetRuneNative),
+          asset: AssetRuneNative,
           amount: amount.amount().toString()
         }
       ],
@@ -209,22 +187,38 @@ export const deposit = async ({
       signer: bech32Address
     })
 
-    const unsignedStdTx: StdTx = await buildDepositTx({ msgNativeTx, nodeUrl, chainId })
+    const unsignedTxBody: proto.cosmos.tx.v1beta1.TxBody = await buildDepositTx({ msgNativeTx, nodeUrl, chainId })
 
     // get account number + sequence from signer account
-    let {
-      data: { result: account }
-    } = await auth.accountsAddressGet(cosmosClient.sdk, msgNativeTx.signer)
-    // Note: Cosmos API has been changed - result has another JSON structure now !!
-    // Code is copied from xchain-cosmos -> SDKClient -> signAndBroadcast
-    if (account.account_number === undefined) {
-      account = BaseAccount.fromJSON((account as BaseAccountResponse).value)
-    }
-    const { account_number, sequence } = account
-    // Get bytes from StdTx to sign
-    const signedStdTx = unsignedStdTx.getSignBytes(chainId, account_number.toString(), sequence.toString())
+    const signer = cosmosclient.AccAddress.fromString(bech32Address)
+    const account = await cosmosClient.getAccount(signer)
+    const { account_number, sequence, pub_key } = account
+
+    const fee = new proto.cosmos.tx.v1beta1.Fee({
+      amount: [],
+      gas_limit: cosmosclient.Long.fromString(DEFAULT_GAS_VALUE)
+    })
+
+    const authInfo = new proto.cosmos.tx.v1beta1.AuthInfo({
+      signer_infos: [
+        {
+          public_key: cosmosclient.codec.packAny(pub_key),
+          mode_info: {
+            single: {
+              mode: proto.cosmos.tx.signing.v1beta1.SignMode.SIGN_MODE_DIRECT
+            }
+          },
+          sequence
+        }
+      ],
+      fee
+    })
+
+    const txBuilder = new cosmosclient.TxBuilder(cosmosClient.sdk, unsignedTxBody, authInfo)
+    const signDocBytes = txBuilder.signDocBytes(account_number || 0)
+
     // Sign StdTx
-    const { signature } = await app.sign(path, signedStdTx.toString())
+    const { signature } = await app.sign(path, signDocBytes.toString())
 
     if (!signature) {
       return E.left({
@@ -235,32 +229,24 @@ export const deposit = async ({
 
     // normalize signature
     const normalizeSignature: Buffer = extractSignatureFromTLV(signature)
-    // create final StdTx
-    const stdTx = new StdTx(
-      unsignedStdTx.msg,
-      unsignedStdTx.fee,
-      [
-        {
-          pub_key: PubKeySecp256k1.fromBase64(compressedPk.toString('base64')),
-          signature: normalizeSignature.toString('base64')
-        }
-      ],
-      unsignedStdTx.memo
-    )
+    txBuilder.addSignature(normalizeSignature)
 
-    // Send signed StdTx
-    const {
-      data: { txhash }
-    } = await auth.txsPost(cosmosClient.sdk, stdTx, 'sync')
+    // Send signed tx
+    const res = await rest.tx.broadcastTx(cosmosClient.sdk, {
+      tx_bytes: txBuilder.txBytes(),
+      mode: rest.tx.BroadcastTxMode.Block
+    })
 
-    if (!txhash) {
+    const txHash = res ? res.data?.tx_response?.txhash : null
+
+    if (!txHash) {
       return E.left({
         errorId: LedgerErrorId.INVALID_RESPONSE,
         msg: `Post request to send 'MsgDeposit' failed`
       })
     }
 
-    return E.right(txhash)
+    return E.right(txHash)
   } catch (error) {
     return E.left({
       errorId: LedgerErrorId.SEND_TX_FAILED,
