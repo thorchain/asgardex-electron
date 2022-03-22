@@ -264,4 +264,12 @@ export const ASYM_DEPOSIT_TOOL_URL: Record<Network, string> = {
 }
 
 // @asgdx-team: Extend list whenever another ledger app will be supported
-export const SUPPORTED_LEDGER_APPS: Chain[] = [THORChain, BNBChain, BTCChain, LTCChain, DOGEChain, BCHChain]
+export const SUPPORTED_LEDGER_APPS: Chain[] = [
+  // Disable Ledger THOR temporarily https://github.com/thorchain/asgardex-electron/issues/2154
+  //  THORChain,
+  BNBChain,
+  BTCChain,
+  LTCChain,
+  DOGEChain,
+  BCHChain
+]
