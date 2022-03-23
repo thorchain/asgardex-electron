@@ -202,8 +202,11 @@ describe('walletHelper', () => {
       expect(isEnabledWallet(THORChain, 'stagenet', 'ledger')).toBeFalsy()
     })
     it('THOR ledger mainnet/testnet -> true', () => {
-      expect(isEnabledWallet(THORChain, 'mainnet', 'ledger')).toBeTruthy()
-      expect(isEnabledWallet(THORChain, 'testnet', 'ledger')).toBeTruthy()
+      // Disable Ledger THOR temporarily https://github.com/thorchain/asgardex-electron/issues/2154
+      // expect(isEnabledWallet(THORChain, 'mainnet', 'ledger')).toBeTruthy()
+      // expect(isEnabledWallet(THORChain, 'testnet', 'ledger')).toBeTruthy()
+      expect(isEnabledWallet(THORChain, 'mainnet', 'ledger')).toBeFalsy()
+      expect(isEnabledWallet(THORChain, 'testnet', 'ledger')).toBeFalsy()
     })
     it('LTC ledger testnet -> false', () => {
       expect(isEnabledWallet(LTCChain, 'testnet', 'ledger')).toBeFalsy()

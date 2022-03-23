@@ -1,3 +1,13 @@
+# 0.12.0 (2022-03-22)
+
+## Update
+
+- Resolve: Upgrade `xchain-cosmos|thorchain` and `cosmos-client` (needed for hardfork) [#2150](https://github.com/thorchain/asgardex-electron/pull/2150)
+
+## Breaking change
+
+- [Ledger] Disable THOR for hard-fork temorary [#2154](https://github.com/thorchain/asgardex-electron/issues/2154)
+
 # 0.11.0 (2022-03-19)
 
 ## Add
