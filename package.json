@@ -100,6 +100,7 @@
     "bitcoinjs-lib": "^5.2.0",
     "chart.js": "^3.5.1",
     "coininfo": "^5.1.0",
+    "cosmos-client": "0.39.2",
     "dayjs": "^1.10.7",
     "electron-debug": "^3.2.0",
     "electron-log": "^4.4.6",
