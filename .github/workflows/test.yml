@@ -1,11 +1,6 @@
 name: Test
 
-# on: push
-
-on:
-  push:
-    branches:
-      - 'skip'
+on: push
 
 jobs:
   test:

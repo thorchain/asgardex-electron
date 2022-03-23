@@ -22,9 +22,7 @@ jobs:
       - uses: actions/setup-node@v2
         with:
           node-version-file: '.nvmrc'
-
-      - name: Clean cache
-        run: yarn cache clean
+          cache: 'yarn'
 
       - name: Install dependencies
         run: yarn install --frozen-lockfile --network-timeout 1000000 --cache-folder .yarn

@@ -4,8 +4,8 @@ on:
   push:
     branches:
       # https://docs.github.com/en/actions/reference/workflow-syntax-for-github-actions#onpushpull_requestbranchestags
-      - 'skip-release/**'
-      - 'skip-hotfix/**'
+      - 'release/**'
+      - 'hotfix/**'
 
 jobs:
   build:
