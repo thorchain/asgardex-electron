@@ -1,4 +1,4 @@
-import { ChainId, DEPOSIT_GAS_VALUE, getChainId, ThorchainDepositResponse } from '@xchainjs/xchain-thorchain'
+import { ChainId, DEPOSIT_GAS_VALUE, ThorchainDepositResponse } from '@xchainjs/xchain-thorchain'
 import axios from 'axios'
 import { AccAddress, Msg, codec } from 'cosmos-client'
 import { TransactionsApi } from 'cosmos-client/api'
@@ -84,10 +84,6 @@ export const buildDepositTx = async ({
   nodeUrl: string
   chainId: ChainId
 }): Promise<StdTx> => {
-  const networkChainId = await getChainId(nodeUrl)
-  if (!networkChainId || chainId !== networkChainId)
-    throw new Error(`Invalid network (asked: ${chainId} / returned: ${networkChainId}`)
-
   const response: ThorchainDepositResponse = (
     await axios.post(`${nodeUrl}/thorchain/deposit`, {
       coins: msgNativeTx.coins,

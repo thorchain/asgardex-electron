@@ -3,7 +3,7 @@ import THORChainApp, { extractSignatureFromTLV, LedgerErrorType } from '@thorcha
 import { Address, TxHash } from '@xchainjs/xchain-client'
 import { BaseAccountResponse } from '@xchainjs/xchain-cosmos'
 import { DEFAULT_GAS_VALUE, getChainId, getDenom, getPrefix } from '@xchainjs/xchain-thorchain'
-import { AssetRuneNative, assetToString, BaseAmount } from '@xchainjs/xchain-util'
+import { AssetRuneNative, assetToString, BaseAmount, delay } from '@xchainjs/xchain-util'
 import { AccAddress, PubKeySecp256k1, Msg, CosmosSDK } from 'cosmos-client'
 import { StdTx, auth, BaseAccount } from 'cosmos-client/x/auth'
 import { MsgSend } from 'cosmos-client/x/bank'
@@ -201,12 +201,18 @@ export const deposit = async ({
       signer: bech32Address
     })
 
+    Legacy.registerCodecs(prefix)
+
     const unsignedStdTx: StdTx = await Legacy.buildDepositTx({ msgNativeTx, nodeUrl, chainId })
 
+    await delay(200)
+
     // get account number + sequence from signer account
+    const accountData = await auth.accountsAddressGet(sdk, signer)
     let {
       data: { result: account }
-    } = await auth.accountsAddressGet(sdk, signer)
+    } = accountData
+
     // Note: Cosmos API has been changed - result has another JSON structure now !!
     // Code is copied from xchain-cosmos -> SDKClient -> signAndBroadcast
     if (account.account_number === undefined) {
