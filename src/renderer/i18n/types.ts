@@ -62,7 +62,8 @@ export type CommonMessageKey =
   | 'common.step'
   | 'common.done'
   | 'common.address.self'
-  | 'common.thorAddress'
+  | 'common.nodeAddress'
+  | 'common.providerAddress'
   | 'common.tx.healthCheck'
   | 'common.tx.sending'
   | 'common.tx.sendingAsset'
@@ -318,6 +319,7 @@ export type SwapMessages = { [key in SwapMessageKey]: string }
 type DepositMessageKey =
   | 'deposit.interact.title'
   | 'deposit.interact.subtitle'
+  | 'deposit.interact.label.bondprovider'
   | 'deposit.interact.actions.bond'
   | 'deposit.interact.actions.unbond'
   | 'deposit.interact.actions.leave'
