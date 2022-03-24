@@ -21,7 +21,7 @@ import { useIntl } from 'react-intl'
 import { Network } from '../../../../../shared/api/types'
 import { isKeystoreWallet, isLedgerWallet } from '../../../../../shared/utils/guard'
 import { WalletType } from '../../../../../shared/wallet/types'
-import { ZERO_BASE_AMOUNT, ZERO_BN } from '../../../../const'
+import { ZERO_BASE_AMOUNT } from '../../../../const'
 import { THORCHAIN_DECIMAL } from '../../../../helpers/assetHelper'
 import { validateAddress } from '../../../../helpers/form/validation'
 import { useSubscriptionState } from '../../../../hooks/useSubscriptionState'
@@ -43,7 +43,7 @@ import * as H from './Interact.helpers'
 import * as Styled from './Interact.styles'
 import { InteractType } from './Interact.types'
 
-type FormValues = { memo: string; thorAddress: string; amount: BigNumber }
+type FormValues = { memo: string; thorAddress: string; providerAddress: string; amount: BigNumber }
 
 type Props = {
   interactType: InteractType
@@ -77,6 +77,8 @@ export const InteractForm: React.FC<Props> = (props) => {
   const intl = useIntl()
 
   const { asset } = balance
+
+  const [hasProviderAddress, setHasProviderAddress] = useState(false)
 
   const [_amountToSend, setAmountToSend] = useState<BaseAmount>(ZERO_BASE_AMOUNT)
 
@@ -223,17 +225,25 @@ export const InteractForm: React.FC<Props> = (props) => {
 
   const getMemo = useCallback(() => {
     const thorAddress = form.getFieldValue('thorAddress')
+    const providerAddress = form.getFieldValue('providerAddress')
     switch (interactType) {
-      case 'bond':
-        return getBondMemo(thorAddress)
-      case 'unbond':
-        return getUnbondMemo(thorAddress, assetToBase(assetAmount(form.getFieldValue('amount'), THORCHAIN_DECIMAL)))
+      case 'bond': {
+        const memo = getBondMemo(thorAddress)
+        return hasProviderAddress ? `${memo}:${providerAddress}` : memo
+      }
+      case 'unbond': {
+        const memo = getUnbondMemo(
+          thorAddress,
+          assetToBase(assetAmount(form.getFieldValue('amount'), THORCHAIN_DECIMAL))
+        )
+        return hasProviderAddress ? `${memo}:${providerAddress}` : memo
+      }
       case 'leave':
         return getLeaveMemo(thorAddress)
       case 'custom':
         return form.getFieldValue('memo')
     }
-  }, [form, interactType])
+  }, [form, hasProviderAddress, interactType])
 
   const submitTx = useCallback(() => {
     setSendTxStartTime(Date.now())
@@ -252,12 +262,9 @@ export const InteractForm: React.FC<Props> = (props) => {
 
   const reset = useCallback(() => {
     resetInteractState()
+    form.resetFields()
+    setHasProviderAddress(false)
     setAmountToSend(ZERO_BASE_AMOUNT)
-    form.setFieldsValue({
-      thorAddress: '',
-      memo: '',
-      amount: ZERO_BN
-    })
   }, [form, resetInteractState])
 
   const renderConfirmationModal = useMemo(() => {
@@ -368,12 +375,24 @@ export const InteractForm: React.FC<Props> = (props) => {
     [feeRD]
   )
 
+  const onClickHasProviderAddress = useCallback(() => {
+    // clean address
+    form.setFieldsValue({ providerAddress: '' })
+    // toggle
+    setHasProviderAddress((v) => !v)
+  }, [form])
+
   useEffect(() => {
     // Whenever `amountToSend` has been updated, we put it back into input field
     form.setFieldsValue({
       amount: baseToAsset(_amountToSend).amount()
     })
   }, [_amountToSend, form])
+
+  // Reset values whenever interactType has been changed (an user clicks on navigation tab)
+  useEffect(() => {
+    reset()
+  }, [interactType, reset])
 
   return (
     <Styled.Form form={form} onFinish={() => setShowConfirmationModal(true)} initialValues={{ thorAddress: '' }}>
@@ -395,10 +414,10 @@ export const InteractForm: React.FC<Props> = (props) => {
           </Styled.InputContainer>
         )}
 
-        {/* THOR address input (BOND/UNBOND/LEAVE only) */}
+        {/* Node address input (BOND/UNBOND/LEAVE only) */}
         {(interactType === 'bond' || interactType === 'unbond' || interactType === 'leave') && (
           <Styled.InputContainer>
-            <Styled.InputLabel>{intl.formatMessage({ id: 'common.thorAddress' })}</Styled.InputLabel>
+            <Styled.InputLabel>{intl.formatMessage({ id: 'common.nodeAddress' })}</Styled.InputLabel>
             <Form.Item
               name="thorAddress"
               rules={[
@@ -409,6 +428,33 @@ export const InteractForm: React.FC<Props> = (props) => {
               ]}>
               <Input disabled={isLoading} size="large" />
             </Form.Item>
+          </Styled.InputContainer>
+        )}
+
+        {/* Provider address input (BOND/UNBOND/ only) */}
+        {(interactType === 'bond' || interactType === 'unbond') && (
+          <Styled.InputContainer style={{ paddingBottom: '20px' }}>
+            <Styled.CheckButton
+              checked={hasProviderAddress}
+              clickHandler={onClickHasProviderAddress}
+              disabled={isLoading}>
+              {intl.formatMessage({ id: 'deposit.interact.label.bondprovider' })}
+            </Styled.CheckButton>
+            {hasProviderAddress && (
+              <>
+                <Styled.InputLabel>{intl.formatMessage({ id: 'common.providerAddress' })}</Styled.InputLabel>
+                <Form.Item
+                  name="providerAddress"
+                  rules={[
+                    {
+                      required: hasProviderAddress,
+                      validator: addressValidator
+                    }
+                  ]}>
+                  <Input disabled={isLoading} size="large" />
+                </Form.Item>
+              </>
+            )}
           </Styled.InputContainer>
         )}
 
