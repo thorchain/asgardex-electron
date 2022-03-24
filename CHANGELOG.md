@@ -1,3 +1,13 @@
+# 0.12.1 (2022-03-25)
+
+## Add
+
+- ADD: Bond Providers [#2160](https://github.com/thorchain/asgardex-electron/issues/2160)
+
+## Fix
+
+- Fix Ledger THOR [#2158](https://github.com/thorchain/asgardex-electron/issues/2158)
+
 # 0.12.0 (2022-03-22)
 
 ## Update
