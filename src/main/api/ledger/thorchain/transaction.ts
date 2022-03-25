@@ -71,7 +71,7 @@ export const send = async ({
     }
 
     const { account_number, sequence } = account
-    if (!account_number || !sequence) {
+    if (!account_number || sequence === undefined) {
       return E.left({
         errorId: fromLedgerErrorType(returnCode),
         msg: `Getting 'account_number' or 'sequence' from 'account' failed (account_number: ${account_number}, sequence:  ${sequence})`
@@ -220,7 +220,7 @@ export const deposit = async ({
     }
 
     const { account_number, sequence } = account
-    if (!account_number || !sequence) {
+    if (!account_number || sequence === undefined) {
       return E.left({
         errorId: fromLedgerErrorType(returnCode),
         msg: `Getting 'account_number' or 'sequence' from 'account' failed (account_number: ${account_number}, sequence:  ${sequence})`
