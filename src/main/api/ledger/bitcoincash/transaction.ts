@@ -49,7 +49,7 @@ export const send = async ({
 
     const haskoinUrl = getHaskoinBCHApiUrl()[network]
 
-    const { builder, utxos } = await buildTx({
+    const { builder, inputs: txInputs } = await buildTx({
       amount,
       recipient,
       memo,
@@ -59,14 +59,16 @@ export const send = async ({
       haskoinUrl
     })
 
-    const inputs: Array<[Transaction, number, string | null, number | null]> = utxos.map(({ txHex, hash, index }) => {
-      if (!txHex) {
-        throw Error(`Missing 'txHex' for UTXO (txHash ${hash})`)
+    const inputs: Array<[Transaction, number, string | null, number | null]> = txInputs.map(
+      ({ txHex, hash, index }) => {
+        if (!txHex) {
+          throw Error(`Missing 'txHex' for UTXO (txHash ${hash})`)
+        }
+        const utxoTx = Bitcoin.Transaction.fromHex(txHex)
+        const splittedTx = app.splitTransaction(txHex, utxoTx.hasWitnesses())
+        return [splittedTx, index, null, null]
       }
-      const utxoTx = Bitcoin.Transaction.fromHex(txHex)
-      const splittedTx = app.splitTransaction(txHex, utxoTx.hasWitnesses())
-      return [splittedTx, index, null, null]
-    })
+    )
 
     const associatedKeysets: string[] = inputs.map((_) => derivePath)
 
