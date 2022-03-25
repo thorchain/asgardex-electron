@@ -1,4 +1,11 @@
-# 0.12.1 (2022-03-25)
+# 0.12.2 (2022-03-25)
+
+## Fix
+
+- BUG: Ledger tx from non-Index0 THOR accounts [#2164](https://github.com/thorchain/asgardex-electron/issues/2164)
+- [BCH] Fix Ledger inputs [#2166](https://github.com/thorchain/asgardex-electron/pull/2166)
+
+# 0.12.1 (2022-03-24)
 
 ## Add
 
