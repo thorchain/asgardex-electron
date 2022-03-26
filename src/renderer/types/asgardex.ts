@@ -80,9 +80,9 @@ export type TxStatus = {
   readonly hash?: string
 }
 
-export type SlipTolerance = 3 | 5 | 10
+export type SlipTolerance = 0.5 | 1 | 3 | 5 | 10
 
 export const isSlipTolerance = (value: SlipTolerance | number): value is SlipTolerance => {
-  const t: SlipTolerance[] = [3, 5, 10]
+  const t: SlipTolerance[] = [0.5, 1, 3, 5, 10]
   return t.includes(value as SlipTolerance)
 }
