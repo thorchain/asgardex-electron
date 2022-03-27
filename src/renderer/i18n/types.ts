@@ -239,7 +239,11 @@ type BondsMessageKey =
 
 export type BondsMessages = { [key in BondsMessageKey]: string }
 
-type PoolSharesMessageKey = 'poolshares.ownership'
+type PoolSharesMessageKey =
+  | 'poolshares.ownership'
+  | 'poolshares.both.info'
+  | 'poolshares.single.info'
+  | 'poolshares.single.notsupported'
 
 export type PoolSharesMessage = { [key in PoolSharesMessageKey]: string }
 

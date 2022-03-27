@@ -3,12 +3,37 @@ import styled from 'styled-components'
 import { palette } from 'styled-theme'
 
 import { ManageButton as ManageButtonUI } from '../manageButton'
+import { AssetIcon as AssetIconUI } from '../uielements/assets/assetIcon'
 import { Button as UIButton } from '../uielements/button'
 import { Label as UILabel } from '../uielements/label'
 import { Table as UITable } from '../uielements/table'
 
 export const Container = styled('div')`
   background: ${palette('background', 0)};
+`
+
+export const AssetIcon = styled(AssetIconUI)`
+  position: relative;
+`
+
+export const AssetIconLabel = styled(UILabel).attrs({
+  textTransform: 'uppercase',
+  size: 'small'
+})`
+  position: absolute;
+  top: 6px;
+  left: 45px;
+
+  font-family: 'MainFontRegular';
+  font-size: 8px;
+  color: ${palette('text', 0)};
+
+  background: ${palette('background', 3)};
+  text-shadow: 1px 1px 1px ${palette('background', 1)};
+  box-shadow: 0px 1px 2px ${palette('gray', 2)};
+  border-radius: 5px;
+  padding: 0px 5px;
+  width: auto;
 `
 
 export const Table = styled(UITable)`
@@ -81,4 +106,5 @@ export const InfoDescription = styled.div`
 export const OwnershipLabel = styled(UILabel)`
   padding-left: 30px;
   padding-right: 16px;
+  font-size: 16px;
 `
