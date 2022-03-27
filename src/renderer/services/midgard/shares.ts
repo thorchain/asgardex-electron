@@ -134,11 +134,6 @@ const createSharesService = (
     shares$(address).pipe(liveData.map((shares) => combineShares(shares)))
 
   /**
-   * Combines 'asym` +  `sym` `Poolshare`'s into a single `Poolshare`
-   */
-  const allShares$ = (address: Address): PoolSharesLD => shares$(address)
-
-  /**
    * Combines 'asym` +  `sym` `Poolshare`'s into a single `Poolshare` by given `Asset`
    */
   const combineSharesByAsset$ = (address: Address, asset: Asset): PoolShareLD =>
@@ -156,7 +151,7 @@ const createSharesService = (
 
   // Loads `asym` + `sym` `PoolShare`'s by given addresses
   const loadAllSharesByAddresses$ = (addresses: Address[]): PoolSharesLD =>
-    FP.pipe(addresses, A.map(allShares$), liveData.sequenceArray, liveData.map(A.flatten))
+    FP.pipe(addresses, A.map(shares$), liveData.sequenceArray, liveData.map(A.flatten))
 
   // `TriggerStream` to reload `symSharesByAddresses`
   const { stream$: reloadSymSharesByAddresses$, trigger: reloadSymSharesByAddresses } = triggerStream()
