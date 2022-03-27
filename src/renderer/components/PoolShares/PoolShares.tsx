@@ -17,8 +17,8 @@ import { useIntl } from 'react-intl'
 import { Network } from '../../../shared/api/types'
 import * as PoolHelpers from '../../helpers/poolHelper'
 import { MimirHalt } from '../../services/thorchain/types'
-import { AssetIcon } from '../uielements/assets/assetIcon'
 import { AssetLabel } from '../uielements/assets/assetLabel'
+import { Tooltip } from '../uielements/common/Common.styles'
 import { Label } from '../uielements/label'
 import * as Styled from './PoolShares.styles'
 import { PoolShareTableRowData, PoolShareTableData } from './PoolShares.types'
@@ -50,13 +50,22 @@ export const PoolShares: React.FC<Props> = ({
     () => ({
       title: '',
       width: 90,
-      render: ({ asset }: PoolShareTableRowData) => (
-        <Row justify="center" align="middle">
-          <AssetIcon asset={asset} size="normal" network={network} />
-        </Row>
-      )
+      render: ({ asset, type }: PoolShareTableRowData) => {
+        const titleId = type === 'asym' ? 'poolshares.single.info' : 'poolshares.both.info'
+
+        return (
+          <Row justify="center" align="middle">
+            <Tooltip title={intl.formatMessage({ id: titleId }, { asset: asset.ticker, rune: AssetRuneNative.ticker })}>
+              <>
+                <Styled.AssetIcon asset={asset} size="normal" network={network} />
+                {type === 'asym' && <Styled.AssetIconLabel>{type}</Styled.AssetIconLabel>}
+              </>
+            </Tooltip>
+          </Row>
+        )
+      }
     }),
-    [network]
+    [intl, network]
   )
 
   const poolColumn: ColumnType<PoolShareTableRowData> = useMemo(
@@ -74,7 +83,12 @@ export const PoolShares: React.FC<Props> = ({
       title: intl.formatMessage({ id: 'poolshares.ownership' }),
       align: 'center',
       render: ({ sharePercent }: PoolShareTableRowData) => (
-        <Styled.OwnershipLabel align="center">{formatBN(sharePercent, 2)}%</Styled.OwnershipLabel>
+        <Tooltip title={`${sharePercent} %`}>
+          {/* div needed for tooltip */}
+          <div>
+            <Styled.OwnershipLabel align="center">{formatBN(sharePercent, 2)}%</Styled.OwnershipLabel>
+          </div>
+        </Tooltip>
       )
     }),
     [intl]
@@ -134,12 +148,22 @@ export const PoolShares: React.FC<Props> = ({
     () => ({
       title: '',
       align: 'right',
-      render: ({ asset }: PoolShareTableRowData) => {
+      render: ({ asset, type }: PoolShareTableRowData) => {
         const disablePool = PoolHelpers.disableAllActions({ chain: asset.chain, haltedChains, mimirHalt })
-        return <Styled.ManageButton disabled={disablePool} asset={asset} isTextView={isDesktopView} />
+        return (
+          <Styled.ManageButton
+            disabled={disablePool || type === 'asym'}
+            asset={asset}
+            isTextView={isDesktopView}
+            title={intl.formatMessage(
+              { id: 'poolshares.single.notsupported' },
+              { asset: asset.ticker, rune: AssetRuneNative.ticker }
+            )}
+          />
+        )
       }
     }),
-    [haltedChains, mimirHalt, isDesktopView]
+    [haltedChains, mimirHalt, isDesktopView, intl]
   )
 
   const desktopColumns: ColumnsType<PoolShareTableRowData> = useMemo(

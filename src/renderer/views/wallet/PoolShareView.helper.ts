@@ -15,7 +15,7 @@ export const getPoolShareTableData = (
 ): PoolShareTableData =>
   FP.pipe(
     shares,
-    A.filterMap(({ units, asset }) =>
+    A.filterMap(({ units, asset, type }) =>
       FP.pipe(
         getPoolDetail(poolDetails, asset),
         O.map((poolDetail) => {
@@ -38,7 +38,8 @@ export const getPoolShareTableData = (
             assetShare,
             sharePercent,
             assetDepositPrice,
-            runeDepositPrice
+            runeDepositPrice,
+            type
           }
         })
       )

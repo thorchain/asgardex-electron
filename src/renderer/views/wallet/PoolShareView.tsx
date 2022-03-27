@@ -42,7 +42,7 @@ export const PoolShareView: React.FC = (): JSX.Element => {
     // @see https://github.com/thorchain/asgardex-electron/issues/1205
     pools: { allPoolDetails$, selectedPricePool$, selectedPricePoolAsset$, reloadAllPools, haltedChains$ },
     reloadNetworkInfo,
-    shares: { symSharesByAddresses$ }
+    shares: { allSharesByAddresses$ }
   } = midgardService
 
   const { addressByChain$ } = useChainContext()
@@ -96,7 +96,7 @@ export const PoolShareView: React.FC = (): JSX.Element => {
            * We have to get a new stake-stream for every new asset
            * @description /src/renderer/services/midgard/shares.ts
            */
-          symSharesByAddresses$
+          allSharesByAddresses$
         )
       )
     )
@@ -164,7 +164,10 @@ export const PoolShareView: React.FC = (): JSX.Element => {
           () => renderPoolSharesTable([], false),
           // loading state
           () => {
-            const data = O.getOrElse(() => [] as PoolShareTableRowData[])(previousPoolShares.current)
+            const data: PoolShareTableRowData[] = FP.pipe(
+              previousPoolShares.current,
+              O.getOrElse<PoolShareTableRowData[]>(() => [])
+            )
             return renderPoolSharesTable(data, true)
           },
           // error state

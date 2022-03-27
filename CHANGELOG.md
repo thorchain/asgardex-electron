@@ -1,3 +1,9 @@
+# 0.12.3 (2022-xx-xx)
+
+## Add
+
+- [Shares] Show asym shares in list [#2172](https://github.com/thorchain/asgardex-electron/issues/2172)
+
 # 0.12.2 (2022-03-25)
 
 ## Fix
