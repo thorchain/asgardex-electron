@@ -3,6 +3,7 @@
 ## Add
 
 - [Shares] Show asym shares in list [#2172](https://github.com/thorchain/asgardex-electron/issues/2172)
+- [Wallet] Show total balance [#2178](https://github.com/thorchain/asgardex-electron/pull/2178)
 
 ## Update
 

@@ -143,7 +143,7 @@ describe('helpers/poolHelper/', () => {
         asset: AssetBNB
       }
       const result = FP.pipe(
-        getPoolPriceValue(balance, poolDetails, usdPool),
+        getPoolPriceValue({ balance, poolDetails, pricePoolData: usdPool, network: 'testnet' }),
         O.fold(
           () => 'failure',
           (price) => price.amount().toString()
@@ -158,7 +158,7 @@ describe('helpers/poolHelper/', () => {
         asset: AssetRuneNative
       }
       const result = FP.pipe(
-        getPoolPriceValue(balance, [], usdPool),
+        getPoolPriceValue({ balance, poolDetails: [], pricePoolData: usdPool, network: 'testnet' }),
         O.fold(
           () => 'failure',
           (price) => price.amount().toString()
@@ -172,7 +172,7 @@ describe('helpers/poolHelper/', () => {
         amount: baseAmount('1'),
         asset: AssetBNB
       }
-      const result = getPoolPriceValue(balance, [], usdPool)
+      const result = getPoolPriceValue({ balance, poolDetails: [], pricePoolData: usdPool, network: 'testnet' })
       expect(result).toBeNone()
     })
   })

@@ -16,6 +16,7 @@ const wallet: WalletMessages = {
   'wallet.action.create': 'Создать',
   'wallet.action.connect': 'Подключить',
   'wallet.action.deposit': 'Вложить',
+  'wallet.balance.total': 'Total balance - RU',
   'wallet.connect.instruction': 'Пожалуйста подключите ваш кошелек',
   'wallet.lock.label': 'Заблокировать кошелёк',
   'wallet.unlock.label': 'Разблокировать кошелёк',
@@ -57,7 +58,7 @@ const wallet: WalletMessages = {
   'wallet.send.average': 'Среднее',
   'wallet.send.max.doge':
     'Рассчитанное макс. значение основано на приблизительных комиссиях, которые могут быть иногда неточны для DOGE. В случае появления сообщения об ошибке "Недостаточно средств для проведения операции" проверьте https://blockchair.com/dogecoin/transactions, чтобы получить среднее значение последних сборов и вычесть его из баланса перед отправкой транзакции.',
-  'wallet.errors.balancesFailed': 'Нет загруженных балансов. {errorMsg} (АПИ Id: {apiId})',
+  'wallet.errors.balancesFailed': 'Нет загруженных балансов. {errorMsg}',
   'wallet.errors.asset.notExist': 'Отсутсвует актив {asset}',
   'wallet.errors.address.empty': 'Адрес не может быть пустым',
   'wallet.errors.address.invalid': 'Адес недействителен',
