@@ -16,6 +16,7 @@ const wallet: WalletMessages = {
   'wallet.action.import': 'Import',
   'wallet.action.create': 'Create',
   'wallet.action.deposit': 'Deposit',
+  'wallet.balance.total': 'Total balance',
   'wallet.connect.instruction': 'Please connect your wallet',
   'wallet.lock.label': 'Lock wallet',
   'wallet.unlock.label': 'Unlock wallet',
@@ -57,7 +58,7 @@ const wallet: WalletMessages = {
   'wallet.send.average': 'Average',
   'wallet.send.max.doge':
     'Calculated max. value based on estimated fees, which might be incorrect for DOGE from time to time. In case of an "Balance Insufficient for transaction" error message check https://blockchair.com/dogecoin/transactions to get an average of latest fees and try to deduct it from your balance before sending a transaction.',
-  'wallet.errors.balancesFailed': 'Loading balances failed. {errorMsg} (API Id: {apiId})',
+  'wallet.errors.balancesFailed': 'Loading balances failed. {errorMsg}',
   'wallet.errors.asset.notExist': 'No {asset} asset',
   'wallet.errors.address.empty': "Address can't be empty",
   'wallet.errors.address.invalid': 'Address is invalid',

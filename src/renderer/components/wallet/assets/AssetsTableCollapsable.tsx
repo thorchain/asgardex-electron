@@ -22,7 +22,7 @@ import { useHistory } from 'react-router-dom'
 import { Network } from '../../../../shared/api/types'
 import { isKeystoreWallet } from '../../../../shared/utils/guard'
 import { WalletType } from '../../../../shared/wallet/types'
-import { disableRuneUpgrade, isNonNativeRuneAsset } from '../../../helpers/assetHelper'
+import { disableRuneUpgrade, isNonNativeRuneAsset, isUSDAsset } from '../../../helpers/assetHelper'
 import { getChainAsset } from '../../../helpers/chainHelper'
 import { getPoolPriceValue } from '../../../helpers/poolHelper'
 import * as walletRoutes from '../../../routes/wallet'
@@ -194,12 +194,16 @@ export const AssetsTableCollapsable: React.FC<Props> = (props): JSX.Element => {
 
   const renderPriceColumn = useCallback(
     (balance: Balance) => {
-      const oPrice = getPoolPriceValue(balance, poolDetails, pricePool.poolData)
+      const oPrice = getPoolPriceValue({ balance, poolDetails, pricePoolData: pricePool.poolData, network })
       const label = FP.pipe(
         oPrice,
         O.map((price) => {
           price.decimal = balance.amount.decimal
-          return formatAssetAmountCurrency({ amount: baseToAsset(price), asset: pricePool.asset, decimal: 3 })
+          return formatAssetAmountCurrency({
+            amount: baseToAsset(price),
+            asset: pricePool.asset,
+            decimal: isUSDAsset(pricePool.asset) ? 2 : 4
+          })
         }),
         // "empty" label if we don't get a price value
         O.getOrElse(() => '--')
@@ -210,7 +214,7 @@ export const AssetsTableCollapsable: React.FC<Props> = (props): JSX.Element => {
         </Styled.Label>
       )
     },
-    [poolDetails, pricePool.asset, pricePool.poolData]
+    [network, poolDetails, pricePool.asset, pricePool.poolData]
   )
 
   const priceColumn: ColumnType<Balance> = useMemo(
@@ -243,15 +247,15 @@ export const AssetsTableCollapsable: React.FC<Props> = (props): JSX.Element => {
 
   const columns = useMemo(() => {
     // desktop
-    if (screenMap?.lg) {
+    if (screenMap?.lg ?? false) {
       return [iconColumn, tickerColumn, balanceColumn, priceColumn]
     }
     // tablet
-    if (screenMap?.md) {
+    if (screenMap?.sm ?? false) {
       return [iconColumn, tickerColumn, balanceColumn]
     }
     // mobile
-    if (screenMap?.xs) {
+    if (screenMap?.xs ?? false) {
       return [iconColumn, balanceColumn]
     }
 
@@ -315,10 +319,10 @@ export const AssetsTableCollapsable: React.FC<Props> = (props): JSX.Element => {
             return <ErrorView title={msg} />
           },
           // success state
-          (assetsWB) => {
+          (balances) => {
             const prev = previousAssetsTableData.current
-            prev[index] = assetsWB
-            return renderAssetsTable({ tableData: assetsWB, oWalletAddress, loading: false, walletType, walletIndex })
+            prev[index] = balances
+            return renderAssetsTable({ tableData: balances, oWalletAddress, loading: false, walletType, walletIndex })
           }
         )
       )

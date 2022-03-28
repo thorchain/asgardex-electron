@@ -16,6 +16,7 @@ const wallet: WalletMessages = {
   'wallet.action.import': 'Importer',
   'wallet.action.create': 'Créer',
   'wallet.action.deposit': 'Déposer',
+  'wallet.balance.total': 'Total balance - FR',
   'wallet.connect.instruction': 'Veuillez connecter votre portefeuille',
   'wallet.lock.label': 'Verrouiller le portefeuille',
   'wallet.unlock.label': 'Déverrouiller le portefeuille',
@@ -59,7 +60,7 @@ const wallet: WalletMessages = {
   'wallet.send.average': 'Normal',
   'wallet.send.max.doge':
     "Valeur calculée max. basée sur des frais estimés, qui peuvent être incorrects pour DOGE de temps à autre. En cas de message d'erreur 'Solde insuffisant pour la transaction', consultez https://blockchair.com/dogecoin/transactions pour obtenir une moyenne des derniers frais et essayez de la déduire de votre solde avant d'envoyer une transaction.",
-  'wallet.errors.balancesFailed': 'Échec lors du chargement des soldes. {errorMsg} (API Id: {apiId})',
+  'wallet.errors.balancesFailed': 'Échec lors du chargement des soldes. {errorMsg}',
   'wallet.errors.asset.notExist': 'Aucun {asset}',
   'wallet.errors.address.empty': "L'adresse ne peut être vide",
   'wallet.errors.address.invalid': "L'adresse est incorrecte",

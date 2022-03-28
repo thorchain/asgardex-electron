@@ -66,7 +66,10 @@ export const WalletView: React.FC = (): JSX.Element => {
             <Redirect to={walletRoutes.assets.path()} />
           </Route>
           <Route path={walletRoutes.assets.template} exact>
-            {reloadButton(reloadBalances)}
+            {reloadButton(() => {
+              reloadAllPools()
+              reloadBalances()
+            })}
             <AssetsNav />
             <AssetsView />
           </Route>

@@ -16,7 +16,7 @@ import { MimirHaltChain, MimirHaltTrading, MimirPauseLP } from '../services/thor
 import { PoolDetail } from '../types/generated/midgard'
 import { PoolTableRowData, PoolTableRowsData, PricePool } from '../views/pools/Pools.types'
 import { getPoolTableRowData } from '../views/pools/Pools.utils'
-import { isRuneNativeAsset, convertBaseAmountDecimal, to1e8BaseAmount } from './assetHelper'
+import { convertBaseAmountDecimal, to1e8BaseAmount, isRuneAsset } from './assetHelper'
 import { isBchChain, isBnbChain, isBtcChain, isDogeChain, isEthChain, isLtcChain } from './chainHelper'
 import { eqChain } from './fp/eq'
 import { ordBaseAmount } from './fp/ord'
@@ -136,22 +136,28 @@ export const getAssetPoolPrice = (runePrice: BigNumber) => (poolDetail: Pick<Poo
 /**
  * Helper to get a pool price value for a given `Balance`
  */
-export const getPoolPriceValue = (
-  { asset, amount }: Balance,
-  poolDetails: PoolDetails,
-  selectedPricePoolData: PoolData
-): O.Option<BaseAmount> => {
+export const getPoolPriceValue = ({
+  balance: { asset, amount },
+  poolDetails,
+  pricePoolData,
+  network
+}: {
+  balance: Balance
+  poolDetails: PoolDetails
+  pricePoolData: PoolData
+  network: Network
+}): O.Option<BaseAmount> => {
   // convert to 1e8 decimal (as same decimal as pool data has)
   const amount1e8 = to1e8BaseAmount(amount)
   return FP.pipe(
     getPoolDetail(poolDetails, asset),
     O.map(toPoolData),
     // calculate value based on `pricePoolData`
-    O.map((poolData) => getValueOfAsset1InAsset2(amount1e8, poolData, selectedPricePoolData)),
+    O.map((poolData) => getValueOfAsset1InAsset2(amount1e8, poolData, pricePoolData)),
     O.alt(() => {
       // Calculate RUNE values based on `pricePoolData`
-      if (isRuneNativeAsset(asset)) {
-        return O.some(getValueOfRuneInAsset(amount1e8, selectedPricePoolData))
+      if (isRuneAsset(asset, network)) {
+        return O.some(getValueOfRuneInAsset(amount1e8, pricePoolData))
       }
       // In all other cases we don't have any price pool and no price
       return O.none

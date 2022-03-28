@@ -9,24 +9,23 @@ import { useObservableState } from 'observable-hooks'
 import { useHistory } from 'react-router-dom'
 import * as RxOp from 'rxjs/operators'
 
-import { Network } from '../../../shared/api/types'
 import { WalletType } from '../../../shared/wallet/types'
 import { AssetsTableCollapsable } from '../../components/wallet/assets/AssetsTableCollapsable'
-import { useAppContext } from '../../contexts/AppContext'
+import { AssetsTotalBalances } from '../../components/wallet/assets/AssetsTotalBalances'
 import { useMidgardContext } from '../../contexts/MidgardContext'
 import { useWalletContext } from '../../contexts/WalletContext'
 import { RUNE_PRICE_POOL } from '../../helpers/poolHelper'
 import { useMimirHalt } from '../../hooks/useMimirHalt'
+import { useNetwork } from '../../hooks/useNetwork'
+import { useTotalWalletBalance } from '../../hooks/useWalletBalance'
 import * as walletRoutes from '../../routes/wallet'
-import { DEFAULT_NETWORK } from '../../services/const'
 import { ChainBalances } from '../../services/wallet/types'
 
 export const AssetsView: React.FC = (): JSX.Element => {
   const history = useHistory()
   const { chainBalances$, setSelectedAsset } = useWalletContext()
 
-  const { network$ } = useAppContext()
-  const network = useObservableState<Network>(network$, DEFAULT_NETWORK)
+  const { network } = useNetwork()
 
   const [chainBalances] = useObservableState(
     () =>
@@ -56,6 +55,8 @@ export const AssetsView: React.FC = (): JSX.Element => {
       pools: { poolsState$, selectedPricePool$ }
     }
   } = useMidgardContext()
+
+  const { total: totalWalletBalances } = useTotalWalletBalance()
 
   const poolsRD = useObservableState(poolsState$, RD.pending)
 
@@ -89,14 +90,17 @@ export const AssetsView: React.FC = (): JSX.Element => {
   const { mimirHaltRD } = useMimirHalt()
 
   return (
-    <AssetsTableCollapsable
-      chainBalances={chainBalances}
-      pricePool={selectedPricePool}
-      poolDetails={poolDetails}
-      selectAssetHandler={selectAssetHandler}
-      setSelectedAsset={setSelectedAsset}
-      mimirHalt={mimirHaltRD}
-      network={network}
-    />
+    <>
+      <AssetsTotalBalances total={totalWalletBalances} pricePool={selectedPricePool} />
+      <AssetsTableCollapsable
+        chainBalances={chainBalances}
+        pricePool={selectedPricePool}
+        poolDetails={poolDetails}
+        selectAssetHandler={selectAssetHandler}
+        setSelectedAsset={setSelectedAsset}
+        mimirHalt={mimirHaltRD}
+        network={network}
+      />
+    </>
   )
 }

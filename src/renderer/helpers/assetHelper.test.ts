@@ -54,7 +54,8 @@ import {
   assetInERC20Whitelist,
   addressInERC20Whitelist,
   validAssetForETH,
-  iconUrlInERC20Whitelist
+  iconUrlInERC20Whitelist,
+  isRuneAsset
 } from './assetHelper'
 import { eqAsset, eqAssetAmount, eqBaseAmount } from './fp/eq'
 
@@ -101,6 +102,34 @@ describe('helpers/assetHelper', () => {
 
     it('returns false for any other asset than RUNE', () => {
       expect(isRuneNativeAsset(AssetBNB)).toBeFalsy()
+    })
+  })
+
+  describe('isRuneAsset', () => {
+    it('AssetRuneNative', () => {
+      expect(isRuneAsset(AssetRuneNative, 'mainnet')).toBeTruthy()
+      expect(isRuneAsset(AssetRuneNative, 'testnet')).toBeTruthy()
+    })
+    it('AssetRune67C', () => {
+      expect(isRuneAsset(AssetRune67C, 'testnet')).toBeTruthy()
+      expect(isRuneAsset(AssetRune67C, 'mainnet')).toBeFalsy()
+    })
+
+    it('AssetRuneB1A', () => {
+      expect(isRuneAsset(AssetRuneB1A, 'mainnet')).toBeTruthy()
+      expect(isRuneAsset(AssetRuneB1A, 'testnet')).toBeFalsy()
+    })
+    it('AssetRuneERC20', () => {
+      expect(isRuneAsset(AssetRuneERC20, 'mainnet')).toBeTruthy()
+      expect(isRuneAsset(AssetRuneERC20, 'testnet')).toBeFalsy()
+    })
+    it('AssetRuneERC20', () => {
+      expect(isRuneAsset(AssetRuneERC20Testnet, 'testnet')).toBeTruthy()
+      expect(isRuneAsset(AssetRuneERC20Testnet, 'mainnet')).toBeFalsy()
+    })
+    it('AssetBTC', () => {
+      expect(isRuneAsset(AssetBTC, 'testnet')).toBeFalsy()
+      expect(isRuneAsset(AssetBTC, 'mainnet')).toBeFalsy()
     })
   })
 

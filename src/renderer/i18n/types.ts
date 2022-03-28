@@ -150,6 +150,7 @@ type WalletMessageKey =
   | 'wallet.action.import'
   | 'wallet.action.create'
   | 'wallet.action.deposit'
+  | 'wallet.balance.total'
   | 'wallet.connect.instruction'
   | 'wallet.unlock.instruction'
   | 'wallet.lock.label'

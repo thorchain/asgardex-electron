@@ -16,6 +16,7 @@ const wallet: WalletMessages = {
   'wallet.action.create': 'Erstellen',
   'wallet.action.connect': 'Verbinden',
   'wallet.action.deposit': 'Einzahlung',
+  'wallet.balance.total': 'Gesamtguthaben',
   'wallet.connect.instruction': 'Bitte verbinde Deine Wallet',
   'wallet.lock.label': 'Wallet sperren',
   'wallet.unlock.title': 'Entsperre Deine Wallet',
@@ -59,7 +60,7 @@ const wallet: WalletMessages = {
   'wallet.send.average': 'Mittel',
   'wallet.send.max.doge':
     'Der berechnete max. Wert basiert auf geschätzte Gebühren, welche bei DOGE von Zeit zur Zeit inkorrekt sein können. Im Falle eines "Balance Insufficient for transaction" Fehler, gehe zu https://blockchair.com/dogecoin/transactions , um einen Durchschnittswert der aktuellen Gebühren zu erhalten und versuche diese von Deiner Balance abzuziehen, bevor Du die Transaktion versendest.',
-  'wallet.errors.balancesFailed': 'Fehler beim Laden der Guthaben. {errorMsg} (API Id: {apiId})',
+  'wallet.errors.balancesFailed': 'Fehler beim Laden der Guthaben. {errorMsg}',
   'wallet.errors.asset.notExist': 'Asset ({asset}) existiert nicht',
   'wallet.errors.address.empty': 'Keine Addresse angegeben',
   'wallet.errors.address.invalid': 'Addresse ist nicht valide',

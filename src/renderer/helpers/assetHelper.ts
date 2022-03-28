@@ -76,6 +76,17 @@ export const isNonNativeRuneAsset = (asset: Asset, network: Network): boolean =>
   isRuneBnbAsset(asset, network) || isRuneEthAsset(asset, network)
 
 /**
+ * Check whether an asset is an RuneNative asset
+ */
+export const isRuneNativeAsset = (asset: Asset): boolean => eqAsset.equals(asset, AssetRuneNative)
+
+/**
+ * Check whether an asset is a Rune (native or non-native) asset
+ */
+export const isRuneAsset = (asset: Asset, network: Network): boolean =>
+  isRuneNativeAsset(asset) || isNonNativeRuneAsset(asset, network)
+
+/**
  * Check whether an asset is a LTC asset
  */
 export const isLtcAsset = (asset: Asset): boolean => eqAsset.equals(asset, AssetLTC)
@@ -209,11 +220,6 @@ export const getEthAssetAddress = (asset: Asset): O.Option<Address> =>
  * Check whether an asset is an ERC20 asset
  */
 export const isEthTokenAsset: (asset: Asset) => boolean = FP.flow(getEthTokenAddress, O.isSome)
-
-/**
- * Check whether an asset is an RuneNative asset
- */
-export const isRuneNativeAsset = (asset: Asset): boolean => eqAsset.equals(asset, AssetRuneNative)
 
 // Type guard for `PricePoolAsset`
 export const isPricePoolAsset = (asset: Asset): asset is PricePoolAsset =>
