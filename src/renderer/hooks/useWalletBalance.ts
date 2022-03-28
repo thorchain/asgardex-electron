@@ -53,8 +53,9 @@ export const useTotalWalletBalance = () => {
                   return FP.pipe(
                     getPoolPriceValue({ balance: currBalance, poolDetails, pricePoolData, network }),
                     O.getOrElse(() => ZERO_BASE_AMOUNT),
-                    // Before sum, all amounts needs to have same decimal - `1e8` in this case
+                    // Before sum, all amounts need to have same decimal - `1e8` in this case
                     to1e8BaseAmount,
+                    // Sum balance
                     acc.plus
                   )
                 })
