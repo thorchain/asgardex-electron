@@ -7,7 +7,7 @@ import { SlipTolerance } from '../types/asgardex'
 
 export const DEFAULT_NETWORK: Network =
   process.env.NODE_ENV !== 'production' && process.env.REACT_APP_DEFAULT_NETWORK === 'testnet' ? 'testnet' : 'mainnet'
-export const DEFAULT_SLIP_TOLERANCE: SlipTolerance = 5
+export const DEFAULT_SLIP_TOLERANCE: SlipTolerance = 1
 export const DEFAULT_CLIENT_NETWORK: Client.Network = Client.Network.Mainnet
 
 export const AVAILABLE_NETWORKS: Network[] = ['testnet', 'stagenet', 'mainnet']

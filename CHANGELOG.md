@@ -4,6 +4,10 @@
 
 - [Shares] Show asym shares in list [#2172](https://github.com/thorchain/asgardex-electron/issues/2172)
 
+## Update
+
+- Add more slippage options [#2170](https://github.com/thorchain/asgardex-electron/pull/2170) by @WojciechKo
+
 # 0.12.2 (2022-03-25)
 
 ## Fix
