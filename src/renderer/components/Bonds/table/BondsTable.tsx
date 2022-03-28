@@ -88,7 +88,6 @@ export const BondsTable: React.FC<Props> = ({ nodes, removeNode, network, goToNo
       render: (_, { nodeAddress }) => (
         <H.Delete
           deleteNode={() => {
-            console.log('removeColumn nodeAddress:', nodeAddress)
             setNodeToRemove(O.some(nodeAddress))
           }}
         />
@@ -128,7 +127,6 @@ export const BondsTable: React.FC<Props> = ({ nodes, removeNode, network, goToNo
         columns={[removeColumn, nodeColumn, bondColumn, awardColumn, statusColumn, infoColumn]}
         dataSource={nodes.map((node) => ({ ...node, key: node.nodeAddress }))}
       />
-      <div>{JSON.stringify(removeConfirmationProps.visible, null, 2)}</div>
       <ConfirmationModal {...removeConfirmationProps} />
     </>
   )
