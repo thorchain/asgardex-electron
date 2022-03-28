@@ -8,6 +8,10 @@
 
 - Add more slippage options [#2170](https://github.com/thorchain/asgardex-electron/pull/2170) by @WojciechKo
 
+## Fix
+
+- [Bonds] Removing a node from list breaks the app [#2176](https://github.com/thorchain/asgardex-electron/pull/2176)
+
 # 0.12.2 (2022-03-25)
 
 ## Fix

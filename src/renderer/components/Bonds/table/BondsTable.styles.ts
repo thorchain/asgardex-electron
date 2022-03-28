@@ -68,6 +68,16 @@ export const DeleteButton = styled(UIButton).attrs({ typevalue: 'transparent' })
   }
 `
 
-export const ConfirmationModalWalletText = styled.span`
+export const ConfirmationModalText = styled(UILabel)`
+  font-family: 'MainFontRegular';
+  text-transform: uppercase;
+  text-align: center;
+  font-size: 14px;
+`
+
+export const ConfirmationModalAddress = styled.span`
   text-transform: none;
+  font-size: 16px;
+  font-weight: 'bold';
+  font-family: 'MainFontBold';
 `
