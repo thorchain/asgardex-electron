@@ -32,7 +32,10 @@ export const Tabs: React.FC<Props> = ({
       tabs.map(({ label, key, content, disabled = false }) => (
         <ATabs.TabPane
           tab={
-            <Styled.TabLabel onClick={!disabled ? () => setActiveTabKey(key) : undefined} disabled={disabled}>
+            <Styled.TabLabel
+              active={activeTabKey === key}
+              onClick={!disabled ? () => setActiveTabKey(key) : undefined}
+              disabled={disabled}>
               {label}
             </Styled.TabLabel>
           }
@@ -41,7 +44,7 @@ export const Tabs: React.FC<Props> = ({
           <Styled.ContentWrapper centerContent={centerContent}>{content}</Styled.ContentWrapper>
         </ATabs.TabPane>
       )),
-    [tabs, centerContent]
+    [tabs, activeTabKey, centerContent]
   )
 
   return (

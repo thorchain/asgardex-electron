@@ -3,13 +3,12 @@ import styled from 'styled-components'
 import { palette, key } from 'styled-theme'
 
 import { media } from '../../helpers/styleHelper'
-import { Label } from '../uielements/label'
+import { Label, LabelProps } from '../uielements/label'
 
 export const Tabs = styled(A.Tabs).attrs({
   size: 'large'
 })`
   min-height: 100%;
-  padding-top: 20px;
   background-color: ${palette('background', 1)};
 
   .ant-tabs-content-holder {
@@ -26,17 +25,20 @@ export const Tabs = styled(A.Tabs).attrs({
   }
 `
 
-export const TabLabel = styled(Label)`
-  color: ${palette('black', 1)};
+export const TabLabel = styled(Label)<LabelProps & { active: boolean }>`
+  color: ${({ active }) => (active ? palette('primary', 0) : palette('text', 1))};
   padding: 0;
   padding-left: 20px;
   padding-right: 20px;
-  font-weight: 600;
   font-size: 16px;
+  font-family: 'MainFontSemiBold';
   line-height: 19px;
   text-transform: uppercase;
   white-space: nowrap;
   cursor: ${({ disabled }) => (disabled ? 'not-allowed' : 'pointer')};
+  &:hover {
+    color: ${palette('primary', 0)};
+  }
 `
 
 export const ContentWrapper = styled('div')<{ centerContent?: boolean }>`
