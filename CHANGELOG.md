@@ -13,6 +13,7 @@
 ## Fix
 
 - [Bonds] Removing a node from list breaks the app [#2176](https://github.com/thorchain/asgardex-electron/pull/2176)
+- URL to thoryield.com analytics is incorrect [#2182](https://github.com/thorchain/asgardex-electron/issues/2182)
 
 # 0.12.2 (2022-03-25)
 
