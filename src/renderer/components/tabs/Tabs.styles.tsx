@@ -37,7 +37,7 @@ export const TabLabel = styled(Label)<LabelProps & { active: boolean }>`
   white-space: nowrap;
   cursor: ${({ disabled }) => (disabled ? 'not-allowed' : 'pointer')};
   &:hover {
-    color: ${palette('primary', 0)};
+    color: ${({ disabled }) => !disabled && palette('primary', 0)};
   }
 `
 
