@@ -1356,185 +1356,194 @@ export const Swap = ({
   }, [oInitialTargetWalletAddress, oTargetLedgerAddress, useTargetAssetLedger])
 
   return (
-    <Styled.Container>
-      <Styled.ContentContainer>
-        <Styled.Header>
-          {FP.pipe(
-            assetsToSwap,
-            O.map(
-              ({ source, target }) => `${intl.formatMessage({ id: 'common.swap' })} ${source.ticker} > ${target.ticker}`
-            ),
-            O.getOrElse(() => `${intl.formatMessage({ id: 'swap.state.error' })} - No such assets`)
-          )}
-        </Styled.Header>
+    // Note: Just one Tab to use as same styles as for other views (deposit / wallet)
+    <Styled.Tabs
+      centered
+      tabs={[
+        {
+          label: intl.formatMessage({ id: 'common.swap' }),
+          key: 'default',
+          // Content includes everything of Swap content
+          content: (
+            <Styled.Container>
+              <Styled.ContentContainer>
+                <Styled.FormContainer>
+                  <Styled.CurrencyInfoContainer>
+                    <CurrencyInfo
+                      slip={swapData.slip}
+                      slipTolerance={slipTolerance}
+                      isCausedSlippage={isCausedSlippage}
+                      changeSlipTolerance={changeSlipTolerance}
+                      from={oSourcePoolAsset}
+                      to={oTargetPoolAsset}
+                      disableSlippage={disableSlippage}
+                      disableSlippageMsg={intl.formatMessage({ id: 'swap.slip.tolerance.ledger-disabled.info' })}
+                    />
+                  </Styled.CurrencyInfoContainer>
 
-        <Styled.FormContainer>
-          <Styled.CurrencyInfoContainer>
-            <CurrencyInfo
-              slip={swapData.slip}
-              slipTolerance={slipTolerance}
-              isCausedSlippage={isCausedSlippage}
-              changeSlipTolerance={changeSlipTolerance}
-              from={oSourcePoolAsset}
-              to={oTargetPoolAsset}
-              disableSlippage={disableSlippage}
-              disableSlippageMsg={intl.formatMessage({ id: 'swap.slip.tolerance.ledger-disabled.info' })}
-            />
-          </Styled.CurrencyInfoContainer>
+                  <Styled.ValueItemContainer className={'valueItemContainer-out'}>
+                    {/* Note: Input value is shown as AssetAmount */}
+                    <Styled.AssetInput
+                      title={intl.formatMessage({ id: 'swap.input' })}
+                      titleTooltip={FP.pipe(
+                        oSourceWalletAddress,
+                        O.getOrElse(() => '')
+                      )}
+                      onChange={setAmountToSwapMax1e8}
+                      onBlur={reloadFeesHandler}
+                      amount={amountToSwapMax1e8}
+                      maxAmount={maxAmountToSwapMax1e8}
+                      hasError={minAmountError}
+                      asset={sourceAssetProp}
+                      disabled={lockedWallet}
+                      maxInfoText={intl.formatMessage({ id: 'swap.info.max.fee' })}
+                    />
 
-          <Styled.ValueItemContainer className={'valueItemContainer-out'}>
-            {/* Note: Input value is shown as AssetAmount */}
-            <Styled.AssetInput
-              title={intl.formatMessage({ id: 'swap.input' })}
-              titleTooltip={FP.pipe(
-                oSourceWalletAddress,
-                O.getOrElse(() => '')
+                    {FP.pipe(
+                      oSourceAsset,
+                      O.fold(
+                        () => <></>,
+                        (asset) => (
+                          <Styled.AssetSelectContainer>
+                            <Styled.AssetSelect
+                              onSelect={setSourceAsset}
+                              asset={asset}
+                              assets={selectAbleSourceAssets}
+                              network={network}
+                            />
+
+                            <Styled.CheckButton
+                              checked={useSourceAssetLedger}
+                              clickHandler={onClickUseSourceAssetLedger}
+                              disabled={!hasSourceAssetLedger}>
+                              {intl.formatMessage({ id: 'ledger.title' })}
+                            </Styled.CheckButton>
+                          </Styled.AssetSelectContainer>
+                        )
+                      )
+                    )}
+                  </Styled.ValueItemContainer>
+                  {minAmountLabel}
+
+                  <Styled.ValueItemContainer className="valueItemContainer-percent">
+                    <Styled.SliderContainer>{renderSlider}</Styled.SliderContainer>
+                    <Styled.SwapOutlined onClick={onSwitchAssets} />
+                  </Styled.ValueItemContainer>
+                  <Styled.ValueItemContainer className="valueItemContainer-in">
+                    <Styled.InValueContainer>
+                      <Styled.ValueTitle>{intl.formatMessage({ id: 'swap.output' })}</Styled.ValueTitle>
+                      <Styled.InValueLabel>{swapResultLabel}</Styled.InValueLabel>
+                    </Styled.InValueContainer>
+                    {FP.pipe(
+                      oTargetAsset,
+                      O.fold(
+                        () => <></>,
+                        (asset) => (
+                          <Styled.AssetSelectContainer>
+                            <Styled.TargetAssetSelect
+                              onSelect={setTargetAsset}
+                              asset={asset}
+                              assets={selectAbleTargetAssets}
+                              network={network}
+                            />
+                            <Styled.CheckButton
+                              checked={useTargetAssetLedger}
+                              clickHandler={onClickUseTargetAssetLedger}
+                              disabled={!hasTargetAssetLedger}>
+                              {intl.formatMessage({ id: 'ledger.title' })}
+                            </Styled.CheckButton>
+                          </Styled.AssetSelectContainer>
+                        )
+                      )
+                    )}
+                  </Styled.ValueItemContainer>
+                  {!lockedWallet && (
+                    <Styled.TargetAddressContainer>
+                      <Row>
+                        <Styled.ValueTitle>{intl.formatMessage({ id: 'common.recipient' })}</Styled.ValueTitle>
+                        {renderTargetWalletType}
+                      </Row>
+                      {renderCustomAddressInput}
+                    </Styled.TargetAddressContainer>
+                  )}
+                </Styled.FormContainer>
+              </Styled.ContentContainer>
+
+              {(walletBalancesLoading || checkIsApproved) && (
+                <LoadingView
+                  label={
+                    // We show only one loading state at time
+                    // Order matters: Show states with shortest loading time before others
+                    // (approve state takes just a short time to load, but needs to be displayed)
+                    checkIsApproved
+                      ? intl.formatMessage({ id: 'common.approve.checking' }, { asset: sourceAssetProp.ticker })
+                      : walletBalancesLoading
+                      ? intl.formatMessage({ id: 'common.balance.loading' })
+                      : undefined
+                  }
+                />
               )}
-              onChange={setAmountToSwapMax1e8}
-              onBlur={reloadFeesHandler}
-              amount={amountToSwapMax1e8}
-              maxAmount={maxAmountToSwapMax1e8}
-              hasError={minAmountError}
-              asset={sourceAssetProp}
-              disabled={lockedWallet}
-              maxInfoText={intl.formatMessage({ id: 'swap.info.max.fee' })}
-            />
+              {renderIsApprovedError}
+              <Styled.SubmitContainer>
+                {!isLocked(keystore) ? (
+                  isApproved ? (
+                    <>
+                      <Styled.SubmitButton
+                        color="success"
+                        sizevalue="xnormal"
+                        onClick={onSubmit}
+                        disabled={disableSubmit}>
+                        {intl.formatMessage({ id: 'common.swap' })}
+                      </Styled.SubmitButton>
+                      {!RD.isInitial(uiFees) && <Fees fees={uiFees} reloadFees={reloadFeesHandler} />}
+                      {sourceChainFeeErrorLabel}
+                    </>
+                  ) : (
+                    <>
+                      {renderApproveFeeError}
+                      {renderApproveError}
+                      <Styled.SubmitButton
+                        sizevalue="xnormal"
+                        color="warning"
+                        disabled={disableSubmitApprove}
+                        onClick={onApprove}
+                        loading={RD.isPending(approveState)}>
+                        {intl.formatMessage({ id: 'common.approve' })}
+                      </Styled.SubmitButton>
 
-            {FP.pipe(
-              oSourceAsset,
-              O.fold(
-                () => <></>,
-                (asset) => (
-                  <Styled.AssetSelectContainer>
-                    <Styled.AssetSelect
-                      onSelect={setSourceAsset}
-                      asset={asset}
-                      assets={selectAbleSourceAssets}
-                      network={network}
-                    />
-
-                    <Styled.CheckButton
-                      checked={useSourceAssetLedger}
-                      clickHandler={onClickUseSourceAssetLedger}
-                      disabled={!hasSourceAssetLedger}>
-                      {intl.formatMessage({ id: 'ledger.title' })}
-                    </Styled.CheckButton>
-                  </Styled.AssetSelectContainer>
-                )
-              )
-            )}
-          </Styled.ValueItemContainer>
-          {minAmountLabel}
-
-          <Styled.ValueItemContainer className="valueItemContainer-percent">
-            <Styled.SliderContainer>{renderSlider}</Styled.SliderContainer>
-            <Styled.SwapOutlined onClick={onSwitchAssets} />
-          </Styled.ValueItemContainer>
-          <Styled.ValueItemContainer className="valueItemContainer-in">
-            <Styled.InValueContainer>
-              <Styled.ValueTitle>{intl.formatMessage({ id: 'swap.output' })}</Styled.ValueTitle>
-              <Styled.InValueLabel>{swapResultLabel}</Styled.InValueLabel>
-            </Styled.InValueContainer>
-            {FP.pipe(
-              oTargetAsset,
-              O.fold(
-                () => <></>,
-                (asset) => (
-                  <Styled.AssetSelectContainer>
-                    <Styled.TargetAssetSelect
-                      onSelect={setTargetAsset}
-                      asset={asset}
-                      assets={selectAbleTargetAssets}
-                      network={network}
-                    />
-                    <Styled.CheckButton
-                      checked={useTargetAssetLedger}
-                      clickHandler={onClickUseTargetAssetLedger}
-                      disabled={!hasTargetAssetLedger}>
-                      {intl.formatMessage({ id: 'ledger.title' })}
-                    </Styled.CheckButton>
-                  </Styled.AssetSelectContainer>
-                )
-              )
-            )}
-          </Styled.ValueItemContainer>
-          {!lockedWallet && (
-            <Styled.TargetAddressContainer>
-              <Row>
-                <Styled.ValueTitle>{intl.formatMessage({ id: 'common.recipient' })}</Styled.ValueTitle>
-                {renderTargetWalletType}
-              </Row>
-              {renderCustomAddressInput}
-            </Styled.TargetAddressContainer>
-          )}
-        </Styled.FormContainer>
-      </Styled.ContentContainer>
-
-      {(walletBalancesLoading || checkIsApproved) && (
-        <LoadingView
-          label={
-            // We show only one loading state at time
-            // Order matters: Show states with shortest loading time before others
-            // (approve state takes just a short time to load, but needs to be displayed)
-            checkIsApproved
-              ? intl.formatMessage({ id: 'common.approve.checking' }, { asset: sourceAssetProp.ticker })
-              : walletBalancesLoading
-              ? intl.formatMessage({ id: 'common.balance.loading' })
-              : undefined
-          }
-        />
-      )}
-      {renderIsApprovedError}
-      <Styled.SubmitContainer>
-        {!isLocked(keystore) ? (
-          isApproved ? (
-            <>
-              <Styled.SubmitButton color="success" sizevalue="xnormal" onClick={onSubmit} disabled={disableSubmit}>
-                {intl.formatMessage({ id: 'common.swap' })}
-              </Styled.SubmitButton>
-              {!RD.isInitial(uiFees) && <Fees fees={uiFees} reloadFees={reloadFeesHandler} />}
-              {sourceChainFeeErrorLabel}
-            </>
-          ) : (
-            <>
-              {renderApproveFeeError}
-              {renderApproveError}
-              <Styled.SubmitButton
-                sizevalue="xnormal"
-                color="warning"
-                disabled={disableSubmitApprove}
-                onClick={onApprove}
-                loading={RD.isPending(approveState)}>
-                {intl.formatMessage({ id: 'common.approve' })}
-              </Styled.SubmitButton>
-
-              {!RD.isInitial(uiApproveFeesRD) && <Fees fees={uiApproveFeesRD} reloadFees={reloadApproveFeesHandler} />}
-            </>
+                      {!RD.isInitial(uiApproveFeesRD) && (
+                        <Fees fees={uiApproveFeesRD} reloadFees={reloadApproveFeesHandler} />
+                      )}
+                    </>
+                  )
+                ) : (
+                  <>
+                    <Styled.NoteLabel align="center">
+                      {!hasImportedKeystore(keystore)
+                        ? intl.formatMessage({ id: 'swap.note.nowallet' })
+                        : isLocked(keystore) && intl.formatMessage({ id: 'swap.note.lockedWallet' })}
+                    </Styled.NoteLabel>
+                    <Styled.SubmitButton sizevalue="xnormal" color="success" onClick={importWalletHandler}>
+                      {!hasImportedKeystore(keystore)
+                        ? intl.formatMessage({ id: 'wallet.imports.label' })
+                        : isLocked(keystore) && intl.formatMessage({ id: 'wallet.unlock.label' })}
+                    </Styled.SubmitButton>
+                  </>
+                )}
+              </Styled.SubmitContainer>
+              {showPasswordModal && (
+                <WalletPasswordConfirmationModal
+                  onSuccess={onSucceedPasswordModal}
+                  onClose={onClosePasswordModal}
+                  validatePassword$={validatePassword$}
+                />
+              )}
+              {renderLedgerConfirmationModal}
+              {renderTxModal}
+            </Styled.Container>
           )
-        ) : (
-          <>
-            <Styled.NoteLabel align="center">
-              {!hasImportedKeystore(keystore)
-                ? intl.formatMessage({ id: 'swap.note.nowallet' })
-                : isLocked(keystore) && intl.formatMessage({ id: 'swap.note.lockedWallet' })}
-            </Styled.NoteLabel>
-            <Styled.SubmitButton sizevalue="xnormal" color="success" onClick={importWalletHandler}>
-              {!hasImportedKeystore(keystore)
-                ? intl.formatMessage({ id: 'wallet.imports.label' })
-                : isLocked(keystore) && intl.formatMessage({ id: 'wallet.unlock.label' })}
-            </Styled.SubmitButton>
-          </>
-        )}
-      </Styled.SubmitContainer>
-      {showPasswordModal && (
-        <WalletPasswordConfirmationModal
-          onSuccess={onSucceedPasswordModal}
-          onClose={onClosePasswordModal}
-          validatePassword$={validatePassword$}
-        />
-      )}
-      {renderLedgerConfirmationModal}
-      {renderTxModal}
-    </Styled.Container>
+        }
+      ]}
+    />
   )
 }

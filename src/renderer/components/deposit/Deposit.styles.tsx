@@ -3,7 +3,7 @@ import styled from 'styled-components'
 import { palette } from 'styled-theme'
 
 import { media } from '../../helpers/styleHelper'
-import { Tabs as TabsBase } from '../tabs/Tabs'
+import { Tabs as TabsUI } from '../tabs/Tabs'
 import { Button } from '../uielements/button'
 
 export const Container = styled('div')`
@@ -42,7 +42,7 @@ export const ShareContentWrapper = styled.div<{ alignTop: boolean }>`
   `};
 `
 
-export const DepositContentCol = styled(Col).attrs({})`
+export const DepositContentCol = styled(Col)`
   background: ${palette('background', 0)};
   min-height: auto;
   ${media.xl`
@@ -50,9 +50,13 @@ export const DepositContentCol = styled(Col).attrs({})`
   `};
 `
 
-export const Tabs = styled(TabsBase)`
+export const Tabs = styled(TabsUI)`
+  padding-top: 0;
   .ant-tabs {
     &-nav {
+      &:before {
+        border-bottom: 1px solid ${palette('gray', 1)};
+      }
       padding: 0 10px;
       ${media.sm`
         padding: 0 50px;
