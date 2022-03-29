@@ -7,7 +7,7 @@
 
 ## Update
 
-- Add more slippage options [#2170](https://github.com/thorchain/asgardex-electron/pull/2170) by @WojciechKo
+- Add more slippage options [#2170](https://github.com/thorchain/asgardex-electron/pull/2170) by @WojciechKo, [#2170](https://github.com/thorchain/asgardex-electron/pull/2170), [#2179](https://github.com/thorchain/asgardex-electron/pull/2179)
 
 ## Fix
 

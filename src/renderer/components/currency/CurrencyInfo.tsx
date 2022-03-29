@@ -26,7 +26,7 @@ type CurrencyInfoProps = {
   disableSlippageMsg: string
 }
 
-export const SLIP_PERCENTAGES: SlipTolerance[] = [3, 5, 10]
+export const SLIP_PERCENTAGES: SlipTolerance[] = [0.5, 1, 3, 5, 10]
 export const SLIP_TOLERANCE_KEY = 'asgdx-slip-tolerance'
 
 export const CurrencyInfo = ({
@@ -56,14 +56,17 @@ export const CurrencyInfo = ({
       <>
         {SLIP_PERCENTAGES.map((slip) => (
           <Row style={{ alignItems: 'center' }} key={slip}>
-            <Styled.SlipLabel key={slip} onClick={() => changeSlipToleranceHandler(slip)}>
+            <Styled.SlipLabel
+              key={slip}
+              active={slip === slipTolerance}
+              onClick={() => changeSlipToleranceHandler(slip)}>
               {slip}%
             </Styled.SlipLabel>
           </Row>
         ))}
       </>
     )
-  }, [changeSlipToleranceHandler])
+  }, [changeSlipToleranceHandler, slipTolerance])
 
   const renderSlipSettings = useMemo(
     () => (
@@ -74,7 +77,7 @@ export const CurrencyInfo = ({
         trigger={['click']}
         placement="bottomCenter">
         <Styled.DropdownContentWrapper style={{ alignItems: 'center', width: '50px' }}>
-          <Styled.SlipLabel>{slipTolerance}%</Styled.SlipLabel>
+          <Styled.SlipLabel active>{slipTolerance}%</Styled.SlipLabel>
           <DownIcon />
         </Styled.DropdownContentWrapper>
       </Dropdown>
