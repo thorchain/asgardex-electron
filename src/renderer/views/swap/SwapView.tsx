@@ -203,8 +203,8 @@ export const SwapView: React.FC<Props> = (_): JSX.Element => {
       localStorage.getItem(SLIP_TOLERANCE_KEY),
       O.fromNullable,
       O.map((s) => {
-        const itemAsInt = parseInt(s)
-        const slipTolerance = isSlipTolerance(itemAsInt) ? itemAsInt : DEFAULT_SLIP_TOLERANCE
+        const itemAsNumber = Number(s)
+        const slipTolerance = isSlipTolerance(itemAsNumber) ? itemAsNumber : DEFAULT_SLIP_TOLERANCE
         changeSlipTolerance(slipTolerance)
         return slipTolerance
       }),

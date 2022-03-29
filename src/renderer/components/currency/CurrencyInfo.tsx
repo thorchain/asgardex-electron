@@ -76,7 +76,7 @@ export const CurrencyInfo = ({
         overlay={slipSettings}
         trigger={['click']}
         placement="bottomCenter">
-        <Styled.DropdownContentWrapper style={{ alignItems: 'center', width: '50px' }}>
+        <Styled.DropdownContentWrapper style={{ alignItems: 'center', width: '55px' }}>
           <Styled.SlipLabel active>{slipTolerance}%</Styled.SlipLabel>
           <DownIcon />
         </Styled.DropdownContentWrapper>
