@@ -101,7 +101,7 @@ export const ShareView: React.FC<Props> = ({
         RD.combine(poolShareRD, poolDetailRD),
         RD.fold(
           () => renderNoShare,
-          () => <Spin />,
+          () => <Spin size="large" />,
           () => renderNoShare,
           ([oPoolShare, pool]) =>
             FP.pipe(

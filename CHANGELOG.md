@@ -8,6 +8,7 @@
 ## Update
 
 - Add more slippage options [#2170](https://github.com/thorchain/asgardex-electron/pull/2170) by @WojciechKo, [#2170](https://github.com/thorchain/asgardex-electron/pull/2170), [#2180](https://github.com/thorchain/asgardex-electron/pull/2180)
+- Tweak layout of `Swap` / `Deposit` [#2181](https://github.com/thorchain/asgardex-electron/pull/2181)
 
 ## Fix
 

@@ -3,6 +3,7 @@ import styled from 'styled-components'
 import { palette } from 'styled-theme'
 
 import { media } from '../../helpers/styleHelper'
+import { Tabs as TabsUI } from '../tabs/Tabs'
 import { AssetInput as AssetInputBase } from '../uielements/assets/assetInput'
 import { AssetSelect as AssetSelectUI } from '../uielements/assets/assetSelect'
 import { Button as UIButton } from '../uielements/button'
@@ -30,33 +31,33 @@ export const AddressCustomRecipient = styled('div')`
   }
 `
 
+export const Tabs = styled(TabsUI)`
+  padding-top: 0;
+  height: 100%;
+  width: 100%;
+  .ant-tabs {
+    &-nav {
+      &:before {
+        border-bottom: 1px solid ${palette('gray', 1)};
+      }
+      padding: 0 10px;
+      ${media.sm`
+        padding: 0 50px;
+    `}
+    }
+  }
+`
+
 export const Container = styled('div')`
   display: flex;
   flex-direction: column;
   justify-content: space-between;
   position: relative;
   max-width: 538px;
-  height: 100%;
   width: 100%;
   margin: auto;
   color: ${palette('text', 0)};
   text-transform: uppercase;
-  padding: 60px 0;
-`
-
-export const Header = styled('div')`
-  text-align: center;
-  background: ${palette('gradient', 0)};
-  padding: 16px;
-  width: 100%;
-  margin-bottom: 30px;
-  font-size: 18px;
-  font-weight: 600;
-  color: ${palette('text', 3)};
-
-  ${media.md`
-    margin-bottom: 50px;
-  `}
 `
 
 export const SwapOutlined = styled(ASwapOutlined).attrs({ rotate: 90 })`
@@ -103,7 +104,6 @@ export const ValueItemContainer = styled('div')`
 
   &.valueItemContainer {
     &-out {
-      margin-bottom: 10px;
       align-items: center;
     }
 
@@ -132,11 +132,13 @@ export const SliderContainer = styled('div')`
   min-width: 212px;
 `
 
-export const InValueContainer = styled('div')`
+export const InValueContainer = styled.div`
   display: flex;
   flex-direction: column;
-  height: 100px;
+  padding: 10px 5px 5px 10px;
+  margin-bottom: 20px;
   width: 100%;
+  border: 1px solid ${palette('gray', 0)};
 
   ${media.md`
     width: auto;
@@ -162,6 +164,7 @@ export const InValueLabel = styled(UILabel).attrs({
   color: 'normal'
 })`
   padding-bottom: 0;
+  padding-left: 10px;
   font-size: 24px;
 `
 

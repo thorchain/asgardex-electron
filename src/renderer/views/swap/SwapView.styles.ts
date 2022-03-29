@@ -19,6 +19,6 @@ export const ContentContainer = styled('div')`
   flex: 1;
   display: flex;
   justify-content: center;
-  align-items: center;
+  align-items: center; /*  needed to center Spin horizontally */
   background-color: ${palette('background', 0)};
 `
