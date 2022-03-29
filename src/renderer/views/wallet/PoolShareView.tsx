@@ -117,7 +117,7 @@ export const PoolShareView: React.FC = (): JSX.Element => {
     const oMainnet = O.fromPredicate<Network>(() => network === 'mainnet')(network)
     return FP.pipe(
       sequenceTOption(oRuneNativeAddress, oMainnet),
-      O.map(([thorAddress, _]) => `https://app.thoryield.com/dashboard?thor=${thorAddress}`),
+      O.map(([thorAddress, _]) => `https://app.thoryield.com/accounts?thor=${thorAddress}`),
       O.map(window.apiUrl.openExternal)
     )
   }, [network, oRuneNativeAddress])
