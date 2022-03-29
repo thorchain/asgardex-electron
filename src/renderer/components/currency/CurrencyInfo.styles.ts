@@ -1,5 +1,5 @@
 import { Row } from 'antd'
-import Text from 'antd/lib/typography/Text'
+import Text, { TextProps } from 'antd/lib/typography/Text'
 import styled from 'styled-components'
 import { palette } from 'styled-theme'
 
@@ -41,15 +41,15 @@ export const DropdownContentWrapper = styled(Row)`
   cursor: pointer;
 `
 
-export const SlipLabel = styled(Text)`
+export const SlipLabel = styled(Text)<TextProps & { active: boolean }>`
   text-transform: uppercase;
   padding: 0;
   font-size: 16px;
   font-family: 'MainFontRegular';
   cursor: pointer;
-  color: ${palette('gray', 2)};
+  color: ${({ active }) => (active ? palette('gray', 2) : palette('gray', 1))};
   &:hover {
-    color: ${palette('text', 0)};
+    color: ${palette('gray', 2)};
   }
 `
 
