@@ -11,7 +11,7 @@ const pools: PoolsMessages = {
   'pools.pending': 'Pending',
   'pools.available': 'Available',
   'pools.pooled': 'pooled',
-  'pools.limit.info': 'Hit protocol limit! {pooled} pooled in pools, {bonded} bonded in nodes',
+  'pools.limit.info': 'Protocol limit reached! {pooled} pooled in pools, {bonded} bonded in nodes',
   'pools.incentivependulum.info': 'Incentive Pendulum: {percentage}%',
   'pools.incentivependulum.tooltip': '{pooled} pooled in pools, {bonded} bonded in nodes',
   'pools.incentivependulum.error': 'Error while loading data of Incentive Pendulum'
