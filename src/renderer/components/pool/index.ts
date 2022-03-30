@@ -1,2 +1,3 @@
 export { PoolDetails } from './PoolDetails'
-export { FundsCap } from './FundsCap'
+export { ProtocolLimit } from './ProtocolLimit'
+export { IncentivePendulum } from './IncentivePendulum'

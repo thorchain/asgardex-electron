@@ -70,4 +70,6 @@ export const BlockLeftLabel = styled(UILabel)`
 export const Label = styled(UILabel)`
   font-size: 16px;
 `
-export const AssetsFilter = styled(AssetsFilterUI)``
+export const AssetsFilter = styled(AssetsFilterUI)`
+  margin-bottom: 20px;
+`

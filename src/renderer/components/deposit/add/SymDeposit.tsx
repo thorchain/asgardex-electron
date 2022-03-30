@@ -42,7 +42,6 @@ import { sequenceSOption, sequenceTOption } from '../../../helpers/fpHelpers'
 import * as PoolHelpers from '../../../helpers/poolHelper'
 import { liveData, LiveData } from '../../../helpers/rx/liveData'
 import * as WalletHelper from '../../../helpers/walletHelper'
-import { FundsCap } from '../../../hooks/useFundsCap'
 import { useSubscriptionState } from '../../../hooks/useSubscriptionState'
 import { INITIAL_SYM_DEPOSIT_STATE } from '../../../services/chain/const'
 import { getZeroSymDepositFees } from '../../../services/chain/fees'
@@ -124,7 +123,7 @@ export type Props = {
   network: Network
   approveERC20Token$: (params: ApproveParams) => TxHashLD
   isApprovedERC20Token$: (params: IsApproveParams) => LiveData<ApiError, boolean>
-  fundsCap: O.Option<FundsCap>
+  protocolLimitReached: boolean
   poolsData: PoolsDataMap
   haltedChains: Chain[]
   mimirHalt: MimirHalt
@@ -169,7 +168,7 @@ export const SymDeposit: React.FC<Props> = (props) => {
     approveERC20Token$,
     reloadApproveFee,
     approveFee$,
-    fundsCap: oFundsCap,
+    protocolLimitReached,
     poolsData,
     haltedChains,
     mimirHalt,
@@ -990,16 +989,6 @@ export const SymDeposit: React.FC<Props> = (props) => {
     setShowPasswordModal(true)
   }, [])
 
-  const fundsCapReached = useMemo(
-    () =>
-      FP.pipe(
-        oFundsCap,
-        O.map(({ reached }) => reached),
-        O.getOrElse(() => false)
-      ),
-    [oFundsCap]
-  )
-
   const inputOnBlur = useCallback(() => {
     setSelectedInput('none')
     reloadFeesHandler()
@@ -1388,7 +1377,7 @@ export const SymDeposit: React.FC<Props> = (props) => {
     () =>
       disableDepositAction ||
       isBalanceError ||
-      fundsCapReached ||
+      protocolLimitReached ||
       disabled ||
       assetBalance.amount().isZero() ||
       runeBalance.amount().isZero() ||
@@ -1398,7 +1387,7 @@ export const SymDeposit: React.FC<Props> = (props) => {
     [
       disableDepositAction,
       isBalanceError,
-      fundsCapReached,
+      protocolLimitReached,
       disabled,
       assetBalance,
       runeBalance,

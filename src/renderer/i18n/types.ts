@@ -128,9 +128,10 @@ type PoolsMessageKey =
   | 'pools.pending'
   | 'pools.available'
   | 'pools.pooled'
-  | 'pools.fundscap.reached'
-  | 'pools.fundscap.no'
-  | 'pools.fundscap.error'
+  | 'pools.limit.info'
+  | 'pools.incentivependulum.info'
+  | 'pools.incentivependulum.tooltip'
+  | 'pools.incentivependulum.error'
 
 export type PoolsMessages = { [key in PoolsMessageKey]: string }
 

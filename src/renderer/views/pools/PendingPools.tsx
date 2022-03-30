@@ -15,15 +15,16 @@ import * as RxOp from 'rxjs/operators'
 
 import { Network } from '../../../shared/api/types'
 import { ManageButton } from '../../components/manageButton'
-import { FundsCap } from '../../components/pool'
+import { ProtocolLimit, IncentivePendulum } from '../../components/pool'
 import { Table } from '../../components/uielements/table'
 import { useAppContext } from '../../contexts/AppContext'
 import { useMidgardContext } from '../../contexts/MidgardContext'
 import * as PoolHelpers from '../../helpers/poolHelper'
 import { getPoolTableRowsData, RUNE_PRICE_POOL } from '../../helpers/poolHelper'
-import { useFundsCap } from '../../hooks/useFundsCap'
+import { useIncentivePendulum } from '../../hooks/useIncentivePendulum'
 import useInterval, { INACTIVE_INTERVAL } from '../../hooks/useInterval'
 import { usePoolCycle } from '../../hooks/usePoolCycle'
+import { useProtocolLimit } from '../../hooks/useProtocolLimit'
 import * as poolsRoutes from '../../routes/pools'
 import { DEFAULT_NETWORK } from '../../services/const'
 import { PendingPoolsState, PoolFilter, ThorchainLastblockRD } from '../../services/midgard/types'
@@ -55,7 +56,8 @@ export const PendingPools: React.FC<PoolsComponentProps> = ({ haltedChains, mimi
   const poolsRD = useObservableState(pendingPoolsState$, RD.pending)
   const thorchainLastblockRD: ThorchainLastblockRD = useObservableState(thorchainLastblockState$, RD.pending)
 
-  const { reload: reloadFundsCap, data: fundsCapRD } = useFundsCap()
+  const { reload: reloadLimit, data: limitRD } = useProtocolLimit()
+  const { data: incentivePendulumRD } = useIncentivePendulum()
 
   const isDesktopView = Grid.useBreakpoint()?.lg ?? false
 
@@ -68,9 +70,9 @@ export const PendingPools: React.FC<PoolsComponentProps> = ({ haltedChains, mimi
 
   const refreshHandler = useCallback(() => {
     reloadPendingPools()
-    reloadFundsCap()
+    reloadLimit()
     reloadPoolCycle()
-  }, [reloadFundsCap, reloadPendingPools, reloadPoolCycle])
+  }, [reloadLimit, reloadPendingPools, reloadPoolCycle])
 
   const pendingCountdownHandler = useCallback(() => {
     reloadThorchainLastblock()
@@ -184,7 +186,8 @@ export const PendingPools: React.FC<PoolsComponentProps> = ({ haltedChains, mimi
               A.map(({ pool }) => pool.target)
             )}
           />
-          <FundsCap fundsCap={fundsCapRD} />
+          <ProtocolLimit limit={limitRD} />
+          <IncentivePendulum incentivePendulum={incentivePendulumRD} />
           <Table
             columns={columns}
             dataSource={FP.pipe(tableData, filterTableData(poolFilter))}
@@ -201,7 +204,16 @@ export const PendingPools: React.FC<PoolsComponentProps> = ({ haltedChains, mimi
         </>
       )
     },
-    [isDesktopView, desktopPoolsColumns, mobilePoolsColumns, setFilter, poolFilter, fundsCapRD, history]
+    [
+      isDesktopView,
+      desktopPoolsColumns,
+      mobilePoolsColumns,
+      setFilter,
+      poolFilter,
+      limitRD,
+      incentivePendulumRD,
+      history
+    ]
   )
 
   return (
