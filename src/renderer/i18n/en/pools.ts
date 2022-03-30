@@ -11,9 +11,10 @@ const pools: PoolsMessages = {
   'pools.pending': 'Pending',
   'pools.available': 'Available',
   'pools.pooled': 'pooled',
-  'pools.fundscap.reached': 'cap reached',
-  'pools.fundscap.no': 'No funds cap',
-  'pools.fundscap.error': 'Error to get funds cap'
+  'pools.limit.info': 'Protocol limit reached! {pooled} pooled in pools, {bonded} bonded in nodes',
+  'pools.incentivependulum.info': 'Incentive Pendulum: {percentage}%',
+  'pools.incentivependulum.tooltip': '{pooled} pooled in pools, {bonded} bonded in nodes',
+  'pools.incentivependulum.error': 'Error while loading data of Incentive Pendulum'
 }
 
 export default pools

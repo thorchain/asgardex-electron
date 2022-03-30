@@ -4,6 +4,8 @@
 
 - [Shares] Show asym shares in list [#2172](https://github.com/thorchain/asgardex-electron/issues/2172)
 - [Wallet] Show total balance [#2178](https://github.com/thorchain/asgardex-electron/pull/2178)
+- Manage / show protocol limit [#2173](https://github.com/thorchain/asgardex-electron/issues/2173)
+- Show Incentive Pendulum [#2184](https://github.com/thorchain/asgardex-electron/issues/2184)
 
 ## Update
 

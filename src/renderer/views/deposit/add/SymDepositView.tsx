@@ -20,10 +20,10 @@ import { useWalletContext } from '../../../contexts/WalletContext'
 import { sequenceTRD } from '../../../helpers/fpHelpers'
 import { getAssetPoolPrice } from '../../../helpers/poolHelper'
 import { liveData } from '../../../helpers/rx/liveData'
-import { FundsCap, useFundsCap } from '../../../hooks/useFundsCap'
 import { useLiquidityProviders } from '../../../hooks/useLiquidityProviders'
 import { useNetwork } from '../../../hooks/useNetwork'
 import { useOpenExplorerTxUrl } from '../../../hooks/useOpenExplorerTxUrl'
+import { useProtocolLimit } from '../../../hooks/useProtocolLimit'
 import { useSymDepositAddresses } from '../../../hooks/useSymDepositAddresses'
 import * as poolsRoutes from '../../../routes/pools'
 import { PoolAddress, PoolAssetsRD } from '../../../services/midgard/types'
@@ -89,7 +89,7 @@ export const SymDepositView: React.FC<Props> = (props) => {
     reloadBalancesByChain
   } = useWalletContext()
 
-  const { data: fundsCapRD } = useFundsCap()
+  const { data: protocolLimitRD } = useProtocolLimit()
 
   const { approveERC20Token$, isApprovedERC20Token$, approveFee$, reloadApproveFee } = useEthereumContext()
 
@@ -136,13 +136,14 @@ export const SymDepositView: React.FC<Props> = (props) => {
     O.some(THORChain)
   )
 
-  const fundsCap: O.Option<FundsCap> = useMemo(
+  const protocolLimitReached = useMemo(
     () =>
       FP.pipe(
-        fundsCapRD,
-        RD.getOrElse((): O.Option<FundsCap> => O.none)
+        protocolLimitRD,
+        RD.map(({ reached }) => reached && network !== 'testnet' /* ignore it on testnet */),
+        RD.getOrElse(() => false)
       ),
-    [fundsCapRD]
+    [network, protocolLimitRD]
   )
 
   const { symPendingAssets, hasAsymAssets, symAssetMismatch } = useLiquidityProviders({
@@ -197,7 +198,7 @@ export const SymDepositView: React.FC<Props> = (props) => {
           approveERC20Token$={approveERC20Token$}
           isApprovedERC20Token$={isApprovedERC20Token$}
           availableAssets={[]}
-          fundsCap={O.none}
+          protocolLimitReached={protocolLimitReached}
           poolsData={{}}
           symPendingAssets={RD.initial}
           openRecoveryTool={openRecoveryTool}
@@ -230,6 +231,7 @@ export const SymDepositView: React.FC<Props> = (props) => {
       network,
       approveERC20Token$,
       isApprovedERC20Token$,
+      protocolLimitReached,
       openRecoveryTool,
       openAsymDepositTool,
       setAssetWalletType,
@@ -277,7 +279,7 @@ export const SymDepositView: React.FC<Props> = (props) => {
               network={network}
               approveERC20Token$={approveERC20Token$}
               isApprovedERC20Token$={isApprovedERC20Token$}
-              fundsCap={fundsCap}
+              protocolLimitReached={protocolLimitReached}
               poolsData={poolsData}
               symPendingAssets={symPendingAssets}
               openRecoveryTool={openRecoveryTool}

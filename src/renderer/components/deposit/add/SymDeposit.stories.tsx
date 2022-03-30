@@ -118,7 +118,7 @@ const defaultProps: SymDepositProps = {
   network: 'testnet',
   approveERC20Token$: () => Rx.of(RD.success('txHash')),
   isApprovedERC20Token$: () => Rx.of(RD.success(true)),
-  fundsCap: O.none,
+  protocolLimitReached: false,
   poolsData: {
     [assetToString(AssetBNB)]: {
       assetBalance: baseAmount(30),

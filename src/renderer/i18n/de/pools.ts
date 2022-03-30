@@ -11,9 +11,10 @@ const pools: PoolsMessages = {
   'pools.pending': 'Bevorstehende',
   'pools.available': 'Verfügbare',
   'pools.pooled': 'angelegt',
-  'pools.fundscap.reached': 'Obergrenze erreicht',
-  'pools.fundscap.no': 'Keine Anlagebeschränkung',
-  'pools.fundscap.error': 'Error beim Laden der Anlagenbegrenzung'
+  'pools.limit.info': 'Protokoll Limit erreicht! {pooled} hinterlegt in Pools, {bonded} bonded in Nodes',
+  'pools.incentivependulum.info': 'Incentive Pendulum: {percentage}%',
+  'pools.incentivependulum.tooltip': '{pooled} in Pools, {bonded} in Nodes',
+  'pools.incentivependulum.error': "Error beim Laden der Daten des Incentive Pendulum's"
 }
 
 export default pools
