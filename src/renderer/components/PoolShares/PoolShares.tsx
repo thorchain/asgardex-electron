@@ -56,10 +56,11 @@ export const PoolShares: React.FC<Props> = ({
         return (
           <Row justify="center" align="middle">
             <Tooltip title={intl.formatMessage({ id: titleId }, { asset: asset.ticker, rune: AssetRuneNative.ticker })}>
-              <>
+              {/* div needed for tooltip */}
+              <div>
                 <Styled.AssetIcon asset={asset} size="normal" network={network} />
                 {type === 'asym' && <Styled.AssetIconLabel>{type}</Styled.AssetIconLabel>}
-              </>
+              </div>
             </Tooltip>
           </Row>
         )

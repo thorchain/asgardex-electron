@@ -9,15 +9,16 @@ import { isUSDAsset } from '../../../helpers/assetHelper'
 import { BaseAmountRD } from '../../../types'
 import { PricePool } from '../../../views/pools/Pools.types'
 import { Spin } from '../../shared/loading'
-import * as Styled from './AssetsTotalBalances.styles'
+import * as Styled from './TotalValue.styles'
 
 type Props = {
   pricePool: PricePool
   total: BaseAmountRD
+  title: string
 }
 
-export const AssetsTotalBalances: React.FC<Props> = (props): JSX.Element => {
-  const { pricePool, total: totalRD } = props
+export const TotalValue: React.FC<Props> = (props): JSX.Element => {
+  const { pricePool, total: totalRD, title } = props
 
   const intl = useIntl()
 
@@ -52,7 +53,7 @@ export const AssetsTotalBalances: React.FC<Props> = (props): JSX.Element => {
 
   return (
     <Styled.Container>
-      <Styled.BalanceTitle> {intl.formatMessage({ id: 'wallet.balance.total' })}</Styled.BalanceTitle>
+      <Styled.BalanceTitle>{title}</Styled.BalanceTitle>
       {renderTotal}
     </Styled.Container>
   )
