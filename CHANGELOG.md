@@ -1,4 +1,4 @@
-# 0.12.3 (2022-xx-xx)
+# 0.12.3 (2022-03-31)
 
 ## Add
 
@@ -10,12 +10,13 @@
 
 ## Update
 
-- Add more slippage options [#2170](https://github.com/thorchain/asgardex-electron/pull/2170) by @WojciechKo, [#2170](https://github.com/thorchain/asgardex-electron/pull/2170), [#2180](https://github.com/thorchain/asgardex-electron/pull/2180)
+- Add more slippage options [#2170](https://github.com/thorchain/asgardex-electron/pull/2170) by @WojciechKo, [#2180](https://github.com/thorchain/asgardex-electron/pull/2180)
 - Tweak layout of `Swap` / `Deposit` [#2181](https://github.com/thorchain/asgardex-electron/pull/2181)
 
 ## Fix
 
 - [Bonds] Removing a node from list breaks the app [#2176](https://github.com/thorchain/asgardex-electron/pull/2176)
+- Update default slip tolerance to 1% [#2175](https://github.com/thorchain/asgardex-electron/pull/2175)
 - URL to thoryield.com analytics is incorrect [#2182](https://github.com/thorchain/asgardex-electron/issues/2182)
 
 # 0.12.2 (2022-03-25)
