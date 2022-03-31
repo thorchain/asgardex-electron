@@ -17,6 +17,7 @@ const wallet: WalletMessages = {
   'wallet.action.connect': 'Подключить',
   'wallet.action.deposit': 'Вложить',
   'wallet.balance.total': 'Total balance - RU',
+  'wallet.shares.total': 'Total value - RU',
   'wallet.connect.instruction': 'Пожалуйста подключите ваш кошелек',
   'wallet.lock.label': 'Заблокировать кошелёк',
   'wallet.unlock.label': 'Разблокировать кошелёк',

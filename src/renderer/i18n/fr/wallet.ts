@@ -17,6 +17,7 @@ const wallet: WalletMessages = {
   'wallet.action.create': 'Créer',
   'wallet.action.deposit': 'Déposer',
   'wallet.balance.total': 'Total balance - FR',
+  'wallet.shares.total': 'Total value - FR',
   'wallet.connect.instruction': 'Veuillez connecter votre portefeuille',
   'wallet.lock.label': 'Verrouiller le portefeuille',
   'wallet.unlock.label': 'Déverrouiller le portefeuille',

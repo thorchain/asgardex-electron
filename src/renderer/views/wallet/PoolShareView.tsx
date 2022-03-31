@@ -17,6 +17,7 @@ import { PoolShares as PoolSharesTable } from '../../components/PoolShares'
 import { PoolShareTableRowData } from '../../components/PoolShares/PoolShares.types'
 import { ErrorView } from '../../components/shared/error'
 import { Button } from '../../components/uielements/button'
+import { TotalValue } from '../../components/wallet/assets'
 import { useChainContext } from '../../contexts/ChainContext'
 import { useMidgardContext } from '../../contexts/MidgardContext'
 import { useWalletContext } from '../../contexts/WalletContext'
@@ -29,7 +30,8 @@ import { useNetwork } from '../../hooks/useNetwork'
 import { WalletAddress$ } from '../../services/clients/types'
 import { ENABLED_CHAINS } from '../../services/const'
 import { PoolSharesRD } from '../../services/midgard/types'
-import { getPoolShareTableData } from './PoolShareView.helper'
+import { BaseAmountRD } from '../../types'
+import * as H from './PoolShareView.helper'
 
 export const PoolShareView: React.FC = (): JSX.Element => {
   const intl = useIntl()
@@ -38,12 +40,12 @@ export const PoolShareView: React.FC = (): JSX.Element => {
 
   const { service: midgardService } = useMidgardContext()
   const {
-    // TODO (@asgardex-team) Improve loading of pool details - no need to load all data
-    // @see https://github.com/thorchain/asgardex-electron/issues/1205
     pools: { allPoolDetails$, selectedPricePool$, selectedPricePoolAsset$, reloadAllPools, haltedChains$ },
     reloadNetworkInfo,
     shares: { allSharesByAddresses$ }
   } = midgardService
+
+  const selectedPricePool = useObservableState(selectedPricePool$, RUNE_PRICE_POOL)
 
   const { addressByChain$ } = useChainContext()
 
@@ -59,7 +61,7 @@ export const PoolShareView: React.FC = (): JSX.Element => {
     O.none
   )
 
-  const [symSharesRD]: [PoolSharesRD, unknown] = useObservableState(() => {
+  const [allSharesRD]: [PoolSharesRD, unknown] = useObservableState(() => {
     // keystore addresses
     const addresses$: WalletAddress$[] = FP.pipe(
       ENABLED_CHAINS,
@@ -155,10 +157,24 @@ export const PoolShareView: React.FC = (): JSX.Element => {
     [clickRefreshHandler, intl]
   )
 
-  return useMemo(
+  const renderSharesTotal = useMemo(() => {
+    const sharesTotalRD: BaseAmountRD = FP.pipe(
+      RD.combine(allSharesRD, poolDetailsRD),
+      RD.map(([poolShares, poolDetails]) => H.getSharesTotal(poolShares, poolDetails, pricePoolData))
+    )
+    return (
+      <TotalValue
+        total={sharesTotalRD}
+        pricePool={selectedPricePool}
+        title={intl.formatMessage({ id: 'wallet.shares.total' })}
+      />
+    )
+  }, [allSharesRD, intl, poolDetailsRD, pricePoolData, selectedPricePool])
+
+  const renderShares = useMemo(
     () =>
       FP.pipe(
-        RD.combine(symSharesRD, poolDetailsRD),
+        RD.combine(allSharesRD, poolDetailsRD),
         RD.fold(
           // initial state
           () => renderPoolSharesTable([], false),
@@ -177,12 +193,19 @@ export const PoolShareView: React.FC = (): JSX.Element => {
           },
           // success state
           ([poolShares, poolDetails]) => {
-            const data = getPoolShareTableData(poolShares, poolDetails, pricePoolData)
+            const data = H.getPoolShareTableData(poolShares, poolDetails, pricePoolData)
             previousPoolShares.current = O.some(data)
             return renderPoolSharesTable(data, false)
           }
         )
       ),
-    [symSharesRD, poolDetailsRD, renderPoolSharesTable, renderRefreshBtn, pricePoolData]
+    [allSharesRD, poolDetailsRD, renderPoolSharesTable, renderRefreshBtn, pricePoolData]
+  )
+
+  return (
+    <>
+      {renderSharesTotal}
+      {renderShares}
+    </>
   )
 }

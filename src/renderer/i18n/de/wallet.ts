@@ -17,6 +17,7 @@ const wallet: WalletMessages = {
   'wallet.action.connect': 'Verbinden',
   'wallet.action.deposit': 'Einzahlung',
   'wallet.balance.total': 'Gesamtguthaben',
+  'wallet.shares.total': 'Gesamtwert',
   'wallet.connect.instruction': 'Bitte verbinde Deine Wallet',
   'wallet.lock.label': 'Wallet sperren',
   'wallet.unlock.title': 'Entsperre Deine Wallet',

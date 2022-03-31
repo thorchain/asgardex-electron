@@ -1,6 +1,6 @@
 import { AssetDetails } from './AssetDetails'
 import { AssetsNav } from './AssetsNav'
 import { AssetsTableCollapsable } from './AssetsTableCollapsable'
-import { AssetsTotalBalances } from './AssetsTotalBalances'
+import { TotalValue } from './TotalValue'
 
-export { AssetDetails, AssetsNav, AssetsTableCollapsable, AssetsTotalBalances }
+export { AssetDetails, AssetsNav, AssetsTableCollapsable, TotalValue }

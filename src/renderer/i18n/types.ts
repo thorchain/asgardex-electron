@@ -152,6 +152,7 @@ type WalletMessageKey =
   | 'wallet.action.create'
   | 'wallet.action.deposit'
   | 'wallet.balance.total'
+  | 'wallet.shares.total'
   | 'wallet.connect.instruction'
   | 'wallet.unlock.instruction'
   | 'wallet.lock.label'
