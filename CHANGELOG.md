@@ -1,3 +1,11 @@
+# 0.13.0 (2022-xx-xx)
+
+## Fix
+
+- [History] Fix viewblock url parameters
+
+## Add
+
 # 0.12.3 (2022-03-31)
 
 ## Add
