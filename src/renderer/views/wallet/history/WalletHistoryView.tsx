@@ -112,8 +112,8 @@ export const WalletHistoryView: React.FC<Props> = ({ className, reloadHistory })
       oSelectedWalletAddress,
       O.map(({ address }) => {
         // add extra params for selected filter
-        const params = `txsType=${historyFilterToViewblockFilter(currentFilter)}`
-        openAddressUrl(address, params)
+        const searchParam = { param: 'txsType', value: historyFilterToViewblockFilter(currentFilter) }
+        openAddressUrl(address, [searchParam])
         return true
       })
     )
