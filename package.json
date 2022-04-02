@@ -58,7 +58,9 @@
     "bitcoin cash",
     "litecoin",
     "ethereum",
-    "binance chain"
+    "binance chain",
+    "doge",
+    "terra"
   ],
   "homepage": "https://thorchain.org",
   "dependencies": {
@@ -74,7 +76,7 @@
     "@ledgerhq/hw-transport-node-hid-singleton": "^6.24.1",
     "@openapitools/openapi-generator-cli": "^2.4.12",
     "@psf/bitcoincashjs-lib": "^4.0.2",
-    "@terra-money/terra.js": "^3.0.6",
+    "@terra-money/terra.js": "^3.0.9",
     "@thorchain/asgardex-midgard": "^1.1.0",
     "@thorchain/asgardex-theme": "^0.1.1",
     "@thorchain/asgardex-util": "^0.10.0",
@@ -89,7 +91,7 @@
     "@xchainjs/xchain-doge": "^0.2.0",
     "@xchainjs/xchain-ethereum": "^0.23.3",
     "@xchainjs/xchain-litecoin": "^0.8.0",
-    "@xchainjs/xchain-terra": "^0.1.0-alpha.2",
+    "@xchainjs/xchain-terra": "^0.1.0-alpha.4",
     "@xchainjs/xchain-thorchain": "0.24.0",
     "@xchainjs/xchain-util": "^0.6.0",
     "antd": "^4.16.13",
