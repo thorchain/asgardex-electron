@@ -29,10 +29,10 @@ const clientState$: ClientState$ = FP.pipe(
         Rx.from(getTerraChains()),
         // merge chain ids into default config
         RxOp.switchMap((chainIds) => Rx.of(mergeChainIds(chainIds, getDefaultClientConfig()))),
-        // In case of failure, still return default config - no error then
-        RxOp.catchError((_: Error) =>
-          // Rx.of(RD.failure<Error>(new Error(`Failed to get chain id for Terra (${error?.msg ?? error.toString()})`)))
-          Rx.of(getDefaultClientConfig())
+        RxOp.catchError((error: Error) =>
+          Rx.of(
+            RD.failure<Error>(new Error(`Failed to get chain id for Terra (${error?.message ?? error.toString()})`))
+          )
         ),
         // use default values if
         RxOp.switchMap((config) =>
