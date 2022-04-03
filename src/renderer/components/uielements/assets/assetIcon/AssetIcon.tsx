@@ -14,6 +14,8 @@ import {
   isBnbAssetSynth,
   isBtcAsset,
   isDogeAsset,
+  isLunaAsset,
+  isUstAsset,
   isEthAsset,
   isLtcAsset,
   isRuneBnbAsset,
@@ -24,7 +26,18 @@ import {
 import { isBnbChain, isEthChain } from '../../../../helpers/chainHelper'
 import { getIntFromName, rainbowStop } from '../../../../helpers/colorHelpers'
 import { useRemoteImage } from '../../../../hooks/useRemoteImage'
-import { bnbIcon, btcIcon, dogeIcon, ethIcon, runeIcon, bnbRuneIcon, xRuneIcon, tgtIcon } from '../../../icons'
+import {
+  bnbIcon,
+  btcIcon,
+  dogeIcon,
+  ethIcon,
+  runeIcon,
+  bnbRuneIcon,
+  xRuneIcon,
+  tgtIcon,
+  lunaIcon,
+  ustIcon
+} from '../../../icons'
 import * as Styled from './AssetIcon.styles'
 import { Size } from './AssetIcon.types'
 
@@ -80,6 +93,16 @@ export const AssetIcon: React.FC<Props> = ({ asset, size = 'normal', className =
     // DOGE
     if (isDogeAsset(asset)) {
       return dogeIcon
+    }
+
+    // LUNA
+    if (isLunaAsset(asset)) {
+      return lunaIcon
+    }
+
+    // UST
+    if (isUstAsset(asset)) {
+      return ustIcon
     }
 
     if (network !== 'testnet') {

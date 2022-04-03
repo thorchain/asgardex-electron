@@ -91,7 +91,7 @@
     "@xchainjs/xchain-doge": "^0.2.0",
     "@xchainjs/xchain-ethereum": "^0.23.3",
     "@xchainjs/xchain-litecoin": "^0.8.0",
-    "@xchainjs/xchain-terra": "^0.1.0-alpha.4",
+    "@xchainjs/xchain-terra": "^0.1.0-alpha.5",
     "@xchainjs/xchain-thorchain": "0.24.0",
     "@xchainjs/xchain-util": "^0.6.0",
     "antd": "^4.16.13",

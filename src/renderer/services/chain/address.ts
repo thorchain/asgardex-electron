@@ -53,7 +53,7 @@ const addressByChain$ = (chain: Chain): WalletAddress$ => {
     case DOGEChain:
       return DOGE.address$
     case TerraChain:
-      // not supported yet
+      // TODO (@veado) Implement Terra
       return Rx.of(O.none)
   }
 }

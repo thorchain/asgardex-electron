@@ -6,6 +6,7 @@ import {
   AssetBTC,
   AssetETH,
   AssetLTC,
+  AssetLUNA,
   AssetRune67C,
   AssetRuneB1A,
   AssetRuneERC20,
@@ -24,6 +25,7 @@ import {
   AssetUniHAddress,
   AssetUSDTERC20,
   AssetUSDTERC20Testnet,
+  AssetUST,
   AssetXRune,
   AssetXRuneAddress,
   AssetXRuneTestnet
@@ -55,7 +57,9 @@ import {
   addressInERC20Whitelist,
   validAssetForETH,
   iconUrlInERC20Whitelist,
-  isRuneAsset
+  isRuneAsset,
+  isLunaAsset,
+  isUstAsset
 } from './assetHelper'
 import { eqAsset, eqAssetAmount, eqBaseAmount } from './fp/eq'
 
@@ -303,19 +307,25 @@ describe('helpers/assetHelper', () => {
       expect(isPricePoolAsset(AssetBNB)).toBeFalsy()
     })
     it('returns false for deprecated asset ', () => {
-      expect(isPricePoolAsset({ chain: BNBChain, symbol: 'RUNE-1AF', ticker: 'RUNE' })).toBeFalsy()
+      expect(isPricePoolAsset({ chain: BNBChain, symbol: 'RUNE-1AF', ticker: 'RUNE', synth: false })).toBeFalsy()
     })
   })
 
   describe('isChainAsset', () => {
-    it('returns false for BNB', () => {
+    it('BNB', () => {
       expect(isChainAsset(AssetBNB)).toBeTruthy()
     })
-    it('returns true for RUNE Native ', () => {
+    it('BUSDB', () => {
+      expect(isChainAsset(AssetBUSDBAF)).toBeFalsy()
+    })
+    it('RUNE Native ', () => {
       expect(isChainAsset(AssetRuneNative)).toBeTruthy()
     })
-    it('returns false for BUSDB', () => {
-      expect(isChainAsset(AssetBUSDBAF)).toBeFalsy()
+    it('LUNA', () => {
+      expect(isChainAsset(AssetLUNA)).toBeTruthy()
+    })
+    it('UST', () => {
+      expect(isChainAsset(AssetUST)).toBeFalsy()
     })
   })
 
@@ -328,6 +338,24 @@ describe('helpers/assetHelper', () => {
     })
     it('returns false for RUNE Native', () => {
       expect(isUSDAsset(AssetRuneNative)).toBeFalsy()
+    })
+  })
+
+  describe('isLunaAsset', () => {
+    it('AssetLUNA -> true', () => {
+      expect(isLunaAsset(AssetLUNA)).toBeTruthy()
+    })
+    it('AssetUST -> false', () => {
+      expect(isLunaAsset(AssetUST)).toBeTruthy()
+    })
+  })
+
+  describe('isUstAsset', () => {
+    it('AssetUST -> true', () => {
+      expect(isUstAsset(AssetUST)).toBeTruthy()
+    })
+    it('AssetLUNA -> false', () => {
+      expect(isUstAsset(AssetLUNA)).toBeTruthy()
     })
   })
 

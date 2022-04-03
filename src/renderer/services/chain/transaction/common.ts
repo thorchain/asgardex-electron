@@ -79,8 +79,8 @@ export const sendTx$ = ({
       return txFailure$(`sendTx$ has not been implemented for Polkadot yet`)
 
     case TerraChain:
-      // not available yet
-      return txFailure$(`sendTx$ has not been implemented for Luna/Terra yet`)
+      // TODO (@veado) Implement Terra
+      return txFailure$(`sendTx$ has not been implemented for Terra`)
 
     case DOGEChain:
       return FP.pipe(
@@ -175,7 +175,8 @@ export const txStatusByChain$ = ({ txHash, chain }: { txHash: TxHash; chain: Cha
     case PolkadotChain:
       return txStatusFailure$(`txStatusByChain$ has not been implemented for Polkadot`)
     case TerraChain:
-      return txStatusFailure$(`txStatusByChain$ has not been implemented for Luna`)
+      // TODO (@veado) Implement Terra
+      return txStatusFailure$(`txStatusByChain$ has not been implemented for Terra`)
     case DOGEChain:
       return DOGE.txStatus$(txHash, O.none)
     case BCHChain:
