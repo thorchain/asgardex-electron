@@ -346,7 +346,7 @@ describe('helpers/assetHelper', () => {
       expect(isLunaAsset(AssetLUNA)).toBeTruthy()
     })
     it('AssetUST -> false', () => {
-      expect(isLunaAsset(AssetUST)).toBeTruthy()
+      expect(isLunaAsset(AssetUST)).toBeFalsy()
     })
   })
 
@@ -355,7 +355,7 @@ describe('helpers/assetHelper', () => {
       expect(isUstAsset(AssetUST)).toBeTruthy()
     })
     it('AssetLUNA -> false', () => {
-      expect(isUstAsset(AssetLUNA)).toBeTruthy()
+      expect(isUstAsset(AssetLUNA)).toBeFalsy()
     })
   })
 
