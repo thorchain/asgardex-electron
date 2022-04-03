@@ -191,6 +191,14 @@ export const AssetUSDC: Asset = {
   synth: false
 }
 
+// TERRA.UST mainnet
+export const AssetUST: Asset = {
+  chain: TerraChain,
+  symbol: 'UST',
+  ticker: 'UST',
+  synth: false
+}
+
 export const DEFAULT_PRICE_ASSETS: PricePoolAssets = [AssetRuneNative, AssetETH, AssetBTC]
 
 export const USD_PRICE_ASSETS: PricePoolAssets = [
@@ -201,7 +209,8 @@ export const USD_PRICE_ASSETS: PricePoolAssets = [
   AssetUSDTDAC,
   AssetUSDT62E,
   AssetUSDTERC20Testnet,
-  AssetUSDC
+  AssetUSDC,
+  AssetUST
 ]
 
 // Weight of chains
@@ -231,9 +240,10 @@ export const CURRENCY_WEIGHTS: PricePoolCurrencyWeights = {
   [assetToString(AssetUSDT62E)]: 5,
   [assetToString(AssetUSDTERC20Testnet)]: 6,
   [assetToString(AssetUSDC)]: 7,
-  [assetToString(AssetETH)]: 8,
-  [assetToString(AssetBTC)]: 9,
-  [assetToString(AssetRuneNative)]: 10
+  [assetToString(AssetUST)]: 8,
+  [assetToString(AssetETH)]: 9,
+  [assetToString(AssetBTC)]: 10,
+  [assetToString(AssetRuneNative)]: 11
 }
 
 // Whitelist of pools for pricing things

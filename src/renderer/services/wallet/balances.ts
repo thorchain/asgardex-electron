@@ -94,8 +94,8 @@ export const createBalancesService = ({
         return FP.constVoid
       case PolkadotChain:
         return FP.constVoid
-      // TODO (@veado) Support Terra
       case TerraChain:
+        // TODO (@veado) Implement Terra
         return FP.constVoid
     }
   }

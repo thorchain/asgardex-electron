@@ -11,6 +11,7 @@ import {
   AssetETH,
   assetFromString,
   AssetLTC,
+  AssetLUNA,
   AssetRune67C,
   AssetRuneB1A,
   AssetRuneERC20,
@@ -30,6 +31,7 @@ import { Network } from '../../shared/api/types'
 import {
   AssetTGTERC20,
   AssetTGTERC20Testnet,
+  AssetUST,
   AssetXRune,
   AssetXRuneTestnet,
   BinanceBlackList,
@@ -120,6 +122,16 @@ export const isEthAsset = (asset: Asset): boolean => eqAsset.equals(asset, Asset
  * Check whether an asset is a DOGE asset
  */
 export const isDogeAsset = (asset: Asset): boolean => eqAsset.equals(asset, AssetDOGE)
+
+/**
+ * Check whether an asset is a LUNA asset
+ */
+export const isLunaAsset = (asset: Asset): boolean => eqAsset.equals(asset, AssetLUNA)
+
+/**
+ * Check whether an asset is a UST (Terra) asset
+ */
+export const isUstAsset = (asset: Asset): boolean => eqAsset.equals(asset, AssetUST)
 
 /**
  * Check whether an ERC20 asset is white listed or not

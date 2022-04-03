@@ -7,6 +7,7 @@ import * as Cosmos from '@xchainjs/xchain-cosmos'
 import * as DOGE from '@xchainjs/xchain-doge'
 import * as ETH from '@xchainjs/xchain-ethereum'
 import * as Litecoin from '@xchainjs/xchain-litecoin'
+import * as TERRA from '@xchainjs/xchain-terra'
 import * as THOR from '@xchainjs/xchain-thorchain'
 import {
   BCHChain,
@@ -41,8 +42,6 @@ const getDefaultFeesByChain = (chain: Chain): Fees => {
       return THOR.getDefaultFees()
     case CosmosChain:
       return Cosmos.getDefaultFees()
-    case PolkadotChain:
-      throw Error('Polkadot is not supported yet')
     case DOGEChain:
       return DOGE.getDefaultFees()
     case BCHChain:
@@ -50,8 +49,9 @@ const getDefaultFeesByChain = (chain: Chain): Fees => {
     case LTCChain:
       return Litecoin.getDefaultFees()
     case TerraChain:
-      // Waiting for https://github.com/xchainjs/xchainjs-lib/issues/480
-      throw Error('Luna/Terra is not supported yet')
+      return TERRA.getDefaultFees()
+    case PolkadotChain:
+      throw Error('Polkadot is not supported yet')
   }
 }
 

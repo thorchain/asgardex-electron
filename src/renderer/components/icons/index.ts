@@ -12,10 +12,12 @@ import bnbIcon from '../../assets/svg/asset-bnb.svg'
 import btcIcon from '../../assets/svg/asset-btc.svg'
 import dropdownIcon from '../../assets/svg/asset-dropdown.svg'
 import ethIcon from '../../assets/svg/asset-eth.svg'
+import lunaIcon from '../../assets/svg/asset-luna.svg'
 import marketIcon from '../../assets/svg/asset-market.svg'
 import refreshIcon from '../../assets/svg/asset-refresh.svg'
 import runeIcon from '../../assets/svg/asset-rune.svg'
 import userAvatarIcon from '../../assets/svg/asset-user.svg'
+import ustIcon from '../../assets/svg/asset-ust.svg'
 import xRuneIcon from '../../assets/svg/asset-xrune.svg'
 import { ReactComponent as CurrencyIcon } from '../../assets/svg/currency-icon.svg'
 import blueArrowIcon from '../../assets/svg/icon-arrow-button.svg'
@@ -29,7 +31,9 @@ export {
   btcIcon,
   dogeIcon,
   ethIcon,
+  lunaIcon,
   runeIcon,
+  ustIcon,
   bnbRuneIcon,
   xRuneIcon,
   tgtIcon,
