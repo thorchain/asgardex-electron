@@ -4684,10 +4684,10 @@
   resolved "https://registry.yarnpkg.com/@xchainjs/xchain-thorchain/-/xchain-thorchain-0.24.0.tgz#f029666ee00e9b642d85ab801c778bbb0b235e92"
   integrity sha512-iaXAQJxATCm54XBKDYEAVRv47tL3F2jcqYTMqQmv13mCYULbB46AHgz0L5NIrPQ/lk3udfo1REA9eLQaDp5VtQ==
 
-"@xchainjs/xchain-util@^0.6.0":
-  version "0.6.0"
-  resolved "https://registry.yarnpkg.com/@xchainjs/xchain-util/-/xchain-util-0.6.0.tgz#d44271d3b803cef9b2f52d157e69544930e09072"
-  integrity sha512-zorppsxWqS7YKly15VppTsxOXLZxIVM0qY+T2rH9zQpLVZEZTV4utpEv+4eySMLq28y2aZAaP2qnNzSN7ZVSPQ==
+"@xchainjs/xchain-util@^0.6.1":
+  version "0.6.1"
+  resolved "https://registry.yarnpkg.com/@xchainjs/xchain-util/-/xchain-util-0.6.1.tgz#910e03339a5d725ba73bbd3516192eaed1f797e9"
+  integrity sha512-6QjYZANI5m6Nn9t84JJx8nt1ak0AYu+A5bbI0YjHaX5dboRhYkijB+snRe1OMsuWmyXRkNoDNuTMUJEgnknbhA==
 
 "@xtuc/ieee754@^1.2.0":
   version "1.2.0"

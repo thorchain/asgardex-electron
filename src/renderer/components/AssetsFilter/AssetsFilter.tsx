@@ -24,7 +24,7 @@ export const AssetsFilter: React.FC<Props> = ({ assets = [], className, activeFi
   const filterNames: Partial<Record<PoolFilter, string>> = useMemo(
     () => ({
       base: intl.formatMessage({ id: 'common.asset.base' }),
-      USD: 'usd',
+      usd: 'usd',
       ETH: 'erc20',
       BNB: 'bep2'
     }),
