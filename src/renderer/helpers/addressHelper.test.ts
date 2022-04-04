@@ -1,4 +1,4 @@
-import { BCHChain, BNBChain, BTCChain, LTCChain, THORChain } from '@xchainjs/xchain-util'
+import { BCHChain, BNBChain, BTCChain, LTCChain, TerraChain, THORChain } from '@xchainjs/xchain-util'
 import * as O from 'fp-ts/lib/Option'
 
 import { getEthChecksumAddress, removeAddressPrefix, truncateAddress } from './addressHelper'
@@ -54,6 +54,11 @@ describe('helpers/addressHelper', () => {
       const result = truncateAddress('ltc1qtephp596jhpwrawlp67junuk347zl2cwpucctk', LTCChain, 'mainnet')
       expect(result).toEqual('ltc1qte...ctk')
     })
+
+    it('terra', () => {
+      const result = truncateAddress('terra15h6vd5f0wqps26zjlwrc6chah08ryu4hzzdwhc', TerraChain, 'mainnet')
+      expect(result).toEqual('terra15h...whc')
+    })
   })
 
   describe('removeAddressPrefix', () => {
@@ -105,6 +110,12 @@ describe('helpers/addressHelper', () => {
     it('litecoin mainnet', () => {
       const result = removeAddressPrefix('ltc1qtephp596jhpwrawlp67junuk347zl2cwpucctk')
       expect(result).toEqual('ltc1qtephp596jhpwrawlp67junuk347zl2cwpucctk')
+    })
+
+    it('terra', () => {
+      const address = 'terra15h6vd5f0wqps26zjlwrc6chah08ryu4hzzdwhc'
+      const result = removeAddressPrefix(address)
+      expect(result).toEqual(address)
     })
   })
 

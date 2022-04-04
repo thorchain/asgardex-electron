@@ -3,7 +3,17 @@ import React, { useMemo } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
 import { Address, XChainClient } from '@xchainjs/xchain-client'
-import { BCHChain, BNBChain, BTCChain, Chain, DOGEChain, ETHChain, LTCChain, THORChain } from '@xchainjs/xchain-util'
+import {
+  BCHChain,
+  BNBChain,
+  BTCChain,
+  Chain,
+  DOGEChain,
+  ETHChain,
+  LTCChain,
+  TerraChain,
+  THORChain
+} from '@xchainjs/xchain-util'
 import * as FP from 'fp-ts/function'
 import * as A from 'fp-ts/lib/Array'
 import * as O from 'fp-ts/lib/Option'
@@ -23,6 +33,7 @@ import { useChainContext } from '../../contexts/ChainContext'
 import { useDogeContext } from '../../contexts/DogeContext'
 import { useEthereumContext } from '../../contexts/EthereumContext'
 import { useLitecoinContext } from '../../contexts/LitecoinContext'
+import { useTerraContext } from '../../contexts/TerraContext'
 import { useThorchainContext } from '../../contexts/ThorchainContext'
 import { useWalletContext } from '../../contexts/WalletContext'
 import {
@@ -57,6 +68,7 @@ export const WalletSettingsView: React.FC = (): JSX.Element => {
   const { addressUI$: ltcAddressUI$ } = useLitecoinContext()
   const { addressUI$: bchAddressUI$ } = useBitcoinCashContext()
   const { addressUI$: dogeAddressUI$ } = useDogeContext()
+  const { addressUI$: terraAddressUI$ } = useTerraContext()
   const oRuneNativeAddress: O.Option<WalletAddress> = useObservableState(thorAddressUI$, O.none)
   const runeNativeAddress = FP.pipe(
     oRuneNativeAddress,
@@ -153,6 +165,7 @@ export const WalletSettingsView: React.FC = (): JSX.Element => {
   const oTHORClient = useObservableState(clientByChain$(THORChain), O.none)
   const oLTCClient = useObservableState(clientByChain$(LTCChain), O.none)
   const oDOGEClient = useObservableState(clientByChain$(DOGEChain), O.none)
+  const oTerraClient = useObservableState(clientByChain$(TerraChain), O.none)
 
   const clickAddressLinkHandler = (chain: Chain, address: Address) => {
     const openExplorerAddressUrl = (client: XChainClient) => {
@@ -181,6 +194,9 @@ export const WalletSettingsView: React.FC = (): JSX.Element => {
         break
       case DOGEChain:
         FP.pipe(oDOGEClient, O.map(openExplorerAddressUrl))
+        break
+      case TerraChain:
+        FP.pipe(oTerraClient, O.map(openExplorerAddressUrl))
         break
       default:
         console.warn(`Chain ${chain} has not been implemented`)
@@ -285,6 +301,10 @@ export const WalletSettingsView: React.FC = (): JSX.Element => {
       ledgerAddress: dogeLedgerWalletAddress,
       chain: DOGEChain
     })
+    const terraWalletAccount$ = walletAccount$({
+      addressUI$: terraAddressUI$,
+      chain: TerraChain
+    })
 
     return FP.pipe(
       // combineLatest is for the future additional accounts
@@ -296,7 +316,8 @@ export const WalletSettingsView: React.FC = (): JSX.Element => {
           BNB: [bnbWalletAccount$],
           BCH: [bchWalletAccount$],
           LTC: [ltcWalletAccount$],
-          DOGE: [dogeWalletAccount$]
+          DOGE: [dogeWalletAccount$],
+          TERRA: [terraWalletAccount$]
         })
       ),
       RxOp.map(A.filter(O.isSome)),
@@ -315,7 +336,8 @@ export const WalletSettingsView: React.FC = (): JSX.Element => {
     ltcAddressUI$,
     ltcLedgerWalletAddress,
     dogeAddressUI$,
-    dogeLedgerWalletAddress
+    dogeLedgerWalletAddress,
+    terraAddressUI$
   ])
   const walletAccounts = useObservableState(walletAccounts$, O.none)
 

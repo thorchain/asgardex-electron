@@ -28,8 +28,8 @@ import { Network } from '../../shared/api/types'
 import { toClientNetwork } from '../../shared/utils/client'
 
 export const truncateAddress = (addr: Address, chain: Chain, network: Network): string => {
-  const first = addr.substr(0, Math.max(getAddressPrefixLength(chain, network) + 3, 6))
-  const last = addr.substr(addr.length - 3, 3)
+  const first = addr.substring(0, Math.max(getAddressPrefixLength(chain, network) + 3, 6))
+  const last = addr.substring(addr.length - 3, addr.length)
   return `${first}...${last}`
 }
 
@@ -59,9 +59,13 @@ export const getAddressPrefixLength = (chain: Chain, network: Network): number =
   }
 }
 
+/**
+ * Removes a prefix from an address, if the prefix ends with ':'
+ * (currently needed for BCH only)
+ */
 export const removeAddressPrefix = (address: Address): Address => {
   const prefixIndex = address.indexOf(':') + 1
-  return address.substr(prefixIndex > 0 ? prefixIndex : 0)
+  return address.substring(prefixIndex > 0 ? prefixIndex : 0)
 }
 
 /**
