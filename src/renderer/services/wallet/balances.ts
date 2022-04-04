@@ -37,6 +37,7 @@ import { WalletBalancesLD, WalletBalancesRD } from '../clients'
 import * as DOGE from '../doge'
 import * as ETH from '../ethereum'
 import * as LTC from '../litecoin'
+import * as TERRA from '../terra'
 import * as THOR from '../thorchain'
 import { INITIAL_BALANCES_STATE } from './const'
 import {
@@ -166,6 +167,13 @@ export const createBalancesService = ({
           resetReloadBalances: DOGE.resetReloadBalances,
           balances$: DOGE.balances$(walletType, walletIndex),
           reloadBalances$: DOGE.reloadBalances$
+        }
+      case TerraChain:
+        return {
+          reloadBalances: TERRA.reloadBalances,
+          resetReloadBalances: TERRA.resetReloadBalances,
+          balances$: TERRA.balances$(walletType, walletIndex),
+          reloadBalances$: TERRA.reloadBalances$
         }
       default:
         return {
@@ -514,6 +522,23 @@ export const createBalancesService = ({
   )
 
   /**
+   * Transforms TERRA balances into `ChainBalance`
+   */
+  const terraChainBalance$: ChainBalance$ = Rx.combineLatest([
+    TERRA.addressUI$,
+    getChainBalance$({ chain: TerraChain, walletType: 'keystore', walletIndex: 0, walletBalanceType: 'all' }) // walletIndex=0 (as long as we don't support HD wallets for keystore)
+  ]).pipe(
+    RxOp.map<[O.Option<WalletAddress>, WalletBalancesRD], ChainBalance>(([oWalletAddress, balances]) => ({
+      walletType: 'keystore',
+      chain: TerraChain,
+      walletAddress: addressFromOptionalWalletAddress(oWalletAddress),
+      walletIndex: 0, // Always 0 as long as we don't support HD wallets for keystore
+      balances,
+      balancesType: 'all'
+    }))
+  )
+
+  /**
    * List of `ChainBalances` for all available chains (order is important)
    *
    * It includes keystore + Ledger balances
@@ -529,7 +554,8 @@ export const createBalancesService = ({
         ETH: [ethChainBalance$],
         BNB: [bnbChainBalance$, bnbLedgerChainBalance$],
         LTC: [ltcBalance$, ltcLedgerChainBalance$],
-        DOGE: [dogeChainBalance$, dogeLedgerChainBalance$]
+        DOGE: [dogeChainBalance$, dogeLedgerChainBalance$],
+        TERRA: [terraChainBalance$]
       })
     ),
     // we ignore all `ChainBalances` with state of `initial` balances

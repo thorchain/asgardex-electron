@@ -35,7 +35,8 @@ const EXTERNALS_WHITELIST = [
   'thornode.thorchain.info',
   'testnet.thornode.thorchain.info',
   'stagenet-thornode.ninerealms.com',
-  'stagenet-rpc.ninerealms.com'
+  'stagenet-rpc.ninerealms.com',
+  'finder.terra.money'
 ]
 
 const openExternal = (target: string) => {
