@@ -240,7 +240,7 @@ export const isPricePoolAsset = (asset: Asset): asset is PricePoolAsset =>
 
 export const isChainAsset = (asset: Asset): boolean => eqAsset.equals(asset, getChainAsset(asset.chain))
 
-export const isUSDAsset = (asset: Asset): boolean => asset.ticker.includes('USD')
+export const isUSDAsset = ({ ticker }: Asset): boolean => ticker.includes('USD') || ticker.includes('UST')
 
 export const isUtxoAssetChain = ({ chain }: Asset) =>
   isBtcChain(chain) || isBchChain(chain) || isLtcChain(chain) || isDogeChain(chain)

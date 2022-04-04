@@ -330,13 +330,16 @@ describe('helpers/assetHelper', () => {
   })
 
   describe('isUSDAsset', () => {
-    it('returns true for BUSD', () => {
+    it('BUSD -> true', () => {
       expect(isUSDAsset(AssetBUSDBAF)).toBeTruthy()
     })
-    it('returns true for ERC20 USDT', () => {
+    it('USDT (ERC20) -> true', () => {
       expect(isUSDAsset(AssetUSDTERC20Testnet)).toBeTruthy()
     })
-    it('returns false for RUNE Native', () => {
+    it('UST -> true', () => {
+      expect(isUSDAsset(AssetUST)).toBeTruthy()
+    })
+    it('RUNE Native -> false', () => {
       expect(isUSDAsset(AssetRuneNative)).toBeFalsy()
     })
   })
