@@ -99,13 +99,16 @@ export const MimirIO = t.type({
   HALTBNBTRADING: t.union([t.number, t.undefined]),
   HALTDOGECHAIN: t.union([t.number, t.undefined]),
   HALTDOGETRADING: t.union([t.number, t.undefined]),
+  HALTTERRACHAIN: t.union([t.number, t.undefined]),
+  HALTTERRATRADING: t.union([t.number, t.undefined]),
   PAUSELP: t.union([t.number, t.undefined]),
   PAUSELPBNB: t.union([t.number, t.undefined]),
   PAUSELPBCH: t.union([t.number, t.undefined]),
   PAUSELPBTC: t.union([t.number, t.undefined]),
   PAUSELPETH: t.union([t.number, t.undefined]),
   PAUSELPLTC: t.union([t.number, t.undefined]),
-  PAUSELPDOGE: t.union([t.number, t.undefined])
+  PAUSELPDOGE: t.union([t.number, t.undefined]),
+  PAUSELPTERRA: t.union([t.number, t.undefined])
 })
 
 export type Mimir = t.TypeOf<typeof MimirIO>
@@ -121,6 +124,7 @@ export type MimirHaltChain = {
   haltLtcChain: boolean
   haltBnbChain: boolean
   haltDogeChain: boolean
+  haltTerraChain: boolean
 }
 export type MimirHaltTrading = {
   haltTrading: boolean
@@ -130,6 +134,7 @@ export type MimirHaltTrading = {
   haltLtcTrading: boolean
   haltBnbTrading: boolean
   haltDogeTrading: boolean
+  haltTerraTrading: boolean
 }
 
 export type MimirPauseLP = {
@@ -140,6 +145,7 @@ export type MimirPauseLP = {
   pauseLpEth: boolean
   pauseLpLtc: boolean
   pauseLpDoge: boolean
+  pauseLpTerra: boolean
 }
 
 export type MimirHalt = MimirHaltChain & MimirHaltTrading & MimirPauseLP

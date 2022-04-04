@@ -32,6 +32,7 @@ export const useMimirHalt = (): { mimirHaltRD: MimirHaltRD; mimirHalt: MimirHalt
           haltLtcChain: mimir.HALTLTCCHAIN === 1,
           haltThorChain: mimir.HALTTHORCHAIN === 1,
           haltDogeChain: mimir.HALTDOGECHAIN === 1,
+          haltTerraChain: mimir.HALTTERRACHAIN === 1,
           // `HALT{chain}TRADING` flags
           haltTrading: mimir.HALTTRADING === 1,
           haltBnbTrading: mimir.HALTBNBTRADING === 1,
@@ -40,6 +41,7 @@ export const useMimirHalt = (): { mimirHaltRD: MimirHaltRD; mimirHalt: MimirHalt
           haltEthTrading: mimir.HALTETHTRADING === 1,
           haltLtcTrading: mimir.HALTLTCTRADING === 1,
           haltDogeTrading: mimir.HALTDOGETRADING === 1,
+          haltTerraTrading: mimir.HALTTERRATRADING === 1,
           // `PAUSELP{chain}` flags
           pauseLp: mimir.PAUSELP === 1,
           pauseLpBnb: mimir.PAUSELPBNB === 1,
@@ -47,7 +49,8 @@ export const useMimirHalt = (): { mimirHaltRD: MimirHaltRD; mimirHalt: MimirHalt
           pauseLpBtc: mimir.PAUSELPBTC === 1,
           pauseLpEth: mimir.PAUSELPETH === 1,
           pauseLpLtc: mimir.PAUSELPLTC === 1,
-          pauseLpDoge: mimir.PAUSELPDOGE === 1
+          pauseLpDoge: mimir.PAUSELPDOGE === 1,
+          pauseLpTerra: mimir.PAUSELPTERRA === 1
         })),
         RxOp.shareReplay(1)
       ),

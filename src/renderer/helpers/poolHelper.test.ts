@@ -12,7 +12,8 @@ import {
   LTCChain,
   BTCChain,
   BCHChain,
-  DOGEChain
+  DOGEChain,
+  TerraChain
 } from '@xchainjs/xchain-util'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
@@ -316,6 +317,17 @@ describe('helpers/poolHelper/', () => {
       })
       expect(result).toBeTruthy()
     })
+    it('true for Terra if TERRA trading is halted', () => {
+      const result = disableTradingActions({
+        chain: TerraChain,
+        haltedChains,
+        mimirHalt: {
+          ...DEFAULT_MIMIR_HALT,
+          haltTerraTrading: true
+        }
+      })
+      expect(result).toBeTruthy()
+    })
     it('true for BNB if BNB trading is halted', () => {
       const result = disableTradingActions({
         chain: BNBChain,
@@ -483,6 +495,22 @@ describe('helpers/poolHelper/', () => {
     it('true if DOGE chain is not in halted list, but LP paused', () => {
       const result = disablePoolActions({
         chain: DOGEChain,
+        haltedChains: [],
+        mimirHalt: { ...DEFAULT_MIMIR_HALT, pauseLp: true }
+      })
+      expect(result).toBeTruthy()
+    })
+    it('true if TERRA chain is not in halted list, but paused', () => {
+      const result = disablePoolActions({
+        chain: TerraChain,
+        haltedChains: [],
+        mimirHalt: { ...DEFAULT_MIMIR_HALT, pauseLpTerra: true }
+      })
+      expect(result).toBeTruthy()
+    })
+    it('true if TERRA chain is not in halted list, but LP paused', () => {
+      const result = disablePoolActions({
+        chain: TerraChain,
         haltedChains: [],
         mimirHalt: { ...DEFAULT_MIMIR_HALT, pauseLp: true }
       })
