@@ -1,6 +1,16 @@
 import React, { createContext, useContext } from 'react'
 
-import { client$, clientState$, address$, addressUI$, explorerUrl$, reloadBalances, balances$ } from '../services/terra'
+import {
+  client$,
+  clientState$,
+  address$,
+  addressUI$,
+  explorerUrl$,
+  reloadBalances,
+  balances$,
+  fees$,
+  reloadFees
+} from '../services/terra'
 
 export type TerraContextValue = {
   client$: typeof client$
@@ -10,6 +20,8 @@ export type TerraContextValue = {
   explorerUrl$: typeof explorerUrl$
   reloadBalances: typeof reloadBalances
   balances$: typeof balances$
+  fees$: typeof fees$
+  reloadFees: typeof reloadFees
 }
 
 const initialContext: TerraContextValue = {
@@ -19,7 +31,9 @@ const initialContext: TerraContextValue = {
   addressUI$,
   explorerUrl$,
   reloadBalances,
-  balances$
+  balances$,
+  fees$,
+  reloadFees
 }
 
 const TerraContext = createContext<TerraContextValue | null>(null)
