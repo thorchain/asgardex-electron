@@ -67,7 +67,7 @@ const Template: Story<Args> = ({ txRDStatus, feeRDStatus, balance, walletType })
     <Component
       walletType={walletType}
       walletIndex={0}
-      walletAddress={'bch-address'}
+      walletAddress={'eth-address'}
       transfer$={transfer$}
       balances={[ethBalance, runeBalance]}
       balance={ethBalance}
