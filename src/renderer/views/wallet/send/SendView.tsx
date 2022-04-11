@@ -10,6 +10,7 @@ import {
   DOGEChain,
   ETHChain,
   LTCChain,
+  TerraChain,
   THORChain
 } from '@xchainjs/xchain-util'
 import * as FP from 'fp-ts/lib/function'
@@ -21,7 +22,16 @@ import { ErrorView } from '../../../components/shared/error/'
 import { BackLink } from '../../../components/uielements/backLink'
 import { SendParams } from '../../../routes/wallet'
 import * as walletRoutes from '../../../routes/wallet'
-import { SendViewBNB, SendViewBCH, SendViewBTC, SendViewETH, SendViewDOGE, SendViewTHOR, SendViewLTC } from './index'
+import {
+  SendViewBNB,
+  SendViewBCH,
+  SendViewBTC,
+  SendViewETH,
+  SendViewDOGE,
+  SendViewTHOR,
+  SendViewLTC,
+  SendViewTERRA
+} from './index'
 
 type Props = {}
 
@@ -81,6 +91,8 @@ export const SendView: React.FC<Props> = (): JSX.Element => {
           return <SendViewLTC walletType={walletType} walletIndex={walletIndex} walletAddress={walletAddress} />
         case DOGEChain:
           return <SendViewDOGE walletType={walletType} walletIndex={walletIndex} walletAddress={walletAddress} />
+        case TerraChain:
+          return <SendViewTERRA walletType={walletType} walletIndex={walletIndex} walletAddress={walletAddress} />
         default:
           return (
             <h1>
