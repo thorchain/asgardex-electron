@@ -1,3 +1,4 @@
+import { AssetLUNA } from '@xchainjs/xchain-terra'
 import {
   Asset,
   AssetBNB,
@@ -18,8 +19,7 @@ import {
   PolkadotChain,
   DOGEChain,
   AssetDOGE,
-  TerraChain,
-  AssetLUNA
+  TerraChain
 } from '@xchainjs/xchain-util'
 
 import { ENABLED_CHAINS } from '../services/const'

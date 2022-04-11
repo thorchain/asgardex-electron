@@ -1,5 +1,6 @@
 import { Address } from '@xchainjs/xchain-client'
 import { ETHAddress, getTokenAddress } from '@xchainjs/xchain-ethereum'
+import { AssetLUNA } from '@xchainjs/xchain-terra'
 import {
   Asset,
   assetAmount,
@@ -11,7 +12,6 @@ import {
   AssetETH,
   assetFromString,
   AssetLTC,
-  AssetLUNA,
   AssetRune67C,
   AssetRuneB1A,
   AssetRuneERC20,
