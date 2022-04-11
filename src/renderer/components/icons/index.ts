@@ -22,6 +22,7 @@ import xRuneIcon from '../../assets/svg/asset-xrune.svg'
 import { ReactComponent as CurrencyIcon } from '../../assets/svg/currency-icon.svg'
 import blueArrowIcon from '../../assets/svg/icon-arrow-button.svg'
 import { ReactComponent as AttentionIcon } from '../../assets/svg/icon-attention.svg'
+import { ReactComponent as DownIcon } from '../../assets/svg/icon-down.svg'
 import { ReactComponent as LedgerIcon } from '../../assets/svg/ledger.svg'
 import orbBlueIcon from '../../assets/svg/orb-blue.svg'
 import orbGreenIcon from '../../assets/svg/orb-green.svg'
@@ -38,6 +39,7 @@ export {
   xRuneIcon,
   tgtIcon,
   CurrencyIcon,
+  DownIcon,
   userAvatarIcon,
   arrowYellowIcon,
   arrowGreenIcon,

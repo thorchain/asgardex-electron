@@ -6,9 +6,9 @@ import { MenuProps } from 'antd/lib/menu'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
 
-import { ReactComponent as DownIcon } from '../../../assets/svg/icon-down.svg'
 import { SelectedPricePoolAsset } from '../../../services/midgard/types'
 import { PricePoolAsset, PricePoolAssets } from '../../../views/pools/Pools.types'
+import { DownIcon } from '../../icons'
 import { Menu } from '../../shared/menu/Menu'
 import { toHeaderCurrencyLabel } from '../Header.util'
 import {

@@ -9,9 +9,9 @@ import { useIntl } from 'react-intl'
 
 import { Network } from '../../../shared/api/types'
 import { Locale } from '../../../shared/i18n/types'
-import { ReactComponent as DownIcon } from '../../assets/svg/icon-down.svg'
 import { LOCALES } from '../../i18n'
 import { AVAILABLE_NETWORKS } from '../../services/const'
+import { DownIcon } from '../icons'
 import { Menu } from '../shared/menu'
 import * as Styled from './AppSettings.styles'
 
