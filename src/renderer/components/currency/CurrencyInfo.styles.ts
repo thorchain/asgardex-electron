@@ -41,7 +41,7 @@ export const DropdownContentWrapper = styled(Row)`
   cursor: pointer;
 `
 
-export const SlipLabel = styled(Text)<TextProps & { active: boolean }>`
+export const SlipLabel = styled(Text)<TextProps & { active: 'true' | 'false' }>`
   text-transform: uppercase;
   padding: 0;
   font-size: 16px;

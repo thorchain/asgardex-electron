@@ -46,7 +46,6 @@ import * as PoolHelpers from '../../helpers/poolHelper'
 import { liveData, LiveData } from '../../helpers/rx/liveData'
 import {
   filterWalletBalancesByAssets,
-  getWalletBalanceByAsset,
   getWalletBalanceByAssetAndWalletType,
   hasLedgerInBalancesByAsset
 } from '../../helpers/walletHelper'
@@ -279,22 +278,26 @@ export const Swap = ({
     return O.none
   }, [editableTargetWalletAddress, hasTargetAssetLedger, oInitialTargetWalletAddress, oTargetLedgerAddress])
 
+  const sourceWalletType: WalletType = useMemo(
+    () => (useSourceAssetLedger ? 'ledger' : 'keystore'),
+    [useSourceAssetLedger]
+  )
+
   // `AssetWB` of source asset - which might be none (user has no balances for this asset or wallet is locked)
   const oSourceAssetWB: O.Option<WalletBalance> = useMemo(
     () =>
       FP.pipe(
         oSourceAsset,
         O.chain((asset) => {
-          const walletType = useSourceAssetLedger ? 'ledger' : 'keystore'
           const oWalletBalances = NEA.fromArray(allBalances)
           return getWalletBalanceByAssetAndWalletType({
             oWalletBalances,
             asset,
-            walletType
+            walletType: sourceWalletType
           })
         })
       ),
-    [oSourceAsset, useSourceAssetLedger, allBalances]
+    [oSourceAsset, allBalances, sourceWalletType]
   )
 
   // User balance for source asset
@@ -318,11 +321,15 @@ export const Swap = ({
   const sourceChainAssetAmount: BaseAmount = useMemo(
     () =>
       FP.pipe(
-        getWalletBalanceByAsset(oWalletBalances, sourceChainAsset),
+        getWalletBalanceByAssetAndWalletType({
+          oWalletBalances,
+          asset: sourceChainAsset,
+          walletType: sourceWalletType
+        }),
         O.map(({ amount }) => amount),
         O.getOrElse(() => ZERO_BASE_AMOUNT)
       ),
-    [oWalletBalances, sourceChainAsset]
+    [oWalletBalances, sourceChainAsset, sourceWalletType]
   )
 
   const {

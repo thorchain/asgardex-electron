@@ -9,6 +9,7 @@ Support Terra [#2002](https://github.com/thorchain/asgardex-electron/issues/2002
 - [History] Fix viewblock url parameters [#2189](https://github.com/thorchain/asgardex-electron/pull/2189)
 - Fix: Filter _USD_ pools [#2199](https://github.com/thorchain/asgardex-electron/pull/2199)
 - Fix: Total balances in asset overview [#2202](https://github.com/thorchain/asgardex-electron/pull/2202)
+- [Swap] Balance of Ledger missing - fee validation failed [#2203](https://github.com/thorchain/asgardex-electron/issues/2203)
 
 # 0.12.3 (2022-03-31)
 
