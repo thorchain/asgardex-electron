@@ -97,7 +97,8 @@ export const AssetsView: React.FC = (): JSX.Element => {
       <TotalValue
         total={totalWalletBalances}
         pricePool={selectedPricePool}
-        title={intl.formatMessage({ id: 'wallet.balance.total' })}
+        title={intl.formatMessage({ id: 'wallet.balance.total.poolAssets' })}
+        info={intl.formatMessage({ id: 'wallet.balance.total.poolAssets.info' })}
       />
       <AssetsTableCollapsable
         chainBalances={chainBalances}

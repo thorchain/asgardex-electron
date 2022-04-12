@@ -16,7 +16,9 @@ const wallet: WalletMessages = {
   'wallet.action.create': 'Erstellen',
   'wallet.action.connect': 'Verbinden',
   'wallet.action.deposit': 'Einzahlung',
-  'wallet.balance.total': 'Gesamtguthaben',
+  'wallet.balance.total.poolAssets': 'Gesamtguthaben von Pool Assets',
+  'wallet.balance.total.poolAssets.info':
+    'Die Gesamtsumme beinhaltet das Guthaben aller Assets, welche bei THORChain in Pools verfügbar sind. Nur über Pools können Preise bei THORChain ermittelt werden.',
   'wallet.shares.total': 'Gesamtwert',
   'wallet.connect.instruction': 'Bitte verbinde Deine Wallet',
   'wallet.lock.label': 'Wallet sperren',

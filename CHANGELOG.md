@@ -1,10 +1,14 @@
 # 0.13.0 (2022-xx-xx)
 
+## Add
+
+Support Terra [#2002](https://github.com/thorchain/asgardex-electron/issues/2002)
+
 ## Fix
 
-- [History] Fix viewblock url parameters
-
-## Add
+- [History] Fix viewblock url parameters [#2189](https://github.com/thorchain/asgardex-electron/pull/2189)
+- Fix: Filter _USD_ pools [#2199](https://github.com/thorchain/asgardex-electron/pull/2199)
+- Fix: Total balances in asset overview [#2202](https://github.com/thorchain/asgardex-electron/pull/2202)
 
 # 0.12.3 (2022-03-31)
 

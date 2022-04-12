@@ -35,6 +35,8 @@ export const useTotalWalletBalance = () => {
         RxOp.map(([chainBalances, poolsStateRD, { poolData: pricePoolData }]) =>
           FP.pipe(
             chainBalances,
+            // Balances of type 'all' only - no duplications
+            A.filter(({ balancesType }) => balancesType === 'all'),
             // Get balances from `ChainBalance`
             A.map(({ balances }) => balances),
             // Get sequence of all balances

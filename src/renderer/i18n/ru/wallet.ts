@@ -16,7 +16,9 @@ const wallet: WalletMessages = {
   'wallet.action.create': 'Создать',
   'wallet.action.connect': 'Подключить',
   'wallet.action.deposit': 'Вложить',
-  'wallet.balance.total': 'Total balance - RU',
+  'wallet.balance.total.poolAssets': 'Total balance of pool assets - RU',
+  'wallet.balance.total.poolAssets.info':
+    'Total balance includes balances of assets available in pools at THORChain only. Pools are source of truth to determine prices at THORChain. - RU',
   'wallet.shares.total': 'Total value - RU',
   'wallet.connect.instruction': 'Пожалуйста подключите ваш кошелек',
   'wallet.lock.label': 'Заблокировать кошелёк',
