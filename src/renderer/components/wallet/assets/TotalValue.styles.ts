@@ -30,6 +30,11 @@ export const BalanceTitle = styled(UILabel)`
   `}
 `
 
+export const TitleContainer = styled.div`
+  display: flex;
+  vertical-items: center;
+`
+
 export const BalanceLabel = styled(UILabel)`
   font-size: 27px;
   line-height: 100%;
