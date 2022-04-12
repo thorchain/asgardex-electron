@@ -8,7 +8,6 @@ import { useIntl } from 'react-intl'
 import { isUSDAsset } from '../../../helpers/assetHelper'
 import { BaseAmountRD } from '../../../types'
 import { PricePool } from '../../../views/pools/Pools.types'
-import { Spin } from '../../shared/loading'
 import { InfoIcon } from '../../uielements/info'
 import * as Styled from './TotalValue.styles'
 
@@ -30,7 +29,7 @@ export const TotalValue: React.FC<Props> = (props): JSX.Element => {
         totalRD,
         RD.fold(
           () => <Styled.BalanceLabel>--</Styled.BalanceLabel>,
-          () => <Spin size="large" />,
+          () => <Styled.Spin />,
           (error) => (
             <Styled.BalanceError>
               {intl.formatMessage({ id: 'wallet.errors.balancesFailed' }, { errorMsg: error.message })}

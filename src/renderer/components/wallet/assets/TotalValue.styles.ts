@@ -2,6 +2,7 @@ import styled from 'styled-components'
 import { palette } from 'styled-theme'
 
 import { media } from '../../../helpers/styleHelper'
+import { Spin as UISpin } from '../../shared/loading'
 import { Label as UILabel } from '../../uielements/label'
 
 export const Container = styled.div`
@@ -11,6 +12,14 @@ export const Container = styled.div`
   justify-content: cemter;
   padding: 20px 10px 30px 20px;
   background-color: ${palette('background', 1)};
+`
+
+export const Spin = styled(UISpin)`
+  padding-top: 10px;
+
+  ${media.sm`
+  padding-top: 20px;
+  `}
 `
 
 export const BalanceTitle = styled(UILabel)`
