@@ -111,10 +111,13 @@ const loadThorchainLastblock$ = () =>
     RxOp.retry(MIDGARD_MAX_RETRY)
   )
 
+const loadThorchainLastblockInterval$ = Rx.timer(0 /* no delay for first value */, 15 * 1000 /* every 15 sec  */)
+
 /**
  * State of `ThorchainLastblock`, it will be loaded data by first subscription only
  */
-const thorchainLastblockState$: ThorchainLastblockLD = reloadThorchainLastblock$.pipe(
+const thorchainLastblockState$: ThorchainLastblockLD = FP.pipe(
+  Rx.combineLatest([reloadThorchainLastblock$, loadThorchainLastblockInterval$]),
   // start request
   RxOp.switchMap((_) => loadThorchainLastblock$()),
   // cache it to avoid reloading data by every subscription
