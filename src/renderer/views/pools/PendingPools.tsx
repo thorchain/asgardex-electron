@@ -22,7 +22,6 @@ import { useMidgardContext } from '../../contexts/MidgardContext'
 import * as PoolHelpers from '../../helpers/poolHelper'
 import { getPoolTableRowsData, RUNE_PRICE_POOL } from '../../helpers/poolHelper'
 import { useIncentivePendulum } from '../../hooks/useIncentivePendulum'
-import useInterval, { INACTIVE_INTERVAL } from '../../hooks/useInterval'
 import { usePoolCycle } from '../../hooks/usePoolCycle'
 import { useProtocolLimit } from '../../hooks/useProtocolLimit'
 import * as poolsRoutes from '../../routes/pools'
@@ -49,8 +48,7 @@ export const PendingPools: React.FC<PoolsComponentProps> = ({ haltedChains, mimi
 
   const {
     thorchainLastblockState$,
-    pools: { pendingPoolsState$, reloadPendingPools, selectedPricePool$, poolsFilters$, setPoolsFilter },
-    reloadThorchainLastblock
+    pools: { pendingPoolsState$, reloadPendingPools, selectedPricePool$, poolsFilters$, setPoolsFilter }
   } = midgardService
 
   const poolsRD = useObservableState(pendingPoolsState$, RD.pending)
@@ -73,18 +71,6 @@ export const PendingPools: React.FC<PoolsComponentProps> = ({ haltedChains, mimi
     reloadLimit()
     reloadPoolCycle()
   }, [reloadLimit, reloadPendingPools, reloadPoolCycle])
-
-  const pendingCountdownHandler = useCallback(() => {
-    reloadThorchainLastblock()
-  }, [reloadThorchainLastblock])
-
-  const pendingCountdownInterval = useMemo(() => {
-    const pendingPools = RD.toNullable(poolsRD)
-    // start countdown if we do have pending pools available only
-    return pendingPools && pendingPools.poolDetails.length > 0 ? 5000 : INACTIVE_INTERVAL
-  }, [poolsRD])
-
-  useInterval(pendingCountdownHandler, pendingCountdownInterval)
 
   const selectedPricePool = useObservableState(selectedPricePool$, RUNE_PRICE_POOL)
 

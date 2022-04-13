@@ -2,7 +2,8 @@
 
 ## Add
 
-Support Terra [#2002](https://github.com/thorchain/asgardex-electron/issues/2002)
+- Support Terra [#2002](https://github.com/thorchain/asgardex-electron/issues/2002)
+- [Mimir] Support block height in HALT{XYZ} flags [#2206](https://github.com/thorchain/asgardex-electron/issues/2206)
 
 ## Fix
 
