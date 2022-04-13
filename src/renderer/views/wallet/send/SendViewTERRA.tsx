@@ -1,8 +1,9 @@
-import React, { useMemo } from 'react'
+import React, { useCallback, useMemo } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
 import { Address } from '@xchainjs/xchain-client'
-import { TerraChain } from '@xchainjs/xchain-util'
+import { FeeParams, TERRA_DECIMAL } from '@xchainjs/xchain-terra'
+import { Asset, baseAmount, TerraChain } from '@xchainjs/xchain-util'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/Option'
 import { useObservableState } from 'observable-hooks'
@@ -14,7 +15,7 @@ import { useChainContext } from '../../../contexts/ChainContext'
 import { useTerraContext } from '../../../contexts/TerraContext'
 import { useWalletContext } from '../../../contexts/WalletContext'
 import { liveData } from '../../../helpers/rx/liveData'
-import { getWalletBalanceByAddress } from '../../../helpers/walletHelper'
+import { getWalletBalanceByAddressAndAsset } from '../../../helpers/walletHelper'
 import { useNetwork } from '../../../hooks/useNetwork'
 import { useOpenExplorerTxUrl } from '../../../hooks/useOpenExplorerTxUrl'
 import { useValidateAddress } from '../../../hooks/useValidateAddress'
@@ -26,10 +27,11 @@ type Props = {
   walletType: WalletType
   walletIndex: number
   walletAddress: Address
+  asset: Asset
 }
 
 export const SendViewTERRA: React.FC<Props> = (props): JSX.Element => {
-  const { walletType, walletIndex, walletAddress } = props
+  const { walletType, walletIndex, walletAddress, asset } = props
 
   const { network } = useNetwork()
   const {
@@ -48,25 +50,38 @@ export const SendViewTERRA: React.FC<Props> = (props): JSX.Element => {
     () =>
       FP.pipe(
         oBalances,
-        O.chain((balances) => getWalletBalanceByAddress(balances, walletAddress))
+        O.chain((balances) => getWalletBalanceByAddressAndAsset({ balances, address: walletAddress, asset }))
       ),
-    [oBalances, walletAddress]
+    [asset, oBalances, walletAddress]
   )
 
   const { transfer$ } = useChainContext()
 
   const { fees$, reloadFees } = useTerraContext()
 
-  const [feeRD] = useObservableState<FeeRD>(
-    () =>
-      FP.pipe(
-        fees$(undefined),
-        liveData.map((fees) => fees.fast)
-      ),
-    RD.initial
-  )
+  const [feeRD] = useObservableState<FeeRD>(() => {
+    // Used for initial fee calculation
+    return FP.pipe(
+      fees$({
+        asset,
+        feeAsset: asset,
+        amount: baseAmount(1, TERRA_DECIMAL),
+        sender: walletAddress,
+        recipient: walletAddress
+      }),
+      liveData.map((fees) => fees.fast)
+    )
+  }, RD.initial)
 
   const { validateAddress } = useValidateAddress(TerraChain)
+
+  const releodFeesHandler = useCallback(
+    (params: O.Option<FeeParams>) => {
+      console.log('params:', params)
+      reloadFees(params)
+    },
+    [reloadFees]
+  )
 
   return FP.pipe(
     oWalletBalance,
@@ -87,7 +102,7 @@ export const SendViewTERRA: React.FC<Props> = (props): JSX.Element => {
           getExplorerTxUrl={getExplorerTxUrl}
           addressValidation={validateAddress}
           fee={feeRD}
-          reloadFeesHandler={reloadFees}
+          reloadFeesHandler={releodFeesHandler}
           validatePassword$={validatePassword$}
           network={network}
         />

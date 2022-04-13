@@ -7,20 +7,21 @@ import {
   formatAssetAmountCurrency,
   assetAmount,
   bn,
-  AssetRuneNative,
   assetToBase,
   BaseAmount,
   baseToAsset,
-  THORChain,
   assetFromString,
   Asset,
-  assetToString
+  assetToString,
+  baseAmount,
+  TerraChain
 } from '@xchainjs/xchain-util'
 import { Row, Form, Dropdown, Menu } from 'antd'
 import { MenuProps } from 'antd/lib/menu'
 import BigNumber from 'bignumber.js'
 import * as A from 'fp-ts/lib/Array'
 import * as FP from 'fp-ts/lib/function'
+import * as NEA from 'fp-ts/lib/NonEmptyArray'
 import * as O from 'fp-ts/lib/Option'
 import { useIntl } from 'react-intl'
 
@@ -28,10 +29,8 @@ import { Network } from '../../../../../shared/api/types'
 import { isKeystoreWallet, isLedgerWallet } from '../../../../../shared/utils/guard'
 import { WalletType } from '../../../../../shared/wallet/types'
 import { ZERO_BASE_AMOUNT } from '../../../../const'
-import { isRuneNativeAsset, THORCHAIN_DECIMAL } from '../../../../helpers/assetHelper'
 import { isTerraChain } from '../../../../helpers/chainHelper'
-import { sequenceTOption } from '../../../../helpers/fpHelpers'
-import { getRuneNativeAmountFromBalances } from '../../../../helpers/walletHelper'
+import { getWalletBalanceByAssetAndWalletType } from '../../../../helpers/walletHelper'
 import { useSubscriptionState } from '../../../../hooks/useSubscriptionState'
 import { INITIAL_SEND_STATE } from '../../../../services/chain/const'
 import { FeeRD, SendTxState, SendTxStateHandler } from '../../../../services/chain/types'
@@ -92,6 +91,7 @@ export const SendFormTERRA: React.FC<Props> = (props): JSX.Element => {
   const intl = useIntl()
 
   const { asset } = balance
+  const [feeAsset, setFeeAsset] = useState<Asset>(asset)
 
   const [amountToSend, setAmountToSend] = useState<BaseAmount>(ZERO_BASE_AMOUNT)
   const [sendAddress, setSendAddress] = useState<O.Option<Address>>(O.none)
@@ -106,41 +106,39 @@ export const SendFormTERRA: React.FC<Props> = (props): JSX.Element => {
 
   const [form] = Form.useForm<FormValues>()
 
-  const oRuneNativeAmount: O.Option<BaseAmount> = useMemo(() => {
-    // return balance of current asset (if RuneNative)
-    if (isRuneNativeAsset(asset)) {
-      return O.some(balance.amount)
-    }
-    // or check list of other assets to get RuneNative balance
-    return FP.pipe(balances, getRuneNativeAmountFromBalances, O.map(assetToBase))
-  }, [asset, balance.amount, balances])
-
   const oFee: O.Option<BaseAmount> = useMemo(() => FP.pipe(feeRD, RD.toOption), [feeRD])
+
+  const feeBalance: BaseAmount = useMemo(
+    () =>
+      FP.pipe(
+        NEA.fromArray(balances),
+        O.chain((walletBalances) =>
+          getWalletBalanceByAssetAndWalletType({ oWalletBalances: O.some(walletBalances), asset: feeAsset, walletType })
+        ),
+        O.map(({ amount }) => amount),
+        O.getOrElse(() => baseAmount(0, TERRA_DECIMAL))
+      ),
+    [balances, feeAsset, walletType]
+  )
 
   const isFeeError = useMemo(() => {
     return FP.pipe(
-      sequenceTOption(oFee, oRuneNativeAmount),
+      oFee,
       O.fold(
         // Missing (or loading) fees does not mean we can't sent something. No error then.
         () => !O.isNone(oFee),
-        ([fee, runeAmount]) => runeAmount.amount().isLessThan(fee.amount())
+        (fee) => feeBalance.lt(fee)
       )
     )
-  }, [oRuneNativeAmount, oFee])
+  }, [oFee, feeBalance])
 
   const renderFeeError = useMemo(() => {
     if (!isFeeError) return <></>
 
-    const amount = FP.pipe(
-      oRuneNativeAmount,
-      // no RuneNative asset == zero amount
-      O.getOrElse(() => ZERO_BASE_AMOUNT)
-    )
-
     const msg = intl.formatMessage(
       { id: 'wallet.errors.fee.notCovered' },
       {
-        balance: formatAssetAmountCurrency({ amount: baseToAsset(amount), asset: AssetRuneNative, trimZeros: true })
+        balance: formatAssetAmountCurrency({ amount: baseToAsset(feeBalance), asset, trimZeros: true })
       }
     )
 
@@ -149,7 +147,7 @@ export const SendFormTERRA: React.FC<Props> = (props): JSX.Element => {
         {msg}
       </Styled.Label>
     )
-  }, [oRuneNativeAmount, intl, isFeeError])
+  }, [asset, feeBalance, intl, isFeeError])
 
   const addressValidator = useCallback(
     async (_: unknown, value: string) => {
@@ -163,18 +161,8 @@ export const SendFormTERRA: React.FC<Props> = (props): JSX.Element => {
     [addressValidation, intl]
   )
 
-  // max amount for RuneNative
-  const maxAmount: BaseAmount = useMemo(() => {
-    const maxRuneAmount = FP.pipe(
-      sequenceTOption(oFee, oRuneNativeAmount),
-      O.fold(
-        // Set maxAmount to zero if we dont know anything about RuneNative and fee amounts
-        () => ZERO_BASE_AMOUNT,
-        ([fee, runeAmount]) => runeAmount.minus(fee)
-      )
-    )
-    return isRuneNativeAsset(asset) ? maxRuneAmount : balance.amount
-  }, [oFee, oRuneNativeAmount, asset, balance.amount])
+  // max amount
+  const maxAmount: BaseAmount = useMemo(() => balance.amount, [balance.amount])
 
   useEffect(() => {
     // Whenever `amountToSend` has been updated, we put it back into input field
@@ -189,13 +177,11 @@ export const SendFormTERRA: React.FC<Props> = (props): JSX.Element => {
       const errors = {
         msg1: intl.formatMessage({ id: 'wallet.errors.amount.shouldBeNumber' }),
         msg2: intl.formatMessage({ id: 'wallet.errors.amount.shouldBeGreaterThan' }, { amount: '0' }),
-        msg3: isRuneNativeAsset(asset)
-          ? intl.formatMessage({ id: 'wallet.errors.amount.shouldBeLessThanBalanceAndFee' })
-          : intl.formatMessage({ id: 'wallet.errors.amount.shouldBeLessThanBalance' })
+        msg3: intl.formatMessage({ id: 'wallet.errors.amount.shouldBeLessThanBalance' })
       }
       return validateTxAmountInput({ input: value, maxAmount: baseToAsset(maxAmount), errors })
     },
-    [asset, intl, maxAmount]
+    [intl, maxAmount]
   )
 
   const onChangeAddress = useCallback(
@@ -255,7 +241,7 @@ export const SendFormTERRA: React.FC<Props> = (props): JSX.Element => {
           onSuccess={onSuccessHandler}
           onClose={onCloseHandler}
           visible={showConfirmationModal}
-          chain={THORChain}
+          chain={TerraChain}
           description={intl.formatMessage({ id: 'wallet.ledger.confirm' })}
           addresses={O.none}
         />
@@ -295,7 +281,7 @@ export const SendFormTERRA: React.FC<Props> = (props): JSX.Element => {
       // we have to validate input before storing into the state
       amountValidator(undefined, value)
         .then(() => {
-          setAmountToSend(assetToBase(assetAmount(value, THORCHAIN_DECIMAL)))
+          setAmountToSend(assetToBase(assetAmount(value, TERRA_DECIMAL)))
         })
         .catch(() => {}) // do nothing, Ant' form does the job for us to show an error message
     },
@@ -312,28 +298,33 @@ export const SendFormTERRA: React.FC<Props> = (props): JSX.Element => {
     [balances, recipientAddress]
   )
 
-  const [feeAsset, setFeeAsset] = useState<Asset>(asset)
+  const reloadFees = useCallback(
+    (overrideFeeAsset?: Asset) => {
+      // If not amount is set, use `1` BaseAmount (needed to calcu)
+      const amount = FP.pipe(
+        amountToSend,
+        O.fromPredicate((value: BaseAmount) => value.gt(ZERO_BASE_AMOUNT)),
+        O.getOrElse(() => baseAmount(1, TERRA_DECIMAL))
+      )
 
-  const reloadFees = useCallback(() => {
-    FP.pipe(
-      sendAddress,
-      O.map((recipient) => {
-        reloadFeesHandler(
-          O.some({
-            asset,
-            feeAsset,
-            amount: amountToSend,
-            recipient,
-            sender: walletAddress,
-            memo: form.getFieldValue('memo')
-          })
-        )
-        return true
-      })
-    )
+      const recipient = FP.pipe(
+        sendAddress,
+        O.getOrElse(() => walletAddress)
+      )
 
-    return false
-  }, [amountToSend, asset, feeAsset, form, reloadFeesHandler, sendAddress, walletAddress])
+      reloadFeesHandler(
+        O.some({
+          asset,
+          feeAsset: overrideFeeAsset || feeAsset,
+          amount,
+          recipient,
+          sender: walletAddress,
+          memo: form.getFieldValue('memo')
+        })
+      )
+    },
+    [amountToSend, asset, feeAsset, form, reloadFeesHandler, sendAddress, walletAddress]
+  )
 
   const addMaxAmountHandler = useCallback(() => {
     setAmountToSend(maxAmount)
@@ -348,7 +339,7 @@ export const SendFormTERRA: React.FC<Props> = (props): JSX.Element => {
         O.fromNullable,
         O.map((asset) => {
           setFeeAsset(asset)
-          reloadFees()
+          reloadFees(asset)
           return true
         })
       )
@@ -424,7 +415,7 @@ export const SendFormTERRA: React.FC<Props> = (props): JSX.Element => {
                   color="primary"
                   size="large"
                   disabled={isLoading}
-                  onBlur={reloadFees}
+                  onBlur={() => reloadFees(feeAsset)}
                   onChange={onChangeAddress}
                   onKeyUp={handleOnKeyUp}
                 />
@@ -436,7 +427,7 @@ export const SendFormTERRA: React.FC<Props> = (props): JSX.Element => {
                   size="large"
                   disabled={isLoading}
                   decimal={TERRA_DECIMAL}
-                  onBlur={reloadFees}
+                  onBlur={() => reloadFees(feeAsset)}
                   onChange={onChangeInput}
                 />
               </Styled.FormItem>
@@ -450,7 +441,7 @@ export const SendFormTERRA: React.FC<Props> = (props): JSX.Element => {
               {renderFeeError}
               <Styled.CustomLabel size="big">{intl.formatMessage({ id: 'common.memo' })}</Styled.CustomLabel>
               <Form.Item name="memo">
-                <Input size="large" disabled={isLoading} />
+                <Input size="large" disabled={isLoading} onBlur={() => reloadFees(feeAsset)} />
               </Form.Item>
             </Styled.SubForm>
             <Styled.SubmitContainer>
