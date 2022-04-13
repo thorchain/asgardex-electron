@@ -1,9 +1,9 @@
 import React from 'react'
 
-import { Meta, Story } from '@storybook/react'
-import { Fees, FeeType, TxHash } from '@xchainjs/xchain-client'
-import { ETH_DECIMAL } from '@xchainjs/xchain-ethereum'
-import { assetAmount, AssetETH, assetToBase } from '@xchainjs/xchain-util'
+import { Story, Meta } from '@storybook/react'
+import { TxHash } from '@xchainjs/xchain-client'
+import { AssetLUNA } from '@xchainjs/xchain-terra'
+import { assetAmount, assetToBase, BaseAmount, baseAmount } from '@xchainjs/xchain-util'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
 import * as Rx from 'rxjs'
@@ -11,20 +11,20 @@ import * as Rx from 'rxjs'
 import { getMockRDValueFactory, RDStatus } from '../../../../../shared/mock/rdByStatus'
 import { mockValidatePassword$ } from '../../../../../shared/mock/wallet'
 import { WalletType } from '../../../../../shared/wallet/types'
-import { THORCHAIN_DECIMAL } from '../../../../helpers/assetHelper'
 import { mockWalletBalance } from '../../../../helpers/test/testWalletHelper'
-import { FeesRD, SendTxStateHandler } from '../../../../services/chain/types'
+import { FeeRD, SendTxStateHandler } from '../../../../services/chain/types'
 import { ApiError, ErrorId, WalletBalance } from '../../../../services/wallet/types'
-import { SendFormETH as Component } from './SendFormETH'
+import { SendFormTERRA as Component } from './SendFormTERRA'
 
 type Args = {
   txRDStatus: RDStatus
   feeRDStatus: RDStatus
   balance: string
+  validAddress: boolean
   walletType: WalletType
 }
 
-const Template: Story<Args> = ({ txRDStatus, feeRDStatus, balance, walletType }) => {
+const Template: Story<Args> = ({ txRDStatus, feeRDStatus, balance, validAddress, walletType }) => {
   const transfer$: SendTxStateHandler = (_) =>
     Rx.of({
       steps: { current: txRDStatus === 'initial' ? 0 : 1, total: 1 },
@@ -40,39 +40,35 @@ const Template: Story<Args> = ({ txRDStatus, feeRDStatus, balance, walletType })
       )
     })
 
-  const ethBalance: WalletBalance = mockWalletBalance({
-    asset: AssetETH,
-    amount: assetToBase(assetAmount(balance, ETH_DECIMAL)),
-    walletAddress: 'ETH wallet address'
-  })
-
-  const runeBalance: WalletBalance = mockWalletBalance({
-    amount: assetToBase(assetAmount(2, THORCHAIN_DECIMAL))
-  })
-
-  const feesRD: FeesRD = FP.pipe(
+  const feeRD: FeeRD = FP.pipe(
     feeRDStatus,
-    getMockRDValueFactory<Error, Fees>(
-      () => ({
-        type: FeeType.PerByte,
-        fastest: assetToBase(assetAmount(0.002499, ETH_DECIMAL)),
-        fast: assetToBase(assetAmount(0.002079, ETH_DECIMAL)),
-        average: assetToBase(assetAmount(0.001848, ETH_DECIMAL))
-      }),
+    getMockRDValueFactory<Error, BaseAmount>(
+      () => baseAmount(2000000),
       () => Error('getting fees failed')
     )
   )
+
+  const lunaBalance: WalletBalance = mockWalletBalance({
+    asset: AssetLUNA,
+    amount: assetToBase(assetAmount(balance))
+  })
+
+  const ustBalance: WalletBalance = mockWalletBalance({
+    asset: { ...AssetLUNA, symbol: 'UST', ticker: 'UST' },
+    amount: assetToBase(assetAmount(12))
+  })
 
   return (
     <Component
       walletType={walletType}
       walletIndex={0}
-      walletAddress={'eth-address'}
+      walletAddress={'terra-address'}
       transfer$={transfer$}
-      balances={[ethBalance, runeBalance]}
-      balance={ethBalance}
-      fees={feesRD}
-      reloadFeesHandler={() => console.log('reload fees')}
+      balances={[lunaBalance, ustBalance]}
+      balance={lunaBalance}
+      addressValidation={(_: string) => validAddress}
+      fee={feeRD}
+      reloadFeesHandler={(params) => console.log('reload fees', params)}
       validatePassword$={mockValidatePassword$}
       network="testnet"
       openExplorerTxUrl={(txHash: TxHash) => {
@@ -86,9 +82,9 @@ const Template: Story<Args> = ({ txRDStatus, feeRDStatus, balance, walletType })
 
 export const Default = Template.bind({})
 
-const meta: Meta = {
+const meta: Meta<Args> = {
   component: Component,
-  title: 'Wallet/SendFormETH',
+  title: 'Wallet/SendFormTERRA',
   argTypes: {
     txRDStatus: {
       name: 'txRDStatus',
@@ -106,9 +102,14 @@ const meta: Meta = {
       defaultValue: 'keystore'
     },
     balance: {
-      name: 'ETH balance',
+      name: 'LUNA Balance',
       control: { type: 'text' },
       defaultValue: '2'
+    },
+    validAddress: {
+      name: 'valid address',
+      control: { type: 'boolean' },
+      defaultValue: true
     }
   }
 }

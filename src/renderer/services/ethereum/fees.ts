@@ -1,6 +1,6 @@
 import * as RD from '@devexperts/remote-data-ts'
 import { Fees, FeeType, TxParams } from '@xchainjs/xchain-client'
-import { getFee, getDefaultFees, ETHAddress } from '@xchainjs/xchain-ethereum'
+import { getFee, getDefaultFees, ETHAddress, GasPrices } from '@xchainjs/xchain-ethereum'
 import { Asset, baseAmount } from '@xchainjs/xchain-util'
 import { ethers } from 'ethers'
 import * as FP from 'fp-ts/lib/function'
@@ -24,7 +24,7 @@ export const createFeesService = (client$: Client$): FeesService => {
     recipient: ETHAddress
   })
 
-  const fees$ = (params?: TxParams): FeesLD =>
+  const fees$ = (params: TxParams): FeesLD =>
     Rx.combineLatest([reloadFees$, client$]).pipe(
       RxOp.switchMap(([reloadFeesParams, oClient]) =>
         FP.pipe(
@@ -55,15 +55,12 @@ export const createFeesService = (client$: Client$): FeesService => {
                 client.estimateCall({ contractAddress: address, abi, funcName: func, funcParams: params }),
                 client.estimateGasPrices()
               ]).pipe(
-                RxOp.map(
-                  ([gasLimit, gasPrices]) =>
-                    ({
-                      type: FeeType.PerByte,
-                      average: getFee({ gasPrice: gasPrices.average, gasLimit }),
-                      fast: getFee({ gasPrice: gasPrices.fast, gasLimit }),
-                      fastest: getFee({ gasPrice: gasPrices.fastest, gasLimit })
-                    } as Fees)
-                ),
+                RxOp.map<[ethers.BigNumber, GasPrices], Fees>(([gasLimit, gasPrices]) => ({
+                  type: FeeType.PerByte,
+                  average: getFee({ gasPrice: gasPrices.average, gasLimit }),
+                  fast: getFee({ gasPrice: gasPrices.fast, gasLimit }),
+                  fastest: getFee({ gasPrice: gasPrices.fastest, gasLimit })
+                })),
                 RxOp.map(RD.success),
                 RxOp.catchError((_) => Rx.of(RD.success(getDefaultFees()))),
                 RxOp.startWith(RD.pending)
@@ -86,15 +83,12 @@ export const createFeesService = (client$: Client$): FeesService => {
             (client) => {
               const gasLimit = isEthAsset(asset) ? ETH_OUT_TX_GAS_LIMIT : ERC20_OUT_TX_GAS_LIMIT
               return Rx.from(client.estimateGasPrices()).pipe(
-                RxOp.map(
-                  (gasPrices) =>
-                    ({
-                      type: 'byte',
-                      average: getFee({ gasPrice: gasPrices.average, gasLimit }),
-                      fast: getFee({ gasPrice: gasPrices.fast, gasLimit }),
-                      fastest: getFee({ gasPrice: gasPrices.fastest, gasLimit })
-                    } as Fees)
-                ),
+                RxOp.map<GasPrices, Fees>((gasPrices) => ({
+                  type: FeeType.PerByte,
+                  average: getFee({ gasPrice: gasPrices.average, gasLimit }),
+                  fast: getFee({ gasPrice: gasPrices.fast, gasLimit }),
+                  fastest: getFee({ gasPrice: gasPrices.fastest, gasLimit })
+                })),
                 RxOp.map(RD.success),
                 RxOp.catchError((_) => Rx.of(RD.success(getDefaultFees()))),
                 RxOp.startWith(RD.pending)

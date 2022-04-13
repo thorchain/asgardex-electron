@@ -1,4 +1,5 @@
 import { ETHAddress } from '@xchainjs/xchain-ethereum'
+import { AssetLUNA } from '@xchainjs/xchain-terra'
 import {
   assetAmount,
   AssetBCH,
@@ -6,7 +7,6 @@ import {
   AssetBTC,
   AssetETH,
   AssetLTC,
-  AssetLUNA,
   AssetRune67C,
   AssetRuneB1A,
   AssetRuneERC20,
