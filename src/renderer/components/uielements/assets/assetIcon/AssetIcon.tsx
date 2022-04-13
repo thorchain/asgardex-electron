@@ -1,6 +1,7 @@
 import React, { useMemo, useCallback } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
+import { isTerraNativeAsset } from '@xchainjs/xchain-terra'
 import { Asset, isSynthAsset } from '@xchainjs/xchain-util'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
@@ -103,6 +104,11 @@ export const AssetIcon: React.FC<Props> = ({ asset, size = 'normal', className =
     // UST
     if (isUstAsset(asset)) {
       return ustIcon
+    }
+
+    // All other Terra native assets
+    if (isTerraNativeAsset(asset)) {
+      return `https://assets.terra.money/icon/svg/Terra/${asset.ticker}.svg`
     }
 
     if (network !== 'testnet') {
