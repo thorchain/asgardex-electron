@@ -14,9 +14,10 @@ import {
   Asset,
   assetToString,
   baseAmount,
-  TerraChain
+  TerraChain,
+  eqAsset
 } from '@xchainjs/xchain-util'
-import { Row, Form, Dropdown, Menu } from 'antd'
+import { Row, Form, Dropdown } from 'antd'
 import { MenuProps } from 'antd/lib/menu'
 import BigNumber from 'bignumber.js'
 import * as A from 'fp-ts/lib/Array'
@@ -39,6 +40,8 @@ import { ValidatePasswordHandler } from '../../../../services/wallet/types'
 import { WalletBalance } from '../../../../services/wallet/types'
 import { DownIcon } from '../../../icons'
 import { LedgerConfirmationModal, WalletPasswordConfirmationModal } from '../../../modal/confirmation'
+import { Menu } from '../../../shared/menu/Menu'
+import { AssetIcon } from '../../../uielements/assets/assetIcon'
 import { MaxBalanceButton } from '../../../uielements/button/MaxBalanceButton'
 import { UIFeesRD } from '../../../uielements/fees'
 import { Input, InputBigNumber } from '../../../uielements/input'
@@ -123,17 +126,18 @@ export const SendFormTERRA: React.FC<Props> = (props): JSX.Element => {
 
   const isFeeError = useMemo(() => {
     return FP.pipe(
-      oFee,
-      O.fold(
-        // Missing (or loading) fees does not mean we can't sent something. No error then.
-        () => !O.isNone(oFee),
+      feeRD,
+      RD.fold(
+        () => false,
+        () => false,
+        (_) => true,
         (fee) => feeBalance.lt(fee)
       )
     )
-  }, [oFee, feeBalance])
+  }, [feeRD, feeBalance])
 
   const renderFeeError = useMemo(() => {
-    if (!isFeeError) return <></>
+    if (!isFeeError || RD.isFailure(feeRD) /* feeRD error is rendered in UIFee */) return <></>
 
     const msg = intl.formatMessage(
       { id: 'wallet.errors.fee.notCovered' },
@@ -147,7 +151,7 @@ export const SendFormTERRA: React.FC<Props> = (props): JSX.Element => {
         {msg}
       </Styled.Label>
     )
-  }, [asset, feeBalance, intl, isFeeError])
+  }, [asset, feeBalance, feeRD, intl, isFeeError])
 
   const addressValidator = useCallback(
     async (_: unknown, value: string) => {
@@ -162,7 +166,22 @@ export const SendFormTERRA: React.FC<Props> = (props): JSX.Element => {
   )
 
   // max amount
-  const maxAmount: BaseAmount = useMemo(() => balance.amount, [balance.amount])
+  const maxAmount: BaseAmount = useMemo(() => {
+    if (eqAsset(feeAsset, asset)) {
+      const max = FP.pipe(
+        oFee,
+        O.fold(
+          () => balance.amount,
+          (fee) => balance.amount.minus(fee)
+        )
+      )
+      const zero = baseAmount(0, TERRA_DECIMAL)
+
+      return max.gt(zero) ? max : zero
+    }
+
+    return balance.amount
+  }, [asset, balance.amount, feeAsset, oFee])
 
   useEffect(() => {
     // Whenever `amountToSend` has been updated, we put it back into input field
@@ -196,6 +215,17 @@ export const SendFormTERRA: React.FC<Props> = (props): JSX.Element => {
     },
     [setSendAddress, addressValidator]
   )
+
+  const memoValidator = useCallback(
+    async (_: unknown, value: string) => {
+      const max = 256
+      if (!!value && value.length > max) {
+        return Promise.reject(intl.formatMessage({ id: 'wallet.errors.memo.max' }, { max: 256 }))
+      }
+    },
+    [intl]
+  )
+
   // Send tx start time
   const [sendTxStartTime, setSendTxStartTime] = useState<number>(0)
 
@@ -300,6 +330,9 @@ export const SendFormTERRA: React.FC<Props> = (props): JSX.Element => {
 
   const reloadFees = useCallback(
     (overrideFeeAsset?: Asset) => {
+      // Check validation errors
+      // Note: Never use a memorized `H.hasFormErrors` here - it will re-load fees with errors otherwise
+      if (H.hasFormErrors(form)) return {}
       // If not amount is set, use `1` BaseAmount (needed to calcu)
       const amount = FP.pipe(
         amountToSend,
@@ -354,25 +387,29 @@ export const SendFormTERRA: React.FC<Props> = (props): JSX.Element => {
           balances,
           A.filter(({ asset }) => isTerraChain(asset.chain)),
           A.map(({ asset }) => (
-            <CStyled.MenuItem key={assetToString(asset)}>
-              <CStyled.MenuItemText>{asset.ticker}</CStyled.MenuItemText>
-            </CStyled.MenuItem>
+            <Menu.Item key={assetToString(asset)}>
+              <CStyled.MenuItemContainer>
+                <AssetIcon size="xsmall" asset={asset} network={network} />
+                <CStyled.MenuItemText>{asset.ticker}</CStyled.MenuItemText>
+              </CStyled.MenuItemContainer>
+            </Menu.Item>
           ))
         )}
       </Menu>
     ),
-    [balances, changeFeeHandler]
+    [balances, changeFeeHandler, network]
   )
 
   const renderFeeAssetSelector = useMemo(
     () => (
-      <Row style={{ alignItems: 'center' }}>
+      <Row align="middle">
         <Styled.CustomLabel size="big" style={{ width: 'auto' }}>
-          Fee asset
+          {intl.formatMessage({ id: 'common.fee.asset' })}
         </Styled.CustomLabel>
         <Dropdown overlay={feeAssetMenu} trigger={['click']} placement="bottomCenter">
           <CStyled.DropdownContentWrapper>
-            <Row style={{ alignItems: 'center' }}>
+            <Row align="middle">
+              <AssetIcon size="xsmall" asset={feeAsset} network={network} />
               <CStyled.MenuItemText>{feeAsset.ticker}</CStyled.MenuItemText>
               <DownIcon />
             </Row>
@@ -380,7 +417,7 @@ export const SendFormTERRA: React.FC<Props> = (props): JSX.Element => {
         </Dropdown>
       </Row>
     ),
-    [feeAsset.ticker, feeAssetMenu]
+    [feeAsset, feeAssetMenu, intl, network]
   )
 
   const uiFeesRD: UIFeesRD = useMemo(
@@ -394,6 +431,8 @@ export const SendFormTERRA: React.FC<Props> = (props): JSX.Element => {
   )
 
   const renderWalletType = useMemo(() => H.renderedWalletType(oMatchedWalletType), [oMatchedWalletType])
+
+  const disableSubmit = useMemo(() => isFeeError || RD.isPending(feeRD), [feeRD, isFeeError])
 
   return (
     <>
@@ -440,12 +479,12 @@ export const SendFormTERRA: React.FC<Props> = (props): JSX.Element => {
               <Styled.Fees fees={uiFeesRD} reloadFees={reloadFees} disabled={isLoading} />
               {renderFeeError}
               <Styled.CustomLabel size="big">{intl.formatMessage({ id: 'common.memo' })}</Styled.CustomLabel>
-              <Form.Item name="memo">
+              <Form.Item rules={[{ required: true, validator: memoValidator }]} name="memo">
                 <Input size="large" disabled={isLoading} onBlur={() => reloadFees(feeAsset)} />
               </Form.Item>
             </Styled.SubForm>
             <Styled.SubmitContainer>
-              <Styled.Button loading={isLoading} disabled={isFeeError} htmlType="submit">
+              <Styled.Button loading={isLoading} disabled={disableSubmit} htmlType="submit">
                 {intl.formatMessage({ id: 'wallet.action.send' })}
               </Styled.Button>
             </Styled.SubmitContainer>

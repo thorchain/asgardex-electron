@@ -1,7 +1,5 @@
 import * as RD from '@devexperts/remote-data-ts'
-import { FeeType, singleFee } from '@xchainjs/xchain-client'
-import { FeeParams, TERRA_DECIMAL } from '@xchainjs/xchain-terra'
-import { baseAmount } from '@xchainjs/xchain-util'
+import { FeeParams } from '@xchainjs/xchain-terra'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
 import * as Rx from 'rxjs'
@@ -29,7 +27,9 @@ export const createFeesService = (client$: Client$): FeesService => {
             (client) =>
               Rx.from(client.getFees(feeParams)).pipe(
                 RxOp.map(RD.success),
-                RxOp.catchError((_) => Rx.of(RD.success(singleFee(FeeType.PerByte, baseAmount(0, TERRA_DECIMAL))))),
+                RxOp.catchError((error) =>
+                  Rx.of(RD.failure(Error(`Error to load fee (${error?.messagee ?? error.toString()})`)))
+                ),
                 RxOp.startWith(RD.pending)
               )
           )

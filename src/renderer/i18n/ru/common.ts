@@ -44,6 +44,7 @@ const common: CommonMessages = {
   'common.viewTransaction': 'Посмотреть транзакцию',
   'common.copyTxUrl': 'Copy transaction url - RU',
   'common.fee': 'Комиссия',
+  'common.fee.asset': 'Fee asset - RU',
   'common.fees': 'Комиссии',
   'common.fee.estimated': 'Ориентировочная комиссия',
   'common.fees.estimated': 'Ориентировочные комиссии',
