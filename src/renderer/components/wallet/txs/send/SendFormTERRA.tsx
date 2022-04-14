@@ -14,7 +14,8 @@ import {
   Asset,
   assetToString,
   baseAmount,
-  TerraChain
+  TerraChain,
+  eqAsset
 } from '@xchainjs/xchain-util'
 import { Row, Form, Dropdown, Menu } from 'antd'
 import { MenuProps } from 'antd/lib/menu'
@@ -162,7 +163,22 @@ export const SendFormTERRA: React.FC<Props> = (props): JSX.Element => {
   )
 
   // max amount
-  const maxAmount: BaseAmount = useMemo(() => balance.amount, [balance.amount])
+  const maxAmount: BaseAmount = useMemo(() => {
+    if (eqAsset(feeAsset, asset)) {
+      const max = FP.pipe(
+        oFee,
+        O.fold(
+          () => balance.amount,
+          (fee) => balance.amount.minus(fee)
+        )
+      )
+      const zero = baseAmount(0, TERRA_DECIMAL)
+
+      return max.gt(zero) ? max : zero
+    }
+
+    return balance.amount
+  }, [asset, balance.amount, feeAsset, oFee])
 
   useEffect(() => {
     // Whenever `amountToSend` has been updated, we put it back into input field
@@ -398,6 +414,8 @@ export const SendFormTERRA: React.FC<Props> = (props): JSX.Element => {
   return (
     <>
       <Row>
+        <div>max {JSON.stringify(maxAmount.amount().toString())}</div>
+        <div>fee balance {JSON.stringify(feeBalance.amount().toString())}</div>
         <Styled.Col span={24}>
           <AccountSelector selectedWallet={balance} network={network} />
           <Styled.Form
