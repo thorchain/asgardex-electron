@@ -139,7 +139,7 @@ export const SendFormETH: React.FC<Props> = (props): JSX.Element => {
       O.fold(
         // Missing (or loading) fees does not mean we can't sent something. No error then.
         () => false,
-        ([fee, ethAmount]) => ethAmount.amount().isLessThan(baseToAsset(fee).amount())
+        ([fee, ethAmount]) => ethAmount.lt(fee)
       )
     )
   }, [oEthAmount, selectedFee])
