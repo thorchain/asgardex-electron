@@ -124,17 +124,18 @@ export const SendFormTERRA: React.FC<Props> = (props): JSX.Element => {
 
   const isFeeError = useMemo(() => {
     return FP.pipe(
-      oFee,
-      O.fold(
-        // Missing (or loading) fees does not mean we can't sent something. No error then.
-        () => !O.isNone(oFee),
+      feeRD,
+      RD.fold(
+        () => false,
+        () => false,
+        (_) => true,
         (fee) => feeBalance.lt(fee)
       )
     )
-  }, [oFee, feeBalance])
+  }, [feeRD, feeBalance])
 
   const renderFeeError = useMemo(() => {
-    if (!isFeeError) return <></>
+    if (!isFeeError || RD.isFailure(feeRD) /* feeRD error is rendered in UIFee */) return <></>
 
     const msg = intl.formatMessage(
       { id: 'wallet.errors.fee.notCovered' },
@@ -148,7 +149,7 @@ export const SendFormTERRA: React.FC<Props> = (props): JSX.Element => {
         {msg}
       </Styled.Label>
     )
-  }, [asset, feeBalance, intl, isFeeError])
+  }, [asset, feeBalance, feeRD, intl, isFeeError])
 
   const addressValidator = useCallback(
     async (_: unknown, value: string) => {
@@ -327,6 +328,10 @@ export const SendFormTERRA: React.FC<Props> = (props): JSX.Element => {
 
   const reloadFees = useCallback(
     (overrideFeeAsset?: Asset) => {
+      // Check validation errors
+      // Note: Never use a memorized `H.hasFormErrors` here - it will re-load fees with errors otherwise
+      // if (form.getFieldsError().filter(({ errors }) => errors.length).length) return {}
+      if (H.hasFormErrors(form)) return {}
       // If not amount is set, use `1` BaseAmount (needed to calcu)
       const amount = FP.pipe(
         amountToSend,
@@ -422,16 +427,11 @@ export const SendFormTERRA: React.FC<Props> = (props): JSX.Element => {
 
   const renderWalletType = useMemo(() => H.renderedWalletType(oMatchedWalletType), [oMatchedWalletType])
 
-  const disableSubmit = useMemo(
-    () => isFeeError || RD.isPending(feeRD) || !!form.getFieldsError().filter(({ errors }) => errors.length).length,
-    [feeRD, form, isFeeError]
-  )
+  const disableSubmit = useMemo(() => isFeeError || RD.isPending(feeRD), [feeRD, isFeeError])
 
   return (
     <>
       <Row>
-        <div>max {JSON.stringify(maxAmount.amount().toString())}</div>
-        <div>fee balance {JSON.stringify(feeBalance.amount().toString())}</div>
         <Styled.Col span={24}>
           <AccountSelector selectedWallet={balance} network={network} />
           <Styled.Form
