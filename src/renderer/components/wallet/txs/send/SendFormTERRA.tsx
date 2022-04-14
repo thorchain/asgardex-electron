@@ -212,6 +212,17 @@ export const SendFormTERRA: React.FC<Props> = (props): JSX.Element => {
     },
     [setSendAddress, addressValidator]
   )
+
+  const memoValidator = useCallback(
+    async (_: unknown, value: string) => {
+      const max = 256
+      if (!!value && value.length > max) {
+        return Promise.reject(intl.formatMessage({ id: 'wallet.errors.memo.max' }, { max: 256 }))
+      }
+    },
+    [intl]
+  )
+
   // Send tx start time
   const [sendTxStartTime, setSendTxStartTime] = useState<number>(0)
 
@@ -411,6 +422,11 @@ export const SendFormTERRA: React.FC<Props> = (props): JSX.Element => {
 
   const renderWalletType = useMemo(() => H.renderedWalletType(oMatchedWalletType), [oMatchedWalletType])
 
+  const disableSubmit = useMemo(
+    () => isFeeError || RD.isPending(feeRD) || !!form.getFieldsError().filter(({ errors }) => errors.length).length,
+    [feeRD, form, isFeeError]
+  )
+
   return (
     <>
       <Row>
@@ -458,12 +474,12 @@ export const SendFormTERRA: React.FC<Props> = (props): JSX.Element => {
               <Styled.Fees fees={uiFeesRD} reloadFees={reloadFees} disabled={isLoading} />
               {renderFeeError}
               <Styled.CustomLabel size="big">{intl.formatMessage({ id: 'common.memo' })}</Styled.CustomLabel>
-              <Form.Item name="memo">
+              <Form.Item rules={[{ required: true, validator: memoValidator }]} name="memo">
                 <Input size="large" disabled={isLoading} onBlur={() => reloadFees(feeAsset)} />
               </Form.Item>
             </Styled.SubForm>
             <Styled.SubmitContainer>
-              <Styled.Button loading={isLoading} disabled={isFeeError} htmlType="submit">
+              <Styled.Button loading={isLoading} disabled={disableSubmit} htmlType="submit">
                 {intl.formatMessage({ id: 'wallet.action.send' })}
               </Styled.Button>
             </Styled.SubmitContainer>

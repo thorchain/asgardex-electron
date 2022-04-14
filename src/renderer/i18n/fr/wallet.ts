@@ -75,6 +75,7 @@ const wallet: WalletMessages = {
   'wallet.errors.amount.shouldBeLessThanBalanceAndFee': 'Le montant doit être inférieur à votre solde moins les frais',
   'wallet.errors.fee.notCovered': 'Les frais ne sont pas couverts par votre solde de ({balance})',
   'wallet.errors.invalidChain': 'Chaîne non valide : {chain}',
+  'wallet.errors.memo.max': "Length of memo can't be more than {max} - FR",
   'wallet.password.confirmation.title': 'Confirmation du mot de passe',
   'wallet.password.confirmation.description': 'Veuillez saisir le mot de passe de votre portefeuille.',
   'wallet.password.confirmation.pending': 'Validation du mot de passe',

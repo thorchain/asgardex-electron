@@ -74,6 +74,7 @@ const wallet: WalletMessages = {
     'Количество должно быть меньше, чем ваш баланс после вычета комиссии',
   'wallet.errors.fee.notCovered': 'Комиссия не покрывается вашим банаслом ({balance})',
   'wallet.errors.invalidChain': 'Неверная цепочка: {chain}',
+  'wallet.errors.memo.max': "Length of memo can't be more than {max} - RU",
   'wallet.password.confirmation.title': 'Подтверждение пароля',
   'wallet.password.confirmation.description': 'пожалуйста введите свой пароль.',
   'wallet.password.confirmation.pending': 'Проверяю пароль',

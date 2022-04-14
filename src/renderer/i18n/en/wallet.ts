@@ -73,6 +73,7 @@ const wallet: WalletMessages = {
   'wallet.errors.amount.shouldBeLessThanBalanceAndFee': 'Amount should be less than your balance minus fee',
   'wallet.errors.fee.notCovered': 'Fees are not covered by your balance ({balance})',
   'wallet.errors.invalidChain': 'Invalid chain: {chain}',
+  'wallet.errors.memo.max': "Length of memo can't be more than {max}",
   'wallet.password.confirmation.title': 'Wallet password confirmation',
   'wallet.password.confirmation.description': 'Please enter your wallet password.',
   'wallet.password.confirmation.pending': 'Validating password',

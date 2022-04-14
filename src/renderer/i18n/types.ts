@@ -212,6 +212,7 @@ type WalletMessageKey =
   | 'wallet.errors.amount.shouldBeLessThanBalanceAndFee'
   | 'wallet.errors.fee.notCovered'
   | 'wallet.errors.invalidChain'
+  | 'wallet.errors.memo.max'
   | 'wallet.send.error'
   | 'wallet.upgrade.pending'
   | 'wallet.upgrade.success'

@@ -76,7 +76,8 @@ const wallet: WalletMessages = {
   'wallet.errors.amount.shouldBeLessThanBalanceAndFee':
     'Der eingegebene Wert sollte nicht höher als Dein Guthaben abzgl. Gebühren sein',
   'wallet.errors.fee.notCovered': 'Die Gebühren sind nicht über Dein Guthaben ({balance}) gedeckt',
-  'wallet.errors.invalidChain': 'Invalide Chain: {chain}',
+  'wallet.errors.invalidChain': 'Ungültige Chain: {chain}',
+  'wallet.errors.memo.max': 'Memo darf nicht mehr als {max} Zeichen beinhalten',
   'wallet.password.confirmation.title': 'Wallet Passwort bestätigen',
   'wallet.password.confirmation.description': 'Bitte gebe zur Bestätigung Dein Wallet Password ein.',
   'wallet.password.confirmation.pending': 'Überprüfe Passwort',
