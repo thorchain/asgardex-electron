@@ -43,6 +43,7 @@ export type CommonMessageKey =
   | 'common.viewTransaction'
   | 'common.copyTxUrl'
   | 'common.fee'
+  | 'common.fee.asset'
   | 'common.fees'
   | 'common.fee.estimated'
   | 'common.fees.estimated'

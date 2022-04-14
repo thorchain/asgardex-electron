@@ -3,10 +3,10 @@ import Text from 'antd/lib/typography/Text'
 import styled from 'styled-components'
 import { palette } from 'styled-theme'
 
-export const MenuItem = styled(A.Menu.Item)`
+export const MenuItemContainer = styled.div`
   display: flex;
   align-items: center;
-  padding: 8px 10px;
+  padding: 8px 0px;
 `
 
 export const DropdownContentWrapper = styled(A.Row)`
@@ -22,4 +22,5 @@ export const MenuItemText = styled(Text)`
   font-family: 'MainFontRegular';
   color: ${palette('text', 1)};
   font-size: 15px;
+  margin-left: 5px;
 `

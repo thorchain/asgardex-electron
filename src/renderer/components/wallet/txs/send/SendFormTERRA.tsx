@@ -17,7 +17,7 @@ import {
   TerraChain,
   eqAsset
 } from '@xchainjs/xchain-util'
-import { Row, Form, Dropdown, Menu } from 'antd'
+import { Row, Form, Dropdown } from 'antd'
 import { MenuProps } from 'antd/lib/menu'
 import BigNumber from 'bignumber.js'
 import * as A from 'fp-ts/lib/Array'
@@ -40,6 +40,8 @@ import { ValidatePasswordHandler } from '../../../../services/wallet/types'
 import { WalletBalance } from '../../../../services/wallet/types'
 import { DownIcon } from '../../../icons'
 import { LedgerConfirmationModal, WalletPasswordConfirmationModal } from '../../../modal/confirmation'
+import { Menu } from '../../../shared/menu/Menu'
+import { AssetIcon } from '../../../uielements/assets/assetIcon'
 import { MaxBalanceButton } from '../../../uielements/button/MaxBalanceButton'
 import { UIFeesRD } from '../../../uielements/fees'
 import { Input, InputBigNumber } from '../../../uielements/input'
@@ -386,25 +388,29 @@ export const SendFormTERRA: React.FC<Props> = (props): JSX.Element => {
           balances,
           A.filter(({ asset }) => isTerraChain(asset.chain)),
           A.map(({ asset }) => (
-            <CStyled.MenuItem key={assetToString(asset)}>
-              <CStyled.MenuItemText>{asset.ticker}</CStyled.MenuItemText>
-            </CStyled.MenuItem>
+            <Menu.Item key={assetToString(asset)}>
+              <CStyled.MenuItemContainer>
+                <AssetIcon size="xsmall" asset={asset} network={network} />
+                <CStyled.MenuItemText>{asset.ticker}</CStyled.MenuItemText>
+              </CStyled.MenuItemContainer>
+            </Menu.Item>
           ))
         )}
       </Menu>
     ),
-    [balances, changeFeeHandler]
+    [balances, changeFeeHandler, network]
   )
 
   const renderFeeAssetSelector = useMemo(
     () => (
-      <Row style={{ alignItems: 'center' }}>
+      <Row align="middle">
         <Styled.CustomLabel size="big" style={{ width: 'auto' }}>
-          Fee asset
+          {intl.formatMessage({ id: 'common.fee.asset' })}
         </Styled.CustomLabel>
         <Dropdown overlay={feeAssetMenu} trigger={['click']} placement="bottomCenter">
           <CStyled.DropdownContentWrapper>
-            <Row style={{ alignItems: 'center' }}>
+            <Row align="middle">
+              <AssetIcon size="xsmall" asset={feeAsset} network={network} />
               <CStyled.MenuItemText>{feeAsset.ticker}</CStyled.MenuItemText>
               <DownIcon />
             </Row>
@@ -412,7 +418,7 @@ export const SendFormTERRA: React.FC<Props> = (props): JSX.Element => {
         </Dropdown>
       </Row>
     ),
-    [feeAsset.ticker, feeAssetMenu]
+    [feeAsset, feeAssetMenu, intl, network]
   )
 
   const uiFeesRD: UIFeesRD = useMemo(

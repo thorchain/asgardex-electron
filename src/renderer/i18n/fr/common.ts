@@ -44,6 +44,7 @@ const common: CommonMessages = {
   'common.viewTransaction': 'Afficher la transaction',
   'common.copyTxUrl': "Copier l'URL de la transaction",
   'common.fee': 'Frais',
+  'common.fee.asset': 'Fee asset - FR',
   'common.fees': 'Frais',
   'common.fee.estimated': 'Frais estimé',
   'common.fees.estimated': 'Frais estimés',
