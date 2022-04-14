@@ -332,7 +332,6 @@ export const SendFormTERRA: React.FC<Props> = (props): JSX.Element => {
     (overrideFeeAsset?: Asset) => {
       // Check validation errors
       // Note: Never use a memorized `H.hasFormErrors` here - it will re-load fees with errors otherwise
-      // if (form.getFieldsError().filter(({ errors }) => errors.length).length) return {}
       if (H.hasFormErrors(form)) return {}
       // If not amount is set, use `1` BaseAmount (needed to calcu)
       const amount = FP.pipe(
