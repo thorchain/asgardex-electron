@@ -9,6 +9,7 @@ import {
   reloadBalances,
   balances$,
   fees$,
+  estimatedFees$,
   reloadFees
 } from '../services/terra'
 
@@ -21,6 +22,7 @@ export type TerraContextValue = {
   reloadBalances: typeof reloadBalances
   balances$: typeof balances$
   fees$: typeof fees$
+  estimatedFees$: typeof estimatedFees$
   reloadFees: typeof reloadFees
 }
 
@@ -33,6 +35,7 @@ const initialContext: TerraContextValue = {
   reloadBalances,
   balances$,
   fees$,
+  estimatedFees$,
   reloadFees
 }
 

@@ -25,6 +25,7 @@ import * as BCH from '../../bitcoincash'
 import * as DOGE from '../../doge'
 import * as ETH from '../../ethereum'
 import * as LTC from '../../litecoin'
+import * as TERRA from '../../terra'
 import * as THOR from '../../thorchain'
 import { ApiError, ErrorId, TxHashLD, TxLD } from '../../wallet/types'
 import { SendPoolTxParams, SendTxParams } from '../types'
@@ -46,7 +47,10 @@ export const sendTx$ = ({
   amount,
   memo,
   feeOption = DEFAULT_FEE_OPTION,
-  walletIndex
+  walletIndex,
+  feeAsset,
+  feeAmount,
+  gasLimit
 }: SendTxParams): TxHashLD => {
   switch (asset.chain) {
     case BNBChain:
@@ -79,8 +83,11 @@ export const sendTx$ = ({
       return txFailure$(`sendTx$ has not been implemented for Polkadot yet`)
 
     case TerraChain:
-      // TODO (@veado) Implement Terra
-      return txFailure$(`sendTx$ has not been implemented for Terra`)
+      if (!feeAmount) return txFailure$('Missing `feeAmount` - needed to transfer TERRA tx')
+      if (!feeAsset) return txFailure$('Missing `feeAsset` - needed to transfer TERRA tx')
+      if (!gasLimit) return txFailure$('Missing `gasLimit` - needed to transfer TERRA tx')
+
+      return TERRA.sendTx({ walletType, amount, asset, memo, recipient, walletIndex, feeAmount, feeAsset, gasLimit })
 
     case DOGEChain:
       return FP.pipe(

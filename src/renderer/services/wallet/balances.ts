@@ -72,6 +72,7 @@ export const createBalancesService = ({
     THOR.reloadBalances()
     LTC.reloadBalances()
     DOGE.reloadBalances()
+    TERRA.reloadBalances()
   }
 
   // Returns lazy functions to reload balances by given chain
@@ -91,12 +92,11 @@ export const createBalancesService = ({
         return LTC.reloadBalances
       case DOGEChain:
         return DOGE.reloadBalances
+      case TerraChain:
+        return TERRA.reloadBalances
       case CosmosChain:
         return FP.constVoid
       case PolkadotChain:
-        return FP.constVoid
-      case TerraChain:
-        // TODO (@veado) Implement Terra
         return FP.constVoid
     }
   }

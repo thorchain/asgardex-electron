@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useMemo, useState } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
 import { Address } from '@xchainjs/xchain-client'
-import { FeeParams, TERRA_DECIMAL } from '@xchainjs/xchain-terra'
+import { EstimatedFee, FeeParams, TERRA_DECIMAL } from '@xchainjs/xchain-terra'
 import {
   formatAssetAmountCurrency,
   assetAmount,
@@ -34,8 +34,9 @@ import { isTerraChain } from '../../../../helpers/chainHelper'
 import { getWalletBalanceByAssetAndWalletType } from '../../../../helpers/walletHelper'
 import { useSubscriptionState } from '../../../../hooks/useSubscriptionState'
 import { INITIAL_SEND_STATE } from '../../../../services/chain/const'
-import { FeeRD, SendTxState, SendTxStateHandler } from '../../../../services/chain/types'
+import { SendTxState, SendTxStateHandler } from '../../../../services/chain/types'
 import { AddressValidation, GetExplorerTxUrl, OpenExplorerTxUrl, WalletBalances } from '../../../../services/clients'
+import { EstimatedFeeRD } from '../../../../services/terra/types'
 import { ValidatePasswordHandler } from '../../../../services/wallet/types'
 import { WalletBalance } from '../../../../services/wallet/types'
 import { DownIcon } from '../../../icons'
@@ -68,7 +69,7 @@ export type Props = {
   openExplorerTxUrl: OpenExplorerTxUrl
   getExplorerTxUrl: GetExplorerTxUrl
   addressValidation: AddressValidation
-  fee: FeeRD
+  fee: EstimatedFeeRD
   reloadFeesHandler: (params: O.Option<FeeParams>) => void
   validatePassword$: ValidatePasswordHandler
   network: Network
@@ -109,7 +110,7 @@ export const SendFormTERRA: React.FC<Props> = (props): JSX.Element => {
 
   const [form] = Form.useForm<FormValues>()
 
-  const oFee: O.Option<BaseAmount> = useMemo(() => FP.pipe(feeRD, RD.toOption), [feeRD])
+  const oFee: O.Option<EstimatedFee> = useMemo(() => FP.pipe(feeRD, RD.toOption), [feeRD])
 
   const feeBalance: BaseAmount = useMemo(
     () =>
@@ -131,7 +132,7 @@ export const SendFormTERRA: React.FC<Props> = (props): JSX.Element => {
         () => false,
         () => false,
         (_) => true,
-        (fee) => feeBalance.lt(fee)
+        ({ amount }) => feeBalance.lt(amount)
       )
     )
   }, [feeRD, feeBalance])
@@ -172,7 +173,7 @@ export const SendFormTERRA: React.FC<Props> = (props): JSX.Element => {
         oFee,
         O.fold(
           () => balance.amount,
-          (fee) => balance.amount.minus(fee)
+          ({ amount }) => balance.amount.minus(amount)
         )
       )
       const zero = baseAmount(0, TERRA_DECIMAL)
@@ -230,19 +231,32 @@ export const SendFormTERRA: React.FC<Props> = (props): JSX.Element => {
   const [sendTxStartTime, setSendTxStartTime] = useState<number>(0)
 
   const submitTx = useCallback(() => {
-    setSendTxStartTime(Date.now())
+    FP.pipe(
+      oFee,
+      O.fold(
+        () => false,
+        (fee) => {
+          setSendTxStartTime(Date.now())
 
-    subscribeSendTxState(
-      transfer$({
-        walletType,
-        walletIndex,
-        recipient: form.getFieldValue('recipient'),
-        asset,
-        amount: amountToSend,
-        memo: form.getFieldValue('memo')
-      })
+          subscribeSendTxState(
+            transfer$({
+              walletType,
+              walletIndex,
+              sender: walletAddress,
+              recipient: form.getFieldValue('recipient'),
+              asset,
+              amount: amountToSend,
+              memo: form.getFieldValue('memo'),
+              feeAsset: fee.asset,
+              feeAmount: fee.amount,
+              gasLimit: fee.gasLimit
+            })
+          )
+          return true
+        }
+      )
     )
-  }, [subscribeSendTxState, transfer$, walletType, walletIndex, form, asset, amountToSend])
+  }, [oFee, subscribeSendTxState, transfer$, walletType, walletIndex, walletAddress, form, asset, amountToSend])
 
   const [showConfirmationModal, setShowConfirmationModal] = useState(false)
 
@@ -424,7 +438,7 @@ export const SendFormTERRA: React.FC<Props> = (props): JSX.Element => {
     () =>
       FP.pipe(
         feeRD,
-        RD.map((fee) => [{ asset: feeAsset, amount: fee }])
+        RD.map(({ amount }) => [{ asset: feeAsset, amount }])
       ),
 
     [feeAsset, feeRD]
