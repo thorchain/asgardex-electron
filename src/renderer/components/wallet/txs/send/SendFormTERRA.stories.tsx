@@ -2,8 +2,8 @@ import React from 'react'
 
 import { Story, Meta } from '@storybook/react'
 import { TxHash } from '@xchainjs/xchain-client'
-import { AssetLUNA } from '@xchainjs/xchain-terra'
-import { assetAmount, assetToBase, BaseAmount, baseAmount } from '@xchainjs/xchain-util'
+import { AssetLUNA, EstimatedFee } from '@xchainjs/xchain-terra'
+import { assetAmount, assetToBase, baseAmount, bn } from '@xchainjs/xchain-util'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
 import * as Rx from 'rxjs'
@@ -12,7 +12,8 @@ import { getMockRDValueFactory, RDStatus } from '../../../../../shared/mock/rdBy
 import { mockValidatePassword$ } from '../../../../../shared/mock/wallet'
 import { WalletType } from '../../../../../shared/wallet/types'
 import { mockWalletBalance } from '../../../../helpers/test/testWalletHelper'
-import { FeeRD, SendTxStateHandler } from '../../../../services/chain/types'
+import { SendTxStateHandler } from '../../../../services/chain/types'
+import { EstimatedFeeRD } from '../../../../services/terra/types'
 import { ApiError, ErrorId, WalletBalance } from '../../../../services/wallet/types'
 import { SendFormTERRA as Component } from './SendFormTERRA'
 
@@ -40,10 +41,10 @@ const Template: Story<Args> = ({ txRDStatus, feeRDStatus, balance, validAddress,
       )
     })
 
-  const feeRD: FeeRD = FP.pipe(
+  const feeRD: EstimatedFeeRD = FP.pipe(
     feeRDStatus,
-    getMockRDValueFactory<Error, BaseAmount>(
-      () => baseAmount(2000000),
+    getMockRDValueFactory<Error, EstimatedFee>(
+      () => ({ amount: baseAmount(2000000), asset: AssetLUNA, gasLimit: bn(2266) }),
       () => Error('getting fees failed')
     )
   )

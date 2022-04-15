@@ -1,6 +1,7 @@
 import * as RD from '@devexperts/remote-data-ts'
 import { Address, FeeOption, Fees, Tx } from '@xchainjs/xchain-client'
 import { Asset, BaseAmount, Chain } from '@xchainjs/xchain-util'
+import BigNumber from 'bignumber.js'
 import * as O from 'fp-ts/lib/Option'
 import * as Rx from 'rxjs'
 
@@ -102,6 +103,9 @@ export type SendTxParams = {
   memo: Memo
   feeOption?: FeeOption
   walletIndex: number
+  feeAsset?: Asset
+  gasLimit?: BigNumber
+  feeAmount?: BaseAmount
 }
 
 export type SendPoolTxParams = SendTxParams & {

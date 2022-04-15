@@ -14,13 +14,12 @@ import { SendFormTERRA } from '../../../components/wallet/txs/send'
 import { useChainContext } from '../../../contexts/ChainContext'
 import { useTerraContext } from '../../../contexts/TerraContext'
 import { useWalletContext } from '../../../contexts/WalletContext'
-import { liveData } from '../../../helpers/rx/liveData'
 import { getWalletBalanceByAddressAndAsset } from '../../../helpers/walletHelper'
 import { useNetwork } from '../../../hooks/useNetwork'
 import { useOpenExplorerTxUrl } from '../../../hooks/useOpenExplorerTxUrl'
 import { useValidateAddress } from '../../../hooks/useValidateAddress'
-import { FeeRD } from '../../../services/chain/types'
 import { WalletBalances } from '../../../services/clients'
+import { EstimatedFeeRD } from '../../../services/terra/types'
 import { DEFAULT_BALANCES_FILTER, INITIAL_BALANCES_STATE } from '../../../services/wallet/const'
 
 type Props = {
@@ -57,19 +56,20 @@ export const SendViewTERRA: React.FC<Props> = (props): JSX.Element => {
 
   const { transfer$ } = useChainContext()
 
-  const { fees$, reloadFees } = useTerraContext()
+  const { estimatedFees$, reloadFees } = useTerraContext()
 
-  const [feeRD] = useObservableState<FeeRD>(() => {
-    // Used for initial fee calculation
+  const [feeRD] = useObservableState<EstimatedFeeRD>(() => {
+    // First call is for initial fee calculation only
+    // At this stage, we don't know recipient nor amount to sent
+    // That's recipient === recipient, amount = smallest amount possible
     return FP.pipe(
-      fees$({
+      estimatedFees$({
         asset,
         feeAsset: asset,
         amount: baseAmount(1, TERRA_DECIMAL),
         sender: walletAddress,
         recipient: walletAddress
-      }),
-      liveData.map((fees) => fees.fast)
+      })
     )
   }, RD.initial)
 

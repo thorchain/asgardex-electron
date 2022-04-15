@@ -5,7 +5,7 @@ import { createTransactionService } from './transaction'
 
 const { txs$, tx$, txStatus$, subscribeTx, resetTx, sendTx, txRD$ } = createTransactionService(client$)
 
-const { reloadFees, fees$ } = createFeesService(client$)
+const { reloadFees, fees$, estimatedFees$ } = createFeesService(client$)
 
 export {
   client$,
@@ -20,6 +20,7 @@ export {
   resetReloadBalances,
   fees$,
   reloadFees,
+  estimatedFees$,
   txs$,
   tx$,
   txStatus$,
