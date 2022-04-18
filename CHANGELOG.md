@@ -11,6 +11,7 @@
 - Fix: Filter _USD_ pools [#2199](https://github.com/thorchain/asgardex-electron/pull/2199)
 - Fix: Total balances in asset overview [#2202](https://github.com/thorchain/asgardex-electron/pull/2202)
 - [Swap] Balance of Ledger missing - fee validation failed [#2203](https://github.com/thorchain/asgardex-electron/issues/2203)
+- [Deposit] Initial amount value can't be read [#2210](https://github.com/thorchain/asgardex-electron/issues/2210)
 
 # 0.12.3 (2022-03-31)
 
