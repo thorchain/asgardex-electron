@@ -8,6 +8,7 @@ import {
   assetToBase,
   BaseAmount,
   baseToAsset,
+  bn,
   formatAssetAmountCurrency,
   THORChain
 } from '@xchainjs/xchain-util'
@@ -395,7 +396,10 @@ export const InteractForm: React.FC<Props> = (props) => {
   }, [interactType, reset])
 
   return (
-    <Styled.Form form={form} onFinish={() => setShowConfirmationModal(true)} initialValues={{ thorAddress: '' }}>
+    <Styled.Form
+      form={form}
+      onFinish={() => setShowConfirmationModal(true)}
+      initialValues={{ thorAddress: '', amount: bn(0) }}>
       <>
         {/* Memo input (CUSTOM only) */}
         {interactType === 'custom' && (
