@@ -4,6 +4,7 @@ import { BCH_DECIMAL } from '@xchainjs/xchain-bitcoincash'
 import { DOGE_DECIMAL } from '@xchainjs/xchain-doge'
 import { ETH_DECIMAL } from '@xchainjs/xchain-ethereum'
 import { LTC_DECIMAL } from '@xchainjs/xchain-litecoin'
+import { AssetLUNA, TERRA_DECIMAL } from '@xchainjs/xchain-terra'
 import {
   Asset,
   AssetBCH,
@@ -30,9 +31,10 @@ import {
   isEthTokenAsset,
   isLtcAsset,
   isRuneNativeAsset,
+  THORCHAIN_DECIMAL,
   to1e8BaseAmount
 } from '../../../helpers/assetHelper'
-import { isBnbChain } from '../../../helpers/chainHelper'
+import { isBnbChain, isTerraChain } from '../../../helpers/chainHelper'
 import { eqAsset } from '../../../helpers/fp/eq'
 import { sequenceTOption } from '../../../helpers/fpHelpers'
 import { RUNE_POOL_DATA } from '../../../helpers/poolHelper'
@@ -96,6 +98,14 @@ export const getChainFeeByGasRate = ({
     return O.some({
       amount: baseAmount(gasRateGwei.multipliedBy(70000), ETH_DECIMAL),
       asset: AssetETH
+    })
+  } else if (isTerraChain(asset.chain)) {
+    // No change for LUNA = gasRate
+    // But convertion of decimal is needed (1e8 -> 1e6)
+    const amount = convertBaseAmountDecimal(baseAmount(gasRate, THORCHAIN_DECIMAL), TERRA_DECIMAL)
+    return O.some({
+      amount,
+      asset: AssetLUNA
     })
   } else {
     return O.none

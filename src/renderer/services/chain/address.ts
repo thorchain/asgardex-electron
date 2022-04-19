@@ -22,6 +22,7 @@ import { address$, WalletAddress$ } from '../clients'
 import * as DOGE from '../doge'
 import * as ETH from '../ethereum'
 import * as LTC from '../litecoin'
+import * as TERRA from '../terra'
 import * as THOR from '../thorchain'
 import { client$ } from './client'
 import { INITIAL_SYM_DEPOSIT_ADDRESSES } from './const'
@@ -53,8 +54,7 @@ const addressByChain$ = (chain: Chain): WalletAddress$ => {
     case DOGEChain:
       return DOGE.address$
     case TerraChain:
-      // TODO (@veado) Implement Terra
-      return Rx.of(O.none)
+      return TERRA.address$
   }
 }
 
