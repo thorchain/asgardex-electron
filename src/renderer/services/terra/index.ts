@@ -3,7 +3,7 @@ import { client$, clientState$, address$, addressUI$, explorerUrl$ } from './com
 import { createFeesService } from './fees'
 import { createTransactionService } from './transaction'
 
-const { txs$, tx$, txStatus$, subscribeTx, resetTx, sendTx, txRD$ } = createTransactionService(client$)
+const { txs$, tx$, txStatus$, subscribeTx, resetTx, sendTx, sendPoolTx$, txRD$ } = createTransactionService(client$)
 
 const { reloadFees, fees$, estimatedFees$ } = createFeesService(client$)
 
@@ -27,5 +27,6 @@ export {
   subscribeTx,
   resetTx,
   sendTx,
+  sendPoolTx$,
   txRD$
 }

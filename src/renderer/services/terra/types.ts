@@ -9,6 +9,7 @@ import { WalletType } from '../../../shared/wallet/types'
 import { LiveData } from '../../helpers/rx/liveData'
 import { FeesLD, Memo } from '../chain/types'
 import * as C from '../clients'
+import { TxHashLD } from '../wallet/types'
 
 export type Client$ = C.Client$<Client>
 
@@ -34,7 +35,11 @@ export type SendTxParams = {
   walletIndex: number
 }
 
-export type TransactionService = C.TransactionService<SendTxParams>
+export type SendPoolTxParams = Omit<SendTxParams, 'feeAsset' | 'gasLimit' | 'feeAmount'>
+
+export type TransactionService = {
+  sendPoolTx$: (params: SendPoolTxParams) => TxHashLD
+} & C.TransactionService<SendTxParams>
 
 export type EstimatedFeeRD = RD.RemoteData<Error, EstimatedFee>
 export type EstimatedFeeLD = LiveData<Error, EstimatedFee>

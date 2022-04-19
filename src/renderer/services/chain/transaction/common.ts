@@ -140,7 +140,7 @@ export const sendPoolTx$ = ({
 }: SendPoolTxParams): TxHashLD => {
   switch (asset.chain) {
     case ETHChain:
-      // TODO(@asgdx-team) Support `walletType`to provide Ledger & Co.
+      // TODO(@asgdx-team) Support `walletType`to provide ETH Ledger
       return ETH.sendPoolTx$({
         router,
         recipient,
@@ -152,6 +152,9 @@ export const sendPoolTx$ = ({
 
     case THORChain:
       return THOR.sendPoolTx$({ walletType, amount, asset, memo, walletIndex })
+
+    case TerraChain:
+      return TERRA.sendPoolTx$({ walletType, amount, asset, memo, recipient, walletIndex })
 
     default:
       return sendTx$({ sender, walletType, asset, recipient, amount, memo, feeOption, walletIndex })
@@ -182,8 +185,7 @@ export const txStatusByChain$ = ({ txHash, chain }: { txHash: TxHash; chain: Cha
     case PolkadotChain:
       return txStatusFailure$(`txStatusByChain$ has not been implemented for Polkadot`)
     case TerraChain:
-      // TODO (@veado) Implement Terra
-      return txStatusFailure$(`txStatusByChain$ has not been implemented for Terra`)
+      return TERRA.txStatus$(txHash, O.none)
     case DOGEChain:
       return DOGE.txStatus$(txHash, O.none)
     case BCHChain:
