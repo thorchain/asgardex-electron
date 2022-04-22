@@ -11,7 +11,7 @@ import {
   isWalletType
 } from './guard'
 
-describe('shared/guard', () => {
+describe('shared/utils/guard', () => {
   describe('isAsset', () => {
     it('true for "THOR.RUNE"', () => {
       expect(isAsset('THOR.RUNE')).toBeTruthy()

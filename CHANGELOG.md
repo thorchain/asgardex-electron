@@ -1,3 +1,9 @@
+# 0.14.0 (2022-04-xx)
+
+## Add
+
+- [Ledger] Support Terra [#2198](https://github.com/thorchain/asgardex-electron/issues/2198)
+
 # 0.13.0 (2022-04-19)
 
 ## Add

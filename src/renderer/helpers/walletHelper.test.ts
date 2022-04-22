@@ -9,7 +9,8 @@ import {
   BTCChain,
   BNBChain,
   BCHChain,
-  DOGEChain
+  DOGEChain,
+  TerraChain
 } from '@xchainjs/xchain-util'
 import * as FP from 'fp-ts/lib/function'
 import * as NEA from 'fp-ts/lib/NonEmptyArray'
@@ -224,18 +225,22 @@ describe('walletHelper', () => {
       expect(isEnabledWallet(BTCChain, 'testnet', 'ledger')).toBeTruthy()
       expect(isEnabledWallet(BTCChain, 'stagenet', 'ledger')).toBeTruthy()
     })
-
     it('BNB ledger -> true', () => {
       expect(isEnabledWallet(BNBChain, 'mainnet', 'ledger')).toBeTruthy()
       expect(isEnabledWallet(BNBChain, 'testnet', 'ledger')).toBeTruthy()
       expect(isEnabledWallet(BNBChain, 'stagenet', 'ledger')).toBeTruthy()
     })
-    it('DOGE ledger testnet', () => {
+    it('DOGE ledger testnet - false', () => {
       expect(isEnabledWallet(DOGEChain, 'testnet', 'ledger')).toBeFalsy()
     })
-    it('DOGE ledger mainnet/stagenet', () => {
+    it('DOGE ledger mainnet/stagenet -> true', () => {
       expect(isEnabledWallet(DOGEChain, 'mainnet', 'ledger')).toBeTruthy()
       expect(isEnabledWallet(DOGEChain, 'stagenet', 'ledger')).toBeTruthy()
+    })
+    it('Terra ledger mainnet/stagenet/testnet -> true', () => {
+      expect(isEnabledWallet(TerraChain, 'testnet', 'ledger')).toBeTruthy()
+      expect(isEnabledWallet(TerraChain, 'mainnet', 'ledger')).toBeTruthy()
+      expect(isEnabledWallet(TerraChain, 'stagenet', 'ledger')).toBeTruthy()
     })
   })
 })

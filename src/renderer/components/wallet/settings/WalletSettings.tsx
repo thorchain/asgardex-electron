@@ -37,6 +37,7 @@ import {
   isBtcChain,
   isDogeChain,
   isLtcChain,
+  isTerraChain,
   isThorChain
 } from '../../../helpers/chainHelper'
 import { isEnabledWallet } from '../../../helpers/walletHelper'
@@ -174,7 +175,8 @@ export const WalletSettings: React.FC<Props> = (props): JSX.Element => {
             isBtcChain(chain) ||
             isLtcChain(chain) ||
             isBchChain(chain) ||
-            isDogeChain(chain)) && (
+            isDogeChain(chain) ||
+            isTerraChain(chain)) && (
             <>
               <Styled.IndexLabel>{intl.formatMessage({ id: 'setting.wallet.index' })}</Styled.IndexLabel>
               <Styled.WalletIndexInput
