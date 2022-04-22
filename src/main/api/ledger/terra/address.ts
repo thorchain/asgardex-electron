@@ -29,7 +29,7 @@ export const getAddress = async (
 
     if (!bech32Address) {
       return E.left({
-        errorId: LedgerErrorId.UNKNOWN,
+        errorId: LedgerErrorId.GET_ADDRESS_FAILED,
         msg: `Getting 'bech32Address' from Ledger's Terra app failed`
       })
     }

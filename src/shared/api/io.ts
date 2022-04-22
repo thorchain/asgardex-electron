@@ -79,6 +79,7 @@ export const ipcLedgerSendTxParamsIO = t.type({
   sender: t.union([t.string, t.undefined]),
   recipient: t.string,
   asset: t.union([assetIO, t.undefined]),
+  feeAsset: t.union([assetIO, t.undefined]),
   amount: baseAmountIO,
   memo: t.union([t.string, t.undefined]),
   walletIndex: t.number,

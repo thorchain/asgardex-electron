@@ -24,6 +24,7 @@ export const createTransactionService = (client$: Client$, network$: Network$): 
       chain: BNBChain,
       network,
       asset,
+      feeAsset: undefined,
       amount,
       sender,
       recipient,

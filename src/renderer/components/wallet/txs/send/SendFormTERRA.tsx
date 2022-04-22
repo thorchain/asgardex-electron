@@ -31,6 +31,7 @@ import { isKeystoreWallet, isLedgerWallet } from '../../../../../shared/utils/gu
 import { WalletType } from '../../../../../shared/wallet/types'
 import { ZERO_BASE_AMOUNT } from '../../../../const'
 import { isTerraChain } from '../../../../helpers/chainHelper'
+import { eqWalletType } from '../../../../helpers/fp/eq'
 import { getWalletBalanceByAssetAndWalletType } from '../../../../helpers/walletHelper'
 import { useSubscriptionState } from '../../../../hooks/useSubscriptionState'
 import { INITIAL_SEND_STATE } from '../../../../services/chain/const'
@@ -400,6 +401,7 @@ export const SendFormTERRA: React.FC<Props> = (props): JSX.Element => {
         {FP.pipe(
           balances,
           A.filter(({ asset }) => isTerraChain(asset.chain)),
+          A.filter(({ walletType: type }) => eqWalletType.equals(type, walletType)),
           A.map(({ asset }) => (
             <Menu.Item key={assetToString(asset)}>
               <CStyled.MenuItemContainer>
@@ -411,7 +413,7 @@ export const SendFormTERRA: React.FC<Props> = (props): JSX.Element => {
         )}
       </Menu>
     ),
-    [balances, changeFeeHandler, network]
+    [balances, changeFeeHandler, network, walletType]
   )
 
   const renderFeeAssetSelector = useMemo(

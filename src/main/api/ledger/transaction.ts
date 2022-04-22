@@ -1,6 +1,6 @@
 import TransportNodeHidSingleton from '@ledgerhq/hw-transport-node-hid-singleton'
 import { TxHash } from '@xchainjs/xchain-client'
-import { BCHChain, BNBChain, BTCChain, DOGEChain, LTCChain, THORChain } from '@xchainjs/xchain-util'
+import { BCHChain, BNBChain, BTCChain, DOGEChain, LTCChain, TerraChain, THORChain } from '@xchainjs/xchain-util'
 import * as E from 'fp-ts/Either'
 
 import { IPCLedgerDepositTxParams, IPCLedgerSendTxParams } from '../../../shared/api/io'
@@ -11,6 +11,7 @@ import * as BTC from './bitcoin/transaction'
 import * as BCH from './bitcoincash/transaction'
 import * as DOGE from './doge/transaction'
 import * as LTC from './litecoin/transaction'
+import * as TERRA from './terra/transaction'
 import * as THOR from './thorchain/transaction'
 
 export const sendTx = async ({
@@ -20,6 +21,7 @@ export const sendTx = async ({
   recipient,
   amount,
   asset,
+  feeAsset,
   memo,
   feeRate,
   walletIndex
@@ -88,6 +90,30 @@ export const sendTx = async ({
           memo,
           walletIndex
         })
+        break
+      case TerraChain:
+        if (!asset) {
+          res = E.left({
+            errorId: LedgerErrorId.INVALID_DATA,
+            msg: `Asset needs to be defined to send Ledger tx on ${chain}`
+          })
+        } else if (!feeAsset) {
+          res = E.left({
+            errorId: LedgerErrorId.INVALID_DATA,
+            msg: `Fee asset needs to be defined to send Ledger tx on ${chain}`
+          })
+        } else {
+          res = await TERRA.send({
+            transport,
+            network,
+            amount,
+            asset,
+            feeAsset,
+            recipient,
+            memo,
+            walletIndex
+          })
+        }
         break
       default:
         res = E.left({

@@ -23,6 +23,7 @@ export const createTransactionService = (client$: Client$, network$: Network$): 
     const sendLedgerTxParams: IPCLedgerSendTxParams = {
       chain: DOGEChain,
       asset: AssetDOGE,
+      feeAsset: undefined,
       network,
       amount,
       sender,

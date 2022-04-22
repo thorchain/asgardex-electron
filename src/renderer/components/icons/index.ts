@@ -26,6 +26,7 @@ import { ReactComponent as DownIcon } from '../../assets/svg/icon-down.svg'
 import { ReactComponent as LedgerIcon } from '../../assets/svg/ledger.svg'
 import orbBlueIcon from '../../assets/svg/orb-blue.svg'
 import orbGreenIcon from '../../assets/svg/orb-green.svg'
+import terraIcon from '../../assets/svg/terra.svg'
 
 export {
   bnbIcon,
@@ -33,6 +34,7 @@ export {
   dogeIcon,
   ethIcon,
   lunaIcon,
+  terraIcon,
   runeIcon,
   ustIcon,
   bnbRuneIcon,
