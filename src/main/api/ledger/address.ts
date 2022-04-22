@@ -1,5 +1,5 @@
 import TransportNodeHidSingleton from '@ledgerhq/hw-transport-node-hid-singleton'
-import { BCHChain, BNBChain, BTCChain, DOGEChain, LTCChain, THORChain } from '@xchainjs/xchain-util'
+import { BCHChain, BNBChain, BTCChain, DOGEChain, LTCChain, TerraChain, THORChain } from '@xchainjs/xchain-util'
 import * as E from 'fp-ts/Either'
 
 import { IPCLedgerAdddressParams, LedgerError, LedgerErrorId } from '../../../shared/api/types'
@@ -10,6 +10,7 @@ import { getAddress as getBTCAddress, verifyAddress as verifyBTCAddress } from '
 import { getAddress as getBCHAddress, verifyAddress as verifyBCHAddress } from './bitcoincash/address'
 import { getAddress as getDOGEAddress, verifyAddress as verifyDOGEAddress } from './doge/address'
 import { getAddress as getLTCAddress, verifyAddress as verifyLTCAddress } from './litecoin/address'
+import { getAddress as getTerraAddress, verifyAddress as verifyTerraAddress } from './terra/address'
 import { getAddress as getTHORAddress, verifyAddress as verifyTHORAddress } from './thorchain/address'
 
 export const getAddress = async ({
@@ -38,6 +39,9 @@ export const getAddress = async ({
         break
       case DOGEChain:
         res = await getDOGEAddress(transport, network, walletIndex)
+        break
+      case TerraChain:
+        res = await getTerraAddress(transport, walletIndex)
         break
       default:
         res = E.left({
@@ -76,6 +80,9 @@ export const verifyLedgerAddress = async ({ chain, network, walletIndex }: IPCLe
       break
     case DOGEChain:
       result = await verifyDOGEAddress({ transport, network, walletIndex })
+      break
+    case TerraChain:
+      result = await verifyTerraAddress(transport, walletIndex)
       break
     default:
       throw Error(`verifyAddress for ${chain} has not been implemented`)

@@ -2,7 +2,7 @@ import { Network } from '@xchainjs/xchain-client'
 
 import { toClientNetwork } from './client'
 
-describe('services/utils/', () => {
+describe('shared/utils/client', () => {
   describe('getClientNetwork', () => {
     it('for testnet', () => {
       expect(toClientNetwork('testnet')).toEqual(Network.Testnet)
