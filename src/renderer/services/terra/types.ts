@@ -24,7 +24,6 @@ export type FeesService = {
 
 export type SendTxParams = {
   walletType: WalletType
-  sender?: string
   asset: Asset
   recipient: Address
   amount: BaseAmount

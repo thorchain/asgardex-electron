@@ -3,7 +3,7 @@ import { LedgerMessages } from '../types'
 const ledger: LedgerMessages = {
   'ledger.title': 'Ledger',
   'ledger.title.sign': 'Signing with Ledger',
-  'ledger.needsconnected': 'Make sure your Ledger device is connected and the "{chain}" application is up and running.',
+  'ledger.needsconnected': 'Make sure your Ledger device is connected and "{chain}" application is up and running.',
   'ledger.add.device': 'Add ledger',
   'ledger.error.nodevice': 'No device connected',
   'ledger.error.inuse': 'Ledger is already in use for another app',

@@ -23,6 +23,7 @@ export const createTransactionService = (client$: Client$, network$: Network$): 
     const sendLedgerTxParams: IPCLedgerSendTxParams = {
       chain: LTCChain,
       asset: AssetLTC,
+      feeAsset: undefined,
       network,
       amount,
       sender,

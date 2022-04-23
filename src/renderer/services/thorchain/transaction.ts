@@ -118,6 +118,7 @@ export const createTransactionService = (client$: Client$, network$: Network$): 
       chain: THORChain,
       network,
       asset: params.asset,
+      feeAsset: undefined,
       amount: params.amount,
       sender: params.sender,
       recipient: params.recipient,
