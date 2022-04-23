@@ -4,6 +4,12 @@
 
 - [Ledger] Support Terra [#2198](https://github.com/thorchain/asgardex-electron/issues/2198)
 
+## Fix
+
+- [Ledger] Address confirmation removes Ledger BNB account [#2221](https://github.com/thorchain/asgardex-electron/issues/2221)
+- [Ledger] Address confirmation modal is missing for Ledger THOR [#2222](https://github.com/thorchain/asgardex-electron/issues/2222)
+- Update to latest xchain-tc@0.24.1 to include latest out of gas fix [#2220](https://github.com/thorchain/asgardex-electron/pull/2220)
+
 # 0.13.0 (2022-04-19)
 
 ## Add

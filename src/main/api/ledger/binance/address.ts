@@ -45,6 +45,6 @@ export const verifyAddress: VerifyAddressHandler = async ({ transport, network, 
   const derive_path = getDerivePath(walletIndex)
   const clientNetwork = toClientNetwork(network)
   const prefix = getPrefix(clientNetwork)
-  const { error_message } = await app.showAddress(prefix, derive_path)
-  return error_message ? false : true
+  const _ = await app.showAddress(prefix, derive_path)
+  return true
 }
