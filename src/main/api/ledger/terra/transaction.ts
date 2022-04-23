@@ -76,9 +76,6 @@ export const send = async ({
     const config = mergeChainIds(chainIds, getDefaultClientConfig())
     const { chainID, cosmosAPIURL } = config[clientNetwork]
 
-    console.log('chainID', chainID)
-    console.log('cosmosAPIURL', cosmosAPIURL)
-
     const { amount: feeAmount, gasLimit } = await getEstimatedFee({
       chainId: chainID,
       cosmosAPIURL,
@@ -90,9 +87,6 @@ export const send = async ({
       memo,
       network: clientNetwork
     })
-
-    console.log('feeAmount', feeAmount.amount().toFixed())
-    console.log('gasLimit', gasLimit.toFixed())
 
     if (!feeAmount || !gasLimit) throw Error(`Missing fee amount and/or gas limit`)
 
@@ -114,8 +108,6 @@ export const send = async ({
       fee
     }
 
-    console.log('txOptions:', JSON.stringify(txOptions, null, 2))
-
     const lcd = new LCDClient({
       URL: cosmosAPIURL,
       chainID: chainID
@@ -124,8 +116,6 @@ export const send = async ({
     const wallet = lcd.wallet(ledgerKey)
     const { sequence, number: accountNumber } = await getAccount(sender, lcd)
 
-    console.log('sequence', sequence)
-    console.log('accountNumber', accountNumber)
     // delay next request to be more relaxed
     await delay(200)
 
@@ -135,13 +125,6 @@ export const send = async ({
       accountNumber,
       signMode: SignatureV2.SignMode.SIGN_MODE_LEGACY_AMINO_JSON
     })
-
-    console.log('signedTx:', JSON.stringify(signedTx.toData(), null, 2))
-
-    // return E.left({
-    //   errorId: LedgerErrorId.UNKNOWN,
-    //   msg: `test`
-    // })
 
     // broadcast (`async` mode)
     const { txhash } = await lcd.tx.broadcastAsync(signedTx)
