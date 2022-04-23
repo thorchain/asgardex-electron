@@ -4755,10 +4755,10 @@
   resolved "https://registry.yarnpkg.com/@xchainjs/xchain-terra/-/xchain-terra-0.1.0-alpha.8.tgz#41234d7fdc33e34a0d94d89777f625823505a852"
   integrity sha512-viy1qlGxnYEJY9zLa2zBRCVCAK2J3LL0aVR7Cgio+tIErP/GpKZJ0IZPPCOwd7V1nhK0GdrsgM9LEt0MVi3wqw==
 
-"@xchainjs/xchain-thorchain@0.24.0":
-  version "0.24.0"
-  resolved "https://registry.yarnpkg.com/@xchainjs/xchain-thorchain/-/xchain-thorchain-0.24.0.tgz#f029666ee00e9b642d85ab801c778bbb0b235e92"
-  integrity sha512-iaXAQJxATCm54XBKDYEAVRv47tL3F2jcqYTMqQmv13mCYULbB46AHgz0L5NIrPQ/lk3udfo1REA9eLQaDp5VtQ==
+"@xchainjs/xchain-thorchain@^0.24.1":
+  version "0.24.1"
+  resolved "https://registry.yarnpkg.com/@xchainjs/xchain-thorchain/-/xchain-thorchain-0.24.1.tgz#06051a1e352f038caee44904416c97e09228c0d6"
+  integrity sha512-5Tb0OoJjmg4lhKVgO8envbg9GvmtRCpSz7cT8QidjhHVGkMC4VrTe8sN6Zi1fvL36WFpmTLYGrnSLlkdyvb74A==
 
 "@xchainjs/xchain-util@^0.7.0":
   version "0.7.0"
