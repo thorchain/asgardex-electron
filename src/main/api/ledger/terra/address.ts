@@ -48,6 +48,6 @@ export const verifyAddress = async (transport: Transport, walletIndex: number) =
   const path = FP.pipe(walletIndex, getDerivationPath, O.toNullable)
   if (!path) return Promise.reject(false)
 
-  const _ = app.showAddressAndPubKey(path, prefix)
+  const _ = await app.showAddressAndPubKey(path, prefix)
   return true
 }
