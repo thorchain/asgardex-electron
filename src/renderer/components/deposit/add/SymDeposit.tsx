@@ -37,6 +37,7 @@ import {
   THORCHAIN_DECIMAL
 } from '../../../helpers/assetHelper'
 import { getChainAsset, isEthChain } from '../../../helpers/chainHelper'
+import { unionAssets } from '../../../helpers/fp/array'
 import { eqBaseAmount, eqOAsset, eqOApproveParams, eqOString } from '../../../helpers/fp/eq'
 import { sequenceSOption, sequenceTOption } from '../../../helpers/fpHelpers'
 import * as PoolHelpers from '../../../helpers/poolHelper'
@@ -202,7 +203,9 @@ export const SymDeposit: React.FC<Props> = (props) => {
 
   const poolBasedBalancesAssets = FP.pipe(
     poolBasedBalances,
-    A.map(({ asset }) => asset)
+    A.map(({ asset }) => asset),
+    // Merge duplications
+    (assets) => unionAssets(assets)(assets)
   )
 
   const oRuneWB: O.Option<WalletBalance> = useMemo(() => {

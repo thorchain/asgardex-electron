@@ -38,7 +38,7 @@ const deposit: DepositMessages = {
   'deposit.add.asymAssets.recoveryTitle': 'THORSwap',
   'deposit.add.assetMissmatch.title': 'Asset missmatch found',
   'deposit.add.assetMissmatch.description':
-    'One of current selected asset side has been already used in a previous deposit, but with another asset. Check following addresses to see the previous deposit pair.',
+    'One of current selected asset side has been already used in a previous deposit, but with another asset. Check following addresses to see previous deposit pair.',
   'deposit.bond.state.error': 'Bond error',
   'deposit.unbond.state.error': 'Unbond error',
   'deposit.leave.state.error': 'Leave error',
