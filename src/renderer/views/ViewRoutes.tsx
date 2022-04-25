@@ -1,6 +1,6 @@
 import React from 'react'
 
-import { Route, Switch, Redirect } from 'react-router-dom'
+import { Navigate, Route, Routes } from 'react-router-dom'
 
 import * as appRoutes from '../routes/app'
 import * as playgroundRoutes from '../routes/playground'
@@ -14,9 +14,9 @@ import { WalletView } from './wallet/WalletView'
 
 export const ViewRoutes: React.FC<{}> = (): JSX.Element => {
   return (
-    <Switch>
-      <Route path={appRoutes.base.path()} exact>
-        <Redirect to={poolsRoutes.base.path()} />
+    <Routes>
+      <Route path={appRoutes.base.path()}>
+        <Navigate to={poolsRoutes.base.path()} replace />
       </Route>
       <Route path={poolsRoutes.base.template}>
         <PoolsView />
@@ -33,6 +33,6 @@ export const ViewRoutes: React.FC<{}> = (): JSX.Element => {
       <Route path="*">
         <NoContentView />
       </Route>
-    </Switch>
+    </Routes>
   )
 }

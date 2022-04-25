@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useMemo } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
 import { Address, XChainClient } from '@xchainjs/xchain-client'
-import { Asset, assetFromString } from '@xchainjs/xchain-util'
+import { Asset } from '@xchainjs/xchain-util'
 import * as FP from 'fp-ts/function'
 import * as O from 'fp-ts/lib/Option'
 import * as NEA from 'fp-ts/NonEmptyArray'
@@ -11,12 +11,13 @@ import { useIntl } from 'react-intl'
 import { useParams } from 'react-router-dom'
 import * as Rx from 'rxjs'
 
+import { WalletType } from '../../../shared/wallet/types'
 import { ErrorView } from '../../components/shared/error'
 import { BackLink } from '../../components/uielements/backLink'
 import { AssetDetails } from '../../components/wallet/assets'
 import { useChainContext } from '../../contexts/ChainContext'
 import { useWalletContext } from '../../contexts/WalletContext'
-import { disableRuneUpgrade, isRuneNativeAsset } from '../../helpers/assetHelper'
+import { disableRuneUpgrade, getAssetFromNullableString, isRuneNativeAsset } from '../../helpers/assetHelper'
 import { sequenceTOption } from '../../helpers/fpHelpers'
 import { useMimirHalt } from '../../hooks/useMimirHalt'
 import { useNetwork } from '../../hooks/useNetwork'
@@ -31,18 +32,15 @@ export const AssetDetailsView: React.FC = (): JSX.Element => {
     asset: routeAsset,
     walletAddress,
     walletType,
-    walletIndex: walletIndexRoute
+    walletIndex: walletIndexRoute = '0'
   } = useParams<AssetDetailsParams>()
 
   const walletIndex = parseInt(walletIndexRoute)
+  const oWalletType: O.Option<WalletType> = O.fromNullable(walletType)
 
-  const oRouteAsset: O.Option<Asset> = useMemo(() => O.fromNullable(assetFromString(routeAsset)), [routeAsset])
+  const oRouteAsset: O.Option<Asset> = useMemo(() => getAssetFromNullableString(routeAsset), [routeAsset])
   const oWalletAddress = useMemo(
-    () =>
-      FP.pipe(
-        walletAddress,
-        O.fromPredicate<Address>(() => !!walletAddress)
-      ),
+    () => FP.pipe(walletAddress, O.fromNullable, O.chain(O.fromPredicate<Address>(() => !!walletAddress))),
     [walletAddress]
   )
 
@@ -143,10 +141,10 @@ export const AssetDetailsView: React.FC = (): JSX.Element => {
   return (
     <>
       {FP.pipe(
-        oRouteAsset,
+        sequenceTOption(oRouteAsset, oWalletType),
         O.fold(
           () => renderAssetError,
-          (asset) => (
+          ([asset, walletType]) => (
             <AssetDetails
               walletType={walletType}
               walletIndex={walletIndex}

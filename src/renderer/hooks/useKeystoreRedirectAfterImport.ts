@@ -4,7 +4,7 @@ import * as RD from '@devexperts/remote-data-ts'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
 import { useObservableState } from 'observable-hooks'
-import { useHistory } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 
 import { useWalletContext } from '../contexts/WalletContext'
 import * as walletRoutes from '../routes/wallet'
@@ -21,7 +21,7 @@ import { useKeystoreClientStates } from './useKeystoreClientStates'
  *
  */
 export const useKeystoreRedirectAfterImport = (): void => {
-  const history = useHistory()
+  const navigate = useNavigate()
   const { clientStates } = useKeystoreClientStates()
   const {
     keystoreService: { keystore$ }
@@ -43,7 +43,7 @@ export const useKeystoreRedirectAfterImport = (): void => {
   useEffect(() => {
     if (readyToRedirect) {
       // redirect to wallets assets view
-      history.push(walletRoutes.assets.path())
+      navigate(walletRoutes.assets.path())
     }
-  }, [history, readyToRedirect])
+  }, [navigate, readyToRedirect])
 }

@@ -7,8 +7,7 @@ import * as A from 'fp-ts/lib/Array'
 import * as O from 'fp-ts/lib/Option'
 import { useObservableState } from 'observable-hooks'
 import { useIntl } from 'react-intl'
-import { useRouteMatch, Link } from 'react-router-dom'
-import { useHistory } from 'react-router-dom'
+import { useMatch, Link, useNavigate } from 'react-router-dom'
 import { palette, size } from 'styled-theme'
 
 import { Network } from '../../../shared/api/types'
@@ -83,7 +82,7 @@ export const HeaderComponent: React.FC<Props> = (props): JSX.Element => {
 
   const intl = useIntl()
 
-  const history = useHistory()
+  const navigate = useNavigate()
 
   const { theme$ } = useThemeContext()
   const theme = useObservableState(theme$)
@@ -120,8 +119,8 @@ export const HeaderComponent: React.FC<Props> = (props): JSX.Element => {
     }
   }, [isDesktopView])
 
-  const matchPoolsRoute = useRouteMatch(poolsRoutes.base.path())
-  const matchWalletRoute = useRouteMatch(walletRoutes.base.path())
+  const matchPoolsRoute = useMatch(poolsRoutes.base.path())
+  const matchWalletRoute = useMatch(walletRoutes.base.path())
 
   const activeKey: TabKey = useMemo(() => {
     if (matchPoolsRoute) {
@@ -186,8 +185,8 @@ export const HeaderComponent: React.FC<Props> = (props): JSX.Element => {
 
   const clickSettingsHandler = useCallback(() => {
     closeMenu()
-    history.push(appRoutes.settings.path())
-  }, [closeMenu, history])
+    navigate(appRoutes.settings.path())
+  }, [closeMenu, navigate])
 
   const clickLockHandler = useCallback(() => {
     // lock if needed ...
@@ -195,10 +194,10 @@ export const HeaderComponent: React.FC<Props> = (props): JSX.Element => {
       lockHandler()
     } else {
       // ... or go to wallet page to unlock
-      history.push(walletRoutes.base.path())
+      navigate(walletRoutes.base.path())
     }
     closeMenu()
-  }, [closeMenu, history, keystore, lockHandler])
+  }, [closeMenu, navigate, keystore, lockHandler])
 
   const currencyChangeHandler = useCallback(
     (asset: PricePoolAsset) => {

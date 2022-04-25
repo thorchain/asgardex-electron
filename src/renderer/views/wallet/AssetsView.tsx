@@ -7,7 +7,7 @@ import * as A from 'fp-ts/lib/Array'
 import * as FP from 'fp-ts/lib/function'
 import { useObservableState } from 'observable-hooks'
 import { useIntl } from 'react-intl'
-import { useHistory } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import * as RxOp from 'rxjs/operators'
 
 import { WalletType } from '../../../shared/wallet/types'
@@ -23,7 +23,7 @@ import * as walletRoutes from '../../routes/wallet'
 import { ChainBalances } from '../../services/wallet/types'
 
 export const AssetsView: React.FC = (): JSX.Element => {
-  const history = useHistory()
+  const navigate = useNavigate()
   const intl = useIntl()
 
   const { chainBalances$, setSelectedAsset } = useWalletContext()
@@ -77,7 +77,7 @@ export const AssetsView: React.FC = (): JSX.Element => {
       walletType: WalletType
       walletIndex: number
     }) =>
-      history.push(
+      navigate(
         walletRoutes.assetDetail.path({
           asset: assetToString(asset),
           walletAddress,
@@ -85,7 +85,7 @@ export const AssetsView: React.FC = (): JSX.Element => {
           walletIndex: walletIndex.toString()
         })
       ),
-    [history]
+    [navigate]
   )
 
   const poolDetails = RD.toNullable(poolsRD)?.poolDetails ?? []

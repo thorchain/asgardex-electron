@@ -7,7 +7,7 @@ import * as FP from 'fp-ts/function'
 import * as O from 'fp-ts/lib/Option'
 import { useObservableState } from 'observable-hooks'
 import { useIntl } from 'react-intl'
-import { useHistory } from 'react-router'
+import { useNavigate } from 'react-router-dom'
 import * as RxOp from 'rxjs/operators'
 
 import { SymDeposit } from '../../../components/deposit/add'
@@ -41,7 +41,7 @@ export const SymDepositView: React.FC<Props> = (props) => {
     assetWalletAddress
   } = props
   const { asset } = assetWD
-  const history = useHistory()
+  const navigate = useNavigate()
   const intl = useIntl()
 
   const { network } = useNetwork()
@@ -50,9 +50,9 @@ export const SymDepositView: React.FC<Props> = (props) => {
 
   const onChangeAsset = useCallback(
     (asset: Asset) => {
-      history.replace(poolsRoutes.deposit.path({ asset: assetToString(asset) }))
+      navigate(poolsRoutes.deposit.path({ asset: assetToString(asset) }), { replace: true })
     },
-    [history]
+    [navigate]
   )
 
   const {

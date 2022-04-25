@@ -1,23 +1,23 @@
 import React, { useCallback } from 'react'
 
 import { useIntl } from 'react-intl'
-import { useHistory } from 'react-router'
+import { useNavigate } from 'react-router-dom'
 
 import { Label } from '../../../components/uielements/label'
 import * as walletRoutes from '../../../routes/wallet'
 import * as Styled from './NoWalletView.styles'
 
 export const NoWalletView = () => {
-  const history = useHistory()
+  const navigate = useNavigate()
   const intl = useIntl()
 
   const importClick = useCallback(() => {
-    history.push(walletRoutes.imports.base.path())
-  }, [history])
+    navigate(walletRoutes.imports.base.path())
+  }, [navigate])
 
   const createClick = useCallback(() => {
-    history.push(walletRoutes.create.base.path())
-  }, [history])
+    navigate(walletRoutes.create.base.path())
+  }, [navigate])
 
   return (
     <Styled.ViewContainer>

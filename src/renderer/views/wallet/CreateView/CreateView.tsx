@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react'
 
 import { useIntl } from 'react-intl'
-import { useHistory } from 'react-router'
+import { useNavigate, useLocation } from 'react-router-dom'
 
 import { PageTitle } from '../../../components/page'
 import { Tabs } from '../../../components/tabs'
@@ -16,17 +16,18 @@ enum TabKey {
 
 export const CreateView = () => {
   const intl = useIntl()
-  const history = useHistory()
+  const navigate = useNavigate()
+  const location = useLocation()
 
   const [activeTab, setActiveTab] = useState(TabKey.PHRASE)
 
   const items = useMemo(
     () => [
-      /* Remove keystore option 
+      /* Remove keystore option
       {
         key: TabKey.KEYSTORE,
         label: (
-          <span onClick={() => history.push(walletRoutes.create.keystore.template)}>
+          <span onClick={() => navigate(walletRoutes.create.keystore.template)}>
             {intl.formatMessage({ id: 'common.keystore' })}
           </span>
         ),
@@ -36,14 +37,14 @@ export const CreateView = () => {
       {
         key: TabKey.PHRASE,
         label: (
-          <span onClick={() => history.push(walletRoutes.create.phrase.template)}>
+          <span onClick={() => navigate(walletRoutes.create.phrase.template)}>
             {intl.formatMessage({ id: 'common.phrase' })}
           </span>
         ),
         content: <PhraseView />
       }
     ],
-    [history, intl]
+    [navigate, intl]
   )
 
   /**
@@ -51,21 +52,19 @@ export const CreateView = () => {
    * Call only for onMount
    */
   useEffect(() => {
-    history.replace(walletRoutes.create.phrase.path())
-  }, [history])
+    navigate(walletRoutes.create.phrase.path(), { replace: true })
+  }, [navigate])
 
   /**
    * Need to sync tabs' state with history
    */
   useEffect(() => {
-    return history.listen((location) => {
-      if (location.pathname.includes(walletRoutes.create.keystore.template)) {
-        setActiveTab(TabKey.KEYSTORE)
-      } else if (location.pathname.includes(walletRoutes.create.phrase.template)) {
-        setActiveTab(TabKey.PHRASE)
-      }
-    })
-  }, [history, activeTab])
+    if (location.pathname.includes(walletRoutes.create.keystore.template)) {
+      setActiveTab(TabKey.KEYSTORE)
+    } else if (location.pathname.includes(walletRoutes.create.phrase.template)) {
+      setActiveTab(TabKey.PHRASE)
+    }
+  }, [navigate, activeTab, location])
 
   return (
     <Styled.Container>

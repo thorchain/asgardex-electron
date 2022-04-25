@@ -1,9 +1,8 @@
 import React, { useCallback, useMemo } from 'react'
 
 import { Row } from 'antd'
-import * as H from 'history'
 import { useObservableState } from 'observable-hooks'
-import { Switch, Route, Redirect } from 'react-router-dom'
+import { Routes, Route, Navigate, useLocation } from 'react-router-dom'
 
 import { RefreshButton } from '../../components/uielements/button/'
 import { AssetsNav } from '../../components/wallet/assets'
@@ -11,7 +10,6 @@ import { useMidgardContext } from '../../contexts/MidgardContext'
 import { useThorchainContext } from '../../contexts/ThorchainContext'
 import { useWalletContext } from '../../contexts/WalletContext'
 import { triggerStream } from '../../helpers/stateHelper'
-import { RedirectRouteState } from '../../routes/types'
 import * as walletRoutes from '../../routes/wallet'
 import { hasImportedKeystore, isLocked } from '../../services/wallet/util'
 import { AssetDetailsView } from './AssetDetailsView'
@@ -39,6 +37,7 @@ export const WalletView: React.FC = (): JSX.Element => {
   const { reloadNodesInfo } = useThorchainContext()
 
   const reloadHistory = triggerStream()
+  const location = useLocation()
 
   // Important note:
   // DON'T set `INITIAL_KEYSTORE_STATE` as default value
@@ -61,11 +60,11 @@ export const WalletView: React.FC = (): JSX.Element => {
   const renderWalletRoutes = useMemo(
     () => (
       <>
-        <Switch>
-          <Route path={walletRoutes.base.template} exact>
-            <Redirect to={walletRoutes.assets.path()} />
+        <Routes>
+          <Route path={walletRoutes.base.template}>
+            <Navigate to={walletRoutes.assets.path()} replace />
           </Route>
-          <Route path={walletRoutes.assets.template} exact>
+          <Route path={walletRoutes.assets.template}>
             {reloadButton(() => {
               reloadAllPools()
               reloadBalances()
@@ -73,7 +72,7 @@ export const WalletView: React.FC = (): JSX.Element => {
             <AssetsNav />
             <AssetsView />
           </Route>
-          <Route path={walletRoutes.poolShares.template} exact>
+          <Route path={walletRoutes.poolShares.template}>
             {reloadButton(() => {
               reloadAllSharesByAddresses()
               reloadAllPools()
@@ -81,24 +80,24 @@ export const WalletView: React.FC = (): JSX.Element => {
             <AssetsNav />
             <PoolShareView />
           </Route>
-          <Route path={walletRoutes.interact.template} exact>
+          <Route path={walletRoutes.interact.template}>
             <InteractView />
           </Route>
-          <Route path={walletRoutes.bonds.template} exact>
+          <Route path={walletRoutes.bonds.template}>
             {reloadButton(reloadNodesInfo)}
             <AssetsNav />
             <BondsView />
           </Route>
-          <Route path={walletRoutes.send.template} exact>
+          <Route path={walletRoutes.send.template}>
             <SendView />
           </Route>
-          <Route path={walletRoutes.upgradeRune.template} exact>
+          <Route path={walletRoutes.upgradeRune.template}>
             <UpgradeView />
           </Route>
-          <Route path={walletRoutes.assetDetail.template} exact>
+          <Route path={walletRoutes.assetDetail.template}>
             <AssetDetailsView />
           </Route>
-          <Route path={walletRoutes.walletSettings.template} exact>
+          <Route path={walletRoutes.walletSettings.template}>
             <Styled.WalletSettingsWrapper>
               <AssetsNav />
               <WalletSettingsView />
@@ -109,63 +108,62 @@ export const WalletView: React.FC = (): JSX.Element => {
             <AssetsNav />
             <Styled.WalletHistoryView reloadHistory={reloadHistory} />
           </Route>
-        </Switch>
+        </Routes>
       </>
     ),
     [reloadButton, reloadBalances, reloadNodesInfo, reloadHistory, reloadAllSharesByAddresses, reloadAllPools]
   )
 
-  const renderWalletRoute = useCallback(
+  const renderWalletRoute = useMemo(() => {
     // Redirect if  an user has not a phrase imported or wallet has been locked
-    ({ location }: { location: H.Location }) => {
-      // Special case: keystore can be `undefined` (see comment at its definition using `useObservableState`)
-      if (keystore === undefined) {
-        return React.Fragment
-      }
+    // Special case: keystore can be `undefined` (see comment at its definition using `useObservableState`)
+    if (keystore === undefined) {
+      return React.Fragment
+    }
 
-      if (!hasImportedKeystore(keystore)) {
-        return (
-          <Redirect
-            to={{
-              pathname: walletRoutes.noWallet.path()
-            }}
-          />
-        )
-      }
+    if (!hasImportedKeystore(keystore)) {
+      return (
+        <Navigate
+          to={{
+            pathname: walletRoutes.noWallet.path()
+          }}
+          replace
+        />
+      )
+    }
 
-      // check lock status
-      if (isLocked(keystore)) {
-        return (
-          <Redirect
-            to={{
-              pathname: walletRoutes.locked.path(),
-              search: location.search,
-              state: { from: location } as RedirectRouteState
-            }}
-          />
-        )
-      }
+    // check lock status
+    if (isLocked(keystore)) {
+      return (
+        <Navigate
+          to={{
+            pathname: walletRoutes.locked.path(),
+            search: location.search
+          }}
+          state={{ referrer: location.pathname }}
+          replace
+        />
+      )
+    }
 
-      return renderWalletRoutes
-    },
-    [renderWalletRoutes, keystore]
-  )
+    return renderWalletRoutes
+  }, [keystore, renderWalletRoutes, location.search, location.pathname])
 
   return (
-    <Switch>
-      <Route path={walletRoutes.noWallet.template} exact>
+    <Routes>
+      <Route path={walletRoutes.noWallet.template}>
         <NoWalletView />
       </Route>
       <Route path={walletRoutes.create.base.template}>
         <CreateView />
       </Route>
-      <Route path={walletRoutes.locked.template} exact>
+      <Route path={walletRoutes.locked.template}>
         <UnlockView />
       </Route>
       <Route path={walletRoutes.imports.base.template}>
         <ImportsView />
       </Route>
-      <Route path={walletRoutes.base.template} render={renderWalletRoute} />
-    </Switch>
+      <Route path={walletRoutes.base.template} element={renderWalletRoute} />
+    </Routes>
   )
 }

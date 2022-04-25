@@ -5,13 +5,12 @@ import * as FP from 'fp-ts/function'
 import * as O from 'fp-ts/lib/Option'
 import { none, Option, some } from 'fp-ts/lib/Option'
 import { useIntl } from 'react-intl'
-import { useHistory, useLocation } from 'react-router-dom'
+import { useLocation, useNavigate, useParams } from 'react-router-dom'
 
 import { IS_PRODUCTION } from '../../../../shared/const'
 import { envOrDefault } from '../../../../shared/utils/env'
 import { getUrlSearchParam } from '../../../helpers/url.helper'
 import * as appRoutes from '../../../routes/app'
-import { RedirectRouteState } from '../../../routes/types'
 import * as walletRoutes from '../../../routes/wallet'
 import { KeystoreState } from '../../../services/wallet/types'
 import { isLocked, hasImportedKeystore } from '../../../services/wallet/util'
@@ -34,8 +33,9 @@ export const UnlockForm: React.FC<Props> = (props): JSX.Element => {
   const { keystore, unlock: unlockHandler = () => Promise.resolve(), removeKeystore = () => Promise.resolve() } = props
 
   const [showRemoveModal, setShowRemoveModal] = useState(false)
-  const history = useHistory()
-  const location = useLocation<RedirectRouteState>()
+  const navigate = useNavigate()
+  const location = useLocation()
+  const params = useParams()
   const intl = useIntl()
   const [form] = Form.useForm<FormValues>()
 
@@ -67,11 +67,11 @@ export const UnlockForm: React.FC<Props> = (props): JSX.Element => {
     if (!isLocked(keystore) && !!validPassword) {
       FP.pipe(
         getUrlSearchParam(location.search, walletRoutes.REDIRECT_PARAMETER_NAME),
-        O.alt(() => O.some(location.state?.from?.pathname ?? walletRoutes.assets.template)),
-        O.map(history.push)
+        O.alt(() => O.some(params.referrer || walletRoutes.assets.template)),
+        O.map((path) => navigate(path))
       )
     }
-  }, [keystore, validPassword, location, history])
+  }, [keystore, validPassword, location, navigate, params.referrer])
 
   const passwordValidator = async (_: Rule, value: string) => {
     if (!value) {
@@ -112,8 +112,8 @@ export const UnlockForm: React.FC<Props> = (props): JSX.Element => {
 
   const onOkHandlder = useCallback(async () => {
     await removeKeystore()
-    history.push(appRoutes.base.template)
-  }, [history, removeKeystore])
+    navigate(appRoutes.base.template)
+  }, [navigate, removeKeystore])
 
   return (
     <>

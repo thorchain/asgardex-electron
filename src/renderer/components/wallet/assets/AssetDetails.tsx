@@ -6,7 +6,7 @@ import { Row, Col, Grid } from 'antd'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
 import { useIntl } from 'react-intl'
-import { useHistory } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 
 import { Network } from '../../../../shared/api/types'
 import { WalletType } from '../../../../shared/wallet/types'
@@ -61,7 +61,7 @@ export const AssetDetails: React.FC<Props> = (props): JSX.Element => {
   const [currentPage, setCurrentPage] = useState(1)
 
   const isDesktopView = Grid.useBreakpoint()?.lg ?? false
-  const history = useHistory()
+  const navigate = useNavigate()
   const intl = useIntl()
 
   const walletActionSendClick = useCallback(() => {
@@ -80,8 +80,8 @@ export const AssetDetails: React.FC<Props> = (props): JSX.Element => {
         walletIndex: walletIndex.toString()
       }))
     )
-    history.push(walletRoutes.send.path(routeParams))
-  }, [asset, history, oWalletAddress, walletIndex, walletType])
+    navigate(walletRoutes.send.path(routeParams))
+  }, [asset, navigate, oWalletAddress, walletIndex, walletType])
 
   const walletActionDepositClick = useCallback(() => {
     FP.pipe(
@@ -94,9 +94,9 @@ export const AssetDetails: React.FC<Props> = (props): JSX.Element => {
           walletIndex: walletIndex.toString()
         })
       ),
-      O.map(history.push)
+      O.map((path) => navigate(path))
     )
-  }, [oWalletAddress, history.push, walletType, walletIndex])
+  }, [oWalletAddress, navigate, walletType, walletIndex])
 
   const isNonNativeRuneAsset: boolean = useMemo(
     () => AssetHelper.isNonNativeRuneAsset(asset, network),
@@ -116,9 +116,9 @@ export const AssetDetails: React.FC<Props> = (props): JSX.Element => {
           walletIndex: walletIndex.toString()
         })
       ),
-      O.map(history.push)
+      O.map((path) => navigate(path))
     )
-  }, [oWalletAddress, history.push, isNonNativeRuneAsset, asset, network, walletType, walletIndex])
+  }, [oWalletAddress, navigate, isNonNativeRuneAsset, asset, network, walletType, walletIndex])
 
   const refreshHandler = useCallback(() => {
     loadTxsHandler({ limit: MAX_ITEMS_PER_PAGE, offset: (currentPage - 1) * MAX_ITEMS_PER_PAGE })

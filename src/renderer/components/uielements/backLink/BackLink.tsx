@@ -2,7 +2,7 @@ import React from 'react'
 
 import { LeftOutlined } from '@ant-design/icons'
 import { useIntl } from 'react-intl'
-import { useHistory } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 
 import { BackLinkWrapper, ButtonText } from './BackLink.styles'
 
@@ -14,14 +14,15 @@ type Props = {
 }
 
 export const BackLink: React.FC<Props> = ({ label, style, path, className }): JSX.Element => {
-  const history = useHistory()
+  const navigate = useNavigate()
   const intl = useIntl()
 
   const clickHandler = () => {
     if (path) {
-      history.push(path)
+      navigate(path)
     } else {
-      history.goBack()
+      // go back
+      navigate(-1)
     }
   }
   return (

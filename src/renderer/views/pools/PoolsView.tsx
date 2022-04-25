@@ -1,6 +1,6 @@
 import React from 'react'
 
-import { Route, Switch } from 'react-router-dom'
+import { Route, Routes } from 'react-router-dom'
 
 import * as poolsRoutes from '../../routes/pools'
 import { DepositView } from '../deposit/DepositView'
@@ -10,19 +10,19 @@ import { PoolsOverview } from './PoolsOverview'
 
 export const PoolsView: React.FC = (): JSX.Element => {
   return (
-    <Switch>
-      <Route path={poolsRoutes.base.template} exact>
+    <Routes>
+      <Route path={poolsRoutes.base.template}>
         <PoolsOverview />
       </Route>
-      <Route path={poolsRoutes.swap.template} exact>
+      <Route path={poolsRoutes.swap.template}>
         <SwapView />
       </Route>
-      <Route path={poolsRoutes.deposit.template} exact>
+      <Route path={poolsRoutes.deposit.template}>
         <DepositView />
       </Route>
-      <Route path={poolsRoutes.detail.template} exact>
+      <Route path={poolsRoutes.detail.template}>
         <PoolDetailsView />
       </Route>
-    </Switch>
+    </Routes>
   )
 }

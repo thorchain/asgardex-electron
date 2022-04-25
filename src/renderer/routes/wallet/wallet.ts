@@ -91,7 +91,7 @@ export const assetDetail: Route<AssetDetailsParams> = {
   }
 }
 
-export type SendParams = { asset: string; walletAddress: string; walletType: WalletType; walletIndex: string }
+export type SendParams = { asset: string; walletAddress: Address; walletType: WalletType; walletIndex: string }
 export const send: Route<SendParams> = {
   template: `${assetDetail.template}/send`,
   path: ({ asset, walletAddress, walletType, walletIndex }) => {

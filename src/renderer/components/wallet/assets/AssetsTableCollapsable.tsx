@@ -17,7 +17,7 @@ import * as A from 'fp-ts/lib/Array'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
 import { useIntl } from 'react-intl'
-import { useHistory } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 
 import { Network } from '../../../../shared/api/types'
 import { isKeystoreWallet } from '../../../../shared/utils/guard'
@@ -71,7 +71,7 @@ export const AssetsTableCollapsable: React.FC<Props> = (props): JSX.Element => {
   } = props
 
   const intl = useIntl()
-  const history = useHistory()
+  const navigate = useNavigate()
   const screenMap: ScreenMap = Grid.useBreakpoint()
 
   const [showQRModal, setShowQRModal] = useState<O.Option<{ asset: Asset; address: Address }>>(O.none)
@@ -142,7 +142,7 @@ export const AssetsTableCollapsable: React.FC<Props> = (props): JSX.Element => {
           e.preventDefault()
           e.stopPropagation()
           setSelectedAsset(O.some(asset))
-          history.push(
+          navigate(
             walletRoutes.upgradeRune.path({
               asset: assetToString(asset),
               walletAddress,
@@ -173,7 +173,7 @@ export const AssetsTableCollapsable: React.FC<Props> = (props): JSX.Element => {
         )
       }
     }),
-    [haltThorChain, haltEthChain, haltBnbChain, network, intl, setSelectedAsset, history]
+    [haltThorChain, haltEthChain, haltBnbChain, network, intl, setSelectedAsset, navigate]
   )
 
   const renderBalanceColumn = ({ asset, amount }: Balance) => {

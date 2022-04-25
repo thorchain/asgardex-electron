@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useMemo, useRef } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
-import { assetFromString, Chain } from '@xchainjs/xchain-util'
+import { Chain } from '@xchainjs/xchain-util'
 import * as FP from 'fp-ts/function'
 import * as O from 'fp-ts/Option'
 import { useObservableState } from 'observable-hooks'
@@ -16,6 +16,7 @@ import { RefreshButton } from '../../components/uielements/button'
 import { ONE_BN } from '../../const'
 import { useAppContext } from '../../contexts/AppContext'
 import { useMidgardContext } from '../../contexts/MidgardContext'
+import { getAssetFromNullableString } from '../../helpers/assetHelper'
 import * as PoolHelpers from '../../helpers/poolHelper'
 import { useMidgardHistoryActions } from '../../hooks/useMidgardHistoryActions'
 import { useMimirHalt } from '../../hooks/useMimirHalt'
@@ -80,7 +81,7 @@ export const PoolDetailsView: React.FC = () => {
     [haltedChains, mimirHalt]
   )
 
-  const oRouteAsset = useMemo(() => O.fromNullable(assetFromString(asset.toUpperCase())), [asset])
+  const oRouteAsset = useMemo(() => getAssetFromNullableString(asset), [asset])
 
   // Set selected pool asset whenever an asset in route has been changed
   // Needed to get all data for this pool (pool details etc.)

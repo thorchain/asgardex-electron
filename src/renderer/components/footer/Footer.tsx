@@ -2,7 +2,7 @@ import React, { useCallback } from 'react'
 
 import Icon, { TwitterOutlined, BranchesOutlined, BugOutlined, GithubOutlined } from '@ant-design/icons'
 import { Row, Col, Grid } from 'antd'
-import { useHistory } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 
 import { ExternalUrl } from '../../../shared/const'
 import { ReactComponent as DiscordIcon } from '../../assets/svg/discord.svg'
@@ -34,10 +34,10 @@ type Props = {
 export const Footer: React.FC<Props> = (props): JSX.Element => {
   const { commitHash, isDev } = props
 
-  const history = useHistory()
+  const navigate = useNavigate()
   const screens = Grid.useBreakpoint()
 
-  const gotoPlayground = useCallback(() => history.push(playgroundRoutes.base.path()), [history])
+  const gotoPlayground = useCallback(() => navigate(playgroundRoutes.base.path()), [navigate])
 
   const clickIconHandler = useCallback((url: string) => {
     window.apiUrl.openExternal(url)

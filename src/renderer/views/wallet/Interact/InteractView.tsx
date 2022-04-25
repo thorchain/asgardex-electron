@@ -6,8 +6,7 @@ import { Col, Row } from 'antd'
 import * as FP from 'fp-ts/function'
 import * as O from 'fp-ts/Option'
 import { useObservableState } from 'observable-hooks'
-import { useParams } from 'react-router'
-import { useHistory } from 'react-router-dom'
+import { useNavigate, useParams } from 'react-router-dom'
 
 import { LoadingView } from '../../../components/shared/loading'
 import { BackLink } from '../../../components/uielements/backLink'
@@ -28,13 +27,13 @@ import * as Styled from './InteractView.styles'
 
 export const InteractView: React.FC = () => {
   const {
-    interactType,
-    walletAddress,
-    walletType,
-    walletIndex: walletIndexRoute
+    interactType = 'bond',
+    walletAddress = '',
+    walletType = 'keystore',
+    walletIndex: walletIndexRoute = '0'
   } = useParams<walletRoutes.InteractParams>()
 
-  const history = useHistory()
+  const navigate = useNavigate()
 
   const walletIndex = parseInt(walletIndexRoute)
 
@@ -77,7 +76,7 @@ export const InteractView: React.FC = () => {
 
   const interactTypeChanged = useCallback(
     (type: InteractType) => {
-      history.push(
+      navigate(
         walletRoutes.interact.path({
           interactType: type,
           walletAddress,
@@ -86,7 +85,7 @@ export const InteractView: React.FC = () => {
         })
       )
     },
-    [history, walletAddress, walletIndex, walletType]
+    [navigate, walletAddress, walletIndex, walletType]
   )
 
   return (
