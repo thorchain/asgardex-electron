@@ -174,8 +174,6 @@ yarn test
 
 ### `e2e`
 
-**Note:** e2e tests are disabled temporary (see #750)
-
 ```bash
 yarn test:e2e
 ```
