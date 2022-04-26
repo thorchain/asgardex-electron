@@ -59,9 +59,10 @@ import {
   iconUrlInERC20Whitelist,
   isRuneAsset,
   isLunaAsset,
-  isUstAsset
+  isUstAsset,
+  getAssetFromNullableString
 } from './assetHelper'
-import { eqAsset, eqAssetAmount, eqBaseAmount } from './fp/eq'
+import { eqAsset, eqAssetAmount, eqBaseAmount, eqOAsset } from './fp/eq'
 
 describe('helpers/assetHelper', () => {
   describe('isRuneBnbAsset', () => {
@@ -547,6 +548,33 @@ describe('helpers/assetHelper', () => {
           network: 'mainnet'
         })
       ).toBeFalsy()
+    })
+  })
+
+  describe('getAssetFromNullableString', () => {
+    it('BNB.BNB (uppercase)', () => {
+      const result = getAssetFromNullableString('BNB.BNB')
+      expect(eqOAsset.equals(result, O.some(AssetBNB))).toBeTruthy()
+    })
+    it('bnb.bnb (lowercase)', () => {
+      const result = getAssetFromNullableString('bnb.bnb')
+      expect(eqOAsset.equals(result, O.some(AssetBNB))).toBeTruthy()
+    })
+    it('invalid', () => {
+      const result = getAssetFromNullableString('invalid')
+      expect(result).toBeNone()
+    })
+    it('BNB (no ticker)', () => {
+      const result = getAssetFromNullableString('BNB')
+      expect(result).toBeNone()
+    })
+    it('undefined', () => {
+      const result = getAssetFromNullableString()
+      expect(result).toBeNone()
+    })
+    it('empty string', () => {
+      const result = getAssetFromNullableString('')
+      expect(result).toBeNone()
     })
   })
 })

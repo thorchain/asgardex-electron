@@ -27,18 +27,11 @@ type Props = {
   changePaginationHandler: (page: number) => void
   network: Network
   chain: Chain
-  walletAddress?: O.Option<Address>
+  walletAddress: Address
 }
 
 export const TxsTable: React.FC<Props> = (props): JSX.Element => {
-  const {
-    txsPageRD,
-    clickTxLinkHandler,
-    changePaginationHandler,
-    network,
-    chain,
-    walletAddress: oWalletAddress = O.none
-  } = props
+  const { txsPageRD, clickTxLinkHandler, changePaginationHandler, network, chain, walletAddress } = props
   const intl = useIntl()
   const isDesktopView = Grid.useBreakpoint()?.lg ?? false
 
@@ -59,25 +52,15 @@ export const TxsTable: React.FC<Props> = (props): JSX.Element => {
   )
 
   const renderAddressWithBreak = useCallback(
-    (address: Address, key: string) => {
-      const selfAddress = FP.pipe(
-        oWalletAddress,
-        O.chain((walletAddress) =>
-          walletAddress === address
-            ? O.some(<Styled.OwnText key={key}>{intl.formatMessage({ id: 'common.address.self' })}</Styled.OwnText>)
-            : O.none
-        )
-      )
-      return FP.pipe(
-        selfAddress,
-        O.getOrElse(() => (
-          <Styled.Text key={key}>
-            <AddressEllipsis address={address} chain={chain} network={network} />
-          </Styled.Text>
-        ))
-      )
-    },
-    [chain, network, oWalletAddress, intl]
+    (address: Address, key: string) =>
+      walletAddress === address ? (
+        <Styled.OwnText key={key}>{intl.formatMessage({ id: 'common.address.self' })}</Styled.OwnText>
+      ) : (
+        <Styled.Text key={key}>
+          <AddressEllipsis address={address} chain={chain} network={network} />
+        </Styled.Text>
+      ),
+    [chain, network, walletAddress, intl]
   )
 
   const renderTypeColumn = useCallback((_, { type }: Tx) => {

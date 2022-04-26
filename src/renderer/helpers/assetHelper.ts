@@ -364,6 +364,8 @@ export const disableRuneUpgrade = ({
   return false
 }
 
-// TODO (@veado) Test
-export const getAssetFromNullableString = (s?: string): O.Option<Asset> =>
-  FP.pipe(O.fromNullable(s), O.map(S.toUpperCase), O.map(assetFromString), O.chain(O.fromNullable))
+/**
+ * Creates an asset from `nullable` string
+ */
+export const getAssetFromNullableString = (assetString?: string): O.Option<Asset> =>
+  FP.pipe(O.fromNullable(assetString), O.map(S.toUpperCase), O.map(assetFromString), O.chain(O.fromNullable))

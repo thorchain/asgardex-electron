@@ -27,8 +27,11 @@ import {
   getAssetAmountByAsset,
   getBnbAmountFromBalances,
   getLtcAmountFromBalances,
+  getWalletAddressFromNullableString,
   getWalletBalanceByAsset,
   getWalletByAddress,
+  getWalletIndexFromNullableString,
+  getWalletTypeFromNullableString,
   hasLedgerInBalancesByAsset,
   isEnabledWallet
 } from './walletHelper'
@@ -241,6 +244,60 @@ describe('walletHelper', () => {
       expect(isEnabledWallet(TerraChain, 'testnet', 'ledger')).toBeTruthy()
       expect(isEnabledWallet(TerraChain, 'mainnet', 'ledger')).toBeTruthy()
       expect(isEnabledWallet(TerraChain, 'stagenet', 'ledger')).toBeTruthy()
+    })
+  })
+
+  //   export const getWalletAddressFromNullableString = (s?: string): O.Option<Address> =>
+  //   FP.pipe(s, optionFromNullableString, O.chain(O.fromPredicate((s) => s.length > 0)))
+
+  // export const getWalletIndexFromNullableString = (s?: string): O.Option<number /* integer */> =>
+  //   FP.pipe(s, optionFromNullableString, O.map(parseInt), O.chain(O.fromPredicate((v) => !isNaN(v) && v >= 0)))
+
+  // export const getWalletTypeFromNullableString = (s?: string): O.Option<WalletType> =>
+  //   FP.pipe(s, optionFromNullableString, O.chain(O.fromPredicate(isWalletType)))
+
+  describe('getWalletAddressFromNullableString', () => {
+    it('address string', () => {
+      const result = getWalletAddressFromNullableString('any-address')
+      expect(result).toEqual(O.some('any-address'))
+    })
+    it('empty string', () => {
+      const result = getWalletAddressFromNullableString('')
+      expect(result).toBeNone()
+    })
+    it('undefined', () => {
+      const result = getWalletAddressFromNullableString()
+      expect(result).toBeNone()
+    })
+  })
+
+  describe('getWalletIndexFromNullableString', () => {
+    it('integer', () => {
+      const result = getWalletIndexFromNullableString('1')
+      expect(result).toEqual(O.some(1))
+    })
+    it('-1', () => {
+      const result = getWalletIndexFromNullableString('-1')
+      expect(result).toBeNone()
+    })
+    it('undefined', () => {
+      const result = getWalletIndexFromNullableString()
+      expect(result).toBeNone()
+    })
+  })
+
+  describe('getWalletTypeFromNullableString', () => {
+    it('keystore', () => {
+      const result = getWalletTypeFromNullableString('keystore')
+      expect(result).toEqual(O.some('keystore'))
+    })
+    it('invalid', () => {
+      const result = getWalletTypeFromNullableString('invalid')
+      expect(result).toBeNone()
+    })
+    it('undefined', () => {
+      const result = getWalletTypeFromNullableString()
+      expect(result).toBeNone()
     })
   })
 })

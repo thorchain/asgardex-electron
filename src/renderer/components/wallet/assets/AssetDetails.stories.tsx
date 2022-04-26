@@ -38,6 +38,7 @@ const openExplorerTxUrl: OpenExplorerTxUrl = (txHash: TxHash) => {
 export const StoryBNB: BaseStory<never, JSX.Element> = () => (
   <AssetDetails
     walletType="keystore"
+    walletAddress="bnb-address"
     walletIndex={0}
     txsPageRD={RD.initial}
     balances={balances}
@@ -53,6 +54,7 @@ StoryBNB.storyName = 'BNB'
 export const StoryRuneTxSuccess: BaseStory<never, JSX.Element> = () => (
   <AssetDetails
     walletType="keystore"
+    walletAddress="thor-address"
     walletIndex={0}
     txsPageRD={RD.initial}
     balances={balances}
@@ -68,6 +70,7 @@ StoryRuneTxSuccess.storyName = 'RUNE - tx success'
 export const StoryRuneNoSend: BaseStory<never, JSX.Element> = () => (
   <AssetDetails
     walletType="keystore"
+    walletAddress="thor-address"
     walletIndex={0}
     txsPageRD={RD.initial}
     balances={balances}
@@ -83,6 +86,7 @@ StoryRuneNoSend.storyName = 'RUNE - no send'
 export const StoryRuneNoUpgrade: BaseStory<never, JSX.Element> = () => (
   <AssetDetails
     walletType="keystore"
+    walletAddress="bnb-address"
     walletIndex={0}
     txsPageRD={RD.initial}
     balances={balances}
@@ -98,6 +102,7 @@ StoryRuneNoUpgrade.storyName = 'RUNE - no upgrade'
 export const StoryRuneTxError: BaseStory<never, JSX.Element> = () => (
   <AssetDetails
     walletType="keystore"
+    walletAddress="bnb-address"
     walletIndex={0}
     txsPageRD={RD.initial}
     balances={balances}
@@ -113,6 +118,7 @@ StoryRuneTxError.storyName = 'RUNE - tx error'
 export const StoryRuneNoBalances: BaseStory<never, JSX.Element> = () => (
   <AssetDetails
     walletType="keystore"
+    walletAddress="bnb-address"
     walletIndex={0}
     txsPageRD={RD.initial}
     balances={getBalances([runeBalanceEmpty, bnbBalance])}
@@ -128,6 +134,7 @@ StoryRuneNoBalances.storyName = 'RUNE - disabled - no balance'
 export const StoryRuneFeeNotCovered: BaseStory<never, JSX.Element> = () => (
   <AssetDetails
     walletType="keystore"
+    walletAddress="bnb-address"
     walletIndex={0}
     txsPageRD={RD.initial}
     balances={getBalances([runeBnbBalance, bnbBalanceEmpty])}
