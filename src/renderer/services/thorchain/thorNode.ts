@@ -75,7 +75,7 @@ const STAGENET_THORNODE_API = `${envOrDefault(
 // Note: We get data from `/thorchain` endpoint !!
 const MAINNET_THORNODE_API = `${envOrDefault(
   process.env.REACT_APP_MAINNET_THORNODE_API,
-  'https://thornode.thorchain.info'
+  'https://thornode.ninerealms.com'
 )}/thorchain`
 
 const thornodeApiUrl$ = (network: Network): ThorNodeApiUrlLD => {
