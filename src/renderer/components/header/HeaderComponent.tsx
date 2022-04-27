@@ -119,8 +119,8 @@ export const HeaderComponent: React.FC<Props> = (props): JSX.Element => {
     }
   }, [isDesktopView])
 
-  const matchPoolsRoute = useMatch(poolsRoutes.base.path())
-  const matchWalletRoute = useMatch(walletRoutes.base.path())
+  const matchPoolsRoute = useMatch({ path: poolsRoutes.base.path(), end: false })
+  const matchWalletRoute = useMatch({ path: walletRoutes.base.path(), end: false })
 
   const activeKey: TabKey = useMemo(() => {
     if (matchPoolsRoute) {

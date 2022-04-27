@@ -1,6 +1,6 @@
 import React from 'react'
 
-import { Routes, Route, useNavigate, Navigate, useLocation } from 'react-router'
+import { Routes, Route, useNavigate, Navigate, useLocation } from 'react-router-dom'
 
 import { NewPhraseConfirm, NewPhraseGenerate } from '../../../components/wallet/phrase'
 import { PhraseInfo } from '../../../components/wallet/phrase/Phrase.types'
@@ -28,7 +28,7 @@ export const PhraseView: React.FC = () => {
           const password = (location.state as PhraseInfo)?.password ?? ''
 
           if (!phrase || !password) {
-            return <Navigate to={walletRoutes.create.phrase.template} replace />
+            return <Navigate to={walletRoutes.create.phrase.path()} replace />
           }
 
           return <NewPhraseConfirm mnemonic={phrase} onConfirm={() => keystoreService.addKeystore(phrase, password)} />

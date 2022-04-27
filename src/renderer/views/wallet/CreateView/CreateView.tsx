@@ -27,7 +27,7 @@ export const CreateView = () => {
       {
         key: TabKey.KEYSTORE,
         label: (
-          <span onClick={() => navigate(walletRoutes.create.keystore.template)}>
+          <span onClick={() => navigate(walletRoutes.create.keystore.path())}>
             {intl.formatMessage({ id: 'common.keystore' })}
           </span>
         ),
@@ -37,7 +37,7 @@ export const CreateView = () => {
       {
         key: TabKey.PHRASE,
         label: (
-          <span onClick={() => navigate(walletRoutes.create.phrase.template)}>
+          <span onClick={() => navigate(walletRoutes.create.phrase.path())}>
             {intl.formatMessage({ id: 'common.phrase' })}
           </span>
         ),

@@ -74,7 +74,7 @@ export const useNetwork = (): { network: Network; changeNetwork: ChangeNetworkHa
    * Quote: "Our recommendation is not to keep your routes in your Redux store at all."
    * ^ @see https://reactrouter.com/web/guides/deep-redux-integration
    *
-   * (2) Why don't we handle re-directing in views, where we defined our routes (such as `PoolsView` or `WalletView`)?
+   * (2) Why don't we handle re-directing in views, where we defined our routes?
    * ------------------------------------------------------------------------------------------------------------------
    * Since we have to subscribe to `network$` to get changes by using `useSubscription` or something,
    * we get state of network after first rendering, but not before. With this, components are still trying to render data,
