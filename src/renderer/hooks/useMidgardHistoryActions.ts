@@ -11,12 +11,12 @@ import { WalletAddress } from '../../shared/wallet/types'
 import { Filter } from '../components/poolActionsHistory/types'
 import { useMidgardContext } from '../contexts/MidgardContext'
 import { liveData } from '../helpers/rx/liveData'
-import { observableState, triggerStream, TriggerStream } from '../helpers/stateHelper'
+import { observableState, triggerStream } from '../helpers/stateHelper'
 import { LoadActionsParams, ActionsPage, ActionsPageRD } from '../services/midgard/types'
 
 export type UseMidgardHistoryActions = ReturnType<typeof useMidgardHistoryActions>
 
-export const useMidgardHistoryActions = (itemsPerPage = 10, reloadTrigger$?: TriggerStream) => {
+export const useMidgardHistoryActions = (itemsPerPage = 10) => {
   const {
     service: {
       actions: { getActions$ }
@@ -61,14 +61,13 @@ export const useMidgardHistoryActions = (itemsPerPage = 10, reloadTrigger$?: Tri
     [getRequestParams, setRequestParams]
   )
 
-  /**
-   * Reloads history
-   * It needs to be memorized to point to same `TriggerStream`
-   */
+  // Note: triggerStream needs to be memorized
+  // If not, it will be re-created in every render, but `useObservableState<ActionsPageRD>` uses still the first created triggerStream
+  // and will lost the stream (no trigger event anymore)
   const { reloadHistory$, reloadHistory } = useMemo(() => {
-    const { stream$, trigger } = reloadTrigger$ || triggerStream()
+    const { stream$, trigger } = triggerStream()
     return { reloadHistory$: stream$, reloadHistory: trigger }
-  }, [reloadTrigger$])
+  }, [])
 
   /**
    * Previous history page
@@ -87,7 +86,7 @@ export const useMidgardHistoryActions = (itemsPerPage = 10, reloadTrigger$?: Tri
             RxOp.debounceTime(300) // debounce reload time
           )
         ]),
-        RxOp.switchMap(([parameters]) => FP.pipe(parameters, getActions$)),
+        RxOp.switchMap(([parameters]) => getActions$(parameters)),
         liveData.map((page) => {
           prevHistoryPage.current = O.some(page)
           return page
@@ -132,9 +131,12 @@ export const useMidgardHistoryActions = (itemsPerPage = 10, reloadTrigger$?: Tri
     [loadHistory]
   )
 
+  const loading = RD.isPending(historyPage)
+
   return {
     loadHistory,
     historyPage,
+    loading,
     requestParams,
     prevHistoryPage: prevHistoryPage.current,
     reloadHistory,

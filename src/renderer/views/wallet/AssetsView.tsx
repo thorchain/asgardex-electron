@@ -1,8 +1,9 @@
-import React, { useCallback } from 'react'
+import React, { useCallback, useMemo } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
 import { Address } from '@xchainjs/xchain-client'
 import { Asset, assetToString } from '@xchainjs/xchain-util'
+import { Row } from 'antd'
 import * as A from 'fp-ts/lib/Array'
 import * as FP from 'fp-ts/lib/function'
 import { useObservableState } from 'observable-hooks'
@@ -11,6 +12,8 @@ import { useNavigate } from 'react-router-dom'
 import * as RxOp from 'rxjs/operators'
 
 import { WalletType } from '../../../shared/wallet/types'
+import { RefreshButton } from '../../components/uielements/button'
+import { AssetsNav } from '../../components/wallet/assets'
 import { AssetsTableCollapsable } from '../../components/wallet/assets/AssetsTableCollapsable'
 import { TotalValue } from '../../components/wallet/assets/TotalValue'
 import { useMidgardContext } from '../../contexts/MidgardContext'
@@ -20,13 +23,14 @@ import { useMimirHalt } from '../../hooks/useMimirHalt'
 import { useNetwork } from '../../hooks/useNetwork'
 import { useTotalWalletBalance } from '../../hooks/useWalletBalance'
 import * as walletRoutes from '../../routes/wallet'
+import { INITIAL_BALANCES_STATE, DEFAULT_BALANCES_FILTER } from '../../services/wallet/const'
 import { ChainBalances } from '../../services/wallet/types'
 
 export const AssetsView: React.FC = (): JSX.Element => {
   const navigate = useNavigate()
   const intl = useIntl()
 
-  const { chainBalances$, setSelectedAsset } = useWalletContext()
+  const { chainBalances$, balancesState$, setSelectedAsset, reloadBalances } = useWalletContext()
 
   const { network } = useNetwork()
 
@@ -53,9 +57,13 @@ export const AssetsView: React.FC = (): JSX.Element => {
     []
   )
 
+  const [{ loading: loadingBalances }] = useObservableState(
+    () => balancesState$(DEFAULT_BALANCES_FILTER),
+    INITIAL_BALANCES_STATE
+  )
   const {
     service: {
-      pools: { poolsState$, selectedPricePool$ }
+      pools: { poolsState$, selectedPricePool$, reloadAllPools }
     }
   } = useMidgardContext()
 
@@ -92,8 +100,19 @@ export const AssetsView: React.FC = (): JSX.Element => {
 
   const { mimirHaltRD } = useMimirHalt()
 
+  const disableRefresh = useMemo(() => RD.isPending(poolsRD) || loadingBalances, [loadingBalances, poolsRD])
+
+  const refreshHandler = useCallback(() => {
+    reloadAllPools()
+    reloadBalances()
+  }, [reloadAllPools, reloadBalances])
+
   return (
     <>
+      <Row justify="end" style={{ marginBottom: '20px' }}>
+        <RefreshButton clickHandler={refreshHandler} disabled={disableRefresh} />
+      </Row>
+      <AssetsNav />
       <TotalValue
         total={totalWalletBalances}
         pricePool={selectedPricePool}

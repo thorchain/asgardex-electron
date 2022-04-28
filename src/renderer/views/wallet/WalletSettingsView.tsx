@@ -24,6 +24,7 @@ import * as RxOp from 'rxjs/operators'
 
 import { Network } from '../../../shared/api/types'
 import { WalletAddress } from '../../../shared/wallet/types'
+import { AssetsNav } from '../../components/wallet/assets'
 import { WalletSettings } from '../../components/wallet/settings/'
 import { useAppContext } from '../../contexts/AppContext'
 import { useBinanceContext } from '../../contexts/BinanceContext'
@@ -366,19 +367,22 @@ export const WalletSettingsView: React.FC = (): JSX.Element => {
   const walletAccounts = useObservableState(walletAccounts$, O.none)
 
   return (
-    <WalletSettings
-      network={network}
-      runeNativeAddress={runeNativeAddress}
-      lockWallet={lock}
-      removeKeystore={removeKeystore}
-      exportKeystore={exportKeystore}
-      addLedgerAddress={addLedgerAddressHandler}
-      verifyLedgerAddress={verifyLedgerAddressHandler}
-      removeLedgerAddress={removeLedgerAddressHandler}
-      phrase={phrase}
-      walletAccounts={walletAccounts}
-      clickAddressLinkHandler={clickAddressLinkHandler}
-      validatePassword$={validatePassword$}
-    />
+    <div style={{ marginTop: '50px' }}>
+      <AssetsNav />
+      <WalletSettings
+        network={network}
+        runeNativeAddress={runeNativeAddress}
+        lockWallet={lock}
+        removeKeystore={removeKeystore}
+        exportKeystore={exportKeystore}
+        addLedgerAddress={addLedgerAddressHandler}
+        verifyLedgerAddress={verifyLedgerAddressHandler}
+        removeLedgerAddress={removeLedgerAddressHandler}
+        phrase={phrase}
+        walletAccounts={walletAccounts}
+        clickAddressLinkHandler={clickAddressLinkHandler}
+        validatePassword$={validatePassword$}
+      />
+    </div>
   )
 }
