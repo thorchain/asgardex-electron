@@ -6,3 +6,5 @@ export type Route<P> = {
   template: string
   path: (p: P) => string
 }
+
+export type ReferrerState = { referrer: string }

@@ -8,7 +8,6 @@ import * as A from 'fp-ts/lib/Array'
 import * as O from 'fp-ts/Option'
 import { useObservableState } from 'observable-hooks'
 import { useIntl } from 'react-intl'
-import { useLocation } from 'react-router-dom'
 
 import { envOrDefault } from '../../../shared/utils/env'
 import { Footer } from '../../components/footer'
@@ -240,8 +239,6 @@ export const AppView: React.FC = (): JSX.Element => {
     )
   }, [apiEndpoint, renderMidgardAlert])
 
-  const { pathname } = useLocation()
-
   return (
     <Styled.AppWrapper>
       <Styled.AppLayout>
@@ -252,7 +249,6 @@ export const AppView: React.FC = (): JSX.Element => {
           {renderMidgardError}
           {renderHaltedChainsWarning}
           {renderUpgradeWarning}
-          <div>pathname {pathname}</div>
           <ViewRoutes />
         </View>
         <Footer commitHash={envOrDefault($COMMIT_HASH, '')} isDev={$IS_DEV} />

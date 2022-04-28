@@ -7,7 +7,7 @@ import * as FP from 'fp-ts/function'
 import * as O from 'fp-ts/lib/Option'
 import { useObservableState } from 'observable-hooks'
 import { useIntl } from 'react-intl'
-import { useNavigate, useParams } from 'react-router-dom'
+import { useLocation, useNavigate, useParams } from 'react-router-dom'
 import * as Rx from 'rxjs'
 import * as RxOp from 'rxjs/operators'
 
@@ -43,6 +43,7 @@ export const SwapView: React.FC<Props> = (_): JSX.Element => {
   const { source, target } = useParams<SwapRouteParams>()
   const intl = useIntl()
   const navigate = useNavigate()
+  const location = useLocation()
 
   const { slipTolerance$, changeSlipTolerance } = useAppContext()
 
@@ -221,8 +222,8 @@ export const SwapView: React.FC<Props> = (_): JSX.Element => {
   )
 
   const importWalletHandler = useCallback(() => {
-    navigate(walletRoutes.base.path())
-  }, [navigate])
+    navigate(walletRoutes.base.path(location.pathname))
+  }, [location.pathname, navigate])
 
   const targetAssetChain = useMemo(
     () =>

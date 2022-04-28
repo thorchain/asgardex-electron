@@ -4,6 +4,7 @@ import { useObservableState } from 'observable-hooks'
 import { Navigate, useLocation } from 'react-router-dom'
 
 import { useWalletContext } from '../../contexts/WalletContext'
+import { ReferrerState } from '../../routes/types'
 import * as walletRoutes from '../../routes/wallet'
 import { hasImportedKeystore, isLocked } from '../../services/wallet/util'
 
@@ -44,7 +45,7 @@ export const WalletAuth = ({ children }: { children: JSX.Element }): JSX.Element
           pathname: walletRoutes.locked.path(),
           search: location.search
         }}
-        state={{ referrer: location.pathname }}
+        state={{ referrer: (location.state as ReferrerState)?.referrer ?? location.pathname }}
         replace
       />
     )

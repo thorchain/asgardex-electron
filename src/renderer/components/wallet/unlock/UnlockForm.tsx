@@ -11,6 +11,7 @@ import { IS_PRODUCTION } from '../../../../shared/const'
 import { envOrDefault } from '../../../../shared/utils/env'
 import { getUrlSearchParam } from '../../../helpers/url.helper'
 import * as appRoutes from '../../../routes/app'
+import { ReferrerState } from '../../../routes/types'
 import * as walletRoutes from '../../../routes/wallet'
 import { KeystoreState } from '../../../services/wallet/types'
 import { isLocked, hasImportedKeystore } from '../../../services/wallet/util'
@@ -67,11 +68,11 @@ export const UnlockForm: React.FC<Props> = (props): JSX.Element => {
     if (!isLocked(keystore) && !!validPassword) {
       FP.pipe(
         getUrlSearchParam(location.search, walletRoutes.REDIRECT_PARAMETER_NAME),
-        O.alt(() => O.some(params.referrer || walletRoutes.assets.template)),
+        O.alt(() => O.some((location.state as ReferrerState)?.referrer || walletRoutes.assets.template)),
         O.map((path) => navigate(path))
       )
     }
-  }, [keystore, validPassword, location, navigate, params.referrer])
+  }, [keystore, validPassword, location, navigate, params])
 
   const passwordValidator = async (_: Rule, value: string) => {
     if (!value) {

@@ -55,6 +55,8 @@ export const useNetwork = (): { network: Network; changeNetwork: ChangeNetworkHa
       walletRoutes.upgradeRune.template,
       walletRoutes.assetDetail.template,
       walletRoutes.bonds.template,
+      walletRoutes.history.template,
+      walletRoutes.poolShares.template,
       walletRoutes.interact.template
     ],
     pathname

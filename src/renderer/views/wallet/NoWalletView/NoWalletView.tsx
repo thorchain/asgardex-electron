@@ -16,7 +16,7 @@ export const NoWalletView = () => {
   }, [navigate])
 
   const createClick = useCallback(() => {
-    navigate(walletRoutes.create.base.path())
+    navigate(walletRoutes.create.phrase.path())
   }, [navigate])
 
   return (

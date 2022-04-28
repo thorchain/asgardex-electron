@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react'
 
 import { useIntl } from 'react-intl'
-import { useLocation, useNavigate } from 'react-router-dom'
+import { useLocation, useMatch, useNavigate } from 'react-router-dom'
 
 import { PageTitle } from '../../../components/page/PageTitle'
 import { Tabs } from '../../../components/tabs'
@@ -56,29 +56,21 @@ export const ImportsView: React.FC = (): JSX.Element => {
     ],
     [addKeystore, clientStates, navigate, importKeystore$, intl, loadKeystore$]
   )
-
-  /**
-   * Need to initial sync tabs' state with history.
-   * Call only for onMount
-   */
-  useEffect(
-    () => {
-      navigate(walletRoutes.imports.phrase.path(), { replace: true })
-    },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    []
-  )
+  const matchKeystorePath = useMatch({ path: walletRoutes.imports.keystore.path(), end: false })
+  const matchPhrasePath = useMatch({ path: walletRoutes.imports.phrase.path(), end: false })
 
   /**
    * Need to sync tabs' state with history
    */
   useEffect(() => {
-    if (location.pathname.includes(walletRoutes.imports.keystore.path())) {
+    if (matchKeystorePath) {
       setActiveTab(TabKey.KEYSTORE)
-    } else if (location.pathname.includes(walletRoutes.imports.phrase.path())) {
+    } else if (matchPhrasePath) {
       setActiveTab(TabKey.PHRASE)
+    } else {
+      // nothing to do
     }
-  }, [navigate, activeTab, location.pathname])
+  }, [navigate, activeTab, location.pathname, matchKeystorePath, matchPhrasePath])
 
   return (
     <Styled.ImportsViewWrapper>

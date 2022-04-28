@@ -7,7 +7,7 @@ import * as A from 'fp-ts/lib/Array'
 import * as O from 'fp-ts/lib/Option'
 import { useObservableState } from 'observable-hooks'
 import { useIntl } from 'react-intl'
-import { useMatch, Link, useNavigate } from 'react-router-dom'
+import { useMatch, Link, useNavigate, useLocation } from 'react-router-dom'
 import { palette, size } from 'styled-theme'
 
 import { Network } from '../../../shared/api/types'
@@ -83,6 +83,7 @@ export const HeaderComponent: React.FC<Props> = (props): JSX.Element => {
   const intl = useIntl()
 
   const navigate = useNavigate()
+  const location = useLocation()
 
   const { theme$ } = useThemeContext()
   const theme = useObservableState(theme$)
@@ -194,10 +195,10 @@ export const HeaderComponent: React.FC<Props> = (props): JSX.Element => {
       lockHandler()
     } else {
       // ... or go to wallet page to unlock
-      navigate(walletRoutes.base.path())
+      navigate(walletRoutes.base.path(location.pathname))
     }
     closeMenu()
-  }, [closeMenu, navigate, keystore, lockHandler])
+  }, [keystore, closeMenu, lockHandler, navigate, location.pathname])
 
   const currencyChangeHandler = useCallback(
     (asset: PricePoolAsset) => {
