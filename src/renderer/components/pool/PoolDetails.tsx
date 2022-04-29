@@ -1,14 +1,15 @@
-import React, { useMemo } from 'react'
+import React, { useCallback, useMemo } from 'react'
 
+import * as RD from '@devexperts/remote-data-ts'
 import { Asset } from '@xchainjs/xchain-util'
 import * as A from 'antd'
 import BigNumber from 'bignumber.js'
-import * as O from 'fp-ts/Option'
+import * as FP from 'fp-ts/lib/function'
 
 import { Network } from '../../../shared/api/types'
-import { EarningsHistoryItemPool, PoolDetail, PoolStatsDetail } from '../../types/generated/midgard/models'
+import { PoolDetailRD, PoolStatsDetailRD } from '../../services/midgard/types'
+import { GetPoolsStatusEnum } from '../../types/generated/midgard'
 import { PoolHistoryActions } from '../../views/pool/PoolHistoryView.types'
-import { stringToGetPoolsStatus } from '../../views/pools/Pools.utils'
 import { PoolCards } from './PoolCards'
 import * as H from './PoolDetails.helpers'
 import { PoolTitle } from './PoolTitle'
@@ -16,17 +17,18 @@ import { PoolTitle } from './PoolTitle'
 export type Props = {
   asset: Asset
   historyActions: PoolHistoryActions
-  poolStatsDetail: PoolStatsDetail
-  poolDetail: PoolDetail
+  poolStatsDetail: PoolStatsDetailRD
+  reloadPoolStatsDetail: FP.Lazy<void>
+  poolDetail: PoolDetailRD
+  reloadPoolDetail: FP.Lazy<void>
   priceRatio: BigNumber
-  priceSymbol?: string
-  earningsHistory: O.Option<EarningsHistoryItemPool>
+  priceSymbol: string
   isLoading?: boolean
   HistoryView: React.ComponentType<{
     poolAsset: Asset
     historyActions: PoolHistoryActions
   }>
-  ChartView: React.ComponentType<{ isLoading?: boolean; priceRatio: BigNumber }>
+  ChartView: React.ComponentType<{ priceRatio: BigNumber }>
   disableTradingPoolAction: boolean
   disableAllPoolActions: boolean
   disablePoolActions: boolean
@@ -36,10 +38,12 @@ export type Props = {
 export const PoolDetails: React.FC<Props> = ({
   asset,
   historyActions,
-  priceSymbol = '',
+  priceSymbol,
   priceRatio,
-  poolDetail,
-  poolStatsDetail,
+  poolDetail: poolDetailRD,
+  reloadPoolDetail,
+  poolStatsDetail: poolStatsDetailRD,
+  reloadPoolStatsDetail,
   isLoading,
   HistoryView,
   ChartView,
@@ -48,29 +52,60 @@ export const PoolDetails: React.FC<Props> = ({
   disablePoolActions,
   network
 }) => {
-  const price = useMemo(() => H.getPrice(poolDetail, priceRatio), [poolDetail, priceRatio])
+  const renderTitle = useMemo(() => {
+    const price = FP.pipe(
+      poolDetailRD,
+      RD.map((poolDetail) => ({
+        amount: H.getPrice(poolDetail, priceRatio),
+        symbol: priceSymbol
+      }))
+    )
+
+    const isAvailablePool = FP.pipe(
+      poolDetailRD,
+      RD.map(({ status }) => status === GetPoolsStatusEnum.Available),
+      RD.getOrElse(() => false)
+    )
+
+    return (
+      <PoolTitle
+        network={network}
+        disableAllPoolActions={disableAllPoolActions}
+        disableTradingPoolAction={disableTradingPoolAction}
+        disablePoolActions={disablePoolActions}
+        asset={asset}
+        price={price}
+        isLoading={isLoading}
+        isAvailablePool={isAvailablePool}
+      />
+    )
+  }, [
+    asset,
+    disableAllPoolActions,
+    disablePoolActions,
+    disableTradingPoolAction,
+    isLoading,
+    network,
+    poolDetailRD,
+    priceRatio,
+    priceSymbol
+  ])
+
+  const reloadPoolCardsData = useCallback(() => {
+    reloadPoolStatsDetail()
+    reloadPoolDetail()
+  }, [reloadPoolDetail, reloadPoolStatsDetail])
+
   return (
     <A.Row gutter={[0, 8]}>
-      <A.Col span={24}>
-        <PoolTitle
-          network={network}
-          disableAllPoolActions={disableAllPoolActions}
-          disableTradingPoolAction={disableTradingPoolAction}
-          disablePoolActions={disablePoolActions}
-          asset={O.some(asset)}
-          price={price}
-          priceSymbol={priceSymbol}
-          isLoading={isLoading}
-          status={stringToGetPoolsStatus(poolDetail.status)}
-        />
-      </A.Col>
+      <A.Col span={24}>{renderTitle}</A.Col>
       <A.Col xs={24} md={8}>
         <PoolCards
-          poolStatsDetail={poolStatsDetail}
+          poolStatsDetail={poolStatsDetailRD}
           priceRatio={priceRatio}
-          poolDetail={poolDetail}
+          poolDetail={poolDetailRD}
           priceSymbol={priceSymbol}
-          isLoading={isLoading}
+          reloadData={reloadPoolCardsData}
         />
       </A.Col>
       <A.Col xs={24} md={16}>

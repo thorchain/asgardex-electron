@@ -53,14 +53,19 @@ export const TitleContainer = styled.div`
 `
 
 export const AssetWrapper = styled.div`
-  margin-left: 10px;
+  margin-left: 25px;
   flex-direction: column;
   width: 100%;
   max-width: 100%;
   overflow: hidden;
 
+  ${media.md`
+  margin-left: 35px;
+  `}
+
   ${media.lg`
     width: auto;
+    margin-left: 15px;
   `}
 `
 
@@ -71,6 +76,12 @@ export const AssetTitle = styled.p`
   font-family: 'MainFontRegular';
   color: ${palette('text', 0)};
   text-transform: uppercase;
+
+  ${media.md`
+  font-size: 23px;
+  line-height: 31px;
+  `}
+
   ${media.lg`
   font-size: 27px;
   line-height: 31px;
@@ -83,6 +94,10 @@ export const AssetSubtitle = styled.p`
   font-family: 'MainFontRegular';
   color: ${palette('text', 2)};
   text-transform: uppercase;
+
+  ${media.md`
+  font-size: 11px;
+  `}
 
   ${media.lg`
   font-size: 13px;

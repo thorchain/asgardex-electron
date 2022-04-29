@@ -645,8 +645,6 @@ const createPoolsService = (
       )
     )
 
-  const { stream$: reloadPoolStatsDetail$, trigger: reloadPoolStatsDetail } = triggerStream()
-
   // Factory to get pool stats detail from Midgard
   const apiGetPoolStatsDetail$ = (request: GetPoolStatsRequest): PoolStatsDetailLD =>
     FP.pipe(
@@ -661,7 +659,9 @@ const createPoolsService = (
       )
     )
 
-  const poolStatsDetail$: PoolStatsDetailLD = Rx.combineLatest([selectedPoolAsset$, reloadSelectedPoolDetail$]).pipe(
+  const { stream$: reloadPoolStatsDetail$, trigger: reloadPoolStatsDetail } = triggerStream()
+
+  const poolStatsDetail$: PoolStatsDetailLD = Rx.combineLatest([selectedPoolAsset$, reloadPoolStatsDetail$]).pipe(
     RxOp.map(([oSelectedPoolAsset]) => oSelectedPoolAsset),
     RxOp.switchMap((selectedPoolAsset) => {
       return FP.pipe(
@@ -697,19 +697,15 @@ const createPoolsService = (
       )
     )
 
+  const { stream$: reloadPoolEarningHistory$, trigger: reloadPoolEarningHistory } = triggerStream()
+
   const poolEarningHistory$: PoolEarningHistoryLD = Rx.combineLatest([
     selectedPoolAsset$,
-    reloadSelectedPoolDetail$
+    reloadPoolEarningHistory$
   ]).pipe(
-    RxOp.switchMap(([oSelectedPoolAsset, delay]) =>
+    RxOp.switchMap(([oSelectedPoolAsset, _]) =>
       FP.pipe(
-        Rx.timer(delay),
-        RxOp.switchMap(() => Rx.of(oSelectedPoolAsset))
-      )
-    ),
-    RxOp.switchMap((selectedPoolAsset) => {
-      return FP.pipe(
-        selectedPoolAsset,
+        oSelectedPoolAsset,
         O.fold(
           () => Rx.of(RD.initial),
           (asset) =>
@@ -722,14 +718,16 @@ const createPoolsService = (
             )
         )
       )
-    }),
+    ),
     RxOp.startWith(RD.pending)
   )
+
+  const { stream$: reloadLiquidityHistory$, trigger: reloadLiquidityHistory } = triggerStream()
 
   // Factory to get liquidity history from Midgard
   const apiGetLiquidityHistory$ = ({ from, to, ...request }: GetLiquidityHistoryRequest): PoolLiquidityHistoryLD =>
     FP.pipe(
-      Rx.combineLatest([midgardDefaultApi$, reloadPoolStatsDetail$]),
+      Rx.combineLatest([midgardDefaultApi$, reloadLiquidityHistory$]),
       RxOp.map(([api]) => api),
       liveData.chain((api) =>
         FP.pipe(
@@ -868,9 +866,11 @@ const createPoolsService = (
     reloadInboundAddresses,
     selectedPoolDetail$,
     reloadSelectedPoolDetail: (delayTime = 0) => _reloadSelectedPoolDetail(delayTime),
-    reloadPoolStatsDetail,
+    reloadLiquidityHistory,
     poolStatsDetail$,
+    reloadPoolStatsDetail,
     poolEarningHistory$,
+    reloadPoolEarningHistory,
     getPoolLiquidityHistory$,
     getSelectedPoolSwapHistory$,
     apiGetSwapHistory$,

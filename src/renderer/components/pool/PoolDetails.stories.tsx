@@ -15,6 +15,7 @@ export const historyActions: PoolHistoryActions = {
   loadHistory: (params) => console.log('load history', params),
   setFilter: (filter) => console.log('filter', filter),
   setPage: (page) => console.log('page', page),
+  reloadHistory: () => console.log('reloadHistory'),
   historyPage: RD.initial,
   prevHistoryPage: O.none
 }
@@ -23,10 +24,11 @@ export const PoolDetailsStory = () => {
   return (
     <PoolDetails
       historyActions={historyActions}
-      poolDetail={getEmptyPoolDetail()}
-      poolStatsDetail={getEmptyPoolStatsDetail()}
+      poolDetail={RD.success(getEmptyPoolDetail())}
+      reloadPoolDetail={() => console.log('reloadPoolDetail')}
+      poolStatsDetail={RD.success(getEmptyPoolStatsDetail())}
+      reloadPoolStatsDetail={() => console.log('reloadPoolStatsDetail')}
       network={'testnet'}
-      earningsHistory={O.none}
       priceSymbol={'R'}
       asset={AssetETH}
       priceRatio={ONE_BN}

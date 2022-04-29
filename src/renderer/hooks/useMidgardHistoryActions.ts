@@ -135,11 +135,11 @@ export const useMidgardHistoryActions = (itemsPerPage = 10) => {
 
   return {
     loadHistory,
+    reloadHistory,
     historyPage,
     loading,
     requestParams,
     prevHistoryPage: prevHistoryPage.current,
-    reloadHistory,
     setPage,
     setFilter,
     setAddress

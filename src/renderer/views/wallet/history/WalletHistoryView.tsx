@@ -166,6 +166,7 @@ export const WalletHistoryView: React.FC = () => {
         prevHistoryPage={prevHistoryPage}
         openExplorerTxUrl={openExplorerTxUrl}
         changePaginationHandler={setPage}
+        reloadHistory={reloadHistory}
       />
     </>
   )

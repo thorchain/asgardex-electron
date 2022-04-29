@@ -20,6 +20,7 @@ type Props = {
   prevHistoryPage?: O.Option<ActionsPage>
   openExplorerTxUrl: OpenExplorerTxUrl
   changePaginationHandler: (page: number) => void
+  reloadHistory: FP.Lazy<void>
   className?: string
 }
 
@@ -31,7 +32,8 @@ export const PoolActionsHistory: React.FC<Props> = (props) => {
     currentPage,
     prevHistoryPage,
     changePaginationHandler,
-    openExplorerTxUrl
+    openExplorerTxUrl,
+    reloadHistory
   } = props
   const isDesktopView = Grid.useBreakpoint()?.lg ?? false
   // store previous data of Txs to render these while reloading
@@ -53,7 +55,8 @@ export const PoolActionsHistory: React.FC<Props> = (props) => {
     prevHistoryPage,
     openExplorerTxUrl,
     changePaginationHandler,
-    network
+    network,
+    reloadHistory
   }
 
   return (
