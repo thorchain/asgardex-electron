@@ -16,7 +16,6 @@ export const swap: Route<SwapRouteParams> = {
    */
   template: `${base.template}/:source|:target`,
   path: ({ source, target }) => {
-    console.log('swap pth:', source, target)
     if (!!source && !!target) {
       return `${base.template}/${source.toLowerCase()}|${target.toLowerCase()}`
     }

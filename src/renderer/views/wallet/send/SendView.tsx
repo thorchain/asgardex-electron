@@ -43,22 +43,22 @@ export const SendView: React.FC<Props> = (): JSX.Element => {
 
   const intl = useIntl()
 
-  const renderAssetError = useMemo(
-    () => (
+  const renderRouteError = useMemo(() => {
+    const { asset, walletAddress, walletType, walletIndex } = routeParams
+    return (
       <>
         <BackLink />
         <ErrorView
           title={intl.formatMessage(
-            { id: 'routes.invalid.asset' },
+            { id: 'routes.invalid.params' },
             {
-              asset: routeParams.asset
+              params: `asset: ${asset} , walletAddress: ${walletAddress}, walletType: ${walletType}, walletIndex: ${walletIndex}`
             }
           )}
         />
       </>
-    ),
-    [intl, routeParams.asset]
-  )
+    )
+  }, [intl, routeParams])
 
   const renderSendView = useCallback(
     ({
@@ -129,7 +129,7 @@ export const SendView: React.FC<Props> = (): JSX.Element => {
   return FP.pipe(
     oRouteParams,
     O.fold(
-      () => renderAssetError,
+      () => renderRouteError,
       ({ asset, walletAddress, walletType, walletIndex }) => (
         <>
           <BackLink

@@ -247,15 +247,6 @@ describe('walletHelper', () => {
     })
   })
 
-  //   export const getWalletAddressFromNullableString = (s?: string): O.Option<Address> =>
-  //   FP.pipe(s, optionFromNullableString, O.chain(O.fromPredicate((s) => s.length > 0)))
-
-  // export const getWalletIndexFromNullableString = (s?: string): O.Option<number /* integer */> =>
-  //   FP.pipe(s, optionFromNullableString, O.map(parseInt), O.chain(O.fromPredicate((v) => !isNaN(v) && v >= 0)))
-
-  // export const getWalletTypeFromNullableString = (s?: string): O.Option<WalletType> =>
-  //   FP.pipe(s, optionFromNullableString, O.chain(O.fromPredicate(isWalletType)))
-
   describe('getWalletAddressFromNullableString', () => {
     it('address string', () => {
       const result = getWalletAddressFromNullableString('any-address')

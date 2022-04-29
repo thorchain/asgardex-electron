@@ -3,11 +3,14 @@ import { bn } from '@xchainjs/xchain-util'
 import BigNumber from 'bignumber.js'
 import * as E from 'fp-ts/Either'
 import * as FP from 'fp-ts/lib/function'
+import * as O from 'fp-ts/lib/Option'
 import { IntlShape } from 'react-intl'
 
 import { greaterThan, greaterThanEqualTo, validateBN } from '../../../../helpers/form/validation'
+import { optionFromNullableString } from '../../../../helpers/fp/from'
 import { emptyString } from '../../../../helpers/stringHelper'
 import { InteractState } from '../../../../services/thorchain/types'
+import { InteractType } from './Interact.types'
 
 export const getInteractiveDescription = ({ state, intl }: { state: InteractState; intl: IntlShape }): string => {
   const { step, stepsTotal, txRD } = state
@@ -80,3 +83,9 @@ export const validateCustomAmountInput = ({
     )
   )
 }
+
+export const isInteractType = (u: unknown): u is InteractType =>
+  u === 'bond' || u === 'unbond' || u === 'leave' || u === 'custom'
+
+export const getInteractTypeFromNullableString = (s?: string): O.Option<InteractType> =>
+  FP.pipe(s, optionFromNullableString, O.chain(O.fromPredicate(isInteractType)))

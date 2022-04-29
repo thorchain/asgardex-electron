@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useMemo } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
-import { assetFromString, Chain, THORChain } from '@xchainjs/xchain-util'
+import { Chain, THORChain } from '@xchainjs/xchain-util'
 import { Spin } from 'antd'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/Option'
@@ -18,6 +18,7 @@ import { useChainContext } from '../../contexts/ChainContext'
 import { useMidgardContext } from '../../contexts/MidgardContext'
 import { useThorchainContext } from '../../contexts/ThorchainContext'
 import { useWalletContext } from '../../contexts/WalletContext'
+import { getAssetFromNullableString } from '../../helpers/assetHelper'
 import { sequenceTOption } from '../../helpers/fpHelpers'
 import { useMimirHalt } from '../../hooks/useMimirHalt'
 import { useNetwork } from '../../hooks/useNetwork'
@@ -55,15 +56,7 @@ export const DepositView: React.FC<Props> = () => {
 
   const { assetWithDecimal$ } = useChainContext()
 
-  const oRouteAsset = useMemo(
-    () =>
-      FP.pipe(
-        O.fromNullable(asset),
-        O.map((assetString) => assetFromString(assetString.toUpperCase())),
-        O.chain(O.fromNullable)
-      ),
-    [asset]
-  )
+  const oRouteAsset = getAssetFromNullableString(asset)
 
   // Set selected pool asset whenever an asset in route has been changed
   // Needed to get all data for this pool (pool details etc.)

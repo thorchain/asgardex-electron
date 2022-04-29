@@ -38,7 +38,6 @@ export const AssetDetailsView: React.FC = (): JSX.Element => {
     walletIndex: routeWalletIndex,
     walletType: routeWalletType
   } = useParams<AssetDetailsParams>()
-  // const oRouteParams = getAssetWalletParams(routeParams)
 
   const oAsset = getAssetFromNullableString(routeAsset)
   const oWalletAddress = getWalletAddressFromNullableString(routeWalletAddress)
@@ -60,7 +59,15 @@ export const AssetDetailsView: React.FC = (): JSX.Element => {
         O.fold(
           () =>
             Rx.of(
-              RD.failure({ errorId: ErrorId.GET_ASSET_TXS, msg: `Invalid walletIndex in route: ${routeWalletIndex} ` })
+              RD.failure({
+                errorId: ErrorId.GET_ASSET_TXS,
+                msg: intl.formatMessage(
+                  { id: 'routes.invalid.params' },
+                  {
+                    params: `walletIndex: ${routeWalletIndex}`
+                  }
+                )
+              })
             ),
           (walletIndex) => getTxs$(oWalletAddress, walletIndex)
         )
@@ -106,21 +113,21 @@ export const AssetDetailsView: React.FC = (): JSX.Element => {
 
   const { network } = useNetwork()
 
-  const renderAssetError = useMemo(
+  const renderRouteError = useMemo(
     () => (
       <>
         <BackLink />
         <ErrorView
           title={intl.formatMessage(
-            { id: 'routes.invalid.asset' },
+            { id: 'routes.invalid.params' },
             {
-              asset: routeAsset
+              params: `walletAddress: ${routeAsset}, walletType: ${routeWalletType}, walletIndex: ${routeWalletIndex}, walletAddress: ${routeWalletAddress} `
             }
           )}
         />
       </>
     ),
-    [intl, routeAsset]
+    [intl, routeAsset, routeWalletAddress, routeWalletIndex, routeWalletType]
   )
 
   const [oClient] = useObservableState<O.Option<XChainClient>>(
@@ -158,7 +165,7 @@ export const AssetDetailsView: React.FC = (): JSX.Element => {
       {FP.pipe(
         sequenceTOption(oAsset, oWalletAddress, oWalletIndex, oWalletType),
         O.fold(
-          () => renderAssetError,
+          () => renderRouteError,
           ([asset, walletAddress, walletIndex, walletType]) => (
             <AssetDetails
               walletType={walletType}

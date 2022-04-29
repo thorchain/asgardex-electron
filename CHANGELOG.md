@@ -1,5 +1,10 @@
 # 0.15.0 (2022-xx-xx)
 
+## Fix
+
+- White screen with Ledger Terra wallet connected (#2227)[https://github.com/thorchain/asgardex-electron/issues/2227]
+- [Wallet] Locking wallet at Deposit or Withdraw failed (#2233)[https://github.com/thorchain/asgardex-electron/issues/2233]
+
 ## Internal
 
 - Update npm dependencies (04-25-2022) - incl. latest Electron@18.x [#2228](https://github.com/thorchain/asgardex-electron/issues/2228)

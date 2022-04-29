@@ -114,7 +114,7 @@ type UpdateMessagesKeys =
 
 export type UpdateMessages = { [key in UpdateMessagesKeys]: string }
 
-type RoutesMessageKey = 'routes.invalid.asset'
+type RoutesMessageKey = 'routes.invalid.asset' | 'routes.invalid.params'
 
 export type RoutesMessages = { [key in RoutesMessageKey]: string }
 

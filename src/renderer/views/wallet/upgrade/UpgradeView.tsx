@@ -149,18 +149,21 @@ export const UpgradeView: React.FC<Props> = (): JSX.Element => {
   }, [oRuneNonNativeAsset, updateRuneNonNativeAssetRD, updateTargetPoolAddressRD])
 
   const renderDataError = useCallback(
-    (error: Error) => (
-      <ErrorView
-        title={intl.formatMessage(
-          { id: 'wallet.upgrade.error.data' },
-          {
-            asset: routeParams.asset
-          }
-        )}
-        subTitle={error?.message ?? error.toString()}
-      />
-    ),
-    [routeParams.asset, intl]
+    (error: Error) => {
+      const { asset, walletAddress, walletType, walletIndex } = routeParams
+      return (
+        <ErrorView
+          title={intl.formatMessage(
+            { id: 'routes.invalid.params' },
+            {
+              params: `asset: ${asset} , walletAddress: ${walletAddress}, walletType: ${walletType}, walletIndex: ${walletIndex}`
+            }
+          )}
+          subTitle={error?.message ?? error.toString()}
+        />
+      )
+    },
+    [routeParams, intl]
   )
 
   const renderUpgradeComponent = useCallback(({ asset }: AssetWithDecimal, props: CommonUpgradeProps) => {
@@ -191,7 +194,12 @@ export const UpgradeView: React.FC<Props> = (): JSX.Element => {
           runeNonNativeAssetRD,
           RD.fromOption(oRouteParams, () =>
             Error(
-              `Invalid route params: walletAddress ${routeParams.walletAddress}, walletIndex ${routeParams.walletIndex}, walletType ${routeParams.walletType}`
+              intl.formatMessage(
+                { id: 'routes.invalid.params' },
+                {
+                  params: `walletAddress ${routeParams.walletAddress}, walletIndex ${routeParams.walletIndex}, walletType ${routeParams.walletType}`
+                }
+              )
             )
           )
         ),
