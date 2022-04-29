@@ -2,7 +2,7 @@ import React, { useCallback } from 'react'
 
 import { FolderAddOutlined, FolderOpenOutlined } from '@ant-design/icons/lib'
 import { useIntl } from 'react-intl'
-import { useHistory } from 'react-router'
+import { useLocation, useNavigate } from 'react-router-dom'
 
 import * as walletRoutes from '../../../routes/wallet'
 import { Button } from '../../uielements/button'
@@ -12,10 +12,11 @@ type Props = { isLocked?: boolean }
 
 export const AddWallet: React.FC<Props> = ({ isLocked = false }) => {
   const intl = useIntl()
-  const history = useHistory()
+  const navigate = useNavigate()
+  const location = useLocation()
   const onButtonClick = useCallback(() => {
-    history.push(walletRoutes.base.path(history.location.pathname))
-  }, [history])
+    navigate(walletRoutes.base.path(location.pathname))
+  }, [location.pathname, navigate])
 
   const intlLabelId = isLocked ? 'wallet.unlock.instruction' : 'wallet.connect.instruction'
   const intlButtonId = isLocked ? 'wallet.action.unlock' : 'wallet.action.connect'

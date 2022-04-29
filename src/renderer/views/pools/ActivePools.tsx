@@ -10,7 +10,7 @@ import * as FP from 'fp-ts/function'
 import * as O from 'fp-ts/Option'
 import { useObservableState } from 'observable-hooks'
 import { useIntl } from 'react-intl'
-import { useHistory } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import * as RxOp from 'rxjs/operators'
 
 import { Network } from '../../../shared/api/types'
@@ -36,7 +36,7 @@ import * as Styled from './PoolsOverview.styles'
 const POOLS_KEY = 'active'
 
 export const ActivePools: React.FC<PoolsComponentProps> = ({ haltedChains, mimirHalt, walletLocked }): JSX.Element => {
-  const history = useHistory()
+  const navigate = useNavigate()
   const intl = useIntl()
 
   const { network$ } = useAppContext()
@@ -77,9 +77,9 @@ export const ActivePools: React.FC<PoolsComponentProps> = ({ haltedChains, mimir
 
   const clickSwapHandler = useCallback(
     (p: SwapRouteParams) => {
-      history.push(poolsRoutes.swap.path(p))
+      navigate(poolsRoutes.swap.path(p))
     },
-    [history]
+    [navigate]
   )
 
   const renderBtnPoolsColumn = useCallback(
@@ -238,7 +238,7 @@ export const ActivePools: React.FC<PoolsComponentProps> = ({ haltedChains, mimir
             onRow={({ pool }: PoolTableRowData) => {
               return {
                 onClick: () => {
-                  history.push(poolsRoutes.detail.path({ asset: assetToString(pool.target) }))
+                  navigate(poolsRoutes.detail.path({ asset: assetToString(pool.target) }))
                 }
               }
             }}
@@ -254,7 +254,7 @@ export const ActivePools: React.FC<PoolsComponentProps> = ({ haltedChains, mimir
       setFilter,
       limitRD,
       incentivePendulumRD,
-      history
+      navigate
     ]
   )
 

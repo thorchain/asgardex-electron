@@ -4,6 +4,7 @@ import { SyncOutlined } from '@ant-design/icons'
 import * as RD from '@devexperts/remote-data-ts'
 import { Address } from '@xchainjs/xchain-client'
 import { Asset, Chain, THORChain } from '@xchainjs/xchain-util'
+import { Row } from 'antd'
 import * as A from 'fp-ts/Array'
 import * as FP from 'fp-ts/function'
 import * as O from 'fp-ts/Option'
@@ -16,8 +17,8 @@ import { Network } from '../../../shared/api/types'
 import { PoolShares as PoolSharesTable } from '../../components/PoolShares'
 import { PoolShareTableRowData } from '../../components/PoolShares/PoolShares.types'
 import { ErrorView } from '../../components/shared/error'
-import { Button } from '../../components/uielements/button'
-import { TotalValue } from '../../components/wallet/assets'
+import { Button, RefreshButton } from '../../components/uielements/button'
+import { AssetsNav, TotalValue } from '../../components/wallet/assets'
 import { useChainContext } from '../../contexts/ChainContext'
 import { useMidgardContext } from '../../contexts/MidgardContext'
 import { useWalletContext } from '../../contexts/WalletContext'
@@ -38,14 +39,24 @@ export const PoolShareView: React.FC = (): JSX.Element => {
 
   const { network } = useNetwork()
 
-  const { service: midgardService } = useMidgardContext()
   const {
-    pools: { allPoolDetails$, selectedPricePool$, selectedPricePoolAsset$, reloadAllPools, haltedChains$ },
-    reloadNetworkInfo,
-    shares: { allSharesByAddresses$ }
-  } = midgardService
+    service: {
+      pools: {
+        allPoolDetails$,
+        poolsState$,
+        selectedPricePool$,
+        selectedPricePoolAsset$,
+        reloadAllPools,
+        haltedChains$
+      },
+      reloadNetworkInfo,
+      shares: { allSharesByAddresses$, reloadAllSharesByAddresses }
+    }
+  } = useMidgardContext()
 
   const selectedPricePool = useObservableState(selectedPricePool$, RUNE_PRICE_POOL)
+
+  const poolsRD = useObservableState(poolsState$, RD.pending)
 
   const { addressByChain$ } = useChainContext()
 
@@ -202,8 +213,19 @@ export const PoolShareView: React.FC = (): JSX.Element => {
     [allSharesRD, poolDetailsRD, renderPoolSharesTable, renderRefreshBtn, pricePoolData]
   )
 
+  const disableRefresh = useMemo(() => RD.isPending(poolsRD) || RD.isPending(allSharesRD), [allSharesRD, poolsRD])
+
+  const refreshHandler = useCallback(() => {
+    reloadAllPools()
+    reloadAllSharesByAddresses()
+  }, [reloadAllPools, reloadAllSharesByAddresses])
+
   return (
     <>
+      <Row justify="end" style={{ marginBottom: '20px' }}>
+        <RefreshButton clickHandler={refreshHandler} disabled={disableRefresh} />
+      </Row>
+      <AssetsNav />
       {renderSharesTotal}
       {renderShares}
     </>

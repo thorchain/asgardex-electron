@@ -3,7 +3,7 @@ import React, { useCallback } from 'react'
 import { PlusOutlined } from '@ant-design/icons'
 import { Asset, assetToString } from '@xchainjs/xchain-util'
 import { useIntl } from 'react-intl'
-import { useHistory } from 'react-router'
+import { useNavigate } from 'react-router-dom'
 
 import * as poolsRoutes from '../../routes/pools'
 import { Button, ButtonProps, ButtonSize } from '../uielements/button'
@@ -24,15 +24,15 @@ export const ManageButton: React.FC<Props> = ({
   ...otherProps
 }) => {
   const intl = useIntl()
-  const history = useHistory()
+  const navigate = useNavigate()
 
   const onClick = useCallback(
     (event) => {
       event.preventDefault()
       event.stopPropagation()
-      history.push(poolsRoutes.deposit.path({ asset: assetToString(asset) }))
+      navigate(poolsRoutes.deposit.path({ asset: assetToString(asset) }))
     },
-    [asset, history]
+    [asset, navigate]
   )
 
   return (

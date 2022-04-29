@@ -6,7 +6,7 @@ import { Grid } from 'antd'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
 import { useIntl } from 'react-intl'
-import { useHistory } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 
 import { Network } from '../../../shared/api/types'
 import { loadingString } from '../../helpers/stringHelper'
@@ -40,7 +40,7 @@ export const PoolTitle: React.FC<Props> = ({
   isLoading,
   status
 }) => {
-  const history = useHistory()
+  const navigate = useNavigate()
   const intl = useIntl()
   const isDesktopView = Grid.useBreakpoint()?.md ?? false
 
@@ -118,7 +118,7 @@ export const PoolTitle: React.FC<Props> = ({
                     onClick={(event) => {
                       event.preventDefault()
                       event.stopPropagation()
-                      history.push(
+                      navigate(
                         poolsRoutes.swap.path({
                           source: assetToString(asset),
                           target: assetToString(AssetRuneNative)
@@ -134,7 +134,7 @@ export const PoolTitle: React.FC<Props> = ({
           }
         )
       ),
-    [oAsset, disableAllPoolActions, disablePoolActions, isDesktopView, status, disableTradingPoolAction, intl, history]
+    [oAsset, disableAllPoolActions, disablePoolActions, isDesktopView, status, disableTradingPoolAction, intl, navigate]
   )
 
   return (

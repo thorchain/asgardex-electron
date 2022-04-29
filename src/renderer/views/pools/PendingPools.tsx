@@ -10,7 +10,7 @@ import * as O from 'fp-ts/lib/Option'
 import * as P from 'fp-ts/lib/Predicate'
 import { useObservableState } from 'observable-hooks'
 import { useIntl } from 'react-intl'
-import { useHistory } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import * as RxOp from 'rxjs/operators'
 
 import { Network } from '../../../shared/api/types'
@@ -38,7 +38,7 @@ import * as Styled from './PoolsOverview.styles'
 const POOLS_KEY = 'pending'
 
 export const PendingPools: React.FC<PoolsComponentProps> = ({ haltedChains, mimirHalt, walletLocked }): JSX.Element => {
-  const history = useHistory()
+  const navigate = useNavigate()
   const intl = useIntl()
 
   const { network$ } = useAppContext()
@@ -182,7 +182,7 @@ export const PendingPools: React.FC<PoolsComponentProps> = ({ haltedChains, mimi
             onRow={({ pool }: PoolTableRowData) => {
               return {
                 onClick: () => {
-                  history.push(poolsRoutes.detail.path({ asset: assetToString(pool.target) }))
+                  navigate(poolsRoutes.detail.path({ asset: assetToString(pool.target) }))
                 }
               }
             }}
@@ -198,7 +198,7 @@ export const PendingPools: React.FC<PoolsComponentProps> = ({ haltedChains, mimi
       poolFilter,
       limitRD,
       incentivePendulumRD,
-      history
+      navigate
     ]
   )
 

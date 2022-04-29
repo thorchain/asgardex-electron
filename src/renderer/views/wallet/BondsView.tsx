@@ -1,8 +1,10 @@
 import React, { useCallback, useMemo, useRef } from 'react'
 
+import * as RD from '@devexperts/remote-data-ts'
 import { Address } from '@xchainjs/xchain-client'
 import { Client as ThorchainClient } from '@xchainjs/xchain-thorchain'
 import { THORChain } from '@xchainjs/xchain-util'
+import { Row } from 'antd'
 import * as A from 'fp-ts/Array'
 import * as FP from 'fp-ts/function'
 import * as NEA from 'fp-ts/NonEmptyArray'
@@ -13,6 +15,8 @@ import * as RxOp from 'rxjs/operators'
 
 import { Network } from '../../../shared/api/types'
 import { Bonds } from '../../components/Bonds'
+import { RefreshButton } from '../../components/uielements/button'
+import { AssetsNav } from '../../components/wallet/assets'
 import { useAppContext } from '../../contexts/AppContext'
 import { useThorchainContext } from '../../contexts/ThorchainContext'
 import { useUserNodesContext } from '../../contexts/UserNodesContext'
@@ -26,7 +30,7 @@ type Node = {
 }
 
 export const BondsView: React.FC = (): JSX.Element => {
-  const { client$, getNodeInfo$ } = useThorchainContext()
+  const { client$, getNodeInfo$, reloadNodesInfo } = useThorchainContext()
   const { userNodes$, addNodeAddress, removeNodeByAddress: removeNodeByAddressService } = useUserNodesContext()
 
   const oClient = useObservableState<O.Option<ThorchainClient>>(client$, O.none)
@@ -46,7 +50,7 @@ export const BondsView: React.FC = (): JSX.Element => {
   const { network$ } = useAppContext()
   const network = useObservableState<Network>(network$, DEFAULT_NETWORK)
 
-  const userNodes = useObservableState(userNodes$, [])
+  const userNodes: Address[] = useObservableState(userNodes$, [])
 
   const nodeInfoCacheRef = useRef<Record<Address, NodeInfoLD>>({})
 
@@ -86,7 +90,19 @@ export const BondsView: React.FC = (): JSX.Element => {
     [userNodes, getNodeInfo$, network]
   )
 
-  const nodesInfo = useObservableState(nodesInfo$, [])
+  const nodesInfo: Node[] = useObservableState(nodesInfo$, [])
+
+  const loadingNodesInfo: boolean = useMemo(
+    () =>
+      FP.pipe(
+        nodesInfo,
+        A.reduce<Node, boolean>(false, (acc, { data }) => {
+          if (acc) return acc
+          return RD.isPending(data)
+        })
+      ),
+    [nodesInfo]
+  )
 
   const removeNodeByAddress = useCallback(
     (node: Address) => {
@@ -100,13 +116,19 @@ export const BondsView: React.FC = (): JSX.Element => {
   )
 
   return (
-    <Bonds
-      addressValidation={validateAddress}
-      nodes={nodesInfo}
-      removeNode={removeNodeByAddress}
-      goToNode={goToExplorerNodeAddress}
-      network={network}
-      addNode={addNodeAddress}
-    />
+    <>
+      <Row justify="end" style={{ marginBottom: '20px' }}>
+        <RefreshButton clickHandler={reloadNodesInfo} disabled={loadingNodesInfo} />
+      </Row>
+      <AssetsNav />
+      <Bonds
+        addressValidation={validateAddress}
+        nodes={nodesInfo}
+        removeNode={removeNodeByAddress}
+        goToNode={goToExplorerNodeAddress}
+        network={network}
+        addNode={addNodeAddress}
+      />
+    </>
   )
 }

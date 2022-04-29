@@ -26,6 +26,7 @@ import * as A from 'fp-ts/lib/Array'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
 import * as P from 'fp-ts/lib/Predicate'
+import * as S from 'fp-ts/lib/string'
 
 import { Network } from '../../shared/api/types'
 import {
@@ -362,3 +363,9 @@ export const disableRuneUpgrade = ({
   }
   return false
 }
+
+/**
+ * Creates an asset from `nullable` string
+ */
+export const getAssetFromNullableString = (assetString?: string): O.Option<Asset> =>
+  FP.pipe(O.fromNullable(assetString), O.map(S.toUpperCase), O.map(assetFromString), O.chain(O.fromNullable))

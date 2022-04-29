@@ -7,9 +7,10 @@ import { useWalletContext } from '../../contexts/WalletContext'
 import { INITIAL_KEYSTORE_STATE } from '../../services/wallet/const'
 
 export const UnlockView: React.FC = (): JSX.Element => {
-  const { keystoreService } = useWalletContext()
-  const { keystore$, removeKeystore } = keystoreService
+  const {
+    keystoreService: { keystore$, removeKeystore, unlock }
+  } = useWalletContext()
   const keystore = useObservableState(keystore$, INITIAL_KEYSTORE_STATE)
 
-  return <UnlockForm keystore={keystore} unlock={keystoreService.unlock} removeKeystore={removeKeystore} />
+  return <UnlockForm keystore={keystore} unlock={unlock} removeKeystore={removeKeystore} />
 }

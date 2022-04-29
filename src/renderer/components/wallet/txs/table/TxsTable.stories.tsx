@@ -24,6 +24,7 @@ const txsRD = RD.success({
 
 export const Default: Story = () => (
   <TxsTable
+    walletAddress="bnb-address"
     txsPageRD={txsRD}
     clickTxLinkHandler={(txHash: string) => console.log('txHash ', txHash)}
     changePaginationHandler={(page: number) => console.log('page:', page)}

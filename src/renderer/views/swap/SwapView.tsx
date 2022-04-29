@@ -1,13 +1,13 @@
 import React, { useCallback, useEffect, useMemo } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
-import { Asset, assetFromString, AssetRuneNative, bnOrZero, Chain, THORChain } from '@xchainjs/xchain-util'
+import { Asset, AssetRuneNative, bnOrZero, Chain, THORChain } from '@xchainjs/xchain-util'
 import { Spin } from 'antd'
 import * as FP from 'fp-ts/function'
 import * as O from 'fp-ts/lib/Option'
 import { useObservableState } from 'observable-hooks'
 import { useIntl } from 'react-intl'
-import { useHistory, useParams } from 'react-router-dom'
+import { useLocation, useNavigate, useParams } from 'react-router-dom'
 import * as Rx from 'rxjs'
 import * as RxOp from 'rxjs/operators'
 
@@ -20,7 +20,7 @@ import { useChainContext } from '../../contexts/ChainContext'
 import { useEthereumContext } from '../../contexts/EthereumContext'
 import { useMidgardContext } from '../../contexts/MidgardContext'
 import { useWalletContext } from '../../contexts/WalletContext'
-import { isRuneNativeAsset } from '../../helpers/assetHelper'
+import { getAssetFromNullableString, isRuneNativeAsset } from '../../helpers/assetHelper'
 import { eqChain } from '../../helpers/fp/eq'
 import { sequenceTOption, sequenceTRD } from '../../helpers/fpHelpers'
 import { addressFromOptionalWalletAddress } from '../../helpers/walletHelper'
@@ -42,7 +42,8 @@ type Props = {}
 export const SwapView: React.FC<Props> = (_): JSX.Element => {
   const { source, target } = useParams<SwapRouteParams>()
   const intl = useIntl()
-  const history = useHistory()
+  const navigate = useNavigate()
+  const location = useLocation()
 
   const { slipTolerance$, changeSlipTolerance } = useAppContext()
 
@@ -71,8 +72,8 @@ export const SwapView: React.FC<Props> = (_): JSX.Element => {
 
   const poolsState = useObservableState(poolsState$, RD.initial)
 
-  const oSourceAsset: O.Option<Asset> = useMemo(() => O.fromNullable(assetFromString(source.toUpperCase())), [source])
-  const oTargetAsset: O.Option<Asset> = useMemo(() => O.fromNullable(assetFromString(target.toUpperCase())), [target])
+  const oSourceAsset: O.Option<Asset> = useMemo(() => getAssetFromNullableString(source), [source])
+  const oTargetAsset: O.Option<Asset> = useMemo(() => getAssetFromNullableString(target), [target])
 
   useEffect(() => {
     // Source asset is the asset of the pool we need to interact with
@@ -215,14 +216,14 @@ export const SwapView: React.FC<Props> = (_): JSX.Element => {
 
   const onChangePath = useCallback(
     (path) => {
-      history.replace(path)
+      navigate(path, { replace: true })
     },
-    [history]
+    [navigate]
   )
 
   const importWalletHandler = useCallback(() => {
-    history.push(walletRoutes.base.path())
-  }, [history])
+    navigate(walletRoutes.base.path(location.pathname))
+  }, [location.pathname, navigate])
 
   const targetAssetChain = useMemo(
     () =>

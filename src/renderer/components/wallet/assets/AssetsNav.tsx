@@ -2,7 +2,7 @@ import React, { useMemo } from 'react'
 
 import { Menu } from 'antd'
 import { useIntl } from 'react-intl'
-import { useRouteMatch, Link } from 'react-router-dom'
+import { Link, matchPath, useLocation } from 'react-router-dom'
 
 import * as walletRoutes from '../../../routes/wallet'
 import * as Styled from './AssetsNav.styles'
@@ -24,6 +24,8 @@ type MenuType = {
 
 export const AssetsNav: React.FC = (): JSX.Element => {
   const intl = useIntl()
+
+  const { pathname } = useLocation()
 
   const menuItems = useMemo(
     () =>
@@ -57,11 +59,11 @@ export const AssetsNav: React.FC = (): JSX.Element => {
     [intl]
   )
 
-  const assetsRoute = useRouteMatch(walletRoutes.assets.path())
-  const poolSharesRoute = useRouteMatch(walletRoutes.poolShares.path())
-  const bondsRoute = useRouteMatch(walletRoutes.bonds.path())
-  const matchHistoryRoute = useRouteMatch(walletRoutes.history.path())
-  const matchWalletSettingsRoute = useRouteMatch(walletRoutes.walletSettings.path())
+  const assetsRoute = matchPath(walletRoutes.assets.path(), pathname)
+  const poolSharesRoute = matchPath(walletRoutes.poolShares.path(), pathname)
+  const bondsRoute = matchPath(walletRoutes.bonds.path(), pathname)
+  const matchHistoryRoute = matchPath(walletRoutes.history.path(), pathname)
+  const matchWalletSettingsRoute = matchPath(walletRoutes.walletSettings.path(), pathname)
 
   const activeMenu: MenuKey = useMemo(() => {
     if (assetsRoute) {

@@ -1,8 +1,8 @@
 import React, { useCallback, useMemo } from 'react'
 
+import { Address } from '@xchainjs/xchain-client'
 import {
   Asset,
-  assetFromString,
   assetToString,
   BCHChain,
   BNBChain,
@@ -16,10 +16,12 @@ import {
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/Option'
 import { useIntl } from 'react-intl'
-import { useParams } from 'react-router'
+import { useParams } from 'react-router-dom'
 
+import { WalletType } from '../../../../shared/wallet/types'
 import { ErrorView } from '../../../components/shared/error/'
 import { BackLink } from '../../../components/uielements/backLink'
+import { getAssetWalletParams } from '../../../helpers/routeHelper'
 import { SendParams } from '../../../routes/wallet'
 import * as walletRoutes from '../../../routes/wallet'
 import {
@@ -36,32 +38,40 @@ import {
 type Props = {}
 
 export const SendView: React.FC<Props> = (): JSX.Element => {
-  const { asset, walletAddress, walletType, walletIndex: walletIndexRoute } = useParams<SendParams>()
+  const routeParams = useParams<SendParams>()
+  const oRouteParams = getAssetWalletParams(routeParams)
 
-  const walletIndex = parseInt(walletIndexRoute)
   const intl = useIntl()
 
-  const oSelectedAsset = useMemo(() => O.fromNullable(assetFromString(asset)), [asset])
-
-  const renderAssetError = useMemo(
-    () => (
+  const renderRouteError = useMemo(() => {
+    const { asset, walletAddress, walletType, walletIndex } = routeParams
+    return (
       <>
         <BackLink />
         <ErrorView
           title={intl.formatMessage(
-            { id: 'routes.invalid.asset' },
+            { id: 'routes.invalid.params' },
             {
-              asset
+              params: `asset: ${asset} , walletAddress: ${walletAddress}, walletType: ${walletType}, walletIndex: ${walletIndex}`
             }
           )}
         />
       </>
-    ),
-    [asset, intl]
-  )
+    )
+  }, [intl, routeParams])
 
   const renderSendView = useCallback(
-    (asset: Asset) => {
+    ({
+      asset,
+      walletAddress,
+      walletType,
+      walletIndex
+    }: {
+      asset: Asset
+      walletAddress: Address
+      walletType: WalletType
+      walletIndex: number
+    }) => {
       switch (asset.chain) {
         case BNBChain:
           return (
@@ -113,24 +123,24 @@ export const SendView: React.FC<Props> = (): JSX.Element => {
           )
       }
     },
-    [walletType, walletAddress, walletIndex, intl]
+    [intl]
   )
 
   return FP.pipe(
-    oSelectedAsset,
+    oRouteParams,
     O.fold(
-      () => renderAssetError,
-      (asset) => (
+      () => renderRouteError,
+      ({ asset, walletAddress, walletType, walletIndex }) => (
         <>
           <BackLink
             path={walletRoutes.assetDetail.path({
               asset: assetToString(asset),
               walletAddress,
               walletType,
-              walletIndex: walletIndexRoute
+              walletIndex: walletIndex.toString()
             })}
           />
-          {renderSendView(asset)}
+          {renderSendView({ asset, walletAddress, walletType, walletIndex })}
         </>
       )
     )

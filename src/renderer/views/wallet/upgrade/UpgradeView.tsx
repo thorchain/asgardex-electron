@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useMemo } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
 import { Address } from '@xchainjs/xchain-client'
-import { Asset, assetFromString, BNBChain, ETHChain, THORChain } from '@xchainjs/xchain-util'
+import { Asset, BNBChain, ETHChain, THORChain } from '@xchainjs/xchain-util'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/Option'
 import { useObservableState } from 'observable-hooks'
@@ -21,6 +21,8 @@ import { useMidgardContext } from '../../../contexts/MidgardContext'
 import { useWalletContext } from '../../../contexts/WalletContext'
 import { isNonNativeRuneAsset } from '../../../helpers/assetHelper'
 import { eqOAsset } from '../../../helpers/fp/eq'
+import { sequenceTRD } from '../../../helpers/fpHelpers'
+import { getAssetWalletParams } from '../../../helpers/routeHelper'
 import { addressFromOptionalWalletAddress } from '../../../helpers/walletHelper'
 import { useOpenExplorerTxUrl } from '../../../hooks/useOpenExplorerTxUrl'
 import { useValidateAddress } from '../../../hooks/useValidateAddress'
@@ -37,7 +39,8 @@ import { UpgradeETH } from './UpgradeViewETH'
 type Props = {}
 
 export const UpgradeView: React.FC<Props> = (): JSX.Element => {
-  const { asset, walletAddress, walletType, walletIndex } = useParams<AssetDetailsParams>()
+  const routeParams = useParams<AssetDetailsParams>()
+  const oRouteParams = getAssetWalletParams(routeParams)
 
   const intl = useIntl()
 
@@ -52,11 +55,11 @@ export const UpgradeView: React.FC<Props> = (): JSX.Element => {
   const oRuneNonNativeAsset: O.Option<Asset> = useMemo(
     () =>
       FP.pipe(
-        assetFromString(asset),
-        O.fromNullable,
-        O.filter((asset) => isNonNativeRuneAsset(asset, network))
+        oRouteParams,
+        O.map(({ asset }) => asset),
+        O.chain(O.fromPredicate((asset) => isNonNativeRuneAsset(asset, network)))
       ),
-    [asset, network]
+    [network, oRouteParams]
   )
 
   const [runeNonNativeAssetRD, updateRuneNonNativeAssetRD] = useObservableState<AssetWithDecimalRD, O.Option<Asset>>(
@@ -125,7 +128,12 @@ export const UpgradeView: React.FC<Props> = (): JSX.Element => {
           FP.flow(
             O.fold(
               // No subscription of `poolAddresses$ ` needed for other assets than [CHAIN].RUNE
-              () => Rx.of(RD.failure(Error(intl.formatMessage({ id: 'wallet.errors.asset.notExist' }, { asset })))),
+              () =>
+                Rx.of(
+                  RD.failure(
+                    Error(intl.formatMessage({ id: 'wallet.errors.asset.notExist' }, { asset: routeParams.asset }))
+                  )
+                ),
               (asset) => poolAddressesByChain$(asset.chain)
             )
           )
@@ -141,18 +149,21 @@ export const UpgradeView: React.FC<Props> = (): JSX.Element => {
   }, [oRuneNonNativeAsset, updateRuneNonNativeAssetRD, updateTargetPoolAddressRD])
 
   const renderDataError = useCallback(
-    (error: Error) => (
-      <ErrorView
-        title={intl.formatMessage(
-          { id: 'wallet.upgrade.error.data' },
-          {
-            asset
-          }
-        )}
-        subTitle={error?.message ?? error.toString()}
-      />
-    ),
-    [asset, intl]
+    (error: Error) => {
+      const { asset, walletAddress, walletType, walletIndex } = routeParams
+      return (
+        <ErrorView
+          title={intl.formatMessage(
+            { id: 'routes.invalid.params' },
+            {
+              params: `asset: ${asset} , walletAddress: ${walletAddress}, walletType: ${walletType}, walletIndex: ${walletIndex}`
+            }
+          )}
+          subTitle={error?.message ?? error.toString()}
+        />
+      )
+    },
+    [routeParams, intl]
   )
 
   const renderUpgradeComponent = useCallback(({ asset }: AssetWithDecimal, props: CommonUpgradeProps) => {
@@ -179,12 +190,24 @@ export const UpgradeView: React.FC<Props> = (): JSX.Element => {
     <>
       <BackLink />
       {FP.pipe(
-        runeNonNativeAssetRD,
+        sequenceTRD(
+          runeNonNativeAssetRD,
+          RD.fromOption(oRouteParams, () =>
+            Error(
+              intl.formatMessage(
+                { id: 'routes.invalid.params' },
+                {
+                  params: `walletAddress ${routeParams.walletAddress}, walletIndex ${routeParams.walletIndex}, walletType ${routeParams.walletType}`
+                }
+              )
+            )
+          )
+        ),
         RD.fold(
           () => <></>,
           () => <LoadingView size="large" />,
           renderDataError,
-          (runeAsset) =>
+          ([runeAsset, { walletAddress, walletType, walletIndex }]) =>
             FP.pipe(
               // Show an error by invalid address
               // All other values should be immediately available by entering the `UpgradeView`
@@ -196,7 +219,7 @@ export const UpgradeView: React.FC<Props> = (): JSX.Element => {
                     addressValidation: validateAddress,
                     walletAddress,
                     walletType,
-                    walletIndex: parseInt(walletIndex),
+                    walletIndex,
                     runeAsset,
                     runeNativeAddress,
                     runeNativeLedgerAddress: oRuneNativeLedgerAddress,
