@@ -3,7 +3,10 @@ import BigNumber from 'bignumber.js'
 
 import { PoolDetail, PoolStatsDetail } from '../../types/generated/midgard'
 
-export const getLiquidity = ({ runeDepth }: Pick<PoolDetail, 'runeDepth'>, priceRatio: BigNumber = bn(1)) =>
+export const getLiquidity = (
+  { runeDepth }: Pick<PoolDetail, 'runeDepth'>,
+  priceRatio: BigNumber = bn(1)
+): AssetAmount =>
   baseToAsset(
     baseAmount(
       bnOrZero(runeDepth)
@@ -30,25 +33,27 @@ export const getVolumeTotal = (
       .times(priceRatio)
   )
 
-export const getAPY = (data: Pick<PoolDetail, 'poolAPY'>) => bnOrZero(data.poolAPY).multipliedBy(100)
+export const getAPY = (data: Pick<PoolDetail, 'poolAPY'>): BigNumber => bnOrZero(data.poolAPY).multipliedBy(100)
 
-export const getPrice = (data: Pick<PoolDetail, 'assetPrice'>, priceRatio: BigNumber = bn(1)) =>
+export const getPrice = (data: Pick<PoolDetail, 'assetPrice'>, priceRatio: BigNumber = bn(1)): AssetAmount =>
   assetAmount(bnOrZero(data.assetPrice).multipliedBy(priceRatio))
 
 export const getTotalSwaps = (data: Pick<PoolStatsDetail, 'swapCount'>) => bnOrZero(data.swapCount)
 
-export const getTotalTx = (data: Pick<PoolStatsDetail, 'swapCount' | 'addLiquidityCount' | 'withdrawCount'>) =>
-  bnOrZero(data.swapCount).plus(bnOrZero(data.addLiquidityCount)).plus(bnOrZero(data.withdrawCount))
+export const getTotalTx = (
+  data: Pick<PoolStatsDetail, 'swapCount' | 'addLiquidityCount' | 'withdrawCount'>
+): BigNumber => bnOrZero(data.swapCount).plus(bnOrZero(data.addLiquidityCount)).plus(bnOrZero(data.withdrawCount))
 
-export const getMembers = (data: Pick<PoolStatsDetail, 'uniqueMemberCount'>) => bnOrZero(data.uniqueMemberCount)
+export const getMembers = (data: Pick<PoolStatsDetail, 'uniqueMemberCount'>): BigNumber =>
+  bnOrZero(data.uniqueMemberCount)
 
-export const getFees = (data: Pick<PoolStatsDetail, 'totalFees'>, priceRatio: BigNumber = bn(1)) =>
+export const getFees = (data: Pick<PoolStatsDetail, 'totalFees'>, priceRatio: BigNumber = bn(1)): AssetAmount =>
   baseToAsset(baseAmount(bnOrZero(data.totalFees).multipliedBy(priceRatio)))
 
 export const getILPPaid = (
   { impermanentLossProtectionPaid }: Pick<PoolStatsDetail, 'impermanentLossProtectionPaid'>,
   priceRatio: BigNumber = bn(1)
-) => baseToAsset(baseAmount(bnOrZero(impermanentLossProtectionPaid).multipliedBy(priceRatio)))
+): AssetAmount => baseToAsset(baseAmount(bnOrZero(impermanentLossProtectionPaid).multipliedBy(priceRatio)))
 
 export const getEmptyPoolDetail = (): PoolDetail => ({
   asset: 'asset',

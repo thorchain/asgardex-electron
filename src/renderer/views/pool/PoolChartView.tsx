@@ -22,16 +22,30 @@ import {
 } from '../../types/generated/midgard'
 import { getLiquidityFromHistoryItems, getVolumeFromHistoryItems } from './PoolChartView.helper'
 
-type Props = {
+export type Props = {
   priceRatio: BigNumber
 }
 
 export const PoolChartView: React.FC<Props> = ({ priceRatio }) => {
   const {
     service: {
-      pools: { selectedPricePoolAsset$, getSelectedPoolSwapHistory$, getDepthHistory$, getPoolLiquidityHistory$ }
+      pools: {
+        selectedPricePoolAsset$,
+        getSelectedPoolSwapHistory$,
+        reloadSwapHistory,
+        getDepthHistory$,
+        reloadDepthHistory,
+        getPoolLiquidityHistory$,
+        reloadLiquidityHistory
+      }
     }
   } = useMidgardContext()
+
+  const reloadData = useCallback(() => {
+    reloadDepthHistory()
+    reloadSwapHistory()
+    reloadLiquidityHistory()
+  }, [reloadDepthHistory, reloadLiquidityHistory, reloadSwapHistory])
 
   const selectedPricePoolAsset = useObservableState<SelectedPricePoolAsset>(selectedPricePoolAsset$, O.none)
   const unit = FP.pipe(
@@ -112,6 +126,7 @@ export const PoolChartView: React.FC<Props> = ({ priceRatio }) => {
     <PoolDetailsChart
       dataTypes={['liquidity', 'volume']}
       selectedDataType={savedParams.current.dataType}
+      reloadData={reloadData}
       setDataType={setDataTypeCallback}
       chartDetails={chartDataRDPriced}
       chartType={savedParams.current.dataType === 'liquidity' ? 'line' : 'bar'}

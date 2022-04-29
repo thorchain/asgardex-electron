@@ -3,13 +3,12 @@ import React, { useCallback, useMemo } from 'react'
 import * as RD from '@devexperts/remote-data-ts'
 import themes, { ThemeType } from '@thorchain/asgardex-theme'
 import { Grid, Spin } from 'antd'
-import * as A from 'fp-ts/lib/Array'
 import * as FP from 'fp-ts/lib/function'
 import { useObservableState } from 'observable-hooks'
 import { useIntl } from 'react-intl'
 
 import { useThemeContext } from '../../../contexts/ThemeContext'
-import { ErrorView } from '../../shared/error'
+import { Button } from '../button'
 import { getChartColors, getChartData, getChartOptions, getDisplayData } from './PoolDetailsChart.helpers'
 import * as Styled from './PoolDetailsChart.styles'
 import {
@@ -23,6 +22,7 @@ import {
 
 type Props = {
   chartDetails: ChartDetailsRD
+  reloadData: FP.Lazy<void>
   chartType: ChartType
   unit: string
   dataTypes: ChartDataType[]
@@ -35,6 +35,7 @@ type Props = {
 export const PoolDetailsChart: React.FC<Props> = React.memo((props: Props): JSX.Element => {
   const {
     chartDetails: chartDetailsRD,
+    reloadData,
     chartType,
     unit,
     dataTypes,
@@ -70,49 +71,76 @@ export const PoolDetailsChart: React.FC<Props> = React.memo((props: Props): JSX.
   )
 
   const renderChart = useMemo(
-    () =>
-      FP.pipe(
-        chartDetailsRD,
-        RD.fold(
-          () => getChart(A.empty),
-          () => <Spin />,
-          (_) => <ErrorView title={intl.formatMessage({ id: 'common.error' })} />,
-          (chartDetails) => getChart(chartDetails)
-        )
-      ),
-    [chartDetailsRD, getChart, intl]
-  )
-
-  const renderHeader = useMemo(
     () => (
-      <Styled.HeaderContainer>
-        <Styled.TypeContainer>
-          {dataTypes.map((dataType) => (
-            <Styled.HeaderToggle
-              primary={selectedDataType === dataType}
-              key={`headerToggle${dataType}`}
-              onClick={() => setDataType(dataType)}>
-              {dataType}
+      <Styled.ChartContainer
+        gradientStart={colors.backgroundGradientStart}
+        gradientStop={colors.backgroundGradientStop}>
+        <Styled.HeaderContainer>
+          <Styled.TypeContainer>
+            {dataTypes.map((dataType) => (
+              <Styled.HeaderToggle
+                primary={selectedDataType === dataType}
+                key={`headerToggle${dataType}`}
+                onClick={() => setDataType(dataType)}>
+                {dataType}
+              </Styled.HeaderToggle>
+            ))}
+          </Styled.TypeContainer>
+          <Styled.TimeContainer>
+            <Styled.HeaderToggle primary={selectedTimeFrame === 'week'} onClick={() => setTimeFrame('week')}>
+              {intl.formatMessage({ id: 'common.time.week' })}
             </Styled.HeaderToggle>
-          ))}
-        </Styled.TypeContainer>
-        <Styled.TimeContainer>
-          <Styled.HeaderToggle primary={selectedTimeFrame === 'week'} onClick={() => setTimeFrame('week')}>
-            {intl.formatMessage({ id: 'common.time.week' })}
-          </Styled.HeaderToggle>
-          <Styled.HeaderToggle primary={selectedTimeFrame === 'allTime'} onClick={() => setTimeFrame('allTime')}>
-            {intl.formatMessage({ id: 'common.time.all' })}
-          </Styled.HeaderToggle>
-        </Styled.TimeContainer>
-      </Styled.HeaderContainer>
+            <Styled.HeaderToggle primary={selectedTimeFrame === 'allTime'} onClick={() => setTimeFrame('allTime')}>
+              {intl.formatMessage({ id: 'common.time.all' })}
+            </Styled.HeaderToggle>
+          </Styled.TimeContainer>
+        </Styled.HeaderContainer>
+        <Styled.ChartWrapper>
+          {FP.pipe(
+            chartDetailsRD,
+            RD.fold(
+              () => getChart([]),
+              () => <Spin />,
+              // no error rendering needed here - it's already done in last `render`
+              () => <></>,
+              getChart
+            )
+          )}
+        </Styled.ChartWrapper>
+      </Styled.ChartContainer>
     ),
-    [dataTypes, intl, selectedDataType, selectedTimeFrame, setDataType, setTimeFrame]
+    [
+      chartDetailsRD,
+      colors.backgroundGradientStart,
+      colors.backgroundGradientStop,
+      dataTypes,
+      getChart,
+      intl,
+      selectedDataType,
+      selectedTimeFrame,
+      setDataType,
+      setTimeFrame
+    ]
   )
 
-  return (
-    <Styled.ChartContainer gradientStart={colors.backgroundGradientStart} gradientStop={colors.backgroundGradientStop}>
-      {renderHeader}
-      <Styled.ChartWrapper>{renderChart}</Styled.ChartWrapper>
-    </Styled.ChartContainer>
+  const renderError = useCallback(
+    (error: Error) => (
+      <Styled.ErrorView
+        title={intl.formatMessage({ id: 'common.error' })}
+        subTitle={error?.message ?? error.toString()}
+        extra={<Button onClick={reloadData}>{intl.formatMessage({ id: 'common.retry' })}</Button>}
+      />
+    ),
+    [intl, reloadData]
+  )
+
+  return FP.pipe(
+    chartDetailsRD,
+    RD.fold(
+      () => renderChart,
+      () => renderChart,
+      renderError,
+      () => renderChart
+    )
   )
 })

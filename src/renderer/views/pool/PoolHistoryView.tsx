@@ -26,7 +26,7 @@ type Props = {
 const HISTORY_FILTERS: Filter[] = ['ALL', 'DEPOSIT', 'SWAP', 'WITHDRAW', 'DONATE', 'REFUND']
 
 export const PoolHistoryView: React.FC<Props> = ({ className, poolAsset, historyActions }) => {
-  const { loadHistory, requestParams, historyPage, prevHistoryPage, setFilter, setPage } = historyActions
+  const { loadHistory, reloadHistory, requestParams, historyPage, prevHistoryPage, setFilter, setPage } = historyActions
 
   const stringAsset = useMemo(() => assetToString(poolAsset), [poolAsset])
 
@@ -87,6 +87,7 @@ export const PoolHistoryView: React.FC<Props> = ({ className, poolAsset, history
       prevHistoryPage={prevHistoryPage}
       openExplorerTxUrl={openExplorerTxUrlHandler}
       changePaginationHandler={setPage}
+      reloadHistory={reloadHistory}
     />
   )
 }

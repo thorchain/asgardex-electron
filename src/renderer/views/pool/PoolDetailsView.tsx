@@ -10,7 +10,6 @@ import { useParams } from 'react-router-dom'
 import * as RxOp from 'rxjs/operators'
 
 import { PoolDetails, Props as PoolDetailProps } from '../../components/pool/PoolDetails'
-import { getEmptyPoolDetail, getEmptyPoolStatsDetail } from '../../components/pool/PoolDetails.helpers'
 import { ErrorView } from '../../components/shared/error'
 import { RefreshButton } from '../../components/uielements/button'
 import { ONE_BN } from '../../const'
@@ -22,20 +21,23 @@ import { useMidgardHistoryActions } from '../../hooks/useMidgardHistoryActions'
 import { useMimirHalt } from '../../hooks/useMimirHalt'
 import { PoolDetailRouteParams } from '../../routes/pools/detail'
 import { DEFAULT_NETWORK } from '../../services/const'
-import { PoolDetailRD, PoolEarningHistoryRD, PoolStatsDetailRD } from '../../services/midgard/types'
+import { PoolDetailRD, PoolStatsDetailRD } from '../../services/midgard/types'
 import { PoolChartView } from './PoolChartView'
 import * as Styled from './PoolDetailsView.styles'
 import { PoolHistoryView } from './PoolHistoryView'
 
-type TargetPoolDetailProps = Omit<PoolDetailProps, 'asset' | 'historyActions'>
+type TargetPoolDetailProps = Omit<
+  PoolDetailProps,
+  'asset' | 'historyActions' | 'reloadPoolDetail' | 'reloadPoolStatsDetail'
+>
 
 const defaultDetailsProps: TargetPoolDetailProps = {
   priceRatio: ONE_BN,
   HistoryView: PoolHistoryView,
   ChartView: PoolChartView,
-  poolDetail: getEmptyPoolDetail(),
-  poolStatsDetail: getEmptyPoolStatsDetail(),
-  earningsHistory: O.none,
+  poolDetail: RD.initial,
+  poolStatsDetail: RD.initial,
+  priceSymbol: '',
   network: DEFAULT_NETWORK,
   disableAllPoolActions: false,
   disableTradingPoolAction: false,
@@ -51,8 +53,11 @@ export const PoolDetailsView: React.FC = () => {
         priceRatio$,
         selectedPricePoolAssetSymbol$,
         poolStatsDetail$,
-        poolEarningHistory$,
+        reloadPoolStatsDetail,
         reloadSelectedPoolDetail,
+        reloadDepthHistory,
+        reloadSwapHistory,
+        reloadLiquidityHistory,
         haltedChains$
       },
       setSelectedPoolAsset
@@ -93,7 +98,11 @@ export const PoolDetailsView: React.FC = () => {
     }
   }, [oRouteAsset, setSelectedPoolAsset])
 
-  const priceSymbol = useObservableState(selectedPricePoolAssetSymbol$, O.none)
+  const oPriceSymbol = useObservableState(selectedPricePoolAssetSymbol$, O.none)
+  const priceSymbol = FP.pipe(
+    oPriceSymbol,
+    O.getOrElse(() => '')
+  )
 
   const priceRatio = useObservableState(priceRatio$, ONE_BN)
 
@@ -104,12 +113,23 @@ export const PoolDetailsView: React.FC = () => {
   const poolDetailRD: PoolDetailRD = useObservableState(selectedPoolDetail$, RD.initial)
 
   const poolStatsDetailRD: PoolStatsDetailRD = useObservableState(poolStatsDetail$, RD.initial)
-  const poolEarningHistoryRD: PoolEarningHistoryRD = useObservableState(poolEarningHistory$, RD.initial)
 
   const onRefreshData = useCallback(() => {
     reloadSelectedPoolDetail()
+    reloadPoolStatsDetail()
     reloadHistory()
-  }, [reloadHistory, reloadSelectedPoolDetail])
+    // following three `reload` functions are needed to reload chart data
+    reloadDepthHistory()
+    reloadSwapHistory()
+    reloadLiquidityHistory()
+  }, [
+    reloadDepthHistory,
+    reloadHistory,
+    reloadLiquidityHistory,
+    reloadPoolStatsDetail,
+    reloadSelectedPoolDetail,
+    reloadSwapHistory
+  ])
 
   const refreshButtonDisabled = useMemo(() => {
     return FP.pipe(historyPageRD, RD.isPending) || FP.pipe(poolDetailRD, RD.isPending)
@@ -127,35 +147,30 @@ export const PoolDetailsView: React.FC = () => {
         oRouteAsset,
         O.fold(
           () => <ErrorView title={intl.formatMessage({ id: 'routes.invalid.asset' }, { asset })} />,
-          (asset) =>
-            FP.pipe(
-              RD.combine(poolDetailRD, poolStatsDetailRD, poolEarningHistoryRD),
-              RD.fold(
-                () => <PoolDetails asset={asset} historyActions={historyActions} {...defaultDetailsProps} />,
-                () => <PoolDetails asset={asset} historyActions={historyActions} {...prevProps.current} isLoading />,
-                ({ message }: Error) => {
-                  return <ErrorView title={message} />
-                },
-                ([poolDetail, poolStatsDetail, poolEarningHistory]) => {
-                  prevProps.current = {
-                    network,
+          (asset) => {
+            prevProps.current = {
+              network,
+              priceRatio,
+              poolDetail: poolDetailRD,
+              poolStatsDetail: poolStatsDetailRD,
+              priceSymbol,
+              HistoryView: PoolHistoryView,
+              ChartView: PoolChartView,
+              disableAllPoolActions: getDisableAllPoolActions(asset.chain),
+              disableTradingPoolAction: getDisableTradingPoolAction(asset.chain),
+              disablePoolActions: getDisablePoolActions(asset.chain)
+            }
 
-                    priceRatio,
-                    poolDetail,
-                    poolStatsDetail,
-                    earningsHistory: poolEarningHistory,
-                    priceSymbol: O.toUndefined(priceSymbol),
-                    HistoryView: PoolHistoryView,
-                    ChartView: PoolChartView,
-                    disableAllPoolActions: getDisableAllPoolActions(asset.chain),
-                    disableTradingPoolAction: getDisableTradingPoolAction(asset.chain),
-                    disablePoolActions: getDisablePoolActions(asset.chain)
-                  }
-
-                  return <PoolDetails asset={asset} historyActions={historyActions} {...prevProps.current} />
-                }
-              )
+            return (
+              <PoolDetails
+                asset={asset}
+                historyActions={historyActions}
+                reloadPoolDetail={reloadSelectedPoolDetail}
+                reloadPoolStatsDetail={reloadPoolStatsDetail}
+                {...prevProps.current}
+              />
             )
+          }
         )
       )}
     </>

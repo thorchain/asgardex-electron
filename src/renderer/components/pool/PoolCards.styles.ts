@@ -2,6 +2,7 @@ import * as A from 'antd'
 import styled from 'styled-components'
 
 import { media } from '../../helpers/styleHelper'
+import { ErrorView as ErrorViewUI } from '../shared/error'
 
 const ITEM_GAP = '8px'
 
@@ -35,4 +36,9 @@ export const Col = styled(A.Col).attrs({
       padding-right: ${ITEM_GAP};
     `}
   }
+`
+
+export const ErrorView = styled(ErrorViewUI)`
+  /* height: 100%; */
+  /* width: 100%; */
 `
