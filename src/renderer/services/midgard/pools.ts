@@ -736,7 +736,11 @@ const createPoolsService = (
             to: O.toUndefined(roundToFiveMinutes(to)),
             ...request
           }),
-          RxOp.map(RD.success),
+          RxOp.map((result) =>
+            result /* result can be null - for whatever reason */
+              ? RD.success(result)
+              : RD.failure(Error('Failed to load liquidity history from Midgard'))
+          ),
           RxOp.startWith(RD.pending),
           RxOp.catchError((e: Error) => Rx.of(RD.failure(e)))
         )
@@ -776,7 +780,11 @@ const createPoolsService = (
             to: O.toUndefined(roundToFiveMinutes(to)),
             ...otherParams
           }),
-          RxOp.map(RD.success),
+          RxOp.map((result) =>
+            result /* result can be null - for whatever reason */
+              ? RD.success(result)
+              : RD.failure(Error('Failed to load swap history from Midgard'))
+          ),
           RxOp.startWith(RD.pending),
           RxOp.catchError((e: Error) => Rx.of(RD.failure(e)))
         )
@@ -821,7 +829,11 @@ const createPoolsService = (
             to: O.toUndefined(roundToFiveMinutes(to)),
             ...otherParams
           }),
-          RxOp.map(RD.success),
+          RxOp.map((result) =>
+            result /* result can be null - for whatever reason */
+              ? RD.success(result)
+              : RD.failure(Error('Failed to load depth history from Midgard'))
+          ),
           RxOp.startWith(RD.pending),
           RxOp.catchError((e: Error) => Rx.of(RD.failure(e)))
         )

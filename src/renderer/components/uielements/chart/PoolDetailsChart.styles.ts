@@ -1,5 +1,5 @@
+import { Chart as ChartJS } from 'chart.js'
 import { transparentize } from 'polished'
-import { Line, Bar, Chart } from 'react-chartjs-2'
 import styled from 'styled-components'
 import { palette } from 'styled-theme'
 
@@ -7,9 +7,9 @@ import { media } from '../../../helpers/styleHelper'
 import { ErrorView as ErrorViewUI } from '../../shared/error'
 
 // https://www.chartjs.org/docs/latest/general/fonts.html#missing-fonts
-Chart.defaults.font.size = 12
-Chart.defaults.font.style = 'normal'
-Chart.defaults.font.family = 'MainFontRegular'
+ChartJS.defaults.font.size = 12
+ChartJS.defaults.font.style = 'normal'
+ChartJS.defaults.font.family = 'MainFontRegular'
 
 type HeaderToggleProps = {
   primary?: boolean
@@ -19,8 +19,6 @@ type ChartContainerProps = {
   gradientStart: string
   gradientStop: string
 }
-
-// const MAX_HEIGHT = 312
 
 export const ChartContainer = styled.div`
   background: transparent;
@@ -102,22 +100,8 @@ export const ChartWrapper = styled.div`
   align-items: center;
 `
 
-export const LineChart = styled(Line).attrs({
-  type: 'line'
-})`
-  width: 100%;
-`
-
-export const BarChart = styled(Bar).attrs({
-  type: 'bar'
-})`
-  width: 100%;
-`
-
 export const ErrorView = styled(ErrorViewUI)`
   height: 100%;
 
-  ${media.md`
-  padding: 30px 0;
-  `}
+  padding: 0;
 `
