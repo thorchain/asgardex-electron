@@ -56,7 +56,7 @@ export const DepositView: React.FC<Props> = () => {
 
   const { assetWithDecimal$ } = useChainContext()
 
-  const oRouteAsset = getAssetFromNullableString(asset)
+  const oRouteAsset = useMemo(() => getAssetFromNullableString(asset), [asset])
 
   // Set selected pool asset whenever an asset in route has been changed
   // Needed to get all data for this pool (pool details etc.)
