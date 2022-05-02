@@ -1,19 +1,10 @@
-import React, { useCallback, useMemo } from 'react'
+import React, { useCallback, useEffect, useMemo, useRef } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
 import themes, { ThemeType } from '@thorchain/asgardex-theme'
 import { Grid, Spin } from 'antd'
-import {
-  Chart as ChartJS,
-  CategoryScale,
-  LinearScale,
-  BarElement,
-  Title,
-  PointElement,
-  Tooltip,
-  LineElement,
-  Legend
-} from 'chart.js'
+// import { Chart as ChartJS, BarElement, PointElement, Tooltip, LineElement, Legend } from 'chart.js'
+import { Chart as ChartJS, registerables } from 'chart.js'
 import * as FP from 'fp-ts/lib/function'
 import { useObservableState } from 'observable-hooks'
 import { Line, Bar } from 'react-chartjs-2'
@@ -25,13 +16,105 @@ import { getChartColors, getChartData, getChartOptions, getDisplayData } from '.
 import * as Styled from './PoolDetailsChart.styles'
 import {
   ChartDataType,
+  ChartDetails,
   ChartDetailsRD,
   ChartTimeFrame,
   ChartType,
   PoolDetailsChartData
 } from './PoolDetailsChart.types'
 
-ChartJS.register(CategoryScale, LinearScale, LineElement, BarElement, PointElement, Title, Tooltip, Legend)
+ChartJS.register(...registerables)
+
+type ChartProps = {
+  type: ChartType
+  unit: string
+  chartDetails: ChartDetails
+}
+
+const Chart: React.FC<ChartProps> = (props): JSX.Element => {
+  const { type, unit, chartDetails } = props
+
+  const isDesktopView = Grid.useBreakpoint()?.md ?? false
+
+  const { themeType$ } = useThemeContext()
+  const themeType = useObservableState(themeType$, ThemeType.LIGHT)
+  const isLight = themeType === ThemeType.LIGHT
+  const theme = isLight ? themes.light : themes.dark
+  const colors = useMemo(() => getChartColors(theme, isLight), [theme, isLight])
+
+  const { labels, values }: PoolDetailsChartData = getChartData(chartDetails)
+  const data = getDisplayData({ labels, values, colors })
+  const options = getChartOptions({ unit, colors, isDesktopView })
+
+  const barRef = useRef<ChartJS<'bar'> | null>(null)
+  const lineRef = useRef<ChartJS<'line'> | null>(null)
+
+  const renderGradientStroke = useCallback(
+    (ctx: CanvasRenderingContext2D): CanvasGradient => {
+      const gradientStroke: CanvasGradient = ctx.createLinearGradient(0, 0, 0, 300)
+      gradientStroke.addColorStop(0, colors.gradientStart)
+      gradientStroke.addColorStop(1, colors.gradientStop)
+      return gradientStroke
+    },
+    [colors.gradientStart, colors.gradientStop]
+  )
+
+  useEffect(() => {
+    const chart = barRef.current
+    if (!chart || type === 'line') return
+
+    const ctx = chart.ctx
+    const gradientStroke: CanvasGradient = renderGradientStroke(ctx)
+    const data = chart.data
+    chart.data = {
+      ...data,
+      datasets: data.datasets.map((dataset) => ({
+        ...dataset,
+        backgroundColor: gradientStroke
+      }))
+    }
+  }, [colors.gradientStart, colors.gradientStop, renderGradientStroke, type])
+
+  useEffect(() => {
+    if (type === 'line') {
+      const chart = lineRef.current
+      if (!chart) return
+
+      const { ctx, data } = chart
+      const gradientStroke: CanvasGradient = renderGradientStroke(ctx)
+
+      chart.data = {
+        ...data,
+        datasets: data.datasets.map((dataset) => ({
+          ...dataset,
+          backgroundColor: gradientStroke
+        }))
+      }
+    }
+
+    if (type === 'bar') {
+      const chart = barRef.current
+      if (!chart) return
+
+      const { ctx, data } = chart
+      const gradientStroke: CanvasGradient = renderGradientStroke(ctx)
+      chart.data = {
+        ...data,
+        datasets: data.datasets.map((dataset) => ({
+          ...dataset,
+          backgroundColor: gradientStroke
+        }))
+      }
+    }
+  }, [colors.gradientStart, colors.gradientStop, renderGradientStroke, type])
+
+  const otherPros = { width: 100, height: 100, options }
+  if (type === 'bar') {
+    return <Bar ref={barRef} data={data} {...otherPros} />
+  }
+
+  return <Line ref={lineRef} data={data} {...otherPros} />
+}
 
 type Props = {
   chartDetails: ChartDetailsRD
@@ -58,15 +141,7 @@ export const PoolDetailsChart: React.FC<Props> = (props: Props): JSX.Element => 
     setTimeFrame
   } = props
 
-  const isDesktopView = Grid.useBreakpoint()?.md ?? false
-
   const intl = useIntl()
-
-  const { themeType$ } = useThemeContext()
-  const themeType = useObservableState(themeType$, ThemeType.LIGHT)
-  const isLight = themeType === ThemeType.LIGHT
-  const theme = isLight ? themes.light : themes.dark
-  const colors = useMemo(() => getChartColors(theme, isLight), [theme, isLight])
 
   const renderError = useCallback(
     (error: Error) => (
@@ -80,10 +155,8 @@ export const PoolDetailsChart: React.FC<Props> = (props: Props): JSX.Element => 
     [intl, reloadData]
   )
 
-  const Chart = chartType === 'bar' ? Bar : Line
-
   return (
-    <Styled.ChartContainer gradientStart={colors.backgroundGradientStart} gradientStop={colors.backgroundGradientStop}>
+    <Styled.ChartContainer>
       <Styled.HeaderContainer>
         <Styled.TypeContainer>
           {dataTypes.map((dataType) => (
@@ -111,21 +184,7 @@ export const PoolDetailsChart: React.FC<Props> = (props: Props): JSX.Element => 
             () => <></>,
             () => <Spin />,
             (error) => renderError(error),
-            (chartDetails) => {
-              const { labels: l, values }: PoolDetailsChartData = getChartData(chartDetails)
-              const data = getDisplayData({ labels: l, values, colors })
-              const _options = getChartOptions({ unit, colors, isDesktopView })
-
-              return (
-                <Chart
-                  data={data}
-                  width={100}
-                  height={100}
-                  // options={{ ...options, maintainAspectRatio: false }}
-                  options={{ maintainAspectRatio: false }}
-                />
-              )
-            }
+            (chartDetails) => <Chart chartDetails={chartDetails} type={chartType} unit={unit} />
           )
         )}
       </Styled.ChartWrapper>

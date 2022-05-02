@@ -1,5 +1,4 @@
 import { Chart as ChartJS } from 'chart.js'
-import { transparentize } from 'polished'
 import styled from 'styled-components'
 import { palette } from 'styled-theme'
 
@@ -15,14 +14,8 @@ type HeaderToggleProps = {
   primary?: boolean
 }
 
-type ChartContainerProps = {
-  gradientStart: string
-  gradientStop: string
-}
-
 export const ChartContainer = styled.div`
-  background: transparent;
-  border: 1px solid ${palette('gray', 0)};
+  background: ${palette('background', 0)};
   padding: 10px 20px;
   border-radius: 4px;
   width: 100%;
@@ -31,12 +24,6 @@ export const ChartContainer = styled.div`
     padding: 10px 20px;
     height: 312px;
   `}
-
-  background-image: ${(props: ChartContainerProps) =>
-    `linear-gradient(to bottom, ${transparentize(0.7, props.gradientStart)}, ${transparentize(
-      1,
-      props.gradientStop
-    )})`};
 `
 
 export const ChartHeaderType = styled.div`

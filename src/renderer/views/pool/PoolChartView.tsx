@@ -55,7 +55,7 @@ export const PoolChartView: React.FC<Props> = ({ priceRatio }) => {
 
   type DataRequestParams = { timeFrame: ChartTimeFrame; dataType: ChartDataType }
   const savedParams = useRef<DataRequestParams>({
-    timeFrame: 'allTime',
+    timeFrame: 'week',
     dataType: 'liquidity'
   })
 
