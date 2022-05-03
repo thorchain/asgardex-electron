@@ -48,6 +48,7 @@ export const PoolDetailsView: React.FC = () => {
   const { network$ } = useAppContext()
   const {
     service: {
+      reloadChartDataUI,
       pools: {
         selectedPoolDetail$,
         priceRatio$,
@@ -55,9 +56,6 @@ export const PoolDetailsView: React.FC = () => {
         poolStatsDetail$,
         reloadPoolStatsDetail,
         reloadSelectedPoolDetail,
-        reloadDepthHistory,
-        reloadSwapHistory,
-        reloadLiquidityHistory,
         haltedChains$
       },
       setSelectedPoolAsset
@@ -118,18 +116,9 @@ export const PoolDetailsView: React.FC = () => {
     reloadSelectedPoolDetail()
     reloadPoolStatsDetail()
     reloadHistory()
-    // following three `reload` functions are needed to reload chart data
-    reloadDepthHistory()
-    reloadSwapHistory()
-    reloadLiquidityHistory()
-  }, [
-    reloadDepthHistory,
-    reloadHistory,
-    reloadLiquidityHistory,
-    reloadPoolStatsDetail,
-    reloadSelectedPoolDetail,
-    reloadSwapHistory
-  ])
+    // trigger reload of chart data, which will be handled in PoolChartView
+    reloadChartDataUI()
+  }, [reloadChartDataUI, reloadHistory, reloadPoolStatsDetail, reloadSelectedPoolDetail])
 
   const refreshButtonDisabled = useMemo(() => {
     return FP.pipe(historyPageRD, RD.isPending) || FP.pipe(poolDetailRD, RD.isPending)

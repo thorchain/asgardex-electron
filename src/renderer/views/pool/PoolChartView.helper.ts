@@ -1,9 +1,11 @@
 import { baseAmount, baseToAsset, bnOrZero } from '@xchainjs/xchain-util'
 import * as A from 'fp-ts/lib/Array'
 import * as FP from 'fp-ts/lib/function'
+import * as O from 'fp-ts/lib/Option'
 
-import { ChartDetails } from '../../components/uielements/chart/PoolDetailsChart.types'
+import { ChartDataType, ChartDetails, ChartTimeFrame } from '../../components/uielements/chart/PoolDetailsChart.types'
 import { DepthHistoryItem, LiquidityHistoryItem, SwapHistoryItem } from '../../types/generated/midgard'
+import { CachedChartData } from './PoolChartView.types'
 
 type PartialDepthHistoryItem = Pick<DepthHistoryItem, 'startTime' | 'runeDepth'>
 
@@ -53,3 +55,33 @@ export const getVolumeFromHistoryItems = ({
       }
     })
   )
+
+export const INITIAL_CACHED_CHART_DATA: CachedChartData = {
+  liquidity: { allTime: O.none, week: O.none },
+  volume: { allTime: O.none, week: O.none }
+}
+
+export const getCachedChartData = ({
+  timeFrame,
+  dataType,
+  cache
+}: {
+  timeFrame: ChartTimeFrame
+  dataType: ChartDataType
+  cache: CachedChartData
+}): O.Option<ChartDetails> => cache[dataType][timeFrame]
+
+export const updateCachedChartData = ({
+  timeFrame,
+  dataType,
+  cache,
+  data: oData
+}: {
+  timeFrame: ChartTimeFrame
+  dataType: ChartDataType
+  cache: CachedChartData
+  data: O.Option<ChartDetails>
+}): CachedChartData => ({
+  ...cache,
+  [dataType]: { ...cache[dataType], [timeFrame]: oData }
+})

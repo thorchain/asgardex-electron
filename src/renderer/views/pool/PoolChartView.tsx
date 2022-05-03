@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo, useRef } from 'react'
+import React, { useCallback, useEffect, useMemo, useRef } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
 import { currencySymbolByAsset } from '@xchainjs/xchain-util'
@@ -20,7 +20,14 @@ import {
   GetLiquidityHistoryIntervalEnum,
   GetSwapHistoryIntervalEnum
 } from '../../types/generated/midgard'
-import { getLiquidityFromHistoryItems, getVolumeFromHistoryItems } from './PoolChartView.helper'
+import {
+  getCachedChartData,
+  getLiquidityFromHistoryItems,
+  getVolumeFromHistoryItems,
+  INITIAL_CACHED_CHART_DATA,
+  updateCachedChartData
+} from './PoolChartView.helper'
+import { CachedChartData } from './PoolChartView.types'
 
 export type Props = {
   priceRatio: BigNumber
@@ -29,29 +36,10 @@ export type Props = {
 export const PoolChartView: React.FC<Props> = ({ priceRatio }) => {
   const {
     service: {
-      pools: {
-        selectedPricePoolAsset$,
-        getSelectedPoolSwapHistory$,
-        reloadSwapHistory,
-        getDepthHistory$,
-        reloadDepthHistory,
-        getPoolLiquidityHistory$,
-        reloadLiquidityHistory
-      }
+      reloadChartDataUI$,
+      pools: { selectedPricePoolAsset$, getSelectedPoolSwapHistory$, getDepthHistory$, getPoolLiquidityHistory$ }
     }
   } = useMidgardContext()
-
-  const reloadData = useCallback(() => {
-    reloadDepthHistory()
-    reloadSwapHistory()
-    reloadLiquidityHistory()
-  }, [reloadDepthHistory, reloadLiquidityHistory, reloadSwapHistory])
-
-  const selectedPricePoolAsset = useObservableState<SelectedPricePoolAsset>(selectedPricePoolAsset$, O.none)
-  const unit = FP.pipe(
-    selectedPricePoolAsset,
-    O.fold(() => '', currencySymbolByAsset)
-  )
 
   type DataRequestParams = { timeFrame: ChartTimeFrame; dataType: ChartDataType }
   const savedParams = useRef<DataRequestParams>({
@@ -59,43 +47,101 @@ export const PoolChartView: React.FC<Props> = ({ priceRatio }) => {
     dataType: 'liquidity'
   })
 
+  const cachedData = useRef<CachedChartData>(INITIAL_CACHED_CHART_DATA)
+
+  const selectedPricePoolAsset = useObservableState<SelectedPricePoolAsset>(selectedPricePoolAsset$, O.none)
+  const unit = FP.pipe(
+    selectedPricePoolAsset,
+    O.fold(() => '', currencySymbolByAsset)
+  )
+
   const [chartDataRD, updateChartData] = useObservableState<ChartDetailsRD, Partial<DataRequestParams>>(
-    (params$) =>
-      FP.pipe(
-        params$,
-        RxOp.startWith(savedParams),
-        RxOp.map((params) => (savedParams.current = { ...savedParams.current, ...params })),
-        RxOp.switchMap((params) => {
-          const requestParams = params.timeFrame === 'week' ? { count: 7 } : {}
-          return Rx.iif(
-            () => params.dataType === 'liquidity',
-            // (1) get data for depth history
-            getDepthHistory$({
-              ...requestParams,
-              interval: GetDepthHistoryIntervalEnum.Day
-            }).pipe(liveData.map(({ intervals }) => getLiquidityFromHistoryItems(intervals))),
-            // (2) or get data for volume history
-            FP.pipe(
-              liveData.sequenceS({
-                swapHistory: getSelectedPoolSwapHistory$({
-                  ...requestParams,
-                  interval: GetSwapHistoryIntervalEnum.Day
-                }),
-                liquidityHistory: getPoolLiquidityHistory$({
-                  ...requestParams,
-                  interval: GetLiquidityHistoryIntervalEnum.Day
-                })
-              }),
-              liveData.map(({ swapHistory, liquidityHistory }) =>
-                getVolumeFromHistoryItems({
-                  swapHistory: swapHistory.intervals,
-                  liquidityHistory: liquidityHistory.intervals
-                })
-              )
+    (partialUpdatedParams$) => {
+      return FP.pipe(
+        partialUpdatedParams$,
+        // In case no partialUpdatedParams is set, start with initial data
+        RxOp.startWith(savedParams.current),
+        // update savedParams
+        RxOp.map((partialUpdatedParams) => {
+          savedParams.current = { ...savedParams.current, ...partialUpdatedParams }
+          return savedParams.current
+        }),
+        RxOp.switchMap(({ dataType, timeFrame }) =>
+          FP.pipe(
+            // get cached data
+            getCachedChartData({ cache: cachedData.current, timeFrame, dataType }),
+            O.fold(
+              // request new data if no cache data
+              () => {
+                console.log('no cache ', dataType, timeFrame)
+                const requestParams = timeFrame === 'week' ? { count: 7 } : {}
+                return Rx.iif(
+                  () => dataType === 'liquidity',
+                  // (1) get data for depth history
+                  getDepthHistory$({
+                    ...requestParams,
+                    interval: GetDepthHistoryIntervalEnum.Day
+                  }).pipe(
+                    liveData.map(({ intervals }) => getLiquidityFromHistoryItems(intervals)),
+                    // cache data
+                    liveData.map((data) => {
+                      cachedData.current = updateCachedChartData({
+                        dataType,
+                        timeFrame,
+                        cache: cachedData.current,
+                        data: O.some(data)
+                      })
+                      return data
+                    })
+                  ),
+                  // (2) or get data for volume history
+                  FP.pipe(
+                    liveData.sequenceS({
+                      swapHistory: getSelectedPoolSwapHistory$({
+                        ...requestParams,
+                        interval: GetSwapHistoryIntervalEnum.Day
+                      }),
+                      liquidityHistory: getPoolLiquidityHistory$({
+                        ...requestParams,
+                        interval: GetLiquidityHistoryIntervalEnum.Day
+                      })
+                    }),
+                    liveData.map(({ swapHistory, liquidityHistory }) =>
+                      getVolumeFromHistoryItems({
+                        swapHistory: swapHistory.intervals,
+                        liquidityHistory: liquidityHistory.intervals
+                      })
+                    ),
+                    // cache data
+                    liveData.map((data) => {
+                      cachedData.current = updateCachedChartData({
+                        dataType,
+                        timeFrame,
+                        cache: cachedData.current,
+                        data: O.some(data)
+                      })
+                      return data
+                    })
+                  )
+                )
+              },
+              // return cached data if available
+              (chartDetails) => {
+                console.log('cache !!! ', dataType, timeFrame)
+                // Note: Chart does need a delay to render everything properly
+                return FP.pipe(
+                  Rx.of(RD.pending),
+                  RxOp.delay(300),
+                  RxOp.switchMap((_) => Rx.of(RD.success(chartDetails))),
+                  // Initial value is needed to show `pending` at UI before `delay`
+                  RxOp.startWith(RD.pending)
+                )
+              }
             )
           )
-        })
-      ),
+        )
+      )
+    },
     RD.initial
   )
 
@@ -122,6 +168,50 @@ export const PoolChartView: React.FC<Props> = ({ priceRatio }) => {
     [updateChartData]
   )
 
+  // Reloading data means asking for "fresh" data - no data is used from cache
+  const reloadData = useCallback(() => {
+    // clear cached data before reloading data
+    const { dataType, timeFrame } = savedParams.current
+    cachedData.current = updateCachedChartData({
+      dataType,
+      timeFrame,
+      cache: cachedData.current,
+      data: O.none
+    })
+    // re-ask data
+    updateChartData({ dataType, timeFrame })
+  }, [updateChartData])
+
+  // Listen to re-load trigger events
+  const [reloaded] = useObservableState(
+    () =>
+      reloadChartDataUI$.pipe(
+        // Since `reloadChartDataUI$` is a `TriggerStream$` with same value all the time
+        // its value needs to be unique to trigger next `useEffect`
+        RxOp.map((v) => `${v}-${Date.now()}`)
+      ),
+    ''
+  )
+
+  // Listen to `reloaded` state (see above ^) to ask for "fresh", not cached data
+  useEffect(() => {
+    console.log('reloaded:', reloaded)
+    if (reloaded) {
+      const {
+        current: { dataType, timeFrame }
+      } = savedParams
+      // clear cache of current chart data
+      cachedData.current = updateCachedChartData({
+        dataType,
+        timeFrame,
+        cache: cachedData.current,
+        data: O.none
+      })
+      // re-ask data
+      updateChartData({ dataType, timeFrame })
+    }
+  }, [reloadData, reloaded, updateChartData])
+
   return (
     <PoolDetailsChart
       dataTypes={['liquidity', 'volume']}
@@ -129,7 +219,6 @@ export const PoolChartView: React.FC<Props> = ({ priceRatio }) => {
       reloadData={reloadData}
       setDataType={setDataTypeCallback}
       chartDetails={chartDataRDPriced}
-      chartType={savedParams.current.dataType === 'liquidity' ? 'line' : 'bar'}
       unit={unit}
       selectedTimeFrame={savedParams.current.timeFrame}
       setTimeFrame={setTimeFrameCallback}
