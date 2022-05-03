@@ -18,13 +18,13 @@ export const PoolStatusWrapper = styled.div`
   &:before {
     content: '';
     position: absolute;
-    width: 6px;
+    width: 3px;
     height: 100%;
     left: 0px;
     top: 0px;
     border-bottom-left-radius: 3px;
     border-top-left-radius: 3px;
-    background: ${palette('gradient', 2)};
+    background: ${palette('success', 0)};
   }
 
   .label-wrapper {
