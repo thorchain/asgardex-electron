@@ -15,13 +15,10 @@ import { ChartDataType, ChartDetailsRD, ChartTimeFrame } from '../../components/
 import { useMidgardContext } from '../../contexts/MidgardContext'
 import { liveData } from '../../helpers/rx/liveData'
 import { SelectedPricePoolAsset } from '../../services/midgard/types'
-import {
-  GetDepthHistoryIntervalEnum,
-  GetLiquidityHistoryIntervalEnum,
-  GetSwapHistoryIntervalEnum
-} from '../../types/generated/midgard'
+import { GetLiquidityHistoryIntervalEnum, GetSwapHistoryIntervalEnum } from '../../types/generated/midgard'
 import {
   getCachedChartData,
+  getDepthHistoryParams,
   getLiquidityFromHistoryItems,
   getVolumeFromHistoryItems,
   INITIAL_CACHED_CHART_DATA,
@@ -73,15 +70,11 @@ export const PoolChartView: React.FC<Props> = ({ priceRatio }) => {
             O.fold(
               // request new data if no cache data
               () => {
-                console.log('no cache ', dataType, timeFrame)
-                const requestParams = timeFrame === 'week' ? { count: 7 } : {}
+                const requestParams = getDepthHistoryParams(timeFrame)
                 return Rx.iif(
                   () => dataType === 'liquidity',
                   // (1) get data for depth history
-                  getDepthHistory$({
-                    ...requestParams,
-                    interval: GetDepthHistoryIntervalEnum.Day
-                  }).pipe(
+                  getDepthHistory$(requestParams).pipe(
                     liveData.map(({ intervals }) => getLiquidityFromHistoryItems(intervals)),
                     // cache data
                     liveData.map((data) => {
@@ -127,7 +120,6 @@ export const PoolChartView: React.FC<Props> = ({ priceRatio }) => {
               },
               // return cached data if available
               (chartDetails) => {
-                console.log('cache !!! ', dataType, timeFrame)
                 // Note: Chart does need a delay to render everything properly
                 return FP.pipe(
                   Rx.of(RD.pending),
@@ -195,7 +187,6 @@ export const PoolChartView: React.FC<Props> = ({ priceRatio }) => {
 
   // Listen to `reloaded` state (see above ^) to ask for "fresh", not cached data
   useEffect(() => {
-    console.log('reloaded:', reloaded)
     if (reloaded) {
       const {
         current: { dataType, timeFrame }

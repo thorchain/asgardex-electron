@@ -10,6 +10,7 @@ import { useIntl } from 'react-intl'
 
 import { useTheme } from '../../../hooks/useTheme'
 import { Button } from '../button'
+import { Tooltip } from '../common/Common.styles'
 import { getChartColors, getChartData, getChartOptions, getDisplayData } from './PoolDetailsChart.helpers'
 import * as Styled from './PoolDetailsChart.styles'
 import {
@@ -135,12 +136,33 @@ export const PoolDetailsChart: React.FC<Props> = (props: Props): JSX.Element => 
           ))}
         </Styled.TypeContainer>
         <Styled.TimeContainer>
-          <Styled.HeaderToggle primary={selectedTimeFrame === 'week'} onClick={() => setTimeFrame('week')}>
-            {intl.formatMessage({ id: 'common.time.week' })}
-          </Styled.HeaderToggle>
-          <Styled.HeaderToggle primary={selectedTimeFrame === 'allTime'} onClick={() => setTimeFrame('allTime')}>
-            {intl.formatMessage({ id: 'common.time.all' })}
-          </Styled.HeaderToggle>
+          <Tooltip title={intl.formatMessage({ id: 'common.time.days7' })}>
+            <Styled.HeaderToggle primary={selectedTimeFrame === 'week'} onClick={() => setTimeFrame('week')}>
+              {intl.formatMessage({ id: 'common.time.days7.short' })}
+            </Styled.HeaderToggle>
+          </Tooltip>
+          <Tooltip title={intl.formatMessage({ id: 'common.time.month1' })}>
+            <Styled.HeaderToggle primary={selectedTimeFrame === 'month'} onClick={() => setTimeFrame('month')}>
+              {intl.formatMessage({ id: 'common.time.month1.short' })}
+            </Styled.HeaderToggle>
+          </Tooltip>
+          <Tooltip title={intl.formatMessage({ id: 'common.time.months3' })}>
+            <Styled.HeaderToggle
+              primary={selectedTimeFrame === 'threeMonths'}
+              onClick={() => setTimeFrame('threeMonths')}>
+              {intl.formatMessage({ id: 'common.time.months3.short' })}
+            </Styled.HeaderToggle>
+          </Tooltip>
+          <Tooltip title={intl.formatMessage({ id: 'common.time.year1' })}>
+            <Styled.HeaderToggle primary={selectedTimeFrame === 'year'} onClick={() => setTimeFrame('year')}>
+              {intl.formatMessage({ id: 'common.time.year1.short' })}
+            </Styled.HeaderToggle>
+          </Tooltip>
+          <Tooltip title={intl.formatMessage({ id: 'common.time.all' })}>
+            <Styled.HeaderToggle primary={selectedTimeFrame === 'all'} onClick={() => setTimeFrame('all')}>
+              {intl.formatMessage({ id: 'common.time.all.short' })}
+            </Styled.HeaderToggle>
+          </Tooltip>
         </Styled.TimeContainer>
       </Styled.HeaderContainer>
       <Styled.ChartWrapper>

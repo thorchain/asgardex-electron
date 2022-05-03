@@ -11,7 +11,7 @@ export type ChartDetailsRD = RD.RemoteData<Error, ChartDetails>
 
 export type ChartDataType = 'liquidity' | 'volume'
 
-export type ChartTimeFrame = 'allTime' | 'week'
+export type ChartTimeFrame = 'week' | 'month' | 'threeMonths' | 'year' | 'all'
 
 export type DisplayDataColor = {
   text: string
