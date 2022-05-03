@@ -728,7 +728,7 @@ const createPoolsService = (
   const apiGetLiquidityHistory$ = ({ from, to, ...request }: GetLiquidityHistoryRequest): PoolLiquidityHistoryLD =>
     FP.pipe(
       Rx.combineLatest([midgardDefaultApi$, reloadLiquidityHistory$]),
-      RxOp.map(([api]) => api),
+      RxOp.map(([api, _]) => api),
       liveData.chain((api) =>
         FP.pipe(
           api.getLiquidityHistory({
@@ -846,7 +846,7 @@ const createPoolsService = (
   const getDepthHistory$ = (params: GetDepthHistoryParams): DepthHistoryLD =>
     FP.pipe(
       Rx.combineLatest([selectedPoolAsset$, reloadDepthHistory$]),
-      RxOp.switchMap(([oSelectedPoolAsset]) =>
+      RxOp.switchMap(([oSelectedPoolAsset, _]) =>
         FP.pipe(
           oSelectedPoolAsset,
           O.fold(

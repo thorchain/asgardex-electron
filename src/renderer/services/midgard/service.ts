@@ -12,7 +12,7 @@ import { envOrDefault } from '../../../shared/utils/env'
 import { THORCHAIN_DECIMAL } from '../../helpers/assetHelper'
 import { fromPromise$ } from '../../helpers/rx/fromPromise'
 import { liveData, LiveData } from '../../helpers/rx/liveData'
-import { triggerStream } from '../../helpers/stateHelper'
+import { triggerStream, TriggerStream$ } from '../../helpers/stateHelper'
 import { Configuration, DefaultApi } from '../../types/generated/midgard'
 import { network$ } from '../app/service'
 import { MIDGARD_MAX_RETRY } from '../const'
@@ -214,14 +214,19 @@ const validateNode$ = (): ValidateNodeLD =>
     RxOp.startWith(RD.initial)
   )
 
+// `TriggerStream` to reload chart data handled on view (not service) level only
+export const { stream$: reloadChartDataUI$, trigger: reloadChartDataUI } = triggerStream()
+
 export type MidgardService = {
   networkInfo$: NetworkInfoLD
-  reloadNetworkInfo: () => void
+  reloadNetworkInfo: FP.Lazy<void>
   thorchainConstantsState$: ThorchainConstantsLD
   thorchainLastblockState$: ThorchainLastblockLD
   nativeTxFee$: NativeFeeLD
-  reloadThorchainLastblock: () => void
-  setSelectedPoolAsset: () => void
+  reloadThorchainLastblock: FP.Lazy<void>
+  setSelectedPoolAsset: FP.Lazy<void>
+  reloadChartDataUI: FP.Lazy<void>
+  reloadChartDataUI$: TriggerStream$
   apiEndpoint$: ByzantineLD
   getTransactionState$: (txId: string) => LiveData<Error, O.Option<string>>
   validateNode$: () => ValidateNodeLD
@@ -237,6 +242,8 @@ export const service = {
   thorchainLastblockState$,
   nativeTxFee$,
   reloadThorchainLastblock,
+  reloadChartDataUI,
+  reloadChartDataUI$,
   setSelectedPoolAsset,
   selectedPoolAsset$,
   apiEndpoint$: byzantine$,

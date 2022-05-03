@@ -10,6 +10,7 @@ import { useIntl } from 'react-intl'
 
 import { useTheme } from '../../../hooks/useTheme'
 import { Button } from '../button'
+import { Tooltip } from '../common/Common.styles'
 import { getChartColors, getChartData, getChartOptions, getDisplayData } from './PoolDetailsChart.helpers'
 import * as Styled from './PoolDetailsChart.styles'
 import {
@@ -17,14 +18,13 @@ import {
   ChartDetails,
   ChartDetailsRD,
   ChartTimeFrame,
-  ChartType,
   PoolDetailsChartData
 } from './PoolDetailsChart.types'
 
 ChartJS.register(...registerables)
 
 type ChartProps = {
-  type: ChartType
+  type: ChartDataType
   unit: string
   chartDetails: ChartDetails
 }
@@ -45,7 +45,6 @@ const Chart: React.FC<ChartProps> = (props): JSX.Element => {
   const lineRef = useRef<ChartJS<'line'> | null>(null)
 
   useEffect(() => {
-    console.log('useEffect')
     const renderGradientStroke = (ctx: CanvasRenderingContext2D): CanvasGradient => {
       const gradientStroke: CanvasGradient = ctx.createLinearGradient(0, 100, 0, 300)
       gradientStroke.addColorStop(0, colors.gradientStart)
@@ -53,11 +52,11 @@ const Chart: React.FC<ChartProps> = (props): JSX.Element => {
       return gradientStroke
     }
 
-    const chart = type === 'bar' ? barRef.current : lineRef.current
+    const chartRef = type === 'liquidity' ? barRef.current : lineRef.current
 
-    if (!chart) return
+    if (!chartRef) return
 
-    const { ctx } = chart
+    const { ctx } = chartRef
     const gradientStroke: CanvasGradient = renderGradientStroke(ctx)
 
     // update background to have a gradient color
@@ -72,18 +71,23 @@ const Chart: React.FC<ChartProps> = (props): JSX.Element => {
     }))
   }, [colors.gradientStart, colors.gradientStop, type])
 
-  const otherPros = { width: 100, height: 100, options }
-  if (type === 'bar') {
-    return <Bar ref={barRef} data={chartData} {...otherPros} />
-  }
+  const renderChart = useMemo(() => {
+    const otherPros = { width: 100, height: 100, options }
 
-  return <Line ref={lineRef} data={chartData} {...otherPros} />
+    if (type === 'liquidity') {
+      lineRef.current = null
+      return <Bar ref={barRef} data={chartData} {...otherPros} />
+    }
+    barRef.current = null
+    return <Line ref={lineRef} data={chartData} {...otherPros} />
+  }, [chartData, options, type])
+
+  return renderChart
 }
 
 type Props = {
   chartDetails: ChartDetailsRD
   reloadData: FP.Lazy<void>
-  chartType: ChartType
   unit: string
   dataTypes: ChartDataType[]
   selectedDataType: ChartDataType
@@ -96,7 +100,6 @@ export const PoolDetailsChart: React.FC<Props> = (props: Props): JSX.Element => 
   const {
     chartDetails: chartDetailsRD,
     reloadData,
-    chartType,
     unit,
     dataTypes,
     selectedDataType,
@@ -133,12 +136,33 @@ export const PoolDetailsChart: React.FC<Props> = (props: Props): JSX.Element => 
           ))}
         </Styled.TypeContainer>
         <Styled.TimeContainer>
-          <Styled.HeaderToggle primary={selectedTimeFrame === 'week'} onClick={() => setTimeFrame('week')}>
-            {intl.formatMessage({ id: 'common.time.week' })}
-          </Styled.HeaderToggle>
-          <Styled.HeaderToggle primary={selectedTimeFrame === 'allTime'} onClick={() => setTimeFrame('allTime')}>
-            {intl.formatMessage({ id: 'common.time.all' })}
-          </Styled.HeaderToggle>
+          <Tooltip title={intl.formatMessage({ id: 'common.time.days7' })}>
+            <Styled.HeaderToggle primary={selectedTimeFrame === 'week'} onClick={() => setTimeFrame('week')}>
+              {intl.formatMessage({ id: 'common.time.days7.short' })}
+            </Styled.HeaderToggle>
+          </Tooltip>
+          <Tooltip title={intl.formatMessage({ id: 'common.time.month1' })}>
+            <Styled.HeaderToggle primary={selectedTimeFrame === 'month'} onClick={() => setTimeFrame('month')}>
+              {intl.formatMessage({ id: 'common.time.month1.short' })}
+            </Styled.HeaderToggle>
+          </Tooltip>
+          <Tooltip title={intl.formatMessage({ id: 'common.time.months3' })}>
+            <Styled.HeaderToggle
+              primary={selectedTimeFrame === 'threeMonths'}
+              onClick={() => setTimeFrame('threeMonths')}>
+              {intl.formatMessage({ id: 'common.time.months3.short' })}
+            </Styled.HeaderToggle>
+          </Tooltip>
+          <Tooltip title={intl.formatMessage({ id: 'common.time.year1' })}>
+            <Styled.HeaderToggle primary={selectedTimeFrame === 'year'} onClick={() => setTimeFrame('year')}>
+              {intl.formatMessage({ id: 'common.time.year1.short' })}
+            </Styled.HeaderToggle>
+          </Tooltip>
+          <Tooltip title={intl.formatMessage({ id: 'common.time.all' })}>
+            <Styled.HeaderToggle primary={selectedTimeFrame === 'all'} onClick={() => setTimeFrame('all')}>
+              {intl.formatMessage({ id: 'common.time.all.short' })}
+            </Styled.HeaderToggle>
+          </Tooltip>
         </Styled.TimeContainer>
       </Styled.HeaderContainer>
       <Styled.ChartWrapper>
@@ -148,7 +172,7 @@ export const PoolDetailsChart: React.FC<Props> = (props: Props): JSX.Element => 
             () => <></>,
             () => <Spin />,
             (error) => renderError(error),
-            (chartDetails) => <Chart chartDetails={chartDetails} type={chartType} unit={unit} />
+            (chartDetails) => <Chart chartDetails={chartDetails} type={selectedDataType} unit={unit} />
           )
         )}
       </Styled.ChartWrapper>
