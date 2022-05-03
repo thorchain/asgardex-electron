@@ -12,13 +12,11 @@ import {
   PoolDetailsChartData
 } from './PoolDetailsChart.types'
 
-export const getChartColors = (theme: Theme, isLight: boolean): DisplayDataColor => ({
+export const getChartColors = (theme: Theme): DisplayDataColor => ({
   text: theme.palette.text[0],
-  line: '#23DCC8',
-  backgroundGradientStart: isLight ? '#c8fffa' : '#186b63',
-  backgroundGradientStop: isLight ? '#ffffff' : '#23DCC8',
-  gradientStart: isLight ? '#23DCC8' : '#186b63',
-  gradientStop: isLight ? '#ffffff' : '#23dcca'
+  line: theme.palette.primary[0],
+  gradientStart: theme.palette.primary[0],
+  gradientStop: theme.palette.background[0]
 })
 
 export const getDisplayData = ({ labels, values, colors }: DisplayDataParams) => ({

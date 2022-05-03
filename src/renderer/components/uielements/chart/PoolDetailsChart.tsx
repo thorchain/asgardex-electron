@@ -1,16 +1,14 @@
-import React, { useCallback, useEffect, useMemo, useRef } from 'react'
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
-import themes, { ThemeType } from '@thorchain/asgardex-theme'
 import { Grid, Spin } from 'antd'
 // import { Chart as ChartJS, BarElement, PointElement, Tooltip, LineElement, Legend } from 'chart.js'
 import { Chart as ChartJS, registerables } from 'chart.js'
 import * as FP from 'fp-ts/lib/function'
-import { useObservableState } from 'observable-hooks'
 import { Line, Bar } from 'react-chartjs-2'
 import { useIntl } from 'react-intl'
 
-import { useThemeContext } from '../../../contexts/ThemeContext'
+import { useTheme } from '../../../hooks/useTheme'
 import { Button } from '../button'
 import { getChartColors, getChartData, getChartOptions, getDisplayData } from './PoolDetailsChart.helpers'
 import * as Styled from './PoolDetailsChart.styles'
@@ -35,85 +33,51 @@ const Chart: React.FC<ChartProps> = (props): JSX.Element => {
   const { type, unit, chartDetails } = props
 
   const isDesktopView = Grid.useBreakpoint()?.md ?? false
-
-  const { themeType$ } = useThemeContext()
-  const themeType = useObservableState(themeType$, ThemeType.LIGHT)
-  const isLight = themeType === ThemeType.LIGHT
-  const theme = isLight ? themes.light : themes.dark
-  const colors = useMemo(() => getChartColors(theme, isLight), [theme, isLight])
+  const { theme } = useTheme()
+  const colors = useMemo(() => getChartColors(theme), [theme])
 
   const { labels, values }: PoolDetailsChartData = getChartData(chartDetails)
   const data = getDisplayData({ labels, values, colors })
   const options = getChartOptions({ unit, colors, isDesktopView })
+  const [chartData, setChartData] = useState(data)
 
   const barRef = useRef<ChartJS<'bar'> | null>(null)
   const lineRef = useRef<ChartJS<'line'> | null>(null)
 
-  const renderGradientStroke = useCallback(
-    (ctx: CanvasRenderingContext2D): CanvasGradient => {
-      const gradientStroke: CanvasGradient = ctx.createLinearGradient(0, 0, 0, 300)
+  useEffect(() => {
+    console.log('useEffect')
+    const renderGradientStroke = (ctx: CanvasRenderingContext2D): CanvasGradient => {
+      const gradientStroke: CanvasGradient = ctx.createLinearGradient(0, 100, 0, 300)
       gradientStroke.addColorStop(0, colors.gradientStart)
       gradientStroke.addColorStop(1, colors.gradientStop)
       return gradientStroke
-    },
-    [colors.gradientStart, colors.gradientStop]
-  )
+    }
 
-  useEffect(() => {
-    const chart = barRef.current
-    if (!chart || type === 'line') return
+    const chart = type === 'bar' ? barRef.current : lineRef.current
 
-    const ctx = chart.ctx
+    if (!chart) return
+
+    const { ctx } = chart
     const gradientStroke: CanvasGradient = renderGradientStroke(ctx)
-    const data = chart.data
-    chart.data = {
-      ...data,
-      datasets: data.datasets.map((dataset) => ({
+
+    // update background to have a gradient color
+    // @see https://react-chartjs-2.js.org/examples/gradient-chart
+    // or @see Example for chartjs (w/o React) https://blog.vanila.io/chart-js-tutorial-how-to-make-gradient-line-chart-af145e5c92f9
+    setChartData((current) => ({
+      ...current,
+      datasets: current.datasets.map((dataset) => ({
         ...dataset,
         backgroundColor: gradientStroke
       }))
-    }
-  }, [colors.gradientStart, colors.gradientStop, renderGradientStroke, type])
-
-  useEffect(() => {
-    if (type === 'line') {
-      const chart = lineRef.current
-      if (!chart) return
-
-      const { ctx, data } = chart
-      const gradientStroke: CanvasGradient = renderGradientStroke(ctx)
-
-      chart.data = {
-        ...data,
-        datasets: data.datasets.map((dataset) => ({
-          ...dataset,
-          backgroundColor: gradientStroke
-        }))
-      }
-    }
-
-    if (type === 'bar') {
-      const chart = barRef.current
-      if (!chart) return
-
-      const { ctx, data } = chart
-      const gradientStroke: CanvasGradient = renderGradientStroke(ctx)
-      chart.data = {
-        ...data,
-        datasets: data.datasets.map((dataset) => ({
-          ...dataset,
-          backgroundColor: gradientStroke
-        }))
-      }
-    }
-  }, [colors.gradientStart, colors.gradientStop, renderGradientStroke, type])
+    }))
+  }, [colors.gradientStart, colors.gradientStop, type])
 
   const otherPros = { width: 100, height: 100, options }
   if (type === 'bar') {
-    return <Bar ref={barRef} data={data} {...otherPros} />
+    return <Bar ref={barRef} data={chartData} {...otherPros} />
   }
 
-  return <Line ref={lineRef} data={data} {...otherPros} />
+  return <Line ref={lineRef} data={chartData} {...otherPros} />
 }
 
 type Props = {

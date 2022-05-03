@@ -18,8 +18,6 @@ export type ChartTimeFrame = 'allTime' | 'week'
 export type DisplayDataColor = {
   text: string
   line: string
-  backgroundGradientStart: string
-  backgroundGradientStop: string
   gradientStart: string
   gradientStop: string
 }
