@@ -136,7 +136,6 @@ export const InValueContainer = styled.div`
   display: flex;
   flex-direction: column;
   padding: 10px 5px 5px 10px;
-  margin-bottom: 20px;
   width: 100%;
   border: 1px solid ${palette('gray', 0)};
 
@@ -167,6 +166,20 @@ export const InValueLabel = styled(UILabel).attrs({
   padding-left: 10px;
   font-size: 24px;
 `
+export const InMinValueContainer = styled.div`
+  display: flex;
+  align-items: center;
+  padding: 0 0 20px 10px;
+`
+
+export const InMinValueLabel = styled(UILabel).attrs({
+  color: 'gray'
+})`
+  text-transform: uppercase;
+  width: auto;
+  padding-right: 5px;
+  font-size: 12px;
+`
 
 export const AssetInput = styled(AssetInputBase)<{ hasError?: boolean }>`
   border-color: ${({ hasError }) => (hasError ? palette('error', 0) : palette('primary', 0))};
@@ -196,9 +209,15 @@ export const NoteLabel = styled(UILabel)`
   color: ${palette('text', 2)};
 `
 
+export const MinAmountContainer = styled.div`
+  display: flex;
+  align-items: center;
+`
+
 export const MinAmountLabel = styled(UILabel)`
-  padding-top: 0;
+  padding: 0 5px;
   text-transform: uppercase;
+  width: auto;
 `
 
 export const AssetSelect = styled(AssetSelectUI)`
