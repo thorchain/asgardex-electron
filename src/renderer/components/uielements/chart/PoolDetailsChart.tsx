@@ -141,7 +141,7 @@ export const PoolDetailsChart: React.FC<Props> = (props: Props): JSX.Element => 
               primary={selectedDataType === dataType}
               disabled={isLoading}
               key={`headerToggle${dataType}`}
-              onClick={() => (!isLoading ? setDataType(dataType) : {})}>
+              onClick={!isLoading ? () => setDataType(dataType) : undefined}>
               {dataType}
             </Styled.HeaderToggle>
           ))}
@@ -151,7 +151,7 @@ export const PoolDetailsChart: React.FC<Props> = (props: Props): JSX.Element => 
             <Tooltip title={intl.formatMessage({ id: tooltipId })} key={key}>
               <Styled.HeaderToggle
                 primary={selectedTimeFrame === key}
-                onClick={() => (!isLoading ? setTimeFrame(key as ChartTimeFrame) : {})}
+                onClick={!isLoading ? () => setTimeFrame(key as ChartTimeFrame) : undefined}
                 disabled={isLoading}>
                 {intl.formatMessage({ id: labelId })}
               </Styled.HeaderToggle>

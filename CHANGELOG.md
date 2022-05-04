@@ -2,7 +2,7 @@
 
 ## Update
 
-- [PoolDetail] Improve loading behavior [#2234](https://github.com/thorchain/asgardex-electron/issues/2234)
+- [PoolDetail] Improve pool details view (loading behavior, error handling, caching data, latest `react-chartjs`) behavior [#2240](https://github.com/thorchain/asgardex-electron/pull/2240), [#2241](https://github.com/thorchain/asgardex-electron/pull/2241)
 
 ## Fix
 
