@@ -10,10 +10,6 @@ ChartJS.defaults.font.size = 12
 ChartJS.defaults.font.style = 'normal'
 ChartJS.defaults.font.family = 'MainFontRegular'
 
-type HeaderToggleProps = {
-  primary?: boolean
-}
-
 export const ChartContainer = styled.div`
   background: ${palette('background', 0)};
   padding: 10px 20px;
@@ -60,13 +56,17 @@ export const TimeContainer = styled.div`
     margin-right: 20px;
   }
 `
+type HeaderToggleProps = {
+  primary?: boolean
+  disabled?: boolean
+}
 
-export const HeaderToggle = styled.span`
+export const HeaderToggle = styled.span<HeaderToggleProps>`
   color: ${palette('text', 0)};
   font-size: 14px !important;
   text-transform: uppercase;
-  font-weight: ${(props: HeaderToggleProps) => (props.primary ? '600' : 'normal')};
-  cursor: pointer;
+  font-family: ${({ primary }) => (primary ? 'MainFontSemiBold' : 'MainFontRegular')};
+  cursor: ${({ disabled }) => (disabled ? 'not-allowed' : 'pointer')};
   ${media.sm`
     font-size: 18px;
     &:hover {
