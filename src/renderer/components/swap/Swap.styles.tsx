@@ -9,11 +9,11 @@ import { AssetInput as AssetInputBase } from '../uielements/assets/assetInput'
 import { AssetSelect as AssetSelectUI } from '../uielements/assets/assetSelect'
 import { Button as UIButton } from '../uielements/button'
 import { CheckButton as CheckButtonUI } from '../uielements/button/CheckButton'
-import { Label as UILabel } from '../uielements/label'
+import { Label as UILabel, CopyLabel as CopyLabelUI } from '../uielements/label'
 
 const ICON_SIZE = 16
 
-export const AddressCustomRecipient = styled('div')`
+export const AddressCustomRecipient = styled.div`
   display: flex;
   flex-direction: row;
   font-size: 16px;
@@ -49,7 +49,7 @@ export const Tabs = styled(TabsUI)`
   }
 `
 
-export const Container = styled('div')`
+export const Container = styled.div`
   display: flex;
   flex-direction: column;
   justify-content: space-between;
@@ -67,7 +67,7 @@ export const SwapOutlinedContainer = styled.div`
   justify-content: center;
 `
 
-export const SwapOutlined = styled(ASwapOutlined).attrs({ rotate: 90 })`
+export const SwapOutlined = styled(ASwapOutlined).attrs({ rotate: 90 })<{ disabled: boolean }>`
   padding: 10px;
   color: ${palette('success', 0)};
   opacity: ${({ disabled = false }) => (disabled ? 0.5 : 1)};
@@ -94,7 +94,7 @@ export const FormContainer = styled.div`
   position: relative;
 `
 
-export const CurrencyInfoContainer = styled('div')`
+export const CurrencyInfoContainer = styled.div`
   display: none;
   position: absolute;
   top: 50px;
@@ -110,7 +110,7 @@ export const CurrencyInfoContainer = styled('div')`
   `}
 `
 
-export const ContentContainer = styled('div')`
+export const ContentContainer = styled.div`
   position: relative;
   padding-bottom: 30px;
 `
@@ -164,7 +164,7 @@ export const ValueItemWrapper = styled.div`
   `}
 `
 
-export const SliderContainer = styled('div')`
+export const SliderContainer = styled.div`
   width: 100%;
   min-width: 212px;
 `
@@ -244,6 +244,8 @@ export const ErrorLabel = styled(UILabel)`
 
 export const NoteLabel = styled(UILabel)`
   color: ${palette('text', 2)};
+  text-align: center;
+  text-transform: uppercase;
 `
 
 export const MinAmountContainer = styled.div`
@@ -292,4 +294,28 @@ export const AssetSelectContainer = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
+`
+
+export const CopyMemoLabel = styled(CopyLabelUI)`
+  font-size: 12px;
+
+  .ant-typography-copy {
+    color: ${palette('gray', 1)} !important;
+    &:hover {
+      color: ${palette('gray', 2)} !important;
+    }
+  }
+  svg {
+    color: ${palette('gray', 1)} !important;
+    &:hover {
+      color: ${palette('gray', 2)} !important;
+    }
+  }
+`
+
+export const MemoLabel = styled(UILabel)`
+  text-transform: uppercase;
+  font-size: 12px;
+  text-align: center;
+  color: ${palette('gray', 1)} !important;
 `

@@ -322,6 +322,7 @@ export const SwapView: React.FC<Props> = (_): JSX.Element => {
                   importWalletHandler={importWalletHandler}
                   clickAddressLinkHandler={openAddressUrl}
                   addressValidator={validateSwapAddress}
+                  isDev={$IS_DEV}
                 />
               )
             }

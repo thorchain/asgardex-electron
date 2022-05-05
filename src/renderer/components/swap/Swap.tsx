@@ -132,6 +132,7 @@ export type SwapProps = {
   mimirHalt: MimirHalt
   clickAddressLinkHandler: (address: Address) => void
   addressValidator: AddressValidationAsync
+  isDev: boolean
 }
 
 export const Swap = ({
@@ -164,7 +165,8 @@ export const Swap = ({
   haltedChains,
   mimirHalt,
   clickAddressLinkHandler,
-  addressValidator
+  addressValidator,
+  isDev
 }: SwapProps) => {
   const intl = useIntl()
 
@@ -1413,6 +1415,21 @@ export const Swap = ({
     setEditableTargetWalletAddress(oAddress)
   }, [oInitialTargetWalletAddress, oTargetLedgerAddress, useTargetAssetLedger])
 
+  const renderMemo = useMemo(() => {
+    const memo = FP.pipe(
+      oSwapParams,
+      O.fold(
+        () => '',
+        ({ memo }) => memo
+      )
+    )
+
+    return (
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        <Styled.CopyMemoLabel label={intl.formatMessage({ id: 'common.memo' })} textToCopy={memo} />
+      </div>
+    )
+  }, [intl, oSwapParams])
   return (
     // Note: Just one Tab to use as same styles as for other views (deposit / wallet)
     <Styled.Tabs
@@ -1614,6 +1631,7 @@ export const Swap = ({
                   validatePassword$={validatePassword$}
                 />
               )}
+              {isDev && renderMemo}
               {renderLedgerConfirmationModal}
               {renderTxModal}
             </Styled.Container>
