@@ -11,6 +11,7 @@
 - [Wallet] Locking wallet at Deposit or Withdraw failed (#2233)[https://github.com/thorchain/asgardex-electron/issues/2233]
 - [e2e] Testcafe is failing [#750](https://github.com/thorchain/asgardex-electron/issues/750)
 - [Swap] Consider fees in swap limit [#2243](https://github.com/thorchain/asgardex-electron/pull/2242)
+- [Swap] Recipient address lost [#2244](https://github.com/thorchain/asgardex-electron/issues/2244)
 
 ## Internal
 
