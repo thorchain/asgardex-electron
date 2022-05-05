@@ -2,7 +2,7 @@
 
 ## Update
 
-- [PoolDetail] Improve loading behavior [#2234](https://github.com/thorchain/asgardex-electron/issues/2234)
+- [PoolDetail] Improve pool details view (loading behavior, error handling, caching data, latest `react-chartjs`) behavior [#2240](https://github.com/thorchain/asgardex-electron/pull/2240), [#2241](https://github.com/thorchain/asgardex-electron/pull/2241)
 - [Swap] Change default slippage tolerance to 3% [#2237](https://github.com/thorchain/asgardex-electron/issues/2237)
 
 ## Fix
@@ -11,6 +11,7 @@
 - [Wallet] Locking wallet at Deposit or Withdraw failed (#2233)[https://github.com/thorchain/asgardex-electron/issues/2233]
 - [e2e] Testcafe is failing [#750](https://github.com/thorchain/asgardex-electron/issues/750)
 - [Swap] Consider fees in swap limit [#2243](https://github.com/thorchain/asgardex-electron/pull/2242)
+- [Swap] Recipient address lost [#2244](https://github.com/thorchain/asgardex-electron/issues/2244)
 
 ## Internal
 

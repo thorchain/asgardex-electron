@@ -85,6 +85,14 @@ const Chart: React.FC<ChartProps> = (props): JSX.Element => {
   return renderChart
 }
 
+// Definition for time range buttons
+const TIME_RANGE_BUTTONS: Record<ChartTimeFrame, { labelId: string; tooltipId: string }> = {
+  week: { labelId: 'common.time.days7.short', tooltipId: 'common.time.days7' },
+  month: { labelId: 'common.time.month1.short', tooltipId: 'common.time.month1' },
+  threeMonths: { labelId: 'common.time.months3.short', tooltipId: 'common.time.months3' },
+  year: { labelId: 'common.time.year1.short', tooltipId: 'common.time.year1' },
+  all: { labelId: 'common.time.all.short', tooltipId: 'common.time.all' }
+}
 type Props = {
   chartDetails: ChartDetailsRD
   reloadData: FP.Lazy<void>
@@ -110,6 +118,8 @@ export const PoolDetailsChart: React.FC<Props> = (props: Props): JSX.Element => 
 
   const intl = useIntl()
 
+  const isLoading = RD.isPending(chartDetailsRD)
+
   const renderError = useCallback(
     (error: Error) => (
       <Styled.ErrorView
@@ -129,40 +139,24 @@ export const PoolDetailsChart: React.FC<Props> = (props: Props): JSX.Element => 
           {dataTypes.map((dataType) => (
             <Styled.HeaderToggle
               primary={selectedDataType === dataType}
+              disabled={isLoading}
               key={`headerToggle${dataType}`}
-              onClick={() => setDataType(dataType)}>
+              onClick={!isLoading ? () => setDataType(dataType) : undefined}>
               {dataType}
             </Styled.HeaderToggle>
           ))}
         </Styled.TypeContainer>
         <Styled.TimeContainer>
-          <Tooltip title={intl.formatMessage({ id: 'common.time.days7' })}>
-            <Styled.HeaderToggle primary={selectedTimeFrame === 'week'} onClick={() => setTimeFrame('week')}>
-              {intl.formatMessage({ id: 'common.time.days7.short' })}
-            </Styled.HeaderToggle>
-          </Tooltip>
-          <Tooltip title={intl.formatMessage({ id: 'common.time.month1' })}>
-            <Styled.HeaderToggle primary={selectedTimeFrame === 'month'} onClick={() => setTimeFrame('month')}>
-              {intl.formatMessage({ id: 'common.time.month1.short' })}
-            </Styled.HeaderToggle>
-          </Tooltip>
-          <Tooltip title={intl.formatMessage({ id: 'common.time.months3' })}>
-            <Styled.HeaderToggle
-              primary={selectedTimeFrame === 'threeMonths'}
-              onClick={() => setTimeFrame('threeMonths')}>
-              {intl.formatMessage({ id: 'common.time.months3.short' })}
-            </Styled.HeaderToggle>
-          </Tooltip>
-          <Tooltip title={intl.formatMessage({ id: 'common.time.year1' })}>
-            <Styled.HeaderToggle primary={selectedTimeFrame === 'year'} onClick={() => setTimeFrame('year')}>
-              {intl.formatMessage({ id: 'common.time.year1.short' })}
-            </Styled.HeaderToggle>
-          </Tooltip>
-          <Tooltip title={intl.formatMessage({ id: 'common.time.all' })}>
-            <Styled.HeaderToggle primary={selectedTimeFrame === 'all'} onClick={() => setTimeFrame('all')}>
-              {intl.formatMessage({ id: 'common.time.all.short' })}
-            </Styled.HeaderToggle>
-          </Tooltip>
+          {Object.entries(TIME_RANGE_BUTTONS).map(([key, { labelId, tooltipId }]) => (
+            <Tooltip title={intl.formatMessage({ id: tooltipId })} key={key}>
+              <Styled.HeaderToggle
+                primary={selectedTimeFrame === key}
+                onClick={!isLoading ? () => setTimeFrame(key as ChartTimeFrame) : undefined}
+                disabled={isLoading}>
+                {intl.formatMessage({ id: labelId })}
+              </Styled.HeaderToggle>
+            </Tooltip>
+          ))}
         </Styled.TimeContainer>
       </Styled.HeaderContainer>
       <Styled.ChartWrapper>
