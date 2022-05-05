@@ -414,16 +414,12 @@ export const Swap = ({
             targetFeeAssetPoolData,
             targetAssetPoolData
           )
+          // convert fee amount back into original decimal
           return convertBaseAmountDecimal(amount1e8, targetAssetDecimal)
         }
       )
     )
   }, [swapFees, targetAssetProp, poolsData, zeroTargetBaseAmountMax, targetAssetDecimal])
-
-  // const outFeeInTargetAssetMax1e8: BaseAmount = useMemo(() => {
-  //   const amount = convertBaseAmountDecimal(outFeeInTargetAsset1e8, targetAssetDecimal)
-  //   return max1e8BaseAmount(amount)
-  // }, [outFeeInTargetAsset1e8, targetAssetDecimal])
 
   const swapData: SwapData = useMemo(
     () =>
@@ -437,10 +433,9 @@ export const Swap = ({
   )
 
   const swapResultAmountMax1e8: BaseAmount = useMemo(() => {
-    // 1. Convert result to original decimal of target asset
-    // orignal decimal might be < 1e8
+    // 1. Convert `swapResult` (1e8) to original decimal of target asset (original decimal might be < 1e8)
     const swapResultAmount = convertBaseAmountDecimal(swapData.swapResult, targetAssetDecimal)
-    // 2. We still need to make sure it <= 1e8
+    // 2. We still need to make sure `swapResult` is <= 1e8
     const swapResultAmountMax1e8 = max1e8BaseAmount(swapResultAmount)
     // 3. Deduct outbound fee from result
     const outFeeMax1e8 = max1e8BaseAmount(outFeeInTargetAsset)
@@ -463,10 +458,11 @@ export const Swap = ({
     [useSourceAssetLedger, oSourceAsset]
   )
 
-  const swapLimit1e8: BaseAmount | undefined = useMemo(() => {
+  const swapLimit1e8: O.Option<BaseAmount> = useMemo(() => {
+    // Disable slippage protection temporary for Ledger/BTC (see https://github.com/thorchain/asgardex-electron/issues/2068)
     return !disableSlippage && swapResultAmountMax1e8.gt(zeroTargetBaseAmountMax1e8)
-      ? Utils.getSwapLimit1e8(swapResultAmountMax1e8, slipTolerance)
-      : undefined
+      ? O.some(Utils.getSwapLimit1e8(swapResultAmountMax1e8, slipTolerance))
+      : O.none
   }, [disableSlippage, slipTolerance, swapResultAmountMax1e8, zeroTargetBaseAmountMax1e8])
 
   const oSwapParams: O.Option<SwapTxParams> = useMemo(() => {
@@ -474,12 +470,10 @@ export const Swap = ({
     return FP.pipe(
       sequenceTOption(assetsToSwap, oPoolAddress, oAddress, oSourceAssetWB),
       O.map(([{ source, target }, poolAddress, address, { walletType, walletAddress, walletIndex }]) => {
-        // Disable slippage protection temporary for Ledger/BTC (see https://github.com/thorchain/asgardex-electron/issues/2068)
-
         const memo = getSwapMemo({
           asset: target,
           address,
-          limit: swapLimit1e8 // limit needs to be in 1e8
+          limit: O.toUndefined(swapLimit1e8) // limit needs to be in 1e8
         })
         return {
           poolAddress,
@@ -649,7 +643,7 @@ export const Swap = ({
     return amountToSwapMax1e8.lt(minAmountToSwapMax1e8)
   }, [amountToSwapMax1e8, isZeroAmountToSwap, minAmountToSwapMax1e8])
 
-  const minAmountLabel = useMemo(
+  const renderMinAmount = useMemo(
     () => (
       <Styled.MinAmountContainer>
         <Styled.MinAmountLabel color={minAmountError ? 'error' : 'gray'}>
@@ -1051,17 +1045,27 @@ export const Swap = ({
     [swapResultAmountMax1e8]
   )
 
-  // Label: Min amount to swap - <= 1e8
+  // Label: Min amount to swap (<= 1e8)
   const swapMinResultLabel = useMemo(() => {
     // for label we do need to convert decimal back to original decimal
-    const amount: BaseAmount = swapLimit1e8
-      ? convertBaseAmountDecimal(swapLimit1e8, targetAssetDecimal)
-      : baseAmount(0, targetAssetDecimal) /* assetAmount1e8 */
+    const amount: BaseAmount = FP.pipe(
+      swapLimit1e8,
+      O.fold(
+        () => baseAmount(0, targetAssetDecimal) /* assetAmount1e8 */,
+        (limit1e8) => convertBaseAmountDecimal(limit1e8, targetAssetDecimal)
+      )
+    )
 
     const amountMax1e8 = max1e8BaseAmount(amount)
 
-    return disableSlippage ? '--' : `${formatAssetAmount({ amount: baseToAsset(amountMax1e8), trimZeros: true })}`
-  }, [disableSlippage, swapLimit1e8, targetAssetDecimal])
+    return disableSlippage
+      ? '--'
+      : `${formatAssetAmountCurrency({
+          asset: targetAssetProp,
+          amount: baseToAsset(amountMax1e8),
+          trimZeros: true
+        })}`
+  }, [disableSlippage, swapLimit1e8, targetAssetDecimal, targetAssetProp])
 
   const uiFees: UIFeesRD = useMemo(
     () =>
@@ -1435,24 +1439,26 @@ export const Swap = ({
                     />
                   </Styled.CurrencyInfoContainer>
 
-                  <Styled.ValueItemContainer className={'valueItemContainer-out'}>
-                    {/* Note: Input value is shown as AssetAmount */}
-                    <Styled.AssetInput
-                      title={intl.formatMessage({ id: 'swap.input' })}
-                      titleTooltip={FP.pipe(
-                        oSourceWalletAddress,
-                        O.getOrElse(() => '')
-                      )}
-                      onChange={setAmountToSwapMax1e8}
-                      onBlur={reloadFeesHandler}
-                      amount={amountToSwapMax1e8}
-                      maxAmount={maxAmountToSwapMax1e8}
-                      hasError={minAmountError}
-                      asset={sourceAssetProp}
-                      disabled={lockedWallet}
-                      maxInfoText={intl.formatMessage({ id: 'swap.info.max.fee' })}
-                    />
-
+                  <Styled.ValueItemContainer className={'valueItemContainer-source'}>
+                    <Styled.ValueItemSourceWrapper>
+                      {/* Note: Input value is shown as AssetAmount */}
+                      <Styled.AssetInput
+                        title={intl.formatMessage({ id: 'swap.input' })}
+                        titleTooltip={FP.pipe(
+                          oSourceWalletAddress,
+                          O.getOrElse(() => '')
+                        )}
+                        onChange={setAmountToSwapMax1e8}
+                        onBlur={reloadFeesHandler}
+                        amount={amountToSwapMax1e8}
+                        maxAmount={maxAmountToSwapMax1e8}
+                        hasError={minAmountError}
+                        asset={sourceAssetProp}
+                        disabled={lockedWallet}
+                        maxInfoText={intl.formatMessage({ id: 'swap.info.max.fee' })}
+                      />
+                      {renderMinAmount}
+                    </Styled.ValueItemSourceWrapper>
                     {FP.pipe(
                       oSourceAsset,
                       O.fold(
@@ -1477,14 +1483,15 @@ export const Swap = ({
                       )
                     )}
                   </Styled.ValueItemContainer>
-                  {minAmountLabel}
 
                   <Styled.ValueItemContainer className="valueItemContainer-percent">
                     <Styled.SliderContainer>{renderSlider}</Styled.SliderContainer>
-                    <Styled.SwapOutlined onClick={onSwitchAssets} />
+                    <Styled.SwapOutlinedContainer>
+                      <Styled.SwapOutlined onClick={onSwitchAssets} />
+                    </Styled.SwapOutlinedContainer>
                   </Styled.ValueItemContainer>
-                  <Styled.ValueItemContainer className="valueItemContainer-in">
-                    <div>
+                  <Styled.ValueItemContainer className="valueItemContainer-target">
+                    <Styled.ValueItemWrapper>
                       <Styled.InValueContainer>
                         <Styled.ValueTitle>{intl.formatMessage({ id: 'swap.output' })}</Styled.ValueTitle>
                         <Styled.InValueLabel>{swapResultLabel}</Styled.InValueLabel>
@@ -1502,7 +1509,7 @@ export const Swap = ({
                           }
                         />
                       </Styled.InMinValueContainer>
-                    </div>
+                    </Styled.ValueItemWrapper>
                     {FP.pipe(
                       oTargetAsset,
                       O.fold(

@@ -1,8 +1,9 @@
 import { SwapOutlined as ASwapOutlined } from '@ant-design/icons/lib'
-import styled from 'styled-components'
+import styled, { css } from 'styled-components'
 import { palette } from 'styled-theme'
 
 import { media } from '../../helpers/styleHelper'
+import { transition } from '../../settings/style-util'
 import { Tabs as TabsUI } from '../tabs/Tabs'
 import { AssetInput as AssetInputBase } from '../uielements/assets/assetInput'
 import { AssetSelect as AssetSelectUI } from '../uielements/assets/assetSelect'
@@ -60,25 +61,44 @@ export const Container = styled('div')`
   text-transform: uppercase;
 `
 
-export const SwapOutlined = styled(ASwapOutlined).attrs({ rotate: 90 })`
+export const SwapOutlinedContainer = styled.div`
+  display: flex;
   width: 100%;
-  color: ${palette('success', 0)};
-  ${(props) => (props.disabled ? 'opacity: 0.5; cursor: not-allowed !important;' : '')}
-  svg {
-    height: 22px;
-    width: 22px;
-  }
+  justify-content: center;
 `
 
-export const FormContainer = styled('div')`
+export const SwapOutlined = styled(ASwapOutlined).attrs({ rotate: 90 })`
+  padding: 10px;
+  color: ${palette('success', 0)};
+  opacity: ${({ disabled = false }) => (disabled ? 0.5 : 1)};
+  cursor: ${({ disabled = false }) => (disabled ? 'not-allowed' : 'pointer')};
+  svg {
+    height: 44px;
+    width: 44px;
+  }
+
+  ${transition(0.5)};
+
+  ${({ disabled }) =>
+    !disabled
+      ? css`
+          &:hover,
+          &.selected {
+            box-shadow: 0 0px 15px ${palette('gray', 1)};
+          }
+        `
+      : ''};
+`
+
+export const FormContainer = styled.div`
   position: relative;
 `
 
 export const CurrencyInfoContainer = styled('div')`
   display: none;
   position: absolute;
-  top: 45px;
-  bottom: 95px;
+  top: 50px;
+  bottom: 140px;
   left: 100%;
   padding-left: 15px;
   align-items: center;
@@ -95,7 +115,7 @@ export const ContentContainer = styled('div')`
   padding-bottom: 30px;
 `
 
-export const ValueItemContainer = styled('div')`
+export const ValueItemContainer = styled.div`
   display: flex;
   flex-direction: column;
   align-items: baseline;
@@ -103,17 +123,14 @@ export const ValueItemContainer = styled('div')`
   position: relative;
 
   &.valueItemContainer {
-    &-out {
+    &-source,
+    &-target {
       align-items: center;
     }
 
     &-percent {
       align-items: center;
       margin: 20px 0;
-    }
-
-    &-in {
-      align-items: center;
     }
   }
 
@@ -124,6 +141,26 @@ export const ValueItemContainer = styled('div')`
       margin-right: 25px;
       min-width: 63%;
     }
+  `}
+`
+
+export const ValueItemSourceWrapper = styled.div`
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+
+  ${media.md`
+  width: auto;
+  `}
+`
+
+export const ValueItemWrapper = styled.div`
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+
+  ${media.md`
+  width: auto;
   `}
 `
 
@@ -147,6 +184,7 @@ export const InValueContainer = styled.div`
 export const TargetAddressContainer = styled.div`
   display: flex;
   flex-direction: column;
+  padding-top: 20px;
 `
 export const ValueTitle = styled(UILabel).attrs({
   color: 'gray',
@@ -168,8 +206,9 @@ export const InValueLabel = styled(UILabel).attrs({
 `
 export const InMinValueContainer = styled.div`
   display: flex;
+  width: 100%;
   align-items: center;
-  padding: 0 0 20px 10px;
+  padding: 0 0 0 10px;
 `
 
 export const InMinValueLabel = styled(UILabel).attrs({
@@ -188,11 +227,9 @@ export const AssetInput = styled(AssetInputBase)<{ hasError?: boolean }>`
     border: none;
   }
 
-  margin-bottom: 50px;
   width: 100%;
 
   ${media.md`
-    margin-bottom: 0;
     width: auto;
   `}
 `
@@ -215,18 +252,15 @@ export const MinAmountContainer = styled.div`
 `
 
 export const MinAmountLabel = styled(UILabel)`
-  padding: 0 5px;
+  padding-left: 5px;
+  padding-right: 5px;
   text-transform: uppercase;
   width: auto;
 `
 
-export const AssetSelect = styled(AssetSelectUI)`
-  /* justify-content: space-between; */
-`
+export const AssetSelect = styled(AssetSelectUI)``
 
-export const TargetAssetSelect = styled(AssetSelect)`
-  /* margin-top: 10px; */
-`
+export const TargetAssetSelect = styled(AssetSelect)``
 
 export const FeeContainer = styled.div`
   width: 100%;
