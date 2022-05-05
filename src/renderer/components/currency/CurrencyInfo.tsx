@@ -58,7 +58,7 @@ export const CurrencyInfo = ({
           <Row style={{ alignItems: 'center' }} key={slip}>
             <Styled.SlipLabel
               key={slip}
-              active={slip === slipTolerance ? 'true' : 'false'}
+              active={slip === slipTolerance}
               onClick={() => changeSlipToleranceHandler(slip)}>
               {slip}%
             </Styled.SlipLabel>
@@ -77,7 +77,7 @@ export const CurrencyInfo = ({
         trigger={['click']}
         placement="bottomCenter">
         <Styled.DropdownContentWrapper style={{ alignItems: 'center', width: '55px' }}>
-          <Styled.SlipLabel active="true">{slipTolerance}%</Styled.SlipLabel>
+          <Styled.SlipLabel active>{slipTolerance}%</Styled.SlipLabel>
           <DownIcon />
         </Styled.DropdownContentWrapper>
       </Dropdown>

@@ -21,7 +21,11 @@ const swap: SwapMessages = {
   'swap.note.nowallet': 'Erstelle oder importiere eine Wallet um zu Tauschen',
   'swap.errors.asset.missingSourceAsset': 'Ursprungs-Asset nicht vorhanden',
   'swap.errors.asset.missingTargetAsset': 'Ziel-Asset nicht vorhanden',
-  'swap.ledger.sign': 'Klick "Weiter", um die Swap Transaktion mit Deinem Ledger zu unterzeichnen.'
+  'swap.ledger.sign': 'Klick "Weiter", um die Swap Transaktion mit Deinem Ledger zu unterzeichnen.',
+  'swap.min.amount.info':
+    'Erforderlicher Mindestwert für ein Tausch um die Gebühren der Ein- und Auszahlungstransaktionen zu decken.',
+  'swap.min.result.info':
+    'Dein Tausch ist mit diesem Mindestwert basierend auf der ausgewählten {tolerance}% Slippage-Toleranz abgesichert. Falls eine Preisänderung vor der Transaktions-Bestätigung mehr als {tolerance}% zu Deinem Nachteil beträgt, wird Deine Tausch-Transaktion zurücküberwiesen.'
 }
 
 export default swap
