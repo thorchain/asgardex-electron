@@ -331,6 +331,8 @@ type SwapMessageKey =
   | 'swap.note.lockedWallet'
   | 'swap.note.nowallet'
   | 'swap.ledger.sign'
+  | 'swap.min.amount.info'
+  | 'swap.min.result.info'
 
 export type SwapMessages = { [key in SwapMessageKey]: string }
 
