@@ -174,9 +174,20 @@ export const Swap = ({
 
   const [oSourceWalletAddress, setSourceWalletAddress] = useState<O.Option<Address>>(oInitialSourceWalletAddress)
 
+  // Update state needed - initial walletAddress is loaded async and can be different at first run
+  useEffect(() => {
+    setSourceWalletAddress(oInitialSourceWalletAddress)
+  }, [oInitialSourceWalletAddress])
+
   const [oTargetWalletAddress, setTargetWalletAddress] = useState<O.Option<Address>>(oInitialTargetWalletAddress)
   const [editableTargetWalletAddress, setEditableTargetWalletAddress] =
     useState<O.Option<Address>>(oInitialTargetWalletAddress)
+
+  // Update state needed - initial target walletAddress is loaded async and can be different at first run
+  useEffect(() => {
+    setTargetWalletAddress(oInitialTargetWalletAddress)
+    setEditableTargetWalletAddress(oInitialTargetWalletAddress)
+  }, [oInitialTargetWalletAddress])
 
   const { balances: oWalletBalances, loading: walletBalancesLoading } = walletBalances
 
@@ -214,6 +225,8 @@ export const Swap = ({
   const [useSourceAssetLedger, setUseSourceAssetLedger] = useState(false)
   const [useTargetAssetLedger, setUseTargetAssetLedger] = useState(false)
 
+  const oTargetAddress: O.Option<Address> = useTargetAssetLedger ? oTargetLedgerAddress : oTargetWalletAddress
+
   const disableAllPoolActions = useCallback(
     (chain: Chain) => PoolHelpers.disableAllActions({ chain, haltedChains, mimirHalt }),
     [haltedChains, mimirHalt]
@@ -247,6 +260,7 @@ export const Swap = ({
     [oSourceAsset, oTargetAsset]
   )
 
+  // Available assets are assets of available pools only
   const allAssets = useMemo((): Asset[] => availableAssets.map(({ asset }) => asset), [availableAssets])
 
   const allBalances: WalletBalances = useMemo(
@@ -467,39 +481,30 @@ export const Swap = ({
       : O.none
   }, [disableSlippage, slipTolerance, swapResultAmountMax1e8, zeroTargetBaseAmountMax1e8])
 
-  const oSwapParams: O.Option<SwapTxParams> = useMemo(() => {
-    const oAddress: O.Option<Address> = useTargetAssetLedger ? oTargetLedgerAddress : oTargetWalletAddress
-    return FP.pipe(
-      sequenceTOption(assetsToSwap, oPoolAddress, oAddress, oSourceAssetWB),
-      O.map(([{ source, target }, poolAddress, address, { walletType, walletAddress, walletIndex }]) => {
-        const memo = getSwapMemo({
-          asset: target,
-          address,
-          limit: O.toUndefined(swapLimit1e8) // limit needs to be in 1e8
+  const oSwapParams: O.Option<SwapTxParams> = useMemo(
+    () =>
+      FP.pipe(
+        sequenceTOption(assetsToSwap, oPoolAddress, oTargetAddress, oSourceAssetWB),
+        O.map(([{ source, target }, poolAddress, address, { walletType, walletAddress, walletIndex }]) => {
+          const memo = getSwapMemo({
+            asset: target,
+            address,
+            limit: O.toUndefined(swapLimit1e8) // limit needs to be in 1e8
+          })
+          return {
+            poolAddress,
+            asset: source,
+            // Decimal needs to be converted back for using orginal decimal of source asset
+            amount: convertBaseAmountDecimal(amountToSwapMax1e8, sourceAssetDecimal),
+            memo,
+            walletType,
+            sender: walletAddress,
+            walletIndex
+          }
         })
-        return {
-          poolAddress,
-          asset: source,
-          // Decimal needs to be converted back for using orginal decimal of source asset
-          amount: convertBaseAmountDecimal(amountToSwapMax1e8, sourceAssetDecimal),
-          memo,
-          walletType,
-          sender: walletAddress,
-          walletIndex
-        }
-      })
-    )
-  }, [
-    useTargetAssetLedger,
-    oTargetLedgerAddress,
-    oTargetWalletAddress,
-    assetsToSwap,
-    oPoolAddress,
-    oSourceAssetWB,
-    swapLimit1e8,
-    amountToSwapMax1e8,
-    sourceAssetDecimal
-  ])
+      ),
+    [assetsToSwap, oPoolAddress, oTargetAddress, oSourceAssetWB, swapLimit1e8, amountToSwapMax1e8, sourceAssetDecimal]
+  )
 
   const isCausedSlippage = useMemo(() => swapData.slip.toNumber() > slipTolerance, [swapData.slip, slipTolerance])
 
@@ -716,7 +721,7 @@ export const Swap = ({
    * Zero balances are ignored.
    * Duplications of assets are merged.
    */
-  const selectAbleSourceAssets: Asset[] = useMemo(
+  const selectableSourceAssets: Asset[] = useMemo(
     () =>
       FP.pipe(
         assetsToSwap,
@@ -737,12 +742,12 @@ export const Swap = ({
   )
 
   /**
-   * Selectable source assets to swap from.
+   * Selectable target assets to swap to.
    *
    * Based on available pool assets.
    * Duplications of assets are merged.
    */
-  const selectAbleTargetAssets = useMemo(
+  const selectableTargetAssets = useMemo(
     (): Asset[] =>
       FP.pipe(
         assetsToSwap,
@@ -1301,6 +1306,24 @@ export const Swap = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [sourceAssetProp, targetAssetProp])
 
+  const disableSwitchAssets = useMemo(() => {
+    const hasTargetBalance = FP.pipe(
+      oTargetAsset,
+      O.chain((asset) => {
+        const oWalletBalances = NEA.fromArray(allBalances)
+        return getWalletBalanceByAssetAndWalletType({
+          oWalletBalances,
+          asset,
+          walletType: sourceWalletType
+        })
+      }),
+      O.map(({ amount }) => amount.gt(baseAmount(0, targetAssetDecimal))),
+      O.getOrElse(() => false)
+    )
+
+    return !hasTargetBalance
+  }, [allBalances, oTargetAsset, sourceWalletType, targetAssetDecimal])
+
   const onSwitchAssets = useCallback(async () => {
     // delay to avoid render issues while switching
     await delay(100)
@@ -1329,7 +1352,8 @@ export const Swap = ({
       RD.isPending(approveState) ||
       minAmountError ||
       isCausedSlippage ||
-      swapResultAmountMax1e8.lte(zeroTargetBaseAmountMax1e8),
+      swapResultAmountMax1e8.lte(zeroTargetBaseAmountMax1e8) ||
+      O.isNone(oTargetAddress),
     [
       disableSwapAction,
       lockedWallet,
@@ -1341,7 +1365,8 @@ export const Swap = ({
       minAmountError,
       isCausedSlippage,
       swapResultAmountMax1e8,
-      zeroTargetBaseAmountMax1e8
+      zeroTargetBaseAmountMax1e8,
+      oTargetAddress
     ]
   )
 
@@ -1415,21 +1440,20 @@ export const Swap = ({
     setEditableTargetWalletAddress(oAddress)
   }, [oInitialTargetWalletAddress, oTargetLedgerAddress, useTargetAssetLedger])
 
-  const renderMemo = useMemo(() => {
-    const memo = FP.pipe(
-      oSwapParams,
-      O.fold(
-        () => '',
-        ({ memo }) => memo
-      )
-    )
-
-    return (
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-        <Styled.CopyMemoLabel label={intl.formatMessage({ id: 'common.memo' })} textToCopy={memo} />
+  const renderMemo = useMemo(
+    () => (
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', paddingTop: 20 }}>
+        {FP.pipe(
+          oSwapParams,
+          O.fold(
+            () => <Styled.MemoLabel>{intl.formatMessage({ id: 'common.memo' })}</Styled.MemoLabel>,
+            ({ memo }) => <Styled.CopyMemoLabel label={intl.formatMessage({ id: 'common.memo' })} textToCopy={memo} />
+          )
+        )}
       </div>
-    )
-  }, [intl, oSwapParams])
+    ),
+    [intl, oSwapParams]
+  )
   return (
     // Note: Just one Tab to use as same styles as for other views (deposit / wallet)
     <Styled.Tabs
@@ -1485,7 +1509,7 @@ export const Swap = ({
                             <Styled.AssetSelect
                               onSelect={setSourceAsset}
                               asset={asset}
-                              assets={selectAbleSourceAssets}
+                              assets={selectableSourceAssets}
                               network={network}
                             />
 
@@ -1504,7 +1528,10 @@ export const Swap = ({
                   <Styled.ValueItemContainer className="valueItemContainer-percent">
                     <Styled.SliderContainer>{renderSlider}</Styled.SliderContainer>
                     <Styled.SwapOutlinedContainer>
-                      <Styled.SwapOutlined onClick={onSwitchAssets} />
+                      <Styled.SwapOutlined
+                        disabled={disableSwitchAssets}
+                        onClick={!disableSwitchAssets ? () => onSwitchAssets() : undefined}
+                      />
                     </Styled.SwapOutlinedContainer>
                   </Styled.ValueItemContainer>
                   <Styled.ValueItemContainer className="valueItemContainer-target">
@@ -1536,7 +1563,7 @@ export const Swap = ({
                             <Styled.TargetAssetSelect
                               onSelect={setTargetAsset}
                               asset={asset}
-                              assets={selectAbleTargetAssets}
+                              assets={selectableTargetAssets}
                               network={network}
                             />
                             <Styled.CheckButton
@@ -1611,7 +1638,7 @@ export const Swap = ({
                   )
                 ) : (
                   <>
-                    <Styled.NoteLabel align="center">
+                    <Styled.NoteLabel>
                       {!hasImportedKeystore(keystore)
                         ? intl.formatMessage({ id: 'swap.note.nowallet' })
                         : isLocked(keystore) && intl.formatMessage({ id: 'swap.note.lockedWallet' })}

@@ -318,4 +318,5 @@ export const MemoLabel = styled(UILabel)`
   font-size: 12px;
   text-align: center;
   color: ${palette('gray', 1)} !important;
+  cursor: not-allowed;
 `
