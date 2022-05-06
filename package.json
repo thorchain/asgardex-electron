@@ -74,7 +74,7 @@
     "@ledgerhq/hw-app-btc": "6.7.0",
     "@ledgerhq/hw-transport": "^6.24.1",
     "@ledgerhq/hw-transport-node-hid-singleton": "^6.24.1",
-    "@openapitools/openapi-generator-cli": "^2.4.12",
+    "@openapitools/openapi-generator-cli": "^2.5.1",
     "@psf/bitcoincashjs-lib": "^4.0.2",
     "@terra-money/ledger-terra-js": "^1.2.2",
     "@terra-money/terra.js": "^3.0.9",
