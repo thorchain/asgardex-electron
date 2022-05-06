@@ -10084,7 +10084,7 @@ fp-ts-rxjs@^0.6.15:
   resolved "https://registry.yarnpkg.com/fp-ts-rxjs/-/fp-ts-rxjs-0.6.15.tgz#4c53ecaf5e18a82c94e4a43a4cf8148978ef9e6c"
   integrity sha512-5fD4a/439l0aUkSkPq7xnznXYsD7YwGyYANO3v6dkkZJTta36et3bNJ2tzq28UcVR6bS9nTDbP7kMjgQqFFxYQ==
 
-fp-ts@^2.11.5, fp-ts@^2.9.5:
+fp-ts@^2.12.1, fp-ts@^2.9.5:
   version "2.12.1"
   resolved "https://registry.yarnpkg.com/fp-ts/-/fp-ts-2.12.1.tgz#e389488bfd1507af06bd5965e97367edcd4fabad"
   integrity sha512-oxvgqUYR6O9VkKXrxkJ0NOyU0FrE705MeqgBUMEPWyTu6Pwn768cJbHChw2XOBlgFLKfIHxjr2OOBFpv2mUGZw==
