@@ -59,6 +59,7 @@ const ThemeContext = createContext<ThemeContextValue | null>(null)
 
 type Props = {
   theme?: Theme // needed for storybook only
+  children: React.ReactNode
 }
 
 export const ThemeProvider: React.FC<Props> = ({ children, theme }): JSX.Element => {

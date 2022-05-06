@@ -11,7 +11,7 @@ const initialContext: MidgardContextValue = {
 }
 const MidgardContext = createContext<MidgardContextValue | null>(null)
 
-export const MidgardProvider: React.FC = ({ children }): JSX.Element => {
+export const MidgardProvider: React.FC<{ children: React.ReactNode }> = ({ children }): JSX.Element => {
   return <MidgardContext.Provider value={initialContext}>{children}</MidgardContext.Provider>
 }
 

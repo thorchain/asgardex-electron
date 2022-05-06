@@ -15,7 +15,7 @@
 
 ## Internal
 
-- Update npm dependencies (04-25-2022) - (e.g. latest Electron@18.x / latest xchain-\* packages / Node 16.13.x) [#2228](https://github.com/thorchain/asgardex-electron/issues/2228)
+- Update npm dependencies (04-25-2022) - (incl. Electron@18.x, React 18.x, latest xchain-\*, Node 16.13.x etc.) [#2228](https://github.com/thorchain/asgardex-electron/issues/2228)
 
 # 0.14.0 (2022-04-23)
 

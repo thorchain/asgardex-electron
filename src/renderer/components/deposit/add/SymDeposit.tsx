@@ -1307,7 +1307,7 @@ export const SymDeposit: React.FC<Props> = (props) => {
   }, [initialAssetAmountToDepositMax1e8, setAssetAmountToDepositMax1e8])
 
   const onChangeRuneWalletType = useCallback(
-    (walletType) => {
+    (walletType: WalletType) => {
       setRuneLedger(() => isLedgerWallet(walletType))
       setRuneWalletType(walletType)
       resetEnteredAmounts()
@@ -1317,7 +1317,7 @@ export const SymDeposit: React.FC<Props> = (props) => {
   )
 
   const onChangeAssetWalletType = useCallback(
-    (walletType) => {
+    (walletType: WalletType) => {
       setUseAssetLedger(() => isLedgerWallet(walletType))
       setAssetWalletType(walletType)
 

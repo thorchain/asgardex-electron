@@ -41,7 +41,7 @@ export const AppSettings: React.FC<Props> = (props): JSX.Element => {
   const intl = useIntl()
 
   const changeLang: MenuProps['onClick'] = useCallback(
-    ({ key }) => {
+    ({ key }: { key: string }) => {
       changeLocale(key as Locale)
     },
     [changeLocale]
@@ -62,7 +62,7 @@ export const AppSettings: React.FC<Props> = (props): JSX.Element => {
 
   const renderLangMenu = useMemo(
     () => (
-      <Dropdown overlay={langMenu} trigger={['click']} placement="bottomCenter">
+      <Dropdown overlay={langMenu} trigger={['click']} placement="bottom">
         <Styled.DropdownContentWrapper>
           <Row style={{ alignItems: 'center' }}>
             <Styled.MenuItemText>{locale}</Styled.MenuItemText>
@@ -75,7 +75,7 @@ export const AppSettings: React.FC<Props> = (props): JSX.Element => {
   )
 
   const changeNetworkHandler: MenuProps['onClick'] = useCallback(
-    ({ key }) => {
+    ({ key }: { key: string }) => {
       changeNetwork(key as Network)
     },
     [changeNetwork]
@@ -102,7 +102,7 @@ export const AppSettings: React.FC<Props> = (props): JSX.Element => {
 
   const renderNetworkMenu = useMemo(
     () => (
-      <Dropdown overlay={networkMenu} trigger={['click']} placement="bottomCenter">
+      <Dropdown overlay={networkMenu} trigger={['click']} placement="bottom">
         <Styled.DropdownContentWrapper>
           <Row style={{ alignItems: 'center' }}>
             {/* TODO asgdx-team: Revert it back to `network` if we go live with mainnet */}

@@ -43,8 +43,8 @@ export const CurrencyInfo = ({
   const [slipDropdownVisible, setSlipDropdownVisible] = useState(false)
 
   const changeSlipToleranceHandler = useCallback(
-    (slipTolerance) => {
-      localStorage.setItem(SLIP_TOLERANCE_KEY, slipTolerance)
+    (slipTolerance: SlipTolerance) => {
+      localStorage.setItem(SLIP_TOLERANCE_KEY, slipTolerance.toString())
       changeSlipTolerance(slipTolerance)
       setSlipDropdownVisible(false)
     },
@@ -75,7 +75,7 @@ export const CurrencyInfo = ({
         visible={slipDropdownVisible}
         overlay={slipSettings}
         trigger={['click']}
-        placement="bottomCenter">
+        placement="bottom">
         <Styled.DropdownContentWrapper style={{ alignItems: 'center', width: '55px' }}>
           <Styled.SlipLabel active="true">{slipTolerance}%</Styled.SlipLabel>
           <DownIcon />

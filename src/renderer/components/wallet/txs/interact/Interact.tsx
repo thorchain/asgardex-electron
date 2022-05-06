@@ -9,6 +9,7 @@ import * as Styled from './Interact.styles'
 import { InteractType } from './Interact.types'
 
 type Props = {
+  children?: React.ReactNode
   interactType: InteractType
   interactTypeChanged: (type: InteractType) => void
   walletType: WalletType

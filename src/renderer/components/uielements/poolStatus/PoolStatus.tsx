@@ -33,17 +33,17 @@ export const PoolStatus: React.FC<Props> = (props): JSX.Element => {
 
   useCbOnResize(onResizeCb)
 
-  const TooltipContainer: React.FC = useCallback(
-    (props) => {
+  const TooltipContainer: React.FC<{ children: React.ReactNode }> = useCallback(
+    ({ children }: { children: React.ReactNode }) => {
       return !isLoading && (showTooltip || fullValue !== displayValue) ? (
         <Styled.Tooltip title={fullValue}>
-          <span>{props.children}</span>
+          <span>{children}</span>
         </Styled.Tooltip>
       ) : (
-        <>{props.children}</>
+        <>{children}</>
       )
     },
-    [fullValue, showTooltip, displayValue, isLoading]
+    [isLoading, showTooltip, fullValue, displayValue]
   )
 
   return (

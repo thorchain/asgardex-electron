@@ -105,7 +105,7 @@ export const AssetDetails: React.FC<Props> = (props): JSX.Element => {
   }, [currentPage, loadTxsHandler, reloadBalancesHandler])
 
   const onChangePagination = useCallback(
-    (pageNo) => {
+    (pageNo: number) => {
       loadTxsHandler({ limit: MAX_ITEMS_PER_PAGE, offset: (pageNo - 1) * MAX_ITEMS_PER_PAGE })
       setCurrentPage(pageNo)
     },
