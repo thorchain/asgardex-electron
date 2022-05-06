@@ -1,4 +1,5 @@
 module.exports = {
+  staticDirs: ['../public'],
   stories: ['../src/renderer/**/*.stories.@(ts|tsx)'],
   addons: [
     '@storybook/preset-create-react-app',
@@ -8,6 +9,7 @@ module.exports = {
     '@storybook/addon-knobs',
     '@react-theming/storybook-addon/register'
   ],
+  framework: "@storybook/react",
   webpackFinal: async (webpackConfig) => {
     /**
      * CRA doesn't support .mjs files

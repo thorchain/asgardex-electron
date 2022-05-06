@@ -24,7 +24,7 @@
     "generate:types": "yarn clean:types:midgard && yarn generate:types:midgard",
     "generate:types:midgard": "TS_POST_PROCESS_FILE=./node_modules/.bin/prettier openapi-generator-cli generate -i https://testnet.midgard.thorchain.info/v2/swagger.json -g typescript-rxjs -o ./src/renderer/types/generated/midgard --reserved-words-mappings in=in --enable-post-process-file",
     "clean:types:midgard": "rimraf ./src/renderer/types/generated/midgard",
-    "storybook": "start-storybook -p 9009 -s public",
+    "storybook": "start-storybook -p 9009",
     "build-storybook": "build-storybook -s public",
     "analyze": "source-map-explorer 'build/static/js/*.js'",
     "prepare": "husky install"
@@ -135,14 +135,14 @@
   },
   "devDependencies": {
     "@react-theming/storybook-addon": "^1.1.1",
-    "@storybook/addon-actions": "^6.3.12",
-    "@storybook/addon-backgrounds": "^6.3.12",
-    "@storybook/addon-controls": "^6.3.12",
+    "@storybook/addon-actions": "^6.4.22",
+    "@storybook/addon-backgrounds": "^6.4.22",
+    "@storybook/addon-controls": "^6.4.22",
     "@storybook/addon-knobs": "^6.3.1",
-    "@storybook/addon-viewport": "^6.3.12",
-    "@storybook/preset-create-react-app": "^3.2.0",
-    "@storybook/react": "6.1.21",
-    "@storybook/theming": "^6.3.12",
+    "@storybook/addon-viewport": "^6.4.22",
+    "@storybook/preset-create-react-app": "^4.0.1",
+    "@storybook/react": "6.4.22",
+    "@storybook/theming": "^6.4.22",
     "@testing-library/jest-dom": "^5.16.4",
     "@testing-library/react": "^13.2.0",
     "@testing-library/react-hooks": "^8.0.0",
@@ -184,5 +184,9 @@
     "wait-on": "^6.0.1",
     "webpack-cli": "^4.9.2",
     "webpack-node-externals": "^3.0.0"
+  },
+  "resolutions": {
+    "@storybook/react-docgen-typescript-plugin": "1.0.2-canary.253f8c1.0",
+    "react-refresh": "0.11.0"
   }
 }

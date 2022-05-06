@@ -1,5 +1,6 @@
 import React from 'react'
-import { addDecorator } from '@storybook/react/dist/client/preview'
+import { addDecorator } from '@storybook/react'
+import { INITIAL_VIEWPORTS } from '@storybook/addon-viewport';
 import { withThemes } from '@react-theming/storybook-addon'
 import { BrowserRouter as Router, Route } from 'react-router-dom'
 
@@ -34,10 +35,18 @@ const providerFn = ({ theme, children }) => (
   </AppProvider>
 )
 
-addDecorator(withThemes(null, [lightTheme, darkTheme], { providerFn }))
+const _themDecorator = withThemes(null, [lightTheme, darkTheme], { providerFn })
 
-addDecorator((story) => (
+const _routeDecorator = (Story) => (
   <Router>
-    <Route path="/" element={story()} />
+    <Route path="/" element={<Story />} />
   </Router>
-))
+)
+
+export const decorators = [];
+
+export const parameters = {
+  viewport: {
+    viewports: INITIAL_VIEWPORTS,
+  }
+};
