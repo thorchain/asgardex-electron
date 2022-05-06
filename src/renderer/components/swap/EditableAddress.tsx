@@ -73,7 +73,7 @@ export const EditableAddress = ({
   }, [address, form, onChangeEditableAddress, onChangeEditableMode])
 
   const inputOnKeyUpHandler = useCallback(
-    (e) => {
+    (e: React.KeyboardEvent<HTMLElement>) => {
       // Call callback before handling key - in other case result will be lost
       onChangeEditableAddress(form.getFieldValue(RECIPIENT_FIELD))
 

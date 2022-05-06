@@ -184,7 +184,7 @@ const SuccessRouteView: React.FC<Props> = ({ sourceAsset, targetAsset }): JSX.El
   const slipTolerance = useObservableState<SlipTolerance>(slipTolerance$, getStoredSlipTolerance())
 
   const onChangePath = useCallback(
-    (path) => {
+    (path: string) => {
       navigate(path, { replace: true })
     },
     [navigate]

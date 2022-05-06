@@ -41,7 +41,7 @@ const initialContext: TerraContextValue = {
 
 const TerraContext = createContext<TerraContextValue | null>(null)
 
-export const TerraProvider: React.FC = ({ children }): JSX.Element => {
+export const TerraProvider: React.FC<{ children: React.ReactNode }> = ({ children }): JSX.Element => {
   return <TerraContext.Provider value={initialContext}>{children}</TerraContext.Provider>
 }
 

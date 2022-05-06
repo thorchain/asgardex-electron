@@ -54,7 +54,7 @@ export const PoolActionsHistoryTable: React.FC<Props> = ({
     [isDesktopView]
   )
 
-  const renderDateColumn = useCallback((_, { date }: Action) => H.renderDate(date), [])
+  const renderDateColumn = useCallback((_: unknown, { date }: Action) => H.renderDate(date), [])
 
   const dateColumn: ColumnType<Action> = useMemo(
     () => ({

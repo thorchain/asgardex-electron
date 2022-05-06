@@ -16,7 +16,7 @@ type FormValues = {
 storiesOf('Components/input/InputBigNumber', module)
   .add('default', () => {
     const [value, setValue] = React.useState<BigNumber>(bn('0.000001'))
-    const handleChange = useCallback((v) => {
+    const handleChange = useCallback((v: BigNumber) => {
       console.log('onChange:', v.toString())
       setValue(v)
     }, [])
@@ -32,7 +32,7 @@ storiesOf('Components/input/InputBigNumber', module)
   })
   .add('1e8', () => {
     const [value, setValue] = React.useState<BigNumber>(bn('0.00000001'))
-    const handleChange = useCallback((v) => {
+    const handleChange = useCallback((v: BigNumber) => {
       setValue(v)
     }, [])
     return (
@@ -43,7 +43,7 @@ storiesOf('Components/input/InputBigNumber', module)
   })
   .add('1e18', () => {
     const [value, setValue] = React.useState<BigNumber>(bn('0.000000000000000001'))
-    const handleChange = useCallback((v) => {
+    const handleChange = useCallback((v: BigNumber) => {
       setValue(v)
     }, [])
     return (

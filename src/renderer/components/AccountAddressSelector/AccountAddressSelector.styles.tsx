@@ -1,5 +1,5 @@
 import { CaretDownOutlined as CaretDownOutlinedUI } from '@ant-design/icons'
-import { Menu as MenuUI } from 'antd'
+import * as A from 'antd'
 import styled from 'styled-components'
 import { palette } from 'styled-theme'
 
@@ -50,7 +50,7 @@ export const CaretDownOutlined = styled(CaretDownOutlinedUI)`
   color: ${palette('primary', 0)};
 `
 
-export const Menu = styled(MenuUI)`
+export const Menu = styled(A.Menu)`
   background-color: ${palette('background', 0)};
 
   & .ant-dropdown-menu-item {
@@ -66,7 +66,7 @@ export const Menu = styled(MenuUI)`
   }
 `
 
-export const MenuItem = styled(MenuUI.Item)`
+export const MenuItem = styled(A.Menu.Item)`
   padding: 0;
   margin: 0;
 `

@@ -4,6 +4,7 @@ import * as Styled from './PoolShareCard.styles'
 
 type Props = {
   title: string
+  children: React.ReactNode
 }
 
 export const PoolShareCard: React.FC<Props> = ({ title, children }) => {

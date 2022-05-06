@@ -45,7 +45,7 @@ export const WalletTypeSelector: React.FC<Props> = (props): JSX.Element => {
   )
 
   return (
-    <Dropdown overlay={overlay} trigger={['click']} placement="bottomCenter" className={className}>
+    <Dropdown overlay={overlay} trigger={['click']} placement="bottom" className={className}>
       <Styled.TitleWrapper>
         <WalletTypeLabel>{title}</WalletTypeLabel>
         <DownIcon />

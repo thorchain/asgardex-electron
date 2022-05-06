@@ -56,9 +56,10 @@ export const AddressEllipsis: React.FC<Props> = (props): JSX.Element => {
   const prepareEllipse = () => {}
 
   const measuredParent = useCallback(
-    (node) => {
+    (node: HTMLElement | null) => {
       if (node !== null) {
-        const prepareEllipse = () => prepEllipse(node, node.childNodes[0], node.childNodes[1])
+        const prepareEllipse = () =>
+          prepEllipse(node, node.childNodes[0] as HTMLElement, node.childNodes[1] as HTMLElement)
         window.addEventListener('resize', prepareEllipse)
         prepareEllipse()
       }

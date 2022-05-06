@@ -182,7 +182,7 @@ export const HeaderNetStatus: React.FC<Props> = (props): JSX.Element => {
     <Styled.Wrapper>
       {isDesktopView && (
         <Col span={24}>
-          <Dropdown overlay={desktopMenu} trigger={['click']} placement="bottomCenter">
+          <Dropdown overlay={desktopMenu} trigger={['click']} placement="bottom">
             {/* eslint-disable-next-line jsx-a11y/anchor-is-valid */}
             <a className="ant-dropdown-link" onClick={(e) => e.preventDefault()}>
               <Row justify="space-between" align="middle">

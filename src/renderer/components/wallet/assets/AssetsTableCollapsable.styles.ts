@@ -27,6 +27,7 @@ export const HeaderRow = styled(A.Row)`
   font-size: 14px;
   font-family: 'MainFontRegular';
   color: ${palette('gray', 2)};
+  width: 100%;
 `
 
 export const HeaderChainContainer = styled.div`

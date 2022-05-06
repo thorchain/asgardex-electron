@@ -24,12 +24,9 @@ export const ViewTxButton: React.FC<Props> = ({
 }): JSX.Element => {
   const intl = useIntl()
 
-  const onClickHandler = useCallback(
-    (_) => {
-      FP.pipe(oTxHash, O.fold(FP.constUndefined, onClick))
-    },
-    [oTxHash, onClick]
-  )
+  const onClickHandler = useCallback(() => {
+    FP.pipe(oTxHash, O.fold(FP.constUndefined, onClick))
+  }, [oTxHash, onClick])
 
   return (
     <Styled.Wrapper className={className}>

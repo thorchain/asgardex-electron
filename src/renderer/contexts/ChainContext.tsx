@@ -73,7 +73,7 @@ const initialContext: ChainContextValue = {
 }
 const ChainContext = createContext<ChainContextValue | null>(null)
 
-export const ChainProvider: React.FC = ({ children }): JSX.Element => {
+export const ChainProvider: React.FC<{ children: React.ReactNode }> = ({ children }): JSX.Element => {
   return <ChainContext.Provider value={initialContext}>{children}</ChainContext.Provider>
 }
 

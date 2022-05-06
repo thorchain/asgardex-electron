@@ -65,7 +65,7 @@ const initialContext: BinanceContextValue = {
 
 const BinanceContext = createContext<BinanceContextValue | null>(null)
 
-export const BinanceProvider: React.FC = ({ children }): JSX.Element => {
+export const BinanceProvider: React.FC<{ children: React.ReactNode }> = ({ children }): JSX.Element => {
   return <BinanceContext.Provider value={initialContext}>{children}</BinanceContext.Provider>
 }
 

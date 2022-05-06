@@ -63,7 +63,7 @@ export const TxsTable: React.FC<Props> = (props): JSX.Element => {
     [chain, network, walletAddress, intl]
   )
 
-  const renderTypeColumn = useCallback((_, { type }: Tx) => {
+  const renderTypeColumn = useCallback((_: unknown, { type }: Tx) => {
     switch (type) {
       case 'transfer':
         return <Styled.TransferIcon />
@@ -84,7 +84,7 @@ export const TxsTable: React.FC<Props> = (props): JSX.Element => {
   )
 
   const renderFromColumn = useCallback(
-    (_, { from }: Tx) =>
+    (_: unknown, { from }: Tx) =>
       from.map(({ from }, index) => {
         const key = `${from}-${index}`
         return renderAddressWithBreak(from, key)
@@ -106,7 +106,7 @@ export const TxsTable: React.FC<Props> = (props): JSX.Element => {
   )
 
   const renderToColumn = useCallback(
-    (_, { to }: Tx) =>
+    (_: unknown, { to }: Tx) =>
       to.map(({ to }, index) => {
         const key = `${to}-${index}`
         // tag address as FEE in case of sending a tx to reserve module
@@ -132,7 +132,7 @@ export const TxsTable: React.FC<Props> = (props): JSX.Element => {
   )
 
   const renderDateColumn = useCallback(
-    (_, { date }: Tx) => (
+    (_: unknown, { date }: Tx) => (
       <Row gutter={[8, 0]}>
         <Col>
           <Styled.Text>
@@ -163,7 +163,7 @@ export const TxsTable: React.FC<Props> = (props): JSX.Element => {
   )
 
   const renderAmountColumn = useCallback(
-    (_, { to }: Tx) =>
+    (_: unknown, { to }: Tx) =>
       to.map(({ amount, to }, index) => {
         const key = `${to}-${index}`
         const text = formatAssetAmount({ amount: baseToAsset(amount), trimZeros: true })

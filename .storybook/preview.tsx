@@ -38,6 +38,6 @@ addDecorator(withThemes(null, [lightTheme, darkTheme], { providerFn }))
 
 addDecorator((story) => (
   <Router>
-    <Route path="/" component={() => story()} />
+    <Route path="/" element={story()} />
   </Router>
 ))

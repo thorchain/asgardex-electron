@@ -380,7 +380,7 @@ export const SendFormTERRA: React.FC<Props> = (props): JSX.Element => {
   }, [maxAmount, reloadFees])
 
   const changeFeeHandler: MenuProps['onClick'] = useCallback(
-    ({ key: assetAsString }) => {
+    ({ key: assetAsString }: { key: string }) => {
       FP.pipe(
         assetAsString,
         assetFromString,
@@ -422,7 +422,7 @@ export const SendFormTERRA: React.FC<Props> = (props): JSX.Element => {
         <Styled.CustomLabel size="big" style={{ width: 'auto' }}>
           {intl.formatMessage({ id: 'common.fee.asset' })}
         </Styled.CustomLabel>
-        <Dropdown overlay={feeAssetMenu} trigger={['click']} placement="bottomCenter">
+        <Dropdown overlay={feeAssetMenu} trigger={['click']} placement="bottom">
           <CStyled.DropdownContentWrapper>
             <Row align="middle">
               <AssetIcon size="xsmall" asset={feeAsset} network={network} />

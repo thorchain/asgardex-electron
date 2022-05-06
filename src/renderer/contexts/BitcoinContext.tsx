@@ -68,7 +68,7 @@ const initialContext: BitcoinContextValue = {
 
 const BitcoinContext = createContext<BitcoinContextValue | null>(null)
 
-export const BitcoinProvider: React.FC = ({ children }): JSX.Element => {
+export const BitcoinProvider: React.FC<{ children: React.ReactNode }> = ({ children }): JSX.Element => {
   return <BitcoinContext.Provider value={initialContext}>{children}</BitcoinContext.Provider>
 }
 

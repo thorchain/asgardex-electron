@@ -31,7 +31,7 @@ export const HeaderPriceSelector: React.FC<Props> = (props): JSX.Element => {
   const { assets, selectedAsset, isDesktopView, disabled = false, changeHandler = (_) => {} } = props
 
   const changeItem: MenuProps['onClick'] = useCallback(
-    (param) => FP.pipe(param.key, assetFromString, O.fromNullable, O.map(changeHandler)),
+    ({ key }: { key: string }) => FP.pipe(key, assetFromString, O.fromNullable, O.map(changeHandler)),
     [changeHandler]
   )
 
@@ -61,7 +61,7 @@ export const HeaderPriceSelector: React.FC<Props> = (props): JSX.Element => {
 
   return (
     <Styled.Wrapper>
-      <Dropdown disabled={disabled} overlay={menu} trigger={['click']} placement="bottomCenter">
+      <Dropdown disabled={disabled} overlay={menu} trigger={['click']} placement="bottom">
         <HeaderDropdownContentWrapper>
           {!isDesktopView && <HeaderDropdownTitle>Currency</HeaderDropdownTitle>}
           <Row style={{ alignItems: 'center' }}>

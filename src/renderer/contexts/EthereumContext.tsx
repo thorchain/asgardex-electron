@@ -62,7 +62,7 @@ const initialContext: EthereumContextValue = {
 
 const EthereumContext = createContext<EthereumContextValue | null>(null)
 
-export const EthereumProvider: React.FC = ({ children }): JSX.Element => {
+export const EthereumProvider: React.FC<{ children: React.ReactNode }> = ({ children }): JSX.Element => {
   return <EthereumContext.Provider value={initialContext}>{children}</EthereumContext.Provider>
 }
 

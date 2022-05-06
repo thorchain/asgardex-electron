@@ -53,7 +53,7 @@ export const AssetSelect: React.FC<Props> = (props): JSX.Element => {
   }
 
   const handleChangeAsset = useCallback(
-    async (asset) => {
+    async (asset: Asset) => {
       setOpenDropdown(false)
 
       // Wait for the dropdown to close
@@ -98,7 +98,7 @@ export const AssetSelect: React.FC<Props> = (props): JSX.Element => {
       className={`${className} ${openDropdown ? 'selected' : ''}`}
       disabled={disableButton}
       onClick={handleDropdownButtonClicked}>
-      <Dropdown overlay={renderMenu} trigger={[]} visible={openDropdown} placement="bottomCenter">
+      <Dropdown overlay={renderMenu} trigger={[]} visible={openDropdown} placement="bottom">
         <>
           <AssetData noTicker={!showAssetName} className={'asset-data'} asset={asset} network={network} />
           <Styled.AssetDropdownButton>

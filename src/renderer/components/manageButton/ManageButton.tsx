@@ -27,7 +27,7 @@ export const ManageButton: React.FC<Props> = ({
   const navigate = useNavigate()
 
   const onClick = useCallback(
-    (event) => {
+    (event: React.MouseEvent<HTMLElement, MouseEvent>) => {
       event.preventDefault()
       event.stopPropagation()
       navigate(poolsRoutes.deposit.path({ asset: assetToString(asset) }))
