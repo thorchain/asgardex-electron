@@ -11,6 +11,7 @@ import { useIntl } from 'react-intl'
 import { useLocation, useNavigate, useParams } from 'react-router-dom'
 import * as RxOp from 'rxjs/operators'
 
+import { Network } from '../../../shared/api/types'
 import { SLIP_TOLERANCE_KEY } from '../../components/currency/CurrencyInfo'
 import { ErrorView } from '../../components/shared/error/'
 import { Swap } from '../../components/swap'
@@ -115,25 +116,25 @@ const SuccessRouteView: React.FC<Props> = ({ sourceAsset, targetAsset }): JSX.El
 
   const selectedPoolAddress = useObservableState(selectedPoolAddress$, O.none)
 
-  const [oSourceKeystoreAddress, sourceKeystoreAddressChain$] = useObservableState<O.Option<Address>, Chain>(
+  const [oSourceKeystoreAddress, updateSourceKeystoreAddress$] = useObservableState<O.Option<Address>, Chain>(
     (sourceChain$) =>
       FP.pipe(sourceChain$, RxOp.switchMap(addressByChain$), RxOp.map(addressFromOptionalWalletAddress)),
     O.none
   )
 
   useEffect(() => {
-    sourceKeystoreAddressChain$(sourceChain)
-  }, [sourceChain, sourceKeystoreAddressChain$])
+    updateSourceKeystoreAddress$(sourceChain)
+  }, [sourceChain, updateSourceKeystoreAddress$])
 
-  const [oTargetKeystoreAddress, targetKeystoreAddressChain$] = useObservableState<O.Option<Address>, Chain>(
+  const [oTargetKeystoreAddress, updateTargetKeystoreAddress$] = useObservableState<O.Option<Address>, Chain>(
     (targetChain$) =>
       FP.pipe(targetChain$, RxOp.switchMap(addressByChain$), RxOp.map(addressFromOptionalWalletAddress)),
     O.none
   )
 
   useEffect(() => {
-    targetKeystoreAddressChain$(targetChain)
-  }, [targetChain, targetKeystoreAddressChain$])
+    updateTargetKeystoreAddress$(targetChain)
+  }, [targetChain, updateTargetKeystoreAddress$])
 
   const { openExplorerTxUrl, getExplorerTxUrl } = useOpenExplorerTxUrl(O.some(THORChain))
 
@@ -204,11 +205,14 @@ const SuccessRouteView: React.FC<Props> = ({ sourceAsset, targetAsset }): JSX.El
     [targetAssetRD]
   )
 
-  const [oSourceLedgerAddress, sourceLedgerAddressChain$] = useObservableState<O.Option<Address>, Chain>(
+  const [oSourceLedgerAddress, updateSourceLedgerAddress$] = useObservableState<
+    O.Option<Address>,
+    { chain: Chain; network: Network }
+  >(
     (sourceLedgerAddressChain$) =>
       FP.pipe(
         sourceLedgerAddressChain$,
-        RxOp.switchMap((chain) => getLedgerAddress$(chain, network)),
+        RxOp.switchMap(({ chain, network }) => getLedgerAddress$(chain, network)),
         RxOp.map((rdAddress) => RD.toOption(rdAddress)),
         RxOp.map(addressFromOptionalWalletAddress)
       ),
@@ -216,14 +220,17 @@ const SuccessRouteView: React.FC<Props> = ({ sourceAsset, targetAsset }): JSX.El
   )
 
   useEffect(() => {
-    sourceLedgerAddressChain$(sourceChain)
-  }, [sourceChain, sourceLedgerAddressChain$])
+    updateSourceLedgerAddress$({ chain: sourceChain, network })
+  }, [network, sourceChain, updateSourceLedgerAddress$])
 
-  const [oTargetLedgerAddress, targetLedgerAddressChain$] = useObservableState<O.Option<Address>, Chain>(
+  const [oTargetLedgerAddress, updateTargetLedgerAddress$] = useObservableState<
+    O.Option<Address>,
+    { chain: Chain; network: Network }
+  >(
     (targetLedgerAddressChain$) =>
       FP.pipe(
         targetLedgerAddressChain$,
-        RxOp.switchMap((chain) => getLedgerAddress$(chain, network)),
+        RxOp.switchMap(({ chain, network }) => getLedgerAddress$(chain, network)),
         RxOp.map((rdAddress) => RD.toOption(rdAddress)),
         RxOp.map(addressFromOptionalWalletAddress)
       ),
@@ -231,8 +238,8 @@ const SuccessRouteView: React.FC<Props> = ({ sourceAsset, targetAsset }): JSX.El
   )
 
   useEffect(() => {
-    targetLedgerAddressChain$(targetChain)
-  }, [targetChain, targetLedgerAddressChain$])
+    updateTargetLedgerAddress$({ chain: targetChain, network })
+  }, [network, targetChain, updateTargetLedgerAddress$])
 
   const { validateSwapAddress } = useValidateAddress(targetAssetChain)
   const openAddressUrl = useOpenAddressUrl(targetAssetChain)
