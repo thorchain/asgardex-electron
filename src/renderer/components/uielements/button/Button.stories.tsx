@@ -1,8 +1,9 @@
 import React from 'react'
 
 import { ArrowRightOutlined } from '@ant-design/icons'
-import { text, radios, boolean } from '@storybook/addon-knobs'
-import { RadiosTypeOptionsProp } from '@storybook/addon-knobs/dist/components/types'
+// TODO (@veado) Replace knobs
+// import { text, radios, boolean } from '@storybook/addon-knobs'
+// import { RadiosTypeOptionsProp } from '@storybook/addon-knobs/dist/components/types'
 import { storiesOf } from '@storybook/react'
 import { Row } from 'antd'
 import styled from 'styled-components'
@@ -138,35 +139,42 @@ storiesOf('Components/button/Button', module)
     )
   })
   .add('properties', () => {
-    const buttonText = text('Button Text', 'button')
-    const sizeOptions: RadiosTypeOptionsProp<ButtonSize> = {
-      small: 'small',
-      normal: 'normal',
-      xnormal: 'xnormal',
-      big: 'big'
-    }
+    //   const buttonText = text('Button Text', 'button')
+    //   const sizeOptions: RadiosTypeOptionsProp<ButtonSize> = {
+    //     small: 'small',
+    //     normal: 'normal',
+    //     xnormal: 'xnormal',
+    //     big: 'big'
+    //   }
 
-    const colorOptions: RadiosTypeOptionsProp<ButtonColor> = {
-      primary: 'primary',
-      success: 'success',
-      warning: 'warning',
-      error: 'error'
-    }
+    //   const colorOptions: RadiosTypeOptionsProp<ButtonColor> = {
+    //     primary: 'primary',
+    //     success: 'success',
+    //     warning: 'warning',
+    //     error: 'error'
+    //   }
 
-    const typeOptions: RadiosTypeOptionsProp<ButtonType> = {
-      default: 'default',
-      outline: 'outline',
-      normal: 'normal',
-      ghost: 'ghost',
-      transparent: 'transparent',
-      underline: 'underline'
-    }
+    //   const typeOptions: RadiosTypeOptionsProp<ButtonType> = {
+    //     default: 'default',
+    //     outline: 'outline',
+    //     normal: 'normal',
+    //     ghost: 'ghost',
+    //     transparent: 'transparent',
+    //     underline: 'underline'
+    //   }
 
-    const size = radios('size', sizeOptions, 'normal')
-    const color = radios('color', colorOptions, 'primary')
-    const type = radios('type', typeOptions, 'default')
-    const focused = boolean('focused', false)
-    const loading = boolean('loading', false)
+    //   const size = radios('size', sizeOptions, 'normal')
+    //   const color = radios('color', colorOptions, 'primary')
+    //   const type = radios('type', typeOptions, 'default')
+    //   const focused = boolean('focused', false)
+    //   const loading = boolean('loading', false)
+
+    const size: ButtonSize = 'normal'
+    const color: ButtonColor = 'primary'
+    const type: ButtonType = 'default'
+    const focused = false
+    const loading = false
+    const buttonText = 'Button label'
 
     return (
       <Button sizevalue={size} color={color} typevalue={type} focused={focused} loading={loading}>
