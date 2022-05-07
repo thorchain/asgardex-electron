@@ -2,12 +2,8 @@ module.exports = {
   staticDirs: ['../public'],
   stories: ['../src/renderer/**/*.stories.@(ts|tsx)'],
   addons: [
+    "@storybook/addon-essentials",
     '@storybook/preset-create-react-app',
-    '@storybook/addon-controls',
-    '@storybook/addon-viewport',
-    '@storybook/addon-actions',
-    '@storybook/addon-knobs',
-    '@react-theming/storybook-addon/register'
   ],
   framework: "@storybook/react",
   webpackFinal: async (webpackConfig) => {
@@ -59,7 +55,7 @@ module.exports = {
    * ```
    * @see https://github.com/styleguidist/react-docgen-typescript/issues/356#issuecomment-850400428
    */
-  typescript: {
-    reactDocgen: 'react-docgen'
-  }
+  // typescript: {
+  //   reactDocgen: 'react-docgen'
+  // }
 }

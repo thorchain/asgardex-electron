@@ -1,7 +1,5 @@
 import React from 'react'
-import { addDecorator } from '@storybook/react'
 import { INITIAL_VIEWPORTS } from '@storybook/addon-viewport';
-import { withThemes } from '@react-theming/storybook-addon'
 import { BrowserRouter as Router, Route } from 'react-router-dom'
 
 import { AppProvider } from '../src/renderer/contexts/AppContext'
@@ -35,18 +33,20 @@ const providerFn = ({ theme, children }) => (
   </AppProvider>
 )
 
-const _themDecorator = withThemes(null, [lightTheme, darkTheme], { providerFn })
+// const _themDecorator = withThemes(null, [lightTheme, darkTheme], { providerFn })
 
-const _routeDecorator = (Story) => (
+// Creates a `Router` decorator
+// based on https://storybook.js.org/docs/react/essentials/toolbars-and-globals#create-a-decorator
+const withRouter = (Story, context) => (
   <Router>
-    <Route path="/" element={<Story />} />
+    <Route path="/" element={<Story {...context} />} />
   </Router>
 )
 
-export const decorators = [];
+export const decorators = [withRouter];
 
 export const parameters = {
   viewport: {
-    viewports: INITIAL_VIEWPORTS,
+    viewports: INITIAL_VIEWPORTS
   }
 };
