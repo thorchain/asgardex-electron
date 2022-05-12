@@ -548,6 +548,15 @@ export const createBalancesService = ({
   })
 
   /**
+   * ETH Ledger balances
+   */
+  const ethLedgerChainBalance$: ChainBalance$ = ledgerChainBalance$({
+    chain: ETHChain,
+    walletBalanceType: 'all',
+    getBalanceByAddress$: ETH.getBalanceByAddress$
+  })
+
+  /**
    * List of `ChainBalances` for all available chains (order is important)
    *
    * It includes keystore + Ledger balances
@@ -560,7 +569,7 @@ export const createBalancesService = ({
         // for BTC we store `confirmed` or `all` (confirmed + unconfirmed) balances
         BTC: [btcChainBalance$, btcChainBalanceConfirmed$, btcLedgerChainBalance$, btcLedgerChainBalanceConfirmed$],
         BCH: [bchChainBalance$, bchLedgerChainBalance$],
-        ETH: [ethChainBalance$],
+        ETH: [ethChainBalance$, ethLedgerChainBalance$],
         BNB: [bnbChainBalance$, bnbLedgerChainBalance$],
         LTC: [ltcBalance$, ltcLedgerChainBalance$],
         DOGE: [dogeChainBalance$, dogeLedgerChainBalance$],

@@ -46,4 +46,7 @@ const balances$: ({
   )
 }
 
-export { reloadBalances, balances$, reloadBalances$, resetReloadBalances }
+// State of balances loaded by Client and Address
+const getBalanceByAddress$ = C.balancesByAddress$({ client$, trigger$: reloadBalances$, walletBalanceType: 'all' })
+
+export { reloadBalances, balances$, reloadBalances$, resetReloadBalances, getBalanceByAddress$ }
