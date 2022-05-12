@@ -45,7 +45,8 @@ import {
   isBtcChain,
   isLtcChain,
   isThorChain,
-  isTerraChain
+  isTerraChain,
+  isEthChain
 } from '../../helpers/chainHelper'
 import { sequenceTOptionFromArray } from '../../helpers/fpHelpers'
 import { useLedger } from '../../hooks/useLedger'
@@ -132,6 +133,13 @@ export const WalletSettingsView: React.FC = (): JSX.Element => {
     removeAddress: removeLedgerTerraAddress
   } = useLedger(TerraChain)
 
+  const {
+    askAddress: askLedgerEthAddress,
+    verifyAddress: verifyLedgerEthAddress,
+    address: ethLedgerAddressRD,
+    removeAddress: removeLedgerEthAddress
+  } = useLedger(ETHChain)
+
   const addLedgerAddressHandler = (chain: Chain, walletIndex: number) => {
     if (isThorChain(chain)) return askLedgerThorAddress(walletIndex)
     if (isBnbChain(chain)) return askLedgerBnbAddress(walletIndex)
@@ -140,6 +148,7 @@ export const WalletSettingsView: React.FC = (): JSX.Element => {
     if (isBchChain(chain)) return askLedgerBchAddress(walletIndex)
     if (isDogeChain(chain)) return askLedgerDOGEAddress(walletIndex)
     if (isTerraChain(chain)) return askLedgerTerraAddress(walletIndex)
+    if (isEthChain(chain)) return askLedgerEthAddress(walletIndex)
 
     return FP.constVoid
   }
@@ -152,6 +161,7 @@ export const WalletSettingsView: React.FC = (): JSX.Element => {
     if (isBchChain(chain)) return verifyLedgerBchAddress(walletIndex)
     if (isDogeChain(chain)) return verifyLedgerDOGEAddress(walletIndex)
     if (isTerraChain(chain)) return verifyLedgerTerraAddress(walletIndex)
+    if (isEthChain(chain)) return verifyLedgerEthAddress(walletIndex)
 
     return false
   }
@@ -164,6 +174,7 @@ export const WalletSettingsView: React.FC = (): JSX.Element => {
     if (isBchChain(chain)) return removeLedgerBchAddress()
     if (isDogeChain(chain)) return removeLedgerDOGEAddress()
     if (isTerraChain(chain)) return removeLedgerTerraAddress()
+    if (isEthChain(chain)) return removeLedgerEthAddress()
 
     return FP.constVoid
   }
@@ -292,6 +303,17 @@ export const WalletSettingsView: React.FC = (): JSX.Element => {
     [intl, terraLedgerAddressRD]
   )
 
+  const ethLedgerWalletAddress: WalletAddressAsync = useMemo(
+    () => ({
+      type: 'ledger',
+      address: FP.pipe(
+        ethLedgerAddressRD,
+        RD.mapLeft(({ errorId, msg }) => Error(`${ledgerErrorIdToI18n(errorId, intl)} (${msg})`))
+      )
+    }),
+    [intl, ethLedgerAddressRD]
+  )
+
   const walletAccounts$ = useMemo(() => {
     const thorWalletAccount$ = walletAccount$({
       addressUI$: thorAddressUI$,
@@ -303,7 +325,11 @@ export const WalletSettingsView: React.FC = (): JSX.Element => {
       ledgerAddress: btcLedgerWalletAddress,
       chain: BTCChain
     })
-    const ethWalletAccount$ = walletAccount$({ addressUI$: ethAddressUI$, chain: ETHChain })
+    const ethWalletAccount$ = walletAccount$({
+      addressUI$: ethAddressUI$,
+      ledgerAddress: ethLedgerWalletAddress,
+      chain: ETHChain
+    })
     const bnbWalletAccount$ = walletAccount$({
       addressUI$: bnbAddressUI$,
       ledgerAddress: bnbLedgerWalletAddress,
@@ -362,7 +388,9 @@ export const WalletSettingsView: React.FC = (): JSX.Element => {
     dogeAddressUI$,
     dogeLedgerWalletAddress,
     terraAddressUI$,
-    terraLedgerWalletAddress
+    terraLedgerWalletAddress,
+    ethAddressUI$,
+    ethLedgerWalletAddress
   ])
   const walletAccounts = useObservableState(walletAccounts$, O.none)
 

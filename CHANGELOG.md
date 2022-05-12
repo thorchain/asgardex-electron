@@ -1,3 +1,9 @@
+# 0.15.0 (2022-xx-xx)
+
+## Add
+
+- [Ledger] Support ETH/ERC20 [#2255](https://github.com/thorchain/asgardex-electron/issues/2255)
+
 # 0.14.1 (2022-05-07)
 
 ## Update
