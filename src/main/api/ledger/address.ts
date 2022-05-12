@@ -1,5 +1,14 @@
 import TransportNodeHidSingleton from '@ledgerhq/hw-transport-node-hid-singleton'
-import { BCHChain, BNBChain, BTCChain, DOGEChain, LTCChain, TerraChain, THORChain } from '@xchainjs/xchain-util'
+import {
+  BCHChain,
+  BNBChain,
+  BTCChain,
+  DOGEChain,
+  ETHChain,
+  LTCChain,
+  TerraChain,
+  THORChain
+} from '@xchainjs/xchain-util'
 import * as E from 'fp-ts/Either'
 
 import { IPCLedgerAdddressParams, LedgerError, LedgerErrorId } from '../../../shared/api/types'
@@ -9,6 +18,7 @@ import { getAddress as getBNBAddress, verifyAddress as verifyBNBAddress } from '
 import { getAddress as getBTCAddress, verifyAddress as verifyBTCAddress } from './bitcoin/address'
 import { getAddress as getBCHAddress, verifyAddress as verifyBCHAddress } from './bitcoincash/address'
 import { getAddress as getDOGEAddress, verifyAddress as verifyDOGEAddress } from './doge/address'
+import { getAddress as getETHAddress, verifyAddress as verifyETHAddress } from './ethereum/address'
 import { getAddress as getLTCAddress, verifyAddress as verifyLTCAddress } from './litecoin/address'
 import { getAddress as getTerraAddress, verifyAddress as verifyTerraAddress } from './terra/address'
 import { getAddress as getTHORAddress, verifyAddress as verifyTHORAddress } from './thorchain/address'
@@ -42,6 +52,9 @@ export const getAddress = async ({
         break
       case TerraChain:
         res = await getTerraAddress(transport, walletIndex)
+        break
+      case ETHChain:
+        res = await getETHAddress(transport, walletIndex)
         break
       default:
         res = E.left({
@@ -83,6 +96,9 @@ export const verifyLedgerAddress = async ({ chain, network, walletIndex }: IPCLe
       break
     case TerraChain:
       result = await verifyTerraAddress(transport, walletIndex)
+      break
+    case ETHChain:
+      result = await verifyETHAddress(transport, walletIndex)
       break
     default:
       throw Error(`verifyAddress for ${chain} has not been implemented`)
