@@ -38,7 +38,7 @@ import {
 } from '../../../helpers/assetHelper'
 import { getChainAsset, isEthChain } from '../../../helpers/chainHelper'
 import { unionAssets } from '../../../helpers/fp/array'
-import { eqBaseAmount, eqOAsset, eqOApproveParams, eqOString } from '../../../helpers/fp/eq'
+import { eqBaseAmount, eqOAsset, eqOApproveParams } from '../../../helpers/fp/eq'
 import { sequenceSOption, sequenceTOption } from '../../../helpers/fpHelpers'
 import * as PoolHelpers from '../../../helpers/poolHelper'
 import { liveData, LiveData } from '../../../helpers/rx/liveData'
@@ -382,21 +382,40 @@ export const SymDeposit: React.FC<Props> = (props) => {
     [oChainAssetBalance]
   )
 
+  const needApprovement = useMemo(() => {
+    // Other chains than ETH do not need an approvement
+    if (!isEthChain(asset.chain)) return false
+    // ETH does not need to be approved
+    if (isEthAsset(asset)) return false
+    // ERC20 token does need approvement only
+    return isEthTokenAsset(asset)
+  }, [asset])
+
   const oApproveParams: O.Option<ApproveParams> = useMemo(() => {
     const oRouterAddress: O.Option<Address> = FP.pipe(
       oPoolAddress,
       O.chain(({ router }) => router)
     )
     const oTokenAddress: O.Option<string> = getEthTokenAddress(asset)
+
+    const oNeedApprovement: O.Option<boolean> = FP.pipe(
+      needApprovement,
+      // `None` if needApprovement is `false`, no request then
+      O.fromPredicate((v) => !!v)
+    )
+
     return FP.pipe(
-      sequenceTOption(oTokenAddress, oRouterAddress),
-      O.map(([tokenAddress, routerAddress]) => ({
+      sequenceTOption(oNeedApprovement, oTokenAddress, oRouterAddress, oAssetWB),
+      O.map(([_, tokenAddress, routerAddress, { walletAddress, walletIndex, walletType }]) => ({
         network,
         spenderAddress: routerAddress,
-        contractAddress: tokenAddress
+        contractAddress: tokenAddress,
+        fromAddress: walletAddress,
+        walletIndex,
+        walletType
       }))
     )
-  }, [oPoolAddress, asset, network])
+  }, [oPoolAddress, asset, needApprovement, oAssetWB, network])
 
   const zeroDepositFees: SymDepositFees = useMemo(() => getZeroSymDepositFees(asset), [asset])
 
@@ -503,6 +522,26 @@ export const SymDeposit: React.FC<Props> = (props) => {
     [approveFeeRD]
   )
 
+  // State for values of `isApprovedERC20Token$`
+  const {
+    state: isApprovedState,
+    reset: resetIsApprovedState,
+    subscribe: subscribeIsApprovedState
+  } = useSubscriptionState<IsApprovedRD>(RD.initial)
+
+  const checkApprovedStatus = useCallback(
+    ({ contractAddress, spenderAddress, walletIndex }: ApproveParams) => {
+      subscribeIsApprovedState(
+        isApprovedERC20Token$({
+          contractAddress,
+          spenderAddress,
+          walletIndex
+        })
+      )
+    },
+    [isApprovedERC20Token$, subscribeIsApprovedState]
+  )
+
   // Update `approveFeesRD` whenever `oApproveParams` has been changed
   useEffect(() => {
     FP.pipe(
@@ -514,10 +553,14 @@ export const SymDeposit: React.FC<Props> = (props) => {
         prevApproveParams.current = O.some(params)
         return params
       }),
-      // Trigger update for `approveFeesRD`
-      O.map(approveFeesParamsUpdated)
+      // Trigger update for `approveFeesRD` + `checkApprove`
+      O.map((params) => {
+        approveFeesParamsUpdated(params)
+        checkApprovedStatus(params)
+        return true
+      })
     )
-  }, [approveFeesParamsUpdated, oApproveParams, oPoolAddress])
+  }, [approveFeesParamsUpdated, checkApprovedStatus, oApproveParams, oPoolAddress])
 
   const reloadApproveFeesHandler = useCallback(() => {
     FP.pipe(oApproveParams, O.map(reloadApproveFee))
@@ -1009,15 +1052,6 @@ export const SymDeposit: React.FC<Props> = (props) => {
     [depositFeesRD, asset]
   )
 
-  const needApprovement = useMemo(() => {
-    // Other chains than ETH do not need an approvement
-    if (!isEthChain(asset.chain)) return false
-    // ETH does not need to be approved
-    if (isEthAsset(asset)) return false
-    // ERC20 token does need approvement only
-    return isEthTokenAsset(asset)
-  }, [asset])
-
   const uiApproveFeesRD: UIFeesRD = useMemo(
     () =>
       FP.pipe(
@@ -1074,13 +1108,16 @@ export const SymDeposit: React.FC<Props> = (props) => {
     )
 
     FP.pipe(
-      sequenceTOption(oRouterAddress, getEthTokenAddress(asset)),
-      O.map(([routerAddress, tokenAddress]) =>
+      sequenceTOption(oRouterAddress, getEthTokenAddress(asset), oAssetWB),
+      O.map(([routerAddress, tokenAddress, { walletIndex, walletType, walletAddress }]) =>
         subscribeApproveState(
           approveERC20Token$({
             network,
             contractAddress: tokenAddress,
-            spenderAddress: routerAddress
+            spenderAddress: routerAddress,
+            fromAddress: walletAddress,
+            walletIndex,
+            walletType
           })
         )
       )
@@ -1101,13 +1138,6 @@ export const SymDeposit: React.FC<Props> = (props) => {
     [approveState]
   )
 
-  // State for values of `isApprovedERC20Token$`
-  const {
-    state: isApprovedState,
-    reset: resetIsApprovedState,
-    subscribe: subscribeIsApprovedState
-  } = useSubscriptionState<IsApprovedRD>(RD.initial)
-
   const isApproved = useMemo(
     () =>
       !needApprovement ||
@@ -1127,31 +1157,6 @@ export const SymDeposit: React.FC<Props> = (props) => {
     // ignore initial + loading states for `isApprovedState`
     return RD.isPending(isApprovedState)
   }, [isApprovedState, needApprovement])
-
-  const checkApprovedStatus = useCallback(
-    (routerAddress: string) => {
-      const oNeedApprovement: O.Option<boolean> = FP.pipe(
-        needApprovement,
-        // `None` if needApprovement is `false`, no request then
-        O.fromPredicate((v) => !!v)
-      )
-
-      const oTokenAddress: O.Option<string> = getEthTokenAddress(asset)
-      // check approve status
-      FP.pipe(
-        sequenceTOption(oNeedApprovement, oTokenAddress),
-        O.map(([_, tokenAddress]) =>
-          subscribeIsApprovedState(
-            isApprovedERC20Token$({
-              contractAddress: tokenAddress,
-              spenderAddress: routerAddress
-            })
-          )
-        )
-      )
-    },
-    [asset, isApprovedERC20Token$, needApprovement, subscribeIsApprovedState]
-  )
 
   const checkIsApprovedError = useMemo(() => {
     // ignore error check if we don't need to check allowance
@@ -1325,25 +1330,6 @@ export const SymDeposit: React.FC<Props> = (props) => {
     },
     [resetEnteredAmounts, setAssetWalletType]
   )
-
-  const prevRouterAddress = useRef<O.Option<Address>>(O.none)
-
-  // Run `checkApprovedStatus` whenever `oPoolAddress` has been changed
-  useEffect(() => {
-    FP.pipe(
-      oPoolAddress,
-      O.chain(({ router }) => router),
-      // Do nothing if prev. and current router a the same
-      O.filter((router) => !eqOString.equals(O.some(router), prevRouterAddress.current)),
-      // update ref
-      O.map((router) => {
-        prevRouterAddress.current = O.some(router)
-        return router
-      }),
-      // check allowance status
-      O.map(checkApprovedStatus)
-    )
-  }, [checkApprovedStatus, oPoolAddress])
 
   useEffect(() => {
     if (!eqOAsset.equals(prevAsset.current, O.some(asset))) {

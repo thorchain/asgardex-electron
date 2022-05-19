@@ -508,6 +508,17 @@ export const Swap = ({
 
   const isCausedSlippage = useMemo(() => swapData.slip.toNumber() > slipTolerance, [swapData.slip, slipTolerance])
 
+  const needApprovement = useMemo(() => {
+    // not needed for users with locked or not imported wallets
+    if (!hasImportedKeystore(keystore) || isLocked(keystore)) return false
+    // Other chains than ETH do not need an approvement
+    if (!isEthChain(sourceChainAsset.chain)) return false
+    // ETH does not need to be approved
+    if (isEthAsset(sourceAssetProp)) return false
+    // ERC20 token does need approvement only
+    return isEthTokenAsset(sourceAssetProp)
+  }, [keystore, sourceAssetProp, sourceChainAsset.chain])
+
   const oApproveParams: O.Option<ApproveParams> = useMemo(() => {
     const oRouterAddress: O.Option<Address> = FP.pipe(
       oPoolAddress,
@@ -515,15 +526,24 @@ export const Swap = ({
     )
     const oTokenAddress: O.Option<string> = getEthTokenAddress(sourceAssetProp)
 
+    const oNeedApprovement: O.Option<boolean> = FP.pipe(
+      needApprovement,
+      // `None` if needApprovement is `false`, no request then
+      O.fromPredicate((v) => !!v)
+    )
+
     return FP.pipe(
-      sequenceTOption(oTokenAddress, oRouterAddress),
-      O.map(([tokenAddress, routerAddress]) => ({
+      sequenceTOption(oNeedApprovement, oTokenAddress, oRouterAddress, oSourceAssetWB),
+      O.map(([_, tokenAddress, routerAddress, { walletAddress, walletIndex, walletType }]) => ({
         network,
         spenderAddress: routerAddress,
-        contractAddress: tokenAddress
+        contractAddress: tokenAddress,
+        fromAddress: walletAddress,
+        walletIndex,
+        walletType
       }))
     )
-  }, [network, oPoolAddress, sourceAssetProp])
+  }, [needApprovement, network, oPoolAddress, oSourceAssetWB, sourceAssetProp])
 
   // Reload balances at `onMount`
   useEffect(() => {
@@ -568,8 +588,29 @@ export const Swap = ({
     [approveFeeRD]
   )
 
+  // State for values of `isApprovedERC20Token$`
+  const {
+    state: isApprovedState,
+    reset: resetIsApprovedState,
+    subscribe: subscribeIsApprovedState
+  } = useSubscriptionState<IsApprovedRD>(RD.initial)
+
+  const checkApprovedStatus = useCallback(
+    ({ contractAddress, spenderAddress, walletIndex }: ApproveParams) => {
+      subscribeIsApprovedState(
+        isApprovedERC20Token$({
+          contractAddress,
+          spenderAddress,
+          walletIndex
+        })
+      )
+    },
+    [isApprovedERC20Token$, subscribeIsApprovedState]
+  )
+
   // whenever `oApproveParams` has been updated,
   // `approveFeeParamsUpdated` needs to be called to update `approveFeesRD`
+  // + `checkApprovedStatus` needs to be called
   useEffect(() => {
     FP.pipe(
       oApproveParams,
@@ -580,10 +621,14 @@ export const Swap = ({
         prevApproveParams.current = O.some(params)
         return params
       }),
-      // Trigger update for `approveFeesRD`
-      O.map(approveFeeParamsUpdated)
+      // Trigger update for `approveFeesRD` + `checkApprove`
+      O.map((params) => {
+        approveFeeParamsUpdated(params)
+        checkApprovedStatus(params)
+        return true
+      })
     )
-  }, [approveFeeParamsUpdated, oApproveParams, oPoolAddress])
+  }, [approveFeeParamsUpdated, checkApprovedStatus, oApproveParams, oPoolAddress])
 
   const reloadApproveFeesHandler = useCallback(() => {
     FP.pipe(oApproveParams, O.map(reloadApproveFee))
@@ -1087,17 +1132,6 @@ export const Swap = ({
     [swapFeesRD, targetAssetProp, outFeeInTargetAsset]
   )
 
-  const needApprovement = useMemo(() => {
-    // not needed for users with locked or not imported wallets
-    if (!hasImportedKeystore(keystore) || isLocked(keystore)) return false
-    // Other chains than ETH do not need an approvement
-    if (!isEthChain(sourceChainAsset.chain)) return false
-    // ETH does not need to be approved
-    if (isEthAsset(sourceAssetProp)) return false
-    // ERC20 token does need approvement only
-    return isEthTokenAsset(sourceAssetProp)
-  }, [keystore, sourceAssetProp, sourceChainAsset.chain])
-
   const uiApproveFeesRD: UIFeesRD = useMemo(
     () =>
       FP.pipe(
@@ -1150,18 +1184,17 @@ export const Swap = ({
   } = useSubscriptionState<TxHashRD>(RD.initial)
 
   const onApprove = () => {
-    const oRouterAddress: O.Option<Address> = FP.pipe(
-      oPoolAddress,
-      O.chain(({ router }) => router)
-    )
     FP.pipe(
-      sequenceTOption(oRouterAddress, getEthTokenAddress(sourceAssetProp)),
-      O.map(([routerAddress, tokenAddress]) =>
+      oApproveParams,
+      O.map(({ walletIndex, walletType, contractAddress, spenderAddress, fromAddress }) =>
         subscribeApproveState(
           approveERC20Token$({
             network,
-            contractAddress: tokenAddress,
-            spenderAddress: routerAddress
+            contractAddress,
+            spenderAddress,
+            fromAddress,
+            walletIndex,
+            walletType
           })
         )
       )
@@ -1182,13 +1215,6 @@ export const Swap = ({
     [approveState]
   )
 
-  // State for values of `isApprovedERC20Token$`
-  const {
-    state: isApprovedState,
-    reset: resetIsApprovedState,
-    subscribe: subscribeIsApprovedState
-  } = useSubscriptionState<IsApprovedRD>(RD.initial)
-
   const isApproved = useMemo(
     () =>
       !needApprovement ||
@@ -1208,32 +1234,6 @@ export const Swap = ({
     // ignore initial + loading states for `isApprovedState`
     return RD.isPending(isApprovedState)
   }, [isApprovedState, needApprovement])
-
-  const checkApprovedStatus = useCallback(() => {
-    const oRouterAddress: O.Option<Address> = FP.pipe(
-      oPoolAddress,
-      O.chain(({ router }) => router)
-    )
-    const oNeedApprovement: O.Option<boolean> = FP.pipe(
-      needApprovement,
-      // `None` if needApprovement is `false`, no request then
-      O.fromPredicate((v) => !!v)
-    )
-    const oTokenAddress: O.Option<string> = getEthTokenAddress(sourceAssetProp)
-
-    // check approve status
-    FP.pipe(
-      sequenceTOption(oNeedApprovement, oRouterAddress, oTokenAddress),
-      O.map(([_, routerAddress, tokenAddress]) =>
-        subscribeIsApprovedState(
-          isApprovedERC20Token$({
-            contractAddress: tokenAddress,
-            spenderAddress: routerAddress
-          })
-        )
-      )
-    )
-  }, [isApprovedERC20Token$, needApprovement, oPoolAddress, sourceAssetProp, subscribeIsApprovedState])
 
   const checkIsApprovedError = useMemo(() => {
     // ignore error check if we don't need to check allowance
@@ -1270,12 +1270,9 @@ export const Swap = ({
     resetApproveState()
     // zero amount to swap
     setAmountToSwapMax1e8(initialAmountToSwapMax1e8)
-    // check approved status
-    checkApprovedStatus()
     // reload fees
     reloadFeesHandler()
   }, [
-    checkApprovedStatus,
     initialAmountToSwapMax1e8,
     reloadFeesHandler,
     resetApproveState,
@@ -1371,9 +1368,9 @@ export const Swap = ({
   )
 
   const disableSubmitApprove = useMemo(
-    () => checkIsApprovedError || isApproveFeeError || walletBalancesLoading,
+    () => checkIsApprovedError || isApproveFeeError || walletBalancesLoading || O.isNone(oApproveParams),
 
-    [checkIsApprovedError, isApproveFeeError, walletBalancesLoading]
+    [checkIsApprovedError, isApproveFeeError, oApproveParams, walletBalancesLoading]
   )
 
   const onChangeTargetAddress = useCallback(

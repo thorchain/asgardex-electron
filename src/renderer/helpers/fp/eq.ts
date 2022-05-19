@@ -103,6 +103,8 @@ export const eqBalancesRD = RD.getEq<ApiError, Balance[]>(eqApiError, eqBalances
 
 export const eqAssetsWithBalanceRD = RD.getEq<ApiError, Balance[]>(eqApiError, eqBalances)
 
+export const eqWalletType: Eq.Eq<WalletType> = eqString
+
 export const eqWalletBalance: Eq.Eq<WalletBalance> = {
   equals: (x, y) => eqBalance.equals(x, y) && x.walletAddress === y.walletAddress
 }
@@ -138,7 +140,10 @@ export const eqApproveParams = Eq.struct<ApproveParams>({
   network: eqString,
   spenderAddress: eqString,
   contractAddress: eqString,
-  amount: eqNullableBaseAmount
+  fromAddress: eqString,
+  walletIndex: eqNumber,
+  amount: eqNullableBaseAmount,
+  walletType: eqWalletType
 })
 
 export const eqOApproveParams = O.getEq(eqApproveParams)
@@ -182,8 +187,6 @@ const eqLedgerError = Eq.struct<LedgerError>({
   errorId: eqLedgerErrorId,
   msg: eqString
 })
-
-export const eqWalletType: Eq.Eq<WalletType> = eqString
 
 export const eqWalletAddress = Eq.struct<WalletAddress>({
   address: eqString,

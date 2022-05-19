@@ -7,8 +7,10 @@ import * as O from 'fp-ts/lib/Option'
 import * as Rx from 'rxjs'
 import * as RxOp from 'rxjs/operators'
 
+import { getEtherscanApiKey } from '../../../shared/api/etherscan'
+import { getEthplorerCreds } from '../../../shared/api/ethplorer'
+import { getInfuraCreds } from '../../../shared/api/infura'
 import { Network } from '../../../shared/api/types'
-import { envOrDefault } from '../../../shared/utils/env'
 import { isError } from '../../../shared/utils/guard'
 import { clientNetwork$ } from '../app/service'
 import * as C from '../clients'
@@ -16,13 +18,6 @@ import { WalletAddress$, ExplorerUrl$ } from '../clients/types'
 import { keystoreService } from '../wallet/keystore'
 import { getPhrase } from '../wallet/util'
 import { Client$, ClientState, ClientState$ } from './types'
-
-const ETHERSCAN_API_KEY = envOrDefault(process.env.REACT_APP_ETHERSCAN_API_KEY, '')
-const INFURA_PROJECT_ID = envOrDefault(process.env.REACT_APP_INFURA_PROJECT_ID, '')
-const INFURA_PROJECT_SECRET = envOrDefault(process.env.REACT_APP_INFURA_PROJECT_SECRET, '')
-
-const ETHPLORER_API_KEY = envOrDefault(process.env.REACT_APP_ETHPLORER_API_KEY, 'freekey')
-const ETHPLORER_API_URL = envOrDefault(process.env.REACT_APP_ETHPLORER_API_URL, 'https://api.ethplorer.io')
 
 /**
  * Stream to create an observable `EthereumClient` depending on existing phrase in keystore
@@ -40,19 +35,14 @@ const clientState$: ClientState$ = FP.pipe(
           getPhrase(keystore),
           O.map<string, ClientState>((phrase) => {
             try {
-              const infuraCreds: ETH.InfuraCreds | undefined = INFURA_PROJECT_ID
-                ? {
-                    projectId: INFURA_PROJECT_ID,
-                    projectSecret: INFURA_PROJECT_SECRET
-                  }
-                : undefined
+              const { ethplorerApiKey, ethplorerUrl } = getEthplorerCreds()
               const client = new ETH.Client({
                 network,
-                etherscanApiKey: ETHERSCAN_API_KEY,
-                ethplorerApiKey: ETHPLORER_API_KEY,
-                ethplorerUrl: ETHPLORER_API_URL,
+                etherscanApiKey: getEtherscanApiKey(),
+                ethplorerApiKey,
+                ethplorerUrl,
                 phrase,
-                infuraCreds
+                infuraCreds: getInfuraCreds()
               })
               return RD.success(client)
             } catch (error) {
@@ -103,7 +93,7 @@ const getERC20Decimal = async (asset: Asset, network: Network): Promise<number> 
       async () => {
         // https://docs.ethers.io/v5/api/providers/api-providers/#EtherscanProvider
         const ethNetwork = network === 'testnet' ? 'ropsten' : 'homestead'
-        const provider = new EtherscanProvider(ethNetwork, ETHERSCAN_API_KEY)
+        const provider = new EtherscanProvider(ethNetwork, getEtherscanApiKey())
         try {
           const decimal = await ETH.getDecimal(asset, provider)
           // store result in memory

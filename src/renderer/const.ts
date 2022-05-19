@@ -8,7 +8,6 @@ import {
   assetToString,
   baseAmount,
   AssetRuneNative,
-  AssetRuneERC20Testnet,
   ETHChain,
   BNBChain,
   AssetRune67C,
@@ -69,73 +68,11 @@ export const AssetTGTERC20: Asset = {
   synth: false
 }
 
-export const AssetTGTERC20Testnet: Asset = {
-  chain: ETHChain,
-  symbol: 'TGT-0x73d6e26896981798526b6ead48d0fab76e205974',
-  ticker: 'TGT',
-  synth: false
-}
-
-// ETH.UST - testnet only
-export const AssetUSTERC20Testnet: Asset = {
-  chain: ETHChain,
-  symbol: 'UST-0x6cA13a4ab78dd7D657226b155873A04DB929A3A4',
-  ticker: 'UST',
-  synth: false
-}
-
-// ETH.THOR - testnet only
-export const AssetThorERC20Testnet: Asset = {
-  chain: ETHChain,
-  symbol: 'THOR-0xA0b515c058F127a15Dd3326F490eBF47d215588e',
-  ticker: 'THOR',
-  synth: false
-}
-
-// TKN8 - random test asset w/ 8 decimal (testnet only)
-export const AssetTKN8ERC20Testnet: Asset = {
-  chain: ETHChain,
-  symbol: 'TKN8-0x242aD49dAcd38aC23caF2ccc118482714206beD4',
-  ticker: 'TKN8',
-  synth: false
-}
-
-// TKN18 - random test asset w/ 18 decimal (testnet only)
-export const AssetTKN18ERC20Testnet: Asset = {
-  chain: ETHChain,
-  symbol: 'TKN18-0x8E3f9E9b5B26AAaE9d31364d2a8e8a9dd2BE3B82',
-  ticker: 'TKN18',
-  synth: false
-}
-
-// Wrapped Ether (WETH) - testnet only
-export const AssetWETHERC20Testnet: Asset = {
-  chain: ETHChain,
-  symbol: 'WETH-0xbCA556c912754Bc8E7D4Aad20Ad69a1B1444F42d',
-  ticker: 'WETH',
-  synth: false
-}
-
-// DAI - testnet only
-export const AssetDAIERC20Testnet: Asset = {
-  chain: ETHChain,
-  symbol: 'DAI-0xad6d458402f60fd3bd25163575031acdce07538d',
-  ticker: 'DAI',
-  synth: false
-}
-
 // This hardcode list is for testnet only
 export const ERC20AssetsTestnet = [
   AssetUSDTERC20Testnet,
-  AssetXRuneTestnet,
-  AssetUSTERC20Testnet,
-  AssetRuneERC20Testnet,
-  AssetThorERC20Testnet,
-  AssetTKN8ERC20Testnet,
-  AssetTKN18ERC20Testnet,
-  AssetWETHERC20Testnet,
-  AssetDAIERC20Testnet,
-  AssetTGTERC20Testnet
+  AssetXRuneTestnet
+  // AssetRuneERC20Testnet
 ]
 export const ETHAssetsTestnet = [AssetETH, ...ERC20AssetsTestnet]
 

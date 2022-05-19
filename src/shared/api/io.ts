@@ -98,3 +98,13 @@ export const ipcLedgerDepositTxParamsIO = t.type({
 })
 
 export type IPCLedgerDepositTxParams = t.TypeOf<typeof ipcLedgerDepositTxParamsIO>
+
+export const ipcLedgerApproveERC20TokenParamsIO = t.type({
+  network: networkIO,
+  contractAddress: t.string,
+  spenderAddress: t.string,
+  walletIndex: t.number,
+  amount: baseAmountIO
+})
+
+export type IPCLedgerApproveERC20TokenParams = t.TypeOf<typeof ipcLedgerApproveERC20TokenParamsIO>

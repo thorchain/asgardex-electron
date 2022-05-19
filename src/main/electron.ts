@@ -11,7 +11,11 @@ import windowStateKeeper from 'electron-window-state'
 import * as E from 'fp-ts/lib/Either'
 import * as FP from 'fp-ts/lib/function'
 
-import { ipcLedgerDepositTxParamsIO, ipcLedgerSendTxParamsIO } from '../shared/api/io'
+import {
+  ipcLedgerApproveERC20TokenParamsIO,
+  ipcLedgerDepositTxParamsIO,
+  ipcLedgerSendTxParamsIO
+} from '../shared/api/io'
 import { IPCLedgerAdddressParams, StoreFileName } from '../shared/api/types'
 import { DEFAULT_STORAGES } from '../shared/const'
 import { Locale } from '../shared/i18n/types'
@@ -24,6 +28,7 @@ import {
   deposit as depositLedgerTx,
   verifyLedgerAddress
 } from './api/ledger'
+import { approveLedgerERC20Token } from './api/ledger/ethereum/approve'
 import IPCMessages from './ipc/messages'
 import { setMenu } from './menu'
 
@@ -162,6 +167,13 @@ const initIPC = () => {
       // params need to be decoded
       ipcLedgerDepositTxParamsIO.decode(params),
       E.fold((e) => Promise.reject(e), depositLedgerTx)
+    )
+  })
+  ipcMain.handle(IPCMessages.APPROVE_LEDGER_ERC20_TOKEN, async (_, params: unknown) => {
+    return FP.pipe(
+      // params need to be decoded
+      ipcLedgerApproveERC20TokenParamsIO.decode(params),
+      E.fold((e) => Promise.reject(e), approveLedgerERC20Token)
     )
   })
   // Update

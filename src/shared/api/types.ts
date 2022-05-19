@@ -124,6 +124,9 @@ export type ApiHDWallet = {
   depositLedgerTx: (
     params: unknown /* will be de-/serialized by ipcLedgerDepositTxParamsIO */
   ) => Promise<Either<LedgerError, TxHash>>
+  approveLedgerERC20Token: (
+    params: unknown /* will be de-/serialized by ipcLedgerApprovedERC20TokenParamsIO */
+  ) => Promise<Either<LedgerError, TxHash>>
 }
 
 declare global {

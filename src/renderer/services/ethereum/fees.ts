@@ -13,7 +13,7 @@ import { observableState } from '../../helpers/stateHelper'
 import { FeeLD } from '../chain/types'
 import * as C from '../clients'
 import { FeesLD } from '../clients'
-import { FeesService, Client$, PollInTxFeeParams, ApproveParams, ApproveFeeHandler } from './types'
+import { FeesService, Client$, PollInTxFeeParams, ApproveFeeHandler, ApproveParams } from './types'
 
 export const ETH_OUT_TX_GAS_LIMIT = ethers.BigNumber.from('35609')
 export const ERC20_OUT_TX_GAS_LIMIT = ethers.BigNumber.from('49610')
@@ -102,7 +102,7 @@ export const createFeesService = (client$: Client$): FeesService => {
   /**
    * Fees for approve Tx
    **/
-  const approveTxFee$ = ({ spenderAddress, contractAddress, amount }: ApproveParams): FeeLD =>
+  const approveTxFee$ = ({ spenderAddress, contractAddress, amount, fromAddress }: ApproveParams): FeeLD =>
     client$.pipe(
       RxOp.switchMap((oClient) =>
         FP.pipe(
@@ -111,7 +111,7 @@ export const createFeesService = (client$: Client$): FeesService => {
             () => Rx.of(RD.initial),
             (client) =>
               Rx.combineLatest([
-                client.estimateApprove({ contractAddress, spenderAddress, amount }),
+                client.estimateApprove({ contractAddress, spenderAddress, fromAddress, amount }),
                 client.estimateGasPrices()
               ]).pipe(
                 RxOp.map(([gasLimit, gasPrices]) => getFee({ gasPrice: gasPrices.fast, gasLimit })),

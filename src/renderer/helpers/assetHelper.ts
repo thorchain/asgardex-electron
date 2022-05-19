@@ -31,7 +31,6 @@ import * as S from 'fp-ts/lib/string'
 import { Network } from '../../shared/api/types'
 import {
   AssetTGTERC20,
-  AssetTGTERC20Testnet,
   AssetUST,
   AssetXRune,
   AssetXRuneTestnet,
@@ -211,8 +210,7 @@ export const isXRuneAsset = (asset: Asset): boolean =>
 /**
  * Check whether an asset is TGT asset
  */
-export const isTgtERC20Asset = (asset: Asset): boolean =>
-  eqAsset.equals(asset, AssetTGTERC20) || eqAsset.equals(asset, AssetTGTERC20Testnet)
+export const isTgtERC20Asset = (asset: Asset): boolean => eqAsset.equals(asset, AssetTGTERC20)
 
 /**
  * Get ethereum token address (as check sum address) from a given asset
