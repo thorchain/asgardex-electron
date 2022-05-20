@@ -30,7 +30,7 @@ export type SendTxParams = {
   recipient: Address
   amount: BaseAmount
   memo: Memo
-  feeOption?: FeeOption
+  feeOptionKey?: FeeOption
   walletIndex: number
 }
 
