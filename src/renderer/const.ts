@@ -19,7 +19,8 @@ import {
   PolkadotChain,
   CosmosChain,
   DOGEChain,
-  TerraChain
+  TerraChain,
+  AssetRuneERC20Testnet
 } from '@xchainjs/xchain-util'
 
 import { Network } from '../shared/api/types'
@@ -69,11 +70,7 @@ export const AssetTGTERC20: Asset = {
 }
 
 // This hardcode list is for testnet only
-export const ERC20AssetsTestnet = [
-  AssetUSDTERC20Testnet,
-  AssetXRuneTestnet
-  // AssetRuneERC20Testnet
-]
+export const ERC20AssetsTestnet = [AssetUSDTERC20Testnet, AssetXRuneTestnet, AssetRuneERC20Testnet]
 export const ETHAssetsTestnet = [AssetETH, ...ERC20AssetsTestnet]
 
 // UNIH (exploit contract)
