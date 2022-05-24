@@ -3,6 +3,9 @@ import { LedgerMessages } from '../types'
 const ledger: LedgerMessages = {
   'ledger.title': 'Ledger',
   'ledger.title.sign': 'Signature avec Ledger',
+  'ledger.sign': 'Click "next" to sign the transaction on your device. - FR',
+  'ledger.blindsign':
+    '"smart contract data" or "blind signing" needs to be enabled for {chain} application on your Ledger device. - FR',
   'ledger.needsconnected':
     "Assurez-vous que votre appareil Ledger est connecté et que l'application {chain} est opérationnelle.",
   'ledger.add.device': 'Ajoutez votre ledger',

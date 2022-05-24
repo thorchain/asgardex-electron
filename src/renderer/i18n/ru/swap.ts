@@ -21,7 +21,6 @@ const swap: SwapMessages = {
   'swap.note.nowallet': 'Для обмена создайте или импортируйте кошелек',
   'swap.errors.asset.missingSourceAsset': 'Исходный актив не поддерживается',
   'swap.errors.asset.missingTargetAsset': 'Целевой актив не поддерживается',
-  'swap.ledger.sign': 'Нажмите далее что бы подписать транзакцию на вашем устройстве.',
   'swap.min.amount.info': 'Minimum value to swap to cover all fees for inbound and outbound transactions. - RU',
   'swap.min.result.info':
     'Your swap is protected by this minimum value based on selected {tolerance}% slippage tolerance. In case the price changes unfavourable more than {tolerance}% your swap transaction will be reverted before comfirmation. - RU'

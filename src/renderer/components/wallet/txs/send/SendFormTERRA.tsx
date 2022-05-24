@@ -287,7 +287,7 @@ export const SendFormTERRA: React.FC<Props> = (props): JSX.Element => {
           onClose={onCloseHandler}
           visible={showConfirmationModal}
           chain={TerraChain}
-          description={intl.formatMessage({ id: 'wallet.ledger.confirm' })}
+          description2={intl.formatMessage({ id: 'wallet.ledger.confirm' })}
           addresses={O.none}
         />
       )

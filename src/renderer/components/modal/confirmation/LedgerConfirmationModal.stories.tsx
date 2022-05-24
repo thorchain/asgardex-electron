@@ -19,7 +19,7 @@ const Template: Story<Args> = ({ chain, visible, description }) => {
       onClose={() => console.log('onClose')}
       onSuccess={() => console.log('onSuccess')}
       chain={chain}
-      description={description}
+      description2={description}
       network="mainnet"
       addresses={O.some({
         sender: 'qpm2qsznhks23z7629mms6s4cwef74vcwvy22gdx6a',

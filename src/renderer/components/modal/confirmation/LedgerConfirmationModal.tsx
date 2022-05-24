@@ -22,7 +22,8 @@ type Props = {
   onSuccess: FP.Lazy<void>
   onClose: FP.Lazy<void>
   chain: Chain
-  description?: string
+  description1?: string
+  description2?: string
   addresses: O.Option<Addresses>
 }
 
@@ -32,7 +33,8 @@ export const LedgerConfirmationModal: React.FC<Props> = ({
   onSuccess,
   chain,
   network,
-  description = '',
+  description1,
+  description2 = '',
   addresses: oAddresses
 }) => {
   const intl = useIntl()
@@ -115,9 +117,9 @@ export const LedgerConfirmationModal: React.FC<Props> = ({
             {renderAppIcon}
           </Styled.LedgerContainer>
           <Styled.Description>
-            {intl.formatMessage({ id: 'ledger.needsconnected' }, { chain: chainToString(chain) })}
+            {description1 || intl.formatMessage({ id: 'ledger.needsconnected' }, { chain: chainToString(chain) })}
           </Styled.Description>
-          {description && <Styled.Description>{description}</Styled.Description>}
+          {description2 && <Styled.Description>{description2}</Styled.Description>}
           {isBchChain(chain) &&
             FP.pipe(
               oAddresses,

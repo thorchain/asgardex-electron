@@ -4,6 +4,10 @@
 
 - [Ledger] Support ETH/ERC20 [#2255](https://github.com/thorchain/asgardex-electron/issues/2255)
 
+## Fix
+
+- Clicking "upgrade" for rune.eth. Next screen is flickering, and not clickable. [#2261](https://github.com/thorchain/asgardex-electron/issues/2261)
+
 # 0.14.1 (2022-05-07)
 
 ## Update

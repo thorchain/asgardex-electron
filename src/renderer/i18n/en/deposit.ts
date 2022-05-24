@@ -70,7 +70,6 @@ const deposit: DepositMessages = {
   'deposit.withdraw.feeNote': 'Note: {fee} BNB will be left in your wallet for the transaction fees.',
   'deposit.withdraw.error.feeNotCovered':
     'Transaction fee {fee} needs to be covered by your balance (currently {balance}).',
-  'deposit.withdraw.ledger.sign': 'Click next to sign the withdraw transaction on your device.',
   'deposit.ledger.sign': 'Click next to sign the deposit transaction on your device.'
 }
 
