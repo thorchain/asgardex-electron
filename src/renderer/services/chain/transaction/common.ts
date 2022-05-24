@@ -69,7 +69,7 @@ export const sendTx$ = ({
       )
 
     case ETHChain:
-      return ETH.sendTx({ asset, recipient, amount, memo, feeOption, walletIndex })
+      return ETH.sendTx({ asset, recipient, amount, memo, feeOptionKey: feeOption, walletIndex })
 
     case THORChain:
       return THOR.sendTx({ walletType, amount, asset, memo, recipient, walletIndex })

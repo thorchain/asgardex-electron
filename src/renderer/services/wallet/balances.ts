@@ -503,9 +503,10 @@ export const createBalancesService = ({
   const ethBalances$ = getChainBalance$({
     chain: ETHChain,
     walletType: 'keystore',
+    // walletIndex=0 (as long as we don't support HD wallets for keystore)
     walletIndex: 0,
     walletBalanceType: 'all'
-  }) // walletIndex=0 (as long as we don't support HD wallets for keystore)
+  })
 
   /**
    * Transforms ETH data (address + `WalletBalance`) into `ChainBalance`
@@ -550,11 +551,16 @@ export const createBalancesService = ({
   /**
    * ETH Ledger balances
    */
-  const ethLedgerChainBalance$: ChainBalance$ = ledgerChainBalance$({
-    chain: ETHChain,
-    walletBalanceType: 'all',
-    getBalanceByAddress$: ETH.getBalanceByAddress$
-  })
+  const ethLedgerChainBalance$: ChainBalance$ = FP.pipe(
+    network$,
+    RxOp.switchMap((network) =>
+      ledgerChainBalance$({
+        chain: ETHChain,
+        walletBalanceType: 'all',
+        getBalanceByAddress$: ETH.getBalanceByAddress$(network)
+      })
+    )
+  )
 
   /**
    * List of `ChainBalances` for all available chains (order is important)

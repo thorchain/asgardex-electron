@@ -47,6 +47,9 @@ const balances$: ({
 }
 
 // State of balances loaded by Client and Address
-const getBalanceByAddress$ = C.balancesByAddress$({ client$, trigger$: reloadBalances$, walletBalanceType: 'all' })
+const getBalanceByAddress$ = (network: Network) => {
+  const assets: Asset[] | undefined = network === 'testnet' ? ETHAssetsTestnet : undefined
+  return C.balancesByAddress$({ client$, trigger$: reloadBalances$, assets, walletBalanceType: 'all' })
+}
 
 export { reloadBalances, balances$, reloadBalances$, resetReloadBalances, getBalanceByAddress$ }

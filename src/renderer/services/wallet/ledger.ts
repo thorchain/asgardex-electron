@@ -95,7 +95,7 @@ export const createLedgerService = ({ keystore$ }: { keystore$: KeystoreState$ }
         Rx.of(
           RD.failure({
             errorId: LedgerErrorId.GET_ADDRESS_FAILED,
-            msg: isError(error) ? error.toString() : `${error}`
+            msg: isError(error) ? error?.message ?? error.toString() : `${error}`
           })
         )
       ),

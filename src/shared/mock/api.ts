@@ -80,5 +80,6 @@ export const apiHDWallet: ApiHDWallet = {
     Promise.resolve(E.right({ chain, address: 'ledger_address', type: 'ledger', walletIndex: 0 })),
   verifyLedgerAddress: () => Promise.resolve(true),
   sendLedgerTx: () => Promise.resolve(E.right('tx_hash')),
-  depositLedgerTx: () => Promise.resolve(E.right('tx_hash'))
+  depositLedgerTx: () => Promise.resolve(E.right('tx_hash')),
+  approveLedgerERC20Token: () => Promise.resolve(E.right('tx_hash'))
 }

@@ -113,7 +113,7 @@ export const createTransactionService = (client$: Client$, network$: Network$): 
       })
     )
 
-  const sendLedgerTx = ({ network, params }: { network: Network; params: SendTxParams }) => {
+  const sendLedgerTx = ({ network, params }: { network: Network; params: SendTxParams }): TxHashLD => {
     const sendLedgerTxParams: IPCLedgerSendTxParams = {
       chain: THORChain,
       network,

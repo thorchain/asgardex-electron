@@ -2,6 +2,9 @@ import { ClientUrl } from '@xchainjs/xchain-bitcoin'
 
 import { envOrDefault } from '../utils/env'
 
+// expose env (needed to access ENVs by `envOrDefault`) in `main` thread)
+require('dotenv').config()
+
 export const getHaskoinBTCApiUrl = (): ClientUrl => {
   const mainnetUrl = envOrDefault(process.env.REACT_APP_HASKOIN_BTC_MAINNET_URL, 'https://haskoin.ninerealms.com/btc')
 

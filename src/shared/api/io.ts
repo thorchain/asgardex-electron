@@ -37,7 +37,7 @@ export const assetIO = new t.Type(
 export type BaseAmountEncoded = { amount: string; decimal: number }
 
 const isBaseAmountEncoded = (u: unknown): u is BaseAmountEncoded =>
-  IOG.string.is((u as BaseAmountEncoded).amount) && IOG.number.is((u as BaseAmountEncoded).decimal)
+  IOG.partial({ amount: IOG.string, decimal: IOG.number }).is(u)
 
 export const baseAmountIO = new t.Type(
   'BaseAmountIO',
@@ -98,3 +98,12 @@ export const ipcLedgerDepositTxParamsIO = t.type({
 })
 
 export type IPCLedgerDepositTxParams = t.TypeOf<typeof ipcLedgerDepositTxParamsIO>
+
+export const ipcLedgerApproveERC20TokenParamsIO = t.type({
+  network: networkIO,
+  contractAddress: t.string,
+  spenderAddress: t.string,
+  walletIndex: t.number
+})
+
+export type IPCLedgerApproveERC20TokenParams = t.TypeOf<typeof ipcLedgerApproveERC20TokenParamsIO>

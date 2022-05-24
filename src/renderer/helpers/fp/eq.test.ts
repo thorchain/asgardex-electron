@@ -47,7 +47,8 @@ import {
   eqLedgerAddressMap,
   eqWalletAddress,
   eqOWalletAddress,
-  eqSymDepositAddresses
+  eqSymDepositAddresses,
+  eqWalletType
 } from './eq'
 
 describe('helpers/fp/eq', () => {
@@ -470,6 +471,18 @@ describe('helpers/fp/eq', () => {
       expect(eqWalletAddress.equals(a, { ...a, type: 'ledger' })).toBeFalsy()
       expect(eqWalletAddress.equals(a, { ...a, chain: BNBChain })).toBeFalsy()
       expect(eqWalletAddress.equals(a, { ...a, walletIndex: 1 })).toBeFalsy()
+    })
+  })
+
+  describe('eqWalletType', () => {
+    it('is equal', () => {
+      expect(eqWalletType.equals('keystore', 'keystore')).toBeTruthy()
+      expect(eqWalletType.equals('ledger', 'ledger')).toBeTruthy()
+    })
+
+    it('is not equal', () => {
+      expect(eqWalletType.equals('keystore', 'ledger')).toBeFalsy()
+      expect(eqWalletType.equals('ledger', 'keystore')).toBeFalsy()
     })
   })
 

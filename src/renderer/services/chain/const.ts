@@ -22,7 +22,8 @@ export const ChainTxFeeOption: { [key in TxTypes]: FeeOption } = {
   SWAP: FeeOption.Fast,
   DEPOSIT: FeeOption.Fast,
   WITHDRAW: FeeOption.Fast,
-  UPGRADE: FeeOption.Fast
+  UPGRADE: FeeOption.Fast,
+  APPROVE: FeeOption.Fast
 }
 
 export const INITIAL_SWAP_STATE: SwapState = {
