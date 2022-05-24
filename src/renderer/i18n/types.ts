@@ -264,6 +264,8 @@ export type PoolSharesMessage = { [key in PoolSharesMessageKey]: string }
 type LedgerMessageKey =
   | 'ledger.title'
   | 'ledger.title.sign'
+  | 'ledger.sign'
+  | 'ledger.blindsign'
   | 'ledger.needsconnected'
   | 'ledger.add.device'
   | 'ledger.error.nodevice'
@@ -330,7 +332,6 @@ type SwapMessageKey =
   | 'swap.errors.amount.outputShouldCoverChainFee'
   | 'swap.note.lockedWallet'
   | 'swap.note.nowallet'
-  | 'swap.ledger.sign'
   | 'swap.min.amount.info'
   | 'swap.min.result.info'
 
@@ -400,7 +401,6 @@ type DepositMessageKey =
   | 'deposit.withdraw.fees'
   | 'deposit.withdraw.feeNote'
   | 'deposit.withdraw.error.feeNotCovered'
-  | 'deposit.withdraw.ledger.sign'
   | 'deposit.ledger.sign'
 
 export type DepositMessages = { [key in DepositMessageKey]: string }

@@ -555,7 +555,7 @@ export const Withdraw: React.FC<Props> = ({
           // we always sent withdraw tx using THORCHain only
           chain={THORChain}
           network={network}
-          description={intl.formatMessage({ id: 'deposit.withdraw.ledger.sign' })}
+          description2={intl.formatMessage({ id: 'ledger.sign' })}
           addresses={O.none}
         />
       )}

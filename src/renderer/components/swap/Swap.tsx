@@ -14,7 +14,8 @@ import {
   delay,
   Chain,
   assetToBase,
-  assetAmount
+  assetAmount,
+  chainToString
 } from '@xchainjs/xchain-util'
 import { Row } from 'antd'
 import BigNumber from 'bignumber.js'
@@ -810,8 +811,9 @@ export const Swap = ({
     [allAssets, assetsToSwap]
   )
 
-  const [showPasswordModal, setShowPasswordModal] = useState(false)
-  const [showLedgerModal, setShowLedgerModal] = useState(false)
+  type ModalState = 'swap' | 'approve' | 'none'
+  const [showPasswordModal, setShowPasswordModal] = useState<ModalState>('none')
+  const [showLedgerModal, setShowLedgerModal] = useState<ModalState>('none')
 
   const submitSwapTx = useCallback(() => {
     FP.pipe(
@@ -827,11 +829,35 @@ export const Swap = ({
     )
   }, [oSwapParams, subscribeSwapState, swap$])
 
+  const {
+    state: approveState,
+    reset: resetApproveState,
+    subscribe: subscribeApproveState
+  } = useSubscriptionState<TxHashRD>(RD.initial)
+
+  const submitApproveTx = useCallback(() => {
+    FP.pipe(
+      oApproveParams,
+      O.map(({ walletIndex, walletType, contractAddress, spenderAddress, fromAddress }) =>
+        subscribeApproveState(
+          approveERC20Token$({
+            network,
+            contractAddress,
+            spenderAddress,
+            fromAddress,
+            walletIndex,
+            walletType
+          })
+        )
+      )
+    )
+  }, [approveERC20Token$, network, oApproveParams, subscribeApproveState])
+
   const onSubmit = useCallback(() => {
     if (useSourceAssetLedger) {
-      setShowLedgerModal(true)
+      setShowLedgerModal('swap')
     } else {
-      setShowPasswordModal(true)
+      setShowPasswordModal('swap')
     }
   }, [setShowLedgerModal, useSourceAssetLedger])
 
@@ -992,43 +1018,70 @@ export const Swap = ({
     swapState
   ])
 
-  const onClosePasswordModal = useCallback(() => {
-    // close PW modal
-    setShowPasswordModal(false)
-  }, [])
+  const renderPasswordConfirmationModal = useMemo(() => {
+    const onSuccess = () => {
+      if (showPasswordModal === 'swap') submitSwapTx()
+      if (showPasswordModal === 'approve') submitApproveTx()
+      setShowPasswordModal('none')
+    }
+    const onClose = () => {
+      setShowPasswordModal('none')
+    }
+    const render = showPasswordModal === 'swap' || showPasswordModal === 'approve'
+    return (
+      render && (
+        <WalletPasswordConfirmationModal
+          onSuccess={onSuccess}
+          onClose={onClose}
+          validatePassword$={validatePassword$}
+        />
+      )
+    )
+  }, [showPasswordModal, submitApproveTx, submitSwapTx, validatePassword$])
 
-  const onSucceedPasswordModal = useCallback(() => {
-    // close PW modal
-    setShowPasswordModal(false)
-    // send tx
-    submitSwapTx()
-  }, [submitSwapTx])
+  const renderLedgerConfirmationModal = useMemo(() => {
+    const visible = showLedgerModal === 'swap' || showLedgerModal === 'approve'
+    return FP.pipe(
+      oSourceAsset,
+      O.map(({ chain }) => {
+        const onClose = () => {
+          setShowLedgerModal('none')
+        }
 
-  const onCloseLedgerModal = useCallback(() => {
-    // close modal
-    setShowLedgerModal(false)
-  }, [])
+        const onSucceess = () => {
+          if (showLedgerModal === 'swap') submitSwapTx()
+          if (showLedgerModal === 'approve') submitApproveTx()
+          setShowLedgerModal('none')
+        }
 
-  const onSucceedLedgerModal = useCallback(() => {
-    // close modal
-    setShowLedgerModal(false)
-    // sign + send tx
-    submitSwapTx()
-  }, [submitSwapTx])
+        const txtNeedsConnected = intl.formatMessage(
+          {
+            id: 'ledger.needsconnected'
+          },
+          { chain: chainToString(chain) }
+        )
 
-  const renderLedgerConfirmationModal = useMemo(
-    () =>
-      FP.pipe(
-        oSourceAsset,
-        O.map(({ chain }) => (
+        const description1 =
+          showLedgerModal === 'approve'
+            ? `${txtNeedsConnected} ${intl.formatMessage(
+                {
+                  id: 'ledger.blindsign'
+                },
+                { chain: chainToString(chain) }
+              )}`
+            : txtNeedsConnected
+
+        const description2 = intl.formatMessage({ id: 'ledger.sign' })
+        return (
           <LedgerConfirmationModal
             key="leder-conf-modal"
             network={network}
-            onSuccess={onSucceedLedgerModal}
-            onClose={onCloseLedgerModal}
-            visible={showLedgerModal}
+            onSuccess={onSucceess}
+            onClose={onClose}
+            visible={visible}
             chain={chain}
-            description={intl.formatMessage({ id: 'swap.ledger.sign' })}
+            description1={description1}
+            description2={description2}
             addresses={FP.pipe(
               oSwapParams,
               O.chain(({ poolAddress, sender }) => {
@@ -1038,21 +1091,11 @@ export const Swap = ({
               })
             )}
           />
-        )),
-        O.toNullable
-      ),
-
-    [
-      intl,
-      network,
-      oSourceAsset,
-      oSwapParams,
-      onCloseLedgerModal,
-      onSucceedLedgerModal,
-      showLedgerModal,
-      useSourceAssetLedger
-    ]
-  )
+        )
+      }),
+      O.toNullable
+    )
+  }, [intl, network, oSourceAsset, oSwapParams, showLedgerModal, submitApproveTx, submitSwapTx, useSourceAssetLedger])
 
   const sourceChainFeeError: boolean = useMemo(() => {
     // ignore error check by having zero amounts or min amount errors
@@ -1177,29 +1220,13 @@ export const Swap = ({
     )
   }, [isApproveFeeError, walletBalancesLoading, intl, sourceAssetProp.chain, sourceChainAssetAmount, approveFee])
 
-  const {
-    state: approveState,
-    reset: resetApproveState,
-    subscribe: subscribeApproveState
-  } = useSubscriptionState<TxHashRD>(RD.initial)
-
-  const onApprove = () => {
-    FP.pipe(
-      oApproveParams,
-      O.map(({ walletIndex, walletType, contractAddress, spenderAddress, fromAddress }) =>
-        subscribeApproveState(
-          approveERC20Token$({
-            network,
-            contractAddress,
-            spenderAddress,
-            fromAddress,
-            walletIndex,
-            walletType
-          })
-        )
-      )
-    )
-  }
+  const onApprove = useCallback(() => {
+    if (useSourceAssetLedger) {
+      setShowLedgerModal('approve')
+    } else {
+      setShowPasswordModal('approve')
+    }
+  }, [setShowLedgerModal, useSourceAssetLedger])
 
   const renderApproveError = useMemo(
     () =>
@@ -1648,14 +1675,8 @@ export const Swap = ({
                   </>
                 )}
               </Styled.SubmitContainer>
-              {showPasswordModal && (
-                <WalletPasswordConfirmationModal
-                  onSuccess={onSucceedPasswordModal}
-                  onClose={onClosePasswordModal}
-                  validatePassword$={validatePassword$}
-                />
-              )}
               {isDev && renderMemo}
+              {renderPasswordConfirmationModal}
               {renderLedgerConfirmationModal}
               {renderTxModal}
             </Styled.Container>

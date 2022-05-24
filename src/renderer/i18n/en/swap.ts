@@ -20,7 +20,6 @@ const swap: SwapMessages = {
   'swap.note.nowallet': 'Create or import a wallet to swap',
   'swap.errors.asset.missingSourceAsset': 'Missing source asset',
   'swap.errors.asset.missingTargetAsset': 'Missing target asset',
-  'swap.ledger.sign': 'Click "next" to sign the swap transaction on your device.',
   'swap.min.amount.info': 'Minimum value to swap to cover all fees for inbound and outbound transactions.',
   'swap.min.result.info':
     'Your swap is protected by this minimum value based on selected {tolerance}% slippage tolerance. In case the price changes unfavourable more than {tolerance}% your swap transaction will be reverted before comfirmation.'

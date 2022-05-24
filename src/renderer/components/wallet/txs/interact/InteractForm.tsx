@@ -295,7 +295,7 @@ export const InteractForm: React.FC<Props> = (props) => {
           onClose={onCloseHandler}
           visible={showConfirmationModal}
           chain={THORChain}
-          description={intl.formatMessage({ id: 'wallet.ledger.confirm' })}
+          description2={intl.formatMessage({ id: 'wallet.ledger.confirm' })}
           addresses={O.none}
         />
       )

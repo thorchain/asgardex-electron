@@ -320,7 +320,7 @@ export const SendFormLTC: React.FC<Props> = (props): JSX.Element => {
           onClose={onCloseHandler}
           visible={showConfirmationModal}
           chain={LTCChain}
-          description={intl.formatMessage({ id: 'wallet.ledger.confirm' })}
+          description2={intl.formatMessage({ id: 'wallet.ledger.confirm' })}
           addresses={O.none}
         />
       )

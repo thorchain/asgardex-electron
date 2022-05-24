@@ -71,7 +71,6 @@ const deposit: DepositMessages = {
   'deposit.withdraw.feeNote': 'Hinweis: {fee} werden für die Transaktionsgebühr in Deiner Wallet belassen',
   'deposit.withdraw.error.feeNotCovered':
     'Transaktionsgebühr in Höhe von {fee} ist nicht über Dein Guthaben {balance} gedeckt.',
-  'deposit.withdraw.ledger.sign': 'Klick "Weiter", um die Auszahlungstransaktion mit Deinem Ledger zu signieren.',
   'deposit.ledger.sign': 'Klick "Weiter", um die Einzahlungstransaktion mit Deinem Ledger zu signieren.'
 }
 
