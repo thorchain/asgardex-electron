@@ -142,7 +142,6 @@ export const eqApproveParams = Eq.struct<ApproveParams>({
   contractAddress: eqString,
   fromAddress: eqString,
   walletIndex: eqNumber,
-  amount: eqNullableBaseAmount,
   walletType: eqWalletType
 })
 

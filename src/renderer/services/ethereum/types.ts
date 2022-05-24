@@ -49,10 +49,9 @@ export type ApproveParams = {
   contractAddress: Address
   spenderAddress: Address
   fromAddress: Address // needed for estimating fees
-  amount?: BaseAmount
 }
 
-export type IsApproveParams = Omit<ApproveParams, 'network' | 'walletType' | 'fromAddress'>
+export type IsApproveParams = { contractAddress: Address; spenderAddress: Address; fromAddress: Address }
 
 export type PollInTxFeeParams = {
   address: Address

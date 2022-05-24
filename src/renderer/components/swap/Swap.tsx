@@ -596,12 +596,12 @@ export const Swap = ({
   } = useSubscriptionState<IsApprovedRD>(RD.initial)
 
   const checkApprovedStatus = useCallback(
-    ({ contractAddress, spenderAddress, walletIndex }: ApproveParams) => {
+    ({ contractAddress, spenderAddress, fromAddress }: ApproveParams) => {
       subscribeIsApprovedState(
         isApprovedERC20Token$({
           contractAddress,
           spenderAddress,
-          walletIndex
+          fromAddress
         })
       )
     },

@@ -102,7 +102,7 @@ export const createFeesService = (client$: Client$): FeesService => {
   /**
    * Fees for approve Tx
    **/
-  const approveTxFee$ = ({ spenderAddress, contractAddress, amount, fromAddress }: ApproveParams): FeeLD =>
+  const approveTxFee$ = ({ spenderAddress, contractAddress, fromAddress }: ApproveParams): FeeLD =>
     client$.pipe(
       RxOp.switchMap((oClient) =>
         FP.pipe(
@@ -111,7 +111,7 @@ export const createFeesService = (client$: Client$): FeesService => {
             () => Rx.of(RD.initial),
             (client) =>
               Rx.combineLatest([
-                client.estimateApprove({ contractAddress, spenderAddress, fromAddress, amount }),
+                client.estimateApprove({ contractAddress, spenderAddress, fromAddress }),
                 client.estimateGasPrices()
               ]).pipe(
                 RxOp.map(([gasLimit, gasPrices]) => getFee({ gasPrice: gasPrices.fast, gasLimit })),

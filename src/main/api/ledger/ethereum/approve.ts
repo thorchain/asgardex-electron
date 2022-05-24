@@ -16,16 +16,19 @@ export const approveLedgerERC20Token = async ({
   network,
   contractAddress,
   spenderAddress,
-  walletIndex,
-  amount
+  walletIndex
 }: IPCLedgerApproveERC20TokenParams) => {
   const { ethplorerApiKey, ethplorerUrl } = getEthplorerCreds()
+
+  const infuraCreds = getInfuraCreds()
+  const clientNetwork = toClientNetwork(network)
+
   const client = new ETH.Client({
-    network: toClientNetwork(network),
+    network: clientNetwork,
     etherscanApiKey: getEtherscanApiKey(),
     ethplorerApiKey,
     ethplorerUrl,
-    infuraCreds: getInfuraCreds()
+    infuraCreds
   })
 
   const transport = await TransportNodeHidSingleton.open()
@@ -34,16 +37,18 @@ export const approveLedgerERC20Token = async ({
   const provider = client.getProvider()
   const signer = new LedgerSigner({ provider, path, app })
 
-  const { hash } = await client.approve({
+  const { wait } = await client.approve({
     signer,
     contractAddress,
     spenderAddress,
-    amount,
     feeOptionKey: FeeOption.Fast, // ChainTxFeeOption.APPROVE
     gasLimitFallback: DEFAULT_APPROVE_GAS_LIMIT_FALLBACK
   })
 
+  // wait until the transaction has been mined
+  const { transactionHash } = await wait(1)
+
   await transport.close()
 
-  return hash
+  return transactionHash
 }

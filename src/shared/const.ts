@@ -2,6 +2,9 @@ import { StoreFilesContent, UserNodesStorage } from './api/types'
 import { Locale } from './i18n/types'
 import { envOrDefault } from './utils/env'
 
+// expose env (needed to access ENVs by `envOrDefault`) in `main` thread)
+require('dotenv').config()
+
 export const IS_PRODUCTION = envOrDefault(process.env.NODE_ENV, '') === 'production'
 
 export enum ExternalUrl {

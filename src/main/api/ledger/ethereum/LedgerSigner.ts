@@ -6,6 +6,8 @@
  */
 
 import EthApp from '@ledgerhq/hw-app-eth'
+import ledgerService from '@ledgerhq/hw-app-eth/lib/services/ledger'
+import type { LedgerEthTransactionResolution } from '@ledgerhq/hw-app-eth/lib/services/types'
 import { ethers } from 'ethers'
 
 export class LedgerSigner extends ethers.Signer {
@@ -40,23 +42,33 @@ export class LedgerSigner extends ethers.Signer {
     const sig = await this.app.signPersonalMessage(this.path, messageHex)
     sig.r = '0x' + sig.r
     sig.s = '0x' + sig.s
+
     return ethers.utils.joinSignature(sig)
   }
 
   async signTransaction(transaction: ethers.providers.TransactionRequest): Promise<string> {
     const tx = await ethers.utils.resolveProperties(transaction)
+
     const baseTx: ethers.utils.UnsignedTransaction = {
       chainId: tx.chainId || undefined,
       data: tx.data || undefined,
       gasLimit: tx.gasLimit || undefined,
       gasPrice: tx.gasPrice || undefined,
       nonce: tx.nonce ? ethers.BigNumber.from(tx.nonce).toNumber() : undefined,
+      maxFeePerGas: tx.maxFeePerGas || undefined,
+      maxPriorityFeePerGas: tx.maxPriorityFeePerGas || undefined,
+      type: tx.type || undefined,
       to: tx.to || undefined,
       value: tx.value || undefined
     }
 
     const unsignedTx = ethers.utils.serializeTransaction(baseTx).substring(2)
-    const sig = await this.app.signTransaction(this.path, unsignedTx)
+
+    // resolution is needed now
+    // see https://github.com/LedgerHQ/ledgerjs/blob/master/packages/hw-app-eth/README.md#signtransaction
+    const resolution: LedgerEthTransactionResolution = await ledgerService.resolveTransaction(unsignedTx, {}, {})
+
+    const sig = await this.app.signTransaction(this.path, unsignedTx, resolution)
 
     return ethers.utils.serializeTransaction(baseTx, {
       v: ethers.BigNumber.from('0x' + sig.v).toNumber(),
