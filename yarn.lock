@@ -4817,10 +4817,10 @@
   dependencies:
     uniqid "^5.4.0"
 
-"@xchainjs/xchain-client@^0.11.2":
-  version "0.11.2"
-  resolved "https://registry.yarnpkg.com/@xchainjs/xchain-client/-/xchain-client-0.11.2.tgz#c58e1a1ba9c19e7492a64aa410691d185f3f2f93"
-  integrity sha512-o+lolh6HjSs+XdK78DxNyjUoWcOdfDc5V5Dtxc4fbqXg0jBlyXN0ONrb9KMFK1ESCHAWwl22CPTIPpQHxtJcRw==
+"@xchainjs/xchain-client@^0.11.3":
+  version "0.11.3"
+  resolved "https://registry.yarnpkg.com/@xchainjs/xchain-client/-/xchain-client-0.11.3.tgz#9c76d27d287eae4d9e9bd623290c0fb95dfc56e9"
+  integrity sha512-wdL2kKUi/07RXQHGVp8yzsJvo75hBVlqr44xfp5PY7fAOhckQhbTSgfDfEFjyI+udpno8FDgZ2UwoZODO2kJMA==
 
 "@xchainjs/xchain-cosmos@0.17.0":
   version "0.17.0"
