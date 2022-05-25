@@ -69,7 +69,7 @@ export const sendTx$ = ({
       )
 
     case ETHChain:
-      return ETH.sendTx({ asset, recipient, amount, memo, feeOptionKey: feeOption, walletIndex })
+      return ETH.sendTx({ walletType, asset, recipient, amount, memo, feeOption, walletIndex })
 
     case THORChain:
       return THOR.sendTx({ walletType, amount, asset, memo, recipient, walletIndex })
@@ -140,8 +140,8 @@ export const sendPoolTx$ = ({
 }: SendPoolTxParams): TxHashLD => {
   switch (asset.chain) {
     case ETHChain:
-      // TODO(@asgdx-team) Support `walletType`to provide ETH Ledger
       return ETH.sendPoolTx$({
+        walletType,
         router,
         recipient,
         asset,

@@ -5,7 +5,7 @@ import * as t from 'io-ts'
 import * as IOD from 'io-ts/Decoder'
 import * as IOG from 'io-ts/Guard'
 
-import { isAsset, isBaseAmount, isChain, isNetwork } from '../utils/guard'
+import { isAsset, isBaseAmount, isChain, isFeeOption, isNetwork } from '../utils/guard'
 
 const assetDecoder: IOD.Decoder<unknown, Asset> = FP.pipe(
   IOD.string,
@@ -73,6 +73,16 @@ export const networkIO = new t.Type(
   t.identity
 )
 
+export const feeOptionIO = new t.Type(
+  'FeeOptionIO',
+  isFeeOption,
+  (u, c) => {
+    if (isFeeOption(u)) return t.success(u)
+    return t.failure(u, c, `Can't decode FeeOption from ${u}`)
+  },
+  t.identity
+)
+
 export const ipcLedgerSendTxParamsIO = t.type({
   chain: chainIO,
   network: networkIO,
@@ -83,7 +93,8 @@ export const ipcLedgerSendTxParamsIO = t.type({
   amount: baseAmountIO,
   memo: t.union([t.string, t.undefined]),
   walletIndex: t.number,
-  feeRate: t.number
+  feeRate: t.number,
+  feeOption: t.union([feeOptionIO, t.undefined])
 })
 
 export type IPCLedgerSendTxParams = t.TypeOf<typeof ipcLedgerSendTxParamsIO>

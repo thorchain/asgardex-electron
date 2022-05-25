@@ -28,6 +28,7 @@ export const createTransactionService = (client$: Client$, network$: Network$): 
       amount,
       sender,
       feeRate,
+      feeOption: undefined,
       recipient,
       memo,
       walletIndex

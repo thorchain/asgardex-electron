@@ -80,7 +80,6 @@ const wallet: WalletMessages = {
   'wallet.password.confirmation.error': 'Password is wrong',
   'wallet.password.repeat': 'Repeat password',
   'wallet.password.mismatch': 'Password mismatch',
-  'wallet.ledger.confirm': 'Click "next" to sign the transaction on your device.',
   'wallet.send.error': 'Send error',
   'wallet.upgrade.pending': 'Upgrading',
   'wallet.upgrade.success': 'Successful upgrade',

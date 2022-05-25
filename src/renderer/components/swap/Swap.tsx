@@ -1043,7 +1043,7 @@ export const Swap = ({
     const visible = showLedgerModal === 'swap' || showLedgerModal === 'approve'
     return FP.pipe(
       oSourceAsset,
-      O.map(({ chain }) => {
+      O.map((asset) => {
         const onClose = () => {
           setShowLedgerModal('none')
         }
@@ -1054,24 +1054,27 @@ export const Swap = ({
           setShowLedgerModal('none')
         }
 
+        const chainAsString = chainToString(asset.chain)
         const txtNeedsConnected = intl.formatMessage(
           {
             id: 'ledger.needsconnected'
           },
-          { chain: chainToString(chain) }
+          { chain: chainAsString }
         )
 
         const description1 =
-          showLedgerModal === 'approve'
+          // extra info for ERC20 assets only
+          isEthChain(asset.chain) && !isEthAsset(asset)
             ? `${txtNeedsConnected} ${intl.formatMessage(
                 {
                   id: 'ledger.blindsign'
                 },
-                { chain: chainToString(chain) }
+                { chain: chainAsString }
               )}`
             : txtNeedsConnected
 
         const description2 = intl.formatMessage({ id: 'ledger.sign' })
+
         return (
           <LedgerConfirmationModal
             key="leder-conf-modal"
@@ -1079,7 +1082,7 @@ export const Swap = ({
             onSuccess={onSucceess}
             onClose={onClose}
             visible={visible}
-            chain={chain}
+            chain={asset.chain}
             description1={description1}
             description2={description2}
             addresses={FP.pipe(

@@ -1,3 +1,4 @@
+import { FeeOption } from '@xchainjs/xchain-client'
 import { assetFromString, Asset, BaseAmount, Chain, isValidAsset } from '@xchainjs/xchain-util'
 import * as Util from '@xchainjs/xchain-util'
 import BigNumber from 'bignumber.js'
@@ -19,6 +20,9 @@ const chainGuard: IOG.Guard<unknown, Chain> = {
 export const isChain = (u: unknown): u is Chain => chainGuard.is(u)
 
 export const isNetwork = (u: unknown): u is Network => u === 'mainnet' || u === 'stagenet' || u === 'testnet'
+
+export const isFeeOption = (u: unknown): u is FeeOption =>
+  u === FeeOption.Average || u === FeeOption.Fast || u === FeeOption.Fastest
 
 export const isWalletType = (u: unknown): u is WalletType => u === 'keystore' || u === 'ledger'
 export const isLedgerWallet = (walletType: WalletType): boolean => walletType === 'ledger'

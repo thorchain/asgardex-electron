@@ -323,7 +323,7 @@ export const SendFormBCH: React.FC<Props> = (props): JSX.Element => {
           onClose={onCloseHandler}
           visible={showConfirmationModal}
           chain={BCHChain}
-          description2={intl.formatMessage({ id: 'wallet.ledger.confirm' })}
+          description2={intl.formatMessage({ id: 'ledger.sign' })}
           addresses={O.some({ sender: walletAddress, recipient: form.getFieldValue('recipient') })}
         />
       )

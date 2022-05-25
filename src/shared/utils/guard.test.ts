@@ -1,3 +1,4 @@
+import { FeeOption } from '@xchainjs/xchain-client'
 import { AssetRuneNative, baseAmount, bn } from '@xchainjs/xchain-util'
 
 import {
@@ -5,6 +6,7 @@ import {
   isBaseAmount,
   isChain,
   isError,
+  isFeeOption,
   isKeystoreWallet,
   isLedgerWallet,
   isNetwork,
@@ -113,6 +115,25 @@ describe('shared/utils/guard', () => {
 
     it('false for empty object', () => {
       expect(isError({})).toBeFalsy()
+    })
+  })
+
+  describe('isFeeOption', () => {
+    it('true (Average)', () => {
+      expect(isFeeOption(FeeOption.Average)).toBeTruthy()
+    })
+    it('true (Fast)', () => {
+      expect(isFeeOption(FeeOption.Fast)).toBeTruthy()
+    })
+    it('true (Fastest)', () => {
+      expect(isFeeOption(FeeOption.Fastest)).toBeTruthy()
+    })
+    it('false (random string)', () => {
+      expect(isFeeOption('foo')).toBeFalsy()
+    })
+    it('false (null|undefined)', () => {
+      expect(isFeeOption(null)).toBeFalsy()
+      expect(isFeeOption(undefined)).toBeFalsy()
     })
   })
 })
