@@ -28,10 +28,12 @@ export type LoadApproveFeeHandler = (p: ApproveParams) => void
 export type SendTxParams = {
   asset: Asset
   recipient: Address
+  sender?: Address
   amount: BaseAmount
   memo: Memo
-  feeOptionKey?: FeeOption
+  feeOption?: FeeOption
   walletIndex: number
+  walletType: WalletType
 }
 
 export type SendPoolTxParams = SendTxParams & {

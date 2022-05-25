@@ -1,6 +1,6 @@
 import EthApp from '@ledgerhq/hw-app-eth'
 import TransportNodeHidSingleton from '@ledgerhq/hw-transport-node-hid-singleton'
-import { FeeOption } from '@xchainjs/xchain-client'
+import { FeeOption, TxHash } from '@xchainjs/xchain-client'
 import * as ETH from '@xchainjs/xchain-ethereum'
 
 import { getEtherscanApiKey } from '../../../../shared/api/etherscan'
@@ -17,7 +17,7 @@ export const approveLedgerERC20Token = async ({
   contractAddress,
   spenderAddress,
   walletIndex
-}: IPCLedgerApproveERC20TokenParams) => {
+}: IPCLedgerApproveERC20TokenParams): Promise<TxHash> => {
   const { ethplorerApiKey, ethplorerUrl } = getEthplorerCreds()
 
   const infuraCreds = getInfuraCreds()

@@ -24,8 +24,8 @@ export type FeesService = C.FeesService
 
 export type SendTxParams = {
   walletType: WalletType
-  sender?: string
-  recipient: string
+  sender?: Address
+  recipient: Address
   amount: BaseAmount
   asset: Asset
   memo?: string

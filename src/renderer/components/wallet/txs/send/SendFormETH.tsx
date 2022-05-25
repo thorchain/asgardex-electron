@@ -11,7 +11,9 @@ import {
   BaseAmount,
   baseAmount,
   assetToBase,
-  assetAmount
+  assetAmount,
+  ETHChain,
+  chainToString
 } from '@xchainjs/xchain-util'
 import { Row, Form } from 'antd'
 import { RadioChangeEvent } from 'antd/lib/radio'
@@ -21,6 +23,7 @@ import * as O from 'fp-ts/lib/Option'
 import { useIntl } from 'react-intl'
 
 import { Network } from '../../../../../shared/api/types'
+import { isKeystoreWallet, isLedgerWallet } from '../../../../../shared/utils/guard'
 import { WalletType } from '../../../../../shared/wallet/types'
 import { ZERO_BASE_AMOUNT, ZERO_BN } from '../../../../const'
 import { isEthAsset } from '../../../../helpers/assetHelper'
@@ -32,7 +35,7 @@ import { SendTxState, SendTxStateHandler } from '../../../../services/chain/type
 import { FeesRD, GetExplorerTxUrl, OpenExplorerTxUrl, WalletBalances } from '../../../../services/clients'
 import { ValidatePasswordHandler } from '../../../../services/wallet/types'
 import { WalletBalance } from '../../../../services/wallet/types'
-import { WalletPasswordConfirmationModal } from '../../../modal/confirmation'
+import { LedgerConfirmationModal, WalletPasswordConfirmationModal } from '../../../modal/confirmation'
 import * as StyledR from '../../../shared/form/Radio.styles'
 import { MaxBalanceButton } from '../../../uielements/button/MaxBalanceButton'
 import { UIFeesRD } from '../../../uielements/fees'
@@ -306,57 +309,96 @@ export const SendFormETH: React.FC<Props> = (props): JSX.Element => {
   const [sendTxStartTime, setSendTxStartTime] = useState<number>(0)
 
   // State for visibility of Modal to confirm tx
-  const [showPwModal, setShowPwModal] = useState(false)
+  const [showConfirmationModal, setShowConfirmationModal] = useState(false)
 
-  const sendHandler = useCallback(() => {
-    // close PW modal
-    setShowPwModal(false)
-
-    FP.pipe(
-      sequenceTOption(amountToSend, sendAddress),
-      O.map(([amount, recipient]) => {
-        setSendTxStartTime(Date.now())
-        subscribeSendTxState(
-          transfer$({
-            walletType,
-            walletIndex,
-            sender: walletAddress,
-            recipient,
-            asset,
-            amount,
-            feeOption: selectedFeeOption,
-            memo: form.getFieldValue('memo')
-          })
-        )
-        return true
-      })
-    )
-  }, [
-    amountToSend,
-    sendAddress,
-    subscribeSendTxState,
-    transfer$,
-    walletType,
-    walletIndex,
-    walletAddress,
-    asset,
-    selectedFeeOption,
-    form
-  ])
-
-  const renderPwModal = useMemo(
+  const submitTx = useCallback(
     () =>
-      showPwModal ? (
+      FP.pipe(
+        sequenceTOption(amountToSend, sendAddress),
+        O.map(([amount, recipient]) => {
+          setSendTxStartTime(Date.now())
+          subscribeSendTxState(
+            transfer$({
+              walletType,
+              walletIndex,
+              sender: walletAddress,
+              recipient,
+              asset,
+              amount,
+              feeOption: selectedFeeOption,
+              memo: form.getFieldValue('memo')
+            })
+          )
+          return true
+        })
+      ),
+    [
+      amountToSend,
+      sendAddress,
+      subscribeSendTxState,
+      transfer$,
+      walletType,
+      walletIndex,
+      walletAddress,
+      asset,
+      selectedFeeOption,
+      form
+    ]
+  )
+
+  const renderConfirmationModal = useMemo(() => {
+    const onSuccessHandler = () => {
+      setShowConfirmationModal(false)
+      submitTx()
+    }
+    const onCloseHandler = () => {
+      setShowConfirmationModal(false)
+    }
+    if (isKeystoreWallet(walletType)) {
+      return (
         <WalletPasswordConfirmationModal
-          onSuccess={sendHandler}
-          onClose={() => setShowPwModal(false)}
+          onSuccess={onSuccessHandler}
+          onClose={onCloseHandler}
           validatePassword$={validatePassword$}
         />
-      ) : (
-        <></>
-      ),
-    [sendHandler, showPwModal, validatePassword$]
-  )
+      )
+    }
+    if (isLedgerWallet(walletType)) {
+      const ethChainString = chainToString(ETHChain)
+      const txtNeedsConnected = intl.formatMessage(
+        {
+          id: 'ledger.needsconnected'
+        },
+        { chain: ethChainString }
+      )
+
+      // extended description for ERC20 tokens only
+      const description1 = !isEthAsset(asset)
+        ? `${txtNeedsConnected} ${intl.formatMessage(
+            {
+              id: 'ledger.blindsign'
+            },
+            { chain: ethChainString }
+          )}`
+        : txtNeedsConnected
+
+      const description2 = intl.formatMessage({ id: 'ledger.sign' })
+
+      return (
+        <LedgerConfirmationModal
+          network={network}
+          onSuccess={onSuccessHandler}
+          onClose={onCloseHandler}
+          visible={showConfirmationModal}
+          chain={ETHChain}
+          description1={description1}
+          description2={description2}
+          addresses={O.none}
+        />
+      )
+    }
+    return null
+  }, [walletType, submitTx, validatePassword$, intl, asset, network, showConfirmationModal])
 
   const renderTxModal = useMemo(
     () =>
@@ -427,7 +469,7 @@ export const SendFormETH: React.FC<Props> = (props): JSX.Element => {
               // Default value for RadioGroup of feeOptions
               fee: DEFAULT_FEE_OPTION
             }}
-            onFinish={() => setShowPwModal(true)}
+            onFinish={() => setShowConfirmationModal(true)}
             labelCol={{ span: 24 }}>
             <Styled.SubForm>
               <Styled.CustomLabel size="big">
@@ -476,7 +518,7 @@ export const SendFormETH: React.FC<Props> = (props): JSX.Element => {
           </Styled.Form>
         </Styled.Col>
       </Row>
-      {renderPwModal}
+      {showConfirmationModal && renderConfirmationModal}
       {renderTxModal}
     </>
   )

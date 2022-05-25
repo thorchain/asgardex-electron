@@ -84,7 +84,6 @@ const wallet: WalletMessages = {
   'wallet.password.confirmation.error': 'Passwort ist falsch',
   'wallet.password.repeat': 'Passwort wiederholen',
   'wallet.password.mismatch': 'Passwort stimmt nicht überein',
-  'wallet.ledger.confirm': 'Klick "Weiter", um die Transaktion mit Deinem Ledger zu bestätigen.',
   'wallet.send.error': 'Error beim Versenden',
   'wallet.upgrade.pending': 'Upgraden',
   'wallet.upgrade.success': 'Updgrade erfolgreich',
