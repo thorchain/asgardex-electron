@@ -170,16 +170,55 @@ export const sendTx = async ({
 export const deposit = async ({
   chain,
   network,
+  asset,
+  router,
+  recipient,
   amount,
   memo,
-  walletIndex
+  walletIndex,
+  feeOption
 }: IPCLedgerDepositTxParams): Promise<E.Either<LedgerError, TxHash>> => {
   try {
     const transport = await TransportNodeHidSingleton.open()
     let res: E.Either<LedgerError, string>
     switch (chain) {
       case THORChain:
-        res = await THOR.deposit({ transport, network, amount, memo, walletIndex: walletIndex ? walletIndex : 0 })
+        res = await THOR.deposit({ transport, network, amount, memo, walletIndex })
+        break
+      case ETHChain:
+        if (!router) {
+          return E.left({
+            errorId: LedgerErrorId.INVALID_DATA,
+            msg: `Router address needs to be defined to send Ledger transaction  on ${chainToString(chain)}`
+          })
+        } else if (!asset) {
+          res = E.left({
+            errorId: LedgerErrorId.INVALID_DATA,
+            msg: `Asset needs to be defined to send Ledger transaction on ${chainToString(chain)}`
+          })
+        } else if (!recipient) {
+          res = E.left({
+            errorId: LedgerErrorId.INVALID_DATA,
+            msg: `Recipient needs to be defined to send Ledger transaction on ${chainToString(chain)}`
+          })
+        } else if (!feeOption) {
+          res = E.left({
+            errorId: LedgerErrorId.INVALID_DATA,
+            msg: `Fee option needs to be defined to send Ledger transaction on ${chainToString(chain)}`
+          })
+        } else {
+          res = await ETH.deposit({
+            asset,
+            router,
+            transport,
+            network,
+            amount,
+            memo,
+            walletIndex,
+            recipient,
+            feeOption
+          })
+        }
         break
       default:
         res = E.left({
@@ -191,7 +230,7 @@ export const deposit = async ({
     return res
   } catch (error) {
     return E.left({
-      errorId: LedgerErrorId.SEND_TX_FAILED,
+      errorId: LedgerErrorId.DEPOSIT_TX_FAILED,
       msg: isError(error) ? error?.message ?? error.toString() : `${error}`
     })
   }

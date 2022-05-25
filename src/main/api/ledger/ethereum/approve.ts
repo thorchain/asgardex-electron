@@ -41,7 +41,7 @@ export const approveLedgerERC20Token = async ({
     signer,
     contractAddress,
     spenderAddress,
-    feeOptionKey: FeeOption.Fast, // ChainTxFeeOption.APPROVE
+    feeOption: FeeOption.Fast, // ChainTxFeeOption.APPROVE
     gasLimitFallback: DEFAULT_APPROVE_GAS_LIMIT_FALLBACK
   })
 

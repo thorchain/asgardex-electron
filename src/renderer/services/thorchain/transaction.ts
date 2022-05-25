@@ -40,7 +40,10 @@ export const createTransactionService = (client$: Client$, network$: Network$): 
       asset: params.asset,
       amount: params.amount,
       memo: params.memo,
-      walletIndex: params.walletIndex
+      recipient: undefined,
+      router: undefined,
+      walletIndex: params.walletIndex,
+      feeOption: undefined
     }
     const encoded = ipcLedgerDepositTxParamsIO.encode(depositLedgerTxParams)
 

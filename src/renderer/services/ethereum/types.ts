@@ -31,7 +31,7 @@ export type SendTxParams = {
   sender?: Address
   amount: BaseAmount
   memo: Memo
-  feeOption?: FeeOption
+  feeOption: FeeOption
   walletIndex: number
   walletType: WalletType
 }

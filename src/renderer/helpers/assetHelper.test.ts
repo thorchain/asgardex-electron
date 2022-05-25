@@ -197,7 +197,7 @@ describe('helpers/assetHelper', () => {
     })
 
     it('returns false for any other asset than ETH', () => {
-      expect(isBnbAsset(AssetRuneB1A)).toBeFalsy()
+      expect(isEthAsset(AssetRuneB1A)).toBeFalsy()
     })
   })
 

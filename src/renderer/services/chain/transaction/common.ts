@@ -147,7 +147,8 @@ export const sendPoolTx$ = ({
         asset,
         amount,
         memo,
-        walletIndex
+        walletIndex,
+        feeOption
       })
 
     case THORChain:
