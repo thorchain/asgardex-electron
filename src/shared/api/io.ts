@@ -103,6 +103,8 @@ export const ipcLedgerDepositTxParamsIO = t.type({
   chain: chainIO,
   network: networkIO,
   asset: t.union([assetIO, t.undefined]),
+  router: t.union([t.string, t.undefined]),
+  recipient: t.union([t.string, t.undefined]),
   amount: baseAmountIO,
   memo: t.string,
   walletIndex: t.number
