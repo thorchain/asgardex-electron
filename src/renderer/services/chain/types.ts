@@ -13,7 +13,7 @@ import { AssetWithAmount } from '../../types/asgardex'
 import { PoolAddress } from '../midgard/types'
 import { ApiError, TxHashRD } from '../wallet/types'
 
-export type TxTypes = 'DEPOSIT' | 'SWAP' | 'WITHDRAW' | 'UPGRADE' | 'APPROVE'
+export type TxTypes = 'DEPOSIT' | 'SWAP' | 'WITHDRAW' | 'UPGRADE' | 'APPROVE' | 'SEND'
 
 export type Chain$ = Rx.Observable<O.Option<Chain>>
 

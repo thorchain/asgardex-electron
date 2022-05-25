@@ -93,7 +93,8 @@ export const deposit = async ({
   amount,
   memo,
   recipient,
-  walletIndex
+  walletIndex,
+  feeOption
 }: {
   asset: Asset
   router: Address
@@ -103,6 +104,7 @@ export const deposit = async ({
   recipient: Address
   memo?: string
   walletIndex: number
+  feeOption: FeeOption
 }): Promise<E.Either<LedgerError, TxHash>> => {
   try {
     const address = ETH.getAssetAddress(asset)
@@ -136,7 +138,7 @@ export const deposit = async ({
     const signer = new LedgerSigner({ provider, path, app })
 
     const gasPrices = await client.estimateGasPrices()
-    const gasPrice = gasPrices[FeeOption.Fast].amount().toFixed(0) // no round down needed
+    const gasPrice = gasPrices[feeOption].amount().toFixed(0) // no round down needed
 
     // Note: We don't use `client.deposit` here to avoid repeating same requests we already do in ASGARDEX
     // That's why we call `deposit` directly here

@@ -18,7 +18,7 @@ type TransportError = Error & {
   id: string
 }
 
-export const isTransportError = (u: unknown): u is TransportError =>
+const isTransportError = (u: unknown): u is TransportError =>
   isError(u) && (u as TransportError).name === 'TransportError' && !!(u as TransportError).id
 
 export class LedgerSigner extends ethers.Signer {

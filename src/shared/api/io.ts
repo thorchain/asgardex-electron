@@ -107,7 +107,8 @@ export const ipcLedgerDepositTxParamsIO = t.type({
   recipient: t.union([t.string, t.undefined]),
   amount: baseAmountIO,
   memo: t.string,
-  walletIndex: t.number
+  walletIndex: t.number,
+  feeOption: t.union([feeOptionIO, t.undefined])
 })
 
 export type IPCLedgerDepositTxParams = t.TypeOf<typeof ipcLedgerDepositTxParamsIO>

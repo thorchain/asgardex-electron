@@ -175,7 +175,8 @@ export const deposit = async ({
   recipient,
   amount,
   memo,
-  walletIndex
+  walletIndex,
+  feeOption
 }: IPCLedgerDepositTxParams): Promise<E.Either<LedgerError, TxHash>> => {
   try {
     const transport = await TransportNodeHidSingleton.open()
@@ -200,8 +201,23 @@ export const deposit = async ({
             errorId: LedgerErrorId.INVALID_DATA,
             msg: `Recipient needs to be defined to send Ledger transaction on ${chainToString(chain)}`
           })
+        } else if (!feeOption) {
+          res = E.left({
+            errorId: LedgerErrorId.INVALID_DATA,
+            msg: `Fee option needs to be defined to send Ledger transaction on ${chainToString(chain)}`
+          })
         } else {
-          res = await ETH.deposit({ asset, router, transport, network, amount, memo, walletIndex, recipient })
+          res = await ETH.deposit({
+            asset,
+            router,
+            transport,
+            network,
+            amount,
+            memo,
+            walletIndex,
+            recipient,
+            feeOption
+          })
         }
         break
       default:

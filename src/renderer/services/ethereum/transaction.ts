@@ -1,5 +1,5 @@
 import * as RD from '@devexperts/remote-data-ts'
-import { FeeOption, TxHash } from '@xchainjs/xchain-client'
+import { TxHash } from '@xchainjs/xchain-client'
 import { ETHAddress, isApproved, abi } from '@xchainjs/xchain-ethereum'
 import { baseAmount, ETHChain } from '@xchainjs/xchain-util'
 import BigNumber from 'bignumber.js'
@@ -63,7 +63,7 @@ export const createTransactionService = (client$: Client$, network$: Network$): 
             RxOp.switchMap((gasPrices) => {
               const isETHAddress = address === ETHAddress
               const amount = isETHAddress ? baseAmount(0) : params.amount
-              const gasPrice = gasPrices[FeeOption.Fast].amount().toFixed(0) // no round down needed
+              const gasPrice = gasPrices[params.feeOption].amount().toFixed(0) // no round down needed
               return Rx.from(
                 // Call deposit function of Router contract
                 // Note:
@@ -108,7 +108,8 @@ export const createTransactionService = (client$: Client$, network$: Network$): 
       amount: params.amount,
       memo: params.memo,
       recipient: params.recipient,
-      walletIndex: params.walletIndex
+      walletIndex: params.walletIndex,
+      feeOption: params.feeOption
     }
     const encoded = ipcLedgerDepositTxParamsIO.encode(ipcParams)
 
