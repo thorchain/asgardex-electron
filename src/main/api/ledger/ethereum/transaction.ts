@@ -10,6 +10,7 @@ import { getEtherscanApiKey } from '../../../../shared/api/etherscan'
 import { getEthplorerCreds } from '../../../../shared/api/ethplorer'
 import { getInfuraCreds } from '../../../../shared/api/infura'
 import { LedgerError, LedgerErrorId, Network } from '../../../../shared/api/types'
+import { FEE_BOUNDS } from '../../../../shared/ethereum/const'
 import { toClientNetwork } from '../../../../shared/utils/client'
 import { isError } from '../../../../shared/utils/guard'
 import { getDerivationPath } from './common'
@@ -49,7 +50,8 @@ export const send = async ({
       etherscanApiKey,
       ethplorerApiKey,
       ethplorerUrl,
-      infuraCreds
+      infuraCreds,
+      feeBounds: FEE_BOUNDS[clientNetwork]
     })
 
     const app = new EthApp(transport)
@@ -129,7 +131,8 @@ export const deposit = async ({
       etherscanApiKey,
       ethplorerApiKey,
       ethplorerUrl,
-      infuraCreds
+      infuraCreds,
+      feeBounds: FEE_BOUNDS[clientNetwork]
     })
 
     const app = new EthApp(transport)

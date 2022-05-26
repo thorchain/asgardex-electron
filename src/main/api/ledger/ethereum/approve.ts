@@ -7,7 +7,7 @@ import { getEtherscanApiKey } from '../../../../shared/api/etherscan'
 import { getEthplorerCreds } from '../../../../shared/api/ethplorer'
 import { getInfuraCreds } from '../../../../shared/api/infura'
 import { IPCLedgerApproveERC20TokenParams } from '../../../../shared/api/io'
-import { DEFAULT_APPROVE_GAS_LIMIT_FALLBACK } from '../../../../shared/ethereum/const'
+import { DEFAULT_APPROVE_GAS_LIMIT_FALLBACK, FEE_BOUNDS } from '../../../../shared/ethereum/const'
 import { toClientNetwork } from '../../../../shared/utils/client'
 import { getDerivationPath } from './common'
 import { LedgerSigner } from './LedgerSigner'
@@ -28,7 +28,8 @@ export const approveLedgerERC20Token = async ({
     etherscanApiKey: getEtherscanApiKey(),
     ethplorerApiKey,
     ethplorerUrl,
-    infuraCreds
+    infuraCreds,
+    feeBounds: FEE_BOUNDS[clientNetwork]
   })
 
   const transport = await TransportNodeHidSingleton.open()

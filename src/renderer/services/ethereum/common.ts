@@ -11,6 +11,7 @@ import { getEtherscanApiKey } from '../../../shared/api/etherscan'
 import { getEthplorerCreds } from '../../../shared/api/ethplorer'
 import { getInfuraCreds } from '../../../shared/api/infura'
 import { Network } from '../../../shared/api/types'
+import { FEE_BOUNDS } from '../../../shared/ethereum/const'
 import { isError } from '../../../shared/utils/guard'
 import { clientNetwork$ } from '../app/service'
 import * as C from '../clients'
@@ -42,7 +43,8 @@ const clientState$: ClientState$ = FP.pipe(
                 ethplorerApiKey,
                 ethplorerUrl,
                 phrase,
-                infuraCreds: getInfuraCreds()
+                infuraCreds: getInfuraCreds(),
+                feeBounds: FEE_BOUNDS[network]
               })
               return RD.success(client)
             } catch (error) {

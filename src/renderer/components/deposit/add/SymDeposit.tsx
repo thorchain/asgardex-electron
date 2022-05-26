@@ -801,14 +801,15 @@ export const SymDeposit: React.FC<Props> = (props) => {
     }
   }, [reloadFeesHandler, selectedInput])
 
-  const [showPasswordModal, setShowPasswordModal] = useState(false)
-  const [showLedgerModal, setShowLedgerModal] = useState(false)
+  type ModalState = 'deposit' | 'approve' | 'none'
+  const [showPasswordModal, setShowPasswordModal] = useState<ModalState>('none')
+  const [showLedgerModal, setShowLedgerModal] = useState<ModalState>('none')
 
   const onSubmit = useCallback(() => {
     if (useAssetLedger || useRuneLedger) {
-      setShowLedgerModal(true)
+      setShowLedgerModal('deposit')
     } else {
-      setShowPasswordModal(true)
+      setShowPasswordModal('deposit')
     }
   }, [useAssetLedger, useRuneLedger])
 
@@ -993,15 +994,6 @@ export const SymDeposit: React.FC<Props> = (props) => {
     getRuneExplorerTxUrl
   ])
 
-  const closePasswordModal = useCallback(() => {
-    setShowPasswordModal(false)
-  }, [setShowPasswordModal])
-
-  const onClosePasswordModal = useCallback(() => {
-    // close password modal
-    closePasswordModal()
-  }, [closePasswordModal])
-
   const submitDepositTx = useCallback(() => {
     FP.pipe(
       oDepositParams,
@@ -1015,25 +1007,6 @@ export const SymDeposit: React.FC<Props> = (props) => {
       })
     )
   }, [oDepositParams, subscribeDepositState, deposit$])
-
-  const onSucceedPasswordModal = useCallback(() => {
-    // close private modal
-    closePasswordModal()
-    // submit tx
-    submitDepositTx()
-  }, [closePasswordModal, submitDepositTx])
-
-  const onCloseLedgerModal = useCallback(() => {
-    // close modal
-    setShowLedgerModal(false)
-  }, [])
-
-  const onSucceedLedgerModal = useCallback(() => {
-    // close modal
-    setShowLedgerModal(false)
-    // open Pw modal
-    setShowPasswordModal(true)
-  }, [])
 
   const inputOnBlur = useCallback(() => {
     setSelectedInput('none')
@@ -1101,28 +1074,31 @@ export const SymDeposit: React.FC<Props> = (props) => {
     subscribe: subscribeApproveState
   } = useSubscriptionState<TxHashRD>(RD.initial)
 
-  const onApprove = () => {
-    const oRouterAddress: O.Option<Address> = FP.pipe(
-      oPoolAddress,
-      O.chain(({ router }) => router)
-    )
+  const onApprove = useCallback(() => {
+    if (useAssetLedger) {
+      setShowLedgerModal('approve')
+    } else {
+      setShowPasswordModal('approve')
+    }
+  }, [useAssetLedger])
 
+  const submitApproveTx = useCallback(() => {
     FP.pipe(
-      sequenceTOption(oRouterAddress, getEthTokenAddress(asset), oAssetWB),
-      O.map(([routerAddress, tokenAddress, { walletIndex, walletType, walletAddress }]) =>
+      oApproveParams,
+      O.map(({ walletIndex, walletType, contractAddress, spenderAddress, fromAddress }) =>
         subscribeApproveState(
           approveERC20Token$({
             network,
-            contractAddress: tokenAddress,
-            spenderAddress: routerAddress,
-            fromAddress: walletAddress,
+            contractAddress,
+            spenderAddress,
+            fromAddress,
             walletIndex,
             walletType
           })
         )
       )
     )
-  }
+  }, [approveERC20Token$, network, oApproveParams, subscribeApproveState])
 
   const renderApproveError = useMemo(
     () =>
@@ -1330,6 +1306,83 @@ export const SymDeposit: React.FC<Props> = (props) => {
     },
     [resetEnteredAmounts, setAssetWalletType]
   )
+
+  const renderPasswordConfirmationModal = useMemo(() => {
+    if (showPasswordModal === 'none') return <></>
+
+    const onSuccess = () => {
+      if (showPasswordModal === 'deposit') submitDepositTx()
+      if (showPasswordModal === 'approve') submitApproveTx()
+      setShowPasswordModal('none')
+    }
+    const onClose = () => {
+      setShowPasswordModal('none')
+    }
+
+    return (
+      <WalletPasswordConfirmationModal onSuccess={onSuccess} onClose={onClose} validatePassword$={validatePassword$} />
+    )
+  }, [showPasswordModal, submitApproveTx, submitDepositTx, validatePassword$])
+
+  const renderLedgerConfirmationModal = useMemo(() => {
+    if (showLedgerModal === 'none') return <></>
+
+    const onClose = () => {
+      setShowLedgerModal('none')
+    }
+
+    const onSucceess = () => {
+      if (showLedgerModal === 'deposit') setShowPasswordModal('deposit')
+      if (showLedgerModal === 'approve') submitApproveTx()
+      setShowLedgerModal('none')
+    }
+
+    const chainAsString = chainToString(asset.chain)
+    const txtNeedsConnected = intl.formatMessage(
+      {
+        id: 'ledger.needsconnected'
+      },
+      { chain: chainAsString }
+    )
+
+    const description1 =
+      // extra info for ERC20 assets only
+      isEthChain(asset.chain) && !isEthAsset(asset)
+        ? `${txtNeedsConnected} ${intl.formatMessage(
+            {
+              id: 'ledger.blindsign'
+            },
+            { chain: chainAsString }
+          )}`
+        : txtNeedsConnected
+
+    const description2 = intl.formatMessage({ id: 'ledger.sign' })
+
+    const oIsDeposit = O.fromPredicate<ModalState>((v) => v === 'deposit')(showLedgerModal)
+
+    const addresses = FP.pipe(
+      sequenceTOption(oIsDeposit, oDepositParams),
+      O.chain(([_, { poolAddress, runeSender, assetSender }]) => {
+        const recipient = poolAddress.address
+        if (useRuneLedger) return O.some({ recipient, sender: runeSender })
+        if (useAssetLedger) return O.some({ recipient, sender: assetSender })
+        return O.none
+      })
+    )
+
+    return (
+      <LedgerConfirmationModal
+        onSuccess={onSucceess}
+        onClose={onClose}
+        visible
+        chain={useRuneLedger ? THORChain : asset.chain}
+        network={network}
+        description1={description1}
+        description2={description2}
+        addresses={addresses}
+      />
+    )
+  }, [asset, intl, network, oDepositParams, showLedgerModal, submitApproveTx, useAssetLedger, useRuneLedger])
 
   useEffect(() => {
     if (!eqOAsset.equals(prevAsset.current, O.some(asset))) {
@@ -1562,34 +1615,8 @@ export const SymDeposit: React.FC<Props> = (props) => {
           </>
         )}
       </Styled.SubmitContainer>
-
-      {showLedgerModal && (
-        <LedgerConfirmationModal
-          onSuccess={onSucceedLedgerModal}
-          onClose={onCloseLedgerModal}
-          visible={showLedgerModal}
-          chain={useRuneLedger ? THORChain : asset.chain}
-          network={network}
-          description2={intl.formatMessage({ id: 'ledger.sign' })}
-          addresses={FP.pipe(
-            oDepositParams,
-            O.chain(({ poolAddress, runeSender, assetSender }) => {
-              const recipient = poolAddress.address
-              if (useRuneLedger) return O.some({ recipient, sender: runeSender })
-              if (useAssetLedger) return O.some({ recipient, sender: assetSender })
-              return O.none
-            })
-          )}
-        />
-      )}
-
-      {showPasswordModal && (
-        <WalletPasswordConfirmationModal
-          onSuccess={onSucceedPasswordModal}
-          onClose={onClosePasswordModal}
-          validatePassword$={validatePassword$}
-        />
-      )}
+      {renderPasswordConfirmationModal}
+      {renderLedgerConfirmationModal}
       {renderTxModal}
     </Styled.Container>
   )
