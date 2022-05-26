@@ -3,7 +3,14 @@ import React, { useMemo, useCallback, useState, useEffect } from 'react'
 import * as RD from '@devexperts/remote-data-ts'
 import { getSwitchMemo } from '@thorchain/asgardex-util'
 import { Address, TxParams } from '@xchainjs/xchain-client'
-import { assetAmount, assetToBase, BaseAmount, baseToAsset, formatAssetAmountCurrency } from '@xchainjs/xchain-util'
+import {
+  assetAmount,
+  assetToBase,
+  BaseAmount,
+  baseToAsset,
+  chainToString,
+  formatAssetAmountCurrency
+} from '@xchainjs/xchain-util'
 import { Form } from 'antd'
 import BigNumber from 'bignumber.js'
 import * as A from 'fp-ts/lib/Array'
@@ -16,7 +23,7 @@ import { useIntl } from 'react-intl'
 import { isKeystoreWallet, isLedgerWallet, isWalletType } from '../../../../../shared/utils/guard'
 import { ZERO_BASE_AMOUNT, ZERO_BN } from '../../../../const'
 import { convertBaseAmountDecimal } from '../../../../helpers/assetHelper'
-import { getChainAsset } from '../../../../helpers/chainHelper'
+import { getChainAsset, isEthChain } from '../../../../helpers/chainHelper'
 import { eqAsset, eqString } from '../../../../helpers/fp/eq'
 import { sequenceTOption } from '../../../../helpers/fpHelpers'
 import { emptyString } from '../../../../helpers/stringHelper'
@@ -410,6 +417,28 @@ export const Upgrade: React.FC<Props> = (props): JSX.Element => {
       )
     }
 
+    const chain = runeAsset.asset.chain
+    const chainAsString = chainToString(chain)
+    const txtNeedsConnected = intl.formatMessage(
+      {
+        id: 'ledger.needsconnected'
+      },
+      { chain: chainAsString }
+    )
+
+    const description1 =
+      // extra info for ETH.RUNE only
+      isEthChain(chain)
+        ? `${txtNeedsConnected} ${intl.formatMessage(
+            {
+              id: 'ledger.blindsign'
+            },
+            { chain: chainAsString }
+          )}`
+        : txtNeedsConnected
+
+    const description2 = intl.formatMessage({ id: 'ledger.sign' })
+
     if (isLedgerWallet(walletType)) {
       return (
         <LedgerConfirmationModal
@@ -417,8 +446,9 @@ export const Upgrade: React.FC<Props> = (props): JSX.Element => {
           onSuccess={onSuccessHandler}
           onClose={onCloseHandler}
           visible={showConfirmationModal}
-          chain={runeAsset.asset.chain}
-          description2={intl.formatMessage({ id: 'ledger.sign' })}
+          chain={chain}
+          description1={description1}
+          description2={description2}
           addresses={O.none}
         />
       )
