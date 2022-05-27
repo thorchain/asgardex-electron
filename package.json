@@ -1,7 +1,7 @@
 {
   "name": "asgardex",
   "productName": "ASGARDEX",
-  "version": "0.14.1",
+  "version": "0.15.0",
   "description": "WALLET AND EXCHANGE CLIENT FOR THORCHAIN",
   "main": "index.js",
   "scripts": {
@@ -107,6 +107,7 @@
     "coininfo": "^5.1.0",
     "cosmos-client": "0.39.2",
     "dayjs": "^1.11.2",
+    "dotenv": "^16.0.1",
     "electron-debug": "^3.2.0",
     "electron-log": "^4.4.7",
     "electron-updater": "^5.0.1",
@@ -159,7 +160,6 @@
     "chalk": "^5.0.1",
     "concurrently": "^7.1.0",
     "cross-env": "^7.0.3",
-    "dotenv": "^16.0.1",
     "electron": "^18.1.0",
     "electron-builder": "^23.0.3",
     "electron-devtools-installer": "^3.2.0",
