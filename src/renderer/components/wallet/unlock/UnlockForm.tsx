@@ -7,7 +7,6 @@ import { none, Option, some } from 'fp-ts/lib/Option'
 import { useIntl } from 'react-intl'
 import { useLocation, useNavigate, useParams } from 'react-router-dom'
 
-import { IS_PRODUCTION } from '../../../../shared/const'
 import { envOrDefault } from '../../../../shared/utils/env'
 import { getUrlSearchParam } from '../../../helpers/url.helper'
 import * as appRoutes from '../../../routes/app'
@@ -49,7 +48,7 @@ export const UnlockForm: React.FC<Props> = (props): JSX.Element => {
    * Wallet has to be imported and `REACT_APP_WALLET_PASSWORD` has to be set as env before
    */
   useEffect(() => {
-    if (!IS_PRODUCTION) {
+    if ($IS_DEV) {
       const checkPassword = async () => {
         const password = envOrDefault(process.env.REACT_APP_WALLET_PASSWORD, '')
         if (password && keystore && hasImportedKeystore(keystore) && isLocked(keystore)) {
