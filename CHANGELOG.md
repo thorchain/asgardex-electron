@@ -1,3 +1,9 @@
+# 0.15.1 (2022-05-29)
+
+## Fix
+
+- Swap ETH failed: SENDING A TRANSACTION REQUIRES A SIGNER [#2269](https://github.com/thorchain/asgardex-electron/issues/2269)
+
 # 0.15.0 (2022-05-27)
 
 ## Add
