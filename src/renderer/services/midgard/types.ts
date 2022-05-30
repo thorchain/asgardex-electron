@@ -289,9 +289,15 @@ export type ActionsPage = {
 export type ActionsPageRD = RD.RemoteData<ApiError, ActionsPage>
 export type ActionsPageLD = LiveData<ApiError, ActionsPage>
 
-export type PoolFilter = Chain | 'base' | 'usd'
+const staticPoolFilters = ['base', 'usd', 'bep2', 'erc20'] as const
+export type StaticPoolFilters = typeof staticPoolFilters[number]
 
+export const isStaticPoolFilter = (v: unknown): v is StaticPoolFilters =>
+  typeof v === 'string' ? staticPoolFilters.includes(v as StaticPoolFilters) : false
+
+export type PoolFilter = StaticPoolFilters | string
 export type PoolFilters = PoolFilter[]
+export const DEFAULT_POOL_FILTERS: PoolFilters = ['base', 'usd', 'bep2', 'erc20']
 
 export type LoadActionsParams = {
   page: number

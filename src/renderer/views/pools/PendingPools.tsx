@@ -26,7 +26,7 @@ import { usePoolCycle } from '../../hooks/usePoolCycle'
 import { useProtocolLimit } from '../../hooks/useProtocolLimit'
 import * as poolsRoutes from '../../routes/pools'
 import { DEFAULT_NETWORK } from '../../services/const'
-import { PendingPoolsState, PoolFilter, ThorchainLastblockRD } from '../../services/midgard/types'
+import { PendingPoolsState, PoolFilter, DEFAULT_POOL_FILTERS, ThorchainLastblockRD } from '../../services/midgard/types'
 import { PoolDetail } from '../../types/generated/midgard'
 import { PoolsComponentProps, PoolTableRowData, PoolTableRowsData } from './Pools.types'
 import { getBlocksLeftForPendingPoolAsString, isEmptyPool } from './Pools.utils'
@@ -166,14 +166,7 @@ export const PendingPools: React.FC<PoolsComponentProps> = ({ haltedChains, mimi
 
       return (
         <>
-          <Styled.AssetsFilter
-            setFilter={setFilter}
-            activeFilter={poolFilter}
-            assets={FP.pipe(
-              tableData,
-              A.map(({ pool }) => pool.target)
-            )}
-          />
+          <Styled.AssetsFilter setFilter={setFilter} activeFilter={poolFilter} poolFilters={DEFAULT_POOL_FILTERS} />
           <ProtocolLimit limit={limitRD} />
           <IncentivePendulum incentivePendulum={incentivePendulumRD} />
           <Table

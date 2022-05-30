@@ -27,7 +27,7 @@ import { useProtocolLimit } from '../../hooks/useProtocolLimit'
 import * as poolsRoutes from '../../routes/pools'
 import { SwapRouteParams } from '../../routes/pools/swap'
 import { DEFAULT_NETWORK } from '../../services/const'
-import { PoolFilter, PoolsState } from '../../services/midgard/types'
+import { PoolFilter, PoolsState, DEFAULT_POOL_FILTERS } from '../../services/midgard/types'
 import { PoolsComponentProps, PoolTableRowData, PoolTableRowsData } from './Pools.types'
 import { filterTableData } from './Pools.utils'
 import * as Shared from './PoolsOverview.shared'
@@ -221,14 +221,7 @@ export const ActivePools: React.FC<PoolsComponentProps> = ({ haltedChains, mimir
 
       return (
         <>
-          <Styled.AssetsFilter
-            activeFilter={poolFilter}
-            setFilter={setFilter}
-            assets={FP.pipe(
-              tableData,
-              A.map(({ pool }) => pool.target)
-            )}
-          />
+          <Styled.AssetsFilter activeFilter={poolFilter} setFilter={setFilter} poolFilters={DEFAULT_POOL_FILTERS} />
           <ProtocolLimit limit={limitRD} />
           <IncentivePendulum incentivePendulum={incentivePendulumRD} />
           <Table
