@@ -217,6 +217,7 @@ export const ActivePools: React.FC<PoolsComponentProps> = ({ haltedChains, mimir
   const renderPoolsTable = useCallback(
     (tableData: PoolTableRowData[], loading = false) => {
       const columns = isDesktopView ? desktopPoolsColumns : mobilePoolsColumns
+      const dataSource = FP.pipe(tableData, filterTableData(poolFilter))
 
       return (
         <>
@@ -232,7 +233,7 @@ export const ActivePools: React.FC<PoolsComponentProps> = ({ haltedChains, mimir
           <IncentivePendulum incentivePendulum={incentivePendulumRD} />
           <Table
             columns={columns}
-            dataSource={FP.pipe(tableData, filterTableData(poolFilter))}
+            dataSource={dataSource}
             loading={loading}
             rowKey="key"
             onRow={({ pool }: PoolTableRowData) => {
