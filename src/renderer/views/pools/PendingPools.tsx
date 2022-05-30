@@ -162,6 +162,8 @@ export const PendingPools: React.FC<PoolsComponentProps> = ({ haltedChains, mimi
   const renderPoolsTable = useCallback(
     (tableData: PoolTableRowData[], loading = false) => {
       const columns = isDesktopView ? desktopPoolsColumns : mobilePoolsColumns
+      const dataSource = FP.pipe(tableData, filterTableData(poolFilter))
+
       return (
         <>
           <Styled.AssetsFilter
@@ -176,7 +178,7 @@ export const PendingPools: React.FC<PoolsComponentProps> = ({ haltedChains, mimi
           <IncentivePendulum incentivePendulum={incentivePendulumRD} />
           <Table
             columns={columns}
-            dataSource={FP.pipe(tableData, filterTableData(poolFilter))}
+            dataSource={dataSource}
             loading={loading}
             rowKey="key"
             onRow={({ pool }: PoolTableRowData) => {

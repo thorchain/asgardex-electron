@@ -28,7 +28,8 @@ import {
   filterTableData,
   minPoolTxAmountUSD,
   stringToGetPoolsStatus,
-  isEmptyPool
+  isEmptyPool,
+  FilterTableData
 } from './Pools.utils'
 
 describe('views/pools/utils', () => {
@@ -131,7 +132,7 @@ describe('views/pools/utils', () => {
   })
 
   describe('filterTableData', () => {
-    const tableData = [
+    const tableData: FilterTableData[] = [
       {
         pool: {
           asset: AssetRuneNative,
@@ -185,6 +186,12 @@ describe('views/pools/utils', () => {
           asset: AssetRuneNative,
           target: AssetETH
         }
+      },
+      {
+        pool: {
+          asset: AssetRuneNative,
+          target: { chain: BNBChain, symbol: 'BNB.ETH-1C9', ticker: 'ETH', synth: false }
+        }
       }
     ] as PoolTableRowData[]
 
@@ -204,16 +211,13 @@ describe('views/pools/utils', () => {
     })
 
     it('should return BNB assets', () => {
-      expect(filterTableData(O.some(BNBChain))(tableData)).toEqual([tableData[0], tableData[4]])
+      const result = filterTableData(O.some(BNBChain))(tableData)
+      expect(result).toEqual([tableData[4], tableData[9]])
     })
 
     it('should return ETH assets', () => {
-      expect(filterTableData(O.some(ETHChain))(tableData)).toEqual([
-        tableData[5],
-        tableData[6],
-        tableData[7],
-        tableData[8]
-      ])
+      const result = filterTableData(O.some(ETHChain))(tableData)
+      expect(result).toEqual([tableData[5], tableData[6], tableData[7]])
     })
 
     it('should return USD assets', () => {

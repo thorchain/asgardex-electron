@@ -4,11 +4,11 @@ import {
   assetFromString,
   Asset,
   AssetRuneNative,
-  assetToString,
   assetToBase,
   assetAmount,
   BaseAmount,
-  bnOrZero
+  bnOrZero,
+  isChain
 } from '@xchainjs/xchain-util'
 import * as A from 'fp-ts/Array'
 import * as FP from 'fp-ts/lib/function'
@@ -17,7 +17,7 @@ import * as O from 'fp-ts/lib/Option'
 import { Network } from '../../../shared/api/types'
 import { ONE_RUNE_BASE_AMOUNT } from '../../../shared/mock/amount'
 import { isBtcAsset, isChainAsset, isEthAsset, isUSDAsset, isEthTokenAsset } from '../../helpers/assetHelper'
-import { eqString } from '../../helpers/fp/eq'
+import { eqChain, eqString } from '../../helpers/fp/eq'
 import { sequenceTOption } from '../../helpers/fpHelpers'
 import { PoolFilter } from '../../services/midgard/types'
 import { toPoolData } from '../../services/midgard/utils'
@@ -117,27 +117,32 @@ export const getBlocksLeftForPendingPoolAsString = (
   )
 }
 
+export type FilterTableData = Pick<PoolTableRowData, 'pool'>
 /**
  * Filters tableData array by passed active filter.
  * If oFilter is O.none will return tableData array without any changes
  */
 export const filterTableData =
   (oFilter: O.Option<PoolFilter> = O.none) =>
-  (tableData: PoolTableRowData[]): PoolTableRowData[] => {
+  (tableData: FilterTableData[]): FilterTableData[] => {
     return FP.pipe(
       oFilter,
       O.map((filter) =>
         FP.pipe(
           tableData,
           A.filterMap((tableRow) => {
+            const asset = tableRow.pool.target
+            // all base chain assets
             if (filter === 'base') {
-              return isChainAsset(tableRow.pool.target) ? O.some(tableRow) : O.none
+              return isChainAsset(asset) ? O.some(tableRow) : O.none
             }
+            // usd assets
             if (filter === 'usd') {
-              return isUSDAsset(tableRow.pool.target) ? O.some(tableRow) : O.none
+              return isUSDAsset(asset) ? O.some(tableRow) : O.none
             }
-            const stringAsset = assetToString(tableRow.pool.target)
-            return stringAsset.includes(filter) ? O.some(tableRow) : O.none
+            // others (bep2 + erc20)
+            const { chain } = asset
+            return isChain(filter) && !isChainAsset(asset) && eqChain.equals(filter, chain) ? O.some(tableRow) : O.none
           })
         )
       ),

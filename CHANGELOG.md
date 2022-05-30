@@ -1,3 +1,9 @@
+# 0.15.2 (2022-xx-xx)
+
+## Fix
+
+- [Pools] ERC20 filter includes BNB.ETH [#2273](https://github.com/thorchain/asgardex-electron/issues/2273)
+
 # 0.15.1 (2022-05-29)
 
 ## Fix
