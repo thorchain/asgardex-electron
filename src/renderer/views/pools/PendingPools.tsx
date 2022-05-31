@@ -3,7 +3,7 @@ import React, { useCallback, useMemo, useRef } from 'react'
 import * as RD from '@devexperts/remote-data-ts'
 import { assetToString } from '@xchainjs/xchain-util'
 import { Grid } from 'antd'
-import { ColumnsType } from 'antd/lib/table'
+import { ColumnsType, ColumnType } from 'antd/lib/table'
 import * as A from 'fp-ts/Array'
 import * as FP from 'fp-ts/function'
 import * as O from 'fp-ts/lib/Option'
@@ -11,7 +11,6 @@ import * as P from 'fp-ts/lib/Predicate'
 import { useObservableState } from 'observable-hooks'
 import { useIntl } from 'react-intl'
 import { useNavigate } from 'react-router-dom'
-import * as RxOp from 'rxjs/operators'
 
 import { Network } from '../../../shared/api/types'
 import { ManageButton } from '../../components/manageButton'
@@ -23,10 +22,11 @@ import * as PoolHelpers from '../../helpers/poolHelper'
 import { getPoolTableRowsData, RUNE_PRICE_POOL } from '../../helpers/poolHelper'
 import { useIncentivePendulum } from '../../hooks/useIncentivePendulum'
 import { usePoolCycle } from '../../hooks/usePoolCycle'
+import { usePoolFilter } from '../../hooks/usePoolFilter'
 import { useProtocolLimit } from '../../hooks/useProtocolLimit'
 import * as poolsRoutes from '../../routes/pools'
 import { DEFAULT_NETWORK } from '../../services/const'
-import { PendingPoolsState, PoolFilter, ThorchainLastblockRD } from '../../services/midgard/types'
+import { PendingPoolsState, DEFAULT_POOL_FILTERS, ThorchainLastblockRD } from '../../services/midgard/types'
 import { PoolDetail } from '../../types/generated/midgard'
 import { PoolsComponentProps, PoolTableRowData, PoolTableRowsData } from './Pools.types'
 import { getBlocksLeftForPendingPoolAsString, isEmptyPool } from './Pools.utils'
@@ -35,8 +35,6 @@ import * as Shared from './PoolsOverview.shared'
 import { TableAction, BlockLeftLabel } from './PoolsOverview.styles'
 import * as Styled from './PoolsOverview.styles'
 
-const POOLS_KEY = 'pending'
-
 export const PendingPools: React.FC<PoolsComponentProps> = ({ haltedChains, mimirHalt, walletLocked }): JSX.Element => {
   const navigate = useNavigate()
   const intl = useIntl()
@@ -44,12 +42,14 @@ export const PendingPools: React.FC<PoolsComponentProps> = ({ haltedChains, mimi
   const { network$ } = useAppContext()
   const network = useObservableState<Network>(network$, DEFAULT_NETWORK)
 
-  const { service: midgardService } = useMidgardContext()
-
   const {
-    thorchainLastblockState$,
-    pools: { pendingPoolsState$, reloadPendingPools, selectedPricePool$, poolsFilters$, setPoolsFilter }
-  } = midgardService
+    service: {
+      thorchainLastblockState$,
+      pools: { pendingPoolsState$, reloadPendingPools, selectedPricePool$ }
+    }
+  } = useMidgardContext()
+
+  const { setFilter: setPoolFilter, filter: poolFilter } = usePoolFilter('pending')
 
   const poolsRD = useObservableState(pendingPoolsState$, RD.pending)
   const thorchainLastblockRD: ThorchainLastblockRD = useObservableState(thorchainLastblockState$, RD.pending)
@@ -88,7 +88,7 @@ export const PendingPools: React.FC<PoolsComponentProps> = ({ haltedChains, mimi
     [haltedChains, isDesktopView, mimirHalt, walletLocked]
   )
 
-  const btnPendingPoolsColumn = useMemo(
+  const btnPendingPoolsColumn: ColumnType<PoolTableRowData> = useMemo(
     () => ({
       key: 'btn',
       title: Shared.renderRefreshBtnColTitle(intl.formatMessage({ id: 'common.refresh' }), refreshHandler),
@@ -97,17 +97,6 @@ export const PendingPools: React.FC<PoolsComponentProps> = ({ haltedChains, mimi
     }),
     [refreshHandler, intl, renderBtnPoolsColumn]
   )
-
-  const [poolFilter] = useObservableState<O.Option<PoolFilter>>(
-    () =>
-      FP.pipe(
-        poolsFilters$,
-        RxOp.map((filters) => FP.pipe(O.fromNullable(filters[POOLS_KEY]), O.flatten))
-      ),
-    O.none
-  )
-
-  const setFilter = useCallback((oFilter: O.Option<PoolFilter>) => setPoolsFilter(POOLS_KEY, oFilter), [setPoolsFilter])
 
   const renderBlockLeftColumn = useCallback(
     (_: string, record: PoolTableRowData) => {
@@ -128,10 +117,11 @@ export const PendingPools: React.FC<PoolsComponentProps> = ({ haltedChains, mimi
     [thorchainLastblockRD, oNewPoolCycle]
   )
 
-  const blockLeftColumn = useMemo(
+  const blockLeftColumn: ColumnType<PoolTableRowData> = useMemo(
     () => ({
       key: 'blocks',
       title: intl.formatMessage({ id: 'pools.blocksleft' }),
+      align: 'right',
       width: 80,
       render: renderBlockLeftColumn
     }),
@@ -166,14 +156,7 @@ export const PendingPools: React.FC<PoolsComponentProps> = ({ haltedChains, mimi
 
       return (
         <>
-          <Styled.AssetsFilter
-            setFilter={setFilter}
-            activeFilter={poolFilter}
-            assets={FP.pipe(
-              tableData,
-              A.map(({ pool }) => pool.target)
-            )}
-          />
+          <Styled.AssetsFilter setFilter={setPoolFilter} activeFilter={poolFilter} poolFilters={DEFAULT_POOL_FILTERS} />
           <ProtocolLimit limit={limitRD} />
           <IncentivePendulum incentivePendulum={incentivePendulumRD} />
           <Table
@@ -196,8 +179,8 @@ export const PendingPools: React.FC<PoolsComponentProps> = ({ haltedChains, mimi
       isDesktopView,
       desktopPoolsColumns,
       mobilePoolsColumns,
-      setFilter,
       poolFilter,
+      setPoolFilter,
       limitRD,
       incentivePendulumRD,
       navigate

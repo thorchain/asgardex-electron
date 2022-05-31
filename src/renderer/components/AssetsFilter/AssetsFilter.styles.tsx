@@ -2,15 +2,47 @@ import styled from 'styled-components'
 import { palette } from 'styled-theme'
 
 import { media } from '../../helpers/styleHelper'
+import { transition } from '../../settings/style-util'
 import { Button as ButtonUI, ButtonProps } from '../uielements/button'
+import { Input as InputUI } from '../uielements/input'
 
 export const Container = styled.div`
   display: flex;
+  flex-direction: column;
   justify-content: center;
+  align-items: center;
+  width: 100%;
 
   ${media.md`
   justify-content: left;
+  flex-direction: row;
 `}
+`
+
+export const ButtonContainer = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+`
+
+export const Input = styled(InputUI)`
+  width: 200px;
+
+  /* ${transition(2, 'width')}; */
+  margin: 10px 0 0 0;
+
+  border-color: ${palette('gray', 1)};
+
+  .ant-input-prefix svg,
+  .anticon-close-circle svg {
+    color: ${palette('gray', 1)};
+  }
+
+  transition: width 2s;
+
+  ${media.md`
+  margin: 0 10px 0 10px;
+  `}
 `
 
 const filterButtonBorderRadius = 15
@@ -40,6 +72,7 @@ export const FilterButton = styled(ButtonUI)<ButtonProps & { active?: 'true' | '
   }
 `
 export const ResetButton = styled(ButtonUI).attrs({ typevalue: 'transparent' })`
+
   &.ant-btn {
     padding: 0;
     min-width: 0;
@@ -50,7 +83,6 @@ export const ResetButton = styled(ButtonUI).attrs({ typevalue: 'transparent' })`
     &:hover,
     &:active,
     &:focus {
-      color: ${palette('error', 0)} !important;
-    }
+      color: ${({ disabled }) => (!disabled ? palette('error', 0) : palette('gray', 1))} !important;
   }
 `

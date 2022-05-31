@@ -11,15 +11,14 @@ import * as RxOp from 'rxjs/operators'
 import { useMidgardContext } from '../../contexts/MidgardContext'
 import { useWalletContext } from '../../contexts/WalletContext'
 import { useMimirHalt } from '../../hooks/useMimirHalt'
+import { PoolType } from '../../services/midgard/types'
 import { isLocked } from '../../services/wallet/util'
 import { ActivePools } from './ActivePools'
 import { PendingPools } from './PendingPools'
 import * as Styled from './PoolsOverview.styles'
 
-type TabKey = 'active' | 'pending'
-
 type Tab = {
-  key: TabKey
+  key: PoolType
   label: string
   content: JSX.Element
 }
@@ -30,7 +29,7 @@ export const PoolsOverview: React.FC = (): JSX.Element => {
   const { keystoreService } = useWalletContext()
   const keystore = useObservableState(keystoreService.keystore$, O.none)
 
-  const [activeTabKey, setActiveTabKey] = useState('active')
+  const [activeTabKey, setActiveTabKey] = useState<PoolType>('active')
 
   const {
     service: {

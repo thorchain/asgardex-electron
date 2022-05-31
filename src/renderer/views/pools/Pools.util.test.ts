@@ -8,8 +8,7 @@ import {
   AssetETH,
   AssetLTC,
   AssetBTC,
-  AssetBCH,
-  ETHChain
+  AssetBCH
 } from '@xchainjs/xchain-util'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
@@ -200,7 +199,7 @@ describe('views/pools/utils', () => {
       expect(filterTableData(O.none)(tableData)).toEqual(tableData)
     })
 
-    it('should return only chain-based pools', () => {
+    it('base', () => {
       expect(filterTableData(O.some('base'))(tableData)).toEqual([
         tableData[0],
         tableData[1],
@@ -210,17 +209,17 @@ describe('views/pools/utils', () => {
       ])
     })
 
-    it('should return BNB assets', () => {
-      const result = filterTableData(O.some(BNBChain))(tableData)
+    it('bep2', () => {
+      const result = filterTableData(O.some('bep2'))(tableData)
       expect(result).toEqual([tableData[4], tableData[9]])
     })
 
-    it('should return ETH assets', () => {
-      const result = filterTableData(O.some(ETHChain))(tableData)
+    it('erc20', () => {
+      const result = filterTableData(O.some('erc20'))(tableData)
       expect(result).toEqual([tableData[5], tableData[6], tableData[7]])
     })
 
-    it('should return USD assets', () => {
+    it('usd', () => {
       expect(filterTableData(O.some('usd'))(tableData)).toEqual([tableData[4], tableData[5], tableData[7]])
     })
   })

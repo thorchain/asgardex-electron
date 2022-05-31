@@ -175,6 +175,8 @@ export type ByzantineLD = LiveData<Error, string>
 export type HealthRD = RD.RemoteData<Error, Health>
 export type HealthLD = LiveData<Error, Health>
 
+export type PoolType = 'active' | 'pending'
+
 export type PoolsService = {
   poolsState$: LiveData<Error, PoolsState>
   pendingPoolsState$: LiveData<Error, PendingPoolsState>
@@ -207,7 +209,7 @@ export type PoolsService = {
   availableAssets$: PoolAssetsLD
   validatePool$: (poolAddresses: PoolAddress, chain: Chain) => ValidatePoolLD
   poolsFilters$: Rx.Observable<Record<string, O.Option<PoolFilter>>>
-  setPoolsFilter: (poolKey: string, filter: O.Option<PoolFilter>) => void
+  setPoolsFilter: (poolKey: PoolType, filter: O.Option<PoolFilter>) => void
   gasRateByChain$: (chain: Chain) => GasRateLD
   reloadGasRates: FP.Lazy<void>
   haltedChains$: HaltedChainsLD
@@ -289,9 +291,18 @@ export type ActionsPage = {
 export type ActionsPageRD = RD.RemoteData<ApiError, ActionsPage>
 export type ActionsPageLD = LiveData<ApiError, ActionsPage>
 
-export type PoolFilter = Chain | 'base' | 'usd'
+const staticPoolFilters = ['base', 'usd', 'bep2', 'erc20'] as const
+export type StaticPoolFilter = typeof staticPoolFilters[number]
 
+/**
+ * Type guard for `StaticPoolFilters`
+ */
+export const isStaticPoolFilter = (v: unknown): v is StaticPoolFilter =>
+  typeof v === 'string' ? staticPoolFilters.includes(v as StaticPoolFilter) : false
+
+export type PoolFilter = StaticPoolFilter | string
 export type PoolFilters = PoolFilter[]
+export const DEFAULT_POOL_FILTERS: PoolFilters = ['base', 'usd', 'bep2', 'erc20']
 
 export type LoadActionsParams = {
   page: number

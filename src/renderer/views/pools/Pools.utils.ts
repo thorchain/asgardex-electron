@@ -8,7 +8,7 @@ import {
   assetAmount,
   BaseAmount,
   bnOrZero,
-  isChain
+  assetToString
 } from '@xchainjs/xchain-util'
 import * as A from 'fp-ts/Array'
 import * as FP from 'fp-ts/lib/function'
@@ -17,7 +17,8 @@ import * as O from 'fp-ts/lib/Option'
 import { Network } from '../../../shared/api/types'
 import { ONE_RUNE_BASE_AMOUNT } from '../../../shared/mock/amount'
 import { isBtcAsset, isChainAsset, isEthAsset, isUSDAsset, isEthTokenAsset } from '../../helpers/assetHelper'
-import { eqChain, eqString } from '../../helpers/fp/eq'
+import { isBnbChain, isEthChain } from '../../helpers/chainHelper'
+import { eqString } from '../../helpers/fp/eq'
 import { sequenceTOption } from '../../helpers/fpHelpers'
 import { PoolFilter } from '../../services/midgard/types'
 import { toPoolData } from '../../services/midgard/utils'
@@ -132,17 +133,29 @@ export const filterTableData =
           tableData,
           A.filterMap((tableRow) => {
             const asset = tableRow.pool.target
+            const value = filter.toLowerCase()
             // all base chain assets
-            if (filter === 'base') {
+            if (value === 'base') {
               return isChainAsset(asset) ? O.some(tableRow) : O.none
             }
             // usd assets
-            if (filter === 'usd') {
+            if (value === 'usd') {
               return isUSDAsset(asset) ? O.some(tableRow) : O.none
             }
-            // others (bep2 + erc20)
-            const { chain } = asset
-            return isChain(filter) && !isChainAsset(asset) && eqChain.equals(filter, chain) ? O.some(tableRow) : O.none
+            // erc20
+            if (value === 'erc20') {
+              return isEthChain(asset.chain) && !isChainAsset(asset) ? O.some(tableRow) : O.none
+            }
+            // bep2
+            if (value === 'bep2') {
+              return isBnbChain(asset.chain) && !isChainAsset(asset) ? O.some(tableRow) : O.none
+            }
+            // custom
+            if (value.length > 0) {
+              return assetToString(asset).toLowerCase().includes(value) ? O.some(tableRow) : O.none
+            }
+
+            return O.none
           })
         )
       ),
