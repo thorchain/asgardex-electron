@@ -202,7 +202,7 @@ describe('views/pools/utils', () => {
     })
 
     it('base', () => {
-      expect(filterTableData(O.some('base'))(tableData)).toEqual([
+      expect(filterTableData(O.some('__base__'))(tableData)).toEqual([
         tableData[0],
         tableData[1],
         tableData[2],
@@ -212,17 +212,17 @@ describe('views/pools/utils', () => {
     })
 
     it('bep2', () => {
-      const result = filterTableData(O.some('bep2'))(tableData)
+      const result = filterTableData(O.some('__bep2__'))(tableData)
       expect(result).toEqual([tableData[4], tableData[9]])
     })
 
     it('erc20', () => {
-      const result = filterTableData(O.some('erc20'))(tableData)
+      const result = filterTableData(O.some('__erc20__'))(tableData)
       expect(result).toEqual([tableData[5], tableData[6], tableData[7]])
     })
 
     it('usd', () => {
-      expect(filterTableData(O.some('usd'))(tableData)).toEqual([tableData[4], tableData[5], tableData[7]])
+      expect(filterTableData(O.some('__usd__'))(tableData)).toEqual([tableData[4], tableData[5], tableData[7]])
     })
   })
 

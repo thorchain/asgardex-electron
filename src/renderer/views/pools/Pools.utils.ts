@@ -127,7 +127,7 @@ export const getBlocksLeftForPendingPoolAsString = (
   )
 }
 
-export type FilterTableData = Pick<PoolTableRowData, 'pool'>
+export type FilterTableData = Pick<PoolTableRowData, 'pool' | 'watched'>
 /**
  * Filters tableData array by passed active filter.
  * If oFilter is O.none will return tableData array without any changes
@@ -143,20 +143,24 @@ export const filterTableData =
           A.filterMap((tableRow) => {
             const asset = tableRow.pool.target
             const value = filter.toLowerCase()
+            // watched assets
+            if (value === '__watched__') {
+              return tableRow.watched ? O.some(tableRow) : O.none
+            }
             // all base chain assets
-            if (value === 'base') {
+            if (value === '__base__') {
               return isChainAsset(asset) ? O.some(tableRow) : O.none
             }
             // usd assets
-            if (value === 'usd') {
+            if (value === '__usd__') {
               return isUSDAsset(asset) ? O.some(tableRow) : O.none
             }
             // erc20
-            if (value === 'erc20') {
+            if (value === '__erc20__') {
               return isEthChain(asset.chain) && !isChainAsset(asset) ? O.some(tableRow) : O.none
             }
             // bep2
-            if (value === 'bep2') {
+            if (value === '__bep2__') {
               return isBnbChain(asset.chain) && !isChainAsset(asset) ? O.some(tableRow) : O.none
             }
             // custom

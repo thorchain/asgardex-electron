@@ -247,7 +247,6 @@ export const ActivePools: React.FC<PoolsComponentProps> = ({ haltedChains, mimir
       desktopPoolsColumns,
       mobilePoolsColumns,
       poolFilter,
-      poolWatchList,
       setPoolFilter,
       limitRD,
       incentivePendulumRD,

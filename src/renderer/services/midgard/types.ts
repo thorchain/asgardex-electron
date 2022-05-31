@@ -297,7 +297,7 @@ export type ActionsPage = {
 export type ActionsPageRD = RD.RemoteData<ApiError, ActionsPage>
 export type ActionsPageLD = LiveData<ApiError, ActionsPage>
 
-const staticPoolFilters = ['base', 'usd', 'bep2', 'erc20'] as const
+const staticPoolFilters = ['__base__', '__usd__', '__bep2__', '__erc20__', '__watched__'] as const
 export type StaticPoolFilter = typeof staticPoolFilters[number]
 
 /**
@@ -308,7 +308,7 @@ export const isStaticPoolFilter = (v: unknown): v is StaticPoolFilter =>
 
 export type PoolFilter = StaticPoolFilter | string
 export type PoolFilters = PoolFilter[]
-export const DEFAULT_POOL_FILTERS: PoolFilters = ['base', 'usd', 'bep2', 'erc20']
+export const DEFAULT_POOL_FILTERS: PoolFilters = ['__watched__', '__base__', '__usd__', '__bep2__', '__erc20__']
 
 export type LoadActionsParams = {
   page: number
