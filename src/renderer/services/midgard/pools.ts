@@ -61,7 +61,8 @@ import {
   GasRateLD,
   PoolsState,
   HaltedChainsLD,
-  SelectedPoolAsset
+  SelectedPoolAsset,
+  PoolType
 } from './types'
 import {
   getPoolAddressesByChain,
@@ -98,9 +99,12 @@ const createPoolsService = (
     get$: poolsFilters$,
     set: _setPoolsFilter,
     get: internalGetPoolsFilter
-  } = observableState<Record<string, O.Option<PoolFilter>>>({})
+  } = observableState<Record<PoolType, O.Option<PoolFilter>>>({
+    active: O.none,
+    pending: O.none
+  })
 
-  const setPoolsFilter = (poolKey: string, filterValue: O.Option<PoolFilter>) => {
+  const setPoolsFilter = (poolKey: PoolType, filterValue: O.Option<PoolFilter>) => {
     const currentState = internalGetPoolsFilter()
     _setPoolsFilter({ ...currentState, [poolKey]: filterValue })
   }

@@ -175,6 +175,8 @@ export type ByzantineLD = LiveData<Error, string>
 export type HealthRD = RD.RemoteData<Error, Health>
 export type HealthLD = LiveData<Error, Health>
 
+export type PoolType = 'active' | 'pending'
+
 export type PoolsService = {
   poolsState$: LiveData<Error, PoolsState>
   pendingPoolsState$: LiveData<Error, PendingPoolsState>
@@ -207,7 +209,7 @@ export type PoolsService = {
   availableAssets$: PoolAssetsLD
   validatePool$: (poolAddresses: PoolAddress, chain: Chain) => ValidatePoolLD
   poolsFilters$: Rx.Observable<Record<string, O.Option<PoolFilter>>>
-  setPoolsFilter: (poolKey: string, filter: O.Option<PoolFilter>) => void
+  setPoolsFilter: (poolKey: PoolType, filter: O.Option<PoolFilter>) => void
   gasRateByChain$: (chain: Chain) => GasRateLD
   reloadGasRates: FP.Lazy<void>
   haltedChains$: HaltedChainsLD

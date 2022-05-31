@@ -1,5 +1,9 @@
 # 0.15.2 (2022-xx-xx)
 
+## Add
+
+- Add search option for pools [#2275](https://github.com/thorchain/asgardex-electron/pull/2275)
+
 ## Fix
 
 - [Pools] ERC20 filter includes BNB.ETH [#2273](https://github.com/thorchain/asgardex-electron/issues/2273)

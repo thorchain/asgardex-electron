@@ -35,8 +35,6 @@ import * as Shared from './PoolsOverview.shared'
 import { TableAction, BlockLeftLabel } from './PoolsOverview.styles'
 import * as Styled from './PoolsOverview.styles'
 
-const POOLS_KEY = 'pending'
-
 export const PendingPools: React.FC<PoolsComponentProps> = ({ haltedChains, mimirHalt, walletLocked }): JSX.Element => {
   const navigate = useNavigate()
   const intl = useIntl()
@@ -102,12 +100,12 @@ export const PendingPools: React.FC<PoolsComponentProps> = ({ haltedChains, mimi
     () =>
       FP.pipe(
         poolsFilters$,
-        RxOp.map((filters) => FP.pipe(O.fromNullable(filters[POOLS_KEY]), O.flatten))
+        RxOp.map((filters) => FP.pipe(O.fromNullable(filters['pending']), O.flatten))
       ),
     O.none
   )
 
-  const setFilter = useCallback((oFilter: O.Option<PoolFilter>) => setPoolsFilter(POOLS_KEY, oFilter), [setPoolsFilter])
+  const setFilter = useCallback((oFilter: O.Option<PoolFilter>) => setPoolsFilter('pending', oFilter), [setPoolsFilter])
 
   const renderBlockLeftColumn = useCallback(
     (_: string, record: PoolTableRowData) => {

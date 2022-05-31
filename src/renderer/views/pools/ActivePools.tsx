@@ -33,8 +33,6 @@ import { filterTableData } from './Pools.utils'
 import * as Shared from './PoolsOverview.shared'
 import * as Styled from './PoolsOverview.styles'
 
-const POOLS_KEY = 'active'
-
 export const ActivePools: React.FC<PoolsComponentProps> = ({ haltedChains, mimirHalt, walletLocked }): JSX.Element => {
   const navigate = useNavigate()
   const intl = useIntl()
@@ -61,12 +59,12 @@ export const ActivePools: React.FC<PoolsComponentProps> = ({ haltedChains, mimir
     () =>
       FP.pipe(
         poolsFilters$,
-        RxOp.map((filters) => FP.pipe(O.fromNullable(filters[POOLS_KEY]), O.flatten))
+        RxOp.map((filters) => FP.pipe(O.fromNullable(filters['active']), O.flatten))
       ),
     O.none
   )
 
-  const setFilter = useCallback((oFilter: O.Option<PoolFilter>) => setPoolsFilter(POOLS_KEY, oFilter), [setPoolsFilter])
+  const setFilter = useCallback((oFilter: O.Option<PoolFilter>) => setPoolsFilter('active', oFilter), [setPoolsFilter])
 
   const refreshHandler = useCallback(() => {
     reloadPools()
