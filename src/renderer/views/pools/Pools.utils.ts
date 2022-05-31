@@ -132,7 +132,6 @@ export const filterTableData =
         FP.pipe(
           tableData,
           A.filterMap((tableRow) => {
-            console.log('FILTER filter:', filter)
             const asset = tableRow.pool.target
             // all base chain assets
             if (filter === 'base') {

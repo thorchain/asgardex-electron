@@ -292,12 +292,15 @@ export type ActionsPageRD = RD.RemoteData<ApiError, ActionsPage>
 export type ActionsPageLD = LiveData<ApiError, ActionsPage>
 
 const staticPoolFilters = ['base', 'usd', 'bep2', 'erc20'] as const
-export type StaticPoolFilters = typeof staticPoolFilters[number]
+export type StaticPoolFilter = typeof staticPoolFilters[number]
 
-export const isStaticPoolFilter = (v: unknown): v is StaticPoolFilters =>
-  typeof v === 'string' ? staticPoolFilters.includes(v as StaticPoolFilters) : false
+/**
+ * Type guard for `StaticPoolFilters`
+ */
+export const isStaticPoolFilter = (v: unknown): v is StaticPoolFilter =>
+  typeof v === 'string' ? staticPoolFilters.includes(v as StaticPoolFilter) : false
 
-export type PoolFilter = StaticPoolFilters | string
+export type PoolFilter = StaticPoolFilter | string
 export type PoolFilters = PoolFilter[]
 export const DEFAULT_POOL_FILTERS: PoolFilters = ['base', 'usd', 'bep2', 'erc20']
 

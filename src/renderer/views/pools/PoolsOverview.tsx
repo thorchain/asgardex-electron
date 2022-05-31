@@ -29,7 +29,7 @@ export const PoolsOverview: React.FC = (): JSX.Element => {
   const { keystoreService } = useWalletContext()
   const keystore = useObservableState(keystoreService.keystore$, O.none)
 
-  const [activeTabKey, setActiveTabKey] = useState('active')
+  const [activeTabKey, setActiveTabKey] = useState<PoolType>('active')
 
   const {
     service: {

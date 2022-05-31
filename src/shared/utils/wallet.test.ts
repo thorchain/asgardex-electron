@@ -2,7 +2,7 @@ import * as NEA from 'fp-ts/lib/NonEmptyArray'
 
 import { toDerivationPathArray } from './wallet'
 
-describe.only('shared/utils/wallet', () => {
+describe('shared/utils/wallet', () => {
   describe('toDerivationPathArray', () => {
     it('success', () => {
       const result = toDerivationPathArray("44'/330'/0'/0/", 0)

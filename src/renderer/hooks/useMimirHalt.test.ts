@@ -1,7 +1,7 @@
 import { getMimirStatus } from './useMimirHalt'
 
 describe('hooks/useMimirHalt', () => {
-  describe.only('getMimirStatus', () => {
+  describe('getMimirStatus', () => {
     it('mimir = 1', () => {
       expect(getMimirStatus(1)).toBeTruthy()
     })
