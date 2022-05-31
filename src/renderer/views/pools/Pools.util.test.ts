@@ -60,12 +60,14 @@ describe('views/pools/utils', () => {
         deepest: false,
         apy: 2,
         key: 'hi',
-        network: 'testnet'
+        network: 'testnet',
+        watched: false
       }
 
       const result = getPoolTableRowData({
         poolDetail: lokPoolDetail,
         pricePoolData: pricePoolData,
+        watchList: [],
         network: 'testnet'
       })
 

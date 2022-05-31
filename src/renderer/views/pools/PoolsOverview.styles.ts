@@ -1,5 +1,6 @@
+import * as AI from '@ant-design/icons'
 import * as A from 'antd'
-import styled from 'styled-components'
+import styled, { css } from 'styled-components'
 import { palette } from 'styled-theme'
 
 import { AssetsFilter as AssetsFilterUI } from '../../components/AssetsFilter'
@@ -73,4 +74,27 @@ export const Label = styled(UILabel)`
 `
 export const AssetsFilter = styled(AssetsFilterUI)`
   margin-bottom: 20px;
+`
+
+export const WatchContainer = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: 100%;
+`
+
+const starStyle = css`
+  svg {
+    fill: ${palette('primary', 0)};
+    width: 20px;
+    height: 20px;
+  }
+`
+
+export const StarOutlined = styled(AI.StarOutlined)`
+  ${starStyle}
+`
+export const StarFilled = styled(AI.StarFilled)`
+  ${starStyle}
 `

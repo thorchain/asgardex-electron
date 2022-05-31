@@ -23,6 +23,7 @@ import { getPoolTableRowsData, RUNE_PRICE_POOL } from '../../helpers/poolHelper'
 import { useIncentivePendulum } from '../../hooks/useIncentivePendulum'
 import { usePoolCycle } from '../../hooks/usePoolCycle'
 import { usePoolFilter } from '../../hooks/usePoolFilter'
+import { usePoolWatchlist } from '../../hooks/usePoolWatchlist'
 import { useProtocolLimit } from '../../hooks/useProtocolLimit'
 import * as poolsRoutes from '../../routes/pools'
 import { DEFAULT_NETWORK } from '../../services/const'
@@ -50,6 +51,7 @@ export const PendingPools: React.FC<PoolsComponentProps> = ({ haltedChains, mimi
   } = useMidgardContext()
 
   const { setFilter: setPoolFilter, filter: poolFilter } = usePoolFilter('pending')
+  const { add: addPoolToWatchlist, remove: removePoolFromWatchlist, list: poolWatchList } = usePoolWatchlist()
 
   const poolsRD = useObservableState(pendingPoolsState$, RD.pending)
   const thorchainLastblockRD: ThorchainLastblockRD = useObservableState(thorchainLastblockState$, RD.pending)
@@ -130,6 +132,7 @@ export const PendingPools: React.FC<PoolsComponentProps> = ({ haltedChains, mimi
 
   const desktopPoolsColumns: ColumnsType<PoolTableRowData> = useMemo(
     () => [
+      Shared.watchColumn(addPoolToWatchlist, removePoolFromWatchlist),
       Shared.poolColumn(intl.formatMessage({ id: 'common.pool' })),
       Shared.assetColumn(intl.formatMessage({ id: 'common.asset' })),
       Shared.priceColumn(intl.formatMessage({ id: 'common.price' }), selectedPricePool.asset),
@@ -137,7 +140,7 @@ export const PendingPools: React.FC<PoolsComponentProps> = ({ haltedChains, mimi
       blockLeftColumn,
       btnPendingPoolsColumn
     ],
-    [intl, selectedPricePool.asset, blockLeftColumn, btnPendingPoolsColumn]
+    [addPoolToWatchlist, removePoolFromWatchlist, intl, selectedPricePool.asset, blockLeftColumn, btnPendingPoolsColumn]
   )
 
   const mobilePoolsColumns: ColumnsType<PoolTableRowData> = useMemo(
@@ -206,6 +209,7 @@ export const PendingPools: React.FC<PoolsComponentProps> = ({ haltedChains, mimi
           const poolViewData = getPoolTableRowsData({
             poolDetails: poolDetailsFiltered,
             pricePoolData: selectedPricePool.poolData,
+            watchList: poolWatchList,
             network
           })
           previousPools.current = O.some(poolViewData)

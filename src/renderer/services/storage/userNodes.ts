@@ -1,6 +1,5 @@
 import { Address } from '@xchainjs/xchain-client'
 import * as A from 'fp-ts/Array'
-import { eqString } from 'fp-ts/Eq'
 import * as FP from 'fp-ts/function'
 import * as O from 'fp-ts/Option'
 import * as Rx from 'rxjs'
@@ -8,6 +7,7 @@ import * as RxOp from 'rxjs/operators'
 
 import { Network, UserNodesStorage } from '../../../shared/api/types'
 import { USER_NODES_STORAGE_DEFAULT } from '../../../shared/const'
+import { eqString } from '../../helpers/fp/eq'
 import { observableState } from '../../helpers/stateHelper'
 import { network$ } from '../app/service'
 import { StoragePartialState, StorageState } from './types'
@@ -44,7 +44,7 @@ const userNodes$: Rx.Observable<Address[]> = FP.pipe(
     FP.pipe(
       storageState,
       O.map((userNodes) => userNodes[network]),
-      O.getOrElse((): Address[] => A.empty)
+      O.getOrElse((): Address[] => [])
     )
   ),
   RxOp.shareReplay(1)
