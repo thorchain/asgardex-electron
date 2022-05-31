@@ -1,8 +1,8 @@
+import * as AI from '@ant-design/icons'
 import styled from 'styled-components'
 import { palette } from 'styled-theme'
 
 import { media } from '../../helpers/styleHelper'
-import { transition } from '../../settings/style-util'
 import { Button as ButtonUI, ButtonProps } from '../uielements/button'
 import { Input as InputUI } from '../uielements/input'
 
@@ -28,7 +28,6 @@ export const ButtonContainer = styled.div`
 export const Input = styled(InputUI)`
   width: 200px;
 
-  /* ${transition(2, 'width')}; */
   margin: 10px 0 0 0;
 
   border-color: ${palette('gray', 1)};
@@ -84,5 +83,13 @@ export const ResetButton = styled(ButtonUI).attrs({ typevalue: 'transparent' })`
     &:active,
     &:focus {
       color: ${({ disabled }) => (!disabled ? palette('error', 0) : palette('gray', 1))} !important;
+  }
+`
+
+export const Star = styled(AI.StarFilled)`
+  svg {
+    fill: ${palette('grey', 0)};
+    width: 15px;
+    height: 15px;
   }
 `

@@ -3,14 +3,13 @@ import { Balance } from '@xchainjs/xchain-client'
 import { bnOrZero, assetFromString, AssetRuneNative, BaseAmount, Chain, THORChain } from '@xchainjs/xchain-util'
 import BigNumber from 'bignumber.js'
 import * as A from 'fp-ts/lib/Array'
-import * as Eq from 'fp-ts/lib/Eq'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
 import * as Ord from 'fp-ts/lib/Ord'
 
 import { Network } from '../../shared/api/types'
 import { ONE_RUNE_BASE_AMOUNT } from '../../shared/mock/amount'
-import { PoolAddress, PoolDetails } from '../services/midgard/types'
+import { PoolAddress, PoolDetails, PoolWatchList } from '../services/midgard/types'
 import { getPoolDetail, toPoolData } from '../services/midgard/utils'
 import { MimirHaltChain, MimirHaltTrading, MimirPauseLP } from '../services/thorchain/types'
 import { PoolDetail } from '../types/generated/midgard'
@@ -18,7 +17,7 @@ import { PoolTableRowData, PoolTableRowsData, PricePool } from '../views/pools/P
 import { getPoolTableRowData } from '../views/pools/Pools.utils'
 import { convertBaseAmountDecimal, to1e8BaseAmount, isRuneAsset } from './assetHelper'
 import { isBchChain, isBnbChain, isBtcChain, isDogeChain, isEthChain, isLtcChain, isTerraChain } from './chainHelper'
-import { eqChain } from './fp/eq'
+import { eqChain, eqString } from './fp/eq'
 import { ordBaseAmount } from './fp/ord'
 import { sequenceTOption, sequenceTOptionFromArray } from './fpHelpers'
 import { emptyString } from './stringHelper'
@@ -62,10 +61,12 @@ export const RUNE_POOL_ADDRESS: PoolAddress = {
 export const getPoolTableRowsData = ({
   poolDetails,
   pricePoolData,
+  watchList,
   network
 }: {
   poolDetails: PoolDetails
   pricePoolData: PoolData
+  watchList: PoolWatchList
   network: Network
 }): PoolTableRowsData => {
   // get symbol of deepest pool
@@ -91,12 +92,12 @@ export const getPoolTableRowsData = ({
         sequenceTOption(oDeepestPoolSymbol, oPoolDetailSymbol),
         O.fold(
           () => false,
-          ([deepestPoolSymbol, poolDetailSymbol]) => Eq.eqString.equals(deepestPoolSymbol, poolDetailSymbol)
+          ([deepestPoolSymbol, poolDetailSymbol]) => eqString.equals(deepestPoolSymbol, poolDetailSymbol)
         )
       )
 
       return FP.pipe(
-        getPoolTableRowData({ poolDetail, pricePoolData, network }),
+        getPoolTableRowData({ poolDetail, pricePoolData, watchList, network }),
         O.map(
           (poolTableRowData) =>
             ({

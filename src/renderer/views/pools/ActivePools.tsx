@@ -23,6 +23,7 @@ import { ordBaseAmount, ordNumber } from '../../helpers/fp/ord'
 import * as PoolHelpers from '../../helpers/poolHelper'
 import { useIncentivePendulum } from '../../hooks/useIncentivePendulum'
 import { usePoolFilter } from '../../hooks/usePoolFilter'
+import { usePoolWatchlist } from '../../hooks/usePoolWatchlist'
 import { useProtocolLimit } from '../../hooks/useProtocolLimit'
 import * as poolsRoutes from '../../routes/pools'
 import { SwapRouteParams } from '../../routes/pools/swap'
@@ -49,6 +50,7 @@ export const ActivePools: React.FC<PoolsComponentProps> = ({ haltedChains, mimir
   const { data: incentivePendulumRD } = useIncentivePendulum()
 
   const { setFilter: setPoolFilter, filter: poolFilter } = usePoolFilter('active')
+  const { add: addPoolToWatchlist, remove: removePoolFromWatchlist, list: poolWatchList } = usePoolWatchlist()
 
   const poolsRD = useObservableState(poolsState$, RD.pending)
 
@@ -182,6 +184,7 @@ export const ActivePools: React.FC<PoolsComponentProps> = ({ haltedChains, mimir
     () =>
       FP.pipe(
         [
+          O.some(Shared.watchColumn(addPoolToWatchlist, removePoolFromWatchlist)),
           O.some(Shared.poolColumn(intl.formatMessage({ id: 'common.pool' }))),
           O.some(Shared.assetColumn(intl.formatMessage({ id: 'common.asset' }))),
           O.some(Shared.priceColumn(intl.formatMessage({ id: 'common.price' }), selectedPricePool.asset)),
@@ -192,7 +195,16 @@ export const ActivePools: React.FC<PoolsComponentProps> = ({ haltedChains, mimir
         ],
         A.filterMap(FP.identity)
       ),
-    [intl, selectedPricePool.asset, isLargeScreen, volumeColumn, apyColumn, btnPoolsColumn]
+    [
+      addPoolToWatchlist,
+      removePoolFromWatchlist,
+      intl,
+      selectedPricePool.asset,
+      volumeColumn,
+      isLargeScreen,
+      apyColumn,
+      btnPoolsColumn
+    ]
   )
 
   const mobilePoolsColumns: ColumnsType<PoolTableRowData> = useMemo(
@@ -259,6 +271,7 @@ export const ActivePools: React.FC<PoolsComponentProps> = ({ haltedChains, mimir
           const poolViewData = PoolHelpers.getPoolTableRowsData({
             poolDetails,
             pricePoolData: selectedPricePool.poolData,
+            watchList: poolWatchList,
             network
           })
           previousPools.current = O.some(poolViewData)

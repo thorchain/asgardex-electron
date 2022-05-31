@@ -18,9 +18,9 @@ import { Network } from '../../../shared/api/types'
 import { ONE_RUNE_BASE_AMOUNT } from '../../../shared/mock/amount'
 import { isBtcAsset, isChainAsset, isEthAsset, isUSDAsset, isEthTokenAsset } from '../../helpers/assetHelper'
 import { isBnbChain, isEthChain } from '../../helpers/chainHelper'
-import { eqString } from '../../helpers/fp/eq'
+import { eqString, eqAsset } from '../../helpers/fp/eq'
 import { sequenceTOption } from '../../helpers/fpHelpers'
-import { PoolFilter } from '../../services/midgard/types'
+import { PoolFilter, PoolWatchList } from '../../services/midgard/types'
 import { toPoolData } from '../../services/midgard/utils'
 import { GetPoolsStatusEnum, PoolDetail, LastblockItem } from '../../types/generated/midgard'
 import { PoolTableRowData, Pool } from './Pools.types'
@@ -42,10 +42,12 @@ export const stringToGetPoolsStatus = (status: string): GetPoolsStatusEnum => {
 export const getPoolTableRowData = ({
   poolDetail,
   pricePoolData,
+  watchList,
   network
 }: {
   poolDetail: PoolDetail
   pricePoolData: PoolData
+  watchList: PoolWatchList
   network: Network
 }): O.Option<PoolTableRowData> => {
   const oPoolDetailAsset = O.fromNullable(assetFromString(poolDetail.asset))
@@ -73,6 +75,12 @@ export const getPoolTableRowData = ({
         target: poolDetailAsset
       }
 
+      const watched: boolean = FP.pipe(
+        watchList,
+        A.findFirst((poolInList) => eqAsset.equals(poolInList, poolDetailAsset)),
+        O.isSome
+      )
+
       return {
         pool,
         poolPrice,
@@ -81,7 +89,8 @@ export const getPoolTableRowData = ({
         status,
         key: poolDetailAsset.ticker,
         network,
-        apy
+        apy,
+        watched
       }
     })
   )
@@ -118,7 +127,7 @@ export const getBlocksLeftForPendingPoolAsString = (
   )
 }
 
-export type FilterTableData = Pick<PoolTableRowData, 'pool'>
+export type FilterTableData = Pick<PoolTableRowData, 'pool' | 'watched'>
 /**
  * Filters tableData array by passed active filter.
  * If oFilter is O.none will return tableData array without any changes
@@ -134,20 +143,24 @@ export const filterTableData =
           A.filterMap((tableRow) => {
             const asset = tableRow.pool.target
             const value = filter.toLowerCase()
+            // watched assets
+            if (value === '__watched__') {
+              return tableRow.watched ? O.some(tableRow) : O.none
+            }
             // all base chain assets
-            if (value === 'base') {
+            if (value === '__base__') {
               return isChainAsset(asset) ? O.some(tableRow) : O.none
             }
             // usd assets
-            if (value === 'usd') {
+            if (value === '__usd__') {
               return isUSDAsset(asset) ? O.some(tableRow) : O.none
             }
             // erc20
-            if (value === 'erc20') {
+            if (value === '__erc20__') {
               return isEthChain(asset.chain) && !isChainAsset(asset) ? O.some(tableRow) : O.none
             }
             // bep2
-            if (value === 'bep2') {
+            if (value === '__bep2__') {
               return isBnbChain(asset.chain) && !isChainAsset(asset) ? O.some(tableRow) : O.none
             }
             // custom

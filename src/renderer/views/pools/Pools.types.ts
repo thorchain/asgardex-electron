@@ -35,6 +35,7 @@ export type PoolTableRowData = {
   deepest?: boolean
   key: string
   network: Network
+  watched: boolean
 }
 
 export type PoolsComponentProps = {

@@ -20,12 +20,13 @@ type Props = {
 export const AssetsFilter: React.FC<Props> = ({ poolFilters, className, activeFilter: oActiveFilter, setFilter }) => {
   const intl = useIntl()
 
-  const filterNames: Record<Exclude<PoolFilter, { custom: string }>, string> = useMemo(
+  const filterNames: Record<StaticPoolFilter, string> = useMemo(
     () => ({
-      base: intl.formatMessage({ id: 'common.asset.base' }),
-      usd: 'usd',
-      erc20: 'erc20',
-      bep2: 'bep2'
+      __watched__: 'star', // will be replaced by an icon, but don't leave it empty
+      __base__: intl.formatMessage({ id: 'common.asset.base' }),
+      __usd__: 'usd',
+      __erc20__: 'erc20',
+      __bep2__: 'bep2'
     }),
     [intl]
   )
@@ -77,7 +78,7 @@ export const AssetsFilter: React.FC<Props> = ({ poolFilters, className, activeFi
             weight={isActive ? 'bold' : 'normal'}
             onClick={() => buttonClickHandler(filter)}
             key={filter}>
-            {filterLabel}
+            {filter !== '__watched__' ? filterLabel : <Styled.Star />}
           </Styled.FilterButton>
         )
       )

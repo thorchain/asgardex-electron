@@ -19,7 +19,7 @@ import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
 
 import { ASSETS_TESTNET } from '../../shared/mock/assets'
-import { PoolDetails } from '../services/midgard/types'
+import { PoolDetails, PoolWatchList } from '../services/midgard/types'
 import { toPoolData } from '../services/midgard/utils'
 import { DEFAULT_MIMIR_HALT } from '../services/thorchain/const'
 import { GetPoolsStatusEnum, PoolDetail } from '../types/generated/midgard'
@@ -51,6 +51,8 @@ describe('helpers/poolHelper/', () => {
   const pool2: PoolDetail = { ...mockPoolDetail, status: GetPoolsStatusEnum.Available, runeDepth: '2000' }
   const pool3: PoolDetail = { ...mockPoolDetail, status: GetPoolsStatusEnum.Suspended, runeDepth: '0' }
   const pool4: PoolDetail = { ...mockPoolDetail, status: GetPoolsStatusEnum.Staged, runeDepth: '4000' }
+
+  const watchList: PoolWatchList = [AssetBNB]
 
   describe('getDeepestPool', () => {
     it('returns deepest pool', () => {
@@ -85,6 +87,7 @@ describe('helpers/poolHelper/', () => {
       const result = getPoolTableRowsData({
         poolDetails: pendingPoolDetails,
         pricePoolData,
+        watchList,
         network: 'testnet'
       })
       expect(result.length).toEqual(2)
@@ -99,6 +102,7 @@ describe('helpers/poolHelper/', () => {
       const result = getPoolTableRowsData({
         poolDetails,
         pricePoolData,
+        watchList,
         network: 'testnet'
       })
       expect(result.length).toEqual(2)

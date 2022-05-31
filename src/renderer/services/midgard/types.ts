@@ -7,6 +7,7 @@ import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
 import * as Rx from 'rxjs'
 
+import { Network } from '../../../shared/api/types'
 import { LiveData } from '../../helpers/rx/liveData'
 import { AssetWithAmount, DepositType } from '../../types/asgardex'
 import {
@@ -177,6 +178,8 @@ export type HealthLD = LiveData<Error, Health>
 
 export type PoolType = 'active' | 'pending'
 
+export type PoolWatchList = Asset[]
+
 export type PoolsService = {
   poolsState$: LiveData<Error, PoolsState>
   pendingPoolsState$: LiveData<Error, PendingPoolsState>
@@ -210,6 +213,9 @@ export type PoolsService = {
   validatePool$: (poolAddresses: PoolAddress, chain: Chain) => ValidatePoolLD
   poolsFilters$: Rx.Observable<Record<string, O.Option<PoolFilter>>>
   setPoolsFilter: (poolKey: PoolType, filter: O.Option<PoolFilter>) => void
+  poolsWatchlist$: Rx.Observable<Record<Network, PoolWatchList>>
+  addPoolToWatchlist: (poolAsset: Asset, network: Network) => void
+  removePoolFromWatchlist: (poolAsset: Asset, network: Network) => void
   gasRateByChain$: (chain: Chain) => GasRateLD
   reloadGasRates: FP.Lazy<void>
   haltedChains$: HaltedChainsLD
@@ -291,7 +297,7 @@ export type ActionsPage = {
 export type ActionsPageRD = RD.RemoteData<ApiError, ActionsPage>
 export type ActionsPageLD = LiveData<ApiError, ActionsPage>
 
-const staticPoolFilters = ['base', 'usd', 'bep2', 'erc20'] as const
+const staticPoolFilters = ['__base__', '__usd__', '__bep2__', '__erc20__', '__watched__'] as const
 export type StaticPoolFilter = typeof staticPoolFilters[number]
 
 /**
@@ -302,7 +308,7 @@ export const isStaticPoolFilter = (v: unknown): v is StaticPoolFilter =>
 
 export type PoolFilter = StaticPoolFilter | string
 export type PoolFilters = PoolFilter[]
-export const DEFAULT_POOL_FILTERS: PoolFilters = ['base', 'usd', 'bep2', 'erc20']
+export const DEFAULT_POOL_FILTERS: PoolFilters = ['__watched__', '__base__', '__usd__', '__bep2__', '__erc20__']
 
 export type LoadActionsParams = {
   page: number

@@ -3,10 +3,10 @@ import { isStaticPoolFilter } from './types'
 describe('views/pools/types', () => {
   describe('isStaticPoolFilter', () => {
     it('true', () => {
-      expect(isStaticPoolFilter('usd')).toBeTruthy()
-      expect(isStaticPoolFilter('base')).toBeTruthy()
-      expect(isStaticPoolFilter('bep2')).toBeTruthy()
-      expect(isStaticPoolFilter('erc20')).toBeTruthy()
+      expect(isStaticPoolFilter('__usd__')).toBeTruthy()
+      expect(isStaticPoolFilter('__base__')).toBeTruthy()
+      expect(isStaticPoolFilter('__bep2__')).toBeTruthy()
+      expect(isStaticPoolFilter('__erc20__')).toBeTruthy()
     })
     it('false', () => {
       expect(isStaticPoolFilter('unknwon')).toBeFalsy()

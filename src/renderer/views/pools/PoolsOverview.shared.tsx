@@ -12,6 +12,41 @@ import { sortByDepth } from '../../helpers/poolHelper'
 import { PoolTableRowData } from './Pools.types'
 import * as Styled from './PoolsOverview.styles'
 
+const renderWatchColumn = ({
+  data: { watched },
+  add,
+  remove
+}: {
+  data: PoolTableRowData
+  add: FP.Lazy<void>
+  remove: FP.Lazy<void>
+}) => (
+  <Styled.WatchContainer
+    onClick={(event) => {
+      event.preventDefault()
+      event.stopPropagation()
+      watched ? remove() : add()
+    }}>
+    {watched ? <Styled.StarFilled /> : <Styled.StarOutlined />}
+  </Styled.WatchContainer>
+)
+
+const sortWatchColumn = ({ watched: watchedA }: PoolTableRowData, { watched: watchedB }: PoolTableRowData) =>
+  watchedA === watchedB ? 0 : 1
+
+export const watchColumn = (
+  add: (asset: Asset) => void,
+  remove: (asset: Asset) => void
+): ColumnType<PoolTableRowData> => ({
+  key: 'watch',
+  align: 'center',
+  width: 50,
+  render: (data: PoolTableRowData) =>
+    renderWatchColumn({ data, add: () => add(data.pool.target), remove: () => remove(data.pool.target) }),
+  sorter: sortWatchColumn,
+  sortDirections: ['descend', 'ascend']
+})
+
 const renderAssetColumn = ({ pool }: PoolTableRowData) => <AssetLabel asset={pool.target} />
 
 const sortAssetColumn = ({ pool: poolA }: PoolTableRowData, { pool: poolB }: PoolTableRowData) =>
