@@ -20,6 +20,7 @@ const sortAssetColumn = ({ pool: poolA }: PoolTableRowData, { pool: poolB }: Poo
 export const assetColumn = (title: string): ColumnType<PoolTableRowData> => ({
   key: 'asset',
   title,
+  align: 'left',
   render: renderAssetColumn,
   sorter: sortAssetColumn,
   sortDirections: ['descend', 'ascend']

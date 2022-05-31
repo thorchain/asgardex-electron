@@ -3,7 +3,7 @@ import React, { useCallback, useMemo, useRef } from 'react'
 import * as RD from '@devexperts/remote-data-ts'
 import { assetToString } from '@xchainjs/xchain-util'
 import { Grid } from 'antd'
-import { ColumnsType } from 'antd/lib/table'
+import { ColumnsType, ColumnType } from 'antd/lib/table'
 import * as A from 'fp-ts/Array'
 import * as FP from 'fp-ts/function'
 import * as O from 'fp-ts/lib/Option'
@@ -88,7 +88,7 @@ export const PendingPools: React.FC<PoolsComponentProps> = ({ haltedChains, mimi
     [haltedChains, isDesktopView, mimirHalt, walletLocked]
   )
 
-  const btnPendingPoolsColumn = useMemo(
+  const btnPendingPoolsColumn: ColumnType<PoolTableRowData> = useMemo(
     () => ({
       key: 'btn',
       title: Shared.renderRefreshBtnColTitle(intl.formatMessage({ id: 'common.refresh' }), refreshHandler),
@@ -117,10 +117,11 @@ export const PendingPools: React.FC<PoolsComponentProps> = ({ haltedChains, mimi
     [thorchainLastblockRD, oNewPoolCycle]
   )
 
-  const blockLeftColumn = useMemo(
+  const blockLeftColumn: ColumnType<PoolTableRowData> = useMemo(
     () => ({
       key: 'blocks',
       title: intl.formatMessage({ id: 'pools.blocksleft' }),
+      align: 'right',
       width: 80,
       render: renderBlockLeftColumn
     }),

@@ -65,6 +65,7 @@ export const BlockLeftLabel = styled(UILabel)`
   display: inline-block;
   width: 100px;
   font-size: 16px;
+  text-align: right;
 `
 
 export const Label = styled(UILabel)`
