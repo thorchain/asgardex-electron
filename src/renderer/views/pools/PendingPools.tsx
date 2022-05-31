@@ -11,7 +11,6 @@ import * as P from 'fp-ts/lib/Predicate'
 import { useObservableState } from 'observable-hooks'
 import { useIntl } from 'react-intl'
 import { useNavigate } from 'react-router-dom'
-import * as RxOp from 'rxjs/operators'
 
 import { Network } from '../../../shared/api/types'
 import { ManageButton } from '../../components/manageButton'
@@ -23,10 +22,11 @@ import * as PoolHelpers from '../../helpers/poolHelper'
 import { getPoolTableRowsData, RUNE_PRICE_POOL } from '../../helpers/poolHelper'
 import { useIncentivePendulum } from '../../hooks/useIncentivePendulum'
 import { usePoolCycle } from '../../hooks/usePoolCycle'
+import { usePoolFilter } from '../../hooks/usePoolFilter'
 import { useProtocolLimit } from '../../hooks/useProtocolLimit'
 import * as poolsRoutes from '../../routes/pools'
 import { DEFAULT_NETWORK } from '../../services/const'
-import { PendingPoolsState, PoolFilter, DEFAULT_POOL_FILTERS, ThorchainLastblockRD } from '../../services/midgard/types'
+import { PendingPoolsState, DEFAULT_POOL_FILTERS, ThorchainLastblockRD } from '../../services/midgard/types'
 import { PoolDetail } from '../../types/generated/midgard'
 import { PoolsComponentProps, PoolTableRowData, PoolTableRowsData } from './Pools.types'
 import { getBlocksLeftForPendingPoolAsString, isEmptyPool } from './Pools.utils'
@@ -42,12 +42,14 @@ export const PendingPools: React.FC<PoolsComponentProps> = ({ haltedChains, mimi
   const { network$ } = useAppContext()
   const network = useObservableState<Network>(network$, DEFAULT_NETWORK)
 
-  const { service: midgardService } = useMidgardContext()
-
   const {
-    thorchainLastblockState$,
-    pools: { pendingPoolsState$, reloadPendingPools, selectedPricePool$, poolsFilters$, setPoolsFilter }
-  } = midgardService
+    service: {
+      thorchainLastblockState$,
+      pools: { pendingPoolsState$, reloadPendingPools, selectedPricePool$ }
+    }
+  } = useMidgardContext()
+
+  const { setFilter: setPoolFilter, filter: poolFilter } = usePoolFilter('pending')
 
   const poolsRD = useObservableState(pendingPoolsState$, RD.pending)
   const thorchainLastblockRD: ThorchainLastblockRD = useObservableState(thorchainLastblockState$, RD.pending)
@@ -95,17 +97,6 @@ export const PendingPools: React.FC<PoolsComponentProps> = ({ haltedChains, mimi
     }),
     [refreshHandler, intl, renderBtnPoolsColumn]
   )
-
-  const [poolFilter] = useObservableState<O.Option<PoolFilter>>(
-    () =>
-      FP.pipe(
-        poolsFilters$,
-        RxOp.map((filters) => FP.pipe(O.fromNullable(filters['pending']), O.flatten))
-      ),
-    O.none
-  )
-
-  const setFilter = useCallback((oFilter: O.Option<PoolFilter>) => setPoolsFilter('pending', oFilter), [setPoolsFilter])
 
   const renderBlockLeftColumn = useCallback(
     (_: string, record: PoolTableRowData) => {
@@ -164,7 +155,7 @@ export const PendingPools: React.FC<PoolsComponentProps> = ({ haltedChains, mimi
 
       return (
         <>
-          <Styled.AssetsFilter setFilter={setFilter} activeFilter={poolFilter} poolFilters={DEFAULT_POOL_FILTERS} />
+          <Styled.AssetsFilter setFilter={setPoolFilter} activeFilter={poolFilter} poolFilters={DEFAULT_POOL_FILTERS} />
           <ProtocolLimit limit={limitRD} />
           <IncentivePendulum incentivePendulum={incentivePendulumRD} />
           <Table
@@ -187,8 +178,8 @@ export const PendingPools: React.FC<PoolsComponentProps> = ({ haltedChains, mimi
       isDesktopView,
       desktopPoolsColumns,
       mobilePoolsColumns,
-      setFilter,
       poolFilter,
+      setPoolFilter,
       limitRD,
       incentivePendulumRD,
       navigate

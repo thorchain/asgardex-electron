@@ -11,7 +11,6 @@ import * as O from 'fp-ts/Option'
 import { useObservableState } from 'observable-hooks'
 import { useIntl } from 'react-intl'
 import { useNavigate } from 'react-router-dom'
-import * as RxOp from 'rxjs/operators'
 
 import { Network } from '../../../shared/api/types'
 import { ManageButton } from '../../components/manageButton'
@@ -23,11 +22,12 @@ import { useMidgardContext } from '../../contexts/MidgardContext'
 import { ordBaseAmount, ordNumber } from '../../helpers/fp/ord'
 import * as PoolHelpers from '../../helpers/poolHelper'
 import { useIncentivePendulum } from '../../hooks/useIncentivePendulum'
+import { usePoolFilter } from '../../hooks/usePoolFilter'
 import { useProtocolLimit } from '../../hooks/useProtocolLimit'
 import * as poolsRoutes from '../../routes/pools'
 import { SwapRouteParams } from '../../routes/pools/swap'
 import { DEFAULT_NETWORK } from '../../services/const'
-import { PoolFilter, PoolsState, DEFAULT_POOL_FILTERS } from '../../services/midgard/types'
+import { PoolsState, DEFAULT_POOL_FILTERS } from '../../services/midgard/types'
 import { PoolsComponentProps, PoolTableRowData, PoolTableRowsData } from './Pools.types'
 import { filterTableData } from './Pools.utils'
 import * as Shared from './PoolsOverview.shared'
@@ -40,13 +40,16 @@ export const ActivePools: React.FC<PoolsComponentProps> = ({ haltedChains, mimir
   const { network$ } = useAppContext()
   const network = useObservableState<Network>(network$, DEFAULT_NETWORK)
 
-  const { service: midgardService } = useMidgardContext()
+  const {
+    service: {
+      pools: { poolsState$, reloadPools, selectedPricePool$ }
+    }
+  } = useMidgardContext()
   const { reload: reloadLimit, data: limitRD } = useProtocolLimit()
   const { data: incentivePendulumRD } = useIncentivePendulum()
 
-  const {
-    pools: { poolsState$, reloadPools, selectedPricePool$, poolsFilters$, setPoolsFilter }
-  } = midgardService
+  const { setFilter: setPoolFilter, filter: poolFilter } = usePoolFilter('active')
+
   const poolsRD = useObservableState(poolsState$, RD.pending)
 
   const isDesktopView = Grid.useBreakpoint()?.lg ?? false
@@ -54,17 +57,6 @@ export const ActivePools: React.FC<PoolsComponentProps> = ({ haltedChains, mimir
 
   // store previous data of pools to render these while reloading
   const previousPools = useRef<O.Option<PoolTableRowsData>>(O.none)
-
-  const [poolFilter] = useObservableState<O.Option<PoolFilter>>(
-    () =>
-      FP.pipe(
-        poolsFilters$,
-        RxOp.map((filters) => FP.pipe(O.fromNullable(filters['active']), O.flatten))
-      ),
-    O.none
-  )
-
-  const setFilter = useCallback((oFilter: O.Option<PoolFilter>) => setPoolsFilter('active', oFilter), [setPoolsFilter])
 
   const refreshHandler = useCallback(() => {
     reloadPools()
@@ -219,7 +211,7 @@ export const ActivePools: React.FC<PoolsComponentProps> = ({ haltedChains, mimir
 
       return (
         <>
-          <Styled.AssetsFilter activeFilter={poolFilter} setFilter={setFilter} poolFilters={DEFAULT_POOL_FILTERS} />
+          <Styled.AssetsFilter activeFilter={poolFilter} setFilter={setPoolFilter} poolFilters={DEFAULT_POOL_FILTERS} />
           <ProtocolLimit limit={limitRD} />
           <IncentivePendulum incentivePendulum={incentivePendulumRD} />
           <Table
@@ -243,7 +235,7 @@ export const ActivePools: React.FC<PoolsComponentProps> = ({ haltedChains, mimir
       desktopPoolsColumns,
       mobilePoolsColumns,
       poolFilter,
-      setFilter,
+      setPoolFilter,
       limitRD,
       incentivePendulumRD,
       navigate
