@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo } from 'react'
+import React, { useCallback, useMemo, useState } from 'react'
 
 import { SearchOutlined, StopOutlined } from '@ant-design/icons/lib'
 import * as A from 'fp-ts/Array'
@@ -6,7 +6,8 @@ import * as FP from 'fp-ts/function'
 import * as O from 'fp-ts/Option'
 import { useIntl } from 'react-intl'
 
-import { isStaticPoolFilter, PoolFilter, PoolFilters } from '../../services/midgard/types'
+import { emptyString } from '../../helpers/stringHelper'
+import { isStaticPoolFilter, PoolFilter, PoolFilters, StaticPoolFilter } from '../../services/midgard/types'
 import * as Styled from './AssetsFilter.styles'
 
 type Props = {
@@ -29,22 +30,26 @@ export const AssetsFilter: React.FC<Props> = ({ poolFilters, className, activeFi
     [intl]
   )
 
+  const [inputFocused, setInputFocused] = useState(false)
+  const [inputValue, setInputValue] = useState(emptyString)
+
   const setCustomFilter = useCallback(
     ({ target }: React.ChangeEvent<HTMLInputElement>) => {
       const filter = target.value
-      setFilter(filter ? O.some(filter) : O.none)
+      setInputValue(filter)
+      // Use non-empty strings only
+      setFilter(O.fromPredicate((v) => !!v)(filter))
     },
     [setFilter]
   )
 
-  const inputValue = useMemo(
-    () =>
-      FP.pipe(
-        oActiveFilter,
-        O.chain(O.fromPredicate((filter) => !!filter.length && !isStaticPoolFilter(filter))),
-        O.getOrElse(() => '')
-      ),
-    [oActiveFilter]
+  const buttonClickHandler = useCallback(
+    (filter: StaticPoolFilter) => {
+      setFilter(O.some(filter))
+      // empty search input
+      setInputValue(emptyString)
+    },
+    [setFilter]
   )
 
   return FP.pipe(
@@ -52,7 +57,13 @@ export const AssetsFilter: React.FC<Props> = ({ poolFilters, className, activeFi
     A.map((filter) => {
       const isActive = FP.pipe(
         oActiveFilter,
-        O.map((active) => active === filter),
+        O.map(
+          (active) =>
+            active === filter &&
+            // don't update if an user has typed something into search field
+            !inputFocused &&
+            !inputValue
+        ),
         O.toUndefined
       )
 
@@ -64,7 +75,7 @@ export const AssetsFilter: React.FC<Props> = ({ poolFilters, className, activeFi
             focused={isActive}
             active={isActive ? 'true' : 'false'}
             weight={isActive ? 'bold' : 'normal'}
-            onClick={() => setFilter(O.some(filter))}
+            onClick={() => buttonClickHandler(filter)}
             key={filter}>
             {filterLabel}
           </Styled.FilterButton>
@@ -84,6 +95,8 @@ export const AssetsFilter: React.FC<Props> = ({ poolFilters, className, activeFi
         <Styled.Input
           prefix={<SearchOutlined />}
           onChange={setCustomFilter}
+          onFocus={() => setInputFocused(true)}
+          onBlur={() => setInputFocused(false)}
           value={inputValue}
           allowClear
           placeholder={intl.formatMessage({ id: 'common.search' }).toUpperCase()}

@@ -133,25 +133,26 @@ export const filterTableData =
           tableData,
           A.filterMap((tableRow) => {
             const asset = tableRow.pool.target
+            const value = filter.toLowerCase()
             // all base chain assets
-            if (filter === 'base') {
+            if (value === 'base') {
               return isChainAsset(asset) ? O.some(tableRow) : O.none
             }
             // usd assets
-            if (filter === 'usd') {
+            if (value === 'usd') {
               return isUSDAsset(asset) ? O.some(tableRow) : O.none
             }
             // erc20
-            if (filter === 'erc20') {
+            if (value === 'erc20') {
               return isEthChain(asset.chain) && !isChainAsset(asset) ? O.some(tableRow) : O.none
             }
             // bep2
-            if (filter === 'bep2') {
+            if (value === 'bep2') {
               return isBnbChain(asset.chain) && !isChainAsset(asset) ? O.some(tableRow) : O.none
             }
             // custom
-            if (filter.length > 0) {
-              return assetToString(asset).toLowerCase().includes(filter.toLowerCase()) ? O.some(tableRow) : O.none
+            if (value.length > 0) {
+              return assetToString(asset).toLowerCase().includes(value) ? O.some(tableRow) : O.none
             }
 
             return O.none
