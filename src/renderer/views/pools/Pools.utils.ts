@@ -151,7 +151,7 @@ export const filterTableData =
             }
             // custom
             if (filter.length > 0) {
-              return assetToString(asset).toLowerCase().includes(filter) ? O.some(tableRow) : O.none
+              return assetToString(asset).toLowerCase().includes(filter.toLowerCase()) ? O.some(tableRow) : O.none
             }
 
             return O.none
