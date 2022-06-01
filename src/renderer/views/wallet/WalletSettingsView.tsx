@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import React, { useMemo } from 'react'
+import React, { useCallback, useMemo } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
 import { Address, XChainClient } from '@xchainjs/xchain-client'
@@ -19,13 +19,13 @@ import * as A from 'fp-ts/lib/Array'
 import * as O from 'fp-ts/lib/Option'
 import { useObservableState } from 'observable-hooks'
 import { useIntl } from 'react-intl'
+import { useLocation, useNavigate } from 'react-router-dom'
 import * as Rx from 'rxjs'
 import * as RxOp from 'rxjs/operators'
 
 import { Network } from '../../../shared/api/types'
 import { WalletAddress } from '../../../shared/wallet/types'
-import { AssetsNav } from '../../components/wallet/assets'
-import { WalletSettings } from '../../components/wallet/settings/'
+import { WalletSettings, UnlockWalletSettings } from '../../components/wallet/settings/'
 import { useAppContext } from '../../contexts/AppContext'
 import { useBinanceContext } from '../../contexts/BinanceContext'
 import { useBitcoinCashContext } from '../../contexts/BitcoinCashContext'
@@ -50,16 +50,23 @@ import {
 } from '../../helpers/chainHelper'
 import { sequenceTOptionFromArray } from '../../helpers/fpHelpers'
 import { useLedger } from '../../hooks/useLedger'
+import * as walletRoutes from '../../routes/wallet'
 import { DEFAULT_NETWORK } from '../../services/const'
 import { WalletAddressAsync } from '../../services/wallet/types'
-import { ledgerErrorIdToI18n } from '../../services/wallet/util'
+import { isLocked, hasImportedKeystore, ledgerErrorIdToI18n } from '../../services/wallet/util'
 import { getPhrase } from '../../services/wallet/util'
 import { walletAccount$ } from './WalletSettingsView.helper'
 
 export const WalletSettingsView: React.FC = (): JSX.Element => {
   const intl = useIntl()
-  const { keystoreService } = useWalletContext()
-  const { keystore$, lock, removeKeystore, exportKeystore, validatePassword$ } = keystoreService
+  const navigate = useNavigate()
+  const location = useLocation()
+
+  const {
+    keystoreService: { keystore$, lock, removeKeystore, exportKeystore, validatePassword$ }
+  } = useWalletContext()
+
+  const keystore = useObservableState(keystore$, O.none)
 
   const { network$ } = useAppContext()
   const network = useObservableState<Network>(network$, DEFAULT_NETWORK)
@@ -394,23 +401,28 @@ export const WalletSettingsView: React.FC = (): JSX.Element => {
   ])
   const walletAccounts = useObservableState(walletAccounts$, O.none)
 
-  return (
-    <div style={{ marginTop: '50px' }}>
-      <AssetsNav />
-      <WalletSettings
-        network={network}
-        runeNativeAddress={runeNativeAddress}
-        lockWallet={lock}
-        removeKeystore={removeKeystore}
-        exportKeystore={exportKeystore}
-        addLedgerAddress={addLedgerAddressHandler}
-        verifyLedgerAddress={verifyLedgerAddressHandler}
-        removeLedgerAddress={removeLedgerAddressHandler}
-        phrase={phrase}
-        walletAccounts={walletAccounts}
-        clickAddressLinkHandler={clickAddressLinkHandler}
-        validatePassword$={validatePassword$}
-      />
-    </div>
+  const noAccess = useMemo(() => isLocked(keystore) || !hasImportedKeystore(keystore), [keystore])
+
+  const unlockWalletHandler = useCallback(() => {
+    navigate(walletRoutes.base.path(location.pathname))
+  }, [])
+
+  return noAccess ? (
+    <UnlockWalletSettings keystore={keystore} unlockHandler={unlockWalletHandler} />
+  ) : (
+    <WalletSettings
+      network={network}
+      runeNativeAddress={runeNativeAddress}
+      lockWallet={lock}
+      removeKeystore={removeKeystore}
+      exportKeystore={exportKeystore}
+      addLedgerAddress={addLedgerAddressHandler}
+      verifyLedgerAddress={verifyLedgerAddressHandler}
+      removeLedgerAddress={removeLedgerAddressHandler}
+      phrase={phrase}
+      walletAccounts={walletAccounts}
+      clickAddressLinkHandler={clickAddressLinkHandler}
+      validatePassword$={validatePassword$}
+    />
   )
 }

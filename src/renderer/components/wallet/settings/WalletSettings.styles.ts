@@ -12,26 +12,24 @@ import {
   WalletTypeLabel as WalletTypeLabelUI
 } from '../../../components/uielements/common/Common.styles'
 import { Label as UILabel } from '../../../components/uielements/label'
+import { media } from '../../../helpers/styleHelper'
 
-export const ContainerWrapper = styled.div`
-  margin: 0px 8px;
+export const Container = styled.div`
+  margin-top: 40px;
+  padding: 10px 40px 30px 40px;
+  background-color: ${palette('background', 1)};
 `
 
 export const TitleWrapper = styled.div`
-  margin: 0px -8px;
   display: flex;
-  justify-content: center;
   align-items: center;
-  background-color: ${palette('background', 1)};
   min-height: 70px;
 `
 
 export const Title = styled(UILabel)`
   color: ${palette('text', 1)};
-  padding: 0 40px;
   text-transform: uppercase;
-  font-family: 'MainFontRegular';
-  font-weight: 600;
+  font-family: 'MainFontSemiBold';
   font-size: 22px;
   line-height: 22px;
 `
@@ -42,21 +40,16 @@ export const Divider = styled(A.Divider)`
 `
 
 export const Subtitle = styled(UILabel)`
-  margin: 10px 0;
+  text-align: center;
+  padding: 20px 0 0 20px;
   color: ${palette('text', 0)};
   text-transform: uppercase;
   font-family: 'MainFontRegular';
-  font-weight: 600;
   font-size: 18px;
-`
 
-export const Row = styled(A.Row)`
-  padding: 10px 30px 40px 30px;
-  background-color: ${palette('background', 1)};
-
-  .ant-row {
-    margin: 0;
-  }
+  ${media.md`
+    text-align: left;
+  `}
 `
 
 export const WalletCol = styled(A.Col)`
@@ -64,10 +57,10 @@ export const WalletCol = styled(A.Col)`
 `
 
 export const Card = styled(A.Card)`
-  padding-top: 20px;
   border-radius: 5px;
   background-color: ${palette('background', 1)};
   border: 1px solid ${palette('gray', 0)};
+  margin-bottom: 40px;
 `
 
 export const OptionCard = styled(A.Card)`
@@ -109,7 +102,6 @@ export const AccountCard = styled(A.Card)`
   border: 1px solid ${palette('gray', 0)};
 
   .ant-card-body {
-    padding: 0;
     background-color: ${palette('background', 1)};
 
     div > div > div > ul > li {
@@ -119,7 +111,7 @@ export const AccountCard = styled(A.Card)`
 `
 
 export const ListItem = styled(A.List.Item)`
-  padding: 40px;
+  padding: 40px 20px;
   flex-direction: column;
   align-items: start;
 
@@ -311,4 +303,24 @@ export const Icon = styled(AIcon)`
     stroke: ${palette('warning', 0)};
     fill: none;
   }
+`
+
+export const UnlockWalletButtonContainer = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 300px;
+  border: 1px solid ${palette('gray', 0)};
+  background-color: ${palette('background', 1)};
+`
+
+export const UnlockWalletButton = styled(UIButton).attrs({
+  type: 'primary',
+  round: 'true',
+  sizevalue: 'xnormal',
+  color: 'success'
+})`
+  min-width: 200px !important;
+  padding: 0 30px;
+  margin: 30px 0;
 `

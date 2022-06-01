@@ -67,7 +67,6 @@ type Props = {
 type AddressToVerify = O.Option<{ address: Address; chain: Chain }>
 
 export const WalletSettings: React.FC<Props> = (props): JSX.Element => {
-  const intl = useIntl()
   const {
     network,
     walletAccounts: oWalletAccounts,
@@ -82,6 +81,8 @@ export const WalletSettings: React.FC<Props> = (props): JSX.Element => {
     clickAddressLinkHandler,
     validatePassword$
   } = props
+
+  const intl = useIntl()
 
   const phrase = useMemo(
     () =>
@@ -284,8 +285,8 @@ export const WalletSettings: React.FC<Props> = (props): JSX.Element => {
         oWalletAccounts,
         O.map((walletAccounts) => (
           <Col key={'accounts'} span={24}>
-            <Styled.Subtitle>{intl.formatMessage({ id: 'setting.account.management' })}</Styled.Subtitle>
             <Styled.AccountCard>
+              <Styled.Subtitle>{intl.formatMessage({ id: 'setting.account.management' })}</Styled.Subtitle>
               <List
                 dataSource={walletAccounts}
                 renderItem={({ chain, accounts }, i: number) => (
@@ -338,7 +339,10 @@ export const WalletSettings: React.FC<Props> = (props): JSX.Element => {
   )
 
   return (
-    <Styled.ContainerWrapper>
+    <Styled.Container>
+      <Styled.TitleWrapper>
+        <Styled.Title>{intl.formatMessage({ id: 'setting.wallet.title' })}</Styled.Title>
+      </Styled.TitleWrapper>
       {showPasswordModal && (
         <WalletPasswordConfirmationModal
           validatePassword$={validatePassword$}
@@ -361,59 +365,54 @@ export const WalletSettings: React.FC<Props> = (props): JSX.Element => {
         onSuccess={removeWallet}
       />
       {renderQRCodeModal}
-      <Styled.Row gutter={[16, 16]}>
-        <Col span={24}>
-          {renderVerifyAddressModal(addressToVerify)}
-          <Styled.Subtitle>{intl.formatMessage({ id: 'setting.wallet.management' })}</Styled.Subtitle>
-          <Styled.Card>
-            <Row style={{ flex: 1, alignItems: 'center' }}>
-              <Styled.WalletCol sm={{ span: 24 }} md={{ span: 12 }}>
-                <Styled.OptionCard bordered={false}>
-                  <Styled.OptionLabel
-                    color="primary"
-                    size="big"
-                    onClick={() => exportKeystore(runeNativeAddress, network)}>
-                    {intl.formatMessage({ id: 'setting.export' })}
-                  </Styled.OptionLabel>
-                </Styled.OptionCard>
-              </Styled.WalletCol>
-              <Styled.WalletCol sm={{ span: 24 }} md={{ span: 12 }}>
-                <Styled.OptionCard bordered={false}>
-                  <Styled.OptionLabel color="warning" size="big" onClick={lockWallet}>
-                    {intl.formatMessage({ id: 'setting.lock' })} <UnlockOutlined />
-                  </Styled.OptionLabel>
-                </Styled.OptionCard>
-              </Styled.WalletCol>
-              <Styled.WalletCol sm={{ span: 24 }} md={{ span: 12 }}>
-                <Styled.OptionCard bordered={false}>
-                  <Styled.Button
-                    sizevalue="xnormal"
-                    color="primary"
-                    typevalue="outline"
-                    round="true"
-                    onClick={() => setShowPasswordModal(true)}
-                    disabled={O.isNone(oPhrase) ? true : false}>
-                    {intl.formatMessage({ id: 'setting.view.phrase' })}
-                  </Styled.Button>
-                </Styled.OptionCard>
-              </Styled.WalletCol>
-              <Styled.WalletCol sm={{ span: 24 }} md={{ span: 12 }}>
-                <Styled.OptionCard bordered={false}>
-                  <Styled.Button
-                    sizevalue="xnormal"
-                    color="error"
-                    typevalue="outline"
-                    round="true"
-                    onClick={() => setShowRemoveWalletModal(true)}>
-                    {intl.formatMessage({ id: 'wallet.remove.label' })}
-                  </Styled.Button>
-                </Styled.OptionCard>
-              </Styled.WalletCol>
-            </Row>
-          </Styled.Card>
-        </Col>
-        {accounts}
-      </Styled.Row>
-    </Styled.ContainerWrapper>
+
+      {renderVerifyAddressModal(addressToVerify)}
+      <Styled.Card>
+        <Styled.Subtitle>{intl.formatMessage({ id: 'setting.wallet.management' })}</Styled.Subtitle>
+        <Row style={{ flex: 1, alignItems: 'center', padding: 20 }}>
+          <Styled.WalletCol sm={{ span: 24 }} md={{ span: 12 }}>
+            <Styled.OptionCard bordered={false}>
+              <Styled.OptionLabel color="primary" size="big" onClick={() => exportKeystore(runeNativeAddress, network)}>
+                {intl.formatMessage({ id: 'setting.export' })}
+              </Styled.OptionLabel>
+            </Styled.OptionCard>
+          </Styled.WalletCol>
+          <Styled.WalletCol sm={{ span: 24 }} md={{ span: 12 }}>
+            <Styled.OptionCard bordered={false}>
+              <Styled.OptionLabel color="warning" size="big" onClick={lockWallet}>
+                {intl.formatMessage({ id: 'setting.lock' })} <UnlockOutlined />
+              </Styled.OptionLabel>
+            </Styled.OptionCard>
+          </Styled.WalletCol>
+          <Styled.WalletCol sm={{ span: 24 }} md={{ span: 12 }}>
+            <Styled.OptionCard bordered={false}>
+              <Styled.Button
+                sizevalue="xnormal"
+                color="primary"
+                typevalue="outline"
+                round="true"
+                onClick={() => setShowPasswordModal(true)}
+                disabled={O.isNone(oPhrase) ? true : false}>
+                {intl.formatMessage({ id: 'setting.view.phrase' })}
+              </Styled.Button>
+            </Styled.OptionCard>
+          </Styled.WalletCol>
+          <Styled.WalletCol sm={{ span: 24 }} md={{ span: 12 }}>
+            <Styled.OptionCard bordered={false}>
+              <Styled.Button
+                sizevalue="xnormal"
+                color="error"
+                typevalue="outline"
+                round="true"
+                onClick={() => setShowRemoveWalletModal(true)}>
+                {intl.formatMessage({ id: 'wallet.remove.label' })}
+              </Styled.Button>
+            </Styled.OptionCard>
+          </Styled.WalletCol>
+        </Row>
+      </Styled.Card>
+
+      {accounts}
+    </Styled.Container>
   )
 }
