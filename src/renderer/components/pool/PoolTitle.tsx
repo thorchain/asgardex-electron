@@ -48,18 +48,14 @@ export const PoolTitle: React.FC<Props> = ({
 
   const title = useMemo(() => {
     const Star = watched ? Styled.StarFilled : Styled.StarOutlined
+    const starClickHandler = watched ? unwatch : watch
     return (
       <>
         <AssetIcon asset={asset} size={isDesktopView ? 'big' : 'normal'} key={assetToString(asset)} network={network} />
         <Styled.AssetWrapper>
           <div style={{ display: 'flex', alignItems: 'center' }}>
             <Styled.AssetTitle>{asset.ticker}</Styled.AssetTitle>
-            <Star
-              style={{ cursor: 'pointer' }}
-              onClick={() => {
-                watched ? unwatch() : watch()
-              }}
-            />
+            <Star onClick={starClickHandler} />
           </div>
           <Styled.AssetSubtitle>{asset.chain}</Styled.AssetSubtitle>
         </Styled.AssetWrapper>

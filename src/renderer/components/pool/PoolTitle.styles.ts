@@ -107,6 +107,7 @@ export const AssetSubtitle = styled.p`
 
 const starStyle = css`
   margin-left: 10px;
+  cursor: pointer;
   svg {
     fill: ${palette('primary', 0)};
     width: 20px;

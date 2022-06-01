@@ -3,7 +3,8 @@
 ## Add
 
 - Add search option for pools [#2275](https://github.com/thorchain/asgardex-electron/pull/2275)
-  [POOLS] Add star / favorite & filter [#1075](https://github.com/thorchain/asgardex-electron/issues/1075)
+  [PoolsOverview] Watch / unwatch pools [#2276](https://github.com/thorchain/asgardex-electron/pull/2276)
+  [PoolDetail] Watch / unwatch pool [#2278](https://github.com/thorchain/asgardex-electron/pull/2276)
 
 ## Fix
 
