@@ -1,3 +1,4 @@
+import { PoolsStorageEncoded } from './api/io'
 import { StoreFilesContent, UserNodesStorage } from './api/types'
 import { Locale } from './i18n/types'
 
@@ -21,6 +22,18 @@ export const USER_NODES_STORAGE_DEFAULT: UserNodesStorage = {
 }
 
 // increase it by `1` if you want to ignore previous version of `common` storage
+const POOLS_STORAGE_VERSION = '1'
+
+const POOLS_STORAGE_DEFAULT: PoolsStorageEncoded = {
+  version: POOLS_STORAGE_VERSION,
+  watchlists: {
+    mainnet: [],
+    stagenet: [],
+    testnet: []
+  }
+}
+
+// increase it by `1` if you want to ignore previous version of `common` storage
 const COMMON_STORAGE_VERSION = '1'
 /**
  * When adding a new store file do not forget to expose
@@ -28,5 +41,6 @@ const COMMON_STORAGE_VERSION = '1'
  */
 export const DEFAULT_STORAGES: StoreFilesContent = {
   common: { version: COMMON_STORAGE_VERSION, locale: Locale.EN },
-  userNodes: USER_NODES_STORAGE_DEFAULT
+  userNodes: USER_NODES_STORAGE_DEFAULT,
+  pools: POOLS_STORAGE_DEFAULT
 }

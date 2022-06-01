@@ -7,7 +7,6 @@ import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
 import * as Rx from 'rxjs'
 
-import { Network } from '../../../shared/api/types'
 import { LiveData } from '../../helpers/rx/liveData'
 import { AssetWithAmount, DepositType } from '../../types/asgardex'
 import {
@@ -178,8 +177,6 @@ export type HealthLD = LiveData<Error, Health>
 
 export type PoolType = 'active' | 'pending'
 
-export type PoolWatchList = Asset[]
-
 export type PoolsService = {
   poolsState$: LiveData<Error, PoolsState>
   pendingPoolsState$: LiveData<Error, PendingPoolsState>
@@ -213,9 +210,6 @@ export type PoolsService = {
   validatePool$: (poolAddresses: PoolAddress, chain: Chain) => ValidatePoolLD
   poolsFilters$: Rx.Observable<Record<string, O.Option<PoolFilter>>>
   setPoolsFilter: (poolKey: PoolType, filter: O.Option<PoolFilter>) => void
-  poolsWatchlist$: Rx.Observable<Record<Network, PoolWatchList>>
-  addPoolToWatchlist: (poolAsset: Asset, network: Network) => void
-  removePoolFromWatchlist: (poolAsset: Asset, network: Network) => void
   gasRateByChain$: (chain: Chain) => GasRateLD
   reloadGasRates: FP.Lazy<void>
   haltedChains$: HaltedChainsLD

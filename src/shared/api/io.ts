@@ -34,6 +34,8 @@ export const assetIO = new t.Type(
   assetToString
 )
 
+export const assetListIO = t.array(assetIO)
+
 export type BaseAmountEncoded = { amount: string; decimal: number }
 
 const isBaseAmountEncoded = (u: unknown): u is BaseAmountEncoded =>
@@ -121,3 +123,27 @@ export const ipcLedgerApproveERC20TokenParamsIO = t.type({
 })
 
 export type IPCLedgerApproveERC20TokenParams = t.TypeOf<typeof ipcLedgerApproveERC20TokenParamsIO>
+
+export const poolsWatchListIO = assetListIO
+
+export type PoolsWatchList = t.TypeOf<typeof poolsWatchListIO>
+
+export const poolsWatchListsIO = t.type({
+  testnet: poolsWatchListIO,
+  stagenet: poolsWatchListIO,
+  mainnet: poolsWatchListIO
+})
+
+export const storageVersionIO = t.string
+
+export type StorageVersion = t.TypeOf<typeof storageVersionIO>
+
+export type PoolsWatchLists = t.TypeOf<typeof poolsWatchListsIO>
+
+export const poolsStorageIO = t.type({
+  watchlists: poolsWatchListsIO,
+  version: storageVersionIO
+})
+
+// Note: We use Encoded type for storage
+export type PoolsStorageEncoded = ReturnType<typeof poolsStorageIO.encode>

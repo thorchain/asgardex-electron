@@ -28,5 +28,6 @@ contextBridge.exposeInMainWorld('apiHDWallet', apiHDWallet)
 // api for storage objects
 contextBridge.exposeInMainWorld('apiCommonStorage', getFileStoreApi('common'))
 contextBridge.exposeInMainWorld('apiUserNodesStorage', getFileStoreApi('userNodes'))
+contextBridge.exposeInMainWorld('apiPoolsStorage', getFileStoreApi('pools'))
 
 contextBridge.exposeInMainWorld('apiAppUpdate', apiAppUpdate)

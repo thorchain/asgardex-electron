@@ -271,7 +271,7 @@ export const ActivePools: React.FC<PoolsComponentProps> = ({ haltedChains, mimir
           const poolViewData = PoolHelpers.getPoolTableRowsData({
             poolDetails,
             pricePoolData: selectedPricePool.poolData,
-            watchList: poolWatchList,
+            watchlist: poolWatchList,
             network
           })
           previousPools.current = O.some(poolViewData)

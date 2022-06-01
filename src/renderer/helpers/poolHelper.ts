@@ -7,9 +7,10 @@ import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
 import * as Ord from 'fp-ts/lib/Ord'
 
+import { PoolsWatchList } from '../../shared/api/io'
 import { Network } from '../../shared/api/types'
 import { ONE_RUNE_BASE_AMOUNT } from '../../shared/mock/amount'
-import { PoolAddress, PoolDetails, PoolWatchList } from '../services/midgard/types'
+import { PoolAddress, PoolDetails } from '../services/midgard/types'
 import { getPoolDetail, toPoolData } from '../services/midgard/utils'
 import { MimirHaltChain, MimirHaltTrading, MimirPauseLP } from '../services/thorchain/types'
 import { PoolDetail } from '../types/generated/midgard'
@@ -61,12 +62,12 @@ export const RUNE_POOL_ADDRESS: PoolAddress = {
 export const getPoolTableRowsData = ({
   poolDetails,
   pricePoolData,
-  watchList,
+  watchlist,
   network
 }: {
   poolDetails: PoolDetails
   pricePoolData: PoolData
-  watchList: PoolWatchList
+  watchlist: PoolsWatchList
   network: Network
 }): PoolTableRowsData => {
   // get symbol of deepest pool
@@ -97,7 +98,7 @@ export const getPoolTableRowsData = ({
       )
 
       return FP.pipe(
-        getPoolTableRowData({ poolDetail, pricePoolData, watchList, network }),
+        getPoolTableRowData({ poolDetail, pricePoolData, watchlist, network }),
         O.map(
           (poolTableRowData) =>
             ({

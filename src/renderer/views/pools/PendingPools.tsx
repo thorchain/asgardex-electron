@@ -209,7 +209,7 @@ export const PendingPools: React.FC<PoolsComponentProps> = ({ haltedChains, mimi
           const poolViewData = getPoolTableRowsData({
             poolDetails: poolDetailsFiltered,
             pricePoolData: selectedPricePool.poolData,
-            watchList: poolWatchList,
+            watchlist: poolWatchList,
             network
           })
           previousPools.current = O.some(poolViewData)
