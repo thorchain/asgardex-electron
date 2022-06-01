@@ -18,11 +18,6 @@ const {
   set: setStorageState
 } = observableState<StorageState<UserNodesStorage>>(O.none)
 
-export const removeStorage = async () => {
-  await window.apiUserNodesStorage.remove()
-  setStorageState(O.none)
-}
-
 const modifyStorage = (oPartialData: StoragePartialState<UserNodesStorage>) => {
   FP.pipe(
     oPartialData,
