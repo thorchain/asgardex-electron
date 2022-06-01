@@ -31,6 +31,9 @@ export const PoolDetailsStory = () => {
       network={'testnet'}
       priceSymbol={'R'}
       asset={AssetETH}
+      watched
+      watch={() => console.log('watch')}
+      unwatch={() => console.log('unwatch')}
       priceRatio={ONE_BN}
       HistoryView={() => <>Actions History Here</>}
       ChartView={() => <>Pool Chart Here</>}

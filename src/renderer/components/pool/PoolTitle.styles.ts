@@ -1,5 +1,6 @@
+import * as AI from '@ant-design/icons'
 import * as A from 'antd'
-import styled from 'styled-components'
+import styled, { css } from 'styled-components'
 import { palette } from 'styled-theme'
 
 import { media } from '../../helpers/styleHelper'
@@ -102,4 +103,21 @@ export const AssetSubtitle = styled.p`
   ${media.lg`
   font-size: 13px;
   `}
+`
+
+const starStyle = css`
+  margin-left: 10px;
+  cursor: pointer;
+  svg {
+    fill: ${palette('primary', 0)};
+    width: 20px;
+    height: 20px;
+  }
+`
+
+export const StarOutlined = styled(AI.StarOutlined)`
+  ${starStyle}
+`
+export const StarFilled = styled(AI.StarFilled)`
+  ${starStyle}
 `
