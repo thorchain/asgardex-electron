@@ -18,11 +18,6 @@ const {
   set: setStorageState
 } = observableState<StorageState<UserNodesStorage>>(O.none)
 
-export const removeStorage = async () => {
-  await window.apiUserNodesStorage.remove()
-  setStorageState(O.none)
-}
-
 const modifyStorage = (oPartialData: StoragePartialState<UserNodesStorage>) => {
   FP.pipe(
     oPartialData,
@@ -58,7 +53,7 @@ const addNodeAddress = (node: Address, network: Network) => {
 
   FP.pipe(savedNodes[network], A.elem(eqString)(node), (isNodeExistsInSavedArray) => {
     if (!isNodeExistsInSavedArray) {
-      modifyStorage(O.some({ ...savedNodes, [`${network}`]: [...savedNodes[network], node] }))
+      modifyStorage(O.some({ ...savedNodes, [network]: [...savedNodes[network], node] }))
     }
   })
 }
@@ -75,7 +70,7 @@ const removeNodeByAddress = (node: Address, network: Network) => {
       modifyStorage(
         O.some({
           ...savedNodes,
-          [`${network}`]: FP.pipe(
+          [network]: FP.pipe(
             savedNodes[network],
             A.filter((savedNode) => savedNode !== node)
           )

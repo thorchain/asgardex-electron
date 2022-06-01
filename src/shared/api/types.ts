@@ -8,11 +8,12 @@ import * as O from 'fp-ts/Option'
 
 import { Locale } from '../i18n/types'
 import { WalletAddress } from '../wallet/types'
+import { PoolsStorageEncoded } from './io'
 
 // A version number starting from `1` to avoid to load deprecated files
 export type StorageVersion = { version: string }
-export type UserNodesStorage = Record<Network, Address[]> & StorageVersion
-export type CommonStorage = Readonly<{ locale: Locale }> & StorageVersion
+export type UserNodesStorage = Readonly<Record<Network, Address[]> & StorageVersion>
+export type CommonStorage = Readonly<{ locale: Locale } & StorageVersion>
 
 /**
  * Hash map of common store files
@@ -23,6 +24,7 @@ export type CommonStorage = Readonly<{ locale: Locale }> & StorageVersion
 export type StoreFilesContent = Readonly<{
   common: CommonStorage
   userNodes: UserNodesStorage
+  pools: PoolsStorageEncoded
 }>
 
 export type StoreFileName = keyof StoreFilesContent
@@ -141,6 +143,7 @@ declare global {
     apiHDWallet: ApiHDWallet
     apiCommonStorage: ApiFileStoreService<StoreFileData<'common'>>
     apiUserNodesStorage: ApiFileStoreService<StoreFileData<'userNodes'>>
+    apiPoolsStorage: ApiFileStoreService<StoreFileData<'pools'>>
     apiAppUpdate: ApiAppUpdate
   }
 }

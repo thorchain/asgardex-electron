@@ -9,11 +9,9 @@ import * as O from 'fp-ts/Option'
 import * as Rx from 'rxjs'
 import * as RxOp from 'rxjs/operators'
 
-import { Network } from '../../../shared/api/types'
 import { ONE_BN, PRICE_POOLS_WHITELIST } from '../../const'
 import { validAssetForETH, isPricePoolAsset, midgardAssetFromString } from '../../helpers/assetHelper'
 import { isEnabledChain, isEthChain } from '../../helpers/chainHelper'
-import { unionAssets } from '../../helpers/fp/array'
 import { eqAsset, eqOAsset, eqOPoolAddresses, eqHaltedChain } from '../../helpers/fp/eq'
 import { sequenceTOption } from '../../helpers/fpHelpers'
 import { LiveData, liveData } from '../../helpers/rx/liveData'
@@ -64,8 +62,7 @@ import {
   PoolsState,
   HaltedChainsLD,
   SelectedPoolAsset,
-  PoolType,
-  PoolWatchList
+  PoolType
 } from './types'
 import {
   getPoolAddressesByChain,
@@ -110,38 +107,6 @@ const createPoolsService = (
   const setPoolsFilter = (poolKey: PoolType, filterValue: O.Option<PoolFilter>) => {
     const currentState = _getPoolsFilter()
     _setPoolsFilter({ ...currentState, [poolKey]: filterValue })
-  }
-
-  const {
-    get$: poolsWatchlist$,
-    set: _setPoolsWatchlist,
-    get: getPoolssWatchlist
-  } = observableState<Record<Network, PoolWatchList>>({
-    testnet: [],
-    stagenet: [],
-    mainnet: []
-  })
-
-  const addPoolToWatchlist = (poolAsset: Asset, network: Network) => {
-    const current = getPoolssWatchlist()
-    FP.pipe(
-      current[network],
-      A.concat([poolAsset]),
-      // remove duplications
-      (poolAssets) => unionAssets(poolAssets)(poolAssets),
-      // update list depending on given network
-      (list) => _setPoolsWatchlist({ ...current, [network]: list })
-    )
-  }
-
-  const removePoolFromWatchlist = (poolAsset: Asset, network: Network) => {
-    const current = getPoolssWatchlist()
-    FP.pipe(
-      current[network],
-      A.filter((current) => !eqAsset.equals(current, poolAsset)),
-      // update list depending on given network
-      (list) => _setPoolsWatchlist({ ...current, [network]: list })
-    )
   }
 
   // Factory to get `Pools` from Midgard
@@ -935,9 +900,6 @@ const createPoolsService = (
     validatePool$,
     poolsFilters$,
     setPoolsFilter,
-    poolsWatchlist$,
-    addPoolToWatchlist,
-    removePoolFromWatchlist,
     gasRateByChain$,
     reloadGasRates,
     haltedChains$

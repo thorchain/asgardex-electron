@@ -51,6 +51,9 @@ global.window.apiKeystore = { ...mockApi.apiKeystore }
 global.window.apiLang = { ...mockApi.apiLang }
 global.window.apiUrl = { ...mockApi.apiUrl }
 global.window.apiHDWallet = { ...mockApi.apiHDWallet }
+global.window.apiCommonStorage = { ...mockApi.apiCommonStorage }
+global.window.apiUserNodesStorage = { ...mockApi.apiUserNodesStorage }
+global.window.apiPoolsStorage = { ...mockApi.apiPoolsStorage }
 
 /**
  * Definition of custom matchers

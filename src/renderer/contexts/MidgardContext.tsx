@@ -1,13 +1,16 @@
 import React, { createContext, useContext } from 'react'
 
 import { service } from '../services/midgard/service'
+import { pools as poolsStorage } from '../services/storage'
 
 type MidgardContextValue = {
   service: typeof service
+  storage: { pools: typeof poolsStorage }
 }
 
 const initialContext: MidgardContextValue = {
-  service
+  service,
+  storage: { pools: poolsStorage }
 }
 const MidgardContext = createContext<MidgardContextValue | null>(null)
 

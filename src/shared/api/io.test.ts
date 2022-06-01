@@ -1,9 +1,10 @@
-import { AssetBNB, baseAmount, BNBChain } from '@xchainjs/xchain-util'
+import { FeeOption } from '@xchainjs/xchain-client'
+import { AssetBNB, AssetRuneNative, baseAmount, BNBChain } from '@xchainjs/xchain-util'
 import * as E from 'fp-ts/lib/Either'
 import * as FP from 'fp-ts/lib/function'
 
 import { eqBaseAmount } from '../../renderer/helpers/fp/eq'
-import { BaseAmountEncoded, baseAmountIO, ipcLedgerSendTxParamsIO } from './io'
+import { BaseAmountEncoded, baseAmountIO, ipcLedgerSendTxParamsIO, poolsWatchListsIO } from './io'
 
 describe('shared/io', () => {
   describe('baseAmountIO', () => {
@@ -35,23 +36,27 @@ describe('shared/io', () => {
         chain: BNBChain,
         network: 'mainnet',
         asset: AssetBNB,
+        feeAsset: AssetBNB,
         amount: baseAmount(10),
         sender: 'address-abc',
         recipient: 'address-abc',
         memo: 'memo-abc',
         walletIndex: 0,
-        feeRate: 1
+        feeRate: 1,
+        feeOption: FeeOption.Fast
       })
       expect(encoded).toEqual({
         chain: 'BNB',
         network: 'mainnet',
         asset: 'BNB.BNB',
+        feeAsset: 'BNB.BNB',
         amount: { amount: '10', decimal: 8 },
         sender: 'address-abc',
         recipient: 'address-abc',
         memo: 'memo-abc',
         walletIndex: 0,
-        feeRate: 1
+        feeRate: 1,
+        feeOption: 'fast'
       })
     })
     it('decode IPCLedgerSendTxParams', () => {
@@ -85,6 +90,22 @@ describe('shared/io', () => {
           }
         )
       )
+    })
+  })
+
+  describe('poolWatchListsIO', () => {
+    it('encode', () => {
+      const encoded = poolsWatchListsIO.encode({
+        testnet: [AssetBNB],
+        stagenet: [],
+        mainnet: [AssetRuneNative]
+      })
+
+      expect(encoded).toEqual({
+        testnet: ['BNB.BNB'],
+        mainnet: ['THOR.RUNE'],
+        stagenet: []
+      })
     })
   })
 })

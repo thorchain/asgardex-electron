@@ -22,17 +22,17 @@ const getFileContent = async <T>(fullFilePathname: string, defaultValue: T): Pro
   // If wile does not exist create a new one with defaultValue as content
   if (!(await isFileExist(fullFilePathname))) {
     await fs.writeJSON(fullFilePathname, { ...defaultValue })
-    return Promise.resolve(defaultValue)
+    return defaultValue
   }
 
   try {
     // Try to read and parse appropriate JSON store-file
     const fileContent = await fs.readJSON(fullFilePathname)
     // Combine file content with provided default value
-    return Promise.resolve({ ...defaultValue, ...fileContent })
+    return { ...defaultValue, ...fileContent }
   } catch {
     // Resolve with default value in case of any error
-    return Promise.resolve(defaultValue)
+    return defaultValue
   }
 }
 /**
