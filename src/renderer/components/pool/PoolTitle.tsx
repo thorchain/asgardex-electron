@@ -18,6 +18,9 @@ import * as Styled from './PoolTitle.styles'
 
 export type Props = {
   asset: Asset
+  watched: boolean
+  watch: FP.Lazy<void>
+  unwatch: FP.Lazy<void>
   price: RD.RemoteData<Error, { amount: AssetAmount; symbol: string }>
   isLoading?: boolean
   disableTradingPoolAction: boolean
@@ -29,6 +32,9 @@ export type Props = {
 
 export const PoolTitle: React.FC<Props> = ({
   asset,
+  watched,
+  watch,
+  unwatch,
   price: priceRD,
   disableTradingPoolAction,
   disableAllPoolActions,
@@ -40,18 +46,26 @@ export const PoolTitle: React.FC<Props> = ({
   const intl = useIntl()
   const isDesktopView = Grid.useBreakpoint()?.md ?? false
 
-  const title = useMemo(
-    () => (
+  const title = useMemo(() => {
+    const Star = watched ? Styled.StarFilled : Styled.StarOutlined
+    return (
       <>
         <AssetIcon asset={asset} size={isDesktopView ? 'big' : 'normal'} key={assetToString(asset)} network={network} />
         <Styled.AssetWrapper>
-          <Styled.AssetTitle>{asset.ticker}</Styled.AssetTitle>
+          <div style={{ display: 'flex', alignItems: 'center' }}>
+            <Styled.AssetTitle>{asset.ticker}</Styled.AssetTitle>
+            <Star
+              style={{ cursor: 'pointer' }}
+              onClick={() => {
+                watched ? unwatch() : watch()
+              }}
+            />
+          </div>
           <Styled.AssetSubtitle>{asset.chain}</Styled.AssetSubtitle>
         </Styled.AssetWrapper>
       </>
-    ),
-    [asset, isDesktopView, network]
-  )
+    )
+  }, [asset, isDesktopView, network, unwatch, watch, watched])
 
   const priceStr = useMemo(
     () =>

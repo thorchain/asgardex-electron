@@ -16,6 +16,9 @@ import { PoolTitle } from './PoolTitle'
 
 export type Props = {
   asset: Asset
+  watched: boolean
+  watch: FP.Lazy<void>
+  unwatch: FP.Lazy<void>
   historyActions: PoolHistoryActions
   poolStatsDetail: PoolStatsDetailRD
   reloadPoolStatsDetail: FP.Lazy<void>
@@ -37,6 +40,9 @@ export type Props = {
 
 export const PoolDetails: React.FC<Props> = ({
   asset,
+  watched,
+  watch,
+  unwatch,
   historyActions,
   priceSymbol,
   priceRatio,
@@ -74,6 +80,9 @@ export const PoolDetails: React.FC<Props> = ({
         disableTradingPoolAction={disableTradingPoolAction}
         disablePoolActions={disablePoolActions}
         asset={asset}
+        watched={watched}
+        watch={watch}
+        unwatch={unwatch}
         price={price}
         isLoading={isLoading}
         isAvailablePool={isAvailablePool}
@@ -88,7 +97,10 @@ export const PoolDetails: React.FC<Props> = ({
     network,
     poolDetailRD,
     priceRatio,
-    priceSymbol
+    priceSymbol,
+    unwatch,
+    watch,
+    watched
   ])
 
   const reloadPoolCardsData = useCallback(() => {

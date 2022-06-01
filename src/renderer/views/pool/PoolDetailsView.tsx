@@ -3,6 +3,7 @@ import React, { useCallback, useEffect, useMemo, useRef } from 'react'
 import * as RD from '@devexperts/remote-data-ts'
 import { Chain } from '@xchainjs/xchain-util'
 import * as FP from 'fp-ts/function'
+import * as A from 'fp-ts/lib/Array'
 import * as O from 'fp-ts/Option'
 import { useObservableState } from 'observable-hooks'
 import { useIntl } from 'react-intl'
@@ -16,9 +17,11 @@ import { ONE_BN } from '../../const'
 import { useAppContext } from '../../contexts/AppContext'
 import { useMidgardContext } from '../../contexts/MidgardContext'
 import { getAssetFromNullableString } from '../../helpers/assetHelper'
+import { eqAsset } from '../../helpers/fp/eq'
 import * as PoolHelpers from '../../helpers/poolHelper'
 import { useMidgardHistoryActions } from '../../hooks/useMidgardHistoryActions'
 import { useMimirHalt } from '../../hooks/useMimirHalt'
+import { usePoolWatchlist } from '../../hooks/usePoolWatchlist'
 import { PoolDetailRouteParams } from '../../routes/pools/detail'
 import { DEFAULT_NETWORK } from '../../services/const'
 import { PoolDetailRD, PoolStatsDetailRD } from '../../services/midgard/types'
@@ -28,7 +31,7 @@ import { PoolHistoryView } from './PoolHistoryView'
 
 type TargetPoolDetailProps = Omit<
   PoolDetailProps,
-  'asset' | 'historyActions' | 'reloadPoolDetail' | 'reloadPoolStatsDetail'
+  'asset' | 'historyActions' | 'reloadPoolDetail' | 'reloadPoolStatsDetail' | 'watched' | 'watch' | 'unwatch'
 >
 
 const defaultDetailsProps: TargetPoolDetailProps = {
@@ -67,6 +70,8 @@ export const PoolDetailsView: React.FC = () => {
   const intl = useIntl()
 
   const { asset } = useParams<PoolDetailRouteParams>()
+
+  const { add: addToWatchList, remove: removeFromWatchList, list: watchedList } = usePoolWatchlist()
 
   const [haltedChains] = useObservableState(() => FP.pipe(haltedChains$, RxOp.map(RD.getOrElse((): Chain[] => []))), [])
   const { mimirHalt } = useMimirHalt()
@@ -150,9 +155,14 @@ export const PoolDetailsView: React.FC = () => {
               disablePoolActions: getDisablePoolActions(asset.chain)
             }
 
+            const watched = FP.pipe(watchedList, A.elem(eqAsset)(asset))
+
             return (
               <PoolDetails
                 asset={asset}
+                watched={watched}
+                watch={() => addToWatchList(asset)}
+                unwatch={() => removeFromWatchList(asset)}
                 historyActions={historyActions}
                 reloadPoolDetail={reloadSelectedPoolDetail}
                 reloadPoolStatsDetail={reloadPoolStatsDetail}
