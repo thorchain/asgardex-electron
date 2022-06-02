@@ -114,14 +114,6 @@ export const ViewRoutes: React.FC<{}> = (): JSX.Element => {
         }
       />
       <Route
-        path={walletRoutes.walletSettings.template}
-        element={
-          <WalletAuth>
-            <WalletSettingsView />
-          </WalletAuth>
-        }
-      />
-      <Route
         path={walletRoutes.history.template}
         element={
           <WalletAuth>
@@ -130,8 +122,15 @@ export const ViewRoutes: React.FC<{}> = (): JSX.Element => {
         }
       />
 
-      {/* <Route path={walletRoutes.base.template} element={<WalletView />} /> */}
-      <Route path={appRoutes.settings.template} element={<AppSettingsView />} />
+      <Route
+        path={appRoutes.settings.template}
+        element={
+          <>
+            <AppSettingsView />
+            <WalletSettingsView />
+          </>
+        }
+      />
       {/* playground - DEV only */}
       <Route path={playgroundRoutes.base.template} element={<PlaygroundView />} />
       {/* 404 */}

@@ -294,6 +294,7 @@ export type LedgerMessages = { [key in LedgerMessageKey]: string }
 
 type SettingMessageKey =
   | 'setting.app.title'
+  | 'setting.wallet.title'
   | 'setting.wallet.management'
   | 'setting.client'
   | 'setting.account.management'

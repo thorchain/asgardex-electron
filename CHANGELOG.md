@@ -6,6 +6,10 @@
   [PoolsOverview] Watch / unwatch pools [#2276](https://github.com/thorchain/asgardex-electron/pull/2276)
   [PoolDetail] Watch / unwatch pool [#2278](https://github.com/thorchain/asgardex-electron/pull/2276)
 
+## Update
+
+- [Settings] Merge global and wallet settings to have one place to go [#2152](https://github.com/thorchain/asgardex-electron/issues/2152)
+
 ## Fix
 
 - [Pools] ERC20 filter includes BNB.ETH [#2273](https://github.com/thorchain/asgardex-electron/issues/2273)
