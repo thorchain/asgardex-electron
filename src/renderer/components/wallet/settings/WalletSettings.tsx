@@ -16,7 +16,7 @@ import {
   DOGEChain,
   TerraChain
 } from '@xchainjs/xchain-util'
-import { Col, List, Row } from 'antd'
+import { Col, List, Collapse, Row } from 'antd'
 import * as FP from 'fp-ts/function'
 import * as A from 'fp-ts/lib/Array'
 import * as O from 'fp-ts/lib/Option'
@@ -338,81 +338,99 @@ export const WalletSettings: React.FC<Props> = (props): JSX.Element => {
     [oWalletAccounts, intl, renderAddress, network]
   )
 
+  const onChangeCollapseHandler = useCallback((key: string | string[]) => {
+    console.log('key:', key)
+  }, [])
+
   return (
     <Styled.Container>
-      <Styled.TitleWrapper>
-        <Styled.Title>{intl.formatMessage({ id: 'setting.wallet.title' })}</Styled.Title>
-      </Styled.TitleWrapper>
-      {showPasswordModal && (
-        <WalletPasswordConfirmationModal
-          validatePassword$={validatePassword$}
-          onSuccess={onSuccessPassword}
-          onClose={() => setShowPasswordModal(false)}
-        />
-      )}
-      {showPhraseModal && (
-        <PhraseCopyModal
-          phrase={phrase}
-          visible={showPhraseModal}
-          onClose={() => {
-            setShowPhraseModal(false)
-          }}
-        />
-      )}
-      <RemoveWalletConfirmationModal
-        visible={showRemoveWalletModal}
-        onClose={() => setShowRemoveWalletModal(false)}
-        onSuccess={removeWallet}
-      />
-      {renderQRCodeModal}
+      <Styled.Collapse
+        expandIcon={({ isActive }) => <Styled.ExpandIcon rotate={isActive ? 90 : 0} />}
+        defaultActiveKey={['1']}
+        // activeKey={'1'}
+        expandIconPosition="right"
+        onChange={onChangeCollapseHandler}
+        ghost>
+        <Collapse.Panel
+          header={<Styled.Title>{intl.formatMessage({ id: 'setting.wallet.title' })}</Styled.Title>}
+          key={'1'}>
+          {showPasswordModal && (
+            <WalletPasswordConfirmationModal
+              validatePassword$={validatePassword$}
+              onSuccess={onSuccessPassword}
+              onClose={() => setShowPasswordModal(false)}
+            />
+          )}
+          {showPhraseModal && (
+            <PhraseCopyModal
+              phrase={phrase}
+              visible={showPhraseModal}
+              onClose={() => {
+                setShowPhraseModal(false)
+              }}
+            />
+          )}
+          <RemoveWalletConfirmationModal
+            visible={showRemoveWalletModal}
+            onClose={() => setShowRemoveWalletModal(false)}
+            onSuccess={removeWallet}
+          />
+          {renderQRCodeModal}
 
-      {renderVerifyAddressModal(addressToVerify)}
-      <Styled.Card>
-        <Styled.Subtitle>{intl.formatMessage({ id: 'setting.wallet.management' })}</Styled.Subtitle>
-        <Row style={{ flex: 1, alignItems: 'center', padding: 20 }}>
-          <Styled.WalletCol sm={{ span: 24 }} md={{ span: 12 }}>
-            <Styled.OptionCard bordered={false}>
-              <Styled.OptionLabel color="primary" size="big" onClick={() => exportKeystore(runeNativeAddress, network)}>
-                {intl.formatMessage({ id: 'setting.export' })}
-              </Styled.OptionLabel>
-            </Styled.OptionCard>
-          </Styled.WalletCol>
-          <Styled.WalletCol sm={{ span: 24 }} md={{ span: 12 }}>
-            <Styled.OptionCard bordered={false}>
-              <Styled.OptionLabel color="warning" size="big" onClick={lockWallet}>
-                {intl.formatMessage({ id: 'setting.lock' })} <UnlockOutlined />
-              </Styled.OptionLabel>
-            </Styled.OptionCard>
-          </Styled.WalletCol>
-          <Styled.WalletCol sm={{ span: 24 }} md={{ span: 12 }}>
-            <Styled.OptionCard bordered={false}>
-              <Styled.Button
-                sizevalue="xnormal"
-                color="primary"
-                typevalue="outline"
-                round="true"
-                onClick={() => setShowPasswordModal(true)}
-                disabled={O.isNone(oPhrase) ? true : false}>
-                {intl.formatMessage({ id: 'setting.view.phrase' })}
-              </Styled.Button>
-            </Styled.OptionCard>
-          </Styled.WalletCol>
-          <Styled.WalletCol sm={{ span: 24 }} md={{ span: 12 }}>
-            <Styled.OptionCard bordered={false}>
-              <Styled.Button
-                sizevalue="xnormal"
-                color="error"
-                typevalue="outline"
-                round="true"
-                onClick={() => setShowRemoveWalletModal(true)}>
-                {intl.formatMessage({ id: 'wallet.remove.label' })}
-              </Styled.Button>
-            </Styled.OptionCard>
-          </Styled.WalletCol>
-        </Row>
-      </Styled.Card>
+          {renderVerifyAddressModal(addressToVerify)}
+          <Styled.CardContainer>
+            <Styled.Card>
+              <Styled.Subtitle>{intl.formatMessage({ id: 'setting.wallet.management' })}</Styled.Subtitle>
+              <Row style={{ flex: 1, alignItems: 'center', padding: 20 }}>
+                <Styled.WalletCol sm={{ span: 24 }} md={{ span: 12 }}>
+                  <Styled.OptionCard bordered={false}>
+                    <Styled.OptionLabel
+                      color="primary"
+                      size="big"
+                      onClick={() => exportKeystore(runeNativeAddress, network)}>
+                      {intl.formatMessage({ id: 'setting.export' })}
+                    </Styled.OptionLabel>
+                  </Styled.OptionCard>
+                </Styled.WalletCol>
+                <Styled.WalletCol sm={{ span: 24 }} md={{ span: 12 }}>
+                  <Styled.OptionCard bordered={false}>
+                    <Styled.OptionLabel color="warning" size="big" onClick={lockWallet}>
+                      {intl.formatMessage({ id: 'setting.lock' })} <UnlockOutlined />
+                    </Styled.OptionLabel>
+                  </Styled.OptionCard>
+                </Styled.WalletCol>
+                <Styled.WalletCol sm={{ span: 24 }} md={{ span: 12 }}>
+                  <Styled.OptionCard bordered={false}>
+                    <Styled.Button
+                      sizevalue="xnormal"
+                      color="primary"
+                      typevalue="outline"
+                      round="true"
+                      onClick={() => setShowPasswordModal(true)}
+                      disabled={O.isNone(oPhrase) ? true : false}>
+                      {intl.formatMessage({ id: 'setting.view.phrase' })}
+                    </Styled.Button>
+                  </Styled.OptionCard>
+                </Styled.WalletCol>
+                <Styled.WalletCol sm={{ span: 24 }} md={{ span: 12 }}>
+                  <Styled.OptionCard bordered={false}>
+                    <Styled.Button
+                      sizevalue="xnormal"
+                      color="error"
+                      typevalue="outline"
+                      round="true"
+                      onClick={() => setShowRemoveWalletModal(true)}>
+                      {intl.formatMessage({ id: 'wallet.remove.label' })}
+                    </Styled.Button>
+                  </Styled.OptionCard>
+                </Styled.WalletCol>
+              </Row>
+            </Styled.Card>
+          </Styled.CardContainer>
 
-      {accounts}
+          {accounts}
+        </Collapse.Panel>
+      </Styled.Collapse>
     </Styled.Container>
   )
 }

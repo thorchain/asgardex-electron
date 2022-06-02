@@ -80,15 +80,12 @@ export const ChainLabel = styled(TickerLabel)`
 export const Collapse = styled(A.Collapse)`
   &.ant-collapse-icon-position-right > .ant-collapse-item > .ant-collapse-header {
     background-color: ${palette('background', 2)};
+    border-bottom: 1px solid ${palette('gray', 1)};
     padding: 5px 20px;
   }
 
   &.ant-collapse-ghost > .ant-collapse-item > .ant-collapse-content > .ant-collapse-content-box {
     padding: 0;
-  }
-
-  &.ant-collapse-icon-position-right > .ant-collapse-item > .ant-collapse-header {
-    border-bottom: 1px solid ${palette('gray', 1)};
   }
 
   &.ant-collapse > .ant-collapse-item > .ant-collapse-header .ant-collapse-arrow {

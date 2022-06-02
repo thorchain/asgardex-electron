@@ -1,7 +1,7 @@
 import React, { useCallback, useMemo } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
-import { Row, Dropdown } from 'antd'
+import { Row, Dropdown, Collapse } from 'antd'
 import { MenuProps } from 'antd/lib/menu'
 import * as FP from 'fp-ts/function'
 import * as O from 'fp-ts/lib/Option'
@@ -177,29 +177,44 @@ export const AppSettings: React.FC<Props> = (props): JSX.Element => {
     [appUpdateState, intl]
   )
 
+  const onChangeCollapseHandler = useCallback((key: string | string[]) => {
+    console.log('key:', key)
+  }, [])
+
   return (
     <Styled.Container>
-      <Styled.Title>{intl.formatMessage({ id: 'setting.app.title' })}</Styled.Title>
-      <Styled.CardContainer>
-        <Styled.Card>
-          <Styled.SectionsWrapper>
-            <Styled.Section>
-              <Styled.SubTitle>{intl.formatMessage({ id: 'common.network' })}</Styled.SubTitle>
-              {renderNetworkMenu}
-            </Styled.Section>
-            <Styled.Section>
-              <Styled.SubTitle>{intl.formatMessage({ id: 'setting.language' })}</Styled.SubTitle>
-              {renderLangMenu}
-            </Styled.Section>
-            <Styled.Section>
-              <Styled.SubTitle>{intl.formatMessage({ id: 'setting.version' })}</Styled.SubTitle>
-              <Styled.Label>v{version}</Styled.Label>
-              <Styled.UpdatesButton {...checkUpdatesProps} />
-              {renderVersionUpdateResult}
-            </Styled.Section>
-          </Styled.SectionsWrapper>
-        </Styled.Card>
-      </Styled.CardContainer>
+      <Styled.Collapse
+        expandIcon={({ isActive }) => <Styled.ExpandIcon rotate={isActive ? 90 : 0} />}
+        defaultActiveKey={['1']}
+        // activeKey={'1'}
+        expandIconPosition="right"
+        onChange={onChangeCollapseHandler}
+        ghost>
+        <Collapse.Panel
+          header={<Styled.Title>{intl.formatMessage({ id: 'setting.app.title' })}</Styled.Title>}
+          key={'1'}>
+          <Styled.CardContainer>
+            <Styled.Card>
+              <Styled.SectionsWrapper>
+                <Styled.Section>
+                  <Styled.SubTitle>{intl.formatMessage({ id: 'common.network' })}</Styled.SubTitle>
+                  {renderNetworkMenu}
+                </Styled.Section>
+                <Styled.Section>
+                  <Styled.SubTitle>{intl.formatMessage({ id: 'setting.language' })}</Styled.SubTitle>
+                  {renderLangMenu}
+                </Styled.Section>
+                <Styled.Section>
+                  <Styled.SubTitle>{intl.formatMessage({ id: 'setting.version' })}</Styled.SubTitle>
+                  <Styled.Label>v{version}</Styled.Label>
+                  <Styled.UpdatesButton {...checkUpdatesProps} />
+                  {renderVersionUpdateResult}
+                </Styled.Section>
+              </Styled.SectionsWrapper>
+            </Styled.Card>
+          </Styled.CardContainer>
+        </Collapse.Panel>
+      </Styled.Collapse>
     </Styled.Container>
   )
 }

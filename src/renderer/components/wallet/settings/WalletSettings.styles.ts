@@ -1,4 +1,4 @@
-import AIcon, { QrcodeOutlined, PlusCircleOutlined } from '@ant-design/icons'
+import AIcon, { QrcodeOutlined, PlusCircleOutlined, CaretRightOutlined } from '@ant-design/icons'
 import { EyeOutlined as EyeOutlinedUI } from '@ant-design/icons'
 import * as A from 'antd'
 import styled from 'styled-components'
@@ -16,8 +16,31 @@ import { media } from '../../../helpers/styleHelper'
 
 export const Container = styled.div`
   margin-top: 40px;
-  padding: 10px 40px 30px 40px;
+  padding: 10px 40px;
   background-color: ${palette('background', 1)};
+`
+
+export const Collapse = styled(A.Collapse)`
+  &.ant-collapse-icon-position-right > .ant-collapse-item > .ant-collapse-header {
+    padding: 5px 0px;
+  }
+
+  &.ant-collapse-ghost > .ant-collapse-item > .ant-collapse-content > .ant-collapse-content-box {
+    padding: 0;
+  }
+
+  &.ant-collapse > .ant-collapse-item > .ant-collapse-header .ant-collapse-arrow {
+    right: 0px;
+  }
+`
+
+export const ExpandIcon = styled(CaretRightOutlined)`
+  margin-top: 0px;
+  svg {
+    width: 20px;
+    height: 20px;
+    color: ${palette('primary', 0)};
+  }
 `
 
 export const TitleWrapper = styled.div`
@@ -54,6 +77,11 @@ export const Subtitle = styled(UILabel)`
 
 export const WalletCol = styled(A.Col)`
   width: 100%;
+`
+
+export const CardContainer = styled.div`
+  width: 100%;
+  padding: 10px 0 0 0;
 `
 
 export const Card = styled(A.Card)`
