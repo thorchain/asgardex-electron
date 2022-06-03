@@ -9,9 +9,11 @@ export enum OnlineStatus {
 }
 
 export type ChangeNetworkHandler = (network: Network) => void
-
 export type Network$ = Rx.Observable<Network>
 
 export type ChangeSlipToleranceHandler = (slip: SlipTolerance) => void
-
 export type SlipTolerance$ = Rx.Observable<SlipTolerance>
+
+export type SettingType = 'app' | 'wallet'
+export type CollapsableSettings = Record<SettingType, boolean>
+export type ToggleCollapsableSetting = (setting: SettingType) => void

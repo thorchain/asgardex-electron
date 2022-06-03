@@ -25,6 +25,8 @@ export type Props = {
   appUpdateState: RD.RemoteData<Error, O.Option<string>>
   checkForUpdates: FP.Lazy<void>
   goToReleasePage: (version: string) => void
+  collapsed: boolean
+  toggleCollapse: FP.Lazy<void>
 }
 
 export const AppSettings: React.FC<Props> = (props): JSX.Element => {
@@ -36,7 +38,9 @@ export const AppSettings: React.FC<Props> = (props): JSX.Element => {
     goToReleasePage = FP.constVoid,
     version,
     changeLocale,
-    locale
+    locale,
+    collapsed,
+    toggleCollapse
   } = props
 
   const intl = useIntl()
@@ -178,18 +182,13 @@ export const AppSettings: React.FC<Props> = (props): JSX.Element => {
     [appUpdateState, intl]
   )
 
-  const onChangeCollapseHandler = useCallback((key: string | string[]) => {
-    console.log('key:', key)
-  }, [])
-
   return (
     <Styled.Container>
       <CStyled.Collapse
         expandIcon={({ isActive }) => <CStyled.ExpandIcon rotate={isActive ? 90 : 0} />}
-        defaultActiveKey={['1']}
-        // activeKey={'1'}
+        activeKey={collapsed ? '0' : '1'}
         expandIconPosition="right"
-        onChange={onChangeCollapseHandler}
+        onChange={toggleCollapse}
         ghost>
         <Collapse.Panel
           header={<CStyled.Title>{intl.formatMessage({ id: 'setting.app.title' })}</CStyled.Title>}

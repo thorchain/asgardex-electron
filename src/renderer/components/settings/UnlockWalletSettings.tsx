@@ -1,4 +1,4 @@
-import React, { useCallback } from 'react'
+import React from 'react'
 
 import { Collapse } from 'antd'
 import * as FP from 'fp-ts/lib/function'
@@ -12,24 +12,21 @@ import * as Styled from './WalletSettings.styles'
 type Props = {
   keystore: KeystoreState
   unlockHandler: FP.Lazy<void>
+  collapsed: boolean
+  toggleCollapse: FP.Lazy<void>
 }
 
 export const UnlockWalletSettings: React.FC<Props> = (props): JSX.Element => {
-  const { unlockHandler, keystore } = props
+  const { unlockHandler, keystore, collapsed, toggleCollapse } = props
   const intl = useIntl()
-
-  const onChangeCollapseHandler = useCallback((key: string | string[]) => {
-    console.log('key:', key)
-  }, [])
 
   return (
     <Styled.Container>
       <CStyled.Collapse
         expandIcon={({ isActive }) => <CStyled.ExpandIcon rotate={isActive ? 90 : 0} />}
-        defaultActiveKey={['1']}
-        // activeKey={'1'}
+        activeKey={collapsed ? '0' : '1'}
         expandIconPosition="right"
-        onChange={onChangeCollapseHandler}
+        onChange={toggleCollapse}
         ghost>
         <Collapse.Panel
           header={<CStyled.Title>{intl.formatMessage({ id: 'setting.wallet.title' })}</CStyled.Title>}

@@ -63,6 +63,8 @@ type Props = {
   phrase: O.Option<string>
   clickAddressLinkHandler: (chain: Chain, address: Address) => void
   validatePassword$: ValidatePasswordHandler
+  collapsed: boolean
+  toggleCollapse: FP.Lazy<void>
 }
 
 type AddressToVerify = O.Option<{ address: Address; chain: Chain }>
@@ -80,7 +82,9 @@ export const WalletSettings: React.FC<Props> = (props): JSX.Element => {
     removeLedgerAddress,
     phrase: oPhrase,
     clickAddressLinkHandler,
-    validatePassword$
+    validatePassword$,
+    collapsed,
+    toggleCollapse
   } = props
 
   const intl = useIntl()
@@ -339,18 +343,13 @@ export const WalletSettings: React.FC<Props> = (props): JSX.Element => {
     [oWalletAccounts, intl, renderAddress, network]
   )
 
-  const onChangeCollapseHandler = useCallback((key: string | string[]) => {
-    console.log('key:', key)
-  }, [])
-
   return (
     <Styled.Container>
       <CStyled.Collapse
         expandIcon={({ isActive }) => <CStyled.ExpandIcon rotate={isActive ? 90 : 0} />}
-        defaultActiveKey={['1']}
-        // activeKey={'1'}
+        activeKey={collapsed ? '0' : '1'}
         expandIconPosition="right"
-        onChange={onChangeCollapseHandler}
+        onChange={toggleCollapse}
         ghost>
         <Collapse.Panel
           header={<CStyled.Title>{intl.formatMessage({ id: 'setting.wallet.title' })}</CStyled.Title>}
