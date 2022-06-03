@@ -4,20 +4,20 @@ import * as A from 'antd'
 import styled from 'styled-components'
 import { palette } from 'styled-theme'
 
-import { ReactComponent as RemoveIcon } from '../../../assets/svg/icon-remove.svg'
-import { AddressEllipsis as AddressEllipsisUI } from '../../../components/uielements/addressEllipsis'
-import { Button as UIButton } from '../../../components/uielements/button'
+import { ReactComponent as RemoveIcon } from '../../assets/svg/icon-remove.svg'
+import { media } from '../../helpers/styleHelper'
+import { AddressEllipsis as AddressEllipsisUI } from '../uielements/addressEllipsis'
+import { Button as UIButton } from '../uielements/button'
 import {
   ExternalLinkIcon as ExternalLinkIconUI,
   WalletTypeLabel as WalletTypeLabelUI
-} from '../../../components/uielements/common/Common.styles'
-import { Label as UILabel } from '../../../components/uielements/label'
-import { media } from '../../../helpers/styleHelper'
+} from '../uielements/common/Common.styles'
+import { Label as UILabel } from '../uielements/label'
 
 export const Container = styled.div`
   margin-top: 40px;
   padding: 10px 40px;
-  background-color: ${palette('background', 1)};
+  background-color: ${palette('background', 0)};
 `
 
 export const Collapse = styled(A.Collapse)`
@@ -86,7 +86,7 @@ export const CardContainer = styled.div`
 
 export const Card = styled(A.Card)`
   border-radius: 5px;
-  background-color: ${palette('background', 1)};
+  background-color: ${palette('background', 0)};
   border: 1px solid ${palette('gray', 0)};
   margin-bottom: 40px;
 `

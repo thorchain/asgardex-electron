@@ -25,7 +25,7 @@ import * as RxOp from 'rxjs/operators'
 
 import { Network } from '../../../shared/api/types'
 import { WalletAddress } from '../../../shared/wallet/types'
-import { WalletSettings, UnlockWalletSettings } from '../../components/wallet/settings/'
+import { WalletSettings, UnlockWalletSettings } from '../../components/settings'
 import { useAppContext } from '../../contexts/AppContext'
 import { useBinanceContext } from '../../contexts/BinanceContext'
 import { useBitcoinCashContext } from '../../contexts/BitcoinCashContext'

@@ -13,7 +13,7 @@ import { Label as UILabel } from '../uielements/label'
 export const Container = styled.div`
   margin-top: 50px;
   padding: 10px 40px;
-  background-color: ${palette('background', 1)};
+  background-color: ${palette('background', 0)};
 `
 
 export const Collapse = styled(A.Collapse)`
@@ -54,7 +54,7 @@ export const CardContainer = styled.div`
 
 export const Card = styled(A.Card)`
   border-radius: 5px;
-  background-color: ${palette('background', 1)};
+  background-color: ${palette('background', 0)};
   border: 1px solid ${palette('gray', 0)};
 `
 

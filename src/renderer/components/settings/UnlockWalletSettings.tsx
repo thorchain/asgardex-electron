@@ -4,8 +4,8 @@ import { Collapse } from 'antd'
 import * as FP from 'fp-ts/lib/function'
 import { useIntl } from 'react-intl'
 
-import { KeystoreState } from '../../../services/wallet/types'
-import { hasImportedKeystore, isLocked } from '../../../services/wallet/util'
+import { KeystoreState } from '../../services/wallet/types'
+import { hasImportedKeystore, isLocked } from '../../services/wallet/util'
 import * as Styled from './WalletSettings.styles'
 
 type Props = {

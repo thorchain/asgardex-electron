@@ -22,14 +22,14 @@ import * as A from 'fp-ts/lib/Array'
 import * as O from 'fp-ts/lib/Option'
 import { FormattedMessage, useIntl } from 'react-intl'
 
-import { Network } from '../../../../shared/api/types'
-import { isLedgerWallet } from '../../../../shared/utils/guard'
-import { ReactComponent as UnlockOutlined } from '../../../assets/svg/icon-unlock-warning.svg'
-import { WalletPasswordConfirmationModal } from '../../../components/modal/confirmation'
-import { RemoveWalletConfirmationModal } from '../../../components/modal/confirmation/RemoveWalletConfirmationModal'
-import { AssetIcon } from '../../../components/uielements/assets/assetIcon/AssetIcon'
-import { QRCodeModal } from '../../../components/uielements/qrCodeModal/QRCodeModal'
-import { PhraseCopyModal } from '../../../components/wallet/phrase/PhraseCopyModal'
+import { Network } from '../../../shared/api/types'
+import { isLedgerWallet } from '../../../shared/utils/guard'
+import { ReactComponent as UnlockOutlined } from '../../assets/svg/icon-unlock-warning.svg'
+import { WalletPasswordConfirmationModal } from '../../components/modal/confirmation'
+import { RemoveWalletConfirmationModal } from '../../components/modal/confirmation/RemoveWalletConfirmationModal'
+import { AssetIcon } from '../../components/uielements/assets/assetIcon/AssetIcon'
+import { QRCodeModal } from '../../components/uielements/qrCodeModal/QRCodeModal'
+import { PhraseCopyModal } from '../../components/wallet/phrase/PhraseCopyModal'
 import {
   getChainAsset,
   isBchChain,
@@ -40,13 +40,13 @@ import {
   isLtcChain,
   isTerraChain,
   isThorChain
-} from '../../../helpers/chainHelper'
-import { isEnabledWallet } from '../../../helpers/walletHelper'
-import { ValidatePasswordHandler, WalletAccounts, WalletAddressAsync } from '../../../services/wallet/types'
-import { walletTypeToI18n } from '../../../services/wallet/util'
-import { AttentionIcon } from '../../icons'
-import { InfoIcon } from '../../uielements/info'
-import { Modal } from '../../uielements/modal'
+} from '../../helpers/chainHelper'
+import { isEnabledWallet } from '../../helpers/walletHelper'
+import { ValidatePasswordHandler, WalletAccounts, WalletAddressAsync } from '../../services/wallet/types'
+import { walletTypeToI18n } from '../../services/wallet/util'
+import { AttentionIcon } from '../icons'
+import { InfoIcon } from '../uielements/info'
+import { Modal } from '../uielements/modal'
 import * as Styled from './WalletSettings.styles'
 
 type Props = {

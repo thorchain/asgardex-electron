@@ -4,7 +4,7 @@ import { useObservableState } from 'observable-hooks'
 
 import { ExternalUrl } from '../../../shared/const'
 import { envOrDefault } from '../../../shared/utils/env'
-import { AppSettings } from '../../components/app/AppSettings'
+import { AppSettings } from '../../components/settings'
 import { useI18nContext } from '../../contexts/I18nContext'
 import { useAppUpdate } from '../../hooks/useAppUpdate'
 import { useNetwork } from '../../hooks/useNetwork'
