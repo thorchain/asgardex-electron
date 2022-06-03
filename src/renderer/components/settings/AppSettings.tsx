@@ -14,6 +14,7 @@ import { AVAILABLE_NETWORKS } from '../../services/const'
 import { DownIcon } from '../icons'
 import { Menu } from '../shared/menu'
 import * as Styled from './AppSettings.styles'
+import * as CStyled from './Common.styles'
 
 export type Props = {
   version: string
@@ -183,18 +184,18 @@ export const AppSettings: React.FC<Props> = (props): JSX.Element => {
 
   return (
     <Styled.Container>
-      <Styled.Collapse
-        expandIcon={({ isActive }) => <Styled.ExpandIcon rotate={isActive ? 90 : 0} />}
+      <CStyled.Collapse
+        expandIcon={({ isActive }) => <CStyled.ExpandIcon rotate={isActive ? 90 : 0} />}
         defaultActiveKey={['1']}
         // activeKey={'1'}
         expandIconPosition="right"
         onChange={onChangeCollapseHandler}
         ghost>
         <Collapse.Panel
-          header={<Styled.Title>{intl.formatMessage({ id: 'setting.app.title' })}</Styled.Title>}
+          header={<CStyled.Title>{intl.formatMessage({ id: 'setting.app.title' })}</CStyled.Title>}
           key={'1'}>
           <Styled.CardContainer>
-            <Styled.Card>
+            <CStyled.Card>
               <Styled.SectionsWrapper>
                 <Styled.Section>
                   <Styled.SubTitle>{intl.formatMessage({ id: 'common.network' })}</Styled.SubTitle>
@@ -211,10 +212,10 @@ export const AppSettings: React.FC<Props> = (props): JSX.Element => {
                   {renderVersionUpdateResult}
                 </Styled.Section>
               </Styled.SectionsWrapper>
-            </Styled.Card>
+            </CStyled.Card>
           </Styled.CardContainer>
         </Collapse.Panel>
-      </Styled.Collapse>
+      </CStyled.Collapse>
     </Styled.Container>
   )
 }

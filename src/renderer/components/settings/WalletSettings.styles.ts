@@ -1,4 +1,4 @@
-import AIcon, { QrcodeOutlined, PlusCircleOutlined, CaretRightOutlined } from '@ant-design/icons'
+import AIcon, { QrcodeOutlined, PlusCircleOutlined } from '@ant-design/icons'
 import { EyeOutlined as EyeOutlinedUI } from '@ant-design/icons'
 import * as A from 'antd'
 import styled from 'styled-components'
@@ -13,6 +13,7 @@ import {
   WalletTypeLabel as WalletTypeLabelUI
 } from '../uielements/common/Common.styles'
 import { Label as UILabel } from '../uielements/label'
+import * as CS from './Common.styles'
 
 export const Container = styled.div`
   margin-top: 40px;
@@ -20,41 +21,10 @@ export const Container = styled.div`
   background-color: ${palette('background', 0)};
 `
 
-export const Collapse = styled(A.Collapse)`
-  &.ant-collapse-icon-position-right > .ant-collapse-item > .ant-collapse-header {
-    padding: 5px 0px;
-  }
-
-  &.ant-collapse-ghost > .ant-collapse-item > .ant-collapse-content > .ant-collapse-content-box {
-    padding: 0;
-  }
-
-  &.ant-collapse > .ant-collapse-item > .ant-collapse-header .ant-collapse-arrow {
-    right: 0px;
-  }
-`
-
-export const ExpandIcon = styled(CaretRightOutlined)`
-  margin-top: 0px;
-  svg {
-    width: 20px;
-    height: 20px;
-    color: ${palette('primary', 0)};
-  }
-`
-
 export const TitleWrapper = styled.div`
   display: flex;
   align-items: center;
   min-height: 70px;
-`
-
-export const Title = styled(UILabel)`
-  color: ${palette('text', 1)};
-  text-transform: uppercase;
-  font-family: 'MainFontSemiBold';
-  font-size: 22px;
-  line-height: 22px;
 `
 
 export const Divider = styled(A.Divider)`
@@ -84,10 +54,7 @@ export const CardContainer = styled.div`
   padding: 10px 0 0 0;
 `
 
-export const Card = styled(A.Card)`
-  border-radius: 5px;
-  background-color: ${palette('background', 0)};
-  border: 1px solid ${palette('gray', 0)};
+export const Card = styled(CS.Card)`
   margin-bottom: 40px;
 `
 
@@ -136,6 +103,10 @@ export const AccountCard = styled(A.Card)`
       border-bottom: 1px solid ${palette('gray', 0)};
     }
   }
+
+  &:last-child {
+    margin-bottom: 20px;
+  }
 `
 
 export const ListItem = styled(A.List.Item)`
@@ -169,16 +140,6 @@ export const AccountContent = styled.div`
   width: 100%;
   overflow: hidden;
   margin: 0 40px;
-`
-
-export const AccountPlaceholder = styled(UILabel)`
-  display: block;
-  padding: 0px;
-  margin-top: 3px;
-  color: ${palette('text', 2)};
-  font-family: 'MainFontRegular';
-  font-size: 12px;
-  text-transform: uppercase;
 `
 
 export const AddressContainer = styled.div`
@@ -340,6 +301,7 @@ export const UnlockWalletButtonContainer = styled.div`
   min-height: 300px;
   border: 1px solid ${palette('gray', 0)};
   background-color: ${palette('background', 1)};
+  margin: 10px 0 20px 0;
 `
 
 export const UnlockWalletButton = styled(UIButton).attrs({

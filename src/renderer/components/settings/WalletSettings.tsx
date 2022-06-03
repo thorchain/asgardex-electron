@@ -47,6 +47,7 @@ import { walletTypeToI18n } from '../../services/wallet/util'
 import { AttentionIcon } from '../icons'
 import { InfoIcon } from '../uielements/info'
 import { Modal } from '../uielements/modal'
+import * as CStyled from './Common.styles'
 import * as Styled from './WalletSettings.styles'
 
 type Props = {
@@ -279,7 +280,7 @@ export const WalletSettings: React.FC<Props> = (props): JSX.Element => {
     [intl, rejectLedgerAddress]
   )
 
-  const accounts = useMemo(
+  const renderAccounts = useMemo(
     () =>
       FP.pipe(
         oWalletAccounts,
@@ -344,15 +345,15 @@ export const WalletSettings: React.FC<Props> = (props): JSX.Element => {
 
   return (
     <Styled.Container>
-      <Styled.Collapse
-        expandIcon={({ isActive }) => <Styled.ExpandIcon rotate={isActive ? 90 : 0} />}
+      <CStyled.Collapse
+        expandIcon={({ isActive }) => <CStyled.ExpandIcon rotate={isActive ? 90 : 0} />}
         defaultActiveKey={['1']}
         // activeKey={'1'}
         expandIconPosition="right"
         onChange={onChangeCollapseHandler}
         ghost>
         <Collapse.Panel
-          header={<Styled.Title>{intl.formatMessage({ id: 'setting.wallet.title' })}</Styled.Title>}
+          header={<CStyled.Title>{intl.formatMessage({ id: 'setting.wallet.title' })}</CStyled.Title>}
           key={'1'}>
           {showPasswordModal && (
             <WalletPasswordConfirmationModal
@@ -427,10 +428,9 @@ export const WalletSettings: React.FC<Props> = (props): JSX.Element => {
               </Row>
             </Styled.Card>
           </Styled.CardContainer>
-
-          {accounts}
+          {renderAccounts}
         </Collapse.Panel>
-      </Styled.Collapse>
+      </CStyled.Collapse>
     </Styled.Container>
   )
 }

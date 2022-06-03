@@ -6,6 +6,7 @@ import { useIntl } from 'react-intl'
 
 import { KeystoreState } from '../../services/wallet/types'
 import { hasImportedKeystore, isLocked } from '../../services/wallet/util'
+import * as CStyled from './Common.styles'
 import * as Styled from './WalletSettings.styles'
 
 type Props = {
@@ -23,15 +24,15 @@ export const UnlockWalletSettings: React.FC<Props> = (props): JSX.Element => {
 
   return (
     <Styled.Container>
-      <Styled.Collapse
-        expandIcon={({ isActive }) => <Styled.ExpandIcon rotate={isActive ? 90 : 0} />}
+      <CStyled.Collapse
+        expandIcon={({ isActive }) => <CStyled.ExpandIcon rotate={isActive ? 90 : 0} />}
         defaultActiveKey={['1']}
         // activeKey={'1'}
         expandIconPosition="right"
         onChange={onChangeCollapseHandler}
         ghost>
         <Collapse.Panel
-          header={<Styled.Title>{intl.formatMessage({ id: 'setting.wallet.title' })}</Styled.Title>}
+          header={<CStyled.Title>{intl.formatMessage({ id: 'setting.wallet.title' })}</CStyled.Title>}
           key={'1'}>
           <Styled.UnlockWalletButtonContainer>
             <Styled.UnlockWalletButton onClick={unlockHandler}>
@@ -41,7 +42,7 @@ export const UnlockWalletSettings: React.FC<Props> = (props): JSX.Element => {
             </Styled.UnlockWalletButton>
           </Styled.UnlockWalletButtonContainer>
         </Collapse.Panel>
-      </Styled.Collapse>
+      </CStyled.Collapse>
     </Styled.Container>
   )
 }
