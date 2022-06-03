@@ -11,27 +11,13 @@ import { Label as UILabel } from '../uielements/label'
 
 export const Container = styled.div`
   margin-top: 50px;
-  padding: 20px 40px 30px 40px;
-  background-color: ${palette('background', 1)};
-`
-
-export const Title = styled(UILabel)`
-  color: ${palette('text', 1)};
-  padding-bottom: 20px;
-  text-transform: uppercase;
-  font-family: 'MainFontSemiBold';
-  font-size: 22px;
-  line-height: 22px;
+  padding: 10px 40px;
+  background-color: ${palette('background', 0)};
 `
 
 export const CardContainer = styled.div`
   width: 100%;
-`
-
-export const Card = styled(A.Card)`
-  border-radius: 5px;
-  background-color: ${palette('background', 1)};
-  border: 1px solid ${palette('gray', 0)};
+  padding: 10px 0 20px 0;
 `
 
 export const SectionsWrapper = styled.div`
@@ -43,7 +29,9 @@ export const Section = styled.div`
   flex-direction: column;
   justify-content: space-between;
   align-items: flex-start;
-  margin-bottom: 20px;
+  &:not(:last-child) {
+    margin-bottom: 20px;
+  }
 `
 
 export const SubTitle = styled(UILabel)`
@@ -104,10 +92,6 @@ export const UpdatesButton = styled(UIButton).attrs({
 
   :disabled:hover {
     color: ${palette('primary', 0)} !important;
-  }
-
-  &:not(:last-child) {
-    margin-bottom: 10px;
   }
 
   &.ant-btn-loading-icon {

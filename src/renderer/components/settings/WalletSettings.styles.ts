@@ -4,34 +4,27 @@ import * as A from 'antd'
 import styled from 'styled-components'
 import { palette } from 'styled-theme'
 
-import { ReactComponent as RemoveIcon } from '../../../assets/svg/icon-remove.svg'
-import { AddressEllipsis as AddressEllipsisUI } from '../../../components/uielements/addressEllipsis'
-import { Button as UIButton } from '../../../components/uielements/button'
+import { ReactComponent as RemoveIcon } from '../../assets/svg/icon-remove.svg'
+import { media } from '../../helpers/styleHelper'
+import { AddressEllipsis as AddressEllipsisUI } from '../uielements/addressEllipsis'
+import { Button as UIButton } from '../uielements/button'
 import {
   ExternalLinkIcon as ExternalLinkIconUI,
   WalletTypeLabel as WalletTypeLabelUI
-} from '../../../components/uielements/common/Common.styles'
-import { Label as UILabel } from '../../../components/uielements/label'
-import { media } from '../../../helpers/styleHelper'
+} from '../uielements/common/Common.styles'
+import { Label as UILabel } from '../uielements/label'
+import * as CS from './Common.styles'
 
 export const Container = styled.div`
   margin-top: 40px;
-  padding: 10px 40px 30px 40px;
-  background-color: ${palette('background', 1)};
+  padding: 10px 40px;
+  background-color: ${palette('background', 0)};
 `
 
 export const TitleWrapper = styled.div`
   display: flex;
   align-items: center;
   min-height: 70px;
-`
-
-export const Title = styled(UILabel)`
-  color: ${palette('text', 1)};
-  text-transform: uppercase;
-  font-family: 'MainFontSemiBold';
-  font-size: 22px;
-  line-height: 22px;
 `
 
 export const Divider = styled(A.Divider)`
@@ -56,10 +49,12 @@ export const WalletCol = styled(A.Col)`
   width: 100%;
 `
 
-export const Card = styled(A.Card)`
-  border-radius: 5px;
-  background-color: ${palette('background', 1)};
-  border: 1px solid ${palette('gray', 0)};
+export const CardContainer = styled.div`
+  width: 100%;
+  padding: 10px 0 0 0;
+`
+
+export const Card = styled(CS.Card)`
   margin-bottom: 40px;
 `
 
@@ -108,6 +103,10 @@ export const AccountCard = styled(A.Card)`
       border-bottom: 1px solid ${palette('gray', 0)};
     }
   }
+
+  &:last-child {
+    margin-bottom: 20px;
+  }
 `
 
 export const ListItem = styled(A.List.Item)`
@@ -141,16 +140,6 @@ export const AccountContent = styled.div`
   width: 100%;
   overflow: hidden;
   margin: 0 40px;
-`
-
-export const AccountPlaceholder = styled(UILabel)`
-  display: block;
-  padding: 0px;
-  margin-top: 3px;
-  color: ${palette('text', 2)};
-  font-family: 'MainFontRegular';
-  font-size: 12px;
-  text-transform: uppercase;
 `
 
 export const AddressContainer = styled.div`
@@ -312,6 +301,7 @@ export const UnlockWalletButtonContainer = styled.div`
   min-height: 300px;
   border: 1px solid ${palette('gray', 0)};
   background-color: ${palette('background', 1)};
+  margin: 10px 0 20px 0;
 `
 
 export const UnlockWalletButton = styled(UIButton).attrs({

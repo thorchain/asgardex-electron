@@ -438,7 +438,7 @@ export const AssetsTableCollapsable: React.FC<Props> = (props): JSX.Element => {
     }
   }, [chainBalances, collapseChangedByUser])
 
-  const onChangeCollpaseHandler = useCallback((key: string | string[]) => {
+  const onChangeCollapseHandler = useCallback((key: string | string[]) => {
     if (Array.isArray(key)) {
       setOpenPanelKeys(key)
     } else {
@@ -474,7 +474,7 @@ export const AssetsTableCollapsable: React.FC<Props> = (props): JSX.Element => {
       defaultActiveKey={openPanelKeys}
       activeKey={openPanelKeys}
       expandIconPosition="right"
-      onChange={onChangeCollpaseHandler}
+      onChange={onChangeCollapseHandler}
       ghost>
       {chainBalances.map(renderPanel)}
       {renderQRCodeModal}

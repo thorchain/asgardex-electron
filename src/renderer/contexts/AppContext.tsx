@@ -6,9 +6,11 @@ import {
   changeNetwork,
   clientNetwork$,
   slipTolerance$,
-  changeSlipTolerance
+  changeSlipTolerance,
+  toggleCollapsedSetting,
+  collapsedSettings$
 } from '../services/app/service'
-import { ChangeNetworkHandler, ChangeSlipToleranceHandler } from '../services/app/types'
+import { ChangeNetworkHandler, ChangeSlipToleranceHandler, ToggleCollapsableSetting } from '../services/app/types'
 
 type AppContextValue = {
   onlineStatus$: typeof onlineStatus$
@@ -17,6 +19,8 @@ type AppContextValue = {
   clientNetwork$: typeof clientNetwork$
   slipTolerance$: typeof slipTolerance$
   changeSlipTolerance: ChangeSlipToleranceHandler
+  collapsedSettings$: typeof collapsedSettings$
+  toggleCollapsedSetting: ToggleCollapsableSetting
 }
 const initialContext: AppContextValue = {
   onlineStatus$,
@@ -24,7 +28,9 @@ const initialContext: AppContextValue = {
   changeNetwork,
   clientNetwork$,
   slipTolerance$,
-  changeSlipTolerance
+  changeSlipTolerance,
+  collapsedSettings$,
+  toggleCollapsedSetting
 }
 
 const AppContext = createContext<AppContextValue | null>(null)

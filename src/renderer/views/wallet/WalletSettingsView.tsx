@@ -23,10 +23,8 @@ import { useLocation, useNavigate } from 'react-router-dom'
 import * as Rx from 'rxjs'
 import * as RxOp from 'rxjs/operators'
 
-import { Network } from '../../../shared/api/types'
 import { WalletAddress } from '../../../shared/wallet/types'
-import { WalletSettings, UnlockWalletSettings } from '../../components/wallet/settings/'
-import { useAppContext } from '../../contexts/AppContext'
+import { WalletSettings, UnlockWalletSettings } from '../../components/settings'
 import { useBinanceContext } from '../../contexts/BinanceContext'
 import { useBitcoinCashContext } from '../../contexts/BitcoinCashContext'
 import { useBitcoinContext } from '../../contexts/BitcoinContext'
@@ -49,9 +47,10 @@ import {
   isEthChain
 } from '../../helpers/chainHelper'
 import { sequenceTOptionFromArray } from '../../helpers/fpHelpers'
+import { useCollapsedSetting } from '../../hooks/useCollapsedSetting'
 import { useLedger } from '../../hooks/useLedger'
+import { useNetwork } from '../../hooks/useNetwork'
 import * as walletRoutes from '../../routes/wallet'
-import { DEFAULT_NETWORK } from '../../services/const'
 import { WalletAddressAsync } from '../../services/wallet/types'
 import { isLocked, hasImportedKeystore, ledgerErrorIdToI18n } from '../../services/wallet/util'
 import { getPhrase } from '../../services/wallet/util'
@@ -68,8 +67,9 @@ export const WalletSettingsView: React.FC = (): JSX.Element => {
 
   const keystore = useObservableState(keystore$, O.none)
 
-  const { network$ } = useAppContext()
-  const network = useObservableState<Network>(network$, DEFAULT_NETWORK)
+  const { network } = useNetwork()
+
+  const { collapsed, toggle: toggleCollapse } = useCollapsedSetting('wallet')
 
   const { address$: thorAddressUI$ } = useThorchainContext()
   const { addressUI$: bnbAddressUI$ } = useBinanceContext()
@@ -408,7 +408,12 @@ export const WalletSettingsView: React.FC = (): JSX.Element => {
   }, [])
 
   return noAccess ? (
-    <UnlockWalletSettings keystore={keystore} unlockHandler={unlockWalletHandler} />
+    <UnlockWalletSettings
+      keystore={keystore}
+      unlockHandler={unlockWalletHandler}
+      collapsed={collapsed}
+      toggleCollapse={toggleCollapse}
+    />
   ) : (
     <WalletSettings
       network={network}
@@ -423,6 +428,8 @@ export const WalletSettingsView: React.FC = (): JSX.Element => {
       walletAccounts={walletAccounts}
       clickAddressLinkHandler={clickAddressLinkHandler}
       validatePassword$={validatePassword$}
+      collapsed={collapsed}
+      toggleCollapse={toggleCollapse}
     />
   )
 }

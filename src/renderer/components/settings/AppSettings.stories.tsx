@@ -16,6 +16,7 @@ type StoryArgs = {
   goToReleasePage: (version: string) => void
   changeLocale: (locale: Locale) => void
   changeNetwork: ChangeNetworkHandler
+  collapsed: boolean
 }
 
 const Template: Story<StoryArgs> = ({
@@ -23,7 +24,8 @@ const Template: Story<StoryArgs> = ({
   updateDataRD,
   checkForUpdates,
   goToReleasePage,
-  changeLocale
+  changeLocale,
+  collapsed
 }) => {
   const appUpdateState = getMockRDValueFactory<Error, O.Option<string>>(
     () => O.some('2.0.0'),
@@ -40,6 +42,8 @@ const Template: Story<StoryArgs> = ({
       goToReleasePage={goToReleasePage}
       locale={Locale.EN}
       changeLocale={changeLocale}
+      collapsed={collapsed}
+      toggleCollapse={() => console.log('toggle')}
     />
   )
 }
@@ -56,6 +60,13 @@ const meta: Meta<StoryArgs> = {
         type: 'select',
         options: rdStatusOptions
       }
+    },
+    collapsed: {
+      name: 'Show / hide',
+      control: {
+        type: 'boolean'
+      },
+      defaultValue: false
     },
     changeNetwork: {
       action: 'changeNetwork'
