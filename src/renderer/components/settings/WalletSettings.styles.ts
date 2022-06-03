@@ -12,6 +12,7 @@ import {
   ExternalLinkIcon as ExternalLinkIconUI,
   WalletTypeLabel as WalletTypeLabelUI
 } from '../uielements/common/Common.styles'
+import { Input as InputUI } from '../uielements/input'
 import { Label as UILabel } from '../uielements/label'
 import * as CS from './Common.styles'
 
@@ -27,9 +28,33 @@ export const TitleWrapper = styled.div`
   min-height: 70px;
 `
 
-export const Divider = styled(A.Divider)`
-  margin: 0;
-  border-top: 1px solid ${palette('gray', 0)};
+export const InputConainer = styled.div`
+  margin-top: 30px;
+  display: flex;
+  justify-content: center;
+
+  ${media.md`
+  justify-content: start;
+  margin-left: 10px;
+  `}
+`
+
+export const Input = styled(InputUI)`
+  border-color: ${palette('gray', 1)};
+  max-width: 300px;
+
+  .ant-input {
+    color: ${palette('text', 0)};
+  }
+
+  .ant-input-prefix svg,
+  .anticon-close-circle svg {
+    color: ${palette('gray', 1)};
+  }
+
+  ${media.md`
+  margin: 0 10px 0 10px;
+  `}
 `
 
 export const Subtitle = styled(UILabel)`

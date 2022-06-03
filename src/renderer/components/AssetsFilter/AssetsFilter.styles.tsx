@@ -37,8 +37,6 @@ export const Input = styled(InputUI)`
     color: ${palette('gray', 1)};
   }
 
-  transition: width 2s;
-
   ${media.md`
   margin: 0 10px 0 10px;
   `}

@@ -50,8 +50,8 @@ const {
   set: _setCollapsedSettings,
   get: getCollapsedSettings
 } = observableState<CollapsableSettings>({
-  wallet: true, // collapsed === closed by default
-  app: true // collapsed === closed by default
+  wallet: false, // not collapsed === open by default
+  app: false // not collapsed === open by default
 })
 
 const toggleCollapsedSetting: ToggleCollapsableSetting = (setting: SettingType) => {
