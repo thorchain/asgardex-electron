@@ -1,5 +1,6 @@
 import React, { useCallback, useMemo, useState } from 'react'
 
+import { SearchOutlined } from '@ant-design/icons'
 import * as RD from '@devexperts/remote-data-ts'
 import { Address } from '@xchainjs/xchain-client'
 import {
@@ -14,7 +15,8 @@ import {
   CosmosChain,
   Chain,
   DOGEChain,
-  TerraChain
+  TerraChain,
+  chainToString
 } from '@xchainjs/xchain-util'
 import { Col, List, Collapse, Row } from 'antd'
 import * as FP from 'fp-ts/function'
@@ -41,6 +43,7 @@ import {
   isTerraChain,
   isThorChain
 } from '../../helpers/chainHelper'
+import { emptyString } from '../../helpers/stringHelper'
 import { isEnabledWallet } from '../../helpers/walletHelper'
 import { ValidatePasswordHandler, WalletAccounts, WalletAddressAsync } from '../../services/wallet/types'
 import { walletTypeToI18n } from '../../services/wallet/util'
@@ -226,11 +229,10 @@ export const WalletSettings: React.FC<Props> = (props): JSX.Element => {
                     <Styled.AddressLinkIcon onClick={() => clickAddressLinkHandler(chain, address)} />
 
                     {isLedgerWallet(walletType) && (
-                      <Styled.EyeOutlined onClick={() => verifyLedgerAddressHandler(address, walletIndex)} />
-                    )}
-
-                    {isLedgerWallet(walletType) && (
-                      <Styled.RemoveLedgerIcon onClick={() => removeLedgerAddress(chain)} />
+                      <>
+                        <Styled.EyeOutlined onClick={() => verifyLedgerAddressHandler(address, walletIndex)} />
+                        <Styled.RemoveLedgerIcon onClick={() => removeLedgerAddress(chain)} />
+                      </>
                     )}
                   </Styled.AddressWrapper>
                 </>
@@ -284,63 +286,84 @@ export const WalletSettings: React.FC<Props> = (props): JSX.Element => {
     [intl, rejectLedgerAddress]
   )
 
-  const renderAccounts = useMemo(
+  const [accountFilter, setAccountFilter] = useState(emptyString)
+
+  const filterAccounts = useCallback(({ target }: React.ChangeEvent<HTMLInputElement>) => {
+    const value = target.value
+    setAccountFilter(value.toLowerCase())
+  }, [])
+
+  const oFilteredWalletAccounts = useMemo(
     () =>
       FP.pipe(
         oWalletAccounts,
-        O.map((walletAccounts) => (
-          <Col key={'accounts'} span={24}>
-            <Styled.AccountCard>
-              <Styled.Subtitle>{intl.formatMessage({ id: 'setting.account.management' })}</Styled.Subtitle>
-              <List
-                dataSource={walletAccounts}
-                renderItem={({ chain, accounts }, i: number) => (
-                  <Styled.ListItem key={i}>
-                    <Styled.AccountTitleWrapper>
-                      <AssetIcon asset={getChainAsset(chain)} size={'small'} network="mainnet" />
-                      <Styled.AccountTitle>{chain}</Styled.AccountTitle>
-                    </Styled.AccountTitleWrapper>
-                    {/* supported Ledger */}
-                    {FP.pipe(
-                      accounts,
-                      A.filter(({ type }) => isEnabledWallet(chain, network, type)),
-                      A.mapWithIndex((index, account) => {
-                        const { type } = account
-                        return (
-                          <Styled.AccountAddressWrapper key={type}>
-                            <Styled.WalletTypeLabel>{walletTypeToI18n(type, intl)}</Styled.WalletTypeLabel>
-                            <Styled.AccountContent key={index}>{renderAddress(chain, account)}</Styled.AccountContent>
-                          </Styled.AccountAddressWrapper>
-                        )
-                      })
-                    )}
-                    {/* unsupported Ledger */}
-                    {FP.pipe(
-                      accounts,
-                      A.filter(({ type }) => !isEnabledWallet(chain, network, type)),
-                      A.map((account) => {
-                        const { type } = account
-                        return (
-                          <Styled.AccountAddressWrapper key={type}>
-                            <Styled.WalletTypeLabel>{walletTypeToI18n(type, intl)}</Styled.WalletTypeLabel>
+        O.map((walletAccounts) =>
+          FP.pipe(
+            walletAccounts,
+            A.filter(({ chain }) =>
+              accountFilter
+                ? chain.toLowerCase().startsWith(accountFilter) ||
+                  chainToString(chain).toLowerCase().startsWith(accountFilter)
+                : true
+            )
+          )
+        )
+      ),
+    [accountFilter, oWalletAccounts]
+  )
 
-                            <Styled.NotSupportedWrapper>
-                              <Styled.Icon component={AttentionIcon} />
-                              {intl.formatMessage({ id: 'common.notsupported.fornetwork' }, { network })}
-                            </Styled.NotSupportedWrapper>
-                          </Styled.AccountAddressWrapper>
-                        )
-                      })
-                    )}
-                  </Styled.ListItem>
+  const renderAccounts = useMemo(
+    () =>
+      FP.pipe(
+        oFilteredWalletAccounts,
+        O.map((walletAccounts) => (
+          <List
+            key="accounts"
+            dataSource={walletAccounts}
+            renderItem={({ chain, accounts }, i: number) => (
+              <Styled.ListItem key={i}>
+                <Styled.AccountTitleWrapper>
+                  <AssetIcon asset={getChainAsset(chain)} size={'small'} network="mainnet" />
+                  <Styled.AccountTitle>{chain}</Styled.AccountTitle>
+                </Styled.AccountTitleWrapper>
+                {/* supported Ledger */}
+                {FP.pipe(
+                  accounts,
+                  A.filter(({ type }) => isEnabledWallet(chain, network, type)),
+                  A.mapWithIndex((index, account) => {
+                    const { type } = account
+                    return (
+                      <Styled.AccountAddressWrapper key={type}>
+                        <Styled.WalletTypeLabel>{walletTypeToI18n(type, intl)}</Styled.WalletTypeLabel>
+                        <Styled.AccountContent key={index}>{renderAddress(chain, account)}</Styled.AccountContent>
+                      </Styled.AccountAddressWrapper>
+                    )
+                  })
                 )}
-              />
-            </Styled.AccountCard>
-          </Col>
+                {/* unsupported Ledger */}
+                {FP.pipe(
+                  accounts,
+                  A.filter(({ type }) => !isEnabledWallet(chain, network, type)),
+                  A.map((account) => {
+                    const { type } = account
+                    return (
+                      <Styled.AccountAddressWrapper key={type}>
+                        <Styled.WalletTypeLabel>{walletTypeToI18n(type, intl)}</Styled.WalletTypeLabel>
+                        <Styled.NotSupportedWrapper>
+                          <Styled.Icon component={AttentionIcon} />
+                          {intl.formatMessage({ id: 'common.notsupported.fornetwork' }, { network })}
+                        </Styled.NotSupportedWrapper>
+                      </Styled.AccountAddressWrapper>
+                    )
+                  })
+                )}
+              </Styled.ListItem>
+            )}
+          />
         )),
         O.getOrElse(() => <></>)
       ),
-    [oWalletAccounts, intl, renderAddress, network]
+    [oFilteredWalletAccounts, intl, renderAddress, network]
   )
 
   return (
@@ -427,7 +450,21 @@ export const WalletSettings: React.FC<Props> = (props): JSX.Element => {
               </Row>
             </Styled.Card>
           </Styled.CardContainer>
-          {renderAccounts}
+          <Col key={'accounts'} span={24}>
+            <Styled.AccountCard>
+              <Styled.Subtitle>{intl.formatMessage({ id: 'setting.account.management' })}</Styled.Subtitle>
+              <Styled.InputConainer>
+                <Styled.Input
+                  prefix={<SearchOutlined />}
+                  onChange={filterAccounts}
+                  allowClear
+                  placeholder={intl.formatMessage({ id: 'common.search' }).toUpperCase()}
+                  size="large"
+                />
+              </Styled.InputConainer>
+              {renderAccounts}
+            </Styled.AccountCard>
+          </Col>
         </Collapse.Panel>
       </CStyled.Collapse>
     </Styled.Container>

@@ -43,6 +43,7 @@ export type InputProps = CustomInputProps & AI.InputProps
 
 const inputStyle = css<InputProps>`
   height: ${({ size = 'middle' }) => sizes[size]};
+  font-family: 'MainFontRegular';
   font-size: ${({ size = 'middle' }) => fontSettings[size].size};
   letter-spacing: ${({ size = 'middle' }) => fontSettings[size].spacing};
   ${({ typevalue }) => typevalue === 'ghost' && 'border: none;'};
