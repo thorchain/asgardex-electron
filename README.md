@@ -94,7 +94,7 @@ _(in alphabetical order)_
 
 ## Install
 
-It's recommended to use a Node version as same as Electron is running with (currently: [`Electron v18.x` / Node `16.13.2`](https://github.com/electron/releases#releases)). It's recommened to install [nvm](https://github.com/nvm-sh/nvm) to run as same Node version locally as used for building ASGARDEX on CI.
+It's recommended to use a Node version as same as Electron is running with (currently: [`Electron v19.x` / Node `16.14.2`](https://github.com/electron/releases#releases)). It's recommened to install [nvm](https://github.com/nvm-sh/nvm) to run as same Node version locally as used for building ASGARDEX on CI.
 
 ```bash
 git clone https://github.com/thorchain/asgardex-electron.git asgardex
@@ -173,6 +173,8 @@ yarn test
 ```
 
 ### `e2e`
+
+Note: Running test-cafe is disabled (see https://github.com/thorchain/asgardex-electron/issues/750)
 
 ```bash
 yarn test:e2e
