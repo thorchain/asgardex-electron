@@ -1,12 +1,12 @@
-# 0.15.2 (2022-xx-xx)
+# 0.15.2 (2022-06-06)
 
 ## Add
 
 - Add search option for pools [#2275](https://github.com/thorchain/asgardex-electron/pull/2275)
-  [PoolsOverview] Watch / unwatch pools [#2276](https://github.com/thorchain/asgardex-electron/pull/2276)
+  [PoolsOverview] Watch / unwatch pools [#2276](https://github.com/thorchain/asgardex-electron/pull/2276), [#2277](https://github.com/thorchain/asgardex-electron/pull/2277)
   [PoolDetail] Watch / unwatch pool [#2278](https://github.com/thorchain/asgardex-electron/pull/2276)
   [Settings] Make settings collapsable [#2281](https://github.com/thorchain/asgardex-electron/pull/2281)
-  [Settings] Filter acconts
+  [Settings] Filter accounts [#2282](https://github.com/thorchain/asgardex-electron/pull/2282)
 
 ## Update
 
@@ -14,7 +14,11 @@
 
 ## Fix
 
-- [Pools] ERC20 filter includes BNB.ETH [#2273](https://github.com/thorchain/asgardex-electron/issues/2273)
+- [Pools] `ERC20` filter includes `BNB.ETH` [#2273](https://github.com/thorchain/asgardex-electron/issues/2273)
+
+## Internal
+
+- Update npm dependencies (incl. latest Electron v19.0.3) [#2283](https://github.com/thorchain/asgardex-electron/issues/2283)
 
 # 0.15.1 (2022-05-29)
 
