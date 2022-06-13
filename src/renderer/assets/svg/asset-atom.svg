@@ -1,50 +1,13 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <svg
-   xmlns:dc="http://purl.org/dc/elements/1.1/"
-   xmlns:cc="http://creativecommons.org/ns#"
-   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
    xmlns:svg="http://www.w3.org/2000/svg"
    xmlns="http://www.w3.org/2000/svg"
-   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
-   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
    width="32"
    height="32"
    viewBox="0 0 32 32"
-   version="1.1"
-   id="svg33"
-   sodipodi:docname="asset-atom.svg"
-   inkscape:version="0.92.3 (2405546, 2018-03-11)">
-  <metadata
-     id="metadata37">
-    <rdf:RDF>
-      <cc:Work
-         rdf:about="">
-        <dc:format>image/svg+xml</dc:format>
-        <dc:type
-           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-      </cc:Work>
-    </rdf:RDF>
-  </metadata>
-  <sodipodi:namedview
-     pagecolor="#ffffff"
-     bordercolor="#666666"
-     borderopacity="1"
-     objecttolerance="10"
-     gridtolerance="10"
-     guidetolerance="10"
-     inkscape:pageopacity="0"
-     inkscape:pageshadow="2"
-     inkscape:window-width="1686"
-     inkscape:window-height="799"
-     id="namedview35"
-     showgrid="false"
-     inkscape:zoom="14.75"
-     inkscape:cx="12.852442"
-     inkscape:cy="15.788326"
-     inkscape:window-x="0"
-     inkscape:window-y="0"
-     inkscape:window-maximized="0"
-     inkscape:current-layer="g13" />
+   version="1.1">
+
+
   <defs
      id="defs7">
     <linearGradient
@@ -65,11 +28,9 @@
   </defs>
   <g
      transform="translate(-37,-96.909)"
-     id="g31"
      style="display:inline">
     <g
        transform="translate(37,96.909)"
-       id="g13"
        style="display:inline;fill:url(#a);stroke:#ffffff;stroke-width:0.5">
       <circle
          cx="16"
@@ -86,47 +47,38 @@
          d="m 989.506,124.8 c -2.6,0 -2.631,-12.2 -2.631,-12.715 0,-0.515 0.03,-12.715 2.631,-12.715 2.601,0 2.631,12.2 2.631,12.715 0,0.515 -0.03,12.715 -2.631,12.715 z m -0.007,-24.553 c -0.6,0.165 -1.747,4.377 -1.747,11.838 0,7.461 1.146,11.674 1.761,11.838 0.6,-0.165 1.747,-4.377 1.747,-11.838 0,-7.461 -1.147,-11.669 -1.76,-11.834 z"
          transform="translate(-978.372,-99.375)"
          id="path15"
-         inkscape:connector-curvature="0"
          style="fill:#ffffff" />
       <path
          d="m 988.416,126.449 c -3.141,0 -10.737,-4.36 -11.116,-4.579 a 52.446,52.446 0 0 1 -7.26,-4.941 c -2.755,-2.322 -2.709,-3.221 -2.436,-3.695 1.3,-2.252 11.878,3.82 12.327,4.079 a 52.449,52.449 0 0 1 7.26,4.941 c 2.755,2.322 2.709,3.221 2.436,3.695 a 1.293,1.293 0 0 1 -1.211,0.5 z m -19.661,-12.865 a 0.589,0.589 0 0 0 -0.4,0.094 c -0.157,0.6 2.917,3.7 9.38,7.432 6.463,3.732 10.682,4.844 11.133,4.395 0.157,-0.6 -2.917,-3.7 -9.38,-7.432 -5.57,-3.218 -9.476,-4.489 -10.733,-4.489 z"
          transform="translate(-967.481,-106.877)"
-         id="path17"
-         inkscape:connector-curvature="0"
          style="fill:#ffffff" />
       <path
          d="m 968.814,126.449 a 1.293,1.293 0 0 1 -1.211,-0.5 c -0.274,-0.474 -0.319,-1.373 2.436,-3.695 a 52.448,52.448 0 0 1 7.26,-4.941 c 0.449,-0.26 11.025,-6.332 12.327,-4.079 0.273,0.474 0.319,1.373 -2.436,3.695 a 52.449,52.449 0 0 1 -7.26,4.941 c -0.379,0.219 -7.974,4.579 -11.116,4.579 z m 19.669,-12.872 c -1.24,0 -5.154,1.268 -10.745,4.5 -6.462,3.731 -9.536,6.829 -9.373,7.444 0.444,0.436 4.665,-0.676 11.126,-4.407 6.461,-3.731 9.537,-6.829 9.373,-7.444 a 0.574,0.574 0 0 0 -0.381,-0.093 z"
          transform="translate(-967.481,-106.877)"
-         id="path19"
-         inkscape:connector-curvature="0"
          style="fill:#ffffff" />
       <circle
          cx="1.3150001"
          cy="1.3150001"
          r="1.3150001"
          transform="translate(9.818,11.4)"
-         id="circle21"
          style="fill:#ffffff" />
       <circle
          cx="1.3150001"
          cy="1.3150001"
          r="1.3150001"
          transform="translate(15.573,5.974)"
-         id="circle23"
          style="fill:#ffffff" />
       <circle
          cx="1.3150001"
          cy="1.3150001"
          r="1.3150001"
          transform="translate(1.543,8.604)"
-         id="circle25"
          style="fill:#ffffff" />
       <circle
          cx="1.3150001"
          cy="1.3150001"
          r="1.3150001"
          transform="translate(8.119,19.566)"
-         id="circle27"
          style="fill:#ffffff" />
     </g>
   </g>

@@ -23,7 +23,7 @@ export const AssetIcon = styled(UIAssetIcon)``
 
 export const TickerLabel = styled(UILabel).attrs({
   textTransform: 'uppercase',
-  weight: '600'
+  weight: 'bold'
 })`
   height: 18px;
   padding: 0px 16px 0px 11px;
@@ -39,7 +39,7 @@ export const ChainLabel = styled(TickerLabel)`
 
 export const AmountLabel = styled(UILabel).attrs({
   textTransform: 'uppercase',
-  weight: '600'
+  weight: 'bold'
 })`
   font-family: 'MainFontRegular';
   padding-left: 10px;
