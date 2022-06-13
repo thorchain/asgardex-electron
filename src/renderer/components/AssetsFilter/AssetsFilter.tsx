@@ -1,6 +1,6 @@
 import React, { useCallback, useMemo, useState } from 'react'
 
-import { SearchOutlined, StopOutlined } from '@ant-design/icons/lib'
+import { SearchOutlined } from '@ant-design/icons/lib'
 import * as A from 'fp-ts/Array'
 import * as FP from 'fp-ts/function'
 import * as O from 'fp-ts/Option'
@@ -31,7 +31,6 @@ export const AssetsFilter: React.FC<Props> = ({ poolFilters, className, activeFi
     [intl]
   )
 
-  const [inputFocused, setInputFocused] = useState(false)
   const [inputValue, setInputValue] = useState(emptyString)
 
   const setCustomFilter = useCallback(
@@ -46,11 +45,20 @@ export const AssetsFilter: React.FC<Props> = ({ poolFilters, className, activeFi
 
   const buttonClickHandler = useCallback(
     (filter: StaticPoolFilter) => {
-      setFilter(O.some(filter))
+      FP.pipe(
+        oActiveFilter,
+        O.fold(
+          () => setFilter(O.some(filter)),
+          (activeFilter) => {
+            if (filter === activeFilter) setFilter(O.none)
+            else setFilter(O.some(filter))
+          }
+        )
+      )
       // empty search input
       setInputValue(emptyString)
     },
-    [setFilter]
+    [oActiveFilter, setFilter]
   )
 
   return FP.pipe(
@@ -62,10 +70,9 @@ export const AssetsFilter: React.FC<Props> = ({ poolFilters, className, activeFi
           (active) =>
             active === filter &&
             // don't update if an user has typed something into search field
-            !inputFocused &&
             !inputValue
         ),
-        O.toUndefined
+        O.getOrElse(() => false)
       )
 
       const filterLabel = isStaticPoolFilter(filter) && filterNames[filter]
@@ -86,18 +93,10 @@ export const AssetsFilter: React.FC<Props> = ({ poolFilters, className, activeFi
     O.fromPredicate((children) => children.length > 0),
     O.map((filters) => (
       <Styled.Container key="container" className={className}>
-        <Styled.ButtonContainer>
-          {filters}
-
-          <Styled.ResetButton key="reset" onClick={() => setFilter(O.none)} disabled={O.isNone(oActiveFilter)}>
-            <StopOutlined />
-          </Styled.ResetButton>
-        </Styled.ButtonContainer>
+        {filters}
         <Styled.Input
           prefix={<SearchOutlined />}
           onChange={setCustomFilter}
-          onFocus={() => setInputFocused(true)}
-          onBlur={() => setInputFocused(false)}
           value={inputValue}
           allowClear
           placeholder={intl.formatMessage({ id: 'common.search' }).toUpperCase()}

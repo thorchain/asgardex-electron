@@ -1,3 +1,9 @@
+# 0.xx.x (2022-xx-xx)
+
+## Update
+
+- [Pools] Toggle filter buttons to remove clear button
+
 # 0.15.2 (2022-06-06)
 
 ## Add
