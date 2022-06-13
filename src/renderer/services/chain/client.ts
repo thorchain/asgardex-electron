@@ -3,6 +3,7 @@ import {
   BNBChain,
   BTCChain,
   Chain,
+  CosmosChain,
   DOGEChain,
   ETHChain,
   LTCChain,
@@ -43,6 +44,9 @@ export const clientByChain$ = (chain: Chain): XChainClient$ => {
       return DOGE.client$
     case TerraChain:
       return TERRA.client$
+    case CosmosChain:
+      // TODO (@veado) Implement Cosmos
+      return Rx.of(O.none)
     default:
       return Rx.of(O.none)
   }

@@ -75,7 +75,7 @@ export const sendTx$ = ({
       return THOR.sendTx({ walletType, amount, asset, memo, recipient, walletIndex })
 
     case CosmosChain:
-      // not available yet
+      // TODO (@veado) Implement Cosmos
       return txFailure$(`sendTx$ has not been implemented for Cosmos yet`)
 
     case PolkadotChain:
@@ -182,6 +182,7 @@ export const txStatusByChain$ = ({ txHash, chain }: { txHash: TxHash; chain: Cha
     case THORChain:
       return THOR.txStatus$(txHash, O.none)
     case CosmosChain:
+      // TODO (@veado) Implement Cosmos
       return txStatusFailure$(`txStatusByChain$ has not been implemented for Cosmos`)
     case PolkadotChain:
       return txStatusFailure$(`txStatusByChain$ has not been implemented for Polkadot`)

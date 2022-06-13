@@ -1,3 +1,4 @@
+import { AssetAtom } from '@xchainjs/xchain-cosmos'
 import { ETHAddress } from '@xchainjs/xchain-ethereum'
 import { AssetLUNA } from '@xchainjs/xchain-terra'
 import {
@@ -327,6 +328,9 @@ describe('helpers/assetHelper', () => {
     })
     it('UST', () => {
       expect(isChainAsset(AssetUST)).toBeFalsy()
+    })
+    it('ATOM', () => {
+      expect(isChainAsset(AssetAtom)).toBeTruthy()
     })
   })
 
