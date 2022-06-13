@@ -22,7 +22,8 @@ import {
   isRuneBnbAsset,
   isRuneNativeAsset,
   isTgtERC20Asset,
-  isXRuneAsset
+  isXRuneAsset,
+  isAtomAsset
 } from '../../../../helpers/assetHelper'
 import { isBnbChain, isEthChain } from '../../../../helpers/chainHelper'
 import { getIntFromName, rainbowStop } from '../../../../helpers/colorHelpers'
@@ -37,7 +38,8 @@ import {
   xRuneIcon,
   tgtIcon,
   lunaIcon,
-  ustIcon
+  ustIcon,
+  atomIcon
 } from '../../../icons'
 import * as Styled from './AssetIcon.styles'
 import { Size } from './AssetIcon.types'
@@ -94,6 +96,11 @@ export const AssetIcon: React.FC<Props> = ({ asset, size = 'normal', className =
     // DOGE
     if (isDogeAsset(asset)) {
       return dogeIcon
+    }
+
+    // Atom
+    if (isAtomAsset(asset)) {
+      return atomIcon
     }
 
     // LUNA

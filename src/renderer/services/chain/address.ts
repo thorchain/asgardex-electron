@@ -45,7 +45,7 @@ const addressByChain$ = (chain: Chain): WalletAddress$ => {
       // not supported yet
       return Rx.of(O.none)
     case CosmosChain:
-      // not supported yet
+      // TODO (@veado) Implement Cosmos
       return Rx.of(O.none)
     case BCHChain:
       return BCH.address$

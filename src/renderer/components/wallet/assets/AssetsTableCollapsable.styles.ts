@@ -58,7 +58,7 @@ export const Label = styled(UILabel)`
 
 export const TickerLabel = styled(UILabel).attrs({
   textTransform: 'uppercase',
-  weight: '600'
+  weight: 'bold'
 })`
   padding: 0px;
   font-size: 16px;

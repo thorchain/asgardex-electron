@@ -1,4 +1,5 @@
 import { Address } from '@xchainjs/xchain-client'
+import { AssetAtom } from '@xchainjs/xchain-cosmos'
 import { ETHAddress, getTokenAddress } from '@xchainjs/xchain-ethereum'
 import { AssetLUNA } from '@xchainjs/xchain-terra'
 import {
@@ -132,6 +133,11 @@ export const isLunaAsset = (asset: Asset): boolean => eqAsset.equals(asset, Asse
  * Check whether an asset is a UST (Terra) asset
  */
 export const isUstAsset = (asset: Asset): boolean => eqAsset.equals(asset, AssetUST)
+
+/**
+ * Check whether an asset is a ATOM asset
+ */
+export const isAtomAsset = (asset: Asset): boolean => eqAsset.equals(asset, AssetAtom)
 
 /**
  * Check whether an ERC20 asset is white listed or not

@@ -19,7 +19,7 @@ export const Wrapper = styled(Row).attrs({
 
 export const TickerLabel = styled(UILabel).attrs({
   textTransform: 'uppercase',
-  weight: '600'
+  weight: 'bold'
 })`
   height: 18px;
   padding: 0px 16px 0px 11px;

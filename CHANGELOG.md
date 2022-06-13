@@ -1,8 +1,12 @@
-# 0.xx.x (2022-xx-xx)
+# 0.16.0 (2022-xx-xx)
+
+## ADD
+
+- Support Terra [#2002](https://github.com/thorchain/asgardex-electron/issues/2002), [#2193](https://github.com/thorchain/asgardex-electron/pull/2193), [#2290](https://github.com/thorchain/asgardex-electron/pull/2290)
 
 ## Update
 
-- [Pools] Toggle filter buttons to remove clear button
+- [Pools] Toggle filter buttons to remove clear button [#2287](https://github.com/thorchain/asgardex-electron/pull/2287)
 
 # 0.15.2 (2022-06-06)
 
