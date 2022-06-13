@@ -13,7 +13,8 @@ import {
   BTCChain,
   BCHChain,
   DOGEChain,
-  TerraChain
+  TerraChain,
+  CosmosChain
 } from '@xchainjs/xchain-util'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
@@ -344,6 +345,18 @@ describe('helpers/poolHelper/', () => {
       })
       expect(result).toBeTruthy()
     })
+
+    it('true for Cosmos if Cosmos trading is halted', () => {
+      const result = disableTradingActions({
+        chain: CosmosChain,
+        haltedChains,
+        mimirHalt: {
+          ...DEFAULT_MIMIR_HALT,
+          haltCosmosTrading: true
+        }
+      })
+      expect(result).toBeTruthy()
+    })
     it('false for a chain, if it is not in halted list, but other chains have trading halted', () => {
       const result = disableTradingActions({
         chain: LTCChain,
@@ -353,7 +366,9 @@ describe('helpers/poolHelper/', () => {
           haltBtcTrading: true,
           haltEthTrading: true,
           haltBchTrading: true,
-          haltBnbTrading: true
+          haltBnbTrading: true,
+          haltTerraTrading: true,
+          haltCosmosTrading: true
         }
       })
       expect(result).toBeFalsy()
@@ -516,6 +531,22 @@ describe('helpers/poolHelper/', () => {
     it('true if TERRA chain is not in halted list, but LP paused', () => {
       const result = disablePoolActions({
         chain: TerraChain,
+        haltedChains: [],
+        mimirHalt: { ...DEFAULT_MIMIR_HALT, pauseLp: true }
+      })
+      expect(result).toBeTruthy()
+    })
+    it('true if Cosmos chain is not in halted list, but paused', () => {
+      const result = disablePoolActions({
+        chain: CosmosChain,
+        haltedChains: [],
+        mimirHalt: { ...DEFAULT_MIMIR_HALT, pauseLpCosmos: true }
+      })
+      expect(result).toBeTruthy()
+    })
+    it('true if Cosmos chain is not in halted list, but LP paused', () => {
+      const result = disablePoolActions({
+        chain: CosmosChain,
         haltedChains: [],
         mimirHalt: { ...DEFAULT_MIMIR_HALT, pauseLp: true }
       })
