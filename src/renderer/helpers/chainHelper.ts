@@ -90,6 +90,11 @@ export const isDogeChain = (chain: Chain): boolean => eqChain.equals(chain, DOGE
  */
 export const isTerraChain = (chain: Chain): boolean => eqChain.equals(chain, TerraChain)
 
+/**
+ * Check whether chain is Cosmos (GAIA) chain
+ */
+export const isCosmosChain = (chain: Chain): boolean => eqChain.equals(chain, CosmosChain)
+
 export const isEnabledChain = (chain: Chain) => ENABLED_CHAINS.includes(chain)
 
 type ChainValues<T> = {

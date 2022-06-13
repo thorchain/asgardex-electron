@@ -6,6 +6,7 @@ import {
   BCHChain,
   BNBChain,
   BTCChain,
+  CosmosChain,
   DOGEChain,
   ETHChain,
   LTCChain,
@@ -18,6 +19,7 @@ import {
   isBchChain,
   isBnbChain,
   isBtcChain,
+  isCosmosChain,
   isDogeChain,
   isEthChain,
   isLtcChain,
@@ -95,6 +97,13 @@ describe('helpers/chainHelper', () => {
     })
     it('TerraChain -> false', () => {
       expect(isTerraChain(ETHChain)).toBeFalsy()
+    })
+
+    it('CosmosChain -> true', () => {
+      expect(isCosmosChain(CosmosChain)).toBeTruthy()
+    })
+    it('CosmosChain -> false', () => {
+      expect(isCosmosChain(ETHChain)).toBeFalsy()
     })
   })
 })
