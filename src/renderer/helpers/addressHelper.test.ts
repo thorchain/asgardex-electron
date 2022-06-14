@@ -1,4 +1,4 @@
-import { BCHChain, BNBChain, BTCChain, LTCChain, TerraChain, THORChain } from '@xchainjs/xchain-util'
+import { BCHChain, BNBChain, BTCChain, CosmosChain, LTCChain, TerraChain, THORChain } from '@xchainjs/xchain-util'
 import * as O from 'fp-ts/lib/Option'
 
 import { getEthChecksumAddress, removeAddressPrefix, truncateAddress } from './addressHelper'
@@ -59,6 +59,11 @@ describe('helpers/addressHelper', () => {
       const result = truncateAddress('terra15h6vd5f0wqps26zjlwrc6chah08ryu4hzzdwhc', TerraChain, 'mainnet')
       expect(result).toEqual('terra15h...whc')
     })
+
+    it('cosmos', () => {
+      const result = truncateAddress('cosmos1av54qcmavhjkqsd67cf6f4cedqjrdeh7ed86fc', CosmosChain, 'mainnet')
+      expect(result).toEqual('cosmos1av...6fc')
+    })
   })
 
   describe('removeAddressPrefix', () => {
@@ -114,6 +119,12 @@ describe('helpers/addressHelper', () => {
 
     it('terra', () => {
       const address = 'terra15h6vd5f0wqps26zjlwrc6chah08ryu4hzzdwhc'
+      const result = removeAddressPrefix(address)
+      expect(result).toEqual(address)
+    })
+
+    it('cosmos', () => {
+      const address = 'cosmos1av54qcmavhjkqsd67cf6f4cedqjrdeh7ed86fc'
       const result = removeAddressPrefix(address)
       expect(result).toEqual(address)
     })

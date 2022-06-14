@@ -18,13 +18,14 @@ import * as BNC from '../binance'
 import * as BTC from '../bitcoin'
 import * as BCH from '../bitcoincash'
 import { XChainClient$ } from '../clients'
+import * as COSMOS from '../cosmos'
 import * as DOGE from '../doge'
 import * as ETH from '../ethereum'
 import * as LTC from '../litecoin'
 import { selectedPoolChain$ } from '../midgard/common'
 import * as TERRA from '../terra'
 import * as THOR from '../thorchain'
-import { Chain$ } from './types'
+import type { Chain$ } from './types'
 
 export const clientByChain$ = (chain: Chain): XChainClient$ => {
   switch (chain) {
@@ -45,8 +46,7 @@ export const clientByChain$ = (chain: Chain): XChainClient$ => {
     case TerraChain:
       return TERRA.client$
     case CosmosChain:
-      // TODO (@veado) Implement Cosmos
-      return Rx.of(O.none)
+      return COSMOS.client$
     default:
       return Rx.of(O.none)
   }

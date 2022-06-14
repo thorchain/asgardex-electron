@@ -7,6 +7,7 @@ import { BinanceProvider } from './contexts/BinanceContext'
 import { BitcoinCashProvider } from './contexts/BitcoinCashContext'
 import { BitcoinProvider } from './contexts/BitcoinContext'
 import { ChainProvider } from './contexts/ChainContext'
+import { CosmosProvider } from './contexts/CosmosContext'
 import { DogeProvider } from './contexts/DogeContext'
 import { EthereumProvider } from './contexts/EthereumContext'
 import { I18nProvider } from './contexts/I18nContext'
@@ -32,17 +33,19 @@ export const App: React.FC = (): JSX.Element => {
                     <EthereumProvider>
                       <DogeProvider>
                         <TerraProvider>
-                          <MidgardProvider>
-                            <UserNodesProvider>
-                              <I18nProvider>
-                                <Router>
-                                  <ThemeProvider>
-                                    <AppView />
-                                  </ThemeProvider>
-                                </Router>
-                              </I18nProvider>
-                            </UserNodesProvider>
-                          </MidgardProvider>
+                          <CosmosProvider>
+                            <MidgardProvider>
+                              <UserNodesProvider>
+                                <I18nProvider>
+                                  <Router>
+                                    <ThemeProvider>
+                                      <AppView />
+                                    </ThemeProvider>
+                                  </Router>
+                                </I18nProvider>
+                              </UserNodesProvider>
+                            </MidgardProvider>
+                          </CosmosProvider>
                         </TerraProvider>
                       </DogeProvider>
                     </EthereumProvider>
