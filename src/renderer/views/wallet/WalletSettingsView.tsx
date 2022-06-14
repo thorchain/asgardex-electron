@@ -8,6 +8,7 @@ import {
   BNBChain,
   BTCChain,
   Chain,
+  CosmosChain,
   DOGEChain,
   ETHChain,
   LTCChain,
@@ -29,6 +30,7 @@ import { useBinanceContext } from '../../contexts/BinanceContext'
 import { useBitcoinCashContext } from '../../contexts/BitcoinCashContext'
 import { useBitcoinContext } from '../../contexts/BitcoinContext'
 import { useChainContext } from '../../contexts/ChainContext'
+import { useCosmosContext } from '../../contexts/CosmosContext'
 import { useDogeContext } from '../../contexts/DogeContext'
 import { useEthereumContext } from '../../contexts/EthereumContext'
 import { useLitecoinContext } from '../../contexts/LitecoinContext'
@@ -79,6 +81,7 @@ export const WalletSettingsView: React.FC = (): JSX.Element => {
   const { addressUI$: bchAddressUI$ } = useBitcoinCashContext()
   const { addressUI$: dogeAddressUI$ } = useDogeContext()
   const { addressUI$: terraAddressUI$ } = useTerraContext()
+  const { addressUI$: cosmosAddressUI$ } = useCosmosContext()
   const oRuneNativeAddress: O.Option<WalletAddress> = useObservableState(thorAddressUI$, O.none)
   const runeNativeAddress = FP.pipe(
     oRuneNativeAddress,
@@ -196,6 +199,7 @@ export const WalletSettingsView: React.FC = (): JSX.Element => {
   const oLTCClient = useObservableState(clientByChain$(LTCChain), O.none)
   const oDOGEClient = useObservableState(clientByChain$(DOGEChain), O.none)
   const oTerraClient = useObservableState(clientByChain$(TerraChain), O.none)
+  const oCosmosClient = useObservableState(clientByChain$(CosmosChain), O.none)
 
   const clickAddressLinkHandler = (chain: Chain, address: Address) => {
     const openExplorerAddressUrl = (client: XChainClient) => {
@@ -227,6 +231,9 @@ export const WalletSettingsView: React.FC = (): JSX.Element => {
         break
       case TerraChain:
         FP.pipe(oTerraClient, O.map(openExplorerAddressUrl))
+        break
+      case CosmosChain:
+        FP.pipe(oCosmosClient, O.map(openExplorerAddressUrl))
         break
       default:
         console.warn(`Chain ${chain} has not been implemented`)
@@ -362,6 +369,10 @@ export const WalletSettingsView: React.FC = (): JSX.Element => {
       ledgerAddress: terraLedgerWalletAddress,
       chain: TerraChain
     })
+    const cosmosWalletAccount$ = walletAccount$({
+      addressUI$: cosmosAddressUI$,
+      chain: CosmosChain
+    })
 
     return FP.pipe(
       // combineLatest is for the future additional accounts
@@ -374,7 +385,8 @@ export const WalletSettingsView: React.FC = (): JSX.Element => {
           BCH: [bchWalletAccount$],
           LTC: [ltcWalletAccount$],
           DOGE: [dogeWalletAccount$],
-          TERRA: [terraWalletAccount$]
+          TERRA: [terraWalletAccount$],
+          GAIA: [cosmosWalletAccount$]
         })
       ),
       RxOp.map(A.filter(O.isSome)),
@@ -396,6 +408,7 @@ export const WalletSettingsView: React.FC = (): JSX.Element => {
     dogeLedgerWalletAddress,
     terraAddressUI$,
     terraLedgerWalletAddress,
+    cosmosAddressUI$,
     ethAddressUI$,
     ethLedgerWalletAddress
   ])

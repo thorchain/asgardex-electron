@@ -34,6 +34,7 @@ import * as BNB from '../binance'
 import * as BTC from '../bitcoin'
 import * as BCH from '../bitcoincash'
 import { WalletBalancesLD, WalletBalancesRD } from '../clients'
+import * as COSMOS from '../cosmos'
 import * as DOGE from '../doge'
 import * as ETH from '../ethereum'
 import * as LTC from '../litecoin'
@@ -97,8 +98,7 @@ export const createBalancesService = ({
       case TerraChain:
         return TERRA.reloadBalances
       case CosmosChain:
-        // TODO (@veado) Implement Cosmos
-        return FP.constVoid
+        return COSMOS.reloadBalances
       case PolkadotChain:
         return FP.constVoid
     }
@@ -178,8 +178,13 @@ export const createBalancesService = ({
           balances$: TERRA.balances$(walletType, walletIndex),
           reloadBalances$: TERRA.reloadBalances$
         }
-      // TODO (@veado) Implement Cosmos
-      // case CosmosChain:
+      case CosmosChain:
+        return {
+          reloadBalances: COSMOS.reloadBalances,
+          resetReloadBalances: COSMOS.resetReloadBalances,
+          balances$: COSMOS.balances$(walletType, walletIndex),
+          reloadBalances$: COSMOS.reloadBalances$
+        }
       default:
         return {
           reloadBalances: FP.constVoid,
@@ -554,6 +559,23 @@ export const createBalancesService = ({
   })
 
   /**
+   * Transforms COSMOS balances into `ChainBalance`
+   */
+  const cosmosChainBalance$: ChainBalance$ = Rx.combineLatest([
+    COSMOS.addressUI$,
+    getChainBalance$({ chain: CosmosChain, walletType: 'keystore', walletIndex: 0, walletBalanceType: 'all' }) // walletIndex=0 (as long as we don't support HD wallets for keystore)
+  ]).pipe(
+    RxOp.map<[O.Option<WalletAddress>, WalletBalancesRD], ChainBalance>(([oWalletAddress, balances]) => ({
+      walletType: 'keystore',
+      chain: CosmosChain,
+      walletAddress: addressFromOptionalWalletAddress(oWalletAddress),
+      walletIndex: 0, // Always 0 as long as we don't support HD wallets for keystore
+      balances,
+      balancesType: 'all'
+    }))
+  )
+
+  /**
    * ETH Ledger balances
    */
   const ethLedgerChainBalance$: ChainBalance$ = FP.pipe(
@@ -584,9 +606,8 @@ export const createBalancesService = ({
         BNB: [bnbChainBalance$, bnbLedgerChainBalance$],
         LTC: [ltcBalance$, ltcLedgerChainBalance$],
         DOGE: [dogeChainBalance$, dogeLedgerChainBalance$],
-        TERRA: [terraChainBalance$, terraLedgerChainBalance$]
-        // TODO (@veado) Implement Cosmos
-        // GAIA: [cosmosChainBalance$, cosmosLedgerChainBalance$]
+        TERRA: [terraChainBalance$, terraLedgerChainBalance$],
+        GAIA: [cosmosChainBalance$]
       })
     ),
     // we ignore all `ChainBalances` with state of `initial` balances
