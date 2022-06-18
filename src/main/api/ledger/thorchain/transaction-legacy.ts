@@ -1,4 +1,4 @@
-import { ChainId, DEPOSIT_GAS_VALUE, ThorchainDepositResponse } from '@xchainjs/xchain-thorchain'
+import { ChainId, DEPOSIT_GAS_LIMIT_VALUE, ThorchainDepositResponse } from '@xchainjs/xchain-thorchain'
 import axios from 'axios'
 import { AccAddress, Msg, codec } from 'cosmos-client'
 import { TransactionsApi } from 'cosmos-client/api'
@@ -102,7 +102,7 @@ export const buildDepositTx = async ({
   const unsignedStdTx = StdTx.fromJSON({
     msg: response.value.msg,
     // override fee
-    fee: { ...fee, gas: DEPOSIT_GAS_VALUE },
+    fee: { ...fee, gas: DEPOSIT_GAS_LIMIT_VALUE },
     signatures: [],
     memo: ''
   })
