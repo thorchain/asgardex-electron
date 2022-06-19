@@ -3,6 +3,7 @@ import {
   BCHChain,
   BNBChain,
   BTCChain,
+  CosmosChain,
   DOGEChain,
   ETHChain,
   LTCChain,
@@ -20,6 +21,7 @@ import * as BTC from '../bitcoin'
 import * as BCH from '../bitcoincash'
 import * as C from '../clients'
 import { ExplorerUrl$, TxsPageLD, LoadTxsParams } from '../clients'
+import * as COSMOS from '../cosmos'
 import * as DOGE from '../doge'
 import * as ETH from '../ethereum'
 import * as LTC from '../litecoin'
@@ -73,6 +75,8 @@ export const getTxs$: (walletAddress: O.Option<string>, walletIndex: number) => 
                 return DOGE.txs$({ asset: O.none, limit, offset, walletAddress, walletIndex })
               case TerraChain:
                 return TERRA.txs$({ asset: O.some(asset), limit, offset, walletAddress, walletIndex })
+              case CosmosChain:
+                return COSMOS.txs$({ asset: O.some(asset), limit, offset, walletAddress, walletIndex })
               default:
                 return Rx.of(
                   RD.failure<ApiError>({ errorId: ErrorId.GET_ASSET_TXS, msg: `Unsupported chain ${asset.chain}` })
