@@ -269,14 +269,11 @@ export const HeaderComponent: React.FC<Props> = (props): JSX.Element => {
     [headerHeight]
   )
 
-  // TODO asgdx-team: Remove `networkLabel` if we go live with mainnet
-  const networkLabel = (network: Network) => (network === 'mainnet' ? 'chaosnet' : network)
-
   const renderLogo = useMemo(
     () => (
       <Styled.LogoWrapper>
         <Styled.AsgardexLogo />
-        <Styled.NetworkLabel network={network}>{networkLabel(network)}</Styled.NetworkLabel>
+        <Styled.NetworkLabel network={network}>{network}</Styled.NetworkLabel>
       </Styled.LogoWrapper>
     ),
     [network]

@@ -3,7 +3,7 @@ import { FeeBounds, Network } from '@xchainjs/xchain-client'
 export const DEFAULT_APPROVE_GAS_LIMIT_FALLBACK = '65000'
 
 export const FEE_BOUNDS: Record<Network, FeeBounds | undefined> = {
-  /* for main|chaosnet use default values defined in ETH.Client */
+  /* for main|stagenet use default values defined in ETH.Client */
   [Network.Mainnet]: undefined,
   [Network.Stagenet]: undefined,
   [Network.Testnet]: {

@@ -11,7 +11,10 @@ const BINANCE_TESTNET_WS_URI = envOrDefault(
   'wss://testnet-dex.binance.org/api/ws'
 )
 
-const BINANCE_MAINET_WS_URI = envOrDefault(process.env.REACT_APP_BINANCE_MAINNET_WS_URI, 'wss://dex.binance.org/api/ws')
+const BINANCE_MAINNET_WS_URI = envOrDefault(
+  process.env.REACT_APP_BINANCE_MAINNET_WS_URI,
+  'wss://dex.binance.org/api/ws'
+)
 
 /**
  * Websocket endpoint depending on `Network`
@@ -19,8 +22,8 @@ const BINANCE_MAINET_WS_URI = envOrDefault(process.env.REACT_APP_BINANCE_MAINNET
 const wsEndpoint$ = network$.pipe(
   mergeMap((network) => {
     if (network === 'testnet') return Rx.of(BINANCE_TESTNET_WS_URI)
-    // chaosnet + mainnet will use Binance mainet url
-    return Rx.of(BINANCE_MAINET_WS_URI)
+    // stage|mainnet will use Binance mainnet url
+    return Rx.of(BINANCE_MAINNET_WS_URI)
   })
 )
 
