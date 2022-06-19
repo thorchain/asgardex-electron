@@ -86,17 +86,13 @@ export const AppSettings: React.FC<Props> = (props): JSX.Element => {
     [changeNetwork]
   )
 
-  // TODO asgdx-team: Remove `networkLabel` if we go live with mainnet
-  const networkLabel = (network: Network) => (network === 'mainnet' ? 'chaosnet' : network)
-
   const networkMenu = useMemo(
     () => (
       <Menu onClick={changeNetworkHandler}>
         {AVAILABLE_NETWORKS.map((network: Network) => (
           <Styled.MenuItem key={network}>
             <Styled.MenuItemText>
-              {/* TODO @asgdx-team: Revert it back to `network` if we go live with mainnet */}
-              <Styled.NetworkLabel network={network}>{networkLabel(network)}</Styled.NetworkLabel>
+              <Styled.NetworkLabel network={network}>{network}</Styled.NetworkLabel>
             </Styled.MenuItemText>
           </Styled.MenuItem>
         ))}
@@ -110,8 +106,7 @@ export const AppSettings: React.FC<Props> = (props): JSX.Element => {
       <Dropdown overlay={networkMenu} trigger={['click']} placement="bottom">
         <Styled.DropdownContentWrapper>
           <Row style={{ alignItems: 'center' }}>
-            {/* TODO asgdx-team: Revert it back to `network` if we go live with mainnet */}
-            <Styled.NetworkLabel network={network}>{networkLabel(network)}</Styled.NetworkLabel>
+            <Styled.NetworkLabel network={network}>{network}</Styled.NetworkLabel>
             <DownIcon />
           </Row>
         </Styled.DropdownContentWrapper>

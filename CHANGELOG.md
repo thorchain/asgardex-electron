@@ -1,12 +1,17 @@
-# 0.16.0 (2022-xx-xx)
+# 1.0.0 (2022-xx-xx)
 
 ## ADD
 
-- Support Terra [#2002](https://github.com/thorchain/asgardex-electron/issues/2002), [#2193](https://github.com/thorchain/asgardex-electron/pull/2193), [#2290](https://github.com/thorchain/asgardex-electron/pull/2290)
+- Support Cosmos (GAIA) [#2288](https://github.com/thorchain/asgardex-electron/issues/2288), [#2193](https://github.com/thorchain/asgardex-electron/pull/2193), [#2290](https://github.com/thorchain/asgardex-electron/pull/2290), [2291](https://github.com/thorchain/asgardex-electron/pull/2291), [2292](https://github.com/thorchain/asgardex-electron/pull/2292)
 
 ## Update
 
 - [Pools] Toggle filter buttons to remove clear button [#2287](https://github.com/thorchain/asgardex-electron/pull/2287)
+- Prepare `mainnet`
+
+## Internal
+
+- Upgrade to latest xchain-thorchain@0.25.1 [2293](https://github.com/thorchain/asgardex-electron/pull/2293)
 
 # 0.15.2 (2022-06-06)
 
