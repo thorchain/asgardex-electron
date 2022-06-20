@@ -1,5 +1,6 @@
 import * as RD from '@devexperts/remote-data-ts'
-import { Client } from '@xchainjs/xchain-cosmos'
+import { Network } from '@xchainjs/xchain-client'
+import { Client, getDefaultClientUrls } from '@xchainjs/xchain-cosmos'
 import { CosmosChain } from '@xchainjs/xchain-util'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
@@ -12,6 +13,8 @@ import * as C from '../clients'
 import { keystoreService } from '../wallet/keystore'
 import { getPhrase } from '../wallet/util'
 import type { Client$, ClientState, ClientState$ } from './types'
+
+const clientUrl = 'https://lcd-cosmos.cosmostation.io'
 
 /**
  * Stream to create an observable `CosmosClient` depending on existing phrase in keystore
@@ -31,7 +34,12 @@ const clientState$: ClientState$ = FP.pipe(
             try {
               const client = new Client({
                 network,
-                phrase
+                phrase,
+                clientUrls: {
+                  ...getDefaultClientUrls(),
+                  [Network.Stagenet]: clientUrl,
+                  [Network.Mainnet]: clientUrl
+                }
               })
               return RD.success(client)
             } catch (error) {
