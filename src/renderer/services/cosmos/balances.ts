@@ -1,4 +1,4 @@
-import { AssetAtom, AssetMuon } from '@xchainjs/xchain-cosmos'
+import { AssetAtom } from '@xchainjs/xchain-cosmos'
 
 import { WalletType } from '../../../shared/wallet/types'
 import { observableState } from '../../helpers/stateHelper'
@@ -29,7 +29,7 @@ const balances$ = (walletType: WalletType, walletIndex: number): C.WalletBalance
     walletIndex,
     walletBalanceType: 'all',
     // ATOM only - no IBC assets etc.
-    assets: [AssetAtom, AssetMuon]
+    assets: [AssetAtom]
   })
 
 // State of balances loaded by Client and Address
@@ -38,7 +38,7 @@ const getBalanceByAddress$ = C.balancesByAddress$({
   trigger$: reloadBalances$,
   walletBalanceType: 'all',
   // ATOM only - no IBC assets etc.
-  assets: [AssetAtom, AssetMuon]
+  assets: [AssetAtom]
 })
 
 export { balances$, reloadBalances, getBalanceByAddress$, reloadBalances$, resetReloadBalances }

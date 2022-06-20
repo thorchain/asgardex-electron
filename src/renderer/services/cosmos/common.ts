@@ -14,7 +14,7 @@ import { keystoreService } from '../wallet/keystore'
 import { getPhrase } from '../wallet/util'
 import type { Client$, ClientState, ClientState$ } from './types'
 
-const clientUrl = 'https://lcd-cosmoshub.keplr.app'
+const clientUrl = 'https://lcd-cosmos.cosmostation.io'
 
 /**
  * Stream to create an observable `CosmosClient` depending on existing phrase in keystore

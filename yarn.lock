@@ -4929,10 +4929,10 @@
   resolved "https://registry.yarnpkg.com/@xchainjs/xchain-client/-/xchain-client-0.11.3.tgz#9c76d27d287eae4d9e9bd623290c0fb95dfc56e9"
   integrity sha512-wdL2kKUi/07RXQHGVp8yzsJvo75hBVlqr44xfp5PY7fAOhckQhbTSgfDfEFjyI+udpno8FDgZ2UwoZODO2kJMA==
 
-"@xchainjs/xchain-cosmos@0.17.0":
-  version "0.17.0"
-  resolved "https://registry.yarnpkg.com/@xchainjs/xchain-cosmos/-/xchain-cosmos-0.17.0.tgz#947d53461870f746357ab46ad027b5c60edefc79"
-  integrity sha512-MpD0rgTXzDw+oA1GuBc3yzf3TKouz6zDqji+VTgCXKrNV15ngMFpIFTzntY1+4ev7bxHp7lVLSgWyztZq8Ex5g==
+"@xchainjs/xchain-cosmos@0.18.0-alpha.1":
+  version "0.18.0-alpha.1"
+  resolved "https://registry.yarnpkg.com/@xchainjs/xchain-cosmos/-/xchain-cosmos-0.18.0-alpha.1.tgz#fbb4920f3c5ab85592437479aa5c88d7eb6e6930"
+  integrity sha512-mzSxJCkMooiz2MdVu+aMAao6GdM0thXkwXm786UZw0EYJTaBEaSXcWzJRixy9TVAMXDkE/FnTE+cjRsoKl6GZA==
 
 "@xchainjs/xchain-crypto@^0.2.6":
   version "0.2.6"
