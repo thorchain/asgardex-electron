@@ -1,7 +1,6 @@
 import type Transport from '@ledgerhq/hw-transport'
 import THORChainApp, { extractSignatureFromTLV, LedgerErrorType } from '@thorchain/ledger-thorchain'
 import { Address, TxHash } from '@xchainjs/xchain-client'
-import { BaseAccountResponse } from '@xchainjs/xchain-cosmos'
 import { DEFAULT_GAS_LIMIT_VALUE, getChainId, getDenom, getPrefix } from '@xchainjs/xchain-thorchain'
 import { AssetRuneNative, assetToString, BaseAmount, delay } from '@xchainjs/xchain-util'
 import { AccAddress, PubKeySecp256k1, Msg, CosmosSDK } from 'cosmos-client'
@@ -67,7 +66,7 @@ export const send = async ({
     // Note: Cosmos API has been changed - result has another JSON structure now !!
     // Code is copied from xchain-cosmos -> SDKClient -> signAndBroadcast
     if (account.account_number === undefined) {
-      account = BaseAccount.fromJSON((account as BaseAccountResponse).value)
+      account = BaseAccount.fromJSON((account as Legacy.BaseAccountResponse).value)
     }
 
     const { account_number, sequence } = account
@@ -216,7 +215,7 @@ export const deposit = async ({
     // Note: Cosmos API has been changed - result has another JSON structure now !!
     // Code is copied from xchain-cosmos -> SDKClient -> signAndBroadcast
     if (account.account_number === undefined) {
-      account = BaseAccount.fromJSON((account as BaseAccountResponse).value)
+      account = BaseAccount.fromJSON((account as Legacy.BaseAccountResponse).value)
     }
 
     const { account_number, sequence } = account

@@ -1,6 +1,6 @@
 import * as RD from '@devexperts/remote-data-ts'
 import { Network } from '@xchainjs/xchain-client'
-import { Client, getDefaultClientUrls } from '@xchainjs/xchain-cosmos'
+import { Client } from '@xchainjs/xchain-cosmos'
 import { CosmosChain } from '@xchainjs/xchain-util'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
@@ -36,9 +36,9 @@ const clientState$: ClientState$ = FP.pipe(
                 network,
                 phrase,
                 clientUrls: {
-                  ...getDefaultClientUrls(),
                   [Network.Stagenet]: clientUrl,
-                  [Network.Mainnet]: clientUrl
+                  [Network.Mainnet]: clientUrl,
+                  [Network.Testnet]: 'https://rest.sentry-01.theta-testnet.polypore.xyz'
                 }
               })
               return RD.success(client)

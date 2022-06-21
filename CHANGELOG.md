@@ -2,7 +2,7 @@
 
 ## ADD
 
-- Support Cosmos (GAIA) [#2288](https://github.com/thorchain/asgardex-electron/issues/2288), [#2193](https://github.com/thorchain/asgardex-electron/pull/2193), [#2290](https://github.com/thorchain/asgardex-electron/pull/2290), [2291](https://github.com/thorchain/asgardex-electron/pull/2291), [2292](https://github.com/thorchain/asgardex-electron/pull/2292)
+- Support Cosmos (GAIA) [#2288](https://github.com/thorchain/asgardex-electron/issues/2288), [#2193](https://github.com/thorchain/asgardex-electron/pull/2193), [#2290](https://github.com/thorchain/asgardex-electron/pull/2290), [2291](https://github.com/thorchain/asgardex-electron/pull/2291), [2292](https://github.com/thorchain/asgardex-electron/pull/2292), [#2295](https://github.com/thorchain/asgardex-electron/pull/2295)
 
 ## Update
 

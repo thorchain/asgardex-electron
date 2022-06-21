@@ -10,6 +10,8 @@ export type Client$ = C.Client$<Client>
 export type ClientState = C.ClientState<Client>
 export type ClientState$ = C.ClientState$<Client>
 
+export type FeesService = C.FeesService
+
 export type SendTxParams = {
   walletType: WalletType
   sender?: Address
@@ -18,6 +20,7 @@ export type SendTxParams = {
   asset: Asset
   memo?: string
   walletIndex: number
+  feeAmount: BaseAmount
 }
 
 export type TransactionService = C.TransactionService<SendTxParams>

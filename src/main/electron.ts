@@ -111,7 +111,13 @@ const initMainWindow = async () => {
       // From Electron 12, it will be enabled by default.
       contextIsolation: true,
       // preload script
-      preload: join(__dirname, IS_DEV ? '../../public/' : '../build/', 'preload.js')
+      preload: join(__dirname, IS_DEV ? '../../public/' : '../build/', 'preload.js'),
+      // for develop locally only to avoid CORS issues
+      webSecurity: !IS_DEV,
+      // `allowRunningInsecureContent` needs to set to `true`,
+      // it will be changed to `false` whenever `webSecurity` is `true`
+      // @see https://www.electronjs.org/docs/latest/api/browser-window#new-browserwindowoptions
+      allowRunningInsecureContent: false
     }
   })
 

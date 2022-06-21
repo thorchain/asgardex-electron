@@ -9,6 +9,11 @@ import {
   // bank
 } from 'cosmos-client/x/bank'
 
+export type BaseAccountResponse = {
+  type?: string
+  value?: { account_number: string; sequence: string }
+}
+
 // MsgNativeTx (legacy)
 // Copied from (deprecated) xchain-thorchain@0.23.0
 // https://github.com/xchainjs/xchainjs-lib/blob/979db1d9207ecbd7875cbd61b1c48b67cc9a6a5c/packages/xchain-thorchain/src/types/messages.ts

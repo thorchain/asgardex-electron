@@ -7,6 +7,7 @@ import {
   BCHChain,
   BNBChain,
   BTCChain,
+  CosmosChain,
   DOGEChain,
   ETHChain,
   LTCChain,
@@ -32,7 +33,8 @@ import {
   SendViewDOGE,
   SendViewTHOR,
   SendViewLTC,
-  SendViewTERRA
+  SendViewTERRA,
+  SendViewCOSMOS
 } from './index'
 
 type Props = {}
@@ -110,6 +112,8 @@ export const SendView: React.FC<Props> = (): JSX.Element => {
               asset={asset}
             />
           )
+        case CosmosChain:
+          return <SendViewCOSMOS walletType={walletType} walletIndex={walletIndex} walletAddress={walletAddress} />
         default:
           return (
             <h1>

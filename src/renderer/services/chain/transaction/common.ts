@@ -22,6 +22,7 @@ import { LiveData, liveData } from '../../../helpers/rx/liveData'
 import * as BNB from '../../binance'
 import * as BTC from '../../bitcoin'
 import * as BCH from '../../bitcoincash'
+import * as COSMOS from '../../cosmos'
 import * as DOGE from '../../doge'
 import * as ETH from '../../ethereum'
 import * as LTC from '../../litecoin'
@@ -75,8 +76,9 @@ export const sendTx$ = ({
       return THOR.sendTx({ walletType, amount, asset, memo, recipient, walletIndex })
 
     case CosmosChain:
-      // TODO (@veado) Implement Cosmos
-      return txFailure$(`sendTx$ has not been implemented for Cosmos yet`)
+      if (!feeAmount) return txFailure$('Missing `feeAmount` - needed to transfer COSMOS tx')
+
+      return COSMOS.sendTx({ walletType, sender, recipient, amount, asset, memo, walletIndex, feeAmount })
 
     case PolkadotChain:
       // not available yet
