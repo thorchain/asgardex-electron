@@ -9,7 +9,7 @@ export const StepLabel = styled(UILabel).attrs({
   color: 'gray'
 })`
   width: 100%;
-  padding-bottom: 20px;
+  padding: 20px 10px;
   font-family: 'MainFontRegular';
   text-align: center;
   text-transform: uppercase;

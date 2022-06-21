@@ -1283,9 +1283,9 @@
   resolved "https://registry.yarnpkg.com/@colors/colors/-/colors-1.5.0.tgz#bb504579c1cae923e6576a4f5da43d25f97bdbd9"
   integrity sha512-ooWCrlZP11i8GImSjTHYHLkvFDP48nS4+204nGb1RiX/WXYHmJA2III9/e2DWVabCESdW7hBAEzHRqUn9OUVvQ==
 
-"@cosmos-client/core@https://github.com/veado/cosmos-client-ts.git#patch/v0.45.1":
-  version "0.45.1"
-  resolved "https://github.com/veado/cosmos-client-ts.git#a3b57191c26f7461d291a5ef296bde523b52ae00"
+"@cosmos-client/core@https://github.com/veado/cosmos-client-ts.git#patch/v0.45.10":
+  version "0.45.10"
+  resolved "https://github.com/veado/cosmos-client-ts.git#bfcf06bbb5a4e4251330223554a1b8d726b3b3e5"
   dependencies:
     axios "^0.23.0"
     bech32 "^1.1.4"
@@ -4929,10 +4929,10 @@
   resolved "https://registry.yarnpkg.com/@xchainjs/xchain-client/-/xchain-client-0.11.3.tgz#9c76d27d287eae4d9e9bd623290c0fb95dfc56e9"
   integrity sha512-wdL2kKUi/07RXQHGVp8yzsJvo75hBVlqr44xfp5PY7fAOhckQhbTSgfDfEFjyI+udpno8FDgZ2UwoZODO2kJMA==
 
-"@xchainjs/xchain-cosmos@0.18.0-alpha.1":
-  version "0.18.0-alpha.1"
-  resolved "https://registry.yarnpkg.com/@xchainjs/xchain-cosmos/-/xchain-cosmos-0.18.0-alpha.1.tgz#fbb4920f3c5ab85592437479aa5c88d7eb6e6930"
-  integrity sha512-mzSxJCkMooiz2MdVu+aMAao6GdM0thXkwXm786UZw0EYJTaBEaSXcWzJRixy9TVAMXDkE/FnTE+cjRsoKl6GZA==
+"@xchainjs/xchain-cosmos@0.18.0-alpha.2":
+  version "0.18.0-alpha.2"
+  resolved "https://registry.yarnpkg.com/@xchainjs/xchain-cosmos/-/xchain-cosmos-0.18.0-alpha.2.tgz#d9f9561dd54bfff7a0d0383c4799240da3d3c9b1"
+  integrity sha512-Jg8DVCMM439kJzQX8K75LNVbccvOWGwlmvaXYIvuOEsJZ8GD1XzgiWUgnT7sdqQRi6QnrdLTozXdZupKAmaOkw==
 
 "@xchainjs/xchain-crypto@^0.2.6":
   version "0.2.6"
@@ -4966,10 +4966,10 @@
   resolved "https://registry.yarnpkg.com/@xchainjs/xchain-terra/-/xchain-terra-0.1.2.tgz#45b676c2c04b8581d65482006174b49d3ce8ea65"
   integrity sha512-FnRZ++TydzO6jJQ5nEJkM88lvv2lOzMYb4BhlagcxhiaOpQw5F3Mlx92FCXxwL+7SZsNXYM7VFvme35Jo5xqRg==
 
-"@xchainjs/xchain-thorchain@^0.25.1":
-  version "0.25.1"
-  resolved "https://registry.yarnpkg.com/@xchainjs/xchain-thorchain/-/xchain-thorchain-0.25.1.tgz#1ba5ccfc29a5bc016cb4b58ba85d58c6c723f40a"
-  integrity sha512-fMB1MPC/3vcZThlK10vvu/oETmXVkigm+IQtPPaP3DuPCqE3QInwJ8qsR89+pKGF5NJc/TLvULv4XgmcXqpJMw==
+"@xchainjs/xchain-thorchain@^0.25.2-alpha.1":
+  version "0.25.2-alpha.1"
+  resolved "https://registry.yarnpkg.com/@xchainjs/xchain-thorchain/-/xchain-thorchain-0.25.2-alpha.1.tgz#628fd96dd5ae3ff6b694df6734e08f4102c3ec89"
+  integrity sha512-XzO/Fua/xplwtqlfGt+badI2nvLmOHbgezUGuvy2gFfBj1C5hfiejokHjc36gHvRTMXazRfML6xBWA2ZoxqG8Q==
 
 "@xchainjs/xchain-util@^0.7.1":
   version "0.7.1"

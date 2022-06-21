@@ -7,7 +7,14 @@ import {
   addressUI$,
   explorerUrl$,
   reloadBalances,
-  balances$
+  balances$,
+  txs$,
+  subscribeTx,
+  resetTx,
+  sendTx,
+  txRD$,
+  reloadFees,
+  fees$
 } from '../services/cosmos'
 
 export type CosmosContextValue = {
@@ -18,6 +25,13 @@ export type CosmosContextValue = {
   explorerUrl$: typeof explorerUrl$
   reloadBalances: typeof reloadBalances
   balances$: typeof balances$
+  txs$: typeof txs$
+  subscribeTx: typeof subscribeTx
+  resetTx: typeof resetTx
+  sendTx: typeof sendTx
+  txRD$: typeof txRD$
+  reloadFees: typeof reloadFees
+  fees$: typeof fees$
 }
 
 const initialContext: CosmosContextValue = {
@@ -27,7 +41,14 @@ const initialContext: CosmosContextValue = {
   addressUI$,
   explorerUrl$,
   reloadBalances,
-  balances$
+  balances$,
+  txs$,
+  subscribeTx,
+  resetTx,
+  sendTx,
+  txRD$,
+  reloadFees,
+  fees$
 }
 
 const CosmosContext = createContext<CosmosContextValue | null>(null)
