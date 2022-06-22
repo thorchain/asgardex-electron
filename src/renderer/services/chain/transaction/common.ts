@@ -50,8 +50,8 @@ export const sendTx$ = ({
   feeOption = DEFAULT_FEE_OPTION,
   walletIndex,
   feeAsset,
-  feeAmount,
-  gasLimit
+  gasLimit,
+  feeAmount
 }: SendTxParams): TxHashLD => {
   switch (asset.chain) {
     case BNBChain:
@@ -76,9 +76,18 @@ export const sendTx$ = ({
       return THOR.sendTx({ walletType, amount, asset, memo, recipient, walletIndex })
 
     case CosmosChain:
-      if (!feeAmount) return txFailure$('Missing `feeAmount` - needed to transfer COSMOS tx')
-
-      return COSMOS.sendTx({ walletType, sender, recipient, amount, asset, memo, walletIndex, feeAmount })
+      return FP.pipe(
+        COSMOS.fees$(),
+        liveData.mapLeft((error) => ({
+          errorId: ErrorId.GET_FEES,
+          msg: error?.message ?? error.toString()
+        })),
+        liveData.chain((fees) =>
+          // fees for COSMOS are FLAT fees for now - different `feeOption` based still on same fee amount
+          // If needed, we can change it later to have fee options (similar to Keplr wallet - search for `gasPriceStep` there)
+          COSMOS.sendTx({ walletType, sender, recipient, amount, asset, memo, walletIndex, feeAmount: fees[feeOption] })
+        )
+      )
 
     case PolkadotChain:
       // not available yet
@@ -184,8 +193,7 @@ export const txStatusByChain$ = ({ txHash, chain }: { txHash: TxHash; chain: Cha
     case THORChain:
       return THOR.txStatus$(txHash, O.none)
     case CosmosChain:
-      // TODO (@veado) Implement Cosmos
-      return txStatusFailure$(`txStatusByChain$ has not been implemented for Cosmos`)
+      return COSMOS.txStatus$(txHash, O.none)
     case PolkadotChain:
       return txStatusFailure$(`txStatusByChain$ has not been implemented for Polkadot`)
     case TerraChain:

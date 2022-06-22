@@ -19,6 +19,7 @@ import * as BNB from '../binance'
 import * as BTC from '../bitcoin'
 import * as BCH from '../bitcoincash'
 import { address$, WalletAddress$ } from '../clients'
+import * as COSMOS from '../cosmos'
 import * as DOGE from '../doge'
 import * as ETH from '../ethereum'
 import * as LTC from '../litecoin'
@@ -45,8 +46,7 @@ const addressByChain$ = (chain: Chain): WalletAddress$ => {
       // not supported yet
       return Rx.of(O.none)
     case CosmosChain:
-      // TODO (@veado) Implement Cosmos
-      return Rx.of(O.none)
+      return COSMOS.address$
     case BCHChain:
       return BCH.address$
     case LTCChain:

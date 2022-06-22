@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useMemo, useState } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
 import { Address } from '@xchainjs/xchain-client'
-import { DECIMAL } from '@xchainjs/xchain-cosmos'
+import { COSMOS_DECIMAL } from '@xchainjs/xchain-cosmos'
 import {
   formatAssetAmountCurrency,
   assetAmount,
@@ -178,29 +178,19 @@ export const SendFormCOSMOS: React.FC<Props> = (props): JSX.Element => {
   const [sendTxStartTime, setSendTxStartTime] = useState<number>(0)
 
   const submitTx = useCallback(() => {
-    FP.pipe(
-      oFee,
-      O.fold(
-        () => false,
-        (fee) => {
-          setSendTxStartTime(Date.now())
+    setSendTxStartTime(Date.now())
 
-          subscribeSendTxState(
-            transfer$({
-              walletType,
-              walletIndex,
-              recipient: form.getFieldValue('recipient'),
-              asset,
-              amount: amountToSend,
-              memo: form.getFieldValue('memo'),
-              feeAmount: fee
-            })
-          )
-          return true
-        }
-      )
+    subscribeSendTxState(
+      transfer$({
+        walletType,
+        walletIndex,
+        recipient: form.getFieldValue('recipient'),
+        asset,
+        amount: amountToSend,
+        memo: form.getFieldValue('memo')
+      })
     )
-  }, [oFee, subscribeSendTxState, transfer$, walletType, walletIndex, form, asset, amountToSend])
+  }, [subscribeSendTxState, transfer$, walletType, walletIndex, form, asset, amountToSend])
 
   const [showConfirmationModal, setShowConfirmationModal] = useState(false)
 
@@ -279,7 +269,7 @@ export const SendFormCOSMOS: React.FC<Props> = (props): JSX.Element => {
       // we have to validate input before storing into the state
       amountValidator(undefined, value)
         .then(() => {
-          setAmountToSend(assetToBase(assetAmount(value, DECIMAL)))
+          setAmountToSend(assetToBase(assetAmount(value, COSMOS_DECIMAL)))
         })
         .catch(() => {}) // do nothing, antd form does the job for us to show an error message
     },
@@ -322,7 +312,13 @@ export const SendFormCOSMOS: React.FC<Props> = (props): JSX.Element => {
               </Form.Item>
               <Styled.CustomLabel size="big">{intl.formatMessage({ id: 'common.amount' })}</Styled.CustomLabel>
               <Styled.FormItem rules={[{ required: true, validator: amountValidator }]} name="amount">
-                <InputBigNumber min={0} size="large" disabled={isLoading} decimal={DECIMAL} onChange={onChangeInput} />
+                <InputBigNumber
+                  min={0}
+                  size="large"
+                  disabled={isLoading}
+                  decimal={COSMOS_DECIMAL}
+                  onChange={onChangeInput}
+                />
               </Styled.FormItem>
               <MaxBalanceButton
                 balance={{ amount: maxAmount, asset: asset }}
