@@ -1,17 +1,13 @@
-# 1.16.0 (2022-xx-xx)
+# 1.16.0 (2022-06-22)
 
 ## ADD
 
-- Support Cosmos (ATOM) [#2288](https://github.com/thorchain/asgardex-electron/issues/2288), [#2193](https://github.com/thorchain/asgardex-electron/pull/2193), [#2290](https://github.com/thorchain/asgardex-electron/pull/2290), [2291](https://github.com/thorchain/asgardex-electron/pull/2291), [2292](https://github.com/thorchain/asgardex-electron/pull/2292), [#2295](https://github.com/thorchain/asgardex-electron/pull/2295), [#2296](https://github.com/thorchain/asgardex-electron/pull/2296)
+- Support Cosmos (ATOM) [#2288](https://github.com/thorchain/asgardex-electron/issues/2288), [#2193](https://github.com/thorchain/asgardex-electron/pull/2193), [#2290](https://github.com/thorchain/asgardex-electron/pull/2290), [2291](https://github.com/thorchain/asgardex-electron/pull/2291), [2292](https://github.com/thorchain/asgardex-electron/pull/2292), [#2295](https://github.com/thorchain/asgardex-electron/pull/2295), [#2296](https://github.com/thorchain/asgardex-electron/pull/2296), [#2297](https://github.com/thorchain/asgardex-electron/pull/2297)
 
 ## Update
 
+- Prepare `mainnet` [#2294](https://github.com/thorchain/asgardex-electron/pull/2294)
 - [Pools] Toggle filter buttons to remove clear button [#2287](https://github.com/thorchain/asgardex-electron/pull/2287)
-- Prepare `mainnet`
-
-## Internal
-
-- Upgrade to latest xchain-thorchain@0.25.1 [2293](https://github.com/thorchain/asgardex-electron/pull/2293)
 
 # 0.15.2 (2022-06-06)
 
