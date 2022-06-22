@@ -1,6 +1,7 @@
 import { getValueOfAsset1InAsset2, PoolData } from '@thorchain/asgardex-util'
 import { BTC_DECIMAL } from '@xchainjs/xchain-bitcoin'
 import { BCH_DECIMAL } from '@xchainjs/xchain-bitcoincash'
+import { AssetAtom, COSMOS_DECIMAL } from '@xchainjs/xchain-cosmos'
 import { DOGE_DECIMAL } from '@xchainjs/xchain-doge'
 import { ETH_DECIMAL } from '@xchainjs/xchain-ethereum'
 import { LTC_DECIMAL } from '@xchainjs/xchain-litecoin'
@@ -34,7 +35,7 @@ import {
   THORCHAIN_DECIMAL,
   to1e8BaseAmount
 } from '../../../helpers/assetHelper'
-import { isBnbChain, isTerraChain } from '../../../helpers/chainHelper'
+import { isBnbChain, isCosmosChain, isTerraChain } from '../../../helpers/chainHelper'
 import { eqAsset } from '../../../helpers/fp/eq'
 import { sequenceTOption } from '../../../helpers/fpHelpers'
 import { RUNE_POOL_DATA } from '../../../helpers/poolHelper'
@@ -101,11 +102,19 @@ export const getChainFeeByGasRate = ({
     })
   } else if (isTerraChain(asset.chain)) {
     // No change for LUNA = gasRate
-    // But convertion of decimal is needed (1e8 -> 1e6)
+    // But convertion of decimal is needed: 1e8 (THORChain) -> 1e6 (TERRA)
     const amount = convertBaseAmountDecimal(baseAmount(gasRate, THORCHAIN_DECIMAL), TERRA_DECIMAL)
     return O.some({
       amount,
       asset: AssetLUNA
+    })
+  } else if (isCosmosChain(asset.chain)) {
+    // No change for ATOM = gasRate
+    // But convertion of decimal is needed: 1e8 (THORChain) -> 1e6 (COSMOS)
+    const amount = convertBaseAmountDecimal(baseAmount(gasRate, THORCHAIN_DECIMAL), COSMOS_DECIMAL)
+    return O.some({
+      amount,
+      asset: AssetAtom
     })
   } else {
     return O.none

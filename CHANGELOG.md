@@ -1,8 +1,8 @@
-# 1.0.0 (2022-xx-xx)
+# 1.16.0 (2022-xx-xx)
 
 ## ADD
 
-- Support Cosmos (GAIA) [#2288](https://github.com/thorchain/asgardex-electron/issues/2288), [#2193](https://github.com/thorchain/asgardex-electron/pull/2193), [#2290](https://github.com/thorchain/asgardex-electron/pull/2290), [2291](https://github.com/thorchain/asgardex-electron/pull/2291), [2292](https://github.com/thorchain/asgardex-electron/pull/2292), [#2295](https://github.com/thorchain/asgardex-electron/pull/2295)
+- Support Cosmos (ATOM) [#2288](https://github.com/thorchain/asgardex-electron/issues/2288), [#2193](https://github.com/thorchain/asgardex-electron/pull/2193), [#2290](https://github.com/thorchain/asgardex-electron/pull/2290), [2291](https://github.com/thorchain/asgardex-electron/pull/2291), [2292](https://github.com/thorchain/asgardex-electron/pull/2292), [#2295](https://github.com/thorchain/asgardex-electron/pull/2295), [#2296](https://github.com/thorchain/asgardex-electron/pull/2296)
 
 ## Update
 
