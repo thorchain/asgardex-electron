@@ -37,6 +37,7 @@ import {
   isBchChain,
   isBnbChain,
   isBtcChain,
+  isCosmosChain,
   isDogeChain,
   isEthChain,
   isLtcChain,
@@ -187,7 +188,8 @@ export const WalletSettings: React.FC<Props> = (props): JSX.Element => {
             isBchChain(chain) ||
             isDogeChain(chain) ||
             isTerraChain(chain) ||
-            isEthChain(chain)) && (
+            isEthChain(chain) ||
+            isCosmosChain(chain)) && (
             <>
               <Styled.IndexLabel>{intl.formatMessage({ id: 'setting.wallet.index' })}</Styled.IndexLabel>
               <Styled.WalletIndexInput

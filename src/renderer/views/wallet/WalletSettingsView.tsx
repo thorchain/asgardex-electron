@@ -46,7 +46,8 @@ import {
   isLtcChain,
   isThorChain,
   isTerraChain,
-  isEthChain
+  isEthChain,
+  isCosmosChain
 } from '../../helpers/chainHelper'
 import { sequenceTOptionFromArray } from '../../helpers/fpHelpers'
 import { useCollapsedSetting } from '../../hooks/useCollapsedSetting'
@@ -150,6 +151,13 @@ export const WalletSettingsView: React.FC = (): JSX.Element => {
     removeAddress: removeLedgerEthAddress
   } = useLedger(ETHChain)
 
+  const {
+    askAddress: askLedgerCosmosAddress,
+    verifyAddress: verifyLedgerCosmosAddress,
+    address: cosmosLedgerAddressRD,
+    removeAddress: removeLedgerCosmosAddress
+  } = useLedger(CosmosChain)
+
   const addLedgerAddressHandler = (chain: Chain, walletIndex: number) => {
     if (isThorChain(chain)) return askLedgerThorAddress(walletIndex)
     if (isBnbChain(chain)) return askLedgerBnbAddress(walletIndex)
@@ -159,6 +167,7 @@ export const WalletSettingsView: React.FC = (): JSX.Element => {
     if (isDogeChain(chain)) return askLedgerDOGEAddress(walletIndex)
     if (isTerraChain(chain)) return askLedgerTerraAddress(walletIndex)
     if (isEthChain(chain)) return askLedgerEthAddress(walletIndex)
+    if (isCosmosChain(chain)) return askLedgerCosmosAddress(walletIndex)
 
     return FP.constVoid
   }
@@ -172,6 +181,7 @@ export const WalletSettingsView: React.FC = (): JSX.Element => {
     if (isDogeChain(chain)) return verifyLedgerDOGEAddress(walletIndex)
     if (isTerraChain(chain)) return verifyLedgerTerraAddress(walletIndex)
     if (isEthChain(chain)) return verifyLedgerEthAddress(walletIndex)
+    if (isCosmosChain(chain)) return verifyLedgerCosmosAddress(walletIndex)
 
     return false
   }
@@ -185,6 +195,7 @@ export const WalletSettingsView: React.FC = (): JSX.Element => {
     if (isDogeChain(chain)) return removeLedgerDOGEAddress()
     if (isTerraChain(chain)) return removeLedgerTerraAddress()
     if (isEthChain(chain)) return removeLedgerEthAddress()
+    if (isCosmosChain(chain)) return removeLedgerCosmosAddress()
 
     return FP.constVoid
   }
@@ -328,6 +339,17 @@ export const WalletSettingsView: React.FC = (): JSX.Element => {
     [intl, ethLedgerAddressRD]
   )
 
+  const cosmosLedgerWalletAddress: WalletAddressAsync = useMemo(
+    () => ({
+      type: 'ledger',
+      address: FP.pipe(
+        cosmosLedgerAddressRD,
+        RD.mapLeft(({ errorId, msg }) => Error(`${ledgerErrorIdToI18n(errorId, intl)} (${msg})`))
+      )
+    }),
+    [intl, cosmosLedgerAddressRD]
+  )
+
   const walletAccounts$ = useMemo(() => {
     const thorWalletAccount$ = walletAccount$({
       addressUI$: thorAddressUI$,
@@ -371,6 +393,7 @@ export const WalletSettingsView: React.FC = (): JSX.Element => {
     })
     const cosmosWalletAccount$ = walletAccount$({
       addressUI$: cosmosAddressUI$,
+      ledgerAddress: cosmosLedgerWalletAddress,
       chain: CosmosChain
     })
 
@@ -409,6 +432,7 @@ export const WalletSettingsView: React.FC = (): JSX.Element => {
     terraAddressUI$,
     terraLedgerWalletAddress,
     cosmosAddressUI$,
+    cosmosLedgerWalletAddress,
     ethAddressUI$,
     ethLedgerWalletAddress
   ])

@@ -3,6 +3,7 @@ import {
   BCHChain,
   BNBChain,
   BTCChain,
+  CosmosChain,
   DOGEChain,
   ETHChain,
   LTCChain,
@@ -17,6 +18,7 @@ import { WalletAddress } from '../../../shared/wallet/types'
 import { getAddress as getBNBAddress, verifyAddress as verifyBNBAddress } from './binance/address'
 import { getAddress as getBTCAddress, verifyAddress as verifyBTCAddress } from './bitcoin/address'
 import { getAddress as getBCHAddress, verifyAddress as verifyBCHAddress } from './bitcoincash/address'
+import { getAddress as getCOSMOSAddress, verifyAddress as verifyCOSMOSAddress } from './cosmos/address'
 import { getAddress as getDOGEAddress, verifyAddress as verifyDOGEAddress } from './doge/address'
 import { getAddress as getETHAddress, verifyAddress as verifyETHAddress } from './ethereum/address'
 import { getAddress as getLTCAddress, verifyAddress as verifyLTCAddress } from './litecoin/address'
@@ -55,6 +57,9 @@ export const getAddress = async ({
         break
       case ETHChain:
         res = await getETHAddress(transport, walletIndex)
+        break
+      case CosmosChain:
+        res = await getCOSMOSAddress(transport, walletIndex)
         break
       default:
         res = E.left({
@@ -99,6 +104,9 @@ export const verifyLedgerAddress = async ({ chain, network, walletIndex }: IPCLe
       break
     case ETHChain:
       result = await verifyETHAddress(transport, walletIndex)
+      break
+    case CosmosChain:
+      result = await verifyCOSMOSAddress(transport, walletIndex)
       break
     default:
       throw Error(`verifyAddress for ${chain} has not been implemented`)
