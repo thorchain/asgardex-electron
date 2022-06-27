@@ -74,8 +74,7 @@ export const createBalancesService = ({
     LTC.reloadBalances()
     DOGE.reloadBalances()
     TERRA.reloadBalances()
-    // TODO (@veado) Implement Cosmos
-    // GAIA.reloadBalances()
+    COSMOS.reloadBalances()
   }
 
   // Returns lazy functions to reload balances by given chain
@@ -576,6 +575,15 @@ export const createBalancesService = ({
   )
 
   /**
+   * Cosmos Ledger balances
+   */
+  const cosmosLedgerChainBalance$: ChainBalance$ = ledgerChainBalance$({
+    chain: CosmosChain,
+    walletBalanceType: 'all',
+    getBalanceByAddress$: COSMOS.getBalanceByAddress$
+  })
+
+  /**
    * ETH Ledger balances
    */
   const ethLedgerChainBalance$: ChainBalance$ = FP.pipe(
@@ -607,7 +615,7 @@ export const createBalancesService = ({
         LTC: [ltcBalance$, ltcLedgerChainBalance$],
         DOGE: [dogeChainBalance$, dogeLedgerChainBalance$],
         TERRA: [terraChainBalance$, terraLedgerChainBalance$],
-        GAIA: [cosmosChainBalance$]
+        GAIA: [cosmosChainBalance$, cosmosLedgerChainBalance$]
       })
     ),
     // we ignore all `ChainBalances` with state of `initial` balances
