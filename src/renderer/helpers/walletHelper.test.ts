@@ -10,7 +10,8 @@ import {
   BNBChain,
   BCHChain,
   DOGEChain,
-  TerraChain
+  TerraChain,
+  CosmosChain
 } from '@xchainjs/xchain-util'
 import * as FP from 'fp-ts/lib/function'
 import * as NEA from 'fp-ts/lib/NonEmptyArray'
@@ -244,6 +245,11 @@ describe('walletHelper', () => {
       expect(isEnabledWallet(TerraChain, 'testnet', 'ledger')).toBeTruthy()
       expect(isEnabledWallet(TerraChain, 'mainnet', 'ledger')).toBeTruthy()
       expect(isEnabledWallet(TerraChain, 'stagenet', 'ledger')).toBeTruthy()
+    })
+    it('Cosmos ledger mainnet/stagenet/testnet -> true', () => {
+      expect(isEnabledWallet(CosmosChain, 'testnet', 'ledger')).toBeTruthy()
+      expect(isEnabledWallet(CosmosChain, 'mainnet', 'ledger')).toBeTruthy()
+      expect(isEnabledWallet(CosmosChain, 'stagenet', 'ledger')).toBeTruthy()
     })
   })
 
