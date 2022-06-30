@@ -66,6 +66,7 @@
   "dependencies": {
     "@ant-design/icons": "^4.7.0",
     "@binance-chain/javascript-sdk": "^4.2.0",
+    "@cosmjs/stargate": "^0.28.10",
     "@cosmos-client/core": "https://github.com/veado/cosmos-client-ts.git#patch/v0.45.10",
     "@craco/craco": "^v6.4.3",
     "@devexperts/remote-data-ts": "^2.1.1",
@@ -131,6 +132,7 @@
     "react-scripts": "^4.0.3",
     "react-test-renderer": "^18.1.0",
     "rxjs": "^6.6.7",
+    "sort-keys": "4.2.0",
     "styled-components": "^5.3.5",
     "styled-theme": "^0.3.3",
     "uuid": "^8.3.2",
@@ -157,6 +159,7 @@
     "@types/react": "^18.0.9",
     "@types/react-dom": "^18.0.5",
     "@types/react-intl": "^3.0.0",
+    "@types/secp256k1": "^4.0.3",
     "@types/styled-components": "^5.1.25",
     "chalk": "^5.0.1",
     "concurrently": "^7.2.1",

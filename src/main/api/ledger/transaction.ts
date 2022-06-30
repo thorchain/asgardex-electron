@@ -5,6 +5,7 @@ import {
   BNBChain,
   BTCChain,
   chainToString,
+  CosmosChain,
   DOGEChain,
   ETHChain,
   LTCChain,
@@ -19,6 +20,7 @@ import { isError } from '../../../shared/utils/guard'
 import * as BNB from './binance/transaction'
 import * as BTC from './bitcoin/transaction'
 import * as BCH from './bitcoincash/transaction'
+import * as COSMOS from './cosmos/transaction'
 import * as DOGE from './doge/transaction'
 import * as ETH from './ethereum/transaction'
 import * as LTC from './litecoin/transaction'
@@ -33,6 +35,7 @@ export const sendTx = async ({
   amount,
   asset,
   feeAsset,
+  feeAmount,
   memo,
   feeRate,
   feeOption,
@@ -148,6 +151,30 @@ export const sendTx = async ({
             memo,
             walletIndex,
             feeOption
+          })
+        }
+        break
+      case CosmosChain:
+        if (!asset) {
+          res = E.left({
+            errorId: LedgerErrorId.INVALID_DATA,
+            msg: `Asset needs to be defined to send Ledger transaction on ${chainToString(chain)}`
+          })
+        } else if (!feeAmount) {
+          res = E.left({
+            errorId: LedgerErrorId.INVALID_DATA,
+            msg: `Fee amount needs to be defined to send Ledger transaction on ${chainToString(chain)}`
+          })
+        } else {
+          res = await COSMOS.send({
+            transport,
+            network,
+            amount,
+            asset,
+            recipient,
+            memo,
+            walletIndex,
+            feeAmount
           })
         }
         break
