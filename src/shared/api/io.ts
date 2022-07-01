@@ -96,7 +96,8 @@ export const ipcLedgerSendTxParamsIO = t.type({
   memo: t.union([t.string, t.undefined]),
   walletIndex: t.number,
   feeRate: t.number,
-  feeOption: t.union([feeOptionIO, t.undefined])
+  feeOption: t.union([feeOptionIO, t.undefined]),
+  feeAmount: t.union([baseAmountIO, t.undefined])
 })
 
 export type IPCLedgerSendTxParams = t.TypeOf<typeof ipcLedgerSendTxParamsIO>

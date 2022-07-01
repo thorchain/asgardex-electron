@@ -31,7 +31,8 @@ export const createTransactionService = (client$: Client$, network$: Network$): 
       memo,
       walletIndex,
       feeRate: NaN,
-      feeOption: undefined
+      feeOption: undefined,
+      feeAmount: undefined
     }
     const encoded = ipcLedgerSendTxParamsIO.encode(sendLedgerTxParams)
 
