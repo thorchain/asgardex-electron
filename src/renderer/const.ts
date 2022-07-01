@@ -216,5 +216,6 @@ export const SUPPORTED_LEDGER_APPS: Chain[] = [
   DOGEChain,
   BCHChain,
   TerraChain,
-  ETHChain
+  ETHChain,
+  CosmosChain
 ]
