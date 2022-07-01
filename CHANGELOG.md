@@ -1,3 +1,14 @@
+# 1.17.0 (2022-07-01)
+
+## ADD
+
+- [Ledger] Support Cosmos (ATOM) [#2301](https://github.com/thorchain/asgardex-electron/issues/2301), [#2302](https://github.com/thorchain/asgardex-electron/pull/2302), [#2303](https://github.com/thorchain/asgardex-electron/pull/2303), [2304](https://github.com/thorchain/asgardex-electron/pull/2304), [2304](https://github.com/thorchain/asgardex-electron/pull/2304)
+
+## Fix
+
+- UI does not show Mimir status of GAIA [#2300](https://github.com/thorchain/asgardex-electron/pull/2300)
+- [Wallet] Shares are not updated while changing the network [#2307](https://github.com/thorchain/asgardex-electron/issues/2307)
+
 # 1.16.0 (2022-06-22)
 
 ## ADD

@@ -1,7 +1,7 @@
 {
   "name": "asgardex",
   "productName": "ASGARDEX",
-  "version": "1.16.0",
+  "version": "1.17.0",
   "description": "WALLET AND EXCHANGE CLIENT FOR THORCHAIN",
   "main": "index.js",
   "scripts": {
@@ -52,7 +52,6 @@
   "keywords": [
     "thorchain",
     "asgardex",
-    "bepswap",
     "thornode",
     "bitcoin",
     "bitcoin cash",
@@ -60,7 +59,8 @@
     "ethereum",
     "binance chain",
     "doge",
-    "terra"
+    "terra",
+    "cosmos"
   ],
   "homepage": "https://thorchain.org",
   "dependencies": {
