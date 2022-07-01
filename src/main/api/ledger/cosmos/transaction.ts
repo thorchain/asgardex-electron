@@ -75,24 +75,14 @@ export const send = async ({
 
     const fee = protoFee({ denom, amount: feeAmount, gasLimit })
 
-    console.log('fee:', fee.toJSON())
-
     const clientUrls = getClientUrls()
     const chainId = await getChainId(clientUrls[clientNetwork])
-
-    console.log('chainId:', chainId)
 
     const app = new CosmosApp(transport)
     const path = getDerivationPath(walletIndex)
 
-    console.log('path:', path)
-
     const { publicKey, address: sender } = await app.getAddress(path, 'cosmos')
     const senderAcc = cosmosclient.AccAddress.fromString(sender)
-
-    console.log('publicKey:', publicKey)
-    console.log('sender:', sender)
-    console.log('senderAcc:', senderAcc)
 
     const client = new Client({
       network: clientNetwork,
@@ -110,9 +100,6 @@ export const send = async ({
 
     // Transform `MsgSend` (proto) -> `MsgSend` (amino)
     const sendMsgAmino = aminoTypes.toAmino({ typeUrl: '/cosmos.bank.v1beta1.MsgSend', value: sendMsg })
-
-    console.log('sendMsg:', sendMsg.toJSON())
-    console.log('sendMsgAmino:', sendMsgAmino)
 
     // Note: `Msg` to sign needs to be in Amino format due Ledger limitation - currently no Ledger support for proto
     // Note2: Keys need to be sorted for Ledger
@@ -134,11 +121,7 @@ export const send = async ({
       )
     )
 
-    console.log('msgToSign:', msgToSign)
-
     const sigResult = await app.sign(path, msgToSign)
-
-    console.log('sigResult:', sigResult)
 
     if (!sigResult || !sigResult?.signature) {
       let signErrorMsg = ''
@@ -165,12 +148,8 @@ export const send = async ({
 
     const txBody = protoTxBody({ from: sender, to: recipient, amount, denom, memo })
 
-    console.log('txBody:', txBody)
-
     const secPubKey = new proto.cosmos.crypto.secp256k1.PubKey()
     secPubKey.key = new Uint8Array(Buffer.from(publicKey, 'hex'))
-
-    console.log('secPubKey:', secPubKey)
 
     const authInfo = protoAuthInfo({
       pubKey: secPubKey,
@@ -179,23 +158,15 @@ export const send = async ({
       mode: proto.cosmos.tx.signing.v1beta1.SignMode.SIGN_MODE_LEGACY_AMINO_JSON
     })
 
-    console.log('authInfo:', authInfo.toJSON())
-
     const secpSignature = secp256k1.signatureImport(new Uint8Array(sigResult.signature))
-
-    console.log('secpSignature:', secpSignature)
 
     const txBuilder = new cosmosclient.TxBuilder(sdk.sdk, txBody, authInfo)
     txBuilder.addSignature(secpSignature)
-
-    console.log('txBuilder:', txBuilder.protoJSONStringify())
 
     const res = await rest.tx.broadcastTx(sdk.sdk, {
       tx_bytes: txBuilder.txBytes(),
       mode: rest.tx.BroadcastTxMode.Sync
     })
-
-    console.log('result:', res)
 
     if (res?.data?.tx_response?.code !== 0) {
       return E.left({

@@ -3,6 +3,7 @@ import { AssetBNB, AssetRuneNative, baseAmount, BNBChain } from '@xchainjs/xchai
 import * as E from 'fp-ts/lib/Either'
 import * as FP from 'fp-ts/lib/function'
 
+import { ZERO_BASE_AMOUNT } from '../../renderer/const'
 import { eqBaseAmount } from '../../renderer/helpers/fp/eq'
 import { BaseAmountEncoded, baseAmountIO, ipcLedgerSendTxParamsIO, poolsWatchListsIO } from './io'
 
@@ -43,7 +44,8 @@ describe('shared/io', () => {
         memo: 'memo-abc',
         walletIndex: 0,
         feeRate: 1,
-        feeOption: FeeOption.Fast
+        feeOption: FeeOption.Fast,
+        feeAmount: baseAmount(1, 6)
       })
       expect(encoded).toEqual({
         chain: 'BNB',
@@ -56,7 +58,8 @@ describe('shared/io', () => {
         memo: 'memo-abc',
         walletIndex: 0,
         feeRate: 1,
-        feeOption: 'fast'
+        feeOption: 'fast',
+        feeAmount: { amount: '1', decimal: 6 }
       })
     })
     it('decode IPCLedgerSendTxParams', () => {
@@ -69,7 +72,8 @@ describe('shared/io', () => {
         recipient: 'address-abc',
         memo: 'memo-abc',
         walletIndex: 0,
-        feeRate: 1
+        feeRate: 1,
+        feeAmount: { amount: '1', decimal: 6 }
       }
       const decoded = ipcLedgerSendTxParamsIO.decode(encoded)
       expect(E.isRight(decoded)).toBeTruthy()
@@ -87,6 +91,7 @@ describe('shared/io', () => {
             expect(eqBaseAmount.equals(r.amount, baseAmount(10, 8))).toBeTruthy()
             expect(r.memo).toEqual('memo-abc')
             expect(r.feeRate).toEqual(1)
+            expect(eqBaseAmount.equals(r?.feeAmount ?? ZERO_BASE_AMOUNT, baseAmount(1, 6))).toBeTruthy()
           }
         )
       )
