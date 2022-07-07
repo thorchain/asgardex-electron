@@ -69,6 +69,12 @@ describe('shared/utils/guard', () => {
     it('false for number', () => {
       expect(isBaseAmount(2)).toBeFalsy()
     })
+    it('false for undefined', () => {
+      expect(isBaseAmount(undefined)).toBeFalsy()
+    })
+    it('false for null', () => {
+      expect(isBaseAmount(null)).toBeFalsy()
+    })
   })
 
   describe('isWalletType', () => {

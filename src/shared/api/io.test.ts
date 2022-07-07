@@ -62,6 +62,39 @@ describe('shared/io', () => {
         feeAmount: { amount: '1', decimal: 6 }
       })
     })
+
+    it('encode IPCLedgerSendTxParams - undefined fee option / fee amount', () => {
+      const encoded = ipcLedgerSendTxParamsIO.encode({
+        chain: BNBChain,
+        network: 'mainnet',
+        asset: AssetBNB,
+        feeAsset: AssetBNB,
+        amount: baseAmount(10),
+        sender: 'address-abc',
+        recipient: 'address-abc',
+        memo: 'memo-abc',
+        walletIndex: 0,
+        feeRate: 1,
+        feeOption: undefined,
+        feeAmount: undefined
+      })
+
+      expect(encoded).toEqual({
+        chain: 'BNB',
+        network: 'mainnet',
+        asset: 'BNB.BNB',
+        feeAsset: 'BNB.BNB',
+        amount: { amount: '10', decimal: 8 },
+        sender: 'address-abc',
+        recipient: 'address-abc',
+        memo: 'memo-abc',
+        walletIndex: 0,
+        feeRate: 1,
+        feeOption: undefined,
+        feeAmount: undefined
+      })
+    })
+
     it('decode IPCLedgerSendTxParams', () => {
       const encoded = {
         chain: 'BNB',
@@ -92,6 +125,34 @@ describe('shared/io', () => {
             expect(r.memo).toEqual('memo-abc')
             expect(r.feeRate).toEqual(1)
             expect(eqBaseAmount.equals(r?.feeAmount ?? ZERO_BASE_AMOUNT, baseAmount(1, 6))).toBeTruthy()
+          }
+        )
+      )
+    })
+    it('decode IPCLedgerSendTxParams - feeAmount undefined', () => {
+      const encoded = {
+        chain: 'BNB',
+        network: 'mainnet',
+        asset: 'BNB.BNB',
+        amount: { amount: '10', decimal: 8 },
+        sender: 'address-abc',
+        recipient: 'address-abc',
+        memo: 'memo-abc',
+        walletIndex: 0,
+        feeRate: 1,
+        feeAmount: undefined
+      }
+      const decoded = ipcLedgerSendTxParamsIO.decode(encoded)
+      expect(E.isRight(decoded)).toBeTruthy()
+
+      FP.pipe(
+        decoded,
+        E.fold(
+          (error) => {
+            fail(error)
+          },
+          (r) => {
+            expect(r?.feeAmount).toBeUndefined()
           }
         )
       )
