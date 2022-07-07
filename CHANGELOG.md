@@ -2,7 +2,11 @@
 
 ## Fix
 
-[Ledger] THORChain tx does not send, but failed silently w/o error [#2310](https://github.com/thorchain/asgardex-electron/issues/2310)
+- [Ledger] THORChain tx does not send, but failed silently w/o error [#2310](https://github.com/thorchain/asgardex-electron/issues/2310)
+
+## Update
+
+- Remove TERRA from supported pools [#2312](https://github.com/thorchain/asgardex-electron/issues/2312)
 
 # 1.17.0 (2022-07-01)
 
