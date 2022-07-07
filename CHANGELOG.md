@@ -1,8 +1,14 @@
+# 1.17.1 (2022-07-xx)
+
+## Fix
+
+[Ledger] THORChain tx does not send, but failed silently w/o error [#2310](https://github.com/thorchain/asgardex-electron/issues/2310)
+
 # 1.17.0 (2022-07-01)
 
 ## ADD
 
-- [Ledger] Support Cosmos (ATOM) [#2301](https://github.com/thorchain/asgardex-electron/issues/2301), [#2302](https://github.com/thorchain/asgardex-electron/pull/2302), [#2303](https://github.com/thorchain/asgardex-electron/pull/2303), [2304](https://github.com/thorchain/asgardex-electron/pull/2304), [2304](https://github.com/thorchain/asgardex-electron/pull/2304)
+- [Ledger] Support Cosmos (ATOM) [#2301](https://github.com/thorchain/asgardex-electron/issues/2301), [#2302](https://github.com/thorchain/asgardex-electron/pull/2302), [#2303](https://github.com/thorchain/asgardex-electron/pull/2303), [#2304](https://github.com/thorchain/asgardex-electron/pull/2304), [#2304](https://github.com/thorchain/asgardex-electron/pull/2304)
 
 ## Fix
 
