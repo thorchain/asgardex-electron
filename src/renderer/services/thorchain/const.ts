@@ -25,8 +25,6 @@ export const DEFAULT_MIMIR_HALT: MimirHalt = {
   haltBnbTrading: false,
   haltDogeChain: false,
   haltDogeTrading: false,
-  haltTerraChain: false,
-  haltTerraTrading: false,
   haltCosmosChain: false,
   haltCosmosTrading: false,
   pauseLp: false,
@@ -36,7 +34,6 @@ export const DEFAULT_MIMIR_HALT: MimirHalt = {
   pauseLpEth: false,
   pauseLpLtc: false,
   pauseLpDoge: false,
-  pauseLpTerra: false,
   pauseLpCosmos: false
 }
 

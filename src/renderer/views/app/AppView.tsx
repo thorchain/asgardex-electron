@@ -2,7 +2,7 @@ import React, { useEffect, useMemo, useRef } from 'react'
 
 import { SyncOutlined } from '@ant-design/icons'
 import * as RD from '@devexperts/remote-data-ts'
-import { BCHChain, BNBChain, BTCChain, Chain, CosmosChain, ETHChain, LTCChain, TerraChain } from '@xchainjs/xchain-util'
+import { BCHChain, BNBChain, BTCChain, Chain, CosmosChain, ETHChain, LTCChain } from '@xchainjs/xchain-util'
 import * as FP from 'fp-ts/function'
 import * as A from 'fp-ts/lib/Array'
 import * as O from 'fp-ts/Option'
@@ -97,9 +97,6 @@ export const AppView: React.FC = (): JSX.Element => {
               haltLtcChain,
               haltLtcTrading,
               pauseLpLtc,
-              haltTerraChain,
-              haltTerraTrading,
-              pauseLpTerra,
               haltCosmosChain,
               haltCosmosTrading,
               pauseLpCosmos
@@ -140,12 +137,6 @@ export const AppView: React.FC = (): JSX.Element => {
                   haltedChain: haltBnbChain,
                   haltedTrading: haltBnbTrading,
                   pausedLP: pauseLpBnb
-                },
-                {
-                  chain: TerraChain,
-                  haltedChain: haltTerraChain,
-                  haltedTrading: haltTerraTrading,
-                  pausedLP: pauseLpTerra
                 },
                 {
                   chain: CosmosChain,

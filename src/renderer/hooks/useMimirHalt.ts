@@ -63,7 +63,6 @@ export const useMimirHalt = (): { mimirHaltRD: MimirHaltRD; mimirHalt: MimirHalt
                 haltLtcChain: getMimirStatus(mimir.HALTLTCCHAIN, lastHeight),
                 haltThorChain: getMimirStatus(mimir.HALTTHORCHAIN, lastHeight),
                 haltDogeChain: getMimirStatus(mimir.HALTDOGECHAIN, lastHeight),
-                haltTerraChain: getMimirStatus(mimir.HALTTERRACHAIN, lastHeight),
                 haltCosmosChain: getMimirStatus(mimir.HALTGAIACHAIN, lastHeight),
                 // `HALT{chain}TRADING` flags
                 haltTrading: getMimirStatus(mimir.HALTTRADING, lastHeight),
@@ -73,7 +72,6 @@ export const useMimirHalt = (): { mimirHaltRD: MimirHaltRD; mimirHalt: MimirHalt
                 haltEthTrading: getMimirStatus(mimir.HALTETHTRADING, lastHeight),
                 haltLtcTrading: getMimirStatus(mimir.HALTLTCTRADING, lastHeight),
                 haltDogeTrading: getMimirStatus(mimir.HALTDOGETRADING, lastHeight),
-                haltTerraTrading: getMimirStatus(mimir.HALTTERRATRADING, lastHeight),
                 haltCosmosTrading: getMimirStatus(mimir.HALTGAIATRADING, lastHeight),
                 // `PAUSELP{chain}` flags
                 pauseLp: getMimirStatus(mimir.PAUSELP, lastHeight),
@@ -83,7 +81,6 @@ export const useMimirHalt = (): { mimirHaltRD: MimirHaltRD; mimirHalt: MimirHalt
                 pauseLpEth: getMimirStatus(mimir.PAUSELPETH, lastHeight),
                 pauseLpLtc: getMimirStatus(mimir.PAUSELPLTC, lastHeight),
                 pauseLpDoge: getMimirStatus(mimir.PAUSELPDOGE, lastHeight),
-                pauseLpTerra: getMimirStatus(mimir.PAUSELPTERRA, lastHeight),
                 pauseLpCosmos: getMimirStatus(mimir.PAUSELPGAIA, lastHeight)
               }
 

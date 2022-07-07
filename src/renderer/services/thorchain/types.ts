@@ -99,8 +99,6 @@ export const MimirIO = t.type({
   HALTBNBTRADING: t.union([t.number, t.undefined]),
   HALTDOGECHAIN: t.union([t.number, t.undefined]),
   HALTDOGETRADING: t.union([t.number, t.undefined]),
-  HALTTERRACHAIN: t.union([t.number, t.undefined]),
-  HALTTERRATRADING: t.union([t.number, t.undefined]),
   HALTGAIACHAIN: t.union([t.number, t.undefined]),
   HALTGAIATRADING: t.union([t.number, t.undefined]),
   PAUSELP: t.union([t.number, t.undefined]),
@@ -110,7 +108,6 @@ export const MimirIO = t.type({
   PAUSELPETH: t.union([t.number, t.undefined]),
   PAUSELPLTC: t.union([t.number, t.undefined]),
   PAUSELPDOGE: t.union([t.number, t.undefined]),
-  PAUSELPTERRA: t.union([t.number, t.undefined]),
   PAUSELPGAIA: t.union([t.number, t.undefined])
 })
 
@@ -127,7 +124,6 @@ export type MimirHaltChain = {
   haltLtcChain: boolean
   haltBnbChain: boolean
   haltDogeChain: boolean
-  haltTerraChain: boolean
   haltCosmosChain: boolean
 }
 export type MimirHaltTrading = {
@@ -138,7 +134,6 @@ export type MimirHaltTrading = {
   haltLtcTrading: boolean
   haltBnbTrading: boolean
   haltDogeTrading: boolean
-  haltTerraTrading: boolean
   haltCosmosTrading: boolean
 }
 
@@ -150,7 +145,6 @@ export type MimirPauseLP = {
   pauseLpEth: boolean
   pauseLpLtc: boolean
   pauseLpDoge: boolean
-  pauseLpTerra: boolean
   pauseLpCosmos: boolean
 }
 
