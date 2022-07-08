@@ -5,9 +5,44 @@ import * as FP from 'fp-ts/lib/function'
 
 import { ZERO_BASE_AMOUNT } from '../../renderer/const'
 import { eqBaseAmount } from '../../renderer/helpers/fp/eq'
-import { BaseAmountEncoded, baseAmountIO, ipcLedgerSendTxParamsIO, poolsWatchListsIO } from './io'
+import { BaseAmountEncoded, baseAmountIO, ipcLedgerSendTxParamsIO, isBaseAmountEncoded, poolsWatchListsIO } from './io'
 
 describe('shared/io', () => {
+  describe('isBaseAmountEncoded', () => {
+    it('true', () => {
+      const encoded = {
+        amount: '1',
+        decimal: 10
+      }
+      expect(isBaseAmountEncoded(encoded)).toBeTruthy()
+    })
+    it('false - no amount', () => {
+      const encoded = {
+        decimal: 10
+      }
+      expect(isBaseAmountEncoded(encoded)).toBeFalsy()
+    })
+    it('false - no decimal', () => {
+      const encoded = {
+        amount: '1'
+      }
+      expect(isBaseAmountEncoded(encoded)).toBeFalsy()
+    })
+    it('false misc.', () => {
+      expect(isBaseAmountEncoded(null)).toBeFalsy()
+      expect(isBaseAmountEncoded(undefined)).toBeFalsy()
+      expect(isBaseAmountEncoded(1)).toBeFalsy()
+      expect(isBaseAmountEncoded(true)).toBeFalsy()
+      expect(isBaseAmountEncoded(false)).toBeFalsy()
+      expect(isBaseAmountEncoded('')).toBeFalsy()
+      expect(isBaseAmountEncoded('hello-world')).toBeFalsy()
+      expect(
+        isBaseAmountEncoded({
+          hello: 'world'
+        })
+      ).toBeFalsy()
+    })
+  })
   describe('baseAmountIO', () => {
     it('encode BaseAmount', () => {
       const encoded = baseAmountIO.encode(baseAmount(1, 18))

@@ -57,23 +57,24 @@ describe('shared/utils/guard', () => {
   })
 
   describe('isBaseAmount', () => {
-    it('true for "THOR"', () => {
+    it('true"', () => {
       expect(isBaseAmount(baseAmount(1))).toBeTruthy()
     })
-    it('false for BigNumber', () => {
+    it('false -> BigNumber', () => {
       expect(isBaseAmount(bn('123'))).toBeFalsy()
     })
-    it('false for string', () => {
+    it('false -> string', () => {
       expect(isBaseAmount('123')).toBeFalsy()
+      expect(isBaseAmount('')).toBeFalsy()
     })
-    it('false for number', () => {
+    it('false -> number', () => {
       expect(isBaseAmount(2)).toBeFalsy()
     })
-    it('false for undefined', () => {
+    it('false -> misc.', () => {
       expect(isBaseAmount(undefined)).toBeFalsy()
-    })
-    it('false for null', () => {
       expect(isBaseAmount(null)).toBeFalsy()
+      expect(isBaseAmount({ hello: 'world' })).toBeFalsy()
+      expect(isBaseAmount({})).toBeFalsy()
     })
   })
 
