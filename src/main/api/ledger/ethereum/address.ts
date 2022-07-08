@@ -16,7 +16,6 @@ export const getAddress = async (
   try {
     const app = new EthApp(transport)
     const mode = await getDerivationMode()
-    console.log('mode:', mode)
     const path = getDerivationPath(walletIndex, mode)
     const { address } = await app.getAddress(path)
 
@@ -39,7 +38,6 @@ export const getAddress = async (
 export const verifyAddress = async (transport: Transport, walletIndex: number) => {
   const app = new EthApp(transport)
   const mode = await getDerivationMode()
-  console.log('mode:', mode)
   const path = getDerivationPath(walletIndex, mode)
   const _ = await app.getAddress(path, true)
   return true

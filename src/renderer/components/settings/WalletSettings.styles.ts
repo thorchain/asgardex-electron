@@ -6,6 +6,7 @@ import { palette } from 'styled-theme'
 
 import { ReactComponent as RemoveIcon } from '../../assets/svg/icon-remove.svg'
 import { media } from '../../helpers/styleHelper'
+import * as StyledR from '../shared/form/Radio.styles'
 import { AddressEllipsis as AddressEllipsisUI } from '../uielements/addressEllipsis'
 import { Button as UIButton } from '../uielements/button'
 import {
@@ -291,6 +292,16 @@ export const EthDerivationModeContainer = styled.div`
   padding-top: 0;
   padding-left: 30px;
   `}
+`
+
+export const EthDerivationModeRadioGroup = styled(StyledR.Radio.Group)`
+  display: flex;
+  align-items: center;
+`
+
+export const EthDerivationModeRadioLabel = styled(StyledR.RadioLabel)`
+  display: flex;
+  align-items: center;
 `
 
 export const IndexLabel = styled('div')`

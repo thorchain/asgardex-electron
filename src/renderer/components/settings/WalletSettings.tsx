@@ -219,12 +219,9 @@ export const WalletSettings: React.FC<Props> = (props): JSX.Element => {
           </Styled.AddLedgerContainer>
           {isEthChain(chain) && (
             <Styled.EthDerivationModeContainer>
-              <StyledR.Radio.Group
-                onChange={onChangeEthDerivationMode}
-                value={ethDerivationMode}
-                style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              <Styled.EthDerivationModeRadioGroup onChange={onChangeEthDerivationMode} value={ethDerivationMode}>
                 <StyledR.Radio value="ledgerlive" key="ledgerlive">
-                  <StyledR.RadioLabel style={{ display: 'flex', alignItems: 'center' }}>
+                  <Styled.EthDerivationModeRadioLabel>
                     {intl.formatMessage({ id: 'common.ledgerlive' })}
                     <InfoIcon
                       tooltip={intl.formatMessage(
@@ -232,10 +229,10 @@ export const WalletSettings: React.FC<Props> = (props): JSX.Element => {
                         { path: getEthDerivationPath(walletIndexMap[ETHChain], 'ledgerlive') }
                       )}
                     />
-                  </StyledR.RadioLabel>
+                  </Styled.EthDerivationModeRadioLabel>
                 </StyledR.Radio>
                 <StyledR.Radio value="legacy" key="legacy">
-                  <StyledR.RadioLabel style={{ display: 'flex', alignItems: 'center' }}>
+                  <Styled.EthDerivationModeRadioLabel>
                     {intl.formatMessage({ id: 'common.legacy' })}
                     <InfoIcon
                       tooltip={intl.formatMessage(
@@ -243,9 +240,9 @@ export const WalletSettings: React.FC<Props> = (props): JSX.Element => {
                         { path: getEthDerivationPath(walletIndexMap[ETHChain], 'legacy') }
                       )}
                     />
-                  </StyledR.RadioLabel>
+                  </Styled.EthDerivationModeRadioLabel>
                 </StyledR.Radio>
-              </StyledR.Radio.Group>
+              </Styled.EthDerivationModeRadioGroup>
             </Styled.EthDerivationModeContainer>
           )}
         </Styled.AddLedgerWrapper>

@@ -14,8 +14,8 @@ const removeFile = async (fullFilePathname: string) => fs.remove(fullFilePathnam
 const isFileExist = async (path: string) => fs.pathExists(path)
 
 // full file path - it includes a version number, so we can ignore deprecated config files (if needed)
-const getFilePath = <T extends StorageVersion>(fileStoreName: StoreFileName, defaultValue: T) =>
-  path.join(STORAGE_DIR, `${fileStoreName}-${defaultValue.version}.json`)
+const getFilePath = (fileStoreName: StoreFileName, version: string) =>
+  path.join(STORAGE_DIR, `${fileStoreName}-${version}.json`)
 
 /**
  * @returns
@@ -23,8 +23,8 @@ const getFilePath = <T extends StorageVersion>(fileStoreName: StoreFileName, def
  * 2. in case content was read returns Promise.resolve(fileContent)
  */
 export const getFileContent = async <T extends StorageVersion>(name: StoreFileName, defaultValue: T): Promise<T> => {
-  // If wile does not exist create a new one with defaultValue as content
-  const path = getFilePath(name, defaultValue)
+  const path = getFilePath(name, defaultValue.version)
+  // If file does not exist create a new one with defaultValue as content
   if (!(await isFileExist(path))) {
     await fs.writeJSON(path, { ...defaultValue })
     return defaultValue
@@ -49,7 +49,7 @@ export const getFileContent = async <T extends StorageVersion>(name: StoreFileNa
  * 2. in case there was any issue while writing: Promise.reject
  */
 const saveToFile = async <T extends StorageVersion>(name: StoreFileName, data: Partial<T>, defaultValue: T) => {
-  const path = getFilePath(name, defaultValue)
+  const path = getFilePath(name, defaultValue.version)
   const fileData = await getFileContent(name, defaultValue)
   // Combine Partial data with previously saved data
   const targetData: T = { ...fileData, ...data }
@@ -57,7 +57,7 @@ const saveToFile = async <T extends StorageVersion>(name: StoreFileName, data: P
 }
 
 export const getFileStoreService = <T extends StorageVersion>(name: StoreFileName, defaultValue: T) => {
-  const path = getFilePath(name, defaultValue)
+  const path = getFilePath(name, defaultValue.version)
 
   const ipcMessages = getStoreFilesIPCMessages(name)
 
