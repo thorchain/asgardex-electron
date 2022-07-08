@@ -38,8 +38,8 @@ export const assetListIO = t.array(assetIO)
 
 export type BaseAmountEncoded = { amount: string; decimal: number }
 
-const isBaseAmountEncoded = (u: unknown): u is BaseAmountEncoded =>
-  !!u && IOG.partial({ amount: IOG.string, decimal: IOG.number }).is(u)
+export const isBaseAmountEncoded = (u: unknown): u is BaseAmountEncoded =>
+  IOG.struct({ amount: IOG.string, decimal: IOG.number }).is(u)
 
 export const baseAmountIO = new t.Type(
   'BaseAmountIO',
