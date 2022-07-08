@@ -3,6 +3,7 @@ import React, { useCallback } from 'react'
 import { useObservableState } from 'observable-hooks'
 
 import { ExternalUrl } from '../../../shared/const'
+import { DEFAULT_LOCALE } from '../../../shared/i18n/const'
 import { envOrDefault } from '../../../shared/utils/env'
 import { AppSettings } from '../../components/settings'
 import { useI18nContext } from '../../contexts/I18nContext'
@@ -16,8 +17,8 @@ export const AppSettingsView: React.FC = (): JSX.Element => {
 
   const { collapsed, toggle: toggleCollapse } = useCollapsedSetting('app')
 
-  const { changeLocale, locale$, initialLocale } = useI18nContext()
-  const currentLocale = useObservableState(locale$, initialLocale)
+  const { changeLocale, locale$ } = useI18nContext()
+  const currentLocale = useObservableState(locale$, DEFAULT_LOCALE)
 
   const goToReleasePage = useCallback(
     (version: string) => window.apiUrl.openExternal(`${ExternalUrl.GITHUB_RELEASE}${version}`),

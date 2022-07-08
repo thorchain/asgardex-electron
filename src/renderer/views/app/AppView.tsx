@@ -9,6 +9,7 @@ import * as O from 'fp-ts/Option'
 import { useObservableState } from 'observable-hooks'
 import { useIntl } from 'react-intl'
 
+import { DEFAULT_LOCALE } from '../../../shared/i18n/const'
 import { envOrDefault } from '../../../shared/utils/env'
 import { Footer } from '../../components/footer'
 import { Header } from '../../components/header'
@@ -34,8 +35,8 @@ type HaltedChainsState = {
 export const AppView: React.FC = (): JSX.Element => {
   const intl = useIntl()
 
-  const { locale$, initialLocale } = useI18nContext()
-  const currentLocale = useObservableState(locale$, initialLocale)
+  const { locale$ } = useI18nContext()
+  const currentLocale = useObservableState(locale$, DEFAULT_LOCALE)
 
   useEffect(() => {
     // Needed to update Electron native menu according to the selected locale
