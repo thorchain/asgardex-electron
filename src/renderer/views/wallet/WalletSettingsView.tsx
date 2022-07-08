@@ -24,6 +24,8 @@ import { useLocation, useNavigate } from 'react-router-dom'
 import * as Rx from 'rxjs'
 import * as RxOp from 'rxjs/operators'
 
+import { DEFAULT_ETH_DERIVATION_MODE } from '../../../shared/ethereum/const'
+import { EthDerivationMode } from '../../../shared/ethereum/types'
 import { WalletAddress } from '../../../shared/wallet/types'
 import { WalletSettings, UnlockWalletSettings } from '../../components/settings'
 import { useBinanceContext } from '../../contexts/BinanceContext'
@@ -76,13 +78,16 @@ export const WalletSettingsView: React.FC = (): JSX.Element => {
 
   const { address$: thorAddressUI$ } = useThorchainContext()
   const { addressUI$: bnbAddressUI$ } = useBinanceContext()
-  const { addressUI$: ethAddressUI$ } = useEthereumContext()
+  const { addressUI$: ethAddressUI$, ethDerivationMode$, updateEthDerivationMode } = useEthereumContext()
   const { addressUI$: btcAddressUI$ } = useBitcoinContext()
   const { addressUI$: ltcAddressUI$ } = useLitecoinContext()
   const { addressUI$: bchAddressUI$ } = useBitcoinCashContext()
   const { addressUI$: dogeAddressUI$ } = useDogeContext()
   const { addressUI$: terraAddressUI$ } = useTerraContext()
   const { addressUI$: cosmosAddressUI$ } = useCosmosContext()
+
+  const ethDerivationMode: EthDerivationMode = useObservableState(ethDerivationMode$, DEFAULT_ETH_DERIVATION_MODE)
+
   const oRuneNativeAddress: O.Option<WalletAddress> = useObservableState(thorAddressUI$, O.none)
   const runeNativeAddress = FP.pipe(
     oRuneNativeAddress,
@@ -467,6 +472,8 @@ export const WalletSettingsView: React.FC = (): JSX.Element => {
       validatePassword$={validatePassword$}
       collapsed={collapsed}
       toggleCollapse={toggleCollapse}
+      ethDerivationMode={ethDerivationMode}
+      updateEthDerivationMode={updateEthDerivationMode}
     />
   )
 }

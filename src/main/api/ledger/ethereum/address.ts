@@ -4,9 +4,10 @@ import { ETHChain } from '@xchainjs/xchain-util'
 import * as E from 'fp-ts/Either'
 
 import { LedgerError, LedgerErrorId } from '../../../../shared/api/types'
+import { getDerivationPath } from '../../../../shared/ethereum/ledger'
 import { isError } from '../../../../shared/utils/guard'
 import { WalletAddress } from '../../../../shared/wallet/types'
-import { getDerivationPath } from './common'
+import { getDerivationMode } from './common'
 
 export const getAddress = async (
   transport: Transport,
@@ -14,7 +15,8 @@ export const getAddress = async (
 ): Promise<E.Either<LedgerError, WalletAddress>> => {
   try {
     const app = new EthApp(transport)
-    const path = getDerivationPath(walletIndex)
+    const mode = await getDerivationMode()
+    const path = getDerivationPath(walletIndex, mode)
     const { address } = await app.getAddress(path)
 
     if (address) {
@@ -35,7 +37,8 @@ export const getAddress = async (
 
 export const verifyAddress = async (transport: Transport, walletIndex: number) => {
   const app = new EthApp(transport)
-  const path = getDerivationPath(walletIndex)
+  const mode = await getDerivationMode()
+  const path = getDerivationPath(walletIndex, mode)
   const _ = await app.getAddress(path, true)
   return true
 }

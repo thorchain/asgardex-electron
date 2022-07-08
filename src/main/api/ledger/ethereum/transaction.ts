@@ -11,9 +11,10 @@ import { getEthplorerCreds } from '../../../../shared/api/ethplorer'
 import { getInfuraCreds } from '../../../../shared/api/infura'
 import { LedgerError, LedgerErrorId, Network } from '../../../../shared/api/types'
 import { FEE_BOUNDS } from '../../../../shared/ethereum/const'
+import { getDerivationPath } from '../../../../shared/ethereum/ledger'
 import { toClientNetwork } from '../../../../shared/utils/client'
 import { isError } from '../../../../shared/utils/guard'
-import { getDerivationPath } from './common'
+import { getDerivationMode } from './common'
 import { LedgerSigner } from './LedgerSigner'
 
 /**
@@ -55,7 +56,8 @@ export const send = async ({
     })
 
     const app = new EthApp(transport)
-    const path = getDerivationPath(walletIndex)
+    const mode = await getDerivationMode()
+    const path = getDerivationPath(walletIndex, mode)
     const provider = client.getProvider()
     const signer = new LedgerSigner({ provider, path, app })
 
@@ -136,7 +138,8 @@ export const deposit = async ({
     })
 
     const app = new EthApp(transport)
-    const path = getDerivationPath(walletIndex)
+    const mode = await getDerivationMode()
+    const path = getDerivationPath(walletIndex, mode)
     const provider = client.getProvider()
     const signer = new LedgerSigner({ provider, path, app })
 

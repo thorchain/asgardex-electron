@@ -107,7 +107,9 @@ const common: CommonMessages = {
   'common.custom': 'Вручную',
   'common.notsupported.fornetwork': 'Not supported for {network} - RU',
   'common.recipient': 'Получатель',
-  'common.sender': 'Sender - RU'
+  'common.sender': 'Sender - RU',
+  'common.legacy': 'Legacy - RU',
+  'common.ledgerlive': 'Ledger Live - RU'
 }
 
 export default common

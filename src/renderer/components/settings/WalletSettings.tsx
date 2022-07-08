@@ -18,13 +18,15 @@ import {
   TerraChain,
   chainToString
 } from '@xchainjs/xchain-util'
-import { Col, List, Collapse, Row } from 'antd'
+import { Col, List, Collapse, Row, RadioChangeEvent } from 'antd'
 import * as FP from 'fp-ts/function'
 import * as A from 'fp-ts/lib/Array'
 import * as O from 'fp-ts/lib/Option'
 import { FormattedMessage, useIntl } from 'react-intl'
 
 import { Network } from '../../../shared/api/types'
+import { getDerivationPath as getEthDerivationPath } from '../../../shared/ethereum/ledger'
+import { EthDerivationMode } from '../../../shared/ethereum/types'
 import { isLedgerWallet } from '../../../shared/utils/guard'
 import { ReactComponent as UnlockOutlined } from '../../assets/svg/icon-unlock-warning.svg'
 import { WalletPasswordConfirmationModal } from '../../components/modal/confirmation'
@@ -32,6 +34,7 @@ import { RemoveWalletConfirmationModal } from '../../components/modal/confirmati
 import { AssetIcon } from '../../components/uielements/assets/assetIcon/AssetIcon'
 import { QRCodeModal } from '../../components/uielements/qrCodeModal/QRCodeModal'
 import { PhraseCopyModal } from '../../components/wallet/phrase/PhraseCopyModal'
+import { updateEthDerivationMode } from '../../contexts/EthereumContext'
 import {
   getChainAsset,
   isBchChain,
@@ -49,6 +52,7 @@ import { isEnabledWallet } from '../../helpers/walletHelper'
 import { ValidatePasswordHandler, WalletAccounts, WalletAddressAsync } from '../../services/wallet/types'
 import { walletTypeToI18n } from '../../services/wallet/util'
 import { AttentionIcon } from '../icons'
+import * as StyledR from '../shared/form/Radio.styles'
 import { InfoIcon } from '../uielements/info'
 import { Modal } from '../uielements/modal'
 import * as CStyled from './Common.styles'
@@ -69,6 +73,8 @@ type Props = {
   validatePassword$: ValidatePasswordHandler
   collapsed: boolean
   toggleCollapse: FP.Lazy<void>
+  ethDerivationMode: EthDerivationMode
+  updateEthDerivationMode: (mode: EthDerivationMode) => void
 }
 
 type AddressToVerify = O.Option<{ address: Address; chain: Chain }>
@@ -88,7 +94,8 @@ export const WalletSettings: React.FC<Props> = (props): JSX.Element => {
     clickAddressLinkHandler,
     validatePassword$,
     collapsed,
-    toggleCollapse
+    toggleCollapse,
+    ethDerivationMode
   } = props
 
   const intl = useIntl()
@@ -176,35 +183,69 @@ export const WalletSettings: React.FC<Props> = (props): JSX.Element => {
         }
       }
 
+      const onChangeEthDerivationMode = (e: RadioChangeEvent) => {
+        updateEthDerivationMode(e.target.value as EthDerivationMode)
+      }
+
       const renderAddLedger = (chain: Chain, loading: boolean) => (
-        <Styled.AddLedgerContainer>
-          <Styled.AddLedgerButton loading={loading} onClick={() => addLedgerAddress(chain, walletIndexMap[chain])}>
-            <Styled.AddLedgerIcon /> {intl.formatMessage({ id: 'ledger.add.device' })}
-          </Styled.AddLedgerButton>
-          {(isBnbChain(chain) ||
-            isThorChain(chain) ||
-            isBtcChain(chain) ||
-            isLtcChain(chain) ||
-            isBchChain(chain) ||
-            isDogeChain(chain) ||
-            isTerraChain(chain) ||
-            isEthChain(chain) ||
-            isCosmosChain(chain)) && (
-            <>
-              <Styled.IndexLabel>{intl.formatMessage({ id: 'setting.wallet.index' })}</Styled.IndexLabel>
-              <Styled.WalletIndexInput
-                value={walletIndexMap[chain].toString()}
-                pattern="[0-9]+"
-                onChange={(value) =>
-                  value !== null && +value >= 0 && setWalletIndexMap({ ...walletIndexMap, [chain]: +value })
-                }
-                style={{ width: 60 }}
-                onPressEnter={() => addLedgerAddress(chain, walletIndexMap[chain])}
-              />
-              <InfoIcon tooltip={intl.formatMessage({ id: 'setting.wallet.index.info' })} />
-            </>
+        <Styled.AddLedgerWrapper>
+          <Styled.AddLedgerContainer>
+            <Styled.AddLedgerButton loading={loading} onClick={() => addLedgerAddress(chain, walletIndexMap[chain])}>
+              <Styled.AddLedgerIcon /> {intl.formatMessage({ id: 'ledger.add.device' })}
+            </Styled.AddLedgerButton>
+            {(isBnbChain(chain) ||
+              isThorChain(chain) ||
+              isBtcChain(chain) ||
+              isLtcChain(chain) ||
+              isBchChain(chain) ||
+              isDogeChain(chain) ||
+              isTerraChain(chain) ||
+              isEthChain(chain) ||
+              isCosmosChain(chain)) && (
+              <>
+                <Styled.IndexLabel>{intl.formatMessage({ id: 'setting.wallet.index' })}</Styled.IndexLabel>
+                <Styled.WalletIndexInput
+                  value={walletIndexMap[chain].toString()}
+                  pattern="[0-9]+"
+                  onChange={(value) =>
+                    value !== null && +value >= 0 && setWalletIndexMap({ ...walletIndexMap, [chain]: +value })
+                  }
+                  style={{ width: 60 }}
+                  onPressEnter={() => addLedgerAddress(chain, walletIndexMap[chain])}
+                />
+                <InfoIcon tooltip={intl.formatMessage({ id: 'setting.wallet.index.info' })} />
+              </>
+            )}
+          </Styled.AddLedgerContainer>
+          {isEthChain(chain) && (
+            <Styled.EthDerivationModeContainer>
+              <Styled.EthDerivationModeRadioGroup onChange={onChangeEthDerivationMode} value={ethDerivationMode}>
+                <StyledR.Radio value="ledgerlive" key="ledgerlive">
+                  <Styled.EthDerivationModeRadioLabel>
+                    {intl.formatMessage({ id: 'common.ledgerlive' })}
+                    <InfoIcon
+                      tooltip={intl.formatMessage(
+                        { id: 'setting.wallet.hdpath.ledgerlive.info' },
+                        { path: getEthDerivationPath(walletIndexMap[ETHChain], 'ledgerlive') }
+                      )}
+                    />
+                  </Styled.EthDerivationModeRadioLabel>
+                </StyledR.Radio>
+                <StyledR.Radio value="legacy" key="legacy">
+                  <Styled.EthDerivationModeRadioLabel>
+                    {intl.formatMessage({ id: 'common.legacy' })}
+                    <InfoIcon
+                      tooltip={intl.formatMessage(
+                        { id: 'setting.wallet.hdpath.legacy.info' },
+                        { path: getEthDerivationPath(walletIndexMap[ETHChain], 'legacy') }
+                      )}
+                    />
+                  </Styled.EthDerivationModeRadioLabel>
+                </StyledR.Radio>
+              </Styled.EthDerivationModeRadioGroup>
+            </Styled.EthDerivationModeContainer>
           )}
-        </Styled.AddLedgerContainer>
+        </Styled.AddLedgerWrapper>
       )
 
       // Render addresses depending on its loading status
@@ -245,6 +286,7 @@ export const WalletSettings: React.FC<Props> = (props): JSX.Element => {
       )
     },
     [
+      ethDerivationMode,
       verifyLedgerAddress,
       rejectLedgerAddress,
       intl,

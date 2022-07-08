@@ -6,6 +6,7 @@ import { Chain } from '@xchainjs/xchain-util'
 import { Either } from 'fp-ts/lib/Either'
 import * as O from 'fp-ts/Option'
 
+import { EthDerivationMode } from '../ethereum/types'
 import { Locale } from '../i18n/types'
 import { WalletAddress } from '../wallet/types'
 import { PoolsStorageEncoded } from './io'
@@ -13,7 +14,7 @@ import { PoolsStorageEncoded } from './io'
 // A version number starting from `1` to avoid to load deprecated files
 export type StorageVersion = { version: string }
 export type UserNodesStorage = Readonly<Record<Network, Address[]> & StorageVersion>
-export type CommonStorage = Readonly<{ locale: Locale } & StorageVersion>
+export type CommonStorage = Readonly<{ locale: Locale; ethDerivationMode: EthDerivationMode } & StorageVersion>
 
 /**
  * Hash map of common store files

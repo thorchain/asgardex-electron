@@ -1,6 +1,6 @@
 import { PoolsStorageEncoded } from './api/io'
 import { StoreFilesContent, UserNodesStorage } from './api/types'
-import { Locale } from './i18n/types'
+import { DEFAULT_LOCALE } from './i18n/const'
 
 export enum ExternalUrl {
   WEBSITE = 'https://thorchain.org',
@@ -40,7 +40,7 @@ const COMMON_STORAGE_VERSION = '1'
  * public api for it at src/main/preload.ts
  */
 export const DEFAULT_STORAGES: StoreFilesContent = {
-  common: { version: COMMON_STORAGE_VERSION, locale: Locale.EN },
+  common: { version: COMMON_STORAGE_VERSION, locale: DEFAULT_LOCALE, ethDerivationMode: 'ledgerlive' },
   userNodes: USER_NODES_STORAGE_DEFAULT,
   pools: POOLS_STORAGE_DEFAULT
 }
