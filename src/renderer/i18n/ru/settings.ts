@@ -15,7 +15,9 @@ const settings: SettingMessages = {
   'setting.notconnected': 'Нет соединения',
   'setting.add.device': 'Добавить устройство',
   'setting.wallet.index': 'Индекс',
-  'setting.wallet.index.info': 'Введите индекс Ledger адреса, который вы хотите использовать'
+  'setting.wallet.index.info': 'Введите индекс Ledger адреса, который вы хотите использовать',
+  'setting.wallet.hdpath.legacy.info': 'Legacy derivation path {path} - RU',
+  'setting.wallet.hdpath.ledgerlive.info': 'Ledger Live derivation path {path} - RU'
 }
 
 export default settings

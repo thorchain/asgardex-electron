@@ -1,12 +1,16 @@
 # 1.17.1 (2022-07-xx)
 
-## Fix
+## Add
 
-- [Ledger] THORChain tx does not send, but failed silently w/o error [#2310](https://github.com/thorchain/asgardex-electron/issues/2310)
+- [Ledger] ETH needs an option to select different derivation paths (`Legacy` vs. `LedgerLive`) [#2309](https://github.com/thorchain/asgardex-electron/issues/2309)
 
 ## Update
 
 - Remove TERRA from supported pools [#2312](https://github.com/thorchain/asgardex-electron/issues/2312)
+
+## Fix
+
+- [Ledger] THORChain tx does not send, but failed silently w/o error [#2310](https://github.com/thorchain/asgardex-electron/issues/2310)
 
 # 1.17.0 (2022-07-01)
 

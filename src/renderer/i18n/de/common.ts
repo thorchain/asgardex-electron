@@ -107,7 +107,9 @@ const common: CommonMessages = {
   'common.custom': 'Benutzerdefiniert',
   'common.notsupported.fornetwork': 'Nicht unterstützt für {network}',
   'common.recipient': 'Empfänger',
-  'common.sender': 'Absender'
+  'common.sender': 'Absender',
+  'common.legacy': 'Veraltet',
+  'common.ledgerlive': 'Ledger Live'
 }
 
 export default common

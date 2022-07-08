@@ -108,6 +108,8 @@ export type CommonMessageKey =
   | 'common.notsupported.fornetwork'
   | 'common.recipient'
   | 'common.sender'
+  | 'common.legacy'
+  | 'common.ledgerlive'
 
 export type CommonMessages = {
   [key in CommonMessageKey]: string
@@ -308,6 +310,8 @@ type SettingMessageKey =
   | 'setting.add.device'
   | 'setting.wallet.index'
   | 'setting.wallet.index.info'
+  | 'setting.wallet.hdpath.legacy.info'
+  | 'setting.wallet.hdpath.ledgerlive.info'
 
 export type SettingMessages = { [key in SettingMessageKey]: string }
 

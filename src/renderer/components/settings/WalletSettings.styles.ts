@@ -260,10 +260,37 @@ export const RemoveLedgerIcon = styled(RemoveIcon)`
   height: ${ICON_SIZE}px;
 `
 
-export const AddLedgerContainer = styled('div')`
+export const AddLedgerWrapper = styled.div`
   display: flex;
+  flex-direction: column;
+  width: 100%;
+
+  ${media.md`
   flex-direction: row;
+  width: auto;
+  `}
+`
+
+export const AddLedgerContainer = styled.div`
+  display: flex;
   align-items: center;
+  margin-right: 30px;
+
+  ${media.md`
+  margin-right: 0;
+  `}
+`
+
+export const EthDerivationModeContainer = styled.div`
+  display: flex;
+  align-items: center;
+  padding-left: 0;
+  padding-top: 10px;
+
+  ${media.md`
+  padding-top: 0;
+  padding-left: 30px;
+  `}
 `
 
 export const IndexLabel = styled('div')`

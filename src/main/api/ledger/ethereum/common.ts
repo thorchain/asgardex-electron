@@ -1,4 +1,8 @@
-// TODO(@veado) Extend`xchain-ethereum` to get derivation path from it
-// Similar to default values in `Client` of `xchain-ethereum`
-// see https://github.com/xchainjs/xchainjs-lib/blob/master/packages/xchain-ethereum/src/client.ts#L121-L125
-export const getDerivationPath = (walletIndex: number): string => `m/44'/60'/0'/0/${walletIndex}`
+import { DEFAULT_STORAGES } from '../../../../shared/const'
+import { EthDerivationMode } from '../../../../shared/ethereum/types'
+import { getFileContent as getFileStore } from '../../fileStore'
+
+export const getDerivationMode = async (): Promise<EthDerivationMode> => {
+  const { ethDerivationMode } = await getFileStore('common', DEFAULT_STORAGES.common)
+  return ethDerivationMode
+}

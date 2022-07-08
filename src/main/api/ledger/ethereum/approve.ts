@@ -8,8 +8,9 @@ import { getEthplorerCreds } from '../../../../shared/api/ethplorer'
 import { getInfuraCreds } from '../../../../shared/api/infura'
 import { IPCLedgerApproveERC20TokenParams } from '../../../../shared/api/io'
 import { DEFAULT_APPROVE_GAS_LIMIT_FALLBACK, FEE_BOUNDS } from '../../../../shared/ethereum/const'
+import { getDerivationPath } from '../../../../shared/ethereum/ledger'
 import { toClientNetwork } from '../../../../shared/utils/client'
-import { getDerivationPath } from './common'
+import { getDerivationMode } from './common'
 import { LedgerSigner } from './LedgerSigner'
 
 export const approveLedgerERC20Token = async ({
@@ -34,7 +35,8 @@ export const approveLedgerERC20Token = async ({
 
   const transport = await TransportNodeHidSingleton.open()
   const app = new EthApp(transport)
-  const path = getDerivationPath(walletIndex)
+  const mode = await getDerivationMode()
+  const path = getDerivationPath(walletIndex, mode)
   const provider = client.getProvider()
   const signer = new LedgerSigner({ provider, path, app })
 
