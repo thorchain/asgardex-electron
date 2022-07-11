@@ -1,8 +1,8 @@
-# 1.17.1 (2022-07-xx)
+# 1.17.1 (2022-07-11)
 
 ## Add
 
-- [Ledger] ETH needs an option to select different derivation paths (`Legacy` vs. `LedgerLive`) [#2309](https://github.com/thorchain/asgardex-electron/issues/2309)
+- [Ledger] ETH needs an option to select different derivation paths (`Legacy` vs. `LedgerLive`) [#2316](https://github.com/thorchain/asgardex-electron/pull/2316)
 
 ## Update
 
