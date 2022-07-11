@@ -9,6 +9,7 @@ import {
   DOGEChain,
   ETHChain,
   LTCChain,
+  TerraChain,
   PolkadotChain,
   THORChain
 } from '@xchainjs/xchain-util'
@@ -17,19 +18,21 @@ import * as O from 'fp-ts/lib/Option'
 import * as Rx from 'rxjs'
 
 import { DEFAULT_FEE_OPTION } from '../../../components/wallet/txs/send/Send.const'
-import { liveData } from '../../../helpers/rx/liveData'
+import { LiveData, liveData } from '../../../helpers/rx/liveData'
 import * as BNB from '../../binance'
 import * as BTC from '../../bitcoin'
 import * as BCH from '../../bitcoincash'
+import * as COSMOS from '../../cosmos'
 import * as DOGE from '../../doge'
 import * as ETH from '../../ethereum'
 import * as LTC from '../../litecoin'
+import * as TERRA from '../../terra'
 import * as THOR from '../../thorchain'
-import { ErrorId, TxHashLD, TxLD } from '../../wallet/types'
+import { ApiError, ErrorId, TxHashLD, TxLD } from '../../wallet/types'
 import { SendPoolTxParams, SendTxParams } from '../types'
 
 // helper to create `RemoteData<ApiError, never>` observable
-const txFailure$ = (msg: string) =>
+const txFailure$ = (msg: string): LiveData<ApiError, never> =>
   Rx.of(
     RD.failure({
       errorId: ErrorId.SEND_TX,
@@ -45,7 +48,10 @@ export const sendTx$ = ({
   amount,
   memo,
   feeOption = DEFAULT_FEE_OPTION,
-  walletIndex
+  walletIndex,
+  feeAsset,
+  gasLimit,
+  feeAmount
 }: SendTxParams): TxHashLD => {
   switch (asset.chain) {
     case BNBChain:
@@ -58,22 +64,41 @@ export const sendTx$ = ({
           errorId: ErrorId.GET_FEES,
           msg: error?.message ?? error.toString()
         })),
-        liveData.chain(({ rates }) => BTC.sendTx({ recipient, amount, feeRate: rates[feeOption], memo, walletIndex }))
+        liveData.chain(({ rates }) =>
+          BTC.sendTx({ walletType, recipient, amount, feeRate: rates[feeOption], memo, walletIndex, sender })
+        )
       )
 
     case ETHChain:
-      return ETH.sendTx({ asset, recipient, amount, memo, feeOption, walletIndex })
+      return ETH.sendTx({ walletType, asset, recipient, amount, memo, feeOption, walletIndex })
 
     case THORChain:
       return THOR.sendTx({ walletType, amount, asset, memo, recipient, walletIndex })
 
     case CosmosChain:
-      // not available yet
-      return txFailure$(`sendTx$ has not been implemented for Cosmos yet`)
+      return FP.pipe(
+        COSMOS.fees$(),
+        liveData.mapLeft((error) => ({
+          errorId: ErrorId.GET_FEES,
+          msg: error?.message ?? error.toString()
+        })),
+        liveData.chain((fees) =>
+          // fees for COSMOS are FLAT fees for now - different `feeOption` based still on same fee amount
+          // If needed, we can change it later to have fee options (similar to Keplr wallet - search for `gasPriceStep` there)
+          COSMOS.sendTx({ walletType, sender, recipient, amount, asset, memo, walletIndex, feeAmount: fees[feeOption] })
+        )
+      )
 
     case PolkadotChain:
       // not available yet
       return txFailure$(`sendTx$ has not been implemented for Polkadot yet`)
+
+    case TerraChain:
+      if (!feeAmount) return txFailure$('Missing `feeAmount` - needed to transfer TERRA tx')
+      if (!feeAsset) return txFailure$('Missing `feeAsset` - needed to transfer TERRA tx')
+      if (!gasLimit) return txFailure$('Missing `gasLimit` - needed to transfer TERRA tx')
+
+      return TERRA.sendTx({ walletType, amount, asset, memo, recipient, walletIndex, feeAmount, feeAsset, gasLimit })
 
     case DOGEChain:
       return FP.pipe(
@@ -83,7 +108,9 @@ export const sendTx$ = ({
           errorId: ErrorId.GET_FEES,
           msg: error?.message ?? error.toString()
         })),
-        liveData.chain(({ rates }) => DOGE.sendTx({ recipient, amount, feeRate: rates[feeOption], memo, walletIndex }))
+        liveData.chain(({ rates }) =>
+          DOGE.sendTx({ walletType, recipient, amount, feeRate: rates[feeOption], memo, walletIndex, sender })
+        )
       )
 
     case BCHChain:
@@ -93,7 +120,9 @@ export const sendTx$ = ({
           errorId: ErrorId.GET_FEES,
           msg: error?.message ?? error.toString()
         })),
-        liveData.chain(({ rates }) => BCH.sendTx({ recipient, amount, feeRate: rates[feeOption], memo, walletIndex }))
+        liveData.chain(({ rates }) =>
+          BCH.sendTx({ walletType, recipient, amount, feeRate: rates[feeOption], memo, walletIndex, sender })
+        )
       )
     case LTCChain:
       return FP.pipe(
@@ -103,7 +132,7 @@ export const sendTx$ = ({
           msg: error?.message ?? error.toString()
         })),
         liveData.chain(({ rates }) => {
-          return LTC.sendTx({ recipient, amount, asset, memo, feeRate: rates[feeOption], walletIndex })
+          return LTC.sendTx({ walletType, recipient, amount, feeRate: rates[feeOption], memo, walletIndex, sender })
         })
       )
   }
@@ -122,18 +151,22 @@ export const sendPoolTx$ = ({
 }: SendPoolTxParams): TxHashLD => {
   switch (asset.chain) {
     case ETHChain:
-      // TODO(@asgdx-team) Support `walletType`to provide Ledger & Co.
       return ETH.sendPoolTx$({
+        walletType,
         router,
         recipient,
         asset,
         amount,
         memo,
-        walletIndex
+        walletIndex,
+        feeOption
       })
 
     case THORChain:
       return THOR.sendPoolTx$({ walletType, amount, asset, memo, walletIndex })
+
+    case TerraChain:
+      return TERRA.sendPoolTx$({ walletType, amount, asset, memo, recipient, walletIndex })
 
     default:
       return sendTx$({ sender, walletType, asset, recipient, amount, memo, feeOption, walletIndex })
@@ -141,7 +174,7 @@ export const sendPoolTx$ = ({
 }
 
 // helper to create `RemoteData<ApiError, never>` observable
-const txStatusFailure$ = (msg: string) =>
+const txStatusFailure$ = (msg: string): LiveData<ApiError, never> =>
   Rx.of(
     RD.failure({
       errorId: ErrorId.GET_TX,
@@ -160,9 +193,11 @@ export const txStatusByChain$ = ({ txHash, chain }: { txHash: TxHash; chain: Cha
     case THORChain:
       return THOR.txStatus$(txHash, O.none)
     case CosmosChain:
-      return txStatusFailure$(`txStatusByChain$ has not been implemented for Cosmos`)
+      return COSMOS.txStatus$(txHash, O.none)
     case PolkadotChain:
       return txStatusFailure$(`txStatusByChain$ has not been implemented for Polkadot`)
+    case TerraChain:
+      return TERRA.txStatus$(txHash, O.none)
     case DOGEChain:
       return DOGE.txStatus$(txHash, O.none)
     case BCHChain:

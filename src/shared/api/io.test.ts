@@ -1,11 +1,48 @@
-import { AssetBNB, baseAmount, BNBChain } from '@xchainjs/xchain-util'
+import { FeeOption } from '@xchainjs/xchain-client'
+import { AssetBNB, AssetRuneNative, baseAmount, BNBChain } from '@xchainjs/xchain-util'
 import * as E from 'fp-ts/lib/Either'
 import * as FP from 'fp-ts/lib/function'
 
+import { ZERO_BASE_AMOUNT } from '../../renderer/const'
 import { eqBaseAmount } from '../../renderer/helpers/fp/eq'
-import { BaseAmountEncoded, baseAmountIO, ipcLedgerSendTxParamsIO } from './io'
+import { BaseAmountEncoded, baseAmountIO, ipcLedgerSendTxParamsIO, isBaseAmountEncoded, poolsWatchListsIO } from './io'
 
 describe('shared/io', () => {
+  describe('isBaseAmountEncoded', () => {
+    it('true', () => {
+      const encoded = {
+        amount: '1',
+        decimal: 10
+      }
+      expect(isBaseAmountEncoded(encoded)).toBeTruthy()
+    })
+    it('false - no amount', () => {
+      const encoded = {
+        decimal: 10
+      }
+      expect(isBaseAmountEncoded(encoded)).toBeFalsy()
+    })
+    it('false - no decimal', () => {
+      const encoded = {
+        amount: '1'
+      }
+      expect(isBaseAmountEncoded(encoded)).toBeFalsy()
+    })
+    it('false misc.', () => {
+      expect(isBaseAmountEncoded(null)).toBeFalsy()
+      expect(isBaseAmountEncoded(undefined)).toBeFalsy()
+      expect(isBaseAmountEncoded(1)).toBeFalsy()
+      expect(isBaseAmountEncoded(true)).toBeFalsy()
+      expect(isBaseAmountEncoded(false)).toBeFalsy()
+      expect(isBaseAmountEncoded('')).toBeFalsy()
+      expect(isBaseAmountEncoded('hello-world')).toBeFalsy()
+      expect(
+        isBaseAmountEncoded({
+          hello: 'world'
+        })
+      ).toBeFalsy()
+    })
+  })
   describe('baseAmountIO', () => {
     it('encode BaseAmount', () => {
       const encoded = baseAmountIO.encode(baseAmount(1, 18))
@@ -35,23 +72,64 @@ describe('shared/io', () => {
         chain: BNBChain,
         network: 'mainnet',
         asset: AssetBNB,
+        feeAsset: AssetBNB,
         amount: baseAmount(10),
         sender: 'address-abc',
         recipient: 'address-abc',
         memo: 'memo-abc',
-        walletIndex: 0
+        walletIndex: 0,
+        feeRate: 1,
+        feeOption: FeeOption.Fast,
+        feeAmount: baseAmount(1, 6)
       })
       expect(encoded).toEqual({
         chain: 'BNB',
         network: 'mainnet',
         asset: 'BNB.BNB',
+        feeAsset: 'BNB.BNB',
         amount: { amount: '10', decimal: 8 },
         sender: 'address-abc',
         recipient: 'address-abc',
         memo: 'memo-abc',
-        walletIndex: 0
+        walletIndex: 0,
+        feeRate: 1,
+        feeOption: 'fast',
+        feeAmount: { amount: '1', decimal: 6 }
       })
     })
+
+    it('encode IPCLedgerSendTxParams - undefined fee option / fee amount', () => {
+      const encoded = ipcLedgerSendTxParamsIO.encode({
+        chain: BNBChain,
+        network: 'mainnet',
+        asset: AssetBNB,
+        feeAsset: AssetBNB,
+        amount: baseAmount(10),
+        sender: 'address-abc',
+        recipient: 'address-abc',
+        memo: 'memo-abc',
+        walletIndex: 0,
+        feeRate: 1,
+        feeOption: undefined,
+        feeAmount: undefined
+      })
+
+      expect(encoded).toEqual({
+        chain: 'BNB',
+        network: 'mainnet',
+        asset: 'BNB.BNB',
+        feeAsset: 'BNB.BNB',
+        amount: { amount: '10', decimal: 8 },
+        sender: 'address-abc',
+        recipient: 'address-abc',
+        memo: 'memo-abc',
+        walletIndex: 0,
+        feeRate: 1,
+        feeOption: undefined,
+        feeAmount: undefined
+      })
+    })
+
     it('decode IPCLedgerSendTxParams', () => {
       const encoded = {
         chain: 'BNB',
@@ -61,7 +139,9 @@ describe('shared/io', () => {
         sender: 'address-abc',
         recipient: 'address-abc',
         memo: 'memo-abc',
-        walletIndex: 0
+        walletIndex: 0,
+        feeRate: 1,
+        feeAmount: { amount: '1', decimal: 6 }
       }
       const decoded = ipcLedgerSendTxParamsIO.decode(encoded)
       expect(E.isRight(decoded)).toBeTruthy()
@@ -78,9 +158,55 @@ describe('shared/io', () => {
             expect(r.asset).toEqual(AssetBNB)
             expect(eqBaseAmount.equals(r.amount, baseAmount(10, 8))).toBeTruthy()
             expect(r.memo).toEqual('memo-abc')
+            expect(r.feeRate).toEqual(1)
+            expect(eqBaseAmount.equals(r?.feeAmount ?? ZERO_BASE_AMOUNT, baseAmount(1, 6))).toBeTruthy()
           }
         )
       )
+    })
+    it('decode IPCLedgerSendTxParams - feeAmount undefined', () => {
+      const encoded = {
+        chain: 'BNB',
+        network: 'mainnet',
+        asset: 'BNB.BNB',
+        amount: { amount: '10', decimal: 8 },
+        sender: 'address-abc',
+        recipient: 'address-abc',
+        memo: 'memo-abc',
+        walletIndex: 0,
+        feeRate: 1,
+        feeAmount: undefined
+      }
+      const decoded = ipcLedgerSendTxParamsIO.decode(encoded)
+      expect(E.isRight(decoded)).toBeTruthy()
+
+      FP.pipe(
+        decoded,
+        E.fold(
+          (error) => {
+            fail(error)
+          },
+          (r) => {
+            expect(r?.feeAmount).toBeUndefined()
+          }
+        )
+      )
+    })
+  })
+
+  describe('poolWatchListsIO', () => {
+    it('encode', () => {
+      const encoded = poolsWatchListsIO.encode({
+        testnet: [AssetBNB],
+        stagenet: [],
+        mainnet: [AssetRuneNative]
+      })
+
+      expect(encoded).toEqual({
+        testnet: ['BNB.BNB'],
+        mainnet: ['THOR.RUNE'],
+        stagenet: []
+      })
     })
   })
 })

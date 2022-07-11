@@ -4,11 +4,13 @@ import * as RD from '@devexperts/remote-data-ts'
 import { Grid } from 'antd'
 import * as FP from 'fp-ts/function'
 import * as O from 'fp-ts/Option'
+import { useIntl } from 'react-intl'
 
 import { Network } from '../../../shared/api/types'
 import { OpenExplorerTxUrl } from '../../services/clients'
 import { Action, ActionsPage, ActionsPageRD } from '../../services/midgard/types'
 import { ErrorView } from '../shared/error'
+import { Button } from '../uielements/button'
 import { Pagination } from '../uielements/pagination'
 import { TxDetail } from '../uielements/txDetail'
 import { DEFAULT_PAGE_SIZE } from './PoolActionsHistory.const'
@@ -22,6 +24,7 @@ type Props = {
   prevHistoryPage?: O.Option<ActionsPage>
   openExplorerTxUrl: OpenExplorerTxUrl
   changePaginationHandler: (page: number) => void
+  reloadHistory: FP.Lazy<void>
   className?: string
 }
 
@@ -32,9 +35,12 @@ export const PoolActionsHistoryList: React.FC<Props> = ({
   prevHistoryPage = O.none,
   openExplorerTxUrl: goToTx,
   currentPage,
+  reloadHistory,
   className
 }) => {
   const isDesktopView = Grid.useBreakpoint()?.lg ?? false
+
+  const intl = useIntl()
 
   const renderListItem = useCallback(
     (action: Action, index: number, goToTx: OpenExplorerTxUrl) => {
@@ -112,7 +118,13 @@ export const PoolActionsHistoryList: React.FC<Props> = ({
             )
             return renderList(data, true)
           },
-          ({ msg }) => <ErrorView key="error view" title={msg} />,
+          ({ msg }) => (
+            <ErrorView
+              title={intl.formatMessage({ id: 'common.error' })}
+              subTitle={msg}
+              extra={<Button onClick={reloadHistory}>{intl.formatMessage({ id: 'common.retry' })}</Button>}
+            />
+          ),
           renderList
         )
       )}

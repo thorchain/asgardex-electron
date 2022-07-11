@@ -8,8 +8,7 @@ import {
   AssetETH,
   AssetLTC,
   AssetBTC,
-  AssetBCH,
-  ETHChain
+  AssetBCH
 } from '@xchainjs/xchain-util'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
@@ -28,7 +27,8 @@ import {
   filterTableData,
   minPoolTxAmountUSD,
   stringToGetPoolsStatus,
-  isEmptyPool
+  isEmptyPool,
+  FilterTableData
 } from './Pools.utils'
 
 describe('views/pools/utils', () => {
@@ -38,6 +38,7 @@ describe('views/pools/utils', () => {
       assetDepth: '11000000000',
       runeDepth: '10000000000',
       volume24h: '10000000000',
+      poolAPY: '0.02',
       status: GetPoolsStatusEnum.Staged
     } as PoolDetail
 
@@ -57,13 +58,16 @@ describe('views/pools/utils', () => {
         volumePrice: assetToBase(assetAmount(1000)),
         status: GetPoolsStatusEnum.Available,
         deepest: false,
+        apy: 2,
         key: 'hi',
-        network: 'testnet'
+        network: 'testnet',
+        watched: false
       }
 
       const result = getPoolTableRowData({
         poolDetail: lokPoolDetail,
         pricePoolData: pricePoolData,
+        watchlist: [],
         network: 'testnet'
       })
 
@@ -75,6 +79,7 @@ describe('views/pools/utils', () => {
           expect(data.pool).toEqual(expected.pool)
           expect(data.depthPrice.eq(expected.depthPrice)).toBeTruthy()
           expect(data.volumePrice.eq(expected.volumePrice)).toBeTruthy()
+          expect(data.apy).toEqual(expected.apy)
           return true
         })
       )
@@ -128,7 +133,7 @@ describe('views/pools/utils', () => {
   })
 
   describe('filterTableData', () => {
-    const tableData = [
+    const tableData: FilterTableData[] = [
       {
         pool: {
           asset: AssetRuneNative,
@@ -182,6 +187,12 @@ describe('views/pools/utils', () => {
           asset: AssetRuneNative,
           target: AssetETH
         }
+      },
+      {
+        pool: {
+          asset: AssetRuneNative,
+          target: { chain: BNBChain, symbol: 'BNB.ETH-1C9', ticker: 'ETH', synth: false }
+        }
       }
     ] as PoolTableRowData[]
 
@@ -190,8 +201,8 @@ describe('views/pools/utils', () => {
       expect(filterTableData(O.none)(tableData)).toEqual(tableData)
     })
 
-    it('should return only chain-based pools', () => {
-      expect(filterTableData(O.some('base'))(tableData)).toEqual([
+    it('base', () => {
+      expect(filterTableData(O.some('__base__'))(tableData)).toEqual([
         tableData[0],
         tableData[1],
         tableData[2],
@@ -200,21 +211,18 @@ describe('views/pools/utils', () => {
       ])
     })
 
-    it('should return BNB assets', () => {
-      expect(filterTableData(O.some(BNBChain))(tableData)).toEqual([tableData[0], tableData[4]])
+    it('bep2', () => {
+      const result = filterTableData(O.some('__bep2__'))(tableData)
+      expect(result).toEqual([tableData[4], tableData[9]])
     })
 
-    it('should return ETH assets', () => {
-      expect(filterTableData(O.some(ETHChain))(tableData)).toEqual([
-        tableData[5],
-        tableData[6],
-        tableData[7],
-        tableData[8]
-      ])
+    it('erc20', () => {
+      const result = filterTableData(O.some('__erc20__'))(tableData)
+      expect(result).toEqual([tableData[5], tableData[6], tableData[7]])
     })
 
-    it('should return USD assets', () => {
-      expect(filterTableData(O.some('usd'))(tableData)).toEqual([tableData[4], tableData[5], tableData[7]])
+    it('usd', () => {
+      expect(filterTableData(O.some('__usd__'))(tableData)).toEqual([tableData[4], tableData[5], tableData[7]])
     })
   })
 

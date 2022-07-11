@@ -11,7 +11,7 @@ export type Props = {
   size?: Size
   color?: Color
   disabled?: boolean
-  weight?: string
+  weight?: 'normal' | 'bold'
   textTransform?: TextTransform
   nowrap?: boolean
   onClick?: (_: React.MouseEvent<HTMLElement>) => void
@@ -55,12 +55,12 @@ const colors: Colors = {
 }
 
 export const LabelWrapper = styled.div<Props>`
-  padding: 10px 0;
+  padding: 0;
   width: 100%;
   white-space: ${({ nowrap = false }) => (nowrap ? 'nowrap' : 'normal')};
   font-size: ${({ size = 'normal' }) => fontSettings[size].size};
   text-transform: ${({ textTransform = 'none' }) => textTransform};
-  font-weight: ${({ weight }) => weight};
+  font-family: ${({ weight }) => (weight === 'bold' ? 'MainFontBold' : 'MainFontRegular')};
   letter-spacing: ${({ size = 'normal' }) => fontSettings[size].spacing};
   color: ${({ color }) => colors[color || 'normal']};
   opacity: ${({ disabled }) => (disabled ? 0.5 : 1)};

@@ -1,6 +1,7 @@
 import React from 'react'
 
-import { boolean } from '@storybook/addon-knobs'
+// TODO (@veado) Replace knobs
+// import { boolean } from '@storybook/addon-knobs'
 import { storiesOf } from '@storybook/react'
 import { AssetBTC, AssetETH, AssetRuneNative } from '@xchainjs/xchain-util'
 import * as O from 'fp-ts/lib/Option'
@@ -13,11 +14,12 @@ const assets: PricePoolAssets = [AssetRuneNative, AssetBTC, AssetETH, AssetBUSDB
 
 storiesOf('Components/HeaderPriceSelector', module).add('desktop / mobile', () => {
   const changeHandler = (asset: PricePoolAsset) => console.log(`changed: ${asset}`)
-  const isDesktopView = boolean('isDesktopView', false)
+  // const isDesktopView = boolean('isDesktopView', false)
   return (
     <HeaderPriceSelector
       assets={assets}
-      isDesktopView={isDesktopView}
+      // isDesktopView={isDesktopView}
+      isDesktopView={true}
       changeHandler={changeHandler}
       selectedAsset={O.some(AssetBUSDBAF)}
     />

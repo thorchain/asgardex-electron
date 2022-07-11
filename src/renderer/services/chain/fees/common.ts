@@ -13,10 +13,10 @@ const {
 } = midgardService
 
 /**
- * Fees for swap txs
+ * Fees for pool txs (swap/deposit/withdraw)
  */
 export const poolFee$ = (asset: Asset): PoolFeeLD => {
-  // special case for RUNE
+  // special case for RUNE - not provided by Midgards `inbound_addresses` endpoint
   if (isRuneNativeAsset(asset)) {
     return FP.pipe(
       THOR.fees$(),

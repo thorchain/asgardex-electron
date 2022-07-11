@@ -7,6 +7,7 @@ import {
   addressUI$,
   reloadBalances,
   balances$,
+  getBalanceByAddress$,
   txRD$,
   reloadFees,
   fees$,
@@ -28,6 +29,7 @@ export type BitcoinContextValue = {
   addressUI$: typeof addressUI$
   reloadBalances: typeof reloadBalances
   balances$: typeof balances$
+  getBalanceByAddress$: typeof getBalanceByAddress$
   reloadFees: typeof reloadFees
   fees$: typeof fees$
   reloadFeesWithRates: typeof reloadFeesWithRates
@@ -49,6 +51,7 @@ const initialContext: BitcoinContextValue = {
   addressUI$,
   reloadBalances,
   balances$,
+  getBalanceByAddress$,
   reloadFees,
   fees$,
   reloadFeesWithRates,
@@ -65,7 +68,7 @@ const initialContext: BitcoinContextValue = {
 
 const BitcoinContext = createContext<BitcoinContextValue | null>(null)
 
-export const BitcoinProvider: React.FC = ({ children }): JSX.Element => {
+export const BitcoinProvider: React.FC<{ children: React.ReactNode }> = ({ children }): JSX.Element => {
   return <BitcoinContext.Provider value={initialContext}>{children}</BitcoinContext.Provider>
 }
 

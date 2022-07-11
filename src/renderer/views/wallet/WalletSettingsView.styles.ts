@@ -147,16 +147,6 @@ export const AccountContent = styled.div`
   margin: 0 40px;
 `
 
-export const AccountPlaceholder = styled(UILabel)`
-  display: block;
-  padding: 0px;
-  margin-top: 3px;
-  color: ${palette('text', 2)};
-  font-family: 'MainFontRegular';
-  font-size: 12px;
-  text-transform: uppercase;
-`
-
 export const AddressContainer = styled.div`
   display: flex;
   flex-direction: row;

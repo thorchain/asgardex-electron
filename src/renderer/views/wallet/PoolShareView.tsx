@@ -4,6 +4,7 @@ import { SyncOutlined } from '@ant-design/icons'
 import * as RD from '@devexperts/remote-data-ts'
 import { Address } from '@xchainjs/xchain-client'
 import { Asset, Chain, THORChain } from '@xchainjs/xchain-util'
+import { Row } from 'antd'
 import * as A from 'fp-ts/Array'
 import * as FP from 'fp-ts/function'
 import * as O from 'fp-ts/Option'
@@ -16,7 +17,8 @@ import { Network } from '../../../shared/api/types'
 import { PoolShares as PoolSharesTable } from '../../components/PoolShares'
 import { PoolShareTableRowData } from '../../components/PoolShares/PoolShares.types'
 import { ErrorView } from '../../components/shared/error'
-import { Button } from '../../components/uielements/button'
+import { Button, RefreshButton } from '../../components/uielements/button'
+import { AssetsNav, TotalValue } from '../../components/wallet/assets'
 import { useChainContext } from '../../contexts/ChainContext'
 import { useMidgardContext } from '../../contexts/MidgardContext'
 import { useWalletContext } from '../../contexts/WalletContext'
@@ -29,21 +31,32 @@ import { useNetwork } from '../../hooks/useNetwork'
 import { WalletAddress$ } from '../../services/clients/types'
 import { ENABLED_CHAINS } from '../../services/const'
 import { PoolSharesRD } from '../../services/midgard/types'
-import { getPoolShareTableData } from './PoolShareView.helper'
+import { BaseAmountRD } from '../../types'
+import * as H from './PoolShareView.helper'
 
 export const PoolShareView: React.FC = (): JSX.Element => {
   const intl = useIntl()
 
   const { network } = useNetwork()
 
-  const { service: midgardService } = useMidgardContext()
   const {
-    // TODO (@asgardex-team) Improve loading of pool details - no need to load all data
-    // @see https://github.com/thorchain/asgardex-electron/issues/1205
-    pools: { allPoolDetails$, selectedPricePool$, selectedPricePoolAsset$, reloadAllPools, haltedChains$ },
-    reloadNetworkInfo,
-    shares: { symSharesByAddresses$ }
-  } = midgardService
+    service: {
+      pools: {
+        allPoolDetails$,
+        poolsState$,
+        selectedPricePool$,
+        selectedPricePoolAsset$,
+        reloadAllPools,
+        haltedChains$
+      },
+      reloadNetworkInfo,
+      shares: { allSharesByAddresses$, reloadAllSharesByAddresses }
+    }
+  } = useMidgardContext()
+
+  const selectedPricePool = useObservableState(selectedPricePool$, RUNE_PRICE_POOL)
+
+  const poolsRD = useObservableState(poolsState$, RD.pending)
 
   const { addressByChain$ } = useChainContext()
 
@@ -59,7 +72,7 @@ export const PoolShareView: React.FC = (): JSX.Element => {
     O.none
   )
 
-  const [symSharesRD]: [PoolSharesRD, unknown] = useObservableState(() => {
+  const [allSharesRD, networkUpdated] = useObservableState<PoolSharesRD, Network>((network$) => {
     // keystore addresses
     const addresses$: WalletAddress$[] = FP.pipe(
       ENABLED_CHAINS,
@@ -68,17 +81,18 @@ export const PoolShareView: React.FC = (): JSX.Element => {
     )
 
     // ledger addresses
-    const ledgerAddresses$: WalletAddress$[] = FP.pipe(
-      ENABLED_CHAINS,
-      A.filter((chain) => !isThorChain(chain)),
-      A.map((chain) => getLedgerAddress$(chain, network)),
-      // Transform `LedgerAddress` -> `Option<WalletAddress>`
-      A.map(RxOp.map(RD.toOption))
-    )
+    const ledgerAddresses$ = (network: Network): WalletAddress$[] =>
+      FP.pipe(
+        ENABLED_CHAINS,
+        A.filter((chain) => !isThorChain(chain)),
+        A.map((chain) => getLedgerAddress$(chain, network)),
+        // Transform `LedgerAddress` -> `Option<WalletAddress>`
+        A.map(RxOp.map(RD.toOption))
+      )
 
     return FP.pipe(
-      Rx.combineLatest([...addresses$, ...ledgerAddresses$]),
-      RxOp.map((v) => v),
+      network$,
+      RxOp.switchMap((network) => Rx.combineLatest([...addresses$, ...ledgerAddresses$(network)])),
       RxOp.switchMap(
         FP.flow(
           /**
@@ -96,11 +110,13 @@ export const PoolShareView: React.FC = (): JSX.Element => {
            * We have to get a new stake-stream for every new asset
            * @description /src/renderer/services/midgard/shares.ts
            */
-          symSharesByAddresses$
+          allSharesByAddresses$
         )
       )
     )
   }, RD.initial)
+
+  useEffect(() => networkUpdated(network), [network, networkUpdated])
 
   const [haltedChains] = useObservableState(() => FP.pipe(haltedChains$, RxOp.map(RD.getOrElse((): Chain[] => []))), [])
   const { mimirHalt } = useMimirHalt()
@@ -117,7 +133,7 @@ export const PoolShareView: React.FC = (): JSX.Element => {
     const oMainnet = O.fromPredicate<Network>(() => network === 'mainnet')(network)
     return FP.pipe(
       sequenceTOption(oRuneNativeAddress, oMainnet),
-      O.map(([thorAddress, _]) => `https://app.thoryield.com/dashboard?thor=${thorAddress}`),
+      O.map(([thorAddress, _]) => `https://app.thoryield.com/accounts?thor=${thorAddress}`),
       O.map(window.apiUrl.openExternal)
     )
   }, [network, oRuneNativeAddress])
@@ -155,16 +171,33 @@ export const PoolShareView: React.FC = (): JSX.Element => {
     [clickRefreshHandler, intl]
   )
 
-  return useMemo(
+  const renderSharesTotal = useMemo(() => {
+    const sharesTotalRD: BaseAmountRD = FP.pipe(
+      RD.combine(allSharesRD, poolDetailsRD),
+      RD.map(([poolShares, poolDetails]) => H.getSharesTotal(poolShares, poolDetails, pricePoolData))
+    )
+    return (
+      <TotalValue
+        total={sharesTotalRD}
+        pricePool={selectedPricePool}
+        title={intl.formatMessage({ id: 'wallet.shares.total' })}
+      />
+    )
+  }, [allSharesRD, intl, poolDetailsRD, pricePoolData, selectedPricePool])
+
+  const renderShares = useMemo(
     () =>
       FP.pipe(
-        RD.combine(symSharesRD, poolDetailsRD),
+        RD.combine(allSharesRD, poolDetailsRD),
         RD.fold(
           // initial state
           () => renderPoolSharesTable([], false),
           // loading state
           () => {
-            const data = O.getOrElse(() => [] as PoolShareTableRowData[])(previousPoolShares.current)
+            const data: PoolShareTableRowData[] = FP.pipe(
+              previousPoolShares.current,
+              O.getOrElse<PoolShareTableRowData[]>(() => [])
+            )
             return renderPoolSharesTable(data, true)
           },
           // error state
@@ -174,12 +207,30 @@ export const PoolShareView: React.FC = (): JSX.Element => {
           },
           // success state
           ([poolShares, poolDetails]) => {
-            const data = getPoolShareTableData(poolShares, poolDetails, pricePoolData)
+            const data = H.getPoolShareTableData(poolShares, poolDetails, pricePoolData)
             previousPoolShares.current = O.some(data)
             return renderPoolSharesTable(data, false)
           }
         )
       ),
-    [symSharesRD, poolDetailsRD, renderPoolSharesTable, renderRefreshBtn, pricePoolData]
+    [allSharesRD, poolDetailsRD, renderPoolSharesTable, renderRefreshBtn, pricePoolData]
+  )
+
+  const disableRefresh = useMemo(() => RD.isPending(poolsRD) || RD.isPending(allSharesRD), [allSharesRD, poolsRD])
+
+  const refreshHandler = useCallback(() => {
+    reloadAllPools()
+    reloadAllSharesByAddresses()
+  }, [reloadAllPools, reloadAllSharesByAddresses])
+
+  return (
+    <>
+      <Row justify="end" style={{ marginBottom: '20px' }}>
+        <RefreshButton clickHandler={refreshHandler} disabled={disableRefresh} />
+      </Row>
+      <AssetsNav />
+      {renderSharesTotal}
+      {renderShares}
+    </>
   )
 }

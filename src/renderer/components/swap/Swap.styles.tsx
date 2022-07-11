@@ -1,17 +1,19 @@
 import { SwapOutlined as ASwapOutlined } from '@ant-design/icons/lib'
-import styled from 'styled-components'
+import styled, { css } from 'styled-components'
 import { palette } from 'styled-theme'
 
 import { media } from '../../helpers/styleHelper'
+import { transition } from '../../settings/style-util'
+import { Tabs as TabsUI } from '../tabs/Tabs'
 import { AssetInput as AssetInputBase } from '../uielements/assets/assetInput'
 import { AssetSelect as AssetSelectUI } from '../uielements/assets/assetSelect'
 import { Button as UIButton } from '../uielements/button'
 import { CheckButton as CheckButtonUI } from '../uielements/button/CheckButton'
-import { Label as UILabel } from '../uielements/label'
+import { Label as UILabel, CopyLabel as CopyLabelUI } from '../uielements/label'
 
 const ICON_SIZE = 16
 
-export const AddressCustomRecipient = styled('div')`
+export const AddressCustomRecipient = styled.div`
   display: flex;
   flex-direction: row;
   font-size: 16px;
@@ -30,54 +32,73 @@ export const AddressCustomRecipient = styled('div')`
   }
 `
 
-export const Container = styled('div')`
+export const Tabs = styled(TabsUI)`
+  padding-top: 0;
+  height: 100%;
+  width: 100%;
+  .ant-tabs {
+    &-nav {
+      &:before {
+        border-bottom: 1px solid ${palette('gray', 1)};
+      }
+      padding: 0 10px;
+      ${media.sm`
+        padding: 0 50px;
+    `}
+    }
+  }
+`
+
+export const Container = styled.div`
   display: flex;
   flex-direction: column;
   justify-content: space-between;
   position: relative;
   max-width: 538px;
-  height: 100%;
   width: 100%;
   margin: auto;
   color: ${palette('text', 0)};
   text-transform: uppercase;
-  padding: 60px 0;
 `
 
-export const Header = styled('div')`
-  text-align: center;
-  background: ${palette('gradient', 0)};
-  padding: 16px;
+export const SwapOutlinedContainer = styled.div`
+  display: flex;
   width: 100%;
-  margin-bottom: 30px;
-  font-size: 18px;
-  font-weight: 600;
-  color: ${palette('text', 3)};
-
-  ${media.md`
-    margin-bottom: 50px;
-  `}
+  justify-content: center;
 `
 
-export const SwapOutlined = styled(ASwapOutlined).attrs({ rotate: 90 })`
-  width: 100%;
+export const SwapOutlined = styled(ASwapOutlined).attrs({ rotate: 90 })<{ disabled: boolean }>`
+  padding: 10px;
   color: ${palette('success', 0)};
-  ${(props) => (props.disabled ? 'opacity: 0.5; cursor: not-allowed !important;' : '')}
+  opacity: ${({ disabled = false }) => (disabled ? 0.5 : 1)};
+  cursor: ${({ disabled = false }) => (disabled ? 'not-allowed' : 'pointer')};
   svg {
-    height: 22px;
-    width: 22px;
+    height: 44px;
+    width: 44px;
   }
+
+  ${transition(0.5)};
+
+  ${({ disabled }) =>
+    !disabled
+      ? css`
+          &:hover,
+          &.selected {
+            box-shadow: 0 0px 15px ${palette('gray', 1)};
+          }
+        `
+      : ''};
 `
 
-export const FormContainer = styled('div')`
+export const FormContainer = styled.div`
   position: relative;
 `
 
-export const CurrencyInfoContainer = styled('div')`
+export const CurrencyInfoContainer = styled.div`
   display: none;
   position: absolute;
-  top: 45px;
-  bottom: 95px;
+  top: 50px;
+  bottom: 140px;
   left: 100%;
   padding-left: 15px;
   align-items: center;
@@ -89,12 +110,12 @@ export const CurrencyInfoContainer = styled('div')`
   `}
 `
 
-export const ContentContainer = styled('div')`
+export const ContentContainer = styled.div`
   position: relative;
   padding-bottom: 30px;
 `
 
-export const ValueItemContainer = styled('div')`
+export const ValueItemContainer = styled.div`
   display: flex;
   flex-direction: column;
   align-items: baseline;
@@ -102,18 +123,14 @@ export const ValueItemContainer = styled('div')`
   position: relative;
 
   &.valueItemContainer {
-    &-out {
-      margin-bottom: 10px;
+    &-source,
+    &-target {
       align-items: center;
     }
 
     &-percent {
       align-items: center;
       margin: 20px 0;
-    }
-
-    &-in {
-      align-items: center;
     }
   }
 
@@ -127,16 +144,37 @@ export const ValueItemContainer = styled('div')`
   `}
 `
 
-export const SliderContainer = styled('div')`
+export const ValueItemSourceWrapper = styled.div`
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+
+  ${media.md`
+  width: auto;
+  `}
+`
+
+export const ValueItemWrapper = styled.div`
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+
+  ${media.md`
+  width: auto;
+  `}
+`
+
+export const SliderContainer = styled.div`
   width: 100%;
   min-width: 212px;
 `
 
-export const InValueContainer = styled('div')`
+export const InValueContainer = styled.div`
   display: flex;
   flex-direction: column;
-  height: 100px;
+  padding: 10px 5px 5px 10px;
   width: 100%;
+  border: 1px solid ${palette('gray', 0)};
 
   ${media.md`
     width: auto;
@@ -146,6 +184,7 @@ export const InValueContainer = styled('div')`
 export const TargetAddressContainer = styled.div`
   display: flex;
   flex-direction: column;
+  padding-top: 20px;
 `
 export const ValueTitle = styled(UILabel).attrs({
   color: 'gray',
@@ -162,7 +201,23 @@ export const InValueLabel = styled(UILabel).attrs({
   color: 'normal'
 })`
   padding-bottom: 0;
+  padding-left: 10px;
   font-size: 24px;
+`
+export const InMinValueContainer = styled.div`
+  display: flex;
+  width: 100%;
+  align-items: center;
+  padding: 0 0 0 10px;
+`
+
+export const InMinValueLabel = styled(UILabel).attrs({
+  color: 'gray'
+})`
+  text-transform: uppercase;
+  width: auto;
+  padding-right: 5px;
+  font-size: 12px;
 `
 
 export const AssetInput = styled(AssetInputBase)<{ hasError?: boolean }>`
@@ -172,11 +227,9 @@ export const AssetInput = styled(AssetInputBase)<{ hasError?: boolean }>`
     border: none;
   }
 
-  margin-bottom: 50px;
   width: 100%;
 
   ${media.md`
-    margin-bottom: 0;
     width: auto;
   `}
 `
@@ -191,20 +244,25 @@ export const ErrorLabel = styled(UILabel)`
 
 export const NoteLabel = styled(UILabel)`
   color: ${palette('text', 2)};
-`
-
-export const MinAmountLabel = styled(UILabel)`
-  padding-top: 0;
+  text-align: center;
   text-transform: uppercase;
 `
 
-export const AssetSelect = styled(AssetSelectUI)`
-  /* justify-content: space-between; */
+export const MinAmountContainer = styled.div`
+  display: flex;
+  align-items: center;
 `
 
-export const TargetAssetSelect = styled(AssetSelect)`
-  /* margin-top: 10px; */
+export const MinAmountLabel = styled(UILabel)`
+  padding-left: 5px;
+  padding-right: 5px;
+  text-transform: uppercase;
+  width: auto;
 `
+
+export const AssetSelect = styled(AssetSelectUI)``
+
+export const TargetAssetSelect = styled(AssetSelect)``
 
 export const FeeContainer = styled.div`
   width: 100%;
@@ -236,4 +294,29 @@ export const AssetSelectContainer = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
+`
+
+export const CopyMemoLabel = styled(CopyLabelUI)`
+  font-size: 12px;
+
+  .ant-typography-copy {
+    color: ${palette('gray', 1)} !important;
+    &:hover {
+      color: ${palette('gray', 2)} !important;
+    }
+  }
+  svg {
+    color: ${palette('gray', 1)} !important;
+    &:hover {
+      color: ${palette('gray', 2)} !important;
+    }
+  }
+`
+
+export const MemoLabel = styled(UILabel)`
+  text-transform: uppercase;
+  font-size: 12px;
+  text-align: center;
+  color: ${palette('gray', 1)} !important;
+  cursor: not-allowed;
 `

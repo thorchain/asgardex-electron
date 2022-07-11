@@ -1,3 +1,4 @@
+import { LoadingOutlined as ALoadingOutlined } from '@ant-design/icons'
 import styled from 'styled-components'
 import { palette } from 'styled-theme'
 
@@ -5,6 +6,7 @@ import { Size, Sizes, FontSizes } from './AssetIcon.types'
 
 type IconProps = {
   size: Size
+  isSynth: boolean
 }
 
 const fontSizes: FontSizes = {
@@ -23,16 +25,31 @@ export const sizes: Sizes = {
   xsmall: 20
 }
 
+export const borders: Sizes = {
+  large: 6,
+  big: 5,
+  normal: 4,
+  small: 3,
+  xsmall: 2
+}
+
 export const IconWrapper = styled.div<IconProps>`
   width: ${({ size }) => `${sizes[size]}px`};
-  min-width: ${({ size }) => `${sizes[size]}px`};
   height: ${({ size }) => `${sizes[size]}px`};
+  border: ${({ isSynth, size }) => (isSynth ? `solid ${borders[size]}px` : `none`)};
+  border-color: ${({ isSynth }) => (isSynth ? palette('primary', 0) : 'transparent')};
+  border-radius: 50%;
   position: relative;
 `
 
+export const LoadingOutlined = styled(ALoadingOutlined)`
+  width: 100%;
+  height: 100%;
+`
+
 export const IconBG = styled.div<IconProps>`
-  width: ${({ size }) => `${sizes[size]}px`};
-  height: ${({ size }) => `${sizes[size]}px`};
+  width: ${({ size, isSynth }) => `${sizes[size] - (isSynth ? 2 : 0) * borders[size]}px`};
+  height: ${({ size, isSynth }) => `${sizes[size] - (isSynth ? 2 : 0) * borders[size]}px`};
   position: absolute;
   left: 0;
   top: 0;
@@ -40,8 +57,8 @@ export const IconBG = styled.div<IconProps>`
 `
 
 export const IconFallback = styled.div<IconProps>`
-  width: ${({ size }) => `${sizes[size]}px`};
-  height: ${({ size }) => `${sizes[size]}px`};
+  width: ${({ size, isSynth }) => `${sizes[size] - (isSynth ? 2 : 0) * borders[size]}px`};
+  height: ${({ size, isSynth }) => `${sizes[size] - (isSynth ? 2 : 0) * borders[size]}px`};
   position: absolute;
   left: 0;
   top: 0;
@@ -55,9 +72,9 @@ export const IconFallback = styled.div<IconProps>`
 
 export const Icon = styled.img<IconProps>`
   position: absolute;
-  left: 0;
-  top: 0;
-  width: ${({ size }) => `${sizes[size]}px`};
-  height: ${({ size }) => `${sizes[size]}px`};
+  left: ${({ size, isSynth }) => `${isSynth ? borders[size] : 0}px`};
+  top: ${({ size, isSynth }) => `${isSynth ? borders[size] : 0}px`};
+  width: ${({ size, isSynth }) => `${sizes[size] - (isSynth ? 2 : 0) * borders[size]}px`};
+  height: ${({ size, isSynth }) => `${sizes[size] - (isSynth ? 2 : 0) * borders[size]}px`};
   border-radius: 50%;
 `

@@ -1,5 +1,6 @@
 import * as A from 'antd'
 import styled from 'styled-components'
+import { palette } from 'styled-theme'
 
 import { BackLink as BackLinkUI } from '../../components/uielements/backLink'
 
@@ -9,7 +10,7 @@ export const Container = styled.div`
   justify-content: center;
   width: 100%;
   height: 100vh;
-  background-color: white;
+  background-color: ${palette('background', 0)};
 `
 
 export const TopControlsContainer = styled(A.Row).attrs({

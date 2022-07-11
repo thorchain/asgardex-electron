@@ -7,11 +7,11 @@ import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
 import { useIntl } from 'react-intl'
 
-import { ReactComponent as DownIcon } from '../../assets/svg/icon-down.svg'
 import { sequenceTOption } from '../../helpers/fpHelpers'
 import { ChangeSlipToleranceHandler } from '../../services/app/types'
 import { PoolAssetDetail } from '../../services/midgard/types'
 import { SlipTolerance } from '../../types/asgardex'
+import { DownIcon } from '../icons'
 import { InfoIcon } from '../uielements/info'
 import * as Styled from './CurrencyInfo.styles'
 
@@ -22,9 +22,11 @@ type CurrencyInfoProps = {
   isCausedSlippage: boolean
   slipTolerance: SlipTolerance
   changeSlipTolerance: ChangeSlipToleranceHandler
+  disableSlippage: boolean
+  disableSlippageMsg: string
 }
 
-export const SLIP_PERCENTAGES: SlipTolerance[] = [3, 5, 10]
+export const SLIP_PERCENTAGES: SlipTolerance[] = [0.5, 1, 3, 5, 10]
 export const SLIP_TOLERANCE_KEY = 'asgdx-slip-tolerance'
 
 export const CurrencyInfo = ({
@@ -33,14 +35,16 @@ export const CurrencyInfo = ({
   slip = bn(0),
   isCausedSlippage,
   slipTolerance,
-  changeSlipTolerance
+  changeSlipTolerance,
+  disableSlippage = false,
+  disableSlippageMsg = ''
 }: CurrencyInfoProps) => {
   const intl = useIntl()
   const [slipDropdownVisible, setSlipDropdownVisible] = useState(false)
 
   const changeSlipToleranceHandler = useCallback(
-    (slipTolerance) => {
-      localStorage.setItem(SLIP_TOLERANCE_KEY, slipTolerance)
+    (slipTolerance: SlipTolerance) => {
+      localStorage.setItem(SLIP_TOLERANCE_KEY, slipTolerance.toString())
       changeSlipTolerance(slipTolerance)
       setSlipDropdownVisible(false)
     },
@@ -52,14 +56,17 @@ export const CurrencyInfo = ({
       <>
         {SLIP_PERCENTAGES.map((slip) => (
           <Row style={{ alignItems: 'center' }} key={slip}>
-            <Styled.SlipLabel key={slip} onClick={() => changeSlipToleranceHandler(slip)}>
+            <Styled.SlipLabel
+              key={slip}
+              active={slip === slipTolerance ? 'true' : 'false'}
+              onClick={() => changeSlipToleranceHandler(slip)}>
               {slip}%
             </Styled.SlipLabel>
           </Row>
         ))}
       </>
     )
-  }, [changeSlipToleranceHandler])
+  }, [changeSlipToleranceHandler, slipTolerance])
 
   const renderSlipSettings = useMemo(
     () => (
@@ -68,9 +75,9 @@ export const CurrencyInfo = ({
         visible={slipDropdownVisible}
         overlay={slipSettings}
         trigger={['click']}
-        placement="bottomCenter">
-        <Styled.DropdownContentWrapper style={{ alignItems: 'center', width: '50px' }}>
-          <Styled.SlipLabel>{slipTolerance}%</Styled.SlipLabel>
+        placement="bottom">
+        <Styled.DropdownContentWrapper style={{ alignItems: 'center', width: '55px' }}>
+          <Styled.SlipLabel active="true">{slipTolerance}%</Styled.SlipLabel>
           <DownIcon />
         </Styled.DropdownContentWrapper>
       </Dropdown>
@@ -123,9 +130,13 @@ export const CurrencyInfo = ({
             </div>
             <div style={{ display: 'flex', alignItems: 'center' }}>
               <Styled.SlipToleranceText>{intl.formatMessage({ id: 'swap.slip.tolerance' })}</Styled.SlipToleranceText>
-              <InfoIcon tooltip={intl.formatMessage({ id: 'swap.slip.tolerance.info' })} />
+              {disableSlippage ? (
+                <InfoIcon tooltip={disableSlippageMsg} color="warning" />
+              ) : (
+                <InfoIcon tooltip={intl.formatMessage({ id: 'swap.slip.tolerance.info' })} />
+              )}
             </div>
-            <div style={{ display: 'flex', flexDirection: 'column' }}>{renderSlipSettings}</div>
+            {!disableSlippage && <div style={{ display: 'flex', flexDirection: 'column' }}>{renderSlipSettings}</div>}
           </div>
         </Styled.Container>
       )

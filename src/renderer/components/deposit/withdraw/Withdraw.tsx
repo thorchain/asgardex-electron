@@ -39,7 +39,7 @@ import {
   SymWithdrawFeesRD,
   SymWithdrawFees
 } from '../../../services/chain/types'
-import { OpenExplorerTxUrl } from '../../../services/clients'
+import { GetExplorerTxUrl, OpenExplorerTxUrl } from '../../../services/clients'
 import { PoolsDataMap } from '../../../services/midgard/types'
 import { MimirHalt } from '../../../services/thorchain/types'
 import { ValidatePasswordHandler } from '../../../services/wallet/types'
@@ -74,6 +74,7 @@ export type Props = {
   /** Flag whether form has to be disabled or not */
   disabled?: boolean
   openRuneExplorerTxUrl: OpenExplorerTxUrl
+  getRuneExplorerTxUrl: GetExplorerTxUrl
   validatePassword$: ValidatePasswordHandler
   reloadBalances: FP.Lazy<void>
   withdraw$: SymWithdrawStateHandler
@@ -101,6 +102,7 @@ export const Withdraw: React.FC<Props> = ({
   shares: { rune: runeShare, asset: assetShare },
   disabled,
   openRuneExplorerTxUrl,
+  getRuneExplorerTxUrl,
   validatePassword$,
   reloadBalances = FP.constVoid,
   reloadFees,
@@ -312,6 +314,7 @@ export const Withdraw: React.FC<Props> = ({
           <Styled.ViewTxButtonTop
             txHash={oTxHash}
             onClick={openRuneExplorerTxUrl}
+            txUrl={FP.pipe(oTxHash, O.chain(getRuneExplorerTxUrl))}
             label={intl.formatMessage({ id: 'common.tx.view' }, { assetTicker: AssetRuneNative.ticker })}
           />
         ))}
@@ -337,7 +340,8 @@ export const Withdraw: React.FC<Props> = ({
     withdrawStartTime,
     txModalExtraContent,
     intl,
-    openRuneExplorerTxUrl
+    openRuneExplorerTxUrl,
+    getRuneExplorerTxUrl
   ])
 
   const [showPasswordModal, setShowPasswordModal] = useState(false)
@@ -350,15 +354,6 @@ export const Withdraw: React.FC<Props> = ({
       setShowPasswordModal(true)
     }
   }, [runeWalletType])
-
-  const closePasswordModal = useCallback(() => {
-    setShowPasswordModal(false)
-  }, [setShowPasswordModal])
-
-  const onClosePasswordModal = useCallback(() => {
-    // close password modal
-    closePasswordModal()
-  }, [closePasswordModal])
 
   const submitWithdrawTx = useCallback(() => {
     // set start time
@@ -373,20 +368,6 @@ export const Withdraw: React.FC<Props> = ({
       })
     )
   }, [subscribeWithdrawState, withdraw$, network, memo, runeWalletType, runeWalletIndex])
-
-  const onSucceedPasswordModal = useCallback(() => {
-    closePasswordModal()
-    submitWithdrawTx()
-  }, [closePasswordModal, submitWithdrawTx])
-
-  const onCloseLedgerModal = useCallback(() => {
-    setShowLedgerModal(false)
-  }, [])
-
-  const onSucceedLedgerModal = useCallback(() => {
-    setShowLedgerModal(false)
-    submitWithdrawTx()
-  }, [submitWithdrawTx])
 
   const uiFeesRD: UIFeesRD = useMemo(
     () =>
@@ -409,6 +390,48 @@ export const Withdraw: React.FC<Props> = ({
     reloadFees(asset)
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
+
+  const renderPasswordConfirmationModal = useMemo(() => {
+    if (!showPasswordModal) return <></>
+
+    const onSuccess = () => {
+      setShowPasswordModal(false)
+      submitWithdrawTx()
+    }
+    const onClose = () => {
+      setShowPasswordModal(false)
+    }
+
+    return (
+      <WalletPasswordConfirmationModal onSuccess={onSuccess} onClose={onClose} validatePassword$={validatePassword$} />
+    )
+  }, [showPasswordModal, submitWithdrawTx, validatePassword$])
+
+  const renderLedgerConfirmationModal = useMemo(() => {
+    if (!showLedgerModal) return <></>
+
+    const onClose = () => {
+      setShowLedgerModal(false)
+    }
+
+    const onSuccess = () => {
+      setShowLedgerModal(false)
+      submitWithdrawTx()
+    }
+
+    return (
+      <LedgerConfirmationModal
+        onSuccess={onSuccess}
+        onClose={onClose}
+        visible
+        // we always sent withdraw tx using THORCHain only
+        chain={THORChain}
+        network={network}
+        description2={intl.formatMessage({ id: 'ledger.sign' })}
+        addresses={O.none}
+      />
+    )
+  }, [intl, network, showLedgerModal, submitWithdrawTx])
 
   const disabledSubmit = useMemo(
     () =>
@@ -542,26 +565,8 @@ export const Withdraw: React.FC<Props> = ({
           {intl.formatMessage({ id: 'common.withdraw' })}
         </Styled.SubmitButton>
       </Styled.SubmitButtonWrapper>
-
-      {showLedgerModal && (
-        <LedgerConfirmationModal
-          onSuccess={onSucceedLedgerModal}
-          onClose={onCloseLedgerModal}
-          visible={showLedgerModal}
-          // we always sent withdraw tx using THORCHain only
-          chain={THORChain}
-          network={network}
-          description={intl.formatMessage({ id: 'deposit.withdraw.ledger.sign' })}
-        />
-      )}
-
-      {showPasswordModal && (
-        <WalletPasswordConfirmationModal
-          onSuccess={onSucceedPasswordModal}
-          onClose={onClosePasswordModal}
-          validatePassword$={validatePassword$}
-        />
-      )}
+      {renderPasswordConfirmationModal}
+      {renderLedgerConfirmationModal}
       {renderTxModal}
     </Styled.Container>
   )

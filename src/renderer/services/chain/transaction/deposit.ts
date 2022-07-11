@@ -157,8 +157,8 @@ export const asymDeposit$ = ({
  * Symetrical deposit stream does 4 steps:
  *
  * 1. Validate pool address + node
- * 2. Send deposit RUNE transaction
- * 3. Send deposit ASSET transaction
+ * 2. Send deposit ASSET transaction
+ * 3. Send deposit RUNE transaction
  * 4. Check status of both transactions
  *
  * @returns SymDepositState$ - Observable state to reflect loading status. It provides all data we do need to display status in `TxModul`

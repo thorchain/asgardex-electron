@@ -175,6 +175,8 @@ export type ByzantineLD = LiveData<Error, string>
 export type HealthRD = RD.RemoteData<Error, Health>
 export type HealthLD = LiveData<Error, Health>
 
+export type PoolType = 'active' | 'pending'
+
 export type PoolsService = {
   poolsState$: LiveData<Error, PoolsState>
   pendingPoolsState$: LiveData<Error, PendingPoolsState>
@@ -191,9 +193,11 @@ export type PoolsService = {
   reloadInboundAddresses: FP.Lazy<void>
   selectedPoolDetail$: PoolDetailLD
   reloadSelectedPoolDetail: (delay?: number) => void
-  reloadPoolStatsDetail: FP.Lazy<void>
+  reloadLiquidityHistory: FP.Lazy<void>
   poolStatsDetail$: PoolStatsDetailLD
+  reloadPoolStatsDetail: FP.Lazy<void>
   poolEarningHistory$: PoolEarningHistoryLD
+  reloadPoolEarningHistory: FP.Lazy<void>
   getPoolLiquidityHistory$: (parmas: PoolLiquidityHistoryParams) => PoolLiquidityHistoryLD
   getSelectedPoolSwapHistory$: (params: GetSwapHistoryParams) => SwapHistoryLD
   apiGetSwapHistory$: (params: ApiGetSwapHistoryParams) => SwapHistoryLD
@@ -205,7 +209,7 @@ export type PoolsService = {
   availableAssets$: PoolAssetsLD
   validatePool$: (poolAddresses: PoolAddress, chain: Chain) => ValidatePoolLD
   poolsFilters$: Rx.Observable<Record<string, O.Option<PoolFilter>>>
-  setPoolsFilter: (poolKey: string, filter: O.Option<PoolFilter>) => void
+  setPoolsFilter: (poolKey: PoolType, filter: O.Option<PoolFilter>) => void
   gasRateByChain$: (chain: Chain) => GasRateLD
   reloadGasRates: FP.Lazy<void>
   haltedChains$: HaltedChainsLD
@@ -287,9 +291,18 @@ export type ActionsPage = {
 export type ActionsPageRD = RD.RemoteData<ApiError, ActionsPage>
 export type ActionsPageLD = LiveData<ApiError, ActionsPage>
 
-export type PoolFilter = Chain | 'base' | 'usd'
+const staticPoolFilters = ['__base__', '__usd__', '__bep2__', '__erc20__', '__watched__'] as const
+export type StaticPoolFilter = typeof staticPoolFilters[number]
 
+/**
+ * Type guard for `StaticPoolFilters`
+ */
+export const isStaticPoolFilter = (v: unknown): v is StaticPoolFilter =>
+  typeof v === 'string' ? staticPoolFilters.includes(v as StaticPoolFilter) : false
+
+export type PoolFilter = StaticPoolFilter | string
 export type PoolFilters = PoolFilter[]
+export const DEFAULT_POOL_FILTERS: PoolFilters = ['__watched__', '__base__', '__usd__', '__bep2__', '__erc20__']
 
 export type LoadActionsParams = {
   page: number

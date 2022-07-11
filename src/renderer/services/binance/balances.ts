@@ -31,11 +31,11 @@ const balances$: (walletType: WalletType, network: Network, walletIndex: number)
   walletIndex
 ) =>
   FP.pipe(
-    C.balances$({ client$, trigger$: reloadBalances$, walletType, walletIndex }),
+    C.balances$({ client$, trigger$: reloadBalances$, walletType, walletIndex, walletBalanceType: 'all' }),
     // Filter out black listed assets
     liveData.map(FP.flow(A.filter(({ asset }) => !assetInBinanceBlacklist(network, asset))))
   )
 
-const getBalanceByAddress$ = C.balancesByAddress$(client$, reloadBalances$)
+const getBalanceByAddress$ = C.balancesByAddress$({ client$, trigger$: reloadBalances$, walletBalanceType: 'all' })
 
 export { balances$, reloadBalances, reloadBalances$, resetReloadBalances, getBalanceByAddress$ }

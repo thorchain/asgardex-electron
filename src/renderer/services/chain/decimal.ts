@@ -1,9 +1,10 @@
 import * as RD from '@devexperts/remote-data-ts'
 import { BTC_DECIMAL } from '@xchainjs/xchain-bitcoin'
 import { BCH_DECIMAL } from '@xchainjs/xchain-bitcoincash'
-import { DECIMAL as COSMOS_DECIMAL } from '@xchainjs/xchain-cosmos'
+import { COSMOS_DECIMAL } from '@xchainjs/xchain-cosmos'
 import { DOGE_DECIMAL } from '@xchainjs/xchain-doge'
 import { LTC_DECIMAL } from '@xchainjs/xchain-litecoin'
+import { TERRA_DECIMAL } from '@xchainjs/xchain-terra'
 import {
   BNBChain,
   CosmosChain,
@@ -14,7 +15,8 @@ import {
   LTCChain,
   Asset,
   BTCChain,
-  DOGEChain
+  DOGEChain,
+  TerraChain
 } from '@xchainjs/xchain-util'
 import * as Rx from 'rxjs'
 import * as RxOp from 'rxjs/operators'
@@ -34,10 +36,6 @@ const getDecimal = (asset: Asset, network: Network): Promise<number> => {
       return getERC20Decimal(asset, network)
     case THORChain:
       return Promise.resolve(THORCHAIN_DECIMAL)
-    case PolkadotChain: {
-      // return Promise.resolve(getDecimalDot(thorNetwork))
-      return Promise.reject('Polkadot is not supported yet')
-    }
     case DOGEChain:
       return Promise.resolve(DOGE_DECIMAL)
     case CosmosChain:
@@ -46,6 +44,12 @@ const getDecimal = (asset: Asset, network: Network): Promise<number> => {
       return Promise.resolve(BCH_DECIMAL)
     case LTCChain:
       return Promise.resolve(LTC_DECIMAL)
+    case TerraChain:
+      return Promise.resolve(TERRA_DECIMAL)
+    case PolkadotChain: {
+      // return Promise.resolve(getDecimalDot(network))
+      return Promise.reject('Polkadot is not supported yet')
+    }
   }
 }
 

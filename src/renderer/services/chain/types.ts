@@ -1,6 +1,7 @@
 import * as RD from '@devexperts/remote-data-ts'
 import { Address, FeeOption, Fees, Tx } from '@xchainjs/xchain-client'
 import { Asset, BaseAmount, Chain } from '@xchainjs/xchain-util'
+import BigNumber from 'bignumber.js'
 import * as O from 'fp-ts/lib/Option'
 import * as Rx from 'rxjs'
 
@@ -12,7 +13,7 @@ import { AssetWithAmount } from '../../types/asgardex'
 import { PoolAddress } from '../midgard/types'
 import { ApiError, TxHashRD } from '../wallet/types'
 
-export type TxTypes = 'DEPOSIT' | 'SWAP' | 'WITHDRAW' | 'UPGRADE'
+export type TxTypes = 'DEPOSIT' | 'SWAP' | 'WITHDRAW' | 'UPGRADE' | 'APPROVE' | 'SEND'
 
 export type Chain$ = Rx.Observable<O.Option<Chain>>
 
@@ -102,6 +103,9 @@ export type SendTxParams = {
   memo: Memo
   feeOption?: FeeOption
   walletIndex: number
+  feeAsset?: Asset
+  gasLimit?: BigNumber
+  feeAmount?: BaseAmount
 }
 
 export type SendPoolTxParams = SendTxParams & {
@@ -311,7 +315,7 @@ export type UpgradeRuneTxState$ = Rx.Observable<UpgradeRuneTxState>
  */
 export type SendTxState = {
   // State of steps (current step + total number of steps)
-  readonly steps: { current: number; readonly total: 2 }
+  readonly steps: { current: number; readonly total: 1 }
   // RD of all steps
   readonly status: TxHashRD
 }

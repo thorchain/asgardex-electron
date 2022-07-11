@@ -16,7 +16,8 @@ import {
   LedgerAddressesMap,
   LedgerAddressLD,
   LedgerAddressRD,
-  LedgerService
+  LedgerService,
+  VerifyLedgerAddressHandler
 } from './types'
 import { hasImportedKeystore } from './util'
 
@@ -53,7 +54,7 @@ export const createLedgerService = ({ keystore$ }: { keystore$: KeystoreState$ }
       RxOp.map((addressMap) => addressMap[network])
     )
 
-  const verifyLedgerAddress = (chain: Chain, network: Network, walletIndex: number): void =>
+  const verifyLedgerAddress: VerifyLedgerAddressHandler = async ({ chain, network, walletIndex }) =>
     window.apiHDWallet.verifyLedgerAddress({ chain, network, walletIndex })
 
   /**
@@ -94,7 +95,7 @@ export const createLedgerService = ({ keystore$ }: { keystore$: KeystoreState$ }
         Rx.of(
           RD.failure({
             errorId: LedgerErrorId.GET_ADDRESS_FAILED,
-            msg: isError(error) ? error.toString() : `${error}`
+            msg: isError(error) ? error?.message ?? error.toString() : `${error}`
           })
         )
       ),

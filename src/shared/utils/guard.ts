@@ -1,3 +1,4 @@
+import { FeeOption } from '@xchainjs/xchain-client'
 import { assetFromString, Asset, BaseAmount, Chain, isValidAsset } from '@xchainjs/xchain-util'
 import * as Util from '@xchainjs/xchain-util'
 import BigNumber from 'bignumber.js'
@@ -20,6 +21,9 @@ export const isChain = (u: unknown): u is Chain => chainGuard.is(u)
 
 export const isNetwork = (u: unknown): u is Network => u === 'mainnet' || u === 'stagenet' || u === 'testnet'
 
+export const isFeeOption = (u: unknown): u is FeeOption =>
+  u === FeeOption.Average || u === FeeOption.Fast || u === FeeOption.Fastest
+
 export const isWalletType = (u: unknown): u is WalletType => u === 'keystore' || u === 'ledger'
 export const isLedgerWallet = (walletType: WalletType): boolean => walletType === 'ledger'
 export const isKeystoreWallet = (walletType: WalletType): boolean => walletType === 'keystore'
@@ -40,7 +44,14 @@ const bnGuard: IOG.Guard<unknown, BigNumber> = {
   is: (u: unknown): u is BigNumber => BigNumber.isBigNumber(u)
 }
 
-export const isBaseAmount = (u: unknown): u is BaseAmount =>
-  IOG.number.is((u as BaseAmount).decimal) && bnGuard.is((u as BaseAmount).amount())
+const baseAmountGuard: IOG.Guard<unknown, BaseAmount> = {
+  is: (u: unknown): u is BaseAmount => {
+    if (u === null && typeof u !== 'object') return false
+
+    return IOG.number.is((u as BaseAmount)?.decimal) && bnGuard.is((u as BaseAmount)?.amount())
+  }
+}
+
+export const isBaseAmount = (u: unknown): u is BaseAmount => baseAmountGuard.is(u)
 
 export const isError = (u: unknown): u is Error => u instanceof Error

@@ -5,7 +5,7 @@ import * as t from 'io-ts'
 import * as IOD from 'io-ts/Decoder'
 import * as IOG from 'io-ts/Guard'
 
-import { isAsset, isBaseAmount, isChain, isNetwork } from '../utils/guard'
+import { isAsset, isBaseAmount, isChain, isFeeOption, isNetwork } from '../utils/guard'
 
 const assetDecoder: IOD.Decoder<unknown, Asset> = FP.pipe(
   IOD.string,
@@ -34,10 +34,12 @@ export const assetIO = new t.Type(
   assetToString
 )
 
+export const assetListIO = t.array(assetIO)
+
 export type BaseAmountEncoded = { amount: string; decimal: number }
 
-const isBaseAmountEncoded = (u: unknown): u is BaseAmountEncoded =>
-  IOG.string.is((u as BaseAmountEncoded).amount) && IOG.number.is((u as BaseAmountEncoded).decimal)
+export const isBaseAmountEncoded = (u: unknown): u is BaseAmountEncoded =>
+  IOG.struct({ amount: IOG.string, decimal: IOG.number }).is(u)
 
 export const baseAmountIO = new t.Type(
   'BaseAmountIO',
@@ -73,15 +75,29 @@ export const networkIO = new t.Type(
   t.identity
 )
 
+export const feeOptionIO = new t.Type(
+  'FeeOptionIO',
+  isFeeOption,
+  (u, c) => {
+    if (isFeeOption(u)) return t.success(u)
+    return t.failure(u, c, `Can't decode FeeOption from ${u}`)
+  },
+  t.identity
+)
+
 export const ipcLedgerSendTxParamsIO = t.type({
   chain: chainIO,
   network: networkIO,
   sender: t.union([t.string, t.undefined]),
   recipient: t.string,
   asset: t.union([assetIO, t.undefined]),
+  feeAsset: t.union([assetIO, t.undefined]),
   amount: baseAmountIO,
   memo: t.union([t.string, t.undefined]),
-  walletIndex: t.number
+  walletIndex: t.number,
+  feeRate: t.number,
+  feeOption: t.union([feeOptionIO, t.undefined]),
+  feeAmount: t.union([baseAmountIO, t.undefined])
 })
 
 export type IPCLedgerSendTxParams = t.TypeOf<typeof ipcLedgerSendTxParamsIO>
@@ -90,9 +106,45 @@ export const ipcLedgerDepositTxParamsIO = t.type({
   chain: chainIO,
   network: networkIO,
   asset: t.union([assetIO, t.undefined]),
+  router: t.union([t.string, t.undefined]),
+  recipient: t.union([t.string, t.undefined]),
   amount: baseAmountIO,
   memo: t.string,
-  walletIndex: t.number
+  walletIndex: t.number,
+  feeOption: t.union([feeOptionIO, t.undefined])
 })
 
 export type IPCLedgerDepositTxParams = t.TypeOf<typeof ipcLedgerDepositTxParamsIO>
+
+export const ipcLedgerApproveERC20TokenParamsIO = t.type({
+  network: networkIO,
+  contractAddress: t.string,
+  spenderAddress: t.string,
+  walletIndex: t.number
+})
+
+export type IPCLedgerApproveERC20TokenParams = t.TypeOf<typeof ipcLedgerApproveERC20TokenParamsIO>
+
+export const poolsWatchListIO = assetListIO
+
+export type PoolsWatchList = t.TypeOf<typeof poolsWatchListIO>
+
+export const poolsWatchListsIO = t.type({
+  testnet: poolsWatchListIO,
+  stagenet: poolsWatchListIO,
+  mainnet: poolsWatchListIO
+})
+
+export const storageVersionIO = t.string
+
+export type StorageVersion = t.TypeOf<typeof storageVersionIO>
+
+export type PoolsWatchLists = t.TypeOf<typeof poolsWatchListsIO>
+
+export const poolsStorageIO = t.type({
+  watchlists: poolsWatchListsIO,
+  version: storageVersionIO
+})
+
+// Note: We use Encoded type for storage
+export type PoolsStorageEncoded = ReturnType<typeof poolsStorageIO.encode>

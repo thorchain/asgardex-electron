@@ -1,61 +1,57 @@
-import React, { useCallback, useMemo } from 'react'
+import React, { useMemo } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
-import { Asset, DOGEChain } from '@xchainjs/xchain-util'
+import { Address } from '@xchainjs/xchain-client'
+import { DOGEChain } from '@xchainjs/xchain-util'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/Option'
 import { useObservableState } from 'observable-hooks'
-import { useIntl } from 'react-intl'
-import { useHistory } from 'react-router-dom'
 
-import { Network } from '../../../../shared/api/types'
 import { WalletType } from '../../../../shared/wallet/types'
-import { Send } from '../../../components/wallet/txs/send'
+import { LoadingView } from '../../../components/shared/loading'
 import { SendFormDOGE } from '../../../components/wallet/txs/send/'
 import { useChainContext } from '../../../contexts/ChainContext'
 import { useDogeContext } from '../../../contexts/DogeContext'
-import { getWalletBalanceByAsset } from '../../../helpers/walletHelper'
-import { useSubscriptionState } from '../../../hooks/useSubscriptionState'
+import { useWalletContext } from '../../../contexts/WalletContext'
+import { getWalletBalanceByAddress } from '../../../helpers/walletHelper'
+import { useNetwork } from '../../../hooks/useNetwork'
+import { useOpenExplorerTxUrl } from '../../../hooks/useOpenExplorerTxUrl'
 import { useValidateAddress } from '../../../hooks/useValidateAddress'
-import { INITIAL_SEND_STATE } from '../../../services/chain/const'
-import type { SendTxParams, SendTxState } from '../../../services/chain/types'
-import { OpenExplorerTxUrl, WalletBalances } from '../../../services/clients'
+import { WalletBalances } from '../../../services/clients'
 import { FeesWithRatesLD } from '../../../services/doge/types'
-import { NonEmptyWalletBalances, ValidatePasswordHandler, WalletBalance } from '../../../services/wallet/types'
-import * as Helper from './SendView.helper'
+import { DEFAULT_BALANCES_FILTER, INITIAL_BALANCES_STATE } from '../../../services/wallet/const'
 
 type Props = {
   walletType: WalletType
   walletIndex: number
-  asset: Asset
-  balances: O.Option<NonEmptyWalletBalances>
-  openExplorerTxUrl: OpenExplorerTxUrl
-  validatePassword$: ValidatePasswordHandler
-  network: Network
+  walletAddress: Address
 }
 
 export const SendViewDOGE: React.FC<Props> = (props): JSX.Element => {
-  const { walletType, walletIndex, asset, balances: oBalances, openExplorerTxUrl, validatePassword$, network } = props
+  const { walletType, walletIndex, walletAddress } = props
 
-  const intl = useIntl()
-  const history = useHistory()
-
-  const oWalletBalance = useMemo(() => getWalletBalanceByAsset(oBalances, asset), [oBalances, asset])
-
-  const { transfer$ } = useChainContext()
-
+  const { network } = useNetwork()
   const {
-    state: sendTxState,
-    reset: resetSendTxState,
-    subscribe: subscribeSendTxState
-  } = useSubscriptionState<SendTxState>(INITIAL_SEND_STATE)
+    balancesState$,
+    keystoreService: { validatePassword$ }
+  } = useWalletContext()
 
-  const onSend = useCallback(
-    (params: SendTxParams) => {
-      subscribeSendTxState(transfer$(params))
-    },
-    [subscribeSendTxState, transfer$]
+  const [{ balances: oBalances }] = useObservableState(
+    () => balancesState$(DEFAULT_BALANCES_FILTER),
+    INITIAL_BALANCES_STATE
   )
+
+  const { openExplorerTxUrl, getExplorerTxUrl } = useOpenExplorerTxUrl(O.some(DOGEChain))
+
+  const oWalletBalance = useMemo(
+    () =>
+      FP.pipe(
+        oBalances,
+        O.chain((balances) => getWalletBalanceByAddress(balances, walletAddress))
+      ),
+    [oBalances, walletAddress]
+  )
+  const { transfer$ } = useChainContext()
 
   const { feesWithRates$, reloadFeesWithRates } = useDogeContext()
 
@@ -64,66 +60,28 @@ export const SendViewDOGE: React.FC<Props> = (props): JSX.Element => {
 
   const { validateAddress } = useValidateAddress(DOGEChain)
 
-  const isLoading = useMemo(() => RD.isPending(sendTxState.status), [sendTxState.status])
-
-  const sendTxStatusMsg = useMemo(
-    () => Helper.sendTxStatusMsg({ sendTxState, asset, intl }),
-    [asset, intl, sendTxState]
-  )
-  /**
-   * Custom send form used by DOGE only
-   */
-  const sendForm = useCallback(
-    (walletBalance: WalletBalance) => (
-      <SendFormDOGE
-        walletType={walletType}
-        walletIndex={walletIndex}
-        balances={FP.pipe(
-          oBalances,
-          O.getOrElse<WalletBalances>(() => [])
-        )}
-        balance={walletBalance}
-        isLoading={isLoading}
-        onSubmit={onSend}
-        addressValidation={validateAddress}
-        feesWithRates={feesWithRatesRD}
-        reloadFeesHandler={reloadFeesWithRates}
-        validatePassword$={validatePassword$}
-        sendTxStatusMsg={sendTxStatusMsg}
-        network={network}
-      />
-    ),
-    [
-      walletType,
-      walletIndex,
-      oBalances,
-      isLoading,
-      onSend,
-      validateAddress,
-      feesWithRatesRD,
-      reloadFeesWithRates,
-      validatePassword$,
-      sendTxStatusMsg,
-      network
-    ]
-  )
-
-  const finishActionHandler = useCallback(() => {
-    resetSendTxState()
-    history.goBack()
-  }, [history, resetSendTxState])
-
   return FP.pipe(
     oWalletBalance,
     O.fold(
-      () => <></>,
+      () => <LoadingView size="large" />,
       (walletBalance) => (
-        <Send
-          txRD={sendTxState.status}
-          viewTxHandler={openExplorerTxUrl}
-          finishActionHandler={finishActionHandler}
-          errorActionHandler={resetSendTxState}
-          sendForm={sendForm(walletBalance)}
+        <SendFormDOGE
+          walletType={walletType}
+          walletIndex={walletIndex}
+          walletAddress={walletAddress}
+          balances={FP.pipe(
+            oBalances,
+            O.getOrElse<WalletBalances>(() => [])
+          )}
+          balance={walletBalance}
+          transfer$={transfer$}
+          openExplorerTxUrl={openExplorerTxUrl}
+          getExplorerTxUrl={getExplorerTxUrl}
+          addressValidation={validateAddress}
+          feesWithRates={feesWithRatesRD}
+          reloadFeesHandler={reloadFeesWithRates}
+          validatePassword$={validatePassword$}
+          network={network}
         />
       )
     )

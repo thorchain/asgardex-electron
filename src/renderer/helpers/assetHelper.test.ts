@@ -1,4 +1,6 @@
+import { AssetAtom } from '@xchainjs/xchain-cosmos'
 import { ETHAddress } from '@xchainjs/xchain-ethereum'
+import { AssetLUNA } from '@xchainjs/xchain-terra'
 import {
   assetAmount,
   AssetBCH,
@@ -24,6 +26,7 @@ import {
   AssetUniHAddress,
   AssetUSDTERC20,
   AssetUSDTERC20Testnet,
+  AssetUST,
   AssetXRune,
   AssetXRuneAddress,
   AssetXRuneTestnet
@@ -54,9 +57,13 @@ import {
   assetInERC20Whitelist,
   addressInERC20Whitelist,
   validAssetForETH,
-  iconUrlInERC20Whitelist
+  iconUrlInERC20Whitelist,
+  isRuneAsset,
+  isLunaAsset,
+  isUstAsset,
+  getAssetFromNullableString
 } from './assetHelper'
-import { eqAsset, eqAssetAmount, eqBaseAmount } from './fp/eq'
+import { eqAsset, eqAssetAmount, eqBaseAmount, eqOAsset } from './fp/eq'
 
 describe('helpers/assetHelper', () => {
   describe('isRuneBnbAsset', () => {
@@ -101,6 +108,34 @@ describe('helpers/assetHelper', () => {
 
     it('returns false for any other asset than RUNE', () => {
       expect(isRuneNativeAsset(AssetBNB)).toBeFalsy()
+    })
+  })
+
+  describe('isRuneAsset', () => {
+    it('AssetRuneNative', () => {
+      expect(isRuneAsset(AssetRuneNative, 'mainnet')).toBeTruthy()
+      expect(isRuneAsset(AssetRuneNative, 'testnet')).toBeTruthy()
+    })
+    it('AssetRune67C', () => {
+      expect(isRuneAsset(AssetRune67C, 'testnet')).toBeTruthy()
+      expect(isRuneAsset(AssetRune67C, 'mainnet')).toBeFalsy()
+    })
+
+    it('AssetRuneB1A', () => {
+      expect(isRuneAsset(AssetRuneB1A, 'mainnet')).toBeTruthy()
+      expect(isRuneAsset(AssetRuneB1A, 'testnet')).toBeFalsy()
+    })
+    it('AssetRuneERC20', () => {
+      expect(isRuneAsset(AssetRuneERC20, 'mainnet')).toBeTruthy()
+      expect(isRuneAsset(AssetRuneERC20, 'testnet')).toBeFalsy()
+    })
+    it('AssetRuneERC20', () => {
+      expect(isRuneAsset(AssetRuneERC20Testnet, 'testnet')).toBeTruthy()
+      expect(isRuneAsset(AssetRuneERC20Testnet, 'mainnet')).toBeFalsy()
+    })
+    it('AssetBTC', () => {
+      expect(isRuneAsset(AssetBTC, 'testnet')).toBeFalsy()
+      expect(isRuneAsset(AssetBTC, 'mainnet')).toBeFalsy()
     })
   })
 
@@ -163,7 +198,7 @@ describe('helpers/assetHelper', () => {
     })
 
     it('returns false for any other asset than ETH', () => {
-      expect(isBnbAsset(AssetRuneB1A)).toBeFalsy()
+      expect(isEthAsset(AssetRuneB1A)).toBeFalsy()
     })
   })
 
@@ -274,31 +309,61 @@ describe('helpers/assetHelper', () => {
       expect(isPricePoolAsset(AssetBNB)).toBeFalsy()
     })
     it('returns false for deprecated asset ', () => {
-      expect(isPricePoolAsset({ chain: BNBChain, symbol: 'RUNE-1AF', ticker: 'RUNE' })).toBeFalsy()
+      expect(isPricePoolAsset({ chain: BNBChain, symbol: 'RUNE-1AF', ticker: 'RUNE', synth: false })).toBeFalsy()
     })
   })
 
   describe('isChainAsset', () => {
-    it('returns false for BNB', () => {
+    it('BNB', () => {
       expect(isChainAsset(AssetBNB)).toBeTruthy()
     })
-    it('returns true for RUNE Native ', () => {
+    it('BUSDB', () => {
+      expect(isChainAsset(AssetBUSDBAF)).toBeFalsy()
+    })
+    it('RUNE Native ', () => {
       expect(isChainAsset(AssetRuneNative)).toBeTruthy()
     })
-    it('returns false for BUSDB', () => {
-      expect(isChainAsset(AssetBUSDBAF)).toBeFalsy()
+    it('LUNA', () => {
+      expect(isChainAsset(AssetLUNA)).toBeTruthy()
+    })
+    it('UST', () => {
+      expect(isChainAsset(AssetUST)).toBeFalsy()
+    })
+    it('ATOM', () => {
+      expect(isChainAsset(AssetAtom)).toBeTruthy()
     })
   })
 
   describe('isUSDAsset', () => {
-    it('returns true for BUSD', () => {
+    it('BUSD -> true', () => {
       expect(isUSDAsset(AssetBUSDBAF)).toBeTruthy()
     })
-    it('returns true for ERC20 USDT', () => {
+    it('USDT (ERC20) -> true', () => {
       expect(isUSDAsset(AssetUSDTERC20Testnet)).toBeTruthy()
     })
-    it('returns false for RUNE Native', () => {
+    it('UST -> true', () => {
+      expect(isUSDAsset(AssetUST)).toBeTruthy()
+    })
+    it('RUNE Native -> false', () => {
       expect(isUSDAsset(AssetRuneNative)).toBeFalsy()
+    })
+  })
+
+  describe('isLunaAsset', () => {
+    it('AssetLUNA -> true', () => {
+      expect(isLunaAsset(AssetLUNA)).toBeTruthy()
+    })
+    it('AssetUST -> false', () => {
+      expect(isLunaAsset(AssetUST)).toBeFalsy()
+    })
+  })
+
+  describe('isUstAsset', () => {
+    it('AssetUST -> true', () => {
+      expect(isUstAsset(AssetUST)).toBeTruthy()
+    })
+    it('AssetLUNA -> false', () => {
+      expect(isUstAsset(AssetLUNA)).toBeFalsy()
     })
   })
 
@@ -487,6 +552,33 @@ describe('helpers/assetHelper', () => {
           network: 'mainnet'
         })
       ).toBeFalsy()
+    })
+  })
+
+  describe('getAssetFromNullableString', () => {
+    it('BNB.BNB (uppercase)', () => {
+      const result = getAssetFromNullableString('BNB.BNB')
+      expect(eqOAsset.equals(result, O.some(AssetBNB))).toBeTruthy()
+    })
+    it('bnb.bnb (lowercase)', () => {
+      const result = getAssetFromNullableString('bnb.bnb')
+      expect(eqOAsset.equals(result, O.some(AssetBNB))).toBeTruthy()
+    })
+    it('invalid', () => {
+      const result = getAssetFromNullableString('invalid')
+      expect(result).toBeNone()
+    })
+    it('BNB (no ticker)', () => {
+      const result = getAssetFromNullableString('BNB')
+      expect(result).toBeNone()
+    })
+    it('undefined', () => {
+      const result = getAssetFromNullableString()
+      expect(result).toBeNone()
+    })
+    it('empty string', () => {
+      const result = getAssetFromNullableString('')
+      expect(result).toBeNone()
     })
   })
 })

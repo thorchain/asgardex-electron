@@ -4,20 +4,22 @@ import {
   assetFromString,
   Asset,
   AssetRuneNative,
-  assetToString,
   assetToBase,
   assetAmount,
   BaseAmount,
-  bnOrZero
+  bnOrZero,
+  assetToString
 } from '@xchainjs/xchain-util'
 import * as A from 'fp-ts/Array'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
 
+import { PoolsWatchList } from '../../../shared/api/io'
 import { Network } from '../../../shared/api/types'
 import { ONE_RUNE_BASE_AMOUNT } from '../../../shared/mock/amount'
 import { isBtcAsset, isChainAsset, isEthAsset, isUSDAsset, isEthTokenAsset } from '../../helpers/assetHelper'
-import { eqString } from '../../helpers/fp/eq'
+import { isBnbChain, isEthChain } from '../../helpers/chainHelper'
+import { eqString, eqAsset } from '../../helpers/fp/eq'
 import { sequenceTOption } from '../../helpers/fpHelpers'
 import { PoolFilter } from '../../services/midgard/types'
 import { toPoolData } from '../../services/midgard/utils'
@@ -41,10 +43,12 @@ export const stringToGetPoolsStatus = (status: string): GetPoolsStatusEnum => {
 export const getPoolTableRowData = ({
   poolDetail,
   pricePoolData,
+  watchlist,
   network
 }: {
   poolDetail: PoolDetail
   pricePoolData: PoolData
+  watchlist: PoolsWatchList
   network: Network
 }): O.Option<PoolTableRowData> => {
   const oPoolDetailAsset = O.fromNullable(assetFromString(poolDetail.asset))
@@ -53,6 +57,8 @@ export const getPoolTableRowData = ({
     oPoolDetailAsset,
     O.map((poolDetailAsset) => {
       const poolData = toPoolData(poolDetail)
+      // convert string -> BN -> number - just for convenience
+      const apy = bnOrZero(poolDetail.poolAPY).multipliedBy(100).decimalPlaces(2).toNumber()
 
       const poolPrice = getValueOfAsset1InAsset2(ONE_RUNE_BASE_AMOUNT, poolData, pricePoolData)
 
@@ -70,6 +76,12 @@ export const getPoolTableRowData = ({
         target: poolDetailAsset
       }
 
+      const watched: boolean = FP.pipe(
+        watchlist,
+        A.findFirst((poolInList) => eqAsset.equals(poolInList, poolDetailAsset)),
+        O.isSome
+      )
+
       return {
         pool,
         poolPrice,
@@ -77,7 +89,9 @@ export const getPoolTableRowData = ({
         volumePrice,
         status,
         key: poolDetailAsset.ticker,
-        network
+        network,
+        apy,
+        watched
       }
     })
   )
@@ -114,27 +128,48 @@ export const getBlocksLeftForPendingPoolAsString = (
   )
 }
 
+export type FilterTableData = Pick<PoolTableRowData, 'pool' | 'watched'>
 /**
  * Filters tableData array by passed active filter.
  * If oFilter is O.none will return tableData array without any changes
  */
 export const filterTableData =
   (oFilter: O.Option<PoolFilter> = O.none) =>
-  (tableData: PoolTableRowData[]): PoolTableRowData[] => {
+  (tableData: FilterTableData[]): FilterTableData[] => {
     return FP.pipe(
       oFilter,
       O.map((filter) =>
         FP.pipe(
           tableData,
           A.filterMap((tableRow) => {
-            if (filter === 'base') {
-              return isChainAsset(tableRow.pool.target) ? O.some(tableRow) : O.none
+            const asset = tableRow.pool.target
+            const value = filter.toLowerCase()
+            // watched assets
+            if (value === '__watched__') {
+              return tableRow.watched ? O.some(tableRow) : O.none
             }
-            if (filter === 'usd') {
-              return isUSDAsset(tableRow.pool.target) ? O.some(tableRow) : O.none
+            // all base chain assets
+            if (value === '__base__') {
+              return isChainAsset(asset) ? O.some(tableRow) : O.none
             }
-            const stringAsset = assetToString(tableRow.pool.target)
-            return stringAsset.includes(filter) ? O.some(tableRow) : O.none
+            // usd assets
+            if (value === '__usd__') {
+              return isUSDAsset(asset) ? O.some(tableRow) : O.none
+            }
+            // erc20
+            if (value === '__erc20__') {
+              return isEthChain(asset.chain) && !isChainAsset(asset) ? O.some(tableRow) : O.none
+            }
+            // bep2
+            if (value === '__bep2__') {
+              return isBnbChain(asset.chain) && !isChainAsset(asset) ? O.some(tableRow) : O.none
+            }
+            // custom
+            if (value.length > 0) {
+              return assetToString(asset).toLowerCase().includes(value) ? O.some(tableRow) : O.none
+            }
+
+            return O.none
           })
         )
       ),

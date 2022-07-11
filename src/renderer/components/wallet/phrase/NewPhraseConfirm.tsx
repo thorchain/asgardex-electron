@@ -4,7 +4,7 @@ import { DeleteOutlined, RedoOutlined } from '@ant-design/icons'
 import { Col, Row, Button as AButton } from 'antd'
 import shuffleArray from 'lodash.shuffle'
 import { useIntl } from 'react-intl'
-import { useHistory } from 'react-router'
+import { useNavigate } from 'react-router-dom'
 import { v4 as uuidv4 } from 'uuid'
 
 import { isSelectedFactory, sortedSelected } from '../../../helpers/array'
@@ -61,7 +61,7 @@ export const NewPhraseConfirm: React.FC<{ mnemonic: string; onConfirm: () => Pro
   const [mnemonicError, setMnemonicError] = useState<string>('')
   const [initialized, setInitialized] = useState<boolean>(false)
   const intl = useIntl()
-  const history = useHistory()
+  const navigate = useNavigate()
 
   const updateWordList = useCallback(
     (wordList: WordType[]) => {
@@ -147,7 +147,7 @@ export const NewPhraseConfirm: React.FC<{ mnemonic: string; onConfirm: () => Pro
     if (checkwords) {
       onConfirm()
         .then(() => {
-          history.push(walletRoutes.base.path())
+          navigate(walletRoutes.base.path())
         })
         .catch(() => {
           setMnemonicError(intl.formatMessage({ id: 'wallet.create.error' }))
@@ -157,7 +157,7 @@ export const NewPhraseConfirm: React.FC<{ mnemonic: string; onConfirm: () => Pro
     else if (wordsList.length === sortedSelectedWords.length) {
       setMnemonicError(intl.formatMessage({ id: 'wallet.create.error.phrase' }))
     }
-  }, [checkPhraseConfirmWords, onConfirm, wordsList, sortedSelectedWords, history, intl])
+  }, [checkPhraseConfirmWords, onConfirm, wordsList, sortedSelectedWords, navigate, intl])
 
   return (
     <>

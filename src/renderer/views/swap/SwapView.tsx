@@ -1,16 +1,17 @@
 import React, { useCallback, useEffect, useMemo } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
-import { Asset, assetFromString, AssetRuneNative, bnOrZero, Chain, THORChain } from '@xchainjs/xchain-util'
+import { Address } from '@xchainjs/xchain-client'
+import { Asset, AssetRuneNative, bnOrZero, Chain, THORChain } from '@xchainjs/xchain-util'
 import { Spin } from 'antd'
 import * as FP from 'fp-ts/function'
 import * as O from 'fp-ts/lib/Option'
 import { useObservableState } from 'observable-hooks'
 import { useIntl } from 'react-intl'
-import { useHistory, useParams } from 'react-router-dom'
-import * as Rx from 'rxjs'
+import { useLocation, useNavigate, useParams } from 'react-router-dom'
 import * as RxOp from 'rxjs/operators'
 
+import { Network } from '../../../shared/api/types'
 import { SLIP_TOLERANCE_KEY } from '../../components/currency/CurrencyInfo'
 import { ErrorView } from '../../components/shared/error/'
 import { Swap } from '../../components/swap'
@@ -20,7 +21,7 @@ import { useChainContext } from '../../contexts/ChainContext'
 import { useEthereumContext } from '../../contexts/EthereumContext'
 import { useMidgardContext } from '../../contexts/MidgardContext'
 import { useWalletContext } from '../../contexts/WalletContext'
-import { isRuneNativeAsset } from '../../helpers/assetHelper'
+import { getAssetFromNullableString, isRuneNativeAsset } from '../../helpers/assetHelper'
 import { eqChain } from '../../helpers/fp/eq'
 import { sequenceTOption, sequenceTRD } from '../../helpers/fpHelpers'
 import { addressFromOptionalWalletAddress } from '../../helpers/walletHelper'
@@ -32,18 +33,20 @@ import { useValidateAddress } from '../../hooks/useValidateAddress'
 import { SwapRouteParams } from '../../routes/pools/swap'
 import * as walletRoutes from '../../routes/wallet'
 import { AssetWithDecimalLD, AssetWithDecimalRD } from '../../services/chain/types'
-import { OpenExplorerTxUrl } from '../../services/clients'
 import { DEFAULT_SLIP_TOLERANCE } from '../../services/const'
-import { INITIAL_BALANCES_STATE } from '../../services/wallet/const'
+import { INITIAL_BALANCES_STATE, DEFAULT_BALANCES_FILTER } from '../../services/wallet/const'
 import { isSlipTolerance, SlipTolerance } from '../../types/asgardex'
 import * as Styled from './SwapView.styles'
 
-type Props = {}
+type Props = { sourceAsset: Asset; targetAsset: Asset }
 
-export const SwapView: React.FC<Props> = (_): JSX.Element => {
-  const { source, target } = useParams<SwapRouteParams>()
+const SuccessRouteView: React.FC<Props> = ({ sourceAsset, targetAsset }): JSX.Element => {
+  const { chain: sourceChain } = sourceAsset
+  const { chain: targetChain } = targetAsset
+
   const intl = useIntl()
-  const history = useHistory()
+  const navigate = useNavigate()
+  const location = useLocation()
 
   const { slipTolerance$, changeSlipTolerance } = useAppContext()
 
@@ -72,19 +75,16 @@ export const SwapView: React.FC<Props> = (_): JSX.Element => {
 
   const poolsState = useObservableState(poolsState$, RD.initial)
 
-  const oSourceAsset: O.Option<Asset> = useMemo(() => O.fromNullable(assetFromString(source.toUpperCase())), [source])
-  const oTargetAsset: O.Option<Asset> = useMemo(() => O.fromNullable(assetFromString(target.toUpperCase())), [target])
-
   useEffect(() => {
     // Source asset is the asset of the pool we need to interact with
     // Store it in global state, all depending streams will be updated then
-    setSelectedPoolAsset(oSourceAsset)
+    setSelectedPoolAsset(O.some(sourceAsset))
 
     // Reset selectedPoolAsset on view's unmount to avoid effects with depending streams
     return () => {
       setSelectedPoolAsset(O.none)
     }
-  }, [oSourceAsset, setSelectedPoolAsset])
+  }, [sourceAsset, setSelectedPoolAsset])
 
   // reload inbound addresses at `onMount` to get always latest `pool address` + `feeRates`
   useEffect(() => {
@@ -92,68 +92,51 @@ export const SwapView: React.FC<Props> = (_): JSX.Element => {
   }, [reloadInboundAddresses])
 
   const sourceAssetDecimal$: AssetWithDecimalLD = useMemo(
-    () =>
-      FP.pipe(
-        oSourceAsset,
-        O.fold(
-          () => Rx.of(RD.failure(Error(intl.formatMessage({ id: 'swap.errors.asset.missingSourceAsset' })))),
-          (asset) => assetWithDecimal$(asset, network)
-        )
-      ),
-    [assetWithDecimal$, intl, network, oSourceAsset]
+    () => assetWithDecimal$(sourceAsset, network),
+    [assetWithDecimal$, network, sourceAsset]
   )
 
   const sourceAssetRD: AssetWithDecimalRD = useObservableState(sourceAssetDecimal$, RD.initial)
 
   const targetAssetDecimal$: AssetWithDecimalLD = useMemo(
-    () =>
-      FP.pipe(
-        oTargetAsset,
-        O.fold(
-          () => Rx.of(RD.failure(Error(intl.formatMessage({ id: 'swap.errors.asset.missingTargetAsset' })))),
-          (asset) => assetWithDecimal$(asset, network)
-        )
-      ),
-    [assetWithDecimal$, intl, network, oTargetAsset]
+    () => assetWithDecimal$(targetAsset, network),
+    [assetWithDecimal$, network, targetAsset]
   )
 
   const targetAssetRD: AssetWithDecimalRD = useObservableState(targetAssetDecimal$, RD.initial)
 
-  const balancesState = useObservableState(balancesState$, INITIAL_BALANCES_STATE)
+  const [balancesState] = useObservableState(
+    () =>
+      balancesState$({
+        ...DEFAULT_BALANCES_FILTER,
+        [Chain.Bitcoin]: 'confirmed'
+      }),
+    INITIAL_BALANCES_STATE
+  )
 
   const selectedPoolAddress = useObservableState(selectedPoolAddress$, O.none)
 
-  const sourceKeystoreAddress$ = useMemo(
-    () =>
-      FP.pipe(
-        oSourceAsset,
-        O.fold(
-          () => Rx.EMPTY,
-          ({ chain }) => addressByChain$(chain)
-        ),
-        RxOp.map(addressFromOptionalWalletAddress)
-      ),
-
-    [addressByChain$, oSourceAsset]
+  const [oSourceKeystoreAddress, updateSourceKeystoreAddress$] = useObservableState<O.Option<Address>, Chain>(
+    (sourceChain$) =>
+      FP.pipe(sourceChain$, RxOp.switchMap(addressByChain$), RxOp.map(addressFromOptionalWalletAddress)),
+    O.none
   )
-  const oSourceKeystoreAddress = useObservableState(sourceKeystoreAddress$, O.none)
 
-  const targetKeystoreAddress$ = useMemo(
-    () =>
-      FP.pipe(
-        oTargetAsset,
-        O.fold(
-          () => Rx.EMPTY,
-          ({ chain }) => addressByChain$(chain)
-        ),
-        RxOp.map(addressFromOptionalWalletAddress)
-      ),
+  useEffect(() => {
+    updateSourceKeystoreAddress$(sourceChain)
+  }, [sourceChain, updateSourceKeystoreAddress$])
 
-    [addressByChain$, oTargetAsset]
+  const [oTargetKeystoreAddress, updateTargetKeystoreAddress$] = useObservableState<O.Option<Address>, Chain>(
+    (targetChain$) =>
+      FP.pipe(targetChain$, RxOp.switchMap(addressByChain$), RxOp.map(addressFromOptionalWalletAddress)),
+    O.none
   )
-  const oTargetKeystoreAddress = useObservableState(targetKeystoreAddress$, O.none)
 
-  const openExplorerTxUrl: OpenExplorerTxUrl = useOpenExplorerTxUrl(O.some(THORChain))
+  useEffect(() => {
+    updateTargetKeystoreAddress$(targetChain)
+  }, [targetChain, updateTargetKeystoreAddress$])
+
+  const { openExplorerTxUrl, getExplorerTxUrl } = useOpenExplorerTxUrl(O.some(THORChain))
 
   const renderError = useCallback(
     (e: Error) => (
@@ -167,19 +150,13 @@ export const SwapView: React.FC<Props> = (_): JSX.Element => {
   )
 
   const reloadBalances = useCallback(() => {
-    FP.pipe(
-      sequenceTOption(oSourceAsset, oTargetAsset),
-      O.map(([{ chain: sourceChain }, { chain: targetChain }]) => {
-        if (eqChain.equals(sourceChain, targetChain)) {
-          reloadBalancesByChain(sourceChain)()
-        } else {
-          reloadBalancesByChain(sourceChain)()
-          reloadBalancesByChain(targetChain)()
-        }
-        return true
-      })
-    )
-  }, [oSourceAsset, oTargetAsset, reloadBalancesByChain])
+    if (eqChain.equals(sourceChain, targetChain)) {
+      reloadBalancesByChain(sourceChain)()
+    } else {
+      reloadBalancesByChain(sourceChain)()
+      reloadBalancesByChain(targetChain)()
+    }
+  }, [sourceChain, targetChain, reloadBalancesByChain])
 
   useEffect(() => {
     // reload balances, whenever sourceAsset and targetAsset have been changed (both are properties of `reloadBalances` )
@@ -197,8 +174,8 @@ export const SwapView: React.FC<Props> = (_): JSX.Element => {
       localStorage.getItem(SLIP_TOLERANCE_KEY),
       O.fromNullable,
       O.map((s) => {
-        const itemAsInt = parseInt(s)
-        const slipTolerance = isSlipTolerance(itemAsInt) ? itemAsInt : DEFAULT_SLIP_TOLERANCE
+        const itemAsNumber = Number(s)
+        const slipTolerance = isSlipTolerance(itemAsNumber) ? itemAsNumber : DEFAULT_SLIP_TOLERANCE
         changeSlipTolerance(slipTolerance)
         return slipTolerance
       }),
@@ -208,15 +185,15 @@ export const SwapView: React.FC<Props> = (_): JSX.Element => {
   const slipTolerance = useObservableState<SlipTolerance>(slipTolerance$, getStoredSlipTolerance())
 
   const onChangePath = useCallback(
-    (path) => {
-      history.replace(path)
+    (path: string) => {
+      navigate(path, { replace: true })
     },
-    [history]
+    [navigate]
   )
 
   const importWalletHandler = useCallback(() => {
-    history.push(walletRoutes.base.path())
-  }, [history])
+    navigate(walletRoutes.base.path(location.pathname))
+  }, [location.pathname, navigate])
 
   const targetAssetChain = useMemo(
     () =>
@@ -228,37 +205,41 @@ export const SwapView: React.FC<Props> = (_): JSX.Element => {
     [targetAssetRD]
   )
 
-  const sourceLedgerAddress$ = useMemo(
-    () =>
+  const [oSourceLedgerAddress, updateSourceLedgerAddress$] = useObservableState<
+    O.Option<Address>,
+    { chain: Chain; network: Network }
+  >(
+    (sourceLedgerAddressChain$) =>
       FP.pipe(
-        oSourceAsset,
-        O.fold(
-          () => Rx.EMPTY,
-          ({ chain }) => getLedgerAddress$(chain, network)
-        ),
+        sourceLedgerAddressChain$,
+        RxOp.switchMap(({ chain, network }) => getLedgerAddress$(chain, network)),
         RxOp.map((rdAddress) => RD.toOption(rdAddress)),
         RxOp.map(addressFromOptionalWalletAddress)
       ),
-
-    [getLedgerAddress$, network, oSourceAsset]
+    O.none
   )
-  const oSourceLedgerAddress = useObservableState(sourceLedgerAddress$, O.none)
 
-  const targetLedgerAddress$ = useMemo(
-    () =>
+  useEffect(() => {
+    updateSourceLedgerAddress$({ chain: sourceChain, network })
+  }, [network, sourceChain, updateSourceLedgerAddress$])
+
+  const [oTargetLedgerAddress, updateTargetLedgerAddress$] = useObservableState<
+    O.Option<Address>,
+    { chain: Chain; network: Network }
+  >(
+    (targetLedgerAddressChain$) =>
       FP.pipe(
-        oTargetAsset,
-        O.fold(
-          () => Rx.EMPTY,
-          ({ chain }) => getLedgerAddress$(chain, network)
-        ),
+        targetLedgerAddressChain$,
+        RxOp.switchMap(({ chain, network }) => getLedgerAddress$(chain, network)),
         RxOp.map((rdAddress) => RD.toOption(rdAddress)),
         RxOp.map(addressFromOptionalWalletAddress)
       ),
-
-    [getLedgerAddress$, network, oTargetAsset]
+    O.none
   )
-  const oTargetLedgerAddress = useObservableState(targetLedgerAddress$, O.none)
+
+  useEffect(() => {
+    updateTargetLedgerAddress$({ chain: targetChain, network })
+  }, [network, targetChain, updateTargetLedgerAddress$])
 
   const { validateSwapAddress } = useValidateAddress(targetAssetChain)
   const openAddressUrl = useOpenAddressUrl(targetAssetChain)
@@ -290,6 +271,7 @@ export const SwapView: React.FC<Props> = (_): JSX.Element => {
                   keystore={keystore}
                   validatePassword$={validatePassword$}
                   goToTransaction={openExplorerTxUrl}
+                  getExplorerTxUrl={getExplorerTxUrl}
                   assets={{ inAsset: sourceAsset, outAsset: targetAsset }}
                   sourceWalletAddress={oSourceKeystoreAddress}
                   sourceLedgerAddress={oSourceLedgerAddress}
@@ -314,6 +296,7 @@ export const SwapView: React.FC<Props> = (_): JSX.Element => {
                   importWalletHandler={importWalletHandler}
                   clickAddressLinkHandler={openAddressUrl}
                   addressValidator={validateSwapAddress}
+                  isDev={$IS_DEV}
                 />
               )
             }
@@ -321,5 +304,30 @@ export const SwapView: React.FC<Props> = (_): JSX.Element => {
         )}
       </Styled.ContentContainer>
     </>
+  )
+}
+
+export const SwapView: React.FC = (): JSX.Element => {
+  const { source, target } = useParams<SwapRouteParams>()
+  const oSourceAsset: O.Option<Asset> = useMemo(() => getAssetFromNullableString(source), [source])
+  const oTargetAsset: O.Option<Asset> = useMemo(() => getAssetFromNullableString(target), [target])
+
+  const intl = useIntl()
+
+  return FP.pipe(
+    sequenceTOption(oSourceAsset, oTargetAsset),
+    O.fold(
+      () => (
+        <ErrorView
+          title={intl.formatMessage(
+            { id: 'routes.invalid.params' },
+            {
+              params: `source: ${source}, target: ${target} `
+            }
+          )}
+        />
+      ),
+      ([sourceAsset, targetAsset]) => <SuccessRouteView sourceAsset={sourceAsset} targetAsset={targetAsset} />
+    )
   )
 }

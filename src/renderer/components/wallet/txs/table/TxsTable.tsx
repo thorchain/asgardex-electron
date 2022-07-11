@@ -27,18 +27,11 @@ type Props = {
   changePaginationHandler: (page: number) => void
   network: Network
   chain: Chain
-  walletAddress?: O.Option<Address>
+  walletAddress: Address
 }
 
 export const TxsTable: React.FC<Props> = (props): JSX.Element => {
-  const {
-    txsPageRD,
-    clickTxLinkHandler,
-    changePaginationHandler,
-    network,
-    chain,
-    walletAddress: oWalletAddress = O.none
-  } = props
+  const { txsPageRD, clickTxLinkHandler, changePaginationHandler, network, chain, walletAddress } = props
   const intl = useIntl()
   const isDesktopView = Grid.useBreakpoint()?.lg ?? false
 
@@ -59,28 +52,18 @@ export const TxsTable: React.FC<Props> = (props): JSX.Element => {
   )
 
   const renderAddressWithBreak = useCallback(
-    (address: Address, key: string) => {
-      const selfAddress = FP.pipe(
-        oWalletAddress,
-        O.chain((walletAddress) =>
-          walletAddress === address
-            ? O.some(<Styled.OwnText key={key}>{intl.formatMessage({ id: 'common.address.self' })}</Styled.OwnText>)
-            : O.none
-        )
-      )
-      return FP.pipe(
-        selfAddress,
-        O.getOrElse(() => (
-          <Styled.Text key={key}>
-            <AddressEllipsis address={address} chain={chain} network={network} />
-          </Styled.Text>
-        ))
-      )
-    },
-    [chain, network, oWalletAddress, intl]
+    (address: Address, key: string) =>
+      walletAddress === address ? (
+        <Styled.OwnText key={key}>{intl.formatMessage({ id: 'common.address.self' })}</Styled.OwnText>
+      ) : (
+        <Styled.Text key={key}>
+          <AddressEllipsis address={address} chain={chain} network={network} />
+        </Styled.Text>
+      ),
+    [chain, network, walletAddress, intl]
   )
 
-  const renderTypeColumn = useCallback((_, { type }: Tx) => {
+  const renderTypeColumn = useCallback((_: unknown, { type }: Tx) => {
     switch (type) {
       case 'transfer':
         return <Styled.TransferIcon />
@@ -101,7 +84,7 @@ export const TxsTable: React.FC<Props> = (props): JSX.Element => {
   )
 
   const renderFromColumn = useCallback(
-    (_, { from }: Tx) =>
+    (_: unknown, { from }: Tx) =>
       from.map(({ from }, index) => {
         const key = `${from}-${index}`
         return renderAddressWithBreak(from, key)
@@ -123,7 +106,7 @@ export const TxsTable: React.FC<Props> = (props): JSX.Element => {
   )
 
   const renderToColumn = useCallback(
-    (_, { to }: Tx) =>
+    (_: unknown, { to }: Tx) =>
       to.map(({ to }, index) => {
         const key = `${to}-${index}`
         // tag address as FEE in case of sending a tx to reserve module
@@ -149,7 +132,7 @@ export const TxsTable: React.FC<Props> = (props): JSX.Element => {
   )
 
   const renderDateColumn = useCallback(
-    (_, { date }: Tx) => (
+    (_: unknown, { date }: Tx) => (
       <Row gutter={[8, 0]}>
         <Col>
           <Styled.Text>
@@ -180,7 +163,7 @@ export const TxsTable: React.FC<Props> = (props): JSX.Element => {
   )
 
   const renderAmountColumn = useCallback(
-    (_, { to }: Tx) =>
+    (_: unknown, { to }: Tx) =>
       to.map(({ amount, to }, index) => {
         const key = `${to}-${index}`
         const text = formatAssetAmount({ amount: baseToAsset(amount), trimZeros: true })

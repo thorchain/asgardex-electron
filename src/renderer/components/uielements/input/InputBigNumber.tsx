@@ -1,13 +1,14 @@
 import React, { useCallback, useState, useEffect, forwardRef } from 'react'
 
 import { delay, bnOrZero } from '@xchainjs/xchain-util'
-import { Input } from 'antd'
+import * as A from 'antd'
 import BigNumber from 'bignumber.js'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
 
 import { ZERO_BN } from '../../../const'
 import { eqBigNumber } from '../../../helpers/fp/eq'
+import { FixmeType } from '../../../types/asgardex'
 import * as Styled from './Input.styles'
 import { formatValue, unformatValue, validInputValue, VALUE_ZERO, EMPTY_INPUT, truncateByDecimals } from './Input.util'
 
@@ -17,7 +18,9 @@ type Props = Omit<Styled.InputProps, 'value' | 'onChange'> & {
   decimal?: number
 }
 
-export const InputBigNumber = forwardRef<Input, Props>((props: Props, ref): JSX.Element => {
+// Note: Since `A.Input` does not support an accessible type for its `ref`, we use `FixmeType`
+// (very similar to InnerForm in src/renderer/components/shared/form/Form.styles.tsx)
+export const InputBigNumber = forwardRef<typeof A.Input, Props>((props: Props, ref: FixmeType): JSX.Element => {
   const {
     decimal = 2,
     value = ZERO_BN,

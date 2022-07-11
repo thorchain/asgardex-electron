@@ -3,7 +3,6 @@ import { join } from 'path'
 import { Keystore } from '@xchainjs/xchain-crypto'
 import { BrowserWindow, app, ipcMain, nativeImage } from 'electron'
 import electronDebug from 'electron-debug'
-// import installExtension, { REACT_DEVELOPER_TOOLS } from 'electron-devtools-installer'
 import isDev from 'electron-is-dev'
 import log from 'electron-log'
 import { warn } from 'electron-log'
@@ -11,10 +10,14 @@ import windowStateKeeper from 'electron-window-state'
 import * as E from 'fp-ts/lib/Either'
 import * as FP from 'fp-ts/lib/function'
 
-import { ipcLedgerDepositTxParamsIO, ipcLedgerSendTxParamsIO } from '../shared/api/io'
-import { IPCLedgerAdddressParams, StoreFileName } from '../shared/api/types'
+import {
+  ipcLedgerApproveERC20TokenParamsIO,
+  ipcLedgerDepositTxParamsIO,
+  ipcLedgerSendTxParamsIO
+} from '../shared/api/io'
+import type { IPCLedgerAdddressParams, StoreFileName } from '../shared/api/types'
 import { DEFAULT_STORAGES } from '../shared/const'
-import { Locale } from '../shared/i18n/types'
+import type { Locale } from '../shared/i18n/types'
 import { registerAppCheckUpdatedHandler } from './api/appUpdate'
 import { getFileStoreService } from './api/fileStore'
 import { saveKeystore, removeKeystore, getKeystore, keystoreExist, exportKeystore, loadKeystore } from './api/keystore'
@@ -24,6 +27,7 @@ import {
   deposit as depositLedgerTx,
   verifyLedgerAddress
 } from './api/ledger'
+import { approveLedgerERC20Token } from './api/ledger/ethereum/approve'
 import IPCMessages from './ipc/messages'
 import { setMenu } from './menu'
 
@@ -77,12 +81,9 @@ const closeHandler = () => {
 }
 
 const setupDevEnv = async () => {
+  const { default: installExtension, REACT_DEVELOPER_TOOLS } = require('electron-devtools-installer')
   try {
-    // Disable `REACT_DEVELOPER_TOOLS` temporary
-    // It causes issues by using latest CRA 4
-    // https://github.com/facebook/create-react-app/issues/9893
-    // // TODO (@Veado / @ThatStrangeGuy) Bring it back once CRA 4 has been fixed
-    // await installExtension(REACT_DEVELOPER_TOOLS)
+    await installExtension(REACT_DEVELOPER_TOOLS)
   } catch (e) {
     warn('unable to install devtools', e)
   }
@@ -110,13 +111,15 @@ const initMainWindow = async () => {
       // From Electron 12, it will be enabled by default.
       contextIsolation: true,
       // preload script
-      preload: join(__dirname, IS_DEV ? '../../public/' : '../build/', 'preload.js')
+      preload: join(__dirname, IS_DEV ? '../../public/' : '../build/', 'preload.js'),
+      // for develop locally only to avoid CORS issues
+      webSecurity: !IS_DEV,
+      // `allowRunningInsecureContent` needs to set to `true`,
+      // it will be changed to `false` whenever `webSecurity` is `true`
+      // @see https://www.electronjs.org/docs/latest/api/browser-window#new-browserwindowoptions
+      allowRunningInsecureContent: false
     }
   })
-
-  if (IS_DEV) {
-    await setupDevEnv()
-  }
 
   mainWindowState.manage(mainWindow)
   mainWindow.on('closed', closeHandler)
@@ -164,6 +167,13 @@ const initIPC = () => {
       E.fold((e) => Promise.reject(e), depositLedgerTx)
     )
   })
+  ipcMain.handle(IPCMessages.APPROVE_LEDGER_ERC20_TOKEN, async (_, params: unknown) => {
+    return FP.pipe(
+      // params need to be decoded
+      ipcLedgerApproveERC20TokenParamsIO.decode(params),
+      E.fold((e) => Promise.reject(e), approveLedgerERC20Token)
+    )
+  })
   // Update
   registerAppCheckUpdatedHandler(IS_DEV)
   // Register all file-stored data services
@@ -174,6 +184,9 @@ const initIPC = () => {
 
 const init = async () => {
   await app.whenReady()
+  if (IS_DEV) {
+    await setupDevEnv()
+  }
   await initMainWindow()
   app.on('window-all-closed', allClosedHandler)
   app.on('activate', activateHandler)

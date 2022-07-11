@@ -8,7 +8,6 @@ import {
   assetToString,
   baseAmount,
   AssetRuneNative,
-  AssetRuneERC20Testnet,
   ETHChain,
   BNBChain,
   AssetRune67C,
@@ -19,7 +18,9 @@ import {
   Chain,
   PolkadotChain,
   CosmosChain,
-  DOGEChain
+  DOGEChain,
+  TerraChain,
+  AssetRuneERC20Testnet
 } from '@xchainjs/xchain-util'
 
 import { Network } from '../shared/api/types'
@@ -33,14 +34,16 @@ import { PricePoolCurrencyWeights, PricePoolAssets } from './views/pools/Pools.t
 export const AssetUSDTERC20: Asset = {
   chain: ETHChain,
   symbol: 'USDT-0xdAC17F958D2ee523a2206206994597C13D831ec7',
-  ticker: 'USDT'
+  ticker: 'USDT',
+  synth: false
 }
 
 // ETH.USDT - testnet only
 export const AssetUSDTERC20Testnet: Asset = {
   chain: ETHChain,
   symbol: 'USDT-0xa3910454bf2cb59b8b3a401589a3bacc5ca42306',
-  ticker: 'USDT'
+  ticker: 'USDT',
+  synth: false
 }
 
 export const AssetXRuneAddress = '0x69fa0fee221ad11012bab0fdb45d444d3d2ce71c'
@@ -48,82 +51,26 @@ const AssetXRuneSymbol = 'XRUNE'
 export const AssetXRune: Asset = {
   chain: ETHChain,
   symbol: `${AssetXRuneSymbol}-${AssetXRuneAddress}`,
-  ticker: AssetXRuneSymbol
+  ticker: AssetXRuneSymbol,
+  synth: false
 }
 
 export const AssetXRuneTestnet: Asset = {
   chain: ETHChain,
   symbol: 'XRUNE-0x8626db1a4f9f3e1002eeb9a4f3c6d391436ffc23',
-  ticker: 'XRUNE'
+  ticker: 'XRUNE',
+  synth: false
 }
 
 export const AssetTGTERC20: Asset = {
   chain: ETHChain,
   symbol: 'TGT-0x108a850856db3f85d0269a2693d896b394c80325',
-  ticker: 'TGT'
-}
-
-export const AssetTGTERC20Testnet: Asset = {
-  chain: ETHChain,
-  symbol: 'TGT-0x73d6e26896981798526b6ead48d0fab76e205974',
-  ticker: 'TGT'
-}
-
-// ETH.UST - testnet only
-export const AssetUSTERC20Testnet: Asset = {
-  chain: ETHChain,
-  symbol: 'UST-0x6cA13a4ab78dd7D657226b155873A04DB929A3A4',
-  ticker: 'UST'
-}
-
-// ETH.THOR - testnet only
-export const AssetThorERC20Testnet: Asset = {
-  chain: ETHChain,
-  symbol: 'THOR-0xA0b515c058F127a15Dd3326F490eBF47d215588e',
-  ticker: 'THOR'
-}
-
-// TKN8 - random test asset w/ 8 decimal (testnet only)
-export const AssetTKN8ERC20Testnet: Asset = {
-  chain: ETHChain,
-  symbol: 'TKN8-0x242aD49dAcd38aC23caF2ccc118482714206beD4',
-  ticker: 'TKN8'
-}
-
-// TKN18 - random test asset w/ 18 decimal (testnet only)
-export const AssetTKN18ERC20Testnet: Asset = {
-  chain: ETHChain,
-  symbol: 'TKN18-0x8E3f9E9b5B26AAaE9d31364d2a8e8a9dd2BE3B82',
-  ticker: 'TKN18'
-}
-
-// Wrapped Ether (WETH) - testnet only
-export const AssetWETHERC20Testnet: Asset = {
-  chain: ETHChain,
-  symbol: 'WETH-0xbCA556c912754Bc8E7D4Aad20Ad69a1B1444F42d',
-  ticker: 'WETH'
-}
-
-// DAI - testnet only
-export const AssetDAIERC20Testnet: Asset = {
-  chain: ETHChain,
-  symbol: 'DAI-0xad6d458402f60fd3bd25163575031acdce07538d',
-  ticker: 'DAI'
+  ticker: 'TGT',
+  synth: false
 }
 
 // This hardcode list is for testnet only
-export const ERC20AssetsTestnet = [
-  AssetUSDTERC20Testnet,
-  AssetXRuneTestnet,
-  AssetUSTERC20Testnet,
-  AssetRuneERC20Testnet,
-  AssetThorERC20Testnet,
-  AssetTKN8ERC20Testnet,
-  AssetTKN18ERC20Testnet,
-  AssetWETHERC20Testnet,
-  AssetDAIERC20Testnet,
-  AssetTGTERC20Testnet
-]
+export const ERC20AssetsTestnet = [AssetUSDTERC20Testnet, AssetXRuneTestnet, AssetRuneERC20Testnet]
 export const ETHAssetsTestnet = [AssetETH, ...ERC20AssetsTestnet]
 
 // UNIH (exploit contract)
@@ -133,7 +80,8 @@ const AssetUniHSymbol = 'UNIH'
 export const AssetUniH: Asset = {
   chain: ETHChain,
   symbol: `${AssetUniHSymbol}-${AssetUniHAddress}`,
-  ticker: AssetUniHSymbol
+  ticker: AssetUniHSymbol,
+  synth: false
 }
 
 // Black listed BNB assets
@@ -149,29 +97,40 @@ export const BinanceBlackList: Record<Network, Array<Asset>> = {
 //
 
 // BUSD testnet
-export const AssetBUSDBAF: Asset = { chain: BNBChain, symbol: 'BUSD-BAF', ticker: 'BUSD' }
-export const AssetBUSD74E: Asset = { chain: BNBChain, symbol: 'BUSD-74E', ticker: 'BUSD' }
+export const AssetBUSDBAF: Asset = { chain: BNBChain, symbol: 'BUSD-BAF', ticker: 'BUSD', synth: false }
+export const AssetBUSD74E: Asset = { chain: BNBChain, symbol: 'BUSD-74E', ticker: 'BUSD', synth: false }
 // BUSD mainnet
-export const AssetBUSDBD1: Asset = { chain: BNBChain, symbol: 'BUSD-BD1', ticker: 'BUSD' }
+export const AssetBUSDBD1: Asset = { chain: BNBChain, symbol: 'BUSD-BD1', ticker: 'BUSD', synth: false }
 // BNB.USDT
-export const AssetUSDTDC8: Asset = { chain: BNBChain, symbol: 'USDT-DC8', ticker: 'USDT' }
+export const AssetUSDTDC8: Asset = { chain: BNBChain, symbol: 'USDT-DC8', ticker: 'USDT', synth: false }
 // ETH.USDT mainnet
 export const AssetUSDTDAC: Asset = {
   chain: ETHChain,
   symbol: 'USDT-0xdAC17F958D2ee523a2206206994597C13D831ec7',
-  ticker: 'USDT'
+  ticker: 'USDT',
+  synth: false
 }
 // ETH.USDT testnet
 export const AssetUSDT62E: Asset = {
   chain: ETHChain,
   symbol: 'USDT-0x62e273709Da575835C7f6aEf4A31140Ca5b1D190',
-  ticker: 'USDT'
+  ticker: 'USDT',
+  synth: false
 }
 // ETH.USDC mainnet
 export const AssetUSDC: Asset = {
   chain: ETHChain,
   symbol: 'USDC-0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48',
-  ticker: 'USDC'
+  ticker: 'USDC',
+  synth: false
+}
+
+// TERRA.UST mainnet
+export const AssetUST: Asset = {
+  chain: TerraChain,
+  symbol: 'UST',
+  ticker: 'UST',
+  synth: false
 }
 
 export const DEFAULT_PRICE_ASSETS: PricePoolAssets = [AssetRuneNative, AssetETH, AssetBTC]
@@ -184,7 +143,8 @@ export const USD_PRICE_ASSETS: PricePoolAssets = [
   AssetUSDTDAC,
   AssetUSDT62E,
   AssetUSDTERC20Testnet,
-  AssetUSDC
+  AssetUSDC,
+  AssetUST
 ]
 
 // Weight of chains
@@ -199,7 +159,8 @@ export const CHAIN_WEIGHTS: Record<Chain, number> = {
   [BNBChain]: 5,
   [CosmosChain]: 6,
   [DOGEChain]: 7,
-  [PolkadotChain]: 8
+  [TerraChain]: 8,
+  [PolkadotChain]: 9
 }
 
 // Weight of currencies needed for pricing
@@ -213,9 +174,10 @@ export const CURRENCY_WEIGHTS: PricePoolCurrencyWeights = {
   [assetToString(AssetUSDT62E)]: 5,
   [assetToString(AssetUSDTERC20Testnet)]: 6,
   [assetToString(AssetUSDC)]: 7,
-  [assetToString(AssetETH)]: 8,
-  [assetToString(AssetBTC)]: 9,
-  [assetToString(AssetRuneNative)]: 10
+  [assetToString(AssetUST)]: 8,
+  [assetToString(AssetETH)]: 9,
+  [assetToString(AssetBTC)]: 10,
+  [assetToString(AssetRuneNative)]: 11
 }
 
 // Whitelist of pools for pricing things
@@ -246,4 +208,14 @@ export const ASYM_DEPOSIT_TOOL_URL: Record<Network, string> = {
 }
 
 // @asgdx-team: Extend list whenever another ledger app will be supported
-export const SUPPORTED_LEDGER_APPS: Chain[] = [THORChain, BNBChain]
+export const SUPPORTED_LEDGER_APPS: Chain[] = [
+  THORChain,
+  BNBChain,
+  BTCChain,
+  LTCChain,
+  DOGEChain,
+  BCHChain,
+  TerraChain,
+  ETHChain,
+  CosmosChain
+]

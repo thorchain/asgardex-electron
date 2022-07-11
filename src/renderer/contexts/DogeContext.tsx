@@ -53,7 +53,7 @@ const initialContext: DogeContextValue = {
 
 const DogeContext = createContext<DogeContextValue | null>(null)
 
-export const DogeProvider: React.FC = ({ children }): JSX.Element => {
+export const DogeProvider: React.FC<{ children: React.ReactNode }> = ({ children }): JSX.Element => {
   return <DogeContext.Provider value={initialContext}>{children}</DogeContext.Provider>
 }
 

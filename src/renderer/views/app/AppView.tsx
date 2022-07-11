@@ -2,13 +2,14 @@ import React, { useEffect, useMemo, useRef } from 'react'
 
 import { SyncOutlined } from '@ant-design/icons'
 import * as RD from '@devexperts/remote-data-ts'
-import { BCHChain, BNBChain, BTCChain, Chain, ETHChain, LTCChain } from '@xchainjs/xchain-util'
+import { BCHChain, BNBChain, BTCChain, Chain, CosmosChain, ETHChain, LTCChain } from '@xchainjs/xchain-util'
 import * as FP from 'fp-ts/function'
 import * as A from 'fp-ts/lib/Array'
 import * as O from 'fp-ts/Option'
 import { useObservableState } from 'observable-hooks'
 import { useIntl } from 'react-intl'
 
+import { DEFAULT_LOCALE } from '../../../shared/i18n/const'
 import { envOrDefault } from '../../../shared/utils/env'
 import { Footer } from '../../components/footer'
 import { Header } from '../../components/header'
@@ -34,8 +35,8 @@ type HaltedChainsState = {
 export const AppView: React.FC = (): JSX.Element => {
   const intl = useIntl()
 
-  const { locale$, initialLocale } = useI18nContext()
-  const currentLocale = useObservableState(locale$, initialLocale)
+  const { locale$ } = useI18nContext()
+  const currentLocale = useObservableState(locale$, DEFAULT_LOCALE)
 
   useEffect(() => {
     // Needed to update Electron native menu according to the selected locale
@@ -96,7 +97,10 @@ export const AppView: React.FC = (): JSX.Element => {
               pauseLpBch,
               haltLtcChain,
               haltLtcTrading,
-              pauseLpLtc
+              pauseLpLtc,
+              haltCosmosChain,
+              haltCosmosTrading,
+              pauseLpCosmos
             }
           }) => {
             let msg = ''
@@ -134,6 +138,12 @@ export const AppView: React.FC = (): JSX.Element => {
                   haltedChain: haltBnbChain,
                   haltedTrading: haltBnbTrading,
                   pausedLP: pauseLpBnb
+                },
+                {
+                  chain: CosmosChain,
+                  haltedChain: haltCosmosChain,
+                  haltedTrading: haltCosmosTrading,
+                  pausedLP: pauseLpCosmos
                 }
               ]
 

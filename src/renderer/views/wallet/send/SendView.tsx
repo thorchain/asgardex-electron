@@ -1,82 +1,79 @@
 import React, { useCallback, useMemo } from 'react'
 
+import { Address } from '@xchainjs/xchain-client'
 import {
   Asset,
-  assetFromString,
   assetToString,
   BCHChain,
   BNBChain,
   BTCChain,
+  CosmosChain,
   DOGEChain,
   ETHChain,
   LTCChain,
+  TerraChain,
   THORChain
 } from '@xchainjs/xchain-util'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/Option'
-import { useObservableState } from 'observable-hooks'
 import { useIntl } from 'react-intl'
-import { useParams } from 'react-router'
+import { useParams } from 'react-router-dom'
 
-import { Network } from '../../../../shared/api/types'
+import { WalletType } from '../../../../shared/wallet/types'
 import { ErrorView } from '../../../components/shared/error/'
 import { BackLink } from '../../../components/uielements/backLink'
-import { useAppContext } from '../../../contexts/AppContext'
-import { useWalletContext } from '../../../contexts/WalletContext'
-import { useOpenExplorerTxUrl } from '../../../hooks/useOpenExplorerTxUrl'
+import { getAssetWalletParams } from '../../../helpers/routeHelper'
 import { SendParams } from '../../../routes/wallet'
 import * as walletRoutes from '../../../routes/wallet'
-import { OpenExplorerTxUrl } from '../../../services/clients'
-import { DEFAULT_NETWORK } from '../../../services/const'
-import { INITIAL_BALANCES_STATE } from '../../../services/wallet/const'
-import { SendViewBNB, SendViewBCH, SendViewBTC, SendViewETH, SendViewDOGE, SendViewTHOR, SendViewLTC } from './index'
+import {
+  SendViewBNB,
+  SendViewBCH,
+  SendViewBTC,
+  SendViewETH,
+  SendViewDOGE,
+  SendViewTHOR,
+  SendViewLTC,
+  SendViewTERRA,
+  SendViewCOSMOS
+} from './index'
 
 type Props = {}
 
 export const SendView: React.FC<Props> = (): JSX.Element => {
-  const { asset, walletAddress, walletType, walletIndex: walletIndexRoute } = useParams<SendParams>()
+  const routeParams = useParams<SendParams>()
+  const oRouteParams = getAssetWalletParams(routeParams)
 
-  const walletIndex = parseInt(walletIndexRoute)
   const intl = useIntl()
 
-  const { network$ } = useAppContext()
-  const network = useObservableState<Network>(network$, DEFAULT_NETWORK)
-
-  const oSelectedAsset = useMemo(() => O.fromNullable(assetFromString(asset)), [asset])
-
-  const {
-    balancesState$,
-    keystoreService: { validatePassword$ }
-  } = useWalletContext()
-
-  const { balances } = useObservableState(balancesState$, INITIAL_BALANCES_STATE)
-
-  const openExplorerTxUrl: OpenExplorerTxUrl = useOpenExplorerTxUrl(
-    FP.pipe(
-      oSelectedAsset,
-      O.map(({ chain }) => chain)
-    )
-  )
-
-  const renderAssetError = useMemo(
-    () => (
+  const renderRouteError = useMemo(() => {
+    const { asset, walletAddress, walletType, walletIndex } = routeParams
+    return (
       <>
         <BackLink />
         <ErrorView
           title={intl.formatMessage(
-            { id: 'routes.invalid.asset' },
+            { id: 'routes.invalid.params' },
             {
-              asset
+              params: `asset: ${asset} , walletAddress: ${walletAddress}, walletType: ${walletType}, walletIndex: ${walletIndex}`
             }
           )}
         />
       </>
-    ),
-    [asset, intl]
-  )
+    )
+  }, [intl, routeParams])
 
   const renderSendView = useCallback(
-    (asset: Asset) => {
+    ({
+      asset,
+      walletAddress,
+      walletType,
+      walletIndex
+    }: {
+      asset: Asset
+      walletAddress: Address
+      walletType: WalletType
+      walletIndex: number
+    }) => {
       switch (asset.chain) {
         case BNBChain:
           return (
@@ -85,85 +82,38 @@ export const SendView: React.FC<Props> = (): JSX.Element => {
               walletAddress={walletAddress}
               walletIndex={walletIndex}
               asset={asset}
-              balances={balances}
-              openExplorerTxUrl={openExplorerTxUrl}
-              validatePassword$={validatePassword$}
-              network={network}
             />
           )
         case BCHChain:
-          return (
-            <SendViewBCH
-              walletType={walletType}
-              walletIndex={walletIndex}
-              asset={asset}
-              balances={balances}
-              openExplorerTxUrl={openExplorerTxUrl}
-              validatePassword$={validatePassword$}
-              network={network}
-            />
-          )
+          return <SendViewBCH walletType={walletType} walletIndex={walletIndex} walletAddress={walletAddress} />
         case BTCChain:
-          return (
-            <SendViewBTC
-              walletType={walletType}
-              walletIndex={walletIndex}
-              asset={asset}
-              balances={balances}
-              openExplorerTxUrl={openExplorerTxUrl}
-              validatePassword$={validatePassword$}
-              network={network}
-            />
-          )
+          return <SendViewBTC walletType={walletType} walletIndex={walletIndex} walletAddress={walletAddress} />
         case ETHChain:
           return (
             <SendViewETH
               walletType={walletType}
               walletIndex={walletIndex}
+              walletAddress={walletAddress}
               asset={asset}
-              balances={balances}
-              openExplorerTxUrl={openExplorerTxUrl}
-              validatePassword$={validatePassword$}
-              network={network}
             />
           )
         case THORChain:
+          return <SendViewTHOR walletType={walletType} walletIndex={walletIndex} walletAddress={walletAddress} />
+        case LTCChain:
+          return <SendViewLTC walletType={walletType} walletIndex={walletIndex} walletAddress={walletAddress} />
+        case DOGEChain:
+          return <SendViewDOGE walletType={walletType} walletIndex={walletIndex} walletAddress={walletAddress} />
+        case TerraChain:
           return (
-            <SendViewTHOR
+            <SendViewTERRA
               walletType={walletType}
               walletIndex={walletIndex}
               walletAddress={walletAddress}
               asset={asset}
-              balances={balances}
-              openExplorerTxUrl={openExplorerTxUrl}
-              validatePassword$={validatePassword$}
-              network={network}
             />
           )
-        case LTCChain:
-          return (
-            <SendViewLTC
-              walletType={walletType}
-              walletIndex={walletIndex}
-              asset={asset}
-              balances={balances}
-              openExplorerTxUrl={openExplorerTxUrl}
-              validatePassword$={validatePassword$}
-              network={network}
-            />
-          )
-        case DOGEChain:
-          return (
-            <SendViewDOGE
-              walletType={walletType}
-              walletIndex={walletIndex}
-              asset={asset}
-              balances={balances}
-              openExplorerTxUrl={openExplorerTxUrl}
-              validatePassword$={validatePassword$}
-              network={network}
-            />
-          )
+        case CosmosChain:
+          return <SendViewCOSMOS walletType={walletType} walletIndex={walletIndex} walletAddress={walletAddress} />
         default:
           return (
             <h1>
@@ -177,24 +127,24 @@ export const SendView: React.FC<Props> = (): JSX.Element => {
           )
       }
     },
-    [walletType, walletAddress, walletIndex, balances, openExplorerTxUrl, validatePassword$, network, intl]
+    [intl]
   )
 
   return FP.pipe(
-    oSelectedAsset,
+    oRouteParams,
     O.fold(
-      () => renderAssetError,
-      (asset) => (
+      () => renderRouteError,
+      ({ asset, walletAddress, walletType, walletIndex }) => (
         <>
           <BackLink
             path={walletRoutes.assetDetail.path({
               asset: assetToString(asset),
               walletAddress,
               walletType,
-              walletIndex: walletIndexRoute
+              walletIndex: walletIndex.toString()
             })}
           />
-          {renderSendView(asset)}
+          {renderSendView({ asset, walletAddress, walletType, walletIndex })}
         </>
       )
     )

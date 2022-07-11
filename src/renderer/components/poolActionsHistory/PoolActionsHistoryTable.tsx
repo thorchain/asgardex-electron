@@ -12,6 +12,7 @@ import { OpenExplorerTxUrl } from '../../services/clients'
 import { ActionsPage, Action, ActionsPageRD } from '../../services/midgard/types'
 import { ApiError } from '../../services/wallet/types'
 import { ErrorView } from '../shared/error'
+import { Button } from '../uielements/button'
 import * as CommonStyled from '../uielements/common/Common.styles'
 import { Pagination } from '../uielements/pagination'
 import { TxDetail } from '../uielements/txDetail'
@@ -26,6 +27,7 @@ export type Props = {
   prevHistoryPage?: O.Option<ActionsPage>
   openExplorerTxUrl: OpenExplorerTxUrl
   changePaginationHandler: (page: number) => void
+  reloadHistory: FP.Lazy<void>
   className?: string
 }
 
@@ -35,6 +37,7 @@ export const PoolActionsHistoryTable: React.FC<Props> = ({
   changePaginationHandler,
   historyPageRD,
   prevHistoryPage = O.none,
+  reloadHistory,
   currentPage
 }) => {
   const intl = useIntl()
@@ -51,7 +54,7 @@ export const PoolActionsHistoryTable: React.FC<Props> = ({
     [isDesktopView]
   )
 
-  const renderDateColumn = useCallback((_, { date }: Action) => H.renderDate(date), [])
+  const renderDateColumn = useCallback((_: unknown, { date }: Action) => H.renderDate(date), [])
 
   const dateColumn: ColumnType<Action> = useMemo(
     () => ({
@@ -144,20 +147,29 @@ export const PoolActionsHistoryTable: React.FC<Props> = ({
   return useMemo(
     () => (
       <>
-        {RD.fold(
-          () => renderTable(H.emptyData, true),
-          () => {
-            const data = FP.pipe(
-              prevHistoryPage,
-              O.getOrElse(() => H.emptyData)
-            )
-            return renderTable(data, true)
-          },
-          ({ msg }: ApiError) => <ErrorView title={msg} />,
-          renderTable
-        )(historyPageRD)}
+        {FP.pipe(
+          historyPageRD,
+          RD.fold(
+            () => renderTable(H.emptyData, true),
+            () => {
+              const data = FP.pipe(
+                prevHistoryPage,
+                O.getOrElse(() => H.emptyData)
+              )
+              return renderTable(data, true)
+            },
+            ({ msg }: ApiError) => (
+              <ErrorView
+                title={intl.formatMessage({ id: 'common.error' })}
+                subTitle={msg}
+                extra={<Button onClick={reloadHistory}>{intl.formatMessage({ id: 'common.retry' })}</Button>}
+              />
+            ),
+            renderTable
+          )
+        )}
       </>
     ),
-    [historyPageRD, renderTable, prevHistoryPage]
+    [renderTable, historyPageRD, prevHistoryPage, intl, reloadHistory]
   )
 }

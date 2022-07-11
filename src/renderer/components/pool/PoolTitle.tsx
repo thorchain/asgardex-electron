@@ -1,140 +1,119 @@
 import React, { useMemo } from 'react'
 
 import { SwapOutlined } from '@ant-design/icons'
+import * as RD from '@devexperts/remote-data-ts'
 import { Asset, AssetAmount, AssetRuneNative, assetToString, formatAssetAmount } from '@xchainjs/xchain-util'
 import { Grid } from 'antd'
 import * as FP from 'fp-ts/lib/function'
-import * as O from 'fp-ts/lib/Option'
 import { useIntl } from 'react-intl'
-import { useHistory } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 
 import { Network } from '../../../shared/api/types'
 import { loadingString } from '../../helpers/stringHelper'
 import * as poolsRoutes from '../../routes/pools'
-import { GetPoolsStatusEnum } from '../../types/generated/midgard'
 import { ManageButton } from '../manageButton'
 import { AssetIcon } from '../uielements/assets/assetIcon'
 import { Button } from '../uielements/button'
 import * as Styled from './PoolTitle.styles'
 
 export type Props = {
-  asset: O.Option<Asset>
-  price: AssetAmount
-  priceSymbol?: string
+  asset: Asset
+  watched: boolean
+  watch: FP.Lazy<void>
+  unwatch: FP.Lazy<void>
+  price: RD.RemoteData<Error, { amount: AssetAmount; symbol: string }>
   isLoading?: boolean
   disableTradingPoolAction: boolean
   disableAllPoolActions: boolean
   disablePoolActions: boolean
   network: Network
-  status: GetPoolsStatusEnum
+  isAvailablePool: boolean
 }
 
 export const PoolTitle: React.FC<Props> = ({
-  asset: oAsset,
-  price,
-  priceSymbol,
+  asset,
+  watched,
+  watch,
+  unwatch,
+  price: priceRD,
   disableTradingPoolAction,
   disableAllPoolActions,
   disablePoolActions,
   network,
-  isLoading,
-  status
+  isAvailablePool
 }) => {
-  const history = useHistory()
+  const navigate = useNavigate()
   const intl = useIntl()
   const isDesktopView = Grid.useBreakpoint()?.md ?? false
 
-  const title = useMemo(
+  const title = useMemo(() => {
+    const Star = watched ? Styled.StarFilled : Styled.StarOutlined
+    const starClickHandler = watched ? unwatch : watch
+    return (
+      <>
+        <AssetIcon asset={asset} size={isDesktopView ? 'big' : 'normal'} key={assetToString(asset)} network={network} />
+        <Styled.AssetWrapper>
+          <div style={{ display: 'flex', alignItems: 'center' }}>
+            <Styled.AssetTitle>{asset.ticker}</Styled.AssetTitle>
+            <Star onClick={starClickHandler} />
+          </div>
+          <Styled.AssetSubtitle>{asset.chain}</Styled.AssetSubtitle>
+        </Styled.AssetWrapper>
+      </>
+    )
+  }, [asset, isDesktopView, network, unwatch, watch, watched])
+
+  const priceStr = useMemo(
     () =>
       FP.pipe(
-        oAsset,
-        O.fold(
-          () => <>--</>,
-          (asset) => (
-            <>
-              <AssetIcon
-                asset={asset}
-                size={isDesktopView ? 'big' : 'normal'}
-                key={assetToString(asset)}
-                network={network}
-              />
-
-              <Styled.AssetWrapper>
-                <Styled.AssetTitle>
-                  {FP.pipe(
-                    oAsset,
-                    O.map(({ ticker }) => ticker),
-                    O.getOrElse(() => loadingString)
-                  )}
-                </Styled.AssetTitle>
-                <Styled.AssetSubtitle>
-                  {FP.pipe(
-                    oAsset,
-                    O.map((asset) => asset.chain),
-                    O.getOrElse(() => loadingString)
-                  )}
-                </Styled.AssetSubtitle>
-              </Styled.AssetWrapper>
-            </>
-          )
-        )
+        priceRD,
+        RD.map(({ amount, symbol }) => `${symbol} ${formatAssetAmount({ amount, decimal: 3 })}`),
+        RD.getOrElse(() => loadingString)
       ),
-    [oAsset, isDesktopView, network]
+    [priceRD]
   )
 
-  const priceStr = useMemo(() => {
-    if (isLoading) return loadingString
-
-    return FP.pipe(
-      oAsset,
-      O.fold(
-        () => '',
-        () => `${priceSymbol} ${formatAssetAmount({ amount: price, decimal: 3 })}`
-      )
-    )
-  }, [isLoading, oAsset, price, priceSymbol])
-
   const buttons = useMemo(
-    () =>
-      FP.pipe(
-        oAsset,
-        O.fold(
-          () => <></>,
-          (asset) => {
-            return (
-              <Styled.ButtonActions>
-                <ManageButton
-                  disabled={disableAllPoolActions || disablePoolActions}
-                  asset={asset}
-                  sizevalue={isDesktopView ? 'normal' : 'small'}
-                  isTextView={isDesktopView}
-                />
-                {status === GetPoolsStatusEnum.Available && (
-                  <Button
-                    disabled={disableAllPoolActions || disableTradingPoolAction}
-                    round="true"
-                    sizevalue={isDesktopView ? 'normal' : 'small'}
-                    style={{ height: 30 }}
-                    onClick={(event) => {
-                      event.preventDefault()
-                      event.stopPropagation()
-                      history.push(
-                        poolsRoutes.swap.path({
-                          source: assetToString(asset),
-                          target: assetToString(AssetRuneNative)
-                        })
-                      )
-                    }}>
-                    <SwapOutlined />
-                    {isDesktopView && intl.formatMessage({ id: 'common.swap' })}
-                  </Button>
-                )}
-              </Styled.ButtonActions>
-            )
-          }
-        )
-      ),
-    [oAsset, disableAllPoolActions, disablePoolActions, isDesktopView, status, disableTradingPoolAction, intl, history]
+    () => (
+      <Styled.ButtonActions>
+        <ManageButton
+          disabled={disableAllPoolActions || disablePoolActions}
+          asset={asset}
+          sizevalue={isDesktopView ? 'normal' : 'small'}
+          isTextView={isDesktopView}
+        />
+        {isAvailablePool && (
+          <Button
+            disabled={disableAllPoolActions || disableTradingPoolAction}
+            round="true"
+            sizevalue={isDesktopView ? 'normal' : 'small'}
+            style={{ height: 30 }}
+            onClick={(event) => {
+              event.preventDefault()
+              event.stopPropagation()
+              navigate(
+                poolsRoutes.swap.path({
+                  source: assetToString(asset),
+                  target: assetToString(AssetRuneNative)
+                })
+              )
+            }}>
+            <SwapOutlined />
+            {isDesktopView && intl.formatMessage({ id: 'common.swap' })}
+          </Button>
+        )}
+      </Styled.ButtonActions>
+    ),
+    [
+      disableAllPoolActions,
+      disablePoolActions,
+      asset,
+      isDesktopView,
+      isAvailablePool,
+      disableTradingPoolAction,
+      intl,
+      navigate
+    ]
   )
 
   return (

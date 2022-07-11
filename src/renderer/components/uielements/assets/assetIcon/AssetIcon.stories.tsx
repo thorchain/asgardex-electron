@@ -1,7 +1,8 @@
 import React from 'react'
 
-import { radios } from '@storybook/addon-knobs'
-import { RadiosTypeOptionsProp } from '@storybook/addon-knobs/dist/components/types'
+// TODO (@veado) Replace knobs
+// import { radios } from '@storybook/addon-knobs'
+// import { RadiosTypeOptionsProp } from '@storybook/addon-knobs/dist/components/types'
 import { storiesOf } from '@storybook/react'
 import { AssetBCH, AssetBNB, AssetBTC, AssetETH, AssetRuneNative } from '@xchainjs/xchain-util'
 
@@ -10,14 +11,15 @@ import { AssetIcon } from './AssetIcon'
 import { Size } from './AssetIcon.types'
 
 storiesOf('Components/assets/AssetIcon', module).add('default', () => {
-  const sizeOptions: RadiosTypeOptionsProp<Size> = {
-    small: 'small',
-    normal: 'normal',
-    large: 'large',
-    big: 'big'
-  }
+  // const sizeOptions: RadiosTypeOptionsProp<Size> = {
+  //   small: 'small',
+  //   normal: 'normal',
+  //   large: 'large',
+  //   big: 'big'
+  // }
 
-  const size = radios('size', sizeOptions, 'small')
+  // const size = radios('size', sizeOptions, 'small')
+  const size: Size = 'normal'
 
   return (
     <div>

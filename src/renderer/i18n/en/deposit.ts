@@ -3,11 +3,10 @@ import { DepositMessages } from '../types'
 const deposit: DepositMessages = {
   'deposit.interact.title': 'Deposit',
   'deposit.interact.subtitle': 'Interact with THORchain',
-  'deposit.interact.actions': 'Available actions',
+  'deposit.interact.label.bondprovider': 'Bond provider (optional)',
   'deposit.interact.actions.bond': 'Bond',
   'deposit.interact.actions.unbond': 'Unbond',
   'deposit.interact.actions.leave': 'Leave',
-  'deposit.interact.actions.custom': 'Custom',
   'deposit.share.title': 'Your pool share',
   'deposit.share.units': 'Liquidity units',
   'deposit.share.total': 'Total value',
@@ -39,7 +38,7 @@ const deposit: DepositMessages = {
   'deposit.add.asymAssets.recoveryTitle': 'THORSwap',
   'deposit.add.assetMissmatch.title': 'Asset missmatch found',
   'deposit.add.assetMissmatch.description':
-    'One of current selected asset side has been already used in a previous deposit, but with another asset. Check following addresses to see the previous deposit pair.',
+    'One of current selected asset side has been already used in a previous deposit, but with another asset. Check following addresses to see previous deposit pair.',
   'deposit.bond.state.error': 'Bond error',
   'deposit.unbond.state.error': 'Unbond error',
   'deposit.leave.state.error': 'Leave error',
@@ -71,7 +70,6 @@ const deposit: DepositMessages = {
   'deposit.withdraw.feeNote': 'Note: {fee} BNB will be left in your wallet for the transaction fees.',
   'deposit.withdraw.error.feeNotCovered':
     'Transaction fee {fee} needs to be covered by your balance (currently {balance}).',
-  'deposit.withdraw.ledger.sign': 'Click next to sign the withdraw transaction on your device.',
   'deposit.ledger.sign': 'Click next to sign the deposit transaction on your device.'
 }
 

@@ -21,11 +21,18 @@ const reloadBalances = () => {
 }
 
 // State of balances loaded by Client
-// Currently in ASGDX `AssetRuneNative` is supported only. Remove asset list if we want to get balances of all assets at THORChain.
+// TODO (@veado) Remove `assets` list to enable synths - currently we support `AssetRuneNative` only
 const balances$ = (walletType: WalletType, walletIndex: number): C.WalletBalancesLD =>
-  C.balances$({ client$, trigger$: reloadBalances$, assets: [AssetRuneNative], walletType, walletIndex })
+  C.balances$({
+    client$,
+    trigger$: reloadBalances$,
+    walletType,
+    walletIndex,
+    assets: [AssetRuneNative],
+    walletBalanceType: 'all'
+  })
 
 // State of balances loaded by Client and Address
-const getBalanceByAddress$ = C.balancesByAddress$(client$, reloadBalances$)
+const getBalanceByAddress$ = C.balancesByAddress$({ client$, trigger$: reloadBalances$, walletBalanceType: 'all' })
 
 export { balances$, getBalanceByAddress$, reloadBalances, reloadBalances$, resetReloadBalances }

@@ -37,12 +37,12 @@ import {
   THORCHAIN_DECIMAL
 } from '../../../helpers/assetHelper'
 import { getChainAsset, isEthChain } from '../../../helpers/chainHelper'
-import { eqBaseAmount, eqOAsset, eqOApproveParams, eqOString } from '../../../helpers/fp/eq'
+import { unionAssets } from '../../../helpers/fp/array'
+import { eqBaseAmount, eqOAsset, eqOApproveParams } from '../../../helpers/fp/eq'
 import { sequenceSOption, sequenceTOption } from '../../../helpers/fpHelpers'
 import * as PoolHelpers from '../../../helpers/poolHelper'
 import { liveData, LiveData } from '../../../helpers/rx/liveData'
 import * as WalletHelper from '../../../helpers/walletHelper'
-import { FundsCap } from '../../../hooks/useFundsCap'
 import { useSubscriptionState } from '../../../hooks/useSubscriptionState'
 import { INITIAL_SYM_DEPOSIT_STATE } from '../../../services/chain/const'
 import { getZeroSymDepositFees } from '../../../services/chain/fees'
@@ -56,7 +56,7 @@ import {
   SymDepositFeesHandler,
   SymDepositFeesRD
 } from '../../../services/chain/types'
-import { OpenExplorerTxUrl } from '../../../services/clients'
+import { GetExplorerTxUrl, OpenExplorerTxUrl } from '../../../services/clients'
 import {
   ApproveFeeHandler,
   ApproveParams,
@@ -114,6 +114,8 @@ export type Props = {
   reloadSelectedPoolDetail: (delay?: number) => void
   openAssetExplorerTxUrl: OpenExplorerTxUrl
   openRuneExplorerTxUrl: OpenExplorerTxUrl
+  getRuneExplorerTxUrl: GetExplorerTxUrl
+  getAssetExplorerTxUrl: GetExplorerTxUrl
   validatePassword$: ValidatePasswordHandler
   onChangeAsset: (asset: Asset) => void
   disabled?: boolean
@@ -122,7 +124,7 @@ export type Props = {
   network: Network
   approveERC20Token$: (params: ApproveParams) => TxHashLD
   isApprovedERC20Token$: (params: IsApproveParams) => LiveData<ApiError, boolean>
-  fundsCap: O.Option<FundsCap>
+  protocolLimitReached: boolean
   poolsData: PoolsDataMap
   haltedChains: Chain[]
   mimirHalt: MimirHalt
@@ -149,6 +151,8 @@ export const SymDeposit: React.FC<Props> = (props) => {
     poolAddress: oPoolAddress,
     openAssetExplorerTxUrl,
     openRuneExplorerTxUrl,
+    getRuneExplorerTxUrl,
+    getAssetExplorerTxUrl,
     validatePassword$,
     priceAsset,
     reloadFees,
@@ -165,7 +169,7 @@ export const SymDeposit: React.FC<Props> = (props) => {
     approveERC20Token$,
     reloadApproveFee,
     approveFee$,
-    fundsCap: oFundsCap,
+    protocolLimitReached,
     poolsData,
     haltedChains,
     mimirHalt,
@@ -199,7 +203,9 @@ export const SymDeposit: React.FC<Props> = (props) => {
 
   const poolBasedBalancesAssets = FP.pipe(
     poolBasedBalances,
-    A.map(({ asset }) => asset)
+    A.map(({ asset }) => asset),
+    // Merge duplications
+    (assets) => unionAssets(assets)(assets)
   )
 
   const oRuneWB: O.Option<WalletBalance> = useMemo(() => {
@@ -376,21 +382,40 @@ export const SymDeposit: React.FC<Props> = (props) => {
     [oChainAssetBalance]
   )
 
+  const needApprovement = useMemo(() => {
+    // Other chains than ETH do not need an approvement
+    if (!isEthChain(asset.chain)) return false
+    // ETH does not need to be approved
+    if (isEthAsset(asset)) return false
+    // ERC20 token does need approvement only
+    return isEthTokenAsset(asset)
+  }, [asset])
+
   const oApproveParams: O.Option<ApproveParams> = useMemo(() => {
     const oRouterAddress: O.Option<Address> = FP.pipe(
       oPoolAddress,
       O.chain(({ router }) => router)
     )
     const oTokenAddress: O.Option<string> = getEthTokenAddress(asset)
+
+    const oNeedApprovement: O.Option<boolean> = FP.pipe(
+      needApprovement,
+      // `None` if needApprovement is `false`, no request then
+      O.fromPredicate((v) => !!v)
+    )
+
     return FP.pipe(
-      sequenceTOption(oTokenAddress, oRouterAddress),
-      O.map(([tokenAddress, routerAddress]) => ({
+      sequenceTOption(oNeedApprovement, oTokenAddress, oRouterAddress, oAssetWB),
+      O.map(([_, tokenAddress, routerAddress, { walletAddress, walletIndex, walletType }]) => ({
         network,
         spenderAddress: routerAddress,
-        contractAddress: tokenAddress
+        contractAddress: tokenAddress,
+        fromAddress: walletAddress,
+        walletIndex,
+        walletType
       }))
     )
-  }, [oPoolAddress, asset, network])
+  }, [oPoolAddress, asset, needApprovement, oAssetWB, network])
 
   const zeroDepositFees: SymDepositFees = useMemo(() => getZeroSymDepositFees(asset), [asset])
 
@@ -448,8 +473,8 @@ export const SymDeposit: React.FC<Props> = (props) => {
               asset: convertBaseAmountDecimal(assetAmountToDepositMax1e8, assetDecimal)
             },
             memos: {
-              asset: getDepositMemo(asset, runeAddress),
-              rune: getDepositMemo(asset, assetAddress)
+              asset: getDepositMemo({ asset, address: runeAddress }),
+              rune: getDepositMemo({ asset, address: assetAddress })
             },
             runeWalletType: runeWB.walletType,
             runeWalletIndex: runeWB.walletIndex,
@@ -497,6 +522,26 @@ export const SymDeposit: React.FC<Props> = (props) => {
     [approveFeeRD]
   )
 
+  // State for values of `isApprovedERC20Token$`
+  const {
+    state: isApprovedState,
+    reset: resetIsApprovedState,
+    subscribe: subscribeIsApprovedState
+  } = useSubscriptionState<IsApprovedRD>(RD.initial)
+
+  const checkApprovedStatus = useCallback(
+    ({ contractAddress, spenderAddress, fromAddress }: ApproveParams) => {
+      subscribeIsApprovedState(
+        isApprovedERC20Token$({
+          contractAddress,
+          spenderAddress,
+          fromAddress
+        })
+      )
+    },
+    [isApprovedERC20Token$, subscribeIsApprovedState]
+  )
+
   // Update `approveFeesRD` whenever `oApproveParams` has been changed
   useEffect(() => {
     FP.pipe(
@@ -508,10 +553,14 @@ export const SymDeposit: React.FC<Props> = (props) => {
         prevApproveParams.current = O.some(params)
         return params
       }),
-      // Trigger update for `approveFeesRD`
-      O.map(approveFeesParamsUpdated)
+      // Trigger update for `approveFeesRD` + `checkApprove`
+      O.map((params) => {
+        approveFeesParamsUpdated(params)
+        checkApprovedStatus(params)
+        return true
+      })
     )
-  }, [approveFeesParamsUpdated, oApproveParams, oPoolAddress])
+  }, [approveFeesParamsUpdated, checkApprovedStatus, oApproveParams, oPoolAddress])
 
   const reloadApproveFeesHandler = useCallback(() => {
     FP.pipe(oApproveParams, O.map(reloadApproveFee))
@@ -752,14 +801,15 @@ export const SymDeposit: React.FC<Props> = (props) => {
     }
   }, [reloadFeesHandler, selectedInput])
 
-  const [showPasswordModal, setShowPasswordModal] = useState(false)
-  const [showLedgerModal, setShowLedgerModal] = useState(false)
+  type ModalState = 'deposit' | 'approve' | 'none'
+  const [showPasswordModal, setShowPasswordModal] = useState<ModalState>('none')
+  const [showLedgerModal, setShowLedgerModal] = useState<ModalState>('none')
 
   const onSubmit = useCallback(() => {
     if (useAssetLedger || useRuneLedger) {
-      setShowLedgerModal(true)
+      setShowLedgerModal('deposit')
     } else {
-      setShowPasswordModal(true)
+      setShowPasswordModal('deposit')
     }
   }, [useAssetLedger, useRuneLedger])
 
@@ -903,6 +953,7 @@ export const SymDeposit: React.FC<Props> = (props) => {
           <Styled.ViewTxButtonTop
             txHash={oTxHash}
             onClick={openAssetExplorerTxUrl}
+            txUrl={FP.pipe(oTxHash, O.chain(getAssetExplorerTxUrl))}
             label={intl.formatMessage({ id: 'common.tx.view' }, { assetTicker: asset.ticker })}
           />
         ))}
@@ -910,6 +961,7 @@ export const SymDeposit: React.FC<Props> = (props) => {
           <ViewTxButton
             txHash={oTxHash}
             onClick={openRuneExplorerTxUrl}
+            txUrl={FP.pipe(oTxHash, O.chain(getRuneExplorerTxUrl))}
             label={intl.formatMessage({ id: 'common.tx.view' }, { assetTicker: AssetRuneNative.ticker })}
           />
         ))}
@@ -936,18 +988,11 @@ export const SymDeposit: React.FC<Props> = (props) => {
     txModalExtraContent,
     intl,
     openAssetExplorerTxUrl,
+    getAssetExplorerTxUrl,
     asset.ticker,
-    openRuneExplorerTxUrl
+    openRuneExplorerTxUrl,
+    getRuneExplorerTxUrl
   ])
-
-  const closePasswordModal = useCallback(() => {
-    setShowPasswordModal(false)
-  }, [setShowPasswordModal])
-
-  const onClosePasswordModal = useCallback(() => {
-    // close password modal
-    closePasswordModal()
-  }, [closePasswordModal])
 
   const submitDepositTx = useCallback(() => {
     FP.pipe(
@@ -962,35 +1007,6 @@ export const SymDeposit: React.FC<Props> = (props) => {
       })
     )
   }, [oDepositParams, subscribeDepositState, deposit$])
-
-  const onSucceedPasswordModal = useCallback(() => {
-    // close private modal
-    closePasswordModal()
-    // submit tx
-    submitDepositTx()
-  }, [closePasswordModal, submitDepositTx])
-
-  const onCloseLedgerModal = useCallback(() => {
-    // close modal
-    setShowLedgerModal(false)
-  }, [])
-
-  const onSucceedLedgerModal = useCallback(() => {
-    // close modal
-    setShowLedgerModal(false)
-    // open Pw modal
-    setShowPasswordModal(true)
-  }, [])
-
-  const fundsCapReached = useMemo(
-    () =>
-      FP.pipe(
-        oFundsCap,
-        O.map(({ reached }) => reached),
-        O.getOrElse(() => false)
-      ),
-    [oFundsCap]
-  )
 
   const inputOnBlur = useCallback(() => {
     setSelectedInput('none')
@@ -1008,15 +1024,6 @@ export const SymDeposit: React.FC<Props> = (props) => {
       ),
     [depositFeesRD, asset]
   )
-
-  const needApprovement = useMemo(() => {
-    // Other chains than ETH do not need an approvement
-    if (!isEthChain(asset.chain)) return false
-    // ETH does not need to be approved
-    if (isEthAsset(asset)) return false
-    // ERC20 token does need approvement only
-    return isEthTokenAsset(asset)
-  }, [asset])
 
   const uiApproveFeesRD: UIFeesRD = useMemo(
     () =>
@@ -1067,25 +1074,31 @@ export const SymDeposit: React.FC<Props> = (props) => {
     subscribe: subscribeApproveState
   } = useSubscriptionState<TxHashRD>(RD.initial)
 
-  const onApprove = () => {
-    const oRouterAddress: O.Option<Address> = FP.pipe(
-      oPoolAddress,
-      O.chain(({ router }) => router)
-    )
+  const onApprove = useCallback(() => {
+    if (useAssetLedger) {
+      setShowLedgerModal('approve')
+    } else {
+      setShowPasswordModal('approve')
+    }
+  }, [useAssetLedger])
 
+  const submitApproveTx = useCallback(() => {
     FP.pipe(
-      sequenceTOption(oRouterAddress, getEthTokenAddress(asset)),
-      O.map(([routerAddress, tokenAddress]) =>
+      oApproveParams,
+      O.map(({ walletIndex, walletType, contractAddress, spenderAddress, fromAddress }) =>
         subscribeApproveState(
           approveERC20Token$({
             network,
-            contractAddress: tokenAddress,
-            spenderAddress: routerAddress
+            contractAddress,
+            spenderAddress,
+            fromAddress,
+            walletIndex,
+            walletType
           })
         )
       )
     )
-  }
+  }, [approveERC20Token$, network, oApproveParams, subscribeApproveState])
 
   const renderApproveError = useMemo(
     () =>
@@ -1100,13 +1113,6 @@ export const SymDeposit: React.FC<Props> = (props) => {
       ),
     [approveState]
   )
-
-  // State for values of `isApprovedERC20Token$`
-  const {
-    state: isApprovedState,
-    reset: resetIsApprovedState,
-    subscribe: subscribeIsApprovedState
-  } = useSubscriptionState<IsApprovedRD>(RD.initial)
 
   const isApproved = useMemo(
     () =>
@@ -1127,31 +1133,6 @@ export const SymDeposit: React.FC<Props> = (props) => {
     // ignore initial + loading states for `isApprovedState`
     return RD.isPending(isApprovedState)
   }, [isApprovedState, needApprovement])
-
-  const checkApprovedStatus = useCallback(
-    (routerAddress: string) => {
-      const oNeedApprovement: O.Option<boolean> = FP.pipe(
-        needApprovement,
-        // `None` if needApprovement is `false`, no request then
-        O.fromPredicate((v) => !!v)
-      )
-
-      const oTokenAddress: O.Option<string> = getEthTokenAddress(asset)
-      // check approve status
-      FP.pipe(
-        sequenceTOption(oNeedApprovement, oTokenAddress),
-        O.map(([_, tokenAddress]) =>
-          subscribeIsApprovedState(
-            isApprovedERC20Token$({
-              contractAddress: tokenAddress,
-              spenderAddress: routerAddress
-            })
-          )
-        )
-      )
-    },
-    [asset, isApprovedERC20Token$, needApprovement, subscribeIsApprovedState]
-  )
 
   const checkIsApprovedError = useMemo(() => {
     // ignore error check if we don't need to check allowance
@@ -1307,7 +1288,7 @@ export const SymDeposit: React.FC<Props> = (props) => {
   }, [initialAssetAmountToDepositMax1e8, setAssetAmountToDepositMax1e8])
 
   const onChangeRuneWalletType = useCallback(
-    (walletType) => {
+    (walletType: WalletType) => {
       setRuneLedger(() => isLedgerWallet(walletType))
       setRuneWalletType(walletType)
       resetEnteredAmounts()
@@ -1317,7 +1298,7 @@ export const SymDeposit: React.FC<Props> = (props) => {
   )
 
   const onChangeAssetWalletType = useCallback(
-    (walletType) => {
+    (walletType: WalletType) => {
       setUseAssetLedger(() => isLedgerWallet(walletType))
       setAssetWalletType(walletType)
 
@@ -1326,24 +1307,82 @@ export const SymDeposit: React.FC<Props> = (props) => {
     [resetEnteredAmounts, setAssetWalletType]
   )
 
-  const prevRouterAddress = useRef<O.Option<Address>>(O.none)
+  const renderPasswordConfirmationModal = useMemo(() => {
+    if (showPasswordModal === 'none') return <></>
 
-  // Run `checkApprovedStatus` whenever `oPoolAddress` has been changed
-  useEffect(() => {
-    FP.pipe(
-      oPoolAddress,
-      O.chain(({ router }) => router),
-      // Do nothing if prev. and current router a the same
-      O.filter((router) => !eqOString.equals(O.some(router), prevRouterAddress.current)),
-      // update ref
-      O.map((router) => {
-        prevRouterAddress.current = O.some(router)
-        return router
-      }),
-      // check allowance status
-      O.map(checkApprovedStatus)
+    const onSuccess = () => {
+      if (showPasswordModal === 'deposit') submitDepositTx()
+      if (showPasswordModal === 'approve') submitApproveTx()
+      setShowPasswordModal('none')
+    }
+    const onClose = () => {
+      setShowPasswordModal('none')
+    }
+
+    return (
+      <WalletPasswordConfirmationModal onSuccess={onSuccess} onClose={onClose} validatePassword$={validatePassword$} />
     )
-  }, [checkApprovedStatus, oPoolAddress])
+  }, [showPasswordModal, submitApproveTx, submitDepositTx, validatePassword$])
+
+  const renderLedgerConfirmationModal = useMemo(() => {
+    if (showLedgerModal === 'none') return <></>
+
+    const onClose = () => {
+      setShowLedgerModal('none')
+    }
+
+    const onSucceess = () => {
+      if (showLedgerModal === 'deposit') setShowPasswordModal('deposit')
+      if (showLedgerModal === 'approve') submitApproveTx()
+      setShowLedgerModal('none')
+    }
+
+    const chainAsString = chainToString(asset.chain)
+    const txtNeedsConnected = intl.formatMessage(
+      {
+        id: 'ledger.needsconnected'
+      },
+      { chain: chainAsString }
+    )
+
+    const description1 =
+      // extra info for ERC20 assets only
+      isEthChain(asset.chain) && !isEthAsset(asset)
+        ? `${txtNeedsConnected} ${intl.formatMessage(
+            {
+              id: 'ledger.blindsign'
+            },
+            { chain: chainAsString }
+          )}`
+        : txtNeedsConnected
+
+    const description2 = intl.formatMessage({ id: 'ledger.sign' })
+
+    const oIsDeposit = O.fromPredicate<ModalState>((v) => v === 'deposit')(showLedgerModal)
+
+    const addresses = FP.pipe(
+      sequenceTOption(oIsDeposit, oDepositParams),
+      O.chain(([_, { poolAddress, runeSender, assetSender }]) => {
+        const recipient = poolAddress.address
+        if (useRuneLedger) return O.some({ recipient, sender: runeSender })
+        if (useAssetLedger) return O.some({ recipient, sender: assetSender })
+        return O.none
+      })
+    )
+
+    return (
+      <LedgerConfirmationModal
+        onSuccess={onSucceess}
+        onClose={onClose}
+        visible
+        chain={useRuneLedger ? THORChain : asset.chain}
+        network={network}
+        description1={description1}
+        description2={description2}
+        addresses={addresses}
+      />
+    )
+  }, [asset, intl, network, oDepositParams, showLedgerModal, submitApproveTx, useAssetLedger, useRuneLedger])
 
   useEffect(() => {
     if (!eqOAsset.equals(prevAsset.current, O.some(asset))) {
@@ -1380,7 +1419,7 @@ export const SymDeposit: React.FC<Props> = (props) => {
     () =>
       disableDepositAction ||
       isBalanceError ||
-      fundsCapReached ||
+      protocolLimitReached ||
       disabled ||
       assetBalance.amount().isZero() ||
       runeBalance.amount().isZero() ||
@@ -1390,7 +1429,7 @@ export const SymDeposit: React.FC<Props> = (props) => {
     [
       disableDepositAction,
       isBalanceError,
-      fundsCapReached,
+      protocolLimitReached,
       disabled,
       assetBalance,
       runeBalance,
@@ -1576,25 +1615,8 @@ export const SymDeposit: React.FC<Props> = (props) => {
           </>
         )}
       </Styled.SubmitContainer>
-
-      {showLedgerModal && (
-        <LedgerConfirmationModal
-          onSuccess={onSucceedLedgerModal}
-          onClose={onCloseLedgerModal}
-          visible={showLedgerModal}
-          chain={useRuneLedger ? THORChain : asset.chain}
-          network={network}
-          description={intl.formatMessage({ id: 'deposit.ledger.sign' })}
-        />
-      )}
-
-      {showPasswordModal && (
-        <WalletPasswordConfirmationModal
-          onSuccess={onSucceedPasswordModal}
-          onClose={onClosePasswordModal}
-          validatePassword$={validatePassword$}
-        />
-      )}
+      {renderPasswordConfirmationModal}
+      {renderLedgerConfirmationModal}
       {renderTxModal}
     </Styled.Container>
   )

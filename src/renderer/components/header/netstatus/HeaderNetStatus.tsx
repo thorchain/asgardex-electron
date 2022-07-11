@@ -7,11 +7,11 @@ import * as O from 'fp-ts/lib/Option'
 import { useObservableState } from 'observable-hooks'
 import { useIntl } from 'react-intl'
 
-import { ReactComponent as DownIcon } from '../../../assets/svg/icon-down.svg'
 import { useAppContext } from '../../../contexts/AppContext'
 import { OnlineStatus } from '../../../services/app/types'
 import { InboundAddressRD } from '../../../services/midgard/types'
 import { MimirRD } from '../../../services/thorchain/types'
+import { DownIcon } from '../../icons'
 import { ConnectionStatus } from '../../shared/icons/ConnectionStatus'
 import { Menu } from '../../shared/menu/Menu'
 import { headerNetStatusSubheadline, headerNetStatusColor, HeaderNetStatusColor } from '../Header.util'
@@ -182,7 +182,7 @@ export const HeaderNetStatus: React.FC<Props> = (props): JSX.Element => {
     <Styled.Wrapper>
       {isDesktopView && (
         <Col span={24}>
-          <Dropdown overlay={desktopMenu} trigger={['click']} placement="bottomCenter">
+          <Dropdown overlay={desktopMenu} trigger={['click']} placement="bottom">
             {/* eslint-disable-next-line jsx-a11y/anchor-is-valid */}
             <a className="ant-dropdown-link" onClick={(e) => e.preventDefault()}>
               <Row justify="space-between" align="middle">

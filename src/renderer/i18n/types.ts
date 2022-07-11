@@ -29,7 +29,6 @@ export type CommonMessageKey =
   | 'common.copy'
   | 'common.loading'
   | 'common.error'
-  | 'common.success'
   | 'common.change'
   | 'common.wallet'
   | 'common.history'
@@ -42,7 +41,9 @@ export type CommonMessageKey =
   | 'common.price.rune'
   | 'common.transaction'
   | 'common.viewTransaction'
+  | 'common.copyTxUrl'
   | 'common.fee'
+  | 'common.fee.asset'
   | 'common.fees'
   | 'common.fee.estimated'
   | 'common.fees.estimated'
@@ -62,10 +63,13 @@ export type CommonMessageKey =
   | 'common.step'
   | 'common.done'
   | 'common.address.self'
-  | 'common.thorAddress'
+  | 'common.nodeAddress'
+  | 'common.providerAddress'
   | 'common.tx.healthCheck'
   | 'common.tx.sending'
   | 'common.tx.sendingAsset'
+  | 'common.tx.success'
+  | 'common.tx.success-info'
   | 'common.tx.checkResult'
   | 'common.tx.view'
   | 'common.modal.confirmTitle'
@@ -83,8 +87,16 @@ export type CommonMessageKey =
   | 'common.tx.type.deposit'
   | 'common.tx.type.withdraw'
   | 'common.tx.type.upgrade'
-  | 'common.time.week'
+  | 'common.time.days7'
+  | 'common.time.days7.short'
+  | 'common.time.month1'
+  | 'common.time.month1.short'
+  | 'common.time.months3'
+  | 'common.time.months3.short'
+  | 'common.time.year1'
+  | 'common.time.year1.short'
   | 'common.time.all'
+  | 'common.time.all.short'
   | 'common.theme.light'
   | 'common.theme.dark'
   | 'common.volume24'
@@ -92,6 +104,12 @@ export type CommonMessageKey =
   | 'common.informationMore'
   | 'common.balance'
   | 'common.balance.loading'
+  | 'common.custom'
+  | 'common.notsupported.fornetwork'
+  | 'common.recipient'
+  | 'common.sender'
+  | 'common.legacy'
+  | 'common.ledgerlive'
 
 export type CommonMessages = {
   [key in CommonMessageKey]: string
@@ -106,12 +124,13 @@ type UpdateMessagesKeys =
 
 export type UpdateMessages = { [key in UpdateMessagesKeys]: string }
 
-type RoutesMessageKey = 'routes.invalid.asset'
+type RoutesMessageKey = 'routes.invalid.asset' | 'routes.invalid.params'
 
 export type RoutesMessages = { [key in RoutesMessageKey]: string }
 
 type PoolsMessageKey =
   | 'pools.depth'
+  | 'pools.apy'
   | 'pools.24hvol'
   | 'pools.avgsize'
   | 'pools.avgfee'
@@ -119,6 +138,11 @@ type PoolsMessageKey =
   | 'pools.trades'
   | 'pools.pending'
   | 'pools.available'
+  | 'pools.pooled'
+  | 'pools.limit.info'
+  | 'pools.incentivependulum.info'
+  | 'pools.incentivependulum.tooltip'
+  | 'pools.incentivependulum.error'
 
 export type PoolsMessages = { [key in PoolsMessageKey]: string }
 
@@ -138,6 +162,9 @@ type WalletMessageKey =
   | 'wallet.action.import'
   | 'wallet.action.create'
   | 'wallet.action.deposit'
+  | 'wallet.balance.total.poolAssets'
+  | 'wallet.balance.total.poolAssets.info'
+  | 'wallet.shares.total'
   | 'wallet.connect.instruction'
   | 'wallet.unlock.instruction'
   | 'wallet.lock.label'
@@ -183,7 +210,6 @@ type WalletMessageKey =
   | 'wallet.password.confirmation.error'
   | 'wallet.password.repeat'
   | 'wallet.password.mismatch'
-  | 'wallet.ledger.confirm'
   | 'wallet.errors.balancesFailed'
   | 'wallet.errors.asset.notExist'
   | 'wallet.errors.address.empty'
@@ -191,10 +217,12 @@ type WalletMessageKey =
   | 'wallet.errors.address.couldNotFind'
   | 'wallet.errors.amount.shouldBeNumber'
   | 'wallet.errors.amount.shouldBeGreaterThan'
+  | 'wallet.errors.amount.shouldBeGreaterOrEqualThan'
   | 'wallet.errors.amount.shouldBeLessThanBalance'
   | 'wallet.errors.amount.shouldBeLessThanBalanceAndFee'
   | 'wallet.errors.fee.notCovered'
   | 'wallet.errors.invalidChain'
+  | 'wallet.errors.memo.max'
   | 'wallet.send.error'
   | 'wallet.upgrade.pending'
   | 'wallet.upgrade.success'
@@ -226,13 +254,19 @@ type BondsMessageKey =
 
 export type BondsMessages = { [key in BondsMessageKey]: string }
 
-type PoolSharesMessageKey = 'poolshares.ownership'
+type PoolSharesMessageKey =
+  | 'poolshares.ownership'
+  | 'poolshares.both.info'
+  | 'poolshares.single.info'
+  | 'poolshares.single.notsupported'
 
 export type PoolSharesMessage = { [key in PoolSharesMessageKey]: string }
 
 type LedgerMessageKey =
   | 'ledger.title'
   | 'ledger.title.sign'
+  | 'ledger.sign'
+  | 'ledger.blindsign'
   | 'ledger.needsconnected'
   | 'ledger.add.device'
   | 'ledger.error.nodevice'
@@ -254,11 +288,15 @@ type LedgerMessageKey =
   | 'ledger.notsupported'
   | 'ledger.notaddedorzerobalances'
   | 'ledger.deposit.oneside'
+  | 'ledger.legacyformat.note'
+  | 'ledger.legacyformat.show'
+  | 'ledger.legacyformat.hide'
 
 export type LedgerMessages = { [key in LedgerMessageKey]: string }
 
 type SettingMessageKey =
   | 'setting.app.title'
+  | 'setting.wallet.title'
   | 'setting.wallet.management'
   | 'setting.client'
   | 'setting.account.management'
@@ -272,6 +310,8 @@ type SettingMessageKey =
   | 'setting.add.device'
   | 'setting.wallet.index'
   | 'setting.wallet.index.info'
+  | 'setting.wallet.hdpath.legacy.info'
+  | 'setting.wallet.hdpath.ledgerlive.info'
 
 export type SettingMessages = { [key in SettingMessageKey]: string }
 
@@ -282,10 +322,10 @@ export type MidgardMessages = { [key in MidgardMessageKey]: string }
 type SwapMessageKey =
   | 'swap.input'
   | 'swap.output'
-  | 'swap.recipient'
   | 'swap.slip.title'
   | 'swap.slip.tolerance'
   | 'swap.slip.tolerance.info'
+  | 'swap.slip.tolerance.ledger-disabled.info'
   | 'swap.state.pending'
   | 'swap.state.success'
   | 'swap.state.error'
@@ -296,18 +336,18 @@ type SwapMessageKey =
   | 'swap.errors.amount.outputShouldCoverChainFee'
   | 'swap.note.lockedWallet'
   | 'swap.note.nowallet'
-  | 'swap.ledger.sign'
+  | 'swap.min.amount.info'
+  | 'swap.min.result.info'
 
 export type SwapMessages = { [key in SwapMessageKey]: string }
 
 type DepositMessageKey =
   | 'deposit.interact.title'
   | 'deposit.interact.subtitle'
-  | 'deposit.interact.actions'
+  | 'deposit.interact.label.bondprovider'
   | 'deposit.interact.actions.bond'
   | 'deposit.interact.actions.unbond'
   | 'deposit.interact.actions.leave'
-  | 'deposit.interact.actions.custom'
   | 'deposit.share.title'
   | 'deposit.share.units'
   | 'deposit.share.poolshare'
@@ -365,7 +405,6 @@ type DepositMessageKey =
   | 'deposit.withdraw.fees'
   | 'deposit.withdraw.feeNote'
   | 'deposit.withdraw.error.feeNotCovered'
-  | 'deposit.withdraw.ledger.sign'
   | 'deposit.ledger.sign'
 
 export type DepositMessages = { [key in DepositMessageKey]: string }

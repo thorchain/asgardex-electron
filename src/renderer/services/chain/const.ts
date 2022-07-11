@@ -22,7 +22,9 @@ export const ChainTxFeeOption: { [key in TxTypes]: FeeOption } = {
   SWAP: FeeOption.Fast,
   DEPOSIT: FeeOption.Fast,
   WITHDRAW: FeeOption.Fast,
-  UPGRADE: FeeOption.Fast
+  UPGRADE: FeeOption.Fast,
+  APPROVE: FeeOption.Fast,
+  SEND: FeeOption.Fast
 }
 
 export const INITIAL_SWAP_STATE: SwapState = {
@@ -59,7 +61,7 @@ export const INITIAL_UPGRADE_RUNE_STATE: UpgradeRuneTxState = {
 }
 
 export const INITIAL_SEND_STATE: SendTxState = {
-  steps: { current: 0, total: 2 },
+  steps: { current: 0, total: 1 },
   status: RD.initial
 }
 

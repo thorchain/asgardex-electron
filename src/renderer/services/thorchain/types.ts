@@ -1,5 +1,5 @@
 import * as RD from '@devexperts/remote-data-ts'
-import { Address, TxHash } from '@xchainjs/xchain-client'
+import { Address } from '@xchainjs/xchain-client'
 import { Client, DepositParam } from '@xchainjs/xchain-thorchain'
 import { Asset, BaseAmount } from '@xchainjs/xchain-util'
 import * as O from 'fp-ts/Option'
@@ -13,7 +13,7 @@ import { WalletType } from '../../../shared/wallet/types'
 import { LiveData } from '../../helpers/rx/liveData'
 import { AssetsWithAmount1e8, AssetWithAmount1e8 } from '../../types/asgardex'
 import * as C from '../clients'
-import { ApiError, TxHashLD } from '../wallet/types'
+import { ApiError, TxHashLD, TxHashRD } from '../wallet/types'
 
 export type Client$ = C.Client$<Client>
 
@@ -24,8 +24,8 @@ export type FeesService = C.FeesService
 
 export type SendTxParams = {
   walletType: WalletType
-  sender?: string
-  recipient: string
+  sender?: Address
+  recipient: Address
   amount: BaseAmount
   asset: Asset
   memo?: string
@@ -57,10 +57,12 @@ export type InteractState = {
   // Constant total amount of steps
   readonly stepsTotal: 2
   // RD of all requests
-  readonly txRD: RD.RemoteData<ApiError, TxHash>
+  readonly txRD: TxHashRD
 }
 
 export type InteractState$ = Rx.Observable<InteractState>
+
+export type InteractStateHandler = (p: InteractParams) => InteractState$
 
 export type NodeStatus = 'active' | 'standby' | 'disabled' | 'unknown'
 
@@ -97,13 +99,16 @@ export const MimirIO = t.type({
   HALTBNBTRADING: t.union([t.number, t.undefined]),
   HALTDOGECHAIN: t.union([t.number, t.undefined]),
   HALTDOGETRADING: t.union([t.number, t.undefined]),
+  HALTGAIACHAIN: t.union([t.number, t.undefined]),
+  HALTGAIATRADING: t.union([t.number, t.undefined]),
   PAUSELP: t.union([t.number, t.undefined]),
   PAUSELPBNB: t.union([t.number, t.undefined]),
   PAUSELPBCH: t.union([t.number, t.undefined]),
   PAUSELPBTC: t.union([t.number, t.undefined]),
   PAUSELPETH: t.union([t.number, t.undefined]),
   PAUSELPLTC: t.union([t.number, t.undefined]),
-  PAUSELPDOGE: t.union([t.number, t.undefined])
+  PAUSELPDOGE: t.union([t.number, t.undefined]),
+  PAUSELPGAIA: t.union([t.number, t.undefined])
 })
 
 export type Mimir = t.TypeOf<typeof MimirIO>
@@ -119,6 +124,7 @@ export type MimirHaltChain = {
   haltLtcChain: boolean
   haltBnbChain: boolean
   haltDogeChain: boolean
+  haltCosmosChain: boolean
 }
 export type MimirHaltTrading = {
   haltTrading: boolean
@@ -128,6 +134,7 @@ export type MimirHaltTrading = {
   haltLtcTrading: boolean
   haltBnbTrading: boolean
   haltDogeTrading: boolean
+  haltCosmosTrading: boolean
 }
 
 export type MimirPauseLP = {
@@ -138,6 +145,7 @@ export type MimirPauseLP = {
   pauseLpEth: boolean
   pauseLpLtc: boolean
   pauseLpDoge: boolean
+  pauseLpCosmos: boolean
 }
 
 export type MimirHalt = MimirHaltChain & MimirHaltTrading & MimirPauseLP

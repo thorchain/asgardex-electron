@@ -9,6 +9,7 @@ import { LedgerError, LedgerErrorId, Network } from '../../../../shared/api/type
 import { toClientNetwork } from '../../../../shared/utils/client'
 import { isError } from '../../../../shared/utils/guard'
 import { WalletAddress } from '../../../../shared/wallet/types'
+import { VerifyAddressHandler } from '../types'
 
 export const getAddress = async (
   transport: Transport,
@@ -39,10 +40,11 @@ export const getAddress = async (
   }
 }
 
-export const verifyAddress = (transport: Transport, network: Network, walletIndex: number): void => {
+export const verifyAddress: VerifyAddressHandler = async ({ transport, network, walletIndex }) => {
   const app = new AppBNB(transport)
   const derive_path = getDerivePath(walletIndex)
   const clientNetwork = toClientNetwork(network)
   const prefix = getPrefix(clientNetwork)
-  app.showAddress(prefix, derive_path)
+  const _ = await app.showAddress(prefix, derive_path)
+  return true
 }

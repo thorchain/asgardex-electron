@@ -1,4 +1,15 @@
-import { BCHChain, BNBChain, BTCChain, Chain, DOGEChain, ETHChain, LTCChain, THORChain } from '@xchainjs/xchain-util'
+import {
+  BCHChain,
+  BNBChain,
+  BTCChain,
+  Chain,
+  CosmosChain,
+  DOGEChain,
+  ETHChain,
+  LTCChain,
+  TerraChain,
+  THORChain
+} from '@xchainjs/xchain-util'
 import * as O from 'fp-ts/lib/Option'
 import * as Rx from 'rxjs'
 import * as RxOp from 'rxjs/operators'
@@ -7,12 +18,14 @@ import * as BNC from '../binance'
 import * as BTC from '../bitcoin'
 import * as BCH from '../bitcoincash'
 import { XChainClient$ } from '../clients'
+import * as COSMOS from '../cosmos'
 import * as DOGE from '../doge'
 import * as ETH from '../ethereum'
 import * as LTC from '../litecoin'
 import { selectedPoolChain$ } from '../midgard/common'
+import * as TERRA from '../terra'
 import * as THOR from '../thorchain'
-import { Chain$ } from './types'
+import type { Chain$ } from './types'
 
 export const clientByChain$ = (chain: Chain): XChainClient$ => {
   switch (chain) {
@@ -30,6 +43,10 @@ export const clientByChain$ = (chain: Chain): XChainClient$ => {
       return LTC.client$
     case DOGEChain:
       return DOGE.client$
+    case TerraChain:
+      return TERRA.client$
+    case CosmosChain:
+      return COSMOS.client$
     default:
       return Rx.of(O.none)
   }

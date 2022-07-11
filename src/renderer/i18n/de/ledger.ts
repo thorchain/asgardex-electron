@@ -3,7 +3,10 @@ import { LedgerMessages } from '../types'
 const ledger: LedgerMessages = {
   'ledger.title': 'Ledger',
   'ledger.title.sign': 'Transaktion mit Ledger signieren',
-  'ledger.needsconnected': 'Stelle sicher, dass Dein Ledger verbunden und darauf die "{chain}" Anwendung geöffnet ist.',
+  'ledger.sign': 'Klick "Weiter", um die Transaktion mit Deinem Ledger zu bestätigen.',
+  'ledger.blindsign':
+    '"smart contract data" oder "blind signing" müssen bei der {chain} Anwendung auf Deinem Ledger aktiviert sein.',
+  'ledger.needsconnected': 'Stelle sicher, dass Dein Ledger verbunden und darauf die {chain} Anwendung geöffnet ist.',
   'ledger.add.device': 'Ledger hinzufügen',
   'ledger.error.nodevice': 'Kein Ledger verbunden',
   'ledger.error.inuse': 'Auf dem Ledger ist bereits eine App geöffnet',
@@ -23,7 +26,10 @@ const ledger: LedgerMessages = {
   'ledger.error.unknown': 'Unbekannter Fehler',
   'ledger.notsupported': 'Kein Ledger support für {chain}.',
   'ledger.notaddedorzerobalances': 'Ledger für {chain} ist nicht verbunden oder hat kein Guthaben.',
-  'ledger.deposit.oneside': 'Ledger wird aktuell nur für eine Assetseite unterstützt.'
+  'ledger.deposit.oneside': 'Ledger wird aktuell nur für eine Assetseite unterstützt.',
+  'ledger.legacyformat.note': 'Ledger zeigt alle Output Addressen im "Legacy", aber nicht im "CashAddr" Format an.',
+  'ledger.legacyformat.show': 'Adressenformate zeigen',
+  'ledger.legacyformat.hide': 'Adressenformate verbergen'
 }
 
 export default ledger

@@ -14,6 +14,7 @@ import { Filter } from '../../components/poolActionsHistory/types'
 import { useNetwork } from '../../hooks/useNetwork'
 import { openExplorerTxUrl } from '../../hooks/useOpenExplorerTxUrl'
 import { OpenExplorerTxUrl } from '../../services/clients'
+import { INITIAL_CHAIN_IDS } from '../../services/thorchain/const'
 import { PoolHistoryActions } from './PoolHistoryView.types'
 
 type Props = {
@@ -25,7 +26,7 @@ type Props = {
 const HISTORY_FILTERS: Filter[] = ['ALL', 'DEPOSIT', 'SWAP', 'WITHDRAW', 'DONATE', 'REFUND']
 
 export const PoolHistoryView: React.FC<Props> = ({ className, poolAsset, historyActions }) => {
-  const { loadHistory, requestParams, historyPage, prevHistoryPage, setFilter, setPage } = historyActions
+  const { loadHistory, reloadHistory, requestParams, historyPage, prevHistoryPage, setFilter, setPage } = historyActions
 
   const stringAsset = useMemo(() => assetToString(poolAsset), [poolAsset])
 
@@ -38,7 +39,14 @@ export const PoolHistoryView: React.FC<Props> = ({ className, poolAsset, history
   const currentFilter = requestParams.type || 'ALL'
 
   const thorChainClient: O.Option<XChainClient> = useMemo(
-    () => FP.pipe(O.tryCatch(() => new Client({ network: toClientNetwork(network) }))),
+    () =>
+      FP.pipe(
+        O.tryCatch(
+          () =>
+            // client is needed to get explorers tx url only. no need to request chainIds (can be 'uknown')
+            new Client({ network: toClientNetwork(network), chainIds: INITIAL_CHAIN_IDS })
+        )
+      ),
     [network]
   )
 
@@ -79,6 +87,7 @@ export const PoolHistoryView: React.FC<Props> = ({ className, poolAsset, history
       prevHistoryPage={prevHistoryPage}
       openExplorerTxUrl={openExplorerTxUrlHandler}
       changePaginationHandler={setPage}
+      reloadHistory={reloadHistory}
     />
   )
 }

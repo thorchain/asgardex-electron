@@ -40,7 +40,10 @@ export const createTransactionService = (client$: Client$, network$: Network$): 
       asset: params.asset,
       amount: params.amount,
       memo: params.memo,
-      walletIndex: params.walletIndex
+      recipient: undefined,
+      router: undefined,
+      walletIndex: params.walletIndex,
+      feeOption: undefined
     }
     const encoded = ipcLedgerDepositTxParamsIO.encode(depositLedgerTxParams)
 
@@ -113,16 +116,20 @@ export const createTransactionService = (client$: Client$, network$: Network$): 
       })
     )
 
-  const sendLedgerTx = ({ network, params }: { network: Network; params: SendTxParams }) => {
+  const sendLedgerTx = ({ network, params }: { network: Network; params: SendTxParams }): TxHashLD => {
     const sendLedgerTxParams: IPCLedgerSendTxParams = {
       chain: THORChain,
       network,
       asset: params.asset,
+      feeAsset: undefined,
       amount: params.amount,
       sender: params.sender,
       recipient: params.recipient,
       memo: params.memo,
-      walletIndex: params.walletIndex
+      walletIndex: params.walletIndex,
+      feeRate: NaN,
+      feeOption: undefined,
+      feeAmount: undefined
     }
     const encoded = ipcLedgerSendTxParamsIO.encode(sendLedgerTxParams)
 

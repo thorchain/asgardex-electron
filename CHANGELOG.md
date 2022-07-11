@@ -1,4 +1,268 @@
-# 0.7.1 (2022-01-xx)
+# 1.17.1 (2022-07-11)
+
+## Add
+
+- [Ledger] ETH needs an option to select different derivation paths (`Legacy` vs. `LedgerLive`) [#2316](https://github.com/thorchain/asgardex-electron/pull/2316)
+
+## Update
+
+- Remove TERRA from supported pools [#2312](https://github.com/thorchain/asgardex-electron/issues/2312)
+
+## Fix
+
+- [Ledger] THORChain tx does not send, but failed silently w/o error [#2310](https://github.com/thorchain/asgardex-electron/issues/2310)
+
+# 1.17.0 (2022-07-01)
+
+## ADD
+
+- [Ledger] Support Cosmos (ATOM) [#2301](https://github.com/thorchain/asgardex-electron/issues/2301), [#2302](https://github.com/thorchain/asgardex-electron/pull/2302), [#2303](https://github.com/thorchain/asgardex-electron/pull/2303), [#2304](https://github.com/thorchain/asgardex-electron/pull/2304), [#2304](https://github.com/thorchain/asgardex-electron/pull/2304)
+
+## Fix
+
+- UI does not show Mimir status of GAIA [#2300](https://github.com/thorchain/asgardex-electron/pull/2300)
+- [Wallet] Shares are not updated while changing the network [#2307](https://github.com/thorchain/asgardex-electron/issues/2307)
+
+# 1.16.0 (2022-06-22)
+
+## ADD
+
+- Support Cosmos (ATOM) [#2288](https://github.com/thorchain/asgardex-electron/issues/2288), [#2193](https://github.com/thorchain/asgardex-electron/pull/2193), [#2290](https://github.com/thorchain/asgardex-electron/pull/2290), [2291](https://github.com/thorchain/asgardex-electron/pull/2291), [2292](https://github.com/thorchain/asgardex-electron/pull/2292), [#2295](https://github.com/thorchain/asgardex-electron/pull/2295), [#2296](https://github.com/thorchain/asgardex-electron/pull/2296), [#2297](https://github.com/thorchain/asgardex-electron/pull/2297)
+
+## Update
+
+- Prepare `mainnet` [#2294](https://github.com/thorchain/asgardex-electron/pull/2294)
+- [Pools] Toggle filter buttons to remove clear button [#2287](https://github.com/thorchain/asgardex-electron/pull/2287)
+
+# 0.15.2 (2022-06-06)
+
+## Add
+
+- Add search option for pools [#2275](https://github.com/thorchain/asgardex-electron/pull/2275)
+  [PoolsOverview] Watch / unwatch pools [#2276](https://github.com/thorchain/asgardex-electron/pull/2276), [#2277](https://github.com/thorchain/asgardex-electron/pull/2277)
+  [PoolDetail] Watch / unwatch pool [#2278](https://github.com/thorchain/asgardex-electron/pull/2276)
+  [Settings] Make settings collapsable [#2281](https://github.com/thorchain/asgardex-electron/pull/2281)
+  [Settings] Filter accounts [#2282](https://github.com/thorchain/asgardex-electron/pull/2282)
+
+## Update
+
+- [Settings] Merge global and wallet settings to have one place to go [#2152](https://github.com/thorchain/asgardex-electron/issues/2152)
+
+## Fix
+
+- [Pools] `ERC20` filter includes `BNB.ETH` [#2273](https://github.com/thorchain/asgardex-electron/issues/2273)
+
+## Internal
+
+- Update npm dependencies (incl. latest Electron v19.0.3) [#2283](https://github.com/thorchain/asgardex-electron/issues/2283)
+
+# 0.15.1 (2022-05-29)
+
+## Fix
+
+- Swap ETH failed: SENDING A TRANSACTION REQUIRES A SIGNER [#2269](https://github.com/thorchain/asgardex-electron/issues/2269)
+
+# 0.15.0 (2022-05-27)
+
+## Add
+
+- [Ledger] Support ETH/ERC20 [#2255](https://github.com/thorchain/asgardex-electron/issues/2255)
+
+## Fix
+
+- Clicking "upgrade" for rune.eth. Next screen is flickering, and not clickable. [#2261](https://github.com/thorchain/asgardex-electron/issues/2261)
+
+# 0.14.1 (2022-05-07)
+
+## Update
+
+- [PoolDetail] Improve pool details view behavior (loading behavior, error handling, caching data) [#2240](https://github.com/thorchain/asgardex-electron/pull/2240), [#2241](https://github.com/thorchain/asgardex-electron/pull/2241)
+- [Swap] Change default slippage tolerance to 3% [#2237](https://github.com/thorchain/asgardex-electron/issues/2237)
+
+## Fix
+
+- [Ledger] White screen with Ledger Terra wallet connected [#2227](https://github.com/thorchain/asgardex-electron/issues/2227)
+- [Wallet] Locking wallet at Deposit or Withdraw failed [#2233](https://github.com/thorchain/asgardex-electron/issues/2233)
+- [e2e] Testcafe is failing [#750](https://github.com/thorchain/asgardex-electron/issues/750)
+- [Swap] Consider fees in swap limit [#2243](https://github.com/thorchain/asgardex-electron/pull/2242)
+- [Swap] Recipient keystore address lost [#2244](https://github.com/thorchain/asgardex-electron/issues/2244)
+- [Swap] Recipient Ledger address lost [#2252](https://github.com/thorchain/asgardex-electron/issues/2252)
+
+## Internal
+
+- Update `npm` dependencies (04-25-2022) - incl. Electron@18.x, React 18.x, latest xchain-\* etc. [#2228](https://github.com/thorchain/asgardex-electron/issues/2228)
+
+# 0.14.0 (2022-04-23)
+
+## Add
+
+- [Ledger] Support Terra [#2198](https://github.com/thorchain/asgardex-electron/issues/2198)
+
+## Fix
+
+- [Ledger] Address confirmation removes Ledger BNB account [#2221](https://github.com/thorchain/asgardex-electron/issues/2221)
+- [Ledger] Address confirmation modal is missing for Ledger THOR [#2222](https://github.com/thorchain/asgardex-electron/issues/2222)
+- Update to latest xchain-tc@0.24.1 to include latest out of gas fix [#2220](https://github.com/thorchain/asgardex-electron/pull/2220)
+
+# 0.13.0 (2022-04-19)
+
+## Add
+
+- Support Terra [#2002](https://github.com/thorchain/asgardex-electron/issues/2002)
+- [Mimir] Support block height in HALT{XYZ} flags [#2206](https://github.com/thorchain/asgardex-electron/issues/2206)
+
+## Fix
+
+- [History] Fix viewblock url parameters [#2189](https://github.com/thorchain/asgardex-electron/pull/2189)
+- Fix: Filter _USD_ pools [#2199](https://github.com/thorchain/asgardex-electron/pull/2199)
+- Fix: Total balances in asset overview [#2202](https://github.com/thorchain/asgardex-electron/pull/2202)
+- [Swap] Balance of Ledger missing - fee validation failed [#2203](https://github.com/thorchain/asgardex-electron/issues/2203)
+- [Deposit] Initial amount value can't be read [#2210](https://github.com/thorchain/asgardex-electron/issues/2210)
+
+# 0.12.3 (2022-03-31)
+
+## Add
+
+- [Shares] Show asym shares in list [#2172](https://github.com/thorchain/asgardex-electron/issues/2172)
+- [Wallet] Show total balance [#2178](https://github.com/thorchain/asgardex-electron/pull/2178)
+- [Wallet] Show total shares [#2179](https://github.com/thorchain/asgardex-electron/issues/2179)
+- [Pools] Manage / show protocol limit [#2173](https://github.com/thorchain/asgardex-electron/issues/2173)
+- [Pools] Show Incentive Pendulum [#2184](https://github.com/thorchain/asgardex-electron/issues/2184)
+
+## Update
+
+- Add more slippage options [#2170](https://github.com/thorchain/asgardex-electron/pull/2170) by @WojciechKo, [#2180](https://github.com/thorchain/asgardex-electron/pull/2180)
+- Tweak layout of `Swap` / `Deposit` [#2181](https://github.com/thorchain/asgardex-electron/pull/2181)
+
+## Fix
+
+- [Bonds] Removing a node from list breaks the app [#2176](https://github.com/thorchain/asgardex-electron/pull/2176)
+- Update default slip tolerance to 1% [#2175](https://github.com/thorchain/asgardex-electron/pull/2175)
+- URL to thoryield.com analytics is incorrect [#2182](https://github.com/thorchain/asgardex-electron/issues/2182)
+
+# 0.12.2 (2022-03-25)
+
+## Fix
+
+- BUG: Ledger tx from non-Index0 THOR accounts [#2164](https://github.com/thorchain/asgardex-electron/issues/2164)
+- [BCH] Fix Ledger inputs [#2166](https://github.com/thorchain/asgardex-electron/pull/2166)
+
+# 0.12.1 (2022-03-24)
+
+## Add
+
+- ADD: Bond Providers [#2160](https://github.com/thorchain/asgardex-electron/issues/2160)
+
+## Fix
+
+- Fix Ledger THOR [#2158](https://github.com/thorchain/asgardex-electron/issues/2158)
+
+# 0.12.0 (2022-03-22)
+
+## Update
+
+- Resolve: Upgrade `xchain-cosmos|thorchain` and `cosmos-client` (needed for hardfork) [#2150](https://github.com/thorchain/asgardex-electron/pull/2150)
+
+## Breaking change
+
+- [Ledger] Disable THOR for hard-fork temorary [#2154](https://github.com/thorchain/asgardex-electron/issues/2154)
+
+# 0.11.0 (2022-03-19)
+
+## Add
+
+- [Ledger] BCH support [#2133](https://github.com/thorchain/asgardex-electron/pull/2133), [#2136](https://github.com/thorchain/asgardex-electron/pull/2136), [#2149](https://github.com/thorchain/asgardex-electron/pull/2149)
+
+## Fix
+
+- [Ledger] Remove address from memory after rejecting address on device [#2145](https://github.com/thorchain/asgardex-electron/issues/2145)
+
+# 0.10.0 (2022-03-15)
+
+## Add
+
+- [Ledger] DOGE support [#2139](https://github.com/thorchain/asgardex-electron/pull/2139), [#2142](https://github.com/thorchain/asgardex-electron/pull/2142)
+
+## Update
+
+- [Pools] Show APY at pools overview [#2135](https://github.com/thorchain/asgardex-electron/issues/2135)
+- Update FR translation 15-03-2022 by @Weyland2093 [#2141](https://github.com/thorchain/asgardex-electron/pull/2141)
+
+## Fix
+
+- [UNBOND] Send ZERO amount [#2134](https://github.com/thorchain/asgardex-electron/issues/2134)
+- Fix estimated fees for BTC [#2140](https://github.com/thorchain/asgardex-electron/pull/2140)
+
+# 0.9.1 (2022-03-08)
+
+## Add
+
+- [WalletSettings] Add info in case Ledger is not supported [#2125](https://github.com/thorchain/asgardex-electron/pull/2125)
+- Get chain id before initializing TC client [#2127](https://github.com/thorchain/asgardex-electron/pull/2127)
+
+## Fix
+
+- Value to send of `UNBOND` or `CUSTOM` deposit tx does not depends on balances [#2122](https://github.com/thorchain/asgardex-electron/issues/2122)
+
+# 0.9.0 (2022-03-05)
+
+## Add
+
+- [Ledger] LTC support [#2118](https://github.com/thorchain/asgardex-electron/pull/2118), [#2119](https://github.com/thorchain/asgardex-electron/pull/2119)
+
+## Fix
+
+- Get correct LP by switching current `network` [2c8463e](https://github.com/thorchain/asgardex-electron/commit/2c8463e635a291b06896b28de8f7cf49868b6b06)
+
+# 0.8.1 (2022-03-03)
+
+## Add
+
+- [TxModal] Add copy button [#1998](https://github.com/thorchain/asgardex-electron/issues/1998)
+- Feature list [#2092](https://github.com/thorchain/asgardex-electron/pull/2092)
+
+## Update
+
+- [Send] Use TxModal [#2096](https://github.com/thorchain/asgardex-electron/pull/2096), [#2097](https://github.com/thorchain/asgardex-electron/pull/2097), [#2098](https://github.com/thorchain/asgardex-electron/pull/2098), [#2099](https://github.com/thorchain/asgardex-electron/pull/2099), [#2100](https://github.com/thorchain/asgardex-electron/pull/2100), [#2101](https://github.com/thorchain/asgardex-electron/pull/2101), [#2102](https://github.com/thorchain/asgardex-electron/pull/2102)
+- [Interact] Use TxModal and other improvements [#2104](https://github.com/thorchain/asgardex-electron/pull/2104)
+- [Ledger] Rune upgrade: Add ledger tickbox to upgrade process [#2063](https://github.com/thorchain/asgardex-electron/issues/2063)
+- Update social links [#2109](https://github.com/thorchain/asgardex-electron/issues/2109)
+- [Upgrade] Use TxModal + LedgerConfirmationModal [#2108](https://github.com/thorchain/asgardex-electron/issues/2108)
+
+## Fix
+
+- [Wallet] New generated phrase might be greater than 12 words [#2054](https://github.com/thorchain/asgardex-electron/issues/2054)
+- [AssetDetailsView] Maximum update depth exceeded [#2114](https://github.com/thorchain/asgardex-electron/issues/2114)
+
+## Internal
+
+- Upgrade API types + endpoints to latest Midgard v2.5.15 [#2112](https://github.com/thorchain/asgardex-electron/pull/2112)
+- Upgrade Electron + TypeScript related dependencies (incl. Node@16.13.0)
+
+# 0.8.0 (2022-02-18)
+
+## Add
+
+- [Ledger] BTC support [#2059](https://github.com/thorchain/asgardex-electron/issues/2059)
+
+## Update
+
+- Handle (confirmed) BTC balances the better way [#2082](https://github.com/thorchain/asgardex-electron/pull/2082)
+- [Send] Remove transaction confirmation check [#2072](https://github.com/thorchain/asgardex-electron/issues/2072)
+- [Ledger] Disable selecting of slippage tolerance for Ledger/BTC temporary [#2068](https://github.com/thorchain/asgardex-electron/issues/2068)
+- Shorten memos [#2052](https://github.com/thorchain/asgardex-electron/issues/2052)
+- Re-enable testnet for releases (production) [#2048](https://github.com/thorchain/asgardex-electron/issues/2048)
+- Update for RU translation (better translation and fix for typos) by @TreefeedXavier [#2046](https://github.com/thorchain/asgardex-electron/pull/2046)
+- Update ERC20 token list to include XDEFI token [#2040](https://github.com/thorchain/asgardex-electron/issues/2040)
+
+## Fix
+
+- [Send] Fix out of gas for RUNE txs [2081](https://github.com/thorchain/asgardex-electron/issues/2081)
+- [i18n] Translate pooled [#2047](https://github.com/thorchain/asgardex-electron/issues/2047)
+- Pre-build of v0.8.0 throws exception on Windows [#2086](https://github.com/thorchain/asgardex-electron/issues/2086)
+- [BTC] Broadcasting a tx to Haskoin might end in 500 error [#2077](https://github.com/thorchain/asgardex-electron/issues/2077)
+
+# 0.7.1 (2022-01-21)
 
 ## Update
 

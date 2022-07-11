@@ -12,7 +12,7 @@ import { IntlProvider } from 'react-intl'
 import * as Rx from 'rxjs'
 import * as RxOp from 'rxjs/operators'
 
-import { DEFAULT_STORAGES } from '../../shared/const'
+import { DEFAULT_LOCALE } from '../../shared/i18n/const'
 import { Locale } from '../../shared/i18n/types'
 import { getMessagesByLocale } from '../i18n'
 import { common } from '../services/storage'
@@ -22,17 +22,14 @@ const { getStorageState$, modifyStorage } = common
 type I18nContextValue = {
   locale$: Rx.Observable<Locale>
   changeLocale: (l: Locale) => void
-  initialLocale: () => Locale
 }
-
-export const initialLocale = (): Locale => DEFAULT_STORAGES.common.locale
 
 export const locale$ = FP.pipe(
   getStorageState$,
   RxOp.map(
     FP.flow(
       O.map(({ locale }) => locale),
-      O.getOrElse(initialLocale)
+      O.getOrElse(() => DEFAULT_LOCALE)
     )
   ),
   RxOp.distinctUntilChanged()
@@ -44,8 +41,7 @@ export const changeLocale = (locale: Locale) => {
 
 export const initialContext: I18nContextValue = {
   locale$,
-  changeLocale,
-  initialLocale
+  changeLocale
 }
 
 const I18nContext = createContext<I18nContextValue | null>(null)
@@ -63,8 +59,8 @@ const getAntdLocale = (locale: Locale) => {
   }
 }
 
-export const I18nProvider: React.FC = ({ children }): JSX.Element => {
-  const locale = useObservableState(locale$, initialLocale)
+export const I18nProvider: React.FC<{ children: React.ReactNode }> = ({ children }): JSX.Element => {
+  const locale = useObservableState(locale$, DEFAULT_LOCALE)
   const messages = useMemo(() => getMessagesByLocale(locale), [locale])
   const antdLocale = getAntdLocale(locale)
   return (

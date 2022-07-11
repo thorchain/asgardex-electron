@@ -8,6 +8,7 @@ export type Props = {
   clickHandler?: (checked: boolean) => void
   disabled?: boolean
   checked: boolean
+  children: React.ReactNode
   className?: string
 }
 

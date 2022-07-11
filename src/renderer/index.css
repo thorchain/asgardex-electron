@@ -27,3 +27,11 @@ body {
   margin: 0;
   font-family: 'MainFontRegular';
 }
+
+/*
+  Hide focus animation showing an ugly blue border around an antd button while clicking it
+  See https://stackoverflow.com/a/69811648/2032698
+*/
+[ant-click-animating-without-extra-node='true']::after {
+  display: none !important;
+}

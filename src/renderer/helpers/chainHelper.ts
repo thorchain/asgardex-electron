@@ -1,4 +1,5 @@
 import { AssetAtom } from '@xchainjs/xchain-cosmos'
+import { AssetLUNA } from '@xchainjs/xchain-terra'
 import {
   Asset,
   AssetBNB,
@@ -18,7 +19,8 @@ import {
   LTCChain,
   PolkadotChain,
   DOGEChain,
-  AssetDOGE
+  AssetDOGE,
+  TerraChain
 } from '@xchainjs/xchain-util'
 
 import { ENABLED_CHAINS } from '../services/const'
@@ -42,6 +44,8 @@ export const getChainAsset = (chain: Chain): Asset => {
       return AssetLTC
     case DOGEChain:
       return AssetDOGE
+    case TerraChain:
+      return AssetLUNA
     case PolkadotChain:
       throw Error('Polkadot is not supported yet')
   }
@@ -81,6 +85,16 @@ export const isBchChain = (chain: Chain): boolean => eqChain.equals(chain, BCHCh
  * Check whether chain is DOGE chain
  */
 export const isDogeChain = (chain: Chain): boolean => eqChain.equals(chain, DOGEChain)
+
+/**
+ * Check whether chain is TERRA chain
+ */
+export const isTerraChain = (chain: Chain): boolean => eqChain.equals(chain, TerraChain)
+
+/**
+ * Check whether chain is Cosmos (GAIA) chain
+ */
+export const isCosmosChain = (chain: Chain): boolean => eqChain.equals(chain, CosmosChain)
 
 export const isEnabledChain = (chain: Chain) => ENABLED_CHAINS.includes(chain)
 

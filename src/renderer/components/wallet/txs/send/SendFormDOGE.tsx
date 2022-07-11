@@ -11,6 +11,7 @@ import {
   baseAmount,
   baseToAsset,
   bn,
+  DOGEChain,
   formatAssetAmountCurrency
 } from '@xchainjs/xchain-util'
 import { Row, Form } from 'antd'
@@ -21,14 +22,17 @@ import * as O from 'fp-ts/lib/Option'
 import { useIntl } from 'react-intl'
 
 import { Network } from '../../../../../shared/api/types'
+import { isKeystoreWallet, isLedgerWallet } from '../../../../../shared/utils/guard'
 import { WalletType } from '../../../../../shared/wallet/types'
 import { ZERO_BASE_AMOUNT, ZERO_BN } from '../../../../const'
+import { useSubscriptionState } from '../../../../hooks/useSubscriptionState'
 import { FeesWithRatesRD } from '../../../../services/bitcoin/types'
-import { FeeRD, Memo, SendTxParams } from '../../../../services/chain/types'
-import { AddressValidation, WalletBalances } from '../../../../services/clients'
+import { INITIAL_SEND_STATE } from '../../../../services/chain/const'
+import { FeeRD, Memo, SendTxState, SendTxStateHandler } from '../../../../services/chain/types'
+import { AddressValidation, GetExplorerTxUrl, OpenExplorerTxUrl, WalletBalances } from '../../../../services/clients'
 import { ValidatePasswordHandler } from '../../../../services/wallet/types'
 import { WalletBalance } from '../../../../services/wallet/types'
-import { WalletPasswordConfirmationModal } from '../../../modal/confirmation'
+import { LedgerConfirmationModal, WalletPasswordConfirmationModal } from '../../../modal/confirmation'
 import * as StyledR from '../../../shared/form/Radio.styles'
 import { MaxBalanceButton } from '../../../uielements/button/MaxBalanceButton'
 import { UIFeesRD } from '../../../uielements/fees'
@@ -39,7 +43,7 @@ import * as H from '../TxForm.helpers'
 import * as Styled from '../TxForm.styles'
 import { validateTxAmountInput } from '../TxForm.util'
 import { DEFAULT_FEE_OPTION } from './Send.const'
-import { useChangeAssetHandler } from './Send.hooks'
+import * as Shared from './Send.shared'
 
 export type FormValues = {
   recipient: string
@@ -51,11 +55,12 @@ export type FormValues = {
 export type Props = {
   walletType: WalletType
   walletIndex: number
+  walletAddress: Address
   balances: WalletBalances
   balance: WalletBalance
-  onSubmit: (p: SendTxParams) => void
-  isLoading: boolean
-  sendTxStatusMsg: string
+  transfer$: SendTxStateHandler
+  openExplorerTxUrl: OpenExplorerTxUrl
+  getExplorerTxUrl: GetExplorerTxUrl
   addressValidation: AddressValidation
   feesWithRates: FeesWithRatesRD
   reloadFeesHandler: (memo?: Memo) => void
@@ -67,11 +72,12 @@ export const SendFormDOGE: React.FC<Props> = (props): JSX.Element => {
   const {
     walletType,
     walletIndex,
+    walletAddress,
     balances,
     balance,
-    onSubmit,
-    isLoading,
-    sendTxStatusMsg,
+    transfer$,
+    openExplorerTxUrl,
+    getExplorerTxUrl,
     addressValidation,
     feesWithRates: feesWithRatesRD,
     reloadFeesHandler,
@@ -81,9 +87,17 @@ export const SendFormDOGE: React.FC<Props> = (props): JSX.Element => {
 
   const intl = useIntl()
 
-  const changeAssetHandler = useChangeAssetHandler()
+  const { asset } = balance
 
   const [amountToSend, setAmountToSend] = useState<BaseAmount>(ZERO_BASE_AMOUNT)
+
+  const {
+    state: sendTxState,
+    reset: resetSendTxState,
+    subscribe: subscribeSendTxState
+  } = useSubscriptionState<SendTxState>(INITIAL_SEND_STATE)
+
+  const isLoading = useMemo(() => RD.isPending(sendTxState.status), [sendTxState.status])
 
   const [selectedFeeOption, setSelectedFeeOption] = useState<FeeOption>(DEFAULT_FEE_OPTION)
 
@@ -226,36 +240,99 @@ export const SendFormDOGE: React.FC<Props> = (props): JSX.Element => {
     [intl, maxAmount]
   )
 
-  // State for visibility of Modal to confirm tx
-  const [showPwModal, setShowPwModal] = useState(false)
+  // Send tx start time
+  const [sendTxStartTime, setSendTxStartTime] = useState<number>(0)
 
-  const sendHandler = useCallback(() => {
-    // close PW modal
-    setShowPwModal(false)
+  const [showConfirmationModal, setShowConfirmationModal] = useState(false)
 
-    onSubmit({
-      walletType,
-      walletIndex,
-      recipient: form.getFieldValue('recipient'),
-      asset: balance.asset,
-      amount: assetToBase(assetAmount(form.getFieldValue('amount'))),
-      feeOption: selectedFeeOption,
-      memo: form.getFieldValue('memo')
-    })
-  }, [onSubmit, walletType, walletIndex, form, balance.asset, selectedFeeOption])
+  const submitTx = useCallback(() => {
+    setShowConfirmationModal(false)
 
-  const renderPwModal = useMemo(
-    () =>
-      showPwModal ? (
+    setSendTxStartTime(Date.now())
+
+    subscribeSendTxState(
+      transfer$({
+        walletType,
+        walletIndex,
+        sender: walletAddress,
+        recipient: form.getFieldValue('recipient'),
+        asset,
+        amount: amountToSend,
+        feeOption: selectedFeeOption,
+        memo: form.getFieldValue('memo')
+      })
+    )
+  }, [
+    subscribeSendTxState,
+    transfer$,
+    walletType,
+    walletIndex,
+    walletAddress,
+    form,
+    asset,
+    amountToSend,
+    selectedFeeOption
+  ])
+
+  const renderConfirmationModal = useMemo(() => {
+    const onSuccessHandler = () => {
+      setShowConfirmationModal(false)
+      submitTx()
+    }
+
+    const onCloseHandler = () => {
+      setShowConfirmationModal(false)
+    }
+
+    if (isLedgerWallet(walletType)) {
+      return (
+        <LedgerConfirmationModal
+          network={network}
+          onSuccess={onSuccessHandler}
+          onClose={onCloseHandler}
+          visible={showConfirmationModal}
+          chain={DOGEChain}
+          description2={intl.formatMessage({ id: 'ledger.sign' })}
+          addresses={O.none}
+        />
+      )
+    } else if (isKeystoreWallet(walletType)) {
+      return (
         <WalletPasswordConfirmationModal
-          onSuccess={sendHandler}
-          onClose={() => setShowPwModal(false)}
+          onSuccess={onSuccessHandler}
+          onClose={onCloseHandler}
           validatePassword$={validatePassword$}
         />
-      ) : (
-        <></>
-      ),
-    [sendHandler, showPwModal, validatePassword$]
+      )
+    } else {
+      return null
+    }
+  }, [walletType, submitTx, network, showConfirmationModal, intl, validatePassword$])
+
+  const renderTxModal = useMemo(
+    () =>
+      Shared.renderTxModal({
+        asset,
+        amountToSend,
+        network,
+        sendTxState,
+        resetSendTxState,
+        sendTxStartTime,
+        openExplorerTxUrl,
+        getExplorerTxUrl,
+        intl
+      }),
+    [
+      asset,
+      amountToSend,
+      network,
+      sendTxState,
+      resetSendTxState,
+      sendTxStartTime,
+      openExplorerTxUrl,
+      getExplorerTxUrl,
+      intl
+    ]
   )
 
   const uiFeesRD: UIFeesRD = useMemo(
@@ -356,12 +433,7 @@ export const SendFormDOGE: React.FC<Props> = (props): JSX.Element => {
     <>
       <Row>
         <Styled.Col span={24}>
-          <AccountSelector
-            onChange={changeAssetHandler}
-            selectedWallet={balance}
-            walletBalances={balances}
-            network={network}
-          />
+          <AccountSelector selectedWallet={balance} network={network} />
           <Styled.Form
             form={form}
             initialValues={{
@@ -370,7 +442,7 @@ export const SendFormDOGE: React.FC<Props> = (props): JSX.Element => {
               // Default value for RadioGroup of feeOptions
               feeRate: DEFAULT_FEE_OPTION
             }}
-            onFinish={() => setShowPwModal(true)}
+            onFinish={() => setShowConfirmationModal(true)}
             labelCol={{ span: 24 }}>
             <Styled.SubForm>
               <Styled.CustomLabel size="big">
@@ -407,7 +479,6 @@ export const SendFormDOGE: React.FC<Props> = (props): JSX.Element => {
               <Form.Item name="feeRate">{renderFeeOptions}</Form.Item>
             </Styled.SubForm>
             <Styled.SubmitContainer>
-              <Styled.SubmitStatus>{sendTxStatusMsg}</Styled.SubmitStatus>
               <Styled.Button loading={isLoading} disabled={!feesAvailable || isLoading} htmlType="submit">
                 {intl.formatMessage({ id: 'wallet.action.send' })}
               </Styled.Button>
@@ -415,7 +486,8 @@ export const SendFormDOGE: React.FC<Props> = (props): JSX.Element => {
           </Styled.Form>
         </Styled.Col>
       </Row>
-      {renderPwModal}
+      {showConfirmationModal && renderConfirmationModal}
+      {renderTxModal}
     </>
   )
 }

@@ -11,8 +11,6 @@ module.exports = {
       // to avoid "Uncaught ReferenceError: require is not defined"
       // ^ https://gist.github.com/msafi/d1b8571aa921feaaa0f893ab24bb727b
       webpackConfig.target = 'web'
-      // support hot reload of hooks
-      webpackConfig.resolve.alias['react-dom'] = '@hot-loader/react-dom'
 
       webpackConfig.optimization.minimizer = [
         // TerserPlugin

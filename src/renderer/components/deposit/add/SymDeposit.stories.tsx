@@ -97,6 +97,8 @@ const defaultProps: SymDepositProps = {
     console.log(`Open RUNE explorer - tx hash ${txHash}`)
     return Promise.resolve(true)
   },
+  getAssetExplorerTxUrl: (txHash: TxHash) => O.some(`url/asset-${txHash}`),
+  getRuneExplorerTxUrl: (txHash: TxHash) => O.some(`url/asset-${txHash}`),
   // mock password validation
   // Password: "123"
   validatePassword$: mockValidatePassword$,
@@ -116,7 +118,7 @@ const defaultProps: SymDepositProps = {
   network: 'testnet',
   approveERC20Token$: () => Rx.of(RD.success('txHash')),
   isApprovedERC20Token$: () => Rx.of(RD.success(true)),
-  fundsCap: O.none,
+  protocolLimitReached: false,
   poolsData: {
     [assetToString(AssetBNB)]: {
       assetBalance: baseAmount(30),

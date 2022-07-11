@@ -7,7 +7,7 @@ type UserNodesContextValue = typeof service
 const initialContext: UserNodesContextValue = service
 const UserNodesContext = createContext<UserNodesContextValue | null>(null)
 
-export const UserNodesProvider: React.FC = ({ children }): JSX.Element => {
+export const UserNodesProvider: React.FC<{ children: React.ReactNode }> = ({ children }): JSX.Element => {
   return <UserNodesContext.Provider value={initialContext}>{children}</UserNodesContext.Provider>
 }
 

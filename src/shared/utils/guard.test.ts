@@ -1,3 +1,4 @@
+import { FeeOption } from '@xchainjs/xchain-client'
 import { AssetRuneNative, baseAmount, bn } from '@xchainjs/xchain-util'
 
 import {
@@ -5,13 +6,14 @@ import {
   isBaseAmount,
   isChain,
   isError,
+  isFeeOption,
   isKeystoreWallet,
   isLedgerWallet,
   isNetwork,
   isWalletType
 } from './guard'
 
-describe('shared/guard', () => {
+describe('shared/utils/guard', () => {
   describe('isAsset', () => {
     it('true for "THOR.RUNE"', () => {
       expect(isAsset('THOR.RUNE')).toBeTruthy()
@@ -55,17 +57,24 @@ describe('shared/guard', () => {
   })
 
   describe('isBaseAmount', () => {
-    it('true for "THOR"', () => {
+    it('true"', () => {
       expect(isBaseAmount(baseAmount(1))).toBeTruthy()
     })
-    it('false for BigNumber', () => {
+    it('false -> BigNumber', () => {
       expect(isBaseAmount(bn('123'))).toBeFalsy()
     })
-    it('false for string', () => {
+    it('false -> string', () => {
       expect(isBaseAmount('123')).toBeFalsy()
+      expect(isBaseAmount('')).toBeFalsy()
     })
-    it('false for number', () => {
+    it('false -> number', () => {
       expect(isBaseAmount(2)).toBeFalsy()
+    })
+    it('false -> misc.', () => {
+      expect(isBaseAmount(undefined)).toBeFalsy()
+      expect(isBaseAmount(null)).toBeFalsy()
+      expect(isBaseAmount({ hello: 'world' })).toBeFalsy()
+      expect(isBaseAmount({})).toBeFalsy()
     })
   })
 
@@ -113,6 +122,25 @@ describe('shared/guard', () => {
 
     it('false for empty object', () => {
       expect(isError({})).toBeFalsy()
+    })
+  })
+
+  describe('isFeeOption', () => {
+    it('true (Average)', () => {
+      expect(isFeeOption(FeeOption.Average)).toBeTruthy()
+    })
+    it('true (Fast)', () => {
+      expect(isFeeOption(FeeOption.Fast)).toBeTruthy()
+    })
+    it('true (Fastest)', () => {
+      expect(isFeeOption(FeeOption.Fastest)).toBeTruthy()
+    })
+    it('false (random string)', () => {
+      expect(isFeeOption('foo')).toBeFalsy()
+    })
+    it('false (null|undefined)', () => {
+      expect(isFeeOption(null)).toBeFalsy()
+      expect(isFeeOption(undefined)).toBeFalsy()
     })
   })
 })

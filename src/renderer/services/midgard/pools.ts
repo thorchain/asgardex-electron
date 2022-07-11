@@ -4,6 +4,7 @@ import BigNumber from 'bignumber.js'
 import * as A from 'fp-ts/Array'
 import * as FP from 'fp-ts/lib/function'
 import * as NEA from 'fp-ts/lib/NonEmptyArray'
+import * as P from 'fp-ts/lib/Predicate'
 import * as O from 'fp-ts/Option'
 import * as Rx from 'rxjs'
 import * as RxOp from 'rxjs/operators'
@@ -60,7 +61,8 @@ import {
   GasRateLD,
   PoolsState,
   HaltedChainsLD,
-  SelectedPoolAsset
+  SelectedPoolAsset,
+  PoolType
 } from './types'
 import {
   getPoolAddressesByChain,
@@ -96,11 +98,14 @@ const createPoolsService = (
   const {
     get$: poolsFilters$,
     set: _setPoolsFilter,
-    get: internalGetPoolsFilter
-  } = observableState<Record<string, O.Option<PoolFilter>>>({})
+    get: _getPoolsFilter
+  } = observableState<Record<PoolType, O.Option<PoolFilter>>>({
+    active: O.none,
+    pending: O.none
+  })
 
-  const setPoolsFilter = (poolKey: string, filterValue: O.Option<PoolFilter>) => {
-    const currentState = internalGetPoolsFilter()
+  const setPoolsFilter = (poolKey: PoolType, filterValue: O.Option<PoolFilter>) => {
+    const currentState = _getPoolsFilter()
     _setPoolsFilter({ ...currentState, [poolKey]: filterValue })
   }
 
@@ -607,7 +612,7 @@ const createPoolsService = (
                   addresses,
                   A.map(({ chain, halted }) => ({ chain, halted })),
                   // Valid chains only that ones which are NOT included to the halted array
-                  FP.not(A.elem(eqHaltedChain)({ chain, halted: true }))
+                  P.not(A.elem(eqHaltedChain)({ chain, halted: true }))
                 ),
               () => new Error(`Trading for pools on ${chain} chain(s) is halted for maintenance.`)
             )
@@ -644,8 +649,6 @@ const createPoolsService = (
       )
     )
 
-  const { stream$: reloadPoolStatsDetail$, trigger: reloadPoolStatsDetail } = triggerStream()
-
   // Factory to get pool stats detail from Midgard
   const apiGetPoolStatsDetail$ = (request: GetPoolStatsRequest): PoolStatsDetailLD =>
     FP.pipe(
@@ -660,7 +663,9 @@ const createPoolsService = (
       )
     )
 
-  const poolStatsDetail$: PoolStatsDetailLD = Rx.combineLatest([selectedPoolAsset$, reloadSelectedPoolDetail$]).pipe(
+  const { stream$: reloadPoolStatsDetail$, trigger: reloadPoolStatsDetail } = triggerStream()
+
+  const poolStatsDetail$: PoolStatsDetailLD = Rx.combineLatest([selectedPoolAsset$, reloadPoolStatsDetail$]).pipe(
     RxOp.map(([oSelectedPoolAsset]) => oSelectedPoolAsset),
     RxOp.switchMap((selectedPoolAsset) => {
       return FP.pipe(
@@ -696,19 +701,15 @@ const createPoolsService = (
       )
     )
 
+  const { stream$: reloadPoolEarningHistory$, trigger: reloadPoolEarningHistory } = triggerStream()
+
   const poolEarningHistory$: PoolEarningHistoryLD = Rx.combineLatest([
     selectedPoolAsset$,
-    reloadSelectedPoolDetail$
+    reloadPoolEarningHistory$
   ]).pipe(
-    RxOp.switchMap(([oSelectedPoolAsset, delay]) =>
+    RxOp.switchMap(([oSelectedPoolAsset, _]) =>
       FP.pipe(
-        Rx.timer(delay),
-        RxOp.switchMap(() => Rx.of(oSelectedPoolAsset))
-      )
-    ),
-    RxOp.switchMap((selectedPoolAsset) => {
-      return FP.pipe(
-        selectedPoolAsset,
+        oSelectedPoolAsset,
         O.fold(
           () => Rx.of(RD.initial),
           (asset) =>
@@ -721,15 +722,17 @@ const createPoolsService = (
             )
         )
       )
-    }),
+    ),
     RxOp.startWith(RD.pending)
   )
+
+  const { stream$: reloadLiquidityHistory$, trigger: reloadLiquidityHistory } = triggerStream()
 
   // Factory to get liquidity history from Midgard
   const apiGetLiquidityHistory$ = ({ from, to, ...request }: GetLiquidityHistoryRequest): PoolLiquidityHistoryLD =>
     FP.pipe(
-      Rx.combineLatest([midgardDefaultApi$, reloadPoolStatsDetail$]),
-      RxOp.map(([api]) => api),
+      Rx.combineLatest([midgardDefaultApi$, reloadLiquidityHistory$]),
+      RxOp.map(([api, _]) => api),
       liveData.chain((api) =>
         FP.pipe(
           api.getLiquidityHistory({
@@ -737,7 +740,11 @@ const createPoolsService = (
             to: O.toUndefined(roundToFiveMinutes(to)),
             ...request
           }),
-          RxOp.map(RD.success),
+          RxOp.map((result) =>
+            result /* result can be null - for whatever reason */
+              ? RD.success(result)
+              : RD.failure(Error('Failed to load liquidity history from Midgard'))
+          ),
           RxOp.startWith(RD.pending),
           RxOp.catchError((e: Error) => Rx.of(RD.failure(e)))
         )
@@ -777,7 +784,11 @@ const createPoolsService = (
             to: O.toUndefined(roundToFiveMinutes(to)),
             ...otherParams
           }),
-          RxOp.map(RD.success),
+          RxOp.map((result) =>
+            result /* result can be null - for whatever reason */
+              ? RD.success(result)
+              : RD.failure(Error('Failed to load swap history from Midgard'))
+          ),
           RxOp.startWith(RD.pending),
           RxOp.catchError((e: Error) => Rx.of(RD.failure(e)))
         )
@@ -822,7 +833,11 @@ const createPoolsService = (
             to: O.toUndefined(roundToFiveMinutes(to)),
             ...otherParams
           }),
-          RxOp.map(RD.success),
+          RxOp.map((result) =>
+            result /* result can be null - for whatever reason */
+              ? RD.success(result)
+              : RD.failure(Error('Failed to load depth history from Midgard'))
+          ),
           RxOp.startWith(RD.pending),
           RxOp.catchError((e: Error) => Rx.of(RD.failure(e)))
         )
@@ -835,7 +850,7 @@ const createPoolsService = (
   const getDepthHistory$ = (params: GetDepthHistoryParams): DepthHistoryLD =>
     FP.pipe(
       Rx.combineLatest([selectedPoolAsset$, reloadDepthHistory$]),
-      RxOp.switchMap(([oSelectedPoolAsset]) =>
+      RxOp.switchMap(([oSelectedPoolAsset, _]) =>
         FP.pipe(
           oSelectedPoolAsset,
           O.fold(
@@ -867,9 +882,11 @@ const createPoolsService = (
     reloadInboundAddresses,
     selectedPoolDetail$,
     reloadSelectedPoolDetail: (delayTime = 0) => _reloadSelectedPoolDetail(delayTime),
-    reloadPoolStatsDetail,
+    reloadLiquidityHistory,
     poolStatsDetail$,
+    reloadPoolStatsDetail,
     poolEarningHistory$,
+    reloadPoolEarningHistory,
     getPoolLiquidityHistory$,
     getSelectedPoolSwapHistory$,
     apiGetSwapHistory$,

@@ -21,7 +21,7 @@ export const AssetInfoWrapper = styled.div`
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  margin-left: 16px;
+  margin-left: 30px;
 `
 
 export const AssetTitleWrapper = styled.div`
@@ -29,18 +29,18 @@ export const AssetTitleWrapper = styled.div`
   align-items: center;
 `
 export const AssetTitle = styled.div`
-  font-size: 32px;
+  font-size: 36px;
   font-family: 'MainFontRegular';
   color: ${palette('text', 0)};
-  line-height: 34px;
+  line-height: 100%;
   text-transform: uppercase;
 `
 
 export const AssetSubTitle = styled.div`
-  font-size: 17px;
+  font-size: 19px;
   font-family: 'MainFontRegular';
   color: ${palette('text', 2)};
-  line-height: 21px;
+  line-height: 26px;
   text-transform: uppercase;
 `
 

@@ -1,6 +1,5 @@
 import { Address } from '@xchainjs/xchain-client'
 import * as A from 'fp-ts/Array'
-import { eqString } from 'fp-ts/Eq'
 import * as FP from 'fp-ts/function'
 import * as O from 'fp-ts/Option'
 import * as Rx from 'rxjs'
@@ -8,6 +7,7 @@ import * as RxOp from 'rxjs/operators'
 
 import { Network, UserNodesStorage } from '../../../shared/api/types'
 import { USER_NODES_STORAGE_DEFAULT } from '../../../shared/const'
+import { eqString } from '../../helpers/fp/eq'
 import { observableState } from '../../helpers/stateHelper'
 import { network$ } from '../app/service'
 import { StoragePartialState, StorageState } from './types'
@@ -17,11 +17,6 @@ const {
   get: getStorageState,
   set: setStorageState
 } = observableState<StorageState<UserNodesStorage>>(O.none)
-
-export const removeStorage = async () => {
-  await window.apiUserNodesStorage.remove()
-  setStorageState(O.none)
-}
 
 const modifyStorage = (oPartialData: StoragePartialState<UserNodesStorage>) => {
   FP.pipe(
@@ -44,7 +39,7 @@ const userNodes$: Rx.Observable<Address[]> = FP.pipe(
     FP.pipe(
       storageState,
       O.map((userNodes) => userNodes[network]),
-      O.getOrElse((): Address[] => A.empty)
+      O.getOrElse((): Address[] => [])
     )
   ),
   RxOp.shareReplay(1)
@@ -58,7 +53,7 @@ const addNodeAddress = (node: Address, network: Network) => {
 
   FP.pipe(savedNodes[network], A.elem(eqString)(node), (isNodeExistsInSavedArray) => {
     if (!isNodeExistsInSavedArray) {
-      modifyStorage(O.some({ ...savedNodes, [`${network}`]: [...savedNodes[network], node] }))
+      modifyStorage(O.some({ ...savedNodes, [network]: [...savedNodes[network], node] }))
     }
   })
 }
@@ -75,7 +70,7 @@ const removeNodeByAddress = (node: Address, network: Network) => {
       modifyStorage(
         O.some({
           ...savedNodes,
-          [`${network}`]: FP.pipe(
+          [network]: FP.pipe(
             savedNodes[network],
             A.filter((savedNode) => savedNode !== node)
           )

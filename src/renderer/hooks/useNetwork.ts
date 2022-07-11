@@ -1,9 +1,10 @@
 import { useCallback } from 'react'
 
+import * as A from 'fp-ts/lib/Array'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
 import { useObservableState } from 'observable-hooks'
-import { useHistory, useRouteMatch } from 'react-router-dom'
+import { useNavigate, matchPath, useLocation } from 'react-router-dom'
 
 import { Network } from '../../shared/api/types'
 import { useAppContext } from '../contexts/AppContext'
@@ -11,6 +12,21 @@ import * as poolsRoutes from '../routes/pools'
 import * as walletRoutes from '../routes/wallet'
 import { ChangeNetworkHandler } from '../services/app/types'
 import { DEFAULT_NETWORK } from '../services/const'
+
+// TODO (@veado)
+// 1. Extract into helper/routes + test
+// 2. Extract changeNetworkHandler into App (not needed to have this in this hook)
+const matchPaths = (pathes: string[], pathname: string): O.Option<string> =>
+  FP.pipe(
+    pathes,
+    A.map((path) => matchPath(path, pathname)),
+    A.map(O.fromNullable),
+    // filter `None` out from list
+    A.filterMap(FP.identity),
+    A.map(({ pathnameBase }) => pathnameBase),
+    A.head,
+    O.map((_) => poolsRoutes.base.path())
+  )
 
 /**
  * Hook to get network data
@@ -22,26 +38,28 @@ export const useNetwork = (): { network: Network; changeNetwork: ChangeNetworkHa
 
   const network = useObservableState<Network>(network$, DEFAULT_NETWORK)
 
-  const history = useHistory()
+  const { pathname } = useLocation()
+
+  const navigate = useNavigate()
 
   // Check pool sub-routes and return url to re-direct in case of matching
-  const oPoolRedirectPath: O.Option<string> = FP.pipe(
-    useRouteMatch([poolsRoutes.deposit.template, poolsRoutes.detail.template, poolsRoutes.swap.template]),
-    O.fromNullable,
-    O.map((_) => poolsRoutes.base.path())
+  const oPoolRedirectPath: O.Option<string> = matchPaths(
+    [poolsRoutes.deposit.template, poolsRoutes.detail.template, poolsRoutes.swap.template],
+    pathname
   )
 
   // Check wallet sub-routes and return url to re-direct in case of matching
-  const oWalletRedirectPath: O.Option<string> = FP.pipe(
-    useRouteMatch([
+  const oWalletRedirectPath: O.Option<string> = matchPaths(
+    [
       walletRoutes.send.template,
       walletRoutes.upgradeRune.template,
       walletRoutes.assetDetail.template,
       walletRoutes.bonds.template,
-      walletRoutes.deposit.template
-    ]),
-    O.fromNullable,
-    O.map((_) => walletRoutes.base.path())
+      walletRoutes.history.template,
+      walletRoutes.poolShares.template,
+      walletRoutes.interact.template
+    ],
+    pathname
   )
 
   /**
@@ -58,7 +76,7 @@ export const useNetwork = (): { network: Network; changeNetwork: ChangeNetworkHa
    * Quote: "Our recommendation is not to keep your routes in your Redux store at all."
    * ^ @see https://reactrouter.com/web/guides/deep-redux-integration
    *
-   * (2) Why don't we handle re-directing in views, where we defined our routes (such as `PoolsView` or `WalletView`)?
+   * (2) Why don't we handle re-directing in views, where we defined our routes?
    * ------------------------------------------------------------------------------------------------------------------
    * Since we have to subscribe to `network$` to get changes by using `useSubscription` or something,
    * we get state of network after first rendering, but not before. With this, components are still trying to render data,
@@ -71,9 +89,12 @@ export const useNetwork = (): { network: Network; changeNetwork: ChangeNetworkHa
 
       const M = O.getFirstMonoid<string>()
       // Handle first "some" value within a list of possible urls to re-direct
-      FP.pipe(M.concat(oPoolRedirectPath, oWalletRedirectPath), O.map(history.replace))
+      FP.pipe(
+        M.concat(oPoolRedirectPath, oWalletRedirectPath),
+        O.map((path) => navigate(path, { replace: true }))
+      )
     },
-    [changeNetwork, history.replace, oPoolRedirectPath, oWalletRedirectPath]
+    [changeNetwork, navigate, oPoolRedirectPath, oWalletRedirectPath]
   )
 
   return { network, changeNetwork: changeNetworkHandler }

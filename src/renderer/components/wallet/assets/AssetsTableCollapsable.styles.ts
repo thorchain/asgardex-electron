@@ -5,7 +5,10 @@ import { palette } from 'styled-theme'
 
 import { Label as UILabel } from '../../../components/uielements/label'
 import { Button as UIButton } from '../../uielements/button'
-import { WalletTypeLabel as WalletTypeLabelUI } from '../../uielements/common/Common.styles'
+import {
+  WalletTypeLabel as WalletTypeLabelUI,
+  AssetSynthLabel as AssetSynthLabelUI
+} from '../../uielements/common/Common.styles'
 import { Table as UITable } from '../../uielements/table'
 
 export const Table = styled(UITable)`
@@ -55,11 +58,16 @@ export const Label = styled(UILabel)`
 
 export const TickerLabel = styled(UILabel).attrs({
   textTransform: 'uppercase',
-  weight: '600'
+  weight: 'bold'
 })`
   padding: 0px;
   font-size: 16px;
   line-height: 18px;
+`
+
+export const ChainLabelWrapper = styled.div`
+  display: flex;
+  align-items: center;
 `
 
 export const ChainLabel = styled(TickerLabel)`
@@ -69,21 +77,18 @@ export const ChainLabel = styled(TickerLabel)`
 `
 
 export const Collapse = styled(A.Collapse)`
-  &.ant-collapse-icon-position-right > .ant-collapse-item > .ant-collapse-header {
+  &.ant-collapse > .ant-collapse-item > .ant-collapse-header {
     background-color: ${palette('background', 2)};
+    border-bottom: 1px solid ${palette('gray', 1)};
     padding: 5px 20px;
+  }
+
+  &.ant-collapse > .ant-collapse-item > .ant-collapse-header .ant-collapse-header-text {
+    width: 100%;
   }
 
   &.ant-collapse-ghost > .ant-collapse-item > .ant-collapse-content > .ant-collapse-content-box {
     padding: 0;
-  }
-
-  &.ant-collapse-icon-position-right > .ant-collapse-item > .ant-collapse-header {
-    border-bottom: 1px solid ${palette('gray', 1)};
-  }
-
-  &.ant-collapse > .ant-collapse-item > .ant-collapse-header .ant-collapse-arrow {
-    top: 15px;
   }
 `
 
@@ -150,4 +155,11 @@ export const UpgradeButton = styled(UIButton).attrs({
 export const WalletTypeLabel = styled(WalletTypeLabelUI)`
   background: ${palette('gray', 1)};
   padding: 0 5px;
+`
+
+export const AssetSynthLabel = styled(AssetSynthLabelUI)`
+  margin-top: 2px;
+  padding: 0 4px;
+  font-size: 10px;
+  line-height: 12px;
 `

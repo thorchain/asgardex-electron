@@ -1,7 +1,8 @@
 import React from 'react'
 
-import { text, radios, withKnobs } from '@storybook/addon-knobs'
-import { RadiosTypeOptionsProp } from '@storybook/addon-knobs/dist/components/types'
+// TODO (@veado) Replace knobs
+// import { text, radios, withKnobs } from '@storybook/addon-knobs'
+// import { RadiosTypeOptionsProp } from '@storybook/addon-knobs/dist/components/types'
 import { storiesOf } from '@storybook/react'
 import { Row } from 'antd'
 import { SizeType } from 'antd/lib/config-provider/SizeContext'
@@ -10,7 +11,7 @@ import { Input, InputPassword, InputTextArea } from './Input.styles'
 import { Color } from './Input.types'
 
 storiesOf('Components/Input', module)
-  .addDecorator(withKnobs)
+  // .addDecorator(withKnobs)
   .add('default', () => {
     return (
       <Row
@@ -34,16 +35,20 @@ storiesOf('Components/Input', module)
     )
   })
   .add('properties', () => {
-    const inputText = text('Input Text', 'text')
-    const sizeOptions: RadiosTypeOptionsProp<SizeType> = { small: 'small', middle: 'middle', large: 'large' }
-    const colorOptions: RadiosTypeOptionsProp<Color> = {
-      primary: 'primary',
-      success: 'success',
-      warning: 'warning',
-      error: 'error'
-    }
+    // const inputText = text('Input Text', 'text')
+    // const sizeOptions: RadiosTypeOptionsProp<SizeType> = { small: 'small', middle: 'middle', large: 'large' }
+    // const colorOptions: RadiosTypeOptionsProp<Color> = {
+    //   primary: 'primary',
+    //   success: 'success',
+    //   warning: 'warning',
+    //   error: 'error'
+    // }
 
-    const size = radios('size', sizeOptions, 'middle')
-    const color = radios('color', colorOptions, 'primary')
+    // const size = radios('size', sizeOptions, 'middle')
+    // const color = radios('color', colorOptions, 'primary')
+    const size: SizeType = 'middle'
+    const color: Color = 'primary'
+    const inputText = 'Input Text'
+
     return <Input color={color} size={size} value={inputText} />
   })

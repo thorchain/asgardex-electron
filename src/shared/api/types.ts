@@ -6,13 +6,15 @@ import { Chain } from '@xchainjs/xchain-util'
 import { Either } from 'fp-ts/lib/Either'
 import * as O from 'fp-ts/Option'
 
+import { EthDerivationMode } from '../ethereum/types'
 import { Locale } from '../i18n/types'
 import { WalletAddress } from '../wallet/types'
+import { PoolsStorageEncoded } from './io'
 
 // A version number starting from `1` to avoid to load deprecated files
 export type StorageVersion = { version: string }
-export type UserNodesStorage = Record<Network, Address[]> & StorageVersion
-export type CommonStorage = Readonly<{ locale: Locale }> & StorageVersion
+export type UserNodesStorage = Readonly<Record<Network, Address[]> & StorageVersion>
+export type CommonStorage = Readonly<{ locale: Locale; ethDerivationMode: EthDerivationMode } & StorageVersion>
 
 /**
  * Hash map of common store files
@@ -23,6 +25,7 @@ export type CommonStorage = Readonly<{ locale: Locale }> & StorageVersion
 export type StoreFilesContent = Readonly<{
   common: CommonStorage
   userNodes: UserNodesStorage
+  pools: PoolsStorageEncoded
 }>
 
 export type StoreFileName = keyof StoreFilesContent
@@ -104,8 +107,11 @@ export type LedgerTHORTxParams = TxParams & {
 export type LedgerBTCTxInfo = Pick<TxParams, 'amount' | 'recipient'> & {
   feeRate: FeeRate
   sender: Address
-  nodeUrl: string
-  nodeApiKey: string
+}
+
+export type LedgerLTCTxInfo = Pick<TxParams, 'amount' | 'recipient'> & {
+  feeRate: FeeRate
+  sender: Address
 }
 
 export type LedgerTxParams = LedgerTHORTxParams | LedgerBNBTxParams
@@ -114,12 +120,15 @@ export type IPCLedgerAdddressParams = { chain: Chain; network: Network; walletIn
 
 export type ApiHDWallet = {
   getLedgerAddress: (params: IPCLedgerAdddressParams) => Promise<Either<LedgerError, WalletAddress>>
-  verifyLedgerAddress: (params: IPCLedgerAdddressParams) => void
+  verifyLedgerAddress: (params: IPCLedgerAdddressParams) => Promise<boolean>
   sendLedgerTx: (
     params: unknown /* will be de-/serialized by ipcLedgerSendTxParamsIO */
   ) => Promise<Either<LedgerError, TxHash>>
   depositLedgerTx: (
     params: unknown /* will be de-/serialized by ipcLedgerDepositTxParamsIO */
+  ) => Promise<Either<LedgerError, TxHash>>
+  approveLedgerERC20Token: (
+    params: unknown /* will be de-/serialized by ipcLedgerApprovedERC20TokenParamsIO */
   ) => Promise<Either<LedgerError, TxHash>>
 }
 
@@ -135,6 +144,7 @@ declare global {
     apiHDWallet: ApiHDWallet
     apiCommonStorage: ApiFileStoreService<StoreFileData<'common'>>
     apiUserNodesStorage: ApiFileStoreService<StoreFileData<'userNodes'>>
+    apiPoolsStorage: ApiFileStoreService<StoreFileData<'pools'>>
     apiAppUpdate: ApiAppUpdate
   }
 }

@@ -5,8 +5,71 @@
   <img src="internals/img/asgardex-splash.png" width="100%" />
 </div>
 
+[![Version](https://img.shields.io/github/package-json/v/thorchain/asgardex-electron?color=xyz&filename=package.json&style=flat-square)](https://github.com/thorchain/asgardex-electron/releases)
 ![Test](https://github.com/thorchain/asgardex-electron/workflows/Test/badge.svg)
 ![Electron build](https://github.com/thorchain/asgardex-electron/workflows/Electron%20build/badge.svg)
+
+[![Discord](https://img.shields.io/badge/chat-on%20discord-7289da.svg)](https://discord.gg/pHcS67yX7Z)
+[![Follow on Twitter](https://img.shields.io/twitter/follow/asgardex?style=social)](https://twitter.com/asgardex)
+
+## Feature list
+
+Symbols:
+:heavy_check_mark: implemented
+:white_check_mark: planned
+`-` not needed
+
+### Wallet
+
+|                | THOR               | BNB / BEP2         | BTC                | BCH                | DOGE               | ETH / ERC20        | LTC                | TERRA              | COSMOS             |
+| -------------- | ------------------ | ------------------ | ------------------ | ------------------ | ------------------ | ------------------ | ------------------ | ------------------ | ------------------ |
+| Keystore       | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: |
+| Ledger \*      | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :white_check_mark: |
+| Send \*\*      | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: |
+| Receive        | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: |
+| Upgrade \*\*\* | :heavy_check_mark: | :heavy_check_mark: | -                  | -                  | -                  | :heavy_check_mark: | -                  | -                  | -                  |
+| Deposit        | :heavy_check_mark: | -                  | -                  | -                  | -                  | -                  | -                  | -                  | -                  |
+| Shares         | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: |
+| History        | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: |
+| Synths         | :white_check_mark: | :white_check_mark: | :white_check_mark: | :white_check_mark: | :white_check_mark: | :white_check_mark: | :white_check_mark: | :white_check_mark: | :white_check_mark: |
+
+(\*) Ledger `THOR` is not supported at `stagenet`. Ledger `LTC`/`BCH`/`DOGE`/`Terra` are not supported at `testnet`
+
+(\*\*) With or without memo
+
+(\*\*\*) Upgrade RUNE (BEP2) or RUNE (ERC20) to RUNE (Native)
+
+### Exchange
+
+|                | THOR               | BNB / BEP2         | BTC                | BCH                | DOGE               | ETH / ERC20        | LTC                | TERRA              | COSMOS             |
+| -------------- | ------------------ | ------------------ | ------------------ | ------------------ | ------------------ | ------------------ | ------------------ | ------------------ | ------------------ |
+| Pools overview | -                  | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: |
+| Pool detail    | -                  | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: |
+| Swap           | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: |
+| Deposit \*     | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: |
+| Withdraw \*    | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: |
+| Recovery tool  | :white_check_mark: | :white_check_mark: | :white_check_mark: | :white_check_mark: | :white_check_mark: | :white_check_mark: | :white_check_mark: | :white_check_mark: | :white_check_mark: |
+| Synths         | :white_check_mark: | :white_check_mark: | :white_check_mark: | :white_check_mark: | :white_check_mark: | :white_check_mark: | :white_check_mark: | :white_check_mark: | :white_check_mark: |
+
+(\*) Symmetrical deposit/withdraw only
+
+### THORNode
+
+| Overview           | Status             | BOND               | UNBOND             | LEAVE              |
+| ------------------ | ------------------ | ------------------ | ------------------ | ------------------ |
+| :heavy_check_mark: | :white_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: |
+
+### Languages
+
+| ENGLISH :us:       | GERMAN :de:        | FRENCH :fr:        | RUSSIAN :ru:       |
+| ------------------ | ------------------ | ------------------ | ------------------ |
+| :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: |
+
+### Misc.
+
+- 100% open-source (built by the community)
+- Security first
+- No extra (affiliate) fees
 
 ## ASGARDEX uses following libraries, frameworks and more:
 
@@ -23,14 +86,15 @@ _(in alphabetical order)_
 - [ReactJS](https://github.com/facebook/react/)
 - [Styled Components](https://styled-components.com/)
 - [Testcafe](https://github.com/DevExpress/testcafe)
-- [THORChain Byzantine Module](https://gitlab.com/thorchain/byzantine-module/)
+- ~~[THORChain Byzantine Module](https://gitlab.com/thorchain/byzantine-module/)~~
 - [RxJS](https://rxjs.dev/)
 - [Typescript](https://github.com/microsoft/TypeScript)
+- [xchainjs-lib](https://github.com/xchainjs/xchainjs-lib/)
 - and others ...
 
 ## Install
 
-It's recommended to use a Node version as same as Electron is running with (currently: [`Electron v16.x` / Node `16.5.0`](https://github.com/electron/releases#releases)). It's recommened to install [nvm](https://github.com/nvm-sh/nvm) to run as same Node version locally as used for building ASGARDEX on CI.
+It's recommended to use a Node version as same as Electron is running with (currently: [`Electron v19.x` / Node `16.14.2`](https://github.com/electron/releases#releases)). It's recommened to install [nvm](https://github.com/nvm-sh/nvm) to run as same Node version locally as used for building ASGARDEX on CI.
 
 ```bash
 git clone https://github.com/thorchain/asgardex-electron.git asgardex
@@ -110,7 +174,7 @@ yarn test
 
 ### `e2e`
 
-**Note:** e2e tests are disabled temporary (see #750)
+Note: Running test-cafe is disabled (see https://github.com/thorchain/asgardex-electron/issues/750)
 
 ```bash
 yarn test:e2e
@@ -123,6 +187,14 @@ yarn lint
 ```
 
 Note: `eslint` is provided by `react-scripts` located in `./node_modules/react-scripts/node_modules/` and don't need to be extra installed. If your editor has some issues to find `eslint`, you might point it to this location (see [VSCode settings file](.vscode/settings.json) as an example).
+
+## Storybook
+
+Note: Running `storybook` is broken currently due lack of `React 18` support (see #2248). It will be fixed as soon as `storybook` supports `React 18`.
+
+```bash
+yarn storybook
+```
 
 ### bundle analyze
 

@@ -1,12 +1,16 @@
 import React from 'react'
 
-import { withKnobs, select } from '@storybook/addon-knobs'
+// TODO (@veado) Replace knobs
+// import { withKnobs, select } from '@storybook/addon-knobs'
 import { useCallback, useState } from '@storybook/addons'
 import { Meta, Story } from '@storybook/react'
 import { Address } from '@xchainjs/xchain-client'
 import { baseAmount } from '@xchainjs/xchain-util'
 
-import { getMockRDValueFactory, RDStatus } from '../../../shared/mock/rdByStatus'
+import {
+  getMockRDValueFactory
+  // RDStatus
+} from '../../../shared/mock/rdByStatus'
 import { AddressValidation } from '../../services/clients'
 import { NodeInfo } from '../../services/thorchain/types'
 import { ApiError, ErrorId } from '../../services/wallet/types'
@@ -29,20 +33,20 @@ const addressValidation: AddressValidation = (_) => true
 export const Default: Story = () => {
   const [nodesList, setNodesList] = useState<Address[]>([])
 
-  const nodesSelect: Record<Address, RDStatus> = nodesList
-    .map((node) =>
-      select(
-        node,
-        {
-          initial: 'initial',
-          pending: 'pending',
-          error: 'error',
-          success: 'success'
-        },
-        'pending'
-      )
-    )
-    .reduce((acc, node, index) => ({ ...acc, [index]: node }), {})
+  // const nodesSelect: Record<Address, RDStatus> = nodesList
+  //   .map((node) =>
+  //     select(
+  //       node,
+  //       {
+  //         initial: 'initial',
+  //         pending: 'pending',
+  //         error: 'error',
+  //         success: 'success'
+  //       },
+  //       'pending'
+  //     )
+  //   )
+  //   .reduce((acc, node, index) => ({ ...acc, [index]: node }), {})
 
   const removeNode = useCallback(
     (node: Address) => {
@@ -59,9 +63,10 @@ export const Default: Story = () => {
       addNode={addNode}
       removeNode={removeNode}
       goToNode={(node) => console.log('go to ', node)}
-      nodes={nodesList.map((node, index) => ({
+      nodes={nodesList.map((node, _index) => ({
         nodeAddress: node,
-        data: getMockRDValue(nodesSelect[index])
+        // data: getMockRDValue(nodesSelect[index])
+        data: getMockRDValue()
       }))}
     />
   )
@@ -70,8 +75,8 @@ Default.storyName = 'default'
 
 const meta: Meta = {
   component: Bonds,
-  title: 'Bonds',
-  decorators: [withKnobs]
+  title: 'Bonds'
+  // decorators: [withKnobs]
 }
 
 export default meta

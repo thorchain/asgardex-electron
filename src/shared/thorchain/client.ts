@@ -3,6 +3,9 @@ import { ClientUrl, getDefaultClientUrl } from '@xchainjs/xchain-thorchain'
 
 import { envOrDefault } from '../utils/env'
 
+// expose env (needed to access ENVs by `envOrDefault`) in `main` thread)
+require('dotenv').config()
+
 export const getClientUrl = (): ClientUrl => {
   const { node: nodeTestnet, rpc: rpcTestnet } = getDefaultClientUrl()[Network.Testnet]
   const { node: nodeStagenet, rpc: rpcStagenet } = getDefaultClientUrl()[Network.Stagenet]

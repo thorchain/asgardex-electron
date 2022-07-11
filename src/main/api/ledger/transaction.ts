@@ -1,12 +1,30 @@
 import TransportNodeHidSingleton from '@ledgerhq/hw-transport-node-hid-singleton'
 import { TxHash } from '@xchainjs/xchain-client'
-import { BNBChain, THORChain } from '@xchainjs/xchain-util'
+import {
+  BCHChain,
+  BNBChain,
+  BTCChain,
+  chainToString,
+  CosmosChain,
+  DOGEChain,
+  ETHChain,
+  LTCChain,
+  TerraChain,
+  THORChain
+} from '@xchainjs/xchain-util'
 import * as E from 'fp-ts/Either'
 
 import { IPCLedgerDepositTxParams, IPCLedgerSendTxParams } from '../../../shared/api/io'
 import { LedgerError, LedgerErrorId } from '../../../shared/api/types'
 import { isError } from '../../../shared/utils/guard'
 import * as BNB from './binance/transaction'
+import * as BTC from './bitcoin/transaction'
+import * as BCH from './bitcoincash/transaction'
+import * as COSMOS from './cosmos/transaction'
+import * as DOGE from './doge/transaction'
+import * as ETH from './ethereum/transaction'
+import * as LTC from './litecoin/transaction'
+import * as TERRA from './terra/transaction'
 import * as THOR from './thorchain/transaction'
 
 export const sendTx = async ({
@@ -16,7 +34,11 @@ export const sendTx = async ({
   recipient,
   amount,
   asset,
+  feeAsset,
+  feeAmount,
   memo,
+  feeRate,
+  feeOption,
   walletIndex
 }: IPCLedgerSendTxParams): Promise<E.Either<LedgerError, TxHash>> => {
   try {
@@ -45,6 +67,117 @@ export const sendTx = async ({
           walletIndex
         })
         break
+      case BTCChain:
+        res = await BTC.send({
+          transport,
+          network,
+          sender,
+          recipient,
+          amount,
+          feeRate,
+          memo,
+          walletIndex
+        })
+        break
+      case LTCChain:
+        res = await LTC.send({
+          transport,
+          network,
+          sender,
+          recipient,
+          amount,
+          feeRate,
+          memo,
+          walletIndex
+        })
+        break
+      case BCHChain:
+        res = await BCH.send({ transport, network, sender, recipient, amount, feeRate, memo, walletIndex })
+        break
+      case DOGEChain:
+        res = await DOGE.send({
+          transport,
+          network,
+          sender,
+          recipient,
+          amount,
+          feeRate,
+          memo,
+          walletIndex
+        })
+        break
+      case TerraChain:
+        if (!asset) {
+          res = E.left({
+            errorId: LedgerErrorId.INVALID_DATA,
+            msg: `Asset needs to be defined to send Ledger transaction on ${chainToString(chain)}`
+          })
+        } else if (!feeAsset) {
+          res = E.left({
+            errorId: LedgerErrorId.INVALID_DATA,
+            msg: `Fee asset needs to be defined to send Ledger transaction on ${chainToString(chain)}`
+          })
+        } else {
+          res = await TERRA.send({
+            transport,
+            network,
+            amount,
+            asset,
+            feeAsset,
+            recipient,
+            memo,
+            walletIndex
+          })
+        }
+        break
+      case ETHChain:
+        if (!asset) {
+          res = E.left({
+            errorId: LedgerErrorId.INVALID_DATA,
+            msg: `Asset needs to be defined to send Ledger transaction on ${chainToString(chain)}`
+          })
+        } else if (!feeOption) {
+          res = E.left({
+            errorId: LedgerErrorId.INVALID_DATA,
+            msg: `Fee option needs to be set to send Ledger transaction on ${chainToString(chain)}`
+          })
+        } else {
+          res = await ETH.send({
+            asset,
+            transport,
+            network,
+            recipient,
+            amount,
+            memo,
+            walletIndex,
+            feeOption
+          })
+        }
+        break
+      case CosmosChain:
+        if (!asset) {
+          res = E.left({
+            errorId: LedgerErrorId.INVALID_DATA,
+            msg: `Asset needs to be defined to send Ledger transaction on ${chainToString(chain)}`
+          })
+        } else if (!feeAmount) {
+          res = E.left({
+            errorId: LedgerErrorId.INVALID_DATA,
+            msg: `Fee amount needs to be defined to send Ledger transaction on ${chainToString(chain)}`
+          })
+        } else {
+          res = await COSMOS.send({
+            transport,
+            network,
+            amount,
+            asset,
+            recipient,
+            memo,
+            walletIndex,
+            feeAmount
+          })
+        }
+        break
       default:
         res = E.left({
           errorId: LedgerErrorId.NOT_IMPLEMENTED,
@@ -64,16 +197,55 @@ export const sendTx = async ({
 export const deposit = async ({
   chain,
   network,
+  asset,
+  router,
+  recipient,
   amount,
   memo,
-  walletIndex
+  walletIndex,
+  feeOption
 }: IPCLedgerDepositTxParams): Promise<E.Either<LedgerError, TxHash>> => {
   try {
     const transport = await TransportNodeHidSingleton.open()
     let res: E.Either<LedgerError, string>
     switch (chain) {
       case THORChain:
-        res = await THOR.deposit({ transport, network, amount, memo, walletIndex: walletIndex ? walletIndex : 0 })
+        res = await THOR.deposit({ transport, network, amount, memo, walletIndex })
+        break
+      case ETHChain:
+        if (!router) {
+          return E.left({
+            errorId: LedgerErrorId.INVALID_DATA,
+            msg: `Router address needs to be defined to send Ledger transaction  on ${chainToString(chain)}`
+          })
+        } else if (!asset) {
+          res = E.left({
+            errorId: LedgerErrorId.INVALID_DATA,
+            msg: `Asset needs to be defined to send Ledger transaction on ${chainToString(chain)}`
+          })
+        } else if (!recipient) {
+          res = E.left({
+            errorId: LedgerErrorId.INVALID_DATA,
+            msg: `Recipient needs to be defined to send Ledger transaction on ${chainToString(chain)}`
+          })
+        } else if (!feeOption) {
+          res = E.left({
+            errorId: LedgerErrorId.INVALID_DATA,
+            msg: `Fee option needs to be defined to send Ledger transaction on ${chainToString(chain)}`
+          })
+        } else {
+          res = await ETH.deposit({
+            asset,
+            router,
+            transport,
+            network,
+            amount,
+            memo,
+            walletIndex,
+            recipient,
+            feeOption
+          })
+        }
         break
       default:
         res = E.left({
@@ -85,7 +257,7 @@ export const deposit = async ({
     return res
   } catch (error) {
     return E.left({
-      errorId: LedgerErrorId.SEND_TX_FAILED,
+      errorId: LedgerErrorId.DEPOSIT_TX_FAILED,
       msg: isError(error) ? error?.message ?? error.toString() : `${error}`
     })
   }

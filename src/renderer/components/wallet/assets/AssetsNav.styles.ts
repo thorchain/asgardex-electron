@@ -27,9 +27,6 @@ export const Menu = styled(MenuUI)`
     transition: none;
   }
 
-  &.ant-menu-horizontal:not(.ant-menu-dark) > .ant-menu-item-active,
-  &.ant-menu-horizontal:not(.ant-menu-dark) > .ant-menu-item:active,
-  &.ant-menu-horizontal:not(.ant-menu-dark) > .ant-menu-item:hover,
   &.ant-menu-horizontal:not(.ant-menu-dark) > .ant-menu-item-selected {
     border-bottom: 2px solid ${palette('primary', 0)};
   }

@@ -2,12 +2,20 @@ import React, { useState, useCallback, useMemo } from 'react'
 
 import { generatePhrase } from '@xchainjs/xchain-crypto'
 import Form, { Rule } from 'antd/lib/form'
+import * as A from 'fp-ts/lib/Array'
+import * as FP from 'fp-ts/lib/function'
+import * as NEA from 'fp-ts/lib/NonEmptyArray'
+import * as S from 'fp-ts/lib/string'
+import { useObservableCallback, useSubscription } from 'observable-hooks'
 import { useIntl } from 'react-intl'
+import * as RxOp from 'rxjs/operators'
 
 import { Button, RefreshButton } from '../../uielements/button'
-import { InputPassword as Input } from '../../uielements/input'
+import { InputPassword } from '../../uielements/input'
+import { CopyLabel } from '../../uielements/label'
 import { Phrase } from './index'
 import * as Styled from './NewPhrase.styles'
+import { WordType } from './NewPhraseConfirm'
 import * as StyledPhrase from './Phrase.styles'
 import { PhraseInfo } from './Phrase.types'
 
@@ -25,7 +33,24 @@ export const NewPhraseGenerate: React.FC<Props> = ({ onSubmit }: Props): JSX.Ele
 
   const [phrase, setPhrase] = useState(generatePhrase())
 
-  const phraseWords = useMemo(() => phrase.split(' ').map((word) => ({ text: word, _id: word })), [phrase])
+  const [clickRefreshButtonHandler, refreshButtonClicked$] = useObservableCallback<React.MouseEvent>((event$) =>
+    // Delay clicks to give `generatePhrase` some time to process w/o rendering issues
+    // see https://github.com/thorchain/asgardex-electron/issues/2054
+    event$.pipe(RxOp.debounceTime(100))
+  )
+
+  useSubscription(refreshButtonClicked$, () => setPhrase(generatePhrase()))
+
+  const phraseWords: WordType[] = useMemo(
+    () =>
+      FP.pipe(
+        phrase,
+        S.split(' '),
+        NEA.fromReadonlyNonEmptyArray,
+        A.mapWithIndex((index, word) => ({ text: word, _id: `${word}-${index.toString()}` }))
+      ),
+    [phrase]
+  )
 
   const [form] = Form.useForm<FormValues>()
 
@@ -56,35 +81,25 @@ export const NewPhraseGenerate: React.FC<Props> = ({ onSubmit }: Props): JSX.Ele
     [intl]
   )
 
-  const copyPhraseToClipborad = useCallback(() => {
-    navigator.clipboard.writeText(phrase)
-  }, [phrase])
   return (
     <>
       <Styled.TitleContainer justify="space-between">
-        <Styled.SectionTitle copyable={{ onCopy: copyPhraseToClipborad }}>
-          {intl.formatMessage({ id: 'wallet.create.copy.phrase' })}
-        </Styled.SectionTitle>
-        <RefreshButton clickHandler={() => setPhrase(generatePhrase())} />
+        <CopyLabel textToCopy={phrase} label={intl.formatMessage({ id: 'wallet.create.copy.phrase' })} />
+        <RefreshButton clickHandler={clickRefreshButtonHandler} />
       </Styled.TitleContainer>
       <Phrase words={phraseWords} readOnly={true} />
       <Styled.Form form={form} onFinish={handleFormFinish} labelCol={{ span: 24 }}>
         <StyledPhrase.PasswordContainer>
           <StyledPhrase.PasswordItem name="password" validateTrigger={['onSubmit', 'onBlur']} rules={rules}>
-            <Input
-              size="large"
-              type="password"
-              placeholder={intl.formatMessage({ id: 'common.password' }).toUpperCase()}
-            />
+            <InputPassword size="large" placeholder={intl.formatMessage({ id: 'common.password' }).toUpperCase()} />
           </StyledPhrase.PasswordItem>
           <StyledPhrase.PasswordItem
             name="repeatPassword"
             dependencies={['password']}
             validateTrigger={['onSubmit', 'onBlur']}
             rules={rules}>
-            <Input
+            <InputPassword
               size="large"
-              type="password"
               placeholder={intl.formatMessage({ id: 'wallet.password.repeat' }).toUpperCase()}
             />
           </StyledPhrase.PasswordItem>

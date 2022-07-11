@@ -1,4 +1,5 @@
-import { reloadBalances, balances$, reloadBalances$, resetReloadBalances } from './balances'
+import { network$ } from '../app/service'
+import { reloadBalances, balances$, reloadBalances$, resetReloadBalances, getBalanceByAddress$ } from './balances'
 import { client$, clientState$, address$, addressUI$, explorerUrl$ } from './common'
 import { createFeesService } from './fees'
 import { createTransactionService } from './transaction'
@@ -14,7 +15,7 @@ const {
   sendPoolTx$,
   approveERC20Token$,
   isApprovedERC20Token$
-} = createTransactionService(client$)
+} = createTransactionService(client$, network$)
 const { reloadFees, fees$, poolInTxFees$, poolOutTxFee$, approveFee$, reloadApproveFee } = createFeesService(client$)
 
 export {
@@ -25,6 +26,7 @@ export {
   reloadBalances,
   explorerUrl$,
   balances$,
+  getBalanceByAddress$,
   reloadBalances$,
   resetReloadBalances,
   txs$,

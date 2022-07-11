@@ -5,6 +5,7 @@ import * as O from 'fp-ts/lib/Option'
 
 import { Network } from '../../../shared/api/types'
 import { WalletType } from '../../../shared/wallet/types'
+import { InteractType } from '../../components/wallet/txs/interact/Interact.types'
 import { isNonNativeRuneAsset } from '../../helpers/assetHelper'
 import { sequenceTOption } from '../../helpers/fpHelpers'
 import { Route } from '../types'
@@ -52,12 +53,17 @@ export const poolShares: Route<void> = {
   }
 }
 
-export type DepositParams = { walletAddress: string; walletType: WalletType; walletIndex: string }
-export const deposit: Route<DepositParams> = {
-  template: `${assets.template}/deposit/:walletType/:walletAddress/:walletIndex`,
-  path({ walletType, walletAddress, walletIndex }) {
+export type InteractParams = {
+  interactType: InteractType
+  walletAddress: string
+  walletType: WalletType
+  walletIndex: string
+}
+export const interact: Route<InteractParams> = {
+  template: `${assets.template}/interact/:interactType/:walletType/:walletAddress/:walletIndex`,
+  path({ interactType, walletType, walletAddress, walletIndex }) {
     if (walletAddress) {
-      return `${assets.template}/deposit/${walletType}/${walletAddress}/${walletIndex}`
+      return `${assets.template}/interact/${interactType}/${walletType}/${walletAddress}/${walletIndex}`
     } else {
       // Redirect to assets route if passed param are invalid
       return assets.path()
@@ -85,7 +91,7 @@ export const assetDetail: Route<AssetDetailsParams> = {
   }
 }
 
-export type SendParams = { asset: string; walletAddress: string; walletType: WalletType; walletIndex: string }
+export type SendParams = { asset: string; walletAddress: Address; walletType: WalletType; walletIndex: string }
 export const send: Route<SendParams> = {
   template: `${assetDetail.template}/send`,
   path: ({ asset, walletAddress, walletType, walletIndex }) => {
@@ -128,13 +134,6 @@ export const upgradeRune: Route<AssetUpgradeDetailsParams> = {
           `${assetDetail.path({ walletType, asset: assetToString(asset), walletAddress, walletIndex })}/upgrade`
       )
     )
-  }
-}
-
-export const walletSettings: Route<void> = {
-  template: `${base.template}/wallet-settings`,
-  path() {
-    return this.template
   }
 }
 

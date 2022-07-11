@@ -85,40 +85,38 @@ export const BondsTable: React.FC<Props> = ({ nodes, removeNode, network, goToNo
       key: 'remove',
       width: 40,
       title: '',
-      render: (_, { nodeAddress }) => <H.Delete deleteNode={() => setNodeToRemove(O.some(nodeAddress))} />,
+      render: (_, { nodeAddress }) => (
+        <H.Delete
+          deleteNode={() => {
+            setNodeToRemove(O.some(nodeAddress))
+          }}
+        />
+      ),
       align: 'right'
     }),
     [setNodeToRemove]
   )
 
   const removeConfirmationProps = useMemo(() => {
-    const commonProps = {
-      onClose: () => setNodeToRemove(O.none),
-      onSuccess: FP.constVoid,
-      content: (
-        <FormattedMessage
-          id="bonds.node.removeMessage"
-          defaultMessage="Are you sure you want to delete {node} node?"
-          values={{
-            node: <Styled.ConfirmationModalWalletText>{nodeToRemove}</Styled.ConfirmationModalWalletText>
-          }}
-        />
-      )
-    }
+    const nodeAddress = FP.pipe(
+      nodeToRemove,
+      O.getOrElse(() => '')
+    )
+
     return {
-      ...commonProps,
-      ...FP.pipe(
-        nodeToRemove,
-        O.fold(
-          () => ({
-            visible: false
-          }),
-          (node) => ({
-            visible: true,
-            onSuccess: () => removeNode(node)
-          })
-        )
-      )
+      onClose: () => setNodeToRemove(O.none),
+      onSuccess: () => removeNode(nodeAddress),
+      content: (
+        <Styled.ConfirmationModalText>
+          <FormattedMessage
+            id="bonds.node.removeMessage"
+            values={{
+              node: <Styled.ConfirmationModalAddress>{nodeAddress}</Styled.ConfirmationModalAddress>
+            }}
+          />
+        </Styled.ConfirmationModalText>
+      ),
+      visible: !!nodeAddress
     }
   }, [nodeToRemove, removeNode])
 

@@ -33,6 +33,7 @@ import { AssetMenu } from '../assetMenu'
 import * as Styled from './AssetCard.styles'
 
 export type Props = {
+  children?: React.ReactNode
   asset: AssetWithAddress
   walletType: O.Option<WalletType>
   walletTypeDisabled: boolean

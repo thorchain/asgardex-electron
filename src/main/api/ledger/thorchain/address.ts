@@ -8,6 +8,7 @@ import { LedgerError, LedgerErrorId, Network } from '../../../../shared/api/type
 import { toClientNetwork } from '../../../../shared/utils/client'
 import { isError } from '../../../../shared/utils/guard'
 import { WalletAddress } from '../../../../shared/wallet/types'
+import { VerifyAddressHandler } from '../types'
 import { fromLedgerErrorType, getDerivationPath } from './common'
 
 export const getAddress = async (
@@ -36,10 +37,11 @@ export const getAddress = async (
   }
 }
 
-export const verifyAddress = async (transport: Transport, network: Network, walletIndex: number) => {
+export const verifyAddress: VerifyAddressHandler = async ({ transport, network, walletIndex }) => {
   const app = new THORChainApp(transport)
   const clientNetwork = toClientNetwork(network)
   const prefix = getPrefix(clientNetwork)
   const path = getDerivationPath(walletIndex)
-  app.showAddressAndPubKey(path, prefix)
+  const _ = await app.showAddressAndPubKey(path, prefix)
+  return true
 }

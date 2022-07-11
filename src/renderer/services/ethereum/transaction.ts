@@ -1,18 +1,31 @@
 import * as RD from '@devexperts/remote-data-ts'
-import { FeeOption, TxHash } from '@xchainjs/xchain-client'
-import { ETHAddress } from '@xchainjs/xchain-ethereum'
-import { baseAmount } from '@xchainjs/xchain-util'
+import { TxHash } from '@xchainjs/xchain-client'
+import { ETHAddress, isApproved, abi } from '@xchainjs/xchain-ethereum'
+import { baseAmount, ETHChain } from '@xchainjs/xchain-util'
 import BigNumber from 'bignumber.js'
+import * as E from 'fp-ts/lib/Either'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/Option'
 import * as Rx from 'rxjs'
 import * as RxOp from 'rxjs/operators'
 
+import {
+  IPCLedgerApproveERC20TokenParams,
+  ipcLedgerApproveERC20TokenParamsIO,
+  IPCLedgerDepositTxParams,
+  ipcLedgerDepositTxParamsIO,
+  IPCLedgerSendTxParams,
+  ipcLedgerSendTxParamsIO
+} from '../../../shared/api/io'
+import { LedgerError, Network } from '../../../shared/api/types'
+import { DEFAULT_APPROVE_GAS_LIMIT_FALLBACK } from '../../../shared/ethereum/const'
+import { isError, isLedgerWallet } from '../../../shared/utils/guard'
 import { addressInERC20Whitelist, getEthAssetAddress } from '../../helpers/assetHelper'
 import { sequenceSOption } from '../../helpers/fpHelpers'
 import { LiveData } from '../../helpers/rx/liveData'
+import { Network$ } from '../app/types'
+import { ChainTxFeeOption } from '../chain/const'
 import * as C from '../clients'
-import { ethRouterABI } from '../const'
 import { ApiError, ErrorId, TxHashLD } from '../wallet/types'
 import {
   ApproveParams,
@@ -21,12 +34,15 @@ import {
   TransactionService,
   IsApprovedLD,
   SendPoolTxParams,
-  IsApproveParams
+  IsApproveParams,
+  SendTxParams
 } from './types'
 
-export const createTransactionService = (client$: Client$): TransactionService => {
+export const createTransactionService = (client$: Client$, network$: Network$): TransactionService => {
   const common = C.createTransactionService(client$)
 
+  // Note: We don't use `client.deposit` to send "pool" txs to avoid repeating same requests we already do in ASGARDEX
+  // That's why we call `deposit` directly here
   const runSendPoolTx$ = (client: EthClient, { ...params }: SendPoolTxParams): TxHashLD => {
     // helper for failures
     const failure$ = (msg: string) =>
@@ -47,15 +63,17 @@ export const createTransactionService = (client$: Client$): TransactionService =
             RxOp.switchMap((gasPrices) => {
               const isETHAddress = address === ETHAddress
               const amount = isETHAddress ? baseAmount(0) : params.amount
-              const gasPrice = gasPrices.fast.amount().toFixed(0) // no round down needed
+              const gasPrice = gasPrices[params.feeOption].amount().toFixed(0) // no round down needed
+              const signer = client.getWallet(params.walletIndex)
               return Rx.from(
                 // Call deposit function of Router contract
                 // Note:
                 // Amounts need to use `toFixed` to convert `BaseAmount` to `Bignumber`
                 // since `value` and `gasPrice` type is `Bignumber`
                 client.call<{ hash: TxHash }>({
+                  signer,
                   contractAddress: router,
-                  abi: ethRouterABI,
+                  abi: abi.router,
                   funcName: 'deposit',
                   funcParams: [
                     params.recipient,
@@ -83,8 +101,49 @@ export const createTransactionService = (client$: Client$): TransactionService =
     )
   }
 
-  const sendPoolTx$ = (params: SendPoolTxParams): TxHashLD =>
-    client$.pipe(
+  const sendLedgerPoolTx = ({ network, params }: { network: Network; params: SendPoolTxParams }): TxHashLD => {
+    const ipcParams: IPCLedgerDepositTxParams = {
+      chain: ETHChain,
+      network,
+      asset: params.asset,
+      router: O.toUndefined(params.router),
+      amount: params.amount,
+      memo: params.memo,
+      recipient: params.recipient,
+      walletIndex: params.walletIndex,
+      feeOption: params.feeOption
+    }
+    const encoded = ipcLedgerDepositTxParamsIO.encode(ipcParams)
+
+    return FP.pipe(
+      Rx.from(window.apiHDWallet.depositLedgerTx(encoded)),
+      RxOp.switchMap(
+        FP.flow(
+          E.fold<LedgerError, TxHash, TxHashLD>(
+            ({ msg }) =>
+              Rx.of(
+                RD.failure({
+                  errorId: ErrorId.DEPOSIT_LEDGER_TX_ERROR,
+                  msg: `Deposit Ledger ETH/ERC20 tx failed. (${msg})`
+                })
+              ),
+            (txHash) => Rx.of(RD.success(txHash))
+          )
+        )
+      ),
+      RxOp.startWith(RD.pending)
+    )
+  }
+
+  const sendPoolTx$ = (params: SendPoolTxParams): TxHashLD => {
+    if (isLedgerWallet(params.walletType))
+      return FP.pipe(
+        network$,
+        RxOp.switchMap((network) => sendLedgerPoolTx({ network, params }))
+      )
+
+    return FP.pipe(
+      client$,
       RxOp.switchMap((oClient) =>
         FP.pipe(
           oClient,
@@ -95,14 +154,19 @@ export const createTransactionService = (client$: Client$): TransactionService =
         )
       )
     )
+  }
 
-  const runApproveERC20Token$ = (client: EthClient, { ...params }: ApproveParams): TxHashLD => {
+  const runApproveERC20Token$ = (
+    client: EthClient,
+    { walletIndex, contractAddress, spenderAddress }: ApproveParams
+  ): TxHashLD => {
+    const signer = client.getWallet(walletIndex)
+
     // check contract address before approving
-    const contractAddress = params.contractAddress
-    if (params.network === 'mainnet' && !addressInERC20Whitelist(contractAddress))
+    if (!signer)
       return Rx.of(
         RD.failure({
-          msg: `Contract address ${contractAddress} is black listed`,
+          msg: `Can't get signer from client`,
           errorId: ErrorId.APPROVE_TX
         })
       )
@@ -111,10 +175,11 @@ export const createTransactionService = (client$: Client$): TransactionService =
     return FP.pipe(
       Rx.from(
         client.approve({
-          ...params,
-          walletIndex: 0,
-          feeOptionKey: FeeOption.Fast,
-          gasLimitFallback: '65000'
+          signer,
+          contractAddress,
+          spenderAddress,
+          feeOption: ChainTxFeeOption.APPROVE,
+          gasLimitFallback: DEFAULT_APPROVE_GAS_LIMIT_FALLBACK
         })
       ),
       RxOp.switchMap((txResult) => Rx.from(txResult.wait(1))),
@@ -133,8 +198,64 @@ export const createTransactionService = (client$: Client$): TransactionService =
     )
   }
 
-  const approveERC20Token$ = (params: ApproveParams): TxHashLD =>
-    client$.pipe(
+  const runApproveLedgerERC20Token$ = ({
+    network,
+    contractAddress,
+    spenderAddress,
+    walletIndex
+  }: ApproveParams): TxHashLD => {
+    const ipcParams: IPCLedgerApproveERC20TokenParams = {
+      network,
+      contractAddress,
+      spenderAddress,
+      walletIndex
+    }
+    const encoded = ipcLedgerApproveERC20TokenParamsIO.encode(ipcParams)
+
+    return FP.pipe(
+      Rx.from(window.apiHDWallet.approveLedgerERC20Token(encoded)),
+      RxOp.switchMap(
+        FP.flow(
+          E.fold<LedgerError, TxHash, TxHashLD>(
+            ({ msg }) =>
+              Rx.of(
+                RD.failure({
+                  errorId: ErrorId.APPROVE_LEDGER_TX,
+                  msg: `Approve Ledger ERC20 token failed. (${msg})`
+                })
+              ),
+            (txHash) => Rx.of(RD.success(txHash))
+          )
+        )
+      ),
+      RxOp.catchError((error) =>
+        Rx.of(
+          RD.failure({
+            errorId: ErrorId.APPROVE_LEDGER_TX,
+            msg: `Approve Ledger ERC20 token failed. ${
+              isError(error) ? error?.message ?? error.toString() : error.toString()
+            }`
+          })
+        )
+      ),
+      RxOp.startWith(RD.pending)
+    )
+  }
+
+  const approveERC20Token$ = (params: ApproveParams): TxHashLD => {
+    const { contractAddress, network, walletType } = params
+    // check contract address before approving
+    if (network === 'mainnet' && !addressInERC20Whitelist(contractAddress))
+      return Rx.of(
+        RD.failure({
+          msg: `Contract address ${contractAddress} is black listed`,
+          errorId: ErrorId.APPROVE_TX
+        })
+      )
+
+    if (isLedgerWallet(walletType)) return runApproveLedgerERC20Token$(params)
+
+    return client$.pipe(
       RxOp.switchMap((oClient) =>
         FP.pipe(
           oClient,
@@ -145,13 +266,16 @@ export const createTransactionService = (client$: Client$): TransactionService =
         )
       )
     )
+  }
 
   const runIsApprovedERC20Token$ = (
     client: EthClient,
-    { contractAddress, spenderAddress, amount }: IsApproveParams
-  ): LiveData<ApiError, boolean> =>
-    FP.pipe(
-      Rx.from(client.isApproved({ contractAddress, spenderAddress, amount })),
+    { contractAddress, spenderAddress, fromAddress }: IsApproveParams
+  ): LiveData<ApiError, boolean> => {
+    const provider = client.getProvider()
+
+    return FP.pipe(
+      Rx.from(isApproved({ provider, contractAddress, spenderAddress, fromAddress })),
       RxOp.map(RD.success),
       RxOp.catchError(
         (error): LiveData<ApiError, boolean> =>
@@ -164,9 +288,11 @@ export const createTransactionService = (client$: Client$): TransactionService =
       ),
       RxOp.startWith(RD.pending)
     )
+  }
 
   const isApprovedERC20Token$ = (params: IsApproveParams): IsApprovedLD =>
     client$.pipe(
+      RxOp.debounceTime(300),
       RxOp.switchMap((oClient) =>
         FP.pipe(
           oClient,
@@ -178,8 +304,56 @@ export const createTransactionService = (client$: Client$): TransactionService =
       )
     )
 
+  const sendLedgerTx = ({ network, params }: { network: Network; params: SendTxParams }): TxHashLD => {
+    const ipcParams: IPCLedgerSendTxParams = {
+      chain: ETHChain,
+      network,
+      asset: params.asset,
+      feeAsset: undefined,
+      amount: params.amount,
+      sender: params.sender,
+      recipient: params.recipient,
+      memo: params.memo,
+      walletIndex: params.walletIndex,
+      feeRate: NaN,
+      feeOption: params.feeOption,
+      feeAmount: undefined
+    }
+    const encoded = ipcLedgerSendTxParamsIO.encode(ipcParams)
+
+    return FP.pipe(
+      Rx.from(window.apiHDWallet.sendLedgerTx(encoded)),
+      RxOp.switchMap(
+        FP.flow(
+          E.fold<LedgerError, TxHash, TxHashLD>(
+            ({ msg }) =>
+              Rx.of(
+                RD.failure({
+                  errorId: ErrorId.SEND_LEDGER_TX,
+                  msg: `Sending Ledger ETH/ERC20 tx failed. (${msg})`
+                })
+              ),
+            (txHash) => Rx.of(RD.success(txHash))
+          )
+        )
+      ),
+      RxOp.startWith(RD.pending)
+    )
+  }
+
+  const sendTx = (params: SendTxParams) =>
+    FP.pipe(
+      network$,
+      RxOp.switchMap((network) => {
+        if (isLedgerWallet(params.walletType)) return sendLedgerTx({ network, params })
+
+        return common.sendTx(params)
+      })
+    )
+
   return {
     ...common,
+    sendTx,
     sendPoolTx$,
     approveERC20Token$,
     isApprovedERC20Token$

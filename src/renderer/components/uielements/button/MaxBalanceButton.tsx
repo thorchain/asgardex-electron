@@ -23,7 +23,7 @@ export const MaxBalanceButton: React.FC<Props> = (props): JSX.Element => {
 
   const intl = useIntl()
 
-  const onClickHandler = useCallback((_) => onClick(amount), [amount, onClick])
+  const onClickHandler = useCallback(() => onClick(amount), [amount, onClick])
 
   return (
     <Row align="middle">

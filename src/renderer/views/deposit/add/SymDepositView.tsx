@@ -1,13 +1,13 @@
 import React, { useCallback, useEffect, useMemo } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
-import { Asset, AssetRuneNative, assetToString, bn, THORChain } from '@xchainjs/xchain-util'
+import { Asset, AssetRuneNative, assetToString, bn, Chain, THORChain } from '@xchainjs/xchain-util'
 import BigNumber from 'bignumber.js'
 import * as FP from 'fp-ts/function'
 import * as O from 'fp-ts/lib/Option'
 import { useObservableState } from 'observable-hooks'
 import { useIntl } from 'react-intl'
-import { useHistory } from 'react-router'
+import { useNavigate } from 'react-router-dom'
 import * as RxOp from 'rxjs/operators'
 
 import { SymDeposit } from '../../../components/deposit/add'
@@ -20,16 +20,15 @@ import { useWalletContext } from '../../../contexts/WalletContext'
 import { sequenceTRD } from '../../../helpers/fpHelpers'
 import { getAssetPoolPrice } from '../../../helpers/poolHelper'
 import { liveData } from '../../../helpers/rx/liveData'
-import { FundsCap, useFundsCap } from '../../../hooks/useFundsCap'
 import { useLiquidityProviders } from '../../../hooks/useLiquidityProviders'
 import { useNetwork } from '../../../hooks/useNetwork'
 import { useOpenExplorerTxUrl } from '../../../hooks/useOpenExplorerTxUrl'
+import { useProtocolLimit } from '../../../hooks/useProtocolLimit'
 import { useSymDepositAddresses } from '../../../hooks/useSymDepositAddresses'
 import * as poolsRoutes from '../../../routes/pools'
-import { OpenExplorerTxUrl } from '../../../services/clients'
 import { PoolAddress, PoolAssetsRD } from '../../../services/midgard/types'
 import { toPoolData } from '../../../services/midgard/utils'
-import { INITIAL_BALANCES_STATE } from '../../../services/wallet/const'
+import { DEFAULT_BALANCES_FILTER, INITIAL_BALANCES_STATE } from '../../../services/wallet/const'
 import { Props } from './SymDepositView.types'
 
 export const SymDepositView: React.FC<Props> = (props) => {
@@ -42,7 +41,7 @@ export const SymDepositView: React.FC<Props> = (props) => {
     assetWalletAddress
   } = props
   const { asset } = assetWD
-  const history = useHistory()
+  const navigate = useNavigate()
   const intl = useIntl()
 
   const { network } = useNetwork()
@@ -51,9 +50,9 @@ export const SymDepositView: React.FC<Props> = (props) => {
 
   const onChangeAsset = useCallback(
     (asset: Asset) => {
-      history.replace(poolsRoutes.deposit.path({ asset: assetToString(asset) }))
+      navigate(poolsRoutes.deposit.path({ asset: assetToString(asset) }), { replace: true })
     },
-    [history]
+    [navigate]
   )
 
   const {
@@ -90,7 +89,7 @@ export const SymDepositView: React.FC<Props> = (props) => {
     reloadBalancesByChain
   } = useWalletContext()
 
-  const { data: fundsCapRD } = useFundsCap()
+  const { data: protocolLimitRD } = useProtocolLimit()
 
   const { approveERC20Token$, isApprovedERC20Token$, approveFee$, reloadApproveFee } = useEthereumContext()
 
@@ -102,7 +101,14 @@ export const SymDepositView: React.FC<Props> = (props) => {
   const runPrice = useObservableState(priceRatio$, bn(1))
   const [selectedPricePoolAsset] = useObservableState(() => FP.pipe(selectedPricePoolAsset$, RxOp.map(O.toUndefined)))
 
-  const balancesState = useObservableState(balancesState$, INITIAL_BALANCES_STATE)
+  const [balancesState] = useObservableState(
+    () =>
+      balancesState$({
+        ...DEFAULT_BALANCES_FILTER,
+        [Chain.Bitcoin]: 'confirmed'
+      }),
+    INITIAL_BALANCES_STATE
+  )
 
   const reloadBalances = useCallback(() => {
     reloadBalancesByChain(assetWD.asset.chain)()
@@ -122,17 +128,22 @@ export const SymDepositView: React.FC<Props> = (props) => {
     RD.map(getAssetPoolPrice(runPrice))
   )
 
-  const openAssetExplorerTxUrl: OpenExplorerTxUrl = useOpenExplorerTxUrl(O.some(asset.chain))
+  const { openExplorerTxUrl: openAssetExplorerTxUrl, getExplorerTxUrl: getAssetExplorerTxUrl } = useOpenExplorerTxUrl(
+    O.some(asset.chain)
+  )
 
-  const openRuneExplorerTxUrl: OpenExplorerTxUrl = useOpenExplorerTxUrl(O.some(THORChain))
+  const { openExplorerTxUrl: openRuneExplorerTxUrl, getExplorerTxUrl: getRuneExplorerTxUrl } = useOpenExplorerTxUrl(
+    O.some(THORChain)
+  )
 
-  const fundsCap: O.Option<FundsCap> = useMemo(
+  const protocolLimitReached = useMemo(
     () =>
       FP.pipe(
-        fundsCapRD,
-        RD.getOrElse((): O.Option<FundsCap> => O.none)
+        protocolLimitRD,
+        RD.map(({ reached }) => reached && network !== 'testnet' /* ignore it on testnet */),
+        RD.getOrElse(() => false)
       ),
-    [fundsCapRD]
+    [network, protocolLimitRD]
   )
 
   const { symPendingAssets, hasAsymAssets, symAssetMismatch } = useLiquidityProviders({
@@ -164,6 +175,8 @@ export const SymDepositView: React.FC<Props> = (props) => {
           validatePassword$={validatePassword$}
           openRuneExplorerTxUrl={openRuneExplorerTxUrl}
           openAssetExplorerTxUrl={openAssetExplorerTxUrl}
+          getRuneExplorerTxUrl={getRuneExplorerTxUrl}
+          getAssetExplorerTxUrl={getAssetExplorerTxUrl}
           onChangeAsset={FP.constVoid}
           asset={assetWD}
           assetPrice={ZERO_BN}
@@ -185,7 +198,7 @@ export const SymDepositView: React.FC<Props> = (props) => {
           approveERC20Token$={approveERC20Token$}
           isApprovedERC20Token$={isApprovedERC20Token$}
           availableAssets={[]}
-          fundsCap={O.none}
+          protocolLimitReached={protocolLimitReached}
           poolsData={{}}
           symPendingAssets={RD.initial}
           openRecoveryTool={openRecoveryTool}
@@ -204,6 +217,8 @@ export const SymDepositView: React.FC<Props> = (props) => {
       validatePassword$,
       openRuneExplorerTxUrl,
       openAssetExplorerTxUrl,
+      getRuneExplorerTxUrl,
+      getAssetExplorerTxUrl,
       assetWD,
       balancesState,
       symDepositFees$,
@@ -216,6 +231,7 @@ export const SymDepositView: React.FC<Props> = (props) => {
       network,
       approveERC20Token$,
       isApprovedERC20Token$,
+      protocolLimitReached,
       openRecoveryTool,
       openAsymDepositTool,
       setAssetWalletType,
@@ -241,6 +257,8 @@ export const SymDepositView: React.FC<Props> = (props) => {
               validatePassword$={validatePassword$}
               openRuneExplorerTxUrl={openRuneExplorerTxUrl}
               openAssetExplorerTxUrl={openAssetExplorerTxUrl}
+              getRuneExplorerTxUrl={getRuneExplorerTxUrl}
+              getAssetExplorerTxUrl={getAssetExplorerTxUrl}
               poolData={toPoolData(poolDetail)}
               onChangeAsset={onChangeAsset}
               asset={assetWD}
@@ -261,7 +279,7 @@ export const SymDepositView: React.FC<Props> = (props) => {
               network={network}
               approveERC20Token$={approveERC20Token$}
               isApprovedERC20Token$={isApprovedERC20Token$}
-              fundsCap={fundsCap}
+              protocolLimitReached={protocolLimitReached}
               poolsData={poolsData}
               symPendingAssets={symPendingAssets}
               openRecoveryTool={openRecoveryTool}

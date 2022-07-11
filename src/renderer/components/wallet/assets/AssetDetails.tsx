@@ -6,13 +6,12 @@ import { Row, Col, Grid } from 'antd'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
 import { useIntl } from 'react-intl'
-import { useHistory } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 
 import { Network } from '../../../../shared/api/types'
 import { WalletType } from '../../../../shared/wallet/types'
 import * as AssetHelper from '../../../helpers/assetHelper'
 import { eqAsset, eqString } from '../../../helpers/fp/eq'
-import { sequenceTOption } from '../../../helpers/fpHelpers'
 import { getWalletAssetAmountFromBalances } from '../../../helpers/walletHelper'
 import * as walletRoutes from '../../../routes/wallet'
 import { OpenExplorerTxUrl, TxsPageRD } from '../../../services/clients'
@@ -35,7 +34,7 @@ type Props = {
   openExplorerAddressUrl?: FP.Lazy<void>
   reloadBalancesHandler?: FP.Lazy<void>
   loadTxsHandler?: LoadTxsHandler
-  walletAddress?: O.Option<Address>
+  walletAddress: Address
   disableSend: boolean
   disableUpgrade: boolean
   network: Network
@@ -52,7 +51,7 @@ export const AssetDetails: React.FC<Props> = (props): JSX.Element => {
     loadTxsHandler = EMPTY_LOAD_TXS_HANDLER,
     openExplorerTxUrl,
     openExplorerAddressUrl,
-    walletAddress: oWalletAddress = O.none,
+    walletAddress,
     disableSend,
     disableUpgrade,
     network
@@ -61,37 +60,28 @@ export const AssetDetails: React.FC<Props> = (props): JSX.Element => {
   const [currentPage, setCurrentPage] = useState(1)
 
   const isDesktopView = Grid.useBreakpoint()?.lg ?? false
-  const history = useHistory()
+  const navigate = useNavigate()
   const intl = useIntl()
 
   const walletActionSendClick = useCallback(() => {
-    const routeParams = FP.pipe(
-      oWalletAddress,
-      O.map((walletAddress) => ({
-        asset: assetToString(asset),
-        walletAddress,
-        walletType,
-        walletIndex: walletIndex.toString()
-      })),
-      O.getOrElse(() => ({
-        asset: assetToString(asset),
-        walletAddress: '',
-        walletType,
-        walletIndex: walletIndex.toString()
-      }))
-    )
-    history.push(walletRoutes.send.path(routeParams))
-  }, [asset, history, oWalletAddress, walletIndex, walletType])
+    const routeParams = {
+      asset: assetToString(asset),
+      walletAddress,
+      walletType,
+      walletIndex: walletIndex.toString()
+    }
+    navigate(walletRoutes.send.path(routeParams))
+  }, [asset, navigate, walletAddress, walletIndex, walletType])
 
   const walletActionDepositClick = useCallback(() => {
-    FP.pipe(
-      oWalletAddress,
-      O.map((walletAddress) =>
-        walletRoutes.deposit.path({ walletType, walletAddress, walletIndex: walletIndex.toString() })
-      ),
-      O.map(history.push)
-    )
-  }, [oWalletAddress, history.push, walletType, walletIndex])
+    const path = walletRoutes.interact.path({
+      interactType: 'bond',
+      walletType,
+      walletAddress,
+      walletIndex: walletIndex.toString()
+    })
+    navigate(path)
+  }, [walletType, walletAddress, walletIndex, navigate])
 
   const isNonNativeRuneAsset: boolean = useMemo(
     () => AssetHelper.isNonNativeRuneAsset(asset, network),
@@ -99,21 +89,15 @@ export const AssetDetails: React.FC<Props> = (props): JSX.Element => {
   )
 
   const walletActionUpgradeNonNativeRuneClick = useCallback(() => {
-    FP.pipe(
-      oWalletAddress,
-      O.filter((_) => isNonNativeRuneAsset),
-      O.map((walletAddress) =>
-        walletRoutes.upgradeRune.path({
-          asset: assetToString(asset),
-          walletAddress,
-          network,
-          walletType,
-          walletIndex: walletIndex.toString()
-        })
-      ),
-      O.map(history.push)
-    )
-  }, [oWalletAddress, history.push, isNonNativeRuneAsset, asset, network, walletType, walletIndex])
+    const path = walletRoutes.upgradeRune.path({
+      asset: assetToString(asset),
+      walletAddress,
+      network,
+      walletType,
+      walletIndex: walletIndex.toString()
+    })
+    navigate(path)
+  }, [asset, walletAddress, network, walletType, walletIndex, navigate])
 
   const refreshHandler = useCallback(() => {
     loadTxsHandler({ limit: MAX_ITEMS_PER_PAGE, offset: (currentPage - 1) * MAX_ITEMS_PER_PAGE })
@@ -121,7 +105,7 @@ export const AssetDetails: React.FC<Props> = (props): JSX.Element => {
   }, [currentPage, loadTxsHandler, reloadBalancesHandler])
 
   const onChangePagination = useCallback(
-    (pageNo) => {
+    (pageNo: number) => {
       loadTxsHandler({ limit: MAX_ITEMS_PER_PAGE, offset: (pageNo - 1) * MAX_ITEMS_PER_PAGE })
       setCurrentPage(pageNo)
     },
@@ -140,14 +124,14 @@ export const AssetDetails: React.FC<Props> = (props): JSX.Element => {
   const getNonNativeRuneBalance: O.Option<(balances: WalletBalances) => O.Option<AssetAmount>> = useMemo(
     () =>
       FP.pipe(
-        sequenceTOption(oNoneNativeRuneAsset, oWalletAddress),
-        O.map(([asset, walletAddress]) =>
+        oNoneNativeRuneAsset,
+        O.map((asset) =>
           getWalletAssetAmountFromBalances(
             (balance) => eqString.equals(balance.walletAddress, walletAddress) && eqAsset.equals(balance.asset, asset)
           )
         )
       ),
-    [oNoneNativeRuneAsset, oWalletAddress]
+    [oNoneNativeRuneAsset, walletAddress]
   )
 
   const oNonNativeRuneAmount: O.Option<BaseAmount> = useMemo(
@@ -169,19 +153,6 @@ export const AssetDetails: React.FC<Props> = (props): JSX.Element => {
     )
   }, [disableUpgrade, oNonNativeRuneAmount])
 
-  const walletInfo = useMemo(
-    () =>
-      FP.pipe(
-        oWalletAddress,
-        O.map((address) => ({
-          address,
-          network,
-          walletType
-        }))
-      ),
-    [oWalletAddress, network, walletType]
-  )
-
   return (
     <>
       <Row justify="space-between">
@@ -194,7 +165,16 @@ export const AssetDetails: React.FC<Props> = (props): JSX.Element => {
       </Row>
       <Row>
         <Col span={24}>
-          <AssetInfo walletInfo={walletInfo} asset={O.some(asset)} assetsWB={oBalances} network={network} />
+          <AssetInfo
+            walletInfo={O.some({
+              address: walletAddress,
+              network,
+              walletType
+            })}
+            asset={O.some(asset)}
+            assetsWB={oBalances}
+            network={network}
+          />
         </Col>
 
         <Styled.Divider />
@@ -264,7 +244,7 @@ export const AssetDetails: React.FC<Props> = (props): JSX.Element => {
             changePaginationHandler={onChangePagination}
             chain={asset.chain}
             network={network}
-            walletAddress={oWalletAddress}
+            walletAddress={walletAddress}
           />
         </Col>
       </Row>

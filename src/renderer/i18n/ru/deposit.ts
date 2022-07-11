@@ -4,10 +4,9 @@ const deposit: DepositMessages = {
   'deposit.interact.actions.bond': 'Вложить',
   'deposit.interact.actions.unbond': 'Изъять',
   'deposit.interact.actions.leave': 'Выйти',
-  'deposit.interact.actions.custom': 'Вручную',
   'deposit.interact.title': 'Вклад',
   'deposit.interact.subtitle': 'Взаимодействие с THORСhain',
-  'deposit.interact.actions': 'Доступные действия',
+  'deposit.interact.label.bondprovider': 'Bond provider (optional) - RU',
   'deposit.share.title': 'Ваша общая доля в пуле',
   'deposit.share.units': 'Единицы ликвидности',
   'deposit.share.poolshare': 'Доля в пуле',
@@ -71,7 +70,6 @@ const deposit: DepositMessages = {
   'deposit.withdraw.feeNote': 'Важно: {fee} BNB останется на вашем кошельке для покрытия комисий.',
   'deposit.withdraw.error.feeNotCovered':
     'Комиссия транзакции {fee} должна покрываться вашим балансом (баланс: {balance})',
-  'deposit.withdraw.ledger.sign': 'Нажмите далее, чтобы подписать транзакцию снятия средств на вашем устройстве.',
   'deposit.ledger.sign': 'Нажмите далее, чтобы подписать транзакцию вложения средств на вашем устройстве.'
 }
 

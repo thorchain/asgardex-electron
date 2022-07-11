@@ -2,6 +2,7 @@ import React, { useMemo, useCallback } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
 import { THORChain } from '@xchainjs/xchain-util'
+import { Row } from 'antd'
 import * as A from 'fp-ts/Array'
 import * as FP from 'fp-ts/function'
 import * as O from 'fp-ts/Option'
@@ -14,11 +15,12 @@ import { PoolActionsHistory } from '../../../components/poolActionsHistory'
 import { historyFilterToViewblockFilter } from '../../../components/poolActionsHistory/PoolActionsHistory.helper'
 import { Filter } from '../../../components/poolActionsHistory/types'
 import { WalletPoolActionsHistoryHeader } from '../../../components/poolActionsHistory/WalletPoolActionsHistoryHeader'
+import { RefreshButton } from '../../../components/uielements/button'
+import { AssetsNav } from '../../../components/wallet/assets'
 import { useChainContext } from '../../../contexts/ChainContext'
 import { useWalletContext } from '../../../contexts/WalletContext'
 import { eqString } from '../../../helpers/fp/eq'
 import { ordWalletAddressByChain } from '../../../helpers/fp/ord'
-import { TriggerStream } from '../../../helpers/stateHelper'
 import { useMidgardHistoryActions } from '../../../hooks/useMidgardHistoryActions'
 import { useNetwork } from '../../../hooks/useNetwork'
 import { useOpenAddressUrl } from '../../../hooks/useOpenAddressUrl'
@@ -27,19 +29,24 @@ import { ENABLED_CHAINS } from '../../../services/const'
 
 const HISTORY_FILTERS: Filter[] = ['ALL', 'SWITCH', 'DEPOSIT', 'SWAP', 'WITHDRAW', 'DONATE', 'REFUND']
 
-export type Props = {
-  className?: string
-  reloadHistory: TriggerStream
-}
-export const WalletHistoryView: React.FC<Props> = ({ className, reloadHistory }) => {
+export const WalletHistoryView: React.FC = () => {
   const { network } = useNetwork()
 
   const { addressByChain$ } = useChainContext()
 
-  const { requestParams, loadHistory, historyPage, prevHistoryPage, setFilter, setAddress, setPage } =
-    useMidgardHistoryActions(10, reloadHistory)
+  const {
+    requestParams,
+    loadHistory,
+    reloadHistory,
+    historyPage,
+    prevHistoryPage,
+    setFilter,
+    setAddress,
+    setPage,
+    loading: loadingHistory
+  } = useMidgardHistoryActions(10)
 
-  const openExplorerTxUrl = useOpenExplorerTxUrl(O.some(THORChain))
+  const { openExplorerTxUrl } = useOpenExplorerTxUrl(O.some(THORChain))
 
   const keystoreAddresses$ = useMemo<Rx.Observable<WalletAddresses>>(
     () =>
@@ -112,8 +119,8 @@ export const WalletHistoryView: React.FC<Props> = ({ className, reloadHistory })
       oSelectedWalletAddress,
       O.map(({ address }) => {
         // add extra params for selected filter
-        const params = `txsType=${historyFilterToViewblockFilter(currentFilter)}`
-        openAddressUrl(address, params)
+        const searchParam = { param: 'txsType', value: historyFilterToViewblockFilter(currentFilter) }
+        openAddressUrl(address, [searchParam])
         return true
       })
     )
@@ -147,15 +154,19 @@ export const WalletHistoryView: React.FC<Props> = ({ className, reloadHistory })
 
   return (
     <>
+      <Row justify="end" style={{ marginBottom: '20px' }}>
+        <RefreshButton clickHandler={reloadHistory} disabled={loadingHistory} />
+      </Row>
+      <AssetsNav />
       <PoolActionsHistory
         network={network}
         headerContent={headerContent}
-        className={className}
         currentPage={requestParams.page + 1}
         historyPageRD={historyPage}
         prevHistoryPage={prevHistoryPage}
         openExplorerTxUrl={openExplorerTxUrl}
         changePaginationHandler={setPage}
+        reloadHistory={reloadHistory}
       />
     </>
   )

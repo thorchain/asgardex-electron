@@ -7,17 +7,14 @@ import * as Rx from 'rxjs'
 import { Observable } from 'rxjs'
 import * as RxOp from 'rxjs/operators'
 
-import { envOrDefault } from '../../../shared/utils/env'
+import { getBlockcypherUrl } from '../../../shared/api/blockcypher'
+import { getSochainUrl } from '../../../shared/api/sochain'
 import { isError } from '../../../shared/utils/guard'
 import { clientNetwork$ } from '../app/service'
 import * as C from '../clients'
 import { keystoreService } from '../wallet/keystore'
 import { getPhrase } from '../wallet/util'
 import { ClientState, ClientState$ } from './types'
-
-const sochainUrl = envOrDefault(process.env.REACT_APP_SOCHAIN_URL, 'https://sochain.com/api/v2')
-
-const blockcypherUrl = envOrDefault(process.env.REACT_APP_BLOCKCYPHER_URL, 'https://api.blockcypher.com/v1')
 
 /**
  * Stream to create an observable DogeClient depending on existing phrase in keystore
@@ -36,8 +33,8 @@ const clientState$: ClientState$ = FP.pipe(
           O.map<string, ClientState>((phrase) => {
             try {
               const client = new DogeClient({
-                sochainUrl,
-                blockcypherUrl,
+                sochainUrl: getSochainUrl(),
+                blockcypherUrl: getBlockcypherUrl(),
                 network,
                 phrase
               })

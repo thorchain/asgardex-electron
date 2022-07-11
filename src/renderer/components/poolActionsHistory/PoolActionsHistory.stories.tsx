@@ -169,6 +169,7 @@ export const History: Story<{ dataStatus: RDStatus }> = ({ dataStatus }) => {
         console.log(`Open explorer - tx hash ${txHash}`)
         return Promise.resolve(true)
       }}
+      reloadHistory={() => console.log(`reloadHistory`)}
       historyPageRD={res}
       changePaginationHandler={setCurrentPage}
       currentPage={currentPage}

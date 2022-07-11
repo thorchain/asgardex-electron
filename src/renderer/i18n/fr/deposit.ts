@@ -3,11 +3,10 @@ import { DepositMessages } from '../types'
 const deposit: DepositMessages = {
   'deposit.interact.title': 'Dépôt',
   'deposit.interact.subtitle': 'Interagir avec THORChain',
-  'deposit.interact.actions': 'Actions disponibles',
+  'deposit.interact.label.bondprovider': 'Bond provider (optional) - FR',
   'deposit.interact.actions.bond': 'Caution',
   'deposit.interact.actions.unbond': 'Retrait',
   'deposit.interact.actions.leave': 'Quitter',
-  'deposit.interact.actions.custom': 'Personnaliser',
   'deposit.share.title': 'Votre part dans la pool',
   'deposit.share.units': 'Unités de liquidité',
   'deposit.share.total': 'Valeur totale',
@@ -73,7 +72,6 @@ const deposit: DepositMessages = {
     'Remarque: {fee} BNB seront laissés dans votre portefeuille pour les frais de transaction.',
   'deposit.withdraw.error.feeNotCovered':
     'Les frais de transaction {fee} doivent être couverts par votre solde (actuellement {balance}).',
-  'deposit.withdraw.ledger.sign': 'Cliquez pour signer la transaction de retrait sur votre appareil.',
   'deposit.ledger.sign': 'Cliquez pour signer la transaction de dépôt sur votre appareil.'
 }
 

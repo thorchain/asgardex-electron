@@ -3,11 +3,11 @@ import { Balance } from '@xchainjs/xchain-client'
 import { bnOrZero, assetFromString, AssetRuneNative, BaseAmount, Chain, THORChain } from '@xchainjs/xchain-util'
 import BigNumber from 'bignumber.js'
 import * as A from 'fp-ts/lib/Array'
-import * as Eq from 'fp-ts/lib/Eq'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
 import * as Ord from 'fp-ts/lib/Ord'
 
+import { PoolsWatchList } from '../../shared/api/io'
 import { Network } from '../../shared/api/types'
 import { ONE_RUNE_BASE_AMOUNT } from '../../shared/mock/amount'
 import { PoolAddress, PoolDetails } from '../services/midgard/types'
@@ -16,9 +16,9 @@ import { MimirHaltChain, MimirHaltTrading, MimirPauseLP } from '../services/thor
 import { PoolDetail } from '../types/generated/midgard'
 import { PoolTableRowData, PoolTableRowsData, PricePool } from '../views/pools/Pools.types'
 import { getPoolTableRowData } from '../views/pools/Pools.utils'
-import { isRuneNativeAsset, convertBaseAmountDecimal, to1e8BaseAmount } from './assetHelper'
-import { isBchChain, isBnbChain, isBtcChain, isDogeChain, isEthChain, isLtcChain } from './chainHelper'
-import { eqChain } from './fp/eq'
+import { convertBaseAmountDecimal, to1e8BaseAmount, isRuneAsset } from './assetHelper'
+import { isBchChain, isBnbChain, isBtcChain, isCosmosChain, isDogeChain, isEthChain, isLtcChain } from './chainHelper'
+import { eqChain, eqString } from './fp/eq'
 import { ordBaseAmount } from './fp/ord'
 import { sequenceTOption, sequenceTOptionFromArray } from './fpHelpers'
 import { emptyString } from './stringHelper'
@@ -62,10 +62,12 @@ export const RUNE_POOL_ADDRESS: PoolAddress = {
 export const getPoolTableRowsData = ({
   poolDetails,
   pricePoolData,
+  watchlist,
   network
 }: {
   poolDetails: PoolDetails
   pricePoolData: PoolData
+  watchlist: PoolsWatchList
   network: Network
 }): PoolTableRowsData => {
   // get symbol of deepest pool
@@ -91,12 +93,12 @@ export const getPoolTableRowsData = ({
         sequenceTOption(oDeepestPoolSymbol, oPoolDetailSymbol),
         O.fold(
           () => false,
-          ([deepestPoolSymbol, poolDetailSymbol]) => Eq.eqString.equals(deepestPoolSymbol, poolDetailSymbol)
+          ([deepestPoolSymbol, poolDetailSymbol]) => eqString.equals(deepestPoolSymbol, poolDetailSymbol)
         )
       )
 
       return FP.pipe(
-        getPoolTableRowData({ poolDetail, pricePoolData, network }),
+        getPoolTableRowData({ poolDetail, pricePoolData, watchlist, network }),
         O.map(
           (poolTableRowData) =>
             ({
@@ -136,22 +138,28 @@ export const getAssetPoolPrice = (runePrice: BigNumber) => (poolDetail: Pick<Poo
 /**
  * Helper to get a pool price value for a given `Balance`
  */
-export const getPoolPriceValue = (
-  { asset, amount }: Balance,
-  poolDetails: PoolDetails,
-  selectedPricePoolData: PoolData
-): O.Option<BaseAmount> => {
+export const getPoolPriceValue = ({
+  balance: { asset, amount },
+  poolDetails,
+  pricePoolData,
+  network
+}: {
+  balance: Balance
+  poolDetails: PoolDetails
+  pricePoolData: PoolData
+  network: Network
+}): O.Option<BaseAmount> => {
   // convert to 1e8 decimal (as same decimal as pool data has)
   const amount1e8 = to1e8BaseAmount(amount)
   return FP.pipe(
     getPoolDetail(poolDetails, asset),
     O.map(toPoolData),
     // calculate value based on `pricePoolData`
-    O.map((poolData) => getValueOfAsset1InAsset2(amount1e8, poolData, selectedPricePoolData)),
+    O.map((poolData) => getValueOfAsset1InAsset2(amount1e8, poolData, pricePoolData)),
     O.alt(() => {
       // Calculate RUNE values based on `pricePoolData`
-      if (isRuneNativeAsset(asset)) {
-        return O.some(getValueOfRuneInAsset(amount1e8, selectedPricePoolData))
+      if (isRuneAsset(asset, network)) {
+        return O.some(getValueOfRuneInAsset(amount1e8, pricePoolData))
       }
       // In all other cases we don't have any price pool and no price
       return O.none
@@ -175,7 +183,16 @@ const isChainElem = A.elem(eqChain)
 export const disableAllActions = ({
   chain,
   haltedChains,
-  mimirHalt: { haltThorChain, haltEthChain, haltBnbChain, haltLtcChain, haltBtcChain, haltBchChain, haltDogeChain }
+  mimirHalt: {
+    haltThorChain,
+    haltEthChain,
+    haltBnbChain,
+    haltLtcChain,
+    haltBtcChain,
+    haltBchChain,
+    haltDogeChain,
+    haltCosmosChain
+  }
 }: {
   chain: Chain
   haltedChains: Chain[]
@@ -202,6 +219,9 @@ export const disableAllActions = ({
   // Check `haltDogeChain` (provided by `mimir` endpoint) to disable all actions for DOGE pools
   if (isDogeChain(chain) && haltDogeChain) return true
 
+  // Check `haltCosmosChain` (provided by `mimir` endpoint) to disable all actions for TERRA pools
+  if (isCosmosChain(chain) && haltCosmosChain) return true
+
   // Check `chain` is included in `haltedChains` (provided by `inbound_addresses` endpoint)
   return FP.pipe(haltedChains, isChainElem(chain))
 }
@@ -224,7 +244,8 @@ export const disableTradingActions = ({
     haltBchTrading,
     haltLtcTrading,
     haltBnbTrading,
-    haltDogeTrading
+    haltDogeTrading,
+    haltCosmosTrading
   }
 }: {
   chain: Chain
@@ -241,6 +262,7 @@ export const disableTradingActions = ({
   if (isLtcChain(chain) && haltLtcTrading) return true
   if (isBnbChain(chain) && haltBnbTrading) return true
   if (isDogeChain(chain) && haltDogeTrading) return true
+  if (isCosmosChain(chain) && haltCosmosTrading) return true
 
   // 3. Check `chain` is included in `haltedChains` (provided by `inbound_addresses` endpoint)
   return FP.pipe(haltedChains, isChainElem(chain))
@@ -257,7 +279,7 @@ export const disableTradingActions = ({
 export const disablePoolActions = ({
   chain,
   haltedChains,
-  mimirHalt: { pauseLp, pauseLpBnb, pauseLpBch, pauseLpBtc, pauseLpEth, pauseLpLtc, pauseLpDoge }
+  mimirHalt: { pauseLp, pauseLpBnb, pauseLpBch, pauseLpBtc, pauseLpEth, pauseLpLtc, pauseLpDoge, pauseLpCosmos }
 }: {
   chain: Chain
   haltedChains: Chain[]
@@ -271,6 +293,7 @@ export const disablePoolActions = ({
   if (isEthChain(chain) && pauseLpEth) return true
   if (isLtcChain(chain) && pauseLpLtc) return true
   if (isDogeChain(chain) && pauseLpDoge) return true
+  if (isCosmosChain(chain) && pauseLpCosmos) return true
 
   // Check `chain` is included in `haltedChains` (provided by `inbound_addresses` endpoint)
   return FP.pipe(haltedChains, isChainElem(chain))

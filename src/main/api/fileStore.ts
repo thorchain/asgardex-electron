@@ -11,28 +11,33 @@ import { STORAGE_DIR } from './const'
 // @see https://github.com/jprichardson/node-fs-extra/blob/master/docs/remove.md
 const removeFile = async (fullFilePathname: string) => fs.remove(fullFilePathname)
 
-const isFileExist = async (fullFilePathname: string) => fs.pathExists(fullFilePathname)
+const isFileExist = async (path: string) => fs.pathExists(path)
+
+// full file path - it includes a version number, so we can ignore deprecated config files (if needed)
+const getFilePath = (fileStoreName: StoreFileName, version: string) =>
+  path.join(STORAGE_DIR, `${fileStoreName}-${version}.json`)
 
 /**
  * @returns
  * 1. in case it's impossible to read from file will return Promise.resolve(defaultValue)
  * 2. in case content was read returns Promise.resolve(fileContent)
  */
-const getFileContent = async <T>(fullFilePathname: string, defaultValue: T): Promise<T> => {
-  // If wile does not exist create a new one with defaultValue as content
-  if (!(await isFileExist(fullFilePathname))) {
-    await fs.writeJSON(fullFilePathname, { ...defaultValue })
-    return Promise.resolve(defaultValue)
+export const getFileContent = async <T extends StorageVersion>(name: StoreFileName, defaultValue: T): Promise<T> => {
+  const path = getFilePath(name, defaultValue.version)
+  // If file does not exist create a new one with defaultValue as content
+  if (!(await isFileExist(path))) {
+    await fs.writeJSON(path, { ...defaultValue })
+    return defaultValue
   }
 
   try {
     // Try to read and parse appropriate JSON store-file
-    const fileContent = await fs.readJSON(fullFilePathname)
+    const fileContent = await fs.readJSON(path)
     // Combine file content with provided default value
-    return Promise.resolve({ ...defaultValue, ...fileContent })
+    return { ...defaultValue, ...fileContent }
   } catch {
     // Resolve with default value in case of any error
-    return Promise.resolve(defaultValue)
+    return defaultValue
   }
 }
 /**
@@ -43,24 +48,24 @@ const getFileContent = async <T>(fullFilePathname: string, defaultValue: T): Pro
  * 1. in case content was written: Promise.resolve(composedContent)
  * 2. in case there was any issue while writing: Promise.reject
  */
-const saveToFile = async <T>(fullFilePathname: string, data: Partial<T>, defaultValue: T) => {
-  const fileData = await getFileContent(fullFilePathname, defaultValue)
+const saveToFile = async <T extends StorageVersion>(name: StoreFileName, data: Partial<T>, defaultValue: T) => {
+  const path = getFilePath(name, defaultValue.version)
+  const fileData = await getFileContent(name, defaultValue)
   // Combine Partial data with previously saved data
   const targetData: T = { ...fileData, ...data }
-  return fs.writeJSON(fullFilePathname, targetData).then(() => targetData)
+  return fs.writeJSON(path, targetData).then(() => targetData)
 }
 
-export const getFileStoreService = <T extends StorageVersion>(fileStoreName: StoreFileName, defaultValue: T) => {
-  // full file path to save - it includes a version number, so we can ignore deprecated config files (if needed)
-  const fullFilePathname = path.join(STORAGE_DIR, `${fileStoreName}-${defaultValue.version}.json`)
+export const getFileStoreService = <T extends StorageVersion>(name: StoreFileName, defaultValue: T) => {
+  const path = getFilePath(name, defaultValue.version)
 
-  const ipcMessages = getStoreFilesIPCMessages(fileStoreName)
+  const ipcMessages = getStoreFilesIPCMessages(name)
 
   const registerIpcHandlersMain = () => {
-    ipcMain.handle(ipcMessages.SAVE_FILE, (_, data: T) => saveToFile(fullFilePathname, data, defaultValue))
-    ipcMain.handle(ipcMessages.REMOVE_FILE, () => removeFile(fullFilePathname))
-    ipcMain.handle(ipcMessages.GET_FILE, () => getFileContent(fullFilePathname, defaultValue))
-    ipcMain.handle(ipcMessages.FILE_EXIST, () => isFileExist(fullFilePathname))
+    ipcMain.handle(ipcMessages.SAVE_FILE, (_, data: T) => saveToFile(name, data, defaultValue))
+    ipcMain.handle(ipcMessages.REMOVE_FILE, () => removeFile(path))
+    ipcMain.handle(ipcMessages.GET_FILE, () => getFileContent(name, defaultValue))
+    ipcMain.handle(ipcMessages.FILE_EXIST, () => isFileExist(path))
   }
 
   return {

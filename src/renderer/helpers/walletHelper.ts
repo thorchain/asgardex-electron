@@ -6,14 +6,15 @@ import * as FP from 'fp-ts/function'
 import * as O from 'fp-ts/Option'
 
 import { Network } from '../../shared/api/types'
-import { isLedgerWallet } from '../../shared/utils/guard'
+import { isLedgerWallet, isWalletType } from '../../shared/utils/guard'
 import { WalletAddress, WalletType } from '../../shared/wallet/types'
 import { ZERO_ASSET_AMOUNT } from '../const'
 import { WalletBalances } from '../services/clients'
 import { NonEmptyWalletBalances, WalletBalance } from '../services/wallet/types'
 import { isBnbAsset, isEthAsset, isLtcAsset, isRuneNativeAsset } from './assetHelper'
-import { isThorChain } from './chainHelper'
+import { isBchChain, isDogeChain, isLtcChain, isThorChain } from './chainHelper'
 import { eqAddress, eqAsset, eqWalletType } from './fp/eq'
+import { optionFromNullableString } from './fp/from'
 
 /**
  * Tries to find an `AssetAmount` of an `Asset`
@@ -154,5 +155,21 @@ export const getWalletByAddress = (walletBalances: WalletBalances, address: Addr
 export const isEnabledWallet = (chain: Chain, network: Network, walletType: WalletType) => {
   // Disable THORChain ledger wallets in stagenet
   if (isThorChain(chain) && network === 'stagenet' && isLedgerWallet(walletType)) return false
+  // Disable LTC ledger wallets in testnet
+  // It seems Ledger can not derive LTC addresses on Testnet properly
+  if (isLtcChain(chain) && network === 'testnet' && isLedgerWallet(walletType)) return false
+  // Same for BCH - no Ledger support for `testnet`
+  if (isBchChain(chain) && network === 'testnet' && isLedgerWallet(walletType)) return false
+  // No DOGE support on `testnet`
+  if (isDogeChain(chain) && network === 'testnet' && isLedgerWallet(walletType)) return false
   return true
 }
+
+export const getWalletAddressFromNullableString = (s?: string): O.Option<Address> =>
+  FP.pipe(s, optionFromNullableString, O.chain(O.fromPredicate((s) => s.length > 0)))
+
+export const getWalletIndexFromNullableString = (s?: string): O.Option<number /* integer */> =>
+  FP.pipe(s, optionFromNullableString, O.map(parseInt), O.chain(O.fromPredicate((v) => !isNaN(v) && v >= 0)))
+
+export const getWalletTypeFromNullableString = (s?: string): O.Option<WalletType> =>
+  FP.pipe(s, optionFromNullableString, O.chain(O.fromPredicate(isWalletType)))

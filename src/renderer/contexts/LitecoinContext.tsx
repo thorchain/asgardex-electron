@@ -59,7 +59,7 @@ const initialContext: LitecoinContextValue = {
 
 const LitecoinContext = createContext<LitecoinContextValue>(initialContext)
 
-export const LitecoinProvider: React.FC = ({ children }): JSX.Element => {
+export const LitecoinProvider: React.FC<{ children: React.ReactNode }> = ({ children }): JSX.Element => {
   return <LitecoinContext.Provider value={initialContext}>{children}</LitecoinContext.Provider>
 }
 

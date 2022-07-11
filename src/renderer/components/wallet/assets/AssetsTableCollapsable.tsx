@@ -2,7 +2,14 @@ import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
 import { Address, Balance } from '@xchainjs/xchain-client'
-import { Asset, assetToString, baseToAsset, chainToString, formatAssetAmountCurrency } from '@xchainjs/xchain-util'
+import {
+  Asset,
+  assetToString,
+  baseToAsset,
+  chainToString,
+  formatAssetAmountCurrency,
+  isSynthAsset
+} from '@xchainjs/xchain-util'
 import { Col, Collapse, Grid, Row } from 'antd'
 import { ScreenMap } from 'antd/lib/_util/responsiveObserve'
 import { ColumnType } from 'antd/lib/table'
@@ -10,12 +17,12 @@ import * as A from 'fp-ts/lib/Array'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
 import { useIntl } from 'react-intl'
-import { useHistory } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 
 import { Network } from '../../../../shared/api/types'
 import { isKeystoreWallet } from '../../../../shared/utils/guard'
 import { WalletType } from '../../../../shared/wallet/types'
-import { disableRuneUpgrade, isNonNativeRuneAsset } from '../../../helpers/assetHelper'
+import { disableRuneUpgrade, isNonNativeRuneAsset, isUSDAsset } from '../../../helpers/assetHelper'
 import { getChainAsset } from '../../../helpers/chainHelper'
 import { getPoolPriceValue } from '../../../helpers/poolHelper'
 import * as walletRoutes from '../../../routes/wallet'
@@ -64,7 +71,7 @@ export const AssetsTableCollapsable: React.FC<Props> = (props): JSX.Element => {
   } = props
 
   const intl = useIntl()
-  const history = useHistory()
+  const navigate = useNavigate()
   const screenMap: ScreenMap = Grid.useBreakpoint()
 
   const [showQRModal, setShowQRModal] = useState<O.Option<{ asset: Asset; address: Address }>>(O.none)
@@ -135,7 +142,7 @@ export const AssetsTableCollapsable: React.FC<Props> = (props): JSX.Element => {
           e.preventDefault()
           e.stopPropagation()
           setSelectedAsset(O.some(asset))
-          history.push(
+          navigate(
             walletRoutes.upgradeRune.path({
               asset: assetToString(asset),
               walletAddress,
@@ -150,7 +157,10 @@ export const AssetsTableCollapsable: React.FC<Props> = (props): JSX.Element => {
           <Styled.AssetTickerWrapper>
             <Styled.Label nowrap>
               <Styled.TickerLabel>{asset.ticker}</Styled.TickerLabel>
-              <Styled.ChainLabel>{asset.chain}</Styled.ChainLabel>
+              <Styled.ChainLabelWrapper>
+                {!isSynthAsset(asset) && <Styled.ChainLabel>{asset.chain}</Styled.ChainLabel>}
+                {isSynthAsset(asset) && <Styled.AssetSynthLabel>synth</Styled.AssetSynthLabel>}
+              </Styled.ChainLabelWrapper>
             </Styled.Label>
             {isNonNativeRuneAsset(asset, network) && (
               <Styled.UpgradeButton
@@ -163,7 +173,7 @@ export const AssetsTableCollapsable: React.FC<Props> = (props): JSX.Element => {
         )
       }
     }),
-    [haltThorChain, haltEthChain, haltBnbChain, network, intl, setSelectedAsset, history]
+    [haltThorChain, haltEthChain, haltBnbChain, network, intl, setSelectedAsset, navigate]
   )
 
   const renderBalanceColumn = ({ asset, amount }: Balance) => {
@@ -184,12 +194,16 @@ export const AssetsTableCollapsable: React.FC<Props> = (props): JSX.Element => {
 
   const renderPriceColumn = useCallback(
     (balance: Balance) => {
-      const oPrice = getPoolPriceValue(balance, poolDetails, pricePool.poolData)
+      const oPrice = getPoolPriceValue({ balance, poolDetails, pricePoolData: pricePool.poolData, network })
       const label = FP.pipe(
         oPrice,
         O.map((price) => {
           price.decimal = balance.amount.decimal
-          return formatAssetAmountCurrency({ amount: baseToAsset(price), asset: pricePool.asset, decimal: 3 })
+          return formatAssetAmountCurrency({
+            amount: baseToAsset(price),
+            asset: pricePool.asset,
+            decimal: isUSDAsset(pricePool.asset) ? 2 : 4
+          })
         }),
         // "empty" label if we don't get a price value
         O.getOrElse(() => '--')
@@ -200,7 +214,7 @@ export const AssetsTableCollapsable: React.FC<Props> = (props): JSX.Element => {
         </Styled.Label>
       )
     },
-    [poolDetails, pricePool.asset, pricePool.poolData]
+    [network, poolDetails, pricePool.asset, pricePool.poolData]
   )
 
   const priceColumn: ColumnType<Balance> = useMemo(
@@ -233,15 +247,15 @@ export const AssetsTableCollapsable: React.FC<Props> = (props): JSX.Element => {
 
   const columns = useMemo(() => {
     // desktop
-    if (screenMap?.lg) {
+    if (screenMap?.lg ?? false) {
       return [iconColumn, tickerColumn, balanceColumn, priceColumn]
     }
     // tablet
-    if (screenMap?.md) {
+    if (screenMap?.sm ?? false) {
       return [iconColumn, tickerColumn, balanceColumn]
     }
     // mobile
-    if (screenMap?.xs) {
+    if (screenMap?.xs ?? false) {
       return [iconColumn, balanceColumn]
     }
 
@@ -305,10 +319,10 @@ export const AssetsTableCollapsable: React.FC<Props> = (props): JSX.Element => {
             return <ErrorView title={msg} />
           },
           // success state
-          (assetsWB) => {
+          (balances) => {
             const prev = previousAssetsTableData.current
-            prev[index] = assetsWB
-            return renderAssetsTable({ tableData: assetsWB, oWalletAddress, loading: false, walletType, walletIndex })
+            prev[index] = balances
+            return renderAssetsTable({ tableData: balances, oWalletAddress, loading: false, walletType, walletIndex })
           }
         )
       )
@@ -424,7 +438,7 @@ export const AssetsTableCollapsable: React.FC<Props> = (props): JSX.Element => {
     }
   }, [chainBalances, collapseChangedByUser])
 
-  const onChangeCollpaseHandler = useCallback((key: string | string[]) => {
+  const onChangeCollapseHandler = useCallback((key: string | string[]) => {
     if (Array.isArray(key)) {
       setOpenPanelKeys(key)
     } else {
@@ -460,7 +474,7 @@ export const AssetsTableCollapsable: React.FC<Props> = (props): JSX.Element => {
       defaultActiveKey={openPanelKeys}
       activeKey={openPanelKeys}
       expandIconPosition="right"
-      onChange={onChangeCollpaseHandler}
+      onChange={onChangeCollapseHandler}
       ghost>
       {chainBalances.map(renderPanel)}
       {renderQRCodeModal}

@@ -3,7 +3,10 @@ import { LedgerMessages } from '../types'
 const ledger: LedgerMessages = {
   'ledger.title': 'Ledger',
   'ledger.title.sign': 'Подписать с помощью Ledger',
-  'ledger.needsconnected': 'Убедитесь, что ваш Ledger подключён и приложение "{chain}" запущено.',
+  'ledger.sign': 'Нажмите "далее" что бы подписать транзакцию на вашем устройстве.',
+  'ledger.blindsign':
+    '"smart contract data" or "blind signing" needs to be enabled for {chain} application on your Ledger device. - RU',
+  'ledger.needsconnected': 'Убедитесь, что ваш Ledger подключён и приложение {chain} запущено.',
   'ledger.add.device': 'Добавить Ledger',
   'ledger.error.nodevice': 'Нет подключенных устройств',
   'ledger.error.inuse': 'Это устройство используется в другом приложении',
@@ -24,7 +27,10 @@ const ledger: LedgerMessages = {
   'ledger.error.unknown': 'Неизвестная ошибка',
   'ledger.notsupported': 'Ledger не поддерживает {chain}.',
   'ledger.notaddedorzerobalances': 'Ledger {chain} не была подключена или имеет нулевой баланс.',
-  'ledger.deposit.oneside': 'Пока что Ledger поддерживается только для одностороннего добавления активов.'
+  'ledger.deposit.oneside': 'Пока что Ledger поддерживается только для одностороннего добавления активов.',
+  'ledger.legacyformat.note': 'Ledger displays all output addresses in "legacy", but not in "CashAddr" format. - RU',
+  'ledger.legacyformat.show': 'Show addresses - RU',
+  'ledger.legacyformat.hide': 'Hide addresses - RU'
 }
 
 export default ledger

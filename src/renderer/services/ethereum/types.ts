@@ -6,6 +6,7 @@ import { ethers } from 'ethers'
 import * as O from 'fp-ts/lib/Option'
 
 import { Network } from '../../../shared/api/types'
+import { WalletType } from '../../../shared/wallet/types'
 import { LiveData } from '../../helpers/rx/liveData'
 import { FeeLD, FeesLD, Memo } from '../chain/types'
 import * as C from '../clients'
@@ -27,24 +28,32 @@ export type LoadApproveFeeHandler = (p: ApproveParams) => void
 export type SendTxParams = {
   asset: Asset
   recipient: Address
+  sender?: Address
   amount: BaseAmount
   memo: Memo
-  feeOption?: FeeOption
+  feeOption: FeeOption
   walletIndex: number
+  walletType: WalletType
 }
 
 export type SendPoolTxParams = SendTxParams & {
   router: O.Option<Address>
 }
 
+/**
+ * `ApproveParams`
+ * are used to `approve but also to estimate `approveFees`
+ */
 export type ApproveParams = {
   network: Network
+  walletType: WalletType
+  walletIndex: number
   contractAddress: Address
   spenderAddress: Address
-  amount?: BaseAmount
+  fromAddress: Address // needed for estimating fees
 }
 
-export type IsApproveParams = Omit<ApproveParams, 'network'>
+export type IsApproveParams = { contractAddress: Address; spenderAddress: Address; fromAddress: Address }
 
 export type PollInTxFeeParams = {
   address: Address

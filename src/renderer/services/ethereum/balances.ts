@@ -40,10 +40,16 @@ const balances$: ({
   // because `xchain-ethereum` does for each asset a single request
   const assets: Asset[] | undefined = network === 'testnet' ? ETHAssetsTestnet : undefined
   return FP.pipe(
-    C.balances$({ client$, trigger$: reloadBalances$, assets, walletType, walletIndex }),
+    C.balances$({ client$, trigger$: reloadBalances$, assets, walletType, walletIndex, walletBalanceType: 'all' }),
     // Filter assets based on ERC20Whitelist (mainnet only)
     liveData.map(FP.flow(A.filter(({ asset }) => validAssetForETH(asset, network))))
   )
 }
 
-export { reloadBalances, balances$, reloadBalances$, resetReloadBalances }
+// State of balances loaded by Client and Address
+const getBalanceByAddress$ = (network: Network) => {
+  const assets: Asset[] | undefined = network === 'testnet' ? ETHAssetsTestnet : undefined
+  return C.balancesByAddress$({ client$, trigger$: reloadBalances$, assets, walletBalanceType: 'all' })
+}
+
+export { reloadBalances, balances$, reloadBalances$, resetReloadBalances, getBalanceByAddress$ }

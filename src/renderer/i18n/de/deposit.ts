@@ -3,11 +3,10 @@ import { DepositMessages } from '../types'
 const deposit: DepositMessages = {
   'deposit.interact.title': 'Einzahlen',
   'deposit.interact.subtitle': 'Interagiere mit THORChain',
+  'deposit.interact.label.bondprovider': 'Bond Provider (optional)',
   'deposit.interact.actions.bond': 'Bond',
   'deposit.interact.actions.unbond': 'Unbond',
   'deposit.interact.actions.leave': 'Verlassen',
-  'deposit.interact.actions.custom': 'Benutzerdefiniert',
-  'deposit.interact.actions': 'Verfügbare Aktionen',
   'deposit.share.title': 'Dein Poolanteil',
   'deposit.share.units': 'Liquiditäts-Einheiten',
   'deposit.share.poolshare': 'Poolanteil',
@@ -72,7 +71,6 @@ const deposit: DepositMessages = {
   'deposit.withdraw.feeNote': 'Hinweis: {fee} werden für die Transaktionsgebühr in Deiner Wallet belassen',
   'deposit.withdraw.error.feeNotCovered':
     'Transaktionsgebühr in Höhe von {fee} ist nicht über Dein Guthaben {balance} gedeckt.',
-  'deposit.withdraw.ledger.sign': 'Klick "Weiter", um die Auszahlungstransaktion mit Deinem Ledger zu signieren.',
   'deposit.ledger.sign': 'Klick "Weiter", um die Einzahlungstransaktion mit Deinem Ledger zu signieren.'
 }
 

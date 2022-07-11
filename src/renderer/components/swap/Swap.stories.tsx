@@ -3,6 +3,7 @@ import React from 'react'
 import * as RD from '@devexperts/remote-data-ts'
 import { Story, Meta } from '@storybook/react'
 import { BTC_DECIMAL } from '@xchainjs/xchain-bitcoin'
+import { TxHash } from '@xchainjs/xchain-client'
 import {
   assetAmount,
   AssetBNB,
@@ -85,7 +86,9 @@ const defaultProps: SwapProps = {
   },
   goToTransaction: (txHash) => {
     console.log(txHash)
+    return Promise.resolve(true)
   },
+  getExplorerTxUrl: (txHash: TxHash) => O.some(`url/asset-${txHash}`),
   // mock password validation
   // Password: "123"
   validatePassword$: mockValidatePassword$,
@@ -112,7 +115,8 @@ const defaultProps: SwapProps = {
   isApprovedERC20Token$: () => Rx.of(RD.success(true)),
   importWalletHandler: () => console.log('import wallet'),
   clickAddressLinkHandler: () => console.log('handle click on address'),
-  addressValidator: () => Promise.resolve(true)
+  addressValidator: () => Promise.resolve(true),
+  isDev: true
 }
 
 export const StoryDefault: Story = () => <Swap {...defaultProps} />

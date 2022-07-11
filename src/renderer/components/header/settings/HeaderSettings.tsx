@@ -16,7 +16,7 @@ export const HeaderSettings: React.FC<Props> = (props): JSX.Element => {
 
   return (
     <HeaderIconWrapper onClick={onPress}>
-      {!isDesktopView && <Styled.Label>{intl.formatMessage({ id: 'setting.app.title' })} </Styled.Label>}
+      {!isDesktopView && <Styled.Label>{intl.formatMessage({ id: 'common.settings' })} </Styled.Label>}
       <Styled.Icon />
     </HeaderIconWrapper>
   )

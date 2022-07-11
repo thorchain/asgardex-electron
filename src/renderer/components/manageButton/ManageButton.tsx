@@ -3,29 +3,36 @@ import React, { useCallback } from 'react'
 import { PlusOutlined } from '@ant-design/icons'
 import { Asset, assetToString } from '@xchainjs/xchain-util'
 import { useIntl } from 'react-intl'
-import { useHistory } from 'react-router'
+import { useNavigate } from 'react-router-dom'
 
 import * as poolsRoutes from '../../routes/pools'
-import { Button, ButtonSize } from '../uielements/button'
+import { Button, ButtonProps, ButtonSize } from '../uielements/button'
 
-type Props = {
+type Props = ButtonProps & {
   className?: string
   asset: Asset
   sizevalue?: ButtonSize
   isTextView: boolean
   disabled?: boolean
 }
-export const ManageButton: React.FC<Props> = ({ disabled, className, asset, sizevalue = 'normal', isTextView }) => {
+export const ManageButton: React.FC<Props> = ({
+  disabled,
+  className,
+  asset,
+  sizevalue = 'normal',
+  isTextView,
+  ...otherProps
+}) => {
   const intl = useIntl()
-  const history = useHistory()
+  const navigate = useNavigate()
 
   const onClick = useCallback(
-    (event) => {
+    (event: React.MouseEvent<HTMLElement, MouseEvent>) => {
       event.preventDefault()
       event.stopPropagation()
-      history.push(poolsRoutes.deposit.path({ asset: assetToString(asset) }))
+      navigate(poolsRoutes.deposit.path({ asset: assetToString(asset) }))
     },
-    [asset, history]
+    [asset, navigate]
   )
 
   return (
@@ -36,7 +43,8 @@ export const ManageButton: React.FC<Props> = ({ disabled, className, asset, size
       sizevalue={sizevalue}
       className={className}
       onClick={onClick}
-      style={{ height: 30 }}>
+      style={{ height: 30 }}
+      {...otherProps}>
       <PlusOutlined />
       {isTextView && intl.formatMessage({ id: 'common.manage' })}
     </Button>

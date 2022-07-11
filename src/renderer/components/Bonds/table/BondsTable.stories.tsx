@@ -1,6 +1,7 @@
 import React, { useCallback, useState } from 'react'
 
-import { withKnobs, select } from '@storybook/addon-knobs'
+// TODO (@veado) Replace knobs
+// import { withKnobs, select } from '@storybook/addon-knobs'
 import { Meta, Story } from '@storybook/react'
 import { Address } from '@xchainjs/xchain-client'
 import { baseAmount } from '@xchainjs/xchain-util'
@@ -23,43 +24,49 @@ const getMockRDValue = getMockRDValueFactory<ApiError, NodeInfo>(
 )
 
 export const Default: Story = () => {
-  const firstNodeRdKnob: RDStatus = select(
-    'first node',
-    {
-      initial: 'initial',
-      pending: 'pending',
-      error: 'error',
-      success: 'success'
-    },
-    'initial'
-  )
+  // const firstNodeRdKnob: RDStatus = select(
+  //   'first node',
+  //   {
+  //     initial: 'initial',
+  //     pending: 'pending',
+  //     error: 'error',
+  //     success: 'success'
+  //   },
+  //   'initial'
+  // )
 
-  const secondNodeRdKnob: RDStatus = select(
-    'second node',
-    {
-      initial: 'initial',
-      pending: 'pending',
-      error: 'error',
-      success: 'success'
-    },
-    'initial'
-  )
+  // const secondNodeRdKnob: RDStatus = select(
+  //   'second node',
+  //   {
+  //     initial: 'initial',
+  //     pending: 'pending',
+  //     error: 'error',
+  //     success: 'success'
+  //   },
+  //   'initial'
+  // )
 
-  const thirdNodeRdKnob: RDStatus = select(
-    'third node',
-    {
-      initial: 'initial',
-      pending: 'pending',
-      error: 'error',
-      success: 'success'
-    },
-    'success'
-  )
+  // const thirdNodeRdKnob: RDStatus = select(
+  //   'third node',
+  //   {
+  //     initial: 'initial',
+  //     pending: 'pending',
+  //     error: 'error',
+  //     success: 'success'
+  //   },
+  //   'success'
+  // )
+
+  // const nodesSelect: Record<Address, RDStatus> = {
+  //   thor1766mazrxs5asuscepa227r6ekr657234f8p7nf: firstNodeRdKnob,
+  //   thor1766mazrxs5asuscepa227r6ekr657234f9asda: secondNodeRdKnob,
+  //   thor1766mazrxs5asuscepa227r6ekr657234fkswjh: thirdNodeRdKnob
+  // }
 
   const nodesSelect: Record<Address, RDStatus> = {
-    thor1766mazrxs5asuscepa227r6ekr657234f8p7nf: firstNodeRdKnob,
-    thor1766mazrxs5asuscepa227r6ekr657234f9asda: secondNodeRdKnob,
-    thor1766mazrxs5asuscepa227r6ekr657234fkswjh: thirdNodeRdKnob
+    thor1766mazrxs5asuscepa227r6ekr657234f8p7nf: 'initial',
+    thor1766mazrxs5asuscepa227r6ekr657234f9asda: 'pending',
+    thor1766mazrxs5asuscepa227r6ekr657234fkswjh: 'success'
   }
   const [nodesList, setNodesList] = useState<Address[]>([
     'thor1766mazrxs5asuscepa227r6ekr657234f8p7nf',
@@ -92,8 +99,8 @@ Default.storyName = 'default'
 
 const meta: Meta = {
   component: BondsTable,
-  title: 'Bonds/BondsTable',
-  decorators: [withKnobs]
+  title: 'Bonds/BondsTable'
+  // decorators: [withKnobs]
 }
 
 export default meta

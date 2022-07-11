@@ -7,7 +7,7 @@ const EXTERNALS_WHITELIST = [
   'thorchain.net',
   'testnet.thorchain.net',
   'docs.thorchain.org',
-  't.me',
+  'discord.gg',
   'twitter.com',
   'github.com',
   'explorer.binance.org',
@@ -15,7 +15,6 @@ const EXTERNALS_WHITELIST = [
   'blockstream.info',
   'dex.binance.org',
   'testnet-dex.binance.org',
-  'runestake.info',
   'thoryield.com',
   'app.thoryield.com',
   'etherscan.io',
@@ -36,7 +35,10 @@ const EXTERNALS_WHITELIST = [
   'thornode.thorchain.info',
   'testnet.thornode.thorchain.info',
   'stagenet-thornode.ninerealms.com',
-  'stagenet-rpc.ninerealms.com'
+  'stagenet-rpc.ninerealms.com',
+  'finder.terra.money',
+  'cosmos.bigdipper.live',
+  'explorer.theta-testnet.polypore.xyz'
 ]
 
 const openExternal = (target: string) => {

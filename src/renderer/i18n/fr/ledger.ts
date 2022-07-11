@@ -2,9 +2,12 @@ import { LedgerMessages } from '../types'
 
 const ledger: LedgerMessages = {
   'ledger.title': 'Ledger',
-  'ledger.title.sign': 'Signing with Ledger - FR',
+  'ledger.title.sign': 'Signature avec Ledger',
+  'ledger.sign': "Cliquez sur 'Suivant' pour signer la transaction sur votre appareil.",
+  'ledger.blindsign':
+    '"smart contract data" or "blind signing" needs to be enabled for {chain} application on your Ledger device. - FR',
   'ledger.needsconnected':
-    'Make sure you your Ledger device is connected and the "{chain}" application is up and running. - FR',
+    "Assurez-vous que votre appareil Ledger est connecté et que l'application {chain} est opérationnelle.",
   'ledger.add.device': 'Ajoutez votre ledger',
   'ledger.error.nodevice': 'Aucun périphérique connecté',
   'ledger.error.inuse': 'Le périphérique est utilisé dans une autre application',
@@ -25,7 +28,10 @@ const ledger: LedgerMessages = {
   'ledger.error.unknown': 'Erreur inconnue',
   'ledger.notsupported': 'Pas de prise en charge de Ledger pour {chain}.',
   'ledger.notaddedorzerobalances': "La chaîne {chaîne} n'a pas été connectée sur Ledger ou n'a aucun solde.",
-  'ledger.deposit.oneside': "Actuellement, Ledger ne prend en charge un actif que d'un seul côté."
+  'ledger.deposit.oneside': "Actuellement, Ledger ne prend en charge un actif que d'un seul côté.",
+  'ledger.legacyformat.note': 'Ledger displays all output addresses in "legacy", but not in "CashAddr" format. - FR',
+  'ledger.legacyformat.show': 'Show addresses - FR',
+  'ledger.legacyformat.hide': 'Hide addresses - FR'
 }
 
 export default ledger

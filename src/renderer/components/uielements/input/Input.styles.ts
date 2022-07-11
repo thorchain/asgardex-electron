@@ -16,7 +16,7 @@ const fontSettings: FontSettings = {
     spacing: '0.5px'
   },
   large: {
-    size: '24px',
+    size: '21px',
     spacing: '0.5px'
   }
 }
@@ -43,6 +43,7 @@ export type InputProps = CustomInputProps & AI.InputProps
 
 const inputStyle = css<InputProps>`
   height: ${({ size = 'middle' }) => sizes[size]};
+  font-family: 'MainFontRegular';
   font-size: ${({ size = 'middle' }) => fontSettings[size].size};
   letter-spacing: ${({ size = 'middle' }) => fontSettings[size].spacing};
   ${({ typevalue }) => typevalue === 'ghost' && 'border: none;'};
@@ -97,7 +98,9 @@ export const InputNumber = styled(A.InputNumber)<InputProps>`
   }
 `
 
-export const InputPassword = styled(A.Input.Password)<InputProps>`
+export const InputPassword = styled(A.Input.Password).attrs({
+  type: 'password'
+})<InputProps>`
   ${inputStyle}
   & .ant-input-password-icon {
     color: ${colors.primary};

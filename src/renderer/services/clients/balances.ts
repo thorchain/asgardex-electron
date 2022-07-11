@@ -1,5 +1,5 @@
 import * as RD from '@devexperts/remote-data-ts'
-import { Address, XChainClient } from '@xchainjs/xchain-client'
+import { Address, Balance, XChainClient } from '@xchainjs/xchain-client'
 import { Asset } from '@xchainjs/xchain-util'
 import * as A from 'fp-ts/Array'
 import * as FP from 'fp-ts/lib/function'
@@ -8,11 +8,18 @@ import * as Rx from 'rxjs'
 import * as RxOp from 'rxjs/operators'
 import { catchError, startWith, map, shareReplay, debounceTime } from 'rxjs/operators'
 
-import { WalletType } from '../../../shared/wallet/types'
+import { WalletBalanceType, WalletType } from '../../../shared/wallet/types'
 import { liveData } from '../../helpers/rx/liveData'
 import { ApiError, ErrorId } from '../wallet/types'
 import { WalletBalancesLD, XChainClient$ } from './types'
 
+// Currently we have two parameters only for `getBalance` in XChainClient defined,
+// but `xchain-btc` has recently added a third parameter `confirmedOnly` and XChainClient needs to be changed in the future,
+// @see `xchain-btc` PR 490 https://github.com/xchainjs/xchainjs-lib/pull/490/files#diff-8fc736951c0a12557cfeea25b9e6671889c2bd252e728501d7bd6c914e6cf5b8R105-R107
+// TEmproary workaround: Override `XChainClient` interface here
+export interface XChainClientOverride extends XChainClient {
+  getBalance(address: Address, assets?: Asset[], confirmedOnly?: boolean): Promise<Balance[]>
+}
 /**
  * Observable to request balances by given `XChainClient` and `Address` (optional)
  * `Balances` are mapped into `WalletBalances`
@@ -22,18 +29,20 @@ import { WalletBalancesLD, XChainClient$ } from './types'
  * Empty list of balances returned by client will be ignored and not part of `WalletBalances`
  *
  */
-const loadBalances$ = ({
+const loadBalances$ = <C extends XChainClientOverride>({
   client,
   walletType,
   address,
   assets,
-  walletIndex
+  walletIndex,
+  walletBalanceType
 }: {
-  client: XChainClient
+  client: C
   walletType: WalletType
   address?: Address
   assets?: Asset[]
   walletIndex: number
+  walletBalanceType: WalletBalanceType
 }): WalletBalancesLD =>
   FP.pipe(
     address,
@@ -44,7 +53,7 @@ const loadBalances$ = ({
       // TODO (@Veado) i18n
       () => Rx.of(RD.failure<ApiError>({ errorId: ErrorId.GET_BALANCES, msg: 'Could not get address' })),
       (walletAddress) =>
-        Rx.from(client.getBalance(walletAddress, assets)).pipe(
+        Rx.from(client.getBalance(walletAddress, assets, walletBalanceType === 'confirmed')).pipe(
           map(RD.success),
           liveData.map(
             A.map((balance) => ({
@@ -62,6 +71,21 @@ const loadBalances$ = ({
     )
   )
 
+type Balances$ = ({
+  walletType,
+  client$,
+  trigger$,
+  assets,
+  walletIndex,
+  walletBalanceType
+}: {
+  walletType: WalletType
+  client$: XChainClient$
+  trigger$: Rx.Observable<boolean>
+  assets?: Asset[]
+  walletIndex: number
+  walletBalanceType: WalletBalanceType
+}) => WalletBalancesLD
 /**
  * State of `Balances` loaded by given `XChainClient`
  * It will be reloaded by a next value of given `TriggerStream$`
@@ -71,19 +95,7 @@ const loadBalances$ = ({
  *
  * If a client is not available (e.g. by removing keystore), it returns an `initial` state
  */
-export const balances$: ({
-  walletType,
-  client$,
-  trigger$,
-  assets,
-  walletIndex
-}: {
-  walletType: WalletType
-  client$: XChainClient$
-  trigger$: Rx.Observable<boolean>
-  assets?: Asset[]
-  walletIndex: number
-}) => WalletBalancesLD = ({ walletType, client$, trigger$, assets, walletIndex }) =>
+export const balances$: Balances$ = ({ walletType, client$, trigger$, assets, walletIndex, walletBalanceType }) =>
   Rx.combineLatest([trigger$.pipe(debounceTime(300)), client$]).pipe(
     RxOp.switchMap(([_, oClient]) => {
       return FP.pipe(
@@ -97,18 +109,25 @@ export const balances$: ({
               walletType,
               client,
               assets,
-              walletIndex
+              walletIndex,
+              walletBalanceType
             })
         )
       )
     })
   )
 
-export const balancesByAddress$: (
-  client$: XChainClient$,
-  trigger$: Rx.Observable<boolean>,
+type BalancesByAddress$ = ({
+  client$,
+  trigger$,
+  assets,
+  walletBalanceType
+}: {
+  client$: XChainClient$
+  trigger$: Rx.Observable<boolean>
   assets?: Asset[]
-) => ({
+  walletBalanceType: WalletBalanceType
+}) => ({
   address,
   walletType,
   walletIndex
@@ -116,8 +135,10 @@ export const balancesByAddress$: (
   address: string
   walletType: WalletType
   walletIndex: number
-}) => WalletBalancesLD =
-  (client$, trigger$, assets) =>
+}) => WalletBalancesLD
+
+export const balancesByAddress$: BalancesByAddress$ =
+  ({ client$, trigger$, assets, walletBalanceType }) =>
   ({ address, walletType, walletIndex }) =>
     Rx.combineLatest([trigger$.pipe(debounceTime(300)), client$]).pipe(
       RxOp.mergeMap(([_, oClient]) => {
@@ -127,7 +148,7 @@ export const balancesByAddress$: (
             // if a client is not available, "reset" state to "initial"
             () => Rx.of(RD.initial),
             // or start request and return state
-            (client) => loadBalances$({ client, address, walletType, assets, walletIndex })
+            (client) => loadBalances$({ client, address, walletType, assets, walletIndex, walletBalanceType })
           )
         )
       }),

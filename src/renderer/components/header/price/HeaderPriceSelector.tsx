@@ -6,9 +6,9 @@ import { MenuProps } from 'antd/lib/menu'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
 
-import { ReactComponent as DownIcon } from '../../../assets/svg/icon-down.svg'
 import { SelectedPricePoolAsset } from '../../../services/midgard/types'
 import { PricePoolAsset, PricePoolAssets } from '../../../views/pools/Pools.types'
+import { DownIcon } from '../../icons'
 import { Menu } from '../../shared/menu/Menu'
 import { toHeaderCurrencyLabel } from '../Header.util'
 import {
@@ -31,7 +31,7 @@ export const HeaderPriceSelector: React.FC<Props> = (props): JSX.Element => {
   const { assets, selectedAsset, isDesktopView, disabled = false, changeHandler = (_) => {} } = props
 
   const changeItem: MenuProps['onClick'] = useCallback(
-    (param) => FP.pipe(param.key, assetFromString, O.fromNullable, O.map(changeHandler)),
+    ({ key }: { key: string }) => FP.pipe(key, assetFromString, O.fromNullable, O.map(changeHandler)),
     [changeHandler]
   )
 
@@ -61,7 +61,7 @@ export const HeaderPriceSelector: React.FC<Props> = (props): JSX.Element => {
 
   return (
     <Styled.Wrapper>
-      <Dropdown disabled={disabled} overlay={menu} trigger={['click']} placement="bottomCenter">
+      <Dropdown disabled={disabled} overlay={menu} trigger={['click']} placement="bottom">
         <HeaderDropdownContentWrapper>
           {!isDesktopView && <HeaderDropdownTitle>Currency</HeaderDropdownTitle>}
           <Row style={{ alignItems: 'center' }}>

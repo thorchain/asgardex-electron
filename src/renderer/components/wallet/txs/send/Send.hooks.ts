@@ -2,13 +2,13 @@ import { useCallback } from 'react'
 
 import { Address } from '@xchainjs/xchain-client'
 import { Asset, assetToString } from '@xchainjs/xchain-util'
-import { useHistory } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 
 import { WalletType } from '../../../../../shared/wallet/types'
 import * as walletRoutes from '../../../../routes/wallet'
 
 export const useChangeAssetHandler = () => {
-  const history = useHistory()
+  const navigate = useNavigate()
 
   const handler = useCallback(
     ({
@@ -28,9 +28,9 @@ export const useChangeAssetHandler = () => {
         walletType,
         walletIndex: walletIndex.toString()
       })
-      history.push(path)
+      navigate(path)
     },
-    [history]
+    [navigate]
   )
   return handler
 }

@@ -142,9 +142,16 @@ const createSharesService = (
   // `TriggerStream` to reload `combineSharesByAddresses`
   const { stream$: reloadCombineSharesByAddresses$, trigger: reloadCombineSharesByAddresses } = triggerStream()
 
+  // `TriggerStream` to reload `allSharesByAddresses`
+  const { stream$: reloadAllSharesByAddresses$, trigger: reloadAllSharesByAddresses } = triggerStream()
+
   // Loads and combines `PoolShare`'s by given addresses
   const loadCombineSharesByAddresses$ = (addresses: Address[]): PoolSharesLD =>
     FP.pipe(addresses, A.map(combineShares$), liveData.sequenceArray, liveData.map(A.flatten))
+
+  // Loads `asym` + `sym` `PoolShare`'s by given addresses
+  const loadAllSharesByAddresses$ = (addresses: Address[]): PoolSharesLD =>
+    FP.pipe(addresses, A.map(shares$), liveData.sequenceArray, liveData.map(A.flatten))
 
   // `TriggerStream` to reload `symSharesByAddresses`
   const { stream$: reloadSymSharesByAddresses$, trigger: reloadSymSharesByAddresses } = triggerStream()
@@ -173,6 +180,17 @@ const createSharesService = (
       RxOp.switchMap(() => loadCombineSharesByAddresses$(addresses))
     )
 
+  /**
+   * Loads 'asym` + `sym` `PoolShare`'s by given `Address`es
+   * Stream will be re-triggered by calling `reloadAllSharesByAddresses`
+   */
+  const allSharesByAddresses$ = (addresses: Address[]): PoolSharesLD =>
+    FP.pipe(
+      reloadAllSharesByAddresses$,
+      RxOp.debounceTime(300),
+      RxOp.switchMap(() => loadAllSharesByAddresses$(addresses))
+    )
+
   return {
     shares$,
     reloadShares: (delayTime = 0) => reloadSharesWithTimer(delayTime),
@@ -183,6 +201,8 @@ const createSharesService = (
     combineSharesByAddresses$,
     reloadCombineSharesByAddresses,
     symSharesByAddresses$,
+    allSharesByAddresses$,
+    reloadAllSharesByAddresses,
     reloadSymSharesByAddresses
   }
 }

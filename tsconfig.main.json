@@ -12,5 +12,5 @@
     "pretty": true
   },
   "include": ["./src/main", "./src/shared"],
-  "exclude": ["src/renderer/"]
+  "exclude": ["src/renderer/", "./src/shared/**/*.test.ts"]
 }

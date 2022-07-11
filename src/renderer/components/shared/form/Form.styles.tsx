@@ -9,6 +9,6 @@ import { FixmeType } from '../../../types/asgardex'
 // We do need a custom "InnerForm" wrapper component created by `forwardRef`
 // to keep a `ref`, which is needed for `onFinish` callback of `A.Form`
 // Since `A.Form` does not support an accessible type for its `ref`, we use `FixmeType`
-export const InnerForm = React.forwardRef<typeof A.Form, FormProps>((props, ref: FixmeType) => (
-  <A.Form ref={ref} {...props} />
-))
+export const InnerForm = React.forwardRef<typeof A.Form, FormProps & { children: React.ReactNode }>(
+  (props, ref: FixmeType) => <A.Form ref={ref} {...props} />
+)

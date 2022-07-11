@@ -2,7 +2,7 @@ import { bn } from '@xchainjs/xchain-util'
 import * as E from 'fp-ts/lib/Either'
 import * as FP from 'fp-ts/lib/function'
 
-import { validateBN, lessThanOrEqualTo, greaterThan, validateAddress } from './validation'
+import { validateBN, lessThanOrEqualTo, greaterThan, validateAddress, greaterThanEqualTo } from './validation'
 
 describe('helpers/form/validation', () => {
   describe('validateBN', () => {
@@ -17,12 +17,18 @@ describe('helpers/form/validation', () => {
     })
   })
   describe('lessThanOrEqualTo', () => {
-    it('is right', () => {
+    it('valid (less)', () => {
+      const value = bn('1')
+      const result = FP.pipe(value, lessThanOrEqualTo(bn(2))('errorMsg'))
+      expect(result).toEqual(E.right(value))
+    })
+
+    it('valid (equal)', () => {
       const value = bn('2')
       const result = FP.pipe(value, lessThanOrEqualTo(bn(2))('errorMsg'))
       expect(result).toEqual(E.right(value))
     })
-    it('is left', () => {
+    it('invalid (greater)', () => {
       const result = FP.pipe(bn(22), lessThanOrEqualTo(bn(2))('errorMsg'))
       expect(result).toEqual(E.left('errorMsg'))
     })
@@ -34,6 +40,22 @@ describe('helpers/form/validation', () => {
       expect(result).toEqual(E.right(value))
     })
     it('is left', () => {
+      const result = FP.pipe(bn('1.99'), greaterThan(bn(2))('errorMsg'))
+      expect(result).toEqual(E.left('errorMsg'))
+    })
+  })
+  describe('greaterThanEqualTo', () => {
+    it('valid (greater)', () => {
+      const value = bn('3')
+      const result = FP.pipe(value, greaterThanEqualTo(bn(2))('errorMsg'))
+      expect(result).toEqual(E.right(value))
+    })
+    it('valid (equal)', () => {
+      const value = bn('3')
+      const result = FP.pipe(value, greaterThanEqualTo(bn(3))('errorMsg'))
+      expect(result).toEqual(E.right(value))
+    })
+    it('invalid (less)', () => {
       const result = FP.pipe(bn('1.99'), greaterThan(bn(2))('errorMsg'))
       expect(result).toEqual(E.left('errorMsg'))
     })

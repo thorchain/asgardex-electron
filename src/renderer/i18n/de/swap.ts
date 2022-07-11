@@ -6,12 +6,13 @@ const swap: SwapMessages = {
   'swap.state.success': 'Erfolgreich getauscht',
   'swap.input': 'Eingabe',
   'swap.output': 'Ausgabe',
-  'swap.recipient': 'Empfänger',
   'swap.info.max.fee': 'Gesamtguthaben minus geschätzter Tauschgebühr',
   'swap.slip.title': 'Slip',
   'swap.slip.tolerance': 'Slippage-Toleranz',
   'swap.slip.tolerance.info':
     'Je höher die Prozentangabe, je höher akzeptierst Du ein Slippage. Mehr Slippage bedeutet zugleich ein größerer Spielraum zur Abdeckung der geschätzten Gebühren, um fehlgeschlagene Swaps zu vermeiden.',
+  'swap.slip.tolerance.ledger-disabled.info':
+    'Slippage-Toleranz ist deaktiviert aufgrund technischer Probleme mit Ledger.',
   'swap.errors.amount.balanceShouldCoverChainFee':
     'Transaktionsgebühr in Höhe von {fee} ist nicht über Dein Guthaben {balance} gedeckt.',
   'swap.errors.amount.outputShouldCoverChainFee':
@@ -20,7 +21,10 @@ const swap: SwapMessages = {
   'swap.note.nowallet': 'Erstelle oder importiere eine Wallet um zu Tauschen',
   'swap.errors.asset.missingSourceAsset': 'Ursprungs-Asset nicht vorhanden',
   'swap.errors.asset.missingTargetAsset': 'Ziel-Asset nicht vorhanden',
-  'swap.ledger.sign': 'Klick "Weiter", um die Swap Transaktion mit Deinem Ledger zu unterzeichnen.'
+  'swap.min.amount.info':
+    'Erforderlicher Mindestwert für ein Tausch um die Gebühren der Ein- und Auszahlungstransaktionen zu decken.',
+  'swap.min.result.info':
+    'Dein Tausch ist mit diesem Mindestwert basierend auf der ausgewählten {tolerance}% Slippage-Toleranz abgesichert. Falls eine Preisänderung vor der Transaktions-Bestätigung mehr als {tolerance}% zu Deinem Nachteil beträgt, wird Deine Tausch-Transaktion zurücküberwiesen.'
 }
 
 export default swap

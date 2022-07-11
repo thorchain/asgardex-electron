@@ -42,6 +42,7 @@ const defaultProps: WitdrawProps = {
     console.log(`Open RUNE explorer - tx hash ${txHash}`)
     return Promise.resolve(true)
   },
+  getRuneExplorerTxUrl: (txHash: TxHash) => O.some(`url/asset-${txHash}`),
   // mock password validation
   // Password: "123"
   validatePassword$: mockValidatePassword$,

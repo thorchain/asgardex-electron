@@ -12,11 +12,13 @@ import {
   LTCChain,
   BTCChain,
   BCHChain,
-  DOGEChain
+  DOGEChain,
+  CosmosChain
 } from '@xchainjs/xchain-util'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
 
+import { PoolsWatchList } from '../../shared/api/io'
 import { ASSETS_TESTNET } from '../../shared/mock/assets'
 import { PoolDetails } from '../services/midgard/types'
 import { toPoolData } from '../services/midgard/utils'
@@ -51,6 +53,8 @@ describe('helpers/poolHelper/', () => {
   const pool3: PoolDetail = { ...mockPoolDetail, status: GetPoolsStatusEnum.Suspended, runeDepth: '0' }
   const pool4: PoolDetail = { ...mockPoolDetail, status: GetPoolsStatusEnum.Staged, runeDepth: '4000' }
 
+  const watchlist: PoolsWatchList = [AssetBNB]
+
   describe('getDeepestPool', () => {
     it('returns deepest pool', () => {
       const pools = [pool1, pool2, pool4, pool3]
@@ -84,6 +88,7 @@ describe('helpers/poolHelper/', () => {
       const result = getPoolTableRowsData({
         poolDetails: pendingPoolDetails,
         pricePoolData,
+        watchlist,
         network: 'testnet'
       })
       expect(result.length).toEqual(2)
@@ -98,6 +103,7 @@ describe('helpers/poolHelper/', () => {
       const result = getPoolTableRowsData({
         poolDetails,
         pricePoolData,
+        watchlist,
         network: 'testnet'
       })
       expect(result.length).toEqual(2)
@@ -143,7 +149,7 @@ describe('helpers/poolHelper/', () => {
         asset: AssetBNB
       }
       const result = FP.pipe(
-        getPoolPriceValue(balance, poolDetails, usdPool),
+        getPoolPriceValue({ balance, poolDetails, pricePoolData: usdPool, network: 'testnet' }),
         O.fold(
           () => 'failure',
           (price) => price.amount().toString()
@@ -158,7 +164,7 @@ describe('helpers/poolHelper/', () => {
         asset: AssetRuneNative
       }
       const result = FP.pipe(
-        getPoolPriceValue(balance, [], usdPool),
+        getPoolPriceValue({ balance, poolDetails: [], pricePoolData: usdPool, network: 'testnet' }),
         O.fold(
           () => 'failure',
           (price) => price.amount().toString()
@@ -172,7 +178,7 @@ describe('helpers/poolHelper/', () => {
         amount: baseAmount('1'),
         asset: AssetBNB
       }
-      const result = getPoolPriceValue(balance, [], usdPool)
+      const result = getPoolPriceValue({ balance, poolDetails: [], pricePoolData: usdPool, network: 'testnet' })
       expect(result).toBeNone()
     })
   })
@@ -316,6 +322,7 @@ describe('helpers/poolHelper/', () => {
       })
       expect(result).toBeTruthy()
     })
+
     it('true for BNB if BNB trading is halted', () => {
       const result = disableTradingActions({
         chain: BNBChain,
@@ -323,6 +330,18 @@ describe('helpers/poolHelper/', () => {
         mimirHalt: {
           ...DEFAULT_MIMIR_HALT,
           haltBnbTrading: true
+        }
+      })
+      expect(result).toBeTruthy()
+    })
+
+    it('true for Cosmos if Cosmos trading is halted', () => {
+      const result = disableTradingActions({
+        chain: CosmosChain,
+        haltedChains,
+        mimirHalt: {
+          ...DEFAULT_MIMIR_HALT,
+          haltCosmosTrading: true
         }
       })
       expect(result).toBeTruthy()
@@ -336,7 +355,8 @@ describe('helpers/poolHelper/', () => {
           haltBtcTrading: true,
           haltEthTrading: true,
           haltBchTrading: true,
-          haltBnbTrading: true
+          haltBnbTrading: true,
+          haltCosmosTrading: true
         }
       })
       expect(result).toBeFalsy()
@@ -483,6 +503,22 @@ describe('helpers/poolHelper/', () => {
     it('true if DOGE chain is not in halted list, but LP paused', () => {
       const result = disablePoolActions({
         chain: DOGEChain,
+        haltedChains: [],
+        mimirHalt: { ...DEFAULT_MIMIR_HALT, pauseLp: true }
+      })
+      expect(result).toBeTruthy()
+    })
+    it('true if Cosmos chain is not in halted list, but paused', () => {
+      const result = disablePoolActions({
+        chain: CosmosChain,
+        haltedChains: [],
+        mimirHalt: { ...DEFAULT_MIMIR_HALT, pauseLpCosmos: true }
+      })
+      expect(result).toBeTruthy()
+    })
+    it('true if Cosmos chain is not in halted list, but LP paused', () => {
+      const result = disablePoolActions({
+        chain: CosmosChain,
         haltedChains: [],
         mimirHalt: { ...DEFAULT_MIMIR_HALT, pauseLp: true }
       })

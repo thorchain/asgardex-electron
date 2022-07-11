@@ -8,7 +8,14 @@ import { toClientNetwork } from '../../../shared/utils/client'
 import { observableState } from '../../helpers/stateHelper'
 import { SlipTolerance } from '../../types/asgardex'
 import { DEFAULT_NETWORK, DEFAULT_SLIP_TOLERANCE } from '../const'
-import { Network$, SlipTolerance$, OnlineStatus } from './types'
+import {
+  Network$,
+  SlipTolerance$,
+  OnlineStatus,
+  CollapsableSettings,
+  SettingType,
+  ToggleCollapsableSetting
+} from './types'
 
 // Check online status
 // https://www.electronjs.org/docs/tutorial/online-offline-events
@@ -30,14 +37,28 @@ const network$: Network$ = getNetwork$.pipe(distinctUntilChanged())
 const clientNetwork$: Rx.Observable<Client.Network> = network$.pipe(RxOp.map(toClientNetwork))
 
 /**
- * State of `Slip`
+ * State of `Slip` tolerance
+ */
+const { get$: getSlipTolerance$, set: changeSlipTolerance } = observableState<SlipTolerance>(DEFAULT_SLIP_TOLERANCE)
+const slipTolerance$: SlipTolerance$ = getSlipTolerance$.pipe(distinctUntilChanged())
+
+/**
+ * State of `collapsed` settings
  */
 const {
-  get$: getSlipTolerance$,
-  set: changeSlipTolerance,
-  get: getCurrentSlipToleranceState
-} = observableState<SlipTolerance>(DEFAULT_SLIP_TOLERANCE)
-const slipTolerance$: SlipTolerance$ = getSlipTolerance$.pipe(distinctUntilChanged())
+  get$: collapsedSettings$,
+  set: _setCollapsedSettings,
+  get: getCollapsedSettings
+} = observableState<CollapsableSettings>({
+  wallet: false, // not collapsed === open by default
+  app: false // not collapsed === open by default
+})
+
+const toggleCollapsedSetting: ToggleCollapsableSetting = (setting: SettingType) => {
+  const currentSettings = getCollapsedSettings()
+  const currentValue = currentSettings[setting]
+  _setCollapsedSettings({ ...currentSettings, [setting]: !currentValue })
+}
 
 export {
   onlineStatus$,
@@ -47,5 +68,6 @@ export {
   clientNetwork$,
   slipTolerance$,
   changeSlipTolerance,
-  getCurrentSlipToleranceState
+  collapsedSettings$,
+  toggleCollapsedSetting
 }

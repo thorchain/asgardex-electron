@@ -1,5 +1,7 @@
 import { Address } from '@xchainjs/xchain-client'
+import { AssetAtom } from '@xchainjs/xchain-cosmos'
 import { ETHAddress, getTokenAddress } from '@xchainjs/xchain-ethereum'
+import { AssetLUNA } from '@xchainjs/xchain-terra'
 import {
   Asset,
   assetAmount,
@@ -24,11 +26,13 @@ import BigNumber from 'bignumber.js'
 import * as A from 'fp-ts/lib/Array'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
+import * as P from 'fp-ts/lib/Predicate'
+import * as S from 'fp-ts/lib/string'
 
 import { Network } from '../../shared/api/types'
 import {
   AssetTGTERC20,
-  AssetTGTERC20Testnet,
+  AssetUST,
   AssetXRune,
   AssetXRuneTestnet,
   BinanceBlackList,
@@ -38,7 +42,7 @@ import {
 import { ERC20_WHITELIST } from '../types/generated/thorchain/erc20whitelist'
 import { PricePoolAsset } from '../views/pools/Pools.types'
 import { getEthChecksumAddress } from './addressHelper'
-import { getChainAsset, isBchChain, isBnbChain, isBtcChain, isEthChain, isLtcChain } from './chainHelper'
+import { getChainAsset, isBchChain, isBnbChain, isBtcChain, isDogeChain, isEthChain, isLtcChain } from './chainHelper'
 import { eqAsset, eqString } from './fp/eq'
 import { sequenceTOption } from './fpHelpers'
 
@@ -75,6 +79,17 @@ export const isNonNativeRuneAsset = (asset: Asset, network: Network): boolean =>
   isRuneBnbAsset(asset, network) || isRuneEthAsset(asset, network)
 
 /**
+ * Check whether an asset is an RuneNative asset
+ */
+export const isRuneNativeAsset = (asset: Asset): boolean => eqAsset.equals(asset, AssetRuneNative)
+
+/**
+ * Check whether an asset is a Rune (native or non-native) asset
+ */
+export const isRuneAsset = (asset: Asset, network: Network): boolean =>
+  isRuneNativeAsset(asset) || isNonNativeRuneAsset(asset, network)
+
+/**
  * Check whether an asset is a LTC asset
  */
 export const isLtcAsset = (asset: Asset): boolean => eqAsset.equals(asset, AssetLTC)
@@ -90,6 +105,11 @@ export const isBchAsset = (asset: Asset): boolean => eqAsset.equals(asset, Asset
 export const isBnbAsset = (asset: Asset): boolean => eqAsset.equals(asset, AssetBNB)
 
 /**
+ * Check whether an asset is a BNB synthetic asset
+ */
+export const isBnbAssetSynth = (asset: Asset): boolean => eqAsset.equals(asset, { ...AssetBNB, synth: true })
+
+/**
  * Check whether an asset is a BTC asset
  */
 export const isBtcAsset = (asset: Asset): boolean => eqAsset.equals(asset, AssetBTC)
@@ -103,6 +123,21 @@ export const isEthAsset = (asset: Asset): boolean => eqAsset.equals(asset, Asset
  * Check whether an asset is a DOGE asset
  */
 export const isDogeAsset = (asset: Asset): boolean => eqAsset.equals(asset, AssetDOGE)
+
+/**
+ * Check whether an asset is a LUNA asset
+ */
+export const isLunaAsset = (asset: Asset): boolean => eqAsset.equals(asset, AssetLUNA)
+
+/**
+ * Check whether an asset is a UST (Terra) asset
+ */
+export const isUstAsset = (asset: Asset): boolean => eqAsset.equals(asset, AssetUST)
+
+/**
+ * Check whether an asset is a ATOM asset
+ */
+export const isAtomAsset = (asset: Asset): boolean => eqAsset.equals(asset, AssetAtom)
 
 /**
  * Check whether an ERC20 asset is white listed or not
@@ -181,8 +216,7 @@ export const isXRuneAsset = (asset: Asset): boolean =>
 /**
  * Check whether an asset is TGT asset
  */
-export const isTgtERC20Asset = (asset: Asset): boolean =>
-  eqAsset.equals(asset, AssetTGTERC20) || eqAsset.equals(asset, AssetTGTERC20Testnet)
+export const isTgtERC20Asset = (asset: Asset): boolean => eqAsset.equals(asset, AssetTGTERC20)
 
 /**
  * Get ethereum token address (as check sum address) from a given asset
@@ -204,11 +238,6 @@ export const getEthAssetAddress = (asset: Asset): O.Option<Address> =>
  */
 export const isEthTokenAsset: (asset: Asset) => boolean = FP.flow(getEthTokenAddress, O.isSome)
 
-/**
- * Check whether an asset is an RuneNative asset
- */
-export const isRuneNativeAsset = (asset: Asset): boolean => eqAsset.equals(asset, AssetRuneNative)
-
 // Type guard for `PricePoolAsset`
 export const isPricePoolAsset = (asset: Asset): asset is PricePoolAsset =>
   // all of PoolAsset except BNB -> see `PricePoolAsset`
@@ -216,9 +245,10 @@ export const isPricePoolAsset = (asset: Asset): asset is PricePoolAsset =>
 
 export const isChainAsset = (asset: Asset): boolean => eqAsset.equals(asset, getChainAsset(asset.chain))
 
-export const isUSDAsset = (asset: Asset): boolean => asset.ticker.includes('USD')
+export const isUSDAsset = ({ ticker }: Asset): boolean => ticker.includes('USD') || ticker.includes('UST')
 
-export const isUtxoAssetChain = ({ chain }: Asset) => isBtcChain(chain) || isBchChain(chain) || isLtcChain(chain)
+export const isUtxoAssetChain = ({ chain }: Asset) =>
+  isBtcChain(chain) || isBchChain(chain) || isLtcChain(chain) || isDogeChain(chain)
 
 /**
  * Update ETH token (ERC20) addresses to be based on checksum addresses
@@ -230,7 +260,7 @@ export const updateEthChecksumAddress = (asset: Asset): Asset =>
     // ETH chain only
     O.fromPredicate(({ chain }) => isEthChain(chain)),
     // ETH asset only
-    O.chain(O.fromPredicate(FP.not(isEthAsset))),
+    O.chain(O.fromPredicate(P.not(isEthAsset))),
     // Get token address as checksum address
     O.chain(FP.flow(getTokenAddress, O.fromNullable)),
     // Update asset for using a checksum address
@@ -337,3 +367,9 @@ export const disableRuneUpgrade = ({
   }
   return false
 }
+
+/**
+ * Creates an asset from `nullable` string
+ */
+export const getAssetFromNullableString = (assetString?: string): O.Option<Asset> =>
+  FP.pipe(O.fromNullable(assetString), O.map(S.toUpperCase), O.map(assetFromString), O.chain(O.fromNullable))

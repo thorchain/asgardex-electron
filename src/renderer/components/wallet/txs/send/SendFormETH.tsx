@@ -11,7 +11,9 @@ import {
   BaseAmount,
   baseAmount,
   assetToBase,
-  assetAmount
+  assetAmount,
+  ETHChain,
+  chainToString
 } from '@xchainjs/xchain-util'
 import { Row, Form } from 'antd'
 import { RadioChangeEvent } from 'antd/lib/radio'
@@ -21,16 +23,19 @@ import * as O from 'fp-ts/lib/Option'
 import { useIntl } from 'react-intl'
 
 import { Network } from '../../../../../shared/api/types'
+import { isKeystoreWallet, isLedgerWallet } from '../../../../../shared/utils/guard'
 import { WalletType } from '../../../../../shared/wallet/types'
 import { ZERO_BASE_AMOUNT, ZERO_BN } from '../../../../const'
 import { isEthAsset } from '../../../../helpers/assetHelper'
 import { sequenceTOption } from '../../../../helpers/fpHelpers'
 import { getEthAmountFromBalances } from '../../../../helpers/walletHelper'
-import { SendTxParams } from '../../../../services/chain/types'
-import { FeesRD, WalletBalances } from '../../../../services/clients'
+import { useSubscriptionState } from '../../../../hooks/useSubscriptionState'
+import { INITIAL_SEND_STATE } from '../../../../services/chain/const'
+import { SendTxState, SendTxStateHandler } from '../../../../services/chain/types'
+import { FeesRD, GetExplorerTxUrl, OpenExplorerTxUrl, WalletBalances } from '../../../../services/clients'
 import { ValidatePasswordHandler } from '../../../../services/wallet/types'
 import { WalletBalance } from '../../../../services/wallet/types'
-import { WalletPasswordConfirmationModal } from '../../../modal/confirmation'
+import { LedgerConfirmationModal, WalletPasswordConfirmationModal } from '../../../modal/confirmation'
 import * as StyledR from '../../../shared/form/Radio.styles'
 import { MaxBalanceButton } from '../../../uielements/button/MaxBalanceButton'
 import { UIFeesRD } from '../../../uielements/fees'
@@ -40,7 +45,7 @@ import * as H from '../TxForm.helpers'
 import * as Styled from '../TxForm.styles'
 import { validateTxAmountInput } from '../TxForm.util'
 import { DEFAULT_FEE_OPTION } from './Send.const'
-import { useChangeAssetHandler } from './Send.hooks'
+import * as Shared from './Send.shared'
 
 export type FormValues = {
   recipient: Address
@@ -51,11 +56,12 @@ export type FormValues = {
 export type Props = {
   walletType: WalletType
   walletIndex: number
+  walletAddress: Address
   balances: WalletBalances
   balance: WalletBalance
-  onSubmit: (p: SendTxParams) => void
-  isLoading: boolean
-  sendTxStatusMsg: string
+  transfer$: SendTxStateHandler
+  openExplorerTxUrl: OpenExplorerTxUrl
+  getExplorerTxUrl: GetExplorerTxUrl
   fees: FeesRD
   reloadFeesHandler: (params: TxParams) => void
   validatePassword$: ValidatePasswordHandler
@@ -66,11 +72,12 @@ export const SendFormETH: React.FC<Props> = (props): JSX.Element => {
   const {
     walletType,
     walletIndex,
+    walletAddress,
     balances,
     balance,
-    onSubmit,
-    isLoading,
-    sendTxStatusMsg,
+    transfer$,
+    openExplorerTxUrl,
+    getExplorerTxUrl,
     fees: feesRD,
     reloadFeesHandler,
     validatePassword$,
@@ -79,12 +86,20 @@ export const SendFormETH: React.FC<Props> = (props): JSX.Element => {
 
   const intl = useIntl()
 
-  const changeAssetHandler = useChangeAssetHandler()
+  const { asset } = balance
 
   const [selectedFeeOption, setSelectedFeeOption] = useState<FeeOption>(DEFAULT_FEE_OPTION)
 
   const [amountToSend, setAmountToSend] = useState<O.Option<BaseAmount>>(O.none)
   const [sendAddress, setSendAddress] = useState<O.Option<Address>>(O.none)
+
+  const {
+    state: sendTxState,
+    reset: resetSendTxState,
+    subscribe: subscribeSendTxState
+  } = useSubscriptionState<SendTxState>(INITIAL_SEND_STATE)
+
+  const isLoading = useMemo(() => RD.isPending(sendTxState.status), [sendTxState.status])
 
   const [form] = Form.useForm<FormValues>()
 
@@ -114,12 +129,12 @@ export const SendFormETH: React.FC<Props> = (props): JSX.Element => {
 
   const oEthAmount: O.Option<BaseAmount> = useMemo(() => {
     // return balance of current asset (if ETH)
-    if (isEthAsset(balance.asset)) {
+    if (isEthAsset(asset)) {
       return O.some(balance.amount)
     }
     // or check list of other assets to get eth balance
     return FP.pipe(balances, getEthAmountFromBalances, O.map(assetToBase))
-  }, [balance, balances])
+  }, [asset, balance.amount, balances])
 
   const isFeeError = useMemo(() => {
     return FP.pipe(
@@ -127,7 +142,7 @@ export const SendFormETH: React.FC<Props> = (props): JSX.Element => {
       O.fold(
         // Missing (or loading) fees does not mean we can't sent something. No error then.
         () => false,
-        ([fee, ethAmount]) => ethAmount.amount().isLessThan(baseToAsset(fee).amount())
+        ([fee, ethAmount]) => ethAmount.lt(fee)
       )
     )
   }, [oEthAmount, selectedFee])
@@ -217,8 +232,8 @@ export const SendFormETH: React.FC<Props> = (props): JSX.Element => {
         }
       )
     )
-    return isEthAsset(balance.asset) ? baseAmount(maxEthAmount, balance.amount.decimal) : balance.amount
-  }, [selectedFee, oEthAmount, balance])
+    return isEthAsset(asset) ? baseAmount(maxEthAmount, balance.amount.decimal) : balance.amount
+  }, [selectedFee, oEthAmount, asset, balance.amount])
 
   useEffect(() => {
     FP.pipe(
@@ -244,13 +259,13 @@ export const SendFormETH: React.FC<Props> = (props): JSX.Element => {
       const errors = {
         msg1: intl.formatMessage({ id: 'wallet.errors.amount.shouldBeNumber' }),
         msg2: intl.formatMessage({ id: 'wallet.errors.amount.shouldBeGreaterThan' }, { amount: '0' }),
-        msg3: isEthAsset(balance.asset)
+        msg3: isEthAsset(asset)
           ? intl.formatMessage({ id: 'wallet.errors.amount.shouldBeLessThanBalanceAndFee' })
           : intl.formatMessage({ id: 'wallet.errors.amount.shouldBeLessThanBalance' })
       }
       return validateTxAmountInput({ input: value, maxAmount: baseToAsset(maxAmount), errors })
     },
-    [balance, intl, maxAmount]
+    [asset, intl, maxAmount]
   )
 
   const onChangeInput = useCallback(
@@ -282,50 +297,140 @@ export const SendFormETH: React.FC<Props> = (props): JSX.Element => {
     FP.pipe(
       sequenceTOption(amountToSend, sendAddress),
       O.map(([amount, recipient]) => {
-        reloadFeesHandler({ asset: balance.asset, amount, recipient, memo: form.getFieldValue('memo') })
+        reloadFeesHandler({ asset, amount, recipient, memo: form.getFieldValue('memo') })
         return true
       })
     )
 
     return false
-  }, [amountToSend, sendAddress, reloadFeesHandler, balance.asset, form])
+  }, [amountToSend, sendAddress, reloadFeesHandler, asset, form])
+
+  // Send tx start time
+  const [sendTxStartTime, setSendTxStartTime] = useState<number>(0)
 
   // State for visibility of Modal to confirm tx
-  const [showPwModal, setShowPwModal] = useState(false)
+  const [showConfirmationModal, setShowConfirmationModal] = useState(false)
 
-  const sendHandler = useCallback(() => {
-    // close PW modal
-    setShowPwModal(false)
-
-    FP.pipe(
-      sequenceTOption(amountToSend, sendAddress),
-      O.map(([amount, recipient]) => {
-        onSubmit({
-          walletType,
-          walletIndex,
-          recipient,
-          asset: balance.asset,
-          amount,
-          feeOption: selectedFeeOption,
-          memo: form.getFieldValue('memo')
-        })
-        return true
-      })
-    )
-  }, [amountToSend, sendAddress, onSubmit, walletType, walletIndex, balance.asset, selectedFeeOption, form])
-
-  const renderPwModal = useMemo(
+  const submitTx = useCallback(
     () =>
-      showPwModal ? (
+      FP.pipe(
+        sequenceTOption(amountToSend, sendAddress),
+        O.map(([amount, recipient]) => {
+          setSendTxStartTime(Date.now())
+          subscribeSendTxState(
+            transfer$({
+              walletType,
+              walletIndex,
+              sender: walletAddress,
+              recipient,
+              asset,
+              amount,
+              feeOption: selectedFeeOption,
+              memo: form.getFieldValue('memo')
+            })
+          )
+          return true
+        })
+      ),
+    [
+      amountToSend,
+      sendAddress,
+      subscribeSendTxState,
+      transfer$,
+      walletType,
+      walletIndex,
+      walletAddress,
+      asset,
+      selectedFeeOption,
+      form
+    ]
+  )
+
+  const renderConfirmationModal = useMemo(() => {
+    const onSuccessHandler = () => {
+      setShowConfirmationModal(false)
+      submitTx()
+    }
+    const onCloseHandler = () => {
+      setShowConfirmationModal(false)
+    }
+    if (isKeystoreWallet(walletType)) {
+      return (
         <WalletPasswordConfirmationModal
-          onSuccess={sendHandler}
-          onClose={() => setShowPwModal(false)}
+          onSuccess={onSuccessHandler}
+          onClose={onCloseHandler}
           validatePassword$={validatePassword$}
         />
-      ) : (
-        <></>
+      )
+    }
+    if (isLedgerWallet(walletType)) {
+      const ethChainString = chainToString(ETHChain)
+      const txtNeedsConnected = intl.formatMessage(
+        {
+          id: 'ledger.needsconnected'
+        },
+        { chain: ethChainString }
+      )
+
+      // extended description for ERC20 tokens only
+      const description1 = !isEthAsset(asset)
+        ? `${txtNeedsConnected} ${intl.formatMessage(
+            {
+              id: 'ledger.blindsign'
+            },
+            { chain: ethChainString }
+          )}`
+        : txtNeedsConnected
+
+      const description2 = intl.formatMessage({ id: 'ledger.sign' })
+
+      return (
+        <LedgerConfirmationModal
+          network={network}
+          onSuccess={onSuccessHandler}
+          onClose={onCloseHandler}
+          visible={showConfirmationModal}
+          chain={ETHChain}
+          description1={description1}
+          description2={description2}
+          addresses={O.none}
+        />
+      )
+    }
+    return null
+  }, [walletType, submitTx, validatePassword$, intl, asset, network, showConfirmationModal])
+
+  const renderTxModal = useMemo(
+    () =>
+      FP.pipe(
+        amountToSend,
+        O.fold(
+          () => <></>,
+          (amount) =>
+            Shared.renderTxModal({
+              asset,
+              amountToSend: amount,
+              network,
+              sendTxState,
+              resetSendTxState,
+              sendTxStartTime,
+              openExplorerTxUrl,
+              getExplorerTxUrl,
+              intl
+            })
+        )
       ),
-    [sendHandler, showPwModal, validatePassword$]
+    [
+      asset,
+      amountToSend,
+      network,
+      sendTxState,
+      resetSendTxState,
+      sendTxStartTime,
+      openExplorerTxUrl,
+      getExplorerTxUrl,
+      intl
+    ]
   )
 
   const uiFeesRD: UIFeesRD = useMemo(
@@ -355,12 +460,7 @@ export const SendFormETH: React.FC<Props> = (props): JSX.Element => {
     <>
       <Row>
         <Styled.Col span={24}>
-          <AccountSelector
-            onChange={changeAssetHandler}
-            selectedWallet={balance}
-            walletBalances={balances}
-            network={network}
-          />
+          <AccountSelector selectedWallet={balance} network={network} />
           <Styled.Form
             form={form}
             initialValues={{
@@ -369,7 +469,7 @@ export const SendFormETH: React.FC<Props> = (props): JSX.Element => {
               // Default value for RadioGroup of feeOptions
               fee: DEFAULT_FEE_OPTION
             }}
-            onFinish={() => setShowPwModal(true)}
+            onFinish={() => setShowConfirmationModal(true)}
             labelCol={{ span: 24 }}>
             <Styled.SubForm>
               <Styled.CustomLabel size="big">
@@ -398,7 +498,7 @@ export const SendFormETH: React.FC<Props> = (props): JSX.Element => {
                 />
               </Styled.FormItem>
               <MaxBalanceButton
-                balance={{ amount: maxAmount, asset: balance.asset }}
+                balance={{ amount: maxAmount, asset }}
                 onClick={addMaxAmountHandler}
                 disabled={isLoading}
               />
@@ -411,7 +511,6 @@ export const SendFormETH: React.FC<Props> = (props): JSX.Element => {
               <Form.Item name="fee">{renderFeeOptions}</Form.Item>
             </Styled.SubForm>
             <Styled.SubmitContainer>
-              <Styled.SubmitStatus>{sendTxStatusMsg}</Styled.SubmitStatus>
               <Styled.Button loading={isLoading} disabled={!feesAvailable || isLoading} htmlType="submit">
                 {intl.formatMessage({ id: 'wallet.action.send' })}
               </Styled.Button>
@@ -419,7 +518,8 @@ export const SendFormETH: React.FC<Props> = (props): JSX.Element => {
           </Styled.Form>
         </Styled.Col>
       </Row>
-      {renderPwModal}
+      {showConfirmationModal && renderConfirmationModal}
+      {renderTxModal}
     </>
   )
 }

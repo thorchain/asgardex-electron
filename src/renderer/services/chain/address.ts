@@ -8,7 +8,8 @@ import {
   THORChain,
   BCHChain,
   LTCChain,
-  DOGEChain
+  DOGEChain,
+  TerraChain
 } from '@xchainjs/xchain-util'
 import * as O from 'fp-ts/lib/Option'
 import * as Rx from 'rxjs'
@@ -18,9 +19,11 @@ import * as BNB from '../binance'
 import * as BTC from '../bitcoin'
 import * as BCH from '../bitcoincash'
 import { address$, WalletAddress$ } from '../clients'
+import * as COSMOS from '../cosmos'
 import * as DOGE from '../doge'
 import * as ETH from '../ethereum'
 import * as LTC from '../litecoin'
+import * as TERRA from '../terra'
 import * as THOR from '../thorchain'
 import { client$ } from './client'
 import { INITIAL_SYM_DEPOSIT_ADDRESSES } from './const'
@@ -43,14 +46,15 @@ const addressByChain$ = (chain: Chain): WalletAddress$ => {
       // not supported yet
       return Rx.of(O.none)
     case CosmosChain:
-      // not supported yet
-      return Rx.of(O.none)
+      return COSMOS.address$
     case BCHChain:
       return BCH.address$
     case LTCChain:
       return LTC.address$
     case DOGEChain:
       return DOGE.address$
+    case TerraChain:
+      return TERRA.address$
   }
 }
 

@@ -1,22 +1,18 @@
 import React from 'react'
 
-import BigNumber from 'bignumber.js'
-
 import { Network } from '../../../../../shared/api/types'
 import * as Styled from './Common.styles'
 import * as C from './Common.types'
-import * as SwapStyled from './SwapAssets.styles'
 
 export type Props = {
   source: C.AssetData
   target: C.AssetData
-  slip?: BigNumber
   stepDescription: string
   network: Network
 }
 
 export const SwapAssets: React.FC<Props> = (props): JSX.Element => {
-  const { source, target, stepDescription, network, slip } = props
+  const { source, target, stepDescription, network } = props
   return (
     <>
       <Styled.StepLabel>{stepDescription}</Styled.StepLabel>
@@ -27,7 +23,6 @@ export const SwapAssets: React.FC<Props> = (props): JSX.Element => {
           <Styled.AssetData asset={target.asset} amount={target.amount} network={network} />
         </Styled.AssetsContainer>
       </Styled.DataWrapper>
-      {slip && <SwapStyled.Trend amount={slip} />}
     </>
   )
 }
