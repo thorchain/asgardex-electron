@@ -1,3 +1,9 @@
+# 1.17.x (2022-xx-xx)
+
+## Update
+
+- Update RU translation by @TreefeedXavier [#2318](https://github.com/thorchain/asgardex-electron/pull/2318)
+
 # 1.17.1 (2022-07-11)
 
 ## Add
