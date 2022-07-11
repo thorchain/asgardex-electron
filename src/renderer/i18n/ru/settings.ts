@@ -2,7 +2,7 @@ import { SettingMessages } from '../types'
 
 const settings: SettingMessages = {
   'setting.app.title': 'Глобальные настройки',
-  'setting.wallet.title': 'Wallet settings - RU',
+  'setting.wallet.title': 'Настройки кошелька',
   'setting.wallet.management': 'Управление Кошельком',
   'setting.client': 'Клиент',
   'setting.account.management': 'Управление Аккаунтом',
@@ -16,8 +16,8 @@ const settings: SettingMessages = {
   'setting.add.device': 'Добавить устройство',
   'setting.wallet.index': 'Индекс',
   'setting.wallet.index.info': 'Введите индекс Ledger адреса, который вы хотите использовать',
-  'setting.wallet.hdpath.legacy.info': 'Legacy derivation path {path} - RU',
-  'setting.wallet.hdpath.ledgerlive.info': 'Ledger Live derivation path {path} - RU'
+  'setting.wallet.hdpath.legacy.info': 'Устаревший путь деривации {path}',
+  'setting.wallet.hdpath.ledgerlive.info': 'Путь деривации Ledger Live {path}'
 }
 
 export default settings

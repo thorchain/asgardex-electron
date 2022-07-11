@@ -5,7 +5,7 @@ const ledger: LedgerMessages = {
   'ledger.title.sign': 'Подписать с помощью Ledger',
   'ledger.sign': 'Нажмите "далее" что бы подписать транзакцию на вашем устройстве.',
   'ledger.blindsign':
-    '"smart contract data" or "blind signing" needs to be enabled for {chain} application on your Ledger device. - RU',
+    '"Данные смарт-контракта" или "слепое подписание" должны быть включены для приложения {chain} на вашем устройстве Ledger.',
   'ledger.needsconnected': 'Убедитесь, что ваш Ledger подключён и приложение {chain} запущено.',
   'ledger.add.device': 'Добавить Ledger',
   'ledger.error.nodevice': 'Нет подключенных устройств',
@@ -28,9 +28,9 @@ const ledger: LedgerMessages = {
   'ledger.notsupported': 'Ledger не поддерживает {chain}.',
   'ledger.notaddedorzerobalances': 'Ledger {chain} не была подключена или имеет нулевой баланс.',
   'ledger.deposit.oneside': 'Пока что Ledger поддерживается только для одностороннего добавления активов.',
-  'ledger.legacyformat.note': 'Ledger displays all output addresses in "legacy", but not in "CashAddr" format. - RU',
-  'ledger.legacyformat.show': 'Show addresses - RU',
-  'ledger.legacyformat.hide': 'Hide addresses - RU'
+  'ledger.legacyformat.note': 'Леджер отображает все выходные адреса в формате "legacy", но не в формате "CashAddr".',
+  'ledger.legacyformat.show': 'Показать адреса',
+  'ledger.legacyformat.hide': 'Скрыть адреса'
 }
 
 export default ledger

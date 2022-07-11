@@ -2,10 +2,10 @@ import { PoolSharesMessage } from '../types'
 
 const poolShares: PoolSharesMessage = {
   'poolshares.ownership': 'Доля',
-  'poolshares.both.info': 'Both side shares ({asset} and {rune}) - RU',
-  'poolshares.single.info': 'Single side share ({asset} or {rune}) - RU',
+  'poolshares.both.info': 'Двух-сторонние вложения ({asset} и {rune})',
+  'poolshares.single.info': 'Одно-сторонние вложения ({asset} или {rune})',
   'poolshares.single.notsupported':
-    'Single side pool shares ({asset} or {rune}) are not supported in ASGARDEX currently - RU'
+    'Одно-сторонние вложения ({asset} или {rune}) не поддерживаются в ASGARDEX пока что'
 }
 
 export default poolShares

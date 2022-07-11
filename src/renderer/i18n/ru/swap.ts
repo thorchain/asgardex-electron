@@ -12,7 +12,7 @@ const swap: SwapMessages = {
   'swap.slip.tolerance.info':
     'Чем выше процент, тем большее проскальзывание вы допускаете. Большее проскальзывание включает также более широкий диапазон расчёта комиссий во избежание прерывания обмена.',
   'swap.slip.tolerance.ledger-disabled.info':
-    'Slippage tolerance has been disabled due technical issues with Ledger. - RU',
+    'Чувствительность к проскальзыванию была отключена из-за технических проблем с Ledger.',
   'swap.errors.amount.balanceShouldCoverChainFee':
     'Комиссия транзакции {fee} дожна покрываться вашим балансом (сейчас {balance}).',
   'swap.errors.amount.outputShouldCoverChainFee':
@@ -21,9 +21,9 @@ const swap: SwapMessages = {
   'swap.note.nowallet': 'Для обмена создайте или импортируйте кошелек',
   'swap.errors.asset.missingSourceAsset': 'Исходный актив не поддерживается',
   'swap.errors.asset.missingTargetAsset': 'Целевой актив не поддерживается',
-  'swap.min.amount.info': 'Minimum value to swap to cover all fees for inbound and outbound transactions. - RU',
+  'swap.min.amount.info': 'Минимальное значение для обмена, чтобы покрыть все комиссии за входящие и исходящие транзакции.',
   'swap.min.result.info':
-    'Your swap is protected by this minimum value based on selected {tolerance}% slippage tolerance. In case the price changes unfavourable more than {tolerance}% your swap transaction will be reverted before comfirmation. - RU'
+    'Ваш обмен защищен этим минимальным значением, основанным на выбранном {tolerance}% допуске на проскальзывание. В случае неблагоприятного изменения цены более чем на {tolerance}% ваша сделка будет отменена до подтверждения.'
 }
 
 export default swap

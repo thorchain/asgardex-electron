@@ -3,7 +3,7 @@ import { PoolsMessages } from '../types'
 const pools: PoolsMessages = {
   'pools.depth': 'Глубина',
   'pools.24hvol': 'объёмы за 24ч',
-  'pools.apy': 'APY - RU',
+  'pools.apy': 'годовых',
   'pools.avgsize': 'ср. размер',
   'pools.avgfee': 'ср. комиссия',
   'pools.blocksleft': 'блоков осталось',
@@ -11,10 +11,10 @@ const pools: PoolsMessages = {
   'pools.pending': 'В ожидании',
   'pools.available': 'Доступны',
   'pools.pooled': 'заполнено',
-  'pools.limit.info': 'Protocol limit reached! {pooled} pooled in pools, {bonded} bonded in nodes - RU',
-  'pools.incentivependulum.info': 'Incentive Pendulum: {percentage}%  - RU',
-  'pools.incentivependulum.tooltip': '{pooled} pooled in pools, {bonded} bonded in nodes - RU',
-  'pools.incentivependulum.error': 'Error while loading data of Incentive Pendulum - RU'
+  'pools.limit.info': 'Лимит протокола достигнут! {pooled} внесено в пулы, {bonded} заложено в нодах',
+  'pools.incentivependulum.info': 'Маятник поощрения: {percentage}%',
+  'pools.incentivependulum.tooltip': '{pooled} внесено в пулы, {bonded} заложено в нодах',
+  'pools.incentivependulum.error': 'Ошибка при загрузке данных маятника поощрения'
 }
 
 export default pools
