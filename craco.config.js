@@ -23,6 +23,28 @@ module.exports = {
         }
         return minimizer
       })
+
+      webpackConfig.resolve.fallback = {
+        ...webpackConfig.resolve.fallback,
+        stream: require.resolve('stream-browserify'),
+        crypto: require.resolve('crypto-browserify'),
+        os: require.resolve('os-browserify/browser'),
+        path: require.resolve('path-browserify'),
+        fs: require.resolve('browserify-fs')
+      }
+
+      webpackConfig.ignoreWarnings = [/Failed to parse source map/]
+
+      webpackConfig.module.rules = [
+        ...webpackConfig.module.rules,
+
+        {
+          test: /\.svg$/,
+          use: ['@svgr/webpack'],
+          issuer: /\.(js|ts)x?$/
+        }
+      ]
+
       return webpackConfig
     },
     plugins: [

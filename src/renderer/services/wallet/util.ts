@@ -29,7 +29,7 @@ export const hasImportedKeystore = (state: KeystoreState): boolean => O.isSome(s
 
 export const isLocked = (state: KeystoreState): boolean => !hasImportedKeystore(state) || !hasKeystoreContent(state)
 
-export const filterNullableBalances = (balances: WalletBalances) => {
+export const filterNullableBalances = (balances: WalletBalances): WalletBalances => {
   return FP.pipe(
     balances,
     A.filter(({ amount }) => Ord.gt(ordBaseAmount)(amount, baseAmount(0)))

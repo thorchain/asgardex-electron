@@ -7,6 +7,8 @@ import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
 
 import { Network } from '../../../../../shared/api/types'
+import atomIcon from '../../../../assets/svg/asset-atom.svg'
+import ethIcon from '../../../../assets/svg/asset-eth.svg'
 import {
   getEthTokenAddress,
   iconUrlInERC20Whitelist,
@@ -32,14 +34,12 @@ import {
   bnbIcon,
   btcIcon,
   dogeIcon,
-  ethIcon,
   runeIcon,
   bnbRuneIcon,
   xRuneIcon,
   tgtIcon,
   lunaIcon,
-  ustIcon,
-  atomIcon
+  ustIcon
 } from '../../../icons'
 import * as Styled from './AssetIcon.styles'
 import { Size } from './AssetIcon.types'
