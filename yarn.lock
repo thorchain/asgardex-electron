@@ -5062,10 +5062,10 @@
   resolved "https://registry.yarnpkg.com/@xchainjs/xchain-bitcoin/-/xchain-bitcoin-0.18.2.tgz#cea4b37604787062d515849c6c7b3bbc11180abd"
   integrity sha512-iHphumDgOa5ex3frSRrgYUkfgGLlpaMHB5EbaJqSwHIt/rPBfvJ5lfddw2pFOv01C8w/JsZkFIyMeHcAeq918g==
 
-"@xchainjs/xchain-bitcoincash@^0.13.1":
-  version "0.13.1"
-  resolved "https://registry.yarnpkg.com/@xchainjs/xchain-bitcoincash/-/xchain-bitcoincash-0.13.1.tgz#ea9eab65e3af23e9f0afa5cad2798eaefe47aa5d"
-  integrity sha512-rEjXk2343xyJ9r2BfY7dy8Lj1k2L9abEVxfC1VJhC1aENn1F9ZRNCAsU+roljvNgIzPnvn0Qdto2fQdccwvoSw==
+"@xchainjs/xchain-bitcoincash@^0.13.2":
+  version "0.13.2"
+  resolved "https://registry.yarnpkg.com/@xchainjs/xchain-bitcoincash/-/xchain-bitcoincash-0.13.2.tgz#706cb3e731c3b345f7717b3c84670f48259ed00f"
+  integrity sha512-+lZWcV4jikp91tW+YpYnREEH2MANVuhUZu91e4AhoJhIU6jJxGO0+v4mzlPVPez5CQ9VQj+ki4zfitlWpiwHRw==
   dependencies:
     uniqid "^5.4.0"
 

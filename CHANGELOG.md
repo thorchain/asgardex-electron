@@ -4,6 +4,10 @@
 
 - Update RU translation by @TreefeedXavier [#2318](https://github.com/thorchain/asgardex-electron/pull/2318)
 
+## Fix
+
+- [BCH] Broadcast tx to Haskoin might end in 500 error [#2320](https://github.com/thorchain/asgardex-electron/issues/2320)
+
 # 1.17.1 (2022-07-11)
 
 ## Add
