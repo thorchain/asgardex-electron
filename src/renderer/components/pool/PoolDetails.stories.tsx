@@ -1,13 +1,13 @@
 import React from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
-import { storiesOf } from '@storybook/react'
+import { ComponentMeta } from '@storybook/react'
 import { AssetETH } from '@xchainjs/xchain-util'
 import * as O from 'fp-ts/Option'
 
 import { ONE_BN } from '../../const'
 import { PoolHistoryActions } from '../../views/pool/PoolHistoryView.types'
-import { PoolDetails } from './PoolDetails'
+import { PoolDetails as Component } from './PoolDetails'
 import { getEmptyPoolDetail, getEmptyPoolStatsDetail } from './PoolDetails.helpers'
 
 export const historyActions: PoolHistoryActions = {
@@ -20,28 +20,28 @@ export const historyActions: PoolHistoryActions = {
   prevHistoryPage: O.none
 }
 
-export const PoolDetailsStory = () => {
-  return (
-    <PoolDetails
-      historyActions={historyActions}
-      poolDetail={RD.success(getEmptyPoolDetail())}
-      reloadPoolDetail={() => console.log('reloadPoolDetail')}
-      poolStatsDetail={RD.success(getEmptyPoolStatsDetail())}
-      reloadPoolStatsDetail={() => console.log('reloadPoolStatsDetail')}
-      network={'testnet'}
-      priceSymbol={'R'}
-      asset={AssetETH}
-      watched
-      watch={() => console.log('watch')}
-      unwatch={() => console.log('unwatch')}
-      priceRatio={ONE_BN}
-      HistoryView={() => <>Actions History Here</>}
-      ChartView={() => <>Pool Chart Here</>}
-      disableTradingPoolAction={false}
-      disableAllPoolActions={false}
-      disablePoolActions={false}
-    />
-  )
+const meta: ComponentMeta<typeof Component> = {
+  component: Component,
+  title: 'Components/pool/PoolDetails',
+  args: {
+    historyActions: historyActions,
+    poolDetail: RD.success(getEmptyPoolDetail()),
+    reloadPoolDetail: () => console.log('reloadPoolDetail'),
+    poolStatsDetail: RD.success(getEmptyPoolStatsDetail()),
+    reloadPoolStatsDetail: () => console.log('reloadPoolStatsDetail'),
+    network: 'testnet',
+    priceSymbol: 'R',
+    asset: AssetETH,
+    watched: true,
+    watch: () => console.log('watch'),
+    unwatch: () => console.log('unwatch'),
+    priceRatio: ONE_BN,
+    HistoryView: () => <>Actions History Here</>,
+    ChartView: () => <>Pool Chart Here</>,
+    disableTradingPoolAction: false,
+    disableAllPoolActions: false,
+    disablePoolActions: false
+  }
 }
 
-storiesOf('Components/pool/PoolDetails', module).add('default', PoolDetailsStory)
+export default meta

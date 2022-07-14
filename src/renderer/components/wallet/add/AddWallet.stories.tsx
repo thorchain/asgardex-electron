@@ -1,9 +1,18 @@
-import React from 'react'
+import { ComponentMeta } from '@storybook/react'
 
-import { storiesOf } from '@storybook/react'
+import { AddWallet as Component } from './index'
 
-import { AddWallet } from './index'
+const meta: ComponentMeta<typeof Component> = {
+  component: Component,
+  title: 'Wallet/AddWallet',
+  argTypes: {
+    isLocked: {
+      control: {
+        type: 'boolean'
+      },
+      defaultValue: false
+    }
+  }
+}
 
-storiesOf('Wallet/AddWallet', module)
-  .add('connect', () => <AddWallet />)
-  .add('unlock', () => <AddWallet isLocked={true} />)
+export default meta

@@ -1,13 +1,19 @@
-import React from 'react'
+import { ComponentMeta } from '@storybook/react'
 
-// TODO (@veado) Replace knobs
-// import { boolean } from '@storybook/addon-knobs'
-import { storiesOf } from '@storybook/react'
+import { HeaderSettings as Component } from './HeaderSettings'
 
-import { HeaderSettings } from './HeaderSettings'
+const meta: ComponentMeta<typeof Component> = {
+  component: Component,
+  title: 'Components/HeaderSettings',
+  argTypes: {
+    isDesktopView: {
+      name: 'isDesktopView',
+      control: {
+        type: 'boolean'
+      },
+      defaultValue: false
+    }
+  }
+}
 
-storiesOf('Components/HeaderSettings', module).add('desktop / mobile', () => {
-  // const isDesktopView = boolean('isDesktopView', false)
-  // return <HeaderSettings isDesktopView={isDesktopView} />
-  return <HeaderSettings isDesktopView={true} />
-})
+export default meta

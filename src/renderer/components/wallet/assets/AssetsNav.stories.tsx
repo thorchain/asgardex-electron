@@ -1,9 +1,10 @@
-import React from 'react'
+import { ComponentMeta } from '@storybook/react'
 
-import { storiesOf } from '@storybook/react'
+import { AssetsNav as Component } from './index'
 
-import { AssetsNav } from './index'
+const meta: ComponentMeta<typeof Component> = {
+  component: Component,
+  title: 'Wallet/AssetsNav'
+}
 
-storiesOf('Wallet/AssetsNav', module).add('default', () => {
-  return <AssetsNav />
-})
+export default meta

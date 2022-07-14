@@ -1,14 +1,23 @@
-import React from 'react'
-
-// TODO (@veado) Replace knobs
-// import { boolean } from '@storybook/addon-knobs'
-import { storiesOf } from '@storybook/react'
+import { ComponentMeta } from '@storybook/react'
 import * as O from 'fp-ts/lib/Option'
 
-import { HeaderLock } from './HeaderLock'
+import { HeaderLock as Component } from './HeaderLock'
 
-storiesOf('Components/HeaderLock', module).add('desktop / mobile', () => {
-  // const isDesktopView = boolean('isDesktopView', false)
-  // return <HeaderLock isDesktopView={isDesktopView} keystore={O.none} />
-  return <HeaderLock isDesktopView={false} keystore={O.none} />
-})
+const meta: ComponentMeta<typeof Component> = {
+  component: Component,
+  title: 'Components/HeaderLock',
+  argTypes: {
+    isDesktopView: {
+      name: 'isDesktopView',
+      control: {
+        type: 'boolean'
+      },
+      defaultValue: false
+    }
+  },
+  args: {
+    keystore: O.none
+  }
+}
+
+export default meta

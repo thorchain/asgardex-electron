@@ -1,13 +1,19 @@
 import React from 'react'
 
-import { storiesOf } from '@storybook/react'
+import { ComponentMeta } from '@storybook/react'
 
-import { BackLink } from './BackLink'
+import { BackLink as Component } from './BackLink'
 
-storiesOf('Components/BackLink', module).add('default', () => {
-  return (
-    <div style={{ padding: '15px' }}>
-      <BackLink />
-    </div>
-  )
-})
+const meta: ComponentMeta<typeof Component> = {
+  component: Component,
+  title: 'Components/BackLink',
+  decorators: [
+    (Story) => (
+      <div style={{ padding: '15px' }}>
+        <Story />
+      </div>
+    )
+  ]
+}
+
+export default meta

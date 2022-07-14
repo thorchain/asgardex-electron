@@ -1,9 +1,19 @@
-import React from 'react'
+import { ComponentMeta } from '@storybook/react'
 
-import { storiesOf } from '@storybook/react'
+import { LoadingView as Component } from './LoadingView'
 
-import { LoadingView } from './LoadingView'
+const meta: ComponentMeta<typeof Component> = {
+  component: Component,
+  title: 'Components/LoadingView',
+  argTypes: {
+    label: {
+      name: 'label',
+      control: {
+        type: 'text'
+      },
+      defaultValue: 'Loading data!'
+    }
+  }
+}
 
-storiesOf('Components/LoadingView', module).add('default', () => {
-  return <LoadingView label="Loading data!" />
-})
+export default meta

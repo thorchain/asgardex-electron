@@ -1,6 +1,6 @@
 import React from 'react'
 import { INITIAL_VIEWPORTS } from '@storybook/addon-viewport';
-import { BrowserRouter as Router, Route } from 'react-router-dom'
+import { BrowserRouter as Router, Route, Routes } from 'react-router-dom'
 
 import { AppProvider } from '../src/renderer/contexts/AppContext'
 import { ThemeProvider, themes } from '../src/renderer/contexts/ThemeContext'
@@ -39,7 +39,9 @@ const providerFn = ({ theme, children }) => (
 // based on https://storybook.js.org/docs/react/essentials/toolbars-and-globals#create-a-decorator
 const withRouter = (Story, context) => (
   <Router>
-    <Route path="/" element={<Story {...context} />} />
+    <Routes>
+      <Route path="/" element={<Story {...context} />} />
+    </Routes>
   </Router>
 )
 

@@ -1,56 +1,26 @@
-import React from 'react'
-
 import * as RD from '@devexperts/remote-data-ts'
-import { storiesOf } from '@storybook/react'
+import { ComponentMeta } from '@storybook/react'
 
-import { HeaderNetStatus } from './HeaderNetStatus'
+import { HeaderNetStatus as Component } from './HeaderNetStatus'
 
-const inboundAddressRD = RD.initial
-const mimirHaltRD = RD.initial
-const midgardUrl = RD.initial
+const meta: ComponentMeta<typeof Component> = {
+  component: Component,
+  title: 'Components/HeaderNetStatus',
+  argTypes: {
+    isDesktopView: {
+      name: 'isDesktopView',
+      control: {
+        type: 'boolean'
+      },
+      defaultValue: false
+    }
+  },
+  args: {
+    midgardStatus: RD.initial,
+    mimirStatus: RD.initial,
+    midgardUrl: RD.initial,
+    thorchainUrl: 'thorchain-url'
+  }
+}
 
-storiesOf('Components/HeaderNetStatus', module)
-  .add('default', () => {
-    return (
-      <HeaderNetStatus
-        isDesktopView={true}
-        midgardStatus={inboundAddressRD}
-        mimirStatus={mimirHaltRD}
-        midgardUrl={midgardUrl}
-        thorchainUrl={'https://thorchain.info'}
-      />
-    )
-  })
-  .add('not connected', () => {
-    return (
-      <HeaderNetStatus
-        isDesktopView={true}
-        midgardStatus={inboundAddressRD}
-        mimirStatus={mimirHaltRD}
-        midgardUrl={midgardUrl}
-        thorchainUrl={'https://thorchain.info'}
-      />
-    )
-  })
-  .add('mobile', () => {
-    return (
-      <HeaderNetStatus
-        isDesktopView={false}
-        midgardStatus={inboundAddressRD}
-        mimirStatus={mimirHaltRD}
-        midgardUrl={midgardUrl}
-        thorchainUrl={'thorchain.info'}
-      />
-    )
-  })
-  .add('mobile - not connected', () => {
-    return (
-      <HeaderNetStatus
-        isDesktopView={false}
-        midgardStatus={inboundAddressRD}
-        mimirStatus={mimirHaltRD}
-        midgardUrl={midgardUrl}
-        thorchainUrl={'thorchain.info'}
-      />
-    )
-  })
+export default meta

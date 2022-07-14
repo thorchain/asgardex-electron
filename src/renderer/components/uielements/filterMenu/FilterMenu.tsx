@@ -7,7 +7,7 @@ import { useIntl } from 'react-intl'
 import { useClickOutside } from '../../../hooks/useOutsideClick'
 import * as Styled from './FilterMenu.styles'
 
-type Props<T> = {
+export type Props<T> = {
   asset?: string
   data: T[]
   placeholder?: string

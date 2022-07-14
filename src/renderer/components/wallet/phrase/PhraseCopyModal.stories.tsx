@@ -1,12 +1,29 @@
-import React from 'react'
+import { ComponentMeta } from '@storybook/react'
 
-import { storiesOf } from '@storybook/react'
+import { PhraseCopyModal as Component } from './PhraseCopyModal'
 
-import { PhraseCopyModal } from './PhraseCopyModal'
+const meta: ComponentMeta<typeof Component> = {
+  component: Component,
+  title: 'Phrase/Copy',
+  argTypes: {
+    visible: {
+      name: 'visible',
+      control: {
+        type: 'boolean'
+      },
+      defaultValue: true
+    },
+    phrase: {
+      name: 'phrase',
+      control: {
+        type: 'text'
+      },
+      defaultValue: 'rural bright ball negative already grass good grant nation screen model pizza'
+    }
+  },
+  args: {
+    onClose: () => console.log('onClose')
+  }
+}
 
-const onClose = () => console.log('onClose')
-const sample_phrase = 'rural bright ball negative already grass good grant nation screen model pizza'
-
-storiesOf('Phrase/Copy', module).add('default', () => {
-  return <PhraseCopyModal phrase={sample_phrase} visible={true} onClose={onClose} />
-})
+export default meta

@@ -1,21 +1,37 @@
 import React from 'react'
 
 import { SyncOutlined } from '@ant-design/icons'
-import { storiesOf } from '@storybook/react'
+import { ComponentMeta } from '@storybook/react'
 
 import { Button } from '../../uielements/button'
-import { ErrorView } from './index'
+import { ErrorView as Component } from './index'
 
-storiesOf('Components/ErrorView', module)
-  .add('default', () => {
-    return <ErrorView title="Error while loading data!" />
-  })
-  .add('action button', () => {
-    const renderActionButton = () => (
-      <Button onClick={() => console.log('action')} typevalue="outline">
-        <SyncOutlined />
-        Action Button
-      </Button>
-    )
-    return <ErrorView title="Error while loading data!" extra={renderActionButton()} />
-  })
+const renderActionButton = () => (
+  <Button onClick={() => console.log('action')} typevalue="outline">
+    <SyncOutlined />
+    Action Button
+  </Button>
+)
+
+const meta: ComponentMeta<typeof Component> = {
+  component: Component,
+  title: 'Components/ErrorView',
+  argTypes: {
+    title: {
+      name: 'title',
+      control: {
+        type: 'text'
+      },
+      defaultValue: 'Error while loading data!'
+    },
+    extra: {
+      options: ['null', 'extra'],
+      mapping: {
+        null: null,
+        extra: renderActionButton()
+      }
+    }
+  }
+}
+
+export default meta

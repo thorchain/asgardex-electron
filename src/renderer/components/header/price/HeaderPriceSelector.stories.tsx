@@ -1,27 +1,28 @@
-import React from 'react'
-
-// TODO (@veado) Replace knobs
-// import { boolean } from '@storybook/addon-knobs'
-import { storiesOf } from '@storybook/react'
+import { ComponentMeta } from '@storybook/react'
 import { AssetBTC, AssetETH, AssetRuneNative } from '@xchainjs/xchain-util'
 import * as O from 'fp-ts/lib/Option'
 
 import { AssetBUSDBAF } from '../../../const'
-import { PricePoolAssets, PricePoolAsset } from '../../../views/pools/Pools.types'
-import { HeaderPriceSelector } from './HeaderPriceSelector'
+import { PricePoolAsset } from '../../../views/pools/Pools.types'
+import { HeaderPriceSelector as Component } from './HeaderPriceSelector'
 
-const assets: PricePoolAssets = [AssetRuneNative, AssetBTC, AssetETH, AssetBUSDBAF]
+const meta: ComponentMeta<typeof Component> = {
+  component: Component,
+  title: 'Components/HeaderPriceSelector',
+  argTypes: {
+    isDesktopView: {
+      name: 'isDesktopView',
+      control: {
+        type: 'boolean'
+      },
+      defaultValue: false
+    }
+  },
+  args: {
+    assets: [AssetRuneNative, AssetBTC, AssetETH, AssetBUSDBAF],
+    changeHandler: (asset: PricePoolAsset) => console.log(`changed: ${asset}`),
+    selectedAsset: O.some(AssetBUSDBAF)
+  }
+}
 
-storiesOf('Components/HeaderPriceSelector', module).add('desktop / mobile', () => {
-  const changeHandler = (asset: PricePoolAsset) => console.log(`changed: ${asset}`)
-  // const isDesktopView = boolean('isDesktopView', false)
-  return (
-    <HeaderPriceSelector
-      assets={assets}
-      // isDesktopView={isDesktopView}
-      isDesktopView={true}
-      changeHandler={changeHandler}
-      selectedAsset={O.some(AssetBUSDBAF)}
-    />
-  )
-})
+export default meta

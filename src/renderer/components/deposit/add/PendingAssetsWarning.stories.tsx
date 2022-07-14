@@ -1,5 +1,3 @@
-import React from 'react'
-
 import { Story, Meta } from '@storybook/react'
 import { assetAmount, assetToBase, AssetBNB, AssetBTC } from '@xchainjs/xchain-util'
 import * as FP from 'fp-ts/lib/function'
