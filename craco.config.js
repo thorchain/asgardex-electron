@@ -37,7 +37,6 @@ module.exports = {
 
       webpackConfig.module.rules = [
         ...webpackConfig.module.rules,
-
         {
           test: /\.svg$/,
           use: ['@svgr/webpack'],
@@ -52,6 +51,10 @@ module.exports = {
         $COMMIT_HASH: JSON.stringify(new GitRevisionPlugin().commithash()),
         $VERSION: JSON.stringify(version),
         $IS_DEV: JSON.stringify(process.env.NODE_ENV !== 'production')
+      }),
+      new webpack.ProvidePlugin({
+        process: 'process/browser',
+        Buffer: ['buffer', 'Buffer']
       })
     ]
   },

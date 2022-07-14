@@ -7,8 +7,6 @@ import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
 
 import { Network } from '../../../../../shared/api/types'
-import atomIcon from '../../../../assets/svg/asset-atom.svg'
-import ethIcon from '../../../../assets/svg/asset-eth.svg'
 import {
   getEthTokenAddress,
   iconUrlInERC20Whitelist,
@@ -31,9 +29,11 @@ import { isBnbChain, isEthChain } from '../../../../helpers/chainHelper'
 import { getIntFromName, rainbowStop } from '../../../../helpers/colorHelpers'
 import { useRemoteImage } from '../../../../hooks/useRemoteImage'
 import {
+  atomIcon,
   bnbIcon,
   btcIcon,
   dogeIcon,
+  ethIcon,
   runeIcon,
   bnbRuneIcon,
   xRuneIcon,
