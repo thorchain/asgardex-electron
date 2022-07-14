@@ -3,7 +3,7 @@ import { bn, baseAmount, AssetBTC, AssetRuneNative, AssetBNB, AssetETH } from '@
 
 import { ASSETS_TESTNET } from '../../../shared/mock/assets'
 import { AssetUSDC, ZERO_BASE_AMOUNT } from '../../const'
-import { WalletBalance } from '../../types/wallet'
+import { WalletBalance } from '../../services/wallet/types'
 import { PricePool } from '../../views/pools/Pools.types'
 import { ordBigNumber, ordBaseAmount, ordAsset, ordWalletBalanceByAsset, ordPricePool } from './ord'
 
@@ -43,7 +43,8 @@ describe('helpers/fp/ord', () => {
       walletType: 'keystore',
       amount: baseAmount('1'),
       asset: AssetRuneNative,
-      walletAddress: ''
+      walletAddress: '',
+      walletIndex: 0
     }
     const b: WalletBalance = {
       ...a,

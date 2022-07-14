@@ -29,6 +29,7 @@ import { isBnbChain, isEthChain } from '../../../../helpers/chainHelper'
 import { getIntFromName, rainbowStop } from '../../../../helpers/colorHelpers'
 import { useRemoteImage } from '../../../../hooks/useRemoteImage'
 import {
+  atomIcon,
   bnbIcon,
   btcIcon,
   dogeIcon,
@@ -38,8 +39,7 @@ import {
   xRuneIcon,
   tgtIcon,
   lunaIcon,
-  ustIcon,
-  atomIcon
+  ustIcon
 } from '../../../icons'
 import * as Styled from './AssetIcon.styles'
 import { Size } from './AssetIcon.types'

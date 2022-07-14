@@ -3,6 +3,7 @@ import { some, none } from 'fp-ts/lib/Option'
 
 import { ASSETS_TESTNET } from '../../../shared/mock/assets'
 import { eqOWalletBalance, eqWalletBalances } from '../../helpers/fp/eq'
+import { WalletBalances } from '../clients'
 import { KeystoreState, KeystoreContent } from './types'
 import {
   getKeystoreContent,
@@ -106,31 +107,41 @@ describe('services/wallet/util/', () => {
 
   describe('filterNullableBalances', () => {
     it('should filter nullable balances', () => {
-      const target = [
+      const target: WalletBalances = [
         {
           asset: ASSETS_TESTNET.TOMO,
           amount: baseAmount(0),
-          walletAddress: 'ADDRESS_TOMO'
+          walletAddress: 'ADDRESS_TOMO',
+          walletIndex: 0,
+          walletType: 'keystore'
         },
         {
           asset: ASSETS_TESTNET.BOLT,
           amount: baseAmount(1),
-          walletAddress: 'ADDRESS_BOLT'
+          walletAddress: 'ADDRESS_BOLT',
+          walletIndex: 0,
+          walletType: 'keystore'
         },
         {
           asset: ASSETS_TESTNET.FTM,
           amount: baseAmount(0),
-          walletAddress: 'ADDRESS_FTM'
+          walletAddress: 'ADDRESS_FTM',
+          walletIndex: 0,
+          walletType: 'keystore'
         },
         {
           asset: AssetBNB,
           amount: baseAmount(2),
-          walletAddress: 'ADDRESS_BNB'
+          walletAddress: 'ADDRESS_BNB',
+          walletIndex: 0,
+          walletType: 'keystore'
         },
         {
           asset: AssetRuneNative,
           amount: baseAmount(0),
-          walletAddress: 'ADDRESS_RUNENATIVE'
+          walletAddress: 'ADDRESS_RUNENATIVE',
+          walletIndex: 0,
+          walletType: 'keystore'
         }
       ]
       const nullableBalances = filterNullableBalances(target)
@@ -140,31 +151,41 @@ describe('services/wallet/util/', () => {
 
   describe('sortBalances', () => {
     it('sorts balances based on orders', () => {
-      const target = [
+      const target: WalletBalances = [
         {
           asset: ASSETS_TESTNET.TOMO,
           amount: baseAmount(0),
-          walletAddress: 'ADDRESS_TOMO'
+          walletAddress: 'ADDRESS_TOMO',
+          walletIndex: 0,
+          walletType: 'keystore'
         },
         {
           asset: ASSETS_TESTNET.BOLT,
           amount: baseAmount(1),
-          walletAddress: 'ADDRESS_BOLT'
+          walletAddress: 'ADDRESS_BOLT',
+          walletIndex: 0,
+          walletType: 'keystore'
         },
         {
           asset: ASSETS_TESTNET.FTM,
           amount: baseAmount(0),
-          walletAddress: 'ADDRESS_FTM'
+          walletAddress: 'ADDRESS_FTM',
+          walletIndex: 0,
+          walletType: 'keystore'
         },
         {
           asset: AssetBNB,
           amount: baseAmount(2),
-          walletAddress: 'ADDRESS_BNB'
+          walletAddress: 'ADDRESS_BNB',
+          walletIndex: 0,
+          walletType: 'keystore'
         },
         {
           asset: AssetRuneNative,
           amount: baseAmount(0),
-          walletAddress: 'ADDRESS_RUNENATIVE'
+          walletAddress: 'ADDRESS_RUNENATIVE',
+          walletIndex: 0,
+          walletType: 'keystore'
         }
       ]
       const balances = sortBalances(target, [AssetBTC.ticker, AssetETH.ticker, AssetRuneNative.ticker, AssetBNB.ticker])
@@ -174,40 +195,54 @@ describe('services/wallet/util/', () => {
 
   describe('getBalanceByAsset', () => {
     it('get balance by asset', () => {
-      const balanceByAsset = getBalanceByAsset(AssetBNB)([
+      const walletBalances: WalletBalances = [
         {
           asset: ASSETS_TESTNET.TOMO,
           amount: baseAmount(0),
-          walletAddress: 'ADDRESS_TOMO'
+          walletAddress: 'ADDRESS_TOMO',
+          walletIndex: 0,
+          walletType: 'keystore'
         },
         {
           asset: ASSETS_TESTNET.BOLT,
           amount: baseAmount(1),
-          walletAddress: 'ADDRESS_BOLT'
+          walletAddress: 'ADDRESS_BOLT',
+          walletIndex: 0,
+          walletType: 'keystore'
         },
         {
           asset: ASSETS_TESTNET.FTM,
           amount: baseAmount(0),
-          walletAddress: 'ADDRESS_FTM'
+          walletAddress: 'ADDRESS_FTM',
+          walletIndex: 0,
+          walletType: 'keystore'
         },
         {
           asset: AssetBNB,
           amount: baseAmount(2),
-          walletAddress: 'ADDRESS_BNB'
+          walletAddress: 'ADDRESS_BNB',
+          walletIndex: 0,
+          walletType: 'keystore'
         },
         {
           asset: AssetRuneNative,
           amount: baseAmount(0),
-          walletAddress: 'ADDRESS_RUNENATIVE'
+          walletAddress: 'ADDRESS_RUNENATIVE',
+          walletIndex: 0,
+          walletType: 'keystore'
         }
-      ])
+      ]
+
+      const balanceByAsset = getBalanceByAsset(AssetBNB)(walletBalances)
       expect(
         eqOWalletBalance.equals(
           balanceByAsset,
           some({
             asset: AssetBNB,
             amount: baseAmount(2),
-            walletAddress: 'ADDRESS_BNB'
+            walletAddress: 'ADDRESS_BNB',
+            walletIndex: 0,
+            walletType: 'keystore'
           })
         )
       ).toBeTruthy()
