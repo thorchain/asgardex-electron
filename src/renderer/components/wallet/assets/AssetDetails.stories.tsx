@@ -1,5 +1,3 @@
-import React from 'react'
-
 import * as RD from '@devexperts/remote-data-ts'
 import { BaseStory } from '@storybook/addons'
 import { TxHash } from '@xchainjs/xchain-client'

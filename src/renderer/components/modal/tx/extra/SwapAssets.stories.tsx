@@ -1,5 +1,3 @@
-import React from 'react'
-
 import { Story, Meta } from '@storybook/react'
 import { assetAmount, AssetBNB, AssetRuneNative, assetToBase } from '@xchainjs/xchain-util'
 
@@ -18,7 +16,7 @@ const meta: Meta = {
   component: SwapAssets,
   title: 'Components/modal/extra/SwapAssets',
   decorators: [
-    (S: Story) => (
+    (Story) => (
       <div
         style={{
           display: 'flex',
@@ -28,7 +26,7 @@ const meta: Meta = {
           height: '100vH'
         }}>
         <div style={{ backgroundColor: 'white' }}>
-          <S />
+          <Story />
         </div>
       </div>
     )

@@ -1,5 +1,3 @@
-import React from 'react'
-
 import * as RD from '@devexperts/remote-data-ts'
 import { Meta, Story } from '@storybook/react'
 import * as Rx from 'rxjs'
@@ -22,14 +20,14 @@ const meta: Meta = {
   component: ImportKeystore,
   title: 'Components/Wallet/Keystore',
   decorators: [
-    (S: Story) => (
+    (Story) => (
       <div
         style={{
           display: 'flex',
           flexDirection: 'column',
           width: '300px'
         }}>
-        <S />
+        <Story />
       </div>
     )
   ]

@@ -1,6 +1,4 @@
-import React from 'react'
-
-import { Meta, Story } from '@storybook/react'
+import { ComponentMeta } from '@storybook/react'
 import { Chain } from '@xchainjs/xchain-util'
 import * as O from 'fp-ts/lib/Option'
 
@@ -12,7 +10,7 @@ type Args = {
   description: string
 }
 
-const Template: Story<Args> = ({ chain, visible, description }) => {
+const Template = ({ chain, visible, description }: Args) => {
   return (
     <LedgerConfirmationModal
       visible={visible}
@@ -29,10 +27,8 @@ const Template: Story<Args> = ({ chain, visible, description }) => {
   )
 }
 
-export const Default = Template.bind({})
-
-const meta: Meta<Args> = {
-  component: LedgerConfirmationModal,
+const meta: ComponentMeta<typeof Template> = {
+  component: Template,
   title: 'Components/Modal/LedgerConfirmation',
   argTypes: {
     visible: {

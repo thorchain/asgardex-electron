@@ -1,5 +1,3 @@
-import React from 'react'
-
 import { SyncOutlined } from '@ant-design/icons'
 import { ComponentMeta } from '@storybook/react'
 

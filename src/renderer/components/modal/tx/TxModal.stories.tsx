@@ -1,5 +1,3 @@
-import React from 'react'
-
 import { SyncOutlined } from '@ant-design/icons'
 import * as RD from '@devexperts/remote-data-ts'
 import { Story, Meta } from '@storybook/react'
@@ -88,7 +86,7 @@ const meta: Meta = {
   component: TxModal,
   title: 'Components/TxModal',
   decorators: [
-    (S: Story) => (
+    (S) => (
       <div
         style={{
           display: 'flex',

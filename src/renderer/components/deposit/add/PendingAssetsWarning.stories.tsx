@@ -1,10 +1,10 @@
-import { Story, Meta } from '@storybook/react'
+import { ComponentMeta } from '@storybook/react'
 import { assetAmount, assetToBase, AssetBNB, AssetBTC } from '@xchainjs/xchain-util'
 import * as FP from 'fp-ts/lib/function'
 
 import { Network } from '../../../../shared/api/types'
 import { AssetWithAmount1e8, AssetsWithAmount1e8 } from '../../../types/asgardex'
-import { PendingAssetsWarning } from './PendingAssetsWarning'
+import { PendingAssetsWarning as Component } from './PendingAssetsWarning'
 
 const bnbAsset: AssetWithAmount1e8 = {
   amount1e8: assetToBase(assetAmount(1)),
@@ -24,31 +24,22 @@ type Args = {
   loading: boolean
 }
 
-const Template: Story<Args> = ({ network, loading, onClickRecovery }) => {
-  return <PendingAssetsWarning assets={assets} network={network} onClickRecovery={onClickRecovery} loading={loading} />
+const Template = ({ network, loading, onClickRecovery }: Args) => {
+  return <Component assets={assets} network={network} onClickRecovery={onClickRecovery} loading={loading} />
 }
 
-export const Default = Template.bind({})
-
-Default.storyName = 'default'
-
-const meta: Meta<Args> = {
-  component: PendingAssetsWarning,
+const meta: ComponentMeta<typeof Template> = {
+  component: Template,
   title: 'Components/Deposit/PendingAssets',
   argTypes: {
     network: {
       name: 'Network',
-      control: {
-        type: 'select',
-        options: ['mainnet', 'stagenet', 'testnet']
-      },
+      options: ['mainnet', 'stagenet', 'testnet'],
       defaultValue: 'mainnet'
     },
     loading: {
       name: 'Loading state',
-      control: {
-        type: 'boolean'
-      },
+      control: 'boolean',
       defaultValue: false
     },
     onClickRecovery: {

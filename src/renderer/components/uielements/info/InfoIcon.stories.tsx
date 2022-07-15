@@ -1,17 +1,9 @@
-import { Meta, Story } from '@storybook/react'
+import { ComponentMeta } from '@storybook/react'
 
-import { InfoIcon } from './InfoIcon'
-import * as Styled from './InfoIcon.styles'
+import { InfoIcon as Component } from './InfoIcon'
 
-type Args = {
-  color: Styled.Color
-  tooltip: string
-}
-
-export const Default: Story<Args> = ({ color, tooltip }) => <InfoIcon color={color} tooltip={tooltip} />
-
-const meta: Meta<Args> = {
-  component: InfoIcon,
+const meta: ComponentMeta<typeof Component> = {
+  component: Component,
   title: 'Components/InfoIcon',
   argTypes: {
     color: {

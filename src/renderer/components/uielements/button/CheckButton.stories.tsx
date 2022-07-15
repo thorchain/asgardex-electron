@@ -1,6 +1,4 @@
-import React from 'react'
-
-import { Story, Meta } from '@storybook/react'
+import { ComponentMeta } from '@storybook/react'
 import * as FP from 'fp-ts/lib/function'
 
 import { CheckButton } from './CheckButton'
@@ -12,7 +10,7 @@ type Args = {
   onClicked: FP.Lazy<void>
 }
 
-const Template: Story<Args> = ({ label, disabled, isChecked, onClicked }) => {
+const Template = ({ label, disabled, isChecked, onClicked }: Args) => {
   return (
     <CheckButton disabled={disabled} checked={isChecked} clickHandler={onClicked}>
       {label}
@@ -20,12 +18,8 @@ const Template: Story<Args> = ({ label, disabled, isChecked, onClicked }) => {
   )
 }
 
-export const Default = Template.bind({})
-
-Default.storyName = 'default'
-
-const meta: Meta<Args> = {
-  component: CheckButton,
+const meta: ComponentMeta<typeof Template> = {
+  component: Template,
   title: 'Components/button/CheckButton',
   argTypes: {
     label: {
@@ -54,13 +48,13 @@ const meta: Meta<Args> = {
     }
   },
   decorators: [
-    (S: Story) => (
+    (Story) => (
       <div
         style={{
           display: 'flex',
           flexDirection: 'row'
         }}>
-        <S />
+        <Story />
       </div>
     )
   ]

@@ -1,9 +1,22 @@
-import React from 'react'
+import { ComponentMeta } from '@storybook/react'
 
-import { storiesOf } from '@storybook/react'
+import { ReloadButton as Component } from './'
 
-import { ReloadButton } from './'
+const meta: ComponentMeta<typeof Component> = {
+  component: Component,
+  title: 'Components/ReloadButton',
+  argTypes: {
+    children: {
+      control: {
+        options: ['none', 'text'],
+        mapping: {
+          none: null,
+          text: 'Reload child text'
+        }
+      },
+      defaultValue: 'text'
+    }
+  }
+}
 
-storiesOf('Components/ReloadButton', module)
-  .add('default', () => <ReloadButton />)
-  .add('with children', () => <ReloadButton>Reload child text here</ReloadButton>)
+export default meta

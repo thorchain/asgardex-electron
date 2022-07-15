@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react'
 
-import { Story } from '@storybook/react'
+import { ComponentMeta } from '@storybook/react'
 import { TxHash } from '@xchainjs/xchain-client'
 import { assetAmount, AssetBNB, AssetBTC, AssetRuneNative, assetToBase } from '@xchainjs/xchain-util'
 import * as O from 'fp-ts/lib/Option'
@@ -141,7 +141,7 @@ const getResults = getMockRDValueFactory(
   () => ({ errorId: ErrorId.GET_ACTIONS, msg: 'some error here' })
 )
 
-export const History: Story<{ dataStatus: RDStatus }> = ({ dataStatus }) => {
+const Template = ({ dataStatus }: { dataStatus: RDStatus }) => {
   const res = useMemo(() => getResults(dataStatus), [dataStatus])
   const [currentPage, setCurrentPage] = useState(1)
   const [filter, setFilter] = useState<Filter>('ALL')
@@ -178,12 +178,12 @@ export const History: Story<{ dataStatus: RDStatus }> = ({ dataStatus }) => {
   )
 }
 
-History.args = {
-  dataStatus: argTypes.dataStatus.control.options[0]
-}
-
-export default {
-  component: PoolActionsHistory,
+const meta: ComponentMeta<typeof Template> = {
+  component: Template,
   title: 'Components/PoolActionsHistory',
-  argTypes
+  argTypes,
+  args: {
+    dataStatus: argTypes.dataStatus.control.options[0]
+  }
 }
+export default meta

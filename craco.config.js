@@ -30,7 +30,8 @@ module.exports = {
         crypto: require.resolve('crypto-browserify'),
         os: require.resolve('os-browserify/browser'),
         path: require.resolve('path-browserify'),
-        fs: require.resolve('browserify-fs')
+        fs: require.resolve('browserify-fs'),
+        assert: require.resolve('assert')
       }
 
       webpackConfig.ignoreWarnings = [/Failed to parse source map/]

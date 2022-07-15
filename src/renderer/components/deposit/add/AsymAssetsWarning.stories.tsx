@@ -1,6 +1,4 @@
-import React from 'react'
-
-import { Story, Meta } from '@storybook/react'
+import { ComponentMeta } from '@storybook/react'
 import { assetFromString } from '@xchainjs/xchain-util'
 import * as A from 'fp-ts/lib/Array'
 import * as FP from 'fp-ts/lib/function'
@@ -16,7 +14,7 @@ type Args = {
   assets: string
 }
 
-const Template: Story<Args> = ({ network, loading, onClickOpenAsymTool, assets }) => {
+const Template = ({ network, loading, onClickOpenAsymTool, assets }: Args) => {
   const assetList = FP.pipe(
     assets.split('|'),
     A.filterMap((assetString) => O.fromNullable(assetFromString(assetString)))
@@ -32,12 +30,8 @@ const Template: Story<Args> = ({ network, loading, onClickOpenAsymTool, assets }
   )
 }
 
-export const Default = Template.bind({})
-
-Default.storyName = 'default'
-
-const meta: Meta<Args> = {
-  component: AsymAssetsWarning,
+const meta: ComponentMeta<typeof Template> = {
+  component: Template,
   title: 'Components/Deposit/AsymAssetsWarning',
   argTypes: {
     network: {

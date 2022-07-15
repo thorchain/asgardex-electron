@@ -1,6 +1,4 @@
-import React from 'react'
-
-import { Story, Meta } from '@storybook/react'
+import { ComponentMeta } from '@storybook/react'
 import * as FP from 'fp-ts/lib/function'
 
 import { RefreshButton } from './RefreshButton'
@@ -11,16 +9,12 @@ type Args = {
   onClicked: FP.Lazy<void>
 }
 
-const Template: Story<Args> = ({ label, disabled, onClicked }) => {
+const Template = ({ label, disabled, onClicked }: Args) => {
   return <RefreshButton disabled={disabled} clickHandler={onClicked} label={label} />
 }
 
-export const Default = Template.bind({})
-
-Default.storyName = 'default'
-
-const meta: Meta<Args> = {
-  component: RefreshButton,
+const meta: ComponentMeta<typeof Template> = {
+  component: Template,
   title: 'Components/button/RefreshButton',
   argTypes: {
     label: {
@@ -42,7 +36,7 @@ const meta: Meta<Args> = {
     }
   },
   decorators: [
-    (S: Story) => (
+    (S) => (
       <div
         style={{
           display: 'flex',

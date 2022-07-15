@@ -1,5 +1,3 @@
-import React from 'react'
-
 import * as RD from '@devexperts/remote-data-ts'
 import { ComponentMeta } from '@storybook/react'
 import { AssetETH } from '@xchainjs/xchain-util'

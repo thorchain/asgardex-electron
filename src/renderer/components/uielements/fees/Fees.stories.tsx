@@ -1,5 +1,3 @@
-import React from 'react'
-
 import * as RD from '@devexperts/remote-data-ts'
 import { Story, Meta } from '@storybook/react'
 import { baseAmount, AssetBTC, AssetRuneNative } from '@xchainjs/xchain-util'

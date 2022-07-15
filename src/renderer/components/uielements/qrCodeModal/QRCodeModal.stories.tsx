@@ -1,6 +1,4 @@
-import React from 'react'
-
-import { Meta, Story } from '@storybook/react'
+import { ComponentMeta } from '@storybook/react'
 import { AssetBNB } from '@xchainjs/xchain-util'
 import * as FP from 'fp-ts/lib/function'
 
@@ -15,7 +13,7 @@ type StoryArgs = {
   onCancelHandler: FP.Lazy<void>
 }
 
-const Template: Story<StoryArgs> = ({ network, visible, onCancelHandler, onOkHandler }) => (
+const Template = ({ network, visible, onCancelHandler, onOkHandler }: StoryArgs) => (
   <Component
     asset={AssetBNB}
     address={network === 'testnet' ? BNB_ADDRESS_TESTNET : BNB_ADDRESS_MAINNET}
@@ -26,20 +24,19 @@ const Template: Story<StoryArgs> = ({ network, visible, onCancelHandler, onOkHan
   />
 )
 
-export const Default = Template.bind({})
-Default.args = { visible: true, network: 'mainnet' }
-
-const meta: Meta<StoryArgs> = {
+const meta: ComponentMeta<typeof Template> = {
   component: Component,
   title: 'Components/QRCodeModal',
   argTypes: {
     network: {
-      control: { type: 'radio', options: ['testnet', 'mainnet'] }
+      control: { type: 'radio', options: ['testnet', 'mainnet'] },
+      defaultValue: 'mainnet'
     },
     visible: {
       control: {
         type: 'boolean'
-      }
+      },
+      defaultValue: <tr></tr>
     },
     onOkHandler: {
       action: 'onOkHandler'

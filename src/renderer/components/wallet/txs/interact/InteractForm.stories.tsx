@@ -1,6 +1,4 @@
-import React from 'react'
-
-import { Story, Meta } from '@storybook/react'
+import { ComponentMeta } from '@storybook/react'
 import { TxHash } from '@xchainjs/xchain-client'
 import { assetAmount, assetToBase, BaseAmount, baseAmount } from '@xchainjs/xchain-util'
 import * as FP from 'fp-ts/lib/function'
@@ -26,7 +24,7 @@ type Args = {
   walletType: WalletType
 }
 
-const Template: Story<Args> = ({ interactType, txRDStatus, feeRDStatus, balance, validAddress, walletType }) => {
+const Template = ({ interactType, txRDStatus, feeRDStatus, balance, validAddress, walletType }: Args) => {
   const interact$: InteractStateHandler = (_) => {
     const getCurrentStep = () => {
       switch (txRDStatus) {
@@ -89,10 +87,8 @@ const Template: Story<Args> = ({ interactType, txRDStatus, feeRDStatus, balance,
   )
 }
 
-export const Default = Template.bind({})
-
-const meta: Meta<Args> = {
-  component: Component,
+const meta: ComponentMeta<typeof Template> = {
+  component: Template,
   title: 'Wallet/InteractForm',
   argTypes: {
     interactType: {

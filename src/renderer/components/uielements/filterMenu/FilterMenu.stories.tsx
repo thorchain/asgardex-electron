@@ -1,5 +1,3 @@
-import React from 'react'
-
 import { ComponentMeta, ComponentStoryObj } from '@storybook/react'
 import { assetAmount, AssetBNB, AssetRuneNative, assetToBase } from '@xchainjs/xchain-util'
 

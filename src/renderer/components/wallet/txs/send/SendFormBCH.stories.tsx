@@ -1,6 +1,4 @@
-import React from 'react'
-
-import { Meta, Story } from '@storybook/react'
+import { ComponentMeta } from '@storybook/react'
 import { BCH_DECIMAL } from '@xchainjs/xchain-bitcoincash'
 import { Address, FeeRates, Fees, FeesWithRates, FeeType, TxHash } from '@xchainjs/xchain-client'
 import { assetAmount, AssetBCH, assetToBase, baseAmount } from '@xchainjs/xchain-util'
@@ -26,7 +24,7 @@ type Args = {
   walletType: WalletType
 }
 
-const Template: Story<Args> = ({ txRDStatus, feeRDStatus, balance, validAddress, walletType }) => {
+const Template = ({ txRDStatus, feeRDStatus, balance, validAddress, walletType }: Args) => {
   const transfer$: SendTxStateHandler = (_) =>
     Rx.of({
       steps: { current: txRDStatus === 'initial' ? 0 : 1, total: 1 },
@@ -94,10 +92,8 @@ const Template: Story<Args> = ({ txRDStatus, feeRDStatus, balance, validAddress,
   )
 }
 
-export const Default = Template.bind({})
-
-const meta: Meta = {
-  component: Component,
+const meta: ComponentMeta<typeof Template> = {
+  component: Template,
   title: 'Wallet/SendFormBCH',
   argTypes: {
     txRDStatus: {

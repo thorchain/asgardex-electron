@@ -1,6 +1,4 @@
-import React from 'react'
-
-import { Meta, Story } from '@storybook/react'
+import { ComponentMeta } from '@storybook/react'
 
 import { ConfirmationModal } from './ConfirmationModal'
 
@@ -11,7 +9,7 @@ type Args = {
   visible: boolean
 }
 
-const Template: Story<Args> = ({ title, message, okText, visible }) => {
+const Template = ({ title, message, okText, visible }: Args) => {
   return (
     <ConfirmationModal
       title={title}
@@ -24,10 +22,8 @@ const Template: Story<Args> = ({ title, message, okText, visible }) => {
   )
 }
 
-export const Default = Template.bind({})
-
-const meta: Meta<Args> = {
-  component: ConfirmationModal,
+const meta: ComponentMeta<typeof Template> = {
+  component: Template,
   title: 'Components/Modal/Confirmation',
   argTypes: {
     title: {

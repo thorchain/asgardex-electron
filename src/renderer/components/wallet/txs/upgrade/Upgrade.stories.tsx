@@ -1,7 +1,5 @@
-import React from 'react'
-
 import * as RD from '@devexperts/remote-data-ts'
-import { Story, Meta } from '@storybook/react'
+import { ComponentMeta } from '@storybook/react'
 import { TxHash, TxParams } from '@xchainjs/xchain-client'
 import {
   assetAmount,
@@ -48,7 +46,7 @@ type Args = {
   walletType: WalletType
 }
 
-const Template: Story<Args> = ({ txRDStatus, feeRDStatus, balance, hasLedger, walletType, validAddress }) => {
+const Template = ({ txRDStatus, feeRDStatus, balance, hasLedger, walletType, validAddress }: Args) => {
   const bnbBalance: WalletBalance = mockWalletBalance({
     asset: AssetBNB,
     amount: assetToBase(assetAmount(balance)),
@@ -126,10 +124,8 @@ const Template: Story<Args> = ({ txRDStatus, feeRDStatus, balance, hasLedger, wa
   )
 }
 
-export const Default = Template.bind({})
-
-const meta: Meta = {
-  component: Component,
+const meta: ComponentMeta<typeof Template> = {
+  component: Template,
   title: 'Wallet/Upgrade',
   argTypes: {
     txRDStatus: {

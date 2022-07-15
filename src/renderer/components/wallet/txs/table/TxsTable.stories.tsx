@@ -1,5 +1,3 @@
-import React from 'react'
-
 import * as RD from '@devexperts/remote-data-ts'
 import { Meta, Story } from '@storybook/react'
 import { Tx, TxType } from '@xchainjs/xchain-client'

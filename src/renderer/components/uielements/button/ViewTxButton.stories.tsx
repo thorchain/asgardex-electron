@@ -1,6 +1,4 @@
-import React from 'react'
-
-import { Story, Meta } from '@storybook/react'
+import { ComponentMeta } from '@storybook/react'
 import { TxHash } from '@xchainjs/xchain-client'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
@@ -17,16 +15,14 @@ type Args = {
   hasTxHash: boolean
 }
 
-const Template: Story<Args> = ({ label, hasTxHash, txUrl }) => {
+const Template = ({ label, hasTxHash, txUrl }: Args) => {
   const url: O.Option<string> = FP.pipe(txUrl, O.fromPredicate(P.not(S.isEmpty)))
   const txHash: O.Option<TxHash> = hasTxHash ? O.some('hash') : O.none
   return <ViewTxButton label={label} txHash={txHash} onClick={onClick} txUrl={url} />
 }
 
-export const Default = Template.bind({})
-
-const meta: Meta<Args> = {
-  component: ViewTxButton,
+const meta: ComponentMeta<typeof Template> = {
+  component: Template,
   title: 'Components/button/ViewTxButton',
   argTypes: {
     hasTxHash: {
@@ -52,7 +48,7 @@ const meta: Meta<Args> = {
     }
   },
   decorators: [
-    (S: Story) => (
+    (S) => (
       <div
         style={{
           display: 'flex',

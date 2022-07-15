@@ -1,5 +1,3 @@
-import React from 'react'
-
 import { Meta, Story } from '@storybook/react'
 import { assetAmount, AssetBNB, AssetBTC, assetToBase, bn } from '@xchainjs/xchain-util'
 

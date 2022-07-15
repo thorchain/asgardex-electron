@@ -1,4 +1,4 @@
-import { Story, Meta } from '@storybook/react'
+import { ComponentMeta } from '@storybook/react'
 
 import { WalletType } from '../../../../shared/wallet/types'
 import { WalletTypeSelector as Component } from './WalletTypeSelector'
@@ -8,7 +8,7 @@ type Args = {
   walletTypes: WalletType[]
 }
 
-const Template: Story<Args> = ({ selectedWalletType, walletTypes }) => (
+const Template = ({ selectedWalletType, walletTypes }: Args) => (
   <div style={{ display: 'flex', alignItems: 'center', padding: '20px', backgroundColor: '#fff' }}>
     <Component
       selectedWalletType={selectedWalletType}
@@ -18,9 +18,7 @@ const Template: Story<Args> = ({ selectedWalletType, walletTypes }) => (
   </div>
 )
 
-export const Default = Template.bind({})
-
-const meta: Meta<Args> = {
+const meta: ComponentMeta<typeof Template> = {
   component: Component,
   title: 'Common/WalletTypeSelector',
   argTypes: {

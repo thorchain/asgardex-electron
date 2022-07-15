@@ -1,30 +1,24 @@
-import { Story, Meta } from '@storybook/react'
+import { ComponentMeta } from '@storybook/react'
 
-import { WalletType } from '../../../../shared/wallet/types'
 import { WalletTypeLabel as Component } from './WalletTypeLabel'
 
-type Args = {
-  walletType: WalletType
-}
-
-const Template: Story<Args> = ({ walletType }) => (
-  <div style={{ display: 'flex', alignItems: 'center', padding: '20px', backgroundColor: '#fff' }}>
-    <Component>{walletType}</Component>
-  </div>
-)
-
-export const Default = Template.bind({})
-
-const meta: Meta<Args> = {
+const meta: ComponentMeta<typeof Component> = {
   component: Component,
   title: 'Common/WalletTypeLabel',
   argTypes: {
-    walletType: {
+    children: {
       name: 'wallet type',
-      control: { type: 'select', options: ['keystore', 'ledger'] },
+      options: ['keystore', 'ledger'],
       defaultValue: 'keystore'
     }
-  }
+  },
+  decorators: [
+    (Story) => (
+      <div style={{ display: 'flex', alignItems: 'center', padding: '20px', backgroundColor: '#fff' }}>
+        <Story />
+      </div>
+    )
+  ]
 }
 
 export default meta

@@ -1,6 +1,4 @@
-import React from 'react'
-
-import { Meta, Story } from '@storybook/react'
+import { ComponentMeta } from '@storybook/react'
 import { AssetBNB, AssetBTC, AssetRuneNative } from '@xchainjs/xchain-util'
 import * as FP from 'fp-ts/lib/function'
 
@@ -15,7 +13,7 @@ type Args = {
   onSelect: FP.Lazy<void>
 }
 
-const Template: Story<Args> = ({ network, withSearch, onSelect }) => (
+const Template = ({ network, withSearch, onSelect }: Args) => (
   <AssetSelect
     asset={AssetBNB}
     withSearch={withSearch}
@@ -26,12 +24,8 @@ const Template: Story<Args> = ({ network, withSearch, onSelect }) => (
   />
 )
 
-export const Default = Template.bind({})
-
-Default.storyName = 'default'
-
-const meta: Meta = {
-  component: AssetSelect,
+const meta: ComponentMeta<typeof Template> = {
+  component: Template,
   title: 'Components/Assets/AssetSelect',
   argTypes: {
     network: {
@@ -54,9 +48,9 @@ const meta: Meta = {
     }
   },
   decorators: [
-    (S: Story) => (
+    (Story) => (
       <div style={{ display: 'flex', padding: '20px' }}>
-        <S />
+        <Story />
       </div>
     )
   ]

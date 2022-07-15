@@ -1,18 +1,21 @@
-import React from 'react'
-
-import { storiesOf } from '@storybook/react'
+import { ComponentMeta } from '@storybook/react'
 import { assetAmount, formatAssetAmountCurrency } from '@xchainjs/xchain-util'
 
-import { PoolStatus } from './PoolStatus'
+import { PoolStatus as Component } from './PoolStatus'
 
-storiesOf('Components/PoolStatus', module).add('default', () => {
-  return (
-    <div style={{ display: 'flex', flexDirection: 'column', width: '250px' }}>
-      <PoolStatus
-        label="DEPTH"
-        displayValue={formatAssetAmountCurrency({ amount: assetAmount(12000) })}
-        fullValue={formatAssetAmountCurrency({ amount: assetAmount(12000) })}
-      />
-    </div>
-  )
-})
+const meta: ComponentMeta<typeof Component> = {
+  component: Component,
+  title: 'Components/PoolStatus',
+  argTypes: {
+    label: {
+      control: 'text',
+      defaultValue: 'Depth'
+    }
+  },
+  args: {
+    displayValue: formatAssetAmountCurrency({ amount: assetAmount(12000) }),
+    fullValue: formatAssetAmountCurrency({ amount: assetAmount(12000) })
+  }
+}
+
+export default meta

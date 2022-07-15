@@ -1,6 +1,4 @@
-import React from 'react'
-
-import { Story, Meta } from '@storybook/react'
+import { ComponentMeta } from '@storybook/react'
 import { TxHash } from '@xchainjs/xchain-client'
 import { assetAmount, assetToBase, BaseAmount, baseAmount } from '@xchainjs/xchain-util'
 import * as FP from 'fp-ts/lib/function'
@@ -23,7 +21,7 @@ type Args = {
   walletType: WalletType
 }
 
-const Template: Story<Args> = ({ txRDStatus, feeRDStatus, balance, validAddress, walletType }) => {
+const Template = ({ txRDStatus, feeRDStatus, balance, validAddress, walletType }: Args) => {
   const transfer$: SendTxStateHandler = (_) =>
     Rx.of({
       steps: { current: txRDStatus === 'initial' ? 0 : 1, total: 1 },
@@ -72,10 +70,8 @@ const Template: Story<Args> = ({ txRDStatus, feeRDStatus, balance, validAddress,
   )
 }
 
-export const Default = Template.bind({})
-
-const meta: Meta<Args> = {
-  component: Component,
+const meta: ComponentMeta<typeof Template> = {
+  component: Template,
   title: 'Wallet/SendFormTHOR',
   argTypes: {
     txRDStatus: {

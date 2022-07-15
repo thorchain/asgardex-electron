@@ -1,36 +1,28 @@
-import React from 'react'
+import { ComponentMeta } from '@storybook/react'
 
-import { Meta, Story } from '@storybook/react'
+import { AppUpdate as Component } from './AppUpdate'
 
-import { AppUpdate } from './AppUpdate'
-
-export const Default: Story<{ isOpen: boolean; goToUpdates: () => void; close: () => void }> = ({
-  isOpen,
-  close,
-  goToUpdates
-}) => {
-  return <AppUpdate isOpen={isOpen} goToUpdates={goToUpdates} close={close} version={'test version'} />
-}
-
-const argTypes = {
-  isOpen: {
-    control: {
-      type: 'boolean'
-    }
-  },
-  goToUpdates: {
-    action: 'goToUpdates'
-  },
-  close: {
-    action: 'close'
-  }
-}
-
-Default.args = { isOpen: true }
-
-const meta: Meta = {
+const meta: ComponentMeta<typeof Component> = {
+  component: Component,
   title: 'AppUpdate',
-  argTypes
+  argTypes: {
+    isOpen: {
+      control: {
+        type: 'boolean'
+      },
+      defaultValue: true
+    },
+    goToUpdates: {
+      action: 'goToUpdates'
+    },
+    close: {
+      action: 'close'
+    },
+    version: {
+      control: 'text',
+      defaultValue: 'test version'
+    }
+  }
 }
 
 export default meta

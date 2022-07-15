@@ -1,20 +1,19 @@
-import React from 'react'
-
-import { Story } from '@storybook/react'
+import { ComponentMeta } from '@storybook/react'
 
 import { QRCode } from './QRCode'
 
-export const Default: Story<{
-  text: string
-}> = ({ text }) => {
-  return <QRCode text={text} qrError={'error for qr generation'} />
-}
-
-Default.args = {
-  text: 'test address here'
-}
-
-export default {
+const meta: ComponentMeta<typeof QRCode> = {
+  component: QRCode,
   title: 'QrCode',
-  component: QRCode
+  argTypes: {
+    text: {
+      control: 'text',
+      defaultValue: 'test address here'
+    }
+  },
+  args: {
+    qrError: 'error for qr generation'
+  }
 }
+
+export default meta

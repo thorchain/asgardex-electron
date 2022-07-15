@@ -1,29 +1,39 @@
-import React from 'react'
+import { ComponentMeta } from '@storybook/react'
 
-import { storiesOf } from '@storybook/react'
+import { Pagination as Component } from './index'
 
-import { Pagination } from './index'
+const meta: ComponentMeta<typeof Component> = {
+  component: Component,
+  title: 'Components/Pagination',
+  argTypes: {
+    defaultCurrent: {
+      name: 'current',
+      control: {
+        type: 'number'
+      },
+      defaultValue: 1
+    },
+    total: {
+      control: {
+        type: 'number'
+      },
+      defaultValue: 100
+    },
+    defaultPageSize: {
+      control: {
+        type: 'number'
+      },
+      defaultValue: 5
+    },
+    showSizeChanger: {
+      name: 'Loading state',
+      control: {
+        type: 'boolean'
+      },
+      defaultValue: false
+    },
+    onChange: { action: 'onChange' }
+  }
+}
 
-storiesOf('Components/Pagination', module)
-  .add('default', () => {
-    return (
-      <Pagination
-        defaultCurrent={6}
-        total={250}
-        defaultPageSize={5}
-        showSizeChanger={false}
-        onChange={(no: number) => console.log('page number:', no)}
-      />
-    )
-  })
-  .add('empty', () => {
-    return (
-      <Pagination
-        defaultCurrent={1}
-        total={1}
-        defaultPageSize={5}
-        showSizeChanger={false}
-        onChange={(no: number) => console.log('page number:', no)}
-      />
-    )
-  })
+export default meta

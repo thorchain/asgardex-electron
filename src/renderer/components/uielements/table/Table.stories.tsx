@@ -1,17 +1,15 @@
-import React from 'react'
+import { ComponentMeta } from '@storybook/react'
 
-import { storiesOf } from '@storybook/react'
+import { Table as Component } from './index'
 
-import { Table } from './index'
-
-export type DataSource = {
+type DataSource = {
   key: number
   name: string
   age: number
   address: string
 }
 
-export type Column = {
+type Column = {
   title: string
   dataIndex: string
   key: string
@@ -50,6 +48,13 @@ const columns: Column[] = [
   }
 ]
 
-storiesOf('Components/Table', module).add('default', () => {
-  return <Table dataSource={dataSource} columns={columns} />
-})
+const Template = () => {
+  return <Component dataSource={dataSource} columns={columns} />
+}
+
+const meta: ComponentMeta<typeof Template> = {
+  component: Template,
+  title: 'Components/Table'
+}
+
+export default meta

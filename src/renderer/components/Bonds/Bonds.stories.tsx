@@ -1,5 +1,3 @@
-import React from 'react'
-
 // TODO (@veado) Replace knobs
 // import { withKnobs, select } from '@storybook/addon-knobs'
 import { useCallback, useState } from '@storybook/addons'

@@ -1,14 +1,16 @@
-import React from 'react'
+import { ComponentMeta } from '@storybook/react'
 
-import { storiesOf } from '@storybook/react'
+import { Selection as Component } from './Selection'
 
-import { Selection } from './Selection'
+const meta: ComponentMeta<typeof Component> = {
+  component: Component,
+  title: 'Components/Selection',
+  argTypes: {
+    selected: { control: { type: 'number' }, defaultValue: 0 },
+    onSelect: {
+      action: 'onSelect'
+    }
+  }
+}
 
-storiesOf('Components/Selection', module).add('default', () => {
-  return (
-    <div>
-      <Selection onSelect={() => {}} selected={0} />
-      <Selection onSelect={() => {}} selected={0} />
-    </div>
-  )
-})
+export default meta

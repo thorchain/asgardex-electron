@@ -1,5 +1,3 @@
-import React from 'react'
-
 import { Story, Meta } from '@storybook/react'
 import {
   assetAmount,
@@ -46,7 +44,7 @@ const meta: Meta = {
   component: MaxBalanceButton,
   title: 'Components/button/MaxBalanceButton',
   decorators: [
-    (S: Story) => (
+    (S) => (
       <div
         style={{
           display: 'flex',

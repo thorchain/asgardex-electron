@@ -1,6 +1,4 @@
-import React from 'react'
-
-import { Story, Meta } from '@storybook/react'
+import { ComponentMeta } from '@storybook/react'
 import { assetAmount, AssetBNB, AssetRuneNative, assetToBase } from '@xchainjs/xchain-util'
 
 import { Network } from '../../../../../shared/api/types'
@@ -16,7 +14,7 @@ type Args = {
   walletType: WalletType & 'undefined'
 }
 
-const Template: Story<Args> = ({ network, size, noTicker, noPrice, walletType }) => {
+const Template = ({ network, size, noTicker, noPrice, walletType }: Args) => {
   const amount = assetToBase(assetAmount(2.49274))
   const price = noPrice ? undefined : assetToBase(assetAmount(217.92))
   const priceAsset = noPrice ? undefined : AssetRuneNative
@@ -36,12 +34,8 @@ const Template: Story<Args> = ({ network, size, noTicker, noPrice, walletType })
   )
 }
 
-export const Default = Template.bind({})
-
-Default.storyName = 'default'
-
-const meta: Meta<Args> = {
-  component: AssetData,
+const meta: ComponentMeta<typeof Template> = {
+  component: Template,
   title: 'Components/Assets/AssetData',
   argTypes: {
     network: {
@@ -84,14 +78,14 @@ const meta: Meta<Args> = {
     }
   },
   decorators: [
-    (S: Story) => (
+    (Story) => (
       <div
         style={{
           display: 'flex',
           flexDirection: 'column',
           width: '500px'
         }}>
-        <S />
+        <Story />
       </div>
     )
   ]

@@ -1,13 +1,41 @@
-import React from 'react'
+import { ComponentMeta } from '@storybook/react'
 
-import { storiesOf } from '@storybook/react'
+import { PoolShareCard as Component } from './PoolShareCard'
 
-import { PoolShareCard } from './PoolShareCard'
+const meta: ComponentMeta<typeof Component> = {
+  component: Component,
+  title: 'Components/PoolShareCard',
+  argTypes: {
+    title: {
+      control: {
+        type: 'text'
+      },
+      defaultValue: 'title'
+    },
+    children: {
+      control: {
+        type: 'select',
+        options: ['one', 'two', 'three'],
+        mapping: {
+          one: <p>Some contents...</p>,
+          two: (
+            <>
+              <p>Some contents...</p>
+              <p>Some contents...</p>
+            </>
+          ),
+          three: (
+            <>
+              <p>Some contents...</p>
+              <p>Some contents...</p>
+              <p>Some contents...</p>
+            </>
+          )
+        }
+      },
+      defaultValue: 'one'
+    }
+  }
+}
 
-storiesOf('Components/PoolShareCard', module).add('default', () => {
-  return (
-    <PoolShareCard title="Title">
-      <p>content</p>
-    </PoolShareCard>
-  )
-})
+export default meta

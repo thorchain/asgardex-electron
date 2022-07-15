@@ -1,6 +1,4 @@
-import React from 'react'
-
-import { Meta, Story } from '@storybook/react'
+import { ComponentMeta } from '@storybook/react'
 import { bn, AssetBNB, assetAmount, assetToBase, AssetBTC, AssetRuneNative } from '@xchainjs/xchain-util'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
@@ -18,7 +16,7 @@ type Args = {
   walletType: WalletType & 'none'
 }
 
-export const Default: Story<Args> = ({ walletTypeDisabled, tooltip, tooltipColor, walletType }) => {
+export const Template = ({ walletTypeDisabled, tooltip, tooltipColor, walletType }: Args) => {
   const props: AssetCardProps = {
     assetBalance: assetToBase(assetAmount(12)),
     asset: { asset: AssetBNB, address: BNB_ADDRESS_TESTNET },
@@ -45,10 +43,8 @@ export const Default: Story<Args> = ({ walletTypeDisabled, tooltip, tooltipColor
   return <AssetCard {...props} />
 }
 
-Default.storyName = 'default'
-
-const meta: Meta<Args> = {
-  component: AssetCard,
+const meta: ComponentMeta<typeof Template> = {
+  component: Template,
   title: 'Components/Assets/AssetCard',
   argTypes: {
     walletType: {
@@ -79,7 +75,7 @@ const meta: Meta<Args> = {
     }
   },
   decorators: [
-    (S: Story) => (
+    (S) => (
       <div style={{ display: 'flex', padding: '20px' }}>
         <S />
       </div>

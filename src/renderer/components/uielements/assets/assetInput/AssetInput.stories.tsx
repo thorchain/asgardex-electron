@@ -1,5 +1,3 @@
-import React from 'react'
-
 import { Story, Meta } from '@storybook/react'
 import { assetAmount, AssetBNB, assetToBase, BaseAmount, baseAmount } from '@xchainjs/xchain-util'
 
@@ -39,9 +37,9 @@ const meta: Meta = {
   component: AssetInput,
   title: 'Components/Assets/AssetInput',
   decorators: [
-    (S: Story) => (
+    (Story) => (
       <div style={{ padding: '20px' }}>
-        <S />
+        <Story />
       </div>
     )
   ]
