@@ -1,10 +1,14 @@
-import { ComponentMeta } from '@storybook/react'
+import { ComponentMeta, StoryFn } from '@storybook/react'
 import { bn, assetToBase, assetAmount, AssetBNB, AssetRuneNative } from '@xchainjs/xchain-util'
 import * as O from 'fp-ts/lib/Option'
 
 import { BNB_ADDRESS_TESTNET, RUNE_ADDRESS_TESTNET } from '../../../../shared/mock/address'
 import { BNB_DECIMAL } from '../../../helpers/assetHelper'
-import { PoolShare as Component } from './PoolShare'
+import { PoolShare as Component, Props } from './PoolShare'
+
+const Template: StoryFn<Props> = (args) => <Component {...args} />
+
+export const Default = Template.bind({})
 
 const meta: ComponentMeta<typeof Component> = {
   component: Component,

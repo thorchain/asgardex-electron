@@ -6,7 +6,7 @@ import { useIntl } from 'react-intl'
 import { CopyLabel } from '../../uielements/label'
 import * as Styled from './PhraseCopyModal.styles'
 
-type Props = {
+export type Props = {
   visible: boolean
   phrase: string
   onClose?: FP.Lazy<void>

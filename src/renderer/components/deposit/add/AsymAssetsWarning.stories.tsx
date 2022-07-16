@@ -30,6 +30,8 @@ const Template = ({ network, loading, onClickOpenAsymTool, assets }: Args) => {
   )
 }
 
+export const Default = Template.bind({})
+
 const meta: ComponentMeta<typeof Template> = {
   component: Template,
   title: 'Components/Deposit/AsymAssetsWarning',
@@ -39,27 +41,29 @@ const meta: ComponentMeta<typeof Template> = {
       control: {
         type: 'select',
         options: ['mainnet', 'stagenet', 'testnet']
-      },
-      defaultValue: 'mainnet'
+      }
     },
     loading: {
       name: 'Loading state',
       control: {
         type: 'boolean'
-      },
-      defaultValue: false
+      }
     },
     assets: {
       name: 'Assets',
       control: {
         type: 'select',
         options: ['BNB.BNB', 'BNB.BNB|BTC.BTC', 'ETH.ETH']
-      },
-      defaultValue: 'BNB.BNB'
+      }
     },
     onClickOpenAsymTool: {
       action: 'onClickOpenAsymTool'
     }
+  },
+  args: {
+    network: 'mainnet',
+    loading: false,
+    assets: 'BNB.BNB'
   }
 }
 

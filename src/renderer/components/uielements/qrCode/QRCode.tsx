@@ -5,7 +5,7 @@ import { Spin } from 'antd'
 import * as FP from 'fp-ts/function'
 import * as O from 'fp-ts/Option'
 import QRCodeLib from 'qrcode'
-import * as ReactDom from 'react-dom'
+import { createRoot } from 'react-dom/client'
 import { useIntl } from 'react-intl'
 
 import * as Styled from './QRCode.styles'
@@ -44,10 +44,14 @@ export const QRCode: React.FC<Props> = ({ text, qrError }) => {
       RD.fold(
         () => {},
         () => {
-          ReactDom.render(<Spin />, canvasContainer.current)
+          if (canvasContainer?.current) {
+            createRoot(canvasContainer.current).render(<Spin />)
+          }
         },
         (e) => {
-          ReactDom.render(<>{e}</>, canvasContainer.current)
+          if (canvasContainer?.current) {
+            createRoot(canvasContainer.current).render(<>{e}</>)
+          }
         },
         (canvas) => {
           FP.pipe(

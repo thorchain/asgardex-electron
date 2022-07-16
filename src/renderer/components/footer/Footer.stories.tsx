@@ -1,25 +1,17 @@
-import { ComponentMeta } from '@storybook/react'
+import { ComponentMeta, StoryFn } from '@storybook/react'
 
-import { Footer as Component } from './index'
+import { Footer as Component, Props } from './Footer'
+
+const Template: StoryFn<Props> = (args) => <Component {...args} />
+
+export const Default = Template.bind({})
 
 const meta: ComponentMeta<typeof Component> = {
   component: Component,
   title: 'Components/Footer',
-  argTypes: {
-    isDev: {
-      name: 'is dev',
-      control: {
-        type: 'boolean'
-      },
-      defaultValue: false
-    },
-    commitHash: {
-      name: 'hash',
-      control: {
-        type: 'text'
-      },
-      defaultValue: 'e69bea54b8228aff6d6bcf4bca6c1de07ac07c90'
-    }
+  args: {
+    isDev: false,
+    commitHash: 'e69bea54b8228aff6d6bcf4bca6c1de07ac07c90'
   }
 }
 

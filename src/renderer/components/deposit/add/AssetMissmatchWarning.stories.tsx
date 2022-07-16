@@ -1,9 +1,13 @@
-import { ComponentMeta } from '@storybook/react'
+import { ComponentMeta, StoryFn } from '@storybook/react'
 import { AssetBNB, AssetRuneNative } from '@xchainjs/xchain-util'
 
 import { BNB_ADDRESS_TESTNET, RUNE_ADDRESS_TESTNET } from '../../../../shared/mock/address'
 import { AssetWithAddress } from '../../../types/asgardex'
-import { AssetMissmatchWarning as Component } from './AssetMissmatchWarning'
+import { AssetMissmatchWarning as Component, Props } from './AssetMissmatchWarning'
+
+const Template: StoryFn<Props> = (args) => <Component {...args} />
+
+export const Default = Template.bind({})
 
 const bnb: AssetWithAddress = { asset: AssetBNB, address: BNB_ADDRESS_TESTNET }
 const rune: AssetWithAddress = { asset: AssetRuneNative, address: RUNE_ADDRESS_TESTNET }
@@ -17,12 +21,12 @@ const meta: ComponentMeta<typeof Component> = {
       control: {
         type: 'select',
         options: ['mainnet', 'testnet']
-      },
-      defaultValue: 'mainnet'
+      }
     }
   },
   args: {
-    assets: [bnb, rune]
+    assets: [bnb, rune],
+    network: 'mainnet'
   }
 }
 

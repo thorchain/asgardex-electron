@@ -1,28 +1,32 @@
-import { ComponentMeta } from '@storybook/react'
+import { ComponentMeta, StoryFn } from '@storybook/react'
 
-import { PhraseCopyModal as Component } from './PhraseCopyModal'
+import { PhraseCopyModal as Component, Props } from './PhraseCopyModal'
+
+const Template: StoryFn<Props> = (args) => <Component {...args} />
+
+export const Default = Template.bind({})
 
 const meta: ComponentMeta<typeof Component> = {
   component: Component,
-  title: 'Phrase/Copy',
+  title: 'Wallet/PhraseCopyModal',
   argTypes: {
     visible: {
       name: 'visible',
       control: {
         type: 'boolean'
-      },
-      defaultValue: true
+      }
     },
     phrase: {
       name: 'phrase',
       control: {
         type: 'text'
-      },
-      defaultValue: 'rural bright ball negative already grass good grant nation screen model pizza'
-    }
+      }
+    },
+    onClose: { action: 'onClose' }
   },
   args: {
-    onClose: () => console.log('onClose')
+    visible: true,
+    phrase: 'rural bright ball negative already grass good grant nation screen model pizza'
   }
 }
 

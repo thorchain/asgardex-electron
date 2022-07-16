@@ -48,7 +48,7 @@ const argTypes = {
 
 const meta: ComponentMeta<typeof Template> = {
   component: Template,
-  title: 'TxType',
+  title: 'Components/TxType',
   argTypes,
   args: {
     type: argTypes.type.control.options[0]

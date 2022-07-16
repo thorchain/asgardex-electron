@@ -57,7 +57,7 @@ Loading.storyName = 'loading'
 
 const meta: Meta = {
   component: Component,
-  title: 'PoolShares'
+  title: 'Components/PoolShares'
 }
 
 export default meta

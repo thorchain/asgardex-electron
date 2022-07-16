@@ -5,5 +5,5 @@ import { ManageButton } from './ManageButton'
 export const Default = () => <ManageButton asset={AssetRuneNative} isTextView={true} />
 
 export default {
-  title: 'ManageButton'
+  title: 'Components/ManageButton'
 }

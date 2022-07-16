@@ -28,6 +28,18 @@ const getValues = (firstAsset: string, secondAsset: string, firstValue: number, 
   return FP.pipe([first, second], A.filterMap(FP.identity))
 }
 
+type TemplateArgs = {
+  firstInValue: number
+  secondInValue: number
+  firstOutValue: number
+  secondOutValue: number
+  firstInAsset: string
+  secondInAsset: string
+  firstOutAsset: string
+  secondOutAsset: string
+  isDesktopView: boolean
+}
+
 const Template = ({
   firstInValue,
   secondInValue,
@@ -38,17 +50,7 @@ const Template = ({
   firstOutAsset,
   secondOutAsset,
   isDesktopView
-}: {
-  firstInValue: number
-  secondInValue: number
-  firstOutValue: number
-  secondOutValue: number
-  firstInAsset: string
-  secondInAsset: string
-  firstOutAsset: string
-  secondOutAsset: string
-  isDesktopView: boolean
-}) => {
+}: TemplateArgs) => {
   return (
     <TxDetail
       network="mainnet"
@@ -115,14 +117,15 @@ const argTypes = {
     name: 'isDesktopView',
     control: {
       type: 'boolean'
-    },
-    defaultValue: true
+    }
   }
 }
 
+export const Default = Template.bind({})
+
 const meta: ComponentMeta<typeof Template> = {
   component: Template,
-  title: 'TxDetail',
+  title: 'Components/TxDetail',
   argTypes,
   args: {
     firstInValue: 1.23,

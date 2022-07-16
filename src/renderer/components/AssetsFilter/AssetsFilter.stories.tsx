@@ -1,20 +1,22 @@
 import { useState } from 'react'
 
-import { ComponentMeta } from '@storybook/react'
+import { ComponentMeta, StoryFn } from '@storybook/react'
 import * as O from 'fp-ts/Option'
 
 import { PoolFilter, DEFAULT_POOL_FILTERS } from '../../services/midgard/types'
-import { AssetsFilter } from './AssetsFilter'
+import { AssetsFilter as Component } from './AssetsFilter'
 
-const Template = () => {
+const Template: StoryFn = () => {
   const [filter, setFilter] = useState<O.Option<PoolFilter>>(O.none)
 
-  return <AssetsFilter setFilter={setFilter} activeFilter={filter} poolFilters={DEFAULT_POOL_FILTERS} />
+  return <Component setFilter={setFilter} activeFilter={filter} poolFilters={DEFAULT_POOL_FILTERS} />
 }
 
-const meta: ComponentMeta<typeof Template> = {
-  component: Template,
-  title: 'AssetsFilter'
+export const Default = Template.bind({})
+
+const meta: ComponentMeta<typeof Component> = {
+  component: Component,
+  title: 'Components/AssetsFilter'
 }
 
 export default meta

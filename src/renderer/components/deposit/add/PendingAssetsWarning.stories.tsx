@@ -28,23 +28,28 @@ const Template = ({ network, loading, onClickRecovery }: Args) => {
   return <Component assets={assets} network={network} onClickRecovery={onClickRecovery} loading={loading} />
 }
 
+export const Default = Template.bind({})
+
 const meta: ComponentMeta<typeof Template> = {
   component: Template,
-  title: 'Components/Deposit/PendingAssets',
+  title: 'Components/Deposit/PendingAssetsWarning',
   argTypes: {
     network: {
       name: 'Network',
-      options: ['mainnet', 'stagenet', 'testnet'],
-      defaultValue: 'mainnet'
+      control: 'select',
+      options: ['mainnet', 'stagenet', 'testnet']
     },
     loading: {
       name: 'Loading state',
-      control: 'boolean',
-      defaultValue: false
+      control: 'boolean'
     },
     onClickRecovery: {
       action: 'onClickRecovery'
     }
+  },
+  args: {
+    network: 'mainnet',
+    loading: false
   }
 }
 
