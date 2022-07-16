@@ -1,9 +1,23 @@
-import { ComponentMeta } from '@storybook/react'
+import { ComponentMeta, StoryFn } from '@storybook/react'
 import { assetAmount, AssetBNB, assetToBase, assetToString } from '@xchainjs/xchain-util'
 
 import { ASSETS_MAINNET } from '../../../../shared/mock/assets'
 import { mockWalletBalance } from '../../../helpers/test/testWalletHelper'
-import { AccountSelector as Component } from './index'
+import { WalletBalances } from '../../../services/clients'
+import { WalletBalance } from '../../../services/wallet/types'
+import { AccountSelector as Component, Props } from './AccountSelector'
+
+const Template: StoryFn<Props> = (args) => <Component {...args} />
+
+export const Default = Template.bind({})
+
+const few: WalletBalances = [AssetBNB, ASSETS_MAINNET.TOMO].map<WalletBalance>((asset) => ({
+  walletType: 'keystore',
+  asset,
+  amount: assetToBase(assetAmount(1)),
+  walletAddress: `${assetToString(asset)} wallet`,
+  walletIndex: 0
+}))
 
 const meta: ComponentMeta<typeof Component> = {
   component: Component,
@@ -13,14 +27,7 @@ const meta: ComponentMeta<typeof Component> = {
       options: ['none', 'few'],
       mapping: {
         none: [],
-        few: [AssetBNB, ASSETS_MAINNET.TOMO].map((asset) => ({
-          walletType: 'keystore',
-          asset,
-          amount: assetToBase(assetAmount(1)),
-          walletAddress: `${assetToString(asset)} wallet`,
-          walletIndex: 0
-        })),
-        defaultValue: 'few'
+        few
       }
     }
   },
@@ -29,7 +36,8 @@ const meta: ComponentMeta<typeof Component> = {
     selectedWallet: mockWalletBalance({
       asset: AssetBNB,
       walletAddress: 'bnb-ledger-address'
-    })
+    }),
+    walletBalances: few
   }
 }
 

@@ -1,5 +1,6 @@
 import { ComponentMeta, StoryFn } from '@storybook/react'
 
+import { MOCK_PHRASE } from '../../../../shared/mock/wallet'
 import { PhraseCopyModal as Component, Props } from './PhraseCopyModal'
 
 const Template: StoryFn<Props> = (args) => <Component {...args} />
@@ -10,12 +11,6 @@ const meta: ComponentMeta<typeof Component> = {
   component: Component,
   title: 'Wallet/PhraseCopyModal',
   argTypes: {
-    visible: {
-      name: 'visible',
-      control: {
-        type: 'boolean'
-      }
-    },
     phrase: {
       name: 'phrase',
       control: {
@@ -26,7 +21,7 @@ const meta: ComponentMeta<typeof Component> = {
   },
   args: {
     visible: true,
-    phrase: 'rural bright ball negative already grass good grant nation screen model pizza'
+    phrase: MOCK_PHRASE
   }
 }
 

@@ -7,12 +7,10 @@ const meta: ComponentMeta<typeof Component> = {
   title: 'Components/ReloadButton',
   argTypes: {
     children: {
-      control: {
-        options: ['none', 'text'],
-        mapping: {
-          none: null,
-          text: 'Reload child text'
-        }
+      options: ['none', 'text'],
+      mapping: {
+        none: null,
+        text: 'Reload child text'
       },
       defaultValue: 'text'
     }

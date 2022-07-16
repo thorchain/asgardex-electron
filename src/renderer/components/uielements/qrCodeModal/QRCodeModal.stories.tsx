@@ -4,6 +4,7 @@ import * as FP from 'fp-ts/lib/function'
 
 import { Network } from '../../../../shared/api/types'
 import { BNB_ADDRESS_MAINNET, BNB_ADDRESS_TESTNET } from '../../../../shared/mock/address'
+import * as AT from '../../../storybook/argTypes'
 import { QRCodeModal as Component } from './QRCodeModal'
 
 type StoryArgs = {
@@ -28,23 +29,15 @@ const meta: ComponentMeta<typeof Template> = {
   component: Component,
   title: 'Components/QRCodeModal',
   argTypes: {
-    network: {
-      control: { type: 'radio', options: ['testnet', 'mainnet'] },
-      defaultValue: 'mainnet'
-    },
-    visible: {
-      control: {
-        type: 'boolean'
-      },
-      defaultValue: <tr></tr>
-    },
+    network: AT.network,
     onOkHandler: {
       action: 'onOkHandler'
     },
     onCancelHandler: {
       action: 'onCancelHandler'
     }
-  }
+  },
+  args: { network: 'mainnet', visible: true }
 }
 
 export default meta

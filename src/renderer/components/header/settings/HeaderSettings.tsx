@@ -5,7 +5,7 @@ import { useIntl } from 'react-intl'
 import { HeaderIconWrapper } from '../HeaderIcon.styles'
 import * as Styled from './HeaderSettings.styles'
 
-type Props = {
+export type Props = {
   onPress?: () => void
   isDesktopView: boolean
 }

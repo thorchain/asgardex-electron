@@ -5,6 +5,7 @@ import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
 
 import { Network } from '../../../../shared/api/types'
+import * as AT from '../../../storybook/argTypes'
 import { AsymAssetsWarning } from './AsymAssetsWarning'
 
 type Args = {
@@ -36,19 +37,7 @@ const meta: ComponentMeta<typeof Template> = {
   component: Template,
   title: 'Components/Deposit/AsymAssetsWarning',
   argTypes: {
-    network: {
-      name: 'Network',
-      control: {
-        type: 'select',
-        options: ['mainnet', 'stagenet', 'testnet']
-      }
-    },
-    loading: {
-      name: 'Loading state',
-      control: {
-        type: 'boolean'
-      }
-    },
+    network: AT.network,
     assets: {
       name: 'Assets',
       control: {

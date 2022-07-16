@@ -8,7 +8,7 @@ import { useNavigate } from 'react-router-dom'
 import * as poolsRoutes from '../../routes/pools'
 import { Button, ButtonProps, ButtonSize } from '../uielements/button'
 
-type Props = ButtonProps & {
+export type Props = ButtonProps & {
   className?: string
   asset: Asset
   sizevalue?: ButtonSize

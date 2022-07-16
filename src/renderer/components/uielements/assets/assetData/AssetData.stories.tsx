@@ -3,6 +3,7 @@ import { assetAmount, AssetBNB, AssetRuneNative, assetToBase } from '@xchainjs/x
 
 import { Network } from '../../../../../shared/api/types'
 import { WalletType } from '../../../../../shared/wallet/types'
+import * as AT from '../../../../storybook/argTypes'
 import { AssetData } from './AssetData'
 import { AssetDataSize } from './AssetData.styles'
 
@@ -11,7 +12,7 @@ type Args = {
   network: Network
   noPrice: boolean
   size: AssetDataSize
-  walletType: WalletType & 'undefined'
+  walletType: WalletType | 'undefined'
 }
 
 const Template = ({ network, size, noTicker, noPrice, walletType }: Args) => {
@@ -38,14 +39,7 @@ const meta: ComponentMeta<typeof Template> = {
   component: Template,
   title: 'Components/Assets/AssetData',
   argTypes: {
-    network: {
-      name: 'Network',
-      control: {
-        type: 'select',
-        options: ['mainnet', 'testnet']
-      },
-      defaultValue: 'mainnet'
-    },
+    network: AT.network,
     noTicker: {
       name: 'no ticker',
       control: {
@@ -65,17 +59,22 @@ const meta: ComponentMeta<typeof Template> = {
       control: {
         type: 'select',
         options: ['small', 'big']
-      },
-      defaultValue: 'small'
+      }
     },
     walletType: {
       name: 'wallet type',
-      control: {
-        type: 'select',
-        options: ['ledger', 'keystore', 'undefined']
-      },
-      defaultValue: 'ledger'
+      options: ['ledger', 'keystore', 'undefined'],
+      mapping: {
+        ledger: 'ledger',
+        keystore: 'keystore',
+        undefined: undefined
+      }
     }
+  },
+  args: {
+    network: 'mainnet',
+    walletType: 'ledger',
+    size: 'small'
   },
   decorators: [
     (Story) => (

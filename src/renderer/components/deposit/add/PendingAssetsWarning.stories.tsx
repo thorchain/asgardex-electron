@@ -3,6 +3,7 @@ import { assetAmount, assetToBase, AssetBNB, AssetBTC } from '@xchainjs/xchain-u
 import * as FP from 'fp-ts/lib/function'
 
 import { Network } from '../../../../shared/api/types'
+import * as AT from '../../../storybook/argTypes'
 import { AssetWithAmount1e8, AssetsWithAmount1e8 } from '../../../types/asgardex'
 import { PendingAssetsWarning as Component } from './PendingAssetsWarning'
 
@@ -34,15 +35,7 @@ const meta: ComponentMeta<typeof Template> = {
   component: Template,
   title: 'Components/Deposit/PendingAssetsWarning',
   argTypes: {
-    network: {
-      name: 'Network',
-      control: 'select',
-      options: ['mainnet', 'stagenet', 'testnet']
-    },
-    loading: {
-      name: 'Loading state',
-      control: 'boolean'
-    },
+    network: AT.network,
     onClickRecovery: {
       action: 'onClickRecovery'
     }

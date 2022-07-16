@@ -1,6 +1,7 @@
 import { ComponentMeta, StoryFn } from '@storybook/react'
 import * as O from 'fp-ts/lib/Option'
 
+import * as AT from '../../../storybook/argTypes'
 import { HeaderLock as Component, Props } from './HeaderLock'
 
 const Template: StoryFn<Props> = (args) => <Component {...args} />
@@ -11,16 +12,13 @@ const meta: ComponentMeta<typeof Component> = {
   component: Component,
   title: 'Components/HeaderLock',
   argTypes: {
-    isDesktopView: {
-      name: 'isDesktopView',
-      control: {
-        type: 'boolean'
-      }
-    }
+    keystore: AT.keystore,
+    onPress: { action: 'onPress' }
   },
   args: {
     keystore: O.none,
-    isDesktopView: false
+    isDesktopView: false,
+    disabled: false
   }
 }
 

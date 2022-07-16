@@ -3,6 +3,7 @@ import { BNBChain } from '@xchainjs/xchain-util'
 
 import { Network } from '../../../../shared/api/types'
 import { BNB_ADDRESS_MAINNET, BNB_ADDRESS_TESTNET } from '../../../../shared/mock/address'
+import * as AT from '../../../storybook/argTypes'
 import { AddressEllipsis as Component } from './index'
 
 type Args = {
@@ -21,26 +22,16 @@ const meta: ComponentMeta<typeof Template> = {
   component: Template,
   title: 'Components/AddressEllipsis',
   argTypes: {
-    network: {
-      name: 'Network',
-      control: {
-        type: 'select',
-        options: ['mainnet', 'testnet']
-      },
-      defaultValue: 'mainnet'
-    },
+    network: AT.network,
     address: {
-      control: {
-        type: 'select',
-        options: ['testnet', 'mainnet'],
-        mapping: {
-          testnet: BNB_ADDRESS_TESTNET,
-          mainnet: BNB_ADDRESS_MAINNET
-        }
-      },
-      defaultValue: 'mainnet'
+      options: ['testnet', 'mainnet'],
+      mapping: {
+        testnet: BNB_ADDRESS_TESTNET,
+        mainnet: BNB_ADDRESS_MAINNET
+      }
     }
-  }
+  },
+  args: { network: 'mainnet', address: BNB_ADDRESS_MAINNET }
 }
 
 export default meta

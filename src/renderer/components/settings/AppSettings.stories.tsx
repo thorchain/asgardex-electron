@@ -56,13 +56,6 @@ const meta: ComponentMeta<typeof Template> = {
         options: rdStatusOptions
       }
     },
-    collapsed: {
-      name: 'Show / hide',
-      control: {
-        type: 'boolean'
-      },
-      defaultValue: false
-    },
     changeNetwork: {
       action: 'changeNetwork'
     },
@@ -73,7 +66,7 @@ const meta: ComponentMeta<typeof Template> = {
       action: 'goToReleasePage'
     }
   },
-  args: { onlineStatus: OnlineStatus.ON, updateDataRD: 'initial' }
+  args: { onlineStatus: OnlineStatus.ON, updateDataRD: 'initial', collapsed: false }
 }
 
 export default meta

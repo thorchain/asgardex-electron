@@ -2,6 +2,7 @@ import { ComponentMeta, StoryFn } from '@storybook/react'
 import { AssetBNB, AssetRuneNative } from '@xchainjs/xchain-util'
 
 import { BNB_ADDRESS_TESTNET, RUNE_ADDRESS_TESTNET } from '../../../../shared/mock/address'
+import * as AT from '../../../storybook/argTypes'
 import { AssetWithAddress } from '../../../types/asgardex'
 import { AssetMissmatchWarning as Component, Props } from './AssetMissmatchWarning'
 
@@ -16,13 +17,7 @@ const meta: ComponentMeta<typeof Component> = {
   component: Component,
   title: 'Components/Deposit/AssetMissmatchWarning',
   argTypes: {
-    network: {
-      name: 'Network',
-      control: {
-        type: 'select',
-        options: ['mainnet', 'testnet']
-      }
-    }
+    network: AT.network
   },
   args: {
     assets: [bnb, rune],

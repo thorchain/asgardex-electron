@@ -3,6 +3,7 @@ import { AssetBNB, AssetBTC, AssetRuneNative } from '@xchainjs/xchain-util'
 import * as FP from 'fp-ts/lib/function'
 
 import { Network } from '../../../../../shared/api/types'
+import * as AT from '../../../../storybook/argTypes'
 import { AssetMenu } from './AssetMenu'
 
 type Args = {
@@ -26,25 +27,12 @@ const meta: ComponentMeta<typeof Template> = {
   component: Template,
   title: 'Components/Assets/AssetMenu',
   argTypes: {
-    network: {
-      name: 'Network',
-      control: {
-        type: 'select',
-        options: ['mainnet', 'testnet']
-      },
-      defaultValue: 'mainnet'
-    },
-    withSearch: {
-      name: 'with search',
-      control: {
-        type: 'boolean'
-      },
-      defaultValue: false
-    },
+    network: AT.network,
     onSelect: {
       action: 'onSelect'
     }
   },
+  args: { network: 'mainnet', withSearch: false },
   decorators: [
     (Story) => (
       <div style={{ display: 'flex', padding: '20px' }}>

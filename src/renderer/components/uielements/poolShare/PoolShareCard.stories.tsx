@@ -13,25 +13,22 @@ const meta: ComponentMeta<typeof Component> = {
       defaultValue: 'title'
     },
     children: {
-      control: {
-        type: 'select',
-        options: ['one', 'two', 'three'],
-        mapping: {
-          one: <p>Some contents...</p>,
-          two: (
-            <>
-              <p>Some contents...</p>
-              <p>Some contents...</p>
-            </>
-          ),
-          three: (
-            <>
-              <p>Some contents...</p>
-              <p>Some contents...</p>
-              <p>Some contents...</p>
-            </>
-          )
-        }
+      options: ['one', 'two', 'three'],
+      mapping: {
+        one: <p>Some contents...</p>,
+        two: (
+          <>
+            <p>Some contents...</p>
+            <p>Some contents...</p>
+          </>
+        ),
+        three: (
+          <>
+            <p>Some contents...</p>
+            <p>Some contents...</p>
+            <p>Some contents...</p>
+          </>
+        )
       },
       defaultValue: 'one'
     }

@@ -1,9 +1,27 @@
+import { ComponentMeta, StoryFn } from '@storybook/react'
 import { AssetRuneNative } from '@xchainjs/xchain-util'
 
-import { ManageButton } from './ManageButton'
+import { ManageButton as Component, Props } from './ManageButton'
 
-export const Default = () => <ManageButton asset={AssetRuneNative} isTextView={true} />
+const Template: StoryFn<Props> = (args) => <Component {...args} />
+export const Default = Template.bind({})
 
-export default {
-  title: 'Components/ManageButton'
+const meta: ComponentMeta<typeof Component> = {
+  title: 'Components/ManageButton',
+  argTypes: {
+    sizevalue: {
+      control: {
+        type: 'select',
+        options: ['small', 'normal', 'xnormal', 'big']
+      }
+    }
+  },
+  args: {
+    isTextView: true,
+    asset: AssetRuneNative,
+    disabled: false,
+    sizevalue: 'normal'
+  }
 }
+
+export default meta

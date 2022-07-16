@@ -42,6 +42,8 @@ export const HeaderLock: React.FC<Props> = (props): JSX.Element => {
 
   return (
     <HeaderIconWrapper onClick={clickHandler} disabled={disabled}>
+      <div>{JSON.stringify(keystore)}</div>
+      <div>{isLocked}</div>
       {isDesktopView ? desktopView : mobileView}
     </HeaderIconWrapper>
   )
