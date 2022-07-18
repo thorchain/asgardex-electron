@@ -2,10 +2,11 @@ import { ComponentMeta } from '@storybook/react'
 
 import { WalletType } from '../../../../shared/wallet/types'
 import { WalletTypeSelector as Component } from './WalletTypeSelector'
+import { SelectableWalletType } from './WalletTypeSelector.types'
 
 type Args = {
   selectedWalletType: WalletType
-  walletTypes: WalletType[]
+  walletTypes: SelectableWalletType[]
 }
 
 const Template = ({ selectedWalletType, walletTypes }: Args) => (
@@ -17,10 +18,11 @@ const Template = ({ selectedWalletType, walletTypes }: Args) => (
     />
   </div>
 )
+export const Default = Template.bind({})
 
 const meta: ComponentMeta<typeof Template> = {
   component: Component,
-  title: 'Common/WalletTypeSelector',
+  title: 'Components/WalletTypeSelector',
   argTypes: {
     selectedWalletType: {
       name: 'selected type',
@@ -29,9 +31,12 @@ const meta: ComponentMeta<typeof Template> = {
     },
     walletTypes: {
       name: 'walletTypes',
-      control: { type: 'select', options: [['keystore', 'ledger', 'custom'], ['keystore', 'ledger'], ['custom']] },
-      defaultValue: ['keystore', 'ledger', 'custom']
+      control: { type: 'select', options: [['keystore', 'ledger', 'custom'], ['keystore', 'ledger'], ['custom']] }
     }
+  },
+  args: {
+    selectedWalletType: 'keystore',
+    walletTypes: ['keystore', 'ledger', 'custom']
   }
 }
 

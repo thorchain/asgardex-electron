@@ -2,8 +2,9 @@
 // Main entry point for Storybook@7.x
 // Based on `https://github.com/storybookjs/storybook/blob/v7.0.0-alpha.13/examples/cra-ts-essentials/.storybook/main.ts
 
-// import type { StorybookConfig } from '@storybook/react-webpack5';
+const { GitRevisionPlugin } = require('git-revision-webpack-plugin')
 
+const { version } = require('../package')
 
 const webpack = require('webpack')
 
@@ -47,6 +48,11 @@ const config = {
       new webpack.ProvidePlugin({
         process: 'process/browser',
         Buffer: ['buffer', 'Buffer']
+      }),
+      new webpack.DefinePlugin({
+        $COMMIT_HASH: JSON.stringify(new GitRevisionPlugin().commithash()),
+        $VERSION: JSON.stringify(version),
+        $IS_DEV: JSON.stringify(process.env.NODE_ENV !== 'production')
       })
     ]
 

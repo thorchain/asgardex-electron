@@ -1,5 +1,3 @@
-// TODO (@veado) Replace knobs
-// import { withKnobs, select } from '@storybook/addon-knobs'
 import { useCallback, useState } from '@storybook/addons'
 import { ComponentMeta, StoryFn } from '@storybook/react'
 import { Address } from '@xchainjs/xchain-client'
@@ -69,7 +67,7 @@ export const Default: StoryFn = () => {
 
 const meta: ComponentMeta<typeof Component> = {
   component: Component,
-  title: 'Bonds'
+  title: 'Bonds/Bonds'
 }
 
 export default meta

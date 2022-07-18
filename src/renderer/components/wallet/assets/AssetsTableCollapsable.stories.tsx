@@ -187,6 +187,7 @@ const Template = (args: Partial<Record<Chain, RDStatus>>) => {
     />
   )
 }
+export const Default = Template.bind({})
 
 const meta: ComponentMeta<typeof Template> = {
   component: Template,

@@ -1,17 +1,15 @@
-import { ComponentMeta } from '@storybook/react'
+import { ComponentMeta, StoryFn } from '@storybook/react'
 
-import { AddWallet as Component } from './index'
+import { AddWallet as Component, Props } from './AddWallet'
+
+const Template: StoryFn<Props> = (args) => <Component {...args} />
+export const Default = Template.bind({})
 
 const meta: ComponentMeta<typeof Component> = {
   component: Component,
   title: 'Wallet/AddWallet',
-  argTypes: {
-    isLocked: {
-      control: {
-        type: 'boolean'
-      },
-      defaultValue: false
-    }
+  args: {
+    isLocked: false
   }
 }
 

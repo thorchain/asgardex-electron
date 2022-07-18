@@ -17,23 +17,20 @@ const Template = ({ interactType, walletType }: Args) => (
     walletType={walletType}
   />
 )
+export const Default = Template.bind({})
 
 const meta: ComponentMeta<typeof Template> = {
   component: Template,
   title: 'Wallet/Interact',
   argTypes: {
     interactType: {
-      name: 'type',
-      control: { type: 'select', options: ['bond', 'unbond', 'leave', 'custom'] },
-      defaultValue: 'bond'
+      control: { type: 'select', options: ['bond', 'unbond', 'leave', 'custom'] }
     },
-
     walletType: {
-      name: 'wallet type',
-      control: { type: 'select', options: ['keystore', 'ledger'] },
-      defaultValue: 'keystore'
+      control: { type: 'select', options: ['keystore', 'ledger'] }
     }
-  }
+  },
+  args: { interactType: 'bond', walletType: 'keystore' }
 }
 
 export default meta

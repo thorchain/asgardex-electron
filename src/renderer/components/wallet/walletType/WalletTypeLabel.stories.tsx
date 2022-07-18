@@ -1,16 +1,21 @@
-import { ComponentMeta } from '@storybook/react'
+import { ComponentMeta, StoryFn } from '@storybook/react'
 
-import { WalletTypeLabel as Component } from './WalletTypeLabel'
+import { WalletTypeLabel as Component, Props } from './WalletTypeLabel'
+
+const Template: StoryFn<Props> = (args) => <Component {...args} />
+export const Default = Template.bind({})
 
 const meta: ComponentMeta<typeof Component> = {
   component: Component,
-  title: 'Common/WalletTypeLabel',
+  title: 'Components/WalletTypeLabel',
   argTypes: {
     children: {
       name: 'wallet type',
-      options: ['keystore', 'ledger'],
-      defaultValue: 'keystore'
+      options: ['keystore', 'ledger']
     }
+  },
+  args: {
+    children: 'keystore'
   },
   decorators: [
     (Story) => (

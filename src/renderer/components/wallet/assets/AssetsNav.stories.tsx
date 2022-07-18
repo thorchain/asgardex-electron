@@ -1,6 +1,9 @@
-import { ComponentMeta } from '@storybook/react'
+import { ComponentMeta, StoryFn } from '@storybook/react'
 
-import { AssetsNav as Component } from './index'
+import { AssetsNav as Component } from './AssetsNav'
+
+const Template: StoryFn = () => <Component />
+export const Default = Template.bind({})
 
 const meta: ComponentMeta<typeof Component> = {
   component: Component,

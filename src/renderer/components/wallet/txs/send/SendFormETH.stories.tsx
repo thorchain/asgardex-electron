@@ -81,31 +81,30 @@ const Template = ({ txRDStatus, feeRDStatus, balance, walletType }: Args) => {
     />
   )
 }
+export const Default = Template.bind({})
 
 const meta: ComponentMeta<typeof Template> = {
   component: Component,
   title: 'Wallet/SendFormETH',
   argTypes: {
     txRDStatus: {
-      name: 'txRDStatus',
-      control: { type: 'select', options: ['pending', 'error', 'success'] },
-      defaultValue: 'success'
+      control: { type: 'select', options: ['pending', 'error', 'success'] }
     },
     feeRDStatus: {
-      name: 'feeRD',
-      control: { type: 'select', options: ['initial', 'pending', 'error', 'success'] },
-      defaultValue: 'success'
+      control: { type: 'select', options: ['initial', 'pending', 'error', 'success'] }
     },
     walletType: {
-      name: 'wallet type',
-      control: { type: 'select', options: ['keystore', 'ledger'] },
-      defaultValue: 'keystore'
+      control: { type: 'select', options: ['keystore', 'ledger'] }
     },
     balance: {
-      name: 'ETH balance',
-      control: { type: 'text' },
-      defaultValue: '2'
+      control: { type: 'text' }
     }
+  },
+  args: {
+    txRDStatus: 'success',
+    feeRDStatus: 'success',
+    walletType: 'keystore',
+    balance: '2'
   }
 }
 

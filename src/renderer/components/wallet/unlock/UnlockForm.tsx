@@ -23,7 +23,7 @@ type FormValues = {
   password: string
 }
 
-type Props = {
+export type Props = {
   keystore: KeystoreState
   unlock?: (state: KeystoreState, password: string) => Promise<void>
   removeKeystore?: () => Promise<void>
