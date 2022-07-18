@@ -12,37 +12,28 @@ type Args = {
 const Template = ({ label, disabled, onClicked }: Args) => {
   return <RefreshButton disabled={disabled} clickHandler={onClicked} label={label} />
 }
+export const Default = Template.bind({})
 
 const meta: ComponentMeta<typeof Template> = {
   component: Template,
   title: 'Components/button/RefreshButton',
   argTypes: {
-    label: {
-      name: 'Label',
-      control: {
-        type: 'text'
-      },
-      defaultValue: 'Label'
-    },
-    disabled: {
-      name: 'disabled',
-      control: {
-        type: 'boolean'
-      },
-      defaultValue: false
-    },
     onClicked: {
       action: 'onClicked'
     }
   },
+  args: {
+    label: 'Label',
+    disabled: false
+  },
   decorators: [
-    (S) => (
+    (Story) => (
       <div
         style={{
           display: 'flex',
           flexDirection: 'row'
         }}>
-        <S />
+        <Story />
       </div>
     )
   ]

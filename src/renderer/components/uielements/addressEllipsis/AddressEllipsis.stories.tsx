@@ -17,6 +17,7 @@ const Template = ({ address, network, width }: Args) => (
     <Component address={address} chain={BNBChain} network={network} />
   </div>
 )
+export const Default = Template.bind({})
 
 const meta: ComponentMeta<typeof Template> = {
   component: Template,

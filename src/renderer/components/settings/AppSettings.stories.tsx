@@ -46,6 +46,8 @@ const Template = ({
   )
 }
 
+export const Default = Template.bind({})
+
 const meta: ComponentMeta<typeof Template> = {
   component: Template,
   title: 'Components/AppSettings',

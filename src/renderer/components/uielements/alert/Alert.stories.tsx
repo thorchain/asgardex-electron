@@ -1,9 +1,12 @@
 import { SyncOutlined } from '@ant-design/icons'
-import { ComponentMeta } from '@storybook/react'
+import { ComponentMeta, StoryFn } from '@storybook/react'
 
 import { Button } from '../button'
 import { ButtonColor } from '../button/Button.types'
-import { Alert as Component } from './Alert'
+import { Alert as Component, Props } from './Alert'
+
+const Template: StoryFn<Props> = (args) => <Component {...args} />
+export const Default = Template.bind({})
 
 const description = <div>This is a description message.</div>
 
@@ -29,12 +32,11 @@ const meta: ComponentMeta<typeof Component> = {
   ],
   argTypes: {
     type: {
-      name: 'title',
+      name: 'type',
       control: {
         type: 'select',
         options: ['success', 'info', 'warning', 'error']
-      },
-      defaultValue: 'success'
+      }
     },
     message: {
       options: ['text', 'jsx'],
@@ -43,6 +45,10 @@ const meta: ComponentMeta<typeof Component> = {
         jsx: renderActionButton('primary')
       }
     }
+  },
+  args: {
+    type: 'success',
+    message: description
   }
 }
 

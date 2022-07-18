@@ -17,29 +17,26 @@ const defaultInput: ComponentMeta<typeof InputPassword> = {
       control: {
         type: 'select',
         options: ['normal', 'ghost']
-      },
-      defaultValue: 'normal'
+      }
     },
     color: {
       control: {
         type: 'select',
         options: ['primary', 'success', 'warning', 'error']
-      },
-      defaultValue: 'primary'
+      }
     },
     size: {
       control: {
         type: 'select',
         options: ['small', 'middle', 'large']
-      },
-      defaultValue: 'middle'
-    },
-    value: {
-      control: {
-        type: 'text'
-      },
-      defaultValue: 'Input Text'
+      }
     }
+  },
+  args: {
+    value: 'Input Text',
+    typevalue: 'normal',
+    color: 'primary',
+    size: 'middle'
   }
 }
 

@@ -1,7 +1,7 @@
 import { Tooltip } from '../common/Common.styles'
 import * as Styled from './InfoIcon.styles'
 
-type Props = {
+export type Props = {
   tooltip: string
   color?: Styled.Color
 }

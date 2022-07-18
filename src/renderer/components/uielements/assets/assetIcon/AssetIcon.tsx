@@ -44,7 +44,7 @@ import {
 import * as Styled from './AssetIcon.styles'
 import { Size } from './AssetIcon.types'
 
-type ComponentProps = {
+export type ComponentProps = {
   size?: Size
   asset: Asset
   network: Network

@@ -27,9 +27,10 @@ const mapType = (type: InputType): MidgardTxType => {
   }
 }
 
-export const Template = ({ type, showTypeIcon }: { type: InputType; showTypeIcon: boolean }) => {
-  return <TxType type={mapType(type)} showTypeIcon={showTypeIcon} />
-}
+const Template = ({ type, showTypeIcon }: { type: InputType; showTypeIcon: boolean }) => (
+  <TxType type={mapType(type)} showTypeIcon={showTypeIcon} />
+)
+export const Default = Template.bind({})
 
 const argTypes = {
   type: {

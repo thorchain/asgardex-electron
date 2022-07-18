@@ -1,8 +1,11 @@
 import { SyncOutlined } from '@ant-design/icons'
-import { ComponentMeta } from '@storybook/react'
+import { ComponentMeta, StoryFn } from '@storybook/react'
 
 import { Button } from '../../uielements/button'
-import { ErrorView as Component } from './index'
+import { ErrorView as Component, Props } from './ErrorView'
+
+const Template: StoryFn<Props> = (args) => <Component {...args} />
+export const Default = Template.bind({})
 
 const renderActionButton = () => (
   <Button onClick={() => console.log('action')} typevalue="outline">
@@ -15,13 +18,6 @@ const meta: ComponentMeta<typeof Component> = {
   component: Component,
   title: 'Components/ErrorView',
   argTypes: {
-    title: {
-      name: 'title',
-      control: {
-        type: 'text'
-      },
-      defaultValue: 'Error while loading data!'
-    },
     extra: {
       options: ['null', 'extra'],
       mapping: {
@@ -29,6 +25,10 @@ const meta: ComponentMeta<typeof Component> = {
         extra: renderActionButton()
       }
     }
+  },
+  args: {
+    title: 'Error while loading data!',
+    extra: null
   }
 }
 

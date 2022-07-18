@@ -1,4 +1,4 @@
-import { ComponentMeta, ComponentStoryObj } from '@storybook/react'
+import { ComponentMeta, StoryFn } from '@storybook/react'
 import { assetAmount, AssetBNB, AssetRuneNative, assetToBase } from '@xchainjs/xchain-util'
 
 import { ONE_RUNE_BASE_AMOUNT } from '../../../../shared/mock/amount'
@@ -7,7 +7,7 @@ import { AssetWithAmount } from '../../../types/asgardex'
 import { AssetData } from '../assets/assetData'
 import { FilterMenu as Component, Props as ComponentProps } from './FilterMenu'
 
-const _coinsProps: ComponentProps<AssetWithAmount> = {
+const coinsProps: ComponentProps<AssetWithAmount> = {
   filterFunction: (item: AssetWithAmount, searchTerm: string) => {
     const symbol = item.asset.symbol?.toLowerCase() ?? ''
     return symbol.indexOf(searchTerm.toLowerCase()) === 0 ?? false
@@ -26,27 +26,28 @@ const _coinsProps: ComponentProps<AssetWithAmount> = {
   ] as AssetWithAmount[]
 }
 
+type ArgTypes = { searchEnabled: boolean }
+
+const Template: StoryFn<ArgTypes> = (args) => <Component {...args} {...coinsProps} />
+export const Default = Template.bind({})
+
 // Coins example
 const Coins: ComponentMeta<typeof Component> = {
   component: Component,
   title: 'Components/FilterMenu',
   argTypes: {
-    searchEnabled: {
-      name: 'enabled',
-      control: {
-        type: 'boolean'
-      },
-      defaultValue: true
-    }
+    onSelect: { action: 'onSelect' },
+    closeMenu: { actioin: 'closeMenu' }
+  },
+  args: {
+    searchEnabled: true
   }
-  // TODO (@veado) Fix props Props<`unknown`> type
-  // args: coinsProps
 }
 
 export default Coins
 
 // General (string) example
-const _generalProps: ComponentProps<string> = {
+const generalProps: ComponentProps<string> = {
   filterFunction: (name: string, searchTerm: string) =>
     name.toLowerCase().indexOf(searchTerm.toLowerCase()) === 0 ?? false,
 
@@ -58,7 +59,5 @@ const _generalProps: ComponentProps<string> = {
   data: ['John', 'Paul', 'George', 'Ringo']
 }
 
-export const General: ComponentStoryObj<typeof Component> = {
-  // TODO (@veado) Fix props Props<`unknown`> type
-  // args: generalProps
-}
+const Template2: StoryFn<ArgTypes> = (args) => <Component {...args} {...generalProps} />
+export const General = Template2.bind({})

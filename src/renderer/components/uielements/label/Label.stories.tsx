@@ -1,6 +1,9 @@
-import { ComponentMeta } from '@storybook/react'
+import { ComponentMeta, StoryFn } from '@storybook/react'
 
-import { Label as Component } from './Label'
+import { Label as Component, LabelProps } from './Label'
+
+const Template: StoryFn<LabelProps> = (args) => <Component {...args} ref={null} />
+export const Default = Template.bind({})
 
 const meta: ComponentMeta<typeof Component> = {
   component: Component,
@@ -26,13 +29,18 @@ const meta: ComponentMeta<typeof Component> = {
         options: ['primary', 'success', 'warning', 'error', 'normal', 'light', 'dark', 'input', 'gray', 'white']
       },
       defaultValue: 'normal'
-    },
-    children: {
-      control: {
-        type: 'text'
-      },
-      defaultValue: 'Label Text'
     }
+  },
+  args: {
+    size: 'normal',
+    weight: 'normal',
+    color: 'normal',
+    children: 'Label Text',
+    nowrap: false,
+    textTransform: 'uppercase',
+    align: 'left',
+    loading: false,
+    disabled: false
   }
 }
 

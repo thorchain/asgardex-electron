@@ -27,17 +27,12 @@ const Template = ({ chain, visible, description }: Args) => {
   )
 }
 
+export const Default = Template.bind({})
+
 const meta: ComponentMeta<typeof Template> = {
   component: Template,
   title: 'Components/Modal/LedgerConfirmation',
   argTypes: {
-    visible: {
-      name: 'Show / hide',
-      control: {
-        type: 'boolean'
-      },
-      defaultValue: true
-    },
     chain: {
       name: 'Chain',
       control: {
@@ -45,14 +40,11 @@ const meta: ComponentMeta<typeof Template> = {
         options: ['BNB', 'BCH', 'BTC', 'ETH']
       },
       defaultValue: 'BCH'
-    },
-    description: {
-      name: 'Description',
-      control: {
-        type: 'text'
-      },
-      defaultValue: 'Any description'
     }
+  },
+  args: {
+    visible: true,
+    description: 'Any description'
   }
 }
 

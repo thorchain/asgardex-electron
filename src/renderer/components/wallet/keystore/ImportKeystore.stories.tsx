@@ -1,24 +1,51 @@
 import * as RD from '@devexperts/remote-data-ts'
-import { Meta, Story } from '@storybook/react'
+import { ComponentMeta, StoryFn } from '@storybook/react'
+import { Keystore } from '@xchainjs/xchain-crypto'
 import * as Rx from 'rxjs'
 
-import { ImportKeystore } from './index'
+import { ImportKeystore as Component, Props } from './ImportKeystore'
 
-const importKeystoreInitial$ = () => Rx.of(RD.initial)
-const loadKeystoreInitial$ = () => Rx.of(RD.initial)
+const initialImportKeystore = () => Rx.of(RD.initial)
+const initialLoadKeystore = () => Rx.of(RD.initial)
 
-export const StoryInitial: Story = () => (
-  <ImportKeystore
-    importKeystore$={importKeystoreInitial$}
-    loadKeystore$={loadKeystoreInitial$}
-    clientStates={RD.initial}
-  />
+const Template: StoryFn<Props> = (args) => (
+  <Component importKeystore$={args.importKeystore$} loadKeystore$={args.loadKeystore$} clientStates={RD.initial} />
 )
-StoryInitial.storyName = 'initial'
+export const Default = Template.bind({})
 
-const meta: Meta = {
-  component: ImportKeystore,
-  title: 'Components/Wallet/Keystore',
+const meta: ComponentMeta<typeof Component> = {
+  component: Component,
+  title: 'Wallet/Keystore',
+  argTypes: {
+    loadKeystore$: {
+      control: {
+        type: 'select',
+        options: ['initial', 'loading', 'error', 'success'],
+        mapping: {
+          intitial: initialLoadKeystore,
+          loading: () => Rx.of(RD.pending),
+          error: () => Rx.of(RD.failure(Error('load keystore error'))),
+          success: () => Rx.of(RD.success({} as Keystore))
+        }
+      }
+    },
+    importKeystore$: {
+      control: {
+        type: 'select',
+        options: ['initial', 'loading', 'error', 'success'],
+        mapping: {
+          intitial: initialImportKeystore,
+          loading: () => Rx.of(RD.pending),
+          error: () => Rx.of(RD.failure(Error('import keystore error'))),
+          success: () => Rx.of(RD.success({}))
+        }
+      }
+    }
+  },
+  args: {
+    loadKeystore$: initialLoadKeystore,
+    importKeystore$: initialImportKeystore
+  },
   decorators: [
     (Story) => (
       <div

@@ -1,6 +1,6 @@
 import { SyncOutlined } from '@ant-design/icons'
 import * as RD from '@devexperts/remote-data-ts'
-import { Story, Meta } from '@storybook/react'
+import { Meta, StoryFn } from '@storybook/react'
 import { TxHash } from '@xchainjs/xchain-client'
 import { Row } from 'antd'
 import * as O from 'fp-ts/lib/Option'
@@ -14,27 +14,27 @@ const onClose = () => console.log('onClose')
 const onFinish = () => console.log('onFinish')
 const _onViewTxClick = (txHash: TxHash) => console.log('txHash', txHash)
 
-export const StoryInitial: Story = () => (
+export const StoryInitial: StoryFn = () => (
   <TxModal title="intial" txRD={RD.initial} onClose={onClose} onFinish={onFinish} />
 )
 StoryInitial.storyName = 'initial'
 
-export const StoryPending: Story = () => (
+export const StoryPending: StoryFn = () => (
   <TxModal title="pending" startTime={Date.now()} txRD={RD.pending} onClose={onClose} onFinish={onFinish} />
 )
 StoryPending.storyName = 'pending'
 
-export const StoryPendingTxHash: Story = () => (
+export const StoryPendingTxHash: StoryFn = () => (
   <TxModal title="pending" startTime={Date.now()} txRD={RD.pending} onClose={onClose} onFinish={onFinish} />
 )
 StoryPendingTxHash.storyName = 'pending + txHash'
 
-export const StorySuccess: Story = () => (
+export const StorySuccess: StoryFn = () => (
   <TxModal title="success" txRD={RD.success(true)} onClose={onClose} onFinish={onFinish} />
 )
 StorySuccess.storyName = 'success'
 
-export const StoryFailure: Story = () => (
+export const StoryFailure: StoryFn = () => (
   <TxModal
     title="error"
     startTime={Date.now()}
@@ -65,12 +65,12 @@ const extraResult = (): JSX.Element => (
   />
 )
 
-export const StoryExtra: Story = () => (
+export const StoryExtra: StoryFn = () => (
   <TxModal title="success" txRD={RD.success(true)} onClose={onClose} onFinish={onFinish} extra={extraContent()} />
 )
 StoryExtra.storyName = 'success + extra content'
 
-export const StoryExtraResult: Story = () => (
+export const StoryExtraResult: StoryFn = () => (
   <TxModal
     title="success"
     txRD={RD.success(true)}
@@ -84,7 +84,7 @@ StoryExtraResult.storyName = 'success + extra content + extra result'
 
 const meta: Meta = {
   component: TxModal,
-  title: 'Components/TxModal',
+  title: 'Components/modal/TxModal',
   decorators: [
     (S) => (
       <div

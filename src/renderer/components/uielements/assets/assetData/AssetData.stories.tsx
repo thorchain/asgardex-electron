@@ -12,14 +12,13 @@ type Args = {
   network: Network
   noPrice: boolean
   size: AssetDataSize
-  walletType: WalletType | 'undefined'
+  walletType: WalletType | undefined
 }
 
 const Template = ({ network, size, noTicker, noPrice, walletType }: Args) => {
   const amount = assetToBase(assetAmount(2.49274))
   const price = noPrice ? undefined : assetToBase(assetAmount(217.92))
   const priceAsset = noPrice ? undefined : AssetRuneNative
-  const wType = walletType !== 'undefined' ? walletType : undefined
 
   return (
     <AssetData
@@ -30,30 +29,18 @@ const Template = ({ network, size, noTicker, noPrice, walletType }: Args) => {
       priceAsset={priceAsset}
       size={size}
       network={network}
-      walletType={wType}
+      walletType={walletType}
     />
   )
 }
+
+export const Default = Template.bind({})
 
 const meta: ComponentMeta<typeof Template> = {
   component: Template,
   title: 'Components/Assets/AssetData',
   argTypes: {
     network: AT.network,
-    noTicker: {
-      name: 'no ticker',
-      control: {
-        type: 'boolean'
-      },
-      defaultValue: false
-    },
-    noPrice: {
-      name: 'no price',
-      control: {
-        type: 'boolean'
-      },
-      defaultValue: true
-    },
     size: {
       name: 'Size',
       control: {
@@ -63,18 +50,23 @@ const meta: ComponentMeta<typeof Template> = {
     },
     walletType: {
       name: 'wallet type',
-      options: ['ledger', 'keystore', 'undefined'],
-      mapping: {
-        ledger: 'ledger',
-        keystore: 'keystore',
-        undefined: undefined
+      control: {
+        type: 'selection',
+        options: ['ledger', 'keystore', 'undefined'],
+        mapping: {
+          ledger: 'ledger',
+          keystore: 'keystore',
+          undefined: undefined
+        }
       }
     }
   },
   args: {
     network: 'mainnet',
     walletType: 'ledger',
-    size: 'small'
+    size: 'small',
+    noPrice: true,
+    noTicker: false
   },
   decorators: [
     (Story) => (

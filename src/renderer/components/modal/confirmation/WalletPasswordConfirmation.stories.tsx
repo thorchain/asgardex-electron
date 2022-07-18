@@ -40,6 +40,8 @@ const Template = ({ validatePwVariant }: Args) => {
   )
 }
 
+export const Default = Template.bind({})
+
 const meta: ComponentMeta<typeof Template> = {
   component: Template,
   title: 'Components/Modal/WalletPasswordConfirmation',

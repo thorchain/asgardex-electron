@@ -22,38 +22,16 @@ const Template = ({ title, message, okText, visible }: Args) => {
   )
 }
 
+export const Default = Template.bind({})
+
 const meta: ComponentMeta<typeof Template> = {
   component: Template,
   title: 'Components/Modal/Confirmation',
-  argTypes: {
-    title: {
-      name: 'Title',
-      control: {
-        type: 'text'
-      },
-      defaultValue: 'Title'
-    },
-    message: {
-      name: 'Message',
-      control: {
-        type: 'text'
-      },
-      defaultValue: 'Message description'
-    },
-    okText: {
-      name: 'Label Confirm',
-      control: {
-        type: 'text'
-      },
-      defaultValue: 'Ok'
-    },
-    visible: {
-      name: 'Show / hide',
-      control: {
-        type: 'boolean'
-      },
-      defaultValue: true
-    }
+  args: {
+    visible: true,
+    title: 'Title',
+    okText: 'Ok',
+    message: 'Message description'
   }
 }
 

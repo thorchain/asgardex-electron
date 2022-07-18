@@ -3,7 +3,7 @@ import React, { useCallback, useRef, useState } from 'react'
 import { useCbOnResize } from '../../../hooks/useCbOnResize'
 import * as Styled from './PoolStatus.styles'
 
-type Props = {
+export type Props = {
   label: string
   displayValue: string
   fullValue?: string

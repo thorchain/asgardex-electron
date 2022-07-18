@@ -24,6 +24,7 @@ const Template = ({ network, visible, onCancelHandler, onOkHandler }: StoryArgs)
     onOk={onOkHandler}
   />
 )
+export const Default = Template.bind({})
 
 const meta: ComponentMeta<typeof Template> = {
   component: Component,

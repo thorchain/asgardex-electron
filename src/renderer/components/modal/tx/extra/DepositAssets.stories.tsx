@@ -1,4 +1,4 @@
-import { Story, Meta } from '@storybook/react'
+import { Meta, StoryFn } from '@storybook/react'
 import { assetAmount, AssetBNB, AssetRuneNative, assetToBase } from '@xchainjs/xchain-util'
 import * as O from 'fp-ts/lib/Option'
 
@@ -11,17 +11,15 @@ const defaultProps: DepositAssetsProps = {
   network: 'testnet'
 }
 
-export const Sym: Story = () => <DepositAssets {...defaultProps} />
-Sym.storyName = 'sym'
+export const Sym: StoryFn = () => <DepositAssets {...defaultProps} />
 
-export const Asym: Story = () => {
+export const Asym: StoryFn = () => {
   const props: DepositAssetsProps = {
     ...defaultProps,
     source: O.none
   }
   return <DepositAssets {...props} />
 }
-Asym.storyName = 'asym'
 
 const meta: Meta = {
   component: DepositAssets,

@@ -1,4 +1,4 @@
-import { Story, Meta } from '@storybook/react'
+import { Meta, StoryFn } from '@storybook/react'
 import { assetAmount, AssetBNB, AssetRuneNative, assetToBase } from '@xchainjs/xchain-util'
 
 import { SwapAssets, Props } from './SwapAssets'
@@ -9,8 +9,7 @@ const defaultProps: Props = {
   target: { asset: AssetBNB, amount: assetToBase(assetAmount(1)) },
   network: 'testnet'
 }
-export const Default: Story = () => <SwapAssets {...defaultProps} />
-Default.storyName = 'default'
+export const Default: StoryFn = () => <SwapAssets {...defaultProps} />
 
 const meta: Meta = {
   component: SwapAssets,

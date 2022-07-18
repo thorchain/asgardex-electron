@@ -178,6 +178,8 @@ const Template = ({ dataStatus }: { dataStatus: RDStatus }) => {
   )
 }
 
+export const Default = Template.bind({})
+
 const meta: ComponentMeta<typeof Template> = {
   component: Template,
   title: 'Components/PoolActionsHistory',

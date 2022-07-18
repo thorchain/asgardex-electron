@@ -1,5 +1,5 @@
 import * as RD from '@devexperts/remote-data-ts'
-import { Story, Meta } from '@storybook/react'
+import { ComponentMeta, StoryFn } from '@storybook/react'
 import { baseAmount, AssetBTC, AssetRuneNative } from '@xchainjs/xchain-util'
 
 import { Fees, Props as FeesProps } from './Fees'
@@ -15,10 +15,9 @@ const defaultProps: FeesProps = {
   disabled: false
 }
 
-export const Default: Story = () => <Fees {...defaultProps} />
-Default.storyName = 'default'
+export const Default: StoryFn<FeesProps> = () => <Fees {...defaultProps} />
 
-export const Multiple: Story = () => {
+export const Multiple: StoryFn<FeesProps> = () => {
   const props: FeesProps = {
     ...defaultProps,
     fees: RD.success([
@@ -31,45 +30,40 @@ export const Multiple: Story = () => {
   }
   return <Fees {...props} />
 }
-Multiple.storyName = 'multiple fees'
 
-export const Loading: Story = () => {
+export const Loading: StoryFn<FeesProps> = () => {
   const props: FeesProps = {
     ...defaultProps,
     fees: RD.pending
   }
   return <Fees {...props} />
 }
-Loading.storyName = 'loading'
 
-export const NoReload: Story = () => {
+export const NoReload: StoryFn<FeesProps> = () => {
   const props: FeesProps = {
     ...defaultProps,
     reloadFees: undefined
   }
   return <Fees {...props} />
 }
-NoReload.storyName = 'no reload'
 
-export const Disabled: Story = () => {
+export const Disabled: StoryFn<FeesProps> = () => {
   const props: FeesProps = {
     ...defaultProps,
     disabled: true
   }
   return <Fees {...props} />
 }
-Disabled.storyName = 'disabled'
 
-export const FeeError: Story = () => {
+export const FeeError: StoryFn<FeesProps> = () => {
   const props: FeesProps = {
     ...defaultProps,
     fees: RD.failure(Error('Fee error'))
   }
   return <Fees {...props} />
 }
-FeeError.storyName = 'error'
 
-const meta: Meta = {
+const meta: ComponentMeta<typeof Fees> = {
   component: Fees,
   title: 'Components/Fees'
 }

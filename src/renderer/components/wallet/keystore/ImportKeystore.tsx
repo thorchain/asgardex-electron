@@ -15,7 +15,7 @@ import { Spin } from '../../shared/loading'
 import { InputPassword } from '../../uielements/input'
 import * as Styled from './Keystore.styles'
 
-type Props = {
+export type Props = {
   clientStates: KeystoreClientStates
   importKeystore$: (keystore: Keystore, password: string) => ImportKeystoreLD
   loadKeystore$: () => LoadKeystoreLD

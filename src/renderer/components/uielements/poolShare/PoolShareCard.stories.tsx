@@ -1,21 +1,20 @@
-import { ComponentMeta } from '@storybook/react'
+import { ComponentMeta, StoryFn } from '@storybook/react'
 
-import { PoolShareCard as Component } from './PoolShareCard'
+import { PoolShareCard as Component, Props } from './PoolShareCard'
+
+const Template: StoryFn<Props> = (args) => <Component {...args} />
+export const Default = Template.bind({})
+
+const oneChild = <p>Some contents...</p>
 
 const meta: ComponentMeta<typeof Component> = {
   component: Component,
   title: 'Components/PoolShareCard',
   argTypes: {
-    title: {
-      control: {
-        type: 'text'
-      },
-      defaultValue: 'title'
-    },
     children: {
       options: ['one', 'two', 'three'],
       mapping: {
-        one: <p>Some contents...</p>,
+        one: oneChild,
         two: (
           <>
             <p>Some contents...</p>
@@ -32,6 +31,10 @@ const meta: ComponentMeta<typeof Component> = {
       },
       defaultValue: 'one'
     }
+  },
+  args: {
+    title: 'title',
+    children: oneChild
   }
 }
 

@@ -1,4 +1,4 @@
-import { Meta, Story } from '@storybook/react'
+import { Meta, StoryFn } from '@storybook/react'
 import { assetAmount, AssetBNB, AssetBTC, assetToBase, bn } from '@xchainjs/xchain-util'
 
 import { ZERO_BASE_AMOUNT } from '../../const'
@@ -42,10 +42,9 @@ const defaultProps: ComponentProps = {
   openShareInfo: () => console.log('go to stake info'),
   network: 'testnet'
 }
-export const Default: Story = () => <Component {...defaultProps} />
-Default.storyName = 'default'
+export const Default: StoryFn = () => <Component {...defaultProps} />
 
-export const Loading: Story = () => {
+export const Loading: StoryFn = () => {
   const props: ComponentProps = {
     ...defaultProps,
     data: [],
@@ -53,7 +52,6 @@ export const Loading: Story = () => {
   }
   return <Component {...props} />
 }
-Loading.storyName = 'loading'
 
 const meta: Meta = {
   component: Component,

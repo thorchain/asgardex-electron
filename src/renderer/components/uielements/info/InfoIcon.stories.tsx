@@ -1,6 +1,9 @@
-import { ComponentMeta } from '@storybook/react'
+import { ComponentMeta, StoryFn } from '@storybook/react'
 
-import { InfoIcon as Component } from './InfoIcon'
+import { InfoIcon as Component, Props } from './InfoIcon'
+
+const Template: StoryFn<Props> = (args) => <Component {...args} />
+export const Default = Template.bind({})
 
 const meta: ComponentMeta<typeof Component> = {
   component: Component,
@@ -12,13 +15,10 @@ const meta: ComponentMeta<typeof Component> = {
         options: ['primary', 'warning', 'error']
       },
       defaultValue: 'primary'
-    },
-    tooltip: {
-      control: {
-        type: 'text'
-      },
-      defaultValue: 'Tooltip example text'
     }
+  },
+  args: {
+    tooltip: 'Tooltip example text'
   }
 }
 

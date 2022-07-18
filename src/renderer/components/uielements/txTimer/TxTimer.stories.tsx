@@ -1,15 +1,14 @@
-import { ComponentMeta } from '@storybook/react'
+import { ComponentMeta, StoryFn } from '@storybook/react'
 
-import { TxTimer } from './TxTimer'
+import { TxTimer as Component, Props } from './TxTimer'
 
-const meta: ComponentMeta<typeof TxTimer> = {
+const Template: StoryFn<Props> = (args) => <Component {...args} />
+export const Default = Template.bind({})
+
+const meta: ComponentMeta<typeof Component> = {
   title: 'Components/TxTimer',
-  component: TxTimer,
+  component: Component,
   argTypes: {
-    status: {
-      control: 'boolean',
-      defaultValue: true
-    },
     startTime: {
       options: ['none', 'now'],
       mapping: {
@@ -19,6 +18,7 @@ const meta: ComponentMeta<typeof TxTimer> = {
     }
   },
   args: {
+    status: true,
     interval: 1000,
     maxValue: 100
   }

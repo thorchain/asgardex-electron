@@ -26,6 +26,7 @@ const Template = () => {
     </div>
   )
 }
+export const Default = Template.bind({})
 
 const meta: ComponentMeta<typeof Template> = {
   component: Template,

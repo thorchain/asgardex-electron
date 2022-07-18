@@ -1,18 +1,15 @@
 // TODO (@veado) Replace knobs
 // import { withKnobs, select } from '@storybook/addon-knobs'
 import { useCallback, useState } from '@storybook/addons'
-import { Meta, Story } from '@storybook/react'
+import { ComponentMeta, StoryFn } from '@storybook/react'
 import { Address } from '@xchainjs/xchain-client'
 import { baseAmount } from '@xchainjs/xchain-util'
 
-import {
-  getMockRDValueFactory
-  // RDStatus
-} from '../../../shared/mock/rdByStatus'
+import { getMockRDValueFactory } from '../../../shared/mock/rdByStatus'
 import { AddressValidation } from '../../services/clients'
 import { NodeInfo } from '../../services/thorchain/types'
 import { ApiError, ErrorId } from '../../services/wallet/types'
-import { Bonds } from './Bonds'
+import { Bonds as Component } from './Bonds'
 
 const getMockRDValue = getMockRDValueFactory<ApiError, NodeInfo>(
   () => ({
@@ -28,7 +25,7 @@ const getMockRDValue = getMockRDValueFactory<ApiError, NodeInfo>(
 
 const addressValidation: AddressValidation = (_) => true
 
-export const Default: Story = () => {
+export const Default: StoryFn = () => {
   const [nodesList, setNodesList] = useState<Address[]>([])
 
   // const nodesSelect: Record<Address, RDStatus> = nodesList
@@ -55,7 +52,7 @@ export const Default: Story = () => {
   const addNode = useCallback((node: string) => setNodesList([...nodesList, node]), [nodesList, setNodesList])
 
   return (
-    <Bonds
+    <Component
       addressValidation={addressValidation}
       network={'testnet'}
       addNode={addNode}
@@ -69,12 +66,10 @@ export const Default: Story = () => {
     />
   )
 }
-Default.storyName = 'default'
 
-const meta: Meta = {
-  component: Bonds,
+const meta: ComponentMeta<typeof Component> = {
+  component: Component,
   title: 'Bonds'
-  // decorators: [withKnobs]
 }
 
 export default meta

@@ -18,35 +18,22 @@ const Template = ({ label, disabled, isChecked, onClicked }: Args) => {
   )
 }
 
+export const Default = Template.bind({})
+
 const meta: ComponentMeta<typeof Template> = {
   component: Template,
   title: 'Components/button/CheckButton',
   argTypes: {
-    label: {
-      name: 'Label',
-      control: {
-        type: 'text'
-      },
-      defaultValue: 'Label'
-    },
-    disabled: {
-      name: 'disabled',
-      control: {
-        type: 'boolean'
-      },
-      defaultValue: false
-    },
-    isChecked: {
-      name: 'isChecked',
-      control: {
-        type: 'boolean'
-      },
-      defaultValue: false
-    },
     onClicked: {
       action: 'onClicked'
     }
   },
+  args: {
+    label: 'Label',
+    disabled: false,
+    isChecked: false
+  },
+
   decorators: [
     (Story) => (
       <div

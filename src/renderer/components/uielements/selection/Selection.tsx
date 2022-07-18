@@ -2,7 +2,7 @@ import React from 'react'
 
 import { SelectionWrapper, Button } from './Selection.styles'
 
-type Props = {
+export type Props = {
   onSelect: (value: number) => void
   selected: number
   className?: string

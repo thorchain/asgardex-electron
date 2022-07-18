@@ -51,6 +51,7 @@ const columns: Column[] = [
 const Template = () => {
   return <Component dataSource={dataSource} columns={columns} />
 }
+export const Default = Template.bind({})
 
 const meta: ComponentMeta<typeof Template> = {
   component: Template,

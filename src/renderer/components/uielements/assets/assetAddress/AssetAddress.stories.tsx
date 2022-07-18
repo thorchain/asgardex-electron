@@ -9,11 +9,13 @@ type Args = {
   size: Size
   width: string
 }
-export const Template = ({ size, width }: Args) => (
+const Template = ({ size, width }: Args) => (
   <div style={{ width }}>
     <Component asset={AssetBNB} size={size} address={BNB_ADDRESS_TESTNET} network="mainnet" />
   </div>
 )
+
+export const Default = Template.bind({})
 
 const meta: ComponentMeta<typeof Template> = {
   component: Template,

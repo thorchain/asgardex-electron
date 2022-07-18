@@ -11,10 +11,10 @@ const meta: ComponentMeta<typeof Component> = {
       mapping: {
         none: null,
         text: 'Reload child text'
-      },
-      defaultValue: 'text'
+      }
     }
-  }
+  },
+  args: { children: 'text' }
 }
 
 export default meta

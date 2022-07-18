@@ -1,6 +1,8 @@
-import { ComponentMeta } from '@storybook/react'
+import { ComponentMeta, StoryFn } from '@storybook/react'
 
-import { StepBar as Component } from './index'
+import { StepBar as Component, Props } from './index'
+
+export const Default: StoryFn<Props> = (args) => <Component {...args} />
 
 const meta: ComponentMeta<typeof Component> = {
   component: Component,

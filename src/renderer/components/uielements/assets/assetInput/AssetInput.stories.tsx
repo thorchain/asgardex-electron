@@ -1,41 +1,42 @@
-import { Story, Meta } from '@storybook/react'
-import { assetAmount, AssetBNB, assetToBase, BaseAmount, baseAmount } from '@xchainjs/xchain-util'
+import { Meta, StoryFn } from '@storybook/react'
+import { assetAmount, AssetBNB, assetToBase } from '@xchainjs/xchain-util'
 
-import { AssetInput } from './AssetInput'
+import { AssetInput as Component, Props } from './AssetInput'
 
-const onChange = (value: BaseAmount) => {
-  console.log('value ', value.amount().toString())
-}
+export const Default: StoryFn<Props> = (args) => <Component {...args} />
 
-export const StoryDefault: Story = () => (
-  <AssetInput
-    title="swap amount"
-    status="slip 2%"
-    amount={baseAmount(1234500000)}
-    maxAmount={baseAmount(1234600000)}
-    asset={AssetBNB}
-    onChange={onChange}
-    maxInfoText={'max balance = balance - swap fees'}
-  />
-)
-StoryDefault.storyName = 'default'
-
-export const StoryDecimal2: Story = () => (
-  <AssetInput
-    title="amount"
-    titleTooltip="Title Tooltip"
-    amount={assetToBase(assetAmount(123, 2))}
-    maxAmount={assetToBase(assetAmount(124, 2))}
-    asset={AssetBNB}
-    onChange={onChange}
-    maxInfoText={'max balance = balance - swap fees'}
-  />
-)
-StoryDecimal2.storyName = 'decimal 2'
+const amount = assetToBase(assetAmount(123, 8))
+const maxAmount = assetToBase(assetAmount(456, 8))
 
 const meta: Meta = {
-  component: AssetInput,
+  component: Component,
   title: 'Components/Assets/AssetInput',
+  argTypes: {
+    onChange: { action: 'onChange' },
+    amount: {
+      options: ['normal', 'decimal'],
+      mapping: {
+        normal: amount,
+        decimal: assetToBase(assetAmount(321, 2))
+      }
+    },
+    maxAmount: {
+      options: ['normal', 'decimal'],
+      mapping: {
+        normal: maxAmount,
+        decimal: assetToBase(assetAmount(654, 2))
+      }
+    }
+  },
+  args: {
+    title: 'Swap amount',
+    status: 'slip 2%',
+    titleTooltip: 'Title Tooltip',
+    maxInfoText: 'max balance = balance - swap fees',
+    asset: AssetBNB,
+    amount: amount,
+    maxAmount: maxAmount
+  },
   decorators: [
     (Story) => (
       <div style={{ padding: '20px' }}>

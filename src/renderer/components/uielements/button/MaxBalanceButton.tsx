@@ -9,7 +9,7 @@ import { InfoIcon } from '../info'
 import { ButtonProps } from './Button.types'
 import * as Styled from './MaxBalanceButton.styles'
 
-type ComponentProps = {
+export type ComponentProps = {
   balance: Balance
   maxInfoText?: string
   onClick?: (amount: BaseAmount) => void

@@ -4,7 +4,7 @@ import * as FP from 'fp-ts/lib/function'
 
 import { Network } from '../../../../../shared/api/types'
 import * as AT from '../../../../storybook/argTypes'
-import { AssetSelect } from './AssetSelect'
+import { AssetSelect as Component } from './AssetSelect'
 
 const assets = [AssetBTC, AssetBNB, AssetRuneNative]
 
@@ -15,7 +15,7 @@ type Args = {
 }
 
 const Template = ({ network, withSearch, onSelect }: Args) => (
-  <AssetSelect
+  <Component
     asset={AssetBNB}
     withSearch={withSearch}
     assets={assets}
@@ -24,6 +24,7 @@ const Template = ({ network, withSearch, onSelect }: Args) => (
     network={network}
   />
 )
+export const Default = Template.bind({})
 
 const meta: ComponentMeta<typeof Template> = {
   component: Template,

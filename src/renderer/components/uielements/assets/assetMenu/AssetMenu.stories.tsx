@@ -4,7 +4,7 @@ import * as FP from 'fp-ts/lib/function'
 
 import { Network } from '../../../../../shared/api/types'
 import * as AT from '../../../../storybook/argTypes'
-import { AssetMenu } from './AssetMenu'
+import { AssetMenu as Component } from './AssetMenu'
 
 type Args = {
   withSearch: boolean
@@ -13,7 +13,7 @@ type Args = {
 }
 
 const Template = ({ network, withSearch, onSelect }: Args) => (
-  <AssetMenu
+  <Component
     withSearch={withSearch}
     asset={AssetBNB}
     assets={[AssetBNB, AssetBTC, AssetRuneNative]}
@@ -22,6 +22,7 @@ const Template = ({ network, withSearch, onSelect }: Args) => (
     network={network}
   />
 )
+export const Default = Template.bind({})
 
 const meta: ComponentMeta<typeof Template> = {
   component: Template,

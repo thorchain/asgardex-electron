@@ -1,18 +1,18 @@
-import { ComponentMeta } from '@storybook/react'
+import React from 'react'
+
+import { ComponentMeta, StoryFn } from '@storybook/react'
 
 import { Headline as Component } from './index'
+
+type ArgTypes = { children: React.ReactNode }
+const Template: StoryFn<ArgTypes> = (args) => <Component {...args} />
+export const Default = Template.bind({})
 
 const meta: ComponentMeta<typeof Component> = {
   component: Component,
   title: 'Components/Headline',
-  argTypes: {
-    children: {
-      name: 'title',
-      control: {
-        type: 'text'
-      },
-      defaultValue: 'Hello headline'
-    }
+  args: {
+    children: 'Hello headline'
   }
 }
 
