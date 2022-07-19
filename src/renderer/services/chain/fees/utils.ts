@@ -82,7 +82,7 @@ export const getChainFeeByGasRate = ({
       asset: AssetLTC
     })
   } else if (isDogeAsset(asset)) {
-    // DOGE = gasRate (sat/byte) * 250 (tx size)
+    // DOGE = gasRate (sat/byte) * 1000 (tx size)
     return O.some({
       amount: baseAmount(gasRate.multipliedBy(1000), DOGE_DECIMAL),
       asset: AssetDOGE
