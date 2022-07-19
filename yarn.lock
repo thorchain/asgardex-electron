@@ -2266,9 +2266,10 @@
   resolved "https://registry.yarnpkg.com/@cosmjs/utils/-/utils-0.28.10.tgz#8cb8cb3381210bb498aa766ac26c9ec369a7bfbb"
   integrity sha512-S0t2kFRiAo1MvIrbXlfrGdsn2D3PApyO1d+GCze14Cg4QOOGWDcTsd6VhHcxKhETO1Z9ofEhE4soJ8ZldBlnpg==
 
-"@cosmos-client/core@https://github.com/veado/cosmos-client-ts.git#patch/v0.45.10":
-  version "0.45.10"
-  resolved "https://github.com/veado/cosmos-client-ts.git#bfcf06bbb5a4e4251330223554a1b8d726b3b3e5"
+"@cosmos-client/core@^0.45.10":
+  version "0.45.13"
+  resolved "https://registry.yarnpkg.com/@cosmos-client/core/-/core-0.45.13.tgz#53a99f65c53b0cdefee245582a8bbea6f2a04e7d"
+  integrity sha512-OTszam3HnH+PSRh9oW/NkEocrOuQnClCGxRmFSOk25Lck8CTtDeKLzkpNbeyFDJVyJvW5IGLL//n9f43UMwbXQ==
   dependencies:
     axios "^0.23.0"
     bech32 "^1.1.4"
