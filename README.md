@@ -21,10 +21,10 @@ Symbols:
 
 ### Wallet
 
-|                | THOR               | BNB / BEP2         | BTC                | BCH                | DOGE               | ETH / ERC20        | LTC                | TERRA              | COSMOS             |
+|                | RUNE               | BNB / BEP2         | BTC                | BCH                | DOGE               | ETH / ERC20        | LTC                | TERRA              | COSMOS             |
 | -------------- | ------------------ | ------------------ | ------------------ | ------------------ | ------------------ | ------------------ | ------------------ | ------------------ | ------------------ |
 | Keystore       | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: |
-| Ledger \*      | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :white_check_mark: |
+| Ledger \*      | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: |
 | Send \*\*      | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: |
 | Receive        | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: |
 | Upgrade \*\*\* | :heavy_check_mark: | :heavy_check_mark: | -                  | -                  | -                  | :heavy_check_mark: | -                  | -                  | -                  |
@@ -33,7 +33,7 @@ Symbols:
 | History        | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: |
 | Synths         | :white_check_mark: | :white_check_mark: | :white_check_mark: | :white_check_mark: | :white_check_mark: | :white_check_mark: | :white_check_mark: | :white_check_mark: | :white_check_mark: |
 
-(\*) Ledger `THOR` is not supported at `stagenet`. Ledger `LTC`/`BCH`/`DOGE`/`Terra` are not supported at `testnet`
+(\*) Ledger `RUNE` is not supported at `stagenet`. Ledger `LTC`/`BCH`/`DOGE`/`Terra` are not supported at `testnet`
 
 (\*\*) With or without memo
 
@@ -41,7 +41,7 @@ Symbols:
 
 ### Exchange
 
-|                | THOR               | BNB / BEP2         | BTC                | BCH                | DOGE               | ETH / ERC20        | LTC                | TERRA              | COSMOS             |
+|                | RUNE               | BNB / BEP2         | BTC                | BCH                | DOGE               | ETH / ERC20        | LTC                | TERRA              | COSMOS             |
 | -------------- | ------------------ | ------------------ | ------------------ | ------------------ | ------------------ | ------------------ | ------------------ | ------------------ | ------------------ |
 | Pools overview | -                  | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: |
 | Pool detail    | -                  | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: |
@@ -102,6 +102,27 @@ cd asgardex
 yarn
 ```
 
+In case you get an an `ENAMETOOLONG: name too long` error or similar by running `yarn install`, e.g.
+
+```bash
+error An unexpected error occurred: "ENAMETOOLONG: name too long, unlink '~/.cache/yarn/v6/npm-@storybook-react-docgen-typescript-plugin-1.0.2-canary.6.9d540b91e815f8fc2f8829189deb00553559ff63.0-3103532ff494fb7dc3cf835f10740ecf6a26c0f9-integrity/node_modules/@storybook/react-docgen-typescript-plugin'".
+```
+
+change cache folder as described in [Unable to install latest SB version: Error: ENAMETOOLONG: name too long, unlink... #18441](https://github.com/storybookjs/storybook/discussions/18441) to run `yarn install` as follow:
+
+1. Check your cache dir
+
+```bash
+yarn cache dir
+~/.cache/yarn/v6
+```
+
+2. Point it to another (short) folder using `YARN_CACHE_FOLDER` (see [Change the cache path for yarn](https://classic.yarnpkg.com/lang/en/docs/cli/cache/#toc-change-the-cache-path-for-yarn)), e.g.
+
+```bash
+YARN_CACHE_FOLDER=/tmp/y/ yarn install
+```
+
 ## Environment variables
 
 While environment variables are not required (defaults are set), you can configure them. Create an `.env` file by copying all content of `.env.sample` and change these for your needs.
@@ -159,7 +180,7 @@ Or add to `REACT_APP_WALLET_PASSWORD=password` to `.env` file and run `yarn dev`
 Add chains you want to have for development to `REACT_APP_CHAINS_ENABLED`, for example
 
 ```bash
-REACT_APP_CHAINS_ENABLED=THOR,BNB,BTC,ETH,LTC
+REACT_APP_CHAINS_ENABLED=THOR,BNB,BTC,LTC,BCH,ETH,DOGE,GAIA
 ```
 
 Note: String of chains have to be as same as [definitions in xchain-util](https://github.com/xchainjs/xchainjs-lib/blob/master/packages/xchain-util/src/chain.const.ts)
@@ -189,8 +210,6 @@ yarn lint
 Note: `eslint` is provided by `react-scripts` located in `./node_modules/react-scripts/node_modules/` and don't need to be extra installed. If your editor has some issues to find `eslint`, you might point it to this location (see [VSCode settings file](.vscode/settings.json) as an example).
 
 ## Storybook
-
-Note: Running `storybook` is broken currently due lack of `React 18` support (see #2248). It will be fixed as soon as `storybook` supports `React 18`.
 
 ```bash
 yarn storybook
