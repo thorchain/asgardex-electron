@@ -5,7 +5,6 @@ import { AssetAtom, COSMOS_DECIMAL } from '@xchainjs/xchain-cosmos'
 import { DOGE_DECIMAL } from '@xchainjs/xchain-doge'
 import { ETH_DECIMAL } from '@xchainjs/xchain-ethereum'
 import { LTC_DECIMAL } from '@xchainjs/xchain-litecoin'
-import { AssetLUNA, TERRA_DECIMAL } from '@xchainjs/xchain-terra'
 import {
   Asset,
   AssetBCH,
@@ -28,14 +27,12 @@ import {
   isBchAsset,
   isBtcAsset,
   isDogeAsset,
-  isEthAsset,
-  isEthTokenAsset,
   isLtcAsset,
   isRuneNativeAsset,
   THORCHAIN_DECIMAL,
   to1e8BaseAmount
 } from '../../../helpers/assetHelper'
-import { isBnbChain, isCosmosChain, isTerraChain } from '../../../helpers/chainHelper'
+import { isBnbChain, isCosmosChain, isEthChain } from '../../../helpers/chainHelper'
 import { eqAsset } from '../../../helpers/fp/eq'
 import { sequenceTOption } from '../../../helpers/fpHelpers'
 import { RUNE_POOL_DATA } from '../../../helpers/poolHelper'
@@ -48,6 +45,8 @@ import { PoolsDataMap } from '../../midgard/types'
  *
  * Formulas based on "Better Fees Handling #1381"
  * @see https://github.com/thorchain/asgardex-electron/issues/1381#issuecomment-827513798
+ * incl. updated tx sizes based on information from Bas1c
+ * @see https://discord.com/channels/838986635756044328/997675038675316776/998552546392162314
  */
 export const getChainFeeByGasRate = ({
   gasRate,
@@ -59,57 +58,43 @@ export const getChainFeeByGasRate = ({
   const gasRateGwei = gasRate.multipliedBy(10 ** 9)
 
   if (isBnbChain(asset.chain)) {
-    // BNB = 1 * gasRate (sat/byte) * 1 (bytes)
+    // No change for BNB, just gasRate
     return O.some({
       amount: baseAmount(gasRate, BNB_DECIMAL),
       asset: AssetBNB
     })
   } else if (isBtcAsset(asset)) {
-    // BTC = 1 * gasRate (sat/byte) * 250 (bytes)
+    // BTC = gasRate (sat/byte) * 1000 (tx size)
     return O.some({
-      amount: baseAmount(gasRate.multipliedBy(250), BTC_DECIMAL),
+      amount: baseAmount(gasRate.multipliedBy(1000), BTC_DECIMAL),
       asset: AssetBTC
     })
   } else if (isBchAsset(asset)) {
-    // BCH (similar to BTC) = 1 * gasRate (sat/byte) * 250 (bytes)
+    // BCH = gasRate (sat/byte) * 1500 (tx size)
     return O.some({
-      amount: baseAmount(gasRate.multipliedBy(250), BCH_DECIMAL),
+      amount: baseAmount(gasRate.multipliedBy(1500), BCH_DECIMAL),
       asset: AssetBCH
     })
   } else if (isLtcAsset(asset)) {
-    // LTC (similar to BTC)  = 1 * gasRate (sat/byte) * 250 (bytes)
+    // LTC = gasRate (sat/byte) * 250 (tx size)
     return O.some({
       amount: baseAmount(gasRate.multipliedBy(250), LTC_DECIMAL),
       asset: AssetLTC
     })
   } else if (isDogeAsset(asset)) {
-    // DOGE (similar to BTC)  = 1 * gasRate (sat/byte) * 250 (bytes)
+    // DOGE = gasRate (sat/byte) * 250 (tx size)
     return O.some({
-      amount: baseAmount(gasRate.multipliedBy(250), DOGE_DECIMAL),
+      amount: baseAmount(gasRate.multipliedBy(1000), DOGE_DECIMAL),
       asset: AssetDOGE
     })
-  } else if (isEthAsset(asset)) {
-    // ETH = 1 * gasRate * 10^9 (GWEI) * 50000 (units)
+  } else if (isEthChain(asset.chain)) {
+    // ETH / ERC20 = gasRate * 10^9 (GWEI) * 80000 (units)
     return O.some({
-      amount: baseAmount(gasRateGwei.multipliedBy(50000), ETH_DECIMAL),
+      amount: baseAmount(gasRateGwei.multipliedBy(80000), ETH_DECIMAL),
       asset: AssetETH
-    })
-  } else if (isEthTokenAsset(asset)) {
-    // ERC20 = 1 * gasRate * 10^9 (GWEI) * 70000 (units)
-    return O.some({
-      amount: baseAmount(gasRateGwei.multipliedBy(70000), ETH_DECIMAL),
-      asset: AssetETH
-    })
-  } else if (isTerraChain(asset.chain)) {
-    // No change for LUNA = gasRate
-    // But convertion of decimal is needed: 1e8 (THORChain) -> 1e6 (TERRA)
-    const amount = convertBaseAmountDecimal(baseAmount(gasRate, THORCHAIN_DECIMAL), TERRA_DECIMAL)
-    return O.some({
-      amount,
-      asset: AssetLUNA
     })
   } else if (isCosmosChain(asset.chain)) {
-    // No change for ATOM = gasRate
+    // No change for ATOM, just gasRate
     // But convertion of decimal is needed: 1e8 (THORChain) -> 1e6 (COSMOS)
     const amount = convertBaseAmountDecimal(baseAmount(gasRate, THORCHAIN_DECIMAL), COSMOS_DECIMAL)
     return O.some({
