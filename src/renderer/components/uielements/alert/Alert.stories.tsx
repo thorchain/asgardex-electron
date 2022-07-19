@@ -1,11 +1,12 @@
-import React from 'react'
-
 import { SyncOutlined } from '@ant-design/icons'
-import { storiesOf } from '@storybook/react'
+import { ComponentMeta, StoryFn } from '@storybook/react'
 
 import { Button } from '../button'
 import { ButtonColor } from '../button/Button.types'
-import { Alert } from './Alert'
+import { Alert as Component, Props } from './Alert'
+
+const Template: StoryFn<Props> = (args) => <Component {...args} />
+export const Default = Template.bind({})
 
 const description = <div>This is a description message.</div>
 
@@ -19,88 +20,36 @@ const renderActionButton = (color: ButtonColor) => (
   </div>
 )
 
-storiesOf('Components/Alert', module)
-  .add('info', () => {
-    return (
+const meta: ComponentMeta<typeof Component> = {
+  component: Component,
+  title: 'Components/Alert',
+  decorators: [
+    (Story) => (
       <div style={{ padding: '15px' }}>
-        <Alert type="info" message="Info" />
+        <Story />
       </div>
     )
-  })
-  .add('info w/ description', () => {
-    return (
-      <div style={{ padding: '15px' }}>
-        <Alert type="info" message="Info" description={description} />
-      </div>
-    )
-  })
-  .add('info w/ action button', () => {
-    return (
-      <div style={{ padding: '15px' }}>
-        <Alert type="info" message="Info" description={renderActionButton('primary')} />
-      </div>
-    )
-  })
-  .add('success', () => {
-    return (
-      <div style={{ padding: '15px' }}>
-        <Alert type="success" message="Success" />
-      </div>
-    )
-  })
-  .add('success w/ description', () => {
-    return (
-      <div style={{ padding: '15px' }}>
-        <Alert type="success" message="Success" description={description} />
-      </div>
-    )
-  })
-  .add('success w/ button', () => {
-    return (
-      <div style={{ padding: '15px' }}>
-        <Alert type="success" message="Success" description={renderActionButton('success')} />
-      </div>
-    )
-  })
-  .add('warning', () => {
-    return (
-      <div style={{ padding: '15px' }}>
-        <Alert type="warning" message="Warning" />
-      </div>
-    )
-  })
-  .add('warning w/ description', () => {
-    return (
-      <div style={{ padding: '15px' }}>
-        <Alert type="warning" message="Warning" description={description} />
-      </div>
-    )
-  })
-  .add('warning w/ button', () => {
-    return (
-      <div style={{ padding: '15px' }}>
-        <Alert type="warning" message="Warning" description={renderActionButton('warning')} />
-      </div>
-    )
-  })
-  .add('error', () => {
-    return (
-      <div style={{ padding: '15px' }}>
-        <Alert type="error" message="Error" description={description} />
-      </div>
-    )
-  })
-  .add('error w/ button', () => {
-    return (
-      <div style={{ padding: '15px' }}>
-        <Alert type="error" message="Error" description={renderActionButton('error')} />
-      </div>
-    )
-  })
-  .add('error w/ empty description', () => {
-    return (
-      <div style={{ padding: '15px' }}>
-        <Alert type="error" message="Error" />
-      </div>
-    )
-  })
+  ],
+  argTypes: {
+    type: {
+      name: 'type',
+      control: {
+        type: 'select',
+        options: ['success', 'info', 'warning', 'error']
+      }
+    },
+    message: {
+      options: ['text', 'jsx'],
+      mapping: {
+        text: description,
+        jsx: renderActionButton('primary')
+      }
+    }
+  },
+  args: {
+    type: 'success',
+    message: description
+  }
+}
+
+export default meta

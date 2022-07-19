@@ -1,8 +1,17 @@
 # 1.17.x (2022-xx-xx)
 
+## Fix
+
+- Fix 500 errors while sending BCH [#2322](https://github.com/thorchain/asgardex-electron/pull/2322)
+
 ## Update
 
 - Update RU translation by @TreefeedXavier [#2318](https://github.com/thorchain/asgardex-electron/pull/2318)
+
+## Internal
+
+- Migrate to CRA5 [#2250](https://github.com/thorchain/asgardex-electron/issues), [##2323](https://github.com/thorchain/asgardex-electron/pull/2323)
+- Migrate to storybook v7 [#2324](https://github.com/thorchain/asgardex-electron/pull/2324)
 
 ## Fix
 

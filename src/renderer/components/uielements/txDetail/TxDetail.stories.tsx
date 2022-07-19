@@ -1,4 +1,4 @@
-import { Story } from '@storybook/react'
+import { ComponentMeta } from '@storybook/react'
 import {
   assetAmount,
   AssetBCH,
@@ -28,7 +28,7 @@ const getValues = (firstAsset: string, secondAsset: string, firstValue: number, 
   return FP.pipe([first, second], A.filterMap(FP.identity))
 }
 
-export const Desktop: Story<{
+type TemplateArgs = {
   firstInValue: number
   secondInValue: number
   firstOutValue: number
@@ -38,7 +38,9 @@ export const Desktop: Story<{
   firstOutAsset: string
   secondOutAsset: string
   isDesktopView: boolean
-}> = ({
+}
+
+const Template = ({
   firstInValue,
   secondInValue,
   firstOutValue,
@@ -48,7 +50,7 @@ export const Desktop: Story<{
   firstOutAsset,
   secondOutAsset,
   isDesktopView
-}) => {
+}: TemplateArgs) => {
   return (
     <TxDetail
       network="mainnet"
@@ -115,25 +117,27 @@ const argTypes = {
     name: 'isDesktopView',
     control: {
       type: 'boolean'
-    },
-    defaultValue: true
+    }
   }
 }
 
-Desktop.args = {
-  firstInValue: 1.23,
-  secondInValue: 0,
-  firstOutValue: 23.34,
-  secondOutValue: 0,
-  firstInAsset: stringAssetsOrNone[1],
-  secondInAsset: stringAssetsOrNone[0],
-  firstOutAsset: stringAssetsOrNone[2],
-  secondOutAsset: stringAssetsOrNone[0],
-  isDesktopView: true
+export const Default = Template.bind({})
+
+const meta: ComponentMeta<typeof Template> = {
+  component: Template,
+  title: 'Components/TxDetail',
+  argTypes,
+  args: {
+    firstInValue: 1.23,
+    secondInValue: 0,
+    firstOutValue: 23.34,
+    secondOutValue: 0,
+    firstInAsset: stringAssetsOrNone[1],
+    secondInAsset: stringAssetsOrNone[0],
+    firstOutAsset: stringAssetsOrNone[2],
+    secondOutAsset: stringAssetsOrNone[0],
+    isDesktopView: true
+  }
 }
 
-export default {
-  component: TxDetail,
-  title: 'TxDetail',
-  argTypes
-}
+export default meta

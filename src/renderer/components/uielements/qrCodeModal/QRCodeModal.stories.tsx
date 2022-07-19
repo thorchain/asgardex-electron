@@ -1,11 +1,10 @@
-import React from 'react'
-
-import { Meta, Story } from '@storybook/react'
+import { ComponentMeta } from '@storybook/react'
 import { AssetBNB } from '@xchainjs/xchain-util'
 import * as FP from 'fp-ts/lib/function'
 
 import { Network } from '../../../../shared/api/types'
 import { BNB_ADDRESS_MAINNET, BNB_ADDRESS_TESTNET } from '../../../../shared/mock/address'
+import * as AT from '../../../storybook/argTypes'
 import { QRCodeModal as Component } from './QRCodeModal'
 
 type StoryArgs = {
@@ -15,7 +14,7 @@ type StoryArgs = {
   onCancelHandler: FP.Lazy<void>
 }
 
-const Template: Story<StoryArgs> = ({ network, visible, onCancelHandler, onOkHandler }) => (
+const Template = ({ network, visible, onCancelHandler, onOkHandler }: StoryArgs) => (
   <Component
     asset={AssetBNB}
     address={network === 'testnet' ? BNB_ADDRESS_TESTNET : BNB_ADDRESS_MAINNET}
@@ -25,29 +24,21 @@ const Template: Story<StoryArgs> = ({ network, visible, onCancelHandler, onOkHan
     onOk={onOkHandler}
   />
 )
-
 export const Default = Template.bind({})
-Default.args = { visible: true, network: 'mainnet' }
 
-const meta: Meta<StoryArgs> = {
+const meta: ComponentMeta<typeof Template> = {
   component: Component,
   title: 'Components/QRCodeModal',
   argTypes: {
-    network: {
-      control: { type: 'radio', options: ['testnet', 'mainnet'] }
-    },
-    visible: {
-      control: {
-        type: 'boolean'
-      }
-    },
+    network: AT.network,
     onOkHandler: {
       action: 'onOkHandler'
     },
     onCancelHandler: {
       action: 'onCancelHandler'
     }
-  }
+  },
+  args: { network: 'mainnet', visible: true }
 }
 
 export default meta

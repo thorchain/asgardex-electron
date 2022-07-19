@@ -1,11 +1,10 @@
-import React from 'react'
-
-import { Meta, Story } from '@storybook/react'
+import { ComponentMeta } from '@storybook/react'
 import { AssetBNB, AssetBTC, AssetRuneNative } from '@xchainjs/xchain-util'
 import * as FP from 'fp-ts/lib/function'
 
 import { Network } from '../../../../../shared/api/types'
-import { AssetSelect } from './AssetSelect'
+import * as AT from '../../../../storybook/argTypes'
+import { AssetSelect as Component } from './AssetSelect'
 
 const assets = [AssetBTC, AssetBNB, AssetRuneNative]
 
@@ -15,8 +14,8 @@ type Args = {
   onSelect: FP.Lazy<void>
 }
 
-const Template: Story<Args> = ({ network, withSearch, onSelect }) => (
-  <AssetSelect
+const Template = ({ network, withSearch, onSelect }: Args) => (
+  <Component
     asset={AssetBNB}
     withSearch={withSearch}
     assets={assets}
@@ -25,38 +24,22 @@ const Template: Story<Args> = ({ network, withSearch, onSelect }) => (
     network={network}
   />
 )
-
 export const Default = Template.bind({})
 
-Default.storyName = 'default'
-
-const meta: Meta = {
-  component: AssetSelect,
+const meta: ComponentMeta<typeof Template> = {
+  component: Template,
   title: 'Components/Assets/AssetSelect',
   argTypes: {
-    network: {
-      name: 'Network',
-      control: {
-        type: 'select',
-        options: ['mainnet', 'testnet']
-      },
-      defaultValue: 'mainnet'
-    },
-    withSearch: {
-      name: 'with search',
-      control: {
-        type: 'boolean'
-      },
-      defaultValue: false
-    },
+    network: AT.network,
     onSelect: {
       action: 'onSelect'
     }
   },
+  args: { network: 'mainnet', withSearch: false },
   decorators: [
-    (S: Story) => (
+    (Story) => (
       <div style={{ display: 'flex', padding: '20px' }}>
-        <S />
+        <Story />
       </div>
     )
   ]

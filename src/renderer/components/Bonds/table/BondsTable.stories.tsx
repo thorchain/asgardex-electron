@@ -100,7 +100,6 @@ Default.storyName = 'default'
 const meta: Meta = {
   component: BondsTable,
   title: 'Bonds/BondsTable'
-  // decorators: [withKnobs]
 }
 
 export default meta

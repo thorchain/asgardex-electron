@@ -1,38 +1,21 @@
-import { Story, Meta } from '@storybook/react'
+import { ComponentMeta, StoryFn } from '@storybook/react'
 
 import { CopyLabel as Component } from './CopyLabel'
 
-type Args = {
+type ArgTypes = {
   label: string
   textToCopy: string
 }
 
-const Template: Story<Args> = ({ label, textToCopy }) => {
-  return <Component label={label} textToCopy={textToCopy} />
-}
-
+const Template: StoryFn<ArgTypes> = (args) => <Component {...args} />
 export const Default = Template.bind({})
 
-Default.storyName = 'default'
-
-const meta: Meta<Args> = {
+const meta: ComponentMeta<typeof Component> = {
   component: Component,
   title: 'Components/CopyLabel',
-  argTypes: {
-    label: {
-      name: 'label',
-      control: {
-        type: 'text'
-      },
-      defaultValue: 'label'
-    },
-    textToCopy: {
-      name: 'textToCopy',
-      control: {
-        type: 'text'
-      },
-      defaultValue: 'text to copy'
-    }
+  args: {
+    label: 'label',
+    textToCopy: 'text to copy'
   }
 }
 

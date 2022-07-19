@@ -8,7 +8,7 @@ import * as WU from '../../../services/wallet/util'
 import { HeaderIconWrapper } from '../HeaderIcon.styles'
 import * as Styled from './HeaderLock.styles'
 
-type Props = {
+export type Props = {
   keystore: KeystoreState
   onPress?: FP.Lazy<void>
   isDesktopView: boolean

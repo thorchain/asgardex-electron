@@ -26,7 +26,7 @@ const FooterIcon: React.FC<IconProps> = (props: IconProps): JSX.Element => {
   return <Styled.IconWrapper onClick={clickHandler}>{children}</Styled.IconWrapper>
 }
 
-type Props = {
+export type Props = {
   commitHash?: string
   isDev: boolean
 }

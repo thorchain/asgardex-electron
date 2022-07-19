@@ -1,54 +1,55 @@
-import React from 'react'
+import { ComponentMeta } from '@storybook/react'
 
-// TODO (@veado) Replace knobs
-// import { text, radios, withKnobs } from '@storybook/addon-knobs'
-// import { RadiosTypeOptionsProp } from '@storybook/addon-knobs/dist/components/types'
-import { storiesOf } from '@storybook/react'
-import { Row } from 'antd'
-import { SizeType } from 'antd/lib/config-provider/SizeContext'
+import { Input as Component, InputPassword, InputTextArea } from './Input.styles'
 
-import { Input, InputPassword, InputTextArea } from './Input.styles'
-import { Color } from './Input.types'
-
-storiesOf('Components/Input', module)
-  // .addDecorator(withKnobs)
-  .add('default', () => {
-    return (
-      <Row
-        style={{
-          display: 'flex',
-          flexDirection: 'column',
-          justifyContent: 'space-between',
-          width: '300px',
-          height: '300px'
-        }}>
-        <Input color="primary" size="small" value="this is text!" />
-        <Input color="primary" size="middle" value="this is text!" />
-        <Input color="primary" size="middle" typevalue="ghost" value="this is text!" />
-        <Input color="primary" size="large" value="this is text!" />
-        <Input color="success" size="large" value="this is text!" />
-        <Input color="warning" size="large" value="this is text!" />
-        <Input color="error" size="large" value="this is text!" />
-        <InputTextArea typevalue={'normal'} color="error" size="large" value="this is text area!" />
-        <InputPassword color="error" size="large" value="this is password!" />
-      </Row>
+const defaultInput: ComponentMeta<typeof InputPassword> = {
+  component: InputPassword,
+  title: 'Components/Input',
+  decorators: [
+    (Story) => (
+      <div style={{ padding: '15px' }}>
+        <Story />
+      </div>
     )
-  })
-  .add('properties', () => {
-    // const inputText = text('Input Text', 'text')
-    // const sizeOptions: RadiosTypeOptionsProp<SizeType> = { small: 'small', middle: 'middle', large: 'large' }
-    // const colorOptions: RadiosTypeOptionsProp<Color> = {
-    //   primary: 'primary',
-    //   success: 'success',
-    //   warning: 'warning',
-    //   error: 'error'
-    // }
+  ],
+  argTypes: {
+    typevalue: {
+      control: {
+        type: 'select',
+        options: ['normal', 'ghost']
+      }
+    },
+    color: {
+      control: {
+        type: 'select',
+        options: ['primary', 'success', 'warning', 'error']
+      }
+    },
+    size: {
+      control: {
+        type: 'select',
+        options: ['small', 'middle', 'large']
+      }
+    }
+  },
+  args: {
+    value: 'Input Text',
+    typevalue: 'normal',
+    color: 'primary',
+    size: 'middle'
+  }
+}
 
-    // const size = radios('size', sizeOptions, 'middle')
-    // const color = radios('color', colorOptions, 'primary')
-    const size: SizeType = 'middle'
-    const color: Color = 'primary'
-    const inputText = 'Input Text'
+export default defaultInput
 
-    return <Input color={color} size={size} value={inputText} />
-  })
+export const pwInput: ComponentMeta<typeof Component> = {
+  component: InputPassword,
+  title: 'Components/InputPassword',
+  argTypes: { ...defaultInput.argTypes }
+}
+
+export const textAreaInput: ComponentMeta<typeof Component> = {
+  component: InputTextArea,
+  title: 'Components/InputTextArea',
+  argTypes: { ...defaultInput.argTypes }
+}

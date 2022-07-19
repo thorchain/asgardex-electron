@@ -1,19 +1,33 @@
-import React from 'react'
-
-import { storiesOf } from '@storybook/react'
+import { ComponentMeta, StoryFn } from '@storybook/react'
 
 import { Button } from '../../uielements/button'
-import { SuccessView } from './index'
+import { SuccessView as Component, Props } from './SuccessView'
 
-storiesOf('Components/SuccessView', module)
-  .add('default', () => {
-    return <SuccessView title="Data loaded successfully!" />
-  })
-  .add('action button', () => {
-    const renderActionButton = () => (
-      <Button onClick={() => console.log('action')} typevalue="outline">
-        Click me
-      </Button>
-    )
-    return <SuccessView title="Data loaded successfully!" extra={renderActionButton()} />
-  })
+const Template: StoryFn<Props> = (args) => <Component {...args} />
+export const Default = Template.bind({})
+
+const renderActionButton = () => (
+  <Button onClick={() => console.log('action')} typevalue="outline">
+    Click me
+  </Button>
+)
+
+const meta: ComponentMeta<typeof Component> = {
+  component: Component,
+  title: 'Components/SuccessView',
+  argTypes: {
+    extra: {
+      options: ['null', 'extra'],
+      mapping: {
+        null: null,
+        extra: renderActionButton()
+      }
+    }
+  },
+  args: {
+    title: 'Data loaded successfully!',
+    extra: null
+  }
+}
+
+export default meta

@@ -1,1 +1,0 @@
-export { Trend } from './Trend'

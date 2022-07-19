@@ -1,5 +1,3 @@
-import React from 'react'
-
 import * as RD from '@devexperts/remote-data-ts'
 import { Story, Meta } from '@storybook/react'
 import { TxHash } from '@xchainjs/xchain-client'
@@ -155,7 +153,7 @@ export const BalanceError: Story = () => {
 }
 BalanceError.storyName = 'balance error'
 
-export const BalanceLoading: Story = () => {
+export const BalanceLoading = () => {
   const props: SymDepositProps = {
     ...defaultProps,
     walletBalances: { balances: O.none, loading: true }

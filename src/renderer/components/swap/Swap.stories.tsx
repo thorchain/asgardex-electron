@@ -1,7 +1,5 @@
-import React from 'react'
-
 import * as RD from '@devexperts/remote-data-ts'
-import { Story, Meta } from '@storybook/react'
+import { ComponentMeta, StoryFn } from '@storybook/react'
 import { BTC_DECIMAL } from '@xchainjs/xchain-bitcoin'
 import { TxHash } from '@xchainjs/xchain-client'
 import {
@@ -26,7 +24,7 @@ import { INITIAL_SWAP_STATE } from '../../services/chain/const'
 import { SwapState } from '../../services/chain/types'
 import { DEFAULT_MIMIR_HALT } from '../../services/thorchain/const'
 import { AssetWithDecimal } from '../../types/asgardex'
-import { Swap, SwapProps } from './Swap'
+import { Swap as Component, SwapProps } from './Swap'
 
 const sourceAsset: AssetWithDecimal = { asset: AssetRuneNative, decimal: THORCHAIN_DECIMAL }
 const targetAsset: AssetWithDecimal = { asset: AssetBTC, decimal: BTC_DECIMAL }
@@ -119,11 +117,10 @@ const defaultProps: SwapProps = {
   isDev: true
 }
 
-export const StoryDefault: Story = () => <Swap {...defaultProps} />
-StoryDefault.storyName = 'default'
+export const Default: StoryFn = () => <Component {...defaultProps} />
 
-const meta: Meta = {
-  component: Swap,
+const meta: ComponentMeta<typeof Component> = {
+  component: Component,
   title: 'Components/Swap'
 }
 

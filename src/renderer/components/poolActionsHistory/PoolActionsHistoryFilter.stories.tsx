@@ -1,11 +1,11 @@
-import React, { useState } from 'react'
+import { useState } from 'react'
 
-import { Story } from '@storybook/react'
+import { ComponentMeta } from '@storybook/react'
 
 import { PoolActionsHistoryFilter } from './PoolActionsHistoryFilter'
 import { Filter as FilterType } from './types'
 
-export const Filter: Story = () => {
+const Template = () => {
   const [filter, setFilter] = useState<FilterType>('ALL')
   return (
     <PoolActionsHistoryFilter
@@ -16,7 +16,11 @@ export const Filter: Story = () => {
   )
 }
 
-export default {
-  title: 'Components/PoolActionsHistoryFilter',
-  component: PoolActionsHistoryFilter
+export const Default = Template.bind({})
+
+const meta: ComponentMeta<typeof Template> = {
+  component: Template,
+  title: 'Components/PoolActionsHistoryFilter'
 }
+
+export default meta

@@ -1,6 +1,4 @@
-import React from 'react'
-
-import { Meta, Story } from '@storybook/react'
+import { ComponentMeta } from '@storybook/react'
 import { BTC_DECIMAL } from '@xchainjs/xchain-bitcoin'
 import { Address, FeeRates, Fees, FeesWithRates, FeeType, TxHash } from '@xchainjs/xchain-client'
 import { assetAmount, AssetBTC, assetToBase, baseAmount } from '@xchainjs/xchain-util'
@@ -26,7 +24,7 @@ type Args = {
   walletType: WalletType
 }
 
-const Template: Story<Args> = ({ txRDStatus, feeRDStatus, balance, validAddress, walletType }) => {
+const Template = ({ txRDStatus, feeRDStatus, balance, validAddress, walletType }: Args) => {
   const transfer$: SendTxStateHandler = (_) =>
     Rx.of({
       steps: { current: txRDStatus === 'initial' ? 0 : 1, total: 1 },
@@ -94,38 +92,31 @@ const Template: Story<Args> = ({ txRDStatus, feeRDStatus, balance, validAddress,
     />
   )
 }
-
 export const Default = Template.bind({})
 
-const meta: Meta<Args> = {
-  component: Component,
+const meta: ComponentMeta<typeof Template> = {
+  component: Template,
   title: 'Wallet/SendFormBTC',
   argTypes: {
     txRDStatus: {
-      name: 'txRDStatus',
-      control: { type: 'select', options: ['pending', 'error', 'success'] },
-      defaultValue: 'success'
+      control: { type: 'select', options: ['pending', 'error', 'success'] }
     },
     feeRDStatus: {
-      name: 'feeRD',
-      control: { type: 'select', options: ['initial', 'pending', 'error', 'success'] },
-      defaultValue: 'success'
+      control: { type: 'select', options: ['initial', 'pending', 'error', 'success'] }
     },
     walletType: {
-      name: 'wallet type',
-      control: { type: 'select', options: ['keystore', 'ledger'] },
-      defaultValue: 'keystore'
+      control: { type: 'select', options: ['keystore', 'ledger'] }
     },
     balance: {
-      name: 'BTC Balance',
-      control: { type: 'text' },
-      defaultValue: '2'
-    },
-    validAddress: {
-      name: 'valid address',
-      control: { type: 'boolean' },
-      defaultValue: true
+      control: { type: 'text' }
     }
+  },
+  args: {
+    txRDStatus: 'success',
+    feeRDStatus: 'success',
+    walletType: 'keystore',
+    balance: '2',
+    validAddress: true
   }
 }
 

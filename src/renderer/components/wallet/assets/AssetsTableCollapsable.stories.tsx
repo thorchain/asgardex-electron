@@ -1,7 +1,5 @@
-import React from 'react'
-
 import * as RD from '@devexperts/remote-data-ts'
-import { Story } from '@storybook/react'
+import { ComponentMeta } from '@storybook/react'
 import { Address } from '@xchainjs/xchain-client'
 import {
   Asset,
@@ -151,12 +149,6 @@ const argTypes = Object.keys(balances).reduce(
   {}
 )
 
-export default {
-  component: AssetsTableCollapsable,
-  title: 'Wallet/AssetsTableCollapsable',
-  argTypes
-}
-
 const getBalance = (chain: Chain, status: RDStatus | undefined, walletType: WalletType) =>
   getMockRDValueFactory(
     () =>
@@ -171,7 +163,7 @@ const getBalance = (chain: Chain, status: RDStatus | undefined, walletType: Wall
     () => ({ ...apiError, msg: `${chain} error` })
   )(status)
 
-export const Default: Story<Partial<Record<Chain, RDStatus>>> = (args) => {
+const Template = (args: Partial<Record<Chain, RDStatus>>) => {
   return (
     <AssetsTableCollapsable
       selectAssetHandler={selectAssetHandler}
@@ -195,5 +187,12 @@ export const Default: Story<Partial<Record<Chain, RDStatus>>> = (args) => {
     />
   )
 }
+export const Default = Template.bind({})
 
-Default.args = argTypes
+const meta: ComponentMeta<typeof Template> = {
+  component: Template,
+  title: 'Wallet/AssetsTableCollapsable',
+  argTypes,
+  args: argTypes
+}
+export default meta

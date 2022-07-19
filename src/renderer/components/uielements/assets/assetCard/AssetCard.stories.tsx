@@ -1,31 +1,27 @@
-import React from 'react'
-
-import { Meta, Story } from '@storybook/react'
+import { ComponentMeta } from '@storybook/react'
 import { bn, AssetBNB, assetAmount, assetToBase, AssetBTC, AssetRuneNative } from '@xchainjs/xchain-util'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
 
 import { BNB_ADDRESS_TESTNET } from '../../../../../shared/mock/address'
+import { isWalletType } from '../../../../../shared/utils/guard'
 import { WalletType } from '../../../../../shared/wallet/types'
 import { ZERO_BASE_AMOUNT } from '../../../../const'
 import * as InfoIconStyled from './../../info/InfoIcon.styles'
-import { AssetCard, Props as AssetCardProps } from './AssetCard'
+import { AssetCard as Component, Props } from './AssetCard'
 
 type Args = {
   tooltipColor: InfoIconStyled.Color
   tooltip: string
   walletTypeDisabled: boolean
-  walletType: WalletType & 'none'
+  walletType: WalletType | 'none'
 }
 
-export const Default: Story<Args> = ({ walletTypeDisabled, tooltip, tooltipColor, walletType }) => {
-  const props: AssetCardProps = {
+const Template = ({ walletTypeDisabled, tooltip, tooltipColor, walletType }: Args) => {
+  const props: Props = {
     assetBalance: assetToBase(assetAmount(12)),
     asset: { asset: AssetBNB, address: BNB_ADDRESS_TESTNET },
-    walletType: FP.pipe(
-      walletType,
-      O.fromPredicate((value) => value !== 'none')
-    ),
+    walletType: FP.pipe(walletType, O.fromPredicate(isWalletType)),
     walletTypeDisabled,
     walletTypeTooltip: tooltip,
     walletTypeTooltipColor: tooltipColor,
@@ -42,44 +38,36 @@ export const Default: Story<Args> = ({ walletTypeDisabled, tooltip, tooltipColor
     network: 'testnet'
   }
 
-  return <AssetCard {...props} />
+  return <Component {...props} />
 }
 
-Default.storyName = 'default'
+export const Default = Template.bind({})
 
-const meta: Meta<Args> = {
-  component: AssetCard,
+const meta: ComponentMeta<typeof Template> = {
+  component: Template,
   title: 'Components/Assets/AssetCard',
   argTypes: {
     walletType: {
       control: {
         type: 'select',
         options: ['keystore', 'ledger', 'none']
-      },
-      defaultValue: 'keystore'
+      }
     },
     tooltipColor: {
       control: {
         type: 'select',
         options: ['primary', 'warning', 'error']
-      },
-      defaultValue: 'primary'
-    },
-    tooltip: {
-      control: {
-        type: 'text'
-      },
-      defaultValue: 'Tooltip example text'
-    },
-    walletTypeDisabled: {
-      control: {
-        type: 'boolean'
-      },
-      defaultValue: false
+      }
     }
   },
+  args: {
+    walletTypeDisabled: false,
+    tooltip: 'Tooltip example text',
+    tooltipColor: 'primary',
+    walletType: 'ledger'
+  },
   decorators: [
-    (S: Story) => (
+    (S) => (
       <div style={{ display: 'flex', padding: '20px' }}>
         <S />
       </div>

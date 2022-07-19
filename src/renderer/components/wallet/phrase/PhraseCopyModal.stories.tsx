@@ -1,12 +1,28 @@
-import React from 'react'
+import { ComponentMeta, StoryFn } from '@storybook/react'
 
-import { storiesOf } from '@storybook/react'
+import { MOCK_PHRASE } from '../../../../shared/mock/wallet'
+import { PhraseCopyModal as Component, Props } from './PhraseCopyModal'
 
-import { PhraseCopyModal } from './PhraseCopyModal'
+const Template: StoryFn<Props> = (args) => <Component {...args} />
 
-const onClose = () => console.log('onClose')
-const sample_phrase = 'rural bright ball negative already grass good grant nation screen model pizza'
+export const Default = Template.bind({})
 
-storiesOf('Phrase/Copy', module).add('default', () => {
-  return <PhraseCopyModal phrase={sample_phrase} visible={true} onClose={onClose} />
-})
+const meta: ComponentMeta<typeof Component> = {
+  component: Component,
+  title: 'Wallet/PhraseCopyModal',
+  argTypes: {
+    phrase: {
+      name: 'phrase',
+      control: {
+        type: 'text'
+      }
+    },
+    onClose: { action: 'onClose' }
+  },
+  args: {
+    visible: true,
+    phrase: MOCK_PHRASE
+  }
+}
+
+export default meta

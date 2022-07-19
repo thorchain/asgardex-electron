@@ -1,61 +1,63 @@
-module.exports = {
+
+// Main entry point for Storybook@7.x
+// Based on `https://github.com/storybookjs/storybook/blob/v7.0.0-alpha.13/examples/cra-ts-essentials/.storybook/main.ts
+
+const { GitRevisionPlugin } = require('git-revision-webpack-plugin')
+
+const { version } = require('../package')
+
+const webpack = require('webpack')
+
+const config = {
+  features: {
+    buildStoriesJson: true,
+    breakingChangesV7: true,
+  },
+  core: {
+    builder: '@storybook/builder-webpack5',
+    channelOptions: { allowFunction: false, maxDepth: 10 },
+    disableTelemetry: true,
+  },
   staticDirs: ['../public'],
   stories: ['../src/renderer/**/*.stories.@(ts|tsx)'],
   addons: [
-    "@storybook/addon-essentials",
     '@storybook/preset-create-react-app',
-  ],
-  framework: "@storybook/react",
-  webpackFinal: async (webpackConfig) => {
-    /**
-     * CRA doesn't support .mjs files
-     * some of packages are provided as .mjs files (e.g. @polkadot/api)
-     * @see similar issue https://github.com/formatjs/formatjs/issues/1395#issuecomment-518823361
-     */
-    webpackConfig.module.rules.push(
-      {
-        test: /\.mjs$/,
-        include: /node_modules/,
-        type: 'javascript/auto'
+    {
+      name: '@storybook/addon-essentials',
+      options: {
+        viewport: false,
       },
-      /**
-       *  Use `babel-loader` for cosmos-client
-       * @see https://webpack.js.org/loaders/babel-loader/#options
-       * Based on"Module parse failed: Unexpected token You may need an appropriate loader to handle this file type. #607 "
-       * @see https://github.com/Akryum/floating-vue/issues/607#issuecomment-1070787029
-       *
-       * Background: It's needed to avoid following error:
-       * ERROR in ./node_modules/@cosmos-client/core/dist/esm/index.js 1:9
-       * ```bash
-       *  Module parse failed: Unexpected token (1:9)
-       *  You may need an appropriate loader to handle this file type, currently no loaders are configured to process this file. See https://webpack.js.org/concepts#loaders
-       *  export * as cosmosclient from './module';
-       *  export * as proto from './proto';
-       *  export * from './rest';
-       * ```
-       */
+    },
+  ],
+  framework: '@storybook/react-webpack5',
+  // Extending Storybook’s Webpack config
+  // https://storybook.js.org/docs/react/builders/webpack#extending-storybooks-webpack-config
+  webpackFinal: async (webpackConfig) => {
+    webpackConfig.resolve.fallback = {
+      ...webpackConfig.resolve.fallback,
+      stream: require.resolve('stream-browserify'),
+      crypto: require.resolve('crypto-browserify'),
+      os: require.resolve('os-browserify/browser'),
+      path: require.resolve('path-browserify'),
+      fs: require.resolve('browserify-fs'),
+      assert: require.resolve('assert')
+    }
 
-      {
-        test: /@?(cosmos-client).*\.js/,
-        use: {
-          loader: 'babel-loader',
-          options: {
-            presets: ['@babel/preset-env']
-          }
-        }
-      }
-    )
+    webpackConfig.plugins = [
+      ...webpackConfig.plugins,
+      new webpack.ProvidePlugin({
+        process: 'process/browser',
+        Buffer: ['buffer', 'Buffer']
+      }),
+      new webpack.DefinePlugin({
+        $COMMIT_HASH: JSON.stringify(new GitRevisionPlugin().commithash()),
+        $VERSION: JSON.stringify(version),
+        $IS_DEV: JSON.stringify(process.env.NODE_ENV !== 'production')
+      })
+    ]
 
     return webpackConfig
-  },
-  /** Use `react-docgen` temporary as a workaround to fix
-   * ```
-   * 70% sealing React Docgen Typescript Plugin/home/jk/Wrk/thorchain/repos/asgardex-electron/node_modules/react-docgen-typescript/lib/parser.js:442
-   *          var trimmedText = (tag.text || '').trim();
-   * ```
-   * @see https://github.com/styleguidist/react-docgen-typescript/issues/356#issuecomment-850400428
-   */
-  // typescript: {
-  //   reactDocgen: 'react-docgen'
-  // }
+  }
 }
+
+module.exports = config;

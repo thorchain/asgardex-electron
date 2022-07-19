@@ -1,29 +1,23 @@
-import React from 'react'
+import { ComponentMeta, StoryFn } from '@storybook/react'
+import { PaginationProps } from 'antd'
 
-import { storiesOf } from '@storybook/react'
+import { Pagination as Component } from './index'
 
-import { Pagination } from './index'
+const Template: StoryFn<PaginationProps> = (args) => <Component {...args} />
+export const Default = Template.bind({})
 
-storiesOf('Components/Pagination', module)
-  .add('default', () => {
-    return (
-      <Pagination
-        defaultCurrent={6}
-        total={250}
-        defaultPageSize={5}
-        showSizeChanger={false}
-        onChange={(no: number) => console.log('page number:', no)}
-      />
-    )
-  })
-  .add('empty', () => {
-    return (
-      <Pagination
-        defaultCurrent={1}
-        total={1}
-        defaultPageSize={5}
-        showSizeChanger={false}
-        onChange={(no: number) => console.log('page number:', no)}
-      />
-    )
-  })
+const meta: ComponentMeta<typeof Component> = {
+  component: Component,
+  title: 'Components/Pagination',
+  argTypes: {
+    onChange: { action: 'onChange' }
+  },
+  args: {
+    defaultCurrent: 1,
+    total: 100,
+    defaultPageSize: 5,
+    showSizeChanger: false
+  }
+}
+
+export default meta

@@ -1,6 +1,4 @@
-import React from 'react'
-
-import { Meta, Story } from '@storybook/react'
+import { ComponentMeta } from '@storybook/react'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
 
@@ -19,14 +17,14 @@ type StoryArgs = {
   collapsed: boolean
 }
 
-const Template: Story<StoryArgs> = ({
+const Template = ({
   changeNetwork,
   updateDataRD,
   checkForUpdates,
   goToReleasePage,
   changeLocale,
   collapsed
-}) => {
+}: StoryArgs) => {
   const appUpdateState = getMockRDValueFactory<Error, O.Option<string>>(
     () => O.some('2.0.0'),
     () => Error('Error while checking for updates ')
@@ -49,10 +47,9 @@ const Template: Story<StoryArgs> = ({
 }
 
 export const Default = Template.bind({})
-Default.args = { onlineStatus: OnlineStatus.ON, updateDataRD: 'initial' }
 
-const meta: Meta<StoryArgs> = {
-  component: Component,
+const meta: ComponentMeta<typeof Template> = {
+  component: Template,
   title: 'Components/AppSettings',
   argTypes: {
     updateDataRD: {
@@ -60,13 +57,6 @@ const meta: Meta<StoryArgs> = {
         type: 'select',
         options: rdStatusOptions
       }
-    },
-    collapsed: {
-      name: 'Show / hide',
-      control: {
-        type: 'boolean'
-      },
-      defaultValue: false
     },
     changeNetwork: {
       action: 'changeNetwork'
@@ -77,7 +67,8 @@ const meta: Meta<StoryArgs> = {
     goToReleasePage: {
       action: 'goToReleasePage'
     }
-  }
+  },
+  args: { onlineStatus: OnlineStatus.ON, updateDataRD: 'initial', collapsed: false }
 }
 
 export default meta

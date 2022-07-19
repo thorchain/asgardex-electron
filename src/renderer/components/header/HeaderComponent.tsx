@@ -45,7 +45,7 @@ type Tab = {
   icon: typeof SwapIcon // all icon types are as same as `SwapIcon`
 }
 
-type Props = {
+export type Props = {
   keystore: KeystoreState
   network: Network
   lockHandler: FP.Lazy<void>

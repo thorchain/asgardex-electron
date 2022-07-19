@@ -19,7 +19,7 @@ module.exports = {
       // Very similar to https://github.com/ObsidianLabs/Black-IDE/blob/52a09abc63b49c6407e49e3acc100653c5ee5ca0/config-overrides.js#L28-L40
       webpackConfig.optimization.minimizer = webpackConfig.optimization.minimizer.map((minimizer) => {
         if (minimizer instanceof TerserPlugin) {
-          minimizer.options.terserOptions.mangle = false
+          minimizer.options.mangle = false
         }
         return minimizer
       })
@@ -30,7 +30,8 @@ module.exports = {
         crypto: require.resolve('crypto-browserify'),
         os: require.resolve('os-browserify/browser'),
         path: require.resolve('path-browserify'),
-        fs: require.resolve('browserify-fs')
+        fs: require.resolve('browserify-fs'),
+        assert: require.resolve('assert')
       }
 
       webpackConfig.ignoreWarnings = [/Failed to parse source map/]
