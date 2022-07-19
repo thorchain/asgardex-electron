@@ -1,8 +1,9 @@
-# 1.17.x (2022-xx-xx)
+# 1.17.2 (2022-07-19)
 
 ## Fix
 
-- Fix 500 errors while sending BCH [#2322](https://github.com/thorchain/asgardex-electron/pull/2322)
+- [BCH] Broadcast tx to Haskoin might end in 500 error [#2320](https://github.com/thorchain/asgardex-electron/issues/2320)
+- Update tx sizes to fix `outbound amount does not meet requirements` errors [#2326](https://github.com/thorchain/asgardex-electron/pull/2326)
 
 ## Update
 
@@ -10,12 +11,9 @@
 
 ## Internal
 
-- Migrate to CRA5 [#2250](https://github.com/thorchain/asgardex-electron/issues), [##2323](https://github.com/thorchain/asgardex-electron/pull/2323)
+- Migrate to CRA5 [##2323](https://github.com/thorchain/asgardex-electron/pull/2323)
 - Migrate to storybook v7 [#2324](https://github.com/thorchain/asgardex-electron/pull/2324)
-
-## Fix
-
-- [BCH] Broadcast tx to Haskoin might end in 500 error [#2320](https://github.com/thorchain/asgardex-electron/issues/2320)
+- Simplify handling of TerserPlugin.mangle [#2321](https://github.com/thorchain/asgardex-electron/issues/2321)
 
 # 1.17.1 (2022-07-11)
 
