@@ -12,18 +12,29 @@
  */
 
 import {
-    MemberPool,
+    Coin,
 } from './';
 
 /**
  * @export
- * @interface MemberDetails
+ * @interface Balance
  */
-export interface MemberDetails {
+export interface Balance {
     /**
-     * List details of all the liquidity providers identified with the given address
-     * @type {Array<MemberPool>}
-     * @memberof MemberDetails
+     * @type {Array<Coin>}
+     * @memberof Balance
      */
-    pools: Array<MemberPool>;
+    coins: Array<Coin>;
+    /**
+     * full timestamp (nanoseconds since 1970) of the block at which the returned balance snapshot was valid
+     * @type {string}
+     * @memberof Balance
+     */
+    date: string;
+    /**
+     * height of the block at which the returned balance snapshot was valid
+     * @type {string}
+     * @memberof Balance
+     */
+    height: string;
 }
