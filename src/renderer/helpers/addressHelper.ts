@@ -6,7 +6,6 @@ import { getPrefix as getCosmosPrefix } from '@xchainjs/xchain-cosmos'
 import { getPrefix as getDogePrefix } from '@xchainjs/xchain-doge'
 import { getPrefix as getEthereumPrefix } from '@xchainjs/xchain-ethereum'
 import { getPrefix as getLitecoinPrefix } from '@xchainjs/xchain-litecoin'
-import { getPrefix as getTerraPrefix } from '@xchainjs/xchain-terra'
 import { getPrefix as getThorchainPrefix } from '@xchainjs/xchain-thorchain'
 import {
   Chain,
@@ -53,7 +52,7 @@ export const getAddressPrefixLength = (chain: Chain, network: Network): number =
     case BCHChain:
       return getBCHPrefix().length
     case TerraChain:
-      return getTerraPrefix().length
+      throw Error('Terra (Classic) is not supported anymore')
     case PolkadotChain:
       throw Error('Polkadot is not supported yet')
   }

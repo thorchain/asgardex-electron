@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useState } from 'react'
+import { useCallback, useState } from 'react'
 
 import { isCashAddress, toCashAddress, toLegacyAddress } from '@xchainjs/xchain-bitcoincash'
 import { Address } from '@xchainjs/xchain-client'
@@ -8,7 +8,7 @@ import * as O from 'fp-ts/lib/Option'
 import { useIntl } from 'react-intl'
 
 import { Network } from '../../../../shared/api/types'
-import { getChainAsset, isBchChain, isTerraChain } from '../../../helpers/chainHelper'
+import { getChainAsset, isBchChain } from '../../../helpers/chainHelper'
 import { AttentionIcon } from '../../icons'
 import { AddressEllipsis } from '../../uielements/addressEllipsis'
 import { ConfirmationModal } from './ConfirmationModal'
@@ -96,13 +96,6 @@ export const LedgerConfirmationModal: React.FC<Props> = ({
     [chain, intl, network]
   )
 
-  const renderAppIcon = useMemo(() => {
-    // Special case (Terra only): Use Terra icon instead of LUNA (which is chain asset)
-    if (isTerraChain(chain)) return <Styled.TerraIcon size="small" />
-    // For other chains render its chain asset
-    return <Styled.AssetIcon asset={asset} network={network} size="small" />
-  }, [asset, chain, network])
-
   return (
     <ConfirmationModal
       visible={visible}
@@ -114,7 +107,7 @@ export const LedgerConfirmationModal: React.FC<Props> = ({
         <Styled.Content>
           <Styled.LedgerContainer>
             <Styled.LedgerConnect />
-            {renderAppIcon}
+            <Styled.AssetIcon asset={asset} network={network} size="small" />
           </Styled.LedgerContainer>
           <Styled.Description>
             {description1 || intl.formatMessage({ id: 'ledger.needsconnected' }, { chain: chainToString(chain) })}

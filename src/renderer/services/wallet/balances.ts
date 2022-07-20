@@ -38,7 +38,6 @@ import * as COSMOS from '../cosmos'
 import * as DOGE from '../doge'
 import * as ETH from '../ethereum'
 import * as LTC from '../litecoin'
-import * as TERRA from '../terra'
 import * as THOR from '../thorchain'
 import { INITIAL_BALANCES_STATE } from './const'
 import {
@@ -73,7 +72,6 @@ export const createBalancesService = ({
     THOR.reloadBalances()
     LTC.reloadBalances()
     DOGE.reloadBalances()
-    TERRA.reloadBalances()
     COSMOS.reloadBalances()
   }
 
@@ -95,7 +93,8 @@ export const createBalancesService = ({
       case DOGEChain:
         return DOGE.reloadBalances
       case TerraChain:
-        return TERRA.reloadBalances
+        // Terra (Classic) is not supported anymore
+        return FP.constVoid
       case CosmosChain:
         return COSMOS.reloadBalances
       case PolkadotChain:
@@ -169,13 +168,6 @@ export const createBalancesService = ({
           resetReloadBalances: DOGE.resetReloadBalances,
           balances$: DOGE.balances$(walletType, walletIndex),
           reloadBalances$: DOGE.reloadBalances$
-        }
-      case TerraChain:
-        return {
-          reloadBalances: TERRA.reloadBalances,
-          resetReloadBalances: TERRA.resetReloadBalances,
-          balances$: TERRA.balances$(walletType, walletIndex),
-          reloadBalances$: TERRA.reloadBalances$
         }
       case CosmosChain:
         return {
@@ -532,32 +524,6 @@ export const createBalancesService = ({
   )
 
   /**
-   * Transforms TERRA balances into `ChainBalance`
-   */
-  const terraChainBalance$: ChainBalance$ = Rx.combineLatest([
-    TERRA.addressUI$,
-    getChainBalance$({ chain: TerraChain, walletType: 'keystore', walletIndex: 0, walletBalanceType: 'all' }) // walletIndex=0 (as long as we don't support HD wallets for keystore)
-  ]).pipe(
-    RxOp.map<[O.Option<WalletAddress>, WalletBalancesRD], ChainBalance>(([oWalletAddress, balances]) => ({
-      walletType: 'keystore',
-      chain: TerraChain,
-      walletAddress: addressFromOptionalWalletAddress(oWalletAddress),
-      walletIndex: 0, // Always 0 as long as we don't support HD wallets for keystore
-      balances,
-      balancesType: 'all'
-    }))
-  )
-
-  /**
-   * Terra Ledger balances
-   */
-  const terraLedgerChainBalance$: ChainBalance$ = ledgerChainBalance$({
-    chain: TerraChain,
-    walletBalanceType: 'all',
-    getBalanceByAddress$: TERRA.getBalanceByAddress$
-  })
-
-  /**
    * Transforms COSMOS balances into `ChainBalance`
    */
   const cosmosChainBalance$: ChainBalance$ = Rx.combineLatest([
@@ -614,7 +580,6 @@ export const createBalancesService = ({
         BNB: [bnbChainBalance$, bnbLedgerChainBalance$],
         LTC: [ltcBalance$, ltcLedgerChainBalance$],
         DOGE: [dogeChainBalance$, dogeLedgerChainBalance$],
-        TERRA: [terraChainBalance$, terraLedgerChainBalance$],
         GAIA: [cosmosChainBalance$, cosmosLedgerChainBalance$]
       })
     ),

@@ -4,7 +4,6 @@ import { COSMOS_DECIMAL } from '@xchainjs/xchain-cosmos'
 import { DOGE_DECIMAL } from '@xchainjs/xchain-doge'
 import { ETH_DECIMAL } from '@xchainjs/xchain-ethereum'
 import { LTC_DECIMAL } from '@xchainjs/xchain-litecoin'
-import { TERRA_DECIMAL } from '@xchainjs/xchain-terra'
 import { DECIMAL as THOR_DECIMAL } from '@xchainjs/xchain-thorchain'
 import {
   BaseAmount,
@@ -44,7 +43,6 @@ export const smallestAmountToSent = (chain: Chain, _network: Network): BaseAmoun
     case CosmosChain:
       return baseAmount(1, COSMOS_DECIMAL)
     case PolkadotChain:
-      // return baseAmount(1, getDecimalDot(getClientNetwork(network))
       throw Error('Polkadot is not supported yet')
     case DOGEChain:
       // 1000 satoshi
@@ -56,11 +54,6 @@ export const smallestAmountToSent = (chain: Chain, _network: Network): BaseAmoun
       // 1000 satoshi
       return baseAmount(1000, LTC_DECIMAL)
     case TerraChain:
-      // Bifrost does "consider transactions with fee paid in uluna" only
-      // ^ https://gitlab.com/thorchain/thornode/-/blob/develop/bifrost/pkg/chainclients/terra/cosmos_block_scanner.go#L195
-      // Also Bifrost does "Ignore the tx when no coins exist"
-      // ^ https://gitlab.com/thorchain/thornode/-/blob/develop/bifrost/pkg/chainclients/terra/cosmos_block_scanner.go#L327
-      // That's 0.000001 or 1 uluna
-      return baseAmount(1, TERRA_DECIMAL)
+      throw Error('Terra (Classic) is not supported anymore')
   }
 }

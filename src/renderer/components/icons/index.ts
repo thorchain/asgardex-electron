@@ -12,7 +12,6 @@ import lunaIcon from '!file-loader!../../assets/svg/asset-luna.svg'
 import runeIcon from '!file-loader!../../assets/svg/asset-rune.svg'
 import ustIcon from '!file-loader!../../assets/svg/asset-ust.svg'
 import xRuneIcon from '!file-loader!../../assets/svg/asset-xrune.svg'
-import terraIcon from '!file-loader!../../assets/svg/terra.svg'
 import dogeIcon from '../../assets/png/asset-doge.png'
 import tgtIcon from '../../assets/png/asset-tgt.png'
 import { ReactComponent as CurrencyIcon } from '../../assets/svg/currency-icon.svg'
@@ -27,7 +26,6 @@ export {
   dogeIcon,
   ethIcon,
   lunaIcon,
-  terraIcon,
   runeIcon,
   ustIcon,
   bnbRuneIcon,

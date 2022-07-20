@@ -7,7 +7,6 @@ import {
   DOGEChain,
   ETHChain,
   LTCChain,
-  TerraChain,
   THORChain
 } from '@xchainjs/xchain-util'
 import * as E from 'fp-ts/Either'
@@ -22,7 +21,6 @@ import { getAddress as getCOSMOSAddress, verifyAddress as verifyCOSMOSAddress } 
 import { getAddress as getDOGEAddress, verifyAddress as verifyDOGEAddress } from './doge/address'
 import { getAddress as getETHAddress, verifyAddress as verifyETHAddress } from './ethereum/address'
 import { getAddress as getLTCAddress, verifyAddress as verifyLTCAddress } from './litecoin/address'
-import { getAddress as getTerraAddress, verifyAddress as verifyTerraAddress } from './terra/address'
 import { getAddress as getTHORAddress, verifyAddress as verifyTHORAddress } from './thorchain/address'
 
 export const getAddress = async ({
@@ -51,9 +49,6 @@ export const getAddress = async ({
         break
       case DOGEChain:
         res = await getDOGEAddress(transport, network, walletIndex)
-        break
-      case TerraChain:
-        res = await getTerraAddress(transport, walletIndex)
         break
       case ETHChain:
         res = await getETHAddress(transport, walletIndex)
@@ -98,9 +93,6 @@ export const verifyLedgerAddress = async ({ chain, network, walletIndex }: IPCLe
       break
     case DOGEChain:
       result = await verifyDOGEAddress({ transport, network, walletIndex })
-      break
-    case TerraChain:
-      result = await verifyTerraAddress(transport, walletIndex)
       break
     case ETHChain:
       result = await verifyETHAddress(transport, walletIndex)

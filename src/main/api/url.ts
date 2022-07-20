@@ -36,7 +36,6 @@ const EXTERNALS_WHITELIST = [
   'testnet.thornode.thorchain.info',
   'stagenet-thornode.ninerealms.com',
   'stagenet-rpc.ninerealms.com',
-  'finder.terra.money',
   'cosmos.bigdipper.live',
   'explorer.theta-testnet.polypore.xyz'
 ]
