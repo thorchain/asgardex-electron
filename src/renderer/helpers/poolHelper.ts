@@ -219,7 +219,7 @@ export const disableAllActions = ({
   // Check `haltDogeChain` (provided by `mimir` endpoint) to disable all actions for DOGE pools
   if (isDogeChain(chain) && haltDogeChain) return true
 
-  // Check `haltCosmosChain` (provided by `mimir` endpoint) to disable all actions for TERRA pools
+  // Check `haltCosmosChain` (provided by `mimir` endpoint) to disable all actions for GAIA pools
   if (isCosmosChain(chain) && haltCosmosChain) return true
 
   // Check `chain` is included in `haltedChains` (provided by `inbound_addresses` endpoint)

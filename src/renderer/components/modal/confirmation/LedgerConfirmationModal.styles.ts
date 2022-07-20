@@ -4,7 +4,7 @@ import { palette } from 'styled-theme'
 
 import { ReactComponent as LedgerConnectUI } from '../../../assets/svg/ledger-device-connect.svg'
 import { media } from '../../../helpers/styleHelper'
-import { AssetIcon as AssetIconUI, TerraIcon as TerraIconUI } from '../../uielements/assets/assetIcon'
+import { AssetIcon as AssetIconUI } from '../../uielements/assets/assetIcon'
 import { Button } from '../../uielements/button'
 import { CopyLabel as CopyLabelUI } from '../../uielements/label'
 
@@ -24,19 +24,6 @@ export const LedgerConnect = styled(LedgerConnectUI)`
 `
 
 export const AssetIcon = styled(AssetIconUI)`
-  position: absolute;
-  top: 20px;
-  left: 180px;
-  transform: scale(0.7, 0.7);
-
-  ${media.md`
-    top: 21px;
-    left: 170px;
-    transform: scale(0.9, 0.9);
-  `}
-`
-
-export const TerraIcon = styled(TerraIconUI)`
   position: absolute;
   top: 20px;
   left: 180px;

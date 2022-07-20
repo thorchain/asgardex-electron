@@ -26,7 +26,6 @@ import * as COSMOS from '../../cosmos'
 import * as DOGE from '../../doge'
 import * as ETH from '../../ethereum'
 import * as LTC from '../../litecoin'
-import * as TERRA from '../../terra'
 import * as THOR from '../../thorchain'
 import { ApiError, ErrorId, TxHashLD, TxLD } from '../../wallet/types'
 import { SendPoolTxParams, SendTxParams } from '../types'
@@ -48,10 +47,7 @@ export const sendTx$ = ({
   amount,
   memo,
   feeOption = DEFAULT_FEE_OPTION,
-  walletIndex,
-  feeAsset,
-  gasLimit,
-  feeAmount
+  walletIndex
 }: SendTxParams): TxHashLD => {
   switch (asset.chain) {
     case BNBChain:
@@ -94,11 +90,7 @@ export const sendTx$ = ({
       return txFailure$(`sendTx$ has not been implemented for Polkadot yet`)
 
     case TerraChain:
-      if (!feeAmount) return txFailure$('Missing `feeAmount` - needed to transfer TERRA tx')
-      if (!feeAsset) return txFailure$('Missing `feeAsset` - needed to transfer TERRA tx')
-      if (!gasLimit) return txFailure$('Missing `gasLimit` - needed to transfer TERRA tx')
-
-      return TERRA.sendTx({ walletType, amount, asset, memo, recipient, walletIndex, feeAmount, feeAsset, gasLimit })
+      return txFailure$(`Terra (Classic) is not supported anymore - sendTx$ has been removed`)
 
     case DOGEChain:
       return FP.pipe(
@@ -165,9 +157,6 @@ export const sendPoolTx$ = ({
     case THORChain:
       return THOR.sendPoolTx$({ walletType, amount, asset, memo, walletIndex })
 
-    case TerraChain:
-      return TERRA.sendPoolTx$({ walletType, amount, asset, memo, recipient, walletIndex })
-
     default:
       return sendTx$({ sender, walletType, asset, recipient, amount, memo, feeOption, walletIndex })
   }
@@ -197,7 +186,7 @@ export const txStatusByChain$ = ({ txHash, chain }: { txHash: TxHash; chain: Cha
     case PolkadotChain:
       return txStatusFailure$(`txStatusByChain$ has not been implemented for Polkadot`)
     case TerraChain:
-      return TERRA.txStatus$(txHash, O.none)
+      return txStatusFailure$(`txStatusByChain$ has been removed - Terra (Classic) is not supported anymore`)
     case DOGEChain:
       return DOGE.txStatus$(txHash, O.none)
     case BCHChain:

@@ -44,7 +44,6 @@ import {
   isDogeChain,
   isEthChain,
   isLtcChain,
-  isTerraChain,
   isThorChain
 } from '../../helpers/chainHelper'
 import { emptyString } from '../../helpers/stringHelper'
@@ -151,9 +150,9 @@ export const WalletSettings: React.FC<Props> = (props): JSX.Element => {
     [THORChain]: 0,
     [ETHChain]: 0,
     [CosmosChain]: 0,
-    [PolkadotChain]: 0,
+    [PolkadotChain]: 0, // not supported in ASGDX, but part of xchain-util
     [DOGEChain]: 0,
-    [TerraChain]: 0
+    [TerraChain]: 0 // not supported in ASGDX anymore, but part of xchain-util
   })
 
   const [addressToVerify, setAddressToVerify] = useState<AddressToVerify>(O.none)
@@ -199,7 +198,6 @@ export const WalletSettings: React.FC<Props> = (props): JSX.Element => {
               isLtcChain(chain) ||
               isBchChain(chain) ||
               isDogeChain(chain) ||
-              isTerraChain(chain) ||
               isEthChain(chain) ||
               isCosmosChain(chain)) && (
               <>

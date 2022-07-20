@@ -12,7 +12,6 @@ import {
   DOGEChain,
   ETHChain,
   LTCChain,
-  TerraChain,
   THORChain
 } from '@xchainjs/xchain-util'
 import * as FP from 'fp-ts/function'
@@ -36,7 +35,6 @@ import { useCosmosContext } from '../../contexts/CosmosContext'
 import { useDogeContext } from '../../contexts/DogeContext'
 import { useEthereumContext } from '../../contexts/EthereumContext'
 import { useLitecoinContext } from '../../contexts/LitecoinContext'
-import { useTerraContext } from '../../contexts/TerraContext'
 import { useThorchainContext } from '../../contexts/ThorchainContext'
 import { useWalletContext } from '../../contexts/WalletContext'
 import {
@@ -47,7 +45,6 @@ import {
   isBtcChain,
   isLtcChain,
   isThorChain,
-  isTerraChain,
   isEthChain,
   isCosmosChain
 } from '../../helpers/chainHelper'
@@ -83,7 +80,6 @@ export const WalletSettingsView: React.FC = (): JSX.Element => {
   const { addressUI$: ltcAddressUI$ } = useLitecoinContext()
   const { addressUI$: bchAddressUI$ } = useBitcoinCashContext()
   const { addressUI$: dogeAddressUI$ } = useDogeContext()
-  const { addressUI$: terraAddressUI$ } = useTerraContext()
   const { addressUI$: cosmosAddressUI$ } = useCosmosContext()
 
   const ethDerivationMode: EthDerivationMode = useObservableState(ethDerivationMode$, DEFAULT_ETH_DERIVATION_MODE)
@@ -143,13 +139,6 @@ export const WalletSettingsView: React.FC = (): JSX.Element => {
   } = useLedger(DOGEChain)
 
   const {
-    askAddress: askLedgerTerraAddress,
-    verifyAddress: verifyLedgerTerraAddress,
-    address: terraLedgerAddressRD,
-    removeAddress: removeLedgerTerraAddress
-  } = useLedger(TerraChain)
-
-  const {
     askAddress: askLedgerEthAddress,
     verifyAddress: verifyLedgerEthAddress,
     address: ethLedgerAddressRD,
@@ -170,7 +159,6 @@ export const WalletSettingsView: React.FC = (): JSX.Element => {
     if (isLtcChain(chain)) return askLedgerLtcAddress(walletIndex)
     if (isBchChain(chain)) return askLedgerBchAddress(walletIndex)
     if (isDogeChain(chain)) return askLedgerDOGEAddress(walletIndex)
-    if (isTerraChain(chain)) return askLedgerTerraAddress(walletIndex)
     if (isEthChain(chain)) return askLedgerEthAddress(walletIndex)
     if (isCosmosChain(chain)) return askLedgerCosmosAddress(walletIndex)
 
@@ -184,7 +172,6 @@ export const WalletSettingsView: React.FC = (): JSX.Element => {
     if (isLtcChain(chain)) return verifyLedgerLtcAddress(walletIndex)
     if (isBchChain(chain)) return verifyLedgerBchAddress(walletIndex)
     if (isDogeChain(chain)) return verifyLedgerDOGEAddress(walletIndex)
-    if (isTerraChain(chain)) return verifyLedgerTerraAddress(walletIndex)
     if (isEthChain(chain)) return verifyLedgerEthAddress(walletIndex)
     if (isCosmosChain(chain)) return verifyLedgerCosmosAddress(walletIndex)
 
@@ -198,7 +185,6 @@ export const WalletSettingsView: React.FC = (): JSX.Element => {
     if (isLtcChain(chain)) return removeLedgerLtcAddress()
     if (isBchChain(chain)) return removeLedgerBchAddress()
     if (isDogeChain(chain)) return removeLedgerDOGEAddress()
-    if (isTerraChain(chain)) return removeLedgerTerraAddress()
     if (isEthChain(chain)) return removeLedgerEthAddress()
     if (isCosmosChain(chain)) return removeLedgerCosmosAddress()
 
@@ -214,7 +200,6 @@ export const WalletSettingsView: React.FC = (): JSX.Element => {
   const oTHORClient = useObservableState(clientByChain$(THORChain), O.none)
   const oLTCClient = useObservableState(clientByChain$(LTCChain), O.none)
   const oDOGEClient = useObservableState(clientByChain$(DOGEChain), O.none)
-  const oTerraClient = useObservableState(clientByChain$(TerraChain), O.none)
   const oCosmosClient = useObservableState(clientByChain$(CosmosChain), O.none)
 
   const clickAddressLinkHandler = (chain: Chain, address: Address) => {
@@ -244,9 +229,6 @@ export const WalletSettingsView: React.FC = (): JSX.Element => {
         break
       case DOGEChain:
         FP.pipe(oDOGEClient, O.map(openExplorerAddressUrl))
-        break
-      case TerraChain:
-        FP.pipe(oTerraClient, O.map(openExplorerAddressUrl))
         break
       case CosmosChain:
         FP.pipe(oCosmosClient, O.map(openExplorerAddressUrl))
@@ -322,17 +304,6 @@ export const WalletSettingsView: React.FC = (): JSX.Element => {
     [intl, dogeLedgerAddressRD]
   )
 
-  const terraLedgerWalletAddress: WalletAddressAsync = useMemo(
-    () => ({
-      type: 'ledger',
-      address: FP.pipe(
-        terraLedgerAddressRD,
-        RD.mapLeft(({ errorId, msg }) => Error(`${ledgerErrorIdToI18n(errorId, intl)} (${msg})`))
-      )
-    }),
-    [intl, terraLedgerAddressRD]
-  )
-
   const ethLedgerWalletAddress: WalletAddressAsync = useMemo(
     () => ({
       type: 'ledger',
@@ -391,11 +362,6 @@ export const WalletSettingsView: React.FC = (): JSX.Element => {
       ledgerAddress: dogeLedgerWalletAddress,
       chain: DOGEChain
     })
-    const terraWalletAccount$ = walletAccount$({
-      addressUI$: terraAddressUI$,
-      ledgerAddress: terraLedgerWalletAddress,
-      chain: TerraChain
-    })
     const cosmosWalletAccount$ = walletAccount$({
       addressUI$: cosmosAddressUI$,
       ledgerAddress: cosmosLedgerWalletAddress,
@@ -413,7 +379,6 @@ export const WalletSettingsView: React.FC = (): JSX.Element => {
           BCH: [bchWalletAccount$],
           LTC: [ltcWalletAccount$],
           DOGE: [dogeWalletAccount$],
-          TERRA: [terraWalletAccount$],
           GAIA: [cosmosWalletAccount$]
         })
       ),
@@ -434,8 +399,6 @@ export const WalletSettingsView: React.FC = (): JSX.Element => {
     ltcLedgerWalletAddress,
     dogeAddressUI$,
     dogeLedgerWalletAddress,
-    terraAddressUI$,
-    terraLedgerWalletAddress,
     cosmosAddressUI$,
     cosmosLedgerWalletAddress,
     ethAddressUI$,

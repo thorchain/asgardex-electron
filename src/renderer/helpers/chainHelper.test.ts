@@ -10,7 +10,6 @@ import {
   DOGEChain,
   ETHChain,
   LTCChain,
-  TerraChain,
   THORChain
 } from '@xchainjs/xchain-util'
 
@@ -23,7 +22,6 @@ import {
   isDogeChain,
   isEthChain,
   isLtcChain,
-  isTerraChain,
   isThorChain
 } from './chainHelper'
 
@@ -90,13 +88,6 @@ describe('helpers/chainHelper', () => {
     })
     it('DOGEChain -> false', () => {
       expect(isDogeChain(ETHChain)).toBeFalsy()
-    })
-
-    it('TerraChain -> true', () => {
-      expect(isTerraChain(TerraChain)).toBeTruthy()
-    })
-    it('TerraChain -> false', () => {
-      expect(isTerraChain(ETHChain)).toBeFalsy()
     })
 
     it('CosmosChain -> true', () => {

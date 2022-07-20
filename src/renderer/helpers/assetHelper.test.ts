@@ -1,6 +1,5 @@
 import { AssetAtom } from '@xchainjs/xchain-cosmos'
 import { ETHAddress } from '@xchainjs/xchain-ethereum'
-import { AssetLUNA } from '@xchainjs/xchain-terra'
 import {
   assetAmount,
   AssetBCH,
@@ -26,7 +25,6 @@ import {
   AssetUniHAddress,
   AssetUSDTERC20,
   AssetUSDTERC20Testnet,
-  AssetUST,
   AssetXRune,
   AssetXRuneAddress,
   AssetXRuneTestnet
@@ -59,8 +57,6 @@ import {
   validAssetForETH,
   iconUrlInERC20Whitelist,
   isRuneAsset,
-  isLunaAsset,
-  isUstAsset,
   getAssetFromNullableString
 } from './assetHelper'
 import { eqAsset, eqAssetAmount, eqBaseAmount, eqOAsset } from './fp/eq'
@@ -323,12 +319,6 @@ describe('helpers/assetHelper', () => {
     it('RUNE Native ', () => {
       expect(isChainAsset(AssetRuneNative)).toBeTruthy()
     })
-    it('LUNA', () => {
-      expect(isChainAsset(AssetLUNA)).toBeTruthy()
-    })
-    it('UST', () => {
-      expect(isChainAsset(AssetUST)).toBeFalsy()
-    })
     it('ATOM', () => {
       expect(isChainAsset(AssetAtom)).toBeTruthy()
     })
@@ -341,29 +331,9 @@ describe('helpers/assetHelper', () => {
     it('USDT (ERC20) -> true', () => {
       expect(isUSDAsset(AssetUSDTERC20Testnet)).toBeTruthy()
     })
-    it('UST -> true', () => {
-      expect(isUSDAsset(AssetUST)).toBeTruthy()
-    })
+
     it('RUNE Native -> false', () => {
       expect(isUSDAsset(AssetRuneNative)).toBeFalsy()
-    })
-  })
-
-  describe('isLunaAsset', () => {
-    it('AssetLUNA -> true', () => {
-      expect(isLunaAsset(AssetLUNA)).toBeTruthy()
-    })
-    it('AssetUST -> false', () => {
-      expect(isLunaAsset(AssetUST)).toBeFalsy()
-    })
-  })
-
-  describe('isUstAsset', () => {
-    it('AssetUST -> true', () => {
-      expect(isUstAsset(AssetUST)).toBeTruthy()
-    })
-    it('AssetLUNA -> false', () => {
-      expect(isUstAsset(AssetLUNA)).toBeFalsy()
     })
   })
 

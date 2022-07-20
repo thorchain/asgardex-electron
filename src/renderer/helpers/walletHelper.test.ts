@@ -10,7 +10,6 @@ import {
   BNBChain,
   BCHChain,
   DOGEChain,
-  TerraChain,
   CosmosChain
 } from '@xchainjs/xchain-util'
 import * as FP from 'fp-ts/lib/function'
@@ -241,11 +240,7 @@ describe('walletHelper', () => {
       expect(isEnabledWallet(DOGEChain, 'mainnet', 'ledger')).toBeTruthy()
       expect(isEnabledWallet(DOGEChain, 'stagenet', 'ledger')).toBeTruthy()
     })
-    it('Terra ledger mainnet/stagenet/testnet -> true', () => {
-      expect(isEnabledWallet(TerraChain, 'testnet', 'ledger')).toBeTruthy()
-      expect(isEnabledWallet(TerraChain, 'mainnet', 'ledger')).toBeTruthy()
-      expect(isEnabledWallet(TerraChain, 'stagenet', 'ledger')).toBeTruthy()
-    })
+
     it('Cosmos ledger mainnet/stagenet/testnet -> true', () => {
       expect(isEnabledWallet(CosmosChain, 'testnet', 'ledger')).toBeTruthy()
       expect(isEnabledWallet(CosmosChain, 'mainnet', 'ledger')).toBeTruthy()
