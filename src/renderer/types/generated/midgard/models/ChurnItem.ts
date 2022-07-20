@@ -11,19 +11,21 @@
  * Do not edit the class manually.
  */
 
-import {
-    MemberPool,
-} from './';
-
 /**
  * @export
- * @interface MemberDetails
+ * @interface ChurnItem
  */
-export interface MemberDetails {
+export interface ChurnItem {
     /**
-     * List details of all the liquidity providers identified with the given address
-     * @type {Array<MemberPool>}
-     * @memberof MemberDetails
+     * full timestamp (nanoseconds since 1970) of the block at which the churn occurred
+     * @type {string}
+     * @memberof ChurnItem
      */
-    pools: Array<MemberPool>;
+    date: string;
+    /**
+     * height of the block at which the churn occurred
+     * @type {string}
+     * @memberof ChurnItem
+     */
+    height: string;
 }
