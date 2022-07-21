@@ -12,22 +12,36 @@ import { WalletType } from '../../../shared/wallet/types'
 import { eqAsset } from '../../helpers/fp/eq'
 import { ordBaseAmount } from '../../helpers/fp/ord'
 import { WalletBalances } from '../clients'
-import { KeystoreState, KeystoreContent, Phrase, BalanceMonoid, WalletBalance } from './types'
-
-export const getKeystoreContent = (state: KeystoreState): O.Option<KeystoreContent> =>
-  FP.pipe(state, O.chain(FP.identity))
+import { KeystoreState, Phrase, BalanceMonoid, WalletBalance, isKeystoreLocked, isKeystoreUnlocked } from './types'
 
 export const getPhrase = (state: KeystoreState): O.Option<Phrase> =>
   FP.pipe(
-    getKeystoreContent(state),
+    state,
+    O.chain(O.fromPredicate(isKeystoreUnlocked)),
     O.map(({ phrase }) => phrase)
   )
 
-export const hasKeystoreContent = (state: KeystoreState): boolean => O.isSome(getKeystoreContent(state))
+export const getKeystoreId = (state: KeystoreState): O.Option<string> =>
+  FP.pipe(
+    state,
+    O.map(({ id }) => id)
+  )
 
 export const hasImportedKeystore = (state: KeystoreState): boolean => O.isSome(state)
 
-export const isLocked = (state: KeystoreState): boolean => !hasImportedKeystore(state) || !hasKeystoreContent(state)
+export const isLocked = (state: KeystoreState) =>
+  FP.pipe(
+    state,
+    // locked
+    O.map((s) => (isKeystoreLocked(s) ? true : false)),
+    // not imported === locked
+    O.getOrElse(() => true)
+  )
+
+export const isUnlocked = (state: KeystoreState): boolean =>
+  FP.pipe(state, O.chain(O.fromPredicate(isKeystoreUnlocked)), O.isSome)
+
+// const url: O.Option<string> = FP.pipe(txUrl, O.fromPredicate(P.not(S.isEmpty)))
 
 export const filterNullableBalances = (balances: WalletBalances): WalletBalances => {
   return FP.pipe(

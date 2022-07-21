@@ -30,13 +30,15 @@ export type StoreFilesContent = Readonly<{
 
 export type StoreFileName = keyof StoreFilesContent
 export type StoreFileData<FileName extends StoreFileName> = StoreFilesContent[FileName]
+export type IPCExportKeystoreParams = { fileName: string; keystore: Keystore }
+export type IPCSaveKeystoreParams = { id: string; keystore: Keystore }
 
 export type ApiKeystore = {
-  save: (keystore: Keystore) => Promise<void>
-  remove: () => Promise<void>
-  get: () => Promise<Keystore>
-  exists: () => Promise<boolean>
-  export: (defaultFileName: string, keystore: Keystore) => Promise<void>
+  save: ({ id, keystore }: IPCSaveKeystoreParams) => Promise<void>
+  remove: (id: string) => Promise<void>
+  get: (id: string) => Promise<Keystore>
+  exists: (id: string) => Promise<boolean>
+  export: (params: IPCExportKeystoreParams) => Promise<void>
   load: () => Promise<Keystore>
 }
 

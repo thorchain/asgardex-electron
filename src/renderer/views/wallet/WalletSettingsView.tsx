@@ -54,7 +54,7 @@ import { useLedger } from '../../hooks/useLedger'
 import { useNetwork } from '../../hooks/useNetwork'
 import * as walletRoutes from '../../routes/wallet'
 import { WalletAddressAsync } from '../../services/wallet/types'
-import { isLocked, hasImportedKeystore, ledgerErrorIdToI18n } from '../../services/wallet/util'
+import { isLocked, hasImportedKeystore, ledgerErrorIdToI18n, getKeystoreId } from '../../services/wallet/util'
 import { getPhrase } from '../../services/wallet/util'
 import { walletAccount$ } from './WalletSettingsView.helper'
 
@@ -85,13 +85,16 @@ export const WalletSettingsView: React.FC = (): JSX.Element => {
   const ethDerivationMode: EthDerivationMode = useObservableState(ethDerivationMode$, DEFAULT_ETH_DERIVATION_MODE)
 
   const oRuneNativeAddress: O.Option<WalletAddress> = useObservableState(thorAddressUI$, O.none)
-  const runeNativeAddress = FP.pipe(
-    oRuneNativeAddress,
-    O.fold(
-      () => '',
-      ({ address }) => address
-    )
-  )
+
+  const exportKeystoreHandler = useCallback(async () => {
+    const id = FP.pipe(keystore, getKeystoreId, O.toNullable)
+    // TODO (@veado) i18n
+    if (!id) throw Error('Couldn not export keystore - missing keystore id')
+    const runeAddress = O.toNullable(oRuneNativeAddress)
+    if (!runeAddress || !runeAddress.address) throw Error('Couldn not export keystore - rune address is needed')
+
+    return exportKeystore({ id, runeAddress: runeAddress.address, network })
+  }, [])
 
   const phrase$ = useMemo(() => FP.pipe(keystore$, RxOp.map(getPhrase)), [keystore$])
   const phrase = useObservableState(phrase$, O.none)
@@ -422,10 +425,9 @@ export const WalletSettingsView: React.FC = (): JSX.Element => {
   ) : (
     <WalletSettings
       network={network}
-      runeNativeAddress={runeNativeAddress}
       lockWallet={lock}
       removeKeystore={removeKeystore}
-      exportKeystore={exportKeystore}
+      exportKeystore={exportKeystoreHandler}
       addLedgerAddress={addLedgerAddressHandler}
       verifyLedgerAddress={verifyLedgerAddressHandler}
       removeLedgerAddress={removeLedgerAddressHandler}

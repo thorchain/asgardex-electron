@@ -25,7 +25,7 @@ type FormValues = {
 
 export type Props = {
   keystore: KeystoreState
-  unlock?: (state: KeystoreState, password: string) => Promise<void>
+  unlock?: (password: string) => Promise<void>
   removeKeystore?: () => Promise<void>
 }
 
@@ -52,7 +52,7 @@ export const UnlockForm: React.FC<Props> = (props): JSX.Element => {
       const checkPassword = async () => {
         const password = envOrDefault(process.env.REACT_APP_WALLET_PASSWORD, '')
         if (password && keystore && hasImportedKeystore(keystore) && isLocked(keystore)) {
-          await unlockHandler(keystore, password).catch((error) => {
+          await unlockHandler(password).catch((error) => {
             setUnlockError(some(error))
           })
           setValidPassword(true)
@@ -85,11 +85,11 @@ export const UnlockForm: React.FC<Props> = (props): JSX.Element => {
   const submitForm = useCallback(
     async ({ password }: FormValues) => {
       setUnlockError(none)
-      await unlockHandler(keystore, password).catch((error) => {
+      await unlockHandler(password).catch((error) => {
         setUnlockError(some(error))
       })
     },
-    [unlockHandler, keystore]
+    [unlockHandler]
   )
 
   const showRemoveConfirm = useCallback(() => {

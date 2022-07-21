@@ -27,7 +27,7 @@ import { FormattedMessage, useIntl } from 'react-intl'
 import { Network } from '../../../shared/api/types'
 import { getDerivationPath as getEthDerivationPath } from '../../../shared/ethereum/ledger'
 import { EthDerivationMode } from '../../../shared/ethereum/types'
-import { isLedgerWallet } from '../../../shared/utils/guard'
+import { isError, isLedgerWallet } from '../../../shared/utils/guard'
 import { ReactComponent as UnlockOutlined } from '../../assets/svg/icon-unlock-warning.svg'
 import { WalletPasswordConfirmationModal } from '../../components/modal/confirmation'
 import { RemoveWalletConfirmationModal } from '../../components/modal/confirmation/RemoveWalletConfirmationModal'
@@ -60,10 +60,9 @@ import * as Styled from './WalletSettings.styles'
 type Props = {
   network: Network
   walletAccounts: O.Option<WalletAccounts>
-  runeNativeAddress: string
   lockWallet: FP.Lazy<void>
   removeKeystore: FP.Lazy<void>
-  exportKeystore: (runeNativeAddress: string, selectedNetwork: Network) => void
+  exportKeystore: () => Promise<void>
   addLedgerAddress: (chain: Chain, walletIndex: number) => void
   verifyLedgerAddress: (chain: Chain, walletIndex: number) => Promise<boolean>
   removeLedgerAddress: (chain: Chain) => void
@@ -82,10 +81,9 @@ export const WalletSettings: React.FC<Props> = (props): JSX.Element => {
   const {
     network,
     walletAccounts: oWalletAccounts,
-    runeNativeAddress = '',
-    lockWallet = () => {},
-    removeKeystore = () => {},
-    exportKeystore = () => {},
+    lockWallet,
+    removeKeystore,
+    exportKeystore,
     addLedgerAddress,
     verifyLedgerAddress,
     removeLedgerAddress,
@@ -354,6 +352,18 @@ export const WalletSettings: React.FC<Props> = (props): JSX.Element => {
     [accountFilter, oWalletAccounts]
   )
 
+  const [exportKeystoreErrorMsg, setExportKeystoreErrorMsg] = useState(emptyString)
+
+  const exportKeystoreHandler = useCallback(async () => {
+    try {
+      setExportKeystoreErrorMsg(emptyString)
+      await exportKeystore()
+    } catch (error) {
+      const errorMsg = isError(error) ? error?.message ?? error.toString() : `${error}`
+      setExportKeystoreErrorMsg(errorMsg)
+    }
+  }, [exportKeystore, setExportKeystoreErrorMsg])
+
   const renderAccounts = useMemo(
     () =>
       FP.pipe(
@@ -449,12 +459,11 @@ export const WalletSettings: React.FC<Props> = (props): JSX.Element => {
               <Row style={{ flex: 1, alignItems: 'center', padding: 20 }}>
                 <Styled.WalletCol sm={{ span: 24 }} md={{ span: 12 }}>
                   <Styled.OptionCard bordered={false}>
-                    <Styled.OptionLabel
-                      color="primary"
-                      size="big"
-                      onClick={() => exportKeystore(runeNativeAddress, network)}>
+                    <Styled.OptionLabel color="primary" size="big" onClick={exportKeystoreHandler}>
                       {intl.formatMessage({ id: 'setting.export' })}
                     </Styled.OptionLabel>
+                    {/* TODO (@veado) Show/hide/style error message */}
+                    <p>export error {exportKeystoreErrorMsg}</p>
                   </Styled.OptionCard>
                 </Styled.WalletCol>
                 <Styled.WalletCol sm={{ span: 24 }} md={{ span: 12 }}>

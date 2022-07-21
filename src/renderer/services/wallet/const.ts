@@ -13,6 +13,10 @@ import {
   LoadTxsHandler
 } from './types'
 
+/**
+ * Initial KeystoreState
+ * Note: It needs to be empty (O.none)
+ */
 export const INITIAL_KEYSTORE_STATE: KeystoreState = O.none
 
 export const INITIAL_BALANCES_STATE: BalancesState = {

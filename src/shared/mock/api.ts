@@ -1,16 +1,23 @@
-import { Keystore } from '@xchainjs/xchain-crypto'
 import * as E from 'fp-ts/Either'
 
 import { PoolsStorageEncoded } from '../api/io'
-import { ApiLang, ApiKeystore, ApiUrl, ApiHDWallet, UserNodesStorage } from '../api/types'
+import {
+  ApiLang,
+  ApiKeystore,
+  ApiUrl,
+  ApiHDWallet,
+  UserNodesStorage,
+  IPCSaveKeystoreParams,
+  IPCExportKeystoreParams
+} from '../api/types'
 import { ApiFileStoreService, CommonStorage } from '../api/types'
 import { Locale } from '../i18n/types'
 
 // Mock "empty" `apiKeystore`
 export const apiKeystore: ApiKeystore = {
-  save: (_: Keystore) => Promise.resolve(),
-  remove: () => Promise.resolve(),
-  get: () =>
+  save: (_: IPCSaveKeystoreParams) => Promise.resolve(),
+  remove: (_: string) => Promise.resolve(),
+  get: (_: string) =>
     Promise.resolve({
       address: '',
       publickeys: {
@@ -36,8 +43,8 @@ export const apiKeystore: ApiKeystore = {
       version: 0,
       meta: ''
     }),
-  exists: () => Promise.resolve(true),
-  export: () => Promise.resolve(),
+  exists: (_) => Promise.resolve(true),
+  export: (_: IPCExportKeystoreParams) => Promise.resolve(),
   load: () =>
     Promise.resolve({
       address: '',

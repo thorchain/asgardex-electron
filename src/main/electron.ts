@@ -1,6 +1,5 @@
 import { join } from 'path'
 
-import { Keystore } from '@xchainjs/xchain-crypto'
 import { BrowserWindow, app, ipcMain, nativeImage } from 'electron'
 import electronDebug from 'electron-debug'
 import isDev from 'electron-is-dev'
@@ -15,7 +14,12 @@ import {
   ipcLedgerDepositTxParamsIO,
   ipcLedgerSendTxParamsIO
 } from '../shared/api/io'
-import type { IPCLedgerAdddressParams, StoreFileName } from '../shared/api/types'
+import type {
+  IPCExportKeystoreParams,
+  IPCLedgerAdddressParams,
+  IPCSaveKeystoreParams,
+  StoreFileName
+} from '../shared/api/types'
 import { DEFAULT_STORAGES } from '../shared/const'
 import type { Locale } from '../shared/i18n/types'
 import { registerAppCheckUpdatedHandler } from './api/appUpdate'
@@ -140,13 +144,11 @@ const initIPC = () => {
   // Lang
   ipcMain.on(IPCMessages.UPDATE_LANG, (_, locale: Locale) => langChangeHandler(locale))
   // Keystore
-  ipcMain.handle(IPCMessages.SAVE_KEYSTORE, (_, keystore: Keystore) => saveKeystore(keystore))
-  ipcMain.handle(IPCMessages.REMOVE_KEYSTORE, () => removeKeystore())
-  ipcMain.handle(IPCMessages.GET_KEYSTORE, () => getKeystore())
-  ipcMain.handle(IPCMessages.KEYSTORE_EXIST, () => keystoreExist())
-  ipcMain.handle(IPCMessages.EXPORT_KEYSTORE, (_, defaultFileName: string, keystore: Keystore) =>
-    exportKeystore(defaultFileName, keystore)
-  )
+  ipcMain.handle(IPCMessages.SAVE_KEYSTORE, (_, params: IPCSaveKeystoreParams) => saveKeystore(params))
+  ipcMain.handle(IPCMessages.REMOVE_KEYSTORE, (_, id: string) => removeKeystore(id))
+  ipcMain.handle(IPCMessages.GET_KEYSTORE, (_, id: string) => getKeystore(id))
+  ipcMain.handle(IPCMessages.KEYSTORE_EXIST, (_, id: string) => keystoreExist(id))
+  ipcMain.handle(IPCMessages.EXPORT_KEYSTORE, (_, params: IPCExportKeystoreParams) => exportKeystore(params))
   ipcMain.handle(IPCMessages.LOAD_KEYSTORE, () => loadKeystore())
   // Ledger
   ipcMain.handle(IPCMessages.GET_LEDGER_ADDRESS, async (_, params: IPCLedgerAdddressParams) => getLedgerAddress(params))
