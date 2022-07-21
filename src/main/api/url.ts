@@ -3,7 +3,6 @@ import { shell } from 'electron'
 import { ApiUrl } from '../../shared/api/types'
 
 const EXTERNALS_WHITELIST = [
-  'thorchain.org',
   'thorchain.net',
   'testnet.thorchain.net',
   'docs.thorchain.org',

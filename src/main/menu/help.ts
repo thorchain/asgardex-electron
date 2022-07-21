@@ -10,12 +10,6 @@ const menu = (intl: IntlShape): MenuItemConstructorOptions => ({
     {
       label: intl.formatMessage({ id: 'menu.help.learn' }),
       click() {
-        apiUrl.openExternal(ExternalUrl.WEBSITE)
-      }
-    },
-    {
-      label: intl.formatMessage({ id: 'menu.help.docs' }),
-      click() {
         apiUrl.openExternal(ExternalUrl.DOCS)
       }
     },
