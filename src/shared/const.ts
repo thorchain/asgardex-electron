@@ -3,7 +3,6 @@ import { StoreFilesContent, UserNodesStorage } from './api/types'
 import { DEFAULT_LOCALE } from './i18n/const'
 
 export enum ExternalUrl {
-  WEBSITE = 'https://thorchain.org',
   DOCS = 'https://docs.thorchain.org',
   DISCORD = 'https://discord.gg/pHcS67yX7Z',
   GITHUB_REPO = `https://github.com/thorchain/asgardex-electron`,
