@@ -8,15 +8,15 @@ import { NonEmptyArray } from 'fp-ts/lib/NonEmptyArray'
 import * as O from 'fp-ts/lib/Option'
 import * as Rx from 'rxjs'
 
-import { LedgerError, Network } from '../../../shared/api/types'
+import { KeystoreId, LedgerError, Network } from '../../../shared/api/types'
 import { WalletAddress, WalletBalanceType, WalletType } from '../../../shared/wallet/types'
 import { LiveData } from '../../helpers/rx/liveData'
 import { LoadTxsParams, WalletBalancesLD, WalletBalancesRD } from '../clients'
 
 export type Phrase = string
 
-export type KeystoreLocked = { id: string }
-export type KeystoreUnlocked = { id: string; phrase: Phrase }
+export type KeystoreLocked = { id: KeystoreId }
+export type KeystoreUnlocked = { id: KeystoreId; phrase: Phrase }
 export type KeystoreContent = KeystoreLocked | KeystoreUnlocked
 
 /**
@@ -51,7 +51,7 @@ export type ValidatePasswordLD = LiveData<Error, void>
 export type ImportKeystoreLD = LiveData<Error, void>
 export type LoadKeystoreLD = LiveData<Error, Keystore>
 
-export type ExportKeystoreParams = { id: string; runeAddress: Address; network: Network }
+export type ExportKeystoreParams = { id: KeystoreId; runeAddress: Address; network: Network }
 
 export type KeystoreService = {
   keystore$: KeystoreState$

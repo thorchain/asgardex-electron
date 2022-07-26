@@ -148,3 +148,21 @@ export const poolsStorageIO = t.type({
 
 // Note: We use Encoded type for storage
 export type PoolsStorageEncoded = ReturnType<typeof poolsStorageIO.encode>
+
+export const ipcKeystoreAccountIO = t.type({
+  id: t.number,
+  name: t.string,
+  selected: t.boolean
+})
+
+/**
+ * Keystore Account
+ * Created by users by importing or creating keystores in `Wallet` section
+ */
+export type KeystoreAccount = ReturnType<typeof ipcKeystoreAccountIO.encode>
+
+export const ipcKeystoreAccountsIO = t.array(ipcKeystoreAccountIO)
+
+export type IPCKeystoreAccounts = t.TypeOf<typeof ipcKeystoreAccountsIO>
+
+export type KeystoreAccounts = ReturnType<typeof ipcKeystoreAccountsIO.encode>

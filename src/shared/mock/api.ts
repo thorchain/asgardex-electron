@@ -8,7 +8,8 @@ import {
   ApiHDWallet,
   UserNodesStorage,
   IPCSaveKeystoreParams,
-  IPCExportKeystoreParams
+  IPCExportKeystoreParams,
+  KeystoreId
 } from '../api/types'
 import { ApiFileStoreService, CommonStorage } from '../api/types'
 import { Locale } from '../i18n/types'
@@ -16,8 +17,8 @@ import { Locale } from '../i18n/types'
 // Mock "empty" `apiKeystore`
 export const apiKeystore: ApiKeystore = {
   save: (_: IPCSaveKeystoreParams) => Promise.resolve(),
-  remove: (_: string) => Promise.resolve(),
-  get: (_: string) =>
+  remove: (_: KeystoreId) => Promise.resolve(),
+  get: (_: KeystoreId) =>
     Promise.resolve({
       address: '',
       publickeys: {
@@ -70,7 +71,8 @@ export const apiKeystore: ApiKeystore = {
       id: '',
       version: 0,
       meta: ''
-    })
+    }),
+  initKeystoreAccounts: () => Promise.resolve([])
 }
 
 // Mock `apiLang`

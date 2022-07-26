@@ -21,7 +21,7 @@ export const getPhrase = (state: KeystoreState): O.Option<Phrase> =>
     O.map(({ phrase }) => phrase)
   )
 
-export const getKeystoreId = (state: KeystoreState): O.Option<string> =>
+export const getKeystoreId = (state: KeystoreState): O.Option<number> =>
   FP.pipe(
     state,
     O.map(({ id }) => id)

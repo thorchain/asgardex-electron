@@ -43,7 +43,7 @@ const addKeystore = async (phrase: Phrase, password: string): Promise<void> => {
     // Note: Since nn user can add one keystore at time only
     // and a keystore with same name can't be overriden,
     // duplications are not possible
-    const id = new Date().getTime().toString()
+    const id = new Date().getTime()
     await window.apiKeystore.save({ id, keystore })
     setKeystoreState(O.some({ id, phrase }))
     return Promise.resolve()
@@ -151,18 +151,26 @@ const unlock = async (password: string) => {
   }
 }
 
-// check keystore at start
-// TODO(@veado) Get id from persistant storage or fro legacy `keystore`
-window.apiKeystore.exists('keystore').then(
-  (result) => setKeystoreState(result ? O.some({ id: 'keystore' }) /*imported, but locked*/ : O.none /*not imported*/),
-  (_) => setKeystoreState(O.none /*not imported*/)
+// initialize accounts at start
+window.apiKeystore.initKeystoreAccounts().then(
+  (accounts) => {
+    console.log('getAccounts accounts:', accounts)
+    // TODO (@veado) Check selected account in `accounts`
+    const state =
+      accounts.length > 0 ? O.some({ id: accounts[0].id }) /*imported, but locked*/ : O.none /*not imported*/
+    setKeystoreState(state)
+  },
+  (error) => {
+    console.log('getAccounts error:', error)
+    setKeystoreState(O.none /*not imported*/)
+  }
 )
 
 const validatePassword$ = (password: string): ValidatePasswordLD =>
   password
     ? FP.pipe(
         // TODO(@veado) Get id from KeystoreState
-        Rx.from(window.apiKeystore.get('keystore')),
+        Rx.from(window.apiKeystore.get(1 /* LEGACY_KEYSTORE_ID */)),
         RxOp.switchMap((keystore) => Rx.from(decryptFromKeystore(keystore, password))),
         RxOp.map(RD.success),
         liveData.map(() => undefined),

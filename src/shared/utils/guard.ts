@@ -8,7 +8,7 @@ import * as IOG from 'io-ts/Guard'
 import { Network } from '../api/types'
 import { WalletType } from '../wallet/types'
 
-const nonEmptyStringGuard = FP.pipe(
+export const nonEmptyStringGuard = FP.pipe(
   IOG.string,
   IOG.refine((s): s is string => s.length > 0)
 )

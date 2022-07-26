@@ -9,7 +9,7 @@ import * as O from 'fp-ts/Option'
 import { EthDerivationMode } from '../ethereum/types'
 import { Locale } from '../i18n/types'
 import { WalletAddress } from '../wallet/types'
-import { PoolsStorageEncoded } from './io'
+import { IPCKeystoreAccounts, PoolsStorageEncoded } from './io'
 
 // A version number starting from `1` to avoid to load deprecated files
 export type StorageVersion = { version: string }
@@ -30,16 +30,21 @@ export type StoreFilesContent = Readonly<{
 
 export type StoreFileName = keyof StoreFilesContent
 export type StoreFileData<FileName extends StoreFileName> = StoreFilesContent[FileName]
+
+export type KeystoreId = number
+export type KeystoreIds = KeystoreId[]
+
 export type IPCExportKeystoreParams = { fileName: string; keystore: Keystore }
-export type IPCSaveKeystoreParams = { id: string; keystore: Keystore }
+export type IPCSaveKeystoreParams = { id: KeystoreId; keystore: Keystore }
 
 export type ApiKeystore = {
   save: ({ id, keystore }: IPCSaveKeystoreParams) => Promise<void>
-  remove: (id: string) => Promise<void>
-  get: (id: string) => Promise<Keystore>
-  exists: (id: string) => Promise<boolean>
+  remove: (id: KeystoreId) => Promise<void>
+  get: (id: KeystoreId) => Promise<Keystore>
+  exists: (id: KeystoreId) => Promise<boolean>
   export: (params: IPCExportKeystoreParams) => Promise<void>
   load: () => Promise<Keystore>
+  initKeystoreAccounts: () => Promise<IPCKeystoreAccounts>
 }
 
 /**

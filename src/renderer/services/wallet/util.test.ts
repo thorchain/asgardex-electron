@@ -17,8 +17,8 @@ import {
 describe('services/wallet/util/', () => {
   const phrase = 'any-phrase'
   const notImportedKeystore: KeystoreState = O.none
-  const lockedKeystore: KeystoreState = O.some({ id: 'id' })
-  const unlockedKeystore: KeystoreState = O.some({ id: 'id', phrase })
+  const lockedKeystore: KeystoreState = O.some({ id: 1 })
+  const unlockedKeystore: KeystoreState = O.some({ id: 1, phrase })
 
   describe('getPhrase', () => {
     it('returns phrase for unlocked keystore ', () => {
