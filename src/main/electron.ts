@@ -10,30 +10,17 @@ import * as E from 'fp-ts/lib/Either'
 import * as FP from 'fp-ts/lib/function'
 
 import {
+  ipcKeystoreAccountsIO,
   ipcLedgerApproveERC20TokenParamsIO,
   ipcLedgerDepositTxParamsIO,
   ipcLedgerSendTxParamsIO
 } from '../shared/api/io'
-import type {
-  IPCExportKeystoreParams,
-  IPCLedgerAdddressParams,
-  IPCSaveKeystoreParams,
-  KeystoreId,
-  StoreFileName
-} from '../shared/api/types'
+import type { IPCExportKeystoreParams, IPCLedgerAdddressParams, StoreFileName } from '../shared/api/types'
 import { DEFAULT_STORAGES } from '../shared/const'
 import type { Locale } from '../shared/i18n/types'
 import { registerAppCheckUpdatedHandler } from './api/appUpdate'
 import { getFileStoreService } from './api/fileStore'
-import {
-  saveKeystore,
-  removeKeystore,
-  getKeystore,
-  keystoreExist,
-  exportKeystore,
-  loadKeystore,
-  initKeystoreAccounts
-} from './api/keystore'
+import { exportKeystore, initKeystoreAccounts, loadKeystore, saveKeystoreAccounts } from './api/keystore'
 import {
   getAddress as getLedgerAddress,
   sendTx as sendLedgerTx,
@@ -153,10 +140,16 @@ const initIPC = () => {
   // Lang
   ipcMain.on(IPCMessages.UPDATE_LANG, (_, locale: Locale) => langChangeHandler(locale))
   // Keystore
-  ipcMain.handle(IPCMessages.SAVE_KEYSTORE, (_, params: IPCSaveKeystoreParams) => saveKeystore(params))
-  ipcMain.handle(IPCMessages.REMOVE_KEYSTORE, (_, id: KeystoreId) => removeKeystore(id))
-  ipcMain.handle(IPCMessages.GET_KEYSTORE, (_, id: KeystoreId) => getKeystore(id))
-  ipcMain.handle(IPCMessages.KEYSTORE_EXIST, (_, id: KeystoreId) => keystoreExist(id))
+  ipcMain.handle(IPCMessages.SAVE_KEYSTORE_ACCOUNTS, (_, params: unknown) => {
+    return FP.pipe(
+      // params need to be decoded
+      ipcKeystoreAccountsIO.decode(params),
+      E.fold(
+        (e) => Promise.reject(e),
+        (accounts) => saveKeystoreAccounts(accounts)()
+      )
+    )
+  })
   ipcMain.handle(IPCMessages.EXPORT_KEYSTORE, (_, params: IPCExportKeystoreParams) => exportKeystore(params))
   ipcMain.handle(IPCMessages.LOAD_KEYSTORE, () => loadKeystore())
   ipcMain.handle(IPCMessages.INIT_KEYSTORE_ACCOUNTS, () => initKeystoreAccounts())

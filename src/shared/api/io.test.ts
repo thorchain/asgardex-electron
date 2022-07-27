@@ -1,11 +1,22 @@
+import { fail } from 'assert'
+
 import { FeeOption } from '@xchainjs/xchain-client'
 import { AssetBNB, AssetRuneNative, baseAmount, BNBChain } from '@xchainjs/xchain-util'
 import * as E from 'fp-ts/lib/Either'
 import * as FP from 'fp-ts/lib/function'
+import * as PR from 'io-ts/lib/PathReporter'
 
 import { ZERO_BASE_AMOUNT } from '../../renderer/const'
 import { eqBaseAmount } from '../../renderer/helpers/fp/eq'
-import { BaseAmountEncoded, baseAmountIO, ipcLedgerSendTxParamsIO, isBaseAmountEncoded, poolsWatchListsIO } from './io'
+import { MOCK_KEYSTORE } from '../mock/wallet'
+import {
+  BaseAmountEncoded,
+  baseAmountIO,
+  ipcLedgerSendTxParamsIO,
+  isBaseAmountEncoded,
+  keystoreIO,
+  poolsWatchListsIO
+} from './io'
 
 describe('shared/io', () => {
   describe('isBaseAmountEncoded', () => {
@@ -56,8 +67,8 @@ describe('shared/io', () => {
       FP.pipe(
         decoded,
         E.fold(
-          (error) => {
-            fail(error)
+          (errors) => {
+            fail(PR.failure(errors).join('\n'))
           },
           (r) => {
             expect(eqBaseAmount.equals(r, baseAmount(1, 18))).toBeTruthy()
@@ -149,8 +160,8 @@ describe('shared/io', () => {
       FP.pipe(
         decoded,
         E.fold(
-          (error) => {
-            fail(error)
+          (errors) => {
+            fail(PR.failure(errors).join('\n'))
           },
           (r) => {
             expect(r.chain).toEqual(BNBChain)
@@ -183,8 +194,8 @@ describe('shared/io', () => {
       FP.pipe(
         decoded,
         E.fold(
-          (error) => {
-            fail(error)
+          (errors) => {
+            fail(PR.failure(errors).join('\n'))
           },
           (r) => {
             expect(r?.feeAmount).toBeUndefined()
@@ -207,6 +218,31 @@ describe('shared/io', () => {
         mainnet: ['THOR.RUNE'],
         stagenet: []
       })
+    })
+  })
+
+  describe('keystoreIO', () => {
+    it('decoded', () => {
+      const data = JSON.parse(JSON.stringify(MOCK_KEYSTORE))
+
+      const decoded = keystoreIO.decode(data)
+
+      FP.pipe(
+        decoded,
+        E.fold(
+          (errors) => {
+            fail(PR.failure(errors).join('\n'))
+          },
+          (result) => {
+            expect(result).toEqual(MOCK_KEYSTORE)
+          }
+        )
+      )
+    })
+
+    it('encode', () => {
+      const encoded = keystoreIO.encode(MOCK_KEYSTORE)
+      expect(encoded).toEqual(JSON.parse(JSON.stringify(MOCK_KEYSTORE)))
     })
   })
 })

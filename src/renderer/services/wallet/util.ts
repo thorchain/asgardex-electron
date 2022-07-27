@@ -1,3 +1,4 @@
+import { Keystore } from '@xchainjs/xchain-crypto'
 import { Asset, assetToString, baseAmount } from '@xchainjs/xchain-util'
 import * as A from 'fp-ts/Array'
 import * as FP from 'fp-ts/function'
@@ -7,7 +8,8 @@ import * as Ord from 'fp-ts/Ord'
 import * as S from 'fp-ts/string'
 import { IntlShape } from 'react-intl'
 
-import { LedgerErrorId } from '../../../shared/api/types'
+import { KeystoreAccounts } from '../../../shared/api/io'
+import { KeystoreId, LedgerErrorId } from '../../../shared/api/types'
 import { WalletType } from '../../../shared/wallet/types'
 import { eqAsset } from '../../helpers/fp/eq'
 import { ordBaseAmount } from '../../helpers/fp/ord'
@@ -26,6 +28,35 @@ export const getKeystoreId = (state: KeystoreState): O.Option<number> =>
     state,
     O.map(({ id }) => id)
   )
+
+export const getSelectedKeystoreId = (accounts: KeystoreAccounts): O.Option<number> =>
+  FP.pipe(
+    accounts,
+    A.filterMap(({ selected, id }) => (selected ? O.some(id) : O.none)),
+    A.head
+  )
+
+export const getKeystore: (id: KeystoreId) => (accounts: KeystoreAccounts) => O.Option<Keystore> = (id) => (accounts) =>
+  FP.pipe(
+    accounts,
+    A.filterMap(({ keystore, id: accountId }) => (accountId === id ? O.some(keystore) : O.none)),
+    A.head
+  )
+
+export const getKeystoreAccountName: (id: KeystoreId) => (accounts: KeystoreAccounts) => O.Option<string> =
+  (id) => (accounts) =>
+    FP.pipe(
+      accounts,
+      A.filterMap(({ name, id: accountId }) => (accountId === id ? O.some(name) : O.none)),
+      A.head
+    )
+
+export const generateKeystoreId = (): KeystoreId =>
+  // id for keystore is current time (ms)
+  // Note: Since an user can add one keystore at time only
+  // and a keystore with same name can't be overriden,
+  // duplications are not possible
+  new Date().getTime()
 
 export const hasImportedKeystore = (state: KeystoreState): boolean => O.isSome(state)
 

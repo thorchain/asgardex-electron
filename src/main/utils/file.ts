@@ -15,6 +15,16 @@ export const readFile: (path: string, encoding: string) => TE.TaskEither<Error, 
 >(fs.readFile)
 
 /**
+ * Reads a JSON file.
+ */
+export const readJSON: (path: string, options?: fs.ReadOptions) => TE.TaskEither<Error, string> = TE.taskify<
+  string,
+  fs.ReadOptions | undefined,
+  Error,
+  string
+>(fs.readJSON)
+
+/**
  * Reads a directory
  */
 export const readDir: (path: fs.PathLike) => TE.TaskEither<NodeJS.ErrnoException, string[]> = TE.taskify<
@@ -32,3 +42,12 @@ export const readDir: (path: fs.PathLike) => TE.TaskEither<NodeJS.ErrnoException
  */
 export const writeFile: (path: string, data: string, options?: fs.WriteFileOptions) => TE.TaskEither<Error, void> =
   TE.taskify<string, string, fs.WriteFileOptions | undefined, Error, void>(fs.outputFile)
+
+/**
+ * Writes a JSON file.
+ * If the parent directory does not exist, it will be created.
+ */
+export const writeJSON: (path: string, data: object, options?: fs.WriteOptions) => TE.TaskEither<Error, void> =
+  TE.taskify<string, object, fs.WriteOptions | undefined, Error, void>(fs.outputJSON)
+
+export const exists: (path: string) => TE.TaskEither<Error, boolean> = TE.taskify<string, Error, boolean>(fs.pathExists)

@@ -48,18 +48,18 @@ export type KeystoreState$ = Rx.Observable<KeystoreState>
 export type ValidatePasswordHandler = (password: string) => LiveData<Error, void>
 export type ValidatePasswordLD = LiveData<Error, void>
 
+export type ImportKeystoreParams = { id: KeystoreId; keystore: Keystore; password: string; name: string }
+export type AddKeystoreParams = { id: KeystoreId; phrase: Phrase; name: string; password: string }
 export type ImportKeystoreLD = LiveData<Error, void>
 export type LoadKeystoreLD = LiveData<Error, Keystore>
 
-export type ExportKeystoreParams = { id: KeystoreId; runeAddress: Address; network: Network }
-
 export type KeystoreService = {
   keystore$: KeystoreState$
-  addKeystore: (phrase: Phrase, password: string) => Promise<void>
-  removeKeystore: () => Promise<void>
-  importKeystore$: (keystore: Keystore, password: string) => ImportKeystoreLD
-  exportKeystore: (params: ExportKeystoreParams) => Promise<void>
+  addKeystoreAccount: (params: AddKeystoreParams) => Promise<void>
+  removeKeystoreAccount: () => Promise<void>
   loadKeystore$: () => LoadKeystoreLD
+  importKeystore$: (params: ImportKeystoreParams) => ImportKeystoreLD
+  exportKeystore: () => Promise<void>
   unlock: (password: string) => Promise<void>
   lock: FP.Lazy<void>
   /**

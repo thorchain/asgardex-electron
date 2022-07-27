@@ -24,7 +24,7 @@ export const ImportsView: React.FC = (): JSX.Element => {
   const location = useLocation()
 
   const { keystoreService } = useWalletContext()
-  const { importKeystore$, loadKeystore$, addKeystore } = keystoreService
+  const { importKeystore$, loadKeystore$, addKeystoreAccount } = keystoreService
   const { clientStates } = useKeystoreClientStates()
   // redirect to wallet assets view  whenever keystore have been imported and ALL clients are initialized
   useKeystoreRedirectAfterImport()
@@ -51,10 +51,10 @@ export const ImportsView: React.FC = (): JSX.Element => {
             {intl.formatMessage({ id: 'common.phrase' })}
           </span>
         ),
-        content: <ImportPhrase clientStates={clientStates} addKeystore={addKeystore} />
+        content: <ImportPhrase clientStates={clientStates} addKeystore={addKeystoreAccount} />
       }
     ],
-    [addKeystore, clientStates, navigate, importKeystore$, intl, loadKeystore$]
+    [addKeystoreAccount, clientStates, navigate, importKeystore$, intl, loadKeystore$]
   )
   const matchKeystorePath = useMatch({ path: walletRoutes.imports.keystore.path(), end: false })
   const matchPhrasePath = useMatch({ path: walletRoutes.imports.phrase.path(), end: false })

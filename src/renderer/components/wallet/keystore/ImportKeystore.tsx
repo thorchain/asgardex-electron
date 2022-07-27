@@ -10,14 +10,14 @@ import { useIntl } from 'react-intl'
 
 import { KeystoreClientStates } from '../../../hooks/useKeystoreClientStates'
 import { useSubscriptionState } from '../../../hooks/useSubscriptionState'
-import { ImportKeystoreLD, LoadKeystoreLD } from '../../../services/wallet/types'
+import { ImportKeystoreLD, ImportKeystoreParams, LoadKeystoreLD } from '../../../services/wallet/types'
 import { Spin } from '../../shared/loading'
 import { InputPassword } from '../../uielements/input'
 import * as Styled from './Keystore.styles'
 
 export type Props = {
   clientStates: KeystoreClientStates
-  importKeystore$: (keystore: Keystore, password: string) => ImportKeystoreLD
+  importKeystore$: (params: ImportKeystoreParams) => ImportKeystoreLD
   loadKeystore$: () => LoadKeystoreLD
 }
 
@@ -40,8 +40,11 @@ export const ImportKeystore: React.FC<Props> = (props): JSX.Element => {
     ({ password }: Store) => {
       FP.pipe(
         loadKeystoreState,
-        RD.map((state) => {
-          subscribeImportKeystoreState(importKeystore$(state, password))
+        RD.map((keystore) => {
+          const id = new Date().getTime()
+          // TODO (@veado) Get name from form
+          const name = `asgardex-account-${id}`
+          subscribeImportKeystoreState(importKeystore$({ keystore, password, id, name }))
           return true
         })
       )
