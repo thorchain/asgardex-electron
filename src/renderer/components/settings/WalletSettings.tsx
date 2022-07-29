@@ -352,7 +352,8 @@ export const WalletSettings: React.FC<Props> = (props): JSX.Element => {
     [accountFilter, oWalletAccounts]
   )
 
-  const [exportKeystoreErrorMsg, setExportKeystoreErrorMsg] = useState(emptyString)
+  // TODO (@Veado) Render `exportKeystoreErrorMsg`
+  const [_ /* exportKeystoreErrorMsg */, setExportKeystoreErrorMsg] = useState(emptyString)
 
   const exportKeystoreHandler = useCallback(async () => {
     try {
@@ -462,8 +463,6 @@ export const WalletSettings: React.FC<Props> = (props): JSX.Element => {
                     <Styled.OptionLabel color="primary" size="big" onClick={exportKeystoreHandler}>
                       {intl.formatMessage({ id: 'setting.export' })}
                     </Styled.OptionLabel>
-                    {/* TODO (@veado) Show/hide/style error message */}
-                    <p>export error {exportKeystoreErrorMsg}</p>
                   </Styled.OptionCard>
                 </Styled.WalletCol>
                 <Styled.WalletCol sm={{ span: 24 }} md={{ span: 12 }}>

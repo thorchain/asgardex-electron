@@ -4,11 +4,11 @@ import { FeeOption } from '@xchainjs/xchain-client'
 import { AssetBNB, AssetRuneNative, baseAmount, BNBChain } from '@xchainjs/xchain-util'
 import * as E from 'fp-ts/lib/Either'
 import * as FP from 'fp-ts/lib/function'
-import * as PR from 'io-ts/lib/PathReporter'
 
 import { ZERO_BASE_AMOUNT } from '../../renderer/const'
 import { eqBaseAmount } from '../../renderer/helpers/fp/eq'
 import { MOCK_KEYSTORE } from '../mock/wallet'
+import { mapIOErrors } from '../utils/fp'
 import {
   BaseAmountEncoded,
   baseAmountIO,
@@ -68,7 +68,7 @@ describe('shared/io', () => {
         decoded,
         E.fold(
           (errors) => {
-            fail(PR.failure(errors).join('\n'))
+            fail(mapIOErrors(errors))
           },
           (r) => {
             expect(eqBaseAmount.equals(r, baseAmount(1, 18))).toBeTruthy()
@@ -161,7 +161,7 @@ describe('shared/io', () => {
         decoded,
         E.fold(
           (errors) => {
-            fail(PR.failure(errors).join('\n'))
+            fail(mapIOErrors(errors))
           },
           (r) => {
             expect(r.chain).toEqual(BNBChain)
@@ -195,7 +195,7 @@ describe('shared/io', () => {
         decoded,
         E.fold(
           (errors) => {
-            fail(PR.failure(errors).join('\n'))
+            fail(mapIOErrors(errors))
           },
           (r) => {
             expect(r?.feeAmount).toBeUndefined()
@@ -231,7 +231,7 @@ describe('shared/io', () => {
         decoded,
         E.fold(
           (errors) => {
-            fail(PR.failure(errors).join('\n'))
+            fail(mapIOErrors(errors))
           },
           (result) => {
             expect(result).toEqual(MOCK_KEYSTORE)

@@ -109,7 +109,7 @@ export const saveKeystoreAccounts = (accounts: KeystoreAccounts): TE.TaskEither<
  * It does the following:
  * 1. Load accounts (if available)
  * 2. Merge legacy keystore (if available and if no accounts)
- * 3. Save updated accounts on disk
+ * 3. Save updated accounts to disk
  */
 export const initKeystoreAccounts: TE.TaskEither<Error, KeystoreAccounts> = FP.pipe(
   loadAccounts,

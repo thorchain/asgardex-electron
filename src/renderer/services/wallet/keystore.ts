@@ -113,18 +113,15 @@ const exportKeystore = async () => {
   try {
     const id = FP.pipe(getKeystoreState(), getKeystoreId, O.toNullable)
     if (!id) {
-      // TODO(@Veado) i18n
       throw Error(`Can't export keystore - keystore id is missing in KeystoreState`)
     }
 
     const accounts = getKeystoreAccounts()
     const keystore = FP.pipe(accounts, getKeystore(id), O.toNullable)
     if (!keystore) {
-      // TODO(@Veado) i18n
       throw Error(`Can't export keystore - keystore is missing in accounts`)
     }
-    const name = FP.pipe(accounts, getKeystoreAccountName(id), O.toNullable)
-    const fileName = `${name}.json`
+    const fileName = `asgardex-${FP.pipe(accounts, getKeystoreAccountName(id), O.toNullable) || 'keystore'}.json`
     return await window.apiKeystore.exportKeystore({ fileName, keystore })
   } catch (error) {
     return Promise.reject(error)
@@ -150,7 +147,6 @@ const lock = async () => {
   const state = getKeystoreState()
   // make sure keystore is already imported
   if (!hasImportedKeystore(state)) {
-    // TODO(@Veado) i18n
     throw Error(`Can't lock - keystore seems not to be imported`)
   }
 
@@ -218,7 +214,6 @@ const keystoreAccounts$: KeystoreAccountsLD = FP.pipe(
 
 const id = FP.pipe(getKeystoreState(), getKeystoreId)
 if (!id) {
-  // TODO(@Veado) i18n
   throw Error(`Can't export keystore - keystore id is missing in KeystoreState`)
 }
 
