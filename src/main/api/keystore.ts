@@ -5,12 +5,12 @@ import * as E from 'fp-ts/lib/Either'
 import * as FP from 'fp-ts/lib/function'
 import * as TE from 'fp-ts/lib/TaskEither'
 import * as fs from 'fs-extra'
-import * as PR from 'io-ts/lib/PathReporter'
 
 import { KeystoreAccounts, ipcKeystoreAccountsIO, keystoreIO } from '../../shared/api/io'
 import { ApiKeystore, IPCExportKeystoreParams } from '../../shared/api/types'
+import { mapIOErrors } from '../../shared/utils/fp'
 import IPCMessages from '../ipc/messages'
-import { exists, readJSON, writeJSON } from '../utils/file'
+import { exists, readJSON, renameFile, writeJSON } from '../utils/file'
 import { STORAGE_DIR } from './const'
 
 export const LEGACY_KEYSTORE_ID = 1
@@ -48,35 +48,16 @@ export const loadKeystore = async () => {
 const migrateLegacyAccount = (): TE.TaskEither<Error, KeystoreAccounts> =>
   FP.pipe(
     exists(LEGACY_KEYSTORE_FILE),
-    TE.chain((ksExists) => {
-      if (ksExists) return readJSON(LEGACY_KEYSTORE_FILE)
-      // no keystore
-      return TE.right(null)
-    }),
-    TE.map((v) => {
-      console.log('migrateLegacyAccount read file', v)
-      return v
-    }),
-    TE.chain(
-      FP.flow(
-        (v) => {
-          console.log('migrateLegacyAccount flow ', v)
-          return v
-        },
-        keystoreIO.decode,
-        E.mapLeft((errors) => {
-          console.log('migrateLegacyAccount errors ', errors)
-          return new Error(PR.failure(errors).join('\n'))
-        }),
-        TE.fromEither
-      )
+    // Switch to error if no file exists
+    TE.fromPredicate(
+      (v) => !!v,
+      () => Error('Keystore file does not exist')
     ),
-    TE.map((v) => {
-      console.log('migrateLegacyAccount decoded', v)
-      return v
-    }),
-    // ... to put it into an account
-    //  one account an user can have
+    // get keystore content
+    TE.chain(() => readJSON(LEGACY_KEYSTORE_FILE)),
+    // decode keystore content
+    TE.chain(FP.flow(keystoreIO.decode, E.mapLeft(mapIOErrors), TE.fromEither)),
+    // create legacy account
     TE.map((keystore) => [
       {
         id: LEGACY_KEYSTORE_ID,
@@ -85,10 +66,14 @@ const migrateLegacyAccount = (): TE.TaskEither<Error, KeystoreAccounts> =>
         keystore
       }
     ]),
-    TE.map((v) => {
-      console.log('migrateLegacyAccount accounts', v)
-      return v
-    })
+    TE.chain((accounts) =>
+      FP.pipe(
+        // rename keystore file to backup it
+        renameFile(LEGACY_KEYSTORE_FILE, path.join(STORAGE_DIR, `keystore-legacy-${new Date().getTime()}.json`)),
+        // return accounts in case of successfull backup
+        TE.map(() => accounts)
+      )
+    )
   )
 
 const loadAccounts: TE.TaskEither<Error, KeystoreAccounts> = FP.pipe(
@@ -100,13 +85,7 @@ const loadAccounts: TE.TaskEither<Error, KeystoreAccounts> = FP.pipe(
     },
     (e: unknown) => Error(`${e}`)
   ),
-  TE.chain(
-    FP.flow(
-      ipcKeystoreAccountsIO.decode,
-      E.mapLeft((errors) => new Error(PR.failure(errors).join('\n'))),
-      TE.fromEither
-    )
-  )
+  TE.chain(FP.flow(ipcKeystoreAccountsIO.decode, E.mapLeft(mapIOErrors), TE.fromEither))
 )
 
 /**
@@ -114,18 +93,14 @@ const loadAccounts: TE.TaskEither<Error, KeystoreAccounts> = FP.pipe(
  * It returns a list of accounts
  */
 export const saveKeystoreAccounts = (accounts: KeystoreAccounts): TE.TaskEither<Error, KeystoreAccounts> =>
-  FP.pipe(
-    ipcKeystoreAccountsIO.decode(accounts),
-    E.mapLeft((errors) => new Error(PR.failure(errors).join('\n'))),
-    TE.fromEither,
-    TE.chain((accountsDecoded) => {
-      console.log('saveAccounts: accountsDecoded', accountsDecoded)
-      return FP.pipe(
-        writeJSON(`${ACCOUNTS_STORAGE_FILE}`, accountsDecoded),
-        // return saved accounts
-        TE.map((_) => accountsDecoded)
-      )
-    })
+  // 1. encode accounts
+  FP.pipe(accounts, ipcKeystoreAccountsIO.encode, (accountsEncoded) =>
+    FP.pipe(
+      // 2. save accounts to disk
+      writeJSON(`${ACCOUNTS_STORAGE_FILE}`, accountsEncoded),
+      // return accounts
+      TE.map((_) => accounts)
+    )
   )
 
 /**
@@ -138,15 +113,25 @@ export const saveKeystoreAccounts = (accounts: KeystoreAccounts): TE.TaskEither<
  */
 export const initKeystoreAccounts: TE.TaskEither<Error, KeystoreAccounts> = FP.pipe(
   loadAccounts,
-  TE.chain((accounts) =>
-    // If we have already saved accounts before, no migration is needed anymore
-    accounts.length > 0 ? TE.fromEither(E.right(accounts)) : migrateLegacyAccount()
-  ),
-  TE.chain(saveKeystoreAccounts)
+  TE.chain((accounts) => {
+    // If we have already stored accounts,
+    // another migration is not needed anymore.
+    if (accounts.length) return TE.right(accounts)
+
+    // In other case (no previous migration | no accounts)
+    // Try to migrate legacy account and save accounts
+    return FP.pipe(
+      migrateLegacyAccount(),
+      // Ignore any legacy keystore errors, but return empty list
+      TE.alt(() => TE.right<Error, KeystoreAccounts>([])),
+      // save accounts to disk
+      TE.chain(saveKeystoreAccounts)
+    )
+  })
 )
 
 export const apiKeystore: ApiKeystore = {
-  // Note: `params` need to be encoded by `ipcKeystoreAccountIO` before calling `saveKeystoreAccounts` */
+  // Note: `params` need to be encoded by `ipcKeystoreAccountsIO` before calling `saveKeystoreAccounts` */
   saveKeystoreAccounts: (params: unknown) => ipcRenderer.invoke(IPCMessages.SAVE_KEYSTORE_ACCOUNTS, params),
   exportKeystore: (params: IPCExportKeystoreParams) => ipcRenderer.invoke(IPCMessages.EXPORT_KEYSTORE, params),
   load: () => ipcRenderer.invoke(IPCMessages.LOAD_KEYSTORE),

@@ -2,6 +2,8 @@ import * as AP from 'fp-ts/lib/Apply'
 import * as FP from 'fp-ts/lib/function'
 import * as TE from 'fp-ts/lib/TaskEither'
 import * as O from 'fp-ts/Option'
+import * as IO from 'io-ts'
+import * as PR from 'io-ts/lib/PathReporter'
 
 // Note: Since `TE.taskEither` is deprecated, use `TE.ApplySey` in `sequenceT`
 // @see https://github.com/gcanti/fp-ts/issues/1491#issuecomment-889976079
@@ -14,3 +16,5 @@ export const integerFromNullableString = (s?: string | null): O.Option<number> =
 
 export const naturalNumberFromNullableString = (s?: string | null): O.Option<number> =>
   FP.pipe(s, integerFromNullableString, O.chain(O.fromPredicate((v) => v >= 0)))
+
+export const mapIOErrors = (errors: IO.Errors) => new Error(PR.failure(errors).join('\n'))

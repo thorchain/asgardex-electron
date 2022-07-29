@@ -43,7 +43,7 @@ export const ImportKeystore: React.FC<Props> = (props): JSX.Element => {
         RD.map((keystore) => {
           const id = new Date().getTime()
           // TODO (@veado) Get name from form
-          const name = `asgardex-account-${id}`
+          const name = `wallet-${id}`
           subscribeImportKeystoreState(importKeystore$({ keystore, password, id, name }))
           return true
         })

@@ -140,7 +140,7 @@ const initIPC = () => {
   // Lang
   ipcMain.on(IPCMessages.UPDATE_LANG, (_, locale: Locale) => langChangeHandler(locale))
   // Keystore
-  ipcMain.handle(IPCMessages.SAVE_KEYSTORE_ACCOUNTS, (_, params: unknown) => {
+  ipcMain.handle(IPCMessages.SAVE_KEYSTORE_ACCOUNTS, async (_, params: unknown) => {
     return FP.pipe(
       // params need to be decoded
       ipcKeystoreAccountsIO.decode(params),
@@ -150,9 +150,9 @@ const initIPC = () => {
       )
     )
   })
-  ipcMain.handle(IPCMessages.EXPORT_KEYSTORE, (_, params: IPCExportKeystoreParams) => exportKeystore(params))
-  ipcMain.handle(IPCMessages.LOAD_KEYSTORE, () => loadKeystore())
-  ipcMain.handle(IPCMessages.INIT_KEYSTORE_ACCOUNTS, () => initKeystoreAccounts())
+  ipcMain.handle(IPCMessages.EXPORT_KEYSTORE, async (_, params: IPCExportKeystoreParams) => exportKeystore(params))
+  ipcMain.handle(IPCMessages.LOAD_KEYSTORE, async () => loadKeystore())
+  ipcMain.handle(IPCMessages.INIT_KEYSTORE_ACCOUNTS, async () => initKeystoreAccounts())
   // Ledger
   ipcMain.handle(IPCMessages.GET_LEDGER_ADDRESS, async (_, params: IPCLedgerAdddressParams) => getLedgerAddress(params))
   ipcMain.handle(IPCMessages.VERIFY_LEDGER_ADDRESS, async (_, params: IPCLedgerAdddressParams) =>

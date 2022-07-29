@@ -20,7 +20,7 @@ const NewPhraseConfirmView: React.FC = (): JSX.Element => {
 
   const id = generateKeystoreId()
   // TODO (@veado) Get name from route
-  const name = `asgardex-account-${id}`
+  const name = `wallet-${id}`
 
   return (
     <NewPhraseConfirm

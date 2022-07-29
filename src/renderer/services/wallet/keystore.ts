@@ -8,9 +8,8 @@ import * as Rx from 'rxjs'
 import * as RxOp from 'rxjs/operators'
 
 import { ipcKeystoreAccountsIO, KeystoreAccounts } from '../../../shared/api/io'
-import { MOCK_KEYSTORE } from '../../../shared/mock/wallet'
 import { liveData } from '../../helpers/rx/liveData'
-import { observableState } from '../../helpers/stateHelper'
+import { observableState, triggerStream } from '../../helpers/stateHelper'
 import { INITIAL_KEYSTORE_STATE } from './const'
 import {
   KeystoreService,
@@ -19,7 +18,8 @@ import {
   ImportKeystoreLD,
   LoadKeystoreLD,
   ImportKeystoreParams,
-  AddKeystoreParams
+  AddKeystoreParams,
+  KeystoreAccountsLD
 } from './types'
 import { getKeystore, getKeystoreAccountName, getKeystoreId, getSelectedKeystoreId, hasImportedKeystore } from './util'
 
@@ -42,17 +42,14 @@ const {
  * Adds a keystore and saves it to disk
  */
 const addKeystoreAccount = async ({ phrase, name, id, password }: AddKeystoreParams): Promise<void> => {
-  console.log('///// addKeystoreAccount')
   try {
     const keystore: Keystore = await encryptToKeyStore(phrase, password)
 
-    console.log('keystore', keystore)
     // remove selected state from current accounts
     const accounts = FP.pipe(
       getKeystoreAccounts(),
       A.map((account) => ({ ...account, selected: false }))
     )
-    console.log('accounts', accounts)
     // Add account to accounts + mark it `selected`
     const newAccounts: KeystoreAccounts = [
       ...accounts,
@@ -64,7 +61,6 @@ const addKeystoreAccount = async ({ phrase, name, id, password }: AddKeystorePar
       }
     ]
 
-    console.log('newAccounts', newAccounts)
     const encodedAccounts = ipcKeystoreAccountsIO.encode(newAccounts)
     // Save accounts to disk
     await window.apiKeystore.saveKeystoreAccounts(encodedAccounts)
@@ -72,7 +68,6 @@ const addKeystoreAccount = async ({ phrase, name, id, password }: AddKeystorePar
     setKeystoreAccounts(newAccounts)
     setKeystoreState(O.some({ id, phrase }))
 
-    console.log('///// addKeystoreAccount END')
     return Promise.resolve()
   } catch (error) {
     return Promise.reject(error)
@@ -129,7 +124,7 @@ const exportKeystore = async () => {
       throw Error(`Can't export keystore - keystore is missing in accounts`)
     }
     const name = FP.pipe(accounts, getKeystoreAccountName(id), O.toNullable)
-    const fileName = `asgardex-${name}.json`
+    const fileName = `${name}.json`
     return await window.apiKeystore.exportKeystore({ fileName, keystore })
   } catch (error) {
     return Promise.reject(error)
@@ -191,46 +186,58 @@ const unlock = async (password: string) => {
   }
 }
 
-// initialize accounts at start
-window.apiKeystore.initKeystoreAccounts().then(
-  (eAccounts) => {
-    // Transform Promise<Either> -> Promise
-    FP.pipe(
-      eAccounts,
-      E.fold(
-        (error) => {
-          console.log('getAccounts error:', error)
-        },
-        (accounts) => {
-          console.log('getAccounts accounts:', accounts)
-          const state =
-            accounts.length > 0
-              ? O.some({
-                  // try to get selected state from accounts
-                  id: FP.pipe(accounts, getSelectedKeystoreId, O.toNullable) || accounts[0].id
-                }) /*imported, but locked*/
-              : O.none /*not imported*/
-          setKeystoreState(state)
-          setKeystoreAccounts(accounts)
-        }
+// `TriggerStream` to reload data of `ThorchainLastblock`
+const { stream$: reloadKeystoreAccounts$, trigger: reloadKeystoreAccounts } = triggerStream()
+
+const keystoreAccounts$: KeystoreAccountsLD = FP.pipe(
+  reloadKeystoreAccounts$,
+  RxOp.switchMap(() => Rx.from(window.apiKeystore.initKeystoreAccounts())),
+  RxOp.catchError((e) => Rx.of(E.left(e))),
+  RxOp.switchMap(
+    FP.flow(
+      E.fold<Error, KeystoreAccounts, KeystoreAccountsLD>(
+        (e) => Rx.of(RD.failure(e)),
+        (accounts) => Rx.of(RD.success(accounts))
       )
     )
-  },
-  (error) => {
-    console.log('getAccounts error:', error)
-  }
+  ),
+  liveData.map((accounts) => {
+    const state = accounts.length
+      ? O.some({
+          // try to get selected state from accounts
+          id: FP.pipe(accounts, getSelectedKeystoreId, O.toNullable) || accounts[0].id
+        }) /*imported, but locked*/
+      : O.none /*not imported*/
+    setKeystoreState(state)
+    setKeystoreAccounts(accounts)
+
+    return accounts
+  }),
+  RxOp.startWith(RD.pending)
 )
+
+const id = FP.pipe(getKeystoreState(), getKeystoreId)
+if (!id) {
+  // TODO(@Veado) i18n
+  throw Error(`Can't export keystore - keystore id is missing in KeystoreState`)
+}
 
 const validatePassword$ = (password: string): ValidatePasswordLD =>
   password
     ? FP.pipe(
-        // TODO(@veado) Get keystore from accounts
-        // Rx.from(window.apiKeystore.get(1 /* LEGACY_KEYSTORE_ID */)),
-        Rx.of(MOCK_KEYSTORE),
-        RxOp.switchMap((keystore) => Rx.from(decryptFromKeystore(keystore, password))),
-        RxOp.map(RD.success),
-        liveData.map(() => undefined),
-        RxOp.catchError((err) => Rx.of(RD.failure(err))),
+        getKeystoreState(),
+        getKeystoreId,
+        O.chain((id) => FP.pipe(getKeystoreAccounts(), getKeystore(id))),
+        O.fold(
+          () => Rx.of(RD.failure(Error('Could not get current keystore to validate password'))),
+          (keystore) =>
+            FP.pipe(
+              Rx.from(decryptFromKeystore(keystore, password)),
+              // // don't store phrase in result
+              RxOp.map((_ /* phrase */) => RD.success(undefined)),
+              RxOp.catchError((err) => Rx.of(RD.failure(err)))
+            )
+        ),
         RxOp.startWith(RD.pending)
       )
     : Rx.of(RD.initial)
@@ -244,7 +251,9 @@ export const keystoreService: KeystoreService = {
   loadKeystore$,
   lock,
   unlock,
-  validatePassword$
+  validatePassword$,
+  reloadKeystoreAccounts,
+  keystoreAccounts$
 }
 
 // TODO(@Veado) Remove it - for debugging only

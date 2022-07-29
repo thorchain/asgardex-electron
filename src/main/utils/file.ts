@@ -51,3 +51,13 @@ export const writeJSON: (path: string, data: object, options?: fs.WriteOptions) 
   TE.taskify<string, object, fs.WriteOptions | undefined, Error, void>(fs.outputJSON)
 
 export const exists: (path: string) => TE.TaskEither<Error, boolean> = TE.taskify<string, Error, boolean>(fs.pathExists)
+
+/**
+ * Renames a file
+ */
+export const renameFile: (oldPath: fs.PathLike, newPath: fs.PathLike) => TE.TaskEither<Error, void> = TE.taskify<
+  fs.PathLike,
+  fs.PathLike,
+  Error,
+  void
+>(fs.rename)

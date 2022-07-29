@@ -69,7 +69,7 @@ export const ImportPhrase: React.FC<Props> = (props): JSX.Element => {
     ({ phrase: newPhrase, password }: Store) => {
       const id = generateKeystoreId()
       // TODO (@veado) Get name from form
-      const name = `asgardex-account-${id}`
+      const name = `wallet-${id}`
       setImportError(O.none)
       setImporting(true)
       addKeystore({ phrase: newPhrase, name, id, password }).catch((error) => {
