@@ -11,13 +11,14 @@ import * as O from 'fp-ts/lib/Option'
 import { useIntl } from 'react-intl'
 
 import { KeystoreClientStates } from '../../../hooks/useKeystoreClientStates'
-import { Phrase } from '../../../services/wallet/types'
+import { AddKeystoreParams } from '../../../services/wallet/types'
+import { generateKeystoreId } from '../../../services/wallet/util'
 import { Spin } from '../../shared/loading'
 import { InputPassword, InputTextArea } from '../../uielements/input'
 import * as Styled from './Phrase.styles'
 
 type Props = {
-  addKeystore: (phrase: Phrase, password: string) => Promise<void>
+  addKeystore: (params: AddKeystoreParams) => Promise<void>
   clientStates: KeystoreClientStates
 }
 
@@ -66,9 +67,12 @@ export const ImportPhrase: React.FC<Props> = (props): JSX.Element => {
 
   const submitForm = useCallback(
     ({ phrase: newPhrase, password }: Store) => {
+      const id = generateKeystoreId()
+      // TODO (@veado) Get name from form
+      const name = `wallet-${id}`
       setImportError(O.none)
       setImporting(true)
-      addKeystore(newPhrase, password).catch((error) => {
+      addKeystore({ phrase: newPhrase, name, id, password }).catch((error) => {
         setImporting(false)
         // TODO(@Veado): i18n
         setImportError(O.some(error))

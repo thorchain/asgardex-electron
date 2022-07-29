@@ -16,6 +16,7 @@ import { Header } from '../../components/header'
 import { Button } from '../../components/uielements/button'
 import { useI18nContext } from '../../contexts/I18nContext'
 import { useMidgardContext } from '../../contexts/MidgardContext'
+import { useWalletContext } from '../../contexts/WalletContext'
 import { unionChains } from '../../helpers/fp/array'
 import { rdAltOnPending } from '../../helpers/fpHelpers'
 import { useMimirHalt } from '../../hooks/useMimirHalt'
@@ -57,6 +58,12 @@ export const AppView: React.FC = (): JSX.Element => {
 
   const prevHaltedChains = useRef<Chain[]>([])
   const prevMimirHalt = useRef<MimirHalt>(DEFAULT_MIMIR_HALT)
+
+  const {
+    keystoreService: { reloadKeystoreAccounts, keystoreAccounts$ }
+  } = useWalletContext()
+
+  const keystoreAccounts = useObservableState(keystoreAccounts$, RD.initial)
 
   const { mimirHaltRD } = useMimirHalt()
 
@@ -249,6 +256,28 @@ export const AppView: React.FC = (): JSX.Element => {
     )
   }, [apiEndpoint, renderMidgardAlert])
 
+  // TODO (@veado) Render alert incl. reload button
+  const renderKeystoreError = useMemo(() => {
+    return (
+      <div>
+        <div>
+          {' '}
+          keystoreAccounts:
+          {FP.pipe(
+            keystoreAccounts,
+            RD.fold(
+              () => <>init</>,
+              () => <>loading</>,
+              (e) => <>error {e.toString()}</>,
+              (accounts) => <>accounts {JSON.stringify(accounts)}</>
+            )
+          )}
+        </div>
+        <button onClick={reloadKeystoreAccounts}>reloadKeystoreAccounts</button>
+      </div>
+    )
+  }, [keystoreAccounts, reloadKeystoreAccounts])
+
   return (
     <Styled.AppWrapper>
       <Styled.AppLayout>
@@ -256,6 +285,7 @@ export const AppView: React.FC = (): JSX.Element => {
         <Header />
 
         <View>
+          {renderKeystoreError}
           {renderMidgardError}
           {renderHaltedChainsWarning}
           {renderUpgradeWarning}

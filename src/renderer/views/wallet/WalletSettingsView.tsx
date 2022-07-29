@@ -25,7 +25,6 @@ import * as RxOp from 'rxjs/operators'
 
 import { DEFAULT_ETH_DERIVATION_MODE } from '../../../shared/ethereum/const'
 import { EthDerivationMode } from '../../../shared/ethereum/types'
-import { WalletAddress } from '../../../shared/wallet/types'
 import { WalletSettings, UnlockWalletSettings } from '../../components/settings'
 import { useBinanceContext } from '../../contexts/BinanceContext'
 import { useBitcoinCashContext } from '../../contexts/BitcoinCashContext'
@@ -64,7 +63,7 @@ export const WalletSettingsView: React.FC = (): JSX.Element => {
   const location = useLocation()
 
   const {
-    keystoreService: { keystore$, lock, removeKeystore, exportKeystore, validatePassword$ }
+    keystoreService: { keystore$, lock, removeKeystoreAccount, exportKeystore, validatePassword$ }
   } = useWalletContext()
 
   const keystore = useObservableState(keystore$, O.none)
@@ -83,15 +82,6 @@ export const WalletSettingsView: React.FC = (): JSX.Element => {
   const { addressUI$: cosmosAddressUI$ } = useCosmosContext()
 
   const ethDerivationMode: EthDerivationMode = useObservableState(ethDerivationMode$, DEFAULT_ETH_DERIVATION_MODE)
-
-  const oRuneNativeAddress: O.Option<WalletAddress> = useObservableState(thorAddressUI$, O.none)
-  const runeNativeAddress = FP.pipe(
-    oRuneNativeAddress,
-    O.fold(
-      () => '',
-      ({ address }) => address
-    )
-  )
 
   const phrase$ = useMemo(() => FP.pipe(keystore$, RxOp.map(getPhrase)), [keystore$])
   const phrase = useObservableState(phrase$, O.none)
@@ -422,9 +412,8 @@ export const WalletSettingsView: React.FC = (): JSX.Element => {
   ) : (
     <WalletSettings
       network={network}
-      runeNativeAddress={runeNativeAddress}
       lockWallet={lock}
-      removeKeystore={removeKeystore}
+      removeKeystore={removeKeystoreAccount}
       exportKeystore={exportKeystore}
       addLedgerAddress={addLedgerAddressHandler}
       verifyLedgerAddress={verifyLedgerAddressHandler}

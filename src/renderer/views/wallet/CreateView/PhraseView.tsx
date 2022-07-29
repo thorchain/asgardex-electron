@@ -6,6 +6,7 @@ import { NewPhraseConfirm, NewPhraseGenerate } from '../../../components/wallet/
 import { PhraseInfo } from '../../../components/wallet/phrase/Phrase.types'
 import { useWalletContext } from '../../../contexts/WalletContext'
 import * as walletRoutes from '../../../routes/wallet'
+import { generateKeystoreId } from '../../../services/wallet/util'
 
 const NewPhraseConfirmView: React.FC = (): JSX.Element => {
   const location = useLocation()
@@ -17,7 +18,16 @@ const NewPhraseConfirmView: React.FC = (): JSX.Element => {
     return <Navigate to={walletRoutes.create.phrase.path()} replace />
   }
 
-  return <NewPhraseConfirm mnemonic={phrase} onConfirm={() => keystoreService.addKeystore(phrase, password)} />
+  const id = generateKeystoreId()
+  // TODO (@veado) Get name from route
+  const name = `wallet-${id}`
+
+  return (
+    <NewPhraseConfirm
+      mnemonic={phrase}
+      onConfirm={() => keystoreService.addKeystoreAccount({ phrase, password, id, name })}
+    />
+  )
 }
 
 export default NewPhraseConfirmView

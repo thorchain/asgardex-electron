@@ -1,6 +1,5 @@
 import { join } from 'path'
 
-import { Keystore } from '@xchainjs/xchain-crypto'
 import { BrowserWindow, app, ipcMain, nativeImage } from 'electron'
 import electronDebug from 'electron-debug'
 import isDev from 'electron-is-dev'
@@ -11,16 +10,17 @@ import * as E from 'fp-ts/lib/Either'
 import * as FP from 'fp-ts/lib/function'
 
 import {
+  ipcKeystoreAccountsIO,
   ipcLedgerApproveERC20TokenParamsIO,
   ipcLedgerDepositTxParamsIO,
   ipcLedgerSendTxParamsIO
 } from '../shared/api/io'
-import type { IPCLedgerAdddressParams, StoreFileName } from '../shared/api/types'
+import type { IPCExportKeystoreParams, IPCLedgerAdddressParams, StoreFileName } from '../shared/api/types'
 import { DEFAULT_STORAGES } from '../shared/const'
 import type { Locale } from '../shared/i18n/types'
 import { registerAppCheckUpdatedHandler } from './api/appUpdate'
 import { getFileStoreService } from './api/fileStore'
-import { saveKeystore, removeKeystore, getKeystore, keystoreExist, exportKeystore, loadKeystore } from './api/keystore'
+import { exportKeystore, initKeystoreAccounts, loadKeystore, saveKeystoreAccounts } from './api/keystore'
 import {
   getAddress as getLedgerAddress,
   sendTx as sendLedgerTx,
@@ -140,14 +140,19 @@ const initIPC = () => {
   // Lang
   ipcMain.on(IPCMessages.UPDATE_LANG, (_, locale: Locale) => langChangeHandler(locale))
   // Keystore
-  ipcMain.handle(IPCMessages.SAVE_KEYSTORE, (_, keystore: Keystore) => saveKeystore(keystore))
-  ipcMain.handle(IPCMessages.REMOVE_KEYSTORE, () => removeKeystore())
-  ipcMain.handle(IPCMessages.GET_KEYSTORE, () => getKeystore())
-  ipcMain.handle(IPCMessages.KEYSTORE_EXIST, () => keystoreExist())
-  ipcMain.handle(IPCMessages.EXPORT_KEYSTORE, (_, defaultFileName: string, keystore: Keystore) =>
-    exportKeystore(defaultFileName, keystore)
-  )
-  ipcMain.handle(IPCMessages.LOAD_KEYSTORE, () => loadKeystore())
+  ipcMain.handle(IPCMessages.SAVE_KEYSTORE_ACCOUNTS, async (_, params: unknown) => {
+    return FP.pipe(
+      // params need to be decoded
+      ipcKeystoreAccountsIO.decode(params),
+      E.fold(
+        (e) => Promise.reject(e),
+        (accounts) => saveKeystoreAccounts(accounts)()
+      )
+    )
+  })
+  ipcMain.handle(IPCMessages.EXPORT_KEYSTORE, async (_, params: IPCExportKeystoreParams) => exportKeystore(params))
+  ipcMain.handle(IPCMessages.LOAD_KEYSTORE, async () => loadKeystore())
+  ipcMain.handle(IPCMessages.INIT_KEYSTORE_ACCOUNTS, async () => initKeystoreAccounts())
   // Ledger
   ipcMain.handle(IPCMessages.GET_LEDGER_ADDRESS, async (_, params: IPCLedgerAdddressParams) => getLedgerAddress(params))
   ipcMain.handle(IPCMessages.VERIFY_LEDGER_ADDRESS, async (_, params: IPCLedgerAdddressParams) =>

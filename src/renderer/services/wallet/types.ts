@@ -8,44 +8,68 @@ import { NonEmptyArray } from 'fp-ts/lib/NonEmptyArray'
 import * as O from 'fp-ts/lib/Option'
 import * as Rx from 'rxjs'
 
-import { LedgerError, Network } from '../../../shared/api/types'
+import { KeystoreAccounts } from '../../../shared/api/io'
+import { KeystoreId, LedgerError, Network } from '../../../shared/api/types'
 import { WalletAddress, WalletBalanceType, WalletType } from '../../../shared/wallet/types'
 import { LiveData } from '../../helpers/rx/liveData'
 import { LoadTxsParams, WalletBalancesLD, WalletBalancesRD } from '../clients'
 
 export type Phrase = string
 
-export type KeystoreContent = { phrase: Phrase }
+export type KeystoreLocked = { id: KeystoreId }
+export type KeystoreUnlocked = { id: KeystoreId; phrase: Phrase }
+export type KeystoreContent = KeystoreLocked | KeystoreUnlocked
+
+/**
+ * Type guard for `KeystoreUnlocked`
+ */
+export const isKeystoreUnlocked = (kc: KeystoreContent): kc is KeystoreUnlocked => 'id' in kc && 'phrase' in kc
+
+/**
+ * Type guard for `KeystoreLocked`
+ */
+export const isKeystoreLocked = (kc: KeystoreContent): kc is KeystoreLocked => 'id' in kc && !('phrase' in kc)
+
 /**
  * Type for providing 3 states of keystore
  *
  * (1) `None` -> DEFAULT (keystore needs to be imported at start of application or after shutdown of app)
- * (2) `Some<None>` -> LOCKED STATUS (keystore file, but no phrase)
- * (3) `Some<Some<KeystoreContent>>` -> UNLOCKED + IMPORTED STATUS (keystore file + phrase)
+ * (2) `Some<{id: string}>` -> LOCKED STATUS (keystore id, but no phrase)
+ * (3) `Some<{id: string, phrase: string}>` -> UNLOCKED + IMPORTED STATUS (keystore id + phrase)
+ *
+ * DEPRECATED (2) `Some<None>` -> LOCKED STATUS (keystore file, but no phrase)
+ * DEPRECATED (3) `Some<Some<KeystoreContent>>` -> UNLOCKED + IMPORTED STATUS (keystore file + phrase)
+ *
+ *
+ *
  */
-export type KeystoreState = O.Option<O.Option<KeystoreContent>>
+export type KeystoreState = O.Option<KeystoreContent>
 export type KeystoreState$ = Rx.Observable<KeystoreState>
 
 export type ValidatePasswordHandler = (password: string) => LiveData<Error, void>
 export type ValidatePasswordLD = LiveData<Error, void>
 
+export type ImportKeystoreParams = { id: KeystoreId; keystore: Keystore; password: string; name: string }
+export type AddKeystoreParams = { id: KeystoreId; phrase: Phrase; name: string; password: string }
 export type ImportKeystoreLD = LiveData<Error, void>
 export type LoadKeystoreLD = LiveData<Error, Keystore>
 
 export type KeystoreService = {
   keystore$: KeystoreState$
-  addKeystore: (phrase: Phrase, password: string) => Promise<void>
-  removeKeystore: () => Promise<void>
-  importKeystore$: (keystore: Keystore, password: string) => ImportKeystoreLD
-  exportKeystore: (runeNativeAddress: string, network: Network) => Promise<void>
+  addKeystoreAccount: (params: AddKeystoreParams) => Promise<void>
+  removeKeystoreAccount: () => Promise<void>
   loadKeystore$: () => LoadKeystoreLD
-  unlock: (state: KeystoreState, password: string) => Promise<void>
+  importKeystore$: (params: ImportKeystoreParams) => ImportKeystoreLD
+  exportKeystore: () => Promise<void>
+  unlock: (password: string) => Promise<void>
   lock: FP.Lazy<void>
   /**
    * Use RemoteData as result of validation
    * No need to store any success data. Only status
    */
   validatePassword$: ValidatePasswordHandler
+  reloadKeystoreAccounts: FP.Lazy<void>
+  keystoreAccounts$: KeystoreAccountsLD
 }
 
 export type WalletAddressAsync = { address: RD.RemoteData<Error, WalletAddress>; type: WalletType }
@@ -180,3 +204,5 @@ export type LedgerAddressMap$ = Rx.Observable<LedgerAddressMap>
 
 export type LedgerAddressesMap = Record<Chain, LedgerAddressMap>
 export type LedgerAddressesMap$ = Rx.Observable<LedgerAddressesMap>
+
+export type KeystoreAccountsLD = LiveData<Error, KeystoreAccounts>

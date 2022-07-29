@@ -3,13 +3,13 @@ import { Address, FeeRate, TxHash, TxParams } from '@xchainjs/xchain-client'
 import { Keystore } from '@xchainjs/xchain-crypto'
 import { NodeUrl } from '@xchainjs/xchain-thorchain'
 import { Chain } from '@xchainjs/xchain-util'
-import { Either } from 'fp-ts/lib/Either'
+import * as E from 'fp-ts/lib/Either'
 import * as O from 'fp-ts/Option'
 
 import { EthDerivationMode } from '../ethereum/types'
 import { Locale } from '../i18n/types'
 import { WalletAddress } from '../wallet/types'
-import { PoolsStorageEncoded } from './io'
+import { KeystoreAccounts, PoolsStorageEncoded } from './io'
 
 // A version number starting from `1` to avoid to load deprecated files
 export type StorageVersion = { version: string }
@@ -31,12 +31,15 @@ export type StoreFilesContent = Readonly<{
 export type StoreFileName = keyof StoreFilesContent
 export type StoreFileData<FileName extends StoreFileName> = StoreFilesContent[FileName]
 
+export type KeystoreId = number
+
+export type IPCExportKeystoreParams = { fileName: string; keystore: Keystore }
+export type IPCSaveKeystoreParams = { id: KeystoreId; keystore: Keystore }
+
 export type ApiKeystore = {
-  save: (keystore: Keystore) => Promise<void>
-  remove: () => Promise<void>
-  get: () => Promise<Keystore>
-  exists: () => Promise<boolean>
-  export: (defaultFileName: string, keystore: Keystore) => Promise<void>
+  saveKeystoreAccounts: (accounts: KeystoreAccounts) => Promise<void>
+  exportKeystore: (params: IPCExportKeystoreParams) => Promise<void>
+  initKeystoreAccounts: () => Promise<E.Either<Error, KeystoreAccounts>>
   load: () => Promise<Keystore>
 }
 
@@ -119,17 +122,17 @@ export type LedgerTxParams = LedgerTHORTxParams | LedgerBNBTxParams
 export type IPCLedgerAdddressParams = { chain: Chain; network: Network; walletIndex: number }
 
 export type ApiHDWallet = {
-  getLedgerAddress: (params: IPCLedgerAdddressParams) => Promise<Either<LedgerError, WalletAddress>>
+  getLedgerAddress: (params: IPCLedgerAdddressParams) => Promise<E.Either<LedgerError, WalletAddress>>
   verifyLedgerAddress: (params: IPCLedgerAdddressParams) => Promise<boolean>
   sendLedgerTx: (
     params: unknown /* will be de-/serialized by ipcLedgerSendTxParamsIO */
-  ) => Promise<Either<LedgerError, TxHash>>
+  ) => Promise<E.Either<LedgerError, TxHash>>
   depositLedgerTx: (
     params: unknown /* will be de-/serialized by ipcLedgerDepositTxParamsIO */
-  ) => Promise<Either<LedgerError, TxHash>>
+  ) => Promise<E.Either<LedgerError, TxHash>>
   approveLedgerERC20Token: (
     params: unknown /* will be de-/serialized by ipcLedgerApprovedERC20TokenParamsIO */
-  ) => Promise<Either<LedgerError, TxHash>>
+  ) => Promise<E.Either<LedgerError, TxHash>>
 }
 
 declare global {
