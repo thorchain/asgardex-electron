@@ -48,12 +48,12 @@ export const loadKeystore = async () => {
 const migrateLegacyAccount = (): TE.TaskEither<Error, KeystoreAccounts> =>
   FP.pipe(
     exists(LEGACY_KEYSTORE_FILE),
-    // Switch to error if no file exists
+    // Switch to error if file does not exists
     TE.fromPredicate(
       (v) => !!v,
-      () => Error('Keystore file does not exist')
+      () => Error(`${LEGACY_KEYSTORE_FILE} file does not exist`)
     ),
-    // get keystore content
+    // read keystore from disc
     TE.chain(() => readJSON(LEGACY_KEYSTORE_FILE)),
     // decode keystore content
     TE.chain(FP.flow(keystoreIO.decode, E.mapLeft(mapIOErrors), TE.fromEither)),
