@@ -20,6 +20,7 @@ import { useWalletContext } from '../../contexts/WalletContext'
 import { unionChains } from '../../helpers/fp/array'
 import { rdAltOnPending } from '../../helpers/fpHelpers'
 import { useMimirHalt } from '../../hooks/useMimirHalt'
+import { useTheme } from '../../hooks/useTheme'
 import { DEFAULT_MIMIR_HALT } from '../../services/thorchain/const'
 import { MimirHalt, MimirHaltRD } from '../../services/thorchain/types'
 import { View } from '../View'
@@ -39,10 +40,22 @@ export const AppView: React.FC = (): JSX.Element => {
   const { locale$ } = useI18nContext()
   const currentLocale = useObservableState(locale$, DEFAULT_LOCALE)
 
+  const { isLight } = useTheme()
+
+  // locale
   useEffect(() => {
     // Needed to update Electron native menu according to the selected locale
     window.apiLang.update(currentLocale)
   }, [currentLocale])
+
+  // Add/remove `dark` selector depending on selected theme (needed for tailwind)
+  useEffect(() => {
+    if (isLight) {
+      document.documentElement.classList.remove('dark')
+    } else {
+      document.documentElement.classList.add('dark')
+    }
+  }, [isLight])
 
   const {
     service: {

@@ -1,8 +1,8 @@
 import * as RD from '@devexperts/remote-data-ts'
 import { ComponentMeta, StoryFn } from '@storybook/react'
-import { Keystore } from '@xchainjs/xchain-crypto'
 import * as Rx from 'rxjs'
 
+import { MOCK_KEYSTORE } from '../../../../shared/mock/wallet'
 import { ImportKeystore as Component, Props } from './ImportKeystore'
 
 const initialImportKeystore = () => Rx.of(RD.initial)
@@ -15,7 +15,7 @@ export const Default = Template.bind({})
 
 const meta: ComponentMeta<typeof Component> = {
   component: Component,
-  title: 'Wallet/Keystore',
+  title: 'Wallet/ImportKeystore',
   argTypes: {
     loadKeystore$: {
       control: {
@@ -25,7 +25,7 @@ const meta: ComponentMeta<typeof Component> = {
           intitial: initialLoadKeystore,
           loading: () => Rx.of(RD.pending),
           error: () => Rx.of(RD.failure(Error('load keystore error'))),
-          success: () => Rx.of(RD.success({} as Keystore))
+          success: () => Rx.of(RD.success(MOCK_KEYSTORE))
         }
       }
     },
@@ -37,7 +37,7 @@ const meta: ComponentMeta<typeof Component> = {
           intitial: initialImportKeystore,
           loading: () => Rx.of(RD.pending),
           error: () => Rx.of(RD.failure(Error('import keystore error'))),
-          success: () => Rx.of(RD.success({}))
+          success: () => Rx.of(RD.success(undefined))
         }
       }
     }
@@ -48,12 +48,7 @@ const meta: ComponentMeta<typeof Component> = {
   },
   decorators: [
     (Story) => (
-      <div
-        style={{
-          display: 'flex',
-          flexDirection: 'column',
-          width: '300px'
-        }}>
+      <div className="flex items-center w-full">
         <Story />
       </div>
     )
