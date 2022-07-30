@@ -17,11 +17,11 @@ export const readFile: (path: string, encoding: string) => TE.TaskEither<Error, 
 /**
  * Reads a JSON file.
  */
-export const readJSON: (path: string, options?: fs.ReadOptions) => TE.TaskEither<Error, string> = TE.taskify<
+export const readJSON: (path: string, options?: fs.ReadOptions) => TE.TaskEither<Error, unknown> = TE.taskify<
   string,
   fs.ReadOptions | undefined,
   Error,
-  string
+  unknown
 >(fs.readJSON)
 
 /**
@@ -47,8 +47,17 @@ export const writeFile: (path: string, data: string, options?: fs.WriteFileOptio
  * Writes a JSON file.
  * If the parent directory does not exist, it will be created.
  */
-export const writeJSON: (path: string, data: object, options?: fs.WriteOptions) => TE.TaskEither<Error, void> =
-  TE.taskify<string, object, fs.WriteOptions | undefined, Error, void>(fs.outputJSON)
+export const writeJSON: (
+  path: string,
+  data: boolean | number | string | object | null,
+  options?: fs.WriteOptions
+) => TE.TaskEither<Error, void> = TE.taskify<
+  string,
+  boolean | number | string | object | null,
+  fs.WriteOptions | undefined,
+  Error,
+  void
+>(fs.outputJSON)
 
 export const exists: (path: string) => TE.TaskEither<Error, boolean> = TE.taskify<string, Error, boolean>(fs.pathExists)
 
