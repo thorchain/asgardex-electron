@@ -20,6 +20,8 @@ const common: CommonMessages = {
   'common.date': 'Datum',
   'common.remove': 'Entfernen',
   'common.keystore': 'Keystore',
+  'common.keystorePassword': 'Keystore Passwort',
+  'common.ledger': 'Ledger',
   'common.phrase': 'Phrase',
   'common.submit': 'Abschicken',
   'common.confirm': 'Bestätigen',

@@ -19,6 +19,8 @@ export type CommonMessageKey =
   | 'common.remove'
   | 'common.back'
   | 'common.keystore'
+  | 'common.keystorePassword'
+  | 'common.ledger'
   | 'common.phrase'
   | 'common.submit'
   | 'common.confirm'
