@@ -8,8 +8,8 @@ import { ImportKeystore as Component, Props } from './ImportKeystore'
 const initialImportKeystore = () => Rx.of(RD.initial)
 const initialLoadKeystore = () => Rx.of(RD.initial)
 
-const Template: StoryFn<Props> = (args) => (
-  <Component importKeystore$={args.importKeystore$} loadKeystore$={args.loadKeystore$} clientStates={RD.initial} />
+const Template: StoryFn<Props> = ({ importKeystore$, loadKeystore$, clientStates }) => (
+  <Component importKeystore$={importKeystore$} loadKeystore$={loadKeystore$} clientStates={clientStates} />
 )
 export const Default = Template.bind({})
 
@@ -44,11 +44,12 @@ const meta: ComponentMeta<typeof Component> = {
   },
   args: {
     loadKeystore$: initialLoadKeystore,
-    importKeystore$: initialImportKeystore
+    importKeystore$: initialImportKeystore,
+    clientStates: RD.success(true)
   },
   decorators: [
     (Story) => (
-      <div className="flex items-center w-full">
+      <div className="w-full bg-white">
         <Story />
       </div>
     )

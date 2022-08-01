@@ -13,6 +13,8 @@ import { getMessagesByLocale } from '../src/renderer/i18n'
 import * as mockApi from '../src/shared/mock/api'
 import type { DecoratorFn } from '@storybook/react';
 
+import "../src/renderer/index.css"
+
 // Mock api provided by main renderer
 window.apiHDWallet = { ...mockApi.apiHDWallet }
 window.apiKeystore = { ...mockApi.apiKeystore }

@@ -1,6 +1,7 @@
-
 // Main entry point for Storybook@7.x
 // Based on `https://github.com/storybookjs/storybook/blob/v7.0.0-alpha.13/examples/cra-ts-essentials/.storybook/main.ts
+
+const path = require('path')
 
 const { GitRevisionPlugin } = require('git-revision-webpack-plugin')
 
@@ -11,12 +12,12 @@ const webpack = require('webpack')
 const config = {
   features: {
     buildStoriesJson: true,
-    breakingChangesV7: true,
+    breakingChangesV7: true
   },
   core: {
     builder: '@storybook/builder-webpack5',
     channelOptions: { allowFunction: false, maxDepth: 10 },
-    disableTelemetry: true,
+    disableTelemetry: true
   },
   staticDirs: ['../public'],
   stories: ['../src/renderer/**/*.stories.@(ts|tsx)'],
@@ -25,9 +26,9 @@ const config = {
     {
       name: '@storybook/addon-essentials',
       options: {
-        viewport: false,
-      },
-    },
+        viewport: false
+      }
+    }
   ],
   framework: '@storybook/react-webpack5',
   // Extending Storybook’s Webpack config
@@ -56,8 +57,26 @@ const config = {
       })
     ]
 
+    webpackConfig.module.rules = [
+      ...webpackConfig.module.rules,
+      {
+        test: /\.css$/,
+        use: [
+          {
+            loader: 'postcss-loader',
+            options: {
+              postcssOptions: {
+                plugins: [require('tailwindcss'), require('autoprefixer')]
+              }
+            }
+          }
+        ],
+        include: path.resolve(__dirname, '../')
+      }
+    ]
+
     return webpackConfig
   }
 }
 
-module.exports = config;
+module.exports = config

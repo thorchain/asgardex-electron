@@ -20,6 +20,8 @@ const common: CommonMessages = {
   'common.back': 'Retour',
   'common.remove': 'Supprimer',
   'common.keystore': 'Keystore',
+  'common.keystorePassword': 'Keystore password - FR',
+  'common.ledger': 'Ledger',
   'common.phrase': 'Phrase de récupération',
   'common.submit': 'Valider',
   'common.confirm': 'Confirmer',
@@ -109,7 +111,7 @@ const common: CommonMessages = {
   'common.recipient': 'Destinataire',
   'common.sender': 'Sender - FR',
   'common.legacy': 'Legacy - FR',
-  'common.ledgerlive': 'Ledger Live - FR'
+  'common.ledgerlive': 'Ledger Live'
 }
 
 export default common

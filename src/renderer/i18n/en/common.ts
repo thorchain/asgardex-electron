@@ -20,6 +20,8 @@ const common: CommonMessages = {
   'common.back': 'Back',
   'common.remove': 'Remove',
   'common.keystore': 'Keystore',
+  'common.keystorePassword': 'Keystore password',
+  'common.ledger': 'Ledger',
   'common.phrase': 'Phrase',
   'common.submit': 'Submit',
   'common.confirm': 'Confirm',
