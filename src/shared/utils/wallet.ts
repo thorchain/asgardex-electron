@@ -28,3 +28,5 @@ export const toDerivationPathArray = (
     // Validation: length must be 5
     O.chain(O.fromPredicate((v) => v.length === 5))
   )
+
+export const defaultWalletName = (id: number) => `wallet-${id}`

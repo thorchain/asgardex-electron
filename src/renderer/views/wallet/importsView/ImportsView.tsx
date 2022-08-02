@@ -29,6 +29,8 @@ export const ImportsView: React.FC = (): JSX.Element => {
   // redirect to wallet assets view  whenever keystore have been imported and ALL clients are initialized
   useKeystoreRedirectAfterImport()
 
+  const walletId = useMemo(() => new Date().getTime(), [])
+
   const [activeTab, setActiveTab] = useState(TabKey.KEYSTORE)
 
   const items = useMemo(
@@ -41,7 +43,12 @@ export const ImportsView: React.FC = (): JSX.Element => {
           </span>
         ),
         content: (
-          <ImportKeystore loadKeystore$={loadKeystore$} importKeystore$={importKeystore$} clientStates={clientStates} />
+          <ImportKeystore
+            walletId={walletId}
+            loadKeystore$={loadKeystore$}
+            importKeystore$={importKeystore$}
+            clientStates={clientStates}
+          />
         )
       },
       {
@@ -51,10 +58,10 @@ export const ImportsView: React.FC = (): JSX.Element => {
             {intl.formatMessage({ id: 'common.phrase' })}
           </span>
         ),
-        content: <ImportPhrase clientStates={clientStates} addKeystore={addKeystoreAccount} />
+        content: <ImportPhrase walletId={walletId} clientStates={clientStates} addKeystore={addKeystoreAccount} />
       }
     ],
-    [addKeystoreAccount, clientStates, navigate, importKeystore$, intl, loadKeystore$]
+    [addKeystoreAccount, clientStates, navigate, importKeystore$, intl, loadKeystore$, walletId]
   )
   const matchKeystorePath = useMatch({ path: walletRoutes.imports.keystore.path(), end: false })
   const matchPhrasePath = useMatch({ path: walletRoutes.imports.phrase.path(), end: false })

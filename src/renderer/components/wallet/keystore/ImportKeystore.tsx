@@ -8,6 +8,10 @@ import { Store } from 'antd/lib/form/interface'
 import * as FP from 'fp-ts/lib/function'
 import { useIntl } from 'react-intl'
 
+/* css import is needed to override antd */
+import '../../uielements/input/overrides.css'
+
+import { defaultWalletName } from '../../../../shared/utils/wallet'
 import { KeystoreClientStates } from '../../../hooks/useKeystoreClientStates'
 import { useSubscriptionState } from '../../../hooks/useSubscriptionState'
 import { ImportKeystoreLD, ImportKeystoreParams, LoadKeystoreLD } from '../../../services/wallet/types'
@@ -18,13 +22,14 @@ import { InputPassword, Input } from '../../uielements/input'
 import { Label } from '../../uielements/label'
 
 export type Props = {
+  walletId: number
   clientStates: KeystoreClientStates
   importKeystore$: (params: ImportKeystoreParams) => ImportKeystoreLD
   loadKeystore$: () => LoadKeystoreLD
 }
 
 export const ImportKeystore: React.FC<Props> = (props): JSX.Element => {
-  const { importKeystore$, loadKeystore$, clientStates } = props
+  const { importKeystore$, loadKeystore$, clientStates, walletId } = props
 
   const [form] = Form.useForm()
 
@@ -38,15 +43,13 @@ export const ImportKeystore: React.FC<Props> = (props): JSX.Element => {
     RD.RemoteData<Error, void>
   >(RD.initial)
 
-  const walletId = useMemo(() => new Date().getTime(), [])
-
   const submitForm = useCallback(
     ({ password, name }: Store) => {
       FP.pipe(
         loadKeystoreState,
         RD.map((keystore) => {
           subscribeImportKeystoreState(
-            importKeystore$({ keystore, password, id: walletId, name: name || `wallet-${walletId}` })
+            importKeystore$({ keystore, password, id: walletId, name: name || defaultWalletName(walletId) })
           )
           return true
         })
@@ -60,7 +63,7 @@ export const ImportKeystore: React.FC<Props> = (props): JSX.Element => {
   }
 
   const renderError = (msg: string) => (
-    <Label className="mb-[20px]" color="error" textTransform="uppercase" align="center">
+    <Label className="mb-20px" color="error" textTransform="uppercase" align="center">
       {msg}
     </Label>
   )
@@ -109,19 +112,19 @@ export const ImportKeystore: React.FC<Props> = (props): JSX.Element => {
 
   return (
     <>
-      <InnerForm className="w-full p-[30px] pt-[15px]" labelCol={{ span: 24 }} form={form} onFinish={submitForm}>
+      <InnerForm className="w-full p-30px pt-15px" labelCol={{ span: 24 }} form={form} onFinish={submitForm}>
         {renderClientError}
         <Spin
           spinning={RD.isPending(importKeystoreState) || RD.isPending(loadKeystoreState)}
           tip={intl.formatMessage({ id: 'common.loading' })}>
           <div className="flex flex-col items-center">
             {/* title */}
-            <Label className="mb-[10px] w-full" size="big" align="center" textTransform="uppercase">
+            <Label className="mb-20px w-full" size="big" align="center" textTransform="uppercase">
               {intl.formatMessage({ id: 'wallet.imports.keystore.title' })}
             </Label>
             {/* import button */}
             <Button
-              className="mw-[100%] mb-[30px] h-[35px] cursor-pointer py-[5xp] px-[10px] text-[14px]"
+              className="mb-30px h-30px min-w-full cursor-pointer py-5px px-10px text-base"
               typevalue="outline"
               sizevalue="normal"
               onClick={uploadKeystore}>
@@ -131,37 +134,30 @@ export const ImportKeystore: React.FC<Props> = (props): JSX.Element => {
             {renderLoadError}
             {renderImportError}
             {/* password */}
-            <div className="flex w-full flex-col items-center">
-              <Form.Item
-                className="!dark:text-text0d w-full !max-w-[380px]  uppercase !text-text0"
-                name="password"
-                label={intl.formatMessage({ id: 'common.keystorePassword' })}>
-                <InputPassword className="!text-[16px]" size="large" />
-              </Form.Item>
-            </div>
+            <Form.Item
+              className="w-full !max-w-[380px]"
+              name="password"
+              label={intl.formatMessage({ id: 'common.keystorePassword' })}
+              validateTrigger={['onSubmit', 'onBlur']}
+              rules={[{ required: true, message: intl.formatMessage({ id: 'wallet.password.empty' }) }]}>
+              <InputPassword className="!text-lg" size="large" />
+            </Form.Item>
             {/* name */}
-            <div className="flex w-full flex-col items-center">
-              <Form.Item
-                className="!dark:text-text0d w-full !max-w-[380px] uppercase !text-text0"
-                name="name"
-                label={'wallet name'}>
-                <Input className="!text-[16px]" size="large" maxLength={20} placeholder={`wallet-${walletId}`} />
-              </Form.Item>
-            </div>
+            <Form.Item className="w-full !max-w-[380px]" name="name" label={intl.formatMessage({ id: 'wallet.name' })}>
+              <Input className="!text-lg" size="large" maxLength={20} placeholder={defaultWalletName(walletId)} />
+            </Form.Item>
+            {/* submit button */}
+            <Button
+              className="mt-50px min-w-[150px]"
+              sizevalue="xnormal"
+              type="primary"
+              htmlType="submit"
+              round="true"
+              disabled={!RD.isSuccess(loadKeystoreState) || RD.isPending(importKeystoreState)}>
+              {intl.formatMessage({ id: 'wallet.action.import' })}
+            </Button>
           </div>
         </Spin>
-        {/* submit button */}
-        <div className="flex flex-col items-center">
-          <Button
-            className="mt-[50px] min-w-[150px]"
-            sizevalue="xnormal"
-            type="primary"
-            htmlType="submit"
-            round="true"
-            disabled={!RD.isSuccess(loadKeystoreState) || RD.isPending(importKeystoreState)}>
-            {intl.formatMessage({ id: 'wallet.action.import' })}
-          </Button>
-        </div>
       </InnerForm>
     </>
   )

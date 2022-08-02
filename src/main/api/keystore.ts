@@ -9,6 +9,7 @@ import * as fs from 'fs-extra'
 import { KeystoreAccounts, ipcKeystoreAccountsIO, keystoreIO } from '../../shared/api/io'
 import { ApiKeystore, IPCExportKeystoreParams } from '../../shared/api/types'
 import { mapIOErrors } from '../../shared/utils/fp'
+import { defaultWalletName } from '../../shared/utils/wallet'
 import IPCMessages from '../ipc/messages'
 import { exists, readJSON, renameFile, writeJSON } from '../utils/file'
 import { STORAGE_DIR } from './const'
@@ -61,7 +62,7 @@ const migrateLegacyAccount = (): TE.TaskEither<Error, KeystoreAccounts> =>
     TE.map((keystore) => [
       {
         id: LEGACY_KEYSTORE_ID,
-        name: `wallet-${LEGACY_KEYSTORE_ID}`,
+        name: defaultWalletName(LEGACY_KEYSTORE_ID),
         selected: true,
         keystore
       }

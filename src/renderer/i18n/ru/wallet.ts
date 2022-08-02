@@ -1,7 +1,7 @@
 import { WalletMessages } from '../types'
 
 const wallet: WalletMessages = {
-  'wallet.main.title': 'Основной',
+  'wallet.name': 'Wallet name - RU',
   'wallet.nav.deposits': 'Вклады',
   'wallet.nav.bonds': 'Бонды',
   'wallet.nav.poolshares': 'Доли',
@@ -78,6 +78,7 @@ const wallet: WalletMessages = {
   'wallet.password.confirmation.title': 'Подтверждение пароля',
   'wallet.password.confirmation.description': 'пожалуйста введите свой пароль.',
   'wallet.password.confirmation.pending': 'Проверяю пароль',
+  'wallet.password.empty': 'Please enter a password - RU',
   'wallet.password.confirmation.error': 'Неверный пароль',
   'wallet.password.repeat': 'Повторите пароль',
   'wallet.password.mismatch': 'Пароли не совпадают',
