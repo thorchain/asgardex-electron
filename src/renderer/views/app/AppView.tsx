@@ -270,7 +270,7 @@ export const AppView: React.FC = (): JSX.Element => {
   }, [apiEndpoint, renderMidgardAlert])
 
   // TODO (@veado) Render alert incl. reload button
-  const renderKeystoreError = useMemo(() => {
+  const _renderKeystoreError = useMemo(() => {
     return (
       <div>
         <div>
@@ -298,7 +298,7 @@ export const AppView: React.FC = (): JSX.Element => {
         <Header />
 
         <View>
-          {renderKeystoreError}
+          {/* {renderKeystoreError} */}
           {renderMidgardError}
           {renderHaltedChainsWarning}
           {renderUpgradeWarning}
