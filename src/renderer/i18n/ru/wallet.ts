@@ -1,7 +1,7 @@
 import { WalletMessages } from '../types'
 
 const wallet: WalletMessages = {
-  'wallet.name': 'Wallet name',
+  'wallet.name': 'Wallet name - RU',
   'wallet.nav.deposits': 'Вклады',
   'wallet.nav.bonds': 'Бонды',
   'wallet.nav.poolshares': 'Доли',
