@@ -2,6 +2,7 @@ import React from 'react'
 
 import { Route, useNavigate, Navigate, useLocation, Routes } from 'react-router-dom'
 
+import { defaultWalletName } from '../../../../shared/utils/wallet'
 import { NewPhraseConfirm, NewPhraseGenerate } from '../../../components/wallet/phrase'
 import { PhraseInfo } from '../../../components/wallet/phrase/Phrase.types'
 import { useWalletContext } from '../../../contexts/WalletContext'
@@ -20,7 +21,7 @@ const NewPhraseConfirmView: React.FC = (): JSX.Element => {
 
   const id = generateKeystoreId()
   // TODO (@veado) Get name from route
-  const name = `wallet-${id}`
+  const name = defaultWalletName(id)
 
   return (
     <NewPhraseConfirm

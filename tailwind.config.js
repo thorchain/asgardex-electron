@@ -7,10 +7,33 @@ module.exports = {
   content: ['./src/**/*.{ts,tsx}'],
   theme: {
     extend: {
+      fontFamily: {
+        main: ['MainFontRegular'],
+        mainBold: ['MainFontBold'],
+        mainSemiBold: ['MainFontSemiBold']
+      },
+      spacing: {
+        '5px': '5px',
+        '10px': '10px',
+        '15px': '15px',
+        '20px': '20px',
+        '30px': '30px',
+        '40px': '40px',
+        '50px': '50px'
+      },
+      // https://tailwindcss.com/docs/font-size#providing-a-default-line-height
+      fontSize: {
+        11: ['11px', '16px'],
+        14: ['14px', '20px'],
+        16: ['16px', '24px'],
+        20: ['20px', '28px']
+      },
       // Custom colors based on `asgardex-theme`
       // Light theme https://gitlab.com/thorchain/asgardex-common/asgardex-theme/-/blob/master/src/light.ts
       // Dark theme https://gitlab.com/thorchain/asgardex-common/asgardex-theme/-/blob/master/src/dark.ts
       colors: {
+        turquoise: '#50E3C2',
+        red: '#FF4954',
         // text
         text0: t.light.palette.text[0],
         text0d: t.dark.palette.text[0],

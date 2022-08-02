@@ -77,6 +77,6 @@ export const Button = styled(BaseButton)`
   ${media.sm`
     margin-bottom: 0;
     width: auto;
-    max-width: 180px;
+    max-width: 200px;
   `}
 `

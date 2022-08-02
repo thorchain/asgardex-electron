@@ -1,7 +1,7 @@
 import { WalletMessages } from '../types'
 
 const wallet: WalletMessages = {
-  'wallet.main.title': 'Main',
+  'wallet.name': 'Wallet Name',
   'wallet.nav.deposits': 'Einzahlungen',
   'wallet.nav.bonds': 'Bonds',
   'wallet.nav.poolshares': 'Anteile',
@@ -81,6 +81,7 @@ const wallet: WalletMessages = {
   'wallet.password.confirmation.title': 'Wallet Passwort bestätigen',
   'wallet.password.confirmation.description': 'Bitte gebe zur Bestätigung Dein Wallet Password ein.',
   'wallet.password.confirmation.pending': 'Überprüfe Passwort',
+  'wallet.password.empty': 'Bitte ein Passwort angeben',
   'wallet.password.confirmation.error': 'Passwort ist falsch',
   'wallet.password.repeat': 'Passwort wiederholen',
   'wallet.password.mismatch': 'Passwort stimmt nicht überein',
@@ -93,7 +94,7 @@ const wallet: WalletMessages = {
   'wallet.upgrade.feeError': 'Die Upgrade Gebühr {fee} ist nicht über Dein Guthaben {balance} gedeckt',
   'wallet.validations.lessThen': 'Der eingegebene Betrag sollte weniger als {value} betragen',
   'wallet.validations.graterThen': 'Der eingegebene Betrag sollte höher als {amount} betragen',
-  'wallet.validations.shouldNotBeEmpty': 'Der eingegebene Werte sollte nicht leer sein.',
+  'wallet.validations.shouldNotBeEmpty': 'Diese Angabe darf nicht leer sein.',
   'wallet.ledger.verifyAddress.modal.title': 'Verify Ledger Address',
   'wallet.ledger.verifyAddress.modal.description': 'Überprüfe die Addresse {address} auf Deinem Ledger'
 }

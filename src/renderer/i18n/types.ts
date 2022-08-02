@@ -149,7 +149,7 @@ type PoolsMessageKey =
 export type PoolsMessages = { [key in PoolsMessageKey]: string }
 
 type WalletMessageKey =
-  | 'wallet.main.title'
+  | 'wallet.name'
   | 'wallet.nav.deposits'
   | 'wallet.nav.bonds'
   | 'wallet.nav.poolshares'
@@ -209,6 +209,7 @@ type WalletMessageKey =
   | 'wallet.password.confirmation.title'
   | 'wallet.password.confirmation.description'
   | 'wallet.password.confirmation.pending'
+  | 'wallet.password.empty'
   | 'wallet.password.confirmation.error'
   | 'wallet.password.repeat'
   | 'wallet.password.mismatch'

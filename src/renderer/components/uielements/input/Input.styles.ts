@@ -69,7 +69,11 @@ const inputStyle = css<InputProps>`
   }
 
   &:hover,
-  &:focus {
+  &:focus,
+  &.ant-input:hover,
+  &.ant-input:focus,
+  &.ant-input-password:hover,
+  &.ant-input-password:focus {
     border-color: ${({ color = 'primary' }) => colors[color]};
     box-shadow: ${({ typevalue = 'normal', color = 'primary' }) =>
       typevalue === 'ghost' ? 'none' : '0 0 0 2px ' + colors[color]};
@@ -102,7 +106,8 @@ export const InputPassword = styled(A.Input.Password).attrs({
   type: 'password'
 })<InputProps>`
   ${inputStyle}
-  & .ant-input-password-icon {
+  & .ant-input-password-icon,
+  & .ant-input-password-icon:hover {
     color: ${colors.primary};
   }
 `

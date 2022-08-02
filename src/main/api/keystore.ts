@@ -61,7 +61,7 @@ const migrateLegacyAccount = (): TE.TaskEither<Error, KeystoreAccounts> =>
     TE.map((keystore) => [
       {
         id: LEGACY_KEYSTORE_ID,
-        name: `wallet-${LEGACY_KEYSTORE_ID}`,
+        name: defaultWalletName(LEGACY_KEYSTORE_ID),
         selected: true,
         keystore
       }
