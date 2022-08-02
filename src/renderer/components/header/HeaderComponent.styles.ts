@@ -113,8 +113,6 @@ type TabLinkProps = {
 
 export const TabLink = styled(Link)`
   display: block;
-  border-bottom-width: 3px;
-  border-color: ${palette('primary', 0)};
   color: ${(props: TabLinkProps) => (props.selected ? palette('text', 1) : palette('text', 2))};
   transition: none;
 

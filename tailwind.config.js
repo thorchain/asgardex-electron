@@ -43,6 +43,15 @@ module.exports = {
         text2d: t.dark.palette.text[2],
         text3: t.light.palette.text[3],
         text3d: t.dark.palette.text[3],
+        // bg
+        bg0: t.light.palette.background[0],
+        bg0d: t.dark.palette.background[0],
+        bg1: t.light.palette.background[1],
+        bg1d: t.dark.palette.background[1],
+        bg2: t.light.palette.background[2],
+        bg2d: t.dark.palette.background[2],
+        bg3: t.light.palette.background[3],
+        bg3d: t.dark.palette.background[3],
         // error
         error0: t.light.palette.error[0],
         error0d: t.dark.palette.error[0],
@@ -51,7 +60,10 @@ module.exports = {
         error2: t.light.palette.error[2],
         error2d: t.dark.palette.error[2],
         error3: t.light.palette.error[3],
-        error3d: t.dark.palette.error[3]
+        error3d: t.dark.palette.error[3],
+        // warning
+        warning0: t.light.palette.warning[0],
+        warningr0d: t.dark.palette.warning[0]
       }
     },
     // Breakpoint definitions based on `MediaQueries`
