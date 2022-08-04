@@ -16,3 +16,5 @@ export type FontSettings = Record<NonNullable<SizeType>, FontSetting>
 export type Colors = {
   [key in Color]: string
 }
+
+export type Size = 'small' | 'normal' | 'large'
