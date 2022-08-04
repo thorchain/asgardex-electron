@@ -1,3 +1,5 @@
+import { WordType } from './NewPhraseConfirm.types'
+
 export const checkPhraseConfirmWordsFactory =
   (setWordsList: (words: WordType[]) => void, setMnemonicError: (error: string) => void) =>
   (words: WordType[], selectedWords: WordType[]) => {
