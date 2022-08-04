@@ -33,7 +33,7 @@ export const NoWalletView = () => {
          "
         onClick={createClick}>
         <FileOutlined
-          className="nowalletview-crateicon mb-[30px] transition duration-500 ease-in-out
+          className="nowalletview-createicon mb-[30px] transition duration-500 ease-in-out
   group-hover:scale-110 group-hover:drop-shadow-lg md:mb-[70px]"
         />
         <p
@@ -83,7 +83,7 @@ export const NoWalletView = () => {
          md:h-full md:w-1/2"
         onClick={importClick}>
         <FileProtectOutlined
-          className="nowalletview-icon mb-[30px] transition duration-500 ease-in-out
+          className="nowalletview-addicon mb-[30px] transition duration-500 ease-in-out
   group-hover:scale-110 group-hover:drop-shadow-lg md:mb-[70px]"
         />
         <p
