@@ -1,4 +1,5 @@
-import { checkPhraseConfirmWordsFactory, WordType } from './NewPhraseConfirm'
+import { checkPhraseConfirmWordsFactory } from './NewPhraseConfirm.helper'
+import type { WordType } from './NewPhraseConfirm.types'
 
 describe('wallet/NewMnemonicConfirm', () => {
   let wordsMock: WordType[]
