@@ -34,11 +34,7 @@ const meta: ComponentMeta<typeof Component> = {
   },
   decorators: [
     (S) => (
-      <div
-        style={{
-          display: 'flex',
-          flexDirection: 'column'
-        }}>
+      <div className="flex-column flex">
         <S />
       </div>
     )

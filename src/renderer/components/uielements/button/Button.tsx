@@ -1,8 +1,9 @@
 import React from 'react'
 
 import { ButtonWrapper } from './Button.styles'
-import { ButtonProps } from './Button.types'
+import type { ButtonProps } from './Button.types'
 
+// TODO (@veado) Extract/Rename to LegacyButton.tsx to remove it in the near future
 export const Button: React.ForwardRefExoticComponent<ButtonProps> = React.forwardRef<HTMLButtonElement, ButtonProps>(
   (props, ref) => {
     const {
