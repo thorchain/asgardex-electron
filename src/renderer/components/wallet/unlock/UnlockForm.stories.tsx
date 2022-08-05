@@ -11,13 +11,26 @@ const meta: ComponentMeta<typeof Component> = {
   component: Component,
   title: 'Wallet/UnlockForm',
   argTypes: {
-    keystore: AT.keystore,
-    unlock: { action: 'unlock' },
-    removeKeystore: { action: 'removeKeystore' }
+    keystore: AT.keystore
   },
   args: {
-    keystore: O.none
-  }
+    keystore: O.none,
+    unlock: (pw: string) => {
+      console.log('unlock:', pw)
+      return Promise.resolve()
+    },
+    removeKeystore: () => {
+      console.log('removeKeystore')
+      return Promise.resolve()
+    }
+  },
+  decorators: [
+    (Story) => (
+      <div className="h-full w-full bg-bg2 p-20">
+        <Story />
+      </div>
+    )
+  ]
 }
 
 export default meta

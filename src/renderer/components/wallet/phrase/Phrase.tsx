@@ -2,7 +2,7 @@ import React from 'react'
 
 import { Row, Col } from 'antd'
 
-import { WordType } from './NewPhraseConfirm'
+import type { WordType } from './NewPhraseConfirm.types'
 import * as Styled from './Phrase.styles'
 
 type Props = {

@@ -1,9 +1,9 @@
-.nowalletview-icon > svg {
+.nowalletview-addicon > svg {
   @apply h-[60px] w-[60px] fill-turquoise transition duration-500 ease-in-out group-hover:fill-white
     md:h-[110px] md:w-[110px];
 }
 
-.nowalletview-crateicon > svg {
+.nowalletview-createicon > svg {
   @apply h-[60px] w-[60px] fill-turquoise transition duration-500 ease-in-out group-hover:fill-white dark:fill-white
     md:h-[110px] md:w-[110px];
 }

@@ -15,7 +15,7 @@ import { InputPassword } from '../../uielements/input'
 import { CopyLabel } from '../../uielements/label'
 import { Phrase } from './index'
 import * as Styled from './NewPhrase.styles'
-import { WordType } from './NewPhraseConfirm'
+import type { WordType } from './NewPhraseConfirm.types'
 import * as StyledPhrase from './Phrase.styles'
 import { PhraseInfo } from './Phrase.types'
 

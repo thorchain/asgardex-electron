@@ -17,6 +17,8 @@ import tgtIcon from '../../assets/png/asset-tgt.png'
 import { ReactComponent as CurrencyIcon } from '../../assets/svg/currency-icon.svg'
 import { ReactComponent as AttentionIcon } from '../../assets/svg/icon-attention.svg'
 import { ReactComponent as DownIcon } from '../../assets/svg/icon-down.svg'
+import { ReactComponent as EyeHideIcon } from '../../assets/svg/icon-eye-hide.svg'
+import { ReactComponent as EyeIcon } from '../../assets/svg/icon-eye.svg'
 import { ReactComponent as LedgerIcon } from '../../assets/svg/ledger.svg'
 
 export {
@@ -34,5 +36,7 @@ export {
   CurrencyIcon,
   DownIcon,
   LedgerIcon,
-  AttentionIcon
+  AttentionIcon,
+  EyeIcon,
+  EyeHideIcon
 }
