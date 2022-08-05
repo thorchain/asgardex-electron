@@ -13,6 +13,7 @@ import { Button } from '../../uielements/button'
 import { Phrase } from './index'
 import * as NewPhraseStyled from './NewPhrase.styles'
 import { checkPhraseConfirmWordsFactory } from './NewPhraseConfirm.helper'
+import { WordType } from './NewPhraseConfirm.types'
 import * as PhraseStyled from './Phrase.styles'
 
 export const NewPhraseConfirm: React.FC<{ mnemonic: string; onConfirm: () => Promise<void> }> = ({
