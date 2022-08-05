@@ -15,7 +15,7 @@ import { KeystoreState } from '../../../services/wallet/types'
 import { isLocked, hasImportedKeystore } from '../../../services/wallet/util'
 import { RemoveWalletConfirmationModal } from '../../modal/confirmation/RemoveWalletConfirmationModal'
 import { BackLink } from '../../uielements/backLink'
-import { Button } from '../../uielements/button'
+import { BorderButton, FlatButton } from '../../uielements/button'
 import { InputPasswordTW } from '../../uielements/input'
 
 type FormData = {
@@ -154,29 +154,24 @@ export const UnlockForm: React.FC<Props> = (props): JSX.Element => {
           </div>
           {renderUnlockError}
           <div className="flex w-full flex-col justify-between sm:flex-row">
-            <Button
-              className="mb-20px w-full sm:mb-0 sm:w-auto sm:max-w-[200px]"
-              sizevalue="xnormal"
+            <BorderButton
+              className="mb-20px w-full min-w-[200px] sm:mb-0 sm:w-auto sm:max-w-[200px]"
+              size="normal"
               color="error"
-              typevalue="outline"
-              round="true"
               onClick={showRemoveConfirm}
               disabled={unlocking}>
               {intl.formatMessage({ id: 'wallet.remove.label' })}
-            </Button>
-            <Button
-              className="mb-0 w-full sm:mb-0 sm:w-auto sm:max-w-[200px]"
-              sizevalue="xnormal"
-              round="true"
-              size="large"
-              type="primary"
-              block
-              htmlType="submit"
+            </BorderButton>
+            <FlatButton
+              className="mb-0 w-full min-w-[200px] sm:mb-0 sm:w-auto sm:max-w-[200px]"
+              size="normal"
+              color="primary"
+              type="submit"
               disabled={unlocking}
               loading={unlocking}
               onClick={handleSubmit(submitForm)}>
               {intl.formatMessage({ id: 'wallet.action.unlock' })}
-            </Button>
+            </FlatButton>
           </div>
         </div>
       </form>

@@ -13,6 +13,7 @@ import { LOCALES } from '../../i18n'
 import { AVAILABLE_NETWORKS } from '../../services/const'
 import { DownIcon } from '../icons'
 import { Menu } from '../shared/menu'
+import { BorderButton } from '../uielements/button'
 import * as Styled from './AppSettings.styles'
 import * as CStyled from './Common.styles'
 
@@ -202,7 +203,7 @@ export const AppSettings: React.FC<Props> = (props): JSX.Element => {
                 <Styled.Section>
                   <Styled.SubTitle>{intl.formatMessage({ id: 'setting.version' })}</Styled.SubTitle>
                   <Styled.Label>v{version}</Styled.Label>
-                  <Styled.UpdatesButton {...checkUpdatesProps} />
+                  <BorderButton className="my-10px" {...checkUpdatesProps} />
                   {renderVersionUpdateResult}
                 </Styled.Section>
               </Styled.SectionsWrapper>
