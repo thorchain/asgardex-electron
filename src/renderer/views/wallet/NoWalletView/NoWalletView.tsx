@@ -49,7 +49,7 @@ export const NoWalletView = () => {
             text-turquoise
             filter-none
             transition
-             duration-500
+            duration-500
             ease-in-out
             group-hover:scale-110
             group-hover:border-white
