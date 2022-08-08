@@ -21,7 +21,14 @@ import {
   AddKeystoreParams,
   KeystoreAccountsLD
 } from './types'
-import { getKeystore, getKeystoreAccountName, getKeystoreId, getSelectedKeystoreId, hasImportedKeystore } from './util'
+import {
+  getKeystore,
+  getKeystoreWalletName,
+  getKeystoreId,
+  hasImportedKeystore,
+  getLockedData,
+  getInitialKeystoreData
+} from './util'
 
 /**
  * State of selected keystore account
@@ -66,7 +73,7 @@ const addKeystoreAccount = async ({ phrase, name, id, password }: AddKeystorePar
     await window.apiKeystore.saveKeystoreAccounts(encodedAccounts)
     // Update states
     setKeystoreAccounts(newAccounts)
-    setKeystoreState(O.some({ id, phrase }))
+    setKeystoreState(O.some({ id, phrase, name }))
 
     return Promise.resolve()
   } catch (error) {
@@ -121,7 +128,7 @@ const exportKeystore = async () => {
     if (!keystore) {
       throw Error(`Can't export keystore - keystore is missing in accounts`)
     }
-    const fileName = `asgardex-${FP.pipe(accounts, getKeystoreAccountName(id), O.toNullable) || 'keystore'}.json`
+    const fileName = `asgardex-${FP.pipe(accounts, getKeystoreWalletName(id), O.toNullable) || 'keystore'}.json`
     return await window.apiKeystore.exportKeystore({ fileName, keystore })
   } catch (error) {
     return Promise.reject(error)
@@ -150,33 +157,33 @@ const lock = async () => {
     throw Error(`Can't lock - keystore seems not to be imported`)
   }
 
-  const id = FP.pipe(state, getKeystoreId, O.toNullable)
-  if (!id) {
-    throw Error(`Can't lock - keystore id is missing`)
+  const lockedState = FP.pipe(getLockedData(state), O.toNullable)
+  if (!lockedState) {
+    throw Error(`Can't lock - keystore 'id' and / or 'name' are missing`)
   }
 
-  setKeystoreState(O.some({ id }))
+  setKeystoreState(O.some(lockedState))
 }
 
 const unlock = async (password: string) => {
   const state = getKeystoreState()
+  const lockedData = FP.pipe(state, getLockedData, O.toNullable)
   // make sure keystore is already imported
-  if (!hasImportedKeystore(state)) {
+  if (!lockedData) {
     throw Error(`Can't unlock - keystore seems not to be imported`)
   }
-  // Get keystore id
-  const id = FP.pipe(state, getKeystoreId, O.toNullable)
-  if (!id) {
-    throw Error(`Can't unlock - keystore id is missing`)
-  }
-  // decrypt phrase from keystore
+
+  const { id, name } = lockedData
+
+  // get keystore from account list (not stored in `KeystoreState`)
   const keystore = FP.pipe(getKeystoreAccounts(), getKeystore(id), O.toNullable)
   if (!keystore) {
     throw Error(`Can't unlock - keystore is missing in accounts`)
   }
   try {
+    // decrypt phrase from keystore
     const phrase = await decryptFromKeystore(keystore, password)
-    setKeystoreState(O.some({ phrase, id }))
+    setKeystoreState(O.some({ id, phrase, name }))
   } catch (error) {
     throw Error(`Can't unlock - could not decrypt phrase from keystore: ${error}`)
   }
@@ -198,12 +205,8 @@ const keystoreAccounts$: KeystoreAccountsLD = FP.pipe(
     )
   ),
   liveData.map((accounts) => {
-    const state = accounts.length
-      ? O.some({
-          // try to get selected state from accounts
-          id: FP.pipe(accounts, getSelectedKeystoreId, O.toNullable) || accounts[0].id
-        }) /*imported, but locked*/
-      : O.none /*not imported*/
+    const state = getInitialKeystoreData(accounts)
+
     setKeystoreState(state)
     setKeystoreAccounts(accounts)
 

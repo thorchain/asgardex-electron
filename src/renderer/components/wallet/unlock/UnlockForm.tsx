@@ -7,12 +7,13 @@ import { useIntl } from 'react-intl'
 import { useLocation, useNavigate, useParams } from 'react-router-dom'
 
 import { envOrDefault } from '../../../../shared/utils/env'
+import { emptyString } from '../../../helpers/stringHelper'
 import { getUrlSearchParam } from '../../../helpers/url.helper'
 import * as appRoutes from '../../../routes/app'
 import { ReferrerState } from '../../../routes/types'
 import * as walletRoutes from '../../../routes/wallet'
 import { KeystoreState } from '../../../services/wallet/types'
-import { isLocked, hasImportedKeystore } from '../../../services/wallet/util'
+import { isLocked, hasImportedKeystore, getWalletName } from '../../../services/wallet/util'
 import { RemoveWalletConfirmationModal } from '../../modal/confirmation/RemoveWalletConfirmationModal'
 import { BackLink } from '../../uielements/backLink'
 import { BorderButton, FlatButton } from '../../uielements/button'
@@ -40,9 +41,7 @@ export const UnlockForm: React.FC<Props> = (props): JSX.Element => {
     register,
     formState: { errors },
     handleSubmit
-  } = useForm<FormData>({
-    mode: 'onChange'
-  })
+  } = useForm<FormData>()
 
   const [validPassword, setValidPassword] = useState(false)
   const [unlocking, setUnlocking] = useState(false)
@@ -96,6 +95,7 @@ export const UnlockForm: React.FC<Props> = (props): JSX.Element => {
   )
 
   const showRemoveConfirm = useCallback(() => {
+    console.log('show modal')
     setShowRemoveModal(true)
   }, [])
 
@@ -119,16 +119,31 @@ export const UnlockForm: React.FC<Props> = (props): JSX.Element => {
     navigate(appRoutes.base.template)
   }, [navigate, removeKeystore])
 
+  const walletName = useMemo(
+    () =>
+      FP.pipe(
+        keystore,
+        getWalletName,
+        O.getOrElse(() => emptyString)
+      ),
+    [keystore]
+  )
+
   return (
     <>
       <div className="relative flex justify-center">
-        <BackLink style={{ position: 'absolute', top: 0, left: 0 }} />
+        <BackLink className="absolute, top-0, left-0" />
         <h1
           className="mb-30px
           inline-block
           w-full
           text-center font-mainSemiBold uppercase text-text1 dark:text-text1d">
-          {intl.formatMessage({ id: 'wallet.unlock.title' })}
+          {intl.formatMessage(
+            { id: 'wallet.unlock.title' },
+            {
+              name: walletName
+            }
+          )}
         </h1>
       </div>
       <form className="flex flex-1 flex-col" onSubmit={handleSubmit(submitForm)}>
@@ -155,6 +170,7 @@ export const UnlockForm: React.FC<Props> = (props): JSX.Element => {
           {renderUnlockError}
           <div className="flex w-full flex-col justify-between sm:flex-row">
             <BorderButton
+              type="button"
               className="mb-20px w-full min-w-[200px] sm:mb-0 sm:w-auto sm:max-w-[200px]"
               size="normal"
               color="error"
@@ -163,19 +179,23 @@ export const UnlockForm: React.FC<Props> = (props): JSX.Element => {
               {intl.formatMessage({ id: 'wallet.remove.label' })}
             </BorderButton>
             <FlatButton
+              type="submit"
               className="mb-0 w-full min-w-[200px] sm:mb-0 sm:w-auto sm:max-w-[200px]"
               size="normal"
               color="primary"
-              type="submit"
               disabled={unlocking}
-              loading={unlocking}
-              onClick={handleSubmit(submitForm)}>
+              loading={unlocking}>
               {intl.formatMessage({ id: 'wallet.action.unlock' })}
             </FlatButton>
           </div>
         </div>
       </form>
-      <RemoveWalletConfirmationModal visible={showRemoveModal} onClose={hideRemoveConfirm} onSuccess={onOkHandlder} />
+      <RemoveWalletConfirmationModal
+        visible={showRemoveModal}
+        onClose={hideRemoveConfirm}
+        onSuccess={onOkHandlder}
+        walletName={walletName}
+      />
     </>
   )
 }

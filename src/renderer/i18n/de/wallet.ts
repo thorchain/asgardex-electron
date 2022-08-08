@@ -22,7 +22,7 @@ const wallet: WalletMessages = {
   'wallet.shares.total': 'Gesamtwert',
   'wallet.connect.instruction': 'Bitte verbinde Deine Wallet',
   'wallet.lock.label': 'Wallet sperren',
-  'wallet.unlock.title': 'Entsperre Deine Wallet',
+  'wallet.unlock.title': 'Entsperre "{name}"',
   'wallet.unlock.label': 'Wallet entsperren',
   'wallet.unlock.instruction': 'Bitte entsperre Deine Wallet',
   'wallet.unlock.password': 'Bitte gebe Dein Passwort ein',
@@ -54,7 +54,7 @@ const wallet: WalletMessages = {
   'wallet.receive.address.error': 'Keine Addresse für den Empfang vorhanden',
   'wallet.receive.address.errorQR': 'Error beim Rendern des QR Codes: {error}',
   'wallet.remove.label': 'Wallet entfernen',
-  'wallet.remove.label.title': 'Bist Du sicher, dass Du Deine Wallet enfernen möchstest?',
+  'wallet.remove.label.title': 'Bist Du sicher, dass Du "{name}" enfernen möchstest?',
   'wallet.remove.label.description':
     'Zur Wiederherstellung Deiner Wallet benötigst Du Deine Phrase. Bitte stelle sicher, dass Du diese bereits an einem sicheren Ort abgelegt hast',
   'wallet.send.success': 'Transaktion war erfolgreich.',

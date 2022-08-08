@@ -9,7 +9,7 @@ export type BaseButtonProps = React.ButtonHTMLAttributes<HTMLButtonElement> & {
 }
 
 export const BaseButton: React.FC<BaseButtonProps> = (props): JSX.Element => {
-  const { size = 'normal', loading = false, className = '', disabled = false, children } = props
+  const { size = 'normal', loading = false, className = '', disabled = false, children, ...restProps } = props
 
   const sizeClasses: Record<Size, string> = {
     small: 'px-4 py-1 text-11',
@@ -32,9 +32,9 @@ export const BaseButton: React.FC<BaseButtonProps> = (props): JSX.Element => {
   return (
     <button
       className={`
-        group
-        inline-flex
-        appearance-none items-center
+      group
+      ${loading && 'flex items-center justify-center'}
+      appearance-none
         ${disabled && 'opacity-70'}
         ${disabled && 'cursor-not-allowed'}
         font-main
@@ -44,7 +44,8 @@ export const BaseButton: React.FC<BaseButtonProps> = (props): JSX.Element => {
         ease-in-out
         ${sizeClasses[size]}
         ${className}
-      `}>
+      `}
+      {...restProps}>
       {loading && (
         <LoadingIcon className={`${iconSize[size]} ${iconMargin[size]} animate-spin group-hover:opacity-70`} />
       )}

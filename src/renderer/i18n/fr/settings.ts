@@ -5,7 +5,7 @@ const settings: SettingMessages = {
   'setting.wallet.title': 'Wallet settings - FR',
   'setting.wallet.management': 'Gestion du portefeuille',
   'setting.client': 'Client',
-  'setting.account.management': 'Gestion du compte',
+  'setting.accounts': 'Accounts - FR',
   'setting.export': 'Exporter la clé privée',
   'setting.lock': 'Verrouiller',
   'setting.view.phrase': 'Afficher la phrase de récupération',

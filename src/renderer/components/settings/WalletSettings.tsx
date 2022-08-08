@@ -48,8 +48,8 @@ import {
 } from '../../helpers/chainHelper'
 import { emptyString } from '../../helpers/stringHelper'
 import { isEnabledWallet } from '../../helpers/walletHelper'
-import { ValidatePasswordHandler, WalletAccounts, WalletAddressAsync } from '../../services/wallet/types'
-import { walletTypeToI18n } from '../../services/wallet/util'
+import { KeystoreState, ValidatePasswordHandler, WalletAccounts, WalletAddressAsync } from '../../services/wallet/types'
+import { getPhrase, getWalletName, walletTypeToI18n } from '../../services/wallet/util'
 import { AttentionIcon } from '../icons'
 import * as StyledR from '../shared/form/Radio.styles'
 import { InfoIcon } from '../uielements/info'
@@ -66,7 +66,7 @@ type Props = {
   addLedgerAddress: (chain: Chain, walletIndex: number) => void
   verifyLedgerAddress: (chain: Chain, walletIndex: number) => Promise<boolean>
   removeLedgerAddress: (chain: Chain) => void
-  phrase: O.Option<string>
+  keystore: KeystoreState
   clickAddressLinkHandler: (chain: Chain, address: Address) => void
   validatePassword$: ValidatePasswordHandler
   collapsed: boolean
@@ -87,7 +87,7 @@ export const WalletSettings: React.FC<Props> = (props): JSX.Element => {
     addLedgerAddress,
     verifyLedgerAddress,
     removeLedgerAddress,
-    phrase: oPhrase,
+    keystore,
     clickAddressLinkHandler,
     validatePassword$,
     collapsed,
@@ -100,11 +100,21 @@ export const WalletSettings: React.FC<Props> = (props): JSX.Element => {
   const phrase = useMemo(
     () =>
       FP.pipe(
-        oPhrase,
-        O.map((phrase) => phrase),
+        keystore,
+        getPhrase,
         O.getOrElse(() => '')
       ),
-    [oPhrase]
+    [keystore]
+  )
+
+  const walletName = useMemo(
+    () =>
+      FP.pipe(
+        keystore,
+        getWalletName,
+        O.getOrElse(() => 'unknown wallet')
+      ),
+    [keystore]
   )
 
   const [showPhraseModal, setShowPhraseModal] = useState(false)
@@ -450,13 +460,14 @@ export const WalletSettings: React.FC<Props> = (props): JSX.Element => {
             visible={showRemoveWalletModal}
             onClose={() => setShowRemoveWalletModal(false)}
             onSuccess={removeWallet}
+            walletName={walletName}
           />
           {renderQRCodeModal}
 
           {renderVerifyAddressModal(addressToVerify)}
           <Styled.CardContainer>
             <Styled.Card>
-              <Styled.Subtitle>{intl.formatMessage({ id: 'setting.wallet.management' })}</Styled.Subtitle>
+              <Styled.Subtitle>{walletName}</Styled.Subtitle>
               <Row style={{ flex: 1, alignItems: 'center', padding: 20 }}>
                 <Styled.WalletCol sm={{ span: 24 }} md={{ span: 12 }}>
                   <Styled.OptionCard bordered={false}>
@@ -480,7 +491,7 @@ export const WalletSettings: React.FC<Props> = (props): JSX.Element => {
                       typevalue="outline"
                       round="true"
                       onClick={() => setShowPasswordModal(true)}
-                      disabled={O.isNone(oPhrase) ? true : false}>
+                      disabled={!phrase}>
                       {intl.formatMessage({ id: 'setting.view.phrase' })}
                     </Styled.Button>
                   </Styled.OptionCard>
@@ -502,7 +513,7 @@ export const WalletSettings: React.FC<Props> = (props): JSX.Element => {
           </Styled.CardContainer>
           <Col key={'accounts'} span={24}>
             <Styled.AccountCard>
-              <Styled.Subtitle>{intl.formatMessage({ id: 'setting.account.management' })}</Styled.Subtitle>
+              <Styled.Subtitle>{intl.formatMessage({ id: 'setting.accounts' })}</Styled.Subtitle>
               <Styled.InputConainer>
                 <Styled.Input
                   prefix={<SearchOutlined />}

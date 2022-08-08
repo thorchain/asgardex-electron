@@ -11,14 +11,19 @@ import {
   getPhrase,
   sortBalances,
   filterNullableBalances,
-  getBalanceByAsset
+  getBalanceByAsset,
+  getWalletName,
+  getLockedData,
+  getInitialKeystoreData
 } from './util'
 
 describe('services/wallet/util/', () => {
   const phrase = 'any-phrase'
+  const name = 'any-name'
+  const id = 1
   const notImportedKeystore: KeystoreState = O.none
-  const lockedKeystore: KeystoreState = O.some({ id: 1 })
-  const unlockedKeystore: KeystoreState = O.some({ id: 1, phrase })
+  const lockedKeystore: KeystoreState = O.some({ id, name })
+  const unlockedKeystore: KeystoreState = O.some({ id, phrase, name })
 
   describe('getPhrase', () => {
     it('returns phrase for unlocked keystore ', () => {
@@ -31,6 +36,36 @@ describe('services/wallet/util/', () => {
     })
     it('returns None if keystore is locked', () => {
       const result = getPhrase(lockedKeystore)
+      expect(result).toBeNone()
+    })
+  })
+
+  describe('getWalletName', () => {
+    it('from unlocked keystore ', () => {
+      const result = getWalletName(unlockedKeystore)
+      expect(result).toEqual(O.some(name))
+    })
+    it('from locked keystore', () => {
+      const result = getWalletName(lockedKeystore)
+      expect(result).toEqual(O.some(name))
+    })
+    it('None (not imported)', () => {
+      const result = getWalletName(notImportedKeystore)
+      expect(result).toBeNone()
+    })
+  })
+
+  describe('getLockedData', () => {
+    it('from unlocked keystore ', () => {
+      const result = getLockedData(unlockedKeystore)
+      expect(result).toEqual(O.some({ id, name }))
+    })
+    it('from locked keystore', () => {
+      const result = getLockedData(unlockedKeystore)
+      expect(result).toEqual(O.some({ id, name }))
+    })
+    it('None (not imported)', () => {
+      const result = getLockedData(notImportedKeystore)
       expect(result).toBeNone()
     })
   })
@@ -62,6 +97,33 @@ describe('services/wallet/util/', () => {
     it('true if keystore is not available', () => {
       const result = isLocked(notImportedKeystore)
       expect(result).toBeTruthy()
+    })
+  })
+
+  describe('getInitialKeystoreData', () => {
+    it('finds selected account', () => {
+      const result = getInitialKeystoreData([
+        { id: 0, name: 'name0', selected: false },
+        { id: 1, name: 'name1', selected: false },
+        { id: 2, name: 'name2', selected: true },
+        { id: 3, name: 'name3', selected: false }
+      ])
+      expect(result).toEqual(O.some({ id: 2, name: 'name2' }))
+    })
+
+    it('uses first account', () => {
+      const result = getInitialKeystoreData([
+        { id: 0, name: 'name0', selected: false },
+        { id: 1, name: 'name1', selected: false },
+        { id: 2, name: 'name2', selected: false },
+        { id: 3, name: 'name3', selected: false }
+      ])
+      expect(result).toEqual(O.some({ id: 0, name: 'name0' }))
+    })
+
+    it('empty list of account', () => {
+      const result = getInitialKeystoreData([])
+      expect(result).toBeNone()
     })
   })
 

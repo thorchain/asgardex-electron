@@ -54,7 +54,6 @@ import { useNetwork } from '../../hooks/useNetwork'
 import * as walletRoutes from '../../routes/wallet'
 import { WalletAddressAsync } from '../../services/wallet/types'
 import { isLocked, hasImportedKeystore, ledgerErrorIdToI18n } from '../../services/wallet/util'
-import { getPhrase } from '../../services/wallet/util'
 import { walletAccount$ } from './WalletSettingsView.helper'
 
 export const WalletSettingsView: React.FC = (): JSX.Element => {
@@ -82,10 +81,6 @@ export const WalletSettingsView: React.FC = (): JSX.Element => {
   const { addressUI$: cosmosAddressUI$ } = useCosmosContext()
 
   const ethDerivationMode: EthDerivationMode = useObservableState(ethDerivationMode$, DEFAULT_ETH_DERIVATION_MODE)
-
-  const phrase$ = useMemo(() => FP.pipe(keystore$, RxOp.map(getPhrase)), [keystore$])
-  const phrase = useObservableState(phrase$, O.none)
-
   const {
     askAddress: askLedgerThorAddress,
     verifyAddress: verifyLedgerThorAddress,
@@ -418,7 +413,7 @@ export const WalletSettingsView: React.FC = (): JSX.Element => {
       addLedgerAddress={addLedgerAddressHandler}
       verifyLedgerAddress={verifyLedgerAddressHandler}
       removeLedgerAddress={removeLedgerAddressHandler}
-      phrase={phrase}
+      keystore={keystore}
       walletAccounts={walletAccounts}
       clickAddressLinkHandler={clickAddressLinkHandler}
       validatePassword$={validatePassword$}

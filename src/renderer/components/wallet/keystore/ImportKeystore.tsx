@@ -45,6 +45,7 @@ export const ImportKeystore: React.FC<Props> = (props): JSX.Element => {
 
   const submitForm = useCallback(
     ({ password, name }: Store) => {
+      // TODO (@veado) Validate `loadKeystoreState` - if it's initial - show info to load keystore
       FP.pipe(
         loadKeystoreState,
         RD.map((keystore) => {

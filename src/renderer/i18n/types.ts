@@ -302,7 +302,7 @@ type SettingMessageKey =
   | 'setting.wallet.title'
   | 'setting.wallet.management'
   | 'setting.client'
-  | 'setting.account.management'
+  | 'setting.accounts'
   | 'setting.export'
   | 'setting.lock'
   | 'setting.view.phrase'

@@ -1,8 +1,10 @@
 import React, { useCallback, useMemo } from 'react'
 
 import * as FP from 'fp-ts/lib/function'
+import * as O from 'fp-ts/lib/Option'
 import { useIntl } from 'react-intl'
 
+import { truncateMiddle } from '../../../helpers/stringHelper'
 import { KeystoreState } from '../../../services/wallet/types'
 import * as WU from '../../../services/wallet/util'
 import { HeaderIconWrapper } from '../HeaderIcon.styles'
@@ -12,11 +14,10 @@ export type Props = {
   keystore: KeystoreState
   onPress?: FP.Lazy<void>
   isDesktopView: boolean
-  disabled?: boolean
 }
 
 export const HeaderLock: React.FC<Props> = (props): JSX.Element => {
-  const { keystore, onPress = FP.constVoid, isDesktopView, disabled = false } = props
+  const { keystore, onPress = FP.constVoid, isDesktopView } = props
 
   const intl = useIntl()
 
@@ -24,7 +25,34 @@ export const HeaderLock: React.FC<Props> = (props): JSX.Element => {
 
   const clickHandler = useCallback((_: React.MouseEvent) => onPress(), [onPress])
 
-  const desktopView = useMemo(() => (isLocked ? <Styled.LockIcon /> : <Styled.UnlockIcon />), [isLocked])
+  const desktopView = useMemo(
+    () => (
+      <div
+        className="relative flex h-[70px] cursor-pointer items-center justify-center pl-[10px]"
+        onClick={clickHandler}>
+        <div className="">{isLocked ? <Styled.LockIcon /> : <Styled.UnlockIcon />}</div>
+        {FP.pipe(
+          keystore,
+          WU.getWalletName,
+          O.fold(
+            () => <></>,
+            (name) => (
+              <p
+                className="dark:text2d w-min-[60px] absolute -bottom-[6px] whitespace-nowrap
+                rounded-full bg-gray0 px-[8px] py-[3px]
+                  font-main text-[9px] uppercase leading-none
+                  text-text2 dark:bg-gray0d
+                  dark:text-text2d
+                  ">
+                {truncateMiddle(name, { start: 4, end: 4, max: 16 })}
+              </p>
+            )
+          )
+        )}
+      </div>
+    ),
+    [clickHandler, isLocked, keystore]
+  )
 
   const mobileView = useMemo(() => {
     const notImported = !WU.hasImportedKeystore(keystore)
@@ -33,16 +61,12 @@ export const HeaderLock: React.FC<Props> = (props): JSX.Element => {
     })
 
     return (
-      <>
+      <HeaderIconWrapper onClick={clickHandler}>
         <Styled.Label>{label}</Styled.Label>
         {isLocked ? <Styled.LockIcon /> : <Styled.UnlockIcon />}
-      </>
+      </HeaderIconWrapper>
     )
-  }, [intl, isLocked, keystore])
+  }, [clickHandler, intl, isLocked, keystore])
 
-  return (
-    <HeaderIconWrapper onClick={clickHandler} disabled={disabled}>
-      {isDesktopView ? desktopView : mobileView}
-    </HeaderIconWrapper>
-  )
+  return isDesktopView ? desktopView : mobileView
 }

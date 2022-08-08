@@ -17,8 +17,7 @@ const meta: ComponentMeta<typeof Component> = {
   },
   args: {
     keystore: O.none,
-    isDesktopView: false,
-    disabled: false
+    isDesktopView: false
   }
 }
 

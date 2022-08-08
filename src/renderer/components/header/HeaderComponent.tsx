@@ -1,7 +1,8 @@
 import React, { useMemo, useState, useCallback, useRef } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
-import { Row, Col, Tabs, Grid, Space } from 'antd'
+import { Tab as TabUI } from '@headlessui/react'
+import { Row, Col, Grid } from 'antd'
 import * as FP from 'fp-ts/function'
 import * as A from 'fp-ts/lib/Array'
 import * as O from 'fp-ts/lib/Option'
@@ -33,9 +34,9 @@ import { HeaderStats } from './stats/HeaderStats'
 import { HeaderTheme } from './theme'
 
 enum TabKey {
-  POOLS = 'pools',
-  WALLET = 'wallet',
-  UNKNOWN = 'unknown'
+  POOLS = 0,
+  WALLET = 1,
+  UNKNOWN = -1
 }
 
 type Tab = {
@@ -108,7 +109,6 @@ export const HeaderComponent: React.FC<Props> = (props): JSX.Element => {
   const [menuVisible, setMenuVisible] = useState(false)
 
   const isDesktopView = Grid.useBreakpoint()?.lg ?? false
-  const isLargeDesktopView = Grid.useBreakpoint()?.xl ?? false
 
   const toggleMenu = useCallback(() => {
     setMenuVisible(!menuVisible)
@@ -153,22 +153,41 @@ export const HeaderComponent: React.FC<Props> = (props): JSX.Element => {
 
   const headerHeight = useMemo(() => size('headerHeight', '70px')({ theme }), [theme])
 
-  const tabs = useMemo(
-    () =>
-      items.map(({ label, key, path, icon: Icon }) => (
-        <Tabs.TabPane
-          key={key}
-          tab={
-            <Styled.TabLink to={path} selected={activeKey === key}>
-              <Row align="middle" style={{ height: headerHeight }}>
-                <Icon style={{ paddingRight: '5px' }} />
-                {label}
-              </Row>
-            </Styled.TabLink>
-          }
-        />
-      )),
-    [items, activeKey, headerHeight]
+  const renderMainNav = useMemo(
+    () => (
+      <TabUI.Group defaultIndex={-1} selectedIndex={activeKey >= 0 ? activeKey : undefined}>
+        <TabUI.List className="flex h-full flex-row">
+          {items.map(({ label, key, path, icon: Icon }) => (
+            <TabUI key={key} as={React.Fragment}>
+              {({ selected }) => (
+                <div
+                  className={`
+                  flex
+                  h-full cursor-pointer items-center
+                  justify-center border-y-[3px] border-solid border-transparent
+                  hover:border-b-turquoise
+                  focus-visible:outline-none
+                   ${selected ? 'border-b-turquoise' : 'border-b-transparent'}
+                  mr-20px pl-10px pr-15px
+              font-mainBold text-18
+              uppercase transition duration-300
+              ease-in-out
+              ${selected ? 'text-turquoise' : 'text-text2 dark:text-text2d'}
+            hover:text-turquoise
+              `}
+                  onClick={() => navigate(path)}>
+                  <div className="flex flex-row items-center">
+                    <Icon className="pr-5px" />
+                    <span className="">{label}</span>
+                  </div>
+                </div>
+              )}
+            </TabUI>
+          ))}
+        </TabUI.List>
+      </TabUI.Group>
+    ),
+    [activeKey, items, navigate]
   )
 
   const links = useMemo(
@@ -295,14 +314,7 @@ export const HeaderComponent: React.FC<Props> = (props): JSX.Element => {
                   />
                 </Row>
               </Col>
-              <Col span="auto">
-                <Space size={isLargeDesktopView ? 130 : 0}>
-                  <Styled.TabsWrapper>
-                    <Tabs activeKey={activeKey}>{tabs}</Tabs>
-                  </Styled.TabsWrapper>
-                  <div></div>
-                </Space>
-              </Col>
+              {renderMainNav}
               <Col>
                 <Row align="middle">
                   {renderHeaderNetStatus}
