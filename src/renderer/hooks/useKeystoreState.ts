@@ -5,14 +5,14 @@ import * as RxOp from 'rxjs/operators'
 
 import { useWalletContext } from '../contexts/WalletContext'
 import { INITIAL_KEYSTORE_STATE } from '../services/wallet/const'
-import { KeystoreState, Phrase } from '../services/wallet/types'
+import { KeystoreState, Phrase, RemoveAccountHandler } from '../services/wallet/types'
 import { getPhrase, getWalletName } from '../services/wallet/util'
 
 export const useKeystoreState = (): {
   state: KeystoreState
   phrase: O.Option<Phrase>
   walletName: O.Option<string>
-  remove: () => Promise<void>
+  remove: RemoveAccountHandler
   unlock: (password: string) => Promise<void>
   lock: FP.Lazy<void>
 } => {

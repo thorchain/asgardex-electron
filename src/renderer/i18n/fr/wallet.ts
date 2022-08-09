@@ -44,6 +44,7 @@ const wallet: WalletMessages = {
   'wallet.empty.phrase.import': 'Importez un portefeuille existant contenant des fonds',
   'wallet.empty.phrase.create': "Créez un nouveau portefeuille, et l'alimenter en fonds",
   'wallet.create.copy.phrase': 'Copiez la phrase ci-dessous',
+  'wallet.add.another': 'Add another wallet - FR',
   'wallet.create.title': 'Créer un nouveau portefeuille',
   'wallet.create.enter.phrase': 'Entrez la phrase correctement',
   'wallet.create.error.phrase': 'Sauvegardez votre phrase en toute sécurité et saisissez-la correctement',

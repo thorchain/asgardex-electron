@@ -72,16 +72,18 @@ export const ImportPhrase: React.FC<Props> = (props): JSX.Element => {
   )
 
   const submitForm = useCallback(
-    ({ phrase: newPhrase, password, name }: Store) => {
+    async ({ phrase: newPhrase, password, name }: Store) => {
       const id = generateKeystoreId()
 
       setImportError(O.none)
       setImporting(true)
-      addKeystore({ phrase: newPhrase, name: name || defaultWalletName(walletId), id, password }).catch((error) => {
-        setImporting(false)
-        // TODO(@Veado): i18n
-        setImportError(O.some(error))
-      })
+      await addKeystore({ phrase: newPhrase, name: name || defaultWalletName(walletId), id, password }).catch(
+        (error) => {
+          setImporting(false)
+          // TODO(@Veado): i18n
+          setImportError(O.some(error))
+        }
+      )
     },
     [addKeystore, walletId]
   )

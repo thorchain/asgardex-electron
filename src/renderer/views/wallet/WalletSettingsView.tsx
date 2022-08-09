@@ -49,6 +49,8 @@ import {
 } from '../../helpers/chainHelper'
 import { sequenceTOptionFromArray } from '../../helpers/fpHelpers'
 import { useCollapsedSetting } from '../../hooks/useCollapsedSetting'
+import { useKeystoreAccounts } from '../../hooks/useKeystoreAccounts'
+import { useKeystoreState } from '../../hooks/useKeystoreState'
 import { useLedger } from '../../hooks/useLedger'
 import { useNetwork } from '../../hooks/useNetwork'
 import * as walletRoutes from '../../routes/wallet'
@@ -62,10 +64,12 @@ export const WalletSettingsView: React.FC = (): JSX.Element => {
   const location = useLocation()
 
   const {
-    keystoreService: { keystore$, lock, removeKeystoreAccount, exportKeystore, validatePassword$ }
+    keystoreService: { exportKeystore, validatePassword$ }
   } = useWalletContext()
 
-  const keystore = useObservableState(keystore$, O.none)
+  const { accountsUI } = useKeystoreAccounts()
+
+  const { state: keystore, lock, remove } = useKeystoreState()
 
   const { network } = useNetwork()
 
@@ -408,12 +412,13 @@ export const WalletSettingsView: React.FC = (): JSX.Element => {
     <WalletSettings
       network={network}
       lockWallet={lock}
-      removeKeystore={removeKeystoreAccount}
+      removeKeystore={remove}
       exportKeystore={exportKeystore}
       addLedgerAddress={addLedgerAddressHandler}
       verifyLedgerAddress={verifyLedgerAddressHandler}
       removeLedgerAddress={removeLedgerAddressHandler}
       keystore={keystore}
+      keystoreAccounts={accountsUI}
       walletAccounts={walletAccounts}
       clickAddressLinkHandler={clickAddressLinkHandler}
       validatePassword$={validatePassword$}
