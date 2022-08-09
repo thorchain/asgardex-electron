@@ -208,6 +208,7 @@ export type LedgerAddressMap$ = Rx.Observable<LedgerAddressMap>
 export type LedgerAddressesMap = Record<Chain, LedgerAddressMap>
 export type LedgerAddressesMap$ = Rx.Observable<LedgerAddressesMap>
 
+export type KeystoreAccountsRD = RD.RemoteData<Error, KeystoreAccounts>
 export type KeystoreAccountsLD = LiveData<Error, KeystoreAccounts>
 
 export type KeystoreAccountUI = Omit<KeystoreAccount, 'keystore'>
