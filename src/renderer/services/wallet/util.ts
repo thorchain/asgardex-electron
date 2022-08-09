@@ -8,13 +8,22 @@ import * as Ord from 'fp-ts/Ord'
 import * as S from 'fp-ts/string'
 import { IntlShape } from 'react-intl'
 
-import { KeystoreAccounts } from '../../../shared/api/io'
+import { KeystoreAccounts, KeystoreAccount } from '../../../shared/api/io'
 import { KeystoreId, LedgerErrorId } from '../../../shared/api/types'
 import { WalletType } from '../../../shared/wallet/types'
 import { eqAsset } from '../../helpers/fp/eq'
 import { ordBaseAmount } from '../../helpers/fp/ord'
+import { sequenceSOption } from '../../helpers/fpHelpers'
 import { WalletBalances } from '../clients'
-import { KeystoreState, Phrase, BalanceMonoid, WalletBalance, isKeystoreLocked, isKeystoreUnlocked } from './types'
+import {
+  KeystoreState,
+  Phrase,
+  BalanceMonoid,
+  WalletBalance,
+  isKeystoreLocked,
+  isKeystoreUnlocked,
+  KeystoreLocked
+} from './types'
 
 export const getPhrase = (state: KeystoreState): O.Option<Phrase> =>
   FP.pipe(
@@ -23,17 +32,48 @@ export const getPhrase = (state: KeystoreState): O.Option<Phrase> =>
     O.map(({ phrase }) => phrase)
   )
 
-export const getKeystoreId = (state: KeystoreState): O.Option<number> =>
+export const getKeystoreId = (state: KeystoreState): O.Option<KeystoreId> =>
   FP.pipe(
     state,
     O.map(({ id }) => id)
   )
+
+export const getWalletName = (state: KeystoreState): O.Option<string> =>
+  FP.pipe(
+    state,
+    O.map(({ name }) => name)
+  )
+
+/**
+ * Returns `LockedState` from `KeystoreState`
+ */
+export const getLockedData = (state: KeystoreState): O.Option<KeystoreLocked> =>
+  FP.pipe(sequenceSOption({ id: getKeystoreId(state), name: getWalletName(state) }))
 
 export const getSelectedKeystoreId = (accounts: KeystoreAccounts): O.Option<number> =>
   FP.pipe(
     accounts,
     A.filterMap(({ selected, id }) => (selected ? O.some(id) : O.none)),
     A.head
+  )
+
+/**
+ * Returns initial keystore state by given accouns
+ *
+ * Initial `Keystore` is always set to `KeystoreLocked`
+ */
+export const getInitialKeystoreData = (
+  accounts: Array<Pick<KeystoreAccount, 'id' | 'name' | 'selected'>>
+): O.Option<KeystoreLocked> =>
+  FP.pipe(
+    accounts,
+    // get selected account (if available)
+    A.filterMap(O.fromPredicate(({ selected }) => selected)),
+    A.head,
+    // if no selected account, use first account in list (if available)
+    O.alt(() => (accounts.length ? O.some(accounts[0]) : O.none)),
+    // get needed data from account
+    O.map(({ id, name }) => ({ id, name }))
   )
 
 export const getKeystore: (id: KeystoreId) => (accounts: KeystoreAccounts) => O.Option<Keystore> = (id) => (accounts) =>
@@ -43,7 +83,7 @@ export const getKeystore: (id: KeystoreId) => (accounts: KeystoreAccounts) => O.
     A.head
   )
 
-export const getKeystoreAccountName: (id: KeystoreId) => (accounts: KeystoreAccounts) => O.Option<string> =
+export const getKeystoreWalletName: (id: KeystoreId) => (accounts: KeystoreAccounts) => O.Option<string> =
   (id) => (accounts) =>
     FP.pipe(
       accounts,
@@ -52,10 +92,9 @@ export const getKeystoreAccountName: (id: KeystoreId) => (accounts: KeystoreAcco
     )
 
 export const generateKeystoreId = (): KeystoreId =>
-  // id for keystore is current time (ms)
-  // Note: Since an user can add one keystore at time only
-  // and a keystore with same name can't be overriden,
-  // duplications are not possible
+  // id for keystore is current time (ms) at the time of importing
+  // Note: An user can import one keystore at time only
+  // and a keystore with same id can't be overriden. That's no duplications.
   new Date().getTime()
 
 export const hasImportedKeystore = (state: KeystoreState): boolean => O.isSome(state)

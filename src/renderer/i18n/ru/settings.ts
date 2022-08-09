@@ -5,7 +5,7 @@ const settings: SettingMessages = {
   'setting.wallet.title': 'Настройки кошелька',
   'setting.wallet.management': 'Управление Кошельком',
   'setting.client': 'Клиент',
-  'setting.account.management': 'Управление Аккаунтом',
+  'setting.accounts': 'Accounts - RU',
   'setting.export': 'Экспортировать Keystore',
   'setting.lock': 'Заблокировать',
   'setting.view.phrase': 'Показать секретную фразу',

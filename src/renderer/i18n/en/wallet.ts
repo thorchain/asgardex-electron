@@ -23,7 +23,7 @@ const wallet: WalletMessages = {
   'wallet.connect.instruction': 'Please connect your wallet',
   'wallet.lock.label': 'Lock wallet',
   'wallet.unlock.label': 'Unlock wallet',
-  'wallet.unlock.title': 'Unlock your wallet',
+  'wallet.unlock.title': 'Unlock "{name}"',
   'wallet.unlock.instruction': 'Please unlock your wallet',
   'wallet.unlock.password': 'Enter your password',
   'wallet.unlock.error': 'Could not unlock the wallet. Please check you password and try it again',
@@ -52,7 +52,7 @@ const wallet: WalletMessages = {
   'wallet.receive.address.error': 'No address available to receive funds',
   'wallet.receive.address.errorQR': 'Error while rendering QR code: {error}',
   'wallet.remove.label': 'Forget wallet',
-  'wallet.remove.label.title': 'Are you sure you want to forget your wallet?',
+  'wallet.remove.label.title': 'Are you sure you want to forget "{name}"?',
   'wallet.remove.label.description':
     'You will need to provide your phrase to re-create your wallet. Please ensure you have your phrase saved at a safe place before you proceed.',
   'wallet.send.success': 'Transaction succeeded.',

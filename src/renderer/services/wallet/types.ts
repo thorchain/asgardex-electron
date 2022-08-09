@@ -16,19 +16,21 @@ import { LoadTxsParams, WalletBalancesLD, WalletBalancesRD } from '../clients'
 
 export type Phrase = string
 
-export type KeystoreLocked = { id: KeystoreId }
-export type KeystoreUnlocked = { id: KeystoreId; phrase: Phrase }
+export type KeystoreLocked = { id: KeystoreId; name: string }
+export type KeystoreUnlocked = KeystoreLocked & { phrase: Phrase }
 export type KeystoreContent = KeystoreLocked | KeystoreUnlocked
 
 /**
  * Type guard for `KeystoreUnlocked`
+ * Unlocked keystore will provide an id, phrase + name
  */
-export const isKeystoreUnlocked = (kc: KeystoreContent): kc is KeystoreUnlocked => 'id' in kc && 'phrase' in kc
+export const isKeystoreUnlocked = (kc: KeystoreContent): kc is KeystoreUnlocked =>
+  'id' in kc && 'name' in kc && 'phrase' in kc
 
 /**
  * Type guard for `KeystoreLocked`
  */
-export const isKeystoreLocked = (kc: KeystoreContent): kc is KeystoreLocked => 'id' in kc && !('phrase' in kc)
+export const isKeystoreLocked = (kc: KeystoreContent): kc is KeystoreLocked => !isKeystoreUnlocked(kc)
 
 /**
  * Type for providing 3 states of keystore

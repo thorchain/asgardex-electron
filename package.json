@@ -71,6 +71,7 @@
     "@devexperts/remote-data-ts": "^2.1.1",
     "@devexperts/rx-utils": "^1.0.0-alpha.14",
     "@devexperts/utils": "^1.0.0-alpha.14",
+    "@headlessui/react": "^1.6.6",
     "@ledgerhq/hw-app-btc": "6.7.0",
     "@ledgerhq/hw-app-cosmos": "^6.27.1",
     "@ledgerhq/hw-app-eth": "^6.28.2",

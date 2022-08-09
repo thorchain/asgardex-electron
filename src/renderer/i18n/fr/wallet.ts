@@ -23,7 +23,7 @@ const wallet: WalletMessages = {
   'wallet.connect.instruction': 'Veuillez connecter votre portefeuille',
   'wallet.lock.label': 'Verrouiller le portefeuille',
   'wallet.unlock.label': 'Déverrouiller le portefeuille',
-  'wallet.unlock.title': 'Déverrouiller votre portefeuille',
+  'wallet.unlock.title': 'Unlock "{name}" - FR',
   'wallet.unlock.instruction': 'Veuillez déverrouiller votre portefeuille',
   'wallet.unlock.password': 'Entrez votre phrase de récupération',
   'wallet.unlock.error':
@@ -53,7 +53,7 @@ const wallet: WalletMessages = {
   'wallet.receive.address.error': 'Aucune adresse disponible pour recevoir des fonds',
   'wallet.receive.address.errorQR': "Erreur lors de l'affichage du QR code : {error}",
   'wallet.remove.label': 'Supprimer le portefeuille',
-  'wallet.remove.label.title': 'Êtes-vous sûr de vouloir supprimer votre portefeuille ?',
+  'wallet.remove.label.title': 'Are you sure you want to forget "{name}"? - FR',
   'wallet.remove.label.description':
     'Vous ne pouvez pas annuler cette action et devrez recréer votre portefeuille à partir de votre phrase de récupération.',
   'wallet.send.success': 'Transaction réussie.',

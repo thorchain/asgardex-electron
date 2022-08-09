@@ -5,7 +5,7 @@ const settings: SettingMessages = {
   'setting.wallet.title': 'Wallet Einstellungen',
   'setting.wallet.management': 'Wallet Management',
   'setting.client': 'Client',
-  'setting.account.management': 'Kontoführung',
+  'setting.accounts': 'Konton',
   'setting.export': 'Exportiere Keystore',
   'setting.lock': 'Sperren',
   'setting.view.phrase': 'Phrase ansehen',

@@ -23,10 +23,11 @@ module.exports = {
       },
       // https://tailwindcss.com/docs/font-size#providing-a-default-line-height
       fontSize: {
-        11: ['11px', '16px'],
-        14: ['14px', '20px'],
-        16: ['16px', '24px'],
-        20: ['20px', '28px']
+        11: ['11px', '14px'],
+        14: ['14px', '17px'],
+        16: ['16px', '19px'],
+        18: ['18px', '21px'],
+        20: ['20px', '23px']
       },
       // Custom colors based on `asgardex-theme`
       // Light theme https://gitlab.com/thorchain/asgardex-common/asgardex-theme/-/blob/master/src/light.ts
@@ -63,7 +64,14 @@ module.exports = {
         error3d: t.dark.palette.error[3],
         // warning
         warning0: t.light.palette.warning[0],
-        warningr0d: t.dark.palette.warning[0]
+        warningr0d: t.dark.palette.warning[0],
+        // gray
+        gray0: t.light.palette.gray[0],
+        gray0d: t.dark.palette.gray[0],
+        gray1: t.light.palette.gray[1],
+        gray1d: t.dark.palette.gray[1],
+        gray2: t.light.palette.gray[2],
+        gray2d: t.dark.palette.gray[2]
       }
     },
     // Breakpoint definitions based on `MediaQueries`

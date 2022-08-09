@@ -23,7 +23,7 @@ const wallet: WalletMessages = {
   'wallet.connect.instruction': 'Пожалуйста подключите ваш кошелек',
   'wallet.lock.label': 'Заблокировать кошелёк',
   'wallet.unlock.label': 'Разблокировать кошелёк',
-  'wallet.unlock.title': 'Разблокировать ваш кошелек',
+  'wallet.unlock.title': 'Unlock "{name}" - RU',
   'wallet.unlock.instruction': 'Пожалуйста разблокируйте ваш кошелек',
   'wallet.unlock.password': 'Введите ваш пароль',
   'wallet.unlock.error': 'Не получилось разблокировать кошелек. Пожалуйста, проверьте пароль и попробуйте еще раз',
@@ -52,7 +52,7 @@ const wallet: WalletMessages = {
   'wallet.receive.address.error': 'Нет доступных адресов для получения',
   'wallet.receive.address.errorQR': 'Ошибка при создании QR-кода: {error}',
   'wallet.remove.label': 'Забыть кошелек',
-  'wallet.remove.label.title': 'Вы уверены, что хотите забыть кошелек?',
+  'wallet.remove.label.title': 'Are you sure you want to forget "{name}"? - RU',
   'wallet.remove.label.description':
     'Для повторного создания кошелька вам потребуется указать свою фразу. Пожалуйста, убедитесь, что ваша фраза сохранена в надежном месте, прежде чем продолжить.',
   'wallet.send.success': 'Тразакция завершена.',
