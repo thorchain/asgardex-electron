@@ -19,7 +19,8 @@ import {
   LoadKeystoreLD,
   ImportKeystoreParams,
   AddKeystoreParams,
-  KeystoreAccountsLD
+  KeystoreAccountsLD,
+  KeystoreAccountsUI$
 } from './types'
 import {
   getKeystore,
@@ -39,6 +40,9 @@ const {
   set: setKeystoreState
 } = observableState<KeystoreState>(INITIAL_KEYSTORE_STATE)
 
+/**
+ * Internal state of keystore accounts - not shared to outside world
+ */
 const {
   get$: getKeystoreAccounts$,
   get: getKeystoreAccounts,
@@ -215,6 +219,14 @@ const keystoreAccounts$: KeystoreAccountsLD = FP.pipe(
   RxOp.startWith(RD.pending)
 )
 
+// Simplified `KeystoreAccounts` (w/o loading state, w/o `keystore`) to display data at UIs
+const keystoreAccountsUI$: KeystoreAccountsUI$ = FP.pipe(
+  getKeystoreAccounts$,
+  // Transform `KeystoreAccounts` -> `KeystoreAccountsUI`
+  RxOp.map(FP.flow(A.map(({ id, name, selected }) => ({ id, name, selected })))),
+  RxOp.shareReplay(1)
+)
+
 const id = FP.pipe(getKeystoreState(), getKeystoreId)
 if (!id) {
   throw Error(`Can't export keystore - keystore id is missing in KeystoreState`)
@@ -251,6 +263,7 @@ export const keystoreService: KeystoreService = {
   unlock,
   validatePassword$,
   reloadKeystoreAccounts,
+  keystoreAccountsUI$,
   keystoreAccounts$
 }
 

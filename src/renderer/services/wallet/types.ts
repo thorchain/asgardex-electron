@@ -8,7 +8,7 @@ import { NonEmptyArray } from 'fp-ts/lib/NonEmptyArray'
 import * as O from 'fp-ts/lib/Option'
 import * as Rx from 'rxjs'
 
-import { KeystoreAccounts } from '../../../shared/api/io'
+import { KeystoreAccount, KeystoreAccounts } from '../../../shared/api/io'
 import { KeystoreId, LedgerError, Network } from '../../../shared/api/types'
 import { WalletAddress, WalletBalanceType, WalletType } from '../../../shared/wallet/types'
 import { LiveData } from '../../helpers/rx/liveData'
@@ -72,6 +72,7 @@ export type KeystoreService = {
   validatePassword$: ValidatePasswordHandler
   reloadKeystoreAccounts: FP.Lazy<void>
   keystoreAccounts$: KeystoreAccountsLD
+  keystoreAccountsUI$: KeystoreAccountsUI$
 }
 
 export type WalletAddressAsync = { address: RD.RemoteData<Error, WalletAddress>; type: WalletType }
@@ -208,3 +209,7 @@ export type LedgerAddressesMap = Record<Chain, LedgerAddressMap>
 export type LedgerAddressesMap$ = Rx.Observable<LedgerAddressesMap>
 
 export type KeystoreAccountsLD = LiveData<Error, KeystoreAccounts>
+
+export type KeystoreAccountUI = Omit<KeystoreAccount, 'keystore'>
+export type KeystoreAccountsUI = KeystoreAccountUI[]
+export type KeystoreAccountsUI$ = Rx.Observable<KeystoreAccountsUI>
