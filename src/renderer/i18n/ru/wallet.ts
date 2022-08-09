@@ -43,6 +43,7 @@ const wallet: WalletMessages = {
   'wallet.empty.phrase.import': 'Импортировать существующий кошелек с балансом',
   'wallet.empty.phrase.create': 'Создать новый кошелек с балансом',
   'wallet.create.copy.phrase': 'Скопируйте фразу ниже',
+  'wallet.add.another': 'Add another wallet - RU',
   'wallet.create.title': 'Создать новый кошелек',
   'wallet.create.enter.phrase': 'Введите фразу правильно',
   'wallet.create.error.phrase': 'Сохраните вашу фразу в надежном месте и введите ее в правильном порядке',

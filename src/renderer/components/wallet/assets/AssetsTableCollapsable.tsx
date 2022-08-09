@@ -473,7 +473,7 @@ export const AssetsTableCollapsable: React.FC<Props> = (props): JSX.Element => {
       expandIcon={({ isActive }) => <Styled.ExpandIcon rotate={isActive ? 90 : 0} />}
       defaultActiveKey={openPanelKeys}
       activeKey={openPanelKeys}
-      expandIconPosition="right"
+      expandIconPosition="end"
       onChange={onChangeCollapseHandler}
       ghost>
       {chainBalances.map(renderPanel)}

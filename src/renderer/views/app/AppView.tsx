@@ -72,7 +72,7 @@ export const AppView: React.FC = (): JSX.Element => {
   const prevHaltedChains = useRef<Chain[]>([])
   const prevMimirHalt = useRef<MimirHalt>(DEFAULT_MIMIR_HALT)
 
-  const { keystoreAccounts, reloadKeystoreAccounts } = useKeystoreAccounts()
+  const { accounts: keystoreAccounts, reload: reloadKeystoreAccounts } = useKeystoreAccounts()
 
   const { mimirHaltRD } = useMimirHalt()
 

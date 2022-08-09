@@ -21,7 +21,7 @@ const meta: ComponentMeta<typeof Component> = {
     },
     removeKeystore: () => {
       console.log('removeKeystore')
-      return Promise.resolve()
+      return Promise.resolve(1)
     }
   },
   decorators: [

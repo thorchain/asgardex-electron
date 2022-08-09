@@ -1,4 +1,4 @@
-import React, { useCallback } from 'react'
+import React from 'react'
 
 import { FileOutlined, FileProtectOutlined } from '@ant-design/icons'
 import { useIntl } from 'react-intl'
@@ -12,14 +12,6 @@ export const NoWalletView = () => {
   const navigate = useNavigate()
   const intl = useIntl()
 
-  const importClick = useCallback(() => {
-    navigate(walletRoutes.imports.base.path())
-  }, [navigate])
-
-  const createClick = useCallback(() => {
-    navigate(walletRoutes.create.phrase.path())
-  }, [navigate])
-
   return (
     <div className="flex h-full w-full flex-col bg-bg1 dark:bg-bg1d md:h-full md:flex-row ">
       <div
@@ -31,7 +23,7 @@ export const NoWalletView = () => {
          ease-in-out hover:bg-turquoise
          md:h-full md:w-1/2
          "
-        onClick={createClick}>
+        onClick={() => navigate(walletRoutes.create.phrase.path())}>
         <FileOutlined
           className="nowalletview-createicon mb-[30px] transition duration-500 ease-in-out
   group-hover:scale-110 group-hover:drop-shadow-lg md:mb-[70px]"
@@ -81,7 +73,7 @@ export const NoWalletView = () => {
         transition duration-500 ease-in-out
          hover:bg-turquoise
          md:h-full md:w-1/2"
-        onClick={importClick}>
+        onClick={() => navigate(walletRoutes.imports.base.path())}>
         <FileProtectOutlined
           className="nowalletview-addicon mb-[30px] transition duration-500 ease-in-out
   group-hover:scale-110 group-hover:drop-shadow-lg md:mb-[70px]"

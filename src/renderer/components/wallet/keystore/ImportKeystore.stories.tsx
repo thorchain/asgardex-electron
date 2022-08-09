@@ -5,7 +5,6 @@ import * as Rx from 'rxjs'
 import { MOCK_KEYSTORE } from '../../../../shared/mock/wallet'
 import { ImportKeystore as Component, Props } from './ImportKeystore'
 
-const initialImportKeystore = () => Rx.of(RD.initial)
 const initialLoadKeystore = () => Rx.of(RD.initial)
 
 const Template: StoryFn<Props> = (args) => <Component {...args} />
@@ -27,22 +26,23 @@ const meta: ComponentMeta<typeof Component> = {
         }
       }
     },
-    importKeystore$: {
+    importingKeystoreState: {
       control: {
         type: 'select',
         options: ['initial', 'loading', 'error', 'success'],
         mapping: {
-          intitial: initialImportKeystore,
-          loading: () => Rx.of(RD.pending),
-          error: () => Rx.of(RD.failure(Error('import keystore error'))),
-          success: () => Rx.of(RD.success(undefined))
+          intitial: RD.initial,
+          loading: () => RD.pending,
+          error: () => RD.failure(Error('import keystore error')),
+          success: () => RD.success(true)
         }
       }
-    }
+    },
+    importKeystore: { action: 'importKeystore' }
   },
   args: {
     loadKeystore$: initialLoadKeystore,
-    importKeystore$: initialImportKeystore,
+    importingKeystoreState: RD.initial,
     clientStates: RD.success(true),
     walletId: new Date().getTime()
   },

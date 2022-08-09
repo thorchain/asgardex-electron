@@ -1,5 +1,6 @@
 import * as RD from '@devexperts/remote-data-ts'
 import { decryptFromKeystore, encryptToKeyStore, Keystore } from '@xchainjs/xchain-crypto'
+import { delay } from '@xchainjs/xchain-util'
 import * as FP from 'fp-ts/function'
 import * as A from 'fp-ts/lib/Array'
 import * as E from 'fp-ts/lib/Either'
@@ -8,6 +9,7 @@ import * as Rx from 'rxjs'
 import * as RxOp from 'rxjs/operators'
 
 import { ipcKeystoreAccountsIO, KeystoreAccounts } from '../../../shared/api/io'
+import { isError } from '../../../shared/utils/guard'
 import { liveData } from '../../helpers/rx/liveData'
 import { observableState, triggerStream } from '../../helpers/stateHelper'
 import { INITIAL_KEYSTORE_STATE } from './const'
@@ -15,7 +17,6 @@ import {
   KeystoreService,
   KeystoreState,
   ValidatePasswordLD,
-  ImportKeystoreLD,
   LoadKeystoreLD,
   ImportKeystoreParams,
   AddKeystoreParams,
@@ -30,6 +31,13 @@ import {
   getLockedData,
   getInitialKeystoreData
 } from './util'
+
+/**
+ * State of importing keystore account
+ */
+const { get$: importingKeystoreState$, set: setImportingKeystoreState } = observableState<
+  RD.RemoteData<Error, boolean>
+>(RD.initial)
 
 /**
  * State of selected keystore account
@@ -54,6 +62,7 @@ const {
  */
 const addKeystoreAccount = async ({ phrase, name, id, password }: AddKeystoreParams): Promise<void> => {
   try {
+    setImportingKeystoreState(RD.pending)
     const keystore: Keystore = await encryptToKeyStore(phrase, password)
 
     // remove selected state from current accounts
@@ -78,9 +87,10 @@ const addKeystoreAccount = async ({ phrase, name, id, password }: AddKeystorePar
     // Update states
     setKeystoreAccounts(newAccounts)
     setKeystoreState(O.some({ id, phrase, name }))
-
+    setImportingKeystoreState(RD.success(true))
     return Promise.resolve()
   } catch (error) {
+    setImportingKeystoreState(RD.failure(isError(error) ? error : Error('Could not add keystore')))
     return Promise.reject(error)
   }
 }
@@ -102,19 +112,24 @@ export const removeKeystoreAccount = async () => {
   await window.apiKeystore.saveKeystoreAccounts(encodedAccounts)
   // Update states
   setKeystoreAccounts(accounts)
-  setKeystoreState(O.none)
+  // Set previous to current account (if available)
+  const prevAccount = FP.pipe(accounts, A.last)
+  setKeystoreState(prevAccount)
+
+  // return no. of accounts
+  return accounts.length
 }
 
-const importKeystore$ = ({ keystore, password, name, id }: ImportKeystoreParams): ImportKeystoreLD => {
-  return FP.pipe(
-    Rx.from(decryptFromKeystore(keystore, password)),
-    // delay to give UI some time to render
-    RxOp.delay(200),
-    RxOp.switchMap((phrase) => Rx.from(addKeystoreAccount({ phrase, name, id, password }))),
-    RxOp.map(RD.success),
-    RxOp.catchError((error) => Rx.of(RD.failure(new Error(`Could not decrypt phrase from keystore: ${error}`)))),
-    RxOp.startWith(RD.pending)
-  )
+const importKeystore = async ({ keystore, password, name, id }: ImportKeystoreParams): Promise<void> => {
+  try {
+    setImportingKeystoreState(RD.pending)
+    const phrase = await decryptFromKeystore(keystore, password)
+    await delay(200)
+    return await addKeystoreAccount({ phrase, name, id, password })
+  } catch (error) {
+    setImportingKeystoreState(RD.failure(isError(error) ? error : Error('Could not add keystore')))
+    return Promise.reject(error)
+  }
 }
 
 /**
@@ -165,7 +180,6 @@ const lock = async () => {
   if (!lockedState) {
     throw Error(`Can't lock - keystore 'id' and / or 'name' are missing`)
   }
-
   setKeystoreState(O.some(lockedState))
 }
 
@@ -216,7 +230,8 @@ const keystoreAccounts$: KeystoreAccountsLD = FP.pipe(
 
     return accounts
   }),
-  RxOp.startWith(RD.pending)
+  RxOp.startWith(RD.pending),
+  RxOp.shareReplay(1)
 )
 
 // Simplified `KeystoreAccounts` (w/o loading state, w/o `keystore`) to display data at UIs
@@ -256,7 +271,7 @@ export const keystoreService: KeystoreService = {
   keystore$: getKeystoreState$,
   addKeystoreAccount,
   removeKeystoreAccount,
-  importKeystore$,
+  importKeystore,
   exportKeystore,
   loadKeystore$,
   lock,
@@ -264,9 +279,11 @@ export const keystoreService: KeystoreService = {
   validatePassword$,
   reloadKeystoreAccounts,
   keystoreAccountsUI$,
-  keystoreAccounts$
+  keystoreAccounts$,
+  importingKeystoreState$,
+  resetImportingKeystoreState: () => setImportingKeystoreState(RD.initial)
 }
 
 // TODO(@Veado) Remove it - for debugging only
-getKeystoreState$.subscribe((v) => console.log('keystoreState', v))
-getKeystoreAccounts$.subscribe((v) => console.log('keystoreAccounts', v))
+getKeystoreState$.subscribe((v) => console.log('keystoreState subscription', v))
+getKeystoreAccounts$.subscribe((v) => console.log('keystoreAccounts subscription', v))

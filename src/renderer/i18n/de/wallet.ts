@@ -44,6 +44,7 @@ const wallet: WalletMessages = {
   'wallet.empty.phrase.import': 'Importiere eine bestehende Wallet mit Guthaben',
   'wallet.empty.phrase.create': 'Erstelle eine neue Wallet und füge ein Guthaben hinzu',
   'wallet.create.copy.phrase': 'Phrase kopieren',
+  'wallet.add.another': 'Weitere Wallet hinzufügen',
   'wallet.create.title': 'Erstelle eine Wallet',
   'wallet.create.enter.phrase': 'Gebe die Phrase richtig ein',
   'wallet.create.words.click': 'Klicke die Wörter in der richtigen Reihenfolge',

@@ -42,8 +42,6 @@ export const isKeystoreLocked = (kc: KeystoreContent): kc is KeystoreLocked => !
  * DEPRECATED (2) `Some<None>` -> LOCKED STATUS (keystore file, but no phrase)
  * DEPRECATED (3) `Some<Some<KeystoreContent>>` -> UNLOCKED + IMPORTED STATUS (keystore file + phrase)
  *
- *
- *
  */
 export type KeystoreState = O.Option<KeystoreContent>
 export type KeystoreState$ = Rx.Observable<KeystoreState>
@@ -53,15 +51,19 @@ export type ValidatePasswordLD = LiveData<Error, void>
 
 export type ImportKeystoreParams = { id: KeystoreId; keystore: Keystore; password: string; name: string }
 export type AddKeystoreParams = { id: KeystoreId; phrase: Phrase; name: string; password: string }
-export type ImportKeystoreLD = LiveData<Error, void>
 export type LoadKeystoreLD = LiveData<Error, Keystore>
+
+export type ImportingKeystoreStateRD = RD.RemoteData<Error, boolean>
+export type ImportingKeystoreStateLD = Rx.Observable<ImportingKeystoreStateRD>
+
+export type RemoveAccountHandler = () => Promise<number>
 
 export type KeystoreService = {
   keystore$: KeystoreState$
   addKeystoreAccount: (params: AddKeystoreParams) => Promise<void>
-  removeKeystoreAccount: () => Promise<void>
+  removeKeystoreAccount: RemoveAccountHandler
   loadKeystore$: () => LoadKeystoreLD
-  importKeystore$: (params: ImportKeystoreParams) => ImportKeystoreLD
+  importKeystore: (params: ImportKeystoreParams) => Promise<void>
   exportKeystore: () => Promise<void>
   unlock: (password: string) => Promise<void>
   lock: FP.Lazy<void>
@@ -73,6 +75,8 @@ export type KeystoreService = {
   reloadKeystoreAccounts: FP.Lazy<void>
   keystoreAccounts$: KeystoreAccountsLD
   keystoreAccountsUI$: KeystoreAccountsUI$
+  importingKeystoreState$: ImportingKeystoreStateLD
+  resetImportingKeystoreState: FP.Lazy<void>
 }
 
 export type WalletAddressAsync = { address: RD.RemoteData<Error, WalletAddress>; type: WalletType }

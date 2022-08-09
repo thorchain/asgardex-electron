@@ -189,6 +189,7 @@ type WalletMessageKey =
   | 'wallet.txs.history'
   | 'wallet.empty.phrase.import'
   | 'wallet.empty.phrase.create'
+  | 'wallet.add.another'
   | 'wallet.create.title'
   | 'wallet.create.creating'
   | 'wallet.create.error'

@@ -1,5 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react'
 
+import * as RD from '@devexperts/remote-data-ts'
+import { useObservableState } from 'observable-hooks'
 import { useIntl } from 'react-intl'
 import { useLocation, useMatch, useNavigate } from 'react-router-dom'
 
@@ -9,8 +11,8 @@ import { ImportKeystore } from '../../../components/wallet/keystore'
 import { ImportPhrase } from '../../../components/wallet/phrase/'
 import { useWalletContext } from '../../../contexts/WalletContext'
 import { useKeystoreClientStates } from '../../../hooks/useKeystoreClientStates'
-import { useKeystoreRedirectAfterImport } from '../../../hooks/useKeystoreRedirectAfterImport'
 import * as walletRoutes from '../../../routes/wallet'
+import { generateKeystoreId } from '../../../services/wallet/util'
 import * as Styled from './ImportsView.styles'
 
 enum TabKey {
@@ -24,12 +26,27 @@ export const ImportsView: React.FC = (): JSX.Element => {
   const location = useLocation()
 
   const { keystoreService } = useWalletContext()
-  const { importKeystore$, loadKeystore$, addKeystoreAccount } = keystoreService
+  const { importKeystore, loadKeystore$, addKeystoreAccount, importingKeystoreState$, resetImportingKeystoreState } =
+    keystoreService
   const { clientStates } = useKeystoreClientStates()
-  // redirect to wallet assets view  whenever keystore have been imported and ALL clients are initialized
-  useKeystoreRedirectAfterImport()
 
-  const walletId = useMemo(() => new Date().getTime(), [])
+  const importingKeystoreState = useObservableState(importingKeystoreState$, RD.initial)
+
+  // Reset `ImportingKeystoreState` by entering the view
+  useEffect(() => {
+    resetImportingKeystoreState()
+  }, [resetImportingKeystoreState])
+
+  // Redirect after successfull import
+  useEffect(() => {
+    if (RD.isSuccess(importingKeystoreState)) {
+      resetImportingKeystoreState()
+      // redirect to wallets assets view
+      navigate(walletRoutes.assets.path())
+    }
+  }, [navigate, importingKeystoreState, resetImportingKeystoreState])
+
+  const walletId = useMemo(() => generateKeystoreId(), [])
 
   const [activeTab, setActiveTab] = useState(TabKey.KEYSTORE)
 
@@ -46,7 +63,8 @@ export const ImportsView: React.FC = (): JSX.Element => {
           <ImportKeystore
             walletId={walletId}
             loadKeystore$={loadKeystore$}
-            importKeystore$={importKeystore$}
+            importKeystore={importKeystore}
+            importingKeystoreState={importingKeystoreState}
             clientStates={clientStates}
           />
         )
@@ -61,7 +79,7 @@ export const ImportsView: React.FC = (): JSX.Element => {
         content: <ImportPhrase walletId={walletId} clientStates={clientStates} addKeystore={addKeystoreAccount} />
       }
     ],
-    [addKeystoreAccount, clientStates, navigate, importKeystore$, intl, loadKeystore$, walletId]
+    [intl, walletId, loadKeystore$, importKeystore, importingKeystoreState, clientStates, addKeystoreAccount, navigate]
   )
   const matchKeystorePath = useMatch({ path: walletRoutes.imports.keystore.path(), end: false })
   const matchPhrasePath = useMatch({ path: walletRoutes.imports.phrase.path(), end: false })

@@ -23,6 +23,7 @@ import * as FP from 'fp-ts/function'
 import * as A from 'fp-ts/lib/Array'
 import * as O from 'fp-ts/lib/Option'
 import { FormattedMessage, useIntl } from 'react-intl'
+import { useNavigate } from 'react-router-dom'
 
 import { Network } from '../../../shared/api/types'
 import { getDerivationPath as getEthDerivationPath } from '../../../shared/ethereum/ledger'
@@ -48,11 +49,20 @@ import {
 } from '../../helpers/chainHelper'
 import { emptyString } from '../../helpers/stringHelper'
 import { isEnabledWallet } from '../../helpers/walletHelper'
-import { KeystoreState, ValidatePasswordHandler, WalletAccounts, WalletAddressAsync } from '../../services/wallet/types'
+import * as appRoutes from '../../routes/app'
+import * as walletRoutes from '../../routes/wallet'
+import {
+  KeystoreAccountsUI,
+  KeystoreState,
+  RemoveAccountHandler,
+  ValidatePasswordHandler,
+  WalletAccounts,
+  WalletAddressAsync
+} from '../../services/wallet/types'
 import { getPhrase, getWalletName, walletTypeToI18n } from '../../services/wallet/util'
 import { AttentionIcon } from '../icons'
 import * as StyledR from '../shared/form/Radio.styles'
-import { BorderButton, TextButton } from '../uielements/button'
+import { BorderButton, FlatButton, TextButton } from '../uielements/button'
 import { InfoIcon } from '../uielements/info'
 import { Modal } from '../uielements/modal'
 import * as CStyled from './Common.styles'
@@ -62,12 +72,13 @@ type Props = {
   network: Network
   walletAccounts: O.Option<WalletAccounts>
   lockWallet: FP.Lazy<void>
-  removeKeystore: FP.Lazy<void>
+  removeKeystore: RemoveAccountHandler
   exportKeystore: () => Promise<void>
   addLedgerAddress: (chain: Chain, walletIndex: number) => void
   verifyLedgerAddress: (chain: Chain, walletIndex: number) => Promise<boolean>
   removeLedgerAddress: (chain: Chain) => void
   keystore: KeystoreState
+  keystoreAccounts: KeystoreAccountsUI
   clickAddressLinkHandler: (chain: Chain, address: Address) => void
   validatePassword$: ValidatePasswordHandler
   collapsed: boolean
@@ -89,6 +100,7 @@ export const WalletSettings: React.FC<Props> = (props): JSX.Element => {
     verifyLedgerAddress,
     removeLedgerAddress,
     keystore,
+    keystoreAccounts,
     clickAddressLinkHandler,
     validatePassword$,
     collapsed,
@@ -97,6 +109,7 @@ export const WalletSettings: React.FC<Props> = (props): JSX.Element => {
   } = props
 
   const intl = useIntl()
+  const navigate = useNavigate()
 
   const phrase = useMemo(
     () =>
@@ -124,9 +137,16 @@ export const WalletSettings: React.FC<Props> = (props): JSX.Element => {
   const [showQRModal, setShowQRModal] = useState<O.Option<{ asset: Asset; address: Address }>>(O.none)
   const closeQrModal = useCallback(() => setShowQRModal(O.none), [setShowQRModal])
 
-  const removeWallet = useCallback(() => {
-    removeKeystore()
-  }, [removeKeystore])
+  const removeWalletHandler = useCallback(async () => {
+    const noAccounts = await removeKeystore()
+    if (noAccounts >= 1) {
+      // goto unlock screen to unlock another account
+      navigate(walletRoutes.locked.path())
+    } else {
+      // no accounts -> go to homepage
+      navigate(appRoutes.base.template)
+    }
+  }, [removeKeystore, navigate])
 
   const onSuccessPassword = useCallback(() => {
     setShowPasswordModal(false)
@@ -441,7 +461,7 @@ export const WalletSettings: React.FC<Props> = (props): JSX.Element => {
       <CStyled.Collapse
         expandIcon={({ isActive }) => <CStyled.ExpandIcon rotate={isActive ? 90 : 0} />}
         activeKey={collapsed ? '0' : '1'}
-        expandIconPosition="right"
+        expandIconPosition="end"
         onChange={toggleCollapse}
         ghost>
         <Collapse.Panel
@@ -466,7 +486,7 @@ export const WalletSettings: React.FC<Props> = (props): JSX.Element => {
           <RemoveWalletConfirmationModal
             visible={showRemoveWalletModal}
             onClose={() => setShowRemoveWalletModal(false)}
-            onSuccess={removeWallet}
+            onSuccess={() => removeWalletHandler()}
             walletName={walletName}
           />
           {renderQRCodeModal}
@@ -510,6 +530,18 @@ export const WalletSettings: React.FC<Props> = (props): JSX.Element => {
                   {intl.formatMessage({ id: 'wallet.remove.label' })}
                 </BorderButton>
               </div>
+            </div>
+            <div className="flex flex-col items-center md:flex-row">
+              <div className="flex w-full justify-center md:w-1/2">
+                <FlatButton
+                  className="m-10px min-w-[200px] md:m-20px"
+                  size="normal"
+                  color="primary"
+                  onClick={() => navigate(walletRoutes.noWallet.path())}>
+                  {intl.formatMessage({ id: 'wallet.add.another' })}
+                </FlatButton>
+              </div>
+              <div className="flex w-full justify-center md:w-1/2">accounts: {JSON.stringify(keystoreAccounts)}</div>
             </div>
           </div>
           <div key={'accounts'} className="w-full">

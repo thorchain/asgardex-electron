@@ -6,16 +6,16 @@ import { useWalletContext } from '../contexts/WalletContext'
 import { KeystoreAccountsRD, KeystoreAccountsUI } from '../services/wallet/types'
 
 export const useKeystoreAccounts = (): {
-  keystoreAccounts: KeystoreAccountsRD
-  reloadKeystoreAccounts: FP.Lazy<void>
-  keystoreAccountsUI: KeystoreAccountsUI
+  accounts: KeystoreAccountsRD
+  reload: FP.Lazy<void>
+  accountsUI: KeystoreAccountsUI
 } => {
   const {
-    keystoreService: { reloadKeystoreAccounts, keystoreAccounts$, keystoreAccountsUI$ }
+    keystoreService: { reloadKeystoreAccounts: reload, keystoreAccounts$, keystoreAccountsUI$ }
   } = useWalletContext()
 
-  const keystoreAccounts = useObservableState(keystoreAccounts$, RD.initial)
-  const keystoreAccountsUI = useObservableState(keystoreAccountsUI$, [])
+  const accounts = useObservableState(keystoreAccounts$, RD.initial)
+  const accountsUI = useObservableState(keystoreAccountsUI$, [])
 
-  return { keystoreAccounts, keystoreAccountsUI, reloadKeystoreAccounts }
+  return { accounts, accountsUI, reload }
 }

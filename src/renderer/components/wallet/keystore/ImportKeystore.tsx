@@ -14,7 +14,7 @@ import '../../uielements/input/overrides.css'
 import { defaultWalletName } from '../../../../shared/utils/wallet'
 import { KeystoreClientStates } from '../../../hooks/useKeystoreClientStates'
 import { useSubscriptionState } from '../../../hooks/useSubscriptionState'
-import { ImportKeystoreLD, ImportKeystoreParams, LoadKeystoreLD } from '../../../services/wallet/types'
+import { ImportingKeystoreStateRD, ImportKeystoreParams, LoadKeystoreLD } from '../../../services/wallet/types'
 import { InnerForm } from '../../shared/form/Form.styles'
 import { Spin } from '../../shared/loading'
 import { Button } from '../../uielements/button'
@@ -24,12 +24,13 @@ import { Label } from '../../uielements/label'
 export type Props = {
   walletId: number
   clientStates: KeystoreClientStates
-  importKeystore$: (params: ImportKeystoreParams) => ImportKeystoreLD
+  importKeystore: (params: ImportKeystoreParams) => Promise<void>
   loadKeystore$: () => LoadKeystoreLD
+  importingKeystoreState: ImportingKeystoreStateRD
 }
 
 export const ImportKeystore: React.FC<Props> = (props): JSX.Element => {
-  const { importKeystore$, loadKeystore$, clientStates, walletId } = props
+  const { importKeystore, importingKeystoreState, loadKeystore$, clientStates, walletId } = props
 
   const [form] = Form.useForm()
 
@@ -39,24 +40,17 @@ export const ImportKeystore: React.FC<Props> = (props): JSX.Element => {
     RD.RemoteData<Error, Keystore>
   >(RD.initial)
 
-  const { state: importKeystoreState, subscribe: subscribeImportKeystoreState } = useSubscriptionState<
-    RD.RemoteData<Error, void>
-  >(RD.initial)
-
   const submitForm = useCallback(
-    ({ password, name }: Store) => {
+    async ({ password, name }: Store) => {
       // TODO (@veado) Validate `loadKeystoreState` - if it's initial - show info to load keystore
       FP.pipe(
         loadKeystoreState,
-        RD.map((keystore) => {
-          subscribeImportKeystoreState(
-            importKeystore$({ keystore, password, id: walletId, name: name || defaultWalletName(walletId) })
-          )
-          return true
+        RD.map(async (keystore) => {
+          await importKeystore({ keystore, password, id: walletId, name: name || defaultWalletName(walletId) })
         })
       )
     },
-    [importKeystore$, loadKeystoreState, subscribeImportKeystoreState, walletId]
+    [importKeystore, loadKeystoreState, walletId]
   )
 
   const uploadKeystore = () => {
@@ -72,7 +66,7 @@ export const ImportKeystore: React.FC<Props> = (props): JSX.Element => {
   const renderImportError = useMemo(
     () =>
       FP.pipe(
-        importKeystoreState,
+        importingKeystoreState,
         RD.fold(
           () => <></>,
           () => <></>,
@@ -80,7 +74,7 @@ export const ImportKeystore: React.FC<Props> = (props): JSX.Element => {
           () => <></>
         )
       ),
-    [importKeystoreState, intl]
+    [importingKeystoreState, intl]
   )
 
   const renderLoadError = useMemo(
@@ -116,7 +110,7 @@ export const ImportKeystore: React.FC<Props> = (props): JSX.Element => {
       <InnerForm className="w-full p-30px pt-15px" labelCol={{ span: 24 }} form={form} onFinish={submitForm}>
         {renderClientError}
         <Spin
-          spinning={RD.isPending(importKeystoreState) || RD.isPending(loadKeystoreState)}
+          spinning={RD.isPending(importingKeystoreState) || RD.isPending(loadKeystoreState)}
           tip={intl.formatMessage({ id: 'common.loading' })}>
           <div className="flex flex-col items-center">
             {/* title */}
@@ -154,7 +148,7 @@ export const ImportKeystore: React.FC<Props> = (props): JSX.Element => {
               type="primary"
               htmlType="submit"
               round="true"
-              disabled={!RD.isSuccess(loadKeystoreState) || RD.isPending(importKeystoreState)}>
+              disabled={!RD.isSuccess(loadKeystoreState) || RD.isPending(importingKeystoreState)}>
               {intl.formatMessage({ id: 'wallet.action.import' })}
             </Button>
           </div>
