@@ -39,3 +39,10 @@ body {
 [ant-click-animating-without-extra-node='true']::after {
   display: none !important;
 }
+
+@layer components {
+  /* similar to antds `Card`  */
+  .card {
+    @apply rounded-[5px] border border-solid border-gray0 bg-bg0 p-[24px] dark:border-gray0d dark:bg-bg0d;
+  }
+}
