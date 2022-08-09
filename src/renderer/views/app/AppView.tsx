@@ -16,9 +16,9 @@ import { Header } from '../../components/header'
 import { Button } from '../../components/uielements/button'
 import { useI18nContext } from '../../contexts/I18nContext'
 import { useMidgardContext } from '../../contexts/MidgardContext'
-import { useWalletContext } from '../../contexts/WalletContext'
 import { unionChains } from '../../helpers/fp/array'
 import { rdAltOnPending } from '../../helpers/fpHelpers'
+import { useKeystoreAccounts } from '../../hooks/useKeystoreAccounts'
 import { useMimirHalt } from '../../hooks/useMimirHalt'
 import { useTheme } from '../../hooks/useTheme'
 import { DEFAULT_MIMIR_HALT } from '../../services/thorchain/const'
@@ -72,11 +72,7 @@ export const AppView: React.FC = (): JSX.Element => {
   const prevHaltedChains = useRef<Chain[]>([])
   const prevMimirHalt = useRef<MimirHalt>(DEFAULT_MIMIR_HALT)
 
-  const {
-    keystoreService: { reloadKeystoreAccounts, keystoreAccounts$ }
-  } = useWalletContext()
-
-  const keystoreAccounts = useObservableState(keystoreAccounts$, RD.initial)
+  const { keystoreAccounts, reloadKeystoreAccounts } = useKeystoreAccounts()
 
   const { mimirHaltRD } = useMimirHalt()
 
