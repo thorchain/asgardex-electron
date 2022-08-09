@@ -170,7 +170,6 @@ export const UnlockForm: React.FC<Props> = (props): JSX.Element => {
           {renderUnlockError}
           <div className="flex w-full flex-col justify-between sm:flex-row">
             <BorderButton
-              type="button"
               className="mb-20px w-full min-w-[200px] sm:mb-0 sm:w-auto sm:max-w-[200px]"
               size="normal"
               color="error"

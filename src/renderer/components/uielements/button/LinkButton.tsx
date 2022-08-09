@@ -1,14 +1,14 @@
 import React from 'react'
 
-import { BaseButton, BaseButtonProps } from './BaseButton'
 import type { Color, Size } from './Button.types'
+import { TextButton, Props as TextButtonProps } from './TextButton'
 
-export type Props = BaseButtonProps & {
-  color?: Color
+export type Props = TextButtonProps & {
+  size?: Size
 }
 
 export const LinkButton: React.FC<Props> = (props): JSX.Element => {
-  const { size = 'normal', color = 'primary', disabled = false, className = '', children, ...otherProps } = props
+  const { color = 'primary', size = 'normal', disabled = false, className = '', children, ...otherProps } = props
 
   const decorationColor: Record<Color, string> = {
     primary: 'decoration-turquoise',
@@ -27,14 +27,8 @@ export const LinkButton: React.FC<Props> = (props): JSX.Element => {
     large: 'decoration-3'
   }
 
-  const textColor: Record<Color, string> = {
-    primary: 'text-turquoise',
-    warning: 'text-warning0',
-    error: 'text-error0'
-  }
-
   return (
-    <BaseButton
+    <TextButton
       size={size}
       color={color}
       disabled={disabled}
@@ -42,7 +36,6 @@ export const LinkButton: React.FC<Props> = (props): JSX.Element => {
         underline
         decoration-solid
           ${thickness[size]}
-          ${textColor[color]}
           ${decorationOffset[size]}
           ${decorationColor[color]}
           ${!disabled && 'hover:text-opacity-80'}
@@ -51,6 +44,6 @@ export const LinkButton: React.FC<Props> = (props): JSX.Element => {
         `}
       {...otherProps}>
       {children}
-    </BaseButton>
+    </TextButton>
   )
 }

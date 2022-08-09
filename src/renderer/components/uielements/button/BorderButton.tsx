@@ -49,7 +49,7 @@ export const BorderButton: React.FC<Props> = (props): JSX.Element => {
       className={`
       rounded-full
       ${borderSize[size]}
-      bg-white
+      bg-bg0 dark:bg-bg0d
         ${textColor[color]}
         ${borderColor[color]}
         ${transparent && 'bg-tranparent'}

@@ -9,7 +9,15 @@ export type BaseButtonProps = React.ButtonHTMLAttributes<HTMLButtonElement> & {
 }
 
 export const BaseButton: React.FC<BaseButtonProps> = (props): JSX.Element => {
-  const { size = 'normal', loading = false, className = '', disabled = false, children, ...restProps } = props
+  const {
+    size = 'normal',
+    loading = false,
+    className = '',
+    disabled = false,
+    type = 'button',
+    children,
+    ...restProps
+  } = props
 
   const sizeClasses: Record<Size, string> = {
     small: 'px-4 py-1 text-11',
@@ -31,11 +39,13 @@ export const BaseButton: React.FC<BaseButtonProps> = (props): JSX.Element => {
 
   return (
     <button
+      disabled={disabled}
+      type={type}
       className={`
       group
-      ${loading && 'flex items-center justify-center'}
-      appearance-none
+      flex appearance-none items-center
         ${disabled && 'opacity-70'}
+      justify-center
         ${disabled && 'cursor-not-allowed'}
         font-main
         uppercase

@@ -15,30 +15,6 @@ import {
 } from '../uielements/common/Common.styles'
 import { Input as InputUI } from '../uielements/input'
 import { Label as UILabel } from '../uielements/label'
-import * as CS from './Common.styles'
-
-export const Container = styled.div`
-  margin-top: 40px;
-  padding: 10px 40px;
-  background-color: ${palette('background', 0)};
-`
-
-export const TitleWrapper = styled.div`
-  display: flex;
-  align-items: center;
-  min-height: 70px;
-`
-
-export const InputConainer = styled.div`
-  margin-top: 30px;
-  display: flex;
-  justify-content: center;
-
-  ${media.md`
-  justify-content: start;
-  margin-left: 10px;
-  `}
-`
 
 export const Input = styled(InputUI)`
   border-color: ${palette('gray', 1)};
@@ -73,26 +49,6 @@ export const Subtitle = styled(UILabel)`
 
 export const WalletCol = styled(A.Col)`
   width: 100%;
-`
-
-export const CardContainer = styled.div`
-  width: 100%;
-  padding: 10px 0 0 0;
-`
-
-export const Card = styled(CS.Card)`
-  margin-bottom: 40px;
-`
-
-export const OptionCard = styled(A.Card)`
-  .ant-card-body {
-    padding: 12px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    background-color: ${palette('background', 1)};
-    width: 100%;
-  }
 `
 
 export const OptionLabel = styled(UILabel)`
@@ -147,14 +103,9 @@ export const ListItem = styled(A.List.Item)`
   }
 `
 
-export const AccountTitleWrapper = styled.div`
-  display: flex;
-  align-items: center;
-`
-
 export const AccountTitle = styled(UILabel)`
   padding: 0px;
-  padding-left: 15px;
+  padding-left: 10px;
   text-transform: uppercase;
   font-weight: normal;
   font-size: 27px;
@@ -162,24 +113,7 @@ export const AccountTitle = styled(UILabel)`
   letter-spacing: 2px;
 `
 
-export const AccountContent = styled.div`
-  width: 100%;
-  overflow: hidden;
-  margin: 0 40px;
-`
-
-export const AddressContainer = styled.div`
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-`
 const ICON_SIZE = 16
-
-export const AddressWrapper = styled.div`
-  display: flex;
-  align-items: center;
-  width: 100%;
-`
 
 export const AddressEllipsis = styled(AddressEllipsisUI)`
   font-size: 16px;
@@ -261,39 +195,6 @@ export const RemoveLedgerIcon = styled(RemoveIcon)`
   height: ${ICON_SIZE}px;
 `
 
-export const AddLedgerWrapper = styled.div`
-  display: flex;
-  flex-direction: column;
-  width: 100%;
-
-  ${media.md`
-  flex-direction: row;
-  width: auto;
-  `}
-`
-
-export const AddLedgerContainer = styled.div`
-  display: flex;
-  align-items: center;
-  margin-right: 30px;
-
-  ${media.md`
-  margin-right: 0;
-  `}
-`
-
-export const EthDerivationModeContainer = styled.div`
-  display: flex;
-  align-items: center;
-  padding-left: 0;
-  padding-top: 10px;
-
-  ${media.md`
-  padding-top: 0;
-  padding-left: 30px;
-  `}
-`
-
 export const EthDerivationModeRadioGroup = styled(StyledR.Radio.Group)`
   display: flex;
   align-items: center;
@@ -304,12 +205,6 @@ export const EthDerivationModeRadioLabel = styled(StyledR.RadioLabel)`
   align-items: center;
 `
 
-export const IndexLabel = styled('div')`
-  color: ${palette('text', 2)};
-  text-transform: uppercase;
-  font-size: 12px;
-`
-
 export const WalletIndexInput = styled(A.InputNumber)`
   color: ${palette('text', 2)};
   background-color: ${palette('background', 1)};
@@ -318,32 +213,9 @@ export const WalletIndexInput = styled(A.InputNumber)`
   max-width: 45px;
 `
 
-export const AddressToVerifyLabel = styled.span`
-  display: block;
-  color: inherit;
-  font-family: 'MainFontBold';
-  font-size: 16px;
-  text-transform: none;
-`
-
-export const AccountAddressWrapper = styled.div`
-  margin-top: 10px;
-  width: 100%;
-`
-
 export const WalletTypeLabel = styled(WalletTypeLabelUI)`
   margin-left: 40px;
   display: inline-block;
-`
-
-export const NotSupportedWrapper = styled('div')`
-  display: flex;
-  align-items: center;
-  margin-left: 40px;
-  padding-top: 5px;
-  color: ${palette('text', 2)};
-  text-transform: uppercase;
-  font-size: 12px;
 `
 
 export const Icon = styled(AIcon)`
@@ -355,16 +227,6 @@ export const Icon = styled(AIcon)`
     stroke: ${palette('warning', 0)};
     fill: none;
   }
-`
-
-export const UnlockWalletButtonContainer = styled.div`
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  min-height: 300px;
-  border: 1px solid ${palette('gray', 0)};
-  background-color: ${palette('background', 1)};
-  margin: 10px 0 20px 0;
 `
 
 export const UnlockWalletButton = styled(UIButton).attrs({
