@@ -183,7 +183,7 @@ export const AppSettings: React.FC<Props> = (props): JSX.Element => {
       <CStyled.Collapse
         expandIcon={({ isActive }) => <CStyled.ExpandIcon rotate={isActive ? 90 : 0} />}
         activeKey={collapsed ? '0' : '1'}
-        expandIconPosition="right"
+        expandIconPosition="end"
         onChange={toggleCollapse}
         ghost>
         <Collapse.Panel
