@@ -138,7 +138,6 @@ export const WalletSettings: React.FC<Props> = (props): JSX.Element => {
   const closeQrModal = useCallback(() => setShowQRModal(O.none), [setShowQRModal])
 
   const removeWalletHandler = useCallback(async () => {
-    console.log('removeWalletHandler')
     const noAccounts = await removeKeystore()
     if (noAccounts >= 1) {
       // goto unlock screen to unlock another account
