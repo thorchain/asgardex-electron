@@ -495,7 +495,7 @@ export const WalletSettings: React.FC<Props> = (props): JSX.Element => {
           <div className="card my-20px w-full ">
             {/* TODO(@veado) Make wallet name editable */}
             <p className="pt-20px text-center font-main text-18 uppercase text-text0 dark:text-text0d">{walletName}</p>
-            <div className="flex flex-col items-center p-20px md:flex-row">
+            <div className="flex flex-col items-center md:flex-row">
               <div className="flex w-full justify-center md:w-1/2">
                 <TextButton
                   className="m-0 min-w-[200px] md:m-20px"
