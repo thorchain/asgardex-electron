@@ -54,8 +54,8 @@ import { useKeystoreWallets } from '../../hooks/useKeystoreWallets'
 import { useLedger } from '../../hooks/useLedger'
 import { useNetwork } from '../../hooks/useNetwork'
 import * as walletRoutes from '../../routes/wallet'
-import { WalletAddressAsync } from '../../services/wallet/types'
-import { isLocked, hasImportedKeystore, ledgerErrorIdToI18n } from '../../services/wallet/util'
+import { isKeystoreUnlocked, WalletAddressAsync } from '../../services/wallet/types'
+import { ledgerErrorIdToI18n } from '../../services/wallet/util'
 import { walletAccount$ } from './WalletSettingsView.helper'
 
 export const WalletSettingsView: React.FC = (): JSX.Element => {
@@ -63,13 +63,13 @@ export const WalletSettingsView: React.FC = (): JSX.Element => {
   const navigate = useNavigate()
   const location = useLocation()
 
+  const { walletsUI } = useKeystoreWallets()
+
   const {
     keystoreService: { exportKeystore, validatePassword$ }
   } = useWalletContext()
 
-  const { walletsUI } = useKeystoreWallets()
-
-  const { state: keystore, lock, remove } = useKeystoreState()
+  const { state: keystore, lock, remove, change } = useKeystoreState()
 
   const { network } = useNetwork()
 
@@ -395,37 +395,46 @@ export const WalletSettingsView: React.FC = (): JSX.Element => {
   ])
   const walletAccounts = useObservableState(walletAccounts$, O.none)
 
-  const noAccess = useMemo(() => isLocked(keystore) || !hasImportedKeystore(keystore), [keystore])
-
   const unlockWalletHandler = useCallback(() => {
     navigate(walletRoutes.base.path(location.pathname))
   }, [])
 
-  return noAccess ? (
-    <UnlockWalletSettings
-      keystore={keystore}
-      unlockHandler={unlockWalletHandler}
-      collapsed={collapsed}
-      toggleCollapse={toggleCollapse}
-    />
-  ) : (
-    <WalletSettings
-      network={network}
-      lockWallet={lock}
-      removeKeystore={remove}
-      exportKeystore={exportKeystore}
-      addLedgerAddress={addLedgerAddressHandler}
-      verifyLedgerAddress={verifyLedgerAddressHandler}
-      removeLedgerAddress={removeLedgerAddressHandler}
-      keystore={keystore}
-      keystoreWallets={walletsUI}
-      walletAccounts={walletAccounts}
-      clickAddressLinkHandler={clickAddressLinkHandler}
-      validatePassword$={validatePassword$}
-      collapsed={collapsed}
-      toggleCollapse={toggleCollapse}
-      ethDerivationMode={ethDerivationMode}
-      updateEthDerivationMode={updateEthDerivationMode}
-    />
+  return FP.pipe(
+    keystore,
+    // Unlocked state only
+    O.chain(FP.flow(O.fromPredicate(isKeystoreUnlocked))),
+    O.fold(
+      // Keystore is not unlocked / not imported
+      () => (
+        <UnlockWalletSettings
+          keystore={keystore}
+          unlockHandler={unlockWalletHandler}
+          collapsed={collapsed}
+          toggleCollapse={toggleCollapse}
+        />
+      ),
+      // Keystore is unlocked
+      (keystore) => (
+        <WalletSettings
+          network={network}
+          lockWallet={lock}
+          removeKeystore={remove}
+          changeKeystore={change}
+          exportKeystore={exportKeystore}
+          addLedgerAddress={addLedgerAddressHandler}
+          verifyLedgerAddress={verifyLedgerAddressHandler}
+          removeLedgerAddress={removeLedgerAddressHandler}
+          keystore={keystore}
+          wallets={walletsUI}
+          walletAccounts={walletAccounts}
+          clickAddressLinkHandler={clickAddressLinkHandler}
+          validatePassword$={validatePassword$}
+          collapsed={collapsed}
+          toggleCollapse={toggleCollapse}
+          ethDerivationMode={ethDerivationMode}
+          updateEthDerivationMode={updateEthDerivationMode}
+        />
+      )
+    )
   )
 }

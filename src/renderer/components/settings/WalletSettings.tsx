@@ -2,6 +2,7 @@ import React, { useCallback, useMemo, useState } from 'react'
 
 import { SearchOutlined } from '@ant-design/icons'
 import * as RD from '@devexperts/remote-data-ts'
+import { Listbox } from '@headlessui/react'
 import { Address } from '@xchainjs/xchain-client'
 import {
   Asset,
@@ -53,13 +54,14 @@ import * as appRoutes from '../../routes/app'
 import * as walletRoutes from '../../routes/wallet'
 import {
   KeystoreWalletsUI,
-  KeystoreState,
   RemoveKeystoreWalletHandler,
   ValidatePasswordHandler,
   WalletAccounts,
-  WalletAddressAsync
+  WalletAddressAsync,
+  KeystoreUnlocked,
+  ChangeKeystoreWalletHandler
 } from '../../services/wallet/types'
-import { getPhrase, getWalletName, walletTypeToI18n } from '../../services/wallet/util'
+import { walletTypeToI18n } from '../../services/wallet/util'
 import { AttentionIcon } from '../icons'
 import * as StyledR from '../shared/form/Radio.styles'
 import { BorderButton, FlatButton, TextButton } from '../uielements/button'
@@ -73,12 +75,13 @@ type Props = {
   walletAccounts: O.Option<WalletAccounts>
   lockWallet: FP.Lazy<void>
   removeKeystore: RemoveKeystoreWalletHandler
+  changeKeystore: ChangeKeystoreWalletHandler
   exportKeystore: () => Promise<void>
   addLedgerAddress: (chain: Chain, walletIndex: number) => void
   verifyLedgerAddress: (chain: Chain, walletIndex: number) => Promise<boolean>
   removeLedgerAddress: (chain: Chain) => void
-  keystore: KeystoreState
-  keystoreWallets: KeystoreWalletsUI
+  keystore: KeystoreUnlocked
+  wallets: KeystoreWalletsUI
   clickAddressLinkHandler: (chain: Chain, address: Address) => void
   validatePassword$: ValidatePasswordHandler
   collapsed: boolean
@@ -95,12 +98,13 @@ export const WalletSettings: React.FC<Props> = (props): JSX.Element => {
     walletAccounts: oWalletAccounts,
     lockWallet,
     removeKeystore,
+    changeKeystore,
     exportKeystore,
     addLedgerAddress,
     verifyLedgerAddress,
     removeLedgerAddress,
-    keystore,
-    keystoreWallets,
+    keystore: { phrase, name: walletName, id: walletId },
+    wallets,
     clickAddressLinkHandler,
     validatePassword$,
     collapsed,
@@ -110,26 +114,6 @@ export const WalletSettings: React.FC<Props> = (props): JSX.Element => {
 
   const intl = useIntl()
   const navigate = useNavigate()
-
-  const phrase = useMemo(
-    () =>
-      FP.pipe(
-        keystore,
-        getPhrase,
-        O.getOrElse(() => '')
-      ),
-    [keystore]
-  )
-
-  const walletName = useMemo(
-    () =>
-      FP.pipe(
-        keystore,
-        getWalletName,
-        O.getOrElse(() => 'unknown wallet')
-      ),
-    [keystore]
-  )
 
   const [showPhraseModal, setShowPhraseModal] = useState(false)
   const [showPasswordModal, setShowPasswordModal] = useState(false)
@@ -541,7 +525,40 @@ export const WalletSettings: React.FC<Props> = (props): JSX.Element => {
                   {intl.formatMessage({ id: 'wallet.add.another' })}
                 </FlatButton>
               </div>
-              <div className="flex w-full justify-center md:w-1/2">accounts: {JSON.stringify(keystoreWallets)}</div>
+              <div className="flex w-full justify-center md:w-1/2">
+                <Listbox
+                  value={{ id: walletId, name: walletName }}
+                  onChange={({ id }) => {
+                    console.log('on change listbox', id)
+                    changeKeystore(id)
+                  }}>
+                  <div className="relative mt-1">
+                    <Listbox.Button
+                      className="
+                    min-w-[200px]
+                    font-main text-14 text-text0 dark:text-text0d">
+                      {walletName}
+                    </Listbox.Button>
+                    <Listbox.Options className="absolute z-[2000] mt-1 max-h-60 w-full overflow-auto rounded-md bg-white py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm">
+                      {FP.pipe(
+                        wallets,
+                        A.map((wallet) => (
+                          <Listbox.Option
+                            className={({ active }) =>
+                              `relative cursor-default select-none py-2 pl-10 pr-4 ${
+                                active ? 'bg-amber-100 text-amber-900' : 'text-gray-900'
+                              }`
+                            }
+                            key={wallet.id}
+                            value={wallet}>
+                            name: {wallet.name} {wallet.selected && 'X'}
+                          </Listbox.Option>
+                        ))
+                      )}
+                    </Listbox.Options>
+                  </div>
+                </Listbox>
+              </div>
             </div>
           </div>
           <div key={'accounts'} className="w-full">

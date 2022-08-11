@@ -228,14 +228,3 @@ export const Icon = styled(AIcon)`
     fill: none;
   }
 `
-
-export const UnlockWalletButton = styled(UIButton).attrs({
-  type: 'primary',
-  round: 'true',
-  sizevalue: 'xnormal',
-  color: 'success'
-})`
-  min-width: 200px !important;
-  padding: 0 30px;
-  margin: 30px 0;
-`

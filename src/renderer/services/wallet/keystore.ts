@@ -9,6 +9,7 @@ import * as Rx from 'rxjs'
 import * as RxOp from 'rxjs/operators'
 
 import { ipcKeystoreWalletsIO, KeystoreWallets } from '../../../shared/api/io'
+import { KeystoreId } from '../../../shared/api/types'
 import { isError } from '../../../shared/utils/guard'
 import { liveData } from '../../helpers/rx/liveData'
 import { observableState, triggerStream } from '../../helpers/stateHelper'
@@ -118,6 +119,35 @@ export const removeKeystoreWallet = async () => {
 
   // return no. of wallets
   return wallets.length
+}
+
+const changeKeystoreWallet = async (keystoreId: KeystoreId) => {
+  const wallets = getKeystoreWallets()
+  // Update selected state for `wallets`
+
+  const selectedWallet = FP.pipe(
+    wallets,
+    A.findFirst(({ id }) => id === keystoreId),
+    O.toNullable
+  )
+
+  if (!selectedWallet) {
+    throw Error(`Could not find a wallet in wallet list with id ${keystoreId}`)
+  }
+
+  const { id, name } = selectedWallet
+
+  const updatedWallets = FP.pipe(
+    getKeystoreWallets(),
+    A.map((wallet) => ({ ...wallet, selected: id === wallet.id }))
+  )
+  const encodedWallets = ipcKeystoreWalletsIO.encode(updatedWallets)
+  // Save updated `wallets` to disk
+  await window.apiKeystore.saveKeystoreWallets(encodedWallets)
+  // Update states
+  setKeystoreWallets(updatedWallets)
+  // set selected wallet
+  setKeystoreState(O.some({ id, name }))
 }
 
 const importKeystore = async ({ keystore, password, name, id }: ImportKeystoreParams): Promise<void> => {
@@ -271,6 +301,7 @@ export const keystoreService: KeystoreService = {
   keystore$: getKeystoreState$,
   addKeystoreWallet,
   removeKeystoreWallet,
+  changeKeystoreWallet,
   importKeystore,
   exportKeystore,
   loadKeystore$,
