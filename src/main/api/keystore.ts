@@ -6,7 +6,7 @@ import * as FP from 'fp-ts/lib/function'
 import * as TE from 'fp-ts/lib/TaskEither'
 import * as fs from 'fs-extra'
 
-import { KeystoreAccounts, ipcKeystoreAccountsIO, keystoreIO } from '../../shared/api/io'
+import { KeystoreWallets, ipcKeystoreWalletsIO, keystoreIO } from '../../shared/api/io'
 import { ApiKeystore, IPCExportKeystoreParams } from '../../shared/api/types'
 import { mapIOErrors } from '../../shared/utils/fp'
 import { defaultWalletName } from '../../shared/utils/wallet'
@@ -17,7 +17,7 @@ import { STORAGE_DIR } from './const'
 export const LEGACY_KEYSTORE_ID = 1
 const LEGACY_KEYSTORE_FILE = path.join(STORAGE_DIR, `keystore.json`)
 
-const ACCOUNTS_STORAGE_FILE = path.join(STORAGE_DIR, `accounts.json`)
+const WALLETS_STORAGE_FILE = path.join(STORAGE_DIR, `wallets.json`)
 
 /**
  * Exports existing keystore to let an user save it anywhere
@@ -46,7 +46,7 @@ export const loadKeystore = async () => {
   }
 }
 
-const migrateLegacyAccount = (): TE.TaskEither<Error, KeystoreAccounts> =>
+const migrateLegacyWallet = (): TE.TaskEither<Error, KeystoreWallets> =>
   FP.pipe(
     exists(LEGACY_KEYSTORE_FILE),
     // Switch to error if file does not exists
@@ -58,7 +58,7 @@ const migrateLegacyAccount = (): TE.TaskEither<Error, KeystoreAccounts> =>
     TE.chain(() => readJSON(LEGACY_KEYSTORE_FILE)),
     // decode keystore content
     TE.chain(FP.flow(keystoreIO.decode, E.mapLeft(mapIOErrors), TE.fromEither)),
-    // create legacy account
+    // create legacy wallet
     TE.map((keystore) => [
       {
         id: LEGACY_KEYSTORE_ID,
@@ -67,74 +67,74 @@ const migrateLegacyAccount = (): TE.TaskEither<Error, KeystoreAccounts> =>
         keystore
       }
     ]),
-    TE.chain((accounts) =>
+    TE.chain((wallets) =>
       FP.pipe(
         // rename keystore file to backup it
         renameFile(LEGACY_KEYSTORE_FILE, path.join(STORAGE_DIR, `keystore-legacy-${new Date().getTime()}.json`)),
-        // return accounts in case of successfull backup
-        TE.map(() => accounts)
+        // return wallets in case of successfull backup
+        TE.map(() => wallets)
       )
     )
   )
 
-const loadAccounts: TE.TaskEither<Error, KeystoreAccounts> = FP.pipe(
+const loadWallets: TE.TaskEither<Error, KeystoreWallets> = FP.pipe(
   TE.tryCatch(
     async () => {
-      const exists = await fs.pathExists(ACCOUNTS_STORAGE_FILE)
-      // empty list of accounts if `accounts.json` does not exist
-      return exists ? fs.readJSON(ACCOUNTS_STORAGE_FILE) : []
+      const exists = await fs.pathExists(WALLETS_STORAGE_FILE)
+      // empty list of wallets if `wallets.json` does not exist
+      return exists ? fs.readJSON(WALLETS_STORAGE_FILE) : []
     },
     (e: unknown) => Error(`${e}`)
   ),
-  TE.chain(FP.flow(ipcKeystoreAccountsIO.decode, E.mapLeft(mapIOErrors), TE.fromEither))
+  TE.chain(FP.flow(ipcKeystoreWalletsIO.decode, E.mapLeft(mapIOErrors), TE.fromEither))
 )
 
 /**
- * Saves keystore accounts
- * It returns a list of accounts
+ * Saves keystore wallets
+ * It returns a list of wallets
  */
-export const saveKeystoreAccounts = (accounts: KeystoreAccounts): TE.TaskEither<Error, KeystoreAccounts> =>
-  // 1. encode accounts
-  FP.pipe(accounts, ipcKeystoreAccountsIO.encode, (accountsEncoded) =>
+export const saveKeystoreWallets = (wallets: KeystoreWallets): TE.TaskEither<Error, KeystoreWallets> =>
+  // 1. encode wallets
+  FP.pipe(wallets, ipcKeystoreWalletsIO.encode, (walletsEncoded) =>
     FP.pipe(
-      // 2. save accounts to disk
-      writeJSON(`${ACCOUNTS_STORAGE_FILE}`, accountsEncoded),
-      // return accounts
-      TE.map((_) => accounts)
+      // 2. save wallets to disk
+      writeJSON(`${WALLETS_STORAGE_FILE}`, walletsEncoded),
+      // return wallets
+      TE.map((_) => wallets)
     )
   )
 
 /**
- * Initializes keystore accounts to migrate legacy keystore.json (if needed)
+ * Initializes keystore wallets to migrate legacy keystore.json (if needed)
  *
  * It does the following:
- * 1. Load accounts (if available)
- * 2. Merge legacy keystore (if available and if no accounts)
- * 3. Save updated accounts to disk
+ * 1. Load wallets (if available)
+ * 2. Merge legacy keystore (if available and if no wallets)
+ * 3. Save updated wallets to disk
  */
-export const initKeystoreAccounts: TE.TaskEither<Error, KeystoreAccounts> = FP.pipe(
-  loadAccounts,
-  TE.chain((accounts) => {
-    // If we have already stored accounts,
+export const initKeystoreWallets: TE.TaskEither<Error, KeystoreWallets> = FP.pipe(
+  loadWallets,
+  TE.chain((wallets) => {
+    // If we have already stored wallets,
     // another migration is not needed anymore.
-    if (accounts.length) return TE.right(accounts)
+    if (wallets.length) return TE.right(wallets)
 
-    // In other case (no previous migration | no accounts)
-    // Try to migrate legacy account and save accounts
+    // In other case (no previous migration | no wallets)
+    // Try to migrate legacy wallet and save wallets
     return FP.pipe(
-      migrateLegacyAccount(),
+      migrateLegacyWallet(),
       // Ignore any legacy keystore errors, but return empty list
-      TE.alt(() => TE.right<Error, KeystoreAccounts>([])),
-      // save accounts to disk
-      TE.chain(saveKeystoreAccounts)
+      TE.alt(() => TE.right<Error, KeystoreWallets>([])),
+      // save wallets to disk
+      TE.chain(saveKeystoreWallets)
     )
   })
 )
 
 export const apiKeystore: ApiKeystore = {
-  // Note: `params` need to be encoded by `ipcKeystoreAccountsIO` before calling `saveKeystoreAccounts` */
-  saveKeystoreAccounts: (params: unknown) => ipcRenderer.invoke(IPCMessages.SAVE_KEYSTORE_ACCOUNTS, params),
+  // Note: `params` need to be encoded by `ipcKeystoreWalletsIO` before calling `saveKeystoreWallets` */
+  saveKeystoreWallets: (params: unknown) => ipcRenderer.invoke(IPCMessages.SAVE_KEYSTORE_WALLETS, params),
   exportKeystore: (params: IPCExportKeystoreParams) => ipcRenderer.invoke(IPCMessages.EXPORT_KEYSTORE, params),
   load: () => ipcRenderer.invoke(IPCMessages.LOAD_KEYSTORE),
-  initKeystoreAccounts: () => ipcRenderer.invoke(IPCMessages.INIT_KEYSTORE_ACCOUNTS)
+  initKeystoreWallets: () => ipcRenderer.invoke(IPCMessages.INIT_KEYSTORE_WALLETS)
 }

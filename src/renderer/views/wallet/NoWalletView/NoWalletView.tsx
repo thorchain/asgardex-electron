@@ -13,7 +13,7 @@ export const NoWalletView = () => {
   const intl = useIntl()
 
   return (
-    <div className="flex h-full w-full flex-col bg-bg1 dark:bg-bg1d md:h-full md:flex-row ">
+    <div className="mt-50px flex h-full w-full flex-col bg-bg1 dark:bg-bg1d md:h-full md:flex-row ">
       <div
         className="
         group

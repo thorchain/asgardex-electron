@@ -11,7 +11,7 @@ import { getUrlSearchParam } from '../../../helpers/url.helper'
 import * as appRoutes from '../../../routes/app'
 import { ReferrerState } from '../../../routes/types'
 import * as walletRoutes from '../../../routes/wallet'
-import { KeystoreState, RemoveAccountHandler } from '../../../services/wallet/types'
+import { KeystoreState, RemoveKeystoreWalletHandler } from '../../../services/wallet/types'
 import { isLocked, getWalletName } from '../../../services/wallet/util'
 import { RemoveWalletConfirmationModal } from '../../modal/confirmation/RemoveWalletConfirmationModal'
 import { BackLink } from '../../uielements/backLink'
@@ -25,7 +25,7 @@ type FormData = {
 export type Props = {
   keystore: KeystoreState
   unlock: (password: string) => Promise<void>
-  removeKeystore: RemoveAccountHandler
+  removeKeystore: RemoveKeystoreWalletHandler
 }
 
 export const UnlockForm: React.FC<Props> = (props): JSX.Element => {

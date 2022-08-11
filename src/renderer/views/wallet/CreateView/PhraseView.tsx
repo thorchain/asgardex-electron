@@ -26,7 +26,7 @@ const NewPhraseConfirmView: React.FC = (): JSX.Element => {
   return (
     <NewPhraseConfirm
       mnemonic={phrase}
-      onConfirm={() => keystoreService.addKeystoreAccount({ phrase, password, id, name })}
+      onConfirm={() => keystoreService.addKeystoreWallet({ phrase, password, id, name })}
     />
   )
 }

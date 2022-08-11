@@ -8,7 +8,7 @@ import { NonEmptyArray } from 'fp-ts/lib/NonEmptyArray'
 import * as O from 'fp-ts/lib/Option'
 import * as Rx from 'rxjs'
 
-import { KeystoreAccount, KeystoreAccounts } from '../../../shared/api/io'
+import { KeystoreWallet, KeystoreWallets } from '../../../shared/api/io'
 import { KeystoreId, LedgerError, Network } from '../../../shared/api/types'
 import { WalletAddress, WalletBalanceType, WalletType } from '../../../shared/wallet/types'
 import { LiveData } from '../../helpers/rx/liveData'
@@ -56,12 +56,12 @@ export type LoadKeystoreLD = LiveData<Error, Keystore>
 export type ImportingKeystoreStateRD = RD.RemoteData<Error, boolean>
 export type ImportingKeystoreStateLD = Rx.Observable<ImportingKeystoreStateRD>
 
-export type RemoveAccountHandler = () => Promise<number>
+export type RemoveKeystoreWalletHandler = () => Promise<number>
 
 export type KeystoreService = {
   keystore$: KeystoreState$
-  addKeystoreAccount: (params: AddKeystoreParams) => Promise<void>
-  removeKeystoreAccount: RemoveAccountHandler
+  addKeystoreWallet: (params: AddKeystoreParams) => Promise<void>
+  removeKeystoreWallet: RemoveKeystoreWalletHandler
   loadKeystore$: () => LoadKeystoreLD
   importKeystore: (params: ImportKeystoreParams) => Promise<void>
   exportKeystore: () => Promise<void>
@@ -72,9 +72,9 @@ export type KeystoreService = {
    * No need to store any success data. Only status
    */
   validatePassword$: ValidatePasswordHandler
-  reloadKeystoreAccounts: FP.Lazy<void>
-  keystoreAccounts$: KeystoreAccountsLD
-  keystoreAccountsUI$: KeystoreAccountsUI$
+  reloadKeystoreWallets: FP.Lazy<void>
+  keystoreWallets$: KeystoreWalletsLD
+  keystoreWalletsUI$: KeystoreWalletsUI$
   importingKeystoreState$: ImportingKeystoreStateLD
   resetImportingKeystoreState: FP.Lazy<void>
 }
@@ -212,9 +212,9 @@ export type LedgerAddressMap$ = Rx.Observable<LedgerAddressMap>
 export type LedgerAddressesMap = Record<Chain, LedgerAddressMap>
 export type LedgerAddressesMap$ = Rx.Observable<LedgerAddressesMap>
 
-export type KeystoreAccountsRD = RD.RemoteData<Error, KeystoreAccounts>
-export type KeystoreAccountsLD = LiveData<Error, KeystoreAccounts>
+export type KeystoreWalletsRD = RD.RemoteData<Error, KeystoreWallets>
+export type KeystoreWalletsLD = LiveData<Error, KeystoreWallets>
 
-export type KeystoreAccountUI = Omit<KeystoreAccount, 'keystore'>
-export type KeystoreAccountsUI = KeystoreAccountUI[]
-export type KeystoreAccountsUI$ = Rx.Observable<KeystoreAccountsUI>
+export type KeystoreWalletUI = Omit<KeystoreWallet, 'keystore'>
+export type KeystoreWalletsUI = KeystoreWalletUI[]
+export type KeystoreWalletsUI$ = Rx.Observable<KeystoreWalletsUI>

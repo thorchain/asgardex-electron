@@ -190,14 +190,7 @@ export const keystoreIO = new t.Type(
   t.identity
 )
 
-/**
- * `Keystore` type
- * As same as `Keystore
- * @see https://github.com/xchainjs/xchainjs-lib/blob/master/packages/xchain-crypto/src/crypto.ts#L17-L39
- */
-// export type Keystore = ReturnType<typeof keystoreIO.encode>
-
-export const ipcKeystoreAccountIO = t.type({
+export const ipcKeystoreWalletIO = t.type({
   id: t.number,
   name: t.string,
   selected: t.boolean,
@@ -205,13 +198,13 @@ export const ipcKeystoreAccountIO = t.type({
 })
 
 /**
- * Keystore Account
+ * Keystore Wallet
  * Created by users by importing or creating keystores in `Wallet` section
  */
-export type KeystoreAccount = ReturnType<typeof ipcKeystoreAccountIO.encode>
+export type KeystoreWallet = ReturnType<typeof ipcKeystoreWalletIO.encode>
 
-export const ipcKeystoreAccountsIO = t.array(ipcKeystoreAccountIO)
+export const ipcKeystoreWalletsIO = t.array(ipcKeystoreWalletIO)
 
-export type IPCKeystoreAccounts = t.TypeOf<typeof ipcKeystoreAccountsIO>
+export type IPCKeystoreWallets = t.TypeOf<typeof ipcKeystoreWalletsIO>
 
-export type KeystoreAccounts = ReturnType<typeof ipcKeystoreAccountsIO.encode>
+export type KeystoreWallets = ReturnType<typeof ipcKeystoreWalletsIO.encode>

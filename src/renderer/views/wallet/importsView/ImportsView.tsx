@@ -26,7 +26,7 @@ export const ImportsView: React.FC = (): JSX.Element => {
   const location = useLocation()
 
   const { keystoreService } = useWalletContext()
-  const { importKeystore, loadKeystore$, addKeystoreAccount, importingKeystoreState$, resetImportingKeystoreState } =
+  const { importKeystore, loadKeystore$, addKeystoreWallet, importingKeystoreState$, resetImportingKeystoreState } =
     keystoreService
   const { clientStates } = useKeystoreClientStates()
 
@@ -76,10 +76,10 @@ export const ImportsView: React.FC = (): JSX.Element => {
             {intl.formatMessage({ id: 'common.phrase' })}
           </span>
         ),
-        content: <ImportPhrase walletId={walletId} clientStates={clientStates} addKeystore={addKeystoreAccount} />
+        content: <ImportPhrase walletId={walletId} clientStates={clientStates} addKeystore={addKeystoreWallet} />
       }
     ],
-    [intl, walletId, loadKeystore$, importKeystore, importingKeystoreState, clientStates, addKeystoreAccount, navigate]
+    [intl, walletId, loadKeystore$, importKeystore, importingKeystoreState, clientStates, addKeystoreWallet, navigate]
   )
   const matchKeystorePath = useMatch({ path: walletRoutes.imports.keystore.path(), end: false })
   const matchPhrasePath = useMatch({ path: walletRoutes.imports.phrase.path(), end: false })
