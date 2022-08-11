@@ -8,7 +8,7 @@ import * as Ord from 'fp-ts/Ord'
 import * as S from 'fp-ts/string'
 import { IntlShape } from 'react-intl'
 
-import { KeystoreAccounts, KeystoreAccount } from '../../../shared/api/io'
+import { KeystoreWallets, KeystoreWallet } from '../../../shared/api/io'
 import { KeystoreId, LedgerErrorId } from '../../../shared/api/types'
 import { WalletType } from '../../../shared/wallet/types'
 import { eqAsset } from '../../helpers/fp/eq'
@@ -50,44 +50,44 @@ export const getWalletName = (state: KeystoreState): O.Option<string> =>
 export const getLockedData = (state: KeystoreState): O.Option<KeystoreLocked> =>
   FP.pipe(sequenceSOption({ id: getKeystoreId(state), name: getWalletName(state) }))
 
-export const getSelectedKeystoreId = (accounts: KeystoreAccounts): O.Option<number> =>
+export const getSelectedKeystoreId = (wallets: KeystoreWallets): O.Option<number> =>
   FP.pipe(
-    accounts,
+    wallets,
     A.filterMap(({ selected, id }) => (selected ? O.some(id) : O.none)),
     A.head
   )
 
 /**
- * Returns initial keystore state by given accouns
+ * Returns initial keystore state by given wallets
  *
  * Initial `Keystore` is always set to `KeystoreLocked`
  */
 export const getInitialKeystoreData = (
-  accounts: Array<Pick<KeystoreAccount, 'id' | 'name' | 'selected'>>
+  wallets: Array<Pick<KeystoreWallet, 'id' | 'name' | 'selected'>>
 ): O.Option<KeystoreLocked> =>
   FP.pipe(
-    accounts,
-    // get selected account (if available)
+    wallets,
+    // get selected wallet (if available)
     A.filterMap(O.fromPredicate(({ selected }) => selected)),
     A.head,
-    // if no selected account, use first account in list (if available)
-    O.alt(() => (accounts.length ? O.some(accounts[0]) : O.none)),
-    // get needed data from account
+    // if no selected wallet, use first wallet in list (if available)
+    O.alt(() => (wallets.length ? O.some(wallets[0]) : O.none)),
+    // get needed data from wallet
     O.map(({ id, name }) => ({ id, name }))
   )
 
-export const getKeystore: (id: KeystoreId) => (accounts: KeystoreAccounts) => O.Option<Keystore> = (id) => (accounts) =>
+export const getKeystore: (id: KeystoreId) => (wallets: KeystoreWallets) => O.Option<Keystore> = (id) => (wallets) =>
   FP.pipe(
-    accounts,
-    A.filterMap(({ keystore, id: accountId }) => (accountId === id ? O.some(keystore) : O.none)),
+    wallets,
+    A.filterMap(({ keystore, id: walletId }) => (walletId === id ? O.some(keystore) : O.none)),
     A.head
   )
 
-export const getKeystoreWalletName: (id: KeystoreId) => (accounts: KeystoreAccounts) => O.Option<string> =
-  (id) => (accounts) =>
+export const getKeystoreWalletName: (id: KeystoreId) => (wallets: KeystoreWallets) => O.Option<string> =
+  (id) => (wallets) =>
     FP.pipe(
-      accounts,
-      A.filterMap(({ name, id: accountId }) => (accountId === id ? O.some(name) : O.none)),
+      wallets,
+      A.filterMap(({ name, id: walletId }) => (walletId === id ? O.some(name) : O.none)),
       A.head
     )
 

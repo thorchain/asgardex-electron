@@ -10,7 +10,7 @@ import * as E from 'fp-ts/lib/Either'
 import * as FP from 'fp-ts/lib/function'
 
 import {
-  ipcKeystoreAccountsIO,
+  ipcKeystoreWalletsIO,
   ipcLedgerApproveERC20TokenParamsIO,
   ipcLedgerDepositTxParamsIO,
   ipcLedgerSendTxParamsIO
@@ -20,7 +20,7 @@ import { DEFAULT_STORAGES } from '../shared/const'
 import type { Locale } from '../shared/i18n/types'
 import { registerAppCheckUpdatedHandler } from './api/appUpdate'
 import { getFileStoreService } from './api/fileStore'
-import { exportKeystore, initKeystoreAccounts, loadKeystore, saveKeystoreAccounts } from './api/keystore'
+import { exportKeystore, initKeystoreWallets, loadKeystore, saveKeystoreWallets } from './api/keystore'
 import {
   getAddress as getLedgerAddress,
   sendTx as sendLedgerTx,
@@ -140,19 +140,19 @@ const initIPC = () => {
   // Lang
   ipcMain.on(IPCMessages.UPDATE_LANG, (_, locale: Locale) => langChangeHandler(locale))
   // Keystore
-  ipcMain.handle(IPCMessages.SAVE_KEYSTORE_ACCOUNTS, async (_, params: unknown) => {
+  ipcMain.handle(IPCMessages.SAVE_KEYSTORE_WALLETS, async (_, params: unknown) => {
     return FP.pipe(
       // params need to be decoded
-      ipcKeystoreAccountsIO.decode(params),
+      ipcKeystoreWalletsIO.decode(params),
       E.fold(
         (e) => Promise.reject(e),
-        (accounts) => saveKeystoreAccounts(accounts)()
+        (wallets) => saveKeystoreWallets(wallets)()
       )
     )
   })
   ipcMain.handle(IPCMessages.EXPORT_KEYSTORE, async (_, params: IPCExportKeystoreParams) => exportKeystore(params))
   ipcMain.handle(IPCMessages.LOAD_KEYSTORE, async () => loadKeystore())
-  ipcMain.handle(IPCMessages.INIT_KEYSTORE_ACCOUNTS, async () => initKeystoreAccounts())
+  ipcMain.handle(IPCMessages.INIT_KEYSTORE_WALLETS, async () => initKeystoreWallets())
   // Ledger
   ipcMain.handle(IPCMessages.GET_LEDGER_ADDRESS, async (_, params: IPCLedgerAdddressParams) => getLedgerAddress(params))
   ipcMain.handle(IPCMessages.VERIFY_LEDGER_ADDRESS, async (_, params: IPCLedgerAdddressParams) =>

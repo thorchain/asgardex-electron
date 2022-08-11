@@ -52,9 +52,9 @@ import { isEnabledWallet } from '../../helpers/walletHelper'
 import * as appRoutes from '../../routes/app'
 import * as walletRoutes from '../../routes/wallet'
 import {
-  KeystoreAccountsUI,
+  KeystoreWalletsUI,
   KeystoreState,
-  RemoveAccountHandler,
+  RemoveKeystoreWalletHandler,
   ValidatePasswordHandler,
   WalletAccounts,
   WalletAddressAsync
@@ -72,13 +72,13 @@ type Props = {
   network: Network
   walletAccounts: O.Option<WalletAccounts>
   lockWallet: FP.Lazy<void>
-  removeKeystore: RemoveAccountHandler
+  removeKeystore: RemoveKeystoreWalletHandler
   exportKeystore: () => Promise<void>
   addLedgerAddress: (chain: Chain, walletIndex: number) => void
   verifyLedgerAddress: (chain: Chain, walletIndex: number) => Promise<boolean>
   removeLedgerAddress: (chain: Chain) => void
   keystore: KeystoreState
-  keystoreAccounts: KeystoreAccountsUI
+  keystoreWallets: KeystoreWalletsUI
   clickAddressLinkHandler: (chain: Chain, address: Address) => void
   validatePassword$: ValidatePasswordHandler
   collapsed: boolean
@@ -100,7 +100,7 @@ export const WalletSettings: React.FC<Props> = (props): JSX.Element => {
     verifyLedgerAddress,
     removeLedgerAddress,
     keystore,
-    keystoreAccounts,
+    keystoreWallets,
     clickAddressLinkHandler,
     validatePassword$,
     collapsed,
@@ -138,12 +138,12 @@ export const WalletSettings: React.FC<Props> = (props): JSX.Element => {
   const closeQrModal = useCallback(() => setShowQRModal(O.none), [setShowQRModal])
 
   const removeWalletHandler = useCallback(async () => {
-    const noAccounts = await removeKeystore()
-    if (noAccounts >= 1) {
-      // goto unlock screen to unlock another account
+    const noWallets = await removeKeystore()
+    if (noWallets >= 1) {
+      // goto unlock screen to unlock another wallet
       navigate(walletRoutes.locked.path())
     } else {
-      // no accounts -> go to homepage
+      // no wallet -> go to homepage
       navigate(appRoutes.base.template)
     }
   }, [removeKeystore, navigate])
@@ -541,7 +541,7 @@ export const WalletSettings: React.FC<Props> = (props): JSX.Element => {
                   {intl.formatMessage({ id: 'wallet.add.another' })}
                 </FlatButton>
               </div>
-              <div className="flex w-full justify-center md:w-1/2">accounts: {JSON.stringify(keystoreAccounts)}</div>
+              <div className="flex w-full justify-center md:w-1/2">accounts: {JSON.stringify(keystoreWallets)}</div>
             </div>
           </div>
           <div key={'accounts'} className="w-full">

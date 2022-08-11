@@ -18,7 +18,7 @@ import { useI18nContext } from '../../contexts/I18nContext'
 import { useMidgardContext } from '../../contexts/MidgardContext'
 import { unionChains } from '../../helpers/fp/array'
 import { rdAltOnPending } from '../../helpers/fpHelpers'
-import { useKeystoreAccounts } from '../../hooks/useKeystoreAccounts'
+import { useKeystoreWallets } from '../../hooks/useKeystoreWallets'
 import { useMimirHalt } from '../../hooks/useMimirHalt'
 import { useTheme } from '../../hooks/useTheme'
 import { DEFAULT_MIMIR_HALT } from '../../services/thorchain/const'
@@ -72,7 +72,7 @@ export const AppView: React.FC = (): JSX.Element => {
   const prevHaltedChains = useRef<Chain[]>([])
   const prevMimirHalt = useRef<MimirHalt>(DEFAULT_MIMIR_HALT)
 
-  const { accounts: keystoreAccounts, reload: reloadKeystoreAccounts } = useKeystoreAccounts()
+  const { wallets: keystoreWallets, reload: reloadKeystoreWallets } = useKeystoreWallets()
 
   const { mimirHaltRD } = useMimirHalt()
 
@@ -271,21 +271,21 @@ export const AppView: React.FC = (): JSX.Element => {
       <div>
         <div>
           {' '}
-          keystoreAccounts:
+          keystoreWallets:
           {FP.pipe(
-            keystoreAccounts,
+            keystoreWallets,
             RD.fold(
               () => <>init</>,
               () => <>loading</>,
               (e) => <>error {e.toString()}</>,
-              (accounts) => <>accounts {JSON.stringify(accounts)}</>
+              (wallets) => <>wallets {JSON.stringify(wallets)}</>
             )
           )}
         </div>
-        <button onClick={reloadKeystoreAccounts}>reloadKeystoreAccounts</button>
+        <button onClick={reloadKeystoreWallets}>reloadKeystoreWallets</button>
       </div>
     )
-  }, [keystoreAccounts, reloadKeystoreAccounts])
+  }, [keystoreWallets, reloadKeystoreWallets])
 
   return (
     <Styled.AppWrapper>

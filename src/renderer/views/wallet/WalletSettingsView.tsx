@@ -49,8 +49,8 @@ import {
 } from '../../helpers/chainHelper'
 import { sequenceTOptionFromArray } from '../../helpers/fpHelpers'
 import { useCollapsedSetting } from '../../hooks/useCollapsedSetting'
-import { useKeystoreAccounts } from '../../hooks/useKeystoreAccounts'
 import { useKeystoreState } from '../../hooks/useKeystoreState'
+import { useKeystoreWallets } from '../../hooks/useKeystoreWallets'
 import { useLedger } from '../../hooks/useLedger'
 import { useNetwork } from '../../hooks/useNetwork'
 import * as walletRoutes from '../../routes/wallet'
@@ -67,7 +67,7 @@ export const WalletSettingsView: React.FC = (): JSX.Element => {
     keystoreService: { exportKeystore, validatePassword$ }
   } = useWalletContext()
 
-  const { accountsUI } = useKeystoreAccounts()
+  const { walletsUI } = useKeystoreWallets()
 
   const { state: keystore, lock, remove } = useKeystoreState()
 
@@ -418,7 +418,7 @@ export const WalletSettingsView: React.FC = (): JSX.Element => {
       verifyLedgerAddress={verifyLedgerAddressHandler}
       removeLedgerAddress={removeLedgerAddressHandler}
       keystore={keystore}
-      keystoreAccounts={accountsUI}
+      keystoreWallets={walletsUI}
       walletAccounts={walletAccounts}
       clickAddressLinkHandler={clickAddressLinkHandler}
       validatePassword$={validatePassword$}

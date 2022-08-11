@@ -101,7 +101,7 @@ describe('services/wallet/util/', () => {
   })
 
   describe('getInitialKeystoreData', () => {
-    it('finds selected account', () => {
+    it('finds selected wallet', () => {
       const result = getInitialKeystoreData([
         { id: 0, name: 'name0', selected: false },
         { id: 1, name: 'name1', selected: false },
@@ -111,7 +111,7 @@ describe('services/wallet/util/', () => {
       expect(result).toEqual(O.some({ id: 2, name: 'name2' }))
     })
 
-    it('uses first account', () => {
+    it('uses first wallet', () => {
       const result = getInitialKeystoreData([
         { id: 0, name: 'name0', selected: false },
         { id: 1, name: 'name1', selected: false },
@@ -121,7 +121,7 @@ describe('services/wallet/util/', () => {
       expect(result).toEqual(O.some({ id: 0, name: 'name0' }))
     })
 
-    it('empty list of account', () => {
+    it('empty list of wallet', () => {
       const result = getInitialKeystoreData([])
       expect(result).toBeNone()
     })
