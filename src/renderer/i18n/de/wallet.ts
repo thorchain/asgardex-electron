@@ -47,6 +47,7 @@ const wallet: WalletMessages = {
   'wallet.add.another': 'Weitere Wallet hinzufügen',
   'wallet.add.label': 'Hinzufügen',
   'wallet.change.title': 'Wallet wechseln',
+  'wallet.change.error': 'Error beim Wechseln der Wallet',
   'wallet.selected.title': 'Ausgwählte Wallet',
   'wallet.create.title': 'Erstelle eine Wallet',
   'wallet.create.enter.phrase': 'Gebe die Phrase richtig ein',

@@ -46,6 +46,7 @@ const wallet: WalletMessages = {
   'wallet.add.another': 'Add another wallet - RU',
   'wallet.add.label': 'Add - RU',
   'wallet.change.title': 'Change wallet - RU',
+  'wallet.change.error': 'Error while changing a wallet - RU',
   'wallet.selected.title': 'Selected wallet - RU',
   'wallet.create.title': 'Создать новый кошелек',
   'wallet.create.enter.phrase': 'Введите фразу правильно',

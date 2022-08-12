@@ -192,6 +192,7 @@ type WalletMessageKey =
   | 'wallet.add.another'
   | 'wallet.add.label'
   | 'wallet.change.title'
+  | 'wallet.change.error'
   | 'wallet.selected.title'
   | 'wallet.create.title'
   | 'wallet.create.creating'
