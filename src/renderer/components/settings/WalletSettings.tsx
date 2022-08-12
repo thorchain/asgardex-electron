@@ -460,12 +460,13 @@ export const WalletSettings: React.FC<Props> = (props): JSX.Element => {
         changeWalletState,
         RD.fold(
           () => <></>,
+          () => <></>,
           (error) => (
             <p className="px-5px font-main text-14 uppercase text-error0 dark:text-error0d">
-              {intl.formatMessage({ id: 'wallet.change.error' })} {error.messsage || error.toString()}
+              {intl.formatMessage({ id: 'wallet.change.error' })} {error.message || error.toString()}
             </p>
           ),
-          () => <></>,
+
           () => <></>
         )
       ),
