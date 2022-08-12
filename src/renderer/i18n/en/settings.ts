@@ -4,6 +4,7 @@ const settings: SettingMessages = {
   'setting.app.title': 'Global settings',
   'setting.wallet.title': 'Wallet settings',
   'setting.wallet.management': 'Wallet Management',
+  'setting.multiwallet.management': 'Multi wallets management',
   'setting.client': 'Client',
   'setting.accounts': 'Accounts',
   'setting.export': 'Export Keystore',

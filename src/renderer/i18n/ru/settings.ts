@@ -4,6 +4,7 @@ const settings: SettingMessages = {
   'setting.app.title': 'Глобальные настройки',
   'setting.wallet.title': 'Настройки кошелька',
   'setting.wallet.management': 'Управление Кошельком',
+  'setting.multiwallet.management': 'Multi wallets management - RU',
   'setting.client': 'Клиент',
   'setting.accounts': 'Accounts - RU',
   'setting.export': 'Экспортировать Keystore',

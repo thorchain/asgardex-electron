@@ -1,7 +1,6 @@
 import React, { useMemo, useState, useCallback, useRef } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
-import { Tab as TabUI } from '@headlessui/react'
 import { Row, Col, Grid } from 'antd'
 import * as FP from 'fp-ts/function'
 import * as A from 'fp-ts/lib/Array'
@@ -34,9 +33,9 @@ import { HeaderStats } from './stats/HeaderStats'
 import { HeaderTheme } from './theme'
 
 enum TabKey {
-  POOLS = 0,
-  WALLET = 1,
-  UNKNOWN = -1
+  POOLS = 'POOLS',
+  WALLET = 'WALLET',
+  UNKNOWN = 'UNKNOWN'
 }
 
 type Tab = {
@@ -155,13 +154,13 @@ export const HeaderComponent: React.FC<Props> = (props): JSX.Element => {
 
   const renderMainNav = useMemo(
     () => (
-      <TabUI.Group defaultIndex={-1} selectedIndex={activeKey >= 0 ? activeKey : undefined}>
-        <TabUI.List className="flex h-full flex-row">
-          {items.map(({ label, key, path, icon: Icon }) => (
-            <TabUI key={key} as={React.Fragment}>
-              {({ selected }) => (
-                <div
-                  className={`
+      <div className="flex h-full flex-row">
+        {items.map(({ label, key, path, icon: Icon }) => {
+          const selected = activeKey === key
+          return (
+            <div
+              key={key}
+              className={`
                   flex
                   h-full cursor-pointer items-center
                   justify-center border-y-[3px] border-solid border-transparent
@@ -175,17 +174,15 @@ export const HeaderComponent: React.FC<Props> = (props): JSX.Element => {
               ${selected ? 'text-turquoise' : 'text-text2 dark:text-text2d'}
             hover:text-turquoise
               `}
-                  onClick={() => navigate(path)}>
-                  <div className="flex flex-row items-center">
-                    <Icon className="pr-5px" />
-                    <span className="">{label}</span>
-                  </div>
-                </div>
-              )}
-            </TabUI>
-          ))}
-        </TabUI.List>
-      </TabUI.Group>
+              onClick={() => navigate(path)}>
+              <div className="flex flex-row items-center">
+                <Icon className="pr-5px" />
+                <span className="">{label}</span>
+              </div>
+            </div>
+          )
+        })}
+      </div>
     ),
     [activeKey, items, navigate]
   )

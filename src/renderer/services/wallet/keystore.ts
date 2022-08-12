@@ -9,6 +9,7 @@ import * as Rx from 'rxjs'
 import * as RxOp from 'rxjs/operators'
 
 import { ipcKeystoreWalletsIO, KeystoreWallets } from '../../../shared/api/io'
+import { KeystoreId } from '../../../shared/api/types'
 import { isError } from '../../../shared/utils/guard'
 import { liveData } from '../../helpers/rx/liveData'
 import { observableState, triggerStream } from '../../helpers/stateHelper'
@@ -21,7 +22,8 @@ import {
   ImportKeystoreParams,
   AddKeystoreParams,
   KeystoreWalletsLD,
-  KeystoreWalletsUI$
+  KeystoreWalletsUI$,
+  ChangeKeystoreWalletLD
 } from './types'
 import {
   getKeystore,
@@ -118,6 +120,43 @@ export const removeKeystoreWallet = async () => {
 
   // return no. of wallets
   return wallets.length
+}
+
+const changeKeystoreWallet = (keystoreId: KeystoreId): ChangeKeystoreWalletLD => {
+  const wallets = getKeystoreWallets()
+  // Get selected wallet
+  const selectedWallet = FP.pipe(
+    wallets,
+    A.findFirst(({ id }) => id === keystoreId),
+    O.toNullable
+  )
+
+  if (!selectedWallet) return Rx.of(RD.failure(Error(`Could not find a wallet in wallet list with id ${keystoreId}`)))
+
+  const { id, name } = selectedWallet
+
+  const updatedWallets = FP.pipe(
+    getKeystoreWallets(),
+    A.map((wallet) => ({ ...wallet, selected: id === wallet.id }))
+  )
+
+  return FP.pipe(
+    updatedWallets,
+    // encode wallets first
+    ipcKeystoreWalletsIO.encode,
+    // Save updated `wallets` to disk
+    (wallets) => Rx.of(window.apiKeystore.saveKeystoreWallets(wallets)),
+    RxOp.catchError((err) => Rx.of(RD.failure(err))),
+    RxOp.map(() => RD.success(true)),
+    liveData.map((_) => {
+      // Update states
+      setKeystoreWallets(updatedWallets)
+      // set selected wallet
+      setKeystoreState(O.some({ id, name }))
+      return true
+    }),
+    RxOp.startWith(RD.pending)
+  )
 }
 
 const importKeystore = async ({ keystore, password, name, id }: ImportKeystoreParams): Promise<void> => {
@@ -271,6 +310,7 @@ export const keystoreService: KeystoreService = {
   keystore$: getKeystoreState$,
   addKeystoreWallet,
   removeKeystoreWallet,
+  changeKeystoreWallet,
   importKeystore,
   exportKeystore,
   loadKeystore$,
