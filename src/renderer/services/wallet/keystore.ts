@@ -22,7 +22,8 @@ import {
   ImportKeystoreParams,
   AddKeystoreParams,
   KeystoreWalletsLD,
-  KeystoreWalletsUI$
+  KeystoreWalletsUI$,
+  ChangeKeystoreWalletLD
 } from './types'
 import {
   getKeystore,
@@ -121,19 +122,16 @@ export const removeKeystoreWallet = async () => {
   return wallets.length
 }
 
-const changeKeystoreWallet = async (keystoreId: KeystoreId) => {
+const changeKeystoreWallet = (keystoreId: KeystoreId): ChangeKeystoreWalletLD => {
   const wallets = getKeystoreWallets()
-  // Update selected state for `wallets`
-
+  // Get selected wallet
   const selectedWallet = FP.pipe(
     wallets,
     A.findFirst(({ id }) => id === keystoreId),
     O.toNullable
   )
 
-  if (!selectedWallet) {
-    throw Error(`Could not find a wallet in wallet list with id ${keystoreId}`)
-  }
+  if (!selectedWallet) return Rx.of(RD.failure(Error(`Could not find a wallet in wallet list with id ${keystoreId}`)))
 
   const { id, name } = selectedWallet
 
@@ -141,13 +139,24 @@ const changeKeystoreWallet = async (keystoreId: KeystoreId) => {
     getKeystoreWallets(),
     A.map((wallet) => ({ ...wallet, selected: id === wallet.id }))
   )
-  const encodedWallets = ipcKeystoreWalletsIO.encode(updatedWallets)
-  // Save updated `wallets` to disk
-  await window.apiKeystore.saveKeystoreWallets(encodedWallets)
-  // Update states
-  setKeystoreWallets(updatedWallets)
-  // set selected wallet
-  setKeystoreState(O.some({ id, name }))
+
+  return FP.pipe(
+    updatedWallets,
+    // encode wallets first
+    ipcKeystoreWalletsIO.encode,
+    // Save updated `wallets` to disk
+    (wallets) => Rx.of(window.apiKeystore.saveKeystoreWallets(wallets)),
+    RxOp.catchError((err) => Rx.of(RD.failure(err))),
+    RxOp.map(() => RD.success(true)),
+    liveData.map((_) => {
+      // Update states
+      setKeystoreWallets(updatedWallets)
+      // set selected wallet
+      setKeystoreState(O.some({ id, name }))
+      return true
+    }),
+    RxOp.startWith(RD.pending)
+  )
 }
 
 const importKeystore = async ({ keystore, password, name, id }: ImportKeystoreParams): Promise<void> => {

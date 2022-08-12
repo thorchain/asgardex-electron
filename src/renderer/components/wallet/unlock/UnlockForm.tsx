@@ -1,22 +1,32 @@
 import React, { useCallback, useState, useEffect, useMemo } from 'react'
 
+import * as RD from '@devexperts/remote-data-ts'
 import * as FP from 'fp-ts/function'
 import * as O from 'fp-ts/lib/Option'
 import { useForm } from 'react-hook-form'
 import { useIntl } from 'react-intl'
 import { useLocation, useNavigate, useParams } from 'react-router-dom'
 
+import { KeystoreId } from '../../../../shared/api/types'
 import { emptyString } from '../../../helpers/stringHelper'
 import { getUrlSearchParam } from '../../../helpers/url.helper'
+import { useSubscriptionState } from '../../../hooks/useSubscriptionState'
 import * as appRoutes from '../../../routes/app'
 import { ReferrerState } from '../../../routes/types'
 import * as walletRoutes from '../../../routes/wallet'
-import { KeystoreState, RemoveKeystoreWalletHandler } from '../../../services/wallet/types'
+import {
+  ChangeKeystoreWalletHandler,
+  ChangeKeystoreWalletRD,
+  KeystoreState,
+  KeystoreWalletsUI,
+  RemoveKeystoreWalletHandler
+} from '../../../services/wallet/types'
 import { isLocked, getWalletName } from '../../../services/wallet/util'
 import { RemoveWalletConfirmationModal } from '../../modal/confirmation/RemoveWalletConfirmationModal'
 import { BackLink } from '../../uielements/backLink'
 import { BorderButton, FlatButton } from '../../uielements/button'
 import { InputPasswordTW } from '../../uielements/input'
+import { WalletSelector } from '../../uielements/wallet'
 
 type FormData = {
   password: string
@@ -26,10 +36,12 @@ export type Props = {
   keystore: KeystoreState
   unlock: (password: string) => Promise<void>
   removeKeystore: RemoveKeystoreWalletHandler
+  changeKeystore$: ChangeKeystoreWalletHandler
+  wallets: KeystoreWalletsUI
 }
 
 export const UnlockForm: React.FC<Props> = (props): JSX.Element => {
-  const { keystore, unlock, removeKeystore } = props
+  const { keystore, unlock, removeKeystore, changeKeystore$, wallets } = props
 
   const [showRemoveModal, setShowRemoveModal] = useState(false)
   const navigate = useNavigate()
@@ -135,21 +147,46 @@ export const UnlockForm: React.FC<Props> = (props): JSX.Element => {
     [keystore]
   )
 
+  const { state: changeWalletState, subscribe: subscribeChangeWalletState } =
+    useSubscriptionState<ChangeKeystoreWalletRD>(RD.initial)
+
+  const changeWalletHandler = useCallback(
+    (id: KeystoreId) => {
+      subscribeChangeWalletState(changeKeystore$(id))
+      navigate(walletRoutes.locked.path())
+    },
+    [changeKeystore$, navigate, subscribeChangeWalletState]
+  )
+
+  const renderChangeWalletError = useMemo(
+    () =>
+      FP.pipe(
+        changeWalletState,
+        RD.fold(
+          () => <></>,
+          // TODO (@veado) i18n for error
+          (error) => (
+            <p className="px-5px font-main text-14 uppercase text-error0 dark:text-error0d">
+              Error while changing wallet {JSON.stringify(error)}
+            </p>
+          ),
+          () => <></>,
+          () => <></>
+        )
+      ),
+    [changeWalletState]
+  )
+
   return (
     <>
       <div className="relative flex justify-center">
-        <BackLink className="absolute, top-0, left-0" />
+        <BackLink className="absolute top-0 left-0" />
         <h1
           className="mb-30px
           inline-block
           w-full
           text-center font-mainSemiBold uppercase text-text1 dark:text-text1d">
-          {intl.formatMessage(
-            { id: 'wallet.unlock.title' },
-            {
-              name: walletName
-            }
-          )}
+          {intl.formatMessage({ id: 'wallet.unlock.label' })}
         </h1>
       </div>
       <form className="flex flex-1 flex-col" onSubmit={handleSubmit(submitForm)}>
@@ -172,6 +209,18 @@ export const UnlockForm: React.FC<Props> = (props): JSX.Element => {
               error={errors.password ? intl.formatMessage({ id: 'wallet.password.empty' }) : ''}
               disabled={unlocking}
             />
+            <div className="flex w-full flex-col items-center">
+              <h2 className="mt-30px w-full text-center font-mainSemiBold uppercase text-text1 dark:text-text1d">
+                {intl.formatMessage({ id: 'wallet.selected.title' })}
+              </h2>
+              <WalletSelector
+                wallets={wallets}
+                onChange={changeWalletHandler}
+                disabled={RD.isPending(changeWalletState)}
+                className="min-w-[100px]"
+              />
+              {renderChangeWalletError}
+            </div>
           </div>
           {renderUnlockError}
           <div className="flex w-full flex-col justify-between sm:flex-row">

@@ -18,12 +18,12 @@ export const useKeystoreState = (): {
   phrase: O.Option<Phrase>
   walletName: O.Option<string>
   remove: RemoveKeystoreWalletHandler
-  change: ChangeKeystoreWalletHandler
+  change$: ChangeKeystoreWalletHandler
   unlock: (password: string) => Promise<void>
   lock: FP.Lazy<void>
 } => {
   const {
-    keystoreService: { keystore$, unlock, lock, removeKeystoreWallet: remove, changeKeystoreWallet: change }
+    keystoreService: { keystore$, unlock, lock, removeKeystoreWallet: remove, changeKeystoreWallet: change$ }
   } = useWalletContext()
 
   const state = useObservableState(keystore$, INITIAL_KEYSTORE_STATE)
@@ -31,5 +31,5 @@ export const useKeystoreState = (): {
   const [phrase] = useObservableState(() => FP.pipe(keystore$, RxOp.map(FP.flow(getPhrase))), O.none)
   const [walletName] = useObservableState(() => FP.pipe(keystore$, RxOp.map(FP.flow(getWalletName))), O.none)
 
-  return { state, phrase, walletName, unlock, lock, remove, change }
+  return { state, phrase, walletName, unlock, lock, remove, change$ }
 }

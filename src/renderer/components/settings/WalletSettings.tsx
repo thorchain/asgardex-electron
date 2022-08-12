@@ -2,7 +2,6 @@ import React, { useCallback, useMemo, useState } from 'react'
 
 import { SearchOutlined } from '@ant-design/icons'
 import * as RD from '@devexperts/remote-data-ts'
-import { Listbox } from '@headlessui/react'
 import { Address } from '@xchainjs/xchain-client'
 import {
   Asset,
@@ -26,7 +25,7 @@ import * as O from 'fp-ts/lib/Option'
 import { FormattedMessage, useIntl } from 'react-intl'
 import { useNavigate } from 'react-router-dom'
 
-import { Network } from '../../../shared/api/types'
+import { KeystoreId, Network } from '../../../shared/api/types'
 import { getDerivationPath as getEthDerivationPath } from '../../../shared/ethereum/ledger'
 import { EthDerivationMode } from '../../../shared/ethereum/types'
 import { isError, isLedgerWallet } from '../../../shared/utils/guard'
@@ -50,6 +49,7 @@ import {
 } from '../../helpers/chainHelper'
 import { emptyString } from '../../helpers/stringHelper'
 import { isEnabledWallet } from '../../helpers/walletHelper'
+import { useSubscriptionState } from '../../hooks/useSubscriptionState'
 import * as appRoutes from '../../routes/app'
 import * as walletRoutes from '../../routes/wallet'
 import {
@@ -59,7 +59,8 @@ import {
   WalletAccounts,
   WalletAddressAsync,
   KeystoreUnlocked,
-  ChangeKeystoreWalletHandler
+  ChangeKeystoreWalletHandler,
+  ChangeKeystoreWalletRD
 } from '../../services/wallet/types'
 import { walletTypeToI18n } from '../../services/wallet/util'
 import { AttentionIcon } from '../icons'
@@ -67,6 +68,7 @@ import * as StyledR from '../shared/form/Radio.styles'
 import { BorderButton, FlatButton, TextButton } from '../uielements/button'
 import { InfoIcon } from '../uielements/info'
 import { Modal } from '../uielements/modal'
+import { WalletSelector } from '../uielements/wallet'
 import * as CStyled from './Common.styles'
 import * as Styled from './WalletSettings.styles'
 
@@ -75,7 +77,7 @@ type Props = {
   walletAccounts: O.Option<WalletAccounts>
   lockWallet: FP.Lazy<void>
   removeKeystore: RemoveKeystoreWalletHandler
-  changeKeystore: ChangeKeystoreWalletHandler
+  changeKeystore$: ChangeKeystoreWalletHandler
   exportKeystore: () => Promise<void>
   addLedgerAddress: (chain: Chain, walletIndex: number) => void
   verifyLedgerAddress: (chain: Chain, walletIndex: number) => Promise<boolean>
@@ -98,12 +100,12 @@ export const WalletSettings: React.FC<Props> = (props): JSX.Element => {
     walletAccounts: oWalletAccounts,
     lockWallet,
     removeKeystore,
-    changeKeystore,
+    changeKeystore$,
     exportKeystore,
     addLedgerAddress,
     verifyLedgerAddress,
     removeLedgerAddress,
-    keystore: { phrase, name: walletName, id: walletId },
+    keystore: { phrase, name: walletName },
     wallets,
     clickAddressLinkHandler,
     validatePassword$,
@@ -440,6 +442,37 @@ export const WalletSettings: React.FC<Props> = (props): JSX.Element => {
     [oFilteredWalletAccounts, intl, renderAddress, network]
   )
 
+  const { state: changeWalletState, subscribe: subscribeChangeWalletState } =
+    useSubscriptionState<ChangeKeystoreWalletRD>(RD.initial)
+
+  const changeWalletHandler = useCallback(
+    (id: KeystoreId) => {
+      subscribeChangeWalletState(changeKeystore$(id))
+      // Jump to `UnlockView` to avoid staying at wallet settings
+      navigate(walletRoutes.locked.path())
+    },
+    [changeKeystore$, navigate, subscribeChangeWalletState]
+  )
+
+  const renderChangeWalletError = useMemo(
+    () =>
+      FP.pipe(
+        changeWalletState,
+        RD.fold(
+          () => <></>,
+          // TODO (@veado) i18n for error
+          (error) => (
+            <p className="px-5px font-main text-14 uppercase text-error0 dark:text-error0d">
+              Error while changing wallet {JSON.stringify(error)}
+            </p>
+          ),
+          () => <></>,
+          () => <></>
+        )
+      ),
+    [changeWalletState]
+  )
+
   return (
     <div className="mt-40px bg-bg0 py-10px px-40px dark:bg-bg0d">
       <CStyled.Collapse
@@ -477,8 +510,14 @@ export const WalletSettings: React.FC<Props> = (props): JSX.Element => {
 
           {renderVerifyAddressModal(addressToVerify)}
           <div className="card my-20px w-full ">
+            <h1 className="p-20px font-main text-18 uppercase text-text0 dark:text-text0d">
+              {intl.formatMessage({ id: 'setting.wallet.management' })}
+            </h1>
+            <h2 className="w-full text-center font-main text-[12px] uppercase text-text2 dark:text-text2d">
+              {intl.formatMessage({ id: 'wallet.name' })}
+            </h2>
             {/* TODO(@veado) Make wallet name editable */}
-            <p className="pt-20px text-center font-main text-18 uppercase text-text0 dark:text-text0d">{walletName}</p>
+            <p className="text-center font-main text-18 uppercase text-text0 dark:text-text0d">{walletName}</p>
             <div className="flex flex-col items-center md:flex-row">
               <div className="flex w-full justify-center md:w-1/2">
                 <TextButton
@@ -515,49 +554,32 @@ export const WalletSettings: React.FC<Props> = (props): JSX.Element => {
                 </BorderButton>
               </div>
             </div>
-            <div className="flex flex-col items-center md:flex-row">
-              <div className="flex w-full justify-center md:w-1/2">
+          </div>
+
+          <div className="card mb-20px w-full ">
+            <h1 className="p-20px font-main text-18 uppercase text-text0 dark:text-text0d">
+              {intl.formatMessage({ id: 'setting.multiwallet.management' })}
+            </h1>
+
+            <div className="flex flex-col py-20px md:flex-row">
+              <div className="flex w-full flex-col items-center justify-center md:w-1/2">
+                <h2 className="w-full text-center font-main text-[12px] uppercase text-text2 dark:text-text2d">
+                  {intl.formatMessage({ id: 'wallet.add.another' })}
+                </h2>
                 <FlatButton
-                  className="m-10px min-w-[200px] md:m-20px"
+                  className="min-w-[200px]"
                   size="normal"
                   color="primary"
                   onClick={() => navigate(walletRoutes.noWallet.path())}>
-                  {intl.formatMessage({ id: 'wallet.add.another' })}
+                  {intl.formatMessage({ id: 'wallet.add.label' })}
                 </FlatButton>
               </div>
-              <div className="flex w-full justify-center md:w-1/2">
-                <Listbox
-                  value={{ id: walletId, name: walletName }}
-                  onChange={({ id }) => {
-                    console.log('on change listbox', id)
-                    changeKeystore(id)
-                  }}>
-                  <div className="relative mt-1">
-                    <Listbox.Button
-                      className="
-                    min-w-[200px]
-                    font-main text-14 text-text0 dark:text-text0d">
-                      {walletName}
-                    </Listbox.Button>
-                    <Listbox.Options className="absolute z-[2000] mt-1 max-h-60 w-full overflow-auto rounded-md bg-white py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm">
-                      {FP.pipe(
-                        wallets,
-                        A.map((wallet) => (
-                          <Listbox.Option
-                            className={({ active }) =>
-                              `relative cursor-default select-none py-2 pl-10 pr-4 ${
-                                active ? 'bg-amber-100 text-amber-900' : 'text-gray-900'
-                              }`
-                            }
-                            key={wallet.id}
-                            value={wallet}>
-                            name: {wallet.name} {wallet.selected && 'X'}
-                          </Listbox.Option>
-                        ))
-                      )}
-                    </Listbox.Options>
-                  </div>
-                </Listbox>
+              <div className="flex w-full flex-col items-center justify-center md:w-1/2">
+                <h2 className="w-full text-center font-main text-[12px] uppercase text-text2 dark:text-text2d">
+                  {intl.formatMessage({ id: 'wallet.change.title' })}
+                </h2>
+                <WalletSelector wallets={wallets} onChange={changeWalletHandler} className="min-w-[100px]" />
+                {renderChangeWalletError}
               </div>
             </div>
           </div>

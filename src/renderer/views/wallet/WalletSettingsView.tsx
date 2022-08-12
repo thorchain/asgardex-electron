@@ -69,7 +69,7 @@ export const WalletSettingsView: React.FC = (): JSX.Element => {
     keystoreService: { exportKeystore, validatePassword$ }
   } = useWalletContext()
 
-  const { state: keystore, lock, remove, change } = useKeystoreState()
+  const { state: keystore, lock, remove, change$ } = useKeystoreState()
 
   const { network } = useNetwork()
 
@@ -407,7 +407,6 @@ export const WalletSettingsView: React.FC = (): JSX.Element => {
       // Keystore is not unlocked / not imported
       () => (
         <UnlockWalletSettings
-          keystore={keystore}
           unlockHandler={unlockWalletHandler}
           collapsed={collapsed}
           toggleCollapse={toggleCollapse}
@@ -419,7 +418,7 @@ export const WalletSettingsView: React.FC = (): JSX.Element => {
           network={network}
           lockWallet={lock}
           removeKeystore={remove}
-          changeKeystore={change}
+          changeKeystore$={change$}
           exportKeystore={exportKeystore}
           addLedgerAddress={addLedgerAddressHandler}
           verifyLedgerAddress={verifyLedgerAddressHandler}
