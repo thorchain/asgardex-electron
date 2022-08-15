@@ -9,10 +9,10 @@ export const Default = Template.bind({})
 const meta: ComponentMeta<typeof Component> = {
   title: 'Components/ManageButton',
   argTypes: {
-    sizevalue: {
+    size: {
       control: {
         type: 'select',
-        options: ['small', 'normal', 'xnormal', 'big']
+        options: ['small', 'normal', 'large']
       }
     }
   },
@@ -20,7 +20,7 @@ const meta: ComponentMeta<typeof Component> = {
     isTextView: true,
     asset: AssetRuneNative,
     disabled: false,
-    sizevalue: 'normal'
+    size: 'normal'
   }
 }
 

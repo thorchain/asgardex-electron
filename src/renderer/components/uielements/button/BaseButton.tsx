@@ -22,14 +22,14 @@ export const BaseButton: React.FC<BaseButtonProps> = (props): JSX.Element => {
   } = props
 
   const sizeClasses: Record<Size, string> = {
-    small: 'px-4 py-1 text-11',
-    normal: 'px-5 py-2 text-14',
-    large: 'px-6 py-2 text-16'
+    small: 'px-2 py-1 text-[10px]',
+    normal: 'px-4 py-1 text-[12px]',
+    large: 'px-6 py-2 text-[16px]'
   }
 
   const iconSize: Record<Size, string> = {
     small: 'w-10px h-10px',
-    normal: 'w-[13px] h-[13px]',
+    normal: 'w-[12px] h-[12px]',
     large: 'w-[17px] h-[17px]'
   }
 

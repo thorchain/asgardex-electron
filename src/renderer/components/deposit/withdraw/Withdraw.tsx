@@ -47,6 +47,7 @@ import { AssetWithDecimal } from '../../../types/asgardex'
 import { LedgerConfirmationModal, WalletPasswordConfirmationModal } from '../../modal/confirmation'
 import { TxModal } from '../../modal/tx'
 import { DepositAssets } from '../../modal/tx/extra'
+import { FlatButton } from '../../uielements/button'
 import { TooltipAddress } from '../../uielements/common/Common.styles'
 import { Fees, UIFeesRD } from '../../uielements/fees'
 import * as Helper from './Withdraw.helper'
@@ -560,11 +561,11 @@ export const Withdraw: React.FC<Props> = ({
           </Styled.FeeErrorRow>
         </Col>
       </Styled.FeesRow>
-      <Styled.SubmitButtonWrapper>
-        <Styled.SubmitButton sizevalue="xnormal" onClick={onSubmit} disabled={disabledSubmit}>
+      <div className="flex flex-col items-center justify-center py-20px">
+        <FlatButton className="mb-30px min-w-[200px] px-20px" size="large" onClick={onSubmit} disabled={disabledSubmit}>
           {intl.formatMessage({ id: 'common.withdraw' })}
-        </Styled.SubmitButton>
-      </Styled.SubmitButtonWrapper>
+        </FlatButton>
+      </div>
       {renderPasswordConfirmationModal}
       {renderLedgerConfirmationModal}
       {renderTxModal}

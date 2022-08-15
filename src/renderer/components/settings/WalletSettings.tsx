@@ -567,7 +567,7 @@ export const WalletSettings: React.FC<Props> = (props): JSX.Element => {
                   {intl.formatMessage({ id: 'wallet.add.another' })}
                 </h2>
                 <FlatButton
-                  className="min-w-[200px]"
+                  className="mt-5px min-w-[200px]"
                   size="normal"
                   color="primary"
                   onClick={() => navigate(walletRoutes.noWallet.path())}>

@@ -18,7 +18,8 @@ const meta: ComponentMeta<typeof Component> = {
         none: null,
         text: 'Reload child text'
       }
-    }
+    },
+    onClick: { action: 'onClick' }
   },
   args: { children: 'text' }
 }

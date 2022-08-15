@@ -15,7 +15,7 @@ import { KeystoreClientStates } from '../../../hooks/useKeystoreClientStates'
 import { MAX_WALLET_NAME_CHARS } from '../../../services/wallet/const'
 import { AddKeystoreParams } from '../../../services/wallet/types'
 import { Spin } from '../../shared/loading'
-import { Button } from '../../uielements/button'
+import { FlatButton } from '../../uielements/button'
 import { InputPassword, InputTextArea, Input } from '../../uielements/input'
 import { Label } from '../../uielements/label'
 
@@ -183,15 +183,14 @@ export const ImportPhrase: React.FC<Props> = (props): JSX.Element => {
               />
             </Form.Item>
 
-            <Button
+            <FlatButton
               className="mt-50px min-w-[150px]"
-              sizevalue="xnormal"
-              type="primary"
-              htmlType="submit"
-              round="true"
+              size="large"
+              color="primary"
+              type="submit"
               disabled={!validPhrase || importing}>
               {intl.formatMessage({ id: 'wallet.action.import' })}
-            </Button>
+            </FlatButton>
           </div>
         </Spin>
       </Form>

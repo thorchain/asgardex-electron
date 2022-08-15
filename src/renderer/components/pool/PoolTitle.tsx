@@ -13,7 +13,7 @@ import { loadingString } from '../../helpers/stringHelper'
 import * as poolsRoutes from '../../routes/pools'
 import { ManageButton } from '../manageButton'
 import { AssetIcon } from '../uielements/assets/assetIcon'
-import { Button } from '../uielements/button'
+import { FlatButton } from '../uielements/button'
 import * as Styled from './PoolTitle.styles'
 
 export type Props = {
@@ -79,15 +79,13 @@ export const PoolTitle: React.FC<Props> = ({
         <ManageButton
           disabled={disableAllPoolActions || disablePoolActions}
           asset={asset}
-          sizevalue={isDesktopView ? 'normal' : 'small'}
+          size="normal"
           isTextView={isDesktopView}
         />
         {isAvailablePool && (
-          <Button
+          <FlatButton
             disabled={disableAllPoolActions || disableTradingPoolAction}
-            round="true"
-            sizevalue={isDesktopView ? 'normal' : 'small'}
-            style={{ height: 30 }}
+            size="normal"
             onClick={(event) => {
               event.preventDefault()
               event.stopPropagation()
@@ -98,9 +96,9 @@ export const PoolTitle: React.FC<Props> = ({
                 })
               )
             }}>
-            <SwapOutlined />
+            <SwapOutlined className="md:mr-[8px]" />
             {isDesktopView && intl.formatMessage({ id: 'common.swap' })}
-          </Button>
+          </FlatButton>
         )}
       </Styled.ButtonActions>
     ),
