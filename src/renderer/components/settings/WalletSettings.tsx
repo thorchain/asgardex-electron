@@ -574,11 +574,11 @@ export const WalletSettings: React.FC<Props> = (props): JSX.Element => {
                   {intl.formatMessage({ id: 'wallet.add.label' })}
                 </FlatButton>
               </div>
-              <div className="flex w-full flex-col items-center justify-center md:w-1/2">
+              <div className="mt-20px flex w-full flex-col items-center justify-center md:mt-0 md:w-1/2">
                 <h2 className="w-full text-center font-main text-[12px] uppercase text-text2 dark:text-text2d">
                   {intl.formatMessage({ id: 'wallet.change.title' })}
                 </h2>
-                <WalletSelector wallets={wallets} onChange={changeWalletHandler} className="min-w-[100px]" />
+                <WalletSelector wallets={wallets} onChange={changeWalletHandler} className="min-w-[200px]" />
                 {renderChangeWalletError}
               </div>
             </div>

@@ -20,10 +20,3 @@ export const phrase: Route<void> = {
     return this.template
   }
 }
-
-export const phraseConfirm: Route<void> = {
-  template: `${base.template}/phrase-confirm`,
-  path() {
-    return this.template
-  }
-}

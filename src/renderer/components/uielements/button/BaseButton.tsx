@@ -6,6 +6,7 @@ import type { Size } from './Button.types'
 export type BaseButtonProps = React.ButtonHTMLAttributes<HTMLButtonElement> & {
   size?: Size
   loading?: boolean
+  uppercase?: boolean
 }
 
 export const BaseButton: React.FC<BaseButtonProps> = (props): JSX.Element => {
@@ -15,6 +16,7 @@ export const BaseButton: React.FC<BaseButtonProps> = (props): JSX.Element => {
     className = '',
     disabled = false,
     type = 'button',
+    uppercase = true, // by default all texts are uppercase in ASDGX
     children,
     ...restProps
   } = props
@@ -44,11 +46,11 @@ export const BaseButton: React.FC<BaseButtonProps> = (props): JSX.Element => {
       className={`
       group
       flex appearance-none items-center
-        ${disabled && 'opacity-70'}
+        ${disabled && 'opacity-60'}
       justify-center
         ${disabled && 'cursor-not-allowed'}
         font-main
-        uppercase
+        ${uppercase && 'uppercase'}
         transition
         duration-300
         ease-in-out

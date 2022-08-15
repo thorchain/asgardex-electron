@@ -150,6 +150,7 @@ export type PoolsMessages = { [key in PoolsMessageKey]: string }
 
 type WalletMessageKey =
   | 'wallet.name'
+  | 'wallet.name.maxChars'
   | 'wallet.nav.deposits'
   | 'wallet.nav.bonds'
   | 'wallet.nav.poolshares'

@@ -22,7 +22,8 @@ export const BorderButton: React.FC<Props> = (props): JSX.Element => {
   const borderColor: Record<Color, string> = {
     primary: 'border-turquoise',
     warning: 'border-warning0',
-    error: 'border-error0'
+    error: 'border-error0',
+    neutral: 'border-text0 dark:border-text0d'
   }
 
   const borderSize: Record<Size, string> = {
@@ -34,7 +35,8 @@ export const BorderButton: React.FC<Props> = (props): JSX.Element => {
   const textColor: Record<Color, string> = {
     primary: 'text-turquoise',
     warning: 'text-warning0 dark:text-warning0d',
-    error: 'text-error0 dark:text-error0d'
+    error: 'text-error0 dark:text-error0d',
+    neutral: 'text-text0 dark:text-text0d'
   }
   const dropShadow: Record<Size, string> = {
     small: 'drop-shadow-lg',

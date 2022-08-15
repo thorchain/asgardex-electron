@@ -2,6 +2,7 @@ import { WalletMessages } from '../types'
 
 const wallet: WalletMessages = {
   'wallet.name': 'Wallet name',
+  'wallet.name.maxChars': 'Max. {max} chars',
   'wallet.nav.deposits': 'Deposits',
   'wallet.nav.bonds': 'Bonds',
   'wallet.nav.poolshares': 'Shares',
@@ -49,11 +50,11 @@ const wallet: WalletMessages = {
   'wallet.change.error': 'Error while changing a wallet',
   'wallet.selected.title': 'Selected wallet',
   'wallet.create.title': 'Create new wallet',
-  'wallet.create.enter.phrase': 'Enter phrase correctly',
-  'wallet.create.error.phrase': 'Save your phrase at a safety place and enter it in a correct way',
+  'wallet.create.enter.phrase': 'Enter your phrase in a right order',
+  'wallet.create.error.phrase': 'Wrong phrase. Please double check your phrase and re-enter it again.',
   'wallet.create.words.click': 'Click the word in correct order',
   'wallet.create.creating': 'Creating wallet',
-  'wallet.create.error': 'Error while saving a phrase',
+  'wallet.create.error': 'Error while creating a wallet',
   'wallet.receive.address.error': 'No address available to receive funds',
   'wallet.receive.address.errorQR': 'Error while rendering QR code: {error}',
   'wallet.remove.label': 'Forget wallet',

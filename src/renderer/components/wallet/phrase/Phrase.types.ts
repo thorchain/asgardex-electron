@@ -1,1 +1,1 @@
-export type PhraseInfo = { phrase: string; password: string }
+export type PhraseInfo = { phrase: string; password: string; name: string }

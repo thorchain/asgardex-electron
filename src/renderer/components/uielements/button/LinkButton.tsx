@@ -13,7 +13,8 @@ export const LinkButton: React.FC<Props> = (props): JSX.Element => {
   const decorationColor: Record<Color, string> = {
     primary: 'decoration-turquoise',
     warning: 'decoration--warning0',
-    error: 'decoration--error0'
+    error: 'decoration--error0',
+    neutral: 'decoration--text0 dark:decoration--text0d'
   }
   const decorationOffset: Record<Size, string> = {
     small: 'underline-offset-1',

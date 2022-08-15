@@ -12,8 +12,8 @@ import { useIntl } from 'react-intl'
 
 import { defaultWalletName } from '../../../../shared/utils/wallet'
 import { KeystoreClientStates } from '../../../hooks/useKeystoreClientStates'
+import { MAX_WALLET_NAME_CHARS } from '../../../services/wallet/const'
 import { AddKeystoreParams } from '../../../services/wallet/types'
-import { generateKeystoreId } from '../../../services/wallet/util'
 import { Spin } from '../../shared/loading'
 import { Button } from '../../uielements/button'
 import { InputPassword, InputTextArea, Input } from '../../uielements/input'
@@ -73,11 +73,9 @@ export const ImportPhrase: React.FC<Props> = (props): JSX.Element => {
 
   const submitForm = useCallback(
     async ({ phrase: newPhrase, password, name }: Store) => {
-      const id = generateKeystoreId()
-
       setImportError(O.none)
       setImporting(true)
-      await addKeystore({ phrase: newPhrase, name: name || defaultWalletName(walletId), id, password }).catch(
+      await addKeystore({ phrase: newPhrase, name: name || defaultWalletName(walletId), id: walletId, password }).catch(
         (error) => {
           setImporting(false)
           // TODO(@Veado): i18n
@@ -166,8 +164,23 @@ export const ImportPhrase: React.FC<Props> = (props): JSX.Element => {
             </Form.Item>
 
             {/* name */}
-            <Form.Item name="name" className="w-full !max-w-[380px]" label={intl.formatMessage({ id: 'wallet.name' })}>
-              <Input className="!text-lg" size="large" maxLength={20} placeholder={defaultWalletName(walletId)} />
+            <Form.Item
+              name="name"
+              className="w-full !max-w-[380px]"
+              label={
+                <div>
+                  {intl.formatMessage({ id: 'wallet.name' })}
+                  <span className="pl-5px text-[12px] text-gray1 dark:text-gray1d">
+                    ({intl.formatMessage({ id: 'wallet.name.maxChars' }, { max: MAX_WALLET_NAME_CHARS })})
+                  </span>
+                </div>
+              }>
+              <Input
+                className="!text-lg"
+                size="large"
+                maxLength={MAX_WALLET_NAME_CHARS}
+                placeholder={defaultWalletName(walletId)}
+              />
             </Form.Item>
 
             <Button

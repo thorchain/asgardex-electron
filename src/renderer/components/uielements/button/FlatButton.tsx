@@ -13,7 +13,15 @@ export const FlatButton: React.FC<Props> = (props): JSX.Element => {
   const bgColor: Record<Color, string> = {
     primary: 'bg-turquoise',
     warning: 'bg-warning0 dark:bg-warning0d',
-    error: 'bg-error0 dark:bg-error0d'
+    error: 'bg-error0 dark:bg-error0d',
+    neutral: 'bg-gray0 dark:bg-gray0d'
+  }
+
+  const textColor: Record<Color, string> = {
+    primary: 'text-white',
+    warning: 'text-white',
+    error: 'text-white',
+    neutral: 'text-text0 dark:text-text0d'
   }
 
   const dropShadow: Record<Size, string> = {
@@ -28,7 +36,7 @@ export const FlatButton: React.FC<Props> = (props): JSX.Element => {
       disabled={disabled}
       className={`
       rounded-full
-      text-white
+        ${textColor[color]}
         ${bgColor[color]}
         ${!disabled && `hover:${dropShadow[size]}`}
         ${!disabled && 'hover:border-opacity-85'}
