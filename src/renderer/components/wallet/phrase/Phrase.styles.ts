@@ -2,19 +2,12 @@ import * as A from 'antd'
 import styled from 'styled-components'
 import { palette } from 'styled-theme'
 
-import { Label as UILabel } from '../../uielements/label'
-
 export const Card = styled(A.Card).attrs({
   bodyStyle: { padding: '6px', minHeight: '100px' }
 })`
   border-color: ${palette('primary', 0)};
   background: transparent;
 `
-
-export const Title = styled(UILabel).attrs({
-  textTransform: 'uppercase',
-  size: 'big'
-})``
 
 const iconClassName = 'mnemonic-word__icon'
 export const IconWrapper = styled('span').attrs({ className: iconClassName })`
