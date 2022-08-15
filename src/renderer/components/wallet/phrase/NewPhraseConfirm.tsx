@@ -109,7 +109,7 @@ export const NewPhraseConfirm: React.FC<{ mnemonic: string; onConfirm: () => Pro
   const handleFormSubmit = useCallback(() => {
     const checkwords = checkPhraseConfirmWords(wordsList, sortedSelectedWords)
 
-    if (checkwords) {
+    if (checkwords && !loading) {
       setLoading(true)
       onConfirm()
         .then(() => {
@@ -127,7 +127,7 @@ export const NewPhraseConfirm: React.FC<{ mnemonic: string; onConfirm: () => Pro
     else if (wordsList.length === sortedSelectedWords.length) {
       setMnemonicError(intl.formatMessage({ id: 'wallet.create.error.phrase' }))
     }
-  }, [checkPhraseConfirmWords, onConfirm, wordsList, sortedSelectedWords, navigate, intl])
+  }, [checkPhraseConfirmWords, wordsList, sortedSelectedWords, loading, onConfirm, navigate, intl])
 
   return (
     <>
@@ -168,7 +168,13 @@ export const NewPhraseConfirm: React.FC<{ mnemonic: string; onConfirm: () => Pro
               </div>
             ))}
           </div>
-          <FlatButton className="mt-20px" size="large" color="primary" type="submit" loading={loading}>
+          <FlatButton
+            className="mt-20px"
+            size="large"
+            color="primary"
+            type="submit"
+            loading={loading}
+            disabled={loading}>
             {intl.formatMessage({ id: 'common.finish' })}
           </FlatButton>
         </div>

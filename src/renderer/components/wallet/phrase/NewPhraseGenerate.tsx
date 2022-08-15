@@ -36,7 +36,7 @@ export const NewPhraseGenerate: React.FC<Props> = ({ onSubmit, walletId }: Props
 
   const [phrase, setPhrase] = useState(generatePhrase())
 
-  const initiialWalletName = useMemo(() => defaultWalletName(walletId), [walletId])
+  const initialWalletName = useMemo(() => defaultWalletName(walletId), [walletId])
 
   const [clickRefreshButtonHandler, refreshButtonClicked$] = useObservableCallback<React.MouseEvent>((event$) =>
     // Delay clicks to give `generatePhrase` some time to process w/o rendering issues
@@ -61,14 +61,16 @@ export const NewPhraseGenerate: React.FC<Props> = ({ onSubmit, walletId }: Props
 
   const handleFormFinish = useCallback(
     ({ password, name }: FormValues) => {
-      try {
-        setLoading(true)
-        onSubmit({ phrase, password, name: name || initiialWalletName })
-      } catch (err) {
-        setLoading(false)
+      if (!loading) {
+        try {
+          setLoading(true)
+          onSubmit({ phrase, password, name: name || initialWalletName })
+        } catch (err) {
+          setLoading(false)
+        }
       }
     },
-    [initiialWalletName, onSubmit, phrase]
+    [initialWalletName, loading, onSubmit, phrase]
   )
 
   const rules: Rule[] = useMemo(
@@ -129,10 +131,16 @@ export const NewPhraseGenerate: React.FC<Props> = ({ onSubmit, walletId }: Props
               className="!text-lg"
               size="large"
               maxLength={MAX_WALLET_NAME_CHARS}
-              placeholder={initiialWalletName}
+              placeholder={initialWalletName}
             />
           </Form.Item>
-          <FlatButton className="mt-20px" size="large" color="primary" type="submit" loading={loading}>
+          <FlatButton
+            className="mt-20px"
+            size="large"
+            color="primary"
+            type="submit"
+            loading={loading}
+            disabled={loading}>
             {intl.formatMessage({ id: 'common.next' })}
           </FlatButton>
         </div>
