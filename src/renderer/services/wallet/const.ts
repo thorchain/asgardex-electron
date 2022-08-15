@@ -63,3 +63,5 @@ export const INITIAL_LEDGER_ADDRESSES_MAP: LedgerAddressesMap = {
   [Chain.Doge]: INITIAL_LEDGER_ADDRESS_MAP,
   [Chain.Terra]: INITIAL_LEDGER_ADDRESS_MAP
 }
+
+export const MAX_WALLET_NAME_CHARS = 20

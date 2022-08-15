@@ -13,7 +13,8 @@ export const TextButton: React.FC<Props> = (props): JSX.Element => {
   const textColor: Record<Color, string> = {
     primary: 'text-turquoise',
     warning: 'text-warning0',
-    error: 'text-error0'
+    error: 'text-error0',
+    neutral: 'text-text0 dark:text-text0d'
   }
 
   return (

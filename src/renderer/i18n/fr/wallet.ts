@@ -2,6 +2,7 @@ import { WalletMessages } from '../types'
 
 const wallet: WalletMessages = {
   'wallet.name': 'Wallet name - FR',
+  'wallet.name.maxChars': 'Max. {max} chars - FR',
   'wallet.nav.deposits': 'Dépots',
   'wallet.nav.bonds': 'Cautions',
   'wallet.nav.poolshares': 'Quote-part',

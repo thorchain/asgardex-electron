@@ -14,6 +14,7 @@ import '../../uielements/input/overrides.css'
 import { defaultWalletName } from '../../../../shared/utils/wallet'
 import { KeystoreClientStates } from '../../../hooks/useKeystoreClientStates'
 import { useSubscriptionState } from '../../../hooks/useSubscriptionState'
+import { MAX_WALLET_NAME_CHARS } from '../../../services/wallet/const'
 import { ImportingKeystoreStateRD, ImportKeystoreParams, LoadKeystoreLD } from '../../../services/wallet/types'
 import { InnerForm } from '../../shared/form/Form.styles'
 import { Spin } from '../../shared/loading'
@@ -138,8 +139,23 @@ export const ImportKeystore: React.FC<Props> = (props): JSX.Element => {
               <InputPassword className="!text-lg" size="large" />
             </Form.Item>
             {/* name */}
-            <Form.Item className="w-full !max-w-[380px]" name="name" label={intl.formatMessage({ id: 'wallet.name' })}>
-              <Input className="!text-lg" size="large" maxLength={20} placeholder={defaultWalletName(walletId)} />
+            <Form.Item
+              className="w-full !max-w-[380px]"
+              name="name"
+              label={
+                <div>
+                  {intl.formatMessage({ id: 'wallet.name' })}
+                  <span className="pl-5px text-[12px] text-gray1 dark:text-gray1d">
+                    ({intl.formatMessage({ id: 'wallet.name.maxChars' }, { max: MAX_WALLET_NAME_CHARS })})
+                  </span>
+                </div>
+              }>
+              <Input
+                className="!text-lg"
+                size="large"
+                maxLength={MAX_WALLET_NAME_CHARS}
+                placeholder={defaultWalletName(walletId)}
+              />
             </Form.Item>
             {/* submit button */}
             <Button
