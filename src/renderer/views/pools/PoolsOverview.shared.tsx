@@ -1,3 +1,4 @@
+import { SyncOutlined } from '@ant-design/icons'
 import { Asset, baseToAsset, formatAssetAmountCurrency } from '@xchainjs/xchain-util'
 import { Row } from 'antd'
 import { ColumnType } from 'antd/lib/table'
@@ -6,6 +7,7 @@ import * as FP from 'fp-ts/function'
 import { ErrorView } from '../../components/shared/error'
 import { AssetIcon } from '../../components/uielements/assets/assetIcon'
 import { AssetLabel } from '../../components/uielements/assets/assetLabel'
+import { TextButton } from '../../components/uielements/button'
 import { ReloadButton } from '../../components/uielements/reloadButton'
 import { ordBaseAmount } from '../../helpers/fp/ord'
 import { sortByDepth } from '../../helpers/poolHelper'
@@ -134,10 +136,22 @@ export const depthColumn = (title: string, pricePoolAsset: Asset): ColumnType<Po
   defaultSortOrder: 'descend'
 })
 
-export const renderRefreshBtnColTitle = (title: string, clickHandler: FP.Lazy<void>) => (
-  <Styled.ActionColumn>
-    <ReloadButton onClick={clickHandler}>{title}</ReloadButton>
-  </Styled.ActionColumn>
+export const renderRefreshBtnColTitle = ({
+  title,
+  clickHandler,
+  iconOnly
+}: {
+  title: string
+  clickHandler: FP.Lazy<void>
+  iconOnly: boolean
+}) => (
+  <div className="flex items-center justify-center">
+    <TextButton size={iconOnly ? 'large' : 'normal'} onClick={clickHandler} className="">
+      <div className="flex items-center">
+        <SyncOutlined className={iconOnly ? 'mr-0' : 'mr-[8px]'} /> {!iconOnly && title}
+      </div>
+    </TextButton>
+  </div>
 )
 
 export const renderTableError = (reloadBtnLabel: string, reloadBtnAction: FP.Lazy<void>) => (error: Error) =>

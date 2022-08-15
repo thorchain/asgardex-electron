@@ -29,7 +29,8 @@ const meta: ComponentMeta<typeof Component> = {
     children: 'Button label',
     size: 'normal',
     loading: false,
-    disabled: false
+    disabled: false,
+    uppercase: true
   },
   decorators: [
     (S) => (

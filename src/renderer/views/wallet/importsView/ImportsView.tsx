@@ -1,9 +1,9 @@
-import React, { useEffect, useMemo, useState } from 'react'
+import React, { useCallback, useEffect, useMemo } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
 import { useObservableState } from 'observable-hooks'
 import { useIntl } from 'react-intl'
-import { useLocation, useMatch, useNavigate } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 
 import { PageTitle } from '../../../components/page/PageTitle'
 import { Tabs } from '../../../components/tabs'
@@ -23,7 +23,6 @@ enum TabKey {
 export const ImportsView: React.FC = (): JSX.Element => {
   const intl = useIntl()
   const navigate = useNavigate()
-  const location = useLocation()
 
   const { keystoreService } = useWalletContext()
   const { importKeystore, loadKeystore$, addKeystoreWallet, importingKeystoreState$, resetImportingKeystoreState } =
@@ -48,17 +47,11 @@ export const ImportsView: React.FC = (): JSX.Element => {
 
   const walletId = useMemo(() => generateKeystoreId(), [])
 
-  const [activeTab, setActiveTab] = useState(TabKey.KEYSTORE)
-
   const items = useMemo(
     () => [
       {
         key: TabKey.KEYSTORE,
-        label: (
-          <span onClick={() => navigate(walletRoutes.imports.keystore.path())}>
-            {intl.formatMessage({ id: 'common.keystore' })}
-          </span>
-        ),
+        label: intl.formatMessage({ id: 'common.keystore' }),
         content: (
           <ImportKeystore
             walletId={walletId}
@@ -71,36 +64,30 @@ export const ImportsView: React.FC = (): JSX.Element => {
       },
       {
         key: TabKey.PHRASE,
-        label: (
-          <span onClick={() => navigate(walletRoutes.imports.phrase.path())}>
-            {intl.formatMessage({ id: 'common.phrase' })}
-          </span>
-        ),
+        label: intl.formatMessage({ id: 'common.phrase' }),
         content: <ImportPhrase walletId={walletId} clientStates={clientStates} addKeystore={addKeystoreWallet} />
       }
     ],
-    [intl, walletId, loadKeystore$, importKeystore, importingKeystoreState, clientStates, addKeystoreWallet, navigate]
+    [intl, walletId, loadKeystore$, importKeystore, importingKeystoreState, clientStates, addKeystoreWallet]
   )
-  const matchKeystorePath = useMatch({ path: walletRoutes.imports.keystore.path(), end: false })
-  const matchPhrasePath = useMatch({ path: walletRoutes.imports.phrase.path(), end: false })
 
-  /**
-   * Need to sync tabs' state with history
-   */
-  useEffect(() => {
-    if (matchKeystorePath) {
-      setActiveTab(TabKey.KEYSTORE)
-    } else if (matchPhrasePath) {
-      setActiveTab(TabKey.PHRASE)
-    } else {
-      // nothing to do
-    }
-  }, [navigate, activeTab, location.pathname, matchKeystorePath, matchPhrasePath])
+  const tabsChangeHandler = useCallback(
+    (key: string) => {
+      if (key === TabKey.PHRASE) {
+        navigate(walletRoutes.imports.phrase.path())
+      } else if (key === TabKey.KEYSTORE) {
+        navigate(walletRoutes.imports.keystore.path())
+      } else {
+        // nothing}
+      }
+    },
+    [navigate]
+  )
 
   return (
     <Styled.ImportsViewWrapper>
       <PageTitle>{intl.formatMessage({ id: 'wallet.imports.wallet' })}</PageTitle>
-      <Tabs tabs={items} defaultTabIndex={1} activeTabKey={activeTab} />
+      <Tabs tabs={items} defaultActiveKey={TabKey.KEYSTORE} onChange={tabsChangeHandler} />
     </Styled.ImportsViewWrapper>
   )
 }

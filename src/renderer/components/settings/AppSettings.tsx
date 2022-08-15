@@ -203,7 +203,7 @@ export const AppSettings: React.FC<Props> = (props): JSX.Element => {
                 <Styled.Section>
                   <Styled.SubTitle>{intl.formatMessage({ id: 'setting.version' })}</Styled.SubTitle>
                   <Styled.Label>v{version}</Styled.Label>
-                  <BorderButton className="my-10px" {...checkUpdatesProps} />
+                  <BorderButton size="normal" className="my-10px" {...checkUpdatesProps} />
                   {renderVersionUpdateResult}
                 </Styled.Section>
               </Styled.SectionsWrapper>

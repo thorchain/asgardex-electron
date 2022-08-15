@@ -1,13 +1,13 @@
 import { ComponentMeta } from '@storybook/react'
 
 import baseMeta from './BaseButton.stories'
-import { LinkButton as Component, Props } from './LinkButton'
+import { TextButton as Component, Props } from './TextButton'
 
-export const LinkButton = ({ children, ...otherProps }: Props) => <Component {...otherProps}>{children}</Component>
+export const TextButton = ({ children, ...otherProps }: Props) => <Component {...otherProps}>{children}</Component>
 
 const meta: ComponentMeta<typeof Component> = {
   component: Component,
-  title: 'Components/button/LinkButton',
+  title: 'Components/button/TextButton',
   argTypes: {
     ...baseMeta.argTypes,
     color: {

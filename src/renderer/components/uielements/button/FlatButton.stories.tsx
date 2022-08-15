@@ -14,7 +14,7 @@ const meta: ComponentMeta<typeof Component> = {
       name: 'color',
       control: {
         type: 'select',
-        options: ['primary', 'warning', 'error']
+        options: ['primary', 'warning', 'error', 'neutral']
       }
     }
   },

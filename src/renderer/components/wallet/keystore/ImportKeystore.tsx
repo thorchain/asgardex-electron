@@ -18,7 +18,7 @@ import { MAX_WALLET_NAME_CHARS } from '../../../services/wallet/const'
 import { ImportingKeystoreStateRD, ImportKeystoreParams, LoadKeystoreLD } from '../../../services/wallet/types'
 import { InnerForm } from '../../shared/form/Form.styles'
 import { Spin } from '../../shared/loading'
-import { Button } from '../../uielements/button'
+import { BorderButton, FlatButton } from '../../uielements/button'
 import { InputPassword, Input } from '../../uielements/input'
 import { Label } from '../../uielements/label'
 
@@ -119,14 +119,10 @@ export const ImportKeystore: React.FC<Props> = (props): JSX.Element => {
               {intl.formatMessage({ id: 'wallet.imports.keystore.title' })}
             </Label>
             {/* import button */}
-            <Button
-              className="mb-30px h-30px min-w-full cursor-pointer py-5px px-10px text-base"
-              typevalue="outline"
-              sizevalue="normal"
-              onClick={uploadKeystore}>
+            <BorderButton className="mb-30px cursor-pointer !rounded-none" size="normal" onClick={uploadKeystore}>
               {RD.isSuccess(loadKeystoreState) ? <CheckCircleTwoTone twoToneColor="#50e3c2" /> : <UploadOutlined />}
-              {intl.formatMessage({ id: 'wallet.imports.keystore.select' })}
-            </Button>
+              <span className="ml-10px">{intl.formatMessage({ id: 'wallet.imports.keystore.select' })}</span>
+            </BorderButton>
             {renderLoadError}
             {renderImportError}
             {/* password */}
@@ -158,15 +154,14 @@ export const ImportKeystore: React.FC<Props> = (props): JSX.Element => {
               />
             </Form.Item>
             {/* submit button */}
-            <Button
+            <FlatButton
               className="mt-50px min-w-[150px]"
-              sizevalue="xnormal"
-              type="primary"
-              htmlType="submit"
-              round="true"
+              size="large"
+              color="primary"
+              type="submit"
               disabled={!RD.isSuccess(loadKeystoreState) || RD.isPending(importingKeystoreState)}>
               {intl.formatMessage({ id: 'wallet.action.import' })}
-            </Button>
+            </FlatButton>
           </div>
         </Spin>
       </InnerForm>

@@ -137,15 +137,6 @@ export const SubmitContainer = styled.div`
   align-items: center;
 `
 
-export const SubmitButton = styled(UIButton).attrs({
-  type: 'primary',
-  round: 'true'
-})`
-  min-width: 200px !important;
-  padding: 0 30px;
-  margin-bottom: 20px;
-`
-
 export const AssetWarningAssetContainer = styled('div')`
   display: flex;
   flex-direction: row;

@@ -5,7 +5,6 @@ import { media } from '../../../helpers/styleHelper'
 import { AssetIcon as AssetIconBase } from '../../uielements/assets/assetIcon'
 import { AssetLabel as AssetLabelUI } from '../../uielements/assets/assetLabel'
 import { ViewTxButton as UIViewTxButton } from '../../uielements/button'
-import { Button as UIButton } from '../../uielements/button'
 import { WalletTypeLabel as WalletTypeLabelUI } from '../../uielements/common/Common.styles'
 import { Label as UILabel } from '../../uielements/label'
 import { Slider as BaseSlider } from '../../uielements/slider'
@@ -155,22 +154,4 @@ export const WalletTypeLabel = styled(WalletTypeLabelUI)`
   ${media.md`
   font-size: 10px;
 `}
-`
-
-export const SubmitButtonWrapper = styled.div`
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  padding: 20px 0;
-`
-
-export const SubmitButton = styled(UIButton).attrs({
-  type: 'primary',
-  round: 'true'
-})`
-  min-width: 200px !important;
-  margin-bottom: 30px;
-  padding-left: 30px;
-  padding-right: 30px;
 `
