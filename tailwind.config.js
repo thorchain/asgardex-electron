@@ -33,7 +33,7 @@ module.exports = {
       // Light theme https://gitlab.com/thorchain/asgardex-common/asgardex-theme/-/blob/master/src/light.ts
       // Dark theme https://gitlab.com/thorchain/asgardex-common/asgardex-theme/-/blob/master/src/dark.ts
       colors: {
-        turquoise: '#50E3C2',
+        turquoise: '#23DCC8', //'#50E3C2'
         red: '#FF4954',
         // text
         text0: t.light.palette.text[0],

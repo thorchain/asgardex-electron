@@ -91,7 +91,11 @@ export const NewPhraseGenerate: React.FC<Props> = ({ onSubmit, walletId }: Props
   return (
     <>
       <Styled.TitleContainer justify="space-between">
-        <CopyLabel textToCopy={phrase} label={intl.formatMessage({ id: 'wallet.create.copy.phrase' })} />
+        <CopyLabel
+          className="text-turquoise"
+          textToCopy={phrase}
+          label={intl.formatMessage({ id: 'wallet.create.copy.phrase' })}
+        />
         <RefreshButton clickHandler={clickRefreshButtonHandler} />
       </Styled.TitleContainer>
       <Phrase words={phraseWords} readOnly={true} />

@@ -23,7 +23,9 @@ export const PhraseCopyModal: React.FC<Props> = (props): JSX.Element => {
       visible={visible}
       onOk={onClose}
       onCancel={onClose}
-      footer={<CopyLabel label={intl.formatMessage({ id: 'common.copy' })} textToCopy={phrase} />}>
+      footer={
+        <CopyLabel className="text-turquoise" label={intl.formatMessage({ id: 'common.copy' })} textToCopy={phrase} />
+      }>
       <Styled.PhraseView>
         {phrase.split(' ').map((item, index) => (
           <Styled.Item key={index}>
