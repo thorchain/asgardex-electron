@@ -35,6 +35,7 @@ export type Props = {
   disableTradingPoolAction: boolean
   disableAllPoolActions: boolean
   disablePoolActions: boolean
+  walletLocked: boolean
   network: Network
 }
 
@@ -56,6 +57,7 @@ export const PoolDetails: React.FC<Props> = ({
   disableTradingPoolAction,
   disableAllPoolActions,
   disablePoolActions,
+  walletLocked,
   network
 }) => {
   const renderTitle = useMemo(() => {
@@ -79,6 +81,7 @@ export const PoolDetails: React.FC<Props> = ({
         disableAllPoolActions={disableAllPoolActions}
         disableTradingPoolAction={disableTradingPoolAction}
         disablePoolActions={disablePoolActions}
+        walletLocked={walletLocked}
         asset={asset}
         watched={watched}
         watch={watch}
@@ -99,6 +102,7 @@ export const PoolDetails: React.FC<Props> = ({
     priceRatio,
     priceSymbol,
     unwatch,
+    walletLocked,
     watch,
     watched
   ])
