@@ -38,7 +38,7 @@ export const HeaderLock: React.FC<Props> = (props): JSX.Element => {
             () => <></>,
             (name) => (
               <p
-                className="dark:text2d w-min-[60px] absolute -bottom-[6px] whitespace-nowrap
+                className="dark:text2d absolute -bottom-[6px] whitespace-nowrap
                 rounded-full bg-gray0 px-[8px] py-[3px]
                   font-main text-[9px] uppercase leading-none
                   text-text2 dark:bg-gray0d
