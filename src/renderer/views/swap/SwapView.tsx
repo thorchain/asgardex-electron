@@ -296,7 +296,6 @@ const SuccessRouteView: React.FC<Props> = ({ sourceAsset, targetAsset }): JSX.El
                   importWalletHandler={importWalletHandler}
                   clickAddressLinkHandler={openAddressUrl}
                   addressValidator={validateSwapAddress}
-                  isDev={$IS_DEV}
                 />
               )
             }

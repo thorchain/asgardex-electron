@@ -1,30 +1,31 @@
 import React from 'react'
 
-import { CheckOutlined, CopyOutlined } from '@ant-design/icons'
+import { DocumentDuplicateIcon, CheckIcon } from '@heroicons/react/outline'
+import * as A from 'antd'
 import { TextProps } from 'antd/lib/typography/Text'
 
-import * as Styled from './CopyLabel.styles'
-
 type Props = {
-  label: string
+  label?: string
   textToCopy: string
   className?: string
+  iconClassName?: string
 } & TextProps
 
-export const CopyLabel: React.FC<Props> = ({ label, textToCopy, className }): JSX.Element => {
+export const CopyLabel: React.FC<Props> = ({ label, textToCopy, className = '' }): JSX.Element => {
+  const Label = () => <span className="mr-5px font-main uppercase text-inherit">{label}</span>
   return (
-    <Styled.CopyLabel
-      className={className}
+    <A.Typography.Text
+      className={`flex items-center text-turquoise ${className}`}
       copyable={{
         text: textToCopy,
         icon: [
-          <div key={1}>
-            {label}
-            <CopyOutlined />
+          <div key={1} className={`group flex items-center ${className}`}>
+            {label && <Label />}
+            <DocumentDuplicateIcon className={`h-20px w-20px group-hover:text-inherit ${className}`} />
           </div>,
-          <div key={2}>
-            {label}
-            <CheckOutlined />
+          <div key={2} className={`group flex items-center  ${className}`}>
+            {label && <Label />}
+            <CheckIcon className={`h-20px w-20px`} />
           </div>
         ]
       }}

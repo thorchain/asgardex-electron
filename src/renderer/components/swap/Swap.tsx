@@ -96,6 +96,7 @@ import { FlatButton, ViewTxButton } from '../uielements/button'
 import { WalletTypeLabel } from '../uielements/common/Common.styles'
 import { Fees, UIFeesRD } from '../uielements/fees'
 import { InfoIcon } from '../uielements/info'
+import { CopyLabel } from '../uielements/label'
 import { Slider } from '../uielements/slider'
 import { EditableAddress } from './EditableAddress'
 import * as Styled from './Swap.styles'
@@ -133,7 +134,6 @@ export type SwapProps = {
   mimirHalt: MimirHalt
   clickAddressLinkHandler: (address: Address) => void
   addressValidator: AddressValidationAsync
-  isDev: boolean
 }
 
 export const Swap = ({
@@ -166,8 +166,7 @@ export const Swap = ({
   haltedChains,
   mimirHalt,
   clickAddressLinkHandler,
-  addressValidator,
-  isDev
+  addressValidator
 }: SwapProps) => {
   const intl = useIntl()
 
@@ -1469,12 +1468,22 @@ export const Swap = ({
 
   const renderMemo = useMemo(
     () => (
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', paddingTop: 20 }}>
+      <div className="flex items-center justify-center pt-20px">
         {FP.pipe(
           oSwapParams,
           O.fold(
-            () => <Styled.MemoLabel>{intl.formatMessage({ id: 'common.memo' })}</Styled.MemoLabel>,
-            ({ memo }) => <Styled.CopyMemoLabel label={intl.formatMessage({ id: 'common.memo' })} textToCopy={memo} />
+            () => (
+              <div className="text-12px cursor-not-allowed text-center uppercase text-gray1 dark:text-gray1d">
+                {intl.formatMessage({ id: 'common.memo' })}
+              </div>
+            ),
+            ({ memo }) => (
+              <CopyLabel
+                className="text-12px uppercase text-gray1 hover:text-gray2 dark:text-gray1d dark:hover:text-gray2d"
+                label={intl.formatMessage({ id: 'common.memo' })}
+                textToCopy={memo}
+              />
+            )
           )
         )}
       </div>
@@ -1680,7 +1689,7 @@ export const Swap = ({
                   </>
                 )}
               </Styled.SubmitContainer>
-              {isDev && renderMemo}
+              {renderMemo}
               {renderPasswordConfirmationModal}
               {renderLedgerConfirmationModal}
               {renderTxModal}

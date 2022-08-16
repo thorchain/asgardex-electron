@@ -1,5 +1,6 @@
 import React, { useState, useMemo, useCallback } from 'react'
 
+import { CheckCircleIcon, ExternalLinkIcon, PencilAltIcon, XCircleIcon } from '@heroicons/react/outline'
 import { Address } from '@xchainjs/xchain-client'
 import { Asset } from '@xchainjs/xchain-util'
 import { Form, Tooltip } from 'antd'
@@ -10,7 +11,9 @@ import { useIntl } from 'react-intl'
 import { Network } from '../../../shared/api/types'
 import { truncateAddress } from '../../helpers/addressHelper'
 import { AddressValidationAsync } from '../../services/clients'
-import * as Styled from './EditableAddress.styles'
+import { InnerForm } from '../shared/form'
+import { Input } from '../uielements/input'
+import { CopyLabel } from '../uielements/label'
 
 export type EditableAddressProps = {
   asset: Asset
@@ -89,42 +92,50 @@ export const EditableAddress = ({
 
   const renderAddress = useMemo(() => {
     return (
-      <Styled.AddressCustomRecipient>
+      <div className="flex items-center overflow-hidden font-main text-[16px] normal-case text-text1 dark:text-text1d">
         <Tooltip overlayStyle={{ maxWidth: '100%', whiteSpace: 'nowrap' }} title={address}>
           {truncatedAddress}
         </Tooltip>
-        <div>
-          <Styled.EditAddressIcon
+        <div className="flex flex-row items-center">
+          <PencilAltIcon
+            className="ml-[5px] h-[20px] w-[20px] cursor-pointer text-turquoise"
             onClick={() => {
               setEditableAddress(O.fromNullable(address))
               onChangeEditableMode(true)
             }}
           />
-          <Styled.CopyLabel copyable={{ text: address }} />
-          <Styled.AddressLinkIcon onClick={() => onClickOpenAddress(address)} />
+          <CopyLabel className="text-turquoise" textToCopy={address} />
+          <ExternalLinkIcon
+            className="ml-[5px] h-[20px] w-[20px] cursor-pointer text-turquoise"
+            onClick={() => onClickOpenAddress(address)}
+          />
         </div>
-      </Styled.AddressCustomRecipient>
+      </div>
     )
   }, [address, truncatedAddress, onChangeEditableMode, onClickOpenAddress])
 
   const renderEditableAddress = useCallback(
     (editableAddress: Address) => {
       return (
-        <Styled.EditableFormWrapper>
-          <Styled.InnerForm
-            form={form}
-            initialValues={{
-              recipient: editableAddress
-            }}>
-            <Form.Item rules={[{ required: true, validator: validateAddress }]} name={RECIPIENT_FIELD}>
-              <Styled.Input color="primary" onKeyUp={inputOnKeyUpHandler} />
-            </Form.Item>
-          </Styled.InnerForm>
-          <Styled.AddressEditButtonsWrapper>
-            <Styled.ConfirmEdit onClick={confirmEditHandler} />
-            <Styled.CancelEdit onClick={cancelEditHandler} />
-          </Styled.AddressEditButtonsWrapper>
-        </Styled.EditableFormWrapper>
+        <InnerForm
+          className="flex w-full items-center"
+          form={form}
+          initialValues={{
+            recipient: editableAddress
+          }}>
+          <Form.Item
+            className="!mb-0 w-full"
+            rules={[{ required: true, validator: validateAddress }]}
+            name={RECIPIENT_FIELD}>
+            <Input className="!text-[16px]" color="primary" onKeyUp={inputOnKeyUpHandler} />
+          </Form.Item>
+
+          <CheckCircleIcon
+            className="ml-[5px] h-[24px] w-[24px] cursor-pointer text-turquoise"
+            onClick={confirmEditHandler}
+          />
+          <XCircleIcon className="ml-[5px] h-[24px] w-[24px] cursor-pointer text-error0" onClick={cancelEditHandler} />
+        </InnerForm>
       )
     },
     [cancelEditHandler, confirmEditHandler, form, inputOnKeyUpHandler, validateAddress]
