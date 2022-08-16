@@ -19,6 +19,7 @@ import { useMidgardContext } from '../../contexts/MidgardContext'
 import { getAssetFromNullableString } from '../../helpers/assetHelper'
 import { eqAsset } from '../../helpers/fp/eq'
 import * as PoolHelpers from '../../helpers/poolHelper'
+import { useKeystoreState } from '../../hooks/useKeystoreState'
 import { useMidgardHistoryActions } from '../../hooks/useMidgardHistoryActions'
 import { useMimirHalt } from '../../hooks/useMimirHalt'
 import { usePoolWatchlist } from '../../hooks/usePoolWatchlist'
@@ -44,7 +45,8 @@ const defaultDetailsProps: TargetPoolDetailProps = {
   network: DEFAULT_NETWORK,
   disableAllPoolActions: false,
   disableTradingPoolAction: false,
-  disablePoolActions: false
+  disablePoolActions: false,
+  walletLocked: false
 }
 
 export const PoolDetailsView: React.FC = () => {
@@ -68,6 +70,8 @@ export const PoolDetailsView: React.FC = () => {
   const network = useObservableState(network$, DEFAULT_NETWORK)
 
   const intl = useIntl()
+
+  const { locked: walletLocked } = useKeystoreState()
 
   const { asset } = useParams<PoolDetailRouteParams>()
 
@@ -152,7 +156,8 @@ export const PoolDetailsView: React.FC = () => {
               ChartView: PoolChartView,
               disableAllPoolActions: getDisableAllPoolActions(asset.chain),
               disableTradingPoolAction: getDisableTradingPoolAction(asset.chain),
-              disablePoolActions: getDisablePoolActions(asset.chain)
+              disablePoolActions: getDisablePoolActions(asset.chain),
+              walletLocked
             }
 
             const watched = FP.pipe(watchedList, A.elem(eqAsset)(asset))

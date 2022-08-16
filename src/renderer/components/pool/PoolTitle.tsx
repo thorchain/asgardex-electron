@@ -26,6 +26,7 @@ export type Props = {
   disableTradingPoolAction: boolean
   disableAllPoolActions: boolean
   disablePoolActions: boolean
+  walletLocked: boolean
   network: Network
   isAvailablePool: boolean
 }
@@ -39,6 +40,7 @@ export const PoolTitle: React.FC<Props> = ({
   disableTradingPoolAction,
   disableAllPoolActions,
   disablePoolActions,
+  walletLocked,
   network,
   isAvailablePool
 }) => {
@@ -77,7 +79,7 @@ export const PoolTitle: React.FC<Props> = ({
     () => (
       <Styled.ButtonActions>
         <ManageButton
-          disabled={disableAllPoolActions || disablePoolActions}
+          disabled={disableAllPoolActions || disablePoolActions || walletLocked}
           asset={asset}
           size="normal"
           isTextView={isDesktopView}
@@ -105,6 +107,7 @@ export const PoolTitle: React.FC<Props> = ({
     [
       disableAllPoolActions,
       disablePoolActions,
+      walletLocked,
       asset,
       isDesktopView,
       isAvailablePool,
