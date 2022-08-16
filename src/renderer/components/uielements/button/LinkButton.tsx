@@ -18,12 +18,14 @@ export const LinkButton: React.FC<Props> = (props): JSX.Element => {
   }
   const decorationOffset: Record<Size, string> = {
     small: 'underline-offset-1',
+    medium: 'underline-offset-1',
     normal: 'underline-offset-2',
     large: 'underline-offset-4'
   }
 
   const thickness: Record<Size, string> = {
     small: 'decoration-1',
+    medium: 'decoration-1',
     normal: 'decoration-2',
     large: 'decoration-3'
   }

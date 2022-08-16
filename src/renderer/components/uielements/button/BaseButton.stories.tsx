@@ -2,8 +2,8 @@ import { ComponentMeta } from '@storybook/react'
 
 import { BaseButton as Component, BaseButtonProps } from './BaseButton'
 
-export const BaseButton = ({ size, loading, disabled, children }: BaseButtonProps) => (
-  <Component size={size} loading={loading} disabled={disabled}>
+export const BaseButton = ({ size, loading, disabled, font, children }: BaseButtonProps) => (
+  <Component size={size} loading={loading} font={font} disabled={disabled}>
     {children}
   </Component>
 )
@@ -13,10 +13,15 @@ const meta: ComponentMeta<typeof Component> = {
   title: 'Components/button/BaseButton',
   argTypes: {
     size: {
-      name: 'size',
       control: {
         type: 'select',
-        options: ['small', 'normal', 'large']
+        options: ['small', 'medium', 'normal', 'large']
+      }
+    },
+    font: {
+      control: {
+        type: 'select',
+        options: ['normal', 'semi', 'bold']
       }
     },
     children: {
@@ -28,6 +33,7 @@ const meta: ComponentMeta<typeof Component> = {
   args: {
     children: 'Button label',
     size: 'normal',
+    font: 'normal',
     loading: false,
     disabled: false,
     uppercase: true
