@@ -7,7 +7,6 @@ import { transition } from '../../settings/style-util'
 import { Tabs as TabsUI } from '../tabs/Tabs'
 import { AssetInput as AssetInputBase } from '../uielements/assets/assetInput'
 import { AssetSelect as AssetSelectUI } from '../uielements/assets/assetSelect'
-import { Button as UIButton } from '../uielements/button'
 import { CheckButton as CheckButtonUI } from '../uielements/button/CheckButton'
 import { Label as UILabel, CopyLabel as CopyLabelUI } from '../uielements/label'
 
@@ -273,15 +272,6 @@ export const SubmitContainer = styled.div`
   flex-direction: column;
   justify-content: center;
   align-items: center;
-`
-
-export const SubmitButton = styled(UIButton).attrs({
-  type: 'primary',
-  round: 'true'
-})`
-  min-width: 200px !important;
-  padding: 0 30px;
-  margin: 30px 0;
 `
 
 export const CheckButton = styled(CheckButtonUI)`

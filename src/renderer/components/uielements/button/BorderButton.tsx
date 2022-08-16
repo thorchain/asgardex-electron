@@ -1,7 +1,8 @@
 import React from 'react'
 
 import { BaseButton, BaseButtonProps } from './BaseButton'
-import type { Color, Size } from './Button.types'
+import { borderSize, dropShadow, borderColor } from './Button.shared'
+import type { Color } from './Button.types'
 
 export type Props = BaseButtonProps & {
   color?: Color
@@ -19,29 +20,11 @@ export const BorderButton: React.FC<Props> = (props): JSX.Element => {
     ...restProps
   } = props
 
-  const borderColor: Record<Color, string> = {
-    primary: 'border-turquoise',
-    warning: 'border-warning0',
-    error: 'border-error0',
-    neutral: 'border-text0 dark:border-text0d'
-  }
-
-  const borderSize: Record<Size, string> = {
-    small: 'border',
-    normal: 'border-2',
-    large: 'border-2'
-  }
-
   const textColor: Record<Color, string> = {
     primary: 'text-turquoise',
     warning: 'text-warning0 dark:text-warning0d',
     error: 'text-error0 dark:text-error0d',
     neutral: 'text-text0 dark:text-text0d'
-  }
-  const dropShadow: Record<Size, string> = {
-    small: 'drop-shadow-lg',
-    normal: 'drop-shadow-lg',
-    large: 'drop-shadow-lg'
   }
 
   return (

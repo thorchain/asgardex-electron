@@ -92,7 +92,7 @@ import { LedgerConfirmationModal, WalletPasswordConfirmationModal } from '../mod
 import { TxModal } from '../modal/tx'
 import { SwapAssets } from '../modal/tx/extra'
 import { LoadingView } from '../shared/loading'
-import { ViewTxButton } from '../uielements/button'
+import { FlatButton, ViewTxButton } from '../uielements/button'
 import { WalletTypeLabel } from '../uielements/common/Common.styles'
 import { Fees, UIFeesRD } from '../uielements/fees'
 import { InfoIcon } from '../uielements/info'
@@ -1635,13 +1635,14 @@ export const Swap = ({
                 {!isLocked(keystore) ? (
                   isApproved ? (
                     <>
-                      <Styled.SubmitButton
-                        color="success"
-                        sizevalue="xnormal"
+                      <FlatButton
+                        className="my-30px min-w-[200px]"
+                        size="large"
+                        color="primary"
                         onClick={onSubmit}
                         disabled={disableSubmit}>
                         {intl.formatMessage({ id: 'common.swap' })}
-                      </Styled.SubmitButton>
+                      </FlatButton>
                       {!RD.isInitial(uiFees) && <Fees fees={uiFees} reloadFees={reloadFeesHandler} />}
                       {sourceChainFeeErrorLabel}
                     </>
@@ -1649,14 +1650,15 @@ export const Swap = ({
                     <>
                       {renderApproveFeeError}
                       {renderApproveError}
-                      <Styled.SubmitButton
-                        sizevalue="xnormal"
+                      <FlatButton
+                        className="my-30px min-w-[200px]"
+                        size="large"
                         color="warning"
                         disabled={disableSubmitApprove}
                         onClick={onApprove}
                         loading={RD.isPending(approveState)}>
                         {intl.formatMessage({ id: 'common.approve' })}
-                      </Styled.SubmitButton>
+                      </FlatButton>
 
                       {!RD.isInitial(uiApproveFeesRD) && (
                         <Fees fees={uiApproveFeesRD} reloadFees={reloadApproveFeesHandler} />
@@ -1670,11 +1672,11 @@ export const Swap = ({
                         ? intl.formatMessage({ id: 'swap.note.nowallet' })
                         : isLocked(keystore) && intl.formatMessage({ id: 'swap.note.lockedWallet' })}
                     </Styled.NoteLabel>
-                    <Styled.SubmitButton sizevalue="xnormal" color="success" onClick={importWalletHandler}>
+                    <FlatButton className="my-30px min-w-[200px]" size="large" onClick={importWalletHandler}>
                       {!hasImportedKeystore(keystore)
                         ? intl.formatMessage({ id: 'wallet.imports.label' })
                         : isLocked(keystore) && intl.formatMessage({ id: 'wallet.unlock.label' })}
-                    </Styled.SubmitButton>
+                    </FlatButton>
                   </>
                 )}
               </Styled.SubmitContainer>

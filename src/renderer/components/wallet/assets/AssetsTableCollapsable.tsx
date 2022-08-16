@@ -34,6 +34,7 @@ import { walletTypeToI18n } from '../../../services/wallet/util'
 import { PricePool } from '../../../views/pools/Pools.types'
 import { ErrorView } from '../../shared/error/'
 import { AssetIcon } from '../../uielements/assets/assetIcon'
+import { FlatButton } from '../../uielements/button'
 import { QRCodeModal } from '../../uielements/qrCodeModal/QRCodeModal'
 import * as Styled from './AssetsTableCollapsable.styles'
 
@@ -163,11 +164,14 @@ export const AssetsTableCollapsable: React.FC<Props> = (props): JSX.Element => {
               </Styled.ChainLabelWrapper>
             </Styled.Label>
             {isNonNativeRuneAsset(asset, network) && (
-              <Styled.UpgradeButton
+              <FlatButton
+                className="ml-20px"
+                size="normal"
+                color="warning"
                 onClick={disableUpgradeButton ? undefined : onClickUpgradeButtonHandler}
                 disabled={disableUpgradeButton}>
                 {intl.formatMessage({ id: 'wallet.action.upgrade' })}
-              </Styled.UpgradeButton>
+              </FlatButton>
             )}
           </Styled.AssetTickerWrapper>
         )

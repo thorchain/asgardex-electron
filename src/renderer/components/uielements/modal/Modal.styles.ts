@@ -13,7 +13,6 @@ export const Modal = styled(A.Modal)`
     border: none;
     text-transform: uppercase;
     font-family: 'MainFontRegular';
-    letter-spacing: 1.5px;
     .ant-modal-title {
       color: ${palette('text', 3)};
     }
@@ -34,9 +33,9 @@ export const Modal = styled(A.Modal)`
   }
   .ant-modal-close {
     .ant-modal-close-x {
-      width: 44px;
-      height: 48px;
-      line-height: 48px;
+      width: 40px;
+      height: 40px;
+      line-height: 40px;
       color: ${palette('text', 3)};
     }
   }
