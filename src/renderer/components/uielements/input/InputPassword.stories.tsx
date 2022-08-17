@@ -18,6 +18,7 @@ const meta: ComponentMeta<typeof Component> = {
   },
   args: {
     placeholder: 'Placeholder',
+    size: 'normal',
     error: '',
     disabled: false
   },

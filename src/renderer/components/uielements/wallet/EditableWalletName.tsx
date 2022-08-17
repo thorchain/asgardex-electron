@@ -43,7 +43,7 @@ export const EditableWalletName: React.FC<Props> = (props): JSX.Element => {
         className={`flex cursor-pointer items-center font-main text-[18px] text-text0 dark:text-text0d`}
         onClick={edit}>
         {name}
-        <PencilAltIcon className="dark:text0d ml-[5px] h-[20px] w-[20px]  text-text0 dark:text-text0d" />
+        <PencilAltIcon className="dark:text0d ml-[5px] h-[20px] w-[20px] text-turquoise" />
       </div>
     )
   }, [name])
@@ -68,25 +68,34 @@ export const EditableWalletName: React.FC<Props> = (props): JSX.Element => {
         }
       }
 
+      const error = !!errors.name
+
       return (
-        <form className="items-top flex w-full justify-center" onSubmit={handleSubmit(submit)}>
-          <Input
-            className="w-full !max-w-[380px] pl-[60px]" // 60px offset of icons width to stay in center
-            classNameInput="text-[18px] ring-gray1 dark:ring-gray1d"
-            size="large"
-            defaultValue={name}
-            autoFocus
-            maxLength={MAX_WALLET_NAME_CHARS}
-            {...register('name', { required: true })}
-            error={errors.name ? intl.formatMessage({ id: 'wallet.name.error.empty' }) : ''}
-            onKeyDown={keyDownHandler}
-          />
-          <div className="flex h-[35px] items-center">
-            <BaseButton className="!p-0 text-turquoise" onClick={confirm} type="submit">
-              <CheckCircleIcon className="ml-[5px] h-[24px] w-[24px]" />
+        <form className="items-top flex w-full flex-col items-center" onSubmit={handleSubmit(submit)}>
+          <div className="flex w-full items-center justify-center">
+            <Input
+              // 60px offset of icons width to stay in center
+              className={`${error ? 'ring-error0' : 'dark:gray1d ring-gray1'} w-full max-w-[380px] text-[18px]
+              `}
+              size="large"
+              defaultValue={name}
+              autoFocus
+              uppercase={false}
+              maxLength={MAX_WALLET_NAME_CHARS}
+              {...register('name', { required: true })}
+              error={!!errors.name}
+              onKeyDown={keyDownHandler}
+            />
+            <BaseButton className="ml-[5px] h-[24px] w-[24px] !p-0 text-turquoise" onClick={confirm} type="submit">
+              <CheckCircleIcon className="" />
             </BaseButton>
             <XCircleIcon className="ml-[5px] h-[24px] w-[24px] cursor-pointer text-error0" onClick={cancel} />
           </div>
+          {errors.name && (
+            <p className={`mt-10px font-main text-[14px] uppercase text-error0`}>
+              {intl.formatMessage({ id: 'wallet.name.error.empty' })}
+            </p>
+          )}
         </form>
       )
     },
