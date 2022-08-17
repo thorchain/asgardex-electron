@@ -57,11 +57,11 @@ export const BaseButton: React.FC<BaseButtonProps> = (props): JSX.Element => {
       className={`
       group
       flex appearance-none items-center
-        ${disabled && 'opacity-60'}
+        ${disabled ? 'opacity-60' : 'opcacity-100'}
       justify-center
-        ${disabled && 'cursor-not-allowed'}
+        ${disabled ? 'cursor-not-allowed' : 'cursor-pointer'}
         ${fontFamily[font]}
-        ${uppercase && 'uppercase'}
+        ${uppercase ? 'uppercase' : 'normal-case'}
         transition
         duration-300
         ease-in-out

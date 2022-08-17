@@ -51,7 +51,7 @@ export const EditableWalletName: React.FC<Props> = (props): JSX.Element => {
         className={`flex ${loading ? 'cursor-not-allowed' : 'cursor-pointer'} items-center text-[18px]`}
         onClick={edit}>
         {name}
-        <PencilAltIcon className="dark:text0d ml-[5px] h-[20px] w-[20px] text-text0 dark:text-text0d" />
+        <PencilAltIcon className="dark:text0d ml-[5px] h-[20px] w-[20px] text-turquoise" />
       </TextButton>
     )
   }, [loading, name])
@@ -76,30 +76,36 @@ export const EditableWalletName: React.FC<Props> = (props): JSX.Element => {
       }
 
       return (
-        <form className="items-top flex w-full justify-center" onSubmit={handleSubmit(submit)}>
-          <Input
-            id="name"
-            className="w-full !max-w-[380px] pl-[60px]" // 60px offset of icons width to stay in center
-            classNameInput="text-[18px] ring-gray1 dark:ring-gray1d"
-            size="large"
-            disabled={loading}
-            defaultValue={name}
-            autoFocus
-            maxLength={MAX_WALLET_NAME_CHARS}
-            {...register('name', { required: true })}
-            error={errors.name ? intl.formatMessage({ id: 'wallet.name.error.empty' }) : ''}
-            onKeyDown={keyDownHandler}
-          />
-          <div className="flex h-[35px] items-center">
-            <BaseButton className="!p-0 text-turquoise" onClick={handleSubmit(submit)} type="submit">
-              <CheckCircleIcon className="ml-[5px] h-[24px] w-[24px]" />
-            </BaseButton>
-            <XCircleIcon className="ml-[5px] h-[24px] w-[24px] cursor-pointer text-error0" onClick={cancel} />
+        <form className="items-top flex w-full flex-col items-center" onSubmit={handleSubmit(submit)}>
+          <div className="flex w-full items-center justify-center">
+            <Input
+              id="name"
+              className="w-full max-w-[380px]"
+              size="large"
+              defaultValue={name}
+              autoFocus
+              uppercase={false}
+              maxLength={MAX_WALLET_NAME_CHARS}
+              {...register('name', { required: true })}
+              error={!!errors.name}
+              onKeyDown={keyDownHandler}
+            />
+            <div className="flex h-[35px] items-center">
+              <BaseButton className="!p-0 text-turquoise" onClick={handleSubmit(submit)} type="submit">
+                <CheckCircleIcon className="ml-[5px] h-[24px] w-[24px]" />
+              </BaseButton>
+              <XCircleIcon className="ml-[5px] h-[24px] w-[24px] cursor-pointer text-error0" onClick={cancel} />
+            </div>
           </div>
+          {errors.name && (
+            <p className={`mt-10px font-main text-[14px] uppercase text-error0`}>
+              {intl.formatMessage({ id: 'wallet.name.error.empty' })}
+            </p>
+          )}
         </form>
       )
     },
-    [loading, errors.name, handleSubmit, intl, onChange, register, reset]
+    [errors.name, handleSubmit, intl, onChange, register, reset]
   )
 
   return (
@@ -119,9 +125,10 @@ export const EditableWalletName: React.FC<Props> = (props): JSX.Element => {
           )
         )}
       </h2>
-      <div className={`flex items-center ${loading ? 'opacity-65' : 'opacity-100'}`}>
-        {/* show loading icon */}
-        {/* {loading && <LoadingIcon className={`mr-[12px] h-[17px] w-[17px] animate-spin group-hover:opacity-70`} />} */}
+      <div
+        className={`flex items-center ${loading ? 'opacity-65' : 'opacity-100'} ${
+          O.isSome(editableName) ? 'w-full' : ''
+        }`}>
         {FP.pipe(editableName, O.fold(renderName, renderEditableName))}
       </div>
     </div>
