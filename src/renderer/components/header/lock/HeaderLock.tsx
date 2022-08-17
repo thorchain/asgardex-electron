@@ -40,7 +40,7 @@ export const HeaderLock: React.FC<Props> = (props): JSX.Element => {
               <p
                 className="dark:text2d absolute -bottom-[6px] whitespace-nowrap
                 rounded-full bg-gray0 px-[8px] py-[3px]
-                  font-main text-[9px] uppercase leading-none
+                  font-main text-[9px] leading-none
                   text-text2 dark:bg-gray0d
                   dark:text-text2d
                   ">

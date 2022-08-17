@@ -1,55 +1,33 @@
-import { ComponentMeta } from '@storybook/react'
+import { ComponentMeta, StoryFn } from '@storybook/react'
 
-import { Input as Component, InputPassword, InputTextArea } from './Input.styles'
+import { Input as Component, InputProps } from './Input'
 
-const defaultInput: ComponentMeta<typeof InputPassword> = {
-  component: InputPassword,
+const Template: StoryFn<InputProps> = (args) => <Component {...args} />
+export const Default = Template.bind({})
+
+const meta: ComponentMeta<typeof Component> = {
+  component: Component,
   title: 'Components/Input',
-  decorators: [
-    (Story) => (
-      <div style={{ padding: '15px' }}>
-        <Story />
-      </div>
-    )
-  ],
   argTypes: {
-    typevalue: {
-      control: {
-        type: 'select',
-        options: ['normal', 'ghost']
-      }
-    },
-    color: {
-      control: {
-        type: 'select',
-        options: ['primary', 'success', 'warning', 'error']
-      }
+    onChange: {
+      action: 'onChange'
     },
     size: {
-      control: {
-        type: 'select',
-        options: ['small', 'middle', 'large']
-      }
+      control: { type: 'select', options: ['small', 'normal', 'large'] }
     }
   },
   args: {
-    value: 'Input Text',
-    typevalue: 'normal',
-    color: 'primary',
-    size: 'middle'
-  }
+    placeholder: 'Placeholder',
+    error: '',
+    disabled: false
+  },
+  decorators: [
+    (Story) => (
+      <div className="w-full bg-white p-20">
+        <Story />
+      </div>
+    )
+  ]
 }
 
-export default defaultInput
-
-export const pwInput: ComponentMeta<typeof Component> = {
-  component: InputPassword,
-  title: 'Components/InputPassword',
-  argTypes: { ...defaultInput.argTypes }
-}
-
-export const textAreaInput: ComponentMeta<typeof Component> = {
-  component: InputTextArea,
-  title: 'Components/InputTextArea',
-  argTypes: { ...defaultInput.argTypes }
-}
+export default meta

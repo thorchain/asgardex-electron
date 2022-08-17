@@ -88,6 +88,10 @@ const inputStyle = css<InputProps>`
   }
 `
 
+/**
+ * Input (Legacy)
+ * @deprecated Use Input.txs instead
+ */
 export const Input = styled(A.Input)<InputProps>`
   ${inputStyle}
 `
@@ -102,6 +106,10 @@ export const InputNumber = styled(A.InputNumber)<InputProps>`
   }
 `
 
+/**
+ * InputPassword (Legacy)
+ * @deprecated Use InputPassword.txs instead
+ */
 export const InputPassword = styled(A.Input.Password).attrs({
   type: 'password'
 })<InputProps>`
