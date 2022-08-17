@@ -60,7 +60,9 @@ import {
   WalletAddressAsync,
   KeystoreUnlocked,
   ChangeKeystoreWalletHandler,
-  ChangeKeystoreWalletRD
+  ChangeKeystoreWalletRD,
+  RenameKeystoreWalletHandler,
+  RenameKeystoreWalletRD
 } from '../../services/wallet/types'
 import { walletTypeToI18n } from '../../services/wallet/util'
 import { AttentionIcon } from '../icons'
@@ -77,8 +79,9 @@ type Props = {
   network: Network
   walletAccounts: O.Option<WalletAccounts>
   lockWallet: FP.Lazy<void>
-  removeKeystore: RemoveKeystoreWalletHandler
-  changeKeystore$: ChangeKeystoreWalletHandler
+  removeKeystoreWallet: RemoveKeystoreWalletHandler
+  changeKeystoreWallet$: ChangeKeystoreWalletHandler
+  renameKeystoreWallet$: RenameKeystoreWalletHandler
   exportKeystore: () => Promise<void>
   addLedgerAddress: (chain: Chain, walletIndex: number) => void
   verifyLedgerAddress: (chain: Chain, walletIndex: number) => Promise<boolean>
@@ -100,13 +103,14 @@ export const WalletSettings: React.FC<Props> = (props): JSX.Element => {
     network,
     walletAccounts: oWalletAccounts,
     lockWallet,
-    removeKeystore,
-    changeKeystore$,
+    removeKeystoreWallet,
+    changeKeystoreWallet$,
+    renameKeystoreWallet$,
     exportKeystore,
     addLedgerAddress,
     verifyLedgerAddress,
     removeLedgerAddress,
-    keystore: { phrase, name: walletName },
+    keystore: { phrase, name: walletName, id: walletId },
     wallets,
     clickAddressLinkHandler,
     validatePassword$,
@@ -125,7 +129,7 @@ export const WalletSettings: React.FC<Props> = (props): JSX.Element => {
   const closeQrModal = useCallback(() => setShowQRModal(O.none), [setShowQRModal])
 
   const removeWalletHandler = useCallback(async () => {
-    const noWallets = await removeKeystore()
+    const noWallets = await removeKeystoreWallet()
     if (noWallets >= 1) {
       // goto unlock screen to unlock another wallet
       navigate(walletRoutes.locked.path())
@@ -133,7 +137,7 @@ export const WalletSettings: React.FC<Props> = (props): JSX.Element => {
       // no wallet -> go to homepage
       navigate(appRoutes.base.template)
     }
-  }, [removeKeystore, navigate])
+  }, [removeKeystoreWallet, navigate])
 
   const onSuccessPassword = useCallback(() => {
     setShowPasswordModal(false)
@@ -448,11 +452,11 @@ export const WalletSettings: React.FC<Props> = (props): JSX.Element => {
 
   const changeWalletHandler = useCallback(
     (id: KeystoreId) => {
-      subscribeChangeWalletState(changeKeystore$(id))
+      subscribeChangeWalletState(changeKeystoreWallet$(id))
       // Jump to `UnlockView` to avoid staying at wallet settings
       navigate(walletRoutes.locked.path())
     },
-    [changeKeystore$, navigate, subscribeChangeWalletState]
+    [changeKeystoreWallet$, navigate, subscribeChangeWalletState]
   )
 
   const renderChangeWalletError = useMemo(
@@ -474,9 +478,33 @@ export const WalletSettings: React.FC<Props> = (props): JSX.Element => {
     [changeWalletState, intl]
   )
 
-  const changeWalletNameHandler = useCallback((walletName: string) => {
-    console.log('walletName:', walletName)
-  }, [])
+  const { state: renameWalletState, subscribe: subscribeRenameWalletState } =
+    useSubscriptionState<RenameKeystoreWalletRD>(RD.initial)
+
+  const changeWalletNameHandler = useCallback(
+    (walletName: string) => {
+      subscribeRenameWalletState(renameKeystoreWallet$(walletId, walletName))
+    },
+    [renameKeystoreWallet$, subscribeRenameWalletState, walletId]
+  )
+
+  const renderRenameWalletError = useMemo(
+    () =>
+      FP.pipe(
+        renameWalletState,
+        RD.fold(
+          () => <></>,
+          () => <></>,
+          (error) => (
+            <p className="text-center font-main text-[14px] uppercase text-error0">
+              {intl.formatMessage({ id: 'wallet.name.error.rename' })} {error?.message ?? error.toString()}
+            </p>
+          ),
+          () => <></>
+        )
+      ),
+    [intl, renameWalletState]
+  )
 
   return (
     <div className="mt-40px bg-bg0 py-10px px-40px dark:bg-bg0d">
@@ -518,8 +546,13 @@ export const WalletSettings: React.FC<Props> = (props): JSX.Element => {
             <h1 className="p-20px font-main text-18 uppercase text-text0 dark:text-text0d">
               {intl.formatMessage({ id: 'setting.wallet.management' })}
             </h1>
-            <EditableWalletName className="mb-30px" name={walletName} onChange={changeWalletNameHandler} />
-            <div className="flex flex-col items-center md:flex-row">
+            <EditableWalletName
+              name={walletName}
+              onChange={changeWalletNameHandler}
+              loading={RD.isPending(renameWalletState)}
+            />
+            {renderRenameWalletError}
+            <div className="mt-30px flex flex-col items-center md:flex-row">
               <div className="flex w-full justify-center md:w-1/2">
                 <TextButton
                   className="m-0 min-w-[200px] md:m-20px"

@@ -4,6 +4,7 @@ const wallet: WalletMessages = {
   'wallet.name': 'Wallet name',
   'wallet.name.maxChars': 'Max. {max} chars',
   'wallet.name.error.empty': 'Please enter a name for your wallet',
+  'wallet.name.error.rename': 'Error while renaming the wallet',
   'wallet.nav.deposits': 'Deposits',
   'wallet.nav.bonds': 'Bonds',
   'wallet.nav.poolshares': 'Shares',

@@ -23,7 +23,9 @@ import {
   AddKeystoreParams,
   KeystoreWalletsLD,
   KeystoreWalletsUI$,
-  ChangeKeystoreWalletLD
+  RenameKeystoreWalletHandler,
+  ChangeKeystoreWalletHandler,
+  isKeystoreUnlocked
 } from './types'
 import {
   getKeystore,
@@ -122,7 +124,7 @@ export const removeKeystoreWallet = async () => {
   return wallets.length
 }
 
-const changeKeystoreWallet = (keystoreId: KeystoreId): ChangeKeystoreWalletLD => {
+const changeKeystoreWallet: ChangeKeystoreWalletHandler = (keystoreId: KeystoreId) => {
   const wallets = getKeystoreWallets()
   // Get selected wallet
   const selectedWallet = FP.pipe(
@@ -136,7 +138,7 @@ const changeKeystoreWallet = (keystoreId: KeystoreId): ChangeKeystoreWalletLD =>
   const { id, name } = selectedWallet
 
   const updatedWallets = FP.pipe(
-    getKeystoreWallets(),
+    wallets,
     A.map((wallet) => ({ ...wallet, selected: id === wallet.id }))
   )
 
@@ -145,14 +147,51 @@ const changeKeystoreWallet = (keystoreId: KeystoreId): ChangeKeystoreWalletLD =>
     // encode wallets first
     ipcKeystoreWalletsIO.encode,
     // Save updated `wallets` to disk
-    (wallets) => Rx.of(window.apiKeystore.saveKeystoreWallets(wallets)),
+    (wallets) => Rx.from(window.apiKeystore.saveKeystoreWallets(wallets)),
     RxOp.catchError((err) => Rx.of(RD.failure(err))),
     RxOp.map(() => RD.success(true)),
     liveData.map((_) => {
       // Update states
       setKeystoreWallets(updatedWallets)
-      // set selected wallet
+      // set selected wallet as locked wallet
       setKeystoreState(O.some({ id, name }))
+      return true
+    }),
+    RxOp.startWith(RD.pending)
+  )
+}
+
+const renameKeystoreWallet: RenameKeystoreWalletHandler = (id, name) => {
+  // get keystore state - needs to be UNLOCKED
+  const updatedKeystoreState = FP.pipe(
+    getKeystoreState(),
+    O.chain(FP.flow(O.fromPredicate(isKeystoreUnlocked))),
+    // rename in state
+    O.map((state) => ({ ...state, name })),
+    O.toNullable
+  )
+
+  if (!updatedKeystoreState)
+    return Rx.of(RD.failure(Error(`Could not rename wallet with id ${id} - it seems to be locked`)))
+
+  // update selected wallet in list of wallets
+  const updatedWallets = FP.pipe(
+    getKeystoreWallets(),
+    A.map((wallet) => (id === wallet.id ? { ...wallet, name } : wallet))
+  )
+  return FP.pipe(
+    updatedWallets,
+    // encode wallets first
+    ipcKeystoreWalletsIO.encode,
+    // Save updated `wallets` to disk
+    (wallets) => Rx.from(window.apiKeystore.saveKeystoreWallets(wallets)),
+    RxOp.catchError((err) => Rx.of(RD.failure(err))),
+    RxOp.map(() => RD.success(true)),
+    liveData.map((_) => {
+      // Update states of all wallets
+      setKeystoreWallets(updatedWallets)
+      // set selected wallet - still unlocked
+      setKeystoreState(O.some(updatedKeystoreState))
       return true
     }),
     RxOp.startWith(RD.pending)
@@ -311,6 +350,7 @@ export const keystoreService: KeystoreService = {
   addKeystoreWallet,
   removeKeystoreWallet,
   changeKeystoreWallet,
+  renameKeystoreWallet,
   importKeystore,
   exportKeystore,
   loadKeystore$,
