@@ -204,7 +204,7 @@ export const UnlockForm: React.FC<Props> = (props): JSX.Element => {
               className="my-0 mx-auto mb-20px w-full max-w-[400px]"
               {...register('password', { required: true })}
               placeholder={intl.formatMessage({ id: 'common.password' }).toUpperCase()}
-              size={'normal'}
+              size="large"
               autoFocus={true}
               error={errors.password ? intl.formatMessage({ id: 'wallet.password.empty' }) : ''}
               disabled={unlocking}

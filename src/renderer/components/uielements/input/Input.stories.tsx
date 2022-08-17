@@ -18,8 +18,10 @@ const meta: ComponentMeta<typeof Component> = {
   },
   args: {
     placeholder: 'Placeholder',
-    error: '',
-    disabled: false
+    size: 'normal',
+    error: false,
+    disabled: false,
+    uppercase: true
   },
   decorators: [
     (Story) => (
