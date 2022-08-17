@@ -90,12 +90,10 @@ export const EditableWalletName: React.FC<Props> = (props): JSX.Element => {
               error={!!errors.name}
               onKeyDown={keyDownHandler}
             />
-            <div className="flex h-[35px] items-center">
-              <BaseButton className="!p-0 text-turquoise" onClick={handleSubmit(submit)} type="submit">
-                <CheckCircleIcon className="ml-[5px] h-[24px] w-[24px]" />
-              </BaseButton>
-              <XCircleIcon className="ml-[5px] h-[24px] w-[24px] cursor-pointer text-error0" onClick={cancel} />
-            </div>
+            <BaseButton className="!p-0 text-turquoise" onClick={handleSubmit(submit)} type="submit">
+              <CheckCircleIcon className="ml-[5px] h-[24px] w-[24px]" />
+            </BaseButton>
+            <XCircleIcon className="ml-[5px] h-[24px] w-[24px] cursor-pointer text-error0" onClick={cancel} />
           </div>
           {errors.name && (
             <p className={`mt-10px font-main text-[14px] uppercase text-error0`}>
