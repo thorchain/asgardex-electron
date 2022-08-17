@@ -69,7 +69,7 @@ export const WalletSettingsView: React.FC = (): JSX.Element => {
     keystoreService: { exportKeystore, validatePassword$ }
   } = useWalletContext()
 
-  const { state: keystore, lock, remove, change$ } = useKeystoreState()
+  const { state: keystore, lock, remove, change$, rename$ } = useKeystoreState()
 
   const { network } = useNetwork()
 
@@ -417,8 +417,9 @@ export const WalletSettingsView: React.FC = (): JSX.Element => {
         <WalletSettings
           network={network}
           lockWallet={lock}
-          removeKeystore={remove}
-          changeKeystore$={change$}
+          removeKeystoreWallet={remove}
+          changeKeystoreWallet$={change$}
+          renameKeystoreWallet$={rename$}
           exportKeystore={exportKeystore}
           addLedgerAddress={addLedgerAddressHandler}
           verifyLedgerAddress={verifyLedgerAddressHandler}

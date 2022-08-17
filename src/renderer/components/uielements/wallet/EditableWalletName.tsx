@@ -7,11 +7,13 @@ import { useForm } from 'react-hook-form'
 import { useIntl } from 'react-intl'
 
 import { MAX_WALLET_NAME_CHARS } from '../../../services/wallet/const'
-import { BaseButton } from '../button'
+// import { LoadingIcon } from '../../icons'
+import { BaseButton, TextButton } from '../button'
 import { Input } from '../input/Input'
 
 export type Props = {
   name: string
+  loading?: boolean
   onChange: (name: string) => void
   className?: string
 }
@@ -21,9 +23,10 @@ type FormData = {
 }
 
 export const EditableWalletName: React.FC<Props> = (props): JSX.Element => {
-  const { name, onChange, className = '' } = props
+  const { name: initialName, onChange, loading = false, className = '' } = props
 
   const [editableName, setEditableName] = useState<O.Option<string>>(O.none)
+  const [name, setName] = useState<string>(initialName)
 
   const intl = useIntl()
 
@@ -39,18 +42,22 @@ export const EditableWalletName: React.FC<Props> = (props): JSX.Element => {
       setEditableName(O.some(name))
     }
     return (
-      <div
-        className={`flex cursor-pointer items-center font-main text-[18px] text-text0 dark:text-text0d`}
+      <TextButton
+        color="neutral"
+        uppercase={false}
+        disabled={loading}
+        size="large"
+        loading={loading}
+        className={`flex ${loading ? 'cursor-not-allowed' : 'cursor-pointer'} items-center text-[18px]`}
         onClick={edit}>
         {name}
         <PencilAltIcon className="dark:text0d ml-[5px] h-[20px] w-[20px] text-turquoise" />
-      </div>
+      </TextButton>
     )
-  }, [name])
+  }, [loading, name])
 
   const renderEditableName = useCallback(
     (name: string) => {
-      const confirm = () => FP.pipe(editableName, O.fold(FP.constVoid, onChange))
       const cancel = () => {
         reset()
         setEditableName(O.none)
@@ -58,25 +65,22 @@ export const EditableWalletName: React.FC<Props> = (props): JSX.Element => {
       const submit = ({ name }: FormData) => {
         setEditableName(O.none)
         onChange(name)
+        setName(name)
         reset()
       }
 
       const keyDownHandler = (e: React.KeyboardEvent<HTMLElement>) => {
-        console.log('key down', e.key)
         if (e.key === 'Escape') {
           cancel()
         }
       }
 
-      const error = !!errors.name
-
       return (
         <form className="items-top flex w-full flex-col items-center" onSubmit={handleSubmit(submit)}>
           <div className="flex w-full items-center justify-center">
             <Input
-              // 60px offset of icons width to stay in center
-              className={`${error ? 'ring-error0' : 'dark:gray1d ring-gray1'} w-full max-w-[380px] text-[18px]
-              `}
+              id="name"
+              className="w-full max-w-[380px]"
               size="large"
               defaultValue={name}
               autoFocus
@@ -86,8 +90,8 @@ export const EditableWalletName: React.FC<Props> = (props): JSX.Element => {
               error={!!errors.name}
               onKeyDown={keyDownHandler}
             />
-            <BaseButton className="ml-[5px] h-[24px] w-[24px] !p-0 text-turquoise" onClick={confirm} type="submit">
-              <CheckCircleIcon className="" />
+            <BaseButton className="!p-0 text-turquoise" onClick={handleSubmit(submit)} type="submit">
+              <CheckCircleIcon className="ml-[5px] h-[24px] w-[24px]" />
             </BaseButton>
             <XCircleIcon className="ml-[5px] h-[24px] w-[24px] cursor-pointer text-error0" onClick={cancel} />
           </div>
@@ -99,13 +103,14 @@ export const EditableWalletName: React.FC<Props> = (props): JSX.Element => {
         </form>
       )
     },
-    [editableName, errors.name, handleSubmit, intl, onChange, register, reset]
+    [errors.name, handleSubmit, intl, onChange, register, reset]
   )
 
   return (
     <div className={`flex w-full flex-col items-center justify-center ${className}`}>
       <h2 className="w-full text-center font-main text-[12px] uppercase text-text2 dark:text-text2d">
-        {intl.formatMessage({ id: 'wallet.name' })}{' '}
+        {intl.formatMessage({ id: 'wallet.name' })}
+        {/* show info about max. chars in editable mode only  */}
         {FP.pipe(
           editableName,
           O.fold(
@@ -118,7 +123,12 @@ export const EditableWalletName: React.FC<Props> = (props): JSX.Element => {
           )
         )}
       </h2>
-      {FP.pipe(editableName, O.fold(renderName, renderEditableName))}
+      <div
+        className={`flex items-center ${loading ? 'opacity-65' : 'opacity-100'} ${
+          O.isSome(editableName) ? 'w-full' : ''
+        }`}>
+        {FP.pipe(editableName, O.fold(renderName, renderEditableName))}
+      </div>
     </div>
   )
 }

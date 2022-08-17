@@ -44,7 +44,7 @@ export const HeaderLock: React.FC<Props> = (props): JSX.Element => {
                   text-text2 dark:bg-gray0d
                   dark:text-text2d
                   ">
-                {truncateMiddle(name, { start: 4, end: 4, max: 16 })}
+                {truncateMiddle(name, { start: 3, end: 3, max: 11 })}
               </p>
             )
           )

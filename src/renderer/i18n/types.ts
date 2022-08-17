@@ -152,6 +152,7 @@ type WalletMessageKey =
   | 'wallet.name'
   | 'wallet.name.maxChars'
   | 'wallet.name.error.empty'
+  | 'wallet.name.error.rename'
   | 'wallet.nav.deposits'
   | 'wallet.nav.bonds'
   | 'wallet.nav.poolshares'
