@@ -69,6 +69,7 @@ import { BorderButton, FlatButton, TextButton } from '../uielements/button'
 import { InfoIcon } from '../uielements/info'
 import { Modal } from '../uielements/modal'
 import { WalletSelector } from '../uielements/wallet'
+import { EditableWalletName } from '../uielements/wallet/EditableWalletName'
 import * as CStyled from './Common.styles'
 import * as Styled from './WalletSettings.styles'
 
@@ -473,6 +474,10 @@ export const WalletSettings: React.FC<Props> = (props): JSX.Element => {
     [changeWalletState, intl]
   )
 
+  const changeWalletNameHandler = useCallback((walletName: string) => {
+    console.log('walletName:', walletName)
+  }, [])
+
   return (
     <div className="mt-40px bg-bg0 py-10px px-40px dark:bg-bg0d">
       <CStyled.Collapse
@@ -513,11 +518,7 @@ export const WalletSettings: React.FC<Props> = (props): JSX.Element => {
             <h1 className="p-20px font-main text-18 uppercase text-text0 dark:text-text0d">
               {intl.formatMessage({ id: 'setting.wallet.management' })}
             </h1>
-            <h2 className="w-full text-center font-main text-[12px] uppercase text-text2 dark:text-text2d">
-              {intl.formatMessage({ id: 'wallet.name' })}
-            </h2>
-            {/* TODO(@veado) Make wallet name editable */}
-            <p className="text-center font-main text-18 uppercase text-text0 dark:text-text0d">{walletName}</p>
+            <EditableWalletName className="mb-30px" name={walletName} onChange={changeWalletNameHandler} />
             <div className="flex flex-col items-center md:flex-row">
               <div className="flex w-full justify-center md:w-1/2">
                 <TextButton
@@ -557,7 +558,7 @@ export const WalletSettings: React.FC<Props> = (props): JSX.Element => {
           </div>
 
           <div className="card mb-20px w-full ">
-            <h1 className="p-20px font-main text-18 uppercase text-text0 dark:text-text0d">
+            <h1 className="p-20px text-center font-main text-18 uppercase text-text0 dark:text-text0d md:text-left">
               {intl.formatMessage({ id: 'setting.multiwallet.management' })}
             </h1>
 

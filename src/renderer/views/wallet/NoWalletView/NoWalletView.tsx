@@ -63,7 +63,7 @@ export const NoWalletView = () => {
           color="gray"
           size="big"
           textTransform="uppercase">
-          {intl.formatMessage({ id: 'wallet.empty.phrase.create' })}
+          {intl.formatMessage({ id: 'wallet.create.error.phrase.empty' })}
         </Label>
       </div>
 
@@ -103,7 +103,7 @@ export const NoWalletView = () => {
           color="gray"
           size="big"
           textTransform="uppercase">
-          {intl.formatMessage({ id: 'wallet.empty.phrase.import' })}
+          {intl.formatMessage({ id: 'wallet.imports.error.phrase.empty' })}
         </Label>
       </div>
     </div>

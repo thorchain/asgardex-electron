@@ -7,7 +7,7 @@ export const Default = Template.bind({})
 
 const meta: ComponentMeta<typeof Component> = {
   component: Component,
-  title: 'Components/InputPasswordTailwind',
+  title: 'Components/InputPassword',
   argTypes: {
     onChange: {
       action: 'onChange'
