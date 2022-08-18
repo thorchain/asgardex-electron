@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo, useState } from 'react'
+import React, { useCallback, useEffect, useMemo, useState } from 'react'
 
 import { SearchOutlined } from '@ant-design/icons'
 import * as RD from '@devexperts/remote-data-ts'
@@ -453,10 +453,8 @@ export const WalletSettings: React.FC<Props> = (props): JSX.Element => {
   const changeWalletHandler = useCallback(
     (id: KeystoreId) => {
       subscribeChangeWalletState(changeKeystoreWallet$(id))
-      // Jump to `UnlockView` to avoid staying at wallet settings
-      navigate(walletRoutes.locked.path())
     },
-    [changeKeystoreWallet$, navigate, subscribeChangeWalletState]
+    [changeKeystoreWallet$, subscribeChangeWalletState]
   )
 
   const renderChangeWalletError = useMemo(
@@ -477,6 +475,13 @@ export const WalletSettings: React.FC<Props> = (props): JSX.Element => {
       ),
     [changeWalletState, intl]
   )
+
+  useEffect(() => {
+    if (RD.isSuccess(changeWalletState)) {
+      // Jump to `UnlockView` to avoid staying at wallet settings
+      navigate(walletRoutes.locked.path())
+    }
+  }, [changeWalletState, navigate])
 
   const { state: renameWalletState, subscribe: subscribeRenameWalletState } =
     useSubscriptionState<RenameKeystoreWalletRD>(RD.initial)
@@ -612,7 +617,12 @@ export const WalletSettings: React.FC<Props> = (props): JSX.Element => {
                 <h2 className="w-full text-center font-main text-[12px] uppercase text-text2 dark:text-text2d">
                   {intl.formatMessage({ id: 'wallet.change.title' })}
                 </h2>
-                <WalletSelector wallets={wallets} onChange={changeWalletHandler} className="min-w-[200px]" />
+                <WalletSelector
+                  className="min-w-[200px]"
+                  disabled={RD.isPending(changeWalletState)}
+                  wallets={wallets}
+                  onChange={changeWalletHandler}
+                />
                 {renderChangeWalletError}
               </div>
             </div>

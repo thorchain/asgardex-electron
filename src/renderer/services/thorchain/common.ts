@@ -23,7 +23,7 @@ import { Client$, ClientState, ClientState$ } from './types'
  * A `ThorchainClient` will never be created as long as no phrase is available
  */
 const clientState$: ClientState$ = FP.pipe(
-  Rx.combineLatest([keystoreService.keystore$, clientNetwork$, Rx.of(getClientUrl())]),
+  Rx.combineLatest([keystoreService.keystoreState$, clientNetwork$, Rx.of(getClientUrl())]),
   RxOp.switchMap(
     ([keystore, network, clientUrl]): ClientState$ =>
       FP.pipe(

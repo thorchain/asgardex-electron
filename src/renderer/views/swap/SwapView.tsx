@@ -63,7 +63,7 @@ const SuccessRouteView: React.FC<Props> = ({ sourceAsset, targetAsset }): JSX.El
     balancesState$,
     reloadBalancesByChain,
     getLedgerAddress$,
-    keystoreService: { keystore$, validatePassword$ }
+    keystoreService: { keystoreState$, validatePassword$ }
   } = useWalletContext()
 
   const [haltedChains] = useObservableState(() => FP.pipe(haltedChains$, RxOp.map(RD.getOrElse((): Chain[] => []))), [])
@@ -71,7 +71,7 @@ const SuccessRouteView: React.FC<Props> = ({ sourceAsset, targetAsset }): JSX.El
 
   const { reloadApproveFee, approveFee$, approveERC20Token$, isApprovedERC20Token$ } = useEthereumContext()
 
-  const keystore = useObservableState(keystore$, O.none)
+  const keystore = useObservableState(keystoreState$, O.none)
 
   const poolsState = useObservableState(poolsState$, RD.initial)
 

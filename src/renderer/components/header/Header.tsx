@@ -19,7 +19,7 @@ export const Header: React.FC = (): JSX.Element => {
   const { keystoreService } = useWalletContext()
   const { mimir$ } = useThorchainContext()
   const { lock } = keystoreService
-  const keystore = useObservableState(keystoreService.keystore$, O.none)
+  const keystore = useObservableState(keystoreService.keystoreState$, O.none)
   const mimir = useObservableState(mimir$, RD.initial)
   const { service: midgardService } = useMidgardContext()
   const {

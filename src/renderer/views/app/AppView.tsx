@@ -72,7 +72,7 @@ export const AppView: React.FC = (): JSX.Element => {
   const prevHaltedChains = useRef<Chain[]>([])
   const prevMimirHalt = useRef<MimirHalt>(DEFAULT_MIMIR_HALT)
 
-  const { wallets: keystoreWallets, reload: reloadKeystoreWallets } = useKeystoreWallets()
+  const { walletsPersistentRD, reload: reloadPersistentWallets } = useKeystoreWallets()
 
   const { mimirHaltRD } = useMimirHalt()
 
@@ -273,7 +273,7 @@ export const AppView: React.FC = (): JSX.Element => {
           {' '}
           keystoreWallets:
           {FP.pipe(
-            keystoreWallets,
+            walletsPersistentRD,
             RD.fold(
               () => <>init</>,
               () => <>loading</>,
@@ -282,10 +282,10 @@ export const AppView: React.FC = (): JSX.Element => {
             )
           )}
         </div>
-        <button onClick={reloadKeystoreWallets}>reloadKeystoreWallets</button>
+        <button onClick={reloadPersistentWallets}>reloadKeystoreWallets</button>
       </div>
     )
-  }, [keystoreWallets, reloadKeystoreWallets])
+  }, [walletsPersistentRD, reloadPersistentWallets])
 
   return (
     <Styled.AppWrapper>

@@ -1,7 +1,10 @@
 import * as RD from '@devexperts/remote-data-ts'
 import { Chain } from '@xchainjs/xchain-util'
+import * as A from 'fp-ts/lib/Array'
 import * as FP from 'fp-ts/lib/function'
+import * as M from 'fp-ts/lib/Map'
 import * as O from 'fp-ts/lib/Option'
+import * as N from 'fp-ts/number'
 import * as Rx from 'rxjs'
 import * as RxOp from 'rxjs/operators'
 
@@ -21,11 +24,19 @@ import {
   VerifyLedgerAddressHandler,
   AskLedgerAddressesHandler,
   RemoveLedgerAddressHandler,
-  isKeystoreUnlocked
+  isKeystoreUnlocked,
+  KeystoreWalletsUI$,
+  RemovedKeystoreId$
 } from './types'
 import { hasImportedKeystore } from './util'
 
-export const createLedgerService = ({ keystore$ }: { keystore$: KeystoreState$ }): LedgerService => {
+export const createLedgerService = ({
+  keystore$,
+  wallets$
+}: {
+  keystore$: KeystoreState$
+  wallets$: KeystoreWalletsUI$
+}): LedgerService => {
   // State of all Ledger addresses added to a keystore wallet
   const {
     get$: keystoreLedgerAddresses$,
@@ -37,7 +48,25 @@ export const createLedgerService = ({ keystore$ }: { keystore$: KeystoreState$ }
     keystore$,
     // Check unlocked keystore only
     RxOp.map(FP.flow(O.chain(O.fromPredicate(isKeystoreUnlocked)))),
-    RxOp.map(FP.flow(O.map(({ id }) => id)))
+    RxOp.map(FP.flow(O.map(({ id }) => id))),
+    RxOp.distinctUntilChanged(),
+    RxOp.shareReplay(1)
+  )
+
+  /**
+   * Stream of removed `KeystoreId`s
+   * by comparing changes of `KeystoreWalletsUI[]`
+   */
+  const removedKeystoreId$: RemovedKeystoreId$ = FP.pipe(
+    wallets$,
+    // get prev. + curr. `KeystoreWalletsUI[]`
+    RxOp.pairwise(),
+    // Transform pair of `KeystoreWalletsUI[]` to pair of `KeystoreId[]`
+    RxOp.map((pair) => FP.pipe(pair, A.map(FP.flow(A.map(({ id }) => id))))),
+    RxOp.map(([prev, curr]) =>
+      // get's the difference
+      FP.pipe(prev, A.difference(N.Eq)(curr), A.head)
+    )
   )
 
   const ledgerAddresses = (id: KeystoreId): LedgerAddressesMap =>
@@ -62,7 +91,8 @@ export const createLedgerService = ({ keystore$ }: { keystore$: KeystoreState$ }
             )
         )
       )
-    )
+    ),
+    RxOp.startWith(INITIAL_LEDGER_ADDRESSES_MAP)
   )
 
   const setLedgerAddresses = (id: KeystoreId, addressesMap: LedgerAddressesMap) => {
@@ -152,6 +182,19 @@ export const createLedgerService = ({ keystore$ }: { keystore$: KeystoreState$ }
       setKeystoreLedgerAddresses(INITIAL_KEYSTORE_LEDGER_ADDRESSES_MAP)
     }
   })
+
+  // Whenever a keystore have been removed, remove its related ledger addresses
+  removedKeystoreId$.subscribe((oKeystoreId: O.Option<KeystoreId>) =>
+    FP.pipe(
+      oKeystoreId,
+      O.map((id) => FP.pipe(keystoreLedgerAddresses(), M.deleteAt(N.Eq)(id), setKeystoreLedgerAddresses))
+    )
+  )
+
+  // TODO(@Veado) Remove it - for debugging only
+  ledgerAddresses$.subscribe((v) => console.log('ledgerAddresses$ sub', v))
+  keystoreLedgerAddresses$.subscribe((v) => console.log('keystoreLedgerAddresses$ sub', v))
+  removedKeystoreId$.subscribe((v) => console.log('removedKeystoreId$ sub', v))
 
   return {
     ledgerAddresses$,

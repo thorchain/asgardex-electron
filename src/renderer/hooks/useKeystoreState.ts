@@ -27,7 +27,7 @@ export const useKeystoreState = (): {
 } => {
   const {
     keystoreService: {
-      keystore$,
+      keystoreState$,
       unlock,
       lock,
       removeKeystoreWallet: remove,
@@ -36,11 +36,11 @@ export const useKeystoreState = (): {
     }
   } = useWalletContext()
 
-  const state = useObservableState(keystore$, INITIAL_KEYSTORE_STATE)
+  const state = useObservableState(keystoreState$, INITIAL_KEYSTORE_STATE)
 
-  const [phrase] = useObservableState(() => FP.pipe(keystore$, RxOp.map(FP.flow(getPhrase))), O.none)
-  const [walletName] = useObservableState(() => FP.pipe(keystore$, RxOp.map(FP.flow(getWalletName))), O.none)
-  const [locked] = useObservableState(() => FP.pipe(keystore$, RxOp.map(FP.flow(isLocked))), false)
+  const [phrase] = useObservableState(() => FP.pipe(keystoreState$, RxOp.map(FP.flow(getPhrase))), O.none)
+  const [walletName] = useObservableState(() => FP.pipe(keystoreState$, RxOp.map(FP.flow(getWalletName))), O.none)
+  const [locked] = useObservableState(() => FP.pipe(keystoreState$, RxOp.map(FP.flow(isLocked))), false)
 
   return { state, phrase, walletName, unlock, lock, locked, remove, change$, rename$ }
 }
