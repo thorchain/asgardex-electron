@@ -67,7 +67,7 @@ export type ChangeKeystoreWalletLD = LiveData<Error, boolean>
 export type ChangeKeystoreWalletHandler = (id: KeystoreId) => ChangeKeystoreWalletLD
 
 export type KeystoreService = {
-  keystore$: KeystoreState$
+  keystoreState$: KeystoreState$
   addKeystoreWallet: (params: AddKeystoreParams) => Promise<void>
   removeKeystoreWallet: RemoveKeystoreWalletHandler
   changeKeystoreWallet: ChangeKeystoreWalletHandler
@@ -82,8 +82,8 @@ export type KeystoreService = {
    * No need to store any success data. Only status
    */
   validatePassword$: ValidatePasswordHandler
-  reloadKeystoreWallets: FP.Lazy<void>
-  keystoreWallets$: KeystoreWalletsLD
+  reloadPersistentKeystoreWallets: FP.Lazy<void>
+  keystoreWalletsPersistent$: KeystoreWalletsLD
   keystoreWalletsUI$: KeystoreWalletsUI$
   importingKeystoreState$: ImportingKeystoreStateLD
   resetImportingKeystoreState: FP.Lazy<void>
@@ -247,6 +247,7 @@ export type KeystoreLedgerAddressesMap = Map<KeystoreId, LedgerAddressesMap>
 
 export type KeystoreWalletsRD = RD.RemoteData<Error, KeystoreWallets>
 export type KeystoreWalletsLD = LiveData<Error, KeystoreWallets>
+export type KeystoreWallets$ = Rx.Observable<KeystoreWallets>
 
 export type KeystoreWalletUI = Omit<KeystoreWallet, 'keystore'>
 export type KeystoreWalletsUI = KeystoreWalletUI[]

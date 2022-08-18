@@ -18,7 +18,7 @@ export const WalletAuth = ({ children }: { children: JSX.Element }): JSX.Element
   // Since `useObservableState` is set after first render (but not before)
   // and Route.render is called before first render,
   // we have to add 'undefined'  as default value
-  const keystore = useObservableState(keystoreService.keystore$, undefined)
+  const keystore = useObservableState(keystoreService.keystoreState$, undefined)
 
   // Redirect if  an user has not a phrase imported or wallet has been locked
   // Special case: keystore can be `undefined` (see comment at its definition using `useObservableState`)

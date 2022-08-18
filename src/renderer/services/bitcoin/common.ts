@@ -24,7 +24,7 @@ import { ClientState, ClientState$ } from './types'
  * A `BitcoinClient` will never be created as long as no phrase is available
  */
 const clientState$: ClientState$ = FP.pipe(
-  Rx.combineLatest([keystoreService.keystore$, clientNetwork$]),
+  Rx.combineLatest([keystoreService.keystoreState$, clientNetwork$]),
   RxOp.switchMap(
     ([keystore, network]): ClientState$ =>
       Rx.of(

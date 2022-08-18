@@ -47,19 +47,15 @@ const { get$: importingKeystoreState$, set: setImportingKeystoreState } = observ
  * State of selected keystore wallet
  */
 const {
-  get$: getKeystoreState$,
-  get: getKeystoreState,
+  get$: keystoreState$,
+  get: keystoreState,
   set: setKeystoreState
 } = observableState<KeystoreState>(INITIAL_KEYSTORE_STATE)
 
 /**
  * Internal state of keystore wallets - not shared to outside world
  */
-const {
-  get$: getKeystoreWallets$,
-  get: getKeystoreWallets,
-  set: setKeystoreWallets
-} = observableState<KeystoreWallets>([])
+const { get$: keystoreWallets$, get: keystoreWallets, set: setKeystoreWallets } = observableState<KeystoreWallets>([])
 
 /**
  * Adds a keystore and saves it to disk
@@ -71,7 +67,7 @@ const addKeystoreWallet = async ({ phrase, name, id, password }: AddKeystorePara
 
     // remove selected state from current wallets
     const wallets = FP.pipe(
-      getKeystoreWallets(),
+      keystoreWallets(),
       A.map((wallet) => ({ ...wallet, selected: false }))
     )
     // Add new wallet to wallet list + mark it `selected`
@@ -100,7 +96,7 @@ const addKeystoreWallet = async ({ phrase, name, id, password }: AddKeystorePara
 }
 
 export const removeKeystoreWallet = async () => {
-  const state = getKeystoreState()
+  const state = keystoreState()
 
   const keystoreId = FP.pipe(state, getKeystoreId, O.toNullable)
   if (!keystoreId) {
@@ -108,7 +104,7 @@ export const removeKeystoreWallet = async () => {
   }
   // Remove it from `wallets`
   const wallets = FP.pipe(
-    getKeystoreWallets(),
+    keystoreWallets(),
     A.filter(({ id }) => id !== keystoreId)
   )
   const encodedWallets = ipcKeystoreWalletsIO.encode(wallets)
@@ -125,7 +121,7 @@ export const removeKeystoreWallet = async () => {
 }
 
 const changeKeystoreWallet: ChangeKeystoreWalletHandler = (keystoreId: KeystoreId) => {
-  const wallets = getKeystoreWallets()
+  const wallets = keystoreWallets()
   // Get selected wallet
   const selectedWallet = FP.pipe(
     wallets,
@@ -164,7 +160,7 @@ const changeKeystoreWallet: ChangeKeystoreWalletHandler = (keystoreId: KeystoreI
 const renameKeystoreWallet: RenameKeystoreWalletHandler = (id, name) => {
   // get keystore state - needs to be UNLOCKED
   const updatedKeystoreState = FP.pipe(
-    getKeystoreState(),
+    keystoreState(),
     O.chain(FP.flow(O.fromPredicate(isKeystoreUnlocked))),
     // rename in state
     O.map((state) => ({ ...state, name })),
@@ -176,7 +172,7 @@ const renameKeystoreWallet: RenameKeystoreWalletHandler = (id, name) => {
 
   // update selected wallet in list of wallets
   const updatedWallets = FP.pipe(
-    getKeystoreWallets(),
+    keystoreWallets(),
     A.map((wallet) => (id === wallet.id ? { ...wallet, name } : wallet))
   )
   return FP.pipe(
@@ -215,12 +211,12 @@ const importKeystore = async ({ keystore, password, name, id }: ImportKeystorePa
  */
 const exportKeystore = async () => {
   try {
-    const id = FP.pipe(getKeystoreState(), getKeystoreId, O.toNullable)
+    const id = FP.pipe(keystoreState(), getKeystoreId, O.toNullable)
     if (!id) {
       throw Error(`Can't export keystore - keystore id is missing in KeystoreState`)
     }
 
-    const wallets = getKeystoreWallets()
+    const wallets = keystoreWallets()
     const keystore = FP.pipe(wallets, getKeystore(id), O.toNullable)
     if (!keystore) {
       throw Error(`Can't export keystore - keystore is missing in wallet list`)
@@ -248,7 +244,7 @@ const loadKeystore$ = (): LoadKeystoreLD => {
 }
 
 const lock = async () => {
-  const state = getKeystoreState()
+  const state = keystoreState()
   // make sure keystore is already imported
   if (!hasImportedKeystore(state)) {
     throw Error(`Can't lock - keystore seems not to be imported`)
@@ -262,7 +258,7 @@ const lock = async () => {
 }
 
 const unlock = async (password: string) => {
-  const state = getKeystoreState()
+  const state = keystoreState()
   const lockedData = FP.pipe(state, getLockedData, O.toNullable)
   // make sure keystore is already imported
   if (!lockedData) {
@@ -272,7 +268,7 @@ const unlock = async (password: string) => {
   const { id, name } = lockedData
 
   // get keystore from wallet list (not stored in `KeystoreState`)
-  const keystore = FP.pipe(getKeystoreWallets(), getKeystore(id), O.toNullable)
+  const keystore = FP.pipe(keystoreWallets(), getKeystore(id), O.toNullable)
   if (!keystore) {
     throw Error(`Can't unlock - keystore is missing in wallet list`)
   }
@@ -285,11 +281,14 @@ const unlock = async (password: string) => {
   }
 }
 
-// `TriggerStream` to reload data of `ThorchainLastblock`
-const { stream$: reloadKeystoreWallets$, trigger: reloadKeystoreWallets } = triggerStream()
+// `TriggerStream` to reload persistent `KeystoreWallets`
+const { stream$: reloadPersistentKeystoreWallets$, trigger: reloadPersistentKeystoreWallets } = triggerStream()
 
-const keystoreWallets$: KeystoreWalletsLD = FP.pipe(
-  reloadKeystoreWallets$,
+/**
+ * Persistent `KeystoreWallets` stored on disc.
+ */
+const keystoreWalletsPersistent$: KeystoreWalletsLD = FP.pipe(
+  reloadPersistentKeystoreWallets$,
   RxOp.switchMap(() => Rx.from(window.apiKeystore.initKeystoreWallets())),
   RxOp.catchError((e) => Rx.of(E.left(e))),
   RxOp.switchMap(
@@ -300,27 +299,35 @@ const keystoreWallets$: KeystoreWalletsLD = FP.pipe(
       )
     )
   ),
-  liveData.map((wallets) => {
-    const state = getInitialKeystoreData(wallets)
-
-    setKeystoreState(state)
-    setKeystoreWallets(wallets)
-
-    return wallets
-  }),
   RxOp.startWith(RD.pending),
   RxOp.shareReplay(1)
 )
 
+// Subscribe keystoreWalletsPersistent$
+// to update internal `KeystoreWallets` + `KeystoreState` stored in memory
+// whenever data are loaded from disc,
+keystoreWalletsPersistent$.subscribe((walletsRD) =>
+  FP.pipe(
+    walletsRD,
+    RD.map((wallets) => {
+      const state = getInitialKeystoreData(wallets)
+      // update internal `KeystoreWallets` + `KeystoreState` stored in memory
+      setKeystoreState(state)
+      setKeystoreWallets(wallets)
+      return true
+    })
+  )
+)
+
 // Simplified `KeystoreWallets` (w/o loading state, w/o `keystore`) to display data at UIs
 const keystoreWalletsUI$: KeystoreWalletsUI$ = FP.pipe(
-  getKeystoreWallets$,
+  keystoreWallets$,
   // Transform `KeystoreWallets` -> `KeystoreWalletsUI`
   RxOp.map(FP.flow(A.map(({ id, name, selected }) => ({ id, name, selected })))),
   RxOp.shareReplay(1)
 )
 
-const id = FP.pipe(getKeystoreState(), getKeystoreId)
+const id = FP.pipe(keystoreState(), getKeystoreId)
 if (!id) {
   throw Error(`Can't export keystore - keystore id is missing in KeystoreState`)
 }
@@ -328,9 +335,9 @@ if (!id) {
 const validatePassword$ = (password: string): ValidatePasswordLD =>
   password
     ? FP.pipe(
-        getKeystoreState(),
+        keystoreState(),
         getKeystoreId,
-        O.chain((id) => FP.pipe(getKeystoreWallets(), getKeystore(id))),
+        O.chain((id) => FP.pipe(keystoreWallets(), getKeystore(id))),
         O.fold(
           () => Rx.of(RD.failure(Error('Could not get current keystore to validate password'))),
           (keystore) =>
@@ -346,7 +353,7 @@ const validatePassword$ = (password: string): ValidatePasswordLD =>
     : Rx.of(RD.initial)
 
 export const keystoreService: KeystoreService = {
-  keystore$: getKeystoreState$,
+  keystoreState$,
   addKeystoreWallet,
   removeKeystoreWallet,
   changeKeystoreWallet,
@@ -357,13 +364,13 @@ export const keystoreService: KeystoreService = {
   lock,
   unlock,
   validatePassword$,
-  reloadKeystoreWallets,
+  keystoreWalletsPersistent$,
+  reloadPersistentKeystoreWallets,
   keystoreWalletsUI$,
-  keystoreWallets$,
   importingKeystoreState$,
   resetImportingKeystoreState: () => setImportingKeystoreState(RD.initial)
 }
 
 // TODO(@Veado) Remove it - for debugging only
-getKeystoreState$.subscribe((v) => console.log('keystoreState subscription', v))
-getKeystoreWallets$.subscribe((v) => console.log('keystoreWallets subscription', v))
+keystoreState$.subscribe((v) => console.log('keystoreState subscription', v))
+keystoreWallets$.subscribe((v) => console.log('keystoreWallets subscription', v))

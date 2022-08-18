@@ -22,7 +22,7 @@ import type { Client$, ClientState, ClientState$ } from './types'
  * A `CosmosClient` will never be created as long as no phrase is available
  */
 const clientState$: ClientState$ = FP.pipe(
-  Rx.combineLatest([keystoreService.keystore$, clientNetwork$, Rx.of(getClientUrls())]),
+  Rx.combineLatest([keystoreService.keystoreState$, clientNetwork$, Rx.of(getClientUrls())]),
   RxOp.switchMap(
     ([keystore, network, clientUrls]): ClientState$ =>
       FP.pipe(

@@ -7,11 +7,11 @@ import { getTxs$, loadTxs, explorerUrl$, resetTxsPage } from './transaction'
 
 const { askLedgerAddress$, getLedgerAddress$, verifyLedgerAddress, removeLedgerAddress, ledgerAddresses$ } =
   createLedgerService({
-    keystore$: keystoreService.keystore$
+    keystore$: keystoreService.keystoreState$
   })
 
 const { reloadBalances, reloadBalancesByChain, balancesState$, chainBalances$ } = createBalancesService({
-  keystore$: keystoreService.keystore$,
+  keystore$: keystoreService.keystoreState$,
   network$,
   getLedgerAddress$
 })
