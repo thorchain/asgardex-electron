@@ -37,7 +37,7 @@ export type IPCExportKeystoreParams = { fileName: string; keystore: Keystore }
 export type IPCSaveKeystoreParams = { id: KeystoreId; keystore: Keystore }
 
 export type ApiKeystore = {
-  saveKeystoreWallets: (wallets: KeystoreWallets) => Promise<void>
+  saveKeystoreWallets: (wallets: KeystoreWallets) => Promise<E.Either<Error, KeystoreWallets>>
   exportKeystore: (params: IPCExportKeystoreParams) => Promise<void>
   initKeystoreWallets: () => Promise<E.Either<Error, KeystoreWallets>>
   load: () => Promise<Keystore>

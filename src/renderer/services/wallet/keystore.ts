@@ -83,7 +83,7 @@ const addKeystoreWallet = async ({ phrase, name, id, password }: AddKeystorePara
 
     const encodedWallets = ipcKeystoreWalletsIO.encode(updatedWallets)
     // Save wallets to disk
-    await window.apiKeystore.saveKeystoreWallets(encodedWallets)
+    const _ = await window.apiKeystore.saveKeystoreWallets(encodedWallets)
     // Update states
     setKeystoreWallets(updatedWallets)
     setKeystoreState(O.some({ id, phrase, name }))
@@ -109,7 +109,7 @@ export const removeKeystoreWallet = async () => {
   )
   const encodedWallets = ipcKeystoreWalletsIO.encode(wallets)
   // Save updated `wallets` to disk
-  await window.apiKeystore.saveKeystoreWallets(encodedWallets)
+  const _ = await window.apiKeystore.saveKeystoreWallets(encodedWallets)
   // Update states
   setKeystoreWallets(wallets)
   // Set previous to current wallets (if available)
@@ -139,20 +139,27 @@ const changeKeystoreWallet: ChangeKeystoreWalletHandler = (keystoreId: KeystoreI
   )
 
   return FP.pipe(
-    updatedWallets,
     // encode wallets first
-    ipcKeystoreWalletsIO.encode,
+    Rx.of(ipcKeystoreWalletsIO.encode(updatedWallets)),
     // Save updated `wallets` to disk
-    (wallets) => Rx.from(window.apiKeystore.saveKeystoreWallets(wallets)),
+    RxOp.switchMap((wallets) => Rx.from(window.apiKeystore.saveKeystoreWallets(wallets))),
+    RxOp.map((eWallets) =>
+      FP.pipe(
+        eWallets,
+        E.fold(
+          (error) => RD.failure(Error(`Could not save wallets on disc ${error?.message ?? error.toString()}`)),
+          (_) => {
+            // Update states
+            setKeystoreWallets(updatedWallets)
+            // set selected wallet as locked wallet
+            setKeystoreState(O.some({ id, name }))
+
+            return RD.success(true)
+          }
+        )
+      )
+    ),
     RxOp.catchError((err) => Rx.of(RD.failure(err))),
-    RxOp.map(() => RD.success(true)),
-    liveData.map((_) => {
-      // Update states
-      setKeystoreWallets(updatedWallets)
-      // set selected wallet as locked wallet
-      setKeystoreState(O.some({ id, name }))
-      return true
-    }),
     RxOp.startWith(RD.pending)
   )
 }
@@ -372,5 +379,6 @@ export const keystoreService: KeystoreService = {
 }
 
 // TODO(@Veado) Remove it - for debugging only
-keystoreState$.subscribe((v) => console.log('keystoreState subscription', v))
-keystoreWallets$.subscribe((v) => console.log('keystoreWallets subscription', v))
+keystoreState$.subscribe((v) => console.log('keystoreState sub', v))
+keystoreWallets$.subscribe((v) => console.log('keystoreWallets sub', v))
+keystoreWalletsUI$.subscribe((v) => console.log('keystoreWalletsUI$ sub', v))

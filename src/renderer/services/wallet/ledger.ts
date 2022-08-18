@@ -37,7 +37,9 @@ export const createLedgerService = ({ keystore$ }: { keystore$: KeystoreState$ }
     keystore$,
     // Check unlocked keystore only
     RxOp.map(FP.flow(O.chain(O.fromPredicate(isKeystoreUnlocked)))),
-    RxOp.map(FP.flow(O.map(({ id }) => id)))
+    RxOp.map(FP.flow(O.map(({ id }) => id))),
+    RxOp.distinctUntilChanged(),
+    RxOp.shareReplay(1)
   )
 
   const ledgerAddresses = (id: KeystoreId): LedgerAddressesMap =>
@@ -62,7 +64,8 @@ export const createLedgerService = ({ keystore$ }: { keystore$: KeystoreState$ }
             )
         )
       )
-    )
+    ),
+    RxOp.startWith(INITIAL_LEDGER_ADDRESSES_MAP)
   )
 
   const setLedgerAddresses = (id: KeystoreId, addressesMap: LedgerAddressesMap) => {
@@ -152,6 +155,9 @@ export const createLedgerService = ({ keystore$ }: { keystore$: KeystoreState$ }
       setKeystoreLedgerAddresses(INITIAL_KEYSTORE_LEDGER_ADDRESSES_MAP)
     }
   })
+
+  // TODO(@Veado) Remove it - for debugging only
+  ledgerAddresses$.subscribe((v) => console.log('ledgerAddresses subscription', v))
 
   return {
     ledgerAddresses$,

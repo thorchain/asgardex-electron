@@ -8,7 +8,7 @@ import { MOCK_KEYSTORE } from './wallet'
 
 // Mock "empty" `apiKeystore`
 export const apiKeystore: ApiKeystore = {
-  saveKeystoreWallets: (_) => Promise.resolve(),
+  saveKeystoreWallets: (_) => Promise.resolve(E.right([])),
   exportKeystore: (_: IPCExportKeystoreParams) => Promise.resolve(),
   load: () => Promise.resolve(MOCK_KEYSTORE),
   initKeystoreWallets: () => Promise.resolve(E.right([]))
