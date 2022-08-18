@@ -177,7 +177,6 @@ type WalletMessageKey =
   | 'wallet.unlock.title'
   | 'wallet.unlock.password'
   | 'wallet.unlock.error'
-  | 'wallet.imports.label'
   | 'wallet.imports.keystore.select'
   | 'wallet.imports.keystore.title'
   | 'wallet.imports.phrase.title'

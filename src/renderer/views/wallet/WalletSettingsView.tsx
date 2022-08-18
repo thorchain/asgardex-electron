@@ -1,5 +1,4 @@
-/* eslint-disable react-hooks/exhaustive-deps */
-import React, { useCallback, useMemo } from 'react'
+import React, { useMemo } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
 import { Address, XChainClient } from '@xchainjs/xchain-client'
@@ -19,13 +18,12 @@ import * as A from 'fp-ts/lib/Array'
 import * as O from 'fp-ts/lib/Option'
 import { useObservableState } from 'observable-hooks'
 import { useIntl } from 'react-intl'
-import { useLocation, useNavigate } from 'react-router-dom'
 import * as Rx from 'rxjs'
 import * as RxOp from 'rxjs/operators'
 
 import { DEFAULT_ETH_DERIVATION_MODE } from '../../../shared/ethereum/const'
 import { EthDerivationMode } from '../../../shared/ethereum/types'
-import { WalletSettings, UnlockWalletSettings } from '../../components/settings'
+import { WalletSettings } from '../../components/settings'
 import { useBinanceContext } from '../../contexts/BinanceContext'
 import { useBitcoinCashContext } from '../../contexts/BitcoinCashContext'
 import { useBitcoinContext } from '../../contexts/BitcoinContext'
@@ -53,15 +51,16 @@ import { useKeystoreState } from '../../hooks/useKeystoreState'
 import { useKeystoreWallets } from '../../hooks/useKeystoreWallets'
 import { useLedger } from '../../hooks/useLedger'
 import { useNetwork } from '../../hooks/useNetwork'
-import * as walletRoutes from '../../routes/wallet'
-import { isKeystoreUnlocked, WalletAddressAsync } from '../../services/wallet/types'
+import { KeystoreUnlocked, WalletAddressAsync } from '../../services/wallet/types'
 import { ledgerErrorIdToI18n } from '../../services/wallet/util'
 import { walletAccount$ } from './WalletSettingsView.helper'
 
-export const WalletSettingsView: React.FC = (): JSX.Element => {
+type Props = {
+  keystoreUnlocked: KeystoreUnlocked
+}
+
+export const WalletSettingsView: React.FC<Props> = ({ keystoreUnlocked }): JSX.Element => {
   const intl = useIntl()
-  const navigate = useNavigate()
-  const location = useLocation()
 
   const { walletsUI } = useKeystoreWallets()
 
@@ -69,7 +68,7 @@ export const WalletSettingsView: React.FC = (): JSX.Element => {
     keystoreService: { exportKeystore, validatePassword$ }
   } = useWalletContext()
 
-  const { state: keystore, lock, remove, change$, rename$ } = useKeystoreState()
+  const { lock, remove, change$, rename$ } = useKeystoreState()
 
   const { network } = useNetwork()
 
@@ -390,51 +389,31 @@ export const WalletSettingsView: React.FC = (): JSX.Element => {
     dogeLedgerWalletAddress,
     cosmosAddressUI$,
     cosmosLedgerWalletAddress,
-    ethAddressUI$,
     ethLedgerWalletAddress
   ])
+
   const walletAccounts = useObservableState(walletAccounts$, O.none)
 
-  const unlockWalletHandler = useCallback(() => {
-    navigate(walletRoutes.base.path(location.pathname))
-  }, [])
-
-  return FP.pipe(
-    keystore,
-    // Unlocked state only
-    O.chain(FP.flow(O.fromPredicate(isKeystoreUnlocked))),
-    O.fold(
-      // Keystore is not unlocked / not imported
-      () => (
-        <UnlockWalletSettings
-          unlockHandler={unlockWalletHandler}
-          collapsed={collapsed}
-          toggleCollapse={toggleCollapse}
-        />
-      ),
-      // Keystore is unlocked
-      (keystore) => (
-        <WalletSettings
-          network={network}
-          lockWallet={lock}
-          removeKeystoreWallet={remove}
-          changeKeystoreWallet$={change$}
-          renameKeystoreWallet$={rename$}
-          exportKeystore={exportKeystore}
-          addLedgerAddress={addLedgerAddressHandler}
-          verifyLedgerAddress={verifyLedgerAddressHandler}
-          removeLedgerAddress={removeLedgerAddressHandler}
-          keystore={keystore}
-          wallets={walletsUI}
-          walletAccounts={walletAccounts}
-          clickAddressLinkHandler={clickAddressLinkHandler}
-          validatePassword$={validatePassword$}
-          collapsed={collapsed}
-          toggleCollapse={toggleCollapse}
-          ethDerivationMode={ethDerivationMode}
-          updateEthDerivationMode={updateEthDerivationMode}
-        />
-      )
-    )
+  return (
+    <WalletSettings
+      network={network}
+      lockWallet={lock}
+      removeKeystoreWallet={remove}
+      changeKeystoreWallet$={change$}
+      renameKeystoreWallet$={rename$}
+      exportKeystore={exportKeystore}
+      addLedgerAddress={addLedgerAddressHandler}
+      verifyLedgerAddress={verifyLedgerAddressHandler}
+      removeLedgerAddress={removeLedgerAddressHandler}
+      keystoreUnlocked={keystoreUnlocked}
+      wallets={walletsUI}
+      walletAccounts={walletAccounts}
+      clickAddressLinkHandler={clickAddressLinkHandler}
+      validatePassword$={validatePassword$}
+      collapsed={collapsed}
+      toggleCollapse={toggleCollapse}
+      ethDerivationMode={ethDerivationMode}
+      updateEthDerivationMode={updateEthDerivationMode}
+    />
   )
 }
