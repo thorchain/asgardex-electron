@@ -86,7 +86,7 @@ type Props = {
   addLedgerAddress: (chain: Chain, walletIndex: number) => void
   verifyLedgerAddress: (chain: Chain, walletIndex: number) => Promise<boolean>
   removeLedgerAddress: (chain: Chain) => void
-  keystore: KeystoreUnlocked
+  keystoreUnlocked: KeystoreUnlocked
   wallets: KeystoreWalletsUI
   clickAddressLinkHandler: (chain: Chain, address: Address) => void
   validatePassword$: ValidatePasswordHandler
@@ -110,7 +110,7 @@ export const WalletSettings: React.FC<Props> = (props): JSX.Element => {
     addLedgerAddress,
     verifyLedgerAddress,
     removeLedgerAddress,
-    keystore: { phrase, name: walletName, id: walletId },
+    keystoreUnlocked: { phrase, name: walletName, id: walletId },
     wallets,
     clickAddressLinkHandler,
     validatePassword$,

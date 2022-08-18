@@ -217,7 +217,7 @@ export const UnlockForm: React.FC<Props> = (props): JSX.Element => {
                 wallets={wallets}
                 onChange={changeWalletHandler}
                 disabled={RD.isPending(changeWalletState)}
-                className="min-w-[100px]"
+                className="min-w-[200px]"
               />
               {renderChangeWalletError}
             </div>

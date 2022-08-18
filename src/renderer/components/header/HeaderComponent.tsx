@@ -237,7 +237,7 @@ export const HeaderComponent: React.FC<Props> = (props): JSX.Element => {
   )
 
   const renderHeaderLock = useMemo(
-    () => <HeaderLock isDesktopView={isDesktopView} keystore={keystore} onPress={clickLockHandler} />,
+    () => <HeaderLock isDesktopView={isDesktopView} keystoreState={keystore} onPress={clickLockHandler} />,
     [isDesktopView, clickLockHandler, keystore]
   )
 

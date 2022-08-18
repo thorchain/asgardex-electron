@@ -30,7 +30,6 @@ const wallet: WalletMessages = {
   'wallet.unlock.instruction': 'Bitte entsperre Deine Wallet',
   'wallet.unlock.password': 'Bitte gebe Dein Passwort ein',
   'wallet.unlock.error': 'Die Wallet konnte nicht entsperrt werden. Bitte überprüfe Dein Passwort und versuche es .',
-  'wallet.imports.label': 'Wallet importieren',
   'wallet.imports.keystore.select': 'Keystore-Datei auswählen',
   'wallet.imports.keystore.title': 'Bitte wähle die Keystore-Datei Deiner Wallet',
   'wallet.imports.phrase.title':
@@ -48,7 +47,7 @@ const wallet: WalletMessages = {
   'wallet.create.copy.phrase': 'Phrase kopieren',
   'wallet.create.error.phrase.empty': 'Erstelle eine neue Wallet und füge ein Guthaben hinzu',
   'wallet.add.another': 'Weitere Wallet hinzufügen',
-  'wallet.add.label': 'Hinzufügen',
+  'wallet.add.label': 'Wallet hinzufügen',
   'wallet.change.title': 'Wallet wechseln',
   'wallet.change.error': 'Error beim Wechseln der Wallet',
   'wallet.selected.title': 'Ausgwählte Wallet',

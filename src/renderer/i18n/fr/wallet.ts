@@ -31,7 +31,6 @@ const wallet: WalletMessages = {
   'wallet.unlock.password': 'Entrez votre phrase de récupération',
   'wallet.unlock.error':
     'Impossible de déverrouiller le portefeuille. Veuillez vérifier votre mot de passe et réessayez',
-  'wallet.imports.label': 'Importer le portefeuille',
   'wallet.imports.keystore.select': 'Sélectionner le fichier keystore',
   'wallet.imports.keystore.title': 'Choisir le fichier à uploader',
   'wallet.imports.phrase.title': 'Veuillez entrer la phrase de récupération avec un seul espace entre les mots',
@@ -48,7 +47,7 @@ const wallet: WalletMessages = {
   'wallet.create.copy.phrase': 'Copiez la phrase ci-dessous',
   'wallet.create.error.phrase.empty': "Créez un nouveau portefeuille, et l'alimenter en fonds",
   'wallet.add.another': 'Add another wallet - FR',
-  'wallet.add.label': 'Add - FR',
+  'wallet.add.label': 'Add wallet - FR',
   'wallet.change.title': 'Change wallet - FR',
   'wallet.change.error': 'Error while changing a wallet - FR',
   'wallet.selected.title': 'Selected wallet - FR',

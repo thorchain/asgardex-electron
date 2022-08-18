@@ -1683,7 +1683,7 @@ export const Swap = ({
                     </Styled.NoteLabel>
                     <FlatButton className="my-30px min-w-[200px]" size="large" onClick={importWalletHandler}>
                       {!hasImportedKeystore(keystore)
-                        ? intl.formatMessage({ id: 'wallet.imports.label' })
+                        ? intl.formatMessage({ id: 'wallet.add.label' })
                         : isLocked(keystore) && intl.formatMessage({ id: 'wallet.unlock.label' })}
                     </FlatButton>
                   </>

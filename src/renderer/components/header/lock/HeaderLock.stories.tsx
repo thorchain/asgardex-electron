@@ -12,11 +12,11 @@ const meta: ComponentMeta<typeof Component> = {
   component: Component,
   title: 'Components/HeaderLock',
   argTypes: {
-    keystore: AT.keystore,
+    keystoreState: AT.keystore,
     onPress: { action: 'onPress' }
   },
   args: {
-    keystore: O.none,
+    keystoreState: O.none,
     isDesktopView: false
   }
 }

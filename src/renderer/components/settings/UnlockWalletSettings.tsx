@@ -4,17 +4,20 @@ import { Collapse } from 'antd'
 import * as FP from 'fp-ts/lib/function'
 import { useIntl } from 'react-intl'
 
+import { KeystoreState } from '../../services/wallet/types'
+import { hasImportedKeystore, isLocked } from '../../services/wallet/util'
 import { FlatButton } from '../uielements/button'
 import * as Styled from './Common.styles'
 
 type Props = {
+  keystoreState: KeystoreState
   unlockHandler: FP.Lazy<void>
   collapsed: boolean
   toggleCollapse: FP.Lazy<void>
 }
 
 export const UnlockWalletSettings: React.FC<Props> = (props): JSX.Element => {
-  const { unlockHandler, collapsed, toggleCollapse } = props
+  const { keystoreState, unlockHandler, collapsed, toggleCollapse } = props
   const intl = useIntl()
 
   return (
@@ -34,8 +37,10 @@ export const UnlockWalletSettings: React.FC<Props> = (props): JSX.Element => {
           mb-20px
           flex min-h-[300px] items-center
           justify-center border-solid border-gray0 bg-bg1 dark:border-gray0d dark:bg-bg1d">
-            <FlatButton className="min-w[200px] my-30px px-30px" onClick={unlockHandler}>
-              {intl.formatMessage({ id: 'wallet.unlock.label' })}
+            <FlatButton className="my-30px min-w-[200px] px-30px" onClick={unlockHandler}>
+              {!hasImportedKeystore(keystoreState)
+                ? intl.formatMessage({ id: 'wallet.add.label' })
+                : isLocked(keystoreState) && intl.formatMessage({ id: 'wallet.unlock.label' })}
             </FlatButton>
           </div>
         </Collapse.Panel>

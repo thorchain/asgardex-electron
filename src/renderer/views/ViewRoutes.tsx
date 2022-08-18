@@ -26,7 +26,7 @@ import { SendView } from './wallet/send'
 import { UnlockView } from './wallet/UnlockView'
 import { UpgradeView } from './wallet/upgrade'
 import { WalletAuth } from './wallet/WalletAuth'
-import { WalletSettingsView } from './wallet/WalletSettingsView'
+import { WalletSettingsAuth } from './wallet/WalletSettingsAuth'
 
 export const ViewRoutes: React.FC<{}> = (): JSX.Element => {
   const location = useLocation()
@@ -127,7 +127,7 @@ export const ViewRoutes: React.FC<{}> = (): JSX.Element => {
         element={
           <>
             <AppSettingsView />
-            <WalletSettingsView />
+            <WalletSettingsAuth />
           </>
         }
       />
