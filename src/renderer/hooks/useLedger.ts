@@ -6,11 +6,12 @@ import * as FP from 'fp-ts/function'
 import { useObservableState } from 'observable-hooks'
 import * as RxOp from 'rxjs/operators'
 
+import { KeystoreId } from '../../shared/api/types'
 import { useWalletContext } from '../contexts/WalletContext'
 import { LedgerAddressRD } from '../services/wallet/types'
 import { useNetwork } from './useNetwork'
 
-export const useLedger = (chain: Chain) => {
+export const useLedger = (chain: Chain, id: KeystoreId) => {
   const { network } = useNetwork()
 
   const { askLedgerAddress$, getLedgerAddress$, verifyLedgerAddress, removeLedgerAddress } = useWalletContext()
@@ -19,7 +20,10 @@ export const useLedger = (chain: Chain) => {
     async (walletIndex: number) => await verifyLedgerAddress({ chain, network, walletIndex }),
     [chain, verifyLedgerAddress, network]
   )
-  const removeAddress = useCallback(() => removeLedgerAddress(chain, network), [chain, removeLedgerAddress, network])
+  const removeAddress = useCallback(
+    () => removeLedgerAddress({ id, chain, network }),
+    [removeLedgerAddress, chain, network, id]
+  )
 
   const address = useObservableState<LedgerAddressRD>(
     FP.pipe(getLedgerAddress$(chain, network), RxOp.shareReplay(1)),
@@ -31,10 +35,10 @@ export const useLedger = (chain: Chain) => {
       // Note: Subscription is needed to get all values
       // and to let `askLedgerAddressByChain` update state of `LedgerAddressRD`
       // Check implementation of `askLedgerAddressByChain` in `src/renderer/services/wallet/ledger.ts`
-      const sub = askLedgerAddress$(chain, network, walletIndex).subscribe()
+      const sub = askLedgerAddress$({ id, chain, network, walletIndex }).subscribe()
       return () => sub.unsubscribe()
     },
-    [askLedgerAddress$, chain, network]
+    [askLedgerAddress$, chain, id, network]
   )
 
   return {

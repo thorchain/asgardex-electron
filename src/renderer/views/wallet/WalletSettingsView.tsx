@@ -62,6 +62,8 @@ type Props = {
 export const WalletSettingsView: React.FC<Props> = ({ keystoreUnlocked }): JSX.Element => {
   const intl = useIntl()
 
+  const { id: keystoreId } = keystoreUnlocked
+
   const { walletsUI } = useKeystoreWallets()
 
   const {
@@ -89,56 +91,56 @@ export const WalletSettingsView: React.FC<Props> = ({ keystoreUnlocked }): JSX.E
     verifyAddress: verifyLedgerThorAddress,
     address: thorLedgerAddressRD,
     removeAddress: removeLedgerThorAddress
-  } = useLedger(THORChain)
+  } = useLedger(THORChain, keystoreId)
 
   const {
     askAddress: askLedgerBnbAddress,
     verifyAddress: verifyLedgerBnbAddress,
     address: bnbLedgerAddressRD,
     removeAddress: removeLedgerBnbAddress
-  } = useLedger(BNBChain)
+  } = useLedger(BNBChain, keystoreId)
 
   const {
     askAddress: askLedgerBtcAddress,
     verifyAddress: verifyLedgerBtcAddress,
     address: btcLedgerAddressRD,
     removeAddress: removeLedgerBtcAddress
-  } = useLedger(BTCChain)
+  } = useLedger(BTCChain, keystoreId)
 
   const {
     askAddress: askLedgerLtcAddress,
     verifyAddress: verifyLedgerLtcAddress,
     address: ltcLedgerAddressRD,
     removeAddress: removeLedgerLtcAddress
-  } = useLedger(LTCChain)
+  } = useLedger(LTCChain, keystoreId)
 
   const {
     askAddress: askLedgerBchAddress,
     verifyAddress: verifyLedgerBchAddress,
     address: bchLedgerAddressRD,
     removeAddress: removeLedgerBchAddress
-  } = useLedger(BCHChain)
+  } = useLedger(BCHChain, keystoreId)
 
   const {
     askAddress: askLedgerDOGEAddress,
     verifyAddress: verifyLedgerDOGEAddress,
     address: dogeLedgerAddressRD,
     removeAddress: removeLedgerDOGEAddress
-  } = useLedger(DOGEChain)
+  } = useLedger(DOGEChain, keystoreId)
 
   const {
     askAddress: askLedgerEthAddress,
     verifyAddress: verifyLedgerEthAddress,
     address: ethLedgerAddressRD,
     removeAddress: removeLedgerEthAddress
-  } = useLedger(ETHChain)
+  } = useLedger(ETHChain, keystoreId)
 
   const {
     askAddress: askLedgerCosmosAddress,
     verifyAddress: verifyLedgerCosmosAddress,
     address: cosmosLedgerAddressRD,
     removeAddress: removeLedgerCosmosAddress
-  } = useLedger(CosmosChain)
+  } = useLedger(CosmosChain, keystoreId)
 
   const addLedgerAddressHandler = (chain: Chain, walletIndex: number) => {
     if (isThorChain(chain)) return askLedgerThorAddress(walletIndex)

@@ -186,13 +186,34 @@ export type VerifyLedgerAddressHandler = (params: {
   walletIndex: number
 }) => Promise<boolean>
 
+export type AskLedgerAddressesHandler = ({
+  id,
+  chain,
+  network,
+  walletIndex
+}: {
+  id: KeystoreId
+  chain: Chain
+  network: Network
+  walletIndex: number
+}) => LedgerAddressLD
+
+export type RemoveLedgerAddressHandler = ({
+  id,
+  chain,
+  network
+}: {
+  id: KeystoreId
+  chain: Chain
+  network: Network
+}) => void
+
 export type LedgerService = {
   ledgerAddresses$: Rx.Observable<LedgerAddressesMap>
-  askLedgerAddress$: (chain: Chain, network: Network, walletIndex: number) => LedgerAddressLD
+  askLedgerAddress$: AskLedgerAddressesHandler
   getLedgerAddress$: GetLedgerAddressHandler
   verifyLedgerAddress: VerifyLedgerAddressHandler
-  removeLedgerAddress: (chain: Chain, network: Network) => void
-  dispose: FP.Lazy<void>
+  removeLedgerAddress: RemoveLedgerAddressHandler
 }
 
 // TODO(@Veado) Move type to clients/type
@@ -221,6 +242,8 @@ export type LedgerAddressMap$ = Rx.Observable<LedgerAddressMap>
 
 export type LedgerAddressesMap = Record<Chain, LedgerAddressMap>
 export type LedgerAddressesMap$ = Rx.Observable<LedgerAddressesMap>
+
+export type KeystoreLedgerAddressesMap = Map<KeystoreId, LedgerAddressesMap>
 
 export type KeystoreWalletsRD = RD.RemoteData<Error, KeystoreWallets>
 export type KeystoreWalletsLD = LiveData<Error, KeystoreWallets>
