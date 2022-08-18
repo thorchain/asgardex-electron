@@ -8,6 +8,7 @@ import {
   BalancesState,
   BalancesStateFilter,
   KeystoreState,
+  KeystoreLedgerAddressesMap,
   LedgerAddressesMap,
   LedgerAddressMap,
   LoadTxsHandler
@@ -63,5 +64,7 @@ export const INITIAL_LEDGER_ADDRESSES_MAP: LedgerAddressesMap = {
   [Chain.Doge]: INITIAL_LEDGER_ADDRESS_MAP,
   [Chain.Terra]: INITIAL_LEDGER_ADDRESS_MAP
 }
+
+export const INITIAL_KEYSTORE_LEDGER_ADDRESSES_MAP: KeystoreLedgerAddressesMap = new Map() // empty by default
 
 export const MAX_WALLET_NAME_CHARS = 50
