@@ -58,6 +58,8 @@ export type ImportingKeystoreStateLD = Rx.Observable<ImportingKeystoreStateRD>
 
 export type RemoveKeystoreWalletHandler = () => Promise<number>
 
+export type RemovedKeystoreId$ = Rx.Observable<O.Option<KeystoreId>>
+
 export type RenameKeystoreWalletRD = RD.RemoteData<Error, boolean>
 export type RenameKeystoreWalletLD = LiveData<Error, boolean>
 export type RenameKeystoreWalletHandler = (id: KeystoreId, name: string) => RenameKeystoreWalletLD
