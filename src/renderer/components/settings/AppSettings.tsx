@@ -199,7 +199,7 @@ export const AppSettings: React.FC<Props> = (props): JSX.Element => {
   )
 
   const midgardUrl = useMemo(() => {
-    const empty = () => emptyString
+    const empty = () => ''
     return FP.pipe(midgardUrlRD, RD.fold(empty, empty, empty, FP.identity))
   }, [midgardUrlRD])
 
