@@ -18,6 +18,8 @@ export type CommonMessageKey =
   | 'common.date'
   | 'common.remove'
   | 'common.back'
+  | 'common.general'
+  | 'common.advanced'
   | 'common.keystore'
   | 'common.keystorePassword'
   | 'common.ledger'
@@ -31,6 +33,7 @@ export type CommonMessageKey =
   | 'common.copy'
   | 'common.loading'
   | 'common.error'
+  | 'common.test'
   | 'common.change'
   | 'common.wallet'
   | 'common.history'
@@ -326,7 +329,12 @@ type SettingMessageKey =
 
 export type SettingMessages = { [key in SettingMessageKey]: string }
 
-type MidgardMessageKey = 'midgard.error.byzantine.title' | 'midgard.error.byzantine.description'
+type MidgardMessageKey =
+  | 'midgard.error.byzantine.title'
+  | 'midgard.error.byzantine.description'
+  | 'midgard.url.error.invalid'
+  | 'midgard.url.error.unhealthy'
+  | 'midgard.url.valid'
 
 export type MidgardMessages = { [key in MidgardMessageKey]: string }
 

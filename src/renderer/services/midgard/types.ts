@@ -170,7 +170,8 @@ export type DepthHistoryItems = DepthHistoryItem[]
 export type NetworkInfoRD = RD.RemoteData<Error, NetworkInfo>
 export type NetworkInfoLD = LiveData<Error, NetworkInfo>
 
-export type ByzantineLD = LiveData<Error, string>
+export type MidgardUrlRD = RD.RemoteData<Error, string>
+export type MidgardUrlLD = LiveData<Error, string>
 
 export type HealthRD = RD.RemoteData<Error, Health>
 export type HealthLD = LiveData<Error, Health>

@@ -1,6 +1,5 @@
 import React, { useMemo, useState, useCallback, useRef } from 'react'
 
-import * as RD from '@devexperts/remote-data-ts'
 import { Row, Col, Grid } from 'antd'
 import * as FP from 'fp-ts/function'
 import * as A from 'fp-ts/lib/Array'
@@ -19,7 +18,7 @@ import { useThemeContext } from '../../contexts/ThemeContext'
 import * as appRoutes from '../../routes/app'
 import * as poolsRoutes from '../../routes/pools'
 import * as walletRoutes from '../../routes/wallet'
-import { InboundAddressRD, PriceRD, SelectedPricePoolAsset } from '../../services/midgard/types'
+import { InboundAddressRD, MidgardUrlRD, PriceRD, SelectedPricePoolAsset } from '../../services/midgard/types'
 import { MimirRD } from '../../services/thorchain/types'
 import { KeystoreState } from '../../services/wallet/types'
 import { isLocked } from '../../services/wallet/util'
@@ -58,7 +57,7 @@ export type Props = {
   selectedPricePoolAsset: SelectedPricePoolAsset
   inboundAddresses: InboundAddressRD
   mimir: MimirRD
-  midgardUrl: RD.RemoteData<Error, string>
+  midgardUrl: MidgardUrlRD
   thorchainUrl: string
 }
 
