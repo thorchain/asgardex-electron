@@ -62,7 +62,8 @@ import {
   PoolsState,
   HaltedChainsLD,
   SelectedPoolAsset,
-  PoolType
+  PoolType,
+  MidgardUrlLD
 } from './types'
 import {
   getPoolAddressesByChain,
@@ -89,11 +90,11 @@ const getStoredSelectedPricePoolAsset = (): SelectedPricePoolAsset =>
 const roundToFiveMinutes = roundUnixTimestampToMinutes(5)
 
 const createPoolsService = (
-  byzantine$: LiveData<Error, string>,
+  midgardUrl$: MidgardUrlLD,
   getMidgardDefaultApi: (basePath: string) => DefaultApi,
   selectedPoolAsset$: Rx.Observable<SelectedPoolAsset>
 ): PoolsService => {
-  const midgardDefaultApi$ = FP.pipe(byzantine$, liveData.map(getMidgardDefaultApi), RxOp.shareReplay(1))
+  const midgardDefaultApi$ = FP.pipe(midgardUrl$, liveData.map(getMidgardDefaultApi), RxOp.shareReplay(1))
 
   const {
     get$: poolsFilters$,

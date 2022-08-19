@@ -72,9 +72,15 @@ module.exports = {
         gray1d: t.dark.palette.gray[1],
         gray2: t.light.palette.gray[2],
         gray2d: t.dark.palette.gray[2]
+      },
+      // Custom transition props
+      // @see https://tailwindcss.com/docs/transition-property#customizing-your-theme
+      transitionProperty: {
+        height: 'height'
       }
     },
-    // Breakpoint definitions based on `MediaQueries`
+    // Breakpoint are overridden (not extended)
+    // Based on `MediaQueries`
     // @see `src/renderer/helpers/styleHelper.ts`
     screens: {
       xs: '0px',

@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo } from 'react'
+import React, { useCallback, useMemo, useState } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
 import { Row, Dropdown, Collapse } from 'antd'
@@ -11,11 +11,14 @@ import { Network } from '../../../shared/api/types'
 import { Locale } from '../../../shared/i18n/types'
 import { LOCALES } from '../../i18n'
 import { AVAILABLE_NETWORKS } from '../../services/const'
+import { CheckMidgardUrlHandler, MidgardUrlRD } from '../../services/midgard/types'
 import { DownIcon } from '../icons'
 import { Menu } from '../shared/menu'
-import { BorderButton } from '../uielements/button'
+import { BorderButton, TextButton } from '../uielements/button'
+import { SwitchButton } from '../uielements/button/SwitchButton'
 import * as Styled from './AppSettings.styles'
 import * as CStyled from './Common.styles'
+import EditableUrl from './EditableUrl'
 
 export type Props = {
   version: string
@@ -28,7 +31,23 @@ export type Props = {
   goToReleasePage: (version: string) => void
   collapsed: boolean
   toggleCollapse: FP.Lazy<void>
+  midgardUrl: MidgardUrlRD
+  onChangeMidgardUrl: (url: string) => void
+  checkMidgardUrl$: CheckMidgardUrlHandler
 }
+
+type SectionProps = {
+  title: string
+  children?: React.ReactNode
+  className?: string
+}
+
+const Section: React.FC<SectionProps> = ({ title, className, children }) => (
+  <div className={`mb-20px flex flex-col items-start ${className}`}>
+    <h2 className="mb-5px font-main text-[12px] uppercase text-text2 dark:text-text2d">{title}</h2>
+    {children}
+  </div>
+)
 
 export const AppSettings: React.FC<Props> = (props): JSX.Element => {
   const {
@@ -41,7 +60,10 @@ export const AppSettings: React.FC<Props> = (props): JSX.Element => {
     changeLocale,
     locale,
     collapsed,
-    toggleCollapse
+    toggleCollapse,
+    midgardUrl: midgardUrlRD,
+    onChangeMidgardUrl,
+    checkMidgardUrl$
   } = props
 
   const intl = useIntl()
@@ -178,8 +200,15 @@ export const AppSettings: React.FC<Props> = (props): JSX.Element => {
     [appUpdateState, intl]
   )
 
+  const midgardUrl = useMemo(() => {
+    const empty = () => ''
+    return FP.pipe(midgardUrlRD, RD.fold(empty, empty, empty, FP.identity))
+  }, [midgardUrlRD])
+
+  const [advancedActive, setAdvancedActive] = useState(false)
+
   return (
-    <Styled.Container>
+    <div className="mt-50px bg-bg0 py-10px px-40px dark:bg-bg0d">
       <CStyled.Collapse
         expandIcon={({ isActive }) => <CStyled.ExpandIcon rotate={isActive ? 90 : 0} />}
         activeKey={collapsed ? '0' : '1'}
@@ -189,28 +218,45 @@ export const AppSettings: React.FC<Props> = (props): JSX.Element => {
         <Collapse.Panel
           header={<CStyled.Title>{intl.formatMessage({ id: 'setting.app.title' })}</CStyled.Title>}
           key={'1'}>
-          <Styled.CardContainer>
-            <CStyled.Card>
-              <Styled.SectionsWrapper>
-                <Styled.Section>
-                  <Styled.SubTitle>{intl.formatMessage({ id: 'common.network' })}</Styled.SubTitle>
-                  {renderNetworkMenu}
-                </Styled.Section>
-                <Styled.Section>
-                  <Styled.SubTitle>{intl.formatMessage({ id: 'setting.language' })}</Styled.SubTitle>
-                  {renderLangMenu}
-                </Styled.Section>
-                <Styled.Section>
-                  <Styled.SubTitle>{intl.formatMessage({ id: 'setting.version' })}</Styled.SubTitle>
-                  <Styled.Label>v{version}</Styled.Label>
-                  <BorderButton size="normal" className="my-10px" {...checkUpdatesProps} />
-                  {renderVersionUpdateResult}
-                </Styled.Section>
-              </Styled.SectionsWrapper>
-            </CStyled.Card>
-          </Styled.CardContainer>
+          <div className="card my-20px w-full p-[44px]">
+            <h1 className="pb-20px font-main text-18 uppercase text-text0 dark:text-text0d">
+              {intl.formatMessage({ id: 'common.general' })}
+            </h1>
+            <Section title={intl.formatMessage({ id: 'common.network' })}>{renderNetworkMenu}</Section>
+            <div className="mb-20px flex flex-col items-start">
+              <Styled.SubTitle>{intl.formatMessage({ id: 'setting.language' })}</Styled.SubTitle>
+              {renderLangMenu}
+            </div>
+            <div className="flex flex-col items-start">
+              <Styled.SubTitle>{intl.formatMessage({ id: 'setting.version' })}</Styled.SubTitle>
+              <Styled.Label>v{version}</Styled.Label>
+              <BorderButton size="normal" className="my-10px" {...checkUpdatesProps} />
+              {renderVersionUpdateResult}
+            </div>
+          </div>
+          <div className="card mb-20px w-full p-40px">
+            <TextButton
+              className={`mb-0 !p-0 font-main !text-18 uppercase text-text0 dark:text-text0d ${
+                advancedActive ? 'opacity-100' : 'opacity-60'
+              } mr-10px`}
+              onClick={() => setAdvancedActive((v) => !v)}>
+              {intl.formatMessage({ id: 'common.advanced' })}
+              <SwitchButton className="ml-10px" active={advancedActive} />
+            </TextButton>
+            {advancedActive && (
+              <Section className="mt-20px" title="Midgard">
+                <EditableUrl
+                  className="w-full xl:w-3/4"
+                  url={midgardUrl}
+                  onChange={onChangeMidgardUrl}
+                  loading={RD.isPending(midgardUrlRD)}
+                  checkUrl$={checkMidgardUrl$}
+                />
+              </Section>
+            )}
+          </div>
         </Collapse.Panel>
       </CStyled.Collapse>
-    </Styled.Container>
+    </div>
   )
 }

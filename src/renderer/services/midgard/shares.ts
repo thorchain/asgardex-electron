@@ -9,18 +9,15 @@ import * as RxOp from 'rxjs/operators'
 
 import { optionFromNullableString } from '../../../shared/utils/fp'
 import { THORCHAIN_DECIMAL } from '../../helpers/assetHelper'
-import { liveData, LiveData } from '../../helpers/rx/liveData'
+import { liveData } from '../../helpers/rx/liveData'
 import { triggerStream, observableState } from '../../helpers/stateHelper'
 import { MemberPool } from '../../types/generated/midgard'
 import { DefaultApi } from '../../types/generated/midgard/apis'
-import { PoolShare, PoolShareLD, PoolSharesLD } from './types'
+import { MidgardUrlLD, PoolShare, PoolShareLD, PoolSharesLD } from './types'
 import { combineShares, combineSharesByAsset, getSharesByAssetAndType, getSymSharesByAddress } from './utils'
 
-const createSharesService = (
-  byzantine$: LiveData<Error, string>,
-  getMidgardDefaultApi: (basePath: string) => DefaultApi
-) => {
-  const api$ = byzantine$.pipe(RxOp.map(RD.map(getMidgardDefaultApi)))
+const createSharesService = (midgardUrl$: MidgardUrlLD, getMidgardDefaultApi: (basePath: string) => DefaultApi) => {
+  const api$ = midgardUrl$.pipe(RxOp.map(RD.map(getMidgardDefaultApi)))
 
   /**
    * We need a possibility to reload shares info with delay for this

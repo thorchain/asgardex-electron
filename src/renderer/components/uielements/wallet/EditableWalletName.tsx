@@ -7,7 +7,6 @@ import { useForm } from 'react-hook-form'
 import { useIntl } from 'react-intl'
 
 import { MAX_WALLET_NAME_CHARS } from '../../../services/wallet/const'
-// import { LoadingIcon } from '../../icons'
 import { BaseButton, TextButton } from '../button'
 import { Input } from '../input/Input'
 
@@ -76,7 +75,7 @@ export const EditableWalletName: React.FC<Props> = (props): JSX.Element => {
       }
 
       return (
-        <form className="items-top flex w-full flex-col items-center" onSubmit={handleSubmit(submit)}>
+        <form className="flex w-full flex-col items-center" onSubmit={handleSubmit(submit)}>
           <div className="flex w-full items-center justify-center">
             <Input
               id="name"

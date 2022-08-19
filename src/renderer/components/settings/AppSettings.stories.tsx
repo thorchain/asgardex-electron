@@ -1,6 +1,8 @@
+import * as RD from '@devexperts/remote-data-ts'
 import { ComponentMeta } from '@storybook/react'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
+import * as Rx from 'rxjs'
 
 import { Locale } from '../../../shared/i18n/types'
 import { getMockRDValueFactory, RDStatus, rdStatusOptions } from '../../../shared/mock/rdByStatus'
@@ -13,6 +15,7 @@ type StoryArgs = {
   checkForUpdates: FP.Lazy<void>
   goToReleasePage: (version: string) => void
   changeLocale: (locale: Locale) => void
+  onChangeMidgardUrl: (url: string) => void
   changeNetwork: ChangeNetworkHandler
   collapsed: boolean
 }
@@ -22,6 +25,7 @@ const Template = ({
   updateDataRD,
   checkForUpdates,
   goToReleasePage,
+  onChangeMidgardUrl,
   changeLocale,
   collapsed
 }: StoryArgs) => {
@@ -42,6 +46,9 @@ const Template = ({
       changeLocale={changeLocale}
       collapsed={collapsed}
       toggleCollapse={() => console.log('toggle')}
+      midgardUrl={RD.pending}
+      onChangeMidgardUrl={onChangeMidgardUrl}
+      checkMidgardUrl$={(url, _) => Rx.of(RD.success(url))}
     />
   )
 }
@@ -66,6 +73,9 @@ const meta: ComponentMeta<typeof Template> = {
     },
     goToReleasePage: {
       action: 'goToReleasePage'
+    },
+    onChangeMidgardUrl: {
+      action: 'onChangeMidgardUrl'
     }
   },
   args: { onlineStatus: OnlineStatus.ON, updateDataRD: 'initial', collapsed: false }

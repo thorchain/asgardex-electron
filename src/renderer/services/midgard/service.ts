@@ -4,15 +4,15 @@ import * as RD from '@devexperts/remote-data-ts'
 import { baseAmount } from '@xchainjs/xchain-util'
 import * as FP from 'fp-ts/function'
 import * as O from 'fp-ts/Option'
+import { IntlShape } from 'react-intl'
 import * as Rx from 'rxjs'
 import * as RxOp from 'rxjs/operators'
 
 import { Network } from '../../../shared/api/types'
 import { envOrDefault } from '../../../shared/utils/env'
 import { THORCHAIN_DECIMAL } from '../../helpers/assetHelper'
-import { fromPromise$ } from '../../helpers/rx/fromPromise'
-import { liveData, LiveData } from '../../helpers/rx/liveData'
-import { triggerStream, TriggerStream$ } from '../../helpers/stateHelper'
+import { liveData } from '../../helpers/rx/liveData'
+import { observableState, triggerStream, TriggerStream$ } from '../../helpers/stateHelper'
 import { Configuration, DefaultApi } from '../../types/generated/midgard'
 import { network$ } from '../app/service'
 import { MIDGARD_MAX_RETRY } from '../const'
@@ -25,11 +25,13 @@ import {
   NetworkInfoRD,
   NetworkInfoLD,
   ThorchainConstantsLD,
-  ByzantineLD,
+  MidgardUrlLD,
   ThorchainLastblockLD,
   NativeFeeLD,
   HealthLD,
-  ValidateNodeLD
+  ValidateNodeLD,
+  CheckMidgardUrlHandler,
+  SelectedPoolAsset
 } from './types'
 
 const MIDGARD_TESTNET_URL = envOrDefault(
@@ -44,50 +46,41 @@ const MIDGARD_STAGENET_URL = envOrDefault(
 
 const MIDGARD_MAINNET_URL = envOrDefault(process.env.REACT_APP_MIDGARD_MAINNET_URL, 'https://midgard.ninerealms.com')
 
+// `TriggerStream` to reload Midgard
+const { stream$: reloadMidgardUrl$, trigger: reloadMidgardUrl } = triggerStream()
+
+const {
+  get$: getMidgardUrl$,
+  get: getMidgardUrl,
+  set: _setMidgardUrl
+} = observableState<Record<Network, string>>({
+  mainnet: MIDGARD_MAINNET_URL,
+  stagenet: MIDGARD_STAGENET_URL,
+  testnet: MIDGARD_TESTNET_URL
+})
+
+const setMidgardUrl = (url: string, network: Network) => {
+  const current = getMidgardUrl()
+  _setMidgardUrl({ ...current, [network]: url })
+}
+
 /**
  * Helper to get `DefaultApi` instance for Midgard using custom basePath
  */
 const getMidgardDefaultApi = (basePath: string) => new DefaultApi(new Configuration({ basePath }))
 
-// `TriggerStream` to reload Byzantine
-const { stream$: reloadByzantine$, trigger: reloadByzantine } = triggerStream()
-
-const nextByzantine$: (n: Network) => LiveData<Error, string> = fromPromise$<RD.RemoteData<Error, string>, Network>(
-  (network: Network) => {
-    // option to set Midgard url (for testnet + development only)
-    let midgardURL
-    switch (network) {
-      case 'mainnet':
-        midgardURL = MIDGARD_MAINNET_URL
-        break
-      case 'stagenet':
-        midgardURL = MIDGARD_STAGENET_URL
-        break
-      case 'testnet':
-        midgardURL = MIDGARD_TESTNET_URL
-        break
-    }
-
-    // Byzantine module is disabled temporary
-    // return midgard(network, true).then(RD.success)
-    return Promise.resolve(RD.success(midgardURL))
-  },
-  RD.pending,
-  RD.failure
-)
-
 /**
- * Endpoint provided by Byzantine
+ * Midgard endpoint
  */
-const byzantine$: ByzantineLD = Rx.combineLatest([network$, reloadByzantine$]).pipe(
-  RxOp.switchMap(([network]) => nextByzantine$(network)),
+const midgardUrl$: MidgardUrlLD = Rx.combineLatest([network$, getMidgardUrl$, reloadMidgardUrl$]).pipe(
+  RxOp.map(([network, midgardUrl, _]) => RD.success(midgardUrl[network])),
   RxOp.shareReplay(1)
 )
 
 /**
  * Get `ThorchainLastblock` data from Midgard
  */
-const apiGetThorchainLastblock$ = byzantine$.pipe(
+const apiGetThorchainLastblock$ = midgardUrl$.pipe(
   liveData.chain((endpoint) =>
     FP.pipe(
       getMidgardDefaultApi(endpoint).getProxiedLastblock(),
@@ -128,7 +121,7 @@ const thorchainLastblockState$: ThorchainLastblockLD = FP.pipe(
  * Get `ThorchainConstants` data from Midgard
  */
 const apiGetThorchainConstants$ = FP.pipe(
-  byzantine$,
+  midgardUrl$,
   liveData.chain((endpoint) =>
     FP.pipe(
       getMidgardDefaultApi(endpoint).getProxiedConstants(),
@@ -167,7 +160,7 @@ const nativeTxFee$: NativeFeeLD = thorchainConstantsState$.pipe(
  */
 const loadNetworkInfo$ = (): Rx.Observable<NetworkInfoRD> =>
   FP.pipe(
-    byzantine$,
+    midgardUrl$,
     liveData.chain((endpoint) =>
       FP.pipe(
         getMidgardDefaultApi(endpoint).getNetworkData(),
@@ -193,7 +186,7 @@ const networkInfo$: NetworkInfoLD = reloadNetworkInfo$.pipe(
 )
 
 const health$: HealthLD = FP.pipe(
-  byzantine$,
+  midgardUrl$,
   liveData.chain((endpoint) =>
     FP.pipe(
       getMidgardDefaultApi(endpoint).getHealth(),
@@ -217,24 +210,45 @@ const validateNode$ = (): ValidateNodeLD =>
 // `TriggerStream` to reload chart data handled on view (not service) level only
 export const { stream$: reloadChartDataUI$, trigger: reloadChartDataUI } = triggerStream()
 
+export const checkMidgardUrl$: CheckMidgardUrlHandler = (url: string, intl: IntlShape) =>
+  FP.pipe(
+    getMidgardDefaultApi(url).getHealth(),
+    RxOp.map((result) => {
+      const { database, inSync } = result
+      if (database && inSync) return RD.success(url)
+
+      return RD.failure(Error(intl.formatMessage({ id: 'midgard.url.error.unhealthy' }, { endpoint: '/health' })))
+    }),
+    RxOp.catchError((_: Error) =>
+      Rx.of(RD.failure(Error(`${intl.formatMessage({ id: 'midgard.url.error.invalid' })}`)))
+    )
+  )
+
 export type MidgardService = {
   networkInfo$: NetworkInfoLD
   reloadNetworkInfo: FP.Lazy<void>
+  reloadThorchainConstants: FP.Lazy<void>
   thorchainConstantsState$: ThorchainConstantsLD
   thorchainLastblockState$: ThorchainLastblockLD
   nativeTxFee$: NativeFeeLD
   reloadThorchainLastblock: FP.Lazy<void>
-  setSelectedPoolAsset: FP.Lazy<void>
+  setSelectedPoolAsset: (p: SelectedPoolAsset) => void
+  selectedPoolAsset$: Rx.Observable<SelectedPoolAsset>
   reloadChartDataUI: FP.Lazy<void>
   reloadChartDataUI$: TriggerStream$
-  apiEndpoint$: ByzantineLD
-  getTransactionState$: (txId: string) => LiveData<Error, O.Option<string>>
+  apiEndpoint$: MidgardUrlLD
+  reloadApiEndpoint: FP.Lazy<void>
+  setMidgardUrl: (url: string, network: Network) => void
+  checkMidgardUrl$: CheckMidgardUrlHandler
+  pools: ReturnType<typeof createPoolsService>
+  shares: ReturnType<typeof createSharesService>
+  actions: ReturnType<typeof createActionsService>
   validateNode$: () => ValidateNodeLD
 }
 /**
  * Service object with all "public" functions and observables we want to provide
  */
-export const service = {
+export const service: MidgardService = {
   networkInfo$,
   reloadNetworkInfo,
   reloadThorchainConstants,
@@ -246,10 +260,12 @@ export const service = {
   reloadChartDataUI$,
   setSelectedPoolAsset,
   selectedPoolAsset$,
-  apiEndpoint$: byzantine$,
-  reloadApiEndpoint: reloadByzantine,
-  pools: createPoolsService(byzantine$, getMidgardDefaultApi, selectedPoolAsset$),
-  shares: createSharesService(byzantine$, getMidgardDefaultApi),
+  apiEndpoint$: midgardUrl$,
+  reloadApiEndpoint: reloadMidgardUrl,
+  setMidgardUrl,
+  checkMidgardUrl$,
   validateNode$,
-  actions: createActionsService(byzantine$, getMidgardDefaultApi)
+  pools: createPoolsService(midgardUrl$, getMidgardDefaultApi, selectedPoolAsset$),
+  shares: createSharesService(midgardUrl$, getMidgardDefaultApi),
+  actions: createActionsService(midgardUrl$, getMidgardDefaultApi)
 }

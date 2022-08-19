@@ -8,29 +8,8 @@ import { Menu } from '../shared/menu'
 import { ExternalLinkIcon as ExternalLinkIconUI } from '../uielements/common/Common.styles'
 import { Label as UILabel } from '../uielements/label'
 
-export const Container = styled.div`
-  margin-top: 50px;
-  padding: 10px 40px;
-  background-color: ${palette('background', 0)};
-`
-
-export const CardContainer = styled.div`
-  width: 100%;
-  padding: 10px 0 20px 0;
-`
-
 export const SectionsWrapper = styled.div`
   padding: 20px;
-`
-
-export const Section = styled.div`
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  align-items: flex-start;
-  &:not(:last-child) {
-    margin-bottom: 20px;
-  }
 `
 
 export const SubTitle = styled(UILabel)`
