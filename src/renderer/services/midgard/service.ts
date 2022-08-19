@@ -42,7 +42,7 @@ const MIDGARD_STAGENET_URL = envOrDefault(
   'https://stagenet-midgard.ninerealms.com'
 )
 
-const MIDGARD_MAINNET_URL = envOrDefault(process.env.REACT_APP_MIDGARD_MAINNET_URL, 'https://midgard.thorchain.info')
+const MIDGARD_MAINNET_URL = envOrDefault(process.env.REACT_APP_MIDGARD_MAINNET_URL, 'https://midgard.ninerealms.com')
 
 /**
  * Helper to get `DefaultApi` instance for Midgard using custom basePath
