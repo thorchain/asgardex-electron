@@ -2,6 +2,7 @@ import * as RD from '@devexperts/remote-data-ts'
 import { ComponentMeta } from '@storybook/react'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
+import * as Rx from 'rxjs'
 
 import { Locale } from '../../../shared/i18n/types'
 import { getMockRDValueFactory, RDStatus, rdStatusOptions } from '../../../shared/mock/rdByStatus'
@@ -47,6 +48,7 @@ const Template = ({
       toggleCollapse={() => console.log('toggle')}
       midgardUrl={RD.pending}
       onChangeMidgardUrl={onChangeMidgardUrl}
+      checkMidgardUrl$={(url, _) => Rx.of(RD.success(url))}
     />
   )
 }

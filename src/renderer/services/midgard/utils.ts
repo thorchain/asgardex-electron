@@ -25,7 +25,7 @@ import { isMiniToken } from '../../helpers/binanceHelper'
 import { eqAsset, eqChain, eqOAddress } from '../../helpers/fp/eq'
 import { ordPricePool } from '../../helpers/fp/ord'
 import { getDeepestPool, RUNE_POOL_ADDRESS, RUNE_PRICE_POOL } from '../../helpers/poolHelper'
-import { Configuration, DefaultApi, PoolDetail } from '../../types/generated/midgard'
+import { PoolDetail } from '../../types/generated/midgard'
 import { PricePoolAssets, PricePools, PricePoolAsset, PricePool } from '../../views/pools/Pools.types'
 import {
   PoolAssetDetails as PoolAssetsDetail,
@@ -40,11 +40,6 @@ import {
   PoolsDataMap,
   InboundAddress
 } from './types'
-
-/**
- * Helper to get `DefaultApi` instance for Midgard using custom basePath
- */
-export const getMidgardDefaultApi = (basePath: string) => new DefaultApi(new Configuration({ basePath }))
 
 export const getPricePools = (details: PoolDetails, whitelist: PricePoolAssets): PricePools => {
   const oUSDPricePool: O.Option<PricePool> = FP.pipe(

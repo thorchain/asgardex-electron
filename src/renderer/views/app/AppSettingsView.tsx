@@ -17,7 +17,7 @@ export const AppSettingsView: React.FC = (): JSX.Element => {
   const { network, changeNetwork } = useNetwork()
   const { appUpdater, checkForUpdates } = useAppUpdate()
   const {
-    service: { apiEndpoint$, setMidgardUrl }
+    service: { apiEndpoint$, setMidgardUrl, checkMidgardUrl$ }
   } = useMidgardContext()
   const midgardUrl = useObservableState(apiEndpoint$, RD.initial)
 
@@ -33,7 +33,7 @@ export const AppSettingsView: React.FC = (): JSX.Element => {
 
   const updateMidgardUrlHandler = useCallback(
     (url: string) => {
-      setMidgardUrl(network, url)
+      setMidgardUrl(url, network)
     },
     [network, setMidgardUrl]
   )
@@ -52,6 +52,7 @@ export const AppSettingsView: React.FC = (): JSX.Element => {
       toggleCollapse={toggleCollapse}
       midgardUrl={midgardUrl}
       onChangeMidgardUrl={updateMidgardUrlHandler}
+      checkMidgardUrl$={checkMidgardUrl$}
     />
   )
 }

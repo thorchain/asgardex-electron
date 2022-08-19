@@ -5,12 +5,10 @@ import { CheckCircleIcon, PencilAltIcon, XCircleIcon } from '@heroicons/react/ou
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
 import { useForm } from 'react-hook-form'
-import { useIntl } from 'react-intl'
-import * as Rx from 'rxjs'
-import * as RxOp from 'rxjs/operators'
+import { IntlShape, useIntl } from 'react-intl'
 
+import { LiveData } from '../../helpers/rx/liveData'
 import { useSubscriptionState } from '../../hooks/useSubscriptionState'
-import { getMidgardDefaultApi } from '../../services/midgard/utils'
 import { BaseButton, BorderButton, TextButton } from '../uielements/button'
 import { Input } from '../uielements/input/Input'
 
@@ -18,18 +16,20 @@ type FormData = {
   url: string
 }
 
-type TestUrlRD = RD.RemoteData<Error, boolean>
-type TestUrl$ = Rx.Observable<TestUrlRD>
+type TestUrlRD = RD.RemoteData<Error, string>
+type TestUrlLD = LiveData<Error, string>
+type TestUrlHandler = (url: string, intl: IntlShape) => TestUrlLD
 
 type Props = {
   url: string
+  checkUrl$: TestUrlHandler
   loading?: boolean
   onChange?: (url: string) => void
   className?: string
 }
 
 const EditableUrl: React.FC<Props> = (props): JSX.Element => {
-  const { url: initialUrl, className, loading = false, onChange = FP.constVoid } = props
+  const { url: initialUrl, className, loading = false, onChange = FP.constVoid, checkUrl$ } = props
 
   const [editableUrl, setEditableUrl] = useState<O.Option<string>>(O.none)
   const [url, setUrl] = useState<string>(initialUrl)
@@ -55,22 +55,7 @@ const EditableUrl: React.FC<Props> = (props): JSX.Element => {
     reset: resetTestUrlState
   } = useSubscriptionState<TestUrlRD>(RD.initial)
 
-  const testUrl = useCallback(
-    (urlToTest: string): TestUrl$ =>
-      FP.pipe(
-        getMidgardDefaultApi(urlToTest).getHealth(),
-        RxOp.map((result) => {
-          const { database, inSync } = result
-          if (database && inSync) return RD.success(true)
-
-          return RD.failure(Error(intl.formatMessage({ id: 'midgard.url.error.unhealthy' }, { endpoint: '/health' })))
-        }),
-        RxOp.catchError((_: Error) =>
-          Rx.of(RD.failure(Error(`${intl.formatMessage({ id: 'midgard.url.error.invalid' })}`)))
-        )
-      ),
-    [intl]
-  )
+  const testUrl = useCallback((urlToTest: string): TestUrlLD => checkUrl$(urlToTest, intl), [checkUrl$, intl])
 
   const testUrlAsPromise = useCallback(
     (urlToTest: string): Promise<TestUrlRD> => testUrl(urlToTest).toPromise(),
@@ -151,7 +136,6 @@ const EditableUrl: React.FC<Props> = (props): JSX.Element => {
       }
       const submit = async ({ url: formUrl }: FormData) => {
         resetTestUrlState()
-        reset()
         // Remove always trailing slash
         const url = formUrl.replace(/\/$/, '')
         if (!url) {
@@ -189,19 +173,23 @@ const EditableUrl: React.FC<Props> = (props): JSX.Element => {
           <div className="flex w-full items-center ">
             <Input
               id="url"
-              className="w-full text-[16px]"
+              className={`w-full text-[16px]
+              ${RD.isSuccess(testUrlState) ? '!ring-turquoise' : ''}
+              `}
               size="large"
               defaultValue={name}
               autoFocus
               uppercase={false}
               {...register('url', { required: true })}
-              error={!!errors.url}
+              error={!!errors.url || RD.isFailure(testUrlState)}
               onKeyDown={keyDownHandler}
             />
             <BaseButton className="!p-0 text-turquoise" onClick={handleSubmit(submit)} type="submit">
               <CheckCircleIcon className="ml-[5px] h-[24px] w-[24px]" />
             </BaseButton>
-            <XCircleIcon className="ml-[5px] h-[24px] w-[24px] cursor-pointer text-error0" onClick={cancel} />
+            <BaseButton className="!p-0 text-error0" onClick={cancel}>
+              <XCircleIcon className="ml-[5px] h-[24px] w-[24px]" />
+            </BaseButton>
             <BorderButton
               className="ml-10px"
               loading={RD.isPending(testUrlState)}

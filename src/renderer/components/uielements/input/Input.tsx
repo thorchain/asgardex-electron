@@ -39,7 +39,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>((props, ref): JSX.
           appearance-none
           ring-1
             focus:outline-none
-            ${error ? 'ring-error0' : 'ring-turquoise'}
+            ${error ? 'ring-error0' : 'ring-gray1 dark:ring-gray1d'}
             bg-bg0
             text-text0
             ${uppercase ? 'placeholder:uppercase' : ''}

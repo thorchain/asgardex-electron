@@ -4,14 +4,16 @@ import * as RD from '@devexperts/remote-data-ts'
 import { baseAmount } from '@xchainjs/xchain-util'
 import * as FP from 'fp-ts/function'
 import * as O from 'fp-ts/Option'
+import { IntlShape } from 'react-intl'
 import * as Rx from 'rxjs'
 import * as RxOp from 'rxjs/operators'
 
 import { Network } from '../../../shared/api/types'
 import { envOrDefault } from '../../../shared/utils/env'
 import { THORCHAIN_DECIMAL } from '../../helpers/assetHelper'
-import { liveData, LiveData } from '../../helpers/rx/liveData'
+import { liveData } from '../../helpers/rx/liveData'
 import { observableState, triggerStream, TriggerStream$ } from '../../helpers/stateHelper'
+import { Configuration, DefaultApi } from '../../types/generated/midgard'
 import { network$ } from '../app/service'
 import { MIDGARD_MAX_RETRY } from '../const'
 import { ErrorId } from '../wallet/types'
@@ -27,9 +29,10 @@ import {
   ThorchainLastblockLD,
   NativeFeeLD,
   HealthLD,
-  ValidateNodeLD
+  ValidateNodeLD,
+  CheckMidgardUrlHandler,
+  SelectedPoolAsset
 } from './types'
-import { getMidgardDefaultApi } from './utils'
 
 const MIDGARD_TESTNET_URL = envOrDefault(
   process.env.REACT_APP_MIDGARD_TESTNET_URL,
@@ -56,10 +59,15 @@ const {
   testnet: MIDGARD_TESTNET_URL
 })
 
-const setMidgardUrl = (network: Network, url: string) => {
+const setMidgardUrl = (url: string, network: Network) => {
   const current = getMidgardUrl()
   _setMidgardUrl({ ...current, [network]: url })
 }
+
+/**
+ * Helper to get `DefaultApi` instance for Midgard using custom basePath
+ */
+const getMidgardDefaultApi = (basePath: string) => new DefaultApi(new Configuration({ basePath }))
 
 /**
  * Midgard endpoint
@@ -202,24 +210,45 @@ const validateNode$ = (): ValidateNodeLD =>
 // `TriggerStream` to reload chart data handled on view (not service) level only
 export const { stream$: reloadChartDataUI$, trigger: reloadChartDataUI } = triggerStream()
 
+export const checkMidgardUrl$: CheckMidgardUrlHandler = (url: string, intl: IntlShape) =>
+  FP.pipe(
+    getMidgardDefaultApi(url).getHealth(),
+    RxOp.map((result) => {
+      const { database, inSync } = result
+      if (database && inSync) return RD.success(url)
+
+      return RD.failure(Error(intl.formatMessage({ id: 'midgard.url.error.unhealthy' }, { endpoint: '/health' })))
+    }),
+    RxOp.catchError((_: Error) =>
+      Rx.of(RD.failure(Error(`${intl.formatMessage({ id: 'midgard.url.error.invalid' })}`)))
+    )
+  )
+
 export type MidgardService = {
   networkInfo$: NetworkInfoLD
   reloadNetworkInfo: FP.Lazy<void>
+  reloadThorchainConstants: FP.Lazy<void>
   thorchainConstantsState$: ThorchainConstantsLD
   thorchainLastblockState$: ThorchainLastblockLD
   nativeTxFee$: NativeFeeLD
   reloadThorchainLastblock: FP.Lazy<void>
-  setSelectedPoolAsset: FP.Lazy<void>
+  setSelectedPoolAsset: (p: SelectedPoolAsset) => void
+  selectedPoolAsset$: Rx.Observable<SelectedPoolAsset>
   reloadChartDataUI: FP.Lazy<void>
   reloadChartDataUI$: TriggerStream$
   apiEndpoint$: MidgardUrlLD
-  getTransactionState$: (txId: string) => LiveData<Error, O.Option<string>>
+  reloadApiEndpoint: FP.Lazy<void>
+  setMidgardUrl: (url: string, network: Network) => void
+  checkMidgardUrl$: CheckMidgardUrlHandler
+  pools: ReturnType<typeof createPoolsService>
+  shares: ReturnType<typeof createSharesService>
+  actions: ReturnType<typeof createActionsService>
   validateNode$: () => ValidateNodeLD
 }
 /**
  * Service object with all "public" functions and observables we want to provide
  */
-export const service = {
+export const service: MidgardService = {
   networkInfo$,
   reloadNetworkInfo,
   reloadThorchainConstants,
@@ -234,8 +263,9 @@ export const service = {
   apiEndpoint$: midgardUrl$,
   reloadApiEndpoint: reloadMidgardUrl,
   setMidgardUrl,
+  checkMidgardUrl$,
+  validateNode$,
   pools: createPoolsService(midgardUrl$, getMidgardDefaultApi, selectedPoolAsset$),
   shares: createSharesService(midgardUrl$, getMidgardDefaultApi),
-  validateNode$,
   actions: createActionsService(midgardUrl$, getMidgardDefaultApi)
 }

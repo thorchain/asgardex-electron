@@ -11,7 +11,7 @@ import { Network } from '../../../shared/api/types'
 import { Locale } from '../../../shared/i18n/types'
 import { LOCALES } from '../../i18n'
 import { AVAILABLE_NETWORKS } from '../../services/const'
-import { MidgardUrlRD } from '../../services/midgard/types'
+import { CheckMidgardUrlHandler, MidgardUrlRD } from '../../services/midgard/types'
 import { DownIcon } from '../icons'
 import { Menu } from '../shared/menu'
 import { BorderButton, TextButton } from '../uielements/button'
@@ -33,6 +33,7 @@ export type Props = {
   toggleCollapse: FP.Lazy<void>
   midgardUrl: MidgardUrlRD
   onChangeMidgardUrl: (url: string) => void
+  checkMidgardUrl$: CheckMidgardUrlHandler
 }
 
 type SectionProps = {
@@ -61,7 +62,8 @@ export const AppSettings: React.FC<Props> = (props): JSX.Element => {
     collapsed,
     toggleCollapse,
     midgardUrl: midgardUrlRD,
-    onChangeMidgardUrl
+    onChangeMidgardUrl,
+    checkMidgardUrl$
   } = props
 
   const intl = useIntl()
@@ -248,6 +250,7 @@ export const AppSettings: React.FC<Props> = (props): JSX.Element => {
                   url={midgardUrl}
                   onChange={onChangeMidgardUrl}
                   loading={RD.isPending(midgardUrlRD)}
+                  checkUrl$={checkMidgardUrl$}
                 />
               </Section>
             )}
