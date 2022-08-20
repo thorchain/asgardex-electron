@@ -58,11 +58,11 @@ export const BondsView: React.FC = (): JSX.Element => {
     () =>
       FP.pipe(
         userNodes,
-        A.map((node) => {
+        A.map((nodeAddress) => {
           // Store previously created stream to avoid re-creating it in case if userNodes was changed
-          if (!nodeInfoCacheRef.current[node]) {
-            nodeInfoCacheRef.current[node] = FP.pipe(
-              getNodeInfo$(node, network),
+          if (!nodeInfoCacheRef.current[nodeAddress]) {
+            nodeInfoCacheRef.current[nodeAddress] = FP.pipe(
+              getNodeInfo$(nodeAddress),
               /**
                * if `userNodes` changed here will be new stream created by combineLatest
                * cache with shareReplay(1) allows to avoid re-requesting data
@@ -71,8 +71,8 @@ export const BondsView: React.FC = (): JSX.Element => {
             )
           }
           return FP.pipe(
-            nodeInfoCacheRef.current[node],
-            RxOp.map((data) => ({ data, nodeAddress: node }))
+            nodeInfoCacheRef.current[nodeAddress],
+            RxOp.map((data) => ({ data, nodeAddress }))
           )
         }),
         NEA.fromArray,
@@ -87,7 +87,7 @@ export const BondsView: React.FC = (): JSX.Element => {
           (nodesInfo) => Rx.combineLatest(nodesInfo)
         )
       ),
-    [userNodes, getNodeInfo$, network]
+    [userNodes, getNodeInfo$]
   )
 
   const nodesInfo: Node[] = useObservableState(nodesInfo$, [])

@@ -8,6 +8,7 @@ const bonds: BondsMessages = {
   'bonds.status.active': 'Actif',
   'bonds.status.standby': 'En attente',
   'bonds.status.disabled': 'Désactivé',
+  'bonds.status.whitelisted': 'Whitelisted - FR',
   'bonds.status.unknown': 'Inconnu',
   'bonds.node.add': 'Ajouter un node',
   'bonds.node.enterMessage': 'Entrez le node à surveiller',

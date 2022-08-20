@@ -259,6 +259,7 @@ type BondsMessageKey =
   | 'bonds.status.active'
   | 'bonds.status.standby'
   | 'bonds.status.disabled'
+  | 'bonds.status.whitelisted'
   | 'bonds.status.unknown'
   | 'bonds.node.add'
   | 'bonds.node.enterMessage'

@@ -6,19 +6,16 @@ import { baseAmount } from '@xchainjs/xchain-util'
 import { getMockRDValueFactory } from '../../../shared/mock/rdByStatus'
 import { AddressValidation } from '../../services/clients'
 import { NodeInfo } from '../../services/thorchain/types'
-import { ApiError, ErrorId } from '../../services/wallet/types'
+import { NodeStatusEnum } from '../../types/generated/thornode'
 import { Bonds as Component } from './Bonds'
 
-const getMockRDValue = getMockRDValueFactory<ApiError, NodeInfo>(
+const getMockRDValue = getMockRDValueFactory<Error, NodeInfo>(
   () => ({
     bond: baseAmount(100000000 * 40000000),
     award: baseAmount(100000000 * 400000),
-    status: 'active'
+    status: NodeStatusEnum.Active
   }),
-  () => ({
-    msg: 'error message',
-    errorId: ErrorId.GET_NODE_INFO
-  })
+  () => Error('error message')
 )
 
 const addressValidation: AddressValidation = (_) => true

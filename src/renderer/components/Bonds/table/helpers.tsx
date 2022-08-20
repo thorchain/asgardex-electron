@@ -9,7 +9,8 @@ import * as FP from 'fp-ts/function'
 import { useIntl } from 'react-intl'
 
 import { Network } from '../../../../shared/api/types'
-import { NodeStatus, NodeDataRD } from '../../../services/thorchain/types'
+import { NodeDataRD } from '../../../services/thorchain/types'
+import { NodeStatusEnum } from '../../../types/generated/thornode'
 import * as Styled from './BondsTable.styles'
 
 export const NodeAddress: React.FC<{ address: Address; network: Network }> = ({ address, network }) => (
@@ -60,16 +61,19 @@ export const AwardValue: React.FC<{ data: NodeDataRD }> = ({ data }) => (
   </Col>
 )
 
-const getStatusMessageId = (status: NodeStatus) => {
+const getStatusMessageId = (status: NodeStatusEnum) => {
   switch (status) {
-    case 'active': {
+    case NodeStatusEnum.Active: {
       return 'bonds.status.active'
     }
-    case 'standby': {
+    case NodeStatusEnum.Standby: {
       return 'bonds.status.standby'
     }
-    case 'disabled': {
+    case NodeStatusEnum.Disabled: {
       return 'bonds.status.disabled'
+    }
+    case NodeStatusEnum.Whitelisted: {
+      return 'bonds.status.whitelisted'
     }
     default: {
       return 'bonds.status.unknown'

@@ -70,7 +70,7 @@ const setMidgardUrl = (url: string, network: Network) => {
 const getMidgardDefaultApi = (basePath: string) => new DefaultApi(new Configuration({ basePath }))
 
 /**
- * Midgard endpoint
+ * Midgard url
  */
 const midgardUrl$: MidgardUrlLD = Rx.combineLatest([network$, getMidgardUrl$, reloadMidgardUrl$]).pipe(
   RxOp.map(([network, midgardUrl, _]) => RD.success(midgardUrl[network])),

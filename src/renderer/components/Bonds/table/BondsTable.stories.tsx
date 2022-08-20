@@ -8,19 +8,16 @@ import { baseAmount } from '@xchainjs/xchain-util'
 
 import { getMockRDValueFactory, RDStatus } from '../../../../shared/mock/rdByStatus'
 import { NodeInfo } from '../../../services/thorchain/types'
-import { ApiError, ErrorId } from '../../../services/wallet/types'
+import { NodeStatusEnum } from '../../../types/generated/thornode'
 import { BondsTable } from './BondsTable'
 
-const getMockRDValue = getMockRDValueFactory<ApiError, NodeInfo>(
+const getMockRDValue = getMockRDValueFactory<Error, NodeInfo>(
   () => ({
     bond: baseAmount(100000000 * 40000000),
     award: baseAmount(100000000 * 400000),
-    status: 'active'
+    status: NodeStatusEnum.Active
   }),
-  () => ({
-    msg: 'error message',
-    errorId: ErrorId.GET_NODE_INFO
-  })
+  () => Error('error message')
 )
 
 export const Default: Story = () => {
