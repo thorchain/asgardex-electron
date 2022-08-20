@@ -152,10 +152,20 @@ export NODE_OPTIONS="--max-old-space-size=4096"
 Whenever Midgard has been updated with a new release, run following script to auto-generate types and endpoints
 
 ```bash
-generate:types
+generate:types:midgard
 ```
 
 Generated files are based on Midgard's [swagger.json](https://midgard.thorchain.info/v2/swagger.json).
+
+### Generate types and endpoints for THORNode
+
+Whenever THORNode has been updated with a new release, run following script to auto-generate types and endpoints
+
+```bash
+generate:types:thornode
+```
+
+Generated files are based on `https://gitlab.com/thorchain/thornode/-/raw/release-{version}/openapi/openapi.yaml` (replace `{version}` with latest version (e.g. `0.19.5`)).
 
 ### Generate ERC20 asset white list
 
