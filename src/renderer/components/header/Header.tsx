@@ -4,13 +4,13 @@ import * as RD from '@devexperts/remote-data-ts'
 import * as O from 'fp-ts/lib/Option'
 import { useObservableState } from 'observable-hooks'
 
-import { getClientUrl } from '../../../shared/thorchain/client'
 import { useMidgardContext } from '../../contexts/MidgardContext'
 import { useThorchainContext } from '../../contexts/ThorchainContext'
 import { useWalletContext } from '../../contexts/WalletContext'
 import { useNetwork } from '../../hooks/useNetwork'
 import { usePricePools } from '../../hooks/usePricePools'
 import { useRunePrice } from '../../hooks/useRunePrice'
+import { useThorchainClientUrl } from '../../hooks/useThorchainClientUrl'
 import { useVolume24Price } from '../../hooks/useVolume24Price'
 import { SelectedPricePoolAsset } from '../../services/midgard/types'
 import { HeaderComponent } from './HeaderComponent'
@@ -39,7 +39,7 @@ export const Header: React.FC = (): JSX.Element => {
   const inboundAddresses = useObservableState(inboundAddressesShared$, RD.initial)
 
   const midgardUrlRD = useObservableState(apiEndpoint$, RD.initial)
-  const thorchainUrl = getClientUrl()[network].node
+  const { node: thorchainNodeUrl, rpc: thorchainRpcUrl } = useThorchainClientUrl()
 
   return (
     <HeaderComponent
@@ -56,7 +56,8 @@ export const Header: React.FC = (): JSX.Element => {
       inboundAddresses={inboundAddresses}
       mimir={mimir}
       midgardUrl={midgardUrlRD}
-      thorchainUrl={thorchainUrl}
+      thorchainNodeUrl={thorchainNodeUrl}
+      thorchainRpcUrl={thorchainRpcUrl}
     />
   )
 }

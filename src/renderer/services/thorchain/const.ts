@@ -1,7 +1,8 @@
 import * as RD from '@devexperts/remote-data-ts'
 import { Network } from '@xchainjs/xchain-client'
-import { ChainIds } from '@xchainjs/xchain-thorchain'
+import { ChainIds, ClientUrl, getDefaultClientUrl } from '@xchainjs/xchain-thorchain'
 
+import { envOrDefault } from '../../../shared/utils/env'
 import { InteractState, MimirHalt } from './types'
 
 export const INITIAL_INTERACT_STATE: InteractState = {
@@ -45,3 +46,25 @@ export const INITIAL_CHAIN_IDS: ChainIds = {
   [Network.Stagenet]: 'unkown-stagenet-chain-id',
   [Network.Testnet]: 'unkown-testnet-chain-id'
 }
+
+const getInitClientUrl = (): ClientUrl => {
+  const { node: nodeTestnet, rpc: rpcTestnet } = getDefaultClientUrl()[Network.Testnet]
+  const { node: nodeStagenet, rpc: rpcStagenet } = getDefaultClientUrl()[Network.Stagenet]
+  const { node: nodeMainnet, rpc: rpcMainnet } = getDefaultClientUrl()[Network.Mainnet]
+  return {
+    [Network.Testnet]: {
+      node: envOrDefault(process.env.REACT_APP_TESTNET_THORNODE_API, nodeTestnet),
+      rpc: envOrDefault(process.env.REACT_APP_TESTNET_THORNODE_RPC, rpcTestnet)
+    },
+    [Network.Stagenet]: {
+      node: envOrDefault(process.env.REACT_APP_STAGENET_THORNODE_API, nodeStagenet),
+      rpc: envOrDefault(process.env.REACT_APP_STAGENET_THORNODE_RPC, rpcStagenet)
+    },
+    [Network.Mainnet]: {
+      node: envOrDefault(process.env.REACT_APP_MAINNET_THORNODE_API, nodeMainnet),
+      rpc: envOrDefault(process.env.REACT_APP_MAINNET_THORNODE_RPC, rpcMainnet)
+    }
+  }
+}
+
+export const INITIAL_CLIENT_URL: ClientUrl = getInitClientUrl()

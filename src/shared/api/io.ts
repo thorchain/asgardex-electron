@@ -98,7 +98,8 @@ export const ipcLedgerSendTxParamsIO = t.type({
   walletIndex: t.number,
   feeRate: t.number,
   feeOption: t.union([feeOptionIO, t.undefined]),
-  feeAmount: t.union([baseAmountIO, t.undefined])
+  feeAmount: t.union([baseAmountIO, t.undefined]),
+  nodeUrl: t.union([t.string, t.undefined])
 })
 
 export type IPCLedgerSendTxParams = t.TypeOf<typeof ipcLedgerSendTxParamsIO>
@@ -112,7 +113,8 @@ export const ipcLedgerDepositTxParamsIO = t.type({
   amount: baseAmountIO,
   memo: t.string,
   walletIndex: t.number,
-  feeOption: t.union([feeOptionIO, t.undefined])
+  feeOption: t.union([feeOptionIO, t.undefined]),
+  nodeUrl: t.union([t.string, t.undefined])
 })
 
 export type IPCLedgerDepositTxParams = t.TypeOf<typeof ipcLedgerDepositTxParamsIO>

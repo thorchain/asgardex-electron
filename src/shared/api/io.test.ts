@@ -91,7 +91,8 @@ describe('shared/io', () => {
         walletIndex: 0,
         feeRate: 1,
         feeOption: FeeOption.Fast,
-        feeAmount: baseAmount(1, 6)
+        feeAmount: baseAmount(1, 6),
+        nodeUrl: 'node-url'
       })
       expect(encoded).toEqual({
         chain: 'BNB',
@@ -105,11 +106,12 @@ describe('shared/io', () => {
         walletIndex: 0,
         feeRate: 1,
         feeOption: 'fast',
-        feeAmount: { amount: '1', decimal: 6 }
+        feeAmount: { amount: '1', decimal: 6 },
+        nodeUrl: 'node-url'
       })
     })
 
-    it('encode IPCLedgerSendTxParams - undefined fee option / fee amount', () => {
+    it('encode IPCLedgerSendTxParams - undefined fee option / fee amount / nodeUrl', () => {
       const encoded = ipcLedgerSendTxParamsIO.encode({
         chain: BNBChain,
         network: 'mainnet',
@@ -122,7 +124,8 @@ describe('shared/io', () => {
         walletIndex: 0,
         feeRate: 1,
         feeOption: undefined,
-        feeAmount: undefined
+        feeAmount: undefined,
+        nodeUrl: undefined
       })
 
       expect(encoded).toEqual({
@@ -137,7 +140,8 @@ describe('shared/io', () => {
         walletIndex: 0,
         feeRate: 1,
         feeOption: undefined,
-        feeAmount: undefined
+        feeAmount: undefined,
+        nodeUrl: undefined
       })
     })
 

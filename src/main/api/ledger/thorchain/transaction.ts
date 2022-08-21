@@ -9,7 +9,6 @@ import { MsgSend } from 'cosmos-client/x/bank'
 import * as E from 'fp-ts/Either'
 
 import { LedgerError, LedgerErrorId, Network } from '../../../../shared/api/types'
-import { getClientUrl } from '../../../../shared/thorchain/client'
 import { toClientNetwork } from '../../../../shared/utils/client'
 import { isError } from '../../../../shared/utils/guard'
 import { fromLedgerErrorType, getDerivationPath } from './common'
@@ -26,7 +25,8 @@ export const send = async ({
   amount,
   memo,
   recipient,
-  walletIndex
+  walletIndex,
+  nodeUrl
 }: {
   transport: Transport
   amount: BaseAmount
@@ -34,6 +34,8 @@ export const send = async ({
   recipient: Address
   memo?: string
   walletIndex: number
+  // Node endpoint for cosmos sdk client
+  nodeUrl: string
 }): Promise<E.Either<LedgerError, TxHash>> => {
   try {
     const clientNetwork = toClientNetwork(network)
@@ -49,8 +51,7 @@ export const send = async ({
         msg: `Getting 'bech32Address' or 'compressedPk' from Ledger THORChainApp failed`
       })
     }
-    // Node endpoint for cosmos sdk client
-    const nodeUrl = getClientUrl()[network].node
+
     const chainId = await getChainId(nodeUrl)
 
     const sdk = new CosmosSDK(nodeUrl, chainId)
@@ -159,13 +160,16 @@ export const deposit = async ({
   network,
   amount,
   memo,
-  walletIndex
+  walletIndex,
+  nodeUrl
 }: {
   transport: Transport
   amount: BaseAmount
   network: Network
   memo: string
   walletIndex: number
+  // Node endpoint for cosmos sdk client
+  nodeUrl: string
 }): Promise<E.Either<LedgerError, TxHash>> => {
   try {
     const clientNetwork = toClientNetwork(network)
@@ -181,8 +185,7 @@ export const deposit = async ({
         msg: `Getting 'bech32Address' or 'compressedPk' from Ledger THORChainApp failed`
       })
     }
-    // Node endpoint for cosmos sdk client
-    const nodeUrl = getClientUrl()[network].node
+
     const chainId = await getChainId(nodeUrl)
 
     const sdk = new CosmosSDK(nodeUrl, chainId)

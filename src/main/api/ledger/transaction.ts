@@ -36,21 +36,30 @@ export const sendTx = async ({
   memo,
   feeRate,
   feeOption,
-  walletIndex
+  walletIndex,
+  nodeUrl
 }: IPCLedgerSendTxParams): Promise<E.Either<LedgerError, TxHash>> => {
   try {
     const transport = await TransportNodeHidSingleton.open()
     let res: E.Either<LedgerError, string>
     switch (chain) {
       case THORChain:
-        res = await THOR.send({
-          transport,
-          network,
-          recipient,
-          amount,
-          memo,
-          walletIndex
-        })
+        if (!nodeUrl) {
+          res = E.left({
+            errorId: LedgerErrorId.INVALID_DATA,
+            msg: `"nodeUrl" needs to be defined to send Ledger transaction on ${chainToString(chain)}`
+          })
+        } else {
+          res = await THOR.send({
+            transport,
+            network,
+            recipient,
+            amount,
+            memo,
+            walletIndex,
+            nodeUrl
+          })
+        }
         break
       case BNBChain:
         res = await BNB.send({
@@ -176,14 +185,22 @@ export const deposit = async ({
   amount,
   memo,
   walletIndex,
-  feeOption
+  feeOption,
+  nodeUrl
 }: IPCLedgerDepositTxParams): Promise<E.Either<LedgerError, TxHash>> => {
   try {
     const transport = await TransportNodeHidSingleton.open()
     let res: E.Either<LedgerError, string>
     switch (chain) {
       case THORChain:
-        res = await THOR.deposit({ transport, network, amount, memo, walletIndex })
+        if (!nodeUrl) {
+          res = E.left({
+            errorId: LedgerErrorId.INVALID_DATA,
+            msg: `"nodeUrl" needs to be defined to send Ledger transaction on ${chainToString(chain)}`
+          })
+        } else {
+          res = await THOR.deposit({ transport, network, amount, memo, walletIndex, nodeUrl })
+        }
         break
       case ETHChain:
         if (!router) {
