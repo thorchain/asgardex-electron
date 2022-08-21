@@ -20,7 +20,8 @@ const wallet: WalletMessages = {
   'wallet.action.connect': 'Подключить',
   'wallet.action.deposit': 'Вложить',
   'wallet.balance.total.poolAssets': 'Общий баланс активов пула',
-  'wallet.balance.total.poolAssets.info': 'Общий баланс включает остатки активов, доступных только в пулах THORChain. Пулы являются источником истины для определения цен в THORChain.',
+  'wallet.balance.total.poolAssets.info':
+    'Общий баланс включает остатки активов, доступных только в пулах THORChain. Пулы являются источником истины для определения цен в THORChain.',
   'wallet.shares.total': 'Итоговая стоимость',
   'wallet.connect.instruction': 'Пожалуйста подключите ваш кошелёк',
   'wallet.lock.label': 'Заблокировать кошелёк',
@@ -59,12 +60,14 @@ const wallet: WalletMessages = {
   'wallet.receive.address.errorQR': 'Ошибка при создании QR-кода: {error}',
   'wallet.remove.label': 'Забыть кошелек',
   'wallet.remove.label.title': 'Вы уверены, что хотите забыть "{name}"?',
-  'wallet.remove.label.description': 'Для повторного создания кошелька вам потребуется указать свою фразу. Пожалуйста, убедитесь, что ваша фраза сохранена в надежном месте, прежде чем продолжить.',
+  'wallet.remove.label.description':
+    'Для повторного создания кошелька вам потребуется указать свою фразу. Пожалуйста, убедитесь, что ваша фраза сохранена в надежном месте, прежде чем продолжить.',
   'wallet.send.success': 'Тразакция завершена.',
   'wallet.send.fastest': 'Наибыстро',
   'wallet.send.fast': 'Быстро',
   'wallet.send.average': 'Среднее',
-  'wallet.send.max.doge': 'Рассчитанное макс. значение основано на приблизительных комиссиях, которые могут быть иногда неточны для DOGE. В случае появления сообщения об ошибке "Недостаточно средств для проведения операции" проверьте https://blockchair.com/dogecoin/transactions, чтобы получить среднее значение последних сборов и вычесть его из баланса перед отправкой транзакции.',
+  'wallet.send.max.doge':
+    'Рассчитанное макс. значение основано на приблизительных комиссиях, которые могут быть иногда неточны для DOGE. В случае появления сообщения об ошибке "Недостаточно средств для проведения операции" проверьте https://blockchair.com/dogecoin/transactions, чтобы получить среднее значение последних сборов и вычесть его из баланса перед отправкой транзакции.',
   'wallet.errors.balancesFailed': 'Нет загруженных балансов. {errorMsg}',
   'wallet.errors.asset.notExist': 'Отсутсвует актив {asset}',
   'wallet.errors.address.empty': 'Адрес не может быть пустым',
