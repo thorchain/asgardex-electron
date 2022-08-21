@@ -77,7 +77,8 @@ const wallet: WalletMessages = {
   'wallet.errors.amount.shouldBeGreaterThan': 'Количество должно быть больше, чем {amount}',
   'wallet.errors.amount.shouldBeGreaterOrEqualThan': 'Сумма должна быть равна или больше {amount}',
   'wallet.errors.amount.shouldBeLessThanBalance': 'Количество должно быть меньше вашего баланса',
-  'wallet.errors.amount.shouldBeLessThanBalanceAndFee': 'Количество должно быть меньше, чем ваш баланс после вычета комиссии',
+  'wallet.errors.amount.shouldBeLessThanBalanceAndFee':
+    'Количество должно быть меньше, чем ваш баланс после вычета комиссии',
   'wallet.errors.fee.notCovered': 'Комиссия не покрывается вашим банаслом ({balance})',
   'wallet.errors.invalidChain': 'Неверная цепочка: {chain}',
   'wallet.errors.memo.max': 'Длина мемо не может быть больше, чем {max}',
