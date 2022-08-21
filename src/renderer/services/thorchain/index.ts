@@ -6,13 +6,13 @@ import { client$, clientState$, address$, addressUI$, explorerUrl$ } from './com
 import { createFeesService } from './fees'
 import { createInteractService$ } from './interact'
 import {
-  getNodeInfo$,
-  reloadNodesInfo,
+  getNodeInfos$,
+  reloadNodeInfos,
   mimir$,
   reloadMimir,
   getLiquidityProviders,
   reloadLiquidityProviders
-} from './thorNode'
+} from './thornode'
 import { createTransactionService } from './transaction'
 
 const { txs$, tx$, txStatus$, subscribeTx, resetTx, sendTx, txRD$, sendPoolTx$ } = createTransactionService(
@@ -44,8 +44,8 @@ export {
   txRD$,
   sendPoolTx$,
   interact$,
-  getNodeInfo$,
-  reloadNodesInfo,
+  getNodeInfos$,
+  reloadNodeInfos,
   mimir$,
   reloadMimir,
   getLiquidityProviders,

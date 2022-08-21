@@ -1,5 +1,4 @@
 import * as RD from '@devexperts/remote-data-ts'
-import { Address } from '@xchainjs/xchain-client'
 import { Asset, AssetRuneNative, assetToString, baseAmount } from '@xchainjs/xchain-util'
 import * as A from 'fp-ts/Array'
 import * as E from 'fp-ts/Either'
@@ -20,12 +19,12 @@ import { network$ } from '../app/service'
 import {
   MimirIO,
   MimirLD,
-  NodeInfoLD,
   ThornodeApiUrlLD,
   LiquidityProviderIO,
   LiquidityProvidersLD,
   LiquidityProvider,
-  NodeInfo
+  NodeInfosLD,
+  NodeInfos
 } from './types'
 
 const {
@@ -56,32 +55,39 @@ const thornodeUrl$: ThornodeApiUrlLD = Rx.combineLatest([network$, getThornodeUr
   RxOp.shareReplay(1)
 )
 
-const apiGetNodeInfo$ = (address: Address) =>
+const apiGetNodeInfos$ = () =>
   FP.pipe(
     thornodeUrl$,
     liveData.chain((basePath) =>
       FP.pipe(
-        new NodesApi(new Configuration({ basePath })).node({ address }),
+        new NodesApi(new Configuration({ basePath })).nodes({ height: undefined }),
         RxOp.map(RD.success),
         RxOp.catchError((e: Error) => Rx.of(RD.failure(e)))
       )
-    )
-  )
-
-const { stream$: reloadNodesInfo$, trigger: reloadNodesInfo } = triggerStream()
-
-const getNodeInfo$ = (address: Address): NodeInfoLD =>
-  FP.pipe(
-    reloadNodesInfo$,
-    RxOp.debounceTime(300),
-    RxOp.switchMap((_) => apiGetNodeInfo$(address)),
-    liveData.map<Node, NodeInfo>(({ bond, current_award, status }) => ({
-      bond: baseAmount(bond, THORCHAIN_DECIMAL),
-      award: baseAmount(current_award, THORCHAIN_DECIMAL),
-      status
-    })),
+    ),
     RxOp.startWith(RD.pending)
   )
+
+const { stream$: reloadNodeInfos$, trigger: reloadNodeInfos } = triggerStream()
+
+const getNodeInfos$: NodeInfosLD = FP.pipe(
+  reloadNodeInfos$,
+  RxOp.debounceTime(300),
+  RxOp.switchMap(apiGetNodeInfos$),
+  liveData.map<Node[], NodeInfos>((nodes) =>
+    FP.pipe(
+      nodes,
+      A.map(({ bond, current_award, status, node_address }) => ({
+        bond: baseAmount(bond, THORCHAIN_DECIMAL),
+        award: baseAmount(current_award, THORCHAIN_DECIMAL),
+        status,
+        address: node_address
+      }))
+    )
+  ),
+  RxOp.startWith(RD.initial),
+  RxOp.shareReplay(1)
+)
 
 const apiGetLiquidityProviders$ = (asset: Asset): LiveData<Error, Pool> =>
   FP.pipe(
@@ -163,4 +169,4 @@ const mimir$: MimirLD = FP.pipe(
   RxOp.shareReplay(1)
 )
 
-export { getNodeInfo$, reloadNodesInfo, mimir$, reloadMimir, getLiquidityProviders, reloadLiquidityProviders }
+export { getNodeInfos$, reloadNodeInfos, mimir$, reloadMimir, getLiquidityProviders, reloadLiquidityProviders }

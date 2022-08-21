@@ -6,15 +6,9 @@ import { palette } from 'styled-theme'
 import { InnerForm } from '../shared/form'
 import { Button as UIButton } from '../uielements/button'
 import { Label as UILabel } from '../uielements/label'
-import { BondsTable as UIBondsTable } from './table'
 
 export const Container = styled('div')`
   background: ${palette('background', 0)};
-`
-
-export const BondsTable = styled(UIBondsTable)`
-  border-bottom: 1px ${palette('gray', 1)} solid;
-  margin-bottom: 25px;
 `
 
 export const Form = styled(InnerForm)`

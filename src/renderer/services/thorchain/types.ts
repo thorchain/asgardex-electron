@@ -65,13 +65,18 @@ export type InteractState$ = Rx.Observable<InteractState>
 export type InteractStateHandler = (p: InteractParams) => InteractState$
 
 export type NodeInfo = {
+  address: Address
   bond: BaseAmount
   award: BaseAmount
   status: NodeStatusEnum
 }
 
 export type NodeInfoLD = LiveData<Error, NodeInfo>
-export type NodeDataRD = RD.RemoteData<Error, NodeInfo>
+export type NodeInfoRD = RD.RemoteData<Error, NodeInfo>
+
+export type NodeInfos = NodeInfo[]
+export type NodeInfosLD = LiveData<Error, NodeInfos>
+export type NodeInfosRD = RD.RemoteData<Error, NodeInfos>
 
 export type ThornodeApiUrlLD = LiveData<Error, string>
 export type ThornodeApiUrlRD = RD.RemoteData<Error, string>
