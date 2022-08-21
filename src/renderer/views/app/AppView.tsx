@@ -18,7 +18,9 @@ import { useI18nContext } from '../../contexts/I18nContext'
 import { useMidgardContext } from '../../contexts/MidgardContext'
 import { unionChains } from '../../helpers/fp/array'
 import { rdAltOnPending } from '../../helpers/fpHelpers'
+import { useKeystoreWallets } from '../../hooks/useKeystoreWallets'
 import { useMimirHalt } from '../../hooks/useMimirHalt'
+import { useTheme } from '../../hooks/useTheme'
 import { DEFAULT_MIMIR_HALT } from '../../services/thorchain/const'
 import { MimirHalt, MimirHaltRD } from '../../services/thorchain/types'
 import { View } from '../View'
@@ -38,10 +40,22 @@ export const AppView: React.FC = (): JSX.Element => {
   const { locale$ } = useI18nContext()
   const currentLocale = useObservableState(locale$, DEFAULT_LOCALE)
 
+  const { isLight } = useTheme()
+
+  // locale
   useEffect(() => {
     // Needed to update Electron native menu according to the selected locale
     window.apiLang.update(currentLocale)
   }, [currentLocale])
+
+  // Add/remove `dark` selector depending on selected theme (needed for tailwind)
+  useEffect(() => {
+    if (isLight) {
+      document.documentElement.classList.remove('dark')
+    } else {
+      document.documentElement.classList.add('dark')
+    }
+  }, [isLight])
 
   const {
     service: {
@@ -57,6 +71,8 @@ export const AppView: React.FC = (): JSX.Element => {
 
   const prevHaltedChains = useRef<Chain[]>([])
   const prevMimirHalt = useRef<MimirHalt>(DEFAULT_MIMIR_HALT)
+
+  const { walletsPersistentRD, reload: reloadPersistentWallets } = useKeystoreWallets()
 
   const { mimirHaltRD } = useMimirHalt()
 
@@ -249,6 +265,28 @@ export const AppView: React.FC = (): JSX.Element => {
     )
   }, [apiEndpoint, renderMidgardAlert])
 
+  // TODO (@veado) Render alert incl. reload button
+  const _renderKeystoreError = useMemo(() => {
+    return (
+      <div>
+        <div>
+          {' '}
+          keystoreWallets:
+          {FP.pipe(
+            walletsPersistentRD,
+            RD.fold(
+              () => <>init</>,
+              () => <>loading</>,
+              (e) => <>error {e.toString()}</>,
+              (wallets) => <>wallets {JSON.stringify(wallets)}</>
+            )
+          )}
+        </div>
+        <button onClick={reloadPersistentWallets}>reloadKeystoreWallets</button>
+      </div>
+    )
+  }, [walletsPersistentRD, reloadPersistentWallets])
+
   return (
     <Styled.AppWrapper>
       <Styled.AppLayout>
@@ -256,6 +294,7 @@ export const AppView: React.FC = (): JSX.Element => {
         <Header />
 
         <View>
+          {/* {renderKeystoreError} */}
           {renderMidgardError}
           {renderHaltedChainsWarning}
           {renderUpgradeWarning}

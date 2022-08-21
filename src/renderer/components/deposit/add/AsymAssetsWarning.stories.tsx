@@ -1,12 +1,11 @@
-import React from 'react'
-
-import { Story, Meta } from '@storybook/react'
+import { ComponentMeta } from '@storybook/react'
 import { assetFromString } from '@xchainjs/xchain-util'
 import * as A from 'fp-ts/lib/Array'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
 
 import { Network } from '../../../../shared/api/types'
+import * as AT from '../../../storybook/argTypes'
 import { AsymAssetsWarning } from './AsymAssetsWarning'
 
 type Args = {
@@ -16,7 +15,7 @@ type Args = {
   assets: string
 }
 
-const Template: Story<Args> = ({ network, loading, onClickOpenAsymTool, assets }) => {
+const Template = ({ network, loading, onClickOpenAsymTool, assets }: Args) => {
   const assetList = FP.pipe(
     assets.split('|'),
     A.filterMap((assetString) => O.fromNullable(assetFromString(assetString)))
@@ -34,38 +33,26 @@ const Template: Story<Args> = ({ network, loading, onClickOpenAsymTool, assets }
 
 export const Default = Template.bind({})
 
-Default.storyName = 'default'
-
-const meta: Meta<Args> = {
-  component: AsymAssetsWarning,
+const meta: ComponentMeta<typeof Template> = {
+  component: Template,
   title: 'Components/Deposit/AsymAssetsWarning',
   argTypes: {
-    network: {
-      name: 'Network',
-      control: {
-        type: 'select',
-        options: ['mainnet', 'stagenet', 'testnet']
-      },
-      defaultValue: 'mainnet'
-    },
-    loading: {
-      name: 'Loading state',
-      control: {
-        type: 'boolean'
-      },
-      defaultValue: false
-    },
+    network: AT.network,
     assets: {
       name: 'Assets',
       control: {
         type: 'select',
         options: ['BNB.BNB', 'BNB.BNB|BTC.BTC', 'ETH.ETH']
-      },
-      defaultValue: 'BNB.BNB'
+      }
     },
     onClickOpenAsymTool: {
       action: 'onClickOpenAsymTool'
     }
+  },
+  args: {
+    network: 'mainnet',
+    loading: false,
+    assets: 'BNB.BNB'
   }
 }
 

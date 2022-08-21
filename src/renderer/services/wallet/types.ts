@@ -8,44 +8,87 @@ import { NonEmptyArray } from 'fp-ts/lib/NonEmptyArray'
 import * as O from 'fp-ts/lib/Option'
 import * as Rx from 'rxjs'
 
-import { LedgerError, Network } from '../../../shared/api/types'
+import { KeystoreWallet, KeystoreWallets } from '../../../shared/api/io'
+import { KeystoreId, LedgerError, Network } from '../../../shared/api/types'
 import { WalletAddress, WalletBalanceType, WalletType } from '../../../shared/wallet/types'
 import { LiveData } from '../../helpers/rx/liveData'
 import { LoadTxsParams, WalletBalancesLD, WalletBalancesRD } from '../clients'
 
 export type Phrase = string
 
-export type KeystoreContent = { phrase: Phrase }
+export type KeystoreLocked = { id: KeystoreId; name: string }
+export type KeystoreUnlocked = KeystoreLocked & { phrase: Phrase }
+export type KeystoreContent = KeystoreLocked | KeystoreUnlocked
+
+/**
+ * Type guard for `KeystoreUnlocked`
+ * Unlocked keystore will provide an id, phrase + name
+ */
+export const isKeystoreUnlocked = (kc: KeystoreContent): kc is KeystoreUnlocked =>
+  'id' in kc && 'name' in kc && 'phrase' in kc
+
+/**
+ * Type guard for `KeystoreLocked`
+ */
+export const isKeystoreLocked = (kc: KeystoreContent): kc is KeystoreLocked => !isKeystoreUnlocked(kc)
+
 /**
  * Type for providing 3 states of keystore
  *
  * (1) `None` -> DEFAULT (keystore needs to be imported at start of application or after shutdown of app)
- * (2) `Some<None>` -> LOCKED STATUS (keystore file, but no phrase)
- * (3) `Some<Some<KeystoreContent>>` -> UNLOCKED + IMPORTED STATUS (keystore file + phrase)
+ * (2) `Some<{id: string}>` -> LOCKED STATUS (keystore id, but no phrase)
+ * (3) `Some<{id: string, phrase: string}>` -> UNLOCKED + IMPORTED STATUS (keystore id + phrase)
+ *
+ * DEPRECATED (2) `Some<None>` -> LOCKED STATUS (keystore file, but no phrase)
+ * DEPRECATED (3) `Some<Some<KeystoreContent>>` -> UNLOCKED + IMPORTED STATUS (keystore file + phrase)
+ *
  */
-export type KeystoreState = O.Option<O.Option<KeystoreContent>>
+export type KeystoreState = O.Option<KeystoreContent>
 export type KeystoreState$ = Rx.Observable<KeystoreState>
 
 export type ValidatePasswordHandler = (password: string) => LiveData<Error, void>
 export type ValidatePasswordLD = LiveData<Error, void>
 
-export type ImportKeystoreLD = LiveData<Error, void>
+export type ImportKeystoreParams = { id: KeystoreId; keystore: Keystore; password: string; name: string }
+export type AddKeystoreParams = { id: KeystoreId; phrase: Phrase; name: string; password: string }
 export type LoadKeystoreLD = LiveData<Error, Keystore>
 
+export type ImportingKeystoreStateRD = RD.RemoteData<Error, boolean>
+export type ImportingKeystoreStateLD = Rx.Observable<ImportingKeystoreStateRD>
+
+export type RemoveKeystoreWalletHandler = () => Promise<number>
+
+export type RemovedKeystoreId$ = Rx.Observable<O.Option<KeystoreId>>
+
+export type RenameKeystoreWalletRD = RD.RemoteData<Error, boolean>
+export type RenameKeystoreWalletLD = LiveData<Error, boolean>
+export type RenameKeystoreWalletHandler = (id: KeystoreId, name: string) => RenameKeystoreWalletLD
+
+export type ChangeKeystoreWalletRD = RD.RemoteData<Error, boolean>
+export type ChangeKeystoreWalletLD = LiveData<Error, boolean>
+export type ChangeKeystoreWalletHandler = (id: KeystoreId) => ChangeKeystoreWalletLD
+
 export type KeystoreService = {
-  keystore$: KeystoreState$
-  addKeystore: (phrase: Phrase, password: string) => Promise<void>
-  removeKeystore: () => Promise<void>
-  importKeystore$: (keystore: Keystore, password: string) => ImportKeystoreLD
-  exportKeystore: (runeNativeAddress: string, network: Network) => Promise<void>
+  keystoreState$: KeystoreState$
+  addKeystoreWallet: (params: AddKeystoreParams) => Promise<void>
+  removeKeystoreWallet: RemoveKeystoreWalletHandler
+  changeKeystoreWallet: ChangeKeystoreWalletHandler
+  renameKeystoreWallet: RenameKeystoreWalletHandler
   loadKeystore$: () => LoadKeystoreLD
-  unlock: (state: KeystoreState, password: string) => Promise<void>
+  importKeystore: (params: ImportKeystoreParams) => Promise<void>
+  exportKeystore: () => Promise<void>
+  unlock: (password: string) => Promise<void>
   lock: FP.Lazy<void>
   /**
    * Use RemoteData as result of validation
    * No need to store any success data. Only status
    */
   validatePassword$: ValidatePasswordHandler
+  reloadPersistentKeystoreWallets: FP.Lazy<void>
+  keystoreWalletsPersistent$: KeystoreWalletsLD
+  keystoreWalletsUI$: KeystoreWalletsUI$
+  importingKeystoreState$: ImportingKeystoreStateLD
+  resetImportingKeystoreState: FP.Lazy<void>
 }
 
 export type WalletAddressAsync = { address: RD.RemoteData<Error, WalletAddress>; type: WalletType }
@@ -112,11 +155,8 @@ export enum ErrorId {
   APPROVE_TX = 'APPROVE_TX',
   POOL_TX = 'POOL_TX',
   GET_TX = 'GET_TX',
-  GET_NODE_INFO = 'GET_NODE_INFO',
   VALIDATE_POOL = 'VALIDATE_POOL',
   GET_NODE = 'GET_NODE',
-  GET_LIQUIDITY_PROVIDERS = 'GET_LIQUIDITY_PROVIDERS',
-  GET_THORNODE_API = 'GET_THORNODE_API',
   VALIDATE_NODE = 'VALIDATE_NODE',
   VALIDATE_RESULT = 'VALIDATE_RESULT',
   GET_ACTIONS = 'GET_ACTIONS',
@@ -145,13 +185,34 @@ export type VerifyLedgerAddressHandler = (params: {
   walletIndex: number
 }) => Promise<boolean>
 
+export type AskLedgerAddressesHandler = ({
+  id,
+  chain,
+  network,
+  walletIndex
+}: {
+  id: KeystoreId
+  chain: Chain
+  network: Network
+  walletIndex: number
+}) => LedgerAddressLD
+
+export type RemoveLedgerAddressHandler = ({
+  id,
+  chain,
+  network
+}: {
+  id: KeystoreId
+  chain: Chain
+  network: Network
+}) => void
+
 export type LedgerService = {
   ledgerAddresses$: Rx.Observable<LedgerAddressesMap>
-  askLedgerAddress$: (chain: Chain, network: Network, walletIndex: number) => LedgerAddressLD
+  askLedgerAddress$: AskLedgerAddressesHandler
   getLedgerAddress$: GetLedgerAddressHandler
   verifyLedgerAddress: VerifyLedgerAddressHandler
-  removeLedgerAddress: (chain: Chain, network: Network) => void
-  dispose: FP.Lazy<void>
+  removeLedgerAddress: RemoveLedgerAddressHandler
 }
 
 // TODO(@Veado) Move type to clients/type
@@ -180,3 +241,13 @@ export type LedgerAddressMap$ = Rx.Observable<LedgerAddressMap>
 
 export type LedgerAddressesMap = Record<Chain, LedgerAddressMap>
 export type LedgerAddressesMap$ = Rx.Observable<LedgerAddressesMap>
+
+export type KeystoreLedgerAddressesMap = Map<KeystoreId, LedgerAddressesMap>
+
+export type KeystoreWalletsRD = RD.RemoteData<Error, KeystoreWallets>
+export type KeystoreWalletsLD = LiveData<Error, KeystoreWallets>
+export type KeystoreWallets$ = Rx.Observable<KeystoreWallets>
+
+export type KeystoreWalletUI = Omit<KeystoreWallet, 'keystore'>
+export type KeystoreWalletsUI = KeystoreWalletUI[]
+export type KeystoreWalletsUI$ = Rx.Observable<KeystoreWalletsUI>

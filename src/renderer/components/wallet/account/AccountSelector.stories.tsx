@@ -1,34 +1,44 @@
-import React from 'react'
-
-import { storiesOf } from '@storybook/react'
+import { ComponentMeta, StoryFn } from '@storybook/react'
 import { assetAmount, AssetBNB, assetToBase, assetToString } from '@xchainjs/xchain-util'
 
 import { ASSETS_MAINNET } from '../../../../shared/mock/assets'
 import { mockWalletBalance } from '../../../helpers/test/testWalletHelper'
+import { WalletBalances } from '../../../services/clients'
 import { WalletBalance } from '../../../services/wallet/types'
-import { AccountSelector } from './index'
+import { AccountSelector as Component, Props } from './AccountSelector'
 
-const balanceBNB: WalletBalance = mockWalletBalance({
-  asset: AssetBNB,
-  walletAddress: 'bnb-ledger-address'
-})
+const Template: StoryFn<Props> = (args) => <Component {...args} />
 
-storiesOf('Wallet/AccountSelector', module)
-  .add('default', () => {
-    return (
-      <AccountSelector
-        selectedWallet={balanceBNB}
-        walletBalances={[AssetBNB, ASSETS_MAINNET.TOMO].map((asset) => ({
-          walletType: 'keystore',
-          asset,
-          amount: assetToBase(assetAmount(1)),
-          walletAddress: `${assetToString(asset)} wallet`,
-          walletIndex: 0
-        }))}
-        network="testnet"
-      />
-    )
-  })
-  .add('w/o dropdown', () => {
-    return <AccountSelector selectedWallet={balanceBNB} walletBalances={[]} network="testnet" />
-  })
+export const Default = Template.bind({})
+
+const few: WalletBalances = [AssetBNB, ASSETS_MAINNET.TOMO].map<WalletBalance>((asset) => ({
+  walletType: 'keystore',
+  asset,
+  amount: assetToBase(assetAmount(1)),
+  walletAddress: `${assetToString(asset)} wallet`,
+  walletIndex: 0
+}))
+
+const meta: ComponentMeta<typeof Component> = {
+  component: Component,
+  title: 'Components/Deposit/PendingAssets',
+  argTypes: {
+    walletBalances: {
+      options: ['none', 'few'],
+      mapping: {
+        none: [],
+        few
+      }
+    }
+  },
+  args: {
+    network: 'testnet',
+    selectedWallet: mockWalletBalance({
+      asset: AssetBNB,
+      walletAddress: 'bnb-ledger-address'
+    }),
+    walletBalances: few
+  }
+}
+
+export default meta

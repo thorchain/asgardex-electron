@@ -1,4 +1,4 @@
-import { Story } from '@storybook/react'
+import { ComponentMeta } from '@storybook/react'
 
 import { TxType as MidgardTxType } from '../../../services/midgard/types'
 import { TxType } from './TxType'
@@ -27,9 +27,10 @@ const mapType = (type: InputType): MidgardTxType => {
   }
 }
 
-export const Default: Story<{ type: InputType; showTypeIcon: boolean }> = ({ type, showTypeIcon }) => {
-  return <TxType type={mapType(type)} showTypeIcon={showTypeIcon} />
-}
+const Template = ({ type, showTypeIcon }: { type: InputType; showTypeIcon: boolean }) => (
+  <TxType type={mapType(type)} showTypeIcon={showTypeIcon} />
+)
+export const Default = Template.bind({})
 
 const argTypes = {
   type: {
@@ -46,12 +47,13 @@ const argTypes = {
   }
 }
 
-Default.args = {
-  type: argTypes.type.control.options[0]
+const meta: ComponentMeta<typeof Template> = {
+  component: Template,
+  title: 'Components/TxType',
+  argTypes,
+  args: {
+    type: argTypes.type.control.options[0]
+  }
 }
 
-export default {
-  component: TxType,
-  title: 'TxType',
-  argTypes
-}
+export default meta

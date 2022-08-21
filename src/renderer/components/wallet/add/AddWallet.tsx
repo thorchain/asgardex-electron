@@ -8,7 +8,7 @@ import * as walletRoutes from '../../../routes/wallet'
 import { Button } from '../../uielements/button'
 import * as Styled from './AddWallet.styles'
 
-type Props = { isLocked?: boolean }
+export type Props = { isLocked?: boolean }
 
 export const AddWallet: React.FC<Props> = ({ isLocked = false }) => {
   const intl = useIntl()

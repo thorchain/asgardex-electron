@@ -1,3 +1,4 @@
+import { Keystore } from '@xchainjs/xchain-crypto'
 import { assetToString, assetFromString, Asset, BaseAmount, baseAmount } from '@xchainjs/xchain-util'
 import * as E from 'fp-ts/lib/Either'
 import * as FP from 'fp-ts/lib/function'
@@ -148,3 +149,62 @@ export const poolsStorageIO = t.type({
 
 // Note: We use Encoded type for storage
 export type PoolsStorageEncoded = ReturnType<typeof poolsStorageIO.encode>
+
+/**
+ * Guard to check `Keystore`
+ */
+export const isKeystore = (u: unknown): u is Keystore =>
+  IOG.struct({
+    crypto: IOG.struct({
+      cipher: IOG.string,
+      ciphertext: IOG.string,
+      cipherparams: IOG.struct({
+        iv: IOG.string
+      }),
+      kdf: IOG.string,
+      kdfparams: IOG.struct({
+        prf: IOG.string,
+        dklen: IOG.number,
+        salt: IOG.string,
+        c: IOG.number
+      }),
+      mac: IOG.string
+    }),
+    id: IOG.string,
+    version: IOG.number,
+    meta: IOG.string
+  }).is(u)
+
+/**
+ * IO interface of `Keystore`
+ *
+ * @see https://github.com/xchainjs/xchainjs-lib/blob/master/packages/xchain-crypto/src/crypto.ts#L17-L39
+ */
+export const keystoreIO = new t.Type(
+  'KeystoreIO',
+  isKeystore,
+  (u, c) => {
+    if (isKeystore(u)) return t.success(u)
+    return t.failure(u, c, `Can't decode Keystore from ${u}`)
+  },
+  t.identity
+)
+
+export const ipcKeystoreWalletIO = t.type({
+  id: t.number,
+  name: t.string,
+  selected: t.boolean,
+  keystore: keystoreIO
+})
+
+/**
+ * Keystore Wallet
+ * Created by users by importing or creating keystores in `Wallet` section
+ */
+export type KeystoreWallet = ReturnType<typeof ipcKeystoreWalletIO.encode>
+
+export const ipcKeystoreWalletsIO = t.array(ipcKeystoreWalletIO)
+
+export type IPCKeystoreWallets = t.TypeOf<typeof ipcKeystoreWalletsIO>
+
+export type KeystoreWallets = ReturnType<typeof ipcKeystoreWalletsIO.encode>

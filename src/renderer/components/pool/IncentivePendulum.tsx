@@ -30,7 +30,7 @@ export const IncentivePendulum: React.FC<Props> = (props): JSX.Element => {
     RD.fold(
       () => loading,
       () => loading,
-      (_) => <>{intl.formatMessage({ id: 'pools.incentivependulum.error' })}</>,
+      (_) => <Styled.ErrorLabel>{intl.formatMessage({ id: 'pools.incentivependulum.error' })}</Styled.ErrorLabel>,
       ({ incentivePendulum, incentivePendulumLight, totalPooledRuneAmount, totalActiveBondAmount }) => {
         // Transform `IncentivePendulumLight` -> `AlertIconColor`
         const getColor = (): AlertIconColor => {

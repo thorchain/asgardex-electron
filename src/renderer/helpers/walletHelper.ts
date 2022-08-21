@@ -6,6 +6,7 @@ import * as FP from 'fp-ts/function'
 import * as O from 'fp-ts/Option'
 
 import { Network } from '../../shared/api/types'
+import { optionFromNullableString } from '../../shared/utils/fp'
 import { isLedgerWallet, isWalletType } from '../../shared/utils/guard'
 import { WalletAddress, WalletType } from '../../shared/wallet/types'
 import { ZERO_ASSET_AMOUNT } from '../const'
@@ -14,7 +15,6 @@ import { NonEmptyWalletBalances, WalletBalance } from '../services/wallet/types'
 import { isBnbAsset, isEthAsset, isLtcAsset, isRuneNativeAsset } from './assetHelper'
 import { isBchChain, isDogeChain, isLtcChain, isThorChain } from './chainHelper'
 import { eqAddress, eqAsset, eqWalletType } from './fp/eq'
-import { optionFromNullableString } from './fp/from'
 
 /**
  * Tries to find an `AssetAmount` of an `Asset`
@@ -168,7 +168,8 @@ export const isEnabledWallet = (chain: Chain, network: Network, walletType: Wall
 export const getWalletAddressFromNullableString = (s?: string): O.Option<Address> =>
   FP.pipe(s, optionFromNullableString, O.chain(O.fromPredicate((s) => s.length > 0)))
 
-export const getWalletIndexFromNullableString = (s?: string): O.Option<number /* integer */> =>
+// TODO (@veado) Use `naturalNumberFromNullableString` from `shared/utils/fp`
+export const getWalletIndexFromNullableString = (s?: string): O.Option<number /* positive integer */> =>
   FP.pipe(s, optionFromNullableString, O.map(parseInt), O.chain(O.fromPredicate((v) => !isNaN(v) && v >= 0)))
 
 export const getWalletTypeFromNullableString = (s?: string): O.Option<WalletType> =>

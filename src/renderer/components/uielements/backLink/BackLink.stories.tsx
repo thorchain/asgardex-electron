@@ -1,13 +1,23 @@
-import React from 'react'
+import { ComponentMeta, StoryFn } from '@storybook/react'
 
-import { storiesOf } from '@storybook/react'
+import { BackLink as Component, Props } from './BackLink'
 
-import { BackLink } from './BackLink'
+const Template: StoryFn<Props> = (args) => <Component {...args} />
+export const Default = Template.bind({})
 
-storiesOf('Components/BackLink', module).add('default', () => {
-  return (
-    <div style={{ padding: '15px' }}>
-      <BackLink />
-    </div>
-  )
-})
+const meta: ComponentMeta<typeof Component> = {
+  component: Component,
+  title: 'Components/BackLink',
+  args: {
+    label: 'Back link'
+  },
+  decorators: [
+    (Story) => (
+      <div style={{ padding: '15px' }}>
+        <Story />
+      </div>
+    )
+  ]
+}
+
+export default meta

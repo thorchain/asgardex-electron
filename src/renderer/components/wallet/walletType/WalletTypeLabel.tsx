@@ -2,7 +2,7 @@ import React from 'react'
 
 import * as Styled from '../../uielements/common/Common.styles'
 
-type Props = {
+export type Props = {
   className?: string
   children?: React.ReactNode
 }

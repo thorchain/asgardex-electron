@@ -2,7 +2,7 @@ import React from 'react'
 
 import { ContentTitleWrapper } from './ContentTitle.styles'
 
-type Props = {
+export type Props = {
   className?: string
   children: React.ReactNode
 }

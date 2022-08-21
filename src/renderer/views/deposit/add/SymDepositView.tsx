@@ -148,7 +148,6 @@ export const SymDepositView: React.FC<Props> = (props) => {
 
   const { symPendingAssets, hasAsymAssets, symAssetMismatch } = useLiquidityProviders({
     asset,
-    network,
     runeAddress: runeWalletAddress,
     assetAddress: assetWalletAddress
   })

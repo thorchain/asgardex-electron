@@ -1,57 +1,40 @@
-import React from 'react'
+import { StoryFn, ComponentMeta } from '@storybook/react'
+import { Balance } from '@xchainjs/xchain-client'
+import { assetAmount, AssetBNB, AssetRuneNative, assetToBase } from '@xchainjs/xchain-util'
 
-import { Story, Meta } from '@storybook/react'
-import {
-  assetAmount,
-  AssetBNB,
-  AssetRuneNative,
-  assetToBase,
-  BaseAmount,
-  formatBaseAmount
-} from '@xchainjs/xchain-util'
+import { MaxBalanceButton as Component, ComponentProps } from './MaxBalanceButton'
 
-import { MaxBalanceButton, Props } from './MaxBalanceButton'
+const Template: StoryFn<ComponentProps> = (args) => <Component {...args} />
+export const Default = Template.bind({})
 
-const defaultProps: Props = {
-  balance: {
-    asset: AssetBNB,
-    amount: assetToBase(assetAmount(1001))
-  },
-  maxInfoText: '',
-  onClick: (amount: BaseAmount) => console.log('amount', formatBaseAmount(amount))
+const bnbBalance: Balance = {
+  asset: AssetBNB,
+  amount: assetToBase(assetAmount(123))
 }
 
-export const Default: Story = () => <MaxBalanceButton {...defaultProps} />
-Default.storyName = 'default - bnb'
-
-export const Disabled: Story = () => {
-  const props: Props = { ...defaultProps, disabled: true }
-  return <MaxBalanceButton {...props} />
-}
-Disabled.storyName = 'disabled'
-
-export const Rune: Story = () => {
-  const props: Props = {
-    ...defaultProps,
-    balance: {
-      asset: AssetRuneNative,
-      amount: assetToBase(assetAmount(2002))
-    }
-  }
-  return <MaxBalanceButton {...props} />
-}
-Rune.storyName = 'rune'
-
-const meta: Meta = {
-  component: MaxBalanceButton,
+const meta: ComponentMeta<typeof Component> = {
+  component: Component,
   title: 'Components/button/MaxBalanceButton',
+  argTypes: {
+    balance: {
+      options: ['BNB', 'RUNE'],
+      mappings: {
+        BNB: bnbBalance,
+        RUNE: {
+          asset: AssetRuneNative,
+          amount: assetToBase(assetAmount(345))
+        }
+      }
+    },
+    onClick: { action: 'onClick' }
+  },
+  args: {
+    maxInfoText: 'info text',
+    balance: bnbBalance
+  },
   decorators: [
-    (S: Story) => (
-      <div
-        style={{
-          display: 'flex',
-          flexDirection: 'column'
-        }}>
+    (S) => (
+      <div className="flex-column flex">
         <S />
       </div>
     )

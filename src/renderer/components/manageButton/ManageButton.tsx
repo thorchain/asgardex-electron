@@ -6,23 +6,15 @@ import { useIntl } from 'react-intl'
 import { useNavigate } from 'react-router-dom'
 
 import * as poolsRoutes from '../../routes/pools'
-import { Button, ButtonProps, ButtonSize } from '../uielements/button'
+import { BorderButton } from '../uielements/button'
+import type { Props as BorderButtonProps } from '../uielements/button/BorderButton'
 
-type Props = ButtonProps & {
+export type Props = BorderButtonProps & {
   className?: string
   asset: Asset
-  sizevalue?: ButtonSize
   isTextView: boolean
-  disabled?: boolean
 }
-export const ManageButton: React.FC<Props> = ({
-  disabled,
-  className,
-  asset,
-  sizevalue = 'normal',
-  isTextView,
-  ...otherProps
-}) => {
+export const ManageButton: React.FC<Props> = ({ asset, isTextView, ...otherProps }) => {
   const intl = useIntl()
   const navigate = useNavigate()
 
@@ -36,17 +28,9 @@ export const ManageButton: React.FC<Props> = ({
   )
 
   return (
-    <Button
-      disabled={disabled}
-      round="true"
-      typevalue="outline"
-      sizevalue={sizevalue}
-      className={className}
-      onClick={onClick}
-      style={{ height: 30 }}
-      {...otherProps}>
-      <PlusOutlined />
+    <BorderButton onClick={onClick} {...otherProps}>
+      <PlusOutlined className={isTextView ? `mr-[8px]` : ''} />
       {isTextView && intl.formatMessage({ id: 'common.manage' })}
-    </Button>
+    </BorderButton>
   )
 }

@@ -1,10 +1,10 @@
-import { Story, Meta } from '@storybook/react'
+import { ComponentMeta, StoryFn } from '@storybook/react'
 import { Address } from '@xchainjs/xchain-client'
 import { AssetBNB } from '@xchainjs/xchain-util'
 
 import { BNB_ADDRESS_TESTNET } from '../../../shared/mock/address'
 import { eqString } from '../../helpers/fp/eq'
-import { EditableAddress, EditableAddressProps } from './EditableAddress'
+import { EditableAddress as Component, EditableAddressProps } from './EditableAddress'
 
 const bnbAddress = BNB_ADDRESS_TESTNET
 
@@ -18,11 +18,10 @@ const defaultProps: EditableAddressProps = {
   onChangeEditableMode: () => console.log('edit mode changed'),
   addressValidator: (address: Address) => Promise.resolve(eqString.equals(address, bnbAddress))
 }
-export const StoryDefault: Story = () => <EditableAddress {...defaultProps} />
-StoryDefault.storyName = 'default'
+export const Default: StoryFn = () => <Component {...defaultProps} />
 
-const meta: Meta = {
-  component: EditableAddress,
+const meta: ComponentMeta<typeof Component> = {
+  component: Component,
   title: 'Components/EditableAddress'
 }
 

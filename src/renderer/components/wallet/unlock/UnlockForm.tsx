@@ -1,95 +1,110 @@
 import React, { useCallback, useState, useEffect, useMemo } from 'react'
 
-import Form, { Rule } from 'antd/lib/form'
+import * as RD from '@devexperts/remote-data-ts'
 import * as FP from 'fp-ts/function'
 import * as O from 'fp-ts/lib/Option'
-import { none, Option, some } from 'fp-ts/lib/Option'
+import { useForm } from 'react-hook-form'
 import { useIntl } from 'react-intl'
 import { useLocation, useNavigate, useParams } from 'react-router-dom'
 
-import { envOrDefault } from '../../../../shared/utils/env'
+import { KeystoreId } from '../../../../shared/api/types'
+import { emptyString } from '../../../helpers/stringHelper'
 import { getUrlSearchParam } from '../../../helpers/url.helper'
+import { useSubscriptionState } from '../../../hooks/useSubscriptionState'
 import * as appRoutes from '../../../routes/app'
 import { ReferrerState } from '../../../routes/types'
 import * as walletRoutes from '../../../routes/wallet'
-import { KeystoreState } from '../../../services/wallet/types'
-import { isLocked, hasImportedKeystore } from '../../../services/wallet/util'
+import {
+  ChangeKeystoreWalletHandler,
+  ChangeKeystoreWalletRD,
+  KeystoreState,
+  KeystoreWalletsUI,
+  RemoveKeystoreWalletHandler
+} from '../../../services/wallet/types'
+import { isLocked, getWalletName } from '../../../services/wallet/util'
 import { RemoveWalletConfirmationModal } from '../../modal/confirmation/RemoveWalletConfirmationModal'
 import { BackLink } from '../../uielements/backLink'
-import { InputPassword } from '../../uielements/input'
-import * as Styled from './UnlockForm.styles'
+import { BorderButton, FlatButton } from '../../uielements/button'
+import { InputPasswordTW } from '../../uielements/input'
+import { WalletSelector } from '../../uielements/wallet'
 
-type FormValues = {
+type FormData = {
   password: string
 }
 
-type Props = {
+export type Props = {
   keystore: KeystoreState
-  unlock?: (state: KeystoreState, password: string) => Promise<void>
-  removeKeystore?: () => Promise<void>
+  unlock: (password: string) => Promise<void>
+  removeKeystore: RemoveKeystoreWalletHandler
+  changeKeystore$: ChangeKeystoreWalletHandler
+  wallets: KeystoreWalletsUI
 }
 
 export const UnlockForm: React.FC<Props> = (props): JSX.Element => {
-  const { keystore, unlock: unlockHandler = () => Promise.resolve(), removeKeystore = () => Promise.resolve() } = props
+  const { keystore, unlock, removeKeystore, changeKeystore$, wallets } = props
 
   const [showRemoveModal, setShowRemoveModal] = useState(false)
   const navigate = useNavigate()
   const location = useLocation()
   const params = useParams()
   const intl = useIntl()
-  const [form] = Form.useForm<FormValues>()
+  const {
+    register,
+    formState: { errors },
+    handleSubmit
+  } = useForm<FormData>()
 
   const [validPassword, setValidPassword] = useState(false)
+  const [unlocking, setUnlocking] = useState(false)
 
-  const [unlockError, setUnlockError] = useState<Option<Error>>(none)
+  const [unlockError, setUnlockError] = useState<O.Option<Error>>(O.none)
 
   /**
    * Helper to auto-unlock wallet in development mode while hot-relaoding the app
    * Wallet has to be imported and `REACT_APP_WALLET_PASSWORD` has to be set as env before
+   *
+   * TEMPORAY disabled in https://github.com/thorchain/asgardex-electron/pull/2348
    */
-  useEffect(() => {
-    if ($IS_DEV) {
-      const checkPassword = async () => {
-        const password = envOrDefault(process.env.REACT_APP_WALLET_PASSWORD, '')
-        if (password && keystore && hasImportedKeystore(keystore) && isLocked(keystore)) {
-          await unlockHandler(keystore, password).catch((error) => {
-            setUnlockError(some(error))
-          })
-          setValidPassword(true)
-        }
-      }
-      checkPassword()
-    }
-  }, [keystore, unlockHandler])
+  // useEffect(() => {
+  //   if ($IS_DEV) {
+  //     const checkPassword = async () => {
+  //       const password = envOrDefault(process.env.REACT_APP_WALLET_PASSWORD, '')
+  //       if (password && keystore && hasImportedKeystore(keystore) && isLocked(keystore)) {
+  //         setUnlocking(true)
+  //         await unlockHandler(password).catch((error) => {
+  //           setUnlockError(O.some(error))
+  //         })
+  //         setUnlocking(false)
+  //         setValidPassword(true)
+  //       }
+  //     }
+  //     checkPassword()
+  //   }
+  // }, [keystore, unlockHandler])
 
   // Re-direct to previous view after unlocking the wallet
   useEffect(() => {
-    if (!isLocked(keystore) && !!validPassword) {
+    if (!isLocked(keystore) && validPassword) {
       FP.pipe(
         getUrlSearchParam(location.search, walletRoutes.REDIRECT_PARAMETER_NAME),
         O.alt(() => O.some((location.state as ReferrerState)?.referrer || walletRoutes.assets.template)),
         O.map((path) => navigate(path))
       )
     }
-  }, [keystore, validPassword, location, navigate, params])
-
-  const passwordValidator = async (_: Rule, value: string) => {
-    if (!value) {
-      setValidPassword(false)
-      return Promise.reject('Value for password required')
-    }
-    setValidPassword(true)
-    return Promise.resolve()
-  }
+  }, [keystore, location, navigate, params, validPassword])
 
   const submitForm = useCallback(
-    async ({ password }: FormValues) => {
-      setUnlockError(none)
-      await unlockHandler(keystore, password).catch((error) => {
-        setUnlockError(some(error))
+    async ({ password }: FormData) => {
+      setUnlockError(O.none)
+      setUnlocking(true)
+      await unlock(password).catch((error) => {
+        setUnlockError(O.some(error))
+        setValidPassword(false)
       })
+      setUnlocking(false)
+      setValidPassword(true)
     },
-    [unlockHandler, keystore]
+    [unlock]
   )
 
   const showRemoveConfirm = useCallback(() => {
@@ -100,68 +115,141 @@ export const UnlockForm: React.FC<Props> = (props): JSX.Element => {
     setShowRemoveModal(false)
   }, [])
 
-  const renderError = useMemo(
+  const renderUnlockError = useMemo(
     () =>
       O.fold(
         () => <></>,
-
-        (_: Error) => <Styled.Text>{intl.formatMessage({ id: 'wallet.unlock.error' })}</Styled.Text>
+        (_: Error) => (
+          <p className="mt-2 font-main text-sm text-error0">{intl.formatMessage({ id: 'wallet.unlock.error' })}</p>
+        )
       )(unlockError),
     [unlockError, intl]
   )
 
-  const onOkHandlder = useCallback(async () => {
-    await removeKeystore()
-    navigate(appRoutes.base.template)
+  const removeConfirmed = useCallback(async () => {
+    const noAccounts = await removeKeystore()
+    if (noAccounts >= 1) {
+      // unlock screen to unlock another account
+      navigate(walletRoutes.locked.path())
+    } else {
+      // no account -> go to homepage
+      navigate(appRoutes.base.template)
+    }
   }, [navigate, removeKeystore])
+
+  const walletName = useMemo(
+    () =>
+      FP.pipe(
+        keystore,
+        getWalletName,
+        O.getOrElse(() => emptyString)
+      ),
+    [keystore]
+  )
+
+  const { state: changeWalletState, subscribe: subscribeChangeWalletState } =
+    useSubscriptionState<ChangeKeystoreWalletRD>(RD.initial)
+
+  const changeWalletHandler = useCallback(
+    (id: KeystoreId) => {
+      subscribeChangeWalletState(changeKeystore$(id))
+      navigate(walletRoutes.locked.path())
+    },
+    [changeKeystore$, navigate, subscribeChangeWalletState]
+  )
+
+  const renderChangeWalletError = useMemo(
+    () =>
+      FP.pipe(
+        changeWalletState,
+        RD.fold(
+          () => <></>,
+          () => <></>,
+          (error) => (
+            <p className="px-5px font-main text-14 uppercase text-error0 dark:text-error0d">
+              {intl.formatMessage({ id: 'wallet.change.error' })} {error.message || error.toString()}
+            </p>
+          ),
+
+          () => <></>
+        )
+      ),
+    [changeWalletState, intl]
+  )
 
   return (
     <>
-      <RemoveWalletConfirmationModal visible={showRemoveModal} onClose={hideRemoveConfirm} onSuccess={onOkHandlder} />
-      <Styled.Header>
-        <BackLink style={{ position: 'absolute', top: 0, left: 0 }} />
-        <Styled.Text>{intl.formatMessage({ id: 'wallet.unlock.title' })}</Styled.Text>
-      </Styled.Header>
-      <Styled.Form form={form} onFinish={submitForm}>
-        <Styled.Content>
-          <div style={{ width: '100%' }}>
-            <Styled.Text>{intl.formatMessage({ id: 'wallet.unlock.password' })}</Styled.Text>
-            <Styled.PasswordInput
-              name="password"
-              rules={[{ required: true, validator: passwordValidator }]}
-              validateTrigger={['onSubmit', 'onChange']}>
-              <InputPassword
-                placeholder={intl.formatMessage({ id: 'common.password' }).toUpperCase()}
-                size="large"
-                autoFocus
+      <div className="relative flex justify-center">
+        <BackLink className="absolute top-0 left-0" />
+        <h1
+          className="mb-30px
+          inline-block
+          w-full
+          text-center font-mainSemiBold uppercase text-text1 dark:text-text1d">
+          {intl.formatMessage({ id: 'wallet.unlock.label' })}
+        </h1>
+      </div>
+      <form className="flex flex-1 flex-col" onSubmit={handleSubmit(submitForm)}>
+        <div
+          className="
+        flex h-full
+        flex-col items-center justify-between bg-bg1 pt-[45px]
+        pr-30px pb-[35px] pl-30px dark:bg-bg1d sm:pt-[90px] sm:pr-[60px] sm:pb-[70px] sm:pl-[60px]">
+          <div className="w-full">
+            <h2 className="mb-30px w-full text-center font-mainSemiBold uppercase text-text1 dark:text-text1d">
+              {intl.formatMessage({ id: 'wallet.unlock.password' })}
+            </h2>
+            <InputPasswordTW
+              id="password"
+              className="my-0 mx-auto mb-20px w-full max-w-[400px]"
+              {...register('password', { required: true })}
+              placeholder={intl.formatMessage({ id: 'common.password' }).toUpperCase()}
+              size="large"
+              autoFocus={true}
+              error={errors.password ? intl.formatMessage({ id: 'wallet.password.empty' }) : ''}
+              disabled={unlocking}
+            />
+            <div className="flex w-full flex-col items-center">
+              <h2 className="mt-30px w-full text-center font-mainSemiBold uppercase text-text1 dark:text-text1d">
+                {intl.formatMessage({ id: 'wallet.selected.title' })}
+              </h2>
+              <WalletSelector
+                wallets={wallets}
+                onChange={changeWalletHandler}
+                disabled={RD.isPending(changeWalletState)}
+                className="min-w-[200px]"
               />
-            </Styled.PasswordInput>
+              {renderChangeWalletError}
+            </div>
           </div>
-          {renderError}
-          <Styled.FormItem>
-            <Styled.Actions>
-              <Styled.Button
-                sizevalue="xnormal"
-                color="error"
-                typevalue="outline"
-                round="true"
-                onClick={showRemoveConfirm}>
-                {intl.formatMessage({ id: 'wallet.remove.label' })}
-              </Styled.Button>
-              <Styled.Button
-                sizevalue="xnormal"
-                round="true"
-                size="large"
-                type="primary"
-                block
-                htmlType="submit"
-                disabled={!validPassword}>
-                {intl.formatMessage({ id: 'wallet.action.unlock' })}
-              </Styled.Button>
-            </Styled.Actions>
-          </Styled.FormItem>
-        </Styled.Content>
-      </Styled.Form>
+          {renderUnlockError}
+          <div className="flex w-full flex-col justify-between sm:flex-row">
+            <BorderButton
+              className="mb-20px w-full min-w-[200px] sm:mb-0 sm:w-auto sm:max-w-[200px]"
+              size="normal"
+              color="error"
+              onClick={showRemoveConfirm}
+              disabled={unlocking}>
+              {intl.formatMessage({ id: 'wallet.remove.label' })}
+            </BorderButton>
+            <FlatButton
+              type="submit"
+              className="mb-0 w-full min-w-[200px] sm:mb-0 sm:w-auto sm:max-w-[200px]"
+              size="normal"
+              color="primary"
+              disabled={unlocking}
+              loading={unlocking}>
+              {intl.formatMessage({ id: 'wallet.action.unlock' })}
+            </FlatButton>
+          </div>
+        </div>
+      </form>
+      <RemoveWalletConfirmationModal
+        visible={showRemoveModal}
+        onClose={hideRemoveConfirm}
+        onSuccess={removeConfirmed}
+        walletName={walletName}
+      />
     </>
   )
 }

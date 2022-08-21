@@ -5,6 +5,7 @@ import { Asset, BaseAmount, Chain } from '@xchainjs/xchain-util'
 import BigNumber from 'bignumber.js'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
+import { IntlShape } from 'react-intl'
 import * as Rx from 'rxjs'
 
 import { LiveData } from '../../helpers/rx/liveData'
@@ -170,7 +171,10 @@ export type DepthHistoryItems = DepthHistoryItem[]
 export type NetworkInfoRD = RD.RemoteData<Error, NetworkInfo>
 export type NetworkInfoLD = LiveData<Error, NetworkInfo>
 
-export type ByzantineLD = LiveData<Error, string>
+export type MidgardUrlRD = RD.RemoteData<Error, string>
+export type MidgardUrlLD = LiveData<Error, string>
+
+export type CheckMidgardUrlHandler = (url: string, intl: IntlShape) => LiveData<Error, string>
 
 export type HealthRD = RD.RemoteData<Error, Health>
 export type HealthLD = LiveData<Error, Health>

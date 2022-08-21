@@ -4,7 +4,6 @@ import { BCH_DECIMAL } from '@xchainjs/xchain-bitcoincash'
 import { COSMOS_DECIMAL } from '@xchainjs/xchain-cosmos'
 import { DOGE_DECIMAL } from '@xchainjs/xchain-doge'
 import { LTC_DECIMAL } from '@xchainjs/xchain-litecoin'
-import { TERRA_DECIMAL } from '@xchainjs/xchain-terra'
 import {
   BNBChain,
   CosmosChain,
@@ -45,9 +44,8 @@ const getDecimal = (asset: Asset, network: Network): Promise<number> => {
     case LTCChain:
       return Promise.resolve(LTC_DECIMAL)
     case TerraChain:
-      return Promise.resolve(TERRA_DECIMAL)
+      return Promise.reject('Terra (Classic) is not supported anymore')
     case PolkadotChain: {
-      // return Promise.resolve(getDecimalDot(network))
       return Promise.reject('Polkadot is not supported yet')
     }
   }

@@ -2,7 +2,7 @@ import React from 'react'
 
 import * as Styled from './PoolShareCard.styles'
 
-type Props = {
+export type Props = {
   title: string
   children: React.ReactNode
 }

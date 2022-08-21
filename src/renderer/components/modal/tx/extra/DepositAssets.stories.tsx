@@ -1,6 +1,4 @@
-import React from 'react'
-
-import { Story, Meta } from '@storybook/react'
+import { Meta, StoryFn } from '@storybook/react'
 import { assetAmount, AssetBNB, AssetRuneNative, assetToBase } from '@xchainjs/xchain-util'
 import * as O from 'fp-ts/lib/Option'
 
@@ -13,23 +11,21 @@ const defaultProps: DepositAssetsProps = {
   network: 'testnet'
 }
 
-export const Sym: Story = () => <DepositAssets {...defaultProps} />
-Sym.storyName = 'sym'
+export const Sym: StoryFn = () => <DepositAssets {...defaultProps} />
 
-export const Asym: Story = () => {
+export const Asym: StoryFn = () => {
   const props: DepositAssetsProps = {
     ...defaultProps,
     source: O.none
   }
   return <DepositAssets {...props} />
 }
-Asym.storyName = 'asym'
 
 const meta: Meta = {
   component: DepositAssets,
   title: 'Components/modal/extra/DepositAssets',
   decorators: [
-    (S: Story) => (
+    (Story) => (
       <div
         style={{
           display: 'flex',
@@ -39,7 +35,7 @@ const meta: Meta = {
           height: '100vH'
         }}>
         <div style={{ backgroundColor: 'white' }}>
-          <S />
+          <Story />
         </div>
       </div>
     )

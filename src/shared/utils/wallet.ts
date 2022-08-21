@@ -3,6 +3,7 @@ import * as FP from 'fp-ts/lib/function'
 import * as NEA from 'fp-ts/lib/NonEmptyArray'
 import * as O from 'fp-ts/lib/Option'
 import * as S from 'fp-ts/lib/string'
+
 /**
  * Helper transform a derivationPath from string to an array
  *
@@ -27,3 +28,5 @@ export const toDerivationPathArray = (
     // Validation: length must be 5
     O.chain(O.fromPredicate((v) => v.length === 5))
   )
+
+export const defaultWalletName = (id: number) => `wallet-${id}`

@@ -1,13 +1,19 @@
-import React from 'react'
+import { ComponentMeta, StoryFn } from '@storybook/react'
 
-// TODO (@veado) Replace knobs
-// import { boolean } from '@storybook/addon-knobs'
-import { storiesOf } from '@storybook/react'
+import { HeaderTheme as Component, Props } from './HeaderTheme'
 
-import { HeaderTheme } from './HeaderTheme'
+const Template: StoryFn<Props> = (args) => <Component {...args} />
+export const Default = Template.bind({})
 
-storiesOf('Components/HeaderTheme', module).add('desktop / mobile', () => {
-  // const isDesktopView = boolean('isDesktopView', false)
-  // return <HeaderTheme isDesktopView={isDesktopView} />
-  return <HeaderTheme isDesktopView={true} />
-})
+const meta: ComponentMeta<typeof Component> = {
+  component: Component,
+  title: 'Components/HeaderTheme',
+  argTypes: {
+    onPress: { action: 'onPress' }
+  },
+  args: {
+    isDesktopView: false
+  }
+}
+
+export default meta

@@ -6,6 +6,8 @@ import * as RxOp from 'rxjs/operators'
 import { useBinanceContext } from '../contexts/BinanceContext'
 import { useBitcoinCashContext } from '../contexts/BitcoinCashContext'
 import { useBitcoinContext } from '../contexts/BitcoinContext'
+import { useCosmosContext } from '../contexts/CosmosContext'
+import { useDogeContext } from '../contexts/DogeContext'
 import { useEthereumContext } from '../contexts/EthereumContext'
 import { useLitecoinContext } from '../contexts/LitecoinContext'
 import { useThorchainContext } from '../contexts/ThorchainContext'
@@ -20,6 +22,8 @@ export const useKeystoreClientStates = (): { clientStates: KeystoreClientStates 
   const { clientState$: ltcClientState$ } = useLitecoinContext()
   const { clientState$: ethClientState$ } = useEthereumContext()
   const { clientState$: thorClientState$ } = useThorchainContext()
+  const { clientState$: dogeClientState$ } = useDogeContext()
+  const { clientState$: cosmosClientState$ } = useCosmosContext()
 
   // State of initializing all clients
   const [clientStates] = useObservableState<KeystoreClientStates>(
@@ -31,7 +35,9 @@ export const useKeystoreClientStates = (): { clientStates: KeystoreClientStates 
           bch: bchClientState$,
           eth: ethClientState$,
           ltc: ltcClientState$,
-          thor: thorClientState$
+          thor: thorClientState$,
+          doge: dogeClientState$,
+          cosmos: cosmosClientState$
         }),
         liveData.map((_) => true),
         RxOp.startWith(RD.pending)

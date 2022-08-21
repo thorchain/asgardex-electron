@@ -1,20 +1,22 @@
 import React from 'react'
 
-import { Story } from '@storybook/react'
+import { ComponentMeta, ComponentStoryFn } from '@storybook/react'
 
-import { QRCode } from './QRCode'
+import { BNB_ADDRESS_MAINNET } from '../../../../shared/mock/address'
+import { QRCode as Component } from './QRCode'
 
-export const Default: Story<{
-  text: string
-}> = ({ text }) => {
-  return <QRCode text={text} qrError={'error for qr generation'} />
+const meta: ComponentMeta<typeof Component> = {
+  component: Component,
+  title: 'Components/QrCode'
 }
+
+export default meta
+
+const Template: ComponentStoryFn<typeof Component> = (args) => <Component {...args} />
+
+export const Default = Template.bind({})
 
 Default.args = {
-  text: 'test address here'
-}
-
-export default {
-  title: 'QrCode',
-  component: QRCode
+  qrError: 'error for qr generation',
+  text: BNB_ADDRESS_MAINNET
 }

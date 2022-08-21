@@ -1,27 +1,33 @@
 import * as path from 'path'
 
-import { Keystore } from '@xchainjs/xchain-crypto'
 import { dialog, ipcRenderer } from 'electron'
+import * as E from 'fp-ts/lib/Either'
+import * as FP from 'fp-ts/lib/function'
+import * as TE from 'fp-ts/lib/TaskEither'
 import * as fs from 'fs-extra'
 
-import { ApiKeystore } from '../../shared/api/types'
+import { KeystoreWallets, ipcKeystoreWalletsIO, keystoreIO } from '../../shared/api/io'
+import { ApiKeystore, IPCExportKeystoreParams } from '../../shared/api/types'
+import { mapIOErrors } from '../../shared/utils/fp'
+import { defaultWalletName } from '../../shared/utils/wallet'
 import IPCMessages from '../ipc/messages'
+import { exists, readJSON, renameFile, writeJSON } from '../utils/file'
 import { STORAGE_DIR } from './const'
 
-export const saveKeystore = async (keystore: Keystore) => {
-  await fs.ensureFile(KEY_FILE)
-  return fs.writeJSON(KEY_FILE, keystore)
-}
+export const LEGACY_KEYSTORE_ID = 1
+const LEGACY_KEYSTORE_FILE = path.join(STORAGE_DIR, `keystore.json`)
 
-// If `KEY_FILE' does not exist, `fs.remove` silently does nothing.
-// ^ see https://github.com/jprichardson/node-fs-extra/blob/master/docs/remove.md
-export const removeKeystore = async () => fs.remove(KEY_FILE)
-export const getKeystore = async () => fs.readJSON(KEY_FILE)
-export const keystoreExist = async () => fs.pathExists(KEY_FILE)
+const WALLETS_STORAGE_FILE = path.join(STORAGE_DIR, `wallets.json`)
 
-export const exportKeystore = async (defaultFileName: string, keystore: Keystore) => {
+/**
+ * Exports existing keystore to let an user save it anywhere
+ *
+ * @param filename Name of keystore file to export
+ * @param keystore Keystore content
+ */
+export const exportKeystore = async ({ fileName, keystore }: IPCExportKeystoreParams) => {
   const savePath = await dialog.showSaveDialog({
-    defaultPath: defaultFileName
+    defaultPath: fileName
   })
   if (!savePath.canceled && savePath.filePath) {
     await fs.ensureFile(savePath.filePath)
@@ -40,15 +46,95 @@ export const loadKeystore = async () => {
   }
 }
 
-// key file path
-export const KEY_FILE = path.join(STORAGE_DIR, 'keystore.json')
+const migrateLegacyWallet = (): TE.TaskEither<Error, KeystoreWallets> =>
+  FP.pipe(
+    exists(LEGACY_KEYSTORE_FILE),
+    // Switch to error if file does not exists
+    TE.fromPredicate(
+      (v) => !!v,
+      () => Error(`${LEGACY_KEYSTORE_FILE} file does not exist`)
+    ),
+    // read keystore from disc
+    TE.chain(() => readJSON(LEGACY_KEYSTORE_FILE)),
+    // decode keystore content
+    TE.chain(FP.flow(keystoreIO.decode, E.mapLeft(mapIOErrors), TE.fromEither)),
+    // create legacy wallet
+    TE.map((keystore) => [
+      {
+        id: LEGACY_KEYSTORE_ID,
+        name: defaultWalletName(LEGACY_KEYSTORE_ID),
+        selected: true,
+        keystore
+      }
+    ]),
+    TE.chain((wallets) =>
+      FP.pipe(
+        // rename keystore file to backup it
+        renameFile(LEGACY_KEYSTORE_FILE, path.join(STORAGE_DIR, `keystore-legacy-${new Date().getTime()}.json`)),
+        // return wallets in case of successfull backup
+        TE.map(() => wallets)
+      )
+    )
+  )
+
+const loadWallets: TE.TaskEither<Error, KeystoreWallets> = FP.pipe(
+  TE.tryCatch(
+    async () => {
+      const exists = await fs.pathExists(WALLETS_STORAGE_FILE)
+      // empty list of wallets if `wallets.json` does not exist
+      return exists ? fs.readJSON(WALLETS_STORAGE_FILE) : []
+    },
+    (e: unknown) => Error(`${e}`)
+  ),
+  TE.chain(FP.flow(ipcKeystoreWalletsIO.decode, E.mapLeft(mapIOErrors), TE.fromEither))
+)
+
+/**
+ * Saves keystore wallets
+ * It returns a list of wallets
+ */
+export const saveKeystoreWallets = (wallets: KeystoreWallets): TE.TaskEither<Error, KeystoreWallets> =>
+  // 1. encode wallets
+  FP.pipe(wallets, ipcKeystoreWalletsIO.encode, (walletsEncoded) =>
+    FP.pipe(
+      // 2. save wallets to disk
+      writeJSON(`${WALLETS_STORAGE_FILE}`, walletsEncoded),
+      // return wallets
+      TE.map((_) => wallets)
+    )
+  )
+
+/**
+ * Initializes keystore wallets to migrate legacy keystore.json (if needed)
+ *
+ * It does the following:
+ * 1. Load wallets (if available)
+ * 2. Merge legacy keystore (if available and if no wallets)
+ * 3. Save updated wallets to disk
+ */
+export const initKeystoreWallets: TE.TaskEither<Error, KeystoreWallets> = FP.pipe(
+  loadWallets,
+  TE.chain((wallets) => {
+    // If we have already stored wallets,
+    // another migration is not needed anymore.
+    if (wallets.length) return TE.right(wallets)
+
+    // In other case (no previous migration | no wallets)
+    // Try to migrate legacy wallet and save wallets
+    return FP.pipe(
+      migrateLegacyWallet(),
+      // Ignore any legacy keystore errors, but return empty list
+      TE.alt(() => TE.right<Error, KeystoreWallets>([])),
+      // save wallets to disk
+      TE.chain(saveKeystoreWallets)
+    )
+  })
+)
 
 export const apiKeystore: ApiKeystore = {
-  save: (keystore: Keystore) => ipcRenderer.invoke(IPCMessages.SAVE_KEYSTORE, keystore),
-  remove: () => ipcRenderer.invoke(IPCMessages.REMOVE_KEYSTORE, KEY_FILE),
-  get: () => ipcRenderer.invoke(IPCMessages.GET_KEYSTORE, KEY_FILE),
-  exists: () => ipcRenderer.invoke(IPCMessages.KEYSTORE_EXIST),
-  export: (defaultFileName: string, keystore: Keystore) =>
-    ipcRenderer.invoke(IPCMessages.EXPORT_KEYSTORE, defaultFileName, keystore),
-  load: () => ipcRenderer.invoke(IPCMessages.LOAD_KEYSTORE)
+  // Note: `params` need to be encoded by `ipcKeystoreWalletsIO` before calling `saveKeystoreWallets` */
+  saveKeystoreWallets: (params: unknown) => ipcRenderer.invoke(IPCMessages.SAVE_KEYSTORE_WALLETS, params),
+  exportKeystore: (params: IPCExportKeystoreParams) => ipcRenderer.invoke(IPCMessages.EXPORT_KEYSTORE, params),
+  load: () => ipcRenderer.invoke(IPCMessages.LOAD_KEYSTORE),
+  initKeystoreWallets: () => ipcRenderer.invoke(IPCMessages.INIT_KEYSTORE_WALLETS)
 }

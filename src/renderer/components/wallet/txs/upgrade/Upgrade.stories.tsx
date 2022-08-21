@@ -1,7 +1,5 @@
-import React from 'react'
-
 import * as RD from '@devexperts/remote-data-ts'
-import { Story, Meta } from '@storybook/react'
+import { ComponentMeta } from '@storybook/react'
 import { TxHash, TxParams } from '@xchainjs/xchain-client'
 import {
   assetAmount,
@@ -40,7 +38,7 @@ const mockTxState$ = (states: UpgradeRuneTxState[]): UpgradeRuneTxState$ =>
 const getBalances = (balances: WalletBalances) => NEA.fromArray<WalletBalance>(balances)
 
 type Args = {
-  txRDStatus: RDStatus & 'animated'
+  txRDStatus: RDStatus | 'animated'
   feeRDStatus: RDStatus
   balance: number
   hasLedger: boolean
@@ -48,7 +46,7 @@ type Args = {
   walletType: WalletType
 }
 
-const Template: Story<Args> = ({ txRDStatus, feeRDStatus, balance, hasLedger, walletType, validAddress }) => {
+const Template = ({ txRDStatus, feeRDStatus, balance, hasLedger, walletType, validAddress }: Args) => {
   const bnbBalance: WalletBalance = mockWalletBalance({
     asset: AssetBNB,
     amount: assetToBase(assetAmount(balance)),
@@ -125,43 +123,29 @@ const Template: Story<Args> = ({ txRDStatus, feeRDStatus, balance, hasLedger, wa
     />
   )
 }
-
 export const Default = Template.bind({})
 
-const meta: Meta = {
-  component: Component,
+const meta: ComponentMeta<typeof Template> = {
+  component: Template,
   title: 'Wallet/Upgrade',
   argTypes: {
     txRDStatus: {
-      name: 'txRDStatus',
-      control: { type: 'select', options: ['pending', 'error', 'success', 'animated'] },
-      defaultValue: 'success'
+      control: { type: 'select', options: ['pending', 'error', 'success', 'animated'] }
     },
     feeRDStatus: {
-      name: 'feeRD',
-      control: { type: 'select', options: ['initial', 'pending', 'error', 'success'] },
-      defaultValue: 'success'
+      control: { type: 'select', options: ['initial', 'pending', 'error', 'success'] }
     },
     walletType: {
-      name: 'wallet type',
-      control: { type: 'select', options: ['keystore', 'ledger'] },
-      defaultValue: 'keystore'
-    },
-    balance: {
-      name: 'BNB.RUNE Balance',
-      control: { type: 'text' },
-      defaultValue: '1001'
-    },
-    hasLedger: {
-      name: 'has Ledger connected',
-      control: { type: 'boolean' },
-      defaultValue: true
-    },
-    validAddress: {
-      name: 'valid address',
-      control: { type: 'boolean' },
-      defaultValue: true
+      control: { type: 'select', options: ['keystore', 'ledger'] }
     }
+  },
+  args: {
+    txRDStatus: 'success',
+    feeRDStatus: 'success',
+    walletType: 'keystore',
+    balance: 1001,
+    hasLedger: true,
+    validAddress: true
   }
 }
 

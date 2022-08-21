@@ -18,8 +18,12 @@ const common: CommonMessages = {
   'common.date': 'Date',
   'common.refresh': 'Rafraîchir',
   'common.back': 'Retour',
+  'common.general': 'General - FR',
+  'common.advanced': 'Advanced - FR',
   'common.remove': 'Supprimer',
   'common.keystore': 'Keystore',
+  'common.keystorePassword': 'Keystore password - FR',
+  'common.ledger': 'Ledger',
   'common.phrase': 'Phrase de récupération',
   'common.submit': 'Valider',
   'common.confirm': 'Confirmer',
@@ -30,6 +34,7 @@ const common: CommonMessages = {
   'common.copy': 'Copier',
   'common.loading': 'Chargement...',
   'common.error': 'Erreur',
+  'common.test': 'Test - FR',
   'common.change': 'Modifier',
   'common.wallet': 'Portefeuille',
   'common.history': 'Historique',
@@ -109,7 +114,7 @@ const common: CommonMessages = {
   'common.recipient': 'Destinataire',
   'common.sender': 'Sender - FR',
   'common.legacy': 'Legacy - FR',
-  'common.ledgerlive': 'Ledger Live - FR'
+  'common.ledgerlive': 'Ledger Live'
 }
 
 export default common

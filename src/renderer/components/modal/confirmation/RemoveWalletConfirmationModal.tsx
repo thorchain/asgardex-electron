@@ -6,11 +6,12 @@ import * as Styled from './RemoveWalletConfirmationModal.styles'
 
 type Props = {
   visible: boolean
+  walletName: string
   onSuccess: FP.Lazy<void>
   onClose: FP.Lazy<void>
 }
 
-export const RemoveWalletConfirmationModal: React.FC<Props> = ({ visible, onClose, onSuccess }) => {
+export const RemoveWalletConfirmationModal: React.FC<Props> = ({ visible, onClose, onSuccess, walletName }) => {
   const intl = useIntl()
 
   return (
@@ -22,7 +23,14 @@ export const RemoveWalletConfirmationModal: React.FC<Props> = ({ visible, onClos
       okText={intl.formatMessage({ id: 'wallet.action.forget' })}
       content={
         <Styled.Content>
-          <Styled.TitleText>{intl.formatMessage({ id: 'wallet.remove.label.title' })}</Styled.TitleText>
+          <Styled.TitleText>
+            {intl.formatMessage(
+              { id: 'wallet.remove.label.title' },
+              {
+                name: walletName
+              }
+            )}
+          </Styled.TitleText>
           <Styled.DescriptionText>
             {intl.formatMessage({ id: 'wallet.remove.label.description' })}
           </Styled.DescriptionText>

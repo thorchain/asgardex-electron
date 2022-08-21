@@ -5,33 +5,11 @@ import { palette } from 'styled-theme'
 
 import { Network } from '../../../shared/api/types'
 import { Menu } from '../shared/menu'
-import { Button as UIButton } from '../uielements/button'
 import { ExternalLinkIcon as ExternalLinkIconUI } from '../uielements/common/Common.styles'
 import { Label as UILabel } from '../uielements/label'
 
-export const Container = styled.div`
-  margin-top: 50px;
-  padding: 10px 40px;
-  background-color: ${palette('background', 0)};
-`
-
-export const CardContainer = styled.div`
-  width: 100%;
-  padding: 10px 0 20px 0;
-`
-
 export const SectionsWrapper = styled.div`
   padding: 20px;
-`
-
-export const Section = styled.div`
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  align-items: flex-start;
-  &:not(:last-child) {
-    margin-bottom: 20px;
-  }
 `
 
 export const SubTitle = styled(UILabel)`
@@ -75,36 +53,6 @@ export const MenuItemText = styled(Text)`
   font-family: 'MainFontRegular';
   color: ${palette('text', 1)};
   font-size: 16px;
-`
-
-export const UpdatesButton = styled(UIButton).attrs({
-  sizevalue: 'xnormal',
-  color: 'primary',
-  typevalue: 'outline',
-  round: 'true'
-})`
-  font-family: 'MainFontRegular';
-  text-transform: uppercase;
-
-  span {
-    font-size: 14px;
-  }
-
-  :disabled:hover {
-    color: ${palette('primary', 0)} !important;
-  }
-
-  &.ant-btn-loading-icon {
-    margin-right: 10px;
-  }
-
-  &.ant-btn {
-    min-width: 0;
-    padding-left: 20px;
-    padding-right: 20px;
-  }
-
-  margin: 10px 0;
 `
 
 export const ExternalLinkIcon = styled(ExternalLinkIconUI)`

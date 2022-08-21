@@ -1,6 +1,4 @@
-import React from 'react'
-
-import { Meta, Story } from '@storybook/react'
+import { ComponentMeta } from '@storybook/react'
 
 import { WalletType } from '../../../../../shared/wallet/types'
 import { Interact as Component } from './Interact'
@@ -11,7 +9,7 @@ type Args = {
   walletType: WalletType
 }
 
-const Template: Story<Args> = ({ interactType, walletType }) => (
+const Template = ({ interactType, walletType }: Args) => (
   <Component
     interactType={interactType}
     interactTypeChanged={(type) => console.log('Interact type changed ', type)}
@@ -19,25 +17,20 @@ const Template: Story<Args> = ({ interactType, walletType }) => (
     walletType={walletType}
   />
 )
-
 export const Default = Template.bind({})
 
-const meta: Meta<Args> = {
-  component: Component,
+const meta: ComponentMeta<typeof Template> = {
+  component: Template,
   title: 'Wallet/Interact',
   argTypes: {
     interactType: {
-      name: 'type',
-      control: { type: 'select', options: ['bond', 'unbond', 'leave', 'custom'] },
-      defaultValue: 'bond'
+      control: { type: 'select', options: ['bond', 'unbond', 'leave', 'custom'] }
     },
-
     walletType: {
-      name: 'wallet type',
-      control: { type: 'select', options: ['keystore', 'ledger'] },
-      defaultValue: 'keystore'
+      control: { type: 'select', options: ['keystore', 'ledger'] }
     }
-  }
+  },
+  args: { interactType: 'bond', walletType: 'keystore' }
 }
 
 export default meta

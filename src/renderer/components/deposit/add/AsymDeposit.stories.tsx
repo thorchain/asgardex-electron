@@ -1,14 +1,13 @@
-import { Story, Meta } from '@storybook/react'
+import { ComponentMeta, StoryFn } from '@storybook/react'
 
-import { AsymDeposit, Props as AsymDepositProps } from './AsymDeposit'
+import { AsymDeposit as Component, Props } from './AsymDeposit'
 
-const defaultProps: AsymDepositProps = {}
+const Template: StoryFn<Props> = (args = {}) => <Component {...args} />
 
-export const Default: Story = () => <AsymDeposit {...defaultProps} />
-Default.storyName = 'default'
+export const Default = Template.bind({})
 
-const meta: Meta = {
-  component: AsymDeposit,
+const meta: ComponentMeta<typeof Component> = {
+  component: Component,
   title: 'Components/Deposit/AsymDeposit'
 }
 

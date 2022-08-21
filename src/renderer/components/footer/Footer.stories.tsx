@@ -1,17 +1,17 @@
-import React from 'react'
+import { ComponentMeta, StoryFn } from '@storybook/react'
 
-import { storiesOf } from '@storybook/react'
+import { Footer as Component, Props } from './Footer'
 
-import { Footer } from './index'
+const Template: StoryFn<Props> = (args) => <Component {...args} />
+export const Default = Template.bind({})
 
-const CHash = 'e69bea54b8228aff6d6bcf4bca6c1de07ac07c90'
-storiesOf('Footer', module)
-  .add('default', () => {
-    return <Footer commitHash={CHash} isDev />
-  })
-  .add('isDev == false (hide playground icon)', () => {
-    return <Footer commitHash={CHash} isDev={false} />
-  })
-  .add('no Github hash (hide branch icon)', () => {
-    return <Footer isDev />
-  })
+const meta: ComponentMeta<typeof Component> = {
+  component: Component,
+  title: 'Components/Footer',
+  args: {
+    isDev: false,
+    commitHash: 'e69bea54b8228aff6d6bcf4bca6c1de07ac07c90'
+  }
+}
+
+export default meta

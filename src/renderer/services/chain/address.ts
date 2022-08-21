@@ -23,7 +23,6 @@ import * as COSMOS from '../cosmos'
 import * as DOGE from '../doge'
 import * as ETH from '../ethereum'
 import * as LTC from '../litecoin'
-import * as TERRA from '../terra'
 import * as THOR from '../thorchain'
 import { client$ } from './client'
 import { INITIAL_SYM_DEPOSIT_ADDRESSES } from './const'
@@ -54,7 +53,8 @@ const addressByChain$ = (chain: Chain): WalletAddress$ => {
     case DOGEChain:
       return DOGE.address$
     case TerraChain:
-      return TERRA.address$
+      // Terra (Classic) is not supported in ASGDX anymore anymore
+      return Rx.of(O.none)
   }
 }
 

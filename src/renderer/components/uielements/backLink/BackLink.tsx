@@ -6,7 +6,7 @@ import { useNavigate } from 'react-router-dom'
 
 import { BackLinkWrapper, ButtonText } from './BackLink.styles'
 
-type Props = {
+export type Props = {
   label?: string
   style?: React.CSSProperties
   path?: string

@@ -1,38 +1,38 @@
-import React from 'react'
-
-import { Meta, Story } from '@storybook/react'
+import { ComponentMeta } from '@storybook/react'
 import { BNBChain } from '@xchainjs/xchain-util'
 
+import { Network } from '../../../../shared/api/types'
 import { BNB_ADDRESS_MAINNET, BNB_ADDRESS_TESTNET } from '../../../../shared/mock/address'
-import { AddressEllipsis } from './index'
+import * as AT from '../../../storybook/argTypes'
+import { AddressEllipsis as Component } from './index'
 
-const mainnetTemplate: Story = (args) => (
-  <div style={{ width: args.width || 400 }}>
-    <AddressEllipsis address={BNB_ADDRESS_MAINNET} chain={BNBChain} network="mainnet" />
-  </div>
-)
-
-export const mainnet: Story = mainnetTemplate.bind({})
-mainnet.storyName = 'mainnet'
-mainnet.args = {
-  width: 400
+type Args = {
+  network: Network
+  address: string
+  width: number
 }
 
-const testnetTemplate: Story = (args) => (
-  <div style={{ width: args.width || 400 }}>
-    <AddressEllipsis address={BNB_ADDRESS_TESTNET} chain={BNBChain} network="testnet" />
+const Template = ({ address, network, width }: Args) => (
+  <div style={{ width: width || 400 }}>
+    <Component address={address} chain={BNBChain} network={network} />
   </div>
 )
+export const Default = Template.bind({})
 
-export const testnet: Story = testnetTemplate.bind({})
-testnet.storyName = 'testnet'
-testnet.args = {
-  width: 400
-}
-
-const meta: Meta = {
-  component: AddressEllipsis,
-  title: 'Components/AddressEllipsis'
+const meta: ComponentMeta<typeof Template> = {
+  component: Template,
+  title: 'Components/AddressEllipsis',
+  argTypes: {
+    network: AT.network,
+    address: {
+      options: ['testnet', 'mainnet'],
+      mapping: {
+        testnet: BNB_ADDRESS_TESTNET,
+        mainnet: BNB_ADDRESS_MAINNET
+      }
+    }
+  },
+  args: { network: 'mainnet', address: BNB_ADDRESS_MAINNET }
 }
 
 export default meta

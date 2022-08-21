@@ -7,9 +7,8 @@ import { transition } from '../../settings/style-util'
 import { Tabs as TabsUI } from '../tabs/Tabs'
 import { AssetInput as AssetInputBase } from '../uielements/assets/assetInput'
 import { AssetSelect as AssetSelectUI } from '../uielements/assets/assetSelect'
-import { Button as UIButton } from '../uielements/button'
 import { CheckButton as CheckButtonUI } from '../uielements/button/CheckButton'
-import { Label as UILabel, CopyLabel as CopyLabelUI } from '../uielements/label'
+import { Label as UILabel } from '../uielements/label'
 
 const ICON_SIZE = 16
 
@@ -275,15 +274,6 @@ export const SubmitContainer = styled.div`
   align-items: center;
 `
 
-export const SubmitButton = styled(UIButton).attrs({
-  type: 'primary',
-  round: 'true'
-})`
-  min-width: 200px !important;
-  padding: 0 30px;
-  margin: 30px 0;
-`
-
 export const CheckButton = styled(CheckButtonUI)`
   &.ant-btn {
     font-size: 10px;
@@ -294,29 +284,4 @@ export const AssetSelectContainer = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
-`
-
-export const CopyMemoLabel = styled(CopyLabelUI)`
-  font-size: 12px;
-
-  .ant-typography-copy {
-    color: ${palette('gray', 1)} !important;
-    &:hover {
-      color: ${palette('gray', 2)} !important;
-    }
-  }
-  svg {
-    color: ${palette('gray', 1)} !important;
-    &:hover {
-      color: ${palette('gray', 2)} !important;
-    }
-  }
-`
-
-export const MemoLabel = styled(UILabel)`
-  text-transform: uppercase;
-  font-size: 12px;
-  text-align: center;
-  color: ${palette('gray', 1)} !important;
-  cursor: not-allowed;
 `

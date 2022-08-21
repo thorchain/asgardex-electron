@@ -16,7 +16,7 @@ import { Size as IconSize } from '../../uielements/assets/assetIcon/AssetIcon.ty
 import { FilterMenu } from '../../uielements/filterMenu'
 import * as Styled from './AccountSelector.styles'
 
-type Props = {
+export type Props = {
   selectedWallet: WalletBalance
   walletBalances?: WalletBalances
   onChange?: (params: { asset: Asset; walletAddress: Address; walletType: WalletType; walletIndex: number }) => void

@@ -1,54 +1,35 @@
-import React from 'react'
+import { ComponentMeta, StoryFn } from '@storybook/react'
 
-// TODO (@veado) Replace knobs
-// import { text, radios, withKnobs } from '@storybook/addon-knobs'
-// import { RadiosTypeOptionsProp } from '@storybook/addon-knobs/dist/components/types'
-import { storiesOf } from '@storybook/react'
-import { Row } from 'antd'
-import { SizeType } from 'antd/lib/config-provider/SizeContext'
+import { Input as Component, InputProps } from './Input'
 
-import { Input, InputPassword, InputTextArea } from './Input.styles'
-import { Color } from './Input.types'
+const Template: StoryFn<InputProps> = (args) => <Component {...args} />
+export const Default = Template.bind({})
 
-storiesOf('Components/Input', module)
-  // .addDecorator(withKnobs)
-  .add('default', () => {
-    return (
-      <Row
-        style={{
-          display: 'flex',
-          flexDirection: 'column',
-          justifyContent: 'space-between',
-          width: '300px',
-          height: '300px'
-        }}>
-        <Input color="primary" size="small" value="this is text!" />
-        <Input color="primary" size="middle" value="this is text!" />
-        <Input color="primary" size="middle" typevalue="ghost" value="this is text!" />
-        <Input color="primary" size="large" value="this is text!" />
-        <Input color="success" size="large" value="this is text!" />
-        <Input color="warning" size="large" value="this is text!" />
-        <Input color="error" size="large" value="this is text!" />
-        <InputTextArea typevalue={'normal'} color="error" size="large" value="this is text area!" />
-        <InputPassword color="error" size="large" value="this is password!" />
-      </Row>
+const meta: ComponentMeta<typeof Component> = {
+  component: Component,
+  title: 'Components/Input',
+  argTypes: {
+    onChange: {
+      action: 'onChange'
+    },
+    size: {
+      control: { type: 'select', options: ['small', 'normal', 'large'] }
+    }
+  },
+  args: {
+    placeholder: 'Placeholder',
+    size: 'normal',
+    error: false,
+    disabled: false,
+    uppercase: true
+  },
+  decorators: [
+    (Story) => (
+      <div className="w-full bg-white p-20">
+        <Story />
+      </div>
     )
-  })
-  .add('properties', () => {
-    // const inputText = text('Input Text', 'text')
-    // const sizeOptions: RadiosTypeOptionsProp<SizeType> = { small: 'small', middle: 'middle', large: 'large' }
-    // const colorOptions: RadiosTypeOptionsProp<Color> = {
-    //   primary: 'primary',
-    //   success: 'success',
-    //   warning: 'warning',
-    //   error: 'error'
-    // }
+  ]
+}
 
-    // const size = radios('size', sizeOptions, 'middle')
-    // const color = radios('color', colorOptions, 'primary')
-    const size: SizeType = 'middle'
-    const color: Color = 'primary'
-    const inputText = 'Input Text'
-
-    return <Input color={color} size={size} value={inputText} />
-  })
+export default meta

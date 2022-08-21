@@ -1,0 +1,4 @@
+/* override antd */
+.ant-form-item-label > label {
+  @apply uppercase text-text0 dark:text-text0d;
+}

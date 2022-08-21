@@ -1,36 +1,26 @@
-import React from 'react'
+import { ComponentMeta, StoryFn } from '@storybook/react'
 
-import { Meta, Story } from '@storybook/react'
+import { AppUpdate as Component, AppUpdateModalProps as Props } from './AppUpdate'
 
-import { AppUpdate } from './AppUpdate'
+const Template: StoryFn<Props> = (args) => <Component {...args} />
 
-export const Default: Story<{ isOpen: boolean; goToUpdates: () => void; close: () => void }> = ({
-  isOpen,
-  close,
-  goToUpdates
-}) => {
-  return <AppUpdate isOpen={isOpen} goToUpdates={goToUpdates} close={close} version={'test version'} />
-}
+export const Default = Template.bind({})
 
-const argTypes = {
-  isOpen: {
-    control: {
-      type: 'boolean'
+const meta: ComponentMeta<typeof Component> = {
+  component: Component,
+  title: 'Components/AppUpdate',
+  argTypes: {
+    goToUpdates: {
+      action: 'goToUpdates'
+    },
+    close: {
+      action: 'close'
     }
   },
-  goToUpdates: {
-    action: 'goToUpdates'
-  },
-  close: {
-    action: 'close'
+  args: {
+    isOpen: true,
+    version: 'test version'
   }
-}
-
-Default.args = { isOpen: true }
-
-const meta: Meta = {
-  title: 'AppUpdate',
-  argTypes
 }
 
 export default meta

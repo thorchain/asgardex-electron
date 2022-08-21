@@ -7,7 +7,6 @@ import {
   DOGEChain,
   ETHChain,
   LTCChain,
-  TerraChain,
   THORChain
 } from '@xchainjs/xchain-util'
 import * as O from 'fp-ts/lib/Option'
@@ -23,7 +22,6 @@ import * as DOGE from '../doge'
 import * as ETH from '../ethereum'
 import * as LTC from '../litecoin'
 import { selectedPoolChain$ } from '../midgard/common'
-import * as TERRA from '../terra'
 import * as THOR from '../thorchain'
 import type { Chain$ } from './types'
 
@@ -43,8 +41,6 @@ export const clientByChain$ = (chain: Chain): XChainClient$ => {
       return LTC.client$
     case DOGEChain:
       return DOGE.client$
-    case TerraChain:
-      return TERRA.client$
     case CosmosChain:
       return COSMOS.client$
     default:

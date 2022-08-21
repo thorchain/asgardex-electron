@@ -5,13 +5,13 @@ import { useIntl } from 'react-intl'
 
 import * as Styled from './LoadingView.styles'
 
-type LoadingViewProps = {
+export type Props = {
   label?: string
   size?: SpinSize
   className?: string
 }
 
-export const LoadingView: React.FC<LoadingViewProps> = ({ label, size = 'default', className }) => {
+export const LoadingView: React.FC<Props> = ({ label, size = 'default', className }) => {
   const intl = useIntl()
   return (
     <Styled.Space className={className}>

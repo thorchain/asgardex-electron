@@ -2,7 +2,7 @@ import React from 'react'
 
 import { Row, Col } from 'antd'
 
-import { WordType } from './NewPhraseConfirm'
+import type { WordType } from './NewPhraseConfirm.types'
 import * as Styled from './Phrase.styles'
 
 type Props = {
@@ -10,13 +10,14 @@ type Props = {
   onWordClick?: (id: string) => void
   readOnly?: boolean
   wordIcon?: React.ReactNode
+  className?: string
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const Phrase = React.forwardRef<any, Props>(
-  ({ words, onWordClick = () => {}, readOnly, wordIcon = null }, ref) => {
+  ({ words, onWordClick = () => {}, readOnly, wordIcon = null, className = '' }, ref) => {
     return (
-      <Styled.Row ref={ref}>
+      <Styled.Row ref={ref} className={className}>
         <Col span={24}>
           <Styled.Card>
             <Row>

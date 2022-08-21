@@ -7,71 +7,72 @@ import * as O from 'fp-ts/Option'
 import { FormattedMessage, useIntl } from 'react-intl'
 
 import { Network } from '../../../../shared/api/types'
+import { NodeInfo, NodeInfos } from '../../../services/thorchain/types'
 import { ConfirmationModal } from '../../modal/confirmation'
 import { ExternalLinkIcon } from '../../uielements/common/Common.styles'
-import { Node } from '../types'
 import * as Styled from './BondsTable.styles'
 import * as H from './helpers'
 
 type Props = {
-  nodes: Node[]
+  nodes: NodeInfos
+  loading?: boolean
   removeNode: (node: Address) => void
   goToNode: (node: Address) => void
   network: Network
   className?: string
 }
 
-export const BondsTable: React.FC<Props> = ({ nodes, removeNode, network, goToNode, className }) => {
+export const BondsTable: React.FC<Props> = ({ nodes, removeNode, network, goToNode, loading = false, className }) => {
   const intl = useIntl()
 
-  const nodeColumn: ColumnType<Node> = useMemo(
+  const nodeColumn: ColumnType<NodeInfo> = useMemo(
     () => ({
       key: 'node',
-      render: (_, { nodeAddress }) => <H.NodeAddress network={network} address={nodeAddress} />,
+      render: (_, { address }) => <H.NodeAddress network={network} address={address} />,
       title: intl.formatMessage({ id: 'bonds.node' }),
       align: 'left'
     }),
     [network, intl]
   )
 
-  const bondColumn: ColumnType<Node> = useMemo(
+  const bondColumn: ColumnType<NodeInfo> = useMemo(
     () => ({
       key: 'bond',
       width: 150,
       title: intl.formatMessage({ id: 'bonds.bond' }),
-      render: (_, { data }) => <H.BondValue data={data} />,
+      render: (_, data) => <H.BondValue data={data} />,
       align: 'right'
     }),
     [intl]
   )
 
-  const awardColumn: ColumnType<Node> = useMemo(
+  const awardColumn: ColumnType<NodeInfo> = useMemo(
     () => ({
       key: 'award',
       width: 150,
       title: intl.formatMessage({ id: 'bonds.award' }),
       align: 'right',
-      render: (_, { data }) => <H.AwardValue data={data} />
+      render: (_, data) => <H.AwardValue data={data} />
     }),
     [intl]
   )
-  const statusColumn: ColumnType<Node> = useMemo(
+  const statusColumn: ColumnType<NodeInfo> = useMemo(
     () => ({
       key: 'status',
       width: 100,
       title: intl.formatMessage({ id: 'bonds.status' }),
-      render: (_, { data }) => <H.Status data={data} />,
+      render: (_, data) => <H.Status data={data} />,
       responsive: ['sm'],
       align: 'center'
     }),
     [intl]
   )
-  const infoColumn: ColumnType<Node> = useMemo(
+  const infoColumn: ColumnType<NodeInfo> = useMemo(
     () => ({
       key: 'info',
       width: 40,
       title: '',
-      render: (_, { nodeAddress }) => <ExternalLinkIcon onClick={() => goToNode(nodeAddress)} />,
+      render: (_, { address }) => <ExternalLinkIcon onClick={() => goToNode(address)} />,
       responsive: ['md'],
       align: 'center'
     }),
@@ -80,15 +81,15 @@ export const BondsTable: React.FC<Props> = ({ nodes, removeNode, network, goToNo
 
   const [nodeToRemove, setNodeToRemove] = useState<O.Option<Address>>(O.none)
 
-  const removeColumn: ColumnType<Node> = useMemo(
+  const removeColumn: ColumnType<NodeInfo> = useMemo(
     () => ({
       key: 'remove',
       width: 40,
       title: '',
-      render: (_, { nodeAddress }) => (
+      render: (_, { address }) => (
         <H.Delete
           deleteNode={() => {
-            setNodeToRemove(O.some(nodeAddress))
+            setNodeToRemove(O.some(address))
           }}
         />
       ),
@@ -125,7 +126,8 @@ export const BondsTable: React.FC<Props> = ({ nodes, removeNode, network, goToNo
       <Styled.Table
         className={className}
         columns={[removeColumn, nodeColumn, bondColumn, awardColumn, statusColumn, infoColumn]}
-        dataSource={nodes.map((node) => ({ ...node, key: node.nodeAddress }))}
+        dataSource={nodes.map((node) => ({ ...node, key: node.address }))}
+        loading={loading}
       />
       <ConfirmationModal {...removeConfirmationProps} />
     </>

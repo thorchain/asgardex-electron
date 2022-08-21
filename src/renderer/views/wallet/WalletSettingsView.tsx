@@ -1,5 +1,4 @@
-/* eslint-disable react-hooks/exhaustive-deps */
-import React, { useCallback, useMemo } from 'react'
+import React, { useMemo } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
 import { Address, XChainClient } from '@xchainjs/xchain-client'
@@ -12,7 +11,6 @@ import {
   DOGEChain,
   ETHChain,
   LTCChain,
-  TerraChain,
   THORChain
 } from '@xchainjs/xchain-util'
 import * as FP from 'fp-ts/function'
@@ -20,14 +18,12 @@ import * as A from 'fp-ts/lib/Array'
 import * as O from 'fp-ts/lib/Option'
 import { useObservableState } from 'observable-hooks'
 import { useIntl } from 'react-intl'
-import { useLocation, useNavigate } from 'react-router-dom'
 import * as Rx from 'rxjs'
 import * as RxOp from 'rxjs/operators'
 
 import { DEFAULT_ETH_DERIVATION_MODE } from '../../../shared/ethereum/const'
 import { EthDerivationMode } from '../../../shared/ethereum/types'
-import { WalletAddress } from '../../../shared/wallet/types'
-import { WalletSettings, UnlockWalletSettings } from '../../components/settings'
+import { WalletSettings } from '../../components/settings'
 import { useBinanceContext } from '../../contexts/BinanceContext'
 import { useBitcoinCashContext } from '../../contexts/BitcoinCashContext'
 import { useBitcoinContext } from '../../contexts/BitcoinContext'
@@ -36,7 +32,6 @@ import { useCosmosContext } from '../../contexts/CosmosContext'
 import { useDogeContext } from '../../contexts/DogeContext'
 import { useEthereumContext } from '../../contexts/EthereumContext'
 import { useLitecoinContext } from '../../contexts/LitecoinContext'
-import { useTerraContext } from '../../contexts/TerraContext'
 import { useThorchainContext } from '../../contexts/ThorchainContext'
 import { useWalletContext } from '../../contexts/WalletContext'
 import {
@@ -47,30 +42,35 @@ import {
   isBtcChain,
   isLtcChain,
   isThorChain,
-  isTerraChain,
   isEthChain,
   isCosmosChain
 } from '../../helpers/chainHelper'
 import { sequenceTOptionFromArray } from '../../helpers/fpHelpers'
 import { useCollapsedSetting } from '../../hooks/useCollapsedSetting'
+import { useKeystoreState } from '../../hooks/useKeystoreState'
+import { useKeystoreWallets } from '../../hooks/useKeystoreWallets'
 import { useLedger } from '../../hooks/useLedger'
 import { useNetwork } from '../../hooks/useNetwork'
-import * as walletRoutes from '../../routes/wallet'
-import { WalletAddressAsync } from '../../services/wallet/types'
-import { isLocked, hasImportedKeystore, ledgerErrorIdToI18n } from '../../services/wallet/util'
-import { getPhrase } from '../../services/wallet/util'
+import { KeystoreUnlocked, WalletAddressAsync } from '../../services/wallet/types'
+import { ledgerErrorIdToI18n } from '../../services/wallet/util'
 import { walletAccount$ } from './WalletSettingsView.helper'
 
-export const WalletSettingsView: React.FC = (): JSX.Element => {
+type Props = {
+  keystoreUnlocked: KeystoreUnlocked
+}
+
+export const WalletSettingsView: React.FC<Props> = ({ keystoreUnlocked }): JSX.Element => {
   const intl = useIntl()
-  const navigate = useNavigate()
-  const location = useLocation()
+
+  const { id: keystoreId } = keystoreUnlocked
+
+  const { walletsUI } = useKeystoreWallets()
 
   const {
-    keystoreService: { keystore$, lock, removeKeystore, exportKeystore, validatePassword$ }
+    keystoreService: { exportKeystore, validatePassword$ }
   } = useWalletContext()
 
-  const keystore = useObservableState(keystore$, O.none)
+  const { lock, remove, change$, rename$ } = useKeystoreState()
 
   const { network } = useNetwork()
 
@@ -83,85 +83,64 @@ export const WalletSettingsView: React.FC = (): JSX.Element => {
   const { addressUI$: ltcAddressUI$ } = useLitecoinContext()
   const { addressUI$: bchAddressUI$ } = useBitcoinCashContext()
   const { addressUI$: dogeAddressUI$ } = useDogeContext()
-  const { addressUI$: terraAddressUI$ } = useTerraContext()
   const { addressUI$: cosmosAddressUI$ } = useCosmosContext()
 
   const ethDerivationMode: EthDerivationMode = useObservableState(ethDerivationMode$, DEFAULT_ETH_DERIVATION_MODE)
-
-  const oRuneNativeAddress: O.Option<WalletAddress> = useObservableState(thorAddressUI$, O.none)
-  const runeNativeAddress = FP.pipe(
-    oRuneNativeAddress,
-    O.fold(
-      () => '',
-      ({ address }) => address
-    )
-  )
-
-  const phrase$ = useMemo(() => FP.pipe(keystore$, RxOp.map(getPhrase)), [keystore$])
-  const phrase = useObservableState(phrase$, O.none)
-
   const {
     askAddress: askLedgerThorAddress,
     verifyAddress: verifyLedgerThorAddress,
     address: thorLedgerAddressRD,
     removeAddress: removeLedgerThorAddress
-  } = useLedger(THORChain)
+  } = useLedger(THORChain, keystoreId)
 
   const {
     askAddress: askLedgerBnbAddress,
     verifyAddress: verifyLedgerBnbAddress,
     address: bnbLedgerAddressRD,
     removeAddress: removeLedgerBnbAddress
-  } = useLedger(BNBChain)
+  } = useLedger(BNBChain, keystoreId)
 
   const {
     askAddress: askLedgerBtcAddress,
     verifyAddress: verifyLedgerBtcAddress,
     address: btcLedgerAddressRD,
     removeAddress: removeLedgerBtcAddress
-  } = useLedger(BTCChain)
+  } = useLedger(BTCChain, keystoreId)
 
   const {
     askAddress: askLedgerLtcAddress,
     verifyAddress: verifyLedgerLtcAddress,
     address: ltcLedgerAddressRD,
     removeAddress: removeLedgerLtcAddress
-  } = useLedger(LTCChain)
+  } = useLedger(LTCChain, keystoreId)
 
   const {
     askAddress: askLedgerBchAddress,
     verifyAddress: verifyLedgerBchAddress,
     address: bchLedgerAddressRD,
     removeAddress: removeLedgerBchAddress
-  } = useLedger(BCHChain)
+  } = useLedger(BCHChain, keystoreId)
 
   const {
     askAddress: askLedgerDOGEAddress,
     verifyAddress: verifyLedgerDOGEAddress,
     address: dogeLedgerAddressRD,
     removeAddress: removeLedgerDOGEAddress
-  } = useLedger(DOGEChain)
-
-  const {
-    askAddress: askLedgerTerraAddress,
-    verifyAddress: verifyLedgerTerraAddress,
-    address: terraLedgerAddressRD,
-    removeAddress: removeLedgerTerraAddress
-  } = useLedger(TerraChain)
+  } = useLedger(DOGEChain, keystoreId)
 
   const {
     askAddress: askLedgerEthAddress,
     verifyAddress: verifyLedgerEthAddress,
     address: ethLedgerAddressRD,
     removeAddress: removeLedgerEthAddress
-  } = useLedger(ETHChain)
+  } = useLedger(ETHChain, keystoreId)
 
   const {
     askAddress: askLedgerCosmosAddress,
     verifyAddress: verifyLedgerCosmosAddress,
     address: cosmosLedgerAddressRD,
     removeAddress: removeLedgerCosmosAddress
-  } = useLedger(CosmosChain)
+  } = useLedger(CosmosChain, keystoreId)
 
   const addLedgerAddressHandler = (chain: Chain, walletIndex: number) => {
     if (isThorChain(chain)) return askLedgerThorAddress(walletIndex)
@@ -170,7 +149,6 @@ export const WalletSettingsView: React.FC = (): JSX.Element => {
     if (isLtcChain(chain)) return askLedgerLtcAddress(walletIndex)
     if (isBchChain(chain)) return askLedgerBchAddress(walletIndex)
     if (isDogeChain(chain)) return askLedgerDOGEAddress(walletIndex)
-    if (isTerraChain(chain)) return askLedgerTerraAddress(walletIndex)
     if (isEthChain(chain)) return askLedgerEthAddress(walletIndex)
     if (isCosmosChain(chain)) return askLedgerCosmosAddress(walletIndex)
 
@@ -184,7 +162,6 @@ export const WalletSettingsView: React.FC = (): JSX.Element => {
     if (isLtcChain(chain)) return verifyLedgerLtcAddress(walletIndex)
     if (isBchChain(chain)) return verifyLedgerBchAddress(walletIndex)
     if (isDogeChain(chain)) return verifyLedgerDOGEAddress(walletIndex)
-    if (isTerraChain(chain)) return verifyLedgerTerraAddress(walletIndex)
     if (isEthChain(chain)) return verifyLedgerEthAddress(walletIndex)
     if (isCosmosChain(chain)) return verifyLedgerCosmosAddress(walletIndex)
 
@@ -198,7 +175,6 @@ export const WalletSettingsView: React.FC = (): JSX.Element => {
     if (isLtcChain(chain)) return removeLedgerLtcAddress()
     if (isBchChain(chain)) return removeLedgerBchAddress()
     if (isDogeChain(chain)) return removeLedgerDOGEAddress()
-    if (isTerraChain(chain)) return removeLedgerTerraAddress()
     if (isEthChain(chain)) return removeLedgerEthAddress()
     if (isCosmosChain(chain)) return removeLedgerCosmosAddress()
 
@@ -214,7 +190,6 @@ export const WalletSettingsView: React.FC = (): JSX.Element => {
   const oTHORClient = useObservableState(clientByChain$(THORChain), O.none)
   const oLTCClient = useObservableState(clientByChain$(LTCChain), O.none)
   const oDOGEClient = useObservableState(clientByChain$(DOGEChain), O.none)
-  const oTerraClient = useObservableState(clientByChain$(TerraChain), O.none)
   const oCosmosClient = useObservableState(clientByChain$(CosmosChain), O.none)
 
   const clickAddressLinkHandler = (chain: Chain, address: Address) => {
@@ -244,9 +219,6 @@ export const WalletSettingsView: React.FC = (): JSX.Element => {
         break
       case DOGEChain:
         FP.pipe(oDOGEClient, O.map(openExplorerAddressUrl))
-        break
-      case TerraChain:
-        FP.pipe(oTerraClient, O.map(openExplorerAddressUrl))
         break
       case CosmosChain:
         FP.pipe(oCosmosClient, O.map(openExplorerAddressUrl))
@@ -322,17 +294,6 @@ export const WalletSettingsView: React.FC = (): JSX.Element => {
     [intl, dogeLedgerAddressRD]
   )
 
-  const terraLedgerWalletAddress: WalletAddressAsync = useMemo(
-    () => ({
-      type: 'ledger',
-      address: FP.pipe(
-        terraLedgerAddressRD,
-        RD.mapLeft(({ errorId, msg }) => Error(`${ledgerErrorIdToI18n(errorId, intl)} (${msg})`))
-      )
-    }),
-    [intl, terraLedgerAddressRD]
-  )
-
   const ethLedgerWalletAddress: WalletAddressAsync = useMemo(
     () => ({
       type: 'ledger',
@@ -391,11 +352,6 @@ export const WalletSettingsView: React.FC = (): JSX.Element => {
       ledgerAddress: dogeLedgerWalletAddress,
       chain: DOGEChain
     })
-    const terraWalletAccount$ = walletAccount$({
-      addressUI$: terraAddressUI$,
-      ledgerAddress: terraLedgerWalletAddress,
-      chain: TerraChain
-    })
     const cosmosWalletAccount$ = walletAccount$({
       addressUI$: cosmosAddressUI$,
       ledgerAddress: cosmosLedgerWalletAddress,
@@ -413,7 +369,6 @@ export const WalletSettingsView: React.FC = (): JSX.Element => {
           BCH: [bchWalletAccount$],
           LTC: [ltcWalletAccount$],
           DOGE: [dogeWalletAccount$],
-          TERRA: [terraWalletAccount$],
           GAIA: [cosmosWalletAccount$]
         })
       ),
@@ -434,39 +389,26 @@ export const WalletSettingsView: React.FC = (): JSX.Element => {
     ltcLedgerWalletAddress,
     dogeAddressUI$,
     dogeLedgerWalletAddress,
-    terraAddressUI$,
-    terraLedgerWalletAddress,
     cosmosAddressUI$,
     cosmosLedgerWalletAddress,
-    ethAddressUI$,
     ethLedgerWalletAddress
   ])
+
   const walletAccounts = useObservableState(walletAccounts$, O.none)
 
-  const noAccess = useMemo(() => isLocked(keystore) || !hasImportedKeystore(keystore), [keystore])
-
-  const unlockWalletHandler = useCallback(() => {
-    navigate(walletRoutes.base.path(location.pathname))
-  }, [])
-
-  return noAccess ? (
-    <UnlockWalletSettings
-      keystore={keystore}
-      unlockHandler={unlockWalletHandler}
-      collapsed={collapsed}
-      toggleCollapse={toggleCollapse}
-    />
-  ) : (
+  return (
     <WalletSettings
       network={network}
-      runeNativeAddress={runeNativeAddress}
       lockWallet={lock}
-      removeKeystore={removeKeystore}
+      removeKeystoreWallet={remove}
+      changeKeystoreWallet$={change$}
+      renameKeystoreWallet$={rename$}
       exportKeystore={exportKeystore}
       addLedgerAddress={addLedgerAddressHandler}
       verifyLedgerAddress={verifyLedgerAddressHandler}
       removeLedgerAddress={removeLedgerAddressHandler}
-      phrase={phrase}
+      keystoreUnlocked={keystoreUnlocked}
+      wallets={walletsUI}
       walletAccounts={walletAccounts}
       clickAddressLinkHandler={clickAddressLinkHandler}
       validatePassword$={validatePassword$}

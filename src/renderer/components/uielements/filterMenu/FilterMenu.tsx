@@ -7,7 +7,7 @@ import { useIntl } from 'react-intl'
 import { useClickOutside } from '../../../hooks/useOutsideClick'
 import * as Styled from './FilterMenu.styles'
 
-type Props<T> = {
+export type Props<T> = {
   asset?: string
   data: T[]
   placeholder?: string
@@ -19,7 +19,7 @@ type Props<T> = {
   closeMenu?: () => void
 }
 
-export const FilterMenu = <T extends unknown>(props: Props<T>): JSX.Element => {
+export const FilterMenu = <T,>(props: Props<T>): JSX.Element => {
   const {
     onSelect = (_) => {},
     searchEnabled = false,

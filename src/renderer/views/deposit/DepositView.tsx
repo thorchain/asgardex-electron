@@ -145,7 +145,7 @@ export const DepositView: React.FC<Props> = () => {
   // Because `useObservableState` will set its state NOT before first rendering loop,
   // and `AddWallet` would be rendered for the first time,
   // before a check of `keystoreState` can be done
-  const keystoreState = useObservableState(keystoreService.keystore$, undefined)
+  const keystoreState = useObservableState(keystoreService.keystoreState$, undefined)
 
   const poolDetailRD = useObservableState<PoolDetailRD>(selectedPoolDetail$, RD.initial)
 

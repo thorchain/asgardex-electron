@@ -6,7 +6,7 @@ import { useIntl } from 'react-intl'
 import { useTheme } from '../../../hooks/useTheme'
 import * as Styled from './HeaderTheme.styles'
 
-type Props = {
+export type Props = {
   onPress?: FP.Lazy<void>
   isDesktopView: boolean
 }

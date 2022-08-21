@@ -88,7 +88,7 @@ import { LedgerConfirmationModal } from '../../modal/confirmation'
 import { WalletPasswordConfirmationModal } from '../../modal/confirmation'
 import { TxModal } from '../../modal/tx'
 import { DepositAssets } from '../../modal/tx/extra'
-import { ViewTxButton } from '../../uielements/button'
+import { FlatButton, ViewTxButton } from '../../uielements/button'
 import { Fees, UIFeesRD } from '../../uielements/fees'
 import * as InfoIconStyled from '../../uielements/info/InfoIcon.styles'
 import { AssetMissmatchWarning } from './AssetMissmatchWarning'
@@ -1593,23 +1593,24 @@ export const SymDeposit: React.FC<Props> = (props) => {
           <>
             {renderAssetChainFeeError}
             {renderThorchainFeeError}
-            <Styled.SubmitButton sizevalue="xnormal" onClick={onSubmit} disabled={disableSubmit}>
+            <FlatButton className="mb-20px min-w-[200px]" size="large" onClick={onSubmit} disabled={disableSubmit}>
               {intl.formatMessage({ id: 'common.add' })}
-            </Styled.SubmitButton>
+            </FlatButton>
             <Fees fees={uiFeesRD} reloadFees={reloadFeesHandler} disabled={disabledForm} />
           </>
         ) : (
           <>
             {renderApproveFeeError}
             {renderApproveError}
-            <Styled.SubmitButton
-              sizevalue="xnormal"
+            <FlatButton
+              className="mb-20px min-w-[200px]"
+              size="large"
               color="warning"
               disabled={disableSubmitApprove}
               onClick={onApprove}
               loading={RD.isPending(approveState)}>
               {intl.formatMessage({ id: 'common.approve' })}
-            </Styled.SubmitButton>
+            </FlatButton>
 
             {!RD.isInitial(uiApproveFeesRD) && <Fees fees={uiApproveFeesRD} reloadFees={reloadApproveFeesHandler} />}
           </>

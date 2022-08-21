@@ -1,9 +1,27 @@
 import React from 'react'
 
-import { storiesOf } from '@storybook/react'
+import { ComponentMeta, StoryFn } from '@storybook/react'
 
-import { ReloadButton } from './'
+import { ReloadButton as Component } from './'
 
-storiesOf('Components/ReloadButton', module)
-  .add('default', () => <ReloadButton />)
-  .add('with children', () => <ReloadButton>Reload child text here</ReloadButton>)
+type ArgTypes = { children: React.ReactNode }
+const Template: StoryFn<ArgTypes> = (args) => <Component {...args} />
+export const Default = Template.bind({})
+
+const meta: ComponentMeta<typeof Component> = {
+  component: Component,
+  title: 'Components/ReloadButton',
+  argTypes: {
+    children: {
+      options: ['none', 'text'],
+      mapping: {
+        none: null,
+        text: 'Reload child text'
+      }
+    },
+    onClick: { action: 'onClick' }
+  },
+  args: { children: 'text' }
+}
+
+export default meta

@@ -1,3 +1,4 @@
+import { Keystore } from '@xchainjs/xchain-crypto'
 import { Asset, assetToString, baseAmount } from '@xchainjs/xchain-util'
 import * as A from 'fp-ts/Array'
 import * as FP from 'fp-ts/function'
@@ -7,29 +8,112 @@ import * as Ord from 'fp-ts/Ord'
 import * as S from 'fp-ts/string'
 import { IntlShape } from 'react-intl'
 
-import { LedgerErrorId } from '../../../shared/api/types'
+import { KeystoreWallets, KeystoreWallet } from '../../../shared/api/io'
+import { KeystoreId, LedgerErrorId } from '../../../shared/api/types'
 import { WalletType } from '../../../shared/wallet/types'
 import { eqAsset } from '../../helpers/fp/eq'
 import { ordBaseAmount } from '../../helpers/fp/ord'
+import { sequenceSOption } from '../../helpers/fpHelpers'
 import { WalletBalances } from '../clients'
-import { KeystoreState, KeystoreContent, Phrase, BalanceMonoid, WalletBalance } from './types'
-
-export const getKeystoreContent = (state: KeystoreState): O.Option<KeystoreContent> =>
-  FP.pipe(state, O.chain(FP.identity))
+import {
+  KeystoreState,
+  Phrase,
+  BalanceMonoid,
+  WalletBalance,
+  isKeystoreLocked,
+  isKeystoreUnlocked,
+  KeystoreLocked
+} from './types'
 
 export const getPhrase = (state: KeystoreState): O.Option<Phrase> =>
   FP.pipe(
-    getKeystoreContent(state),
+    state,
+    O.chain(O.fromPredicate(isKeystoreUnlocked)),
     O.map(({ phrase }) => phrase)
   )
 
-export const hasKeystoreContent = (state: KeystoreState): boolean => O.isSome(getKeystoreContent(state))
+export const getKeystoreId = (state: KeystoreState): O.Option<KeystoreId> =>
+  FP.pipe(
+    state,
+    O.map(({ id }) => id)
+  )
+
+export const getWalletName = (state: KeystoreState): O.Option<string> =>
+  FP.pipe(
+    state,
+    O.map(({ name }) => name)
+  )
+
+/**
+ * Returns `LockedState` from `KeystoreState`
+ */
+export const getLockedData = (state: KeystoreState): O.Option<KeystoreLocked> =>
+  FP.pipe(sequenceSOption({ id: getKeystoreId(state), name: getWalletName(state) }))
+
+export const getSelectedKeystoreId = (wallets: KeystoreWallets): O.Option<number> =>
+  FP.pipe(
+    wallets,
+    A.filterMap(({ selected, id }) => (selected ? O.some(id) : O.none)),
+    A.head
+  )
+
+/**
+ * Returns initial keystore state by given wallets
+ *
+ * Initial `Keystore` is always set to `KeystoreLocked`
+ */
+export const getInitialKeystoreData = (
+  wallets: Array<Pick<KeystoreWallet, 'id' | 'name' | 'selected'>>
+): O.Option<KeystoreLocked> =>
+  FP.pipe(
+    wallets,
+    // get selected wallet (if available)
+    A.filterMap(O.fromPredicate(({ selected }) => selected)),
+    A.head,
+    // if no selected wallet, use first wallet in list (if available)
+    O.alt(() => (wallets.length ? O.some(wallets[0]) : O.none)),
+    // get needed data from wallet
+    O.map(({ id, name }) => ({ id, name }))
+  )
+
+export const getKeystore: (id: KeystoreId) => (wallets: KeystoreWallets) => O.Option<Keystore> = (id) => (wallets) =>
+  FP.pipe(
+    wallets,
+    A.filterMap(({ keystore, id: walletId }) => (walletId === id ? O.some(keystore) : O.none)),
+    A.head
+  )
+
+export const getKeystoreWalletName: (id: KeystoreId) => (wallets: KeystoreWallets) => O.Option<string> =
+  (id) => (wallets) =>
+    FP.pipe(
+      wallets,
+      A.filterMap(({ name, id: walletId }) => (walletId === id ? O.some(name) : O.none)),
+      A.head
+    )
+
+export const generateKeystoreId = (): KeystoreId =>
+  // id for keystore is current time (ms) at the time of importing
+  // Note: An user can import one keystore at time only
+  // and a keystore with same id can't be overriden. That's no duplications.
+  new Date().getTime()
 
 export const hasImportedKeystore = (state: KeystoreState): boolean => O.isSome(state)
 
-export const isLocked = (state: KeystoreState): boolean => !hasImportedKeystore(state) || !hasKeystoreContent(state)
+export const isLocked = (state: KeystoreState) =>
+  FP.pipe(
+    state,
+    // locked
+    O.map((s) => (isKeystoreLocked(s) ? true : false)),
+    // not imported === locked
+    O.getOrElse(() => true)
+  )
 
-export const filterNullableBalances = (balances: WalletBalances) => {
+export const isUnlocked = (state: KeystoreState): boolean =>
+  FP.pipe(state, O.chain(O.fromPredicate(isKeystoreUnlocked)), O.isSome)
+
+// const url: O.Option<string> = FP.pipe(txUrl, O.fromPredicate(P.not(S.isEmpty)))
+
+export const filterNullableBalances = (balances: WalletBalances): WalletBalances => {
   return FP.pipe(
     balances,
     A.filter(({ amount }) => Ord.gt(ordBaseAmount)(amount, baseAmount(0)))

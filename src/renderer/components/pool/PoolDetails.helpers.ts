@@ -67,7 +67,8 @@ export const getEmptyPoolDetail = (): PoolDetail => ({
   volume24h: '',
   liquidityUnits: '0',
   synthUnits: '0',
-  synthSupply: '0'
+  synthSupply: '0',
+  annualPercentageRate: '0'
 })
 
 export const getEmptyPoolStatsDetail = (): PoolStatsDetail => ({
@@ -104,5 +105,6 @@ export const getEmptyPoolStatsDetail = (): PoolStatsDetail => ({
   impermanentLossProtectionPaid: '0',
   liquidityUnits: '0',
   synthUnits: '0',
-  synthSupply: '0'
+  synthSupply: '0',
+  annualPercentageRate: '0'
 })

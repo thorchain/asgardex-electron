@@ -93,11 +93,15 @@ export const PendingPools: React.FC<PoolsComponentProps> = ({ haltedChains, mimi
   const btnPendingPoolsColumn: ColumnType<PoolTableRowData> = useMemo(
     () => ({
       key: 'btn',
-      title: Shared.renderRefreshBtnColTitle(intl.formatMessage({ id: 'common.refresh' }), refreshHandler),
+      title: Shared.renderRefreshBtnColTitle({
+        title: intl.formatMessage({ id: 'common.refresh' }),
+        clickHandler: refreshHandler,
+        iconOnly: !isDesktopView
+      }),
       width: 200,
       render: renderBtnPoolsColumn
     }),
-    [refreshHandler, intl, renderBtnPoolsColumn]
+    [intl, refreshHandler, isDesktopView, renderBtnPoolsColumn]
   )
 
   const renderBlockLeftColumn = useCallback(

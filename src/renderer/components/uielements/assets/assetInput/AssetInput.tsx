@@ -10,7 +10,7 @@ import { InputBigNumber } from '../../input'
 import * as Styled from './AssetInput.styles'
 import { AssetInputProps } from './AssetInput.types'
 
-type Props = {
+export type Props = {
   title: string
   titleTooltip?: string
   status?: string

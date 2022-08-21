@@ -1,5 +1,4 @@
 import { AssetAtom } from '@xchainjs/xchain-cosmos'
-import { AssetLUNA } from '@xchainjs/xchain-terra'
 import {
   Asset,
   AssetBNB,
@@ -45,7 +44,7 @@ export const getChainAsset = (chain: Chain): Asset => {
     case DOGEChain:
       return AssetDOGE
     case TerraChain:
-      return AssetLUNA
+      throw Error('Terra (Classic) is not supported anymore')
     case PolkadotChain:
       throw Error('Polkadot is not supported yet')
   }
@@ -85,11 +84,6 @@ export const isBchChain = (chain: Chain): boolean => eqChain.equals(chain, BCHCh
  * Check whether chain is DOGE chain
  */
 export const isDogeChain = (chain: Chain): boolean => eqChain.equals(chain, DOGEChain)
-
-/**
- * Check whether chain is TERRA chain
- */
-export const isTerraChain = (chain: Chain): boolean => eqChain.equals(chain, TerraChain)
 
 /**
  * Check whether chain is Cosmos (GAIA) chain

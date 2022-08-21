@@ -107,7 +107,7 @@ export const Upgrade: React.FC<Props> = (props): JSX.Element => {
   const targetWalletTypes: WalletTypesSelectorItems = useMemo(() => {
     const labels: Record<SelectableWalletType, string> = {
       keystore: intl.formatMessage({ id: 'common.keystore' }),
-      ledger: 'Ledger',
+      ledger: intl.formatMessage({ id: 'common.ledger' }),
       custom: intl.formatMessage({ id: 'common.custom' })
     }
     return FP.pipe(

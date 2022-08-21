@@ -1,6 +1,5 @@
 import { Layout, Row, Drawer } from 'antd'
 import Text from 'antd/lib/typography/Text'
-import { Link } from 'react-router-dom'
 import styled from 'styled-components'
 import { palette, size } from 'styled-theme'
 
@@ -20,9 +19,6 @@ export const HeaderContainer = styled(Layout.Header)`
     }
   }
   /* Make sure following id's are defined in svg */
-  #swap_icon,
-  #stake_icon,
-  #wallet_icon,
   #menu_icon,
   #close_icon,
   #theme_switch_icon {
@@ -100,41 +96,6 @@ export const LogoWrapper = styled.div`
   position: relative;
   height: ${size('headerHeight', '70px')};
 `
-export const TabsWrapper = styled(Row).attrs({
-  justify: 'center',
-  align: 'bottom'
-})`
-  height: ${size('headerHeight', '70px')};
-`
-
-type TabLinkProps = {
-  selected: boolean
-}
-
-export const TabLink = styled(Link)`
-  display: block;
-  border-bottom-width: 3px;
-  border-color: ${palette('primary', 0)};
-  color: ${(props: TabLinkProps) => (props.selected ? palette('text', 1) : palette('text', 2))};
-  transition: none;
-
-  &:hover,
-  &:active {
-    color: ${palette('primary', 0)};
-    #swap_icon,
-    #stake_icon,
-    #wallet_icon {
-      > * {
-        fill: ${palette('primary', 0)};
-      }
-    }
-  }
-  & > * {
-    text-transform: uppercase;
-    font-family: 'MainFontSemiBold';
-    font-size: 18px;
-  }
-`
 
 export const HeaderDrawer = styled(Drawer)`
   .ant-drawer-body {
@@ -146,15 +107,6 @@ export const HeaderDrawer = styled(Drawer)`
 
   .ant-drawer-content {
     background-color: transparent;
-  }
-
-  /* Make sure following id's are defined in svg */
-  #swap_icon,
-  #stake_icon,
-  #wallet_icon {
-    & > * {
-      fill: currentColor;
-    }
   }
 `
 

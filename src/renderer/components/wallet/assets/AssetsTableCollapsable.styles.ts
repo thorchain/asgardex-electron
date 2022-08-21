@@ -4,7 +4,6 @@ import styled from 'styled-components'
 import { palette } from 'styled-theme'
 
 import { Label as UILabel } from '../../../components/uielements/label'
-import { Button as UIButton } from '../../uielements/button'
 import {
   WalletTypeLabel as WalletTypeLabelUI,
   AssetSynthLabel as AssetSynthLabelUI
@@ -139,17 +138,6 @@ export const AssetTickerWrapper = styled('div')`
   display: flex;
   flex-direction: row;
   align-items: center;
-`
-
-export const UpgradeButton = styled(UIButton).attrs({
-  type: 'primary',
-  round: 'true',
-  color: 'warning'
-})`
-  &.ant-btn {
-    min-width: auto;
-    margin-left: 10px;
-  }
 `
 
 export const WalletTypeLabel = styled(WalletTypeLabelUI)`

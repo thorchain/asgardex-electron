@@ -1,6 +1,4 @@
-import React from 'react'
-
-import { Story, Meta } from '@storybook/react'
+import { ComponentMeta } from '@storybook/react'
 import { AssetBNB } from '@xchainjs/xchain-util'
 
 import { BNB_ADDRESS_TESTNET } from '../../../../../shared/mock/address'
@@ -11,7 +9,7 @@ type Args = {
   size: Size
   width: string
 }
-export const Template: Story<Args> = ({ size, width }) => (
+const Template = ({ size, width }: Args) => (
   <div style={{ width }}>
     <Component asset={AssetBNB} size={size} address={BNB_ADDRESS_TESTNET} network="mainnet" />
   </div>
@@ -19,10 +17,8 @@ export const Template: Story<Args> = ({ size, width }) => (
 
 export const Default = Template.bind({})
 
-Default.storyName = 'default'
-
-const meta: Meta<Args> = {
-  component: Component,
+const meta: ComponentMeta<typeof Template> = {
+  component: Template,
   title: 'Components/AssetAddress',
   argTypes: {
     size: {

@@ -1,6 +1,4 @@
-import React from 'react'
-
-import { Story, Meta } from '@storybook/react'
+import { ComponentMeta } from '@storybook/react'
 import { TxHash } from '@xchainjs/xchain-client'
 import { assetAmount, assetToBase, BaseAmount, baseAmount } from '@xchainjs/xchain-util'
 import * as FP from 'fp-ts/lib/function'
@@ -26,7 +24,7 @@ type Args = {
   walletType: WalletType
 }
 
-const Template: Story<Args> = ({ interactType, txRDStatus, feeRDStatus, balance, validAddress, walletType }) => {
+const Template = ({ interactType, txRDStatus, feeRDStatus, balance, validAddress, walletType }: Args) => {
   const interact$: InteractStateHandler = (_) => {
     const getCurrentStep = () => {
       switch (txRDStatus) {
@@ -91,40 +89,29 @@ const Template: Story<Args> = ({ interactType, txRDStatus, feeRDStatus, balance,
 
 export const Default = Template.bind({})
 
-const meta: Meta<Args> = {
-  component: Component,
+const meta: ComponentMeta<typeof Template> = {
+  component: Template,
   title: 'Wallet/InteractForm',
   argTypes: {
     interactType: {
-      name: 'type',
-      control: { type: 'select', options: ['bond', 'unbond', 'leave', 'custom'] },
-      defaultValue: 'bond'
+      control: { type: 'select', options: ['bond', 'unbond', 'leave', 'custom'] }
     },
     txRDStatus: {
-      name: 'txRDStatus',
-      control: { type: 'select', options: ['pending', 'error', 'success'] },
-      defaultValue: 'success'
+      control: { type: 'select', options: ['pending', 'error', 'success'] }
     },
     feeRDStatus: {
-      name: 'feeRD',
-      control: { type: 'select', options: ['initial', 'pending', 'error', 'success'] },
-      defaultValue: 'success'
+      control: { type: 'select', options: ['initial', 'pending', 'error', 'success'] }
     },
     walletType: {
-      name: 'wallet type',
-      control: { type: 'select', options: ['keystore', 'ledger'] },
-      defaultValue: 'keystore'
-    },
-    balance: {
-      name: 'RUNE Balance',
-      control: { type: 'text' },
-      defaultValue: '2'
-    },
-    validAddress: {
-      name: 'valid address',
-      control: { type: 'boolean' },
-      defaultValue: true
+      control: { type: 'select', options: ['keystore', 'ledger'] }
     }
+  },
+  args: {
+    interactType: 'bond',
+    txRDStatus: 'success',
+    walletType: 'keystore',
+    balance: '2',
+    validAddress: true
   }
 }
 

@@ -1,6 +1,4 @@
-import React from 'react'
-
-import { Story } from '@storybook/react'
+import { ComponentMeta } from '@storybook/react'
 import { AssetRuneNative, assetToBase, assetAmount } from '@xchainjs/xchain-util'
 import * as FP from 'fp-ts/function'
 import * as O from 'fp-ts/Option'
@@ -8,10 +6,11 @@ import * as O from 'fp-ts/Option'
 import { mockWalletBalance } from '../../../../helpers/test/testWalletHelper'
 import { AssetInfo } from './AssetInfo'
 
-export const AssetInfoStory: Story<{
+type Args = {
   address: string
   balance: number
-}> = ({ address, balance }) => {
+}
+export const Template = ({ address, balance }: Args) => {
   return (
     <AssetInfo
       walletInfo={FP.pipe(
@@ -30,12 +29,18 @@ export const AssetInfoStory: Story<{
   )
 }
 
-AssetInfoStory.args = {
-  address: 'tthor18ngerf2l9c6ht7wr83ccyt02s6pws4lff8w0ug',
-  balance: 123
-}
-
-export default {
+const meta: ComponentMeta<typeof Template> = {
+  component: Template,
   title: 'Wallet/AssetInfo',
-  component: AssetInfo
+  argTypes: {
+    address: {
+      control: 'text',
+      defaultValue: 'tthor18ngerf2l9c6ht7wr83ccyt02s6pws4lff8w0ug'
+    },
+    balance: {
+      control: 'number',
+      defaultValue: 123
+    }
+  }
 }
+export default meta

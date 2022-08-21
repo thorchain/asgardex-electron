@@ -125,14 +125,6 @@ export const AssetUSDC: Asset = {
   synth: false
 }
 
-// TERRA.UST mainnet
-export const AssetUST: Asset = {
-  chain: TerraChain,
-  symbol: 'UST',
-  ticker: 'UST',
-  synth: false
-}
-
 export const DEFAULT_PRICE_ASSETS: PricePoolAssets = [AssetRuneNative, AssetETH, AssetBTC]
 
 export const USD_PRICE_ASSETS: PricePoolAssets = [
@@ -143,8 +135,7 @@ export const USD_PRICE_ASSETS: PricePoolAssets = [
   AssetUSDTDAC,
   AssetUSDT62E,
   AssetUSDTERC20Testnet,
-  AssetUSDC,
-  AssetUST
+  AssetUSDC
 ]
 
 // Weight of chains
@@ -159,8 +150,8 @@ export const CHAIN_WEIGHTS: Record<Chain, number> = {
   [BNBChain]: 5,
   [CosmosChain]: 6,
   [DOGEChain]: 7,
-  [TerraChain]: 8,
-  [PolkadotChain]: 9
+  [TerraChain]: 8, // not supported in ASGDX anymore, but part of xchain-util
+  [PolkadotChain]: 9 // not supported in ASGDX, but part of xchain-util
 }
 
 // Weight of currencies needed for pricing
@@ -174,10 +165,9 @@ export const CURRENCY_WEIGHTS: PricePoolCurrencyWeights = {
   [assetToString(AssetUSDT62E)]: 5,
   [assetToString(AssetUSDTERC20Testnet)]: 6,
   [assetToString(AssetUSDC)]: 7,
-  [assetToString(AssetUST)]: 8,
-  [assetToString(AssetETH)]: 9,
-  [assetToString(AssetBTC)]: 10,
-  [assetToString(AssetRuneNative)]: 11
+  [assetToString(AssetETH)]: 8,
+  [assetToString(AssetBTC)]: 9,
+  [assetToString(AssetRuneNative)]: 10
 }
 
 // Whitelist of pools for pricing things
@@ -215,7 +205,6 @@ export const SUPPORTED_LEDGER_APPS: Chain[] = [
   LTCChain,
   DOGEChain,
   BCHChain,
-  TerraChain,
   ETHChain,
   CosmosChain
 ]

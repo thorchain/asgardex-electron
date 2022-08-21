@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo, useState } from 'react'
+import React, { useCallback, useEffect, useMemo, useState } from 'react'
 
 import { SearchOutlined } from '@ant-design/icons'
 import * as RD from '@devexperts/remote-data-ts'
@@ -18,16 +18,17 @@ import {
   TerraChain,
   chainToString
 } from '@xchainjs/xchain-util'
-import { Col, List, Collapse, Row, RadioChangeEvent } from 'antd'
+import { List, Collapse, RadioChangeEvent } from 'antd'
 import * as FP from 'fp-ts/function'
 import * as A from 'fp-ts/lib/Array'
 import * as O from 'fp-ts/lib/Option'
 import { FormattedMessage, useIntl } from 'react-intl'
+import { useNavigate } from 'react-router-dom'
 
-import { Network } from '../../../shared/api/types'
+import { KeystoreId, Network } from '../../../shared/api/types'
 import { getDerivationPath as getEthDerivationPath } from '../../../shared/ethereum/ledger'
 import { EthDerivationMode } from '../../../shared/ethereum/types'
-import { isLedgerWallet } from '../../../shared/utils/guard'
+import { isError, isLedgerWallet } from '../../../shared/utils/guard'
 import { ReactComponent as UnlockOutlined } from '../../assets/svg/icon-unlock-warning.svg'
 import { WalletPasswordConfirmationModal } from '../../components/modal/confirmation'
 import { RemoveWalletConfirmationModal } from '../../components/modal/confirmation/RemoveWalletConfirmationModal'
@@ -44,31 +45,49 @@ import {
   isDogeChain,
   isEthChain,
   isLtcChain,
-  isTerraChain,
   isThorChain
 } from '../../helpers/chainHelper'
 import { emptyString } from '../../helpers/stringHelper'
 import { isEnabledWallet } from '../../helpers/walletHelper'
-import { ValidatePasswordHandler, WalletAccounts, WalletAddressAsync } from '../../services/wallet/types'
+import { useSubscriptionState } from '../../hooks/useSubscriptionState'
+import * as appRoutes from '../../routes/app'
+import * as walletRoutes from '../../routes/wallet'
+import {
+  KeystoreWalletsUI,
+  RemoveKeystoreWalletHandler,
+  ValidatePasswordHandler,
+  WalletAccounts,
+  WalletAddressAsync,
+  KeystoreUnlocked,
+  ChangeKeystoreWalletHandler,
+  ChangeKeystoreWalletRD,
+  RenameKeystoreWalletHandler,
+  RenameKeystoreWalletRD
+} from '../../services/wallet/types'
 import { walletTypeToI18n } from '../../services/wallet/util'
 import { AttentionIcon } from '../icons'
 import * as StyledR from '../shared/form/Radio.styles'
+import { BorderButton, FlatButton, TextButton } from '../uielements/button'
 import { InfoIcon } from '../uielements/info'
 import { Modal } from '../uielements/modal'
+import { WalletSelector } from '../uielements/wallet'
+import { EditableWalletName } from '../uielements/wallet/EditableWalletName'
 import * as CStyled from './Common.styles'
 import * as Styled from './WalletSettings.styles'
 
 type Props = {
   network: Network
   walletAccounts: O.Option<WalletAccounts>
-  runeNativeAddress: string
   lockWallet: FP.Lazy<void>
-  removeKeystore: FP.Lazy<void>
-  exportKeystore: (runeNativeAddress: string, selectedNetwork: Network) => void
+  removeKeystoreWallet: RemoveKeystoreWalletHandler
+  changeKeystoreWallet$: ChangeKeystoreWalletHandler
+  renameKeystoreWallet$: RenameKeystoreWalletHandler
+  exportKeystore: () => Promise<void>
   addLedgerAddress: (chain: Chain, walletIndex: number) => void
   verifyLedgerAddress: (chain: Chain, walletIndex: number) => Promise<boolean>
   removeLedgerAddress: (chain: Chain) => void
-  phrase: O.Option<string>
+  keystoreUnlocked: KeystoreUnlocked
+  wallets: KeystoreWalletsUI
   clickAddressLinkHandler: (chain: Chain, address: Address) => void
   validatePassword$: ValidatePasswordHandler
   collapsed: boolean
@@ -83,14 +102,16 @@ export const WalletSettings: React.FC<Props> = (props): JSX.Element => {
   const {
     network,
     walletAccounts: oWalletAccounts,
-    runeNativeAddress = '',
-    lockWallet = () => {},
-    removeKeystore = () => {},
-    exportKeystore = () => {},
+    lockWallet,
+    removeKeystoreWallet,
+    changeKeystoreWallet$,
+    renameKeystoreWallet$,
+    exportKeystore,
     addLedgerAddress,
     verifyLedgerAddress,
     removeLedgerAddress,
-    phrase: oPhrase,
+    keystoreUnlocked: { phrase, name: walletName, id: walletId },
+    wallets,
     clickAddressLinkHandler,
     validatePassword$,
     collapsed,
@@ -99,16 +120,7 @@ export const WalletSettings: React.FC<Props> = (props): JSX.Element => {
   } = props
 
   const intl = useIntl()
-
-  const phrase = useMemo(
-    () =>
-      FP.pipe(
-        oPhrase,
-        O.map((phrase) => phrase),
-        O.getOrElse(() => '')
-      ),
-    [oPhrase]
-  )
+  const navigate = useNavigate()
 
   const [showPhraseModal, setShowPhraseModal] = useState(false)
   const [showPasswordModal, setShowPasswordModal] = useState(false)
@@ -116,9 +128,16 @@ export const WalletSettings: React.FC<Props> = (props): JSX.Element => {
   const [showQRModal, setShowQRModal] = useState<O.Option<{ asset: Asset; address: Address }>>(O.none)
   const closeQrModal = useCallback(() => setShowQRModal(O.none), [setShowQRModal])
 
-  const removeWallet = useCallback(() => {
-    removeKeystore()
-  }, [removeKeystore])
+  const removeWalletHandler = useCallback(async () => {
+    const noWallets = await removeKeystoreWallet()
+    if (noWallets >= 1) {
+      // goto unlock screen to unlock another wallet
+      navigate(walletRoutes.locked.path())
+    } else {
+      // no wallet -> go to homepage
+      navigate(appRoutes.base.template)
+    }
+  }, [removeKeystoreWallet, navigate])
 
   const onSuccessPassword = useCallback(() => {
     setShowPasswordModal(false)
@@ -151,9 +170,9 @@ export const WalletSettings: React.FC<Props> = (props): JSX.Element => {
     [THORChain]: 0,
     [ETHChain]: 0,
     [CosmosChain]: 0,
-    [PolkadotChain]: 0,
+    [PolkadotChain]: 0, // not supported in ASGDX, but part of xchain-util
     [DOGEChain]: 0,
-    [TerraChain]: 0
+    [TerraChain]: 0 // not supported in ASGDX anymore, but part of xchain-util
   })
 
   const [addressToVerify, setAddressToVerify] = useState<AddressToVerify>(O.none)
@@ -188,8 +207,8 @@ export const WalletSettings: React.FC<Props> = (props): JSX.Element => {
       }
 
       const renderAddLedger = (chain: Chain, loading: boolean) => (
-        <Styled.AddLedgerWrapper>
-          <Styled.AddLedgerContainer>
+        <div className="flex w-full flex-col md:w-auto md:flex-row">
+          <div className="mr-30px flex items-center md:mr-0">
             <Styled.AddLedgerButton loading={loading} onClick={() => addLedgerAddress(chain, walletIndexMap[chain])}>
               <Styled.AddLedgerIcon /> {intl.formatMessage({ id: 'ledger.add.device' })}
             </Styled.AddLedgerButton>
@@ -199,11 +218,12 @@ export const WalletSettings: React.FC<Props> = (props): JSX.Element => {
               isLtcChain(chain) ||
               isBchChain(chain) ||
               isDogeChain(chain) ||
-              isTerraChain(chain) ||
               isEthChain(chain) ||
               isCosmosChain(chain)) && (
               <>
-                <Styled.IndexLabel>{intl.formatMessage({ id: 'setting.wallet.index' })}</Styled.IndexLabel>
+                <div className="text-[12px] uppercase text-text2 dark:text-text2d">
+                  {intl.formatMessage({ id: 'setting.wallet.index' })}
+                </div>
                 <Styled.WalletIndexInput
                   value={walletIndexMap[chain].toString()}
                   pattern="[0-9]+"
@@ -216,9 +236,9 @@ export const WalletSettings: React.FC<Props> = (props): JSX.Element => {
                 <InfoIcon tooltip={intl.formatMessage({ id: 'setting.wallet.index.info' })} />
               </>
             )}
-          </Styled.AddLedgerContainer>
+          </div>
           {isEthChain(chain) && (
-            <Styled.EthDerivationModeContainer>
+            <div className="flex items-center pl-0 pt-10px md:pt-0 md:pl-30px">
               <Styled.EthDerivationModeRadioGroup onChange={onChangeEthDerivationMode} value={ethDerivationMode}>
                 <StyledR.Radio value="ledgerlive" key="ledgerlive">
                   <Styled.EthDerivationModeRadioLabel>
@@ -243,14 +263,14 @@ export const WalletSettings: React.FC<Props> = (props): JSX.Element => {
                   </Styled.EthDerivationModeRadioLabel>
                 </StyledR.Radio>
               </Styled.EthDerivationModeRadioGroup>
-            </Styled.EthDerivationModeContainer>
+            </div>
           )}
-        </Styled.AddLedgerWrapper>
+        </div>
       )
 
       // Render addresses depending on its loading status
       return (
-        <Styled.AddressContainer>
+        <div className="flex flex-row items-center">
           {FP.pipe(
             addressRD,
             RD.fold(
@@ -264,7 +284,7 @@ export const WalletSettings: React.FC<Props> = (props): JSX.Element => {
               ),
               ({ address, walletIndex }) => (
                 <>
-                  <Styled.AddressWrapper>
+                  <div className="flex w-full items-center">
                     <Styled.AddressEllipsis address={address} chain={chain} network={network} enableCopy={true} />
                     <Styled.QRCodeIcon
                       onClick={() => setShowQRModal(O.some({ asset: getChainAsset(chain), address }))}
@@ -277,12 +297,12 @@ export const WalletSettings: React.FC<Props> = (props): JSX.Element => {
                         <Styled.RemoveLedgerIcon onClick={() => removeLedgerAddress(chain)} />
                       </>
                     )}
-                  </Styled.AddressWrapper>
+                  </div>
                 </>
               )
             )
           )}
-        </Styled.AddressContainer>
+        </div>
       )
     },
     [
@@ -315,11 +335,13 @@ export const WalletSettings: React.FC<Props> = (props): JSX.Element => {
               okText={intl.formatMessage({ id: 'common.confirm' })}
               okButtonProps={{ autoFocus: true }}
               cancelText={intl.formatMessage({ id: 'common.reject' })}>
-              <div style={{ textAlign: 'center' }}>
+              <div className="text-center">
                 <FormattedMessage
                   id="wallet.ledger.verifyAddress.modal.description"
                   values={{
-                    address: <Styled.AddressToVerifyLabel>{address}</Styled.AddressToVerifyLabel>
+                    address: (
+                      <span className="block transform-none font-mainBold text-[16px] text-inherit">{address}</span>
+                    )
                   }}
                 />
               </div>
@@ -356,6 +378,19 @@ export const WalletSettings: React.FC<Props> = (props): JSX.Element => {
     [accountFilter, oWalletAccounts]
   )
 
+  // TODO (@Veado) Render `exportKeystoreErrorMsg`
+  const [_ /* exportKeystoreErrorMsg */, setExportKeystoreErrorMsg] = useState(emptyString)
+
+  const exportKeystoreHandler = useCallback(async () => {
+    try {
+      setExportKeystoreErrorMsg(emptyString)
+      await exportKeystore()
+    } catch (error) {
+      const errorMsg = isError(error) ? error?.message ?? error.toString() : `${error}`
+      setExportKeystoreErrorMsg(errorMsg)
+    }
+  }, [exportKeystore, setExportKeystoreErrorMsg])
+
   const renderAccounts = useMemo(
     () =>
       FP.pipe(
@@ -366,10 +401,10 @@ export const WalletSettings: React.FC<Props> = (props): JSX.Element => {
             dataSource={walletAccounts}
             renderItem={({ chain, accounts }, i: number) => (
               <Styled.ListItem key={i}>
-                <Styled.AccountTitleWrapper>
-                  <AssetIcon asset={getChainAsset(chain)} size={'small'} network="mainnet" />
+                <div className="flex w-full items-center">
+                  <AssetIcon asset={getChainAsset(chain)} size="small" network="mainnet" />
                   <Styled.AccountTitle>{chain}</Styled.AccountTitle>
-                </Styled.AccountTitleWrapper>
+                </div>
                 {/* supported Ledger */}
                 {FP.pipe(
                   accounts,
@@ -377,10 +412,12 @@ export const WalletSettings: React.FC<Props> = (props): JSX.Element => {
                   A.mapWithIndex((index, account) => {
                     const { type } = account
                     return (
-                      <Styled.AccountAddressWrapper key={type}>
+                      <div className="mt-10px w-full" key={type}>
                         <Styled.WalletTypeLabel>{walletTypeToI18n(type, intl)}</Styled.WalletTypeLabel>
-                        <Styled.AccountContent key={index}>{renderAddress(chain, account)}</Styled.AccountContent>
-                      </Styled.AccountAddressWrapper>
+                        <div className="my-0 mx-40px w-full overflow-hidden " key={index}>
+                          {renderAddress(chain, account)}
+                        </div>
+                      </div>
                     )
                   })
                 )}
@@ -391,13 +428,13 @@ export const WalletSettings: React.FC<Props> = (props): JSX.Element => {
                   A.map((account) => {
                     const { type } = account
                     return (
-                      <Styled.AccountAddressWrapper key={type}>
+                      <div className="mt-10px w-full" key={type}>
                         <Styled.WalletTypeLabel>{walletTypeToI18n(type, intl)}</Styled.WalletTypeLabel>
-                        <Styled.NotSupportedWrapper>
+                        <div className="ml-40px flex items-center pt-5px text-[12px] text-text2 dark:text-text2d">
                           <Styled.Icon component={AttentionIcon} />
                           {intl.formatMessage({ id: 'common.notsupported.fornetwork' }, { network })}
-                        </Styled.NotSupportedWrapper>
-                      </Styled.AccountAddressWrapper>
+                        </div>
+                      </div>
                     )
                   })
                 )}
@@ -410,12 +447,76 @@ export const WalletSettings: React.FC<Props> = (props): JSX.Element => {
     [oFilteredWalletAccounts, intl, renderAddress, network]
   )
 
+  const { state: changeWalletState, subscribe: subscribeChangeWalletState } =
+    useSubscriptionState<ChangeKeystoreWalletRD>(RD.initial)
+
+  const changeWalletHandler = useCallback(
+    (id: KeystoreId) => {
+      subscribeChangeWalletState(changeKeystoreWallet$(id))
+    },
+    [changeKeystoreWallet$, subscribeChangeWalletState]
+  )
+
+  const renderChangeWalletError = useMemo(
+    () =>
+      FP.pipe(
+        changeWalletState,
+        RD.fold(
+          () => <></>,
+          () => <></>,
+          (error) => (
+            <p className="px-5px font-main text-14 uppercase text-error0 dark:text-error0d">
+              {intl.formatMessage({ id: 'wallet.change.error' })} {error.message || error.toString()}
+            </p>
+          ),
+
+          () => <></>
+        )
+      ),
+    [changeWalletState, intl]
+  )
+
+  useEffect(() => {
+    if (RD.isSuccess(changeWalletState)) {
+      // Jump to `UnlockView` to avoid staying at wallet settings
+      navigate(walletRoutes.locked.path())
+    }
+  }, [changeWalletState, navigate])
+
+  const { state: renameWalletState, subscribe: subscribeRenameWalletState } =
+    useSubscriptionState<RenameKeystoreWalletRD>(RD.initial)
+
+  const changeWalletNameHandler = useCallback(
+    (walletName: string) => {
+      subscribeRenameWalletState(renameKeystoreWallet$(walletId, walletName))
+    },
+    [renameKeystoreWallet$, subscribeRenameWalletState, walletId]
+  )
+
+  const renderRenameWalletError = useMemo(
+    () =>
+      FP.pipe(
+        renameWalletState,
+        RD.fold(
+          () => <></>,
+          () => <></>,
+          (error) => (
+            <p className="text-center font-main text-[14px] uppercase text-error0">
+              {intl.formatMessage({ id: 'wallet.name.error.rename' })} {error?.message ?? error.toString()}
+            </p>
+          ),
+          () => <></>
+        )
+      ),
+    [intl, renameWalletState]
+  )
+
   return (
-    <Styled.Container>
+    <div className="mt-40px bg-bg0 py-10px px-40px dark:bg-bg0d">
       <CStyled.Collapse
         expandIcon={({ isActive }) => <CStyled.ExpandIcon rotate={isActive ? 90 : 0} />}
         activeKey={collapsed ? '0' : '1'}
-        expandIconPosition="right"
+        expandIconPosition="end"
         onChange={toggleCollapse}
         ghost>
         <Collapse.Panel
@@ -440,64 +541,96 @@ export const WalletSettings: React.FC<Props> = (props): JSX.Element => {
           <RemoveWalletConfirmationModal
             visible={showRemoveWalletModal}
             onClose={() => setShowRemoveWalletModal(false)}
-            onSuccess={removeWallet}
+            onSuccess={() => removeWalletHandler()}
+            walletName={walletName}
           />
           {renderQRCodeModal}
 
           {renderVerifyAddressModal(addressToVerify)}
-          <Styled.CardContainer>
-            <Styled.Card>
-              <Styled.Subtitle>{intl.formatMessage({ id: 'setting.wallet.management' })}</Styled.Subtitle>
-              <Row style={{ flex: 1, alignItems: 'center', padding: 20 }}>
-                <Styled.WalletCol sm={{ span: 24 }} md={{ span: 12 }}>
-                  <Styled.OptionCard bordered={false}>
-                    <Styled.OptionLabel
-                      color="primary"
-                      size="big"
-                      onClick={() => exportKeystore(runeNativeAddress, network)}>
-                      {intl.formatMessage({ id: 'setting.export' })}
-                    </Styled.OptionLabel>
-                  </Styled.OptionCard>
-                </Styled.WalletCol>
-                <Styled.WalletCol sm={{ span: 24 }} md={{ span: 12 }}>
-                  <Styled.OptionCard bordered={false}>
-                    <Styled.OptionLabel color="warning" size="big" onClick={lockWallet}>
-                      {intl.formatMessage({ id: 'setting.lock' })} <UnlockOutlined />
-                    </Styled.OptionLabel>
-                  </Styled.OptionCard>
-                </Styled.WalletCol>
-                <Styled.WalletCol sm={{ span: 24 }} md={{ span: 12 }}>
-                  <Styled.OptionCard bordered={false}>
-                    <Styled.Button
-                      sizevalue="xnormal"
-                      color="primary"
-                      typevalue="outline"
-                      round="true"
-                      onClick={() => setShowPasswordModal(true)}
-                      disabled={O.isNone(oPhrase) ? true : false}>
-                      {intl.formatMessage({ id: 'setting.view.phrase' })}
-                    </Styled.Button>
-                  </Styled.OptionCard>
-                </Styled.WalletCol>
-                <Styled.WalletCol sm={{ span: 24 }} md={{ span: 12 }}>
-                  <Styled.OptionCard bordered={false}>
-                    <Styled.Button
-                      sizevalue="xnormal"
-                      color="error"
-                      typevalue="outline"
-                      round="true"
-                      onClick={() => setShowRemoveWalletModal(true)}>
-                      {intl.formatMessage({ id: 'wallet.remove.label' })}
-                    </Styled.Button>
-                  </Styled.OptionCard>
-                </Styled.WalletCol>
-              </Row>
-            </Styled.Card>
-          </Styled.CardContainer>
-          <Col key={'accounts'} span={24}>
+          <div className="card my-20px w-full ">
+            <h1 className="p-20px font-main text-18 uppercase text-text0 dark:text-text0d">
+              {intl.formatMessage({ id: 'setting.wallet.management' })}
+            </h1>
+            <EditableWalletName
+              name={walletName}
+              onChange={changeWalletNameHandler}
+              loading={RD.isPending(renameWalletState)}
+            />
+            {renderRenameWalletError}
+            <div className="mt-30px flex flex-col items-center md:flex-row">
+              <div className="flex w-full justify-center md:w-1/2">
+                <TextButton
+                  className="m-0 min-w-[200px] md:m-20px"
+                  color="primary"
+                  size="normal"
+                  onClick={exportKeystoreHandler}>
+                  {intl.formatMessage({ id: 'setting.export' })}
+                </TextButton>
+              </div>
+              <div className="flex w-full justify-center md:w-1/2">
+                <TextButton className="m-0 min-w-[200px] md:m-20px" color="warning" size="normal" onClick={lockWallet}>
+                  {intl.formatMessage({ id: 'setting.lock' })} <UnlockOutlined />
+                </TextButton>
+              </div>
+            </div>
+            <div className="flex flex-col items-center md:flex-row">
+              <div className="flex w-full justify-center md:w-1/2">
+                <BorderButton
+                  className="m-10px min-w-[200px] md:m-20px"
+                  size="normal"
+                  color="primary"
+                  onClick={() => setShowPasswordModal(true)}>
+                  {intl.formatMessage({ id: 'setting.view.phrase' })}
+                </BorderButton>
+              </div>
+              <div className="flex w-full justify-center md:w-1/2">
+                <BorderButton
+                  className="m-10px min-w-[200px] md:m-20px"
+                  size="normal"
+                  color="error"
+                  onClick={() => setShowRemoveWalletModal(true)}>
+                  {intl.formatMessage({ id: 'wallet.remove.label' })}
+                </BorderButton>
+              </div>
+            </div>
+          </div>
+
+          <div className="card mb-20px w-full ">
+            <h1 className="p-20px text-center font-main text-18 uppercase text-text0 dark:text-text0d md:text-left">
+              {intl.formatMessage({ id: 'setting.multiwallet.management' })}
+            </h1>
+
+            <div className="flex flex-col py-20px md:flex-row">
+              <div className="flex w-full flex-col items-center justify-center md:w-1/2">
+                <h2 className="w-full text-center font-main text-[12px] uppercase text-text2 dark:text-text2d">
+                  {intl.formatMessage({ id: 'wallet.add.another' })}
+                </h2>
+                <FlatButton
+                  className="mt-5px min-w-[200px]"
+                  size="normal"
+                  color="primary"
+                  onClick={() => navigate(walletRoutes.noWallet.path())}>
+                  {intl.formatMessage({ id: 'wallet.add.label' })}
+                </FlatButton>
+              </div>
+              <div className="mt-20px flex w-full flex-col items-center justify-center md:mt-0 md:w-1/2">
+                <h2 className="w-full text-center font-main text-[12px] uppercase text-text2 dark:text-text2d">
+                  {intl.formatMessage({ id: 'wallet.change.title' })}
+                </h2>
+                <WalletSelector
+                  className="min-w-[200px]"
+                  disabled={RD.isPending(changeWalletState)}
+                  wallets={wallets}
+                  onChange={changeWalletHandler}
+                />
+                {renderChangeWalletError}
+              </div>
+            </div>
+          </div>
+          <div key={'accounts'} className="w-full">
             <Styled.AccountCard>
-              <Styled.Subtitle>{intl.formatMessage({ id: 'setting.account.management' })}</Styled.Subtitle>
-              <Styled.InputConainer>
+              <Styled.Subtitle>{intl.formatMessage({ id: 'setting.accounts' })}</Styled.Subtitle>
+              <div className="mt-30px flex justify-center md:ml-10px md:justify-start">
                 <Styled.Input
                   prefix={<SearchOutlined />}
                   onChange={filterAccounts}
@@ -505,12 +638,12 @@ export const WalletSettings: React.FC<Props> = (props): JSX.Element => {
                   placeholder={intl.formatMessage({ id: 'common.search' }).toUpperCase()}
                   size="large"
                 />
-              </Styled.InputConainer>
+              </div>
               {renderAccounts}
             </Styled.AccountCard>
-          </Col>
+          </div>
         </Collapse.Panel>
       </CStyled.Collapse>
-    </Styled.Container>
+    </div>
   )
 }

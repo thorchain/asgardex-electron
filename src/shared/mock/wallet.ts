@@ -1,4 +1,5 @@
 import * as RD from '@devexperts/remote-data-ts'
+import { Keystore } from '@xchainjs/xchain-crypto'
 import { BTCChain, BCHChain, BNBChain, ETHChain, LTCChain, THORChain } from '@xchainjs/xchain-util'
 import * as Rx from 'rxjs'
 import * as RxOp from 'rxjs/operators'
@@ -59,3 +60,24 @@ export const MOCK_WALLET_ADDRESSES: WalletAddresses = [
     walletIndex: 0
   }
 ]
+
+export const MOCK_KEYSTORE: Keystore = {
+  crypto: {
+    cipher: 'cipher',
+    ciphertext: 'ciphertext',
+    cipherparams: {
+      iv: 'iv'
+    },
+    kdf: 'kdf',
+    kdfparams: {
+      prf: 'prf',
+      dklen: 0,
+      salt: 'salt',
+      c: 0
+    },
+    mac: 'mac'
+  },
+  id: 'id',
+  version: 0,
+  meta: 'xchain-keystore'
+}

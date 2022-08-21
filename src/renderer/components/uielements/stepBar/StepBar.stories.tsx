@@ -1,39 +1,22 @@
-import React from 'react'
+import { ComponentMeta, StoryFn } from '@storybook/react'
 
-import { Meta, Story } from '@storybook/react'
-import { storiesOf } from '@storybook/react'
+import { StepBar as Component, Props } from './index'
 
-import { StepBar, Props as StepBarProps } from './index'
+export const Default: StoryFn<Props> = (args) => <Component {...args} />
 
-storiesOf('Components/StepBar', module).add('default', () => {
-  return (
-    <div style={{ padding: '20px' }}>
-      <StepBar />
-    </div>
-  )
-})
-
-const Template: Story<StepBarProps> = (args) => <StepBar {...args} />
-
-export const StoryDefault: Story = Template.bind({})
-StoryDefault.storyName = 'default'
-
-export const StorySize: Story = Template.bind({})
-StorySize.args = {
-  size: 100
-}
-StorySize.storyName = 'dynamic size'
-
-const meta: Meta = {
-  component: StepBar,
+const meta: ComponentMeta<typeof Component> = {
+  component: Component,
   title: 'Components/StepBar',
   decorators: [
-    (S: Story) => (
+    (Story) => (
       <div style={{ padding: '20px' }}>
-        <S />
+        <Story />
       </div>
     )
-  ]
+  ],
+  args: {
+    size: 100
+  }
 }
 
 export default meta

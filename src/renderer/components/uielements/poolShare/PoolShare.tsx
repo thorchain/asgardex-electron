@@ -23,7 +23,7 @@ import { TooltipAddress } from '../common/Common.styles'
 import * as Styled from './PoolShare.styles'
 import { PoolShareCard } from './PoolShareCard'
 
-type Props = {
+export type Props = {
   asset: AssetWithDecimal
   runePrice: BaseAmount
   priceAsset?: Asset

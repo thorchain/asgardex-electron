@@ -19,7 +19,7 @@ import {
 } from '../HeaderMenu.styles'
 import * as Styled from './HeaderPriceSelector.styles'
 
-type Props = {
+export type Props = {
   isDesktopView: boolean
   assets: PricePoolAssets
   disabled?: boolean

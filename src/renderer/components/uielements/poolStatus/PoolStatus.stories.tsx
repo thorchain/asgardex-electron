@@ -1,19 +1,20 @@
-import React from 'react'
+import { ComponentMeta, StoryFn } from '@storybook/react'
+import { assetAmount, formatAssetAmountCurrency } from '@xchainjs/xchain-util'
 
-import { storiesOf } from '@storybook/react'
-import { bn, assetAmount, formatAssetAmountCurrency } from '@xchainjs/xchain-util'
+import { PoolStatus as Component, Props } from './PoolStatus'
 
-import { PoolStatus } from './PoolStatus'
+const Template: StoryFn<Props> = (args) => <Component {...args} />
+export const Default = Template.bind({})
 
-storiesOf('Components/PoolStatus', module).add('default', () => {
-  return (
-    <div style={{ display: 'flex', flexDirection: 'column', width: '250px' }}>
-      <PoolStatus
-        trend={bn(2.66)}
-        label="DEPTH"
-        displayValue={formatAssetAmountCurrency({ amount: assetAmount(12000) })}
-        fullValue={formatAssetAmountCurrency({ amount: assetAmount(12000) })}
-      />
-    </div>
-  )
-})
+const meta: ComponentMeta<typeof Component> = {
+  component: Component,
+  title: 'Components/PoolStatus',
+  args: {
+    label: 'Depth',
+    displayValue: formatAssetAmountCurrency({ amount: assetAmount(12000) }),
+    fullValue: formatAssetAmountCurrency({ amount: assetAmount(12000) }),
+    isLoading: false
+  }
+}
+
+export default meta

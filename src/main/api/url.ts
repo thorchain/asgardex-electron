@@ -3,7 +3,6 @@ import { shell } from 'electron'
 import { ApiUrl } from '../../shared/api/types'
 
 const EXTERNALS_WHITELIST = [
-  'thorchain.org',
   'thorchain.net',
   'testnet.thorchain.net',
   'docs.thorchain.org',
@@ -36,7 +35,6 @@ const EXTERNALS_WHITELIST = [
   'testnet.thornode.thorchain.info',
   'stagenet-thornode.ninerealms.com',
   'stagenet-rpc.ninerealms.com',
-  'finder.terra.money',
   'cosmos.bigdipper.live',
   'explorer.theta-testnet.polypore.xyz'
 ]

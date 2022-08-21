@@ -1,16 +1,13 @@
-import React from 'react'
-
-import { Story, Meta } from '@storybook/react'
+import { StoryFn, ComponentMeta } from '@storybook/react'
 import { AssetBNB } from '@xchainjs/xchain-util'
 
-import { AssetLabel } from './AssetLabel'
+import { AssetLabel as Component } from './AssetLabel'
 
-export const StoryAsset: Story = () => <AssetLabel asset={AssetBNB} />
-StoryAsset.storyName = 'asset'
+export const Default: StoryFn = () => <Component asset={AssetBNB} />
 
-const meta: Meta = {
-  component: AssetLabel,
-  title: 'Components/AssetLabel'
+const meta: ComponentMeta<typeof Component> = {
+  component: Component,
+  title: 'Components/Assets/AssetLabel'
 }
 
 export default meta

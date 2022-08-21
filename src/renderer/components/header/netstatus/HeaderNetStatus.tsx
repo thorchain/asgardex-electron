@@ -26,7 +26,7 @@ type MenuItem = {
   color: HeaderNetStatusColor
 }
 
-type Props = {
+export type Props = {
   isDesktopView: boolean
   midgardStatus: InboundAddressRD
   mimirStatus: MimirRD

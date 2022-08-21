@@ -1,136 +1,169 @@
 import { AssetBNB, AssetBTC, AssetETH, AssetRuneNative, baseAmount } from '@xchainjs/xchain-util'
-import { some, none } from 'fp-ts/lib/Option'
+import * as O from 'fp-ts/lib/Option'
 
 import { ASSETS_TESTNET } from '../../../shared/mock/assets'
 import { eqOWalletBalance, eqWalletBalances } from '../../helpers/fp/eq'
-import { KeystoreState, KeystoreContent } from './types'
+import { WalletBalances } from '../clients'
+import { KeystoreState } from './types'
 import {
-  getKeystoreContent,
-  hasKeystoreContent,
   hasImportedKeystore,
   isLocked,
   getPhrase,
   sortBalances,
   filterNullableBalances,
-  getBalanceByAsset
+  getBalanceByAsset,
+  getWalletName,
+  getLockedData,
+  getInitialKeystoreData
 } from './util'
 
 describe('services/wallet/util/', () => {
-  describe('getKeystoreContent', () => {
-    it('returns content of keystore state', () => {
-      const content: KeystoreContent = { phrase: 'any-phrase' }
-      const state: KeystoreState = some(some(content))
-      const result = getKeystoreContent(state)
-      expect(result).toEqual(some(content))
-    })
-    it('returns None if content is not available', () => {
-      const state: KeystoreState = some(none)
-      const result = getKeystoreContent(state)
-      expect(result).toBeNone()
-    })
-    it('returns None if keystore is not available', () => {
-      const result = getKeystoreContent(none)
-      expect(result).toBeNone()
-    })
-  })
+  const phrase = 'any-phrase'
+  const name = 'any-name'
+  const id = 1
+  const notImportedKeystore: KeystoreState = O.none
+  const lockedKeystore: KeystoreState = O.some({ id, name })
+  const unlockedKeystore: KeystoreState = O.some({ id, phrase, name })
 
   describe('getPhrase', () => {
-    it('returns phrase if available of keystore state', () => {
-      const phrase = 'any-phrase'
-      const content: KeystoreContent = { phrase }
-      const state: KeystoreState = some(some(content))
-      const result = getPhrase(state)
-      expect(result).toEqual(some(phrase))
+    it('returns phrase for unlocked keystore ', () => {
+      const result = getPhrase(unlockedKeystore)
+      expect(result).toEqual(O.some(phrase))
     })
-    it('returns None if content is not available', () => {
-      const state: KeystoreState = some(none)
-      const result = getPhrase(state)
+    it('returns None if its not imported', () => {
+      const result = getPhrase(notImportedKeystore)
       expect(result).toBeNone()
     })
-    it('returns None if keystore is not available', () => {
-      const result = getPhrase(none)
+    it('returns None if keystore is locked', () => {
+      const result = getPhrase(lockedKeystore)
       expect(result).toBeNone()
     })
   })
 
-  describe('hasKeystoreContent', () => {
-    it('returns true if content of keystore is available', () => {
-      const state: KeystoreState = some(some({ phrase: 'any-phrase' }))
-      const result = hasKeystoreContent(state)
-      expect(result).toBeTruthy()
+  describe('getWalletName', () => {
+    it('from unlocked keystore ', () => {
+      const result = getWalletName(unlockedKeystore)
+      expect(result).toEqual(O.some(name))
     })
-    it('returns false if content is not available', () => {
-      const state: KeystoreState = some(none)
-      const result = hasKeystoreContent(state)
-      expect(result).toBeFalsy()
+    it('from locked keystore', () => {
+      const result = getWalletName(lockedKeystore)
+      expect(result).toEqual(O.some(name))
     })
-    it('returns false if keystore is not available', () => {
-      const result = hasKeystoreContent(none)
-      expect(result).toBeFalsy()
+    it('None (not imported)', () => {
+      const result = getWalletName(notImportedKeystore)
+      expect(result).toBeNone()
+    })
+  })
+
+  describe('getLockedData', () => {
+    it('from unlocked keystore ', () => {
+      const result = getLockedData(unlockedKeystore)
+      expect(result).toEqual(O.some({ id, name }))
+    })
+    it('from locked keystore', () => {
+      const result = getLockedData(unlockedKeystore)
+      expect(result).toEqual(O.some({ id, name }))
+    })
+    it('None (not imported)', () => {
+      const result = getLockedData(notImportedKeystore)
+      expect(result).toBeNone()
     })
   })
 
   describe('hasImportedKeystore', () => {
-    it('returns true if keystore is available including its content', () => {
-      const state: KeystoreState = some(some({ phrase: 'any-phrase' }))
-      const result = hasImportedKeystore(state)
+    it('true for unlocked ', () => {
+      const result = hasImportedKeystore(unlockedKeystore)
       expect(result).toBeTruthy()
     })
-    it('returns true if keystore is available, but no content', () => {
-      const state: KeystoreState = some(none)
-      const result = hasImportedKeystore(state)
+    it('true for locked keystore', () => {
+      const result = hasImportedKeystore(lockedKeystore)
       expect(result).toBeTruthy()
     })
-    it('returns false if keystore is not available', () => {
-      const result = hasImportedKeystore(none)
+    it('false for not imported keystore', () => {
+      const result = hasImportedKeystore(notImportedKeystore)
       expect(result).toBeFalsy()
     })
   })
 
   describe('isLocked', () => {
-    it('returns false if keystore is available including its content', () => {
-      const state: KeystoreState = some(some({ phrase: 'any-phrase' }))
-      const result = isLocked(state)
+    it('false for unlocked keystore', () => {
+      const result = isLocked(unlockedKeystore)
       expect(result).toBeFalsy()
     })
-    it('returns true if keystore is available, but no content', () => {
-      const state: KeystoreState = some(none)
-      const result = isLocked(state)
+    it('true for locked keystore', () => {
+      const result = isLocked(lockedKeystore)
       expect(result).toBeTruthy()
     })
-    it('returns true if keystore is not available', () => {
-      const result = isLocked(none)
+    it('true if keystore is not available', () => {
+      const result = isLocked(notImportedKeystore)
       expect(result).toBeTruthy()
+    })
+  })
+
+  describe('getInitialKeystoreData', () => {
+    it('finds selected wallet', () => {
+      const result = getInitialKeystoreData([
+        { id: 0, name: 'name0', selected: false },
+        { id: 1, name: 'name1', selected: false },
+        { id: 2, name: 'name2', selected: true },
+        { id: 3, name: 'name3', selected: false }
+      ])
+      expect(result).toEqual(O.some({ id: 2, name: 'name2' }))
+    })
+
+    it('uses first wallet', () => {
+      const result = getInitialKeystoreData([
+        { id: 0, name: 'name0', selected: false },
+        { id: 1, name: 'name1', selected: false },
+        { id: 2, name: 'name2', selected: false },
+        { id: 3, name: 'name3', selected: false }
+      ])
+      expect(result).toEqual(O.some({ id: 0, name: 'name0' }))
+    })
+
+    it('empty list of wallet', () => {
+      const result = getInitialKeystoreData([])
+      expect(result).toBeNone()
     })
   })
 
   describe('filterNullableBalances', () => {
     it('should filter nullable balances', () => {
-      const target = [
+      const target: WalletBalances = [
         {
           asset: ASSETS_TESTNET.TOMO,
           amount: baseAmount(0),
-          walletAddress: 'ADDRESS_TOMO'
+          walletAddress: 'ADDRESS_TOMO',
+          walletIndex: 0,
+          walletType: 'keystore'
         },
         {
           asset: ASSETS_TESTNET.BOLT,
           amount: baseAmount(1),
-          walletAddress: 'ADDRESS_BOLT'
+          walletAddress: 'ADDRESS_BOLT',
+          walletIndex: 0,
+          walletType: 'keystore'
         },
         {
           asset: ASSETS_TESTNET.FTM,
           amount: baseAmount(0),
-          walletAddress: 'ADDRESS_FTM'
+          walletAddress: 'ADDRESS_FTM',
+          walletIndex: 0,
+          walletType: 'keystore'
         },
         {
           asset: AssetBNB,
           amount: baseAmount(2),
-          walletAddress: 'ADDRESS_BNB'
+          walletAddress: 'ADDRESS_BNB',
+          walletIndex: 0,
+          walletType: 'keystore'
         },
         {
           asset: AssetRuneNative,
           amount: baseAmount(0),
-          walletAddress: 'ADDRESS_RUNENATIVE'
+          walletAddress: 'ADDRESS_RUNENATIVE',
+          walletIndex: 0,
+          walletType: 'keystore'
         }
       ]
       const nullableBalances = filterNullableBalances(target)
@@ -140,31 +173,41 @@ describe('services/wallet/util/', () => {
 
   describe('sortBalances', () => {
     it('sorts balances based on orders', () => {
-      const target = [
+      const target: WalletBalances = [
         {
           asset: ASSETS_TESTNET.TOMO,
           amount: baseAmount(0),
-          walletAddress: 'ADDRESS_TOMO'
+          walletAddress: 'ADDRESS_TOMO',
+          walletIndex: 0,
+          walletType: 'keystore'
         },
         {
           asset: ASSETS_TESTNET.BOLT,
           amount: baseAmount(1),
-          walletAddress: 'ADDRESS_BOLT'
+          walletAddress: 'ADDRESS_BOLT',
+          walletIndex: 0,
+          walletType: 'keystore'
         },
         {
           asset: ASSETS_TESTNET.FTM,
           amount: baseAmount(0),
-          walletAddress: 'ADDRESS_FTM'
+          walletAddress: 'ADDRESS_FTM',
+          walletIndex: 0,
+          walletType: 'keystore'
         },
         {
           asset: AssetBNB,
           amount: baseAmount(2),
-          walletAddress: 'ADDRESS_BNB'
+          walletAddress: 'ADDRESS_BNB',
+          walletIndex: 0,
+          walletType: 'keystore'
         },
         {
           asset: AssetRuneNative,
           amount: baseAmount(0),
-          walletAddress: 'ADDRESS_RUNENATIVE'
+          walletAddress: 'ADDRESS_RUNENATIVE',
+          walletIndex: 0,
+          walletType: 'keystore'
         }
       ]
       const balances = sortBalances(target, [AssetBTC.ticker, AssetETH.ticker, AssetRuneNative.ticker, AssetBNB.ticker])
@@ -174,40 +217,54 @@ describe('services/wallet/util/', () => {
 
   describe('getBalanceByAsset', () => {
     it('get balance by asset', () => {
-      const balanceByAsset = getBalanceByAsset(AssetBNB)([
+      const walletBalances: WalletBalances = [
         {
           asset: ASSETS_TESTNET.TOMO,
           amount: baseAmount(0),
-          walletAddress: 'ADDRESS_TOMO'
+          walletAddress: 'ADDRESS_TOMO',
+          walletIndex: 0,
+          walletType: 'keystore'
         },
         {
           asset: ASSETS_TESTNET.BOLT,
           amount: baseAmount(1),
-          walletAddress: 'ADDRESS_BOLT'
+          walletAddress: 'ADDRESS_BOLT',
+          walletIndex: 0,
+          walletType: 'keystore'
         },
         {
           asset: ASSETS_TESTNET.FTM,
           amount: baseAmount(0),
-          walletAddress: 'ADDRESS_FTM'
+          walletAddress: 'ADDRESS_FTM',
+          walletIndex: 0,
+          walletType: 'keystore'
         },
         {
           asset: AssetBNB,
           amount: baseAmount(2),
-          walletAddress: 'ADDRESS_BNB'
+          walletAddress: 'ADDRESS_BNB',
+          walletIndex: 0,
+          walletType: 'keystore'
         },
         {
           asset: AssetRuneNative,
           amount: baseAmount(0),
-          walletAddress: 'ADDRESS_RUNENATIVE'
+          walletAddress: 'ADDRESS_RUNENATIVE',
+          walletIndex: 0,
+          walletType: 'keystore'
         }
-      ])
+      ]
+
+      const balanceByAsset = getBalanceByAsset(AssetBNB)(walletBalances)
       expect(
         eqOWalletBalance.equals(
           balanceByAsset,
-          some({
+          O.some({
             asset: AssetBNB,
             amount: baseAmount(2),
-            walletAddress: 'ADDRESS_BNB'
+            walletAddress: 'ADDRESS_BNB',
+            walletIndex: 0,
+            walletType: 'keystore'
           })
         )
       ).toBeTruthy()

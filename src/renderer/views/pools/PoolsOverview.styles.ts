@@ -56,12 +56,6 @@ export const TableAction = styled.div`
   }
 `
 
-export const ActionColumn = styled.div`
-  display: flex;
-  align-items: center;
-  justify-content: center;
-`
-
 export const BlockLeftLabel = styled(UILabel)`
   display: inline-block;
   width: 100px;

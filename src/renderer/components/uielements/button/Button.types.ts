@@ -17,3 +17,8 @@ export type ComponentProps = {
 }
 
 export type ButtonProps = ComponentProps & AB.ButtonProps
+
+// Tailwind based button types
+export type Size = 'small' | 'medium' | 'normal' | 'large'
+export type Font = 'normal' | 'semi' | 'bold'
+export type Color = 'primary' | 'warning' | 'error' | 'neutral'

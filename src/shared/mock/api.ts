@@ -1,69 +1,17 @@
-import { Keystore } from '@xchainjs/xchain-crypto'
 import * as E from 'fp-ts/Either'
 
 import { PoolsStorageEncoded } from '../api/io'
-import { ApiLang, ApiKeystore, ApiUrl, ApiHDWallet, UserNodesStorage } from '../api/types'
+import { ApiLang, ApiKeystore, ApiUrl, ApiHDWallet, UserNodesStorage, IPCExportKeystoreParams } from '../api/types'
 import { ApiFileStoreService, CommonStorage } from '../api/types'
 import { Locale } from '../i18n/types'
+import { MOCK_KEYSTORE } from './wallet'
 
 // Mock "empty" `apiKeystore`
 export const apiKeystore: ApiKeystore = {
-  save: (_: Keystore) => Promise.resolve(),
-  remove: () => Promise.resolve(),
-  get: () =>
-    Promise.resolve({
-      address: '',
-      publickeys: {
-        ed25519: null,
-        secp256k1: null
-      },
-      crypto: {
-        cipher: '',
-        ciphertext: '',
-        cipherparams: {
-          iv: ''
-        },
-        kdf: '',
-        kdfparams: {
-          prf: '',
-          dklen: 0,
-          salt: '',
-          c: 0
-        },
-        mac: ''
-      },
-      id: '',
-      version: 0,
-      meta: ''
-    }),
-  exists: () => Promise.resolve(true),
-  export: () => Promise.resolve(),
-  load: () =>
-    Promise.resolve({
-      address: '',
-      publickeys: {
-        ed25519: null,
-        secp256k1: null
-      },
-      crypto: {
-        cipher: '',
-        ciphertext: '',
-        cipherparams: {
-          iv: ''
-        },
-        kdf: '',
-        kdfparams: {
-          prf: '',
-          dklen: 0,
-          salt: '',
-          c: 0
-        },
-        mac: ''
-      },
-      id: '',
-      version: 0,
-      meta: ''
-    })
+  saveKeystoreWallets: (_) => Promise.resolve(E.right([])),
+  exportKeystore: (_: IPCExportKeystoreParams) => Promise.resolve(),
+  load: () => Promise.resolve(MOCK_KEYSTORE),
+  initKeystoreWallets: () => Promise.resolve(E.right([]))
 }
 
 // Mock `apiLang`

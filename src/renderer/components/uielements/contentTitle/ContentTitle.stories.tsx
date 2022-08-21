@@ -1,9 +1,16 @@
-import React from 'react'
+import { ComponentMeta, StoryFn } from '@storybook/react'
 
-import { storiesOf } from '@storybook/react'
+import { ContentTitle as Component, Props } from './ContentTitle'
 
-import { ContentTitle } from './ContentTitle'
+const Template: StoryFn<Props> = (args) => <Component {...args} />
+export const Default = Template.bind({})
 
-storiesOf('Components/ContentTitle', module).add('default', () => {
-  return <ContentTitle>you are swapping</ContentTitle>
-})
+const meta: ComponentMeta<typeof Component> = {
+  component: Component,
+  title: 'Components/ContentTitle',
+  args: {
+    children: 'you are swapping'
+  }
+}
+
+export default meta

@@ -1,7 +1,5 @@
-import React from 'react'
-
 import * as RD from '@devexperts/remote-data-ts'
-import { Story, Meta } from '@storybook/react'
+import { ComponentMeta } from '@storybook/react'
 import { Chain } from '@xchainjs/xchain-util'
 import * as Rx from 'rxjs'
 
@@ -28,7 +26,7 @@ const validatePasswordRD = (variants: 'initial' | 'pending' | 'failure' | 'succe
       return RD.initial
   }
 }
-const Template: Story<Args> = ({ validatePwVariant }) => {
+const Template = ({ validatePwVariant }: Args) => {
   return (
     <WalletPasswordConfirmationModal
       onClose={() => console.log('onClose')}
@@ -44,8 +42,8 @@ const Template: Story<Args> = ({ validatePwVariant }) => {
 
 export const Default = Template.bind({})
 
-const meta: Meta<Args> = {
-  component: WalletPasswordConfirmationModal,
+const meta: ComponentMeta<typeof Template> = {
+  component: Template,
   title: 'Components/Modal/WalletPasswordConfirmation',
   argTypes: {
     validatePwVariant: {
@@ -58,14 +56,14 @@ const meta: Meta<Args> = {
     }
   },
   decorators: [
-    (S: Story) => (
+    (Story) => (
       <div
         style={{
           display: 'flex',
           flexDirection: 'column',
           width: '300px'
         }}>
-        <S />
+        <Story />
       </div>
     )
   ]

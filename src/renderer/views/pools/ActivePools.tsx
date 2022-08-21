@@ -15,7 +15,7 @@ import { useNavigate } from 'react-router-dom'
 import { Network } from '../../../shared/api/types'
 import { ManageButton } from '../../components/manageButton'
 import { ProtocolLimit, IncentivePendulum } from '../../components/pool'
-import { Button } from '../../components/uielements/button'
+import { FlatButton } from '../../components/uielements/button'
 import { Table } from '../../components/uielements/table'
 import { useAppContext } from '../../contexts/AppContext'
 import { useMidgardContext } from '../../contexts/MidgardContext'
@@ -94,14 +94,13 @@ export const ActivePools: React.FC<PoolsComponentProps> = ({ haltedChains, mimir
           <ManageButton
             disabled={disableAllPoolActions || disablePoolActions || walletLocked}
             asset={pool.target}
-            sizevalue={isDesktopView ? 'normal' : 'small'}
+            size={isDesktopView ? 'normal' : 'large'}
             isTextView={isDesktopView}
           />
-          <Button
-            round="true"
-            sizevalue={isDesktopView ? 'normal' : 'small'}
+          <FlatButton
+            className="ml-10px"
+            size={isDesktopView ? 'normal' : 'large'}
             disabled={disableAllPoolActions || disableTradingActions}
-            style={{ height: 30 }}
             onClick={(event) => {
               event.preventDefault()
               event.stopPropagation()
@@ -110,9 +109,9 @@ export const ActivePools: React.FC<PoolsComponentProps> = ({ haltedChains, mimir
                 target: assetToString(pool.target)
               })
             }}>
-            <SwapOutlined />
+            <SwapOutlined className="lg:mr-[8px]" />
             {isDesktopView && intl.formatMessage({ id: 'common.swap' })}
-          </Button>
+          </FlatButton>
         </Styled.TableAction>
       )
     },
@@ -123,11 +122,15 @@ export const ActivePools: React.FC<PoolsComponentProps> = ({ haltedChains, mimir
   const btnPoolsColumn = useMemo(
     () => ({
       key: 'btn',
-      title: Shared.renderRefreshBtnColTitle(intl.formatMessage({ id: 'common.refresh' }), refreshHandler),
+      title: Shared.renderRefreshBtnColTitle({
+        title: intl.formatMessage({ id: 'common.refresh' }),
+        clickHandler: refreshHandler,
+        iconOnly: !isDesktopView
+      }),
       width: 280,
       render: renderBtnPoolsColumn
     }),
-    [refreshHandler, intl, renderBtnPoolsColumn]
+    [refreshHandler, intl, renderBtnPoolsColumn, isDesktopView]
   )
 
   const renderVolumeColumn = useCallback(

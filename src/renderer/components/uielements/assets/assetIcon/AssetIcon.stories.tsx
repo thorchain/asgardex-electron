@@ -1,53 +1,37 @@
-import React from 'react'
-
-// TODO (@veado) Replace knobs
-// import { radios } from '@storybook/addon-knobs'
-// import { RadiosTypeOptionsProp } from '@storybook/addon-knobs/dist/components/types'
-import { storiesOf } from '@storybook/react'
+import { ComponentMeta, StoryFn } from '@storybook/react'
 import { AssetBCH, AssetBNB, AssetBTC, AssetETH, AssetRuneNative } from '@xchainjs/xchain-util'
 
-import { ASSETS_MAINNET, ASSETS_TESTNET, ERC20_MAINNET, ERC20_TESTNET } from '../../../../../shared/mock/assets'
-import { AssetIcon } from './AssetIcon'
-import { Size } from './AssetIcon.types'
+import * as AT from '../../../../storybook/argTypes'
+import { AssetIcon as Component, ComponentProps } from './AssetIcon'
 
-storiesOf('Components/assets/AssetIcon', module).add('default', () => {
-  // const sizeOptions: RadiosTypeOptionsProp<Size> = {
-  //   small: 'small',
-  //   normal: 'normal',
-  //   large: 'large',
-  //   big: 'big'
-  // }
+const Template: StoryFn<ComponentProps> = (args) => <Component {...args} />
+export const Default = Template.bind({})
 
-  // const size = radios('size', sizeOptions, 'small')
-  const size: Size = 'normal'
+const meta: ComponentMeta<typeof Component> = {
+  component: Component,
+  title: 'Components/Assets/AssetIcon',
+  argTypes: {
+    network: AT.network,
+    size: {
+      name: 'size',
+      control: {
+        type: 'select',
+        options: ['small', 'normal', 'large', 'big']
+      }
+    },
+    asset: {
+      name: 'asset',
+      options: ['RUNE', 'BTC', 'BNB', 'ETH', 'BCH'],
+      mapping: {
+        RUNE: AssetRuneNative,
+        BTC: AssetBTC,
+        BNB: AssetBNB,
+        BCH: AssetBCH,
+        ETH: AssetETH
+      }
+    }
+  },
+  args: { network: 'mainnet', asset: AssetBTC, size: 'normal' }
+}
 
-  return (
-    <div>
-      <div style={{ display: 'flex' }}>
-        <AssetIcon asset={AssetBTC} size={size} network="mainnet" />
-        <AssetIcon asset={AssetBCH} size={size} network="mainnet" />
-        <AssetIcon asset={AssetBNB} size={size} network="mainnet" />
-        <AssetIcon asset={ASSETS_MAINNET.BOLT} size={size} network="mainnet" />
-        <AssetIcon asset={ASSETS_MAINNET.FTM} size={size} network="mainnet" />
-        <AssetIcon asset={ASSETS_MAINNET.TOMO} size={size} network="mainnet" />
-        <AssetIcon asset={AssetETH} size={size} network="mainnet" />
-        <AssetIcon asset={ERC20_MAINNET.USDT} size={size} network="mainnet" />
-        <AssetIcon asset={ERC20_MAINNET.RUNE} size={size} network="mainnet" />
-        <AssetIcon asset={AssetRuneNative} size={size} network="mainnet" />
-      </div>
-
-      <div style={{ display: 'flex' }}>
-        <AssetIcon asset={AssetBTC} size={size} network="testnet" />
-        <AssetIcon asset={AssetBCH} size={size} network="testnet" />
-        <AssetIcon asset={AssetBNB} size={size} network="testnet" />
-        <AssetIcon asset={ASSETS_TESTNET.BOLT} size={size} network="testnet" />
-        <AssetIcon asset={ASSETS_TESTNET.FTM} size={size} network="testnet" />
-        <AssetIcon asset={ASSETS_TESTNET.TOMO} size={size} network="testnet" />
-        <AssetIcon asset={AssetETH} size={size} network="testnet" />
-        <AssetIcon asset={ERC20_TESTNET.USDT} size={size} network="testnet" />
-        <AssetIcon asset={ERC20_TESTNET.RUNE} size={size} network="testnet" />
-        <AssetIcon asset={AssetRuneNative} size={size} network="testnet" />
-      </div>
-    </div>
-  )
-})
+export default meta

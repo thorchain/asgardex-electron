@@ -6,7 +6,10 @@ const cracoConfig = require('./craco.config.js')
 
 let jestConfig = createJestConfig(cracoConfig)
 // Add `crypto` to avoid  "Crypto module not found" errors after adding `terra.js`
-jestConfig = { ...jestConfig, globals: { ...jestConfig.globals, crypto: require('crypto') } }
+jestConfig = {
+  ...jestConfig,
+  globals: { ...jestConfig.globals, crypto: require('crypto') }
+}
 
 // console.log('jestConfig:', JSON.stringify(jestConfig, null, 2))
 

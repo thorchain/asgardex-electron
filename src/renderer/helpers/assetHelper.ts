@@ -1,7 +1,6 @@
 import { Address } from '@xchainjs/xchain-client'
 import { AssetAtom } from '@xchainjs/xchain-cosmos'
 import { ETHAddress, getTokenAddress } from '@xchainjs/xchain-ethereum'
-import { AssetLUNA } from '@xchainjs/xchain-terra'
 import {
   Asset,
   assetAmount,
@@ -32,7 +31,6 @@ import * as S from 'fp-ts/lib/string'
 import { Network } from '../../shared/api/types'
 import {
   AssetTGTERC20,
-  AssetUST,
   AssetXRune,
   AssetXRuneTestnet,
   BinanceBlackList,
@@ -123,16 +121,6 @@ export const isEthAsset = (asset: Asset): boolean => eqAsset.equals(asset, Asset
  * Check whether an asset is a DOGE asset
  */
 export const isDogeAsset = (asset: Asset): boolean => eqAsset.equals(asset, AssetDOGE)
-
-/**
- * Check whether an asset is a LUNA asset
- */
-export const isLunaAsset = (asset: Asset): boolean => eqAsset.equals(asset, AssetLUNA)
-
-/**
- * Check whether an asset is a UST (Terra) asset
- */
-export const isUstAsset = (asset: Asset): boolean => eqAsset.equals(asset, AssetUST)
 
 /**
  * Check whether an asset is a ATOM asset

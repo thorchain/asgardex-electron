@@ -1,3 +1,7 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
 /*
 Since `createGlobalStyle` of `styled-components` re-loads fonts in some cases (and for unknown reasons),
 which ends up in flickering texts, we do defined all fonts and other "global" styles here
@@ -7,7 +11,7 @@ which ends up in flickering texts, we do defined all fonts and other "global" st
   font-family: 'MainFontRegular';
   font-style: normal;
   font-weight: normal;
-  src: local('MainFontBold'), url(./assets/fonts/Exo2-Regular.otf) format('opentype');
+  src: local('MainFontRegular'), url(./assets/fonts/Exo2-Regular.otf) format('opentype');
 }
 @font-face {
   font-family: 'MainFontBold';
@@ -34,4 +38,11 @@ body {
 */
 [ant-click-animating-without-extra-node='true']::after {
   display: none !important;
+}
+
+@layer components {
+  /* similar to antds `Card`  */
+  .card {
+    @apply rounded-[5px] border border-solid border-gray0 bg-bg0 p-[24px] dark:border-gray0d dark:bg-bg0d;
+  }
 }
