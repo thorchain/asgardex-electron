@@ -15,8 +15,8 @@ import {
   resetTx,
   subscribeTx,
   interact$,
-  getNodeInfo$,
-  reloadNodesInfo,
+  getNodeInfos$,
+  reloadNodeInfos,
   explorerUrl$,
   mimir$,
   reloadMimir,
@@ -39,9 +39,9 @@ export type ThorchainContextValue = {
   sendTx: typeof sendTx
   txRD$: typeof txRD$
   interact$: typeof interact$
-  getNodeInfo$: typeof getNodeInfo$
+  getNodeInfos$: typeof getNodeInfos$
   explorerUrl$: typeof explorerUrl$
-  reloadNodesInfo: typeof reloadNodesInfo
+  reloadNodeInfos: typeof reloadNodeInfos
   mimir$: typeof mimir$
   reloadMimir: typeof reloadMimir
   getLiquidityProviders: typeof getLiquidityProviders
@@ -63,9 +63,9 @@ const initialContext: ThorchainContextValue = {
   reloadFees,
   fees$,
   interact$,
-  getNodeInfo$,
+  getNodeInfos$,
   explorerUrl$,
-  reloadNodesInfo,
+  reloadNodeInfos,
   mimir$,
   reloadMimir,
   getLiquidityProviders,

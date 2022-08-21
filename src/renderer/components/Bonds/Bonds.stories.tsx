@@ -1,42 +1,23 @@
+import * as RD from '@devexperts/remote-data-ts'
 import { useCallback, useState } from '@storybook/addons'
 import { ComponentMeta, StoryFn } from '@storybook/react'
 import { Address } from '@xchainjs/xchain-client'
 import { baseAmount } from '@xchainjs/xchain-util'
 
-import { getMockRDValueFactory } from '../../../shared/mock/rdByStatus'
 import { AddressValidation } from '../../services/clients'
-import { NodeInfo } from '../../services/thorchain/types'
 import { NodeStatusEnum } from '../../types/generated/thornode'
 import { Bonds as Component } from './Bonds'
 
-const getMockRDValue = getMockRDValueFactory<Error, NodeInfo>(
-  () => ({
-    bond: baseAmount(100000000 * 40000000),
-    award: baseAmount(100000000 * 400000),
-    status: NodeStatusEnum.Active
-  }),
-  () => Error('error message')
-)
-
+const mockNodeInfo = (address: Address) => ({
+  bond: baseAmount(100000000 * 40000000),
+  award: baseAmount(100000000 * 400000),
+  status: NodeStatusEnum.Active,
+  address
+})
 const addressValidation: AddressValidation = (_) => true
 
 export const Default: StoryFn = () => {
   const [nodesList, setNodesList] = useState<Address[]>([])
-
-  // const nodesSelect: Record<Address, RDStatus> = nodesList
-  //   .map((node) =>
-  //     select(
-  //       node,
-  //       {
-  //         initial: 'initial',
-  //         pending: 'pending',
-  //         error: 'error',
-  //         success: 'success'
-  //       },
-  //       'pending'
-  //     )
-  //   )
-  //   .reduce((acc, node, index) => ({ ...acc, [index]: node }), {})
 
   const removeNode = useCallback(
     (node: Address) => {
@@ -53,11 +34,8 @@ export const Default: StoryFn = () => {
       addNode={addNode}
       removeNode={removeNode}
       goToNode={(node) => console.log('go to ', node)}
-      nodes={nodesList.map((node, _index) => ({
-        nodeAddress: node,
-        // data: getMockRDValue(nodesSelect[index])
-        data: getMockRDValue()
-      }))}
+      reloadNodeInfos={() => console.log('reloadNodeInfos')}
+      nodes={RD.success(nodesList.map((address) => mockNodeInfo(address)))}
     />
   )
 }

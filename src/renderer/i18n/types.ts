@@ -262,6 +262,7 @@ type BondsMessageKey =
   | 'bonds.status.whitelisted'
   | 'bonds.status.unknown'
   | 'bonds.node.add'
+  | 'bonds.nodes.error'
   | 'bonds.node.enterMessage'
   | 'bonds.node.removeMessage'
   | 'bonds.validations.nodeAlreadyAdded'

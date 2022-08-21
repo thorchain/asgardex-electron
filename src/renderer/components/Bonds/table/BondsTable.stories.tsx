@@ -1,70 +1,26 @@
 import React, { useCallback, useState } from 'react'
 
-// TODO (@veado) Replace knobs
-// import { withKnobs, select } from '@storybook/addon-knobs'
 import { Meta, Story } from '@storybook/react'
 import { Address } from '@xchainjs/xchain-client'
 import { baseAmount } from '@xchainjs/xchain-util'
 
-import { getMockRDValueFactory, RDStatus } from '../../../../shared/mock/rdByStatus'
-import { NodeInfo } from '../../../services/thorchain/types'
 import { NodeStatusEnum } from '../../../types/generated/thornode'
 import { BondsTable } from './BondsTable'
 
-const getMockRDValue = getMockRDValueFactory<Error, NodeInfo>(
-  () => ({
-    bond: baseAmount(100000000 * 40000000),
-    award: baseAmount(100000000 * 400000),
-    status: NodeStatusEnum.Active
-  }),
-  () => Error('error message')
-)
+const mockNodeInfo = (address: Address) => ({
+  bond: baseAmount(100000000 * 40000000),
+  award: baseAmount(100000000 * 400000),
+  status: NodeStatusEnum.Active,
+  address
+})
 
 export const Default: Story = () => {
-  // const firstNodeRdKnob: RDStatus = select(
-  //   'first node',
-  //   {
-  //     initial: 'initial',
-  //     pending: 'pending',
-  //     error: 'error',
-  //     success: 'success'
-  //   },
-  //   'initial'
-  // )
-
-  // const secondNodeRdKnob: RDStatus = select(
-  //   'second node',
-  //   {
-  //     initial: 'initial',
-  //     pending: 'pending',
-  //     error: 'error',
-  //     success: 'success'
-  //   },
-  //   'initial'
-  // )
-
-  // const thirdNodeRdKnob: RDStatus = select(
-  //   'third node',
-  //   {
-  //     initial: 'initial',
-  //     pending: 'pending',
-  //     error: 'error',
-  //     success: 'success'
-  //   },
-  //   'success'
-  // )
-
   // const nodesSelect: Record<Address, RDStatus> = {
   //   thor1766mazrxs5asuscepa227r6ekr657234f8p7nf: firstNodeRdKnob,
   //   thor1766mazrxs5asuscepa227r6ekr657234f9asda: secondNodeRdKnob,
   //   thor1766mazrxs5asuscepa227r6ekr657234fkswjh: thirdNodeRdKnob
   // }
 
-  const nodesSelect: Record<Address, RDStatus> = {
-    thor1766mazrxs5asuscepa227r6ekr657234f8p7nf: 'initial',
-    thor1766mazrxs5asuscepa227r6ekr657234f9asda: 'pending',
-    thor1766mazrxs5asuscepa227r6ekr657234fkswjh: 'success'
-  }
   const [nodesList, setNodesList] = useState<Address[]>([
     'thor1766mazrxs5asuscepa227r6ekr657234f8p7nf',
     'thor1766mazrxs5asuscepa227r6ekr657234f9asda',
@@ -83,12 +39,7 @@ export const Default: Story = () => {
       network={'testnet'}
       removeNode={removeNode}
       goToNode={(node) => console.log('go to ', node)}
-      nodes={nodesList
-        .filter((node) => !!nodesSelect[node])
-        .map((node) => ({
-          nodeAddress: node,
-          data: getMockRDValue(nodesSelect[node])
-        }))}
+      nodes={nodesList.map((address) => mockNodeInfo(address))}
     />
   )
 }
