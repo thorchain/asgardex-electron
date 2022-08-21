@@ -1,19 +1,30 @@
 import * as RD from '@devexperts/remote-data-ts'
-import { Client, getChainId } from '@xchainjs/xchain-thorchain'
+import { Client, ClientUrl, getChainId } from '@xchainjs/xchain-thorchain'
 import { THORChain } from '@xchainjs/xchain-util'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
 import * as Rx from 'rxjs'
 import * as RxOp from 'rxjs/operators'
 
-import { getClientUrl } from '../../../shared/thorchain/client'
+import { Network } from '../../../shared/api/types'
+import { toClientNetwork } from '../../../shared/utils/client'
 import { isError } from '../../../shared/utils/guard'
+import { observableState } from '../../helpers/stateHelper'
 import { clientNetwork$ } from '../app/service'
 import * as C from '../clients'
 import { keystoreService } from '../wallet/keystore'
 import { getPhrase } from '../wallet/util'
-import { INITIAL_CHAIN_IDS } from './const'
-import { Client$, ClientState, ClientState$ } from './types'
+import { INITIAL_CHAIN_IDS, INITIAL_CLIENT_URL } from './const'
+import { Client$, ClientState, ClientState$, NodeUrlType } from './types'
+
+const { get$: clientUrl$, get: getClientUrl, set: _setClientUrl } = observableState<ClientUrl>(INITIAL_CLIENT_URL)
+
+const setClientUrl = ({ url, network, type }: { url: string; network: Network; type: NodeUrlType }) => {
+  // TODO(@veado) Store data persistent on disc
+  const current = getClientUrl()
+  const cNetwork = toClientNetwork(network)
+  _setClientUrl({ ...current, [cNetwork]: { ...[cNetwork], [type]: url } })
+}
 
 /**
  * Stream to create an observable `ThorchainClient` depending on existing phrase in keystore
@@ -23,7 +34,7 @@ import { Client$, ClientState, ClientState$ } from './types'
  * A `ThorchainClient` will never be created as long as no phrase is available
  */
 const clientState$: ClientState$ = FP.pipe(
-  Rx.combineLatest([keystoreService.keystoreState$, clientNetwork$, Rx.of(getClientUrl())]),
+  Rx.combineLatest([keystoreService.keystoreState$, clientNetwork$, clientUrl$]),
   RxOp.switchMap(
     ([keystore, network, clientUrl]): ClientState$ =>
       FP.pipe(
@@ -78,4 +89,4 @@ const addressUI$: C.WalletAddress$ = C.addressUI$(client$, THORChain)
  */
 const explorerUrl$: C.ExplorerUrl$ = C.explorerUrl$(client$)
 
-export { client$, clientState$, address$, addressUI$, explorerUrl$ }
+export { client$, clientState$, clientUrl$, setClientUrl, address$, addressUI$, explorerUrl$ }

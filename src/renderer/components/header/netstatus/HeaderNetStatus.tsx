@@ -9,7 +9,7 @@ import { useIntl } from 'react-intl'
 
 import { useAppContext } from '../../../contexts/AppContext'
 import { OnlineStatus } from '../../../services/app/types'
-import { InboundAddressRD } from '../../../services/midgard/types'
+import { InboundAddressRD, MidgardUrlRD } from '../../../services/midgard/types'
 import { MimirRD } from '../../../services/thorchain/types'
 import { DownIcon } from '../../icons'
 import { ConnectionStatus } from '../../shared/icons/ConnectionStatus'
@@ -30,8 +30,9 @@ export type Props = {
   isDesktopView: boolean
   midgardStatus: InboundAddressRD
   mimirStatus: MimirRD
-  midgardUrl: RD.RemoteData<Error, string>
-  thorchainUrl: string
+  midgardUrl: MidgardUrlRD
+  thorchainNodeUrl: string
+  thorchainRpcUrl: string
 }
 
 export const HeaderNetStatus: React.FC<Props> = (props): JSX.Element => {
@@ -40,21 +41,10 @@ export const HeaderNetStatus: React.FC<Props> = (props): JSX.Element => {
     midgardStatus: midgardStatusRD,
     mimirStatus: mimirStatusRD,
     midgardUrl: midgardUrlRD,
-    thorchainUrl
+    thorchainNodeUrl,
+    thorchainRpcUrl
   } = props
   const intl = useIntl()
-
-  const midgardUrl = useMemo(() => {
-    return FP.pipe(
-      midgardUrlRD,
-      RD.fold(
-        () => '',
-        () => '',
-        () => '',
-        (url) => url
-      )
-    )
-  }, [midgardUrlRD])
 
   const prevMidgardStatus = useRef<OnlineStatus>(OnlineStatus.OFF)
   const midgardStatus: OnlineStatus = useMemo(
@@ -108,6 +98,11 @@ export const HeaderNetStatus: React.FC<Props> = (props): JSX.Element => {
 
   const menuItems = useMemo((): MenuItem[] => {
     const notConnectedTxt = intl.formatMessage({ id: 'setting.notconnected' })
+    const midgardUrl = FP.pipe(
+      midgardUrlRD,
+      RD.getOrElse(() => '')
+    )
+
     return [
       {
         key: 'midgard',
@@ -124,9 +119,21 @@ export const HeaderNetStatus: React.FC<Props> = (props): JSX.Element => {
       {
         key: 'thorchain',
         headline: 'Thorchain API',
-        url: `${thorchainUrl}/thorchain/doc/`,
+        url: `${thorchainNodeUrl}/thorchain/doc/`,
         subheadline: headerNetStatusSubheadline({
-          url: O.some(thorchainUrl),
+          url: O.some(thorchainNodeUrl),
+          onlineStatus: onlineStatus,
+          clientStatus: thorchainStatus,
+          notConnectedTxt
+        }),
+        color: headerNetStatusColor({ onlineStatus: onlineStatus, clientStatus: thorchainStatus })
+      },
+      {
+        key: 'thorchain-rpc',
+        headline: 'Thorchain RPC',
+        url: `${thorchainRpcUrl}`,
+        subheadline: headerNetStatusSubheadline({
+          url: O.some(thorchainRpcUrl),
           onlineStatus: onlineStatus,
           clientStatus: thorchainStatus,
           notConnectedTxt
@@ -134,7 +141,7 @@ export const HeaderNetStatus: React.FC<Props> = (props): JSX.Element => {
         color: headerNetStatusColor({ onlineStatus: onlineStatus, clientStatus: thorchainStatus })
       }
     ]
-  }, [intl, midgardStatus, midgardUrl, onlineStatus, thorchainStatus, thorchainUrl])
+  }, [intl, midgardUrlRD, thorchainNodeUrl, thorchainRpcUrl, onlineStatus, midgardStatus, thorchainStatus])
 
   const desktopMenu = useMemo(() => {
     return (
@@ -148,8 +155,8 @@ export const HeaderNetStatus: React.FC<Props> = (props): JSX.Element => {
                   <ConnectionStatus color={color} />
                 </Col>
                 <Col span={20}>
-                  <Styled.MenuItemHeadline>{headline}</Styled.MenuItemHeadline>
-                  <Styled.MenuItemSubHeadline>{subheadline}</Styled.MenuItemSubHeadline>
+                  <Styled.MenuItemHeadline nowrap>{headline}</Styled.MenuItemHeadline>
+                  <Styled.MenuItemSubHeadline nowrap>{subheadline}</Styled.MenuItemSubHeadline>
                 </Col>
               </Row>
             </Menu.Item>
@@ -169,8 +176,8 @@ export const HeaderNetStatus: React.FC<Props> = (props): JSX.Element => {
           </Row>
           <Row>
             <Col>
-              <Styled.MenuItemHeadline>{headline}</Styled.MenuItemHeadline>
-              <Styled.MenuItemSubHeadline>{subheadline}</Styled.MenuItemSubHeadline>
+              <Styled.MenuItemHeadline nowrap>{headline}</Styled.MenuItemHeadline>
+              <Styled.MenuItemSubHeadline nowrap>{subheadline}</Styled.MenuItemSubHeadline>
             </Col>
           </Row>
         </HeaderDrawerItem>

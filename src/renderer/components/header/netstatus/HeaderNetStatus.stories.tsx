@@ -13,8 +13,9 @@ const meta: ComponentMeta<typeof Component> = {
   args: {
     midgardStatus: RD.initial,
     mimirStatus: RD.initial,
-    midgardUrl: RD.initial,
-    thorchainUrl: 'thorchain-url',
+    midgardUrl: RD.success('midgard-url'),
+    thorchainNodeUrl: 'thorchain-node-url',
+    thorchainRpcUrl: 'thorchain-rpc-url',
     isDesktopView: false
   }
 }

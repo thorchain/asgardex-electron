@@ -58,7 +58,8 @@ export type Props = {
   inboundAddresses: InboundAddressRD
   mimir: MimirRD
   midgardUrl: MidgardUrlRD
-  thorchainUrl: string
+  thorchainNodeUrl: string
+  thorchainRpcUrl: string
 }
 
 export const HeaderComponent: React.FC<Props> = (props): JSX.Element => {
@@ -75,8 +76,9 @@ export const HeaderComponent: React.FC<Props> = (props): JSX.Element => {
     selectedPricePoolAsset: oSelectedPricePoolAsset,
     lockHandler,
     setSelectedPricePool,
-    midgardUrl,
-    thorchainUrl
+    midgardUrl: midgardUrlRD,
+    thorchainNodeUrl,
+    thorchainRpcUrl
   } = props
 
   const intl = useIntl()
@@ -251,11 +253,12 @@ export const HeaderComponent: React.FC<Props> = (props): JSX.Element => {
         isDesktopView={isDesktopView}
         midgardStatus={inboundAddressRD}
         mimirStatus={mimirRD}
-        midgardUrl={midgardUrl}
-        thorchainUrl={thorchainUrl}
+        midgardUrl={midgardUrlRD}
+        thorchainNodeUrl={thorchainNodeUrl}
+        thorchainRpcUrl={thorchainRpcUrl}
       />
     ),
-    [inboundAddressRD, isDesktopView, midgardUrl, mimirRD, thorchainUrl]
+    [inboundAddressRD, isDesktopView, midgardUrlRD, mimirRD, thorchainNodeUrl, thorchainRpcUrl]
   )
 
   const iconStyle = { fontSize: '1.5em', marginRight: '20px' }

@@ -1,6 +1,6 @@
 import * as RD from '@devexperts/remote-data-ts'
 import { TxHash } from '@xchainjs/xchain-client'
-import { DepositParam } from '@xchainjs/xchain-thorchain'
+import { ClientUrl, DepositParam } from '@xchainjs/xchain-thorchain'
 import { THORChain } from '@xchainjs/xchain-util'
 import * as E from 'fp-ts/lib/Either'
 import * as FP from 'fp-ts/lib/function'
@@ -21,17 +21,23 @@ import { retryRequest } from '../../helpers/rx/retryRequest'
 import { Network$ } from '../app/types'
 import * as C from '../clients'
 import { TxHashLD, ErrorId } from '../wallet/types'
-import { Client$, SendTxParams } from './types'
+import { Client$, ClientUrl$, SendTxParams } from './types'
 import { TransactionService } from './types'
 
-export const createTransactionService = (client$: Client$, network$: Network$): TransactionService => {
+export const createTransactionService = (
+  client$: Client$,
+  network$: Network$,
+  clientUrl$: ClientUrl$
+): TransactionService => {
   const common = C.createTransactionService(client$)
 
   const depositLedgerTx = ({
     network,
+    clientUrl,
     params
   }: {
     network: Network
+    clientUrl: ClientUrl
     params: DepositParam & { walletIndex: number /* override walletIndex of DepositParam to avoid 'undefined' */ }
   }) => {
     const depositLedgerTxParams: IPCLedgerDepositTxParams = {
@@ -43,7 +49,8 @@ export const createTransactionService = (client$: Client$, network$: Network$): 
       recipient: undefined,
       router: undefined,
       walletIndex: params.walletIndex,
-      feeOption: undefined
+      feeOption: undefined,
+      nodeUrl: clientUrl[network].node
     }
     const encoded = ipcLedgerDepositTxParamsIO.encode(depositLedgerTxParams)
 
@@ -107,16 +114,24 @@ export const createTransactionService = (client$: Client$, network$: Network$): 
     walletIndex: number /* override walletIndex of DepositParam to avoid 'undefined' */
   }) =>
     FP.pipe(
-      network$,
-      RxOp.switchMap((network) => {
+      Rx.combineLatest([network$, clientUrl$]),
+      RxOp.switchMap(([network, clientUrl]) => {
         if (isLedgerWallet(walletType))
-          return depositLedgerTx({ network, params: { walletIndex, asset, amount, memo } })
+          return depositLedgerTx({ network, clientUrl, params: { walletIndex, asset, amount, memo } })
 
         return depositTx({ walletIndex, asset, amount, memo })
       })
     )
 
-  const sendLedgerTx = ({ network, params }: { network: Network; params: SendTxParams }): TxHashLD => {
+  const sendLedgerTx = ({
+    network,
+    clientUrl,
+    params
+  }: {
+    network: Network
+    clientUrl: ClientUrl
+    params: SendTxParams
+  }): TxHashLD => {
     const sendLedgerTxParams: IPCLedgerSendTxParams = {
       chain: THORChain,
       network,
@@ -129,7 +144,8 @@ export const createTransactionService = (client$: Client$, network$: Network$): 
       walletIndex: params.walletIndex,
       feeRate: NaN,
       feeOption: undefined,
-      feeAmount: undefined
+      feeAmount: undefined,
+      nodeUrl: clientUrl[network].node
     }
     const encoded = ipcLedgerSendTxParamsIO.encode(sendLedgerTxParams)
 
@@ -155,9 +171,9 @@ export const createTransactionService = (client$: Client$, network$: Network$): 
 
   const sendTx = (params: SendTxParams) =>
     FP.pipe(
-      network$,
-      RxOp.switchMap((network) => {
-        if (isLedgerWallet(params.walletType)) return sendLedgerTx({ network, params })
+      Rx.combineLatest([network$, clientUrl$]),
+      RxOp.switchMap(([network, clientUrl]) => {
+        if (isLedgerWallet(params.walletType)) return sendLedgerTx({ network, clientUrl, params })
 
         return common.sendTx(params)
       })

@@ -29,8 +29,9 @@ const meta: ComponentMeta<typeof Component> = {
     selectedPricePoolAsset: O.some(AssetRuneNative),
     inboundAddresses: RD.initial,
     mimir: RD.initial,
-    midgardUrl: RD.initial,
-    thorchainUrl: 'thorchain.info',
+    midgardUrl: RD.success('midgard-url'),
+    thorchainNodeUrl: 'thorchain-node-url',
+    thorchainRpcUrl: 'thorchain-rpc-url',
     network: 'mainnet'
   }
 }

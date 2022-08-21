@@ -1,6 +1,6 @@
 import * as RD from '@devexperts/remote-data-ts'
 import { Address } from '@xchainjs/xchain-client'
-import { Client, DepositParam } from '@xchainjs/xchain-thorchain'
+import { Client, ClientUrl, DepositParam, NodeUrl } from '@xchainjs/xchain-thorchain'
 import { Asset, BaseAmount } from '@xchainjs/xchain-util'
 import * as O from 'fp-ts/Option'
 import * as t from 'io-ts'
@@ -19,6 +19,19 @@ export type Client$ = C.Client$<Client>
 
 export type ClientState = C.ClientState<Client>
 export type ClientState$ = C.ClientState$<Client>
+
+export type NodeUrlType = keyof NodeUrl
+export type ClientUrl$ = Rx.Observable<ClientUrl>
+export type ClientUrlLD = LiveData<Error, ClientUrl>
+export type ClientUrlRD = RD.RemoteData<Error, ClientUrl>
+
+export type NodeUrl$ = Rx.Observable<NodeUrl>
+export type NodeUrlLD = LiveData<Error, NodeUrl>
+export type NodeUrlRD = RD.RemoteData<Error, NodeUrl>
+
+type UrlRD = RD.RemoteData<Error, string>
+export type ThornodeNodeUrlRD = UrlRD
+export type ThornodeRpcUrlRD = UrlRD
 
 export type FeesService = C.FeesService
 

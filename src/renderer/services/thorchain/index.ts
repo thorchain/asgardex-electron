@@ -2,7 +2,7 @@ import { THORChain } from '@xchainjs/xchain-util'
 
 import { network$ } from '../app/service'
 import { reloadBalances, balances$, getBalanceByAddress$, reloadBalances$, resetReloadBalances } from './balances'
-import { client$, clientState$, address$, addressUI$, explorerUrl$ } from './common'
+import { client$, clientState$, address$, addressUI$, explorerUrl$, clientUrl$, setClientUrl } from './common'
 import { createFeesService } from './fees'
 import { createInteractService$ } from './interact'
 import {
@@ -17,7 +17,8 @@ import { createTransactionService } from './transaction'
 
 const { txs$, tx$, txStatus$, subscribeTx, resetTx, sendTx, txRD$, sendPoolTx$ } = createTransactionService(
   client$,
-  network$
+  network$,
+  clientUrl$
 )
 const { reloadFees, fees$ } = createFeesService({ client$, chain: THORChain })
 const interact$ = createInteractService$(sendPoolTx$, txStatus$)
@@ -25,6 +26,8 @@ const interact$ = createInteractService$(sendPoolTx$, txStatus$)
 export {
   client$,
   clientState$,
+  clientUrl$,
+  setClientUrl,
   address$,
   addressUI$,
   explorerUrl$,
