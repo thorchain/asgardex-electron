@@ -8,12 +8,12 @@ import { optionFromNullable } from 'io-ts-types/lib/optionFromNullable'
 import * as Rx from 'rxjs'
 
 import { assetIO } from '../../../shared/api/io'
-import { Network } from '../../../shared/api/types'
 import { WalletType } from '../../../shared/wallet/types'
 import { LiveData } from '../../helpers/rx/liveData'
 import { AssetsWithAmount1e8, AssetWithAmount1e8 } from '../../types/asgardex'
+import { NodeStatusEnum } from '../../types/generated/thornode'
 import * as C from '../clients'
-import { ApiError, TxHashLD, TxHashRD } from '../wallet/types'
+import { TxHashLD, TxHashRD } from '../wallet/types'
 
 export type Client$ = C.Client$<Client>
 
@@ -64,18 +64,17 @@ export type InteractState$ = Rx.Observable<InteractState>
 
 export type InteractStateHandler = (p: InteractParams) => InteractState$
 
-export type NodeStatus = 'active' | 'standby' | 'disabled' | 'unknown'
-
 export type NodeInfo = {
   bond: BaseAmount
   award: BaseAmount
-  status: NodeStatus
+  status: NodeStatusEnum
 }
 
-export type NodeInfoLD = LiveData<ApiError, NodeInfo>
-export type NodeDataRD = RD.RemoteData<ApiError, NodeInfo>
+export type NodeInfoLD = LiveData<Error, NodeInfo>
+export type NodeDataRD = RD.RemoteData<Error, NodeInfo>
 
-export type ThorNodeApiUrlLD = LiveData<ApiError, string>
+export type ThornodeApiUrlLD = LiveData<Error, string>
+export type ThornodeApiUrlRD = RD.RemoteData<Error, string>
 
 /**
  * IO type for mimir endpoints:
@@ -152,19 +151,9 @@ export type MimirHalt = MimirHaltChain & MimirHaltTrading & MimirPauseLP
 
 export type MimirHaltRD = RD.RemoteData<Error, MimirHalt>
 
-export type GetLiquidityProvidersParams = {
-  asset: Asset
-  network: Network
-}
-
-export type GetLiquidityProviderParams = GetLiquidityProvidersParams & {
-  runeAddress: Address
-  assetAddress: Address
-}
-
 export type PendingAsset = AssetWithAmount1e8
 export type PendingAssets = AssetsWithAmount1e8
-export type PendingAssetsRD = RD.RemoteData<ApiError, PendingAssets>
+export type PendingAssetsRD = RD.RemoteData<Error, PendingAssets>
 
 export type LiquidityProvider = {
   runeAddress: O.Option<Address>
@@ -174,16 +163,16 @@ export type LiquidityProvider = {
   pendingAsset: O.Option<PendingAsset>
 }
 
-export type LiquidityProvidersLD = LiveData<ApiError, LiquidityProvider[]>
-export type LiquidityProviderLD = LiveData<ApiError, O.Option<LiquidityProvider>>
-export type LiquidityProviderRD = RD.RemoteData<ApiError, O.Option<LiquidityProvider>>
-export type LiquidityProvidersRD = RD.RemoteData<ApiError, LiquidityProvider[]>
+export type LiquidityProvidersLD = LiveData<Error, LiquidityProvider[]>
+export type LiquidityProviderLD = LiveData<Error, O.Option<LiquidityProvider>>
+export type LiquidityProviderRD = RD.RemoteData<Error, O.Option<LiquidityProvider>>
+export type LiquidityProvidersRD = RD.RemoteData<Error, LiquidityProvider[]>
 
 export type LiquidityProviderHasAsymAssets = { rune: boolean; asset: boolean }
-export type LiquidityProviderHasAsymAssetsRD = RD.RemoteData<ApiError, LiquidityProviderHasAsymAssets>
+export type LiquidityProviderHasAsymAssetsRD = RD.RemoteData<Error, LiquidityProviderHasAsymAssets>
 
 export type LiquidityProviderAssetMismatch = O.Option<{ runeAddress: Address; assetAddress: Address }>
-export type LiquidityProviderAssetMismatchRD = RD.RemoteData<ApiError, LiquidityProviderAssetMismatch>
+export type LiquidityProviderAssetMismatchRD = RD.RemoteData<Error, LiquidityProviderAssetMismatch>
 
 export const LiquidityProviderIO = t.type({
   asset: assetIO,
