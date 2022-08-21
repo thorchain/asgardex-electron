@@ -16,6 +16,8 @@ type StoryArgs = {
   goToReleasePage: (version: string) => void
   changeLocale: (locale: Locale) => void
   onChangeMidgardUrl: (url: string) => void
+  onChangeThornodeNodeUrl: (url: string) => void
+  onChangeThornodeRpcUrl: (url: string) => void
   changeNetwork: ChangeNetworkHandler
   collapsed: boolean
 }
@@ -26,6 +28,8 @@ const Template = ({
   checkForUpdates,
   goToReleasePage,
   onChangeMidgardUrl,
+  onChangeThornodeRpcUrl,
+  onChangeThornodeNodeUrl,
   changeLocale,
   collapsed
 }: StoryArgs) => {
@@ -47,8 +51,14 @@ const Template = ({
       collapsed={collapsed}
       toggleCollapse={() => console.log('toggle')}
       midgardUrl={RD.pending}
+      thornodeNodeUrl="thornode-node-url"
+      thornodeRpcUrl="thornode-rpc-url"
       onChangeMidgardUrl={onChangeMidgardUrl}
+      onChangeThornodeRpcUrl={onChangeThornodeRpcUrl}
+      onChangeThornodeNodeUrl={onChangeThornodeNodeUrl}
       checkMidgardUrl$={(url, _) => Rx.of(RD.success(url))}
+      checkThornodeNodeUrl$={(url, _) => Rx.of(RD.success(url))}
+      checkThornodeRpcUrl$={(url, _) => Rx.of(RD.success(url))}
     />
   )
 }
@@ -76,6 +86,12 @@ const meta: ComponentMeta<typeof Template> = {
     },
     onChangeMidgardUrl: {
       action: 'onChangeMidgardUrl'
+    },
+    onChangeThornodeNodeUrl: {
+      action: 'onChangeThornodeNodeUrl'
+    },
+    onChangeThornodeRpcUrl: {
+      action: 'onChangeThornodeRpcUrl'
     }
   },
   args: { onlineStatus: OnlineStatus.ON, updateDataRD: 'initial', collapsed: false }

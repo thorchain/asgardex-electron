@@ -12,6 +12,7 @@ import { useMidgardContext } from '../../contexts/MidgardContext'
 import { useAppUpdate } from '../../hooks/useAppUpdate'
 import { useCollapsedSetting } from '../../hooks/useCollapsedSetting'
 import { useNetwork } from '../../hooks/useNetwork'
+import { useThorchainClientUrl } from '../../hooks/useThorchainClientUrl'
 
 export const AppSettingsView: React.FC = (): JSX.Element => {
   const { network, changeNetwork } = useNetwork()
@@ -22,6 +23,15 @@ export const AppSettingsView: React.FC = (): JSX.Element => {
   const midgardUrl = useObservableState(apiEndpoint$, RD.initial)
 
   const { collapsed, toggle: toggleCollapse } = useCollapsedSetting('app')
+
+  const {
+    node: thornodeNodeUrl,
+    rpc: thornodeRpcUrl,
+    setRpc: setThornodeRpcUrl,
+    setNode: setThornodeNodeUrl,
+    checkRpc$: checkThornodeRpcUrl$,
+    checkNode$: checkThornodeNodeUrl$
+  } = useThorchainClientUrl()
 
   const { changeLocale, locale$ } = useI18nContext()
   const currentLocale = useObservableState(locale$, DEFAULT_LOCALE)
@@ -52,7 +62,13 @@ export const AppSettingsView: React.FC = (): JSX.Element => {
       toggleCollapse={toggleCollapse}
       midgardUrl={midgardUrl}
       onChangeMidgardUrl={updateMidgardUrlHandler}
+      onChangeThornodeNodeUrl={setThornodeNodeUrl}
+      onChangeThornodeRpcUrl={setThornodeRpcUrl}
       checkMidgardUrl$={checkMidgardUrl$}
+      thornodeRpcUrl={thornodeRpcUrl}
+      thornodeNodeUrl={thornodeNodeUrl}
+      checkThornodeRpcUrl$={checkThornodeRpcUrl$}
+      checkThornodeNodeUrl$={checkThornodeNodeUrl$}
     />
   )
 }

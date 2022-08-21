@@ -5,6 +5,7 @@ import { Asset, BaseAmount } from '@xchainjs/xchain-util'
 import * as O from 'fp-ts/Option'
 import * as t from 'io-ts'
 import { optionFromNullable } from 'io-ts-types/lib/optionFromNullable'
+import { IntlShape } from 'react-intl'
 import * as Rx from 'rxjs'
 
 import { assetIO } from '../../../shared/api/io'
@@ -29,9 +30,16 @@ export type NodeUrl$ = Rx.Observable<NodeUrl>
 export type NodeUrlLD = LiveData<Error, NodeUrl>
 export type NodeUrlRD = RD.RemoteData<Error, NodeUrl>
 
+export type CheckThornodeNodeRpcHandler = (url: string, intl: IntlShape) => LiveData<Error, string>
+
 type UrlRD = RD.RemoteData<Error, string>
+type CheckUrlHandler = (url: string, intl: IntlShape) => LiveData<Error, string>
+
 export type ThornodeNodeUrlRD = UrlRD
+export type CheckThornodeNodeUrlHandler = CheckUrlHandler
+
 export type ThornodeRpcUrlRD = UrlRD
+export type CheckThornodeRpcUrlHandler = CheckUrlHandler
 
 export type FeesService = C.FeesService
 

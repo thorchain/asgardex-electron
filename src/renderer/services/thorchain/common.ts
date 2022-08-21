@@ -23,7 +23,7 @@ const setClientUrl = ({ url, network, type }: { url: string; network: Network; t
   // TODO(@veado) Store data persistent on disc
   const current = getClientUrl()
   const cNetwork = toClientNetwork(network)
-  _setClientUrl({ ...current, [cNetwork]: { ...[cNetwork], [type]: url } })
+  _setClientUrl({ ...current, [cNetwork]: { ...current[cNetwork], [type]: url } })
 }
 
 /**

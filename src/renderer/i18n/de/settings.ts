@@ -18,7 +18,14 @@ const settings: SettingMessages = {
   'setting.wallet.index': 'Index',
   'setting.wallet.index.info': 'Trage die Index Nummer der Ledger Addresse ein, die Du verwenden möchtest',
   'setting.wallet.hdpath.legacy.info': 'Veralteter Derivation Pfad {path}',
-  'setting.wallet.hdpath.ledgerlive.info': 'Ledger Live Derivation Pfad {path}'
+  'setting.wallet.hdpath.ledgerlive.info': 'Ledger Live Derivation Pfad {path}',
+  'setting.thornode.node.error.unhealthy':
+    'THORNode API URL scheint "unhealthy" zu sein beim Überprüfen von "{endpoint}"',
+  'setting.thornode.node.error.url': 'Ungültige THORNode API URL. Bitte überprüfe diese und versuche es erneut.',
+  'setting.thornode.rpc.error.url': 'Ungültige THORNode RPC URL. Bitte überprüfe diese und versuche es erneut.',
+  'setting.thornode.rpc.error.unhealthy': 'THORNode RPC scheint "unhealthy" zu sein beim Überprüfen von "{endpoint"',
+  'setting.thornode.node.valid': 'Gültige THORNode API URL',
+  'setting.thornode.rpc.valid': 'Gültige THORNode RPC URL'
 }
 
 export default settings

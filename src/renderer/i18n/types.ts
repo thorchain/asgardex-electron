@@ -328,6 +328,12 @@ type SettingMessageKey =
   | 'setting.wallet.index.info'
   | 'setting.wallet.hdpath.legacy.info'
   | 'setting.wallet.hdpath.ledgerlive.info'
+  | 'setting.thornode.node.error.url'
+  | 'setting.thornode.node.error.unhealthy'
+  | 'setting.thornode.rpc.error.url'
+  | 'setting.thornode.rpc.error.unhealthy'
+  | 'setting.thornode.node.valid'
+  | 'setting.thornode.rpc.valid'
 
 export type SettingMessages = { [key in SettingMessageKey]: string }
 
