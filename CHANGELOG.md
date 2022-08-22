@@ -3,7 +3,7 @@
 ## Add
 
 - [Wallet] Multi wallet support [#2334](https://github.com/thorchain/asgardex-electron/pull/2334, [#2338](https://github.com/thorchain/asgardex-electron/pull/2338), [#2339](https://github.com/thorchain/asgardex-electron/pull/2339), [#2345](https://github.com/thorchain/asgardex-electron/pull/2345), [#2346](https://github.com/thorchain/asgardex-electron/pull/2346), [#2348](https://github.com/thorchain/asgardex-electron/pull/2348), [#2349](https://github.com/thorchain/asgardex-electron/pull/2349), [#2350](https://github.com/thorchain/asgardex-electron/pull/2350), [#2351](https://github.com/thorchain/asgardex-electron/pull/2351), [#2356](https://github.com/thorchain/asgardex-electron/pull/2356), [#2358](https://github.com/thorchain/asgardex-electron/pull/2358), [#2359](https://github.com/thorchain/asgardex-electron/pull/2359), [#2360](https://github.com/thorchain/asgardex-electron/pull/2360), [#2361](https://github.com/thorchain/asgardex-electron/pull/2361)
-- [Settings] Editable endpoints for Midgard, THORNode (API/RPC) [#2371](https://github.com/thorchain/asgardex-electron/pull/2371), [#2372](https://github.com/thorchain/asgardex-electron/pull/2372), [#2364](https://github.com/thorchain/asgardex-electron/pull/2364), [#2368](https://github.com/thorchain/asgardex-electron/pull/2368), [#2370](https://github.com/thorchain/asgardex-electron/pull/2370), [#2371](https://github.com/thorchain/asgardex-electron/pull/2371)
+- [Settings] Editable endpoints for Midgard, THORNode (API/RPC) [#2371](https://github.com/thorchain/asgardex-electron/pull/2371), [#2364](https://github.com/thorchain/asgardex-electron/pull/2364), [#2368](https://github.com/thorchain/asgardex-electron/pull/2368), [#2370](https://github.com/thorchain/asgardex-electron/pull/2370), [#2371](https://github.com/thorchain/asgardex-electron/pull/2371)
 
 ## Update
 
@@ -19,6 +19,7 @@
 - Quick fix: Website url is deprecated [#2333](https://github.com/thorchain/asgardex-electron/pull/2333)
 - Quick fix: Disable manage button in PoolsDetails [#2353](https://github.com/thorchain/asgardex-electron/pull/2353)
 - Use 9R Midgard by default [#2363](https://github.com/thorchain/asgardex-electron/pull/2363)
+- Fix deprecated usage of Antd.Menu children [#2372](https://github.com/thorchain/asgardex-electron/pull/2372)
 
 ## Remove
 
