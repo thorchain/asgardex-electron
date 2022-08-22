@@ -1,3 +1,34 @@
+# 1.18.0 (2022-08-xx)
+
+## Add
+
+- [Wallet] Multi wallet support [#2334](https://github.com/thorchain/asgardex-electron/pull/2334, [#2338](https://github.com/thorchain/asgardex-electron/pull/2338), [#2339](https://github.com/thorchain/asgardex-electron/pull/2339), [#2345](https://github.com/thorchain/asgardex-electron/pull/2345), [#2346](https://github.com/thorchain/asgardex-electron/pull/2346), [#2348](https://github.com/thorchain/asgardex-electron/pull/2348), [#2349](https://github.com/thorchain/asgardex-electron/pull/2349), [#2350](https://github.com/thorchain/asgardex-electron/pull/2350), [#2351](https://github.com/thorchain/asgardex-electron/pull/2351), [#2356](https://github.com/thorchain/asgardex-electron/pull/2356), [#2358](https://github.com/thorchain/asgardex-electron/pull/2358), [#2359](https://github.com/thorchain/asgardex-electron/pull/2359), [#2360](https://github.com/thorchain/asgardex-electron/pull/2360), [#2361](https://github.com/thorchain/asgardex-electron/pull/2361)
+- [Settings] Editable endpoints for Midgard, THORNode (API/RPC) [#2371](https://github.com/thorchain/asgardex-electron/pull/2371), [#2364](https://github.com/thorchain/asgardex-electron/pull/2364), [#2368](https://github.com/thorchain/asgardex-electron/pull/2368), [#2370](https://github.com/thorchain/asgardex-electron/pull/2370), [#2371](https://github.com/thorchain/asgardex-electron/pull/2371)
+
+## Update
+
+- Update to latest Midgard v2.9.0 [#2331](https://github.com/thorchain/asgardex-electron/pull/2331)
+- Generate types/endpoints for THORNode 0.19.5 [#2365](https://github.com/thorchain/asgardex-electron/pull/2365)
+- Use generated THORNode types / endpoints [#2367](https://github.com/thorchain/asgardex-electron/pull/2367)
+- Updated RU translation by @TreefeedXavier [#2369](https://github.com/thorchain/asgardex-electron/pull/2369)
+
+## Fix
+
+- Fix KeystoreClientStates [#2330](https://github.com/thorchain/asgardex-electron/pull/2330)
+- Fix styles of IncentivePendulum [#2332](https://github.com/thorchain/asgardex-electron/pull/2332)
+- Quick fix: Website url is deprecated [#2333](https://github.com/thorchain/asgardex-electron/pull/2333)
+- Quick fix: Disable manage button in PoolsDetails [#2353](https://github.com/thorchain/asgardex-electron/pull/2353)
+- Use 9R Midgard by default [#2363](https://github.com/thorchain/asgardex-electron/pull/2363)
+- Fix deprecated usage of Antd.Menu children [#2372](https://github.com/thorchain/asgardex-electron/pull/2372)
+
+## Remove
+
+- Remove TERRA finally [#2329](https://github.com/thorchain/asgardex-electron/pull/2329)
+
+## Internal
+
+- Introduce Tailwind - for styling and to replace antd components (step by step) [#2337](https://github.com/thorchain/asgardex-electron/pull/2337), [#2340](https://github.com/thorchain/asgardex-electron/pull/2340), [#2342](https://github.com/thorchain/asgardex-electron/pull/2342), [#2343](https://github.com/thorchain/asgardex-electron/pull/2343), [#2347](https://github.com/thorchain/asgardex-electron/pull/2347), [#2352](https://github.com/thorchain/asgardex-electron/pull/2352), [#2354](https://github.com/thorchain/asgardex-electron/pull/2354), [#2355](https://github.com/thorchain/asgardex-electron/pull/2355), [#2356](https://github.com/thorchain/asgardex-electron/pull/2356), [#2357](https://github.com/thorchain/asgardex-electron/pull/2357)
+
 # 1.17.2 (2022-07-19)
 
 ## Fix

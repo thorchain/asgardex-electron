@@ -1,6 +1,8 @@
 import React, { useMemo } from 'react'
 
-import { Menu } from 'antd'
+import { ItemType } from 'antd/lib/menu/hooks/useItems'
+import * as A from 'fp-ts/lib/Array'
+import * as FP from 'fp-ts/lib/function'
 import { useIntl } from 'react-intl'
 import { Link, matchPath, useLocation } from 'react-router-dom'
 
@@ -76,13 +78,18 @@ export const AssetsNav: React.FC = (): JSX.Element => {
   return (
     <>
       <Styled.MenuDropdownGlobalStyles />
-      <Styled.Menu mode="horizontal" selectedKeys={[activeMenu]} triggerSubMenuAction={'click'}>
-        {menuItems.map(({ key, label, path }) => (
-          <Menu.Item key={key}>
-            <Link to={path}>{label}</Link>
-          </Menu.Item>
-        ))}
-      </Styled.Menu>
+      <Styled.Menu
+        mode="horizontal"
+        selectedKeys={[activeMenu]}
+        triggerSubMenuAction={'click'}
+        items={FP.pipe(
+          menuItems,
+          A.map<MenuType, ItemType>(({ key, label, path }) => ({
+            label: <Link to={path}>{label}</Link>,
+            key
+          }))
+        )}
+      />
     </>
   )
 }

@@ -2,6 +2,9 @@ import React, { RefObject, useCallback, useMemo, useRef, useState } from 'react'
 
 import { SearchOutlined } from '@ant-design/icons'
 import { MenuProps } from 'antd/lib/menu'
+import { ItemType } from 'antd/lib/menu/hooks/useItems'
+import * as A from 'fp-ts/lib/Array'
+import * as FP from 'fp-ts/lib/function'
 import { useIntl } from 'react-intl'
 
 import { useClickOutside } from '../../../hooks/useOutsideClick'
@@ -60,33 +63,47 @@ export const FilterMenu = <T,>(props: Props<T>): JSX.Element => {
     [data, filterFunction, searchTerm]
   )
 
+  const items: ItemType[] = useMemo(() => {
+    const searchInput: ItemType[] = searchEnabled
+      ? [
+          {
+            label: (
+              <Styled.Input
+                autoFocus
+                value={searchTerm}
+                onChange={handleSearchChanged}
+                placeholder={(placeholder || intl.formatMessage({ id: 'common.search' })).toUpperCase()}
+                size="large"
+                typevalue="ghost"
+                suffix={<SearchOutlined />}
+              />
+            ),
+            disabled: true,
+            key: '_search'
+          }
+        ]
+      : []
+
+    const filteredItems: ItemType[] = FP.pipe(
+      filteredData,
+      A.map<T, ItemType>((item: T) => {
+        const { key, node } = cellRenderer(item)
+        const disableItem = disableItemFilter(item)
+
+        return {
+          label: node,
+          disabled: disableItem,
+          key
+        }
+      })
+    )
+
+    return [...searchInput, ...filteredItems]
+  }, [cellRenderer, disableItemFilter, filteredData, handleSearchChanged, intl, placeholder, searchEnabled, searchTerm])
+
   return (
     <div ref={ref}>
-      <Styled.Menu onClick={handleClick}>
-        {searchEnabled && (
-          <Styled.Menu.Item disabled key="_search">
-            <Styled.Input
-              autoFocus
-              value={searchTerm}
-              onChange={handleSearchChanged}
-              placeholder={placeholder || intl.formatMessage({ id: 'common.search' })}
-              size="large"
-              typevalue="ghost"
-              suffix={<SearchOutlined />}
-            />
-          </Styled.Menu.Item>
-        )}
-        {filteredData.map((item: T) => {
-          const { key, node } = cellRenderer(item)
-          const disableItem = disableItemFilter(item)
-
-          return (
-            <Styled.MenuItem disabled={disableItem} key={key}>
-              {node}
-            </Styled.MenuItem>
-          )
-        })}
-      </Styled.Menu>
+      <Styled.Menu onClick={handleClick} items={items} />
     </div>
   )
 }

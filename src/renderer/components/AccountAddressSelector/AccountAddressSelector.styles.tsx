@@ -39,7 +39,7 @@ export const WalletAddress = styled.div`
 `
 
 export const TruncatedAddress = styled.div`
-  margin: 5px 15px 5px 10px;
+  margin: 3px 15px 3px 10px;
   font-size: 14px;
   color: ${palette('primary', 0)};
 `
@@ -53,36 +53,25 @@ export const CaretDownOutlined = styled(CaretDownOutlinedUI)`
 export const Menu = styled(A.Menu)`
   background-color: ${palette('background', 0)};
 
-  & .ant-dropdown-menu-item {
+  > .ant-dropdown-menu-item {
     &:hover,
     &:focus,
     &:active {
-      background: ${palette('background', 2)};
+      background: ${palette('background', 2)} !important;
     }
 
     &-selected {
-      background: ${palette('background', 2)};
+      background: ${palette('background', 2)} !important;
     }
   }
 `
 
-export const MenuItem = styled(A.Menu.Item)`
-  padding: 0;
-  margin: 0;
-`
-
-export const MenuItemWrapper = styled.div<{ selected: boolean }>`
+export const MenuItemWrapper = styled.div`
   display: flex;
   flex-direction: row;
   align-items: center;
   font-size: 14px;
   padding: 5px;
-  background-color: ${({ selected }) => (selected ? palette('background', 2) : 'inherit')};
-
-  &:hover,
-  &:active {
-    background-color: palette('background', 2);
-  }
 `
 
 export const AssetIcon = styled(AssetIconUI)`

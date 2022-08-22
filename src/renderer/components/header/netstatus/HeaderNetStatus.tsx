@@ -2,7 +2,9 @@ import React, { useMemo, useRef } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
 import { Dropdown, Row, Col } from 'antd'
+import { ItemType } from 'antd/lib/menu/hooks/useItems'
 import * as FP from 'fp-ts/function'
+import * as A from 'fp-ts/lib/Array'
 import * as O from 'fp-ts/lib/Option'
 import { useObservableState } from 'observable-hooks'
 import { useIntl } from 'react-intl'
@@ -145,24 +147,28 @@ export const HeaderNetStatus: React.FC<Props> = (props): JSX.Element => {
 
   const desktopMenu = useMemo(() => {
     return (
-      <Menu>
-        {menuItems.map((item) => {
-          const { headline, key, subheadline, color, url } = item
-          return (
-            <Menu.Item key={key} onClick={() => window.apiUrl.openExternal(url)}>
-              <Row align="middle">
-                <Col span={4}>
-                  <ConnectionStatus color={color} />
-                </Col>
-                <Col span={20}>
-                  <Styled.MenuItemHeadline nowrap>{headline}</Styled.MenuItemHeadline>
-                  <Styled.MenuItemSubHeadline nowrap>{subheadline}</Styled.MenuItemSubHeadline>
-                </Col>
-              </Row>
-            </Menu.Item>
-          )
-        })}
-      </Menu>
+      <Menu
+        items={FP.pipe(
+          menuItems,
+          A.map<MenuItem, ItemType>((item) => {
+            const { headline, key, subheadline, color, url } = item
+            return {
+              label: (
+                <Row align="middle" onClick={() => window.apiUrl.openExternal(url)}>
+                  <Col span={4}>
+                    <ConnectionStatus color={color} />
+                  </Col>
+                  <Col span={20}>
+                    <Styled.MenuItemHeadline nowrap>{headline}</Styled.MenuItemHeadline>
+                    <Styled.MenuItemSubHeadline nowrap>{subheadline}</Styled.MenuItemSubHeadline>
+                  </Col>
+                </Row>
+              ),
+              key
+            }
+          })
+        )}
+      />
     )
   }, [menuItems])
 

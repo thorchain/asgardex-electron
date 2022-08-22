@@ -65,7 +65,7 @@ export const useThorchainClientUrl = () => {
           return RD.success(url)
 
         return RD.failure(
-          Error(intl.formatMessage({ id: 'setting.thornode.rpc.error.unhealthy' }, { endpoint: '/ping' }))
+          Error(intl.formatMessage({ id: 'setting.thornode.rpc.error.unhealthy' }, { endpoint: '/health' }))
         )
       }),
 

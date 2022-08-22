@@ -1,9 +1,11 @@
 import React, { useCallback, useMemo, useState } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
-import { Row, Dropdown, Collapse } from 'antd'
+import { Dropdown, Collapse } from 'antd'
 import { MenuProps } from 'antd/lib/menu'
+import { ItemType } from 'antd/lib/menu/hooks/useItems'
 import * as FP from 'fp-ts/function'
+import * as A from 'fp-ts/lib/Array'
 import * as O from 'fp-ts/lib/Option'
 import { useIntl } from 'react-intl'
 
@@ -50,7 +52,7 @@ type SectionProps = {
 }
 
 const Section: React.FC<SectionProps> = ({ title, className, children }) => (
-  <div className={`mb-20px flex flex-col items-start ${className}`}>
+  <div className={`mb-20px flex flex-col items-start last:mb-0 ${className}`}>
     <h2 className="mb-5px font-main text-[12px] uppercase text-text2 dark:text-text2d">{title}</h2>
     {children}
   </div>
@@ -90,26 +92,34 @@ export const AppSettings: React.FC<Props> = (props): JSX.Element => {
 
   const langMenu = useMemo(
     () => (
-      <Menu onClick={changeLang}>
-        {LOCALES.map((locale: Locale) => (
-          <Styled.MenuItem key={locale}>
-            <Styled.MenuItemText>{locale}</Styled.MenuItemText>
-          </Styled.MenuItem>
-        ))}
-      </Menu>
+      <Menu
+        onClick={changeLang}
+        items={FP.pipe(
+          LOCALES,
+          A.map<Locale, ItemType>((l: Locale) => ({
+            label: (
+              <div
+                className={`dark:text-1 flex items-center py-[8px] px-10px font-main text-16 uppercase text-text1 dark:text-text1d ${
+                  l === locale ? 'font-mainSemiBold' : 'font-main'
+                }`}>
+                {l}
+              </div>
+            ),
+            key: l
+          }))
+        )}
+      />
     ),
-    [changeLang]
+    [changeLang, locale]
   )
 
   const renderLangMenu = useMemo(
     () => (
       <Dropdown overlay={langMenu} trigger={['click']} placement="bottom">
-        <Styled.DropdownContentWrapper>
-          <Row style={{ alignItems: 'center' }}>
-            <Styled.MenuItemText>{locale}</Styled.MenuItemText>
-            <DownIcon />
-          </Row>
-        </Styled.DropdownContentWrapper>
+        <div className="flex cursor-pointer justify-center ">
+          <h3 className={`font-main text-16 uppercase text-text1 dark:text-text1d`}>{locale}</h3>
+          <DownIcon />
+        </div>
       </Dropdown>
     ),
     [langMenu, locale]
@@ -122,33 +132,51 @@ export const AppSettings: React.FC<Props> = (props): JSX.Element => {
     [changeNetwork]
   )
 
-  const networkMenu = useMemo(
-    () => (
-      <Menu onClick={changeNetworkHandler}>
-        {AVAILABLE_NETWORKS.map((network: Network) => (
-          <Styled.MenuItem key={network}>
-            <Styled.MenuItemText>
-              <Styled.NetworkLabel network={network}>{network}</Styled.NetworkLabel>
-            </Styled.MenuItemText>
-          </Styled.MenuItem>
-        ))}
-      </Menu>
-    ),
-    [changeNetworkHandler]
-  )
+  const networkTextColor = useCallback((network: Network) => {
+    switch (network) {
+      case 'mainnet':
+        return 'text-turquoise'
+      case 'stagenet':
+        return 'text-error1 dark:text-error1d'
+      case 'testnet':
+        return 'text-warning0 dark:text-warning0'
+      default:
+        return 'text-text2 dark:text-text2'
+    }
+  }, [])
+
+  const networkMenu = useMemo(() => {
+    return (
+      <Menu
+        onClick={changeNetworkHandler}
+        items={FP.pipe(
+          AVAILABLE_NETWORKS,
+          A.map<Network, ItemType>((n: Network) => ({
+            label: (
+              <div
+                className={`flex items-center py-[8px] px-10px ${networkTextColor(n)} text-16 uppercase ${
+                  n === network ? 'font-mainSemiBold' : 'font-main'
+                }`}>
+                {n}
+              </div>
+            ),
+            key: n
+          }))
+        )}
+      />
+    )
+  }, [changeNetworkHandler, network, networkTextColor])
 
   const renderNetworkMenu = useMemo(
     () => (
       <Dropdown overlay={networkMenu} trigger={['click']} placement="bottom">
-        <Styled.DropdownContentWrapper>
-          <Row style={{ alignItems: 'center' }}>
-            <Styled.NetworkLabel network={network}>{network}</Styled.NetworkLabel>
-            <DownIcon />
-          </Row>
-        </Styled.DropdownContentWrapper>
+        <div className="flex cursor-pointer justify-center ">
+          <h3 className={`font-main text-16 uppercase ${networkTextColor(network)}`}>{network}</h3>
+          <DownIcon />
+        </div>
       </Dropdown>
     ),
-    [networkMenu, network]
+    [networkMenu, networkTextColor, network]
   )
 
   const checkUpdatesProps = useMemo(() => {
@@ -236,16 +264,14 @@ export const AppSettings: React.FC<Props> = (props): JSX.Element => {
               {intl.formatMessage({ id: 'common.general' })}
             </h1>
             <Section title={intl.formatMessage({ id: 'common.network' })}>{renderNetworkMenu}</Section>
-            <div className="mb-20px flex flex-col items-start">
-              <Styled.SubTitle>{intl.formatMessage({ id: 'setting.language' })}</Styled.SubTitle>
-              {renderLangMenu}
-            </div>
-            <div className="flex flex-col items-start">
-              <Styled.SubTitle>{intl.formatMessage({ id: 'setting.version' })}</Styled.SubTitle>
-              <Styled.Label>v{version}</Styled.Label>
-              <BorderButton size="normal" className="my-10px" {...checkUpdatesProps} />
-              {renderVersionUpdateResult}
-            </div>
+            <Section title={intl.formatMessage({ id: 'setting.language' })}>{renderLangMenu}</Section>
+            <Section title={intl.formatMessage({ id: 'setting.version' })}>
+              <>
+                <Styled.Label>v{version}</Styled.Label>
+                <BorderButton size="normal" className="mt-10px" {...checkUpdatesProps} />
+                {renderVersionUpdateResult}
+              </>
+            </Section>
           </div>
           <div className="card mb-20px w-full p-40px">
             <TextButton
@@ -254,7 +280,7 @@ export const AppSettings: React.FC<Props> = (props): JSX.Element => {
               } mr-10px`}
               onClick={() => setAdvancedActive((v) => !v)}>
               {intl.formatMessage({ id: 'common.advanced' })}
-              <SwitchButton className="ml-10px" active={advancedActive} />
+              <SwitchButton className="ml-10px" active={advancedActive}></SwitchButton>
             </TextButton>
             {advancedActive && (
               <>
@@ -268,7 +294,7 @@ export const AppSettings: React.FC<Props> = (props): JSX.Element => {
                     successMsg={intl.formatMessage({ id: 'midgard.url.valid' })}
                   />
                 </Section>
-                <Section className="mt-10px" title="THORNode API">
+                <Section title="THORNode API">
                   <EditableUrl
                     className="w-full xl:w-3/4"
                     url={thornodeNodeUrl}
@@ -277,7 +303,7 @@ export const AppSettings: React.FC<Props> = (props): JSX.Element => {
                     successMsg={intl.formatMessage({ id: 'setting.thornode.node.valid' })}
                   />
                 </Section>
-                <Section className="mt-10px" title="THORNode RPC">
+                <Section title="THORNode RPC">
                   <EditableUrl
                     className="w-full xl:w-3/4"
                     url={thornodeRpcUrl}

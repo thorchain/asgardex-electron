@@ -1,7 +1,9 @@
-import React, { useMemo } from 'react'
+import React, { useCallback, useMemo } from 'react'
 
 import { CaretDownOutlined } from '@ant-design/icons'
-import { Menu, Dropdown } from 'antd'
+import { Dropdown } from 'antd'
+import { MenuProps } from 'antd/lib/menu'
+import { ItemType } from 'antd/lib/menu/hooks/useItems'
 import * as A from 'fp-ts/Array'
 import * as FP from 'fp-ts/function'
 import { useIntl } from 'react-intl'
@@ -41,23 +43,32 @@ export const PoolActionsHistoryFilter: React.FC<Props> = ({
     [intl]
   )
 
+  const changeFilter: MenuProps['onClick'] = useCallback(
+    ({ key }: { key: string }) => {
+      onFilterChanged(key as Filter)
+    },
+    [onFilterChanged]
+  )
+
   const menu = useMemo(() => {
     return (
-      <Styled.Menu selectedKeys={[availableFilters[activeFilterIndex]]}>
-        {FP.pipe(
+      <Styled.Menu
+        onClick={changeFilter}
+        selectedKeys={[availableFilters[activeFilterIndex]]}
+        items={FP.pipe(
           availableFilters,
-          A.map((filter) => {
+          A.map<Filter, ItemType>((filter) => {
             const content = filter === 'ALL' ? allItemContent : <TxTypeUI type={filter} showTypeIcon />
-            return (
-              <Menu.Item key={filter} onClick={() => onFilterChanged(filter)}>
-                <Styled.FilterItem>{content}</Styled.FilterItem>
-              </Menu.Item>
-            )
+
+            return {
+              label: <Styled.FilterItem>{content}</Styled.FilterItem>,
+              key: filter
+            }
           })
         )}
-      </Styled.Menu>
+      />
     )
-  }, [activeFilterIndex, onFilterChanged, allItemContent, availableFilters])
+  }, [changeFilter, availableFilters, activeFilterIndex, allItemContent])
 
   return (
     <Dropdown overlay={menu} trigger={['click']} disabled={disabled}>

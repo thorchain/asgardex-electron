@@ -1,8 +1,10 @@
 import React, { useMemo, useCallback } from 'react'
 
-import { assetFromString, assetToString } from '@xchainjs/xchain-util'
+import { Asset, assetFromString, assetToString } from '@xchainjs/xchain-util'
 import { Row, Dropdown } from 'antd'
 import { MenuProps } from 'antd/lib/menu'
+import { ItemType } from 'antd/lib/menu/hooks/useItems'
+import * as A from 'fp-ts/lib/Array'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
 
@@ -11,12 +13,7 @@ import { PricePoolAsset, PricePoolAssets } from '../../../views/pools/Pools.type
 import { DownIcon } from '../../icons'
 import { Menu } from '../../shared/menu/Menu'
 import { toHeaderCurrencyLabel } from '../Header.util'
-import {
-  HeaderDropdownMenuItem,
-  HeaderDropdownContentWrapper,
-  HeaderDropdownMenuItemText,
-  HeaderDropdownTitle
-} from '../HeaderMenu.styles'
+import { HeaderDropdownContentWrapper, HeaderDropdownMenuItemText, HeaderDropdownTitle } from '../HeaderMenu.styles'
 import * as Styled from './HeaderPriceSelector.styles'
 
 export type Props = {
@@ -37,15 +34,20 @@ export const HeaderPriceSelector: React.FC<Props> = (props): JSX.Element => {
 
   const menu = useMemo(
     () => (
-      <Menu onClick={changeItem}>
-        {assets.map((asset) => {
-          return (
-            <HeaderDropdownMenuItem key={assetToString(asset)}>
-              <HeaderDropdownMenuItemText strong>{toHeaderCurrencyLabel(asset)}</HeaderDropdownMenuItemText>
-            </HeaderDropdownMenuItem>
-          )
-        })}
-      </Menu>
+      <Menu
+        onClick={changeItem}
+        items={FP.pipe(
+          assets,
+          A.map<Asset, ItemType>((asset) => ({
+            label: (
+              <HeaderDropdownMenuItemText strong className="px-10px py-[8px]">
+                {toHeaderCurrencyLabel(asset)}
+              </HeaderDropdownMenuItemText>
+            ),
+            key: assetToString(asset)
+          }))
+        )}
+      />
     ),
     [changeItem, assets]
   )
