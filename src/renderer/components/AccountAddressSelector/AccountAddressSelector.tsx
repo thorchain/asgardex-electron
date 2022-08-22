@@ -50,26 +50,27 @@ export const AccountAddressSelector: React.FC<Props> = (props) => {
       )
 
     return (
-      <Styled.Menu>
-        {FP.pipe(
+      <Styled.Menu
+        items={FP.pipe(
           addresses,
           A.map((walletAddress) => {
             const { address, type, chain } = walletAddress
             const selected = isSelected(walletAddress)
-            return (
-              <Styled.MenuItem key={address} onClick={() => onChangeAddress(walletAddress)}>
-                <Styled.MenuItemWrapper key={address} selected={selected}>
+            return {
+              label: (
+                <Styled.MenuItemWrapper onClick={() => onChangeAddress(walletAddress)}>
                   <Styled.AssetIcon asset={getChainAsset(chain)} size={size} network={network} />
                   <Styled.WalletAddress>{address}</Styled.WalletAddress>
                   {isLedgerWallet(type) && (
                     <Styled.WalletTypeLabel selected={selected}>{walletTypeToI18n(type, intl)}</Styled.WalletTypeLabel>
                   )}
                 </Styled.MenuItemWrapper>
-              </Styled.MenuItem>
-            )
+              ),
+              key: address
+            }
           })
         )}
-      </Styled.Menu>
+      />
     )
   }, [addresses, intl, network, oSelectedAddress, onChangeAddress, size])
 

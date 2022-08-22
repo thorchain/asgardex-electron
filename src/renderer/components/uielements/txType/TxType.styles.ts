@@ -13,8 +13,8 @@ export const Label = styled(LabelUI)`
   margin-left: 10px;
   padding: 0;
   width: auto;
+  font-size: 14px;
   text-transform: uppercase;
-  font-weight: 600;
 `
 
 export const IconContainer = styled.span`

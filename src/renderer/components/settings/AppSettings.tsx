@@ -16,7 +16,7 @@ import { AVAILABLE_NETWORKS } from '../../services/const'
 import { CheckMidgardUrlHandler, MidgardUrlRD } from '../../services/midgard/types'
 import { CheckThornodeNodeUrlHandler, CheckThornodeRpcUrlHandler } from '../../services/thorchain/types'
 import { DownIcon } from '../icons'
-import { Menu as SharedMenu } from '../shared/menu'
+import { Menu } from '../shared/menu'
 import { BorderButton, TextButton } from '../uielements/button'
 import { SwitchButton } from '../uielements/button/SwitchButton'
 import * as Styled from './AppSettings.styles'
@@ -92,7 +92,7 @@ export const AppSettings: React.FC<Props> = (props): JSX.Element => {
 
   const langMenu = useMemo(
     () => (
-      <SharedMenu
+      <Menu
         onClick={changeLang}
         items={FP.pipe(
           LOCALES,
@@ -107,7 +107,8 @@ export const AppSettings: React.FC<Props> = (props): JSX.Element => {
             ),
             key: l
           }))
-        )}></SharedMenu>
+        )}
+      />
     ),
     [changeLang, locale]
   )
@@ -146,7 +147,7 @@ export const AppSettings: React.FC<Props> = (props): JSX.Element => {
 
   const networkMenu = useMemo(() => {
     return (
-      <SharedMenu
+      <Menu
         onClick={changeNetworkHandler}
         items={FP.pipe(
           AVAILABLE_NETWORKS,
@@ -161,7 +162,8 @@ export const AppSettings: React.FC<Props> = (props): JSX.Element => {
             ),
             key: n
           }))
-        )}></SharedMenu>
+        )}
+      />
     )
   }, [changeNetworkHandler, network, networkTextColor])
 

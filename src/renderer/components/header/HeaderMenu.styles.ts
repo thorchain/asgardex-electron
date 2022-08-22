@@ -53,4 +53,5 @@ export const HeaderDropdownMenuItemText = styled(Text)`
   font-family: 'MainFontBold';
   color: ${palette('text', 0)};
   font-size: 18px;
+  background: transparent;
 `

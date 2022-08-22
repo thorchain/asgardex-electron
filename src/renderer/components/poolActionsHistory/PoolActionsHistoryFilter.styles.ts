@@ -22,6 +22,8 @@ export const Menu = styled(A.Menu)`
 `
 
 export const FilterButton = styled(Button).attrs({ typevalue: 'outline' })`
+  font-size: 14px !important;
+
   & .anticon-caret-down {
     width: 14px;
     height: 14px;
@@ -63,4 +65,6 @@ export const AllContent = styled.div`
   display: flex;
   flex-direction: row;
   align-items: center;
+  font-size: 14px;
+  font-family: 'MainFontRegular';
 `
