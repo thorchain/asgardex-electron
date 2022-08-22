@@ -12,6 +12,7 @@ import { Locale } from '../../../shared/i18n/types'
 import { LOCALES } from '../../i18n'
 import { AVAILABLE_NETWORKS } from '../../services/const'
 import { CheckMidgardUrlHandler, MidgardUrlRD } from '../../services/midgard/types'
+import { CheckThornodeNodeUrlHandler, CheckThornodeRpcUrlHandler } from '../../services/thorchain/types'
 import { DownIcon } from '../icons'
 import { Menu } from '../shared/menu'
 import { BorderButton, TextButton } from '../uielements/button'
@@ -34,6 +35,12 @@ export type Props = {
   midgardUrl: MidgardUrlRD
   onChangeMidgardUrl: (url: string) => void
   checkMidgardUrl$: CheckMidgardUrlHandler
+  checkThornodeNodeUrl$: CheckThornodeNodeUrlHandler
+  onChangeThornodeNodeUrl: (url: string) => void
+  checkThornodeRpcUrl$: CheckThornodeRpcUrlHandler
+  thornodeRpcUrl: string
+  thornodeNodeUrl: string
+  onChangeThornodeRpcUrl: (url: string) => void
 }
 
 type SectionProps = {
@@ -63,7 +70,13 @@ export const AppSettings: React.FC<Props> = (props): JSX.Element => {
     toggleCollapse,
     midgardUrl: midgardUrlRD,
     onChangeMidgardUrl,
-    checkMidgardUrl$
+    checkMidgardUrl$,
+    onChangeThornodeNodeUrl,
+    checkThornodeNodeUrl$,
+    checkThornodeRpcUrl$,
+    onChangeThornodeRpcUrl,
+    thornodeRpcUrl,
+    thornodeNodeUrl
   } = props
 
   const intl = useIntl()
@@ -244,15 +257,36 @@ export const AppSettings: React.FC<Props> = (props): JSX.Element => {
               <SwitchButton className="ml-10px" active={advancedActive} />
             </TextButton>
             {advancedActive && (
-              <Section className="mt-20px" title="Midgard">
-                <EditableUrl
-                  className="w-full xl:w-3/4"
-                  url={midgardUrl}
-                  onChange={onChangeMidgardUrl}
-                  loading={RD.isPending(midgardUrlRD)}
-                  checkUrl$={checkMidgardUrl$}
-                />
-              </Section>
+              <>
+                <Section className="mt-20px" title="Midgard">
+                  <EditableUrl
+                    className="w-full xl:w-3/4"
+                    url={midgardUrl}
+                    onChange={onChangeMidgardUrl}
+                    loading={RD.isPending(midgardUrlRD)}
+                    checkUrl$={checkMidgardUrl$}
+                    successMsg={intl.formatMessage({ id: 'midgard.url.valid' })}
+                  />
+                </Section>
+                <Section className="mt-10px" title="THORNode API">
+                  <EditableUrl
+                    className="w-full xl:w-3/4"
+                    url={thornodeNodeUrl}
+                    onChange={onChangeThornodeNodeUrl}
+                    checkUrl$={checkThornodeNodeUrl$}
+                    successMsg={intl.formatMessage({ id: 'setting.thornode.node.valid' })}
+                  />
+                </Section>
+                <Section className="mt-10px" title="THORNode RPC">
+                  <EditableUrl
+                    className="w-full xl:w-3/4"
+                    url={thornodeRpcUrl}
+                    onChange={onChangeThornodeRpcUrl}
+                    checkUrl$={checkThornodeRpcUrl$}
+                    successMsg={intl.formatMessage({ id: 'setting.thornode.rpc.valid' })}
+                  />
+                </Section>
+              </>
             )}
           </div>
         </Collapse.Panel>

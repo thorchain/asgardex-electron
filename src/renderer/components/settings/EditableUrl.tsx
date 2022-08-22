@@ -23,13 +23,14 @@ type TestUrlHandler = (url: string, intl: IntlShape) => TestUrlLD
 type Props = {
   url: string
   checkUrl$: TestUrlHandler
+  successMsg: string
   loading?: boolean
   onChange?: (url: string) => void
   className?: string
 }
 
 const EditableUrl: React.FC<Props> = (props): JSX.Element => {
-  const { url: initialUrl, className, loading = false, onChange = FP.constVoid, checkUrl$ } = props
+  const { url: initialUrl, className, successMsg, loading = false, onChange = FP.constVoid, checkUrl$ } = props
 
   const [editableUrl, setEditableUrl] = useState<O.Option<string>>(O.none)
   const [url, setUrl] = useState<string>(initialUrl)
@@ -86,14 +87,10 @@ const EditableUrl: React.FC<Props> = (props): JSX.Element => {
               {error?.message ?? error.toString()}
             </p>
           ),
-          (_) => (
-            <p className={`mt-10px font-main text-[14px] uppercase text-turquoise`}>
-              {intl.formatMessage({ id: 'midgard.url.valid' })}
-            </p>
-          )
+          (_) => <p className={`mt-10px font-main text-[14px] uppercase text-turquoise`}>{successMsg}</p>
         )
       ),
-    [intl, testUrlState]
+    [successMsg, testUrlState]
   )
 
   const renderUrl = useCallback(() => {
