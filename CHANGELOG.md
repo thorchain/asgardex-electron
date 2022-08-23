@@ -20,6 +20,7 @@
 - Quick fix: Disable manage button in PoolsDetails [#2353](https://github.com/thorchain/asgardex-electron/pull/2353)
 - Use 9R Midgard by default [#2363](https://github.com/thorchain/asgardex-electron/pull/2363)
 - Fix deprecated usage of Antd.Menu children [#2372](https://github.com/thorchain/asgardex-electron/pull/2372)
+- [Ledger] Fix/extend HD pathes for ETH [#2344](https://github.com/thorchain/asgardex-electron/issues/2344)
 
 ## Remove
 
