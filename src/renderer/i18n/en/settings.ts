@@ -19,6 +19,7 @@ const settings: SettingMessages = {
   'setting.wallet.index.info': 'Enter the index number of the Ledger address you want to use',
   'setting.wallet.hdpath.legacy.info': 'Legacy derivation path {path}',
   'setting.wallet.hdpath.ledgerlive.info': 'Ledger Live derivation path {path}',
+  'setting.wallet.hdpath.metamask.info': 'Metamask derivation path {path}',
   'setting.thornode.node.error.unhealthy': 'THORNode API seems to be unhealthy by checking "{endpoint}"',
   'setting.thornode.node.error.url': 'Invalid THORNode API URL. Please double check and try again',
   'setting.thornode.rpc.error.url': 'Invalid THORNode RPC URL. Please double check and try again',

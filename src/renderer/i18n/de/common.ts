@@ -114,7 +114,8 @@ const common: CommonMessages = {
   'common.recipient': 'Empfänger',
   'common.sender': 'Absender',
   'common.legacy': 'Veraltet',
-  'common.ledgerlive': 'Ledger Live'
+  'common.ledgerlive': 'Ledger Live',
+  'common.metamask': 'MetaMask'
 }
 
 export default common

@@ -1,1 +1,1 @@
-export type EthDerivationMode = 'legacy' | 'ledgerlive'
+export type EthDerivationMode = 'legacy' | 'ledgerlive' | 'metamask'
