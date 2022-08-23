@@ -11,7 +11,8 @@ import {
   protoFee,
   protoAuthInfo,
   protoMsgSend,
-  protoTxBody
+  protoTxBody,
+  getDefaultChainIds
 } from '@xchainjs/xchain-cosmos'
 import { Asset, assetToString, BaseAmount } from '@xchainjs/xchain-util'
 import BigNumber from 'bignumber.js'
@@ -76,7 +77,9 @@ export const send = async ({
     const fee = protoFee({ denom, amount: feeAmount, gasLimit })
 
     const clientUrls = getClientUrls()
-    const chainId = await getChainId(clientUrls[clientNetwork])
+    const chainId =
+      // request chain id (for testnet only, cosmoshub.keplr.app does not an endpoint for it)
+      network === 'testnet' ? await getChainId(clientUrls[clientNetwork]) : getDefaultChainIds()[network]
 
     const app = new CosmosApp(transport)
     const path = getDerivationPath(walletIndex)
