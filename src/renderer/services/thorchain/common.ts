@@ -40,9 +40,6 @@ const clientState$: ClientState$ = FP.pipe(
       FP.pipe(
         // request chain id from node whenever network or keystore state have been changed
         Rx.from(getChainId(clientUrl[network].node)),
-        RxOp.catchError((error) =>
-          Rx.of(RD.failure<Error>(new Error(`Failed to get THORChain's chain id (${error?.msg ?? error.toString()})`)))
-        ),
         RxOp.switchMap((chainId) =>
           Rx.of(
             FP.pipe(
@@ -65,10 +62,13 @@ const clientState$: ClientState$ = FP.pipe(
             )
           )
         ),
+        RxOp.catchError((error) =>
+          Rx.of(RD.failure<Error>(new Error(`Failed to get THORChain's chain id (${error?.msg ?? error.toString()})`)))
+        ),
         RxOp.startWith(RD.pending)
       )
   ),
-  RxOp.startWith<ClientState>(RD.initial),
+  RxOp.startWith(RD.initial),
   RxOp.shareReplay(1)
 )
 
