@@ -32,7 +32,7 @@ const common: CommonMessages = {
   'common.next': 'Next',
   'common.finish': 'Finish',
   'common.copy': 'Copy',
-  'common.loading': 'Loading...',
+  'common.loading': 'Loading…',
   'common.error': 'Error',
   'common.test': 'Test',
   'common.change': 'Change',
@@ -114,7 +114,8 @@ const common: CommonMessages = {
   'common.recipient': 'Recipient',
   'common.sender': 'Sender',
   'common.legacy': 'Legacy',
-  'common.ledgerlive': 'Ledger Live'
+  'common.ledgerlive': 'Ledger Live',
+  'common.metamask': 'MetaMask'
 }
 
 export default common

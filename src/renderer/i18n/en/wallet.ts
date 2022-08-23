@@ -55,7 +55,7 @@ const wallet: WalletMessages = {
   'wallet.create.enter.phrase': 'Enter your phrase in a right order',
   'wallet.create.error.phrase': 'Wrong phrase. Please double check your phrase and re-enter it again.',
   'wallet.create.words.click': 'Click the word in correct order',
-  'wallet.create.creating': 'Creating wallet',
+  'wallet.create.creating': 'Creating wallet…',
   'wallet.create.error': 'Error while creating a wallet',
   'wallet.receive.address.error': 'No address available to receive funds',
   'wallet.receive.address.errorQR': 'Error while rendering QR code: {error}',

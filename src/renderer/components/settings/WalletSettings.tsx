@@ -207,7 +207,7 @@ export const WalletSettings: React.FC<Props> = (props): JSX.Element => {
       }
 
       const renderAddLedger = (chain: Chain, loading: boolean) => (
-        <div className="flex w-full flex-col md:w-auto md:flex-row">
+        <div className="flex w-full flex-col md:w-auto lg:flex-row">
           <div className="mr-30px flex items-center md:mr-0">
             <Styled.AddLedgerButton loading={loading} onClick={() => addLedgerAddress(chain, walletIndexMap[chain])}>
               <Styled.AddLedgerIcon /> {intl.formatMessage({ id: 'ledger.add.device' })}
@@ -238,32 +238,44 @@ export const WalletSettings: React.FC<Props> = (props): JSX.Element => {
             )}
           </div>
           {isEthChain(chain) && (
-            <div className="flex items-center pl-0 pt-10px md:pt-0 md:pl-30px">
-              <Styled.EthDerivationModeRadioGroup onChange={onChangeEthDerivationMode} value={ethDerivationMode}>
-                <StyledR.Radio value="ledgerlive" key="ledgerlive">
-                  <Styled.EthDerivationModeRadioLabel>
-                    {intl.formatMessage({ id: 'common.ledgerlive' })}
-                    <InfoIcon
-                      tooltip={intl.formatMessage(
-                        { id: 'setting.wallet.hdpath.ledgerlive.info' },
-                        { path: getEthDerivationPath(walletIndexMap[ETHChain], 'ledgerlive') }
-                      )}
-                    />
-                  </Styled.EthDerivationModeRadioLabel>
-                </StyledR.Radio>
-                <StyledR.Radio value="legacy" key="legacy">
-                  <Styled.EthDerivationModeRadioLabel>
-                    {intl.formatMessage({ id: 'common.legacy' })}
-                    <InfoIcon
-                      tooltip={intl.formatMessage(
-                        { id: 'setting.wallet.hdpath.legacy.info' },
-                        { path: getEthDerivationPath(walletIndexMap[ETHChain], 'legacy') }
-                      )}
-                    />
-                  </Styled.EthDerivationModeRadioLabel>
-                </StyledR.Radio>
-              </Styled.EthDerivationModeRadioGroup>
-            </div>
+            <StyledR.Radio.Group
+              className="!flex flex-col items-start lg:flex-row lg:items-center lg:!pl-30px"
+              onChange={onChangeEthDerivationMode}
+              value={ethDerivationMode}>
+              <StyledR.Radio value="ledgerlive" key="ledgerlive" className="">
+                <Styled.EthDerivationModeRadioLabel>
+                  {intl.formatMessage({ id: 'common.ledgerlive' })}
+                  <InfoIcon
+                    tooltip={intl.formatMessage(
+                      { id: 'setting.wallet.hdpath.ledgerlive.info' },
+                      { path: getEthDerivationPath(walletIndexMap[ETHChain], 'ledgerlive') }
+                    )}
+                  />
+                </Styled.EthDerivationModeRadioLabel>
+              </StyledR.Radio>
+              <StyledR.Radio value="legacy" key="legacy">
+                <Styled.EthDerivationModeRadioLabel>
+                  {intl.formatMessage({ id: 'common.legacy' })}
+                  <InfoIcon
+                    tooltip={intl.formatMessage(
+                      { id: 'setting.wallet.hdpath.legacy.info' },
+                      { path: getEthDerivationPath(walletIndexMap[ETHChain], 'legacy') }
+                    )}
+                  />
+                </Styled.EthDerivationModeRadioLabel>
+              </StyledR.Radio>
+              <StyledR.Radio value="metamask" key="metamask">
+                <Styled.EthDerivationModeRadioLabel>
+                  {intl.formatMessage({ id: 'common.metamask' })}
+                  <InfoIcon
+                    tooltip={intl.formatMessage(
+                      { id: 'setting.wallet.hdpath.metamask.info' },
+                      { path: getEthDerivationPath(walletIndexMap[ETHChain], 'metamask') }
+                    )}
+                  />
+                </Styled.EthDerivationModeRadioLabel>
+              </StyledR.Radio>
+            </StyledR.Radio.Group>
           )}
         </div>
       )

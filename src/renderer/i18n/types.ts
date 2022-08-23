@@ -115,6 +115,7 @@ export type CommonMessageKey =
   | 'common.sender'
   | 'common.legacy'
   | 'common.ledgerlive'
+  | 'common.metamask'
 
 export type CommonMessages = {
   [key in CommonMessageKey]: string
@@ -329,6 +330,7 @@ type SettingMessageKey =
   | 'setting.wallet.index.info'
   | 'setting.wallet.hdpath.legacy.info'
   | 'setting.wallet.hdpath.ledgerlive.info'
+  | 'setting.wallet.hdpath.metamask.info'
   | 'setting.thornode.node.error.url'
   | 'setting.thornode.node.error.unhealthy'
   | 'setting.thornode.rpc.error.url'

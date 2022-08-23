@@ -195,14 +195,13 @@ export const RemoveLedgerIcon = styled(RemoveIcon)`
   height: ${ICON_SIZE}px;
 `
 
-export const EthDerivationModeRadioGroup = styled(StyledR.Radio.Group)`
-  display: flex;
-  align-items: center;
-`
-
 export const EthDerivationModeRadioLabel = styled(StyledR.RadioLabel)`
   display: flex;
   align-items: center;
+  margin-top: 10px;
+  ${media.lg`
+  margin-top: 0;
+  `}
 `
 
 export const WalletIndexInput = styled(A.InputNumber)`
