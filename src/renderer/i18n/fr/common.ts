@@ -32,7 +32,7 @@ const common: CommonMessages = {
   'common.next': 'Suivant',
   'common.finish': 'Finir',
   'common.copy': 'Copier',
-  'common.loading': 'Chargement...',
+  'common.loading': 'Chargement…',
   'common.error': 'Erreur',
   'common.test': 'Test - FR',
   'common.change': 'Modifier',

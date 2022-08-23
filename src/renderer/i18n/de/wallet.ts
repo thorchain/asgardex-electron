@@ -55,7 +55,7 @@ const wallet: WalletMessages = {
   'wallet.create.title': 'Erstelle eine Wallet',
   'wallet.create.enter.phrase': 'Gebe Deine Phrase in richtiger Reihenfolge ein',
   'wallet.create.words.click': 'Klicke die Wörter in der richtigen Reihenfolge',
-  'wallet.create.creating': 'Erstelle eine Wallet ...',
+  'wallet.create.creating': 'Erstelle eine Wallet…',
   'wallet.create.error': 'Fehler beim Erstellen der Wallet',
   'wallet.create.error.phrase': 'Falsche Phrase. Bitte überprüfe Deine Phrase und gebe diese erneut ein.',
   'wallet.receive.address.error': 'Keine Addresse für den Empfang vorhanden',
