@@ -188,6 +188,7 @@ type WalletMessageKey =
   | 'wallet.imports.error.instance'
   | 'wallet.imports.error.keystore.load'
   | 'wallet.imports.error.keystore.import'
+  | 'wallet.imports.error.keystore.password'
   | 'wallet.phrase.error.valueRequired'
   | 'wallet.phrase.error.invalid'
   | 'wallet.phrase.error.import'
@@ -338,8 +339,7 @@ type SettingMessageKey =
 export type SettingMessages = { [key in SettingMessageKey]: string }
 
 type MidgardMessageKey =
-  | 'midgard.error.byzantine.title'
-  | 'midgard.error.byzantine.description'
+  | 'midgard.error.endpoint.title'
   | 'midgard.url.error.invalid'
   | 'midgard.url.error.unhealthy'
   | 'midgard.url.valid'

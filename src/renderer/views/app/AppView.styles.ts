@@ -3,7 +3,6 @@ import styled from 'styled-components'
 import { palette } from 'styled-theme'
 
 import { Alert as UIAlert } from '../../components/uielements/alert'
-import { Label as UILabel } from '../../components/uielements/label'
 import { media } from '../../helpers/styleHelper'
 
 export const AppWrapper = styled.div`
@@ -58,8 +57,3 @@ export const Alert = styled(UIAlert)`
     }
   `}
 `
-
-export const ErrorDescription = styled(UILabel).attrs({
-  textTransform: 'uppercase',
-  size: 'normal'
-})``

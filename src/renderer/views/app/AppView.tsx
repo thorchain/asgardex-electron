@@ -13,7 +13,7 @@ import { DEFAULT_LOCALE } from '../../../shared/i18n/const'
 import { envOrDefault } from '../../../shared/utils/env'
 import { Footer } from '../../components/footer'
 import { Header } from '../../components/header'
-import { Button } from '../../components/uielements/button'
+import { BorderButton } from '../../components/uielements/button'
 import { useI18nContext } from '../../contexts/I18nContext'
 import { useMidgardContext } from '../../contexts/MidgardContext'
 import { unionChains } from '../../helpers/fp/array'
@@ -168,7 +168,7 @@ export const AppView: React.FC = (): JSX.Element => {
                 A.filter(({ haltedChain }) => haltedChain),
                 A.map(({ chain }) => chain),
                 // merge chains of `inbound_addresses` and `mimir` endpoints
-                // by  removing duplicates
+                // by removing duplicates
                 unionChains(inboundHaltedChains)
               )
 
@@ -235,57 +235,54 @@ export const AppView: React.FC = (): JSX.Element => {
     [intl, mimirHaltRD]
   )
 
-  const renderMidgardAlert = useMemo(() => {
-    const description = (
-      <>
-        <Styled.ErrorDescription>
-          {intl.formatMessage({ id: 'midgard.error.byzantine.description' })}
-        </Styled.ErrorDescription>
-        <Button onClick={reloadApiEndpoint} typevalue="outline" color="error">
-          <SyncOutlined />
-          {intl.formatMessage({ id: 'common.reload' })}
-        </Button>
-      </>
-    )
-
-    return (
-      <Styled.Alert
-        type="error"
-        message={intl.formatMessage({ id: 'midgard.error.byzantine.title' })}
-        description={description}
-      />
-    )
-  }, [intl, reloadApiEndpoint])
-
   const renderMidgardError = useMemo(() => {
     const empty = () => <></>
     return FP.pipe(
       apiEndpoint,
-      RD.fold(empty, empty, () => renderMidgardAlert, empty)
+      RD.fold(
+        empty,
+        empty,
+        (e) => (
+          <Styled.Alert
+            type="error"
+            message={intl.formatMessage({ id: 'midgard.error.endpoint.title' })}
+            description={e?.message ?? e.toString()}
+            action={
+              <BorderButton onClick={reloadApiEndpoint} color="error" size="medium">
+                <SyncOutlined className="mr-10px" />
+                {intl.formatMessage({ id: 'common.reload' })}
+              </BorderButton>
+            }
+          />
+        ),
+        empty
+      )
     )
-  }, [apiEndpoint, renderMidgardAlert])
+  }, [apiEndpoint, intl, reloadApiEndpoint])
 
-  // TODO (@veado) Render alert incl. reload button
-  const _renderKeystoreError = useMemo(() => {
-    return (
-      <div>
-        <div>
-          {' '}
-          keystoreWallets:
-          {FP.pipe(
-            walletsPersistentRD,
-            RD.fold(
-              () => <>init</>,
-              () => <>loading</>,
-              (e) => <>error {e.toString()}</>,
-              (wallets) => <>wallets {JSON.stringify(wallets)}</>
-            )
-          )}
-        </div>
-        <button onClick={reloadPersistentWallets}>reloadKeystoreWallets</button>
-      </div>
+  const renderKeystoreError = useMemo(() => {
+    const empty = () => <></>
+    return FP.pipe(
+      walletsPersistentRD,
+      RD.fold(
+        empty,
+        empty,
+        (e) => (
+          <Styled.Alert
+            type="warning"
+            message={intl.formatMessage({ id: 'wallet.imports.error.keystore.import' })}
+            description={e?.message ?? e.toString()}
+            action={
+              <BorderButton color="warning" size="medium" onClick={reloadPersistentWallets}>
+                {intl.formatMessage({ id: 'common.retry' })}
+              </BorderButton>
+            }
+          />
+        ),
+        empty
+      )
     )
-  }, [walletsPersistentRD, reloadPersistentWallets])
+  }, [walletsPersistentRD, reloadPersistentWallets, intl])
 
   return (
     <Styled.AppWrapper>
@@ -294,8 +291,8 @@ export const AppView: React.FC = (): JSX.Element => {
         <Header />
 
         <View>
-          {/* {renderKeystoreError} */}
           {renderMidgardError}
+          {renderKeystoreError}
           {renderHaltedChainsWarning}
           {renderUpgradeWarning}
           <ViewRoutes />

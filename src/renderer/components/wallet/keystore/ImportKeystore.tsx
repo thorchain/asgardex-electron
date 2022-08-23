@@ -71,7 +71,7 @@ export const ImportKeystore: React.FC<Props> = (props): JSX.Element => {
         RD.fold(
           () => <></>,
           () => <></>,
-          (_) => renderError(intl.formatMessage({ id: 'wallet.imports.error.keystore.import' })),
+          (_) => renderError(intl.formatMessage({ id: 'wallet.imports.error.keystore.password' })),
           () => <></>
         )
       ),
