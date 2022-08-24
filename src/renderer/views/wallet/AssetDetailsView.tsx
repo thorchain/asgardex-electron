@@ -121,7 +121,7 @@ export const AssetDetailsView: React.FC = (): JSX.Element => {
           title={intl.formatMessage(
             { id: 'routes.invalid.params' },
             {
-              params: `walletAddress: ${routeAsset}, walletType: ${routeWalletType}, walletIndex: ${routeWalletIndex}, walletAddress: ${routeWalletAddress} `
+              params: `asset: ${routeAsset}, walletType: ${routeWalletType}, walletIndex: ${routeWalletIndex}, walletAddress: ${routeWalletAddress} `
             }
           )}
         />
