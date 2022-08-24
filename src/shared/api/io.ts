@@ -6,7 +6,7 @@ import * as t from 'io-ts'
 import * as IOD from 'io-ts/Decoder'
 import * as IOG from 'io-ts/Guard'
 
-import { isAsset, isBaseAmount, isChain, isFeeOption, isNetwork } from '../utils/guard'
+import { isAsset, isBaseAmount, isChain, isEthDerivationMode, isFeeOption, isNetwork } from '../utils/guard'
 
 const assetDecoder: IOD.Decoder<unknown, Asset> = FP.pipe(
   IOD.string,
@@ -72,6 +72,16 @@ export const networkIO = new t.Type(
   (u, c) => {
     if (isNetwork(u)) return t.success(u)
     return t.failure(u, c, `Can't decode Network from ${u}`)
+  },
+  t.identity
+)
+
+export const ethDerivationModeIO = new t.Type(
+  'EthDerivationMode',
+  isEthDerivationMode,
+  (u, c) => {
+    if (isEthDerivationMode(u)) return t.success(u)
+    return t.failure(u, c, `Can't decode EthDerivationMode from ${u}`)
   },
   t.identity
 )
@@ -210,3 +220,20 @@ export const ipcKeystoreWalletsIO = t.array(ipcKeystoreWalletIO)
 export type IPCKeystoreWallets = t.TypeOf<typeof ipcKeystoreWalletsIO>
 
 export type KeystoreWallets = ReturnType<typeof ipcKeystoreWalletsIO.encode>
+
+export const ipcLedgerAddressIO = t.type({
+  address: t.string,
+  chain: chainIO,
+  network: networkIO,
+  walletIndex: t.number,
+  ethDerivationMode: t.union([ethDerivationModeIO, t.undefined])
+})
+
+export const ipcKeystoreLedgerAddressIO = t.type({
+  keystoreId: t.number,
+  ledgers: t.array(ipcLedgerAddressIO)
+})
+
+export const ipcKeystorLedgerAddressesIO = t.array(ipcKeystoreLedgerAddressIO)
+
+export type IPCKeystoresLedgerAddressesIO = t.TypeOf<typeof ipcKeystorLedgerAddressesIO>

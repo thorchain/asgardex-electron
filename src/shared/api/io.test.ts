@@ -1,7 +1,7 @@
 import { fail } from 'assert'
 
 import { FeeOption } from '@xchainjs/xchain-client'
-import { AssetBNB, AssetRuneNative, baseAmount, BNBChain } from '@xchainjs/xchain-util'
+import { AssetBNB, AssetRuneNative, baseAmount, BNBChain, ETHChain } from '@xchainjs/xchain-util'
 import * as E from 'fp-ts/lib/Either'
 import * as FP from 'fp-ts/lib/function'
 
@@ -12,9 +12,13 @@ import { mapIOErrors } from '../utils/fp'
 import {
   BaseAmountEncoded,
   baseAmountIO,
+  IPCKeystoresLedgerAddressesIO,
+  ipcKeystoreWalletIO,
+  ipcKeystorLedgerAddressesIO,
   ipcLedgerSendTxParamsIO,
   isBaseAmountEncoded,
   keystoreIO,
+  KeystoreWallet,
   poolsWatchListsIO
 } from './io'
 
@@ -248,5 +252,112 @@ describe('shared/io', () => {
       const encoded = keystoreIO.encode(MOCK_KEYSTORE)
       expect(encoded).toEqual(JSON.parse(JSON.stringify(MOCK_KEYSTORE)))
     })
+  })
+
+  describe('ipcKeystoreWalletIO', () => {
+    const keystoreWallet: KeystoreWallet = {
+      id: 1,
+      name: 'wallet1',
+      selected: true,
+      keystore: MOCK_KEYSTORE
+    }
+    it('decoded', () => {
+      const data = JSON.parse(JSON.stringify(keystoreWallet))
+
+      const decoded = ipcKeystoreWalletIO.decode(data)
+
+      FP.pipe(
+        decoded,
+        E.fold(
+          (errors) => {
+            fail(mapIOErrors(errors))
+          },
+          (result) => {
+            expect(result).toEqual(keystoreWallet)
+          }
+        )
+      )
+    })
+    it('encode', () => {
+      const encoded = ipcKeystoreWalletIO.encode(keystoreWallet)
+      expect(encoded).toEqual(JSON.parse(JSON.stringify(keystoreWallet)))
+    })
+    it('round-trip', () => {
+      const encoded = ipcKeystoreWalletIO.encode(keystoreWallet)
+      const decoded = ipcKeystoreWalletIO.decode(encoded)
+
+      FP.pipe(
+        decoded,
+        E.fold(
+          (errors) => {
+            fail(mapIOErrors(errors))
+          },
+          (result) => {
+            expect(result).toEqual(keystoreWallet)
+          }
+        )
+      )
+    })
+  })
+})
+describe('ipcKeystoreWalletIO', () => {
+  const ledgers: IPCKeystoresLedgerAddressesIO = [
+    {
+      keystoreId: 1,
+      ledgers: [
+        {
+          chain: ETHChain,
+          network: 'mainnet',
+          address: 'eth-address',
+          walletIndex: 1,
+          ethDerivationMode: 'metamask'
+        },
+        {
+          chain: BNBChain,
+          network: 'stagenet',
+          address: 'nbn-address',
+          walletIndex: 2,
+          ethDerivationMode: undefined
+        }
+      ]
+    }
+  ]
+  it('decoded', () => {
+    const data = JSON.parse(JSON.stringify(ledgers))
+
+    const decoded = ipcKeystorLedgerAddressesIO.decode(data)
+
+    FP.pipe(
+      decoded,
+      E.fold(
+        (errors) => {
+          fail(mapIOErrors(errors))
+        },
+        (result) => {
+          expect(result).toEqual(ledgers)
+        }
+      )
+    )
+  })
+  it('encode', () => {
+    const encoded = ipcKeystorLedgerAddressesIO.encode(ledgers)
+    expect(encoded).toEqual(JSON.parse(JSON.stringify(ledgers)))
+  })
+
+  it('round-trip', () => {
+    const encoded = ipcKeystorLedgerAddressesIO.encode(ledgers)
+    const decoded = ipcKeystorLedgerAddressesIO.decode(encoded)
+
+    FP.pipe(
+      decoded,
+      E.fold(
+        (errors) => {
+          fail(mapIOErrors(errors))
+        },
+        (result) => {
+          expect(result).toEqual(ledgers)
+        }
+      )
+    )
   })
 })
