@@ -274,14 +274,16 @@ export const AppSettings: React.FC<Props> = (props): JSX.Element => {
             </Section>
           </div>
           <div className="card mb-20px w-full p-40px">
-            <TextButton
-              className={`mb-0 !p-0 font-main !text-18 uppercase text-text0 dark:text-text0d ${
-                advancedActive ? 'opacity-100' : 'opacity-60'
-              } mr-10px`}
-              onClick={() => setAdvancedActive((v) => !v)}>
-              {intl.formatMessage({ id: 'common.advanced' })}
-              <SwitchButton className="ml-10px" active={advancedActive}></SwitchButton>
-            </TextButton>
+            <div className="flex items-center">
+              <TextButton
+                className={`mb-0 !py-0 !pr-10px !pl-0  font-main !text-18 uppercase text-text0 dark:text-text0d ${
+                  advancedActive ? 'opacity-100' : 'opacity-60'
+                }`}
+                onClick={() => setAdvancedActive((v) => !v)}>
+                {intl.formatMessage({ id: 'common.advanced' })}
+              </TextButton>
+              <SwitchButton active={advancedActive} onChange={(active) => setAdvancedActive(active)}></SwitchButton>
+            </div>
             {advancedActive && (
               <>
                 <Section className="mt-20px" title="Midgard">
