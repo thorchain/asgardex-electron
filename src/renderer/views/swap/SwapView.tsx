@@ -35,6 +35,7 @@ import * as walletRoutes from '../../routes/wallet'
 import { AssetWithDecimalLD, AssetWithDecimalRD } from '../../services/chain/types'
 import { DEFAULT_SLIP_TOLERANCE } from '../../services/const'
 import { INITIAL_BALANCES_STATE, DEFAULT_BALANCES_FILTER } from '../../services/wallet/const'
+import { keystoreLedgerAddressToWalletAddress } from '../../services/wallet/util'
 import { isSlipTolerance, SlipTolerance } from '../../types/asgardex'
 import * as Styled from './SwapView.styles'
 
@@ -212,8 +213,8 @@ const SuccessRouteView: React.FC<Props> = ({ sourceAsset, targetAsset }): JSX.El
     (sourceLedgerAddressChain$) =>
       FP.pipe(
         sourceLedgerAddressChain$,
-        RxOp.switchMap(({ chain, network }) => getLedgerAddress$(chain, network)),
-        RxOp.map((rdAddress) => RD.toOption(rdAddress)),
+        RxOp.switchMap(({ chain }) => getLedgerAddress$(chain)),
+        RxOp.map(O.map(keystoreLedgerAddressToWalletAddress)),
         RxOp.map(addressFromOptionalWalletAddress)
       ),
     O.none
@@ -230,8 +231,8 @@ const SuccessRouteView: React.FC<Props> = ({ sourceAsset, targetAsset }): JSX.El
     (targetLedgerAddressChain$) =>
       FP.pipe(
         targetLedgerAddressChain$,
-        RxOp.switchMap(({ chain, network }) => getLedgerAddress$(chain, network)),
-        RxOp.map((rdAddress) => RD.toOption(rdAddress)),
+        RxOp.switchMap(({ chain }) => getLedgerAddress$(chain)),
+        RxOp.map(O.map(keystoreLedgerAddressToWalletAddress)),
         RxOp.map(addressFromOptionalWalletAddress)
       ),
     O.none

@@ -5,17 +5,18 @@ import * as E from 'fp-ts/Either'
 
 import { LedgerError, LedgerErrorId } from '../../../../shared/api/types'
 import { getDerivationPath } from '../../../../shared/ethereum/ledger'
+import { EthDerivationMode } from '../../../../shared/ethereum/types'
 import { isError } from '../../../../shared/utils/guard'
 import { WalletAddress } from '../../../../shared/wallet/types'
 import { getDerivationMode } from './common'
 
 export const getAddress = async (
   transport: Transport,
-  walletIndex: number
+  walletIndex: number,
+  mode: EthDerivationMode
 ): Promise<E.Either<LedgerError, WalletAddress>> => {
   try {
     const app = new EthApp(transport)
-    const mode = await getDerivationMode()
     const path = getDerivationPath(walletIndex, mode)
     const { address } = await app.getAddress(path)
 

@@ -15,7 +15,6 @@ import {
   explorerUrl$,
   fees$,
   reloadFees,
-  ledgerAddress$,
   ledgerTxRD$,
   pushLedgerTx,
   resetLedgerTx
@@ -36,7 +35,6 @@ export type BinanceContextValue = {
   explorerUrl$: typeof explorerUrl$
   fees$: typeof fees$
   reloadFees: typeof reloadFees
-  ledgerAddress$: typeof ledgerAddress$
   ledgerTxRD$: typeof ledgerTxRD$
   pushLedgerTx: typeof pushLedgerTx
   resetLedgerTx: typeof resetLedgerTx
@@ -57,7 +55,6 @@ const initialContext: BinanceContextValue = {
   explorerUrl$,
   fees$,
   reloadFees,
-  ledgerAddress$,
   ledgerTxRD$,
   pushLedgerTx,
   resetLedgerTx

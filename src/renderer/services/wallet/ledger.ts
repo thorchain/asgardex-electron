@@ -2,47 +2,63 @@ import * as RD from '@devexperts/remote-data-ts'
 import { Chain } from '@xchainjs/xchain-util'
 import * as A from 'fp-ts/lib/Array'
 import * as FP from 'fp-ts/lib/function'
-import * as M from 'fp-ts/lib/Map'
 import * as O from 'fp-ts/lib/Option'
 import * as N from 'fp-ts/number'
 import * as Rx from 'rxjs'
 import * as RxOp from 'rxjs/operators'
 
-import { KeystoreId, LedgerErrorId, Network } from '../../../shared/api/types'
+import { KeystoreId, LedgerErrorId } from '../../../shared/api/types'
 import { isError } from '../../../shared/utils/guard'
-import { eqLedgerAddressMap } from '../../helpers/fp/eq'
-import { observableState } from '../../helpers/stateHelper'
-import { INITIAL_KEYSTORE_LEDGER_ADDRESSES_MAP, INITIAL_LEDGER_ADDRESSES_MAP } from './const'
+import { WalletAddress } from '../../../shared/wallet/types'
 import {
-  GetLedgerAddressHandler,
-  KeystoreState,
+  eqChain,
+  eqKeystoreId,
+  eqKeystoreLedgerAddress,
+  eqNetwork,
+  eqOKeystoreLedgerAddress
+} from '../../helpers/fp/eq'
+import { liveData } from '../../helpers/rx/liveData'
+import { observableState } from '../../helpers/stateHelper'
+import { Network$ } from '../app/types'
+import { INITIAL_KEYSTORE_LEDGER_ADDRESSES } from './const'
+import {
+  GetKeystoreLedgerAddressHandler,
   KeystoreState$,
-  KeystoreLedgerAddressesMap,
-  LedgerAddressesMap,
-  LedgerAddressRD,
+  KeystoreLedgerAddresses,
   LedgerService,
   VerifyLedgerAddressHandler,
   AskLedgerAddressesHandler,
   RemoveLedgerAddressHandler,
   isKeystoreUnlocked,
   KeystoreWalletsUI$,
-  RemovedKeystoreId$
+  RemovedKeystoreId$,
+  KeystoreLedgerAddress
 } from './types'
-import { hasImportedKeystore } from './util'
 
 export const createLedgerService = ({
   keystore$,
-  wallets$
+  wallets$,
+  network$
 }: {
   keystore$: KeystoreState$
   wallets$: KeystoreWalletsUI$
+  network$: Network$
 }): LedgerService => {
-  // State of all Ledger addresses added to a keystore wallet
+  /**
+   * State of all Ledger addresses added to a keystore wallet
+   * Note: Only ONE Ledger for a Keystore / Chain / Network combo possible
+   */
   const {
     get$: keystoreLedgerAddresses$,
     get: keystoreLedgerAddresses,
-    set: setKeystoreLedgerAddresses
-  } = observableState<KeystoreLedgerAddressesMap>(INITIAL_KEYSTORE_LEDGER_ADDRESSES_MAP)
+    set: _setKeystoreLedgerAddresses
+  } = observableState<KeystoreLedgerAddresses>(INITIAL_KEYSTORE_LEDGER_ADDRESSES)
+
+  const setKeystoreLedgerAddresses = (addresses: KeystoreLedgerAddresses) => {
+    console.log('TODO save ks ledger addresses', addresses)
+
+    return _setKeystoreLedgerAddresses(addresses)
+  }
 
   const selectedKeystoreId$: Rx.Observable<O.Option<KeystoreId>> = FP.pipe(
     keystore$,
@@ -69,102 +85,177 @@ export const createLedgerService = ({
     )
   )
 
-  const ledgerAddresses = (id: KeystoreId): LedgerAddressesMap =>
-    FP.pipe(
-      keystoreLedgerAddresses().get(id),
-      O.fromNullable,
-      O.getOrElse(() => INITIAL_LEDGER_ADDRESSES_MAP)
-    )
-
+  /**
+   * Stream o f Ledger addresses depending on selected keystoreId + network
+   */
   const ledgerAddresses$ = FP.pipe(
-    Rx.combineLatest([selectedKeystoreId$, keystoreLedgerAddresses$]),
-    RxOp.map(([oKeystoreId, addressesMap]) =>
+    Rx.combineLatest([network$, selectedKeystoreId$, keystoreLedgerAddresses$]),
+    RxOp.map(([network, oKeystoreId, addresses]) =>
       FP.pipe(
         oKeystoreId,
         O.fold(
-          () => INITIAL_LEDGER_ADDRESSES_MAP,
+          () => INITIAL_KEYSTORE_LEDGER_ADDRESSES,
           (id) =>
             FP.pipe(
-              addressesMap.get(id),
-              O.fromNullable,
-              O.getOrElse(() => INITIAL_LEDGER_ADDRESSES_MAP)
+              addresses,
+              A.map((v) => v),
+              A.filter(
+                ({ keystoreId, network: n }) => eqKeystoreId.equals(id, keystoreId) && eqNetwork.equals(n, network)
+              )
             )
         )
       )
     ),
-    RxOp.startWith(INITIAL_LEDGER_ADDRESSES_MAP)
+    RxOp.startWith(INITIAL_KEYSTORE_LEDGER_ADDRESSES)
   )
 
-  const setLedgerAddresses = (id: KeystoreId, addressesMap: LedgerAddressesMap) => {
-    const updated = keystoreLedgerAddresses().set(id, addressesMap)
-    setKeystoreLedgerAddresses(updated)
-  }
-
-  const setLedgerAddressRD = ({
-    addressRD,
-    chain,
-    network,
-    id
-  }: {
-    addressRD: LedgerAddressRD
-    chain: Chain
-    network: Network
-    id: KeystoreId
-  }) => {
-    const addresses = ledgerAddresses(id)
-    return setLedgerAddresses(id, { ...addresses, [chain]: { ...addresses[chain], [network]: addressRD } })
+  /**
+   * Update address by given chain, network, keystoreId
+   */
+  const addLedgerAddress = (address: KeystoreLedgerAddress) => {
+    const { chain, network, keystoreId } = address
+    return FP.pipe(
+      keystoreLedgerAddresses(),
+      // remove same entry if available just to avoid duplication
+      A.filter(
+        ({ chain: c, network: n, keystoreId: id }) =>
+          !(eqKeystoreId.equals(id, keystoreId) && eqChain.equals(c, chain) && eqNetwork.equals(n, network))
+      ),
+      A.prepend(address),
+      setKeystoreLedgerAddresses
+    )
   }
 
   /**
-   * Get ledger address from memory
+   * Update address by given chain, network, keystoreId
    */
-  const getLedgerAddress$: GetLedgerAddressHandler = (chain, network) =>
+  const _updateLedgerAddress = (address: KeystoreLedgerAddress) => {
+    const { address: ledgerAddress, ethDerivationMode } = address
+    return FP.pipe(
+      keystoreLedgerAddresses(),
+      A.map((addressInList) => {
+        // update address if available
+        if (eqKeystoreLedgerAddress.equals(addressInList, address))
+          return { ...addressInList, address: ledgerAddress, ethDerivationMode }
+
+        return addressInList
+      }),
+      setKeystoreLedgerAddresses
+    )
+  }
+
+  /**
+   * Update `ethDerivationMode` by given chain, network, keystoreId
+   */
+  // const setEthDerivationMode = ({
+  //   mode,
+  //   network,
+  //   id
+  // }: {
+  //   mode: EthDerivationMode
+  //   network: Network
+  //   id: KeystoreId
+  // }) => {
+  //   const updated = FP.pipe(
+  //     keystoreLedgerAddresses(),
+  //     A.prepend,map((address) => {
+  //       const { chain: c, network: n, keystoreId } = address
+  //       // update address if available
+  //       if (eqKeystoreId.equals(id, keystoreId) && eqChain.equals(c, ETHChain) && eqNetwork.equals(n, network))
+  //         return { ...address, ethDerivationMode: O.some(mode) }
+
+  //       return address
+  //     })
+  //   )
+  //   return setKeystoreLedgerAddresses(updated)
+  // }
+
+  /**
+   * Stream to get ledger address from memory
+   */
+  const getLedgerAddress$: GetKeystoreLedgerAddressHandler = (chain: Chain) =>
     FP.pipe(
       ledgerAddresses$,
-      RxOp.map((addressesMap) => addressesMap[chain]),
-      RxOp.distinctUntilChanged(eqLedgerAddressMap.equals),
-      RxOp.map((addressMap) => addressMap[network])
+      RxOp.map(
+        (addresses) =>
+          FP.pipe(
+            addresses,
+            A.findFirst(({ chain: c }) => eqChain.equals(c, chain))
+          ),
+        RxOp.distinctUntilChanged(eqOKeystoreLedgerAddress.equals)
+      )
     )
 
-  const verifyLedgerAddress: VerifyLedgerAddressHandler = async ({ chain, network, walletIndex }) =>
-    window.apiHDWallet.verifyLedgerAddress({ chain, network, walletIndex })
+  const verifyLedgerAddress$: VerifyLedgerAddressHandler = (chain) =>
+    FP.pipe(
+      getLedgerAddress$(chain),
+      RxOp.switchMap((oAddress) =>
+        FP.pipe(
+          oAddress,
+          O.fold(
+            () => Rx.of(RD.failure(Error(`Could not find Ledger for ${chain}`))),
+            ({ chain, network, walletIndex, ethDerivationMode }) =>
+              FP.pipe(
+                Rx.from(
+                  window.apiHDWallet.verifyLedgerAddress({
+                    chain,
+                    network,
+                    walletIndex,
+                    ethDerivationMode: O.toUndefined(ethDerivationMode)
+                  })
+                ),
+                RxOp.catchError((error: Error) => Rx.of(RD.failure(error))),
+                RxOp.map((verified) =>
+                  verified ? RD.success(true) : RD.failure(Error(`Could not verify Ledger for ${chain}`))
+                )
+              )
+          )
+        )
+      ),
+      RxOp.startWith(RD.pending)
+    )
+
+  //     RD.fromOption(() => Error(`Could not find Ledger for ${chain}`))),
+  //   liveData.chain((address) => {
+  //     const {chain, network, walletIndex, eth} = address
+  //       return Rx.of( window.apiHDWallet.verifyLedgerAddress({
+  //         chain,
+  //         network,
+  //         walletIndex,
+  //         ethDerivationPath
+  //       }).then((result))
+
+  //       )
+  //   })
+  // )
 
   /**
-   * Removes ledger address from memory
+   * Removes ledger address from `keystoreLedgerAddresses` list
    */
   const removeLedgerAddress: RemoveLedgerAddressHandler = ({ id, chain, network }) =>
-    setLedgerAddressRD({
-      addressRD: RD.initial,
-      chain,
-      network,
-      id
-    })
-
-  /**
-   * Sets ledger address in `pending` state
-   */
-  const setPendingLedgerAddress = ({ id, chain, network }: { id: KeystoreId; chain: Chain; network: Network }): void =>
-    setLedgerAddressRD({
-      id,
-      addressRD: RD.pending,
-      chain,
-      network
-    })
+    FP.pipe(
+      keystoreLedgerAddresses(),
+      A.filter(
+        ({ chain: c, network: n, keystoreId }) =>
+          !(eqKeystoreId.equals(id, keystoreId) && eqChain.equals(c, chain) && eqNetwork.equals(n, network))
+      ),
+      setKeystoreLedgerAddresses
+    )
 
   /**
    * Ask Ledger to get address from it
    */
-  const askLedgerAddress$: AskLedgerAddressesHandler = ({ id, chain, network, walletIndex }) =>
+  const askLedgerAddress$: AskLedgerAddressesHandler = ({ id, chain, network, ethDerivationMode, walletIndex }) =>
     FP.pipe(
-      // remove address from memory
-      removeLedgerAddress({ id, chain, network }),
-      // set pending
-      () => setPendingLedgerAddress({ id, chain, network }),
-      // ask for ledger address
-      () => Rx.from(window.apiHDWallet.getLedgerAddress({ chain, network, walletIndex })),
+      Rx.from(
+        window.apiHDWallet.getLedgerAddress({
+          chain,
+          network,
+          walletIndex,
+          ethDerivationMode: O.toUndefined(ethDerivationMode)
+        })
+      ),
       RxOp.map(RD.fromEither),
-      // store address in memory
-      RxOp.tap((addressRD: LedgerAddressRD) => setLedgerAddressRD({ chain, addressRD, network, id })),
       RxOp.catchError((error) =>
         Rx.of(
           RD.failure({
@@ -173,21 +264,41 @@ export const createLedgerService = ({
           })
         )
       ),
+      liveData.map<WalletAddress, KeystoreLedgerAddress>(({ address }) => {
+        const ledgerAddress: KeystoreLedgerAddress = {
+          keystoreId: id,
+          chain,
+          network,
+          ethDerivationMode,
+          walletIndex,
+          address
+        }
+        // store address in memory
+        addLedgerAddress(ledgerAddress)
+        return ledgerAddress
+      }),
       RxOp.startWith(RD.pending)
     )
 
+  // TODO(@veado) Do we still need `keystore$.subscribe` or does `removedKeystoreId$.subscribe` same job?
   // Whenever all keystores have been removed, reset all stored ledger addresses
-  keystore$.subscribe((keystoreState: KeystoreState) => {
-    if (!hasImportedKeystore(keystoreState)) {
-      setKeystoreLedgerAddresses(INITIAL_KEYSTORE_LEDGER_ADDRESSES_MAP)
-    }
-  })
+  // keystore$.subscribe((keystoreState: KeystoreState) => {
+  //   if (!hasImportedKeystore(keystoreState)) {
+  //     setKeystoreLedgerAddresses(INITIAL_KEYSTORE_LEDGER_ADDRESSES)
+  //   }
+  // })
 
   // Whenever a keystore have been removed, remove its related ledger addresses
   removedKeystoreId$.subscribe((oKeystoreId: O.Option<KeystoreId>) =>
     FP.pipe(
       oKeystoreId,
-      O.map((id) => FP.pipe(keystoreLedgerAddresses(), M.deleteAt(N.Eq)(id), setKeystoreLedgerAddresses))
+      O.map((id) =>
+        FP.pipe(
+          keystoreLedgerAddresses(),
+          A.filter(({ keystoreId }) => keystoreId !== id),
+          setKeystoreLedgerAddresses
+        )
+      )
     )
   )
 
@@ -200,7 +311,7 @@ export const createLedgerService = ({
     ledgerAddresses$,
     askLedgerAddress$,
     getLedgerAddress$,
-    verifyLedgerAddress,
+    verifyLedgerAddress$,
     removeLedgerAddress
   }
 }

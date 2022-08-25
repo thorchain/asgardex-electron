@@ -15,7 +15,6 @@ import {
   reloadFeesWithRates,
   subscribeTx,
   resetTx,
-  ledgerAddress$,
   ledgerTxRD$,
   pushLedgerTx,
   resetLedgerTx,
@@ -37,7 +36,6 @@ export type BitcoinContextValue = {
   txRD$: typeof txRD$
   subscribeTx: typeof subscribeTx
   resetTx: typeof resetTx
-  ledgerAddress$: typeof ledgerAddress$
   ledgerTxRD$: typeof ledgerTxRD$
   pushLedgerTx: typeof pushLedgerTx
   resetLedgerTx: typeof resetLedgerTx
@@ -59,7 +57,6 @@ const initialContext: BitcoinContextValue = {
   txRD$,
   subscribeTx,
   resetTx,
-  ledgerAddress$,
   ledgerTxRD$,
   pushLedgerTx,
   resetLedgerTx,

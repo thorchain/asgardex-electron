@@ -10,7 +10,7 @@ import { IntlShape } from 'react-intl'
 
 import { KeystoreWallets, KeystoreWallet } from '../../../shared/api/io'
 import { KeystoreId, LedgerErrorId } from '../../../shared/api/types'
-import { WalletType } from '../../../shared/wallet/types'
+import { WalletAddress, WalletType } from '../../../shared/wallet/types'
 import { eqAsset } from '../../helpers/fp/eq'
 import { ordBaseAmount } from '../../helpers/fp/ord'
 import { sequenceSOption } from '../../helpers/fpHelpers'
@@ -22,7 +22,8 @@ import {
   WalletBalance,
   isKeystoreLocked,
   isKeystoreUnlocked,
-  KeystoreLocked
+  KeystoreLocked,
+  KeystoreLedgerAddress
 } from './types'
 
 export const getPhrase = (state: KeystoreState): O.Option<Phrase> =>
@@ -201,3 +202,14 @@ export const ledgerErrorIdToI18n = (errorId: LedgerErrorId, intl: IntlShape) => 
       return intl.formatMessage({ id: 'ledger.error.unknown' })
   }
 }
+
+export const keystoreLedgerAddressToWalletAddress = ({
+  walletIndex,
+  address,
+  chain
+}: KeystoreLedgerAddress): WalletAddress => ({
+  type: 'ledger',
+  walletIndex,
+  address,
+  chain
+})

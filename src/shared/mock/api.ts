@@ -31,7 +31,9 @@ export const apiHDWallet: ApiHDWallet = {
   verifyLedgerAddress: () => Promise.resolve(true),
   sendLedgerTx: () => Promise.resolve(E.right('tx_hash')),
   depositLedgerTx: () => Promise.resolve(E.right('tx_hash')),
-  approveLedgerERC20Token: () => Promise.resolve(E.right('tx_hash'))
+  approveLedgerERC20Token: () => Promise.resolve(E.right('tx_hash')),
+  saveLedgerAddresses: (_) => Promise.resolve(E.right([])),
+  getLedgerAddresses: () => Promise.resolve(E.right([]))
 }
 
 const commonStorageData: CommonStorage = {

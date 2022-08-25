@@ -10,6 +10,7 @@ import * as Rx from 'rxjs'
 
 import { KeystoreWallet, KeystoreWallets } from '../../../shared/api/io'
 import { KeystoreId, LedgerError, Network } from '../../../shared/api/types'
+import { EthDerivationMode } from '../../../shared/ethereum/types'
 import { WalletAddress, WalletBalanceType, WalletType } from '../../../shared/wallet/types'
 import { LiveData } from '../../helpers/rx/liveData'
 import { LoadTxsParams, WalletBalancesLD, WalletBalancesRD } from '../clients'
@@ -91,12 +92,9 @@ export type KeystoreService = {
   resetImportingKeystoreState: FP.Lazy<void>
 }
 
-export type WalletAddressAsync = { address: RD.RemoteData<Error, WalletAddress>; type: WalletType }
-export type WalletAddressesAsync = WalletAddressAsync[]
-
 export type WalletAccount = {
   chain: Chain
-  accounts: WalletAddressesAsync
+  accounts: WalletAddress[]
 }
 
 export type WalletAccounts = WalletAccount[]
@@ -178,24 +176,22 @@ export type BalancesService = {
   dispose: FP.Lazy<void>
 }
 
-export type GetLedgerAddressHandler = (chain: Chain, network: Network) => LedgerAddressLD
-export type VerifyLedgerAddressHandler = (params: {
-  chain: Chain
-  network: Network
-  walletIndex: number
-}) => Promise<boolean>
+export type GetKeystoreLedgerAddressHandler = (chain: Chain) => Rx.Observable<O.Option<KeystoreLedgerAddress>>
+export type VerifyLedgerAddressHandler = (chain: Chain) => Rx.Observable<RD.RemoteData<Error, boolean>>
 
 export type AskLedgerAddressesHandler = ({
   id,
   chain,
   network,
-  walletIndex
+  walletIndex,
+  ethDerivationMode
 }: {
   id: KeystoreId
   chain: Chain
   network: Network
   walletIndex: number
-}) => LedgerAddressLD
+  ethDerivationMode: O.Option<EthDerivationMode>
+}) => KeystoreLedgerAddressLD
 
 export type RemoveLedgerAddressHandler = ({
   id,
@@ -208,10 +204,10 @@ export type RemoveLedgerAddressHandler = ({
 }) => void
 
 export type LedgerService = {
-  ledgerAddresses$: Rx.Observable<LedgerAddressesMap>
+  ledgerAddresses$: KeystoreLedgerAddresses$
   askLedgerAddress$: AskLedgerAddressesHandler
-  getLedgerAddress$: GetLedgerAddressHandler
-  verifyLedgerAddress: VerifyLedgerAddressHandler
+  getLedgerAddress$: GetKeystoreLedgerAddressHandler
+  verifyLedgerAddress$: VerifyLedgerAddressHandler
   removeLedgerAddress: RemoveLedgerAddressHandler
 }
 
@@ -233,16 +229,17 @@ export type TxHashLD = LiveData<ApiError, TxHash>
 export type LedgerTxHashRD = RD.RemoteData<LedgerError, TxHash>
 export type LedgerTxHashLD = LiveData<LedgerError, TxHash>
 
-export type LedgerAddressRD = RD.RemoteData<LedgerError, WalletAddress>
-export type LedgerAddressLD = LiveData<LedgerError, WalletAddress>
+export type KeystoreLedgerAddress = Omit<WalletAddress, 'type'> & {
+  keystoreId: KeystoreId
+  network: Network
+  ethDerivationMode: O.Option<EthDerivationMode>
+}
+export type KeystoreLedgerAddressRD = RD.RemoteData<LedgerError, KeystoreLedgerAddress>
+export type KeystoreLedgerAddressLD = LiveData<LedgerError, KeystoreLedgerAddress>
 
-export type LedgerAddressMap = Record<Network, LedgerAddressRD>
-export type LedgerAddressMap$ = Rx.Observable<LedgerAddressMap>
-
-export type LedgerAddressesMap = Record<Chain, LedgerAddressMap>
-export type LedgerAddressesMap$ = Rx.Observable<LedgerAddressesMap>
-
-export type KeystoreLedgerAddressesMap = Map<KeystoreId, LedgerAddressesMap>
+export type KeystoreLedgerAddresses = KeystoreLedgerAddress[]
+export type KeystoreLedgerAddresses$ = Rx.Observable<KeystoreLedgerAddresses>
+export type KeystoreLedgerAddressesLD = Rx.Observable<KeystoreLedgerAddresses>
 
 export type KeystoreWalletsRD = RD.RemoteData<Error, KeystoreWallets>
 export type KeystoreWalletsLD = LiveData<Error, KeystoreWallets>

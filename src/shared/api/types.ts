@@ -89,6 +89,7 @@ export enum LedgerErrorId {
   TIMEOUT = 'TIMEOUT',
   INVALID_RESPONSE = 'INVALID_RESPONSE',
   NOT_IMPLEMENTED = 'NOT_IMPLEMENTED',
+  INVALID_ETH_DERIVATION_MODE = 'INVALID_ETH_DERIVATION_MODE',
   GET_ADDRESS_FAILED = 'GET_ADDRESS_FAILED',
   UNKNOWN = 'UNKNOWN'
 }
@@ -119,7 +120,12 @@ export type LedgerLTCTxInfo = Pick<TxParams, 'amount' | 'recipient'> & {
 
 export type LedgerTxParams = LedgerTHORTxParams | LedgerBNBTxParams
 
-export type IPCLedgerAdddressParams = { chain: Chain; network: Network; walletIndex: number }
+export type IPCLedgerAdddressParams = {
+  chain: Chain
+  network: Network
+  walletIndex: number
+  ethDerivationMode: EthDerivationMode | undefined
+}
 
 export type ApiHDWallet = {
   getLedgerAddress: (params: IPCLedgerAdddressParams) => Promise<E.Either<LedgerError, WalletAddress>>

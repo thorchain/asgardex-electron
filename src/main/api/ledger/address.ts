@@ -26,7 +26,8 @@ import { getAddress as getTHORAddress, verifyAddress as verifyTHORAddress } from
 export const getAddress = async ({
   chain,
   network,
-  walletIndex
+  walletIndex,
+  ethDerivationMode
 }: IPCLedgerAdddressParams): Promise<E.Either<LedgerError, WalletAddress>> => {
   try {
     let res: E.Either<LedgerError, WalletAddress>
@@ -50,9 +51,17 @@ export const getAddress = async ({
       case DOGEChain:
         res = await getDOGEAddress(transport, network, walletIndex)
         break
-      case ETHChain:
-        res = await getETHAddress(transport, walletIndex)
+      case ETHChain: {
+        if (!ethDerivationMode) {
+          res = res = E.left({
+            errorId: LedgerErrorId.INVALID_ETH_DERIVATION_MODE,
+            msg: `To get Ledger address 'ethDerivationMode' is needed for ETH`
+          })
+        } else {
+          res = await getETHAddress(transport, walletIndex, ethDerivationMode)
+        }
         break
+      }
       case CosmosChain:
         res = await getCOSMOSAddress(transport, walletIndex)
         break

@@ -49,7 +49,7 @@ import {
   KeystoreState$,
   KeystoreState,
   ChainBalance,
-  GetLedgerAddressHandler
+  GetKeystoreLedgerAddressHandler
 } from './types'
 import { sortBalances } from './util'
 import { hasImportedKeystore } from './util'
@@ -61,7 +61,7 @@ export const createBalancesService = ({
 }: {
   keystore$: KeystoreState$
   network$: Network$
-  getLedgerAddress$: GetLedgerAddressHandler
+  getLedgerAddress$: GetKeystoreLedgerAddressHandler
 }): BalancesService => {
   // reload all balances
   const reloadBalances: FP.Lazy<void> = () => {
@@ -295,12 +295,10 @@ export const createBalancesService = ({
     }) => WalletBalancesLD
   }): ChainBalance$ =>
     FP.pipe(
-      network$,
-      RxOp.switchMap((network) => getLedgerAddress$(chain, network)),
-      RxOp.switchMap((addressRD) =>
+      getLedgerAddress$(chain),
+      RxOp.switchMap((oAddress) =>
         FP.pipe(
-          addressRD,
-          RD.toOption,
+          oAddress,
           O.fold(
             () =>
               // In case we don't get an address,

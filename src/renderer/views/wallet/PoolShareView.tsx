@@ -72,7 +72,7 @@ export const PoolShareView: React.FC = (): JSX.Element => {
     O.none
   )
 
-  const [allSharesRD, networkUpdated] = useObservableState<PoolSharesRD, Network>((network$) => {
+  const [allSharesRD] = useObservableState<PoolSharesRD, Network>(() => {
     // keystore addresses
     const addresses$: WalletAddress$[] = FP.pipe(
       ENABLED_CHAINS,
@@ -81,18 +81,29 @@ export const PoolShareView: React.FC = (): JSX.Element => {
     )
 
     // ledger addresses
-    const ledgerAddresses$ = (network: Network): WalletAddress$[] =>
+    const ledgerAddresses$ = (): WalletAddress$[] =>
       FP.pipe(
         ENABLED_CHAINS,
         A.filter((chain) => !isThorChain(chain)),
-        A.map((chain) => getLedgerAddress$(chain, network)),
-        // Transform `LedgerAddress` -> `Option<WalletAddress>`
-        A.map(RxOp.map(RD.toOption))
+        A.map((chain) => getLedgerAddress$(chain)),
+        A.map(
+          RxOp.map(
+            FP.flow(
+              // Transform `KeystoreLedgerAddress` -> `WalletAddress`
+              O.map(({ network, chain, walletIndex, address }) => ({
+                network,
+                chain,
+                walletIndex,
+                address,
+                type: 'ledger'
+              }))
+            )
+          )
+        )
       )
 
     return FP.pipe(
-      network$,
-      RxOp.switchMap((network) => Rx.combineLatest([...addresses$, ...ledgerAddresses$(network)])),
+      Rx.combineLatest([...addresses$, ...ledgerAddresses$()]),
       RxOp.switchMap(
         FP.flow(
           /**
@@ -115,8 +126,6 @@ export const PoolShareView: React.FC = (): JSX.Element => {
       )
     )
   }, RD.initial)
-
-  useEffect(() => networkUpdated(network), [network, networkUpdated])
 
   const [haltedChains] = useObservableState(() => FP.pipe(haltedChains$, RxOp.map(RD.getOrElse((): Chain[] => []))), [])
   const { mimirHalt } = useMimirHalt()
