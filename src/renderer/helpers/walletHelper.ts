@@ -152,16 +152,16 @@ export const getWalletByAddress = (walletBalances: WalletBalances, address: Addr
     A.findFirst(({ walletAddress }) => eqAddress.equals(walletAddress, address))
   )
 
-export const isEnabledWallet = (chain: Chain, network: Network, walletType: WalletType) => {
+export const isEnabledLedger = (chain: Chain, network: Network) => {
   // Disable THORChain ledger wallets in stagenet
-  if (isThorChain(chain) && network === 'stagenet' && isLedgerWallet(walletType)) return false
+  if (isThorChain(chain) && network === 'stagenet') return false
   // Disable LTC ledger wallets in testnet
   // It seems Ledger can not derive LTC addresses on Testnet properly
-  if (isLtcChain(chain) && network === 'testnet' && isLedgerWallet(walletType)) return false
+  if (isLtcChain(chain) && network === 'testnet') return false
   // Same for BCH - no Ledger support for `testnet`
-  if (isBchChain(chain) && network === 'testnet' && isLedgerWallet(walletType)) return false
+  if (isBchChain(chain) && network === 'testnet') return false
   // No DOGE support on `testnet`
-  if (isDogeChain(chain) && network === 'testnet' && isLedgerWallet(walletType)) return false
+  if (isDogeChain(chain) && network === 'testnet') return false
   return true
 }
 

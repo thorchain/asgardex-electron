@@ -33,7 +33,7 @@ import {
   getWalletIndexFromNullableString,
   getWalletTypeFromNullableString,
   hasLedgerInBalancesByAsset,
-  isEnabledWallet
+  isEnabledLedger
 } from './walletHelper'
 
 describe('walletHelper', () => {
@@ -201,50 +201,50 @@ describe('walletHelper', () => {
     })
   })
 
-  describe('isEnabledWallet', () => {
+  describe('isEnabledLedger', () => {
     it('THOR ledger stagenet -> false', () => {
-      expect(isEnabledWallet(THORChain, 'stagenet', 'ledger')).toBeFalsy()
+      expect(isEnabledLedger(THORChain, 'stagenet')).toBeFalsy()
     })
     it('THOR ledger mainnet/testnet -> true', () => {
-      expect(isEnabledWallet(THORChain, 'mainnet', 'ledger')).toBeTruthy()
-      expect(isEnabledWallet(THORChain, 'testnet', 'ledger')).toBeTruthy()
+      expect(isEnabledLedger(THORChain, 'mainnet')).toBeTruthy()
+      expect(isEnabledLedger(THORChain, 'testnet')).toBeTruthy()
     })
     it('LTC ledger testnet -> false', () => {
-      expect(isEnabledWallet(LTCChain, 'testnet', 'ledger')).toBeFalsy()
+      expect(isEnabledLedger(LTCChain, 'testnet')).toBeFalsy()
     })
     it('LTC ledger mainnet/stagenet -> true', () => {
-      expect(isEnabledWallet(LTCChain, 'mainnet', 'ledger')).toBeTruthy()
-      expect(isEnabledWallet(LTCChain, 'stagenet', 'ledger')).toBeTruthy()
+      expect(isEnabledLedger(LTCChain, 'mainnet')).toBeTruthy()
+      expect(isEnabledLedger(LTCChain, 'stagenet')).toBeTruthy()
     })
     it('BCH ledger testnet -> false', () => {
-      expect(isEnabledWallet(BCHChain, 'testnet', 'ledger')).toBeFalsy()
+      expect(isEnabledLedger(BCHChain, 'testnet')).toBeFalsy()
     })
     it('BCH ledger mainnet/stagenet -> true', () => {
-      expect(isEnabledWallet(BCHChain, 'mainnet', 'ledger')).toBeTruthy()
-      expect(isEnabledWallet(BCHChain, 'stagenet', 'ledger')).toBeTruthy()
+      expect(isEnabledLedger(BCHChain, 'mainnet')).toBeTruthy()
+      expect(isEnabledLedger(BCHChain, 'stagenet')).toBeTruthy()
     })
     it('BTC ledger -> true', () => {
-      expect(isEnabledWallet(BTCChain, 'mainnet', 'ledger')).toBeTruthy()
-      expect(isEnabledWallet(BTCChain, 'testnet', 'ledger')).toBeTruthy()
-      expect(isEnabledWallet(BTCChain, 'stagenet', 'ledger')).toBeTruthy()
+      expect(isEnabledLedger(BTCChain, 'mainnet')).toBeTruthy()
+      expect(isEnabledLedger(BTCChain, 'testnet')).toBeTruthy()
+      expect(isEnabledLedger(BTCChain, 'stagenet')).toBeTruthy()
     })
     it('BNB ledger -> true', () => {
-      expect(isEnabledWallet(BNBChain, 'mainnet', 'ledger')).toBeTruthy()
-      expect(isEnabledWallet(BNBChain, 'testnet', 'ledger')).toBeTruthy()
-      expect(isEnabledWallet(BNBChain, 'stagenet', 'ledger')).toBeTruthy()
+      expect(isEnabledLedger(BNBChain, 'mainnet')).toBeTruthy()
+      expect(isEnabledLedger(BNBChain, 'testnet')).toBeTruthy()
+      expect(isEnabledLedger(BNBChain, 'stagenet')).toBeTruthy()
     })
     it('DOGE ledger testnet - false', () => {
-      expect(isEnabledWallet(DOGEChain, 'testnet', 'ledger')).toBeFalsy()
+      expect(isEnabledLedger(DOGEChain, 'testnet')).toBeFalsy()
     })
     it('DOGE ledger mainnet/stagenet -> true', () => {
-      expect(isEnabledWallet(DOGEChain, 'mainnet', 'ledger')).toBeTruthy()
-      expect(isEnabledWallet(DOGEChain, 'stagenet', 'ledger')).toBeTruthy()
+      expect(isEnabledLedger(DOGEChain, 'mainnet')).toBeTruthy()
+      expect(isEnabledLedger(DOGEChain, 'stagenet')).toBeTruthy()
     })
 
     it('Cosmos ledger mainnet/stagenet/testnet -> true', () => {
-      expect(isEnabledWallet(CosmosChain, 'testnet', 'ledger')).toBeTruthy()
-      expect(isEnabledWallet(CosmosChain, 'mainnet', 'ledger')).toBeTruthy()
-      expect(isEnabledWallet(CosmosChain, 'stagenet', 'ledger')).toBeTruthy()
+      expect(isEnabledLedger(CosmosChain, 'testnet')).toBeTruthy()
+      expect(isEnabledLedger(CosmosChain, 'mainnet')).toBeTruthy()
+      expect(isEnabledLedger(CosmosChain, 'stagenet')).toBeTruthy()
     })
   })
 

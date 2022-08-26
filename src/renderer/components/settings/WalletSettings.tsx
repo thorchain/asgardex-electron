@@ -24,12 +24,11 @@ import * as A from 'fp-ts/lib/Array'
 import * as O from 'fp-ts/lib/Option'
 import { FormattedMessage, useIntl } from 'react-intl'
 import { useNavigate } from 'react-router-dom'
-import * as Rx from 'rxjs'
 
 import { KeystoreId, Network } from '../../../shared/api/types'
 import { getDerivationPath as getEthDerivationPath } from '../../../shared/ethereum/ledger'
 import { EthDerivationMode } from '../../../shared/ethereum/types'
-import { isError, isLedgerWallet } from '../../../shared/utils/guard'
+import { isError } from '../../../shared/utils/guard'
 import { WalletAddress } from '../../../shared/wallet/types'
 import { ReactComponent as UnlockOutlined } from '../../assets/svg/icon-unlock-warning.svg'
 import { WalletPasswordConfirmationModal } from '../../components/modal/confirmation'
@@ -37,19 +36,10 @@ import { RemoveWalletConfirmationModal } from '../../components/modal/confirmati
 import { AssetIcon } from '../../components/uielements/assets/assetIcon/AssetIcon'
 import { QRCodeModal } from '../../components/uielements/qrCodeModal/QRCodeModal'
 import { PhraseCopyModal } from '../../components/wallet/phrase/PhraseCopyModal'
-import {
-  getChainAsset,
-  isBchChain,
-  isBnbChain,
-  isBtcChain,
-  isCosmosChain,
-  isDogeChain,
-  isEthChain,
-  isLtcChain,
-  isThorChain
-} from '../../helpers/chainHelper'
+import { getChainAsset, isEthChain } from '../../helpers/chainHelper'
+import { eqChain } from '../../helpers/fp/eq'
 import { emptyString } from '../../helpers/stringHelper'
-import { isEnabledWallet } from '../../helpers/walletHelper'
+import { isEnabledLedger } from '../../helpers/walletHelper'
 import { useSubscriptionState } from '../../hooks/useSubscriptionState'
 import * as appRoutes from '../../routes/app'
 import * as walletRoutes from '../../routes/wallet'
@@ -62,7 +52,11 @@ import {
   ChangeKeystoreWalletHandler,
   ChangeKeystoreWalletRD,
   RenameKeystoreWalletHandler,
-  RenameKeystoreWalletRD
+  RenameKeystoreWalletRD,
+  VerifiedLedgerAddressLD,
+  KeystoreLedgerAddressRD,
+  KeystoreLedgerAddressLD,
+  VerifiedLedgerAddressRD
 } from '../../services/wallet/types'
 import { walletTypeToI18n } from '../../services/wallet/util'
 import { AttentionIcon } from '../icons'
@@ -83,12 +77,16 @@ type Props = {
   changeKeystoreWallet$: ChangeKeystoreWalletHandler
   renameKeystoreWallet$: RenameKeystoreWalletHandler
   exportKeystore: () => Promise<void>
-  addLedgerAddress: (params: {
+  addLedgerAddress$: (params: {
     chain: Chain
     walletIndex: number
     ethDerivationMode: O.Option<EthDerivationMode>
-  }) => void
-  verifyLedgerAddress$: (chain: Chain) => Rx.Observable<RD.RemoteData<Error, boolean>>
+  }) => KeystoreLedgerAddressLD
+  verifyLedgerAddress$: (params: {
+    chain: Chain
+    walletIndex: number
+    ethDerivationMode: O.Option<EthDerivationMode>
+  }) => VerifiedLedgerAddressLD
   removeLedgerAddress: (chain: Chain) => void
   keystoreUnlocked: KeystoreUnlocked
   wallets: KeystoreWalletsUI
@@ -109,7 +107,7 @@ export const WalletSettings: React.FC<Props> = (props): JSX.Element => {
     changeKeystoreWallet$,
     renameKeystoreWallet$,
     exportKeystore,
-    addLedgerAddress,
+    addLedgerAddress$,
     verifyLedgerAddress$,
     removeLedgerAddress,
     keystoreUnlocked: { phrase, name: walletName, id: walletId },
@@ -176,187 +174,235 @@ export const WalletSettings: React.FC<Props> = (props): JSX.Element => {
     [TerraChain]: 0 // not supported in ASGDX anymore, but part of xchain-util
   })
 
-  const [addressToVerify, setAddressToVerify] = useState<AddressToVerify>(O.none)
+  const {
+    state: verifyLedgerAddressRD,
+    reset: resetVerifyLedgerAddressRD,
+    subscribe: subscribeVerifyLedgerAddressRD
+  } = useSubscriptionState<VerifiedLedgerAddressRD>(RD.initial)
 
-  const rejectLedgerAddress = useCallback(
-    (chain: Chain) => {
-      removeLedgerAddress(chain)
-      setAddressToVerify(O.none)
-    },
-    [removeLedgerAddress]
-  )
+  useEffect(() => {
+    FP.pipe(
+      verifyLedgerAddressRD,
+      RD.map(() => {
+        setLedgerAddressToVerify(O.none) // close modal
+        resetVerifyLedgerAddressRD() // reset state
+        return true
+      })
+    )
+  }, [verifyLedgerAddressRD, resetVerifyLedgerAddressRD])
+
+  const [ledgerAddressToVerify, setLedgerAddressToVerify] = useState<AddressToVerify>(O.none)
 
   const [ethDerivationMode, setEthDerivationMode] = useState<EthDerivationMode>('ledgerlive')
 
-  const renderAddress = useCallback(
-    (chain: Chain, { type: walletType, address, walletIndex }: WalletAddress) => {
-      const verifyLedgerAddressHandler = () => {
-        setAddressToVerify(
-          O.some({
-            address,
-            chain
-          })
-        )
-        try {
-          const result = verifyLedgerAddress$(chain)
-          // TODO/@veado) Fix: Use `useSubscriptionState` to handle verification state
-          !result ? rejectLedgerAddress(chain) : setAddressToVerify(O.none) /* close modal */
-        } catch (_) {
-          rejectLedgerAddress(chain)
-        }
-      }
+  const renderLedgerNotSupported = useMemo(
+    () => (
+      <div className="mt-10px w-full">
+        <Styled.WalletTypeLabel>{walletTypeToI18n('ledger', intl)}</Styled.WalletTypeLabel>
+        <div className="ml-40px flex items-center pt-5px text-[12px] text-text2 dark:text-text2d">
+          <Styled.Icon component={AttentionIcon} />
+          {intl.formatMessage({ id: 'common.notsupported.fornetwork' }, { network })}
+        </div>
+      </div>
+    ),
+    [intl, network]
+  )
 
-      const onChangeEthDerivationMode = (e: RadioChangeEvent) => {
-        setEthDerivationMode(e.target.value as EthDerivationMode)
-      }
+  const {
+    state: addLedgerAddressRD,
+    reset: resetAddLedgerAddressRD,
+    subscribe: subscribeAddLedgerAddressRD
+  } = useSubscriptionState<KeystoreLedgerAddressRD>(RD.initial)
 
-      const addLedgerAddressHandler = () => {
-        addLedgerAddress({
+  const [ledgerChainToAdd, setLedgerChainToAdd] = useState<O.Option<Chain>>(O.none)
+
+  const addLedgerAddress = useCallback(
+    (chain: Chain, walletIndex: number) => {
+      resetAddLedgerAddressRD()
+      setLedgerChainToAdd(O.some(chain))
+      subscribeAddLedgerAddressRD(
+        addLedgerAddress$({
           chain,
           walletIndex,
           ethDerivationMode: isEthChain(chain) ? O.some(ethDerivationMode) : O.none
         })
+      )
+    },
+    [addLedgerAddress$, setLedgerChainToAdd, ethDerivationMode, resetAddLedgerAddressRD, subscribeAddLedgerAddressRD]
+  )
+
+  const verifyLedgerAddressHandler = useCallback(
+    (walletAddress: WalletAddress) => {
+      const { chain, walletIndex, address } = walletAddress
+      setLedgerAddressToVerify(O.some({ chain, address }))
+      subscribeVerifyLedgerAddressRD(
+        verifyLedgerAddress$({
+          chain,
+          walletIndex,
+          ethDerivationMode: isEthChain(chain) ? O.some(ethDerivationMode) : O.none
+        })
+      )
+    },
+    [ethDerivationMode, subscribeVerifyLedgerAddressRD, verifyLedgerAddress$]
+  )
+
+  const renderLedgerAddress = useCallback(
+    (chain: Chain, oAddress: O.Option<WalletAddress>) => {
+      const renderAddAddress = () => {
+        const onChangeEthDerivationMode = (e: RadioChangeEvent) => {
+          setEthDerivationMode(e.target.value as EthDerivationMode)
+        }
+
+        const selectedWalletIndex = walletIndexMap[chain]
+
+        const addingLedger: boolean = FP.pipe(
+          ledgerChainToAdd,
+          O.map((c) => eqChain.equals(chain, c)),
+          O.getOrElse(() => false)
+        )
+        const loading = addingLedger && RD.isPending(addLedgerAddressRD)
+        const empty = () => <></>
+        const renderError = FP.pipe(
+          addLedgerAddressRD,
+          RD.fold(
+            empty,
+            empty,
+            (error) => <p className="pt-10px font-main text-[12px] uppercase text-error0">{error.msg}</p>,
+            empty
+          )
+        )
+
+        const addLedgerAddressHandler = () => {
+          addLedgerAddress(chain, selectedWalletIndex)
+        }
+
+        return (
+          <div>
+            <div className="flex w-full flex-col md:w-auto lg:flex-row">
+              <div className="mr-30px flex items-center md:mr-0">
+                <Styled.AddLedgerButton onClick={addLedgerAddressHandler} loading={loading}>
+                  <Styled.AddLedgerIcon /> {intl.formatMessage({ id: 'ledger.add.device' })}
+                </Styled.AddLedgerButton>
+                <>
+                  <div className="text-[12px] uppercase text-text2 dark:text-text2d">
+                    {intl.formatMessage({ id: 'setting.wallet.index' })}
+                  </div>
+                  <Styled.WalletIndexInput
+                    value={selectedWalletIndex.toString()}
+                    pattern="[0-9]+"
+                    onChange={(value) =>
+                      value !== null && +value >= 0 && setWalletIndexMap({ ...walletIndexMap, [chain]: +value })
+                    }
+                    style={{ width: 60 }}
+                    disabled={loading}
+                    onPressEnter={addLedgerAddressHandler}
+                  />
+                  <InfoIcon tooltip={intl.formatMessage({ id: 'setting.wallet.index.info' })} />
+                </>
+              </div>
+
+              {isEthChain(chain) && (
+                <StyledR.Radio.Group
+                  className="!flex flex-col items-start lg:flex-row lg:items-center lg:!pl-30px"
+                  onChange={onChangeEthDerivationMode}
+                  value={ethDerivationMode}>
+                  <StyledR.Radio value="ledgerlive" key="ledgerlive">
+                    <Styled.EthDerivationModeRadioLabel>
+                      {intl.formatMessage({ id: 'common.ledgerlive' })}
+                      <InfoIcon
+                        tooltip={intl.formatMessage(
+                          { id: 'setting.wallet.hdpath.ledgerlive.info' },
+                          { path: getEthDerivationPath(walletIndexMap[ETHChain], 'ledgerlive') }
+                        )}
+                      />
+                    </Styled.EthDerivationModeRadioLabel>
+                  </StyledR.Radio>
+                  <StyledR.Radio value="legacy" key="legacy">
+                    <Styled.EthDerivationModeRadioLabel>
+                      {intl.formatMessage({ id: 'common.legacy' })}
+                      <InfoIcon
+                        tooltip={intl.formatMessage(
+                          { id: 'setting.wallet.hdpath.legacy.info' },
+                          { path: getEthDerivationPath(walletIndexMap[ETHChain], 'legacy') }
+                        )}
+                      />
+                    </Styled.EthDerivationModeRadioLabel>
+                  </StyledR.Radio>
+                  <StyledR.Radio value="metamask" key="metamask">
+                    <Styled.EthDerivationModeRadioLabel>
+                      {intl.formatMessage({ id: 'common.metamask' })}
+                      <InfoIcon
+                        tooltip={intl.formatMessage(
+                          { id: 'setting.wallet.hdpath.metamask.info' },
+                          { path: getEthDerivationPath(walletIndexMap[ETHChain], 'metamask') }
+                        )}
+                      />
+                    </Styled.EthDerivationModeRadioLabel>
+                  </StyledR.Radio>
+                </StyledR.Radio.Group>
+              )}
+            </div>
+            {addingLedger && renderError}
+          </div>
+        )
       }
 
-      // TODO(@veado) Bring it back
-      const _renderAddLedger = (chain: Chain, loading: boolean) => (
-        <div className="flex w-full flex-col md:w-auto lg:flex-row">
-          <div className="mr-30px flex items-center md:mr-0">
-            <Styled.AddLedgerButton loading={loading} onClick={addLedgerAddressHandler}>
-              <Styled.AddLedgerIcon /> {intl.formatMessage({ id: 'ledger.add.device' })}
-            </Styled.AddLedgerButton>
-            {(isBnbChain(chain) ||
-              isThorChain(chain) ||
-              isBtcChain(chain) ||
-              isLtcChain(chain) ||
-              isBchChain(chain) ||
-              isDogeChain(chain) ||
-              isEthChain(chain) ||
-              isCosmosChain(chain)) && (
-              <>
-                <div className="text-[12px] uppercase text-text2 dark:text-text2d">
-                  {intl.formatMessage({ id: 'setting.wallet.index' })}
-                </div>
-                <Styled.WalletIndexInput
-                  value={walletIndexMap[chain].toString()}
-                  pattern="[0-9]+"
-                  onChange={(value) =>
-                    value !== null && +value >= 0 && setWalletIndexMap({ ...walletIndexMap, [chain]: +value })
-                  }
-                  style={{ width: 60 }}
-                  onPressEnter={addLedgerAddressHandler}
-                />
-                <InfoIcon tooltip={intl.formatMessage({ id: 'setting.wallet.index.info' })} />
-              </>
-            )}
-          </div>
-          {isEthChain(chain) && (
-            <StyledR.Radio.Group
-              className="!flex flex-col items-start lg:flex-row lg:items-center lg:!pl-30px"
-              onChange={onChangeEthDerivationMode}
-              value={ethDerivationMode}>
-              <StyledR.Radio value="ledgerlive" key="ledgerlive">
-                <Styled.EthDerivationModeRadioLabel>
-                  {intl.formatMessage({ id: 'common.ledgerlive' })}
-                  <InfoIcon
-                    tooltip={intl.formatMessage(
-                      { id: 'setting.wallet.hdpath.ledgerlive.info' },
-                      { path: getEthDerivationPath(walletIndexMap[ETHChain], 'ledgerlive') }
-                    )}
-                  />
-                </Styled.EthDerivationModeRadioLabel>
-              </StyledR.Radio>
-              <StyledR.Radio value="legacy" key="legacy">
-                <Styled.EthDerivationModeRadioLabel>
-                  {intl.formatMessage({ id: 'common.legacy' })}
-                  <InfoIcon
-                    tooltip={intl.formatMessage(
-                      { id: 'setting.wallet.hdpath.legacy.info' },
-                      { path: getEthDerivationPath(walletIndexMap[ETHChain], 'legacy') }
-                    )}
-                  />
-                </Styled.EthDerivationModeRadioLabel>
-              </StyledR.Radio>
-              <StyledR.Radio value="metamask" key="metamask">
-                <Styled.EthDerivationModeRadioLabel>
-                  {intl.formatMessage({ id: 'common.metamask' })}
-                  <InfoIcon
-                    tooltip={intl.formatMessage(
-                      { id: 'setting.wallet.hdpath.metamask.info' },
-                      { path: getEthDerivationPath(walletIndexMap[ETHChain], 'metamask') }
-                    )}
-                  />
-                </Styled.EthDerivationModeRadioLabel>
-              </StyledR.Radio>
-            </StyledR.Radio.Group>
-          )}
-        </div>
-      )
+      const renderAddress = (walletAddress: WalletAddress) => {
+        const { address, chain } = walletAddress
+        return (
+          <>
+            <div className="flex w-full items-center">
+              <Styled.AddressEllipsis address={address} chain={chain} network={network} enableCopy={true} />
+              <Styled.QRCodeIcon onClick={() => setShowQRModal(O.some({ asset: getChainAsset(chain), address }))} />
+              <Styled.AddressLinkIcon onClick={() => clickAddressLinkHandler(chain, address)} />
+              <Styled.EyeOutlined onClick={() => verifyLedgerAddressHandler(walletAddress)} />
+              <Styled.RemoveLedgerIcon onClick={() => removeLedgerAddress(chain)} />
+            </div>
+          </>
+        )
+      }
 
       // Render addresses depending on its loading status
       return (
         <>
-          <div className="flex w-full items-center">
-            <Styled.AddressEllipsis address={address} chain={chain} network={network} enableCopy={true} />
-            <Styled.QRCodeIcon onClick={() => setShowQRModal(O.some({ asset: getChainAsset(chain), address }))} />
-            <Styled.AddressLinkIcon onClick={() => clickAddressLinkHandler(chain, address)} />
-
-            {isLedgerWallet(walletType) && (
-              <>
-                <Styled.EyeOutlined onClick={() => verifyLedgerAddressHandler()} />
-                <Styled.RemoveLedgerIcon onClick={() => removeLedgerAddress(chain)} />
-              </>
-            )}
+          <Styled.WalletTypeLabel>{walletTypeToI18n('ledger', intl)}</Styled.WalletTypeLabel>
+          <div className="my-0 mx-40px w-full overflow-hidden ">
+            {FP.pipe(oAddress, O.fold(renderAddAddress, renderAddress))}
           </div>
         </>
-        // TODO (@veado) Show error / pending state for ledger
-
-        // <div className="flex flex-row items-center">
-        //   {FP.pipe(
-        //     addressRD,
-        //     RD.fold(
-        //       () => (isLedgerWallet(walletType) ? renderAddLedger(chain, false) : <>...</>),
-        //       () => (isLedgerWallet(walletType) ? renderAddLedger(chain, true) : <>...</>),
-        //       (error) => (
-        //         <div>
-        //           <Styled.AddressError>{error?.message ?? error.toString()}</Styled.AddressError>
-        //           {isLedgerWallet(walletType) && renderAddLedger(chain, false)}
-        //         </div>
-        //       ),
-        //       ({ address, walletIndex }) => (
-        //         <>
-        //           <div className="flex w-full items-center">
-        //             <Styled.AddressEllipsis address={address} chain={chain} network={network} enableCopy={true} />
-        //             <Styled.QRCodeIcon
-        //               onClick={() => setShowQRModal(O.some({ asset: getChainAsset(chain), address }))}
-        //             />
-        //             <Styled.AddressLinkIcon onClick={() => clickAddressLinkHandler(chain, address)} />
-
-        //             {isLedgerWallet(walletType) && (
-        //               <>
-        //                 <Styled.EyeOutlined onClick={() => verifyLedgerAddressHandler(address)} />
-        //                 <Styled.RemoveLedgerIcon onClick={() => removeLedgerAddress(chain)} />
-        //               </>
-        //             )}
-        //           </div>
-        //         </>
-        //       )
-        //     )
-        //   )}
-        // </div>
       )
     },
     [
-      ethDerivationMode,
-      verifyLedgerAddress$,
-      rejectLedgerAddress,
       intl,
       walletIndexMap,
+      ledgerChainToAdd,
+      addLedgerAddressRD,
+      ethDerivationMode,
       addLedgerAddress,
       network,
       clickAddressLinkHandler,
-      removeLedgerAddress
+      removeLedgerAddress,
+      verifyLedgerAddressHandler
     ]
+  )
+
+  const renderKeystoreAddress = useCallback(
+    (chain: Chain, { address }: WalletAddress) => {
+      // Render addresses depending on its loading status
+      return (
+        <>
+          <Styled.WalletTypeLabel>{walletTypeToI18n('keystore', intl)}</Styled.WalletTypeLabel>
+          <div className="my-0 mx-40px w-full overflow-hidden ">
+            <div className="flex w-full items-center">
+              <Styled.AddressEllipsis address={address} chain={chain} network={network} enableCopy={true} />
+              <Styled.QRCodeIcon onClick={() => setShowQRModal(O.some({ asset: getChainAsset(chain), address }))} />
+              <Styled.AddressLinkIcon onClick={() => clickAddressLinkHandler(chain, address)} />
+            </div>
+          </div>
+        </>
+      )
+    },
+    [intl, network, clickAddressLinkHandler]
   )
 
   const renderVerifyAddressModal = useCallback(
@@ -365,32 +411,44 @@ export const WalletSettings: React.FC<Props> = (props): JSX.Element => {
         oAddress,
         O.fold(
           () => <></>,
-          ({ address, chain }) => (
-            <Modal
-              title={intl.formatMessage({ id: 'wallet.ledger.verifyAddress.modal.title' })}
-              visible={true}
-              onOk={() => setAddressToVerify(O.none)}
-              onCancel={() => rejectLedgerAddress(chain)}
-              maskClosable={false}
-              closable={false}
-              okText={intl.formatMessage({ id: 'common.confirm' })}
-              okButtonProps={{ autoFocus: true }}
-              cancelText={intl.formatMessage({ id: 'common.reject' })}>
-              <div className="text-center">
-                <FormattedMessage
-                  id="wallet.ledger.verifyAddress.modal.description"
-                  values={{
-                    address: (
-                      <span className="block transform-none font-mainBold text-[16px] text-inherit">{address}</span>
-                    )
-                  }}
-                />
-              </div>
-            </Modal>
-          )
+          ({ address, chain }) => {
+            const onOk = () => {
+              resetVerifyLedgerAddressRD()
+              setLedgerAddressToVerify(O.none)
+            }
+            const onCancel = () => {
+              resetVerifyLedgerAddressRD()
+              setLedgerAddressToVerify(O.none)
+              removeLedgerAddress(chain)
+            }
+
+            return (
+              <Modal
+                title={intl.formatMessage({ id: 'wallet.ledger.verifyAddress.modal.title' })}
+                visible={true}
+                onOk={onOk}
+                onCancel={onCancel}
+                maskClosable={false}
+                closable={false}
+                okText={intl.formatMessage({ id: 'common.confirm' })}
+                okButtonProps={{ autoFocus: true }}
+                cancelText={intl.formatMessage({ id: 'common.reject' })}>
+                <div className="text-center">
+                  <FormattedMessage
+                    id="wallet.ledger.verifyAddress.modal.description"
+                    values={{
+                      address: (
+                        <span className="block transform-none font-mainBold text-[16px] text-inherit">{address}</span>
+                      )
+                    }}
+                  />
+                </div>
+              </Modal>
+            )
+          }
         )
       ),
-    [intl, rejectLedgerAddress]
+    [intl, removeLedgerAddress, resetVerifyLedgerAddressRD]
   )
 
   const [accountFilter, setAccountFilter] = useState(emptyString)
@@ -440,52 +498,25 @@ export const WalletSettings: React.FC<Props> = (props): JSX.Element => {
           <List
             key="accounts"
             dataSource={walletAccounts}
-            renderItem={({ chain, accounts }, i: number) => (
+            renderItem={({ chain, accounts: { keystore, ledger: oLedger } }, i: number) => (
               <Styled.ListItem key={i}>
                 <div className="flex w-full items-center">
                   <AssetIcon asset={getChainAsset(chain)} size="small" network="mainnet" />
                   <Styled.AccountTitle>{chain}</Styled.AccountTitle>
                 </div>
-                {/* supported Ledger */}
-                {FP.pipe(
-                  accounts,
-                  A.filter(({ type }) => isEnabledWallet(chain, network, type)),
-                  A.mapWithIndex((index, account) => {
-                    const { type } = account
-                    return (
-                      <div className="mt-10px w-full" key={type}>
-                        <Styled.WalletTypeLabel>{walletTypeToI18n(type, intl)}</Styled.WalletTypeLabel>
-                        <div className="my-0 mx-40px w-full overflow-hidden " key={index}>
-                          {renderAddress(chain, account)}
-                        </div>
-                      </div>
-                    )
-                  })
-                )}
-                {/* unsupported Ledger */}
-                {FP.pipe(
-                  accounts,
-                  A.filter(({ type }) => !isEnabledWallet(chain, network, type)),
-                  A.map((account) => {
-                    const { type } = account
-                    return (
-                      <div className="mt-10px w-full" key={type}>
-                        <Styled.WalletTypeLabel>{walletTypeToI18n(type, intl)}</Styled.WalletTypeLabel>
-                        <div className="ml-40px flex items-center pt-5px text-[12px] text-text2 dark:text-text2d">
-                          <Styled.Icon component={AttentionIcon} />
-                          {intl.formatMessage({ id: 'common.notsupported.fornetwork' }, { network })}
-                        </div>
-                      </div>
-                    )
-                  })
-                )}
+                <div className="mt-10px w-full">
+                  {/* keystore */}
+                  {renderKeystoreAddress(chain, keystore)}
+                  {/* ledger */}
+                  {isEnabledLedger(chain, network) ? renderLedgerAddress(chain, oLedger) : renderLedgerNotSupported}
+                </div>
               </Styled.ListItem>
             )}
           />
         )),
         O.getOrElse(() => <></>)
       ),
-    [oFilteredWalletAccounts, intl, renderAddress, network]
+    [oFilteredWalletAccounts, renderKeystoreAddress, network, renderLedgerAddress, renderLedgerNotSupported]
   )
 
   const { state: changeWalletState, subscribe: subscribeChangeWalletState } =
@@ -587,7 +618,7 @@ export const WalletSettings: React.FC<Props> = (props): JSX.Element => {
           />
           {renderQRCodeModal}
 
-          {renderVerifyAddressModal(addressToVerify)}
+          {renderVerifyAddressModal(ledgerAddressToVerify)}
           <div className="card my-20px w-full ">
             <h1 className="p-20px font-main text-18 uppercase text-text0 dark:text-text0d">
               {intl.formatMessage({ id: 'setting.wallet.management' })}

@@ -94,7 +94,7 @@ export type KeystoreService = {
 
 export type WalletAccount = {
   chain: Chain
-  accounts: WalletAddress[]
+  accounts: { keystore: WalletAddress; ledger: O.Option<WalletAddress> }
 }
 
 export type WalletAccounts = WalletAccount[]
@@ -177,7 +177,20 @@ export type BalancesService = {
 }
 
 export type GetKeystoreLedgerAddressHandler = (chain: Chain) => Rx.Observable<O.Option<KeystoreLedgerAddress>>
-export type VerifyLedgerAddressHandler = (chain: Chain) => Rx.Observable<RD.RemoteData<Error, boolean>>
+
+export type VerifiedLedgerAddressRD = RD.RemoteData<Error, boolean>
+export type VerifiedLedgerAddressLD = LiveData<Error, boolean>
+export type VerifyLedgerAddressHandler = ({
+  chain,
+  network,
+  walletIndex,
+  ethDerivationMode
+}: {
+  chain: Chain
+  network: Network
+  walletIndex: number
+  ethDerivationMode: O.Option<EthDerivationMode>
+}) => VerifiedLedgerAddressLD
 
 export type AskLedgerAddressesHandler = ({
   id,

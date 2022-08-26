@@ -186,48 +186,22 @@ export const createLedgerService = ({
       )
     )
 
-  const verifyLedgerAddress$: VerifyLedgerAddressHandler = (chain) =>
+  const verifyLedgerAddress$: VerifyLedgerAddressHandler = ({ chain, network, walletIndex, ethDerivationMode }) =>
     FP.pipe(
-      getLedgerAddress$(chain),
-      RxOp.switchMap((oAddress) =>
-        FP.pipe(
-          oAddress,
-          O.fold(
-            () => Rx.of(RD.failure(Error(`Could not find Ledger for ${chain}`))),
-            ({ chain, network, walletIndex, ethDerivationMode }) =>
-              FP.pipe(
-                Rx.from(
-                  window.apiHDWallet.verifyLedgerAddress({
-                    chain,
-                    network,
-                    walletIndex,
-                    ethDerivationMode: O.toUndefined(ethDerivationMode)
-                  })
-                ),
-                RxOp.catchError((error: Error) => Rx.of(RD.failure(error))),
-                RxOp.map((verified) =>
-                  verified ? RD.success(true) : RD.failure(Error(`Could not verify Ledger for ${chain}`))
-                )
-              )
-          )
-        )
+      Rx.from(
+        window.apiHDWallet.verifyLedgerAddress({
+          chain,
+          network,
+          walletIndex,
+          ethDerivationMode: O.toUndefined(ethDerivationMode)
+        })
+      ),
+      RxOp.catchError((error: Error) => Rx.of(RD.failure(error))),
+      RxOp.switchMap((verified) =>
+        Rx.of(verified ? RD.success(true) : RD.failure(Error(`Could not verify Ledger for ${chain}`)))
       ),
       RxOp.startWith(RD.pending)
     )
-
-  //     RD.fromOption(() => Error(`Could not find Ledger for ${chain}`))),
-  //   liveData.chain((address) => {
-  //     const {chain, network, walletIndex, eth} = address
-  //       return Rx.of( window.apiHDWallet.verifyLedgerAddress({
-  //         chain,
-  //         network,
-  //         walletIndex,
-  //         ethDerivationPath
-  //       }).then((result))
-
-  //       )
-  //   })
-  // )
 
   /**
    * Removes ledger address from `keystoreLedgerAddresses` list

@@ -167,15 +167,6 @@ export const EyeOutlined = styled(EyeOutlinedUI)`
   }
 `
 
-export const AddressError = styled(UILabel)`
-  display: block;
-  padding: 0;
-  color: ${palette('error', 0)};
-  text-transform: uppercase;
-  font-family: 'MainFontRegular';
-  font-size: 14px;
-`
-
 export const AddLedgerButton = styled(UIButton).attrs({
   typevalue: 'transparent'
 })`

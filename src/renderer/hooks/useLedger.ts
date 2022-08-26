@@ -19,7 +19,11 @@ export const useLedger = (chain: Chain, id: KeystoreId) => {
 
   const { askLedgerAddress$, getLedgerAddress$, verifyLedgerAddress$, removeLedgerAddress } = useWalletContext()
 
-  const verifyAddress = useCallback(() => verifyLedgerAddress$(chain), [chain, verifyLedgerAddress$])
+  const verifyAddress = useCallback(
+    (walletIndex: number, ethDerivationMode: O.Option<EthDerivationMode>) =>
+      verifyLedgerAddress$({ chain, network, walletIndex, ethDerivationMode }),
+    [chain, verifyLedgerAddress$, network]
+  )
   const removeAddress = useCallback(
     () => removeLedgerAddress({ id, chain, network }),
     [removeLedgerAddress, chain, network, id]

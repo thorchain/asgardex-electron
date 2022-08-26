@@ -5,7 +5,6 @@ import * as Rx from 'rxjs'
 import * as RxOp from 'rxjs/operators'
 
 import { WalletAddress } from '../../../shared/wallet/types'
-import { sequenceTOption } from '../../helpers/fpHelpers'
 import { WalletAddress$ } from '../../services/clients'
 import { WalletAccount } from '../../services/wallet/types'
 
@@ -20,18 +19,10 @@ export const walletAccount$ = ({
 }): Rx.Observable<O.Option<WalletAccount>> =>
   FP.pipe(
     addressUI$, // all `keystore` based
-    RxOp.map((okeystoreAddress) =>
+    RxOp.map((oKeystoreAddress) =>
       FP.pipe(
-        // Take keystore + ledger into account
-        sequenceTOption(okeystoreAddress, oLedgerAddress),
-        // Or try to add keystore account if ledger is not available
-        O.alt(() =>
-          FP.pipe(
-            okeystoreAddress,
-            O.map((keystoreAddress) => [keystoreAddress])
-          )
-        ),
-        O.map((accounts) => ({ chain, accounts }))
+        oKeystoreAddress,
+        O.map((keystoreAddress) => ({ chain, accounts: { keystore: keystoreAddress, ledger: oLedgerAddress } }))
       )
     )
   )
