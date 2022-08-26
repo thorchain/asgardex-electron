@@ -192,7 +192,7 @@ export type VerifyLedgerAddressHandler = ({
   ethDerivationMode: O.Option<EthDerivationMode>
 }) => VerifiedLedgerAddressLD
 
-export type AskLedgerAddressesHandler = ({
+export type AddLedgerAddressHandler = ({
   id,
   chain,
   network,
@@ -214,14 +214,16 @@ export type RemoveLedgerAddressHandler = ({
   id: KeystoreId
   chain: Chain
   network: Network
-}) => void
+}) => KeystoreLedgerAddressesLD
 
 export type LedgerService = {
   ledgerAddresses$: KeystoreLedgerAddresses$
-  askLedgerAddress$: AskLedgerAddressesHandler
+  addLedgerAddress$: AddLedgerAddressHandler
   getLedgerAddress$: GetKeystoreLedgerAddressHandler
   verifyLedgerAddress$: VerifyLedgerAddressHandler
   removeLedgerAddress: RemoveLedgerAddressHandler
+  persistentLedgerAddresses$: KeystoreLedgerAddressesLD
+  reloadPersistentLedgerAddresses: FP.Lazy<void>
 }
 
 // TODO(@Veado) Move type to clients/type
@@ -252,7 +254,8 @@ export type KeystoreLedgerAddressLD = LiveData<LedgerError, KeystoreLedgerAddres
 
 export type KeystoreLedgerAddresses = KeystoreLedgerAddress[]
 export type KeystoreLedgerAddresses$ = Rx.Observable<KeystoreLedgerAddresses>
-export type KeystoreLedgerAddressesLD = Rx.Observable<KeystoreLedgerAddresses>
+export type KeystoreLedgerAddressesRD = RD.RemoteData<Error, KeystoreLedgerAddresses>
+export type KeystoreLedgerAddressesLD = LiveData<Error, KeystoreLedgerAddresses>
 
 export type KeystoreWalletsRD = RD.RemoteData<Error, KeystoreWallets>
 export type KeystoreWalletsLD = LiveData<Error, KeystoreWallets>

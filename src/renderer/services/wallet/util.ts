@@ -8,7 +8,7 @@ import * as Ord from 'fp-ts/Ord'
 import * as S from 'fp-ts/string'
 import { IntlShape } from 'react-intl'
 
-import { KeystoreWallets, KeystoreWallet } from '../../../shared/api/io'
+import { KeystoreWallets, KeystoreWallet, IPCKeystoresLedgerAddressesIO } from '../../../shared/api/io'
 import { KeystoreId, LedgerErrorId } from '../../../shared/api/types'
 import { WalletAddress, WalletType } from '../../../shared/wallet/types'
 import { eqAsset } from '../../helpers/fp/eq'
@@ -23,7 +23,8 @@ import {
   isKeystoreLocked,
   isKeystoreUnlocked,
   KeystoreLocked,
-  KeystoreLedgerAddress
+  KeystoreLedgerAddress,
+  KeystoreLedgerAddresses
 } from './types'
 
 export const getPhrase = (state: KeystoreState): O.Option<Phrase> =>
@@ -213,3 +214,29 @@ export const keystoreLedgerAddressToWalletAddress = ({
   address,
   chain
 })
+
+export const toIPCKeystoresLedgerAddressesIO = (addresses: KeystoreLedgerAddresses): IPCKeystoresLedgerAddressesIO =>
+  FP.pipe(
+    addresses,
+    A.map(({ keystoreId, address, chain, network, walletIndex, ethDerivationMode }) => ({
+      keystoreId,
+      address,
+      chain,
+      network,
+      walletIndex,
+      ethDerivationMode: O.toUndefined(ethDerivationMode)
+    }))
+  )
+
+export const fromIPCKeystoresLedgerAddressesIO = (addresses: IPCKeystoresLedgerAddressesIO): KeystoreLedgerAddresses =>
+  FP.pipe(
+    addresses,
+    A.map(({ keystoreId, address, chain, network, walletIndex, ethDerivationMode }) => ({
+      keystoreId,
+      address,
+      chain,
+      network,
+      walletIndex,
+      ethDerivationMode: O.fromNullable(ethDerivationMode)
+    }))
+  )

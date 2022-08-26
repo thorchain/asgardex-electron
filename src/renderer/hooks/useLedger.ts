@@ -17,7 +17,7 @@ import { useNetwork } from './useNetwork'
 export const useLedger = (chain: Chain, id: KeystoreId) => {
   const { network } = useNetwork()
 
-  const { askLedgerAddress$, getLedgerAddress$, verifyLedgerAddress$, removeLedgerAddress } = useWalletContext()
+  const { addLedgerAddress$, getLedgerAddress$, verifyLedgerAddress$, removeLedgerAddress } = useWalletContext()
 
   const verifyAddress = useCallback(
     (walletIndex: number, ethDerivationMode: O.Option<EthDerivationMode>) =>
@@ -42,14 +42,14 @@ export const useLedger = (chain: Chain, id: KeystoreId) => {
     O.none
   )
 
-  const askAddress = useCallback(
+  const addAddress = useCallback(
     (walletIndex: number, ethDerivationMode: O.Option<EthDerivationMode>) =>
-      askLedgerAddress$({ id, chain, network, walletIndex, ethDerivationMode }),
-    [askLedgerAddress$, chain, id, network]
+      addLedgerAddress$({ id, chain, network, walletIndex, ethDerivationMode }),
+    [addLedgerAddress$, chain, id, network]
   )
 
   return {
-    askAddress,
+    addAddress,
     verifyAddress,
     removeAddress,
     address

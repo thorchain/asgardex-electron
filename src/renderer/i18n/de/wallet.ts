@@ -39,6 +39,7 @@ const wallet: WalletMessages = {
   'wallet.imports.error.instance': 'Es konnte keine Instanz vom Client erstellt werden',
   'wallet.imports.error.keystore.load': 'Ungültige Keystore-Datei',
   'wallet.imports.error.keystore.import': 'Error beim Importieren der Keystore Wallets',
+  'wallet.imports.error.ledger.import': 'Error beim Importieren der Ledger Accounts',
   'wallet.imports.error.keystore.password': 'Ungültiges Passwort',
   'wallet.phrase.error.valueRequired': 'Bitte Phrase angeben',
   'wallet.imports.error.phrase.empty': 'Importiere eine bestehende Wallet mit Guthaben',

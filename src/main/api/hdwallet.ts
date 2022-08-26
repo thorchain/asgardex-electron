@@ -56,6 +56,7 @@ export const apiHDWallet: ApiHDWallet = {
   // Note: `params` need to be encoded by `ipcLedgerApproveERC20TokenParamsIO` before calling `approveLedgerERC20Token` */
   approveLedgerERC20Token: (params: unknown) => ipcRenderer.invoke(IPCMessages.APPROVE_LEDGER_ERC20_TOKEN, params),
   // Note: `params` need to be encoded by `ipcKeystorLedgerAddressesIO` before calling `saveLedgerAddresses` */
-  saveLedgerAddresses: (params: unknown) => ipcRenderer.invoke(IPCMessages.SAVE_LEDGER_ADDRESSES, params),
+  saveLedgerAddresses: (params: IPCKeystoresLedgerAddressesIO) =>
+    ipcRenderer.invoke(IPCMessages.SAVE_LEDGER_ADDRESSES, params),
   getLedgerAddresses: () => ipcRenderer.invoke(IPCMessages.GET_LEDGER_ADDRESSES)
 }

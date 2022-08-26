@@ -38,6 +38,7 @@ const wallet: WalletMessages = {
   'wallet.imports.error.instance': 'Could not create an instance of Client',
   'wallet.imports.error.keystore.load': 'Invalid Keystore',
   'wallet.imports.error.keystore.import': 'Error while importing keystore wallets',
+  'wallet.imports.error.ledger.import': 'Error trying to import ledger accounts',
   'wallet.imports.error.keystore.password': 'Invalid Password',
   'wallet.phrase.error.valueRequired': 'Value for phrase is required',
   'wallet.phrase.error.invalid': 'Invalid phrase',

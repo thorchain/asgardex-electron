@@ -62,6 +62,7 @@ import { walletTypeToI18n } from '../../services/wallet/util'
 import { AttentionIcon } from '../icons'
 import * as StyledR from '../shared/form/Radio.styles'
 import { BorderButton, FlatButton, TextButton } from '../uielements/button'
+import { WalletTypeLabel } from '../uielements/common/Common.styles'
 import { InfoIcon } from '../uielements/info'
 import { Modal } from '../uielements/modal'
 import { WalletSelector } from '../uielements/wallet'
@@ -199,7 +200,7 @@ export const WalletSettings: React.FC<Props> = (props): JSX.Element => {
     () => (
       <div className="mt-10px w-full">
         <Styled.WalletTypeLabel>{walletTypeToI18n('ledger', intl)}</Styled.WalletTypeLabel>
-        <div className="ml-40px flex items-center pt-5px text-[12px] text-text2 dark:text-text2d">
+        <div className="ml-40px flex items-center pt-5px text-[12px] uppercase text-text2 dark:text-text2d">
           <Styled.Icon component={AttentionIcon} />
           {intl.formatMessage({ id: 'common.notsupported.fornetwork' }, { network })}
         </div>
@@ -277,7 +278,7 @@ export const WalletSettings: React.FC<Props> = (props): JSX.Element => {
         }
 
         return (
-          <div>
+          <>
             <div className="flex w-full flex-col md:w-auto lg:flex-row">
               <div className="mr-30px flex items-center md:mr-0">
                 <Styled.AddLedgerButton onClick={addLedgerAddressHandler} loading={loading}>
@@ -343,7 +344,7 @@ export const WalletSettings: React.FC<Props> = (props): JSX.Element => {
               )}
             </div>
             {addingLedger && renderError}
-          </div>
+          </>
         )
       }
 
@@ -362,10 +363,11 @@ export const WalletSettings: React.FC<Props> = (props): JSX.Element => {
         )
       }
 
-      // Render addresses depending on its loading status
       return (
         <>
-          <Styled.WalletTypeLabel>{walletTypeToI18n('ledger', intl)}</Styled.WalletTypeLabel>
+          <WalletTypeLabel className="mt-10px ml-40px inline-block ">
+            {walletTypeToI18n('ledger', intl)}
+          </WalletTypeLabel>
           <div className="my-0 mx-40px w-full overflow-hidden ">
             {FP.pipe(oAddress, O.fold(renderAddAddress, renderAddress))}
           </div>

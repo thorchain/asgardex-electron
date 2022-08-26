@@ -221,17 +221,13 @@ export type IPCKeystoreWallets = t.TypeOf<typeof ipcKeystoreWalletsIO>
 
 export type KeystoreWallets = ReturnType<typeof ipcKeystoreWalletsIO.encode>
 
-export const ipcLedgerAddressIO = t.type({
+export const ipcKeystoreLedgerAddressIO = t.type({
+  keystoreId: t.number,
   address: t.string,
   chain: chainIO,
   network: networkIO,
   walletIndex: t.number,
   ethDerivationMode: t.union([ethDerivationModeIO, t.undefined])
-})
-
-export const ipcKeystoreLedgerAddressIO = t.type({
-  keystoreId: t.number,
-  ledgers: t.array(ipcLedgerAddressIO)
 })
 
 export const ipcKeystorLedgerAddressesIO = t.array(ipcKeystoreLedgerAddressIO)

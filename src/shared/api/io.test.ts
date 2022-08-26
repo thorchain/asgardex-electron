@@ -304,24 +304,22 @@ describe('ipcKeystoreWalletIO', () => {
   const ledgers: IPCKeystoresLedgerAddressesIO = [
     {
       keystoreId: 1,
-      ledgers: [
-        {
-          chain: ETHChain,
-          network: 'mainnet',
-          address: 'eth-address',
-          walletIndex: 1,
-          ethDerivationMode: 'metamask'
-        },
-        {
-          chain: BNBChain,
-          network: 'stagenet',
-          address: 'nbn-address',
-          walletIndex: 2,
-          ethDerivationMode: undefined
-        }
-      ]
+      chain: ETHChain,
+      network: 'mainnet',
+      address: 'eth-address',
+      walletIndex: 1,
+      ethDerivationMode: 'metamask'
+    },
+    {
+      keystoreId: 1,
+      chain: BNBChain,
+      network: 'stagenet',
+      address: 'nbn-address',
+      walletIndex: 2,
+      ethDerivationMode: undefined
     }
   ]
+
   it('decoded', () => {
     const data = JSON.parse(JSON.stringify(ledgers))
 

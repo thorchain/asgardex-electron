@@ -140,7 +140,7 @@ export type ApiHDWallet = {
     params: unknown /* will be de-/serialized by ipcLedgerApprovedERC20TokenParamsIO */
   ) => Promise<E.Either<LedgerError, TxHash>>
   saveLedgerAddresses: (
-    params: unknown /* will be de-/serialized by ipcKeystorLedgerAddressesIO */
+    params: IPCKeystoresLedgerAddressesIO
   ) => Promise<E.Either<Error, IPCKeystoresLedgerAddressesIO>>
   getLedgerAddresses: () => Promise<E.Either<Error, IPCKeystoresLedgerAddressesIO>>
 }

@@ -10,6 +10,7 @@ import * as E from 'fp-ts/lib/Either'
 import * as FP from 'fp-ts/lib/function'
 
 import {
+  IPCKeystoresLedgerAddressesIO,
   ipcKeystoreWalletsIO,
   ipcLedgerApproveERC20TokenParamsIO,
   ipcLedgerDepositTxParamsIO,
@@ -20,6 +21,7 @@ import { DEFAULT_STORAGES } from '../shared/const'
 import type { Locale } from '../shared/i18n/types'
 import { registerAppCheckUpdatedHandler } from './api/appUpdate'
 import { getFileStoreService } from './api/fileStore'
+import { getLedgerAddresses, saveLedgerAddresses } from './api/hdwallet'
 import { exportKeystore, initKeystoreWallets, loadKeystore, saveKeystoreWallets } from './api/keystore'
 import {
   getAddress as getLedgerAddress,
@@ -179,6 +181,10 @@ const initIPC = () => {
       E.fold((e) => Promise.reject(e), approveLedgerERC20Token)
     )
   })
+  ipcMain.handle(IPCMessages.SAVE_LEDGER_ADDRESSES, async (_, params: IPCKeystoresLedgerAddressesIO) =>
+    saveLedgerAddresses(params)()
+  )
+  ipcMain.handle(IPCMessages.GET_LEDGER_ADDRESSES, async () => getLedgerAddresses())
   // Update
   registerAppCheckUpdatedHandler(IS_DEV)
   // Register all file-stored data services

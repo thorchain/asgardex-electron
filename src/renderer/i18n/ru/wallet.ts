@@ -38,6 +38,7 @@ const wallet: WalletMessages = {
   'wallet.imports.error.instance': 'Не удалось создать экземпляр Клиента',
   'wallet.imports.error.keystore.load': 'Недопустимый Keystore',
   'wallet.imports.error.keystore.import': 'Error while importing keystore wallets - RU',
+  'wallet.imports.error.ledger.import': 'Error trying to import ledger accounts - RU',
   'wallet.imports.error.keystore.password': 'Неверный пароль',
   'wallet.phrase.error.valueRequired': 'Необходимо значение для фразы',
   'wallet.phrase.error.invalid': 'Неверная фраза',

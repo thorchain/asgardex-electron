@@ -82,56 +82,56 @@ export const WalletSettingsView: React.FC<Props> = ({ keystoreUnlocked }): JSX.E
   const { addressUI$: cosmosAddressUI$ } = useCosmosContext()
 
   const {
-    askAddress: askLedgerThorAddress,
+    addAddress: addLedgerThorAddress,
     verifyAddress: verifyLedgerThorAddress,
     address: oThorLedgerWalletAddress,
     removeAddress: removeLedgerThorAddress
   } = useLedger(THORChain, keystoreId)
 
   const {
-    askAddress: askLedgerBnbAddress,
+    addAddress: addLedgerBnbAddress,
     verifyAddress: verifyLedgerBnbAddress,
     address: oBnbLedgerWalletAddress,
     removeAddress: removeLedgerBnbAddress
   } = useLedger(BNBChain, keystoreId)
 
   const {
-    askAddress: askLedgerBtcAddress,
+    addAddress: addLedgerBtcAddress,
     verifyAddress: verifyLedgerBtcAddress,
     address: oBtcLedgerWalletAddress,
     removeAddress: removeLedgerBtcAddress
   } = useLedger(BTCChain, keystoreId)
 
   const {
-    askAddress: askLedgerLtcAddress,
+    addAddress: addLedgerLtcAddress,
     verifyAddress: verifyLedgerLtcAddress,
     address: oLtcLedgerWalletAddress,
     removeAddress: removeLedgerLtcAddress
   } = useLedger(LTCChain, keystoreId)
 
   const {
-    askAddress: askLedgerBchAddress,
+    addAddress: addLedgerBchAddress,
     verifyAddress: verifyLedgerBchAddress,
     address: oBchLedgerWalletAddress,
     removeAddress: removeLedgerBchAddress
   } = useLedger(BCHChain, keystoreId)
 
   const {
-    askAddress: askLedgerDOGEAddress,
+    addAddress: addLedgerDOGEAddress,
     verifyAddress: verifyLedgerDOGEAddress,
     address: oDogeLedgerWalletAddress,
     removeAddress: removeLedgerDOGEAddress
   } = useLedger(DOGEChain, keystoreId)
 
   const {
-    askAddress: askLedgerEthAddress,
+    addAddress: addLedgerEthAddress,
     verifyAddress: verifyLedgerEthAddress,
     address: oEthLedgerWalletAddress,
     removeAddress: removeLedgerEthAddress
   } = useLedger(ETHChain, keystoreId)
 
   const {
-    askAddress: askLedgerCosmosAddress,
+    addAddress: addLedgerCosmosAddress,
     verifyAddress: verifyLedgerCosmosAddress,
     address: oCosmosLedgerWalletAddress,
     removeAddress: removeLedgerCosmosAddress
@@ -146,14 +146,14 @@ export const WalletSettingsView: React.FC<Props> = ({ keystoreUnlocked }): JSX.E
     walletIndex: number
     ethDerivationMode: O.Option<EthDerivationMode>
   }): KeystoreLedgerAddressLD => {
-    if (isThorChain(chain)) return askLedgerThorAddress(walletIndex, ethDerivationMode)
-    if (isBnbChain(chain)) return askLedgerBnbAddress(walletIndex, ethDerivationMode)
-    if (isBtcChain(chain)) return askLedgerBtcAddress(walletIndex, ethDerivationMode)
-    if (isLtcChain(chain)) return askLedgerLtcAddress(walletIndex, ethDerivationMode)
-    if (isBchChain(chain)) return askLedgerBchAddress(walletIndex, ethDerivationMode)
-    if (isDogeChain(chain)) return askLedgerDOGEAddress(walletIndex, ethDerivationMode)
-    if (isEthChain(chain)) return askLedgerEthAddress(walletIndex, ethDerivationMode)
-    if (isCosmosChain(chain)) return askLedgerCosmosAddress(walletIndex, ethDerivationMode)
+    if (isThorChain(chain)) return addLedgerThorAddress(walletIndex, ethDerivationMode)
+    if (isBnbChain(chain)) return addLedgerBnbAddress(walletIndex, ethDerivationMode)
+    if (isBtcChain(chain)) return addLedgerBtcAddress(walletIndex, ethDerivationMode)
+    if (isLtcChain(chain)) return addLedgerLtcAddress(walletIndex, ethDerivationMode)
+    if (isBchChain(chain)) return addLedgerBchAddress(walletIndex, ethDerivationMode)
+    if (isDogeChain(chain)) return addLedgerDOGEAddress(walletIndex, ethDerivationMode)
+    if (isEthChain(chain)) return addLedgerEthAddress(walletIndex, ethDerivationMode)
+    if (isCosmosChain(chain)) return addLedgerCosmosAddress(walletIndex, ethDerivationMode)
 
     return Rx.of(
       RD.failure({
