@@ -53,6 +53,7 @@ const Template = ({ txRDStatus, feeRDStatus, balance, validAddress, walletType }
     <Component
       walletType={walletType}
       walletIndex={0}
+      hdMode="default"
       transfer$={transfer$}
       balances={[runeBalance]}
       balance={runeBalance}

@@ -47,7 +47,8 @@ export const sendTx$ = ({
   amount,
   memo,
   feeOption = DEFAULT_FEE_OPTION,
-  walletIndex
+  walletIndex,
+  hdMode
 }: SendTxParams): TxHashLD => {
   switch (asset.chain) {
     case BNBChain:
@@ -61,12 +62,12 @@ export const sendTx$ = ({
           msg: error?.message ?? error.toString()
         })),
         liveData.chain(({ rates }) =>
-          BTC.sendTx({ walletType, recipient, amount, feeRate: rates[feeOption], memo, walletIndex, sender })
+          BTC.sendTx({ walletType, recipient, amount, feeRate: rates[feeOption], memo, walletIndex, hdMode, sender })
         )
       )
 
     case ETHChain:
-      return ETH.sendTx({ walletType, asset, recipient, amount, memo, feeOption, walletIndex })
+      return ETH.sendTx({ walletType, asset, recipient, amount, memo, feeOption, walletIndex, hdMode })
 
     case THORChain:
       return THOR.sendTx({ walletType, amount, asset, memo, recipient, walletIndex })
@@ -134,6 +135,7 @@ export const sendPoolTx$ = ({
   sender,
   walletType,
   walletIndex,
+  hdMode,
   router,
   asset,
   recipient,
@@ -151,11 +153,12 @@ export const sendPoolTx$ = ({
         amount,
         memo,
         walletIndex,
+        hdMode,
         feeOption
       })
 
     case THORChain:
-      return THOR.sendPoolTx$({ walletType, amount, asset, memo, walletIndex })
+      return THOR.sendPoolTx$({ walletType, amount, asset, memo, walletIndex, hdMode })
 
     default:
       return sendTx$({ sender, walletType, asset, recipient, amount, memo, feeOption, walletIndex })

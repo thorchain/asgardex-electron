@@ -8,7 +8,7 @@ import * as Rx from 'rxjs'
 import * as RxOp from 'rxjs/operators'
 import { catchError, startWith, map, shareReplay, debounceTime } from 'rxjs/operators'
 
-import { WalletBalanceType, WalletType } from '../../../shared/wallet/types'
+import { HDMode, WalletBalanceType, WalletType } from '../../../shared/wallet/types'
 import { liveData } from '../../helpers/rx/liveData'
 import { ApiError, ErrorId } from '../wallet/types'
 import { WalletBalancesLD, XChainClient$ } from './types'
@@ -35,6 +35,7 @@ const loadBalances$ = <C extends XChainClientOverride>({
   address,
   assets,
   walletIndex,
+  hdMode,
   walletBalanceType
 }: {
   client: C
@@ -42,6 +43,7 @@ const loadBalances$ = <C extends XChainClientOverride>({
   address?: Address
   assets?: Asset[]
   walletIndex: number
+  hdMode: HDMode
   walletBalanceType: WalletBalanceType
 }): WalletBalancesLD =>
   FP.pipe(
@@ -60,7 +62,8 @@ const loadBalances$ = <C extends XChainClientOverride>({
               ...balance,
               walletType,
               walletAddress,
-              walletIndex
+              walletIndex,
+              hdMode
             }))
           ),
           catchError((error: Error) =>
@@ -77,6 +80,7 @@ type Balances$ = ({
   trigger$,
   assets,
   walletIndex,
+  hdMode,
   walletBalanceType
 }: {
   walletType: WalletType
@@ -84,6 +88,7 @@ type Balances$ = ({
   trigger$: Rx.Observable<boolean>
   assets?: Asset[]
   walletIndex: number
+  hdMode: HDMode
   walletBalanceType: WalletBalanceType
 }) => WalletBalancesLD
 /**
@@ -95,7 +100,15 @@ type Balances$ = ({
  *
  * If a client is not available (e.g. by removing keystore), it returns an `initial` state
  */
-export const balances$: Balances$ = ({ walletType, client$, trigger$, assets, walletIndex, walletBalanceType }) =>
+export const balances$: Balances$ = ({
+  walletType,
+  client$,
+  trigger$,
+  assets,
+  walletIndex,
+  hdMode,
+  walletBalanceType
+}) =>
   Rx.combineLatest([trigger$.pipe(debounceTime(300)), client$]).pipe(
     RxOp.switchMap(([_, oClient]) => {
       return FP.pipe(
@@ -110,6 +123,7 @@ export const balances$: Balances$ = ({ walletType, client$, trigger$, assets, wa
               client,
               assets,
               walletIndex,
+              hdMode,
               walletBalanceType
             })
         )
@@ -130,16 +144,18 @@ type BalancesByAddress$ = ({
 }) => ({
   address,
   walletType,
-  walletIndex
+  walletIndex,
+  hdMode
 }: {
   address: string
   walletType: WalletType
   walletIndex: number
+  hdMode: HDMode
 }) => WalletBalancesLD
 
 export const balancesByAddress$: BalancesByAddress$ =
   ({ client$, trigger$, assets, walletBalanceType }) =>
-  ({ address, walletType, walletIndex }) =>
+  ({ address, walletType, walletIndex, hdMode }) =>
     Rx.combineLatest([trigger$.pipe(debounceTime(300)), client$]).pipe(
       RxOp.mergeMap(([_, oClient]) => {
         return FP.pipe(
@@ -148,7 +164,7 @@ export const balancesByAddress$: BalancesByAddress$ =
             // if a client is not available, "reset" state to "initial"
             () => Rx.of(RD.initial),
             // or start request and return state
-            (client) => loadBalances$({ client, address, walletType, assets, walletIndex, walletBalanceType })
+            (client) => loadBalances$({ client, address, walletType, assets, walletIndex, walletBalanceType, hdMode })
           )
         )
       }),

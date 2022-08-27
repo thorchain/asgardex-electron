@@ -74,6 +74,7 @@ const Template = ({ txRDStatus, feeRDStatus, balance, validAddress, walletType }
     <Component
       walletType={walletType}
       walletIndex={0}
+      hdMode="default"
       walletAddress={'bch-address'}
       transfer$={transfer$}
       balances={[bchBalance, runeBalance]}

@@ -1,7 +1,7 @@
 import React, { useCallback, useMemo, useState } from 'react'
 
 import { Address } from '@xchainjs/xchain-client'
-import { Asset, AssetAmount, assetToBase, assetToString, BaseAmount } from '@xchainjs/xchain-util'
+import { Asset, AssetAmount, assetToBase, BaseAmount } from '@xchainjs/xchain-util'
 import { Row, Col, Grid } from 'antd'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
@@ -26,7 +26,6 @@ import * as Styled from './AssetDetails.styles'
 
 type Props = {
   walletType: WalletType
-  walletIndex: number
   txsPageRD: TxsPageRD
   balances: O.Option<NonEmptyWalletBalances>
   asset: Asset
@@ -43,7 +42,6 @@ type Props = {
 export const AssetDetails: React.FC<Props> = (props): JSX.Element => {
   const {
     walletType,
-    walletIndex,
     txsPageRD,
     balances: oBalances,
     asset,
@@ -64,24 +62,15 @@ export const AssetDetails: React.FC<Props> = (props): JSX.Element => {
   const intl = useIntl()
 
   const walletActionSendClick = useCallback(() => {
-    const routeParams = {
-      asset: assetToString(asset),
-      walletAddress,
-      walletType,
-      walletIndex: walletIndex.toString()
-    }
-    navigate(walletRoutes.send.path(routeParams))
-  }, [asset, navigate, walletAddress, walletIndex, walletType])
+    navigate(walletRoutes.send.path())
+  }, [navigate])
 
   const walletActionDepositClick = useCallback(() => {
     const path = walletRoutes.interact.path({
-      interactType: 'bond',
-      walletType,
-      walletAddress,
-      walletIndex: walletIndex.toString()
+      interactType: 'bond'
     })
     navigate(path)
-  }, [walletType, walletAddress, walletIndex, navigate])
+  }, [navigate])
 
   const isNonNativeRuneAsset: boolean = useMemo(
     () => AssetHelper.isNonNativeRuneAsset(asset, network),
@@ -89,15 +78,9 @@ export const AssetDetails: React.FC<Props> = (props): JSX.Element => {
   )
 
   const walletActionUpgradeNonNativeRuneClick = useCallback(() => {
-    const path = walletRoutes.upgradeRune.path({
-      asset: assetToString(asset),
-      walletAddress,
-      network,
-      walletType,
-      walletIndex: walletIndex.toString()
-    })
+    const path = walletRoutes.upgradeRune.path()
     navigate(path)
-  }, [asset, walletAddress, network, walletType, walletIndex, navigate])
+  }, [navigate])
 
   const refreshHandler = useCallback(() => {
     loadTxsHandler({ limit: MAX_ITEMS_PER_PAGE, offset: (currentPage - 1) * MAX_ITEMS_PER_PAGE })

@@ -7,7 +7,7 @@ import { useObservableState } from 'observable-hooks'
 import * as RxOp from 'rxjs/operators'
 
 import { KeystoreId } from '../../shared/api/types'
-import { EthDerivationMode } from '../../shared/ethereum/types'
+import { EthHDMode } from '../../shared/ethereum/types'
 import { WalletAddress } from '../../shared/wallet/types'
 import { useWalletContext } from '../contexts/WalletContext'
 import { LedgerAddress } from '../services/wallet/types'
@@ -20,7 +20,7 @@ export const useLedger = (chain: Chain, id: KeystoreId) => {
   const { addLedgerAddress$, getLedgerAddress$, verifyLedgerAddress$, removeLedgerAddress } = useWalletContext()
 
   const verifyAddress = useCallback(
-    (walletIndex: number, ethDerivationMode: O.Option<EthDerivationMode>) =>
+    (walletIndex: number, ethDerivationMode: O.Option<EthHDMode>) =>
       verifyLedgerAddress$({ chain, network, walletIndex, ethDerivationMode }),
     [chain, verifyLedgerAddress$, network]
   )
@@ -40,7 +40,7 @@ export const useLedger = (chain: Chain, id: KeystoreId) => {
   )
 
   const addAddress = useCallback(
-    (walletIndex: number, ethDerivationMode: O.Option<EthDerivationMode>) =>
+    (walletIndex: number, ethDerivationMode: O.Option<EthHDMode>) =>
       addLedgerAddress$({ id, chain, network, walletIndex, ethDerivationMode }),
     [addLedgerAddress$, chain, id, network]
   )

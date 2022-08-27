@@ -5,23 +5,26 @@ import * as E from 'fp-ts/Either'
 
 import { LedgerError, LedgerErrorId } from '../../../../shared/api/types'
 import { getDerivationPath } from '../../../../shared/ethereum/ledger'
-import { EthDerivationMode } from '../../../../shared/ethereum/types'
+import { EthHDMode } from '../../../../shared/ethereum/types'
 import { isError } from '../../../../shared/utils/guard'
 import { WalletAddress } from '../../../../shared/wallet/types'
-import { getDerivationMode } from './common'
 
-export const getAddress = async (
-  transport: Transport,
-  walletIndex: number,
-  mode: EthDerivationMode
-): Promise<E.Either<LedgerError, WalletAddress>> => {
+export const getAddress = async ({
+  transport,
+  walletIndex,
+  ethHdMode
+}: {
+  transport: Transport
+  walletIndex: number
+  ethHdMode: EthHDMode
+}): Promise<E.Either<LedgerError, WalletAddress>> => {
   try {
     const app = new EthApp(transport)
-    const path = getDerivationPath(walletIndex, mode)
+    const path = getDerivationPath(walletIndex, ethHdMode)
     const { address } = await app.getAddress(path)
 
     if (address) {
-      return E.right({ address, chain: ETHChain, type: 'ledger', walletIndex })
+      return E.right({ address, chain: ETHChain, type: 'ledger', walletIndex, hdMode: ethHdMode })
     } else {
       return E.left({
         errorId: LedgerErrorId.INVALID_PUBKEY,
@@ -36,10 +39,17 @@ export const getAddress = async (
   }
 }
 
-export const verifyAddress = async (transport: Transport, walletIndex: number) => {
+export const verifyAddress = async ({
+  transport,
+  walletIndex,
+  ethHdMode
+}: {
+  transport: Transport
+  walletIndex: number
+  ethHdMode: EthHDMode
+}) => {
   const app = new EthApp(transport)
-  const mode = await getDerivationMode()
-  const path = getDerivationPath(walletIndex, mode)
+  const path = getDerivationPath(walletIndex, ethHdMode)
   const _ = await app.getAddress(path, true)
   return true
 }

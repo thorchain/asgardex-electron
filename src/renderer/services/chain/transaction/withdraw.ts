@@ -28,7 +28,7 @@ const { pools: midgardPoolsService, validateNode$ } = midgardService
  * @returns WithdrawState$ - Observable state to reflect loading status. It provides all data we do need to display status in `TxModal`
  *
  */
-export const symWithdraw$ = ({ memo, network, walletType, walletIndex }: SymWithdrawParams): WithdrawState$ => {
+export const symWithdraw$ = ({ memo, network, walletType, walletIndex, hdMode }: SymWithdrawParams): WithdrawState$ => {
   // total of progress
   const total = O.some(100)
 
@@ -54,6 +54,7 @@ export const symWithdraw$ = ({ memo, network, walletType, walletIndex }: SymWith
       return sendPoolTx$({
         walletType,
         walletIndex,
+        hdMode,
         router: O.none, // no router for RUNE
         asset: AssetRuneNative,
         recipient: '', // empty for RUNE txs
@@ -140,6 +141,7 @@ export const asymWithdraw$ = ({
   memo,
   network,
   walletIndex,
+  hdMode,
   walletType
 }: AsymWithdrawParams): WithdrawState$ => {
   // total of progress
@@ -176,6 +178,7 @@ export const asymWithdraw$ = ({
       return sendTx$({
         walletType,
         walletIndex,
+        hdMode,
         asset,
         recipient: poolAddress.address, // it will be empty string for RUNE
         amount: smallestAmountToSent(asset.chain, network),

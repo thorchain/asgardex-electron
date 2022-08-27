@@ -78,7 +78,8 @@ export const Upgrade: React.FC<Props> = (props): JSX.Element => {
     network,
     walletAddress,
     walletType,
-    walletIndex
+    walletIndex,
+    hdMode
   } = props
 
   const intl = useIntl()
@@ -538,7 +539,8 @@ export const Upgrade: React.FC<Props> = (props): JSX.Element => {
               amount: assetToBase(assetAmount(0)),
               asset: runeAsset.asset,
               walletAddress: '',
-              walletIndex
+              walletIndex,
+              hdMode
             }}
             walletBalances={[]}
             network={network}

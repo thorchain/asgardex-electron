@@ -2,14 +2,7 @@ import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
 import { Address, Balance } from '@xchainjs/xchain-client'
-import {
-  Asset,
-  assetToString,
-  baseToAsset,
-  chainToString,
-  formatAssetAmountCurrency,
-  isSynthAsset
-} from '@xchainjs/xchain-util'
+import { Asset, baseToAsset, chainToString, formatAssetAmountCurrency, isSynthAsset } from '@xchainjs/xchain-util'
 import { Col, Collapse, Grid, Row } from 'antd'
 import { ScreenMap } from 'antd/lib/_util/responsiveObserve'
 import { ColumnType } from 'antd/lib/table'
@@ -17,19 +10,24 @@ import * as A from 'fp-ts/lib/Array'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
 import { useIntl } from 'react-intl'
-import { useNavigate } from 'react-router-dom'
 
 import { Network } from '../../../../shared/api/types'
 import { isKeystoreWallet } from '../../../../shared/utils/guard'
-import { WalletType } from '../../../../shared/wallet/types'
+import { HDMode, WalletType } from '../../../../shared/wallet/types'
 import { disableRuneUpgrade, isNonNativeRuneAsset, isUSDAsset } from '../../../helpers/assetHelper'
 import { getChainAsset } from '../../../helpers/chainHelper'
 import { getPoolPriceValue } from '../../../helpers/poolHelper'
-import * as walletRoutes from '../../../routes/wallet'
 import { WalletBalancesRD } from '../../../services/clients'
 import { PoolDetails } from '../../../services/midgard/types'
 import { MimirHaltRD } from '../../../services/thorchain/types'
-import { ApiError, ChainBalance, ChainBalances, WalletBalance, WalletBalances } from '../../../services/wallet/types'
+import {
+  ApiError,
+  ChainBalance,
+  ChainBalances,
+  SelectedWalletAsset,
+  WalletBalance,
+  WalletBalances
+} from '../../../services/wallet/types'
 import { walletTypeToI18n } from '../../../services/wallet/util'
 import { PricePool } from '../../../views/pools/Pools.types'
 import { ErrorView } from '../../shared/error/'
@@ -44,18 +42,8 @@ type Props = {
   chainBalances: ChainBalances
   pricePool: PricePool
   poolDetails: PoolDetails
-  selectAssetHandler?: ({
-    asset,
-    walletAddress,
-    walletType,
-    walletIndex
-  }: {
-    asset: Asset
-    walletAddress: Address
-    walletType: WalletType
-    walletIndex: number
-  }) => void
-  setSelectedAsset?: (oAsset: O.Option<Asset>) => void
+  selectAssetHandler: (asset: SelectedWalletAsset) => void
+  upgradeAssetHandler: (asset: SelectedWalletAsset) => void
   network: Network
   mimirHalt: MimirHaltRD
 }
@@ -65,14 +53,13 @@ export const AssetsTableCollapsable: React.FC<Props> = (props): JSX.Element => {
     chainBalances = [],
     pricePool,
     poolDetails,
-    selectAssetHandler = (_) => {},
-    setSelectedAsset = () => {},
+    selectAssetHandler,
+    upgradeAssetHandler,
     mimirHalt: mimirHaltRD,
     network
   } = props
 
   const intl = useIntl()
-  const navigate = useNavigate()
   const screenMap: ScreenMap = Grid.useBreakpoint()
 
   const [showQRModal, setShowQRModal] = useState<O.Option<{ asset: Asset; address: Address }>>(O.none)
@@ -96,12 +83,22 @@ export const AssetsTableCollapsable: React.FC<Props> = (props): JSX.Element => {
   )
 
   const onRowHandler = useCallback(
-    (oWalletAddress: O.Option<Address>, walletType: WalletType, walletIndex: number) =>
+    ({
+        oWalletAddress,
+        walletType,
+        walletIndex,
+        hdMode
+      }: {
+        oWalletAddress: O.Option<Address>
+        walletType: WalletType
+        walletIndex: number
+        hdMode: HDMode
+      }) =>
       ({ asset }: Balance) => {
         // Disable click for NativeRUNE if Thorchain is halted
         const onClick = FP.pipe(
           oWalletAddress,
-          O.map((walletAddress) => () => selectAssetHandler({ asset, walletAddress, walletType, walletIndex })),
+          O.map((walletAddress) => () => selectAssetHandler({ asset, walletAddress, walletType, walletIndex, hdMode })),
           // TODO(@Veado) Add error message / alert
           O.getOrElse(() => () => console.error('Unknown address'))
         )
@@ -135,23 +132,14 @@ export const AssetsTableCollapsable: React.FC<Props> = (props): JSX.Element => {
   const tickerColumn: ColumnType<WalletBalance> = useMemo(
     () => ({
       width: 80,
-      render: ({ asset, walletAddress, walletType, walletIndex }: WalletBalance) => {
+      render: ({ asset, walletAddress, walletType, walletIndex, hdMode }: WalletBalance) => {
         // Disable UPGRADE button if needed
         const disableUpgradeButton = disableRuneUpgrade({ asset, haltThorChain, haltEthChain, haltBnbChain, network })
 
         const onClickUpgradeButtonHandler = (e: React.MouseEvent<HTMLElement, MouseEvent>) => {
           e.preventDefault()
           e.stopPropagation()
-          setSelectedAsset(O.some(asset))
-          navigate(
-            walletRoutes.upgradeRune.path({
-              asset: assetToString(asset),
-              walletAddress,
-              network,
-              walletType,
-              walletIndex: walletIndex ? walletIndex.toString() : '0'
-            })
-          )
+          upgradeAssetHandler({ asset, walletAddress, walletIndex, walletType, hdMode })
         }
 
         return (
@@ -177,7 +165,7 @@ export const AssetsTableCollapsable: React.FC<Props> = (props): JSX.Element => {
         )
       }
     }),
-    [haltThorChain, haltEthChain, haltBnbChain, network, intl, setSelectedAsset, navigate]
+    [haltThorChain, haltEthChain, haltBnbChain, network, intl, upgradeAssetHandler]
   )
 
   const renderBalanceColumn = ({ asset, amount }: Balance) => {
@@ -272,13 +260,15 @@ export const AssetsTableCollapsable: React.FC<Props> = (props): JSX.Element => {
       oWalletAddress,
       loading = false,
       walletType,
-      walletIndex
+      walletIndex,
+      hdMode
     }: {
       tableData: Balance[]
       oWalletAddress: O.Option<Address>
       loading?: boolean
       walletType: WalletType
       walletIndex: number
+      hdMode: HDMode
     }) => {
       return (
         <Styled.Table
@@ -286,7 +276,7 @@ export const AssetsTableCollapsable: React.FC<Props> = (props): JSX.Element => {
           dataSource={tableData}
           loading={loading}
           rowKey={({ asset }) => asset.symbol}
-          onRow={onRowHandler(oWalletAddress, walletType, walletIndex)}
+          onRow={onRowHandler({ oWalletAddress, walletType, walletIndex, hdMode })}
           columns={columns}
         />
       )
@@ -300,23 +290,32 @@ export const AssetsTableCollapsable: React.FC<Props> = (props): JSX.Element => {
       index,
       oWalletAddress,
       walletType,
-      walletIndex
+      walletIndex,
+      hdMode
     }: {
       balancesRD: WalletBalancesRD
       index: number
       oWalletAddress: O.Option<Address>
       walletType: WalletType
       walletIndex: number
+      hdMode: HDMode
     }) => {
       return FP.pipe(
         balancesRD,
         RD.fold(
           // initial state
-          () => renderAssetsTable({ tableData: [], oWalletAddress, loading: false, walletType, walletIndex }),
+          () => renderAssetsTable({ tableData: [], oWalletAddress, loading: false, walletType, walletIndex, hdMode }),
           // loading state
           () => {
             const data = previousAssetsTableData.current[index] ?? []
-            return renderAssetsTable({ tableData: data, oWalletAddress, loading: true, walletType, walletIndex })
+            return renderAssetsTable({
+              tableData: data,
+              oWalletAddress,
+              loading: true,
+              walletType,
+              walletIndex,
+              hdMode
+            })
           },
           // error state
           ({ msg }: ApiError) => {
@@ -326,7 +325,14 @@ export const AssetsTableCollapsable: React.FC<Props> = (props): JSX.Element => {
           (balances) => {
             const prev = previousAssetsTableData.current
             prev[index] = balances
-            return renderAssetsTable({ tableData: balances, oWalletAddress, loading: false, walletType, walletIndex })
+            return renderAssetsTable({
+              tableData: balances,
+              oWalletAddress,
+              loading: false,
+              walletType,
+              walletIndex,
+              hdMode
+            })
           }
         )
       )
@@ -337,7 +343,7 @@ export const AssetsTableCollapsable: React.FC<Props> = (props): JSX.Element => {
   // Panel
   const renderPanel = useCallback(
     (
-      { chain, walletType, walletAddress: oWalletAddress, balances: balancesRD, walletIndex }: ChainBalance,
+      { chain, walletType, walletAddress: oWalletAddress, balances: balancesRD, walletIndex, hdMode }: ChainBalance,
       key: number
     ) => {
       /**
@@ -415,7 +421,8 @@ export const AssetsTableCollapsable: React.FC<Props> = (props): JSX.Element => {
             index: key,
             oWalletAddress,
             walletType,
-            walletIndex
+            walletIndex,
+            hdMode
           })}
         </Panel>
       )

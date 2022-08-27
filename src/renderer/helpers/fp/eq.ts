@@ -11,12 +11,12 @@ import * as O from 'fp-ts/lib/Option'
 import * as S from 'fp-ts/lib/string'
 
 import { KeystoreId, LedgerError, Network } from '../../../shared/api/types'
-import { EthDerivationMode } from '../../../shared/ethereum/types'
-import { WalletAddress, WalletType } from '../../../shared/wallet/types'
+import { EthHDMode } from '../../../shared/ethereum/types'
+import { HDMode, WalletAddress, WalletType } from '../../../shared/wallet/types'
 import { DepositAssetFees, DepositFees, SwapFeesParams, SymDepositAddresses } from '../../services/chain/types'
 import { ApproveParams } from '../../services/ethereum/types'
 import { PoolAddress, PoolShare } from '../../services/midgard/types'
-import { ApiError, LedgerAddress, WalletBalance } from '../../services/wallet/types'
+import { ApiError, LedgerAddress, SelectedWalletAsset, WalletBalance } from '../../services/wallet/types'
 import { AssetWithAmount } from '../../types/asgardex'
 import { PricePool } from '../../views/pools/Pools.types'
 
@@ -108,11 +108,27 @@ export const eqAssetsWithBalanceRD = RD.getEq<ApiError, Balance[]>(eqApiError, e
 
 export const eqWalletType: Eq.Eq<WalletType> = eqString
 
+export const eqEthDerivationMode: Eq.Eq<EthHDMode> = eqString
+export const eqOEthDerivationMode = O.getEq(eqEthDerivationMode)
+
+export const eqHDMode: Eq.Eq<HDMode> = eqString
+export const eqOHDMode = O.getEq(eqHDMode)
+
 export const eqWalletBalance: Eq.Eq<WalletBalance> = {
   equals: (x, y) => eqBalance.equals(x, y) && x.walletAddress === y.walletAddress
 }
 export const eqOWalletBalance = O.getEq(eqWalletBalance)
 export const eqWalletBalances = A.getEq(eqWalletBalance)
+
+export const eqSelectedWalletAsset = Eq.struct<SelectedWalletAsset>({
+  asset: eqAsset,
+  walletAddress: eqAddress,
+  walletIndex: eqNumber,
+  walletType: eqWalletType,
+  hdMode: eqHDMode
+})
+
+export const eqOSelectedWalletAsset = O.getEq(eqSelectedWalletAsset)
 
 export const eqPoolShare = Eq.struct<PoolShare>({
   asset: eqAsset,
@@ -127,8 +143,8 @@ export const eqPoolShares = A.getEq(eqPoolShare)
 
 export const eqPoolAddresses = Eq.struct<PoolAddress>({
   chain: eqChain,
-  address: eqString,
-  router: eqOString,
+  address: eqAddress,
+  router: eqOAddress,
   halted: eqBoolean
 })
 
@@ -141,11 +157,12 @@ export const eqSwapFeesParams = Eq.struct<SwapFeesParams>({
 
 export const eqApproveParams = Eq.struct<ApproveParams>({
   network: eqString,
-  spenderAddress: eqString,
-  contractAddress: eqString,
-  fromAddress: eqString,
+  spenderAddress: eqAddress,
+  contractAddress: eqAddress,
+  fromAddress: eqAddress,
   walletIndex: eqNumber,
-  walletType: eqWalletType
+  walletType: eqWalletType,
+  hdMode: eqHDMode
 })
 
 export const eqOApproveParams = O.getEq(eqApproveParams)
@@ -191,14 +208,13 @@ const eqLedgerError = Eq.struct<LedgerError>({
 })
 
 export const eqKeystoreId: Eq.Eq<KeystoreId> = eqNumber
-export const eqEthDerivationMode: Eq.Eq<EthDerivationMode> = eqString
-export const eqOEthDerivationMode = O.getEq(eqEthDerivationMode)
 
 export const eqWalletAddress = Eq.struct<WalletAddress>({
-  address: eqString,
+  address: eqAddress,
   type: eqString,
   chain: eqChain,
-  walletIndex: eqNumber
+  walletIndex: eqNumber,
+  hdMode: eqHDMode
 })
 
 export const eqOWalletAddress = O.getEq(eqWalletAddress)
@@ -209,9 +225,10 @@ export const eqLedgerAddress = Eq.struct<LedgerAddress>({
   keystoreId: eqKeystoreId,
   chain: eqChain,
   network: eqNetwork,
-  address: eqString,
+  address: eqAddress,
   walletIndex: eqNumber,
-  ethDerivationMode: eqOEthDerivationMode
+  hdMode: eqHDMode,
+  type: eqWalletType
 })
 
 export const eqOLedgerAddress = O.getEq(eqLedgerAddress)

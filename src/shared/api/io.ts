@@ -6,7 +6,7 @@ import * as t from 'io-ts'
 import * as IOD from 'io-ts/Decoder'
 import * as IOG from 'io-ts/Guard'
 
-import { isAsset, isBaseAmount, isChain, isEthDerivationMode, isFeeOption, isNetwork } from '../utils/guard'
+import { isAsset, isBaseAmount, isChain, isEthHDMode, isFeeOption, isHDMode, isNetwork } from '../utils/guard'
 
 const assetDecoder: IOD.Decoder<unknown, Asset> = FP.pipe(
   IOD.string,
@@ -76,12 +76,22 @@ export const networkIO = new t.Type(
   t.identity
 )
 
-export const ethDerivationModeIO = new t.Type(
-  'EthDerivationMode',
-  isEthDerivationMode,
+export const ethHDModeIO = new t.Type(
+  'EthHDMode',
+  isEthHDMode,
   (u, c) => {
-    if (isEthDerivationMode(u)) return t.success(u)
-    return t.failure(u, c, `Can't decode EthDerivationMode from ${u}`)
+    if (isEthHDMode(u)) return t.success(u)
+    return t.failure(u, c, `Can't decode EthHDMode from ${u}`)
+  },
+  t.identity
+)
+
+export const hdModeIO = new t.Type(
+  'HDMode',
+  isHDMode,
+  (u, c) => {
+    if (isHDMode(u)) return t.success(u)
+    return t.failure(u, c, `Can't decode HDMode from ${u}`)
   },
   t.identity
 )
@@ -109,7 +119,8 @@ export const ipcLedgerSendTxParamsIO = t.type({
   feeRate: t.number,
   feeOption: t.union([feeOptionIO, t.undefined]),
   feeAmount: t.union([baseAmountIO, t.undefined]),
-  nodeUrl: t.union([t.string, t.undefined])
+  nodeUrl: t.union([t.string, t.undefined]),
+  hdMode: hdModeIO
 })
 
 export type IPCLedgerSendTxParams = t.TypeOf<typeof ipcLedgerSendTxParamsIO>
@@ -124,7 +135,8 @@ export const ipcLedgerDepositTxParamsIO = t.type({
   memo: t.string,
   walletIndex: t.number,
   feeOption: t.union([feeOptionIO, t.undefined]),
-  nodeUrl: t.union([t.string, t.undefined])
+  nodeUrl: t.union([t.string, t.undefined]),
+  hdMode: hdModeIO
 })
 
 export type IPCLedgerDepositTxParams = t.TypeOf<typeof ipcLedgerDepositTxParamsIO>
@@ -133,7 +145,8 @@ export const ipcLedgerApproveERC20TokenParamsIO = t.type({
   network: networkIO,
   contractAddress: t.string,
   spenderAddress: t.string,
-  walletIndex: t.number
+  walletIndex: t.number,
+  ethHdMode: ethHDModeIO
 })
 
 export type IPCLedgerApproveERC20TokenParams = t.TypeOf<typeof ipcLedgerApproveERC20TokenParamsIO>
@@ -227,7 +240,7 @@ export const ipcLedgerAddressIO = t.type({
   chain: chainIO,
   network: networkIO,
   walletIndex: t.number,
-  ethDerivationMode: t.union([ethDerivationModeIO, t.undefined])
+  hdMode: hdModeIO
 })
 
 export const ipcLedgerAddressesIO = t.array(ipcLedgerAddressIO)

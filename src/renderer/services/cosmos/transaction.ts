@@ -56,7 +56,8 @@ export const createTransactionService = (client$: Client$, network$: Network$): 
       feeRate: NaN,
       feeOption: undefined,
       feeAmount,
-      nodeUrl: undefined
+      nodeUrl: undefined,
+      hdMode: 'default'
     }
     const encoded = ipcLedgerSendTxParamsIO.encode(sendLedgerTxParams)
 

@@ -21,7 +21,7 @@ import * as Rx from 'rxjs'
 import * as RxOp from 'rxjs/operators'
 
 import { LedgerErrorId } from '../../../shared/api/types'
-import { EthDerivationMode } from '../../../shared/ethereum/types'
+import { EthHDMode } from '../../../shared/ethereum/types'
 import { WalletSettings } from '../../components/settings'
 import { useBinanceContext } from '../../contexts/BinanceContext'
 import { useBitcoinCashContext } from '../../contexts/BitcoinCashContext'
@@ -144,7 +144,7 @@ export const WalletSettingsView: React.FC<Props> = ({ keystoreUnlocked }): JSX.E
   }: {
     chain: Chain
     walletIndex: number
-    ethDerivationMode: O.Option<EthDerivationMode>
+    ethDerivationMode: O.Option<EthHDMode>
   }): LedgerAddressLD => {
     if (isThorChain(chain)) return addLedgerThorAddress(walletIndex, ethDerivationMode)
     if (isBnbChain(chain)) return addLedgerBnbAddress(walletIndex, ethDerivationMode)
@@ -170,7 +170,7 @@ export const WalletSettingsView: React.FC<Props> = ({ keystoreUnlocked }): JSX.E
   }: {
     chain: Chain
     walletIndex: number
-    ethDerivationMode: O.Option<EthDerivationMode>
+    ethDerivationMode: O.Option<EthHDMode>
   }): VerifiedLedgerAddressLD => {
     if (isThorChain(chain)) return verifyLedgerThorAddress(walletIndex, ethDerivationMode)
     if (isBnbChain(chain)) return verifyLedgerBnbAddress(walletIndex, ethDerivationMode)

@@ -1,14 +1,12 @@
 import React, { useMemo } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
-import { Address } from '@xchainjs/xchain-client'
 import { ETHAddress } from '@xchainjs/xchain-ethereum'
-import { Asset, baseAmount, ETHChain } from '@xchainjs/xchain-util'
+import { baseAmount, ETHChain } from '@xchainjs/xchain-util'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
 import { useObservableState } from 'observable-hooks'
 
-import { WalletType } from '../../../../shared/wallet/types'
 import { LoadingView } from '../../../components/shared/loading'
 import { SendFormETH } from '../../../components/wallet/txs/send/'
 import { useChainContext } from '../../../contexts/ChainContext'
@@ -19,16 +17,14 @@ import { useNetwork } from '../../../hooks/useNetwork'
 import { useOpenExplorerTxUrl } from '../../../hooks/useOpenExplorerTxUrl'
 import { FeesRD, WalletBalances } from '../../../services/clients'
 import { DEFAULT_BALANCES_FILTER, INITIAL_BALANCES_STATE } from '../../../services/wallet/const'
+import { SelectedWalletAsset } from '../../../services/wallet/types'
 
 type Props = {
-  walletType: WalletType
-  walletIndex: number
-  walletAddress: Address
-  asset: Asset
+  asset: SelectedWalletAsset
 }
 
 export const SendViewETH: React.FC<Props> = (props): JSX.Element => {
-  const { walletType, walletIndex, walletAddress, asset } = props
+  const { asset } = props
 
   const { network } = useNetwork()
 
@@ -48,9 +44,11 @@ export const SendViewETH: React.FC<Props> = (props): JSX.Element => {
     () =>
       FP.pipe(
         oBalances,
-        O.chain((balances) => getWalletBalanceByAddressAndAsset({ balances, address: walletAddress, asset }))
+        O.chain((balances) =>
+          getWalletBalanceByAddressAndAsset({ balances, address: asset.walletAddress, asset: asset.asset })
+        )
       ),
-    [asset, oBalances, walletAddress]
+    [asset, oBalances]
   )
 
   const { transfer$ } = useChainContext()
@@ -63,7 +61,7 @@ export const SendViewETH: React.FC<Props> = (props): JSX.Element => {
     // `reloadFees` will be called and with it, `feesRD` will be updated with fees
     () => {
       return fees$({
-        asset,
+        asset: asset.asset,
         amount: baseAmount(1),
         recipient: ETHAddress
       })
@@ -77,9 +75,7 @@ export const SendViewETH: React.FC<Props> = (props): JSX.Element => {
       () => <LoadingView size="large" />,
       (walletBalance) => (
         <SendFormETH
-          walletType={walletType}
-          walletIndex={walletIndex}
-          walletAddress={walletAddress}
+          asset={asset}
           balance={walletBalance}
           balances={FP.pipe(
             oBalances,

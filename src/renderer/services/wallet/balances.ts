@@ -22,7 +22,7 @@ import * as Rx from 'rxjs'
 import * as RxOp from 'rxjs/operators'
 
 import { Network } from '../../../shared/api/types'
-import { WalletAddress, WalletBalanceType, WalletType } from '../../../shared/wallet/types'
+import { HDMode, WalletAddress, WalletBalanceType, WalletType } from '../../../shared/wallet/types'
 import { getBnbRuneAsset } from '../../helpers/assetHelper'
 import { filterEnabledChains } from '../../helpers/chainHelper'
 import { eqBalancesRD } from '../../helpers/fp/eq'
@@ -106,11 +106,13 @@ export const createBalancesService = ({
     chain,
     walletType,
     walletIndex,
+    hdMode,
     walletBalanceType
   }: {
     chain: Chain
     walletType: WalletType
     walletIndex: number
+    hdMode: HDMode
     walletBalanceType: WalletBalanceType
   }): ChainBalancesService => {
     switch (chain) {
@@ -128,14 +130,14 @@ export const createBalancesService = ({
         return {
           reloadBalances: BTC.reloadBalances,
           resetReloadBalances: BTC.resetReloadBalances,
-          balances$: BTC.balances$(walletType, walletIndex, walletBalanceType),
+          balances$: BTC.balances$({ walletType, walletIndex, walletBalanceType, hdMode }),
           reloadBalances$: BTC.reloadBalances$
         }
       case BCHChain:
         return {
           reloadBalances: BCH.reloadBalances,
           resetReloadBalances: BCH.resetReloadBalances,
-          balances$: BCH.balances$(walletType, walletIndex),
+          balances$: BCH.balances$({ walletType, walletIndex, hdMode }),
           reloadBalances$: BCH.reloadBalances$
         }
       case ETHChain:
@@ -144,7 +146,7 @@ export const createBalancesService = ({
           resetReloadBalances: ETH.resetReloadBalances,
           balances$: FP.pipe(
             network$,
-            RxOp.switchMap((network) => ETH.balances$({ walletType, network, walletIndex }))
+            RxOp.switchMap((network) => ETH.balances$({ walletType, network, walletIndex, hdMode }))
           ),
           reloadBalances$: ETH.reloadBalances$
         }
@@ -152,28 +154,28 @@ export const createBalancesService = ({
         return {
           reloadBalances: THOR.reloadBalances,
           resetReloadBalances: THOR.resetReloadBalances,
-          balances$: THOR.balances$(walletType, walletIndex),
+          balances$: THOR.balances$({ walletType, walletIndex, hdMode }),
           reloadBalances$: THOR.reloadBalances$
         }
       case LTCChain:
         return {
           reloadBalances: LTC.reloadBalances,
           resetReloadBalances: LTC.resetReloadBalances,
-          balances$: LTC.balances$(walletType, walletIndex),
+          balances$: LTC.balances$({ walletType, walletIndex, hdMode }),
           reloadBalances$: LTC.reloadBalances$
         }
       case DOGEChain:
         return {
           reloadBalances: DOGE.reloadBalances,
           resetReloadBalances: DOGE.resetReloadBalances,
-          balances$: DOGE.balances$(walletType, walletIndex),
+          balances$: DOGE.balances$({ walletType, walletIndex, hdMode }),
           reloadBalances$: DOGE.reloadBalances$
         }
       case CosmosChain:
         return {
           reloadBalances: COSMOS.reloadBalances,
           resetReloadBalances: COSMOS.resetReloadBalances,
-          balances$: COSMOS.balances$(walletType, walletIndex),
+          balances$: COSMOS.balances$({ walletType, walletIndex, hdMode }),
           reloadBalances$: COSMOS.reloadBalances$
         }
       default:
@@ -212,14 +214,16 @@ export const createBalancesService = ({
     chain,
     walletType,
     walletIndex,
+    hdMode,
     walletBalanceType
   }: {
     chain: Chain
     walletType: WalletType
     walletIndex: number
+    hdMode: HDMode
     walletBalanceType: WalletBalanceType
   }): WalletBalancesLD => {
-    const chainService = getBalancesServiceByChain({ chain, walletType, walletIndex, walletBalanceType })
+    const chainService = getBalancesServiceByChain({ chain, walletType, walletIndex, hdMode, walletBalanceType })
     const reload$ = FP.pipe(
       chainService.reloadBalances$,
       RxOp.finalize(() => {
@@ -260,7 +264,13 @@ export const createBalancesService = ({
    */
   const thorChainBalance$: ChainBalance$ = Rx.combineLatest([
     THOR.addressUI$,
-    getChainBalance$({ chain: THORChain, walletType: 'keystore', walletIndex: 0, walletBalanceType: 'all' }) // walletIndex=0 (as long as we don't support HD wallets for keystore)
+    getChainBalance$({
+      chain: THORChain,
+      walletType: 'keystore',
+      walletIndex: 0, // walletIndex=0 (as long as we don't support HD wallets for keystore)
+      hdMode: 'default',
+      walletBalanceType: 'all'
+    })
   ]).pipe(
     RxOp.map(([oWalletAddress, balances]) => ({
       walletType: 'keystore',
@@ -286,11 +296,13 @@ export const createBalancesService = ({
       address,
       walletType,
       walletIndex,
+      hdMode,
       walletBalanceType
     }: {
       address: Address
       walletType: WalletType
       walletIndex: number
+      hdMode: HDMode
       walletBalanceType: WalletBalanceType
     }) => WalletBalancesLD
   }): ChainBalance$ =>
@@ -311,11 +323,11 @@ export const createBalancesService = ({
                 walletIndex: 0,
                 balancesType: walletBalanceType
               }),
-            ({ address, walletIndex }) =>
+            ({ address, walletIndex, hdMode }) =>
               // Load balances by given Ledger address
               // and put it's RD state into `balances` of `ChainBalance`
               FP.pipe(
-                getBalanceByAddress$({ address, walletType: 'ledger', walletIndex, walletBalanceType }),
+                getBalanceByAddress$({ address, walletType: 'ledger', walletIndex, walletBalanceType, hdMode }),
                 RxOp.map<WalletBalancesRD, ChainBalance>((balances) => ({
                   walletType: 'ledger',
                   walletIndex,
@@ -344,7 +356,13 @@ export const createBalancesService = ({
    */
   const ltcBalance$: ChainBalance$ = Rx.combineLatest([
     LTC.addressUI$,
-    getChainBalance$({ chain: LTCChain, walletType: 'keystore', walletIndex: 0, walletBalanceType: 'all' }) // walletIndex=0 (as long as we don't support HD wallets for keystore)
+    getChainBalance$({
+      chain: LTCChain,
+      walletType: 'keystore',
+      walletIndex: 0,
+      hdMode: 'default',
+      walletBalanceType: 'all'
+    }) // walletIndex=0 (as long as we don't support HD wallets for keystore)
   ]).pipe(
     RxOp.map<[O.Option<WalletAddress>, WalletBalancesRD], ChainBalance>(([oWalletAddress, balances]) => ({
       walletType: 'keystore',
@@ -370,7 +388,13 @@ export const createBalancesService = ({
    */
   const bchChainBalance$: ChainBalance$ = Rx.combineLatest([
     BCH.addressUI$,
-    getChainBalance$({ chain: BCHChain, walletType: 'keystore', walletIndex: 0, walletBalanceType: 'all' }) // walletIndex=0 (as long as we don't support HD wallets for keystore)
+    getChainBalance$({
+      chain: BCHChain,
+      walletType: 'keystore',
+      walletIndex: 0, // walletIndex=0 (as long as we don't support HD wallets for keystore)
+      walletBalanceType: 'all',
+      hdMode: 'default'
+    })
   ]).pipe(
     RxOp.map<[O.Option<WalletAddress>, WalletBalancesRD], ChainBalance>(([oWalletAddress, balances]) => ({
       walletType: 'keystore',
@@ -405,7 +429,13 @@ export const createBalancesService = ({
    */
   const bnbChainBalance$: ChainBalance$ = Rx.combineLatest([
     BNB.addressUI$,
-    getChainBalance$({ chain: BNBChain, walletType: 'keystore', walletIndex: 0, walletBalanceType: 'all' }), // walletIndex=0 (as long as we don't support HD wallets for keystore)
+    getChainBalance$({
+      chain: BNBChain,
+      walletType: 'keystore',
+      walletIndex: 0, // walletIndex=0 (as long as we don't support HD wallets for keystore)
+      hdMode: 'default',
+      walletBalanceType: 'all'
+    }),
     network$
   ]).pipe(
     RxOp.map<[O.Option<WalletAddress>, WalletBalancesRD, Network], ChainBalance>(
@@ -414,6 +444,7 @@ export const createBalancesService = ({
         chain: BNBChain,
         walletAddress: addressFromOptionalWalletAddress(oWalletAddress),
         walletIndex: 0, // Always 0 as long as we don't support HD wallets for keystore
+        hdMode: 'default',
         balances: FP.pipe(
           balances,
           RD.map((assets) => sortBalances(assets, [AssetBNB.ticker, getBnbRuneAsset(network).ticker]))
@@ -445,7 +476,13 @@ export const createBalancesService = ({
    */
   const btcChainBalance$: ChainBalance$ = Rx.combineLatest([
     BTC.addressUI$,
-    getChainBalance$({ chain: BTCChain, walletType: 'keystore', walletIndex: 0, walletBalanceType: 'all' }) // walletIndex=0 (as long as we don't support HD wallets for keystore)
+    getChainBalance$({
+      chain: BTCChain,
+      walletType: 'keystore',
+      walletIndex: 0, // walletIndex=0 (as long as we don't support HD wallets for keystore)
+      hdMode: 'default',
+      walletBalanceType: 'all'
+    })
   ]).pipe(
     RxOp.map<[O.Option<WalletAddress>, WalletBalancesRD], ChainBalance>(([oWalletAddress, balances]) => ({
       walletType: 'keystore',
@@ -461,7 +498,13 @@ export const createBalancesService = ({
    */
   const btcChainBalanceConfirmed$: ChainBalance$ = Rx.combineLatest([
     BTC.addressUI$,
-    getChainBalance$({ chain: BTCChain, walletType: 'keystore', walletIndex: 0, walletBalanceType: 'confirmed' }) // walletIndex=0 (as long as we don't support HD wallets for keystore)
+    getChainBalance$({
+      chain: BTCChain,
+      walletType: 'keystore',
+      walletIndex: 0, // walletIndex=0 (as long as we don't support HD wallets for keystore)
+      hdMode: 'default',
+      walletBalanceType: 'confirmed'
+    })
   ]).pipe(
     RxOp.map<[O.Option<WalletAddress>, WalletBalancesRD], ChainBalance>(([oWalletAddress, balances]) => ({
       walletType: 'keystore',
@@ -478,7 +521,13 @@ export const createBalancesService = ({
    */
   const dogeChainBalance$: ChainBalance$ = Rx.combineLatest([
     DOGE.addressUI$,
-    getChainBalance$({ chain: DOGEChain, walletType: 'keystore', walletIndex: 0, walletBalanceType: 'all' }) // walletIndex=0 (as long as we don't support HD wallets for keystore)
+    getChainBalance$({
+      chain: DOGEChain,
+      walletType: 'keystore',
+      walletIndex: 0, // walletIndex=0 (as long as we don't support HD wallets for keystore)
+      hdMode: 'default',
+      walletBalanceType: 'all'
+    })
   ]).pipe(
     RxOp.map<[O.Option<WalletAddress>, WalletBalancesRD], ChainBalance>(([oWalletAddress, balances]) => ({
       walletType: 'keystore',
@@ -502,8 +551,8 @@ export const createBalancesService = ({
   const ethBalances$ = getChainBalance$({
     chain: ETHChain,
     walletType: 'keystore',
-    // walletIndex=0 (as long as we don't support HD wallets for keystore)
-    walletIndex: 0,
+    walletIndex: 0, // walletIndex=0 (as long as we don't support HD wallets for keystore)
+    hdMode: 'default',
     walletBalanceType: 'all'
   })
 
@@ -526,7 +575,13 @@ export const createBalancesService = ({
    */
   const cosmosChainBalance$: ChainBalance$ = Rx.combineLatest([
     COSMOS.addressUI$,
-    getChainBalance$({ chain: CosmosChain, walletType: 'keystore', walletIndex: 0, walletBalanceType: 'all' }) // walletIndex=0 (as long as we don't support HD wallets for keystore)
+    getChainBalance$({
+      chain: CosmosChain,
+      walletType: 'keystore',
+      walletIndex: 0, // walletIndex=0 (as long as we don't support HD wallets for keystore)
+      hdMode: 'default',
+      walletBalanceType: 'all'
+    })
   ]).pipe(
     RxOp.map<[O.Option<WalletAddress>, WalletBalancesRD], ChainBalance>(([oWalletAddress, balances]) => ({
       walletType: 'keystore',

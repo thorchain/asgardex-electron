@@ -27,7 +27,7 @@ import { useNavigate } from 'react-router-dom'
 
 import { KeystoreId, Network } from '../../../shared/api/types'
 import { getDerivationPath as getEthDerivationPath } from '../../../shared/ethereum/ledger'
-import { EthDerivationMode } from '../../../shared/ethereum/types'
+import { EthHDMode } from '../../../shared/ethereum/types'
 import { isError } from '../../../shared/utils/guard'
 import { WalletAddress } from '../../../shared/wallet/types'
 import { ReactComponent as UnlockOutlined } from '../../assets/svg/icon-unlock-warning.svg'
@@ -81,12 +81,12 @@ type Props = {
   addLedgerAddress$: (params: {
     chain: Chain
     walletIndex: number
-    ethDerivationMode: O.Option<EthDerivationMode>
+    ethDerivationMode: O.Option<EthHDMode>
   }) => LedgerAddressLD
   verifyLedgerAddress$: (params: {
     chain: Chain
     walletIndex: number
-    ethDerivationMode: O.Option<EthDerivationMode>
+    ethDerivationMode: O.Option<EthHDMode>
   }) => VerifiedLedgerAddressLD
   removeLedgerAddress: (chain: Chain) => void
   keystoreUnlocked: KeystoreUnlocked
@@ -194,7 +194,7 @@ export const WalletSettings: React.FC<Props> = (props): JSX.Element => {
 
   const [ledgerAddressToVerify, setLedgerAddressToVerify] = useState<AddressToVerify>(O.none)
 
-  const [ethDerivationMode, setEthDerivationMode] = useState<EthDerivationMode>('ledgerlive')
+  const [ethDerivationMode, setEthDerivationMode] = useState<EthHDMode>('ledgerlive')
 
   const renderLedgerNotSupported = useMemo(
     () => (
@@ -251,7 +251,7 @@ export const WalletSettings: React.FC<Props> = (props): JSX.Element => {
     (chain: Chain, oAddress: O.Option<WalletAddress>) => {
       const renderAddAddress = () => {
         const onChangeEthDerivationMode = (e: RadioChangeEvent) => {
-          setEthDerivationMode(e.target.value as EthDerivationMode)
+          setEthDerivationMode(e.target.value as EthHDMode)
         }
 
         const selectedWalletIndex = walletIndexMap[chain]

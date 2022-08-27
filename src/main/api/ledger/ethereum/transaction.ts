@@ -12,9 +12,9 @@ import { getInfuraCreds } from '../../../../shared/api/infura'
 import { LedgerError, LedgerErrorId, Network } from '../../../../shared/api/types'
 import { FEE_BOUNDS } from '../../../../shared/ethereum/const'
 import { getDerivationPath } from '../../../../shared/ethereum/ledger'
+import { EthHDMode } from '../../../../shared/ethereum/types'
 import { toClientNetwork } from '../../../../shared/utils/client'
 import { isError } from '../../../../shared/utils/guard'
-import { getDerivationMode } from './common'
 import { LedgerSigner } from './LedgerSigner'
 
 /**
@@ -28,7 +28,8 @@ export const send = async ({
   memo,
   recipient,
   feeOption,
-  walletIndex
+  walletIndex,
+  ethHDMode
 }: {
   asset: Asset
   transport: Transport
@@ -38,6 +39,7 @@ export const send = async ({
   memo?: string
   feeOption: FeeOption
   walletIndex: number
+  ethHDMode: EthHDMode
 }): Promise<E.Either<LedgerError, TxHash>> => {
   try {
     const { ethplorerApiKey, ethplorerUrl } = getEthplorerCreds()
@@ -56,8 +58,7 @@ export const send = async ({
     })
 
     const app = new EthApp(transport)
-    const mode = await getDerivationMode()
-    const path = getDerivationPath(walletIndex, mode)
+    const path = getDerivationPath(walletIndex, ethHDMode)
     const provider = client.getProvider()
     const signer = new LedgerSigner({ provider, path, app })
 
@@ -98,7 +99,8 @@ export const deposit = async ({
   memo,
   recipient,
   walletIndex,
-  feeOption
+  feeOption,
+  ethHDMode
 }: {
   asset: Asset
   router: Address
@@ -109,6 +111,7 @@ export const deposit = async ({
   memo?: string
   walletIndex: number
   feeOption: FeeOption
+  ethHDMode: EthHDMode
 }): Promise<E.Either<LedgerError, TxHash>> => {
   try {
     const address = ETH.getAssetAddress(asset)
@@ -138,8 +141,7 @@ export const deposit = async ({
     })
 
     const app = new EthApp(transport)
-    const mode = await getDerivationMode()
-    const path = getDerivationPath(walletIndex, mode)
+    const path = getDerivationPath(walletIndex, ethHDMode)
     const provider = client.getProvider()
     const signer = new LedgerSigner({ provider, path, app })
 

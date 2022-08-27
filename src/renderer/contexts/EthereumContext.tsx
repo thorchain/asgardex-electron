@@ -6,7 +6,7 @@ import * as Rx from 'rxjs'
 import * as RxOp from 'rxjs/operators'
 
 import { DEFAULT_ETH_DERIVATION_MODE } from '../../shared/ethereum/const'
-import { EthDerivationMode } from '../../shared/ethereum/types'
+import { EthHDMode } from '../../shared/ethereum/types'
 import {
   client$,
   clientState$,
@@ -46,8 +46,8 @@ export type EthereumContextValue = {
   isApprovedERC20Token$: typeof isApprovedERC20Token$
   approveFee$: typeof approveFee$
   reloadApproveFee: typeof reloadApproveFee
-  ethDerivationMode$: Rx.Observable<EthDerivationMode>
-  updateEthDerivationMode: (m: EthDerivationMode) => void
+  ethDerivationMode$: Rx.Observable<EthHDMode>
+  updateEthDerivationMode: (m: EthHDMode) => void
 }
 
 export const ethDerivationMode$ = FP.pipe(
@@ -61,7 +61,7 @@ export const ethDerivationMode$ = FP.pipe(
   RxOp.distinctUntilChanged()
 )
 
-export const updateEthDerivationMode = (mode: EthDerivationMode) => {
+export const updateEthDerivationMode = (mode: EthHDMode) => {
   modifyStorage(O.some({ ethDerivationMode: mode }))
 }
 

@@ -28,7 +28,8 @@ export const addressUI$: (client$: XChainClient$, chain: Chain) => WalletAddress
           address,
           chain,
           type: 'keystore',
-          walletIndex: 0 /* As long as we don't have HD wallets introduced, keystore will be always 0 */
+          walletIndex: 0 /* As long as we don't have HD wallets introduced, keystore will be always 0 */,
+          hdMode: 'default'
         }))
       )
     ),

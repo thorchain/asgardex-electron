@@ -1,6 +1,6 @@
 import { FeeBounds, Network } from '@xchainjs/xchain-client'
 
-import { EthDerivationMode } from './types'
+import { EthHDMode } from './types'
 
 export const DEFAULT_APPROVE_GAS_LIMIT_FALLBACK = '65000'
 
@@ -14,4 +14,4 @@ export const FEE_BOUNDS: Record<Network, FeeBounds | undefined> = {
   }
 }
 
-export const DEFAULT_ETH_DERIVATION_MODE: EthDerivationMode = 'ledgerlive'
+export const DEFAULT_ETH_DERIVATION_MODE: EthHDMode = 'ledgerlive'

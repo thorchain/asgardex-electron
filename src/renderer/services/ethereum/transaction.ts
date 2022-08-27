@@ -19,7 +19,7 @@ import {
 } from '../../../shared/api/io'
 import { LedgerError, Network } from '../../../shared/api/types'
 import { DEFAULT_APPROVE_GAS_LIMIT_FALLBACK } from '../../../shared/ethereum/const'
-import { isError, isLedgerWallet } from '../../../shared/utils/guard'
+import { isError, isEthHDMode, isLedgerWallet } from '../../../shared/utils/guard'
 import { addressInERC20Whitelist, getEthAssetAddress } from '../../helpers/assetHelper'
 import { sequenceSOption } from '../../helpers/fpHelpers'
 import { LiveData } from '../../helpers/rx/liveData'
@@ -112,7 +112,8 @@ export const createTransactionService = (client$: Client$, network$: Network$): 
       recipient: params.recipient,
       walletIndex: params.walletIndex,
       feeOption: params.feeOption,
-      nodeUrl: undefined
+      nodeUrl: undefined,
+      hdMode: params.hdMode
     }
     const encoded = ipcLedgerDepositTxParamsIO.encode(ipcParams)
 
@@ -203,13 +204,24 @@ export const createTransactionService = (client$: Client$, network$: Network$): 
     network,
     contractAddress,
     spenderAddress,
-    walletIndex
+    walletIndex,
+    hdMode
   }: ApproveParams): TxHashLD => {
+    if (!isEthHDMode(hdMode)) {
+      return Rx.of(
+        RD.failure({
+          errorId: ErrorId.APPROVE_LEDGER_TX,
+          msg: `Invalid EthHDMode ${hdMode} - needed for Ledger to send ERC20 token.`
+        })
+      )
+    }
+
     const ipcParams: IPCLedgerApproveERC20TokenParams = {
       network,
       contractAddress,
       spenderAddress,
-      walletIndex
+      walletIndex,
+      ethHdMode: hdMode
     }
     const encoded = ipcLedgerApproveERC20TokenParamsIO.encode(ipcParams)
 
@@ -319,7 +331,8 @@ export const createTransactionService = (client$: Client$, network$: Network$): 
       feeRate: NaN,
       feeOption: params.feeOption,
       feeAmount: undefined,
-      nodeUrl: undefined
+      nodeUrl: undefined,
+      hdMode: params.hdMode
     }
     const encoded = ipcLedgerSendTxParamsIO.encode(ipcParams)
 

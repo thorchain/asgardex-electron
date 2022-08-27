@@ -7,7 +7,6 @@ import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/Option'
 import { useObservableState } from 'observable-hooks'
 import { useIntl } from 'react-intl'
-import { useParams } from 'react-router-dom'
 import * as Rx from 'rxjs'
 import * as RxOp from 'rxjs/operators'
 
@@ -19,18 +18,12 @@ import { useAppContext } from '../../../contexts/AppContext'
 import { useChainContext } from '../../../contexts/ChainContext'
 import { useMidgardContext } from '../../../contexts/MidgardContext'
 import { useWalletContext } from '../../../contexts/WalletContext'
-import { getAssetFromNullableString, isNonNativeRuneAsset } from '../../../helpers/assetHelper'
+import { isNonNativeRuneAsset } from '../../../helpers/assetHelper'
 import { eqOAsset } from '../../../helpers/fp/eq'
 import { sequenceSOption, sequenceTRD } from '../../../helpers/fpHelpers'
-import {
-  addressFromOptionalWalletAddress,
-  getWalletAddressFromNullableString,
-  getWalletIndexFromNullableString,
-  getWalletTypeFromNullableString
-} from '../../../helpers/walletHelper'
+import { addressFromOptionalWalletAddress } from '../../../helpers/walletHelper'
 import { useOpenExplorerTxUrl } from '../../../hooks/useOpenExplorerTxUrl'
 import { useValidateAddress } from '../../../hooks/useValidateAddress'
-import { AssetDetailsParams } from '../../../routes/wallet'
 import { AssetWithDecimalLD, AssetWithDecimalRD } from '../../../services/chain/types'
 import { DEFAULT_NETWORK } from '../../../services/const'
 import { PoolAddressRD } from '../../../services/midgard/types'
@@ -44,18 +37,6 @@ import { UpgradeETH } from './UpgradeViewETH'
 type Props = {}
 
 export const UpgradeView: React.FC<Props> = (): JSX.Element => {
-  const {
-    asset: routeAsset,
-    walletAddress: routeWalletAddress,
-    walletIndex: routeWalletIndex,
-    walletType: routeWalletType
-  } = useParams<AssetDetailsParams>()
-
-  const oAsset = useMemo(() => getAssetFromNullableString(routeAsset), [routeAsset])
-  const oWalletAddress = useMemo(() => getWalletAddressFromNullableString(routeWalletAddress), [routeWalletAddress])
-  const oWalletIndex = useMemo(() => getWalletIndexFromNullableString(routeWalletIndex), [routeWalletIndex])
-  const oWalletType = useMemo(() => getWalletTypeFromNullableString(routeWalletType), [routeWalletType])
-
   const intl = useIntl()
 
   const { network$ } = useAppContext()
@@ -216,7 +197,7 @@ export const UpgradeView: React.FC<Props> = (): JSX.Element => {
           )
         ),
         RD.fold(
-          () => <></>,
+          () => <LoadingView size="large" />,
           () => <LoadingView size="large" />,
           renderDataError,
           ([runeAsset, { walletAddress, walletType, walletIndex }]) =>

@@ -49,11 +49,9 @@ export type FormValues = {
 }
 
 export type Props = {
-  walletType: WalletType
+  asset: SelectedWalletAsset
   balances: WalletBalances
   balance: WalletBalance
-  walletAddress: Address
-  walletIndex: number
   transfer$: SendTxStateHandler
   openExplorerTxUrl: OpenExplorerTxUrl
   getExplorerTxUrl: GetExplorerTxUrl
@@ -66,11 +64,9 @@ export type Props = {
 
 export const SendFormBNB: React.FC<Props> = (props): JSX.Element => {
   const {
-    walletType,
     balances,
     balance,
-    walletAddress,
-    walletIndex,
+    asset: { walletType, walletAddress, walletIndex, hdMode },
     transfer$,
     openExplorerTxUrl,
     getExplorerTxUrl,
@@ -197,6 +193,7 @@ export const SendFormBNB: React.FC<Props> = (props): JSX.Element => {
       transfer$({
         walletType,
         walletIndex,
+        hdMode,
         sender: walletAddress,
         recipient: form.getFieldValue('recipient'),
         asset,
@@ -204,7 +201,7 @@ export const SendFormBNB: React.FC<Props> = (props): JSX.Element => {
         memo: form.getFieldValue('memo')
       })
     )
-  }, [asset, subscribeSendTxState, transfer$, walletType, walletIndex, walletAddress, form, amountToSend])
+  }, [asset, subscribeSendTxState, transfer$, walletType, walletIndex, hdMode, walletAddress, form, amountToSend])
 
   const renderConfirmationModal = useMemo(() => {
     const onSuccessHandler = () => {

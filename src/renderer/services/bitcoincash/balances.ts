@@ -1,4 +1,4 @@
-import { WalletType } from '../../../shared/wallet/types'
+import { HDMode, WalletType } from '../../../shared/wallet/types'
 import { observableState } from '../../helpers/stateHelper'
 import * as C from '../clients'
 import { client$ } from './common'
@@ -19,8 +19,23 @@ const reloadBalances = () => {
 }
 
 // State of balances loaded by Client
-const balances$ = (walletType: WalletType, walletIndex: number): C.WalletBalancesLD =>
-  C.balances$({ client$, trigger$: reloadBalances$, walletType, walletIndex, walletBalanceType: 'all' })
+const balances$ = ({
+  walletType,
+  walletIndex,
+  hdMode
+}: {
+  walletType: WalletType
+  walletIndex: number
+  hdMode: HDMode
+}): C.WalletBalancesLD =>
+  C.balances$({
+    client$,
+    trigger$: reloadBalances$,
+    walletType,
+    walletIndex,
+    hdMode,
+    walletBalanceType: 'all'
+  })
 
 // State of balances loaded by Client and Address
 const getBalanceByAddress$ = C.balancesByAddress$({ client$, trigger$: reloadBalances$, walletBalanceType: 'all' })

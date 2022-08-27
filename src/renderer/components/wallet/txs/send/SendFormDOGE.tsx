@@ -30,7 +30,7 @@ import { FeesWithRatesRD } from '../../../../services/bitcoin/types'
 import { INITIAL_SEND_STATE } from '../../../../services/chain/const'
 import { FeeRD, Memo, SendTxState, SendTxStateHandler } from '../../../../services/chain/types'
 import { AddressValidation, GetExplorerTxUrl, OpenExplorerTxUrl, WalletBalances } from '../../../../services/clients'
-import { ValidatePasswordHandler } from '../../../../services/wallet/types'
+import { SelectedWalletAsset, ValidatePasswordHandler } from '../../../../services/wallet/types'
 import { WalletBalance } from '../../../../services/wallet/types'
 import { LedgerConfirmationModal, WalletPasswordConfirmationModal } from '../../../modal/confirmation'
 import * as StyledR from '../../../shared/form/Radio.styles'
@@ -53,9 +53,7 @@ export type FormValues = {
 }
 
 export type Props = {
-  walletType: WalletType
-  walletIndex: number
-  walletAddress: Address
+  asset: SelectedWalletAsset
   balances: WalletBalances
   balance: WalletBalance
   transfer$: SendTxStateHandler
@@ -70,9 +68,7 @@ export type Props = {
 
 export const SendFormDOGE: React.FC<Props> = (props): JSX.Element => {
   const {
-    walletType,
-    walletIndex,
-    walletAddress,
+    asset: { walletType, walletIndex, hdMode, walletAddress },
     balances,
     balance,
     transfer$,
@@ -254,6 +250,7 @@ export const SendFormDOGE: React.FC<Props> = (props): JSX.Element => {
       transfer$({
         walletType,
         walletIndex,
+        hdMode,
         sender: walletAddress,
         recipient: form.getFieldValue('recipient'),
         asset,
@@ -267,6 +264,7 @@ export const SendFormDOGE: React.FC<Props> = (props): JSX.Element => {
     transfer$,
     walletType,
     walletIndex,
+    hdMode,
     walletAddress,
     form,
     asset,

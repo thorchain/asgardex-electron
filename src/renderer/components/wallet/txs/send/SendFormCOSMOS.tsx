@@ -47,8 +47,7 @@ export type FormValues = {
 }
 
 export type Props = {
-  walletType: WalletType
-  walletIndex: number
+  asset: SelectedWalletAsset
   balances: WalletBalances
   balance: WalletBalance
   transfer$: SendTxStateHandler
@@ -63,8 +62,7 @@ export type Props = {
 
 export const SendFormCOSMOS: React.FC<Props> = (props): JSX.Element => {
   const {
-    walletType,
-    walletIndex,
+    asset: { walletType, walletIndex, hdMode },
     balances,
     balance,
     transfer$,
@@ -184,13 +182,14 @@ export const SendFormCOSMOS: React.FC<Props> = (props): JSX.Element => {
       transfer$({
         walletType,
         walletIndex,
+        hdMode,
         recipient: form.getFieldValue('recipient'),
         asset,
         amount: amountToSend,
         memo: form.getFieldValue('memo')
       })
     )
-  }, [subscribeSendTxState, transfer$, walletType, walletIndex, form, asset, amountToSend])
+  }, [subscribeSendTxState, transfer$, walletType, walletIndex, hdMode, form, asset, amountToSend])
 
   const [showConfirmationModal, setShowConfirmationModal] = useState(false)
 

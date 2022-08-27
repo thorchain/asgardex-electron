@@ -107,6 +107,7 @@ const Template = ({ txRDStatus, feeRDStatus, balance, hasLedger, walletType, val
       addressValidation={(_: string) => validAddress}
       walletType={walletType}
       walletIndex={0}
+      hdMode="default"
       targetPoolAddressRD={RD.success({ chain: BNBChain, address: 'bnb-pool-address', router: O.none, halted: false })}
       validatePassword$={mockValidatePassword$}
       fee={feeRD}

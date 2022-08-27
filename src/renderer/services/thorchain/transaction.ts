@@ -50,7 +50,8 @@ export const createTransactionService = (
       router: undefined,
       walletIndex: params.walletIndex,
       feeOption: undefined,
-      nodeUrl: clientUrl[network].node
+      nodeUrl: clientUrl[network].node,
+      hdMode: 'default'
     }
     const encoded = ipcLedgerDepositTxParamsIO.encode(depositLedgerTxParams)
 
@@ -145,7 +146,8 @@ export const createTransactionService = (
       feeRate: NaN,
       feeOption: undefined,
       feeAmount: undefined,
-      nodeUrl: clientUrl[network].node
+      nodeUrl: clientUrl[network].node,
+      hdMode: 'default'
     }
     const encoded = ipcLedgerSendTxParamsIO.encode(sendLedgerTxParams)
 

@@ -1,9 +1,6 @@
-import React, { useCallback, useMemo } from 'react'
+import React, { useCallback } from 'react'
 
-import { Address } from '@xchainjs/xchain-client'
 import {
-  Asset,
-  assetToString,
   BCHChain,
   BNBChain,
   BTCChain,
@@ -15,15 +12,14 @@ import {
 } from '@xchainjs/xchain-util'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/Option'
+import { useObservableState } from 'observable-hooks'
 import { useIntl } from 'react-intl'
-import { useParams } from 'react-router-dom'
 
-import { WalletType } from '../../../../shared/wallet/types'
-import { ErrorView } from '../../../components/shared/error/'
+import { LoadingView } from '../../../components/shared/loading'
 import { BackLink } from '../../../components/uielements/backLink'
-import { getAssetWalletParams } from '../../../helpers/routeHelper'
-import { SendParams } from '../../../routes/wallet'
+import { useWalletContext } from '../../../contexts/WalletContext'
 import * as walletRoutes from '../../../routes/wallet'
+import { SelectedWalletAsset } from '../../../services/wallet/types'
 import {
   SendViewBNB,
   SendViewBCH,
@@ -38,78 +34,41 @@ import {
 type Props = {}
 
 export const SendView: React.FC<Props> = (): JSX.Element => {
-  const routeParams = useParams<SendParams>()
-  const oRouteParams = getAssetWalletParams(routeParams)
-
   const intl = useIntl()
 
-  const renderRouteError = useMemo(() => {
-    const { asset, walletAddress, walletType, walletIndex } = routeParams
-    return (
-      <>
-        <BackLink />
-        <ErrorView
-          title={intl.formatMessage(
-            { id: 'routes.invalid.params' },
-            {
-              params: `asset: ${asset} , walletAddress: ${walletAddress}, walletType: ${walletType}, walletIndex: ${walletIndex}`
-            }
-          )}
-        />
-      </>
-    )
-  }, [intl, routeParams])
+  const { selectedAsset$ } = useWalletContext()
+
+  const oSelectedAsset = useObservableState(selectedAsset$, O.none)
 
   const renderSendView = useCallback(
-    ({
-      asset,
-      walletAddress,
-      walletType,
-      walletIndex
-    }: {
-      asset: Asset
-      walletAddress: Address
-      walletType: WalletType
-      walletIndex: number
-    }) => {
-      switch (asset.chain) {
+    (asset: SelectedWalletAsset) => {
+      const {
+        asset: { chain }
+      } = asset
+      switch (chain) {
         case BNBChain:
-          return (
-            <SendViewBNB
-              walletType={walletType}
-              walletAddress={walletAddress}
-              walletIndex={walletIndex}
-              asset={asset}
-            />
-          )
+          return <SendViewBNB asset={asset} />
         case BCHChain:
-          return <SendViewBCH walletType={walletType} walletIndex={walletIndex} walletAddress={walletAddress} />
+          return <SendViewBCH asset={asset} />
         case BTCChain:
-          return <SendViewBTC walletType={walletType} walletIndex={walletIndex} walletAddress={walletAddress} />
+          return <SendViewBTC asset={asset} />
         case ETHChain:
-          return (
-            <SendViewETH
-              walletType={walletType}
-              walletIndex={walletIndex}
-              walletAddress={walletAddress}
-              asset={asset}
-            />
-          )
+          return <SendViewETH asset={asset} />
         case THORChain:
-          return <SendViewTHOR walletType={walletType} walletIndex={walletIndex} walletAddress={walletAddress} />
+          return <SendViewTHOR asset={asset} />
         case LTCChain:
-          return <SendViewLTC walletType={walletType} walletIndex={walletIndex} walletAddress={walletAddress} />
+          return <SendViewLTC asset={asset} />
         case DOGEChain:
-          return <SendViewDOGE walletType={walletType} walletIndex={walletIndex} walletAddress={walletAddress} />
+          return <SendViewDOGE asset={asset} />
         case CosmosChain:
-          return <SendViewCOSMOS walletType={walletType} walletIndex={walletIndex} walletAddress={walletAddress} />
+          return <SendViewCOSMOS asset={asset} />
         default:
           return (
             <h1>
               {intl.formatMessage(
                 { id: 'wallet.errors.invalidChain' },
                 {
-                  chain: asset.chain
+                  chain
                 }
               )}
             </h1>
@@ -120,20 +79,13 @@ export const SendView: React.FC<Props> = (): JSX.Element => {
   )
 
   return FP.pipe(
-    oRouteParams,
+    oSelectedAsset,
     O.fold(
-      () => renderRouteError,
-      ({ asset, walletAddress, walletType, walletIndex }) => (
+      () => <LoadingView size="large" />,
+      (selectedAsset) => (
         <>
-          <BackLink
-            path={walletRoutes.assetDetail.path({
-              asset: assetToString(asset),
-              walletAddress,
-              walletType,
-              walletIndex: walletIndex.toString()
-            })}
-          />
-          {renderSendView({ asset, walletAddress, walletType, walletIndex })}
+          <BackLink path={walletRoutes.assetDetail.path()} />
+          {renderSendView(selectedAsset)}
         </>
       )
     )

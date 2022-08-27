@@ -143,14 +143,14 @@ export const createLedgerService = ({
       )
     )
 
-  const verifyLedgerAddress$: VerifyLedgerAddressHandler = ({ chain, network, walletIndex, ethDerivationMode }) =>
+  const verifyLedgerAddress$: VerifyLedgerAddressHandler = ({ chain, network, walletIndex, hdMode }) =>
     FP.pipe(
       Rx.from(
         window.apiHDWallet.verifyLedgerAddress({
           chain,
           network,
           walletIndex,
-          ethDerivationMode: O.toUndefined(ethDerivationMode)
+          hdMode
         })
       ),
       RxOp.catchError((error: Error) => Rx.of(RD.failure(error))),
@@ -176,14 +176,14 @@ export const createLedgerService = ({
   /**
    * Add Ledger by asking address from it
    */
-  const addLedgerAddress$: AddLedgerAddressHandler = ({ id, chain, network, ethDerivationMode, walletIndex }) =>
+  const addLedgerAddress$: AddLedgerAddressHandler = ({ id, chain, network, hdMode, walletIndex }) =>
     FP.pipe(
       Rx.from(
         window.apiHDWallet.getLedgerAddress({
           chain,
           network,
           walletIndex,
-          ethDerivationMode: O.toUndefined(ethDerivationMode)
+          hdMode
         })
       ),
       RxOp.map(RD.fromEither),
@@ -200,9 +200,10 @@ export const createLedgerService = ({
           keystoreId: id,
           chain,
           network,
-          ethDerivationMode,
+          hdMode,
           walletIndex,
-          address
+          address,
+          type: 'ledger'
         }
         // store address in memory
         _addLedgerAddress(ledgerAddress)

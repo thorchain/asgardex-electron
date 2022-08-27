@@ -8,7 +8,7 @@ import * as Rx from 'rxjs'
 
 import { getMockRDValueFactory, RDStatus } from '../../../../../shared/mock/rdByStatus'
 import { mockValidatePassword$ } from '../../../../../shared/mock/wallet'
-import { WalletType } from '../../../../../shared/wallet/types'
+import { HDMode, WalletType } from '../../../../../shared/wallet/types'
 import { THORCHAIN_DECIMAL } from '../../../../helpers/assetHelper'
 import { mockWalletBalance } from '../../../../helpers/test/testWalletHelper'
 import { FeesRD, SendTxStateHandler } from '../../../../services/chain/types'
@@ -20,9 +20,10 @@ type Args = {
   feeRDStatus: RDStatus
   balance: string
   walletType: WalletType
+  hdMode: HDMode
 }
 
-const Template = ({ txRDStatus, feeRDStatus, balance, walletType }: Args) => {
+const Template = ({ txRDStatus, feeRDStatus, balance, walletType, hdMode }: Args) => {
   const transfer$: SendTxStateHandler = (_) =>
     Rx.of({
       steps: { current: txRDStatus === 'initial' ? 0 : 1, total: 1 },
@@ -65,6 +66,7 @@ const Template = ({ txRDStatus, feeRDStatus, balance, walletType }: Args) => {
     <Component
       walletType={walletType}
       walletIndex={0}
+      hdMode={hdMode}
       walletAddress={'eth-address'}
       transfer$={transfer$}
       balances={[ethBalance, runeBalance]}
@@ -95,6 +97,9 @@ const meta: ComponentMeta<typeof Template> = {
     },
     walletType: {
       control: { type: 'select', options: ['keystore', 'ledger'] }
+    },
+    hdMode: {
+      control: { type: 'select', options: ['default', 'ledgerlive', 'metamask', 'legacy'] }
     },
     balance: {
       control: { type: 'text' }

@@ -6,7 +6,7 @@ import * as O from 'fp-ts/lib/Option'
 import * as Rx from 'rxjs'
 
 import { Network } from '../../../shared/api/types'
-import { WalletType, WalletAddress } from '../../../shared/wallet/types'
+import { WalletType, WalletAddress, HDMode } from '../../../shared/wallet/types'
 import { LiveData } from '../../helpers/rx/liveData'
 import { AssetWithDecimal } from '../../types/asgardex'
 import { AssetWithAmount } from '../../types/asgardex'
@@ -85,15 +85,6 @@ export type SymDepositParams = {
   readonly assetSender: Address
 }
 
-export type SendDepositTxParams = {
-  walletType: WalletType
-  chain: Chain
-  asset: Asset
-  poolAddress: string
-  amount: BaseAmount
-  memo: Memo
-}
-
 export type SendTxParams = {
   walletType: WalletType
   asset: Asset
@@ -106,6 +97,7 @@ export type SendTxParams = {
   feeAsset?: Asset
   gasLimit?: BigNumber
   feeAmount?: BaseAmount
+  hdMode: HDMode
 }
 
 export type SendPoolTxParams = SendTxParams & {
@@ -261,6 +253,7 @@ export type SymWithdrawParams = {
   readonly network: Network
   readonly walletType: WalletType
   readonly walletIndex: number
+  readonly hdMode: HDMode
 }
 
 export type SymWithdrawStateHandler = (p: SymWithdrawParams) => WithdrawState$
@@ -272,6 +265,7 @@ export type AsymWithdrawParams = {
   readonly network: Network
   readonly walletType: WalletType
   readonly walletIndex: number
+  readonly hdMode: HDMode
 }
 
 export type AsymWithdrawStateHandler = (p: AsymWithdrawParams) => WithdrawState$

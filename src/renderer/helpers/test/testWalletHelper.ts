@@ -24,6 +24,7 @@ export const mockWalletBalance = (overrides?: Partial<WalletBalance>): WalletBal
   asset: AssetRuneNative,
   walletAddress: 'wallet-address',
   walletIndex: 0,
+  hdMode: 'default',
   ...overrides
 })
 
@@ -46,5 +47,6 @@ export const mockWalletAddress = (overrides?: Partial<WalletAddress>): WalletAdd
   type: 'keystore',
   chain: THORChain,
   walletIndex: 0,
+  hdMode: 'default',
   ...overrides
 })

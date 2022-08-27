@@ -3,7 +3,7 @@ import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/Option'
 
 import { Network } from '../../../../shared/api/types'
-import { WalletType } from '../../../../shared/wallet/types'
+import { HDMode, WalletType } from '../../../../shared/wallet/types'
 import { UpgradeRuneParams, UpgradeRuneTxState$ } from '../../../services/chain/types'
 import { AddressValidation, GetExplorerTxUrl, OpenExplorerTxUrl } from '../../../services/clients'
 import { PoolAddressRD } from '../../../services/midgard/types'
@@ -15,6 +15,7 @@ export type CommonUpgradeProps = {
   walletAddress: Address
   walletType: WalletType
   walletIndex: number
+  hdMode: HDMode
   runeNativeAddress: Address
   runeNativeLedgerAddress: O.Option<Address>
   targetPoolAddressRD: PoolAddressRD

@@ -24,7 +24,7 @@ export const getAddress = async (
       // @see https://github.com/LedgerHQ/ledgerjs/blob/master/packages/hw-app-btc/README.md#parameters-2
       format: 'legacy'
     })
-    return E.right({ address, chain: DOGEChain, type: 'ledger', walletIndex })
+    return E.right({ address, chain: DOGEChain, type: 'ledger', walletIndex, hdMode: 'default' })
   } catch (error) {
     return E.left({
       errorId: LedgerErrorId.GET_ADDRESS_FAILED,
