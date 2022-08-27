@@ -1,4 +1,3 @@
-import * as RD from '@devexperts/remote-data-ts'
 import { Balance } from '@xchainjs/xchain-client'
 import {
   assetAmount,
@@ -14,14 +13,12 @@ import {
 } from '@xchainjs/xchain-util'
 import * as O from 'fp-ts/lib/Option'
 
-import { LedgerErrorId } from '../../../shared/api/types'
 import { BNB_ADDRESS_TESTNET, RUNE_ADDRESS_TESTNET } from '../../../shared/mock/address'
 import { ASSETS_TESTNET } from '../../../shared/mock/assets'
 import { WalletAddress } from '../../../shared/wallet/types'
 import { SymDepositAddresses } from '../../services/chain/types'
 import { PoolAddress, PoolShare } from '../../services/midgard/types'
-import { INITIAL_LEDGER_ADDRESS_MAP } from '../../services/wallet/const'
-import { ApiError, ErrorId, LedgerAddressMap } from '../../services/wallet/types'
+import { ApiError, ErrorId } from '../../services/wallet/types'
 import { AssetWithAmount } from '../../types/asgardex'
 import { PricePool } from '../../views/pools/Pools.types'
 import { mockWalletAddress } from '../test/testWalletHelper'
@@ -44,11 +41,12 @@ import {
   eqAssetAmount,
   eqPricePool,
   eqOString,
-  eqLedgerAddressMap,
   eqWalletAddress,
   eqOWalletAddress,
   eqSymDepositAddresses,
-  eqWalletType
+  eqWalletType,
+  eqKeystoreId,
+  eqNetwork
 } from './eq'
 
 describe('helpers/fp/eq', () => {
@@ -137,6 +135,17 @@ describe('helpers/fp/eq', () => {
     })
     it('none/none are equal', () => {
       expect(eqOChain.equals(O.none, O.none)).toBeTruthy()
+    })
+  })
+
+  describe('eqNetwork', () => {
+    it('equal', () => {
+      expect(eqNetwork.equals('testnet', 'testnet')).toBeTruthy()
+      expect(eqNetwork.equals('mainnet', 'mainnet')).toBeTruthy()
+      expect(eqNetwork.equals('stagenet', 'stagenet')).toBeTruthy()
+    })
+    it('not equal', () => {
+      expect(eqNetwork.equals('stagenet', 'mainnet')).toBeFalsy()
     })
   })
 
@@ -435,27 +444,12 @@ describe('helpers/fp/eq', () => {
     })
   })
 
-  describe('eqLedgerAddressMap', () => {
-    const a: LedgerAddressMap = INITIAL_LEDGER_ADDRESS_MAP
-    const b: LedgerAddressMap = {
-      ...INITIAL_LEDGER_ADDRESS_MAP,
-      mainnet: RD.pending
-    }
-    const c: LedgerAddressMap = {
-      ...INITIAL_LEDGER_ADDRESS_MAP,
-      testnet: RD.failure({ errorId: LedgerErrorId.DENIED, msg: '' })
-    }
-
-    it('is equal', () => {
-      expect(eqLedgerAddressMap.equals(a, a)).toBeTruthy()
-      expect(eqLedgerAddressMap.equals(b, b)).toBeTruthy()
-      expect(eqLedgerAddressMap.equals(c, c)).toBeTruthy()
+  describe('eqKeystoreId', () => {
+    it('equal', () => {
+      expect(eqKeystoreId.equals(1, 1)).toBeTruthy()
     })
-    it('is not equal', () => {
-      expect(eqLedgerAddressMap.equals(a, b)).toBeFalsy()
-      expect(eqLedgerAddressMap.equals(b, a)).toBeFalsy()
-      expect(eqLedgerAddressMap.equals(a, c)).toBeFalsy()
-      expect(eqLedgerAddressMap.equals(c, b)).toBeFalsy()
+    it('not equal', () => {
+      expect(eqKeystoreId.equals(1, 2)).toBeFalsy()
     })
   })
 

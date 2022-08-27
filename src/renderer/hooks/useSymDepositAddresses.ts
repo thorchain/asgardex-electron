@@ -1,6 +1,5 @@
 import { useCallback, useMemo } from 'react'
 
-import * as RD from '@devexperts/remote-data-ts'
 import { Asset, THORChain } from '@xchainjs/xchain-util'
 import * as FP from 'fp-ts/function'
 import * as O from 'fp-ts/lib/Option'
@@ -14,8 +13,7 @@ import { useChainContext } from '../contexts/ChainContext'
 import { useWalletContext } from '../contexts/WalletContext'
 import { INITIAL_SYM_DEPOSIT_ADDRESSES } from '../services/chain/const'
 import { SymDepositAddresses } from '../services/chain/types'
-import { LedgerAddressRD } from '../services/wallet/types'
-import { useNetwork } from './useNetwork'
+import { ledgerAddressToWalletAddress } from '../services/wallet/util'
 
 /**
  * Hook to handle wallet addresses needed for sym. deposit
@@ -23,8 +21,6 @@ import { useNetwork } from './useNetwork'
  * As always: Use it at `view` level only (not in components)
  */
 export const useSymDepositAddresses = (oAsset: O.Option<Asset>) => {
-  const { network } = useNetwork()
-
   const { addressByChain$, symDepositAddresses$, setSymDepositAddresses } = useChainContext()
 
   const symDepositAddresses = useObservableState(symDepositAddresses$, INITIAL_SYM_DEPOSIT_ADDRESSES)
@@ -65,22 +61,21 @@ export const useSymDepositAddresses = (oAsset: O.Option<Asset>) => {
       INITIAL_SYM_DEPOSIT_ADDRESSES
     )
 
-  const assetLedgerAddressRD = useObservableState<LedgerAddressRD>(
+  const assetLedgerAddress = useObservableState(
     FP.pipe(
       oAsset,
       O.fold(
-        () => Rx.of(RD.initial),
-        ({ chain }) => getLedgerAddress$(chain, network)
+        () => Rx.of(O.none),
+        ({ chain }) => FP.pipe(getLedgerAddress$(chain), RxOp.map(O.map(ledgerAddressToWalletAddress)))
       )
     ),
-    RD.initial
+    O.none
   )
 
-  const assetLedgerAddress = RD.toOption(assetLedgerAddressRD)
-
-  const runeLedgerAddressRD = useObservableState<LedgerAddressRD>(getLedgerAddress$(THORChain, network), RD.initial)
-
-  const runeLedgerAddress = RD.toOption(runeLedgerAddressRD)
+  const [runeLedgerAddress] = useObservableState(
+    () => FP.pipe(getLedgerAddress$(THORChain), RxOp.map(O.map(ledgerAddressToWalletAddress))),
+    O.none
+  )
 
   const setAssetWalletType = useCallback(
     (walletType: WalletType) => {

@@ -189,6 +189,7 @@ type WalletMessageKey =
   | 'wallet.imports.error.instance'
   | 'wallet.imports.error.keystore.load'
   | 'wallet.imports.error.keystore.import'
+  | 'wallet.imports.error.ledger.import'
   | 'wallet.imports.error.keystore.password'
   | 'wallet.phrase.error.valueRequired'
   | 'wallet.phrase.error.invalid'

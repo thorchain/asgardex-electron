@@ -8,9 +8,9 @@ import * as Ord from 'fp-ts/Ord'
 import * as S from 'fp-ts/string'
 import { IntlShape } from 'react-intl'
 
-import { KeystoreWallets, KeystoreWallet } from '../../../shared/api/io'
+import { KeystoreWallets, KeystoreWallet, IPCLedgerAddressesIO } from '../../../shared/api/io'
 import { KeystoreId, LedgerErrorId } from '../../../shared/api/types'
-import { WalletType } from '../../../shared/wallet/types'
+import { WalletAddress, WalletType } from '../../../shared/wallet/types'
 import { eqAsset } from '../../helpers/fp/eq'
 import { ordBaseAmount } from '../../helpers/fp/ord'
 import { sequenceSOption } from '../../helpers/fpHelpers'
@@ -22,7 +22,9 @@ import {
   WalletBalance,
   isKeystoreLocked,
   isKeystoreUnlocked,
-  KeystoreLocked
+  KeystoreLocked,
+  LedgerAddress,
+  LedgerAddresses
 } from './types'
 
 export const getPhrase = (state: KeystoreState): O.Option<Phrase> =>
@@ -201,3 +203,36 @@ export const ledgerErrorIdToI18n = (errorId: LedgerErrorId, intl: IntlShape) => 
       return intl.formatMessage({ id: 'ledger.error.unknown' })
   }
 }
+
+export const ledgerAddressToWalletAddress = ({ walletIndex, address, chain }: LedgerAddress): WalletAddress => ({
+  type: 'ledger',
+  walletIndex,
+  address,
+  chain
+})
+
+export const toIPCLedgerAddressesIO = (addresses: LedgerAddresses): IPCLedgerAddressesIO =>
+  FP.pipe(
+    addresses,
+    A.map(({ keystoreId, address, chain, network, walletIndex, ethDerivationMode }) => ({
+      keystoreId,
+      address,
+      chain,
+      network,
+      walletIndex,
+      ethDerivationMode: O.toUndefined(ethDerivationMode)
+    }))
+  )
+
+export const fromIPCLedgerAddressesIO = (addresses: IPCLedgerAddressesIO): LedgerAddresses =>
+  FP.pipe(
+    addresses,
+    A.map(({ keystoreId, address, chain, network, walletIndex, ethDerivationMode }) => ({
+      keystoreId,
+      address,
+      chain,
+      network,
+      walletIndex,
+      ethDerivationMode: O.fromNullable(ethDerivationMode)
+    }))
+  )

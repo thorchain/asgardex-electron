@@ -9,7 +9,7 @@ import * as O from 'fp-ts/Option'
 import { EthDerivationMode } from '../ethereum/types'
 import { Locale } from '../i18n/types'
 import { WalletAddress } from '../wallet/types'
-import { KeystoreWallets, PoolsStorageEncoded } from './io'
+import { IPCLedgerAddressesIO, KeystoreWallets, PoolsStorageEncoded } from './io'
 
 // A version number starting from `1` to avoid to load deprecated files
 export type StorageVersion = { version: string }
@@ -89,6 +89,7 @@ export enum LedgerErrorId {
   TIMEOUT = 'TIMEOUT',
   INVALID_RESPONSE = 'INVALID_RESPONSE',
   NOT_IMPLEMENTED = 'NOT_IMPLEMENTED',
+  INVALID_ETH_DERIVATION_MODE = 'INVALID_ETH_DERIVATION_MODE',
   GET_ADDRESS_FAILED = 'GET_ADDRESS_FAILED',
   UNKNOWN = 'UNKNOWN'
 }
@@ -119,7 +120,12 @@ export type LedgerLTCTxInfo = Pick<TxParams, 'amount' | 'recipient'> & {
 
 export type LedgerTxParams = LedgerTHORTxParams | LedgerBNBTxParams
 
-export type IPCLedgerAdddressParams = { chain: Chain; network: Network; walletIndex: number }
+export type IPCLedgerAdddressParams = {
+  chain: Chain
+  network: Network
+  walletIndex: number
+  ethDerivationMode: EthDerivationMode | undefined
+}
 
 export type ApiHDWallet = {
   getLedgerAddress: (params: IPCLedgerAdddressParams) => Promise<E.Either<LedgerError, WalletAddress>>
@@ -133,6 +139,8 @@ export type ApiHDWallet = {
   approveLedgerERC20Token: (
     params: unknown /* will be de-/serialized by ipcLedgerApprovedERC20TokenParamsIO */
   ) => Promise<E.Either<LedgerError, TxHash>>
+  saveLedgerAddresses: (params: IPCLedgerAddressesIO) => Promise<E.Either<Error, IPCLedgerAddressesIO>>
+  getLedgerAddresses: () => Promise<E.Either<Error, IPCLedgerAddressesIO>>
 }
 
 declare global {

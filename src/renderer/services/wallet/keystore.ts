@@ -147,7 +147,7 @@ const changeKeystoreWallet: ChangeKeystoreWalletHandler = (keystoreId: KeystoreI
       FP.pipe(
         eWallets,
         E.fold(
-          (error) => RD.failure(Error(`Could not save wallets on disc ${error?.message ?? error.toString()}`)),
+          (error) => RD.failure(Error(`Could not save wallets on disk ${error?.message ?? error.toString()}`)),
           (_) => {
             // Update states
             setKeystoreWallets(updatedWallets)
@@ -377,8 +377,3 @@ export const keystoreService: KeystoreService = {
   importingKeystoreState$,
   resetImportingKeystoreState: () => setImportingKeystoreState(RD.initial)
 }
-
-// TODO(@Veado) Remove it - for debugging only
-keystoreState$.subscribe((v) => console.log('keystoreState sub', v))
-keystoreWallets$.subscribe((v) => console.log('keystoreWallets sub', v))
-keystoreWalletsUI$.subscribe((v) => console.log('keystoreWalletsUI$ sub', v))

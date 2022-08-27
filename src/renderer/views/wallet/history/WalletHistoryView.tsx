@@ -4,7 +4,7 @@ import * as RD from '@devexperts/remote-data-ts'
 import { THORChain } from '@xchainjs/xchain-util'
 import { Row } from 'antd'
 import * as A from 'fp-ts/Array'
-import * as FP from 'fp-ts/function'
+import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/Option'
 import { useObservableState } from 'observable-hooks'
 import * as Rx from 'rxjs'
@@ -26,6 +26,7 @@ import { useNetwork } from '../../../hooks/useNetwork'
 import { useOpenAddressUrl } from '../../../hooks/useOpenAddressUrl'
 import { useOpenExplorerTxUrl } from '../../../hooks/useOpenExplorerTxUrl'
 import { ENABLED_CHAINS } from '../../../services/const'
+import { ledgerAddressToWalletAddress } from '../../../services/wallet/util'
 
 const HISTORY_FILTERS: Filter[] = ['ALL', 'SWITCH', 'DEPOSIT', 'SWAP', 'WITHDRAW', 'DONATE', 'REFUND']
 
@@ -61,16 +62,17 @@ export const WalletHistoryView: React.FC = () => {
 
   const { getLedgerAddress$ } = useWalletContext()
 
-  const ledgerAddresses$ = useMemo(
+  const ledgerAddresses$ = useMemo<Rx.Observable<WalletAddresses>>(
     () =>
       FP.pipe(
         ENABLED_CHAINS,
-        A.map((chain) => getLedgerAddress$(chain, network)),
+        A.map((chain) => getLedgerAddress$(chain)),
         (addresses) => Rx.combineLatest(addresses),
         // Accept `successfully` added addresses only
-        RxOp.map(A.filterMap(RD.toOption))
+        RxOp.map(A.filterMap(FP.identity)),
+        RxOp.map(A.map(ledgerAddressToWalletAddress))
       ),
-    [getLedgerAddress$, network]
+    [getLedgerAddress$]
   )
 
   const addresses$ = useMemo(

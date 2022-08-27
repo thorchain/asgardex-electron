@@ -10,12 +10,13 @@ import * as N from 'fp-ts/lib/number'
 import * as O from 'fp-ts/lib/Option'
 import * as S from 'fp-ts/lib/string'
 
-import { LedgerError } from '../../../shared/api/types'
+import { KeystoreId, LedgerError, Network } from '../../../shared/api/types'
+import { EthDerivationMode } from '../../../shared/ethereum/types'
 import { WalletAddress, WalletType } from '../../../shared/wallet/types'
 import { DepositAssetFees, DepositFees, SwapFeesParams, SymDepositAddresses } from '../../services/chain/types'
 import { ApproveParams } from '../../services/ethereum/types'
 import { PoolAddress, PoolShare } from '../../services/midgard/types'
-import { ApiError, LedgerAddressMap, WalletBalance } from '../../services/wallet/types'
+import { ApiError, LedgerAddress, WalletBalance } from '../../services/wallet/types'
 import { AssetWithAmount } from '../../types/asgardex'
 import { PricePool } from '../../views/pools/Pools.types'
 
@@ -49,6 +50,8 @@ export const eqChain: Eq.Eq<Chain> = {
 }
 
 export const eqOChain = O.getEq(eqChain)
+
+export const eqNetwork: Eq.Eq<Network> = eqString
 
 export const eqBaseAmount: Eq.Eq<BaseAmount> = {
   equals: (x, y) => eqBigNumber.equals(x.amount(), y.amount()) && x.decimal === y.decimal
@@ -187,6 +190,10 @@ const eqLedgerError = Eq.struct<LedgerError>({
   msg: eqString
 })
 
+export const eqKeystoreId: Eq.Eq<KeystoreId> = eqNumber
+export const eqEthDerivationMode: Eq.Eq<EthDerivationMode> = eqString
+export const eqOEthDerivationMode = O.getEq(eqEthDerivationMode)
+
 export const eqWalletAddress = Eq.struct<WalletAddress>({
   address: eqString,
   type: eqString,
@@ -198,11 +205,16 @@ export const eqOWalletAddress = O.getEq(eqWalletAddress)
 
 export const eqLedgerAddressRD = RD.getEq<LedgerError, WalletAddress>(eqLedgerError, eqWalletAddress)
 
-export const eqLedgerAddressMap = Eq.struct<LedgerAddressMap>({
-  testnet: eqLedgerAddressRD,
-  stagenet: eqLedgerAddressRD,
-  mainnet: eqLedgerAddressRD
+export const eqLedgerAddress = Eq.struct<LedgerAddress>({
+  keystoreId: eqKeystoreId,
+  chain: eqChain,
+  network: eqNetwork,
+  address: eqString,
+  walletIndex: eqNumber,
+  ethDerivationMode: eqOEthDerivationMode
 })
+
+export const eqOLedgerAddress = O.getEq(eqLedgerAddress)
 
 export const eqSymDepositAddresses = Eq.struct<SymDepositAddresses>({
   rune: eqOWalletAddress,

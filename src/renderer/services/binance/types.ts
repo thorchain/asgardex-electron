@@ -9,7 +9,7 @@ import { LedgerBNBTxParams, Network } from '../../../shared/api/types'
 import { WalletType } from '../../../shared/wallet/types'
 import { LiveData } from '../../helpers/rx/liveData'
 import * as C from '../clients'
-import { ApiError, LedgerAddressLD, LedgerTxHashLD } from '../wallet/types'
+import { ApiError, LedgerTxHashLD } from '../wallet/types'
 
 export type Client$ = C.Client$<Client>
 
@@ -60,9 +60,6 @@ export type SendTxParams = {
 export type TransactionService = C.TransactionService<SendTxParams>
 
 export type LedgerService = {
-  ledgerAddress$: LedgerAddressLD
-  retrieveLedgerAddress: (network: Network, walletIndex: number) => void
-  removeLedgerAddress: () => void
   ledgerTxRD$: LedgerTxHashLD
   pushLedgerTx: (network: Network, params: LedgerBNBTxParams) => Rx.Subscription
   resetLedgerTx: () => void

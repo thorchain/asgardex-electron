@@ -295,12 +295,10 @@ export const createBalancesService = ({
     }) => WalletBalancesLD
   }): ChainBalance$ =>
     FP.pipe(
-      network$,
-      RxOp.switchMap((network) => getLedgerAddress$(chain, network)),
-      RxOp.switchMap((addressRD) =>
+      getLedgerAddress$(chain),
+      RxOp.switchMap((oAddress) =>
         FP.pipe(
-          addressRD,
-          RD.toOption,
+          oAddress,
           O.fold(
             () =>
               // In case we don't get an address,

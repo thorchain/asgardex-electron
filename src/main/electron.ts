@@ -10,6 +10,7 @@ import * as E from 'fp-ts/lib/Either'
 import * as FP from 'fp-ts/lib/function'
 
 import {
+  IPCLedgerAddressesIO,
   ipcKeystoreWalletsIO,
   ipcLedgerApproveERC20TokenParamsIO,
   ipcLedgerDepositTxParamsIO,
@@ -25,7 +26,9 @@ import {
   getAddress as getLedgerAddress,
   sendTx as sendLedgerTx,
   deposit as depositLedgerTx,
-  verifyLedgerAddress
+  verifyLedgerAddress,
+  getAddresses as getLedgerAddresses,
+  saveAddresses as saveLedgerAddresses
 } from './api/ledger'
 import { approveLedgerERC20Token } from './api/ledger/ethereum/approve'
 import IPCMessages from './ipc/messages'
@@ -179,6 +182,10 @@ const initIPC = () => {
       E.fold((e) => Promise.reject(e), approveLedgerERC20Token)
     )
   })
+  ipcMain.handle(IPCMessages.SAVE_LEDGER_ADDRESSES, async (_, params: IPCLedgerAddressesIO) =>
+    saveLedgerAddresses(params)()
+  )
+  ipcMain.handle(IPCMessages.GET_LEDGER_ADDRESSES, async () => getLedgerAddresses())
   // Update
   registerAppCheckUpdatedHandler(IS_DEV)
   // Register all file-stored data services

@@ -19,6 +19,7 @@ import { useMidgardContext } from '../../contexts/MidgardContext'
 import { unionChains } from '../../helpers/fp/array'
 import { rdAltOnPending } from '../../helpers/fpHelpers'
 import { useKeystoreWallets } from '../../hooks/useKeystoreWallets'
+import { useLedgerAddresses } from '../../hooks/useLedgerAddresses'
 import { useMimirHalt } from '../../hooks/useMimirHalt'
 import { useTheme } from '../../hooks/useTheme'
 import { DEFAULT_MIMIR_HALT } from '../../services/thorchain/const'
@@ -73,6 +74,7 @@ export const AppView: React.FC = (): JSX.Element => {
   const prevMimirHalt = useRef<MimirHalt>(DEFAULT_MIMIR_HALT)
 
   const { walletsPersistentRD, reload: reloadPersistentWallets } = useKeystoreWallets()
+  const { ledgerAddressesPersistentRD, reloadPersistentLedgerAddresses } = useLedgerAddresses()
 
   const { mimirHaltRD } = useMimirHalt()
 
@@ -260,7 +262,7 @@ export const AppView: React.FC = (): JSX.Element => {
     )
   }, [apiEndpoint, intl, reloadApiEndpoint])
 
-  const renderKeystoreError = useMemo(() => {
+  const renderImportKeystoreWalletsError = useMemo(() => {
     const empty = () => <></>
     return FP.pipe(
       walletsPersistentRD,
@@ -284,6 +286,30 @@ export const AppView: React.FC = (): JSX.Element => {
     )
   }, [walletsPersistentRD, reloadPersistentWallets, intl])
 
+  const renderImportLedgerAddressesError = useMemo(() => {
+    const empty = () => <></>
+    return FP.pipe(
+      ledgerAddressesPersistentRD,
+      RD.fold(
+        empty,
+        empty,
+        (e) => (
+          <Styled.Alert
+            type="warning"
+            message={intl.formatMessage({ id: 'wallet.imports.error.ledger.import' })}
+            description={e?.message ?? e.toString()}
+            action={
+              <BorderButton color="warning" size="medium" onClick={reloadPersistentLedgerAddresses}>
+                {intl.formatMessage({ id: 'common.retry' })}
+              </BorderButton>
+            }
+          />
+        ),
+        empty
+      )
+    )
+  }, [ledgerAddressesPersistentRD, reloadPersistentLedgerAddresses, intl])
+
   return (
     <Styled.AppWrapper>
       <Styled.AppLayout>
@@ -292,7 +318,8 @@ export const AppView: React.FC = (): JSX.Element => {
 
         <View>
           {renderMidgardError}
-          {renderKeystoreError}
+          {renderImportKeystoreWalletsError}
+          {renderImportLedgerAddressesError}
           {renderHaltedChainsWarning}
           {renderUpgradeWarning}
           <ViewRoutes />

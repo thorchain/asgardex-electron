@@ -6,6 +6,7 @@ import {
   isBaseAmount,
   isChain,
   isError,
+  isEthDerivationMode,
   isFeeOption,
   isKeystoreWallet,
   isLedgerWallet,
@@ -53,6 +54,21 @@ describe('shared/utils/guard', () => {
     })
     it('false for invalid network ', () => {
       expect(isNetwork('network')).toBeFalsy()
+    })
+  })
+
+  describe('isNetwork', () => {
+    it('legacy', () => {
+      expect(isEthDerivationMode('legacy')).toBeTruthy()
+    })
+    it('ledgerlive', () => {
+      expect(isEthDerivationMode('ledgerlive')).toBeTruthy()
+    })
+    it('metamask', () => {
+      expect(isEthDerivationMode('metamask')).toBeTruthy()
+    })
+    it('false for invalid value', () => {
+      expect(isNetwork('anything')).toBeFalsy()
     })
   })
 

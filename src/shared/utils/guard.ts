@@ -6,6 +6,7 @@ import * as FP from 'fp-ts/lib/function'
 import * as IOG from 'io-ts/Guard'
 
 import { Network } from '../api/types'
+import { EthDerivationMode } from '../ethereum/types'
 import { WalletType } from '../wallet/types'
 
 export const nonEmptyStringGuard = FP.pipe(
@@ -27,6 +28,8 @@ export const isFeeOption = (u: unknown): u is FeeOption =>
 export const isWalletType = (u: unknown): u is WalletType => u === 'keystore' || u === 'ledger'
 export const isLedgerWallet = (walletType: WalletType): boolean => walletType === 'ledger'
 export const isKeystoreWallet = (walletType: WalletType): boolean => walletType === 'keystore'
+export const isEthDerivationMode = (u: unknown): u is EthDerivationMode =>
+  u === 'legacy' || u === 'ledgerlive' || u === 'metamask'
 
 const assetGuard = IOG.struct({ symbol: nonEmptyStringGuard, ticker: nonEmptyStringGuard, chain: chainGuard })
 

@@ -9,6 +9,7 @@ import * as fs from 'fs-extra'
 import { KeystoreWallets, ipcKeystoreWalletsIO, keystoreIO } from '../../shared/api/io'
 import { ApiKeystore, IPCExportKeystoreParams } from '../../shared/api/types'
 import { mapIOErrors } from '../../shared/utils/fp'
+import { isError } from '../../shared/utils/guard'
 import { defaultWalletName } from '../../shared/utils/wallet'
 import IPCMessages from '../ipc/messages'
 import { exists, readJSON, renameFile, writeJSON } from '../utils/file'
@@ -54,7 +55,7 @@ const migrateLegacyWallet = (): TE.TaskEither<Error, KeystoreWallets> =>
       (v) => !!v,
       () => Error(`${LEGACY_KEYSTORE_FILE} file does not exist`)
     ),
-    // read keystore from disc
+    // read keystore from disk
     TE.chain(() => readJSON(LEGACY_KEYSTORE_FILE)),
     // decode keystore content
     TE.chain(FP.flow(keystoreIO.decode, E.mapLeft(mapIOErrors), TE.fromEither)),
@@ -84,7 +85,7 @@ const loadWallets: TE.TaskEither<Error, KeystoreWallets> = FP.pipe(
       // empty list of wallets if `wallets.json` does not exist
       return exists ? fs.readJSON(WALLETS_STORAGE_FILE) : []
     },
-    (e: unknown) => Error(`${e}`)
+    (error: unknown) => (isError(error) ? error : Error(`${error}`))
   ),
   TE.chain(FP.flow(ipcKeystoreWalletsIO.decode, E.mapLeft(mapIOErrors), TE.fromEither))
 )

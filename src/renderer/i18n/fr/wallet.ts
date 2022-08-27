@@ -39,6 +39,7 @@ const wallet: WalletMessages = {
   'wallet.imports.error.instance': 'Impossible de créer une instance du Client',
   'wallet.imports.error.keystore.load': 'Clé privée incorrecte',
   'wallet.imports.error.keystore.import': 'Error while importing keystore wallets - FR',
+  'wallet.imports.error.ledger.import': 'Error trying to import ledger accounts - FR',
   'wallet.imports.error.keystore.password': 'Mot de passe incorrect',
   'wallet.phrase.error.valueRequired': 'La phrase de récupération est requise',
   'wallet.phrase.error.invalid': 'Phrase de récupération incorrecte',

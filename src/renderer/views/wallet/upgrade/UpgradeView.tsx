@@ -35,6 +35,7 @@ import { AssetWithDecimalLD, AssetWithDecimalRD } from '../../../services/chain/
 import { DEFAULT_NETWORK } from '../../../services/const'
 import { PoolAddressRD } from '../../../services/midgard/types'
 import { DEFAULT_BALANCES_FILTER, INITIAL_BALANCES_STATE } from '../../../services/wallet/const'
+import { ledgerAddressToWalletAddress } from '../../../services/wallet/util'
 import { AssetWithDecimal } from '../../../types/asgardex'
 import { CommonUpgradeProps } from './types'
 import { UpgradeBNB } from './UpgradeViewBNB'
@@ -118,12 +119,12 @@ export const UpgradeView: React.FC<Props> = (): JSX.Element => {
   const runeNativeLedgerAddress$ = useMemo(
     () =>
       FP.pipe(
-        getLedgerAddress$(THORChain, network),
-        RxOp.map((rdAddress) => RD.toOption(rdAddress)),
+        getLedgerAddress$(THORChain),
+        RxOp.map(O.map(ledgerAddressToWalletAddress)),
         RxOp.map(addressFromOptionalWalletAddress)
       ),
 
-    [getLedgerAddress$, network]
+    [getLedgerAddress$]
   )
   const oRuneNativeLedgerAddress = useObservableState(runeNativeLedgerAddress$, O.none)
 
