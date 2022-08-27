@@ -50,7 +50,7 @@ import { useKeystoreState } from '../../hooks/useKeystoreState'
 import { useKeystoreWallets } from '../../hooks/useKeystoreWallets'
 import { useLedger } from '../../hooks/useLedger'
 import { useNetwork } from '../../hooks/useNetwork'
-import { KeystoreLedgerAddressLD, KeystoreUnlocked, VerifiedLedgerAddressLD } from '../../services/wallet/types'
+import { LedgerAddressLD, KeystoreUnlocked, VerifiedLedgerAddressLD } from '../../services/wallet/types'
 import { walletAccount$ } from './WalletSettingsView.helper'
 
 type Props = {
@@ -145,7 +145,7 @@ export const WalletSettingsView: React.FC<Props> = ({ keystoreUnlocked }): JSX.E
     chain: Chain
     walletIndex: number
     ethDerivationMode: O.Option<EthDerivationMode>
-  }): KeystoreLedgerAddressLD => {
+  }): LedgerAddressLD => {
     if (isThorChain(chain)) return addLedgerThorAddress(walletIndex, ethDerivationMode)
     if (isBnbChain(chain)) return addLedgerBnbAddress(walletIndex, ethDerivationMode)
     if (isBtcChain(chain)) return addLedgerBtcAddress(walletIndex, ethDerivationMode)

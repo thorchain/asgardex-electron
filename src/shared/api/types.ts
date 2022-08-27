@@ -9,7 +9,7 @@ import * as O from 'fp-ts/Option'
 import { EthDerivationMode } from '../ethereum/types'
 import { Locale } from '../i18n/types'
 import { WalletAddress } from '../wallet/types'
-import { IPCKeystoresLedgerAddressesIO, KeystoreWallets, PoolsStorageEncoded } from './io'
+import { IPCLedgerAddressesIO, KeystoreWallets, PoolsStorageEncoded } from './io'
 
 // A version number starting from `1` to avoid to load deprecated files
 export type StorageVersion = { version: string }
@@ -139,10 +139,8 @@ export type ApiHDWallet = {
   approveLedgerERC20Token: (
     params: unknown /* will be de-/serialized by ipcLedgerApprovedERC20TokenParamsIO */
   ) => Promise<E.Either<LedgerError, TxHash>>
-  saveLedgerAddresses: (
-    params: IPCKeystoresLedgerAddressesIO
-  ) => Promise<E.Either<Error, IPCKeystoresLedgerAddressesIO>>
-  getLedgerAddresses: () => Promise<E.Either<Error, IPCKeystoresLedgerAddressesIO>>
+  saveLedgerAddresses: (params: IPCLedgerAddressesIO) => Promise<E.Either<Error, IPCLedgerAddressesIO>>
+  getLedgerAddresses: () => Promise<E.Either<Error, IPCLedgerAddressesIO>>
 }
 
 declare global {

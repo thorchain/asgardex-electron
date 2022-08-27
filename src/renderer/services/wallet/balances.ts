@@ -49,7 +49,7 @@ import {
   KeystoreState$,
   KeystoreState,
   ChainBalance,
-  GetKeystoreLedgerAddressHandler
+  GetLedgerAddressHandler
 } from './types'
 import { sortBalances } from './util'
 import { hasImportedKeystore } from './util'
@@ -61,7 +61,7 @@ export const createBalancesService = ({
 }: {
   keystore$: KeystoreState$
   network$: Network$
-  getLedgerAddress$: GetKeystoreLedgerAddressHandler
+  getLedgerAddress$: GetLedgerAddressHandler
 }): BalancesService => {
   // reload all balances
   const reloadBalances: FP.Lazy<void> = () => {

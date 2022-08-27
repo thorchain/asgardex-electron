@@ -144,7 +144,7 @@ describe('helpers/fp/eq', () => {
       expect(eqNetwork.equals('mainnet', 'mainnet')).toBeTruthy()
       expect(eqNetwork.equals('stagenet', 'stagenet')).toBeTruthy()
     })
-    it('non equal', () => {
+    it('not equal', () => {
       expect(eqNetwork.equals('stagenet', 'mainnet')).toBeFalsy()
     })
   })
@@ -448,7 +448,7 @@ describe('helpers/fp/eq', () => {
     it('equal', () => {
       expect(eqKeystoreId.equals(1, 1)).toBeTruthy()
     })
-    it('non equal', () => {
+    it('not equal', () => {
       expect(eqKeystoreId.equals(1, 2)).toBeFalsy()
     })
   })

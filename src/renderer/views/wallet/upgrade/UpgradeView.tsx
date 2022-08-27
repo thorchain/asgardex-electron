@@ -35,7 +35,7 @@ import { AssetWithDecimalLD, AssetWithDecimalRD } from '../../../services/chain/
 import { DEFAULT_NETWORK } from '../../../services/const'
 import { PoolAddressRD } from '../../../services/midgard/types'
 import { DEFAULT_BALANCES_FILTER, INITIAL_BALANCES_STATE } from '../../../services/wallet/const'
-import { keystoreLedgerAddressToWalletAddress } from '../../../services/wallet/util'
+import { ledgerAddressToWalletAddress } from '../../../services/wallet/util'
 import { AssetWithDecimal } from '../../../types/asgardex'
 import { CommonUpgradeProps } from './types'
 import { UpgradeBNB } from './UpgradeViewBNB'
@@ -120,7 +120,7 @@ export const UpgradeView: React.FC<Props> = (): JSX.Element => {
     () =>
       FP.pipe(
         getLedgerAddress$(THORChain),
-        RxOp.map(O.map(keystoreLedgerAddressToWalletAddress)),
+        RxOp.map(O.map(ledgerAddressToWalletAddress)),
         RxOp.map(addressFromOptionalWalletAddress)
       ),
 

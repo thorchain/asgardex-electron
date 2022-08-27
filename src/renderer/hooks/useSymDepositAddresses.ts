@@ -13,7 +13,7 @@ import { useChainContext } from '../contexts/ChainContext'
 import { useWalletContext } from '../contexts/WalletContext'
 import { INITIAL_SYM_DEPOSIT_ADDRESSES } from '../services/chain/const'
 import { SymDepositAddresses } from '../services/chain/types'
-import { keystoreLedgerAddressToWalletAddress } from '../services/wallet/util'
+import { ledgerAddressToWalletAddress } from '../services/wallet/util'
 
 /**
  * Hook to handle wallet addresses needed for sym. deposit
@@ -66,14 +66,14 @@ export const useSymDepositAddresses = (oAsset: O.Option<Asset>) => {
       oAsset,
       O.fold(
         () => Rx.of(O.none),
-        ({ chain }) => FP.pipe(getLedgerAddress$(chain), RxOp.map(O.map(keystoreLedgerAddressToWalletAddress)))
+        ({ chain }) => FP.pipe(getLedgerAddress$(chain), RxOp.map(O.map(ledgerAddressToWalletAddress)))
       )
     ),
     O.none
   )
 
   const [runeLedgerAddress] = useObservableState(
-    () => FP.pipe(getLedgerAddress$(THORChain), RxOp.map(O.map(keystoreLedgerAddressToWalletAddress))),
+    () => FP.pipe(getLedgerAddress$(THORChain), RxOp.map(O.map(ledgerAddressToWalletAddress))),
     O.none
   )
 

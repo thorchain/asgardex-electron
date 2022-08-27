@@ -3,12 +3,12 @@ import * as FP from 'fp-ts/lib/function'
 import { useObservableState } from 'observable-hooks'
 
 import { useWalletContext } from '../contexts/WalletContext'
-import { KeystoreLedgerAddresses, KeystoreLedgerAddressesRD } from '../services/wallet/types'
+import { LedgerAddresses, LedgerAddressesRD } from '../services/wallet/types'
 
-export const useKeystoreLedgers = (): {
-  ledgerAddressesPersistentRD: KeystoreLedgerAddressesRD
+export const useLedgerAddresses = (): {
+  ledgerAddressesPersistentRD: LedgerAddressesRD
   reloadPersistentLedgerAddresses: FP.Lazy<void>
-  ledgerAddresses: KeystoreLedgerAddresses
+  ledgerAddresses: LedgerAddresses
 } => {
   const { reloadPersistentLedgerAddresses, persistentLedgerAddresses$, ledgerAddresses$ } = useWalletContext()
 

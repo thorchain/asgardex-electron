@@ -53,9 +53,9 @@ export const getAddress = async ({
         break
       case ETHChain: {
         if (!ethDerivationMode) {
-          res = res = E.left({
+          res = E.left({
             errorId: LedgerErrorId.INVALID_ETH_DERIVATION_MODE,
-            msg: `To get Ledger address 'ethDerivationMode' is needed for ETH`
+            msg: `'ethDerivationMode' is needed for ETH to get Ledger address`
           })
         } else {
           res = await getETHAddress(transport, walletIndex, ethDerivationMode)

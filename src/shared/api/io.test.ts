@@ -12,9 +12,9 @@ import { mapIOErrors } from '../utils/fp'
 import {
   BaseAmountEncoded,
   baseAmountIO,
-  IPCKeystoresLedgerAddressesIO,
+  IPCLedgerAddressesIO,
   ipcKeystoreWalletIO,
-  ipcKeystorLedgerAddressesIO,
+  ipcLedgerAddressesIO,
   ipcLedgerSendTxParamsIO,
   isBaseAmountEncoded,
   keystoreIO,
@@ -300,8 +300,8 @@ describe('shared/io', () => {
     })
   })
 })
-describe('ipcKeystoreWalletIO', () => {
-  const ledgers: IPCKeystoresLedgerAddressesIO = [
+describe('ipcKeystorLedgerAddressesIO', () => {
+  const ledgers: IPCLedgerAddressesIO = [
     {
       keystoreId: 1,
       chain: ETHChain,
@@ -323,7 +323,7 @@ describe('ipcKeystoreWalletIO', () => {
   it('decoded', () => {
     const data = JSON.parse(JSON.stringify(ledgers))
 
-    const decoded = ipcKeystorLedgerAddressesIO.decode(data)
+    const decoded = ipcLedgerAddressesIO.decode(data)
 
     FP.pipe(
       decoded,
@@ -338,13 +338,13 @@ describe('ipcKeystoreWalletIO', () => {
     )
   })
   it('encode', () => {
-    const encoded = ipcKeystorLedgerAddressesIO.encode(ledgers)
+    const encoded = ipcLedgerAddressesIO.encode(ledgers)
     expect(encoded).toEqual(JSON.parse(JSON.stringify(ledgers)))
   })
 
   it('round-trip', () => {
-    const encoded = ipcKeystorLedgerAddressesIO.encode(ledgers)
-    const decoded = ipcKeystorLedgerAddressesIO.decode(encoded)
+    const encoded = ipcLedgerAddressesIO.encode(ledgers)
+    const decoded = ipcLedgerAddressesIO.decode(encoded)
 
     FP.pipe(
       decoded,

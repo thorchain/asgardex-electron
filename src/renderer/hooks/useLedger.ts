@@ -10,8 +10,8 @@ import { KeystoreId } from '../../shared/api/types'
 import { EthDerivationMode } from '../../shared/ethereum/types'
 import { WalletAddress } from '../../shared/wallet/types'
 import { useWalletContext } from '../contexts/WalletContext'
-import { KeystoreLedgerAddress } from '../services/wallet/types'
-import { keystoreLedgerAddressToWalletAddress } from '../services/wallet/util'
+import { LedgerAddress } from '../services/wallet/types'
+import { ledgerAddressToWalletAddress } from '../services/wallet/util'
 import { useNetwork } from './useNetwork'
 
 export const useLedger = (chain: Chain, id: KeystoreId) => {
@@ -32,11 +32,8 @@ export const useLedger = (chain: Chain, id: KeystoreId) => {
     () =>
       FP.pipe(
         getLedgerAddress$(chain),
-        // KeystoreLedgerAddress -> WalletAddress
-        RxOp.map<O.Option<KeystoreLedgerAddress>, O.Option<WalletAddress>>(
-          FP.flow(O.map(keystoreLedgerAddressToWalletAddress))
-        ),
-        // RxOp.map<KeystoreLedgerAddress, WalletAddress>(),
+        // LedgerAddress -> WalletAddress
+        RxOp.map<O.Option<LedgerAddress>, O.Option<WalletAddress>>(FP.flow(O.map(ledgerAddressToWalletAddress))),
         RxOp.shareReplay(1)
       ),
     O.none

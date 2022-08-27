@@ -16,7 +16,7 @@ import { WalletAddress, WalletType } from '../../../shared/wallet/types'
 import { DepositAssetFees, DepositFees, SwapFeesParams, SymDepositAddresses } from '../../services/chain/types'
 import { ApproveParams } from '../../services/ethereum/types'
 import { PoolAddress, PoolShare } from '../../services/midgard/types'
-import { ApiError, KeystoreLedgerAddress, WalletBalance } from '../../services/wallet/types'
+import { ApiError, LedgerAddress, WalletBalance } from '../../services/wallet/types'
 import { AssetWithAmount } from '../../types/asgardex'
 import { PricePool } from '../../views/pools/Pools.types'
 
@@ -205,7 +205,7 @@ export const eqOWalletAddress = O.getEq(eqWalletAddress)
 
 export const eqLedgerAddressRD = RD.getEq<LedgerError, WalletAddress>(eqLedgerError, eqWalletAddress)
 
-export const eqKeystoreLedgerAddress = Eq.struct<KeystoreLedgerAddress>({
+export const eqLedgerAddress = Eq.struct<LedgerAddress>({
   keystoreId: eqKeystoreId,
   chain: eqChain,
   network: eqNetwork,
@@ -214,7 +214,7 @@ export const eqKeystoreLedgerAddress = Eq.struct<KeystoreLedgerAddress>({
   ethDerivationMode: eqOEthDerivationMode
 })
 
-export const eqOKeystoreLedgerAddress = O.getEq(eqKeystoreLedgerAddress)
+export const eqOLedgerAddress = O.getEq(eqLedgerAddress)
 
 export const eqSymDepositAddresses = Eq.struct<SymDepositAddresses>({
   rune: eqOWalletAddress,

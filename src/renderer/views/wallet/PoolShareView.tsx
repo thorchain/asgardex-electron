@@ -31,6 +31,7 @@ import { useNetwork } from '../../hooks/useNetwork'
 import { WalletAddress$ } from '../../services/clients/types'
 import { ENABLED_CHAINS } from '../../services/const'
 import { PoolSharesRD } from '../../services/midgard/types'
+import { ledgerAddressToWalletAddress } from '../../services/wallet/util'
 import { BaseAmountRD } from '../../types'
 import * as H from './PoolShareView.helper'
 
@@ -86,20 +87,7 @@ export const PoolShareView: React.FC = (): JSX.Element => {
         ENABLED_CHAINS,
         A.filter((chain) => !isThorChain(chain)),
         A.map((chain) => getLedgerAddress$(chain)),
-        A.map(
-          RxOp.map(
-            FP.flow(
-              // Transform `KeystoreLedgerAddress` -> `WalletAddress`
-              O.map(({ network, chain, walletIndex, address }) => ({
-                network,
-                chain,
-                walletIndex,
-                address,
-                type: 'ledger'
-              }))
-            )
-          )
-        )
+        A.map(RxOp.map(FP.flow(O.map(ledgerAddressToWalletAddress))))
       )
 
     return FP.pipe(

@@ -18,8 +18,8 @@ import { useI18nContext } from '../../contexts/I18nContext'
 import { useMidgardContext } from '../../contexts/MidgardContext'
 import { unionChains } from '../../helpers/fp/array'
 import { rdAltOnPending } from '../../helpers/fpHelpers'
-import { useKeystoreLedgers } from '../../hooks/useKeystoreLedgers'
 import { useKeystoreWallets } from '../../hooks/useKeystoreWallets'
+import { useLedgerAddresses } from '../../hooks/useLedgerAddresses'
 import { useMimirHalt } from '../../hooks/useMimirHalt'
 import { useTheme } from '../../hooks/useTheme'
 import { DEFAULT_MIMIR_HALT } from '../../services/thorchain/const'
@@ -74,7 +74,7 @@ export const AppView: React.FC = (): JSX.Element => {
   const prevMimirHalt = useRef<MimirHalt>(DEFAULT_MIMIR_HALT)
 
   const { walletsPersistentRD, reload: reloadPersistentWallets } = useKeystoreWallets()
-  const { ledgerAddressesPersistentRD, reloadPersistentLedgerAddresses } = useKeystoreLedgers()
+  const { ledgerAddressesPersistentRD, reloadPersistentLedgerAddresses } = useLedgerAddresses()
 
   const { mimirHaltRD } = useMimirHalt()
 
@@ -262,7 +262,7 @@ export const AppView: React.FC = (): JSX.Element => {
     )
   }, [apiEndpoint, intl, reloadApiEndpoint])
 
-  const renderKeystoreError = useMemo(() => {
+  const renderImportKeystoreWalletsError = useMemo(() => {
     const empty = () => <></>
     return FP.pipe(
       walletsPersistentRD,
@@ -286,7 +286,7 @@ export const AppView: React.FC = (): JSX.Element => {
     )
   }, [walletsPersistentRD, reloadPersistentWallets, intl])
 
-  const renderKeystoreLedgerError = useMemo(() => {
+  const renderImportLedgerAddressesError = useMemo(() => {
     const empty = () => <></>
     return FP.pipe(
       ledgerAddressesPersistentRD,
@@ -318,8 +318,8 @@ export const AppView: React.FC = (): JSX.Element => {
 
         <View>
           {renderMidgardError}
-          {renderKeystoreError}
-          {renderKeystoreLedgerError}
+          {renderImportKeystoreWalletsError}
+          {renderImportLedgerAddressesError}
           {renderHaltedChainsWarning}
           {renderUpgradeWarning}
           <ViewRoutes />

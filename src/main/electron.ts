@@ -10,7 +10,7 @@ import * as E from 'fp-ts/lib/Either'
 import * as FP from 'fp-ts/lib/function'
 
 import {
-  IPCKeystoresLedgerAddressesIO,
+  IPCLedgerAddressesIO,
   ipcKeystoreWalletsIO,
   ipcLedgerApproveERC20TokenParamsIO,
   ipcLedgerDepositTxParamsIO,
@@ -21,13 +21,14 @@ import { DEFAULT_STORAGES } from '../shared/const'
 import type { Locale } from '../shared/i18n/types'
 import { registerAppCheckUpdatedHandler } from './api/appUpdate'
 import { getFileStoreService } from './api/fileStore'
-import { getLedgerAddresses, saveLedgerAddresses } from './api/hdwallet'
 import { exportKeystore, initKeystoreWallets, loadKeystore, saveKeystoreWallets } from './api/keystore'
 import {
   getAddress as getLedgerAddress,
   sendTx as sendLedgerTx,
   deposit as depositLedgerTx,
-  verifyLedgerAddress
+  verifyLedgerAddress,
+  getAddresses as getLedgerAddresses,
+  saveAddresses as saveLedgerAddresses
 } from './api/ledger'
 import { approveLedgerERC20Token } from './api/ledger/ethereum/approve'
 import IPCMessages from './ipc/messages'
@@ -181,7 +182,7 @@ const initIPC = () => {
       E.fold((e) => Promise.reject(e), approveLedgerERC20Token)
     )
   })
-  ipcMain.handle(IPCMessages.SAVE_LEDGER_ADDRESSES, async (_, params: IPCKeystoresLedgerAddressesIO) =>
+  ipcMain.handle(IPCMessages.SAVE_LEDGER_ADDRESSES, async (_, params: IPCLedgerAddressesIO) =>
     saveLedgerAddresses(params)()
   )
   ipcMain.handle(IPCMessages.GET_LEDGER_ADDRESSES, async () => getLedgerAddresses())

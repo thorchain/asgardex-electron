@@ -10,15 +10,15 @@ import * as RxOp from 'rxjs/operators'
 import { KeystoreId, LedgerErrorId } from '../../../shared/api/types'
 import { isError } from '../../../shared/utils/guard'
 import { WalletAddress } from '../../../shared/wallet/types'
-import { eqChain, eqKeystoreId, eqNetwork, eqOKeystoreLedgerAddress } from '../../helpers/fp/eq'
+import { eqChain, eqKeystoreId, eqNetwork, eqOLedgerAddress } from '../../helpers/fp/eq'
 import { liveData } from '../../helpers/rx/liveData'
 import { observableState, triggerStream } from '../../helpers/stateHelper'
 import { Network$ } from '../app/types'
-import { INITIAL_KEYSTORE_LEDGER_ADDRESSES } from './const'
+import { INITIAL_KEYSTORE_LEDGER_ADDRESSES as INITIAL_LEDGER_ADDRESSES } from './const'
 import {
-  GetKeystoreLedgerAddressHandler,
+  GetLedgerAddressHandler,
   KeystoreState$,
-  KeystoreLedgerAddresses,
+  LedgerAddresses,
   LedgerService,
   VerifyLedgerAddressHandler,
   AddLedgerAddressHandler,
@@ -26,10 +26,10 @@ import {
   isKeystoreUnlocked,
   KeystoreWalletsUI$,
   RemovedKeystoreId$,
-  KeystoreLedgerAddress,
-  KeystoreLedgerAddressesLD
+  LedgerAddress,
+  LedgerAddressesLD
 } from './types'
-import { fromIPCKeystoresLedgerAddressesIO, toIPCKeystoresLedgerAddressesIO } from './util'
+import { fromIPCLedgerAddressesIO, toIPCLedgerAddressesIO } from './util'
 
 export const createLedgerService = ({
   keystore$,
@@ -45,19 +45,19 @@ export const createLedgerService = ({
    * Note: Only ONE Ledger for a Keystore / Chain / Network combo possible
    */
   const {
-    get$: keystoreLedgerAddresses$,
-    get: keystoreLedgerAddresses,
-    set: setKeystoreLedgerAddresses
-  } = observableState<KeystoreLedgerAddresses>(INITIAL_KEYSTORE_LEDGER_ADDRESSES)
+    get$: ledgerAddresses$,
+    get: ledgerAddresses,
+    set: setLedgerAddresses
+  } = observableState<LedgerAddresses>(INITIAL_LEDGER_ADDRESSES)
 
-  const saveKeystoreLedgerAddresses = (addresses: KeystoreLedgerAddresses): KeystoreLedgerAddressesLD =>
+  const saveLedgerAddresses = (addresses: LedgerAddresses): LedgerAddressesLD =>
     FP.pipe(
-      setKeystoreLedgerAddresses(addresses),
-      () => toIPCKeystoresLedgerAddressesIO(addresses),
+      setLedgerAddresses(addresses),
+      () => toIPCLedgerAddressesIO(addresses),
       (ioAddresses) => Rx.from(window.apiHDWallet.saveLedgerAddresses(ioAddresses)),
       RxOp.map(RD.fromEither),
       RxOp.catchError((error: Error) => Rx.of(RD.failure(error))),
-      liveData.map(fromIPCKeystoresLedgerAddressesIO),
+      liveData.map(fromIPCLedgerAddressesIO),
       RxOp.startWith(RD.pending)
     )
 
@@ -89,13 +89,13 @@ export const createLedgerService = ({
   /**
    * Stream of Ledger addresses depending on selected keystoreId + network
    */
-  const ledgerAddresses$ = FP.pipe(
-    Rx.combineLatest([network$, selectedKeystoreId$, keystoreLedgerAddresses$]),
+  const currentLedgerAddresses$ = FP.pipe(
+    Rx.combineLatest([network$, selectedKeystoreId$, ledgerAddresses$]),
     RxOp.map(([network, oKeystoreId, addresses]) =>
       FP.pipe(
         oKeystoreId,
         O.fold(
-          () => INITIAL_KEYSTORE_LEDGER_ADDRESSES,
+          () => INITIAL_LEDGER_ADDRESSES,
           (id) =>
             FP.pipe(
               addresses,
@@ -107,39 +107,39 @@ export const createLedgerService = ({
         )
       )
     ),
-    RxOp.startWith(INITIAL_KEYSTORE_LEDGER_ADDRESSES)
+    RxOp.startWith(INITIAL_LEDGER_ADDRESSES)
   )
 
   /**
    * Update address by given chain, network, keystoreId
    */
-  const _addLedgerAddress = (address: KeystoreLedgerAddress): KeystoreLedgerAddressesLD => {
+  const _addLedgerAddress = (address: LedgerAddress): LedgerAddressesLD => {
     const { chain, network, keystoreId } = address
     return FP.pipe(
-      keystoreLedgerAddresses(),
+      ledgerAddresses(),
       // remove same entry if available just to avoid duplication
       A.filter(
         ({ chain: c, network: n, keystoreId: id }) =>
           !(eqKeystoreId.equals(id, keystoreId) && eqChain.equals(c, chain) && eqNetwork.equals(n, network))
       ),
       A.prepend(address),
-      saveKeystoreLedgerAddresses
+      saveLedgerAddresses
     )
   }
 
   /**
    * Stream to get ledger address from memory
    */
-  const getLedgerAddress$: GetKeystoreLedgerAddressHandler = (chain: Chain) =>
+  const getLedgerAddress$: GetLedgerAddressHandler = (chain: Chain) =>
     FP.pipe(
-      ledgerAddresses$,
+      currentLedgerAddresses$,
       RxOp.map(
         (addresses) =>
           FP.pipe(
             addresses,
             A.findFirst(({ chain: c }) => eqChain.equals(c, chain))
           ),
-        RxOp.distinctUntilChanged(eqOKeystoreLedgerAddress.equals)
+        RxOp.distinctUntilChanged(eqOLedgerAddress.equals)
       )
     )
 
@@ -161,16 +161,16 @@ export const createLedgerService = ({
     )
 
   /**
-   * Removes ledger address from `keystoreLedgerAddresses` list
+   * Removes ledger address from `LedgerAddresses` list
    */
   const removeLedgerAddress: RemoveLedgerAddressHandler = ({ id, chain, network }) =>
     FP.pipe(
-      keystoreLedgerAddresses(),
+      ledgerAddresses(),
       A.filter(
         ({ chain: c, network: n, keystoreId }) =>
           !(eqKeystoreId.equals(id, keystoreId) && eqChain.equals(c, chain) && eqNetwork.equals(n, network))
       ),
-      saveKeystoreLedgerAddresses
+      saveLedgerAddresses
     )
 
   /**
@@ -195,8 +195,8 @@ export const createLedgerService = ({
           })
         )
       ),
-      liveData.map<WalletAddress, KeystoreLedgerAddress>(({ address }) => {
-        const ledgerAddress: KeystoreLedgerAddress = {
+      liveData.map<WalletAddress, LedgerAddress>(({ address }) => {
+        const ledgerAddress: LedgerAddress = {
           keystoreId: id,
           chain,
           network,
@@ -217,50 +217,45 @@ export const createLedgerService = ({
       oKeystoreId,
       O.map((id) =>
         FP.pipe(
-          keystoreLedgerAddresses(),
+          ledgerAddresses(),
           A.filter(({ keystoreId }) => keystoreId !== id),
-          saveKeystoreLedgerAddresses
+          saveLedgerAddresses
         )
       )
     )
   )
 
-  // `TriggerStream` to reload persistent `KeystoreLedgerAddresses`
+  // `TriggerStream` to reload persistent `LedgerAddresses`
   const { stream$: reloadPersistentLedgerAddresses$, trigger: reloadPersistentLedgerAddresses } = triggerStream()
 
   /**
    * Persistent `KeystoreWallets` stored on disc.
    */
-  const persistentLedgerAddresses$: KeystoreLedgerAddressesLD = FP.pipe(
+  const persistentLedgerAddresses$: LedgerAddressesLD = FP.pipe(
     reloadPersistentLedgerAddresses$,
     RxOp.switchMap(() => Rx.from(window.apiHDWallet.getLedgerAddresses())),
     RxOp.map(RD.fromEither),
     RxOp.catchError((error: Error) => Rx.of(RD.failure(error))),
-    liveData.map(fromIPCKeystoresLedgerAddressesIO),
+    liveData.map(fromIPCLedgerAddressesIO),
     RxOp.startWith(RD.pending),
     RxOp.shareReplay(1)
   )
 
-  // Subscribe keystoreLedgersPersistent$
-  // to update internal `KeystoreLedgerAddresses`
+  // Subscribe persistentLedgerAddresses$
+  // to update internal `LedgerAddresses`
   // whenever data are loaded from disc,
   persistentLedgerAddresses$.subscribe((ledgersRD) =>
     FP.pipe(
       ledgersRD,
       RD.map((ledgers) => {
-        setKeystoreLedgerAddresses(ledgers)
+        setLedgerAddresses(ledgers)
         return true
       })
     )
   )
 
-  // TODO(@Veado) Remove it - for debugging only
-  ledgerAddresses$.subscribe((v) => console.log('ledgerAddresses$ sub', v))
-  keystoreLedgerAddresses$.subscribe((v) => console.log('keystoreLedgerAddresses$ sub', v))
-  removedKeystoreId$.subscribe((v) => console.log('removedKeystoreId$ sub', v))
-
   return {
-    ledgerAddresses$,
+    currentLedgerAddresses$,
     addLedgerAddress$,
     getLedgerAddress$,
     verifyLedgerAddress$,

@@ -10,7 +10,7 @@ const {
   getLedgerAddress$,
   verifyLedgerAddress$,
   removeLedgerAddress,
-  ledgerAddresses$,
+  currentLedgerAddresses$: ledgerAddresses$,
   reloadPersistentLedgerAddresses,
   persistentLedgerAddresses$
 } = createLedgerService({

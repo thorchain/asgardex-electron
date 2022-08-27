@@ -54,8 +54,8 @@ import {
   RenameKeystoreWalletHandler,
   RenameKeystoreWalletRD,
   VerifiedLedgerAddressLD,
-  KeystoreLedgerAddressRD,
-  KeystoreLedgerAddressLD,
+  LedgerAddressRD,
+  LedgerAddressLD,
   VerifiedLedgerAddressRD
 } from '../../services/wallet/types'
 import { walletTypeToI18n } from '../../services/wallet/util'
@@ -82,7 +82,7 @@ type Props = {
     chain: Chain
     walletIndex: number
     ethDerivationMode: O.Option<EthDerivationMode>
-  }) => KeystoreLedgerAddressLD
+  }) => LedgerAddressLD
   verifyLedgerAddress$: (params: {
     chain: Chain
     walletIndex: number
@@ -213,7 +213,7 @@ export const WalletSettings: React.FC<Props> = (props): JSX.Element => {
     state: addLedgerAddressRD,
     reset: resetAddLedgerAddressRD,
     subscribe: subscribeAddLedgerAddressRD
-  } = useSubscriptionState<KeystoreLedgerAddressRD>(RD.initial)
+  } = useSubscriptionState<LedgerAddressRD>(RD.initial)
 
   const [ledgerChainToAdd, setLedgerChainToAdd] = useState<O.Option<Chain>>(O.none)
 
@@ -256,12 +256,13 @@ export const WalletSettings: React.FC<Props> = (props): JSX.Element => {
 
         const selectedWalletIndex = walletIndexMap[chain]
 
-        const addingLedger: boolean = FP.pipe(
+        // check
+        const currentLedgerToAdd: boolean = FP.pipe(
           ledgerChainToAdd,
           O.map((c) => eqChain.equals(chain, c)),
           O.getOrElse(() => false)
         )
-        const loading = addingLedger && RD.isPending(addLedgerAddressRD)
+        const loading = currentLedgerToAdd && RD.isPending(addLedgerAddressRD)
         const empty = () => <></>
         const renderError = FP.pipe(
           addLedgerAddressRD,
@@ -343,7 +344,7 @@ export const WalletSettings: React.FC<Props> = (props): JSX.Element => {
                 </StyledR.Radio.Group>
               )}
             </div>
-            {addingLedger && renderError}
+            {currentLedgerToAdd && renderError}
           </>
         )
       }
@@ -390,7 +391,7 @@ export const WalletSettings: React.FC<Props> = (props): JSX.Element => {
 
   const renderKeystoreAddress = useCallback(
     (chain: Chain, { address }: WalletAddress) => {
-      // Render addresses depending on its loading status
+      // Render addresses depending on its loading state
       return (
         <>
           <Styled.WalletTypeLabel>{walletTypeToI18n('keystore', intl)}</Styled.WalletTypeLabel>

@@ -26,7 +26,7 @@ import { useNetwork } from '../../../hooks/useNetwork'
 import { useOpenAddressUrl } from '../../../hooks/useOpenAddressUrl'
 import { useOpenExplorerTxUrl } from '../../../hooks/useOpenExplorerTxUrl'
 import { ENABLED_CHAINS } from '../../../services/const'
-import { keystoreLedgerAddressToWalletAddress } from '../../../services/wallet/util'
+import { ledgerAddressToWalletAddress } from '../../../services/wallet/util'
 
 const HISTORY_FILTERS: Filter[] = ['ALL', 'SWITCH', 'DEPOSIT', 'SWAP', 'WITHDRAW', 'DONATE', 'REFUND']
 
@@ -70,7 +70,7 @@ export const WalletHistoryView: React.FC = () => {
         (addresses) => Rx.combineLatest(addresses),
         // Accept `successfully` added addresses only
         RxOp.map(A.filterMap(FP.identity)),
-        RxOp.map(A.map(keystoreLedgerAddressToWalletAddress))
+        RxOp.map(A.map(ledgerAddressToWalletAddress))
       ),
     [getLedgerAddress$]
   )
