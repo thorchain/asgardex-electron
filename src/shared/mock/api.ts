@@ -38,7 +38,8 @@ export const apiHDWallet: ApiHDWallet = {
 
 const commonStorageData: CommonStorage = {
   locale: Locale.EN,
-  version: '2'
+  ethDerivationMode: 'metamask',
+  version: '1'
 }
 
 export const apiCommonStorage: ApiFileStoreService<CommonStorage> = {

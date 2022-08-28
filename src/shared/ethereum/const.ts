@@ -14,4 +14,4 @@ export const FEE_BOUNDS: Record<Network, FeeBounds | undefined> = {
   }
 }
 
-export const DEFAULT_ETH_DERIVATION_MODE: EthHDMode = 'ledgerlive'
+export const DEFAULT_ETH_HD_MODE: EthHDMode = 'ledgerlive'

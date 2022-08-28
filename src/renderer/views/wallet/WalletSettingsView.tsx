@@ -21,6 +21,8 @@ import * as Rx from 'rxjs'
 import * as RxOp from 'rxjs/operators'
 
 import { LedgerErrorId } from '../../../shared/api/types'
+import { DEFAULT_ETH_HD_MODE } from '../../../shared/ethereum/const'
+import { EthHDMode } from '../../../shared/ethereum/types'
 import { HDMode } from '../../../shared/wallet/types'
 import { WalletSettings } from '../../components/settings'
 import { useBinanceContext } from '../../contexts/BinanceContext'
@@ -74,12 +76,14 @@ export const WalletSettingsView: React.FC<Props> = ({ keystoreUnlocked }): JSX.E
 
   const { address$: thorAddressUI$ } = useThorchainContext()
   const { addressUI$: bnbAddressUI$ } = useBinanceContext()
-  const { addressUI$: ethAddressUI$ } = useEthereumContext()
+  const { addressUI$: ethAddressUI$, ethHDMode$, updateEthHDMode } = useEthereumContext()
   const { addressUI$: btcAddressUI$ } = useBitcoinContext()
   const { addressUI$: ltcAddressUI$ } = useLitecoinContext()
   const { addressUI$: bchAddressUI$ } = useBitcoinCashContext()
   const { addressUI$: dogeAddressUI$ } = useDogeContext()
   const { addressUI$: cosmosAddressUI$ } = useCosmosContext()
+
+  const ethHDMode: EthHDMode = useObservableState(ethHDMode$, DEFAULT_ETH_HD_MODE)
 
   const {
     addAddress: addLedgerThorAddress,
@@ -342,6 +346,8 @@ export const WalletSettingsView: React.FC<Props> = ({ keystoreUnlocked }): JSX.E
       validatePassword$={validatePassword$}
       collapsed={collapsed}
       toggleCollapse={toggleCollapse}
+      ethHDMode={ethHDMode}
+      updateEthHDMode={updateEthHDMode}
     />
   )
 }
