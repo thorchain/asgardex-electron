@@ -21,7 +21,7 @@
 - Use 9R Midgard by default [#2363](https://github.com/thorchain/asgardex-electron/pull/2363)
 - Fix deprecated usage of Antd.Menu children [#2372](https://github.com/thorchain/asgardex-electron/pull/2372)
 - [Ledger] Fix/extend HD pathes for ETH [#2344](https://github.com/thorchain/asgardex-electron/issues/2344)
-- Fix: lcd-cosmos.cosmosstation.io api is down [#2375](https://github.com/thorchain/asgardex-electron/pull/2375)
+- Fix: lcd-cosmos.cosmosstation.io api is down - pt2 [#2382](https://github.com/thorchain/asgardex-electron/pull/2382)
 
 ## Remove
 
