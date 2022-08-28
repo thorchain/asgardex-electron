@@ -87,6 +87,8 @@ type Props = {
   validatePassword$: ValidatePasswordHandler
   collapsed: boolean
   toggleCollapse: FP.Lazy<void>
+  ethHDMode: EthHDMode
+  updateEthHDMode: (mode: EthHDMode) => void
 }
 
 type AddressToVerify = O.Option<{ address: Address; chain: Chain }>
@@ -108,7 +110,9 @@ export const WalletSettings: React.FC<Props> = (props): JSX.Element => {
     clickAddressLinkHandler,
     validatePassword$,
     collapsed,
-    toggleCollapse
+    toggleCollapse,
+    updateEthHDMode,
+    ethHDMode
   } = props
 
   const intl = useIntl()
@@ -186,8 +190,6 @@ export const WalletSettings: React.FC<Props> = (props): JSX.Element => {
 
   const [ledgerAddressToVerify, setLedgerAddressToVerify] = useState<AddressToVerify>(O.none)
 
-  const [ethDerivationMode, setEthDerivationMode] = useState<EthHDMode>('ledgerlive')
-
   const renderLedgerNotSupported = useMemo(
     () => (
       <div className="mt-10px w-full">
@@ -217,11 +219,11 @@ export const WalletSettings: React.FC<Props> = (props): JSX.Element => {
         addLedgerAddress$({
           chain,
           walletIndex,
-          hdMode: isEthChain(chain) ? ethDerivationMode : 'default'
+          hdMode: isEthChain(chain) ? ethHDMode : 'default' // other Ledgers uses `default` path
         })
       )
     },
-    [addLedgerAddress$, setLedgerChainToAdd, ethDerivationMode, resetAddLedgerAddressRD, subscribeAddLedgerAddressRD]
+    [resetAddLedgerAddressRD, subscribeAddLedgerAddressRD, addLedgerAddress$, ethHDMode]
   )
 
   const verifyLedgerAddressHandler = useCallback(
@@ -243,7 +245,7 @@ export const WalletSettings: React.FC<Props> = (props): JSX.Element => {
     (chain: Chain, oAddress: O.Option<WalletAddress>) => {
       const renderAddAddress = () => {
         const onChangeEthDerivationMode = (e: RadioChangeEvent) => {
-          setEthDerivationMode(e.target.value as EthHDMode)
+          updateEthHDMode(e.target.value as EthHDMode)
         }
 
         const selectedWalletIndex = walletIndexMap[chain]
@@ -299,7 +301,7 @@ export const WalletSettings: React.FC<Props> = (props): JSX.Element => {
                 <StyledR.Radio.Group
                   className="!flex flex-col items-start lg:flex-row lg:items-center lg:!pl-30px"
                   onChange={onChangeEthDerivationMode}
-                  value={ethDerivationMode}>
+                  value={ethHDMode}>
                   <StyledR.Radio value="ledgerlive" key="ledgerlive">
                     <Styled.EthDerivationModeRadioLabel>
                       {intl.formatMessage({ id: 'common.ledgerlive' })}
@@ -372,12 +374,13 @@ export const WalletSettings: React.FC<Props> = (props): JSX.Element => {
       walletIndexMap,
       ledgerChainToAdd,
       addLedgerAddressRD,
-      ethDerivationMode,
+      ethHDMode,
+      updateEthHDMode,
       addLedgerAddress,
       network,
       clickAddressLinkHandler,
-      removeLedgerAddress,
-      verifyLedgerAddressHandler
+      verifyLedgerAddressHandler,
+      removeLedgerAddress
     ]
   )
 
