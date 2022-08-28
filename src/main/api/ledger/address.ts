@@ -12,7 +12,7 @@ import {
 import * as E from 'fp-ts/Either'
 
 import { IPCLedgerAdddressParams, LedgerError, LedgerErrorId } from '../../../shared/api/types'
-import { isError } from '../../../shared/utils/guard'
+import { isError, isEthHDMode } from '../../../shared/utils/guard'
 import { WalletAddress } from '../../../shared/wallet/types'
 import { getAddress as getBNBAddress, verifyAddress as verifyBNBAddress } from './binance/address'
 import { getAddress as getBTCAddress, verifyAddress as verifyBTCAddress } from './bitcoin/address'
@@ -27,7 +27,7 @@ export const getAddress = async ({
   chain,
   network,
   walletIndex,
-  ethDerivationMode
+  hdMode
 }: IPCLedgerAdddressParams): Promise<E.Either<LedgerError, WalletAddress>> => {
   try {
     let res: E.Either<LedgerError, WalletAddress>
@@ -52,13 +52,13 @@ export const getAddress = async ({
         res = await getDOGEAddress(transport, network, walletIndex)
         break
       case ETHChain: {
-        if (!ethDerivationMode) {
+        if (!isEthHDMode(hdMode)) {
           res = E.left({
             errorId: LedgerErrorId.INVALID_ETH_DERIVATION_MODE,
-            msg: `'ethDerivationMode' is needed for ETH to get Ledger address`
+            msg: `Invaid 'EthHDMode' - needed for ETH to get Ledger address`
           })
         } else {
-          res = await getETHAddress(transport, walletIndex, ethDerivationMode)
+          res = await getETHAddress({ transport, walletIndex, ethHdMode: hdMode })
         }
         break
       }
@@ -81,7 +81,7 @@ export const getAddress = async ({
   }
 }
 
-export const verifyLedgerAddress = async ({ chain, network, walletIndex }: IPCLedgerAdddressParams) => {
+export const verifyLedgerAddress = async ({ chain, network, walletIndex, hdMode }: IPCLedgerAdddressParams) => {
   const transport = await TransportNodeHidSingleton.open()
   let result = false
   switch (chain) {
@@ -103,9 +103,11 @@ export const verifyLedgerAddress = async ({ chain, network, walletIndex }: IPCLe
     case DOGEChain:
       result = await verifyDOGEAddress({ transport, network, walletIndex })
       break
-    case ETHChain:
-      result = await verifyETHAddress(transport, walletIndex)
+    case ETHChain: {
+      if (!isEthHDMode(hdMode)) throw Error(`Invaid 'EthHDMode' - needed for ETH to verify Ledger address`)
+      result = await verifyETHAddress({ transport, walletIndex, ethHdMode: hdMode })
       break
+    }
     case CosmosChain:
       result = await verifyCOSMOSAddress(transport, walletIndex)
       break

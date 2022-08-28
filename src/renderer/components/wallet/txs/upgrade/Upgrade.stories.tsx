@@ -97,17 +97,18 @@ const Template = ({ txRDStatus, feeRDStatus, balance, hasLedger, walletType, val
 
   return (
     <Component
-      runeAsset={{
+      assetData={{
         asset: AssetRune67C,
+        walletAddress: 'bnb-address',
+        walletType,
+        walletIndex: 0,
+        hdMode: 'default',
         decimal: BNB_DECIMAL
       }}
       runeNativeAddress="rune-native-address"
       runeNativeLedgerAddress={hasLedger ? O.some('rune-native-ledger-address') : O.none}
-      walletAddress="bnb-address"
       addressValidation={(_: string) => validAddress}
-      walletType={walletType}
-      walletIndex={0}
-      targetPoolAddressRD={RD.success({ chain: BNBChain, address: 'bnb-pool-address', router: O.none, halted: false })}
+      targetPoolAddress={{ chain: BNBChain, address: 'bnb-pool-address', router: O.none, halted: false }}
       validatePassword$={mockValidatePassword$}
       fee={feeRD}
       upgrade$={upgrade$}

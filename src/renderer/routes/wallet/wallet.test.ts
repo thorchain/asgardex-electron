@@ -71,97 +71,29 @@ describe('Wallet routes', () => {
 
   describe('asset detail route', () => {
     it('template', () => {
-      expect(assetDetail.template).toEqual('/wallet/assets/detail/:walletType/:walletAddress/:walletIndex/:asset')
+      expect(assetDetail.template).toEqual('/wallet/assets/detail')
     })
-    it('returns path by given asset parameter', () => {
-      expect(
-        assetDetail.path({ walletType: 'keystore', asset: 'BNB.BNB', walletAddress: 'abc123', walletIndex: '0' })
-      ).toEqual('/wallet/assets/detail/keystore/abc123/0/BNB.BNB')
-    })
-    it('redirects to base path if asset is empty', () => {
-      expect(
-        assetDetail.path({ walletType: 'keystore', asset: '', walletAddress: 'abc123', walletIndex: '0' })
-      ).toEqual(assets.path())
-    })
-
-    it('redirects to base path if address is empty', () => {
-      expect(
-        assetDetail.path({ walletType: 'keystore', asset: 'some asset', walletAddress: '', walletIndex: '0' })
-      ).toEqual(assets.path())
+    it('path', () => {
+      expect(assetDetail.path()).toEqual('/wallet/assets/detail')
     })
   })
 
   describe('send route', () => {
     it('template', () => {
-      expect(send.template).toEqual('/wallet/assets/detail/:walletType/:walletAddress/:walletIndex/:asset/send')
+      expect(send.template).toEqual('/wallet/assets/detail/send')
     })
     it('path ', () => {
-      expect(
-        send.path({ asset: 'BNB.BNB', walletAddress: 'bnb123address', walletType: 'keystore', walletIndex: '0' })
-      ).toEqual('/wallet/assets/detail/keystore/bnb123address/0/BNB.BNB/send')
-    })
-    it('redirects to base path if asset is empty', () => {
-      expect(send.path({ asset: '', walletAddress: 'some wallet', walletType: 'keystore', walletIndex: '0' })).toEqual(
-        assets.path()
-      )
-    })
-
-    it('redirects to base path if address is empty', () => {
-      expect(send.path({ asset: 'some asset', walletAddress: '', walletType: 'keystore', walletIndex: '0' })).toEqual(
-        assets.path()
-      )
+      expect(send.path()).toEqual('/wallet/assets/detail/send')
     })
   })
 
   describe('upgrade route', () => {
     it('template', () => {
-      expect(upgradeRune.template).toEqual(
-        '/wallet/assets/detail/:walletType/:walletAddress/:walletIndex/:asset/upgrade'
-      )
+      expect(upgradeRune.template).toEqual('/wallet/assets/detail/upgrade')
     })
-    it('path for BNB.RUNE-67C ', () => {
-      expect(
-        upgradeRune.path({
-          asset: 'BNB.RUNE-67C',
-          walletAddress: 'bnb123address',
-          network: 'testnet',
-          walletType: 'keystore',
-          walletIndex: '0'
-        })
-      ).toEqual('/wallet/assets/detail/keystore/bnb123address/0/BNB.RUNE-67C/upgrade')
-    })
-    it('path for BNB.RUNE-B1A ', () => {
-      expect(
-        upgradeRune.path({
-          asset: 'BNB.RUNE-B1A',
-          walletAddress: 'bnb123address',
-          network: 'mainnet',
-          walletType: 'keystore',
-          walletIndex: '0'
-        })
-      ).toEqual('/wallet/assets/detail/keystore/bnb123address/0/BNB.RUNE-B1A/upgrade')
-    })
-    it('redirects to base path for BNB assets ', () => {
-      expect(
-        upgradeRune.path({
-          asset: 'BNB.BNB',
-          walletAddress: 'walletAddress',
-          network: 'mainnet',
-          walletType: 'keystore',
-          walletIndex: '0'
-        })
-      ).toEqual('/wallet/assets')
-    })
-    it('redirects to base path for empty addresses ', () => {
-      expect(
-        upgradeRune.path({
-          asset: 'BNB.RUNE-67C',
-          walletAddress: '',
-          network: 'testnet',
-          walletType: 'keystore',
-          walletIndex: '0'
-        })
-      ).toEqual('/wallet/assets')
+
+    it('path ', () => {
+      expect(upgradeRune.path()).toEqual('/wallet/assets/detail/upgrade')
     })
   })
 
@@ -176,37 +108,22 @@ describe('Wallet routes', () => {
 
   describe('interact route', () => {
     it('template', () => {
-      expect(interact.template).toEqual('/wallet/assets/interact/:interactType/:walletType/:walletAddress/:walletIndex')
+      expect(interact.template).toEqual('/wallet/assets/interact/:interactType')
     })
     it('bond + keystore', () => {
-      expect(
-        interact.path({ interactType: 'bond', walletType: 'keystore', walletAddress: 'abc123', walletIndex: '0' })
-      ).toEqual('/wallet/assets/interact/bond/keystore/abc123/0')
+      expect(interact.path({ interactType: 'bond' })).toEqual('/wallet/assets/interact/bond')
     })
     it('bond + ledger + index 1', () => {
-      expect(
-        interact.path({ interactType: 'bond', walletType: 'ledger', walletAddress: 'abc123', walletIndex: '1' })
-      ).toEqual('/wallet/assets/interact/bond/ledger/abc123/1')
+      expect(interact.path({ interactType: 'bond' })).toEqual('/wallet/assets/interact/bond')
     })
     it('unbond', () => {
-      expect(
-        interact.path({ interactType: 'unbond', walletType: 'keystore', walletAddress: 'abc123', walletIndex: '0' })
-      ).toEqual('/wallet/assets/interact/unbond/keystore/abc123/0')
+      expect(interact.path({ interactType: 'unbond' })).toEqual('/wallet/assets/interact/unbond')
     })
     it('leave', () => {
-      expect(
-        interact.path({ interactType: 'leave', walletType: 'keystore', walletAddress: 'abc123', walletIndex: '0' })
-      ).toEqual('/wallet/assets/interact/leave/keystore/abc123/0')
+      expect(interact.path({ interactType: 'leave' })).toEqual('/wallet/assets/interact/leave')
     })
     it('custom', () => {
-      expect(
-        interact.path({ interactType: 'custom', walletType: 'keystore', walletAddress: 'abc123', walletIndex: '0' })
-      ).toEqual('/wallet/assets/interact/custom/keystore/abc123/0')
-    })
-    it('redirects for invalid values ', () => {
-      expect(
-        interact.path({ interactType: 'bond', walletAddress: '', walletType: 'ledger', walletIndex: '0' })
-      ).toEqual('/wallet/assets')
+      expect(interact.path({ interactType: 'custom' })).toEqual('/wallet/assets/interact/custom')
     })
   })
 })

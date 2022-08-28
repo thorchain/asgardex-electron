@@ -24,7 +24,7 @@ export const getAddress = async (
         msg: `Getting 'address' from Ledger's Cosmos app failed`
       })
     }
-    return E.right({ address, chain: CosmosChain, type: 'ledger', walletIndex })
+    return E.right({ address, chain: CosmosChain, type: 'ledger', walletIndex, hdMode: 'default' })
   } catch (error) {
     return E.left({
       errorId: LedgerErrorId.GET_ADDRESS_FAILED,

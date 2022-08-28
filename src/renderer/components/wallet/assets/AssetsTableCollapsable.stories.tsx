@@ -1,8 +1,6 @@
 import * as RD from '@devexperts/remote-data-ts'
 import { ComponentMeta } from '@storybook/react'
-import { Address } from '@xchainjs/xchain-client'
 import {
-  Asset,
   AssetBNB,
   AssetBTC,
   AssetLTC,
@@ -26,27 +24,22 @@ import { getMockRDValueFactory, RDStatus } from '../../../../shared/mock/rdBySta
 import { WalletType } from '../../../../shared/wallet/types'
 import { RUNE_PRICE_POOL } from '../../../helpers/poolHelper'
 import { WalletBalances } from '../../../services/clients'
-import { ApiError, ChainBalances, ErrorId } from '../../../services/wallet/types'
+import { ApiError, ChainBalances, ErrorId, SelectedWalletAsset } from '../../../services/wallet/types'
 import { AssetsTableCollapsable } from './index'
 
 const apiError: ApiError = { errorId: ErrorId.GET_BALANCES, msg: 'error message' }
 
-const selectAssetHandler = ({
-  asset,
-  walletType,
-  walletAddress
-}: {
-  asset: Asset
-  walletAddress: Address
-  walletType: WalletType
-}) => console.log('selectAssetHandler params ', assetToString(asset), walletType, walletAddress)
+const selectAssetHandler = ({ asset, walletType, walletAddress }: SelectedWalletAsset) =>
+  console.log('selectAssetHandler params ', assetToString(asset), walletType, walletAddress)
+const upgradeAssetHandler = ({ asset, walletType, walletAddress }: SelectedWalletAsset) =>
+  console.log('upgradeAssetHandler params ', assetToString(asset), walletType, walletAddress)
 
 const balances: Partial<Record<Chain, ChainBalances>> = {
   [BNBChain]: [
     {
       walletType: 'keystore',
       walletAddress: O.some('bnb keystore'),
-      walletIndex: 0,
+
       chain: BNBChain,
       balances: RD.success([
         {
@@ -54,14 +47,16 @@ const balances: Partial<Record<Chain, ChainBalances>> = {
           amount: baseAmount('1000000'),
           asset: AssetBNB,
           walletAddress: 'BNB wallet address',
-          walletIndex: 0
+          walletIndex: 0,
+          hdMode: 'default'
         },
         {
           walletType: 'keystore',
           amount: baseAmount('300000000'),
           asset: AssetRune67C,
           walletAddress: 'BNB wallet address',
-          walletIndex: 0
+          walletIndex: 0,
+          hdMode: 'default'
         }
       ]),
       balancesType: 'all'
@@ -71,7 +66,6 @@ const balances: Partial<Record<Chain, ChainBalances>> = {
     {
       walletType: 'keystore',
       walletAddress: O.some('btc keystore'),
-      walletIndex: 0,
       chain: BTCChain,
       balances: RD.success([
         {
@@ -79,7 +73,8 @@ const balances: Partial<Record<Chain, ChainBalances>> = {
           amount: baseAmount('1000000'),
           asset: AssetBTC,
           walletAddress: 'BNB wallet address',
-          walletIndex: 0
+          walletIndex: 0,
+          hdMode: 'default'
         }
       ]),
       balancesType: 'all'
@@ -89,7 +84,6 @@ const balances: Partial<Record<Chain, ChainBalances>> = {
     {
       walletType: 'keystore',
       walletAddress: O.some('eth keystore'),
-      walletIndex: 0,
       chain: ETHChain,
       balances: RD.success([
         {
@@ -97,7 +91,8 @@ const balances: Partial<Record<Chain, ChainBalances>> = {
           amount: baseAmount('300000000'),
           asset: AssetETH,
           walletAddress: 'ETH wallet address',
-          walletIndex: 0
+          walletIndex: 0,
+          hdMode: 'default'
         }
       ]),
       balancesType: 'all'
@@ -107,7 +102,6 @@ const balances: Partial<Record<Chain, ChainBalances>> = {
     {
       walletType: 'keystore',
       walletAddress: O.some('thor keystore'),
-      walletIndex: 0,
       chain: THORChain,
       balances: RD.success([
         {
@@ -115,7 +109,8 @@ const balances: Partial<Record<Chain, ChainBalances>> = {
           amount: baseAmount('1000000'),
           asset: AssetRuneNative,
           walletAddress: 'BNB wallet address',
-          walletIndex: 0
+          walletIndex: 0,
+          hdMode: 'default'
         }
       ]),
       balancesType: 'all'
@@ -125,7 +120,6 @@ const balances: Partial<Record<Chain, ChainBalances>> = {
     {
       walletType: 'keystore',
       walletAddress: O.some('ltc keystore'),
-      walletIndex: 0,
       chain: LTCChain,
       balances: RD.success([
         {
@@ -133,7 +127,8 @@ const balances: Partial<Record<Chain, ChainBalances>> = {
           amount: baseAmount('1000000'),
           asset: AssetLTC,
           walletAddress: 'LTC wallet address',
-          walletIndex: 0
+          walletIndex: 0,
+          hdMode: 'default'
         }
       ]),
       balancesType: 'all'
@@ -167,6 +162,7 @@ const Template = (args: Partial<Record<Chain, RDStatus>>) => {
   return (
     <AssetsTableCollapsable
       selectAssetHandler={selectAssetHandler}
+      upgradeAssetHandler={upgradeAssetHandler}
       chainBalances={FP.pipe(
         Object.entries(balances),
         A.map(([chain, chainBalances]) =>

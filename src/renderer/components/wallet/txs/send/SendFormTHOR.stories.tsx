@@ -1,6 +1,6 @@
 import { ComponentMeta } from '@storybook/react'
 import { TxHash } from '@xchainjs/xchain-client'
-import { assetAmount, assetToBase, BaseAmount, baseAmount } from '@xchainjs/xchain-util'
+import { assetAmount, AssetRuneNative, assetToBase, BaseAmount, baseAmount } from '@xchainjs/xchain-util'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
 import * as Rx from 'rxjs'
@@ -51,8 +51,7 @@ const Template = ({ txRDStatus, feeRDStatus, balance, validAddress, walletType }
 
   return (
     <Component
-      walletType={walletType}
-      walletIndex={0}
+      asset={{ asset: AssetRuneNative, walletAddress: 'thorxyz', walletType, walletIndex: 0, hdMode: 'default' }}
       transfer$={transfer$}
       balances={[runeBalance]}
       balance={runeBalance}

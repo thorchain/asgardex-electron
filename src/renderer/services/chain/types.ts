@@ -6,7 +6,7 @@ import * as O from 'fp-ts/lib/Option'
 import * as Rx from 'rxjs'
 
 import { Network } from '../../../shared/api/types'
-import { WalletType, WalletAddress } from '../../../shared/wallet/types'
+import { WalletType, WalletAddress, HDMode } from '../../../shared/wallet/types'
 import { LiveData } from '../../helpers/rx/liveData'
 import { AssetWithDecimal } from '../../types/asgardex'
 import { AssetWithAmount } from '../../types/asgardex'
@@ -68,6 +68,7 @@ export type AsymDepositParams = {
   readonly memo: string
   readonly walletIndex: number
   readonly walletType: WalletType
+  readonly hdMode: HDMode
 }
 
 export type SymDepositAmounts = { rune: BaseAmount; asset: BaseAmount }
@@ -79,19 +80,12 @@ export type SymDepositParams = {
   readonly memos: SymDepositMemo
   readonly runeWalletType: WalletType
   readonly runeWalletIndex: number
+  readonly runeHDMode: HDMode
   readonly runeSender: Address
   readonly assetWalletIndex: number
   readonly assetWalletType: WalletType
+  readonly assetHDMode: HDMode
   readonly assetSender: Address
-}
-
-export type SendDepositTxParams = {
-  walletType: WalletType
-  chain: Chain
-  asset: Asset
-  poolAddress: string
-  amount: BaseAmount
-  memo: Memo
 }
 
 export type SendTxParams = {
@@ -106,6 +100,7 @@ export type SendTxParams = {
   feeAsset?: Asset
   gasLimit?: BigNumber
   feeAmount?: BaseAmount
+  hdMode: HDMode
 }
 
 export type SendPoolTxParams = SendTxParams & {
@@ -141,6 +136,7 @@ export type SwapTxParams = {
   readonly walletType: WalletType
   readonly sender: Address
   readonly walletIndex: number
+  readonly hdMode: HDMode
 }
 
 export type SwapStateHandler = (p: SwapTxParams) => SwapState$
@@ -261,6 +257,7 @@ export type SymWithdrawParams = {
   readonly network: Network
   readonly walletType: WalletType
   readonly walletIndex: number
+  readonly hdMode: HDMode
 }
 
 export type SymWithdrawStateHandler = (p: SymWithdrawParams) => WithdrawState$
@@ -272,6 +269,7 @@ export type AsymWithdrawParams = {
   readonly network: Network
   readonly walletType: WalletType
   readonly walletIndex: number
+  readonly hdMode: HDMode
 }
 
 export type AsymWithdrawStateHandler = (p: AsymWithdrawParams) => WithdrawState$
@@ -280,6 +278,7 @@ export type UpgradeRuneParams = {
   readonly walletAddress: string
   readonly walletType: WalletType
   readonly walletIndex: number
+  readonly hdMode: HDMode
   readonly poolAddress: PoolAddress
   readonly asset: Asset
   readonly amount: BaseAmount

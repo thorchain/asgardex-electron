@@ -15,7 +15,7 @@ import * as E from 'fp-ts/Either'
 
 import { IPCLedgerDepositTxParams, IPCLedgerSendTxParams } from '../../../shared/api/io'
 import { LedgerError, LedgerErrorId } from '../../../shared/api/types'
-import { isError } from '../../../shared/utils/guard'
+import { isError, isEthHDMode } from '../../../shared/utils/guard'
 import * as BNB from './binance/transaction'
 import * as BTC from './bitcoin/transaction'
 import * as BCH from './bitcoincash/transaction'
@@ -37,7 +37,8 @@ export const sendTx = async ({
   feeRate,
   feeOption,
   walletIndex,
-  nodeUrl
+  nodeUrl,
+  hdMode
 }: IPCLedgerSendTxParams): Promise<E.Either<LedgerError, TxHash>> => {
   try {
     const transport = await TransportNodeHidSingleton.open()
@@ -123,6 +124,11 @@ export const sendTx = async ({
             errorId: LedgerErrorId.INVALID_DATA,
             msg: `Fee option needs to be set to send Ledger transaction on ${chainToString(chain)}`
           })
+        } else if (!isEthHDMode(hdMode)) {
+          res = E.left({
+            errorId: LedgerErrorId.INVALID_DATA,
+            msg: `Invalid EthHDMode set - needed to send Ledger transaction on ${chainToString(chain)}`
+          })
         } else {
           res = await ETH.send({
             asset,
@@ -132,7 +138,8 @@ export const sendTx = async ({
             amount,
             memo,
             walletIndex,
-            feeOption
+            feeOption,
+            ethHDMode: hdMode
           })
         }
         break
@@ -186,7 +193,8 @@ export const deposit = async ({
   memo,
   walletIndex,
   feeOption,
-  nodeUrl
+  nodeUrl,
+  hdMode
 }: IPCLedgerDepositTxParams): Promise<E.Either<LedgerError, TxHash>> => {
   try {
     const transport = await TransportNodeHidSingleton.open()
@@ -223,6 +231,11 @@ export const deposit = async ({
             errorId: LedgerErrorId.INVALID_DATA,
             msg: `Fee option needs to be defined to send Ledger transaction on ${chainToString(chain)}`
           })
+        } else if (!isEthHDMode(hdMode)) {
+          res = E.left({
+            errorId: LedgerErrorId.INVALID_DATA,
+            msg: `Invalid EthHDMode set - needed to send Ledger transaction on ${chainToString(chain)}`
+          })
         } else {
           res = await ETH.deposit({
             asset,
@@ -233,7 +246,8 @@ export const deposit = async ({
             memo,
             walletIndex,
             recipient,
-            feeOption
+            feeOption,
+            ethHDMode: hdMode
           })
         }
         break

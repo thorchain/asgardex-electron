@@ -18,3 +18,8 @@ export const network = {
     options: ['mainnet', 'stagenet', 'testnet']
   }
 }
+
+export const hdMode = {
+  name: 'HDMode',
+  control: { type: 'select', options: ['default', 'ledgerlive', 'metamask', 'legacy'] }
+}

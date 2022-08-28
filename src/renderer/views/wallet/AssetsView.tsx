@@ -1,17 +1,15 @@
 import React, { useCallback, useMemo } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
-import { Address } from '@xchainjs/xchain-client'
-import { Asset, assetToString } from '@xchainjs/xchain-util'
 import { Row } from 'antd'
 import * as A from 'fp-ts/lib/Array'
 import * as FP from 'fp-ts/lib/function'
+import * as O from 'fp-ts/lib/Option'
 import { useObservableState } from 'observable-hooks'
 import { useIntl } from 'react-intl'
 import { useNavigate } from 'react-router-dom'
 import * as RxOp from 'rxjs/operators'
 
-import { WalletType } from '../../../shared/wallet/types'
 import { RefreshButton } from '../../components/uielements/button'
 import { AssetsNav } from '../../components/wallet/assets'
 import { AssetsTableCollapsable } from '../../components/wallet/assets/AssetsTableCollapsable'
@@ -24,7 +22,7 @@ import { useNetwork } from '../../hooks/useNetwork'
 import { useTotalWalletBalance } from '../../hooks/useWalletBalance'
 import * as walletRoutes from '../../routes/wallet'
 import { INITIAL_BALANCES_STATE, DEFAULT_BALANCES_FILTER } from '../../services/wallet/const'
-import { ChainBalances } from '../../services/wallet/types'
+import { ChainBalances, SelectedWalletAsset } from '../../services/wallet/types'
 
 export const AssetsView: React.FC = (): JSX.Element => {
   const navigate = useNavigate()
@@ -74,26 +72,19 @@ export const AssetsView: React.FC = (): JSX.Element => {
   const selectedPricePool = useObservableState(selectedPricePool$, RUNE_PRICE_POOL)
 
   const selectAssetHandler = useCallback(
-    ({
-      asset,
-      walletAddress,
-      walletType,
-      walletIndex
-    }: {
-      asset: Asset
-      walletAddress: Address
-      walletType: WalletType
-      walletIndex: number
-    }) =>
-      navigate(
-        walletRoutes.assetDetail.path({
-          asset: assetToString(asset),
-          walletAddress,
-          walletType,
-          walletIndex: walletIndex.toString()
-        })
-      ),
-    [navigate]
+    (selectedAsset: SelectedWalletAsset) => {
+      setSelectedAsset(O.some(selectedAsset))
+      navigate(walletRoutes.assetDetail.path())
+    },
+    [navigate, setSelectedAsset]
+  )
+
+  const upgradeAssetHandler = useCallback(
+    (selectedAsset: SelectedWalletAsset) => {
+      setSelectedAsset(O.some(selectedAsset))
+      navigate(walletRoutes.upgradeRune.path())
+    },
+    [navigate, setSelectedAsset]
   )
 
   const poolDetails = RD.toNullable(poolsRD)?.poolDetails ?? []
@@ -124,7 +115,7 @@ export const AssetsView: React.FC = (): JSX.Element => {
         pricePool={selectedPricePool}
         poolDetails={poolDetails}
         selectAssetHandler={selectAssetHandler}
-        setSelectedAsset={setSelectedAsset}
+        upgradeAssetHandler={upgradeAssetHandler}
         mimirHalt={mimirHaltRD}
         network={network}
       />

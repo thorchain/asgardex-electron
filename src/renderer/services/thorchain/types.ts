@@ -9,7 +9,7 @@ import { IntlShape } from 'react-intl'
 import * as Rx from 'rxjs'
 
 import { assetIO } from '../../../shared/api/io'
-import { WalletType } from '../../../shared/wallet/types'
+import { HDMode, WalletType } from '../../../shared/wallet/types'
 import { LiveData } from '../../helpers/rx/liveData'
 import { AssetsWithAmount1e8, AssetWithAmount1e8 } from '../../types/asgardex'
 import { NodeStatusEnum } from '../../types/generated/thornode'
@@ -51,6 +51,7 @@ export type SendTxParams = {
   asset: Asset
   memo?: string
   walletIndex: number
+  hdMode: HDMode
 }
 
 export type TransactionService = {
@@ -58,6 +59,7 @@ export type TransactionService = {
     params: DepositParam & {
       walletType: WalletType
       walletIndex: number /* override walletIndex of DepositParam to avoid 'undefined' */
+      hdMode: HDMode
     }
   ) => TxHashLD
 } & C.TransactionService<SendTxParams>
@@ -65,6 +67,7 @@ export type TransactionService = {
 export type InteractParams = {
   readonly walletType: WalletType
   readonly walletIndex: number
+  readonly hdMode: HDMode
   readonly amount: BaseAmount
   readonly memo: string
 }

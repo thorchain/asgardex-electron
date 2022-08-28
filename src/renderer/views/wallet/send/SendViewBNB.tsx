@@ -1,13 +1,11 @@
 import React, { useMemo } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
-import { Address } from '@xchainjs/xchain-client'
-import { Asset, BNBChain } from '@xchainjs/xchain-util'
+import { BNBChain } from '@xchainjs/xchain-util'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
 import { useObservableState } from 'observable-hooks'
 
-import { WalletType } from '../../../../shared/wallet/types'
 import { LoadingView } from '../../../components/shared/loading'
 import { SendFormBNB } from '../../../components/wallet/txs/send'
 import { useBinanceContext } from '../../../contexts/BinanceContext'
@@ -21,16 +19,14 @@ import { useValidateAddress } from '../../../hooks/useValidateAddress'
 import { FeeRD } from '../../../services/chain/types'
 import { WalletBalances } from '../../../services/clients'
 import { DEFAULT_BALANCES_FILTER, INITIAL_BALANCES_STATE } from '../../../services/wallet/const'
+import { SelectedWalletAsset } from '../../../services/wallet/types'
 
 type Props = {
-  walletType: WalletType
-  walletAddress: Address
-  walletIndex: number
-  asset: Asset
+  asset: SelectedWalletAsset
 }
 
 export const SendViewBNB: React.FC<Props> = (props): JSX.Element => {
-  const { walletAddress, asset, walletType, walletIndex } = props
+  const { asset } = props
 
   const { network } = useNetwork()
 
@@ -50,9 +46,11 @@ export const SendViewBNB: React.FC<Props> = (props): JSX.Element => {
     () =>
       FP.pipe(
         oBalances,
-        O.chain((balances) => getWalletBalanceByAddressAndAsset({ balances, address: walletAddress, asset }))
+        O.chain((balances) =>
+          getWalletBalanceByAddressAndAsset({ balances, address: asset.walletAddress, asset: asset.asset })
+        )
       ),
-    [asset, oBalances, walletAddress]
+    [asset, oBalances]
   )
 
   const { transfer$ } = useChainContext()
@@ -76,9 +74,7 @@ export const SendViewBNB: React.FC<Props> = (props): JSX.Element => {
       () => <LoadingView size="large" />,
       (walletBalance) => (
         <SendFormBNB
-          walletType={walletType}
-          walletIndex={walletIndex}
-          walletAddress={walletAddress}
+          asset={asset}
           balances={FP.pipe(
             oBalances,
             O.getOrElse<WalletBalances>(() => [])

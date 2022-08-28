@@ -5,7 +5,7 @@ import { BaseAmount } from '@xchainjs/xchain-util'
 import * as Rx from 'rxjs'
 
 import { LedgerBTCTxInfo, Network } from '../../../shared/api/types'
-import { WalletType } from '../../../shared/wallet/types'
+import { HDMode, WalletType } from '../../../shared/wallet/types'
 import { LiveData } from '../../helpers/rx/liveData'
 import { Memo } from '../chain/types'
 import * as C from '../clients'
@@ -30,6 +30,7 @@ export type SendTxParams = {
   feeRate: number
   memo?: string
   walletIndex: number
+  hdMode: HDMode
 }
 
 export type TransactionService = C.TransactionService<SendTxParams>

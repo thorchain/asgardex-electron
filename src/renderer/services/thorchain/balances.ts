@@ -1,6 +1,6 @@
 import { AssetRuneNative } from '@xchainjs/xchain-util'
 
-import { WalletType } from '../../../shared/wallet/types'
+import { HDMode, WalletType } from '../../../shared/wallet/types'
 import { observableState } from '../../helpers/stateHelper'
 import * as C from '../clients'
 import { client$ } from './common'
@@ -22,12 +22,21 @@ const reloadBalances = () => {
 
 // State of balances loaded by Client
 // TODO (@veado) Remove `assets` list to enable synths - currently we support `AssetRuneNative` only
-const balances$ = (walletType: WalletType, walletIndex: number): C.WalletBalancesLD =>
+const balances$ = ({
+  walletType,
+  walletIndex,
+  hdMode
+}: {
+  walletType: WalletType
+  walletIndex: number
+  hdMode: HDMode
+}): C.WalletBalancesLD =>
   C.balances$({
     client$,
     trigger$: reloadBalances$,
     walletType,
     walletIndex,
+    hdMode,
     assets: [AssetRuneNative],
     walletBalanceType: 'all'
   })

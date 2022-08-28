@@ -1,13 +1,4 @@
-import { Address } from '@xchainjs/xchain-client'
-import { assetFromString, assetToString } from '@xchainjs/xchain-util'
-import * as FP from 'fp-ts/lib/function'
-import * as O from 'fp-ts/lib/Option'
-
-import { Network } from '../../../shared/api/types'
-import { WalletType } from '../../../shared/wallet/types'
 import { InteractType } from '../../components/wallet/txs/interact/Interact.types'
-import { isNonNativeRuneAsset } from '../../helpers/assetHelper'
-import { sequenceTOption } from '../../helpers/fpHelpers'
 import { Route } from '../types'
 
 export * as imports from './imports'
@@ -55,19 +46,11 @@ export const poolShares: Route<void> = {
 
 export type InteractParams = {
   interactType: InteractType
-  walletAddress: string
-  walletType: WalletType
-  walletIndex: string
 }
 export const interact: Route<InteractParams> = {
-  template: `${assets.template}/interact/:interactType/:walletType/:walletAddress/:walletIndex`,
-  path({ interactType, walletType, walletAddress, walletIndex }) {
-    if (walletAddress) {
-      return `${assets.template}/interact/${interactType}/${walletType}/${walletAddress}/${walletIndex}`
-    } else {
-      // Redirect to assets route if passed param are invalid
-      return assets.path()
-    }
+  template: `${assets.template}/interact/:interactType`,
+  path({ interactType }) {
+    return `${assets.template}/interact/${interactType}`
   }
 }
 
@@ -78,62 +61,24 @@ export const bonds: Route<void> = {
   }
 }
 
-export type AssetDetailsParams = { asset: string; walletAddress: Address; walletType: WalletType; walletIndex: string }
-export const assetDetail: Route<AssetDetailsParams> = {
-  template: `${assets.template}/detail/:walletType/:walletAddress/:walletIndex/:asset`,
-  path: ({ walletType, asset, walletAddress, walletIndex }) => {
-    if (asset && !!walletAddress) {
-      return `${assets.template}/detail/${walletType}/${walletAddress}/${walletIndex}/${asset}`
-    } else {
-      // Redirect to assets route if passed param is empty
-      return assets.path()
-    }
+export const assetDetail: Route<void> = {
+  template: `${assets.template}/detail`,
+  path() {
+    return this.template
   }
 }
 
-export type SendParams = { asset: string; walletAddress: Address; walletType: WalletType; walletIndex: string }
-export const send: Route<SendParams> = {
+export const send: Route<void> = {
   template: `${assetDetail.template}/send`,
-  path: ({ asset, walletAddress, walletType, walletIndex }) => {
-    if (asset && !!walletAddress) {
-      return `${assetDetail.path({ walletType, asset, walletAddress, walletIndex })}/send`
-    } else {
-      // Redirect to assets route if passed params are empty
-      return assets.path()
-    }
+  path() {
+    return this.template
   }
 }
 
-export type AssetUpgradeDetailsParams = {
-  asset: string
-  walletAddress: string
-  network: Network
-  walletType: WalletType
-  walletIndex: string
-}
-export const upgradeRune: Route<AssetUpgradeDetailsParams> = {
+export const upgradeRune: Route<void> = {
   template: `${assetDetail.template}/upgrade`,
-  path: ({ asset: assetString, walletAddress, network, walletType, walletIndex }) => {
-    // Validate asset string to accept BNB.Rune only
-    const oAsset = FP.pipe(
-      assetFromString(assetString),
-      O.fromNullable,
-      O.filter((asset) => isNonNativeRuneAsset(asset, network))
-    )
-    // Simple validation of address
-    const oWalletAddress = FP.pipe(
-      walletAddress,
-      O.fromPredicate((s: string) => s.length > 0)
-    )
-    return FP.pipe(
-      sequenceTOption(oAsset, oWalletAddress, O.some(walletIndex)),
-      O.fold(
-        // Redirect to assets route if passed params are empty
-        () => assets.path(),
-        ([asset, walletAddress, walletIndex]) =>
-          `${assetDetail.path({ walletType, asset: assetToString(asset), walletAddress, walletIndex })}/upgrade`
-      )
-    )
+  path() {
+    return this.template
   }
 }
 

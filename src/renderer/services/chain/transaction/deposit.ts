@@ -44,7 +44,8 @@ export const asymDeposit$ = ({
   amount,
   memo,
   walletType,
-  walletIndex
+  walletIndex,
+  hdMode
 }: AsymDepositParams): AsymDepositState$ => {
   // total of progress
   const total = O.some(100)
@@ -80,6 +81,7 @@ export const asymDeposit$ = ({
       return sendPoolTx$({
         walletType,
         walletIndex,
+        hdMode,
         router: poolAddress.router,
         asset,
         recipient: poolAddress.address,
@@ -171,9 +173,11 @@ export const symDeposit$ = ({
   memos,
   runeWalletType,
   runeWalletIndex,
+  runeHDMode,
   runeSender,
   assetWalletType,
   assetWalletIndex,
+  assetHDMode,
   assetSender
 }: SymDepositParams): SymDepositState$ => {
   // total of progress
@@ -208,6 +212,7 @@ export const symDeposit$ = ({
         sender: assetSender,
         walletType: assetWalletType,
         walletIndex: assetWalletIndex,
+        hdMode: assetHDMode,
         router: poolAddresses.router,
         asset,
         recipient: poolAddresses.address,
@@ -235,6 +240,7 @@ export const symDeposit$ = ({
         sender: runeSender,
         walletType: runeWalletType,
         walletIndex: runeWalletIndex,
+        hdMode: runeHDMode,
         router: O.none, // no router for RUNE
         asset: AssetRuneNative,
         recipient: '', // no recipient for RUNE needed

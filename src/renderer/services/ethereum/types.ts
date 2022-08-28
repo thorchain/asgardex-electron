@@ -6,7 +6,7 @@ import { ethers } from 'ethers'
 import * as O from 'fp-ts/lib/Option'
 
 import { Network } from '../../../shared/api/types'
-import { WalletType } from '../../../shared/wallet/types'
+import { HDMode, WalletType } from '../../../shared/wallet/types'
 import { LiveData } from '../../helpers/rx/liveData'
 import { FeeLD, FeesLD, Memo } from '../chain/types'
 import * as C from '../clients'
@@ -33,6 +33,7 @@ export type SendTxParams = {
   memo: Memo
   feeOption: FeeOption
   walletIndex: number
+  hdMode: HDMode
   walletType: WalletType
 }
 
@@ -51,6 +52,7 @@ export type ApproveParams = {
   contractAddress: Address
   spenderAddress: Address
   fromAddress: Address // needed for estimating fees
+  hdMode: HDMode
 }
 
 export type IsApproveParams = { contractAddress: Address; spenderAddress: Address; fromAddress: Address }

@@ -73,9 +73,7 @@ const Template = ({ txRDStatus, feeRDStatus, balance, validAddress, walletType }
 
   return (
     <Component
-      walletType={walletType}
-      walletIndex={0}
-      walletAddress={'doge-address'}
+      asset={{ asset: AssetDOGE, walletAddress: 'doge-address', walletType, walletIndex: 0, hdMode: 'default' }}
       transfer$={transfer$}
       balances={[dogeBalance, runeBalance]}
       balance={dogeBalance}

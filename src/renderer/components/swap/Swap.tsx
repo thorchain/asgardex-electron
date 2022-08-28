@@ -485,7 +485,7 @@ export const Swap = ({
     () =>
       FP.pipe(
         sequenceTOption(assetsToSwap, oPoolAddress, oTargetAddress, oSourceAssetWB),
-        O.map(([{ source, target }, poolAddress, address, { walletType, walletAddress, walletIndex }]) => {
+        O.map(([{ source, target }, poolAddress, address, { walletType, walletAddress, walletIndex, hdMode }]) => {
           const memo = getSwapMemo({
             asset: target,
             address,
@@ -499,7 +499,8 @@ export const Swap = ({
             memo,
             walletType,
             sender: walletAddress,
-            walletIndex
+            walletIndex,
+            hdMode
           }
         })
       ),
@@ -534,12 +535,13 @@ export const Swap = ({
 
     return FP.pipe(
       sequenceTOption(oNeedApprovement, oTokenAddress, oRouterAddress, oSourceAssetWB),
-      O.map(([_, tokenAddress, routerAddress, { walletAddress, walletIndex, walletType }]) => ({
+      O.map(([_, tokenAddress, routerAddress, { walletAddress, walletIndex, walletType, hdMode }]) => ({
         network,
         spenderAddress: routerAddress,
         contractAddress: tokenAddress,
         fromAddress: walletAddress,
         walletIndex,
+        hdMode,
         walletType
       }))
     )
@@ -837,7 +839,7 @@ export const Swap = ({
   const submitApproveTx = useCallback(() => {
     FP.pipe(
       oApproveParams,
-      O.map(({ walletIndex, walletType, contractAddress, spenderAddress, fromAddress }) =>
+      O.map(({ walletIndex, walletType, hdMode, contractAddress, spenderAddress, fromAddress }) =>
         subscribeApproveState(
           approveERC20Token$({
             network,
@@ -845,6 +847,7 @@ export const Swap = ({
             spenderAddress,
             fromAddress,
             walletIndex,
+            hdMode,
             walletType
           })
         )

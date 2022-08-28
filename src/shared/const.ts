@@ -33,13 +33,13 @@ const POOLS_STORAGE_DEFAULT: PoolsStorageEncoded = {
 }
 
 // increase it by `1` if you want to ignore previous version of `common` storage
-const COMMON_STORAGE_VERSION = '1'
+const COMMON_STORAGE_VERSION = '2'
 /**
  * When adding a new store file do not forget to expose
  * public api for it at src/main/preload.ts
  */
 export const DEFAULT_STORAGES: StoreFilesContent = {
-  common: { version: COMMON_STORAGE_VERSION, locale: DEFAULT_LOCALE, ethDerivationMode: 'ledgerlive' },
+  common: { version: COMMON_STORAGE_VERSION, locale: DEFAULT_LOCALE },
   userNodes: USER_NODES_STORAGE_DEFAULT,
   pools: POOLS_STORAGE_DEFAULT
 }

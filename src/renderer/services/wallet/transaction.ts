@@ -55,7 +55,7 @@ export const getTxs$: (walletAddress: O.Option<string>, walletIndex: number) => 
         oAsset,
         O.fold(
           () => Rx.of(RD.initial),
-          (asset) => {
+          ({ asset }) => {
             switch (asset.chain) {
               case BNBChain:
                 return BNB.txs$({ asset: O.some(asset), limit, offset, walletAddress, walletIndex })

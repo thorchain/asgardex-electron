@@ -6,15 +6,14 @@ import { Chain } from '@xchainjs/xchain-util'
 import * as E from 'fp-ts/lib/Either'
 import * as O from 'fp-ts/Option'
 
-import { EthDerivationMode } from '../ethereum/types'
 import { Locale } from '../i18n/types'
-import { WalletAddress } from '../wallet/types'
+import { HDMode, WalletAddress } from '../wallet/types'
 import { IPCLedgerAddressesIO, KeystoreWallets, PoolsStorageEncoded } from './io'
 
 // A version number starting from `1` to avoid to load deprecated files
 export type StorageVersion = { version: string }
 export type UserNodesStorage = Readonly<Record<Network, Address[]> & StorageVersion>
-export type CommonStorage = Readonly<{ locale: Locale; ethDerivationMode: EthDerivationMode } & StorageVersion>
+export type CommonStorage = Readonly<{ locale: Locale } & StorageVersion>
 
 /**
  * Hash map of common store files
@@ -124,7 +123,7 @@ export type IPCLedgerAdddressParams = {
   chain: Chain
   network: Network
   walletIndex: number
-  ethDerivationMode: EthDerivationMode | undefined
+  hdMode: HDMode
 }
 
 export type ApiHDWallet = {

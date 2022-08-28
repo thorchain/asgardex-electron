@@ -47,11 +47,12 @@ export const sendTx$ = ({
   amount,
   memo,
   feeOption = DEFAULT_FEE_OPTION,
-  walletIndex
+  walletIndex,
+  hdMode
 }: SendTxParams): TxHashLD => {
   switch (asset.chain) {
     case BNBChain:
-      return BNB.sendTx({ walletType, sender, recipient, amount, asset, memo, walletIndex })
+      return BNB.sendTx({ walletType, sender, recipient, amount, asset, memo, walletIndex, hdMode })
 
     case BTCChain:
       return FP.pipe(
@@ -61,15 +62,15 @@ export const sendTx$ = ({
           msg: error?.message ?? error.toString()
         })),
         liveData.chain(({ rates }) =>
-          BTC.sendTx({ walletType, recipient, amount, feeRate: rates[feeOption], memo, walletIndex, sender })
+          BTC.sendTx({ walletType, recipient, amount, feeRate: rates[feeOption], memo, walletIndex, hdMode, sender })
         )
       )
 
     case ETHChain:
-      return ETH.sendTx({ walletType, asset, recipient, amount, memo, feeOption, walletIndex })
+      return ETH.sendTx({ walletType, asset, recipient, amount, memo, feeOption, walletIndex, hdMode })
 
     case THORChain:
-      return THOR.sendTx({ walletType, amount, asset, memo, recipient, walletIndex })
+      return THOR.sendTx({ walletType, amount, asset, memo, recipient, walletIndex, hdMode })
 
     case CosmosChain:
       return FP.pipe(
@@ -81,7 +82,17 @@ export const sendTx$ = ({
         liveData.chain((fees) =>
           // fees for COSMOS are FLAT fees for now - different `feeOption` based still on same fee amount
           // If needed, we can change it later to have fee options (similar to Keplr wallet - search for `gasPriceStep` there)
-          COSMOS.sendTx({ walletType, sender, recipient, amount, asset, memo, walletIndex, feeAmount: fees[feeOption] })
+          COSMOS.sendTx({
+            walletType,
+            sender,
+            recipient,
+            amount,
+            asset,
+            memo,
+            walletIndex,
+            hdMode,
+            feeAmount: fees[feeOption]
+          })
         )
       )
 
@@ -101,7 +112,7 @@ export const sendTx$ = ({
           msg: error?.message ?? error.toString()
         })),
         liveData.chain(({ rates }) =>
-          DOGE.sendTx({ walletType, recipient, amount, feeRate: rates[feeOption], memo, walletIndex, sender })
+          DOGE.sendTx({ walletType, recipient, amount, feeRate: rates[feeOption], memo, walletIndex, hdMode, sender })
         )
       )
 
@@ -113,7 +124,7 @@ export const sendTx$ = ({
           msg: error?.message ?? error.toString()
         })),
         liveData.chain(({ rates }) =>
-          BCH.sendTx({ walletType, recipient, amount, feeRate: rates[feeOption], memo, walletIndex, sender })
+          BCH.sendTx({ walletType, recipient, amount, feeRate: rates[feeOption], memo, walletIndex, hdMode, sender })
         )
       )
     case LTCChain:
@@ -124,7 +135,16 @@ export const sendTx$ = ({
           msg: error?.message ?? error.toString()
         })),
         liveData.chain(({ rates }) => {
-          return LTC.sendTx({ walletType, recipient, amount, feeRate: rates[feeOption], memo, walletIndex, sender })
+          return LTC.sendTx({
+            walletType,
+            recipient,
+            amount,
+            feeRate: rates[feeOption],
+            memo,
+            walletIndex,
+            hdMode,
+            sender
+          })
         })
       )
   }
@@ -134,6 +154,7 @@ export const sendPoolTx$ = ({
   sender,
   walletType,
   walletIndex,
+  hdMode,
   router,
   asset,
   recipient,
@@ -151,14 +172,15 @@ export const sendPoolTx$ = ({
         amount,
         memo,
         walletIndex,
+        hdMode,
         feeOption
       })
 
     case THORChain:
-      return THOR.sendPoolTx$({ walletType, amount, asset, memo, walletIndex })
+      return THOR.sendPoolTx$({ walletType, amount, asset, memo, walletIndex, hdMode })
 
     default:
-      return sendTx$({ sender, walletType, asset, recipient, amount, memo, feeOption, walletIndex })
+      return sendTx$({ sender, walletType, asset, recipient, amount, memo, feeOption, walletIndex, hdMode })
   }
 }
 

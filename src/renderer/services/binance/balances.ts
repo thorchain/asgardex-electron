@@ -2,7 +2,7 @@ import * as A from 'fp-ts/lib/Array'
 import * as FP from 'fp-ts/lib/function'
 
 import { Network } from '../../../shared/api/types'
-import { WalletType } from '../../../shared/wallet/types'
+import { HDMode, WalletType } from '../../../shared/wallet/types'
 import { assetInBinanceBlacklist } from '../../helpers/assetHelper'
 import { liveData } from '../../helpers/rx/liveData'
 import { observableState } from '../../helpers/stateHelper'
@@ -25,13 +25,14 @@ const reloadBalances = () => {
 }
 
 // State of balances loaded by Client
-const balances$: (walletType: WalletType, network: Network, walletIndex: number) => C.WalletBalancesLD = (
-  walletType,
-  network,
-  walletIndex
-) =>
+const balances$: (
+  walletType: WalletType,
+  network: Network,
+  walletIndex: number,
+  hdMode: HDMode
+) => C.WalletBalancesLD = (walletType, network, walletIndex, hdMode) =>
   FP.pipe(
-    C.balances$({ client$, trigger$: reloadBalances$, walletType, walletIndex, walletBalanceType: 'all' }),
+    C.balances$({ client$, trigger$: reloadBalances$, walletType, walletIndex, hdMode, walletBalanceType: 'all' }),
     // Filter out black listed assets
     liveData.map(FP.flow(A.filter(({ asset }) => !assetInBinanceBlacklist(network, asset))))
   )

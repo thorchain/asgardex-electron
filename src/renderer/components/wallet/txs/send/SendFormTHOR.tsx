@@ -29,7 +29,7 @@ import { useSubscriptionState } from '../../../../hooks/useSubscriptionState'
 import { INITIAL_SEND_STATE } from '../../../../services/chain/const'
 import { FeeRD, SendTxState, SendTxStateHandler } from '../../../../services/chain/types'
 import { AddressValidation, GetExplorerTxUrl, OpenExplorerTxUrl, WalletBalances } from '../../../../services/clients'
-import { ValidatePasswordHandler } from '../../../../services/wallet/types'
+import { SelectedWalletAsset, ValidatePasswordHandler } from '../../../../services/wallet/types'
 import { WalletBalance } from '../../../../services/wallet/types'
 import { LedgerConfirmationModal, WalletPasswordConfirmationModal } from '../../../modal/confirmation'
 import { MaxBalanceButton } from '../../../uielements/button/MaxBalanceButton'
@@ -48,8 +48,7 @@ export type FormValues = {
 }
 
 export type Props = {
-  walletType: WalletType
-  walletIndex: number
+  asset: SelectedWalletAsset
   balances: WalletBalances
   balance: WalletBalance
   transfer$: SendTxStateHandler
@@ -64,8 +63,8 @@ export type Props = {
 
 export const SendFormTHOR: React.FC<Props> = (props): JSX.Element => {
   const {
-    walletType,
-    walletIndex,
+    asset: { walletType, walletIndex, hdMode },
+
     balances,
     balance,
     transfer$,
@@ -199,10 +198,11 @@ export const SendFormTHOR: React.FC<Props> = (props): JSX.Element => {
         recipient: form.getFieldValue('recipient'),
         asset,
         amount: amountToSend,
-        memo: form.getFieldValue('memo')
+        memo: form.getFieldValue('memo'),
+        hdMode
       })
     )
-  }, [subscribeSendTxState, transfer$, walletType, walletIndex, form, asset, amountToSend])
+  }, [subscribeSendTxState, transfer$, walletType, walletIndex, hdMode, form, asset, amountToSend])
 
   const [showConfirmationModal, setShowConfirmationModal] = useState(false)
 

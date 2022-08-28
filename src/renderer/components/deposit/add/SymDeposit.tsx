@@ -406,13 +406,14 @@ export const SymDeposit: React.FC<Props> = (props) => {
 
     return FP.pipe(
       sequenceTOption(oNeedApprovement, oTokenAddress, oRouterAddress, oAssetWB),
-      O.map(([_, tokenAddress, routerAddress, { walletAddress, walletIndex, walletType }]) => ({
+      O.map(([_, tokenAddress, routerAddress, { walletAddress, walletIndex, walletType, hdMode }]) => ({
         network,
         spenderAddress: routerAddress,
         contractAddress: tokenAddress,
         fromAddress: walletAddress,
         walletIndex,
-        walletType
+        walletType,
+        hdMode
       }))
     )
   }, [oPoolAddress, asset, needApprovement, oAssetWB, network])
@@ -478,9 +479,11 @@ export const SymDeposit: React.FC<Props> = (props) => {
             },
             runeWalletType: runeWB.walletType,
             runeWalletIndex: runeWB.walletIndex,
+            runeHDMode: runeWB.hdMode,
             runeSender: runeAddress,
             assetWalletType: assetWB.walletType,
             assetWalletIndex: assetWB.walletIndex,
+            assetHDMode: assetWB.hdMode,
             assetSender: assetAddress
           }
         })
@@ -1085,7 +1088,7 @@ export const SymDeposit: React.FC<Props> = (props) => {
   const submitApproveTx = useCallback(() => {
     FP.pipe(
       oApproveParams,
-      O.map(({ walletIndex, walletType, contractAddress, spenderAddress, fromAddress }) =>
+      O.map(({ walletIndex, walletType, contractAddress, spenderAddress, fromAddress, hdMode }) =>
         subscribeApproveState(
           approveERC20Token$({
             network,
@@ -1093,7 +1096,8 @@ export const SymDeposit: React.FC<Props> = (props) => {
             spenderAddress,
             fromAddress,
             walletIndex,
-            walletType
+            walletType,
+            hdMode
           })
         )
       )

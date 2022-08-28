@@ -6,7 +6,7 @@ import * as O from 'fp-ts/lib/Option'
 import * as Rx from 'rxjs'
 
 import { LedgerBNBTxParams, Network } from '../../../shared/api/types'
-import { WalletType } from '../../../shared/wallet/types'
+import { HDMode, WalletType } from '../../../shared/wallet/types'
 import { LiveData } from '../../helpers/rx/liveData'
 import * as C from '../clients'
 import { ApiError, LedgerTxHashLD } from '../wallet/types'
@@ -55,6 +55,7 @@ export type SendTxParams = {
   asset: Asset
   memo?: string
   walletIndex: number
+  hdMode: HDMode
 }
 
 export type TransactionService = C.TransactionService<SendTxParams>

@@ -96,7 +96,8 @@ describe('shared/io', () => {
         feeRate: 1,
         feeOption: FeeOption.Fast,
         feeAmount: baseAmount(1, 6),
-        nodeUrl: 'node-url'
+        nodeUrl: 'node-url',
+        hdMode: 'default'
       })
       expect(encoded).toEqual({
         chain: 'BNB',
@@ -111,7 +112,8 @@ describe('shared/io', () => {
         feeRate: 1,
         feeOption: 'fast',
         feeAmount: { amount: '1', decimal: 6 },
-        nodeUrl: 'node-url'
+        nodeUrl: 'node-url',
+        hdMode: 'default'
       })
     })
 
@@ -129,7 +131,8 @@ describe('shared/io', () => {
         feeRate: 1,
         feeOption: undefined,
         feeAmount: undefined,
-        nodeUrl: undefined
+        nodeUrl: undefined,
+        hdMode: 'default'
       })
 
       expect(encoded).toEqual({
@@ -145,7 +148,8 @@ describe('shared/io', () => {
         feeRate: 1,
         feeOption: undefined,
         feeAmount: undefined,
-        nodeUrl: undefined
+        nodeUrl: undefined,
+        hdMode: 'default'
       })
     })
 
@@ -160,7 +164,8 @@ describe('shared/io', () => {
         memo: 'memo-abc',
         walletIndex: 0,
         feeRate: 1,
-        feeAmount: { amount: '1', decimal: 6 }
+        feeAmount: { amount: '1', decimal: 6 },
+        hdMode: 'default'
       }
       const decoded = ipcLedgerSendTxParamsIO.decode(encoded)
       expect(E.isRight(decoded)).toBeTruthy()
@@ -194,7 +199,8 @@ describe('shared/io', () => {
         memo: 'memo-abc',
         walletIndex: 0,
         feeRate: 1,
-        feeAmount: undefined
+        feeAmount: undefined,
+        hdMode: 'default'
       }
       const decoded = ipcLedgerSendTxParamsIO.decode(encoded)
       expect(E.isRight(decoded)).toBeTruthy()
@@ -308,7 +314,7 @@ describe('ipcKeystorLedgerAddressesIO', () => {
       network: 'mainnet',
       address: 'eth-address',
       walletIndex: 1,
-      ethDerivationMode: 'metamask'
+      hdMode: 'metamask'
     },
     {
       keystoreId: 1,
@@ -316,7 +322,7 @@ describe('ipcKeystorLedgerAddressesIO', () => {
       network: 'stagenet',
       address: 'nbn-address',
       walletIndex: 2,
-      ethDerivationMode: undefined
+      hdMode: 'default'
     }
   ]
 

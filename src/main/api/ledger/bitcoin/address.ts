@@ -22,7 +22,7 @@ export const getAddress = async (
     const { bitcoinAddress } = await app.getWalletPublicKey(derivePath, {
       format: 'bech32' // bech32 format with 84' paths
     })
-    return E.right({ address: bitcoinAddress, chain: BTCChain, type: 'ledger', walletIndex })
+    return E.right({ address: bitcoinAddress, chain: BTCChain, type: 'ledger', walletIndex, hdMode: 'default' })
   } catch (error) {
     return E.left({
       errorId: LedgerErrorId.GET_ADDRESS_FAILED,

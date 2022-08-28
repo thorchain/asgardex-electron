@@ -6,73 +6,46 @@ import * as FP from 'fp-ts/function'
 import * as O from 'fp-ts/lib/Option'
 import * as NEA from 'fp-ts/NonEmptyArray'
 import { useObservableState } from 'observable-hooks'
-import { useIntl } from 'react-intl'
-import { useParams } from 'react-router-dom'
 import * as Rx from 'rxjs'
+import * as RxOp from 'rxjs/operators'
 
-import { ErrorView } from '../../components/shared/error'
-import { BackLink } from '../../components/uielements/backLink'
+import { LoadingView } from '../../components/shared/loading'
 import { AssetDetails } from '../../components/wallet/assets'
 import { useChainContext } from '../../contexts/ChainContext'
 import { useWalletContext } from '../../contexts/WalletContext'
-import { disableRuneUpgrade, getAssetFromNullableString, isRuneNativeAsset } from '../../helpers/assetHelper'
+import { disableRuneUpgrade, isRuneNativeAsset } from '../../helpers/assetHelper'
+import { eqOSelectedWalletAsset } from '../../helpers/fp/eq'
 import { sequenceTOption } from '../../helpers/fpHelpers'
-import {
-  getWalletAddressFromNullableString,
-  getWalletIndexFromNullableString,
-  getWalletTypeFromNullableString
-} from '../../helpers/walletHelper'
 import { useMimirHalt } from '../../hooks/useMimirHalt'
 import { useNetwork } from '../../hooks/useNetwork'
 import { useOpenExplorerTxUrl } from '../../hooks/useOpenExplorerTxUrl'
-import { AssetDetailsParams } from '../../routes/wallet'
+import { TxsPageRD } from '../../services/clients'
 import { DEFAULT_BALANCES_FILTER, INITIAL_BALANCES_STATE } from '../../services/wallet/const'
-import { ErrorId } from '../../services/wallet/types'
+import { SelectedWalletAsset } from '../../services/wallet/types'
 
 export const AssetDetailsView: React.FC = (): JSX.Element => {
-  const intl = useIntl()
-
-  const {
-    asset: routeAsset,
-    walletAddress: routeWalletAddress,
-    walletIndex: routeWalletIndex,
-    walletType: routeWalletType
-  } = useParams<AssetDetailsParams>()
-
-  const oAsset = getAssetFromNullableString(routeAsset)
-  const oWalletAddress = getWalletAddressFromNullableString(routeWalletAddress)
-  const oWalletIndex = getWalletIndexFromNullableString(routeWalletIndex)
-  const oWalletType = getWalletTypeFromNullableString(routeWalletType)
-
   const { clientByChain$ } = useChainContext()
 
   const {
     mimirHalt: { haltThorChain, haltEthChain, haltBnbChain }
   } = useMimirHalt()
 
-  const { getTxs$, balancesState$, loadTxs, reloadBalancesByChain, setSelectedAsset, resetTxsPage } = useWalletContext()
+  const { getTxs$, balancesState$, loadTxs, reloadBalancesByChain, selectedAsset$, resetTxsPage } = useWalletContext()
 
-  const [txsRD] = useObservableState(
-    () =>
+  const oSelectedAsset = useObservableState(selectedAsset$, O.none)
+
+  const [txsRD, updateTxsRD] = useObservableState<TxsPageRD, O.Option<SelectedWalletAsset>>(
+    (selectedAssetUpdated$) =>
       FP.pipe(
-        oWalletIndex,
-        O.fold(
-          () =>
-            Rx.of(
-              RD.failure({
-                errorId: ErrorId.GET_ASSET_TXS,
-                msg: intl.formatMessage(
-                  { id: 'routes.invalid.params' },
-                  {
-                    params: `walletIndex: ${routeWalletIndex}`
-                  }
-                )
-              })
-            ),
-          (walletIndex) => getTxs$(oWalletAddress, walletIndex)
+        selectedAssetUpdated$,
+        RxOp.distinctUntilChanged(eqOSelectedWalletAsset.equals),
+        RxOp.switchMap(
+          O.fold(
+            () => Rx.of(RD.pending),
+            ({ walletIndex, walletAddress }) => getTxs$(O.some(walletAddress), walletIndex)
+          )
         )
       ),
-
     RD.initial
   )
 
@@ -80,13 +53,6 @@ export const AssetDetailsView: React.FC = (): JSX.Element => {
     () => balancesState$(DEFAULT_BALANCES_FILTER),
     INITIAL_BALANCES_STATE
   )
-
-  // Set selected asset once
-  // Needed to get all data for this asset (transactions etc.)
-  useEffect(() => {
-    setSelectedAsset(oAsset)
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
 
   useEffect(() => {
     return () => resetTxsPage()
@@ -102,95 +68,82 @@ export const AssetDetailsView: React.FC = (): JSX.Element => {
   const walletBalances = useMemo(
     () =>
       FP.pipe(
-        sequenceTOption(oBalances, oWalletAddress),
-        O.map(([balances, walletAddress]) =>
+        sequenceTOption(oBalances, oSelectedAsset),
+        O.map(([balances, { walletAddress }]) =>
           balances.filter((walletBalance) => walletBalance.walletAddress === walletAddress)
         ),
         O.chain(NEA.fromArray)
       ),
-    [oBalances, oWalletAddress]
+    [oBalances, oSelectedAsset]
   )
 
   const { network } = useNetwork()
 
-  const renderRouteError = useMemo(
-    () => (
-      <>
-        <BackLink />
-        <ErrorView
-          title={intl.formatMessage(
-            { id: 'routes.invalid.params' },
-            {
-              params: `asset: ${routeAsset}, walletType: ${routeWalletType}, walletIndex: ${routeWalletIndex}, walletAddress: ${routeWalletAddress} `
-            }
-          )}
-        />
-      </>
-    ),
-    [intl, routeAsset, routeWalletAddress, routeWalletIndex, routeWalletType]
-  )
-
-  const [oClient] = useObservableState<O.Option<XChainClient>>(
-    () =>
+  const [oClient, updateClient] = useObservableState<O.Option<XChainClient>, O.Option<SelectedWalletAsset>>(
+    (selectedAssetUpdated$) =>
       FP.pipe(
-        oAsset,
-        O.fold(
-          () => Rx.of(O.none),
-          (asset) => clientByChain$(asset.chain)
+        selectedAssetUpdated$,
+        RxOp.distinctUntilChanged(eqOSelectedWalletAsset.equals),
+        RxOp.switchMap(
+          O.fold(
+            () => Rx.of(O.none),
+            ({ asset }) => clientByChain$(asset.chain)
+          )
         )
       ),
     O.none
   )
 
+  // Inform `useObservableState` about changes of `oSelectedAsset`
+  useEffect(() => {
+    updateTxsRD(oSelectedAsset)
+    updateClient(oSelectedAsset)
+  }, [oSelectedAsset, updateClient, updateTxsRD])
+
   const openExplorerAddressUrlHandler = useCallback(() => {
     FP.pipe(
-      sequenceTOption(oClient, oWalletAddress),
-      O.map(async ([client, address]) => {
-        const url = client.getExplorerAddressUrl(address)
+      sequenceTOption(oClient, oSelectedAsset),
+      O.map(async ([client, { walletAddress }]) => {
+        const url = client.getExplorerAddressUrl(walletAddress)
         await window.apiUrl.openExternal(url)
         return true
       })
     )
-  }, [oClient, oWalletAddress])
+  }, [oClient, oSelectedAsset])
 
   const { openExplorerTxUrl } = useOpenExplorerTxUrl(
     FP.pipe(
-      oAsset,
-      O.map(({ chain }) => chain)
+      oSelectedAsset,
+      O.map(({ asset }) => asset.chain)
     )
   )
 
-  return (
-    <>
-      {FP.pipe(
-        sequenceTOption(oAsset, oWalletAddress, oWalletIndex, oWalletType),
-        O.fold(
-          () => renderRouteError,
-          ([asset, walletAddress, walletIndex, walletType]) => (
-            <AssetDetails
-              walletType={walletType}
-              walletIndex={walletIndex}
-              txsPageRD={txsRD}
-              balances={walletBalances}
-              asset={asset}
-              loadTxsHandler={loadTxs}
-              reloadBalancesHandler={reloadBalancesByChain(asset.chain)}
-              openExplorerTxUrl={openExplorerTxUrl}
-              openExplorerAddressUrl={openExplorerAddressUrlHandler}
-              walletAddress={walletAddress}
-              disableSend={isRuneNativeAsset(asset) && haltThorChain}
-              disableUpgrade={disableRuneUpgrade({
-                asset,
-                haltThorChain,
-                haltEthChain,
-                haltBnbChain,
-                network
-              })}
-              network={network}
-            />
-          )
-        )
-      )}
-    </>
+  return FP.pipe(
+    oSelectedAsset,
+    O.fold(
+      () => <LoadingView size="large" />,
+      ({ asset, walletAddress, walletType }) => (
+        <AssetDetails
+          walletType={walletType}
+          txsPageRD={txsRD}
+          balances={walletBalances}
+          asset={asset}
+          loadTxsHandler={loadTxs}
+          reloadBalancesHandler={reloadBalancesByChain(asset.chain)}
+          openExplorerTxUrl={openExplorerTxUrl}
+          openExplorerAddressUrl={openExplorerAddressUrlHandler}
+          walletAddress={walletAddress}
+          disableSend={isRuneNativeAsset(asset) && haltThorChain}
+          disableUpgrade={disableRuneUpgrade({
+            asset,
+            haltThorChain,
+            haltEthChain,
+            haltBnbChain,
+            network
+          })}
+          network={network}
+        />
+      )
+    )
   )
 }

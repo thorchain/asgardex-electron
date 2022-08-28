@@ -135,35 +135,40 @@ describe('services/wallet/util/', () => {
           amount: baseAmount(0),
           walletAddress: 'ADDRESS_TOMO',
           walletIndex: 0,
-          walletType: 'keystore'
+          walletType: 'keystore',
+          hdMode: 'default'
         },
         {
           asset: ASSETS_TESTNET.BOLT,
           amount: baseAmount(1),
           walletAddress: 'ADDRESS_BOLT',
           walletIndex: 0,
-          walletType: 'keystore'
+          walletType: 'keystore',
+          hdMode: 'default'
         },
         {
           asset: ASSETS_TESTNET.FTM,
           amount: baseAmount(0),
           walletAddress: 'ADDRESS_FTM',
           walletIndex: 0,
-          walletType: 'keystore'
+          walletType: 'keystore',
+          hdMode: 'default'
         },
         {
           asset: AssetBNB,
           amount: baseAmount(2),
           walletAddress: 'ADDRESS_BNB',
           walletIndex: 0,
-          walletType: 'keystore'
+          walletType: 'keystore',
+          hdMode: 'default'
         },
         {
           asset: AssetRuneNative,
           amount: baseAmount(0),
           walletAddress: 'ADDRESS_RUNENATIVE',
           walletIndex: 0,
-          walletType: 'keystore'
+          walletType: 'keystore',
+          hdMode: 'default'
         }
       ]
       const nullableBalances = filterNullableBalances(target)
@@ -179,35 +184,40 @@ describe('services/wallet/util/', () => {
           amount: baseAmount(0),
           walletAddress: 'ADDRESS_TOMO',
           walletIndex: 0,
-          walletType: 'keystore'
+          walletType: 'keystore',
+          hdMode: 'default'
         },
         {
           asset: ASSETS_TESTNET.BOLT,
           amount: baseAmount(1),
           walletAddress: 'ADDRESS_BOLT',
           walletIndex: 0,
-          walletType: 'keystore'
+          walletType: 'keystore',
+          hdMode: 'default'
         },
         {
           asset: ASSETS_TESTNET.FTM,
           amount: baseAmount(0),
           walletAddress: 'ADDRESS_FTM',
           walletIndex: 0,
-          walletType: 'keystore'
+          walletType: 'keystore',
+          hdMode: 'default'
         },
         {
           asset: AssetBNB,
           amount: baseAmount(2),
           walletAddress: 'ADDRESS_BNB',
           walletIndex: 0,
-          walletType: 'keystore'
+          walletType: 'keystore',
+          hdMode: 'default'
         },
         {
           asset: AssetRuneNative,
           amount: baseAmount(0),
           walletAddress: 'ADDRESS_RUNENATIVE',
           walletIndex: 0,
-          walletType: 'keystore'
+          walletType: 'keystore',
+          hdMode: 'default'
         }
       ]
       const balances = sortBalances(target, [AssetBTC.ticker, AssetETH.ticker, AssetRuneNative.ticker, AssetBNB.ticker])
@@ -223,35 +233,40 @@ describe('services/wallet/util/', () => {
           amount: baseAmount(0),
           walletAddress: 'ADDRESS_TOMO',
           walletIndex: 0,
-          walletType: 'keystore'
+          walletType: 'keystore',
+          hdMode: 'default'
         },
         {
           asset: ASSETS_TESTNET.BOLT,
           amount: baseAmount(1),
           walletAddress: 'ADDRESS_BOLT',
           walletIndex: 0,
-          walletType: 'keystore'
+          walletType: 'keystore',
+          hdMode: 'default'
         },
         {
           asset: ASSETS_TESTNET.FTM,
           amount: baseAmount(0),
           walletAddress: 'ADDRESS_FTM',
           walletIndex: 0,
-          walletType: 'keystore'
+          walletType: 'keystore',
+          hdMode: 'default'
         },
         {
           asset: AssetBNB,
           amount: baseAmount(2),
           walletAddress: 'ADDRESS_BNB',
           walletIndex: 0,
-          walletType: 'keystore'
+          walletType: 'keystore',
+          hdMode: 'default'
         },
         {
           asset: AssetRuneNative,
           amount: baseAmount(0),
           walletAddress: 'ADDRESS_RUNENATIVE',
           walletIndex: 0,
-          walletType: 'keystore'
+          walletType: 'keystore',
+          hdMode: 'default'
         }
       ]
 
@@ -264,7 +279,8 @@ describe('services/wallet/util/', () => {
             amount: baseAmount(2),
             walletAddress: 'ADDRESS_BNB',
             walletIndex: 0,
-            walletType: 'keystore'
+            walletType: 'keystore',
+            hdMode: 'default'
           })
         )
       ).toBeTruthy()

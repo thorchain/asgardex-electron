@@ -204,35 +204,46 @@ export const ledgerErrorIdToI18n = (errorId: LedgerErrorId, intl: IntlShape) => 
   }
 }
 
-export const ledgerAddressToWalletAddress = ({ walletIndex, address, chain }: LedgerAddress): WalletAddress => ({
-  type: 'ledger',
+/**
+ * Type transformation
+ */
+export const ledgerAddressToWalletAddress = ({
   walletIndex,
   address,
-  chain
+  chain,
+  type,
+  hdMode
+}: LedgerAddress): WalletAddress => ({
+  type,
+  walletIndex,
+  address,
+  chain,
+  hdMode
 })
 
 export const toIPCLedgerAddressesIO = (addresses: LedgerAddresses): IPCLedgerAddressesIO =>
   FP.pipe(
     addresses,
-    A.map(({ keystoreId, address, chain, network, walletIndex, ethDerivationMode }) => ({
+    A.map(({ keystoreId, address, chain, network, walletIndex, hdMode }) => ({
       keystoreId,
       address,
       chain,
       network,
       walletIndex,
-      ethDerivationMode: O.toUndefined(ethDerivationMode)
+      hdMode
     }))
   )
 
 export const fromIPCLedgerAddressesIO = (addresses: IPCLedgerAddressesIO): LedgerAddresses =>
   FP.pipe(
     addresses,
-    A.map(({ keystoreId, address, chain, network, walletIndex, ethDerivationMode }) => ({
+    A.map(({ keystoreId, address, chain, network, walletIndex, hdMode }) => ({
       keystoreId,
       address,
       chain,
       network,
       walletIndex,
-      ethDerivationMode: O.fromNullable(ethDerivationMode)
+      hdMode,
+      type: 'ledger'
     }))
   )

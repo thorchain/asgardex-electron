@@ -118,7 +118,12 @@ export const Withdraw: React.FC<Props> = ({
 
   const { asset, decimal: assetDecimal } = assetWD
 
-  const { type: runeWalletType, address: runeAddress, walletIndex: runeWalletIndex } = runeWalletAddress
+  const {
+    type: runeWalletType,
+    address: runeAddress,
+    walletIndex: runeWalletIndex,
+    hdMode: runeHDMode
+  } = runeWalletAddress
   const { type: assetWalletType, address: assetAddress } = assetWalletAddress
 
   // Disable withdraw in case all or pool actions are disabled
@@ -365,10 +370,11 @@ export const Withdraw: React.FC<Props> = ({
         network,
         memo,
         walletType: runeWalletType,
-        walletIndex: runeWalletIndex
+        walletIndex: runeWalletIndex,
+        hdMode: runeHDMode
       })
     )
-  }, [subscribeWithdrawState, withdraw$, network, memo, runeWalletType, runeWalletIndex])
+  }, [subscribeWithdrawState, withdraw$, network, memo, runeWalletType, runeWalletIndex, runeHDMode])
 
   const uiFeesRD: UIFeesRD = useMemo(
     () =>

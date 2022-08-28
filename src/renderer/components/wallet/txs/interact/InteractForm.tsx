@@ -21,7 +21,7 @@ import { useIntl } from 'react-intl'
 
 import { Network } from '../../../../../shared/api/types'
 import { isKeystoreWallet, isLedgerWallet } from '../../../../../shared/utils/guard'
-import { WalletType } from '../../../../../shared/wallet/types'
+import { HDMode, WalletType } from '../../../../../shared/wallet/types'
 import { ZERO_BASE_AMOUNT } from '../../../../const'
 import { THORCHAIN_DECIMAL } from '../../../../helpers/assetHelper'
 import { validateAddress } from '../../../../helpers/form/validation'
@@ -50,6 +50,7 @@ type Props = {
   interactType: InteractType
   walletType: WalletType
   walletIndex: number
+  hdMode: HDMode
   balance: WalletBalance
   interact$: InteractStateHandler
   openExplorerTxUrl: OpenExplorerTxUrl
@@ -65,6 +66,7 @@ export const InteractForm: React.FC<Props> = (props) => {
     interactType,
     balance,
     walletType,
+    hdMode,
     walletIndex,
     interact$,
     openExplorerTxUrl,
@@ -253,11 +255,12 @@ export const InteractForm: React.FC<Props> = (props) => {
       interact$({
         walletType,
         walletIndex,
+        hdMode,
         amount: amountToSend,
         memo: getMemo()
       })
     )
-  }, [subscribeInteractState, interact$, walletType, walletIndex, amountToSend, getMemo])
+  }, [subscribeInteractState, interact$, walletType, walletIndex, hdMode, amountToSend, getMemo])
 
   const [showConfirmationModal, setShowConfirmationModal] = useState(false)
 

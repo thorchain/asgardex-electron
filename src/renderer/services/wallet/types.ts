@@ -1,7 +1,7 @@
 import * as RD from '@devexperts/remote-data-ts'
 import { Address, Balance, Tx, TxHash } from '@xchainjs/xchain-client'
 import { Keystore } from '@xchainjs/xchain-crypto'
-import { Chain } from '@xchainjs/xchain-util'
+import { Asset, Chain } from '@xchainjs/xchain-util'
 import { getMonoid } from 'fp-ts/Array'
 import * as FP from 'fp-ts/lib/function'
 import { NonEmptyArray } from 'fp-ts/lib/NonEmptyArray'
@@ -10,8 +10,7 @@ import * as Rx from 'rxjs'
 
 import { KeystoreWallet, KeystoreWallets } from '../../../shared/api/io'
 import { KeystoreId, LedgerError, Network } from '../../../shared/api/types'
-import { EthDerivationMode } from '../../../shared/ethereum/types'
-import { WalletAddress, WalletBalanceType, WalletType } from '../../../shared/wallet/types'
+import { HDMode, WalletAddress, WalletBalanceType, WalletType } from '../../../shared/wallet/types'
 import { LiveData } from '../../helpers/rx/liveData'
 import { LoadTxsParams, WalletBalancesLD, WalletBalancesRD } from '../clients'
 
@@ -99,16 +98,31 @@ export type WalletAccount = {
 
 export type WalletAccounts = WalletAccount[]
 
-export type WalletBalance = Balance & { walletAddress: Address; walletType: WalletType; walletIndex: number }
+export type WalletBalance = Balance & {
+  walletAddress: Address
+  walletType: WalletType
+  walletIndex: number
+  hdMode: HDMode
+}
 export type WalletBalances = WalletBalance[]
 
+export type SelectedWalletAsset = {
+  asset: Asset
+  walletAddress: Address
+  walletType: WalletType
+  walletIndex: number
+  hdMode: HDMode
+}
+
+export type SelectedWalletAssetRD = RD.RemoteData<Error, SelectedWalletAsset>
+export type SelectedWalletAssetLD = LiveData<Error, SelectedWalletAsset>
 /**
- * Wraps WalletBalancesRD into an object to provide extra information (`Address` + `Chain` + `WalletType`)
- * Currently needed in `AssetView` - TODO(@Veado) Think about to extract it into view layer (as helper or so)
+ * Wraps WalletBalancesRD into an object to provide extra information (`Address` + `Chain` + `WalletType` + `WalletBalanceType`)
+ * Currently needed in `AssetView` only
+ * TODO(@Veado) Think about to extract it into view layer (as helper or so)
  */
 export type ChainBalance = {
   walletType: WalletType
-  walletIndex: number
   walletAddress: O.Option<Address>
   chain: Chain
   balances: WalletBalancesRD
@@ -184,12 +198,12 @@ export type VerifyLedgerAddressHandler = ({
   chain,
   network,
   walletIndex,
-  ethDerivationMode
+  hdMode
 }: {
   chain: Chain
   network: Network
   walletIndex: number
-  ethDerivationMode: O.Option<EthDerivationMode>
+  hdMode: HDMode
 }) => VerifiedLedgerAddressLD
 
 export type AddLedgerAddressHandler = ({
@@ -197,13 +211,13 @@ export type AddLedgerAddressHandler = ({
   chain,
   network,
   walletIndex,
-  ethDerivationMode
+  hdMode
 }: {
   id: KeystoreId
   chain: Chain
   network: Network
   walletIndex: number
-  ethDerivationMode: O.Option<EthDerivationMode>
+  hdMode: HDMode
 }) => LedgerAddressLD
 
 export type RemoveLedgerAddressHandler = ({
@@ -245,9 +259,9 @@ export type LedgerTxHashRD = RD.RemoteData<LedgerError, TxHash>
 export type LedgerTxHashLD = LiveData<LedgerError, TxHash>
 
 export type LedgerAddress = Omit<WalletAddress, 'type'> & {
-  keystoreId: KeystoreId
-  network: Network
-  ethDerivationMode: O.Option<EthDerivationMode>
+  readonly keystoreId: KeystoreId
+  readonly network: Network
+  readonly type: 'ledger'
 }
 export type LedgerAddressRD = RD.RemoteData<LedgerError, LedgerAddress>
 export type LedgerAddressLD = LiveData<LedgerError, LedgerAddress>

@@ -63,9 +63,7 @@ const Template = ({ txRDStatus, feeRDStatus, balance, walletType }: Args) => {
 
   return (
     <Component
-      walletType={walletType}
-      walletIndex={0}
-      walletAddress={'eth-address'}
+      asset={{ asset: AssetETH, walletAddress: 'eth-address', walletType, walletIndex: 0, hdMode: 'default' }}
       transfer$={transfer$}
       balances={[ethBalance, runeBalance]}
       balance={ethBalance}

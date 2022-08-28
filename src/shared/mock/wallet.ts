@@ -27,37 +27,43 @@ export const MOCK_WALLET_ADDRESSES: WalletAddresses = [
     address: 'tbnb1ed04qgw3s69z90jskr3shpyn9mr0e59qdtsxqa',
     type: 'ledger',
     chain: BNBChain,
-    walletIndex: 0
+    walletIndex: 0,
+    hdMode: 'default'
   },
   {
     address: 'tthor13gym97tmw3axj3hpewdggy2cr288d3qffr8skg',
     type: 'ledger',
     chain: THORChain,
-    walletIndex: 0
+    walletIndex: 0,
+    hdMode: 'default'
   },
   {
     address: '0x33292c1d02c432d323fb62c57fb327da45e1bdde',
     type: 'keystore',
     chain: ETHChain,
-    walletIndex: 0
+    walletIndex: 0,
+    hdMode: 'default'
   },
   {
     address: 'tb1qtephp596jhpwrawlp67junuk347zl2cwc56xml',
     type: 'keystore',
     chain: BTCChain,
-    walletIndex: 0
+    walletIndex: 0,
+    hdMode: 'default'
   },
   {
     address: 'qr20g55jd7x3dalp4qxjfgfvda0nwr8cfccrgxd0dw',
     type: 'keystore',
     chain: BCHChain,
-    walletIndex: 0
+    walletIndex: 0,
+    hdMode: 'default'
   },
   {
     address: 'tltc1qtephp596jhpwrawlp67junuk347zl2cwpucctk',
     type: 'keystore',
     chain: LTCChain,
-    walletIndex: 0
+    walletIndex: 0,
+    hdMode: 'default'
   }
 ]
 

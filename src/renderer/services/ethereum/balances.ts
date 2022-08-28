@@ -3,7 +3,7 @@ import * as A from 'fp-ts/lib/Array'
 import * as FP from 'fp-ts/lib/function'
 
 import { Network } from '../../../shared/api/types'
-import { WalletType } from '../../../shared/wallet/types'
+import { HDMode, WalletType } from '../../../shared/wallet/types'
 import { ETHAssetsTestnet } from '../../const'
 import { validAssetForETH } from '../../helpers/assetHelper'
 import { liveData } from '../../helpers/rx/liveData'
@@ -30,17 +30,27 @@ const reloadBalances = () => {
 const balances$: ({
   walletType,
   network,
-  walletIndex
+  walletIndex,
+  hdMode
 }: {
   walletType: WalletType
   network: Network
   walletIndex: number
-}) => C.WalletBalancesLD = ({ walletType, walletIndex, network }) => {
+  hdMode: HDMode
+}) => C.WalletBalancesLD = ({ walletType, walletIndex, network, hdMode }) => {
   // For testnet we limit requests by using pre-defined assets only
   // because `xchain-ethereum` does for each asset a single request
   const assets: Asset[] | undefined = network === 'testnet' ? ETHAssetsTestnet : undefined
   return FP.pipe(
-    C.balances$({ client$, trigger$: reloadBalances$, assets, walletType, walletIndex, walletBalanceType: 'all' }),
+    C.balances$({
+      client$,
+      trigger$: reloadBalances$,
+      assets,
+      walletType,
+      walletIndex,
+      hdMode,
+      walletBalanceType: 'all'
+    }),
     // Filter assets based on ERC20Whitelist (mainnet only)
     liveData.map(FP.flow(A.filter(({ asset }) => validAssetForETH(asset, network))))
   )
