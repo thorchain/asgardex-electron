@@ -39,9 +39,8 @@ const balances: Partial<Record<Chain, ChainBalances>> = {
     {
       walletType: 'keystore',
       walletAddress: O.some('bnb keystore'),
-      walletIndex: 0,
+
       chain: BNBChain,
-      hdMode: 'default',
       balances: RD.success([
         {
           walletType: 'keystore',
@@ -67,9 +66,7 @@ const balances: Partial<Record<Chain, ChainBalances>> = {
     {
       walletType: 'keystore',
       walletAddress: O.some('btc keystore'),
-      walletIndex: 0,
       chain: BTCChain,
-      hdMode: 'default',
       balances: RD.success([
         {
           walletType: 'keystore',
@@ -87,8 +84,6 @@ const balances: Partial<Record<Chain, ChainBalances>> = {
     {
       walletType: 'keystore',
       walletAddress: O.some('eth keystore'),
-      walletIndex: 0,
-      hdMode: 'default',
       chain: ETHChain,
       balances: RD.success([
         {
@@ -107,8 +102,6 @@ const balances: Partial<Record<Chain, ChainBalances>> = {
     {
       walletType: 'keystore',
       walletAddress: O.some('thor keystore'),
-      walletIndex: 0,
-      hdMode: 'default',
       chain: THORChain,
       balances: RD.success([
         {
@@ -127,8 +120,6 @@ const balances: Partial<Record<Chain, ChainBalances>> = {
     {
       walletType: 'keystore',
       walletAddress: O.some('ltc keystore'),
-      walletIndex: 0,
-      hdMode: 'default',
       chain: LTCChain,
       balances: RD.success([
         {

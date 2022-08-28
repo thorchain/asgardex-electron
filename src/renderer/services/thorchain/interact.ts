@@ -7,7 +7,7 @@ import * as O from 'fp-ts/lib/Option'
 import * as Rx from 'rxjs'
 import * as RxOp from 'rxjs/operators'
 
-import { WalletType } from '../../../shared/wallet/types'
+import { HDMode, WalletType } from '../../../shared/wallet/types'
 import { liveData } from '../../helpers/rx/liveData'
 import { LiveData } from '../../helpers/rx/liveData'
 import { observableState } from '../../helpers/stateHelper'
@@ -31,11 +31,12 @@ export const createInteractService$ =
       _: DepositParam & {
         walletType: WalletType
         walletIndex: number /* override walletIndex of DepositParam to avoid 'undefined' */
+        hdMode: HDMode
       }
     ) => LiveData<ApiError, string>,
     getTxStatus: (txHash: string, assetAddress: O.Option<Address>) => TxLD
   ) =>
-  ({ walletType, walletIndex, amount, memo }: InteractParams): InteractState$ => {
+  ({ walletType, walletIndex, hdMode, amount, memo }: InteractParams): InteractState$ => {
     // total of progress
     const total = O.some(100)
 
@@ -57,6 +58,7 @@ export const createInteractService$ =
       depositTx$({
         walletType,
         walletIndex,
+        hdMode,
         asset: AssetRuneNative,
         amount,
         memo

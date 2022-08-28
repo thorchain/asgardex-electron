@@ -71,6 +71,7 @@ const Template = ({ interactType, txRDStatus, feeRDStatus, balance, validAddress
       interactType={interactType}
       walletType={walletType}
       walletIndex={0}
+      hdMode="default"
       interact$={interact$}
       balance={runeBalance}
       addressValidation={(_: string) => validAddress}

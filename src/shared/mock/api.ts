@@ -38,8 +38,7 @@ export const apiHDWallet: ApiHDWallet = {
 
 const commonStorageData: CommonStorage = {
   locale: Locale.EN,
-  ethDerivationMode: 'ledgerlive',
-  version: '1'
+  version: '2'
 }
 
 export const apiCommonStorage: ApiFileStoreService<CommonStorage> = {

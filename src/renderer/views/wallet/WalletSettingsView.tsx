@@ -21,7 +21,7 @@ import * as Rx from 'rxjs'
 import * as RxOp from 'rxjs/operators'
 
 import { LedgerErrorId } from '../../../shared/api/types'
-import { EthHDMode } from '../../../shared/ethereum/types'
+import { HDMode } from '../../../shared/wallet/types'
 import { WalletSettings } from '../../components/settings'
 import { useBinanceContext } from '../../contexts/BinanceContext'
 import { useBitcoinCashContext } from '../../contexts/BitcoinCashContext'
@@ -140,20 +140,20 @@ export const WalletSettingsView: React.FC<Props> = ({ keystoreUnlocked }): JSX.E
   const addLedgerAddressHandler = ({
     chain,
     walletIndex,
-    ethDerivationMode
+    hdMode
   }: {
     chain: Chain
     walletIndex: number
-    ethDerivationMode: O.Option<EthHDMode>
+    hdMode: HDMode
   }): LedgerAddressLD => {
-    if (isThorChain(chain)) return addLedgerThorAddress(walletIndex, ethDerivationMode)
-    if (isBnbChain(chain)) return addLedgerBnbAddress(walletIndex, ethDerivationMode)
-    if (isBtcChain(chain)) return addLedgerBtcAddress(walletIndex, ethDerivationMode)
-    if (isLtcChain(chain)) return addLedgerLtcAddress(walletIndex, ethDerivationMode)
-    if (isBchChain(chain)) return addLedgerBchAddress(walletIndex, ethDerivationMode)
-    if (isDogeChain(chain)) return addLedgerDOGEAddress(walletIndex, ethDerivationMode)
-    if (isEthChain(chain)) return addLedgerEthAddress(walletIndex, ethDerivationMode)
-    if (isCosmosChain(chain)) return addLedgerCosmosAddress(walletIndex, ethDerivationMode)
+    if (isThorChain(chain)) return addLedgerThorAddress(walletIndex, hdMode)
+    if (isBnbChain(chain)) return addLedgerBnbAddress(walletIndex, hdMode)
+    if (isBtcChain(chain)) return addLedgerBtcAddress(walletIndex, hdMode)
+    if (isLtcChain(chain)) return addLedgerLtcAddress(walletIndex, hdMode)
+    if (isBchChain(chain)) return addLedgerBchAddress(walletIndex, hdMode)
+    if (isDogeChain(chain)) return addLedgerDOGEAddress(walletIndex, hdMode)
+    if (isEthChain(chain)) return addLedgerEthAddress(walletIndex, hdMode)
+    if (isCosmosChain(chain)) return addLedgerCosmosAddress(walletIndex, hdMode)
 
     return Rx.of(
       RD.failure({
@@ -166,20 +166,20 @@ export const WalletSettingsView: React.FC<Props> = ({ keystoreUnlocked }): JSX.E
   const verifyLedgerAddressHandler = ({
     chain,
     walletIndex,
-    ethDerivationMode
+    hdMode
   }: {
     chain: Chain
     walletIndex: number
-    ethDerivationMode: O.Option<EthHDMode>
+    hdMode: HDMode
   }): VerifiedLedgerAddressLD => {
-    if (isThorChain(chain)) return verifyLedgerThorAddress(walletIndex, ethDerivationMode)
-    if (isBnbChain(chain)) return verifyLedgerBnbAddress(walletIndex, ethDerivationMode)
-    if (isBtcChain(chain)) return verifyLedgerBtcAddress(walletIndex, ethDerivationMode)
-    if (isLtcChain(chain)) return verifyLedgerLtcAddress(walletIndex, ethDerivationMode)
-    if (isBchChain(chain)) return verifyLedgerBchAddress(walletIndex, ethDerivationMode)
-    if (isDogeChain(chain)) return verifyLedgerDOGEAddress(walletIndex, ethDerivationMode)
-    if (isEthChain(chain)) return verifyLedgerEthAddress(walletIndex, ethDerivationMode)
-    if (isCosmosChain(chain)) return verifyLedgerCosmosAddress(walletIndex, ethDerivationMode)
+    if (isThorChain(chain)) return verifyLedgerThorAddress(walletIndex, hdMode)
+    if (isBnbChain(chain)) return verifyLedgerBnbAddress(walletIndex, hdMode)
+    if (isBtcChain(chain)) return verifyLedgerBtcAddress(walletIndex, hdMode)
+    if (isLtcChain(chain)) return verifyLedgerLtcAddress(walletIndex, hdMode)
+    if (isBchChain(chain)) return verifyLedgerBchAddress(walletIndex, hdMode)
+    if (isDogeChain(chain)) return verifyLedgerDOGEAddress(walletIndex, hdMode)
+    if (isEthChain(chain)) return verifyLedgerEthAddress(walletIndex, hdMode)
+    if (isCosmosChain(chain)) return verifyLedgerCosmosAddress(walletIndex, hdMode)
 
     return Rx.of(RD.failure(Error(`Ledger address verification for ${chain} has not been implemented`)))
   }

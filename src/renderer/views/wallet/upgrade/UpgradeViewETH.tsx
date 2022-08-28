@@ -10,13 +10,16 @@ import { liveData } from '../../../helpers/rx/liveData'
 import { CommonUpgradeProps } from './types'
 
 export const UpgradeETH: React.FC<CommonUpgradeProps> = (props) => {
+  const {
+    assetData: { asset }
+  } = props
   const { fees$, reloadFees } = useEthereumContext()
 
   const [upgradeFeeRD] = useObservableState(
     () =>
       FP.pipe(
         fees$({
-          asset: props.runeAsset.asset,
+          asset,
           amount: baseAmount(1),
           recipient: ETHAddress
         }),

@@ -1,12 +1,5 @@
 import React, { createContext, useContext } from 'react'
 
-import * as FP from 'fp-ts/lib/function'
-import * as O from 'fp-ts/lib/Option'
-import * as Rx from 'rxjs'
-import * as RxOp from 'rxjs/operators'
-
-import { DEFAULT_ETH_DERIVATION_MODE } from '../../shared/ethereum/const'
-import { EthHDMode } from '../../shared/ethereum/types'
 import {
   client$,
   clientState$,
@@ -26,7 +19,6 @@ import {
   approveFee$,
   reloadApproveFee
 } from '../services/ethereum'
-import { getStorageState$, modifyStorage } from '../services/storage/common'
 
 export type EthereumContextValue = {
   client$: typeof client$
@@ -46,23 +38,6 @@ export type EthereumContextValue = {
   isApprovedERC20Token$: typeof isApprovedERC20Token$
   approveFee$: typeof approveFee$
   reloadApproveFee: typeof reloadApproveFee
-  ethDerivationMode$: Rx.Observable<EthHDMode>
-  updateEthDerivationMode: (m: EthHDMode) => void
-}
-
-export const ethDerivationMode$ = FP.pipe(
-  getStorageState$,
-  RxOp.map(
-    FP.flow(
-      O.map(({ ethDerivationMode }) => ethDerivationMode),
-      O.getOrElse(() => DEFAULT_ETH_DERIVATION_MODE)
-    )
-  ),
-  RxOp.distinctUntilChanged()
-)
-
-export const updateEthDerivationMode = (mode: EthHDMode) => {
-  modifyStorage(O.some({ ethDerivationMode: mode }))
 }
 
 const initialContext: EthereumContextValue = {
@@ -82,9 +57,7 @@ const initialContext: EthereumContextValue = {
   approveERC20Token$,
   isApprovedERC20Token$,
   approveFee$,
-  reloadApproveFee,
-  ethDerivationMode$,
-  updateEthDerivationMode
+  reloadApproveFee
 }
 
 const EthereumContext = createContext<EthereumContextValue | null>(null)

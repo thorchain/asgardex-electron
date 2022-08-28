@@ -13,7 +13,6 @@ import { useIntl } from 'react-intl'
 
 import { Network } from '../../../../shared/api/types'
 import { isKeystoreWallet } from '../../../../shared/utils/guard'
-import { HDMode, WalletType } from '../../../../shared/wallet/types'
 import { disableRuneUpgrade, isNonNativeRuneAsset, isUSDAsset } from '../../../helpers/assetHelper'
 import { getChainAsset } from '../../../helpers/chainHelper'
 import { getPoolPriceValue } from '../../../helpers/poolHelper'
@@ -70,7 +69,7 @@ export const AssetsTableCollapsable: React.FC<Props> = (props): JSX.Element => {
   const [collapseChangedByUser, setCollapseChangedByUser] = useState(false)
 
   // store previous data of asset data to render these while reloading
-  const previousAssetsTableData = useRef<Balance[][]>([])
+  const previousAssetsTableData = useRef<WalletBalances[]>([])
 
   // get halt status from Mimir
   const { haltThorChain, haltEthChain, haltBnbChain } = useMemo(
@@ -83,30 +82,10 @@ export const AssetsTableCollapsable: React.FC<Props> = (props): JSX.Element => {
   )
 
   const onRowHandler = useCallback(
-    ({
-        oWalletAddress,
-        walletType,
-        walletIndex,
-        hdMode
-      }: {
-        oWalletAddress: O.Option<Address>
-        walletType: WalletType
-        walletIndex: number
-        hdMode: HDMode
-      }) =>
-      ({ asset }: Balance) => {
-        // Disable click for NativeRUNE if Thorchain is halted
-        const onClick = FP.pipe(
-          oWalletAddress,
-          O.map((walletAddress) => () => selectAssetHandler({ asset, walletAddress, walletType, walletIndex, hdMode })),
-          // TODO(@Veado) Add error message / alert
-          O.getOrElse(() => () => console.error('Unknown address'))
-        )
-
-        return {
-          onClick
-        }
-      },
+    ({ asset, walletAddress, walletType, walletIndex, hdMode }: WalletBalance) => ({
+      // Disable click for NativeRUNE if Thorchain is halted
+      onClick: () => selectAssetHandler({ asset, walletAddress, walletType, walletIndex, hdMode })
+    }),
     [selectAssetHandler]
   )
 
@@ -255,66 +234,34 @@ export const AssetsTableCollapsable: React.FC<Props> = (props): JSX.Element => {
   }, [balanceColumn, iconColumn, priceColumn, screenMap, tickerColumn])
 
   const renderAssetsTable = useCallback(
-    ({
-      tableData,
-      oWalletAddress,
-      loading = false,
-      walletType,
-      walletIndex,
-      hdMode
-    }: {
-      tableData: Balance[]
-      oWalletAddress: O.Option<Address>
-      loading?: boolean
-      walletType: WalletType
-      walletIndex: number
-      hdMode: HDMode
-    }) => {
+    ({ tableData, loading = false }: { tableData: WalletBalances; loading?: boolean }) => {
       return (
         <Styled.Table
           showHeader={false}
           dataSource={tableData}
           loading={loading}
           rowKey={({ asset }) => asset.symbol}
-          onRow={onRowHandler({ oWalletAddress, walletType, walletIndex, hdMode })}
+          onRow={onRowHandler}
           columns={columns}
         />
       )
     },
-    [onRowHandler, columns]
+    [columns, onRowHandler]
   )
 
   const renderBalances = useCallback(
-    ({
-      balancesRD,
-      index,
-      oWalletAddress,
-      walletType,
-      walletIndex,
-      hdMode
-    }: {
-      balancesRD: WalletBalancesRD
-      index: number
-      oWalletAddress: O.Option<Address>
-      walletType: WalletType
-      walletIndex: number
-      hdMode: HDMode
-    }) => {
+    ({ balancesRD, index }: { balancesRD: WalletBalancesRD; index: number }) => {
       return FP.pipe(
         balancesRD,
         RD.fold(
           // initial state
-          () => renderAssetsTable({ tableData: [], oWalletAddress, loading: false, walletType, walletIndex, hdMode }),
+          () => renderAssetsTable({ tableData: [], loading: false }),
           // loading state
           () => {
             const data = previousAssetsTableData.current[index] ?? []
             return renderAssetsTable({
               tableData: data,
-              oWalletAddress,
-              loading: true,
-              walletType,
-              walletIndex,
-              hdMode
+              loading: true
             })
           },
           // error state
@@ -327,11 +274,7 @@ export const AssetsTableCollapsable: React.FC<Props> = (props): JSX.Element => {
             prev[index] = balances
             return renderAssetsTable({
               tableData: balances,
-              oWalletAddress,
-              loading: false,
-              walletType,
-              walletIndex,
-              hdMode
+              loading: false
             })
           }
         )
@@ -342,10 +285,7 @@ export const AssetsTableCollapsable: React.FC<Props> = (props): JSX.Element => {
 
   // Panel
   const renderPanel = useCallback(
-    (
-      { chain, walletType, walletAddress: oWalletAddress, balances: balancesRD, walletIndex, hdMode }: ChainBalance,
-      key: number
-    ) => {
+    ({ chain, walletType, walletAddress: oWalletAddress, balances: balancesRD }: ChainBalance, key: number) => {
       /**
        * We need to push initial value to the ledger-based streams
        * 'cuz chainBalances$ stream is created by 'combineLatest'
@@ -418,11 +358,7 @@ export const AssetsTableCollapsable: React.FC<Props> = (props): JSX.Element => {
         <Panel header={header} key={key}>
           {renderBalances({
             balancesRD,
-            index: key,
-            oWalletAddress,
-            walletType,
-            walletIndex,
-            hdMode
+            index: key
           })}
         </Panel>
       )

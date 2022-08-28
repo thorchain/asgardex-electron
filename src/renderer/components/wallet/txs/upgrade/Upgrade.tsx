@@ -62,10 +62,9 @@ type FormValues = {
 
 export const Upgrade: React.FC<Props> = (props): JSX.Element => {
   const {
-    runeAsset,
     runeNativeAddress: initialRuneNativeAddress,
     runeNativeLedgerAddress: oRuneNativeLedgerAddress,
-    targetPoolAddressRD,
+    targetPoolAddress,
     validatePassword$,
     fee: feeRD,
     upgrade$,
@@ -76,10 +75,7 @@ export const Upgrade: React.FC<Props> = (props): JSX.Element => {
     reloadFeeHandler,
     addressValidation,
     network,
-    walletAddress,
-    walletType,
-    walletIndex,
-    hdMode
+    assetData: { asset, walletAddress, walletType, walletIndex, hdMode, decimal: assetDecimal }
   } = props
 
   const intl = useIntl()
@@ -136,13 +132,12 @@ export const Upgrade: React.FC<Props> = (props): JSX.Element => {
   const getRuneBalance = useMemo(
     () =>
       getWalletAssetAmountFromBalances(
-        (balance) =>
-          eqString.equals(balance.walletAddress, walletAddress) && eqAsset.equals(balance.asset, runeAsset.asset)
+        (balance) => eqString.equals(balance.walletAddress, walletAddress) && eqAsset.equals(balance.asset, asset)
       ),
-    [runeAsset, walletAddress]
+    [asset, walletAddress]
   )
 
-  const chainBaseAsset = useMemo(() => getChainAsset(runeAsset.asset.chain), [runeAsset])
+  const chainBaseAsset = useMemo(() => getChainAsset(asset.chain), [asset])
 
   const getBaseAssetBalance = useMemo(
     () =>
@@ -199,11 +194,11 @@ export const Upgrade: React.FC<Props> = (props): JSX.Element => {
       // we have to validate input before storing into the state
       amountValidator(undefined, value)
         .then(() => {
-          setAmountToUpgrade(convertBaseAmountDecimal(assetToBase(assetAmount(value)), runeAsset.decimal))
+          setAmountToUpgrade(convertBaseAmountDecimal(assetToBase(assetAmount(value)), assetDecimal))
         })
         .catch(() => {}) // do nothing, Ant' form does the job for us to show an error message
     },
-    [amountValidator, runeAsset]
+    [amountValidator, assetDecimal]
   )
 
   // Send tx start time
@@ -212,36 +207,31 @@ export const Upgrade: React.FC<Props> = (props): JSX.Element => {
   const submitTx = useCallback(() => {
     setSendTxStartTime(Date.now())
 
-    return FP.pipe(
-      targetPoolAddressRD,
-      RD.toOption,
-      O.map((poolAddress) => {
-        subscribeUpgradeTxState(
-          upgrade$({
-            poolAddress,
-            amount: amountToUpgrade,
-            asset: runeAsset.asset,
-            memo: getSwitchMemo(form.getFieldValue('address')),
-            network,
-            walletAddress,
-            walletIndex,
-            walletType
-          })
-        )
-        return true
+    subscribeUpgradeTxState(
+      upgrade$({
+        poolAddress: targetPoolAddress,
+        amount: amountToUpgrade,
+        asset,
+        memo: getSwitchMemo(form.getFieldValue('address')),
+        network,
+        walletAddress,
+        walletIndex,
+        walletType,
+        hdMode
       })
     )
   }, [
-    targetPoolAddressRD,
     subscribeUpgradeTxState,
     upgrade$,
+    targetPoolAddress,
     amountToUpgrade,
-    runeAsset.asset,
+    asset,
     form,
     network,
     walletAddress,
     walletIndex,
-    walletType
+    walletType,
+    hdMode
   ])
 
   const oFee: O.Option<BaseAmount> = useMemo(() => FP.pipe(feeRD, RD.toOption), [feeRD])
@@ -302,7 +292,7 @@ export const Upgrade: React.FC<Props> = (props): JSX.Element => {
   const txStatusMsg = useMemo(() => {
     const stepDescriptions = [
       intl.formatMessage({ id: 'common.tx.healthCheck' }),
-      intl.formatMessage({ id: 'common.tx.sendingAsset' }, { assetTicker: runeAsset.asset.ticker }),
+      intl.formatMessage({ id: 'common.tx.sendingAsset' }, { assetTicker: asset.ticker }),
       intl.formatMessage({ id: 'common.tx.checkResult' })
     ]
     const { steps, status } = upgradeTxState
@@ -320,7 +310,7 @@ export const Upgrade: React.FC<Props> = (props): JSX.Element => {
         () => emptyString
       )
     )
-  }, [intl, runeAsset.asset.ticker, upgradeTxState])
+  }, [intl, asset.ticker, upgradeTxState])
 
   const addMaxAmountHandler = useCallback(() => setAmountToUpgrade(maxAmount), [maxAmount])
 
@@ -338,17 +328,8 @@ export const Upgrade: React.FC<Props> = (props): JSX.Element => {
   )
 
   const reloadFees = useCallback(() => {
-    FP.pipe(
-      targetPoolAddressRD,
-      RD.toOption,
-      O.map((poolAddress) => {
-        reloadFeeHandler({ asset: runeAsset.asset, amount: amountToUpgrade, recipient: poolAddress.address })
-        return true
-      })
-    )
-
-    return false
-  }, [targetPoolAddressRD, reloadFeeHandler, runeAsset.asset, amountToUpgrade])
+    reloadFeeHandler({ asset, amount: amountToUpgrade, recipient: targetPoolAddress.address })
+  }, [targetPoolAddress, reloadFeeHandler, asset, amountToUpgrade])
 
   const addressValidator = useCallback(
     async (_: unknown, value: string) => {
@@ -418,7 +399,7 @@ export const Upgrade: React.FC<Props> = (props): JSX.Element => {
       )
     }
 
-    const chain = runeAsset.asset.chain
+    const { chain } = asset
     const chainAsString = chainToString(chain)
     const txtNeedsConnected = intl.formatMessage(
       {
@@ -455,7 +436,7 @@ export const Upgrade: React.FC<Props> = (props): JSX.Element => {
       )
     }
     return null
-  }, [intl, network, runeAsset.asset.chain, showConfirmationModal, submitTx, validatePassword$, walletType])
+  }, [asset, intl, network, showConfirmationModal, submitTx, validatePassword$, walletType])
 
   const renderTxModal = useMemo(() => {
     const { status } = upgradeTxState
@@ -509,7 +490,7 @@ export const Upgrade: React.FC<Props> = (props): JSX.Element => {
         )}
         extra={
           <SendAsset
-            asset={{ asset: runeAsset.asset, amount: amountToUpgrade }}
+            asset={{ asset, amount: amountToUpgrade }}
             network={network}
             description={CH.getUpgradeDescription({ state: upgradeTxState, intl })}
           />
@@ -519,13 +500,13 @@ export const Upgrade: React.FC<Props> = (props): JSX.Element => {
   }, [
     upgradeTxState,
     intl,
-    resetUpgradeTxState,
     sendTxStartTime,
     openExplorerTxUrl,
     getExplorerTxUrl,
-    runeAsset.asset,
+    asset,
     amountToUpgrade,
     network,
+    resetUpgradeTxState,
     reloadBalancesHandler
   ])
 
@@ -537,7 +518,7 @@ export const Upgrade: React.FC<Props> = (props): JSX.Element => {
             selectedWallet={{
               walletType,
               amount: assetToBase(assetAmount(0)),
-              asset: runeAsset.asset,
+              asset,
               walletAddress: '',
               walletIndex,
               hdMode
@@ -564,7 +545,7 @@ export const Upgrade: React.FC<Props> = (props): JSX.Element => {
                 <InputBigNumber size="large" disabled={isLoading} decimal={8} onChange={onChangeInput} />
               </Styled.FormItem>
               <MaxBalanceButton
-                balance={{ amount: maxAmount, asset: runeAsset.asset }}
+                balance={{ amount: maxAmount, asset }}
                 onClick={addMaxAmountHandler}
                 disabled={isLoading}
               />

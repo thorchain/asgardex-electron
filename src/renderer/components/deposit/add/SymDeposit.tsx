@@ -479,9 +479,11 @@ export const SymDeposit: React.FC<Props> = (props) => {
             },
             runeWalletType: runeWB.walletType,
             runeWalletIndex: runeWB.walletIndex,
+            runeHDMode: runeWB.hdMode,
             runeSender: runeAddress,
             assetWalletType: assetWB.walletType,
             assetWalletIndex: assetWB.walletIndex,
+            assetHDMode: assetWB.hdMode,
             assetSender: assetAddress
           }
         })

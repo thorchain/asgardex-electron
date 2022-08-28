@@ -47,7 +47,7 @@ export const SendViewLTC: React.FC<Props> = (props): JSX.Element => {
         oBalances,
         O.chain((balances) => getWalletBalanceByAddress(balances, asset.walletAddress))
       ),
-    [oBalances, walletAddress]
+    [asset.walletAddress, oBalances]
   )
 
   const { transfer$ } = useChainContext()

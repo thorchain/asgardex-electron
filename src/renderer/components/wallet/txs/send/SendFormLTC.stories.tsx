@@ -72,10 +72,7 @@ const Template = ({ txRDStatus, feeRDStatus, balance, validAddress, walletType }
 
   return (
     <Component
-      walletType={walletType}
-      walletIndex={0}
-      hdMode="default"
-      walletAddress={'ltc-address'}
+      asset={{ asset: AssetLTC, walletAddress: 'ltc-address', walletType, walletIndex: 0, hdMode: 'default' }}
       transfer$={transfer$}
       balances={[ltcBalance, runeBalance]}
       balance={ltcBalance}

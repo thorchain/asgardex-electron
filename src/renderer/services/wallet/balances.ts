@@ -122,7 +122,7 @@ export const createBalancesService = ({
           resetReloadBalances: BNB.resetReloadBalances,
           balances$: FP.pipe(
             network$,
-            RxOp.switchMap((network) => BNB.balances$(walletType, network, walletIndex))
+            RxOp.switchMap((network) => BNB.balances$(walletType, network, walletIndex, hdMode))
           ),
           reloadBalances$: BNB.reloadBalances$
         }
@@ -320,7 +320,6 @@ export const createBalancesService = ({
                 chain,
                 walletAddress: O.none,
                 balances: RD.initial,
-                walletIndex: 0,
                 balancesType: walletBalanceType
               }),
             ({ address, walletIndex, hdMode }) =>
@@ -330,11 +329,11 @@ export const createBalancesService = ({
                 getBalanceByAddress$({ address, walletType: 'ledger', walletIndex, walletBalanceType, hdMode }),
                 RxOp.map<WalletBalancesRD, ChainBalance>((balances) => ({
                   walletType: 'ledger',
-                  walletIndex,
                   chain,
                   walletAddress: O.some(address),
                   balances,
-                  balancesType: walletBalanceType
+                  balancesType: walletBalanceType,
+                  hdMode
                 }))
               )
           )
@@ -359,16 +358,16 @@ export const createBalancesService = ({
     getChainBalance$({
       chain: LTCChain,
       walletType: 'keystore',
+      // walletIndex=0 (as long as we don't support HD wallets for keystore)
       walletIndex: 0,
       hdMode: 'default',
       walletBalanceType: 'all'
-    }) // walletIndex=0 (as long as we don't support HD wallets for keystore)
+    })
   ]).pipe(
     RxOp.map<[O.Option<WalletAddress>, WalletBalancesRD], ChainBalance>(([oWalletAddress, balances]) => ({
       walletType: 'keystore',
       chain: LTCChain,
       walletAddress: addressFromOptionalWalletAddress(oWalletAddress),
-      walletIndex: 0, // Always 0 as long as we don't support HD wallets for keystore for keystore
       balances,
       balancesType: 'all'
     }))

@@ -16,7 +16,7 @@ import {
 } from '../../../shared/api/io'
 import { LedgerError, Network } from '../../../shared/api/types'
 import { isLedgerWallet } from '../../../shared/utils/guard'
-import { WalletType } from '../../../shared/wallet/types'
+import { HDMode, WalletType } from '../../../shared/wallet/types'
 import { retryRequest } from '../../helpers/rx/retryRequest'
 import { Network$ } from '../app/types'
 import * as C from '../clients'
@@ -38,7 +38,10 @@ export const createTransactionService = (
   }: {
     network: Network
     clientUrl: ClientUrl
-    params: DepositParam & { walletIndex: number /* override walletIndex of DepositParam to avoid 'undefined' */ }
+    params: DepositParam & {
+      walletIndex: number /* override walletIndex of DepositParam to avoid 'undefined' */
+      hdMode: HDMode
+    }
   }) => {
     const depositLedgerTxParams: IPCLedgerDepositTxParams = {
       chain: THORChain,
@@ -51,7 +54,7 @@ export const createTransactionService = (
       walletIndex: params.walletIndex,
       feeOption: undefined,
       nodeUrl: clientUrl[network].node,
-      hdMode: 'default'
+      hdMode: params.hdMode
     }
     const encoded = ipcLedgerDepositTxParamsIO.encode(depositLedgerTxParams)
 
@@ -107,18 +110,20 @@ export const createTransactionService = (
   const sendPoolTx = ({
     walletType,
     walletIndex,
+    hdMode,
     asset,
     amount,
     memo
   }: DepositParam & {
     walletType: WalletType
+    hdMode: HDMode
     walletIndex: number /* override walletIndex of DepositParam to avoid 'undefined' */
   }) =>
     FP.pipe(
       Rx.combineLatest([network$, clientUrl$]),
       RxOp.switchMap(([network, clientUrl]) => {
         if (isLedgerWallet(walletType))
-          return depositLedgerTx({ network, clientUrl, params: { walletIndex, asset, amount, memo } })
+          return depositLedgerTx({ network, clientUrl, params: { walletIndex, hdMode, asset, amount, memo } })
 
         return depositTx({ walletIndex, asset, amount, memo })
       })

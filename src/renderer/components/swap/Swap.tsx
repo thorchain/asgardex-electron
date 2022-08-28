@@ -485,7 +485,7 @@ export const Swap = ({
     () =>
       FP.pipe(
         sequenceTOption(assetsToSwap, oPoolAddress, oTargetAddress, oSourceAssetWB),
-        O.map(([{ source, target }, poolAddress, address, { walletType, walletAddress, walletIndex }]) => {
+        O.map(([{ source, target }, poolAddress, address, { walletType, walletAddress, walletIndex, hdMode }]) => {
           const memo = getSwapMemo({
             asset: target,
             address,
@@ -499,7 +499,8 @@ export const Swap = ({
             memo,
             walletType,
             sender: walletAddress,
-            walletIndex
+            walletIndex,
+            hdMode
           }
         })
       ),

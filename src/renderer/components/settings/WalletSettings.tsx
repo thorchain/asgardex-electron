@@ -29,7 +29,7 @@ import { KeystoreId, Network } from '../../../shared/api/types'
 import { getDerivationPath as getEthDerivationPath } from '../../../shared/ethereum/ledger'
 import { EthHDMode } from '../../../shared/ethereum/types'
 import { isError } from '../../../shared/utils/guard'
-import { WalletAddress } from '../../../shared/wallet/types'
+import { HDMode, WalletAddress } from '../../../shared/wallet/types'
 import { ReactComponent as UnlockOutlined } from '../../assets/svg/icon-unlock-warning.svg'
 import { WalletPasswordConfirmationModal } from '../../components/modal/confirmation'
 import { RemoveWalletConfirmationModal } from '../../components/modal/confirmation/RemoveWalletConfirmationModal'
@@ -78,16 +78,8 @@ type Props = {
   changeKeystoreWallet$: ChangeKeystoreWalletHandler
   renameKeystoreWallet$: RenameKeystoreWalletHandler
   exportKeystore: () => Promise<void>
-  addLedgerAddress$: (params: {
-    chain: Chain
-    walletIndex: number
-    ethDerivationMode: O.Option<EthHDMode>
-  }) => LedgerAddressLD
-  verifyLedgerAddress$: (params: {
-    chain: Chain
-    walletIndex: number
-    ethDerivationMode: O.Option<EthHDMode>
-  }) => VerifiedLedgerAddressLD
+  addLedgerAddress$: (params: { chain: Chain; walletIndex: number; hdMode: HDMode }) => LedgerAddressLD
+  verifyLedgerAddress$: (params: { chain: Chain; walletIndex: number; hdMode: HDMode }) => VerifiedLedgerAddressLD
   removeLedgerAddress: (chain: Chain) => void
   keystoreUnlocked: KeystoreUnlocked
   wallets: KeystoreWalletsUI
@@ -225,7 +217,7 @@ export const WalletSettings: React.FC<Props> = (props): JSX.Element => {
         addLedgerAddress$({
           chain,
           walletIndex,
-          ethDerivationMode: isEthChain(chain) ? O.some(ethDerivationMode) : O.none
+          hdMode: isEthChain(chain) ? ethDerivationMode : 'default'
         })
       )
     },
@@ -234,17 +226,17 @@ export const WalletSettings: React.FC<Props> = (props): JSX.Element => {
 
   const verifyLedgerAddressHandler = useCallback(
     (walletAddress: WalletAddress) => {
-      const { chain, walletIndex, address } = walletAddress
+      const { chain, walletIndex, address, hdMode } = walletAddress
       setLedgerAddressToVerify(O.some({ chain, address }))
       subscribeVerifyLedgerAddressRD(
         verifyLedgerAddress$({
           chain,
           walletIndex,
-          ethDerivationMode: isEthChain(chain) ? O.some(ethDerivationMode) : O.none
+          hdMode
         })
       )
     },
-    [ethDerivationMode, subscribeVerifyLedgerAddressRD, verifyLedgerAddress$]
+    [subscribeVerifyLedgerAddressRD, verifyLedgerAddress$]
   )
 
   const renderLedgerAddress = useCallback(

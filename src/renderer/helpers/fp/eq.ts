@@ -11,7 +11,6 @@ import * as O from 'fp-ts/lib/Option'
 import * as S from 'fp-ts/lib/string'
 
 import { KeystoreId, LedgerError, Network } from '../../../shared/api/types'
-import { EthHDMode } from '../../../shared/ethereum/types'
 import { HDMode, WalletAddress, WalletType } from '../../../shared/wallet/types'
 import { DepositAssetFees, DepositFees, SwapFeesParams, SymDepositAddresses } from '../../services/chain/types'
 import { ApproveParams } from '../../services/ethereum/types'
@@ -107,9 +106,6 @@ export const eqBalancesRD = RD.getEq<ApiError, Balance[]>(eqApiError, eqBalances
 export const eqAssetsWithBalanceRD = RD.getEq<ApiError, Balance[]>(eqApiError, eqBalances)
 
 export const eqWalletType: Eq.Eq<WalletType> = eqString
-
-export const eqEthDerivationMode: Eq.Eq<EthHDMode> = eqString
-export const eqOEthDerivationMode = O.getEq(eqEthDerivationMode)
 
 export const eqHDMode: Eq.Eq<HDMode> = eqString
 export const eqOHDMode = O.getEq(eqHDMode)

@@ -1,13 +1,13 @@
 import React, { useCallback, useMemo } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
-import { AssetRuneNative, assetToString, THORChain } from '@xchainjs/xchain-util'
+import { THORChain } from '@xchainjs/xchain-util'
 import { Col, Row } from 'antd'
 import * as FP from 'fp-ts/function'
 import * as O from 'fp-ts/Option'
 import { useObservableState } from 'observable-hooks'
-import { useIntl } from 'react-intl'
 import { useNavigate, useParams } from 'react-router-dom'
+import * as RxOp from 'rxjs/operators'
 
 import { ErrorView } from '../../../components/shared/error'
 import { LoadingView } from '../../../components/shared/loading'
@@ -18,36 +18,39 @@ import { InteractType } from '../../../components/wallet/txs/interact/Interact.t
 import { InteractForm } from '../../../components/wallet/txs/interact/InteractForm'
 import { useThorchainContext } from '../../../contexts/ThorchainContext'
 import { useWalletContext } from '../../../contexts/WalletContext'
-import { sequenceTOption } from '../../../helpers/fpHelpers'
+import { eqOSelectedWalletAsset } from '../../../helpers/fp/eq'
+import { sequenceTOption, sequenceTRD } from '../../../helpers/fpHelpers'
 import { liveData } from '../../../helpers/rx/liveData'
-import {
-  getWalletAddressFromNullableString,
-  getWalletBalanceByAddress,
-  getWalletIndexFromNullableString,
-  getWalletTypeFromNullableString
-} from '../../../helpers/walletHelper'
+import { getWalletBalanceByAddress } from '../../../helpers/walletHelper'
 import { useNetwork } from '../../../hooks/useNetwork'
 import { useOpenExplorerTxUrl } from '../../../hooks/useOpenExplorerTxUrl'
 import { useValidateAddress } from '../../../hooks/useValidateAddress'
 import * as walletRoutes from '../../../routes/wallet'
 import { FeeRD } from '../../../services/chain/types'
 import { DEFAULT_BALANCES_FILTER, INITIAL_BALANCES_STATE } from '../../../services/wallet/const'
+import { SelectedWalletAssetRD } from '../../../services/wallet/types'
 import * as Styled from './InteractView.styles'
 
 export const InteractView: React.FC = () => {
-  const {
-    interactType: routeInteractType,
-    walletAddress: routeWalletAddress,
-    walletType: routeWalletType,
-    walletIndex: routeWalletIndex
-  } = useParams<walletRoutes.InteractParams>()
+  const { interactType: routeInteractType } = useParams<walletRoutes.InteractParams>()
 
-  const intl = useIntl()
+  const { selectedAsset$ } = useWalletContext()
 
-  const oInteractType = getInteractTypeFromNullableString(routeInteractType)
-  const oWalletIndex = getWalletIndexFromNullableString(routeWalletIndex)
-  const oWalletType = getWalletTypeFromNullableString(routeWalletType)
-  const oWalletAddress = getWalletAddressFromNullableString(routeWalletAddress)
+  const [selectedAssetRD] = useObservableState<SelectedWalletAssetRD>(
+    () =>
+      FP.pipe(
+        selectedAsset$,
+        RxOp.distinctUntilChanged(eqOSelectedWalletAsset.equals),
+        RxOp.map((v) => v),
+        RxOp.map((oSelectedAsset) => RD.fromOption(oSelectedAsset, () => Error('No selected asset'))),
+        RxOp.startWith(RD.pending)
+      ),
+    RD.initial
+  )
+
+  const interactTypeRD = FP.pipe(routeInteractType, getInteractTypeFromNullableString, (oInteractType) =>
+    RD.fromOption(oInteractType, () => Error(`Invalid route param for interactive type: ${routeInteractType}`))
+  )
 
   const navigate = useNavigate()
 
@@ -69,10 +72,12 @@ export const InteractView: React.FC = () => {
   const oWalletBalance = useMemo(
     () =>
       FP.pipe(
-        sequenceTOption(oBalances, oWalletAddress),
-        O.chain(([balances, walletAddress]) => getWalletBalanceByAddress(balances, walletAddress))
+        selectedAssetRD,
+        RD.toOption,
+        (oSelectedAsset) => sequenceTOption(oBalances, oSelectedAsset),
+        O.chain(([balances, { walletAddress }]) => getWalletBalanceByAddress(balances, walletAddress))
       ),
-    [oBalances, oWalletAddress]
+    [oBalances, selectedAssetRD]
   )
 
   const { interact$ } = useThorchainContext()
@@ -90,56 +95,31 @@ export const InteractView: React.FC = () => {
 
   const interactTypeChanged = useCallback(
     (type: InteractType) => {
-      FP.pipe(
-        sequenceTOption(oWalletAddress, oWalletType, oWalletIndex),
-        O.map(([walletAddress, walletType, walletIndex]) =>
-          navigate(
-            walletRoutes.interact.path({
-              interactType: type,
-              walletAddress,
-              walletType,
-              walletIndex: walletIndex.toString()
-            })
-          )
-        )
+      navigate(
+        walletRoutes.interact.path({
+          interactType: type
+        })
       )
     },
-    [navigate, oWalletAddress, oWalletType, oWalletIndex]
-  )
-
-  const renderRouteError = useMemo(
-    () => (
-      <>
-        <BackLink />
-        <ErrorView
-          title={intl.formatMessage(
-            { id: 'routes.invalid.params' },
-            {
-              params: `routeInteractType: ${routeInteractType}, walletAddress: ${routeWalletAddress}, walletType: ${routeWalletType}, walletIndex: ${routeWalletIndex}, `
-            }
-          )}
-        />
-      </>
-    ),
-    [intl, routeWalletAddress, routeWalletIndex, routeWalletType, routeInteractType]
+    [navigate]
   )
 
   return FP.pipe(
-    sequenceTOption(oInteractType, oWalletAddress, oWalletType, oWalletIndex),
-    O.fold(
-      () => renderRouteError,
-      ([interactType, walletAddress, walletType, walletIndex]) => (
+    sequenceTRD(interactTypeRD, selectedAssetRD),
+    RD.fold(
+      () => <LoadingView size="large" />,
+      () => <LoadingView size="large" />,
+      (error) => (
+        <>
+          <BackLink />
+          <ErrorView title="Missing data for InteractiveView" subTitle={error?.message ?? error.toString()} />
+        </>
+      ),
+      ([interactType, { walletType, walletIndex, hdMode }]) => (
         <>
           <Row justify="space-between">
             <Col>
-              <BackLink
-                path={walletRoutes.assetDetail.path({
-                  asset: assetToString(AssetRuneNative),
-                  walletAddress,
-                  walletType,
-                  walletIndex: walletIndex.toString()
-                })}
-              />
+              <BackLink path={walletRoutes.assetDetail.path()} />
             </Col>
           </Row>
           <Styled.Container>
@@ -157,6 +137,7 @@ export const InteractView: React.FC = () => {
                       interactType={interactType}
                       walletIndex={walletIndex}
                       walletType={walletType}
+                      hdMode={hdMode}
                       balance={walletBalance}
                       interact$={interact$}
                       openExplorerTxUrl={openExplorerTxUrl}

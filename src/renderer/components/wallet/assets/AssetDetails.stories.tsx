@@ -37,7 +37,6 @@ export const StoryBNB: BaseStory<never, JSX.Element> = () => (
   <AssetDetails
     walletType="keystore"
     walletAddress="bnb-address"
-    walletIndex={0}
     txsPageRD={RD.initial}
     balances={balances}
     asset={AssetBNB}
@@ -53,7 +52,6 @@ export const StoryRuneTxSuccess: BaseStory<never, JSX.Element> = () => (
   <AssetDetails
     walletType="keystore"
     walletAddress="thor-address"
-    walletIndex={0}
     txsPageRD={RD.initial}
     balances={balances}
     asset={AssetRune67C}
@@ -69,7 +67,6 @@ export const StoryRuneNoSend: BaseStory<never, JSX.Element> = () => (
   <AssetDetails
     walletType="keystore"
     walletAddress="thor-address"
-    walletIndex={0}
     txsPageRD={RD.initial}
     balances={balances}
     asset={AssetRune67C}
@@ -85,7 +82,6 @@ export const StoryRuneNoUpgrade: BaseStory<never, JSX.Element> = () => (
   <AssetDetails
     walletType="keystore"
     walletAddress="bnb-address"
-    walletIndex={0}
     txsPageRD={RD.initial}
     balances={balances}
     asset={AssetRune67C}
@@ -101,7 +97,6 @@ export const StoryRuneTxError: BaseStory<never, JSX.Element> = () => (
   <AssetDetails
     walletType="keystore"
     walletAddress="bnb-address"
-    walletIndex={0}
     txsPageRD={RD.initial}
     balances={balances}
     asset={AssetRune67C}
@@ -117,7 +112,6 @@ export const StoryRuneNoBalances: BaseStory<never, JSX.Element> = () => (
   <AssetDetails
     walletType="keystore"
     walletAddress="bnb-address"
-    walletIndex={0}
     txsPageRD={RD.initial}
     balances={getBalances([runeBalanceEmpty, bnbBalance])}
     asset={AssetRune67C}
@@ -133,7 +127,6 @@ export const StoryRuneFeeNotCovered: BaseStory<never, JSX.Element> = () => (
   <AssetDetails
     walletType="keystore"
     walletAddress="bnb-address"
-    walletIndex={0}
     txsPageRD={RD.initial}
     balances={getBalances([runeBnbBalance, bnbBalanceEmpty])}
     asset={AssetRune67C}

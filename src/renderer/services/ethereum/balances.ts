@@ -37,7 +37,7 @@ const balances$: ({
   network: Network
   walletIndex: number
   hdMode: HDMode
-}) => C.WalletBalancesLD = ({ walletType, walletIndex, network }) => {
+}) => C.WalletBalancesLD = ({ walletType, walletIndex, network, hdMode }) => {
   // For testnet we limit requests by using pre-defined assets only
   // because `xchain-ethereum` does for each asset a single request
   const assets: Asset[] | undefined = network === 'testnet' ? ETHAssetsTestnet : undefined

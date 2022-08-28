@@ -2,7 +2,7 @@ import { Address } from '@xchainjs/xchain-client'
 import { Client } from '@xchainjs/xchain-cosmos'
 import { Asset, BaseAmount } from '@xchainjs/xchain-util'
 
-import { WalletType } from '../../../shared/wallet/types'
+import { HDMode, WalletType } from '../../../shared/wallet/types'
 import * as C from '../clients'
 
 export type Client$ = C.Client$<Client>
@@ -20,6 +20,7 @@ export type SendTxParams = {
   asset: Asset
   memo?: string
   walletIndex: number
+  hdMode: HDMode
   feeAmount: BaseAmount
 }
 

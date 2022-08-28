@@ -16,7 +16,8 @@ const few: WalletBalances = [AssetBNB, ASSETS_MAINNET.TOMO].map<WalletBalance>((
   asset,
   amount: assetToBase(assetAmount(1)),
   walletAddress: `${assetToString(asset)} wallet`,
-  walletIndex: 0
+  walletIndex: 0,
+  hdMode: 'default'
 }))
 
 const meta: ComponentMeta<typeof Component> = {

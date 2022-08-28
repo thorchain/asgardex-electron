@@ -113,14 +113,16 @@ export type SelectedWalletAsset = {
   walletIndex: number
   hdMode: HDMode
 }
+
+export type SelectedWalletAssetRD = RD.RemoteData<Error, SelectedWalletAsset>
+export type SelectedWalletAssetLD = LiveData<Error, SelectedWalletAsset>
 /**
- * Wraps WalletBalancesRD into an object to provide extra information (`Address` + `Chain` + `WalletType`)
- * Currently needed in `AssetView` - TODO(@Veado) Think about to extract it into view layer (as helper or so)
+ * Wraps WalletBalancesRD into an object to provide extra information (`Address` + `Chain` + `WalletType` + `WalletBalanceType`)
+ * Currently needed in `AssetView` only
+ * TODO(@Veado) Think about to extract it into view layer (as helper or so)
  */
 export type ChainBalance = {
   walletType: WalletType
-  walletIndex: number
-  hdMode: HDMode
   walletAddress: O.Option<Address>
   chain: Chain
   balances: WalletBalancesRD

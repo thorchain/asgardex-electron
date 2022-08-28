@@ -68,6 +68,7 @@ export type AsymDepositParams = {
   readonly memo: string
   readonly walletIndex: number
   readonly walletType: WalletType
+  readonly hdMode: HDMode
 }
 
 export type SymDepositAmounts = { rune: BaseAmount; asset: BaseAmount }
@@ -79,9 +80,11 @@ export type SymDepositParams = {
   readonly memos: SymDepositMemo
   readonly runeWalletType: WalletType
   readonly runeWalletIndex: number
+  readonly runeHDMode: HDMode
   readonly runeSender: Address
   readonly assetWalletIndex: number
   readonly assetWalletType: WalletType
+  readonly assetHDMode: HDMode
   readonly assetSender: Address
 }
 
@@ -133,6 +136,7 @@ export type SwapTxParams = {
   readonly walletType: WalletType
   readonly sender: Address
   readonly walletIndex: number
+  readonly hdMode: HDMode
 }
 
 export type SwapStateHandler = (p: SwapTxParams) => SwapState$
@@ -274,6 +278,7 @@ export type UpgradeRuneParams = {
   readonly walletAddress: string
   readonly walletType: WalletType
   readonly walletIndex: number
+  readonly hdMode: HDMode
   readonly poolAddress: PoolAddress
   readonly asset: Asset
   readonly amount: BaseAmount

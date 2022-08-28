@@ -33,8 +33,8 @@ export type SendTxParams = {
   memo: Memo
   feeOption: FeeOption
   walletIndex: number
-  walletType: WalletType
   hdMode: HDMode
+  walletType: WalletType
 }
 
 export type SendPoolTxParams = SendTxParams & {
