@@ -296,38 +296,73 @@ ASGARDEX follows [security recommendation made by Electron team](https://www.ele
 yarn package:electron
 ```
 
-## Keystore
+## Keystores
 
-By creating a new wallet or importing an existing one, ASGARDEX is saving wallet's phrase encrypted in `keystore.json` on your machine in [Electron's `appData` folder](https://www.electronjs.org/docs/api/app#appgetpathname) at following location:
+By creating or importing a keystore wallet, ASGARDEX is adding its encrypted keystore into `wallets.json` in [Electron's `appData` folder](https://www.electronjs.org/docs/api/app#appgetpathname) at following location:
 
 ### Windows
 
 ```bash
 # ASGARDEX installed from *.exe
-%APPDATA%/ASGARDEX/storage/keystore.json
+%APPDATA%/ASGARDEX/storage/wallets.json
 # ASGARDEX built and run locally
-%APPDATA%/Electron/storage/keystore.json
+%APPDATA%/Electron/storage/wallets.json
 ```
 
 ### macOS
 
 ```bash
 # ASGARDEX installed from *.dmg
-~/Library/Application Support/ASGARDEX/storage/keystore.json
+~/Library/Application Support/ASGARDEX/storage/wallets.json
 # ASGARDEX built and run locally
-~/Library/Application Support/Electron/storage/keystore.json
+~/Library/Application Support/Electron/storage/wallets.json
 ```
 
 ### Linux
 
 ```bash
 # ASGARDEX installed from *.deb
-~/.config/ASGARDEX/storage/keystore.json
+~/.config/ASGARDEX/storage/wallets.json
 # ASGARDEX built and run locally
-~/.config/Electron/storage/keystore.json
+~/.config/Electron/storage/wallets.json
 ```
 
-`keystore.json` can be removed in ASGARDEX by clicking "Remove wallet" in `Wallet -> Settings` or by removing it manually.
+By removing a wallet in `Wallet` -> `Settings` its data will be removed from `wallets.json`. ASGARDEX will prompt a message to users to inform about saving its phrase on a save place before removing the wallet.
+
+After removing all wallets `wallets.json` will be empty and won't include any wallet related data.
+
+## Ledger accounts
+
+By adding a Ledger account to a wallet, ASGARDEX saves its `address` and some extra information (`chain`, `network`, `walletIndex`, `hdMode`) into `ledgers.json` located in [Electron's `appData` folder](https://www.electronjs.org/docs/api/app#appgetpathname):
+
+### Windows
+
+```bash
+# ASGARDEX installed from *.exe
+%APPDATA%/ASGARDEX/storage/ledgers.json
+# ASGARDEX built and run locally
+%APPDATA%/Electron/storage/ledgers.json
+```
+
+### macOS
+
+```bash
+# ASGARDEX installed from *.dmg
+~/Library/Application Support/ASGARDEX/storage/ledgers.json
+# ASGARDEX built and run locally
+~/Library/Application Support/Electron/storage/ledgers.json
+```
+
+### Linux
+
+```bash
+# ASGARDEX installed from *.deb
+~/.config/ASGARDEX/storage/ledgers.json
+# ASGARDEX built and run locally
+~/.config/Electron/storage/ledgers.json
+```
+
+Whenever a Ledger has been removed in `Wallet` -> `Settings`, its data will be removed from `ledgers.json`. By removing all Ledger accounts from each wallet `ledgers.json` will be empty and won't include any Ledger related data. The same by removing all wallets.
 
 ## Git branching workflow
 
