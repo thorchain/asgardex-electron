@@ -5,7 +5,7 @@ import { ComponentMeta, StoryFn } from '@storybook/react'
 import { EditableWalletName as Component, Props } from './EditableWalletName'
 
 export const Default: StoryFn<Props> = (args) => {
-  const { name, onChange, ...otherProps } = args
+  const { name, names, onChange, ...otherProps } = args
   const [walletName, setWalletName] = useState(name)
 
   const onChangeHandler = (name: string) => {
@@ -13,7 +13,7 @@ export const Default: StoryFn<Props> = (args) => {
     onChange(name)
   }
 
-  return <Component name={walletName} onChange={onChangeHandler} {...otherProps} />
+  return <Component name={walletName} onChange={onChangeHandler} names={names} {...otherProps} />
 }
 
 const meta: ComponentMeta<typeof Component> = {
@@ -30,7 +30,8 @@ const meta: ComponentMeta<typeof Component> = {
     onChange: { action: 'onChange' }
   },
   args: {
-    name: 'my wallet'
+    name: 'my wallet',
+    names: ['my wallet1', 'wallet2']
   }
 }
 

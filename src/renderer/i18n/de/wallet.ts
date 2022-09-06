@@ -3,7 +3,8 @@ import { WalletMessages } from '../types'
 const wallet: WalletMessages = {
   'wallet.name': 'Wallet Name',
   'wallet.name.maxChars': 'Max. {max} Zeichen',
-  'wallet.name.error.empty': 'Bitte Namen der Wallet angeben',
+  'wallet.name.error.empty': 'Bitte gebe einen Namen für Deine Wallet ein',
+  'wallet.name.error.duplicated': 'Dieser Name existiert bereits, bitte einen anderen verwenden.',
   'wallet.name.error.rename': 'Error beim Umbenennen der Wallet',
   'wallet.nav.deposits': 'Einzahlungen',
   'wallet.nav.bonds': 'Bonds',

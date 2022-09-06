@@ -4,6 +4,7 @@ const wallet: WalletMessages = {
   'wallet.name': 'Название кошелька',
   'wallet.name.maxChars': 'Макс. {max} символов',
   'wallet.name.error.empty': 'Пожалуйста, введите имя для вашего кошелька',
+  'wallet.name.error.duplicated': 'Name already exists, please use another name. - RU',
   'wallet.name.error.rename': 'Ошибка при переименовании кошелька',
   'wallet.nav.deposits': 'Вклады',
   'wallet.nav.bonds': 'Бонды',

@@ -1,5 +1,9 @@
 # 1.18.1 (2022-xx-xx)
 
+## Fix
+
+Add validation of wallet names to avoid duplications [#2386](https://github.com/thorchain/asgardex-electron/issues/2386)
+
 ## Internal
 
 - Upgrade to Yarn 3.x [#2389](https://github.com/thorchain/asgardex-electron/issues/2389)
