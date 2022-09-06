@@ -39,7 +39,7 @@ import { PhraseCopyModal } from '../../components/wallet/phrase/PhraseCopyModal'
 import { getChainAsset, isEthChain } from '../../helpers/chainHelper'
 import { eqChain, eqString } from '../../helpers/fp/eq'
 import { emptyString } from '../../helpers/stringHelper'
-import { isEnabledLedger } from '../../helpers/walletHelper'
+import { getWalletNamesFromKeystoreWallets, isEnabledLedger } from '../../helpers/walletHelper'
 import { useSubscriptionState } from '../../hooks/useSubscriptionState'
 import * as appRoutes from '../../routes/app'
 import * as walletRoutes from '../../routes/wallet'
@@ -524,7 +524,7 @@ export const WalletSettings: React.FC<Props> = (props): JSX.Element => {
     () =>
       FP.pipe(
         wallets,
-        A.map(({ name }) => name),
+        getWalletNamesFromKeystoreWallets,
         A.filter((name) => !eqString.equals(name, walletName))
       ),
     [walletName, wallets]

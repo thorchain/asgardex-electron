@@ -1,8 +1,6 @@
 import React, { useCallback, useEffect, useMemo } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
-import * as A from 'fp-ts/lib/Array'
-import * as FP from 'fp-ts/lib/function'
 import { useObservableState } from 'observable-hooks'
 import { useIntl } from 'react-intl'
 import { useNavigate } from 'react-router-dom'
@@ -12,6 +10,7 @@ import { Tabs } from '../../../components/tabs'
 import { ImportKeystore } from '../../../components/wallet/keystore'
 import { ImportPhrase } from '../../../components/wallet/phrase/'
 import { useWalletContext } from '../../../contexts/WalletContext'
+import { getWalletNamesFromKeystoreWallets } from '../../../helpers/walletHelper'
 import { useKeystoreClientStates } from '../../../hooks/useKeystoreClientStates'
 import { useKeystoreWallets } from '../../../hooks/useKeystoreWallets'
 import * as walletRoutes from '../../../routes/wallet'
@@ -42,15 +41,7 @@ export const ImportsView: React.FC = (): JSX.Element => {
   const { clientStates } = useKeystoreClientStates()
 
   const { walletsUI } = useKeystoreWallets()
-
-  const walletNames = useMemo(
-    () =>
-      FP.pipe(
-        walletsUI,
-        A.map(({ name }) => name)
-      ),
-    [walletsUI]
-  )
+  const walletNames = useMemo(() => getWalletNamesFromKeystoreWallets(walletsUI), [walletsUI])
 
   // Reset `ImportingKeystoreState` by entering the view
   useEffect(() => {
