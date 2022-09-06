@@ -11,7 +11,7 @@
     "dev:app": "cross-env BROWSER=none yarn start:web",
     "dev:electron": "wait-on http://localhost:3000 && nodemon -I --watch ./src/main/ --exec electron .",
     "build": "cross-env CI=false PUBLIC_URL=./ craco build",
-    "prebuild": "webpack --config webpack.main.js --mode production",
+    "prebuild": "./node_modules/.bin/webpack --config webpack.main.js --mode production",
     "test": "./node_modules/.bin/jest",
     "package": "yarn prebuild && yarn build && yarn package:electron",
     "package:electron": "yarn force-rebuild-native-deps && electron-builder build -c.extraMetadata.main=build/electron.js --config .electronbuildrc",
