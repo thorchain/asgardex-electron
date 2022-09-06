@@ -7682,6 +7682,7 @@ __metadata:
     electron-notarize: ^1.2.1
     electron-updater: ^5.0.1
     electron-window-state: ^5.0.3
+    eslint: ^8.23.0
     eslint-config-prettier: ^8.5.0
     eslint-plugin-prettier: ^4.0.0
     ethers: ^5.6.6
@@ -12503,7 +12504,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"eslint@npm:^8.3.0":
+"eslint@npm:^8.23.0, eslint@npm:^8.3.0":
   version: 8.23.0
   resolution: "eslint@npm:8.23.0"
   dependencies:

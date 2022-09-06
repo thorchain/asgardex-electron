@@ -105,7 +105,7 @@ yarn
 In case you get an an `ENAMETOOLONG: name too long` error or similar by running `yarn install`, e.g.
 
 ```bash
-error An unexpected error occurred: "ENAMETOOLONG: name too long, unlink '~/.cache/yarn/v6/npm-@storybook-react-docgen-typescript-plugin-1.0.2-canary.6.9d540b91e815f8fc2f8829189deb00553559ff63.0-3103532ff494fb7dc3cf835f10740ecf6a26c0f9-integrity/node_modules/@storybook/react-docgen-typescript-plugin'".
+YN0001: │ Error: @storybook/react-docgen-typescript-plugin@npm:1.0.2-canary.6.9d540b91e815f8fc2f8829189deb00553559ff63.0: ENAMETOOLONG: name too long, unlink '~/.yarn/berry/cache/@storybook-react-docgen-typescript-plugin-npm-1.0.2-canary.6.9d540b91e815f8fc2f8829189deb00553559ff63.0-b31cc57c40-8.zip' -> 'asgardex-electron/.yarn/cache/@storybook-react-docgen-typescript-plugin-npm-1.0.2-canary.6.9d540b91e815f8fc2f8829189deb00553559ff63.0-b31cc57c40-91a3015d38.zip-3439e0483605ccee.tmp'
 ```
 
 change cache folder as described in [Unable to install latest SB version: Error: ENAMETOOLONG: name too long, unlink... #18441](https://github.com/storybookjs/storybook/discussions/18441) to run `yarn install` as follow:
