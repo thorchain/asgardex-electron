@@ -37,7 +37,7 @@ import { AssetIcon } from '../../components/uielements/assets/assetIcon/AssetIco
 import { QRCodeModal } from '../../components/uielements/qrCodeModal/QRCodeModal'
 import { PhraseCopyModal } from '../../components/wallet/phrase/PhraseCopyModal'
 import { getChainAsset, isEthChain } from '../../helpers/chainHelper'
-import { eqChain } from '../../helpers/fp/eq'
+import { eqChain, eqString } from '../../helpers/fp/eq'
 import { emptyString } from '../../helpers/stringHelper'
 import { isEnabledLedger } from '../../helpers/walletHelper'
 import { useSubscriptionState } from '../../hooks/useSubscriptionState'
@@ -520,6 +520,16 @@ export const WalletSettings: React.FC<Props> = (props): JSX.Element => {
   const { state: changeWalletState, subscribe: subscribeChangeWalletState } =
     useSubscriptionState<ChangeKeystoreWalletRD>(RD.initial)
 
+  const walletNames = useMemo(
+    () =>
+      FP.pipe(
+        wallets,
+        A.map(({ name }) => name),
+        A.filter((name) => !eqString.equals(name, walletName))
+      ),
+    [walletName, wallets]
+  )
+
   const changeWalletHandler = useCallback(
     (id: KeystoreId) => {
       subscribeChangeWalletState(changeKeystoreWallet$(id))
@@ -623,6 +633,7 @@ export const WalletSettings: React.FC<Props> = (props): JSX.Element => {
             </h1>
             <EditableWalletName
               name={walletName}
+              names={walletNames}
               onChange={changeWalletNameHandler}
               loading={RD.isPending(renameWalletState)}
             />

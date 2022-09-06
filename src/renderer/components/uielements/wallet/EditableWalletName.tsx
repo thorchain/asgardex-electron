@@ -12,6 +12,7 @@ import { Input } from '../input/Input'
 
 export type Props = {
   name: string
+  names: string[]
   loading?: boolean
   onChange: (name: string) => void
   className?: string
@@ -22,7 +23,7 @@ type FormData = {
 }
 
 export const EditableWalletName: React.FC<Props> = (props): JSX.Element => {
-  const { name: initialName, onChange, loading = false, className = '' } = props
+  const { name: initialName, names, onChange, loading = false, className = '' } = props
 
   const [editableName, setEditableName] = useState<O.Option<string>>(O.none)
   const [name, setName] = useState<string>(initialName)
@@ -33,7 +34,8 @@ export const EditableWalletName: React.FC<Props> = (props): JSX.Element => {
     register,
     formState: { errors },
     reset,
-    handleSubmit
+    handleSubmit,
+    setError
   } = useForm<FormData>()
 
   const renderName = useCallback(() => {
@@ -62,10 +64,14 @@ export const EditableWalletName: React.FC<Props> = (props): JSX.Element => {
         setEditableName(O.none)
       }
       const submit = ({ name }: FormData) => {
-        setEditableName(O.none)
-        onChange(name)
-        setName(name)
-        reset()
+        if (names.includes(name)) {
+          setError('name', { type: 'custom', message: intl.formatMessage({ id: 'wallet.name.error.duplicated' }) })
+        } else {
+          setEditableName(O.none)
+          onChange(name)
+          setName(name)
+          reset()
+        }
       }
 
       const keyDownHandler = (e: React.KeyboardEvent<HTMLElement>) => {
@@ -85,7 +91,7 @@ export const EditableWalletName: React.FC<Props> = (props): JSX.Element => {
               autoFocus
               uppercase={false}
               maxLength={MAX_WALLET_NAME_CHARS}
-              {...register('name', { required: true })}
+              {...register('name', { required: intl.formatMessage({ id: 'wallet.name.error.empty' }) })}
               error={!!errors.name}
               onKeyDown={keyDownHandler}
             />
@@ -95,9 +101,7 @@ export const EditableWalletName: React.FC<Props> = (props): JSX.Element => {
             <XCircleIcon className="ml-[5px] h-[24px] w-[24px] cursor-pointer text-error0" onClick={cancel} />
           </div>
           {errors.name && (
-            <p className={`mt-10px font-main text-[14px] uppercase text-error0`}>
-              {intl.formatMessage({ id: 'wallet.name.error.empty' })}
-            </p>
+            <p className={`mt-10px font-main text-[14px] uppercase text-error0`}>{errors.name.message}</p>
           )}
         </form>
       )
