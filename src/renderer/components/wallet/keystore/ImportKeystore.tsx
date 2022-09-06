@@ -24,6 +24,7 @@ import { Label } from '../../uielements/label'
 
 export type Props = {
   walletId: number
+  walletNames: string[]
   clientStates: KeystoreClientStates
   importKeystore: (params: ImportKeystoreParams) => Promise<void>
   loadKeystore$: () => LoadKeystoreLD
@@ -31,7 +32,7 @@ export type Props = {
 }
 
 export const ImportKeystore: React.FC<Props> = (props): JSX.Element => {
-  const { importKeystore, importingKeystoreState, loadKeystore$, clientStates, walletId } = props
+  const { importKeystore, importingKeystoreState, loadKeystore$, clientStates, walletId, walletNames } = props
 
   const [form] = Form.useForm()
 
@@ -106,6 +107,15 @@ export const ImportKeystore: React.FC<Props> = (props): JSX.Element => {
     [clientStates]
   )
 
+  const walletNameValidator = useCallback(
+    async (_: unknown, value: string) => {
+      if (walletNames.includes(value)) {
+        return Promise.reject(intl.formatMessage({ id: 'wallet.name.error.duplicated' }))
+      }
+    },
+    [intl, walletNames]
+  )
+
   return (
     <>
       <InnerForm className="w-full p-30px pt-15px" labelCol={{ span: 24 }} form={form} onFinish={submitForm}>
@@ -138,6 +148,7 @@ export const ImportKeystore: React.FC<Props> = (props): JSX.Element => {
             <Form.Item
               className="w-full !max-w-[380px]"
               name="name"
+              rules={[{ validator: walletNameValidator }]}
               label={
                 <div>
                   {intl.formatMessage({ id: 'wallet.name' })}

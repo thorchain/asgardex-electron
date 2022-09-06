@@ -106,7 +106,7 @@ export const EditableWalletName: React.FC<Props> = (props): JSX.Element => {
         </form>
       )
     },
-    [errors.name, handleSubmit, intl, onChange, register, reset]
+    [errors.name, handleSubmit, intl, names, onChange, register, reset, setError]
   )
 
   return (

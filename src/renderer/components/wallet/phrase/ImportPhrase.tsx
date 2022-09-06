@@ -24,12 +24,13 @@ import '../../uielements/input/overrides.css'
 
 type Props = {
   walletId: number
+  walletNames: string[]
   addKeystore: (params: AddKeystoreParams) => Promise<void>
   clientStates: KeystoreClientStates
 }
 
 export const ImportPhrase: React.FC<Props> = (props): JSX.Element => {
-  const { addKeystore, clientStates, walletId } = props
+  const { addKeystore, clientStates, walletId, walletNames } = props
   const [form] = Form.useForm()
 
   const intl = useIntl()
@@ -86,7 +87,7 @@ export const ImportPhrase: React.FC<Props> = (props): JSX.Element => {
     [addKeystore, walletId]
   )
 
-  const rules: Rule[] = useMemo(
+  const passwordRules: Rule[] = useMemo(
     () => [
       { required: true, message: intl.formatMessage({ id: 'wallet.password.empty' }) },
       ({ getFieldValue }) => ({
@@ -99,6 +100,15 @@ export const ImportPhrase: React.FC<Props> = (props): JSX.Element => {
       })
     ],
     [intl]
+  )
+
+  const walletNameValidator = useCallback(
+    async (_: unknown, value: string) => {
+      if (walletNames.includes(value)) {
+        return Promise.reject(intl.formatMessage({ id: 'wallet.name.error.duplicated' }))
+      }
+    },
+    [intl, walletNames]
   )
 
   const renderImportError = useMemo(
@@ -147,7 +157,7 @@ export const ImportPhrase: React.FC<Props> = (props): JSX.Element => {
               name="password"
               className="w-full !max-w-[380px]"
               validateTrigger={['onSubmit', 'onBlur']}
-              rules={rules}
+              rules={passwordRules}
               label={intl.formatMessage({ id: 'common.password' })}>
               <InputPassword className="!text-lg" size="large" />
             </Form.Item>
@@ -158,7 +168,7 @@ export const ImportPhrase: React.FC<Props> = (props): JSX.Element => {
               className="w-full !max-w-[380px]"
               dependencies={['password']}
               validateTrigger={['onSubmit', 'onBlur']}
-              rules={rules}
+              rules={passwordRules}
               label={intl.formatMessage({ id: 'wallet.password.repeat' })}>
               <InputPassword className="!text-lg" size="large" />
             </Form.Item>
@@ -167,6 +177,7 @@ export const ImportPhrase: React.FC<Props> = (props): JSX.Element => {
             <Form.Item
               name="name"
               className="w-full !max-w-[380px]"
+              rules={[{ validator: walletNameValidator }]}
               label={
                 <div>
                   {intl.formatMessage({ id: 'wallet.name' })}
