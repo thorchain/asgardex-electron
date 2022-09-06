@@ -20,7 +20,7 @@ jobs:
         if: runner.os == 'Linux'
 
       - name: Install dependencies
-        run: yarn install --frozen-lockfile
+        run: yarn install --immutable
 
       - name: Run unit tests
         run: yarn test
@@ -42,7 +42,7 @@ jobs:
         if: runner.os == 'Linux'
 
       - name: Install dependencies
-        run: yarn install --frozen-lockfile
+        run: yarn install --immutable
 
       - name: Run ESLint
         run: yarn lint
@@ -64,7 +64,7 @@ jobs:
         if: runner.os == 'Linux'
 
       - name: Install dependencies
-        run: yarn install --frozen-lockfile
+        run: yarn install --immutable
 
       - name: Run build
         env:

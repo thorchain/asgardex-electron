@@ -11,11 +11,11 @@
     "dev:app": "cross-env BROWSER=none yarn start:web",
     "dev:electron": "wait-on http://localhost:3000 && nodemon -I --watch ./src/main/ --exec electron .",
     "build": "cross-env CI=false PUBLIC_URL=./ craco build",
-    "prebuild": "webpack --config webpack.main.js --mode production",
+    "prebuild": "./node_modules/.bin/webpack --config webpack.main.js --mode production",
     "test": "./node_modules/.bin/jest",
-    "package": "yarn build && yarn package:electron",
+    "package": "yarn prebuild && yarn build && yarn package:electron",
     "package:electron": "yarn force-rebuild-native-deps && electron-builder build -c.extraMetadata.main=build/electron.js --config .electronbuildrc",
-    "package:ci": "yarn postinstall && yarn build && yarn package:electron --publish always",
+    "package:ci": "yarn postinstall && yarn prebuild && yarn build && yarn package:electron --publish always",
     "postinstall": "git config blame.ignoreRevsFile .git-blame-ignore-revs && yarn force-rebuild-native-deps && electron-builder install-app-deps",
     "lint": "eslint \"{src,e2e,}/**/*.{ts,tsx}\" --fix",
     "_test:e2e": "yarn build && yarn test:cafe",
@@ -114,6 +114,7 @@
     "electron-log": "^4.4.7",
     "electron-updater": "^5.0.1",
     "electron-window-state": "^5.0.3",
+    "eslint": "^8.23.0",
     "ethers": "^5.6.6",
     "fp-ts": "^2.12.1",
     "fp-ts-rxjs": "^0.6.15",
@@ -205,5 +206,6 @@
   },
   "resolutions": {
     "@svgr/webpack": "^6.2.1"
-  }
+  },
+  "packageManager": "yarn@3.2.3"
 }

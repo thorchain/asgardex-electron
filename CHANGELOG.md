@@ -1,3 +1,9 @@
+# 1.18.1 (2022-xx-xx)
+
+## Internal
+
+- Upgrade to Yarn 3.x [#2389](https://github.com/thorchain/asgardex-electron/issues/2389)
+
 # 1.18.0 (2022-08-29)
 
 ## Add

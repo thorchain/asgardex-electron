@@ -28,7 +28,7 @@ jobs:
         run: sudo apt-get update && sudo apt-get install libudev-dev libusb-1.0-0-dev
 
       - name: Install dependencies
-        run: yarn install --frozen-lockfile
+        run: yarn install --immutable
 
       - name: Publish Linux binaries
         run: yarn package:ci
