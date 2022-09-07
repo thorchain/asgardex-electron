@@ -36,14 +36,12 @@ export const WalletSelector: React.FC<Props> = (props): JSX.Element => {
           value={selectedWallet}
           disabled={disabled}
           onChange={({ id }) => {
-            console.log('on change listbox', id)
             onChange(id)
           }}>
           <div className={`relative ${className}`}>
             <Listbox.Button
               as="div"
               className={`flex
-
               cursor-pointer
                     items-center
                     bg-bg0
@@ -51,7 +49,6 @@ export const WalletSelector: React.FC<Props> = (props): JSX.Element => {
                    pl-20px pr-10px
                    font-main
                     text-14
-                    uppercase
                     text-text0
                     transition duration-300
                     ease-in-out
@@ -93,10 +90,10 @@ export const WalletSelector: React.FC<Props> = (props): JSX.Element => {
                       px-20px
                       ${selected && 'text-gray2 dark:text-gray2d'}
                       ${selected ? 'cursor-disabled' : 'cursor-pointer'}
-                      font-main text-14 uppercase  text-text0
-                      hover:bg-gray0 hover:text-gray2
-                      dark:text-text0d hover:dark:bg-gray0d
-                      hover:dark:text-gray2d
+                      font-main text-14  text-text0
+                      dark:text-text0d
+                      ${!selected && 'hover:bg-gray0 hover:text-gray2'}
+                      ${!selected && 'hover:dark:bg-gray0d hover:dark:text-gray2d'}
                       `
                     }
                     key={wallet.id}

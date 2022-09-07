@@ -64,7 +64,7 @@ module.exports = {
         error3d: t.dark.palette.error[3],
         // warning
         warning0: t.light.palette.warning[0],
-        warningr0d: t.dark.palette.warning[0],
+        warning0d: t.dark.palette.warning[0],
         // gray
         gray0: t.light.palette.gray[0],
         gray0d: t.dark.palette.gray[0],

@@ -6,7 +6,8 @@ import { useObservableState } from 'observable-hooks'
 
 import { useMidgardContext } from '../../contexts/MidgardContext'
 import { useThorchainContext } from '../../contexts/ThorchainContext'
-import { useWalletContext } from '../../contexts/WalletContext'
+import { useKeystoreState } from '../../hooks/useKeystoreState'
+import { useKeystoreWallets } from '../../hooks/useKeystoreWallets'
 import { useNetwork } from '../../hooks/useNetwork'
 import { usePricePools } from '../../hooks/usePricePools'
 import { useRunePrice } from '../../hooks/useRunePrice'
@@ -16,10 +17,9 @@ import { SelectedPricePoolAsset } from '../../services/midgard/types'
 import { HeaderComponent } from './HeaderComponent'
 
 export const Header: React.FC = (): JSX.Element => {
-  const { keystoreService } = useWalletContext()
+  const { lock, state: keystoreState, change$: changeWalletHandler$ } = useKeystoreState()
+  const { walletsUI } = useKeystoreWallets()
   const { mimir$ } = useThorchainContext()
-  const { lock } = keystoreService
-  const keystore = useObservableState(keystoreService.keystoreState$, O.none)
   const mimir = useObservableState(mimir$, RD.initial)
   const { service: midgardService } = useMidgardContext()
   const {
@@ -44,8 +44,10 @@ export const Header: React.FC = (): JSX.Element => {
   return (
     <HeaderComponent
       network={network}
-      keystore={keystore}
+      keystore={keystoreState}
+      wallets={walletsUI}
       lockHandler={lock}
+      changeWalletHandler$={changeWalletHandler$}
       pricePools={pricePools}
       setSelectedPricePool={setSelectedPricePool}
       runePrice={runePriceRD}
