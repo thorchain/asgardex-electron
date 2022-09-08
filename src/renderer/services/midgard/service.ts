@@ -1,6 +1,4 @@
 import * as RD from '@devexperts/remote-data-ts'
-// Byzantine module is disabled temporary
-// import midgard from '@thorchain/asgardex-midgard'
 import { baseAmount } from '@xchainjs/xchain-util'
 import * as FP from 'fp-ts/function'
 import * as O from 'fp-ts/Option'
@@ -8,14 +6,16 @@ import { IntlShape } from 'react-intl'
 import * as Rx from 'rxjs'
 import * as RxOp from 'rxjs/operators'
 
-import { Network } from '../../../shared/api/types'
-import { envOrDefault } from '../../../shared/utils/env'
+import { ApiUrls, Network } from '../../../shared/api/types'
+import { DEFAULT_MIDGARD_URLS } from '../../../shared/midgard/const'
 import { THORCHAIN_DECIMAL } from '../../helpers/assetHelper'
+import { eqApiUrls } from '../../helpers/fp/eq'
 import { liveData } from '../../helpers/rx/liveData'
-import { observableState, triggerStream, TriggerStream$ } from '../../helpers/stateHelper'
+import { triggerStream, TriggerStream$ } from '../../helpers/stateHelper'
 import { Configuration, DefaultApi } from '../../types/generated/midgard'
 import { network$ } from '../app/service'
 import { MIDGARD_MAX_RETRY } from '../const'
+import { getStorageState$, modifyStorage, getStorageState } from '../storage/common'
 import { ErrorId } from '../wallet/types'
 import { createActionsService } from './actions'
 import { selectedPoolAsset$, setSelectedPoolAsset } from './common'
@@ -34,34 +34,40 @@ import {
   SelectedPoolAsset
 } from './types'
 
-const MIDGARD_TESTNET_URL = envOrDefault(
-  process.env.REACT_APP_MIDGARD_TESTNET_URL,
-  'https://testnet.midgard.thorchain.info'
-)
-
-const MIDGARD_STAGENET_URL = envOrDefault(
-  process.env.REACT_APP_MIDGARD_STAGENET_URL,
-  'https://stagenet-midgard.ninerealms.com'
-)
-
-const MIDGARD_MAINNET_URL = envOrDefault(process.env.REACT_APP_MIDGARD_MAINNET_URL, 'https://midgard.ninerealms.com')
-
 // `TriggerStream` to reload Midgard
 const { stream$: reloadMidgardUrl$, trigger: reloadMidgardUrl } = triggerStream()
 
-const {
-  get$: getMidgardUrl$,
-  get: getMidgardUrl,
-  set: _setMidgardUrl
-} = observableState<Record<Network, string>>({
-  mainnet: MIDGARD_MAINNET_URL,
-  stagenet: MIDGARD_STAGENET_URL,
-  testnet: MIDGARD_TESTNET_URL
-})
+/**
+ * Stream of Midgard urls (from storage)
+ */
+const getMidgardUrl$ = FP.pipe(
+  Rx.combineLatest([getStorageState$, reloadMidgardUrl$]),
+  RxOp.map(([storage]) =>
+    FP.pipe(
+      storage,
+      O.map(({ midgardUrls }) => midgardUrls),
+      O.getOrElse(() => DEFAULT_MIDGARD_URLS)
+    )
+  ),
+  RxOp.distinctUntilChanged(eqApiUrls.equals)
+)
 
+/**
+ * Current value of Midgard urls (from storage)
+ */
+const getMidgardUrl = (): ApiUrls =>
+  FP.pipe(
+    getStorageState(),
+    O.map(({ midgardUrls }) => midgardUrls),
+    O.getOrElse(() => DEFAULT_MIDGARD_URLS)
+  )
+
+/**
+ * Updates Midgard url and stores it persistantly
+ */
 const setMidgardUrl = (url: string, network: Network) => {
-  const current = getMidgardUrl()
-  _setMidgardUrl({ ...current, [network]: url })
+  const midgardUrls = { ...getMidgardUrl(), [network]: url }
+  modifyStorage(O.some({ midgardUrls }))
 }
 
 /**
@@ -72,8 +78,8 @@ const getMidgardDefaultApi = (basePath: string) => new DefaultApi(new Configurat
 /**
  * Midgard url
  */
-const midgardUrl$: MidgardUrlLD = Rx.combineLatest([network$, getMidgardUrl$, reloadMidgardUrl$]).pipe(
-  RxOp.map(([network, midgardUrl, _]) => RD.success(midgardUrl[network])),
+const midgardUrl$: MidgardUrlLD = Rx.combineLatest([network$, getMidgardUrl$]).pipe(
+  RxOp.map(([network, midgardUrl]) => RD.success(midgardUrl[network])),
   RxOp.shareReplay(1)
 )
 
