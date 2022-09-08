@@ -7674,7 +7674,7 @@ __metadata:
     crypto-browserify: ^3.12.0
     dayjs: ^1.11.3
     dotenv: ^16.0.1
-    electron: ^19.0.14
+    electron: ^19.0.15
     electron-builder: ^23.0.3
     electron-debug: ^3.2.0
     electron-devtools-installer: ^3.2.0
@@ -11642,16 +11642,16 @@ __metadata:
   languageName: node
   linkType: hard
 
-"electron@npm:^19.0.14":
-  version: 19.0.14
-  resolution: "electron@npm:19.0.14"
+"electron@npm:^19.0.15":
+  version: 19.0.15
+  resolution: "electron@npm:19.0.15"
   dependencies:
     "@electron/get": ^1.14.1
     "@types/node": ^16.11.26
     extract-zip: ^1.0.3
   bin:
     electron: cli.js
-  checksum: af19de0a086f0e65f659a3f4530865b5f19a81462a6d818b32edc3ef7b29bb8d0f9428b8a92c3d8d0080e4db0cda45ff04b9fa811d1e793f15e9805a3d08b84b
+  checksum: f2c0a286bd13c83de63e341cf09dd2750808225ea96e062ccfe22f16a8a8de59c4f3953ddfa34116033d86c429ef04d829c7c3879e85e9d5ec701730099c996d
   languageName: node
   linkType: hard
 

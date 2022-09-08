@@ -51,7 +51,7 @@ export const HeaderDropdownTitle = styled(Text)`
 export const HeaderDropdownMenuItemText = styled(Text)`
   text-transform: uppercase;
   font-family: 'MainFontBold';
-  color: ${palette('text', 0)};
-  font-size: 18px;
+  color: ${palette('text', 1)};
+  font-size: 16px;
   background: transparent;
 `

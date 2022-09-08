@@ -20,6 +20,8 @@ import { ReactComponent as DownIcon } from '../../assets/svg/icon-down.svg'
 import { ReactComponent as EyeHideIcon } from '../../assets/svg/icon-eye-hide.svg'
 import { ReactComponent as EyeIcon } from '../../assets/svg/icon-eye.svg'
 import { ReactComponent as LoadingIcon } from '../../assets/svg/icon-loading.svg'
+import { ReactComponent as LockIcon } from '../../assets/svg/icon-lock-warning.svg'
+import { ReactComponent as UnlockIcon } from '../../assets/svg/icon-unlock-warning.svg'
 import { ReactComponent as LedgerIcon } from '../../assets/svg/ledger.svg'
 
 export {
@@ -40,5 +42,7 @@ export {
   LoadingIcon,
   AttentionIcon,
   EyeIcon,
-  EyeHideIcon
+  EyeHideIcon,
+  LockIcon,
+  UnlockIcon
 }

@@ -20,11 +20,12 @@ import * as poolsRoutes from '../../routes/pools'
 import * as walletRoutes from '../../routes/wallet'
 import { InboundAddressRD, MidgardUrlRD, PriceRD, SelectedPricePoolAsset } from '../../services/midgard/types'
 import { MimirRD } from '../../services/thorchain/types'
-import { KeystoreState } from '../../services/wallet/types'
+import { ChangeKeystoreWalletHandler, KeystoreState, KeystoreWalletsUI } from '../../services/wallet/types'
 import { isLocked } from '../../services/wallet/util'
 import { PricePoolAsset, PricePoolAssets, PricePools } from '../../views/pools/Pools.types'
 import * as Styled from './HeaderComponent.styles'
 import { HeaderLock } from './lock/'
+import { HeaderLockMobile } from './lock/HeaderLockMobile'
 import { HeaderNetStatus } from './netstatus'
 import { HeaderPriceSelector } from './price'
 import { HeaderSettings } from './settings'
@@ -46,8 +47,10 @@ type Tab = {
 
 export type Props = {
   keystore: KeystoreState
+  wallets: KeystoreWalletsUI
   network: Network
   lockHandler: FP.Lazy<void>
+  changeWalletHandler$: ChangeKeystoreWalletHandler
   setSelectedPricePool: (asset: PricePoolAsset) => void
   pricePools: O.Option<PricePools>
   runePrice: PriceRD
@@ -65,6 +68,7 @@ export type Props = {
 export const HeaderComponent: React.FC<Props> = (props): JSX.Element => {
   const {
     keystore,
+    wallets,
     network,
     pricePools: oPricePools,
     runePrice: runePriceRD,
@@ -75,6 +79,7 @@ export const HeaderComponent: React.FC<Props> = (props): JSX.Element => {
     reloadVolume24Price,
     selectedPricePoolAsset: oSelectedPricePoolAsset,
     lockHandler,
+    changeWalletHandler$,
     setSelectedPricePool,
     midgardUrl: midgardUrlRD,
     thorchainNodeUrl,
@@ -237,11 +242,6 @@ export const HeaderComponent: React.FC<Props> = (props): JSX.Element => {
     [hasPricePools, isDesktopView, oSelectedPricePoolAsset, pricePoolAssets, currencyChangeHandler]
   )
 
-  const renderHeaderLock = useMemo(
-    () => <HeaderLock isDesktopView={isDesktopView} keystoreState={keystore} onPress={clickLockHandler} />,
-    [isDesktopView, clickLockHandler, keystore]
-  )
-
   const renderHeaderSettings = useMemo(
     () => <HeaderSettings isDesktopView={isDesktopView} onPress={clickSettingsHandler} />,
     [isDesktopView, clickSettingsHandler]
@@ -319,7 +319,12 @@ export const HeaderComponent: React.FC<Props> = (props): JSX.Element => {
                   {renderHeaderNetStatus}
                   <HeaderTheme isDesktopView={isDesktopView} />
                   {renderHeaderCurrency}
-                  {renderHeaderLock}
+                  <HeaderLock
+                    keystoreState={keystore}
+                    wallets={wallets}
+                    lockHandler={clickLockHandler}
+                    changeWalletHandler$={changeWalletHandler$}
+                  />
                   {renderHeaderSettings}
                 </Row>
               </Col>
@@ -374,7 +379,9 @@ export const HeaderComponent: React.FC<Props> = (props): JSX.Element => {
             <Styled.HeaderDrawerItem>
               <HeaderTheme isDesktopView={isDesktopView} />
             </Styled.HeaderDrawerItem>
-            <Styled.HeaderDrawerItem>{renderHeaderLock}</Styled.HeaderDrawerItem>
+            <Styled.HeaderDrawerItem>
+              <HeaderLockMobile keystoreState={keystore} onPress={clickLockHandler} />
+            </Styled.HeaderDrawerItem>
             <Styled.HeaderDrawerItem>{renderHeaderSettings}</Styled.HeaderDrawerItem>
             {renderHeaderNetStatus}
           </Styled.HeaderDrawer>

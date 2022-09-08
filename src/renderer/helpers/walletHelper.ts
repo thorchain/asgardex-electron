@@ -11,7 +11,7 @@ import { isLedgerWallet, isWalletType } from '../../shared/utils/guard'
 import { WalletAddress, WalletType } from '../../shared/wallet/types'
 import { ZERO_ASSET_AMOUNT } from '../const'
 import { WalletBalances } from '../services/clients'
-import { KeystoreWalletsUI, NonEmptyWalletBalances, WalletBalance } from '../services/wallet/types'
+import { NonEmptyWalletBalances, WalletBalance } from '../services/wallet/types'
 import { isBnbAsset, isEthAsset, isLtcAsset, isRuneNativeAsset } from './assetHelper'
 import { isBchChain, isDogeChain, isLtcChain, isThorChain } from './chainHelper'
 import { eqAddress, eqAsset, eqWalletType } from './fp/eq'
@@ -175,7 +175,7 @@ export const getWalletIndexFromNullableString = (s?: string): O.Option<number /*
 export const getWalletTypeFromNullableString = (s?: string): O.Option<WalletType> =>
   FP.pipe(s, optionFromNullableString, O.chain(O.fromPredicate(isWalletType)))
 
-export const getWalletNamesFromKeystoreWallets = (wallets: KeystoreWalletsUI) =>
+export const getWalletNamesFromKeystoreWallets = (wallets: Array<Required<{ name: string }>>) =>
   FP.pipe(
     wallets,
     A.map(({ name }) => name)

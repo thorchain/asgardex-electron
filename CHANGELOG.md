@@ -1,5 +1,9 @@
 # 1.18.1 (2022-xx-xx)
 
+## Add
+
+[Header] Add wallet selector [#1576](https://github.com/thorchain/asgardex-electron/issues/1576)
+
 ## Fix
 
 Add validation of wallet names to avoid duplications [#2386](https://github.com/thorchain/asgardex-electron/issues/2386)
