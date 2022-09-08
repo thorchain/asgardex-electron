@@ -39,6 +39,11 @@ export const apiHDWallet: ApiHDWallet = {
 const commonStorageData: CommonStorage = {
   locale: Locale.EN,
   ethDerivationMode: 'metamask',
+  midgardUrls: {
+    mainnet: 'midgard-url-mainnet',
+    stagenet: 'midgard-url-stagenet',
+    testnet: 'midgard-url-testnet'
+  },
   version: '1'
 }
 

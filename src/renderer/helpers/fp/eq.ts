@@ -10,7 +10,7 @@ import * as N from 'fp-ts/lib/number'
 import * as O from 'fp-ts/lib/Option'
 import * as S from 'fp-ts/lib/string'
 
-import { KeystoreId, LedgerError, Network } from '../../../shared/api/types'
+import { ApiUrls, KeystoreId, LedgerError, Network } from '../../../shared/api/types'
 import { HDMode, WalletAddress, WalletType } from '../../../shared/wallet/types'
 import { DepositAssetFees, DepositFees, SwapFeesParams, SymDepositAddresses } from '../../services/chain/types'
 import { ApproveParams } from '../../services/ethereum/types'
@@ -232,4 +232,10 @@ export const eqOLedgerAddress = O.getEq(eqLedgerAddress)
 export const eqSymDepositAddresses = Eq.struct<SymDepositAddresses>({
   rune: eqOWalletAddress,
   asset: eqOWalletAddress
+})
+
+export const eqApiUrls = Eq.struct<ApiUrls>({
+  mainnet: eqString,
+  stagenet: eqString,
+  testnet: eqString
 })

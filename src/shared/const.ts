@@ -2,6 +2,7 @@ import { PoolsStorageEncoded } from './api/io'
 import { StoreFilesContent, UserNodesStorage } from './api/types'
 import { DEFAULT_ETH_HD_MODE } from './ethereum/const'
 import { DEFAULT_LOCALE } from './i18n/const'
+import { DEFAULT_MIDGARD_URLS } from './midgard/const'
 
 export enum ExternalUrl {
   DOCS = 'https://docs.thorchain.org',
@@ -40,7 +41,12 @@ const COMMON_STORAGE_VERSION = '1'
  * public api for it at src/main/preload.ts
  */
 export const DEFAULT_STORAGES: StoreFilesContent = {
-  common: { version: COMMON_STORAGE_VERSION, ethDerivationMode: DEFAULT_ETH_HD_MODE, locale: DEFAULT_LOCALE },
+  common: {
+    version: COMMON_STORAGE_VERSION,
+    ethDerivationMode: DEFAULT_ETH_HD_MODE,
+    locale: DEFAULT_LOCALE,
+    midgardUrls: DEFAULT_MIDGARD_URLS
+  },
   userNodes: USER_NODES_STORAGE_DEFAULT,
   pools: POOLS_STORAGE_DEFAULT
 }

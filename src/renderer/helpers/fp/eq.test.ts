@@ -13,6 +13,7 @@ import {
 } from '@xchainjs/xchain-util'
 import * as O from 'fp-ts/lib/Option'
 
+import { ApiUrls } from '../../../shared/api/types'
 import { BNB_ADDRESS_TESTNET, RUNE_ADDRESS_TESTNET } from '../../../shared/mock/address'
 import { ASSETS_TESTNET } from '../../../shared/mock/assets'
 import { WalletAddress } from '../../../shared/wallet/types'
@@ -46,7 +47,8 @@ import {
   eqSymDepositAddresses,
   eqWalletType,
   eqKeystoreId,
-  eqNetwork
+  eqNetwork,
+  eqApiUrls
 } from './eq'
 
 describe('helpers/fp/eq', () => {
@@ -523,6 +525,26 @@ describe('helpers/fp/eq', () => {
       expect(eqSymDepositAddresses.equals(addresses, { asset: oAsset, rune: O.none })).toBeFalsy()
       expect(eqSymDepositAddresses.equals(addresses, { asset: O.none, rune: oRune })).toBeFalsy()
       expect(eqSymDepositAddresses.equals(addresses, { asset: O.none, rune: O.none })).toBeFalsy()
+    })
+  })
+  describe('eqApiUrls', () => {
+    const a: ApiUrls = {
+      mainnet: 'mainnet-a',
+      stagenet: 'stagenet-a',
+      testnet: 'testnet-a'
+    }
+    const b: ApiUrls = {
+      mainnet: 'mainnet-b',
+      stagenet: 'stagenet-b',
+      testnet: 'testnet-b'
+    }
+    it('equal', () => {
+      expect(eqApiUrls.equals(a, a)).toBeTruthy()
+      expect(eqApiUrls.equals(b, b)).toBeTruthy()
+    })
+    it('not equal', () => {
+      expect(eqApiUrls.equals(a, b)).toBeFalsy()
+      expect(eqApiUrls.equals(b, a)).toBeFalsy()
     })
   })
 })

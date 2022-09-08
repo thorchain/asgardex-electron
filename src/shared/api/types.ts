@@ -11,10 +11,15 @@ import { Locale } from '../i18n/types'
 import { HDMode, WalletAddress } from '../wallet/types'
 import { IPCLedgerAddressesIO, KeystoreWallets, PoolsStorageEncoded } from './io'
 
+export type Network = 'testnet' | 'stagenet' | 'mainnet'
+
 // A version number starting from `1` to avoid to load deprecated files
 export type StorageVersion = { version: string }
+export type ApiUrls = Record<Network, string>
 export type UserNodesStorage = Readonly<Record<Network, Address[]> & StorageVersion>
-export type CommonStorage = Readonly<{ locale: Locale; ethDerivationMode: EthHDMode } & StorageVersion>
+export type CommonStorage = Readonly<
+  { locale: Locale; ethDerivationMode: EthHDMode; midgardUrls: ApiUrls } & StorageVersion
+>
 
 /**
  * Hash map of common store files
@@ -71,8 +76,6 @@ export type ApiLang = {
 export type ApiUrl = {
   openExternal: (url: string) => Promise<void>
 }
-
-export type Network = 'testnet' | 'stagenet' | 'mainnet'
 
 export enum LedgerErrorId {
   NO_DEVICE = 'NO_DEVICE',
