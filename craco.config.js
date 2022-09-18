@@ -17,11 +17,11 @@ module.exports = {
       // as described in https://github.com/bitcoinjs/bitcoinjs-lib/issues/959#issuecomment-351040758
       // In our case (and to simplify things) we just disable ALL sources by setting `mangle` to `false
       // Very similar to https://github.com/ObsidianLabs/Black-IDE/blob/52a09abc63b49c6407e49e3acc100653c5ee5ca0/config-overrides.js#L28-L40
-      webpackConfig.optimization.minimizer = webpackConfig.optimization.minimizer.map((minimizer) => {
-        if (minimizer instanceof TerserPlugin) {
-          minimizer.options.mangle = false
+      webpackConfig.optimization.minimizer = webpackConfig.optimization.minimizer.map((plugin) => {
+        if (plugin instanceof TerserPlugin) {
+          plugin.options.minimizer.options.mangle = false
         }
-        return minimizer
+        return plugin
       })
 
       webpackConfig.resolve.fallback = {

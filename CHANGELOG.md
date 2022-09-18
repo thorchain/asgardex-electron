@@ -1,4 +1,4 @@
-# 1.18.1 (2022-xx-xx)
+# 1.18.2 (2022-xx-xx)
 
 ## Add
 
@@ -11,6 +11,12 @@ Add validation of wallet names to avoid duplications [#2386](https://github.com/
 ## Internal
 
 - Upgrade to Yarn 3.x [#2389](https://github.com/thorchain/asgardex-electron/issues/2389)
+
+# 1.18.1 (2022-09-18)
+
+## Fix
+
+[BCH] Reintroduction of error `Expected property "1" of type BigInteger, got n` [#2394](https://github.com/thorchain/asgardex-electron/issues/2394)
 
 # 1.18.0 (2022-08-29)
 
