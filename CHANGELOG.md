@@ -1,3 +1,11 @@
+# 1.18.1 (2022-09-18)
+
+## Fix
+
+[BCH] Reintroduction of error `Expected property "1" of type BigInteger, got n` [#2394](https://github.com/thorchain/asgardex-electron/issues/2394)
+
+## Add
+
 # 1.18.0 (2022-08-29)
 
 ## Add
