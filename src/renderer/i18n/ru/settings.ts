@@ -19,13 +19,13 @@ const settings: SettingMessages = {
   'setting.wallet.index.info': 'Введите индекс Ledger адреса, который вы хотите использовать',
   'setting.wallet.hdpath.legacy.info': 'Устаревший путь деривации {path}',
   'setting.wallet.hdpath.ledgerlive.info': 'Путь деривации Ledger Live {path}',
-  'setting.wallet.hdpath.metamask.info': 'Metamask derivation path {path} - RU',
-  'setting.thornode.node.error.unhealthy': 'THORNode API seems to be unhealthy by checking "{endpoint} - RU"',
-  'setting.thornode.node.error.url': 'Invalid THORNode API URL. Please double check and try again - RU',
-  'setting.thornode.rpc.error.url': 'Invalid THORNode RPC URL. Please double check and try again - RU',
-  'setting.thornode.rpc.error.unhealthy': 'THORNode RPC seems to be unhealthy by checking "{endpoint}" - RU',
-  'setting.thornode.node.valid': 'Valid THORNode API URL - RU',
-  'setting.thornode.rpc.valid': 'Valid THORNode RPC URL - RU'
+  'setting.wallet.hdpath.metamask.info': 'Путь деривации Metamask {path}',
+  'setting.thornode.node.error.unhealthy': 'API THORNode кажется нездоровым при проверке "{endpoint}"',
+  'setting.thornode.node.error.url': 'Неверный URL API THORNode. Пожалуйста, перепроверьте и попробуйте еще раз',
+  'setting.thornode.rpc.error.url': 'Неверный URL RPC THORNode. Пожалуйста, перепроверьте и попробуйте еще раз',
+  'setting.thornode.rpc.error.unhealthy': 'RPC THORNode кажется нездоровым при проверке "{endpoint}"',
+  'setting.thornode.node.valid': 'Действительный URL API THORNode',
+  'setting.thornode.rpc.valid': 'Действительный URL RPC THORNode'
 }
 
 export default settings
