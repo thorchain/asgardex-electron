@@ -1,10 +1,10 @@
-import { Address } from '@xchainjs/xchain-client'
-import { AssetAtom } from '@xchainjs/xchain-cosmos'
 import { ETHAddress, getTokenAddress } from '@xchainjs/xchain-ethereum'
 import {
+  Address,
   Asset,
   assetAmount,
   AssetAmount,
+  AssetAtom,
   AssetBCH,
   AssetBNB,
   AssetBTC,
@@ -261,8 +261,7 @@ export const updateEthChecksumAddress = (asset: Asset): Asset =>
  * Helper to get Midgard assets properly
  */
 export const midgardAssetFromString: (assetString: string) => O.Option<Asset> = FP.flow(
-  assetFromString,
-  O.fromNullable,
+  O.tryCatchK(assetFromString),
   // FOR ETH tokens we need to update its addresses to have a valid check sum address
   // Because ERC20 assets from Midgard might start with 0X rather than 0x
   // And 0X isn't recognized as valid address in ethers lib
@@ -360,4 +359,9 @@ export const disableRuneUpgrade = ({
  * Creates an asset from `nullable` string
  */
 export const getAssetFromNullableString = (assetString?: string): O.Option<Asset> =>
-  FP.pipe(O.fromNullable(assetString), O.map(S.toUpperCase), O.map(assetFromString), O.chain(O.fromNullable))
+  FP.pipe(
+    O.fromNullable(assetString),
+    O.map(S.toUpperCase),
+    O.chain(O.tryCatchK(assetFromString)),
+    O.chain(O.fromNullable)
+  )

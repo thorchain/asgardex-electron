@@ -1,7 +1,7 @@
 import * as RD from '@devexperts/remote-data-ts'
 import { Client } from '@xchainjs/xchain-bitcoin'
-import { Address, FeeRate, FeesWithRates } from '@xchainjs/xchain-client'
-import { BaseAmount } from '@xchainjs/xchain-util'
+import { FeeRate, FeesWithRates } from '@xchainjs/xchain-client'
+import { Address, BaseAmount } from '@xchainjs/xchain-util'
 import * as Rx from 'rxjs'
 
 import { LedgerBTCTxInfo, Network } from '../../../shared/api/types'

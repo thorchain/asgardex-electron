@@ -1,7 +1,7 @@
 import * as RD from '@devexperts/remote-data-ts'
 import { FeeOption, TxParams, XChainClient } from '@xchainjs/xchain-client'
-import { Address, EthereumClient, FeesWithGasPricesAndLimits } from '@xchainjs/xchain-ethereum'
-import { Asset, BaseAmount } from '@xchainjs/xchain-util'
+import { EthereumClient, FeesWithGasPricesAndLimits } from '@xchainjs/xchain-ethereum'
+import { Address, Asset, BaseAmount } from '@xchainjs/xchain-util'
 import { ethers } from 'ethers'
 import * as O from 'fp-ts/lib/Option'
 

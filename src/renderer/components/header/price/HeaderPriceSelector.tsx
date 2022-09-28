@@ -28,7 +28,7 @@ export const HeaderPriceSelector: React.FC<Props> = (props): JSX.Element => {
   const { assets, selectedAsset, isDesktopView, disabled = false, changeHandler = (_) => {} } = props
 
   const changeItem: MenuProps['onClick'] = useCallback(
-    ({ key }: { key: string }) => FP.pipe(key, assetFromString, O.fromNullable, O.map(changeHandler)),
+    ({ key }: { key: string }) => FP.pipe(key, O.tryCatchK(assetFromString), O.map(changeHandler)),
     [changeHandler]
   )
 

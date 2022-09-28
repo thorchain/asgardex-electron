@@ -1,5 +1,5 @@
 import * as RD from '@devexperts/remote-data-ts'
-import { Address } from '@xchainjs/xchain-client'
+import { Address } from '@xchainjs/xchain-util'
 import { Asset } from '@xchainjs/xchain-util'
 import { FormInstance } from 'antd'
 import * as FP from 'fp-ts/lib/function'

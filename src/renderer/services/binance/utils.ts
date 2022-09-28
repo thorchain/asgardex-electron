@@ -11,7 +11,7 @@ import { BNB_DECIMAL } from '../../helpers/assetHelper'
  * Converts a BinanceChain symbol to an `Asset`
  **/
 export const bncSymbolToAsset = (symbol: string): O.Option<Asset> =>
-  O.fromNullable(assetFromString(bncSymbolToAssetString(symbol)))
+  O.tryCatch(() => assetFromString(bncSymbolToAssetString(symbol)))
 
 /**
  * Converts a BinanceChain symbol to an `Asset` string

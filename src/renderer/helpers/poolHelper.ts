@@ -75,7 +75,7 @@ export const getPoolTableRowsData = ({
     poolDetails,
     getDeepestPool,
     O.chain((poolDetail) => O.fromNullable(poolDetail.asset)),
-    O.chain((assetString) => O.fromNullable(assetFromString(assetString))),
+    O.chain(O.tryCatchK(assetFromString)),
     O.map(({ symbol }) => symbol)
   )
 
@@ -85,7 +85,7 @@ export const getPoolTableRowsData = ({
     A.mapWithIndex<PoolDetail, O.Option<PoolTableRowData>>((index, poolDetail) => {
       // get symbol of PoolDetail
       const oPoolDetailSymbol: O.Option<string> = FP.pipe(
-        O.fromNullable(assetFromString(poolDetail.asset ?? '')),
+        O.tryCatch(() => assetFromString(poolDetail.asset ?? '')),
         O.map(({ symbol }) => symbol)
       )
       // compare symbols to set deepest pool

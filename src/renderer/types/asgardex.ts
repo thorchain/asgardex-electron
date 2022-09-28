@@ -1,5 +1,4 @@
-import { Address } from '@xchainjs/xchain-client'
-import { BaseAmount, Asset } from '@xchainjs/xchain-util'
+import { BaseAmount, Asset, Address } from '@xchainjs/xchain-util'
 import { Option } from 'fp-ts/lib/Option'
 
 import { WalletType } from '../../shared/wallet/types'

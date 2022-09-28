@@ -1,4 +1,3 @@
-import { AssetAtom } from '@xchainjs/xchain-cosmos'
 import {
   Asset,
   AssetBNB,
@@ -16,10 +15,11 @@ import {
   BTCChain,
   CosmosChain,
   LTCChain,
-  PolkadotChain,
   DOGEChain,
   AssetDOGE,
-  TerraChain
+  TerraChain,
+  AVAXChain,
+  AssetAtom
 } from '@xchainjs/xchain-util'
 
 import { ENABLED_CHAINS } from '../services/const'
@@ -45,8 +45,8 @@ export const getChainAsset = (chain: Chain): Asset => {
       return AssetDOGE
     case TerraChain:
       throw Error('Terra (Classic) is not supported anymore')
-    case PolkadotChain:
-      throw Error('Polkadot is not supported yet')
+    case AVAXChain:
+      throw Error('AVAX is not supported yet')
   }
 }
 

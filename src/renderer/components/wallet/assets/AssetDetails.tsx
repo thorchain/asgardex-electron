@@ -1,6 +1,6 @@
 import React, { useCallback, useMemo, useState } from 'react'
 
-import { Address } from '@xchainjs/xchain-client'
+import { Address } from '@xchainjs/xchain-util'
 import { Asset, AssetAmount, assetToBase, BaseAmount } from '@xchainjs/xchain-util'
 import { Row, Col, Grid } from 'antd'
 import * as FP from 'fp-ts/lib/function'

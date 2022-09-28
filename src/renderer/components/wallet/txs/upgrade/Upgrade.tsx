@@ -2,8 +2,9 @@ import React, { useMemo, useCallback, useState, useEffect } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
 import { getSwitchMemo } from '@thorchain/asgardex-util'
-import { Address, TxParams } from '@xchainjs/xchain-client'
+import { TxParams } from '@xchainjs/xchain-client'
 import {
+  Address,
   assetAmount,
   assetToBase,
   BaseAmount,

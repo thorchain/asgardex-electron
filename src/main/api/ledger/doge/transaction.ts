@@ -1,9 +1,9 @@
 import AppBTC from '@ledgerhq/hw-app-btc'
 import { Transaction } from '@ledgerhq/hw-app-btc/lib/types'
 import Transport from '@ledgerhq/hw-transport'
-import { Address, FeeRate, TxHash } from '@xchainjs/xchain-client'
+import { FeeRate, TxHash } from '@xchainjs/xchain-client'
 import { broadcastTx, buildTx, getSendTxUrl } from '@xchainjs/xchain-doge'
-import { BaseAmount } from '@xchainjs/xchain-util'
+import { Address, BaseAmount } from '@xchainjs/xchain-util'
 import * as E from 'fp-ts/lib/Either'
 
 import { getBlockcypherUrl } from '../../../../shared/api/blockcypher'

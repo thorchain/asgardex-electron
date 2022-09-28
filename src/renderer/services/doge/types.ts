@@ -1,7 +1,7 @@
 import * as RD from '@devexperts/remote-data-ts'
-import { Address, FeeRate, FeesWithRates } from '@xchainjs/xchain-client'
+import { FeeRate, FeesWithRates } from '@xchainjs/xchain-client'
 import { Client } from '@xchainjs/xchain-doge'
-import { BaseAmount } from '@xchainjs/xchain-util'
+import { Address, BaseAmount } from '@xchainjs/xchain-util'
 
 import { HDMode, WalletType } from '../../../shared/wallet/types'
 import { LiveData } from '../../helpers/rx/liveData'

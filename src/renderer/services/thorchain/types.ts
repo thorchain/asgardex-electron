@@ -1,7 +1,6 @@
 import * as RD from '@devexperts/remote-data-ts'
-import { Address } from '@xchainjs/xchain-client'
 import { Client, ClientUrl, DepositParam, NodeUrl } from '@xchainjs/xchain-thorchain'
-import { Asset, BaseAmount } from '@xchainjs/xchain-util'
+import { Address, Asset, BaseAmount } from '@xchainjs/xchain-util'
 import * as O from 'fp-ts/Option'
 import * as t from 'io-ts'
 import { optionFromNullable } from 'io-ts-types/lib/optionFromNullable'

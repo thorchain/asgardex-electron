@@ -1,8 +1,9 @@
 import React, { useMemo } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
-import { Address, XChainClient } from '@xchainjs/xchain-client'
+import { XChainClient } from '@xchainjs/xchain-client'
 import {
+  Address,
   BCHChain,
   BNBChain,
   BTCChain,

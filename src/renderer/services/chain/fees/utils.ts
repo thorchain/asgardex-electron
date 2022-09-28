@@ -1,7 +1,7 @@
 import { getValueOfAsset1InAsset2, PoolData } from '@thorchain/asgardex-util'
 import { BTC_DECIMAL } from '@xchainjs/xchain-bitcoin'
 import { BCH_DECIMAL } from '@xchainjs/xchain-bitcoincash'
-import { AssetAtom, COSMOS_DECIMAL } from '@xchainjs/xchain-cosmos'
+import { COSMOS_DECIMAL } from '@xchainjs/xchain-cosmos'
 import { DOGE_DECIMAL } from '@xchainjs/xchain-doge'
 import { ETH_DECIMAL } from '@xchainjs/xchain-ethereum'
 import { LTC_DECIMAL } from '@xchainjs/xchain-litecoin'
@@ -15,7 +15,8 @@ import {
   baseAmount,
   assetToString,
   BaseAmount,
-  AssetDOGE
+  AssetDOGE,
+  AssetAtom
 } from '@xchainjs/xchain-util'
 import BigNumber from 'bignumber.js'
 import * as FP from 'fp-ts/function'

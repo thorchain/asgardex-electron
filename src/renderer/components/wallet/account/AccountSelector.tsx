@@ -1,6 +1,6 @@
 import React, { useCallback, useMemo } from 'react'
 
-import { Address } from '@xchainjs/xchain-client'
+import { Address } from '@xchainjs/xchain-util'
 import { Asset, formatAssetAmountCurrency, baseToAsset, assetToString } from '@xchainjs/xchain-util'
 import { Dropdown, Row, Col } from 'antd'
 import { useIntl } from 'react-intl'

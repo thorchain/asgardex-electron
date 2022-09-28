@@ -1,6 +1,5 @@
 import * as RD from '@devexperts/remote-data-ts'
-import { Address } from '@xchainjs/xchain-client'
-import { Asset, assetFromString, baseAmount, bnOrZero } from '@xchainjs/xchain-util'
+import { Address, Asset, assetFromString, baseAmount, bnOrZero } from '@xchainjs/xchain-util'
 import * as A from 'fp-ts/lib/Array'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
@@ -81,8 +80,7 @@ const createSharesService = (midgardUrl$: MidgardUrlLD, getMidgardDefaultApi: (b
             // ignore all invalid pool strings
             FP.pipe(
               pool,
-              assetFromString,
-              O.fromNullable,
+              O.tryCatchK(assetFromString),
               O.map((asset) => ({
                 type: !!runeAddress && !!assetAddress ? 'sym' : 'asym',
                 assetAddress: optionFromNullableString(assetAddress),

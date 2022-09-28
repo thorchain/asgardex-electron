@@ -1,6 +1,5 @@
 import * as RD from '@devexperts/remote-data-ts'
 import { PoolData } from '@thorchain/asgardex-util'
-import { Address } from '@xchainjs/xchain-client'
 import {
   assetFromString,
   bnOrZero,
@@ -10,7 +9,8 @@ import {
   Chain,
   isValidBN,
   bn,
-  BaseAmount
+  BaseAmount,
+  Address
 } from '@xchainjs/xchain-util'
 import BigNumber from 'bignumber.js'
 import * as A from 'fp-ts/lib/Array'
@@ -52,8 +52,7 @@ export const getPricePools = (details: PoolDetails, whitelist: PricePoolAssets):
     getDeepestPool,
     O.chain((detail) =>
       FP.pipe(
-        assetFromString(detail.asset),
-        O.fromNullable,
+        O.tryCatch(() => assetFromString(detail.asset)),
         O.map((asset) => ({
           asset,
           poolData: toPoolData(detail)
@@ -75,8 +74,7 @@ export const getPricePools = (details: PoolDetails, whitelist: PricePoolAssets):
     A.filterMap(
       (detail: PoolDetail): O.Option<PricePool> =>
         FP.pipe(
-          assetFromString(detail.asset),
-          O.fromNullable,
+          O.tryCatch(() => assetFromString(detail.asset)),
           O.map((asset) => ({
             asset,
             poolData: toPoolData(detail)
@@ -138,11 +136,14 @@ export const pricePoolSelectorFromRD = (
  */
 export const getPoolDetail = (details: PoolDetails, asset: Asset): O.Option<PoolDetail> =>
   FP.pipe(
-    details.find((detail: PoolDetail) => {
-      const { asset: detailAssetString = '' } = detail
-      const detailAsset = assetFromString(detailAssetString)
-      return detailAsset && eqAsset.equals(detailAsset, asset)
-    }),
+    details.find((detail: PoolDetail) =>
+      FP.pipe(
+        detail.asset,
+        O.tryCatchK(assetFromString),
+        O.map((detailAsset) => eqAsset.equals(detailAsset, asset)),
+        O.getOrElse(() => false)
+      )
+    ),
     O.fromNullable
   )
 
@@ -172,7 +173,13 @@ export const toPoolData = ({ assetDepth, runeDepth }: Pick<PoolDetail, 'assetDep
  * Filter out mini tokens from pool assets
  */
 export const filterPoolAssets = (poolAssets: string[]) => {
-  return poolAssets.filter((poolAsset) => !isMiniToken(assetFromString(poolAsset) || { symbol: '' }))
+  return poolAssets.filter((poolAsset) => {
+    const asset = FP.pipe(
+      O.tryCatch(() => assetFromString(poolAsset)),
+      O.toUndefined
+    )
+    return !isMiniToken(asset || { symbol: '' })
+  })
 }
 
 export const getPoolAddressesByChain = (addresses: PoolAddresses, chain: Chain): O.Option<PoolAddress> =>
@@ -306,9 +313,7 @@ export const getPoolAssetDetail = ({
   assetPrice
 }: Pick<PoolDetail, 'assetPrice' | 'asset'>): O.Option<PoolAssetDetail> =>
   FP.pipe(
-    assetString,
-    assetFromString,
-    O.fromNullable,
+    O.tryCatch(() => assetFromString(assetString)),
     O.map((asset) => ({
       asset,
       assetPrice: bnOrZero(assetPrice)

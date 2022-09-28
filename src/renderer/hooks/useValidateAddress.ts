@@ -1,7 +1,7 @@
 import { useCallback, useEffect } from 'react'
 
-import { Address, XChainClient } from '@xchainjs/xchain-client'
-import { Chain } from '@xchainjs/xchain-util'
+import { XChainClient } from '@xchainjs/xchain-client'
+import { Address, Chain } from '@xchainjs/xchain-util'
 import * as FP from 'fp-ts/function'
 import * as O from 'fp-ts/Option'
 import { useObservableState } from 'observable-hooks'

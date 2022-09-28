@@ -6,6 +6,7 @@ import { ETH_DECIMAL } from '@xchainjs/xchain-ethereum'
 import { LTC_DECIMAL } from '@xchainjs/xchain-litecoin'
 import { DECIMAL as THOR_DECIMAL } from '@xchainjs/xchain-thorchain'
 import {
+  AVAXChain,
   BaseAmount,
   baseAmount,
   BCHChain,
@@ -17,7 +18,6 @@ import {
   ETHChain,
   LTCChain,
   TerraChain,
-  PolkadotChain,
   THORChain
 } from '@xchainjs/xchain-util'
 
@@ -42,8 +42,8 @@ export const smallestAmountToSent = (chain: Chain, _network: Network): BaseAmoun
       return baseAmount(0, ETH_DECIMAL)
     case CosmosChain:
       return baseAmount(1, COSMOS_DECIMAL)
-    case PolkadotChain:
-      throw Error('Polkadot is not supported yet')
+    case AVAXChain:
+      throw Error('AVAX is not supported yet')
     case DOGEChain:
       // 1000 satoshi
       return baseAmount(1000, DOGE_DECIMAL)

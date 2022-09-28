@@ -1,8 +1,7 @@
 import React from 'react'
 
 import { StopOutlined } from '@ant-design/icons'
-import { Address } from '@xchainjs/xchain-client'
-import { AssetRuneNative, baseToAsset, formatAssetAmountCurrency, THORChain } from '@xchainjs/xchain-util'
+import { Address, AssetRuneNative, baseToAsset, formatAssetAmountCurrency, THORChain } from '@xchainjs/xchain-util'
 import { Col } from 'antd'
 import { useIntl } from 'react-intl'
 

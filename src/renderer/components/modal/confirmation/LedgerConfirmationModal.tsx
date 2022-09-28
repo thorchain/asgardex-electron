@@ -1,8 +1,7 @@
 import { useCallback, useState } from 'react'
 
 import { isCashAddress, toCashAddress, toLegacyAddress } from '@xchainjs/xchain-bitcoincash'
-import { Address } from '@xchainjs/xchain-client'
-import { Chain, chainToString } from '@xchainjs/xchain-util'
+import { Address, Chain, chainToString } from '@xchainjs/xchain-util'
 import * as FP from 'fp-ts/function'
 import * as O from 'fp-ts/lib/Option'
 import { useIntl } from 'react-intl'

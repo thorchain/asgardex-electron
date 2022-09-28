@@ -2,6 +2,7 @@ import { Keystore } from '@xchainjs/xchain-crypto'
 import { assetToString, assetFromString, Asset, BaseAmount, baseAmount } from '@xchainjs/xchain-util'
 import * as E from 'fp-ts/lib/Either'
 import * as FP from 'fp-ts/lib/function'
+import * as O from 'fp-ts/lib/Option'
 import * as t from 'io-ts'
 import * as IOD from 'io-ts/Decoder'
 import * as IOG from 'io-ts/Guard'
@@ -12,8 +13,8 @@ const assetDecoder: IOD.Decoder<unknown, Asset> = FP.pipe(
   IOD.string,
   IOD.parse((assetString) =>
     FP.pipe(
-      assetString,
-      assetFromString,
+      O.tryCatch(() => assetFromString(assetString)),
+      O.toNullable,
       E.fromNullable(new Error(`Can't decode asset from ${assetString}`)),
       E.fold((e) => IOD.failure(assetString, e.message), IOD.success)
     )

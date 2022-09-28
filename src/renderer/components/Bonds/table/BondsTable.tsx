@@ -1,6 +1,6 @@
 import React, { useMemo, useState } from 'react'
 
-import { Address } from '@xchainjs/xchain-client'
+import { Address } from '@xchainjs/xchain-util'
 import { ColumnType } from 'antd/lib/table'
 import * as FP from 'fp-ts/function'
 import * as O from 'fp-ts/Option'
