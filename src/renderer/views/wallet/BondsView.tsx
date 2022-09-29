@@ -1,9 +1,8 @@
 import React, { useCallback, useMemo } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
-import { Address } from '@xchainjs/xchain-client'
 import { Client as ThorchainClient } from '@xchainjs/xchain-thorchain'
-import { THORChain } from '@xchainjs/xchain-util'
+import { Address, THORChain } from '@xchainjs/xchain-util'
 import { Row } from 'antd'
 import * as A from 'fp-ts/Array'
 import * as FP from 'fp-ts/function'

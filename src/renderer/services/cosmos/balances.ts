@@ -1,4 +1,4 @@
-import { AssetAtom } from '@xchainjs/xchain-cosmos'
+import { AssetAtom } from '@xchainjs/xchain-util'
 
 import { HDMode, WalletType } from '../../../shared/wallet/types'
 import { observableState } from '../../helpers/stateHelper'

@@ -1,8 +1,7 @@
 import React, { useState, useMemo, useCallback } from 'react'
 
 import { CheckCircleIcon, ExternalLinkIcon, PencilAltIcon, XCircleIcon } from '@heroicons/react/outline'
-import { Address } from '@xchainjs/xchain-client'
-import { Asset } from '@xchainjs/xchain-util'
+import { Address, Asset } from '@xchainjs/xchain-util'
 import { Form, Tooltip } from 'antd'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/Option'

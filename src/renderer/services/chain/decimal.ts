@@ -8,14 +8,14 @@ import {
   BNBChain,
   CosmosChain,
   ETHChain,
-  PolkadotChain,
   THORChain,
   BCHChain,
   LTCChain,
   Asset,
   BTCChain,
   DOGEChain,
-  TerraChain
+  TerraChain,
+  AVAXChain
 } from '@xchainjs/xchain-util'
 import * as Rx from 'rxjs'
 import * as RxOp from 'rxjs/operators'
@@ -45,8 +45,8 @@ const getDecimal = (asset: Asset, network: Network): Promise<number> => {
       return Promise.resolve(LTC_DECIMAL)
     case TerraChain:
       return Promise.reject('Terra (Classic) is not supported anymore')
-    case PolkadotChain: {
-      return Promise.reject('Polkadot is not supported yet')
+    case AVAXChain: {
+      return Promise.reject('AVAX is not supported yet')
     }
   }
 }

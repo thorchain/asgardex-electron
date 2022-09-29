@@ -1,7 +1,6 @@
 import { useCallback, useEffect } from 'react'
 
-import { Address } from '@xchainjs/xchain-client'
-import { Chain } from '@xchainjs/xchain-util'
+import { Address, Chain } from '@xchainjs/xchain-util'
 
 import { Network } from '../../../../shared/api/types'
 import { truncateAddress } from '../../../helpers/addressHelper'

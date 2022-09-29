@@ -1,8 +1,7 @@
 import React, { useCallback, useEffect, useMemo } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
-import { Address } from '@xchainjs/xchain-client'
-import { Asset, assetToString, BNBChain, Chain, ETHChain, THORChain } from '@xchainjs/xchain-util'
+import { Address, Asset, assetToString, BNBChain, Chain, ETHChain, THORChain } from '@xchainjs/xchain-util'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/Option'
 import { useObservableState } from 'observable-hooks'

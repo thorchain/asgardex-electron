@@ -4,12 +4,12 @@ import {
   Chain,
   CosmosChain,
   ETHChain,
-  PolkadotChain,
   THORChain,
   BCHChain,
   LTCChain,
   DOGEChain,
-  TerraChain
+  TerraChain,
+  AVAXChain
 } from '@xchainjs/xchain-util'
 import * as O from 'fp-ts/lib/Option'
 import * as Rx from 'rxjs'
@@ -41,7 +41,7 @@ const addressByChain$ = (chain: Chain): WalletAddress$ => {
       return ETH.address$
     case THORChain:
       return THOR.address$
-    case PolkadotChain:
+    case AVAXChain:
       // not supported yet
       return Rx.of(O.none)
     case CosmosChain:

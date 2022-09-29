@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
-import { Address } from '@xchainjs/xchain-client'
+import { Address } from '@xchainjs/xchain-util'
 import {
   formatAssetAmountCurrency,
   assetAmount,

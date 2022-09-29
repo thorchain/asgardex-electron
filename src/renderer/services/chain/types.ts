@@ -1,6 +1,6 @@
 import * as RD from '@devexperts/remote-data-ts'
-import { Address, FeeOption, Fees, Tx } from '@xchainjs/xchain-client'
-import { Asset, BaseAmount, Chain } from '@xchainjs/xchain-util'
+import { FeeOption, Fees, Tx } from '@xchainjs/xchain-client'
+import { Address, Asset, BaseAmount, Chain } from '@xchainjs/xchain-util'
 import BigNumber from 'bignumber.js'
 import * as O from 'fp-ts/lib/Option'
 import * as Rx from 'rxjs'
