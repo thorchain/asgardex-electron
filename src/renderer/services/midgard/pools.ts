@@ -82,7 +82,7 @@ const getStoredSelectedPricePoolAsset = (): SelectedPricePoolAsset =>
   FP.pipe(
     localStorage.getItem(PRICE_POOL_KEY) as string,
     O.fromNullable,
-    O.chain(O.tryCatchK(assetFromString)),
+    O.map(assetFromString),
     O.chain(O.fromNullable),
     O.filter(isPricePoolAsset)
   )
@@ -280,7 +280,7 @@ const createPoolsService = (
     const poolAssets$: PoolAssetsLD = FP.pipe(
       apiGetPoolsAll$,
       // Filter out all unknown / invalid assets created from asset strings
-      liveData.map(A.filterMap(({ asset }) => O.tryCatch(() => assetFromString(asset)))),
+      liveData.map(A.filterMap(({ asset }) => FP.pipe(asset, assetFromString, O.fromNullable))),
       // Filter pools by using enabled chains only (defined via ENV)
       liveData.map(A.filter(({ chain }) => isEnabledChain(chain))),
       RxOp.shareReplay(1)
@@ -314,7 +314,7 @@ const createPoolsService = (
           FP.pipe(
             pools,
             // Filter out all unknown / invalid assets created from asset strings
-            RD.map(A.filterMap(({ asset }) => O.tryCatch(() => assetFromString(asset)))),
+            RD.map(A.filterMap(({ asset }) => FP.pipe(asset, assetFromString, O.fromNullable))),
             // Filter pools by using enabled chains only (defined via ENV)
             RD.map(A.filter(({ chain }) => isEnabledChain(chain))),
             // Filter pools based on ERC20Whitelist (mainnet + ETHChain only)
@@ -386,7 +386,7 @@ const createPoolsService = (
           FP.pipe(
             pools,
             // Filter out all unknown / invalid assets created from asset strings
-            RD.map(A.filterMap(({ asset }) => O.tryCatch(() => assetFromString(asset)))),
+            RD.map(A.filterMap(({ asset }) => FP.pipe(asset, assetFromString, O.fromNullable))),
             // Filter pools by using enabled chains only (defined via ENV)
             RD.map(A.filter(({ chain }) => isEnabledChain(chain))),
             // Filter pools based on ERC20Whitelist (mainnet + ETH only)

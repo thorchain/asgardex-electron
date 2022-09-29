@@ -16,7 +16,10 @@ type Args = {
 }
 
 const Template = ({ network, loading, onClickOpenAsymTool, assets }: Args) => {
-  const assetList = FP.pipe(assets.split('|'), A.filterMap(O.tryCatchK(assetFromString)))
+  const assetList = FP.pipe(
+    assets.split('|'),
+    A.filterMap((assetString) => O.fromNullable(assetFromString(assetString)))
+  )
 
   return (
     <AsymAssetsWarning

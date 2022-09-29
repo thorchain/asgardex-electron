@@ -41,12 +41,10 @@ export const getRequestType = (type?: TxType | 'ALL'): string | undefined => {
   return
 }
 
-export const mapCoin = (coin: Coin): O.Option<AssetWithAmount> =>
-  FP.pipe(
-    coin.asset,
-    O.tryCatchK(assetFromString),
-    O.map((asset) => ({ asset, amount: baseAmount(coin.amount) }))
-  )
+export const mapCoin = (coin: Coin): O.Option<AssetWithAmount> => {
+  const asset = assetFromString(coin.asset)
+  return asset ? O.some({ asset, amount: baseAmount(coin.amount) }) : O.none
+}
 
 export const mapTransaction = (tx: Transaction): Tx => ({
   ...tx,

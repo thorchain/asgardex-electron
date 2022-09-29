@@ -52,7 +52,8 @@ export const getPricePools = (details: PoolDetails, whitelist: PricePoolAssets):
     getDeepestPool,
     O.chain((detail) =>
       FP.pipe(
-        O.tryCatch(() => assetFromString(detail.asset)),
+        assetFromString(detail.asset),
+        O.fromNullable,
         O.map((asset) => ({
           asset,
           poolData: toPoolData(detail)
@@ -74,7 +75,8 @@ export const getPricePools = (details: PoolDetails, whitelist: PricePoolAssets):
     A.filterMap(
       (detail: PoolDetail): O.Option<PricePool> =>
         FP.pipe(
-          O.tryCatch(() => assetFromString(detail.asset)),
+          assetFromString(detail.asset),
+          O.fromNullable,
           O.map((asset) => ({
             asset,
             poolData: toPoolData(detail)
@@ -139,7 +141,8 @@ export const getPoolDetail = (details: PoolDetails, asset: Asset): O.Option<Pool
     details.find((detail: PoolDetail) =>
       FP.pipe(
         detail.asset,
-        O.tryCatchK(assetFromString),
+        assetFromString,
+        O.fromNullable,
         O.map((detailAsset) => eqAsset.equals(detailAsset, asset)),
         O.getOrElse(() => false)
       )
@@ -173,13 +176,7 @@ export const toPoolData = ({ assetDepth, runeDepth }: Pick<PoolDetail, 'assetDep
  * Filter out mini tokens from pool assets
  */
 export const filterPoolAssets = (poolAssets: string[]) => {
-  return poolAssets.filter((poolAsset) => {
-    const asset = FP.pipe(
-      O.tryCatch(() => assetFromString(poolAsset)),
-      O.toUndefined
-    )
-    return !isMiniToken(asset || { symbol: '' })
-  })
+  return poolAssets.filter((poolAsset) => !isMiniToken(assetFromString(poolAsset) || { symbol: '' }))
 }
 
 export const getPoolAddressesByChain = (addresses: PoolAddresses, chain: Chain): O.Option<PoolAddress> =>
@@ -313,7 +310,9 @@ export const getPoolAssetDetail = ({
   assetPrice
 }: Pick<PoolDetail, 'assetPrice' | 'asset'>): O.Option<PoolAssetDetail> =>
   FP.pipe(
-    O.tryCatch(() => assetFromString(assetString)),
+    assetString,
+    assetFromString,
+    O.fromNullable,
     O.map((asset) => ({
       asset,
       assetPrice: bnOrZero(assetPrice)

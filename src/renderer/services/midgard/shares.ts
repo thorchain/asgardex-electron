@@ -80,7 +80,8 @@ const createSharesService = (midgardUrl$: MidgardUrlLD, getMidgardDefaultApi: (b
             // ignore all invalid pool strings
             FP.pipe(
               pool,
-              O.tryCatchK(assetFromString),
+              assetFromString,
+              O.fromNullable,
               O.map((asset) => ({
                 type: !!runeAddress && !!assetAddress ? 'sym' : 'asym',
                 assetAddress: optionFromNullableString(assetAddress),

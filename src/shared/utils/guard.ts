@@ -39,12 +39,8 @@ export const isAsset = (u: unknown): u is Asset => {
   if (assetGuard.is(u)) return true
 
   if (typeof u === 'string') {
-    try {
-      const asset = assetFromString(u)
-      return isValidAsset(asset)
-    } catch (_) {
-      return false
-    }
+    const asset = assetFromString(u)
+    if (asset) return isValidAsset(asset)
   }
   return false
 }

@@ -52,7 +52,9 @@ export const getPoolTableRowData = ({
   network: Network
 }): O.Option<PoolTableRowData> => {
   return FP.pipe(
-    O.tryCatch(() => assetFromString(poolDetail.asset)),
+    poolDetail.asset,
+    assetFromString,
+    O.fromNullable,
     O.map((poolDetailAsset) => {
       const poolData = toPoolData(poolDetail)
       // convert string -> BN -> number - just for convenience
