@@ -16,11 +16,11 @@ import {
   LTCChain,
   BCHChain,
   Chain,
-  PolkadotChain,
   CosmosChain,
   DOGEChain,
   TerraChain,
-  AssetRuneERC20Testnet
+  AssetRuneERC20Testnet,
+  AVAXChain
 } from '@xchainjs/xchain-util'
 
 import { Network } from '../shared/api/types'
@@ -151,7 +151,7 @@ export const CHAIN_WEIGHTS: Record<Chain, number> = {
   [CosmosChain]: 6,
   [DOGEChain]: 7,
   [TerraChain]: 8, // not supported in ASGDX anymore, but part of xchain-util
-  [PolkadotChain]: 9 // not supported in ASGDX, but part of xchain-util
+  [AVAXChain]: 9 // not supported in ASGDX yet
 }
 
 // Weight of currencies needed for pricing

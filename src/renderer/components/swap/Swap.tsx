@@ -2,7 +2,6 @@ import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
 import { getSwapMemo, getValueOfAsset1InAsset2, PoolData } from '@thorchain/asgardex-util'
-import { Address } from '@xchainjs/xchain-client'
 import {
   Asset,
   assetToString,
@@ -15,7 +14,8 @@ import {
   Chain,
   assetToBase,
   assetAmount,
-  chainToString
+  chainToString,
+  Address
 } from '@xchainjs/xchain-util'
 import { Row } from 'antd'
 import BigNumber from 'bignumber.js'

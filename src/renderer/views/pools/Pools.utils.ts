@@ -51,10 +51,10 @@ export const getPoolTableRowData = ({
   watchlist: PoolsWatchList
   network: Network
 }): O.Option<PoolTableRowData> => {
-  const oPoolDetailAsset = O.fromNullable(assetFromString(poolDetail.asset))
-
   return FP.pipe(
-    oPoolDetailAsset,
+    poolDetail.asset,
+    assetFromString,
+    O.fromNullable,
     O.map((poolDetailAsset) => {
       const poolData = toPoolData(poolDetail)
       // convert string -> BN -> number - just for convenience

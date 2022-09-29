@@ -1,6 +1,8 @@
 import * as RD from '@devexperts/remote-data-ts'
-import { Address, TxHash } from '@xchainjs/xchain-client'
+import { TxHash } from '@xchainjs/xchain-client'
 import {
+  Address,
+  AVAXChain,
   BCHChain,
   BNBChain,
   BTCChain,
@@ -10,7 +12,6 @@ import {
   ETHChain,
   LTCChain,
   TerraChain,
-  PolkadotChain,
   THORChain
 } from '@xchainjs/xchain-util'
 import * as FP from 'fp-ts/lib/function'
@@ -96,9 +97,9 @@ export const sendTx$ = ({
         )
       )
 
-    case PolkadotChain:
+    case AVAXChain:
       // not available yet
-      return txFailure$(`sendTx$ has not been implemented for Polkadot yet`)
+      return txFailure$(`sendTx$ has not been implemented for AVAX yet`)
 
     case TerraChain:
       return txFailure$(`Terra (Classic) is not supported anymore - sendTx$ has been removed`)
@@ -205,8 +206,8 @@ export const txStatusByChain$ = ({ txHash, chain }: { txHash: TxHash; chain: Cha
       return THOR.txStatus$(txHash, O.none)
     case CosmosChain:
       return COSMOS.txStatus$(txHash, O.none)
-    case PolkadotChain:
-      return txStatusFailure$(`txStatusByChain$ has not been implemented for Polkadot`)
+    case AVAXChain:
+      return txStatusFailure$(`txStatusByChain$ has not been implemented for AVAX`)
     case TerraChain:
       return txStatusFailure$(`txStatusByChain$ has been removed - Terra (Classic) is not supported anymore`)
     case DOGEChain:

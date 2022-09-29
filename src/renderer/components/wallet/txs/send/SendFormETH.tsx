@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
 import { FeeOption, Fees, TxParams } from '@xchainjs/xchain-client'
-import { Address, validateAddress } from '@xchainjs/xchain-ethereum'
+import { validateAddress } from '@xchainjs/xchain-ethereum'
 import {
   formatAssetAmountCurrency,
   bn,
@@ -13,7 +13,8 @@ import {
   assetToBase,
   assetAmount,
   ETHChain,
-  chainToString
+  chainToString,
+  Address
 } from '@xchainjs/xchain-util'
 import { Row, Form } from 'antd'
 import { RadioChangeEvent } from 'antd/lib/radio'

@@ -1,8 +1,8 @@
 import EthApp from '@ledgerhq/hw-app-eth'
 import type Transport from '@ledgerhq/hw-transport'
-import { Address, FeeOption, TxHash } from '@xchainjs/xchain-client'
+import { FeeOption, TxHash } from '@xchainjs/xchain-client'
 import * as ETH from '@xchainjs/xchain-ethereum'
-import { Asset, assetToString, BaseAmount } from '@xchainjs/xchain-util'
+import { Address, Asset, assetToString, BaseAmount } from '@xchainjs/xchain-util'
 import BigNumber from 'bignumber.js'
 import * as E from 'fp-ts/Either'
 

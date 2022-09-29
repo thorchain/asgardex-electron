@@ -2,7 +2,7 @@ import { AminoMsgSend, AminoTypes, Coin } from '@cosmjs/stargate'
 import { cosmosclient, proto, rest } from '@cosmos-client/core'
 import CosmosApp from '@ledgerhq/hw-app-cosmos'
 import type Transport from '@ledgerhq/hw-transport'
-import { Address, TxHash } from '@xchainjs/xchain-client'
+import { TxHash } from '@xchainjs/xchain-client'
 import {
   Client,
   DEFAULT_GAS_LIMIT,
@@ -13,7 +13,7 @@ import {
   protoMsgSend,
   protoTxBody
 } from '@xchainjs/xchain-cosmos'
-import { Asset, assetToString, BaseAmount } from '@xchainjs/xchain-util'
+import { Address, Asset, assetToString, BaseAmount } from '@xchainjs/xchain-util'
 import BigNumber from 'bignumber.js'
 import * as E from 'fp-ts/Either'
 import secp256k1 from 'secp256k1'

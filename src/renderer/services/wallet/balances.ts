@@ -1,7 +1,8 @@
 import * as RD from '@devexperts/remote-data-ts'
-import { Address } from '@xchainjs/xchain-client'
 import {
+  Address,
   AssetBNB,
+  AVAXChain,
   BCHChain,
   BNBChain,
   BTCChain,
@@ -11,7 +12,6 @@ import {
   ETHChain,
   LTCChain,
   TerraChain,
-  PolkadotChain,
   THORChain
 } from '@xchainjs/xchain-util'
 import * as A from 'fp-ts/lib/Array'
@@ -97,7 +97,8 @@ export const createBalancesService = ({
         return FP.constVoid
       case CosmosChain:
         return COSMOS.reloadBalances
-      case PolkadotChain:
+      case AVAXChain:
+        // AVAX is not supported yet
         return FP.constVoid
     }
   }

@@ -1,7 +1,7 @@
-import { AssetAtom } from '@xchainjs/xchain-cosmos'
 import { ETHAddress } from '@xchainjs/xchain-ethereum'
 import {
   assetAmount,
+  AssetAtom,
   AssetBCH,
   AssetBNB,
   AssetBTC,

@@ -2,8 +2,8 @@ import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
 import { getDepositMemo, PoolData } from '@thorchain/asgardex-util'
-import { Address } from '@xchainjs/xchain-client'
 import {
+  Address,
   Asset,
   AssetRuneNative,
   baseAmount,

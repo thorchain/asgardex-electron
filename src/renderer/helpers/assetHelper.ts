@@ -1,10 +1,10 @@
-import { Address } from '@xchainjs/xchain-client'
-import { AssetAtom } from '@xchainjs/xchain-cosmos'
 import { ETHAddress, getTokenAddress } from '@xchainjs/xchain-ethereum'
 import {
+  Address,
   Asset,
   assetAmount,
   AssetAmount,
+  AssetAtom,
   AssetBCH,
   AssetBNB,
   AssetBTC,

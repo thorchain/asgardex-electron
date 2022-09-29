@@ -1,5 +1,4 @@
-import { Address } from '@xchainjs/xchain-client'
-import { Chain } from '@xchainjs/xchain-util'
+import { Address, Chain } from '@xchainjs/xchain-util'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
 import * as RxOp from 'rxjs/operators'

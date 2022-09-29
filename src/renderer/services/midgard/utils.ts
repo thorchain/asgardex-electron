@@ -1,6 +1,5 @@
 import * as RD from '@devexperts/remote-data-ts'
 import { PoolData } from '@thorchain/asgardex-util'
-import { Address } from '@xchainjs/xchain-client'
 import {
   assetFromString,
   bnOrZero,
@@ -10,7 +9,8 @@ import {
   Chain,
   isValidBN,
   bn,
-  BaseAmount
+  BaseAmount,
+  Address
 } from '@xchainjs/xchain-util'
 import BigNumber from 'bignumber.js'
 import * as A from 'fp-ts/lib/Array'
@@ -138,11 +138,15 @@ export const pricePoolSelectorFromRD = (
  */
 export const getPoolDetail = (details: PoolDetails, asset: Asset): O.Option<PoolDetail> =>
   FP.pipe(
-    details.find((detail: PoolDetail) => {
-      const { asset: detailAssetString = '' } = detail
-      const detailAsset = assetFromString(detailAssetString)
-      return detailAsset && eqAsset.equals(detailAsset, asset)
-    }),
+    details.find((detail: PoolDetail) =>
+      FP.pipe(
+        detail.asset,
+        assetFromString,
+        O.fromNullable,
+        O.map((detailAsset) => eqAsset.equals(detailAsset, asset)),
+        O.getOrElse(() => false)
+      )
+    ),
     O.fromNullable
   )
 

@@ -1,6 +1,6 @@
 import React from 'react'
 
-import { Address } from '@xchainjs/xchain-client'
+import { Address } from '@xchainjs/xchain-util'
 import { Asset } from '@xchainjs/xchain-util'
 
 import { Network } from '../../../../../shared/api/types'

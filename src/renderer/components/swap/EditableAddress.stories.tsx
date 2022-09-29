@@ -1,6 +1,5 @@
 import { ComponentMeta, StoryFn } from '@storybook/react'
-import { Address } from '@xchainjs/xchain-client'
-import { AssetBNB } from '@xchainjs/xchain-util'
+import { Address, AssetBNB } from '@xchainjs/xchain-util'
 
 import { BNB_ADDRESS_TESTNET } from '../../../shared/mock/address'
 import { eqString } from '../../helpers/fp/eq'
