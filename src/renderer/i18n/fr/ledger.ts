@@ -29,7 +29,8 @@ const ledger: LedgerMessages = {
   'ledger.notsupported': 'Pas de prise en charge de Ledger pour {chain}.',
   'ledger.notaddedorzerobalances': "La chaîne {chaîne} n'a pas été connectée sur Ledger ou n'a aucun solde.",
   'ledger.deposit.oneside': "Actuellement, Ledger ne prend en charge un actif que d'un seul côté.",
-  'ledger.legacyformat.note': 'Ledger affiche toutes les adresses de sortie en "Legacy", mais pas au format "CashAddr".',
+  'ledger.legacyformat.note':
+    'Ledger affiche toutes les adresses de sortie en "Legacy", mais pas au format "CashAddr".',
   'ledger.legacyformat.show': 'Afficher les adresses',
   'ledger.legacyformat.hide': 'Masquer les adresses'
 }
