@@ -14,6 +14,7 @@ import { AssetDetails } from '../../components/wallet/assets'
 import { useChainContext } from '../../contexts/ChainContext'
 import { useWalletContext } from '../../contexts/WalletContext'
 import { disableRuneUpgrade, isRuneNativeAsset } from '../../helpers/assetHelper'
+import { isCosmosChain } from '../../helpers/chainHelper'
 import { eqOSelectedWalletAsset } from '../../helpers/fp/eq'
 import { sequenceTOption } from '../../helpers/fpHelpers'
 import { useMimirHalt } from '../../hooks/useMimirHalt'
@@ -39,10 +40,16 @@ export const AssetDetailsView: React.FC = (): JSX.Element => {
       FP.pipe(
         selectedAssetUpdated$,
         RxOp.distinctUntilChanged(eqOSelectedWalletAsset.equals),
+        /*
+          Disable txs history for Cosmos temporarily
+          as long as an external API can't provide it - currently `https://lcd-cosmoshub.keplr.app`
+          See https://github.com/thorchain/asgardex-electron/pull/2405
+        */
         RxOp.switchMap(
           O.fold(
             () => Rx.of(RD.pending),
-            ({ walletIndex, walletAddress }) => getTxs$(O.some(walletAddress), walletIndex)
+            ({ walletIndex, walletAddress, asset }) =>
+              isCosmosChain(asset.chain) ? Rx.of(RD.initial) : getTxs$(O.some(walletAddress), walletIndex)
           )
         )
       ),

@@ -1,8 +1,8 @@
 import React, { useCallback, useMemo, useState } from 'react'
 
-import { Address } from '@xchainjs/xchain-util'
+import { Address, chainToString } from '@xchainjs/xchain-util'
 import { Asset, AssetAmount, assetToBase, BaseAmount } from '@xchainjs/xchain-util'
-import { Row, Col, Grid } from 'antd'
+import { Row, Col } from 'antd'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
 import { useIntl } from 'react-intl'
@@ -11,6 +11,7 @@ import { useNavigate } from 'react-router-dom'
 import { Network } from '../../../../shared/api/types'
 import { WalletType } from '../../../../shared/wallet/types'
 import * as AssetHelper from '../../../helpers/assetHelper'
+import { isCosmosChain } from '../../../helpers/chainHelper'
 import { eqAsset, eqString } from '../../../helpers/fp/eq'
 import { getWalletAssetAmountFromBalances } from '../../../helpers/walletHelper'
 import * as walletRoutes from '../../../routes/wallet'
@@ -18,9 +19,10 @@ import { OpenExplorerTxUrl, TxsPageRD } from '../../../services/clients'
 import { MAX_ITEMS_PER_PAGE } from '../../../services/const'
 import { EMPTY_LOAD_TXS_HANDLER } from '../../../services/wallet/const'
 import { LoadTxsHandler, NonEmptyWalletBalances, WalletBalances } from '../../../services/wallet/types'
+import { WarningView } from '../../shared/warning'
 import { AssetInfo } from '../../uielements/assets/assetInfo'
 import { BackLink } from '../../uielements/backLink'
-import { Button, RefreshButton } from '../../uielements/button'
+import { BorderButton, FlatButton, RefreshButton, TextButton } from '../../uielements/button'
 import { TxsTable } from '../txs/table/TxsTable'
 import * as Styled from './AssetDetails.styles'
 
@@ -57,7 +59,6 @@ export const AssetDetails: React.FC<Props> = (props): JSX.Element => {
 
   const [currentPage, setCurrentPage] = useState(1)
 
-  const isDesktopView = Grid.useBreakpoint()?.lg ?? false
   const navigate = useNavigate()
   const intl = useIntl()
 
@@ -166,14 +167,14 @@ export const AssetDetails: React.FC<Props> = (props): JSX.Element => {
           <Styled.ActionCol sm={{ span: actionColSpanMobile }} md={{ span: actionColSpanDesktop }}>
             <Styled.ActionWrapper>
               <Row justify="center">
-                <Button
-                  type="primary"
-                  round="true"
-                  sizevalue="xnormal"
+                <FlatButton
+                  className="min-w-[200px]"
+                  size="large"
+                  color="primary"
                   onClick={disableSend ? undefined : walletActionSendClick}
                   disabled={disableSend}>
                   {intl.formatMessage({ id: 'wallet.action.send' })}
-                </Button>
+                </FlatButton>
               </Row>
             </Styled.ActionWrapper>
           </Styled.ActionCol>
@@ -181,15 +182,14 @@ export const AssetDetails: React.FC<Props> = (props): JSX.Element => {
             <Styled.ActionCol sm={{ span: actionColSpanMobile }} md={{ span: actionColSpanDesktop }}>
               <Styled.ActionWrapper>
                 <Row justify="center">
-                  <Button
-                    type="primary"
-                    round="true"
-                    sizevalue="xnormal"
+                  <BorderButton
+                    className="min-w-[200px]"
+                    size="large"
                     color="warning"
                     onClick={runeUpgradeDisabled ? undefined : walletActionUpgradeNonNativeRuneClick}
                     disabled={runeUpgradeDisabled}>
                     {intl.formatMessage({ id: 'wallet.action.upgrade' })}
-                  </Button>
+                  </BorderButton>
                 </Row>
               </Styled.ActionWrapper>
             </Styled.ActionCol>
@@ -198,14 +198,14 @@ export const AssetDetails: React.FC<Props> = (props): JSX.Element => {
             <Styled.ActionCol sm={{ span: actionColSpanMobile }} md={{ span: actionColSpanDesktop }}>
               <Styled.ActionWrapper>
                 <Row justify="center">
-                  <Button
-                    typevalue="outline"
-                    round="true"
-                    sizevalue="xnormal"
+                  <BorderButton
+                    className="min-w-[200px]"
+                    size="large"
+                    color="primary"
                     onClick={disableSend ? undefined : walletActionDepositClick}
                     disabled={disableSend}>
                     {intl.formatMessage({ id: 'wallet.action.deposit' })}
-                  </Button>
+                  </BorderButton>
                 </Row>
               </Styled.ActionWrapper>
             </Styled.ActionCol>
@@ -215,20 +215,44 @@ export const AssetDetails: React.FC<Props> = (props): JSX.Element => {
       </Row>
       <Row>
         <Col span={24}>
-          <Styled.TableHeadline isDesktop={isDesktopView}>
-            {intl.formatMessage({ id: 'wallet.txs.history' })}{' '}
-            <Styled.TableHeadlineLinkIcon onClick={openExplorerAddressUrl} />
-          </Styled.TableHeadline>
+          <TextButton
+            className="px-0 pt-40px pb-20px !font-mainSemiBold !text-18"
+            size="large"
+            color="neutral"
+            onClick={openExplorerAddressUrl}>
+            {intl.formatMessage({ id: 'wallet.txs.history' })}
+            <Styled.TableHeadlineLinkIcon />
+          </TextButton>
         </Col>
         <Col span={24}>
-          <TxsTable
-            txsPageRD={txsPageRD}
-            clickTxLinkHandler={openExplorerTxUrl}
-            changePaginationHandler={onChangePagination}
-            chain={asset.chain}
-            network={network}
-            walletAddress={walletAddress}
-          />
+          {/*
+            Disable txs history for Cosmos temporarily
+            as long as an external API can't provide it - currently `https://lcd-cosmoshub.keplr.app`
+            See https://github.com/thorchain/asgardex-electron/pull/2405
+           */}
+          {isCosmosChain(asset.chain) ? (
+            <WarningView
+              subTitle={intl.formatMessage(
+                { id: 'wallet.txs.history.disabled' },
+                { chain: chainToString(asset.chain) }
+              )}
+              extra={
+                <FlatButton size="normal" color="neutral" onClick={openExplorerAddressUrl}>
+                  {intl.formatMessage({ id: 'wallet.txs.history' })}
+                  <Styled.TableHeadlineLinkIcon />
+                </FlatButton>
+              }
+            />
+          ) : (
+            <TxsTable
+              txsPageRD={txsPageRD}
+              clickTxLinkHandler={openExplorerTxUrl}
+              changePaginationHandler={onChangePagination}
+              chain={asset.chain}
+              network={network}
+              walletAddress={walletAddress}
+            />
+          )}
         </Col>
       </Row>
     </>

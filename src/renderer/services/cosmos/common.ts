@@ -1,11 +1,13 @@
 import * as RD from '@devexperts/remote-data-ts'
-import { Client, getChainId } from '@xchainjs/xchain-cosmos'
+import { Client } from '@xchainjs/xchain-cosmos'
 import { CosmosChain } from '@xchainjs/xchain-util'
+import * as E from 'fp-ts/lib/Either'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
 import * as Rx from 'rxjs'
 import * as RxOp from 'rxjs/operators'
 
+import { getChainId } from '../../../shared/api/cosmos'
 import { getClientUrls, INITIAL_CHAIN_IDS } from '../../../shared/cosmos/client'
 import { isError } from '../../../shared/utils/guard'
 import { clientNetwork$ } from '../app/service'
@@ -21,37 +23,46 @@ import type { Client$, ClientState, ClientState$ } from './types'
  * By the other hand: Whenever a phrase has been removed, `ClientState` is set to `initial`
  * A `CosmosClient` will never be created as long as no phrase is available
  */
+
+// const rpcURL = 'https://api.cosmos.network'
 const clientState$: ClientState$ = FP.pipe(
   Rx.combineLatest([keystoreService.keystoreState$, clientNetwork$, Rx.of(getClientUrls())]),
   RxOp.switchMap(
     ([keystore, network, clientUrls]): ClientState$ =>
       FP.pipe(
-        // request chain id whenever network or keystore are changed
-        Rx.from(getChainId(clientUrls[network])),
-        RxOp.switchMap((chainId) =>
-          Rx.of(
-            FP.pipe(
-              getPhrase(keystore),
-              O.map<string, ClientState>((phrase) => {
-                try {
-                  const client = new Client({
-                    network,
-                    phrase,
-                    clientUrls: getClientUrls(),
-                    chainIds: { ...INITIAL_CHAIN_IDS, [network]: chainId }
-                  })
-                  return RD.success(client)
-                } catch (error) {
-                  return RD.failure<Error>(isError(error) ? error : new Error('Failed to create Cosmos client'))
-                }
-              }),
-              // Set back to `initial` if no phrase is available (locked wallet)
-              O.getOrElse<ClientState>(() => RD.initial)
+        // request chain id whenever network or keystore have been changed
+        Rx.from(getChainId(clientUrls[network])()),
+        // Rx.from(getChainId(rpcURL)()),
+        RxOp.switchMap((eChainId) =>
+          FP.pipe(
+            eChainId,
+            E.fold(
+              (error) =>
+                Rx.of(RD.failure(Error(`Failed to get Cosmos' chain id (${error?.message ?? error.toString()})`))),
+              (chainId) =>
+                Rx.of(
+                  FP.pipe(
+                    getPhrase(keystore),
+                    O.map<string, ClientState>((phrase) => {
+                      try {
+                        const client = new Client({
+                          network,
+                          phrase,
+                          clientUrls: getClientUrls(),
+                          // clientUrls: { ...getClientUrls(), [network]: rpcURL },
+                          chainIds: { ...INITIAL_CHAIN_IDS, [network]: chainId }
+                        })
+                        return RD.success(client)
+                      } catch (error) {
+                        return RD.failure<Error>(isError(error) ? error : new Error('Failed to create Cosmos client'))
+                      }
+                    }),
+                    // Set back to `initial` if no phrase is available (locked wallet)
+                    O.getOrElse<ClientState>(() => RD.initial)
+                  )
+                )
             )
           )
-        ),
-        RxOp.catchError((error) =>
-          Rx.of(RD.failure<Error>(new Error(`Failed to get Cosmos' chain id (${error?.msg ?? error.toString()})`)))
         ),
         RxOp.startWith(RD.pending)
       )
