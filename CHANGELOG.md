@@ -7,9 +7,10 @@
 
 ## Update
 
-- Translation of missing RU strings. Typo fixes. by TreefeedXavier [#2401](https://github.com/thorchain/asgardex-electron/pull/2401)
+- Translation of missing RU strings. Typo fixes. by @TreefeedXavier [#2401](https://github.com/thorchain/asgardex-electron/pull/2401)
 - Update fr translation by @Weyland2093 [#2403](https://github.com/thorchain/asgardex-electron/pull/2403)
 - Deprecate all `thorchain.info` API endpoints [#2400](https://github.com/thorchain/asgardex-electron/issues/2400)
+- Disable testnet [#2399](https://github.com/thorchain/asgardex-electron/issues/2399)
 
 ## Fix
 
