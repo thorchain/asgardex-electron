@@ -47,6 +47,7 @@ const wallet: WalletMessages = {
   'wallet.phrase.error.invalid': 'Invalide Phrase',
   'wallet.phrase.error.import': 'Error beim Importieren der Phrase',
   'wallet.txs.history': 'Transaktionenverlauf',
+  'wallet.txs.history.disabled': 'Transaktionenverlauf für {chain} ist vorübergehend nicht verfügbar',
   'wallet.create.copy.phrase': 'Phrase kopieren',
   'wallet.create.error.phrase.empty': 'Erstelle eine neue Wallet und füge ein Guthaben hinzu',
   'wallet.add.another': 'Weitere Wallet hinzufügen',

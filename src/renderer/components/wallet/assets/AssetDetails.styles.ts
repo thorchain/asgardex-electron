@@ -4,7 +4,6 @@ import { palette } from 'styled-theme'
 
 import { media } from '../../../helpers/styleHelper'
 import { ExternalLinkIcon as ExternalLinkIconUI } from '../../uielements/common/Common.styles'
-import { Headline } from '../../uielements/headline'
 import { Label as UILabel } from '../../uielements/label'
 
 export const Divider = styled(A.Divider)`
@@ -44,18 +43,6 @@ export const FeeRow = styled(A.Row).attrs({
 })`
   width: 100%;
   padding-top: 10px;
-`
-
-type TableHeadlineProps = {
-  isDesktop: boolean
-}
-
-export const TableHeadline = styled(Headline)`
-  display: flex;
-  align-items: center;
-  padding: 40px 0 20px 0;
-  width: 100%;
-  text-align: ${({ isDesktop }: TableHeadlineProps) => (isDesktop ? 'left' : 'center')};
 `
 
 export const TableHeadlineLinkIcon = styled(ExternalLinkIconUI)`

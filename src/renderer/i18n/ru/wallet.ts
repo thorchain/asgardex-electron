@@ -46,6 +46,7 @@ const wallet: WalletMessages = {
   'wallet.phrase.error.import': 'Ошибка при импорте фразы',
   'wallet.imports.error.phrase.empty': 'Импортировать существующий кошелёк с балансом',
   'wallet.txs.history': 'История переводов',
+  'wallet.txs.history.disabled': 'Transaction history for {chain} has been disabled temporarily - RU',
   'wallet.create.copy.phrase': 'Скопируйте фразу ниже',
   'wallet.create.error.phrase.empty': 'Создать новый кошелёк с балансом',
   'wallet.add.another': 'Добавить еще один кошелёк',

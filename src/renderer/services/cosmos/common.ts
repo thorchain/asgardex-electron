@@ -23,6 +23,8 @@ import type { Client$, ClientState, ClientState$ } from './types'
  * By the other hand: Whenever a phrase has been removed, `ClientState` is set to `initial`
  * A `CosmosClient` will never be created as long as no phrase is available
  */
+
+// const rpcURL = 'https://api.cosmos.network'
 const clientState$: ClientState$ = FP.pipe(
   Rx.combineLatest([keystoreService.keystoreState$, clientNetwork$, Rx.of(getClientUrls())]),
   RxOp.switchMap(
@@ -30,6 +32,7 @@ const clientState$: ClientState$ = FP.pipe(
       FP.pipe(
         // request chain id whenever network or keystore have been changed
         Rx.from(getChainId(clientUrls[network])()),
+        // Rx.from(getChainId(rpcURL)()),
         RxOp.switchMap((eChainId) =>
           FP.pipe(
             eChainId,
@@ -46,6 +49,7 @@ const clientState$: ClientState$ = FP.pipe(
                           network,
                           phrase,
                           clientUrls: getClientUrls(),
+                          // clientUrls: { ...getClientUrls(), [network]: rpcURL },
                           chainIds: { ...INITIAL_CHAIN_IDS, [network]: chainId }
                         })
                         return RD.success(client)
