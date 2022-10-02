@@ -106,7 +106,7 @@ export type ThornodeApiUrlRD = RD.RemoteData<Error, string>
 
 /**
  * IO type for mimir endpoints:
- * mainnet: https://thornode.thorchain.info/thorchain/mimir
+ * mainnet: https://thornode.ninerealms.com/thorchain/mimir
  * testnet: https://testnet.thornode.thorchain.info/thorchain/mimir
  */
 export const MimirIO = t.type({
