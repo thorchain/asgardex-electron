@@ -11,10 +11,10 @@ const pools: PoolsMessages = {
   'pools.pending': 'En attente',
   'pools.available': 'Disponible',
   'pools.pooled': 'Mis en commun',
-  'pools.limit.info': 'Protocol limit reached! {pooled} pooled in pools, {bonded} bonded in nodes - FR',
-  'pools.incentivependulum.info': 'Incentive Pendulum: {percentage}%  - FR',
-  'pools.incentivependulum.tooltip': '{pooled} pooled in pools, {bonded} bonded in nodes - FR',
-  'pools.incentivependulum.error': 'Error while loading data of Incentive Pendulum - FR'
+  'pools.limit.info': 'Limite de protocole atteinte ! {pooled} regroupés en pools, {bonded} en caution dans les nœuds',
+  'pools.incentivependulum.info': "Balancier incitatif : {percentage}%",
+  'pools.incentivependulum.tooltip': '{pooled} regroupés en pools, {bonded} en caution dans les nœuds',
+  'pools.incentivependulum.error': 'Erreur lors du chargement des données du balancier incitatif'
 }
 
 export default pools
