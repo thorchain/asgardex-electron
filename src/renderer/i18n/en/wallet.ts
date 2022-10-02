@@ -46,6 +46,7 @@ const wallet: WalletMessages = {
   'wallet.phrase.error.import': 'Error while importing phrase',
   'wallet.imports.error.phrase.empty': 'Import an existing wallet with funds on it',
   'wallet.txs.history': 'Transaction history',
+  'wallet.txs.history.disabled': 'Transaction history for {chain} has been disabled temporarily',
   'wallet.create.copy.phrase': 'Copy phrase',
   'wallet.create.error.phrase.empty': 'Create a new wallet, add funds to it',
   'wallet.add.another': 'Add another wallet',

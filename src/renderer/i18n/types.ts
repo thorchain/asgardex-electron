@@ -197,6 +197,7 @@ type WalletMessageKey =
   | 'wallet.phrase.error.import'
   | 'wallet.imports.error.phrase.empty'
   | 'wallet.txs.history'
+  | 'wallet.txs.history.disabled'
   | 'wallet.add.another'
   | 'wallet.add.label'
   | 'wallet.change.title'

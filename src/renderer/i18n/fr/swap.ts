@@ -21,7 +21,8 @@ const swap: SwapMessages = {
   'swap.note.nowallet': 'Créez ou importez un portefeuille pour échanger',
   'swap.errors.asset.missingSourceAsset': 'Actif source manquant',
   'swap.errors.asset.missingTargetAsset': 'Actif cible manquant',
-  'swap.min.amount.info': 'Valeur minimale à échanger pour couvrir tous les frais des transactions entrantes et sortantes.',
+  'swap.min.amount.info':
+    'Valeur minimale à échanger pour couvrir tous les frais des transactions entrantes et sortantes.',
   'swap.min.result.info':
     "Votre échange est protégé par cette valeur minimale basée sur la tolérance de slippage de {tolerance} % sélectionnée. Dans le cas où le prix change défavorablement de plus de {tolerance} %, votre transaction d'échange sera annulée avant la confirmation."
 }

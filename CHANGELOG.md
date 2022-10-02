@@ -1,22 +1,31 @@
-# 1.18.2 (2022-xx-xx)
+# 1.18.2 (2022-10-xx)
 
 ## Add
 
-[Header] Add wallet selector [#1576](https://github.com/thorchain/asgardex-electron/issues/1576)
+- [Header] Add wallet selector [#1576](https://github.com/thorchain/asgardex-electron/issues/1576)
+- Store Midgard url persistently #2393(https://github.com/thorchain/asgardex-electron/pull/2393)
+
+## Update
+
+- Translation of missing RU strings. Typo fixes. by TreefeedXavier [#2401](https://github.com/thorchain/asgardex-electron/pull/2401)
+- Update fr translation by @Weyland2093 [#2403](https://github.com/thorchain/asgardex-electron/pull/2403)
 
 ## Fix
 
-Add validation of wallet names to avoid duplications [#2386](https://github.com/thorchain/asgardex-electron/issues/2386)
+- Add validation of wallet names to avoid duplications [#2386](https://github.com/thorchain/asgardex-electron/issues/2386)
+- Swap DOGE -> RUNE failed due maximum fee rate error [#2398](https://github.com/thorchain/asgardex-electron/issues/2398)
+- [Cosmos] Wallet is not available - https://cosmos-lcd.quickapi.com is down [#2404](https://github.com/thorchain/asgardex-electron/issues/2404)
 
 ## Internal
 
 - Upgrade to Yarn 3.x [#2389](https://github.com/thorchain/asgardex-electron/issues/2389)
+- Update xchain-\* libs [#2402](https://github.com/thorchain/asgardex-electron/pull/2402)
 
 # 1.18.1 (2022-09-18)
 
 ## Fix
 
-[BCH] Reintroduction of error `Expected property "1" of type BigInteger, got n` [#2394](https://github.com/thorchain/asgardex-electron/issues/2394)
+- [BCH] Reintroduction of error `Expected property "1" of type BigInteger, got n` [#2394](https://github.com/thorchain/asgardex-electron/issues/2394)
 
 # 1.18.0 (2022-08-29)
 

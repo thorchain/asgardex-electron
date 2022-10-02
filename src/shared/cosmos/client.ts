@@ -6,7 +6,7 @@ import { envOrDefault } from '../utils/env'
 // expose env (needed to access ENVs by `envOrDefault`) in `main` thread)
 require('dotenv').config()
 
-const MAINNET_LCD = envOrDefault(process.env.REACT_APP_COSMOS_MAINNET_LCD, 'https://cosmos-lcd.quickapi.com')
+const MAINNET_LCD = envOrDefault(process.env.REACT_APP_COSMOS_MAINNET_LCD, 'https://lcd-cosmoshub.keplr.app')
 
 export const getClientUrls = (): ClientUrls => ({
   [Network.Stagenet]: MAINNET_LCD,
@@ -17,7 +17,9 @@ export const getClientUrls = (): ClientUrls => ({
 /**
  * Default Cosmos' chain ids
  *
- * Note: All 'unknown' will be fetched from Cosmos `node_info`` endpoint
+ * Note:
+ * All 'unknown' will be fetched from Tendermint RPC
+ * see `getChainId` in `src/shared/api/cosmos.ts`
  * just before initializing a `xchain-cosmos` client
  */
 export const INITIAL_CHAIN_IDS: ChainIds = {
