@@ -11,12 +11,12 @@ import * as RxOp from 'rxjs/operators'
 
 import { Network } from '../../shared/api/types'
 import { useThorchainContext } from '../contexts/ThorchainContext'
-import { INITIAL_CLIENT_URL } from '../services/thorchain/const'
+import { DEFAULT_CLIENT_URL } from '../services/thorchain/const'
 import { Configuration, HealthApi } from '../types/generated/thornode'
 import { useNetwork } from './useNetwork'
 
 export const useThorchainClientUrl = () => {
-  const { clientUrl$, setClientUrl } = useThorchainContext()
+  const { clientUrl$, setThornodeRpcUrl, setThornodeApiUrl } = useThorchainContext()
   const { network } = useNetwork()
   const intl = useIntl()
 
@@ -27,19 +27,20 @@ export const useThorchainClientUrl = () => {
         RxOp.map(([clientUrl, network]) => clientUrl[network]),
         RxOp.shareReplay(1)
       ),
-    INITIAL_CLIENT_URL[network]
+    DEFAULT_CLIENT_URL[network]
   )
 
   // To update `useObservableState` properly
   // to push latest `network` into `nodeUrl`
   useEffect(() => networkUpdated(network), [network, networkUpdated])
 
-  const setRpc = (url: string) => setClientUrl({ url, network, type: 'rpc' })
-  const setNode = (url: string) => setClientUrl({ url, network, type: 'node' })
+  const setRpc = (url: string) => setThornodeRpcUrl(url, network)
+  const setNode = (url: string) => setThornodeApiUrl(url, network)
 
   const checkNode$ = (url: string) =>
     FP.pipe(
-      // Check `ping` endpoint
+      // Check `ping` endpoint of THORNode REST API
+      // https://thornode.ninerealms.com/thorchain/doc/
       new HealthApi(new Configuration({ basePath: url })).ping(),
       RxOp.map((result) => {
         const { ping } = result
@@ -56,7 +57,7 @@ export const useThorchainClientUrl = () => {
 
   const checkRpc$ = (url: string) =>
     FP.pipe(
-      // Check `health` endpoint
+      // Check `health` endpoint of THORNode RPC API
       // https://docs.tendermint.com/v0.34/rpc/#/Info/health
       RxAjax.ajax(`${url}/health`),
       RxOp.map(({ response }) => {
@@ -70,7 +71,7 @@ export const useThorchainClientUrl = () => {
       }),
 
       RxOp.catchError((_: Error) =>
-        Rx.of(RD.failure(Error(`${intl.formatMessage({ id: 'thornode.url.error.invalid' })}`)))
+        Rx.of(RD.failure(Error(`${intl.formatMessage({ id: 'setting.thornode.rpc.error.url' })}`)))
       )
     )
 

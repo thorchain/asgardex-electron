@@ -45,7 +45,7 @@ const getMidgardUrl$ = FP.pipe(
   RxOp.map(([storage]) =>
     FP.pipe(
       storage,
-      O.map(({ midgardUrls }) => midgardUrls),
+      O.map(({ midgard: midgardUrls }) => midgardUrls),
       O.getOrElse(() => DEFAULT_MIDGARD_URLS)
     )
   ),
@@ -58,7 +58,7 @@ const getMidgardUrl$ = FP.pipe(
 const getMidgardUrl = (): ApiUrls =>
   FP.pipe(
     getStorageState(),
-    O.map(({ midgardUrls }) => midgardUrls),
+    O.map(({ midgard: midgardUrls }) => midgardUrls),
     O.getOrElse(() => DEFAULT_MIDGARD_URLS)
   )
 
@@ -67,7 +67,7 @@ const getMidgardUrl = (): ApiUrls =>
  */
 const setMidgardUrl = (url: string, network: Network) => {
   const midgardUrls = { ...getMidgardUrl(), [network]: url }
-  modifyStorage(O.some({ midgardUrls }))
+  modifyStorage(O.some({ midgard: midgardUrls }))
 }
 
 /**

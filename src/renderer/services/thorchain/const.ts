@@ -1,8 +1,8 @@
 import * as RD from '@devexperts/remote-data-ts'
 import { Network } from '@xchainjs/xchain-client'
-import { ChainIds, ClientUrl, getDefaultClientUrl } from '@xchainjs/xchain-thorchain'
+import { ChainIds, ClientUrl } from '@xchainjs/xchain-thorchain'
 
-import { envOrDefault } from '../../../shared/utils/env'
+import { DEFAULT_THORNODE_API_URLS, DEFAULT_THORNODE_RPC_URLS } from '../../../shared/thorchain/const'
 import { InteractState, MimirHalt } from './types'
 
 export const INITIAL_INTERACT_STATE: InteractState = {
@@ -47,24 +47,17 @@ export const INITIAL_CHAIN_IDS: ChainIds = {
   [Network.Testnet]: 'unkown-testnet-chain-id'
 }
 
-const getInitClientUrl = (): ClientUrl => {
-  const { node: nodeTestnet, rpc: rpcTestnet } = getDefaultClientUrl()[Network.Testnet]
-  const { node: nodeStagenet, rpc: rpcStagenet } = getDefaultClientUrl()[Network.Stagenet]
-  const { node: nodeMainnet, rpc: rpcMainnet } = getDefaultClientUrl()[Network.Mainnet]
-  return {
-    [Network.Testnet]: {
-      node: envOrDefault(process.env.REACT_APP_TESTNET_THORNODE_API, nodeTestnet),
-      rpc: envOrDefault(process.env.REACT_APP_TESTNET_THORNODE_RPC, rpcTestnet)
-    },
-    [Network.Stagenet]: {
-      node: envOrDefault(process.env.REACT_APP_STAGENET_THORNODE_API, nodeStagenet),
-      rpc: envOrDefault(process.env.REACT_APP_STAGENET_THORNODE_RPC, rpcStagenet)
-    },
-    [Network.Mainnet]: {
-      node: envOrDefault(process.env.REACT_APP_MAINNET_THORNODE_API, nodeMainnet),
-      rpc: envOrDefault(process.env.REACT_APP_MAINNET_THORNODE_RPC, rpcMainnet)
-    }
+export const DEFAULT_CLIENT_URL: ClientUrl = {
+  [Network.Testnet]: {
+    node: DEFAULT_THORNODE_API_URLS.testnet,
+    rpc: DEFAULT_THORNODE_RPC_URLS.testnet
+  },
+  [Network.Stagenet]: {
+    node: DEFAULT_THORNODE_API_URLS.stagenet,
+    rpc: DEFAULT_THORNODE_RPC_URLS.stagenet
+  },
+  [Network.Mainnet]: {
+    node: DEFAULT_THORNODE_API_URLS.mainnet,
+    rpc: DEFAULT_THORNODE_RPC_URLS.mainnet
   }
 }
-
-export const INITIAL_CLIENT_URL: ClientUrl = getInitClientUrl()
