@@ -1,9 +1,9 @@
-# 1.18.2 (2022-10-xx)
+# 1.18.2 (2022-10-03)
 
 ## Add
 
-- [Header] Add wallet selector [#1576](https://github.com/thorchain/asgardex-electron/issues/1576)
-- [Settings] Persistent data of editable endpoints (Midgard, THORNode API|RPC) [#2387](https://github.com/thorchain/asgardex-electron/issues/2387), [#2393](https://github.com/thorchain/asgardex-electron/pull/2393), [#2408](https://github.com/thorchain/asgardex-electron/pull/2408)
+- [Header] Add wallet selector [#2392](https://github.com/thorchain/asgardex-electron/pull/2392)
+- [Settings] Persistent data of editable endpoints (Midgard, THORNode API|RPC) [#2387](https://github.com/thorchain/asgardex-electron/issues/2387), [#2393](https://github.com/thorchain/asgardex-electron/pull/2393), [#2409](https://github.com/thorchain/asgardex-electron/pull/2409)
 
 ## Update
 
