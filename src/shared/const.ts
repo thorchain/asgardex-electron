@@ -3,6 +3,7 @@ import { StoreFilesContent, UserNodesStorage } from './api/types'
 import { DEFAULT_ETH_HD_MODE } from './ethereum/const'
 import { DEFAULT_LOCALE } from './i18n/const'
 import { DEFAULT_MIDGARD_URLS } from './midgard/const'
+import { DEFAULT_THORNODE_API_URLS, DEFAULT_THORNODE_RPC_URLS } from './thorchain/const'
 
 export enum ExternalUrl {
   DOCS = 'https://docs.thorchain.org',
@@ -45,7 +46,9 @@ export const DEFAULT_STORAGES: StoreFilesContent = {
     version: COMMON_STORAGE_VERSION,
     ethDerivationMode: DEFAULT_ETH_HD_MODE,
     locale: DEFAULT_LOCALE,
-    midgardUrls: DEFAULT_MIDGARD_URLS
+    midgard: DEFAULT_MIDGARD_URLS,
+    thornodeApi: DEFAULT_THORNODE_API_URLS,
+    thornodeRpc: DEFAULT_THORNODE_RPC_URLS
   },
   userNodes: USER_NODES_STORAGE_DEFAULT,
   pools: POOLS_STORAGE_DEFAULT

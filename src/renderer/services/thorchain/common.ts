@@ -1,29 +1,72 @@
 import * as RD from '@devexperts/remote-data-ts'
-import { Client, ClientUrl, getChainId } from '@xchainjs/xchain-thorchain'
+import { Network as ClientNetwork } from '@xchainjs/xchain-client'
+import { Client, getChainId } from '@xchainjs/xchain-thorchain'
 import { THORChain } from '@xchainjs/xchain-util'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
 import * as Rx from 'rxjs'
 import * as RxOp from 'rxjs/operators'
 
-import { Network } from '../../../shared/api/types'
-import { toClientNetwork } from '../../../shared/utils/client'
+import { ApiUrls, Network } from '../../../shared/api/types'
+import { DEFAULT_THORNODE_API_URLS, DEFAULT_THORNODE_RPC_URLS } from '../../../shared/thorchain/const'
 import { isError } from '../../../shared/utils/guard'
-import { observableState } from '../../helpers/stateHelper'
+import { triggerStream } from '../../helpers/stateHelper'
 import { clientNetwork$ } from '../app/service'
 import * as C from '../clients'
+import { getStorageState, getStorageState$, modifyStorage } from '../storage/common'
 import { keystoreService } from '../wallet/keystore'
 import { getPhrase } from '../wallet/util'
-import { INITIAL_CHAIN_IDS, INITIAL_CLIENT_URL } from './const'
-import { Client$, ClientState, ClientState$, NodeUrlType } from './types'
+import { INITIAL_CHAIN_IDS, DEFAULT_CLIENT_URL } from './const'
+import { Client$, ClientState, ClientState$, ClientUrl$ } from './types'
 
-const { get$: clientUrl$, get: getClientUrl, set: _setClientUrl } = observableState<ClientUrl>(INITIAL_CLIENT_URL)
+// `TriggerStream` to reload ClientUrl
+const { stream$: reloadClientUrl$, trigger: reloadClientUrl } = triggerStream()
 
-const setClientUrl = ({ url, network, type }: { url: string; network: Network; type: NodeUrlType }) => {
-  // TODO(@veado) Store data persistent on disc
-  const current = getClientUrl()
-  const cNetwork = toClientNetwork(network)
-  _setClientUrl({ ...current, [cNetwork]: { ...current[cNetwork], [type]: url } })
+/**
+ * Stream of ClientUrl (from storage)
+ */
+const clientUrl$: ClientUrl$ = FP.pipe(
+  Rx.combineLatest([getStorageState$, reloadClientUrl$]),
+  RxOp.map(([storage]) =>
+    FP.pipe(
+      storage,
+      O.map(({ thornodeApi, thornodeRpc }) => ({
+        [ClientNetwork.Testnet]: {
+          node: thornodeApi.testnet,
+          rpc: thornodeRpc.testnet
+        },
+        [ClientNetwork.Stagenet]: {
+          node: thornodeApi.stagenet,
+          rpc: thornodeRpc.stagenet
+        },
+        [ClientNetwork.Mainnet]: {
+          node: thornodeApi.mainnet,
+          rpc: thornodeRpc.mainnet
+        }
+      })),
+      O.getOrElse(() => DEFAULT_CLIENT_URL)
+    )
+  )
+)
+
+const setThornodeRpcUrl = (url: string, network: Network) => {
+  const current = FP.pipe(
+    getStorageState(),
+    O.map(({ thornodeRpc }) => thornodeRpc),
+    O.getOrElse(() => DEFAULT_THORNODE_RPC_URLS)
+  )
+  const updated: ApiUrls = { ...current, [network]: url }
+  modifyStorage(O.some({ thornodeRpc: updated }))
+}
+
+const setThornodeApiUrl = (url: string, network: Network) => {
+  const current = FP.pipe(
+    getStorageState(),
+    O.map(({ thornodeApi }) => thornodeApi),
+    O.getOrElse(() => DEFAULT_THORNODE_API_URLS)
+  )
+  const updated: ApiUrls = { ...current, [network]: url }
+  modifyStorage(O.some({ thornodeRpc: updated }))
 }
 
 /**
@@ -89,4 +132,14 @@ const addressUI$: C.WalletAddress$ = C.addressUI$(client$, THORChain)
  */
 const explorerUrl$: C.ExplorerUrl$ = C.explorerUrl$(client$)
 
-export { client$, clientState$, clientUrl$, setClientUrl, address$, addressUI$, explorerUrl$ }
+export {
+  client$,
+  clientState$,
+  clientUrl$,
+  reloadClientUrl,
+  setThornodeRpcUrl,
+  setThornodeApiUrl,
+  address$,
+  addressUI$,
+  explorerUrl$
+}

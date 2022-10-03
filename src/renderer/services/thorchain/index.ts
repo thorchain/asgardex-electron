@@ -2,7 +2,17 @@ import { THORChain } from '@xchainjs/xchain-util'
 
 import { network$ } from '../app/service'
 import { reloadBalances, balances$, getBalanceByAddress$, reloadBalances$, resetReloadBalances } from './balances'
-import { client$, clientState$, address$, addressUI$, explorerUrl$, clientUrl$, setClientUrl } from './common'
+import {
+  client$,
+  clientState$,
+  address$,
+  addressUI$,
+  explorerUrl$,
+  clientUrl$,
+  reloadClientUrl,
+  setThornodeRpcUrl,
+  setThornodeApiUrl
+} from './common'
 import { createFeesService } from './fees'
 import { createInteractService$ } from './interact'
 import {
@@ -27,7 +37,9 @@ export {
   client$,
   clientState$,
   clientUrl$,
-  setClientUrl,
+  reloadClientUrl,
+  setThornodeRpcUrl,
+  setThornodeApiUrl,
   address$,
   addressUI$,
   explorerUrl$,
