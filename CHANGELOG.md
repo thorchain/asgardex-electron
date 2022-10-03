@@ -3,7 +3,7 @@
 ## Add
 
 - [Header] Add wallet selector [#1576](https://github.com/thorchain/asgardex-electron/issues/1576)
-- Store Midgard url persistently #2393(https://github.com/thorchain/asgardex-electron/pull/2393)
+- [Settings] Persistent data of editable endpoints (Midgard, THORNode API|RPC) [#2387](https://github.com/thorchain/asgardex-electron/issues/2387), [#2393](https://github.com/thorchain/asgardex-electron/pull/2393), [#2408](https://github.com/thorchain/asgardex-electron/pull/2408)
 
 ## Update
 

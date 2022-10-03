@@ -18,7 +18,13 @@ export type StorageVersion = { version: string }
 export type ApiUrls = Record<Network, string>
 export type UserNodesStorage = Readonly<Record<Network, Address[]> & StorageVersion>
 export type CommonStorage = Readonly<
-  { locale: Locale; ethDerivationMode: EthHDMode; midgardUrls: ApiUrls } & StorageVersion
+  {
+    locale: Locale
+    ethDerivationMode: EthHDMode
+    midgard: ApiUrls
+    thornodeRpc: ApiUrls
+    thornodeApi: ApiUrls
+  } & StorageVersion
 >
 
 /**

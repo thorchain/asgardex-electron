@@ -20,7 +20,6 @@ export type Client$ = C.Client$<Client>
 export type ClientState = C.ClientState<Client>
 export type ClientState$ = C.ClientState$<Client>
 
-export type NodeUrlType = keyof NodeUrl
 export type ClientUrl$ = Rx.Observable<ClientUrl>
 export type ClientUrlLD = LiveData<Error, ClientUrl>
 export type ClientUrlRD = RD.RemoteData<Error, ClientUrl>
