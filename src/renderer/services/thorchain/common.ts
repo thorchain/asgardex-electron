@@ -66,7 +66,7 @@ const setThornodeApiUrl = (url: string, network: Network) => {
     O.getOrElse(() => DEFAULT_THORNODE_API_URLS)
   )
   const updated: ApiUrls = { ...current, [network]: url }
-  modifyStorage(O.some({ thornodeRpc: updated }))
+  modifyStorage(O.some({ thornodeApi: updated }))
 }
 
 /**
