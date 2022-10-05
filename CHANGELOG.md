@@ -1,3 +1,10 @@
+# 1.18.3 (2022-10-xx)
+
+## Internal
+
+- Update types/api for latest thornode@1.97.2 [#2412](https://github.com/thorchain/asgardex-electron/pull/2412)
+- Update types/api for latest midgard@2.9.4 [#2413](https://github.com/thorchain/asgardex-electron/pull/2413)
+
 # 1.18.2 (2022-10-03)
 
 ## Add
