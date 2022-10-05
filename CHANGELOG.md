@@ -5,7 +5,7 @@
 - Update types/api for latest thornode@1.97.2 [#2412](https://github.com/thorchain/asgardex-electron/pull/2412)
 - Update types/api for latest midgard@2.9.4 [#2413](https://github.com/thorchain/asgardex-electron/pull/2413)
 - Update ERC20 whitelist based on latest thornode@1.97.2 [#2414](https://github.com/thorchain/asgardex-electron/pull/2414)
-- Get outbound fees from inbound_addresses [#2406](https://github.com/thorchain/asgardex-electron/issues/2406)
+- Get outbound fees from `inbound_addresses` [#2406](https://github.com/thorchain/asgardex-electron/issues/2406)
 
 # 1.18.2 (2022-10-03)
 

@@ -218,7 +218,6 @@ export type PoolsService = {
   poolsFilters$: Rx.Observable<Record<string, O.Option<PoolFilter>>>
   setPoolsFilter: (poolKey: PoolType, filter: O.Option<PoolFilter>) => void
   outboundAssetFeeByChain$: (chain: Chain) => PoolFeeLD
-  inboundAssetFeeByChain$: (chain: Chain) => PoolFeeLD
   reloadGasRates: FP.Lazy<void>
   haltedChains$: HaltedChainsLD
   inboundAddressesShared$: InboundAddressesLD

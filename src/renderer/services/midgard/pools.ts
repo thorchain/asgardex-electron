@@ -579,20 +579,6 @@ const createPoolsService = (
     )
 
   /**
-   * (Cached) inbound fees by given chain
-   *
-   * Note: Fees are for asset side only (not RUNE)
-   *
-   * Inbound fees are thirds of outbound fees
-   */
-  const inboundAssetFeeByChain$ = (chain: Chain): PoolFeeLD =>
-    FP.pipe(
-      chain,
-      outboundAssetFeeByChain$,
-      liveData.map(({ asset, amount }) => ({ asset, amount: amount.div(3) }))
-    )
-
-  /**
    * Use this to convert asset's price to selected price asset by multiplying to the priceRation inner value
    */
   const priceRatio$: Rx.Observable<BigNumber> = FP.pipe(
@@ -918,7 +904,6 @@ const createPoolsService = (
     poolsFilters$,
     setPoolsFilter,
     outboundAssetFeeByChain$,
-    inboundAssetFeeByChain$,
     reloadGasRates,
     haltedChains$
   }
