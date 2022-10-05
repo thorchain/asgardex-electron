@@ -1,4 +1,5 @@
 export * from './BanResponse';
+export * from './Bucket';
 export * from './ChainHeight';
 export * from './Coin';
 export * from './ConstantsResponse';

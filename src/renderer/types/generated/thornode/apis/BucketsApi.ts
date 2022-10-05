@@ -14,51 +14,51 @@
 import { Observable } from 'rxjs';
 import { BaseAPI, HttpQuery, throwIfNullOrUndefined, encodeURI } from '../runtime';
 import {
-    Node,
+    Bucket,
 } from '../models';
 
-export interface NodeRequest {
-    address: string;
+export interface BucketRequest {
+    asset: string;
     height?: number;
 }
 
-export interface NodesRequest {
+export interface BucketsRequest {
     height?: number;
 }
 
 /**
  * no description
  */
-export class NodesApi extends BaseAPI {
+export class BucketsApi extends BaseAPI {
 
     /**
-     * Returns node information for the provided node address.
+     * Returns the bucket information for the provided asset.
      */
-    node = ({ address, height }: NodeRequest): Observable<Node> => {
-        throwIfNullOrUndefined(address, 'node');
+    bucket = ({ asset, height }: BucketRequest): Observable<Bucket> => {
+        throwIfNullOrUndefined(asset, 'bucket');
 
         const query: HttpQuery = {};
 
         if (height != null) { query['height'] = height; }
 
-        return this.request<Node>({
-            path: '/thorchain/node/{address}'.replace('{address}', encodeURI(address)),
+        return this.request<Bucket>({
+            path: '/thorchain/bucket/{asset}'.replace('{asset}', encodeURI(asset)),
             method: 'GET',
             query,
         });
     };
 
     /**
-     * Returns node information for all registered validators.
+     * Returns the bucket information for all assets.
      */
-    nodes = ({ height }: NodesRequest): Observable<Array<Node>> => {
+    buckets = ({ height }: BucketsRequest): Observable<Array<Bucket>> => {
 
         const query: HttpQuery = {};
 
         if (height != null) { query['height'] = height; }
 
-        return this.request<Array<Node>>({
-            path: '/thorchain/nodes',
+        return this.request<Array<Bucket>>({
+            path: '/thorchain/buckets',
             method: 'GET',
             query,
         });

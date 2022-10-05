@@ -13,22 +13,28 @@
 
 /**
  * @export
- * @interface BanResponse
+ * @interface Bucket
  */
-export interface BanResponse {
+export interface Bucket {
     /**
      * @type {string}
-     * @memberof BanResponse
+     * @memberof Bucket
      */
-    node_address?: string;
+    balance_asset: string;
     /**
-     * @type {number}
-     * @memberof BanResponse
+     * @type {string}
+     * @memberof Bucket
      */
-    block_height?: number;
+    asset: string;
     /**
-     * @type {Array<string>}
-     * @memberof BanResponse
+     * the total pool liquidity provider units
+     * @type {string}
+     * @memberof Bucket
      */
-    signers?: Array<string>;
+    LP_units: string;
+    /**
+     * @type {string}
+     * @memberof Bucket
+     */
+    status: string;
 }
