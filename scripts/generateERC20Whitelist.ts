@@ -17,7 +17,7 @@ import { writeFile, readFile } from '../src/main/utils/file'
 import { ERC20Whitelist, erc20WhitelistIO } from '../src/renderer/services/thorchain/types'
 
 const WHITELIST_URL =
-  'https://gitlab.com/thorchain/thornode/-/raw/develop/common/tokenlist/ethtokens/eth_mainnet_V97.json'
+  'https://gitlab.com/thorchain/thornode/-/raw/release-1.97.2/common/tokenlist/ethtokens/eth_mainnet_V97.json'
 
 const PATH = './src/renderer/types/generated/thorchain/erc20whitelist.ts'
 
@@ -112,7 +112,10 @@ const onSuccess = (): T.Task<void> =>
   )
 
 const main = FP.pipe(
-  loadList(),
+  C.info(ansis.italic.gray(`Generate whitelist...`)),
+  TE.fromIO,
+  TE.mapLeft(E.toError),
+  TE.chain(loadList),
   TE.map(transformList),
   TE.chain(writeList),
   TE.chain(formatList),
