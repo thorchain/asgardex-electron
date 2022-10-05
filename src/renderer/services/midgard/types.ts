@@ -31,7 +31,7 @@ import {
   GetLiquidityHistoryRequest
 } from '../../types/generated/midgard'
 import { PricePools, PricePoolAsset, PricePool } from '../../views/pools/Pools.types'
-import { Memo } from '../chain/types'
+import { Memo, PoolFeeLD } from '../chain/types'
 import { ApiError } from '../wallet/types'
 
 export type PoolAsset = string
@@ -107,15 +107,18 @@ export type NativeFeeRD = RD.RemoteData<Error, NativeFee>
 export type NativeFeeLD = LiveData<Error, NativeFee>
 
 // To mMake sure we accept inbound addresses with valid chains only: chain:string -> chain:Chain
-export type InboundAddress = Omit<InboundAddressesItem, 'chain'> & { chain: Chain }
+export type InboundAddress = Omit<InboundAddressesItem, 'chain'> & {
+  chain: Chain
+  // TODO (@veado) Remove it as soon as we call `inbound_addresses` from THORNode
+  // see https://github.com/thorchain/asgardex-electron/issues/2130
+  outbound_fee?: string /* not part of Midgard's Swagger yet, but needed for fee calculation */
+}
 export type InboundAddresses = InboundAddress[]
 export type InboundAddressesLD = LiveData<Error, InboundAddresses>
 
 export type HaltedChainsRD = RD.RemoteData<Error, Chain[]>
 export type HaltedChainsLD = LiveData<Error, Chain[]>
 
-export type GasRate = BigNumber
-export type GasRateLD = LiveData<Error, GasRate>
 /**
  * Type for addresses of a pool
  * A pool has a vault address
@@ -214,7 +217,8 @@ export type PoolsService = {
   validatePool$: (poolAddresses: PoolAddress, chain: Chain) => ValidatePoolLD
   poolsFilters$: Rx.Observable<Record<string, O.Option<PoolFilter>>>
   setPoolsFilter: (poolKey: PoolType, filter: O.Option<PoolFilter>) => void
-  gasRateByChain$: (chain: Chain) => GasRateLD
+  outboundAssetFeeByChain$: (chain: Chain) => PoolFeeLD
+  inboundAssetFeeByChain$: (chain: Chain) => PoolFeeLD
   reloadGasRates: FP.Lazy<void>
   haltedChains$: HaltedChainsLD
   inboundAddressesShared$: InboundAddressesLD

@@ -13,7 +13,7 @@ import { observableState } from '../../../helpers/stateHelper'
 import { service as midgardService } from '../../midgard/service'
 import * as THOR from '../../thorchain'
 import { SymDepositFees, SymDepositFeesHandler } from '../types'
-import { poolFee$ } from './common'
+import { poolOutboundFee$, poolInboundFee$ } from './common'
 
 const {
   pools: { reloadGasRates }
@@ -66,16 +66,18 @@ const symDepositFees$: SymDepositFeesHandler = (initialAsset) => {
 
       return FP.pipe(
         liveData.sequenceS({
-          runeInFee: poolFee$(AssetRuneNative),
-          assetInFee: poolFee$(asset)
+          runeInFee: poolInboundFee$(AssetRuneNative),
+          assetInFee: poolInboundFee$(asset),
+          runeOutFee: poolOutboundFee$(AssetRuneNative),
+          assetOutFee: poolOutboundFee$(asset)
         }),
-        liveData.map(({ runeInFee, assetInFee }) => ({
-          rune: { inFee: runeInFee.amount, outFee: runeInFee.amount.times(3), refundFee: runeInFee.amount.times(3) },
+        liveData.map(({ runeInFee, assetInFee, runeOutFee, assetOutFee }) => ({
+          rune: { inFee: runeInFee.amount, outFee: runeOutFee.amount, refundFee: runeOutFee.amount },
           asset: {
             asset: assetInFee.asset,
             inFee: assetInFee.amount,
-            outFee: assetInFee.amount.times(3),
-            refundFee: assetInFee.amount.times(3)
+            outFee: assetOutFee.amount,
+            refundFee: assetOutFee.amount
           }
         }))
       )

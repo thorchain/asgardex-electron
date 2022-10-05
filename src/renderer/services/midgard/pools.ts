@@ -28,6 +28,7 @@ import {
 } from '../../types/generated/midgard/apis'
 import { PricePool, PricePoolAsset, PricePools } from '../../views/pools/Pools.types'
 import { network$ } from '../app/service'
+import { PoolFeeLD } from '../chain/types'
 import { ErrorId } from '../wallet/types'
 import {
   PoolAssetDetailsLD,
@@ -58,7 +59,6 @@ import {
   InboundAddressesLD,
   PoolAddresses,
   InboundAddresses,
-  GasRateLD,
   PoolsState,
   HaltedChainsLD,
   SelectedPoolAsset,
@@ -72,7 +72,7 @@ import {
   pricePoolSelector,
   pricePoolSelectorFromRD,
   inboundToPoolAddresses,
-  getGasRateByChain,
+  getOutboundAssetFeeByChain,
   toPoolsData
 } from './utils'
 
@@ -561,19 +561,35 @@ const createPoolsService = (
   const reloadGasRates = () => {
     reloadInboundAddresses()
   }
+
   /**
-   * Get's (cached) gas rates by given chain
+   * (Cached) outbound fees by given chain
+   * Note: Fees are for asset side only (not RUNE)
    *
-   * It will be updated as soon as `inboundAddressesInterval` is triggered
-   * or by reloading via `reloadInboundAddresses`
+   * Fees will be updated as soon as `inboundAddressesInterval` is triggered
+   * OR by reloading via `reloadInboundAddresses`
    * All defined in `inboundAddressesShared$`
    */
-  const gasRateByChain$ = (chain: Chain): GasRateLD =>
+  const outboundAssetFeeByChain$ = (chain: Chain): PoolFeeLD =>
     FP.pipe(
       inboundAddressesShared$,
-      liveData.map((addresses: InboundAddresses) => getGasRateByChain(addresses, chain)),
+      liveData.map((addresses: InboundAddresses) => getOutboundAssetFeeByChain(addresses, chain)),
       // Add error in case no address could be found
-      liveData.chain(liveData.fromOption(() => Error(`Could not find gas rate for ${chain}`)))
+      liveData.chain(liveData.fromOption(() => Error(`Could not find outbound fee for ${chain}`)))
+    )
+
+  /**
+   * (Cached) inbound fees by given chain
+   *
+   * Note: Fees are for asset side only (not RUNE)
+   *
+   * Inbound fees are thirds of outbound fees
+   */
+  const inboundAssetFeeByChain$ = (chain: Chain): PoolFeeLD =>
+    FP.pipe(
+      chain,
+      outboundAssetFeeByChain$,
+      liveData.map(({ asset, amount }) => ({ asset, amount: amount.div(3) }))
     )
 
   /**
@@ -901,7 +917,8 @@ const createPoolsService = (
     validatePool$,
     poolsFilters$,
     setPoolsFilter,
-    gasRateByChain$,
+    outboundAssetFeeByChain$,
+    inboundAssetFeeByChain$,
     reloadGasRates,
     haltedChains$
   }

@@ -6,28 +6,36 @@ import { liveData } from '../../../helpers/rx/liveData'
 import { service as midgardService } from '../../midgard/service'
 import * as THOR from '../../thorchain'
 import { PoolFeeLD } from '../types'
-import { getChainFeeByGasRate } from './utils'
 
 const {
-  pools: { gasRateByChain$ }
+  pools: { outboundAssetFeeByChain$: outboundFeeByChain$, inboundAssetFeeByChain$: inboundFeeByChain$ }
 } = midgardService
 
 /**
- * Fees for pool txs (swap/deposit/withdraw)
+ * Fees for pool outbound txs (swap/deposit/withdraw)
  */
-export const poolFee$ = (asset: Asset): PoolFeeLD => {
-  // special case for RUNE - not provided by Midgards `inbound_addresses` endpoint
+export const poolOutboundFee$ = (asset: Asset): PoolFeeLD => {
+  // special case for RUNE - not provided in `inbound_addresses` endpoint
+  if (isRuneNativeAsset(asset)) {
+    return FP.pipe(
+      THOR.fees$(),
+      liveData.map((fees) => ({ amount: fees.fast.times(3), asset: AssetRuneNative }))
+    )
+  } else {
+    return outboundFeeByChain$(asset.chain)
+  }
+}
+/**
+ * Fees for pool inbound txs (swap/deposit/withdraw)
+ */
+export const poolInboundFee$ = (asset: Asset): PoolFeeLD => {
+  // special case for RUNE - not provided in `inbound_addresses` endpoint
   if (isRuneNativeAsset(asset)) {
     return FP.pipe(
       THOR.fees$(),
       liveData.map((fees) => ({ amount: fees.fast, asset: AssetRuneNative }))
     )
   } else {
-    return FP.pipe(
-      gasRateByChain$(asset.chain),
-      liveData.map((gasRate) => getChainFeeByGasRate({ asset, gasRate })),
-      // Map to an error if fee could not be found
-      liveData.chain(liveData.fromOption(() => Error(`Could not find fee for ${asset.chain} chain`)))
-    )
+    return inboundFeeByChain$(asset.chain)
   }
 }
