@@ -1,3 +1,4 @@
+export * from './BucketsApi';
 export * from './HealthApi';
 export * from './LiquidityProvidersApi';
 export * from './MimirApi';
