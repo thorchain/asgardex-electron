@@ -222,12 +222,12 @@ export const getOutboundAssetFeeByChain = (
     A.findFirst((address) => eqChain.equals(address.chain, chain)),
     // extract outbound fee
     O.map(({ outbound_fee }) => outbound_fee),
-    // Check: undefined values
+    // Ignore undefined values
     O.chain(O.fromNullable),
     O.map(bn),
-    // Check: Valid BigNumber
+    // Valid BigNumbers only
     O.chain(O.fromPredicate(isValidBN)),
-    // Convert fee values to `BaseAmount` to put into  `AssetWithAmount`
+    // Convert fee values to `BaseAmount` to put into `AssetWithAmount`
     O.chain((value) => {
       switch (chain) {
         case BNBChain:
@@ -296,7 +296,7 @@ export const inboundToPoolAddresses = (
       halted
     })),
     // Add "empty" rune "pool address" - we never had such pool, but do need it to calculate tx
-    A.cons(RUNE_POOL_ADDRESS)
+    A.prepend(RUNE_POOL_ADDRESS)
   )
 
 /**

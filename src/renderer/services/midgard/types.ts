@@ -106,7 +106,7 @@ export type NativeFee = O.Option<BaseAmount>
 export type NativeFeeRD = RD.RemoteData<Error, NativeFee>
 export type NativeFeeLD = LiveData<Error, NativeFee>
 
-// To mMake sure we accept inbound addresses with valid chains only: chain:string -> chain:Chain
+// To make sure we accept inbound addresses with valid chains only: chain:string -> chain:Chain
 export type InboundAddress = Omit<InboundAddressesItem, 'chain'> & {
   chain: Chain
   // TODO (@veado) Remove it as soon as we call `inbound_addresses` from THORNode

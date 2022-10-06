@@ -8,7 +8,7 @@ import * as THOR from '../../thorchain'
 import { PoolFeeLD } from '../types'
 
 const {
-  pools: { outboundAssetFeeByChain$: outboundFeeByChain$ }
+  pools: { outboundAssetFeeByChain$ }
 } = midgardService
 
 /**
@@ -22,15 +22,15 @@ export const poolOutboundFee$ = (asset: Asset): PoolFeeLD => {
       liveData.map((fees) => ({ amount: fees.fast.times(3), asset: AssetRuneNative }))
     )
   } else {
-    return outboundFeeByChain$(asset.chain)
+    return outboundAssetFeeByChain$(asset.chain)
   }
 }
 /**
  * Fees for pool inbound txs (swap/deposit/withdraw)
- * Note: Inbound fees are thirds of outbound fees, which are provided by `inbound_addresses` endpoint
  */
 export const poolInboundFee$ = (asset: Asset): PoolFeeLD =>
   FP.pipe(
     poolOutboundFee$(asset),
+    // inbound fees = outbound fees / 3
     liveData.map(({ asset, amount }) => ({ asset, amount: amount.div(3) }))
   )

@@ -510,7 +510,7 @@ describe('services/midgard/utils/', () => {
       const data: { chain: Chain; outbound_fee?: string }[] = [
         { chain: BNBChain, outbound_fee: '1' },
         { chain: ETHChain, outbound_fee: '2' },
-        { chain: CosmosChain, outbound_fee: '300' }, // "3" 1e6 (COSMOS) is provided as "300" 1e8 in THORChain ->
+        { chain: CosmosChain, outbound_fee: '300' },
         { chain: LTCChain }, // no value
         { chain: BCHChain, outbound_fee: 'invalid' } // invalid value
       ]
@@ -546,6 +546,7 @@ describe('services/midgard/utils/', () => {
             result,
             O.some({
               asset: AssetAtom,
+              // "300" (1e8) in THORChain will be "3" (1e6) at COSMOS
               amount: baseAmount(3, COSMOS_DECIMAL)
             })
           )
