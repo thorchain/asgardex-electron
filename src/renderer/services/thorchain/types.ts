@@ -1,6 +1,6 @@
 import * as RD from '@devexperts/remote-data-ts'
 import { Client, ClientUrl, DepositParam, NodeUrl } from '@xchainjs/xchain-thorchain'
-import { Address, Asset, BaseAmount } from '@xchainjs/xchain-util'
+import { Address, Asset, BaseAmount, Chain } from '@xchainjs/xchain-util'
 import * as O from 'fp-ts/Option'
 import * as t from 'io-ts'
 import { optionFromNullable } from 'io-ts-types/lib/optionFromNullable'
@@ -11,9 +11,16 @@ import { assetIO } from '../../../shared/api/io'
 import { HDMode, WalletType } from '../../../shared/wallet/types'
 import { LiveData } from '../../helpers/rx/liveData'
 import { AssetsWithAmount1e8, AssetWithAmount1e8 } from '../../types/asgardex'
-import { NodeStatusEnum } from '../../types/generated/thornode'
+import { InboundAddressesRequest, NodeStatusEnum } from '../../types/generated/thornode'
 import * as C from '../clients'
 import { TxHashLD, TxHashRD } from '../wallet/types'
+
+export type InboundAddress = Omit<InboundAddressesRequest, 'chain'> & {
+  chain: Chain
+}
+
+export type InboundAddresses = InboundAddress[]
+export type InboundAddressesLD = LiveData<Error, InboundAddresses>
 
 export type Client$ = C.Client$<Client>
 
