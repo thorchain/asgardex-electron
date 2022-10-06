@@ -12,7 +12,7 @@ import { observableState } from '../../../helpers/stateHelper'
 import { service as midgardService } from '../../midgard/service'
 import * as THOR from '../../thorchain'
 import { SwapFeesHandler, SwapFeesParams, SwapFees } from '../types'
-import { poolFee$ } from './common'
+import { poolOutboundFee$, poolInboundFee$ } from './common'
 
 const {
   pools: { reloadGasRates }
@@ -66,15 +66,8 @@ const swapFees$: SwapFeesHandler = (initialParams) => {
       )
 
       return liveData.sequenceS({
-        inFee: poolFee$(inAsset),
-        outFee: FP.pipe(
-          outAsset,
-          poolFee$,
-          liveData.map((chainFee) => ({
-            ...chainFee,
-            amount: chainFee.amount.times(3)
-          }))
-        )
+        inFee: poolInboundFee$(inAsset),
+        outFee: poolOutboundFee$(outAsset)
       })
     })
   )
