@@ -11,7 +11,7 @@ import { observableState } from '../../../helpers/stateHelper'
 import { service as midgardService } from '../../midgard/service'
 import * as THOR from '../../thorchain'
 import { SymWithdrawFees, SymWithdrawFeesHandler } from '../types'
-import { poolFee$ } from './common'
+import { poolOutboundFee$, poolInboundFee$ } from './common'
 
 const {
   pools: { reloadGasRates }
@@ -69,21 +69,13 @@ const symWithdrawFee$: SymWithdrawFeesHandler = (initialAsset) =>
 
       return FP.pipe(
         liveData.sequenceS({
-          runeFee: poolFee$(AssetRuneNative),
-          assetFee: poolFee$(asset)
+          runeInFee: poolInboundFee$(AssetRuneNative),
+          runeOutFee: poolOutboundFee$(AssetRuneNative),
+          assetOutFee: poolOutboundFee$(asset)
         }),
-        liveData.map(({ runeFee, assetFee }) => ({
-          // outbound fee is 3x inbound fee
-          // see "ADD: Better Fees Handling #1381" (search for OutboundFee):
-          // Check issue description
-          // https://github.com/thorchain/asgardex-electron/issues/1381
-          // and following comment
-          // https://github.com/thorchain/asgardex-electron/issues/1381#issuecomment-827513798
-          rune: { inFee: runeFee.amount, outFee: runeFee.amount.times(3) },
-          asset: {
-            asset: assetFee.asset,
-            amount: assetFee.amount.times(3)
-          }
+        liveData.map(({ runeInFee, runeOutFee, assetOutFee }) => ({
+          rune: { inFee: runeInFee.amount, outFee: runeOutFee.amount },
+          asset: assetOutFee
         }))
       )
     })
