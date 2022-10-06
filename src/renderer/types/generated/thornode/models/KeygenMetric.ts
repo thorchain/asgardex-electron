@@ -12,23 +12,22 @@
  */
 
 import {
-    KeygenMetric,
-    KeysignMetrics,
+    NodeKeygenMetric,
 } from './';
 
 /**
  * @export
- * @interface MetricsResponse
+ * @interface KeygenMetric
  */
-export interface MetricsResponse {
+export interface KeygenMetric {
     /**
-     * @type {Array<KeygenMetric>}
-     * @memberof MetricsResponse
+     * @type {string}
+     * @memberof KeygenMetric
      */
-    keygen?: Array<KeygenMetric>;
+    pub_key?: string;
     /**
-     * @type {KeysignMetrics}
-     * @memberof MetricsResponse
+     * @type {Array<NodeKeygenMetric>}
+     * @memberof KeygenMetric
      */
-    keysign?: KeysignMetrics;
+    node_tss_times: Array<NodeKeygenMetric>;
 }
