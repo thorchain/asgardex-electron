@@ -27,6 +27,8 @@ import {
   reloadInboundAddresses,
   reloadThorchainConstants,
   thorchainConstantsState$,
+  thorchainLastblockState$,
+  reloadThorchainLastblock,
   getLiquidityProviders,
   reloadLiquidityProviders
 } from '../services/thorchain'
@@ -58,6 +60,8 @@ export type ThorchainContextValue = {
   reloadInboundAddresses: typeof reloadInboundAddresses
   thorchainConstantsState$: typeof thorchainConstantsState$
   reloadThorchainConstants: typeof reloadThorchainConstants
+  thorchainLastblockState$: typeof thorchainLastblockState$
+  reloadThorchainLastblock: typeof reloadThorchainLastblock
   getLiquidityProviders: typeof getLiquidityProviders
   reloadLiquidityProviders: typeof reloadLiquidityProviders
 }
@@ -89,6 +93,8 @@ const initialContext: ThorchainContextValue = {
   reloadInboundAddresses,
   reloadThorchainConstants,
   thorchainConstantsState$,
+  thorchainLastblockState$,
+  reloadThorchainLastblock,
   getLiquidityProviders,
   reloadLiquidityProviders
 }
