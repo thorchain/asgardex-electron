@@ -11,13 +11,21 @@ import { assetIO } from '../../../shared/api/io'
 import { HDMode, WalletType } from '../../../shared/wallet/types'
 import { LiveData } from '../../helpers/rx/liveData'
 import { AssetsWithAmount1e8, AssetWithAmount1e8 } from '../../types/asgardex'
-import { InboundAddressesRequest, NodeStatusEnum } from '../../types/generated/thornode'
+import * as TN from '../../types/generated/thornode'
 import * as C from '../clients'
 import { TxHashLD, TxHashRD } from '../wallet/types'
 
-export type InboundAddress = Omit<InboundAddressesRequest, 'chain'> & {
-  chain: Chain
-}
+/**
+ * Custom `InboundAddress` to mark some properties as `required
+ */
+export type InboundAddress = Omit<TN.InboundAddress, 'chain' | 'address'> &
+  Required<{
+    chain: Chain
+    // outboundFee: BigNumber
+    address: Address
+  }>
+
+export type InboundAddressRD = RD.RemoteData<Error, InboundAddresses>
 
 export type InboundAddresses = InboundAddress[]
 export type InboundAddressesLD = LiveData<Error, InboundAddresses>
@@ -97,7 +105,7 @@ export type NodeInfo = {
   address: Address
   bond: BaseAmount
   award: BaseAmount
-  status: NodeStatusEnum
+  status: TN.NodeStatusEnum
 }
 
 export type NodeInfoLD = LiveData<Error, NodeInfo>

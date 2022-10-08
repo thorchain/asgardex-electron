@@ -59,12 +59,16 @@ export const createThornodeService$ = (network$: Network$, clientUrl$: ClientUrl
         FP.pipe(
           new NetworkApi(new Configuration({ basePath })).inboundAddresses({}),
           RxOp.map(RD.success),
-          RxOp.map((v) => v),
-          // Accept valid chains only
           liveData.map(
             FP.flow(
-              A.filterMap(({ chain, ...rest }) =>
-                chain !== undefined && isChain(chain) ? O.some({ chain, ...rest }) : O.none
+              A.filterMap(({ chain, address, ...rest }) =>
+                // validate chain
+                chain !== undefined &&
+                isChain(chain) &&
+                // address is required
+                !!address
+                  ? O.some({ chain, address, ...rest })
+                  : O.none
               )
             )
           ),
@@ -200,6 +204,7 @@ export const createThornodeService$ = (network$: Network$, clientUrl$: ClientUrl
     reloadNodeInfos,
     inboundAddressesShared$,
     reloadInboundAddresses,
+    loadInboundAddresses$,
     mimir$,
     reloadMimir,
     getLiquidityProviders,

@@ -16,6 +16,7 @@ import { BackLink } from '../../../components/uielements/backLink'
 import { useAppContext } from '../../../contexts/AppContext'
 import { useChainContext } from '../../../contexts/ChainContext'
 import { useMidgardContext } from '../../../contexts/MidgardContext'
+import { useThorchainContext } from '../../../contexts/ThorchainContext'
 import { useWalletContext } from '../../../contexts/WalletContext'
 import { isNonNativeRuneAsset } from '../../../helpers/assetHelper'
 import { eqOAsset } from '../../../helpers/fp/eq'
@@ -112,9 +113,11 @@ export const UpgradeView: React.FC<Props> = (): JSX.Element => {
 
   const {
     service: {
-      pools: { poolAddressesByChain$, reloadInboundAddresses }
+      pools: { poolAddressesByChain$ }
     }
   } = useMidgardContext()
+
+  const { reloadInboundAddresses } = useThorchainContext()
 
   // reload inbound addresses at `onMount` to get always latest `pool address`
   useEffect(() => {

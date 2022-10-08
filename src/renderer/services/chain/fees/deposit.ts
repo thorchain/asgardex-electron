@@ -10,14 +10,10 @@ import { getChainAsset } from '../../../helpers/chainHelper'
 import { eqOAsset } from '../../../helpers/fp/eq'
 import { liveData } from '../../../helpers/rx/liveData'
 import { observableState } from '../../../helpers/stateHelper'
-import { service as midgardService } from '../../midgard/service'
 import * as THOR from '../../thorchain'
+import { reloadInboundAddresses } from '../../thorchain'
 import { SymDepositFees, SymDepositFeesHandler } from '../types'
 import { poolOutboundFee$, poolInboundFee$ } from './common'
-
-const {
-  pools: { reloadGasRates }
-} = midgardService
 
 /**
  * Returns zero sym deposit fees
@@ -48,8 +44,8 @@ const reloadSymDepositFees = (asset: Asset) => {
   }
   // (2) Reload fees for RUNE
   THOR.reloadFees()
-  // (3) Reload fees for asset
-  reloadGasRates()
+  // (3) Reload fees for asset, which are provided via `inbound_addresses` endpoint
+  reloadInboundAddresses()
 }
 
 const symDepositFees$: SymDepositFeesHandler = (initialAsset) => {
