@@ -27,7 +27,6 @@ import {
   DepthHistory,
   DepthHistoryItem,
   SwapHistoryItem,
-  InboundAddressesItem,
   GetLiquidityHistoryRequest
 } from '../../types/generated/midgard'
 import { PricePools, PricePoolAsset, PricePool } from '../../views/pools/Pools.types'
@@ -73,8 +72,6 @@ export type PoolsState = {
   pricePools: O.Option<PricePools>
 }
 
-export type InboundAddressRD = RD.RemoteData<Error, InboundAddresses>
-
 export type PoolsStateRD = RD.RemoteData<Error, PoolsState>
 export type PoolsStateLD = LiveData<Error, PoolsState>
 
@@ -95,6 +92,9 @@ export type SelectedPricePool = PricePool
 
 export type PriceRD = RD.RemoteData<Error, AssetWithAmount>
 
+export type MidgardStatusRD = RD.RemoteData<Error, boolean>
+export type MidgardStatusLD = LiveData<Error, boolean>
+
 export type LastblockItems = LastblockItem[]
 export type ThorchainLastblockRD = RD.RemoteData<Error, LastblockItems>
 export type ThorchainLastblockLD = LiveData<Error, LastblockItems>
@@ -105,16 +105,6 @@ export type ThorchainConstantsLD = LiveData<Error, ThorchainConstants>
 export type NativeFee = O.Option<BaseAmount>
 export type NativeFeeRD = RD.RemoteData<Error, NativeFee>
 export type NativeFeeLD = LiveData<Error, NativeFee>
-
-// To make sure we accept inbound addresses with valid chains only: chain:string -> chain:Chain
-export type InboundAddress = Omit<InboundAddressesItem, 'chain'> & {
-  chain: Chain
-  // TODO (@veado) Remove it as soon as we call `inbound_addresses` from THORNode
-  // see https://github.com/thorchain/asgardex-electron/issues/2130
-  outbound_fee?: string /* not part of Midgard's Swagger yet, but needed for fee calculation */
-}
-export type InboundAddresses = InboundAddress[]
-export type InboundAddressesLD = LiveData<Error, InboundAddresses>
 
 export type HaltedChainsRD = RD.RemoteData<Error, Chain[]>
 export type HaltedChainsLD = LiveData<Error, Chain[]>
@@ -197,7 +187,6 @@ export type PoolsService = {
   reloadAllPools: FP.Lazy<void>
   selectedPoolAddress$: PoolAddress$
   poolAddressesByChain$: (chain: Chain) => PoolAddressLD
-  reloadInboundAddresses: FP.Lazy<void>
   selectedPoolDetail$: PoolDetailLD
   reloadSelectedPoolDetail: (delay?: number) => void
   reloadLiquidityHistory: FP.Lazy<void>
@@ -218,9 +207,7 @@ export type PoolsService = {
   poolsFilters$: Rx.Observable<Record<string, O.Option<PoolFilter>>>
   setPoolsFilter: (poolKey: PoolType, filter: O.Option<PoolFilter>) => void
   outboundAssetFeeByChain$: (chain: Chain) => PoolFeeLD
-  reloadGasRates: FP.Lazy<void>
   haltedChains$: HaltedChainsLD
-  inboundAddressesShared$: InboundAddressesLD
 }
 
 export type PoolShareType = DepositType | 'all'

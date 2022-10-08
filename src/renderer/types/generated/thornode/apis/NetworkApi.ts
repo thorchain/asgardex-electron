@@ -16,6 +16,7 @@ import { BaseAPI, HttpQuery, throwIfNullOrUndefined, encodeURI } from '../runtim
 import {
     BanResponse,
     ConstantsResponse,
+    InboundAddress,
     LastBlock,
     NetworkResponse,
     VersionResponse,
@@ -96,13 +97,13 @@ export class NetworkApi extends BaseAPI {
     /**
      * Returns the set of asgard addresses that should be used for inbound transactions.
      */
-    inboundAddresses = ({ height }: InboundAddressesRequest): Observable<Array<object>> => {
+    inboundAddresses = ({ height }: InboundAddressesRequest): Observable<Array<InboundAddress>> => {
 
         const query: HttpQuery = {};
 
         if (height != null) { query['height'] = height; }
 
-        return this.request<Array<object>>({
+        return this.request<Array<InboundAddress>>({
             path: '/thorchain/inbound_addresses',
             method: 'GET',
             query,

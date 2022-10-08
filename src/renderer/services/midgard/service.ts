@@ -16,6 +16,7 @@ import { Configuration, DefaultApi } from '../../types/generated/midgard'
 import { network$ } from '../app/service'
 import { MIDGARD_MAX_RETRY } from '../const'
 import { getStorageState$, modifyStorage, getStorageState } from '../storage/common'
+import { inboundAddressesShared$, loadInboundAddresses$ } from '../thorchain/'
 import { ErrorId } from '../wallet/types'
 import { createActionsService } from './actions'
 import { selectedPoolAsset$, setSelectedPoolAsset } from './common'
@@ -271,7 +272,13 @@ export const service: MidgardService = {
   setMidgardUrl,
   checkMidgardUrl$,
   validateNode$,
-  pools: createPoolsService(midgardUrl$, getMidgardDefaultApi, selectedPoolAsset$),
+  pools: createPoolsService({
+    midgardUrl$,
+    getMidgardDefaultApi,
+    selectedPoolAsset$,
+    loadInboundAddresses$,
+    inboundAddressesShared$
+  }),
   shares: createSharesService(midgardUrl$, getMidgardDefaultApi),
   actions: createActionsService(midgardUrl$, getMidgardDefaultApi)
 }

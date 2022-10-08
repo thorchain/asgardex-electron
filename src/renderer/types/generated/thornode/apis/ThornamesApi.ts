@@ -13,6 +13,9 @@
 
 import { Observable } from 'rxjs';
 import { BaseAPI, HttpQuery, throwIfNullOrUndefined, encodeURI } from '../runtime';
+import {
+    Thorname,
+} from '../models';
 
 export interface ThornameRequest {
     name: string;
@@ -27,14 +30,14 @@ export class ThornamesApi extends BaseAPI {
     /**
      * Returns addresses registered to the provided thorname.
      */
-    thorname = ({ name, height }: ThornameRequest): Observable<Array<object>> => {
+    thorname = ({ name, height }: ThornameRequest): Observable<Array<Thorname>> => {
         throwIfNullOrUndefined(name, 'thorname');
 
         const query: HttpQuery = {};
 
         if (height != null) { query['height'] = height; }
 
-        return this.request<Array<object>>({
+        return this.request<Array<Thorname>>({
             path: '/thorchain/thorname/{name}'.replace('{name}', encodeURI(name)),
             method: 'GET',
             query,

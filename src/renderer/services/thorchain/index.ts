@@ -15,15 +15,22 @@ import {
 } from './common'
 import { createFeesService } from './fees'
 import { createInteractService$ } from './interact'
-import {
+import { createThornodeService$ } from './thornode'
+import { createTransactionService } from './transaction'
+
+const {
+  thornodeUrl$,
+  reloadThornodeUrl,
   getNodeInfos$,
   reloadNodeInfos,
+  inboundAddressesShared$,
+  loadInboundAddresses$,
+  reloadInboundAddresses,
   mimir$,
   reloadMimir,
   getLiquidityProviders,
   reloadLiquidityProviders
-} from './thornode'
-import { createTransactionService } from './transaction'
+} = createThornodeService$(network$, clientUrl$)
 
 const { txs$, tx$, txStatus$, subscribeTx, resetTx, sendTx, txRD$, sendPoolTx$ } = createTransactionService(
   client$,
@@ -34,6 +41,11 @@ const { reloadFees, fees$ } = createFeesService({ client$, chain: THORChain })
 const interact$ = createInteractService$(sendPoolTx$, txStatus$)
 
 export {
+  thornodeUrl$,
+  reloadThornodeUrl,
+  inboundAddressesShared$,
+  reloadInboundAddresses,
+  loadInboundAddresses$,
   client$,
   clientState$,
   clientUrl$,

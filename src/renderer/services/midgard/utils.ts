@@ -50,6 +50,7 @@ import { getDeepestPool, RUNE_POOL_ADDRESS, RUNE_PRICE_POOL } from '../../helper
 import { AssetWithAmount } from '../../types/asgardex'
 import { PoolDetail } from '../../types/generated/midgard'
 import { PricePoolAssets, PricePools, PricePoolAsset, PricePool } from '../../views/pools/Pools.types'
+import { InboundAddress } from '../thorchain/types'
 import {
   PoolAssetDetails as PoolAssetsDetail,
   PoolDetails,
@@ -60,8 +61,7 @@ import {
   PoolShare,
   PoolAddress,
   PoolAddresses,
-  PoolsDataMap,
-  InboundAddress
+  PoolsDataMap
 } from './types'
 
 export const getPricePools = (details: PoolDetails, whitelist: PricePoolAssets): PricePools => {
