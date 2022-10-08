@@ -8,15 +8,10 @@ import { isRuneNativeAsset } from '../../../helpers/assetHelper'
 import { eqOAsset } from '../../../helpers/fp/eq'
 import { liveData } from '../../../helpers/rx/liveData'
 import { observableState } from '../../../helpers/stateHelper'
-import { service as midgardService } from '../../midgard/service'
 import * as THOR from '../../thorchain'
+import { reloadInboundAddresses } from '../../thorchain'
 import { SymWithdrawFees, SymWithdrawFeesHandler } from '../types'
 import { poolOutboundFee$, poolInboundFee$ } from './common'
-
-const {
-  pools: { reloadGasRates }
-} = midgardService
-
 /**
  * Returns zero withdraw fees
  * by given asset to withdraw
@@ -50,8 +45,8 @@ const reloadWithdrawFees = (asset: Asset) => {
     // Reload fees for RUNE
     THOR.reloadFees()
   } else {
-    // OR reload fees for asset
-    reloadGasRates()
+    // OR reload fees for asset, which are provided via `inbound_addresses` endpoint
+    reloadInboundAddresses()
   }
 }
 

@@ -16,6 +16,7 @@ import { ASYM_DEPOSIT_TOOL_URL, RECOVERY_TOOL_URL, ZERO_BN, ZERO_POOL_DATA } fro
 import { useChainContext } from '../../../contexts/ChainContext'
 import { useEthereumContext } from '../../../contexts/EthereumContext'
 import { useMidgardContext } from '../../../contexts/MidgardContext'
+import { useThorchainContext } from '../../../contexts/ThorchainContext'
 import { useWalletContext } from '../../../contexts/WalletContext'
 import { sequenceTRD } from '../../../helpers/fpHelpers'
 import { getAssetPoolPrice } from '../../../helpers/poolHelper'
@@ -55,6 +56,8 @@ export const SymDepositView: React.FC<Props> = (props) => {
     [navigate]
   )
 
+  const { reloadInboundAddresses } = useThorchainContext()
+
   const {
     service: {
       pools: {
@@ -63,7 +66,6 @@ export const SymDepositView: React.FC<Props> = (props) => {
         selectedPricePoolAsset$,
         reloadSelectedPoolDetail,
         selectedPoolAddress$,
-        reloadInboundAddresses,
         poolsState$
       },
       shares: { reloadShares }

@@ -11,24 +11,19 @@
  * Do not edit the class manually.
  */
 
-import {
-    KeygenMetric,
-    KeysignMetrics,
-} from './';
-
 /**
  * @export
- * @interface MetricsResponse
+ * @interface NodeKeygenMetric
  */
-export interface MetricsResponse {
+export interface NodeKeygenMetric {
     /**
-     * @type {Array<KeygenMetric>}
-     * @memberof MetricsResponse
+     * @type {string}
+     * @memberof NodeKeygenMetric
      */
-    keygen?: Array<KeygenMetric>;
+    address?: string;
     /**
-     * @type {KeysignMetrics}
-     * @memberof MetricsResponse
+     * @type {string}
+     * @memberof NodeKeygenMetric
      */
-    keysign?: KeysignMetrics;
+    tss_time?: string;
 }

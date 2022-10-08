@@ -9,14 +9,10 @@ import { getChainAsset } from '../../../helpers/chainHelper'
 import { eqOSwapFeesParams } from '../../../helpers/fp/eq'
 import { liveData } from '../../../helpers/rx/liveData'
 import { observableState } from '../../../helpers/stateHelper'
-import { service as midgardService } from '../../midgard/service'
 import * as THOR from '../../thorchain'
+import { reloadInboundAddresses } from '../../thorchain'
 import { SwapFeesHandler, SwapFeesParams, SwapFees } from '../types'
 import { poolOutboundFee$, poolInboundFee$ } from './common'
-
-const {
-  pools: { reloadGasRates }
-} = midgardService
 
 /**
  * Returns zero swap fees
@@ -48,9 +44,9 @@ const reloadSwapFees = (params: SwapFeesParams) => {
     THOR.reloadFees()
   }
 
-  // OR (2) check other fees, which all depend on gas rates
+  // OR (2) check other fees, which all depend on outbound fees defined in `inbound_addresses`
   if (!isRuneNativeAsset(inAsset) || !isRuneNativeAsset(outAsset)) {
-    reloadGasRates()
+    reloadInboundAddresses()
   }
 }
 

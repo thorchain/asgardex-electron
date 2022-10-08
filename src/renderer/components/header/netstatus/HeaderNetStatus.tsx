@@ -11,7 +11,7 @@ import { useIntl } from 'react-intl'
 
 import { useAppContext } from '../../../contexts/AppContext'
 import { OnlineStatus } from '../../../services/app/types'
-import { InboundAddressRD, MidgardUrlRD } from '../../../services/midgard/types'
+import { MidgardStatusRD, MidgardUrlRD } from '../../../services/midgard/types'
 import { MimirRD } from '../../../services/thorchain/types'
 import { DownIcon } from '../../icons'
 import { ConnectionStatus } from '../../shared/icons/ConnectionStatus'
@@ -30,7 +30,7 @@ type MenuItem = {
 
 export type Props = {
   isDesktopView: boolean
-  midgardStatus: InboundAddressRD
+  midgardStatus: MidgardStatusRD
   mimirStatus: MimirRD
   midgardUrl: MidgardUrlRD
   thorchainNodeUrl: string
