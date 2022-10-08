@@ -21,7 +21,6 @@ import { TxHashLD, TxHashRD } from '../wallet/types'
 export type InboundAddress = Omit<TN.InboundAddress, 'chain' | 'address'> &
   Required<{
     chain: Chain
-    // outboundFee: BigNumber
     address: Address
   }>
 

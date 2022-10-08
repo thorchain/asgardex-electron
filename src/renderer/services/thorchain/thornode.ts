@@ -28,7 +28,7 @@ import {
 } from './types'
 
 export const createThornodeService$ = (network$: Network$, clientUrl$: ClientUrl$) => {
-  // `TriggerStream` to reload ClientUrl
+  // `TriggerStream` to reload THORNode url
   const { stream$: reloadThornodeUrl$, trigger: reloadThornodeUrl } = triggerStream()
 
   /**
