@@ -24,7 +24,8 @@ import {
   NodeInfosLD,
   NodeInfos,
   ClientUrl$,
-  InboundAddressesLD
+  InboundAddressesLD,
+  ThorchainConstantsLD
 } from './types'
 
 export const createThornodeService$ = (network$: Network$, clientUrl$: ClientUrl$) => {
@@ -94,6 +95,34 @@ export const createThornodeService$ = (network$: Network$, clientUrl$: ClientUrl
     RxOp.debounceTime(300),
     RxOp.switchMap((_) => loadInboundAddresses$()),
     RxOp.shareReplay(1)
+  )
+
+  /**
+   * Get `ThorchainConstants` data from Midgard
+   */
+  const apiGetThorchainConstants$ = FP.pipe(
+    thornodeUrl$,
+    liveData.chain((basePath) =>
+      FP.pipe(
+        new NetworkApi(new Configuration({ basePath })).constants({}),
+        RxOp.map(RD.success),
+        RxOp.catchError((e: Error) => Rx.of(RD.failure(e)))
+      )
+    )
+  )
+
+  const { stream$: reloadThorchainConstants$, trigger: reloadThorchainConstants } = triggerStream()
+
+  /**
+   * Provides data of `ThorchainConstants`
+   */
+  const thorchainConstantsState$: ThorchainConstantsLD = FP.pipe(
+    reloadThorchainConstants$,
+    RxOp.debounceTime(300),
+    RxOp.switchMap(() => apiGetThorchainConstants$),
+    RxOp.startWith(RD.pending),
+    RxOp.shareReplay(1),
+    RxOp.catchError(() => Rx.of(RD.failure(Error('Failed to load THORChain constants'))))
   )
 
   const { stream$: reloadNodeInfos$, trigger: reloadNodeInfos } = triggerStream()
@@ -202,6 +231,8 @@ export const createThornodeService$ = (network$: Network$, clientUrl$: ClientUrl
     reloadThornodeUrl,
     getNodeInfos$,
     reloadNodeInfos,
+    reloadThorchainConstants,
+    thorchainConstantsState$,
     inboundAddressesShared$,
     reloadInboundAddresses,
     loadInboundAddresses$,

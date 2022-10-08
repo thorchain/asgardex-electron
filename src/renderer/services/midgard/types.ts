@@ -12,7 +12,6 @@ import { LiveData } from '../../helpers/rx/liveData'
 import { AssetWithAmount, DepositType } from '../../types/asgardex'
 import {
   Network as NetworkInfo,
-  Constants as ThorchainConstants,
   LastblockItem,
   PoolDetail,
   Health,
@@ -98,13 +97,6 @@ export type MidgardStatusLD = LiveData<Error, boolean>
 export type LastblockItems = LastblockItem[]
 export type ThorchainLastblockRD = RD.RemoteData<Error, LastblockItems>
 export type ThorchainLastblockLD = LiveData<Error, LastblockItems>
-
-export type ThorchainConstantsRD = RD.RemoteData<Error, ThorchainConstants>
-export type ThorchainConstantsLD = LiveData<Error, ThorchainConstants>
-
-export type NativeFee = O.Option<BaseAmount>
-export type NativeFeeRD = RD.RemoteData<Error, NativeFee>
-export type NativeFeeLD = LiveData<Error, NativeFee>
 
 export type HaltedChainsRD = RD.RemoteData<Error, Chain[]>
 export type HaltedChainsLD = LiveData<Error, Chain[]>
