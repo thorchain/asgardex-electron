@@ -25,7 +25,8 @@ import {
   NodeInfos,
   ClientUrl$,
   InboundAddressesLD,
-  ThorchainConstantsLD
+  ThorchainConstantsLD,
+  ThorchainLastblockLD
 } from './types'
 
 export const createThornodeService$ = (network$: Network$, clientUrl$: ClientUrl$) => {
@@ -123,6 +124,46 @@ export const createThornodeService$ = (network$: Network$, clientUrl$: ClientUrl
     RxOp.startWith(RD.pending),
     RxOp.shareReplay(1),
     RxOp.catchError(() => Rx.of(RD.failure(Error('Failed to load THORChain constants'))))
+  )
+
+  /**
+   * Api call to `lastblock` endpoint
+   */
+  const apiGetThorchainLastblock$ = FP.pipe(
+    thornodeUrl$,
+    liveData.chain((basePath) =>
+      FP.pipe(
+        new NetworkApi(new Configuration({ basePath })).lastblock({}),
+        RxOp.map(RD.success),
+        RxOp.catchError((e: Error) => Rx.of(RD.failure(e)))
+      )
+    )
+  )
+
+  // `TriggerStream` to reload data of `ThorchainLastblock`
+  const { stream$: reloadThorchainLastblock$, trigger: reloadThorchainLastblock } = triggerStream()
+
+  /**
+   * Loads data of `lastblock`
+   */
+  const loadThorchainLastblock$ = () =>
+    apiGetThorchainLastblock$.pipe(
+      // catch any errors if there any
+      RxOp.catchError((error: Error) => Rx.of(RD.failure(error))),
+      RxOp.startWith(RD.pending)
+    )
+
+  const loadThorchainLastblockInterval$ = Rx.timer(0 /* no delay for first value */, 15 * 1000 /* every 15 sec  */)
+
+  /**
+   * State of `ThorchainLastblock`, it will be loaded data by first subscription only
+   */
+  const thorchainLastblockState$: ThorchainLastblockLD = FP.pipe(
+    Rx.combineLatest([reloadThorchainLastblock$, loadThorchainLastblockInterval$]),
+    // start request
+    RxOp.switchMap((_) => loadThorchainLastblock$()),
+    // cache it to avoid reloading data by every subscription
+    RxOp.shareReplay(1)
   )
 
   const { stream$: reloadNodeInfos$, trigger: reloadNodeInfos } = triggerStream()
@@ -233,6 +274,8 @@ export const createThornodeService$ = (network$: Network$, clientUrl$: ClientUrl
     reloadNodeInfos,
     reloadThorchainConstants,
     thorchainConstantsState$,
+    thorchainLastblockState$,
+    reloadThorchainLastblock,
     inboundAddressesShared$,
     reloadInboundAddresses,
     loadInboundAddresses$,

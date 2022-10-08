@@ -12,7 +12,6 @@ import { LiveData } from '../../helpers/rx/liveData'
 import { AssetWithAmount, DepositType } from '../../types/asgardex'
 import {
   Network as NetworkInfo,
-  LastblockItem,
   PoolDetail,
   Health,
   PoolStatsDetail,
@@ -94,10 +93,6 @@ export type PriceRD = RD.RemoteData<Error, AssetWithAmount>
 export type MidgardStatusRD = RD.RemoteData<Error, boolean>
 export type MidgardStatusLD = LiveData<Error, boolean>
 
-export type LastblockItems = LastblockItem[]
-export type ThorchainLastblockRD = RD.RemoteData<Error, LastblockItems>
-export type ThorchainLastblockLD = LiveData<Error, LastblockItems>
-
 export type HaltedChainsRD = RD.RemoteData<Error, Chain[]>
 export type HaltedChainsLD = LiveData<Error, Chain[]>
 
@@ -159,7 +154,8 @@ export type NetworkInfoLD = LiveData<Error, NetworkInfo>
 export type MidgardUrlRD = RD.RemoteData<Error, string>
 export type MidgardUrlLD = LiveData<Error, string>
 
-export type CheckMidgardUrlHandler = (url: string, intl: IntlShape) => LiveData<Error, string>
+export type CheckMidgardUrlLD = LiveData<Error, string>
+export type CheckMidgardUrlHandler = (url: string, intl?: IntlShape) => CheckMidgardUrlLD
 
 export type HealthRD = RD.RemoteData<Error, Health>
 export type HealthLD = LiveData<Error, Health>
