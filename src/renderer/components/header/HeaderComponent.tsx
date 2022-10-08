@@ -18,7 +18,7 @@ import { useThemeContext } from '../../contexts/ThemeContext'
 import * as appRoutes from '../../routes/app'
 import * as poolsRoutes from '../../routes/pools'
 import * as walletRoutes from '../../routes/wallet'
-import { InboundAddressRD, MidgardUrlRD, PriceRD, SelectedPricePoolAsset } from '../../services/midgard/types'
+import { MidgardStatusRD, MidgardUrlRD, PriceRD, SelectedPricePoolAsset } from '../../services/midgard/types'
 import { MimirRD } from '../../services/thorchain/types'
 import { ChangeKeystoreWalletHandler, KeystoreState, KeystoreWalletsUI } from '../../services/wallet/types'
 import { isLocked } from '../../services/wallet/util'
@@ -58,7 +58,7 @@ export type Props = {
   volume24Price: PriceRD
   reloadVolume24Price: FP.Lazy<void>
   selectedPricePoolAsset: SelectedPricePoolAsset
-  inboundAddresses: InboundAddressRD
+  midgardStatus: MidgardStatusRD
   mimir: MimirRD
   midgardUrl: MidgardUrlRD
   thorchainNodeUrl: string
@@ -72,7 +72,7 @@ export const HeaderComponent: React.FC<Props> = (props): JSX.Element => {
     network,
     pricePools: oPricePools,
     runePrice: runePriceRD,
-    inboundAddresses: inboundAddressRD,
+    midgardStatus: midgardStatusRD,
     mimir: mimirRD,
     reloadRunePrice,
     volume24Price: volume24PriceRD,
@@ -251,14 +251,14 @@ export const HeaderComponent: React.FC<Props> = (props): JSX.Element => {
     () => (
       <HeaderNetStatus
         isDesktopView={isDesktopView}
-        midgardStatus={inboundAddressRD}
+        midgardStatus={midgardStatusRD}
         mimirStatus={mimirRD}
         midgardUrl={midgardUrlRD}
         thorchainNodeUrl={thorchainNodeUrl}
         thorchainRpcUrl={thorchainRpcUrl}
       />
     ),
-    [inboundAddressRD, isDesktopView, midgardUrlRD, mimirRD, thorchainNodeUrl, thorchainRpcUrl]
+    [midgardStatusRD, isDesktopView, midgardUrlRD, mimirRD, thorchainNodeUrl, thorchainRpcUrl]
   )
 
   const iconStyle = { fontSize: '1.5em', marginRight: '20px' }
