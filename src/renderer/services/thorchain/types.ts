@@ -33,9 +33,9 @@ export type InboundAddressesLD = LiveData<Error, InboundAddresses>
 export type ThorchainConstantsRD = RD.RemoteData<Error, ConstantsResponse>
 export type ThorchainConstantsLD = LiveData<Error, ConstantsResponse>
 
-export type NativeFee = O.Option<BaseAmount>
-export type NativeFeeRD = RD.RemoteData<Error, NativeFee>
-export type NativeFeeLD = LiveData<Error, NativeFee>
+export type LastblockItems = TN.LastBlock[]
+export type ThorchainLastblockRD = RD.RemoteData<Error, LastblockItems>
+export type ThorchainLastblockLD = LiveData<Error, LastblockItems>
 
 export type Client$ = C.Client$<Client>
 
