@@ -11,11 +11,19 @@ import * as RxOp from 'rxjs/operators'
 
 import { Network } from '../../shared/api/types'
 import { useThorchainContext } from '../contexts/ThorchainContext'
+import { LiveData } from '../helpers/rx/liveData'
 import { DEFAULT_CLIENT_URL } from '../services/thorchain/const'
 import { Configuration, HealthApi } from '../types/generated/thornode'
 import { useNetwork } from './useNetwork'
 
-export const useThorchainClientUrl = () => {
+export const useThorchainClientUrl = (): {
+  rpc: string
+  node: string
+  setRpc: (url: string) => void
+  setNode: (url: string) => void
+  checkNode$: (url: string) => LiveData<Error, string>
+  checkRpc$: (url: string) => LiveData<Error, string>
+} => {
   const { clientUrl$, setThornodeRpcUrl, setThornodeApiUrl } = useThorchainContext()
   const { network } = useNetwork()
   const intl = useIntl()
