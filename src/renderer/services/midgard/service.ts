@@ -1,5 +1,4 @@
 import * as RD from '@devexperts/remote-data-ts'
-import { baseAmount } from '@xchainjs/xchain-util'
 import * as FP from 'fp-ts/function'
 import * as O from 'fp-ts/Option'
 import { IntlShape } from 'react-intl'
@@ -8,7 +7,6 @@ import * as RxOp from 'rxjs/operators'
 
 import { ApiUrls, Network } from '../../../shared/api/types'
 import { DEFAULT_MIDGARD_URLS } from '../../../shared/midgard/const'
-import { THORCHAIN_DECIMAL } from '../../helpers/assetHelper'
 import { eqApiUrls } from '../../helpers/fp/eq'
 import { liveData } from '../../helpers/rx/liveData'
 import { triggerStream, TriggerStream$ } from '../../helpers/stateHelper'
@@ -25,10 +23,8 @@ import { createSharesService } from './shares'
 import {
   NetworkInfoRD,
   NetworkInfoLD,
-  ThorchainConstantsLD,
   MidgardUrlLD,
   ThorchainLastblockLD,
-  NativeFeeLD,
   HealthLD,
   ValidateNodeLD,
   CheckMidgardUrlHandler,
@@ -125,44 +121,6 @@ const thorchainLastblockState$: ThorchainLastblockLD = FP.pipe(
 )
 
 /**
- * Get `ThorchainConstants` data from Midgard
- */
-const apiGetThorchainConstants$ = FP.pipe(
-  midgardUrl$,
-  liveData.chain((endpoint) =>
-    FP.pipe(
-      getMidgardDefaultApi(endpoint).getProxiedConstants(),
-      RxOp.map(RD.success),
-      RxOp.catchError((e: Error) => Rx.of(RD.failure(e)))
-    )
-  )
-)
-
-const { stream$: reloadThorchainConstants$, trigger: reloadThorchainConstants } = triggerStream()
-
-/**
- * Provides data of `ThorchainConstants`
- */
-const thorchainConstantsState$: ThorchainConstantsLD = FP.pipe(
-  reloadThorchainConstants$,
-  RxOp.debounceTime(300),
-  RxOp.switchMap(() => apiGetThorchainConstants$),
-  RxOp.startWith(RD.pending),
-  RxOp.retry(MIDGARD_MAX_RETRY),
-  RxOp.shareReplay(1),
-  RxOp.catchError(() => Rx.of(RD.failure(Error('Failed to load Thorchain constants'))))
-)
-
-const nativeTxFee$: NativeFeeLD = thorchainConstantsState$.pipe(
-  liveData.map((constants) =>
-    FP.pipe(
-      O.fromNullable(constants.int_64_values?.NativeTransactionFee),
-      O.map((value) => baseAmount(value, THORCHAIN_DECIMAL))
-    )
-  )
-)
-
-/**
  * Loads data of `NetworkInfo`
  */
 const loadNetworkInfo$ = (): Rx.Observable<NetworkInfoRD> =>
@@ -234,10 +192,7 @@ export const checkMidgardUrl$: CheckMidgardUrlHandler = (url: string, intl: Intl
 export type MidgardService = {
   networkInfo$: NetworkInfoLD
   reloadNetworkInfo: FP.Lazy<void>
-  reloadThorchainConstants: FP.Lazy<void>
-  thorchainConstantsState$: ThorchainConstantsLD
   thorchainLastblockState$: ThorchainLastblockLD
-  nativeTxFee$: NativeFeeLD
   reloadThorchainLastblock: FP.Lazy<void>
   setSelectedPoolAsset: (p: SelectedPoolAsset) => void
   selectedPoolAsset$: Rx.Observable<SelectedPoolAsset>
@@ -258,10 +213,7 @@ export type MidgardService = {
 export const service: MidgardService = {
   networkInfo$,
   reloadNetworkInfo,
-  reloadThorchainConstants,
-  thorchainConstantsState$,
   thorchainLastblockState$,
-  nativeTxFee$,
   reloadThorchainLastblock,
   reloadChartDataUI,
   reloadChartDataUI$,

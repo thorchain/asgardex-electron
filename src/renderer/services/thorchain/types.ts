@@ -12,6 +12,7 @@ import { HDMode, WalletType } from '../../../shared/wallet/types'
 import { LiveData } from '../../helpers/rx/liveData'
 import { AssetsWithAmount1e8, AssetWithAmount1e8 } from '../../types/asgardex'
 import * as TN from '../../types/generated/thornode'
+import { ConstantsResponse } from '../../types/generated/thornode'
 import * as C from '../clients'
 import { TxHashLD, TxHashRD } from '../wallet/types'
 
@@ -28,6 +29,13 @@ export type InboundAddressRD = RD.RemoteData<Error, InboundAddresses>
 
 export type InboundAddresses = InboundAddress[]
 export type InboundAddressesLD = LiveData<Error, InboundAddresses>
+
+export type ThorchainConstantsRD = RD.RemoteData<Error, ConstantsResponse>
+export type ThorchainConstantsLD = LiveData<Error, ConstantsResponse>
+
+export type NativeFee = O.Option<BaseAmount>
+export type NativeFeeRD = RD.RemoteData<Error, NativeFee>
+export type NativeFeeLD = LiveData<Error, NativeFee>
 
 export type Client$ = C.Client$<Client>
 

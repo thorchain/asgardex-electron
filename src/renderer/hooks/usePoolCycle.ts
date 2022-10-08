@@ -8,7 +8,6 @@ import { useObservableState } from 'observable-hooks'
 import * as Rx from 'rxjs'
 import * as RxOp from 'rxjs/operators'
 
-import { useMidgardContext } from '../contexts/MidgardContext'
 import { useThorchainContext } from '../contexts/ThorchainContext'
 import { eqApiError } from '../helpers/fp/eq'
 import { LiveData, liveData } from '../helpers/rx/liveData'
@@ -24,16 +23,21 @@ export const usePoolCycle = (): {
   reloadPoolCycle: FP.Lazy<void>
 } => {
   const { mimir$, reloadMimir } = useThorchainContext()
-  const {
-    service: { thorchainConstantsState$, reloadThorchainConstants }
-  } = useMidgardContext()
+  const { thorchainConstantsState$, reloadThorchainConstants } = useThorchainContext()
 
   const midgardConstantsPoolCycle$: PoolCycleLD = useMemo(
     () =>
       FP.pipe(
         thorchainConstantsState$,
-        liveData.map(({ int_64_values }) => int_64_values.PoolCycle),
-        liveData.mapLeft(() => ({ errorId: ErrorId.GET_POOL_CYCLE, msg: 'Unable to load pool cycle from Midgard' }))
+        liveData.map(({ int64_values }) => Number(int64_values?.PoolCycle)),
+        liveData.chain((poolCycle) =>
+          // validation -> value needs to be a number
+          liveData.fromPredicate<Error, number>(
+            () => !isNaN(poolCycle),
+            () => Error(`Invalid value of constant 'PoolCycle' ${poolCycle} `)
+          )(poolCycle)
+        ),
+        liveData.mapLeft(() => ({ errorId: ErrorId.GET_POOL_CYCLE, msg: 'Unable to get constant of PoolCycle' }))
       ),
     [thorchainConstantsState$]
   )
