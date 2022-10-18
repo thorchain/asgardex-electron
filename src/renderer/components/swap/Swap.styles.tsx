@@ -5,7 +5,6 @@ import { palette } from 'styled-theme'
 import { media } from '../../helpers/styleHelper'
 import { transition } from '../../settings/style-util'
 import { Tabs as TabsUI } from '../tabs/Tabs'
-import { AssetInput as AssetInputBase } from '../uielements/assets/assetInput'
 import { AssetSelect as AssetSelectUI } from '../uielements/assets/assetSelect'
 import { CheckButton as CheckButtonUI } from '../uielements/button/CheckButton'
 import { Label as UILabel } from '../uielements/label'
@@ -137,23 +136,13 @@ export const ValueItemContainer = styled.div`
     flex-direction: row;
 
     &>*:first-child {
-      margin-right: 25px;
-      min-width: 63%;
+      /* margin-right: 25px;
+      min-width: 63%; */
     }
   `}
 `
 
 export const ValueItemSourceWrapper = styled.div`
-  display: flex;
-  flex-direction: column;
-  width: 100%;
-
-  ${media.md`
-  width: auto;
-  `}
-`
-
-export const ValueItemWrapper = styled.div`
   display: flex;
   flex-direction: column;
   width: 100%;
@@ -217,20 +206,6 @@ export const InMinValueLabel = styled(UILabel).attrs({
   width: auto;
   padding-right: 5px;
   font-size: 12px;
-`
-
-export const AssetInput = styled(AssetInputBase)<{ hasError?: boolean }>`
-  border-color: ${({ hasError }) => (hasError ? palette('error', 0) : palette('primary', 0))};
-
-  & .ant-input {
-    border: none;
-  }
-
-  width: 100%;
-
-  ${media.md`
-    width: auto;
-  `}
 `
 
 export const ErrorLabel = styled(UILabel)`

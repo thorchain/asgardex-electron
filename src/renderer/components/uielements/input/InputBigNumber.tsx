@@ -1,7 +1,6 @@
 import React, { useCallback, useState, useEffect, forwardRef } from 'react'
 
 import { delay, bnOrZero } from '@xchainjs/xchain-util'
-import * as A from 'antd'
 import BigNumber from 'bignumber.js'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
@@ -9,18 +8,17 @@ import * as O from 'fp-ts/lib/Option'
 import { ZERO_BN } from '../../../const'
 import { eqBigNumber } from '../../../helpers/fp/eq'
 import { FixmeType } from '../../../types/asgardex'
-import * as Styled from './Input.styles'
+import { Input, InputProps } from './Input'
 import { formatValue, unformatValue, validInputValue, VALUE_ZERO, EMPTY_INPUT, truncateByDecimals } from './Input.util'
 
-type Props = Omit<Styled.InputProps, 'value' | 'onChange'> & {
+type Props = Omit<InputProps, 'value' | 'onChange'> & {
   value?: BigNumber
   onChange?: (value: BigNumber) => void
   decimal?: number
+  onPressEnter?: (value: BigNumber) => void
 }
 
-// Note: Since `A.Input` does not support an accessible type for its `ref`, we use `FixmeType`
-// (very similar to InnerForm in src/renderer/components/shared/form/Form.styles.tsx)
-export const InputBigNumber = forwardRef<typeof A.Input, Props>((props: Props, ref: FixmeType): JSX.Element => {
+export const InputBigNumber = forwardRef<HTMLInputElement, Props>((props: Props, ref: FixmeType): JSX.Element => {
   const {
     decimal = 2,
     value = ZERO_BN,
@@ -116,9 +114,14 @@ export const InputBigNumber = forwardRef<typeof A.Input, Props>((props: Props, r
     [_onBlurHandler, onBlur]
   )
 
-  const onPressEnterHandler = useCallback(() => {
-    _onBlurHandler()
-  }, [_onBlurHandler])
+  const onKeyDownHandler = useCallback(
+    (e: React.KeyboardEvent<HTMLElement>) => {
+      if (e.key === 'Enter') {
+        _onBlurHandler()
+      }
+    },
+    [_onBlurHandler]
+  )
 
   const onChangeHandler = useCallback(
     ({ target }: React.ChangeEvent<HTMLInputElement>) => {
@@ -149,7 +152,7 @@ export const InputBigNumber = forwardRef<typeof A.Input, Props>((props: Props, r
   )
 
   return (
-    <Styled.InputBigNumber
+    <Input
       ref={ref}
       value={FP.pipe(
         broadcastValue,
@@ -158,7 +161,7 @@ export const InputBigNumber = forwardRef<typeof A.Input, Props>((props: Props, r
       onChange={onChangeHandler}
       onFocus={onFocusHandler}
       onBlur={onBlurHandler}
-      onPressEnter={onPressEnterHandler}
+      onKeyDown={onKeyDownHandler}
       max={max}
       {...otherProps}
     />
