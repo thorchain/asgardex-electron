@@ -41,7 +41,7 @@ import {
 import { getChainAsset, isBchChain, isBtcChain, isDogeChain, isEthChain, isLtcChain } from '../../helpers/chainHelper'
 import { unionAssets } from '../../helpers/fp/array'
 import { eqAsset, eqBaseAmount, eqOAsset, eqOApproveParams, eqAddress, eqOAddress } from '../../helpers/fp/eq'
-import { sequenceSOption, sequenceTOption } from '../../helpers/fpHelpers'
+import { sequenceTOption } from '../../helpers/fpHelpers'
 import * as PoolHelpers from '../../helpers/poolHelper'
 import { liveData, LiveData } from '../../helpers/rx/liveData'
 import {
@@ -72,7 +72,7 @@ import {
   IsApproveParams,
   LoadApproveFeeHandler
 } from '../../services/ethereum/types'
-import { PoolAssetDetail, PoolAssetDetails, PoolAddress, PoolsDataMap } from '../../services/midgard/types'
+import { PoolAddress, PoolsDataMap } from '../../services/midgard/types'
 import { MimirHalt } from '../../services/thorchain/types'
 import {
   ApiError,
@@ -102,13 +102,16 @@ import { CopyLabel } from '../uielements/label'
 import { Slider } from '../uielements/slider'
 import { EditableAddress } from './EditableAddress'
 import * as Styled from './Swap.styles'
-import { AssetsToSwap, SwapData } from './Swap.types'
+import { SwapData } from './Swap.types'
 import * as Utils from './Swap.utils'
 
 export type SwapProps = {
   keystore: KeystoreState
-  availableAssets: PoolAssetDetails
-  assets: { inAsset: AssetWithDecimal; outAsset: AssetWithDecimal }
+  poolAssets: Asset[]
+  assets: {
+    source: AssetWithDecimal
+    target: AssetWithDecimal
+  }
   sourceWalletAddress: O.Option<Address>
   sourceLedgerAddress: O.Option<Address>
   poolAddress: O.Option<PoolAddress>
@@ -140,8 +143,8 @@ export type SwapProps = {
 
 export const Swap = ({
   keystore,
-  availableAssets,
-  assets: { inAsset: sourceAssetWD, outAsset: targetAssetWD },
+  poolAssets,
+  assets: { source: sourceAssetWD, target: targetAssetWD },
   sourceWalletAddress: oInitialSourceWalletAddress,
   sourceLedgerAddress: oSourceLedgerAddress,
   poolAddress: oPoolAddress,
@@ -193,8 +196,8 @@ export const Swap = ({
 
   const { balances: oWalletBalances, loading: walletBalancesLoading } = walletBalances
 
-  const { asset: sourceAssetProp, decimal: sourceAssetDecimal } = sourceAssetWD
-  const { asset: targetAssetProp, decimal: targetAssetDecimal } = targetAssetWD
+  const { asset: sourceAsset, decimal: sourceAssetDecimal } = sourceAssetWD
+  const { asset: targetAsset, decimal: targetAssetDecimal } = targetAssetWD
 
   // ZERO `BaseAmount` for target Asset - original decimal
   const zeroTargetBaseAmountMax = useMemo(() => baseAmount(0, targetAssetDecimal), [targetAssetDecimal])
@@ -204,25 +207,6 @@ export const Swap = ({
 
   const prevSourceAsset = useRef<O.Option<Asset>>(O.none)
   const prevTargetAsset = useRef<O.Option<Asset>>(O.none)
-
-  const oSourcePoolAsset: O.Option<PoolAssetDetail> = useMemo(
-    () => Utils.pickPoolAsset(availableAssets, sourceAssetProp),
-    [availableAssets, sourceAssetProp]
-  )
-
-  const oTargetPoolAsset: O.Option<PoolAssetDetail> = useMemo(
-    () => Utils.pickPoolAsset(availableAssets, targetAssetProp),
-    [availableAssets, targetAssetProp]
-  )
-
-  const oSourceAsset: O.Option<Asset> = useMemo(
-    () => Utils.poolAssetDetailToAsset(oSourcePoolAsset),
-    [oSourcePoolAsset]
-  )
-  const oTargetAsset: O.Option<Asset> = useMemo(
-    () => Utils.poolAssetDetailToAsset(oTargetPoolAsset),
-    [oTargetPoolAsset]
-  )
 
   const [useSourceAssetLedger, setUseSourceAssetLedger] = useState(false)
   const [useTargetAssetLedger, setUseTargetAssetLedger] = useState(false)
@@ -240,49 +224,31 @@ export const Swap = ({
 
   const [customAddressEditActive, setCustomAddressEditActive] = useState(false)
 
-  const disableSwapAction = useMemo(
-    () =>
-      FP.pipe(
-        sequenceTOption(oSourceAsset, oTargetAsset),
-        O.map(
-          ([{ chain: sourceChain }, { chain: targetChain }]) =>
-            disableAllPoolActions(sourceChain) ||
-            disableTradingPoolActions(sourceChain) ||
-            disableAllPoolActions(targetChain) ||
-            disableTradingPoolActions(targetChain) ||
-            customAddressEditActive
-        ),
-        O.getOrElse(() => true)
-      ),
-    [customAddressEditActive, disableAllPoolActions, disableTradingPoolActions, oSourceAsset, oTargetAsset]
-  )
-
-  const assetsToSwap: O.Option<AssetsToSwap> = useMemo(
-    () => sequenceSOption({ source: oSourceAsset, target: oTargetAsset }),
-    [oSourceAsset, oTargetAsset]
-  )
-
-  // Available assets are assets of available pools only
-  const allAssets = useMemo((): Asset[] => availableAssets.map(({ asset }) => asset), [availableAssets])
+  const disableSwapAction = useMemo(() => {
+    const sourceChain = sourceAsset.chain
+    const targetChain = targetAsset.chain
+    return (
+      disableAllPoolActions(sourceChain) ||
+      disableTradingPoolActions(sourceChain) ||
+      disableAllPoolActions(targetChain) ||
+      disableTradingPoolActions(targetChain) ||
+      customAddressEditActive
+    )
+  }, [customAddressEditActive, disableAllPoolActions, disableTradingPoolActions, sourceAsset.chain, targetAsset.chain])
 
   const allBalances: WalletBalances = useMemo(
     () =>
       FP.pipe(
         oWalletBalances,
-        O.map((balances) => filterWalletBalancesByAssets(balances, allAssets)),
+        O.map((balances) => filterWalletBalancesByAssets(balances, poolAssets)),
         O.getOrElse<WalletBalances>(() => [])
       ),
-    [allAssets, oWalletBalances]
+    [poolAssets, oWalletBalances]
   )
 
   const _hasSourceAssetLedger = useMemo(
-    () =>
-      FP.pipe(
-        oSourceAsset,
-        O.map((asset) => hasLedgerInBalancesByAsset(asset, allBalances)),
-        O.getOrElse(() => false)
-      ),
-    [oSourceAsset, allBalances]
+    () => hasLedgerInBalancesByAsset(sourceAsset, allBalances),
+    [sourceAsset, allBalances]
   )
 
   const hasTargetAssetLedger = useMemo(() => O.isSome(oTargetLedgerAddress), [oTargetLedgerAddress])
@@ -309,21 +275,14 @@ export const Swap = ({
   )
 
   // `AssetWB` of source asset - which might be none (user has no balances for this asset or wallet is locked)
-  const oSourceAssetWB: O.Option<WalletBalance> = useMemo(
-    () =>
-      FP.pipe(
-        oSourceAsset,
-        O.chain((asset) => {
-          const oWalletBalances = NEA.fromArray(allBalances)
-          return getWalletBalanceByAssetAndWalletType({
-            oWalletBalances,
-            asset,
-            walletType: sourceWalletType
-          })
-        })
-      ),
-    [oSourceAsset, allBalances, sourceWalletType]
-  )
+  const oSourceAssetWB: O.Option<WalletBalance> = useMemo(() => {
+    const oWalletBalances = NEA.fromArray(allBalances)
+    return getWalletBalanceByAssetAndWalletType({
+      oWalletBalances,
+      asset: sourceAsset,
+      walletType: sourceWalletType
+    })
+  }, [sourceAsset, allBalances, sourceWalletType])
 
   // User balance for source asset
   const sourceAssetAmount: BaseAmount = useMemo(
@@ -340,7 +299,7 @@ export const Swap = ({
   const sourceAssetAmountMax1e8: BaseAmount = useMemo(() => max1e8BaseAmount(sourceAssetAmount), [sourceAssetAmount])
 
   // source chain asset
-  const sourceChainAsset = useMemo(() => getChainAsset(sourceAssetProp.chain), [sourceAssetProp])
+  const sourceChainAsset: Asset = useMemo(() => getChainAsset(sourceAsset.chain), [sourceAsset])
 
   // User balance for source chain asset
   const sourceChainAssetAmount: BaseAmount = useMemo(
@@ -377,8 +336,8 @@ export const Swap = ({
   const isZeroAmountToSwap = useMemo(() => amountToSwapMax1e8.amount().isZero(), [amountToSwapMax1e8])
 
   const zeroSwapFees = useMemo(
-    () => getZeroSwapFees({ inAsset: sourceAssetProp, outAsset: targetAssetProp }),
-    [sourceAssetProp, targetAssetProp]
+    () => getZeroSwapFees({ inAsset: sourceAsset, outAsset: targetAsset }),
+    [sourceAsset, targetAsset]
   )
 
   const prevChainFees = useRef<O.Option<SwapFees>>(O.none)
@@ -386,8 +345,8 @@ export const Swap = ({
   const [swapFeesRD] = useObservableState<SwapFeesRD>(() => {
     return FP.pipe(
       fees$({
-        inAsset: sourceAssetProp,
-        outAsset: targetAssetProp
+        inAsset: sourceAsset,
+        outAsset: targetAsset
       }),
       liveData.map((chainFees) => {
         // store every successfully loaded chainFees to the ref value
@@ -415,10 +374,10 @@ export const Swap = ({
     } = swapFees
 
     // no pricing if target asset === target fee asset
-    if (eqAsset.equals(targetAssetProp, outFeeAsset)) return outFeeAmount
+    if (eqAsset.equals(targetAsset, outFeeAsset)) return outFeeAmount
 
     const oTargetFeeAssetPoolData: O.Option<PoolData> = O.fromNullable(poolsData[assetToString(outFeeAsset)])
-    const oTargetAssetPoolData: O.Option<PoolData> = O.fromNullable(poolsData[assetToString(targetAssetProp)])
+    const oTargetAssetPoolData: O.Option<PoolData> = O.fromNullable(poolsData[assetToString(targetAsset)])
 
     return FP.pipe(
       sequenceTOption(oTargetFeeAssetPoolData, oTargetAssetPoolData),
@@ -437,17 +396,17 @@ export const Swap = ({
         }
       )
     )
-  }, [swapFees, targetAssetProp, poolsData, zeroTargetBaseAmountMax, targetAssetDecimal])
+  }, [swapFees, targetAsset, poolsData, zeroTargetBaseAmountMax, targetAssetDecimal])
 
   const swapData: SwapData = useMemo(
     () =>
       Utils.getSwapData({
         amountToSwap: amountToSwapMax1e8,
-        sourceAsset: oSourceAsset,
-        targetAsset: oTargetAsset,
+        sourceAsset: sourceAsset,
+        targetAsset: targetAsset,
         poolsData
       }),
-    [amountToSwapMax1e8, oSourceAsset, oTargetAsset, poolsData]
+    [amountToSwapMax1e8, sourceAsset, targetAsset, poolsData]
   )
 
   const swapResultAmountMax1e8: BaseAmount = useMemo(() => {
@@ -463,18 +422,10 @@ export const Swap = ({
   }, [outFeeInTargetAsset, swapData.swapResult, targetAssetDecimal, zeroTargetBaseAmountMax1e8])
 
   // Disable slippage selection temporary for Ledger/BTC (see https://github.com/thorchain/asgardex-electron/issues/2068)
-  const disableSlippage = useMemo(
-    () =>
-      FP.pipe(
-        oSourceAsset,
-        O.map(
-          ({ chain }) =>
-            (isBtcChain(chain) || isLtcChain(chain) || isBchChain(chain) || isDogeChain(chain)) && useSourceAssetLedger
-        ),
-        O.getOrElse(() => false)
-      ),
-    [useSourceAssetLedger, oSourceAsset]
-  )
+  const disableSlippage = useMemo(() => {
+    const chain = sourceAsset.chain
+    return (isBtcChain(chain) || isLtcChain(chain) || isBchChain(chain) || isDogeChain(chain)) && useSourceAssetLedger
+  }, [useSourceAssetLedger, sourceAsset])
 
   const swapLimit1e8: O.Option<BaseAmount> = useMemo(() => {
     // Disable slippage protection temporary for Ledger/BTC (see https://github.com/thorchain/asgardex-electron/issues/2068)
@@ -486,16 +437,16 @@ export const Swap = ({
   const oSwapParams: O.Option<SwapTxParams> = useMemo(
     () =>
       FP.pipe(
-        sequenceTOption(assetsToSwap, oPoolAddress, oTargetAddress, oSourceAssetWB),
-        O.map(([{ source, target }, poolAddress, address, { walletType, walletAddress, walletIndex, hdMode }]) => {
+        sequenceTOption(oPoolAddress, oTargetAddress, oSourceAssetWB),
+        O.map(([poolAddress, address, { walletType, walletAddress, walletIndex, hdMode }]) => {
           const memo = getSwapMemo({
-            asset: target,
+            asset: targetAsset,
             address,
             limit: O.toUndefined(swapLimit1e8) // limit needs to be in 1e8
           })
           return {
             poolAddress,
-            asset: source,
+            asset: sourceAsset,
             // Decimal needs to be converted back for using orginal decimal of source asset
             amount: convertBaseAmountDecimal(amountToSwapMax1e8, sourceAssetDecimal),
             memo,
@@ -506,7 +457,16 @@ export const Swap = ({
           }
         })
       ),
-    [assetsToSwap, oPoolAddress, oTargetAddress, oSourceAssetWB, swapLimit1e8, amountToSwapMax1e8, sourceAssetDecimal]
+    [
+      oPoolAddress,
+      oTargetAddress,
+      oSourceAssetWB,
+      targetAsset,
+      swapLimit1e8,
+      sourceAsset,
+      amountToSwapMax1e8,
+      sourceAssetDecimal
+    ]
   )
 
   const isCausedSlippage = useMemo(() => swapData.slip.toNumber() > slipTolerance, [swapData.slip, slipTolerance])
@@ -517,17 +477,17 @@ export const Swap = ({
     // Other chains than ETH do not need an approvement
     if (!isEthChain(sourceChainAsset.chain)) return false
     // ETH does not need to be approved
-    if (isEthAsset(sourceAssetProp)) return false
+    if (isEthAsset(sourceAsset)) return false
     // ERC20 token does need approvement only
-    return isEthTokenAsset(sourceAssetProp)
-  }, [keystore, sourceAssetProp, sourceChainAsset.chain])
+    return isEthTokenAsset(sourceAsset)
+  }, [keystore, sourceAsset, sourceChainAsset.chain])
 
   const oApproveParams: O.Option<ApproveParams> = useMemo(() => {
     const oRouterAddress: O.Option<Address> = FP.pipe(
       oPoolAddress,
       O.chain(({ router }) => router)
     )
-    const oTokenAddress: O.Option<string> = getEthTokenAddress(sourceAssetProp)
+    const oTokenAddress: O.Option<string> = getEthTokenAddress(sourceAsset)
 
     const oNeedApprovement: O.Option<boolean> = FP.pipe(
       needApprovement,
@@ -547,7 +507,7 @@ export const Swap = ({
         walletType
       }))
     )
-  }, [needApprovement, network, oPoolAddress, oSourceAssetWB, sourceAssetProp])
+  }, [needApprovement, network, oPoolAddress, oSourceAssetWB, sourceAsset])
 
   // Reload balances at `onMount`
   useEffect(() => {
@@ -557,10 +517,10 @@ export const Swap = ({
 
   const reloadFeesHandler = useCallback(() => {
     reloadFees({
-      inAsset: sourceAssetProp,
-      outAsset: targetAssetProp
+      inAsset: sourceAsset,
+      outAsset: targetAsset
     })
-  }, [reloadFees, sourceAssetProp, targetAssetProp])
+  }, [reloadFees, sourceAsset, targetAsset])
 
   const prevApproveFee = useRef<O.Option<BaseAmount>>(O.none)
 
@@ -646,19 +606,14 @@ export const Swap = ({
       // delay to avoid render issues while switching
       await delay(100)
 
-      FP.pipe(
-        oTargetAsset,
-        O.map((targetAsset) =>
-          onChangePath(
-            swap.path({
-              source: assetToString(asset),
-              target: assetToString(targetAsset)
-            })
-          )
-        )
+      onChangePath(
+        swap.path({
+          source: assetToString(asset),
+          target: assetToString(targetAsset)
+        })
       )
     },
-    [onChangePath, oTargetAsset]
+    [onChangePath, targetAsset]
   )
 
   const setTargetAsset = useCallback(
@@ -666,31 +621,26 @@ export const Swap = ({
       // delay to avoid render issues while switching
       await delay(100)
 
-      FP.pipe(
-        oSourceAsset,
-        O.map((sourceAsset) =>
-          onChangePath(
-            swap.path({
-              source: assetToString(sourceAsset),
-              target: assetToString(asset)
-            })
-          )
-        )
+      onChangePath(
+        swap.path({
+          source: assetToString(sourceAsset),
+          target: assetToString(asset)
+        })
       )
     },
-    [oSourceAsset, onChangePath]
+    [sourceAsset, onChangePath]
   )
 
   const minAmountToSwapMax1e8: BaseAmount = useMemo(
     () =>
       Utils.minAmountToSwapMax1e8({
         swapFees,
-        inAsset: sourceAssetProp,
+        inAsset: sourceAsset,
         inAssetDecimal: sourceAssetDecimal,
-        outAsset: targetAssetProp,
+        outAsset: targetAsset,
         poolsData
       }),
-    [poolsData, sourceAssetDecimal, sourceAssetProp, swapFees, targetAssetProp]
+    [poolsData, sourceAssetDecimal, sourceAsset, swapFees, targetAsset]
   )
 
   const minAmountError = useMemo(() => {
@@ -704,7 +654,7 @@ export const Swap = ({
       <Styled.MinAmountContainer>
         <Styled.MinAmountLabel color={minAmountError ? 'error' : 'gray'}>
           {`${intl.formatMessage({ id: 'common.min' })}: ${formatAssetAmountCurrency({
-            asset: sourceAssetProp,
+            asset: sourceAsset,
             amount: baseToAsset(minAmountToSwapMax1e8),
             trimZeros: true
           })}`}
@@ -715,7 +665,7 @@ export const Swap = ({
         />
       </Styled.MinAmountContainer>
     ),
-    [intl, minAmountError, minAmountToSwapMax1e8, sourceAssetProp]
+    [intl, minAmountError, minAmountToSwapMax1e8, sourceAsset]
   )
 
   // Max amount to swap
@@ -773,21 +723,16 @@ export const Swap = ({
   const _selectableSourceAssets: Asset[] = useMemo(
     () =>
       FP.pipe(
-        assetsToSwap,
-        O.map(({ source, target }) =>
-          FP.pipe(
-            allBalances,
-            // get asset
-            A.map(({ asset }) => asset),
-            // Ignore already selected source / target assets
-            A.filter((asset) => !eqAsset.equals(asset, source) && !eqAsset.equals(asset, target)),
-            // Merge duplications
-            (assets) => unionAssets(assets)(assets)
-          )
-        ),
-        O.getOrElse<Asset[]>(() => [])
+        allBalances,
+        // get asset
+        A.map(({ asset }) => asset),
+        // Ignore already selected source / target assets
+        A.filter((asset) => !eqAsset.equals(asset, sourceAsset) && !eqAsset.equals(asset, targetAsset)),
+        // Merge duplications
+        (assets) => unionAssets(assets)(assets)
       ),
-    [assetsToSwap, allBalances]
+
+    [allBalances, sourceAsset, targetAsset]
   )
 
   /**
@@ -799,19 +744,13 @@ export const Swap = ({
   const selectableTargetAssets = useMemo(
     (): Asset[] =>
       FP.pipe(
-        assetsToSwap,
-        O.map(({ source, target }) =>
-          FP.pipe(
-            allAssets,
-            // Ignore already selected source / target assets
-            A.filter((asset) => !eqAsset.equals(asset, source) && !eqAsset.equals(asset, target)),
-            // Merge duplications
-            (assets) => unionAssets(assets)(assets)
-          )
-        ),
-        O.getOrElse<Asset[]>(() => [])
+        poolAssets,
+        // Ignore already selected source / target assets
+        A.filter((asset) => !eqAsset.equals(asset, sourceAsset) && !eqAsset.equals(asset, targetAsset)),
+        // Merge duplications
+        (assets) => unionAssets(assets)(assets)
       ),
-    [allAssets, assetsToSwap]
+    [poolAssets, sourceAsset, targetAsset]
   )
 
   type ModalState = 'swap' | 'approve' | 'none'
@@ -897,51 +836,41 @@ export const Swap = ({
   ])
 
   const extraTxModalContent = useMemo(() => {
-    return FP.pipe(
-      sequenceTOption(oSourcePoolAsset, oTargetPoolAsset),
-      O.map(([sourceAssetWP, targetAssetWP]) => {
-        const targetAsset = targetAssetWP.asset
-        const sourceAsset = sourceAssetWP.asset
+    const stepLabels = [
+      intl.formatMessage({ id: 'common.tx.healthCheck' }),
+      intl.formatMessage({ id: 'common.tx.sending' }),
+      intl.formatMessage({ id: 'common.tx.checkResult' })
+    ]
+    const stepLabel = FP.pipe(
+      swapState.swap,
+      RD.fold(
+        () => '',
+        () =>
+          `${intl.formatMessage({ id: 'common.step' }, { current: swapState.step, total: swapState.stepsTotal })}: ${
+            stepLabels[swapState.step - 1]
+          }`,
+        () => '',
+        () => 'Done!'
+      )
+    )
 
-        const stepLabels = [
-          intl.formatMessage({ id: 'common.tx.healthCheck' }),
-          intl.formatMessage({ id: 'common.tx.sending' }),
-          intl.formatMessage({ id: 'common.tx.checkResult' })
-        ]
-        const stepLabel = FP.pipe(
-          swapState.swap,
-          RD.fold(
-            () => '',
-            () =>
-              `${intl.formatMessage(
-                { id: 'common.step' },
-                { current: swapState.step, total: swapState.stepsTotal }
-              )}: ${stepLabels[swapState.step - 1]}`,
-            () => '',
-            () => 'Done!'
-          )
-        )
-
-        return (
-          <SwapAssets
-            key="swap-assets"
-            source={{ asset: sourceAsset, amount: amountToSwapMax1e8 }}
-            target={{ asset: targetAsset, amount: swapResultAmountMax1e8 }}
-            stepDescription={stepLabel}
-            network={network}
-          />
-        )
-      }),
-      O.getOrElse(() => <></>)
+    return (
+      <SwapAssets
+        key="swap-assets"
+        source={{ asset: sourceAsset, amount: amountToSwapMax1e8 }}
+        target={{ asset: targetAsset, amount: swapResultAmountMax1e8 }}
+        stepDescription={stepLabel}
+        network={network}
+      />
     )
   }, [
-    oSourcePoolAsset,
-    oTargetPoolAsset,
     intl,
     swapState.swap,
     swapState.step,
     swapState.stepsTotal,
+    sourceAsset,
     amountToSwapMax1e8,
+    targetAsset,
     swapResultAmountMax1e8,
     network
   ])
@@ -985,11 +914,11 @@ export const Swap = ({
     )
 
     const oTxHash = FP.pipe(
-      sequenceTOption(oSourceAsset, RD.toOption(swapTx)),
+      RD.toOption(swapTx),
       // Note: As long as we link to `viewblock` to open tx details in a browser,
       // `0x` needs to be removed from tx hash in case of ETH
       // @see https://github.com/thorchain/asgardex-electron/issues/1787#issuecomment-931934508
-      O.map(([{ chain }, txHash]) => (isEthChain(chain) ? txHash.replace(/0x/i, '') : txHash))
+      O.map((txHash) => (isEthChain(sourceAsset.chain) ? txHash.replace(/0x/i, '') : txHash))
     )
 
     return (
@@ -1015,7 +944,7 @@ export const Swap = ({
     getExplorerTxUrl,
     goToTransaction,
     intl,
-    oSourceAsset,
+    sourceAsset,
     onFinishTxModal,
     resetSwapState,
     swapStartTime,
@@ -1045,64 +974,59 @@ export const Swap = ({
 
   const renderLedgerConfirmationModal = useMemo(() => {
     const visible = showLedgerModal === 'swap' || showLedgerModal === 'approve'
-    return FP.pipe(
-      oSourceAsset,
-      O.map((asset) => {
-        const onClose = () => {
-          setShowLedgerModal('none')
-        }
 
-        const onSucceess = () => {
-          if (showLedgerModal === 'swap') submitSwapTx()
-          if (showLedgerModal === 'approve') submitApproveTx()
-          setShowLedgerModal('none')
-        }
+    const onClose = () => {
+      setShowLedgerModal('none')
+    }
 
-        const chainAsString = chainToString(asset.chain)
-        const txtNeedsConnected = intl.formatMessage(
-          {
-            id: 'ledger.needsconnected'
-          },
-          { chain: chainAsString }
-        )
+    const onSucceess = () => {
+      if (showLedgerModal === 'swap') submitSwapTx()
+      if (showLedgerModal === 'approve') submitApproveTx()
+      setShowLedgerModal('none')
+    }
 
-        const description1 =
-          // extra info for ERC20 assets only
-          isEthChain(asset.chain) && !isEthAsset(asset)
-            ? `${txtNeedsConnected} ${intl.formatMessage(
-                {
-                  id: 'ledger.blindsign'
-                },
-                { chain: chainAsString }
-              )}`
-            : txtNeedsConnected
-
-        const description2 = intl.formatMessage({ id: 'ledger.sign' })
-
-        return (
-          <LedgerConfirmationModal
-            key="leder-conf-modal"
-            network={network}
-            onSuccess={onSucceess}
-            onClose={onClose}
-            visible={visible}
-            chain={asset.chain}
-            description1={description1}
-            description2={description2}
-            addresses={FP.pipe(
-              oSwapParams,
-              O.chain(({ poolAddress, sender }) => {
-                const recipient = poolAddress.address
-                if (useSourceAssetLedger) return O.some({ recipient, sender })
-                return O.none
-              })
-            )}
-          />
-        )
-      }),
-      O.toNullable
+    const chainAsString = chainToString(sourceAsset.chain)
+    const txtNeedsConnected = intl.formatMessage(
+      {
+        id: 'ledger.needsconnected'
+      },
+      { chain: chainAsString }
     )
-  }, [intl, network, oSourceAsset, oSwapParams, showLedgerModal, submitApproveTx, submitSwapTx, useSourceAssetLedger])
+
+    const description1 =
+      // extra info for ERC20 assets only
+      isEthChain(sourceAsset.chain) && !isEthAsset(sourceAsset)
+        ? `${txtNeedsConnected} ${intl.formatMessage(
+            {
+              id: 'ledger.blindsign'
+            },
+            { chain: chainAsString }
+          )}`
+        : txtNeedsConnected
+
+    const description2 = intl.formatMessage({ id: 'ledger.sign' })
+
+    return (
+      <LedgerConfirmationModal
+        key="leder-conf-modal"
+        network={network}
+        onSuccess={onSucceess}
+        onClose={onClose}
+        visible={visible}
+        chain={sourceAsset.chain}
+        description1={description1}
+        description2={description2}
+        addresses={FP.pipe(
+          oSwapParams,
+          O.chain(({ poolAddress, sender }) => {
+            const recipient = poolAddress.address
+            if (useSourceAssetLedger) return O.some({ recipient, sender })
+            return O.none
+          })
+        )}
+      />
+    )
+  }, [intl, network, sourceAsset, oSwapParams, showLedgerModal, submitApproveTx, submitSwapTx, useSourceAssetLedger])
 
   const sourceChainFeeError: boolean = useMemo(() => {
     // ignore error check by having zero amounts or min amount errors
@@ -1126,7 +1050,7 @@ export const Swap = ({
           { id: 'swap.errors.amount.balanceShouldCoverChainFee' },
           {
             balance: formatAssetAmountCurrency({
-              asset: getChainAsset(sourceAssetProp.chain),
+              asset: getChainAsset(sourceAsset.chain),
               amount: baseToAsset(sourceChainAssetAmount),
               trimZeros: true
             }),
@@ -1139,7 +1063,7 @@ export const Swap = ({
         )}
       </Styled.ErrorLabel>
     )
-  }, [sourceChainFeeError, swapFees, intl, sourceAssetProp.chain, sourceChainAssetAmount])
+  }, [sourceChainFeeError, swapFees, intl, sourceAsset.chain, sourceChainAssetAmount])
 
   // Label: Min amount to swap (<= 1e8)
   const swapMinResultLabel = useMemo(() => {
@@ -1157,11 +1081,11 @@ export const Swap = ({
     return disableSlippage
       ? '--'
       : `${formatAssetAmountCurrency({
-          asset: targetAssetProp,
+          asset: targetAsset,
           amount: baseToAsset(amountMax1e8),
           trimZeros: true
         })}`
-  }, [disableSlippage, swapLimit1e8, targetAssetDecimal, targetAssetProp])
+  }, [disableSlippage, swapLimit1e8, targetAssetDecimal, targetAsset])
 
   const uiFees: UIFeesRD = useMemo(
     () =>
@@ -1170,19 +1094,19 @@ export const Swap = ({
         RD.map(({ inFee }) => [
           { asset: inFee.asset, amount: inFee.amount },
           // price out fee in target asset
-          { asset: targetAssetProp, amount: outFeeInTargetAsset }
+          { asset: targetAsset, amount: outFeeInTargetAsset }
         ])
       ),
-    [swapFeesRD, targetAssetProp, outFeeInTargetAsset]
+    [swapFeesRD, targetAsset, outFeeInTargetAsset]
   )
 
   const uiApproveFeesRD: UIFeesRD = useMemo(
     () =>
       FP.pipe(
         approveFeeRD,
-        RD.map((approveFee) => [{ asset: getChainAsset(sourceAssetProp.chain), amount: approveFee }])
+        RD.map((approveFee) => [{ asset: getChainAsset(sourceAsset.chain), amount: approveFee }])
       ),
-    [approveFeeRD, sourceAssetProp.chain]
+    [approveFeeRD, sourceAsset.chain]
   )
 
   const isApproveFeeError = useMemo(() => {
@@ -1206,12 +1130,12 @@ export const Swap = ({
           { id: 'swap.errors.amount.balanceShouldCoverChainFee' },
           {
             balance: formatAssetAmountCurrency({
-              asset: getChainAsset(sourceAssetProp.chain),
+              asset: getChainAsset(sourceAsset.chain),
               amount: baseToAsset(sourceChainAssetAmount),
               trimZeros: true
             }),
             fee: formatAssetAmountCurrency({
-              asset: getChainAsset(sourceAssetProp.chain),
+              asset: getChainAsset(sourceAsset.chain),
               trimZeros: true,
               amount: baseToAsset(approveFee)
             })
@@ -1219,7 +1143,7 @@ export const Swap = ({
         )}
       </Styled.ErrorLabel>
     )
-  }, [isApproveFeeError, walletBalancesLoading, intl, sourceAssetProp.chain, sourceChainAssetAmount, approveFee])
+  }, [isApproveFeeError, walletBalancesLoading, intl, sourceAsset.chain, sourceChainAssetAmount, approveFee])
 
   const onApprove = useCallback(() => {
     if (useSourceAssetLedger) {
@@ -1281,13 +1205,13 @@ export const Swap = ({
         () => <></>,
         (error) => (
           <Styled.ErrorLabel align="center">
-            {intl.formatMessage({ id: 'common.approve.error' }, { asset: sourceAssetProp.ticker, error: error.msg })}
+            {intl.formatMessage({ id: 'common.approve.error' }, { asset: sourceAsset.ticker, error: error.msg })}
           </Styled.ErrorLabel>
         ),
         (_) => <></>
       )
     )
-  }, [checkIsApprovedError, intl, isApprovedState, sourceAssetProp.ticker])
+  }, [checkIsApprovedError, intl, isApprovedState, sourceAsset.ticker])
 
   const reset = useCallback(() => {
     // reset swap state
@@ -1315,13 +1239,13 @@ export const Swap = ({
   useEffect(() => {
     let doReset = false
     // reset data whenever source asset has been changed
-    if (!eqOAsset.equals(prevSourceAsset.current, O.some(sourceAssetProp))) {
-      prevSourceAsset.current = O.some(sourceAssetProp)
+    if (!eqOAsset.equals(prevSourceAsset.current, O.some(sourceAsset))) {
+      prevSourceAsset.current = O.some(sourceAsset)
       doReset = true
     }
     // reset data whenever target asset has been changed
-    if (!eqOAsset.equals(prevTargetAsset.current, O.some(targetAssetProp))) {
-      prevTargetAsset.current = O.some(targetAssetProp)
+    if (!eqOAsset.equals(prevTargetAsset.current, O.some(targetAsset))) {
+      prevTargetAsset.current = O.some(targetAsset)
       doReset = true
     }
     // reset only once
@@ -1329,42 +1253,36 @@ export const Swap = ({
 
     // Note: useEffect does depends on `sourceAssetProp`, `targetAssetProp` - ignore other values
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [sourceAssetProp, targetAssetProp])
+  }, [sourceAsset, targetAsset])
 
   const disableSwitchAssets = useMemo(() => {
     const hasTargetBalance = FP.pipe(
-      oTargetAsset,
-      O.chain((asset) => {
-        const oWalletBalances = NEA.fromArray(allBalances)
-        return getWalletBalanceByAssetAndWalletType({
+      allBalances,
+      NEA.fromArray,
+      (oWalletBalances) =>
+        getWalletBalanceByAssetAndWalletType({
           oWalletBalances,
-          asset,
+          asset: targetAsset,
           walletType: sourceWalletType
-        })
-      }),
+        }),
       O.map(({ amount }) => amount.gt(baseAmount(0, targetAssetDecimal))),
       O.getOrElse(() => false)
     )
 
     return !hasTargetBalance
-  }, [allBalances, oTargetAsset, sourceWalletType, targetAssetDecimal])
+  }, [allBalances, targetAsset, sourceWalletType, targetAssetDecimal])
 
   const onSwitchAssets = useCallback(async () => {
     // delay to avoid render issues while switching
     await delay(100)
 
-    FP.pipe(
-      assetsToSwap,
-      O.map(({ source, target }) =>
-        onChangePath(
-          swap.path({
-            target: assetToString(source),
-            source: assetToString(target)
-          })
-        )
-      )
+    onChangePath(
+      swap.path({
+        target: assetToString(sourceAsset),
+        source: assetToString(targetAsset)
+      })
     )
-  }, [assetsToSwap, onChangePath])
+  }, [onChangePath, sourceAsset, targetAsset])
 
   const disableSubmit: boolean = useMemo(
     () =>
@@ -1419,13 +1337,13 @@ export const Swap = ({
   const renderCustomAddressInput = useMemo(
     () =>
       FP.pipe(
-        sequenceTOption(oTargetAsset, oTargetWalletAddress),
+        oTargetWalletAddress,
         O.fold(
           () => <></>,
-          ([asset, address]) => (
+          (address) => (
             <EditableAddress
               key={address}
-              asset={asset}
+              asset={targetAsset}
               network={network}
               address={address}
               onClickOpenAddress={(address) => clickAddressLinkHandler(address)}
@@ -1437,7 +1355,7 @@ export const Swap = ({
           )
         )
       ),
-    [oTargetAsset, oTargetWalletAddress, network, onChangeTargetAddress, addressValidator, clickAddressLinkHandler]
+    [targetAsset, oTargetWalletAddress, network, onChangeTargetAddress, addressValidator, clickAddressLinkHandler]
   )
 
   const renderTargetWalletType = useMemo(() => {
@@ -1533,13 +1451,7 @@ export const Swap = ({
                         />
 
                         <div className="flex h-[80px] w-[200px] items-center justify-center bg-gray0">
-                          {FP.pipe(
-                            oSourceAsset,
-                            O.fold(
-                              () => <></>,
-                              (asset) => <AssetSelectButton asset={asset} network={network} />
-                            )
-                          )}
+                          <AssetSelectButton asset={sourceAsset} network={network} />
                         </div>
                       </div>
                       <div className="flex items-stretch">
@@ -1547,7 +1459,7 @@ export const Swap = ({
                           className="ml-5px"
                           color="neutral"
                           size="medium"
-                          balance={{ amount: maxAmountToSwapMax1e8, asset: sourceAssetProp }}
+                          balance={{ amount: maxAmountToSwapMax1e8, asset: sourceAsset }}
                           onClick={() => setAmountToSwapMax1e8(maxAmountToSwapMax1e8)}
                           disabled={lockedWallet}
                           maxInfoText={intl.formatMessage({ id: 'swap.info.max.fee' })}
@@ -1585,29 +1497,21 @@ export const Swap = ({
                       </div>
                       {renderMinAmount}
                     </Styled.ValueItemSourceWrapper>
-                    {FP.pipe(
-                      oSourceAsset,
-                      O.fold(
-                        () => <></>,
-                        (_asset) => (
-                          <Styled.AssetSelectContainer>
-                            {/* <Styled.AssetSelect
+                    <Styled.AssetSelectContainer>
+                      {/* <Styled.AssetSelect
                               onSelect={setSourceAsset}
-                              asset={asset}
+                              asset={sourceAsset}
                               assets={_selectableSourceAssets}
                               network={network}
                             /> */}
 
-                            {/* <Styled.CheckButton
+                      {/* <Styled.CheckButton
                               checked={useSourceAssetLedger}
                               clickHandler={onClickUseSourceAssetLedger}
                               disabled={!hasSourceAssetLedger}>
                               {intl.formatMessage({ id: 'ledger.title' })}
                             </Styled.CheckButton> */}
-                          </Styled.AssetSelectContainer>
-                        )
-                      )
-                    )}
+                    </Styled.AssetSelectContainer>
                   </Styled.ValueItemContainer>
 
                   <Styled.ValueItemContainer className="valueItemContainer-percent">
@@ -1642,28 +1546,20 @@ export const Swap = ({
                         />
                       </Styled.InMinValueContainer>
                     </div>
-                    {FP.pipe(
-                      oTargetAsset,
-                      O.fold(
-                        () => <></>,
-                        (asset) => (
-                          <Styled.AssetSelectContainer>
-                            <Styled.TargetAssetSelect
-                              onSelect={setTargetAsset}
-                              asset={asset}
-                              assets={selectableTargetAssets}
-                              network={network}
-                            />
-                            <Styled.CheckButton
-                              checked={useTargetAssetLedger}
-                              clickHandler={onClickUseTargetAssetLedger}
-                              disabled={!hasTargetAssetLedger}>
-                              {intl.formatMessage({ id: 'ledger.title' })}
-                            </Styled.CheckButton>
-                          </Styled.AssetSelectContainer>
-                        )
-                      )
-                    )}
+                    <Styled.AssetSelectContainer>
+                      <Styled.TargetAssetSelect
+                        onSelect={setTargetAsset}
+                        asset={targetAsset}
+                        assets={selectableTargetAssets}
+                        network={network}
+                      />
+                      <Styled.CheckButton
+                        checked={useTargetAssetLedger}
+                        clickHandler={onClickUseTargetAssetLedger}
+                        disabled={!hasTargetAssetLedger}>
+                        {intl.formatMessage({ id: 'ledger.title' })}
+                      </Styled.CheckButton>
+                    </Styled.AssetSelectContainer>
                   </Styled.ValueItemContainer>
                   {!lockedWallet && (
                     <Styled.TargetAddressContainer>
@@ -1684,7 +1580,7 @@ export const Swap = ({
                     // Order matters: Show states with shortest loading time before others
                     // (approve state takes just a short time to load, but needs to be displayed)
                     checkIsApproved
-                      ? intl.formatMessage({ id: 'common.approve.checking' }, { asset: sourceAssetProp.ticker })
+                      ? intl.formatMessage({ id: 'common.approve.checking' }, { asset: sourceAsset.ticker })
                       : walletBalancesLoading
                       ? intl.formatMessage({ id: 'common.balance.loading' })
                       : undefined

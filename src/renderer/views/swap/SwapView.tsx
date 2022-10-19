@@ -1,9 +1,10 @@
 import React, { useCallback, useEffect, useMemo } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
-import { Address, Asset, AssetRuneNative, bnOrZero, Chain, THORChain } from '@xchainjs/xchain-util'
+import { Address, Asset, AssetRuneNative, assetToString, Chain, THORChain } from '@xchainjs/xchain-util'
 import { Spin } from 'antd'
 import * as FP from 'fp-ts/function'
+import * as A from 'fp-ts/lib/Array'
 import * as O from 'fp-ts/lib/Option'
 import { useObservableState } from 'observable-hooks'
 import { useIntl } from 'react-intl'
@@ -21,7 +22,7 @@ import { useEthereumContext } from '../../contexts/EthereumContext'
 import { useMidgardContext } from '../../contexts/MidgardContext'
 import { useThorchainContext } from '../../contexts/ThorchainContext'
 import { useWalletContext } from '../../contexts/WalletContext'
-import { getAssetFromNullableString, isRuneNativeAsset } from '../../helpers/assetHelper'
+import { assetInList, getAssetFromNullableString } from '../../helpers/assetHelper'
 import { eqChain } from '../../helpers/fp/eq'
 import { sequenceTOption, sequenceTRD } from '../../helpers/fpHelpers'
 import { addressFromOptionalWalletAddress } from '../../helpers/walletHelper'
@@ -260,12 +261,24 @@ const SuccessRouteView: React.FC<Props> = ({ sourceAsset, targetAsset }): JSX.El
             () => <></>,
             () => <Spin size="large" />,
             renderError,
-            ([{ assetDetails: availableAssets, poolsData }, sourceAsset, targetAsset]) => {
-              const hasRuneAsset = Boolean(availableAssets.find(({ asset }) => isRuneNativeAsset(asset)))
-
+            ([{ assetDetails, poolsData }, sourceAsset, targetAsset]) => {
+              const poolAssets: Asset[] = FP.pipe(
+                assetDetails,
+                A.map(({ asset }) => asset)
+              )
+              const hasRuneAsset = FP.pipe(poolAssets, assetInList(AssetRuneNative))
               if (!hasRuneAsset) {
-                availableAssets.unshift({ asset: AssetRuneNative, assetPrice: bnOrZero(1) })
+                poolAssets.unshift(AssetRuneNative)
               }
+
+              // Make sure sourceAsset is available in pools
+              const hasSourceAsset = FP.pipe(poolAssets, assetInList(sourceAsset.asset))
+              if (!hasSourceAsset)
+                return renderError(Error(`Missing pool for source asset ${assetToString(sourceAsset.asset)}`))
+              // Make sure targetAsset is available in pools
+              const hasTargetAsset = FP.pipe(poolAssets, assetInList(targetAsset.asset))
+              if (!hasTargetAsset)
+                return renderError(Error(`Missing pool for target asset ${assetToString(targetAsset.asset)}`))
 
               return (
                 <Swap
@@ -275,11 +288,14 @@ const SuccessRouteView: React.FC<Props> = ({ sourceAsset, targetAsset }): JSX.El
                   validatePassword$={validatePassword$}
                   goToTransaction={openExplorerTxUrl}
                   getExplorerTxUrl={getExplorerTxUrl}
-                  assets={{ inAsset: sourceAsset, outAsset: targetAsset }}
+                  assets={{
+                    source: sourceAsset,
+                    target: targetAsset
+                  }}
                   sourceWalletAddress={oSourceKeystoreAddress}
                   sourceLedgerAddress={oSourceLedgerAddress}
                   poolAddress={selectedPoolAddress}
-                  availableAssets={availableAssets}
+                  poolAssets={poolAssets}
                   poolsData={poolsData}
                   walletBalances={balancesState}
                   reloadFees={reloadSwapFees}

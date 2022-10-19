@@ -10,7 +10,6 @@ import {
   assetToBase,
   assetToString,
   baseAmount,
-  bn,
   BNBChain
 } from '@xchainjs/xchain-util'
 import * as O from 'fp-ts/lib/Option'
@@ -18,7 +17,6 @@ import * as Rx from 'rxjs'
 import * as RxOp from 'rxjs/operators'
 
 import { mockValidatePassword$ } from '../../../shared/mock/wallet'
-import { ONE_BN } from '../../const'
 import { THORCHAIN_DECIMAL } from '../../helpers/assetHelper'
 import { INITIAL_SWAP_STATE } from '../../services/chain/const'
 import { SwapState } from '../../services/chain/types'
@@ -34,11 +32,8 @@ const defaultProps: SwapProps = {
   haltedChains: [],
   mimirHalt: DEFAULT_MIMIR_HALT,
   keystore: O.none,
-  availableAssets: [
-    { asset: AssetBTC, assetPrice: bn('56851.67420275761') },
-    { asset: AssetRuneNative, assetPrice: ONE_BN }
-  ],
-  assets: { inAsset: sourceAsset, outAsset: targetAsset },
+  poolAssets: [AssetBTC, AssetRuneNative],
+  assets: { source: sourceAsset, target: targetAsset },
   poolAddress: O.some({
     chain: BNBChain,
     address: 'vault-address',

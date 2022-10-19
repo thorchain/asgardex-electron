@@ -16,6 +16,7 @@ import {
   BNBChain,
   ETHChain
 } from '@xchainjs/xchain-util'
+import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
 
 import { ERC20_TESTNET } from '../../shared/mock/assets'
@@ -58,7 +59,8 @@ import {
   validAssetForETH,
   iconUrlInERC20Whitelist,
   isRuneAsset,
-  getAssetFromNullableString
+  getAssetFromNullableString,
+  assetInList
 } from './assetHelper'
 import { eqAsset, eqAssetAmount, eqBaseAmount, eqOAsset } from './fp/eq'
 
@@ -295,6 +297,23 @@ describe('helpers/assetHelper', () => {
     })
     it('UNIH - mainnet', () => {
       expect(validAssetForETH(AssetUniH, 'mainnet')).toBeFalsy()
+    })
+  })
+
+  describe('assetInList', () => {
+    const list = [AssetBNB, AssetBTC, AssetRuneNative]
+
+    it('AssetBNB', () => {
+      expect(FP.pipe(list, assetInList(AssetBNB))).toBeTruthy()
+    })
+    it('AssetBTC', () => {
+      expect(FP.pipe(list, assetInList(AssetBTC))).toBeTruthy()
+    })
+    it('RUNE-67C', () => {
+      expect(FP.pipe(list, assetInList(AssetRune67C))).toBeFalsy()
+    })
+    it('AssetETH', () => {
+      expect(FP.pipe(list, assetInList(AssetETH))).toBeFalsy()
     })
   })
 
