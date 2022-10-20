@@ -10,6 +10,7 @@ import { useIntl } from 'react-intl'
 import { Network } from '../../../../../shared/api/types'
 import { eqAsset } from '../../../../helpers/fp/eq'
 import { ordAsset } from '../../../../helpers/fp/ord'
+import { DownIcon } from '../../../icons'
 import { AssetData } from '../assetData'
 import { AssetMenu } from '../assetMenu'
 import * as Styled from './AssetSelect.styles'
@@ -90,25 +91,28 @@ export const AssetSelect: React.FC<Props> = (props): JSX.Element => {
     )
   }, [assets, intl, closeMenu, asset, withSearch, searchDisable, handleChangeAsset, network])
 
-  const hideButton = !assets.length
-  const disableButton = disabled || hideButton
-
   return (
     <Styled.AssetSelectWrapper
       className={`${className} ${openDropdown ? 'selected' : ''}`}
-      disabled={disableButton}
+      disabled={disabled}
       onClick={handleDropdownButtonClicked}>
       <Dropdown overlay={renderMenu} trigger={[]} visible={openDropdown} placement="bottom">
-        <>
+        <div className="group flex items-center">
           <AssetData noTicker={!showAssetName} className={'asset-data'} asset={asset} network={network} />
           <Styled.AssetDropdownButton>
-            {!hideButton && (
-              <Styled.DropdownIconHolder>
-                <Styled.DropdownIcon open={openDropdown} disabled={disableButton} />
-              </Styled.DropdownIconHolder>
-            )}
+            <DownIcon
+              className={`
+                scale-150
+                  ${disabled ? 'opacity-50' : 'opacity-100'}
+                ${openDropdown ? 'rotate-180' : 'rotate-0'}
+                transition
+                duration-200
+                ease-in-out
+                group-hover:rotate-180
+                `}
+            />
           </Styled.AssetDropdownButton>
-        </>
+        </div>
       </Dropdown>
     </Styled.AssetSelectWrapper>
   )

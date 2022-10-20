@@ -196,6 +196,8 @@ export const AssetCard: React.FC<Props> = (props): JSX.Element => {
                       (walletType) => (
                         <>
                           <Styled.CheckButton
+                            className="mr-5px"
+                            size="medium"
                             checked={isLedgerWallet(walletType)}
                             clickHandler={(checked) => onChangeWalletType(checked ? 'ledger' : 'keystore')}
                             disabled={walletTypeDisabled}>

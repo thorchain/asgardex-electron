@@ -19,11 +19,7 @@ export const AssetSelectButton: React.FC<Props> = (props): JSX.Element => {
       <AssetData asset={asset} network={network} />
       <div className="flex flex-row items-center border-none bg-transparent p-0 focus:outline-none">
         <div className="pt-5px">
-          <DownIcon
-            className={`scale-125
-
-                          `}
-          />
+          <DownIcon className="scale-125" />
         </div>
       </div>
     </div>

@@ -13,6 +13,7 @@ export type ComponentProps = {
   onClick: (amount: BaseAmount) => void
   disabled?: boolean
   className?: string
+  classNameButton?: string
 }
 
 export type Props = ComponentProps & Omit<ButtonProps, 'onClick'>
@@ -25,7 +26,8 @@ export const MaxBalanceButton: React.FC<Props> = (props): JSX.Element => {
     maxInfoText = '',
     color = 'primary',
     size = 'normal',
-    className = ''
+    className = '',
+    classNameButton = ''
   } = props
   const { amount, asset } = balance
 
@@ -35,7 +37,12 @@ export const MaxBalanceButton: React.FC<Props> = (props): JSX.Element => {
 
   return (
     <div className={`space-between flex items-center ${className}`}>
-      <TextButton color={color} size={size} disabled={disabled} onClick={onClickHandler} className="mr-5px w-auto !p-0">
+      <TextButton
+        color={color}
+        size={size}
+        disabled={disabled}
+        onClick={onClickHandler}
+        className={`mr-5px w-auto !p-0 ${classNameButton}`}>
         <span className="underline">{intl.formatMessage({ id: 'common.max' })}:</span>
         &nbsp;
         {formatAssetAmountCurrency({

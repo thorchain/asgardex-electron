@@ -1,6 +1,7 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
+import { ArrowSmDownIcon } from '@heroicons/react/solid'
 import { getSwapMemo, getValueOfAsset1InAsset2, PoolData } from '@thorchain/asgardex-util'
 import {
   Asset,
@@ -16,7 +17,6 @@ import {
   chainToString,
   Address
 } from '@xchainjs/xchain-util'
-import { Row } from 'antd'
 import BigNumber from 'bignumber.js'
 import * as A from 'fp-ts/Array'
 import * as FP from 'fp-ts/function'
@@ -92,8 +92,8 @@ import { TxModal } from '../modal/tx'
 import { SwapAssets } from '../modal/tx/extra'
 import { LoadingView } from '../shared/loading'
 import { AssetInput } from '../uielements/assets/assetInput'
-import { AssetSelectButton } from '../uielements/assets/assetSelect'
-import { FlatButton, ViewTxButton } from '../uielements/button'
+import { BaseButton, FlatButton, ViewTxButton } from '../uielements/button'
+import { CheckButton } from '../uielements/button/CheckButton'
 import { MaxBalanceButton } from '../uielements/button/MaxBalanceButton'
 import { WalletTypeLabel } from '../uielements/common/Common.styles'
 import { Fees, UIFeesRD } from '../uielements/fees'
@@ -246,7 +246,7 @@ export const Swap = ({
     [poolAssets, oWalletBalances]
   )
 
-  const _hasSourceAssetLedger = useMemo(
+  const hasSourceAssetLedger = useMemo(
     () => hasLedgerInBalancesByAsset(sourceAsset, allBalances),
     [sourceAsset, allBalances]
   )
@@ -601,7 +601,7 @@ export const Swap = ({
   // Swap start time
   const [swapStartTime, setSwapStartTime] = useState<number>(0)
 
-  const _setSourceAsset = useCallback(
+  const setSourceAsset = useCallback(
     async (asset: Asset) => {
       // delay to avoid render issues while switching
       await delay(100)
@@ -651,19 +651,22 @@ export const Swap = ({
 
   const renderMinAmount = useMemo(
     () => (
-      <Styled.MinAmountContainer>
-        <Styled.MinAmountLabel color={minAmountError ? 'error' : 'gray'}>
+      <div className="flex w-full items-center pl-10px pt-5px">
+        <p
+          className={`m-0 pr-5px font-main text-[12px] uppercase ${
+            minAmountError ? 'dark:error-0d text-error0' : 'text-gray2 dark:text-gray2d'
+          }`}>
           {`${intl.formatMessage({ id: 'common.min' })}: ${formatAssetAmountCurrency({
             asset: sourceAsset,
             amount: baseToAsset(minAmountToSwapMax1e8),
             trimZeros: true
           })}`}
-        </Styled.MinAmountLabel>
+        </p>
         <InfoIcon
           color={minAmountError ? 'error' : 'primary'}
           tooltip={intl.formatMessage({ id: 'swap.min.amount.info' })}
         />
-      </Styled.MinAmountContainer>
+      </div>
     ),
     [intl, minAmountError, minAmountToSwapMax1e8, sourceAsset]
   )
@@ -1358,17 +1361,7 @@ export const Swap = ({
     [targetAsset, oTargetWalletAddress, network, onChangeTargetAddress, addressValidator, clickAddressLinkHandler]
   )
 
-  const renderTargetWalletType = useMemo(() => {
-    return FP.pipe(
-      oTargetWalletType,
-      O.fold(
-        () => <></>,
-        (walletType) => <WalletTypeLabel>{walletType}</WalletTypeLabel>
-      )
-    )
-  }, [oTargetWalletType])
-
-  const _onClickUseSourceAssetLedger = useCallback(() => {
+  const onClickUseSourceAssetLedger = useCallback(() => {
     const useLedger = !useSourceAssetLedger
     setUseSourceAssetLedger(() => !useSourceAssetLedger)
     const oAddress = useLedger ? oSourceLedgerAddress : oInitialSourceWalletAddress
@@ -1390,13 +1383,13 @@ export const Swap = ({
           oSwapParams,
           O.fold(
             () => (
-              <div className="text-12px cursor-not-allowed text-center uppercase text-gray1 dark:text-gray1d">
+              <div className="dark:text-gray1dpx cursor-not-allowed text-center text-[12px] uppercase text-gray1 dark:text-gray1d">
                 {intl.formatMessage({ id: 'common.memo' })}
               </div>
             ),
             ({ memo }) => (
               <CopyLabel
-                className="text-12px uppercase text-gray1 hover:text-gray2 dark:text-gray1d dark:hover:text-gray2d"
+                className="dark:text-gray1dpx text-[12px] uppercase text-gray1 hover:text-gray2 dark:text-gray1d dark:hover:text-gray2d"
                 label={intl.formatMessage({ id: 'common.memo' })}
                 textToCopy={memo}
               />
@@ -1417,10 +1410,17 @@ export const Swap = ({
           key: 'default',
           // Content includes everything of Swap content
           content: (
-            <Styled.Container>
-              <Styled.ContentContainer>
-                <Styled.FormContainer>
-                  {/* <Styled.CurrencyInfoContainer>
+            <div
+              className="m-auto w-full max-w-[500px] flex-col justify-between
+            "
+              // border border-green-200
+            >
+              <div
+                className="
+              "
+                // border border-yellow-400
+              >
+                {/* <Styled.CurrencyInfoContainer>
                     <CurrencyInfo
                       slip={swapData.slip}
                       slipTolerance={slipTolerance}
@@ -1433,145 +1433,123 @@ export const Swap = ({
                     />
                   </Styled.CurrencyInfoContainer> */}
 
-                  <Styled.ValueItemContainer className={'valueItemContainer-source'}>
-                    <Styled.ValueItemSourceWrapper>
-                      <div className="flex items-center">
-                        {/* Note: Input value is shown as AssetAmount */}
-                        <AssetInput
-                          className="w-full md:w-auto"
-                          title={intl.formatMessage({ id: 'swap.input' })}
-                          titleTooltip={FP.pipe(
-                            oSourceWalletAddress,
-                            O.getOrElse(() => '')
-                          )}
-                          onChange={setAmountToSwapMax1e8}
-                          onBlur={reloadFeesHandler}
-                          amount={amountToSwapMax1e8}
-                          showError={minAmountError}
-                        />
+                <div className="flex flex-col">
+                  {/* Note: Input value is shown as AssetAmount */}
 
-                        <div className="flex h-[80px] w-[200px] items-center justify-center bg-gray0">
-                          <AssetSelectButton asset={sourceAsset} network={network} />
-                        </div>
-                      </div>
-                      <div className="flex items-stretch">
-                        <MaxBalanceButton
-                          className="ml-5px"
-                          color="neutral"
-                          size="medium"
-                          balance={{ amount: maxAmountToSwapMax1e8, asset: sourceAsset }}
-                          onClick={() => setAmountToSwapMax1e8(maxAmountToSwapMax1e8)}
-                          disabled={lockedWallet}
-                          maxInfoText={intl.formatMessage({ id: 'swap.info.max.fee' })}
-                        />
-                        <div className="flex grow items-center justify-end">
-                          <FlatButton
-                            className="!py-0 !px-2"
-                            size="small"
-                            color="neutral"
-                            onClick={() => setAmountToSwapFromPercentValue(25)}>
-                            25%
-                          </FlatButton>
-                          <FlatButton
-                            className="!py-0 !px-2"
-                            size="small"
-                            color="neutral"
-                            onClick={() => setAmountToSwapFromPercentValue(50)}>
-                            50%
-                          </FlatButton>
-                          <FlatButton
-                            className="!py-0 !px-2"
-                            size="small"
-                            color="neutral"
-                            onClick={() => setAmountToSwapFromPercentValue(75)}>
-                            75%
-                          </FlatButton>
-                          <FlatButton
-                            className="!py-0 !px-2"
-                            size="small"
-                            color="neutral"
-                            onClick={() => setAmountToSwapFromPercentValue(100)}>
-                            100%
-                          </FlatButton>
-                        </div>
-                      </div>
+                  <AssetInput
+                    className="w-full"
+                    title={intl.formatMessage({ id: 'swap.input' })}
+                    titleTooltip={FP.pipe(
+                      oSourceWalletAddress,
+                      O.getOrElse(() => '')
+                    )}
+                    asset={sourceAsset}
+                    assets={_selectableSourceAssets}
+                    network={network}
+                    onChangeAsset={setSourceAsset}
+                    onChange={setAmountToSwapMax1e8}
+                    onBlur={reloadFeesHandler}
+                    amount={amountToSwapMax1e8}
+                    showError={minAmountError}
+                  />
+
+                  <div className="flex flex-row">
+                    <div className="flex w-full flex-col">
+                      <MaxBalanceButton
+                        className="ml-10px mt-5px"
+                        classNameButton="!text-gray2 !dark:text-gray2d"
+                        size="medium"
+                        balance={{ amount: maxAmountToSwapMax1e8, asset: sourceAsset }}
+                        onClick={() => setAmountToSwapMax1e8(maxAmountToSwapMax1e8)}
+                        maxInfoText={intl.formatMessage({ id: 'swap.info.max.fee' })}
+                      />
                       {renderMinAmount}
-                    </Styled.ValueItemSourceWrapper>
-                    <Styled.AssetSelectContainer>
-                      {/* <Styled.AssetSelect
-                              onSelect={setSourceAsset}
-                              asset={sourceAsset}
-                              assets={_selectableSourceAssets}
-                              network={network}
-                            /> */}
-
-                      {/* <Styled.CheckButton
-                              checked={useSourceAssetLedger}
-                              clickHandler={onClickUseSourceAssetLedger}
-                              disabled={!hasSourceAssetLedger}>
-                              {intl.formatMessage({ id: 'ledger.title' })}
-                            </Styled.CheckButton> */}
-                    </Styled.AssetSelectContainer>
-                  </Styled.ValueItemContainer>
-
-                  <Styled.ValueItemContainer className="valueItemContainer-percent">
-                    {/* <Styled.SliderContainer>{renderSlider}</Styled.SliderContainer> */}
-                    <Styled.SwapOutlinedContainer>
-                      <Styled.SwapOutlined
-                        disabled={disableSwitchAssets}
-                        onClick={!disableSwitchAssets ? () => onSwitchAssets() : undefined}
-                      />
-                    </Styled.SwapOutlinedContainer>
-                  </Styled.ValueItemContainer>
-                  <Styled.ValueItemContainer className="valueItemContainer-target">
-                    <div className="flex w-full flex-col md:w-auto">
-                      <AssetInput
-                        className="w-full md:w-auto"
-                        title={intl.formatMessage({ id: 'swap.output' })}
-                        // Show swap result <= 1e8
-                        amount={swapResultAmountMax1e8}
-                        asLabel
-                      />
-                      <Styled.InMinValueContainer>
-                        <Styled.InMinValueLabel>
-                          {intl.formatMessage({ id: 'common.min' })}: {swapMinResultLabel}
-                        </Styled.InMinValueLabel>
-                        <InfoIcon
-                          color={disableSlippage ? 'warning' : 'primary'}
-                          tooltip={
-                            disableSlippage
-                              ? intl.formatMessage({ id: 'swap.slip.tolerance.ledger-disabled.info' })
-                              : intl.formatMessage({ id: 'swap.min.result.info' }, { tolerance: slipTolerance })
-                          }
-                        />
-                      </Styled.InMinValueContainer>
                     </div>
-                    <Styled.AssetSelectContainer>
-                      <Styled.TargetAssetSelect
-                        onSelect={setTargetAsset}
-                        asset={targetAsset}
-                        assets={selectableTargetAssets}
-                        network={network}
-                      />
-                      <Styled.CheckButton
-                        checked={useTargetAssetLedger}
-                        clickHandler={onClickUseTargetAssetLedger}
-                        disabled={!hasTargetAssetLedger}>
+                    <div className="flex w-[240px] flex-col items-center justify-start">
+                      <CheckButton
+                        size="small"
+                        color="neutral"
+                        className={`w-full rounded-b-lg bg-gray0 py-5px dark:bg-gray0d ${
+                          !hasSourceAssetLedger ? 'hidden' : ''
+                        }`}
+                        checked={useSourceAssetLedger}
+                        clickHandler={onClickUseSourceAssetLedger}>
                         {intl.formatMessage({ id: 'ledger.title' })}
-                      </Styled.CheckButton>
-                    </Styled.AssetSelectContainer>
-                  </Styled.ValueItemContainer>
-                  {!lockedWallet && (
-                    <Styled.TargetAddressContainer>
-                      <Row>
-                        <Styled.ValueTitle>{intl.formatMessage({ id: 'common.recipient' })}</Styled.ValueTitle>
-                        {renderTargetWalletType}
-                      </Row>
-                      {renderCustomAddressInput}
-                    </Styled.TargetAddressContainer>
-                  )}
-                </Styled.FormContainer>
-              </Styled.ContentContainer>
+                      </CheckButton>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="mb-20px flex w-full justify-center">
+                  <BaseButton
+                    disabled={disableSwitchAssets}
+                    onClick={!disableSwitchAssets ? () => onSwitchAssets() : undefined}
+                    className="group">
+                    <ArrowSmDownIcon
+                      className="ease h-[50px] w-[50px] text-turquoise
+                    group-hover:rotate-180
+                    "
+                    />
+                  </BaseButton>
+                </div>
+                <div className="flex flex-col">
+                  <AssetInput
+                    className="w-full md:w-auto"
+                    title={intl.formatMessage({ id: 'swap.output' })}
+                    // Show swap result <= 1e8
+                    amount={swapResultAmountMax1e8}
+                    asset={targetAsset}
+                    onChangeAsset={setTargetAsset}
+                    assets={selectableTargetAssets}
+                    network={network}
+                    asLabel
+                  />
+                  <div className="flex flex-row">
+                    <div className="flex w-full items-center">
+                      <p
+                        className={`m-0 pl-10px font-main text-[12px] uppercase text-gray2
+          dark:text-gray2d`}>
+                        {intl.formatMessage({ id: 'common.min' })}: {swapMinResultLabel}
+                      </p>
+                      <InfoIcon
+                        color={disableSlippage ? 'warning' : 'primary'}
+                        tooltip={
+                          disableSlippage
+                            ? intl.formatMessage({ id: 'swap.slip.tolerance.ledger-disabled.info' })
+                            : intl.formatMessage({ id: 'swap.min.result.info' }, { tolerance: slipTolerance })
+                        }
+                      />
+                    </div>
+                    <div className="flex w-[240px] flex-col items-center justify-start">
+                      <CheckButton
+                        size="small"
+                        color="neutral"
+                        className={`w-full rounded-b-lg bg-gray0 py-5px dark:bg-gray0d ${
+                          !hasSourceAssetLedger ? 'hidden' : ''
+                        }`}
+                        checked={useTargetAssetLedger}
+                        clickHandler={onClickUseTargetAssetLedger}>
+                        {intl.formatMessage({ id: 'ledger.title' })}
+                      </CheckButton>
+                    </div>
+                  </div>
+                </div>
+                {!lockedWallet && (
+                  <div className="mt-20px flex flex-col  px-10px">
+                    <div className="flex items-center">
+                      <h3 className="font-[12px] !mb-0 mr-10px w-auto p-0 font-main uppercase text-gray2 dark:text-gray2d">
+                        {intl.formatMessage({ id: 'common.recipient' })}
+                      </h3>
+                      {FP.pipe(
+                        oTargetWalletType,
+                        O.map((walletType) => <WalletTypeLabel key="target-w-type">{walletType}</WalletTypeLabel>),
+                        O.toNullable
+                      )}
+                    </div>
+                    {renderCustomAddressInput}
+                  </div>
+                )}
+              </div>
 
               {(walletBalancesLoading || checkIsApproved) && (
                 <LoadingView
@@ -1641,7 +1619,7 @@ export const Swap = ({
               {renderPasswordConfirmationModal}
               {renderLedgerConfirmationModal}
               {renderTxModal}
-            </Styled.Container>
+            </div>
           )
         }
       ]}

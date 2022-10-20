@@ -6,7 +6,6 @@ import { media } from '../../helpers/styleHelper'
 import { transition } from '../../settings/style-util'
 import { Tabs as TabsUI } from '../tabs/Tabs'
 import { AssetSelect as AssetSelectUI } from '../uielements/assets/assetSelect'
-import { CheckButton as CheckButtonUI } from '../uielements/button/CheckButton'
 import { Label as UILabel } from '../uielements/label'
 
 const ICON_SIZE = 16
@@ -52,17 +51,9 @@ export const Container = styled.div`
   flex-direction: column;
   justify-content: space-between;
   position: relative;
-  max-width: 538px;
+  max-width: 540px;
   width: 100%;
   margin: auto;
-  color: ${palette('text', 0)};
-  text-transform: uppercase;
-`
-
-export const SwapOutlinedContainer = styled.div`
-  display: flex;
-  width: 100%;
-  justify-content: center;
 `
 
 export const SwapOutlined = styled(ASwapOutlined).attrs({ rotate: 90 })<{ disabled: boolean }>`
@@ -88,10 +79,6 @@ export const SwapOutlined = styled(ASwapOutlined).attrs({ rotate: 90 })<{ disabl
       : ''};
 `
 
-export const FormContainer = styled.div`
-  position: relative;
-`
-
 export const CurrencyInfoContainer = styled.div`
   display: none;
   position: absolute;
@@ -108,55 +95,6 @@ export const CurrencyInfoContainer = styled.div`
   `}
 `
 
-export const ContentContainer = styled.div`
-  position: relative;
-  padding-bottom: 30px;
-`
-
-export const ValueItemContainer = styled.div`
-  display: flex;
-  flex-direction: column;
-  align-items: baseline;
-  width: 100%;
-  position: relative;
-
-  &.valueItemContainer {
-    &-source,
-    &-target {
-      align-items: center;
-    }
-
-    &-percent {
-      align-items: center;
-      margin: 20px 0;
-    }
-  }
-
-  ${media.md`
-    flex-direction: row;
-
-    &>*:first-child {
-      /* margin-right: 25px;
-      min-width: 63%; */
-    }
-  `}
-`
-
-export const ValueItemSourceWrapper = styled.div`
-  display: flex;
-  flex-direction: column;
-  width: 100%;
-
-  ${media.md`
-  width: auto;
-  `}
-`
-
-export const SliderContainer = styled.div`
-  width: 100%;
-  min-width: 212px;
-`
-
 export const InValueContainer = styled.div`
   display: flex;
   flex-direction: column;
@@ -169,11 +107,6 @@ export const InValueContainer = styled.div`
   `}
 `
 
-export const TargetAddressContainer = styled.div`
-  display: flex;
-  flex-direction: column;
-  padding-top: 20px;
-`
 export const ValueTitle = styled(UILabel).attrs({
   color: 'gray',
   textTransform: 'uppercase'
@@ -183,29 +116,6 @@ export const ValueTitle = styled(UILabel).attrs({
   padding: 0;
   font-size: 12px;
   width: auto;
-`
-
-export const InValueLabel = styled(UILabel).attrs({
-  color: 'normal'
-})`
-  padding-bottom: 0;
-  padding-left: 10px;
-  font-size: 24px;
-`
-export const InMinValueContainer = styled.div`
-  display: flex;
-  width: 100%;
-  align-items: center;
-  padding: 0 0 0 10px;
-`
-
-export const InMinValueLabel = styled(UILabel).attrs({
-  color: 'gray'
-})`
-  text-transform: uppercase;
-  width: auto;
-  padding-right: 5px;
-  font-size: 12px;
 `
 
 export const ErrorLabel = styled(UILabel)`
@@ -220,11 +130,6 @@ export const NoteLabel = styled(UILabel)`
   color: ${palette('text', 2)};
   text-align: center;
   text-transform: uppercase;
-`
-
-export const MinAmountContainer = styled.div`
-  display: flex;
-  align-items: center;
 `
 
 export const MinAmountLabel = styled(UILabel)`
@@ -246,17 +151,5 @@ export const SubmitContainer = styled.div`
   display: flex;
   flex-direction: column;
   justify-content: center;
-  align-items: center;
-`
-
-export const CheckButton = styled(CheckButtonUI)`
-  &.ant-btn {
-    font-size: 10px;
-  }
-`
-
-export const AssetSelectContainer = styled.div`
-  display: flex;
-  flex-direction: column;
   align-items: center;
 `

@@ -1,19 +1,25 @@
 import React, { useRef, useCallback, useState } from 'react'
 
-import { assetAmount, assetToBase, BaseAmount, baseToAsset } from '@xchainjs/xchain-util'
+import { Asset, assetAmount, assetToBase, BaseAmount, baseToAsset } from '@xchainjs/xchain-util'
 import BigNumber from 'bignumber.js'
 import * as FP from 'fp-ts/lib/function'
 
+import { Network } from '../../../../../shared/api/types'
 import { FixmeType } from '../../../../types/asgardex'
 import { TooltipAddress } from '../../common/Common.styles'
 import { InputBigNumber } from '../../input'
+import { AssetSelect } from '../assetSelect'
 
 export type Props = {
   title: string
   titleTooltip?: string
   amount: BaseAmount
+  asset: Asset
+  assets: Asset[]
+  network: Network
   disabled?: boolean
   showError?: boolean
+  onChangeAsset: (asset: Asset) => void
   onChange?: (value: BaseAmount) => void
   onBlur?: FP.Lazy<void>
   onFocus?: FP.Lazy<void>
@@ -34,16 +40,20 @@ export const AssetInput: React.FC<Props> = (props): JSX.Element => {
     title,
     titleTooltip = '',
     amount,
+    asset,
+    assets,
+    network,
     disabled = false,
     showError = false,
     className = '',
     asLabel = false,
+    onChangeAsset,
     onChange = FP.constVoid,
     onBlur = FP.constVoid,
     onFocus = FP.constVoid
   } = props
 
-  const inputRef = useRef<FixmeType>()
+  const inputWrapperRef = useRef<FixmeType>()
 
   const [focused, setFocused] = useState(false)
 
@@ -55,12 +65,13 @@ export const AssetInput: React.FC<Props> = (props): JSX.Element => {
   )
 
   const handleClickWrapper = useCallback(() => {
-    inputRef.current?.firstChild?.focus()
+    inputWrapperRef.current?.firstChild?.focus()
   }, [])
 
-  const titleClassName = `absolute left-[10px] top-[-15px] p-5px mb-[2px] cursor-default bg-bg0 dark:bg-bg0d font-main text-[14px]
-    ${showError ? 'text-error0 dark:text-error0d' : focused ? 'text-turquoise' : 'text-gray2 dark:text-gray2d'}
+  const titleClassName = `absolute left-[10px] top-[-15px] p-5px font-main text-[14px]
+    text-gray2 dark:text-gray2d m-0 bg-bg0 dark:bg-bg0d
     `
+
   const Title = () => <p className={titleClassName}>{title}</p>
 
   const TitleWithTooltip = () => (
@@ -83,35 +94,50 @@ export const AssetInput: React.FC<Props> = (props): JSX.Element => {
     <div
       className={`
       relative
-      flex min-w-[212px] flex-col
+      flex
       ${
         showError
           ? 'border-error0 dark:border-error0d'
           : focused
           ? 'border-turquoise'
-          : 'border-gray0 dark:border-gray0d'
+          : 'border-gray1 dark:border-gray1d'
       }
-      rounded-lg border-4
-      p-[4px] uppercase
+      ease
+      border
+      uppercase
       ${className}`}
+      ref={inputWrapperRef}
       onClick={handleClickWrapper}>
+      {/* title */}
       {titleTooltip ? <TitleWithTooltip /> : <Title />}
 
-      <div className="flex content-between items-start py-[10px]" ref={inputRef}>
-        <InputBigNumber
-          value={baseToAsset(amount).amount()}
-          onChange={onChangeHandler}
-          onBlur={onBlurHandler}
-          onFocus={onFocusHandler}
-          size="xlarge"
-          ghost
-          error={showError}
-          disabled={asLabel || disabled}
-          decimal={amount.decimal}
-          // override text style of input for acting as label only
-          className={asLabel ? 'text-text0 !opacity-100 dark:text-text0d' : ''}
-        />
-      </div>
+      <InputBigNumber
+        value={baseToAsset(amount).amount()}
+        onChange={onChangeHandler}
+        onBlur={onBlurHandler}
+        onFocus={onFocusHandler}
+        size="xlarge"
+        ghost
+        error={showError}
+        disabled={asLabel || disabled}
+        decimal={amount.decimal}
+        // override text style of input for acting as label only
+        className={`
+        !my-20px
+        w-full
+        border-r
+        border-gray1 dark:border-gray1d
+          ${asLabel ? 'text-text0 !opacity-100 dark:text-text0d' : ''}`}
+      />
+
+      <AssetSelect
+        className="w-[240px]"
+        onSelect={onChangeAsset}
+        asset={asset}
+        assets={assets}
+        network={network}
+        disabled={disabled}
+      />
     </div>
   )
 }
