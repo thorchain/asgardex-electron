@@ -6,7 +6,7 @@ const sizeClasses: Record<Size, string> = {
   small: 'px-[3px] py-[1px] text-[11px]',
   normal: 'px-[6px] py-[3px] text-[14px]',
   large: 'px-[10px] py-[4px] text-[21px]',
-  xlarge: 'px-[12px] py-[5px] text-[24px]'
+  xlarge: 'px-[15px] py-[5px] text-[27px]'
 }
 
 export type InputProps = Omit<React.InputHTMLAttributes<HTMLInputElement>, 'size'> & {

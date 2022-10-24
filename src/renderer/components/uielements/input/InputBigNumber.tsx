@@ -9,10 +9,12 @@ import { ZERO_BN } from '../../../const'
 import { eqBigNumber } from '../../../helpers/fp/eq'
 import { FixmeType } from '../../../types/asgardex'
 import { Input, InputProps } from './Input'
+import { Size } from './Input.types'
 import { formatValue, unformatValue, validInputValue, VALUE_ZERO, EMPTY_INPUT, truncateByDecimals } from './Input.util'
 
 type Props = Omit<InputProps, 'value' | 'onChange'> & {
   value?: BigNumber
+  size?: Size
   onChange?: (value: BigNumber) => void
   decimal?: number
   onPressEnter?: (value: BigNumber) => void
@@ -20,9 +22,10 @@ type Props = Omit<InputProps, 'value' | 'onChange'> & {
 
 export const InputBigNumber = forwardRef<HTMLInputElement, Props>((props: Props, ref: FixmeType): JSX.Element => {
   const {
-    decimal = 2,
+    size = 'normal',
     value = ZERO_BN,
     onChange = () => {},
+    decimal = 2,
     onFocus = FP.constVoid,
     onBlur = FP.constVoid,
     max,
@@ -154,6 +157,7 @@ export const InputBigNumber = forwardRef<HTMLInputElement, Props>((props: Props,
   return (
     <Input
       ref={ref}
+      size={size}
       value={FP.pipe(
         broadcastValue,
         O.getOrElse(() => EMPTY_INPUT)

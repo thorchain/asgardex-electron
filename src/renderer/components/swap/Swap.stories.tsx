@@ -18,6 +18,7 @@ import * as RxOp from 'rxjs/operators'
 
 import { mockValidatePassword$ } from '../../../shared/mock/wallet'
 import { THORCHAIN_DECIMAL } from '../../helpers/assetHelper'
+import { RUNE_PRICE_POOL } from '../../helpers/poolHelper'
 import { INITIAL_SWAP_STATE } from '../../services/chain/const'
 import { SwapState } from '../../services/chain/types'
 import { DEFAULT_MIMIR_HALT } from '../../services/thorchain/const'
@@ -40,6 +41,8 @@ const defaultProps: SwapProps = {
     router: O.some('router-address'),
     halted: false
   }),
+  poolDetails: [],
+  pricePool: RUNE_PRICE_POOL,
   // mock successfull result of swap$
   swap$: (params) =>
     Rx.of(params).pipe(

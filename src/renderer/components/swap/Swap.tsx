@@ -36,7 +36,8 @@ import {
   max1e8BaseAmount,
   convertBaseAmountDecimal,
   isChainAsset,
-  to1e8BaseAmount
+  to1e8BaseAmount,
+  THORCHAIN_DECIMAL
 } from '../../helpers/assetHelper'
 import { getChainAsset, isBchChain, isBtcChain, isDogeChain, isEthChain, isLtcChain } from '../../helpers/chainHelper'
 import { unionAssets } from '../../helpers/fp/array'
@@ -72,7 +73,7 @@ import {
   IsApproveParams,
   LoadApproveFeeHandler
 } from '../../services/ethereum/types'
-import { PoolAddress, PoolsDataMap } from '../../services/midgard/types'
+import { PoolAddress, PoolDetails, PoolsDataMap } from '../../services/midgard/types'
 import { MimirHalt } from '../../services/thorchain/types'
 import {
   ApiError,
@@ -85,8 +86,9 @@ import {
   WalletBalances
 } from '../../services/wallet/types'
 import { hasImportedKeystore, isLocked } from '../../services/wallet/util'
-import { AssetWithDecimal, SlipTolerance } from '../../types/asgardex'
+import { AssetWithAmount, AssetWithDecimal, SlipTolerance } from '../../types/asgardex'
 // import { CurrencyInfo } from '../currency'
+import { PricePool } from '../../views/pools/Pools.types'
 import { LedgerConfirmationModal, WalletPasswordConfirmationModal } from '../modal/confirmation'
 import { TxModal } from '../modal/tx'
 import { SwapAssets } from '../modal/tx/extra'
@@ -117,6 +119,8 @@ export type SwapProps = {
   poolAddress: O.Option<PoolAddress>
   swap$: SwapStateHandler
   poolsData: PoolsDataMap
+  pricePool: PricePool
+  poolDetails: PoolDetails
   walletBalances: Pick<BalancesState, 'balances' | 'loading'>
   goToTransaction: OpenExplorerTxUrl
   getExplorerTxUrl: GetExplorerTxUrl
@@ -150,6 +154,8 @@ export const Swap = ({
   poolAddress: oPoolAddress,
   swap$,
   poolsData,
+  poolDetails,
+  pricePool,
   walletBalances,
   goToTransaction,
   getExplorerTxUrl,
@@ -333,6 +339,21 @@ export const Swap = ({
     _setAmountToSwapMax1e8 /* private - never set it directly, use setAmountToSwap() instead */
   ] = useState(initialAmountToSwapMax1e8)
 
+  const priceAmountToSwapMax1e8: AssetWithAmount = useMemo(
+    () =>
+      FP.pipe(
+        PoolHelpers.getPoolPriceValue({
+          balance: { asset: sourceAsset, amount: amountToSwapMax1e8 },
+          poolDetails,
+          pricePoolData: pricePool.poolData,
+          network
+        }),
+        O.getOrElse(() => baseAmount(0, amountToSwapMax1e8.decimal)),
+        (amount) => ({ asset: pricePool.asset, amount })
+      ),
+    [amountToSwapMax1e8, network, poolDetails, pricePool, sourceAsset]
+  )
+
   const isZeroAmountToSwap = useMemo(() => amountToSwapMax1e8.amount().isZero(), [amountToSwapMax1e8])
 
   const zeroSwapFees = useMemo(
@@ -420,6 +441,21 @@ export const Swap = ({
     // don't show negative results
     return resultMax1e8.gt(zeroTargetBaseAmountMax1e8) ? resultMax1e8 : zeroTargetBaseAmountMax1e8
   }, [outFeeInTargetAsset, swapData.swapResult, targetAssetDecimal, zeroTargetBaseAmountMax1e8])
+
+  const priceSwapResultAmountMax1e8: AssetWithAmount = useMemo(
+    () =>
+      FP.pipe(
+        PoolHelpers.getPoolPriceValue({
+          balance: { asset: targetAsset, amount: swapResultAmountMax1e8 },
+          poolDetails,
+          pricePoolData: pricePool.poolData,
+          network
+        }),
+        O.getOrElse(() => baseAmount(0, THORCHAIN_DECIMAL /* default decimal*/)),
+        (amount) => ({ asset: pricePool.asset, amount })
+      ),
+    [swapResultAmountMax1e8, network, poolDetails, pricePool, targetAsset]
+  )
 
   // Disable slippage selection temporary for Ledger/BTC (see https://github.com/thorchain/asgardex-electron/issues/2068)
   const disableSlippage = useMemo(() => {
@@ -1410,16 +1446,8 @@ export const Swap = ({
           key: 'default',
           // Content includes everything of Swap content
           content: (
-            <div
-              className="m-auto w-full max-w-[500px] flex-col justify-between
-            "
-              // border border-green-200
-            >
-              <div
-                className="
-              "
-                // border border-yellow-400
-              >
+            <div className="m-auto w-full max-w-[500px] flex-col justify-between">
+              <div>
                 {/* <Styled.CurrencyInfoContainer>
                     <CurrencyInfo
                       slip={swapData.slip}
@@ -1443,13 +1471,13 @@ export const Swap = ({
                       oSourceWalletAddress,
                       O.getOrElse(() => '')
                     )}
-                    asset={sourceAsset}
+                    amount={{ amount: amountToSwapMax1e8, asset: sourceAsset }}
+                    priceAmount={priceAmountToSwapMax1e8}
                     assets={_selectableSourceAssets}
                     network={network}
                     onChangeAsset={setSourceAsset}
                     onChange={setAmountToSwapMax1e8}
                     onBlur={reloadFeesHandler}
-                    amount={amountToSwapMax1e8}
                     showError={minAmountError}
                   />
 
@@ -1457,7 +1485,7 @@ export const Swap = ({
                     <div className="flex w-full flex-col">
                       <MaxBalanceButton
                         className="ml-10px mt-5px"
-                        classNameButton="!text-gray2 !dark:text-gray2d"
+                        classNameButton="!text-gray2 dark:!text-gray2d"
                         size="medium"
                         balance={{ amount: maxAmountToSwapMax1e8, asset: sourceAsset }}
                         onClick={() => setAmountToSwapMax1e8(maxAmountToSwapMax1e8)}
@@ -1487,7 +1515,7 @@ export const Swap = ({
                     className="group">
                     <ArrowSmDownIcon
                       className="ease h-[50px] w-[50px] text-turquoise
-                    group-hover:rotate-180
+                   group-hover:rotate-180
                     "
                     />
                   </BaseButton>
@@ -1497,8 +1525,8 @@ export const Swap = ({
                     className="w-full md:w-auto"
                     title={intl.formatMessage({ id: 'swap.output' })}
                     // Show swap result <= 1e8
-                    amount={swapResultAmountMax1e8}
-                    asset={targetAsset}
+                    amount={{ amount: swapResultAmountMax1e8, asset: targetAsset }}
+                    priceAmount={priceSwapResultAmountMax1e8}
                     onChangeAsset={setTargetAsset}
                     assets={selectableTargetAssets}
                     network={network}
@@ -1507,8 +1535,8 @@ export const Swap = ({
                   <div className="flex flex-row">
                     <div className="flex w-full items-center">
                       <p
-                        className={`m-0 pl-10px font-main text-[12px] uppercase text-gray2
-          dark:text-gray2d`}>
+                        className="mb-0 mt-5px pl-10px font-main text-[12px] uppercase text-gray2
+          dark:text-gray2d">
                         {intl.formatMessage({ id: 'common.min' })}: {swapMinResultLabel}
                       </p>
                       <InfoIcon

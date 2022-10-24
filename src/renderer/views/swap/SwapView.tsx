@@ -25,6 +25,7 @@ import { useWalletContext } from '../../contexts/WalletContext'
 import { assetInList, getAssetFromNullableString } from '../../helpers/assetHelper'
 import { eqChain } from '../../helpers/fp/eq'
 import { sequenceTOption, sequenceTRD } from '../../helpers/fpHelpers'
+import { RUNE_PRICE_POOL } from '../../helpers/poolHelper'
 import { addressFromOptionalWalletAddress } from '../../helpers/walletHelper'
 import { useMimirHalt } from '../../hooks/useMimirHalt'
 import { useNetwork } from '../../hooks/useNetwork'
@@ -58,9 +59,12 @@ const SuccessRouteView: React.FC<Props> = ({ sourceAsset, targetAsset }): JSX.El
 
   const { service: midgardService } = useMidgardContext()
   const {
-    pools: { poolsState$, reloadPools, selectedPoolAddress$, haltedChains$ },
+    pools: { poolsState$, reloadPools, selectedPoolAddress$, selectedPricePool$, haltedChains$ },
     setSelectedPoolAsset
   } = midgardService
+
+  const pricePool = useObservableState(selectedPricePool$, RUNE_PRICE_POOL)
+
   const { reloadSwapFees, swapFees$, addressByChain$, swap$, assetWithDecimal$ } = useChainContext()
 
   const {
@@ -261,7 +265,7 @@ const SuccessRouteView: React.FC<Props> = ({ sourceAsset, targetAsset }): JSX.El
             () => <></>,
             () => <Spin size="large" />,
             renderError,
-            ([{ assetDetails, poolsData }, sourceAsset, targetAsset]) => {
+            ([{ assetDetails, poolsData, poolDetails }, sourceAsset, targetAsset]) => {
               const poolAssets: Asset[] = FP.pipe(
                 assetDetails,
                 A.map(({ asset }) => asset)
@@ -297,6 +301,8 @@ const SuccessRouteView: React.FC<Props> = ({ sourceAsset, targetAsset }): JSX.El
                   poolAddress={selectedPoolAddress}
                   poolAssets={poolAssets}
                   poolsData={poolsData}
+                  pricePool={pricePool}
+                  poolDetails={poolDetails}
                   walletBalances={balancesState}
                   reloadFees={reloadSwapFees}
                   fees$={swapFees$}
