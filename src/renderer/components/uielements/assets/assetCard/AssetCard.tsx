@@ -27,7 +27,7 @@ import { useClickOutside } from '../../../../hooks/useOutsideClick'
 import { AssetWithAddress } from '../../../../types/asgardex'
 import { TooltipAddress } from '../../common/Common.styles'
 import { InfoIcon } from '../../info'
-import * as InfoIconStyled from '../../info/InfoIcon.styles'
+import { Color as InfoIconColor } from '../../info/InfoIcon'
 import { Slider } from '../../slider'
 import { AssetMenu } from '../assetMenu'
 import * as Styled from './AssetCard.styles'
@@ -38,7 +38,7 @@ export type Props = {
   walletType: O.Option<WalletType>
   walletTypeDisabled: boolean
   walletTypeTooltip?: string
-  walletTypeTooltipColor?: InfoIconStyled.Color
+  walletTypeTooltipColor?: InfoIconColor
   onChangeWalletType: (walletType: WalletType) => void
   assets: Asset[]
   assetBalance: BaseAmount

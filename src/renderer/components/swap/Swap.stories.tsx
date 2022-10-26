@@ -10,6 +10,7 @@ import {
   assetToBase,
   assetToString,
   baseAmount,
+  bn,
   BNBChain
 } from '@xchainjs/xchain-util'
 import * as O from 'fp-ts/lib/Option'
@@ -17,16 +18,17 @@ import * as Rx from 'rxjs'
 import * as RxOp from 'rxjs/operators'
 
 import { mockValidatePassword$ } from '../../../shared/mock/wallet'
+import { ONE_BN } from '../../const'
 import { THORCHAIN_DECIMAL } from '../../helpers/assetHelper'
 import { RUNE_PRICE_POOL } from '../../helpers/poolHelper'
 import { INITIAL_SWAP_STATE } from '../../services/chain/const'
 import { SwapState } from '../../services/chain/types'
 import { DEFAULT_MIMIR_HALT } from '../../services/thorchain/const'
-import { AssetWithDecimal } from '../../types/asgardex'
 import { Swap as Component, SwapProps } from './Swap'
+import { SwapAsset } from './Swap.types'
 
-const sourceAsset: AssetWithDecimal = { asset: AssetRuneNative, decimal: THORCHAIN_DECIMAL }
-const targetAsset: AssetWithDecimal = { asset: AssetBTC, decimal: BTC_DECIMAL }
+const sourceAsset: SwapAsset = { asset: AssetRuneNative, decimal: THORCHAIN_DECIMAL, price: ONE_BN }
+const targetAsset: SwapAsset = { asset: AssetBTC, decimal: BTC_DECIMAL, price: bn('56851.67420275761') }
 
 /* Mock all (default) data needed by `Swap` commponent */
 const defaultProps: SwapProps = {

@@ -20,10 +20,12 @@ import * as O from 'fp-ts/lib/Option'
 
 import { PoolsWatchList } from '../../shared/api/io'
 import { ASSETS_TESTNET } from '../../shared/mock/assets'
+import { AssetBUSD74E } from '../const'
 import { PoolDetails } from '../services/midgard/types'
 import { toPoolData } from '../services/midgard/utils'
 import { DEFAULT_MIMIR_HALT } from '../services/thorchain/const'
 import { GetPoolsStatusEnum, PoolDetail } from '../types/generated/midgard'
+import { PricePool } from '../views/pools/Pools.types'
 import {
   disableAllActions,
   disablePoolActions,
@@ -139,9 +141,13 @@ describe('helpers/poolHelper/', () => {
         runeDepth: '10000000000'
       }
     ]
-    const usdPool: PoolData = {
-      assetBalance: assetToBase(assetAmount(110000)),
-      runeBalance: assetToBase(assetAmount(100000))
+
+    const usdPricePool: PricePool = {
+      asset: AssetBUSD74E,
+      poolData: {
+        assetBalance: assetToBase(assetAmount(110000)),
+        runeBalance: assetToBase(assetAmount(100000))
+      }
     }
 
     it('returns a price for BNB in USD', () => {
@@ -150,7 +156,7 @@ describe('helpers/poolHelper/', () => {
         asset: AssetBNB
       }
       const result = FP.pipe(
-        getPoolPriceValue({ balance, poolDetails, pricePoolData: usdPool, network: 'testnet' }),
+        getPoolPriceValue({ balance, poolDetails, pricePool: usdPricePool, network: 'testnet' }),
         O.fold(
           () => 'failure',
           (price) => price.amount().toString()
@@ -165,7 +171,7 @@ describe('helpers/poolHelper/', () => {
         asset: AssetRuneNative
       }
       const result = FP.pipe(
-        getPoolPriceValue({ balance, poolDetails: [], pricePoolData: usdPool, network: 'testnet' }),
+        getPoolPriceValue({ balance, poolDetails: [], pricePool: usdPricePool, network: 'testnet' }),
         O.fold(
           () => 'failure',
           (price) => price.amount().toString()
@@ -179,7 +185,7 @@ describe('helpers/poolHelper/', () => {
         amount: baseAmount('1'),
         asset: AssetBNB
       }
-      const result = getPoolPriceValue({ balance, poolDetails: [], pricePoolData: usdPool, network: 'testnet' })
+      const result = getPoolPriceValue({ balance, poolDetails: [], pricePool: usdPricePool, network: 'testnet' })
       expect(result).toBeNone()
     })
   })

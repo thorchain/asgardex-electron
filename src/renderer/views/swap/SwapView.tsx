@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useMemo } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
-import { Address, Asset, AssetRuneNative, assetToString, Chain, THORChain } from '@xchainjs/xchain-util'
+import { Address, Asset, AssetRuneNative, assetToString, bn, Chain, THORChain } from '@xchainjs/xchain-util'
 import { Spin } from 'antd'
 import * as FP from 'fp-ts/function'
 import * as A from 'fp-ts/lib/Array'
@@ -15,6 +15,7 @@ import { Network } from '../../../shared/api/types'
 import { SLIP_TOLERANCE_KEY } from '../../components/currency/CurrencyInfo'
 import { ErrorView } from '../../components/shared/error/'
 import { Swap } from '../../components/swap'
+import * as Utils from '../../components/swap/Swap.utils'
 import { Button, RefreshButton } from '../../components/uielements/button'
 import { useAppContext } from '../../contexts/AppContext'
 import { useChainContext } from '../../contexts/ChainContext'
@@ -266,23 +267,28 @@ const SuccessRouteView: React.FC<Props> = ({ sourceAsset, targetAsset }): JSX.El
             () => <Spin size="large" />,
             renderError,
             ([{ assetDetails, poolsData, poolDetails }, sourceAsset, targetAsset]) => {
+              const hasRuneAsset = FP.pipe(
+                assetDetails,
+                A.map(({ asset }) => asset),
+                assetInList(AssetRuneNative)
+              )
+              if (!hasRuneAsset) {
+                assetDetails = [{ asset: AssetRuneNative, assetPrice: bn(1) }, ...assetDetails]
+              }
+
+              const sourceAssetDetail = FP.pipe(Utils.pickPoolAsset(assetDetails, sourceAsset.asset), O.toNullable)
+              // Make sure sourceAsset is available in pools
+              if (!sourceAssetDetail)
+                return renderError(Error(`Missing pool for source asset ${assetToString(sourceAsset.asset)}`))
+              const targetAssetDetail = FP.pipe(Utils.pickPoolAsset(assetDetails, targetAsset.asset), O.toNullable)
+              // Make sure targetAsset is available in pools
+              if (!targetAssetDetail)
+                return renderError(Error(`Missing pool for target asset ${assetToString(targetAsset.asset)}`))
+
               const poolAssets: Asset[] = FP.pipe(
                 assetDetails,
                 A.map(({ asset }) => asset)
               )
-              const hasRuneAsset = FP.pipe(poolAssets, assetInList(AssetRuneNative))
-              if (!hasRuneAsset) {
-                poolAssets.unshift(AssetRuneNative)
-              }
-
-              // Make sure sourceAsset is available in pools
-              const hasSourceAsset = FP.pipe(poolAssets, assetInList(sourceAsset.asset))
-              if (!hasSourceAsset)
-                return renderError(Error(`Missing pool for source asset ${assetToString(sourceAsset.asset)}`))
-              // Make sure targetAsset is available in pools
-              const hasTargetAsset = FP.pipe(poolAssets, assetInList(targetAsset.asset))
-              if (!hasTargetAsset)
-                return renderError(Error(`Missing pool for target asset ${assetToString(targetAsset.asset)}`))
 
               return (
                 <Swap
@@ -293,8 +299,8 @@ const SuccessRouteView: React.FC<Props> = ({ sourceAsset, targetAsset }): JSX.El
                   goToTransaction={openExplorerTxUrl}
                   getExplorerTxUrl={getExplorerTxUrl}
                   assets={{
-                    source: sourceAsset,
-                    target: targetAsset
+                    source: { ...sourceAsset, price: sourceAssetDetail.assetPrice },
+                    target: { ...targetAsset, price: targetAssetDetail.assetPrice }
                   }}
                   sourceWalletAddress={oSourceKeystoreAddress}
                   sourceLedgerAddress={oSourceLedgerAddress}

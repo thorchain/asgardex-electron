@@ -1,6 +1,8 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
+import { Disclosure, Transition } from '@headlessui/react'
+import { ArrowCircleUpIcon, MinusIcon, PlusIcon } from '@heroicons/react/outline'
 import { ArrowSmDownIcon } from '@heroicons/react/solid'
 import { getSwapMemo, getValueOfAsset1InAsset2, PoolData } from '@thorchain/asgardex-util'
 import {
@@ -37,14 +39,16 @@ import {
   convertBaseAmountDecimal,
   isChainAsset,
   to1e8BaseAmount,
-  THORCHAIN_DECIMAL
+  THORCHAIN_DECIMAL,
+  isUSDAsset
 } from '../../helpers/assetHelper'
 import { getChainAsset, isBchChain, isBtcChain, isDogeChain, isEthChain, isLtcChain } from '../../helpers/chainHelper'
 import { unionAssets } from '../../helpers/fp/array'
 import { eqAsset, eqBaseAmount, eqOAsset, eqOApproveParams, eqAddress, eqOAddress } from '../../helpers/fp/eq'
-import { sequenceTOption } from '../../helpers/fpHelpers'
+import { sequenceSOption, sequenceTOption } from '../../helpers/fpHelpers'
 import * as PoolHelpers from '../../helpers/poolHelper'
 import { liveData, LiveData } from '../../helpers/rx/liveData'
+import { emptyString, loadingString, noDataString } from '../../helpers/stringHelper'
 import {
   filterWalletBalancesByAssets,
   getWalletBalanceByAssetAndWalletType,
@@ -86,7 +90,7 @@ import {
   WalletBalances
 } from '../../services/wallet/types'
 import { hasImportedKeystore, isLocked } from '../../services/wallet/util'
-import { AssetWithAmount, AssetWithDecimal, SlipTolerance } from '../../types/asgardex'
+import { AssetWithAmount, SlipTolerance } from '../../types/asgardex'
 // import { CurrencyInfo } from '../currency'
 import { PricePool } from '../../views/pools/Pools.types'
 import { LedgerConfirmationModal, WalletPasswordConfirmationModal } from '../modal/confirmation'
@@ -104,15 +108,15 @@ import { CopyLabel } from '../uielements/label'
 import { Slider } from '../uielements/slider'
 import { EditableAddress } from './EditableAddress'
 import * as Styled from './Swap.styles'
-import { SwapData } from './Swap.types'
+import { SwapAsset, SwapData } from './Swap.types'
 import * as Utils from './Swap.utils'
 
 export type SwapProps = {
   keystore: KeystoreState
   poolAssets: Asset[]
   assets: {
-    source: AssetWithDecimal
-    target: AssetWithDecimal
+    source: SwapAsset
+    target: SwapAsset
   }
   sourceWalletAddress: O.Option<Address>
   sourceLedgerAddress: O.Option<Address>
@@ -148,7 +152,10 @@ export type SwapProps = {
 export const Swap = ({
   keystore,
   poolAssets,
-  assets: { source: sourceAssetWD, target: targetAssetWD },
+  assets: {
+    source: { asset: sourceAsset, decimal: sourceAssetDecimal, price: sourceAssetPrice },
+    target: { asset: targetAsset, decimal: targetAssetDecimal, price: targetAssetPrice }
+  },
   sourceWalletAddress: oInitialSourceWalletAddress,
   sourceLedgerAddress: oSourceLedgerAddress,
   poolAddress: oPoolAddress,
@@ -181,7 +188,7 @@ export const Swap = ({
 }: SwapProps) => {
   const intl = useIntl()
 
-  const lockedWallet = useMemo(() => isLocked(keystore) || !hasImportedKeystore(keystore), [keystore])
+  const lockedWallet: boolean = useMemo(() => isLocked(keystore) || !hasImportedKeystore(keystore), [keystore])
 
   const [oSourceWalletAddress, setSourceWalletAddress] = useState<O.Option<Address>>(oInitialSourceWalletAddress)
 
@@ -201,9 +208,6 @@ export const Swap = ({
   }, [oInitialTargetWalletAddress])
 
   const { balances: oWalletBalances, loading: walletBalancesLoading } = walletBalances
-
-  const { asset: sourceAsset, decimal: sourceAssetDecimal } = sourceAssetWD
-  const { asset: targetAsset, decimal: targetAssetDecimal } = targetAssetWD
 
   // ZERO `BaseAmount` for target Asset - original decimal
   const zeroTargetBaseAmountMax = useMemo(() => baseAmount(0, targetAssetDecimal), [targetAssetDecimal])
@@ -345,7 +349,7 @@ export const Swap = ({
         PoolHelpers.getPoolPriceValue({
           balance: { asset: sourceAsset, amount: amountToSwapMax1e8 },
           poolDetails,
-          pricePoolData: pricePool.poolData,
+          pricePool,
           network
         }),
         O.getOrElse(() => baseAmount(0, amountToSwapMax1e8.decimal)),
@@ -386,6 +390,143 @@ export const Swap = ({
         O.getOrElse(() => zeroSwapFees)
       ),
     [swapFeesRD, zeroSwapFees]
+  )
+
+  // Price of swap IN fee
+  const oPriceSwapInFee: O.Option<AssetWithAmount> = useMemo(() => {
+    const asset = swapFees.inFee.asset
+    const amount = swapFees.inFee.amount
+
+    return FP.pipe(
+      PoolHelpers.getPoolPriceValue({
+        balance: { asset, amount },
+        poolDetails,
+        pricePool,
+        network
+      }),
+      O.map((amount) => ({ amount, asset: pricePool.asset }))
+    )
+  }, [network, poolDetails, pricePool, swapFees])
+
+  const priceSwapInFeeLabel = useMemo(
+    () =>
+      FP.pipe(
+        swapFeesRD,
+        RD.fold(
+          () => loadingString,
+          () => loadingString,
+          () => noDataString,
+          ({ inFee: { amount, asset: feeAsset } }) => {
+            const fee = formatAssetAmountCurrency({
+              amount: baseToAsset(amount),
+              asset: feeAsset,
+              decimal: isUSDAsset(feeAsset) ? 2 : 6,
+              trimZeros: !isUSDAsset(feeAsset)
+            })
+            const price = FP.pipe(
+              oPriceSwapInFee,
+              O.map(({ amount, asset: priceAsset }) =>
+                eqAsset.equals(feeAsset, priceAsset)
+                  ? emptyString
+                  : `(${formatAssetAmountCurrency({
+                      amount: baseToAsset(amount),
+                      asset: priceAsset,
+                      decimal: isUSDAsset(priceAsset) ? 2 : 6,
+                      trimZeros: !isUSDAsset(priceAsset)
+                    })})`
+              ),
+              O.getOrElse(() => emptyString)
+            )
+
+            return `${fee} ${price}`
+          }
+        )
+      ),
+
+    [oPriceSwapInFee, swapFeesRD]
+  )
+
+  // Price of swap OUT fee
+  const oPriceSwapOutFee: O.Option<AssetWithAmount> = useMemo(() => {
+    const asset = swapFees.outFee.asset
+    const amount = swapFees.outFee.amount
+
+    return FP.pipe(
+      PoolHelpers.getPoolPriceValue({
+        balance: { asset, amount },
+        poolDetails,
+        pricePool,
+        network
+      }),
+      O.map((amount) => ({ asset: pricePool.asset, amount }))
+    )
+  }, [network, poolDetails, pricePool, swapFees])
+
+  const priceSwapOutFeeLabel = useMemo(
+    () =>
+      FP.pipe(
+        swapFeesRD,
+        RD.fold(
+          () => loadingString,
+          () => loadingString,
+          () => noDataString,
+          ({ outFee: { amount, asset: feeAsset } }) => {
+            const fee = formatAssetAmountCurrency({
+              amount: baseToAsset(amount),
+              asset: feeAsset,
+              decimal: isUSDAsset(feeAsset) ? 2 : 6,
+              trimZeros: !isUSDAsset(feeAsset)
+            })
+            const price = FP.pipe(
+              oPriceSwapOutFee,
+              O.map(({ amount, asset: priceAsset }) =>
+                eqAsset.equals(feeAsset, priceAsset)
+                  ? emptyString
+                  : `(${formatAssetAmountCurrency({
+                      amount: baseToAsset(amount),
+                      asset: priceAsset,
+                      decimal: isUSDAsset(priceAsset) ? 2 : 6,
+                      trimZeros: !isUSDAsset(priceAsset)
+                    })})`
+              ),
+              O.getOrElse(() => emptyString)
+            )
+
+            return `${fee} ${price}`
+          }
+        )
+      ),
+
+    [oPriceSwapOutFee, swapFeesRD]
+  )
+
+  /**
+   * Price sum of swap fees (IN + OUT)
+   */
+  const oPriceSwapFees1e8: O.Option<AssetWithAmount> = useMemo(
+    () =>
+      FP.pipe(
+        sequenceSOption({ inFee: oPriceSwapInFee, outFee: oPriceSwapOutFee }),
+        O.map(({ inFee, outFee }) => {
+          const in1e8 = to1e8BaseAmount(inFee.amount)
+          const out1e8 = to1e8BaseAmount(outFee.amount)
+          return { asset: inFee.asset, amount: in1e8.plus(out1e8) }
+        })
+      ),
+    [oPriceSwapInFee, oPriceSwapOutFee]
+  )
+
+  const priceSwapFeesLabel = useMemo(
+    () =>
+      FP.pipe(
+        oPriceSwapFees1e8,
+        O.map(({ amount, asset }) =>
+          formatAssetAmountCurrency({ amount: baseToAsset(amount), asset, decimal: isUSDAsset(asset) ? 2 : 6 })
+        ),
+        O.getOrElse(() => '--')
+      ),
+
+    [oPriceSwapFees1e8]
   )
 
   // Helper to price target fees into source asset - original decimal
@@ -442,13 +583,16 @@ export const Swap = ({
     return resultMax1e8.gt(zeroTargetBaseAmountMax1e8) ? resultMax1e8 : zeroTargetBaseAmountMax1e8
   }, [outFeeInTargetAsset, swapData.swapResult, targetAssetDecimal, zeroTargetBaseAmountMax1e8])
 
+  /**
+   * Price of swap result in max 1e8
+   */
   const priceSwapResultAmountMax1e8: AssetWithAmount = useMemo(
     () =>
       FP.pipe(
         PoolHelpers.getPoolPriceValue({
           balance: { asset: targetAsset, amount: swapResultAmountMax1e8 },
           poolDetails,
-          pricePoolData: pricePool.poolData,
+          pricePool,
           network
         }),
         O.getOrElse(() => baseAmount(0, THORCHAIN_DECIMAL /* default decimal*/)),
@@ -506,6 +650,38 @@ export const Swap = ({
   )
 
   const isCausedSlippage = useMemo(() => swapData.slip.toNumber() > slipTolerance, [swapData.slip, slipTolerance])
+
+  type RateDirection = 'fromSource' | 'fromTarget'
+  const [rateDirection, setRateDirection] = useState<RateDirection>('fromSource')
+
+  const rateLabel = useMemo(() => {
+    switch (rateDirection) {
+      case 'fromSource':
+        return `${formatAssetAmountCurrency({
+          asset: sourceAsset,
+          amount: assetAmount(1),
+          decimal: isUSDAsset(sourceAsset) ? 2 : 6,
+          trimZeros: true
+        })}${' '}=${' '}${formatAssetAmountCurrency({
+          asset: targetAsset,
+          amount: assetAmount(sourceAssetPrice.dividedBy(targetAssetPrice)),
+          decimal: isUSDAsset(targetAsset) ? 2 : 6,
+          trimZeros: true
+        })}`
+      case 'fromTarget':
+        return `${formatAssetAmountCurrency({
+          asset: targetAsset,
+          decimal: isUSDAsset(targetAsset) ? 2 : 6,
+          amount: assetAmount(1),
+          trimZeros: true
+        })}${' '}=${' '}${formatAssetAmountCurrency({
+          asset: sourceAsset,
+          decimal: isUSDAsset(sourceAsset) ? 2 : 6,
+          amount: assetAmount(targetAssetPrice.dividedBy(sourceAssetPrice)),
+          trimZeros: true
+        })}`
+    }
+  }, [rateDirection, sourceAsset, sourceAssetPrice, targetAsset, targetAssetPrice])
 
   const needApprovement = useMemo(() => {
     // not needed for users with locked or not imported wallets
@@ -699,7 +875,9 @@ export const Swap = ({
           })}`}
         </p>
         <InfoIcon
-          color={minAmountError ? 'error' : 'primary'}
+          // override color
+          className={`${minAmountError ? '' : 'text-gray2 dark:text-gray2d'}`}
+          color={minAmountError ? 'error' : 'neutral'}
           tooltip={intl.formatMessage({ id: 'swap.min.amount.info' })}
         />
       </div>
@@ -1373,30 +1551,6 @@ export const Swap = ({
     [oTargetLedgerAddress]
   )
 
-  const renderCustomAddressInput = useMemo(
-    () =>
-      FP.pipe(
-        oTargetWalletAddress,
-        O.fold(
-          () => <></>,
-          (address) => (
-            <EditableAddress
-              key={address}
-              asset={targetAsset}
-              network={network}
-              address={address}
-              onClickOpenAddress={(address) => clickAddressLinkHandler(address)}
-              onChangeAddress={onChangeTargetAddress}
-              onChangeEditableAddress={(newAddress) => setEditableTargetWalletAddress(O.some(newAddress))}
-              onChangeEditableMode={(editModeActive) => setCustomAddressEditActive(editModeActive)}
-              addressValidator={addressValidator}
-            />
-          )
-        )
-      ),
-    [targetAsset, oTargetWalletAddress, network, onChangeTargetAddress, addressValidator, clickAddressLinkHandler]
-  )
-
   const onClickUseSourceAssetLedger = useCallback(() => {
     const useLedger = !useSourceAssetLedger
     setUseSourceAssetLedger(() => !useSourceAssetLedger)
@@ -1412,20 +1566,20 @@ export const Swap = ({
     setEditableTargetWalletAddress(oAddress)
   }, [oInitialTargetWalletAddress, oTargetLedgerAddress, useTargetAssetLedger])
 
-  const renderMemo = useMemo(
+  const memoTitle = useMemo(
     () => (
-      <div className="flex items-center justify-center pt-20px">
+      <div className="flex items-center justify-center">
         {FP.pipe(
           oSwapParams,
           O.fold(
             () => (
-              <div className="dark:text-gray1dpx cursor-not-allowed text-center text-[12px] uppercase text-gray1 dark:text-gray1d">
+              <div className="dark:text-gray1dpx cursor-not-allowed text-center font-mainSemiBold text-[14px] uppercase text-gray1 dark:text-gray1d">
                 {intl.formatMessage({ id: 'common.memo' })}
               </div>
             ),
             ({ memo }) => (
               <CopyLabel
-                className="dark:text-gray1dpx text-[12px] uppercase text-gray1 hover:text-gray2 dark:text-gray1d dark:hover:text-gray2d"
+                className="dark:text-gray1dpx font-mainSemiBold text-[14px] uppercase text-gray1 hover:text-gray2 dark:text-gray1d dark:hover:text-gray2d"
                 label={intl.formatMessage({ id: 'common.memo' })}
                 textToCopy={memo}
               />
@@ -1436,6 +1590,17 @@ export const Swap = ({
     ),
     [intl, oSwapParams]
   )
+
+  const memoLabel = useMemo(
+    () =>
+      FP.pipe(
+        oSwapParams,
+        O.map(({ memo }) => memo),
+        O.getOrElse(() => emptyString)
+      ),
+    [oSwapParams]
+  )
+
   return (
     // Note: Just one Tab to use as same styles as for other views (deposit / wallet)
     <Styled.Tabs
@@ -1486,14 +1651,15 @@ export const Swap = ({
                       <MaxBalanceButton
                         className="ml-10px mt-5px"
                         classNameButton="!text-gray2 dark:!text-gray2d"
+                        classNameIcon="text-gray2 dark:text-gray2d"
                         size="medium"
                         balance={{ amount: maxAmountToSwapMax1e8, asset: sourceAsset }}
                         onClick={() => setAmountToSwapMax1e8(maxAmountToSwapMax1e8)}
                         maxInfoText={intl.formatMessage({ id: 'swap.info.max.fee' })}
                       />
-                      {renderMinAmount}
+                      {minAmountError && renderMinAmount}
                     </div>
-                    <div className="flex w-[240px] flex-col items-center justify-start">
+                    <div className="flex w-[250px] flex-col items-center justify-start">
                       <CheckButton
                         size="small"
                         color="neutral"
@@ -1533,22 +1699,23 @@ export const Swap = ({
                     asLabel
                   />
                   <div className="flex flex-row">
-                    <div className="flex w-full items-center">
-                      <p
-                        className="mb-0 mt-5px pl-10px font-main text-[12px] uppercase text-gray2
-          dark:text-gray2d">
+                    {/*
+                    Min Swap Amount
+                    <div className="mt-5px flex w-full items-center pl-10px ">
+                      <div className=" font-main text-[12px] uppercase text-gray2 dark:text-gray2d">
                         {intl.formatMessage({ id: 'common.min' })}: {swapMinResultLabel}
-                      </p>
+                      </div>
                       <InfoIcon
-                        color={disableSlippage ? 'warning' : 'primary'}
+                        className={`ml-[3px] ${disableSlippage ? '' : 'text-gray2 dark:text-gray2d'}`}
+                        color={disableSlippage ? 'warning' : 'neutral'}
                         tooltip={
                           disableSlippage
                             ? intl.formatMessage({ id: 'swap.slip.tolerance.ledger-disabled.info' })
                             : intl.formatMessage({ id: 'swap.min.result.info' }, { tolerance: slipTolerance })
                         }
                       />
-                    </div>
-                    <div className="flex w-[240px] flex-col items-center justify-start">
+                    </div> */}
+                    <div className="flex w-[250px] flex-col items-center justify-start">
                       <CheckButton
                         size="small"
                         color="neutral"
@@ -1562,25 +1729,37 @@ export const Swap = ({
                     </div>
                   </div>
                 </div>
-                {!lockedWallet && (
-                  <div className="mt-20px flex flex-col  px-10px">
-                    <div className="flex items-center">
-                      <h3 className="font-[12px] !mb-0 mr-10px w-auto p-0 font-main uppercase text-gray2 dark:text-gray2d">
-                        {intl.formatMessage({ id: 'common.recipient' })}
-                      </h3>
-                      {FP.pipe(
-                        oTargetWalletType,
-                        O.map((walletType) => <WalletTypeLabel key="target-w-type">{walletType}</WalletTypeLabel>),
-                        O.toNullable
-                      )}
-                    </div>
-                    {renderCustomAddressInput}
-                  </div>
-                )}
+                {!lockedWallet &&
+                  FP.pipe(
+                    sequenceTOption(oTargetWalletType, oTargetAddress),
+                    O.map(([walletType, address]) => (
+                      <div className="mt-20px flex flex-col  px-10px" key="edit-address">
+                        <div className="flex items-center">
+                          <h3 className="font-[12px] !mb-0 mr-10px w-auto p-0 font-main uppercase text-text2 dark:text-text2d">
+                            {intl.formatMessage({ id: 'common.recipient' })}
+                          </h3>
+                          <WalletTypeLabel key="target-w-type">{walletType}</WalletTypeLabel>
+                        </div>
+                        <EditableAddress
+                          key={address}
+                          asset={targetAsset}
+                          network={network}
+                          address={address}
+                          onClickOpenAddress={(address) => clickAddressLinkHandler(address)}
+                          onChangeAddress={onChangeTargetAddress}
+                          onChangeEditableAddress={(newAddress) => setEditableTargetWalletAddress(O.some(newAddress))}
+                          onChangeEditableMode={(editModeActive) => setCustomAddressEditActive(editModeActive)}
+                          addressValidator={addressValidator}
+                        />
+                      </div>
+                    )),
+                    O.toNullable
+                  )}
               </div>
 
               {(walletBalancesLoading || checkIsApproved) && (
                 <LoadingView
+                  className="w-full pt-10px"
                   label={
                     // We show only one loading state at time
                     // Order matters: Show states with shortest loading time before others
@@ -1606,7 +1785,106 @@ export const Swap = ({
                         disabled={disableSubmit}>
                         {intl.formatMessage({ id: 'common.swap' })}
                       </FlatButton>
-                      {!RD.isInitial(uiFees) && <Fees fees={uiFees} reloadFees={reloadFeesHandler} />}
+                      {/* {!RD.isInitial(uiFees) && <Fees fees={uiFees} reloadFees={reloadFeesHandler} />} */}
+                      <Disclosure>
+                        {({ open }) => (
+                          <div
+                            className={`mx-50px w-full  ${
+                              open ? 'py-5px' : 'py-5px'
+                            } px-10px font-main text-[12px] uppercase dark:border-gray1d`}>
+                            <Disclosure.Button className="flex w-full justify-between">
+                              <span className="font-mainSemiBold text-[16px] uppercase text-text2 dark:text-text2d">
+                                Details
+                              </span>
+                              {open ? (
+                                <MinusIcon className="h-[20px] w-[20px] text-turquoise" />
+                              ) : (
+                                <PlusIcon className="h-[20px] w-[20px] text-turquoise" />
+                              )}
+                            </Disclosure.Button>
+                            <Transition
+                              enter="ease"
+                              enterFrom="opacity-0"
+                              enterTo="opacity-100"
+                              leave="ease"
+                              leaveFrom="opacity-100"
+                              leaveTo="opacity-0">
+                              <Disclosure.Panel className="font-main text-[14px] text-gray2 dark:text-gray2d">
+                                {/* fees */}
+                                <div className="flex w-full items-center justify-between pt-10px font-mainBold">
+                                  <BaseButton
+                                    disabled={RD.isPending(uiFees) || RD.isInitial(uiFees)}
+                                    className="pl-0 !font-mainBold !text-gray2 dark:!text-gray2d"
+                                    onClick={reloadFeesHandler}>
+                                    {intl.formatMessage({ id: 'common.fees.estimated' })}
+                                    <ArrowCircleUpIcon className="ml-5px h-[20px] w-[20px]" />
+                                  </BaseButton>
+                                  <div>{priceSwapFeesLabel}</div>
+                                </div>
+                                <div className="flex w-full justify-between pl-10px text-[12px]">
+                                  <div>Inbound</div>
+                                  <div>{priceSwapInFeeLabel}</div>
+                                </div>
+                                <div className="flex w-full justify-between pl-10px text-[12px]">
+                                  <div>Outbound</div>
+                                  <div>{priceSwapOutFeeLabel}</div>
+                                </div>
+                                {/* Slippage */}
+                                <div
+                                  className={`flex w-full justify-between pt-10px font-mainBold text-[14px]${
+                                    isCausedSlippage ? 'text-error0 dark:text-error0d' : ''
+                                  }`}>
+                                  <div>{intl.formatMessage({ id: 'swap.slip.title' })}</div>
+                                  <div>{swapData.slip.toFixed(2)}%</div>
+                                </div>
+                                <div className="flex w-full justify-between pl-10px text-[12px]">
+                                  <div>{intl.formatMessage({ id: 'swap.slip.tolerance' })}</div>
+                                  <div>{slipTolerance}%</div>
+                                </div>
+                                <div className="flex w-full justify-between pl-10px text-[12px]">
+                                  <div className="flex items-center">
+                                    Protected swap result
+                                    <InfoIcon
+                                      className={`ml-[3px] ${disableSlippage ? '' : 'text-gray2 dark:text-gray2d'}`}
+                                      color={disableSlippage ? 'warning' : 'neutral'}
+                                      tooltip={
+                                        disableSlippage
+                                          ? intl.formatMessage({ id: 'swap.slip.tolerance.ledger-disabled.info' })
+                                          : intl.formatMessage(
+                                              { id: 'swap.min.result.info' },
+                                              { tolerance: slipTolerance }
+                                            )
+                                      }
+                                    />
+                                  </div>
+                                  <div>{swapMinResultLabel}</div>
+                                </div>
+                                {/* Rate */}
+                                <div className="flex w-full justify-between pt-10px font-mainBold text-[14px]">
+                                  <BaseButton
+                                    className="pl-0 !font-mainBold !text-gray2 dark:!text-gray2d"
+                                    onClick={() =>
+                                      // toggle rate
+                                      setRateDirection((current) =>
+                                        current === 'fromSource' ? 'fromTarget' : 'fromSource'
+                                      )
+                                    }>
+                                    Rate
+                                    <ArrowCircleUpIcon className="ml-5px h-[20px] w-[20px]" />
+                                  </BaseButton>
+                                  <div>{rateLabel}</div>
+                                </div>
+                                {/* memo */}
+                                <div className="flex w-full items-start justify-between pt-10px font-mainBold text-[14px]">
+                                  {memoTitle}
+                                  <div className="break-all pl-20px">{memoLabel}</div>
+                                </div>
+                              </Disclosure.Panel>
+                            </Transition>
+                          </div>
+                        )}
+                      </Disclosure>
+
                       {sourceChainFeeErrorLabel}
                     </>
                   ) : (
@@ -1643,7 +1921,7 @@ export const Swap = ({
                   </>
                 )}
               </Styled.SubmitContainer>
-              {renderMemo}
+
               {renderPasswordConfirmationModal}
               {renderLedgerConfirmationModal}
               {renderTxModal}

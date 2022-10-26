@@ -153,7 +153,7 @@ export const AssetInput: React.FC<Props> = (props): JSX.Element => {
       </div>
 
       <AssetSelect
-        className="w-[240px]"
+        className="w-[250px]"
         onSelect={onChangeAsset}
         asset={asset}
         assets={assets}

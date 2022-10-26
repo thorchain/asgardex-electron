@@ -14,6 +14,7 @@ export type ComponentProps = {
   disabled?: boolean
   className?: string
   classNameButton?: string
+  classNameIcon?: string
 }
 
 export type Props = ComponentProps & Omit<ButtonProps, 'onClick'>
@@ -27,7 +28,8 @@ export const MaxBalanceButton: React.FC<Props> = (props): JSX.Element => {
     color = 'primary',
     size = 'normal',
     className = '',
-    classNameButton = ''
+    classNameButton = '',
+    classNameIcon = ''
   } = props
   const { amount, asset } = balance
 
@@ -52,7 +54,7 @@ export const MaxBalanceButton: React.FC<Props> = (props): JSX.Element => {
         })}
       </TextButton>
 
-      {maxInfoText && <InfoIcon tooltip={maxInfoText} />}
+      {maxInfoText && <InfoIcon tooltip={maxInfoText} className={classNameIcon} />}
     </div>
   )
 }
