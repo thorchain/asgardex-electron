@@ -95,7 +95,7 @@ export const EditableAddress = ({
       <div className="flex items-center overflow-hidden font-main text-[16px] normal-case text-text2 dark:text-text2d">
         <Tooltip overlayStyle={{ maxWidth: '100%', whiteSpace: 'nowrap' }} title={address}>
           <BaseButton
-            className="px-0 normal-case  !text-text2 dark:!text-text2d"
+            className="!px-0 normal-case !text-text2 dark:!text-text2d"
             onClick={() => {
               setEditableAddress(O.fromNullable(address))
               onChangeEditableMode(true)

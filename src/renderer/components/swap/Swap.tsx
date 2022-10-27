@@ -100,12 +100,13 @@ import { AssetInput } from '../uielements/assets/assetInput'
 import { BaseButton, FlatButton, ViewTxButton } from '../uielements/button'
 import { CheckButton } from '../uielements/button/CheckButton'
 import { MaxBalanceButton } from '../uielements/button/MaxBalanceButton'
-import { WalletTypeLabel } from '../uielements/common/Common.styles'
+import { Tooltip, WalletTypeLabel } from '../uielements/common/Common.styles'
 import { Fees, UIFeesRD } from '../uielements/fees'
 import { InfoIcon } from '../uielements/info'
 import { CopyLabel } from '../uielements/label'
 import { Slider } from '../uielements/slider'
 import { EditableAddress } from './EditableAddress'
+import { SelectableSlipTolerance } from './SelectableSlipTolerance'
 import * as Styled from './Swap.styles'
 import { SwapAsset, SwapData } from './Swap.types'
 import * as Utils from './Swap.utils'
@@ -174,7 +175,7 @@ export const Swap = ({
   onChangePath,
   network,
   slipTolerance,
-  // changeSlipTolerance,
+  changeSlipTolerance,
   isApprovedERC20Token$,
   approveERC20Token$,
   reloadApproveFee,
@@ -427,17 +428,17 @@ export const Swap = ({
               O.map(({ amount, asset: priceAsset }) =>
                 eqAsset.equals(feeAsset, priceAsset)
                   ? emptyString
-                  : `(${formatAssetAmountCurrency({
+                  : formatAssetAmountCurrency({
                       amount: baseToAsset(amount),
                       asset: priceAsset,
                       decimal: isUSDAsset(priceAsset) ? 2 : 6,
                       trimZeros: !isUSDAsset(priceAsset)
-                    })})`
+                    })
               ),
               O.getOrElse(() => emptyString)
             )
 
-            return `${fee} ${price}`
+            return price ? `${price} (${fee})` : fee
           }
         )
       ),
@@ -481,17 +482,17 @@ export const Swap = ({
               O.map(({ amount, asset: priceAsset }) =>
                 eqAsset.equals(feeAsset, priceAsset)
                   ? emptyString
-                  : `(${formatAssetAmountCurrency({
+                  : formatAssetAmountCurrency({
                       amount: baseToAsset(amount),
                       asset: priceAsset,
                       decimal: isUSDAsset(priceAsset) ? 2 : 6,
                       trimZeros: !isUSDAsset(priceAsset)
-                    })})`
+                    })
               ),
               O.getOrElse(() => emptyString)
             )
 
-            return `${fee} ${price}`
+            return price ? `${price} (${fee})` : fee
           }
         )
       ),
@@ -1566,27 +1567,19 @@ export const Swap = ({
   }, [oInitialTargetWalletAddress, oTargetLedgerAddress, useTargetAssetLedger])
 
   const memoTitle = useMemo(
-    () => (
-      <div className="flex items-center justify-center">
-        {FP.pipe(
-          oSwapParams,
-          O.fold(
-            () => (
-              <div className="dark:text-gray1dpx cursor-not-allowed text-center font-mainSemiBold text-[14px] uppercase text-gray1 dark:text-gray1d">
-                {intl.formatMessage({ id: 'common.memo' })}
-              </div>
-            ),
-            ({ memo }) => (
-              <CopyLabel
-                className="dark:text-gray1dpx font-mainSemiBold text-[14px] uppercase text-gray1 hover:text-gray2 dark:text-gray1d dark:hover:text-gray2d"
-                label={intl.formatMessage({ id: 'common.memo' })}
-                textToCopy={memo}
-              />
-            )
-          )
-        )}
-      </div>
-    ),
+    () =>
+      FP.pipe(
+        oSwapParams,
+        O.map(({ memo }) => (
+          <CopyLabel
+            className="pl-0 !font-mainBold text-[14px] uppercase text-gray2 dark:text-gray2d"
+            label={intl.formatMessage({ id: 'common.memo' })}
+            key="memo-copy"
+            textToCopy={memo}
+          />
+        )),
+        O.toNullable
+      ),
     [intl, oSwapParams]
   )
 
@@ -1594,8 +1587,12 @@ export const Swap = ({
     () =>
       FP.pipe(
         oSwapParams,
-        O.map(({ memo }) => memo),
-        O.getOrElse(() => emptyString)
+        O.map(({ memo }) => (
+          <Tooltip title={memo} key="tooltip-memo">
+            {memo}
+          </Tooltip>
+        )),
+        O.toNullable
       ),
     [oSwapParams]
   )
@@ -1679,9 +1676,9 @@ export const Swap = ({
                     onClick={!disableSwitchAssets ? () => onSwitchAssets() : undefined}
                     className="group">
                     <ArrowsUpDownIcon
-                      className="ease h-[50px] w-[50px] text-turquoise
-                   group-hover:rotate-180
-                    "
+                      className={`ease h-[50px] w-[50px] text-turquoise
+                   ${!disableSwitchAssets ? 'group-hover:rotate-180' : ''}
+                      `}
                     />
                   </BaseButton>
                 </div>
@@ -1785,7 +1782,7 @@ export const Swap = ({
                         {intl.formatMessage({ id: 'common.swap' })}
                       </FlatButton>
                       {/* {!RD.isInitial(uiFees) && <Fees fees={uiFees} reloadFees={reloadFeesHandler} />} */}
-                      <Disclosure>
+                      <Disclosure defaultOpen>
                         {({ open }) => (
                           <div
                             className={`mx-50px w-full  ${
@@ -1813,10 +1810,10 @@ export const Swap = ({
                                 <div className="flex w-full items-center justify-between pt-10px font-mainBold">
                                   <BaseButton
                                     disabled={RD.isPending(uiFees) || RD.isInitial(uiFees)}
-                                    className="pl-0 !font-mainBold !text-gray2 dark:!text-gray2d"
+                                    className="group pl-0 !font-mainBold !text-gray2 dark:!text-gray2d"
                                     onClick={reloadFeesHandler}>
                                     {intl.formatMessage({ id: 'common.fees.estimated' })}
-                                    <ArrowPathIcon className="ml-5px h-[20px] w-[20px]" />
+                                    <ArrowPathIcon className="ease ml-5px h-[15px] w-[15px] group-hover:rotate-180" />
                                   </BaseButton>
                                   <div>{priceSwapFeesLabel}</div>
                                 </div>
@@ -1828,6 +1825,16 @@ export const Swap = ({
                                   <div>Outbound</div>
                                   <div>{priceSwapOutFeeLabel}</div>
                                 </div>
+                                <div className="flex w-full justify-between pl-10px text-[12px]">
+                                  <div>Affiliate</div>
+                                  <div>
+                                    {formatAssetAmountCurrency({
+                                      amount: assetAmount(0),
+                                      asset: pricePool.asset,
+                                      decimal: 0
+                                    })}
+                                  </div>
+                                </div>
                                 {/* Slippage */}
                                 <div
                                   className={`flex w-full justify-between pt-10px font-mainBold text-[14px]${
@@ -1837,14 +1844,38 @@ export const Swap = ({
                                   <div>{swapData.slip.toFixed(2)}%</div>
                                 </div>
                                 <div className="flex w-full justify-between pl-10px text-[12px]">
-                                  <div>{intl.formatMessage({ id: 'swap.slip.tolerance' })}</div>
-                                  <div>{slipTolerance}%</div>
+                                  <div
+                                    className={`flex items-center ${
+                                      disableSlippage ? 'text-warning0 dark:text-warning0d' : ''
+                                    }`}>
+                                    {intl.formatMessage({ id: 'swap.slip.tolerance' })}
+                                    {disableSlippage ? (
+                                      <InfoIcon
+                                        className="ml-[3px] h-[15px] w-[15px] text-inherit"
+                                        tooltip={intl.formatMessage({ id: 'swap.slip.tolerance.ledger-disabled.info' })}
+                                        color="warning"
+                                      />
+                                    ) : (
+                                      <InfoIcon
+                                        className="ml-[3px] h-[15px] w-[15px] text-inherit"
+                                        tooltip={intl.formatMessage({ id: 'swap.slip.tolerance.info' })}
+                                      />
+                                    )}
+                                  </div>
+                                  <div>
+                                    {/* we don't show slippage tolerance whenever slippage is disabled (e.g. due memo restriction for Ledger BTC) */}
+                                    {!disableSlippage && (
+                                      <SelectableSlipTolerance value={slipTolerance} onChange={changeSlipTolerance} />
+                                    )}
+                                  </div>
                                 </div>
                                 <div className="flex w-full justify-between pl-10px text-[12px]">
                                   <div className="flex items-center">
                                     Protected swap result
                                     <InfoIcon
-                                      className={`ml-[3px] ${disableSlippage ? '' : 'text-gray2 dark:text-gray2d'}`}
+                                      className={`ml-[3px] ${
+                                        disableSlippage ? '' : 'text-gray2 dark:text-gray2d'
+                                      } h-[15px] w-[15px]`}
                                       color={disableSlippage ? 'warning' : 'neutral'}
                                       tooltip={
                                         disableSlippage
@@ -1861,7 +1892,7 @@ export const Swap = ({
                                 {/* Rate */}
                                 <div className="flex w-full justify-between pt-10px font-mainBold text-[14px]">
                                   <BaseButton
-                                    className="pl-0 !font-mainBold !text-gray2 dark:!text-gray2d"
+                                    className="group pl-0 !font-mainBold !text-gray2 dark:!text-gray2d"
                                     onClick={() =>
                                       // toggle rate
                                       setRateDirection((current) =>
@@ -1869,14 +1900,14 @@ export const Swap = ({
                                       )
                                     }>
                                     Rate
-                                    <ArrowsRightLeftIcon className="ml-5px h-[20px] w-[20px]" />
+                                    <ArrowsRightLeftIcon className="ease ml-5px h-[15px] w-[15px] group-hover:rotate-180" />
                                   </BaseButton>
                                   <div>{rateLabel}</div>
                                 </div>
                                 {/* memo */}
-                                <div className="flex w-full items-start justify-between pt-10px font-mainBold text-[14px]">
-                                  {memoTitle}
-                                  <div className="break-all pl-20px">{memoLabel}</div>
+                                <div className="flex w-full items-start justify-between pt-10px text-[14px]">
+                                  <div className="ml-[-2px] font-mainBold">{memoTitle}</div>
+                                  <div className="truncate pl-20px font-main">{memoLabel}</div>
                                 </div>
                               </Disclosure.Panel>
                             </Transition>
@@ -1907,11 +1938,11 @@ export const Swap = ({
                   )
                 ) : (
                   <>
-                    <Styled.NoteLabel>
+                    <p className="center mb-0 mt-30px font-main text-[12px] uppercase text-text2 dark:text-text2d">
                       {!hasImportedKeystore(keystore)
                         ? intl.formatMessage({ id: 'swap.note.nowallet' })
                         : isLocked(keystore) && intl.formatMessage({ id: 'swap.note.lockedWallet' })}
-                    </Styled.NoteLabel>
+                    </p>
                     <FlatButton className="my-30px min-w-[200px]" size="large" onClick={importWalletHandler}>
                       {!hasImportedKeystore(keystore)
                         ? intl.formatMessage({ id: 'wallet.add.label' })

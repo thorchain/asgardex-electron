@@ -126,12 +126,6 @@ export const ErrorLabel = styled(UILabel)`
   text-align: center;
 `
 
-export const NoteLabel = styled(UILabel)`
-  color: ${palette('text', 2)};
-  text-align: center;
-  text-transform: uppercase;
-`
-
 export const MinAmountLabel = styled(UILabel)`
   padding-left: 5px;
   padding-right: 5px;
