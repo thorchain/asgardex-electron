@@ -46,7 +46,6 @@ export const ContentWrapper = styled('div')<{ centerContent?: boolean }>`
   flex-direction: column;
   justify-content: ${(props) => (props.centerContent ? 'center' : '')};
   align-items: ${(props) => (props.centerContent ? 'center' : '')};
-  min-height: 100%;
   padding: ${key('sizes.gutter.vertical', '0px')};
 
   ${media.md`

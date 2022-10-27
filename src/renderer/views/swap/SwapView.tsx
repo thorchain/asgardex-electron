@@ -16,6 +16,7 @@ import { ErrorView } from '../../components/shared/error/'
 import { Swap } from '../../components/swap'
 import { SLIP_TOLERANCE_KEY } from '../../components/swap/SelectableSlipTolerance'
 import * as Utils from '../../components/swap/Swap.utils'
+import { BackLink } from '../../components/uielements/backLink'
 import { Button, RefreshButton } from '../../components/uielements/button'
 import { useAppContext } from '../../contexts/AppContext'
 import { useChainContext } from '../../contexts/ChainContext'
@@ -40,7 +41,6 @@ import { DEFAULT_SLIP_TOLERANCE } from '../../services/const'
 import { INITIAL_BALANCES_STATE, DEFAULT_BALANCES_FILTER } from '../../services/wallet/const'
 import { ledgerAddressToWalletAddress } from '../../services/wallet/util'
 import { isSlipTolerance, SlipTolerance } from '../../types/asgardex'
-import * as Styled from './SwapView.styles'
 
 type Props = { sourceAsset: Asset; targetAsset: Asset }
 
@@ -255,11 +255,11 @@ const SuccessRouteView: React.FC<Props> = ({ sourceAsset, targetAsset }): JSX.El
 
   return (
     <>
-      <Styled.TopControlsContainer>
-        <Styled.BackLink />
+      <div className="mb-20px flex items-center justify-between">
+        <BackLink className="!m-0" />
         <RefreshButton clickHandler={reloadHandler} />
-      </Styled.TopControlsContainer>
-      <Styled.ContentContainer>
+      </div>
+      <div className="flex flex-1 items-center justify-center bg-bg0 dark:bg-bg0d">
         {FP.pipe(
           sequenceTRD(poolsState, sourceAssetRD, targetAssetRD),
           RD.fold(
@@ -332,7 +332,7 @@ const SuccessRouteView: React.FC<Props> = ({ sourceAsset, targetAsset }): JSX.El
             }
           )
         )}
-      </Styled.ContentContainer>
+      </div>
     </>
   )
 }

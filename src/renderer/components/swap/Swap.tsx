@@ -90,7 +90,6 @@ import {
 } from '../../services/wallet/types'
 import { hasImportedKeystore, isLocked } from '../../services/wallet/util'
 import { AssetWithAmount, SlipTolerance } from '../../types/asgardex'
-// import { CurrencyInfo } from '../currency'
 import { PricePool } from '../../views/pools/Pools.types'
 import { LedgerConfirmationModal, WalletPasswordConfirmationModal } from '../modal/confirmation'
 import { TxModal } from '../modal/tx'
@@ -107,9 +106,17 @@ import { CopyLabel } from '../uielements/label'
 import { Slider } from '../uielements/slider'
 import { EditableAddress } from './EditableAddress'
 import { SelectableSlipTolerance } from './SelectableSlipTolerance'
-import * as Styled from './Swap.styles'
 import { SwapAsset, SwapData } from './Swap.types'
 import * as Utils from './Swap.utils'
+
+const ErrorLabel: React.FC<{
+  children: React.ReactNode
+  className?: string
+}> = ({ children, className }): JSX.Element => (
+  <div className={`mb-[14px] text-center font-main uppercase text-error0 dark:text-error0d ${className} text-[12px]`}>
+    {children}
+  </div>
+)
 
 export type SwapProps = {
   keystore: KeystoreState
@@ -1258,11 +1265,11 @@ export const Swap = ({
     }
 
     const {
-      inFee: { asset: inFeeAsset }
+      inFee: { asset: inFeeAsset, amount: inFeeAmount }
     } = swapFees
 
     return (
-      <Styled.ErrorLabel>
+      <ErrorLabel>
         {intl.formatMessage(
           { id: 'swap.errors.amount.balanceShouldCoverChainFee' },
           {
@@ -1274,11 +1281,11 @@ export const Swap = ({
             fee: formatAssetAmountCurrency({
               asset: inFeeAsset,
               trimZeros: true,
-              amount: baseToAsset(Utils.minBalanceToSwap(swapFees))
+              amount: baseToAsset(inFeeAmount)
             })
           }
         )}
-      </Styled.ErrorLabel>
+      </ErrorLabel>
     )
   }, [sourceChainFeeError, swapFees, intl, sourceAsset.chain, sourceChainAssetAmount])
 
@@ -1338,11 +1345,12 @@ export const Swap = ({
       !isApproveFeeError ||
       // Don't render error if walletBalances are still loading
       walletBalancesLoading
-    )
+    ) {
       return <></>
+    }
 
     return (
-      <Styled.ErrorLabel>
+      <ErrorLabel>
         {intl.formatMessage(
           { id: 'swap.errors.amount.balanceShouldCoverChainFee' },
           {
@@ -1358,7 +1366,7 @@ export const Swap = ({
             })
           }
         )}
-      </Styled.ErrorLabel>
+      </ErrorLabel>
     )
   }, [isApproveFeeError, walletBalancesLoading, intl, sourceAsset.chain, sourceChainAssetAmount, approveFee])
 
@@ -1377,7 +1385,7 @@ export const Swap = ({
         RD.fold(
           () => <></>,
           () => <></>,
-          (error) => <Styled.ErrorLabel>{error.msg}</Styled.ErrorLabel>,
+          (error) => <ErrorLabel>{error.msg}</ErrorLabel>,
           () => <></>
         )
       ),
@@ -1416,14 +1424,13 @@ export const Swap = ({
 
     return FP.pipe(
       isApprovedState,
-
       RD.fold(
         () => <></>,
         () => <></>,
         (error) => (
-          <Styled.ErrorLabel align="center">
+          <ErrorLabel>
             {intl.formatMessage({ id: 'common.approve.error' }, { asset: sourceAsset.ticker, error: error.msg })}
-          </Styled.ErrorLabel>
+          </ErrorLabel>
         ),
         (_) => <></>
       )
@@ -1598,367 +1605,331 @@ export const Swap = ({
   )
 
   return (
-    // Note: Just one Tab to use as same styles as for other views (deposit / wallet)
-    <Styled.Tabs
-      centered
-      tabs={[
-        {
-          label: intl.formatMessage({ id: 'common.swap' }),
-          key: 'default',
-          // Content includes everything of Swap content
-          content: (
-            <div className="m-auto w-full max-w-[500px] flex-col justify-between">
-              <div>
-                {/* <Styled.CurrencyInfoContainer>
-                    <CurrencyInfo
-                      slip={swapData.slip}
-                      slipTolerance={slipTolerance}
-                      isCausedSlippage={isCausedSlippage}
-                      changeSlipTolerance={changeSlipTolerance}
-                      from={oSourcePoolAsset}
-                      to={oTargetPoolAsset}
-                      disableSlippage={disableSlippage}
-                      disableSlippageMsg={intl.formatMessage({ id: 'swap.slip.tolerance.ledger-disabled.info' })}
-                    />
-                  </Styled.CurrencyInfoContainer> */}
+    <div className="flex w-full flex-col items-center">
+      <div className="flex w-full justify-center border-b border-gray1 dark:border-gray1d">
+        <div className="border-b-[2px] border-turquoise py-10px px-10px font-mainSemiBold text-[16px] uppercase text-turquoise ">
+          {intl.formatMessage({ id: 'common.swap' })}
+        </div>
+      </div>
+      <div className="w-full max-w-[500px] flex-col justify-between pt-[60px] pb-30px">
+        <div>
+          <div className="flex flex-col">
+            {/* Note: Input value is shown as AssetAmount */}
 
-                <div className="flex flex-col">
-                  {/* Note: Input value is shown as AssetAmount */}
+            <AssetInput
+              className="w-full"
+              title={intl.formatMessage({ id: 'swap.input' })}
+              titleTooltip={FP.pipe(
+                oSourceWalletAddress,
+                O.getOrElse(() => '')
+              )}
+              amount={{ amount: amountToSwapMax1e8, asset: sourceAsset }}
+              priceAmount={priceAmountToSwapMax1e8}
+              assets={_selectableSourceAssets}
+              network={network}
+              onChangeAsset={setSourceAsset}
+              onChange={setAmountToSwapMax1e8}
+              onBlur={reloadFeesHandler}
+              showError={minAmountError}
+            />
 
-                  <AssetInput
-                    className="w-full"
-                    title={intl.formatMessage({ id: 'swap.input' })}
-                    titleTooltip={FP.pipe(
-                      oSourceWalletAddress,
-                      O.getOrElse(() => '')
-                    )}
-                    amount={{ amount: amountToSwapMax1e8, asset: sourceAsset }}
-                    priceAmount={priceAmountToSwapMax1e8}
-                    assets={_selectableSourceAssets}
-                    network={network}
-                    onChangeAsset={setSourceAsset}
-                    onChange={setAmountToSwapMax1e8}
-                    onBlur={reloadFeesHandler}
-                    showError={minAmountError}
-                  />
+            <div className="flex flex-row">
+              <div className="flex w-full flex-col">
+                <MaxBalanceButton
+                  className="ml-10px mt-5px"
+                  classNameButton="!text-gray2 dark:!text-gray2d"
+                  classNameIcon="text-gray2 dark:text-gray2d"
+                  size="medium"
+                  balance={{ amount: maxAmountToSwapMax1e8, asset: sourceAsset }}
+                  onClick={() => setAmountToSwapMax1e8(maxAmountToSwapMax1e8)}
+                  maxInfoText={intl.formatMessage({ id: 'swap.info.max.fee' })}
+                />
+                {minAmountError && renderMinAmount}
+              </div>
+              <div className="flex w-[250px] flex-col items-center justify-start">
+                <CheckButton
+                  size="small"
+                  color="neutral"
+                  className={`w-full rounded-b-lg bg-gray0 py-5px dark:bg-gray0d ${
+                    !hasSourceAssetLedger ? 'hidden' : ''
+                  }`}
+                  checked={useSourceAssetLedger}
+                  clickHandler={onClickUseSourceAssetLedger}>
+                  {intl.formatMessage({ id: 'ledger.title' })}
+                </CheckButton>
+              </div>
+            </div>
+          </div>
 
-                  <div className="flex flex-row">
-                    <div className="flex w-full flex-col">
-                      <MaxBalanceButton
-                        className="ml-10px mt-5px"
-                        classNameButton="!text-gray2 dark:!text-gray2d"
-                        classNameIcon="text-gray2 dark:text-gray2d"
-                        size="medium"
-                        balance={{ amount: maxAmountToSwapMax1e8, asset: sourceAsset }}
-                        onClick={() => setAmountToSwapMax1e8(maxAmountToSwapMax1e8)}
-                        maxInfoText={intl.formatMessage({ id: 'swap.info.max.fee' })}
-                      />
-                      {minAmountError && renderMinAmount}
-                    </div>
-                    <div className="flex w-[250px] flex-col items-center justify-start">
-                      <CheckButton
-                        size="small"
-                        color="neutral"
-                        className={`w-full rounded-b-lg bg-gray0 py-5px dark:bg-gray0d ${
-                          !hasSourceAssetLedger ? 'hidden' : ''
-                        }`}
-                        checked={useSourceAssetLedger}
-                        clickHandler={onClickUseSourceAssetLedger}>
-                        {intl.formatMessage({ id: 'ledger.title' })}
-                      </CheckButton>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="mb-20px flex w-full justify-center">
-                  <BaseButton
-                    disabled={disableSwitchAssets}
-                    onClick={!disableSwitchAssets ? () => onSwitchAssets() : undefined}
-                    className="group">
-                    <ArrowsUpDownIcon
-                      className={`ease h-[50px] w-[50px] text-turquoise
+          <div className="mb-20px flex w-full justify-center">
+            <BaseButton
+              disabled={disableSwitchAssets}
+              onClick={!disableSwitchAssets ? () => onSwitchAssets() : undefined}
+              className="group w-full">
+              <ArrowsUpDownIcon
+                className={`ease h-[30px] w-[30px] text-turquoise
                    ${!disableSwitchAssets ? 'group-hover:rotate-180' : ''}
                       `}
-                    />
-                  </BaseButton>
-                </div>
-                <div className="flex flex-col">
-                  <AssetInput
-                    className="w-full md:w-auto"
-                    title={intl.formatMessage({ id: 'swap.output' })}
-                    // Show swap result <= 1e8
-                    amount={{ amount: swapResultAmountMax1e8, asset: targetAsset }}
-                    priceAmount={priceSwapResultAmountMax1e8}
-                    onChangeAsset={setTargetAsset}
-                    assets={selectableTargetAssets}
-                    network={network}
-                    asLabel
-                  />
-                  <div className="flex flex-row">
-                    {/*
-                    Min Swap Amount
-                    <div className="mt-5px flex w-full items-center pl-10px ">
-                      <div className=" font-main text-[12px] uppercase text-gray2 dark:text-gray2d">
-                        {intl.formatMessage({ id: 'common.min' })}: {swapMinResultLabel}
-                      </div>
-                      <InfoIcon
-                        className={`ml-[3px] ${disableSlippage ? '' : 'text-gray2 dark:text-gray2d'}`}
-                        color={disableSlippage ? 'warning' : 'neutral'}
-                        tooltip={
-                          disableSlippage
-                            ? intl.formatMessage({ id: 'swap.slip.tolerance.ledger-disabled.info' })
-                            : intl.formatMessage({ id: 'swap.min.result.info' }, { tolerance: slipTolerance })
-                        }
-                      />
-                    </div> */}
-                    <div className="flex w-[250px] flex-col items-center justify-start">
-                      <CheckButton
-                        size="small"
-                        color="neutral"
-                        className={`w-full rounded-b-lg bg-gray0 py-5px dark:bg-gray0d ${
-                          !hasSourceAssetLedger ? 'hidden' : ''
-                        }`}
-                        checked={useTargetAssetLedger}
-                        clickHandler={onClickUseTargetAssetLedger}>
-                        {intl.formatMessage({ id: 'ledger.title' })}
-                      </CheckButton>
-                    </div>
-                  </div>
-                </div>
-                {!lockedWallet &&
-                  FP.pipe(
-                    sequenceTOption(oTargetWalletType, oTargetAddress),
-                    O.map(([walletType, address]) => (
-                      <div className="mt-20px flex flex-col  px-10px" key="edit-address">
-                        <div className="flex items-center">
-                          <h3 className="font-[12px] !mb-0 mr-10px w-auto p-0 font-main uppercase text-text2 dark:text-text2d">
-                            {intl.formatMessage({ id: 'common.recipient' })}
-                          </h3>
-                          <WalletTypeLabel key="target-w-type">{walletType}</WalletTypeLabel>
-                        </div>
-                        <EditableAddress
-                          key={address}
-                          asset={targetAsset}
-                          network={network}
-                          address={address}
-                          onClickOpenAddress={(address) => clickAddressLinkHandler(address)}
-                          onChangeAddress={onChangeTargetAddress}
-                          onChangeEditableAddress={(newAddress) => setEditableTargetWalletAddress(O.some(newAddress))}
-                          onChangeEditableMode={(editModeActive) => setCustomAddressEditActive(editModeActive)}
-                          addressValidator={addressValidator}
-                        />
-                      </div>
-                    )),
-                    O.toNullable
-                  )}
+              />
+            </BaseButton>
+          </div>
+          <div className="flex flex-col">
+            <AssetInput
+              className="w-full md:w-auto"
+              title={intl.formatMessage({ id: 'swap.output' })}
+              // Show swap result <= 1e8
+              amount={{ amount: swapResultAmountMax1e8, asset: targetAsset }}
+              priceAmount={priceSwapResultAmountMax1e8}
+              onChangeAsset={setTargetAsset}
+              assets={selectableTargetAssets}
+              network={network}
+              asLabel
+            />
+            <div className="flex flex-row">
+              <div className="flex w-[250px] flex-col items-center justify-start">
+                <CheckButton
+                  size="small"
+                  color="neutral"
+                  className={`w-full rounded-b-lg bg-gray0 py-5px dark:bg-gray0d ${
+                    !hasSourceAssetLedger ? 'hidden' : ''
+                  }`}
+                  checked={useTargetAssetLedger}
+                  clickHandler={onClickUseTargetAssetLedger}>
+                  {intl.formatMessage({ id: 'ledger.title' })}
+                </CheckButton>
               </div>
-
-              {(walletBalancesLoading || checkIsApproved) && (
-                <LoadingView
-                  className="w-full pt-10px"
-                  label={
-                    // We show only one loading state at time
-                    // Order matters: Show states with shortest loading time before others
-                    // (approve state takes just a short time to load, but needs to be displayed)
-                    checkIsApproved
-                      ? intl.formatMessage({ id: 'common.approve.checking' }, { asset: sourceAsset.ticker })
-                      : walletBalancesLoading
-                      ? intl.formatMessage({ id: 'common.balance.loading' })
-                      : undefined
-                  }
-                />
-              )}
-              {renderIsApprovedError}
-              <Styled.SubmitContainer>
-                {!isLocked(keystore) ? (
-                  isApproved ? (
-                    <>
-                      <FlatButton
-                        className="my-30px min-w-[200px]"
-                        size="large"
-                        color="primary"
-                        onClick={onSubmit}
-                        disabled={disableSubmit}>
-                        {intl.formatMessage({ id: 'common.swap' })}
-                      </FlatButton>
-                      {/* {!RD.isInitial(uiFees) && <Fees fees={uiFees} reloadFees={reloadFeesHandler} />} */}
-                      <Disclosure defaultOpen>
-                        {({ open }) => (
-                          <div
-                            className={`mx-50px w-full  ${
-                              open ? 'py-5px' : 'py-5px'
-                            } px-10px font-main text-[12px] uppercase dark:border-gray1d`}>
-                            <Disclosure.Button className="flex w-full justify-between">
-                              <span className="font-mainSemiBold text-[16px] uppercase text-text2 dark:text-text2d">
-                                Details
-                              </span>
-                              {open ? (
-                                <MinusIcon className="h-[20px] w-[20px] text-turquoise" />
-                              ) : (
-                                <PlusIcon className="h-[20px] w-[20px] text-turquoise" />
-                              )}
-                            </Disclosure.Button>
-                            <Transition
-                              enter="ease"
-                              enterFrom="opacity-0"
-                              enterTo="opacity-100"
-                              leave="ease"
-                              leaveFrom="opacity-100"
-                              leaveTo="opacity-0">
-                              <Disclosure.Panel className="font-main text-[14px] text-gray2 dark:text-gray2d">
-                                {/* fees */}
-                                <div className="flex w-full items-center justify-between pt-10px font-mainBold">
-                                  <BaseButton
-                                    disabled={RD.isPending(uiFees) || RD.isInitial(uiFees)}
-                                    className="group pl-0 !font-mainBold !text-gray2 dark:!text-gray2d"
-                                    onClick={reloadFeesHandler}>
-                                    {intl.formatMessage({ id: 'common.fees.estimated' })}
-                                    <ArrowPathIcon className="ease ml-5px h-[15px] w-[15px] group-hover:rotate-180" />
-                                  </BaseButton>
-                                  <div>{priceSwapFeesLabel}</div>
-                                </div>
-                                <div className="flex w-full justify-between pl-10px text-[12px]">
-                                  <div>Inbound</div>
-                                  <div>{priceSwapInFeeLabel}</div>
-                                </div>
-                                <div className="flex w-full justify-between pl-10px text-[12px]">
-                                  <div>Outbound</div>
-                                  <div>{priceSwapOutFeeLabel}</div>
-                                </div>
-                                <div className="flex w-full justify-between pl-10px text-[12px]">
-                                  <div>Affiliate</div>
-                                  <div>
-                                    {formatAssetAmountCurrency({
-                                      amount: assetAmount(0),
-                                      asset: pricePool.asset,
-                                      decimal: 0
-                                    })}
-                                  </div>
-                                </div>
-                                {/* Slippage */}
-                                <div
-                                  className={`flex w-full justify-between pt-10px font-mainBold text-[14px]${
-                                    isCausedSlippage ? 'text-error0 dark:text-error0d' : ''
-                                  }`}>
-                                  <div>{intl.formatMessage({ id: 'swap.slip.title' })}</div>
-                                  <div>{swapData.slip.toFixed(2)}%</div>
-                                </div>
-                                <div className="flex w-full justify-between pl-10px text-[12px]">
-                                  <div
-                                    className={`flex items-center ${
-                                      disableSlippage ? 'text-warning0 dark:text-warning0d' : ''
-                                    }`}>
-                                    {intl.formatMessage({ id: 'swap.slip.tolerance' })}
-                                    {disableSlippage ? (
-                                      <InfoIcon
-                                        className="ml-[3px] h-[15px] w-[15px] text-inherit"
-                                        tooltip={intl.formatMessage({ id: 'swap.slip.tolerance.ledger-disabled.info' })}
-                                        color="warning"
-                                      />
-                                    ) : (
-                                      <InfoIcon
-                                        className="ml-[3px] h-[15px] w-[15px] text-inherit"
-                                        tooltip={intl.formatMessage({ id: 'swap.slip.tolerance.info' })}
-                                      />
-                                    )}
-                                  </div>
-                                  <div>
-                                    {/* we don't show slippage tolerance whenever slippage is disabled (e.g. due memo restriction for Ledger BTC) */}
-                                    {!disableSlippage && (
-                                      <SelectableSlipTolerance value={slipTolerance} onChange={changeSlipTolerance} />
-                                    )}
-                                  </div>
-                                </div>
-                                <div className="flex w-full justify-between pl-10px text-[12px]">
-                                  <div className="flex items-center">
-                                    Protected swap result
-                                    <InfoIcon
-                                      className={`ml-[3px] ${
-                                        disableSlippage ? '' : 'text-gray2 dark:text-gray2d'
-                                      } h-[15px] w-[15px]`}
-                                      color={disableSlippage ? 'warning' : 'neutral'}
-                                      tooltip={
-                                        disableSlippage
-                                          ? intl.formatMessage({ id: 'swap.slip.tolerance.ledger-disabled.info' })
-                                          : intl.formatMessage(
-                                              { id: 'swap.min.result.info' },
-                                              { tolerance: slipTolerance }
-                                            )
-                                      }
-                                    />
-                                  </div>
-                                  <div>{swapMinResultLabel}</div>
-                                </div>
-                                {/* Rate */}
-                                <div className="flex w-full justify-between pt-10px font-mainBold text-[14px]">
-                                  <BaseButton
-                                    className="group pl-0 !font-mainBold !text-gray2 dark:!text-gray2d"
-                                    onClick={() =>
-                                      // toggle rate
-                                      setRateDirection((current) =>
-                                        current === 'fromSource' ? 'fromTarget' : 'fromSource'
-                                      )
-                                    }>
-                                    Rate
-                                    <ArrowsRightLeftIcon className="ease ml-5px h-[15px] w-[15px] group-hover:rotate-180" />
-                                  </BaseButton>
-                                  <div>{rateLabel}</div>
-                                </div>
-                                {/* memo */}
-                                <div className="flex w-full items-start justify-between pt-10px text-[14px]">
-                                  <div className="ml-[-2px] font-mainBold">{memoTitle}</div>
-                                  <div className="truncate pl-20px font-main">{memoLabel}</div>
-                                </div>
-                              </Disclosure.Panel>
-                            </Transition>
-                          </div>
-                        )}
-                      </Disclosure>
-
-                      {sourceChainFeeErrorLabel}
-                    </>
-                  ) : (
-                    <>
-                      {renderApproveFeeError}
-                      {renderApproveError}
-                      <FlatButton
-                        className="my-30px min-w-[200px]"
-                        size="large"
-                        color="warning"
-                        disabled={disableSubmitApprove}
-                        onClick={onApprove}
-                        loading={RD.isPending(approveState)}>
-                        {intl.formatMessage({ id: 'common.approve' })}
-                      </FlatButton>
-
-                      {!RD.isInitial(uiApproveFeesRD) && (
-                        <Fees fees={uiApproveFeesRD} reloadFees={reloadApproveFeesHandler} />
-                      )}
-                    </>
-                  )
-                ) : (
-                  <>
-                    <p className="center mb-0 mt-30px font-main text-[12px] uppercase text-text2 dark:text-text2d">
-                      {!hasImportedKeystore(keystore)
-                        ? intl.formatMessage({ id: 'swap.note.nowallet' })
-                        : isLocked(keystore) && intl.formatMessage({ id: 'swap.note.lockedWallet' })}
-                    </p>
-                    <FlatButton className="my-30px min-w-[200px]" size="large" onClick={importWalletHandler}>
-                      {!hasImportedKeystore(keystore)
-                        ? intl.formatMessage({ id: 'wallet.add.label' })
-                        : isLocked(keystore) && intl.formatMessage({ id: 'wallet.unlock.label' })}
-                    </FlatButton>
-                  </>
-                )}
-              </Styled.SubmitContainer>
-
-              {renderPasswordConfirmationModal}
-              {renderLedgerConfirmationModal}
-              {renderTxModal}
             </div>
-          )
-        }
-      ]}
-    />
+          </div>
+          {!lockedWallet &&
+            FP.pipe(
+              sequenceTOption(oTargetWalletType, oTargetAddress),
+              O.map(([walletType, address]) => (
+                <div className="mt-20px flex flex-col  px-10px" key="edit-address">
+                  <div className="flex items-center">
+                    <h3 className="font-[12px] !mb-0 mr-10px w-auto p-0 font-main uppercase text-text2 dark:text-text2d">
+                      {intl.formatMessage({ id: 'common.recipient' })}
+                    </h3>
+                    <WalletTypeLabel key="target-w-type">{walletType}</WalletTypeLabel>
+                  </div>
+                  <EditableAddress
+                    key={address}
+                    asset={targetAsset}
+                    network={network}
+                    address={address}
+                    onClickOpenAddress={(address) => clickAddressLinkHandler(address)}
+                    onChangeAddress={onChangeTargetAddress}
+                    onChangeEditableAddress={(newAddress) => setEditableTargetWalletAddress(O.some(newAddress))}
+                    onChangeEditableMode={(editModeActive) => setCustomAddressEditActive(editModeActive)}
+                    addressValidator={addressValidator}
+                  />
+                </div>
+              )),
+              O.toNullable
+            )}
+        </div>
+
+        {(walletBalancesLoading || checkIsApproved) && (
+          <LoadingView
+            className="w-full pt-10px"
+            label={
+              // We show only one loading state at time
+              // Order matters: Show states with shortest loading time before others
+              // (approve state takes just a short time to load, but needs to be displayed)
+              checkIsApproved
+                ? intl.formatMessage({ id: 'common.approve.checking' }, { asset: sourceAsset.ticker })
+                : walletBalancesLoading
+                ? intl.formatMessage({ id: 'common.balance.loading' })
+                : undefined
+            }
+          />
+        )}
+        <div className="flex flex-col items-center justify-center">
+          {!isLocked(keystore) ? (
+            <>
+              {isApproved ? (
+                <>
+                  <FlatButton
+                    className="my-30px min-w-[200px]"
+                    size="large"
+                    color="primary"
+                    onClick={onSubmit}
+                    disabled={disableSubmit}>
+                    {intl.formatMessage({ id: 'common.swap' })}
+                  </FlatButton>
+                  {sourceChainFeeErrorLabel}
+                </>
+              ) : (
+                <>
+                  <FlatButton
+                    className="my-30px min-w-[200px]"
+                    size="large"
+                    color="warning"
+                    disabled={disableSubmitApprove}
+                    onClick={onApprove}
+                    loading={RD.isPending(approveState)}>
+                    {intl.formatMessage({ id: 'common.approve' })}
+                  </FlatButton>
+
+                  {renderApproveFeeError}
+                  {renderApproveError}
+                  {renderIsApprovedError}
+
+                  {/* TODO(@veado) ADD ApproveFees to details */}
+
+                  {!RD.isInitial(uiApproveFeesRD) && (
+                    <Fees fees={uiApproveFeesRD} reloadFees={reloadApproveFeesHandler} />
+                  )}
+                </>
+              )}
+
+              <Disclosure defaultOpen>
+                {({ open }) => (
+                  <div
+                    className={`mx-50px w-full  ${
+                      open ? 'py-5px' : 'py-5px'
+                    } px-10px font-main text-[12px] uppercase dark:border-gray1d`}>
+                    <Disclosure.Button className="flex w-full justify-between">
+                      <span className="font-mainSemiBold text-[16px] uppercase text-text2 dark:text-text2d">
+                        Details
+                      </span>
+                      {open ? (
+                        <MinusIcon className="h-[20px] w-[20px] text-turquoise" />
+                      ) : (
+                        <PlusIcon className="h-[20px] w-[20px] text-turquoise" />
+                      )}
+                    </Disclosure.Button>
+                    <Transition
+                      enter="ease"
+                      enterFrom="opacity-0"
+                      enterTo="opacity-100"
+                      leave="ease"
+                      leaveFrom="opacity-100"
+                      leaveTo="opacity-0">
+                      <Disclosure.Panel className="font-main text-[14px] text-gray2 dark:text-gray2d">
+                        {/* fees */}
+                        <div className="flex w-full items-center justify-between pt-10px font-mainBold">
+                          <BaseButton
+                            disabled={RD.isPending(uiFees) || RD.isInitial(uiFees)}
+                            className="group pl-0 !font-mainBold !text-gray2 dark:!text-gray2d"
+                            onClick={reloadFeesHandler}>
+                            {intl.formatMessage({ id: 'common.fees.estimated' })}
+                            <ArrowPathIcon className="ease ml-5px h-[15px] w-[15px] group-hover:rotate-180" />
+                          </BaseButton>
+                          <div>{priceSwapFeesLabel}</div>
+                        </div>
+                        <div className="flex w-full justify-between pl-10px text-[12px]">
+                          <div>Inbound</div>
+                          <div>{priceSwapInFeeLabel}</div>
+                        </div>
+                        <div className="flex w-full justify-between pl-10px text-[12px]">
+                          <div>Outbound</div>
+                          <div>{priceSwapOutFeeLabel}</div>
+                        </div>
+                        <div className="flex w-full justify-between pl-10px text-[12px]">
+                          <div>Affiliate</div>
+                          <div>
+                            {formatAssetAmountCurrency({
+                              amount: assetAmount(0),
+                              asset: pricePool.asset,
+                              decimal: 0
+                            })}
+                          </div>
+                        </div>
+                        {/* Slippage */}
+                        <div
+                          className={`flex w-full justify-between pt-10px font-mainBold text-[14px]${
+                            isCausedSlippage ? 'text-error0 dark:text-error0d' : ''
+                          }`}>
+                          <div>{intl.formatMessage({ id: 'swap.slip.title' })}</div>
+                          <div>{swapData.slip.toFixed(2)}%</div>
+                        </div>
+                        <div className="flex w-full justify-between pl-10px text-[12px]">
+                          <div
+                            className={`flex items-center ${
+                              disableSlippage ? 'text-warning0 dark:text-warning0d' : ''
+                            }`}>
+                            {intl.formatMessage({ id: 'swap.slip.tolerance' })}
+                            {disableSlippage ? (
+                              <InfoIcon
+                                className="ml-[3px] h-[15px] w-[15px] text-inherit"
+                                tooltip={intl.formatMessage({ id: 'swap.slip.tolerance.ledger-disabled.info' })}
+                                color="warning"
+                              />
+                            ) : (
+                              <InfoIcon
+                                className="ml-[3px] h-[15px] w-[15px] text-inherit"
+                                tooltip={intl.formatMessage({ id: 'swap.slip.tolerance.info' })}
+                              />
+                            )}
+                          </div>
+                          <div>
+                            {/* we don't show slippage tolerance whenever slippage is disabled (e.g. due memo restriction for Ledger BTC) */}
+                            {!disableSlippage && (
+                              <SelectableSlipTolerance value={slipTolerance} onChange={changeSlipTolerance} />
+                            )}
+                          </div>
+                        </div>
+                        <div className="flex w-full justify-between pl-10px text-[12px]">
+                          <div className="flex items-center">
+                            Protected swap result
+                            <InfoIcon
+                              className={`ml-[3px] ${
+                                disableSlippage ? '' : 'text-gray2 dark:text-gray2d'
+                              } h-[15px] w-[15px]`}
+                              color={disableSlippage ? 'warning' : 'neutral'}
+                              tooltip={
+                                disableSlippage
+                                  ? intl.formatMessage({ id: 'swap.slip.tolerance.ledger-disabled.info' })
+                                  : intl.formatMessage({ id: 'swap.min.result.info' }, { tolerance: slipTolerance })
+                              }
+                            />
+                          </div>
+                          <div>{swapMinResultLabel}</div>
+                        </div>
+                        {/* Rate */}
+                        <div className="flex w-full justify-between pt-10px font-mainBold text-[14px]">
+                          <BaseButton
+                            className="group pl-0 !font-mainBold !text-gray2 dark:!text-gray2d"
+                            onClick={() =>
+                              // toggle rate
+                              setRateDirection((current) => (current === 'fromSource' ? 'fromTarget' : 'fromSource'))
+                            }>
+                            Rate
+                            <ArrowsRightLeftIcon className="ease ml-5px h-[15px] w-[15px] group-hover:rotate-180" />
+                          </BaseButton>
+                          <div>{rateLabel}</div>
+                        </div>
+                        {/* memo */}
+                        <div className="flex w-full items-start justify-between pt-10px text-[14px]">
+                          <div className="ml-[-2px] font-mainBold">{memoTitle}</div>
+                          <div className="truncate pl-20px font-main">{memoLabel}</div>
+                        </div>
+                      </Disclosure.Panel>
+                    </Transition>
+                  </div>
+                )}
+              </Disclosure>
+            </>
+          ) : (
+            <>
+              <p className="center mb-0 mt-30px font-main text-[12px] uppercase text-text2 dark:text-text2d">
+                {!hasImportedKeystore(keystore)
+                  ? intl.formatMessage({ id: 'swap.note.nowallet' })
+                  : isLocked(keystore) && intl.formatMessage({ id: 'swap.note.lockedWallet' })}
+              </p>
+              <FlatButton className="my-30px min-w-[200px]" size="large" onClick={importWalletHandler}>
+                {!hasImportedKeystore(keystore)
+                  ? intl.formatMessage({ id: 'wallet.add.label' })
+                  : isLocked(keystore) && intl.formatMessage({ id: 'wallet.unlock.label' })}
+              </FlatButton>
+            </>
+          )}
+        </div>
+
+        {renderPasswordConfirmationModal}
+        {renderLedgerConfirmationModal}
+        {renderTxModal}
+      </div>
+    </div>
   )
 }
