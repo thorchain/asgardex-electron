@@ -1,8 +1,13 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
-import { Disclosure, Transition } from '@headlessui/react'
-import { ArrowPathIcon, ArrowsRightLeftIcon, ArrowsUpDownIcon, MinusIcon, PlusIcon } from '@heroicons/react/24/outline'
+import {
+  ArrowPathIcon,
+  ArrowsRightLeftIcon,
+  ArrowsUpDownIcon,
+  MagnifyingGlassMinusIcon,
+  MagnifyingGlassPlusIcon
+} from '@heroicons/react/24/outline'
 import { getSwapMemo, getValueOfAsset1InAsset2, PoolData } from '@thorchain/asgardex-util'
 import {
   Asset,
@@ -526,14 +531,22 @@ export const Swap = ({
   const priceSwapFeesLabel = useMemo(
     () =>
       FP.pipe(
-        oPriceSwapFees1e8,
-        O.map(({ amount, asset }) =>
-          formatAssetAmountCurrency({ amount: baseToAsset(amount), asset, decimal: isUSDAsset(asset) ? 2 : 6 })
-        ),
-        O.getOrElse(() => '--')
+        swapFeesRD,
+        RD.fold(
+          () => loadingString,
+          () => loadingString,
+          () => noDataString,
+          (_) =>
+            FP.pipe(
+              oPriceSwapFees1e8,
+              O.map(({ amount, asset }) =>
+                formatAssetAmountCurrency({ amount: baseToAsset(amount), asset, decimal: isUSDAsset(asset) ? 2 : 6 })
+              ),
+              O.getOrElse(() => noDataString)
+            )
+        )
       ),
-
-    [oPriceSwapFees1e8]
+    [oPriceSwapFees1e8, swapFeesRD]
   )
 
   // Helper to price target fees into source asset - original decimal
@@ -1303,26 +1316,13 @@ export const Swap = ({
     const amountMax1e8 = max1e8BaseAmount(amount)
 
     return disableSlippage
-      ? '--'
+      ? noDataString
       : `${formatAssetAmountCurrency({
           asset: targetAsset,
           amount: baseToAsset(amountMax1e8),
           trimZeros: true
         })}`
   }, [disableSlippage, swapLimit1e8, targetAssetDecimal, targetAsset])
-
-  const uiFees: UIFeesRD = useMemo(
-    () =>
-      FP.pipe(
-        swapFeesRD,
-        RD.map(({ inFee }) => [
-          { asset: inFee.asset, amount: inFee.amount },
-          // price out fee in target asset
-          { asset: targetAsset, amount: outFeeInTargetAsset }
-        ])
-      ),
-    [swapFeesRD, targetAsset, outFeeInTargetAsset]
-  )
 
   const uiApproveFeesRD: UIFeesRD = useMemo(
     () =>
@@ -1604,6 +1604,8 @@ export const Swap = ({
     [oSwapParams]
   )
 
+  const [showDetails, setShowDetails] = useState<boolean>(false)
+
   return (
     <div className="flex w-full flex-col items-center">
       <div className="flex w-full justify-center border-b border-gray1 dark:border-gray1d">
@@ -1611,7 +1613,7 @@ export const Swap = ({
           {intl.formatMessage({ id: 'common.swap' })}
         </div>
       </div>
-      <div className="w-full max-w-[500px] flex-col justify-between pt-[60px] pb-30px">
+      <div className="w-full max-w-[500px] flex-col justify-between py-[60px]">
         <div>
           <div className="flex flex-col">
             {/* Note: Input value is shown as AssetAmount */}
@@ -1782,133 +1784,130 @@ export const Swap = ({
                 </>
               )}
 
-              <Disclosure defaultOpen>
-                {({ open }) => (
-                  <div
-                    className={`mx-50px w-full  ${
-                      open ? 'py-5px' : 'py-5px'
-                    } px-10px font-main text-[12px] uppercase dark:border-gray1d`}>
-                    <Disclosure.Button className="flex w-full justify-between">
-                      <span className="font-mainSemiBold text-[16px] uppercase text-text2 dark:text-text2d">
-                        Details
-                      </span>
-                      {open ? (
-                        <MinusIcon className="h-[20px] w-[20px] text-turquoise" />
-                      ) : (
-                        <PlusIcon className="h-[20px] w-[20px] text-turquoise" />
-                      )}
-                    </Disclosure.Button>
-                    <Transition
-                      enter="ease"
-                      enterFrom="opacity-0"
-                      enterTo="opacity-100"
-                      leave="ease"
-                      leaveFrom="opacity-100"
-                      leaveTo="opacity-0">
-                      <Disclosure.Panel className="font-main text-[14px] text-gray2 dark:text-gray2d">
-                        {/* fees */}
-                        <div className="flex w-full items-center justify-between pt-10px font-mainBold">
-                          <BaseButton
-                            disabled={RD.isPending(uiFees) || RD.isInitial(uiFees)}
-                            className="group pl-0 !font-mainBold !text-gray2 dark:!text-gray2d"
-                            onClick={reloadFeesHandler}>
-                            {intl.formatMessage({ id: 'common.fees.estimated' })}
-                            <ArrowPathIcon className="ease ml-5px h-[15px] w-[15px] group-hover:rotate-180" />
-                          </BaseButton>
-                          <div>{priceSwapFeesLabel}</div>
-                        </div>
-                        <div className="flex w-full justify-between pl-10px text-[12px]">
-                          <div>Inbound</div>
-                          <div>{priceSwapInFeeLabel}</div>
-                        </div>
-                        <div className="flex w-full justify-between pl-10px text-[12px]">
-                          <div>Outbound</div>
-                          <div>{priceSwapOutFeeLabel}</div>
-                        </div>
-                        <div className="flex w-full justify-between pl-10px text-[12px]">
-                          <div>Affiliate</div>
-                          <div>
-                            {formatAssetAmountCurrency({
-                              amount: assetAmount(0),
-                              asset: pricePool.asset,
-                              decimal: 0
-                            })}
-                          </div>
-                        </div>
-                        {/* Slippage */}
-                        <div
-                          className={`flex w-full justify-between pt-10px font-mainBold text-[14px]${
-                            isCausedSlippage ? 'text-error0 dark:text-error0d' : ''
-                          }`}>
-                          <div>{intl.formatMessage({ id: 'swap.slip.title' })}</div>
-                          <div>{swapData.slip.toFixed(2)}%</div>
-                        </div>
-                        <div className="flex w-full justify-between pl-10px text-[12px]">
-                          <div
-                            className={`flex items-center ${
-                              disableSlippage ? 'text-warning0 dark:text-warning0d' : ''
-                            }`}>
-                            {intl.formatMessage({ id: 'swap.slip.tolerance' })}
-                            {disableSlippage ? (
-                              <InfoIcon
-                                className="ml-[3px] h-[15px] w-[15px] text-inherit"
-                                tooltip={intl.formatMessage({ id: 'swap.slip.tolerance.ledger-disabled.info' })}
-                                color="warning"
-                              />
-                            ) : (
-                              <InfoIcon
-                                className="ml-[3px] h-[15px] w-[15px] text-inherit"
-                                tooltip={intl.formatMessage({ id: 'swap.slip.tolerance.info' })}
-                              />
-                            )}
-                          </div>
-                          <div>
-                            {/* we don't show slippage tolerance whenever slippage is disabled (e.g. due memo restriction for Ledger BTC) */}
-                            {!disableSlippage && (
-                              <SelectableSlipTolerance value={slipTolerance} onChange={changeSlipTolerance} />
-                            )}
-                          </div>
-                        </div>
-                        <div className="flex w-full justify-between pl-10px text-[12px]">
-                          <div className="flex items-center">
-                            Protected swap result
-                            <InfoIcon
-                              className={`ml-[3px] ${
-                                disableSlippage ? '' : 'text-gray2 dark:text-gray2d'
-                              } h-[15px] w-[15px]`}
-                              color={disableSlippage ? 'warning' : 'neutral'}
-                              tooltip={
-                                disableSlippage
-                                  ? intl.formatMessage({ id: 'swap.slip.tolerance.ledger-disabled.info' })
-                                  : intl.formatMessage({ id: 'swap.min.result.info' }, { tolerance: slipTolerance })
-                              }
-                            />
-                          </div>
-                          <div>{swapMinResultLabel}</div>
-                        </div>
-                        {/* Rate */}
-                        <div className="flex w-full justify-between pt-10px font-mainBold text-[14px]">
-                          <BaseButton
-                            className="group pl-0 !font-mainBold !text-gray2 dark:!text-gray2d"
-                            onClick={() =>
-                              // toggle rate
-                              setRateDirection((current) => (current === 'fromSource' ? 'fromTarget' : 'fromSource'))
-                            }>
-                            Rate
-                            <ArrowsRightLeftIcon className="ease ml-5px h-[15px] w-[15px] group-hover:rotate-180" />
-                          </BaseButton>
-                          <div>{rateLabel}</div>
-                        </div>
-                        {/* memo */}
-                        <div className="flex w-full items-start justify-between pt-10px text-[14px]">
-                          <div className="ml-[-2px] font-mainBold">{memoTitle}</div>
-                          <div className="truncate pl-20px font-main">{memoLabel}</div>
-                        </div>
-                      </Disclosure.Panel>
-                    </Transition>
+              <div className={`mx-50px w-full px-10px font-main text-[12px] uppercase dark:border-gray1d`}>
+                <BaseButton
+                  className="goup flex w-full justify-between !p-0 font-mainSemiBold text-[16px] text-text2 hover:text-turquoise dark:text-text2d dark:hover:text-turquoise"
+                  onClick={() => setShowDetails((current) => !current)}>
+                  Details
+                  {showDetails ? (
+                    <MagnifyingGlassMinusIcon className="ease h-[20px] w-[20px] text-inherit group-hover:scale-125" />
+                  ) : (
+                    <MagnifyingGlassPlusIcon className="ease h-[20px] w-[20px] text-inherit group-hover:scale-125 " />
+                  )}
+                </BaseButton>
+
+                <div className="font-main text-[14px] text-gray2 dark:text-gray2d">
+                  {/* fees */}
+                  <div className="flex w-full items-center justify-between pt-10px font-mainBold">
+                    <BaseButton
+                      disabled={RD.isPending(swapFeesRD) || RD.isInitial(swapFeesRD)}
+                      className="group !p-0 !font-mainBold !text-gray2 dark:!text-gray2d"
+                      onClick={reloadFeesHandler}>
+                      {intl.formatMessage({ id: 'common.fees.estimated' })}
+                      <ArrowPathIcon className="ease ml-5px h-[15px] w-[15px] group-hover:rotate-180" />
+                    </BaseButton>
+                    <div>{priceSwapFeesLabel}</div>
                   </div>
-                )}
-              </Disclosure>
+
+                  {showDetails && (
+                    <>
+                      <div className="flex w-full justify-between pl-10px text-[12px]">
+                        <div>Inbound</div>
+                        <div>{priceSwapInFeeLabel}</div>
+                      </div>
+                      <div className="flex w-full justify-between pl-10px text-[12px]">
+                        <div>Outbound</div>
+                        <div>{priceSwapOutFeeLabel}</div>
+                      </div>
+                      <div className="flex w-full justify-between pl-10px text-[12px]">
+                        <div>Affiliate</div>
+                        <div>
+                          {formatAssetAmountCurrency({
+                            amount: assetAmount(0),
+                            asset: pricePool.asset,
+                            decimal: 0
+                          })}
+                        </div>
+                      </div>
+                    </>
+                  )}
+                  {/* Slippage */}
+                  <div
+                    className={`flex w-full justify-between ${showDetails ? 'pt-10px' : ''} font-mainBold text-[14px]${
+                      isCausedSlippage ? 'text-error0 dark:text-error0d' : ''
+                    }`}>
+                    <div>{intl.formatMessage({ id: 'swap.slip.title' })}</div>
+                    <div>{swapData.slip.toFixed(2)}%</div>
+                  </div>
+
+                  {showDetails && (
+                    <>
+                      <div className="flex w-full justify-between pl-10px text-[12px]">
+                        <div
+                          className={`flex items-center ${disableSlippage ? 'text-warning0 dark:text-warning0d' : ''}`}>
+                          {intl.formatMessage({ id: 'swap.slip.tolerance' })}
+                          {disableSlippage ? (
+                            <InfoIcon
+                              className="ml-[3px] h-[15px] w-[15px] text-inherit"
+                              tooltip={intl.formatMessage({ id: 'swap.slip.tolerance.ledger-disabled.info' })}
+                              color="warning"
+                            />
+                          ) : (
+                            <InfoIcon
+                              className="ml-[3px] h-[15px] w-[15px] text-inherit"
+                              tooltip={intl.formatMessage({ id: 'swap.slip.tolerance.info' })}
+                            />
+                          )}
+                        </div>
+                        <div>
+                          {/* we don't show slippage tolerance whenever slippage is disabled (e.g. due memo restriction for Ledger BTC) */}
+                          {!disableSlippage && (
+                            <SelectableSlipTolerance value={slipTolerance} onChange={changeSlipTolerance} />
+                          )}
+                        </div>
+                      </div>
+                      <div className="flex w-full justify-between pl-10px text-[12px]">
+                        <div className="flex items-center">
+                          Protected swap result
+                          <InfoIcon
+                            className={`ml-[3px] ${
+                              disableSlippage ? '' : 'text-gray2 dark:text-gray2d'
+                            } h-[15px] w-[15px]`}
+                            color={disableSlippage ? 'warning' : 'neutral'}
+                            tooltip={
+                              disableSlippage
+                                ? intl.formatMessage({ id: 'swap.slip.tolerance.ledger-disabled.info' })
+                                : intl.formatMessage({ id: 'swap.min.result.info' }, { tolerance: slipTolerance })
+                            }
+                          />
+                        </div>
+                        <div>{swapMinResultLabel}</div>
+                      </div>
+                    </>
+                  )}
+                  {/* Rate */}
+                  <div
+                    className={`flex w-full justify-between ${showDetails ? 'pt-10px' : ''} font-mainBold text-[14px]`}>
+                    <BaseButton
+                      className="group !p-0 !font-mainBold !text-gray2 dark:!text-gray2d"
+                      onClick={() =>
+                        // toggle rate
+                        setRateDirection((current) => (current === 'fromSource' ? 'fromTarget' : 'fromSource'))
+                      }>
+                      Rate
+                      <ArrowsRightLeftIcon className="ease ml-5px h-[15px] w-[15px] group-hover:rotate-180" />
+                    </BaseButton>
+                    <div>{rateLabel}</div>
+                  </div>
+                  {/* memo */}
+                  {showDetails && (
+                    <div className="flex w-full items-start justify-between pt-10px text-[14px]">
+                      <div className="ml-[-2px] font-mainBold">{memoTitle}</div>
+                      <div className="break-all pl-20px font-main">{memoLabel}</div>
+                    </div>
+                  )}
+                </div>
+              </div>
             </>
           ) : (
             <>

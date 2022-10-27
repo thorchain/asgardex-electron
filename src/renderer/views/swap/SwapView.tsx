@@ -259,7 +259,7 @@ const SuccessRouteView: React.FC<Props> = ({ sourceAsset, targetAsset }): JSX.El
         <BackLink className="!m-0" />
         <RefreshButton clickHandler={reloadHandler} />
       </div>
-      <div className="flex flex-1 items-center justify-center bg-bg0 dark:bg-bg0d">
+      <div className="flex items-center justify-center bg-bg0 dark:bg-bg0d">
         {FP.pipe(
           sequenceTRD(poolsState, sourceAssetRD, targetAssetRD),
           RD.fold(
