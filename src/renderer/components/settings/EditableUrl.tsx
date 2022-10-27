@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
-import { CheckCircleIcon, PencilAltIcon, XCircleIcon } from '@heroicons/react/outline'
+import { CheckCircleIcon, PencilSquareIcon, XCircleIcon } from '@heroicons/react/24/outline'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
 import { useForm } from 'react-hook-form'
@@ -109,7 +109,7 @@ const EditableUrl: React.FC<Props> = (props): JSX.Element => {
           loading={loading}
           onClick={edit}>
           {url}
-          <PencilAltIcon className="dark:text0d ml-[5px] h-[20px] w-[20px] text-turquoise" />
+          <PencilSquareIcon className="dark:text0d ml-[5px] h-[20px] w-[20px] text-turquoise" />
         </TextButton>
         <BorderButton
           className="ml-10px"

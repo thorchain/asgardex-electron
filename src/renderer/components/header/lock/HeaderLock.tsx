@@ -2,7 +2,7 @@ import React, { useCallback, useMemo } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
 import { Listbox } from '@headlessui/react'
-import { PlusCircleIcon } from '@heroicons/react/outline'
+import { PlusCircleIcon } from '@heroicons/react/24/outline'
 import * as A from 'fp-ts/lib/Array'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'

@@ -2,8 +2,7 @@ import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
 import { Disclosure, Transition } from '@headlessui/react'
-import { ArrowCircleUpIcon, MinusIcon, PlusIcon } from '@heroicons/react/outline'
-import { ArrowSmDownIcon } from '@heroicons/react/solid'
+import { ArrowPathIcon, ArrowsRightLeftIcon, ArrowsUpDownIcon, MinusIcon, PlusIcon } from '@heroicons/react/24/outline'
 import { getSwapMemo, getValueOfAsset1InAsset2, PoolData } from '@thorchain/asgardex-util'
 import {
   Asset,
@@ -1679,7 +1678,7 @@ export const Swap = ({
                     disabled={disableSwitchAssets}
                     onClick={!disableSwitchAssets ? () => onSwitchAssets() : undefined}
                     className="group">
-                    <ArrowSmDownIcon
+                    <ArrowsUpDownIcon
                       className="ease h-[50px] w-[50px] text-turquoise
                    group-hover:rotate-180
                     "
@@ -1817,7 +1816,7 @@ export const Swap = ({
                                     className="pl-0 !font-mainBold !text-gray2 dark:!text-gray2d"
                                     onClick={reloadFeesHandler}>
                                     {intl.formatMessage({ id: 'common.fees.estimated' })}
-                                    <ArrowCircleUpIcon className="ml-5px h-[20px] w-[20px]" />
+                                    <ArrowPathIcon className="ml-5px h-[20px] w-[20px]" />
                                   </BaseButton>
                                   <div>{priceSwapFeesLabel}</div>
                                 </div>
@@ -1870,7 +1869,7 @@ export const Swap = ({
                                       )
                                     }>
                                     Rate
-                                    <ArrowCircleUpIcon className="ml-5px h-[20px] w-[20px]" />
+                                    <ArrowsRightLeftIcon className="ml-5px h-[20px] w-[20px]" />
                                   </BaseButton>
                                   <div>{rateLabel}</div>
                                 </div>
