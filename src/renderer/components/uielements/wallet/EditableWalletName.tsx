@@ -1,6 +1,6 @@
 import React, { useCallback, useState } from 'react'
 
-import { CheckCircleIcon, PencilAltIcon, XCircleIcon } from '@heroicons/react/outline'
+import { CheckCircleIcon, PencilSquareIcon, XCircleIcon } from '@heroicons/react/24/outline'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
 import { useForm } from 'react-hook-form'
@@ -52,7 +52,7 @@ export const EditableWalletName: React.FC<Props> = (props): JSX.Element => {
         className={`flex ${loading ? 'cursor-not-allowed' : 'cursor-pointer'} items-center text-[18px]`}
         onClick={edit}>
         {name}
-        <PencilAltIcon className="dark:text0d ml-[5px] h-[20px] w-[20px] text-turquoise" />
+        <PencilSquareIcon className="dark:text0d ml-[5px] h-[20px] w-[20px] text-turquoise" />
       </TextButton>
     )
   }, [loading, name])

@@ -74,7 +74,7 @@
     "@devexperts/rx-utils": "^1.0.0-alpha.14",
     "@devexperts/utils": "^1.0.0-alpha.14",
     "@headlessui/react": "^1.6.6",
-    "@heroicons/react": "^1.0.6",
+    "@heroicons/react": "^2.0.12",
     "@ledgerhq/hw-app-btc": "6.7.0",
     "@ledgerhq/hw-app-cosmos": "^6.27.1",
     "@ledgerhq/hw-app-eth": "^6.28.2",

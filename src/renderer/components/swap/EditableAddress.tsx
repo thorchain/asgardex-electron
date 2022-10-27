@@ -1,6 +1,6 @@
 import React, { useState, useMemo, useCallback } from 'react'
 
-import { CheckCircleIcon, ExternalLinkIcon, PencilAltIcon, XCircleIcon } from '@heroicons/react/outline'
+import { CheckCircleIcon, ArrowTopRightOnSquareIcon, PencilSquareIcon, XCircleIcon } from '@heroicons/react/24/outline'
 import { Address, Asset } from '@xchainjs/xchain-util'
 import { Form, Tooltip } from 'antd'
 import * as FP from 'fp-ts/lib/function'
@@ -96,7 +96,7 @@ export const EditableAddress = ({
           {truncatedAddress}
         </Tooltip>
         <div className="flex flex-row items-center">
-          <PencilAltIcon
+          <PencilSquareIcon
             className="ml-[5px] h-[20px] w-[20px] cursor-pointer text-turquoise"
             onClick={() => {
               setEditableAddress(O.fromNullable(address))
@@ -104,7 +104,7 @@ export const EditableAddress = ({
             }}
           />
           <CopyLabel className="text-turquoise" textToCopy={address} />
-          <ExternalLinkIcon
+          <ArrowTopRightOnSquareIcon
             className="ml-[5px] h-[20px] w-[20px] cursor-pointer text-turquoise"
             onClick={() => onClickOpenAddress(address)}
           />
