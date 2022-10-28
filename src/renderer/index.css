@@ -45,4 +45,8 @@ body {
   .card {
     @apply rounded-[5px] border border-solid border-gray0 bg-bg0 p-[24px] dark:border-gray0d dark:bg-bg0d;
   }
+  /* default ease */
+  .ease {
+    @apply transition duration-300 ease-in-out;
+  }
 }
