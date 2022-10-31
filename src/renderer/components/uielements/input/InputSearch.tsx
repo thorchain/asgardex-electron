@@ -7,7 +7,7 @@ import { emptyString } from '../../../helpers/stringHelper'
 import { Size } from '../button'
 import { Input, InputProps } from './Input'
 
-export type Props = { classNameInput: string; onSearch?: (searchTxt: string) => void } & Omit<InputProps, 'uppercase'>
+export type Props = { classNameInput?: string; onSearch?: (searchTxt: string) => void } & Omit<InputProps, 'uppercase'>
 
 export const InputSearch = forwardRef<HTMLInputElement, Props>((props, ref): JSX.Element => {
   const {

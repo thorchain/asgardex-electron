@@ -83,6 +83,8 @@ const common: CommonMessages = {
   'common.manage': 'Gérer',
   'common.analytics': 'Analyse',
   'common.asset.base': 'Base',
+  'common.asset.change': 'Change asset - FR',
+  'common.noResult': 'No result - FR',
   'common.tx.type.swap': 'Échange',
   'common.tx.type.donate': 'Don',
   'common.tx.type.refund': 'Remboursement',
