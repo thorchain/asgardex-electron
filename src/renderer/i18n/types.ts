@@ -85,6 +85,8 @@ export type CommonMessageKey =
   | 'common.all'
   | 'common.analytics'
   | 'common.asset.base'
+  | 'common.asset.change'
+  | 'common.noResult'
   | 'common.tx.type.swap'
   | 'common.tx.type.deposit'
   | 'common.tx.type.refund'
