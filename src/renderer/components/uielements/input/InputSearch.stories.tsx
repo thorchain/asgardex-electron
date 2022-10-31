@@ -1,31 +1,31 @@
 import { ComponentMeta, StoryFn } from '@storybook/react'
 
-import { InputPassword as Component, PasswordProps } from './InputPassword'
+import { InputSearch as Component, Props } from './InputSearch'
 
-const Template: StoryFn<PasswordProps> = (args) => <Component {...args} />
+const Template: StoryFn<Props> = (args) => <Component {...args} />
 export const Default = Template.bind({})
 
 const meta: ComponentMeta<typeof Component> = {
   component: Component,
-  title: 'Components/InputPassword',
+  title: 'Components/InputSearch',
   argTypes: {
     onChange: {
       action: 'onChange'
     },
-    onEnter: {
-      action: 'onEnter'
-    },
     onCancel: {
       action: 'onCancel'
     },
+    onSearch: {
+      action: 'onSearch'
+    },
     size: {
-      control: { type: 'select', options: ['small', 'normal', 'large'] }
+      control: { type: 'select', options: ['small', 'medium', 'normal', 'large'] }
     }
   },
   args: {
-    placeholder: 'Placeholder',
+    placeholder: 'Search',
     size: 'normal',
-    error: '',
+    error: false,
     disabled: false
   },
   decorators: [

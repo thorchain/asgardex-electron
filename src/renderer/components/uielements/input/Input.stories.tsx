@@ -12,6 +12,12 @@ const meta: ComponentMeta<typeof Component> = {
     onChange: {
       action: 'onChange'
     },
+    onEnter: {
+      action: 'onEnter'
+    },
+    onCancel: {
+      action: 'onCancel'
+    },
     size: {
       control: { type: 'select', options: ['small', 'normal', 'large'] }
     }
