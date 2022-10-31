@@ -14,7 +14,7 @@ import {
 
 import { AssetBUSDBD1 } from '../../../../const'
 import * as AT from '../../../../storybook/argTypes'
-import { AssetMenu2 as Component, Props } from './AssetMenu2'
+import { AssetMenu as Component, Props } from './AssetMenu'
 
 const assets = [AssetBTC, AssetBNB, AssetRuneNative, AssetETH, AssetLTC, AssetBCH, AssetDOGE, AssetBUSDBD1]
 
@@ -44,7 +44,7 @@ export const Default = Template.bind({})
 
 const meta: ComponentMeta<typeof Template> = {
   component: Template,
-  title: 'Components/Assets/AssetMenu2',
+  title: 'Components/Assets/AssetMenu',
   argTypes: {
     network: AT.network,
     onSelect: {

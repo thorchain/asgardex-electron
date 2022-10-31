@@ -27,7 +27,7 @@ import { TooltipAddress } from '../../common/Common.styles'
 import { InfoIcon } from '../../info'
 import * as InfoIconStyled from '../../info/InfoIcon.styles'
 import { Slider } from '../../slider'
-import { AssetMenu2 as AssetMenu } from '../assetMenu'
+import { AssetMenu } from '../assetMenu'
 import { AssetSelect } from '../assetSelect'
 import * as Styled from './AssetCard.styles'
 

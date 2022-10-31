@@ -1,1 +1,1 @@
-export { AssetMenu2 } from './AssetMenu2'
+export { AssetMenu } from './AssetMenu'

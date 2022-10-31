@@ -27,7 +27,7 @@ export type Props = {
   network: Network
 }
 
-export const AssetMenu2: React.FC<Props> = (props): JSX.Element => {
+export const AssetMenu: React.FC<Props> = (props): JSX.Element => {
   const {
     asset,
     open,
