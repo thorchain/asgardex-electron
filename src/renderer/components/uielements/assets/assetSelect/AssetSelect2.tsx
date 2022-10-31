@@ -1,9 +1,8 @@
-import React, { useCallback, useState, useMemo } from 'react'
+import React, { useCallback, useState, useMemo, useRef } from 'react'
 
 import { Dialog } from '@headlessui/react'
-import { ChevronDownIcon } from '@heroicons/react/24/outline'
+import { ArchiveBoxXMarkIcon, ChevronDownIcon, XMarkIcon } from '@heroicons/react/24/outline'
 import { Asset, assetToString } from '@xchainjs/xchain-util'
-import Input from 'antd/lib/input/Input'
 import * as A from 'fp-ts/lib/Array'
 import * as FP from 'fp-ts/lib/function'
 import * as NEA from 'fp-ts/lib/NonEmptyArray'
@@ -13,16 +12,16 @@ import { useIntl } from 'react-intl'
 import { Network } from '../../../../../shared/api/types'
 import { emptyString } from '../../../../helpers/stringHelper'
 import { BaseButton } from '../../button'
+import { InputSearch } from '../../input'
 import { AssetData } from '../assetData'
 
 export type Props = {
   asset: Asset
   assets: Asset[]
-  withSearch?: boolean
-  searchDisable?: string[]
   onSelect: (_: Asset) => void
   className?: string
   showAssetName?: boolean
+  dialogHeadline?: string
   disabled?: boolean
   network: Network
 }
@@ -31,10 +30,9 @@ export const AssetSelect2: React.FC<Props> = (props): JSX.Element => {
   const {
     asset,
     assets = [],
-    // withSearch = true,
-    // searchDisable = [],
     onSelect = (_: Asset) => {},
     className = '',
+    dialogHeadline = emptyString,
     showAssetName = true,
     disabled = false,
     network
@@ -44,7 +42,11 @@ export const AssetSelect2: React.FC<Props> = (props): JSX.Element => {
 
   const [searchValue, setSearchValue] = useState<string>(emptyString)
 
-  const _intl = useIntl()
+  const clearSearchValue = useCallback(() => {
+    setSearchValue(emptyString)
+  }, [])
+
+  const intl = useIntl()
 
   const handleDropdownButtonClicked = (e: React.MouseEvent) => {
     e.stopPropagation()
@@ -55,9 +57,9 @@ export const AssetSelect2: React.FC<Props> = (props): JSX.Element => {
     async (asset: Asset) => {
       onSelect(asset)
       setOpenMenu(false)
-      setSearchValue(emptyString)
+      clearSearchValue()
     },
-    [onSelect]
+    [clearSearchValue, onSelect]
   )
 
   const filteredAssets = useMemo(
@@ -77,16 +79,23 @@ export const AssetSelect2: React.FC<Props> = (props): JSX.Element => {
         filteredAssets,
         NEA.fromArray,
         O.fold(
-          () => <>no result</>,
+          () => (
+            <div className="flex h-full w-full flex-col items-center justify-center px-20px py-50px">
+              <h2 className="mb-10px text-[14px] uppercase text-gray1 dark:text-gray1d">
+                {intl.formatMessage({ id: 'common.noResult' })}
+              </h2>
+              <ArchiveBoxXMarkIcon className="h-[75px] w-[75px] text-gray0 dark:text-gray0d" />
+            </div>
+          ),
           (assets) => (
-            <div className="overflow-y-auto">
+            <div className="w-full overflow-y-auto">
               {FP.pipe(
                 assets,
                 NEA.map((asset) => (
                   <BaseButton
                     key={assetToString(asset)}
                     onClick={() => handleChangeAsset(asset)}
-                    className="w-full !justify-start px-[30px] hover:bg-gray0 hover:dark:bg-gray0d">
+                    className="w-full !justify-start hover:bg-gray0 hover:dark:bg-gray0d">
                     <AssetData asset={asset} network={network} className="" />
                   </BaseButton>
                 ))
@@ -95,7 +104,7 @@ export const AssetSelect2: React.FC<Props> = (props): JSX.Element => {
           )
         )
       ),
-    [filteredAssets, handleChangeAsset, network]
+    [filteredAssets, handleChangeAsset, intl, network]
   )
 
   const searchHandler = useCallback(({ target }: React.ChangeEvent<HTMLInputElement>) => {
@@ -105,29 +114,52 @@ export const AssetSelect2: React.FC<Props> = (props): JSX.Element => {
 
   const onCloseMenu = useCallback(() => {
     setOpenMenu(false)
-    setSearchValue(emptyString)
-  }, [])
+    clearSearchValue()
+  }, [clearSearchValue])
+
+  // Ref to `InputSearch` - needed for intial focus in dialog
+  // @see https://headlessui.com/react/dialog#managing-initial-focus
+  const inputSearchRef = useRef(null)
 
   const renderMenu = useMemo(
     () => (
-      <Dialog as="div" className="relative z-10" open={openMenu} onClose={onCloseMenu}>
-        {/* The backdrop, rendered as a fixed sibling to the panel container */}
+      <Dialog as="div" className="relative z-10" initialFocus={inputSearchRef} open={openMenu} onClose={onCloseMenu}>
+        {/* backdrop */}
         <div className="fixed inset-0 bg-bg0/80 dark:bg-bg0d/80" aria-hidden="true" />
 
-        {/* Full-screen container to center the panel */}
+        {/* container to center the panel */}
         <div className="fixed inset-0 flex items-center justify-center p-4">
-          {/* The actual dialog panel  */}
-          <Dialog.Panel className="mx-auto flex h-[50%] max-w-[250px] flex-col items-center rounded-[20px] bg-bg0 p-20px shadow-lg dark:bg-bg0d">
-            <h1 className="mb-0 text-center font-mainSemiBold text-[17px] uppercase text-text2 dark:text-text2d">
-              output asset
-            </h1>
-            <Input className="my-20px" size="large" onChange={searchHandler} />
+          {/* dialog panel  */}
+          <Dialog.Panel
+            className="relative mx-auto flex h-[50%] min-h-[350px] max-w-[250px]
+          flex-col items-center rounded-[10px]
+           bg-bg0 px-20px
+           pb-20px pt-30px shadow-lg dark:bg-bg0d
+            ">
+            <BaseButton
+              className="absolute right-[15px] top-10px !p-0 text-gray1 hover:text-gray2 dark:text-gray1d hover:dark:text-gray2d"
+              onClick={() => setOpenMenu(false)}>
+              <XMarkIcon className="h-20px w-20px text-inherit" />
+            </BaseButton>
+            {dialogHeadline && (
+              <h1 className="!my-5px text-center font-mainSemiBold text-[17px] uppercase text-text2 dark:text-text2d">
+                {dialogHeadline}
+              </h1>
+            )}
+            <InputSearch
+              ref={inputSearchRef}
+              className="my-10px"
+              size="large"
+              onChange={searchHandler}
+              onCancel={clearSearchValue}
+              placeholder={intl.formatMessage({ id: 'common.search' })}
+            />
             {renderAssets}
           </Dialog.Panel>
         </div>
       </Dialog>
     ),
-    [onCloseMenu, openMenu, renderAssets, searchHandler]
+    [openMenu, onCloseMenu, dialogHeadline, searchHandler, clearSearchValue, intl, renderAssets]
   )
 
   const hideButton = !assets.length

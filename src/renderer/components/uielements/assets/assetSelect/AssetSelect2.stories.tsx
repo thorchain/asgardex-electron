@@ -20,23 +20,22 @@ import { AssetSelect2 as Component } from './AssetSelect2'
 const assets = [AssetBTC, AssetBNB, AssetRuneNative, AssetETH, AssetLTC, AssetBCH, AssetDOGE, AssetBUSDBD1]
 
 type Args = {
-  withSearch: boolean
   network: Network
+  dialogHeadline: string
   onSelect: (asset: Asset) => void
 }
 
-const Template = ({ network, withSearch, onSelect }: Args) => {
+const Template = ({ network, onSelect, dialogHeadline }: Args) => {
   const [asset, setAsset] = useState<Asset>(AssetBNB)
   return (
     <Component
       asset={asset}
-      withSearch={withSearch}
       assets={assets}
       onSelect={(asset) => {
         onSelect(asset)
         setAsset(asset)
       }}
-      searchDisable={[]}
+      dialogHeadline={dialogHeadline}
       network={network}
     />
   )
@@ -52,12 +51,12 @@ const meta: ComponentMeta<typeof Template> = {
       action: 'onSelect'
     }
   },
-  args: { network: 'mainnet', withSearch: false },
+  args: { network: 'mainnet', dialogHeadline: 'Change asset' },
   decorators: [
     (Story) => (
       <div className="flex min-h-full w-full flex-col items-center justify-center bg-white">
-        <h1>Random headline</h1>
-        <p>Some random text</p>
+        <h1 className="uppercase text-gray2">Random headline</h1>
+        <p className="uppercase text-gray1">Some random text</p>
         <Story />
       </div>
     )
