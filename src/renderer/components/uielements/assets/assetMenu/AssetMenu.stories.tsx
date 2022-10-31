@@ -1,27 +1,45 @@
+import { useState } from 'react'
+
 import { ComponentMeta } from '@storybook/react'
-import { AssetBNB, AssetBTC, AssetRuneNative } from '@xchainjs/xchain-util'
-import * as FP from 'fp-ts/lib/function'
+import {
+  Asset,
+  AssetBCH,
+  AssetBNB,
+  AssetBTC,
+  AssetDOGE,
+  AssetETH,
+  AssetLTC,
+  AssetRuneNative
+} from '@xchainjs/xchain-util'
 
-import { Network } from '../../../../../shared/api/types'
+import { AssetBUSDBD1 } from '../../../../const'
 import * as AT from '../../../../storybook/argTypes'
-import { AssetMenu as Component } from './AssetMenu'
+import { AssetMenu as Component, Props } from './AssetMenu'
 
-type Args = {
-  withSearch: boolean
-  network: Network
-  onSelect: FP.Lazy<void>
+const assets = [AssetBTC, AssetBNB, AssetRuneNative, AssetETH, AssetLTC, AssetBCH, AssetDOGE, AssetBUSDBD1]
+
+const Template = ({ network, onSelect, open, onClose, headline }: Props) => {
+  const [asset, setAsset] = useState<Asset>(AssetBNB)
+  const [openMenu, setOpenMenu] = useState(open)
+  return (
+    <Component
+      asset={asset}
+      assets={assets}
+      open={openMenu}
+      headline={headline}
+      onSelect={(asset) => {
+        onSelect(asset)
+        setAsset(asset)
+        setOpenMenu(false)
+      }}
+      onClose={() => {
+        onClose()
+        setOpenMenu(false)
+      }}
+      network={network}
+    />
+  )
 }
-
-const Template = ({ network, withSearch, onSelect }: Args) => (
-  <Component
-    withSearch={withSearch}
-    asset={AssetBNB}
-    assets={[AssetBNB, AssetBTC, AssetRuneNative]}
-    onSelect={onSelect}
-    searchDisable={[]}
-    network={network}
-  />
-)
 export const Default = Template.bind({})
 
 const meta: ComponentMeta<typeof Template> = {
@@ -31,12 +49,15 @@ const meta: ComponentMeta<typeof Template> = {
     network: AT.network,
     onSelect: {
       action: 'onSelect'
+    },
+    onClose: {
+      action: 'onClose'
     }
   },
-  args: { network: 'mainnet', withSearch: false },
+  args: { network: 'mainnet', open: true, headline: 'Menu headline' },
   decorators: [
     (Story) => (
-      <div style={{ display: 'flex', padding: '20px' }}>
+      <div className="flex min-h-full w-full bg-white">
         <Story />
       </div>
     )

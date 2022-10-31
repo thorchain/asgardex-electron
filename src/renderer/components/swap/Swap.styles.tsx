@@ -6,7 +6,6 @@ import { media } from '../../helpers/styleHelper'
 import { transition } from '../../settings/style-util'
 import { Tabs as TabsUI } from '../tabs/Tabs'
 import { AssetInput as AssetInputBase } from '../uielements/assets/assetInput'
-import { AssetSelect as AssetSelectUI } from '../uielements/assets/assetSelect'
 import { CheckButton as CheckButtonUI } from '../uielements/button/CheckButton'
 import { Label as UILabel } from '../uielements/label'
 
@@ -258,10 +257,6 @@ export const MinAmountLabel = styled(UILabel)`
   text-transform: uppercase;
   width: auto;
 `
-
-export const AssetSelect = styled(AssetSelectUI)``
-
-export const TargetAssetSelect = styled(AssetSelect)``
 
 export const FeeContainer = styled.div`
   width: 100%;
