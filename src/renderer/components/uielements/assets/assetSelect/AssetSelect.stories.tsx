@@ -1,29 +1,45 @@
+import { useState } from 'react'
+
 import { ComponentMeta } from '@storybook/react'
-import { AssetBNB, AssetBTC, AssetRuneNative } from '@xchainjs/xchain-util'
-import * as FP from 'fp-ts/lib/function'
+import {
+  Asset,
+  AssetBCH,
+  AssetBNB,
+  AssetBTC,
+  AssetDOGE,
+  AssetETH,
+  AssetLTC,
+  AssetRuneNative
+} from '@xchainjs/xchain-util'
 
 import { Network } from '../../../../../shared/api/types'
+import { AssetBUSDBD1 } from '../../../../const'
 import * as AT from '../../../../storybook/argTypes'
 import { AssetSelect as Component } from './AssetSelect'
 
-const assets = [AssetBTC, AssetBNB, AssetRuneNative]
+const assets = [AssetBTC, AssetBNB, AssetRuneNative, AssetETH, AssetLTC, AssetBCH, AssetDOGE, AssetBUSDBD1]
 
 type Args = {
-  withSearch: boolean
   network: Network
-  onSelect: FP.Lazy<void>
+  dialogHeadline: string
+  onSelect: (asset: Asset) => void
 }
 
-const Template = ({ network, withSearch, onSelect }: Args) => (
-  <Component
-    asset={AssetBNB}
-    withSearch={withSearch}
-    assets={assets}
-    onSelect={onSelect}
-    searchDisable={[]}
-    network={network}
-  />
-)
+const Template = ({ network, onSelect, dialogHeadline }: Args) => {
+  const [asset, setAsset] = useState<Asset>(AssetBNB)
+  return (
+    <Component
+      asset={asset}
+      assets={assets}
+      onSelect={(asset) => {
+        onSelect(asset)
+        setAsset(asset)
+      }}
+      dialogHeadline={dialogHeadline}
+      network={network}
+    />
+  )
+}
 export const Default = Template.bind({})
 
 const meta: ComponentMeta<typeof Template> = {
@@ -35,10 +51,12 @@ const meta: ComponentMeta<typeof Template> = {
       action: 'onSelect'
     }
   },
-  args: { network: 'mainnet', withSearch: false },
+  args: { network: 'mainnet', dialogHeadline: 'Change asset' },
   decorators: [
     (Story) => (
-      <div style={{ display: 'flex', padding: '20px' }}>
+      <div className="flex min-h-full w-full flex-col items-center justify-center bg-white">
+        <h1 className="uppercase text-gray2">Random headline</h1>
+        <p className="uppercase text-gray1">Some random text</p>
         <Story />
       </div>
     )

@@ -10,6 +10,7 @@ import {
 } from '@xchainjs/xchain-util'
 import BigNumber from 'bignumber.js'
 import * as FP from 'fp-ts/lib/function'
+import { useIntl } from 'react-intl'
 
 import { Network } from '../../../../../shared/api/types'
 import { isUSDAsset } from '../../../../helpers/assetHelper'
@@ -62,6 +63,8 @@ export const AssetInput: React.FC<Props> = (props): JSX.Element => {
   } = props
 
   const inputWrapperRef = useRef<FixmeType>()
+
+  const intl = useIntl()
 
   const [focused, setFocused] = useState(false)
 
@@ -153,11 +156,12 @@ export const AssetInput: React.FC<Props> = (props): JSX.Element => {
       </div>
 
       <AssetSelect
-        className="w-[250px]"
+        className="h-full w-[180px]"
         onSelect={onChangeAsset}
         asset={asset}
         assets={assets}
         network={network}
+        dialogHeadline={intl.formatMessage({ id: 'common.asset.change' })}
         disabled={disabled}
       />
     </div>

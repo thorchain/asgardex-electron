@@ -1,4 +1,6 @@
-import React, { forwardRef } from 'react'
+import React, { forwardRef, useCallback } from 'react'
+
+import * as FP from 'fp-ts/lib/function'
 
 import type { Size } from './Input.types'
 
@@ -17,6 +19,8 @@ export type InputProps = Omit<React.InputHTMLAttributes<HTMLInputElement>, 'size
   disabled?: boolean
   autoFocus?: boolean
   ghost?: boolean
+  onEnter?: (value: string) => void
+  onCancel?: FP.Lazy<void>
 }
 
 export const Input = forwardRef<HTMLInputElement, InputProps>((props, ref): JSX.Element => {
@@ -28,9 +32,24 @@ export const Input = forwardRef<HTMLInputElement, InputProps>((props, ref): JSX.
     autoFocus = false,
     uppercase = true,
     error = '',
+    onEnter = FP.constVoid,
+    onCancel = FP.constVoid,
     className = '',
     ...otherProps
   } = props
+
+  const onKeyDownHandler = useCallback(
+    (e: React.KeyboardEvent<HTMLInputElement>) => {
+      const value = e.currentTarget.value
+      if (e.key === 'Enter') {
+        onEnter(value)
+      }
+      if (e.key === 'Escape') {
+        onCancel()
+      }
+    },
+    [onEnter, onCancel]
+  )
 
   return (
     <input
@@ -54,6 +73,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>((props, ref): JSX.
             ${disabled ? 'opacity-50' : 'opacity-100'}
             ${className}`}
       type="text"
+      onKeyDown={onKeyDownHandler}
       autoComplete="off"
       disabled={disabled}
       {...otherProps}
