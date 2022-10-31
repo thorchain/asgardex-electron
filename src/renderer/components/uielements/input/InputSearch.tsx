@@ -44,8 +44,6 @@ export const InputSearch = forwardRef<HTMLInputElement, Props>((props, ref): JSX
   const onEnterHandler = useCallback(
     (value: string) => {
       onSearch(value)
-      // clear stored value
-      setSearchTxt(emptyString)
       onEnter(value)
     },
     [onSearch, onEnter]
