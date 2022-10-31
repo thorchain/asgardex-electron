@@ -28,7 +28,7 @@ import { InfoIcon } from '../../info'
 import * as InfoIconStyled from '../../info/InfoIcon.styles'
 import { Slider } from '../../slider'
 import { AssetMenu2 as AssetMenu } from '../assetMenu'
-import { AssetSelect2 as AssetSelect } from '../assetSelect/AssetSelect2'
+import { AssetSelect } from '../assetSelect'
 import * as Styled from './AssetCard.styles'
 
 export type Props = {
@@ -173,10 +173,12 @@ export const AssetCard: React.FC<Props> = (props): JSX.Element => {
             </Styled.AssetData>
             <Styled.AssetSelectContainer>
               <AssetSelect
+                className="w-[100px]"
                 showAssetName={false}
                 assets={assets}
                 asset={asset}
                 onSelect={handleChangeAsset}
+                dialogHeadline={intl.formatMessage({ id: 'common.asset.change' })}
                 network={network}
               />
 

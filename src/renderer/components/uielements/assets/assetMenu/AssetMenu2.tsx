@@ -121,7 +121,8 @@ export const AssetMenu2: React.FC<Props> = (props): JSX.Element => {
 
   const onCloseMenu = useCallback(() => {
     clearSearchValue()
-  }, [clearSearchValue])
+    onClose()
+  }, [clearSearchValue, onClose])
 
   // Ref to `InputSearch` - needed for intial focus in dialog
   // @see https://headlessui.com/react/dialog#managing-initial-focus
@@ -135,16 +136,15 @@ export const AssetMenu2: React.FC<Props> = (props): JSX.Element => {
       open={open}
       onClose={onCloseMenu}>
       {/* backdrop */}
-      <div className="fixed inset-0 bg-bg0/80 dark:bg-bg0d/80" aria-hidden="true" />
+      <div className="fixed inset-0 bg-bg0/60 dark:bg-bg0d/60" aria-hidden="true" />
 
       {/* container to center the panel */}
       <div className="fixed inset-0 flex items-center justify-center p-4">
         {/* dialog panel  */}
         <Dialog.Panel
-          className="relative mx-auto flex h-[50%] min-h-[350px] max-w-[250px]
-        flex-col items-center rounded-[10px]
-         bg-bg0 px-20px
-         pb-20px pt-30px shadow-lg dark:bg-bg0d
+          className="shadow-full relative mx-auto flex h-[75%] max-h-[500px] min-h-[350px]
+        max-w-[250px] flex-col items-center
+         rounded-[10px] bg-bg0 p-20px pt-30px dark:bg-bg0d
           ">
           <BaseButton
             className="absolute right-[15px] top-10px !p-0 text-gray1 hover:text-gray2 dark:text-gray1d hover:dark:text-gray2d"
@@ -152,7 +152,7 @@ export const AssetMenu2: React.FC<Props> = (props): JSX.Element => {
             <XMarkIcon className="h-20px w-20px text-inherit" />
           </BaseButton>
           {headline && (
-            <h1 className="!my-5px text-center font-mainSemiBold text-[17px] uppercase text-text2 dark:text-text2d">
+            <h1 className="mt-10px mb-0 px-5px text-center font-mainSemiBold text-[17px] uppercase text-text2 dark:text-text2d">
               {headline}
             </h1>
           )}
