@@ -23,7 +23,7 @@ export type Props = {
   open: boolean
   onClose: FP.Lazy<void>
   className?: string
-  dialogHeadline?: string
+  headline?: string
   network: Network
 }
 
@@ -33,7 +33,7 @@ export const AssetMenu2: React.FC<Props> = (props): JSX.Element => {
     open,
     assets = [],
     onSelect = (_: Asset) => {},
-    dialogHeadline = emptyString,
+    headline = emptyString,
     network,
     onClose,
     className = ''
@@ -111,6 +111,14 @@ export const AssetMenu2: React.FC<Props> = (props): JSX.Element => {
     setSearchValue(value.replace(/\s/g, ''))
   }, [])
 
+  const onEnterHandler = useCallback(() => {
+    console.log('onEnter:', filteredAssets)
+    if (filteredAssets.length === 1) {
+      // select first asset
+      handleChangeAsset(filteredAssets[0])
+    }
+  }, [filteredAssets, handleChangeAsset])
+
   const onCloseMenu = useCallback(() => {
     clearSearchValue()
   }, [clearSearchValue])
@@ -143,9 +151,9 @@ export const AssetMenu2: React.FC<Props> = (props): JSX.Element => {
             onClick={() => onClose()}>
             <XMarkIcon className="h-20px w-20px text-inherit" />
           </BaseButton>
-          {dialogHeadline && (
+          {headline && (
             <h1 className="!my-5px text-center font-mainSemiBold text-[17px] uppercase text-text2 dark:text-text2d">
-              {dialogHeadline}
+              {headline}
             </h1>
           )}
           <InputSearch
@@ -154,6 +162,7 @@ export const AssetMenu2: React.FC<Props> = (props): JSX.Element => {
             size="large"
             onChange={searchHandler}
             onCancel={clearSearchValue}
+            onEnter={onEnterHandler}
             placeholder={intl.formatMessage({ id: 'common.search' })}
           />
           {renderAssets}

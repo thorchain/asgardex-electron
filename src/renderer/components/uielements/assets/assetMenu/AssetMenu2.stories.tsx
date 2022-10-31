@@ -18,7 +18,7 @@ import { AssetMenu2 as Component, Props } from './AssetMenu2'
 
 const assets = [AssetBTC, AssetBNB, AssetRuneNative, AssetETH, AssetLTC, AssetBCH, AssetDOGE, AssetBUSDBD1]
 
-const Template = ({ network, onSelect, open, onClose }: Props) => {
+const Template = ({ network, onSelect, open, onClose, headline }: Props) => {
   const [asset, setAsset] = useState<Asset>(AssetBNB)
   const [openMenu, setOpenMenu] = useState(open)
   return (
@@ -26,6 +26,7 @@ const Template = ({ network, onSelect, open, onClose }: Props) => {
       asset={asset}
       assets={assets}
       open={openMenu}
+      headline={headline}
       onSelect={(asset) => {
         onSelect(asset)
         setAsset(asset)
@@ -53,7 +54,7 @@ const meta: ComponentMeta<typeof Template> = {
       action: 'onClose'
     }
   },
-  args: { network: 'mainnet', open: true },
+  args: { network: 'mainnet', open: true, headline: 'Menu headline' },
   decorators: [
     (Story) => (
       <div className="flex min-h-full w-full bg-white">
