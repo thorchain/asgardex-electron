@@ -3,6 +3,7 @@ import React, { useCallback, useState, useMemo } from 'react'
 import { Dialog } from '@headlessui/react'
 import { ChevronDownIcon } from '@heroicons/react/24/outline'
 import { Asset, assetToString } from '@xchainjs/xchain-util'
+import Input from 'antd/lib/input/Input'
 import * as A from 'fp-ts/lib/Array'
 import * as FP from 'fp-ts/lib/function'
 import * as NEA from 'fp-ts/lib/NonEmptyArray'
@@ -12,7 +13,6 @@ import { useIntl } from 'react-intl'
 import { Network } from '../../../../../shared/api/types'
 import { emptyString } from '../../../../helpers/stringHelper'
 import { BaseButton } from '../../button'
-import { Input } from '../../input/Input'
 import { AssetData } from '../assetData'
 
 export type Props = {
@@ -34,7 +34,7 @@ export const AssetSelect2: React.FC<Props> = (props): JSX.Element => {
     // withSearch = true,
     // searchDisable = [],
     onSelect = (_: Asset) => {},
-    className,
+    className = '',
     showAssetName = true,
     disabled = false,
     network
@@ -55,6 +55,7 @@ export const AssetSelect2: React.FC<Props> = (props): JSX.Element => {
     async (asset: Asset) => {
       onSelect(asset)
       setOpenMenu(false)
+      setSearchValue(emptyString)
     },
     [onSelect]
   )
@@ -78,7 +79,7 @@ export const AssetSelect2: React.FC<Props> = (props): JSX.Element => {
         O.fold(
           () => <>no result</>,
           (assets) => (
-            <>
+            <div className="overflow-y-auto">
               {FP.pipe(
                 assets,
                 NEA.map((asset) => (
@@ -90,7 +91,7 @@ export const AssetSelect2: React.FC<Props> = (props): JSX.Element => {
                   </BaseButton>
                 ))
               )}
-            </>
+            </div>
           )
         )
       ),
@@ -99,26 +100,34 @@ export const AssetSelect2: React.FC<Props> = (props): JSX.Element => {
 
   const searchHandler = useCallback(({ target }: React.ChangeEvent<HTMLInputElement>) => {
     const { value } = target
-    setSearchValue(value)
+    setSearchValue(value.replace(/\s/g, ''))
+  }, [])
+
+  const onCloseMenu = useCallback(() => {
+    setOpenMenu(false)
+    setSearchValue(emptyString)
   }, [])
 
   const renderMenu = useMemo(
     () => (
-      <Dialog as="div" className="relative z-10" open={openMenu} onClose={() => setOpenMenu(false)}>
+      <Dialog as="div" className="relative z-10" open={openMenu} onClose={onCloseMenu}>
         {/* The backdrop, rendered as a fixed sibling to the panel container */}
-        <div className="fixed inset-0 bg-black/30" aria-hidden="true" />
+        <div className="fixed inset-0 bg-bg0/80 dark:bg-bg0d/80" aria-hidden="true" />
 
         {/* Full-screen container to center the panel */}
         <div className="fixed inset-0 flex items-center justify-center p-4">
           {/* The actual dialog panel  */}
-          <Dialog.Panel className="mx-auto max-h-[90%] max-w-sm overflow-y-scroll rounded-[10px] bg-white py-10px shadow-lg">
-            <Input size="normal" onChange={searchHandler} />
+          <Dialog.Panel className="mx-auto flex h-[50%] max-w-[250px] flex-col items-center rounded-[20px] bg-bg0 p-20px shadow-lg dark:bg-bg0d">
+            <h1 className="mb-0 text-center font-mainSemiBold text-[17px] uppercase text-text2 dark:text-text2d">
+              output asset
+            </h1>
+            <Input className="my-20px" size="large" onChange={searchHandler} />
             {renderAssets}
           </Dialog.Panel>
         </div>
       </Dialog>
     ),
-    [openMenu, renderAssets, searchHandler]
+    [onCloseMenu, openMenu, renderAssets, searchHandler]
   )
 
   const hideButton = !assets.length
@@ -127,15 +136,15 @@ export const AssetSelect2: React.FC<Props> = (props): JSX.Element => {
   return (
     <div>
       <BaseButton
-        className={`group py-[2px] px-10px ${className}`}
+        className={`group py-[2px] px-10px focus:outline-none  ${className}`}
         disabled={disableButton}
         onClick={handleDropdownButtonClicked}>
         <AssetData noTicker={!showAssetName} className="" asset={asset} network={network} />
         {!hideButton && (
           <ChevronDownIcon
-            className={`ease h-20px w-20px text-turquoise ${
-              openMenu ? 'rotate-180' : 'rotate-0'
-            } group-hover:rotate-180`}
+            className={`ease h-20px w-20px text-turquoise ${openMenu ? 'rotate-180' : 'rotate-0'}
+            group-hover:rotate-180
+            `}
           />
         )}
       </BaseButton>
