@@ -92,7 +92,7 @@ import { LedgerConfirmationModal, WalletPasswordConfirmationModal } from '../mod
 import { TxModal } from '../modal/tx'
 import { SwapAssets } from '../modal/tx/extra'
 import { LoadingView } from '../shared/loading'
-import { AssetSelect2 } from '../uielements/assets/assetSelect/AssetSelect2'
+import { AssetSelect2 as AssetSelect } from '../uielements/assets/assetSelect/AssetSelect2'
 import { FlatButton, ViewTxButton } from '../uielements/button'
 import { WalletTypeLabel } from '../uielements/common/Common.styles'
 import { Fees, UIFeesRD } from '../uielements/fees'
@@ -1546,7 +1546,7 @@ export const Swap = ({
                         () => <></>,
                         (asset) => (
                           <Styled.AssetSelectContainer>
-                            <Styled.AssetSelect
+                            <AssetSelect
                               onSelect={setSourceAsset}
                               asset={asset}
                               assets={selectableSourceAssets}
@@ -1600,7 +1600,7 @@ export const Swap = ({
                         () => <></>,
                         (asset) => (
                           <Styled.AssetSelectContainer>
-                            <AssetSelect2
+                            <AssetSelect
                               onSelect={setTargetAsset}
                               asset={asset}
                               assets={selectableTargetAssets}

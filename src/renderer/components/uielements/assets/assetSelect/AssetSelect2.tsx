@@ -7,7 +7,7 @@ import { Network } from '../../../../../shared/api/types'
 import { emptyString } from '../../../../helpers/stringHelper'
 import { BaseButton } from '../../button'
 import { AssetData } from '../assetData'
-import { AssetMenu2 as AssetMenu } from '../assetMenu/AssetMenu2'
+import { AssetMenu2 as AssetMenu } from '../assetMenu'
 
 export type Props = {
   asset: Asset

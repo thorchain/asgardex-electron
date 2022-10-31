@@ -1,4 +1,4 @@
-import React, { useRef, useState, RefObject, useCallback, useMemo } from 'react'
+import React, { useState, useCallback, useMemo } from 'react'
 
 import { BTC_DECIMAL } from '@xchainjs/xchain-bitcoin'
 import {
@@ -11,7 +11,6 @@ import {
   assetAmount
 } from '@xchainjs/xchain-util'
 import * as AU from '@xchainjs/xchain-util'
-import { Dropdown } from 'antd'
 import BigNumber from 'bignumber.js'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
@@ -23,13 +22,13 @@ import { WalletType } from '../../../../../shared/wallet/types'
 import { ZERO_BASE_AMOUNT } from '../../../../const'
 import { isBtcAsset } from '../../../../helpers/assetHelper'
 import { ordAsset } from '../../../../helpers/fp/ord'
-import { useClickOutside } from '../../../../hooks/useOutsideClick'
 import { AssetWithAddress } from '../../../../types/asgardex'
 import { TooltipAddress } from '../../common/Common.styles'
 import { InfoIcon } from '../../info'
 import * as InfoIconStyled from '../../info/InfoIcon.styles'
 import { Slider } from '../../slider'
-import { AssetMenu } from '../assetMenu'
+import { AssetMenu2 as AssetMenu } from '../assetMenu'
+import { AssetSelect2 as AssetSelect } from '../assetSelect/AssetSelect2'
 import * as Styled from './AssetCard.styles'
 
 export type Props = {
@@ -47,9 +46,7 @@ export type Props = {
   price: BigNumber
   priceAsset?: Asset
   slip?: number
-  searchDisable?: string[]
   percentValue?: number
-  withSearch?: boolean
   onChangeAssetAmount?: (value: BaseAmount) => void
   inputOnBlurHandler?: FP.Lazy<void>
   inputOnFocusHandler?: FP.Lazy<void>
@@ -75,8 +72,6 @@ export const AssetCard: React.FC<Props> = (props): JSX.Element => {
     slip,
     priceAsset,
     percentValue = NaN,
-    withSearch = false,
-    searchDisable = [],
     onChangeAssetAmount = (_: BaseAmount) => {},
     inputOnBlurHandler = FP.constVoid,
     inputOnFocusHandler = FP.constVoid,
@@ -98,12 +93,9 @@ export const AssetCard: React.FC<Props> = (props): JSX.Element => {
   const { asset, address: assetAddress } = assetWA
 
   const [openDropdown, setOpenDropdown] = useState(false)
-  const ref: RefObject<HTMLDivElement> = useRef(null)
 
   const selectedAmountBn = useMemo(() => baseToAsset(selectedAmount).amount(), [selectedAmount])
   const maxAmountBn = useMemo(() => baseToAsset(maxAmount).amount(), [maxAmount])
-
-  useClickOutside<HTMLDivElement>(ref, () => setOpenDropdown(false))
 
   const handleChangeAsset = useCallback(
     (asset: Asset) => {
@@ -113,20 +105,20 @@ export const AssetCard: React.FC<Props> = (props): JSX.Element => {
     [onChangeAsset, onChangeAssetAmount]
   )
 
-  const renderMenu = useCallback(() => {
+  const renderMenu = useMemo(() => {
     const sortedAssets = assets.sort(ordAsset.compare)
 
     return (
       <AssetMenu
-        assets={sortedAssets}
         asset={asset}
-        withSearch={withSearch}
-        searchDisable={searchDisable}
+        assets={sortedAssets}
         onSelect={handleChangeAsset}
         network={network}
+        open={openDropdown}
+        onClose={() => setOpenDropdown(false)}
       />
     )
-  }, [assets, asset, withSearch, searchDisable, handleChangeAsset, network])
+  }, [assets, asset, handleChangeAsset, network, openDropdown])
 
   const withPercentSlider = useMemo(() => !isNaN(percentValue), [percentValue])
 
@@ -151,67 +143,66 @@ export const AssetCard: React.FC<Props> = (props): JSX.Element => {
   }, [asset, assetBalance])
 
   return (
-    <Styled.AssetCardWrapper ref={ref}>
-      <Dropdown overlay={renderMenu()} trigger={[]} visible={openDropdown}>
-        <Styled.CardBorderWrapper error={minAmountError}>
-          <TooltipAddress title={assetAddress}>
-            <Styled.Header>
-              <Styled.AssetLabel asset={asset} />
-              {balanceLabel}
-            </Styled.Header>
-          </TooltipAddress>
-          <Styled.CardTopRow>
-            <Styled.AssetDataWrapper>
-              <Styled.AssetData>
-                <Styled.InputBigNumber
-                  disabled={disabled}
-                  value={selectedAmountBn}
-                  onChange={changeAssetAmountHandler}
-                  decimal={selectedAmount.decimal}
-                  max={maxAmountBn.toString()}
-                  onBlur={inputOnBlurHandler}
-                  onFocus={inputOnFocusHandler}
-                />
-                <Styled.AssetCardFooter>
-                  <Styled.FooterLabel>{priceLabel}</Styled.FooterLabel>
-                  {slip !== undefined && (
-                    <Styled.FooterLabel className="asset-slip-label">SLIP: {slip.toFixed(0)} %</Styled.FooterLabel>
-                  )}
-                </Styled.AssetCardFooter>
-              </Styled.AssetData>
-              <Styled.AssetSelectContainer>
-                <Styled.AssetSelect
-                  showAssetName={false}
-                  assets={assets}
-                  asset={asset}
-                  onSelect={handleChangeAsset}
-                  network={network}
-                />
+    <Styled.AssetCardWrapper>
+      {renderMenu}
+      <Styled.CardBorderWrapper error={minAmountError}>
+        <TooltipAddress title={assetAddress}>
+          <Styled.Header>
+            <Styled.AssetLabel asset={asset} />
+            {balanceLabel}
+          </Styled.Header>
+        </TooltipAddress>
+        <Styled.CardTopRow>
+          <Styled.AssetDataWrapper>
+            <Styled.AssetData>
+              <Styled.InputBigNumber
+                disabled={disabled}
+                value={selectedAmountBn}
+                onChange={changeAssetAmountHandler}
+                decimal={selectedAmount.decimal}
+                max={maxAmountBn.toString()}
+                onBlur={inputOnBlurHandler}
+                onFocus={inputOnFocusHandler}
+              />
+              <Styled.AssetCardFooter>
+                <Styled.FooterLabel>{priceLabel}</Styled.FooterLabel>
+                {slip !== undefined && (
+                  <Styled.FooterLabel className="asset-slip-label">SLIP: {slip.toFixed(0)} %</Styled.FooterLabel>
+                )}
+              </Styled.AssetCardFooter>
+            </Styled.AssetData>
+            <Styled.AssetSelectContainer>
+              <AssetSelect
+                showAssetName={false}
+                assets={assets}
+                asset={asset}
+                onSelect={handleChangeAsset}
+                network={network}
+              />
 
-                <Styled.WalletTypeContainer>
-                  {FP.pipe(
-                    oWalletType,
-                    O.fold(
-                      () => <></>,
-                      (walletType) => (
-                        <>
-                          <Styled.CheckButton
-                            checked={isLedgerWallet(walletType)}
-                            clickHandler={(checked) => onChangeWalletType(checked ? 'ledger' : 'keystore')}
-                            disabled={walletTypeDisabled}>
-                            {intl.formatMessage({ id: 'ledger.title' })}
-                          </Styled.CheckButton>
-                          {walletTypeTooltip && <InfoIcon color={walletTypeTooltipColor} tooltip={walletTypeTooltip} />}
-                        </>
-                      )
+              <Styled.WalletTypeContainer>
+                {FP.pipe(
+                  oWalletType,
+                  O.fold(
+                    () => <></>,
+                    (walletType) => (
+                      <>
+                        <Styled.CheckButton
+                          checked={isLedgerWallet(walletType)}
+                          clickHandler={(checked) => onChangeWalletType(checked ? 'ledger' : 'keystore')}
+                          disabled={walletTypeDisabled}>
+                          {intl.formatMessage({ id: 'ledger.title' })}
+                        </Styled.CheckButton>
+                        {walletTypeTooltip && <InfoIcon color={walletTypeTooltipColor} tooltip={walletTypeTooltip} />}
+                      </>
                     )
-                  )}
-                </Styled.WalletTypeContainer>
-              </Styled.AssetSelectContainer>
-            </Styled.AssetDataWrapper>
-          </Styled.CardTopRow>
-        </Styled.CardBorderWrapper>
-      </Dropdown>
+                  )
+                )}
+              </Styled.WalletTypeContainer>
+            </Styled.AssetSelectContainer>
+          </Styled.AssetDataWrapper>
+        </Styled.CardTopRow>
+      </Styled.CardBorderWrapper>
       {minAmountLabel && (
         <Styled.MinAmountLabel color={minAmountError ? 'error' : 'normal'}>{minAmountLabel}</Styled.MinAmountLabel>
       )}
