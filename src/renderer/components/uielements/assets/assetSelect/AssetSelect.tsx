@@ -62,7 +62,7 @@ export const AssetSelect: React.FC<Props> = (props): JSX.Element => {
       />
       <BaseButton
         className={`group py-[2px] px-10px ${
-          !disableButton ? 'hover:shadow-full dark:shadow-fulld' : ''
+          !disableButton ? 'hover:shadow-full hover:dark:shadow-fulld' : ''
         } focus:outline-none ${className}`}
         disabled={disableButton}
         onClick={buttonClickHandler}>

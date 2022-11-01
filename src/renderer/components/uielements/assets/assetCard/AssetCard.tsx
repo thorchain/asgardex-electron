@@ -23,6 +23,7 @@ import { ZERO_BASE_AMOUNT } from '../../../../const'
 import { isBtcAsset } from '../../../../helpers/assetHelper'
 import { ordAsset } from '../../../../helpers/fp/ord'
 import { AssetWithAddress } from '../../../../types/asgardex'
+import { CheckButton } from '../../button/CheckButton'
 import { TooltipAddress } from '../../common/Common.styles'
 import { InfoIcon } from '../../info'
 import { Color as InfoIconColor } from '../../info/InfoIcon'
@@ -189,12 +190,14 @@ export const AssetCard: React.FC<Props> = (props): JSX.Element => {
                     () => <></>,
                     (walletType) => (
                       <>
-                        <Styled.CheckButton
+                        <CheckButton
+                          size="medium"
+                          className="mr-5px"
                           checked={isLedgerWallet(walletType)}
                           clickHandler={(checked) => onChangeWalletType(checked ? 'ledger' : 'keystore')}
                           disabled={walletTypeDisabled}>
                           {intl.formatMessage({ id: 'ledger.title' })}
-                        </Styled.CheckButton>
+                        </CheckButton>
                         {walletTypeTooltip && <InfoIcon color={walletTypeTooltipColor} tooltip={walletTypeTooltip} />}
                       </>
                     )

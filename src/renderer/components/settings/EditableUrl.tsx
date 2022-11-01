@@ -173,7 +173,7 @@ const EditableUrl: React.FC<Props> = (props): JSX.Element => {
               className={`w-full text-[16px]
               ${RD.isSuccess(testUrlState) ? '!ring-turquoise' : ''}
               `}
-              size="large"
+              size="normal"
               defaultValue={name}
               autoFocus
               uppercase={false}
