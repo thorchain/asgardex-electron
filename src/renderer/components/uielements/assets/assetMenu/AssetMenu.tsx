@@ -158,12 +158,12 @@ export const AssetMenu: React.FC<Props> = (props): JSX.Element => {
             leaveFrom="opacity-100 scale-100"
             leaveTo="opacity-0 scale-95">
             <Dialog.Panel
-              className="relative mx-auto flex h-[75%] max-h-[500px] min-h-[350px] max-w-[250px]
-        flex-col items-center
-         bg-bg0 p-20px shadow-full dark:bg-bg0d dark:shadow-fulld
+              className="relative mx-auto flex h-[75%] max-h-[500px] min-h-[350px] max-w-[250px] flex-col
+        items-center bg-bg0
+         p-20px shadow-full dark:bg-bg0d dark:shadow-fulld md:max-w-[350px] md:p-40px
           ">
               <BaseButton
-                className="absolute right-[10px] top-10px !p-0 text-gray1 hover:text-gray2 dark:text-gray1d hover:dark:text-gray2d"
+                className="absolute right-20px top-20px !p-0 text-gray1 hover:text-gray2 dark:text-gray1d hover:dark:text-gray2d"
                 onClick={() => onClose()}>
                 <XMarkIcon className="h-20px w-20px text-inherit" />
               </BaseButton>
