@@ -1,6 +1,6 @@
-import React, { useCallback, useState, useMemo, useRef } from 'react'
+import React, { useCallback, useState, useMemo, useRef, Fragment } from 'react'
 
-import { Dialog } from '@headlessui/react'
+import { Dialog, Transition } from '@headlessui/react'
 import { ArchiveBoxXMarkIcon, CheckIcon, XMarkIcon } from '@heroicons/react/24/outline'
 import { Asset, assetToString } from '@xchainjs/xchain-util'
 import * as A from 'fp-ts/lib/Array'
@@ -112,7 +112,6 @@ export const AssetMenu: React.FC<Props> = (props): JSX.Element => {
   }, [])
 
   const onEnterHandler = useCallback(() => {
-    console.log('onEnter:', filteredAssets)
     if (filteredAssets.length === 1) {
       // select first asset
       handleChangeAsset(filteredAssets[0])
@@ -135,39 +134,58 @@ export const AssetMenu: React.FC<Props> = (props): JSX.Element => {
       initialFocus={inputSearchRef}
       open={open}
       onClose={onCloseMenu}>
-      {/* backdrop */}
-      <div className="fixed inset-0 bg-bg0/75 dark:bg-bg0d/75" aria-hidden="true" />
+      <Transition appear show={open} as="div">
+        {/* backdrop animated */}
+        <Transition.Child
+          enter="ease"
+          enterFrom="opacity-0"
+          enterTo="opacity-70"
+          leave="ease"
+          leaveFrom="opacity-70"
+          leaveTo="opacity-0">
+          <div className="ease fixed inset-0 bg-bg0 dark:bg-bg0d" aria-hidden="true" />
+        </Transition.Child>
 
-      {/* container to center the panel */}
-      <div className="fixed inset-0 flex items-center justify-center p-4">
-        {/* dialog panel  */}
-        <Dialog.Panel
-          className="relative mx-auto flex h-[75%] max-h-[500px] min-h-[350px] max-w-[250px]
-        flex-col items-center rounded-[10px]
-         bg-bg0 p-20px shadow-full dark:bg-bg0d dark:shadow-full
+        {/* container to center the panel */}
+        <div className="fixed inset-0 flex items-center justify-center p-4">
+          {/* dialog panel animated  */}
+          <Transition.Child
+            as={Fragment}
+            enter="ease"
+            enterFrom="opacity-0 scale-95"
+            enterTo="opacity-100 scale-100"
+            leave="ease-"
+            leaveFrom="opacity-100 scale-100"
+            leaveTo="opacity-0 scale-95">
+            <Dialog.Panel
+              className="relative mx-auto flex h-[75%] max-h-[500px] min-h-[350px] max-w-[250px]
+        flex-col items-center
+         bg-bg0 p-20px shadow-full dark:bg-bg0d dark:shadow-fulld
           ">
-          <BaseButton
-            className="absolute right-[15px] top-10px !p-0 text-gray1 hover:text-gray2 dark:text-gray1d hover:dark:text-gray2d"
-            onClick={() => onClose()}>
-            <XMarkIcon className="h-20px w-20px text-inherit" />
-          </BaseButton>
-          {headline && (
-            <h1 className="my-0 px-5px text-center font-mainSemiBold text-[16px] uppercase text-text2 dark:text-text2d">
-              {headline}
-            </h1>
-          )}
-          <InputSearch
-            ref={inputSearchRef}
-            className="my-10px"
-            size="normal"
-            onChange={searchHandler}
-            onCancel={clearSearchValue}
-            onEnter={onEnterHandler}
-            placeholder={intl.formatMessage({ id: 'common.search' })}
-          />
-          {renderAssets}
-        </Dialog.Panel>
-      </div>
+              <BaseButton
+                className="absolute right-[10px] top-10px !p-0 text-gray1 hover:text-gray2 dark:text-gray1d hover:dark:text-gray2d"
+                onClick={() => onClose()}>
+                <XMarkIcon className="h-20px w-20px text-inherit" />
+              </BaseButton>
+              {headline && (
+                <h1 className="my-0 px-5px text-center font-mainSemiBold text-[16px] uppercase text-text2 dark:text-text2d">
+                  {headline}
+                </h1>
+              )}
+              <InputSearch
+                ref={inputSearchRef}
+                className="my-10px"
+                size="normal"
+                onChange={searchHandler}
+                onCancel={clearSearchValue}
+                onEnter={onEnterHandler}
+                placeholder={intl.formatMessage({ id: 'common.search' })}
+              />
+              {renderAssets}
+            </Dialog.Panel>
+          </Transition.Child>
+        </div>
+      </Transition>
     </Dialog>
   )
 }

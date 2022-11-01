@@ -47,8 +47,7 @@ export const AssetSelect: React.FC<Props> = (props): JSX.Element => {
     [onSelect]
   )
 
-  const hideButton = !assets.length
-  const disableButton = disabled || hideButton
+  const disableButton = disabled || !assets.length
 
   return (
     <div>
@@ -68,13 +67,12 @@ export const AssetSelect: React.FC<Props> = (props): JSX.Element => {
         disabled={disableButton}
         onClick={buttonClickHandler}>
         <AssetData noTicker={!showAssetName} className="" asset={asset} network={network} />
-        {!hideButton && (
-          <ChevronDownIcon
-            className={`ease h-20px w-20px text-turquoise ${openMenu ? 'rotate-180' : 'rotate-0'}
-            group-hover:rotate-180
+
+        <ChevronDownIcon
+          className={`ease h-20px w-20px text-turquoise ${openMenu ? 'rotate-180' : 'rotate-0'}
+            ${!disableButton ? 'group-hover:rotate-180' : ''}
             `}
-          />
-        )}
+        />
       </BaseButton>
     </div>
   )
