@@ -1,6 +1,5 @@
 import React, { useCallback, useMemo, useState } from 'react'
 
-import { SearchOutlined } from '@ant-design/icons/lib'
 import * as A from 'fp-ts/Array'
 import * as FP from 'fp-ts/function'
 import * as O from 'fp-ts/Option'
@@ -8,6 +7,7 @@ import { useIntl } from 'react-intl'
 
 import { emptyString } from '../../helpers/stringHelper'
 import { isStaticPoolFilter, PoolFilter, PoolFilters, StaticPoolFilter } from '../../services/midgard/types'
+import { InputSearch } from '../uielements/input'
 import * as Styled from './AssetsFilter.styles'
 
 type Props = {
@@ -61,6 +61,11 @@ export const AssetsFilter: React.FC<Props> = ({ poolFilters, className, activeFi
     [oActiveFilter, setFilter]
   )
 
+  const clearFilter = useCallback(() => {
+    setInputValue(emptyString)
+    setFilter(O.none)
+  }, [setFilter])
+
   return FP.pipe(
     poolFilters,
     A.map((filter) => {
@@ -92,17 +97,20 @@ export const AssetsFilter: React.FC<Props> = ({ poolFilters, className, activeFi
     }),
     O.fromPredicate((children) => children.length > 0),
     O.map((filters) => (
-      <Styled.Container key="container" className={className}>
+      <div
+        key="container"
+        className={`flex w-full flex-col items-center justify-center md:flex-row md:justify-start ${className}`}>
         {filters}
-        <Styled.Input
-          prefix={<SearchOutlined />}
+        <InputSearch
+          className="mt-10px md:mt-0"
+          classNameInput="ease w-[150px] focus:w-[350px] bg-gray0 focus:dark:bg-gray0d focus:bg-bg0 dark:bg-bg0d"
           onChange={setCustomFilter}
           value={inputValue}
-          allowClear
-          placeholder={intl.formatMessage({ id: 'common.search' }).toUpperCase()}
-          size="large"
+          size="normal"
+          onCancel={clearFilter}
+          placeholder={intl.formatMessage({ id: 'common.search' })}
         />
-      </Styled.Container>
+      </div>
     )),
     O.toNullable
   )
