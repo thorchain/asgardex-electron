@@ -144,7 +144,7 @@ export const AssetMenu: React.FC<Props> = (props): JSX.Element => {
         <Dialog.Panel
           className="relative mx-auto flex h-[75%] max-h-[500px] min-h-[350px] max-w-[250px]
         flex-col items-center rounded-[10px]
-         bg-bg0 p-20px shadow-full dark:bg-bg0d
+         bg-bg0 p-20px shadow-full dark:bg-bg0d dark:shadow-full
           ">
           <BaseButton
             className="absolute right-[15px] top-10px !p-0 text-gray1 hover:text-gray2 dark:text-gray1d hover:dark:text-gray2d"

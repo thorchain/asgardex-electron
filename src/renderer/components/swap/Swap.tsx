@@ -23,7 +23,6 @@ import {
   chainToString,
   Address
 } from '@xchainjs/xchain-util'
-import BigNumber from 'bignumber.js'
 import * as A from 'fp-ts/Array'
 import * as FP from 'fp-ts/function'
 import * as NEA from 'fp-ts/lib/NonEmptyArray'
@@ -108,7 +107,6 @@ import { Tooltip, WalletTypeLabel } from '../uielements/common/Common.styles'
 import { Fees, UIFeesRD } from '../uielements/fees'
 import { InfoIcon } from '../uielements/info'
 import { CopyLabel } from '../uielements/label'
-import { Slider } from '../uielements/slider'
 import { EditableAddress } from './EditableAddress'
 import { SelectableSlipTolerance } from './SelectableSlipTolerance'
 import { SwapAsset, SwapData } from './Swap.types'
@@ -942,14 +940,6 @@ export const Swap = ({
     [amountToSwapMax1e8, maxAmountToSwapMax1e8]
   )
 
-  const setAmountToSwapFromPercentValue = useCallback(
-    (percents: number) => {
-      const amountFromPercentage = maxAmountToSwapMax1e8.amount().multipliedBy(percents / 100)
-      return setAmountToSwapMax1e8(baseAmount(amountFromPercentage, sourceAssetAmountMax1e8.decimal))
-    },
-    [maxAmountToSwapMax1e8, setAmountToSwapMax1e8, sourceAssetAmountMax1e8.decimal]
-  )
-
   /**
    * Selectable source assets to swap from.
    *
@@ -957,19 +947,19 @@ export const Swap = ({
    * Zero balances are ignored.
    * Duplications of assets are merged.
    */
-  const _selectableSourceAssets: Asset[] = useMemo(
+  const selectableSourceAssets: Asset[] = useMemo(
     () =>
       FP.pipe(
         allBalances,
         // get asset
         A.map(({ asset }) => asset),
-        // Ignore already selected source / target assets
-        A.filter((asset) => !eqAsset.equals(asset, sourceAsset) && !eqAsset.equals(asset, targetAsset)),
+        // Remove target assets from source list
+        A.filter((asset) => !eqAsset.equals(asset, targetAsset)),
         // Merge duplications
         (assets) => unionAssets(assets)(assets)
       ),
 
-    [allBalances, sourceAsset, targetAsset]
+    [allBalances, targetAsset]
   )
 
   /**
@@ -982,12 +972,12 @@ export const Swap = ({
     (): Asset[] =>
       FP.pipe(
         poolAssets,
-        // Ignore already selected source / target assets
-        A.filter((asset) => !eqAsset.equals(asset, sourceAsset) && !eqAsset.equals(asset, targetAsset)),
+        // Remove source assets from List
+        A.filter((asset) => !eqAsset.equals(asset, sourceAsset)),
         // Merge duplications
         (assets) => unionAssets(assets)(assets)
       ),
-    [poolAssets, sourceAsset, targetAsset]
+    [poolAssets, sourceAsset]
   )
 
   type ModalState = 'swap' | 'approve' | 'none'
@@ -1040,37 +1030,6 @@ export const Swap = ({
       setShowPasswordModal('swap')
     }
   }, [setShowLedgerModal, useSourceAssetLedger])
-
-  const _renderSlider = useMemo(() => {
-    const percentage = lockedWallet
-      ? 0
-      : amountToSwapMax1e8
-          .amount()
-          .dividedBy(sourceAssetAmountMax1e8.amount())
-          .multipliedBy(100)
-          // Remove decimal of `BigNumber`s used within `BaseAmount` and always round down for currencies
-          .decimalPlaces(0, BigNumber.ROUND_DOWN)
-          .toNumber()
-    return (
-      <Slider
-        key={'swap percentage slider'}
-        value={percentage}
-        onChange={setAmountToSwapFromPercentValue}
-        onAfterChange={reloadFeesHandler}
-        tooltipVisible={true}
-        withLabel={true}
-        tooltipPlacement={'top'}
-        disabled={lockedWallet || disableSwapAction}
-      />
-    )
-  }, [
-    lockedWallet,
-    amountToSwapMax1e8,
-    sourceAssetAmountMax1e8,
-    setAmountToSwapFromPercentValue,
-    reloadFeesHandler,
-    disableSwapAction
-  ])
 
   const extraTxModalContent = useMemo(() => {
     const stepLabels = [
@@ -1475,7 +1434,7 @@ export const Swap = ({
     // reset only once
     if (doReset) reset()
 
-    // Note: useEffect does depends on `sourceAssetProp`, `targetAssetProp` - ignore other values
+    // Note: useEffect does depend on `sourceAssetProp`, `targetAssetProp` - ignore other values
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [sourceAsset, targetAsset])
 
@@ -1627,7 +1586,7 @@ export const Swap = ({
               )}
               amount={{ amount: amountToSwapMax1e8, asset: sourceAsset }}
               priceAmount={priceAmountToSwapMax1e8}
-              assets={_selectableSourceAssets}
+              assets={selectableSourceAssets}
               network={network}
               onChangeAsset={setSourceAsset}
               onChange={setAmountToSwapMax1e8}

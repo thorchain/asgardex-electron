@@ -7,11 +7,11 @@ import { BNB_ADDRESS_TESTNET } from '../../../../../shared/mock/address'
 import { isWalletType } from '../../../../../shared/utils/guard'
 import { WalletType } from '../../../../../shared/wallet/types'
 import { ZERO_BASE_AMOUNT } from '../../../../const'
-import * as InfoIconStyled from './../../info/InfoIcon.styles'
+import { Color as InfoIconColor } from './../../info/InfoIcon'
 import { AssetCard as Component, Props } from './AssetCard'
 
 type Args = {
-  tooltipColor: InfoIconStyled.Color
+  tooltipColor: InfoIconColor
   tooltip: string
   walletTypeDisabled: boolean
   walletType: WalletType | 'none'
