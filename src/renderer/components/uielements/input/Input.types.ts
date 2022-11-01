@@ -17,4 +17,4 @@ export type Colors = {
   [key in Color]: string
 }
 
-export type Size = 'small' | 'normal' | 'large'
+export type Size = 'small' | 'normal' | 'large' | 'xlarge'

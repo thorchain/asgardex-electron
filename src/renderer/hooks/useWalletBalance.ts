@@ -32,7 +32,7 @@ export const useTotalWalletBalance = () => {
     () =>
       FP.pipe(
         Rx.combineLatest([chainBalances$, poolsState$, selectedPricePool$]),
-        RxOp.map(([chainBalances, poolsStateRD, { poolData: pricePoolData }]) =>
+        RxOp.map(([chainBalances, poolsStateRD, pricePool]) =>
           FP.pipe(
             chainBalances,
             // Balances of type 'all' only - no duplications
@@ -53,7 +53,7 @@ export const useTotalWalletBalance = () => {
                 // sum all balances
                 A.reduce<WalletBalance, BaseAmount>(ZERO_BASE_AMOUNT, (acc, currBalance) => {
                   return FP.pipe(
-                    getPoolPriceValue({ balance: currBalance, poolDetails, pricePoolData, network }),
+                    getPoolPriceValue({ balance: currBalance, poolDetails, pricePool, network }),
                     O.getOrElse(() => ZERO_BASE_AMOUNT),
                     // Before sum, all amounts need to have same decimal - `1e8` in this case
                     to1e8BaseAmount,

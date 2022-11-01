@@ -1,41 +1,36 @@
 import { Meta, StoryFn } from '@storybook/react'
 import { assetAmount, AssetBNB, assetToBase } from '@xchainjs/xchain-util'
 
+import { AssetBUSD74E } from '../../../../const'
 import { AssetInput as Component, Props } from './AssetInput'
 
 export const Default: StoryFn<Props> = (args) => <Component {...args} />
 
-const amount = assetToBase(assetAmount(123, 8))
-const maxAmount = assetToBase(assetAmount(456, 8))
+const amount = { amount: assetToBase(assetAmount(1.23, 8)), asset: AssetBNB }
+const priceAmount = { amount: assetToBase(assetAmount(345, 8)), asset: AssetBUSD74E }
 
 const meta: Meta = {
   component: Component,
   title: 'Components/Assets/AssetInput',
   argTypes: {
     onChange: { action: 'onChange' },
+    onBlur: { action: 'onBlur' },
+    onFocus: { action: 'onFocus' },
     amount: {
       options: ['normal', 'decimal'],
       mapping: {
         normal: amount,
         decimal: assetToBase(assetAmount(321, 2))
       }
-    },
-    maxAmount: {
-      options: ['normal', 'decimal'],
-      mapping: {
-        normal: maxAmount,
-        decimal: assetToBase(assetAmount(654, 2))
-      }
     }
   },
   args: {
     title: 'Swap amount',
-    status: 'slip 2%',
     titleTooltip: 'Title Tooltip',
-    maxInfoText: 'max balance = balance - swap fees',
-    asset: AssetBNB,
-    amount: amount,
-    maxAmount: maxAmount
+    amount,
+    priceAmount,
+    showError: false,
+    disabled: false
   },
   decorators: [
     (Story) => (

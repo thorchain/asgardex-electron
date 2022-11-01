@@ -77,64 +77,76 @@ export const isNonNativeRuneAsset = (asset: Asset, network: Network): boolean =>
   isRuneBnbAsset(asset, network) || isRuneEthAsset(asset, network)
 
 /**
- * Check whether an asset is an RuneNative asset
+ * Checks whether an asset is an RuneNative asset
  */
 export const isRuneNativeAsset = (asset: Asset): boolean => eqAsset.equals(asset, AssetRuneNative)
 
 /**
- * Check whether an asset is a Rune (native or non-native) asset
+ * Checks whether an asset is a Rune (native or non-native) asset
  */
 export const isRuneAsset = (asset: Asset, network: Network): boolean =>
   isRuneNativeAsset(asset) || isNonNativeRuneAsset(asset, network)
 
 /**
- * Check whether an asset is a LTC asset
+ * Checks whether an asset is a LTC asset
  */
 export const isLtcAsset = (asset: Asset): boolean => eqAsset.equals(asset, AssetLTC)
 
 /**
- * Check whether an asset is a BCH asset
+ * Checks whether an asset is a BCH asset
  */
 export const isBchAsset = (asset: Asset): boolean => eqAsset.equals(asset, AssetBCH)
 
 /**
- * Check whether an asset is a BNB asset
+ * Checks whether an asset is a BNB asset
  */
 export const isBnbAsset = (asset: Asset): boolean => eqAsset.equals(asset, AssetBNB)
 
 /**
- * Check whether an asset is a BNB synthetic asset
+ * Checks whether an asset is a BNB synthetic asset
  */
 export const isBnbAssetSynth = (asset: Asset): boolean => eqAsset.equals(asset, { ...AssetBNB, synth: true })
 
 /**
- * Check whether an asset is a BTC asset
+ * Checks whether an asset is a BTC asset
  */
 export const isBtcAsset = (asset: Asset): boolean => eqAsset.equals(asset, AssetBTC)
 
 /**
- * Check whether an asset is an ETH asset
+ * Checks whether an asset is an ETH asset
  */
 export const isEthAsset = (asset: Asset): boolean => eqAsset.equals(asset, AssetETH)
 
 /**
- * Check whether an asset is a DOGE asset
+ * Checks whether an asset is a DOGE asset
  */
 export const isDogeAsset = (asset: Asset): boolean => eqAsset.equals(asset, AssetDOGE)
 
 /**
- * Check whether an asset is a ATOM asset
+ * Checks whether an asset is a ATOM asset
  */
 export const isAtomAsset = (asset: Asset): boolean => eqAsset.equals(asset, AssetAtom)
 
 /**
- * Check whether an ERC20 asset is white listed or not
+ * Check whether an asset is in a list
+ */
+export const assetInList =
+  (asset: Asset) =>
+  (list: Asset[]): boolean =>
+    FP.pipe(
+      list,
+      A.findFirst((assetInList) => eqAsset.equals(assetInList, asset)),
+      O.isSome
+    )
+
+/**
+ * Checks whether an ERC20 asset is white listed or not
  */
 export const assetInERC20Whitelist = (asset: Asset): boolean =>
   FP.pipe(
     ERC20_WHITELIST,
-    A.findFirst(({ asset: assetInList }) => eqAsset.equals(assetInList, asset)),
-    O.isSome
+    A.map(({ asset }) => asset),
+    assetInList(asset)
   )
 
 /**
@@ -158,7 +170,7 @@ export const validAssetForETH = (asset: Asset /* ETH or ERC20 asset */, network:
   network !== 'mainnet' /* (1) */ || isEthAsset(asset) /* (2) */ || assetInERC20Whitelist(asset)
 
 /**
- * Check whether an ERC20 address is black listed or not
+ * Checks whether an ERC20 address is black listed or not
  */
 const addressInList = (address: Address, list: Asset[]): boolean => {
   const oChecksumAddress = getEthChecksumAddress(address)
@@ -181,19 +193,15 @@ const erc20WhiteListAssetOnly = FP.pipe(
   A.map(({ asset }) => asset)
 )
 /**
- * Check whether an ERC20 address is white listed or not
+ * Checks whether an ERC20 address is white listed or not
  */
 export const addressInERC20Whitelist = (address: Address): boolean => addressInList(address, erc20WhiteListAssetOnly)
 
 /**
- * Check whether an asset is black listed for Binance or not
+ * Checks whether an asset is black listed for Binance or not
  */
 export const assetInBinanceBlacklist = (network: Network, asset: Asset): boolean =>
-  FP.pipe(
-    BinanceBlackList[network],
-    A.findFirst((assetInList) => eqAsset.equals(assetInList, asset)),
-    O.isSome
-  )
+  FP.pipe(BinanceBlackList[network], assetInList(asset))
 
 /**
  * Check whether an asset is XRune asset

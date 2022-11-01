@@ -74,10 +74,10 @@ export const AssetMenu: React.FC<Props> = (props): JSX.Element => {
         O.fold(
           () => (
             <div className="flex h-full w-full flex-col items-center justify-center px-20px py-50px">
+              <ArchiveBoxXMarkIcon className="h-[75px] w-[75px] text-gray0 dark:text-gray0d" />
               <h2 className="mb-10px text-[14px] uppercase text-gray1 dark:text-gray1d">
                 {intl.formatMessage({ id: 'common.noResult' })}
               </h2>
-              <ArchiveBoxXMarkIcon className="h-[75px] w-[75px] text-gray0 dark:text-gray0d" />
             </div>
           ),
           (assets) => (
@@ -136,15 +136,15 @@ export const AssetMenu: React.FC<Props> = (props): JSX.Element => {
       open={open}
       onClose={onCloseMenu}>
       {/* backdrop */}
-      <div className="fixed inset-0 bg-bg0/60 dark:bg-bg0d/60" aria-hidden="true" />
+      <div className="fixed inset-0 bg-bg0/75 dark:bg-bg0d/75" aria-hidden="true" />
 
       {/* container to center the panel */}
       <div className="fixed inset-0 flex items-center justify-center p-4">
         {/* dialog panel  */}
         <Dialog.Panel
-          className="shadow-full relative mx-auto flex h-[75%] max-h-[500px] min-h-[350px]
-        max-w-[250px] flex-col items-center
-         rounded-[10px] bg-bg0 p-20px pt-30px dark:bg-bg0d
+          className="relative mx-auto flex h-[75%] max-h-[500px] min-h-[350px] max-w-[250px]
+        flex-col items-center rounded-[10px]
+         bg-bg0 p-20px shadow-full dark:bg-bg0d dark:shadow-full
           ">
           <BaseButton
             className="absolute right-[15px] top-10px !p-0 text-gray1 hover:text-gray2 dark:text-gray1d hover:dark:text-gray2d"
@@ -152,14 +152,14 @@ export const AssetMenu: React.FC<Props> = (props): JSX.Element => {
             <XMarkIcon className="h-20px w-20px text-inherit" />
           </BaseButton>
           {headline && (
-            <h1 className="mt-10px mb-0 px-5px text-center font-mainSemiBold text-[17px] uppercase text-text2 dark:text-text2d">
+            <h1 className="my-0 px-5px text-center font-mainSemiBold text-[16px] uppercase text-text2 dark:text-text2d">
               {headline}
             </h1>
           )}
           <InputSearch
             ref={inputSearchRef}
             className="my-10px"
-            size="large"
+            size="normal"
             onChange={searchHandler}
             onCancel={clearSearchValue}
             onEnter={onEnterHandler}

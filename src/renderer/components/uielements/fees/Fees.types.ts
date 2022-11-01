@@ -6,6 +6,14 @@ export type UIFee = {
   asset: Asset
 }
 
+export type UISwapFees = {
+  inbound: UIFee
+  priceInbound: UIFee
+  outbound: UIFee
+  priceOutbound: UIFee
+}
+
 export type UIFees = UIFee[]
 
 export type UIFeesRD = RD.RemoteData<Error, UIFees>
+export type UISwapFeesRD = RD.RemoteData<Error, UISwapFees>

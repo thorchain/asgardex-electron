@@ -1,29 +1,39 @@
-import React, { useRef, useCallback } from 'react'
+import React, { useRef, useCallback, useState } from 'react'
 
-import { Asset, assetAmount, assetToBase, BaseAmount, baseToAsset } from '@xchainjs/xchain-util'
+import {
+  Asset,
+  assetAmount,
+  assetToBase,
+  BaseAmount,
+  baseToAsset,
+  formatAssetAmountCurrency
+} from '@xchainjs/xchain-util'
 import BigNumber from 'bignumber.js'
 import * as FP from 'fp-ts/lib/function'
+import { useIntl } from 'react-intl'
 
-import { FixmeType } from '../../../../types/asgardex'
-import { MaxBalanceButton } from '../../button/MaxBalanceButton'
+import { Network } from '../../../../../shared/api/types'
+import { isUSDAsset } from '../../../../helpers/assetHelper'
+import { AssetWithAmount, FixmeType } from '../../../../types/asgardex'
+import { TooltipAddress } from '../../common/Common.styles'
 import { InputBigNumber } from '../../input'
-import * as Styled from './AssetInput.styles'
-import { AssetInputProps } from './AssetInput.types'
+import { AssetSelect } from '../assetSelect'
 
 export type Props = {
   title: string
   titleTooltip?: string
-  status?: string
-  amount: BaseAmount
-  maxAmount: BaseAmount
-  asset: Asset
-  inputProps?: AssetInputProps
-  onChange: (value: BaseAmount) => void
+  amount: AssetWithAmount
+  priceAmount: AssetWithAmount
+  assets: Asset[]
+  network: Network
+  disabled?: boolean
+  showError?: boolean
+  onChangeAsset: (asset: Asset) => void
+  onChange?: (value: BaseAmount) => void
   onBlur?: FP.Lazy<void>
   onFocus?: FP.Lazy<void>
-  disabled?: boolean
   className?: string
-  maxInfoText?: string
+  asLabel?: boolean
 }
 
 /**
@@ -38,21 +48,25 @@ export const AssetInput: React.FC<Props> = (props): JSX.Element => {
   const {
     title,
     titleTooltip = '',
-    amount,
-    maxAmount,
-    asset,
-    status,
-    disabled,
-    inputProps = {},
+    amount: { amount, asset },
+    priceAmount: { amount: priceAmount, asset: priceAsset },
+    assets,
+    network,
+    disabled = false,
+    showError = false,
     className = '',
-    maxInfoText = '',
-    onChange,
-    onBlur: onBlurHandler = FP.constVoid,
-    onFocus: onFocusHandler = FP.constVoid,
-    ...otherProps
+    asLabel = false,
+    onChangeAsset,
+    onChange = FP.constVoid,
+    onBlur = FP.constVoid,
+    onFocus = FP.constVoid
   } = props
 
-  const inputRef = useRef<FixmeType>()
+  const inputWrapperRef = useRef<FixmeType>()
+
+  const intl = useIntl()
+
+  const [focused, setFocused] = useState(false)
 
   const onChangeHandler = useCallback(
     (value: BigNumber) => {
@@ -62,37 +76,94 @@ export const AssetInput: React.FC<Props> = (props): JSX.Element => {
   )
 
   const handleClickWrapper = useCallback(() => {
-    inputRef.current?.firstChild?.focus()
+    inputWrapperRef.current?.firstChild?.focus()
   }, [])
 
+  const titleClassName = `absolute left-[10px] top-[-15px] p-5px font-main text-[14px]
+    ${showError ? 'text-error0 dark:text-error0d' : 'text-gray2 dark:text-gray2d'} m-0 bg-bg0 dark:bg-bg0d`
+
+  const Title = () => <p className={titleClassName}>{title}</p>
+
+  const TitleWithTooltip = () => (
+    <TooltipAddress title={titleTooltip}>
+      <p className={titleClassName}>{title}</p>
+    </TooltipAddress>
+  )
+
+  const onFocusHandler = useCallback(() => {
+    setFocused(true)
+    onFocus()
+  }, [onFocus])
+
+  const onBlurHandler = useCallback(() => {
+    setFocused(false)
+    onBlur()
+  }, [onBlur])
+
   return (
-    <Styled.Wrapper className={`assetInput-wrapper ${className}`} onClick={handleClickWrapper} {...otherProps}>
-      <div className="asset-input-header">
-        {titleTooltip && (
-          <Styled.TitleTooltip title={titleTooltip}>
-            <Styled.Title>{title}</Styled.Title>
-          </Styled.TitleTooltip>
-        )}
-        {!titleTooltip && <Styled.Title>{title}</Styled.Title>}
-        {status && <p className="asset-input-header-label">{status}</p>}
-        <MaxBalanceButton
-          balance={{ amount: maxAmount, asset }}
-          onClick={() => onChangeHandler(maxAmount.amount())}
-          disabled={disabled}
-          maxInfoText={maxInfoText}
-        />
-      </div>
-      <div className="asset-input-content" ref={inputRef}>
+    <div
+      className={`
+      relative
+      flex
+      border-gray1 dark:border-gray1d
+      ${showError ? 'border-error0 dark:border-error0d' : ''}
+      ${focused ? 'shadow-full dark:shadow-fulld' : ''}
+      ease
+      border
+      uppercase
+      ${className}`}
+      ref={inputWrapperRef}
+      onClick={handleClickWrapper}>
+      {/* title */}
+      {titleTooltip ? <TitleWithTooltip /> : <Title />}
+
+      <div
+        className="flex w-full flex-col
+        py-20px
+        ">
         <InputBigNumber
           value={baseToAsset(amount).amount()}
           onChange={onChangeHandler}
           onBlur={onBlurHandler}
           onFocus={onFocusHandler}
-          size={'large'}
-          {...inputProps}
+          size="xlarge"
+          ghost
+          error={showError}
+          disabled={asLabel || disabled}
           decimal={amount.decimal}
+          // override text style of input for acting as label only
+          className={`
+        w-full
+        border-r
+        border-gray1
+        leading-none
+        dark:border-gray1d
+          ${asLabel ? 'text-text0 !opacity-100 dark:text-text0d' : ''}`}
         />
+
+        <p
+          className="mb-0 border-r border-gray1 px-15px font-main text-[14px]
+        leading-none
+        text-gray1 dark:border-gray1d dark:text-gray1d
+        ">
+          {formatAssetAmountCurrency({
+            amount: baseToAsset(priceAmount),
+            asset: priceAsset,
+            decimal: isUSDAsset(priceAsset) ? 2 : 6,
+            trimZeros: true
+          })}
+        </p>
       </div>
-    </Styled.Wrapper>
+
+      <AssetSelect
+        className="h-full w-[180px]"
+        onSelect={onChangeAsset}
+        asset={asset}
+        assets={assets}
+        network={network}
+        dialogHeadline={intl.formatMessage({ id: 'common.asset.change' })}
+        disabled={disabled}
+      />
+    </div>
   )
 }

@@ -120,7 +120,9 @@ export const UnlockForm: React.FC<Props> = (props): JSX.Element => {
       O.fold(
         () => <></>,
         (_: Error) => (
-          <p className="mt-2 font-main text-sm text-error0">{intl.formatMessage({ id: 'wallet.unlock.error' })}</p>
+          <p className="mt-2 font-main text-sm uppercase text-error0">
+            {intl.formatMessage({ id: 'wallet.unlock.error' })}
+          </p>
         )
       )(unlockError),
     [unlockError, intl]

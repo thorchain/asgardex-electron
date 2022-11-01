@@ -7,7 +7,6 @@ import { media } from '../../../../helpers/styleHelper'
 import { InnerForm } from '../../../shared/form'
 import { AssetIcon as UIAssetIcon } from '../../../uielements/assets/assetIcon'
 import { Button as UIButton, ButtonProps as UIButtonProps } from '../../../uielements/button'
-import { CheckButton as CheckButtonUI } from '../../../uielements/button/CheckButton'
 import { WalletTypeLabel as WalletTypeLabelUI } from '../../../uielements/common/Common.styles'
 import { Fees as UIFees } from '../../../uielements/fees'
 import { Label as UILabel } from '../../../uielements/label'
@@ -203,10 +202,4 @@ export const InputLabel = styled(UILabel)`
 
 export const Fees = styled(UIFees)`
   padding-bottom: 20px;
-`
-
-export const CheckButton = styled(CheckButtonUI)`
-  &.ant-btn {
-    font-size: 14px;
-  }
 `

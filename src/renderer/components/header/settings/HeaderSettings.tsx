@@ -17,10 +17,10 @@ export const HeaderSettings: React.FC<Props> = (props): JSX.Element => {
   const intl = useIntl()
 
   return (
-    <HeaderIconWrapper onClick={onPress}>
+    <HeaderIconWrapper className="group" onClick={onPress}>
       {!isDesktopView && <Styled.Label>{intl.formatMessage({ id: 'common.settings' })} </Styled.Label>}
       <Tooltip title={intl.formatMessage({ id: 'common.settings' })}>
-        <Cog8ToothIcon className="h-[24px] w-[24px] text-text2 dark:text-text2d" />
+        <Cog8ToothIcon className="ease h-[24px] w-[24px] text-text2 group-hover:rotate-180 dark:text-text2d" />
       </Tooltip>
     </HeaderIconWrapper>
   )
