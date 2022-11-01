@@ -1,12 +1,12 @@
 import { SwapMessages } from '../types'
 
 const swap: SwapMessages = {
-  'swap.state.pending': 'Tauschen',
-  'swap.state.error': 'Error beim Tauschen',
+  'swap.state.pending': 'Swappen',
+  'swap.state.error': 'Error beim Swap',
   'swap.state.success': 'Erfolgreich getauscht',
   'swap.input': 'Eingabe',
   'swap.output': 'Ausgabe',
-  'swap.info.max.fee': 'Gesamtguthaben minus geschätzter Tauschgebühr',
+  'swap.info.max.fee': 'Gesamtguthaben minus voraussichtliche Swapgebühr',
   'swap.slip.title': 'Slip',
   'swap.slip.tolerance': 'Slippage-Toleranz',
   'swap.slip.tolerance.info':
@@ -18,13 +18,14 @@ const swap: SwapMessages = {
   'swap.errors.amount.outputShouldCoverChainFee':
     'Auszahlungsgebühr in Höhe von {fee} ist nicht über den zu erwartenen Auszahlungsbetrag (momentan {amount}) gedeckt',
   'swap.note.lockedWallet': 'Entsperre Deine Wallet, um zu tauschen',
-  'swap.note.nowallet': 'Erstelle oder importiere eine Wallet um zu Tauschen',
+  'swap.note.nowallet': 'Erstelle oder importiere eine Wallet um zu Swappen',
   'swap.errors.asset.missingSourceAsset': 'Ursprungs-Asset nicht vorhanden',
   'swap.errors.asset.missingTargetAsset': 'Ziel-Asset nicht vorhanden',
   'swap.min.amount.info':
-    'Erforderlicher Mindestwert für ein Tausch um die Gebühren der Ein- und Auszahlungstransaktionen zu decken.',
+    'Erforderlicher Mindestwert für ein Swap um die Gebühren der Ein- und Auszahlungstransaktionen zu decken.',
   'swap.min.result.info':
-    'Dein Tausch ist mit diesem Mindestwert basierend auf der ausgewählten {tolerance}% Slippage-Toleranz abgesichert. Falls eine Preisänderung vor der Transaktions-Bestätigung mehr als {tolerance}% zu Deinem Nachteil beträgt, wird Deine Tausch-Transaktion zurücküberwiesen.'
+    'Dein Swap ist mit diesem Mindestwert basierend auf der ausgewählten {tolerance}% Slippage-Toleranz abgesichert. Falls eine Preisänderung vor der Transaktions-Bestätigung mehr als {tolerance}% zu Deinem Nachteil beträgt, wird Deine Swap-Transaktion zurücküberwiesen.',
+  'swap.min.result.protected': 'Gesichertes Swap Ergebnis'
 }
 
 export default swap

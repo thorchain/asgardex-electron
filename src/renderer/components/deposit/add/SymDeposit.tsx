@@ -90,7 +90,7 @@ import { TxModal } from '../../modal/tx'
 import { DepositAssets } from '../../modal/tx/extra'
 import { FlatButton, ViewTxButton } from '../../uielements/button'
 import { Fees, UIFeesRD } from '../../uielements/fees'
-import * as InfoIconStyled from '../../uielements/info/InfoIcon.styles'
+import { Color as InfoIconColor } from '../../uielements/info/InfoIcon'
 import { AssetMissmatchWarning } from './AssetMissmatchWarning'
 import { AsymAssetsWarning } from './AsymAssetsWarning'
 import * as Helper from './Deposit.helper'
@@ -139,7 +139,7 @@ export type Props = {
 
 type SelectedInput = 'asset' | 'rune' | 'none'
 
-type WalletTypeTooltip = { text: string; color: InfoIconStyled.Color }
+type WalletTypeTooltip = { text: string; color: InfoIconColor }
 
 export const SymDeposit: React.FC<Props> = (props) => {
   const {

@@ -25,7 +25,7 @@ export const BaseButton: React.FC<BaseButtonProps> = (props): JSX.Element => {
 
   const sizeClasses: Record<Size, string> = {
     small: 'px-[10px] py-[1px] text-[10px]',
-    medium: 'px-[12px] py-[2px] text-[11px]',
+    medium: 'px-[12px] py-[2px] text-[12px]',
     normal: 'px-[15px] py-[3px] text-[14px]',
     large: 'px-[20px] py-[4px] text-[16px]'
   }

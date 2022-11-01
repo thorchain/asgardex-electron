@@ -18,7 +18,7 @@ import { PoolTableRowData, PoolTableRowsData, PricePool } from '../views/pools/P
 import { getPoolTableRowData } from '../views/pools/Pools.utils'
 import { convertBaseAmountDecimal, to1e8BaseAmount, isRuneAsset } from './assetHelper'
 import { isBchChain, isBnbChain, isBtcChain, isCosmosChain, isDogeChain, isEthChain, isLtcChain } from './chainHelper'
-import { eqChain, eqString } from './fp/eq'
+import { eqAsset, eqChain, eqString } from './fp/eq'
 import { ordBaseAmount } from './fp/ord'
 import { sequenceTOption, sequenceTOptionFromArray } from './fpHelpers'
 import { emptyString } from './stringHelper'
@@ -141,14 +141,17 @@ export const getAssetPoolPrice = (runePrice: BigNumber) => (poolDetail: Pick<Poo
 export const getPoolPriceValue = ({
   balance: { asset, amount },
   poolDetails,
-  pricePoolData,
+  pricePool: { asset: priceAsset, poolData: pricePoolData },
   network
 }: {
   balance: Balance
   poolDetails: PoolDetails
-  pricePoolData: PoolData
+  pricePool: PricePool
   network: Network
 }): O.Option<BaseAmount> => {
+  // no pricing if balance asset === price pool asset
+  if (eqAsset.equals(asset, priceAsset)) return O.some(amount)
+
   // convert to 1e8 decimal (as same decimal as pool data has)
   const amount1e8 = to1e8BaseAmount(amount)
   return FP.pipe(

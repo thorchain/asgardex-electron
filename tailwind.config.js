@@ -77,6 +77,10 @@ module.exports = {
       // @see https://tailwindcss.com/docs/transition-property#customizing-your-theme
       transitionProperty: {
         height: 'height'
+      },
+      boxShadow: {
+        full: `0 0 15px ${t.light.palette.gray[1]}`,
+        fulld: `0 0 15px ${t.dark.palette.gray[1]}`
       }
     },
     // Breakpoint are overridden (not extended)

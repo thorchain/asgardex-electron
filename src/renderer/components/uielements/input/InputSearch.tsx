@@ -4,7 +4,7 @@ import { MagnifyingGlassIcon, XMarkIcon } from '@heroicons/react/24/outline'
 import * as FP from 'fp-ts/lib/function'
 
 import { emptyString } from '../../../helpers/stringHelper'
-import { Size } from '../button'
+import { Size } from '../input'
 import { Input, InputProps } from './Input'
 
 export type Props = { classNameInput?: string; onSearch?: (searchTxt: string) => void } & Omit<InputProps, 'uppercase'>
@@ -51,30 +51,30 @@ export const InputSearch = forwardRef<HTMLInputElement, Props>((props, ref): JSX
 
   const iconSize: Record<Size, string> = {
     small: 'h-[12px] w-[12px]',
-    medium: 'h-[15px] w-[15px]',
     normal: 'h-20px w-20px',
-    large: 'h-20px w-20px'
+    large: 'h-20px w-20px',
+    xlarge: 'h-20px w-20px'
   }
 
   const iconOffsetL: Record<Size, string> = {
     small: 'left-[3px]',
-    medium: 'left-[3px]',
     normal: 'left-5px',
-    large: 'left-5px'
+    large: 'left-5px',
+    xlarge: 'left-5px'
   }
 
   const iconOffsetR: Record<Size, string> = {
     small: 'right-[3px]',
-    medium: 'right-[3px]',
     normal: 'right-5px',
-    large: 'right-5px'
+    large: 'right-5px',
+    xlarge: 'right-5px'
   }
 
   const inputOffsetX: Record<Size, string> = {
     small: '!px-20px',
-    medium: '!px-20px',
     normal: '!px-30px',
-    large: '!px-30px'
+    large: '!px-30px',
+    xlarge: '!px-30px'
   }
 
   return (

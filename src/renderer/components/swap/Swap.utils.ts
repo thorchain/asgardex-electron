@@ -7,7 +7,7 @@ import * as FP from 'fp-ts/function'
 import * as O from 'fp-ts/Option'
 
 import { isLedgerWallet } from '../../../shared/utils/guard'
-import { ASGARDEX_SWAP_IDENTIFIER, ZERO_BASE_AMOUNT, ZERO_BN } from '../../const'
+import { ASGARDEX_SWAP_IDENTIFIER, ZERO_BASE_AMOUNT } from '../../const'
 import {
   isChainAsset,
   isRuneNativeAsset,
@@ -117,11 +117,6 @@ export const getSwapResult = ({
   )
 }
 
-export const DEFAULT_SWAP_DATA: SwapData = {
-  slip: ZERO_BN,
-  swapResult: ZERO_BASE_AMOUNT
-}
-
 /**
  * Returns `SwapData`
  *
@@ -134,22 +129,17 @@ export const getSwapData = ({
   poolsData
 }: {
   amountToSwap: BaseAmount
-  sourceAsset: O.Option<Asset>
-  targetAsset: O.Option<Asset>
+  sourceAsset: Asset
+  targetAsset: Asset
   poolsData: PoolsDataMap
-}): SwapData =>
-  FP.pipe(
-    sequenceTOption(sourceAsset, targetAsset),
-    O.map(([sourceAsset, targetAsset]) => {
-      const slip = getSlipPercent({ sourceAsset, targetAsset, amountToSwap, poolsData })
-      const swapResult = getSwapResult({ sourceAsset, targetAsset, amountToSwap, poolsData })
-      return {
-        slip,
-        swapResult
-      }
-    }),
-    O.getOrElse(() => DEFAULT_SWAP_DATA)
-  )
+}): SwapData => {
+  const slip = getSlipPercent({ sourceAsset, targetAsset, amountToSwap, poolsData })
+  const swapResult = getSwapResult({ sourceAsset, targetAsset, amountToSwap, poolsData })
+  return {
+    slip,
+    swapResult
+  }
+}
 
 /**
  * Returns `BaseAmount` with asgardex identifier counted into the limit
@@ -172,12 +162,6 @@ export const pickPoolAsset = (assets: PoolAssetDetails, asset: Asset): O.Option<
     assets,
     A.findFirst(({ asset: availableAsset }) => eqAsset.equals(availableAsset, asset)),
     O.alt(() => FP.pipe(assets, A.head))
-  )
-
-export const poolAssetDetailToAsset = (oAsset: O.Option<PoolAssetDetail>): O.Option<Asset> =>
-  FP.pipe(
-    oAsset,
-    O.map(({ asset }) => asset)
   )
 
 export const calcRefundFee = (inboundFee: BaseAmount): BaseAmount => inboundFee.times(3)

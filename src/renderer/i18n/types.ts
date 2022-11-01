@@ -48,7 +48,9 @@ export type CommonMessageKey =
   | 'common.viewTransaction'
   | 'common.copyTxUrl'
   | 'common.fee'
-  | 'common.fee.asset'
+  | 'common.fee.inbound'
+  | 'common.fee.outbound'
+  | 'common.fee.affiliate'
   | 'common.fees'
   | 'common.fee.estimated'
   | 'common.fees.estimated'
@@ -81,12 +83,14 @@ export type CommonMessageKey =
   | 'common.value'
   | 'common.manage'
   | 'common.detail'
+  | 'common.details'
   | 'common.filter'
   | 'common.all'
   | 'common.analytics'
   | 'common.asset.base'
   | 'common.asset.change'
   | 'common.noResult'
+  | 'common.rate'
   | 'common.tx.type.swap'
   | 'common.tx.type.deposit'
   | 'common.tx.type.refund'
@@ -372,6 +376,7 @@ type SwapMessageKey =
   | 'swap.note.nowallet'
   | 'swap.min.amount.info'
   | 'swap.min.result.info'
+  | `swap.min.result.protected`
 
 export type SwapMessages = { [key in SwapMessageKey]: string }
 

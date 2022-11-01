@@ -20,31 +20,31 @@ import * as RxOp from 'rxjs/operators'
 import { mockValidatePassword$ } from '../../../shared/mock/wallet'
 import { ONE_BN } from '../../const'
 import { THORCHAIN_DECIMAL } from '../../helpers/assetHelper'
+import { RUNE_PRICE_POOL } from '../../helpers/poolHelper'
 import { INITIAL_SWAP_STATE } from '../../services/chain/const'
 import { SwapState } from '../../services/chain/types'
 import { DEFAULT_MIMIR_HALT } from '../../services/thorchain/const'
-import { AssetWithDecimal } from '../../types/asgardex'
 import { Swap as Component, SwapProps } from './Swap'
+import { SwapAsset } from './Swap.types'
 
-const sourceAsset: AssetWithDecimal = { asset: AssetRuneNative, decimal: THORCHAIN_DECIMAL }
-const targetAsset: AssetWithDecimal = { asset: AssetBTC, decimal: BTC_DECIMAL }
+const sourceAsset: SwapAsset = { asset: AssetRuneNative, decimal: THORCHAIN_DECIMAL, price: ONE_BN }
+const targetAsset: SwapAsset = { asset: AssetBTC, decimal: BTC_DECIMAL, price: bn('56851.67420275761') }
 
 /* Mock all (default) data needed by `Swap` commponent */
 const defaultProps: SwapProps = {
   haltedChains: [],
   mimirHalt: DEFAULT_MIMIR_HALT,
   keystore: O.none,
-  availableAssets: [
-    { asset: AssetBTC, assetPrice: bn('56851.67420275761') },
-    { asset: AssetRuneNative, assetPrice: ONE_BN }
-  ],
-  assets: { inAsset: sourceAsset, outAsset: targetAsset },
+  poolAssets: [AssetBTC, AssetRuneNative],
+  assets: { source: sourceAsset, target: targetAsset },
   poolAddress: O.some({
     chain: BNBChain,
     address: 'vault-address',
     router: O.some('router-address'),
     halted: false
   }),
+  poolDetails: [],
+  pricePool: RUNE_PRICE_POOL,
   // mock successfull result of swap$
   swap$: (params) =>
     Rx.of(params).pipe(

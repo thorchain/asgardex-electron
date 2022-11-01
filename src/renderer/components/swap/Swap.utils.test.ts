@@ -22,13 +22,11 @@ import { eqAsset, eqBaseAmount } from '../../helpers/fp/eq'
 import { mockWalletBalance } from '../../helpers/test/testWalletHelper'
 import { PoolsDataMap } from '../../services/midgard/types'
 import {
-  DEFAULT_SWAP_DATA,
   isRuneSwap,
   getSlipPercent,
   getSwapResult,
   getSwapData,
   pickPoolAsset,
-  poolAssetDetailToAsset,
   minBalanceToSwap,
   calcRefundFee,
   minAmountToSwapMax1e8,
@@ -222,28 +220,6 @@ describe('components/swap/utils', () => {
   })
 
   describe('getSwapData', () => {
-    it('should return default value', () => {
-      expect(
-        getSwapData({ amountToSwap: baseAmount(123), sourceAsset: O.none, targetAsset: O.none, poolsData: {} })
-      ).toEqual(DEFAULT_SWAP_DATA)
-      expect(
-        getSwapData({
-          amountToSwap: baseAmount(123),
-          sourceAsset: O.some(ASSETS_TESTNET.FTM),
-          targetAsset: O.none,
-          poolsData: {}
-        })
-      ).toEqual(DEFAULT_SWAP_DATA)
-      expect(
-        getSwapData({
-          amountToSwap: baseAmount(123),
-          sourceAsset: O.none,
-          targetAsset: O.some(ASSETS_TESTNET.FTM),
-          poolsData: {}
-        })
-      ).toEqual(DEFAULT_SWAP_DATA)
-    })
-
     it('should calculate swap data', () => {
       const poolsData: PoolsDataMap = {
         [assetToString(AssetBNB)]: {
@@ -258,8 +234,8 @@ describe('components/swap/utils', () => {
 
       const { slip, swapResult } = getSwapData({
         amountToSwap: assetToBase(assetAmount(0.0001)),
-        sourceAsset: O.some(AssetBNB),
-        targetAsset: O.some(AssetRuneNative),
+        sourceAsset: AssetBNB,
+        targetAsset: AssetRuneNative,
         poolsData
       })
 
@@ -358,17 +334,6 @@ describe('components/swap/utils', () => {
           AssetETH
         )
       ).toEqual(O.some({ asset: AssetETH, assetPrice: bn(2) }))
-    })
-  })
-
-  describe('poolAssetToAsset', () => {
-    it('returns none', () => {
-      expect(poolAssetDetailToAsset(O.none)).toBeNone()
-    })
-    it('returns AssetRuneNative', () => {
-      expect(poolAssetDetailToAsset(O.some({ asset: AssetRuneNative, assetPrice: bn(0) }))).toEqual(
-        O.some(AssetRuneNative)
-      )
     })
   })
 

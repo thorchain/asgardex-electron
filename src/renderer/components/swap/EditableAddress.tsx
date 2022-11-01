@@ -11,7 +11,8 @@ import { Network } from '../../../shared/api/types'
 import { truncateAddress } from '../../helpers/addressHelper'
 import { AddressValidationAsync } from '../../services/clients'
 import { InnerForm } from '../shared/form'
-import { Input } from '../uielements/input'
+import { BaseButton } from '../uielements/button'
+import { Input } from '../uielements/input/Input'
 import { CopyLabel } from '../uielements/label'
 
 export type EditableAddressProps = {
@@ -91,21 +92,28 @@ export const EditableAddress = ({
 
   const renderAddress = useMemo(() => {
     return (
-      <div className="flex items-center overflow-hidden font-main text-[16px] normal-case text-text1 dark:text-text1d">
+      <div className="flex items-center overflow-hidden font-main text-[16px] normal-case text-text2 dark:text-text2d">
         <Tooltip overlayStyle={{ maxWidth: '100%', whiteSpace: 'nowrap' }} title={address}>
-          {truncatedAddress}
+          <BaseButton
+            className="!px-0 normal-case !text-text2 dark:!text-text2d"
+            onClick={() => {
+              setEditableAddress(O.fromNullable(address))
+              onChangeEditableMode(true)
+            }}>
+            {truncatedAddress}
+          </BaseButton>
         </Tooltip>
         <div className="flex flex-row items-center">
           <PencilSquareIcon
-            className="ml-[5px] h-[20px] w-[20px] cursor-pointer text-turquoise"
+            className="ml-[5px] h-[20px] w-[20px] cursor-pointer text-gray2 dark:text-gray2d"
             onClick={() => {
               setEditableAddress(O.fromNullable(address))
               onChangeEditableMode(true)
             }}
           />
-          <CopyLabel className="text-turquoise" textToCopy={address} />
+          <CopyLabel className="text-gray2 dark:text-gray2d" textToCopy={address} />
           <ArrowTopRightOnSquareIcon
-            className="ml-[5px] h-[20px] w-[20px] cursor-pointer text-turquoise"
+            className="ml-[5px] h-[20px] w-[20px] cursor-pointer text-gray2 dark:text-gray2d"
             onClick={() => onClickOpenAddress(address)}
           />
         </div>
@@ -126,14 +134,17 @@ export const EditableAddress = ({
             className="!mb-0 w-full"
             rules={[{ required: true, validator: validateAddress }]}
             name={RECIPIENT_FIELD}>
-            <Input className="!text-[16px]" color="primary" onKeyUp={inputOnKeyUpHandler} />
+            <Input className="!text-[16px] normal-case" color="primary" onKeyUp={inputOnKeyUpHandler} />
           </Form.Item>
 
           <CheckCircleIcon
-            className="ml-[5px] h-[24px] w-[24px] cursor-pointer text-turquoise"
+            className="ml-[5px] h-[30px] w-[30px] cursor-pointer text-turquoise"
             onClick={confirmEditHandler}
           />
-          <XCircleIcon className="ml-[5px] h-[24px] w-[24px] cursor-pointer text-error0" onClick={cancelEditHandler} />
+          <XCircleIcon
+            className="ml-[5px] h-[30px] w-[30px] cursor-pointer text-gray2 dark:text-gray2d"
+            onClick={cancelEditHandler}
+          />
         </InnerForm>
       )
     },
