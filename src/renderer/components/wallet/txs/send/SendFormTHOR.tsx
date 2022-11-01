@@ -32,6 +32,7 @@ import { AddressValidation, GetExplorerTxUrl, OpenExplorerTxUrl, WalletBalances 
 import { SelectedWalletAsset, ValidatePasswordHandler } from '../../../../services/wallet/types'
 import { WalletBalance } from '../../../../services/wallet/types'
 import { LedgerConfirmationModal, WalletPasswordConfirmationModal } from '../../../modal/confirmation'
+import { FlatButton } from '../../../uielements/button'
 import { MaxBalanceButton } from '../../../uielements/button/MaxBalanceButton'
 import { UIFeesRD } from '../../../uielements/fees'
 import { Input, InputBigNumber } from '../../../uielements/input'
@@ -331,6 +332,8 @@ export const SendFormTHOR: React.FC<Props> = (props): JSX.Element => {
                 />
               </Styled.FormItem>
               <MaxBalanceButton
+                className="mb-10px "
+                color="neutral"
                 balance={{ amount: maxAmount, asset: asset }}
                 onClick={addMaxAmountHandler}
                 disabled={isLoading}
@@ -342,11 +345,14 @@ export const SendFormTHOR: React.FC<Props> = (props): JSX.Element => {
                 <Input size="large" disabled={isLoading} />
               </Form.Item>
             </Styled.SubForm>
-            <Styled.SubmitContainer>
-              <Styled.Button loading={isLoading} disabled={isFeeError} htmlType="submit">
-                {intl.formatMessage({ id: 'wallet.action.send' })}
-              </Styled.Button>
-            </Styled.SubmitContainer>
+            <FlatButton
+              className="mt-40px min-w-[200px]"
+              loading={isLoading}
+              disabled={isFeeError}
+              type="submit"
+              size="large">
+              {intl.formatMessage({ id: 'wallet.action.send' })}
+            </FlatButton>
           </Styled.Form>
         </Styled.Col>
       </Row>
