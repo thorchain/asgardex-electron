@@ -1788,7 +1788,7 @@ export const Swap = ({
                 <BaseButton
                   className="goup flex w-full justify-between !p-0 font-mainSemiBold text-[16px] text-text2 hover:text-turquoise dark:text-text2d dark:hover:text-turquoise"
                   onClick={() => setShowDetails((current) => !current)}>
-                  Details
+                  {intl.formatMessage({ id: 'common.detail' })}
                   {showDetails ? (
                     <MagnifyingGlassMinusIcon className="ease h-[20px] w-[20px] text-inherit group-hover:scale-125" />
                   ) : (
@@ -1812,15 +1812,15 @@ export const Swap = ({
                   {showDetails && (
                     <>
                       <div className="flex w-full justify-between pl-10px text-[12px]">
-                        <div>Inbound</div>
+                        <div>{intl.formatMessage({ id: 'common.fee.inbound' })}</div>
                         <div>{priceSwapInFeeLabel}</div>
                       </div>
                       <div className="flex w-full justify-between pl-10px text-[12px]">
-                        <div>Outbound</div>
+                        <div>{intl.formatMessage({ id: 'common.fee.outbound' })}</div>
                         <div>{priceSwapOutFeeLabel}</div>
                       </div>
                       <div className="flex w-full justify-between pl-10px text-[12px]">
-                        <div>Affiliate</div>
+                        <div>{intl.formatMessage({ id: 'common.fee.affiliate' })}</div>
                         <div>
                           {formatAssetAmountCurrency({
                             amount: assetAmount(0),
@@ -1868,7 +1868,7 @@ export const Swap = ({
                       </div>
                       <div className="flex w-full justify-between pl-10px text-[12px]">
                         <div className="flex items-center">
-                          Protected swap result
+                          {intl.formatMessage({ id: 'swap.min.result.protected' })}
                           <InfoIcon
                             className={`ml-[3px] ${
                               disableSlippage ? '' : 'text-gray2 dark:text-gray2d'
@@ -1894,7 +1894,7 @@ export const Swap = ({
                         // toggle rate
                         setRateDirection((current) => (current === 'fromSource' ? 'fromTarget' : 'fromSource'))
                       }>
-                      Rate
+                      {intl.formatMessage({ id: 'common.rate' })}
                       <ArrowsRightLeftIcon className="ease ml-5px h-[15px] w-[15px] group-hover:rotate-180" />
                     </BaseButton>
                     <div>{rateLabel}</div>
