@@ -34,6 +34,7 @@ import * as RxOp from 'rxjs/operators'
 import { Network } from '../../../shared/api/types'
 import { WalletType } from '../../../shared/wallet/types'
 import { ZERO_BASE_AMOUNT } from '../../const'
+import { truncateAddress } from '../../helpers/addressHelper'
 import {
   getEthTokenAddress,
   isEthAsset,
@@ -100,10 +101,11 @@ import { TxModal } from '../modal/tx'
 import { SwapAssets } from '../modal/tx/extra'
 import { LoadingView } from '../shared/loading'
 import { AssetInput } from '../uielements/assets/assetInput'
+import { ASSET_SELECT_BUTTON_WIDTH } from '../uielements/assets/assetInput/AssetInput'
 import { BaseButton, FlatButton, ViewTxButton } from '../uielements/button'
 import { CheckButton } from '../uielements/button/CheckButton'
 import { MaxBalanceButton } from '../uielements/button/MaxBalanceButton'
-import { Tooltip, WalletTypeLabel } from '../uielements/common/Common.styles'
+import { Tooltip, TooltipAddress, WalletTypeLabel } from '../uielements/common/Common.styles'
 import { Fees, UIFeesRD } from '../uielements/fees'
 import { InfoIcon } from '../uielements/info'
 import { CopyLabel } from '../uielements/label'
@@ -128,8 +130,6 @@ export type SwapProps = {
     source: SwapAsset
     target: SwapAsset
   }
-  sourceWalletAddress: O.Option<Address>
-  sourceLedgerAddress: O.Option<Address>
   poolAddress: O.Option<PoolAddress>
   swap$: SwapStateHandler
   poolsData: PoolsDataMap
@@ -166,8 +166,6 @@ export const Swap = ({
     source: { asset: sourceAsset, decimal: sourceAssetDecimal, price: sourceAssetPrice },
     target: { asset: targetAsset, decimal: targetAssetDecimal, price: targetAssetPrice }
   },
-  sourceWalletAddress: oInitialSourceWalletAddress,
-  sourceLedgerAddress: oSourceLedgerAddress,
   poolAddress: oPoolAddress,
   swap$,
   poolsData,
@@ -199,13 +197,6 @@ export const Swap = ({
   const intl = useIntl()
 
   const lockedWallet: boolean = useMemo(() => isLocked(keystore) || !hasImportedKeystore(keystore), [keystore])
-
-  const [oSourceWalletAddress, setSourceWalletAddress] = useState<O.Option<Address>>(oInitialSourceWalletAddress)
-
-  // Update state needed - initial walletAddress is loaded async and can be different at first run
-  useEffect(() => {
-    setSourceWalletAddress(oInitialSourceWalletAddress)
-  }, [oInitialSourceWalletAddress])
 
   const [oTargetWalletAddress, setTargetWalletAddress] = useState<O.Option<Address>>(oInitialTargetWalletAddress)
   const [editableTargetWalletAddress, setEditableTargetWalletAddress] =
@@ -1518,11 +1509,8 @@ export const Swap = ({
   )
 
   const onClickUseSourceAssetLedger = useCallback(() => {
-    const useLedger = !useSourceAssetLedger
     setUseSourceAssetLedger(() => !useSourceAssetLedger)
-    const oAddress = useLedger ? oSourceLedgerAddress : oInitialSourceWalletAddress
-    setSourceWalletAddress(oAddress)
-  }, [oInitialSourceWalletAddress, oSourceLedgerAddress, useSourceAssetLedger])
+  }, [useSourceAssetLedger])
 
   const onClickUseTargetAssetLedger = useCallback(() => {
     const useLedger = !useTargetAssetLedger
@@ -1580,10 +1568,6 @@ export const Swap = ({
             <AssetInput
               className="w-full"
               title={intl.formatMessage({ id: 'swap.input' })}
-              titleTooltip={FP.pipe(
-                oSourceWalletAddress,
-                O.getOrElse(() => '')
-              )}
               amount={{ amount: amountToSwapMax1e8, asset: sourceAsset }}
               priceAmount={priceAmountToSwapMax1e8}
               assets={selectableSourceAssets}
@@ -1607,11 +1591,11 @@ export const Swap = ({
                 />
                 {minAmountError && renderMinAmount}
               </div>
-              <div className="flex w-[250px] flex-col items-center justify-start">
+              <div className="flex w-full justify-end">
                 <CheckButton
-                  size="small"
+                  size="medium"
                   color="neutral"
-                  className={`w-full rounded-b-lg bg-gray0 py-5px dark:bg-gray0d ${
+                  className={`${ASSET_SELECT_BUTTON_WIDTH} rounded-b-lg bg-gray0 py-5px dark:bg-gray0d ${
                     !hasSourceAssetLedger ? 'hidden' : ''
                   }`}
                   checked={useSourceAssetLedger}
@@ -1646,19 +1630,17 @@ export const Swap = ({
               network={network}
               asLabel
             />
-            <div className="flex flex-row">
-              <div className="flex w-[250px] flex-col items-center justify-start">
-                <CheckButton
-                  size="small"
-                  color="neutral"
-                  className={`w-full rounded-b-lg bg-gray0 py-5px dark:bg-gray0d ${
-                    !hasSourceAssetLedger ? 'hidden' : ''
-                  }`}
-                  checked={useTargetAssetLedger}
-                  clickHandler={onClickUseTargetAssetLedger}>
-                  {intl.formatMessage({ id: 'ledger.title' })}
-                </CheckButton>
-              </div>
+            <div className="flex w-full justify-end">
+              <CheckButton
+                size="medium"
+                color="neutral"
+                className={`${ASSET_SELECT_BUTTON_WIDTH} rounded-b-lg bg-gray0 py-5px dark:bg-gray0d ${
+                  !hasTargetAssetLedger ? 'hidden' : ''
+                }`}
+                checked={useTargetAssetLedger}
+                clickHandler={onClickUseTargetAssetLedger}>
+                {intl.formatMessage({ id: 'ledger.title' })}
+              </CheckButton>
             </div>
           </div>
           {!lockedWallet &&
@@ -1747,7 +1729,7 @@ export const Swap = ({
                 <BaseButton
                   className="goup flex w-full justify-between !p-0 font-mainSemiBold text-[16px] text-text2 hover:text-turquoise dark:text-text2d dark:hover:text-turquoise"
                   onClick={() => setShowDetails((current) => !current)}>
-                  {intl.formatMessage({ id: 'common.detail' })}
+                  {intl.formatMessage({ id: 'common.details' })}
                   {showDetails ? (
                     <MagnifyingGlassMinusIcon className="ease h-[20px] w-[20px] text-inherit group-hover:scale-125" />
                   ) : (
@@ -1755,9 +1737,25 @@ export const Swap = ({
                   )}
                 </BaseButton>
 
-                <div className="font-main text-[14px] text-gray2 dark:text-gray2d">
+                <div className="pt-10px font-main text-[14px] text-gray2 dark:text-gray2d">
+                  {/* Rate */}
+                  <div className={`flex w-full justify-between font-mainBold text-[14px]`}>
+                    <BaseButton
+                      className="group !p-0 !font-mainBold !text-gray2 dark:!text-gray2d"
+                      onClick={() =>
+                        // toggle rate
+                        setRateDirection((current) => (current === 'fromSource' ? 'fromTarget' : 'fromSource'))
+                      }>
+                      {intl.formatMessage({ id: 'common.rate' })}
+                      <ArrowsRightLeftIcon className="ease ml-5px h-[15px] w-[15px] group-hover:rotate-180" />
+                    </BaseButton>
+                    <div>{rateLabel}</div>
+                  </div>
                   {/* fees */}
-                  <div className="flex w-full items-center justify-between pt-10px font-mainBold">
+                  <div
+                    className={`flex w-full items-center justify-between font-mainBold ${
+                      showDetails ? 'pt-10px' : ''
+                    }`}>
                     <BaseButton
                       disabled={RD.isPending(swapFeesRD) || RD.isInitial(swapFeesRD)}
                       className="group !p-0 !font-mainBold !text-gray2 dark:!text-gray2d"
@@ -1820,13 +1818,16 @@ export const Swap = ({
                         </div>
                         <div>
                           {/* we don't show slippage tolerance whenever slippage is disabled (e.g. due memo restriction for Ledger BTC) */}
-                          {!disableSlippage && (
+                          {disableSlippage ? (
+                            <>{noDataString}</>
+                          ) : (
                             <SelectableSlipTolerance value={slipTolerance} onChange={changeSlipTolerance} />
                           )}
                         </div>
                       </div>
                       <div className="flex w-full justify-between pl-10px text-[12px]">
-                        <div className="flex items-center">
+                        <div
+                          className={`flex items-center ${disableSlippage ? 'text-warning0 dark:text-warning0d' : ''}`}>
                           {intl.formatMessage({ id: 'swap.min.result.protected' })}
                           <InfoIcon
                             className={`ml-[3px] ${
@@ -1844,20 +1845,61 @@ export const Swap = ({
                       </div>
                     </>
                   )}
-                  {/* Rate */}
-                  <div
-                    className={`flex w-full justify-between ${showDetails ? 'pt-10px' : ''} font-mainBold text-[14px]`}>
-                    <BaseButton
-                      className="group !p-0 !font-mainBold !text-gray2 dark:!text-gray2d"
-                      onClick={() =>
-                        // toggle rate
-                        setRateDirection((current) => (current === 'fromSource' ? 'fromTarget' : 'fromSource'))
-                      }>
-                      {intl.formatMessage({ id: 'common.rate' })}
-                      <ArrowsRightLeftIcon className="ease ml-5px h-[15px] w-[15px] group-hover:rotate-180" />
-                    </BaseButton>
-                    <div>{rateLabel}</div>
-                  </div>
+
+                  {/* addresses */}
+                  {showDetails && (
+                    <>
+                      <div className={`w-full pt-10px font-mainBold text-[14px]`}>
+                        {intl.formatMessage({ id: 'common.addresses' })}
+                      </div>
+                      {/* sender address */}
+                      <div className="flex w-full justify-between pl-10px text-[12px]">
+                        <div>{intl.formatMessage({ id: 'common.sender' })}</div>
+                        <div className="normal-case">
+                          {FP.pipe(
+                            oSwapParams,
+                            O.map(({ sender }) => (
+                              <TooltipAddress title={sender} key="tooltip-sender-addr">
+                                {truncateAddress(sender, sourceAsset.chain, network)}
+                              </TooltipAddress>
+                            )),
+                            O.getOrElse(() => <>{noDataString}</>)
+                          )}
+                        </div>
+                      </div>
+                      {/* recipient address */}
+                      <div className="flex w-full justify-between pl-10px text-[12px]">
+                        <div>{intl.formatMessage({ id: 'common.recipient' })}</div>
+                        <div className="normal-case">
+                          {FP.pipe(
+                            oTargetAddress,
+                            O.map((address) => (
+                              <TooltipAddress title={address} key="tooltip-target-addr">
+                                {truncateAddress(address, targetAsset.chain, network)}
+                              </TooltipAddress>
+                            )),
+                            O.getOrElse(() => <>{noDataString}</>)
+                          )}
+                        </div>
+                      </div>
+                      {/* inbound address */}
+                      {FP.pipe(
+                        oSwapParams,
+                        O.map(({ poolAddress: { address, chain } }) =>
+                          address ? (
+                            <div className="flex w-full justify-between pl-10px text-[12px]" key="pool-addr">
+                              <div>{intl.formatMessage({ id: 'common.pool.inbound' })}</div>
+                              <TooltipAddress title={address}>
+                                <div className="normal-case">{truncateAddress(address, chain, network)}</div>
+                              </TooltipAddress>
+                            </div>
+                          ) : null
+                        ),
+                        O.toNullable
+                      )}
+                    </>
+                  )}
+
                   {/* memo */}
                   {showDetails && (
                     <div className="flex w-full items-start justify-between pt-10px text-[14px]">

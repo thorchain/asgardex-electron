@@ -34,7 +34,7 @@ import { ValidatePasswordHandler, WalletBalance } from '../../../../services/wal
 import { LedgerConfirmationModal, WalletPasswordConfirmationModal } from '../../../modal/confirmation'
 import { TxModal } from '../../../modal/tx'
 import { SendAsset } from '../../../modal/tx/extra/SendAsset'
-import { ViewTxButton } from '../../../uielements/button'
+import { FlatButton, ViewTxButton } from '../../../uielements/button'
 import { CheckButton } from '../../../uielements/button/CheckButton'
 import { MaxBalanceButton } from '../../../uielements/button/MaxBalanceButton'
 import { UIFeesRD } from '../../../uielements/fees'
@@ -481,6 +481,7 @@ export const InteractForm: React.FC<Props> = (props) => {
             {(interactType === 'bond' || interactType === 'custom') && (
               <MaxBalanceButton
                 className="mb-10px"
+                color="neutral"
                 balance={{ amount: maxAmount, asset: asset }}
                 onClick={addMaxAmountHandler}
                 disabled={isLoading}
@@ -492,14 +493,16 @@ export const InteractForm: React.FC<Props> = (props) => {
         )}
       </>
 
-      <Styled.SubmitButtonContainer>
-        <Styled.SubmitButton
+      <div>
+        <FlatButton
+          className="mt-10px min-w-[200px]"
           loading={isLoading}
           disabled={isLoading || !!form.getFieldsError().filter(({ errors }) => errors.length).length}
-          htmlType="submit">
+          type="submit"
+          size="large">
           {submitLabel}
-        </Styled.SubmitButton>
-      </Styled.SubmitButtonContainer>
+        </FlatButton>
+      </div>
       {showConfirmationModal && renderConfirmationModal}
       {renderTxModal}
     </Styled.Form>

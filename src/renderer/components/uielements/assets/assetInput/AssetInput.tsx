@@ -15,13 +15,13 @@ import { useIntl } from 'react-intl'
 import { Network } from '../../../../../shared/api/types'
 import { isUSDAsset } from '../../../../helpers/assetHelper'
 import { AssetWithAmount, FixmeType } from '../../../../types/asgardex'
-import { TooltipAddress } from '../../common/Common.styles'
 import { InputBigNumber } from '../../input'
 import { AssetSelect } from '../assetSelect'
 
+export const ASSET_SELECT_BUTTON_WIDTH = 'w-[180px]'
+
 export type Props = {
   title: string
-  titleTooltip?: string
   amount: AssetWithAmount
   priceAmount: AssetWithAmount
   assets: Asset[]
@@ -47,7 +47,6 @@ export type Props = {
 export const AssetInput: React.FC<Props> = (props): JSX.Element => {
   const {
     title,
-    titleTooltip = '',
     amount: { amount, asset },
     priceAmount: { amount: priceAmount, asset: priceAsset },
     assets,
@@ -79,17 +78,6 @@ export const AssetInput: React.FC<Props> = (props): JSX.Element => {
     inputWrapperRef.current?.firstChild?.focus()
   }, [])
 
-  const titleClassName = `absolute left-[10px] top-[-15px] p-5px font-main text-[14px]
-    ${showError ? 'text-error0 dark:text-error0d' : 'text-gray2 dark:text-gray2d'} m-0 bg-bg0 dark:bg-bg0d`
-
-  const Title = () => <p className={titleClassName}>{title}</p>
-
-  const TitleWithTooltip = () => (
-    <TooltipAddress title={titleTooltip}>
-      <p className={titleClassName}>{title}</p>
-    </TooltipAddress>
-  )
-
   const onFocusHandler = useCallback(() => {
     setFocused(true)
     onFocus()
@@ -115,7 +103,11 @@ export const AssetInput: React.FC<Props> = (props): JSX.Element => {
       ref={inputWrapperRef}
       onClick={handleClickWrapper}>
       {/* title */}
-      {titleTooltip ? <TitleWithTooltip /> : <Title />}
+      <p
+        className={`absolute left-[10px] top-[-15px] p-5px font-main text-[14px]
+    ${showError ? 'text-error0 dark:text-error0d' : 'text-gray2 dark:text-gray2d'} m-0 bg-bg0 dark:bg-bg0d`}>
+        {title}
+      </p>
 
       <div
         className="flex w-full flex-col
@@ -156,7 +148,7 @@ export const AssetInput: React.FC<Props> = (props): JSX.Element => {
       </div>
 
       <AssetSelect
-        className="h-full w-[180px]"
+        className={`h-full ${ASSET_SELECT_BUTTON_WIDTH}`}
         onSelect={onChangeAsset}
         asset={asset}
         assets={assets}

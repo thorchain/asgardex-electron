@@ -4,6 +4,7 @@ import { MagnifyingGlassIcon, XMarkIcon } from '@heroicons/react/24/outline'
 import * as FP from 'fp-ts/lib/function'
 
 import { emptyString } from '../../../helpers/stringHelper'
+import { BaseButton } from '../button'
 import { Size } from '../input'
 import { Input, InputProps } from './Input'
 
@@ -36,8 +37,8 @@ export const InputSearch = forwardRef<HTMLInputElement, Props>((props, ref): JSX
   )
 
   const onCancelHandler = useCallback(() => {
-    setSearchTxt(emptyString)
     onCancel()
+    setSearchTxt(emptyString)
     onSearch(emptyString)
   }, [onCancel, onSearch])
 
@@ -88,18 +89,15 @@ export const InputSearch = forwardRef<HTMLInputElement, Props>((props, ref): JSX
             ${disabled ? 'cursor-not-allowed' : 'cursor-pointer'}
             `}
       />
-      <XMarkIcon
-        className={`absolute top-[50%]  ${iconOffsetR[size]} ${
-          iconSize[size]
-        } translate-y-[-50%] text-gray2 dark:text-gray2
-          ${!searchTxt ? 'hidden' : ''}
-          ${disabled ? 'opacity-50' : ''}
-          ${disabled ? 'cursor-not-allowed' : 'cursor-pointer'}
-          `}
+      <BaseButton
+        className={`absolute top-[50%] !px-0 ${iconOffsetR[size]} translate-y-[-50%] text-gray2 dark:text-gray2
+        ${!searchTxt ? 'hidden' : ''}
+        `}
         onClick={() => {
           onCancelHandler()
-        }}
-      />
+        }}>
+        <XMarkIcon className={`${iconSize[size]}`} />
+      </BaseButton>
       <Input
         className={`${inputOffsetX[size]} placeholder:uppercase ${classNameInput}`}
         ref={ref}

@@ -28,7 +28,7 @@ const sizes: Record<NonNullable<SizeType>, string> = {
 }
 
 const colors: Colors = {
-  primary: palette('primary', 0),
+  primary: palette('gray', 1),
   success: palette('success', 0),
   warning: palette('warning', 0),
   error: palette('error', 0)
