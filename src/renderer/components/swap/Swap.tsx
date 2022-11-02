@@ -34,7 +34,6 @@ import * as RxOp from 'rxjs/operators'
 import { Network } from '../../../shared/api/types'
 import { WalletType } from '../../../shared/wallet/types'
 import { ZERO_BASE_AMOUNT } from '../../const'
-import { truncateAddress } from '../../helpers/addressHelper'
 import {
   getEthTokenAddress,
   isEthAsset,
@@ -1853,14 +1852,14 @@ export const Swap = ({
                         {intl.formatMessage({ id: 'common.addresses' })}
                       </div>
                       {/* sender address */}
-                      <div className="flex w-full justify-between pl-10px text-[12px]">
+                      <div className="flex w-full items-center justify-between pl-10px text-[12px]">
                         <div>{intl.formatMessage({ id: 'common.sender' })}</div>
-                        <div className="normal-case">
+                        <div className="truncate pl-20px text-[13px] normal-case leading-normal">
                           {FP.pipe(
                             oSwapParams,
                             O.map(({ sender }) => (
                               <TooltipAddress title={sender} key="tooltip-sender-addr">
-                                {truncateAddress(sender, sourceAsset.chain, network)}
+                                {sender}
                               </TooltipAddress>
                             )),
                             O.getOrElse(() => <>{noDataString}</>)
@@ -1868,14 +1867,14 @@ export const Swap = ({
                         </div>
                       </div>
                       {/* recipient address */}
-                      <div className="flex w-full justify-between pl-10px text-[12px]">
+                      <div className="flex w-full items-center justify-between pl-10px text-[12px]">
                         <div>{intl.formatMessage({ id: 'common.recipient' })}</div>
-                        <div className="normal-case">
+                        <div className="truncate pl-20px text-[13px] normal-case leading-normal">
                           {FP.pipe(
                             oTargetAddress,
                             O.map((address) => (
                               <TooltipAddress title={address} key="tooltip-target-addr">
-                                {truncateAddress(address, targetAsset.chain, network)}
+                                {address}
                               </TooltipAddress>
                             )),
                             O.getOrElse(() => <>{noDataString}</>)
@@ -1885,12 +1884,14 @@ export const Swap = ({
                       {/* inbound address */}
                       {FP.pipe(
                         oSwapParams,
-                        O.map(({ poolAddress: { address, chain } }) =>
+                        O.map(({ poolAddress: { address } }) =>
                           address ? (
-                            <div className="flex w-full justify-between pl-10px text-[12px]" key="pool-addr">
+                            <div
+                              className="flex w-full items-center justify-between pl-10px text-[12px]"
+                              key="pool-addr">
                               <div>{intl.formatMessage({ id: 'common.pool.inbound' })}</div>
                               <TooltipAddress title={address}>
-                                <div className="normal-case">{truncateAddress(address, chain, network)}</div>
+                                <div className="truncate pl-20px text-[13px] normal-case leading-normal">{address}</div>
                               </TooltipAddress>
                             </div>
                           ) : null
@@ -1902,10 +1903,12 @@ export const Swap = ({
 
                   {/* memo */}
                   {showDetails && (
-                    <div className="flex w-full items-start justify-between pt-10px text-[14px]">
-                      <div className="ml-[-2px] font-mainBold">{memoTitle}</div>
-                      <div className="break-all pl-20px font-main">{memoLabel}</div>
-                    </div>
+                    <>
+                      <div className="ml-[-2px] flex w-full items-start pt-10px font-mainBold text-[14px]">
+                        {memoTitle}
+                      </div>
+                      <div className="truncate pl-10px font-main text-[12px]">{memoLabel}</div>
+                    </>
                   )}
                 </div>
               </div>
