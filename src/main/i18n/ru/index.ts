@@ -20,7 +20,7 @@ const editMenu: EditMenuMessages = {
 
 const helpMenu: HelpMenuMessages = {
   'menu.help.title': 'Помощь',
-  'menu.help.learn': 'Узнать больше...',
+  'menu.help.learn': 'Узнать больше…',
   'menu.help.docs': 'Документация',
   'menu.help.discord': 'Discord',
   'menu.help.issues': 'Проблемы'
@@ -29,7 +29,7 @@ const helpMenu: HelpMenuMessages = {
 const viewMenu: ViewMenuMessages = {
   'menu.view.title': ' Вид',
   'menu.view.reload': 'Обновить',
-  'menu.view.toggleFullscreen': 'Переключить полноэеранные режим',
+  'menu.view.toggleFullscreen': 'Переключить в полноэкранный режим',
   'menu.view.toggleDevTools': 'Открыть/Скрыть инструменты разработчика'
 }
 

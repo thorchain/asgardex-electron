@@ -20,7 +20,7 @@ const editMenu: EditMenuMessages = {
 
 const helpMenu: HelpMenuMessages = {
   'menu.help.title': 'Hilfe',
-  'menu.help.learn': 'Mehr erfahren ...',
+  'menu.help.learn': 'Mehr erfahren…',
   'menu.help.docs': 'Dokumentation',
   'menu.help.discord': 'Discord',
   'menu.help.issues': 'Probleme melden'

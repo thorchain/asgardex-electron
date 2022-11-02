@@ -12,7 +12,7 @@ const ledger: LedgerMessages = {
   'ledger.error.inuse': 'Это устройство используется в другом приложении',
   'ledger.error.appnotopened': 'Приложение Ledger не открыто',
   'ledger.error.noapp':
-    'Нет открытых Ledger приложений. Пожалуйста, откройте соответствующее приложение на устрйостве.',
+    'Нет открытых Ledger приложений. Пожалуйста, откройте соответствующее приложение на устройстве.',
   'ledger.error.getaddressfailed': 'Добавление адреса из Ledger не удалось',
   'ledger.error.signfailed': 'Подпись транзакции с помощью Ledger не удалась',
   'ledger.error.sendfailed': 'Отправка транзакции с помощью Ledger не удалась',
@@ -28,7 +28,7 @@ const ledger: LedgerMessages = {
   'ledger.notsupported': 'Ledger не поддерживает {chain}.',
   'ledger.notaddedorzerobalances': 'Ledger {chain} не была подключена или имеет нулевой баланс.',
   'ledger.deposit.oneside': 'Пока что Ledger поддерживается только для одностороннего добавления активов.',
-  'ledger.legacyformat.note': 'Леджер отображает все выходные адреса в формате "legacy", но не в формате "CashAddr".',
+  'ledger.legacyformat.note': 'Ledger отображает все выходные адреса в формате "legacy", но не в формате "CashAddr".',
   'ledger.legacyformat.show': 'Показать адреса',
   'ledger.legacyformat.hide': 'Скрыть адреса'
 }
