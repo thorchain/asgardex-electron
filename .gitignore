@@ -32,3 +32,4 @@ yarn-error.log*
 .env
 
 dev-app-update.yml
+/.idea/

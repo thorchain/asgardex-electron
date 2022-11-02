@@ -28,7 +28,7 @@ const deposit: DepositMessages = {
   'deposit.add.pendingAssets.description':
     'Following assets have been successfully sent, but the transaction of the other asset side has not been finalized or it was failed:',
   'deposit.add.pendingAssets.recoveryDescription':
-    'Please note: Transactions of an asset pair might take different time by running on different blockchains. In case of failures, you have a way to withdraw pending assets using the Recovery Tool of THORSWap at {url}. This feature is currently not available in ASGARDEX desktop.',
+    'Please note: Transactions of an asset pair might take different time by running on different blockchains. In case of failures, you have a way to withdraw pending assets using the Recovery Tool of THORSwap at {url}. This feature is currently not available in ASGARDEX desktop.',
   'deposit.add.pendingAssets.recoveryTitle': 'Open Recovery Tool',
   'deposit.add.asymAssets.title': 'Asymmetrical deposit found',
   'deposit.add.asymAssets.description':
