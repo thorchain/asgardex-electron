@@ -256,10 +256,9 @@ export const getOutboundAssetFeeByChain = (
             asset: AssetDOGE
           })
         case ETHChain: {
-          // For ETH value is provided in `gwei` and needs to be converted into `wei`
-          const valueGwei = value.multipliedBy(10 ** 9)
           return O.some({
-            amount: baseAmount(valueGwei, ETH_DECIMAL),
+            // Convertion of decimal needed: 1e8 (by default in THORChain) -> 1e18 (ETH)
+            amount: convertBaseAmountDecimal(baseAmount(value, THORCHAIN_DECIMAL), ETH_DECIMAL),
             asset: AssetETH
           })
         }
