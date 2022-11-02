@@ -103,7 +103,9 @@ export const AssetsFilter: React.FC<Props> = ({ poolFilters, className, activeFi
         {filters}
         <InputSearch
           className="mt-10px md:mt-0"
-          classNameInput="ease w-[150px] focus:w-[350px] bg-gray0 focus:dark:bg-gray0d focus:bg-bg0 dark:bg-bg0d"
+          // Note: `delay-200` needed to handle `onCancel` callback of InputSearch
+          // in other case X icon in InputSearch does not fire `onClick` event internally due focus changes + animation of width (tailwind bug?)
+          classNameInput="duration-200 delay-200 w-[150px] focus:w-[300px] !bg-gray0 focus:dark:!bg-gray0d focus:!bg-bg0 dark:!bg-bg0d"
           onChange={setCustomFilter}
           value={inputValue}
           size="normal"
