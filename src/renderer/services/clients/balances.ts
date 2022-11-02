@@ -1,6 +1,6 @@
 import * as RD from '@devexperts/remote-data-ts'
-import { Address, Balance, XChainClient } from '@xchainjs/xchain-client'
-import { Asset } from '@xchainjs/xchain-util'
+import { Balance, XChainClient } from '@xchainjs/xchain-client'
+import { Address, Asset } from '@xchainjs/xchain-util'
 import * as A from 'fp-ts/Array'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'

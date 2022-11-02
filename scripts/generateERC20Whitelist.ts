@@ -1,6 +1,6 @@
 import { Asset, assetFromString, ETHChain } from '@xchainjs/xchain-util'
+import ansis from 'ansis'
 import axios from 'axios'
-import chalk from 'chalk'
 import * as IO from 'fp-ts/IO'
 import * as A from 'fp-ts/lib/Array'
 import * as C from 'fp-ts/lib/Console'
@@ -17,7 +17,7 @@ import { writeFile, readFile } from '../src/main/utils/file'
 import { ERC20Whitelist, erc20WhitelistIO } from '../src/renderer/services/thorchain/types'
 
 const WHITELIST_URL =
-  'https://gitlab.com/thorchain/thornode/-/raw/develop/bifrost/pkg/chainclients/ethereum/token_list.json'
+  'https://gitlab.com/thorchain/thornode/-/raw/release-1.97.2/common/tokenlist/ethtokens/eth_mainnet_V97.json'
 
 const PATH = './src/renderer/types/generated/thorchain/erc20whitelist.ts'
 
@@ -98,7 +98,7 @@ const formatList = () =>
 const onError = (e: Error): T.Task<void> =>
   T.fromIO(
     FP.pipe(
-      C.log(chalk.bold.red('Unexpected Error!')),
+      C.log(ansis.bold.red('Unexpected Error!')),
       IO.chain(() => C.error(e))
     )
   )
@@ -106,13 +106,16 @@ const onError = (e: Error): T.Task<void> =>
 const onSuccess = (): T.Task<void> =>
   T.fromIO(
     FP.pipe(
-      C.info(chalk.green.bold(`Created whitelist successfully!`)),
+      C.info(ansis.green.bold(`Created whitelist successfully!`)),
       IO.chain(() => C.log(`Location: ${PATH}`))
     )
   )
 
 const main = FP.pipe(
-  loadList(),
+  C.info(ansis.italic.gray(`Generate whitelist...`)),
+  TE.fromIO,
+  TE.mapLeft(E.toError),
+  TE.chain(loadList),
   TE.map(transformList),
   TE.chain(writeList),
   TE.chain(formatList),

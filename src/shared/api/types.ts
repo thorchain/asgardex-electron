@@ -1,8 +1,8 @@
 import * as RD from '@devexperts/remote-data-ts'
-import { Address, FeeRate, TxHash, TxParams } from '@xchainjs/xchain-client'
+import { FeeRate, TxHash, TxParams } from '@xchainjs/xchain-client'
 import { Keystore } from '@xchainjs/xchain-crypto'
 import { NodeUrl } from '@xchainjs/xchain-thorchain'
-import { Chain } from '@xchainjs/xchain-util'
+import { Address, Chain } from '@xchainjs/xchain-util'
 import * as E from 'fp-ts/lib/Either'
 import * as O from 'fp-ts/Option'
 
@@ -18,7 +18,13 @@ export type StorageVersion = { version: string }
 export type ApiUrls = Record<Network, string>
 export type UserNodesStorage = Readonly<Record<Network, Address[]> & StorageVersion>
 export type CommonStorage = Readonly<
-  { locale: Locale; ethDerivationMode: EthHDMode; midgardUrls: ApiUrls } & StorageVersion
+  {
+    locale: Locale
+    ethDerivationMode: EthHDMode
+    midgard: ApiUrls
+    thornodeRpc: ApiUrls
+    thornodeApi: ApiUrls
+  } & StorageVersion
 >
 
 /**

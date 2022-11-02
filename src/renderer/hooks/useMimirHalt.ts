@@ -8,7 +8,6 @@ import { useObservableState } from 'observable-hooks'
 import * as Rx from 'rxjs'
 import * as RxOp from 'rxjs/operators'
 
-import { useMidgardContext } from '../contexts/MidgardContext'
 import { useThorchainContext } from '../contexts/ThorchainContext'
 import { sequenceTRD } from '../helpers/fpHelpers'
 import { DEFAULT_MIMIR_HALT } from '../services/thorchain/const'
@@ -33,11 +32,7 @@ export const getMimirStatus = (mimir = 0, lastHeight = 0) => {
  * Note: Same rule as we have for services - Use this hook in top level *views only (but in child components)
  */
 export const useMimirHalt = (): { mimirHaltRD: MimirHaltRD; mimirHalt: MimirHalt } => {
-  const { mimir$ } = useThorchainContext()
-
-  const {
-    service: { thorchainLastblockState$ }
-  } = useMidgardContext()
+  const { mimir$, thorchainLastblockState$ } = useThorchainContext()
 
   const [mimirHaltRD] = useObservableState<MimirHaltRD>(
     () =>

@@ -1,7 +1,6 @@
 import { getPrefix as getBinancePrefix } from '@xchainjs/xchain-binance'
 import { getPrefix as getBitcoinPrefix } from '@xchainjs/xchain-bitcoin'
 import { getPrefix as getBCHPrefix } from '@xchainjs/xchain-bitcoincash'
-import { Address } from '@xchainjs/xchain-client'
 import { getPrefix as getCosmosPrefix } from '@xchainjs/xchain-cosmos'
 import { getPrefix as getDogePrefix } from '@xchainjs/xchain-doge'
 import { getPrefix as getEthereumPrefix } from '@xchainjs/xchain-ethereum'
@@ -13,12 +12,13 @@ import {
   BTCChain,
   CosmosChain,
   ETHChain,
-  PolkadotChain,
   THORChain,
   LTCChain,
   BCHChain,
   DOGEChain,
-  TerraChain
+  TerraChain,
+  AVAXChain,
+  Address
 } from '@xchainjs/xchain-util'
 import { ethers } from 'ethers'
 import * as O from 'fp-ts/lib/Option'
@@ -53,8 +53,8 @@ export const getAddressPrefixLength = (chain: Chain, network: Network): number =
       return getBCHPrefix().length
     case TerraChain:
       throw Error('Terra (Classic) is not supported anymore')
-    case PolkadotChain:
-      throw Error('Polkadot is not supported yet')
+    case AVAXChain:
+      throw Error('AVAX is not supported yet')
   }
 }
 

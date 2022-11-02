@@ -1,14 +1,11 @@
 import * as RD from '@devexperts/remote-data-ts'
-import { baseAmount } from '@xchainjs/xchain-util'
 import * as FP from 'fp-ts/function'
 import * as O from 'fp-ts/Option'
-import { IntlShape } from 'react-intl'
 import * as Rx from 'rxjs'
 import * as RxOp from 'rxjs/operators'
 
 import { ApiUrls, Network } from '../../../shared/api/types'
 import { DEFAULT_MIDGARD_URLS } from '../../../shared/midgard/const'
-import { THORCHAIN_DECIMAL } from '../../helpers/assetHelper'
 import { eqApiUrls } from '../../helpers/fp/eq'
 import { liveData } from '../../helpers/rx/liveData'
 import { triggerStream, TriggerStream$ } from '../../helpers/stateHelper'
@@ -16,6 +13,7 @@ import { Configuration, DefaultApi } from '../../types/generated/midgard'
 import { network$ } from '../app/service'
 import { MIDGARD_MAX_RETRY } from '../const'
 import { getStorageState$, modifyStorage, getStorageState } from '../storage/common'
+import { inboundAddressesShared$, loadInboundAddresses$ } from '../thorchain/'
 import { ErrorId } from '../wallet/types'
 import { createActionsService } from './actions'
 import { selectedPoolAsset$, setSelectedPoolAsset } from './common'
@@ -24,14 +22,12 @@ import { createSharesService } from './shares'
 import {
   NetworkInfoRD,
   NetworkInfoLD,
-  ThorchainConstantsLD,
   MidgardUrlLD,
-  ThorchainLastblockLD,
-  NativeFeeLD,
   HealthLD,
   ValidateNodeLD,
   CheckMidgardUrlHandler,
-  SelectedPoolAsset
+  SelectedPoolAsset,
+  MidgardStatusLD
 } from './types'
 
 // `TriggerStream` to reload Midgard
@@ -45,7 +41,7 @@ const getMidgardUrl$ = FP.pipe(
   RxOp.map(([storage]) =>
     FP.pipe(
       storage,
-      O.map(({ midgardUrls }) => midgardUrls),
+      O.map(({ midgard: midgardUrls }) => midgardUrls),
       O.getOrElse(() => DEFAULT_MIDGARD_URLS)
     )
   ),
@@ -58,7 +54,7 @@ const getMidgardUrl$ = FP.pipe(
 const getMidgardUrl = (): ApiUrls =>
   FP.pipe(
     getStorageState(),
-    O.map(({ midgardUrls }) => midgardUrls),
+    O.map(({ midgard: midgardUrls }) => midgardUrls),
     O.getOrElse(() => DEFAULT_MIDGARD_URLS)
   )
 
@@ -67,7 +63,7 @@ const getMidgardUrl = (): ApiUrls =>
  */
 const setMidgardUrl = (url: string, network: Network) => {
   const midgardUrls = { ...getMidgardUrl(), [network]: url }
-  modifyStorage(O.some({ midgardUrls }))
+  modifyStorage(O.some({ midgard: midgardUrls }))
 }
 
 /**
@@ -81,84 +77,6 @@ const getMidgardDefaultApi = (basePath: string) => new DefaultApi(new Configurat
 const midgardUrl$: MidgardUrlLD = Rx.combineLatest([network$, getMidgardUrl$]).pipe(
   RxOp.map(([network, midgardUrl]) => RD.success(midgardUrl[network])),
   RxOp.shareReplay(1)
-)
-
-/**
- * Get `ThorchainLastblock` data from Midgard
- */
-const apiGetThorchainLastblock$ = midgardUrl$.pipe(
-  liveData.chain((endpoint) =>
-    FP.pipe(
-      getMidgardDefaultApi(endpoint).getProxiedLastblock(),
-      RxOp.map(RD.success),
-      RxOp.catchError((e: Error) => Rx.of(RD.failure(e)))
-    )
-  )
-)
-
-// `TriggerStream` to reload data of `ThorchainLastblock`
-const { stream$: reloadThorchainLastblock$, trigger: reloadThorchainLastblock } = triggerStream()
-
-/**
- * Loads data of `ThorchainLastblock`
- */
-const loadThorchainLastblock$ = () =>
-  apiGetThorchainLastblock$.pipe(
-    // catch any errors if there any
-    RxOp.catchError((error: Error) => Rx.of(RD.failure(error))),
-    RxOp.startWith(RD.pending),
-    RxOp.retry(MIDGARD_MAX_RETRY)
-  )
-
-const loadThorchainLastblockInterval$ = Rx.timer(0 /* no delay for first value */, 15 * 1000 /* every 15 sec  */)
-
-/**
- * State of `ThorchainLastblock`, it will be loaded data by first subscription only
- */
-const thorchainLastblockState$: ThorchainLastblockLD = FP.pipe(
-  Rx.combineLatest([reloadThorchainLastblock$, loadThorchainLastblockInterval$]),
-  // start request
-  RxOp.switchMap((_) => loadThorchainLastblock$()),
-  // cache it to avoid reloading data by every subscription
-  RxOp.shareReplay(1)
-)
-
-/**
- * Get `ThorchainConstants` data from Midgard
- */
-const apiGetThorchainConstants$ = FP.pipe(
-  midgardUrl$,
-  liveData.chain((endpoint) =>
-    FP.pipe(
-      getMidgardDefaultApi(endpoint).getProxiedConstants(),
-      RxOp.map(RD.success),
-      RxOp.catchError((e: Error) => Rx.of(RD.failure(e)))
-    )
-  )
-)
-
-const { stream$: reloadThorchainConstants$, trigger: reloadThorchainConstants } = triggerStream()
-
-/**
- * Provides data of `ThorchainConstants`
- */
-const thorchainConstantsState$: ThorchainConstantsLD = FP.pipe(
-  reloadThorchainConstants$,
-  RxOp.debounceTime(300),
-  RxOp.switchMap(() => apiGetThorchainConstants$),
-  RxOp.startWith(RD.pending),
-  RxOp.retry(MIDGARD_MAX_RETRY),
-  RxOp.shareReplay(1),
-  RxOp.catchError(() => Rx.of(RD.failure(Error('Failed to load Thorchain constants'))))
-)
-
-const nativeTxFee$: NativeFeeLD = thorchainConstantsState$.pipe(
-  liveData.map((constants) =>
-    FP.pipe(
-      O.fromNullable(constants.int_64_values?.NativeTransactionFee),
-      O.map((value) => baseAmount(value, THORCHAIN_DECIMAL))
-    )
-  )
 )
 
 /**
@@ -216,28 +134,38 @@ const validateNode$ = (): ValidateNodeLD =>
 // `TriggerStream` to reload chart data handled on view (not service) level only
 export const { stream$: reloadChartDataUI$, trigger: reloadChartDataUI } = triggerStream()
 
-export const checkMidgardUrl$: CheckMidgardUrlHandler = (url: string, intl: IntlShape) =>
+export const checkMidgardUrl$: CheckMidgardUrlHandler = (url, intl) =>
   FP.pipe(
     getMidgardDefaultApi(url).getHealth(),
     RxOp.map((result) => {
       const { database, inSync } = result
       if (database && inSync) return RD.success(url)
 
-      return RD.failure(Error(intl.formatMessage({ id: 'midgard.url.error.unhealthy' }, { endpoint: '/health' })))
+      return RD.failure(
+        Error(
+          intl?.formatMessage({ id: 'midgard.url.error.unhealthy' }, { endpoint: '/health' }) || 'Midgard is unhealthy'
+        )
+      )
     }),
     RxOp.catchError((_: Error) =>
-      Rx.of(RD.failure(Error(`${intl.formatMessage({ id: 'midgard.url.error.invalid' })}`)))
+      Rx.of(
+        RD.failure(Error(`${intl?.formatMessage({ id: 'midgard.url.error.invalid' })} || 'Midgard can't be accessed'`))
+      )
     )
   )
+
+const healthInterval$ = Rx.timer(0 /* no delay for first value */, 5 * 60 * 1000 /* others are delayed by 5 min  */)
+
+const healthStatus$: MidgardStatusLD = FP.pipe(
+  Rx.combineLatest([midgardUrl$, healthInterval$]),
+  RxOp.map(([urlRD, _]) => urlRD),
+  liveData.chain((url) => checkMidgardUrl$(url)),
+  liveData.map((_) => true)
+)
 
 export type MidgardService = {
   networkInfo$: NetworkInfoLD
   reloadNetworkInfo: FP.Lazy<void>
-  reloadThorchainConstants: FP.Lazy<void>
-  thorchainConstantsState$: ThorchainConstantsLD
-  thorchainLastblockState$: ThorchainLastblockLD
-  nativeTxFee$: NativeFeeLD
-  reloadThorchainLastblock: FP.Lazy<void>
   setSelectedPoolAsset: (p: SelectedPoolAsset) => void
   selectedPoolAsset$: Rx.Observable<SelectedPoolAsset>
   reloadChartDataUI: FP.Lazy<void>
@@ -249,6 +177,7 @@ export type MidgardService = {
   pools: ReturnType<typeof createPoolsService>
   shares: ReturnType<typeof createSharesService>
   actions: ReturnType<typeof createActionsService>
+  healthStatus$: MidgardStatusLD
   validateNode$: () => ValidateNodeLD
 }
 /**
@@ -257,11 +186,6 @@ export type MidgardService = {
 export const service: MidgardService = {
   networkInfo$,
   reloadNetworkInfo,
-  reloadThorchainConstants,
-  thorchainConstantsState$,
-  thorchainLastblockState$,
-  nativeTxFee$,
-  reloadThorchainLastblock,
   reloadChartDataUI,
   reloadChartDataUI$,
   setSelectedPoolAsset,
@@ -270,8 +194,15 @@ export const service: MidgardService = {
   reloadApiEndpoint: reloadMidgardUrl,
   setMidgardUrl,
   checkMidgardUrl$,
+  healthStatus$,
   validateNode$,
-  pools: createPoolsService(midgardUrl$, getMidgardDefaultApi, selectedPoolAsset$),
+  pools: createPoolsService({
+    midgardUrl$,
+    getMidgardDefaultApi,
+    selectedPoolAsset$,
+    loadInboundAddresses$,
+    inboundAddressesShared$
+  }),
   shares: createSharesService(midgardUrl$, getMidgardDefaultApi),
   actions: createActionsService(midgardUrl$, getMidgardDefaultApi)
 }

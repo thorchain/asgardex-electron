@@ -1,8 +1,16 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
-import { Address, Balance } from '@xchainjs/xchain-client'
-import { Asset, baseToAsset, chainToString, formatAssetAmountCurrency, isSynthAsset } from '@xchainjs/xchain-util'
+import { Balance } from '@xchainjs/xchain-client'
+import {
+  Address,
+  Asset,
+  baseAmount,
+  baseToAsset,
+  chainToString,
+  formatAssetAmountCurrency,
+  isSynthAsset
+} from '@xchainjs/xchain-util'
 import { Col, Collapse, Grid, Row } from 'antd'
 import { ScreenMap } from 'antd/lib/_util/responsiveObserve'
 import { ColumnType } from 'antd/lib/table'
@@ -165,13 +173,13 @@ export const AssetsTableCollapsable: React.FC<Props> = (props): JSX.Element => {
 
   const renderPriceColumn = useCallback(
     (balance: Balance) => {
-      const oPrice = getPoolPriceValue({ balance, poolDetails, pricePoolData: pricePool.poolData, network })
+      const oPrice = getPoolPriceValue({ balance, poolDetails, pricePool, network })
       const label = FP.pipe(
         oPrice,
         O.map((price) => {
-          price.decimal = balance.amount.decimal
+          const priceAmount = baseAmount(price.amount(), balance.amount.decimal)
           return formatAssetAmountCurrency({
-            amount: baseToAsset(price),
+            amount: baseToAsset(priceAmount),
             asset: pricePool.asset,
             decimal: isUSDAsset(pricePool.asset) ? 2 : 4
           })
@@ -185,7 +193,7 @@ export const AssetsTableCollapsable: React.FC<Props> = (props): JSX.Element => {
         </Styled.Label>
       )
     },
-    [network, poolDetails, pricePool.asset, pricePool.poolData]
+    [network, poolDetails, pricePool]
   )
 
   const priceColumn: ColumnType<Balance> = useMemo(

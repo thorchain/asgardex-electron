@@ -1,6 +1,11 @@
 import * as RD from '@devexperts/remote-data-ts'
 import { PoolData } from '@thorchain/asgardex-util'
-import { Address } from '@xchainjs/xchain-client'
+import { BTC_DECIMAL } from '@xchainjs/xchain-bitcoin'
+import { BCH_DECIMAL } from '@xchainjs/xchain-bitcoincash'
+import { COSMOS_DECIMAL } from '@xchainjs/xchain-cosmos'
+import { DOGE_DECIMAL } from '@xchainjs/xchain-doge'
+import { ETH_DECIMAL } from '@xchainjs/xchain-ethereum'
+import { LTC_DECIMAL } from '@xchainjs/xchain-litecoin'
 import {
   assetFromString,
   bnOrZero,
@@ -10,9 +15,26 @@ import {
   Chain,
   isValidBN,
   bn,
-  BaseAmount
+  BaseAmount,
+  Address,
+  AssetBNB,
+  BNBChain,
+  BTCChain,
+  AssetBTC,
+  BCHChain,
+  AssetBCH,
+  LTCChain,
+  AssetLTC,
+  DOGEChain,
+  AssetDOGE,
+  ETHChain,
+  AssetETH,
+  CosmosChain,
+  AssetAtom,
+  AVAXChain,
+  TerraChain,
+  THORChain
 } from '@xchainjs/xchain-util'
-import BigNumber from 'bignumber.js'
 import * as A from 'fp-ts/lib/Array'
 import * as FP from 'fp-ts/lib/function'
 import * as NEA from 'fp-ts/lib/NonEmptyArray'
@@ -20,13 +42,15 @@ import * as O from 'fp-ts/lib/Option'
 import * as P from 'fp-ts/lib/Predicate'
 
 import { optionFromNullableString } from '../../../shared/utils/fp'
-import { isUSDAsset, THORCHAIN_DECIMAL } from '../../helpers/assetHelper'
+import { BNB_DECIMAL, convertBaseAmountDecimal, isUSDAsset, THORCHAIN_DECIMAL } from '../../helpers/assetHelper'
 import { isMiniToken } from '../../helpers/binanceHelper'
 import { eqAsset, eqChain, eqOAddress } from '../../helpers/fp/eq'
 import { ordPricePool } from '../../helpers/fp/ord'
 import { getDeepestPool, RUNE_POOL_ADDRESS, RUNE_PRICE_POOL } from '../../helpers/poolHelper'
+import { AssetWithAmount } from '../../types/asgardex'
 import { PoolDetail } from '../../types/generated/midgard'
 import { PricePoolAssets, PricePools, PricePoolAsset, PricePool } from '../../views/pools/Pools.types'
+import { InboundAddress } from '../thorchain/types'
 import {
   PoolAssetDetails as PoolAssetsDetail,
   PoolDetails,
@@ -37,8 +61,7 @@ import {
   PoolShare,
   PoolAddress,
   PoolAddresses,
-  PoolsDataMap,
-  InboundAddress
+  PoolsDataMap
 } from './types'
 
 export const getPricePools = (details: PoolDetails, whitelist: PricePoolAssets): PricePools => {
@@ -138,11 +161,15 @@ export const pricePoolSelectorFromRD = (
  */
 export const getPoolDetail = (details: PoolDetails, asset: Asset): O.Option<PoolDetail> =>
   FP.pipe(
-    details.find((detail: PoolDetail) => {
-      const { asset: detailAssetString = '' } = detail
-      const detailAsset = assetFromString(detailAssetString)
-      return detailAsset && eqAsset.equals(detailAsset, asset)
-    }),
+    details.find((detail: PoolDetail) =>
+      FP.pipe(
+        detail.asset,
+        assetFromString,
+        O.fromNullable,
+        O.map((detailAsset) => eqAsset.equals(detailAsset, asset)),
+        O.getOrElse(() => false)
+      )
+    ),
     O.fromNullable
   )
 
@@ -181,24 +208,79 @@ export const getPoolAddressesByChain = (addresses: PoolAddresses, chain: Chain):
     A.findFirst((address) => eqChain.equals(address.chain, chain))
   )
 
-export const getGasRateByChain = (
-  addresses: Pick<InboundAddress, 'chain' | 'gas_rate'>[],
+/**
+ * Helper to get outbound fees by given `outbound_fee` and `chain`
+ *
+ * Note: It includes fees for asset side only (not for RUNE side).
+ */
+export const getOutboundAssetFeeByChain = (
+  addresses: Pick<InboundAddress, 'chain' | 'outbound_fee'>[],
   chain: Chain
-): O.Option<BigNumber> =>
+): O.Option<AssetWithAmount> =>
   FP.pipe(
     addresses,
     A.findFirst((address) => eqChain.equals(address.chain, chain)),
-    O.chain(({ gas_rate }) =>
-      FP.pipe(
-        gas_rate,
-        O.fromNullable,
-        // accept valid numbers only
-        O.filterMap((rate) => {
-          const rateBN = bn(rate)
-          return isValidBN(rateBN) ? O.some(rateBN) : O.none
-        })
-      )
-    )
+    // extract outbound fee
+    O.map(({ outbound_fee }) => outbound_fee),
+    // Ignore undefined values
+    O.chain(O.fromNullable),
+    O.map(bn),
+    // Valid BigNumbers only
+    O.chain(O.fromPredicate(isValidBN)),
+    // Convert fee values to `BaseAmount` to put into `AssetWithAmount`
+    O.chain((value) => {
+      switch (chain) {
+        case BNBChain:
+          return O.some({
+            amount: baseAmount(value, BNB_DECIMAL),
+            asset: AssetBNB
+          })
+        case BTCChain:
+          return O.some({
+            amount: baseAmount(value, BTC_DECIMAL),
+            asset: AssetBTC
+          })
+        case BCHChain:
+          return O.some({
+            amount: baseAmount(value, BCH_DECIMAL),
+            asset: AssetBCH
+          })
+        case LTCChain:
+          return O.some({
+            amount: baseAmount(value, LTC_DECIMAL),
+            asset: AssetLTC
+          })
+        case DOGEChain:
+          return O.some({
+            amount: baseAmount(value, DOGE_DECIMAL),
+            asset: AssetDOGE
+          })
+        case ETHChain: {
+          return O.some({
+            // Convertion of decimal needed: 1e8 (by default in THORChain) -> 1e18 (ETH)
+            amount: convertBaseAmountDecimal(baseAmount(value, THORCHAIN_DECIMAL), ETH_DECIMAL),
+            asset: AssetETH
+          })
+        }
+        case CosmosChain: {
+          // Convertion of decimal needed: 1e8 (by default in THORChain) -> 1e6 (COSMOS)
+          const amount = convertBaseAmountDecimal(baseAmount(value, THORCHAIN_DECIMAL), COSMOS_DECIMAL)
+          return O.some({
+            amount,
+            asset: AssetAtom
+          })
+        }
+        // AVAX is not supported yet
+        case AVAXChain:
+          return O.none
+        // 'Terra (Classic) is not supported anymore'
+        case TerraChain:
+          return O.none
+        // 'THORChain can be ignored - fees for asset side only
+        case THORChain:
+          return O.none
+      }
+    })
   )
 
 export const inboundToPoolAddresses = (
@@ -213,7 +295,7 @@ export const inboundToPoolAddresses = (
       halted
     })),
     // Add "empty" rune "pool address" - we never had such pool, but do need it to calculate tx
-    A.cons(RUNE_POOL_ADDRESS)
+    A.prepend(RUNE_POOL_ADDRESS)
   )
 
 /**

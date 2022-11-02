@@ -1,6 +1,6 @@
 import React from 'react'
 
-import { CogIcon } from '@heroicons/react/solid'
+import { Cog8ToothIcon } from '@heroicons/react/20/solid'
 import { useIntl } from 'react-intl'
 
 import { Tooltip } from '../../uielements/common/Common.styles'
@@ -17,10 +17,10 @@ export const HeaderSettings: React.FC<Props> = (props): JSX.Element => {
   const intl = useIntl()
 
   return (
-    <HeaderIconWrapper onClick={onPress}>
+    <HeaderIconWrapper className="group" onClick={onPress}>
       {!isDesktopView && <Styled.Label>{intl.formatMessage({ id: 'common.settings' })} </Styled.Label>}
       <Tooltip title={intl.formatMessage({ id: 'common.settings' })}>
-        <CogIcon className="h-[28px] w-[28px] text-text2 dark:text-text2d" />
+        <Cog8ToothIcon className="ease h-[24px] w-[24px] text-text2 group-hover:rotate-180 dark:text-text2d" />
       </Tooltip>
     </HeaderIconWrapper>
   )

@@ -1,11 +1,9 @@
 import styled from 'styled-components'
 import { palette } from 'styled-theme'
 
-import { CheckButton as CheckButtonUI } from '../../button/CheckButton'
 import { InputBigNumber as InputBigNumberUI } from '../../input'
 import { Label } from '../../label'
 import { AssetLabel as AssetLabelUI } from '../assetLabel'
-import { AssetSelect as AssetSelectUI } from '../assetSelect'
 
 export const AssetCardWrapper = styled.div`
   width: 100%;
@@ -70,8 +68,6 @@ export const AssetDataWrapper = styled.div`
   justify-content: center;
 `
 
-export const AssetSelect = styled(AssetSelectUI)``
-
 export const InputBigNumber = styled(InputBigNumberUI).attrs({
   size: 'large'
 })`
@@ -116,10 +112,4 @@ export const WalletTypeContainer = styled.div`
   display: flex;
   flex-direction: row;
   align-items: center;
-`
-
-export const CheckButton = styled(CheckButtonUI)`
-  &.ant-btn {
-    font-size: 10px;
-  }
 `

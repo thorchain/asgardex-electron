@@ -39,10 +39,20 @@ export const apiHDWallet: ApiHDWallet = {
 const commonStorageData: CommonStorage = {
   locale: Locale.EN,
   ethDerivationMode: 'metamask',
-  midgardUrls: {
+  midgard: {
     mainnet: 'midgard-url-mainnet',
     stagenet: 'midgard-url-stagenet',
     testnet: 'midgard-url-testnet'
+  },
+  thornodeRpc: {
+    mainnet: 'thornode-rpc-mainnet',
+    stagenet: 'thornode-rpc-stagenet',
+    testnet: 'thornode-rpc-testnet'
+  },
+  thornodeApi: {
+    mainnet: 'thornode-api-mainnet',
+    stagenet: 'thornode-api-stagenet',
+    testnet: 'thornode-api-testnet'
   },
   version: '1'
 }

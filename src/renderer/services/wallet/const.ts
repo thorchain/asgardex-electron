@@ -23,7 +23,7 @@ export const DEFAULT_BALANCES_FILTER: BalancesStateFilter = {
   [Chain.BitcoinCash]: 'all',
   [Chain.Ethereum]: 'all',
   [Chain.Cosmos]: 'all',
-  [Chain.Polkadot]: 'all',
+  [Chain.Avax]: 'all',
   [Chain.Litecoin]: 'all',
   [Chain.THORChain]: 'all',
   [Chain.Doge]: 'all',

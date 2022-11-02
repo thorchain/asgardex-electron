@@ -12,6 +12,26 @@ export const ERC20_WHITELIST: { asset: Asset; iconUrl: O.Option<string> }[] = [
   {
     asset: {
       chain: ETHChain,
+      symbol: "RAZE-0x5Eaa69B29f99C84Fe5dE8200340b4e9b4Ab38EaC",
+      ticker: "RAZE",
+      synth: false,
+    },
+    iconUrl: O.some(
+      "https://tokens.1inch.io/0x5eaa69b29f99c84fe5de8200340b4e9b4ab38eac.png"
+    ),
+  },
+  {
+    asset: {
+      chain: ETHChain,
+      symbol: "VIU-0x519475b31653E46D20cD09F9FdcF3B12BDAcB4f5",
+      ticker: "VIU",
+      synth: false,
+    },
+    iconUrl: O.none,
+  },
+  {
+    asset: {
+      chain: ETHChain,
       symbol: "STX-0x006BeA43Baa3f7A6f765F14f10A1a1b08334EF45",
       ticker: "STX",
       synth: false,
@@ -34,34 +54,12 @@ export const ERC20_WHITELIST: { asset: Asset; iconUrl: O.Option<string> }[] = [
   {
     asset: {
       chain: ETHChain,
-      symbol: "LID-0x0417912b3a7AF768051765040A55BB0925D4DDcF",
-      ticker: "LID",
-      synth: false,
-    },
-    iconUrl: O.some(
-      "https://tokens.1inch.io/0x0417912b3a7af768051765040a55bb0925d4ddcf.png"
-    ),
-  },
-  {
-    asset: {
-      chain: ETHChain,
       symbol: "UMA-0x04Fa0d235C4abf4BcF4787aF4CF447DE572eF828",
       ticker: "UMA",
       synth: false,
     },
     iconUrl: O.some(
       "https://tokens.1inch.io/0x04fa0d235c4abf4bcf4787af4cf447de572ef828.png"
-    ),
-  },
-  {
-    asset: {
-      chain: ETHChain,
-      symbol: "1UP-0x07597255910a51509CA469568B048F2597E72504",
-      ticker: "1UP",
-      synth: false,
-    },
-    iconUrl: O.some(
-      "https://tokens.1inch.io/0x07597255910a51509ca469568b048f2597e72504.png"
     ),
   },
   {
@@ -210,28 +208,6 @@ export const ERC20_WHITELIST: { asset: Asset; iconUrl: O.Option<string> }[] = [
   {
     asset: {
       chain: ETHChain,
-      symbol: "CUR-0x13339fD07934CD674269726EdF3B5ccEE9DD93de",
-      ticker: "CUR",
-      synth: false,
-    },
-    iconUrl: O.some(
-      "https://tokens.1inch.io/0x13339fd07934cd674269726edf3b5ccee9dd93de.png"
-    ),
-  },
-  {
-    asset: {
-      chain: ETHChain,
-      symbol: "TEND-0x1453Dbb8A29551ADe11D89825CA812e05317EAEB",
-      ticker: "TEND",
-      synth: false,
-    },
-    iconUrl: O.some(
-      "https://tokens.1inch.io/0x1453dbb8a29551ade11d89825ca812e05317eaeb.png"
-    ),
-  },
-  {
-    asset: {
-      chain: ETHChain,
       symbol: "NMR-0x1776e1F26f98b1A5dF9cD347953a26dd3Cb46671",
       ticker: "NMR",
       synth: false,
@@ -342,17 +318,6 @@ export const ERC20_WHITELIST: { asset: Asset; iconUrl: O.Option<string> }[] = [
   {
     asset: {
       chain: ETHChain,
-      symbol: "YFT-0x26B3038a7Fc10b36c426846a9086Ef87328dA702",
-      ticker: "YFT",
-      synth: false,
-    },
-    iconUrl: O.some(
-      "https://tokens.1inch.io/0x26b3038a7fc10b36c426846a9086ef87328da702.png"
-    ),
-  },
-  {
-    asset: {
-      chain: ETHChain,
       symbol: "AST-0x27054b13b1B798B345b591a4d22e6562d47eA75a",
       ticker: "AST",
       synth: false,
@@ -408,28 +373,6 @@ export const ERC20_WHITELIST: { asset: Asset; iconUrl: O.Option<string> }[] = [
   {
     asset: {
       chain: ETHChain,
-      symbol: "OST-0x2C4e8f2D746113d0696cE89B35F0d8bF88E0AEcA",
-      ticker: "OST",
-      synth: false,
-    },
-    iconUrl: O.some(
-      "https://tokens.1inch.io/0x2c4e8f2d746113d0696ce89b35f0d8bf88e0aeca.png"
-    ),
-  },
-  {
-    asset: {
-      chain: ETHChain,
-      symbol: "TRYB-0x2C537E5624e4af88A7ae4060C022609376C8D0EB",
-      ticker: "TRYB",
-      synth: false,
-    },
-    iconUrl: O.some(
-      "https://tokens.1inch.io/0x2c537e5624e4af88a7ae4060c022609376c8d0eb.png"
-    ),
-  },
-  {
-    asset: {
-      chain: ETHChain,
       symbol: "VIB-0x2C974B2d0BA1716E644c1FC59982a89DDD2fF724",
       ticker: "VIB",
       synth: false,
@@ -474,17 +417,6 @@ export const ERC20_WHITELIST: { asset: Asset; iconUrl: O.Option<string> }[] = [
   {
     asset: {
       chain: ETHChain,
-      symbol: "QDAO-0x3166C570935a7D8554c8f4eA792ff965D2EFe1f2",
-      ticker: "QDAO",
-      synth: false,
-    },
-    iconUrl: O.some(
-      "https://tokens.1inch.io/0x3166c570935a7d8554c8f4ea792ff965d2efe1f2.png"
-    ),
-  },
-  {
-    asset: {
-      chain: ETHChain,
       symbol: "VEE-0x340D2bdE5Eb28c1eed91B2f790723E3B160613B7",
       ticker: "VEE",
       synth: false,
@@ -496,45 +428,12 @@ export const ERC20_WHITELIST: { asset: Asset; iconUrl: O.Option<string> }[] = [
   {
     asset: {
       chain: ETHChain,
-      symbol: "AID-0x37E8789bB9996CaC9156cD5F5Fd32599E6b91289",
-      ticker: "AID",
-      synth: false,
-    },
-    iconUrl: O.some(
-      "https://tokens.1inch.io/0x37e8789bb9996cac9156cd5f5fd32599e6b91289.png"
-    ),
-  },
-  {
-    asset: {
-      chain: ETHChain,
-      symbol: "TBX-0x3A92bD396aEf82af98EbC0Aa9030D25a23B11C6b",
-      ticker: "TBX",
-      synth: false,
-    },
-    iconUrl: O.some(
-      "https://tokens.1inch.io/0x3a92bd396aef82af98ebc0aa9030d25a23b11c6b.png"
-    ),
-  },
-  {
-    asset: {
-      chain: ETHChain,
       symbol: "PERX-0x3C6ff50c9Ec362efa359317009428d52115fe643",
       ticker: "PERX",
       synth: false,
     },
     iconUrl: O.some(
       "https://tokens.1inch.io/0x3c6ff50c9ec362efa359317009428d52115fe643.png"
-    ),
-  },
-  {
-    asset: {
-      chain: ETHChain,
-      symbol: "RVT-0x3d1BA9be9f66B8ee101911bC36D3fB562eaC2244",
-      ticker: "RVT",
-      synth: false,
-    },
-    iconUrl: O.some(
-      "https://tokens.1inch.io/0x3d1ba9be9f66b8ee101911bc36d3fb562eac2244.png"
     ),
   },
   {
@@ -568,17 +467,6 @@ export const ERC20_WHITELIST: { asset: Asset; iconUrl: O.Option<string> }[] = [
     },
     iconUrl: O.some(
       "https://tokens.1inch.io/0x419d0d8bdd9af5e606ae2232ed285aff190e711b.png"
-    ),
-  },
-  {
-    asset: {
-      chain: ETHChain,
-      symbol: "XDCE-0x41AB1b6fcbB2fA9DCEd81aCbdeC13Ea6315F2Bf2",
-      ticker: "XDCE",
-      synth: false,
-    },
-    iconUrl: O.some(
-      "https://tokens.1inch.io/0x41ab1b6fcbb2fa9dced81acbdec13ea6315f2bf2.png"
     ),
   },
   {
@@ -628,17 +516,6 @@ export const ERC20_WHITELIST: { asset: Asset; iconUrl: O.Option<string> }[] = [
   {
     asset: {
       chain: ETHChain,
-      symbol: "ADXv1-0x4470BB87d77b963A013DB939BE332f927f2b992e",
-      ticker: "ADXv1",
-      synth: false,
-    },
-    iconUrl: O.some(
-      "https://tokens.1inch.io/0x4470bb87d77b963a013db939be332f927f2b992e.png"
-    ),
-  },
-  {
-    asset: {
-      chain: ETHChain,
       symbol: "VSN-0x456AE45c0CE901E2e7c99c0718031cEc0A7A59Ff",
       ticker: "VSN",
       synth: false,
@@ -672,17 +549,6 @@ export const ERC20_WHITELIST: { asset: Asset; iconUrl: O.Option<string> }[] = [
   {
     asset: {
       chain: ETHChain,
-      symbol: "USDQ-0x4954Db6391F4feB5468b6B943D4935353596aEC9",
-      ticker: "USDQ",
-      synth: false,
-    },
-    iconUrl: O.some(
-      "https://tokens.1inch.io/0x4954db6391f4feb5468b6b943d4935353596aec9.png"
-    ),
-  },
-  {
-    asset: {
-      chain: ETHChain,
       symbol: "QNT-0x4a220E6096B25EADb88358cb44068A3248254675",
       ticker: "QNT",
       synth: false,
@@ -694,56 +560,12 @@ export const ERC20_WHITELIST: { asset: Asset; iconUrl: O.Option<string> }[] = [
   {
     asset: {
       chain: ETHChain,
-      symbol: "FXC-0x4a57E687b9126435a9B19E4A802113e266AdeBde",
-      ticker: "FXC",
-      synth: false,
-    },
-    iconUrl: O.some(
-      "https://tokens.1inch.io/0x4a57e687b9126435a9b19e4a802113e266adebde.png"
-    ),
-  },
-  {
-    asset: {
-      chain: ETHChain,
-      symbol: "ZINC-0x4AaC461C86aBfA71e9d00d9a2cde8d74E4E1aeEa",
-      ticker: "ZINC",
-      synth: false,
-    },
-    iconUrl: O.some(
-      "https://tokens.1inch.io/0x4aac461c86abfa71e9d00d9a2cde8d74e4e1aeea.png"
-    ),
-  },
-  {
-    asset: {
-      chain: ETHChain,
       symbol: "GHOST-0x4c327471C44B2dacD6E90525f9D629bd2e4f662C",
       ticker: "GHOST",
       synth: false,
     },
     iconUrl: O.some(
       "https://tokens.1inch.io/0x4c327471c44b2dacd6e90525f9d629bd2e4f662c.png"
-    ),
-  },
-  {
-    asset: {
-      chain: ETHChain,
-      symbol: "KEY-0x4CC19356f2D37338b9802aa8E8fc58B0373296E7",
-      ticker: "KEY",
-      synth: false,
-    },
-    iconUrl: O.some(
-      "https://tokens.1inch.io/0x4cc19356f2d37338b9802aa8e8fc58b0373296e7.png"
-    ),
-  },
-  {
-    asset: {
-      chain: ETHChain,
-      symbol: "MINI-0x4D953cf077c0C95Ba090226E59A18FcF97db44EC",
-      ticker: "MINI",
-      synth: false,
-    },
-    iconUrl: O.some(
-      "https://tokens.1inch.io/0x4d953cf077c0c95ba090226e59a18fcf97db44ec.png"
     ),
   },
   {
@@ -771,34 +593,12 @@ export const ERC20_WHITELIST: { asset: Asset; iconUrl: O.Option<string> }[] = [
   {
     asset: {
       chain: ETHChain,
-      symbol: "DGX-0x4f3AfEC4E5a3F2A6a1A411DEF7D7dFe50eE057bF",
-      ticker: "DGX",
-      synth: false,
-    },
-    iconUrl: O.some(
-      "https://tokens.1inch.io/0x4f3afec4e5a3f2a6a1a411def7d7dfe50ee057bf.png"
-    ),
-  },
-  {
-    asset: {
-      chain: ETHChain,
       symbol: "BUSD-0x4Fabb145d64652a948d72533023f6E7A623C7C53",
       ticker: "BUSD",
       synth: false,
     },
     iconUrl: O.some(
       "https://tokens.1inch.io/0x4fabb145d64652a948d72533023f6e7a623c7c53.png"
-    ),
-  },
-  {
-    asset: {
-      chain: ETHChain,
-      symbol: "LDC-0x5102791cA02FC3595398400BFE0e33d7B6C82267",
-      ticker: "LDC",
-      synth: false,
-    },
-    iconUrl: O.some(
-      "https://tokens.1inch.io/0x5102791ca02fc3595398400bfe0e33d7b6c82267.png"
     ),
   },
   {
@@ -991,34 +791,12 @@ export const ERC20_WHITELIST: { asset: Asset; iconUrl: O.Option<string> }[] = [
   {
     asset: {
       chain: ETHChain,
-      symbol: "WINGS-0x667088b212ce3d06a1b553a7221E1fD19000d9aF",
-      ticker: "WINGS",
-      synth: false,
-    },
-    iconUrl: O.some(
-      "https://tokens.1inch.io/0x667088b212ce3d06a1b553a7221e1fd19000d9af.png"
-    ),
-  },
-  {
-    asset: {
-      chain: ETHChain,
       symbol: "MFG-0x6710c63432A2De02954fc0f851db07146a6c0312",
       ticker: "MFG",
       synth: false,
     },
     iconUrl: O.some(
       "https://tokens.1inch.io/0x6710c63432a2de02954fc0f851db07146a6c0312.png"
-    ),
-  },
-  {
-    asset: {
-      chain: ETHChain,
-      symbol: "POA20-0x6758B7d441a9739b98552B373703d8d3d14f9e62",
-      ticker: "POA20",
-      synth: false,
-    },
-    iconUrl: O.some(
-      "https://tokens.1inch.io/0x6758b7d441a9739b98552b373703d8d3d14f9e62.png"
     ),
   },
   {
@@ -1068,17 +846,6 @@ export const ERC20_WHITELIST: { asset: Asset; iconUrl: O.Option<string> }[] = [
   {
     asset: {
       chain: ETHChain,
-      symbol: "UP-0x6Ba460AB75Cd2c56343b3517ffeBA60748654D26",
-      ticker: "UP",
-      synth: false,
-    },
-    iconUrl: O.some(
-      "https://tokens.1inch.io/0x6ba460ab75cd2c56343b3517ffeba60748654d26.png"
-    ),
-  },
-  {
-    asset: {
-      chain: ETHChain,
       symbol: "HOT-0x6c6EE5e31d828De241282B9606C8e98Ea48526E2",
       ticker: "HOT",
       synth: false,
@@ -1096,17 +863,6 @@ export const ERC20_WHITELIST: { asset: Asset; iconUrl: O.Option<string> }[] = [
     },
     iconUrl: O.some(
       "https://tokens.1inch.io/0x6f87d756daf0503d08eb8993686c7fc01dc44fb1.png"
-    ),
-  },
-  {
-    asset: {
-      chain: ETHChain,
-      symbol: "PROPS-0x6fe56C0bcdD471359019FcBC48863d6c3e9d4F41",
-      ticker: "PROPS",
-      synth: false,
-    },
-    iconUrl: O.some(
-      "https://tokens.1inch.io/0x6fe56c0bcdd471359019fcbc48863d6c3e9d4f41.png"
     ),
   },
   {
@@ -1140,28 +896,6 @@ export const ERC20_WHITELIST: { asset: Asset; iconUrl: O.Option<string> }[] = [
     },
     iconUrl: O.some(
       "https://tokens.1inch.io/0x744d70fdbe2ba4cf95131626614a1763df805b9e.png"
-    ),
-  },
-  {
-    asset: {
-      chain: ETHChain,
-      symbol: "BETR-0x763186eB8d4856D536eD4478302971214FEbc6A9",
-      ticker: "BETR",
-      synth: false,
-    },
-    iconUrl: O.some(
-      "https://tokens.1inch.io/0x763186eb8d4856d536ed4478302971214febc6a9.png"
-    ),
-  },
-  {
-    asset: {
-      chain: ETHChain,
-      symbol: "BOXX-0x780116D91E5592E58a3b3c76A351571b39abCEc6",
-      ticker: "BOXX",
-      synth: false,
-    },
-    iconUrl: O.some(
-      "https://tokens.1inch.io/0x780116d91e5592e58a3b3c76a351571b39abcec6.png"
     ),
   },
   {
@@ -1255,28 +989,6 @@ export const ERC20_WHITELIST: { asset: Asset; iconUrl: O.Option<string> }[] = [
   {
     asset: {
       chain: ETHChain,
-      symbol: "REM-0x83984d6142934bb535793A82ADB0a46EF0F66B6d",
-      ticker: "REM",
-      synth: false,
-    },
-    iconUrl: O.some(
-      "https://tokens.1inch.io/0x83984d6142934bb535793a82adb0a46ef0f66b6d.png"
-    ),
-  },
-  {
-    asset: {
-      chain: ETHChain,
-      symbol: "MNTP-0x83cee9e086A77e492eE0bB93C2B0437aD6fdECCc",
-      ticker: "MNTP",
-      synth: false,
-    },
-    iconUrl: O.some(
-      "https://tokens.1inch.io/0x83cee9e086a77e492ee0bb93c2b0437ad6fdeccc.png"
-    ),
-  },
-  {
-    asset: {
-      chain: ETHChain,
       symbol: "UBT-0x8400D94A5cb0fa0D041a3788e395285d61c9ee5e",
       ticker: "UBT",
       synth: false,
@@ -1332,17 +1044,6 @@ export const ERC20_WHITELIST: { asset: Asset; iconUrl: O.Option<string> }[] = [
   {
     asset: {
       chain: ETHChain,
-      symbol: "NVT-0x7b6F71c8B123b38aa8099e0098bEC7fbc35B8a13",
-      ticker: "NVT",
-      synth: false,
-    },
-    iconUrl: O.some(
-      "https://tokens.1inch.io/0x7b6f71c8b123b38aa8099e0098bec7fbc35b8a13.png"
-    ),
-  },
-  {
-    asset: {
-      chain: ETHChain,
       symbol: "SXP-0x8CE9137d39326AD0cD6491fb5CC0CbA0e089b6A9",
       ticker: "SXP",
       synth: false,
@@ -1393,17 +1094,6 @@ export const ERC20_WHITELIST: { asset: Asset; iconUrl: O.Option<string> }[] = [
     },
     iconUrl: O.some(
       "https://tokens.1inch.io/0x0258f474786ddfd37abce6df6bbb1dd5dfc4434a.png"
-    ),
-  },
-  {
-    asset: {
-      chain: ETHChain,
-      symbol: "REAL-0x9214eC02CB71CbA0ADA6896b8dA260736a67ab10",
-      ticker: "REAL",
-      synth: false,
-    },
-    iconUrl: O.some(
-      "https://tokens.1inch.io/0x9214ec02cb71cba0ada6896b8da260736a67ab10.png"
     ),
   },
   {
@@ -1492,17 +1182,6 @@ export const ERC20_WHITELIST: { asset: Asset; iconUrl: O.Option<string> }[] = [
     },
     iconUrl: O.some(
       "https://tokens.1inch.io/0x9cb2f26a23b8d89973f08c957c4d7cdf75cd341c.png"
-    ),
-  },
-  {
-    asset: {
-      chain: ETHChain,
-      symbol: "ETHRSIAPY-0x9f49ed43C90A540d1cF12f6170aCE8d0B88a14E6",
-      ticker: "ETHRSIAPY",
-      synth: false,
-    },
-    iconUrl: O.some(
-      "https://tokens.1inch.io/0x9f49ed43c90a540d1cf12f6170ace8d0b88a14e6.png"
     ),
   },
   {
@@ -1662,34 +1341,12 @@ export const ERC20_WHITELIST: { asset: Asset; iconUrl: O.Option<string> }[] = [
   {
     asset: {
       chain: ETHChain,
-      symbol: "TNS-0xb0280743b44bF7db4B6bE482b2Ba7b75E5dA096C",
-      ticker: "TNS",
-      synth: false,
-    },
-    iconUrl: O.some(
-      "https://tokens.1inch.io/0xb0280743b44bf7db4b6be482b2ba7b75e5da096c.png"
-    ),
-  },
-  {
-    asset: {
-      chain: ETHChain,
       symbol: "CEEK-0xb056c38f6b7Dc4064367403E26424CD2c60655e1",
       ticker: "CEEK",
       synth: false,
     },
     iconUrl: O.some(
       "https://tokens.1inch.io/0xb056c38f6b7dc4064367403e26424cd2c60655e1.png"
-    ),
-  },
-  {
-    asset: {
-      chain: ETHChain,
-      symbol: "cZRX-0xB3319f5D18Bc0D84dD1b4825Dcde5d5f7266d407",
-      ticker: "cZRX",
-      synth: false,
-    },
-    iconUrl: O.some(
-      "https://tokens.1inch.io/0xb3319f5d18bc0d84dd1b4825dcde5d5f7266d407.png"
     ),
   },
   {
@@ -1723,28 +1380,6 @@ export const ERC20_WHITELIST: { asset: Asset; iconUrl: O.Option<string> }[] = [
     },
     iconUrl: O.some(
       "https://tokens.1inch.io/0xeca82185adce47f39c684352b0439f030f860318.png"
-    ),
-  },
-  {
-    asset: {
-      chain: ETHChain,
-      symbol: "STONK-0xb4058411967D5046f3510943103805be61f0600E",
-      ticker: "STONK",
-      synth: false,
-    },
-    iconUrl: O.some(
-      "https://tokens.1inch.io/0xb4058411967d5046f3510943103805be61f0600e.png"
-    ),
-  },
-  {
-    asset: {
-      chain: ETHChain,
-      symbol: "BTU-0xb683D83a532e2Cb7DFa5275eED3698436371cc9f",
-      ticker: "BTU",
-      synth: false,
-    },
-    iconUrl: O.some(
-      "https://tokens.1inch.io/0xb683d83a532e2cb7dfa5275eed3698436371cc9f.png"
     ),
   },
   {
@@ -1822,17 +1457,6 @@ export const ERC20_WHITELIST: { asset: Asset; iconUrl: O.Option<string> }[] = [
     },
     iconUrl: O.some(
       "https://tokens.1inch.io/0xbd2949f67dcdc549c6ebe98696449fa79d988a9f.png"
-    ),
-  },
-  {
-    asset: {
-      chain: ETHChain,
-      symbol: "KAI-0xD9Ec3ff1f8be459Bb9369b4E79e9Ebcf7141C093",
-      ticker: "KAI",
-      synth: false,
-    },
-    iconUrl: O.some(
-      "https://tokens.1inch.io/0xd9ec3ff1f8be459bb9369b4e79e9ebcf7141c093.png"
     ),
   },
   {
@@ -1926,17 +1550,6 @@ export const ERC20_WHITELIST: { asset: Asset; iconUrl: O.Option<string> }[] = [
   {
     asset: {
       chain: ETHChain,
-      symbol: "TAU-0xc27A2F05fa577a83BA0fDb4c38443c0718356501",
-      ticker: "TAU",
-      synth: false,
-    },
-    iconUrl: O.some(
-      "https://tokens.1inch.io/0xc27a2f05fa577a83ba0fdb4c38443c0718356501.png"
-    ),
-  },
-  {
-    asset: {
-      chain: ETHChain,
       symbol: "EQUAD-0xC28e931814725BbEB9e670676FaBBCb694Fe7DF2",
       ticker: "EQUAD",
       synth: false,
@@ -1954,28 +1567,6 @@ export const ERC20_WHITELIST: { asset: Asset; iconUrl: O.Option<string> }[] = [
     },
     iconUrl: O.some(
       "https://tokens.1inch.io/0xc3dd23a0a854b4f9ae80670f528094e9eb607ccb.png"
-    ),
-  },
-  {
-    asset: {
-      chain: ETHChain,
-      symbol: "GTO-0xC5bBaE50781Be1669306b9e001EFF57a2957b09d",
-      ticker: "GTO",
-      synth: false,
-    },
-    iconUrl: O.some(
-      "https://tokens.1inch.io/0xc5bbae50781be1669306b9e001eff57a2957b09d.png"
-    ),
-  },
-  {
-    asset: {
-      chain: ETHChain,
-      symbol: "ZZZ-0xc75F15AdA581219c95485c578E124df3985e4CE0",
-      ticker: "ZZZ",
-      synth: false,
-    },
-    iconUrl: O.some(
-      "https://tokens.1inch.io/0xc75f15ada581219c95485c578e124df3985e4ce0.png"
     ),
   },
   {
@@ -2014,17 +1605,6 @@ export const ERC20_WHITELIST: { asset: Asset; iconUrl: O.Option<string> }[] = [
   {
     asset: {
       chain: ETHChain,
-      symbol: "YFFI-0xCee1d3c3A02267e37E6B373060F79d5d7b9e1669",
-      ticker: "YFFI",
-      synth: false,
-    },
-    iconUrl: O.some(
-      "https://tokens.1inch.io/0xcee1d3c3a02267e37e6b373060f79d5d7b9e1669.png"
-    ),
-  },
-  {
-    asset: {
-      chain: ETHChain,
       symbol: "CBIX7-0xCf8f9555D55CE45a3A33a81D6eF99a2a2E71Dee2",
       ticker: "CBIX7",
       synth: false,
@@ -2053,17 +1633,6 @@ export const ERC20_WHITELIST: { asset: Asset; iconUrl: O.Option<string> }[] = [
     },
     iconUrl: O.some(
       "https://tokens.1inch.io/0xd26114cd6ee289accf82350c8d8487fedb8a0c07.png"
-    ),
-  },
-  {
-    asset: {
-      chain: ETHChain,
-      symbol: "ONG-0xd341d1680Eeee3255b8C4c75bCCE7EB57f144dAe",
-      ticker: "ONG",
-      synth: false,
-    },
-    iconUrl: O.some(
-      "https://tokens.1inch.io/0xd341d1680eeee3255b8c4c75bcce7eb57f144dae.png"
     ),
   },
   {
@@ -2108,17 +1677,6 @@ export const ERC20_WHITELIST: { asset: Asset; iconUrl: O.Option<string> }[] = [
     },
     iconUrl: O.some(
       "https://tokens.1inch.io/0xd6f0bb2a45110f819e908a915237d652ac7c5aa8.png"
-    ),
-  },
-  {
-    asset: {
-      chain: ETHChain,
-      symbol: "SCL-0xd7631787B4dCc87b1254cfd1e5cE48e96823dEe8",
-      ticker: "SCL",
-      synth: false,
-    },
-    iconUrl: O.some(
-      "https://tokens.1inch.io/0xd7631787b4dcc87b1254cfd1e5ce48e96823dee8.png"
     ),
   },
   {
@@ -2212,17 +1770,6 @@ export const ERC20_WHITELIST: { asset: Asset; iconUrl: O.Option<string> }[] = [
   {
     asset: {
       chain: ETHChain,
-      symbol: "SHIP-0xe25b0BBA01Dc5630312B6A21927E578061A13f55",
-      ticker: "SHIP",
-      synth: false,
-    },
-    iconUrl: O.some(
-      "https://tokens.1inch.io/0xe25b0bba01dc5630312b6a21927e578061a13f55.png"
-    ),
-  },
-  {
-    asset: {
-      chain: ETHChain,
       symbol: "PLR-0xe3818504c1B32bF1557b16C238B2E01Fd3149C17",
       ticker: "PLR",
       synth: false,
@@ -2278,17 +1825,6 @@ export const ERC20_WHITELIST: { asset: Asset; iconUrl: O.Option<string> }[] = [
   {
     asset: {
       chain: ETHChain,
-      symbol: "ZIPT-0xEDD7c94FD7B4971b916d15067Bc454b9E1bAD980",
-      ticker: "ZIPT",
-      synth: false,
-    },
-    iconUrl: O.some(
-      "https://tokens.1inch.io/0xedd7c94fd7b4971b916d15067bc454b9e1bad980.png"
-    ),
-  },
-  {
-    asset: {
-      chain: ETHChain,
       symbol: "ASKO-0xeEEE2a622330E6d2036691e983DEe87330588603",
       ticker: "ASKO",
       synth: false,
@@ -2322,17 +1858,6 @@ export const ERC20_WHITELIST: { asset: Asset; iconUrl: O.Option<string> }[] = [
   {
     asset: {
       chain: ETHChain,
-      symbol: "EVO-0xefBd6D7deF37ffae990503EcdB1291B2f7E38788",
-      ticker: "EVO",
-      synth: false,
-    },
-    iconUrl: O.some(
-      "https://tokens.1inch.io/0xefbd6d7def37ffae990503ecdb1291b2f7e38788.png"
-    ),
-  },
-  {
-    asset: {
-      chain: ETHChain,
       symbol: "FLIXX-0xf04a8ac553FceDB5BA99A64799155826C136b0Be",
       ticker: "FLIXX",
       synth: false,
@@ -2344,34 +1869,12 @@ export const ERC20_WHITELIST: { asset: Asset; iconUrl: O.Option<string> }[] = [
   {
     asset: {
       chain: ETHChain,
-      symbol: "PAMP-0xF0FAC7104aAC544e4a7CE1A55ADF2B5a25c65bD1",
-      ticker: "PAMP",
-      synth: false,
-    },
-    iconUrl: O.some(
-      "https://tokens.1inch.io/0xf0fac7104aac544e4a7ce1a55adf2b5a25c65bd1.png"
-    ),
-  },
-  {
-    asset: {
-      chain: ETHChain,
       symbol: "HEDG-0xF1290473E210b2108A85237fbCd7b6eb42Cc654F",
       ticker: "HEDG",
       synth: false,
     },
     iconUrl: O.some(
       "https://tokens.1inch.io/0xf1290473e210b2108a85237fbcd7b6eb42cc654f.png"
-    ),
-  },
-  {
-    asset: {
-      chain: ETHChain,
-      symbol: "DMST-0xF29992D7b589A0A6bD2de7Be29a97A6EB73EaF85",
-      ticker: "DMST",
-      synth: false,
-    },
-    iconUrl: O.some(
-      "https://tokens.1inch.io/0xf29992d7b589a0a6bd2de7be29a97a6eb73eaf85.png"
     ),
   },
   {
@@ -2476,45 +1979,12 @@ export const ERC20_WHITELIST: { asset: Asset; iconUrl: O.Option<string> }[] = [
   {
     asset: {
       chain: ETHChain,
-      symbol: "TAUD-0x00006100F7090010005F1bd7aE6122c3C2CF0090",
-      ticker: "TAUD",
-      synth: false,
-    },
-    iconUrl: O.some(
-      "https://tokens.1inch.io/0x00006100f7090010005f1bd7ae6122c3c2cf0090.png"
-    ),
-  },
-  {
-    asset: {
-      chain: ETHChain,
       symbol: "TGBP-0x00000000441378008EA67F4284A57932B1c000a5",
       ticker: "TGBP",
       synth: false,
     },
     iconUrl: O.some(
       "https://tokens.1inch.io/0x00000000441378008ea67f4284a57932b1c000a5.png"
-    ),
-  },
-  {
-    asset: {
-      chain: ETHChain,
-      symbol: "TCAD-0x00000100F2A2bd000715001920eB70D229700085",
-      ticker: "TCAD",
-      synth: false,
-    },
-    iconUrl: O.some(
-      "https://tokens.1inch.io/0x00000100f2a2bd000715001920eb70d229700085.png"
-    ),
-  },
-  {
-    asset: {
-      chain: ETHChain,
-      symbol: "THKD-0x0000852600CEB001E08e00bC008be620d60031F2",
-      ticker: "THKD",
-      synth: false,
-    },
-    iconUrl: O.some(
-      "https://tokens.1inch.io/0x0000852600ceb001e08e00bc008be620d60031f2.png"
     ),
   },
   {
@@ -2537,17 +2007,6 @@ export const ERC20_WHITELIST: { asset: Asset; iconUrl: O.Option<string> }[] = [
     },
     iconUrl: O.some(
       "https://tokens.1inch.io/0x06af07097c9eeb7fd685c692751d5c66db49c215.png"
-    ),
-  },
-  {
-    asset: {
-      chain: ETHChain,
-      symbol: "cBAT-0x6C8c6b02E7b2BE14d4fA6022Dfd6d75921D90E4E",
-      ticker: "cBAT",
-      synth: false,
-    },
-    iconUrl: O.some(
-      "https://tokens.1inch.io/0x6c8c6b02e7b2be14d4fa6022dfd6d75921d90e4e.png"
     ),
   },
   {
@@ -2581,17 +2040,6 @@ export const ERC20_WHITELIST: { asset: Asset; iconUrl: O.Option<string> }[] = [
     },
     iconUrl: O.some(
       "https://tokens.1inch.io/0x39aa39c021dfbae8fac545936693ac917d5e7563.png"
-    ),
-  },
-  {
-    asset: {
-      chain: ETHChain,
-      symbol: "cREP-0x158079Ee67Fce2f58472A96584A73C7Ab9AC95c1",
-      ticker: "cREP",
-      synth: false,
-    },
-    iconUrl: O.some(
-      "https://tokens.1inch.io/0x158079ee67fce2f58472a96584a73c7ab9ac95c1.png"
     ),
   },
   {
@@ -2663,34 +2111,12 @@ export const ERC20_WHITELIST: { asset: Asset; iconUrl: O.Option<string> }[] = [
   {
     asset: {
       chain: ETHChain,
-      symbol: "USDx-0xeb269732ab75A6fD61Ea60b06fE994cD32a83549",
-      ticker: "USDx",
-      synth: false,
-    },
-    iconUrl: O.some(
-      "https://tokens.1inch.io/0xeb269732ab75a6fd61ea60b06fe994cd32a83549.png"
-    ),
-  },
-  {
-    asset: {
-      chain: ETHChain,
       symbol: "TUSD-0x0000000000085d4780B73119b644AE5ecd22b376",
       ticker: "TUSD",
       synth: false,
     },
     iconUrl: O.some(
       "https://tokens.1inch.io/0x0000000000085d4780b73119b644ae5ecd22b376.png"
-    ),
-  },
-  {
-    asset: {
-      chain: ETHChain,
-      symbol: "TLN-0x679131F591B4f369acB8cd8c51E68596806c3916",
-      ticker: "TLN",
-      synth: false,
-    },
-    iconUrl: O.some(
-      "https://tokens.1inch.io/0x679131f591b4f369acb8cd8c51e68596806c3916.png"
     ),
   },
   {
@@ -2839,34 +2265,12 @@ export const ERC20_WHITELIST: { asset: Asset; iconUrl: O.Option<string> }[] = [
   {
     asset: {
       chain: ETHChain,
-      symbol: "yBUSD-0x04bC0Ab673d88aE9dbC9DA2380cB6B79C4BCa9aE",
-      ticker: "yBUSD",
-      synth: false,
-    },
-    iconUrl: O.some(
-      "https://tokens.1inch.io/0x04bc0ab673d88ae9dbc9da2380cb6b79c4bca9ae.png"
-    ),
-  },
-  {
-    asset: {
-      chain: ETHChain,
       symbol: "yBTC-0x04Aa51bbcB46541455cCF1B8bef2ebc5d3787EC9",
       ticker: "yBTC",
       synth: false,
     },
     iconUrl: O.some(
       "https://tokens.1inch.io/0x04aa51bbcb46541455ccf1b8bef2ebc5d3787ec9.png"
-    ),
-  },
-  {
-    asset: {
-      chain: ETHChain,
-      symbol: "yTUSDiearn-0x73a052500105205d34Daf004eAb301916DA8190f",
-      ticker: "yTUSDiearn",
-      synth: false,
-    },
-    iconUrl: O.some(
-      "https://tokens.1inch.io/0x73a052500105205d34daf004eab301916da8190f.png"
     ),
   },
   {
@@ -2911,17 +2315,6 @@ export const ERC20_WHITELIST: { asset: Asset; iconUrl: O.Option<string> }[] = [
     },
     iconUrl: O.some(
       "https://tokens.1inch.io/0x26ea744e5b887e5205727f55dfbe8685e3b21951.png"
-    ),
-  },
-  {
-    asset: {
-      chain: ETHChain,
-      symbol: "ySUSD-0xF61718057901F84C4eEC4339EF8f0D86D2B45600",
-      ticker: "ySUSD",
-      synth: false,
-    },
-    iconUrl: O.some(
-      "https://tokens.1inch.io/0xf61718057901f84c4eec4339ef8f0d86d2b45600.png"
     ),
   },
   {
@@ -3092,28 +2485,6 @@ export const ERC20_WHITELIST: { asset: Asset; iconUrl: O.Option<string> }[] = [
   {
     asset: {
       chain: ETHChain,
-      symbol: "ESH-0xD6a55C63865AffD67E2FB9f284F87b7a9E5FF3bD",
-      ticker: "ESH",
-      synth: false,
-    },
-    iconUrl: O.some(
-      "https://tokens.1inch.io/0xd6a55c63865affd67e2fb9f284f87b7a9e5ff3bd.png"
-    ),
-  },
-  {
-    asset: {
-      chain: ETHChain,
-      symbol: "UAX-0x1Fc31488f28ac846588FFA201cDe0669168471bD",
-      ticker: "UAX",
-      synth: false,
-    },
-    iconUrl: O.some(
-      "https://tokens.1inch.io/0x1fc31488f28ac846588ffa201cde0669168471bd.png"
-    ),
-  },
-  {
-    asset: {
-      chain: ETHChain,
       symbol: "PAXG-0x45804880De22913dAFE09f4980848ECE6EcbAf78",
       ticker: "PAXG",
       synth: false,
@@ -3175,28 +2546,6 @@ export const ERC20_WHITELIST: { asset: Asset; iconUrl: O.Option<string> }[] = [
     },
     iconUrl: O.some(
       "https://tokens.1inch.io/0xfca59cd816ab1ead66534d82bc21e7515ce441cf.png"
-    ),
-  },
-  {
-    asset: {
-      chain: ETHChain,
-      symbol: "PARETO-0xea5f88E54d982Cbb0c441cde4E79bC305e5b43Bc",
-      ticker: "PARETO",
-      synth: false,
-    },
-    iconUrl: O.some(
-      "https://tokens.1inch.io/0xea5f88e54d982cbb0c441cde4e79bc305e5b43bc.png"
-    ),
-  },
-  {
-    asset: {
-      chain: ETHChain,
-      symbol: "PLT-0x9fBFed658919A896B5Dc7b00456Ce22D780f9B65",
-      ticker: "PLT",
-      synth: false,
-    },
-    iconUrl: O.some(
-      "https://tokens.1inch.io/0x9fbfed658919a896b5dc7b00456ce22d780f9b65.png"
     ),
   },
   {
@@ -3345,45 +2694,12 @@ export const ERC20_WHITELIST: { asset: Asset; iconUrl: O.Option<string> }[] = [
   {
     asset: {
       chain: ETHChain,
-      symbol: "BASED-0x68A118Ef45063051Eac49c7e647CE5Ace48a68a5",
-      ticker: "BASED",
-      synth: false,
-    },
-    iconUrl: O.some(
-      "https://tokens.1inch.io/0x68a118ef45063051eac49c7e647ce5ace48a68a5.png"
-    ),
-  },
-  {
-    asset: {
-      chain: ETHChain,
       symbol: "TRAC-0xaA7a9CA87d3694B5755f213B5D04094b8d0F0A6F",
       ticker: "TRAC",
       synth: false,
     },
     iconUrl: O.some(
       "https://tokens.1inch.io/0xaa7a9ca87d3694b5755f213b5d04094b8d0f0a6f.png"
-    ),
-  },
-  {
-    asset: {
-      chain: ETHChain,
-      symbol: "MDT2-0x4Dfd148B532e934a2a26eA65689cf6268753e130",
-      ticker: "MDT2",
-      synth: false,
-    },
-    iconUrl: O.some(
-      "https://tokens.1inch.io/0x4dfd148b532e934a2a26ea65689cf6268753e130.png"
-    ),
-  },
-  {
-    asset: {
-      chain: ETHChain,
-      symbol: "YAMv2-0xAba8cAc6866B83Ae4eec97DD07ED254282f6aD8A",
-      ticker: "YAMv2",
-      synth: false,
-    },
-    iconUrl: O.some(
-      "https://tokens.1inch.io/0xaba8cac6866b83ae4eec97dd07ed254282f6ad8a.png"
     ),
   },
   {
@@ -3455,17 +2771,6 @@ export const ERC20_WHITELIST: { asset: Asset; iconUrl: O.Option<string> }[] = [
   {
     asset: {
       chain: ETHChain,
-      symbol: "GRO-0x09e64c2B61a5f1690Ee6fbeD9baf5D6990F8dFd0",
-      ticker: "GRO",
-      synth: false,
-    },
-    iconUrl: O.some(
-      "https://tokens.1inch.io/0x09e64c2b61a5f1690ee6fbed9baf5d6990f8dfd0.png"
-    ),
-  },
-  {
-    asset: {
-      chain: ETHChain,
       symbol: "CVP-0x38e4adB44ef08F22F5B5b76A8f0c2d0dCbE7DcA1",
       ticker: "CVP",
       synth: false,
@@ -3488,7 +2793,7 @@ export const ERC20_WHITELIST: { asset: Asset; iconUrl: O.Option<string> }[] = [
   {
     asset: {
       chain: ETHChain,
-      symbol: "SUSHI-0x6b3595068778dd592e39a122f4f5a5cf09c90fe2",
+      symbol: "SUSHI-0x6B3595068778DD592e39A122f4f5a5cF09C90fE2",
       ticker: "SUSHI",
       synth: false,
     },
@@ -3532,17 +2837,6 @@ export const ERC20_WHITELIST: { asset: Asset; iconUrl: O.Option<string> }[] = [
   {
     asset: {
       chain: ETHChain,
-      symbol: "ADEL-0x94d863173EE77439E4292284fF13fAD54b3BA182",
-      ticker: "ADEL",
-      synth: false,
-    },
-    iconUrl: O.some(
-      "https://tokens.1inch.io/0x94d863173ee77439e4292284ff13fad54b3ba182.png"
-    ),
-  },
-  {
-    asset: {
-      chain: ETHChain,
       symbol: "SWRV-0xB8BAa0e4287890a5F79863aB62b7F175ceCbD433",
       ticker: "SWRV",
       synth: false,
@@ -3565,39 +2859,6 @@ export const ERC20_WHITELIST: { asset: Asset; iconUrl: O.Option<string> }[] = [
   {
     asset: {
       chain: ETHChain,
-      symbol: "GVT-0x103c3A209da59d3E7C4A89307e66521e081CFDF0",
-      ticker: "GVT",
-      synth: false,
-    },
-    iconUrl: O.some(
-      "https://tokens.1inch.io/0x103c3a209da59d3e7c4a89307e66521e081cfdf0.png"
-    ),
-  },
-  {
-    asset: {
-      chain: ETHChain,
-      symbol: "crCream-0x892B14321a4FCba80669aE30Bd0cd99a7ECF6aC0",
-      ticker: "crCream",
-      synth: false,
-    },
-    iconUrl: O.some(
-      "https://tokens.1inch.io/0x892b14321a4fcba80669ae30bd0cd99a7ecf6ac0.png"
-    ),
-  },
-  {
-    asset: {
-      chain: ETHChain,
-      symbol: "yWETH-0xe1237aA7f535b0CC33Fd973D66cBf830354D16c7",
-      ticker: "yWETH",
-      synth: false,
-    },
-    iconUrl: O.some(
-      "https://tokens.1inch.io/0xe1237aa7f535b0cc33fd973d66cbf830354d16c7.png"
-    ),
-  },
-  {
-    asset: {
-      chain: ETHChain,
       symbol: "yUSD-0x5dbcF33D8c2E976c6b560249878e6F1491Bca25c",
       ticker: "yUSD",
       synth: false,
@@ -3615,17 +2876,6 @@ export const ERC20_WHITELIST: { asset: Asset; iconUrl: O.Option<string> }[] = [
     },
     iconUrl: O.some(
       "https://tokens.1inch.io/0x50026ad58b338cf3eccc2b422deb8faa725f377f.png"
-    ),
-  },
-  {
-    asset: {
-      chain: ETHChain,
-      symbol: "SAFE-0x1Aa61c196E76805fcBe394eA00e4fFCEd24FC469",
-      ticker: "SAFE",
-      synth: false,
-    },
-    iconUrl: O.some(
-      "https://tokens.1inch.io/0x1aa61c196e76805fcbe394ea00e4ffced24fc469.png"
     ),
   },
   {
@@ -3670,17 +2920,6 @@ export const ERC20_WHITELIST: { asset: Asset; iconUrl: O.Option<string> }[] = [
     },
     iconUrl: O.some(
       "https://tokens.1inch.io/0x1f9840a85d5af5bf1d1762f925bdaddc4201f984.png"
-    ),
-  },
-  {
-    asset: {
-      chain: ETHChain,
-      symbol: "GXC-0x2e93FE8d550a7B7E7b2e561cd45ceBccbAa79358",
-      ticker: "GXC",
-      synth: false,
-    },
-    iconUrl: O.some(
-      "https://tokens.1inch.io/0x2e93fe8d550a7b7e7b2e561cd45cebccbaa79358.png"
     ),
   },
   {
@@ -3763,17 +3002,6 @@ export const ERC20_WHITELIST: { asset: Asset; iconUrl: O.Option<string> }[] = [
   {
     asset: {
       chain: ETHChain,
-      symbol: "cyUSD-0x1D09144F3479bb805CB7c92346987420BcbDC10C",
-      ticker: "cyUSD",
-      synth: false,
-    },
-    iconUrl: O.some(
-      "https://tokens.1inch.io/0x1d09144f3479bb805cb7c92346987420bcbdc10c.png"
-    ),
-  },
-  {
-    asset: {
-      chain: ETHChain,
       symbol: "AAVE-0x7Fc66500c84A76Ad7e9c93437bFc5Ac33E2DDaE9",
       ticker: "AAVE",
       synth: false,
@@ -3791,17 +3019,6 @@ export const ERC20_WHITELIST: { asset: Asset; iconUrl: O.Option<string> }[] = [
     },
     iconUrl: O.some(
       "https://tokens.1inch.io/0x43dfc4159d86f3a37a5a4b3d4580b888ad7d4ddd.png"
-    ),
-  },
-  {
-    asset: {
-      chain: ETHChain,
-      symbol: "SAFE2-0x250a3500f48666561386832f1F1f1019b89a2699",
-      ticker: "SAFE2",
-      synth: false,
-    },
-    iconUrl: O.some(
-      "https://tokens.1inch.io/0x250a3500f48666561386832f1f1f1019b89a2699.png"
     ),
   },
   {
@@ -3851,28 +3068,6 @@ export const ERC20_WHITELIST: { asset: Asset; iconUrl: O.Option<string> }[] = [
   {
     asset: {
       chain: ETHChain,
-      symbol: "VALUE-0x49E833337ECe7aFE375e44F4E3e8481029218E5c",
-      ticker: "VALUE",
-      synth: false,
-    },
-    iconUrl: O.some(
-      "https://tokens.1inch.io/0x49e833337ece7afe375e44f4e3e8481029218e5c.png"
-    ),
-  },
-  {
-    asset: {
-      chain: ETHChain,
-      symbol: "SPRKL-0x4b7aD3a56810032782Afce12d7d27122bDb96efF",
-      ticker: "SPRKL",
-      synth: false,
-    },
-    iconUrl: O.some(
-      "https://tokens.1inch.io/0x4b7ad3a56810032782afce12d7d27122bdb96eff.png"
-    ),
-  },
-  {
-    asset: {
-      chain: ETHChain,
       symbol: "USDK-0x1c48f86ae57291F7686349F12601910BD8D470bb",
       ticker: "USDK",
       synth: false,
@@ -3912,28 +3107,6 @@ export const ERC20_WHITELIST: { asset: Asset; iconUrl: O.Option<string> }[] = [
     },
     iconUrl: O.some(
       "https://tokens.1inch.io/0xad32a8e6220741182940c5abf610bde99e737b2d.png"
-    ),
-  },
-  {
-    asset: {
-      chain: ETHChain,
-      symbol: "kSEED-0x3F09400313e83d53366147e3ea0e4e2279D80850",
-      ticker: "kSEED",
-      synth: false,
-    },
-    iconUrl: O.some(
-      "https://tokens.1inch.io/0x3f09400313e83d53366147e3ea0e4e2279d80850.png"
-    ),
-  },
-  {
-    asset: {
-      chain: ETHChain,
-      symbol: "cCOMP-0x70e36f6BF80a52b3B46b3aF8e106CC0ed743E8e4",
-      ticker: "cCOMP",
-      synth: false,
-    },
-    iconUrl: O.some(
-      "https://tokens.1inch.io/0x70e36f6bf80a52b3b46b3af8e106cc0ed743e8e4.png"
     ),
   },
   {
@@ -4066,17 +3239,6 @@ export const ERC20_WHITELIST: { asset: Asset; iconUrl: O.Option<string> }[] = [
     },
     iconUrl: O.some(
       "https://tokens.1inch.io/0x36f3fd68e7325a35eb768f1aedaae9ea0689d723.png"
-    ),
-  },
-  {
-    asset: {
-      chain: ETHChain,
-      symbol: "TEAC-0xa9AF25a2d43Eb04723a6Ec0749913519cf347842",
-      ticker: "TEAC",
-      synth: false,
-    },
-    iconUrl: O.some(
-      "https://tokens.1inch.io/0xa9af25a2d43eb04723a6ec0749913519cf347842.png"
     ),
   },
   {
@@ -4269,34 +3431,12 @@ export const ERC20_WHITELIST: { asset: Asset; iconUrl: O.Option<string> }[] = [
   {
     asset: {
       chain: ETHChain,
-      symbol: "VALOR-0x297E4e5e59Ad72B1B0A2fd446929e76117be0E0a",
-      ticker: "VALOR",
-      synth: false,
-    },
-    iconUrl: O.some(
-      "https://tokens.1inch.io/0x297e4e5e59ad72b1b0a2fd446929e76117be0e0a.png"
-    ),
-  },
-  {
-    asset: {
-      chain: ETHChain,
       symbol: "ALBT-0x00a8b738E453fFd858a7edf03bcCfe20412f0Eb0",
       ticker: "ALBT",
       synth: false,
     },
     iconUrl: O.some(
       "https://tokens.1inch.io/0x00a8b738e453ffd858a7edf03bccfe20412f0eb0.png"
-    ),
-  },
-  {
-    asset: {
-      chain: ETHChain,
-      symbol: "BOT-0x5bEaBAEBB3146685Dd74176f68a0721F91297D37",
-      ticker: "BOT",
-      synth: false,
-    },
-    iconUrl: O.some(
-      "https://tokens.1inch.io/0x5beabaebb3146685dd74176f68a0721f91297d37.png"
     ),
   },
   {
@@ -4319,28 +3459,6 @@ export const ERC20_WHITELIST: { asset: Asset; iconUrl: O.Option<string> }[] = [
     },
     iconUrl: O.some(
       "https://tokens.1inch.io/0xb1f66997a5760428d3a87d68b90bfe0ae64121cc.png"
-    ),
-  },
-  {
-    asset: {
-      chain: ETHChain,
-      symbol: "HOLY-0x39eAE99E685906fF1C11A962a743440d0a1A6e09",
-      ticker: "HOLY",
-      synth: false,
-    },
-    iconUrl: O.some(
-      "https://tokens.1inch.io/0x39eae99e685906ff1c11a962a743440d0a1a6e09.png"
-    ),
-  },
-  {
-    asset: {
-      chain: ETHChain,
-      symbol: "DEFISOCKS-0x9d942bD31169eD25a1ca78c776DAB92dE104e50E",
-      ticker: "DEFISOCKS",
-      synth: false,
-    },
-    iconUrl: O.some(
-      "https://tokens.1inch.io/0x9d942bd31169ed25a1ca78c776dab92de104e50e.png"
     ),
   },
   {
@@ -4577,17 +3695,6 @@ export const ERC20_WHITELIST: { asset: Asset; iconUrl: O.Option<string> }[] = [
   {
     asset: {
       chain: ETHChain,
-      symbol: "SYN-0x1695936d6a953df699C38CA21c2140d497C08BD9",
-      ticker: "SYN",
-      synth: false,
-    },
-    iconUrl: O.some(
-      "https://tokens.1inch.io/0x1695936d6a953df699c38ca21c2140d497c08bd9.png"
-    ),
-  },
-  {
-    asset: {
-      chain: ETHChain,
       symbol: "LTO-0x3DB6Ba6ab6F95efed1a6E794caD492fAAabF294D",
       ticker: "LTO",
       synth: false,
@@ -4654,17 +3761,6 @@ export const ERC20_WHITELIST: { asset: Asset; iconUrl: O.Option<string> }[] = [
   {
     asset: {
       chain: ETHChain,
-      symbol: "GOLDx-0x355C665e101B9DA58704A8fDDb5FeeF210eF20c0",
-      ticker: "GOLDx",
-      synth: false,
-    },
-    iconUrl: O.some(
-      "https://tokens.1inch.io/0x355c665e101b9da58704a8fddb5feef210ef20c0.png"
-    ),
-  },
-  {
-    asset: {
-      chain: ETHChain,
       symbol: "aRENv1-0x69948cC03f478B95283F7dbf1CE764d0fc7EC54C",
       ticker: "aRENv1",
       synth: false,
@@ -4709,17 +3805,6 @@ export const ERC20_WHITELIST: { asset: Asset; iconUrl: O.Option<string> }[] = [
   {
     asset: {
       chain: ETHChain,
-      symbol: "BAS-0xa7ED29B253D8B4E3109ce07c80fc570f81B63696",
-      ticker: "BAS",
-      synth: false,
-    },
-    iconUrl: O.some(
-      "https://tokens.1inch.io/0xa7ed29b253d8b4e3109ce07c80fc570f81b63696.png"
-    ),
-  },
-  {
-    asset: {
-      chain: ETHChain,
       symbol: "PIPT-0x26607aC599266b21d13c7aCF7942c7701a8b699c",
       ticker: "PIPT",
       synth: false,
@@ -4759,17 +3844,6 @@ export const ERC20_WHITELIST: { asset: Asset; iconUrl: O.Option<string> }[] = [
     },
     iconUrl: O.some(
       "https://tokens.1inch.io/0x91dfbee3965baaee32784c2d546b7a0c62f268c9.png"
-    ),
-  },
-  {
-    asset: {
-      chain: ETHChain,
-      symbol: "NSBT-0x9D79d5B61De59D882ce90125b18F74af650acB93",
-      ticker: "NSBT",
-      synth: false,
-    },
-    iconUrl: O.some(
-      "https://tokens.1inch.io/0x9d79d5b61de59d882ce90125b18f74af650acb93.png"
     ),
   },
   {
@@ -5006,28 +4080,6 @@ export const ERC20_WHITELIST: { asset: Asset; iconUrl: O.Option<string> }[] = [
   {
     asset: {
       chain: ETHChain,
-      symbol: "LION-0xf644d4477cd8Db7791ceA3013CB053b3Fec4bEB3",
-      ticker: "LION",
-      synth: false,
-    },
-    iconUrl: O.some(
-      "https://tokens.1inch.io/0xf644d4477cd8db7791cea3013cb053b3fec4beb3.png"
-    ),
-  },
-  {
-    asset: {
-      chain: ETHChain,
-      symbol: "zLOT-0xA8e7AD77C60eE6f30BaC54E2E7c0617Bd7B5A03E",
-      ticker: "zLOT",
-      synth: false,
-    },
-    iconUrl: O.some(
-      "https://tokens.1inch.io/0xa8e7ad77c60ee6f30bac54e2e7c0617bd7b5a03e.png"
-    ),
-  },
-  {
-    asset: {
-      chain: ETHChain,
       symbol: "ECO-0x191557728e4d8CAa4Ac94f86af842148c0FA8F7E",
       ticker: "ECO",
       synth: false,
@@ -5199,17 +4251,6 @@ export const ERC20_WHITELIST: { asset: Asset; iconUrl: O.Option<string> }[] = [
     },
     iconUrl: O.some(
       "https://tokens.1inch.io/0x4b4d2e899658fb59b1d518b68fe836b100ee8958.png"
-    ),
-  },
-  {
-    asset: {
-      chain: ETHChain,
-      symbol: "BCS-0x03066dA434e5264ef0B32f787923f974A5726fDc",
-      ticker: "BCS",
-      synth: false,
-    },
-    iconUrl: O.some(
-      "https://tokens.1inch.io/0x03066da434e5264ef0b32f787923f974a5726fdc.png"
     ),
   },
   {
@@ -5743,28 +4784,6 @@ export const ERC20_WHITELIST: { asset: Asset; iconUrl: O.Option<string> }[] = [
   {
     asset: {
       chain: ETHChain,
-      symbol: "FL-0xfFED56a180f23fD32Bc6A1d8d3c09c283aB594A8",
-      ticker: "FL",
-      synth: false,
-    },
-    iconUrl: O.some(
-      "https://tokens.1inch.io/0xffed56a180f23fd32bc6a1d8d3c09c283ab594a8.png"
-    ),
-  },
-  {
-    asset: {
-      chain: ETHChain,
-      symbol: "JUL-0x5580ab97F226C324c671746a1787524AEF42E415",
-      ticker: "JUL",
-      synth: false,
-    },
-    iconUrl: O.some(
-      "https://tokens.1inch.io/0x5580ab97f226c324c671746a1787524aef42e415.png"
-    ),
-  },
-  {
-    asset: {
-      chain: ETHChain,
       symbol: "ALPHA-0xa1faa113cbE53436Df28FF0aEe54275c13B40975",
       ticker: "ALPHA",
       synth: false,
@@ -5815,17 +4834,6 @@ export const ERC20_WHITELIST: { asset: Asset; iconUrl: O.Option<string> }[] = [
     },
     iconUrl: O.some(
       "https://tokens.1inch.io/0x3c03b4ec9477809072ff9cc9292c9b25d4a8e6c6.png"
-    ),
-  },
-  {
-    asset: {
-      chain: ETHChain,
-      symbol: "PHOON-0x79256DB1BDB6259315a1a3D7Dd237F69cADFd8FC",
-      ticker: "PHOON",
-      synth: false,
-    },
-    iconUrl: O.some(
-      "https://tokens.1inch.io/0x79256db1bdb6259315a1a3d7dd237f69cadfd8fc.png"
     ),
   },
   {
@@ -5952,17 +4960,6 @@ export const ERC20_WHITELIST: { asset: Asset; iconUrl: O.Option<string> }[] = [
   {
     asset: {
       chain: ETHChain,
-      symbol: "ASSY-0xFA2562da1Bba7B954f26C74725dF51fb62646313",
-      ticker: "ASSY",
-      synth: false,
-    },
-    iconUrl: O.some(
-      "https://tokens.1inch.io/0xfa2562da1bba7b954f26c74725df51fb62646313.png"
-    ),
-  },
-  {
-    asset: {
-      chain: ETHChain,
       symbol: "DYP-0x961C8c0B1aaD0c0b10a51FeF6a867E3091BCef17",
       ticker: "DYP",
       synth: false,
@@ -5974,122 +4971,12 @@ export const ERC20_WHITELIST: { asset: Asset; iconUrl: O.Option<string> }[] = [
   {
     asset: {
       chain: ETHChain,
-      symbol: "OPIUMLPa55e-0x7A3eB5727E33A8000030718E82481f33bc20C4e3",
-      ticker: "OPIUMLPa55e",
-      synth: false,
-    },
-    iconUrl: O.some(
-      "https://tokens.1inch.io/0x7a3eb5727e33a8000030718e82481f33bc20c4e3.png"
-    ),
-  },
-  {
-    asset: {
-      chain: ETHChain,
-      symbol: "ybCRV-0x2994529C0652D127b7842094103715ec5299bBed",
-      ticker: "ybCRV",
-      synth: false,
-    },
-    iconUrl: O.some(
-      "https://tokens.1inch.io/0x2994529c0652d127b7842094103715ec5299bbed.png"
-    ),
-  },
-  {
-    asset: {
-      chain: ETHChain,
-      symbol: "yDAI-0xACd43E627e64355f1861cEC6d3a6688B31a6F952",
-      ticker: "yDAI",
-      synth: false,
-    },
-    iconUrl: O.some(
-      "https://tokens.1inch.io/0xacd43e627e64355f1861cec6d3a6688b31a6f952.png"
-    ),
-  },
-  {
-    asset: {
-      chain: ETHChain,
-      symbol: "yUSDC-0x597aD1e0c13Bfe8025993D9e79C69E1c0233522e",
-      ticker: "yUSDC",
-      synth: false,
-    },
-    iconUrl: O.some(
-      "https://tokens.1inch.io/0x597ad1e0c13bfe8025993d9e79c69e1c0233522e.png"
-    ),
-  },
-  {
-    asset: {
-      chain: ETHChain,
-      symbol: "yUSDT-0x2f08119C6f07c006695E079AAFc638b8789FAf18",
-      ticker: "yUSDT",
-      synth: false,
-    },
-    iconUrl: O.some(
-      "https://tokens.1inch.io/0x2f08119c6f07c006695e079aafc638b8789faf18.png"
-    ),
-  },
-  {
-    asset: {
-      chain: ETHChain,
-      symbol: "yTUSDyearn-0x37d19d1c4E1fa9DC47bD1eA12f742a0887eDa74a",
-      ticker: "yTUSDyearn",
-      synth: false,
-    },
-    iconUrl: O.some(
-      "https://tokens.1inch.io/0x37d19d1c4e1fa9dc47bd1ea12f742a0887eda74a.png"
-    ),
-  },
-  {
-    asset: {
-      chain: ETHChain,
-      symbol: "ycrvRenWSBTC-0x7Ff566E1d69DEfF32a7b244aE7276b9f90e9D0f6",
-      ticker: "ycrvRenWSBTC",
-      synth: false,
-    },
-    iconUrl: O.some(
-      "https://tokens.1inch.io/0x7ff566e1d69deff32a7b244ae7276b9f90e9d0f6.png"
-    ),
-  },
-  {
-    asset: {
-      chain: ETHChain,
-      symbol: "FcrvRenWBTC-0x9aA8F427A17d6B0d91B6262989EdC7D45d6aEdf8",
-      ticker: "FcrvRenWBTC",
-      synth: false,
-    },
-    iconUrl: O.some(
-      "https://tokens.1inch.io/0x9aa8f427a17d6b0d91b6262989edc7d45d6aedf8.png"
-    ),
-  },
-  {
-    asset: {
-      chain: ETHChain,
-      symbol: "vETH2-0x898BAD2774EB97cF6b94605677F43b41871410B1",
-      ticker: "vETH2",
-      synth: false,
-    },
-    iconUrl: O.some(
-      "https://tokens.1inch.io/0x898bad2774eb97cf6b94605677f43b41871410b1.png"
-    ),
-  },
-  {
-    asset: {
-      chain: ETHChain,
       symbol: "aETHc-0xE95A203B1a91a908F9B9CE46459d101078c2c3cb",
       ticker: "aETHc",
       synth: false,
     },
     iconUrl: O.some(
       "https://tokens.1inch.io/0xe95a203b1a91a908f9b9ce46459d101078c2c3cb.png"
-    ),
-  },
-  {
-    asset: {
-      chain: ETHChain,
-      symbol: "CRETH2-0xcBc1065255cBc3aB41a6868c22d1f1C573AB89fd",
-      ticker: "CRETH2",
-      synth: false,
-    },
-    iconUrl: O.some(
-      "https://tokens.1inch.io/0xcbc1065255cbc3ab41a6868c22d1f1c573ab89fd.png"
     ),
   },
   {
@@ -6112,17 +4999,6 @@ export const ERC20_WHITELIST: { asset: Asset; iconUrl: O.Option<string> }[] = [
     },
     iconUrl: O.some(
       "https://tokens.1inch.io/0x8642a849d0dcb7a15a974794668adcfbe4794b56.png"
-    ),
-  },
-  {
-    asset: {
-      chain: ETHChain,
-      symbol: "FAST-0xC888A0Ab4831A29e6cA432BaBf52E353D23Db3c2",
-      ticker: "FAST",
-      synth: false,
-    },
-    iconUrl: O.some(
-      "https://tokens.1inch.io/0xc888a0ab4831a29e6ca432babf52e353d23db3c2.png"
     ),
   },
   {
@@ -6167,39 +5043,6 @@ export const ERC20_WHITELIST: { asset: Asset; iconUrl: O.Option<string> }[] = [
     },
     iconUrl: O.some(
       "https://tokens.1inch.io/0x09a3ecafa817268f77be1283176b946c4ff2e608.png"
-    ),
-  },
-  {
-    asset: {
-      chain: ETHChain,
-      symbol: "FLEX-0x0D7DeA5922535087078dd3D7c554EA9f2655d4cB",
-      ticker: "FLEX",
-      synth: false,
-    },
-    iconUrl: O.some(
-      "https://tokens.1inch.io/0x0d7dea5922535087078dd3d7c554ea9f2655d4cb.png"
-    ),
-  },
-  {
-    asset: {
-      chain: ETHChain,
-      symbol: "DYNA-0xdC76450Fd7E6352733fe8550efABfF750B2De0e3",
-      ticker: "DYNA",
-      synth: false,
-    },
-    iconUrl: O.some(
-      "https://tokens.1inch.io/0xdc76450fd7e6352733fe8550efabff750b2de0e3.png"
-    ),
-  },
-  {
-    asset: {
-      chain: ETHChain,
-      symbol: "wOPIUM-0x7A8d51b82b36Fa5B50fb77001D6d189E920d2f75",
-      ticker: "wOPIUM",
-      synth: false,
-    },
-    iconUrl: O.some(
-      "https://tokens.1inch.io/0x7a8d51b82b36fa5b50fb77001d6d189e920d2f75.png"
     ),
   },
   {
@@ -6277,28 +5120,6 @@ export const ERC20_WHITELIST: { asset: Asset; iconUrl: O.Option<string> }[] = [
     },
     iconUrl: O.some(
       "https://tokens.1inch.io/0x1f3f9d3068568f8040775be2e8c03c103c61f3af.png"
-    ),
-  },
-  {
-    asset: {
-      chain: ETHChain,
-      symbol: "BBP-0xbb0A009ba1EB20c5062C790432f080F6597662AF",
-      ticker: "BBP",
-      synth: false,
-    },
-    iconUrl: O.some(
-      "https://tokens.1inch.io/0xbb0a009ba1eb20c5062c790432f080f6597662af.png"
-    ),
-  },
-  {
-    asset: {
-      chain: ETHChain,
-      symbol: "SX-0x99fE3B1391503A1bC1788051347A1324bff41452",
-      ticker: "SX",
-      synth: false,
-    },
-    iconUrl: O.some(
-      "https://tokens.1inch.io/0x99fe3b1391503a1bc1788051347a1324bff41452.png"
     ),
   },
   {
@@ -6403,17 +5224,6 @@ export const ERC20_WHITELIST: { asset: Asset; iconUrl: O.Option<string> }[] = [
   {
     asset: {
       chain: ETHChain,
-      symbol: "xINCHb-0x6B33f15360cedBFB8F60539ec828ef52910acA9b",
-      ticker: "xINCHb",
-      synth: false,
-    },
-    iconUrl: O.some(
-      "https://tokens.1inch.io/0x6b33f15360cedbfb8f60539ec828ef52910aca9b.png"
-    ),
-  },
-  {
-    asset: {
-      chain: ETHChain,
       symbol: "xINCHa-0x8F6A193C8B3c949E1046f1547C3A3f0836944E4b",
       ticker: "xINCHa",
       synth: false,
@@ -6513,28 +5323,6 @@ export const ERC20_WHITELIST: { asset: Asset; iconUrl: O.Option<string> }[] = [
   {
     asset: {
       chain: ETHChain,
-      symbol: "DEFI5-0xfa6de2697D59E88Ed7Fc4dFE5A33daC43565ea41",
-      ticker: "DEFI5",
-      synth: false,
-    },
-    iconUrl: O.some(
-      "https://tokens.1inch.io/0xfa6de2697d59e88ed7fc4dfe5a33dac43565ea41.png"
-    ),
-  },
-  {
-    asset: {
-      chain: ETHChain,
-      symbol: "CC10-0x17aC188e09A7890a1844E5E65471fE8b0CcFadF3",
-      ticker: "CC10",
-      synth: false,
-    },
-    iconUrl: O.some(
-      "https://tokens.1inch.io/0x17ac188e09a7890a1844e5e65471fe8b0ccfadf3.png"
-    ),
-  },
-  {
-    asset: {
-      chain: ETHChain,
       symbol: "TXL-0x8eEF5a82E6Aa222a60F009ac18c24EE12dBf4b41",
       ticker: "TXL",
       synth: false,
@@ -6612,17 +5400,6 @@ export const ERC20_WHITELIST: { asset: Asset; iconUrl: O.Option<string> }[] = [
   {
     asset: {
       chain: ETHChain,
-      symbol: "wCRES-0xa0afAA285Ce85974c3C881256cB7F225e3A1178a",
-      ticker: "wCRES",
-      synth: false,
-    },
-    iconUrl: O.some(
-      "https://tokens.1inch.io/0xa0afaa285ce85974c3c881256cb7f225e3a1178a.png"
-    ),
-  },
-  {
-    asset: {
-      chain: ETHChain,
       symbol: "GALA-0x15D4c048F83bd7e37d49eA4C83a07267Ec4203dA",
       ticker: "GALA",
       synth: false,
@@ -6667,17 +5444,6 @@ export const ERC20_WHITELIST: { asset: Asset; iconUrl: O.Option<string> }[] = [
   {
     asset: {
       chain: ETHChain,
-      symbol: "COIN-0xE61fDAF474Fac07063f2234Fb9e60C1163Cfa850",
-      ticker: "COIN",
-      synth: false,
-    },
-    iconUrl: O.some(
-      "https://tokens.1inch.io/0xe61fdaf474fac07063f2234fb9e60c1163cfa850.png"
-    ),
-  },
-  {
-    asset: {
-      chain: ETHChain,
       symbol: "DEXTF-0x5F64Ab1544D28732F0A24F4713c2C8ec0dA089f0",
       ticker: "DEXTF",
       synth: false,
@@ -6717,17 +5483,6 @@ export const ERC20_WHITELIST: { asset: Asset; iconUrl: O.Option<string> }[] = [
     },
     iconUrl: O.some(
       "https://tokens.1inch.io/0xd2877702675e6ceb975b4a1dff9fb7baf4c91ea9.png"
-    ),
-  },
-  {
-    asset: {
-      chain: ETHChain,
-      symbol: "EZ-0x00AbA6fE5557De1a1d565658cBDdddf7C710a1eb",
-      ticker: "EZ",
-      synth: false,
-    },
-    iconUrl: O.some(
-      "https://tokens.1inch.io/0x00aba6fe5557de1a1d565658cbddddf7c710a1eb.png"
     ),
   },
   {
@@ -6865,17 +5620,6 @@ export const ERC20_WHITELIST: { asset: Asset; iconUrl: O.Option<string> }[] = [
   {
     asset: {
       chain: ETHChain,
-      symbol: "FLASH-0xB4467E8D621105312a914F1D42f10770C0Ffe3c8",
-      ticker: "FLASH",
-      synth: false,
-    },
-    iconUrl: O.some(
-      "https://tokens.1inch.io/0xb4467e8d621105312a914f1d42f10770c0ffe3c8.png"
-    ),
-  },
-  {
-    asset: {
-      chain: ETHChain,
       symbol: "BFLY-0xf680429328caaaCabee69b7A9FdB21a71419c063",
       ticker: "BFLY",
       synth: false,
@@ -6948,17 +5692,6 @@ export const ERC20_WHITELIST: { asset: Asset; iconUrl: O.Option<string> }[] = [
     },
     iconUrl: O.some(
       "https://tokens.1inch.io/0x9af15d7b8776fa296019979e70a5be53c714a7ec.png"
-    ),
-  },
-  {
-    asset: {
-      chain: ETHChain,
-      symbol: "KLON-0xB97D5cF2864FB0D08b34a484FF48d5492B2324A0",
-      ticker: "KLON",
-      synth: false,
-    },
-    iconUrl: O.some(
-      "https://tokens.1inch.io/0xb97d5cf2864fb0d08b34a484ff48d5492b2324a0.png"
     ),
   },
   {
@@ -7184,17 +5917,6 @@ export const ERC20_WHITELIST: { asset: Asset; iconUrl: O.Option<string> }[] = [
   {
     asset: {
       chain: ETHChain,
-      symbol: "SAKE-0x066798d9ef0833ccc719076Dab77199eCbd178b0",
-      ticker: "SAKE",
-      synth: false,
-    },
-    iconUrl: O.some(
-      "https://tokens.1inch.io/0x066798d9ef0833ccc719076dab77199ecbd178b0.png"
-    ),
-  },
-  {
-    asset: {
-      chain: ETHChain,
       symbol: "mBTC-0x945Facb997494CC2570096c74b5F66A3507330a1",
       ticker: "mBTC",
       synth: false,
@@ -7212,17 +5934,6 @@ export const ERC20_WHITELIST: { asset: Asset; iconUrl: O.Option<string> }[] = [
     },
     iconUrl: O.some(
       "https://tokens.1inch.io/0x1b40183efb4dd766f11bda7a7c3ad8982e998421.png"
-    ),
-  },
-  {
-    asset: {
-      chain: ETHChain,
-      symbol: "SGT-0x84810bcF08744d5862B8181f12d17bfd57d3b078",
-      ticker: "SGT",
-      synth: false,
-    },
-    iconUrl: O.some(
-      "https://tokens.1inch.io/0x84810bcf08744d5862b8181f12d17bfd57d3b078.png"
     ),
   },
   {
@@ -7250,34 +5961,12 @@ export const ERC20_WHITELIST: { asset: Asset; iconUrl: O.Option<string> }[] = [
   {
     asset: {
       chain: ETHChain,
-      symbol: "FUD-0x2688213fEDd489762a281a67Ae4F2295D8E17ECc",
-      ticker: "FUD",
-      synth: false,
-    },
-    iconUrl: O.some(
-      "https://tokens.1inch.io/0x2688213fedd489762a281a67ae4f2295d8e17ecc.png"
-    ),
-  },
-  {
-    asset: {
-      chain: ETHChain,
       symbol: "RAI-0x03ab458634910AaD20eF5f1C8ee96F1D6ac54919",
       ticker: "RAI",
       synth: false,
     },
     iconUrl: O.some(
       "https://tokens.1inch.io/0x03ab458634910aad20ef5f1c8ee96f1d6ac54919.png"
-    ),
-  },
-  {
-    asset: {
-      chain: ETHChain,
-      symbol: "UNIDX-0x95b3497bBcCcc46a8F45F5Cf54b0878b39f8D96C",
-      ticker: "UNIDX",
-      synth: false,
-    },
-    iconUrl: O.some(
-      "https://tokens.1inch.io/0x95b3497bbcccc46a8f45f5cf54b0878b39f8d96c.png"
     ),
   },
   {
@@ -7300,17 +5989,6 @@ export const ERC20_WHITELIST: { asset: Asset; iconUrl: O.Option<string> }[] = [
     },
     iconUrl: O.some(
       "https://tokens.1inch.io/0xfc05987bd2be489accf0f509e44b0145d68240f7.png"
-    ),
-  },
-  {
-    asset: {
-      chain: ETHChain,
-      symbol: "GTH-0xc3771d47E2Ab5A519E2917E61e23078d0C05Ed7f",
-      ticker: "GTH",
-      synth: false,
-    },
-    iconUrl: O.some(
-      "https://tokens.1inch.io/0xc3771d47e2ab5a519e2917e61e23078d0c05ed7f.png"
     ),
   },
   {
@@ -7404,28 +6082,6 @@ export const ERC20_WHITELIST: { asset: Asset; iconUrl: O.Option<string> }[] = [
   {
     asset: {
       chain: ETHChain,
-      symbol: "RIGEL-0x4cA0654f4fc1025cF1a17B7459c20aC0479522aD",
-      ticker: "RIGEL",
-      synth: false,
-    },
-    iconUrl: O.some(
-      "https://tokens.1inch.io/0x4ca0654f4fc1025cf1a17b7459c20ac0479522ad.png"
-    ),
-  },
-  {
-    asset: {
-      chain: ETHChain,
-      symbol: "DVG-0x51e00a95748DBd2a3F47bC5c3b3E7B3F0fea666c",
-      ticker: "DVG",
-      synth: false,
-    },
-    iconUrl: O.some(
-      "https://tokens.1inch.io/0x51e00a95748dbd2a3f47bc5c3b3e7b3f0fea666c.png"
-    ),
-  },
-  {
-    asset: {
-      chain: ETHChain,
       symbol: "POOL-0x0cEC1A9154Ff802e7934Fc916Ed7Ca50bDE6844e",
       ticker: "POOL",
       synth: false,
@@ -7509,17 +6165,6 @@ export const ERC20_WHITELIST: { asset: Asset; iconUrl: O.Option<string> }[] = [
     },
     iconUrl: O.some(
       "https://tokens.1inch.io/0xea1ea0972fa092dd463f2968f9bb51cc4c981d71.png"
-    ),
-  },
-  {
-    asset: {
-      chain: ETHChain,
-      symbol: "HYDRO-0x946112efaB61C3636CBD52DE2E1392D7A75A6f01",
-      ticker: "HYDRO",
-      synth: false,
-    },
-    iconUrl: O.some(
-      "https://tokens.1inch.io/0x946112efab61c3636cbd52de2e1392d7a75a6f01.png"
     ),
   },
   {
@@ -7701,28 +6346,6 @@ export const ERC20_WHITELIST: { asset: Asset; iconUrl: O.Option<string> }[] = [
   {
     asset: {
       chain: ETHChain,
-      symbol: "CGI-0xAdA0A1202462085999652Dc5310a7A9e2BF3eD42",
-      ticker: "CGI",
-      synth: false,
-    },
-    iconUrl: O.some(
-      "https://tokens.1inch.io/0xada0a1202462085999652dc5310a7a9e2bf3ed42.png"
-    ),
-  },
-  {
-    asset: {
-      chain: ETHChain,
-      symbol: "MUSH-0xea6412Fb370e8d1605E6aEeAA21aD07C3C7e9F24",
-      ticker: "MUSH",
-      synth: false,
-    },
-    iconUrl: O.some(
-      "https://tokens.1inch.io/0xea6412fb370e8d1605e6aeeaa21ad07c3c7e9f24.png"
-    ),
-  },
-  {
-    asset: {
-      chain: ETHChain,
       symbol: "LPOOL-0x6149C26Cd2f7b5CCdb32029aF817123F6E37Df5B",
       ticker: "LPOOL",
       synth: false,
@@ -7800,17 +6423,6 @@ export const ERC20_WHITELIST: { asset: Asset; iconUrl: O.Option<string> }[] = [
   {
     asset: {
       chain: ETHChain,
-      symbol: "GRAP-0xC8D2AB2a6FdEbC25432E54941cb85b55b9f152dB",
-      ticker: "GRAP",
-      synth: false,
-    },
-    iconUrl: O.some(
-      "https://tokens.1inch.io/0xc8d2ab2a6fdebc25432e54941cb85b55b9f152db.png"
-    ),
-  },
-  {
-    asset: {
-      chain: ETHChain,
       symbol: "RNDR-0x6De037ef9aD2725EB40118Bb1702EBb27e4Aeb24",
       ticker: "RNDR",
       synth: false,
@@ -7861,39 +6473,6 @@ export const ERC20_WHITELIST: { asset: Asset; iconUrl: O.Option<string> }[] = [
     },
     iconUrl: O.some(
       "https://tokens.1inch.io/0x48fb253446873234f2febbf9bdeaa72d9d387f94.png"
-    ),
-  },
-  {
-    asset: {
-      chain: ETHChain,
-      symbol: "crUNIV2WBTCETH-0x011a014d5e8Eb4771E575bB1000318D509230Afa",
-      ticker: "crUNIV2WBTCETH",
-      synth: false,
-    },
-    iconUrl: O.some(
-      "https://tokens.1inch.io/0x011a014d5e8eb4771e575bb1000318d509230afa.png"
-    ),
-  },
-  {
-    asset: {
-      chain: ETHChain,
-      symbol: "crYETH-0x01da76DEa59703578040012357b81ffE62015C2d",
-      ticker: "crYETH",
-      synth: false,
-    },
-    iconUrl: O.some(
-      "https://tokens.1inch.io/0x01da76dea59703578040012357b81ffe62015c2d.png"
-    ),
-  },
-  {
-    asset: {
-      chain: ETHChain,
-      symbol: "crHBTC-0x054B7ed3F45714d3091e82aAd64A1588dC4096Ed",
-      ticker: "crHBTC",
-      synth: false,
-    },
-    iconUrl: O.some(
-      "https://tokens.1inch.io/0x054b7ed3f45714d3091e82aad64a1588dc4096ed.png"
     ),
   },
   {
@@ -8075,17 +6654,6 @@ export const ERC20_WHITELIST: { asset: Asset; iconUrl: O.Option<string> }[] = [
   {
     asset: {
       chain: ETHChain,
-      symbol: "crSLPDAIETH-0x38f27c03d6609a86FF7716ad03038881320BE4Ad",
-      ticker: "crSLPDAIETH",
-      synth: false,
-    },
-    iconUrl: O.some(
-      "https://tokens.1inch.io/0x38f27c03d6609a86ff7716ad03038881320be4ad.png"
-    ),
-  },
-  {
-    asset: {
-      chain: ETHChain,
       symbol: "crESD-0x3C6C553A95910F9FC81c98784736bd628636D296",
       ticker: "crESD",
       synth: false,
@@ -8130,45 +6698,12 @@ export const ERC20_WHITELIST: { asset: Asset; iconUrl: O.Option<string> }[] = [
   {
     asset: {
       chain: ETHChain,
-      symbol: "crUNIV2USDCETH-0x4Fe11BC316B6d7A345493127fBE298b95AdaAd85",
-      ticker: "crUNIV2USDCETH",
-      synth: false,
-    },
-    iconUrl: O.some(
-      "https://tokens.1inch.io/0x4fe11bc316b6d7a345493127fbe298b95adaad85.png"
-    ),
-  },
-  {
-    asset: {
-      chain: ETHChain,
       symbol: "crOGN-0x59089279987DD76fC65Bf94Cb40E186b96e03cB3",
       ticker: "crOGN",
       synth: false,
     },
     iconUrl: O.some(
       "https://tokens.1inch.io/0x59089279987dd76fc65bf94cb40e186b96e03cb3.png"
-    ),
-  },
-  {
-    asset: {
-      chain: ETHChain,
-      symbol: "crSLPETHUSDT-0x5C291bc83d15f71fB37805878161718eA4b6AEe9",
-      ticker: "crSLPETHUSDT",
-      synth: false,
-    },
-    iconUrl: O.some(
-      "https://tokens.1inch.io/0x5c291bc83d15f71fb37805878161718ea4b6aee9.png"
-    ),
-  },
-  {
-    asset: {
-      chain: ETHChain,
-      symbol: "crSLPUSDCETH-0x5EcaD8A75216CEa7DFF978525B2D523a251eEA92",
-      ticker: "crSLPUSDCETH",
-      synth: false,
-    },
-    iconUrl: O.some(
-      "https://tokens.1inch.io/0x5ecad8a75216cea7dff978525b2d523a251eea92.png"
     ),
   },
   {
@@ -8191,28 +6726,6 @@ export const ERC20_WHITELIST: { asset: Asset; iconUrl: O.Option<string> }[] = [
     },
     iconUrl: O.some(
       "https://tokens.1inch.io/0x697256caa3ccafd62bb6d3aa1c7c5671786a5fd9.png"
-    ),
-  },
-  {
-    asset: {
-      chain: ETHChain,
-      symbol: "crSLPSUSHIETH-0x6BA0C66C48641e220CF78177C144323b3838D375",
-      ticker: "crSLPSUSHIETH",
-      synth: false,
-    },
-    iconUrl: O.some(
-      "https://tokens.1inch.io/0x6ba0c66c48641e220cf78177c144323b3838d375.png"
-    ),
-  },
-  {
-    asset: {
-      chain: ETHChain,
-      symbol: "crSLPWBTCETH-0x73f6cBA38922960b7092175c0aDD22Ab8d0e81fC",
-      ticker: "crSLPWBTCETH",
-      synth: false,
-    },
-    iconUrl: O.some(
-      "https://tokens.1inch.io/0x73f6cba38922960b7092175c0add22ab8d0e81fc.png"
     ),
   },
   {
@@ -8383,17 +6896,6 @@ export const ERC20_WHITELIST: { asset: Asset; iconUrl: O.Option<string> }[] = [
   {
     asset: {
       chain: ETHChain,
-      symbol: "crUNIV2DAIETH-0xcD22C4110c12AC41aCEfA0091c432ef44efaAFA0",
-      ticker: "crUNIV2DAIETH",
-      synth: false,
-    },
-    iconUrl: O.some(
-      "https://tokens.1inch.io/0xcd22c4110c12ac41acefa0091c432ef44efaafa0.png"
-    ),
-  },
-  {
-    asset: {
-      chain: ETHChain,
       symbol: "crBAL-0xcE4Fe9b4b8Ff61949DCfeB7e03bc9FAca59D2Eb3",
       ticker: "crBAL",
       synth: false,
@@ -8416,45 +6918,12 @@ export const ERC20_WHITELIST: { asset: Asset; iconUrl: O.Option<string> }[] = [
   {
     asset: {
       chain: ETHChain,
-      symbol: "crHFIL-0xd5103AfcD0B3fA865997Ef2984C66742c51b2a8b",
-      ticker: "crHFIL",
-      synth: false,
-    },
-    iconUrl: O.some(
-      "https://tokens.1inch.io/0xd5103afcd0b3fa865997ef2984c66742c51b2a8b.png"
-    ),
-  },
-  {
-    asset: {
-      chain: ETHChain,
-      symbol: "crSLPYFIETH-0xd532944df6DFd5Dd629E8772F03D4fC861873abF",
-      ticker: "crSLPYFIETH",
-      synth: false,
-    },
-    iconUrl: O.some(
-      "https://tokens.1inch.io/0xd532944df6dfd5dd629e8772f03d4fc861873abf.png"
-    ),
-  },
-  {
-    asset: {
-      chain: ETHChain,
       symbol: "crHUSD-0xD692ac3245bb82319A31068D6B8412796eE85d2c",
       ticker: "crHUSD",
       synth: false,
     },
     iconUrl: O.some(
       "https://tokens.1inch.io/0xd692ac3245bb82319a31068d6b8412796ee85d2c.png"
-    ),
-  },
-  {
-    asset: {
-      chain: ETHChain,
-      symbol: "crUNIV2ETHUSDT-0xE6C3120F38F56deb38B69b65cC7dcAF916373963",
-      ticker: "crUNIV2ETHUSDT",
-      synth: false,
-    },
-    iconUrl: O.some(
-      "https://tokens.1inch.io/0xe6c3120f38f56deb38b69b65cc7dcaf916373963.png"
     ),
   },
   {
@@ -8510,17 +6979,6 @@ export const ERC20_WHITELIST: { asset: Asset; iconUrl: O.Option<string> }[] = [
     },
     iconUrl: O.some(
       "https://tokens.1inch.io/0xf55bbe0255f7f4e70f63837ff72a577fbddbe924.png"
-    ),
-  },
-  {
-    asset: {
-      chain: ETHChain,
-      symbol: "crCRETH2-0xfd609a03B393F1A1cFcAcEdaBf068CAD09a924E2",
-      ticker: "crCRETH2",
-      synth: false,
-    },
-    iconUrl: O.some(
-      "https://tokens.1inch.io/0xfd609a03b393f1a1cfcacedabf068cad09a924e2.png"
     ),
   },
   {
@@ -8625,17 +7083,6 @@ export const ERC20_WHITELIST: { asset: Asset; iconUrl: O.Option<string> }[] = [
   {
     asset: {
       chain: ETHChain,
-      symbol: "SENT-0xa44E5137293E855B1b7bC7E2C6f8cD796fFCB037",
-      ticker: "SENT",
-      synth: false,
-    },
-    iconUrl: O.some(
-      "https://tokens.1inch.io/0xa44e5137293e855b1b7bc7e2c6f8cd796ffcb037.png"
-    ),
-  },
-  {
-    asset: {
-      chain: ETHChain,
       symbol: "DEGO-0x88EF27e69108B2633F8E1C184CC37940A075cC02",
       ticker: "DEGO",
       synth: false,
@@ -8675,17 +7122,6 @@ export const ERC20_WHITELIST: { asset: Asset; iconUrl: O.Option<string> }[] = [
     },
     iconUrl: O.some(
       "https://tokens.1inch.io/0x739763a258640919981f9ba610ae65492455be53.png"
-    ),
-  },
-  {
-    asset: {
-      chain: ETHChain,
-      symbol: "DAOfi-0xD82BB924a1707950903e2C0a619824024e254cD1",
-      ticker: "DAOfi",
-      synth: false,
-    },
-    iconUrl: O.some(
-      "https://tokens.1inch.io/0xd82bb924a1707950903e2c0a619824024e254cd1.png"
     ),
   },
   {
@@ -8823,17 +7259,6 @@ export const ERC20_WHITELIST: { asset: Asset; iconUrl: O.Option<string> }[] = [
   {
     asset: {
       chain: ETHChain,
-      symbol: "ETHA-0x59E9261255644c411AfDd00bD89162d09D862e38",
-      ticker: "ETHA",
-      synth: false,
-    },
-    iconUrl: O.some(
-      "https://tokens.1inch.io/0x59e9261255644c411afdd00bd89162d09d862e38.png"
-    ),
-  },
-  {
-    asset: {
-      chain: ETHChain,
       symbol: "PAINT-0x4C6eC08CF3fc987c6C4BEB03184D335A2dFc4042",
       ticker: "PAINT",
       synth: false,
@@ -8873,17 +7298,6 @@ export const ERC20_WHITELIST: { asset: Asset; iconUrl: O.Option<string> }[] = [
     },
     iconUrl: O.some(
       "https://tokens.1inch.io/0x7a5ce6abd131ea6b148a022cb76fc180ae3315a6.png"
-    ),
-  },
-  {
-    asset: {
-      chain: ETHChain,
-      symbol: "DEA-0x80aB141F324C3d6F2b18b030f1C4E95d4d658778",
-      ticker: "DEA",
-      synth: false,
-    },
-    iconUrl: O.some(
-      "https://tokens.1inch.io/0x80ab141f324c3d6f2b18b030f1c4e95d4d658778.png"
     ),
   },
   {
@@ -9010,28 +7424,6 @@ export const ERC20_WHITELIST: { asset: Asset; iconUrl: O.Option<string> }[] = [
   {
     asset: {
       chain: ETHChain,
-      symbol: "FYZNFT-0x19A2cF2A1B2f76e52E2b0c572bD80A95B4Fa8643",
-      ticker: "FYZNFT",
-      synth: false,
-    },
-    iconUrl: O.some(
-      "https://tokens.1inch.io/0x19a2cf2a1b2f76e52e2b0c572bd80a95b4fa8643.png"
-    ),
-  },
-  {
-    asset: {
-      chain: ETHChain,
-      symbol: "SWG-0x92eF4FFBfe0Df030837b65d7FcCFE1ABd6549579",
-      ticker: "SWG",
-      synth: false,
-    },
-    iconUrl: O.some(
-      "https://tokens.1inch.io/0x92ef4ffbfe0df030837b65d7fccfe1abd6549579.png"
-    ),
-  },
-  {
-    asset: {
-      chain: ETHChain,
       symbol: "ARCXOLD-0xED30Dd7E50EdF3581AD970eFC5D9379Ce2614AdB",
       ticker: "ARCXOLD",
       synth: false,
@@ -9104,28 +7496,6 @@ export const ERC20_WHITELIST: { asset: Asset; iconUrl: O.Option<string> }[] = [
     },
     iconUrl: O.some(
       "https://tokens.1inch.io/0x544c42fbb96b39b21df61cf322b5edc285ee7429.png"
-    ),
-  },
-  {
-    asset: {
-      chain: ETHChain,
-      symbol: "TOZ-0x29239242A83479a4074Cb1c9e2A3e6705A4A4455",
-      ticker: "TOZ",
-      synth: false,
-    },
-    iconUrl: O.some(
-      "https://tokens.1inch.io/0x29239242a83479a4074cb1c9e2a3e6705a4a4455.png"
-    ),
-  },
-  {
-    asset: {
-      chain: ETHChain,
-      symbol: "VISR-0xF938424F7210f31dF2Aee3011291b658f872e91e",
-      ticker: "VISR",
-      synth: false,
-    },
-    iconUrl: O.some(
-      "https://tokens.1inch.io/0xf938424f7210f31df2aee3011291b658f872e91e.png"
     ),
   },
   {
@@ -9230,17 +7600,6 @@ export const ERC20_WHITELIST: { asset: Asset; iconUrl: O.Option<string> }[] = [
   {
     asset: {
       chain: ETHChain,
-      symbol: "CX-0x3F4E02741B155F5CE8D6190D294d4f916125B896",
-      ticker: "CX",
-      synth: false,
-    },
-    iconUrl: O.some(
-      "https://tokens.1inch.io/0x3f4e02741b155f5ce8d6190d294d4f916125b896.png"
-    ),
-  },
-  {
-    asset: {
-      chain: ETHChain,
       symbol: "JGN-0x73374Ea518De7adDD4c2B624C0e8B113955ee041",
       ticker: "JGN",
       synth: false,
@@ -9269,17 +7628,6 @@ export const ERC20_WHITELIST: { asset: Asset; iconUrl: O.Option<string> }[] = [
     },
     iconUrl: O.some(
       "https://tokens.1inch.io/0xe9a95d175a5f4c9369f3b74222402eb1b837693b.png"
-    ),
-  },
-  {
-    asset: {
-      chain: ETHChain,
-      symbol: "CNFI-0xEABB8996eA1662cAd2f7fB715127852cd3262Ae9",
-      ticker: "CNFI",
-      synth: false,
-    },
-    iconUrl: O.some(
-      "https://tokens.1inch.io/0xeabb8996ea1662cad2f7fb715127852cd3262ae9.png"
     ),
   },
   {
@@ -9571,28 +7919,6 @@ export const ERC20_WHITELIST: { asset: Asset; iconUrl: O.Option<string> }[] = [
   {
     asset: {
       chain: ETHChain,
-      symbol: "renDGB-0xe3Cb486f3f5C639e98cCBaF57d95369375687F80",
-      ticker: "renDGB",
-      synth: false,
-    },
-    iconUrl: O.some(
-      "https://tokens.1inch.io/0xe3cb486f3f5c639e98ccbaf57d95369375687f80.png"
-    ),
-  },
-  {
-    asset: {
-      chain: ETHChain,
-      symbol: "CHIP-0x0ace20a35eE382Bda90D1D93CEE65f5970FC01c8",
-      ticker: "CHIP",
-      synth: false,
-    },
-    iconUrl: O.some(
-      "https://tokens.1inch.io/0x0ace20a35ee382bda90d1d93cee65f5970fc01c8.png"
-    ),
-  },
-  {
-    asset: {
-      chain: ETHChain,
       symbol: "ARA-0xa92E7c82B11d10716aB534051B271D2f6aEf7Df5",
       ticker: "ARA",
       synth: false,
@@ -9610,17 +7936,6 @@ export const ERC20_WHITELIST: { asset: Asset; iconUrl: O.Option<string> }[] = [
     },
     iconUrl: O.some(
       "https://tokens.1inch.io/0x5dc02ea99285e17656b8350722694c35154db1e8.png"
-    ),
-  },
-  {
-    asset: {
-      chain: ETHChain,
-      symbol: "2GT-0xC96c1609A1a45CcC667B2b7FA6508e29617f7b69",
-      ticker: "2GT",
-      synth: false,
-    },
-    iconUrl: O.some(
-      "https://tokens.1inch.io/0xc96c1609a1a45ccc667b2b7fa6508e29617f7b69.png"
     ),
   },
   {
@@ -9912,17 +8227,6 @@ export const ERC20_WHITELIST: { asset: Asset; iconUrl: O.Option<string> }[] = [
   {
     asset: {
       chain: ETHChain,
-      symbol: "PYR-0x9534ad65fb398E27Ac8F4251dAe1780B989D136e",
-      ticker: "PYR",
-      synth: false,
-    },
-    iconUrl: O.some(
-      "https://tokens.1inch.io/0x9534ad65fb398e27ac8f4251dae1780b989d136e.png"
-    ),
-  },
-  {
-    asset: {
-      chain: ETHChain,
       symbol: "ROOBEE-0xA31B1767e09f842ECFd4bc471Fe44F830E3891AA",
       ticker: "ROOBEE",
       synth: false,
@@ -9984,39 +8288,6 @@ export const ERC20_WHITELIST: { asset: Asset; iconUrl: O.Option<string> }[] = [
     },
     iconUrl: O.some(
       "https://tokens.1inch.io/0xe0b9a2c3e9f40cf74b2c7f591b2b0cca055c3112.png"
-    ),
-  },
-  {
-    asset: {
-      chain: ETHChain,
-      symbol: "INXT-0xa8006C4ca56F24d6836727D106349320dB7fEF82",
-      ticker: "INXT",
-      synth: false,
-    },
-    iconUrl: O.some(
-      "https://tokens.1inch.io/0xa8006c4ca56f24d6836727d106349320db7fef82.png"
-    ),
-  },
-  {
-    asset: {
-      chain: ETHChain,
-      symbol: "OHM-0x383518188C0C6d7730D91b2c03a03C837814a899",
-      ticker: "OHM",
-      synth: false,
-    },
-    iconUrl: O.some(
-      "https://tokens.1inch.io/0x383518188c0c6d7730d91b2c03a03c837814a899.png"
-    ),
-  },
-  {
-    asset: {
-      chain: ETHChain,
-      symbol: "RAZE-0x5Eaa69B29f99C84Fe5dE8200340b4e9b4Ab38EaC",
-      ticker: "RAZE",
-      synth: false,
-    },
-    iconUrl: O.some(
-      "https://tokens.1inch.io/0x5eaa69b29f99c84fe5de8200340b4e9b4ab38eac.png"
     ),
   },
   {
@@ -10330,17 +8601,6 @@ export const ERC20_WHITELIST: { asset: Asset; iconUrl: O.Option<string> }[] = [
   {
     asset: {
       chain: ETHChain,
-      symbol: "AGA-0x2D80f5F5328FdcB6ECeb7Cacf5DD8AEDaEC94e20",
-      ticker: "AGA",
-      synth: false,
-    },
-    iconUrl: O.some(
-      "https://tokens.1inch.io/0x2d80f5f5328fdcb6eceb7cacf5dd8aedaec94e20.png"
-    ),
-  },
-  {
-    asset: {
-      chain: ETHChain,
       symbol: "Coval-0x3D658390460295FB963f54dC0899cfb1c30776Df",
       ticker: "Coval",
       synth: false,
@@ -10369,17 +8629,6 @@ export const ERC20_WHITELIST: { asset: Asset; iconUrl: O.Option<string> }[] = [
     },
     iconUrl: O.some(
       "https://tokens.1inch.io/0x1de5e000c41c8d35b9f1f4985c23988f05831057.png"
-    ),
-  },
-  {
-    asset: {
-      chain: ETHChain,
-      symbol: "KIN-0x818Fc6C2Ec5986bc6E2CBf00939d90556aB12ce5",
-      ticker: "KIN",
-      synth: false,
-    },
-    iconUrl: O.some(
-      "https://tokens.1inch.io/0x818fc6c2ec5986bc6e2cbf00939d90556ab12ce5.png"
     ),
   },
   {
@@ -10517,39 +8766,6 @@ export const ERC20_WHITELIST: { asset: Asset; iconUrl: O.Option<string> }[] = [
   {
     asset: {
       chain: ETHChain,
-      symbol: "AGAr-0xb453f1f2EE776dAF2586501361c457dB70e1ca0F",
-      ticker: "AGAr",
-      synth: false,
-    },
-    iconUrl: O.some(
-      "https://tokens.1inch.io/0xb453f1f2ee776daf2586501361c457db70e1ca0f.png"
-    ),
-  },
-  {
-    asset: {
-      chain: ETHChain,
-      symbol: "OPIUMLP1c60-0x0cAb5A7dCAb521aF5404Fa604b85113267d38444",
-      ticker: "OPIUMLP1c60",
-      synth: false,
-    },
-    iconUrl: O.some(
-      "https://tokens.1inch.io/0x0cab5a7dcab521af5404fa604b85113267d38444.png"
-    ),
-  },
-  {
-    asset: {
-      chain: ETHChain,
-      symbol: "OPIUMLPaf0d-0xb54539D39529cE58fB63877DEbC6d6b70E3ecA01",
-      ticker: "OPIUMLPaf0d",
-      synth: false,
-    },
-    iconUrl: O.some(
-      "https://tokens.1inch.io/0xb54539d39529ce58fb63877debc6d6b70e3eca01.png"
-    ),
-  },
-  {
-    asset: {
-      chain: ETHChain,
       symbol: "CTX-0x321C2fE4446C7c963dc41Dd58879AF648838f98D",
       ticker: "CTX",
       synth: false,
@@ -10594,17 +8810,6 @@ export const ERC20_WHITELIST: { asset: Asset; iconUrl: O.Option<string> }[] = [
   {
     asset: {
       chain: ETHChain,
-      symbol: "SMDX-0x7e8539D1E5cB91d63E46B8e188403b3f262a949B",
-      ticker: "SMDX",
-      synth: false,
-    },
-    iconUrl: O.some(
-      "https://tokens.1inch.io/0x7e8539d1e5cb91d63e46b8e188403b3f262a949b.png"
-    ),
-  },
-  {
-    asset: {
-      chain: ETHChain,
       symbol: "KISHU-0xA2b4C0Af19cC16a6CfAcCe81F192B024d625817D",
       ticker: "KISHU",
       synth: false,
@@ -10627,34 +8832,12 @@ export const ERC20_WHITELIST: { asset: Asset; iconUrl: O.Option<string> }[] = [
   {
     asset: {
       chain: ETHChain,
-      symbol: "STBU-0x212DD60D4Bf0DA8372fe8116474602d429E5735F",
-      ticker: "STBU",
-      synth: false,
-    },
-    iconUrl: O.some(
-      "https://tokens.1inch.io/0x212dd60d4bf0da8372fe8116474602d429e5735f.png"
-    ),
-  },
-  {
-    asset: {
-      chain: ETHChain,
       symbol: "O3-0xEe9801669C6138E84bD50dEB500827b776777d28",
       ticker: "O3",
       synth: false,
     },
     iconUrl: O.some(
       "https://tokens.1inch.io/0xee9801669c6138e84bd50deb500827b776777d28.png"
-    ),
-  },
-  {
-    asset: {
-      chain: ETHChain,
-      symbol: "WOOFY-0xD0660cD418a64a1d44E9214ad8e459324D8157f1",
-      ticker: "WOOFY",
-      synth: false,
-    },
-    iconUrl: O.some(
-      "https://tokens.1inch.io/0xd0660cd418a64a1d44e9214ad8e459324d8157f1.png"
     ),
   },
   {
@@ -10759,45 +8942,12 @@ export const ERC20_WHITELIST: { asset: Asset; iconUrl: O.Option<string> }[] = [
   {
     asset: {
       chain: ETHChain,
-      symbol: "TBC-0xa1eD0364D53394209D61aE8bfdb8Ff50484D8c91",
-      ticker: "TBC",
-      synth: false,
-    },
-    iconUrl: O.some(
-      "https://tokens.1inch.io/0xa1ed0364d53394209d61ae8bfdb8ff50484d8c91.png"
-    ),
-  },
-  {
-    asset: {
-      chain: ETHChain,
       symbol: "VUSD-0x677ddbd918637E5F2c79e164D402454dE7dA8619",
       ticker: "VUSD",
       synth: false,
     },
     iconUrl: O.some(
       "https://tokens.1inch.io/0x677ddbd918637e5f2c79e164d402454de7da8619.png"
-    ),
-  },
-  {
-    asset: {
-      chain: ETHChain,
-      symbol: "BOR-0x3c9d6c1C73b31c837832c72E04D3152f051fc1A9",
-      ticker: "BOR",
-      synth: false,
-    },
-    iconUrl: O.some(
-      "https://tokens.1inch.io/0x3c9d6c1c73b31c837832c72e04d3152f051fc1a9.png"
-    ),
-  },
-  {
-    asset: {
-      chain: ETHChain,
-      symbol: "ZOOT-0x1341A2257fa7b770420Ef70616f888056f90926c",
-      ticker: "ZOOT",
-      synth: false,
-    },
-    iconUrl: O.some(
-      "https://tokens.1inch.io/0x1341a2257fa7b770420ef70616f888056f90926c.png"
     ),
   },
   {
@@ -11133,28 +9283,6 @@ export const ERC20_WHITELIST: { asset: Asset; iconUrl: O.Option<string> }[] = [
   {
     asset: {
       chain: ETHChain,
-      symbol: "NXM-0xd7c49CEE7E9188cCa6AD8FF264C1DA2e69D4Cf3B",
-      ticker: "NXM",
-      synth: false,
-    },
-    iconUrl: O.some(
-      "https://tokens.1inch.io/0xd7c49cee7e9188cca6ad8ff264c1da2e69d4cf3b.png"
-    ),
-  },
-  {
-    asset: {
-      chain: ETHChain,
-      symbol: "COL-0xC76FB75950536d98FA62ea968E1D6B45ffea2A55",
-      ticker: "COL",
-      synth: false,
-    },
-    iconUrl: O.some(
-      "https://tokens.1inch.io/0xc76fb75950536d98fa62ea968e1d6b45ffea2a55.png"
-    ),
-  },
-  {
-    asset: {
-      chain: ETHChain,
       symbol: "Auction-0xA9B1Eb5908CfC3cdf91F9B8B3a74108598009096",
       ticker: "Auction",
       synth: false,
@@ -11419,17 +9547,6 @@ export const ERC20_WHITELIST: { asset: Asset; iconUrl: O.Option<string> }[] = [
   {
     asset: {
       chain: ETHChain,
-      symbol: "UNFI-0x441761326490cACF7aF299725B6292597EE822c2",
-      ticker: "UNFI",
-      synth: false,
-    },
-    iconUrl: O.some(
-      "https://tokens.1inch.io/0x441761326490cacf7af299725b6292597ee822c2.png"
-    ),
-  },
-  {
-    asset: {
-      chain: ETHChain,
       symbol: "STARL-0x8E6cd950Ad6ba651F6DD608Dc70e5886B1AA6B24",
       ticker: "STARL",
       synth: false,
@@ -11474,17 +9591,6 @@ export const ERC20_WHITELIST: { asset: Asset; iconUrl: O.Option<string> }[] = [
   {
     asset: {
       chain: ETHChain,
-      symbol: "aAMPL-0x1E6bb68Acec8fefBD87D192bE09bb274170a0548",
-      ticker: "aAMPL",
-      synth: false,
-    },
-    iconUrl: O.some(
-      "https://tokens.1inch.io/0x1e6bb68acec8fefbd87d192be09bb274170a0548.png"
-    ),
-  },
-  {
-    asset: {
-      chain: ETHChain,
       symbol: "PEEPS-0xe1030B48b2033314979143766d7dC1F40ef8CE11",
       ticker: "PEEPS",
       synth: false,
@@ -11518,17 +9624,6 @@ export const ERC20_WHITELIST: { asset: Asset; iconUrl: O.Option<string> }[] = [
   {
     asset: {
       chain: ETHChain,
-      symbol: "FLOKI-0x43f11c02439e2736800433b4594994Bd43Cd066D",
-      ticker: "FLOKI",
-      synth: false,
-    },
-    iconUrl: O.some(
-      "https://tokens.1inch.io/0x43f11c02439e2736800433b4594994bd43cd066d.png"
-    ),
-  },
-  {
-    asset: {
-      chain: ETHChain,
       symbol: "VOL-0x5166E09628b696285E3A151e84FB977736a83575",
       ticker: "VOL",
       synth: false,
@@ -11546,17 +9641,6 @@ export const ERC20_WHITELIST: { asset: Asset; iconUrl: O.Option<string> }[] = [
     },
     iconUrl: O.some(
       "https://tokens.1inch.io/0x06f3c323f0238c72bf35011071f2b5b7f43a054c.png"
-    ),
-  },
-  {
-    asset: {
-      chain: ETHChain,
-      symbol: "HI-0xC4f6E93AEDdc11dc22268488465bAbcAF09399aC",
-      ticker: "HI",
-      synth: false,
-    },
-    iconUrl: O.some(
-      "https://tokens.1inch.io/0xc4f6e93aeddc11dc22268488465babcaf09399ac.png"
     ),
   },
   {
@@ -11661,34 +9745,12 @@ export const ERC20_WHITELIST: { asset: Asset; iconUrl: O.Option<string> }[] = [
   {
     asset: {
       chain: ETHChain,
-      symbol: "HOTCROSS-0x4297394c20800E8a38A619A243E9BbE7681Ff24E",
-      ticker: "HOTCROSS",
-      synth: false,
-    },
-    iconUrl: O.some(
-      "https://tokens.1inch.io/0x4297394c20800e8a38a619a243e9bbe7681ff24e.png"
-    ),
-  },
-  {
-    asset: {
-      chain: ETHChain,
       symbol: "HAKA-0xD85AD783cc94bd04196a13DC042A3054a9B52210",
       ticker: "HAKA",
       synth: false,
     },
     iconUrl: O.some(
       "https://tokens.1inch.io/0xd85ad783cc94bd04196a13dc042a3054a9b52210.png"
-    ),
-  },
-  {
-    asset: {
-      chain: ETHChain,
-      symbol: "SAITAMA-0x8B3192f5eEBD8579568A2Ed41E6FEB402f93f73F",
-      ticker: "SAITAMA",
-      synth: false,
-    },
-    iconUrl: O.some(
-      "https://tokens.1inch.io/0x8b3192f5eebd8579568a2ed41e6feb402f93f73f.png"
     ),
   },
   {
@@ -11859,56 +9921,12 @@ export const ERC20_WHITELIST: { asset: Asset; iconUrl: O.Option<string> }[] = [
   {
     asset: {
       chain: ETHChain,
-      symbol: "iBTC-0xD6014EA05BDe904448B743833dDF07c3C7837481",
-      ticker: "iBTC",
-      synth: false,
-    },
-    iconUrl: O.some(
-      "https://tokens.1inch.io/0xd6014ea05bde904448b743833ddf07c3c7837481.png"
-    ),
-  },
-  {
-    asset: {
-      chain: ETHChain,
-      symbol: "iETH-0xA9859874e1743A32409f75bB11549892138BBA1E",
-      ticker: "iETH",
-      synth: false,
-    },
-    iconUrl: O.some(
-      "https://tokens.1inch.io/0xa9859874e1743a32409f75bb11549892138bba1e.png"
-    ),
-  },
-  {
-    asset: {
-      chain: ETHChain,
-      symbol: "sAUD-0xF48e200EAF9906362BB1442fca31e0835773b8B4",
-      ticker: "sAUD",
-      synth: false,
-    },
-    iconUrl: O.some(
-      "https://tokens.1inch.io/0xf48e200eaf9906362bb1442fca31e0835773b8b4.png"
-    ),
-  },
-  {
-    asset: {
-      chain: ETHChain,
       symbol: "sBTC-0xfE18be6b3Bd88A2D2A7f928d00292E7a9963CfC6",
       ticker: "sBTC",
       synth: false,
     },
     iconUrl: O.some(
       "https://tokens.1inch.io/0xfe18be6b3bd88a2d2a7f928d00292e7a9963cfc6.png"
-    ),
-  },
-  {
-    asset: {
-      chain: ETHChain,
-      symbol: "sDEFI-0xe1aFe1Fd76Fd88f78cBf599ea1846231B8bA3B6B",
-      ticker: "sDEFI",
-      synth: false,
-    },
-    iconUrl: O.some(
-      "https://tokens.1inch.io/0xe1afe1fd76fd88f78cbf599ea1846231b8ba3b6b.png"
     ),
   },
   {
@@ -12123,17 +10141,6 @@ export const ERC20_WHITELIST: { asset: Asset; iconUrl: O.Option<string> }[] = [
   {
     asset: {
       chain: ETHChain,
-      symbol: "OCCT-0x95A1796437BAd6502d1c1cce165Cd76E522409a9",
-      ticker: "OCCT",
-      synth: false,
-    },
-    iconUrl: O.some(
-      "https://tokens.1inch.io/0x95a1796437bad6502d1c1cce165cd76e522409a9.png"
-    ),
-  },
-  {
-    asset: {
-      chain: ETHChain,
       symbol: "HOKK-0xe87e15B9c7d989474Cb6d8c56b3DB4eFAD5b21E8",
       ticker: "HOKK",
       synth: false,
@@ -12255,20 +10262,486 @@ export const ERC20_WHITELIST: { asset: Asset; iconUrl: O.Option<string> }[] = [
   {
     asset: {
       chain: ETHChain,
-      symbol: "DNA-0xef6344de1fcfC5F48c30234C16c1389e8CdC572C",
-      ticker: "DNA",
+      symbol: "SOS-0x3b484b82567a09e2588A13D54D032153f0c0aEe0",
+      ticker: "SOS",
       synth: false,
     },
-    iconUrl: O.none,
+    iconUrl: O.some(
+      "https://tokens.1inch.io/0x3b484b82567a09e2588a13d54d032153f0c0aee0.png"
+    ),
   },
   {
     asset: {
       chain: ETHChain,
-      symbol: "VIU-0x519475b31653E46D20cD09F9FdcF3B12BDAcB4f5",
-      ticker: "VIU",
+      symbol: "VXL-0x16CC8367055aE7e9157DBcB9d86Fd6CE82522b31",
+      ticker: "VXL",
       synth: false,
     },
-    iconUrl: O.none,
+    iconUrl: O.some(
+      "https://tokens.1inch.io/0x16cc8367055ae7e9157dbcb9d86fd6ce82522b31.png"
+    ),
+  },
+  {
+    asset: {
+      chain: ETHChain,
+      symbol: "GAS-0x6Bba316c48b49BD1eAc44573c5c871ff02958469",
+      ticker: "GAS",
+      synth: false,
+    },
+    iconUrl: O.some(
+      "https://tokens.1inch.io/0x6bba316c48b49bd1eac44573c5c871ff02958469.png"
+    ),
+  },
+  {
+    asset: {
+      chain: ETHChain,
+      symbol: "TEMP-0xA36FDBBAE3c9d55a1d67EE5821d53B50B63A1aB9",
+      ticker: "TEMP",
+      synth: false,
+    },
+    iconUrl: O.some(
+      "https://tokens.1inch.io/0xa36fdbbae3c9d55a1d67ee5821d53b50b63a1ab9.png"
+    ),
+  },
+  {
+    asset: {
+      chain: ETHChain,
+      symbol: "LGB-0x21E783bcf445B515957A10E992aD3c8E9FF51288",
+      ticker: "LGB",
+      synth: false,
+    },
+    iconUrl: O.some(
+      "https://tokens.1inch.io/0x21e783bcf445b515957a10e992ad3c8e9ff51288.png"
+    ),
+  },
+  {
+    asset: {
+      chain: ETHChain,
+      symbol: "KTO-0x616ef40D55C0D2c506f4d6873Bda8090b79BF8fC",
+      ticker: "KTO",
+      synth: false,
+    },
+    iconUrl: O.some(
+      "https://tokens.1inch.io/0x616ef40d55c0d2c506f4d6873bda8090b79bf8fc.png"
+    ),
+  },
+  {
+    asset: {
+      chain: ETHChain,
+      symbol: "RADAR-0x44709a920fCcF795fbC57BAA433cc3dd53C44DbE",
+      ticker: "RADAR",
+      synth: false,
+    },
+    iconUrl: O.some(
+      "https://tokens.1inch.io/0x44709a920fccf795fbc57baa433cc3dd53c44dbe.png"
+    ),
+  },
+  {
+    asset: {
+      chain: ETHChain,
+      symbol: "ALPHA1-0x138C2F1123cF3f82E4596d097c118eAc6684940B",
+      ticker: "ALPHA1",
+      synth: false,
+    },
+    iconUrl: O.some(
+      "https://tokens.1inch.io/0x138c2f1123cf3f82e4596d097c118eac6684940b.png"
+    ),
+  },
+  {
+    asset: {
+      chain: ETHChain,
+      symbol: "0xBTC-0xB6eD7644C69416d67B522e20bC294A9a9B405B31",
+      ticker: "0xBTC",
+      synth: false,
+    },
+    iconUrl: O.some(
+      "https://tokens.1inch.io/0xb6ed7644c69416d67b522e20bc294a9a9b405b31.png"
+    ),
+  },
+  {
+    asset: {
+      chain: ETHChain,
+      symbol: "NIL-0x47252A63C723889814AeBcAC0683E615624ceC64",
+      ticker: "NIL",
+      synth: false,
+    },
+    iconUrl: O.some(
+      "https://tokens.1inch.io/0x47252a63c723889814aebcac0683e615624cec64.png"
+    ),
+  },
+  {
+    asset: {
+      chain: ETHChain,
+      symbol: "BORING-0xBC19712FEB3a26080eBf6f2F7849b417FdD792CA",
+      ticker: "BORING",
+      synth: false,
+    },
+    iconUrl: O.some(
+      "https://tokens.1inch.io/0xbc19712feb3a26080ebf6f2f7849b417fdd792ca.png"
+    ),
+  },
+  {
+    asset: {
+      chain: ETHChain,
+      symbol: "WTF-0xA68Dd8cB83097765263AdAD881Af6eeD479c4a33",
+      ticker: "WTF",
+      synth: false,
+    },
+    iconUrl: O.some(
+      "https://tokens.1inch.io/0xa68dd8cb83097765263adad881af6eed479c4a33.png"
+    ),
+  },
+  {
+    asset: {
+      chain: ETHChain,
+      symbol: "ACYC-0xB56A1f3310578f23120182Fb2e58c087EFE6e147",
+      ticker: "ACYC",
+      synth: false,
+    },
+    iconUrl: O.some(
+      "https://tokens.1inch.io/0xb56a1f3310578f23120182fb2e58c087efe6e147.png"
+    ),
+  },
+  {
+    asset: {
+      chain: ETHChain,
+      symbol: "GMI-0x47110d43175f7f2C2425E7d15792acC5817EB44f",
+      ticker: "GMI",
+      synth: false,
+    },
+    iconUrl: O.some(
+      "https://tokens.1inch.io/0x47110d43175f7f2c2425e7d15792acc5817eb44f.png"
+    ),
+  },
+  {
+    asset: {
+      chain: ETHChain,
+      symbol: "ACCEL-0x7475C42f8BF2c19F4EAF12fEaabaBA859fdC8914",
+      ticker: "ACCEL",
+      synth: false,
+    },
+    iconUrl: O.some(
+      "https://tokens.1inch.io/0x7475c42f8bf2c19f4eaf12feaababa859fdc8914.png"
+    ),
+  },
+  {
+    asset: {
+      chain: ETHChain,
+      symbol: "WXRP-0x39fBBABf11738317a448031930706cd3e612e1B9",
+      ticker: "WXRP",
+      synth: false,
+    },
+    iconUrl: O.some(
+      "https://tokens.1inch.io/0x39fbbabf11738317a448031930706cd3e612e1b9.png"
+    ),
+  },
+  {
+    asset: {
+      chain: ETHChain,
+      symbol: "T-0xCdF7028ceAB81fA0C6971208e83fa7872994beE5",
+      ticker: "T",
+      synth: false,
+    },
+    iconUrl: O.some(
+      "https://tokens.1inch.io/0xcdf7028ceab81fa0c6971208e83fa7872994bee5.png"
+    ),
+  },
+  {
+    asset: {
+      chain: ETHChain,
+      symbol: "FLOKI-0xcf0C122c6b73ff809C693DB761e7BaeBe62b6a2E",
+      ticker: "FLOKI",
+      synth: false,
+    },
+    iconUrl: O.some(
+      "https://tokens.1inch.io/0xcf0c122c6b73ff809c693db761e7baebe62b6a2e.png"
+    ),
+  },
+  {
+    asset: {
+      chain: ETHChain,
+      symbol: "OOKI-0x0De05F6447ab4D22c8827449EE4bA2D5C288379B",
+      ticker: "OOKI",
+      synth: false,
+    },
+    iconUrl: O.some(
+      "https://tokens.1inch.io/0x0de05f6447ab4d22c8827449ee4ba2d5c288379b.png"
+    ),
+  },
+  {
+    asset: {
+      chain: ETHChain,
+      symbol: "IXS-0x73d7c860998CA3c01Ce8c808F5577d94d545d1b4",
+      ticker: "IXS",
+      synth: false,
+    },
+    iconUrl: O.some(
+      "https://tokens.1inch.io/0x73d7c860998ca3c01ce8c808f5577d94d545d1b4.png"
+    ),
+  },
+  {
+    asset: {
+      chain: ETHChain,
+      symbol: "agEUR-0x1a7e4e63778B4f12a199C062f3eFdD288afCBce8",
+      ticker: "agEUR",
+      synth: false,
+    },
+    iconUrl: O.some(
+      "https://tokens.1inch.io/0x1a7e4e63778b4f12a199c062f3efdd288afcbce8.png"
+    ),
+  },
+  {
+    asset: {
+      chain: ETHChain,
+      symbol: "LOOKS-0xf4d2888d29D722226FafA5d9B24F9164c092421E",
+      ticker: "LOOKS",
+      synth: false,
+    },
+    iconUrl: O.some(
+      "https://tokens.1inch.io/0xf4d2888d29d722226fafa5d9b24f9164c092421e.png"
+    ),
+  },
+  {
+    asset: {
+      chain: ETHChain,
+      symbol: "JACY-0x916c5DE09cF63f6602d1e1793FB41F6437814A62",
+      ticker: "JACY",
+      synth: false,
+    },
+    iconUrl: O.some(
+      "https://tokens.1inch.io/0x916c5de09cf63f6602d1e1793fb41f6437814a62.png"
+    ),
+  },
+  {
+    asset: {
+      chain: ETHChain,
+      symbol: "BEAN-0xDC59ac4FeFa32293A95889Dc396682858d52e5Db",
+      ticker: "BEAN",
+      synth: false,
+    },
+    iconUrl: O.some(
+      "https://tokens.1inch.io/0xdc59ac4fefa32293a95889dc396682858d52e5db.png"
+    ),
+  },
+  {
+    asset: {
+      chain: ETHChain,
+      symbol: "ANGLE-0x31429d1856aD1377A8A0079410B297e1a9e214c2",
+      ticker: "ANGLE",
+      synth: false,
+    },
+    iconUrl: O.some(
+      "https://tokens.1inch.io/0x31429d1856ad1377a8a0079410b297e1a9e214c2.png"
+    ),
+  },
+  {
+    asset: {
+      chain: ETHChain,
+      symbol: "AVINOC-0xF1cA9cb74685755965c7458528A36934Df52A3EF",
+      ticker: "AVINOC",
+      synth: false,
+    },
+    iconUrl: O.some(
+      "https://tokens.1inch.io/0xf1ca9cb74685755965c7458528a36934df52a3ef.png"
+    ),
+  },
+  {
+    asset: {
+      chain: ETHChain,
+      symbol: "XYZ-0x618679dF9EfCd19694BB1daa8D00718Eacfa2883",
+      ticker: "XYZ",
+      synth: false,
+    },
+    iconUrl: O.some(
+      "https://tokens.1inch.io/0x618679df9efcd19694bb1daa8d00718eacfa2883.png"
+    ),
+  },
+  {
+    asset: {
+      chain: ETHChain,
+      symbol: "Metis-0x9E32b13ce7f2E80A01932B42553652E053D6ed8e",
+      ticker: "Metis",
+      synth: false,
+    },
+    iconUrl: O.some(
+      "https://tokens.1inch.io/0x9e32b13ce7f2e80a01932b42553652e053d6ed8e.png"
+    ),
+  },
+  {
+    asset: {
+      chain: ETHChain,
+      symbol: "SIS-0xd38BB40815d2B0c2d2c866e0c72c5728ffC76dd9",
+      ticker: "SIS",
+      synth: false,
+    },
+    iconUrl: O.some(
+      "https://tokens.1inch.io/0xd38bb40815d2b0c2d2c866e0c72c5728ffc76dd9.png"
+    ),
+  },
+  {
+    asset: {
+      chain: ETHChain,
+      symbol: "BBS-0xFe459828c90c0BA4bC8b42F5C5D44F316700B430",
+      ticker: "BBS",
+      synth: false,
+    },
+    iconUrl: O.some(
+      "https://tokens.1inch.io/0xfe459828c90c0ba4bc8b42f5c5d44f316700b430.png"
+    ),
+  },
+  {
+    asset: {
+      chain: ETHChain,
+      symbol: "DEPO-0xa5DEf515cFd373D17830E7c1de1639cB3530a112",
+      ticker: "DEPO",
+      synth: false,
+    },
+    iconUrl: O.some(
+      "https://tokens.1inch.io/0xa5def515cfd373d17830e7c1de1639cb3530a112.png"
+    ),
+  },
+  {
+    asset: {
+      chain: ETHChain,
+      symbol: "X2Y2-0x1E4EDE388cbc9F4b5c79681B7f94d36a11ABEBC9",
+      ticker: "X2Y2",
+      synth: false,
+    },
+    iconUrl: O.some(
+      "https://tokens.1inch.io/0x1e4ede388cbc9f4b5c79681b7f94d36a11abebc9.png"
+    ),
+  },
+  {
+    asset: {
+      chain: ETHChain,
+      symbol: "WRLD-0xD5d86FC8d5C0Ea1aC1Ac5Dfab6E529c9967a45E9",
+      ticker: "WRLD",
+      synth: false,
+    },
+    iconUrl: O.some(
+      "https://tokens.1inch.io/0xd5d86fc8d5c0ea1ac1ac5dfab6e529c9967a45e9.png"
+    ),
+  },
+  {
+    asset: {
+      chain: ETHChain,
+      symbol: "VADER-0x2602278EE1882889B946eb11DC0E810075650983",
+      ticker: "VADER",
+      synth: false,
+    },
+    iconUrl: O.some(
+      "https://tokens.1inch.io/0x2602278ee1882889b946eb11dc0e810075650983.png"
+    ),
+  },
+  {
+    asset: {
+      chain: ETHChain,
+      symbol: "UFO-0x249e38Ea4102D0cf8264d3701f1a0E39C4f2DC3B",
+      ticker: "UFO",
+      synth: false,
+    },
+    iconUrl: O.some(
+      "https://tokens.1inch.io/0x249e38ea4102d0cf8264d3701f1a0e39c4f2dc3b.png"
+    ),
+  },
+  {
+    asset: {
+      chain: ETHChain,
+      symbol: "IMX-0xF57e7e7C23978C3cAEC3C3548E3D615c346e79fF",
+      ticker: "IMX",
+      synth: false,
+    },
+    iconUrl: O.some(
+      "https://tokens.1inch.io/0xf57e7e7c23978c3caec3c3548e3d615c346e79ff.png"
+    ),
+  },
+  {
+    asset: {
+      chain: ETHChain,
+      symbol: "TOKE-0x2e9d63788249371f1DFC918a52f8d799F4a38C94",
+      ticker: "TOKE",
+      synth: false,
+    },
+    iconUrl: O.some(
+      "https://tokens.1inch.io/0x2e9d63788249371f1dfc918a52f8d799f4a38c94.png"
+    ),
+  },
+  {
+    asset: {
+      chain: ETHChain,
+      symbol: "NCR-0xDB5C3C46E28B53a39C255AA39A411dD64e5fed9c",
+      ticker: "NCR",
+      synth: false,
+    },
+    iconUrl: O.some(
+      "https://tokens.1inch.io/0xdb5c3c46e28b53a39c255aa39a411dd64e5fed9c.png"
+    ),
+  },
+  {
+    asset: {
+      chain: ETHChain,
+      symbol: "SYN-0x0f2D719407FdBeFF09D87557AbB7232601FD9F29",
+      ticker: "SYN",
+      synth: false,
+    },
+    iconUrl: O.some(
+      "https://tokens.1inch.io/0x0f2d719407fdbeff09d87557abb7232601fd9f29.png"
+    ),
+  },
+  {
+    asset: {
+      chain: ETHChain,
+      symbol: "NFTI2-0x525eF76138Bf76118d786DbedeaE5F87aaBf4a81",
+      ticker: "NFTI2",
+      synth: false,
+    },
+    iconUrl: O.some(
+      "https://tokens.1inch.io/0x525ef76138bf76118d786dbedeae5f87aabf4a81.png"
+    ),
+  },
+  {
+    asset: {
+      chain: ETHChain,
+      symbol: "WFLOW-0x5c147e74D63B1D31AA3Fd78Eb229B65161983B2b",
+      ticker: "WFLOW",
+      synth: false,
+    },
+    iconUrl: O.some(
+      "https://tokens.1inch.io/0x5c147e74d63b1d31aa3fd78eb229b65161983b2b.png"
+    ),
+  },
+  {
+    asset: {
+      chain: ETHChain,
+      symbol: "BST-0x509A38b7a1cC0dcd83Aa9d06214663D9eC7c7F4a",
+      ticker: "BST",
+      synth: false,
+    },
+    iconUrl: O.some(
+      "https://tokens.1inch.io/0x509a38b7a1cc0dcd83aa9d06214663d9ec7c7f4a.png"
+    ),
+  },
+  {
+    asset: {
+      chain: ETHChain,
+      symbol: "XDB-0xB9EefC4b0d472A44be93970254Df4f4016569d27",
+      ticker: "XDB",
+      synth: false,
+    },
+    iconUrl: O.some(
+      "https://tokens.1inch.io/0xb9eefc4b0d472a44be93970254df4f4016569d27.png"
+    ),
+  },
+  {
+    asset: {
+      chain: ETHChain,
+      symbol: "stkATOM-0x44017598f2AF1bD733F9D87b5017b4E7c1B28DDE",
+      ticker: "stkATOM",
+      synth: false,
+    },
+    iconUrl: O.some(
+      "https://tokens.1inch.io/0x44017598f2af1bd733f9d87b5017b4e7c1b28dde.png"
+    ),
   },
   {
     asset: {
@@ -12277,7 +10750,141 @@ export const ERC20_WHITELIST: { asset: Asset; iconUrl: O.Option<string> }[] = [
       ticker: "THOR",
       synth: false,
     },
-    iconUrl: O.none,
+    iconUrl: O.some(
+      "https://tokens.1inch.io/0xa5f2211b9b8170f694421f2046281775e8468044.png"
+    ),
+  },
+  {
+    asset: {
+      chain: ETHChain,
+      symbol: "FODL-0x4C2e59D098DF7b6cBaE0848d66DE2f8A4889b9C3",
+      ticker: "FODL",
+      synth: false,
+    },
+    iconUrl: O.some(
+      "https://tokens.1inch.io/0x4c2e59d098df7b6cbae0848d66de2f8a4889b9c3.png"
+    ),
+  },
+  {
+    asset: {
+      chain: ETHChain,
+      symbol: "APE-0x4d224452801ACEd8B2F0aebE155379bb5D594381",
+      ticker: "APE",
+      synth: false,
+    },
+    iconUrl: O.some(
+      "https://tokens.1inch.io/0x4d224452801aced8b2f0aebe155379bb5d594381.png"
+    ),
+  },
+  {
+    asset: {
+      chain: ETHChain,
+      symbol: "SAITAMA-0x8B3192f5eEBD8579568A2Ed41E6FEB402f93f73F",
+      ticker: "SAITAMA",
+      synth: false,
+    },
+    iconUrl: O.some(
+      "https://tokens.1inch.io/0x8b3192f5eebd8579568a2ed41e6feb402f93f73f.png"
+    ),
+  },
+  {
+    asset: {
+      chain: ETHChain,
+      symbol: "STG-0xAf5191B0De278C7286d6C7CC6ab6BB8A73bA2Cd6",
+      ticker: "STG",
+      synth: false,
+    },
+    iconUrl: O.some(
+      "https://tokens.1inch.io/0xaf5191b0de278c7286d6c7cc6ab6bb8a73ba2cd6.png"
+    ),
+  },
+  {
+    asset: {
+      chain: ETHChain,
+      symbol: "SLP-0xCC8Fa225D80b9c7D42F96e9570156c65D6cAAa25",
+      ticker: "SLP",
+      synth: false,
+    },
+    iconUrl: O.some(
+      "https://tokens.1inch.io/0xcc8fa225d80b9c7d42f96e9570156c65d6caaa25.png"
+    ),
+  },
+  {
+    asset: {
+      chain: ETHChain,
+      symbol: "STBU-0xa6422E3E219ee6d4C1B18895275FE43556fd50eD",
+      ticker: "STBU",
+      synth: false,
+    },
+    iconUrl: O.some(
+      "https://tokens.1inch.io/0xa6422e3e219ee6d4c1b18895275fe43556fd50ed.png"
+    ),
+  },
+  {
+    asset: {
+      chain: ETHChain,
+      symbol: "OHM-0x64aa3364F17a4D01c6f1751Fd97C2BD3D7e7f1D5",
+      ticker: "OHM",
+      synth: false,
+    },
+    iconUrl: O.some(
+      "https://tokens.1inch.io/0x64aa3364f17a4d01c6f1751fd97c2bd3d7e7f1d5.png"
+    ),
+  },
+  {
+    asset: {
+      chain: ETHChain,
+      symbol: "COW-0xDEf1CA1fb7FBcDC777520aa7f396b4E015F497aB",
+      ticker: "COW",
+      synth: false,
+    },
+    iconUrl: O.some(
+      "https://tokens.1inch.io/0xdef1ca1fb7fbcdc777520aa7f396b4e015f497ab.png"
+    ),
+  },
+  {
+    asset: {
+      chain: ETHChain,
+      symbol: "KNIGHT-0x3541A5C1b04AdABA0B83F161747815cd7B1516bC",
+      ticker: "KNIGHT",
+      synth: false,
+    },
+    iconUrl: O.some(
+      "https://tokens.1inch.io/0x3541a5c1b04adaba0b83f161747815cd7b1516bc.png"
+    ),
+  },
+  {
+    asset: {
+      chain: ETHChain,
+      symbol: "CULT-0xf0f9D895aCa5c8678f706FB8216fa22957685A13",
+      ticker: "CULT",
+      synth: false,
+    },
+    iconUrl: O.some(
+      "https://tokens.1inch.io/0xf0f9d895aca5c8678f706fb8216fa22957685a13.png"
+    ),
+  },
+  {
+    asset: {
+      chain: ETHChain,
+      symbol: "MLT-0x9506d37f70eB4C3d79C398d326C871aBBf10521d",
+      ticker: "MLT",
+      synth: false,
+    },
+    iconUrl: O.some(
+      "https://tokens.1inch.io/0x9506d37f70eb4c3d79c398d326c871abbf10521d.png"
+    ),
+  },
+  {
+    asset: {
+      chain: ETHChain,
+      symbol: "ORE-0x4f640F2529ee0cF119A2881485845FA8e61A782A",
+      ticker: "ORE",
+      synth: false,
+    },
+    iconUrl: O.some(
+      "https://tokens.1inch.io/0x4f640f2529ee0cf119a2881485845fa8e61a782a.png"
+    ),
   },
   {
     asset: {
@@ -12286,7 +10893,9 @@ export const ERC20_WHITELIST: { asset: Asset; iconUrl: O.Option<string> }[] = [
       ticker: "TGT",
       synth: false,
     },
-    iconUrl: O.none,
+    iconUrl: O.some(
+      "https://assets.coingecko.com/coins/images/21843/small/tgt_logo.png"
+    ),
   },
   {
     asset: {
@@ -12295,7 +10904,9 @@ export const ERC20_WHITELIST: { asset: Asset; iconUrl: O.Option<string> }[] = [
       ticker: "XRUNE",
       synth: false,
     },
-    iconUrl: O.none,
+    iconUrl: O.some(
+      "https://assets.coingecko.com/coins/images/16835/small/thorstarter.jpg"
+    ),
   },
   {
     asset: {

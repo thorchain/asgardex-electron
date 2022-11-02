@@ -1,8 +1,7 @@
 import * as RD from '@devexperts/remote-data-ts'
 import { useCallback, useState } from '@storybook/addons'
 import { ComponentMeta, StoryFn } from '@storybook/react'
-import { Address } from '@xchainjs/xchain-client'
-import { baseAmount } from '@xchainjs/xchain-util'
+import { Address, baseAmount } from '@xchainjs/xchain-util'
 
 import { AddressValidation } from '../../services/clients'
 import { NodeStatusEnum } from '../../types/generated/thornode'

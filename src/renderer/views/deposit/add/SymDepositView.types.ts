@@ -1,4 +1,4 @@
-import { Address } from '@xchainjs/xchain-client'
+import { Address } from '@xchainjs/xchain-util'
 import { Chain } from '@xchainjs/xchain-util'
 
 import { PoolDetailRD } from '../../../services/midgard/types'

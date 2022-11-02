@@ -1,8 +1,7 @@
 import React, { useCallback, useEffect, useMemo } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
-import { Address } from '@xchainjs/xchain-client'
-import { Asset, assetToString, BNBChain, Chain, ETHChain, THORChain } from '@xchainjs/xchain-util'
+import { Address, Asset, assetToString, BNBChain, Chain, ETHChain, THORChain } from '@xchainjs/xchain-util'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/Option'
 import { useObservableState } from 'observable-hooks'
@@ -17,6 +16,7 @@ import { BackLink } from '../../../components/uielements/backLink'
 import { useAppContext } from '../../../contexts/AppContext'
 import { useChainContext } from '../../../contexts/ChainContext'
 import { useMidgardContext } from '../../../contexts/MidgardContext'
+import { useThorchainContext } from '../../../contexts/ThorchainContext'
 import { useWalletContext } from '../../../contexts/WalletContext'
 import { isNonNativeRuneAsset } from '../../../helpers/assetHelper'
 import { eqOAsset } from '../../../helpers/fp/eq'
@@ -113,9 +113,11 @@ export const UpgradeView: React.FC<Props> = (): JSX.Element => {
 
   const {
     service: {
-      pools: { poolAddressesByChain$, reloadInboundAddresses }
+      pools: { poolAddressesByChain$ }
     }
   } = useMidgardContext()
+
+  const { reloadInboundAddresses } = useThorchainContext()
 
   // reload inbound addresses at `onMount` to get always latest `pool address`
   useEffect(() => {

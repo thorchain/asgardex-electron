@@ -2,13 +2,11 @@ import React, { useCallback, useEffect, useMemo, useState } from 'react'
 
 import { SearchOutlined } from '@ant-design/icons'
 import * as RD from '@devexperts/remote-data-ts'
-import { Address } from '@xchainjs/xchain-client'
 import {
   Asset,
   BNBChain,
   THORChain,
   ETHChain,
-  PolkadotChain,
   BCHChain,
   BTCChain,
   LTCChain,
@@ -16,7 +14,9 @@ import {
   Chain,
   DOGEChain,
   TerraChain,
-  chainToString
+  chainToString,
+  AVAXChain,
+  Address
 } from '@xchainjs/xchain-util'
 import { List, Collapse, RadioChangeEvent } from 'antd'
 import * as FP from 'fp-ts/function'
@@ -166,7 +166,7 @@ export const WalletSettings: React.FC<Props> = (props): JSX.Element => {
     [THORChain]: 0,
     [ETHChain]: 0,
     [CosmosChain]: 0,
-    [PolkadotChain]: 0, // not supported in ASGDX, but part of xchain-util
+    [AVAXChain]: 0, // not supported in ASGDX yet, but part of xchain-util
     [DOGEChain]: 0,
     [TerraChain]: 0 // not supported in ASGDX anymore, but part of xchain-util
   })

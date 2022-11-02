@@ -1,7 +1,6 @@
 import * as RD from '@devexperts/remote-data-ts'
-import { Address } from '@xchainjs/xchain-client'
 import { DepositParam } from '@xchainjs/xchain-thorchain'
-import { AssetRuneNative } from '@xchainjs/xchain-util'
+import { Address, AssetRuneNative } from '@xchainjs/xchain-util'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
 import * as Rx from 'rxjs'

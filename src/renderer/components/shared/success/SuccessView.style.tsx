@@ -1,46 +1,10 @@
-import { CheckCircleOutlined } from '@ant-design/icons'
-import * as A from 'antd'
 import styled from 'styled-components'
 import { palette } from 'styled-theme'
 
-import { media } from '../../../helpers/styleHelper'
+import { Icon as ResultIcon } from '../result/ResultView.styles'
 
-export const Result = styled(A.Result)`
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding: 150px 20px;
-  ${media.lg`
-    padding: 50px 10px;
-  `}
-  background-color: ${palette('background', 1)};
-
-  .ant-result-title {
-    font-size: 17px;
-    text-transform: uppercase;
-    color: ${palette('text', 0)};
-  }
-  .ant-result-subtitle {
-    color: ${palette('text', 1)};
-  }
-`
-export const IconWrapper = styled.div`
-  display: inline-block;
-  width: 100px;
-  height: 100px;
-  border-radius: 50%;
-  background: ${palette('background', 2)};
-`
-
-export const Icon = styled(CheckCircleOutlined)`
-  display: flex;
-  width: 100%;
-  height: 100%;
-  justify-content: center;
-  align-items: center;
+export const Icon = styled(ResultIcon)`
   svg {
-    width: 60px;
-    height: 60px;
     fill: ${palette('success', 0)};
   }
 `

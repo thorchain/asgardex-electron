@@ -3,7 +3,7 @@ import { DepositMessages } from '../types'
 const deposit: DepositMessages = {
   'deposit.interact.title': 'Dépôt',
   'deposit.interact.subtitle': 'Interagir avec THORChain',
-  'deposit.interact.label.bondprovider': 'Bond provider (optional) - FR',
+  'deposit.interact.label.bondprovider': 'Fournisseur de caution (facultatif)',
   'deposit.interact.actions.bond': 'Caution',
   'deposit.interact.actions.unbond': 'Retrait',
   'deposit.interact.actions.leave': 'Quitter',

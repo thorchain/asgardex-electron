@@ -1,8 +1,7 @@
 import React, { useCallback, useState } from 'react'
 
 import { Meta, Story } from '@storybook/react'
-import { Address } from '@xchainjs/xchain-client'
-import { baseAmount } from '@xchainjs/xchain-util'
+import { Address, baseAmount } from '@xchainjs/xchain-util'
 
 import { NodeStatusEnum } from '../../../types/generated/thornode'
 import { BondsTable } from './BondsTable'

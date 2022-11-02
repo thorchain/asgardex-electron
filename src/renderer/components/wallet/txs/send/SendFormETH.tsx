@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
 import { FeeOption, Fees, TxParams } from '@xchainjs/xchain-client'
-import { Address, validateAddress } from '@xchainjs/xchain-ethereum'
+import { validateAddress } from '@xchainjs/xchain-ethereum'
 import {
   formatAssetAmountCurrency,
   bn,
@@ -13,7 +13,8 @@ import {
   assetToBase,
   assetAmount,
   ETHChain,
-  chainToString
+  chainToString,
+  Address
 } from '@xchainjs/xchain-util'
 import { Row, Form } from 'antd'
 import { RadioChangeEvent } from 'antd/lib/radio'
@@ -37,6 +38,7 @@ import { SelectedWalletAsset, ValidatePasswordHandler } from '../../../../servic
 import { WalletBalance } from '../../../../services/wallet/types'
 import { LedgerConfirmationModal, WalletPasswordConfirmationModal } from '../../../modal/confirmation'
 import * as StyledR from '../../../shared/form/Radio.styles'
+import { FlatButton } from '../../../uielements/button'
 import { MaxBalanceButton } from '../../../uielements/button/MaxBalanceButton'
 import { UIFeesRD } from '../../../uielements/fees'
 import { Input, InputBigNumber } from '../../../uielements/input'
@@ -496,6 +498,8 @@ export const SendFormETH: React.FC<Props> = (props): JSX.Element => {
                 />
               </Styled.FormItem>
               <MaxBalanceButton
+                className="mb-10px"
+                color="neutral"
                 balance={{ amount: maxAmount, asset }}
                 onClick={addMaxAmountHandler}
                 disabled={isLoading}
@@ -508,11 +512,14 @@ export const SendFormETH: React.FC<Props> = (props): JSX.Element => {
               </Form.Item>
               <Form.Item name="fee">{renderFeeOptions}</Form.Item>
             </Styled.SubForm>
-            <Styled.SubmitContainer>
-              <Styled.Button loading={isLoading} disabled={!feesAvailable || isLoading} htmlType="submit">
-                {intl.formatMessage({ id: 'wallet.action.send' })}
-              </Styled.Button>
-            </Styled.SubmitContainer>
+            <FlatButton
+              className="mt-40px min-w-[200px]"
+              loading={isLoading}
+              disabled={!feesAvailable || isLoading}
+              type="submit"
+              size="large">
+              {intl.formatMessage({ id: 'wallet.action.send' })}
+            </FlatButton>
           </Styled.Form>
         </Styled.Col>
       </Row>

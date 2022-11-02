@@ -1,6 +1,9 @@
 import * as RD from '@devexperts/remote-data-ts'
+import { COSMOS_DECIMAL } from '@xchainjs/xchain-cosmos'
+import { ETH_DECIMAL } from '@xchainjs/xchain-ethereum'
 import {
   assetAmount,
+  AssetAtom,
   AssetBNB,
   AssetBTC,
   AssetETH,
@@ -8,11 +11,13 @@ import {
   AssetRuneNative,
   assetToBase,
   assetToString,
+  baseAmount,
   BCHChain,
   bn,
   BNBChain,
   BTCChain,
   Chain,
+  CosmosChain,
   ETHChain,
   LTCChain,
   THORChain
@@ -29,7 +34,7 @@ import {
 } from '../../../shared/mock/amount'
 import { PRICE_POOLS_WHITELIST, AssetBUSDBAF, AssetUSDC, AssetUSDTDAC, AssetBUSD74E } from '../../const'
 import { BNB_DECIMAL } from '../../helpers/assetHelper'
-import { eqAsset, eqPoolShare, eqPoolShares, eqOBigNumber } from '../../helpers/fp/eq'
+import { eqAsset, eqPoolShare, eqPoolShares, eqOAssetWithAmount } from '../../helpers/fp/eq'
 import { RUNE_POOL_ADDRESS, RUNE_PRICE_POOL } from '../../helpers/poolHelper'
 import { PoolDetail } from '../../types/generated/midgard'
 import { PricePool, PricePools } from '../../views/pools/Pools.types'
@@ -49,7 +54,7 @@ import {
   getPoolAssetDetail,
   getPoolAssetsDetail,
   inboundToPoolAddresses,
-  getGasRateByChain,
+  getOutboundAssetFeeByChain,
   getSymSharesByAddress
 } from './utils'
 
@@ -501,29 +506,63 @@ describe('services/midgard/utils/', () => {
       })
     })
 
-    describe('getGasRateByChain', () => {
-      const data: { chain: Chain; gas_rate?: string }[] = [
-        { chain: BNBChain, gas_rate: '1' },
-        { chain: ETHChain, gas_rate: '2' },
-        { chain: BTCChain, gas_rate: '3' },
-        { chain: LTCChain }, // no gas rate
-        { chain: BCHChain, gas_rate: 'invalid' } // invalid gas rate
+    describe('getOutboundAssetFeeByChain', () => {
+      const data: { chain: Chain; outbound_fee?: string }[] = [
+        { chain: BNBChain, outbound_fee: '1' },
+        { chain: ETHChain, outbound_fee: '2' },
+        { chain: CosmosChain, outbound_fee: '300' },
+        { chain: LTCChain }, // no value
+        { chain: BCHChain, outbound_fee: 'invalid' } // invalid value
       ]
 
-      it('gas rate for BNB', () => {
-        const result = getGasRateByChain(data, BNBChain)
-        expect(eqOBigNumber.equals(result, O.some(bn(1)))).toBeTruthy()
+      it('BNB', () => {
+        const result = getOutboundAssetFeeByChain(data, BNBChain)
+        expect(
+          eqOAssetWithAmount.equals(
+            result,
+            O.some({
+              asset: AssetBNB,
+              amount: baseAmount(1, BNB_DECIMAL)
+            })
+          )
+        ).toBeTruthy()
       })
-      it('gas rate for ETH', () => {
-        const result = getGasRateByChain(data, ETHChain)
-        expect(eqOBigNumber.equals(result, O.some(bn(2)))).toBeTruthy()
+      it('ETH', () => {
+        const result = getOutboundAssetFeeByChain(data, ETHChain)
+        expect(
+          eqOAssetWithAmount.equals(
+            result,
+            O.some({
+              asset: AssetETH,
+              // "2" (1e8) in THORChain will be "20000000000" (1e18) at ETH
+              amount: baseAmount(20000000000, ETH_DECIMAL)
+            })
+          )
+        ).toBeTruthy()
       })
-      it('none for missing gas rate (LTC)', () => {
-        const result = getGasRateByChain(data, LTCChain)
+      it('Cosmos', () => {
+        const result = getOutboundAssetFeeByChain(data, CosmosChain)
+        expect(
+          eqOAssetWithAmount.equals(
+            result,
+            O.some({
+              asset: AssetAtom,
+              // "300" (1e8) in THORChain will be "3" (1e6) at COSMOS
+              amount: baseAmount(3, COSMOS_DECIMAL)
+            })
+          )
+        ).toBeTruthy()
+      })
+      it('none for missing value (LTC)', () => {
+        const result = getOutboundAssetFeeByChain(data, LTCChain)
         expect(result).toBeNone()
       })
-      it('none for invalid gas rate (BCH)', () => {
-        const result = getGasRateByChain(data, BCHChain)
+      it('none for invalid value (BCH)', () => {
+        const result = getOutboundAssetFeeByChain(data, BCHChain)
+        expect(result).toBeNone()
+      })
+      it('none for THORChain', () => {
+        const result = getOutboundAssetFeeByChain(data, THORChain)
         expect(result).toBeNone()
       })
     })

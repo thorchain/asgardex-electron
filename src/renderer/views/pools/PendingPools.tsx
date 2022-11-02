@@ -18,6 +18,7 @@ import { ProtocolLimit, IncentivePendulum } from '../../components/pool'
 import { Table } from '../../components/uielements/table'
 import { useAppContext } from '../../contexts/AppContext'
 import { useMidgardContext } from '../../contexts/MidgardContext'
+import { useThorchainContext } from '../../contexts/ThorchainContext'
 import * as PoolHelpers from '../../helpers/poolHelper'
 import { getPoolTableRowsData, RUNE_PRICE_POOL } from '../../helpers/poolHelper'
 import { useIncentivePendulum } from '../../hooks/useIncentivePendulum'
@@ -27,7 +28,8 @@ import { usePoolWatchlist } from '../../hooks/usePoolWatchlist'
 import { useProtocolLimit } from '../../hooks/useProtocolLimit'
 import * as poolsRoutes from '../../routes/pools'
 import { DEFAULT_NETWORK } from '../../services/const'
-import { PendingPoolsState, DEFAULT_POOL_FILTERS, ThorchainLastblockRD } from '../../services/midgard/types'
+import { PendingPoolsState, DEFAULT_POOL_FILTERS } from '../../services/midgard/types'
+import { ThorchainLastblockRD } from '../../services/thorchain/types'
 import { PoolDetail } from '../../types/generated/midgard'
 import { PoolsComponentProps, PoolTableRowData, PoolTableRowsData } from './Pools.types'
 import { getBlocksLeftForPendingPoolAsString, isEmptyPool } from './Pools.utils'
@@ -45,10 +47,11 @@ export const PendingPools: React.FC<PoolsComponentProps> = ({ haltedChains, mimi
 
   const {
     service: {
-      thorchainLastblockState$,
       pools: { pendingPoolsState$, reloadPendingPools, selectedPricePool$ }
     }
   } = useMidgardContext()
+
+  const { thorchainLastblockState$ } = useThorchainContext()
 
   const { setFilter: setPoolFilter, filter: poolFilter } = usePoolFilter('pending')
   const { add: addPoolToWatchlist, remove: removePoolFromWatchlist, list: poolWatchList } = usePoolWatchlist()

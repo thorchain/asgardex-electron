@@ -1,5 +1,5 @@
 import * as RD from '@devexperts/remote-data-ts'
-import { Asset, assetFromString, assetToString, bn, Chain, currencySymbolByAsset, isChain } from '@xchainjs/xchain-util'
+import { Asset, assetFromString, assetToString, bn, Chain, currencySymbolByAsset } from '@xchainjs/xchain-util'
 import BigNumber from 'bignumber.js'
 import * as A from 'fp-ts/Array'
 import * as FP from 'fp-ts/lib/function'
@@ -28,6 +28,8 @@ import {
 } from '../../types/generated/midgard/apis'
 import { PricePool, PricePoolAsset, PricePools } from '../../views/pools/Pools.types'
 import { network$ } from '../app/service'
+import { PoolFeeLD } from '../chain/types'
+import { InboundAddresses, InboundAddressesLD } from '../thorchain/types'
 import { ErrorId } from '../wallet/types'
 import {
   PoolAssetDetailsLD,
@@ -55,10 +57,7 @@ import {
   ApiGetDepthHistoryParams,
   EarningsHistoryLD,
   PoolEarningHistoryLD,
-  InboundAddressesLD,
   PoolAddresses,
-  InboundAddresses,
-  GasRateLD,
   PoolsState,
   HaltedChainsLD,
   SelectedPoolAsset,
@@ -72,7 +71,7 @@ import {
   pricePoolSelector,
   pricePoolSelectorFromRD,
   inboundToPoolAddresses,
-  getGasRateByChain,
+  getOutboundAssetFeeByChain,
   toPoolsData
 } from './utils'
 
@@ -89,11 +88,19 @@ const getStoredSelectedPricePoolAsset = (): SelectedPricePoolAsset =>
 
 const roundToFiveMinutes = roundUnixTimestampToMinutes(5)
 
-const createPoolsService = (
-  midgardUrl$: MidgardUrlLD,
-  getMidgardDefaultApi: (basePath: string) => DefaultApi,
+const createPoolsService = ({
+  midgardUrl$,
+  getMidgardDefaultApi,
+  selectedPoolAsset$,
+  loadInboundAddresses$,
+  inboundAddressesShared$
+}: {
+  midgardUrl$: MidgardUrlLD
+  getMidgardDefaultApi: (basePath: string) => DefaultApi
   selectedPoolAsset$: Rx.Observable<SelectedPoolAsset>
-): PoolsService => {
+  loadInboundAddresses$: () => InboundAddressesLD
+  inboundAddressesShared$: InboundAddressesLD
+}): PoolsService => {
   const midgardDefaultApi$ = FP.pipe(midgardUrl$, liveData.map(getMidgardDefaultApi), RxOp.shareReplay(1))
 
   const {
@@ -475,43 +482,6 @@ const createPoolsService = (
     RxOp.map(([poolsState, selectedPricePoolAsset]) => pricePoolSelectorFromRD(poolsState, selectedPricePoolAsset))
   )
 
-  const loadInboundAddresses$ = (): InboundAddressesLD =>
-    FP.pipe(
-      midgardDefaultApi$,
-      liveData.chain((api) => {
-        return FP.pipe(
-          api.getProxiedInboundAddresses(),
-          RxOp.map(RD.success),
-          // Accept valid chains only
-          liveData.map(
-            FP.flow(A.filterMap(({ chain, ...rest }) => (isChain(chain) ? O.some({ chain, ...rest }) : O.none)))
-          ),
-
-          RxOp.catchError((e: Error) => Rx.of(RD.failure(e))),
-          RxOp.startWith(RD.pending)
-        )
-      }),
-      RxOp.catchError((e: Error) => Rx.of(RD.failure(e)))
-    )
-
-  // Trigger to reload pool addresses (`inbound_addresses`)
-  const { stream$: reloadInboundAddresses$, trigger: reloadInboundAddresses } = triggerStream()
-  const inboundAddressesInterval$ = Rx.timer(0 /* no delay for first value */, 5 * 60 * 1000 /* delay of 5 min  */)
-
-  /**
-   * Get's inbound addresses once and share result by next subscription
-   *
-   * It will be updated using a timer defined in `inboundAddressesInterval`
-   * or by reloading of data possible by `reloadInboundAddresses`
-   */
-  const inboundAddressesShared$: InboundAddressesLD = FP.pipe(
-    Rx.combineLatest([reloadInboundAddresses$, inboundAddressesInterval$]),
-    // debounce it, reloadInboundAddresses might be called by UI many times
-    RxOp.debounceTime(300),
-    RxOp.switchMap((_) => loadInboundAddresses$()),
-    RxOp.shareReplay(1)
-  )
-
   const haltedChains$: HaltedChainsLD = FP.pipe(
     inboundAddressesShared$,
     liveData.map(A.filterMap((inboundAddress) => (inboundAddress.halted ? O.some(inboundAddress.chain) : O.none)))
@@ -553,27 +523,19 @@ const createPoolsService = (
     )
 
   /**
-   * Reloads gas rates
+   * (Cached) outbound fees by given chain
+   * Note: Fees are for asset side only (not RUNE)
    *
-   * Note: Since `gasRateByChain$` depends on `inboundAddressesShared`
-   * we do need to call `reloadInboundAddresses`
-   */
-  const reloadGasRates = () => {
-    reloadInboundAddresses()
-  }
-  /**
-   * Get's (cached) gas rates by given chain
-   *
-   * It will be updated as soon as `inboundAddressesInterval` is triggered
-   * or by reloading via `reloadInboundAddresses`
+   * Fees will be updated as soon as `inboundAddressesInterval` is triggered
+   * OR by reloading via `reloadInboundAddresses`
    * All defined in `inboundAddressesShared$`
    */
-  const gasRateByChain$ = (chain: Chain): GasRateLD =>
+  const outboundAssetFeeByChain$ = (chain: Chain): PoolFeeLD =>
     FP.pipe(
       inboundAddressesShared$,
-      liveData.map((addresses: InboundAddresses) => getGasRateByChain(addresses, chain)),
+      liveData.map((addresses: InboundAddresses) => getOutboundAssetFeeByChain(addresses, chain)),
       // Add error in case no address could be found
-      liveData.chain(liveData.fromOption(() => Error(`Could not find gas rate for ${chain}`)))
+      liveData.chain(liveData.fromOption(() => Error(`Could not find outbound fee for ${chain}`)))
     )
 
   /**
@@ -880,7 +842,6 @@ const createPoolsService = (
     reloadAllPools,
     selectedPoolAddress$,
     poolAddressesByChain$,
-    reloadInboundAddresses,
     selectedPoolDetail$,
     reloadSelectedPoolDetail: (delayTime = 0) => _reloadSelectedPoolDetail(delayTime),
     reloadLiquidityHistory,
@@ -894,15 +855,13 @@ const createPoolsService = (
     apiGetLiquidityHistory$,
     reloadSwapHistory,
     getDepthHistory$,
-    inboundAddressesShared$,
     reloadDepthHistory,
     priceRatio$,
     availableAssets$,
     validatePool$,
     poolsFilters$,
     setPoolsFilter,
-    gasRateByChain$,
-    reloadGasRates,
+    outboundAssetFeeByChain$,
     haltedChains$
   }
 }

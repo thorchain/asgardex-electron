@@ -4,7 +4,8 @@ import {
   client$,
   clientState$,
   clientUrl$,
-  setClientUrl,
+  setThornodeRpcUrl,
+  setThornodeApiUrl,
   address$,
   addressUI$,
   balances$,
@@ -22,6 +23,12 @@ import {
   explorerUrl$,
   mimir$,
   reloadMimir,
+  inboundAddressesShared$,
+  reloadInboundAddresses,
+  reloadThorchainConstants,
+  thorchainConstantsState$,
+  thorchainLastblockState$,
+  reloadThorchainLastblock,
   getLiquidityProviders,
   reloadLiquidityProviders
 } from '../services/thorchain'
@@ -30,7 +37,8 @@ export type ThorchainContextValue = {
   client$: typeof client$
   clientState$: typeof clientState$
   clientUrl$: typeof clientUrl$
-  setClientUrl: typeof setClientUrl
+  setThornodeRpcUrl: typeof setThornodeRpcUrl
+  setThornodeApiUrl: typeof setThornodeApiUrl
   address$: typeof address$
   addressUI$: typeof addressUI$
   reloadBalances: typeof reloadBalances
@@ -48,6 +56,12 @@ export type ThorchainContextValue = {
   reloadNodeInfos: typeof reloadNodeInfos
   mimir$: typeof mimir$
   reloadMimir: typeof reloadMimir
+  inboundAddressesShared$: typeof inboundAddressesShared$
+  reloadInboundAddresses: typeof reloadInboundAddresses
+  thorchainConstantsState$: typeof thorchainConstantsState$
+  reloadThorchainConstants: typeof reloadThorchainConstants
+  thorchainLastblockState$: typeof thorchainLastblockState$
+  reloadThorchainLastblock: typeof reloadThorchainLastblock
   getLiquidityProviders: typeof getLiquidityProviders
   reloadLiquidityProviders: typeof reloadLiquidityProviders
 }
@@ -56,7 +70,8 @@ const initialContext: ThorchainContextValue = {
   client$,
   clientState$,
   clientUrl$,
-  setClientUrl,
+  setThornodeRpcUrl,
+  setThornodeApiUrl,
   address$,
   addressUI$,
   reloadBalances,
@@ -74,6 +89,12 @@ const initialContext: ThorchainContextValue = {
   reloadNodeInfos,
   mimir$,
   reloadMimir,
+  inboundAddressesShared$,
+  reloadInboundAddresses,
+  reloadThorchainConstants,
+  thorchainConstantsState$,
+  thorchainLastblockState$,
+  reloadThorchainLastblock,
   getLiquidityProviders,
   reloadLiquidityProviders
 }

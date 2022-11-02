@@ -1,6 +1,6 @@
 import React, { RefObject, useCallback, useMemo, useRef } from 'react'
 
-import { Address } from '@xchainjs/xchain-client'
+import { Address } from '@xchainjs/xchain-util'
 import {
   formatBN,
   BaseAmount,

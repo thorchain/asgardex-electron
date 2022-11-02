@@ -1,6 +1,6 @@
 import React from 'react'
 
-import { DocumentDuplicateIcon, CheckIcon } from '@heroicons/react/outline'
+import { DocumentDuplicateIcon, CheckIcon } from '@heroicons/react/24/outline'
 import * as A from 'antd'
 import { TextProps } from 'antd/lib/typography/Text'
 
@@ -12,7 +12,7 @@ type Props = {
 } & TextProps
 
 export const CopyLabel: React.FC<Props> = ({ label, textToCopy, className = '' }): JSX.Element => {
-  const Label = () => <span className="mr-5px font-main uppercase text-inherit">{label}</span>
+  const Label = () => <span className={`mr-5px font-main uppercase text-inherit ${className}`}>{label}</span>
   return (
     <A.Typography.Text
       className={`flex items-center text-turquoise ${className}`}

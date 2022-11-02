@@ -27,7 +27,7 @@ const meta: ComponentMeta<typeof Component> = {
     reloadVolume24Price: () => console.log('reload volume24 price'),
     setSelectedPricePool: () => console.log('setSelectedPricePool'),
     selectedPricePoolAsset: O.some(AssetRuneNative),
-    inboundAddresses: RD.initial,
+    midgardStatus: RD.initial,
     mimir: RD.initial,
     midgardUrl: RD.success('midgard-url'),
     thorchainNodeUrl: 'thorchain-node-url',

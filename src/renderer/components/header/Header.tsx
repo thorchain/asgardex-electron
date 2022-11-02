@@ -23,8 +23,9 @@ export const Header: React.FC = (): JSX.Element => {
   const mimir = useObservableState(mimir$, RD.initial)
   const { service: midgardService } = useMidgardContext()
   const {
-    pools: { setSelectedPricePoolAsset: setSelectedPricePool, selectedPricePoolAsset$, inboundAddressesShared$ },
-    apiEndpoint$
+    pools: { setSelectedPricePoolAsset: setSelectedPricePool, selectedPricePoolAsset$ },
+    apiEndpoint$,
+    healthStatus$
   } = midgardService
 
   const { network } = useNetwork()
@@ -36,7 +37,7 @@ export const Header: React.FC = (): JSX.Element => {
 
   const pricePools = usePricePools()
 
-  const inboundAddresses = useObservableState(inboundAddressesShared$, RD.initial)
+  const midgardStatusRD = useObservableState(healthStatus$, RD.initial)
 
   const midgardUrlRD = useObservableState(apiEndpoint$, RD.initial)
   const { node: thorchainNodeUrl, rpc: thorchainRpcUrl } = useThorchainClientUrl()
@@ -55,7 +56,7 @@ export const Header: React.FC = (): JSX.Element => {
       volume24Price={volume24PriceRD}
       reloadVolume24Price={reloadVolume24Price}
       selectedPricePoolAsset={oSelectedPricePoolAsset}
-      inboundAddresses={inboundAddresses}
+      midgardStatus={midgardStatusRD}
       mimir={mimir}
       midgardUrl={midgardUrlRD}
       thorchainNodeUrl={thorchainNodeUrl}

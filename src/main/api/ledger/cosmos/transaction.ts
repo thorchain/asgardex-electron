@@ -2,23 +2,23 @@ import { AminoMsgSend, AminoTypes, Coin } from '@cosmjs/stargate'
 import { cosmosclient, proto, rest } from '@cosmos-client/core'
 import CosmosApp from '@ledgerhq/hw-app-cosmos'
 import type Transport from '@ledgerhq/hw-transport'
-import { Address, TxHash } from '@xchainjs/xchain-client'
+import { TxHash } from '@xchainjs/xchain-client'
 import {
   Client,
   DEFAULT_GAS_LIMIT,
-  getChainId,
   getDenom,
   protoFee,
   protoAuthInfo,
   protoMsgSend,
   protoTxBody
 } from '@xchainjs/xchain-cosmos'
-import { Asset, assetToString, BaseAmount } from '@xchainjs/xchain-util'
+import { Address, Asset, assetToString, BaseAmount } from '@xchainjs/xchain-util'
 import BigNumber from 'bignumber.js'
 import * as E from 'fp-ts/Either'
 import secp256k1 from 'secp256k1'
 import sortKeys from 'sort-keys'
 
+import { getChainId } from '../../../../shared/api/cosmos'
 import { LedgerError, LedgerErrorId, Network } from '../../../../shared/api/types'
 import { getClientUrls, INITIAL_CHAIN_IDS } from '../../../../shared/cosmos/client'
 import { toClientNetwork } from '../../../../shared/utils/client'
@@ -76,7 +76,12 @@ export const send = async ({
     const fee = protoFee({ denom, amount: feeAmount, gasLimit })
 
     const clientUrls = getClientUrls()
-    const chainId = await getChainId(clientUrls[clientNetwork])
+    const eChainId = await getChainId(clientUrls[clientNetwork])()
+    const chainId = E.getOrElse(() => '')(eChainId)
+
+    if (!chainId) {
+      throw Error(`Could not get Cosmos' chain id`)
+    }
 
     const app = new CosmosApp(transport)
     const path = getDerivationPath(walletIndex)

@@ -1,22 +1,57 @@
-# 1.18.2 (2022-xx-xx)
+# 1.18.3 (2022-11-03)
+
+## Update
+
+- [Swap] Redesign [#2430](https://github.com/thorchain/asgardex-electron/pull/2430), [#2432](https://github.com/thorchain/asgardex-electron/pull/2432)
+- Refactor `AssetMenu` component [#2429](https://github.com/thorchain/asgardex-electron/pull/2429)
+- Redesign AssetSelect [#2426](https://github.com/thorchain/asgardex-electron/pull/2426)
+- Upgrade to heroicons@2.x [#2425](https://github.com/thorchain/asgardex-electron/pull/2425)
+- Move handling of LastBlock from Midgard to THORNode [#2419](https://github.com/thorchain/asgardex-electron/pull/2419)
+- Move handling of Constants from Midgard to THORNode [#2418](https://github.com/thorchain/asgardex-electron/pull/2418)
+- Update types/api for latest thornode@1.97.2 [#2412](https://github.com/thorchain/asgardex-electron/pull/2412)
+- Update types/api for latest midgard@2.9.4 [#2413](https://github.com/thorchain/asgardex-electron/pull/2413)
+- Update ERC20 whitelist based on latest thornode@1.97.2 [#2414](https://github.com/thorchain/asgardex-electron/pull/2414)
+- Get outbound fees from `inbound_addresses` [#2406](https://github.com/thorchain/asgardex-electron/issues/2406)
 
 ## Add
 
-[Header] Add wallet selector [#1576](https://github.com/thorchain/asgardex-electron/issues/1576)
+- `InputSearch` component [#2427](https://github.com/thorchain/asgardex-electron/pull/2427)
 
 ## Fix
 
-Add validation of wallet names to avoid duplications [#2386](https://github.com/thorchain/asgardex-electron/issues/2386)
+- AssetSelect: Scroll area breaks layout + dialog shouldn't close by clicking search input [#2428](https://github.com/thorchain/asgardex-electron/issues/2428)
+- Check Midgard status from its health endpoint [#2417](https://github.com/thorchain/asgardex-electron/issues/2417)
+
+# 1.18.2 (2022-10-03)
+
+## Add
+
+- [Header] Add wallet selector [#2392](https://github.com/thorchain/asgardex-electron/pull/2392)
+- [Settings] Persistent data of editable endpoints (Midgard, THORNode API|RPC) [#2387](https://github.com/thorchain/asgardex-electron/issues/2387), [#2393](https://github.com/thorchain/asgardex-electron/pull/2393), [#2409](https://github.com/thorchain/asgardex-electron/pull/2409)
+
+## Update
+
+- Translation of missing RU strings. Typo fixes. by @TreefeedXavier [#2401](https://github.com/thorchain/asgardex-electron/pull/2401)
+- Update fr translation by @Weyland2093 [#2403](https://github.com/thorchain/asgardex-electron/pull/2403)
+- Deprecate all `thorchain.info` API endpoints [#2400](https://github.com/thorchain/asgardex-electron/issues/2400)
+- Disable testnet [#2399](https://github.com/thorchain/asgardex-electron/issues/2399)
+
+## Fix
+
+- Add validation of wallet names to avoid duplications [#2386](https://github.com/thorchain/asgardex-electron/issues/2386)
+- Swap DOGE -> RUNE failed due maximum fee rate error [#2398](https://github.com/thorchain/asgardex-electron/issues/2398)
+- [Cosmos] Wallet is not available - https://cosmos-lcd.quickapi.com is down [#2404](https://github.com/thorchain/asgardex-electron/issues/2404)
 
 ## Internal
 
 - Upgrade to Yarn 3.x [#2389](https://github.com/thorchain/asgardex-electron/issues/2389)
+- Update xchain-\* libs [#2402](https://github.com/thorchain/asgardex-electron/pull/2402)
 
 # 1.18.1 (2022-09-18)
 
 ## Fix
 
-[BCH] Reintroduction of error `Expected property "1" of type BigInteger, got n` [#2394](https://github.com/thorchain/asgardex-electron/issues/2394)
+- [BCH] Reintroduction of error `Expected property "1" of type BigInteger, got n` [#2394](https://github.com/thorchain/asgardex-electron/issues/2394)
 
 # 1.18.0 (2022-08-29)
 

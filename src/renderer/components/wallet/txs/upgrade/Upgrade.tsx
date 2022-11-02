@@ -2,8 +2,9 @@ import React, { useMemo, useCallback, useState, useEffect } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
 import { getSwitchMemo } from '@thorchain/asgardex-util'
-import { Address, TxParams } from '@xchainjs/xchain-client'
+import { TxParams } from '@xchainjs/xchain-client'
 import {
+  Address,
   assetAmount,
   assetToBase,
   BaseAmount,
@@ -37,6 +38,7 @@ import { CommonUpgradeProps } from '../../../../views/wallet/upgrade/types'
 import { LedgerConfirmationModal, WalletPasswordConfirmationModal } from '../../../modal/confirmation'
 import { TxModal } from '../../../modal/tx'
 import { SendAsset } from '../../../modal/tx/extra/SendAsset'
+import { FlatButton } from '../../../uielements/button'
 import { MaxBalanceButton } from '../../../uielements/button/MaxBalanceButton'
 import { ViewTxButton } from '../../../uielements/button/ViewTxButton'
 import { UIFeesRD } from '../../../uielements/fees'
@@ -545,6 +547,8 @@ export const Upgrade: React.FC<Props> = (props): JSX.Element => {
                 <InputBigNumber size="large" disabled={isLoading} decimal={8} onChange={onChangeInput} />
               </Styled.FormItem>
               <MaxBalanceButton
+                className="mb-10px"
+                color="neutral"
                 balance={{ amount: maxAmount, asset }}
                 onClick={addMaxAmountHandler}
                 disabled={isLoading}
@@ -567,9 +571,14 @@ export const Upgrade: React.FC<Props> = (props): JSX.Element => {
             </Styled.SubForm>
             <Styled.SubmitContainer>
               <Styled.SubmitStatus>{txStatusMsg}</Styled.SubmitStatus>
-              <Styled.Button loading={isLoading} htmlType="submit" disabled={isDisabled}>
+              <FlatButton
+                className="min-w-[200px]"
+                loading={isLoading}
+                disabled={isDisabled}
+                type="submit"
+                size="large">
                 {intl.formatMessage({ id: 'wallet.action.upgrade' })}
-              </Styled.Button>
+              </FlatButton>
             </Styled.SubmitContainer>
           </Styled.Form>
         </CStyled.FormContainer>

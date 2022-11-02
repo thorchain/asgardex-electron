@@ -1,10 +1,10 @@
 import React, { useCallback, useEffect, useMemo } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
-import { Address } from '@xchainjs/xchain-client'
-import { Asset, AssetRuneNative, bnOrZero, Chain, THORChain } from '@xchainjs/xchain-util'
+import { Address, Asset, AssetRuneNative, assetToString, bn, Chain, THORChain } from '@xchainjs/xchain-util'
 import { Spin } from 'antd'
 import * as FP from 'fp-ts/function'
+import * as A from 'fp-ts/lib/Array'
 import * as O from 'fp-ts/lib/Option'
 import { useObservableState } from 'observable-hooks'
 import { useIntl } from 'react-intl'
@@ -12,18 +12,22 @@ import { useLocation, useNavigate, useParams } from 'react-router-dom'
 import * as RxOp from 'rxjs/operators'
 
 import { Network } from '../../../shared/api/types'
-import { SLIP_TOLERANCE_KEY } from '../../components/currency/CurrencyInfo'
 import { ErrorView } from '../../components/shared/error/'
 import { Swap } from '../../components/swap'
+import { SLIP_TOLERANCE_KEY } from '../../components/swap/SelectableSlipTolerance'
+import * as Utils from '../../components/swap/Swap.utils'
+import { BackLink } from '../../components/uielements/backLink'
 import { Button, RefreshButton } from '../../components/uielements/button'
 import { useAppContext } from '../../contexts/AppContext'
 import { useChainContext } from '../../contexts/ChainContext'
 import { useEthereumContext } from '../../contexts/EthereumContext'
 import { useMidgardContext } from '../../contexts/MidgardContext'
+import { useThorchainContext } from '../../contexts/ThorchainContext'
 import { useWalletContext } from '../../contexts/WalletContext'
-import { getAssetFromNullableString, isRuneNativeAsset } from '../../helpers/assetHelper'
+import { assetInList, getAssetFromNullableString } from '../../helpers/assetHelper'
 import { eqChain } from '../../helpers/fp/eq'
 import { sequenceTOption, sequenceTRD } from '../../helpers/fpHelpers'
+import { RUNE_PRICE_POOL } from '../../helpers/poolHelper'
 import { addressFromOptionalWalletAddress } from '../../helpers/walletHelper'
 import { useMimirHalt } from '../../hooks/useMimirHalt'
 import { useNetwork } from '../../hooks/useNetwork'
@@ -37,7 +41,6 @@ import { DEFAULT_SLIP_TOLERANCE } from '../../services/const'
 import { INITIAL_BALANCES_STATE, DEFAULT_BALANCES_FILTER } from '../../services/wallet/const'
 import { ledgerAddressToWalletAddress } from '../../services/wallet/util'
 import { isSlipTolerance, SlipTolerance } from '../../types/asgardex'
-import * as Styled from './SwapView.styles'
 
 type Props = { sourceAsset: Asset; targetAsset: Asset }
 
@@ -53,11 +56,16 @@ const SuccessRouteView: React.FC<Props> = ({ sourceAsset, targetAsset }): JSX.El
 
   const { network } = useNetwork()
 
+  const { reloadInboundAddresses } = useThorchainContext()
+
   const { service: midgardService } = useMidgardContext()
   const {
-    pools: { poolsState$, reloadPools, selectedPoolAddress$, reloadInboundAddresses, haltedChains$ },
+    pools: { poolsState$, reloadPools, selectedPoolAddress$, selectedPricePool$, haltedChains$ },
     setSelectedPoolAsset
   } = midgardService
+
+  const pricePool = useObservableState(selectedPricePool$, RUNE_PRICE_POOL)
+
   const { reloadSwapFees, swapFees$, addressByChain$, swap$, assetWithDecimal$ } = useChainContext()
 
   const {
@@ -116,16 +124,6 @@ const SuccessRouteView: React.FC<Props> = ({ sourceAsset, targetAsset }): JSX.El
   )
 
   const selectedPoolAddress = useObservableState(selectedPoolAddress$, O.none)
-
-  const [oSourceKeystoreAddress, updateSourceKeystoreAddress$] = useObservableState<O.Option<Address>, Chain>(
-    (sourceChain$) =>
-      FP.pipe(sourceChain$, RxOp.switchMap(addressByChain$), RxOp.map(addressFromOptionalWalletAddress)),
-    O.none
-  )
-
-  useEffect(() => {
-    updateSourceKeystoreAddress$(sourceChain)
-  }, [sourceChain, updateSourceKeystoreAddress$])
 
   const [oTargetKeystoreAddress, updateTargetKeystoreAddress$] = useObservableState<O.Option<Address>, Chain>(
     (targetChain$) =>
@@ -206,24 +204,6 @@ const SuccessRouteView: React.FC<Props> = ({ sourceAsset, targetAsset }): JSX.El
     [targetAssetRD]
   )
 
-  const [oSourceLedgerAddress, updateSourceLedgerAddress$] = useObservableState<
-    O.Option<Address>,
-    { chain: Chain; network: Network }
-  >(
-    (sourceLedgerAddressChain$) =>
-      FP.pipe(
-        sourceLedgerAddressChain$,
-        RxOp.switchMap(({ chain }) => getLedgerAddress$(chain)),
-        RxOp.map(O.map(ledgerAddressToWalletAddress)),
-        RxOp.map(addressFromOptionalWalletAddress)
-      ),
-    O.none
-  )
-
-  useEffect(() => {
-    updateSourceLedgerAddress$({ chain: sourceChain, network })
-  }, [network, sourceChain, updateSourceLedgerAddress$])
-
   const [oTargetLedgerAddress, updateTargetLedgerAddress$] = useObservableState<
     O.Option<Address>,
     { chain: Chain; network: Network }
@@ -247,23 +227,50 @@ const SuccessRouteView: React.FC<Props> = ({ sourceAsset, targetAsset }): JSX.El
 
   return (
     <>
-      <Styled.TopControlsContainer>
-        <Styled.BackLink />
+      <div className="mb-20px flex items-center justify-between">
+        <BackLink className="!m-0" />
         <RefreshButton clickHandler={reloadHandler} />
-      </Styled.TopControlsContainer>
-      <Styled.ContentContainer>
+      </div>
+
+      <div className="flex flex-col items-center justify-center bg-bg0 dark:bg-bg0d">
+        <div className="flex w-full justify-center border-b border-gray1 dark:border-gray1d">
+          <div className="border-b-[2px] border-turquoise py-10px px-10px font-mainSemiBold text-[16px] uppercase text-turquoise ">
+            {intl.formatMessage({ id: 'common.swap' })}
+          </div>
+        </div>
         {FP.pipe(
           sequenceTRD(poolsState, sourceAssetRD, targetAssetRD),
           RD.fold(
             () => <></>,
-            () => <Spin size="large" />,
+            () => (
+              <div className="flex min-h-[400px] items-center justify-center">
+                <Spin size="large" />
+              </div>
+            ),
             renderError,
-            ([{ assetDetails: availableAssets, poolsData }, sourceAsset, targetAsset]) => {
-              const hasRuneAsset = Boolean(availableAssets.find(({ asset }) => isRuneNativeAsset(asset)))
-
+            ([{ assetDetails, poolsData, poolDetails }, sourceAsset, targetAsset]) => {
+              const hasRuneAsset = FP.pipe(
+                assetDetails,
+                A.map(({ asset }) => asset),
+                assetInList(AssetRuneNative)
+              )
               if (!hasRuneAsset) {
-                availableAssets.unshift({ asset: AssetRuneNative, assetPrice: bnOrZero(1) })
+                assetDetails = [{ asset: AssetRuneNative, assetPrice: bn(1) }, ...assetDetails]
               }
+
+              const sourceAssetDetail = FP.pipe(Utils.pickPoolAsset(assetDetails, sourceAsset.asset), O.toNullable)
+              // Make sure sourceAsset is available in pools
+              if (!sourceAssetDetail)
+                return renderError(Error(`Missing pool for source asset ${assetToString(sourceAsset.asset)}`))
+              const targetAssetDetail = FP.pipe(Utils.pickPoolAsset(assetDetails, targetAsset.asset), O.toNullable)
+              // Make sure targetAsset is available in pools
+              if (!targetAssetDetail)
+                return renderError(Error(`Missing pool for target asset ${assetToString(targetAsset.asset)}`))
+
+              const poolAssets: Asset[] = FP.pipe(
+                assetDetails,
+                A.map(({ asset }) => asset)
+              )
 
               return (
                 <Swap
@@ -273,12 +280,15 @@ const SuccessRouteView: React.FC<Props> = ({ sourceAsset, targetAsset }): JSX.El
                   validatePassword$={validatePassword$}
                   goToTransaction={openExplorerTxUrl}
                   getExplorerTxUrl={getExplorerTxUrl}
-                  assets={{ inAsset: sourceAsset, outAsset: targetAsset }}
-                  sourceWalletAddress={oSourceKeystoreAddress}
-                  sourceLedgerAddress={oSourceLedgerAddress}
+                  assets={{
+                    source: { ...sourceAsset, price: sourceAssetDetail.assetPrice },
+                    target: { ...targetAsset, price: targetAssetDetail.assetPrice }
+                  }}
                   poolAddress={selectedPoolAddress}
-                  availableAssets={availableAssets}
+                  poolAssets={poolAssets}
                   poolsData={poolsData}
+                  pricePool={pricePool}
+                  poolDetails={poolDetails}
                   walletBalances={balancesState}
                   reloadFees={reloadSwapFees}
                   fees$={swapFees$}
@@ -302,7 +312,7 @@ const SuccessRouteView: React.FC<Props> = ({ sourceAsset, targetAsset }): JSX.El
             }
           )
         )}
-      </Styled.ContentContainer>
+      </div>
     </>
   )
 }

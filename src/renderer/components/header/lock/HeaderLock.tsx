@@ -2,7 +2,7 @@ import React, { useCallback, useMemo } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
 import { Listbox } from '@headlessui/react'
-import { PlusCircleIcon } from '@heroicons/react/outline'
+import { CheckIcon, ChevronDownIcon, PlusCircleIcon } from '@heroicons/react/24/outline'
 import * as A from 'fp-ts/lib/Array'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
@@ -20,7 +20,7 @@ import {
   KeystoreWalletsUI
 } from '../../../services/wallet/types'
 import * as WU from '../../../services/wallet/util'
-import { DownIcon, LockIcon, UnlockIcon } from '../../icons'
+import { LockIcon, UnlockIcon } from '../../icons'
 import { BaseButton } from '../../uielements/button'
 import { Tooltip } from '../../uielements/common/Common.styles'
 
@@ -82,9 +82,13 @@ export const HeaderLock: React.FC<Props> = (props): JSX.Element => {
         O.fold(
           () => <>no selected wallet</>,
           (selectedWallet) => (
-            <div className="flex h-[25px] items-center rounded-full bg-gray0 dark:bg-gray0d">
+            <div className="ease flex h-[25px] items-center rounded-full bg-gray0 dark:bg-gray0d ">
               <div
-                className="rounded-full border-4 border-gray0 bg-gray0 dark:border-gray0d dark:bg-gray0d"
+                className="ease
+                rounded-full border-4 border-gray0
+                bg-gray0
+                 dark:border-gray0d dark:bg-gray0d
+                 "
                 onClick={() => onPress()}>
                 {isLocked ? <LockIcon className="h-[28px] w-[28px]" /> : <UnlockIcon className="h-[28px] w-[28px]" />}
               </div>
@@ -93,6 +97,7 @@ export const HeaderLock: React.FC<Props> = (props): JSX.Element => {
                   <Listbox.Button
                     as="div"
                     className={`
+                    group
                   flex
                   cursor-pointer
                   items-center
@@ -109,11 +114,12 @@ export const HeaderLock: React.FC<Props> = (props): JSX.Element => {
                         <span className="w-full">
                           {truncateMiddle(selectedWallet.name, { start: 3, end: 3, max: 6 })}
                         </span>
-                        <DownIcon
+                        <ChevronDownIcon
                           className={`
                           ${open && 'rotate-180'}
-                          transition
-                          duration-500
+  ease
+                          h-20px w-20px
+                          group-hover:rotate-180
                           `}
                         />
                       </>
@@ -134,10 +140,14 @@ export const HeaderLock: React.FC<Props> = (props): JSX.Element => {
                     ">
                     {FP.pipe(
                       walletData,
-                      A.map((wallet) => (
-                        <Listbox.Option
-                          disabled={wallet.id === selectedWallet.id}
-                          className={({ selected }) => `select-none
+                      A.map((wallet) => {
+                        const selected = wallet.id === selectedWallet.id
+                        return (
+                          <Listbox.Option
+                            disabled={selected}
+                            className={({ selected }) => `
+                            flex select-none items-center
+                            justify-between
                     px-20px py-10px
                     ${selected && 'text-gray2 dark:text-gray2d'}
                     ${selected ? 'cursor-disabled' : 'cursor-pointer'}
@@ -147,11 +157,13 @@ export const HeaderLock: React.FC<Props> = (props): JSX.Element => {
                     dark:text-text1d
                     ${!selected && 'hover:dark:bg-gray0d hover:dark:text-gray2d'}
                     `}
-                          key={wallet.id}
-                          value={wallet}>
-                          {truncateMiddle(wallet.name, { start: 9, end: 9, max: 20 })}
-                        </Listbox.Option>
-                      ))
+                            key={wallet.id}
+                            value={wallet}>
+                            {truncateMiddle(wallet.name, { start: 9, end: 9, max: 20 })}
+                            {selected && <CheckIcon className="h-20px w-20px text-turquoise" />}
+                          </Listbox.Option>
+                        )
+                      })
                     )}
                   </Listbox.Options>
                 </div>
@@ -175,5 +187,5 @@ export const HeaderLock: React.FC<Props> = (props): JSX.Element => {
     [intl, navigate]
   )
 
-  return <div className="flex justify-center">{hasWallets ? renderWallets : renderAddWallet}</div>
+  return <div className="flex justify-center ">{hasWallets ? renderWallets : renderAddWallet}</div>
 }

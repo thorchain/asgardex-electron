@@ -1,9 +1,10 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
-import { Address, FeeOption, FeesWithRates } from '@xchainjs/xchain-client'
+import { FeeOption, FeesWithRates } from '@xchainjs/xchain-client'
 import { DOGE_DECIMAL } from '@xchainjs/xchain-doge'
 import {
+  Address,
   assetAmount,
   AssetDOGE,
   assetToBase,
@@ -34,6 +35,7 @@ import { SelectedWalletAsset, ValidatePasswordHandler } from '../../../../servic
 import { WalletBalance } from '../../../../services/wallet/types'
 import { LedgerConfirmationModal, WalletPasswordConfirmationModal } from '../../../modal/confirmation'
 import * as StyledR from '../../../shared/form/Radio.styles'
+import { FlatButton } from '../../../uielements/button'
 import { MaxBalanceButton } from '../../../uielements/button/MaxBalanceButton'
 import { UIFeesRD } from '../../../uielements/fees'
 import { InfoIcon } from '../../../uielements/info'
@@ -460,14 +462,15 @@ export const SendFormDOGE: React.FC<Props> = (props): JSX.Element => {
                   onChange={onChangeInput}
                 />
               </Styled.FormItem>
-              <Styled.MaxBalanceButtonContainer>
+              <div className="mb-10px flex items-center">
                 <MaxBalanceButton
+                  color="neutral"
                   balance={{ amount: maxAmount, asset: AssetDOGE }}
                   onClick={addMaxAmountHandler}
                   disabled={isMaxButtonDisabled}
                 />
                 <InfoIcon color="warning" tooltip={intl.formatMessage({ id: 'wallet.send.max.doge' })} />
-              </Styled.MaxBalanceButtonContainer>
+              </div>
               <Styled.Fees fees={uiFeesRD} reloadFees={reloadFees} disabled={isLoading} />
               {renderFeeError}
               <Styled.CustomLabel size="big">{intl.formatMessage({ id: 'common.memo' })}</Styled.CustomLabel>
@@ -476,11 +479,14 @@ export const SendFormDOGE: React.FC<Props> = (props): JSX.Element => {
               </Form.Item>
               <Form.Item name="feeRate">{renderFeeOptions}</Form.Item>
             </Styled.SubForm>
-            <Styled.SubmitContainer>
-              <Styled.Button loading={isLoading} disabled={!feesAvailable || isLoading} htmlType="submit">
-                {intl.formatMessage({ id: 'wallet.action.send' })}
-              </Styled.Button>
-            </Styled.SubmitContainer>
+            <FlatButton
+              className="mt-40px min-w-[200px]"
+              loading={isLoading}
+              disabled={!feesAvailable || isLoading}
+              type="submit"
+              size="large">
+              {intl.formatMessage({ id: 'wallet.action.send' })}
+            </FlatButton>
           </Styled.Form>
         </Styled.Col>
       </Row>

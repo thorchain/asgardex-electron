@@ -1,7 +1,7 @@
-import { AssetAtom } from '@xchainjs/xchain-cosmos'
 import { ETHAddress } from '@xchainjs/xchain-ethereum'
 import {
   assetAmount,
+  AssetAtom,
   AssetBCH,
   AssetBNB,
   AssetBTC,
@@ -13,8 +13,10 @@ import {
   AssetRuneERC20Testnet,
   AssetRuneNative,
   baseAmount,
-  BNBChain
+  BNBChain,
+  ETHChain
 } from '@xchainjs/xchain-util'
+import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
 
 import { ERC20_TESTNET } from '../../shared/mock/assets'
@@ -57,7 +59,8 @@ import {
   validAssetForETH,
   iconUrlInERC20Whitelist,
   isRuneAsset,
-  getAssetFromNullableString
+  getAssetFromNullableString,
+  assetInList
 } from './assetHelper'
 import { eqAsset, eqAssetAmount, eqBaseAmount, eqOAsset } from './fp/eq'
 
@@ -237,25 +240,38 @@ describe('helpers/assetHelper', () => {
   })
 
   describe('iconUrlInERC20Whitelist', () => {
-    it('USDT', () => {
+    it('USDT (w/ icon)', () => {
       expect(iconUrlInERC20Whitelist(AssetUSDTERC20)).toEqual(
         O.some('https://tokens.1inch.io/0xdac17f958d2ee523a2206206994597c13d831ec7.png')
       )
     })
 
-    it('XRUNE', () => {
-      expect(iconUrlInERC20Whitelist(AssetXRune)).toBeNone()
+    it('XRUNE (w/ icon)', () => {
+      expect(iconUrlInERC20Whitelist(AssetXRune)).toEqual(
+        O.some('https://assets.coingecko.com/coins/images/16835/small/thorstarter.jpg')
+      )
+    })
+
+    it('VIU (w/o icon)', () => {
+      expect(
+        iconUrlInERC20Whitelist({
+          chain: ETHChain,
+          symbol: 'VIU-0x519475b31653E46D20cD09F9FdcF3B12BDAcB4f5',
+          ticker: 'VIU',
+          synth: false
+        })
+      ).toBeNone()
     })
   })
 
   describe('addressInERC20Whitelist', () => {
-    it('USDT (white listed)', () => {
+    it('USDT (whitelisted)', () => {
       expect(addressInERC20Whitelist('0xdAC17F958D2ee523a2206206994597C13D831ec7')).toBeTruthy()
     })
-    it('XRUNE (white listed)', () => {
+    it('XRUNE (whitelisted)', () => {
       expect(addressInERC20Whitelist(AssetXRuneAddress)).toBeTruthy()
     })
-    it('UNIH (not white listed)', () => {
+    it('UNIH (not whitelisted)', () => {
       expect(addressInERC20Whitelist(AssetUniHAddress)).toBeFalsy()
     })
   })
@@ -281,6 +297,23 @@ describe('helpers/assetHelper', () => {
     })
     it('UNIH - mainnet', () => {
       expect(validAssetForETH(AssetUniH, 'mainnet')).toBeFalsy()
+    })
+  })
+
+  describe('assetInList', () => {
+    const list = [AssetBNB, AssetBTC, AssetRuneNative]
+
+    it('AssetBNB', () => {
+      expect(FP.pipe(list, assetInList(AssetBNB))).toBeTruthy()
+    })
+    it('AssetBTC', () => {
+      expect(FP.pipe(list, assetInList(AssetBTC))).toBeTruthy()
+    })
+    it('RUNE-67C', () => {
+      expect(FP.pipe(list, assetInList(AssetRune67C))).toBeFalsy()
+    })
+    it('AssetETH', () => {
+      expect(FP.pipe(list, assetInList(AssetETH))).toBeFalsy()
     })
   })
 

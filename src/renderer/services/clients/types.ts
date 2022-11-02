@@ -1,7 +1,7 @@
 import * as RD from '@devexperts/remote-data-ts'
-import { Address, TxHash, XChainClient } from '@xchainjs/xchain-client'
+import { TxHash, XChainClient } from '@xchainjs/xchain-client'
 import { TxsPage, Fees } from '@xchainjs/xchain-client'
-import { Asset } from '@xchainjs/xchain-util'
+import { Address, Asset } from '@xchainjs/xchain-util'
 import * as O from 'fp-ts/lib/Option'
 import * as Rx from 'rxjs'
 

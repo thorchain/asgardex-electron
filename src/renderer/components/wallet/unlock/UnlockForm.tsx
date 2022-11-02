@@ -120,7 +120,9 @@ export const UnlockForm: React.FC<Props> = (props): JSX.Element => {
       O.fold(
         () => <></>,
         (_: Error) => (
-          <p className="mt-2 font-main text-sm text-error0">{intl.formatMessage({ id: 'wallet.unlock.error' })}</p>
+          <p className="mt-2 font-main text-sm uppercase text-error0">
+            {intl.formatMessage({ id: 'wallet.unlock.error' })}
+          </p>
         )
       )(unlockError),
     [unlockError, intl]
@@ -201,10 +203,10 @@ export const UnlockForm: React.FC<Props> = (props): JSX.Element => {
             </h2>
             <InputPasswordTW
               id="password"
-              className="my-0 mx-auto mb-20px w-full max-w-[400px]"
+              className="my-0 mx-auto mb-20px w-full max-w-[300px]"
               {...register('password', { required: true })}
               placeholder={intl.formatMessage({ id: 'common.password' }).toUpperCase()}
-              size="large"
+              size="normal"
               autoFocus={true}
               error={errors.password ? intl.formatMessage({ id: 'wallet.password.empty' }) : ''}
               disabled={unlocking}
