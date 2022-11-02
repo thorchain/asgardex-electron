@@ -1,13 +1,13 @@
 import React from 'react'
 
 import { Listbox } from '@headlessui/react'
+import { CheckIcon, ChevronDownIcon } from '@heroicons/react/24/outline'
 import * as A from 'fp-ts/lib/Array'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
 
 import { KeystoreId } from '../../../../shared/api/types'
 import { KeystoreWalletsUI } from '../../../services/wallet/types'
-import { DownIcon } from '../../icons'
 
 export type Props = {
   wallets: KeystoreWalletsUI
@@ -41,29 +41,33 @@ export const WalletSelector: React.FC<Props> = (props): JSX.Element => {
           <div className={`relative ${className}`}>
             <Listbox.Button
               as="div"
-              className={`flex
-              cursor-pointer
-                    items-center
-                    bg-bg0
+              className={({ open }) => `group
+              flex
+              cursor-pointer items-center
+              bg-bg0
                     py-10px
-                   pl-20px pr-10px
-                   font-main
-                    text-14
-                    text-text0
-                    transition duration-300
-                    ease-in-out
+                    pl-20px
+                    pr-10px
+                   font-main text-14
+                   text-text0
+                    transition
+                    duration-300
+                    ease-in-out hover:shadow-full
+                    hover:dark:shadow-fulld
                     ${disabled && 'opacity-70'}
+                    ${open ? 'shadow-full dark:shadow-fulld' : ''}
                     dark:bg-bg0d
                     dark:text-text0d
                     `}>
               {({ open }) => (
                 <>
                   <span className="w-full">{selectedWallet.name}</span>
-                  <DownIcon
+                  <ChevronDownIcon
                     className={`
                   ${open && 'rotate-180'}
-                  transition
-                  duration-500
+                  ease
+                  h-20px w-20px
+                          group-hover:rotate-180
 
                   `}
                   />
@@ -72,35 +76,41 @@ export const WalletSelector: React.FC<Props> = (props): JSX.Element => {
             </Listbox.Button>
             <Listbox.Options
               className="
-              absolute
-            z-[2000] mt-1 max-h-60
-            w-full
-            overflow-auto
-             bg-bg0
+              absolute z-[2000]
+              mt-[0px]
+            max-h-60 w-full overflow-auto
+            border
+            border-gray0 bg-bg0
             focus:outline-none
-            dark:bg-bg0d
+            dark:border-gray0d  dark:bg-bg0d
             ">
               {FP.pipe(
                 wallets,
-                A.map((wallet) => (
-                  <Listbox.Option
-                    disabled={wallet.id === selectedWallet.id}
-                    className={({ selected }) =>
-                      `w-full select-none py-10px
-                      px-20px
+                A.map((wallet) => {
+                  const selected = wallet.id === selectedWallet.id
+                  return (
+                    <Listbox.Option
+                      disabled={wallet.id === selectedWallet.id}
+                      className={({ selected }) =>
+                        `flex w-full
+                      select-none
+                      items-center justify-between
+                      py-10px pr-10px pl-20px
                       ${selected && 'text-gray2 dark:text-gray2d'}
                       ${selected ? 'cursor-disabled' : 'cursor-pointer'}
-                      font-main text-14  text-text0
+                      font-main text-14 text-text0
                       dark:text-text0d
                       ${!selected && 'hover:bg-gray0 hover:text-gray2'}
                       ${!selected && 'hover:dark:bg-gray0d hover:dark:text-gray2d'}
                       `
-                    }
-                    key={wallet.id}
-                    value={wallet}>
-                    {wallet.name}
-                  </Listbox.Option>
-                ))
+                      }
+                      key={wallet.id}
+                      value={wallet}>
+                      {wallet.name}
+                      {selected && <CheckIcon className="h-20px w-20px text-turquoise" />}
+                    </Listbox.Option>
+                  )
+                })
               )}
             </Listbox.Options>
           </div>
