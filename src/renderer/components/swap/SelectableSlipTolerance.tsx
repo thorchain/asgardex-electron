@@ -35,7 +35,7 @@ export const SelectableSlipTolerance: React.FC<Props> = (props): JSX.Element => 
         {value.toString()} %
         <Cog8ToothIcon className="ease ml-5px h-[15px] w-[15px] text-gray2 group-hover:rotate-180 dark:text-gray2d" />
       </Popover.Button>
-      <Popover.Panel className="absolute z-10 translate-y-[-100%] translate-x-[-50%] bg-bg0 shadow dark:bg-bg0d ">
+      <Popover.Panel className="absolute z-10 translate-y-[-100%] translate-x-[-50%] bg-bg0 shadow-full dark:bg-bg0d dark:shadow-fulld ">
         {({ close }) => (
           <div>
             {FP.pipe(
