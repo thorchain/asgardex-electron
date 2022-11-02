@@ -125,16 +125,6 @@ const SuccessRouteView: React.FC<Props> = ({ sourceAsset, targetAsset }): JSX.El
 
   const selectedPoolAddress = useObservableState(selectedPoolAddress$, O.none)
 
-  const [oSourceKeystoreAddress, updateSourceKeystoreAddress$] = useObservableState<O.Option<Address>, Chain>(
-    (sourceChain$) =>
-      FP.pipe(sourceChain$, RxOp.switchMap(addressByChain$), RxOp.map(addressFromOptionalWalletAddress)),
-    O.none
-  )
-
-  useEffect(() => {
-    updateSourceKeystoreAddress$(sourceChain)
-  }, [sourceChain, updateSourceKeystoreAddress$])
-
   const [oTargetKeystoreAddress, updateTargetKeystoreAddress$] = useObservableState<O.Option<Address>, Chain>(
     (targetChain$) =>
       FP.pipe(targetChain$, RxOp.switchMap(addressByChain$), RxOp.map(addressFromOptionalWalletAddress)),
@@ -214,24 +204,6 @@ const SuccessRouteView: React.FC<Props> = ({ sourceAsset, targetAsset }): JSX.El
     [targetAssetRD]
   )
 
-  const [oSourceLedgerAddress, updateSourceLedgerAddress$] = useObservableState<
-    O.Option<Address>,
-    { chain: Chain; network: Network }
-  >(
-    (sourceLedgerAddressChain$) =>
-      FP.pipe(
-        sourceLedgerAddressChain$,
-        RxOp.switchMap(({ chain }) => getLedgerAddress$(chain)),
-        RxOp.map(O.map(ledgerAddressToWalletAddress)),
-        RxOp.map(addressFromOptionalWalletAddress)
-      ),
-    O.none
-  )
-
-  useEffect(() => {
-    updateSourceLedgerAddress$({ chain: sourceChain, network })
-  }, [network, sourceChain, updateSourceLedgerAddress$])
-
   const [oTargetLedgerAddress, updateTargetLedgerAddress$] = useObservableState<
     O.Option<Address>,
     { chain: Chain; network: Network }
@@ -302,8 +274,6 @@ const SuccessRouteView: React.FC<Props> = ({ sourceAsset, targetAsset }): JSX.El
                     source: { ...sourceAsset, price: sourceAssetDetail.assetPrice },
                     target: { ...targetAsset, price: targetAssetDetail.assetPrice }
                   }}
-                  sourceWalletAddress={oSourceKeystoreAddress}
-                  sourceLedgerAddress={oSourceLedgerAddress}
                   poolAddress={selectedPoolAddress}
                   poolAssets={poolAssets}
                   poolsData={poolsData}

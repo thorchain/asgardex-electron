@@ -1,7 +1,6 @@
 import styled from 'styled-components'
 import { palette } from 'styled-theme'
 
-import { CheckButton as CheckButtonUI } from '../../button/CheckButton'
 import { InputBigNumber as InputBigNumberUI } from '../../input'
 import { Label } from '../../label'
 import { AssetLabel as AssetLabelUI } from '../assetLabel'
@@ -113,10 +112,4 @@ export const WalletTypeContainer = styled.div`
   display: flex;
   flex-direction: row;
   align-items: center;
-`
-
-export const CheckButton = styled(CheckButtonUI)`
-  &.ant-btn {
-    font-size: 10px;
-  }
 `
