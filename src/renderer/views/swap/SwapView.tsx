@@ -231,12 +231,22 @@ const SuccessRouteView: React.FC<Props> = ({ sourceAsset, targetAsset }): JSX.El
         <BackLink className="!m-0" />
         <RefreshButton clickHandler={reloadHandler} />
       </div>
-      <div className="flex items-center justify-center bg-bg0 dark:bg-bg0d">
+
+      <div className="flex flex-col items-center justify-center bg-bg0 dark:bg-bg0d">
+        <div className="flex w-full justify-center border-b border-gray1 dark:border-gray1d">
+          <div className="border-b-[2px] border-turquoise py-10px px-10px font-mainSemiBold text-[16px] uppercase text-turquoise ">
+            {intl.formatMessage({ id: 'common.swap' })}
+          </div>
+        </div>
         {FP.pipe(
           sequenceTRD(poolsState, sourceAssetRD, targetAssetRD),
           RD.fold(
             () => <></>,
-            () => <Spin size="large" />,
+            () => (
+              <div className="flex min-h-[400px] items-center justify-center">
+                <Spin size="large" />
+              </div>
+            ),
             renderError,
             ([{ assetDetails, poolsData, poolDetails }, sourceAsset, targetAsset]) => {
               const hasRuneAsset = FP.pipe(

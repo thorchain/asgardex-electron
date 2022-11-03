@@ -534,7 +534,8 @@ describe('services/midgard/utils/', () => {
             result,
             O.some({
               asset: AssetETH,
-              amount: baseAmount(2000000000, ETH_DECIMAL)
+              // "2" (1e8) in THORChain will be "20000000000" (1e18) at ETH
+              amount: baseAmount(20000000000, ETH_DECIMAL)
             })
           )
         ).toBeTruthy()
