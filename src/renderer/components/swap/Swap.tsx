@@ -907,11 +907,10 @@ export const Swap = ({
     // We are substracting fee from source asset
     // In other cases ERC20/BEP20
     // max value of token can be allocated for swap
-    if (isChainAsset(sourceChainAsset))
-      return Utils.maxAmountToSwapMax1e8(sourceAssetAmountMax1e8, swapFees.inFee.amount)
+    if (isChainAsset(sourceAsset)) return Utils.maxAmountToSwapMax1e8(sourceAssetAmountMax1e8, swapFees.inFee.amount)
 
     return sourceAssetAmountMax1e8
-  }, [lockedWallet, sourceAssetAmountMax1e8, sourceChainAsset, swapFees])
+  }, [lockedWallet, sourceAssetAmountMax1e8, sourceAsset, swapFees])
 
   const setAmountToSwapMax1e8 = useCallback(
     (amountToSwap: BaseAmount) => {
@@ -1572,7 +1571,7 @@ export const Swap = ({
     const balanceLabel = formatAssetAmountCurrency({
       amount: baseToAsset(sourceAssetAmountMax1e8),
       asset: sourceAsset,
-      decimal: isUSDAsset(sourceAsset) ? 2 : 6,
+      decimal: isUSDAsset(sourceAsset) ? 2 : 8, // use 8 decimal as same we use in maxAmountToSwapMax1e8
       trimZeros: !isUSDAsset(sourceAsset)
     })
 
@@ -1582,14 +1581,16 @@ export const Swap = ({
         formatAssetAmountCurrency({
           amount: baseToAsset(amount),
           asset: feeAsset,
-          decimal: isUSDAsset(feeAsset) ? 2 : 6,
+          decimal: isUSDAsset(feeAsset) ? 2 : 8, // use 8 decimal as same we use in maxAmountToSwapMax1e8
           trimZeros: !isUSDAsset(feeAsset)
         })
       ),
       RD.getOrElse(() => noDataString)
     )
 
-    return intl.formatMessage({ id: 'swap.info.max.fee' }, { balance: balanceLabel, fee: feeLabel })
+    return isChainAsset(sourceAsset)
+      ? intl.formatMessage({ id: 'swap.info.max.balanceMinusFee' }, { balance: balanceLabel, fee: feeLabel })
+      : intl.formatMessage({ id: 'swap.info.max.balance' }, { balance: balanceLabel })
   }, [sourceAssetAmountMax1e8, sourceAsset, swapFeesRD, intl])
 
   const [showDetails, setShowDetails] = useState<boolean>(false)
