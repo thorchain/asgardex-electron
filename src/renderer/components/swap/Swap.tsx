@@ -1644,14 +1644,18 @@ export const Swap = ({
         </div>
         {!lockedWallet &&
           FP.pipe(
-            sequenceTOption(oTargetWalletType, oTargetAddress),
-            O.map(([walletType, address]) => (
+            oTargetAddress,
+            O.map((address) => (
               <div className="mt-20px flex flex-col  px-10px" key="edit-address">
                 <div className="flex items-center">
                   <h3 className="font-[12px] !mb-0 mr-10px w-auto p-0 font-main uppercase text-text2 dark:text-text2d">
                     {intl.formatMessage({ id: 'common.recipient' })}
                   </h3>
-                  <WalletTypeLabel key="target-w-type">{walletType}</WalletTypeLabel>
+                  {FP.pipe(
+                    oTargetWalletType,
+                    O.map((walletType) => <WalletTypeLabel key="target-w-type">{walletType}</WalletTypeLabel>),
+                    O.toNullable
+                  )}
                 </div>
                 <EditableAddress
                   key={address}
