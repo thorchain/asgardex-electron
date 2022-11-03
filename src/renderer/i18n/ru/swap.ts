@@ -6,7 +6,7 @@ const swap: SwapMessages = {
   'swap.state.error': 'Ошибка при обмене',
   'swap.input': 'Отдаете',
   'swap.output': 'Получаете',
-  'swap.info.max.fee': 'Баланс актива за вычетом комиссии обмена',
+  'swap.info.max.fee': 'Баланс актива ({balance}) за вычетом комиссии обмена ({fee})',
   'swap.slip.title': 'Проскальзывание',
   'swap.slip.tolerance': 'Допуск по проскальзыванию',
   'swap.slip.tolerance.info':
