@@ -6,7 +6,8 @@ const swap: SwapMessages = {
   'swap.state.error': 'Swap error',
   'swap.input': 'Input',
   'swap.output': 'Output',
-  'swap.info.max.fee': 'Total asset balance ({balance}) substracted by estimated swap fees ({fee})',
+  'swap.info.max.balance': 'Total asset balance ({balance})',
+  'swap.info.max.balanceMinusFee': 'Total asset balance ({balance}) substracted by estimated swap fees ({fee})',
   'swap.slip.title': 'Slip',
   'swap.slip.tolerance': 'Slippage tolerance',
   'swap.slip.tolerance.info':

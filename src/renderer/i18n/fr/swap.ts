@@ -6,7 +6,8 @@ const swap: SwapMessages = {
   'swap.state.error': "Erreur lors de l'échange",
   'swap.input': 'Entrée',
   'swap.output': 'Sortie',
-  'swap.info.max.fee': "Solde total de l'actif ({balance}) moins les frais d'échange estimés ({fee})",
+  'swap.info.max.balance': "Solde total de l'actif ({balance})",
+  'swap.info.max.balanceMinusFee': "Solde total de l'actif ({balance}) moins les frais d'échange estimés ({fee})",
   'swap.slip.title': 'Slippage',
   'swap.slip.tolerance': 'Tolérance de slippage',
   'swap.slip.tolerance.info':
