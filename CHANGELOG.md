@@ -1,8 +1,19 @@
+# 1.18.4 (2022-11-03)
+
+## Fix
+
+- [Swap] Custom recipient address locked out [#2437](https://github.com/thorchain/asgardex-electron/issues/2437)
+- [Swap] Can't switch asset pair in some cases [#2439](https://github.com/thorchain/asgardex-electron/issues/2439)
+
+## Update
+
+- [Swap] Improve info text of max value to swap [#2442](https://github.com/thorchain/asgardex-electron/pull/2442)
+
 # 1.18.3 (2022-11-02)
 
 ## Update
 
-- [Swap] Redesign [#2430](https://github.com/thorchain/asgardex-electron/pull/2430), [#2432](https://github.com/thorchain/asgardex-electron/pull/2432)
+- [Swap] Redesign [#2420](https://github.com/thorchain/asgardex-electron/pull/2420). [#2430](https://github.com/thorchain/asgardex-electron/pull/2430), [#2432](https://github.com/thorchain/asgardex-electron/pull/2432)
 - Refactor `AssetMenu` component [#2429](https://github.com/thorchain/asgardex-electron/pull/2429)
 - Redesign AssetSelect [#2426](https://github.com/thorchain/asgardex-electron/pull/2426)
 - Upgrade to heroicons@2.x [#2425](https://github.com/thorchain/asgardex-electron/pull/2425)
