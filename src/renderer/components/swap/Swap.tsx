@@ -1568,6 +1568,30 @@ export const Swap = ({
     [oSwapParams]
   )
 
+  const maxBalanceInfoTxt = useMemo(() => {
+    const balanceLabel = formatAssetAmountCurrency({
+      amount: baseToAsset(sourceAssetAmountMax1e8),
+      asset: sourceAsset,
+      decimal: isUSDAsset(sourceAsset) ? 2 : 6,
+      trimZeros: !isUSDAsset(sourceAsset)
+    })
+
+    const feeLabel = FP.pipe(
+      swapFeesRD,
+      RD.map(({ inFee: { amount, asset: feeAsset } }) =>
+        formatAssetAmountCurrency({
+          amount: baseToAsset(amount),
+          asset: feeAsset,
+          decimal: isUSDAsset(feeAsset) ? 2 : 6,
+          trimZeros: !isUSDAsset(feeAsset)
+        })
+      ),
+      RD.getOrElse(() => noDataString)
+    )
+
+    return intl.formatMessage({ id: 'swap.info.max.fee' }, { balance: balanceLabel, fee: feeLabel })
+  }, [sourceAssetAmountMax1e8, sourceAsset, swapFeesRD, intl])
+
   const [showDetails, setShowDetails] = useState<boolean>(false)
 
   return (
@@ -1594,11 +1618,16 @@ export const Swap = ({
               <MaxBalanceButton
                 className="ml-10px mt-5px"
                 classNameButton="!text-gray2 dark:!text-gray2d"
-                classNameIcon="text-gray2 dark:text-gray2d"
+                classNameIcon={
+                  // show warn icon if maxAmountToSwapMax <= 0
+                  maxAmountToSwapMax1e8.gt(zeroTargetBaseAmountMax1e8)
+                    ? `text-gray2 dark:text-gray2d`
+                    : 'text-warning0 dark:text-warning0d'
+                }
                 size="medium"
                 balance={{ amount: maxAmountToSwapMax1e8, asset: sourceAsset }}
                 onClick={() => setAmountToSwapMax1e8(maxAmountToSwapMax1e8)}
-                maxInfoText={intl.formatMessage({ id: 'swap.info.max.fee' })}
+                maxInfoText={maxBalanceInfoTxt}
               />
               {minAmountError && renderMinAmount}
             </div>
