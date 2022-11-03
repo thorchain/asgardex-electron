@@ -14,7 +14,7 @@ const swap: SwapMessages = {
   'swap.slip.tolerance.ledger-disabled.info':
     'Чувствительность к проскальзыванию была отключена из-за технических проблем с Ledger.',
   'swap.errors.amount.balanceShouldCoverChainFee':
-    'Комиссия транзакции {fee} дожна покрываться вашим балансом (сейчас {balance}).',
+    'Комиссия транзакции {fee} должна покрываться вашим балансом (сейчас {balance}).',
   'swap.errors.amount.outputShouldCoverChainFee':
     'Исходящая комиссия {fee} должна покрываться получаемым количеством (сейчас {amount}).',
   'swap.note.lockedWallet': 'Для обмена необходимо разблокировать кошелек',
@@ -25,7 +25,7 @@ const swap: SwapMessages = {
     'Минимальное значение для обмена, чтобы покрыть все комиссии за входящие и исходящие транзакции.',
   'swap.min.result.info':
     'Ваш обмен защищен этим минимальным значением, основанным на выбранном {tolerance}% допуске на проскальзывание. В случае неблагоприятного изменения цены более чем на {tolerance}% ваша сделка будет отменена до подтверждения.',
-  'swap.min.result.protected': 'Protected swap result - RU'
+  'swap.min.result.protected': 'Результат защищённого обмена'
 }
 
 export default swap

@@ -29,13 +29,13 @@ const deposit: DepositMessages = {
   'deposit.add.pendingAssets.description':
     'Folgende Assets wurden erfolgreich überwiesen, jedoch als "Pending" markiert, da die Transaktion des anderen Assets noch aussteht.',
   'deposit.add.pendingAssets.recoveryDescription':
-    'Bitte beachte: Die Transaktionen der Assetpaare können aufgrund unterschiedlicher Blockchains unterschiedliche Zeit benötigen. Falls die Transaktion eines der Assets fehlgeschlagen sein sollte, kannst Du die bereits eingezahlten, auf "Pending" gesetzten Assets, über das Recovery Tool von THORSWap unter {url} zurücküberweisen. Dieses Feature ist derzeit noch nicht in ASGARDEX Desktop verfügbar.',
+    'Bitte beachte: Die Transaktionen der Assetpaare können aufgrund unterschiedlicher Blockchains unterschiedliche Zeit benötigen. Falls die Transaktion eines der Assets fehlgeschlagen sein sollte, kannst Du die bereits eingezahlten, auf "Pending" gesetzten Assets, über das Recovery Tool von THORSwap unter {url} zurücküberweisen. Dieses Feature ist derzeit noch nicht in ASGARDEX Desktop verfügbar.',
   'deposit.add.pendingAssets.recoveryTitle': 'Öffne Recovery Tool',
   'deposit.add.asymAssets.title': 'Asymmetrisches Deposit gefunden',
   'deposit.add.asymAssets.description':
     'Das Hinzufügen eines Assetpaares in den Pool ist nicht möglich, da Du bereits folgende(s) Asset(s) asymmetrisch (einseitig) hinzugefügt hast:',
   'deposit.add.asymAssets.recoveryDescription':
-    'Asymmetrisches (einseitiges) Hinzufügen von Assets ist aktuell in ASGARDEX Desktop noch nicht möglich. Aber Du hast die Möglichkeit, dieses Feature zwischenzeitlich in THORSWap zu nutzen, um die zuvor asymmetrisch hinzugefügten Assets zurückzuüberweisen',
+    'Asymmetrisches (einseitiges) Hinzufügen von Assets ist aktuell in ASGARDEX Desktop noch nicht möglich. Aber Du hast die Möglichkeit, dieses Feature zwischenzeitlich in THORSwap zu nutzen, um die zuvor asymmetrisch hinzugefügten Assets zurückzuüberweisen',
   'deposit.add.asymAssets.recoveryTitle': 'THORSwap',
   'deposit.add.assetMissmatch.title': 'Asset Diskrepanz',
   'deposit.add.assetMissmatch.description':
