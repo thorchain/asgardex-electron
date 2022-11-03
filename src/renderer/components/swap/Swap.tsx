@@ -246,10 +246,14 @@ export const Swap = ({
     )
   }, [customAddressEditActive, disableAllPoolActions, disableTradingPoolActions, sourceAsset.chain, targetAsset.chain])
 
+  /**
+   * All balances based on available assets to swap
+   */
   const allBalances: WalletBalances = useMemo(
     () =>
       FP.pipe(
         oWalletBalances,
+        // filter wallet balances to include assets available to swap only
         O.map((balances) => filterWalletBalancesByAssets(balances, poolAssets)),
         O.getOrElse<WalletBalances>(() => [])
       ),
@@ -1432,22 +1436,32 @@ export const Swap = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [sourceAsset, targetAsset])
 
+  /**
+   * Disables switch of assets based on following rule:
+   * Target asset (which will be the new source asset after a switch ) needs to have balances.
+   * Without balances, a source asset can't doing a swap.
+   */
   const disableSwitchAssets = useMemo(() => {
     const hasTargetBalance = FP.pipe(
       allBalances,
       NEA.fromArray,
       (oWalletBalances) =>
-        getWalletBalanceByAssetAndWalletType({
-          oWalletBalances,
-          asset: targetAsset,
-          walletType: sourceWalletType
-        }),
+        FP.pipe(
+          oTargetWalletType,
+          O.chain((walletType) =>
+            getWalletBalanceByAssetAndWalletType({
+              oWalletBalances,
+              asset: targetAsset,
+              walletType
+            })
+          )
+        ),
       O.map(({ amount }) => amount.gt(baseAmount(0, targetAssetDecimal))),
       O.getOrElse(() => false)
     )
 
     return !hasTargetBalance
-  }, [allBalances, targetAsset, sourceWalletType, targetAssetDecimal])
+  }, [allBalances, targetAsset, oTargetWalletType, targetAssetDecimal])
 
   const onSwitchAssets = useCallback(async () => {
     // delay to avoid render issues while switching
