@@ -4,6 +4,7 @@
 
 - [Swap] Custom recipient address locked out [#2437](https://github.com/thorchain/asgardex-electron/issues/2437)
 - [Swap] Can't switch asset pair in some cases [#2439](https://github.com/thorchain/asgardex-electron/issues/2439)
+- [Swap] Wrong max amount to swap value for non chain (source) asset [#2444](https://github.com/thorchain/asgardex-electron/issues/2444)
 
 ## Update
 
