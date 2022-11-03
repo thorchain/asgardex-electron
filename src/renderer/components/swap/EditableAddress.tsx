@@ -124,8 +124,9 @@ export const EditableAddress = ({
   const renderEditableAddress = useCallback(
     (editableAddress: Address) => {
       return (
+        // `items-start` is needed to postion icons on top in case of error message
         <InnerForm
-          className="flex w-full items-center"
+          className="flex w-full items-start"
           form={form}
           initialValues={{
             recipient: editableAddress
@@ -138,11 +139,11 @@ export const EditableAddress = ({
           </Form.Item>
 
           <CheckCircleIcon
-            className="ml-[5px] h-[30px] w-[30px] cursor-pointer text-turquoise"
+            className="ml-5px h-[30px] w-[30px] cursor-pointer text-turquoise"
             onClick={confirmEditHandler}
           />
           <XCircleIcon
-            className="ml-[5px] h-[30px] w-[30px] cursor-pointer text-gray2 dark:text-gray2d"
+            className="ml-5px h-[30px] w-[30px] cursor-pointer text-gray2 dark:text-gray2d"
             onClick={cancelEditHandler}
           />
         </InnerForm>
