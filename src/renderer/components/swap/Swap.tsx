@@ -246,10 +246,14 @@ export const Swap = ({
     )
   }, [customAddressEditActive, disableAllPoolActions, disableTradingPoolActions, sourceAsset.chain, targetAsset.chain])
 
+  /**
+   * All balances based on available assets to swap
+   */
   const allBalances: WalletBalances = useMemo(
     () =>
       FP.pipe(
         oWalletBalances,
+        // filter wallet balances to include assets available to swap only
         O.map((balances) => filterWalletBalancesByAssets(balances, poolAssets)),
         O.getOrElse<WalletBalances>(() => [])
       ),
@@ -903,11 +907,10 @@ export const Swap = ({
     // We are substracting fee from source asset
     // In other cases ERC20/BEP20
     // max value of token can be allocated for swap
-    if (isChainAsset(sourceChainAsset))
-      return Utils.maxAmountToSwapMax1e8(sourceAssetAmountMax1e8, swapFees.inFee.amount)
+    if (isChainAsset(sourceAsset)) return Utils.maxAmountToSwapMax1e8(sourceAssetAmountMax1e8, swapFees.inFee.amount)
 
     return sourceAssetAmountMax1e8
-  }, [lockedWallet, sourceAssetAmountMax1e8, sourceChainAsset, swapFees])
+  }, [lockedWallet, sourceAssetAmountMax1e8, sourceAsset, swapFees])
 
   const setAmountToSwapMax1e8 = useCallback(
     (amountToSwap: BaseAmount) => {
@@ -1432,22 +1435,32 @@ export const Swap = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [sourceAsset, targetAsset])
 
+  /**
+   * Disables switch of assets based on following rule:
+   * Target asset (which will be the new source asset after a switch ) needs to have balances.
+   * Without balances, a source asset can't doing a swap.
+   */
   const disableSwitchAssets = useMemo(() => {
     const hasTargetBalance = FP.pipe(
       allBalances,
       NEA.fromArray,
       (oWalletBalances) =>
-        getWalletBalanceByAssetAndWalletType({
-          oWalletBalances,
-          asset: targetAsset,
-          walletType: sourceWalletType
-        }),
+        FP.pipe(
+          oTargetWalletType,
+          O.chain((walletType) =>
+            getWalletBalanceByAssetAndWalletType({
+              oWalletBalances,
+              asset: targetAsset,
+              walletType
+            })
+          )
+        ),
       O.map(({ amount }) => amount.gt(baseAmount(0, targetAssetDecimal))),
       O.getOrElse(() => false)
     )
 
     return !hasTargetBalance
-  }, [allBalances, targetAsset, sourceWalletType, targetAssetDecimal])
+  }, [allBalances, targetAsset, oTargetWalletType, targetAssetDecimal])
 
   const onSwitchAssets = useCallback(async () => {
     // delay to avoid render issues while switching
@@ -1554,6 +1567,32 @@ export const Swap = ({
     [oSwapParams]
   )
 
+  const maxBalanceInfoTxt = useMemo(() => {
+    const balanceLabel = formatAssetAmountCurrency({
+      amount: baseToAsset(sourceAssetAmountMax1e8),
+      asset: sourceAsset,
+      decimal: isUSDAsset(sourceAsset) ? 2 : 8, // use 8 decimal as same we use in maxAmountToSwapMax1e8
+      trimZeros: !isUSDAsset(sourceAsset)
+    })
+
+    const feeLabel = FP.pipe(
+      swapFeesRD,
+      RD.map(({ inFee: { amount, asset: feeAsset } }) =>
+        formatAssetAmountCurrency({
+          amount: baseToAsset(amount),
+          asset: feeAsset,
+          decimal: isUSDAsset(feeAsset) ? 2 : 8, // use 8 decimal as same we use in maxAmountToSwapMax1e8
+          trimZeros: !isUSDAsset(feeAsset)
+        })
+      ),
+      RD.getOrElse(() => noDataString)
+    )
+
+    return isChainAsset(sourceAsset)
+      ? intl.formatMessage({ id: 'swap.info.max.balanceMinusFee' }, { balance: balanceLabel, fee: feeLabel })
+      : intl.formatMessage({ id: 'swap.info.max.balance' }, { balance: balanceLabel })
+  }, [sourceAssetAmountMax1e8, sourceAsset, swapFeesRD, intl])
+
   const [showDetails, setShowDetails] = useState<boolean>(false)
 
   return (
@@ -1580,11 +1619,16 @@ export const Swap = ({
               <MaxBalanceButton
                 className="ml-10px mt-5px"
                 classNameButton="!text-gray2 dark:!text-gray2d"
-                classNameIcon="text-gray2 dark:text-gray2d"
+                classNameIcon={
+                  // show warn icon if maxAmountToSwapMax <= 0
+                  maxAmountToSwapMax1e8.gt(zeroTargetBaseAmountMax1e8)
+                    ? `text-gray2 dark:text-gray2d`
+                    : 'text-warning0 dark:text-warning0d'
+                }
                 size="medium"
                 balance={{ amount: maxAmountToSwapMax1e8, asset: sourceAsset }}
                 onClick={() => setAmountToSwapMax1e8(maxAmountToSwapMax1e8)}
-                maxInfoText={intl.formatMessage({ id: 'swap.info.max.fee' })}
+                maxInfoText={maxBalanceInfoTxt}
               />
               {minAmountError && renderMinAmount}
             </div>
@@ -1644,14 +1688,18 @@ export const Swap = ({
         </div>
         {!lockedWallet &&
           FP.pipe(
-            sequenceTOption(oTargetWalletType, oTargetAddress),
-            O.map(([walletType, address]) => (
+            oTargetAddress,
+            O.map((address) => (
               <div className="mt-20px flex flex-col  px-10px" key="edit-address">
                 <div className="flex items-center">
                   <h3 className="font-[12px] !mb-0 mr-10px w-auto p-0 font-main uppercase text-text2 dark:text-text2d">
                     {intl.formatMessage({ id: 'common.recipient' })}
                   </h3>
-                  <WalletTypeLabel key="target-w-type">{walletType}</WalletTypeLabel>
+                  {FP.pipe(
+                    oTargetWalletType,
+                    O.map((walletType) => <WalletTypeLabel key="target-w-type">{walletType}</WalletTypeLabel>),
+                    O.toNullable
+                  )}
                 </div>
                 <EditableAddress
                   key={address}
