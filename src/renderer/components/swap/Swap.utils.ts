@@ -252,15 +252,29 @@ export const minBalanceToSwap = (swapFees: Pick<SwapFees, 'inFee'>): BaseAmount 
 }
 
 /**
- * Returns max. balance available for swap by substracting fees of chain asset
+ * Helper to calculate balance available to swap by considering possible fees
  *
- * assetAmountMax1e8 => balances of source asset - max 1e8
- * feeAmount => fee of inbound tx
+ * @param assetAmountMax1e8 Balances of source asset - max 1e8
+ * @param sourceAsset Source asset to swap from
+ * @param inFeeAmount fee of inbound tx
+ *
+ * @returns BaseAmount available to swap from
  */
-export const maxAmountToSwapMax1e8 = (assetAmountMax1e8: BaseAmount, feeAmount: BaseAmount): BaseAmount => {
-  const estimatedFee = max1e8BaseAmount(feeAmount)
-  const maxAmountToSwap = assetAmountMax1e8.minus(estimatedFee)
-  return maxAmountToSwap.gt(baseAmount(0)) ? maxAmountToSwap : baseAmount(0)
+export const calcAmountToSwapMax1e8 = ({
+  amountToSwapMax1e8,
+  sourceAsset,
+  inFeeAmount
+}: {
+  amountToSwapMax1e8: BaseAmount
+  sourceAsset: Asset
+  inFeeAmount: BaseAmount
+}): BaseAmount => {
+  // No chain asset, no fee
+  if (!isChainAsset(sourceAsset)) return amountToSwapMax1e8
+  // In case of chain asset
+  // fees needs to be deducted
+  const amountToSwap = amountToSwapMax1e8.minus(max1e8BaseAmount(inFeeAmount))
+  return amountToSwap.gt(baseAmount(0)) ? amountToSwap : baseAmount(0, amountToSwapMax1e8.decimal)
 }
 
 export const assetsInWallet: (_: WalletBalances) => Asset[] = FP.flow(A.map(({ asset }) => asset))

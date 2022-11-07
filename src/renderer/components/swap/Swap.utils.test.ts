@@ -16,7 +16,7 @@ import {
 import * as O from 'fp-ts/lib/Option'
 
 import { ASSETS_TESTNET } from '../../../shared/mock/assets'
-import { AssetBUSD74E, AssetUSDTERC20Testnet, ZERO_BASE_AMOUNT } from '../../const'
+import { AssetBUSD74E, AssetBUSDBAF, AssetUSDTERC20Testnet, ZERO_BASE_AMOUNT } from '../../const'
 import { BNB_DECIMAL, THORCHAIN_DECIMAL } from '../../helpers/assetHelper'
 import { eqAsset, eqBaseAmount } from '../../helpers/fp/eq'
 import { mockWalletBalance } from '../../helpers/test/testWalletHelper'
@@ -31,7 +31,7 @@ import {
   calcRefundFee,
   minAmountToSwapMax1e8,
   getSwapLimit1e8,
-  maxAmountToSwapMax1e8,
+  calcAmountToSwapMax1e8,
   assetsInWallet,
   balancesToSwapFrom,
   hasLedgerInBalancesByChain
@@ -654,34 +654,48 @@ describe('components/swap/utils', () => {
     })
   })
 
-  describe('maxAmountToSwapMax1e8', () => {
-    it('returns max. balance to swap - with estimated fees', () => {
+  describe('calcAmountToSwapMax1e8', () => {
+    it('balance to swap - with estimated fees', () => {
       const params = {
-        inputBalanceAmount: baseAmount(1000),
+        amountToSwapMax1e8: baseAmount(1000),
+        sourceAsset: AssetBNB,
         inFeeAmount: baseAmount(100)
       }
-      const result = maxAmountToSwapMax1e8(params.inputBalanceAmount, params.inFeeAmount)
+      const result = calcAmountToSwapMax1e8(params)
       expect(eqBaseAmount.equals(result, baseAmount(900))).toBeTruthy()
     })
 
-    it('returns max. balance to swap - with 1e18 based estimated fees', () => {
+    it('balance to swap - with 1e18 based estimated fees', () => {
       const params = {
-        inputBalanceAmount: baseAmount(100),
+        amountToSwapMax1e8: baseAmount(100),
+        sourceAsset: AssetETH,
         inFeeAmount: baseAmount(100000000000, 18)
       }
-      const result = maxAmountToSwapMax1e8(params.inputBalanceAmount, params.inFeeAmount)
+      const result = calcAmountToSwapMax1e8(params)
       expect(eqBaseAmount.equals(result, baseAmount(90))).toBeTruthy()
     })
 
     it('balance is less than fee - with 1e18 based estimated fees', () => {
       const params = {
-        inputBalanceAmount: baseAmount(1),
+        amountToSwapMax1e8: baseAmount(1),
+        sourceAsset: AssetETH,
         inFeeAmount: baseAmount(100000000000, 18)
       }
-      const result = maxAmountToSwapMax1e8(params.inputBalanceAmount, params.inFeeAmount)
+      const result = calcAmountToSwapMax1e8(params)
       expect(eqBaseAmount.equals(result, baseAmount(0))).toBeTruthy()
     })
+
+    it('no chain asset - no change', () => {
+      const params = {
+        amountToSwapMax1e8: baseAmount(100),
+        sourceAsset: AssetBUSDBAF,
+        inFeeAmount: baseAmount(50, 8)
+      }
+      const result = calcAmountToSwapMax1e8(params)
+      expect(eqBaseAmount.equals(result, baseAmount(100))).toBeTruthy()
+    })
   })
+
   describe('assetsInWallet', () => {
     const a = mockWalletBalance()
     const b = mockWalletBalance({ asset: AssetBNB })
