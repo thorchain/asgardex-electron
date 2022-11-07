@@ -117,6 +117,7 @@ const common: CommonMessages = {
   'common.informationMore': 'More information',
   'common.balance': 'Balance',
   'common.balance.loading': 'Loading balance',
+  'common.balances': 'Balances',
   'common.custom': 'Custom',
   'common.notsupported.fornetwork': 'Not supported for {network}',
   'common.recipient': 'Recipient',

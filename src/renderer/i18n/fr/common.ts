@@ -117,6 +117,7 @@ const common: CommonMessages = {
   'common.informationMore': "Plus d'information",
   'common.balance': 'Solde',
   'common.balance.loading': 'Chargement du solde',
+  'common.balances': 'Soldes',
   'common.custom': 'Personnaliser',
   'common.notsupported.fornetwork': 'Non pris en charge pour {network}',
   'common.recipient': 'Destinataire',

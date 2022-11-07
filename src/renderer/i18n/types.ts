@@ -117,6 +117,7 @@ export type CommonMessageKey =
   | 'common.informationMore'
   | 'common.balance'
   | 'common.balance.loading'
+  | 'common.balances'
   | 'common.custom'
   | 'common.notsupported.fornetwork'
   | 'common.recipient'

@@ -129,6 +129,8 @@ export type SwapProps = {
     source: SwapAsset
     target: SwapAsset
   }
+  sourceWalletAddress: O.Option<Address>
+  sourceLedgerAddress: O.Option<Address>
   poolAddress: O.Option<PoolAddress>
   swap$: SwapStateHandler
   poolsData: PoolsDataMap
@@ -177,6 +179,8 @@ export const Swap = ({
   reloadFees,
   reloadBalances = FP.constVoid,
   fees$,
+  sourceWalletAddress: oInitialSourceWalletAddress,
+  sourceLedgerAddress: oSourceLedgerAddress,
   targetWalletAddress: oInitialTargetWalletAddress,
   targetLedgerAddress: oTargetLedgerAddress,
   onChangePath,
@@ -196,6 +200,12 @@ export const Swap = ({
   const intl = useIntl()
 
   const lockedWallet: boolean = useMemo(() => isLocked(keystore) || !hasImportedKeystore(keystore), [keystore])
+
+  const [oSourceWalletAddress, setSourceWalletAddress] = useState<O.Option<Address>>(oInitialSourceWalletAddress)
+  // Update state needed - initial walletAddress is loaded async and can be different at first run
+  useEffect(() => {
+    setSourceWalletAddress(oInitialSourceWalletAddress)
+  }, [oInitialSourceWalletAddress])
 
   const [oTargetWalletAddress, setTargetWalletAddress] = useState<O.Option<Address>>(oInitialTargetWalletAddress)
   const [editableTargetWalletAddress, setEditableTargetWalletAddress] =
@@ -328,6 +338,58 @@ export const Swap = ({
         O.getOrElse(() => baseAmount(0, sourceAssetDecimal))
       ),
     [oWalletBalances, sourceAssetDecimal, sourceChainAsset, sourceWalletType]
+  )
+
+  // Balance of target asset
+  // Note: Users balances included in its wallet are checked only. Custom (not users) balances are ignored.
+  const oTargetAssetAmount: O.Option<BaseAmount> = useMemo(
+    () =>
+      FP.pipe(
+        allBalances,
+        NEA.fromArray,
+        (oWalletBalances) =>
+          FP.pipe(
+            oTargetWalletType,
+            O.chain((walletType) =>
+              getWalletBalanceByAssetAndWalletType({
+                oWalletBalances,
+                asset: targetAsset,
+                walletType
+              })
+            )
+          ),
+        O.map(({ amount }) => amount)
+      ),
+    [allBalances, oTargetWalletType, targetAsset]
+  )
+
+  // Formatted balances of target asset.
+  // Note: Users balances included in its wallet are checked only. Balances of custom (not users) balances are not shown.
+  const targetAssetAmountLabel = useMemo(
+    () =>
+      FP.pipe(
+        oTargetAssetAmount,
+        O.map((amount) =>
+          formatAssetAmountCurrency({
+            amount: baseToAsset(amount),
+            asset: targetAsset,
+            decimal: 8,
+            trimZeros: true
+          })
+        ),
+        O.getOrElse(() =>
+          O.isSome(oTargetWalletType)
+            ? // Zero balances are hidden, but we show a zero amount for users wallets (ledger or keystore)
+              formatAssetAmountCurrency({
+                amount: assetAmount(0, targetAssetDecimal),
+                asset: targetAsset,
+                decimal: 0
+              })
+            : // for unknown recipient we show nothing (for privacy)
+              noDataString
+        )
+      ),
+    [oTargetAssetAmount, oTargetWalletType, targetAsset, targetAssetDecimal]
   )
 
   const {
@@ -1442,25 +1504,12 @@ export const Swap = ({
    */
   const disableSwitchAssets = useMemo(() => {
     const hasTargetBalance = FP.pipe(
-      allBalances,
-      NEA.fromArray,
-      (oWalletBalances) =>
-        FP.pipe(
-          oTargetWalletType,
-          O.chain((walletType) =>
-            getWalletBalanceByAssetAndWalletType({
-              oWalletBalances,
-              asset: targetAsset,
-              walletType
-            })
-          )
-        ),
-      O.map(({ amount }) => amount.gt(baseAmount(0, targetAssetDecimal))),
+      oTargetAssetAmount,
+      O.map((amount) => amount.gt(baseAmount(0, targetAssetDecimal))),
       O.getOrElse(() => false)
     )
-
     return !hasTargetBalance
-  }, [allBalances, targetAsset, oTargetWalletType, targetAssetDecimal])
+  }, [oTargetAssetAmount, targetAssetDecimal])
 
   const onSwitchAssets = useCallback(async () => {
     // delay to avoid render issues while switching
@@ -1525,8 +1574,11 @@ export const Swap = ({
   )
 
   const onClickUseSourceAssetLedger = useCallback(() => {
+    const useLedger = !useSourceAssetLedger
     setUseSourceAssetLedger(() => !useSourceAssetLedger)
-  }, [useSourceAssetLedger])
+    const oAddress = useLedger ? oSourceLedgerAddress : oInitialSourceWalletAddress
+    setSourceWalletAddress(oAddress)
+  }, [oInitialSourceWalletAddress, oSourceLedgerAddress, useSourceAssetLedger])
 
   const onClickUseTargetAssetLedger = useCallback(() => {
     const useLedger = !useTargetAssetLedger
@@ -1540,15 +1592,16 @@ export const Swap = ({
     () =>
       FP.pipe(
         oSwapParams,
-        O.map(({ memo }) => (
+        O.map(({ memo }) => memo),
+        O.getOrElse(() => emptyString),
+        (memo) => (
           <CopyLabel
             className="pl-0 !font-mainBold text-[14px] uppercase text-gray2 dark:text-gray2d"
             label={intl.formatMessage({ id: 'common.memo' })}
             key="memo-copy"
             textToCopy={memo}
           />
-        )),
-        O.toNullable
+        )
       ),
     [intl, oSwapParams]
   )
@@ -1902,10 +1955,10 @@ export const Swap = ({
                       <div>{intl.formatMessage({ id: 'common.sender' })}</div>
                       <div className="truncate pl-20px text-[13px] normal-case leading-normal">
                         {FP.pipe(
-                          oSwapParams,
-                          O.map(({ sender }) => (
-                            <TooltipAddress title={sender} key="tooltip-sender-addr">
-                              {sender}
+                          oSourceWalletAddress,
+                          O.map((address) => (
+                            <TooltipAddress title={address} key="tooltip-sender-addr">
+                              {address}
                             </TooltipAddress>
                           )),
                           O.getOrElse(() => <>{noDataString}</>)
@@ -1945,6 +1998,41 @@ export const Swap = ({
                   </>
                 )}
 
+                {/* balances */}
+                {showDetails && (
+                  <>
+                    <div className={`w-full pt-10px text-[14px]`}>
+                      <BaseButton
+                        disabled={walletBalancesLoading}
+                        className="group !p-0 !font-mainBold !text-gray2 dark:!text-gray2d"
+                        onClick={reloadBalances}>
+                        {intl.formatMessage({ id: 'common.balances' })}
+                        <ArrowPathIcon className="ease ml-5px h-[15px] w-[15px] group-hover:rotate-180" />
+                      </BaseButton>
+                    </div>
+                    {/* sender balance */}
+                    <div className="flex w-full items-center justify-between pl-10px text-[12px]">
+                      <div>{intl.formatMessage({ id: 'common.sender' })}</div>
+                      <div className="truncate pl-20px text-[13px] normal-case leading-normal">
+                        {walletBalancesLoading
+                          ? loadingString
+                          : formatAssetAmountCurrency({
+                              amount: baseToAsset(sourceAssetAmountMax1e8),
+                              asset: sourceAsset,
+                              decimal: 8,
+                              trimZeros: true
+                            })}
+                      </div>
+                    </div>
+                    {/* recipient balance */}
+                    <div className="flex w-full items-center justify-between pl-10px text-[12px]">
+                      <div>{intl.formatMessage({ id: 'common.recipient' })}</div>
+                      <div className="truncate pl-20px text-[13px] normal-case leading-normal">
+                        {walletBalancesLoading ? loadingString : targetAssetAmountLabel}
+                      </div>
+                    </div>
+                  </>
+                )}
                 {/* memo */}
                 {showDetails && (
                   <>
