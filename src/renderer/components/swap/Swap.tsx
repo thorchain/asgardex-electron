@@ -330,6 +330,48 @@ export const Swap = ({
     [oWalletBalances, sourceAssetDecimal, sourceChainAsset, sourceWalletType]
   )
 
+  // Balance of target asset
+  // Note: Users balances included in its wallet are checked only. Custom (not users) balances are ignored.
+  const oTargetAssetAmount: O.Option<BaseAmount> = useMemo(
+    () =>
+      FP.pipe(
+        allBalances,
+        NEA.fromArray,
+        (oWalletBalances) =>
+          FP.pipe(
+            oTargetWalletType,
+            O.chain((walletType) =>
+              getWalletBalanceByAssetAndWalletType({
+                oWalletBalances,
+                asset: targetAsset,
+                walletType
+              })
+            )
+          ),
+        O.map(({ amount }) => amount)
+      ),
+    [allBalances, oTargetWalletType, targetAsset]
+  )
+
+  // Formatted balances of target asset.
+  // Note: Users balances included in its wallet are checked only. Balances of custom (not users) balances are not shown.
+  const targetAssetAmountLabel = useMemo(
+    () =>
+      FP.pipe(
+        oTargetAssetAmount,
+        O.map((amount) =>
+          formatAssetAmountCurrency({
+            amount: baseToAsset(amount),
+            asset: targetAsset,
+            decimal: 8,
+            trimZeros: true
+          })
+        ),
+        O.getOrElse(() => noDataString)
+      ),
+    [oTargetAssetAmount, targetAsset]
+  )
+
   const {
     state: swapState,
     reset: resetSwapState,
@@ -1442,25 +1484,12 @@ export const Swap = ({
    */
   const disableSwitchAssets = useMemo(() => {
     const hasTargetBalance = FP.pipe(
-      allBalances,
-      NEA.fromArray,
-      (oWalletBalances) =>
-        FP.pipe(
-          oTargetWalletType,
-          O.chain((walletType) =>
-            getWalletBalanceByAssetAndWalletType({
-              oWalletBalances,
-              asset: targetAsset,
-              walletType
-            })
-          )
-        ),
-      O.map(({ amount }) => amount.gt(baseAmount(0, targetAssetDecimal))),
+      oTargetAssetAmount,
+      O.map((amount) => amount.gt(baseAmount(0, targetAssetDecimal))),
       O.getOrElse(() => false)
     )
-
     return !hasTargetBalance
-  }, [allBalances, targetAsset, oTargetWalletType, targetAssetDecimal])
+  }, [oTargetAssetAmount, targetAssetDecimal])
 
   const onSwitchAssets = useCallback(async () => {
     // delay to avoid render issues while switching
@@ -1945,6 +1974,33 @@ export const Swap = ({
                   </>
                 )}
 
+                {/* balances */}
+                {showDetails && (
+                  <>
+                    <div className={`w-full pt-10px font-mainBold text-[14px]`}>
+                      {intl.formatMessage({ id: 'common.balance' })}
+                    </div>
+                    {/* sender balance */}
+                    <div className="flex w-full items-center justify-between pl-10px text-[12px]">
+                      <div>{intl.formatMessage({ id: 'common.sender' })}</div>
+                      <div className="truncate pl-20px text-[13px] normal-case leading-normal">
+                        {formatAssetAmountCurrency({
+                          amount: baseToAsset(sourceAssetAmountMax1e8),
+                          asset: sourceAsset,
+                          decimal: 8,
+                          trimZeros: true
+                        })}
+                      </div>
+                    </div>
+                    {/* recipient balance */}
+                    <div className="flex w-full items-center justify-between pl-10px text-[12px]">
+                      <div>{intl.formatMessage({ id: 'common.recipient' })}</div>
+                      <div className="truncate pl-20px text-[13px] normal-case leading-normal">
+                        {targetAssetAmountLabel}
+                      </div>
+                    </div>
+                  </>
+                )}
                 {/* memo */}
                 {showDetails && (
                   <>
