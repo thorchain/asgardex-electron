@@ -117,6 +117,7 @@ const common: CommonMessages = {
   'common.informationMore': 'Больше данных',
   'common.balance': 'Баланс',
   'common.balance.loading': 'Загружаю баланс',
+  'common.balances': 'Балансы',
   'common.custom': 'Вручную',
   'common.notsupported.fornetwork': 'Не поддерживается для сети {network}',
   'common.recipient': 'Получатель',
