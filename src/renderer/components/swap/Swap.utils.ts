@@ -218,10 +218,10 @@ export const minAmountToSwapMax1e8 = ({
   const feeToCover: BaseAmount = successSwapFee.gte(failureSwapFee) ? successSwapFee : failureSwapFee
 
   return FP.pipe(
-    // Over-estimate fee by 50%
+    // Over-estimate fee by 50% to cover possible fee changes
     1.5,
     feeToCover.times,
-    // transform decimal to be `max1e8`
+    // transform fee decimal to be `max1e8`
     max1e8BaseAmount,
     // Zero amount is possible only in case there is not fees information loaded.
     // Just to avoid blinking min value filter out zero min amounts too.
@@ -229,26 +229,6 @@ export const minAmountToSwapMax1e8 = ({
     // increase min value by 10k satoshi (for meaningful UTXO assets' only)
     E.getOrElse((amount) => amount.plus(10000))
   )
-}
-
-/**
- * Returns min. balance to cover fees for inbound chain
- *
- * It sums fees for happy path (successfull swap) and unhappy path (failed swap)
- *
- * This helper is only needed if source asset is not a chain asset,
- * In other case use `minAmountToSwapMax1e8` to get min value
- */
-export const minBalanceToSwap = (swapFees: Pick<SwapFees, 'inFee'>): BaseAmount => {
-  const {
-    inFee: { amount: inFeeAmount }
-  } = swapFees
-
-  // Sum inbound (success swap) + refund fee (failure swap)
-  const refundFee = calcRefundFee(inFeeAmount)
-  const feeToCover: BaseAmount = inFeeAmount.plus(refundFee)
-  // Over-estimate balance by 50%
-  return feeToCover.times(1.5)
 }
 
 /**

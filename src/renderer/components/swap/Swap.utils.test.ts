@@ -27,7 +27,6 @@ import {
   getSwapResult,
   getSwapData,
   pickPoolAsset,
-  minBalanceToSwap,
   calcRefundFee,
   minAmountToSwapMax1e8,
   getSwapLimit1e8,
@@ -341,19 +340,6 @@ describe('components/swap/utils', () => {
     it('should be 3 x inbound fee', () => {
       const result = calcRefundFee(baseAmount(2))
       expect(eqBaseAmount.equals(result, baseAmount(6))).toBeTruthy()
-    })
-  })
-
-  describe('minBalanceToSwap', () => {
-    it('returns min. balance to cover inbound + refund fees', () => {
-      const params = {
-        inFee: {
-          amount: baseAmount(100),
-          asset: AssetBNB
-        }
-      }
-      const result = minBalanceToSwap(params)
-      expect(eqBaseAmount.equals(result, baseAmount(600))).toBeTruthy()
     })
   })
 
