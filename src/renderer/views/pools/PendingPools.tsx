@@ -13,8 +13,8 @@ import { useIntl } from 'react-intl'
 import { useNavigate } from 'react-router-dom'
 
 import { Network } from '../../../shared/api/types'
-import { ManageButton } from '../../components/manageButton'
 import { ProtocolLimit, IncentivePendulum } from '../../components/pool'
+import { ManageButton } from '../../components/uielements/button'
 import { Table } from '../../components/uielements/table'
 import { useAppContext } from '../../contexts/AppContext'
 import { useMidgardContext } from '../../contexts/MidgardContext'
@@ -80,13 +80,13 @@ export const PendingPools: React.FC<PoolsComponentProps> = ({ haltedChains, mimi
   const selectedPricePool = useObservableState(selectedPricePool$, RUNE_PRICE_POOL)
 
   const renderBtnPoolsColumn = useCallback(
-    (_: string, { pool }: PoolTableRowData) => {
+    (_: string, { asset }: PoolTableRowData) => {
       const disablePool =
-        PoolHelpers.disableAllActions({ chain: pool.target.chain, haltedChains, mimirHalt }) ||
-        PoolHelpers.disablePoolActions({ chain: pool.target.chain, haltedChains, mimirHalt })
+        PoolHelpers.disableAllActions({ chain: asset.chain, haltedChains, mimirHalt }) ||
+        PoolHelpers.disablePoolActions({ chain: asset.chain, haltedChains, mimirHalt })
       return (
         <TableAction>
-          <ManageButton asset={pool.target} isTextView={isDesktopView} disabled={disablePool || walletLocked} />
+          <ManageButton asset={asset} isTextView={isDesktopView} disabled={disablePool || walletLocked} />
         </TableAction>
       )
     },
@@ -109,11 +109,11 @@ export const PendingPools: React.FC<PoolsComponentProps> = ({ haltedChains, mimi
 
   const renderBlockLeftColumn = useCallback(
     (_: string, record: PoolTableRowData) => {
-      const { deepest, pool } = record
+      const { deepest, asset } = record
 
       const blocksLeft: string = FP.pipe(
         thorchainLastblockRD,
-        RD.map((lastblockItems) => getBlocksLeftForPendingPoolAsString(lastblockItems, pool.target, oNewPoolCycle)),
+        RD.map((lastblockItems) => getBlocksLeftForPendingPoolAsString(lastblockItems, asset, oNewPoolCycle)),
         RD.getOrElse(() => '--')
       )
 
@@ -174,10 +174,10 @@ export const PendingPools: React.FC<PoolsComponentProps> = ({ haltedChains, mimi
             dataSource={dataSource}
             loading={loading}
             rowKey="key"
-            onRow={({ pool }: PoolTableRowData) => {
+            onRow={({ asset }: PoolTableRowData) => {
               return {
                 onClick: () => {
-                  navigate(poolsRoutes.detail.path({ asset: assetToString(pool.target) }))
+                  navigate(poolsRoutes.detail.path({ asset: assetToString(asset) }))
                 }
               }
             }}

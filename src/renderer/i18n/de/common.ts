@@ -65,6 +65,7 @@ const common: CommonMessages = {
   'common.reload': 'Neuladen',
   'common.add': 'Einzahlen',
   'common.swap': 'Swap',
+  'common.savers': 'Savers',
   'common.liquidity': 'Liquidität',
   'common.withdraw': 'Auszahlen',
   'common.approve': 'Erlauben',

@@ -23,7 +23,7 @@ import {
 } from '../../../services/wallet/types'
 import { isLocked, getWalletName } from '../../../services/wallet/util'
 import { RemoveWalletConfirmationModal } from '../../modal/confirmation/RemoveWalletConfirmationModal'
-import { BackLink } from '../../uielements/backLink'
+import { BackLinkButton } from '../../uielements/button'
 import { BorderButton, FlatButton } from '../../uielements/button'
 import { InputPasswordTW } from '../../uielements/input'
 import { WalletSelector } from '../../uielements/wallet'
@@ -182,7 +182,7 @@ export const UnlockForm: React.FC<Props> = (props): JSX.Element => {
   return (
     <>
       <div className="relative flex justify-center">
-        <BackLink className="absolute top-0 left-0" />
+        <BackLinkButton className="absolute top-0 left-0" />
         <h1
           className="mb-30px
           inline-block

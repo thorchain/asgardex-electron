@@ -7,7 +7,7 @@ const Template: StoryFn<Props> = (args) => <Component {...args} />
 export const Default = Template.bind({})
 
 const meta: ComponentMeta<typeof Component> = {
-  title: 'Components/ManageButton',
+  title: 'Components/button/ManageButton',
   argTypes: {
     size: {
       control: {

@@ -16,7 +16,7 @@ import { ErrorView } from '../../components/shared/error/'
 import { Swap } from '../../components/swap'
 import { SLIP_TOLERANCE_KEY } from '../../components/swap/SelectableSlipTolerance'
 import * as Utils from '../../components/swap/Swap.utils'
-import { BackLink } from '../../components/uielements/backLink'
+import { BackLinkButton } from '../../components/uielements/button'
 import { Button, RefreshButton } from '../../components/uielements/button'
 import { useAppContext } from '../../contexts/AppContext'
 import { useChainContext } from '../../contexts/ChainContext'
@@ -256,7 +256,7 @@ const SuccessRouteView: React.FC<Props> = ({ sourceAsset, targetAsset }): JSX.El
   return (
     <>
       <div className="mb-20px flex items-center justify-between">
-        <BackLink className="!m-0" />
+        <BackLinkButton className="!m-0" />
         <RefreshButton clickHandler={reloadHandler} />
       </div>
 

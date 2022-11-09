@@ -21,7 +21,7 @@ import { EMPTY_LOAD_TXS_HANDLER } from '../../../services/wallet/const'
 import { LoadTxsHandler, NonEmptyWalletBalances, WalletBalances } from '../../../services/wallet/types'
 import { WarningView } from '../../shared/warning'
 import { AssetInfo } from '../../uielements/assets/assetInfo'
-import { BackLink } from '../../uielements/backLink'
+import { BackLinkButton } from '../../uielements/button'
 import { BorderButton, FlatButton, RefreshButton, TextButton } from '../../uielements/button'
 import { TxsTable } from '../txs/table/TxsTable'
 import * as Styled from './AssetDetails.styles'
@@ -141,7 +141,7 @@ export const AssetDetails: React.FC<Props> = (props): JSX.Element => {
     <>
       <Row justify="space-between">
         <Col>
-          <BackLink path={walletRoutes.assets.path()} />
+          <BackLinkButton path={walletRoutes.assets.path()} />
         </Col>
         <Col>
           <RefreshButton clickHandler={refreshHandler} />

@@ -2,7 +2,7 @@ import * as A from 'antd'
 import styled from 'styled-components'
 import { palette } from 'styled-theme'
 
-import { BackLink as BackLinkUI } from '../../components/uielements/backLink'
+import { BackLinkButton as BackLinkUI } from '../../components/uielements/button'
 
 export const Container = styled.div`
   display: flex;

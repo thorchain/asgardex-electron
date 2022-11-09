@@ -1,6 +1,6 @@
 import React from 'react'
 
-import { BackLink } from '../uielements/backLink'
+import { BackLinkButton } from '../uielements/button'
 import * as Styled from './PageTitle.styles'
 
 export const PageTitle: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -8,7 +8,7 @@ export const PageTitle: React.FC<{ children: React.ReactNode }> = ({ children })
     <Styled.Container>
       <Styled.Title>
         <Styled.BackLinkContainer>
-          <BackLink />
+          <BackLinkButton />
         </Styled.BackLinkContainer>
         {children}
       </Styled.Title>

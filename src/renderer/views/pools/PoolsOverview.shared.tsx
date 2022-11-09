@@ -44,15 +44,15 @@ export const watchColumn = (
   align: 'center',
   width: 50,
   render: (data: PoolTableRowData) =>
-    renderWatchColumn({ data, add: () => add(data.pool.target), remove: () => remove(data.pool.target) }),
+    renderWatchColumn({ data, add: () => add(data.asset), remove: () => remove(data.asset) }),
   sorter: sortWatchColumn,
   sortDirections: ['descend', 'ascend']
 })
 
-const renderAssetColumn = ({ pool }: PoolTableRowData) => <AssetLabel asset={pool.target} />
+const renderAssetColumn = ({ asset }: PoolTableRowData) => <AssetLabel asset={asset} />
 
-const sortAssetColumn = ({ pool: poolA }: PoolTableRowData, { pool: poolB }: PoolTableRowData) =>
-  poolA.target.symbol.localeCompare(poolB.target.symbol)
+const sortAssetColumn = ({ asset: assetA }: PoolTableRowData, { asset: assetB }: PoolTableRowData) =>
+  assetA.symbol.localeCompare(assetB.symbol)
 
 export const assetColumn = (title: string): ColumnType<PoolTableRowData> => ({
   key: 'asset',
@@ -63,9 +63,9 @@ export const assetColumn = (title: string): ColumnType<PoolTableRowData> => ({
   sortDirections: ['descend', 'ascend']
 })
 
-const renderPoolColumn = ({ pool, network }: PoolTableRowData) => (
+const renderPoolColumn = ({ asset, network }: PoolTableRowData) => (
   <Row justify="center" align="middle">
-    <AssetIcon asset={pool.target} network={network} />
+    <AssetIcon asset={asset} network={network} />
   </Row>
 )
 
@@ -77,9 +77,9 @@ export const poolColumn = (title: string): ColumnType<PoolTableRowData> => ({
   render: renderPoolColumn
 })
 
-const renderPoolColumnMobile = ({ pool, network }: PoolTableRowData) => (
+const renderPoolColumnMobile = ({ asset, network }: PoolTableRowData) => (
   <Row justify="center" align="middle" style={{ width: '100%' }}>
-    <AssetIcon asset={pool.target} network={network} />
+    <AssetIcon asset={asset} network={network} />
   </Row>
 )
 export const poolColumnMobile = (title: string): ColumnType<PoolTableRowData> => ({

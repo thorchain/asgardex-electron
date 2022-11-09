@@ -1,19 +1,14 @@
 import React, { useMemo } from 'react'
 
-import { SwapOutlined } from '@ant-design/icons'
 import * as RD from '@devexperts/remote-data-ts'
-import { Asset, AssetAmount, AssetRuneNative, assetToString, formatAssetAmount } from '@xchainjs/xchain-util'
+import { Asset, AssetAmount, assetToString, formatAssetAmount } from '@xchainjs/xchain-util'
 import { Grid } from 'antd'
 import * as FP from 'fp-ts/lib/function'
-import { useIntl } from 'react-intl'
-import { useNavigate } from 'react-router-dom'
 
 import { Network } from '../../../shared/api/types'
 import { loadingString } from '../../helpers/stringHelper'
-import * as poolsRoutes from '../../routes/pools'
-import { ManageButton } from '../manageButton'
 import { AssetIcon } from '../uielements/assets/assetIcon'
-import { FlatButton } from '../uielements/button'
+import { SwapButton, ManageButton } from '../uielements/button'
 import * as Styled from './PoolTitle.styles'
 
 export type Props = {
@@ -44,8 +39,6 @@ export const PoolTitle: React.FC<Props> = ({
   network,
   isAvailablePool
 }) => {
-  const navigate = useNavigate()
-  const intl = useIntl()
   const isDesktopView = Grid.useBreakpoint()?.md ?? false
 
   const title = useMemo(() => {
@@ -85,22 +78,12 @@ export const PoolTitle: React.FC<Props> = ({
           isTextView={isDesktopView}
         />
         {isAvailablePool && (
-          <FlatButton
+          <SwapButton
             disabled={disableAllPoolActions || disableTradingPoolAction}
             size="normal"
-            onClick={(event) => {
-              event.preventDefault()
-              event.stopPropagation()
-              navigate(
-                poolsRoutes.swap.path({
-                  source: assetToString(asset),
-                  target: assetToString(AssetRuneNative)
-                })
-              )
-            }}>
-            <SwapOutlined className="md:mr-[8px]" />
-            {isDesktopView && intl.formatMessage({ id: 'common.swap' })}
-          </FlatButton>
+            asset={asset}
+            isTextView={isDesktopView}
+          />
         )}
       </Styled.ButtonActions>
     ),
@@ -111,9 +94,7 @@ export const PoolTitle: React.FC<Props> = ({
       asset,
       isDesktopView,
       isAvailablePool,
-      disableTradingPoolAction,
-      intl,
-      navigate
+      disableTradingPoolAction
     ]
   )
 

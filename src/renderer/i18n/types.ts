@@ -64,6 +64,7 @@ export type CommonMessageKey =
   | 'common.reload'
   | 'common.add'
   | 'common.swap'
+  | 'common.savers'
   | 'common.liquidity'
   | 'common.withdraw'
   | 'common.approve'
