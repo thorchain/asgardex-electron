@@ -40,7 +40,6 @@ import {
   isEthTokenAsset,
   max1e8BaseAmount,
   convertBaseAmountDecimal,
-  isChainAsset,
   to1e8BaseAmount,
   THORCHAIN_DECIMAL,
   isUSDAsset
@@ -406,7 +405,7 @@ export const Swap = ({
   const [
     /* max. 1e8 decimal */
     amountToSwapMax1e8,
-    _setAmountToSwapMax1e8 /* private - never set it directly, use setAmountToSwap() instead */
+    _setAmountToSwapMax1e8 /* private - never set it directly, use setAmountToSwapMax1e8() instead */
   ] = useState(initialAmountToSwapMax1e8)
 
   const priceAmountToSwapMax1e8: AssetWithAmount = useMemo(
@@ -634,16 +633,20 @@ export const Swap = ({
     )
   }, [swapFees, targetAsset, poolsData, zeroTargetBaseAmountMax, targetAssetDecimal])
 
-  const swapData: SwapData = useMemo(
-    () =>
-      Utils.getSwapData({
-        amountToSwap: amountToSwapMax1e8,
-        sourceAsset: sourceAsset,
-        targetAsset: targetAsset,
-        poolsData
-      }),
-    [amountToSwapMax1e8, sourceAsset, targetAsset, poolsData]
-  )
+  const swapData: SwapData = useMemo(() => {
+    const amountToSwap = Utils.calcAmountToSwapMax1e8({
+      amountToSwapMax1e8,
+      sourceAsset,
+      inFeeAmount: swapFees.inFee.amount
+    })
+
+    return Utils.getSwapData({
+      amountToSwap,
+      sourceAsset: sourceAsset,
+      targetAsset: targetAsset,
+      poolsData
+    })
+  }, [sourceAsset, swapFees.inFee.amount, amountToSwapMax1e8, targetAsset, poolsData])
 
   const swapResultAmountMax1e8: BaseAmount = useMemo(() => {
     // 1. Convert `swapResult` (1e8) to original decimal of target asset (original decimal might be < 1e8)
@@ -959,20 +962,13 @@ export const Swap = ({
     [intl, minAmountError, minAmountToSwapMax1e8, sourceAsset]
   )
 
-  // Max amount to swap
-  // depends on users balances of source asset
+  // Max amount to swap == users balances of source asset
   // Decimal always <= 1e8 based
   const maxAmountToSwapMax1e8: BaseAmount = useMemo(() => {
     if (lockedWallet) return assetToBase(assetAmount(Number.MAX_SAFE_INTEGER, sourceAssetAmountMax1e8.decimal))
 
-    // In case of chain asset
-    // We are substracting fee from source asset
-    // In other cases ERC20/BEP20
-    // max value of token can be allocated for swap
-    if (isChainAsset(sourceAsset)) return Utils.maxAmountToSwapMax1e8(sourceAssetAmountMax1e8, swapFees.inFee.amount)
-
     return sourceAssetAmountMax1e8
-  }, [lockedWallet, sourceAssetAmountMax1e8, sourceAsset, swapFees])
+  }, [lockedWallet, sourceAssetAmountMax1e8])
 
   const setAmountToSwapMax1e8 = useCallback(
     (amountToSwap: BaseAmount) => {
@@ -1628,23 +1624,8 @@ export const Swap = ({
       trimZeros: !isUSDAsset(sourceAsset)
     })
 
-    const feeLabel = FP.pipe(
-      swapFeesRD,
-      RD.map(({ inFee: { amount, asset: feeAsset } }) =>
-        formatAssetAmountCurrency({
-          amount: baseToAsset(amount),
-          asset: feeAsset,
-          decimal: isUSDAsset(feeAsset) ? 2 : 8, // use 8 decimal as same we use in maxAmountToSwapMax1e8
-          trimZeros: !isUSDAsset(feeAsset)
-        })
-      ),
-      RD.getOrElse(() => noDataString)
-    )
-
-    return isChainAsset(sourceAsset)
-      ? intl.formatMessage({ id: 'swap.info.max.balanceMinusFee' }, { balance: balanceLabel, fee: feeLabel })
-      : intl.formatMessage({ id: 'swap.info.max.balance' }, { balance: balanceLabel })
-  }, [sourceAssetAmountMax1e8, sourceAsset, swapFeesRD, intl])
+    return intl.formatMessage({ id: 'swap.info.max.balance' }, { balance: balanceLabel })
+  }, [sourceAssetAmountMax1e8, sourceAsset, intl])
 
   const [showDetails, setShowDetails] = useState<boolean>(false)
 
