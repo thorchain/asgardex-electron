@@ -1,6 +1,5 @@
 import React, { useCallback, useMemo, useRef } from 'react'
 
-import { SwapOutlined } from '@ant-design/icons'
 import * as RD from '@devexperts/remote-data-ts'
 import { assetToString, baseToAsset, bn, formatAssetAmountCurrency, formatBN } from '@xchainjs/xchain-util'
 import { Grid } from 'antd'
@@ -13,9 +12,8 @@ import { useIntl } from 'react-intl'
 import { useNavigate } from 'react-router-dom'
 
 import { Network } from '../../../shared/api/types'
-import { ManageButton } from '../../components/manageButton'
 import { ProtocolLimit, IncentivePendulum } from '../../components/pool'
-import { FlatButton } from '../../components/uielements/button'
+import { ManageButton, SaversButton, Size as ButtonSize, SwapButton } from '../../components/uielements/button'
 import { Table } from '../../components/uielements/table'
 import { useAppContext } from '../../contexts/AppContext'
 import { useMidgardContext } from '../../contexts/MidgardContext'
@@ -26,7 +24,6 @@ import { usePoolFilter } from '../../hooks/usePoolFilter'
 import { usePoolWatchlist } from '../../hooks/usePoolWatchlist'
 import { useProtocolLimit } from '../../hooks/useProtocolLimit'
 import * as poolsRoutes from '../../routes/pools'
-import { SwapRouteParams } from '../../routes/pools/swap'
 import { DEFAULT_NETWORK } from '../../services/const'
 import { PoolsState, DEFAULT_POOL_FILTERS } from '../../services/midgard/types'
 import { PoolsComponentProps, PoolTableRowData, PoolTableRowsData } from './Pools.types'
@@ -67,16 +64,9 @@ export const ActivePools: React.FC<PoolsComponentProps> = ({ haltedChains, mimir
 
   const selectedPricePool = useObservableState(selectedPricePool$, PoolHelpers.RUNE_PRICE_POOL)
 
-  const clickSwapHandler = useCallback(
-    (p: SwapRouteParams) => {
-      navigate(poolsRoutes.swap.path(p))
-    },
-    [navigate]
-  )
-
   const renderBtnPoolsColumn = useCallback(
-    (_: string, { pool }: PoolTableRowData) => {
-      const chain = pool.target.chain
+    (_: string, { asset }: PoolTableRowData) => {
+      const chain = asset.chain
       const disableAllPoolActions = PoolHelpers.disableAllActions({ chain, haltedChains, mimirHalt })
       const disableTradingActions = PoolHelpers.disableTradingActions({
         chain,
@@ -89,34 +79,35 @@ export const ActivePools: React.FC<PoolsComponentProps> = ({ haltedChains, mimir
         mimirHalt
       })
 
+      const buttonSize: ButtonSize = isDesktopView ? 'normal' : 'large'
+
       return (
         <Styled.TableAction>
           <ManageButton
             disabled={disableAllPoolActions || disablePoolActions || walletLocked}
-            asset={pool.target}
-            size={isDesktopView ? 'normal' : 'large'}
+            asset={asset}
+            size={buttonSize}
             isTextView={isDesktopView}
           />
-          <FlatButton
+          <SwapButton
             className="ml-10px"
-            size={isDesktopView ? 'normal' : 'large'}
+            size={buttonSize}
             disabled={disableAllPoolActions || disableTradingActions}
-            onClick={(event) => {
-              event.preventDefault()
-              event.stopPropagation()
-              clickSwapHandler({
-                source: assetToString(pool.asset),
-                target: assetToString(pool.target)
-              })
-            }}>
-            <SwapOutlined className="lg:mr-[8px]" />
-            {isDesktopView && intl.formatMessage({ id: 'common.swap' })}
-          </FlatButton>
+            asset={asset}
+            isTextView={isDesktopView}
+          />
+          <SaversButton
+            className="ml-10px"
+            size={buttonSize}
+            disabled={disableAllPoolActions || disableTradingActions}
+            asset={asset}
+            isTextView={isDesktopView}
+          />
         </Styled.TableAction>
       )
     },
 
-    [haltedChains, mimirHalt, walletLocked, isDesktopView, intl, clickSwapHandler]
+    [haltedChains, mimirHalt, walletLocked, isDesktopView]
   )
 
   const btnPoolsColumn = useMemo(
@@ -234,10 +225,10 @@ export const ActivePools: React.FC<PoolsComponentProps> = ({ haltedChains, mimir
             dataSource={dataSource}
             loading={loading}
             rowKey="key"
-            onRow={({ pool }: PoolTableRowData) => {
+            onRow={({ asset }: PoolTableRowData) => {
               return {
                 onClick: () => {
-                  navigate(poolsRoutes.detail.path({ asset: assetToString(pool.target) }))
+                  navigate(poolsRoutes.detail.path({ asset: assetToString(asset) }))
                 }
               }
             }}

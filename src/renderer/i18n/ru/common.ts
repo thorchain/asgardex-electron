@@ -65,6 +65,7 @@ const common: CommonMessages = {
   'common.reload': 'Обновить',
   'common.add': 'Добавить',
   'common.swap': 'Обмен',
+  'common.savers': 'Savers - RU',
   'common.liquidity': 'Ликвидность',
   'common.withdraw': 'Вывести',
   'common.approve': 'Подтвердить',

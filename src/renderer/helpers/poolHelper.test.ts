@@ -96,10 +96,8 @@ describe('helpers/poolHelper/', () => {
       })
       expect(result.length).toEqual(2)
       // Note: `getPoolTableRowsData` reverses the order of given `poolDetails`
-      expect(result[0].pool.asset).toEqual(AssetRuneNative)
-      expect(result[0].pool.target).toEqual(ASSETS_TESTNET.FTM)
-      expect(result[1].pool.asset).toEqual(AssetRuneNative)
-      expect(result[1].pool.target).toEqual(ASSETS_TESTNET.BOLT)
+      expect(result[0].asset).toEqual(ASSETS_TESTNET.FTM)
+      expect(result[1].asset).toEqual(ASSETS_TESTNET.BOLT)
     })
 
     it('returns data for available pools', () => {
@@ -111,10 +109,8 @@ describe('helpers/poolHelper/', () => {
       })
       expect(result.length).toEqual(2)
       // Note: `getPoolTableRowsData` reverses the order of given `poolDetails`
-      expect(result[0].pool.asset).toEqual(AssetRuneNative)
-      expect(result[0].pool.target).toEqual(ASSETS_TESTNET.FTM)
-      expect(result[1].pool.asset).toEqual(AssetRuneNative)
-      expect(result[1].pool.target).toEqual(ASSETS_TESTNET.TOMO)
+      expect(result[0].asset).toEqual(ASSETS_TESTNET.FTM)
+      expect(result[1].asset).toEqual(ASSETS_TESTNET.TOMO)
     })
   })
 

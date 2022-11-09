@@ -1,13 +1,13 @@
 import { ComponentMeta, StoryFn } from '@storybook/react'
 
-import { BackLink as Component, Props } from './BackLink'
+import { BackLinkButton as Component, Props } from './BackLinkButton'
 
 const Template: StoryFn<Props> = (args) => <Component {...args} />
 export const Default = Template.bind({})
 
 const meta: ComponentMeta<typeof Component> = {
   component: Component,
-  title: 'Components/BackLink',
+  title: 'Components/button/BackLinkButton',
   args: {
     label: 'Back link'
   },

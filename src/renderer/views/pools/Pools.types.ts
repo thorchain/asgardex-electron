@@ -6,11 +6,6 @@ import { Network } from '../../../shared/api/types'
 import { MimirHalt } from '../../services/thorchain/types'
 import { GetPoolsStatusEnum } from '../../types/generated/midgard'
 
-export type Pool = {
-  asset: Asset
-  target: Asset
-}
-
 // List of assets used for pricing
 export type PricePoolAsset = Asset
 export type PricePoolAssets = PricePoolAsset[]
@@ -26,7 +21,7 @@ export type PricePool = {
 export type PricePools = NonEmptyArray<PricePool>
 
 export type PoolTableRowData = {
-  pool: Pool
+  asset: Asset
   depthPrice: BaseAmount
   volumePrice: BaseAmount
   poolPrice: BaseAmount
