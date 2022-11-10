@@ -63,6 +63,7 @@ const common: CommonMessages = {
   'common.searchAsset': 'Suche Asset',
   'common.retry': 'Wiederholen',
   'common.reload': 'Neuladen',
+  'common.action': 'Aktion',
   'common.add': 'Einzahlen',
   'common.swap': 'Swap',
   'common.savers': 'Savers',

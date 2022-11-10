@@ -62,6 +62,7 @@ export type CommonMessageKey =
   | 'common.searchAsset'
   | 'common.retry'
   | 'common.reload'
+  | 'common.action'
   | 'common.add'
   | 'common.swap'
   | 'common.savers'

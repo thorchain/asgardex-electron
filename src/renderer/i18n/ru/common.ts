@@ -63,6 +63,7 @@ const common: CommonMessages = {
   'common.searchAsset': 'Поиск актива',
   'common.retry': 'Повторить',
   'common.reload': 'Обновить',
+  'common.action': 'Action - RU',
   'common.add': 'Добавить',
   'common.swap': 'Обмен',
   'common.savers': 'Savers - RU',

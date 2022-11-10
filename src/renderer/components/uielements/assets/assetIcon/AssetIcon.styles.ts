@@ -77,4 +77,5 @@ export const Icon = styled.img<IconProps>`
   width: ${({ size, isSynth }) => `${sizes[size] - (isSynth ? 2 : 0) * borders[size]}px`};
   height: ${({ size, isSynth }) => `${sizes[size] - (isSynth ? 2 : 0) * borders[size]}px`};
   border-radius: 50%;
+  max-width: auto; // overridden to avoid max-w-100% (default)
 `
