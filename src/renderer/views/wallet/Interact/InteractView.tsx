@@ -119,7 +119,7 @@ export const InteractView: React.FC = () => {
         <>
           <Row justify="space-between">
             <Col>
-              <BackLinkButton path={walletRoutes.assetDetail.path()} />
+              <BackLinkButton />
             </Col>
           </Row>
           <Styled.Container>

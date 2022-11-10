@@ -1,7 +1,6 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
-import { Balance } from '@xchainjs/xchain-client'
 import {
   Address,
   Asset,
@@ -21,7 +20,7 @@ import { useIntl } from 'react-intl'
 
 import { Network } from '../../../../shared/api/types'
 import { isKeystoreWallet } from '../../../../shared/utils/guard'
-import { disableRuneUpgrade, isNonNativeRuneAsset, isUSDAsset } from '../../../helpers/assetHelper'
+import { disableRuneUpgrade, isNonNativeRuneAsset, isRuneNativeAsset, isUSDAsset } from '../../../helpers/assetHelper'
 import { getChainAsset } from '../../../helpers/chainHelper'
 import { getPoolPriceValue } from '../../../helpers/poolHelper'
 import { WalletBalancesRD } from '../../../services/clients'
@@ -39,32 +38,25 @@ import { walletTypeToI18n } from '../../../services/wallet/util'
 import { PricePool } from '../../../views/pools/Pools.types'
 import { ErrorView } from '../../shared/error/'
 import { AssetIcon } from '../../uielements/assets/assetIcon'
-import { FlatButton } from '../../uielements/button'
+import { Action as ActionButtonAction, ActionButton } from '../../uielements/button/ActionButton'
 import { QRCodeModal } from '../../uielements/qrCodeModal/QRCodeModal'
 import * as Styled from './AssetsTableCollapsable.styles'
 
 const { Panel } = Collapse
 
+export type AssetAction = 'send' | 'upgrade' | 'deposit'
+
 type Props = {
   chainBalances: ChainBalances
   pricePool: PricePool
   poolDetails: PoolDetails
-  selectAssetHandler: (asset: SelectedWalletAsset) => void
-  upgradeAssetHandler: (asset: SelectedWalletAsset) => void
+  assetHandler: (asset: SelectedWalletAsset, action: AssetAction) => void
   network: Network
   mimirHalt: MimirHaltRD
 }
 
 export const AssetsTableCollapsable: React.FC<Props> = (props): JSX.Element => {
-  const {
-    chainBalances = [],
-    pricePool,
-    poolDetails,
-    selectAssetHandler,
-    upgradeAssetHandler,
-    mimirHalt: mimirHaltRD,
-    network
-  } = props
+  const { chainBalances = [], pricePool, poolDetails, assetHandler, mimirHalt: mimirHaltRD, network } = props
 
   const intl = useIntl()
   const screenMap: ScreenMap = Grid.useBreakpoint()
@@ -89,25 +81,11 @@ export const AssetsTableCollapsable: React.FC<Props> = (props): JSX.Element => {
     [mimirHaltRD]
   )
 
-  const onRowHandler = useCallback(
-    ({ asset, walletAddress, walletType, walletIndex, hdMode }: WalletBalance) => ({
-      // Disable click for NativeRUNE if Thorchain is halted
-      onClick: () => selectAssetHandler({ asset, walletAddress, walletType, walletIndex, hdMode })
-    }),
-    [selectAssetHandler]
-  )
-
-  // Hide column of "show/hide" icon temporary
-  // const hideAssetHandler = useCallback((_asset: Asset) => {
-  //   // TODO (@Veado) Add logic as part of
-  //   // https://github.com/thorchain/asgardex-electron/issues/476
-  // }, [])
-
-  const iconColumn: ColumnType<Balance> = useMemo(
+  const iconColumn: ColumnType<WalletBalance> = useMemo(
     () => ({
       title: '',
       width: 120,
-      render: ({ asset }: Balance) => (
+      render: ({ asset }: WalletBalance) => (
         <Row justify="center" align="middle">
           <AssetIcon asset={asset} size="normal" network={network} />
         </Row>
@@ -119,43 +97,22 @@ export const AssetsTableCollapsable: React.FC<Props> = (props): JSX.Element => {
   const tickerColumn: ColumnType<WalletBalance> = useMemo(
     () => ({
       width: 80,
-      render: ({ asset, walletAddress, walletType, walletIndex, hdMode }: WalletBalance) => {
-        // Disable UPGRADE button if needed
-        const disableUpgradeButton = disableRuneUpgrade({ asset, haltThorChain, haltEthChain, haltBnbChain, network })
-
-        const onClickUpgradeButtonHandler = (e: React.MouseEvent<HTMLElement, MouseEvent>) => {
-          e.preventDefault()
-          e.stopPropagation()
-          upgradeAssetHandler({ asset, walletAddress, walletIndex, walletType, hdMode })
-        }
-
-        return (
-          <Styled.AssetTickerWrapper>
-            <Styled.Label nowrap>
-              <Styled.TickerLabel>{asset.ticker}</Styled.TickerLabel>
-              <Styled.ChainLabelWrapper>
-                {!isSynthAsset(asset) && <Styled.ChainLabel>{asset.chain}</Styled.ChainLabel>}
-                {isSynthAsset(asset) && <Styled.AssetSynthLabel>synth</Styled.AssetSynthLabel>}
-              </Styled.ChainLabelWrapper>
-            </Styled.Label>
-            {isNonNativeRuneAsset(asset, network) && (
-              <FlatButton
-                className="ml-20px"
-                size="normal"
-                color="warning"
-                onClick={disableUpgradeButton ? undefined : onClickUpgradeButtonHandler}
-                disabled={disableUpgradeButton}>
-                {intl.formatMessage({ id: 'wallet.action.upgrade' })}
-              </FlatButton>
-            )}
-          </Styled.AssetTickerWrapper>
-        )
-      }
+      render: ({ asset }: WalletBalance) => (
+        <Styled.AssetTickerWrapper>
+          <Styled.Label nowrap>
+            <Styled.TickerLabel>{asset.ticker}</Styled.TickerLabel>
+            <Styled.ChainLabelWrapper>
+              {!isSynthAsset(asset) && <Styled.ChainLabel>{asset.chain}</Styled.ChainLabel>}
+              {isSynthAsset(asset) && <Styled.AssetSynthLabel>synth</Styled.AssetSynthLabel>}
+            </Styled.ChainLabelWrapper>
+          </Styled.Label>
+        </Styled.AssetTickerWrapper>
+      )
     }),
-    [haltThorChain, haltEthChain, haltBnbChain, network, intl, upgradeAssetHandler]
+    []
   )
 
-  const renderBalanceColumn = ({ asset, amount }: Balance) => {
+  const renderBalanceColumn = ({ asset, amount }: WalletBalance) => {
     const balance = formatAssetAmountCurrency({ amount: baseToAsset(amount), asset, decimal: 3 })
     return (
       <Styled.Label nowrap align="right">
@@ -164,7 +121,7 @@ export const AssetsTableCollapsable: React.FC<Props> = (props): JSX.Element => {
     )
   }
 
-  const balanceColumn: ColumnType<Balance> = useMemo(
+  const balanceColumn: ColumnType<WalletBalance> = useMemo(
     () => ({
       render: renderBalanceColumn
     }),
@@ -172,12 +129,12 @@ export const AssetsTableCollapsable: React.FC<Props> = (props): JSX.Element => {
   )
 
   const renderPriceColumn = useCallback(
-    (balance: Balance) => {
-      const oPrice = getPoolPriceValue({ balance, poolDetails, pricePool, network })
+    ({ asset, amount }: WalletBalance) => {
+      const oPrice = getPoolPriceValue({ balance: { asset, amount }, poolDetails, pricePool, network })
       const label = FP.pipe(
         oPrice,
         O.map((price) => {
-          const priceAmount = baseAmount(price.amount(), balance.amount.decimal)
+          const priceAmount = baseAmount(price.amount(), amount.decimal)
           return formatAssetAmountCurrency({
             amount: baseToAsset(priceAmount),
             asset: pricePool.asset,
@@ -196,7 +153,7 @@ export const AssetsTableCollapsable: React.FC<Props> = (props): JSX.Element => {
     [network, poolDetails, pricePool]
   )
 
-  const priceColumn: ColumnType<Balance> = useMemo(
+  const priceColumn: ColumnType<WalletBalance> = useMemo(
     () => ({
       width: 300,
       render: renderPriceColumn
@@ -204,42 +161,87 @@ export const AssetsTableCollapsable: React.FC<Props> = (props): JSX.Element => {
     [renderPriceColumn]
   )
 
-  // Hide column of "show/hide" icon temporary
-  // const hideColumn: ColumnType<Balance> = useMemo(
-  //   () => ({
-  //     width: 20,
-  //     render: ({ asset }: Balance) => (
-  //       <Row
-  //         justify="center"
-  //         align="middle"
-  //         onClick={(event) => {
-  //           event.preventDefault()
-  //           event.stopPropagation()
-  //           hideAssetHandler(asset)
-  //         }}>
-  //         <Styled.HideIcon />
-  //       </Row>
-  //     )
-  //   }),
-  //   [hideAssetHandler]
-  // )
+  const renderActionColumn = useCallback(
+    ({ asset, walletAddress, walletIndex, walletType, hdMode }: WalletBalance) => {
+      const walletAsset: SelectedWalletAsset = { asset, walletAddress, walletIndex, walletType, hdMode }
+      const actions: ActionButtonAction[] = FP.pipe(
+        [
+          {
+            label: intl.formatMessage({ id: 'wallet.action.send' }),
+            callback: () => {
+              assetHandler(walletAsset, 'send')
+            }
+          },
+          {
+            label: intl.formatMessage({ id: 'wallet.action.receive' }),
+            callback: () => {
+              setShowQRModal(O.some({ asset: getChainAsset(asset.chain), address: walletAddress }))
+            }
+          }
+        ],
+        // 'deposit'  for RuneNativeAsset only
+        A.concatW<ActionButtonAction>(
+          isRuneNativeAsset(asset)
+            ? [
+                {
+                  label: intl.formatMessage({ id: 'wallet.action.deposit' }),
+                  callback: () => {
+                    assetHandler(walletAsset, 'deposit')
+                  }
+                }
+              ]
+            : []
+        ),
+        // 'upgrade'  for non-RuneNativeAsset only
+        A.concatW<ActionButtonAction>(
+          isNonNativeRuneAsset(asset, network)
+            ? [
+                {
+                  label: intl.formatMessage({ id: 'wallet.action.upgrade' }),
+                  // Disable UPGRADE button if needed
+                  disabled: disableRuneUpgrade({ asset, haltThorChain, haltEthChain, haltBnbChain, network }),
+                  callback: () => {
+                    assetHandler(walletAsset, 'upgrade')
+                  }
+                }
+              ]
+            : []
+        )
+      )
+
+      return (
+        <div className="flex justify-center">
+          <ActionButton size="medium" actions={actions} />
+        </div>
+      )
+    },
+    [assetHandler, haltBnbChain, haltEthChain, haltThorChain, intl, network]
+  )
+
+  const actionColumn: ColumnType<WalletBalance> = useMemo(
+    () => ({
+      width: 150,
+      render: renderActionColumn
+    }),
+    [renderActionColumn]
+  )
 
   const columns = useMemo(() => {
     // desktop
     if (screenMap?.lg ?? false) {
-      return [iconColumn, tickerColumn, balanceColumn, priceColumn]
+      return [iconColumn, tickerColumn, balanceColumn, priceColumn, actionColumn]
     }
     // tablet
     if (screenMap?.sm ?? false) {
-      return [iconColumn, tickerColumn, balanceColumn]
+      return [iconColumn, tickerColumn, balanceColumn, actionColumn]
     }
     // mobile
     if (screenMap?.xs ?? false) {
-      return [iconColumn, balanceColumn]
+      return [iconColumn, balanceColumn, actionColumn]
     }
 
     return []
-  }, [balanceColumn, iconColumn, priceColumn, screenMap, tickerColumn])
+  }, [actionColumn, balanceColumn, iconColumn, priceColumn, screenMap?.lg, screenMap?.sm, screenMap?.xs, tickerColumn])
 
   const renderAssetsTable = useCallback(
     ({ tableData, loading = false }: { tableData: WalletBalances; loading?: boolean }) => {
@@ -249,12 +251,11 @@ export const AssetsTableCollapsable: React.FC<Props> = (props): JSX.Element => {
           dataSource={tableData}
           loading={loading}
           rowKey={({ asset }) => asset.symbol}
-          onRow={onRowHandler}
           columns={columns}
         />
       )
     },
-    [columns, onRowHandler]
+    [columns]
   )
 
   const renderBalances = useCallback(
