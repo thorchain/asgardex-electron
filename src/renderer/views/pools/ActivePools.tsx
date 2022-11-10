@@ -1,7 +1,14 @@
 import React, { useCallback, useMemo, useRef } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
-import { assetToString, baseToAsset, bn, formatAssetAmountCurrency, formatBN } from '@xchainjs/xchain-util'
+import {
+  AssetRuneNative,
+  assetToString,
+  baseToAsset,
+  bn,
+  formatAssetAmountCurrency,
+  formatBN
+} from '@xchainjs/xchain-util'
 import { Grid } from 'antd'
 import { ColumnsType, ColumnType } from 'antd/lib/table'
 import * as A from 'fp-ts/Array'
@@ -13,7 +20,7 @@ import { useNavigate } from 'react-router-dom'
 
 import { Network } from '../../../shared/api/types'
 import { ProtocolLimit, IncentivePendulum } from '../../components/pool'
-import { ManageButton, SaversButton, Size as ButtonSize, SwapButton } from '../../components/uielements/button'
+import { Action as ActionButtonAction, ActionButton } from '../../components/uielements/button/ActionButton'
 import { Table } from '../../components/uielements/table'
 import { useAppContext } from '../../contexts/AppContext'
 import { useMidgardContext } from '../../contexts/MidgardContext'
@@ -79,35 +86,39 @@ export const ActivePools: React.FC<PoolsComponentProps> = ({ haltedChains, mimir
         mimirHalt
       })
 
-      const buttonSize: ButtonSize = isDesktopView ? 'normal' : 'large'
+      const actions: ActionButtonAction[] = [
+        {
+          label: intl.formatMessage({ id: 'common.swap' }),
+          disabled: disableAllPoolActions || disableTradingActions,
+          callback: () => {
+            console.log('swap', assetToString(asset))
+            navigate(poolsRoutes.swap.path({ source: assetToString(AssetRuneNative), target: assetToString(asset) }))
+          }
+        },
+        {
+          label: intl.formatMessage({ id: 'common.manage' }),
+          disabled: disableAllPoolActions || disablePoolActions || walletLocked,
+          callback: () => {
+            navigate(poolsRoutes.deposit.path({ asset: assetToString(asset) }))
+          }
+        },
+        {
+          label: intl.formatMessage({ id: 'common.savers' }),
+          disabled: disableAllPoolActions || disableTradingActions,
+          callback: () => {
+            navigate(poolsRoutes.savers.path({ asset: assetToString(asset) }))
+          }
+        }
+      ]
 
       return (
         <Styled.TableAction>
-          <ManageButton
-            disabled={disableAllPoolActions || disablePoolActions || walletLocked}
-            asset={asset}
-            size={buttonSize}
-            isTextView={isDesktopView}
-          />
-          <SwapButton
-            className="ml-10px"
-            size={buttonSize}
-            disabled={disableAllPoolActions || disableTradingActions}
-            asset={asset}
-            isTextView={isDesktopView}
-          />
-          <SaversButton
-            className="ml-10px"
-            size={buttonSize}
-            disabled={disableAllPoolActions || disableTradingActions}
-            asset={asset}
-            isTextView={isDesktopView}
-          />
+          <ActionButton size="normal" actions={actions} />
         </Styled.TableAction>
       )
     },
 
-    [haltedChains, mimirHalt, walletLocked, isDesktopView]
+    [haltedChains, mimirHalt, intl, walletLocked, navigate]
   )
 
   const btnPoolsColumn = useMemo(
