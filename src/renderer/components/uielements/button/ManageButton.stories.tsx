@@ -12,7 +12,7 @@ const meta: ComponentMeta<typeof Component> = {
     size: {
       control: {
         type: 'select',
-        options: ['small', 'normal', 'large']
+        options: ['small', 'medium', 'normal', 'large']
       }
     }
   },

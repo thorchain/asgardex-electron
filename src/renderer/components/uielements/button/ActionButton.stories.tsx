@@ -1,7 +1,6 @@
 import { ComponentMeta, StoryFn } from '@storybook/react'
-import { AssetBNB, AssetBTC, AssetETH, AssetLTC, AssetRuneB1A, AssetRuneNative } from '@xchainjs/xchain-util'
 
-import { Actionbutton as Component, Props } from './ActionButton'
+import { ActionButton as Component, Props } from './ActionButton'
 
 const Template: StoryFn<Props> = (args) => <Component {...args} />
 export const Default = Template.bind({})
@@ -12,18 +11,54 @@ const meta: ComponentMeta<typeof Component> = {
     size: {
       control: {
         type: 'select',
-        options: ['small', 'normal', 'large']
+        options: ['small', 'medium', 'normal', 'large']
       }
     }
   },
   args: {
     actions: [
-      { type: 'swap', data: { target: AssetRuneNative, source: AssetBNB } },
-      { type: 'manage', data: { asset: AssetBNB } },
-      { type: 'savers', data: { asset: AssetBTC } },
-      { type: 'send', data: { asset: AssetETH } },
-      { type: 'deposit', data: { asset: AssetLTC } },
-      { type: 'upgrade', data: { asset: AssetRuneB1A } }
+      {
+        label: 'swap',
+        callback: () => {
+          console.log('swap')
+        },
+        disabled: false
+      },
+      {
+        label: 'manage',
+        callback: () => {
+          console.log('manage')
+        },
+        disabled: false
+      },
+      {
+        label: 'savers',
+        callback: () => {
+          console.log('savers')
+        },
+        disabled: true
+      },
+      {
+        label: 'send',
+        callback: () => {
+          console.log('send')
+        },
+        disabled: false
+      },
+      {
+        label: 'deposit',
+        callback: () => {
+          console.log('deposit')
+        },
+        disabled: false
+      },
+      {
+        label: 'upgrade',
+        callback: () => {
+          console.log('upgrade')
+        },
+        disabled: true
+      }
     ],
     disabled: false,
     size: 'normal'
