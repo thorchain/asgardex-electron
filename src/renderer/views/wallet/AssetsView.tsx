@@ -13,6 +13,7 @@ import * as RxOp from 'rxjs/operators'
 import { RefreshButton } from '../../components/uielements/button'
 import { AssetsNav } from '../../components/wallet/assets'
 import { AssetsTableCollapsable } from '../../components/wallet/assets/AssetsTableCollapsable'
+import type { AssetAction } from '../../components/wallet/assets/AssetsTableCollapsable'
 import { TotalValue } from '../../components/wallet/assets/TotalValue'
 import { useMidgardContext } from '../../contexts/MidgardContext'
 import { useWalletContext } from '../../contexts/WalletContext'
@@ -71,18 +72,20 @@ export const AssetsView: React.FC = (): JSX.Element => {
 
   const selectedPricePool = useObservableState(selectedPricePool$, RUNE_PRICE_POOL)
 
-  const selectAssetHandler = useCallback(
-    (selectedAsset: SelectedWalletAsset) => {
+  const assetHandler = useCallback(
+    (selectedAsset: SelectedWalletAsset, action: AssetAction) => {
       setSelectedAsset(O.some(selectedAsset))
-      navigate(walletRoutes.assetDetail.path())
-    },
-    [navigate, setSelectedAsset]
-  )
-
-  const upgradeAssetHandler = useCallback(
-    (selectedAsset: SelectedWalletAsset) => {
-      setSelectedAsset(O.some(selectedAsset))
-      navigate(walletRoutes.upgradeRune.path())
+      switch (action) {
+        case 'send':
+          navigate(walletRoutes.send.path())
+          break
+        case 'upgrade':
+          navigate(walletRoutes.upgradeRune.path())
+          break
+        case 'deposit':
+          navigate(walletRoutes.interact.path({ interactType: 'bond' }))
+          break
+      }
     },
     [navigate, setSelectedAsset]
   )
@@ -114,8 +117,7 @@ export const AssetsView: React.FC = (): JSX.Element => {
         chainBalances={chainBalances}
         pricePool={selectedPricePool}
         poolDetails={poolDetails}
-        selectAssetHandler={selectAssetHandler}
-        upgradeAssetHandler={upgradeAssetHandler}
+        assetHandler={assetHandler}
         mimirHalt={mimirHaltRD}
         network={network}
       />

@@ -177,6 +177,7 @@ type WalletMessageKey =
   | 'wallet.action.send'
   | 'wallet.action.upgrade'
   | 'wallet.action.receive'
+  | 'wallet.action.receive.title'
   | 'wallet.action.forget'
   | 'wallet.action.unlock'
   | 'wallet.action.connect'

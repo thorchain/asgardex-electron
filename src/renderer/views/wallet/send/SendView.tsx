@@ -18,7 +18,6 @@ import { useIntl } from 'react-intl'
 import { LoadingView } from '../../../components/shared/loading'
 import { BackLinkButton } from '../../../components/uielements/button'
 import { useWalletContext } from '../../../contexts/WalletContext'
-import * as walletRoutes from '../../../routes/wallet'
 import { SelectedWalletAsset } from '../../../services/wallet/types'
 import {
   SendViewBNB,
@@ -84,7 +83,7 @@ export const SendView: React.FC<Props> = (): JSX.Element => {
       () => <LoadingView size="large" />,
       (selectedAsset) => (
         <div>
-          <BackLinkButton path={walletRoutes.assetDetail.path()} />
+          <BackLinkButton />
           {renderSendView(selectedAsset)}
         </div>
       )

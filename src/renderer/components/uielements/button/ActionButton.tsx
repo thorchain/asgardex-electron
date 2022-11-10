@@ -16,12 +16,12 @@ export type Props = Omit<ButtonProps, 'onClick'> & {
 }
 
 export const ActionButton: React.FC<Props> = (props): JSX.Element => {
-  const { size, actions, isTextView = true, disabled = false } = props
+  const { size, actions, isTextView = true, disabled = false, className = '' } = props
 
   const intl = useIntl()
 
   return (
-    <Popover className="relative">
+    <Popover className={`relative ${className}`}>
       <Popover.Button as="div" className="group">
         {({ open }) => (
           <FlatButton size={size} disabled={disabled}>

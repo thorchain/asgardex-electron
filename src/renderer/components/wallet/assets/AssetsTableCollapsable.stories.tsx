@@ -29,10 +29,8 @@ import { AssetsTableCollapsable } from './index'
 
 const apiError: ApiError = { errorId: ErrorId.GET_BALANCES, msg: 'error message' }
 
-const selectAssetHandler = ({ asset, walletType, walletAddress }: SelectedWalletAsset) =>
-  console.log('selectAssetHandler params ', assetToString(asset), walletType, walletAddress)
-const upgradeAssetHandler = ({ asset, walletType, walletAddress }: SelectedWalletAsset) =>
-  console.log('upgradeAssetHandler params ', assetToString(asset), walletType, walletAddress)
+const assetHandler = ({ asset, walletType, walletAddress }: SelectedWalletAsset) =>
+  console.log('assetHandler params ', assetToString(asset), walletType, walletAddress)
 
 const balances: Partial<Record<Chain, ChainBalances>> = {
   [BNBChain]: [
@@ -161,8 +159,7 @@ const getBalance = (chain: Chain, status: RDStatus | undefined, walletType: Wall
 const Template = (args: Partial<Record<Chain, RDStatus>>) => {
   return (
     <AssetsTableCollapsable
-      selectAssetHandler={selectAssetHandler}
-      upgradeAssetHandler={upgradeAssetHandler}
+      assetHandler={assetHandler}
       chainBalances={FP.pipe(
         Object.entries(balances),
         A.map(([chain, chainBalances]) =>

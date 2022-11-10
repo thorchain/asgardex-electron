@@ -26,7 +26,7 @@ export const QRCodeModal: React.FC<Props> = (props): JSX.Element => {
     <Styled.QRCodeModal
       key="qr-code-modal"
       title={intl.formatMessage(
-        { id: 'wallet.action.receive' },
+        { id: 'wallet.action.receive.title' },
         { asset: `${asset.ticker} (${chainToString(asset.chain)})` }
       )}
       visible={visible}
