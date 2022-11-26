@@ -6,10 +6,11 @@ import * as RxOp from 'rxjs/operators'
 
 import { ApiUrls, Network } from '../../../shared/api/types'
 import { DEFAULT_MIDGARD_URLS } from '../../../shared/midgard/const'
+import { ASGARDEX_IDENTIFIER } from '../../const'
 import { eqApiUrls } from '../../helpers/fp/eq'
 import { liveData } from '../../helpers/rx/liveData'
 import { triggerStream, TriggerStream$ } from '../../helpers/stateHelper'
-import { Configuration, DefaultApi } from '../../types/generated/midgard'
+import { Configuration, DefaultApi, Middleware, RequestArgs } from '../../types/generated/midgard'
 import { network$ } from '../app/service'
 import { MIDGARD_MAX_RETRY } from '../const'
 import { getStorageState$, modifyStorage, getStorageState } from '../storage/common'
@@ -66,11 +67,23 @@ const setMidgardUrl = (url: string, network: Network) => {
   modifyStorage(O.some({ midgard: midgardUrls }))
 }
 
+const MIDGARD_API_MIDDLEWARE: Middleware = {
+  pre: (req: RequestArgs) => {
+    const headers = req?.headers ?? {}
+    return { ...req, headers: { ...headers, 'x-client-id': `${ASGARDEX_IDENTIFIER}` } }
+  }
+}
+
 /**
  * Helper to get `DefaultApi` instance for Midgard using custom basePath
  */
-const getMidgardDefaultApi = (basePath: string) => new DefaultApi(new Configuration({ basePath }))
-
+const getMidgardDefaultApi = (basePath: string) =>
+  new DefaultApi(
+    new Configuration({
+      basePath,
+      middleware: [MIDGARD_API_MIDDLEWARE]
+    })
+  )
 /**
  * Midgard url
  */
