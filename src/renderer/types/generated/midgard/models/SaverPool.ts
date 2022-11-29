@@ -11,55 +11,51 @@
  * Do not edit the class manually.
  */
 
-import {
-    Coin,
-} from './';
-
 /**
  * @export
- * @interface SwapMetadata
+ * @interface SaverPool
  */
-export interface SwapMetadata {
+export interface SaverPool {
     /**
-     * Affiliate fee address of the swap, empty if fee swap
+     * Int64(e8), total asset added to the saver pool by member
      * @type {string}
-     * @memberof SwapMetadata
+     * @memberof SaverPool
      */
-    affiliateAddress: string;
+    assetAdded: string;
     /**
-     * Int64 (Basis points, 0-1000, where 1000=10%)
+     * saver address used by the member
      * @type {string}
-     * @memberof SwapMetadata
+     * @memberof SaverPool
      */
-    affiliateFee: string;
+    assetAddress: string;
     /**
-     * Int64(e8), RUNE amount charged as swap liquidity fee
+     * Int64(e8), total asset withdrawn from the saver pool by member
      * @type {string}
-     * @memberof SwapMetadata
+     * @memberof SaverPool
      */
-    liquidityFee: string;
+    assetWithdrawn: string;
     /**
-     * Transaction memo of the swap action
+     * Int64, Unix timestamp for the first time member deposited into the saver pool
      * @type {string}
-     * @memberof SwapMetadata
+     * @memberof SaverPool
      */
-    memo: string;
+    dateFirstAdded: string;
     /**
-     * List of network fees associated to an action. One network fee is charged for each outbound transaction 
-     * @type {Array<Coin>}
-     * @memberof SwapMetadata
-     */
-    networkFees: Array<Coin>;
-    /**
-     * Int64 (Basis points, 0-10000, where 10000=100%), swap slip percentage
+     * Int64, Unix timestamp for the last time member deposited into the saver pool
      * @type {string}
-     * @memberof SwapMetadata
+     * @memberof SaverPool
      */
-    swapSlip: string;
+    dateLastAdded: string;
     /**
-     * Int64(e8), minimum output amount specified for the swap
+     * The Pool rest of the data are refering to (only those pools can show up which have a corresponding saver pool)
      * @type {string}
-     * @memberof SwapMetadata
+     * @memberof SaverPool
      */
-    swapTarget: string;
+    pool: string;
+    /**
+     * Int64, saver liquidity units that belong the the member
+     * @type {string}
+     * @memberof SaverPool
+     */
+    saverUnits: string;
 }
