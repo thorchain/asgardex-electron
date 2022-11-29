@@ -22,7 +22,8 @@ import { eqString, eqAsset } from '../../helpers/fp/eq'
 import { sequenceTOption } from '../../helpers/fpHelpers'
 import { PoolFilter } from '../../services/midgard/types'
 import { toPoolData } from '../../services/midgard/utils'
-import { GetPoolsStatusEnum, PoolDetail, LastblockItem } from '../../types/generated/midgard'
+import { LastblockItem } from '../../services/thorchain/types'
+import { GetPoolsStatusEnum, type PoolDetail } from '../../types/generated/midgard'
 import { PoolTableRowData } from './Pools.types'
 
 export const stringToGetPoolsStatus = (status: string): GetPoolsStatusEnum => {

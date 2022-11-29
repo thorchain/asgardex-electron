@@ -68,7 +68,10 @@ export const getEmptyPoolDetail = (): PoolDetail => ({
   liquidityUnits: '0',
   synthUnits: '0',
   synthSupply: '0',
-  annualPercentageRate: '0'
+  annualPercentageRate: '0',
+  nativeDecimal: '0',
+  saversDepth: '0',
+  saversUnits: '0'
 })
 
 export const getEmptyPoolStatsDetail = (): PoolStatsDetail => ({
