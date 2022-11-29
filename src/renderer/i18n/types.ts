@@ -66,6 +66,7 @@ export type CommonMessageKey =
   | 'common.add'
   | 'common.swap'
   | 'common.savers'
+  | 'common.earn'
   | 'common.liquidity'
   | 'common.withdraw'
   | 'common.approve'
@@ -148,6 +149,9 @@ export type RoutesMessages = { [key in RoutesMessageKey]: string }
 type PoolsMessageKey =
   | 'pools.depth'
   | 'pools.apy'
+  | 'pools.apr'
+  | 'pools.count'
+  | 'pools.filled'
   | 'pools.24hvol'
   | 'pools.avgsize'
   | 'pools.avgfee'

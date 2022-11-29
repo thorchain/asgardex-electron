@@ -12,11 +12,12 @@ import { TextButton, FlatButton } from './index'
 export type Action = { label: string; callback: FP.Lazy<void>; disabled?: boolean }
 export type Props = Omit<ButtonProps, 'onClick'> & {
   actions: Action[]
+  btnClassName?: string
   isTextView?: boolean
 }
 
 export const ActionButton: React.FC<Props> = (props): JSX.Element => {
-  const { size, actions, isTextView = true, disabled = false, className = '' } = props
+  const { size, actions, isTextView = true, disabled = false, className = '', btnClassName = '' } = props
 
   const intl = useIntl()
 
@@ -24,7 +25,7 @@ export const ActionButton: React.FC<Props> = (props): JSX.Element => {
     <Popover className={`relative ${className}`}>
       <Popover.Button as="div" className="group">
         {({ open }) => (
-          <FlatButton size={size} disabled={disabled}>
+          <FlatButton className={`${btnClassName}`} size={size} disabled={disabled}>
             <span className={`${isTextView ? 'mr-10px' : 'hidden'}`}>
               {intl.formatMessage({ id: 'common.action' })}
             </span>

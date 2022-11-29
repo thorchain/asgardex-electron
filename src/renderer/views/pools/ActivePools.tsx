@@ -104,7 +104,7 @@ export const ActivePools: React.FC<PoolsComponentProps> = ({ haltedChains, mimir
           }
         },
         {
-          label: intl.formatMessage({ id: 'common.savers' }),
+          label: intl.formatMessage({ id: 'common.earn' }),
           disabled: disableAllPoolActions || disableTradingActions,
           callback: () => {
             navigate(poolsRoutes.savers.path({ asset: assetToString(asset) }))
@@ -114,7 +114,7 @@ export const ActivePools: React.FC<PoolsComponentProps> = ({ haltedChains, mimir
 
       return (
         <Styled.TableAction>
-          <ActionButton size="normal" actions={actions} />
+          <ActionButton btnClassName="min-w-[120px]" size="normal" actions={actions} />
         </Styled.TableAction>
       )
     },

@@ -1,5 +1,5 @@
-import { getValueOfRuneInAsset, PoolData } from '@thorchain/asgardex-util'
-import { assetFromString, baseAmount } from '@xchainjs/xchain-util'
+import { getValueOfAsset1InAsset2, PoolData } from '@thorchain/asgardex-util'
+import { assetFromString, BaseAmount, baseAmount } from '@xchainjs/xchain-util'
 import * as A from 'fp-ts/lib/Array'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
@@ -8,6 +8,7 @@ import * as Ord from 'fp-ts/lib/Ord'
 import { PoolsWatchList } from '../../shared/api/io'
 import { Network } from '../../shared/api/types'
 import type { PoolDetails } from '../services/midgard/types'
+import { toPoolData } from '../services/midgard/utils'
 import { PoolDetail } from '../types/generated/midgard'
 import type { SaversTableRowData, SaversTableRowsData } from '../views/savers/Savers.types'
 import { eqAsset, eqString } from './fp/eq'
@@ -15,8 +16,13 @@ import { ordBaseAmount } from './fp/ord'
 import { sequenceTOption, sequenceTOptionFromArray } from './fpHelpers'
 import { getDeepestPoolSymbol } from './poolHelper'
 
-// TODO(@veado) Depth price or Savers depth
-const ordByDepth = Ord.Contravariant.contramap(ordBaseAmount, ({ depthPrice }: SaversTableRowData) => depthPrice)
+/**
+ * Order savers by depth price
+ */
+export const ordSaversByDepth = Ord.Contravariant.contramap(
+  ordBaseAmount,
+  ({ depthPrice }: { depthPrice: BaseAmount }) => depthPrice
+)
 
 export const getSaversTableRowData = ({
   poolDetail,
@@ -35,8 +41,9 @@ export const getSaversTableRowData = ({
     assetFromString,
     O.fromNullable,
     O.map((poolDetailAsset) => {
+      const poolData = toPoolData(poolDetail)
       const depthAmount = baseAmount(poolDetail.saversDepth)
-      const depthPrice = getValueOfRuneInAsset(depthAmount, pricePoolData)
+      const depthPrice = getValueOfAsset1InAsset2(depthAmount, poolData, pricePoolData)
 
       const watched: boolean = FP.pipe(
         watchlist,
@@ -107,7 +114,7 @@ export const getSaversTableRowsData = ({
     O.getOrElse(() => [] as SaversTableRowsData),
     // Table does not accept `defaultSortOrder` for depth  for any reason,
     // that's why we sort depth here
-    A.sortBy([ordByDepth]),
+    A.sortBy([ordSaversByDepth]),
     // descending sort
     A.reverse
   )

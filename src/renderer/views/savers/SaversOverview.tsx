@@ -1,9 +1,17 @@
 import { useCallback, useMemo, useRef } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
-import { assetFromString, assetToString, Chain } from '@xchainjs/xchain-util'
+import {
+  Asset,
+  assetFromString,
+  assetToString,
+  BaseAmount,
+  baseToAsset,
+  Chain,
+  formatAssetAmountCurrency
+} from '@xchainjs/xchain-util'
 import { Grid } from 'antd'
-import { ColumnsType } from 'antd/lib/table'
+import { ColumnsType, ColumnType } from 'antd/lib/table'
 import * as A from 'fp-ts/lib/Array'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
@@ -11,11 +19,13 @@ import { useObservableState } from 'observable-hooks'
 import { useIntl } from 'react-intl'
 import { useNavigate } from 'react-router-dom'
 
+import { FlatButton } from '../../components/uielements/button'
 import { Table } from '../../components/uielements/table'
 import { useMidgardContext } from '../../contexts/MidgardContext'
 import { isChainAsset } from '../../helpers/assetHelper'
+import { ordNumber } from '../../helpers/fp/ord'
 import * as PoolHelpers from '../../helpers/poolHelper'
-import { getSaversTableRowsData } from '../../helpers/savers'
+import { getSaversTableRowsData, ordSaversByDepth } from '../../helpers/savers'
 import { useNetwork } from '../../hooks/useNetwork'
 import { usePoolWatchlist } from '../../hooks/usePoolWatchlist'
 import * as poolsRoutes from '../../routes/pools'
@@ -30,7 +40,8 @@ export type Props = {
   walletLocked: boolean
 }
 
-export const SaversOverview: React.FC<Props> = (): JSX.Element => {
+export const SaversOverview: React.FC<Props> = (props): JSX.Element => {
+  const { haltedChains, mimirHalt, walletLocked } = props
   const intl = useIntl()
   const navigate = useNavigate()
   const { network } = useNetwork()
@@ -56,21 +67,151 @@ export const SaversOverview: React.FC<Props> = (): JSX.Element => {
 
   const { add: addPoolToWatchlist, remove: removePoolFromWatchlist, list: poolWatchList } = usePoolWatchlist()
 
+  const depthColumn = useCallback(
+    <T extends { asset: Asset; depth: BaseAmount; depthPrice: BaseAmount }>(pricePoolAsset: Asset): ColumnType<T> => ({
+      key: 'depth',
+      align: 'right',
+      title: intl.formatMessage({ id: 'common.liquidity' }),
+      render: ({ asset, depth, depthPrice }: { asset: Asset; depth: BaseAmount; depthPrice: BaseAmount }) => (
+        <div className="flex flex-col items-end justify-center font-main">
+          <div className="d:text-gray1d text-16 text-text0 dark:text-text0d">
+            {formatAssetAmountCurrency({
+              amount: baseToAsset(depth),
+              asset,
+              decimal: 3
+            })}
+          </div>
+          <div className="text-14 text-gray2 dark:text-gray2d">
+            {formatAssetAmountCurrency({
+              amount: baseToAsset(depthPrice),
+              asset: pricePoolAsset,
+              decimal: 2
+            })}
+          </div>
+        </div>
+      ),
+      sorter: ordSaversByDepth,
+      sortDirections: ['descend', 'ascend'],
+      // Note: `defaultSortOrder` has no effect here, that's we do a default sort in `getPoolTableRowsData`
+      defaultSortOrder: 'descend'
+    }),
+    [intl]
+  )
+
+  const aprColumn = useCallback(
+    <T extends { apr: number }>(): ColumnType<T> => ({
+      key: 'apr',
+      align: 'center',
+      title: intl.formatMessage({ id: 'pools.apr' }),
+      render: ({ apr }: { apr: number }) => <div className="font-main text-16">{apr}%</div>,
+      sorter: (a: { apr: number }, b: { apr: number }) => ordNumber.compare(a.apr, b.apr),
+      sortDirections: ['descend', 'ascend']
+    }),
+    [intl]
+  )
+
+  const filledColumn = useCallback(
+    <T extends { filled: number }>(): ColumnType<T> => ({
+      key: 'filled',
+      align: 'center',
+      title: intl.formatMessage({ id: 'pools.filled' }),
+      render: ({ filled }: { filled: number }) => <div className="font-main text-16">{filled}%</div>,
+      sorter: (a: { filled: number }, b: { filled: number }) => ordNumber.compare(a.filled, b.filled),
+      sortDirections: ['descend', 'ascend']
+    }),
+    [intl]
+  )
+
+  const countColumn = useCallback(
+    <T extends { count: number }>(): ColumnType<T> => ({
+      key: 'count',
+      align: 'center',
+      title: intl.formatMessage({ id: 'pools.count' }),
+      render: ({ count }: { count: number }) => <div className="font-main text-16">{count}</div>,
+      sorter: (a: { count: number }, b: { count: number }) => ordNumber.compare(a.count, b.count),
+      sortDirections: ['descend', 'ascend']
+    }),
+    [intl]
+  )
+
+  const renderBtnPoolsColumn = useCallback(
+    (_: string, { asset }: { asset: Asset }) => {
+      const chain = asset.chain
+      const disableAllPoolActions = PoolHelpers.disableAllActions({ chain, haltedChains, mimirHalt })
+      const disableTradingActions = PoolHelpers.disableTradingActions({
+        chain,
+        haltedChains,
+        mimirHalt
+      })
+      const disablePoolActions = PoolHelpers.disablePoolActions({
+        chain,
+        haltedChains,
+        mimirHalt
+      })
+
+      const disabled = disableAllPoolActions || disableTradingActions || disablePoolActions || walletLocked
+
+      const onClickHandler = () => {
+        navigate(poolsRoutes.savers.path({ asset: assetToString(asset) }))
+      }
+
+      return (
+        <div className="flex items-center justify-center">
+          <FlatButton className="min-w-[120px]" disabled={disabled} size="normal" onClick={onClickHandler}>
+            {intl.formatMessage({ id: 'common.earn' })}
+          </FlatButton>
+        </div>
+      )
+    },
+
+    [haltedChains, intl, mimirHalt, navigate, walletLocked]
+  )
+
+  const btnColumn = useCallback(
+    <T extends { asset: Asset }>(): ColumnType<T> => ({
+      key: 'btn',
+      title: Shared.renderRefreshBtnColTitle({
+        title: intl.formatMessage({ id: 'common.refresh' }),
+        clickHandler: refreshHandler,
+        iconOnly: !isDesktopView
+      }),
+      width: 280,
+      render: renderBtnPoolsColumn
+    }),
+    [refreshHandler, intl, renderBtnPoolsColumn, isDesktopView]
+  )
+
   const desktopColumns: ColumnsType<SaversTableRowData> = useMemo(
     () => [
       Shared.watchColumn(addPoolToWatchlist, removePoolFromWatchlist),
-      Shared.poolColumnMobile(intl.formatMessage({ id: 'common.pool' })),
-      Shared.assetColumn(intl.formatMessage({ id: 'common.asset' }))
+      Shared.poolColumn(intl.formatMessage({ id: 'common.pool' })),
+      Shared.assetColumn(intl.formatMessage({ id: 'common.asset' })),
+      depthColumn<SaversTableRowData>(selectedPricePool.asset),
+      countColumn<SaversTableRowData>(),
+      filledColumn<SaversTableRowData>(),
+      aprColumn<SaversTableRowData>(),
+      btnColumn()
     ],
-    [addPoolToWatchlist, intl, removePoolFromWatchlist]
+    [
+      addPoolToWatchlist,
+      aprColumn,
+      btnColumn,
+      countColumn,
+      depthColumn,
+      filledColumn,
+      intl,
+      removePoolFromWatchlist,
+      selectedPricePool.asset
+    ]
   )
 
   const mobileColumns: ColumnsType<SaversTableRowData> = useMemo(
     () => [
       Shared.poolColumnMobile<SaversTableRowData>(intl.formatMessage({ id: 'common.pool' })),
-      Shared.assetColumn<SaversTableRowData>(intl.formatMessage({ id: 'common.asset' }))
+      Shared.assetColumn<SaversTableRowData>(intl.formatMessage({ id: 'common.asset' })),
+      btnColumn()
     ],
-    [intl]
+    [btnColumn, intl]
   )
 
   const renderTable = useCallback(

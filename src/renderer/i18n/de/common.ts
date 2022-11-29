@@ -67,6 +67,7 @@ const common: CommonMessages = {
   'common.add': 'Einzahlen',
   'common.swap': 'Swap',
   'common.savers': 'Savers',
+  'common.earn': 'Earn',
   'common.liquidity': 'Liquidität',
   'common.withdraw': 'Auszahlen',
   'common.approve': 'Erlauben',
