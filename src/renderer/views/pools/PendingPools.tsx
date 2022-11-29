@@ -86,7 +86,12 @@ export const PendingPools: React.FC<PoolsComponentProps> = ({ haltedChains, mimi
         PoolHelpers.disablePoolActions({ chain: asset.chain, haltedChains, mimirHalt })
       return (
         <TableAction>
-          <ManageButton asset={asset} isTextView={isDesktopView} disabled={disablePool || walletLocked} />
+          <ManageButton
+            className="min-w-[120px]"
+            asset={asset}
+            isTextView={isDesktopView}
+            disabled={disablePool || walletLocked}
+          />
         </TableAction>
       )
     },

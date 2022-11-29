@@ -1,9 +1,10 @@
 import { SyncOutlined } from '@ant-design/icons'
-import { Asset, baseToAsset, formatAssetAmountCurrency } from '@xchainjs/xchain-util'
+import { Asset, BaseAmount, baseToAsset, formatAssetAmountCurrency } from '@xchainjs/xchain-util'
 import { Row } from 'antd'
 import { ColumnType } from 'antd/lib/table'
 import * as FP from 'fp-ts/function'
 
+import { Network } from '../../../shared/api/types'
 import { ErrorView } from '../../components/shared/error'
 import { AssetIcon } from '../../components/uielements/assets/assetIcon'
 import { AssetLabel } from '../../components/uielements/assets/assetLabel'
@@ -11,7 +12,6 @@ import { TextButton } from '../../components/uielements/button'
 import { ReloadButton } from '../../components/uielements/reloadButton'
 import { ordBaseAmount } from '../../helpers/fp/ord'
 import { sortByDepth } from '../../helpers/poolHelper'
-import { PoolTableRowData } from './Pools.types'
 import * as Styled from './PoolsOverview.styles'
 
 const renderWatchColumn = ({
@@ -19,7 +19,7 @@ const renderWatchColumn = ({
   add,
   remove
 }: {
-  data: PoolTableRowData
+  data: { watched: boolean }
   add: FP.Lazy<void>
   remove: FP.Lazy<void>
 }) => (
@@ -33,28 +33,28 @@ const renderWatchColumn = ({
   </Styled.WatchContainer>
 )
 
-const sortWatchColumn = ({ watched: watchedA }: PoolTableRowData, { watched: watchedB }: PoolTableRowData) =>
+const sortWatchColumn = ({ watched: watchedA }: { watched: boolean }, { watched: watchedB }: { watched: boolean }) =>
   watchedA === watchedB ? 0 : 1
 
-export const watchColumn = (
+export const watchColumn = <T extends { watched: boolean; asset: Asset }>(
   add: (asset: Asset) => void,
   remove: (asset: Asset) => void
-): ColumnType<PoolTableRowData> => ({
+): ColumnType<T> => ({
   key: 'watch',
   align: 'center',
   width: 50,
-  render: (data: PoolTableRowData) =>
+  render: (data: { watched: boolean; asset: Asset }) =>
     renderWatchColumn({ data, add: () => add(data.asset), remove: () => remove(data.asset) }),
   sorter: sortWatchColumn,
   sortDirections: ['descend', 'ascend']
 })
 
-const renderAssetColumn = ({ asset }: PoolTableRowData) => <AssetLabel asset={asset} />
+const renderAssetColumn = ({ asset }: { asset: Asset }) => <AssetLabel asset={asset} />
 
-const sortAssetColumn = ({ asset: assetA }: PoolTableRowData, { asset: assetB }: PoolTableRowData) =>
+const sortAssetColumn = ({ asset: assetA }: { asset: Asset }, { asset: assetB }: { asset: Asset }) =>
   assetA.symbol.localeCompare(assetB.symbol)
 
-export const assetColumn = (title: string): ColumnType<PoolTableRowData> => ({
+export const assetColumn = <T extends { asset: Asset }>(title: string): ColumnType<T> => ({
   key: 'asset',
   title,
   align: 'left',
@@ -63,13 +63,13 @@ export const assetColumn = (title: string): ColumnType<PoolTableRowData> => ({
   sortDirections: ['descend', 'ascend']
 })
 
-const renderPoolColumn = ({ asset, network }: PoolTableRowData) => (
+const renderPoolColumn = ({ asset, network }: { asset: Asset; network: Network }) => (
   <Row justify="center" align="middle">
     <AssetIcon asset={asset} network={network} />
   </Row>
 )
 
-export const poolColumn = (title: string): ColumnType<PoolTableRowData> => ({
+export const poolColumn = <T extends { network: Network; asset: Asset }>(title: string): ColumnType<T> => ({
   key: 'pool',
   align: 'center',
   title,
@@ -77,12 +77,12 @@ export const poolColumn = (title: string): ColumnType<PoolTableRowData> => ({
   render: renderPoolColumn
 })
 
-const renderPoolColumnMobile = ({ asset, network }: PoolTableRowData) => (
+const renderPoolColumnMobile = ({ asset, network }: { network: Network; asset: Asset }) => (
   <Row justify="center" align="middle" style={{ width: '100%' }}>
     <AssetIcon asset={asset} network={network} />
   </Row>
 )
-export const poolColumnMobile = (title: string): ColumnType<PoolTableRowData> => ({
+export const poolColumnMobile = <T extends { network: Network; asset: Asset }>(title: string): ColumnType<T> => ({
   key: 'pool',
   title,
   render: renderPoolColumnMobile
@@ -90,7 +90,7 @@ export const poolColumnMobile = (title: string): ColumnType<PoolTableRowData> =>
 
 const renderPriceColumn =
   (pricePoolAsset: Asset) =>
-  ({ poolPrice }: PoolTableRowData) =>
+  ({ poolPrice }: { poolPrice: BaseAmount }) =>
     (
       <Styled.Label align="right" nowrap>
         {formatAssetAmountCurrency({
@@ -101,9 +101,13 @@ const renderPriceColumn =
       </Styled.Label>
     )
 
-const sortPriceColumn = (a: PoolTableRowData, b: PoolTableRowData) => ordBaseAmount.compare(a.poolPrice, b.poolPrice)
+const sortPriceColumn = (a: { poolPrice: BaseAmount }, b: { poolPrice: BaseAmount }) =>
+  ordBaseAmount.compare(a.poolPrice, b.poolPrice)
 
-export const priceColumn = (title: string, pricePoolAsset: Asset): ColumnType<PoolTableRowData> => ({
+export const priceColumn = <T extends { poolPrice: BaseAmount }>(
+  title: string,
+  pricePoolAsset: Asset
+): ColumnType<T> => ({
   key: 'poolprice',
   align: 'right',
   title,
@@ -114,7 +118,7 @@ export const priceColumn = (title: string, pricePoolAsset: Asset): ColumnType<Po
 
 const renderDepthColumn =
   (pricePoolAsset: Asset) =>
-  ({ depthPrice }: PoolTableRowData) =>
+  ({ depthPrice }: { depthPrice: BaseAmount }) =>
     (
       <Styled.Label align="right" nowrap>
         {formatAssetAmountCurrency({
@@ -125,7 +129,10 @@ const renderDepthColumn =
       </Styled.Label>
     )
 
-export const depthColumn = (title: string, pricePoolAsset: Asset): ColumnType<PoolTableRowData> => ({
+export const depthColumn = <T extends { depthPrice: BaseAmount }>(
+  title: string,
+  pricePoolAsset: Asset
+): ColumnType<T> => ({
   key: 'depth',
   align: 'right',
   title,

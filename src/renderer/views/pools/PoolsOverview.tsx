@@ -74,12 +74,12 @@ export const PoolsOverview: React.FC = (): JSX.Element => {
               group
               flex cursor-pointer
               items-center
-              justify-center`}>
+              justify-center focus-visible:outline-none`}>
                   {/* label */}
                   <span
                     className={`
                   border-y-[2px] border-solid border-transparent
-              focus-visible:outline-none
+
               group-hover:border-b-turquoise
                ${selected ? 'border-b-turquoise' : 'border-b-transparent'}
               ease mr-0 px-5px

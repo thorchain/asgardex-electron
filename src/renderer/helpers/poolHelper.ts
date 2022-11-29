@@ -23,7 +23,7 @@ import { ordBaseAmount } from './fp/ord'
 import { sequenceTOption, sequenceTOptionFromArray } from './fpHelpers'
 import { emptyString } from './stringHelper'
 
-export const sortByDepth = (a: PoolTableRowData, b: PoolTableRowData) =>
+export const sortByDepth = (a: { depthPrice: BaseAmount }, b: { depthPrice: BaseAmount }) =>
   ordBaseAmount.compare(a.depthPrice, b.depthPrice)
 
 const ordByDepth = Ord.Contravariant.contramap(ordBaseAmount, ({ depthPrice }: PoolTableRowData) => depthPrice)
@@ -59,6 +59,16 @@ export const RUNE_POOL_ADDRESS: PoolAddress = {
   router: O.none
 }
 
+// get symbol of deepest pool
+export const getDeepestPoolSymbol = (poolDetails: PoolDetails): O.Option<string> =>
+  FP.pipe(
+    poolDetails,
+    getDeepestPool,
+    O.chain((poolDetail) => O.fromNullable(poolDetail.asset)),
+    O.chain((assetString) => O.fromNullable(assetFromString(assetString))),
+    O.map(({ symbol }) => symbol)
+  )
+
 export const getPoolTableRowsData = ({
   poolDetails,
   pricePoolData,
@@ -71,13 +81,7 @@ export const getPoolTableRowsData = ({
   network: Network
 }): PoolTableRowsData => {
   // get symbol of deepest pool
-  const oDeepestPoolSymbol: O.Option<string> = FP.pipe(
-    poolDetails,
-    getDeepestPool,
-    O.chain((poolDetail) => O.fromNullable(poolDetail.asset)),
-    O.chain((assetString) => O.fromNullable(assetFromString(assetString))),
-    O.map(({ symbol }) => symbol)
-  )
+  const oDeepestPoolSymbol: O.Option<string> = getDeepestPoolSymbol(poolDetails)
 
   // Transform `PoolDetails` -> PoolRowType
   return FP.pipe(

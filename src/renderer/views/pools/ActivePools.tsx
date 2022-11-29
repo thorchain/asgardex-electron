@@ -2,8 +2,10 @@ import React, { useCallback, useMemo, useRef } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
 import {
+  Asset,
   AssetRuneNative,
   assetToString,
+  BaseAmount,
   baseToAsset,
   bn,
   formatAssetAmountCurrency,
@@ -72,7 +74,7 @@ export const ActivePools: React.FC<PoolsComponentProps> = ({ haltedChains, mimir
   const selectedPricePool = useObservableState(selectedPricePool$, PoolHelpers.RUNE_PRICE_POOL)
 
   const renderBtnPoolsColumn = useCallback(
-    (_: string, { asset }: PoolTableRowData) => {
+    (_: string, { asset }: { asset: Asset }) => {
       const chain = asset.chain
       const disableAllPoolActions = PoolHelpers.disableAllActions({ chain, haltedChains, mimirHalt })
       const disableTradingActions = PoolHelpers.disableTradingActions({
@@ -102,7 +104,7 @@ export const ActivePools: React.FC<PoolsComponentProps> = ({ haltedChains, mimir
           }
         },
         {
-          label: intl.formatMessage({ id: 'common.savers' }),
+          label: intl.formatMessage({ id: 'common.earn' }),
           disabled: disableAllPoolActions || disableTradingActions,
           callback: () => {
             navigate(poolsRoutes.savers.path({ asset: assetToString(asset) }))
@@ -112,7 +114,7 @@ export const ActivePools: React.FC<PoolsComponentProps> = ({ haltedChains, mimir
 
       return (
         <Styled.TableAction>
-          <ActionButton size="normal" actions={actions} />
+          <ActionButton btnClassName="min-w-[120px]" size="normal" actions={actions} />
         </Styled.TableAction>
       )
     },
@@ -120,8 +122,8 @@ export const ActivePools: React.FC<PoolsComponentProps> = ({ haltedChains, mimir
     [haltedChains, mimirHalt, intl, walletLocked, navigate]
   )
 
-  const btnPoolsColumn = useMemo(
-    () => ({
+  const btnPoolsColumn = useCallback(
+    <T extends { asset: Asset }>(): ColumnType<T> => ({
       key: 'btn',
       title: Shared.renderRefreshBtnColTitle({
         title: intl.formatMessage({ id: 'common.refresh' }),
@@ -135,7 +137,7 @@ export const ActivePools: React.FC<PoolsComponentProps> = ({ haltedChains, mimir
   )
 
   const renderVolumeColumn = useCallback(
-    ({ volumePrice }: PoolTableRowData) => (
+    ({ volumePrice }: { volumePrice: BaseAmount }) => (
       <Styled.Label align="right" nowrap>
         {formatAssetAmountCurrency({
           amount: baseToAsset(volumePrice),
@@ -147,11 +149,12 @@ export const ActivePools: React.FC<PoolsComponentProps> = ({ haltedChains, mimir
     [selectedPricePool.asset]
   )
   const sortVolumeColumn = useCallback(
-    (a: PoolTableRowData, b: PoolTableRowData) => ordBaseAmount.compare(a.volumePrice, b.volumePrice),
+    (a: { volumePrice: BaseAmount }, b: { volumePrice: BaseAmount }) =>
+      ordBaseAmount.compare(a.volumePrice, b.volumePrice),
     []
   )
-  const volumeColumn: ColumnType<PoolTableRowData> = useMemo(
-    () => ({
+  const volumeColumn = useCallback(
+    <T extends { volumePrice: BaseAmount }>(): ColumnType<T> => ({
       key: 'vol',
       align: 'right',
       title: intl.formatMessage({ id: 'pools.24hvol' }),
@@ -163,7 +166,7 @@ export const ActivePools: React.FC<PoolsComponentProps> = ({ haltedChains, mimir
   )
 
   const renderAPYColumn = useCallback(
-    ({ apy }: PoolTableRowData) => (
+    ({ apy }: { apy: number }) => (
       <Styled.Label align="right" nowrap>
         {formatBN(bn(apy), 2)}%
       </Styled.Label>
@@ -171,9 +174,9 @@ export const ActivePools: React.FC<PoolsComponentProps> = ({ haltedChains, mimir
     []
   )
 
-  const sortAPYColumn = useCallback((a: PoolTableRowData, b: PoolTableRowData) => ordNumber.compare(a.apy, b.apy), [])
-  const apyColumn: ColumnType<PoolTableRowData> = useMemo(
-    () => ({
+  const sortAPYColumn = useCallback((a: { apy: number }, b: { apy: number }) => ordNumber.compare(a.apy, b.apy), [])
+  const apyColumn = useCallback(
+    <T extends { apy: number }>(): ColumnType<T> => ({
       key: 'apy',
       align: 'right',
       title: intl.formatMessage({ id: 'pools.apy' }),
@@ -188,14 +191,21 @@ export const ActivePools: React.FC<PoolsComponentProps> = ({ haltedChains, mimir
     () =>
       FP.pipe(
         [
-          O.some(Shared.watchColumn(addPoolToWatchlist, removePoolFromWatchlist)),
-          O.some(Shared.poolColumn(intl.formatMessage({ id: 'common.pool' }))),
-          O.some(Shared.assetColumn(intl.formatMessage({ id: 'common.asset' }))),
-          O.some(Shared.priceColumn(intl.formatMessage({ id: 'common.price' }), selectedPricePool.asset)),
-          O.some(Shared.depthColumn(intl.formatMessage({ id: 'common.liquidity' }), selectedPricePool.asset)),
-          O.some(volumeColumn),
-          isLargeScreen ? O.some(apyColumn) : O.none,
-          O.some(btnPoolsColumn)
+          O.some(Shared.watchColumn<PoolTableRowData>(addPoolToWatchlist, removePoolFromWatchlist)),
+          O.some(Shared.poolColumn<PoolTableRowData>(intl.formatMessage({ id: 'common.pool' }))),
+          O.some(Shared.assetColumn<PoolTableRowData>(intl.formatMessage({ id: 'common.asset' }))),
+          O.some(
+            Shared.priceColumn<PoolTableRowData>(intl.formatMessage({ id: 'common.price' }), selectedPricePool.asset)
+          ),
+          O.some(
+            Shared.depthColumn<PoolTableRowData>(
+              intl.formatMessage({ id: 'common.liquidity' }),
+              selectedPricePool.asset
+            )
+          ),
+          O.some(volumeColumn<PoolTableRowData>()),
+          isLargeScreen ? O.some(apyColumn<PoolTableRowData>()) : O.none,
+          O.some(btnPoolsColumn<PoolTableRowData>())
         ],
         A.filterMap(FP.identity)
       ),
@@ -215,7 +225,7 @@ export const ActivePools: React.FC<PoolsComponentProps> = ({ haltedChains, mimir
     () => [
       Shared.poolColumnMobile(intl.formatMessage({ id: 'common.pool' })),
       Shared.assetColumn(intl.formatMessage({ id: 'common.asset' })),
-      btnPoolsColumn
+      btnPoolsColumn()
     ],
     [btnPoolsColumn, intl]
   )
