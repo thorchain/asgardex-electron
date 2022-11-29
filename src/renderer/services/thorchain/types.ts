@@ -11,7 +11,7 @@ import { assetIO } from '../../../shared/api/io'
 import { HDMode, WalletType } from '../../../shared/wallet/types'
 import { LiveData } from '../../helpers/rx/liveData'
 import { AssetsWithAmount1e8, AssetWithAmount1e8 } from '../../types/asgardex'
-import * as TN from '../../types/generated/thornode'
+import type * as TN from '../../types/generated/thornode'
 import { ConstantsResponse } from '../../types/generated/thornode'
 import * as C from '../clients'
 import { TxHashLD, TxHashRD } from '../wallet/types'
@@ -33,7 +33,8 @@ export type InboundAddressesLD = LiveData<Error, InboundAddresses>
 export type ThorchainConstantsRD = RD.RemoteData<Error, ConstantsResponse>
 export type ThorchainConstantsLD = LiveData<Error, ConstantsResponse>
 
-export type LastblockItems = TN.LastBlock[]
+export type LastblockItem = TN.LastBlock
+export type LastblockItems = LastblockItem[]
 export type ThorchainLastblockRD = RD.RemoteData<Error, LastblockItems>
 export type ThorchainLastblockLD = LiveData<Error, LastblockItems>
 
