@@ -14,7 +14,6 @@
 import { Observable } from 'rxjs';
 import { BaseAPI, HttpQuery, throwIfNullOrUndefined, encodeURI } from '../runtime';
 import {
-    KeygenMetric,
     KeysignResponse,
     MetricsResponse,
 } from '../models';
@@ -86,14 +85,14 @@ export class TSSApi extends BaseAPI {
     /**
      * Returns keygen metrics for the provided vault pubkey.
      */
-    metricsKeygen = ({ pubkey, height }: MetricsKeygenRequest): Observable<Array<KeygenMetric>> => {
+    metricsKeygen = ({ pubkey, height }: MetricsKeygenRequest): Observable<Array<object>> => {
         throwIfNullOrUndefined(pubkey, 'metricsKeygen');
 
         const query: HttpQuery = {};
 
         if (height != null) { query['height'] = height; }
 
-        return this.request<Array<KeygenMetric>>({
+        return this.request<Array<object>>({
             path: '/thorchain/metric/keygen/{pubkey}'.replace('{pubkey}', encodeURI(pubkey)),
             method: 'GET',
             query,

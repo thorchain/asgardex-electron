@@ -24,7 +24,7 @@
     "generate:types": "yarn generate:types:midgard && yarn generate:types:thornode",
     "generate:types:midgard": "yarn clean:types:midgard && TS_POST_PROCESS_FILE=./node_modules/.bin/prettier openapi-generator-cli generate -i https://midgard.ninerealms.com/v2/swagger.json -g typescript-rxjs -o ./src/renderer/types/generated/midgard --reserved-words-mappings in=in --enable-post-process-file",
     "clean:types:midgard": "rimraf ./src/renderer/types/generated/midgard",
-    "generate:types:thornode": "yarn clean:types:thornode && TS_POST_PROCESS_FILE=./node_modules/.bin/prettier openapi-generator-cli generate -i https://gitlab.com/thorchain/thornode/-/raw/release-1.97.2/openapi/openapi.yaml -g typescript-rxjs -o ./src/renderer/types/generated/thornode --enable-post-process-file --skip-validate-spec",
+    "generate:types:thornode": "yarn clean:types:thornode && TS_POST_PROCESS_FILE=./node_modules/.bin/prettier openapi-generator-cli generate -i https://gitlab.com/thorchain/thornode/-/raw/release-1.100.0/openapi/openapi.yaml -g typescript-rxjs -o ./src/renderer/types/generated/thornode --enable-post-process-file --skip-validate-spec",
     "clean:types:thornode": "rimraf ./src/renderer/types/generated/thornode",
     "storybook": "sb dev -p 9009 --no-manager-cache",
     "build-storybook": "sb build",

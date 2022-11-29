@@ -12,7 +12,6 @@
  */
 
 import {
-    KeygenMetric,
     KeysignMetrics,
 } from './';
 
@@ -22,10 +21,10 @@ import {
  */
 export interface MetricsResponse {
     /**
-     * @type {Array<KeygenMetric>}
+     * @type {Array<object>}
      * @memberof MetricsResponse
      */
-    keygen?: Array<KeygenMetric>;
+    keygen?: Array<object>;
     /**
      * @type {KeysignMetrics}
      * @memberof MetricsResponse
