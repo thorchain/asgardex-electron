@@ -1,11 +1,18 @@
-import { useEffect, useMemo } from 'react'
+import { useCallback, useEffect, useMemo } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
 import * as FP from 'fp-ts/function'
+import * as N from 'fp-ts/lib/number'
+import * as O from 'fp-ts/lib/Option'
 import { useObservableState } from 'observable-hooks'
+import * as Rx from 'rxjs'
+import * as RxOp from 'rxjs/operators'
 
 import { useThorchainContext } from '../contexts/ThorchainContext'
+import { eqError } from '../helpers/fp/eq'
 import { LiveData, liveData } from '../helpers/rx/liveData'
+
+const eqMaxSynthPerPoolDepthRD = RD.getEq<Error, number>(eqError, N.Eq)
 
 type MaxSynthPerPoolDepthRD = RD.RemoteData<Error, number>
 type MaxSynthPerPoolDepthLD = LiveData<Error, number>
@@ -14,9 +21,9 @@ export const useSynthConstants = (): {
   maxSynthPerPoolDepth: MaxSynthPerPoolDepthRD
   reloadConstants: FP.Lazy<void>
 } => {
-  const { thorchainConstantsState$, reloadThorchainConstants } = useThorchainContext()
+  const { mimir$, reloadMimir, thorchainConstantsState$, reloadThorchainConstants } = useThorchainContext()
 
-  const maxSynthPerPoolDepth$: MaxSynthPerPoolDepthLD = useMemo(
+  const tnMaxSynthPerPoolDepth$: MaxSynthPerPoolDepthLD = useMemo(
     () =>
       FP.pipe(
         thorchainConstantsState$,
@@ -32,13 +39,41 @@ export const useSynthConstants = (): {
     [thorchainConstantsState$]
   )
 
-  const maxSynthPerPoolDepth = useObservableState(maxSynthPerPoolDepth$, RD.initial)
+  const mimirMaxSynthPerPoolDepth$: MaxSynthPerPoolDepthLD = useMemo(
+    () =>
+      FP.pipe(
+        mimir$,
+        liveData.map(({ MAXSYNTHPERPOOLDEPTH: poolCycle }) => O.fromNullable(poolCycle)),
+        liveData.chain(liveData.fromOption(() => Error(`Unable to get 'MAXSYNTHPERPOOLDEPTH' from Mimir`)))
+      ),
+    [mimir$]
+  )
+
+  const getData = useCallback(() => {
+    reloadMimir()
+    reloadThorchainConstants()
+  }, [reloadThorchainConstants, reloadMimir])
+
+  const [data] = useObservableState(
+    () =>
+      FP.pipe(
+        Rx.combineLatest([mimirMaxSynthPerPoolDepth$, tnMaxSynthPerPoolDepth$]),
+        RxOp.map(([mimirMaxSynthPerPoolDepthRD, tnMaxSynthPerPoolDepthRD]) =>
+          FP.pipe(
+            mimirMaxSynthPerPoolDepthRD,
+            RD.alt(() => tnMaxSynthPerPoolDepthRD)
+          )
+        ),
+        RxOp.distinctUntilChanged(eqMaxSynthPerPoolDepthRD.equals)
+      ),
+    RD.initial
+  )
 
   // Reload data on mount
   useEffect(() => {
-    reloadThorchainConstants()
+    getData()
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
-  return { maxSynthPerPoolDepth, reloadConstants: reloadThorchainConstants }
+  return { maxSynthPerPoolDepth: data, reloadConstants: getData }
 }

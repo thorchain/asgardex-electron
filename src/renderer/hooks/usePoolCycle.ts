@@ -22,10 +22,9 @@ export const usePoolCycle = (): {
   poolCycle: PoolCycleRD
   reloadPoolCycle: FP.Lazy<void>
 } => {
-  const { mimir$, reloadMimir } = useThorchainContext()
-  const { thorchainConstantsState$, reloadThorchainConstants } = useThorchainContext()
+  const { mimir$, reloadMimir, thorchainConstantsState$, reloadThorchainConstants } = useThorchainContext()
 
-  const midgardConstantsPoolCycle$: PoolCycleLD = useMemo(
+  const tnConstantsPoolCycle$: PoolCycleLD = useMemo(
     () =>
       FP.pipe(
         thorchainConstantsState$,
@@ -61,11 +60,11 @@ export const usePoolCycle = (): {
   const [data] = useObservableState(
     () =>
       FP.pipe(
-        Rx.combineLatest([midgardConstantsPoolCycle$, mimirPoolCycle$]),
-        RxOp.map(([mimirPoolCycleRD, midgardPoolCycleRD]) =>
+        Rx.combineLatest([tnConstantsPoolCycle$, mimirPoolCycle$]),
+        RxOp.map(([tnPoolCycleRD, mimirPoolCycleRD]) =>
           FP.pipe(
             mimirPoolCycleRD,
-            RD.alt(() => midgardPoolCycleRD)
+            RD.alt(() => tnPoolCycleRD)
           )
         ),
         RxOp.distinctUntilChanged(eqPoolCycle.equals)
