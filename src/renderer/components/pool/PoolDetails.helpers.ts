@@ -71,7 +71,8 @@ export const getEmptyPoolDetail = (): PoolDetail => ({
   annualPercentageRate: '0',
   nativeDecimal: '0',
   saversDepth: '0',
-  saversUnits: '0'
+  saversUnits: '0',
+  saversAPR: '0'
 })
 
 export const getEmptyPoolStatsDetail = (): PoolStatsDetail => ({
