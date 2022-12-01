@@ -28,12 +28,13 @@ export const getSaversTableRowData = ({
   poolDetail,
   pricePoolData,
   watchlist,
+  maxSynthPerPoolDepth,
   network
 }: {
-  // TODO(@veado) Update Midgard types
-  poolDetail: PoolDetail & { saversAPR?: string }
+  poolDetail: PoolDetail
   pricePoolData: PoolData
   watchlist: PoolsWatchList
+  maxSynthPerPoolDepth: number
   network: Network
 }): O.Option<SaversTableRowData> => {
   return FP.pipe(
@@ -48,16 +49,11 @@ export const getSaversTableRowData = ({
       console.log('poolDetail.saversApr', poolDetail.saversAPR)
       console.log('apr:', apr.toString())
 
-      // TODO(@veado) get it from `constants`
-      const MAXSYNTHPERPOOLDEPTH = 1700
-      const maxPercent = bnOrZero(MAXSYNTHPERPOOLDEPTH).div(100)
-      console.log('maxPercent:', maxPercent.toString())
+      const maxPercent = bnOrZero(maxSynthPerPoolDepth).div(100)
       // saverCap = assetDepth * 2 * maxPercent / 100
       const saverCap = bnOrZero(poolDetail.assetDepth).times(2).times(maxPercent).div(100)
-      console.log('saverCap:', saverCap.toString())
       // filled = saversDepth * 100 / saverCap
       const filled = bnOrZero(poolDetail.saversDepth).times(100).div(saverCap)
-      console.log('filled:', filled.toString())
 
       const watched: boolean = FP.pipe(
         watchlist,
@@ -70,7 +66,7 @@ export const getSaversTableRowData = ({
         depth: depthAmount,
         depthPrice,
         filled,
-        count: 0, // TODO(@veado) Get count
+        count: 0, // TODO(@veado) Get count or just delete it
         key: poolDetailAsset.ticker,
         network,
         apr,
@@ -84,11 +80,13 @@ export const getSaversTableRowsData = ({
   poolDetails,
   pricePoolData,
   watchlist,
+  maxSynthPerPoolDepth,
   network
 }: {
   poolDetails: PoolDetails
   pricePoolData: PoolData
   watchlist: PoolsWatchList
+  maxSynthPerPoolDepth: number
   network: Network
 }): SaversTableRowsData => {
   // get symbol of deepest pool
@@ -113,7 +111,7 @@ export const getSaversTableRowsData = ({
       )
 
       return FP.pipe(
-        getSaversTableRowData({ poolDetail, pricePoolData, watchlist, network }),
+        getSaversTableRowData({ poolDetail, pricePoolData, watchlist, maxSynthPerPoolDepth, network }),
         O.map(
           (poolTableRowData) =>
             ({

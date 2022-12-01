@@ -29,7 +29,7 @@ export const usePoolCycle = (): {
     () =>
       FP.pipe(
         thorchainConstantsState$,
-        liveData.map(({ int64_values }) => Number(int64_values?.PoolCycle)),
+        liveData.map(({ int_64_values }) => Number(int_64_values?.PoolCycle)),
         liveData.chain((poolCycle) =>
           // validation -> value needs to be a number
           liveData.fromPredicate<Error, number>(
@@ -37,7 +37,7 @@ export const usePoolCycle = (): {
             () => Error(`Invalid value of constant 'PoolCycle' ${poolCycle} `)
           )(poolCycle)
         ),
-        liveData.mapLeft(() => ({ errorId: ErrorId.GET_POOL_CYCLE, msg: 'Unable to get constant of PoolCycle' }))
+        liveData.mapLeft(() => ({ errorId: ErrorId.GET_TC_CONSTANT, msg: 'Unable to get constant of PoolCycle' }))
       ),
     [thorchainConstantsState$]
   )
@@ -48,7 +48,7 @@ export const usePoolCycle = (): {
         mimir$,
         liveData.map(({ POOLCYCLE: poolCycle }) => O.fromNullable(poolCycle)),
         liveData.chain(liveData.fromOption(() => Error('Unable to load pool cycle from Mimir'))),
-        liveData.mapLeft(({ message }) => ({ errorId: ErrorId.GET_POOL_CYCLE, msg: message }))
+        liveData.mapLeft(({ message }) => ({ errorId: ErrorId.GET_TC_CONSTANT, msg: message }))
       ),
     [mimir$]
   )

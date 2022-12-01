@@ -26,10 +26,12 @@ import { Table } from '../../components/uielements/table'
 import { useMidgardContext } from '../../contexts/MidgardContext'
 import { isChainAsset } from '../../helpers/assetHelper'
 import { ordBigNumber, ordNumber } from '../../helpers/fp/ord'
+import { sequenceTRD } from '../../helpers/fpHelpers'
 import * as PoolHelpers from '../../helpers/poolHelper'
 import { getSaversTableRowsData, ordSaversByDepth } from '../../helpers/savers'
 import { useNetwork } from '../../hooks/useNetwork'
 import { usePoolWatchlist } from '../../hooks/usePoolWatchlist'
+import { useSynthConstants } from '../../hooks/useSynthConstants'
 import * as poolsRoutes from '../../routes/pools'
 import { PoolDetails, PoolsState } from '../../services/midgard/types'
 import type { MimirHalt } from '../../services/thorchain/types'
@@ -54,9 +56,12 @@ export const SaversOverview: React.FC<Props> = (props): JSX.Element => {
     }
   } = useMidgardContext()
 
+  const { maxSynthPerPoolDepth: maxSynthPerPoolDepthRD, reloadConstants } = useSynthConstants()
+
   const refreshHandler = useCallback(() => {
     reloadPools()
-  }, [reloadPools])
+    reloadConstants()
+  }, [reloadConstants, reloadPools])
 
   const selectedPricePool = useObservableState(selectedPricePool$, PoolHelpers.RUNE_PRICE_POOL)
 
@@ -241,42 +246,47 @@ export const SaversOverview: React.FC<Props> = (props): JSX.Element => {
 
   return (
     <>
-      {RD.fold(
-        // initial state
-        () => renderTable([], true),
-        // loading state
-        () => {
-          const pools = O.getOrElse(() => [] as SaversTableRowsData)(previousSavers.current)
-          return renderTable(pools, true)
-        },
-        // render error state
-        Shared.renderTableError(intl.formatMessage({ id: 'common.refresh' }), refreshHandler),
-        // success state
-        ({ poolDetails }: PoolsState): JSX.Element => {
-          // filter chain assets
-          const poolDetailsFiltered: PoolDetails = FP.pipe(
-            poolDetails,
-            A.filter(({ asset: assetString }) =>
-              FP.pipe(
-                assetString,
-                assetFromString,
-                O.fromNullable,
-                O.map(isChainAsset),
-                O.getOrElse(() => false)
+      {FP.pipe(
+        sequenceTRD(poolsRD, maxSynthPerPoolDepthRD),
+        RD.fold(
+          // initial state
+          () => renderTable([], true),
+          // loading state
+          () => {
+            const pools = O.getOrElse(() => [] as SaversTableRowsData)(previousSavers.current)
+            return renderTable(pools, true)
+          },
+          // render error state
+          Shared.renderTableError(intl.formatMessage({ id: 'common.refresh' }), refreshHandler),
+          // success state
+          ([pools, maxSynthPerPoolDepth]): JSX.Element => {
+            const { poolDetails }: PoolsState = pools
+            // filter chain assets
+            const poolDetailsFiltered: PoolDetails = FP.pipe(
+              poolDetails,
+              A.filter(({ asset: assetString }) =>
+                FP.pipe(
+                  assetString,
+                  assetFromString,
+                  O.fromNullable,
+                  O.map(isChainAsset),
+                  O.getOrElse(() => false)
+                )
               )
             )
-          )
 
-          const poolViewData = getSaversTableRowsData({
-            poolDetails: poolDetailsFiltered,
-            pricePoolData: selectedPricePool.poolData,
-            watchlist: poolWatchList,
-            network
-          })
-          previousSavers.current = O.some(poolViewData)
-          return renderTable(poolViewData)
-        }
-      )(poolsRD)}
+            const poolViewData = getSaversTableRowsData({
+              poolDetails: poolDetailsFiltered,
+              pricePoolData: selectedPricePool.poolData,
+              watchlist: poolWatchList,
+              maxSynthPerPoolDepth,
+              network
+            })
+            previousSavers.current = O.some(poolViewData)
+            return renderTable(poolViewData)
+          }
+        )
+      )}
     </>
   )
 }
