@@ -1,5 +1,5 @@
 import { getValueOfAsset1InAsset2, PoolData } from '@thorchain/asgardex-util'
-import { assetFromString, BaseAmount, baseAmount } from '@xchainjs/xchain-util'
+import { assetFromString, BaseAmount, baseAmount, bnOrZero } from '@xchainjs/xchain-util'
 import * as A from 'fp-ts/lib/Array'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
@@ -31,7 +31,7 @@ export const getSaversTableRowData = ({
   network
 }: {
   // TODO(@veado) Update Midgard types
-  poolDetail: PoolDetail & { saversDepth?: string }
+  poolDetail: PoolDetail & { saversAPR?: string }
   pricePoolData: PoolData
   watchlist: PoolsWatchList
   network: Network
@@ -44,6 +44,20 @@ export const getSaversTableRowData = ({
       const poolData = toPoolData(poolDetail)
       const depthAmount = baseAmount(poolDetail.saversDepth)
       const depthPrice = getValueOfAsset1InAsset2(depthAmount, poolData, pricePoolData)
+      const apr = bnOrZero(poolDetail.saversAPR).times(100)
+      console.log('poolDetail.saversApr', poolDetail.saversAPR)
+      console.log('apr:', apr.toString())
+
+      // TODO(@veado) get it from `constants`
+      const MAXSYNTHPERPOOLDEPTH = 1700
+      const maxPercent = bnOrZero(MAXSYNTHPERPOOLDEPTH).div(100)
+      console.log('maxPercent:', maxPercent.toString())
+      // saverCap = assetDepth * 2 * maxPercent / 100
+      const saverCap = bnOrZero(poolDetail.assetDepth).times(2).times(maxPercent).div(100)
+      console.log('saverCap:', saverCap.toString())
+      // filled = saversDepth * 100 / saverCap
+      const filled = bnOrZero(poolDetail.saversDepth).times(100).div(saverCap)
+      console.log('filled:', filled.toString())
 
       const watched: boolean = FP.pipe(
         watchlist,
@@ -55,11 +69,11 @@ export const getSaversTableRowData = ({
         asset: poolDetailAsset,
         depth: depthAmount,
         depthPrice,
-        filled: 0, // TODO(@veado) Get dat from extra data
-        count: 0, // TODO(@veado) Get dat from extra data
+        filled,
+        count: 0, // TODO(@veado) Get count
         key: poolDetailAsset.ticker,
         network,
-        apr: 0, // get APR
+        apr,
         watched
       }
     })

@@ -8,10 +8,12 @@ import {
   BaseAmount,
   baseToAsset,
   Chain,
-  formatAssetAmountCurrency
+  formatAssetAmountCurrency,
+  formatBN
 } from '@xchainjs/xchain-util'
 import { Grid } from 'antd'
 import { ColumnsType, ColumnType } from 'antd/lib/table'
+import BigNumber from 'bignumber.js'
 import * as A from 'fp-ts/lib/Array'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
@@ -23,7 +25,7 @@ import { FlatButton } from '../../components/uielements/button'
 import { Table } from '../../components/uielements/table'
 import { useMidgardContext } from '../../contexts/MidgardContext'
 import { isChainAsset } from '../../helpers/assetHelper'
-import { ordNumber } from '../../helpers/fp/ord'
+import { ordBigNumber, ordNumber } from '../../helpers/fp/ord'
 import * as PoolHelpers from '../../helpers/poolHelper'
 import { getSaversTableRowsData, ordSaversByDepth } from '../../helpers/savers'
 import { useNetwork } from '../../hooks/useNetwork'
@@ -99,30 +101,30 @@ export const SaversOverview: React.FC<Props> = (props): JSX.Element => {
   )
 
   const aprColumn = useCallback(
-    <T extends { apr: number }>(): ColumnType<T> => ({
+    <T extends { apr: BigNumber }>(): ColumnType<T> => ({
       key: 'apr',
       align: 'center',
       title: intl.formatMessage({ id: 'pools.apr' }),
-      render: ({ apr }: { apr: number }) => <div className="font-main text-16">{apr}%</div>,
-      sorter: (a: { apr: number }, b: { apr: number }) => ordNumber.compare(a.apr, b.apr),
+      render: ({ apr }: { apr: BigNumber }) => <div className="font-main text-16">{formatBN(apr, 2)}%</div>,
+      sorter: (a: { apr: BigNumber }, b: { apr: BigNumber }) => ordBigNumber.compare(a.apr, b.apr),
       sortDirections: ['descend', 'ascend']
     }),
     [intl]
   )
 
   const filledColumn = useCallback(
-    <T extends { filled: number }>(): ColumnType<T> => ({
+    <T extends { filled: BigNumber }>(): ColumnType<T> => ({
       key: 'filled',
       align: 'center',
       title: intl.formatMessage({ id: 'pools.filled' }),
-      render: ({ filled }: { filled: number }) => <div className="font-main text-16">{filled}%</div>,
-      sorter: (a: { filled: number }, b: { filled: number }) => ordNumber.compare(a.filled, b.filled),
+      render: ({ filled }: { filled: BigNumber }) => <div className="font-main text-16">{formatBN(filled, 2)}%</div>,
+      sorter: (a: { filled: BigNumber }, b: { filled: BigNumber }) => ordBigNumber.compare(a.filled, b.filled),
       sortDirections: ['descend', 'ascend']
     }),
     [intl]
   )
 
-  const countColumn = useCallback(
+  const _countColumn = useCallback(
     <T extends { count: number }>(): ColumnType<T> => ({
       key: 'count',
       align: 'center',
@@ -187,7 +189,6 @@ export const SaversOverview: React.FC<Props> = (props): JSX.Element => {
       Shared.poolColumn(intl.formatMessage({ id: 'common.pool' })),
       Shared.assetColumn(intl.formatMessage({ id: 'common.asset' })),
       depthColumn<SaversTableRowData>(selectedPricePool.asset),
-      countColumn<SaversTableRowData>(),
       filledColumn<SaversTableRowData>(),
       aprColumn<SaversTableRowData>(),
       btnColumn()
@@ -196,7 +197,6 @@ export const SaversOverview: React.FC<Props> = (props): JSX.Element => {
       addPoolToWatchlist,
       aprColumn,
       btnColumn,
-      countColumn,
       depthColumn,
       filledColumn,
       intl,
