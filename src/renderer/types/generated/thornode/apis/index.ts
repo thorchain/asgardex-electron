@@ -1,4 +1,3 @@
-export * from './BucketsApi';
 export * from './HealthApi';
 export * from './LiquidityProvidersApi';
 export * from './MimirApi';
@@ -7,6 +6,8 @@ export * from './NodesApi';
 export * from './POLApi';
 export * from './PoolsApi';
 export * from './QueueApi';
+export * from './QuoteApi';
+export * from './SaversApi';
 export * from './TSSApi';
 export * from './ThornamesApi';
 export * from './TransactionsApi';

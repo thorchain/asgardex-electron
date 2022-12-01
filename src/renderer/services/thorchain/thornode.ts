@@ -175,8 +175,8 @@ export const createThornodeService$ = (network$: Network$, clientUrl$: ClientUrl
     liveData.map<Node[], NodeInfos>((nodes) =>
       FP.pipe(
         nodes,
-        A.map(({ bond, current_award, status, node_address }) => ({
-          bond: baseAmount(bond, THORCHAIN_DECIMAL),
+        A.map(({ total_bond, current_award, status, node_address }) => ({
+          bond: baseAmount(total_bond, THORCHAIN_DECIMAL),
           award: baseAmount(current_award, THORCHAIN_DECIMAL),
           status,
           address: node_address
