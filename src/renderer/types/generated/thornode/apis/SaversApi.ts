@@ -17,13 +17,13 @@ import {
     LiquidityProvider,
 } from '../models';
 
-export interface LiquidityProviderRequest {
+export interface SaverRequest {
     asset: string;
     address: string;
     height?: number;
 }
 
-export interface LiquidityProvidersRequest {
+export interface SaversRequest {
     asset: string;
     height?: number;
 }
@@ -31,38 +31,38 @@ export interface LiquidityProvidersRequest {
 /**
  * no description
  */
-export class LiquidityProvidersApi extends BaseAPI {
+export class SaversApi extends BaseAPI {
 
     /**
-     * Returns the liquidity provider information for an address and asset.
+     * Returns the saver position given then savers pool and address.
      */
-    liquidityProvider = ({ asset, address, height }: LiquidityProviderRequest): Observable<Array<LiquidityProvider>> => {
-        throwIfNullOrUndefined(asset, 'liquidityProvider');
-        throwIfNullOrUndefined(address, 'liquidityProvider');
+    saver = ({ asset, address, height }: SaverRequest): Observable<Array<LiquidityProvider>> => {
+        throwIfNullOrUndefined(asset, 'saver');
+        throwIfNullOrUndefined(address, 'saver');
 
         const query: HttpQuery = {};
 
         if (height != null) { query['height'] = height; }
 
         return this.request<Array<LiquidityProvider>>({
-            path: '/thorchain/pool/{asset}/liquidity_provider/{address}'.replace('{asset}', encodeURI(asset)).replace('{address}', encodeURI(address)),
+            path: '/thorchain/pool/{asset}/saver/{address}'.replace('{asset}', encodeURI(asset)).replace('{address}', encodeURI(address)),
             method: 'GET',
             query,
         });
     };
 
     /**
-     * Returns all liquidity provider information for an asset.
+     * Returns all savers for the savers pool.
      */
-    liquidityProviders = ({ asset, height }: LiquidityProvidersRequest): Observable<Array<LiquidityProvider>> => {
-        throwIfNullOrUndefined(asset, 'liquidityProviders');
+    savers = ({ asset, height }: SaversRequest): Observable<Array<LiquidityProvider>> => {
+        throwIfNullOrUndefined(asset, 'savers');
 
         const query: HttpQuery = {};
 
         if (height != null) { query['height'] = height; }
 
         return this.request<Array<LiquidityProvider>>({
-            path: '/thorchain/pool/{asset}/liquidity_providers'.replace('{asset}', encodeURI(asset)),
+            path: '/thorchain/pool/{asset}/savers'.replace('{asset}', encodeURI(asset)),
             method: 'GET',
             query,
         });

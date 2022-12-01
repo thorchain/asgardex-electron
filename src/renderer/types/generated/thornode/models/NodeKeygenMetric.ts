@@ -11,23 +11,19 @@
  * Do not edit the class manually.
  */
 
-import {
-    VaultRouter,
-} from './';
-
 /**
  * @export
- * @interface VaultInfo
+ * @interface NodeKeygenMetric
  */
-export interface VaultInfo {
+export interface NodeKeygenMetric {
     /**
      * @type {string}
-     * @memberof VaultInfo
+     * @memberof NodeKeygenMetric
      */
-    pub_key: string;
+    address?: string;
     /**
-     * @type {Array<VaultRouter>}
-     * @memberof VaultInfo
+     * @type {string}
+     * @memberof NodeKeygenMetric
      */
-    routers: Array<VaultRouter>;
+    tss_time?: string;
 }

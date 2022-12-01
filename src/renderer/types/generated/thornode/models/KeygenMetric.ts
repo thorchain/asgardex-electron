@@ -12,22 +12,22 @@
  */
 
 import {
-    VaultRouter,
+    NodeKeygenMetric,
 } from './';
 
 /**
  * @export
- * @interface VaultInfo
+ * @interface KeygenMetric
  */
-export interface VaultInfo {
+export interface KeygenMetric {
     /**
      * @type {string}
-     * @memberof VaultInfo
+     * @memberof KeygenMetric
      */
-    pub_key: string;
+    pub_key?: string;
     /**
-     * @type {Array<VaultRouter>}
-     * @memberof VaultInfo
+     * @type {Array<NodeKeygenMetric>}
+     * @memberof KeygenMetric
      */
-    routers: Array<VaultRouter>;
+    node_tss_times: Array<NodeKeygenMetric>;
 }

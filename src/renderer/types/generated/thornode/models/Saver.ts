@@ -11,48 +11,39 @@
  * Do not edit the class manually.
  */
 
-import {
-    Coin,
-} from './';
-
 /**
  * @export
- * @interface Tx
+ * @interface Saver
  */
-export interface Tx {
+export interface Saver {
     /**
      * @type {string}
-     * @memberof Tx
+     * @memberof Saver
      */
-    id?: string;
+    asset: string;
     /**
      * @type {string}
-     * @memberof Tx
+     * @memberof Saver
      */
-    chain?: string;
+    asset_address: string;
+    /**
+     * @type {number}
+     * @memberof Saver
+     */
+    last_add_height?: number;
+    /**
+     * @type {number}
+     * @memberof Saver
+     */
+    last_withdraw_height?: number;
     /**
      * @type {string}
-     * @memberof Tx
+     * @memberof Saver
      */
-    from_address?: string;
+    units: string;
     /**
      * @type {string}
-     * @memberof Tx
+     * @memberof Saver
      */
-    to_address?: string;
-    /**
-     * @type {Array<Coin>}
-     * @memberof Tx
-     */
-    coins: Array<Coin>;
-    /**
-     * @type {Array<Coin>}
-     * @memberof Tx
-     */
-    gas: Array<Coin>;
-    /**
-     * @type {string}
-     * @memberof Tx
-     */
-    memo?: string;
+    asset_deposit_value: string;
 }

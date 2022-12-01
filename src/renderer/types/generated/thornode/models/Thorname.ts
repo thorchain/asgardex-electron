@@ -12,47 +12,37 @@
  */
 
 import {
-    Coin,
+    ThornameAlias,
 } from './';
 
 /**
  * @export
- * @interface Tx
+ * @interface Thorname
  */
-export interface Tx {
+export interface Thorname {
     /**
      * @type {string}
-     * @memberof Tx
+     * @memberof Thorname
      */
-    id?: string;
+    name?: string;
+    /**
+     * @type {number}
+     * @memberof Thorname
+     */
+    expire_block_height?: number;
     /**
      * @type {string}
-     * @memberof Tx
+     * @memberof Thorname
      */
-    chain?: string;
+    owner?: string;
     /**
      * @type {string}
-     * @memberof Tx
+     * @memberof Thorname
      */
-    from_address?: string;
+    preferred_asset: string;
     /**
-     * @type {string}
-     * @memberof Tx
+     * @type {Array<ThornameAlias>}
+     * @memberof Thorname
      */
-    to_address?: string;
-    /**
-     * @type {Array<Coin>}
-     * @memberof Tx
-     */
-    coins: Array<Coin>;
-    /**
-     * @type {Array<Coin>}
-     * @memberof Tx
-     */
-    gas: Array<Coin>;
-    /**
-     * @type {string}
-     * @memberof Tx
-     */
-    memo?: string;
+    aliases: Array<ThornameAlias>;
 }

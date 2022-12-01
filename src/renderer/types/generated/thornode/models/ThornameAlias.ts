@@ -11,23 +11,19 @@
  * Do not edit the class manually.
  */
 
-import {
-    VaultRouter,
-} from './';
-
 /**
  * @export
- * @interface VaultInfo
+ * @interface ThornameAlias
  */
-export interface VaultInfo {
+export interface ThornameAlias {
     /**
      * @type {string}
-     * @memberof VaultInfo
+     * @memberof ThornameAlias
      */
-    pub_key: string;
+    chain?: string;
     /**
-     * @type {Array<VaultRouter>}
-     * @memberof VaultInfo
+     * @type {string}
+     * @memberof ThornameAlias
      */
-    routers: Array<VaultRouter>;
+    address?: string;
 }
