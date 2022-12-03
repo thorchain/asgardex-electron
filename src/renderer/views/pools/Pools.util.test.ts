@@ -49,10 +49,7 @@ describe('views/pools/utils', () => {
 
     it('transforms data for a FTM pool', () => {
       const expected: PoolTableRowData = {
-        pool: {
-          asset: AssetRuneNative,
-          target: ASSETS_TESTNET.FTM
-        },
+        asset: ASSETS_TESTNET.FTM,
         poolPrice: assetToBase(assetAmount(2)),
         depthPrice: assetToBase(assetAmount(2000)),
         volumePrice: assetToBase(assetAmount(1000)),
@@ -75,8 +72,8 @@ describe('views/pools/utils', () => {
       FP.pipe(
         result,
         O.map((data) => {
-          expect(data.pool).toEqual(expected.pool)
-          expect(data.pool).toEqual(expected.pool)
+          expect(data.asset).toEqual(expected.asset)
+          expect(data.asset).toEqual(expected.asset)
           expect(data.depthPrice.eq(expected.depthPrice)).toBeTruthy()
           expect(data.volumePrice.eq(expected.volumePrice)).toBeTruthy()
           expect(data.apy).toEqual(expected.apy)
@@ -135,64 +132,34 @@ describe('views/pools/utils', () => {
   describe('filterTableData', () => {
     const tableData: FilterTableData[] = [
       {
-        pool: {
-          asset: AssetRuneNative,
-          target: AssetBNB
-        }
+        asset: AssetBNB
       },
       {
-        pool: {
-          asset: AssetRuneNative,
-          target: AssetLTC
-        }
+        asset: AssetLTC
       },
       {
-        pool: {
-          asset: AssetRuneNative,
-          target: AssetBTC
-        }
+        asset: AssetBTC
       },
       {
-        pool: {
-          asset: AssetRuneNative,
-          target: AssetBCH
-        }
+        asset: AssetBCH
       },
       {
-        pool: {
-          asset: AssetRuneNative,
-          target: ASSETS_TESTNET.BUSD
-        }
+        asset: ASSETS_TESTNET.BUSD
       },
       {
-        pool: {
-          asset: AssetRuneNative,
-          target: ERC20_TESTNET.USDT
-        }
+        asset: ERC20_TESTNET.USDT
       },
       {
-        pool: {
-          asset: AssetRuneNative,
-          target: ERC20_TESTNET.RUNE
-        }
+        asset: ERC20_TESTNET.RUNE
       },
       {
-        pool: {
-          asset: AssetRuneNative,
-          target: ERC20_TESTNET.USDT
-        }
+        asset: ERC20_TESTNET.USDT
       },
       {
-        pool: {
-          asset: AssetRuneNative,
-          target: AssetETH
-        }
+        asset: AssetETH
       },
       {
-        pool: {
-          asset: AssetRuneNative,
-          target: { chain: BNBChain, symbol: 'BNB.ETH-1C9', ticker: 'ETH', synth: false }
-        }
+        asset: { chain: BNBChain, symbol: 'BNB.ETH-1C9', ticker: 'ETH', synth: false }
       }
     ] as PoolTableRowData[]
 

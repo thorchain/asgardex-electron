@@ -49,7 +49,11 @@ describe('helpers/poolHelper/', () => {
     liquidityUnits: '0',
     synthUnits: '0',
     synthSupply: '0',
-    annualPercentageRate: '0'
+    annualPercentageRate: '0',
+    nativeDecimal: '0',
+    saversDepth: '0',
+    saversUnits: '0',
+    saversAPR: '0'
   }
   const pool1: PoolDetail = { ...mockPoolDetail, status: GetPoolsStatusEnum.Staged, runeDepth: '1000' }
   const pool2: PoolDetail = { ...mockPoolDetail, status: GetPoolsStatusEnum.Available, runeDepth: '2000' }
@@ -96,10 +100,8 @@ describe('helpers/poolHelper/', () => {
       })
       expect(result.length).toEqual(2)
       // Note: `getPoolTableRowsData` reverses the order of given `poolDetails`
-      expect(result[0].pool.asset).toEqual(AssetRuneNative)
-      expect(result[0].pool.target).toEqual(ASSETS_TESTNET.FTM)
-      expect(result[1].pool.asset).toEqual(AssetRuneNative)
-      expect(result[1].pool.target).toEqual(ASSETS_TESTNET.BOLT)
+      expect(result[0].asset).toEqual(ASSETS_TESTNET.FTM)
+      expect(result[1].asset).toEqual(ASSETS_TESTNET.BOLT)
     })
 
     it('returns data for available pools', () => {
@@ -111,10 +113,8 @@ describe('helpers/poolHelper/', () => {
       })
       expect(result.length).toEqual(2)
       // Note: `getPoolTableRowsData` reverses the order of given `poolDetails`
-      expect(result[0].pool.asset).toEqual(AssetRuneNative)
-      expect(result[0].pool.target).toEqual(ASSETS_TESTNET.FTM)
-      expect(result[1].pool.asset).toEqual(AssetRuneNative)
-      expect(result[1].pool.target).toEqual(ASSETS_TESTNET.TOMO)
+      expect(result[0].asset).toEqual(ASSETS_TESTNET.FTM)
+      expect(result[1].asset).toEqual(ASSETS_TESTNET.TOMO)
     })
   })
 

@@ -1,6 +1,6 @@
 import styled from 'styled-components'
 
-import { BackLink as BackLinkUI } from '../../components/uielements/backLink'
+import { BackLinkButton as BackLinkUI } from '../../components/uielements/button'
 
 export const ControlsContainer = styled.div`
   display: flex;

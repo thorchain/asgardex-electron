@@ -16,9 +16,8 @@ import { useObservableState } from 'observable-hooks'
 import { useIntl } from 'react-intl'
 
 import { LoadingView } from '../../../components/shared/loading'
-import { BackLink } from '../../../components/uielements/backLink'
+import { BackLinkButton } from '../../../components/uielements/button'
 import { useWalletContext } from '../../../contexts/WalletContext'
-import * as walletRoutes from '../../../routes/wallet'
 import { SelectedWalletAsset } from '../../../services/wallet/types'
 import {
   SendViewBNB,
@@ -83,10 +82,10 @@ export const SendView: React.FC<Props> = (): JSX.Element => {
     O.fold(
       () => <LoadingView size="large" />,
       (selectedAsset) => (
-        <>
-          <BackLink path={walletRoutes.assetDetail.path()} />
+        <div>
+          <BackLinkButton />
           {renderSendView(selectedAsset)}
-        </>
+        </div>
       )
     )
   )

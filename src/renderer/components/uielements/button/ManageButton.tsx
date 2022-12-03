@@ -1,13 +1,13 @@
 import React, { useCallback } from 'react'
 
-import { PlusOutlined } from '@ant-design/icons'
+import { PlusIcon } from '@heroicons/react/24/outline'
 import { Asset, assetToString } from '@xchainjs/xchain-util'
 import { useIntl } from 'react-intl'
 import { useNavigate } from 'react-router-dom'
 
-import * as poolsRoutes from '../../routes/pools'
-import { BorderButton } from '../uielements/button'
-import type { Props as BorderButtonProps } from '../uielements/button/BorderButton'
+import * as poolsRoutes from '../../../routes/pools'
+import { BorderButton } from './'
+import type { Props as BorderButtonProps } from './BorderButton'
 
 export type Props = BorderButtonProps & {
   className?: string
@@ -29,8 +29,8 @@ export const ManageButton: React.FC<Props> = ({ asset, isTextView, ...otherProps
 
   return (
     <BorderButton onClick={onClick} {...otherProps}>
-      <PlusOutlined className={isTextView ? `mr-[8px]` : ''} />
-      {isTextView && intl.formatMessage({ id: 'common.manage' })}
+      <PlusIcon className={`h-[16px] w-[16px] text-inherit lg:h-20px lg:w-20px ${isTextView ? `mr-[8px]` : ''}`} />
+      <span className={`${isTextView ? 'mr-10px' : 'hidden'}`}>{intl.formatMessage({ id: 'common.manage' })}</span>
     </BorderButton>
   )
 }

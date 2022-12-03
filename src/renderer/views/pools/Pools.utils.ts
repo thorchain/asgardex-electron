@@ -3,7 +3,6 @@ import {
   baseAmount,
   assetFromString,
   Asset,
-  AssetRuneNative,
   assetToBase,
   assetAmount,
   BaseAmount,
@@ -23,8 +22,9 @@ import { eqString, eqAsset } from '../../helpers/fp/eq'
 import { sequenceTOption } from '../../helpers/fpHelpers'
 import { PoolFilter } from '../../services/midgard/types'
 import { toPoolData } from '../../services/midgard/utils'
-import { GetPoolsStatusEnum, PoolDetail, LastblockItem } from '../../types/generated/midgard'
-import { PoolTableRowData, Pool } from './Pools.types'
+import { LastblockItem } from '../../services/thorchain/types'
+import { GetPoolsStatusEnum, type PoolDetail } from '../../types/generated/midgard'
+import { PoolTableRowData } from './Pools.types'
 
 export const stringToGetPoolsStatus = (status: string): GetPoolsStatusEnum => {
   switch (status) {
@@ -71,11 +71,6 @@ export const getPoolTableRowData = ({
 
       const status = stringToGetPoolsStatus(poolDetail.status)
 
-      const pool: Pool = {
-        asset: AssetRuneNative,
-        target: poolDetailAsset
-      }
-
       const watched: boolean = FP.pipe(
         watchlist,
         A.findFirst((poolInList) => eqAsset.equals(poolInList, poolDetailAsset)),
@@ -83,7 +78,7 @@ export const getPoolTableRowData = ({
       )
 
       return {
-        pool,
+        asset: poolDetailAsset,
         poolPrice,
         depthPrice,
         volumePrice,
@@ -128,7 +123,7 @@ export const getBlocksLeftForPendingPoolAsString = (
   )
 }
 
-export type FilterTableData = Pick<PoolTableRowData, 'pool' | 'watched'>
+export type FilterTableData = Pick<PoolTableRowData, 'asset' | 'watched'>
 /**
  * Filters tableData array by passed active filter.
  * If oFilter is O.none will return tableData array without any changes
@@ -142,7 +137,7 @@ export const filterTableData =
         FP.pipe(
           tableData,
           A.filterMap((tableRow) => {
-            const asset = tableRow.pool.target
+            const asset = tableRow.asset
             const value = filter.toLowerCase()
             // watched assets
             if (value === '__watched__') {

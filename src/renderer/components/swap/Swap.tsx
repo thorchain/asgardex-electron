@@ -40,7 +40,6 @@ import {
   isEthTokenAsset,
   max1e8BaseAmount,
   convertBaseAmountDecimal,
-  isChainAsset,
   to1e8BaseAmount,
   THORCHAIN_DECIMAL,
   isUSDAsset
@@ -129,6 +128,8 @@ export type SwapProps = {
     source: SwapAsset
     target: SwapAsset
   }
+  sourceWalletAddress: O.Option<Address>
+  sourceLedgerAddress: O.Option<Address>
   poolAddress: O.Option<PoolAddress>
   swap$: SwapStateHandler
   poolsData: PoolsDataMap
@@ -177,6 +178,8 @@ export const Swap = ({
   reloadFees,
   reloadBalances = FP.constVoid,
   fees$,
+  sourceWalletAddress: oInitialSourceWalletAddress,
+  sourceLedgerAddress: oSourceLedgerAddress,
   targetWalletAddress: oInitialTargetWalletAddress,
   targetLedgerAddress: oTargetLedgerAddress,
   onChangePath,
@@ -196,6 +199,12 @@ export const Swap = ({
   const intl = useIntl()
 
   const lockedWallet: boolean = useMemo(() => isLocked(keystore) || !hasImportedKeystore(keystore), [keystore])
+
+  const [oSourceWalletAddress, setSourceWalletAddress] = useState<O.Option<Address>>(oInitialSourceWalletAddress)
+  // Update state needed - initial walletAddress is loaded async and can be different at first run
+  useEffect(() => {
+    setSourceWalletAddress(oInitialSourceWalletAddress)
+  }, [oInitialSourceWalletAddress])
 
   const [oTargetWalletAddress, setTargetWalletAddress] = useState<O.Option<Address>>(oInitialTargetWalletAddress)
   const [editableTargetWalletAddress, setEditableTargetWalletAddress] =
@@ -330,6 +339,58 @@ export const Swap = ({
     [oWalletBalances, sourceAssetDecimal, sourceChainAsset, sourceWalletType]
   )
 
+  // Balance of target asset
+  // Note: Users balances included in its wallet are checked only. Custom (not users) balances are ignored.
+  const oTargetAssetAmount: O.Option<BaseAmount> = useMemo(
+    () =>
+      FP.pipe(
+        allBalances,
+        NEA.fromArray,
+        (oWalletBalances) =>
+          FP.pipe(
+            oTargetWalletType,
+            O.chain((walletType) =>
+              getWalletBalanceByAssetAndWalletType({
+                oWalletBalances,
+                asset: targetAsset,
+                walletType
+              })
+            )
+          ),
+        O.map(({ amount }) => amount)
+      ),
+    [allBalances, oTargetWalletType, targetAsset]
+  )
+
+  // Formatted balances of target asset.
+  // Note: Users balances included in its wallet are checked only. Balances of custom (not users) balances are not shown.
+  const targetAssetAmountLabel = useMemo(
+    () =>
+      FP.pipe(
+        oTargetAssetAmount,
+        O.map((amount) =>
+          formatAssetAmountCurrency({
+            amount: baseToAsset(amount),
+            asset: targetAsset,
+            decimal: 8,
+            trimZeros: true
+          })
+        ),
+        O.getOrElse(() =>
+          O.isSome(oTargetWalletType)
+            ? // Zero balances are hidden, but we show a zero amount for users wallets (ledger or keystore)
+              formatAssetAmountCurrency({
+                amount: assetAmount(0, targetAssetDecimal),
+                asset: targetAsset,
+                decimal: 0
+              })
+            : // for unknown recipient we show nothing (for privacy)
+              noDataString
+        )
+      ),
+    [oTargetAssetAmount, oTargetWalletType, targetAsset, targetAssetDecimal]
+  )
+
   const {
     state: swapState,
     reset: resetSwapState,
@@ -344,7 +405,7 @@ export const Swap = ({
   const [
     /* max. 1e8 decimal */
     amountToSwapMax1e8,
-    _setAmountToSwapMax1e8 /* private - never set it directly, use setAmountToSwap() instead */
+    _setAmountToSwapMax1e8 /* private - never set it directly, use setAmountToSwapMax1e8() instead */
   ] = useState(initialAmountToSwapMax1e8)
 
   const priceAmountToSwapMax1e8: AssetWithAmount = useMemo(
@@ -572,16 +633,20 @@ export const Swap = ({
     )
   }, [swapFees, targetAsset, poolsData, zeroTargetBaseAmountMax, targetAssetDecimal])
 
-  const swapData: SwapData = useMemo(
-    () =>
-      Utils.getSwapData({
-        amountToSwap: amountToSwapMax1e8,
-        sourceAsset: sourceAsset,
-        targetAsset: targetAsset,
-        poolsData
-      }),
-    [amountToSwapMax1e8, sourceAsset, targetAsset, poolsData]
-  )
+  const swapData: SwapData = useMemo(() => {
+    const amountToSwap = Utils.calcAmountToSwapMax1e8({
+      amountToSwapMax1e8,
+      sourceAsset,
+      inFeeAmount: swapFees.inFee.amount
+    })
+
+    return Utils.getSwapData({
+      amountToSwap,
+      sourceAsset: sourceAsset,
+      targetAsset: targetAsset,
+      poolsData
+    })
+  }, [sourceAsset, swapFees.inFee.amount, amountToSwapMax1e8, targetAsset, poolsData])
 
   const swapResultAmountMax1e8: BaseAmount = useMemo(() => {
     // 1. Convert `swapResult` (1e8) to original decimal of target asset (original decimal might be < 1e8)
@@ -897,20 +962,13 @@ export const Swap = ({
     [intl, minAmountError, minAmountToSwapMax1e8, sourceAsset]
   )
 
-  // Max amount to swap
-  // depends on users balances of source asset
+  // Max amount to swap == users balances of source asset
   // Decimal always <= 1e8 based
   const maxAmountToSwapMax1e8: BaseAmount = useMemo(() => {
     if (lockedWallet) return assetToBase(assetAmount(Number.MAX_SAFE_INTEGER, sourceAssetAmountMax1e8.decimal))
 
-    // In case of chain asset
-    // We are substracting fee from source asset
-    // In other cases ERC20/BEP20
-    // max value of token can be allocated for swap
-    if (isChainAsset(sourceAsset)) return Utils.maxAmountToSwapMax1e8(sourceAssetAmountMax1e8, swapFees.inFee.amount)
-
     return sourceAssetAmountMax1e8
-  }, [lockedWallet, sourceAssetAmountMax1e8, sourceAsset, swapFees])
+  }, [lockedWallet, sourceAssetAmountMax1e8])
 
   const setAmountToSwapMax1e8 = useCallback(
     (amountToSwap: BaseAmount) => {
@@ -1442,25 +1500,12 @@ export const Swap = ({
    */
   const disableSwitchAssets = useMemo(() => {
     const hasTargetBalance = FP.pipe(
-      allBalances,
-      NEA.fromArray,
-      (oWalletBalances) =>
-        FP.pipe(
-          oTargetWalletType,
-          O.chain((walletType) =>
-            getWalletBalanceByAssetAndWalletType({
-              oWalletBalances,
-              asset: targetAsset,
-              walletType
-            })
-          )
-        ),
-      O.map(({ amount }) => amount.gt(baseAmount(0, targetAssetDecimal))),
+      oTargetAssetAmount,
+      O.map((amount) => amount.gt(baseAmount(0, targetAssetDecimal))),
       O.getOrElse(() => false)
     )
-
     return !hasTargetBalance
-  }, [allBalances, targetAsset, oTargetWalletType, targetAssetDecimal])
+  }, [oTargetAssetAmount, targetAssetDecimal])
 
   const onSwitchAssets = useCallback(async () => {
     // delay to avoid render issues while switching
@@ -1525,8 +1570,11 @@ export const Swap = ({
   )
 
   const onClickUseSourceAssetLedger = useCallback(() => {
+    const useLedger = !useSourceAssetLedger
     setUseSourceAssetLedger(() => !useSourceAssetLedger)
-  }, [useSourceAssetLedger])
+    const oAddress = useLedger ? oSourceLedgerAddress : oInitialSourceWalletAddress
+    setSourceWalletAddress(oAddress)
+  }, [oInitialSourceWalletAddress, oSourceLedgerAddress, useSourceAssetLedger])
 
   const onClickUseTargetAssetLedger = useCallback(() => {
     const useLedger = !useTargetAssetLedger
@@ -1540,15 +1588,16 @@ export const Swap = ({
     () =>
       FP.pipe(
         oSwapParams,
-        O.map(({ memo }) => (
+        O.map(({ memo }) => memo),
+        O.getOrElse(() => emptyString),
+        (memo) => (
           <CopyLabel
             className="pl-0 !font-mainBold text-[14px] uppercase text-gray2 dark:text-gray2d"
             label={intl.formatMessage({ id: 'common.memo' })}
             key="memo-copy"
             textToCopy={memo}
           />
-        )),
-        O.toNullable
+        )
       ),
     [intl, oSwapParams]
   )
@@ -1575,23 +1624,8 @@ export const Swap = ({
       trimZeros: !isUSDAsset(sourceAsset)
     })
 
-    const feeLabel = FP.pipe(
-      swapFeesRD,
-      RD.map(({ inFee: { amount, asset: feeAsset } }) =>
-        formatAssetAmountCurrency({
-          amount: baseToAsset(amount),
-          asset: feeAsset,
-          decimal: isUSDAsset(feeAsset) ? 2 : 8, // use 8 decimal as same we use in maxAmountToSwapMax1e8
-          trimZeros: !isUSDAsset(feeAsset)
-        })
-      ),
-      RD.getOrElse(() => noDataString)
-    )
-
-    return isChainAsset(sourceAsset)
-      ? intl.formatMessage({ id: 'swap.info.max.balanceMinusFee' }, { balance: balanceLabel, fee: feeLabel })
-      : intl.formatMessage({ id: 'swap.info.max.balance' }, { balance: balanceLabel })
-  }, [sourceAssetAmountMax1e8, sourceAsset, swapFeesRD, intl])
+    return intl.formatMessage({ id: 'swap.info.max.balance' }, { balance: balanceLabel })
+  }, [sourceAssetAmountMax1e8, sourceAsset, intl])
 
   const [showDetails, setShowDetails] = useState<boolean>(false)
 
@@ -1902,10 +1936,10 @@ export const Swap = ({
                       <div>{intl.formatMessage({ id: 'common.sender' })}</div>
                       <div className="truncate pl-20px text-[13px] normal-case leading-normal">
                         {FP.pipe(
-                          oSwapParams,
-                          O.map(({ sender }) => (
-                            <TooltipAddress title={sender} key="tooltip-sender-addr">
-                              {sender}
+                          oSourceWalletAddress,
+                          O.map((address) => (
+                            <TooltipAddress title={address} key="tooltip-sender-addr">
+                              {address}
                             </TooltipAddress>
                           )),
                           O.getOrElse(() => <>{noDataString}</>)
@@ -1945,6 +1979,41 @@ export const Swap = ({
                   </>
                 )}
 
+                {/* balances */}
+                {showDetails && (
+                  <>
+                    <div className={`w-full pt-10px text-[14px]`}>
+                      <BaseButton
+                        disabled={walletBalancesLoading}
+                        className="group !p-0 !font-mainBold !text-gray2 dark:!text-gray2d"
+                        onClick={reloadBalances}>
+                        {intl.formatMessage({ id: 'common.balances' })}
+                        <ArrowPathIcon className="ease ml-5px h-[15px] w-[15px] group-hover:rotate-180" />
+                      </BaseButton>
+                    </div>
+                    {/* sender balance */}
+                    <div className="flex w-full items-center justify-between pl-10px text-[12px]">
+                      <div>{intl.formatMessage({ id: 'common.sender' })}</div>
+                      <div className="truncate pl-20px text-[13px] normal-case leading-normal">
+                        {walletBalancesLoading
+                          ? loadingString
+                          : formatAssetAmountCurrency({
+                              amount: baseToAsset(sourceAssetAmountMax1e8),
+                              asset: sourceAsset,
+                              decimal: 8,
+                              trimZeros: true
+                            })}
+                      </div>
+                    </div>
+                    {/* recipient balance */}
+                    <div className="flex w-full items-center justify-between pl-10px text-[12px]">
+                      <div>{intl.formatMessage({ id: 'common.recipient' })}</div>
+                      <div className="truncate pl-20px text-[13px] normal-case leading-normal">
+                        {walletBalancesLoading ? loadingString : targetAssetAmountLabel}
+                      </div>
+                    </div>
+                  </>
+                )}
                 {/* memo */}
                 {showDetails && (
                   <>

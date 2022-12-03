@@ -11,7 +11,7 @@ import * as RxOp from 'rxjs/operators'
 
 import { ErrorView } from '../../../components/shared/error'
 import { LoadingView } from '../../../components/shared/loading'
-import { BackLink } from '../../../components/uielements/backLink'
+import { BackLinkButton } from '../../../components/uielements/button'
 import { Interact } from '../../../components/wallet/txs/interact'
 import { getInteractTypeFromNullableString } from '../../../components/wallet/txs/interact/Interact.helpers'
 import { InteractType } from '../../../components/wallet/txs/interact/Interact.types'
@@ -110,16 +110,16 @@ export const InteractView: React.FC = () => {
       () => <LoadingView size="large" />,
       () => <LoadingView size="large" />,
       (error) => (
-        <>
-          <BackLink />
+        <div>
+          <BackLinkButton />
           <ErrorView title="Missing data for InteractiveView" subTitle={error?.message ?? error.toString()} />
-        </>
+        </div>
       ),
       ([interactType, { walletType, walletIndex, hdMode }]) => (
         <>
           <Row justify="space-between">
             <Col>
-              <BackLink path={walletRoutes.assetDetail.path()} />
+              <BackLinkButton />
             </Col>
           </Row>
           <Styled.Container>

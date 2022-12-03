@@ -12,7 +12,7 @@ import * as RxOp from 'rxjs/operators'
 import { Network } from '../../../../shared/api/types'
 import { ErrorView } from '../../../components/shared/error'
 import { LoadingView } from '../../../components/shared/loading'
-import { BackLink } from '../../../components/uielements/backLink'
+import { BackLinkButton } from '../../../components/uielements/button'
 import { useAppContext } from '../../../contexts/AppContext'
 import { useChainContext } from '../../../contexts/ChainContext'
 import { useMidgardContext } from '../../../contexts/MidgardContext'
@@ -197,8 +197,8 @@ export const UpgradeView: React.FC<Props> = (): JSX.Element => {
   )
 
   return (
-    <>
-      <BackLink />
+    <div>
+      <BackLinkButton />
       {FP.pipe(
         sequenceTRD(runeToUpgradeAssetRD, runeToDecimalRD, targetPoolAddressRD),
         RD.fold(
@@ -241,6 +241,6 @@ export const UpgradeView: React.FC<Props> = (): JSX.Element => {
           }
         )
       )}
-    </>
+    </div>
   )
 }

@@ -38,15 +38,6 @@ export const RowItem = styled(A.Col)`
   align-items: center;
 `
 
-export const ButtonActions = styled.div`
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  > :not(:first-child) {
-    margin-left: 10px;
-  }
-`
-
 export const TitleContainer = styled.div`
   display: flex;
   flex-direction: row;

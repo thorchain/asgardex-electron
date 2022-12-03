@@ -1,4 +1,4 @@
-import { base, deposit, swap, detail } from './pools'
+import { base, deposit, swap, detail, savers } from './index'
 
 describe('Pools routes', () => {
   describe('base route', () => {
@@ -15,10 +15,22 @@ describe('Pools routes', () => {
       expect(deposit.template).toEqual('/pools/deposit/:asset')
     })
     it('returns path by given asset parameter', () => {
-      expect(deposit.path({ asset: 'BNB' })).toEqual('/pools/deposit/bnb')
+      expect(deposit.path({ asset: 'BNB.BNB' })).toEqual('/pools/deposit/bnb.bnb')
     })
     it('redirects to base path if asset is empty', () => {
       expect(deposit.path({ asset: '' })).toEqual('/pools/deposit')
+    })
+  })
+
+  describe('Savers routes', () => {
+    it('template', () => {
+      expect(savers.template).toEqual('/pools/savers/:asset')
+    })
+    it('returns path by given asset parameter', () => {
+      expect(savers.path({ asset: 'BNB.BNB' })).toEqual('/pools/savers/bnb.bnb')
+    })
+    it('redirects to base path if asset is empty', () => {
+      expect(savers.path({ asset: '' })).toEqual('/pools/savers')
     })
   })
 
@@ -27,13 +39,13 @@ describe('Pools routes', () => {
       expect(swap.template).toEqual('/pools/swap/:source|:target')
     })
     it('returns path by given source/target parameters', () => {
-      expect(swap.path({ source: 'BNB', target: 'RUNE' })).toEqual('/pools/swap/bnb|rune')
+      expect(swap.path({ source: 'BNB.BNB', target: 'THOR.RUNE' })).toEqual('/pools/swap/bnb.bnb|thor.rune')
     })
     it('redirects to base path if source is empty', () => {
-      expect(swap.path({ source: '', target: 'RUNE' })).toEqual('/pools/swap')
+      expect(swap.path({ source: '', target: 'THOR.RUNE' })).toEqual('/pools/swap')
     })
     it('redirects to base path if target is empty', () => {
-      expect(swap.path({ source: 'bnb', target: '' })).toEqual('/pools/swap')
+      expect(swap.path({ source: 'BNB.BNB', target: '' })).toEqual('/pools/swap')
     })
   })
 

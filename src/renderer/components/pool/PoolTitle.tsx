@@ -1,6 +1,5 @@
 import React, { useMemo } from 'react'
 
-import { SwapOutlined } from '@ant-design/icons'
 import * as RD from '@devexperts/remote-data-ts'
 import { Asset, AssetAmount, AssetRuneNative, assetToString, formatAssetAmount } from '@xchainjs/xchain-util'
 import { Grid } from 'antd'
@@ -9,11 +8,10 @@ import { useIntl } from 'react-intl'
 import { useNavigate } from 'react-router-dom'
 
 import { Network } from '../../../shared/api/types'
+import { Action as ActionButtonAction, ActionButton } from '../../components/uielements/button/ActionButton'
 import { loadingString } from '../../helpers/stringHelper'
 import * as poolsRoutes from '../../routes/pools'
-import { ManageButton } from '../manageButton'
 import { AssetIcon } from '../uielements/assets/assetIcon'
-import { FlatButton } from '../uielements/button'
 import * as Styled from './PoolTitle.styles'
 
 export type Props = {
@@ -44,9 +42,10 @@ export const PoolTitle: React.FC<Props> = ({
   network,
   isAvailablePool
 }) => {
-  const navigate = useNavigate()
-  const intl = useIntl()
   const isDesktopView = Grid.useBreakpoint()?.md ?? false
+
+  const intl = useIntl()
+  const navigate = useNavigate()
 
   const title = useMemo(() => {
     const Star = watched ? Styled.StarFilled : Styled.StarOutlined
@@ -75,47 +74,43 @@ export const PoolTitle: React.FC<Props> = ({
     [priceRD]
   )
 
-  const buttons = useMemo(
-    () => (
-      <Styled.ButtonActions>
-        <ManageButton
-          disabled={disableAllPoolActions || disablePoolActions || walletLocked}
-          asset={asset}
-          size="normal"
-          isTextView={isDesktopView}
-        />
-        {isAvailablePool && (
-          <FlatButton
-            disabled={disableAllPoolActions || disableTradingPoolAction}
-            size="normal"
-            onClick={(event) => {
-              event.preventDefault()
-              event.stopPropagation()
-              navigate(
-                poolsRoutes.swap.path({
-                  source: assetToString(asset),
-                  target: assetToString(AssetRuneNative)
-                })
-              )
-            }}>
-            <SwapOutlined className="md:mr-[8px]" />
-            {isDesktopView && intl.formatMessage({ id: 'common.swap' })}
-          </FlatButton>
-        )}
-      </Styled.ButtonActions>
-    ),
-    [
-      disableAllPoolActions,
-      disablePoolActions,
-      walletLocked,
-      asset,
-      isDesktopView,
-      isAvailablePool,
-      disableTradingPoolAction,
-      intl,
-      navigate
+  const actionButton = useMemo(() => {
+    const actions: ActionButtonAction[] = [
+      {
+        label: intl.formatMessage({ id: 'common.swap' }),
+        disabled: !isAvailablePool || disableAllPoolActions || disableTradingPoolAction,
+        callback: () => {
+          navigate(poolsRoutes.swap.path({ source: assetToString(AssetRuneNative), target: assetToString(asset) }))
+        }
+      },
+      {
+        label: intl.formatMessage({ id: 'common.manage' }),
+        disabled: disableAllPoolActions || disablePoolActions || walletLocked,
+        callback: () => {
+          navigate(poolsRoutes.deposit.path({ asset: assetToString(asset) }))
+        }
+      },
+      {
+        label: intl.formatMessage({ id: 'common.savers' }),
+        disabled: !isAvailablePool || disableAllPoolActions || disableTradingPoolAction,
+        callback: () => {
+          navigate(poolsRoutes.savers.path({ asset: assetToString(asset) }))
+        }
+      }
     ]
-  )
+
+    return <ActionButton size={isDesktopView ? 'large' : 'normal'} actions={actions} />
+  }, [
+    intl,
+    isAvailablePool,
+    disableAllPoolActions,
+    disableTradingPoolAction,
+    disablePoolActions,
+    walletLocked,
+    isDesktopView,
+    navigate,
+    asset
+  ])
 
   return (
     <Styled.Container>
@@ -123,7 +118,7 @@ export const PoolTitle: React.FC<Props> = ({
         <Styled.TitleContainer>{title}</Styled.TitleContainer>
         <Styled.Price>{priceStr}</Styled.Price>
       </Styled.RowItem>
-      <Styled.RowItem>{buttons}</Styled.RowItem>
+      <Styled.RowItem>{actionButton}</Styled.RowItem>
     </Styled.Container>
   )
 }

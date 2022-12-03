@@ -1,3 +1,19 @@
+# 1.19.0 (2022-11-xx)
+
+## Add
+
+- [Epic] Savers [#2431](https://github.com/thorchain/asgardex-electron/issues/2431), [#2450](https://github.com/thorchain/asgardex-electron/pull/2450)
+- Introduce `ActionButton` [#2452](https://github.com/thorchain/asgardex-electron/pull/2452)
+- [Swap] Show balances [#2446](https://github.com/thorchain/asgardex-electron/issues/2446)
+
+## Update
+
+- Add/update buttons components: `Swap|Savers|Back|ManageButton` [#2451](https://github.com/thorchain/asgardex-electron/pull/2451)
+
+## Fix
+
+- [Swap] Max. amount to swap needs to be equal to max. balances [#2448](https://github.com/thorchain/asgardex-electron/issues/2448)
+
 # 1.18.4 (2022-11-03)
 
 ## Fix
