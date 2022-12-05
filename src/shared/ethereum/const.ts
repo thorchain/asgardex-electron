@@ -15,3 +15,5 @@ export const FEE_BOUNDS: Record<Network, FeeBounds | undefined> = {
 }
 
 export const DEFAULT_ETH_HD_MODE: EthHDMode = 'ledgerlive'
+
+export const DEPOSIT_EXPIRATION_OFFSET = 15 * 60 // 15min in seconds

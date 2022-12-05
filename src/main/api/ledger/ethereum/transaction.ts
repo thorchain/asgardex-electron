@@ -10,8 +10,10 @@ import { getEtherscanApiKey } from '../../../../shared/api/etherscan'
 import { getEthplorerCreds } from '../../../../shared/api/ethplorer'
 import { getInfuraCreds } from '../../../../shared/api/infura'
 import { LedgerError, LedgerErrorId, Network } from '../../../../shared/api/types'
-import { FEE_BOUNDS } from '../../../../shared/ethereum/const'
+import { ROUTER_ABI } from '../../../../shared/ethereum/abi'
+import { DEPOSIT_EXPIRATION_OFFSET, FEE_BOUNDS } from '../../../../shared/ethereum/const'
 import { getDerivationPath } from '../../../../shared/ethereum/ledger'
+import { getBlocktime } from '../../../../shared/ethereum/provider'
 import { EthHDMode } from '../../../../shared/ethereum/types'
 import { toClientNetwork } from '../../../../shared/utils/client'
 import { isError } from '../../../../shared/utils/guard'
@@ -147,6 +149,7 @@ export const deposit = async ({
 
     const gasPrices = await client.estimateGasPrices()
     const gasPrice = gasPrices[feeOption].amount().toFixed(0) // no round down needed
+    const blockTime = await getBlocktime(provider)
 
     // Note: We don't use `client.deposit` here to avoid repeating same requests we already do in ASGARDEX
     // That's why we call `deposit` directly here
@@ -158,14 +161,15 @@ export const deposit = async ({
     const { hash } = await client.call<{ hash: TxHash }>({
       signer,
       contractAddress: router,
-      abi: ETH.abi.router,
-      funcName: 'deposit',
+      abi: ROUTER_ABI,
+      funcName: 'depositWithExpiry',
       funcParams: [
         recipient,
         address,
         // Send `BaseAmount` w/o decimal and always round down for currencies
         amount.amount().toFixed(0, BigNumber.ROUND_DOWN),
         memo,
+        blockTime + DEPOSIT_EXPIRATION_OFFSET,
         isETHAddress
           ? {
               // Send `BaseAmount` w/o decimal and always round down for currencies
