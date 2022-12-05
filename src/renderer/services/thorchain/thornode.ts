@@ -9,10 +9,21 @@ import { PathReporter } from 'io-ts/lib/PathReporter'
 import * as Rx from 'rxjs'
 import * as RxOp from 'rxjs/operators'
 
+import { ASGARDEX_IDENTIFIER } from '../../const'
 import { THORCHAIN_DECIMAL } from '../../helpers/assetHelper'
 import { LiveData, liveData } from '../../helpers/rx/liveData'
 import { triggerStream } from '../../helpers/stateHelper'
-import { Configuration, MimirApi, NetworkApi, Node, NodesApi, Pool, PoolsApi } from '../../types/generated/thornode'
+import {
+  Configuration,
+  Middleware,
+  MimirApi,
+  NetworkApi,
+  Node,
+  NodesApi,
+  Pool,
+  PoolsApi,
+  RequestArgs
+} from '../../types/generated/thornode'
 import { Network$ } from '../app/types'
 import {
   MimirIO,
@@ -28,6 +39,17 @@ import {
   ThorchainConstantsLD,
   ThorchainLastblockLD
 } from './types'
+
+export const getThornodeAPIConfiguration = (basePath: string): Configuration => {
+  const middleware: Middleware = {
+    pre: (req: RequestArgs) => {
+      const headers = req?.headers ?? {}
+      return { ...req, headers: { ...headers, 'x-client-id': `${ASGARDEX_IDENTIFIER}` } }
+    }
+  }
+
+  return new Configuration({ basePath, middleware: [middleware] })
+}
 
 export const createThornodeService$ = (network$: Network$, clientUrl$: ClientUrl$) => {
   // `TriggerStream` to reload THORNode url
@@ -46,7 +68,7 @@ export const createThornodeService$ = (network$: Network$, clientUrl$: ClientUrl
       thornodeUrl$,
       liveData.chain((basePath) =>
         FP.pipe(
-          new NodesApi(new Configuration({ basePath })).nodes({ height: undefined }),
+          new NodesApi(getThornodeAPIConfiguration(basePath)).nodes({ height: undefined }),
           RxOp.map(RD.success),
           RxOp.catchError((e: Error) => Rx.of(RD.failure(e)))
         )
@@ -59,7 +81,7 @@ export const createThornodeService$ = (network$: Network$, clientUrl$: ClientUrl
       thornodeUrl$,
       liveData.chain((basePath) =>
         FP.pipe(
-          new NetworkApi(new Configuration({ basePath })).inboundAddresses({}),
+          new NetworkApi(getThornodeAPIConfiguration(basePath)).inboundAddresses({}),
           RxOp.map(RD.success),
           liveData.map(
             FP.flow(
@@ -105,7 +127,7 @@ export const createThornodeService$ = (network$: Network$, clientUrl$: ClientUrl
     thornodeUrl$,
     liveData.chain((basePath) =>
       FP.pipe(
-        new NetworkApi(new Configuration({ basePath })).constants({}),
+        new NetworkApi(getThornodeAPIConfiguration(basePath)).constants({}),
         RxOp.map(RD.success),
         RxOp.catchError((e: Error) => Rx.of(RD.failure(e)))
       )
@@ -133,7 +155,7 @@ export const createThornodeService$ = (network$: Network$, clientUrl$: ClientUrl
     thornodeUrl$,
     liveData.chain((basePath) =>
       FP.pipe(
-        new NetworkApi(new Configuration({ basePath })).lastblock({}),
+        new NetworkApi(getThornodeAPIConfiguration(basePath)).lastblock({}),
         RxOp.map(RD.success),
         RxOp.catchError((e: Error) => Rx.of(RD.failure(e)))
       )
@@ -192,7 +214,7 @@ export const createThornodeService$ = (network$: Network$, clientUrl$: ClientUrl
       thornodeUrl$,
       liveData.chain((basePath) =>
         FP.pipe(
-          new PoolsApi(new Configuration({ basePath })).pool({ asset: assetToString(asset) }),
+          new PoolsApi(getThornodeAPIConfiguration(basePath)).pool({ asset: assetToString(asset) }),
           RxOp.map(RD.success),
           RxOp.catchError((e: Error) => Rx.of(RD.failure(e)))
         )
@@ -243,7 +265,7 @@ export const createThornodeService$ = (network$: Network$, clientUrl$: ClientUrl
     thornodeUrl$,
     liveData.chain((basePath) =>
       FP.pipe(
-        new MimirApi(new Configuration({ basePath })).mimir({ height: undefined }),
+        new MimirApi(getThornodeAPIConfiguration(basePath)).mimir({ height: undefined }),
         RxOp.catchError((e) => Rx.of(RD.failure(Error(`Failed loading mimir: ${JSON.stringify(e)}`)))),
         RxOp.map((response) => MimirIO.decode(response)),
         RxOp.map((result) =>
