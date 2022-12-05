@@ -46,8 +46,6 @@ export const getSaversTableRowData = ({
       const depthAmount = baseAmount(poolDetail.saversDepth)
       const depthPrice = getValueOfAsset1InAsset2(depthAmount, poolData, pricePoolData)
       const apr = bnOrZero(poolDetail.saversAPR).times(100)
-      console.log('poolDetail.saversApr', poolDetail.saversAPR)
-      console.log('apr:', apr.toString())
 
       const maxPercent = bnOrZero(maxSynthPerPoolDepth).div(100)
       // saverCap = assetDepth * 2 * maxPercent / 100
@@ -66,7 +64,6 @@ export const getSaversTableRowData = ({
         depth: depthAmount,
         depthPrice,
         filled,
-        count: 0, // TODO(@veado) Get count or just delete it
         key: poolDetailAsset.ticker,
         network,
         apr,

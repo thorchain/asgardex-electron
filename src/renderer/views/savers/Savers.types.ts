@@ -8,7 +8,6 @@ export type SaversTableRowData = {
   depthPrice: BaseAmount
   depth: BaseAmount
   filled: BigNumber
-  count: number
   apr: BigNumber
   key: string
   network: Network

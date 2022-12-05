@@ -25,7 +25,7 @@ import { FlatButton } from '../../components/uielements/button'
 import { Table } from '../../components/uielements/table'
 import { useMidgardContext } from '../../contexts/MidgardContext'
 import { isChainAsset } from '../../helpers/assetHelper'
-import { ordBigNumber, ordNumber } from '../../helpers/fp/ord'
+import { ordBigNumber } from '../../helpers/fp/ord'
 import { sequenceTRD } from '../../helpers/fpHelpers'
 import * as PoolHelpers from '../../helpers/poolHelper'
 import { getSaversTableRowsData, ordSaversByDepth } from '../../helpers/savers'
@@ -124,18 +124,6 @@ export const SaversOverview: React.FC<Props> = (props): JSX.Element => {
       title: intl.formatMessage({ id: 'pools.filled' }),
       render: ({ filled }: { filled: BigNumber }) => <div className="font-main text-16">{formatBN(filled, 2)}%</div>,
       sorter: (a: { filled: BigNumber }, b: { filled: BigNumber }) => ordBigNumber.compare(a.filled, b.filled),
-      sortDirections: ['descend', 'ascend']
-    }),
-    [intl]
-  )
-
-  const _countColumn = useCallback(
-    <T extends { count: number }>(): ColumnType<T> => ({
-      key: 'count',
-      align: 'center',
-      title: intl.formatMessage({ id: 'pools.count' }),
-      render: ({ count }: { count: number }) => <div className="font-main text-16">{count}</div>,
-      sorter: (a: { count: number }, b: { count: number }) => ordNumber.compare(a.count, b.count),
       sortDirections: ['descend', 'ascend']
     }),
     [intl]
