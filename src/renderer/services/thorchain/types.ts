@@ -134,6 +134,7 @@ export type ThornodeApiUrlRD = RD.RemoteData<Error, string>
 export const MimirIO = t.type({
   MAXIMUMLIQUIDITYRUNE: t.union([t.number, t.undefined]),
   POOLCYCLE: t.union([t.number, t.undefined]),
+  MAXSYNTHPERPOOLDEPTH: t.union([t.number, t.undefined]),
   HALTTRADING: t.union([t.number, t.undefined]),
   HALTTHORCHAIN: t.union([t.number, t.undefined]),
   HALTETHCHAIN: t.union([t.number, t.undefined]),

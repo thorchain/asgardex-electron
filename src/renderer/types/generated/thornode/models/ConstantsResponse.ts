@@ -20,7 +20,7 @@ export interface ConstantsResponse {
      * @type {{ [key: string]: string; }}
      * @memberof ConstantsResponse
      */
-    int64_values?: { [key: string]: string; };
+    int_64_values?: { [key: string]: string; };
     /**
      * @type {{ [key: string]: string; }}
      * @memberof ConstantsResponse

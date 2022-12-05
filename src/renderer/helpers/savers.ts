@@ -1,5 +1,5 @@
 import { getValueOfAsset1InAsset2, PoolData } from '@thorchain/asgardex-util'
-import { assetFromString, BaseAmount, baseAmount } from '@xchainjs/xchain-util'
+import { assetFromString, BaseAmount, baseAmount, bnOrZero } from '@xchainjs/xchain-util'
 import * as A from 'fp-ts/lib/Array'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
@@ -28,12 +28,13 @@ export const getSaversTableRowData = ({
   poolDetail,
   pricePoolData,
   watchlist,
+  maxSynthPerPoolDepth,
   network
 }: {
-  // TODO(@veado) Update Midgard types
-  poolDetail: PoolDetail & { saversDepth?: string }
+  poolDetail: PoolDetail
   pricePoolData: PoolData
   watchlist: PoolsWatchList
+  maxSynthPerPoolDepth: number
   network: Network
 }): O.Option<SaversTableRowData> => {
   return FP.pipe(
@@ -44,6 +45,13 @@ export const getSaversTableRowData = ({
       const poolData = toPoolData(poolDetail)
       const depthAmount = baseAmount(poolDetail.saversDepth)
       const depthPrice = getValueOfAsset1InAsset2(depthAmount, poolData, pricePoolData)
+      const apr = bnOrZero(poolDetail.saversAPR).times(100)
+
+      const maxPercent = bnOrZero(maxSynthPerPoolDepth).div(100)
+      // saverCap = assetDepth * 2 * maxPercent / 100
+      const saverCap = bnOrZero(poolDetail.assetDepth).times(2).times(maxPercent).div(100)
+      // filled = saversDepth * 100 / saverCap
+      const filled = bnOrZero(poolDetail.saversDepth).times(100).div(saverCap)
 
       const watched: boolean = FP.pipe(
         watchlist,
@@ -55,11 +63,10 @@ export const getSaversTableRowData = ({
         asset: poolDetailAsset,
         depth: depthAmount,
         depthPrice,
-        filled: 0, // TODO(@veado) Get dat from extra data
-        count: 0, // TODO(@veado) Get dat from extra data
+        filled,
         key: poolDetailAsset.ticker,
         network,
-        apr: 0, // get APR
+        apr,
         watched
       }
     })
@@ -70,11 +77,13 @@ export const getSaversTableRowsData = ({
   poolDetails,
   pricePoolData,
   watchlist,
+  maxSynthPerPoolDepth,
   network
 }: {
   poolDetails: PoolDetails
   pricePoolData: PoolData
   watchlist: PoolsWatchList
+  maxSynthPerPoolDepth: number
   network: Network
 }): SaversTableRowsData => {
   // get symbol of deepest pool
@@ -99,7 +108,7 @@ export const getSaversTableRowsData = ({
       )
 
       return FP.pipe(
-        getSaversTableRowData({ poolDetail, pricePoolData, watchlist, network }),
+        getSaversTableRowData({ poolDetail, pricePoolData, watchlist, maxSynthPerPoolDepth, network }),
         O.map(
           (poolTableRowData) =>
             ({
