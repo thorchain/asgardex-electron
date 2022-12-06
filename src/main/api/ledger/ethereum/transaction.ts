@@ -150,13 +150,11 @@ export const deposit = async ({
     const gasPrices = await client.estimateGasPrices()
     const gasPrice = gasPrices[feeOption].amount().toFixed(0) // no round down needed
     const blockTime = await getBlocktime(provider)
+    const expiration = blockTime + DEPOSIT_EXPIRATION_OFFSET
 
-    // Note: We don't use `client.deposit` here to avoid repeating same requests we already do in ASGARDEX
-    // That's why we call `deposit` directly here
-    // Note2: `client.call` handling very similar to `runSendPoolTx$` in `src/renderer/services/ethereum/transaction.ts`
-    //
+    // Note: `client.call` handling very - similar to `runSendPoolTx$` in `src/renderer/services/ethereum/transaction.ts`
     // Call deposit function of Router contract
-    // Note3: Amounts need to use `toFixed` to convert `BaseAmount` to `Bignumber`
+    // Note2: Amounts need to use `toFixed` to convert `BaseAmount` to `Bignumber`
     // since `value` and `gasPrice` type is `Bignumber`
     const { hash } = await client.call<{ hash: TxHash }>({
       signer,
@@ -169,7 +167,7 @@ export const deposit = async ({
         // Send `BaseAmount` w/o decimal and always round down for currencies
         amount.amount().toFixed(0, BigNumber.ROUND_DOWN),
         memo,
-        blockTime + DEPOSIT_EXPIRATION_OFFSET,
+        expiration,
         isETHAddress
           ? {
               // Send `BaseAmount` w/o decimal and always round down for currencies

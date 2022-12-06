@@ -72,6 +72,7 @@ export const createTransactionService = (client$: Client$, network$: Network$): 
               const amount = isETHAddress ? baseAmount(0) : params.amount
               const gasPrice = gasPrices[params.feeOption].amount().toFixed(0) // no round down needed
               const signer = client.getWallet(params.walletIndex)
+              const expiration = blockTime + DEPOSIT_EXPIRATION_OFFSET
               return Rx.from(
                 // Call deposit function of Router contract
                 // Note:
@@ -88,7 +89,7 @@ export const createTransactionService = (client$: Client$, network$: Network$): 
                     // Send `BaseAmount` w/o decimal and always round down for currencies
                     amount.amount().toFixed(0, BigNumber.ROUND_DOWN),
                     params.memo,
-                    blockTime + DEPOSIT_EXPIRATION_OFFSET,
+                    expiration,
                     isETHAddress
                       ? {
                           // Send `BaseAmount` w/o decimal and always round down for currencies
