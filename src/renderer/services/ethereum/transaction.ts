@@ -1,6 +1,6 @@
 import * as RD from '@devexperts/remote-data-ts'
 import { TxHash } from '@xchainjs/xchain-client'
-import { ETHAddress, isApproved, abi } from '@xchainjs/xchain-ethereum'
+import { ETHAddress, isApproved } from '@xchainjs/xchain-ethereum'
 import { baseAmount, ETHChain } from '@xchainjs/xchain-util'
 import BigNumber from 'bignumber.js'
 import * as E from 'fp-ts/lib/Either'
@@ -18,7 +18,9 @@ import {
   ipcLedgerSendTxParamsIO
 } from '../../../shared/api/io'
 import { LedgerError, Network } from '../../../shared/api/types'
-import { DEFAULT_APPROVE_GAS_LIMIT_FALLBACK } from '../../../shared/ethereum/const'
+import { ROUTER_ABI } from '../../../shared/ethereum/abi'
+import { DEFAULT_APPROVE_GAS_LIMIT_FALLBACK, DEPOSIT_EXPIRATION_OFFSET } from '../../../shared/ethereum/const'
+import { getBlocktime } from '../../../shared/ethereum/provider'
 import { isError, isEthHDMode, isLedgerWallet } from '../../../shared/utils/guard'
 import { addressInERC20Whitelist, getEthAssetAddress } from '../../helpers/assetHelper'
 import { sequenceSOption } from '../../helpers/fpHelpers'
@@ -53,18 +55,24 @@ export const createTransactionService = (client$: Client$, network$: Network$): 
         })
       )
 
+    const provider = client.getProvider()
+
     return FP.pipe(
       sequenceSOption({ address: getEthAssetAddress(params.asset), router: params.router }),
       O.fold(
         () => failure$(`Invalid values: Asset ${params.asset} / router address ${params.router}`),
         ({ address, router }) =>
           FP.pipe(
-            Rx.from(client.estimateGasPrices()),
-            RxOp.switchMap((gasPrices) => {
+            Rx.forkJoin({
+              gasPrices: Rx.from(client.estimateGasPrices()),
+              blockTime: Rx.from(getBlocktime(provider))
+            }),
+            RxOp.switchMap(({ gasPrices, blockTime }) => {
               const isETHAddress = address === ETHAddress
               const amount = isETHAddress ? baseAmount(0) : params.amount
               const gasPrice = gasPrices[params.feeOption].amount().toFixed(0) // no round down needed
               const signer = client.getWallet(params.walletIndex)
+              const expiration = blockTime + DEPOSIT_EXPIRATION_OFFSET
               return Rx.from(
                 // Call deposit function of Router contract
                 // Note:
@@ -73,14 +81,15 @@ export const createTransactionService = (client$: Client$, network$: Network$): 
                 client.call<{ hash: TxHash }>({
                   signer,
                   contractAddress: router,
-                  abi: abi.router,
-                  funcName: 'deposit',
+                  abi: ROUTER_ABI,
+                  funcName: 'depositWithExpiry',
                   funcParams: [
                     params.recipient,
                     address,
                     // Send `BaseAmount` w/o decimal and always round down for currencies
                     amount.amount().toFixed(0, BigNumber.ROUND_DOWN),
                     params.memo,
+                    expiration,
                     isETHAddress
                       ? {
                           // Send `BaseAmount` w/o decimal and always round down for currencies
