@@ -1939,11 +1939,11 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@cosmos-client/core@npm:^0.45.10":
+"@cosmos-client/core@https://github.com/veado/cosmos-client-ts.git#patch/v0.45.13":
   version: 0.45.13
-  resolution: "@cosmos-client/core@npm:0.45.13"
+  resolution: "@cosmos-client/core@https://github.com/veado/cosmos-client-ts.git#commit=edffc1cc300f3bbd9c7c3c2354e88418a6a6c868"
   dependencies:
-    axios: ^0.23.0
+    axios: ^0.25.0
     bech32: ^1.1.4
     bip32: ^2.0.6
     bip39: ^3.0.4
@@ -1951,7 +1951,7 @@ __metadata:
     rxjs: ^7.4.0
     secp256k1: ^4.0.2
     tweetnacl: ^1.0.3
-  checksum: 1e79f035d5ca84bdbbcfddaee43cf2efc56989a4de2ec32d6e74457eeb92ece2d5d2f8db707409093a9e49328149cc1b0e6a638a3c606a13d84cefbc868bd9c8
+  checksum: 8e58581e97a9922833b4f50aff32bd03901d08e198beb91fcc8b6d45586de32c0a202aa475232005788f0d31754069a41efd3b6dfa5760192379b8edd4a435a9
   languageName: node
   linkType: hard
 
@@ -7608,7 +7608,7 @@ __metadata:
     "@ant-design/icons": ^4.7.0
     "@binance-chain/javascript-sdk": ^4.2.0
     "@cosmjs/stargate": ^0.28.10
-    "@cosmos-client/core": ^0.45.10
+    "@cosmos-client/core": "https://github.com/veado/cosmos-client-ts.git#patch/v0.45.13"
     "@craco/craco": ^7.0.0-alpha.7
     "@devexperts/remote-data-ts": ^2.1.1
     "@devexperts/rx-utils": ^1.0.0-alpha.14
@@ -7958,15 +7958,6 @@ __metadata:
   dependencies:
     follow-redirects: ^1.14.0
   checksum: 44245f24ac971e7458f3120c92f9d66d1fc695e8b97019139de5b0cc65d9b8104647db01e5f46917728edfc0cfd88eb30fc4c55e6053eef4ace76768ce95ff3c
-  languageName: node
-  linkType: hard
-
-"axios@npm:^0.23.0":
-  version: 0.23.0
-  resolution: "axios@npm:0.23.0"
-  dependencies:
-    follow-redirects: ^1.14.4
-  checksum: 879f61022bd825da2a7ebb72410bc528683ba54c140436baa0b924b7cab02ec0919fe64a04a546f482a75f5fd570b77884f9826764a95f2fd88265e61dcb70db
   languageName: node
   linkType: hard
 
@@ -13361,7 +13352,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"follow-redirects@npm:^1.0.0, follow-redirects@npm:^1.10.0, follow-redirects@npm:^1.14.0, follow-redirects@npm:^1.14.4, follow-redirects@npm:^1.14.7, follow-redirects@npm:^1.14.8":
+"follow-redirects@npm:^1.0.0, follow-redirects@npm:^1.10.0, follow-redirects@npm:^1.14.0, follow-redirects@npm:^1.14.7, follow-redirects@npm:^1.14.8":
   version: 1.15.1
   resolution: "follow-redirects@npm:1.15.1"
   peerDependenciesMeta:

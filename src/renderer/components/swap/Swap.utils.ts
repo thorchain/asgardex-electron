@@ -6,8 +6,9 @@ import * as E from 'fp-ts/Either'
 import * as FP from 'fp-ts/function'
 import * as O from 'fp-ts/Option'
 
+import { ASGARDEX_IDENTIFIER } from '../../../shared/const'
 import { isLedgerWallet } from '../../../shared/utils/guard'
-import { ASGARDEX_IDENTIFIER, ZERO_BASE_AMOUNT } from '../../const'
+import { ZERO_BASE_AMOUNT } from '../../const'
 import {
   isChainAsset,
   isRuneNativeAsset,

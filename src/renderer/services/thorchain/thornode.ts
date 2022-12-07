@@ -9,7 +9,7 @@ import { PathReporter } from 'io-ts/lib/PathReporter'
 import * as Rx from 'rxjs'
 import * as RxOp from 'rxjs/operators'
 
-import { ASGARDEX_IDENTIFIER } from '../../const'
+import { ASGARDEX_IDENTIFIER } from '../../../shared/const'
 import { THORCHAIN_DECIMAL } from '../../helpers/assetHelper'
 import { LiveData, liveData } from '../../helpers/rx/liveData'
 import { triggerStream } from '../../helpers/stateHelper'
