@@ -183,8 +183,6 @@ export const ZERO_BASE_AMOUNT = baseAmount(ZERO_BN)
 
 export const ZERO_POOL_DATA: PoolData = { runeBalance: ZERO_BASE_AMOUNT, assetBalance: ZERO_BASE_AMOUNT }
 
-export const ASGARDEX_IDENTIFIER = 999
-
 export const RECOVERY_TOOL_URL: Record<Network, string> = {
   testnet: 'https://testnet.thorswap.finance/pending',
   stagenet: 'https://stagenet.thorswap.finance/pending',
