@@ -16,7 +16,7 @@ import {
   ipcLedgerDepositTxParamsIO,
   ipcLedgerSendTxParamsIO
 } from '../shared/api/io'
-import { register9R } from '../shared/api/ninerealms'
+import { register9Rheader } from '../shared/api/ninerealms'
 import type { IPCExportKeystoreParams, IPCLedgerAdddressParams, StoreFileName } from '../shared/api/types'
 import { DEFAULT_STORAGES } from '../shared/const'
 import type { Locale } from '../shared/i18n/types'
@@ -203,7 +203,8 @@ const init = async () => {
   await initMainWindow()
   app.on('window-all-closed', allClosedHandler)
   app.on('activate', activateHandler)
-  register9R()
+  // Registers custom headers (9R endpoints only)
+  register9Rheader()
   initIPC()
 }
 

@@ -9,7 +9,7 @@ import { PathReporter } from 'io-ts/lib/PathReporter'
 import * as Rx from 'rxjs'
 import * as RxOp from 'rxjs/operators'
 
-import { ASGARDEX_IDENTIFIER } from '../../../shared/const'
+import { add9Rheader } from '../../../shared/api/ninerealms'
 import { THORCHAIN_DECIMAL } from '../../helpers/assetHelper'
 import { LiveData, liveData } from '../../helpers/rx/liveData'
 import { triggerStream } from '../../helpers/stateHelper'
@@ -21,8 +21,7 @@ import {
   Node,
   NodesApi,
   Pool,
-  PoolsApi,
-  RequestArgs
+  PoolsApi
 } from '../../types/generated/thornode'
 import { Network$ } from '../app/types'
 import {
@@ -41,13 +40,7 @@ import {
 } from './types'
 
 export const getThornodeAPIConfiguration = (basePath: string): Configuration => {
-  const middleware: Middleware = {
-    pre: (req: RequestArgs) => {
-      const headers = req?.headers ?? {}
-      return { ...req, headers: { ...headers, 'x-client-id': `${ASGARDEX_IDENTIFIER}` } }
-    }
-  }
-
+  const middleware: Middleware = { pre: add9Rheader }
   return new Configuration({ basePath, middleware: [middleware] })
 }
 

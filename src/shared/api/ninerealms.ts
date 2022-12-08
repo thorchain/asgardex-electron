@@ -1,30 +1,40 @@
 import { cosmosclient } from '@cosmos-client/core'
-import axios, { AxiosRequestConfig } from 'axios'
+import axios from 'axios'
 
-import { ASGARDEX_IDENTIFIER } from '../const'
+import { ASGARDEX_IDENTIFIER, NINE_REALMS_CLIENT_HEADER } from '../const'
 
 const {
   config: { globalAxios }
 } = cosmosclient
 
-export const register9R = () => {
-  const interceptor = <T>(config: AxiosRequestConfig<T>) => {
-    try {
-      // Creating an URL will throw an `TypeError` if `url` is not available and 'unknown-url' is set
-      // [TypeError: Invalid URL] input: 'unknown-url', code: 'ERR_INVALID_URL' }
-      const url = new URL(config?.url ?? 'unknown-url')
-      if (url.host.includes('ninerealms')) {
-        // headers might be undefined/empty by definition
-        if (!config.headers) config.headers = {}
-        config.headers['x-client-id'] = `${ASGARDEX_IDENTIFIER}`
-      }
-    } catch (error) {
-      console.error(`Failed to add custom 'x-client-id' header`, error)
+/**
+ * Middleware to add custom header to requests (9R endpoints only)
+ *
+ * @param request RequestArgs (rxjs/ajax) | AxiosRequestConfig (axios)
+ * @returns RequestArgs (rxjs/ajax) | AxiosRequestConfig (axios)
+ */
+export const add9Rheader = <T extends { url?: string; headers?: Object }>(request: T) => {
+  try {
+    // URL throws an `TypeError` if `url` is not available and 'unknown-url' is set
+    // [TypeError: Invalid URL] input: 'unknown-url', code: 'ERR_INVALID_URL' }
+    const url = new URL(request?.url ?? 'unknown-url')
+    if (url.host.includes('ninerealms')) {
+      const headers = request?.headers ?? {}
+      // Add custom header to request before returning it
+      return { ...request, headers: { ...headers, [`${NINE_REALMS_CLIENT_HEADER}`]: `${ASGARDEX_IDENTIFIER}` } }
     }
-
-    return config
+  } catch (error) {
+    console.error(`Failed to add custom ${NINE_REALMS_CLIENT_HEADER} header`, error)
   }
 
-  axios.interceptors.request.use(interceptor, (error) => Promise.reject(error))
-  globalAxios.interceptors.request.use(interceptor, (error) => Promise.reject(error))
+  // If it errors, just return same request and keep it untouched (no change)
+  return request
+}
+
+/**
+ * Adds custom header to axios requests (9R endpoints only)
+ */
+export const register9Rheader = () => {
+  axios.interceptors.request.use(add9Rheader, (error) => Promise.reject(error))
+  globalAxios.interceptors.request.use(add9Rheader, (error) => Promise.reject(error))
 }

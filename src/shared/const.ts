@@ -7,6 +7,9 @@ import { DEFAULT_THORNODE_API_URLS, DEFAULT_THORNODE_RPC_URLS } from './thorchai
 
 export const ASGARDEX_IDENTIFIER = 999
 
+// Header key for 9R endpoints
+export const NINE_REALMS_CLIENT_HEADER = 'x-client-id'
+
 export enum ExternalUrl {
   DOCS = 'https://docs.thorchain.org',
   DISCORD = 'https://discord.gg/pHcS67yX7Z',
