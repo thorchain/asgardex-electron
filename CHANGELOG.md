@@ -1,14 +1,25 @@
-# 1.19.0 (2022-11-xx)
+# 1.18.5 (2022-12-xx)
 
 ## Add
 
-- [Epic] Savers [#2431](https://github.com/thorchain/asgardex-electron/issues/2431), [#2450](https://github.com/thorchain/asgardex-electron/pull/2450)
 - Introduce `ActionButton` [#2452](https://github.com/thorchain/asgardex-electron/pull/2452)
 - [Swap] Show balances [#2446](https://github.com/thorchain/asgardex-electron/issues/2446)
+- ETH: Use depositWithExpiry to deposit [#2472](https://github.com/thorchain/asgardex-electron/issues/2472)
+- Add 'x-client-id' header to send ASGDX' identifier for any request to 9R servers [#2463](https://github.com/thorchain/asgardex-electron/issues/2463), [#2464](https://github.com/thorchain/asgardex-electron/pull/2464), [#2474](https://github.com/thorchain/asgardex-electron/pull/2474)
+- [Savers] Routes [#2450](https://github.com/thorchain/asgardex-electron/pull/2450)
+- Add wallet actions to assets table [#2455](https://github.com/thorchain/asgardex-electron/pull/2455)
+- Savers overview [#2466](https://github.com/thorchain/asgardex-electron/pull/2466), [#2470](https://github.com/thorchain/asgardex-electron/pull/2470)
 
 ## Update
 
 - Add/update buttons components: `Swap|Savers|Back|ManageButton` [#2451](https://github.com/thorchain/asgardex-electron/pull/2451)
+- Upgrade to latest Midgard@2.12.1 [#2469](https://github.com/thorchain/asgardex-electron/pull/2469),
+- Upgrade to latest Midgard@2.11.0 [#2467](https://github.com/thorchain/asgardex-electron/pull/2467)
+- Upgrade types / endpoints to latest THORNode@1.100.0 [#2468](https://github.com/thorchain/asgardex-electron/pull/2468)
+- Refactor PoolsOverview [#2465](https://github.com/thorchain/asgardex-electron/pull/2465)
+- Translation ru3 dec by @TreefeedXavier [#2471](https://github.com/thorchain/asgardex-electron/pull/2471)
+- Upgrade types / endpoints to latest THORNode@1.100.0 [#2468](https://github.com/thorchain/asgardex-electron/pull/2468)
+- Upgrade types / endpoints to latest THORNode@1.101.0 [#2475](https://github.com/thorchain/asgardex-electron/pull/2475)
 
 ## Fix
 
