@@ -9,7 +9,7 @@ import * as O from 'fp-ts/Option'
 import * as Rx from 'rxjs'
 import * as RxOp from 'rxjs/operators'
 
-import { ONE_BN, PRICE_POOLS_WHITELIST } from '../../const'
+import { DEFAULT_GET_POOLS_PERIOD, ONE_BN, PRICE_POOLS_WHITELIST } from '../../const'
 import { validAssetForETH, isPricePoolAsset, midgardAssetFromString } from '../../helpers/assetHelper'
 import { isEnabledChain, isEthChain } from '../../helpers/chainHelper'
 import { eqAsset, eqOAsset, eqOPoolAddresses, eqHaltedChain } from '../../helpers/fp/eq'
@@ -21,6 +21,7 @@ import {
   DefaultApi,
   GetEarningsHistoryRequest,
   GetLiquidityHistoryRequest,
+  GetPoolsPeriodEnum,
   GetPoolsRequest,
   GetPoolsStatusEnum,
   GetPoolStatsPeriodEnum,
@@ -101,7 +102,11 @@ const createPoolsService = ({
   loadInboundAddresses$: () => InboundAddressesLD
   inboundAddressesShared$: InboundAddressesLD
 }): PoolsService => {
-  const midgardDefaultApi$ = FP.pipe(midgardUrl$, liveData.map(getMidgardDefaultApi), RxOp.shareReplay(1))
+  const midgardDefaultApi$: LiveData<Error, DefaultApi> = FP.pipe(
+    midgardUrl$,
+    liveData.map(getMidgardDefaultApi),
+    RxOp.shareReplay(1)
+  )
 
   const {
     get$: poolsFilters$,
@@ -120,11 +125,16 @@ const createPoolsService = ({
   // Factory to get `Pools` from Midgard
   const apiGetPools$ = (request: GetPoolsRequest, reload$: TriggerStream$): PoolDetailsLD =>
     FP.pipe(
-      Rx.combineLatest([midgardDefaultApi$, reload$]),
-      RxOp.map(([api]) => api),
-      liveData.chain((api) =>
+      Rx.combineLatest([midgardDefaultApi$, poolsPeriod$, reload$]),
+      RxOp.map(([apiRD, period, _]) =>
         FP.pipe(
-          api.getPools(request),
+          apiRD,
+          RD.map((api) => ({ api, period }))
+        )
+      ),
+      liveData.chain(({ api, period }) =>
+        FP.pipe(
+          api.getPools({ ...request, period }),
           RxOp.map(RD.success),
           // Filter `PoolDetails`by using enabled chains only (defined via ENV)
           liveData.map(
@@ -148,6 +158,10 @@ const createPoolsService = ({
 
   // `TriggerStream` to reload data of pools
   const { stream$: reloadPools$, trigger: reloadPools } = triggerStream()
+
+  const { get$: _getPoolsPeriod$, set: setPoolsPeriod } = observableState<GetPoolsPeriodEnum>(DEFAULT_GET_POOLS_PERIOD)
+
+  const poolsPeriod$ = FP.pipe(_getPoolsPeriod$, RxOp.distinctUntilChanged(), RxOp.shareReplay(1))
 
   /**
    * Data of enabled `Pools` from Midgard
@@ -303,7 +317,8 @@ const createPoolsService = ({
   /**
    * `PoolDetails` of all pools
    */
-  const allPoolDetails$: PoolDetailsLD = reloadPools$.pipe(
+  const allPoolDetails$: PoolDetailsLD = FP.pipe(
+    reloadPools$,
     // start loading queue
     RxOp.switchMap(loadAllPoolDetails$),
     // cache it to avoid reloading data by every subscription
@@ -420,7 +435,8 @@ const createPoolsService = ({
   /**
    * State of data of pendings pools
    */
-  const pendingPoolsState$: PendingPoolsStateLD = reloadPendingPools$.pipe(
+  const pendingPoolsState$: PendingPoolsStateLD = FP.pipe(
+    reloadPendingPools$,
     // start loading queue
     RxOp.switchMap(loadPendingPoolsStateData$),
     // cache it to avoid reloading data by every subscription
@@ -830,6 +846,8 @@ const createPoolsService = ({
     )
 
   return {
+    setPoolsPeriod,
+    poolsPeriod$: poolsPeriod$,
     poolsState$,
     pendingPoolsState$,
     allPoolDetails$,

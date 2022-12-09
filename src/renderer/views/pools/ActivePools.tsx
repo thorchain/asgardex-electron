@@ -35,6 +35,7 @@ import { useProtocolLimit } from '../../hooks/useProtocolLimit'
 import * as poolsRoutes from '../../routes/pools'
 import { DEFAULT_NETWORK } from '../../services/const'
 import { PoolsState, DEFAULT_POOL_FILTERS } from '../../services/midgard/types'
+import { GetPoolsPeriodEnum } from '../../types/generated/midgard'
 import { PoolsComponentProps, PoolTableRowData, PoolTableRowsData } from './Pools.types'
 import { filterTableData } from './Pools.utils'
 import * as Shared from './PoolsOverview.shared'
@@ -49,11 +50,13 @@ export const ActivePools: React.FC<PoolsComponentProps> = ({ haltedChains, mimir
 
   const {
     service: {
-      pools: { poolsState$, reloadPools, selectedPricePool$ }
+      pools: { poolsState$, reloadPools, selectedPricePool$, poolsPeriod$, setPoolsPeriod }
     }
   } = useMidgardContext()
   const { reload: reloadLimit, data: limitRD } = useProtocolLimit()
   const { data: incentivePendulumRD } = useIncentivePendulum()
+
+  const poolsPeriod = useObservableState(poolsPeriod$, GetPoolsPeriodEnum._30d)
 
   const { setFilter: setPoolFilter, filter: poolFilter } = usePoolFilter('active')
   const { add: addPoolToWatchlist, remove: removePoolFromWatchlist, list: poolWatchList } = usePoolWatchlist()
@@ -176,10 +179,23 @@ export const ActivePools: React.FC<PoolsComponentProps> = ({ haltedChains, mimir
 
   const sortAPYColumn = useCallback((a: { apy: number }, b: { apy: number }) => ordNumber.compare(a.apy, b.apy), [])
   const apyColumn = useCallback(
-    <T extends { apy: number }>(): ColumnType<T> => ({
+    <T extends { apy: number }>(
+      poolsPeriod: GetPoolsPeriodEnum,
+      setPoolsPeriod: (v: GetPoolsPeriodEnum) => void
+    ): ColumnType<T> => ({
       key: 'apy',
       align: 'right',
-      title: intl.formatMessage({ id: 'pools.apy' }),
+      title: (
+        <div>
+          <div className="font-main text-16">{intl.formatMessage({ id: 'pools.apy' })}</div>
+          <div>current {poolsPeriod}</div>
+          <div className="flex flex-col">
+            <button onClick={() => setPoolsPeriod(GetPoolsPeriodEnum._7d)}>7d</button>
+            <button onClick={() => setPoolsPeriod(GetPoolsPeriodEnum._30d)}>30d</button>
+          </div>
+        </div>
+      ),
+
       render: renderAPYColumn,
       sorter: sortAPYColumn,
       sortDirections: ['descend', 'ascend']
@@ -204,7 +220,7 @@ export const ActivePools: React.FC<PoolsComponentProps> = ({ haltedChains, mimir
             )
           ),
           O.some(volumeColumn<PoolTableRowData>()),
-          isLargeScreen ? O.some(apyColumn<PoolTableRowData>()) : O.none,
+          isLargeScreen ? O.some(apyColumn<PoolTableRowData>(poolsPeriod, setPoolsPeriod)) : O.none,
           O.some(btnPoolsColumn<PoolTableRowData>())
         ],
         A.filterMap(FP.identity)
@@ -217,6 +233,8 @@ export const ActivePools: React.FC<PoolsComponentProps> = ({ haltedChains, mimir
       volumeColumn,
       isLargeScreen,
       apyColumn,
+      poolsPeriod,
+      setPoolsPeriod,
       btnPoolsColumn
     ]
   )

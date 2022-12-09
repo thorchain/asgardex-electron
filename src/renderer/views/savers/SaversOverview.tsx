@@ -23,6 +23,7 @@ import { useNavigate } from 'react-router-dom'
 
 import { FlatButton } from '../../components/uielements/button'
 import { Table } from '../../components/uielements/table'
+import { DEFAULT_GET_POOLS_PERIOD } from '../../const'
 import { useMidgardContext } from '../../contexts/MidgardContext'
 import { isChainAsset } from '../../helpers/assetHelper'
 import { ordBigNumber } from '../../helpers/fp/ord'
@@ -35,6 +36,7 @@ import { useSynthConstants } from '../../hooks/useSynthConstants'
 import * as poolsRoutes from '../../routes/pools'
 import { PoolDetails, PoolsState } from '../../services/midgard/types'
 import type { MimirHalt } from '../../services/thorchain/types'
+import { GetPoolsPeriodEnum } from '../../types/generated/midgard'
 import * as Shared from '../pools/PoolsOverview.shared'
 import type { SaversTableRowData, SaversTableRowsData } from './Savers.types'
 
@@ -52,9 +54,11 @@ export const SaversOverview: React.FC<Props> = (props): JSX.Element => {
 
   const {
     service: {
-      pools: { poolsState$, reloadPools, selectedPricePool$ }
+      pools: { poolsState$, reloadPools, selectedPricePool$, poolsPeriod$, setPoolsPeriod }
     }
   } = useMidgardContext()
+
+  const poolsPeriod = useObservableState(poolsPeriod$, DEFAULT_GET_POOLS_PERIOD)
 
   const { maxSynthPerPoolDepth: maxSynthPerPoolDepthRD, reloadConstants } = useSynthConstants()
 
@@ -106,10 +110,22 @@ export const SaversOverview: React.FC<Props> = (props): JSX.Element => {
   )
 
   const aprColumn = useCallback(
-    <T extends { apr: BigNumber }>(): ColumnType<T> => ({
+    <T extends { apr: BigNumber }>(
+      poolsPeriod: GetPoolsPeriodEnum,
+      setPoolsPeriod: (v: GetPoolsPeriodEnum) => void
+    ): ColumnType<T> => ({
       key: 'apr',
       align: 'center',
-      title: intl.formatMessage({ id: 'pools.apr' }),
+      title: (
+        <div>
+          <div className="font-main text-16">{intl.formatMessage({ id: 'pools.apr' })}</div>
+          <div>current {poolsPeriod}</div>
+          <div className="flex flex-col">
+            <button onClick={() => setPoolsPeriod(GetPoolsPeriodEnum._7d)}>7d</button>
+            <button onClick={() => setPoolsPeriod(GetPoolsPeriodEnum._30d)}>30d</button>
+          </div>
+        </div>
+      ),
       render: ({ apr }: { apr: BigNumber }) => <div className="font-main text-16">{formatBN(apr, 2)}%</div>,
       sorter: (a: { apr: BigNumber }, b: { apr: BigNumber }) => ordBigNumber.compare(a.apr, b.apr),
       sortDirections: ['descend', 'ascend']
@@ -183,7 +199,7 @@ export const SaversOverview: React.FC<Props> = (props): JSX.Element => {
       Shared.assetColumn(intl.formatMessage({ id: 'common.asset' })),
       depthColumn<SaversTableRowData>(selectedPricePool.asset),
       filledColumn<SaversTableRowData>(),
-      aprColumn<SaversTableRowData>(),
+      aprColumn<SaversTableRowData>(poolsPeriod, setPoolsPeriod),
       btnColumn()
     ],
     [
@@ -192,9 +208,11 @@ export const SaversOverview: React.FC<Props> = (props): JSX.Element => {
       btnColumn,
       depthColumn,
       filledColumn,
+      poolsPeriod,
       intl,
       removePoolFromWatchlist,
-      selectedPricePool.asset
+      selectedPricePool.asset,
+      setPoolsPeriod
     ]
   )
 
