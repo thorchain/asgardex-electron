@@ -50,8 +50,8 @@ export const getSaversTableRowData = ({
       const maxPercent = bnOrZero(maxSynthPerPoolDepth).div(100)
       // saverCap = assetDepth * 2 * maxPercent / 100
       const saverCap = bnOrZero(poolDetail.assetDepth).times(2).times(maxPercent).div(100)
-      // filled = saversDepth * 100 / saverCap
-      const filled = bnOrZero(poolDetail.saversDepth).times(100).div(saverCap)
+      // filled = synthSupply * 100 / saverCap
+      const filled = bnOrZero(poolDetail.synthSupply).times(100).div(saverCap)
 
       const watched: boolean = FP.pipe(
         watchlist,
