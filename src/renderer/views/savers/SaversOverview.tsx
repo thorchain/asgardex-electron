@@ -22,6 +22,7 @@ import { useIntl } from 'react-intl'
 import { useNavigate } from 'react-router-dom'
 
 import { FlatButton } from '../../components/uielements/button'
+import { PoolsPeriodSelector } from '../../components/uielements/pools/PoolsPeriodSelector'
 import { Table } from '../../components/uielements/table'
 import { DEFAULT_GET_POOLS_PERIOD } from '../../const'
 import { useMidgardContext } from '../../contexts/MidgardContext'
@@ -117,13 +118,9 @@ export const SaversOverview: React.FC<Props> = (props): JSX.Element => {
       key: 'apr',
       align: 'center',
       title: (
-        <div>
-          <div className="font-main text-16">{intl.formatMessage({ id: 'pools.apr' })}</div>
-          <div>current {poolsPeriod}</div>
-          <div className="flex flex-col">
-            <button onClick={() => setPoolsPeriod(GetPoolsPeriodEnum._7d)}>7d</button>
-            <button onClick={() => setPoolsPeriod(GetPoolsPeriodEnum._30d)}>30d</button>
-          </div>
+        <div className="flex flex-col items-center">
+          <div className="text-12 font-main">{intl.formatMessage({ id: 'pools.apr' })}</div>
+          <PoolsPeriodSelector selectedValue={poolsPeriod} onChange={setPoolsPeriod} />
         </div>
       ),
       render: ({ apr }: { apr: BigNumber }) => <div className="font-main text-16">{formatBN(apr, 2)}%</div>,

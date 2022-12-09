@@ -23,6 +23,7 @@ import { useNavigate } from 'react-router-dom'
 import { Network } from '../../../shared/api/types'
 import { ProtocolLimit, IncentivePendulum } from '../../components/pool'
 import { Action as ActionButtonAction, ActionButton } from '../../components/uielements/button/ActionButton'
+import { PoolsPeriodSelector } from '../../components/uielements/pools/PoolsPeriodSelector'
 import { Table } from '../../components/uielements/table'
 import { useAppContext } from '../../contexts/AppContext'
 import { useMidgardContext } from '../../contexts/MidgardContext'
@@ -170,7 +171,7 @@ export const ActivePools: React.FC<PoolsComponentProps> = ({ haltedChains, mimir
 
   const renderAPYColumn = useCallback(
     ({ apy }: { apy: number }) => (
-      <Styled.Label align="right" nowrap>
+      <Styled.Label align="center" nowrap>
         {formatBN(bn(apy), 2)}%
       </Styled.Label>
     ),
@@ -184,15 +185,11 @@ export const ActivePools: React.FC<PoolsComponentProps> = ({ haltedChains, mimir
       setPoolsPeriod: (v: GetPoolsPeriodEnum) => void
     ): ColumnType<T> => ({
       key: 'apy',
-      align: 'right',
+      align: 'center',
       title: (
-        <div>
-          <div className="font-main text-16">{intl.formatMessage({ id: 'pools.apy' })}</div>
-          <div>current {poolsPeriod}</div>
-          <div className="flex flex-col">
-            <button onClick={() => setPoolsPeriod(GetPoolsPeriodEnum._7d)}>7d</button>
-            <button onClick={() => setPoolsPeriod(GetPoolsPeriodEnum._30d)}>30d</button>
-          </div>
+        <div className="flex flex-col items-center">
+          <div className="text-12 font-main">{intl.formatMessage({ id: 'pools.apy' })}</div>
+          <PoolsPeriodSelector selectedValue={poolsPeriod} onChange={setPoolsPeriod} />
         </div>
       ),
 
