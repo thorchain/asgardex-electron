@@ -13,87 +13,62 @@
 
 /**
  * @export
- * @interface LiquidityProvider
+ * @interface LiquidityProviderSummary
  */
-export interface LiquidityProvider {
+export interface LiquidityProviderSummary {
     /**
      * @type {string}
-     * @memberof LiquidityProvider
+     * @memberof LiquidityProviderSummary
      */
     asset: string;
     /**
      * @type {string}
-     * @memberof LiquidityProvider
+     * @memberof LiquidityProviderSummary
      */
     rune_address?: string;
     /**
      * @type {string}
-     * @memberof LiquidityProvider
+     * @memberof LiquidityProviderSummary
      */
     asset_address?: string;
     /**
      * @type {number}
-     * @memberof LiquidityProvider
+     * @memberof LiquidityProviderSummary
      */
     last_add_height?: number;
     /**
      * @type {number}
-     * @memberof LiquidityProvider
+     * @memberof LiquidityProviderSummary
      */
     last_withdraw_height?: number;
     /**
      * @type {string}
-     * @memberof LiquidityProvider
+     * @memberof LiquidityProviderSummary
      */
     units: string;
     /**
      * @type {string}
-     * @memberof LiquidityProvider
+     * @memberof LiquidityProviderSummary
      */
     pending_rune: string;
     /**
      * @type {string}
-     * @memberof LiquidityProvider
+     * @memberof LiquidityProviderSummary
      */
     pending_asset: string;
     /**
      * @type {string}
-     * @memberof LiquidityProvider
+     * @memberof LiquidityProviderSummary
      */
     pending_tx_id?: string;
     /**
      * @type {string}
-     * @memberof LiquidityProvider
+     * @memberof LiquidityProviderSummary
      */
     rune_deposit_value: string;
     /**
      * @type {string}
-     * @memberof LiquidityProvider
+     * @memberof LiquidityProviderSummary
      */
     asset_deposit_value: string;
-    /**
-     * @type {string}
-     * @memberof LiquidityProvider
-     */
-    rune_redeem_value: string;
-    /**
-     * @type {string}
-     * @memberof LiquidityProvider
-     */
-    asset_redeem_value: string;
-    /**
-     * @type {string}
-     * @memberof LiquidityProvider
-     */
-    luvi_deposit_value: string;
-    /**
-     * @type {string}
-     * @memberof LiquidityProvider
-     */
-    luvi_redeem_value: string;
-    /**
-     * @type {string}
-     * @memberof LiquidityProvider
-     */
-    luvi_growth_pct: string;
 }
