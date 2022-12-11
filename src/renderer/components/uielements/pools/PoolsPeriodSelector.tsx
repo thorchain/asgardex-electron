@@ -55,11 +55,7 @@ export const PoolsPeriodSelector: React.FC<Props> = (props): JSX.Element => {
       disabled={disabled}
       onChange={({ value }) => {
         onChange(value)
-      }}
-      as="div"
-      className={({ open }) => `
-                    ${open ? 'shadow-full dark:shadow-fulld' : ''}
-                    `}>
+      }}>
       <div
         className={`relative ${className}`}
         onClick={(event: React.MouseEvent<HTMLElement, MouseEvent>) => {
@@ -72,20 +68,20 @@ export const PoolsPeriodSelector: React.FC<Props> = (props): JSX.Element => {
               group
               flex cursor-pointer
               items-center
-                    bg-bg0
-                    py-5px
-                    pl-20px
-                   pr-10px font-main
-                   text-text0
-                    transition
-                    duration-300
-                    ease-in-out hover:shadow-full
-                    hover:dark:shadow-fulld
-                    ${disabled && 'opacity-70'}
-                    whitespace-nowrap
-                    dark:bg-bg0d
-                    dark:text-text0d
-                    `}>
+              bg-bg0
+              py-5px
+              pl-20px
+              pr-10px font-main
+              text-text0
+              transition
+              duration-300
+              ease-in-out hover:shadow-full
+              hover:dark:shadow-fulld
+              ${disabled && 'opacity-70'}
+              whitespace-nowrap
+              dark:bg-bg0d
+              dark:text-text0d
+              `}>
           {({ open }) => (
             <>
               <span className="w-full">{selectedItem.label}</span>
@@ -103,8 +99,8 @@ export const PoolsPeriodSelector: React.FC<Props> = (props): JSX.Element => {
         </Listbox.Button>
         <Listbox.Options
           className="
-              absolute z-[2000]
-              mt-[0px]
+            absolute z-[2000]
+            mt-[0px]
             max-h-60 w-full overflow-auto
             border
             border-gray0 bg-bg0 focus:outline-none
