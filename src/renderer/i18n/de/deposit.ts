@@ -55,7 +55,7 @@ const deposit: DepositMessages = {
   'deposit.poolDetails.totalTx': 'Transaktionen (Gesamt)',
   'deposit.poolDetails.totalFees': 'Gebühren (total)',
   'deposit.poolDetails.members': 'Mitglieder',
-  'deposit.poolDetails.apy': 'Effektivertrag',
+  'deposit.poolDetails.apy': 'APY',
   'deposit.wallet.add': 'Wallet hinzufügen',
   'deposit.wallet.connect': 'Bitte verbinde Deine Wallet',
   'deposit.pool.noShares': 'Du hast keine Anteile in diesem Pool',

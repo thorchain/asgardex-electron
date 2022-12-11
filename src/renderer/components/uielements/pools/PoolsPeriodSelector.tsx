@@ -1,23 +1,17 @@
-import React from 'react'
+import React, { useMemo } from 'react'
 
 import { Listbox } from '@headlessui/react'
 import { CheckIcon, ChevronDownIcon } from '@heroicons/react/24/outline'
 import * as A from 'fp-ts/lib/Array'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
+import { useIntl } from 'react-intl'
 
 import { GetPoolsPeriodEnum } from '../../../types/generated/midgard'
 
 type PeriodItem = { value: GetPoolsPeriodEnum; label: string }
 
 const DEFAULT_ITEM: PeriodItem = { value: GetPoolsPeriodEnum._30d, label: '30 days' }
-const LIST_ITEMS: PeriodItem[] = [
-  { value: GetPoolsPeriodEnum._7d, label: '7 days' },
-  DEFAULT_ITEM, // 30 days
-  { value: GetPoolsPeriodEnum._90d, label: '90 days' },
-  { value: GetPoolsPeriodEnum._180d, label: '180 days' },
-  { value: GetPoolsPeriodEnum._365d, label: '365 days' }
-]
 
 export type Props = {
   selectedValue: GetPoolsPeriodEnum
@@ -29,8 +23,26 @@ export type Props = {
 export const PoolsPeriodSelector: React.FC<Props> = (props): JSX.Element => {
   const { selectedValue, onChange, disabled = false, className = '' } = props
 
+  const intl = useIntl()
+
+  const defaultItem: PeriodItem = useMemo(
+    () => ({ value: GetPoolsPeriodEnum._30d, label: intl.formatMessage({ id: 'common.time.days' }, { days: '30' }) }),
+    [intl]
+  )
+
+  const listItems: PeriodItem[] = useMemo(
+    () => [
+      { value: GetPoolsPeriodEnum._7d, label: intl.formatMessage({ id: 'common.time.days' }, { days: '7' }) },
+      defaultItem, // 30 days
+      { value: GetPoolsPeriodEnum._90d, label: intl.formatMessage({ id: 'common.time.days' }, { days: '90' }) },
+      { value: GetPoolsPeriodEnum._180d, label: intl.formatMessage({ id: 'common.time.days' }, { days: '180' }) },
+      { value: GetPoolsPeriodEnum._365d, label: intl.formatMessage({ id: 'common.time.days' }, { days: '365' }) }
+    ],
+    [defaultItem, intl]
+  )
+
   const selectedItem: PeriodItem = FP.pipe(
-    LIST_ITEMS,
+    listItems,
     // get selected wallet
     A.findFirst(({ value }) => value === selectedValue),
     // use first if no wallet is selected
@@ -100,7 +112,7 @@ export const PoolsPeriodSelector: React.FC<Props> = (props): JSX.Element => {
 
             ">
           {FP.pipe(
-            LIST_ITEMS,
+            listItems,
             A.map((item) => {
               const selected = item.value === selectedItem.value
               return (
