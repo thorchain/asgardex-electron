@@ -20,7 +20,6 @@ export type Props = {
   watch: FP.Lazy<void>
   unwatch: FP.Lazy<void>
   price: RD.RemoteData<Error, { amount: AssetAmount; symbol: string }>
-  isLoading?: boolean
   disableTradingPoolAction: boolean
   disableAllPoolActions: boolean
   disablePoolActions: boolean

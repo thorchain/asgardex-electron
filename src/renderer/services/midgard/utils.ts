@@ -48,7 +48,7 @@ import { eqAsset, eqChain, eqOAddress } from '../../helpers/fp/eq'
 import { ordPricePool } from '../../helpers/fp/ord'
 import { getDeepestPool, RUNE_POOL_ADDRESS, RUNE_PRICE_POOL } from '../../helpers/poolHelper'
 import { AssetWithAmount } from '../../types/asgardex'
-import { PoolDetail } from '../../types/generated/midgard'
+import { GetPoolPeriodEnum, GetPoolsPeriodEnum, PoolDetail } from '../../types/generated/midgard'
 import { PricePoolAssets, PricePools, PricePoolAsset, PricePool } from '../../views/pools/Pools.types'
 import { InboundAddress } from '../thorchain/types'
 import {
@@ -400,3 +400,26 @@ export const getPoolAssetDetail = ({
 export const getPoolAssetsDetail: (_: Array<Pick<PoolDetail, 'assetPrice' | 'asset'>>) => PoolAssetsDetail = (
   poolDetails
 ) => FP.pipe(poolDetails, A.filterMap(getPoolAssetDetail))
+
+export const poolsPeriodToPoolPeriod = (period: GetPoolsPeriodEnum): GetPoolPeriodEnum => {
+  switch (period) {
+    case GetPoolsPeriodEnum.All:
+      return GetPoolPeriodEnum.All
+    case GetPoolsPeriodEnum._365d:
+      return GetPoolPeriodEnum._365d
+    case GetPoolsPeriodEnum._180d:
+      return GetPoolPeriodEnum._180d
+    case GetPoolsPeriodEnum._100d:
+      return GetPoolPeriodEnum._100d
+    case GetPoolsPeriodEnum._90d:
+      return GetPoolPeriodEnum._90d
+    case GetPoolsPeriodEnum._30d:
+      return GetPoolPeriodEnum._30d
+    case GetPoolsPeriodEnum._7d:
+      return GetPoolPeriodEnum._7d
+    case GetPoolsPeriodEnum._24h:
+      return GetPoolPeriodEnum._24h
+    case GetPoolsPeriodEnum._1h:
+      return GetPoolPeriodEnum._1h
+  }
+}

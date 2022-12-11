@@ -73,7 +73,8 @@ import {
   pricePoolSelectorFromRD,
   inboundToPoolAddresses,
   getOutboundAssetFeeByChain,
-  toPoolsData
+  toPoolsData,
+  poolsPeriodToPoolPeriod
 } from './utils'
 
 const PRICE_POOL_KEY = 'asgdx-price-pool'
@@ -221,10 +222,16 @@ const createPoolsService = ({
    */
   const apiGetPoolDetail$ = (asset: Asset): PoolDetailLD =>
     FP.pipe(
-      midgardDefaultApi$,
-      liveData.chain((api) => {
+      Rx.combineLatest([midgardDefaultApi$, poolsPeriod$]),
+      RxOp.map(([apiRD, period]) =>
+        FP.pipe(
+          apiRD,
+          RD.map((api) => ({ api, period }))
+        )
+      ),
+      liveData.chain(({ api, period }) => {
         return FP.pipe(
-          api.getPool({ asset: assetToString(asset) }),
+          api.getPool({ asset: assetToString(asset), period: poolsPeriodToPoolPeriod(period) }),
           RxOp.map(RD.success),
           RxOp.startWith(RD.pending),
           RxOp.catchError((e: Error) => Rx.of(RD.failure(e)))
@@ -847,7 +854,7 @@ const createPoolsService = ({
 
   return {
     setPoolsPeriod,
-    poolsPeriod$: poolsPeriod$,
+    poolsPeriod$,
     poolsState$,
     pendingPoolsState$,
     allPoolDetails$,

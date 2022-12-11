@@ -8,7 +8,7 @@ import * as FP from 'fp-ts/lib/function'
 
 import { Network } from '../../../shared/api/types'
 import { PoolDetailRD, PoolStatsDetailRD } from '../../services/midgard/types'
-import { GetPoolsStatusEnum } from '../../types/generated/midgard'
+import { GetPoolsPeriodEnum, GetPoolsStatusEnum } from '../../types/generated/midgard'
 import { PoolHistoryActions } from '../../views/pool/PoolHistoryView.types'
 import { PoolCards } from './PoolCards'
 import * as H from './PoolDetails.helpers'
@@ -26,7 +26,6 @@ export type Props = {
   reloadPoolDetail: FP.Lazy<void>
   priceRatio: BigNumber
   priceSymbol: string
-  isLoading?: boolean
   HistoryView: React.ComponentType<{
     poolAsset: Asset
     historyActions: PoolHistoryActions
@@ -37,6 +36,8 @@ export type Props = {
   disablePoolActions: boolean
   walletLocked: boolean
   network: Network
+  poolsPeriod: GetPoolsPeriodEnum
+  setPoolsPeriod: (v: GetPoolsPeriodEnum) => void
 }
 
 export const PoolDetails: React.FC<Props> = ({
@@ -51,14 +52,15 @@ export const PoolDetails: React.FC<Props> = ({
   reloadPoolDetail,
   poolStatsDetail: poolStatsDetailRD,
   reloadPoolStatsDetail,
-  isLoading,
   HistoryView,
   ChartView,
   disableTradingPoolAction,
   disableAllPoolActions,
   disablePoolActions,
   walletLocked,
-  network
+  network,
+  poolsPeriod,
+  setPoolsPeriod
 }) => {
   const renderTitle = useMemo(() => {
     const price = FP.pipe(
@@ -87,7 +89,6 @@ export const PoolDetails: React.FC<Props> = ({
         watch={watch}
         unwatch={unwatch}
         price={price}
-        isLoading={isLoading}
         isAvailablePool={isAvailablePool}
       />
     )
@@ -96,7 +97,6 @@ export const PoolDetails: React.FC<Props> = ({
     disableAllPoolActions,
     disablePoolActions,
     disableTradingPoolAction,
-    isLoading,
     network,
     poolDetailRD,
     priceRatio,
@@ -122,6 +122,8 @@ export const PoolDetails: React.FC<Props> = ({
           poolDetail={poolDetailRD}
           priceSymbol={priceSymbol}
           reloadData={reloadPoolCardsData}
+          poolsPeriod={poolsPeriod}
+          setPoolsPeriod={setPoolsPeriod}
         />
       </A.Col>
       <A.Col xs={24} md={16}>

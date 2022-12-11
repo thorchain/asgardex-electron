@@ -13,7 +13,7 @@ import * as RxOp from 'rxjs/operators'
 import { PoolDetails, Props as PoolDetailProps } from '../../components/pool/PoolDetails'
 import { ErrorView } from '../../components/shared/error'
 import { RefreshButton } from '../../components/uielements/button'
-import { ONE_BN } from '../../const'
+import { DEFAULT_GET_POOLS_PERIOD, ONE_BN } from '../../const'
 import { useAppContext } from '../../contexts/AppContext'
 import { useMidgardContext } from '../../contexts/MidgardContext'
 import { getAssetFromNullableString } from '../../helpers/assetHelper'
@@ -32,7 +32,14 @@ import { PoolHistoryView } from './PoolHistoryView'
 
 type TargetPoolDetailProps = Omit<
   PoolDetailProps,
-  'asset' | 'historyActions' | 'reloadPoolDetail' | 'reloadPoolStatsDetail' | 'watched' | 'watch' | 'unwatch'
+  | 'asset'
+  | 'historyActions'
+  | 'reloadPoolDetail'
+  | 'reloadPoolStatsDetail'
+  | 'watched'
+  | 'watch'
+  | 'unwatch'
+  | 'setPoolsPeriod'
 >
 
 const defaultDetailsProps: TargetPoolDetailProps = {
@@ -46,7 +53,8 @@ const defaultDetailsProps: TargetPoolDetailProps = {
   disableAllPoolActions: false,
   disableTradingPoolAction: false,
   disablePoolActions: false,
-  walletLocked: false
+  walletLocked: false,
+  poolsPeriod: DEFAULT_GET_POOLS_PERIOD
 }
 
 export const PoolDetailsView: React.FC = () => {
@@ -61,7 +69,9 @@ export const PoolDetailsView: React.FC = () => {
         poolStatsDetail$,
         reloadPoolStatsDetail,
         reloadSelectedPoolDetail,
-        haltedChains$
+        haltedChains$,
+        poolsPeriod$,
+        setPoolsPeriod
       },
       setSelectedPoolAsset
     }
@@ -76,6 +86,8 @@ export const PoolDetailsView: React.FC = () => {
   const { asset } = useParams<PoolDetailRouteParams>()
 
   const { add: addToWatchList, remove: removeFromWatchList, list: watchedList } = usePoolWatchlist()
+
+  const poolsPeriod = useObservableState(poolsPeriod$, DEFAULT_GET_POOLS_PERIOD)
 
   const [haltedChains] = useObservableState(() => FP.pipe(haltedChains$, RxOp.map(RD.getOrElse((): Chain[] => []))), [])
   const { mimirHalt } = useMimirHalt()
@@ -157,7 +169,8 @@ export const PoolDetailsView: React.FC = () => {
               disableAllPoolActions: getDisableAllPoolActions(asset.chain),
               disableTradingPoolAction: getDisableTradingPoolAction(asset.chain),
               disablePoolActions: getDisablePoolActions(asset.chain),
-              walletLocked
+              walletLocked,
+              poolsPeriod
             }
 
             const watched = FP.pipe(watchedList, A.elem(eqAsset)(asset))
@@ -171,6 +184,7 @@ export const PoolDetailsView: React.FC = () => {
                 historyActions={historyActions}
                 reloadPoolDetail={reloadSelectedPoolDetail}
                 reloadPoolStatsDetail={reloadPoolStatsDetail}
+                setPoolsPeriod={setPoolsPeriod}
                 {...prevProps.current}
               />
             )

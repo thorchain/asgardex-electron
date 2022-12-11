@@ -70,6 +70,7 @@ export const PoolsPeriodSelector: React.FC<Props> = (props): JSX.Element => {
                     ease-in-out hover:shadow-full
                     hover:dark:shadow-fulld
                     ${disabled && 'opacity-70'}
+                    whitespace-nowrap
                     dark:bg-bg0d
                     dark:text-text0d
                     `}>
