@@ -24,6 +24,7 @@ import {
 } from '@xchainjs/xchain-util'
 
 import { Network } from '../shared/api/types'
+import { GetPoolsPeriodEnum } from './types/generated/midgard'
 import { PricePoolCurrencyWeights, PricePoolAssets } from './views/pools/Pools.types'
 
 //
@@ -206,3 +207,5 @@ export const SUPPORTED_LEDGER_APPS: Chain[] = [
   ETHChain,
   CosmosChain
 ]
+
+export const DEFAULT_GET_POOLS_PERIOD = GetPoolsPeriodEnum._30d

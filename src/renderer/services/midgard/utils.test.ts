@@ -34,9 +34,9 @@ import {
 } from '../../../shared/mock/amount'
 import { PRICE_POOLS_WHITELIST, AssetBUSDBAF, AssetUSDC, AssetUSDTDAC, AssetBUSD74E } from '../../const'
 import { BNB_DECIMAL } from '../../helpers/assetHelper'
-import { eqAsset, eqPoolShare, eqPoolShares, eqOAssetWithAmount } from '../../helpers/fp/eq'
+import { eqAsset, eqPoolShare, eqPoolShares, eqOAssetWithAmount, eqString } from '../../helpers/fp/eq'
 import { RUNE_POOL_ADDRESS, RUNE_PRICE_POOL } from '../../helpers/poolHelper'
-import { PoolDetail } from '../../types/generated/midgard'
+import { GetPoolPeriodEnum, GetPoolsPeriodEnum, PoolDetail } from '../../types/generated/midgard'
 import { PricePool, PricePools } from '../../views/pools/Pools.types'
 import { PoolAddress, PoolShare, PoolShares, PoolsStateRD } from './types'
 import {
@@ -55,7 +55,8 @@ import {
   getPoolAssetsDetail,
   inboundToPoolAddresses,
   getOutboundAssetFeeByChain,
-  getSymSharesByAddress
+  getSymSharesByAddress,
+  poolsPeriodToPoolPeriod
 } from './utils'
 
 describe('services/midgard/utils/', () => {
@@ -564,6 +565,41 @@ describe('services/midgard/utils/', () => {
       it('none for THORChain', () => {
         const result = getOutboundAssetFeeByChain(data, THORChain)
         expect(result).toBeNone()
+      })
+    })
+
+    describe('poolsPeriodToPoolPeriod', () => {
+      it('All', () => {
+        const result = poolsPeriodToPoolPeriod(GetPoolsPeriodEnum.All)
+        expect(eqString.equals(result, GetPoolPeriodEnum.All)).toBeTruthy()
+      })
+      it('365d', () => {
+        const result = poolsPeriodToPoolPeriod(GetPoolsPeriodEnum._365d)
+        expect(eqString.equals(result, GetPoolPeriodEnum._365d)).toBeTruthy()
+      })
+      it('180d', () => {
+        const result = poolsPeriodToPoolPeriod(GetPoolsPeriodEnum._180d)
+        expect(eqString.equals(result, GetPoolPeriodEnum._180d)).toBeTruthy()
+      })
+      it('90d', () => {
+        const result = poolsPeriodToPoolPeriod(GetPoolsPeriodEnum._90d)
+        expect(eqString.equals(result, GetPoolPeriodEnum._90d)).toBeTruthy()
+      })
+      it('_30d', () => {
+        const result = poolsPeriodToPoolPeriod(GetPoolsPeriodEnum._30d)
+        expect(eqString.equals(result, GetPoolPeriodEnum._30d)).toBeTruthy()
+      })
+      it('7d', () => {
+        const result = poolsPeriodToPoolPeriod(GetPoolsPeriodEnum._7d)
+        expect(eqString.equals(result, GetPoolPeriodEnum._7d)).toBeTruthy()
+      })
+      it('24h', () => {
+        const result = poolsPeriodToPoolPeriod(GetPoolsPeriodEnum._24h)
+        expect(eqString.equals(result, GetPoolPeriodEnum._24h)).toBeTruthy()
+      })
+      it('1h', () => {
+        const result = poolsPeriodToPoolPeriod(GetPoolsPeriodEnum._1h)
+        expect(eqString.equals(result, GetPoolPeriodEnum._1h)).toBeTruthy()
       })
     })
   })

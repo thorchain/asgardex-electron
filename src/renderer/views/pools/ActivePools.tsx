@@ -23,6 +23,7 @@ import { useNavigate } from 'react-router-dom'
 import { Network } from '../../../shared/api/types'
 import { ProtocolLimit, IncentivePendulum } from '../../components/pool'
 import { Action as ActionButtonAction, ActionButton } from '../../components/uielements/button/ActionButton'
+import { PoolsPeriodSelector } from '../../components/uielements/pools/PoolsPeriodSelector'
 import { Table } from '../../components/uielements/table'
 import { useAppContext } from '../../contexts/AppContext'
 import { useMidgardContext } from '../../contexts/MidgardContext'
@@ -35,6 +36,7 @@ import { useProtocolLimit } from '../../hooks/useProtocolLimit'
 import * as poolsRoutes from '../../routes/pools'
 import { DEFAULT_NETWORK } from '../../services/const'
 import { PoolsState, DEFAULT_POOL_FILTERS } from '../../services/midgard/types'
+import { GetPoolsPeriodEnum } from '../../types/generated/midgard'
 import { PoolsComponentProps, PoolTableRowData, PoolTableRowsData } from './Pools.types'
 import { filterTableData } from './Pools.utils'
 import * as Shared from './PoolsOverview.shared'
@@ -49,11 +51,13 @@ export const ActivePools: React.FC<PoolsComponentProps> = ({ haltedChains, mimir
 
   const {
     service: {
-      pools: { poolsState$, reloadPools, selectedPricePool$ }
+      pools: { poolsState$, reloadPools, selectedPricePool$, poolsPeriod$, setPoolsPeriod }
     }
   } = useMidgardContext()
   const { reload: reloadLimit, data: limitRD } = useProtocolLimit()
   const { data: incentivePendulumRD } = useIncentivePendulum()
+
+  const poolsPeriod = useObservableState(poolsPeriod$, GetPoolsPeriodEnum._30d)
 
   const { setFilter: setPoolFilter, filter: poolFilter } = usePoolFilter('active')
   const { add: addPoolToWatchlist, remove: removePoolFromWatchlist, list: poolWatchList } = usePoolWatchlist()
@@ -167,7 +171,7 @@ export const ActivePools: React.FC<PoolsComponentProps> = ({ haltedChains, mimir
 
   const renderAPYColumn = useCallback(
     ({ apy }: { apy: number }) => (
-      <Styled.Label align="right" nowrap>
+      <Styled.Label align="center" nowrap>
         {formatBN(bn(apy), 2)}%
       </Styled.Label>
     ),
@@ -176,10 +180,19 @@ export const ActivePools: React.FC<PoolsComponentProps> = ({ haltedChains, mimir
 
   const sortAPYColumn = useCallback((a: { apy: number }, b: { apy: number }) => ordNumber.compare(a.apy, b.apy), [])
   const apyColumn = useCallback(
-    <T extends { apy: number }>(): ColumnType<T> => ({
+    <T extends { apy: number }>(
+      poolsPeriod: GetPoolsPeriodEnum,
+      setPoolsPeriod: (v: GetPoolsPeriodEnum) => void
+    ): ColumnType<T> => ({
       key: 'apy',
-      align: 'right',
-      title: intl.formatMessage({ id: 'pools.apy' }),
+      align: 'center',
+      title: (
+        <div className="flex flex-col items-center">
+          <div className="text-12 font-main">{intl.formatMessage({ id: 'pools.apy' })}</div>
+          <PoolsPeriodSelector selectedValue={poolsPeriod} onChange={setPoolsPeriod} />
+        </div>
+      ),
+
       render: renderAPYColumn,
       sorter: sortAPYColumn,
       sortDirections: ['descend', 'ascend']
@@ -204,7 +217,7 @@ export const ActivePools: React.FC<PoolsComponentProps> = ({ haltedChains, mimir
             )
           ),
           O.some(volumeColumn<PoolTableRowData>()),
-          isLargeScreen ? O.some(apyColumn<PoolTableRowData>()) : O.none,
+          isLargeScreen ? O.some(apyColumn<PoolTableRowData>(poolsPeriod, setPoolsPeriod)) : O.none,
           O.some(btnPoolsColumn<PoolTableRowData>())
         ],
         A.filterMap(FP.identity)
@@ -217,6 +230,8 @@ export const ActivePools: React.FC<PoolsComponentProps> = ({ haltedChains, mimir
       volumeColumn,
       isLargeScreen,
       apyColumn,
+      poolsPeriod,
+      setPoolsPeriod,
       btnPoolsColumn
     ]
   )
