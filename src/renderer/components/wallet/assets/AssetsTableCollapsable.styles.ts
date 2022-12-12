@@ -1,4 +1,4 @@
-import { CaretRightOutlined, EyeInvisibleOutlined, QrcodeOutlined as QrcodeOutlinedIcon } from '@ant-design/icons'
+import { CaretRightOutlined, EyeInvisibleOutlined } from '@ant-design/icons'
 import * as A from 'antd'
 import styled from 'styled-components'
 import { palette } from 'styled-theme'
@@ -118,17 +118,6 @@ export const CopyLabel = styled(A.Typography.Text)`
   color: ${palette('primary', 0)};
   svg {
     color: ${palette('primary', 0)};
-    height: ${ICON_SIZE}px;
-    width: ${ICON_SIZE}px;
-  }
-`
-
-export const QRCodeIcon = styled(QrcodeOutlinedIcon)`
-  cursor: pointer;
-  margin-left: 5px;
-  color: ${palette('primary', 0)};
-  svg {
-    color: inherit;
     height: ${ICON_SIZE}px;
     width: ${ICON_SIZE}px;
   }
