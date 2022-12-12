@@ -22,7 +22,9 @@ export type PricePools = NonEmptyArray<PricePool>
 
 export type PoolTableRowData = {
   asset: Asset
+  depthAmount: BaseAmount
   depthPrice: BaseAmount
+  volumeAmount: BaseAmount
   volumePrice: BaseAmount
   poolPrice: BaseAmount
   apy: number

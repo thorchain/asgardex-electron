@@ -51,7 +51,9 @@ describe('views/pools/utils', () => {
       const expected: PoolTableRowData = {
         asset: ASSETS_TESTNET.FTM,
         poolPrice: assetToBase(assetAmount(2)),
+        depthAmount: assetToBase(assetAmount(220)),
         depthPrice: assetToBase(assetAmount(2000)),
+        volumeAmount: assetToBase(assetAmount(110)),
         volumePrice: assetToBase(assetAmount(1000)),
         status: GetPoolsStatusEnum.Available,
         deepest: false,
@@ -75,7 +77,9 @@ describe('views/pools/utils', () => {
           expect(data.asset).toEqual(expected.asset)
           expect(data.asset).toEqual(expected.asset)
           expect(data.depthPrice.eq(expected.depthPrice)).toBeTruthy()
+          expect(data.depthAmount.eq(expected.depthAmount)).toBeTruthy()
           expect(data.volumePrice.eq(expected.volumePrice)).toBeTruthy()
+          expect(data.volumeAmount.eq(expected.volumeAmount)).toBeTruthy()
           expect(data.apy).toEqual(expected.apy)
           return true
         })

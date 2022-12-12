@@ -86,14 +86,14 @@ export const SaversOverview: React.FC<Props> = (props): JSX.Element => {
       title: intl.formatMessage({ id: 'common.liquidity' }),
       render: ({ asset, depth, depthPrice }: { asset: Asset; depth: BaseAmount; depthPrice: BaseAmount }) => (
         <div className="flex flex-col items-end justify-center font-main">
-          <div className="d:text-gray1d text-16 text-text0 dark:text-text0d">
+          <div className="whitespace-nowrap text-16 text-text0 dark:text-text0d">
             {formatAssetAmountCurrency({
               amount: baseToAsset(depth),
               asset,
               decimal: 3
             })}
           </div>
-          <div className="text-14 text-gray2 dark:text-gray2d">
+          <div className="whitespace-nowrap text-14 text-gray2 dark:text-gray2d">
             {formatAssetAmountCurrency({
               amount: baseToAsset(depthPrice),
               asset: pricePoolAsset,
