@@ -63,11 +63,13 @@ export const getPoolTableRowData = ({
       const poolPrice = getValueOfAsset1InAsset2(ONE_RUNE_BASE_AMOUNT, poolData, pricePoolData)
 
       // `depthAmount` is one side only, but we do need to show depth of both sides (asset + rune depth)
-      const depthAmount = baseAmount(poolDetail.runeDepth).times(2)
-      const depthPrice = getValueOfRuneInAsset(depthAmount, pricePoolData)
+      const depthAmountInRune = baseAmount(poolDetail.runeDepth).times(2)
+      const depthPrice = getValueOfRuneInAsset(depthAmountInRune, pricePoolData)
+      const depthAmountInAsset = getValueOfRuneInAsset(depthAmountInRune, poolData)
 
       const volumeAmount = baseAmount(poolDetail.volume24h)
       const volumePrice = getValueOfRuneInAsset(volumeAmount, pricePoolData)
+      const volumeAmountInAsset = getValueOfRuneInAsset(volumeAmount, poolData)
 
       const status = stringToGetPoolsStatus(poolDetail.status)
 
@@ -80,8 +82,10 @@ export const getPoolTableRowData = ({
       return {
         asset: poolDetailAsset,
         poolPrice,
+        depthAmount: depthAmountInAsset,
         depthPrice,
         volumePrice,
+        volumeAmount: volumeAmountInAsset,
         status,
         key: poolDetailAsset.ticker,
         network,

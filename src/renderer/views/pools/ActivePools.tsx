@@ -141,17 +141,29 @@ export const ActivePools: React.FC<PoolsComponentProps> = ({ haltedChains, mimir
   )
 
   const renderVolumeColumn = useCallback(
-    ({ volumePrice }: { volumePrice: BaseAmount }) => (
+    ({ asset, volumePrice, volumeAmount }: { asset: Asset; volumePrice: BaseAmount; volumeAmount: BaseAmount }) => (
       <Styled.Label align="right" nowrap>
-        {formatAssetAmountCurrency({
-          amount: baseToAsset(volumePrice),
-          asset: selectedPricePool.asset,
-          decimal: 2
-        })}
+        <div className="flex flex-col items-end justify-center font-main">
+          <div className="whitespace-nowrap text-16 text-text0 dark:text-text0d">
+            {formatAssetAmountCurrency({
+              amount: baseToAsset(volumeAmount),
+              asset,
+              decimal: 2
+            })}
+          </div>
+          <div className="whitespace-nowrap text-14 text-gray2 dark:text-gray2d">
+            {formatAssetAmountCurrency({
+              amount: baseToAsset(volumePrice),
+              asset: selectedPricePool.asset,
+              decimal: 2
+            })}
+          </div>
+        </div>
       </Styled.Label>
     ),
     [selectedPricePool.asset]
   )
+
   const sortVolumeColumn = useCallback(
     (a: { volumePrice: BaseAmount }, b: { volumePrice: BaseAmount }) =>
       ordBaseAmount.compare(a.volumePrice, b.volumePrice),
