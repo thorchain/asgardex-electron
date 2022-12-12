@@ -135,7 +135,16 @@ export const SaversOverview: React.FC<Props> = (props): JSX.Element => {
       key: 'filled',
       align: 'center',
       title: intl.formatMessage({ id: 'pools.filled' }),
-      render: ({ filled }: { filled: BigNumber }) => <div className="font-main text-16">{formatBN(filled, 2)}%</div>,
+      render: ({ filled }: { filled: BigNumber }) => (
+        <div className="flex flex-col justify-start">
+          <div className="font-main text-16">{formatBN(filled, 2)}%</div>
+          <div className="relative my-[6px] h-[5px] w-full bg-gray1 dark:bg-gray1d">
+            <div
+              className="absolute h-[5px] bg-turquoise"
+              style={{ width: `${Math.min(filled.toNumber(), 100) /* max. 100% */}%` }}></div>
+          </div>
+        </div>
+      ),
       sorter: (a: { filled: BigNumber }, b: { filled: BigNumber }) => ordBigNumber.compare(a.filled, b.filled),
       sortDirections: ['descend', 'ascend']
     }),
