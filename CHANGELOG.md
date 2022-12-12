@@ -8,7 +8,8 @@
 - Add 'x-client-id' header to send ASGDX' identifier for any request to 9R servers [#2463](https://github.com/thorchain/asgardex-electron/issues/2463), [#2464](https://github.com/thorchain/asgardex-electron/pull/2464), [#2474](https://github.com/thorchain/asgardex-electron/pull/2474)
 - [Savers] Routes [#2450](https://github.com/thorchain/asgardex-electron/pull/2450)
 - Add wallet actions to assets table [#2455](https://github.com/thorchain/asgardex-electron/pull/2455)
-- Savers overview [#2466](https://github.com/thorchain/asgardex-electron/pull/2466), [#2470](https://github.com/thorchain/asgardex-electron/pull/2470)
+- Savers overview [#2466](https://github.com/thorchain/asgardex-electron/pull/2466), [#2470](https://github.com/thorchain/asgardex-electron/pull/2470), (#2479)[https://github.com/thorchain/asgardex-electron/pull/2479]
+- Display APY/APR depending on days [#2477](https://github.com/thorchain/asgardex-electron/pull/2477)
 
 ## Update
 
@@ -20,10 +21,15 @@
 - Translation ru3 dec by @TreefeedXavier [#2471](https://github.com/thorchain/asgardex-electron/pull/2471)
 - Upgrade types / endpoints to latest THORNode@1.100.0 [#2468](https://github.com/thorchain/asgardex-electron/pull/2468)
 - Upgrade types / endpoints to latest THORNode@1.101.0 [#2475](https://github.com/thorchain/asgardex-electron/pull/2475)
+- AssetsTableCollapsable: Combine balance/price [#2478](https://github.com/thorchain/asgardex-electron/pull/2478)
 
 ## Fix
 
 - [Swap] Max. amount to swap needs to be equal to max. balances [#2448](https://github.com/thorchain/asgardex-electron/issues/2448)
+
+## Internal
+
+- Update to latest Electron@22.0.0 / TypeScript@4.9.4[#2480](https://github.com/thorchain/asgardex-electron/pull/2480)
 
 # 1.18.4 (2022-11-03)
 

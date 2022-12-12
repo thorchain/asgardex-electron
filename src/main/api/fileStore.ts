@@ -1,9 +1,9 @@
 import path from 'path'
 
-import { ipcRenderer, ipcMain } from 'electron'
+import { ipcMain } from 'electron'
 import * as fs from 'fs-extra'
 
-import { ApiFileStoreService, StorageVersion, StoreFileData, StoreFileName } from '../../shared/api/types'
+import { StorageVersion, StoreFileName } from '../../shared/api/types'
 import { getStoreFilesIPCMessages } from '../../shared/ipc/fileStore'
 import { STORAGE_DIR } from './const'
 
@@ -70,21 +70,5 @@ export const getFileStoreService = <T extends StorageVersion>(name: StoreFileNam
 
   return {
     registerIpcHandlersMain
-  }
-}
-
-/**
- * Provides real-world-to-electron public API  for
- * declared STORE_FILES_DEFAULTS (src/shared/const.ts) only
- */
-export const getFileStoreApi = <FileName extends StoreFileName>(
-  storeFileName: FileName
-): ApiFileStoreService<StoreFileData<FileName>> => {
-  const ipcMessages = getStoreFilesIPCMessages(storeFileName)
-  return {
-    save: (data) => ipcRenderer.invoke(ipcMessages.SAVE_FILE, data),
-    remove: () => ipcRenderer.invoke(ipcMessages.REMOVE_FILE),
-    get: () => ipcRenderer.invoke(ipcMessages.GET_FILE),
-    exists: () => ipcRenderer.invoke(ipcMessages.FILE_EXIST)
   }
 }

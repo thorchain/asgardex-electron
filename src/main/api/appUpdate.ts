@@ -1,5 +1,5 @@
 import * as RD from '@devexperts/remote-data-ts'
-import { ipcRenderer, ipcMain } from 'electron'
+import { ipcMain } from 'electron'
 import log from 'electron-log'
 import { autoUpdater } from 'electron-updater'
 import * as O from 'fp-ts/Option'
@@ -49,12 +49,4 @@ export const registerAppCheckUpdatedHandler = (isDev = false) => {
         })
     })
   })
-}
-
-export const checkForAppUpdates = (): Promise<AppUpdateRD> => {
-  return ipcRenderer.invoke(IPCMessages.APP_CHECK_FOR_UPDATE)
-}
-
-export const apiAppUpdate = {
-  checkForAppUpdates
 }
