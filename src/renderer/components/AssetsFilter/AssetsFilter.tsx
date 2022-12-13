@@ -1,8 +1,9 @@
-import React, { useCallback, useMemo, useState } from 'react'
+import React, { useCallback, useEffect, useMemo, useState } from 'react'
 
 import * as A from 'fp-ts/Array'
 import * as FP from 'fp-ts/function'
 import * as O from 'fp-ts/Option'
+import * as P from 'fp-ts/Predicate'
 import { useIntl } from 'react-intl'
 
 import { emptyString } from '../../helpers/stringHelper'
@@ -32,6 +33,15 @@ export const AssetsFilter: React.FC<Props> = ({ poolFilters, className, activeFi
   )
 
   const [inputValue, setInputValue] = useState(emptyString)
+
+  useEffect(() => {
+    const filter = FP.pipe(
+      oActiveFilter,
+      O.chain(O.fromPredicate(P.not(isStaticPoolFilter))),
+      O.getOrElse(() => emptyString)
+    )
+    setInputValue(filter)
+  }, [oActiveFilter])
 
   const setCustomFilter = useCallback(
     ({ target }: React.ChangeEvent<HTMLInputElement>) => {

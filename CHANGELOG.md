@@ -22,10 +22,12 @@
 - Upgrade types / endpoints to latest THORNode@1.100.0 [#2468](https://github.com/thorchain/asgardex-electron/pull/2468)
 - Upgrade types / endpoints to latest THORNode@1.101.0 [#2475](https://github.com/thorchain/asgardex-electron/pull/2475)
 - AssetsTableCollapsable: Combine balance/price [#2478](https://github.com/thorchain/asgardex-electron/pull/2478)
+- Update pools routes [#2482](https://github.com/thorchain/asgardex-electron/pull/2482)
 
 ## Fix
 
 - [Swap] Max. amount to swap needs to be equal to max. balances [#2448](https://github.com/thorchain/asgardex-electron/issues/2448)
+- [PoolsOverview] Inconsistent search state [#2483](https://github.com/thorchain/asgardex-electron/issues/2483)
 
 ## Internal
 
