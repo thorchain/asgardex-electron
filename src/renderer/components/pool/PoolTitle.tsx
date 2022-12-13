@@ -11,6 +11,7 @@ import { Network } from '../../../shared/api/types'
 import { Action as ActionButtonAction, ActionButton } from '../../components/uielements/button/ActionButton'
 import { loadingString } from '../../helpers/stringHelper'
 import * as poolsRoutes from '../../routes/pools'
+import * as saversRoutes from '../../routes/pools/savers'
 import { AssetIcon } from '../uielements/assets/assetIcon'
 import * as Styled from './PoolTitle.styles'
 
@@ -93,7 +94,7 @@ export const PoolTitle: React.FC<Props> = ({
         label: intl.formatMessage({ id: 'common.savers' }),
         disabled: !isAvailablePool || disableAllPoolActions || disableTradingPoolAction,
         callback: () => {
-          navigate(poolsRoutes.savers.path({ asset: assetToString(asset) }))
+          navigate(saversRoutes.earn.path({ asset: assetToString(asset) }))
         }
       }
     ]

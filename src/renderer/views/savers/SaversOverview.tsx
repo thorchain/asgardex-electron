@@ -35,6 +35,7 @@ import { useNetwork } from '../../hooks/useNetwork'
 import { usePoolWatchlist } from '../../hooks/usePoolWatchlist'
 import { useSynthConstants } from '../../hooks/useSynthConstants'
 import * as poolsRoutes from '../../routes/pools'
+import * as saversRoutes from '../../routes/pools/savers'
 import { PoolDetails, PoolsState } from '../../services/midgard/types'
 import type { MimirHalt } from '../../services/thorchain/types'
 import { GetPoolsPeriodEnum } from '../../types/generated/midgard'
@@ -151,7 +152,7 @@ export const SaversOverview: React.FC<Props> = (props): JSX.Element => {
     [intl]
   )
 
-  const renderBtnPoolsColumn = useCallback(
+  const renderBtnColumn = useCallback(
     (_: string, { asset }: { asset: Asset }) => {
       const chain = asset.chain
       const disableAllPoolActions = PoolHelpers.disableAllActions({ chain, haltedChains, mimirHalt })
@@ -168,14 +169,16 @@ export const SaversOverview: React.FC<Props> = (props): JSX.Element => {
 
       const disabled = disableAllPoolActions || disableTradingActions || disablePoolActions || walletLocked
 
-      const onClickHandler = () => {
-        navigate(poolsRoutes.savers.path({ asset: assetToString(asset) }))
+      const onClickHandler = (event: React.MouseEvent<HTMLElement, MouseEvent>) => {
+        event.preventDefault()
+        event.stopPropagation()
+        navigate(saversRoutes.earn.path({ asset: assetToString(asset) }))
       }
 
       return (
         <div className="flex items-center justify-center">
           <FlatButton className="min-w-[120px]" disabled={disabled} size="normal" onClick={onClickHandler}>
-            {intl.formatMessage({ id: 'common.earn' })}
+            {intl.formatMessage({ id: 'common.manage' })}
           </FlatButton>
         </div>
       )
@@ -193,9 +196,9 @@ export const SaversOverview: React.FC<Props> = (props): JSX.Element => {
         iconOnly: !isDesktopView
       }),
       width: 280,
-      render: renderBtnPoolsColumn
+      render: renderBtnColumn
     }),
-    [refreshHandler, intl, renderBtnPoolsColumn, isDesktopView]
+    [refreshHandler, intl, renderBtnColumn, isDesktopView]
   )
 
   const desktopColumns: ColumnsType<SaversTableRowData> = useMemo(

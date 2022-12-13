@@ -1,4 +1,4 @@
-import { base, deposit, swap, detail, savers } from './index'
+import { base, pending, active, deposit, swap, detail } from './index'
 
 describe('Pools routes', () => {
   describe('base route', () => {
@@ -7,6 +7,24 @@ describe('Pools routes', () => {
     })
     it('path', () => {
       expect(base.path()).toEqual('/pools')
+    })
+  })
+
+  describe('active', () => {
+    it('template', () => {
+      expect(active.template).toEqual('/pools/active')
+    })
+    it('path', () => {
+      expect(active.path()).toEqual('/pools/active')
+    })
+  })
+
+  describe('pending', () => {
+    it('template', () => {
+      expect(pending.template).toEqual('/pools/pending')
+    })
+    it('path', () => {
+      expect(pending.path()).toEqual('/pools/pending')
     })
   })
 
@@ -19,18 +37,6 @@ describe('Pools routes', () => {
     })
     it('redirects to base path if asset is empty', () => {
       expect(deposit.path({ asset: '' })).toEqual('/pools/deposit')
-    })
-  })
-
-  describe('Savers routes', () => {
-    it('template', () => {
-      expect(savers.template).toEqual('/pools/savers/:asset')
-    })
-    it('returns path by given asset parameter', () => {
-      expect(savers.path({ asset: 'BNB.BNB' })).toEqual('/pools/savers/bnb.bnb')
-    })
-    it('redirects to base path if asset is empty', () => {
-      expect(savers.path({ asset: '' })).toEqual('/pools/savers')
     })
   })
 

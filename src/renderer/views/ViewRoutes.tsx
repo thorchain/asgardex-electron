@@ -5,6 +5,7 @@ import { Navigate, Route, Routes, useLocation } from 'react-router-dom'
 import * as appRoutes from '../routes/app'
 import * as playgroundRoutes from '../routes/playground'
 import * as poolsRoutes from '../routes/pools'
+import * as saversRoutes from '../routes/pools/savers'
 import * as walletRoutes from '../routes/wallet'
 import { AppSettingsView } from './app/AppSettingsView'
 import { DepositView } from './deposit/DepositView'
@@ -37,9 +38,14 @@ export const ViewRoutes: React.FC<{}> = (): JSX.Element => {
       <Route path={appRoutes.base.template} element={<Navigate to={poolsRoutes.base.path()} />} />
       {/* pool routes */}
       <Route path={poolsRoutes.base.template} element={<PoolsOverview />} />
+      <Route path={poolsRoutes.active.template} element={<PoolsOverview />} />
+      <Route path={poolsRoutes.pending.template} element={<PoolsOverview />} />
+      <Route path={poolsRoutes.savers.template} element={<PoolsOverview />} />
+
       <Route path={poolsRoutes.detail.template} element={<PoolDetailsView />} />
       <Route path={poolsRoutes.swap.template} element={<SwapView />} />
-      <Route path={poolsRoutes.savers.template} element={<SaversView />} />
+      <Route path={saversRoutes.earn.template} element={<SaversView />} />
+      <Route path={saversRoutes.withdraw.template} element={<SaversView />} />
       <Route
         path={poolsRoutes.deposit.template}
         element={

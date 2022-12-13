@@ -5,7 +5,7 @@ import { Asset, assetToString } from '@xchainjs/xchain-util'
 import { useIntl } from 'react-intl'
 import { useNavigate } from 'react-router-dom'
 
-import * as poolsRoutes from '../../../routes/pools'
+import * as saversRoutes from '../../../routes/pools/savers'
 import { FlatButton } from './FlatButton'
 import type { Props as ButtonProps } from './FlatButton'
 
@@ -21,7 +21,7 @@ export const SaversButton: React.FC<Props> = ({ asset, isTextView, ...otherProps
     (event: React.MouseEvent<HTMLElement, MouseEvent>) => {
       event.preventDefault()
       event.stopPropagation()
-      navigate(poolsRoutes.savers.path({ asset: assetToString(asset) }))
+      navigate(saversRoutes.earn.path({ asset: assetToString(asset) }))
     },
     [asset, navigate]
   )
