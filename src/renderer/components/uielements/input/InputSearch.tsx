@@ -1,4 +1,4 @@
-import React, { forwardRef, useCallback, useState } from 'react'
+import React, { forwardRef, useCallback, useEffect, useState } from 'react'
 
 import { MagnifyingGlassIcon, XMarkIcon } from '@heroicons/react/24/outline'
 import * as FP from 'fp-ts/lib/function'
@@ -8,11 +8,15 @@ import { BaseButton } from '../button'
 import { Size } from '../input'
 import { Input, InputProps } from './Input'
 
-export type Props = { classNameInput?: string; onSearch?: (searchTxt: string) => void } & Omit<InputProps, 'uppercase'>
+export type Props = { value?: string; classNameInput?: string; onSearch?: (searchTxt: string) => void } & Omit<
+  InputProps,
+  'uppercase' | 'value'
+>
 
 export const InputSearch = forwardRef<HTMLInputElement, Props>((props, ref): JSX.Element => {
   const {
     id = 'input-search',
+    value = '',
     size = 'normal',
     disabled = false,
     error = false,
@@ -25,7 +29,11 @@ export const InputSearch = forwardRef<HTMLInputElement, Props>((props, ref): JSX
     ...otherProps
   } = props
 
-  const [searchTxt, setSearchTxt] = useState(emptyString)
+  useEffect(() => {
+    setSearchTxt(value)
+  }, [value])
+
+  const [searchTxt, setSearchTxt] = useState(value)
 
   const onChangeHandler = useCallback(
     (event: React.ChangeEvent<HTMLInputElement>) => {
