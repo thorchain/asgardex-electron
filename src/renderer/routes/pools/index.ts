@@ -5,7 +5,9 @@ import * as saversRoutes from './savers'
 import * as swapRoutes from './swap'
 
 export const base = baseRoutes.base
+export const pending = baseRoutes.pending
+export const active = baseRoutes.active
 export const deposit = depositRoutes.deposit
-export const savers = saversRoutes.savers
+export const savers = saversRoutes.base
 export const swap = swapRoutes.swap
 export const detail = poolDetailRoutes.poolDetail

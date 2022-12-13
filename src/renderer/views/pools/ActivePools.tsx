@@ -34,6 +34,7 @@ import { usePoolFilter } from '../../hooks/usePoolFilter'
 import { usePoolWatchlist } from '../../hooks/usePoolWatchlist'
 import { useProtocolLimit } from '../../hooks/useProtocolLimit'
 import * as poolsRoutes from '../../routes/pools'
+import * as saversRoutes from '../../routes/pools/savers'
 import { DEFAULT_NETWORK } from '../../services/const'
 import { PoolsState, DEFAULT_POOL_FILTERS } from '../../services/midgard/types'
 import { GetPoolsPeriodEnum } from '../../types/generated/midgard'
@@ -111,7 +112,7 @@ export const ActivePools: React.FC<PoolsComponentProps> = ({ haltedChains, mimir
           label: intl.formatMessage({ id: 'common.earn' }),
           disabled: disableAllPoolActions || disableTradingActions,
           callback: () => {
-            navigate(poolsRoutes.savers.path({ asset: assetToString(asset) }))
+            navigate(saversRoutes.earn.path({ asset: assetToString(asset) }))
           }
         }
       ]
