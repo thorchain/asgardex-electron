@@ -13,7 +13,7 @@ import * as RxOp from 'rxjs/operators'
 
 import { Deposit } from '../../components/deposit/Deposit'
 import { ErrorView } from '../../components/shared/error'
-import { RefreshButton } from '../../components/uielements/button'
+import { BackLinkButton, RefreshButton } from '../../components/uielements/button'
 import { useChainContext } from '../../contexts/ChainContext'
 import { useMidgardContext } from '../../contexts/MidgardContext'
 import { useThorchainContext } from '../../contexts/ThorchainContext'
@@ -27,7 +27,6 @@ import { DepositRouteParams } from '../../routes/pools/deposit'
 import { AssetWithDecimalLD, AssetWithDecimalRD } from '../../services/chain/types'
 import { PoolDetailRD, PoolSharesLD, PoolSharesRD } from '../../services/midgard/types'
 import { SymDepositView } from './add/SymDepositView'
-import * as Styled from './DepositView.styles'
 import { ShareView } from './share/ShareView'
 import { WithdrawDepositView } from './withdraw/WithdrawDepositView'
 
@@ -151,19 +150,22 @@ export const DepositView: React.FC<Props> = () => {
 
   const renderTopContent = useMemo(
     () => (
-      <Styled.TopControlsContainer>
-        <Styled.BackLink />
-        <RefreshButton disabled={refreshButtonDisabled} clickHandler={reloadHandler} />
-      </Styled.TopControlsContainer>
+      <div className="relative mb-20px flex items-center justify-between">
+        <BackLinkButton className="absolute !m-0" />
+        <h2 className="m-0 w-full text-center font-mainSemiBold text-16 uppercase text-turquoise">
+          {intl.formatMessage({ id: 'common.liquidity' })}
+        </h2>
+        <RefreshButton className="absolute right-0" disabled={refreshButtonDisabled} clickHandler={reloadHandler} />
+      </div>
     ),
-    [refreshButtonDisabled, reloadHandler]
+    [intl, refreshButtonDisabled, reloadHandler]
   )
 
   const renderLoadingContent = useMemo(
     () => (
-      <Styled.Container>
+      <div className="flex h-screen w-full items-center justify-center bg-bg0 dark:bg-bg0d">
         <Spin size="large" />
-      </Styled.Container>
+      </div>
     ),
     []
   )

@@ -255,23 +255,21 @@ const SuccessRouteView: React.FC<Props> = ({ sourceAsset, targetAsset }): JSX.El
 
   return (
     <>
-      <div className="mb-20px flex items-center justify-between">
-        <BackLinkButton className="!m-0" />
-        <RefreshButton clickHandler={reloadHandler} />
+      <div className="relative mb-20px flex items-center justify-between">
+        <BackLinkButton className="absolute !m-0" />
+        <h2 className="m-0 w-full text-center font-mainSemiBold text-16 uppercase text-turquoise">
+          {intl.formatMessage({ id: 'common.swap' })}
+        </h2>
+        <RefreshButton className="absolute right-0" clickHandler={reloadHandler} />
       </div>
 
-      <div className="flex flex-col items-center justify-center bg-bg0 dark:bg-bg0d">
-        <div className="flex w-full justify-center border-b border-gray1 dark:border-gray1d">
-          <div className="border-b-[2px] border-turquoise py-10px px-10px font-mainSemiBold text-[16px] uppercase text-turquoise ">
-            {intl.formatMessage({ id: 'common.swap' })}
-          </div>
-        </div>
+      <div className="flex justify-center bg-bg0 dark:bg-bg0d">
         {FP.pipe(
           sequenceTRD(poolsState, sourceAssetRD, targetAssetRD),
           RD.fold(
             () => <></>,
             () => (
-              <div className="flex min-h-[400px] items-center justify-center">
+              <div className="h-min-full flex items-center justify-center">
                 <Spin size="large" />
               </div>
             ),
