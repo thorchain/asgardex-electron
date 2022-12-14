@@ -2,7 +2,7 @@ import { Fragment, useCallback, useMemo } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
 import { Tab } from '@headlessui/react'
-import { Asset, assetToString } from '@xchainjs/xchain-util'
+import { Asset, assetToString, baseAmount } from '@xchainjs/xchain-util'
 import * as A from 'fp-ts/lib/Array'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
@@ -11,6 +11,7 @@ import { useIntl } from 'react-intl'
 import { useMatch, useNavigate, useParams } from 'react-router-dom'
 
 import { AddSavers } from '../../components/savers/AddSavers'
+import { SaversDetails } from '../../components/savers/SaversDetails'
 import { WithdrawSavers } from '../../components/savers/WithdrawSavers'
 import { ErrorView } from '../../components/shared/error'
 import { Spin } from '../../components/shared/loading'
@@ -19,25 +20,23 @@ import { useChainContext } from '../../contexts/ChainContext'
 import { useMidgardContext } from '../../contexts/MidgardContext'
 import { getAssetFromNullableString } from '../../helpers/assetHelper'
 import { sequenceTRD } from '../../helpers/fpHelpers'
+import { RUNE_PRICE_POOL } from '../../helpers/poolHelper'
 import { useNetwork } from '../../hooks/useNetwork'
 import * as poolsRoutes from '../../routes/pools'
 import { SaversRouteParams } from '../../routes/pools/savers'
 import * as saversRoutes from '../../routes/pools/savers'
 import { AssetWithDecimalLD, AssetWithDecimalRD } from '../../services/chain/types'
+import { BaseAmountRD } from '../../types'
 
-type TabType = 'add' | 'withdraw'
-
-type TabData = {
-  index: number
-  key: TabType
-  label: string
+enum TabIndex {
+  ADD = 0,
+  WITHDRAW = 1
 }
 
-/* <div className="flex w-full justify-center border-b border-gray1 dark:border-gray1d">
-<div className="border-b-[2px] border-turquoise py-10px px-10px font-mainSemiBold text-[16px] uppercase text-turquoise ">
-  {intl.formatMessage({ id: 'common.swap' })}
-</div>
-</div> */
+type TabData = {
+  index: TabIndex
+  label: string
+}
 
 type Props = { asset: Asset }
 
@@ -61,11 +60,16 @@ const Content: React.FC<Props> = ({ asset }): JSX.Element => {
 
   const {
     service: {
-      pools: { poolsState$, reloadPools }
+      pools: { poolsState$, reloadPools, selectedPricePool$ }
     }
   } = useMidgardContext()
 
+  const pricePool = useObservableState(selectedPricePool$, RUNE_PRICE_POOL)
+
   const poolsState = useObservableState(poolsState$, RD.initial)
+
+  // TODO(@veado) Get fees
+  const feesRD: BaseAmountRD = RD.success(baseAmount(123000))
 
   const renderError = useCallback(
     (e: Error) => (
@@ -87,24 +91,22 @@ const Content: React.FC<Props> = ({ asset }): JSX.Element => {
 
   const selectedIndex: number = useMemo(() => {
     if (matchAddRoute) {
-      return 0
+      return TabIndex.ADD
     } else if (matchWithdrawRoute) {
-      return 1
+      return TabIndex.WITHDRAW
     } else {
-      return 0
+      return TabIndex.ADD
     }
   }, [matchAddRoute, matchWithdrawRoute])
 
   const tabs = useMemo(
     (): TabData[] => [
       {
-        index: 0,
-        key: 'add',
-        label: intl.formatMessage({ id: 'common.add' })
+        index: TabIndex.ADD,
+        label: intl.formatMessage({ id: 'common.earn' })
       },
       {
-        index: 1,
-        key: 'withdraw',
+        index: TabIndex.WITHDRAW,
         label: intl.formatMessage({ id: 'common.withdraw' })
       }
     ],
@@ -135,18 +137,18 @@ const Content: React.FC<Props> = ({ asset }): JSX.Element => {
             ([_, assetWD]) => {
               const getTabContentByIndex = (index: number) => {
                 switch (index) {
-                  case 0:
-                    return <AddSavers network={network} asset={assetWD} />
-                  case 1:
-                    return <WithdrawSavers network={network} asset={assetWD} />
+                  case TabIndex.ADD:
+                    return <AddSavers network={network} asset={assetWD} pricePool={pricePool} fees={feesRD} />
+                  case TabIndex.WITHDRAW:
+                    return <WithdrawSavers network={network} asset={assetWD} pricePool={pricePool} fees={feesRD} />
                   default:
-                    return null
+                    return <>`Unknown tab content (index ${index})`</>
                 }
               }
               return (
                 <div className="flex min-h-full w-full">
-                  <div className="flex min-h-full w-full flex-col md:flex-row">
-                    <div className="min-h-auto flex w-full flex-col bg-bg0 dark:bg-bg0d md:min-h-full md:w-2/3">
+                  <div className="flex min-h-full w-full flex-col lg:flex-row">
+                    <div className="min-h-auto flex w-full flex-col bg-bg0 dark:bg-bg0d lg:min-h-full lg:w-2/3">
                       <Tab.Group
                         selectedIndex={selectedIndex}
                         onChange={(index) => {
@@ -197,7 +199,7 @@ const Content: React.FC<Props> = ({ asset }): JSX.Element => {
                             ))
                           )}
                         </Tab.List>
-                        <Tab.Panels className="mt-2 w-full">
+                        <Tab.Panels className="mt-2 flex w-full justify-center">
                           {FP.pipe(
                             tabs,
                             A.map(({ index }) => (
@@ -207,8 +209,8 @@ const Content: React.FC<Props> = ({ asset }): JSX.Element => {
                         </Tab.Panels>
                       </Tab.Group>
                     </div>
-                    <div className="min-h-auto ml-0 flex w-full bg-bg0 dark:bg-bg0d md:ml-20px md:min-h-full md:w-1/3">
-                      Earnings
+                    <div className="min-h-auto mt-20px ml-0 flex w-full bg-bg0 dark:bg-bg0d lg:mt-0 lg:ml-20px lg:min-h-full lg:w-1/3">
+                      <SaversDetails asset={asset} />
                     </div>
                   </div>
                 </div>
