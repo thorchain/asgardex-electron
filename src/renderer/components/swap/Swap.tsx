@@ -1630,7 +1630,7 @@ export const Swap = ({
   const [showDetails, setShowDetails] = useState<boolean>(false)
 
   return (
-    <div className="flex w-full max-w-[500px] flex-col justify-between py-[60px]">
+    <div className="my-50px flex w-full max-w-[500px] flex-col justify-between">
       <div>
         <div className="flex flex-col">
           {/* Note: Input value is shown as AssetAmount */}
