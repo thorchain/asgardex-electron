@@ -8,8 +8,9 @@
 - Add 'x-client-id' header to send ASGDX' identifier for any request to 9R servers [#2463](https://github.com/thorchain/asgardex-electron/issues/2463), [#2464](https://github.com/thorchain/asgardex-electron/pull/2464), [#2474](https://github.com/thorchain/asgardex-electron/pull/2474)
 - [Savers] Routes [#2450](https://github.com/thorchain/asgardex-electron/pull/2450)
 - Add wallet actions to assets table [#2455](https://github.com/thorchain/asgardex-electron/pull/2455)
-- Savers overview [#2466](https://github.com/thorchain/asgardex-electron/pull/2466), [#2470](https://github.com/thorchain/asgardex-electron/pull/2470), (#2479)[https://github.com/thorchain/asgardex-electron/pull/2479]
+- Savers overview [#2466](https://github.com/thorchain/asgardex-electron/pull/2466), [#2470](https://github.com/thorchain/asgardex-electron/pull/2470), [#2479](https://github.com/thorchain/asgardex-electron/pull/2479)
 - Display APY/APR depending on days [#2477](https://github.com/thorchain/asgardex-electron/pull/2477)
+- [Savers] UI [#2485](https://github.com/thorchain/asgardex-electron/pull/2485)
 
 ## Update
 

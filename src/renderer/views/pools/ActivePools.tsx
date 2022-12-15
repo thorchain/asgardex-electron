@@ -25,6 +25,7 @@ import { ProtocolLimit, IncentivePendulum } from '../../components/pool'
 import { Action as ActionButtonAction, ActionButton } from '../../components/uielements/button/ActionButton'
 import { PoolsPeriodSelector } from '../../components/uielements/pools/PoolsPeriodSelector'
 import { Table } from '../../components/uielements/table'
+import { DEFAULT_WALLET_TYPE } from '../../const'
 import { useAppContext } from '../../contexts/AppContext'
 import { useMidgardContext } from '../../contexts/MidgardContext'
 import { ordBaseAmount, ordNumber } from '../../helpers/fp/ord'
@@ -112,7 +113,7 @@ export const ActivePools: React.FC<PoolsComponentProps> = ({ haltedChains, mimir
           label: intl.formatMessage({ id: 'common.earn' }),
           disabled: disableAllPoolActions || disableTradingActions,
           callback: () => {
-            navigate(saversRoutes.earn.path({ asset: assetToString(asset) }))
+            navigate(saversRoutes.earn.path({ asset: assetToString(asset), walletType: DEFAULT_WALLET_TYPE }))
           }
         }
       ]

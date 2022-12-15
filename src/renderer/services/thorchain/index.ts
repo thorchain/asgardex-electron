@@ -33,7 +33,9 @@ const {
   mimir$,
   reloadMimir,
   getLiquidityProviders,
-  reloadLiquidityProviders
+  reloadLiquidityProviders,
+  getSaverProvider$,
+  reloadSaverProvider
 } = createThornodeService$(network$, clientUrl$)
 
 const { txs$, tx$, txStatus$, subscribeTx, resetTx, sendTx, txRD$, sendPoolTx$ } = createTransactionService(
@@ -84,5 +86,7 @@ export {
   mimir$,
   reloadMimir,
   getLiquidityProviders,
-  reloadLiquidityProviders
+  reloadLiquidityProviders,
+  getSaverProvider$,
+  reloadSaverProvider
 }

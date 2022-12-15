@@ -3,6 +3,7 @@ import React, { useCallback, useMemo, useState } from 'react'
 import * as RD from '@devexperts/remote-data-ts'
 import { ArrowPathIcon, MagnifyingGlassMinusIcon, MagnifyingGlassPlusIcon } from '@heroicons/react/24/outline'
 import {
+  Address,
   Asset,
   assetAmount,
   BaseAmount,
@@ -30,6 +31,7 @@ export const ASSET_SELECT_BUTTON_WIDTH = 'w-[180px]'
 
 export type Props = {
   asset: AssetWithDecimal
+  address: Address
   network: Network
   pricePool: PricePool
   fees: BaseAmountRD
