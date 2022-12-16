@@ -11,6 +11,7 @@ import { isLedgerWallet } from '../../shared/utils/guard'
 import { WalletType } from '../../shared/wallet/types'
 import { useChainContext } from '../contexts/ChainContext'
 import { useWalletContext } from '../contexts/WalletContext'
+import { eqSymDepositAddresses } from '../helpers/fp/eq'
 import { INITIAL_SYM_DEPOSIT_ADDRESSES } from '../services/chain/const'
 import { SymDepositAddresses } from '../services/chain/types'
 import { ledgerAddressToWalletAddress } from '../services/wallet/util'
@@ -23,7 +24,10 @@ import { ledgerAddressToWalletAddress } from '../services/wallet/util'
 export const useSymDepositAddresses = (oAsset: O.Option<Asset>) => {
   const { addressByChain$, symDepositAddresses$, setSymDepositAddresses } = useChainContext()
 
-  const symDepositAddresses = useObservableState(symDepositAddresses$, INITIAL_SYM_DEPOSIT_ADDRESSES)
+  const [symDepositAddresses] = useObservableState(
+    () => FP.pipe(symDepositAddresses$, RxOp.distinctUntilChanged(eqSymDepositAddresses.equals)),
+    INITIAL_SYM_DEPOSIT_ADDRESSES
+  )
 
   const { getLedgerAddress$ } = useWalletContext()
 
@@ -61,14 +65,15 @@ export const useSymDepositAddresses = (oAsset: O.Option<Asset>) => {
       INITIAL_SYM_DEPOSIT_ADDRESSES
     )
 
-  const assetLedgerAddress = useObservableState(
-    FP.pipe(
-      oAsset,
-      O.fold(
-        () => Rx.of(O.none),
-        ({ chain }) => FP.pipe(getLedgerAddress$(chain), RxOp.map(O.map(ledgerAddressToWalletAddress)))
-      )
-    ),
+  const [assetLedgerAddress] = useObservableState(
+    () =>
+      FP.pipe(
+        oAsset,
+        O.fold(
+          () => Rx.of(O.none),
+          ({ chain }) => FP.pipe(getLedgerAddress$(chain), RxOp.map(O.map(ledgerAddressToWalletAddress)))
+        )
+      ),
     O.none
   )
 
