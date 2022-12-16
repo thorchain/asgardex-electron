@@ -29,6 +29,7 @@
 
 - [Swap] Max. amount to swap needs to be equal to max. balances [#2448](https://github.com/thorchain/asgardex-electron/issues/2448)
 - [PoolsOverview] Inconsistent search state [#2483](https://github.com/thorchain/asgardex-electron/issues/2483)
+- [Deposit] Maximum update depth exceeded [#2487](https://github.com/thorchain/asgardex-electron/issues/2487)
 
 ## Internal
 
