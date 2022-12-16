@@ -4,6 +4,7 @@ import * as RD from '@devexperts/remote-data-ts'
 import { Tab } from '@headlessui/react'
 import { Address, Asset, assetToString, baseAmount, Chain } from '@xchainjs/xchain-util'
 import * as A from 'fp-ts/lib/Array'
+import * as Eq from 'fp-ts/lib/Eq'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
 import { useObservableState } from 'observable-hooks'
@@ -24,6 +25,7 @@ import { useMidgardContext } from '../../contexts/MidgardContext'
 import { useThorchainContext } from '../../contexts/ThorchainContext'
 import { useWalletContext } from '../../contexts/WalletContext'
 import { getAssetFromNullableString } from '../../helpers/assetHelper'
+import { eqChain, eqNetwork, eqWalletType } from '../../helpers/fp/eq'
 import { sequenceTOption, sequenceTRD } from '../../helpers/fpHelpers'
 import { RUNE_PRICE_POOL } from '../../helpers/poolHelper'
 import { addressFromOptionalWalletAddress } from '../../helpers/walletHelper'
@@ -46,6 +48,18 @@ type TabData = {
   label: string
 }
 
+type UpdateAddress = {
+  walletType: WalletType
+  chain: Chain
+  network: Network /* network is needed to re-trigger stream in case of network changes */
+}
+
+const eqUpdateAddress = Eq.struct<UpdateAddress>({
+  walletType: eqWalletType,
+  chain: eqChain,
+  network: eqNetwork
+})
+
 type Props = { asset: Asset; walletType: WalletType }
 
 const Content: React.FC<Props> = (props): JSX.Element => {
@@ -67,18 +81,12 @@ const Content: React.FC<Props> = (props): JSX.Element => {
 
   const assetRD: AssetWithDecimalRD = useObservableState(assetDecimal$, RD.initial)
 
-  const [addressRD, updateAddress$] = useObservableState<
-    RD.RemoteData<Error, Address>,
-    {
-      walletType: WalletType
-      chain: Chain
-      network: Network /* network is needed to re-trigger stream in case of network changes */
-    }
-  >(
+  const [addressRD, updateAddress$] = useObservableState<RD.RemoteData<Error, Address>, UpdateAddress>(
     (updated$) =>
       FP.pipe(
         updated$,
         RxOp.debounceTime(300),
+        RxOp.distinctUntilChanged(eqUpdateAddress.equals),
         RxOp.switchMap(({ walletType, chain }) =>
           isLedgerWallet(walletType)
             ? FP.pipe(getLedgerAddress$(chain), RxOp.map(O.map(ledgerAddressToWalletAddress)))

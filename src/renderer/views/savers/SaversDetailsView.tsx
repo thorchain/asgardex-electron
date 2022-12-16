@@ -1,7 +1,8 @@
-import React, { useEffect, useMemo } from 'react'
+import React, { useEffect } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
 import { Address, Asset } from '@xchainjs/xchain-util'
+import * as Eq from 'fp-ts/lib/Eq'
 import * as FP from 'fp-ts/lib/function'
 import { useObservableState } from 'observable-hooks'
 import { useIntl } from 'react-intl'
@@ -12,12 +13,20 @@ import { ErrorView } from '../../components/shared/error'
 import { Spin } from '../../components/shared/loading'
 import { FlatButton } from '../../components/uielements/button'
 import { useThorchainContext } from '../../contexts/ThorchainContext'
+import { eqAsset, eqString } from '../../helpers/fp/eq'
 import { SaverProviderRD } from '../../services/thorchain/types'
 
 type Props = {
   asset: Asset
   address: Address
 }
+
+type UpdateSaverProvider = { address: Address; asset: Asset }
+
+const eqUpdateSaverProvider = Eq.struct<UpdateSaverProvider>({
+  address: eqString,
+  asset: eqAsset
+})
 
 export const SaversDetailsView: React.FC<Props> = (props): JSX.Element => {
   const { asset, address } = props
@@ -34,6 +43,7 @@ export const SaversDetailsView: React.FC<Props> = (props): JSX.Element => {
       FP.pipe(
         updated$,
         RxOp.debounceTime(300),
+        RxOp.distinctUntilChanged(eqUpdateSaverProvider.equals),
         RxOp.switchMap(({ address, asset }) => getSaverProvider$(asset, address))
       ),
     RD.initial
@@ -43,26 +53,17 @@ export const SaversDetailsView: React.FC<Props> = (props): JSX.Element => {
     updateSaverProvider$({ address, asset })
   }, [address, asset, updateSaverProvider$])
 
-  const renderNoSavings = useMemo(
-    () => (
-      <div className="flex h-full w-full items-center justify-center">
-        {intl.formatMessage({
-          id: 'deposit.pool.noShares'
-        })}
-      </div>
-    ),
-    [intl]
+  const renderLoading = () => (
+    <div className="flex h-full w-full items-center justify-center">
+      <Spin size="default" />,
+    </div>
   )
 
   return FP.pipe(
     saverProviderRD,
     RD.fold(
-      () => renderNoSavings,
-      () => (
-        <div className="flex h-full w-full items-center justify-center">
-          <Spin size="default" />,
-        </div>
-      ),
+      () => renderLoading(),
+      () => renderLoading(),
       (error) => (
         <ErrorView
           title={intl.formatMessage({ id: 'common.error' })}
