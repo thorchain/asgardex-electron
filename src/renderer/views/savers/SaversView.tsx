@@ -1,32 +1,42 @@
-import { Fragment, useCallback, useMemo } from 'react'
+import { Fragment, useCallback, useEffect, useMemo } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
 import { Tab } from '@headlessui/react'
-import { Asset, assetToString, baseAmount } from '@xchainjs/xchain-util'
+import { Address, Asset, assetToString, baseAmount, Chain } from '@xchainjs/xchain-util'
 import * as A from 'fp-ts/lib/Array'
+import * as Eq from 'fp-ts/lib/Eq'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
 import { useObservableState } from 'observable-hooks'
 import { useIntl } from 'react-intl'
 import { useMatch, useNavigate, useParams } from 'react-router-dom'
+import * as RxOp from 'rxjs/operators'
 
+import { Network } from '../../../shared/api/types'
+import { isLedgerWallet, isWalletType } from '../../../shared/utils/guard'
+import { WalletType } from '../../../shared/wallet/types'
 import { AddSavers } from '../../components/savers/AddSavers'
-import { SaversDetails } from '../../components/savers/SaversDetails'
 import { WithdrawSavers } from '../../components/savers/WithdrawSavers'
 import { ErrorView } from '../../components/shared/error'
 import { Spin } from '../../components/shared/loading'
 import { BackLinkButton, FlatButton, RefreshButton } from '../../components/uielements/button'
 import { useChainContext } from '../../contexts/ChainContext'
 import { useMidgardContext } from '../../contexts/MidgardContext'
+import { useThorchainContext } from '../../contexts/ThorchainContext'
+import { useWalletContext } from '../../contexts/WalletContext'
 import { getAssetFromNullableString } from '../../helpers/assetHelper'
-import { sequenceTRD } from '../../helpers/fpHelpers'
-import { RUNE_PRICE_POOL } from '../../helpers/poolHelper'
+import { eqChain, eqNetwork, eqWalletType } from '../../helpers/fp/eq'
+import { sequenceTOption, sequenceTRD } from '../../helpers/fpHelpers'
+import { addressFromOptionalWalletAddress } from '../../helpers/walletHelper'
 import { useNetwork } from '../../hooks/useNetwork'
+import { usePricePool } from '../../hooks/usePricePool'
 import * as poolsRoutes from '../../routes/pools'
 import { SaversRouteParams } from '../../routes/pools/savers'
 import * as saversRoutes from '../../routes/pools/savers'
 import { AssetWithDecimalLD, AssetWithDecimalRD } from '../../services/chain/types'
+import { ledgerAddressToWalletAddress } from '../../services/wallet/util'
 import { BaseAmountRD } from '../../types'
+import { SaversDetailsView } from './SaversDetailsView'
 
 enum TabIndex {
   ADD = 0,
@@ -38,18 +48,31 @@ type TabData = {
   label: string
 }
 
-type Props = { asset: Asset }
+type UpdateAddress = {
+  walletType: WalletType
+  chain: Chain
+  network: Network /* network is needed to re-trigger stream in case of network changes */
+}
 
-const Content: React.FC<Props> = ({ asset }): JSX.Element => {
+const eqUpdateAddress = Eq.struct<UpdateAddress>({
+  walletType: eqWalletType,
+  chain: eqChain,
+  network: eqNetwork
+})
+
+type Props = { asset: Asset; walletType: WalletType }
+
+const Content: React.FC<Props> = (props): JSX.Element => {
+  const { asset, walletType } = props
   const intl = useIntl()
 
   const navigate = useNavigate()
 
   const { network } = useNetwork()
 
-  const reloadHandler = useCallback(() => {}, [])
-
-  const { assetWithDecimal$ } = useChainContext()
+  const { reloadSaverProvider } = useThorchainContext()
+  const { assetWithDecimal$, addressByChain$ } = useChainContext()
+  const { reloadBalancesByChain, getLedgerAddress$ } = useWalletContext()
 
   const assetDecimal$: AssetWithDecimalLD = useMemo(
     () => assetWithDecimal$(asset, network),
@@ -58,22 +81,49 @@ const Content: React.FC<Props> = ({ asset }): JSX.Element => {
 
   const assetRD: AssetWithDecimalRD = useObservableState(assetDecimal$, RD.initial)
 
+  const [addressRD, updateAddress$] = useObservableState<RD.RemoteData<Error, Address>, UpdateAddress>(
+    (updated$) =>
+      FP.pipe(
+        updated$,
+        RxOp.debounceTime(300),
+        RxOp.distinctUntilChanged(eqUpdateAddress.equals),
+        RxOp.switchMap(({ walletType, chain }) =>
+          isLedgerWallet(walletType)
+            ? FP.pipe(getLedgerAddress$(chain), RxOp.map(O.map(ledgerAddressToWalletAddress)))
+            : addressByChain$(chain)
+        ),
+        RxOp.map(addressFromOptionalWalletAddress),
+        RxOp.map((oAddress) => RD.fromOption(oAddress, () => new Error(`Could not get address for ${walletType}`)))
+      ),
+    RD.initial
+  )
+
+  useEffect(() => {
+    updateAddress$({ chain: asset.chain, network, walletType })
+  }, [network, asset.chain, walletType, updateAddress$])
+
   const {
     service: {
-      pools: { poolsState$, reloadPools, selectedPricePool$ }
+      pools: { poolsState$, reloadPools }
     }
   } = useMidgardContext()
 
-  const pricePool = useObservableState(selectedPricePool$, RUNE_PRICE_POOL)
+  const pricePool = usePricePool()
 
-  const poolsState = useObservableState(poolsState$, RD.initial)
+  const poolsStateRD = useObservableState(poolsState$, RD.initial)
 
   // TODO(@veado) Get fees
   const feesRD: BaseAmountRD = RD.success(baseAmount(123000))
 
+  const reloadHandler = useCallback(() => {
+    reloadBalancesByChain(asset.chain)
+    reloadSaverProvider()
+  }, [asset.chain, reloadBalancesByChain, reloadSaverProvider])
+
   const renderError = useCallback(
     (e: Error) => (
       <ErrorView
+        className="flex h-full w-full justify-center"
         title={intl.formatMessage({ id: 'common.error' })}
         subTitle={e?.message ?? e.toString()}
         extra={
@@ -86,8 +136,14 @@ const Content: React.FC<Props> = ({ asset }): JSX.Element => {
     [intl, reloadPools]
   )
 
-  const matchAddRoute = useMatch({ path: saversRoutes.earn.path({ asset: assetToString(asset) }), end: false })
-  const matchWithdrawRoute = useMatch({ path: saversRoutes.withdraw.path({ asset: assetToString(asset) }), end: false })
+  const matchAddRoute = useMatch({
+    path: saversRoutes.earn.path({ asset: assetToString(asset), walletType }),
+    end: false
+  })
+  const matchWithdrawRoute = useMatch({
+    path: saversRoutes.withdraw.path({ asset: assetToString(asset), walletType }),
+    end: false
+  })
 
   const selectedIndex: number = useMemo(() => {
     if (matchAddRoute) {
@@ -113,6 +169,15 @@ const Content: React.FC<Props> = ({ asset }): JSX.Element => {
     [intl]
   )
 
+  const renderLoading = useMemo(
+    () => (
+      <div className="flex min-h-full items-center justify-center">
+        <Spin size="large" />
+      </div>
+    ),
+    []
+  )
+
   return (
     <>
       <div className=" relative mb-20px flex items-center justify-between">
@@ -125,39 +190,51 @@ const Content: React.FC<Props> = ({ asset }): JSX.Element => {
 
       <div className="flex h-screen flex-col items-center justify-center ">
         {FP.pipe(
-          sequenceTRD(poolsState, assetRD),
+          sequenceTRD(poolsStateRD, assetRD, addressRD),
           RD.fold(
-            () => <></>,
-            () => (
-              <div className="flex min-h-full items-center justify-center">
-                <Spin size="large" />
-              </div>
-            ),
+            () => renderLoading,
+            () => renderLoading,
             renderError,
-            ([_, assetWD]) => {
+            ([{ poolDetails }, assetWD, address]) => {
               const getTabContentByIndex = (index: number) => {
                 switch (index) {
                   case TabIndex.ADD:
-                    return <AddSavers network={network} asset={assetWD} pricePool={pricePool} fees={feesRD} />
+                    return (
+                      <AddSavers
+                        network={network}
+                        asset={assetWD}
+                        pricePool={pricePool}
+                        fees={feesRD}
+                        address={address}
+                      />
+                    )
                   case TabIndex.WITHDRAW:
-                    return <WithdrawSavers network={network} asset={assetWD} pricePool={pricePool} fees={feesRD} />
+                    return (
+                      <WithdrawSavers
+                        network={network}
+                        asset={assetWD}
+                        pricePool={pricePool}
+                        fees={feesRD}
+                        address={address}
+                      />
+                    )
                   default:
                     return <>`Unknown tab content (index ${index})`</>
                 }
               }
               return (
                 <div className="flex min-h-full w-full">
-                  <div className="flex min-h-full w-full flex-col lg:flex-row">
-                    <div className="min-h-auto flex w-full flex-col bg-bg0 dark:bg-bg0d lg:min-h-full lg:w-2/3">
+                  <div className="flex min-h-full w-full flex-col xl:flex-row">
+                    <div className="min-h-auto flex w-full flex-col bg-bg0 dark:bg-bg0d xl:min-h-full xl:w-2/3">
                       <Tab.Group
                         selectedIndex={selectedIndex}
                         onChange={(index) => {
                           switch (index) {
-                            case 0:
-                              navigate(saversRoutes.earn.path({ asset: assetToString(asset) }))
+                            case TabIndex.ADD:
+                              navigate(saversRoutes.earn.path({ asset: assetToString(asset), walletType }))
                               break
-                            case 1:
-                              navigate(saversRoutes.withdraw.path({ asset: assetToString(asset) }))
+                            case TabIndex.WITHDRAW:
+                              navigate(saversRoutes.withdraw.path({ asset: assetToString(asset), walletType }))
                               break
                             default:
                             // nothing to do
@@ -209,8 +286,8 @@ const Content: React.FC<Props> = ({ asset }): JSX.Element => {
                         </Tab.Panels>
                       </Tab.Group>
                     </div>
-                    <div className="min-h-auto mt-20px ml-0 flex w-full bg-bg0 dark:bg-bg0d lg:mt-0 lg:ml-20px lg:min-h-full lg:w-1/3">
-                      <SaversDetails asset={asset} />
+                    <div className="min-h-auto mt-20px ml-0 flex w-full bg-bg0 dark:bg-bg0d xl:mt-0 xl:ml-20px xl:min-h-full xl:w-1/3">
+                      <SaversDetailsView asset={asset} address={address} poolDetails={poolDetails} />
                     </div>
                   </div>
                 </div>
@@ -224,25 +301,27 @@ const Content: React.FC<Props> = ({ asset }): JSX.Element => {
 }
 
 export const SaversView: React.FC = (): JSX.Element => {
-  const { asset } = useParams<SaversRouteParams>()
+  const { asset, walletType } = useParams<SaversRouteParams>()
+
+  const oWalletType = useMemo(() => FP.pipe(walletType, O.fromPredicate(isWalletType)), [walletType])
   const oAsset: O.Option<Asset> = useMemo(() => getAssetFromNullableString(asset), [asset])
 
   const intl = useIntl()
 
   return FP.pipe(
-    oAsset,
+    sequenceTOption(oAsset, oWalletType),
     O.fold(
       () => (
         <ErrorView
           title={intl.formatMessage(
             { id: 'routes.invalid.params' },
             {
-              params: `asset: ${asset}`
+              params: `asset: ${asset}, walletType: ${walletType}`
             }
           )}
         />
       ),
-      (asset) => <Content asset={asset} />
+      ([asset, walletType]) => <Content asset={asset} walletType={walletType} />
     )
   )
 }

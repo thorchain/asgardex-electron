@@ -24,7 +24,7 @@ import { useNavigate } from 'react-router-dom'
 import { FlatButton } from '../../components/uielements/button'
 import { PoolsPeriodSelector } from '../../components/uielements/pools/PoolsPeriodSelector'
 import { Table } from '../../components/uielements/table'
-import { DEFAULT_GET_POOLS_PERIOD } from '../../const'
+import { DEFAULT_GET_POOLS_PERIOD, DEFAULT_WALLET_TYPE } from '../../const'
 import { useMidgardContext } from '../../contexts/MidgardContext'
 import { isChainAsset } from '../../helpers/assetHelper'
 import { ordBigNumber } from '../../helpers/fp/ord'
@@ -172,7 +172,7 @@ export const SaversOverview: React.FC<Props> = (props): JSX.Element => {
       const onClickHandler = (event: React.MouseEvent<HTMLElement, MouseEvent>) => {
         event.preventDefault()
         event.stopPropagation()
-        navigate(saversRoutes.earn.path({ asset: assetToString(asset) }))
+        navigate(saversRoutes.earn.path({ asset: assetToString(asset), walletType: DEFAULT_WALLET_TYPE }))
       }
 
       return (

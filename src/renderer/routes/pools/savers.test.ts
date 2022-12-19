@@ -12,25 +12,27 @@ describe('Savers routes', () => {
 
   describe('Earn routes', () => {
     it('template', () => {
-      expect(earn.template).toEqual('/pools/savers/:asset/earn')
+      expect(earn.template).toEqual('/pools/savers/:asset/earn/:walletType')
     })
-    it('returns path by given asset parameter', () => {
-      expect(earn.path({ asset: 'BNB.BNB' })).toEqual('/pools/savers/bnb.bnb/earn')
+    it('asset / keystore', () => {
+      expect(earn.path({ asset: 'BNB.BNB', walletType: 'keystore' })).toEqual('/pools/savers/bnb.bnb/earn/keystore')
     })
-    it('redirects to base path if asset is empty', () => {
-      expect(earn.path({ asset: '' })).toEqual('/pools/savers')
+    it('asset / ledger', () => {
+      expect(earn.path({ asset: 'BNB.BNB', walletType: 'ledger' })).toEqual('/pools/savers/bnb.bnb/earn/ledger')
     })
   })
 
   describe('Withdraw routes', () => {
     it('template', () => {
-      expect(withdraw.template).toEqual('/pools/savers/:asset/withdraw')
+      expect(withdraw.template).toEqual('/pools/savers/:asset/withdraw/:walletType')
     })
-    it('returns path by given asset parameter', () => {
-      expect(withdraw.path({ asset: 'BNB.BNB' })).toEqual('/pools/savers/bnb.bnb/withdraw')
+    it('asset / keystore', () => {
+      expect(withdraw.path({ asset: 'BNB.BNB', walletType: 'keystore' })).toEqual(
+        '/pools/savers/bnb.bnb/withdraw/keystore'
+      )
     })
-    it('redirects to base path if asset is empty', () => {
-      expect(withdraw.path({ asset: '' })).toEqual('/pools/savers')
+    it('asset / ledger', () => {
+      expect(withdraw.path({ asset: 'BNB.BNB', walletType: 'ledger' })).toEqual('/pools/savers/bnb.bnb/withdraw/ledger')
     })
   })
 })

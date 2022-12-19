@@ -458,6 +458,15 @@ type DepositMessageKey =
 
 export type DepositMessages = { [key in DepositMessageKey]: string }
 
+type SaversMessageKey =
+  | 'savers.noSavings'
+  | 'savers.detail.title'
+  | 'savers.detail.current.title'
+  | 'savers.detail.redeem.title'
+  | 'savers.detail.percent'
+
+export type SaversMessages = { [key in SaversMessageKey]: string }
+
 export type HaltMessageKey =
   | 'halt.thorchain'
   | 'halt.trading'
@@ -477,6 +486,7 @@ export type Messages = CommonMessages &
   SettingMessages &
   SwapMessages &
   DepositMessages &
+  SaversMessages &
   LedgerMessages &
   BondsMessages &
   PoolSharesMessage &

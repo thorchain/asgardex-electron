@@ -149,7 +149,7 @@ export const AssetsTableCollapsable: React.FC<Props> = (props): JSX.Element => {
         )
         return (
           <div className="flex flex-col items-end justify-center font-main">
-            <div className="d:text-gray1d text-16 text-text0 dark:text-text0d">{balance}</div>
+            <div className="text-16 text-text0 dark:text-text0d">{balance}</div>
             <div className="text-14 text-gray2 dark:text-gray2d">{price}</div>
           </div>
         )

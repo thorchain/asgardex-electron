@@ -1,8 +1,9 @@
 import * as RD from '@devexperts/remote-data-ts'
-import { Asset, AssetRuneNative, assetToString, baseAmount, isChain } from '@xchainjs/xchain-util'
+import { Address, Asset, AssetRuneNative, assetToString, baseAmount, bnOrZero, isChain } from '@xchainjs/xchain-util'
 import * as A from 'fp-ts/Array'
 import * as E from 'fp-ts/Either'
 import * as FP from 'fp-ts/function'
+import * as N from 'fp-ts/lib/number'
 import * as O from 'fp-ts/Option'
 import * as t from 'io-ts'
 import { PathReporter } from 'io-ts/lib/PathReporter'
@@ -21,7 +22,9 @@ import {
   Node,
   NodesApi,
   Pool,
-  PoolsApi
+  PoolsApi,
+  Saver,
+  SaversApi
 } from '../../types/generated/thornode'
 import { Network$ } from '../app/types'
 import {
@@ -36,7 +39,9 @@ import {
   ClientUrl$,
   InboundAddressesLD,
   ThorchainConstantsLD,
-  ThorchainLastblockLD
+  ThorchainLastblockLD,
+  SaverProviderLD,
+  SaverProvider
 } from './types'
 
 export const getThornodeAPIConfiguration = (basePath: string): Configuration => {
@@ -282,6 +287,56 @@ export const createThornodeService$ = (network$: Network$, clientUrl$: ClientUrl
     RxOp.shareReplay(1)
   )
 
+  const apiGetSaverProvider$ = (asset: Asset, address: Address): LiveData<Error, Saver> =>
+    FP.pipe(
+      thornodeUrl$,
+      liveData.chain((basePath) =>
+        FP.pipe(
+          new SaversApi(getThornodeAPIConfiguration(basePath)).saver({
+            asset: assetToString(asset),
+            address
+          }),
+          RxOp.map(RD.success),
+          RxOp.catchError((e: Error) => Rx.of(RD.failure(e)))
+        )
+      ),
+      RxOp.startWith(RD.pending)
+    )
+
+  const { stream$: reloadSaverProvider$, trigger: reloadSaverProvider } = triggerStream()
+
+  const getSaverProvider$ = (asset: Asset, address: Address): SaverProviderLD =>
+    FP.pipe(
+      reloadSaverProvider$,
+      RxOp.debounceTime(300),
+      RxOp.switchMap((_) => apiGetSaverProvider$(asset, address)),
+      liveData.map(
+        // transform Saver -> SaverProvider
+        (provider): SaverProvider => {
+          const { asset_deposit_value, asset_redeem_value, growth_pct, last_add_height, last_withdraw_height } =
+            provider
+          /* 1e8 decimal by default, which is default decimal for ALL accets at THORChain  */
+          const depositValue = baseAmount(asset_deposit_value, THORCHAIN_DECIMAL)
+          const redeemValue = baseAmount(asset_redeem_value, THORCHAIN_DECIMAL)
+          const growthPercent = bnOrZero(growth_pct)
+          const addHeight = FP.pipe(last_add_height, O.fromPredicate(N.isNumber))
+          const withdrawHeight = FP.pipe(last_withdraw_height, O.fromPredicate(N.isNumber))
+          return {
+            address: provider.asset_address,
+            depositValue,
+            redeemValue,
+            growthPercent,
+            addHeight,
+            withdrawHeight
+          }
+        }
+      ),
+      RxOp.catchError(
+        (): SaverProviderLD => Rx.of(RD.failure(Error(`Failed to load info for ${assetToString(asset)} saver`)))
+      ),
+      RxOp.startWith(RD.pending)
+    )
+
   return {
     thornodeUrl$,
     reloadThornodeUrl,
@@ -297,6 +352,8 @@ export const createThornodeService$ = (network$: Network$, clientUrl$: ClientUrl
     mimir$,
     reloadMimir,
     getLiquidityProviders,
-    reloadLiquidityProviders
+    reloadLiquidityProviders,
+    getSaverProvider$,
+    reloadSaverProvider
   }
 }

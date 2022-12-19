@@ -5,6 +5,7 @@ import { Address, Asset, AssetRuneNative, assetToString, bn, Chain, THORChain } 
 import { Spin } from 'antd'
 import * as FP from 'fp-ts/function'
 import * as A from 'fp-ts/lib/Array'
+import * as Eq from 'fp-ts/lib/Eq'
 import * as O from 'fp-ts/lib/Option'
 import { useObservableState } from 'observable-hooks'
 import { useIntl } from 'react-intl'
@@ -25,7 +26,7 @@ import { useMidgardContext } from '../../contexts/MidgardContext'
 import { useThorchainContext } from '../../contexts/ThorchainContext'
 import { useWalletContext } from '../../contexts/WalletContext'
 import { assetInList, getAssetFromNullableString } from '../../helpers/assetHelper'
-import { eqChain } from '../../helpers/fp/eq'
+import { eqChain, eqNetwork } from '../../helpers/fp/eq'
 import { sequenceTOption, sequenceTRD } from '../../helpers/fpHelpers'
 import { RUNE_PRICE_POOL } from '../../helpers/poolHelper'
 import { addressFromOptionalWalletAddress } from '../../helpers/walletHelper'
@@ -41,6 +42,13 @@ import { DEFAULT_SLIP_TOLERANCE } from '../../services/const'
 import { INITIAL_BALANCES_STATE, DEFAULT_BALANCES_FILTER } from '../../services/wallet/const'
 import { ledgerAddressToWalletAddress } from '../../services/wallet/util'
 import { isSlipTolerance, SlipTolerance } from '../../types/asgardex'
+
+type UpdateLedgerAddress = { chain: Chain; network: Network }
+
+const eqUpdateLedgerAddress = Eq.struct<UpdateLedgerAddress>({
+  chain: eqChain,
+  network: eqNetwork
+})
 
 type Props = { sourceAsset: Asset; targetAsset: Asset }
 
@@ -127,7 +135,12 @@ const SuccessRouteView: React.FC<Props> = ({ sourceAsset, targetAsset }): JSX.El
 
   const [oSourceKeystoreAddress, updateSourceKeystoreAddress$] = useObservableState<O.Option<Address>, Chain>(
     (sourceChain$) =>
-      FP.pipe(sourceChain$, RxOp.switchMap(addressByChain$), RxOp.map(addressFromOptionalWalletAddress)),
+      FP.pipe(
+        sourceChain$,
+        RxOp.distinctUntilChanged(eqChain.equals),
+        RxOp.switchMap(addressByChain$),
+        RxOp.map(addressFromOptionalWalletAddress)
+      ),
     O.none
   )
 
@@ -137,7 +150,12 @@ const SuccessRouteView: React.FC<Props> = ({ sourceAsset, targetAsset }): JSX.El
 
   const [oTargetKeystoreAddress, updateTargetKeystoreAddress$] = useObservableState<O.Option<Address>, Chain>(
     (targetChain$) =>
-      FP.pipe(targetChain$, RxOp.switchMap(addressByChain$), RxOp.map(addressFromOptionalWalletAddress)),
+      FP.pipe(
+        targetChain$,
+        RxOp.distinctUntilChanged(eqChain.equals),
+        RxOp.switchMap(addressByChain$),
+        RxOp.map(addressFromOptionalWalletAddress)
+      ),
     O.none
   )
 
@@ -214,13 +232,11 @@ const SuccessRouteView: React.FC<Props> = ({ sourceAsset, targetAsset }): JSX.El
     [targetAssetRD]
   )
 
-  const [oTargetLedgerAddress, updateTargetLedgerAddress$] = useObservableState<
-    O.Option<Address>,
-    { chain: Chain; network: Network }
-  >(
+  const [oTargetLedgerAddress, updateTargetLedgerAddress$] = useObservableState<O.Option<Address>, UpdateLedgerAddress>(
     (targetLedgerAddressChain$) =>
       FP.pipe(
         targetLedgerAddressChain$,
+        RxOp.distinctUntilChanged(eqUpdateLedgerAddress.equals),
         RxOp.switchMap(({ chain }) => getLedgerAddress$(chain)),
         RxOp.map(O.map(ledgerAddressToWalletAddress)),
         RxOp.map(addressFromOptionalWalletAddress)
@@ -232,13 +248,11 @@ const SuccessRouteView: React.FC<Props> = ({ sourceAsset, targetAsset }): JSX.El
     updateTargetLedgerAddress$({ chain: targetChain, network })
   }, [network, targetChain, updateTargetLedgerAddress$])
 
-  const [oSourceLedgerAddress, updateSourceLedgerAddress$] = useObservableState<
-    O.Option<Address>,
-    { chain: Chain; network: Network }
-  >(
+  const [oSourceLedgerAddress, updateSourceLedgerAddress$] = useObservableState<O.Option<Address>, UpdateLedgerAddress>(
     (sourceLedgerAddressChain$) =>
       FP.pipe(
         sourceLedgerAddressChain$,
+        RxOp.distinctUntilChanged(eqUpdateLedgerAddress.equals),
         RxOp.switchMap(({ chain }) => getLedgerAddress$(chain)),
         RxOp.map(O.map(ledgerAddressToWalletAddress)),
         RxOp.map(addressFromOptionalWalletAddress)
