@@ -27,9 +27,9 @@ import { useWalletContext } from '../../contexts/WalletContext'
 import { getAssetFromNullableString } from '../../helpers/assetHelper'
 import { eqChain, eqNetwork, eqWalletType } from '../../helpers/fp/eq'
 import { sequenceTOption, sequenceTRD } from '../../helpers/fpHelpers'
-import { RUNE_PRICE_POOL } from '../../helpers/poolHelper'
 import { addressFromOptionalWalletAddress } from '../../helpers/walletHelper'
 import { useNetwork } from '../../hooks/useNetwork'
+import { usePricePool } from '../../hooks/usePricePool'
 import * as poolsRoutes from '../../routes/pools'
 import { SaversRouteParams } from '../../routes/pools/savers'
 import * as saversRoutes from '../../routes/pools/savers'
@@ -104,13 +104,13 @@ const Content: React.FC<Props> = (props): JSX.Element => {
 
   const {
     service: {
-      pools: { poolsState$, reloadPools, selectedPricePool$ }
+      pools: { poolsState$, reloadPools }
     }
   } = useMidgardContext()
 
-  const pricePool = useObservableState(selectedPricePool$, RUNE_PRICE_POOL)
+  const pricePool = usePricePool()
 
-  const poolsState = useObservableState(poolsState$, RD.initial)
+  const poolsStateRD = useObservableState(poolsState$, RD.initial)
 
   // TODO(@veado) Get fees
   const feesRD: BaseAmountRD = RD.success(baseAmount(123000))
@@ -190,12 +190,12 @@ const Content: React.FC<Props> = (props): JSX.Element => {
 
       <div className="flex h-screen flex-col items-center justify-center ">
         {FP.pipe(
-          sequenceTRD(poolsState, assetRD, addressRD),
+          sequenceTRD(poolsStateRD, assetRD, addressRD),
           RD.fold(
             () => renderLoading,
             () => renderLoading,
             renderError,
-            ([_, assetWD, address]) => {
+            ([{ poolDetails }, assetWD, address]) => {
               const getTabContentByIndex = (index: number) => {
                 switch (index) {
                   case TabIndex.ADD:
@@ -224,8 +224,8 @@ const Content: React.FC<Props> = (props): JSX.Element => {
               }
               return (
                 <div className="flex min-h-full w-full">
-                  <div className="flex min-h-full w-full flex-col lg:flex-row">
-                    <div className="min-h-auto flex w-full flex-col bg-bg0 dark:bg-bg0d lg:min-h-full lg:w-2/3">
+                  <div className="flex min-h-full w-full flex-col xl:flex-row">
+                    <div className="min-h-auto flex w-full flex-col bg-bg0 dark:bg-bg0d xl:min-h-full xl:w-2/3">
                       <Tab.Group
                         selectedIndex={selectedIndex}
                         onChange={(index) => {
@@ -286,8 +286,8 @@ const Content: React.FC<Props> = (props): JSX.Element => {
                         </Tab.Panels>
                       </Tab.Group>
                     </div>
-                    <div className="min-h-auto mt-20px ml-0 flex w-full bg-bg0 dark:bg-bg0d lg:mt-0 lg:ml-20px lg:min-h-full lg:w-1/3">
-                      <SaversDetailsView asset={asset} address={address} />
+                    <div className="min-h-auto mt-20px ml-0 flex w-full bg-bg0 dark:bg-bg0d xl:mt-0 xl:ml-20px xl:min-h-full xl:w-1/3">
+                      <SaversDetailsView asset={asset} address={address} poolDetails={poolDetails} />
                     </div>
                   </div>
                 </div>
