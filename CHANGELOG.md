@@ -30,6 +30,7 @@
 - AssetsTableCollapsable: Combine balance/price [#2478](https://github.com/thorchain/asgardex-electron/pull/2478)
 - Update pools routes [#2482](https://github.com/thorchain/asgardex-electron/pull/2482)
 - [Ledger] Add a safety check of fees before signing txs [#2491](https://github.com/thorchain/asgardex-electron/issues/2491)
+- [Ledger] Update `@ledgerhq/hw-*` packages [#2494](https://github.com/thorchain/asgardex-electron/pull/2494)
 
 ## Fix
 
@@ -41,6 +42,8 @@
 
 - Update to latest Electron@22.0.0 / TypeScript@4.9.4[#2480](https://github.com/thorchain/asgardex-electron/pull/2480)
 - Downgrade to Electron@20.x.x [#2493](https://github.com/thorchain/asgardex-electron/pull/2493)
+- Update CI to deprecate Ubuntu 18.x in favour of building on Ubuntu 20.04 [#2494](https://github.com/thorchain/asgardex-electron/pull/2494)
+- Update CI to continue build support of `macOS-11` [#2494](https://github.com/thorchain/asgardex-electron/pull/2494)
 
 # 1.18.4 (2022-11-03)
 
