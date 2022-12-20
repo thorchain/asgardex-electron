@@ -25,7 +25,7 @@ import { ProtocolLimit, IncentivePendulum } from '../../components/pool'
 import { Action as ActionButtonAction, ActionButton } from '../../components/uielements/button/ActionButton'
 import { PoolsPeriodSelector } from '../../components/uielements/pools/PoolsPeriodSelector'
 import { Table } from '../../components/uielements/table'
-import { DEFAULT_WALLET_TYPE } from '../../const'
+// import { DEFAULT_WALLET_TYPE } from '../../const'
 import { useAppContext } from '../../contexts/AppContext'
 import { useMidgardContext } from '../../contexts/MidgardContext'
 import { ordBaseAmount, ordNumber } from '../../helpers/fp/ord'
@@ -35,7 +35,7 @@ import { usePoolFilter } from '../../hooks/usePoolFilter'
 import { usePoolWatchlist } from '../../hooks/usePoolWatchlist'
 import { useProtocolLimit } from '../../hooks/useProtocolLimit'
 import * as poolsRoutes from '../../routes/pools'
-import * as saversRoutes from '../../routes/pools/savers'
+// import * as saversRoutes from '../../routes/pools/savers'
 import { DEFAULT_NETWORK } from '../../services/const'
 import { PoolsState, DEFAULT_POOL_FILTERS } from '../../services/midgard/types'
 import { GetPoolsPeriodEnum } from '../../types/generated/midgard'
@@ -108,14 +108,15 @@ export const ActivePools: React.FC<PoolsComponentProps> = ({ haltedChains, mimir
           callback: () => {
             navigate(poolsRoutes.deposit.path({ asset: assetToString(asset) }))
           }
-        },
-        {
-          label: intl.formatMessage({ id: 'common.earn' }),
-          disabled: disableAllPoolActions || disableTradingActions,
-          callback: () => {
-            navigate(saversRoutes.earn.path({ asset: assetToString(asset), walletType: DEFAULT_WALLET_TYPE }))
-          }
         }
+        // TODO(@veado) Enable savers
+        // {
+        //   label: intl.formatMessage({ id: 'common.earn' }),
+        //   disabled: disableAllPoolActions || disableTradingActions,
+        //   callback: () => {
+        //     navigate(saversRoutes.earn.path({ asset: assetToString(asset), walletType: DEFAULT_WALLET_TYPE }))
+        //   }
+        // }
       ]
 
       return (

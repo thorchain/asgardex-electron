@@ -167,7 +167,8 @@ export const SaversOverview: React.FC<Props> = (props): JSX.Element => {
         mimirHalt
       })
 
-      const disabled = disableAllPoolActions || disableTradingActions || disablePoolActions || walletLocked
+      // TODO(@veado) Enable savers
+      const _disabled = disableAllPoolActions || disableTradingActions || disablePoolActions || walletLocked
 
       const onClickHandler = (event: React.MouseEvent<HTMLElement, MouseEvent>) => {
         event.preventDefault()
@@ -176,10 +177,13 @@ export const SaversOverview: React.FC<Props> = (props): JSX.Element => {
       }
 
       return (
-        <div className="flex items-center justify-center">
-          <FlatButton className="min-w-[120px]" disabled={disabled} size="normal" onClick={onClickHandler}>
+        <div className="relative flex flex-col items-center justify-center">
+          <FlatButton className="min-w-[120px]" disabled={true} size="normal" onClick={onClickHandler}>
             {intl.formatMessage({ id: 'common.manage' })}
           </FlatButton>
+          <div className="absolute translate-y-[-50%] rotate-[-30deg] rounded-sm bg-bg0 px-10px font-mainSemiBold text-[10px] uppercase text-warning0 shadow-md dark:bg-bg0d dark:text-warning0d">
+            coming soon
+          </div>
         </div>
       )
     },

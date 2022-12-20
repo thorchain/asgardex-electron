@@ -1,16 +1,21 @@
-# 1.18.5 (2022-12-xx)
+# 1.19.0 (2022-12-xx)
+
+## Add
+
+- [Savers] UI [#2485](https://github.com/thorchain/asgardex-electron/pull/2485)
+
+# 1.18.5 (2022-12-20)
 
 ## Add
 
 - Introduce `ActionButton` [#2452](https://github.com/thorchain/asgardex-electron/pull/2452)
 - [Swap] Show balances [#2446](https://github.com/thorchain/asgardex-electron/issues/2446)
-- ETH: Use depositWithExpiry to deposit [#2472](https://github.com/thorchain/asgardex-electron/issues/2472)
-- Add 'x-client-id' header to send ASGDX' identifier for any request to 9R servers [#2463](https://github.com/thorchain/asgardex-electron/issues/2463), [#2464](https://github.com/thorchain/asgardex-electron/pull/2464), [#2474](https://github.com/thorchain/asgardex-electron/pull/2474)
+- [ETH] Use `depositWithExpiry` to deposit [#2472](https://github.com/thorchain/asgardex-electron/issues/2472)
+- Add `x-client-id` header to send ASGDX' identifier for any request to 9R servers [#2463](https://github.com/thorchain/asgardex-electron/issues/2463), [#2464](https://github.com/thorchain/asgardex-electron/pull/2464), [#2474](https://github.com/thorchain/asgardex-electron/pull/2474)
 - [Savers] Routes [#2450](https://github.com/thorchain/asgardex-electron/pull/2450)
 - Add wallet actions to assets table [#2455](https://github.com/thorchain/asgardex-electron/pull/2455)
 - Savers overview [#2466](https://github.com/thorchain/asgardex-electron/pull/2466), [#2470](https://github.com/thorchain/asgardex-electron/pull/2470), [#2479](https://github.com/thorchain/asgardex-electron/pull/2479)
 - Display APY/APR depending on days [#2477](https://github.com/thorchain/asgardex-electron/pull/2477)
-- [Savers] UI [#2485](https://github.com/thorchain/asgardex-electron/pull/2485)
 
 ## Update
 
@@ -25,6 +30,7 @@
 - AssetsTableCollapsable: Combine balance/price [#2478](https://github.com/thorchain/asgardex-electron/pull/2478)
 - Update pools routes [#2482](https://github.com/thorchain/asgardex-electron/pull/2482)
 - [Ledger] Add a safety check of fees before signing txs [#2491](https://github.com/thorchain/asgardex-electron/issues/2491)
+- [Ledger] Update `@ledgerhq/hw-*` packages [#2494](https://github.com/thorchain/asgardex-electron/pull/2494)
 
 ## Fix
 
@@ -36,6 +42,8 @@
 
 - Update to latest Electron@22.0.0 / TypeScript@4.9.4[#2480](https://github.com/thorchain/asgardex-electron/pull/2480)
 - Downgrade to Electron@20.x.x [#2493](https://github.com/thorchain/asgardex-electron/pull/2493)
+- Update CI to deprecate Ubuntu 18.x in favour of building on Ubuntu 20.04 [#2494](https://github.com/thorchain/asgardex-electron/pull/2494)
+- Update CI to continue build support of `macOS-11` [#2494](https://github.com/thorchain/asgardex-electron/pull/2494)
 
 # 1.18.4 (2022-11-03)
 

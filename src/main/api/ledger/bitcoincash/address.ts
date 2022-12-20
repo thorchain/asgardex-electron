@@ -16,7 +16,10 @@ export const getAddress = async (
   walletIndex: number
 ): Promise<E.Either<LedgerError, WalletAddress>> => {
   try {
-    const app = new AppBTC(transport)
+    // Value of `currency` -> `GetAddressOptions` -> `currency` -> `id`
+    // Example https://github.com/LedgerHQ/ledger-live/blob/37c0771329dd5a40dfe3430101bbfb100330f6bd/libs/ledger-live-common/src/families/bitcoin/hw-getAddress.ts#L17
+    // BCH -> `bitcoin_cash` https://github.com/LedgerHQ/ledger-live/blob/37c0771329dd5a40dfe3430101bbfb100330f6bd/libs/ledgerjs/packages/cryptoassets/src/currencies.ts#L319
+    const app = new AppBTC({ transport, currency: 'bitcoin_cash' })
     const clientNetwork = toClientNetwork(network)
     const derivePath = getDerivationPath(walletIndex, clientNetwork)
     const { bitcoinAddress: bchAddress } = await app.getWalletPublicKey(derivePath, {
@@ -35,12 +38,15 @@ export const getAddress = async (
   }
 }
 export const verifyAddress: VerifyAddressHandler = async ({ transport, network, walletIndex }) => {
-  const app = new AppBTC(transport)
+  // Value of `currency` -> `GetAddressOptions` -> `currency` -> `id`
+  // Example https://github.com/LedgerHQ/ledger-live/blob/37c0771329dd5a40dfe3430101bbfb100330f6bd/libs/ledger-live-common/src/families/bitcoin/hw-getAddress.ts#L17
+  // BCH -> `bitcoin_cash` https://github.com/LedgerHQ/ledger-live/blob/37c0771329dd5a40dfe3430101bbfb100330f6bd/libs/ledgerjs/packages/cryptoassets/src/currencies.ts#L319
+  const app = new AppBTC({ transport, currency: 'bitcoin_cash' })
   const clientNetwork = toClientNetwork(network)
   const derivePath = getDerivationPath(walletIndex, clientNetwork)
   const _ = await app.getWalletPublicKey(derivePath, {
     // cashaddr in case of Bitcoin Cash
-    // @see https://github.com/LedgerHQ/ledgerjs/blob/master/packages/hw-app-btc/README.md#parameters-2
+    // @see https://github.com/LedgerHQ/ledger-live/tree/37c0771329dd5a40dfe3430101bbfb100330f6bd/libs/ledgerjs/packages/hw-app-btc#parameters-2
     format: 'cashaddr',
     verify: true // confirm the address on the device
   })
