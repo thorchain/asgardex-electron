@@ -72,6 +72,14 @@ export const AssetsView: React.FC = (): JSX.Element => {
 
   const selectedPricePool = useObservableState(selectedPricePool$, RUNE_PRICE_POOL)
 
+  const selectAssetHandler = useCallback(
+    (selectedAsset: SelectedWalletAsset) => {
+      setSelectedAsset(O.some(selectedAsset))
+      navigate(walletRoutes.assetDetail.path())
+    },
+    [navigate, setSelectedAsset]
+  )
+
   const assetHandler = useCallback(
     (selectedAsset: SelectedWalletAsset, action: AssetAction) => {
       setSelectedAsset(O.some(selectedAsset))
@@ -117,6 +125,7 @@ export const AssetsView: React.FC = (): JSX.Element => {
         chainBalances={chainBalances}
         pricePool={selectedPricePool}
         poolDetails={poolDetails}
+        selectAssetHandler={selectAssetHandler}
         assetHandler={assetHandler}
         mimirHalt={mimirHaltRD}
         network={network}

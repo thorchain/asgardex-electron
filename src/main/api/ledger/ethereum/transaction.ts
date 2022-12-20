@@ -10,8 +10,10 @@ import { getEtherscanApiKey } from '../../../../shared/api/etherscan'
 import { getEthplorerCreds } from '../../../../shared/api/ethplorer'
 import { getInfuraCreds } from '../../../../shared/api/infura'
 import { LedgerError, LedgerErrorId, Network } from '../../../../shared/api/types'
-import { FEE_BOUNDS } from '../../../../shared/ethereum/const'
+import { ROUTER_ABI } from '../../../../shared/ethereum/abi'
+import { DEPOSIT_EXPIRATION_OFFSET, FEE_BOUNDS } from '../../../../shared/ethereum/const'
 import { getDerivationPath } from '../../../../shared/ethereum/ledger'
+import { getBlocktime } from '../../../../shared/ethereum/provider'
 import { EthHDMode } from '../../../../shared/ethereum/types'
 import { toClientNetwork } from '../../../../shared/utils/client'
 import { isError } from '../../../../shared/utils/guard'
@@ -147,25 +149,25 @@ export const deposit = async ({
 
     const gasPrices = await client.estimateGasPrices()
     const gasPrice = gasPrices[feeOption].amount().toFixed(0) // no round down needed
+    const blockTime = await getBlocktime(provider)
+    const expiration = blockTime + DEPOSIT_EXPIRATION_OFFSET
 
-    // Note: We don't use `client.deposit` here to avoid repeating same requests we already do in ASGARDEX
-    // That's why we call `deposit` directly here
-    // Note2: `client.call` handling very similar to `runSendPoolTx$` in `src/renderer/services/ethereum/transaction.ts`
-    //
+    // Note: `client.call` handling very - similar to `runSendPoolTx$` in `src/renderer/services/ethereum/transaction.ts`
     // Call deposit function of Router contract
-    // Note3: Amounts need to use `toFixed` to convert `BaseAmount` to `Bignumber`
+    // Note2: Amounts need to use `toFixed` to convert `BaseAmount` to `Bignumber`
     // since `value` and `gasPrice` type is `Bignumber`
     const { hash } = await client.call<{ hash: TxHash }>({
       signer,
       contractAddress: router,
-      abi: ETH.abi.router,
-      funcName: 'deposit',
+      abi: ROUTER_ABI,
+      funcName: 'depositWithExpiry',
       funcParams: [
         recipient,
         address,
         // Send `BaseAmount` w/o decimal and always round down for currencies
         amount.amount().toFixed(0, BigNumber.ROUND_DOWN),
         memo,
+        expiration,
         isETHAddress
           ? {
               // Send `BaseAmount` w/o decimal and always round down for currencies

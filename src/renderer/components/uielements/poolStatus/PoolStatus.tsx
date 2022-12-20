@@ -5,13 +5,14 @@ import * as Styled from './PoolStatus.styles'
 
 export type Props = {
   label: string
+  extraLabel?: React.ReactNode
   displayValue: string
   fullValue?: string
   isLoading?: boolean
 }
 
 export const PoolStatus: React.FC<Props> = (props): JSX.Element => {
-  const { label, displayValue, fullValue, isLoading } = props
+  const { label, extraLabel = <></>, displayValue, fullValue, isLoading } = props
   const [showTooltip, setShowTooltip] = useState(false)
   const amountRef = useRef<HTMLDivElement>(null)
   const containerRef = useRef<HTMLDivElement>(null)
@@ -45,9 +46,10 @@ export const PoolStatus: React.FC<Props> = (props): JSX.Element => {
 
   return (
     <Styled.PoolStatusWrapper ref={containerRef} {...props}>
-      <Styled.Title textTransform="uppercase" color="light">
-        {label}
-      </Styled.Title>
+      <div className="flex items-center">
+        <Styled.Title textTransform="uppercase">{label}</Styled.Title>
+        {extraLabel}
+      </div>
       <Styled.Value loading={isLoading} ref={amountRef} className="amount">
         <TooltipContainer>{displayValue}</TooltipContainer>
       </Styled.Value>

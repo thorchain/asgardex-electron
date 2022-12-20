@@ -13,7 +13,8 @@ import { Network } from '../../shared/api/types'
 import { useThorchainContext } from '../contexts/ThorchainContext'
 import { LiveData } from '../helpers/rx/liveData'
 import { DEFAULT_CLIENT_URL } from '../services/thorchain/const'
-import { Configuration, HealthApi } from '../types/generated/thornode'
+import { getThornodeAPIConfiguration } from '../services/thorchain/thornode'
+import { HealthApi } from '../types/generated/thornode'
 import { useNetwork } from './useNetwork'
 
 export const useThorchainClientUrl = (): {
@@ -49,7 +50,7 @@ export const useThorchainClientUrl = (): {
     FP.pipe(
       // Check `ping` endpoint of THORNode REST API
       // https://thornode.ninerealms.com/thorchain/doc/
-      new HealthApi(new Configuration({ basePath: url })).ping(),
+      new HealthApi(getThornodeAPIConfiguration(url)).ping(),
       RxOp.map((result) => {
         const { ping } = result
         if (ping) return RD.success(url)

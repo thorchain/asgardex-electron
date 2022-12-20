@@ -23,6 +23,7 @@ import { isKeystoreWallet } from '../../../../shared/utils/guard'
 import { disableRuneUpgrade, isNonNativeRuneAsset, isRuneNativeAsset, isUSDAsset } from '../../../helpers/assetHelper'
 import { getChainAsset } from '../../../helpers/chainHelper'
 import { getPoolPriceValue } from '../../../helpers/poolHelper'
+import { noDataString } from '../../../helpers/stringHelper'
 import { WalletBalancesRD } from '../../../services/clients'
 import { PoolDetails } from '../../../services/midgard/types'
 import { MimirHaltRD } from '../../../services/thorchain/types'
@@ -50,13 +51,22 @@ type Props = {
   chainBalances: ChainBalances
   pricePool: PricePool
   poolDetails: PoolDetails
+  selectAssetHandler: (asset: SelectedWalletAsset) => void
   assetHandler: (asset: SelectedWalletAsset, action: AssetAction) => void
   network: Network
   mimirHalt: MimirHaltRD
 }
 
 export const AssetsTableCollapsable: React.FC<Props> = (props): JSX.Element => {
-  const { chainBalances = [], pricePool, poolDetails, assetHandler, mimirHalt: mimirHaltRD, network } = props
+  const {
+    chainBalances = [],
+    pricePool,
+    poolDetails,
+    selectAssetHandler,
+    assetHandler,
+    mimirHalt: mimirHaltRD,
+    network
+  } = props
 
   const intl = useIntl()
   const screenMap: ScreenMap = Grid.useBreakpoint()
@@ -79,6 +89,14 @@ export const AssetsTableCollapsable: React.FC<Props> = (props): JSX.Element => {
         RD.getOrElse(() => ({ haltThorChain: true, haltEthChain: true, haltBnbChain: true }))
       ),
     [mimirHaltRD]
+  )
+
+  const onRowHandler = useCallback(
+    ({ asset, walletAddress, walletType, walletIndex, hdMode }: WalletBalance) => ({
+      // Disable click for NativeRUNE if Thorchain is halted
+      onClick: () => selectAssetHandler({ asset, walletAddress, walletType, walletIndex, hdMode })
+    }),
+    [selectAssetHandler]
   )
 
   const iconColumn: ColumnType<WalletBalance> = useMemo(
@@ -112,53 +130,32 @@ export const AssetsTableCollapsable: React.FC<Props> = (props): JSX.Element => {
     []
   )
 
-  const renderBalanceColumn = ({ asset, amount }: WalletBalance) => {
-    const balance = formatAssetAmountCurrency({ amount: baseToAsset(amount), asset, decimal: 3 })
-    return (
-      <Styled.Label nowrap align="right">
-        {balance}
-      </Styled.Label>
-    )
-  }
-
   const balanceColumn: ColumnType<WalletBalance> = useMemo(
     () => ({
-      render: renderBalanceColumn
+      render: ({ asset, amount }: WalletBalance) => {
+        const balance = formatAssetAmountCurrency({ amount: baseToAsset(amount), asset, decimal: 3 })
+        const price = FP.pipe(
+          getPoolPriceValue({ balance: { asset, amount }, poolDetails, pricePool, network }),
+          O.map((price) => {
+            const priceAmount = baseAmount(price.amount(), amount.decimal)
+            return formatAssetAmountCurrency({
+              amount: baseToAsset(priceAmount),
+              asset: pricePool.asset,
+              decimal: isUSDAsset(pricePool.asset) ? 2 : 4
+            })
+          }),
+          // "empty" label if we don't get a price value
+          O.getOrElse(() => noDataString)
+        )
+        return (
+          <div className="flex flex-col items-end justify-center font-main">
+            <div className="text-16 text-text0 dark:text-text0d">{balance}</div>
+            <div className="text-14 text-gray2 dark:text-gray2d">{price}</div>
+          </div>
+        )
+      }
     }),
-    []
-  )
-
-  const renderPriceColumn = useCallback(
-    ({ asset, amount }: WalletBalance) => {
-      const oPrice = getPoolPriceValue({ balance: { asset, amount }, poolDetails, pricePool, network })
-      const label = FP.pipe(
-        oPrice,
-        O.map((price) => {
-          const priceAmount = baseAmount(price.amount(), amount.decimal)
-          return formatAssetAmountCurrency({
-            amount: baseToAsset(priceAmount),
-            asset: pricePool.asset,
-            decimal: isUSDAsset(pricePool.asset) ? 2 : 4
-          })
-        }),
-        // "empty" label if we don't get a price value
-        O.getOrElse(() => '--')
-      )
-      return (
-        <Styled.Label nowrap align="right">
-          {label}
-        </Styled.Label>
-      )
-    },
     [network, poolDetails, pricePool]
-  )
-
-  const priceColumn: ColumnType<WalletBalance> = useMemo(
-    () => ({
-      width: 300,
-      render: renderPriceColumn
-    }),
-    [renderPriceColumn]
   )
 
   const renderActionColumn = useCallback(
@@ -211,7 +208,7 @@ export const AssetsTableCollapsable: React.FC<Props> = (props): JSX.Element => {
 
       return (
         <div className="flex justify-center">
-          <ActionButton size="medium" actions={actions} />
+          <ActionButton size="normal" actions={actions} />
         </div>
       )
     },
@@ -229,7 +226,7 @@ export const AssetsTableCollapsable: React.FC<Props> = (props): JSX.Element => {
   const columns = useMemo(() => {
     // desktop
     if (screenMap?.lg ?? false) {
-      return [iconColumn, tickerColumn, balanceColumn, priceColumn, actionColumn]
+      return [iconColumn, tickerColumn, balanceColumn, actionColumn]
     }
     // tablet
     if (screenMap?.sm ?? false) {
@@ -241,7 +238,7 @@ export const AssetsTableCollapsable: React.FC<Props> = (props): JSX.Element => {
     }
 
     return []
-  }, [actionColumn, balanceColumn, iconColumn, priceColumn, screenMap?.lg, screenMap?.sm, screenMap?.xs, tickerColumn])
+  }, [actionColumn, balanceColumn, iconColumn, screenMap?.lg, screenMap?.sm, screenMap?.xs, tickerColumn])
 
   const renderAssetsTable = useCallback(
     ({ tableData, loading = false }: { tableData: WalletBalances; loading?: boolean }) => {
@@ -251,11 +248,12 @@ export const AssetsTableCollapsable: React.FC<Props> = (props): JSX.Element => {
           dataSource={tableData}
           loading={loading}
           rowKey={({ asset }) => asset.symbol}
+          onRow={onRowHandler}
           columns={columns}
         />
       )
     },
-    [columns]
+    [columns, onRowHandler]
   )
 
   const renderBalances = useCallback(
@@ -319,7 +317,7 @@ export const AssetsTableCollapsable: React.FC<Props> = (props): JSX.Element => {
           (_: ApiError) => intl.formatMessage({ id: 'common.error' }),
           (balances) => {
             const length = balances.length
-            const i18nKey = length === 1 ? 'common.asset' : 'common.assets'
+            const i18nKey = length <= 1 ? 'common.asset' : 'common.assets'
             return `(${length} ${intl.formatMessage({ id: i18nKey })})`
           }
         )
@@ -347,13 +345,6 @@ export const AssetsTableCollapsable: React.FC<Props> = (props): JSX.Element => {
                   event.stopPropagation()
                 }}>
                 <Styled.CopyLabel copyable={{ text: walletAddress }} />
-                <Styled.QRCodeIcon
-                  onClick={(event) => {
-                    event.preventDefault()
-                    event.stopPropagation()
-                    setShowQRModal(O.some({ asset: getChainAsset(chain), address: walletAddress }))
-                  }}
-                />
               </Styled.CopyLabelContainer>
             </Styled.HeaderAddress>
           </Col>

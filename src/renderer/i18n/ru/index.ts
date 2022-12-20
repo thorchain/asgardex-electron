@@ -8,6 +8,7 @@ import midgard from './midgard'
 import pools from './pools'
 import poolShares from './poolshares'
 import routes from './routes'
+import savers from './savers'
 import settings from './settings'
 import swap from './swap'
 import update from './update'
@@ -21,6 +22,7 @@ export default {
   ...settings,
   ...swap,
   ...deposit,
+  ...savers,
   ...midgard,
   ...ledger,
   ...bonds,

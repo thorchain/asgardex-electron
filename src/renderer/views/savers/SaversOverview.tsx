@@ -8,10 +8,12 @@ import {
   BaseAmount,
   baseToAsset,
   Chain,
-  formatAssetAmountCurrency
+  formatAssetAmountCurrency,
+  formatBN
 } from '@xchainjs/xchain-util'
 import { Grid } from 'antd'
 import { ColumnsType, ColumnType } from 'antd/lib/table'
+import BigNumber from 'bignumber.js'
 import * as A from 'fp-ts/lib/Array'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
@@ -20,17 +22,23 @@ import { useIntl } from 'react-intl'
 import { useNavigate } from 'react-router-dom'
 
 import { FlatButton } from '../../components/uielements/button'
+import { PoolsPeriodSelector } from '../../components/uielements/pools/PoolsPeriodSelector'
 import { Table } from '../../components/uielements/table'
+import { DEFAULT_GET_POOLS_PERIOD, DEFAULT_WALLET_TYPE } from '../../const'
 import { useMidgardContext } from '../../contexts/MidgardContext'
 import { isChainAsset } from '../../helpers/assetHelper'
-import { ordNumber } from '../../helpers/fp/ord'
+import { ordBigNumber } from '../../helpers/fp/ord'
+import { sequenceTRD } from '../../helpers/fpHelpers'
 import * as PoolHelpers from '../../helpers/poolHelper'
 import { getSaversTableRowsData, ordSaversByDepth } from '../../helpers/savers'
 import { useNetwork } from '../../hooks/useNetwork'
 import { usePoolWatchlist } from '../../hooks/usePoolWatchlist'
+import { useSynthConstants } from '../../hooks/useSynthConstants'
 import * as poolsRoutes from '../../routes/pools'
+import * as saversRoutes from '../../routes/pools/savers'
 import { PoolDetails, PoolsState } from '../../services/midgard/types'
 import type { MimirHalt } from '../../services/thorchain/types'
+import { GetPoolsPeriodEnum } from '../../types/generated/midgard'
 import * as Shared from '../pools/PoolsOverview.shared'
 import type { SaversTableRowData, SaversTableRowsData } from './Savers.types'
 
@@ -48,13 +56,18 @@ export const SaversOverview: React.FC<Props> = (props): JSX.Element => {
 
   const {
     service: {
-      pools: { poolsState$, reloadPools, selectedPricePool$ }
+      pools: { poolsState$, reloadPools, selectedPricePool$, poolsPeriod$, setPoolsPeriod }
     }
   } = useMidgardContext()
 
+  const poolsPeriod = useObservableState(poolsPeriod$, DEFAULT_GET_POOLS_PERIOD)
+
+  const { maxSynthPerPoolDepth: maxSynthPerPoolDepthRD, reloadConstants } = useSynthConstants()
+
   const refreshHandler = useCallback(() => {
     reloadPools()
-  }, [reloadPools])
+    reloadConstants()
+  }, [reloadConstants, reloadPools])
 
   const selectedPricePool = useObservableState(selectedPricePool$, PoolHelpers.RUNE_PRICE_POOL)
 
@@ -74,14 +87,14 @@ export const SaversOverview: React.FC<Props> = (props): JSX.Element => {
       title: intl.formatMessage({ id: 'common.liquidity' }),
       render: ({ asset, depth, depthPrice }: { asset: Asset; depth: BaseAmount; depthPrice: BaseAmount }) => (
         <div className="flex flex-col items-end justify-center font-main">
-          <div className="d:text-gray1d text-16 text-text0 dark:text-text0d">
+          <div className="whitespace-nowrap text-16 text-text0 dark:text-text0d">
             {formatAssetAmountCurrency({
               amount: baseToAsset(depth),
               asset,
               decimal: 3
             })}
           </div>
-          <div className="text-14 text-gray2 dark:text-gray2d">
+          <div className="whitespace-nowrap text-14 text-gray2 dark:text-gray2d">
             {formatAssetAmountCurrency({
               amount: baseToAsset(depthPrice),
               asset: pricePoolAsset,
@@ -99,42 +112,47 @@ export const SaversOverview: React.FC<Props> = (props): JSX.Element => {
   )
 
   const aprColumn = useCallback(
-    <T extends { apr: number }>(): ColumnType<T> => ({
+    <T extends { apr: BigNumber }>(
+      poolsPeriod: GetPoolsPeriodEnum,
+      setPoolsPeriod: (v: GetPoolsPeriodEnum) => void
+    ): ColumnType<T> => ({
       key: 'apr',
       align: 'center',
-      title: intl.formatMessage({ id: 'pools.apr' }),
-      render: ({ apr }: { apr: number }) => <div className="font-main text-16">{apr}%</div>,
-      sorter: (a: { apr: number }, b: { apr: number }) => ordNumber.compare(a.apr, b.apr),
+      title: (
+        <div className="flex flex-col items-center">
+          <div className="text-12 font-main">{intl.formatMessage({ id: 'pools.apr' })}</div>
+          <PoolsPeriodSelector selectedValue={poolsPeriod} onChange={setPoolsPeriod} />
+        </div>
+      ),
+      render: ({ apr }: { apr: BigNumber }) => <div className="font-main text-16">{formatBN(apr, 2)}%</div>,
+      sorter: (a: { apr: BigNumber }, b: { apr: BigNumber }) => ordBigNumber.compare(a.apr, b.apr),
       sortDirections: ['descend', 'ascend']
     }),
     [intl]
   )
 
   const filledColumn = useCallback(
-    <T extends { filled: number }>(): ColumnType<T> => ({
+    <T extends { filled: BigNumber }>(): ColumnType<T> => ({
       key: 'filled',
       align: 'center',
       title: intl.formatMessage({ id: 'pools.filled' }),
-      render: ({ filled }: { filled: number }) => <div className="font-main text-16">{filled}%</div>,
-      sorter: (a: { filled: number }, b: { filled: number }) => ordNumber.compare(a.filled, b.filled),
+      render: ({ filled }: { filled: BigNumber }) => (
+        <div className="flex flex-col justify-start">
+          <div className="font-main text-16">{formatBN(filled, 2)}%</div>
+          <div className="relative my-[6px] h-[5px] w-full bg-gray1 dark:bg-gray1d">
+            <div
+              className="absolute h-[5px] bg-turquoise"
+              style={{ width: `${Math.min(filled.toNumber(), 100) /* max. 100% */}%` }}></div>
+          </div>
+        </div>
+      ),
+      sorter: (a: { filled: BigNumber }, b: { filled: BigNumber }) => ordBigNumber.compare(a.filled, b.filled),
       sortDirections: ['descend', 'ascend']
     }),
     [intl]
   )
 
-  const countColumn = useCallback(
-    <T extends { count: number }>(): ColumnType<T> => ({
-      key: 'count',
-      align: 'center',
-      title: intl.formatMessage({ id: 'pools.count' }),
-      render: ({ count }: { count: number }) => <div className="font-main text-16">{count}</div>,
-      sorter: (a: { count: number }, b: { count: number }) => ordNumber.compare(a.count, b.count),
-      sortDirections: ['descend', 'ascend']
-    }),
-    [intl]
-  )
-
-  const renderBtnPoolsColumn = useCallback(
+  const renderBtnColumn = useCallback(
     (_: string, { asset }: { asset: Asset }) => {
       const chain = asset.chain
       const disableAllPoolActions = PoolHelpers.disableAllActions({ chain, haltedChains, mimirHalt })
@@ -151,14 +169,16 @@ export const SaversOverview: React.FC<Props> = (props): JSX.Element => {
 
       const disabled = disableAllPoolActions || disableTradingActions || disablePoolActions || walletLocked
 
-      const onClickHandler = () => {
-        navigate(poolsRoutes.savers.path({ asset: assetToString(asset) }))
+      const onClickHandler = (event: React.MouseEvent<HTMLElement, MouseEvent>) => {
+        event.preventDefault()
+        event.stopPropagation()
+        navigate(saversRoutes.earn.path({ asset: assetToString(asset), walletType: DEFAULT_WALLET_TYPE }))
       }
 
       return (
         <div className="flex items-center justify-center">
           <FlatButton className="min-w-[120px]" disabled={disabled} size="normal" onClick={onClickHandler}>
-            {intl.formatMessage({ id: 'common.earn' })}
+            {intl.formatMessage({ id: 'common.manage' })}
           </FlatButton>
         </div>
       )
@@ -176,9 +196,9 @@ export const SaversOverview: React.FC<Props> = (props): JSX.Element => {
         iconOnly: !isDesktopView
       }),
       width: 280,
-      render: renderBtnPoolsColumn
+      render: renderBtnColumn
     }),
-    [refreshHandler, intl, renderBtnPoolsColumn, isDesktopView]
+    [refreshHandler, intl, renderBtnColumn, isDesktopView]
   )
 
   const desktopColumns: ColumnsType<SaversTableRowData> = useMemo(
@@ -187,21 +207,21 @@ export const SaversOverview: React.FC<Props> = (props): JSX.Element => {
       Shared.poolColumn(intl.formatMessage({ id: 'common.pool' })),
       Shared.assetColumn(intl.formatMessage({ id: 'common.asset' })),
       depthColumn<SaversTableRowData>(selectedPricePool.asset),
-      countColumn<SaversTableRowData>(),
       filledColumn<SaversTableRowData>(),
-      aprColumn<SaversTableRowData>(),
+      aprColumn<SaversTableRowData>(poolsPeriod, setPoolsPeriod),
       btnColumn()
     ],
     [
       addPoolToWatchlist,
       aprColumn,
       btnColumn,
-      countColumn,
       depthColumn,
       filledColumn,
+      poolsPeriod,
       intl,
       removePoolFromWatchlist,
-      selectedPricePool.asset
+      selectedPricePool.asset,
+      setPoolsPeriod
     ]
   )
 
@@ -241,42 +261,47 @@ export const SaversOverview: React.FC<Props> = (props): JSX.Element => {
 
   return (
     <>
-      {RD.fold(
-        // initial state
-        () => renderTable([], true),
-        // loading state
-        () => {
-          const pools = O.getOrElse(() => [] as SaversTableRowsData)(previousSavers.current)
-          return renderTable(pools, true)
-        },
-        // render error state
-        Shared.renderTableError(intl.formatMessage({ id: 'common.refresh' }), refreshHandler),
-        // success state
-        ({ poolDetails }: PoolsState): JSX.Element => {
-          // filter chain assets
-          const poolDetailsFiltered: PoolDetails = FP.pipe(
-            poolDetails,
-            A.filter(({ asset: assetString }) =>
-              FP.pipe(
-                assetString,
-                assetFromString,
-                O.fromNullable,
-                O.map(isChainAsset),
-                O.getOrElse(() => false)
+      {FP.pipe(
+        sequenceTRD(poolsRD, maxSynthPerPoolDepthRD),
+        RD.fold(
+          // initial state
+          () => renderTable([], true),
+          // loading state
+          () => {
+            const pools = O.getOrElse(() => [] as SaversTableRowsData)(previousSavers.current)
+            return renderTable(pools, true)
+          },
+          // render error state
+          Shared.renderTableError(intl.formatMessage({ id: 'common.refresh' }), refreshHandler),
+          // success state
+          ([pools, maxSynthPerPoolDepth]): JSX.Element => {
+            const { poolDetails }: PoolsState = pools
+            // filter chain assets
+            const poolDetailsFiltered: PoolDetails = FP.pipe(
+              poolDetails,
+              A.filter(({ asset: assetString }) =>
+                FP.pipe(
+                  assetString,
+                  assetFromString,
+                  O.fromNullable,
+                  O.map(isChainAsset),
+                  O.getOrElse(() => false)
+                )
               )
             )
-          )
 
-          const poolViewData = getSaversTableRowsData({
-            poolDetails: poolDetailsFiltered,
-            pricePoolData: selectedPricePool.poolData,
-            watchlist: poolWatchList,
-            network
-          })
-          previousSavers.current = O.some(poolViewData)
-          return renderTable(poolViewData)
-        }
-      )(poolsRD)}
+            const poolViewData = getSaversTableRowsData({
+              poolDetails: poolDetailsFiltered,
+              pricePoolData: selectedPricePool.poolData,
+              watchlist: poolWatchList,
+              maxSynthPerPoolDepth,
+              network
+            })
+            previousSavers.current = O.some(poolViewData)
+            return renderTable(poolViewData)
+          }
+        )
+      )}
     </>
   )
 }

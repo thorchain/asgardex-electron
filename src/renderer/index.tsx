@@ -3,8 +3,12 @@ import React from 'react'
 import './index.css'
 import { createRoot } from 'react-dom/client'
 
+import { register9Rheader } from '../shared/api/ninerealms'
 import { App } from './App'
 import * as serviceWorker from './serviceWorker'
+
+// Registers custom headers (9R endpoints only)
+register9Rheader()
 
 // React 18 introduces a new root API
 // @see https://reactjs.org/blog/2022/03/08/react-18-upgrade-guide.html#updates-to-client-rendering-apis

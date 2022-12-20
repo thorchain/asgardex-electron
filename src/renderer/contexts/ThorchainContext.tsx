@@ -30,7 +30,9 @@ import {
   thorchainLastblockState$,
   reloadThorchainLastblock,
   getLiquidityProviders,
-  reloadLiquidityProviders
+  reloadLiquidityProviders,
+  getSaverProvider$,
+  reloadSaverProvider
 } from '../services/thorchain'
 
 export type ThorchainContextValue = {
@@ -64,6 +66,8 @@ export type ThorchainContextValue = {
   reloadThorchainLastblock: typeof reloadThorchainLastblock
   getLiquidityProviders: typeof getLiquidityProviders
   reloadLiquidityProviders: typeof reloadLiquidityProviders
+  getSaverProvider$: typeof getSaverProvider$
+  reloadSaverProvider: typeof reloadSaverProvider
 }
 
 const initialContext: ThorchainContextValue = {
@@ -96,7 +100,9 @@ const initialContext: ThorchainContextValue = {
   thorchainLastblockState$,
   reloadThorchainLastblock,
   getLiquidityProviders,
-  reloadLiquidityProviders
+  reloadLiquidityProviders,
+  getSaverProvider$,
+  reloadSaverProvider
 }
 
 const ThorchainContext = createContext<ThorchainContextValue | null>(null)

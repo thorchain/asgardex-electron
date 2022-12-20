@@ -25,7 +25,8 @@ import {
   DepthHistory,
   DepthHistoryItem,
   SwapHistoryItem,
-  GetLiquidityHistoryRequest
+  GetLiquidityHistoryRequest,
+  GetPoolsPeriodEnum
 } from '../../types/generated/midgard'
 import { PricePools, PricePoolAsset, PricePool } from '../../views/pools/Pools.types'
 import { Memo, PoolFeeLD } from '../chain/types'
@@ -163,6 +164,8 @@ export type HealthLD = LiveData<Error, Health>
 export type PoolType = 'active' | 'pending'
 
 export type PoolsService = {
+  setPoolsPeriod: (v: GetPoolsPeriodEnum) => void
+  poolsPeriod$: Rx.Observable<GetPoolsPeriodEnum>
   poolsState$: LiveData<Error, PoolsState>
   pendingPoolsState$: LiveData<Error, PendingPoolsState>
   allPoolDetails$: LiveData<Error, PoolDetails>

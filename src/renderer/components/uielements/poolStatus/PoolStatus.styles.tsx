@@ -46,7 +46,6 @@ export const Value = styled(Label).attrs({
   weight: 'bold',
   size: 'big'
 })`
-  margin-top: 8px;
   text-transform: uppercase;
   overflow: hidden;
   white-space: nowrap;

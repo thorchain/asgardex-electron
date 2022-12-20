@@ -1,6 +1,7 @@
 import * as RD from '@devexperts/remote-data-ts'
 import { Client, ClientUrl, DepositParam, NodeUrl } from '@xchainjs/xchain-thorchain'
 import { Address, Asset, BaseAmount, Chain } from '@xchainjs/xchain-util'
+import BigNumber from 'bignumber.js'
 import * as O from 'fp-ts/Option'
 import * as t from 'io-ts'
 import { optionFromNullable } from 'io-ts-types/lib/optionFromNullable'
@@ -134,6 +135,7 @@ export type ThornodeApiUrlRD = RD.RemoteData<Error, string>
 export const MimirIO = t.type({
   MAXIMUMLIQUIDITYRUNE: t.union([t.number, t.undefined]),
   POOLCYCLE: t.union([t.number, t.undefined]),
+  MAXSYNTHPERPOOLDEPTH: t.union([t.number, t.undefined]),
   HALTTRADING: t.union([t.number, t.undefined]),
   HALTTHORCHAIN: t.union([t.number, t.undefined]),
   HALTETHCHAIN: t.union([t.number, t.undefined]),
@@ -231,6 +233,18 @@ export const LiquidityProviderIO = t.type({
   pending_rune: t.string,
   pending_asset: t.string
 })
+
+export type SaverProvider = {
+  address: Address
+  depositValue: BaseAmount
+  redeemValue: BaseAmount
+  growthPercent: BigNumber
+  addHeight: O.Option<number>
+  withdrawHeight: O.Option<number>
+}
+
+export type SaverProviderRD = RD.RemoteData<Error, SaverProvider>
+export type SaverProviderLD = LiveData<Error, SaverProvider>
 
 export const erc20WhitelistTokenIO = t.type({
   chainId: t.number,

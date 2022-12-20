@@ -118,15 +118,24 @@ export const priceColumn = <T extends { poolPrice: BaseAmount }>(
 
 const renderDepthColumn =
   (pricePoolAsset: Asset) =>
-  ({ depthPrice }: { depthPrice: BaseAmount }) =>
+  ({ asset, depthPrice, depthAmount }: { asset: Asset; depthPrice: BaseAmount; depthAmount: BaseAmount }) =>
     (
-      <Styled.Label align="right" nowrap>
-        {formatAssetAmountCurrency({
-          amount: baseToAsset(depthPrice),
-          asset: pricePoolAsset,
-          decimal: 2
-        })}
-      </Styled.Label>
+      <div className="flex flex-col items-end justify-center font-main">
+        <div className="whitespace-nowrap text-16 text-text0 dark:text-text0d">
+          {formatAssetAmountCurrency({
+            amount: baseToAsset(depthAmount),
+            asset,
+            decimal: 2
+          })}
+        </div>
+        <div className="whitespace-nowrap text-14 text-gray2 dark:text-gray2d">
+          {formatAssetAmountCurrency({
+            amount: baseToAsset(depthPrice),
+            asset: pricePoolAsset,
+            decimal: 2
+          })}
+        </div>
+      </div>
     )
 
 export const depthColumn = <T extends { depthPrice: BaseAmount }>(

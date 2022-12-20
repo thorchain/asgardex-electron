@@ -85,14 +85,6 @@ const Chart: React.FC<ChartProps> = (props): JSX.Element => {
   return renderChart
 }
 
-// Definition for time range buttons
-const TIME_RANGE_BUTTONS: Record<ChartTimeFrame, { labelId: string; tooltipId: string }> = {
-  week: { labelId: 'common.time.days7.short', tooltipId: 'common.time.days7' },
-  month: { labelId: 'common.time.month1.short', tooltipId: 'common.time.month1' },
-  threeMonths: { labelId: 'common.time.months3.short', tooltipId: 'common.time.months3' },
-  year: { labelId: 'common.time.year1.short', tooltipId: 'common.time.year1' },
-  all: { labelId: 'common.time.all.short', tooltipId: 'common.time.all' }
-}
 type Props = {
   chartDetails: ChartDetailsRD
   reloadData: FP.Lazy<void>
@@ -132,6 +124,33 @@ export const PoolDetailsChart: React.FC<Props> = (props: Props): JSX.Element => 
     [intl, reloadData]
   )
 
+  // Labels/toolTips of time range buttons
+  const timeRangeButtons: Record<ChartTimeFrame, { label: string; tooltip: string }> = useMemo(
+    () => ({
+      week: {
+        label: intl.formatMessage({ id: 'common.time.days.short' }, { days: '7' }),
+        tooltip: intl.formatMessage({ id: 'common.time.days' }, { days: '7' })
+      },
+      month: {
+        label: intl.formatMessage({ id: 'common.time.month1.short' }),
+        tooltip: intl.formatMessage({ id: 'common.time.month1' })
+      },
+      threeMonths: {
+        label: intl.formatMessage({ id: 'common.time.months3.short' }),
+        tooltip: intl.formatMessage({ id: 'common.time.months3' })
+      },
+      year: {
+        label: intl.formatMessage({ id: 'common.time.year1.short' }),
+        tooltip: intl.formatMessage({ id: 'common.time.year1' })
+      },
+      all: {
+        label: intl.formatMessage({ id: 'common.time.all.short' }),
+        tooltip: intl.formatMessage({ id: 'common.time.all' })
+      }
+    }),
+    [intl]
+  )
+
   return (
     <Styled.ChartContainer>
       <Styled.HeaderContainer>
@@ -147,13 +166,13 @@ export const PoolDetailsChart: React.FC<Props> = (props: Props): JSX.Element => 
           ))}
         </Styled.TypeContainer>
         <Styled.TimeContainer>
-          {Object.entries(TIME_RANGE_BUTTONS).map(([key, { labelId, tooltipId }]) => (
-            <Tooltip title={intl.formatMessage({ id: tooltipId })} key={key}>
+          {Object.entries(timeRangeButtons).map(([key, { label, tooltip }]) => (
+            <Tooltip title={tooltip} key={key}>
               <Styled.HeaderToggle
                 primary={selectedTimeFrame === key}
                 onClick={!isLoading ? () => setTimeFrame(key as ChartTimeFrame) : undefined}
                 disabled={isLoading}>
-                {intl.formatMessage({ id: labelId })}
+                {label}
               </Styled.HeaderToggle>
             </Tooltip>
           ))}

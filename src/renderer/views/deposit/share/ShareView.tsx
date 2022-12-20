@@ -10,6 +10,7 @@ import * as O from 'fp-ts/lib/Option'
 import { useObservableState } from 'observable-hooks'
 import { useIntl } from 'react-intl'
 
+import { EmptyResult } from '../../../components/shared/result/EmptyResult'
 import { PoolShare as PoolShareUI } from '../../../components/uielements/poolShare'
 import { useMidgardContext } from '../../../contexts/MidgardContext'
 import { to1e8BaseAmount } from '../../../helpers/assetHelper'
@@ -19,7 +20,6 @@ import { PoolDetailRD, PoolShareRD, PoolShare } from '../../../services/midgard/
 import { toPoolData } from '../../../services/midgard/utils'
 import { AssetWithDecimal } from '../../../types/asgardex'
 import { PoolDetail } from '../../../types/generated/midgard'
-import * as Styled from './ShareView.styles'
 
 type Props = {
   asset: AssetWithDecimal
@@ -86,8 +86,8 @@ export const ShareView: React.FC<Props> = ({
 
   const renderNoShare = useMemo(
     () => (
-      <Styled.EmptyData
-        description={intl.formatMessage({
+      <EmptyResult
+        title={intl.formatMessage({
           id: 'deposit.pool.noShares'
         })}
       />

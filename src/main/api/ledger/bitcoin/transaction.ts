@@ -1,8 +1,8 @@
 import AppBTC from '@ledgerhq/hw-app-btc'
 import { Transaction } from '@ledgerhq/hw-app-btc/lib/types'
 import Transport from '@ledgerhq/hw-transport'
-import { broadcastTx, buildTx } from '@xchainjs/xchain-bitcoin'
-import { FeeRate, TxHash } from '@xchainjs/xchain-client'
+import { broadcastTx, buildTx, LOWER_FEE_BOUND, UPPER_FEE_BOUND } from '@xchainjs/xchain-bitcoin'
+import { checkFeeBounds, FeeRate, TxHash } from '@xchainjs/xchain-client'
 import { Address, BaseAmount } from '@xchainjs/xchain-util'
 import * as Bitcoin from 'bitcoinjs-lib'
 import * as E from 'fp-ts/lib/Either'
@@ -44,6 +44,10 @@ export const send = async ({
   }
 
   try {
+    // safety check for fees, similar to handling in `Client.transfer`
+    // @see https://github.com/xchainjs/xchainjs-lib/blob/21e1f65288b994de8b98cb779550e08c15f96314/packages/xchain-bitcoin/src/client.ts#L296
+    checkFeeBounds({ lower: LOWER_FEE_BOUND, upper: UPPER_FEE_BOUND }, feeRate)
+
     const app = new AppBTC(transport)
     const clientNetwork = toClientNetwork(network)
     const derivePath = getDerivationPath(walletIndex, clientNetwork)

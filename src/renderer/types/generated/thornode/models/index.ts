@@ -9,6 +9,7 @@ export * from './KeysignMetrics';
 export * from './KeysignResponse';
 export * from './LastBlock';
 export * from './LiquidityProvider';
+export * from './LiquidityProviderSummary';
 export * from './MetricsResponse';
 export * from './MimirNodesResponse';
 export * from './MimirVote';

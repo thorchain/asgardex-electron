@@ -97,6 +97,8 @@ export const eqApiError = Eq.struct<ApiError>({
   msg: eqString
 })
 
+export const eqError: Eq.Eq<Error> = { equals: (x, y) => x === y }
+
 export const eqBalances = A.getEq(eqBalance)
 export const eqAssetsWithAmount = A.getEq(eqAssetWithAmount)
 

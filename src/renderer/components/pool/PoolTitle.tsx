@@ -9,8 +9,10 @@ import { useNavigate } from 'react-router-dom'
 
 import { Network } from '../../../shared/api/types'
 import { Action as ActionButtonAction, ActionButton } from '../../components/uielements/button/ActionButton'
+import { DEFAULT_WALLET_TYPE } from '../../const'
 import { loadingString } from '../../helpers/stringHelper'
 import * as poolsRoutes from '../../routes/pools'
+import * as saversRoutes from '../../routes/pools/savers'
 import { AssetIcon } from '../uielements/assets/assetIcon'
 import * as Styled from './PoolTitle.styles'
 
@@ -20,7 +22,6 @@ export type Props = {
   watch: FP.Lazy<void>
   unwatch: FP.Lazy<void>
   price: RD.RemoteData<Error, { amount: AssetAmount; symbol: string }>
-  isLoading?: boolean
   disableTradingPoolAction: boolean
   disableAllPoolActions: boolean
   disablePoolActions: boolean
@@ -94,7 +95,7 @@ export const PoolTitle: React.FC<Props> = ({
         label: intl.formatMessage({ id: 'common.savers' }),
         disabled: !isAvailablePool || disableAllPoolActions || disableTradingPoolAction,
         callback: () => {
-          navigate(poolsRoutes.savers.path({ asset: assetToString(asset) }))
+          navigate(saversRoutes.earn.path({ asset: assetToString(asset), walletType: DEFAULT_WALLET_TYPE }))
         }
       }
     ]

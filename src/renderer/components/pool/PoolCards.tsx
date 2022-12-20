@@ -10,8 +10,10 @@ import { ZERO_ASSET_AMOUNT, ZERO_BN } from '../../const'
 import { sequenceTRD } from '../../helpers/fpHelpers'
 import { abbreviateNumber } from '../../helpers/numberHelper'
 import { PoolDetailRD, PoolStatsDetailRD } from '../../services/midgard/types'
+import { GetPoolsPeriodEnum } from '../../types/generated/midgard'
 import { ErrorView } from '../shared/error'
 import { Button } from '../uielements/button'
+import { PoolsPeriodSelector } from '../uielements/pools/PoolsPeriodSelector'
 import { PoolStatus } from '../uielements/poolStatus'
 import * as Styled from './PoolCards.styles'
 import * as H from './PoolDetails.helpers'
@@ -22,10 +24,20 @@ export type Props = {
   reloadData: FP.Lazy<void>
   priceSymbol: string
   priceRatio: BigNumber
+  poolsPeriod: GetPoolsPeriodEnum
+  setPoolsPeriod: (v: GetPoolsPeriodEnum) => void
 }
 
 export const PoolCards: React.FC<Props> = (props) => {
-  const { poolStatsDetail: poolStatsDetailRD, priceSymbol, poolDetail: poolDetailRD, priceRatio, reloadData } = props
+  const {
+    poolStatsDetail: poolStatsDetailRD,
+    priceSymbol,
+    poolDetail: poolDetailRD,
+    priceRatio,
+    reloadData,
+    poolsPeriod,
+    setPoolsPeriod
+  } = props
   const intl = useIntl()
 
   const getFullValue = useCallback(
@@ -112,6 +124,7 @@ export const PoolCards: React.FC<Props> = (props) => {
           <PoolStatus
             isLoading={isLoading}
             label={intl.formatMessage({ id: 'deposit.poolDetails.apy' })}
+            extraLabel={<PoolsPeriodSelector selectedValue={poolsPeriod} onChange={setPoolsPeriod} />}
             displayValue={`${abbreviateNumber(apy.toNumber(), 2)} %`}
           />
         </Styled.Col>
@@ -126,7 +139,7 @@ export const PoolCards: React.FC<Props> = (props) => {
         </Styled.Col>
       </Styled.Container>
     ),
-    [getFullValue, intl, priceSymbol]
+    [getFullValue, intl, poolsPeriod, priceSymbol, setPoolsPeriod]
   )
 
   return FP.pipe(
