@@ -24,6 +24,7 @@
 - Upgrade types / endpoints to latest THORNode@1.101.0 [#2475](https://github.com/thorchain/asgardex-electron/pull/2475)
 - AssetsTableCollapsable: Combine balance/price [#2478](https://github.com/thorchain/asgardex-electron/pull/2478)
 - Update pools routes [#2482](https://github.com/thorchain/asgardex-electron/pull/2482)
+- [Ledger] Add a safety check of fees before signing txs [#2491](https://github.com/thorchain/asgardex-electron/issues/2491)
 
 ## Fix
 
@@ -34,6 +35,7 @@
 ## Internal
 
 - Update to latest Electron@22.0.0 / TypeScript@4.9.4[#2480](https://github.com/thorchain/asgardex-electron/pull/2480)
+- Downgrade to Electron@20.x.x [#2493](https://github.com/thorchain/asgardex-electron/pull/2493)
 
 # 1.18.4 (2022-11-03)
 
