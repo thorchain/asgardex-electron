@@ -47,7 +47,10 @@ export const send = async ({
     // @see https://github.com/xchainjs/xchainjs-lib/blob/d6752ac3d6f17a0fe8f1755fcc6cd190119e4e23/packages/xchain-doge/src/client.ts#L300
     checkFeeBounds({ lower: LOWER_FEE_BOUND, upper: UPPER_FEE_BOUND }, feeRate)
 
-    const app = new AppBTC(transport)
+    // Value of `currency` -> `GetAddressOptions` -> `currency` -> `id`
+    // Example https://github.com/LedgerHQ/ledger-live/blob/37c0771329dd5a40dfe3430101bbfb100330f6bd/libs/ledger-live-common/src/families/bitcoin/hw-getAddress.ts#L17
+    // DOGE -> `dogecoin` https://github.com/LedgerHQ/ledger-live/blob/37c0771329dd5a40dfe3430101bbfb100330f6bd/libs/ledgerjs/packages/cryptoassets/src/currencies.ts#L834
+    const app = new AppBTC({ transport, currency: 'dogecoin' })
     const clientNetwork = toClientNetwork(network)
     const derivePath = getDerivationPath(walletIndex, clientNetwork)
 
@@ -77,7 +80,7 @@ export const send = async ({
 
     const outputScriptHex = app.serializeTransactionOutputs(newTx).toString('hex')
 
-    const txHex = await app.createPaymentTransactionNew({
+    const txHex = await app.createPaymentTransaction({
       inputs,
       associatedKeysets,
       outputScriptHex,

@@ -48,7 +48,10 @@ export const send = async ({
     // @see https://github.com/xchainjs/xchainjs-lib/blob/21e1f65288b994de8b98cb779550e08c15f96314/packages/xchain-litecoin/src/client.ts#L306
     checkFeeBounds({ lower: LOWER_FEE_BOUND, upper: UPPER_FEE_BOUND }, feeRate)
 
-    const app = new AppBTC(transport)
+    // Value of `currency` -> `GetAddressOptions` -> `currency` -> `id`
+    // Example https://github.com/LedgerHQ/ledger-live/blob/37c0771329dd5a40dfe3430101bbfb100330f6bd/libs/ledger-live-common/src/families/bitcoin/hw-getAddress.ts#L17
+    // LTC -> `litecoin` https://github.com/LedgerHQ/ledger-live/blob/37c0771329dd5a40dfe3430101bbfb100330f6bd/libs/ledgerjs/packages/cryptoassets/src/currencies.ts#L1546
+    const app = new AppBTC({ transport, currency: 'litecoin' })
     const clientNetwork = toClientNetwork(network)
     const derivePath = getDerivationPath(walletIndex, clientNetwork)
 
@@ -79,7 +82,7 @@ export const send = async ({
 
     const outputScriptHex = app.serializeTransactionOutputs(newTx).toString('hex')
 
-    const txHex = await app.createPaymentTransactionNew({
+    const txHex = await app.createPaymentTransaction({
       inputs,
       associatedKeysets,
       outputScriptHex,
