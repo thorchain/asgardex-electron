@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useMemo, useState } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
 import { COSMOS_DECIMAL } from '@xchainjs/xchain-cosmos'
-import { Address } from '@xchainjs/xchain-util'
+import { Address, baseAmount } from '@xchainjs/xchain-util'
 import {
   formatAssetAmountCurrency,
   assetAmount,
@@ -145,7 +145,11 @@ export const SendFormCOSMOS: React.FC<Props> = (props): JSX.Element => {
       O.fold(
         // Set maxAmount to zero if we dont know anything about RuneNative and fee amounts
         () => ZERO_BASE_AMOUNT,
-        (fee) => balance.amount.minus(fee)
+        (fee) => {
+          const max = balance.amount.minus(fee)
+          const zero = baseAmount(0, max.decimal)
+          return max.gt(zero) ? max : zero
+        }
       )
     )
     return isRuneNativeAsset(asset) ? maxRuneAmount : balance.amount

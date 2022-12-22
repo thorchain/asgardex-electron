@@ -7,6 +7,7 @@
 ## Fix
 
 - External links not clickable [#2495](https://github.com/thorchain/asgardex-electron/issues/2495)
+- [Send] Max value can't be negative [#2500](https://github.com/thorchain/asgardex-electron/issues/2500)
 
 # 1.18.5 (2022-12-20)
 

@@ -157,7 +157,11 @@ export const SendFormBNB: React.FC<Props> = (props): JSX.Element => {
       O.fold(
         // Set maxAmount to zero if we dont know anything about bnb and fee amounts
         () => ZERO_BASE_AMOUNT,
-        ([fee, bnbAmount]) => baseAmount(bnbAmount.amount().minus(fee.amount()))
+        ([fee, bnbAmount]) => {
+          const max = bnbAmount.minus(fee)
+          const zero = baseAmount(0, max.decimal)
+          return max.gt(zero) ? max : zero
+        }
       )
     )
     return isBnbAsset(asset) ? maxBnbAmount : balance.amount
