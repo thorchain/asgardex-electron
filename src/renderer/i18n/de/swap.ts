@@ -7,6 +7,7 @@ const swap: SwapMessages = {
   'swap.input': 'Eingabe',
   'swap.output': 'Ausgabe',
   'swap.info.max.balance': 'Gesamtguthaben ({balance})',
+  'swap.info.max.balanceMinusFee': 'Gesamtguthaben ({balance}) minus voraussichtliche Swapgebühr ({fee})',
   'swap.slip.title': 'Slip',
   'swap.slip.tolerance': 'Slippage-Toleranz',
   'swap.slip.tolerance.info':
