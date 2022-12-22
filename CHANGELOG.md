@@ -7,6 +7,7 @@
 ## Fix
 
 - External links not clickable [#2495](https://github.com/thorchain/asgardex-electron/issues/2495)
+- [Swap] Fees needs to be considered for max value to swap [#2498](https://github.com/thorchain/asgardex-electron/issues/2498)
 
 # 1.18.5 (2022-12-20)
 

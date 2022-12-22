@@ -10,6 +10,7 @@ import { ASGARDEX_IDENTIFIER } from '../../../shared/const'
 import { isLedgerWallet } from '../../../shared/utils/guard'
 import { ZERO_BASE_AMOUNT } from '../../const'
 import {
+  isAtomAsset,
   isChainAsset,
   isRuneNativeAsset,
   isUtxoAssetChain,
@@ -256,6 +257,30 @@ export const calcAmountToSwapMax1e8 = ({
   // fees needs to be deducted
   const amountToSwap = amountToSwapMax1e8.minus(max1e8BaseAmount(inFeeAmount))
   return amountToSwap.gt(baseAmount(0)) ? amountToSwap : baseAmount(0, amountToSwapMax1e8.decimal)
+}
+
+/**
+ * Calculates max. balance available to swap
+ * In some cases fees needs to be deducted from given amount
+ *
+ * assetAmountMax1e8 => balances of source asset (max 1e8)
+ * feeAmount => fee of inbound tx
+ */
+export const maxAmountToSwapMax1e8 = ({
+  asset,
+  balanceAmountMax1e8,
+  feeAmount
+}: {
+  asset: Asset
+  balanceAmountMax1e8: BaseAmount
+  feeAmount: BaseAmount
+}): BaseAmount => {
+  // For not chain assets or THOR/COSMOS chains: No change
+  if (!isChainAsset(asset) || isRuneNativeAsset(asset) || isAtomAsset(asset)) return balanceAmountMax1e8
+
+  const estimatedFee = max1e8BaseAmount(feeAmount)
+  const maxAmountToSwap = balanceAmountMax1e8.minus(estimatedFee)
+  return maxAmountToSwap.gt(baseAmount(0)) ? maxAmountToSwap : baseAmount(0)
 }
 
 export const assetsInWallet: (_: WalletBalances) => Asset[] = FP.flow(A.map(({ asset }) => asset))
