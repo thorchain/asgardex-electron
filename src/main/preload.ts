@@ -4,6 +4,7 @@ import { ipcRenderer } from 'electron'
 import type {
   ApiFileStoreService,
   ApiKeystore,
+  ApiUrl,
   AppUpdateRD,
   IPCExportKeystoreParams,
   StoreFileData,
@@ -12,7 +13,6 @@ import type {
 import { getStoreFilesIPCMessages } from '../shared/ipc/fileStore'
 import { apiHDWallet } from './api/hdwallet'
 import { apiLang } from './api/lang'
-import { apiUrl } from './api/url'
 import IPCMessages from './ipc/messages'
 
 // ContextBridge is used here to expose custom api objects on `window`
@@ -45,6 +45,10 @@ contextBridge.exposeInMainWorld('apiLang', apiLang)
 //
 // `apiUrl` object
 //
+const apiUrl: ApiUrl = {
+  openExternal: (url: string) => ipcRenderer.invoke(IPCMessages.OPEN_EXTERNAL_URL, url)
+}
+
 contextBridge.exposeInMainWorld('apiUrl', apiUrl)
 
 //

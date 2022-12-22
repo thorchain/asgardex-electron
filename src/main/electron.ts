@@ -32,6 +32,7 @@ import {
   saveAddresses as saveLedgerAddresses
 } from './api/ledger'
 import { approveLedgerERC20Token } from './api/ledger/ethereum/approve'
+import { openExternal } from './api/url'
 import IPCMessages from './ipc/messages'
 import { setMenu } from './menu'
 
@@ -157,6 +158,8 @@ const initIPC = () => {
   ipcMain.handle(IPCMessages.EXPORT_KEYSTORE, async (_, params: IPCExportKeystoreParams) => exportKeystore(params))
   ipcMain.handle(IPCMessages.LOAD_KEYSTORE, async () => loadKeystore())
   ipcMain.handle(IPCMessages.INIT_KEYSTORE_WALLETS, async () => initKeystoreWallets())
+  // Url
+  ipcMain.handle(IPCMessages.OPEN_EXTERNAL_URL, async (_, url) => openExternal(url))
   // Ledger
   ipcMain.handle(IPCMessages.GET_LEDGER_ADDRESS, async (_, params: IPCLedgerAdddressParams) => getLedgerAddress(params))
   ipcMain.handle(IPCMessages.VERIFY_LEDGER_ADDRESS, async (_, params: IPCLedgerAdddressParams) =>

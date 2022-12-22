@@ -4,6 +4,10 @@
 
 - [Savers] UI [#2485](https://github.com/thorchain/asgardex-electron/pull/2485)
 
+## Fix
+
+- External links not clickable [#2495](https://github.com/thorchain/asgardex-electron/issues/2495)
+
 # 1.18.5 (2022-12-20)
 
 ## Add
