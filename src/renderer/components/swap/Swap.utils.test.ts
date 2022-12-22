@@ -30,7 +30,7 @@ import {
   calcRefundFee,
   minAmountToSwapMax1e8,
   getSwapLimit1e8,
-  calcAmountToSwapMax1e8,
+  maxAmountToSwapMax1e8,
   assetsInWallet,
   balancesToSwapFrom,
   hasLedgerInBalancesByChain
@@ -640,44 +640,44 @@ describe('components/swap/utils', () => {
     })
   })
 
-  describe('calcAmountToSwapMax1e8', () => {
+  describe('maxAmountToSwapMax1e8', () => {
     it('balance to swap - with estimated fees', () => {
       const params = {
-        amountToSwapMax1e8: baseAmount(1000),
-        sourceAsset: AssetBNB,
-        inFeeAmount: baseAmount(100)
+        balanceAmountMax1e8: baseAmount(1000),
+        asset: AssetBNB,
+        feeAmount: baseAmount(100)
       }
-      const result = calcAmountToSwapMax1e8(params)
+      const result = maxAmountToSwapMax1e8(params)
       expect(eqBaseAmount.equals(result, baseAmount(900))).toBeTruthy()
     })
 
     it('balance to swap - with 1e18 based estimated fees', () => {
       const params = {
-        amountToSwapMax1e8: baseAmount(100),
-        sourceAsset: AssetETH,
-        inFeeAmount: baseAmount(100000000000, 18)
+        balanceAmountMax1e8: baseAmount(100),
+        asset: AssetETH,
+        feeAmount: baseAmount(100000000000, 18)
       }
-      const result = calcAmountToSwapMax1e8(params)
+      const result = maxAmountToSwapMax1e8(params)
       expect(eqBaseAmount.equals(result, baseAmount(90))).toBeTruthy()
     })
 
     it('balance is less than fee - with 1e18 based estimated fees', () => {
       const params = {
-        amountToSwapMax1e8: baseAmount(1),
-        sourceAsset: AssetETH,
-        inFeeAmount: baseAmount(100000000000, 18)
+        balanceAmountMax1e8: baseAmount(1),
+        asset: AssetETH,
+        feeAmount: baseAmount(100000000000, 18)
       }
-      const result = calcAmountToSwapMax1e8(params)
+      const result = maxAmountToSwapMax1e8(params)
       expect(eqBaseAmount.equals(result, baseAmount(0))).toBeTruthy()
     })
 
     it('no chain asset - no change', () => {
       const params = {
-        amountToSwapMax1e8: baseAmount(100),
-        sourceAsset: AssetBUSDBAF,
-        inFeeAmount: baseAmount(50, 8)
+        balanceAmountMax1e8: baseAmount(100),
+        asset: AssetBUSDBAF,
+        feeAmount: baseAmount(50, 8)
       }
-      const result = calcAmountToSwapMax1e8(params)
+      const result = maxAmountToSwapMax1e8(params)
       expect(eqBaseAmount.equals(result, baseAmount(100))).toBeTruthy()
     })
   })

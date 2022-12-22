@@ -258,6 +258,30 @@ export const calcAmountToSwapMax1e8 = ({
   return amountToSwap.gt(baseAmount(0)) ? amountToSwap : baseAmount(0, amountToSwapMax1e8.decimal)
 }
 
+/**
+ * Calculates max. balance available to swap
+ * In some cases fees needs to be deducted from given amount
+ *
+ * assetAmountMax1e8 => balances of source asset (max 1e8)
+ * feeAmount => fee of inbound tx
+ */
+export const maxAmountToSwapMax1e8 = ({
+  asset,
+  balanceAmountMax1e8,
+  feeAmount
+}: {
+  asset: Asset
+  balanceAmountMax1e8: BaseAmount
+  feeAmount: BaseAmount
+}): BaseAmount => {
+  // Ignore non-chain assets
+  if (!isChainAsset(asset)) return balanceAmountMax1e8
+
+  const estimatedFee = max1e8BaseAmount(feeAmount)
+  const maxAmountToSwap = balanceAmountMax1e8.minus(estimatedFee)
+  return maxAmountToSwap.gt(baseAmount(0)) ? maxAmountToSwap : baseAmount(0)
+}
+
 export const assetsInWallet: (_: WalletBalances) => Asset[] = FP.flow(A.map(({ asset }) => asset))
 
 export const balancesToSwapFrom = ({

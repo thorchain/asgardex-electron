@@ -42,7 +42,8 @@ import {
   convertBaseAmountDecimal,
   to1e8BaseAmount,
   THORCHAIN_DECIMAL,
-  isUSDAsset
+  isUSDAsset,
+  isChainAsset
 } from '../../helpers/assetHelper'
 import { getChainAsset, isBchChain, isBtcChain, isDogeChain, isEthChain, isLtcChain } from '../../helpers/chainHelper'
 import { unionAssets } from '../../helpers/fp/array'
@@ -633,20 +634,16 @@ export const Swap = ({
     )
   }, [swapFees, targetAsset, poolsData, zeroTargetBaseAmountMax, targetAssetDecimal])
 
-  const swapData: SwapData = useMemo(() => {
-    const amountToSwap = Utils.calcAmountToSwapMax1e8({
-      amountToSwapMax1e8,
-      sourceAsset,
-      inFeeAmount: swapFees.inFee.amount
-    })
-
-    return Utils.getSwapData({
-      amountToSwap,
-      sourceAsset: sourceAsset,
-      targetAsset: targetAsset,
-      poolsData
-    })
-  }, [sourceAsset, swapFees.inFee.amount, amountToSwapMax1e8, targetAsset, poolsData])
+  const swapData: SwapData = useMemo(
+    () =>
+      Utils.getSwapData({
+        amountToSwap: amountToSwapMax1e8,
+        sourceAsset: sourceAsset,
+        targetAsset: targetAsset,
+        poolsData
+      }),
+    [sourceAsset, amountToSwapMax1e8, targetAsset, poolsData]
+  )
 
   const swapResultAmountMax1e8: BaseAmount = useMemo(() => {
     // 1. Convert `swapResult` (1e8) to original decimal of target asset (original decimal might be < 1e8)
@@ -967,8 +964,12 @@ export const Swap = ({
   const maxAmountToSwapMax1e8: BaseAmount = useMemo(() => {
     if (lockedWallet) return assetToBase(assetAmount(Number.MAX_SAFE_INTEGER, sourceAssetAmountMax1e8.decimal))
 
-    return sourceAssetAmountMax1e8
-  }, [lockedWallet, sourceAssetAmountMax1e8])
+    return Utils.maxAmountToSwapMax1e8({
+      asset: sourceAsset,
+      balanceAmountMax1e8: sourceAssetAmountMax1e8,
+      feeAmount: swapFees.inFee.amount
+    })
+  }, [lockedWallet, sourceAsset, sourceAssetAmountMax1e8, swapFees.inFee.amount])
 
   const setAmountToSwapMax1e8 = useCallback(
     (amountToSwap: BaseAmount) => {
@@ -1624,8 +1625,23 @@ export const Swap = ({
       trimZeros: !isUSDAsset(sourceAsset)
     })
 
-    return intl.formatMessage({ id: 'swap.info.max.balance' }, { balance: balanceLabel })
-  }, [sourceAssetAmountMax1e8, sourceAsset, intl])
+    const feeLabel = FP.pipe(
+      swapFeesRD,
+      RD.map(({ inFee: { amount, asset: feeAsset } }) =>
+        formatAssetAmountCurrency({
+          amount: baseToAsset(amount),
+          asset: feeAsset,
+          decimal: isUSDAsset(feeAsset) ? 2 : 8, // use 8 decimal as same we use in maxAmountToSwapMax1e8
+          trimZeros: !isUSDAsset(feeAsset)
+        })
+      ),
+      RD.getOrElse(() => noDataString)
+    )
+
+    return isChainAsset(sourceAsset)
+      ? intl.formatMessage({ id: 'swap.info.max.balanceMinusFee' }, { balance: balanceLabel, fee: feeLabel })
+      : intl.formatMessage({ id: 'swap.info.max.balance' }, { balance: balanceLabel })
+  }, [sourceAssetAmountMax1e8, sourceAsset, swapFeesRD, intl])
 
   const [showDetails, setShowDetails] = useState<boolean>(false)
 

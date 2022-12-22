@@ -378,6 +378,7 @@ type SwapMessageKey =
   | 'swap.state.success'
   | 'swap.state.error'
   | 'swap.info.max.balance'
+  | 'swap.info.max.balanceMinusFee'
   | 'swap.errors.asset.missingSourceAsset'
   | 'swap.errors.asset.missingTargetAsset'
   | 'swap.errors.amount.balanceShouldCoverChainFee'
