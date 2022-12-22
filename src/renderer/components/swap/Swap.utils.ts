@@ -10,7 +10,6 @@ import { ASGARDEX_IDENTIFIER } from '../../../shared/const'
 import { isLedgerWallet } from '../../../shared/utils/guard'
 import { ZERO_BASE_AMOUNT } from '../../const'
 import {
-  isAtomAsset,
   isChainAsset,
   isRuneNativeAsset,
   isUtxoAssetChain,
@@ -275,8 +274,8 @@ export const maxAmountToSwapMax1e8 = ({
   balanceAmountMax1e8: BaseAmount
   feeAmount: BaseAmount
 }): BaseAmount => {
-  // For not chain assets or THOR/COSMOS chains: No change
-  if (!isChainAsset(asset) || isRuneNativeAsset(asset) || isAtomAsset(asset)) return balanceAmountMax1e8
+  // Ignore non-chain assets
+  if (!isChainAsset(asset)) return balanceAmountMax1e8
 
   const estimatedFee = max1e8BaseAmount(feeAmount)
   const maxAmountToSwap = balanceAmountMax1e8.minus(estimatedFee)

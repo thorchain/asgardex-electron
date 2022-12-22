@@ -43,9 +43,7 @@ import {
   to1e8BaseAmount,
   THORCHAIN_DECIMAL,
   isUSDAsset,
-  isChainAsset,
-  isRuneNativeAsset,
-  isAtomAsset
+  isChainAsset
 } from '../../helpers/assetHelper'
 import { getChainAsset, isBchChain, isBtcChain, isDogeChain, isEthChain, isLtcChain } from '../../helpers/chainHelper'
 import { unionAssets } from '../../helpers/fp/array'
@@ -1640,7 +1638,7 @@ export const Swap = ({
       RD.getOrElse(() => noDataString)
     )
 
-    return isChainAsset(sourceAsset) && !isRuneNativeAsset(sourceAsset) && !isAtomAsset(sourceAsset)
+    return isChainAsset(sourceAsset)
       ? intl.formatMessage({ id: 'swap.info.max.balanceMinusFee' }, { balance: balanceLabel, fee: feeLabel })
       : intl.formatMessage({ id: 'swap.info.max.balance' }, { balance: balanceLabel })
   }, [sourceAssetAmountMax1e8, sourceAsset, swapFeesRD, intl])
