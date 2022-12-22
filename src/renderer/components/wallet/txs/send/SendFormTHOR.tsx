@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
-import { Address } from '@xchainjs/xchain-util'
+import { Address, baseAmount } from '@xchainjs/xchain-util'
 import {
   formatAssetAmountCurrency,
   assetAmount,
@@ -158,7 +158,11 @@ export const SendFormTHOR: React.FC<Props> = (props): JSX.Element => {
       O.fold(
         // Set maxAmount to zero if we dont know anything about RuneNative and fee amounts
         () => ZERO_BASE_AMOUNT,
-        ([fee, runeAmount]) => runeAmount.minus(fee)
+        ([fee, runeAmount]) => {
+          const max = runeAmount.minus(fee)
+          const zero = baseAmount(0, max.decimal)
+          return max.gt(zero) ? max : zero
+        }
       )
     )
     return isRuneNativeAsset(asset) ? maxRuneAmount : balance.amount

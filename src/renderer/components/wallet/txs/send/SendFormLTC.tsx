@@ -25,7 +25,7 @@ import { useIntl } from 'react-intl'
 import { Network } from '../../../../../shared/api/types'
 import { isKeystoreWallet, isLedgerWallet } from '../../../../../shared/utils/guard'
 import { WalletType } from '../../../../../shared/wallet/types'
-import { ZERO_BASE_AMOUNT, ZERO_BN } from '../../../../const'
+import { ZERO_BASE_AMOUNT } from '../../../../const'
 import { useSubscriptionState } from '../../../../hooks/useSubscriptionState'
 import { INITIAL_SEND_STATE } from '../../../../services/chain/const'
 import { Memo, SendTxState, SendTxStateHandler } from '../../../../services/chain/types'
@@ -235,10 +235,13 @@ export const SendFormLTC: React.FC<Props> = (props): JSX.Element => {
       FP.pipe(
         selectedFee,
         O.alt(() => prevSelectedFeeRef.current),
-        O.map((fee) => balance.amount.amount().minus(fee.amount())),
+        O.map((fee) => {
+          const max = balance.amount.minus(fee)
+          const zero = baseAmount(0, max.decimal)
+          return max.gt(zero) ? max : zero
+        }),
         // Set maxAmount to zero as long as we dont have a feeRate
-        O.getOrElse(() => ZERO_BN),
-        baseAmount
+        O.getOrElse(() => ZERO_BASE_AMOUNT)
       ),
     [balance.amount, selectedFee]
   )

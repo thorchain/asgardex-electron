@@ -44,8 +44,8 @@ export const MaxBalanceButton: React.FC<Props> = (props): JSX.Element => {
         size={size}
         disabled={disabled}
         onClick={onClickHandler}
-        className={`mr-5px w-auto !p-0 ${classNameButton}`}>
-        <span className="underline">{intl.formatMessage({ id: 'common.max' })}:</span>
+        className={`mr-5px w-auto !p-0 ${classNameButton} whitespace-nowrap`}>
+        <span className="pr-5px underline">{intl.formatMessage({ id: 'common.max' })}:</span>
         &nbsp;
         {formatAssetAmountCurrency({
           amount: baseToAsset(amount),
