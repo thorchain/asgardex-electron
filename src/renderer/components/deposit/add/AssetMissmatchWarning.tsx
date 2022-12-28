@@ -4,16 +4,18 @@ import { useIntl } from 'react-intl'
 
 import { Network } from '../../../../shared/api/types'
 import { AssetsWithAddress } from '../../../types/asgardex'
+import { Alert } from '../../uielements/alert'
 import * as CStyled from './AssetMissmatchWarning.styles'
 import * as Styled from './Deposit.styles'
 
 export type Props = {
   network: Network
   assets: AssetsWithAddress
+  className?: string
 }
 
 export const AssetMissmatchWarning: React.FC<Props> = (props): JSX.Element => {
-  const { assets: assetsWA, network } = props
+  const { assets: assetsWA, network, className = '' } = props
 
   const intl = useIntl()
 
@@ -49,7 +51,8 @@ export const AssetMissmatchWarning: React.FC<Props> = (props): JSX.Element => {
   )
 
   return (
-    <Styled.Alert
+    <Alert
+      className={className}
       type="warning"
       message={intl.formatMessage({ id: 'deposit.add.assetMissmatch.title' })}
       description={subContent}

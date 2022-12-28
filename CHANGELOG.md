@@ -1,8 +1,14 @@
-# 1.19.0 (2022-12-xx)
+# 1.19.0 (2023-01-xx)
 
 ## Add
 
 - [Savers] UI [#2485](https://github.com/thorchain/asgardex-electron/pull/2485)
+
+# 1.18.6 (2022-12-xx)
+
+## Update
+
+- [SymDeposit] Redesign
 
 ## Fix
 

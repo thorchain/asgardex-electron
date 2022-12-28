@@ -5,7 +5,6 @@ import { palette } from 'styled-theme'
 
 import { media } from '../../../helpers/styleHelper'
 import { LoadingView as UILoadingView } from '../../shared/loading'
-import { Alert as UIAlert } from '../../uielements/alert'
 import { AssetCard as UIAssetCard } from '../../uielements/assets/assetCard'
 import { AssetIcon as UIAssetIcon } from '../../uielements/assets/assetIcon'
 import { AssetLabel as UIAssetLabel } from '../../uielements/assets/assetLabel'
@@ -14,38 +13,11 @@ import { ViewTxButton as UIViewTxButton } from '../../uielements/button'
 import { ExternalLinkIcon as UIExternalLinkIcon } from '../../uielements/common/Common.styles'
 import { Label as UILabel } from '../../uielements/label'
 
-export const Container = styled.div`
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: space-between;
-  width: 100%;
-  min-height: 100%;
-`
-
 export const CardsRow = styled(Row).attrs({
   justify: 'center',
   align: 'top'
 })`
   width: 100%;
-`
-
-export const AlertRow = styled(Row)`
-  width: 100%;
-  padding: 0 0 20px 0;
-
-  ${media.xl`
-    padding: 0 20px 20px 20px;
-`}
-`
-
-export const Alert = styled(UIAlert)`
-  width: 100%;
-  margin: 0;
-
-  ${media.xl`
-  margin-right: 20px;
-`}
 `
 
 export const BalanceErrorLabel = styled(UILabel).attrs({

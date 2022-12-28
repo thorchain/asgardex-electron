@@ -7,6 +7,7 @@ import { FormattedMessage, useIntl } from 'react-intl'
 import { Network } from '../../../../shared/api/types'
 import { RECOVERY_TOOL_URL } from '../../../const'
 import { AssetWithAmount1e8, AssetsWithAmount1e8 } from '../../../types/asgardex'
+import { Alert } from '../../uielements/alert'
 import * as Styled from './Deposit.styles'
 
 type AssetIconAmountProps = {
@@ -40,10 +41,11 @@ export type PendingAssetsProps = {
   assets: AssetsWithAmount1e8
   loading: boolean
   onClickRecovery: FP.Lazy<void>
+  className?: string
 }
 
 export const PendingAssetsWarning: React.FC<PendingAssetsProps> = (props): JSX.Element => {
-  const { assets, network, loading, onClickRecovery } = props
+  const { assets, network, loading, onClickRecovery, className = '' } = props
 
   const intl = useIntl()
 
@@ -93,7 +95,8 @@ export const PendingAssetsWarning: React.FC<PendingAssetsProps> = (props): JSX.E
   )
 
   return (
-    <Styled.Alert
+    <Alert
+      className={className}
       type="warning"
       message={intl.formatMessage({ id: 'deposit.add.pendingAssets.title' })}
       description={subContent}

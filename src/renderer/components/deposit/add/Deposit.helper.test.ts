@@ -2,13 +2,13 @@ import * as RD from '@devexperts/remote-data-ts'
 import { PoolData } from '@thorchain/asgardex-util'
 import { BTC_DECIMAL } from '@xchainjs/xchain-bitcoin'
 import { ETH_DECIMAL } from '@xchainjs/xchain-ethereum'
-import { assetAmount, AssetBNB, AssetBTC, AssetETH, assetToBase, BaseAmount, baseAmount } from '@xchainjs/xchain-util'
+import { assetAmount, AssetBNB, AssetBTC, AssetETH, assetToBase, baseAmount } from '@xchainjs/xchain-util'
 import * as O from 'fp-ts/Option'
 
 import { AssetBUSD74E, AssetUSDTERC20Testnet } from '../../../const'
 import { BNB_DECIMAL, THORCHAIN_DECIMAL } from '../../../helpers/assetHelper'
 import { eqBaseAmount, eqODepositAssetFees, eqODepositFees } from '../../../helpers/fp/eq'
-import { DepositAssetFees, DepositFees, SymDepositFeesRD } from '../../../services/chain/types'
+import { DepositAssetFees, DepositFees, SymDepositFees, SymDepositFeesRD } from '../../../services/chain/types'
 import {
   getAssetAmountToDeposit,
   getRuneAmountToDeposit,
@@ -18,7 +18,8 @@ import {
   getThorchainFees,
   minBalanceToDeposit,
   minAssetAmountToDepositMax1e8,
-  minRuneAmountToDeposit
+  minRuneAmountToDeposit,
+  getZeroSymDepositFees
 } from './Deposit.helper'
 
 describe('deposit/Deposit.helper', () => {
@@ -28,34 +29,120 @@ describe('deposit/Deposit.helper', () => {
     assetBalance: baseAmount(100000) //  1 ASSET == 2 RUNE
   }
   // user balances
-  const runeBalance = baseAmount(10000)
-  const assetBalance = baseAmount(20000)
-  const thorchainFee: BaseAmount = baseAmount(1000)
+  const runeBalance = baseAmount(1000)
+  const assetBalance = { asset: AssetBNB, amount: baseAmount(2000) }
+  const mockFees = getZeroSymDepositFees(AssetBNB)
+  const fees: SymDepositFees = {
+    ...mockFees,
+    rune: {
+      ...mockFees.rune,
+      inFee: baseAmount(100)
+    },
+    asset: {
+      ...mockFees.asset,
+      inFee: baseAmount(200)
+    }
+  }
 
   describe('maxRuneAmountToDeposit', () => {
-    it('is 9000', () => {
-      const result = maxRuneAmountToDeposit({ poolData, assetBalance, runeBalance, thorchainFee })
-      expect(eqBaseAmount.equals(result, baseAmount(9000))).toBeTruthy()
+    it('900', () => {
+      const result = maxRuneAmountToDeposit({ poolData, assetBalance, runeBalance, fees })
+      // R = 200000 (rune pool)
+      // A = 100000 (asset pool)
+      // r = 1000 (rune balance)
+      // rf = 100 (rune fee)
+      // mrb = a - af (max rune balance = rune balance - rune fee)
+      // mrb = 1000 - 100 = 900
+      // a = 2000 (asset balance)
+      // af = 200 (asset fee)
+      // mab = a - af (max asset balance = asset balance - asset fee)
+      // mab = 2000 - 200 = 1800
+      // max = R / A * mab
+      // max = 200000 / 100000 * 1800 = 3600
+      // max > mrb ? mrb : max
+      // 3600 >  900 ? 900 : 3600
+      expect(eqBaseAmount.equals(result, baseAmount(900))).toBeTruthy()
     })
-    it('is 4000', () => {
+    it('4900', () => {
       const runeBalance = baseAmount(5000)
-      const assetBalance = baseAmount(10000)
-      const result = maxRuneAmountToDeposit({ poolData, assetBalance, runeBalance, thorchainFee })
-
-      expect(eqBaseAmount.equals(result, baseAmount(4000))).toBeTruthy()
+      const assetBalance = { asset: AssetBNB, amount: baseAmount(10000) }
+      const result = maxRuneAmountToDeposit({ poolData, assetBalance, runeBalance, fees })
+      // R = 200000 (rune pool)
+      // A = 100000 (asset pool)
+      // r = 5000 (rune balance)
+      // rf = 100 (rune fee)
+      // mrb = a - af (max rune balance = rune balance - rune fee)
+      // mrb = 5000 - 100 = 4900
+      // a = 2000 (asset balance)
+      // af = 200 (asset fee)
+      // mab = a - af (max asset balance = asset balance - asset fee)
+      // mab = 10000 - 200 = 9800
+      // max = R / A * mab
+      // max = 200000 / 100000 * 9800 = 19600
+      // max > mrb ? mrb : max
+      // 19600 >  4900 ? 4900 : 19600
+      expect(eqBaseAmount.equals(result, baseAmount(4900))).toBeTruthy()
     })
   })
 
   describe('maxAssetAmountToDeposit', () => {
-    it('is 5000', () => {
-      const result = maxAssetAmountToDeposit({ poolData, assetBalance, runeBalance })
-      expect(eqBaseAmount.equals(result, baseAmount(5000))).toBeTruthy()
+    it('gas asset -> 450', () => {
+      const result = maxAssetAmountToDeposit({ poolData, assetBalance, runeBalance, fees })
+      // R = 200000 (rune pool)
+      // A = 100000 (asset pool)
+      // r = 1000 (rune balance)
+      // rf = 100 (rune fee)
+      // mrb = a - af (max rune balance = rune balance - rune fee)
+      // mrb = 1000 - 100 = 900
+      // a = 2000 (asset balance)
+      // af = 200 (asset fee)
+      // mab = a - af (max asset balance = asset balance - asset fee)
+      // mab = 2000 - 200 = 1800
+      // max = A / R * mrb
+      // max = 100000 / 200000 * 900 = 450
+      // max > mab ? mab : max
+      // 450 > 1800 ? 1800 : 450
+      expect(eqBaseAmount.equals(result, baseAmount(450))).toBeTruthy()
     })
-    it('is 10000', () => {
+    it('gas asset -> 9800', () => {
       const runeBalance = baseAmount(20000)
-      const assetBalance = baseAmount(10000)
-      const result = maxAssetAmountToDeposit({ poolData, assetBalance, runeBalance })
-      expect(eqBaseAmount.equals(result, baseAmount(10000))).toBeTruthy()
+      const assetBalance = { asset: AssetBNB, amount: baseAmount(10000) }
+      const result = maxAssetAmountToDeposit({ poolData, assetBalance, runeBalance, fees })
+      // R = 200000 (rune pool)
+      // A = 100000 (asset pool)
+      // r = 20000 (rune balance)
+      // rf = 100 (rune fee)
+      // mrb = a - af (max rune balance = rune balance - rune fee)
+      // mrb = 20000 - 100 = 19800
+      // a = 10000 (asset balance)
+      // af = 200 (asset fee)
+      // mab = a - af (max asset balance = asset balance - asset fee)
+      // mab = 10000 - 200 = 9800
+      // max = A / R * mrb
+      // max = 100000 / 200000 * 19800 = 9900
+      // max > mab ? mab : max
+      // 9900 > 9800 ? 9800 : 9900
+      expect(eqBaseAmount.equals(result, baseAmount(9800))).toBeTruthy()
+    })
+    it('non gas asset -> 9950', () => {
+      const runeBalance = baseAmount(20000)
+      const assetBalance = { asset: AssetBUSD74E, amount: baseAmount(10000) }
+      const result = maxAssetAmountToDeposit({ poolData, assetBalance, runeBalance, fees })
+      console.log('result', result.amount().toString())
+      // R = 200000 (rune pool)
+      // A = 100000 (asset pool)
+      // r = 20000 (rune balance)
+      // rf = 100 (rune fee)
+      // mrb = a - af (max rune balance = rune balance - rune fee)
+      // mrb = 20000 - 100 = 19900
+      // a = 10000 (asset balance)
+      // mab = a (non gas asset - no fee deduction)
+      // mab = 10000
+      // max = A / R * mrb
+      // max = 100000 / 200000 * 19900 = 9950
+      // max > mab ? mab : max
+      // 9950 > 10000 ? 10000 : 9950
+      expect(eqBaseAmount.equals(result, baseAmount(9950))).toBeTruthy()
     })
   })
 

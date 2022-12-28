@@ -6,6 +6,7 @@ import { FormattedMessage, useIntl } from 'react-intl'
 
 import { Network } from '../../../../shared/api/types'
 import { ASYM_DEPOSIT_TOOL_URL } from '../../../const'
+import { Alert } from '../../uielements/alert'
 import { AssetData } from '../../uielements/assets/assetData'
 import * as Styled from './Deposit.styles'
 
@@ -14,10 +15,11 @@ export type AsymAssetsWarningProps = {
   assets: Asset[]
   loading: boolean
   onClickOpenAsymTool: FP.Lazy<void>
+  className?: string
 }
 
 export const AsymAssetsWarning: React.FC<AsymAssetsWarningProps> = (props): JSX.Element => {
-  const { assets, network, onClickOpenAsymTool } = props
+  const { assets, network, onClickOpenAsymTool, className = '' } = props
 
   const intl = useIntl()
 
@@ -61,7 +63,8 @@ export const AsymAssetsWarning: React.FC<AsymAssetsWarningProps> = (props): JSX.
   )
 
   return (
-    <Styled.Alert
+    <Alert
+      className={className}
       type="warning"
       message={intl.formatMessage({ id: 'deposit.add.asymAssets.title' })}
       description={subContent}

@@ -19,8 +19,7 @@ import { useMidgardContext } from '../../../contexts/MidgardContext'
 import { useThorchainContext } from '../../../contexts/ThorchainContext'
 import { useWalletContext } from '../../../contexts/WalletContext'
 import { sequenceTRD } from '../../../helpers/fpHelpers'
-import { getAssetPoolPrice } from '../../../helpers/poolHelper'
-import { liveData } from '../../../helpers/rx/liveData'
+import { getAssetPoolPrice, RUNE_PRICE_POOL } from '../../../helpers/poolHelper'
 import { useLiquidityProviders } from '../../../hooks/useLiquidityProviders'
 import { useNetwork } from '../../../hooks/useNetwork'
 import { useOpenExplorerTxUrl } from '../../../hooks/useOpenExplorerTxUrl'
@@ -66,7 +65,8 @@ export const SymDepositView: React.FC<Props> = (props) => {
         selectedPricePoolAsset$,
         reloadSelectedPoolDetail,
         selectedPoolAddress$,
-        poolsState$
+        poolsState$,
+        selectedPricePool$
       },
       shares: { reloadShares }
     }
@@ -74,14 +74,7 @@ export const SymDepositView: React.FC<Props> = (props) => {
 
   const { symDepositFees$, symDeposit$, reloadSymDepositFees } = useChainContext()
 
-  const [poolsDataRD] = useObservableState(
-    () =>
-      FP.pipe(
-        poolsState$,
-        liveData.map(({ poolsData }) => poolsData)
-      ),
-    RD.initial
-  )
+  const poolsState = useObservableState(poolsState$, RD.initial)
 
   const oPoolAddress: O.Option<PoolAddress> = useObservableState(selectedPoolAddress$, O.none)
 
@@ -102,6 +95,7 @@ export const SymDepositView: React.FC<Props> = (props) => {
 
   const runPrice = useObservableState(priceRatio$, bn(1))
   const [selectedPricePoolAsset] = useObservableState(() => FP.pipe(selectedPricePoolAsset$, RxOp.map(O.toUndefined)))
+  const pricePool = useObservableState(selectedPricePool$, RUNE_PRICE_POOL)
 
   const [balancesState] = useObservableState(
     () =>
@@ -187,6 +181,7 @@ export const SymDepositView: React.FC<Props> = (props) => {
           reloadFees={FP.constVoid}
           approveFee$={approveFee$}
           reloadApproveFee={FP.constVoid}
+          pricePool={pricePool}
           priceAsset={selectedPricePoolAsset}
           disabled={true}
           poolAddress={O.none}
@@ -200,6 +195,7 @@ export const SymDepositView: React.FC<Props> = (props) => {
           isApprovedERC20Token$={isApprovedERC20Token$}
           availableAssets={[]}
           protocolLimitReached={protocolLimitReached}
+          poolDetails={[]}
           poolsData={{}}
           symPendingAssets={RD.initial}
           openRecoveryTool={openRecoveryTool}
@@ -224,6 +220,7 @@ export const SymDepositView: React.FC<Props> = (props) => {
       balancesState,
       symDepositFees$,
       approveFee$,
+      pricePool,
       selectedPricePoolAsset,
       reloadBalances,
       reloadShares,
@@ -241,12 +238,12 @@ export const SymDepositView: React.FC<Props> = (props) => {
   )
 
   return FP.pipe(
-    sequenceTRD(assetPriceRD, poolAssetsRD, poolDetailRD, poolsDataRD),
+    sequenceTRD(assetPriceRD, poolAssetsRD, poolDetailRD, poolsState),
     RD.fold(
       renderDisabledAddDeposit,
       (_) => renderDisabledAddDeposit(),
       (error) => renderDisabledAddDeposit(error),
-      ([assetPrice, poolAssets, poolDetail, poolsData]) => {
+      ([assetPrice, poolAssets, poolDetail, { poolsData, poolDetails }]) => {
         // Since RUNE is not part of pool assets, add it to the list of available assets
         const availableAssets = [AssetRuneNative, ...poolAssets]
 
@@ -271,6 +268,7 @@ export const SymDepositView: React.FC<Props> = (props) => {
               reloadFees={reloadSymDepositFees}
               approveFee$={approveFee$}
               reloadApproveFee={reloadApproveFee}
+              pricePool={pricePool}
               priceAsset={selectedPricePoolAsset}
               reloadBalances={reloadBalances}
               reloadShares={reloadShares}
@@ -281,6 +279,7 @@ export const SymDepositView: React.FC<Props> = (props) => {
               approveERC20Token$={approveERC20Token$}
               isApprovedERC20Token$={isApprovedERC20Token$}
               protocolLimitReached={protocolLimitReached}
+              poolDetails={poolDetails}
               poolsData={poolsData}
               symPendingAssets={symPendingAssets}
               openRecoveryTool={openRecoveryTool}

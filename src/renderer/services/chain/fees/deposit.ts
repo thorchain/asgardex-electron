@@ -5,29 +5,13 @@ import * as O from 'fp-ts/lib/Option'
 import * as Rx from 'rxjs'
 import * as RxOp from 'rxjs/operators'
 
-import { ZERO_BASE_AMOUNT } from '../../../const'
-import { getChainAsset } from '../../../helpers/chainHelper'
 import { eqOAsset } from '../../../helpers/fp/eq'
 import { liveData } from '../../../helpers/rx/liveData'
 import { observableState } from '../../../helpers/stateHelper'
 import * as THOR from '../../thorchain'
 import { reloadInboundAddresses } from '../../thorchain'
-import { SymDepositFees, SymDepositFeesHandler } from '../types'
+import { SymDepositFeesHandler } from '../types'
 import { poolOutboundFee$, poolInboundFee$ } from './common'
-
-/**
- * Returns zero sym deposit fees
- * by given paired asset to deposit
- */
-export const getZeroSymDepositFees = (asset: Asset): SymDepositFees => ({
-  rune: { inFee: ZERO_BASE_AMOUNT, outFee: ZERO_BASE_AMOUNT, refundFee: ZERO_BASE_AMOUNT },
-  asset: {
-    asset: getChainAsset(asset.chain),
-    inFee: ZERO_BASE_AMOUNT,
-    outFee: ZERO_BASE_AMOUNT,
-    refundFee: ZERO_BASE_AMOUNT
-  }
-})
 
 // State to reload sym deposit fees
 const {
