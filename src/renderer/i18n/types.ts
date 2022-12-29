@@ -406,6 +406,8 @@ type DepositMessageKey =
   | 'deposit.totalEarnings'
   | 'deposit.add.sym'
   | 'deposit.add.asym'
+  | 'deposit.add.runeSide'
+  | 'deposit.add.assetSide'
   | 'deposit.add.state.sending'
   | 'deposit.add.state.checkResults'
   | 'deposit.add.state.pending'
