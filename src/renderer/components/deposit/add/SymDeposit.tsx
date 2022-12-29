@@ -1,6 +1,8 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
+import { ArrowPathIcon } from '@heroicons/react/20/solid'
+import { MagnifyingGlassMinusIcon, MagnifyingGlassPlusIcon } from '@heroicons/react/24/outline'
 import { getDepositMemo, PoolData } from '@thorchain/asgardex-util'
 import {
   Address,
@@ -12,6 +14,7 @@ import {
   Chain,
   chainToString,
   formatAssetAmountCurrency,
+  isAssetRuneNative,
   THORChain
 } from '@xchainjs/xchain-util'
 import { Col } from 'antd'
@@ -27,21 +30,25 @@ import * as RxOp from 'rxjs/operators'
 import { Network } from '../../../../shared/api/types'
 import { isLedgerWallet } from '../../../../shared/utils/guard'
 import { WalletType } from '../../../../shared/wallet/types'
-import { SUPPORTED_LEDGER_APPS, ZERO_BASE_AMOUNT } from '../../../const'
+import { SUPPORTED_LEDGER_APPS, ZERO_ASSET_AMOUNT, ZERO_BASE_AMOUNT } from '../../../const'
 import {
   convertBaseAmountDecimal,
   getEthTokenAddress,
   isEthAsset,
   isEthTokenAsset,
+  isRuneNativeAsset,
+  isUSDAsset,
   max1e8BaseAmount,
-  THORCHAIN_DECIMAL
+  THORCHAIN_DECIMAL,
+  to1e8BaseAmount
 } from '../../../helpers/assetHelper'
 import { getChainAsset, isEthChain } from '../../../helpers/chainHelper'
 import { unionAssets } from '../../../helpers/fp/array'
-import { eqBaseAmount, eqOAsset, eqOApproveParams } from '../../../helpers/fp/eq'
+import { eqBaseAmount, eqOAsset, eqOApproveParams, eqAsset } from '../../../helpers/fp/eq'
 import { sequenceSOption, sequenceTOption } from '../../../helpers/fpHelpers'
 import * as PoolHelpers from '../../../helpers/poolHelper'
 import { liveData, LiveData } from '../../../helpers/rx/liveData'
+import { emptyString, loadingString, noDataString } from '../../../helpers/stringHelper'
 import * as WalletHelper from '../../../helpers/walletHelper'
 import { useSubscriptionState } from '../../../hooks/useSubscriptionState'
 import { INITIAL_SYM_DEPOSIT_STATE } from '../../../services/chain/const'
@@ -91,7 +98,7 @@ import { DepositAssets } from '../../modal/tx/extra'
 import { LoadingView } from '../../shared/loading'
 import { Alert } from '../../uielements/alert'
 import { AssetInput } from '../../uielements/assets/assetInput'
-import { FlatButton, ViewTxButton } from '../../uielements/button'
+import { BaseButton, FlatButton, ViewTxButton } from '../../uielements/button'
 import { MaxBalanceButton } from '../../uielements/button/MaxBalanceButton'
 import { Fees, UIFeesRD } from '../../uielements/fees'
 import { Color as InfoIconColor, InfoIcon } from '../../uielements/info/InfoIcon'
@@ -468,6 +475,264 @@ export const SymDeposit: React.FC<Props> = (props) => {
         O.getOrElse(() => zeroDepositFees)
       ),
     [depositFeesRD, zeroDepositFees]
+  )
+
+  // Price of RUNE IN fee
+  const oPriceRuneInFee: O.Option<AssetWithAmount> = useMemo(() => {
+    const amount = depositFees.rune.inFee
+
+    return FP.pipe(
+      PoolHelpers.getPoolPriceValue({
+        balance: { asset: AssetRuneNative, amount },
+        poolDetails,
+        pricePool,
+        network
+      }),
+      O.map((amount) => ({ amount, asset: pricePool.asset }))
+    )
+  }, [network, poolDetails, pricePool, depositFees])
+
+  const priceRuneInFeeLabel = useMemo(
+    () =>
+      FP.pipe(
+        depositFeesRD,
+        RD.fold(
+          () => loadingString,
+          () => loadingString,
+          () => noDataString,
+          ({ rune: { inFee } }) => {
+            const fee = formatAssetAmountCurrency({
+              amount: baseToAsset(inFee),
+              asset: AssetRuneNative,
+              decimal: 6,
+              trimZeros: true
+            })
+            const price = FP.pipe(
+              oPriceRuneInFee,
+              O.map(({ amount, asset: priceAsset }) =>
+                isAssetRuneNative(priceAsset)
+                  ? emptyString
+                  : formatAssetAmountCurrency({
+                      amount: baseToAsset(amount),
+                      asset: priceAsset,
+                      decimal: isUSDAsset(priceAsset) ? 2 : 6,
+                      trimZeros: !isUSDAsset(priceAsset)
+                    })
+              ),
+              O.getOrElse(() => emptyString)
+            )
+
+            return price ? `${price} (${fee})` : fee
+          }
+        )
+      ),
+
+    [depositFeesRD, oPriceRuneInFee]
+  )
+
+  // Price of RUNE OUT fee
+  const oPriceRuneOutFee: O.Option<AssetWithAmount> = useMemo(() => {
+    const amount = depositFees.rune.outFee
+
+    return FP.pipe(
+      PoolHelpers.getPoolPriceValue({
+        balance: { asset: AssetRuneNative, amount },
+        poolDetails,
+        pricePool,
+        network
+      }),
+      O.map((amount) => ({ asset: pricePool.asset, amount }))
+    )
+  }, [network, poolDetails, pricePool, depositFees])
+
+  const priceRuneOutFeeLabel = useMemo(
+    () =>
+      FP.pipe(
+        depositFeesRD,
+        RD.fold(
+          () => loadingString,
+          () => loadingString,
+          () => noDataString,
+          ({ rune: { outFee } }) => {
+            const fee = formatAssetAmountCurrency({
+              amount: baseToAsset(outFee),
+              asset: AssetRuneNative,
+              decimal: 6,
+              trimZeros: true
+            })
+            const price = FP.pipe(
+              oPriceRuneOutFee,
+              O.map(({ amount, asset: priceAsset }) =>
+                isRuneNativeAsset(priceAsset)
+                  ? emptyString
+                  : formatAssetAmountCurrency({
+                      amount: baseToAsset(amount),
+                      asset: priceAsset,
+                      decimal: isUSDAsset(priceAsset) ? 2 : 6,
+                      trimZeros: !isUSDAsset(priceAsset)
+                    })
+              ),
+              O.getOrElse(() => emptyString)
+            )
+
+            return price ? `${price} (${fee})` : fee
+          }
+        )
+      ),
+
+    [depositFeesRD, oPriceRuneOutFee]
+  )
+
+  // Price of asset IN fee
+  const oPriceAssetInFee: O.Option<AssetWithAmount> = useMemo(() => {
+    const asset = depositFees.asset.asset
+    const amount = depositFees.asset.inFee
+
+    return FP.pipe(
+      PoolHelpers.getPoolPriceValue({
+        balance: { asset, amount },
+        poolDetails,
+        pricePool,
+        network
+      }),
+      O.map((amount) => ({ amount, asset: pricePool.asset }))
+    )
+  }, [network, poolDetails, pricePool, depositFees])
+
+  const priceAssetInFeeLabel = useMemo(
+    () =>
+      FP.pipe(
+        depositFeesRD,
+        RD.fold(
+          () => loadingString,
+          () => loadingString,
+          () => noDataString,
+          ({ asset: { inFee, asset: feeAsset } }) => {
+            const fee = formatAssetAmountCurrency({
+              amount: baseToAsset(inFee),
+              asset: feeAsset,
+              decimal: isUSDAsset(feeAsset) ? 2 : 6,
+              trimZeros: !isUSDAsset(feeAsset)
+            })
+            const price = FP.pipe(
+              oPriceAssetInFee,
+              O.map(({ amount, asset: priceAsset }) =>
+                eqAsset.equals(feeAsset, priceAsset)
+                  ? emptyString
+                  : formatAssetAmountCurrency({
+                      amount: baseToAsset(amount),
+                      asset: priceAsset,
+                      decimal: isUSDAsset(priceAsset) ? 2 : 6,
+                      trimZeros: !isUSDAsset(priceAsset)
+                    })
+              ),
+              O.getOrElse(() => emptyString)
+            )
+
+            return price ? `${price} (${fee})` : fee
+          }
+        )
+      ),
+
+    [depositFeesRD, oPriceAssetInFee]
+  )
+
+  // Price of asset OUT fee
+  const oPriceAssetOutFee: O.Option<AssetWithAmount> = useMemo(() => {
+    const asset = depositFees.asset.asset
+    const amount = depositFees.asset.outFee
+
+    return FP.pipe(
+      PoolHelpers.getPoolPriceValue({
+        balance: { asset, amount },
+        poolDetails,
+        pricePool,
+        network
+      }),
+      O.map((amount) => ({ asset: pricePool.asset, amount }))
+    )
+  }, [network, poolDetails, pricePool, depositFees])
+
+  const priceAssetOutFeeLabel = useMemo(
+    () =>
+      FP.pipe(
+        depositFeesRD,
+        RD.fold(
+          () => loadingString,
+          () => loadingString,
+          () => noDataString,
+          ({ asset: { outFee, asset: feeAsset } }) => {
+            const fee = formatAssetAmountCurrency({
+              amount: baseToAsset(outFee),
+              asset: feeAsset,
+              decimal: isUSDAsset(feeAsset) ? 2 : 6,
+              trimZeros: !isUSDAsset(feeAsset)
+            })
+            const price = FP.pipe(
+              oPriceAssetOutFee,
+              O.map(({ amount, asset: priceAsset }) =>
+                eqAsset.equals(feeAsset, priceAsset)
+                  ? emptyString
+                  : formatAssetAmountCurrency({
+                      amount: baseToAsset(amount),
+                      asset: priceAsset,
+                      decimal: isUSDAsset(priceAsset) ? 2 : 6,
+                      trimZeros: !isUSDAsset(priceAsset)
+                    })
+              ),
+              O.getOrElse(() => emptyString)
+            )
+
+            return price ? `${price} (${fee})` : fee
+          }
+        )
+      ),
+
+    [depositFeesRD, oPriceAssetOutFee]
+  )
+
+  /**
+   * Sum price of deposit fees (IN + OUT)
+   */
+  const oPriceDepositFees1e8: O.Option<AssetWithAmount> = useMemo(
+    () =>
+      FP.pipe(
+        sequenceSOption({
+          priceRuneInFee: oPriceRuneInFee,
+          priceRuneOutFee: oPriceRuneOutFee,
+          priceAssetInFee: oPriceAssetInFee,
+          priceAssetOutFee: oPriceAssetOutFee
+        }),
+        O.map(({ priceRuneInFee, priceRuneOutFee, priceAssetInFee, priceAssetOutFee }) => {
+          const sumRune = priceRuneInFee.amount.plus(priceRuneOutFee.amount)
+          const assetIn1e8 = to1e8BaseAmount(priceAssetInFee.amount)
+          const assetOut1e8 = to1e8BaseAmount(priceAssetOutFee.amount)
+          const sumAsset1e8 = assetIn1e8.plus(assetOut1e8)
+          return { asset: priceAssetInFee.asset, amount: sumRune.plus(sumAsset1e8) }
+        })
+      ),
+    [oPriceAssetInFee, oPriceAssetOutFee, oPriceRuneInFee, oPriceRuneOutFee]
+  )
+
+  const priceDepositFeesLabel = useMemo(
+    () =>
+      FP.pipe(
+        depositFeesRD,
+        RD.fold(
+          () => loadingString,
+          () => loadingString,
+          () => noDataString,
+          (_) =>
+            FP.pipe(
+              oPriceDepositFees1e8,
+              O.map(({ amount, asset }) =>
+                formatAssetAmountCurrency({ amount: baseToAsset(amount), asset, decimal: isUSDAsset(asset) ? 2 : 6 })
+              ),
+              O.getOrElse(() => noDataString)
+            )
+        )
+      ),
+    [depositFeesRD, oPriceDepositFees1e8]
   )
 
   const oDepositParams: O.Option<SymDepositParams> = useMemo(
@@ -1576,7 +1841,7 @@ export const SymDeposit: React.FC<Props> = (props) => {
     [intl]
   )
 
-  // const [showDetails, setShowDetails] = useState<boolean>(false)
+  const [showDetails, setShowDetails] = useState<boolean>(false)
 
   return (
     <div className="flex min-h-full w-full flex-col items-center justify-between">
@@ -1730,6 +1995,64 @@ export const SymDeposit: React.FC<Props> = (props) => {
               {!RD.isInitial(uiApproveFeesRD) && <Fees fees={uiApproveFeesRD} reloadFees={reloadApproveFeesHandler} />}
             </>
           )}
+        </div>
+
+        <div className={`w-full px-10px font-main text-[12px] uppercase dark:border-gray1d`}>
+          <BaseButton
+            className="goup flex w-full justify-between !p-0 font-mainSemiBold text-[16px] text-text2 hover:text-turquoise dark:text-text2d dark:hover:text-turquoise"
+            onClick={() => setShowDetails((current) => !current)}>
+            {intl.formatMessage({ id: 'common.details' })}
+            {showDetails ? (
+              <MagnifyingGlassMinusIcon className="ease h-[20px] w-[20px] text-inherit group-hover:scale-125" />
+            ) : (
+              <MagnifyingGlassPlusIcon className="ease h-[20px] w-[20px] text-inherit group-hover:scale-125 " />
+            )}
+          </BaseButton>
+
+          <div className="pt-10px font-main text-[14px] text-gray2 dark:text-gray2d">
+            {/* fees */}
+            <div className="flex w-full items-center justify-between font-mainBold">
+              <BaseButton
+                disabled={RD.isPending(depositFeesRD) || RD.isInitial(depositFeesRD)}
+                className="group !p-0 !font-mainBold !text-gray2 dark:!text-gray2d"
+                onClick={reloadFeesHandler}>
+                {intl.formatMessage({ id: 'common.fees.estimated' })}
+                <ArrowPathIcon className="ease ml-5px h-[15px] w-[15px] group-hover:rotate-180" />
+              </BaseButton>
+              <div>{priceDepositFeesLabel}</div>
+            </div>
+
+            {showDetails && (
+              <>
+                <div className="flex w-full justify-between pl-10px text-[12px]">
+                  <div>{intl.formatMessage({ id: 'common.fee.inbound.rune' })}</div>
+                  <div>{priceRuneInFeeLabel}</div>
+                </div>
+                <div className="flex w-full justify-between pl-10px text-[12px]">
+                  <div>{intl.formatMessage({ id: 'common.fee.outbound.rune' })}</div>
+                  <div>{priceRuneOutFeeLabel}</div>
+                </div>
+                <div className="flex w-full justify-between pl-10px text-[12px]">
+                  <div>{intl.formatMessage({ id: 'common.fee.inbound.asset' })}</div>
+                  <div>{priceAssetInFeeLabel}</div>
+                </div>
+                <div className="flex w-full justify-between pl-10px text-[12px]">
+                  <div>{intl.formatMessage({ id: 'common.fee.outbound.asset' })}</div>
+                  <div>{priceAssetOutFeeLabel}</div>
+                </div>
+                <div className="flex w-full justify-between pl-10px text-[12px]">
+                  <div>{intl.formatMessage({ id: 'common.fee.affiliate' })}</div>
+                  <div>
+                    {formatAssetAmountCurrency({
+                      amount: ZERO_ASSET_AMOUNT,
+                      asset: pricePool.asset,
+                      decimal: 0
+                    })}
+                  </div>
+                </div>
+              </>
+            )}
+          </div>
         </div>
         {renderPasswordConfirmationModal}
         {renderLedgerConfirmationModal}
