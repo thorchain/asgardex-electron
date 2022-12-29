@@ -100,9 +100,10 @@ import { Alert } from '../../uielements/alert'
 import { AssetInput } from '../../uielements/assets/assetInput'
 import { BaseButton, FlatButton, ViewTxButton } from '../../uielements/button'
 import { MaxBalanceButton } from '../../uielements/button/MaxBalanceButton'
-import { TooltipAddress } from '../../uielements/common/Common.styles'
+import { Tooltip, TooltipAddress } from '../../uielements/common/Common.styles'
 import { Fees, UIFeesRD } from '../../uielements/fees'
 import { Color as InfoIconColor, InfoIcon } from '../../uielements/info/InfoIcon'
+import { CopyLabel } from '../../uielements/label'
 import { Slider } from '../../uielements/slider'
 import { AssetMissmatchWarning } from './AssetMissmatchWarning'
 import { AsymAssetsWarning } from './AsymAssetsWarning'
@@ -2105,6 +2106,74 @@ export const SymDeposit: React.FC<Props> = (props) => {
                   ),
                   O.toNullable
                 )}
+              </>
+            )}
+
+            {/* memo */}
+            {showDetails && (
+              <>
+                <div className={`w-full pt-10px font-mainBold text-[14px]`}>
+                  {intl.formatMessage({ id: 'common.memos' })}
+                </div>
+                <div className="flex w-full items-center justify-between pl-10px text-[12px]">
+                  <div className="">
+                    {FP.pipe(
+                      oDepositParams,
+                      O.map(({ memos: { rune: memo } }) => memo),
+                      O.getOrElse(() => emptyString),
+                      (memo) => (
+                        <CopyLabel
+                          className="whitespace-nowrap pl-0 uppercase text-gray2 dark:text-gray2d"
+                          label={intl.formatMessage({ id: 'common.sender.rune' })}
+                          key="memo-copy"
+                          textToCopy={memo}
+                        />
+                      )
+                    )}
+                  </div>
+
+                  <div className="truncate pl-10px font-main text-[12px]">
+                    {FP.pipe(
+                      oDepositParams,
+                      O.map(({ memos: { rune: memo } }) => (
+                        <Tooltip title={memo} key="tooltip-rune-memo">
+                          {memo}
+                        </Tooltip>
+                      )),
+                      O.toNullable
+                    )}
+                  </div>
+                </div>
+
+                <div className="flex w-full items-center justify-between pl-10px text-[12px]">
+                  <div className="">
+                    {FP.pipe(
+                      oDepositParams,
+                      O.map(({ memos: { asset: memo } }) => memo),
+                      O.getOrElse(() => emptyString),
+                      (memo) => (
+                        <CopyLabel
+                          className="whitespace-nowrap pl-0 uppercase text-gray2 dark:text-gray2d"
+                          label={intl.formatMessage({ id: 'common.sender.asset' })}
+                          key="memo-copy"
+                          textToCopy={memo}
+                        />
+                      )
+                    )}
+                  </div>
+
+                  <div className="truncate pl-10px font-main text-[12px]">
+                    {FP.pipe(
+                      oDepositParams,
+                      O.map(({ memos: { asset: memo } }) => (
+                        <Tooltip title={memo} key="tooltip-asset-memo">
+                          {memo}
+                        </Tooltip>
+                      )),
+                      O.toNullable
+                    )}
+                  </div>
+                </div>
               </>
             )}
           </div>
