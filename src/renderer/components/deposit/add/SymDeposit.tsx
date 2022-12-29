@@ -17,7 +17,6 @@ import {
   isAssetRuneNative,
   THORChain
 } from '@xchainjs/xchain-util'
-import { Col } from 'antd'
 import BigNumber from 'bignumber.js'
 import * as A from 'fp-ts/lib/Array'
 import * as FP from 'fp-ts/lib/function'
@@ -30,7 +29,7 @@ import * as RxOp from 'rxjs/operators'
 import { Network } from '../../../../shared/api/types'
 import { isLedgerWallet } from '../../../../shared/utils/guard'
 import { WalletType } from '../../../../shared/wallet/types'
-import { SUPPORTED_LEDGER_APPS, ZERO_ASSET_AMOUNT, ZERO_BASE_AMOUNT } from '../../../const'
+import { ZERO_ASSET_AMOUNT, ZERO_BASE_AMOUNT } from '../../../const'
 import {
   convertBaseAmountDecimal,
   getEthTokenAddress,
@@ -102,25 +101,21 @@ import { BaseButton, FlatButton, ViewTxButton } from '../../uielements/button'
 import { MaxBalanceButton } from '../../uielements/button/MaxBalanceButton'
 import { Tooltip, TooltipAddress } from '../../uielements/common/Common.styles'
 import { Fees, UIFeesRD } from '../../uielements/fees'
-import { Color as InfoIconColor, InfoIcon } from '../../uielements/info/InfoIcon'
+import { InfoIcon } from '../../uielements/info/InfoIcon'
 import { CopyLabel } from '../../uielements/label'
 import { Slider } from '../../uielements/slider'
 import { AssetMissmatchWarning } from './AssetMissmatchWarning'
 import { AsymAssetsWarning } from './AsymAssetsWarning'
 import * as Helper from './Deposit.helper'
-import * as Styled from './Deposit.styles'
 import { PendingAssetsWarning } from './PendingAssetsWarning'
 
 export type Props = {
   asset: AssetWithDecimal
-  assetPrice: BigNumber
   availableAssets: Asset[]
   walletBalances: Pick<BalancesState, 'balances' | 'loading'>
-  runePrice: BigNumber
   poolAddress: O.Option<PoolAddress>
   pricePool: PricePool
   poolDetails: PoolDetails
-  priceAsset?: Asset
   reloadFees: ReloadSymDepositFeesHandler
   fees$: SymDepositFeesHandler
   reloadApproveFee: LoadApproveFeeHandler
@@ -155,15 +150,11 @@ export type Props = {
 
 type SelectedInput = 'asset' | 'rune' | 'none'
 
-type WalletTypeTooltip = { text: string; color: InfoIconColor }
-
 export const SymDeposit: React.FC<Props> = (props) => {
   const {
     asset: { asset, decimal: assetDecimal },
-    assetPrice,
     availableAssets,
     walletBalances,
-    runePrice,
     poolAddress: oPoolAddress,
     openAssetExplorerTxUrl,
     openRuneExplorerTxUrl,
@@ -172,7 +163,6 @@ export const SymDeposit: React.FC<Props> = (props) => {
     validatePassword$,
     pricePool,
     poolDetails,
-    priceAsset,
     reloadFees,
     reloadBalances,
     reloadShares,
@@ -255,70 +245,6 @@ export const SymDeposit: React.FC<Props> = (props) => {
     () => WalletHelper.hasLedgerInBalancesByAsset(AssetRuneNative, poolBasedBalances),
     [poolBasedBalances]
   )
-
-  const assetWalletTypeTooltip: WalletTypeTooltip = useMemo(() => {
-    // Different tooltips for different situations (order matters):
-    // 1. Check Ledger support for chain
-    // 2. Check if RUNE side is already using Ledger
-    // 3. Check if Ledger is not connected or has no balances
-    if (!SUPPORTED_LEDGER_APPS.includes(asset.chain))
-      return {
-        text: intl.formatMessage(
-          { id: 'ledger.notsupported' },
-          {
-            chain: chainToString(asset.chain)
-          }
-        ),
-        color: 'primary'
-      }
-
-    if (useRuneLedger) return { text: intl.formatMessage({ id: 'ledger.deposit.oneside' }), color: 'primary' }
-
-    if (!hasAssetLedger)
-      return {
-        text: intl.formatMessage(
-          { id: 'ledger.notaddedorzerobalances' },
-          {
-            chain: chainToString(THORChain)
-          }
-        ),
-        color: 'primary'
-      }
-
-    return { text: '', color: 'primary' }
-  }, [asset.chain, hasAssetLedger, intl, useRuneLedger])
-
-  const runeWalletTypeTooltip: WalletTypeTooltip = useMemo(() => {
-    // Different tooltips for different situations (order matters):
-    // 1. Check Ledger support for chain
-    // 2. Check if asset side is already using Ledger
-    // 3. Check if Ledger is not connected or has no balances
-    if (!SUPPORTED_LEDGER_APPS.includes(THORChain))
-      return {
-        text: intl.formatMessage(
-          { id: 'ledger.notsupported' },
-          {
-            chain: chainToString(THORChain)
-          }
-        ),
-        color: 'primary'
-      }
-
-    if (useAssetLedger) return { text: intl.formatMessage({ id: 'ledger.deposit.oneside' }), color: 'primary' }
-
-    if (!hasRuneLedger)
-      return {
-        text: intl.formatMessage(
-          { id: 'ledger.notaddedorzerobalances' },
-          {
-            chain: chainToString(THORChain)
-          }
-        ),
-        color: 'primary'
-      }
-
-    return { text: '', color: 'primary' }
-  }, [hasRuneLedger, intl, useAssetLedger])
 
   /** Asset balance based on original decimal */
   const assetBalance: BaseAmount = useMemo(
@@ -1322,18 +1248,6 @@ export const SymDeposit: React.FC<Props> = (props) => {
     reloadFeesHandler()
   }, [reloadFeesHandler])
 
-  const uiFeesRD: UIFeesRD = useMemo(
-    () =>
-      FP.pipe(
-        depositFeesRD,
-        RD.map(({ asset: assetFee, rune }) => [
-          { asset: getChainAsset(asset.chain), amount: assetFee.inFee.plus(assetFee.outFee) },
-          { asset: AssetRuneNative, amount: rune.inFee.plus(rune.outFee) }
-        ])
-      ),
-    [depositFeesRD, asset]
-  )
-
   const uiApproveFeesRD: UIFeesRD = useMemo(
     () =>
       FP.pipe(
@@ -1602,16 +1516,6 @@ export const SymDeposit: React.FC<Props> = (props) => {
     setPercentValueToDeposit(0)
   }, [initialAssetAmountToDepositMax1e8, setAssetAmountToDepositMax1e8])
 
-  const onChangeRuneWalletType = useCallback(
-    (walletType: WalletType) => {
-      setRuneLedger(() => isLedgerWallet(walletType))
-      setRuneWalletType(walletType)
-      resetEnteredAmounts()
-    },
-
-    [resetEnteredAmounts, setRuneWalletType]
-  )
-
   const useRuneLedgerHandler = useCallback(
     (useLedger: boolean) => {
       const walletType: WalletType = useLedger ? 'ledger' : 'keystore'
@@ -1621,16 +1525,6 @@ export const SymDeposit: React.FC<Props> = (props) => {
     },
 
     [resetEnteredAmounts, setRuneWalletType]
-  )
-
-  const onChangeAssetWalletType = useCallback(
-    (walletType: WalletType) => {
-      setUseAssetLedger(() => isLedgerWallet(walletType))
-      setAssetWalletType(walletType)
-
-      resetEnteredAmounts()
-    },
-    [resetEnteredAmounts, setAssetWalletType]
   )
 
   const useAssetLedgerHandler = useCallback(
@@ -1978,7 +1872,6 @@ export const SymDeposit: React.FC<Props> = (props) => {
               <FlatButton className="mb-20px min-w-[200px]" size="large" onClick={onSubmit} disabled={disableSubmit}>
                 {intl.formatMessage({ id: 'common.add' })}
               </FlatButton>
-              <Fees fees={uiFeesRD} reloadFees={reloadFeesHandler} disabled={disabledForm} />
             </>
           ) : (
             <>
@@ -2237,85 +2130,6 @@ export const SymDeposit: React.FC<Props> = (props) => {
         {renderLedgerConfirmationModal}
         {renderTxModal}
       </div>
-      <Styled.CardsRow gutter={{ lg: 32 }}>
-        <Col xs={24} xl={12}>
-          <Styled.AssetCard
-            walletType={Helper.getWalletType(asset.chain, useAssetLedger)}
-            walletTypeTooltip={assetWalletTypeTooltip.text}
-            walletTypeTooltipColor={assetWalletTypeTooltip.color}
-            // Disable ledger selection if RUNE Ledger has been selected
-            walletTypeDisabled={!hasAssetLedger || useRuneLedger}
-            onChangeWalletType={onChangeAssetWalletType}
-            assetBalance={assetBalance}
-            disabled={disabledForm}
-            asset={{
-              asset,
-              address: FP.pipe(
-                oAssetWB,
-                O.map(({ walletAddress }) => walletAddress),
-                O.getOrElse(() => '')
-              )
-            }}
-            selectedAmount={assetAmountToDepositMax1e8}
-            maxAmount={maxAssetAmountToDepositMax1e8}
-            onChangeAssetAmount={assetAmountChangeHandler}
-            inputOnFocusHandler={() => setSelectedInput('asset')}
-            inputOnBlurHandler={inputOnBlur}
-            price={assetPrice}
-            assets={poolBasedBalancesAssets}
-            percentValue={percentValueToDeposit}
-            onChangePercent={changePercentHandler}
-            onChangeAsset={onChangeAssetHandler}
-            priceAsset={priceAsset}
-            network={network}
-            onAfterSliderChange={onAfterSliderChangeHandler}
-            minAmountError={minAssetAmountError}
-            minAmountLabel={`${intl.formatMessage({ id: 'common.min' })}: ${formatAssetAmountCurrency({
-              asset,
-              amount: baseToAsset(minAssetAmountToDepositMax1e8),
-              trimZeros: true
-            })}`}
-          />
-        </Col>
-
-        <Col xs={24} xl={12}>
-          <>
-            <Styled.AssetCard
-              walletType={Helper.getWalletType(THORChain, useRuneLedger)}
-              walletTypeTooltip={runeWalletTypeTooltip.text}
-              walletTypeTooltipColor={runeWalletTypeTooltip.color}
-              // Disable ledger checkbox if asset ledger is used
-              walletTypeDisabled={!hasRuneLedger || useAssetLedger}
-              onChangeWalletType={onChangeRuneWalletType}
-              assetBalance={runeBalance}
-              disabled={disabledForm}
-              asset={{
-                asset: AssetRuneNative,
-                address: FP.pipe(
-                  oRuneWB,
-                  O.map(({ walletAddress }) => walletAddress),
-                  O.getOrElse(() => '')
-                )
-              }}
-              selectedAmount={runeAmountToDeposit}
-              maxAmount={maxRuneAmountToDeposit}
-              onChangeAssetAmount={runeAmountChangeHandler}
-              inputOnFocusHandler={() => setSelectedInput('rune')}
-              inputOnBlurHandler={inputOnBlur}
-              price={runePrice}
-              priceAsset={priceAsset}
-              network={network}
-              assets={[]}
-              minAmountError={minRuneAmountError}
-              minAmountLabel={`${intl.formatMessage({ id: 'common.min' })}: ${formatAssetAmountCurrency({
-                asset: AssetRuneNative,
-                amount: baseToAsset(minRuneAmountToDeposit),
-                trimZeros: true
-              })}`}
-            />
-          </>
-        </Col>
-      </Styled.CardsRow>
     </div>
   )
 }
