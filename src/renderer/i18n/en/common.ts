@@ -129,6 +129,8 @@ const common: CommonMessages = {
   'common.notsupported.fornetwork': 'Not supported for {network}',
   'common.recipient': 'Recipient',
   'common.sender': 'Sender',
+  'common.sender.rune': 'Sender RUNE',
+  'common.sender.asset': 'Sender asset',
   'common.legacy': 'Legacy',
   'common.ledgerlive': 'Ledger Live',
   'common.metamask': 'MetaMask'

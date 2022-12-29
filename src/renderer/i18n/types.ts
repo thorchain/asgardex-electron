@@ -129,6 +129,8 @@ export type CommonMessageKey =
   | 'common.notsupported.fornetwork'
   | 'common.recipient'
   | 'common.sender'
+  | 'common.sender.rune'
+  | 'common.sender.asset'
   | 'common.legacy'
   | 'common.ledgerlive'
   | 'common.metamask'

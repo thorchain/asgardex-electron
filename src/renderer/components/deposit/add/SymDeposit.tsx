@@ -100,6 +100,7 @@ import { Alert } from '../../uielements/alert'
 import { AssetInput } from '../../uielements/assets/assetInput'
 import { BaseButton, FlatButton, ViewTxButton } from '../../uielements/button'
 import { MaxBalanceButton } from '../../uielements/button/MaxBalanceButton'
+import { TooltipAddress } from '../../uielements/common/Common.styles'
 import { Fees, UIFeesRD } from '../../uielements/fees'
 import { Color as InfoIconColor, InfoIcon } from '../../uielements/info/InfoIcon'
 import { Slider } from '../../uielements/slider'
@@ -2050,6 +2051,60 @@ export const SymDeposit: React.FC<Props> = (props) => {
                     })}
                   </div>
                 </div>
+              </>
+            )}
+
+            {/* addresses */}
+            {showDetails && (
+              <>
+                <div className={`w-full pt-10px font-mainBold text-[14px]`}>
+                  {intl.formatMessage({ id: 'common.addresses' })}
+                </div>
+                {/* rune sender address */}
+                <div className="flex w-full items-center justify-between pl-10px text-[12px]">
+                  <div>{intl.formatMessage({ id: 'common.sender.rune' })}</div>
+                  <div className="truncate pl-20px text-[13px] normal-case leading-normal">
+                    {FP.pipe(
+                      oRuneWB,
+                      O.map(({ walletAddress: address }) => (
+                        <TooltipAddress title={address} key="tooltip-asset-sender-addr">
+                          {address}
+                        </TooltipAddress>
+                      )),
+                      O.getOrElse(() => <>{noDataString}</>)
+                    )}
+                  </div>
+                </div>
+                {/* asset sender address */}
+                <div className="flex w-full items-center justify-between pl-10px text-[12px]">
+                  <div>{intl.formatMessage({ id: 'common.sender.asset' })}</div>
+                  <div className="truncate pl-20px text-[13px] normal-case leading-normal">
+                    {FP.pipe(
+                      oAssetWB,
+                      O.map(({ walletAddress: address }) => (
+                        <TooltipAddress title={address} key="tooltip-asset-sender-addr">
+                          {address}
+                        </TooltipAddress>
+                      )),
+                      O.getOrElse(() => <>{noDataString}</>)
+                    )}
+                  </div>
+                </div>
+                {/* asset inbound address */}
+                {FP.pipe(
+                  oDepositParams,
+                  O.map(({ poolAddress: { address } }) =>
+                    address ? (
+                      <div className="flex w-full items-center justify-between pl-10px text-[12px]" key="pool-addr">
+                        <div>{intl.formatMessage({ id: 'common.pool.inbound' })}</div>
+                        <TooltipAddress title={address}>
+                          <div className="truncate pl-20px text-[13px] normal-case leading-normal">{address}</div>
+                        </TooltipAddress>
+                      </div>
+                    ) : null
+                  ),
+                  O.toNullable
+                )}
               </>
             )}
           </div>
