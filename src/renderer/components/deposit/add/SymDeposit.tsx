@@ -1898,10 +1898,10 @@ export const SymDeposit: React.FC<Props> = (props) => {
           }
         />
 
-        <div className="w-full px-20px pt-5px pb-10px">
+        <div className="w-full px-20px pt-20px pb-40px">
           <Slider
             onAfterChange={onAfterSliderChangeHandler}
-            disabled={disabled}
+            disabled={disabledForm}
             value={percentValueToDeposit}
             onChange={changePercentHandler}
             tooltipPlacement="top"
@@ -1954,7 +1954,7 @@ export const SymDeposit: React.FC<Props> = (props) => {
           }
         />
 
-        <div className="flex flex-col items-center justify-between py-20">
+        <div className="flex flex-col items-center justify-between py-30px">
           {renderIsApprovedError}
           {(walletBalancesLoading || checkIsApproved) && (
             <LoadingView
@@ -2106,6 +2106,61 @@ export const SymDeposit: React.FC<Props> = (props) => {
                   ),
                   O.toNullable
                 )}
+              </>
+            )}
+
+            {/* balances */}
+            {showDetails && (
+              <>
+                <div className={`w-full pt-10px text-[14px]`}>
+                  <BaseButton
+                    disabled={walletBalancesLoading}
+                    className="group !p-0 !font-mainBold !text-gray2 dark:!text-gray2d"
+                    onClick={reloadBalances}>
+                    {intl.formatMessage({ id: 'common.balances' })}
+                    <ArrowPathIcon className="ease ml-5px h-[15px] w-[15px] group-hover:rotate-180" />
+                  </BaseButton>
+                </div>
+                {/* rune sender balance */}
+                <div className="flex w-full items-center justify-between pl-10px text-[12px]">
+                  <div>{intl.formatMessage({ id: 'common.sender.rune' })}</div>
+                  <div className="truncate pl-20px text-[13px] normal-case leading-normal">
+                    {walletBalancesLoading
+                      ? loadingString
+                      : FP.pipe(
+                          oRuneWB,
+                          O.map(({ amount, asset }) =>
+                            formatAssetAmountCurrency({
+                              amount: baseToAsset(amount),
+                              asset,
+                              decimal: 8,
+                              trimZeros: true
+                            })
+                          ),
+                          O.getOrElse(() => noDataString)
+                        )}
+                  </div>
+                </div>
+                {/* asset sender balance */}
+                <div className="flex w-full items-center justify-between pl-10px text-[12px]">
+                  <div>{intl.formatMessage({ id: 'common.sender.asset' })}</div>
+                  <div className="truncate pl-20px text-[13px] normal-case leading-normal">
+                    {walletBalancesLoading
+                      ? loadingString
+                      : FP.pipe(
+                          oAssetWB,
+                          O.map(({ amount, asset }) =>
+                            formatAssetAmountCurrency({
+                              amount: baseToAsset(amount),
+                              asset,
+                              decimal: 8,
+                              trimZeros: true
+                            })
+                          ),
+                          O.getOrElse(() => noDataString)
+                        )}
+                  </div>
+                </div>
               </>
             )}
 
