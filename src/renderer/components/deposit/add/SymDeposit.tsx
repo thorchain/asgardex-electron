@@ -88,6 +88,7 @@ import { LedgerConfirmationModal } from '../../modal/confirmation'
 import { WalletPasswordConfirmationModal } from '../../modal/confirmation'
 import { TxModal } from '../../modal/tx'
 import { DepositAssets } from '../../modal/tx/extra'
+import { LoadingView } from '../../shared/loading'
 import { Alert } from '../../uielements/alert'
 import { AssetInput } from '../../uielements/assets/assetInput'
 import { FlatButton, ViewTxButton } from '../../uielements/button'
@@ -867,7 +868,7 @@ export const SymDeposit: React.FC<Props> = (props) => {
         }
       )
 
-      return <Styled.ErrorLabel>{msg}</Styled.ErrorLabel>
+      return <p className="mb-20px p-0 text-center font-main uppercase text-error0 dark:text-error0d">{msg}</p>
     },
     [intl]
   )
@@ -988,9 +989,10 @@ export const SymDeposit: React.FC<Props> = (props) => {
     )
 
     const extraResult = (
-      <Styled.ExtraContainer>
+      <div className="flex flex-col items-center justify-between">
         {FP.pipe(symDepositTxs.asset, RD.toOption, (oTxHash) => (
-          <Styled.ViewTxButtonTop
+          <ViewTxButton
+            className="pb-20px"
             txHash={oTxHash}
             onClick={openAssetExplorerTxUrl}
             txUrl={FP.pipe(oTxHash, O.chain(getAssetExplorerTxUrl))}
@@ -1005,7 +1007,7 @@ export const SymDeposit: React.FC<Props> = (props) => {
             label={intl.formatMessage({ id: 'common.tx.view' }, { assetTicker: AssetRuneNative.ticker })}
           />
         ))}
-      </Styled.ExtraContainer>
+      </div>
     )
 
     return (
@@ -1148,7 +1150,9 @@ export const SymDeposit: React.FC<Props> = (props) => {
         RD.fold(
           () => <></>,
           () => <></>,
-          (error) => <Styled.ErrorLabel>{error.msg}</Styled.ErrorLabel>,
+          (error) => (
+            <p className="mb-20px p-0 text-center font-main uppercase text-error0 dark:text-error0d">{error.msg}</p>
+          ),
           () => <></>
         )
       ),
@@ -1192,9 +1196,9 @@ export const SymDeposit: React.FC<Props> = (props) => {
         () => <></>,
         () => <></>,
         (error) => (
-          <Styled.ErrorLabel align="center">
+          <p className="mb-20px p-0 text-center font-main uppercase text-error0 dark:text-error0d">
             {intl.formatMessage({ id: 'common.approve.error' }, { asset: asset.ticker, error: error.msg })}
-          </Styled.ErrorLabel>
+          </p>
         ),
         (_) => <></>
       )
@@ -1572,6 +1576,8 @@ export const SymDeposit: React.FC<Props> = (props) => {
     [intl]
   )
 
+  // const [showDetails, setShowDetails] = useState<boolean>(false)
+
   return (
     <div className="flex min-h-full w-full flex-col items-center justify-between">
       {hasPendingAssets && <div className="w-full pb-20px xl:px-20px">{renderPendingAssets}</div>}
@@ -1582,7 +1588,63 @@ export const SymDeposit: React.FC<Props> = (props) => {
       <div className="flex max-w-[500px] flex-col">
         <AssetInput
           className="w-full"
-          title={intl.formatMessage({ id: 'common.asset' })}
+          title={intl.formatMessage({ id: 'deposit.add.runeSide' })}
+          amount={{ amount: runeAmountToDeposit, asset: AssetRuneNative }}
+          priceAmount={priceRuneAmountToDepositMax1e8}
+          assets={[]}
+          network={network}
+          onChangeAsset={FP.constVoid}
+          onChange={runeAmountChangeHandler}
+          onBlur={inputOnBlur}
+          onFocus={() => setSelectedInput('rune')}
+          showError={minRuneAmountError}
+          useLedger={useRuneLedger}
+          hasLedger={hasRuneLedger}
+          useLedgerHandler={useRuneLedgerHandler}
+          extraContent={
+            <div className="flex flex-col">
+              <MaxBalanceButton
+                className="ml-10px mt-5px"
+                classNameButton="!text-gray2 dark:!text-gray2d"
+                classNameIcon={
+                  // show warn icon if maxAmountToSwapMax <= 0
+                  maxRuneAmountToDeposit.gt(ZERO_BASE_AMOUNT)
+                    ? `text-gray2 dark:text-gray2d`
+                    : 'text-warning0 dark:text-warning0d'
+                }
+                size="medium"
+                balance={{ amount: maxRuneAmountToDeposit, asset: AssetRuneNative }}
+                onClick={() => {
+                  setRuneAmountToDeposit(maxRuneAmountToDeposit)
+                  setPercentValueToDeposit(100)
+                }}
+                maxInfoText={'TODO: Add max info txt'}
+              />
+              {minRuneAmountError &&
+                renderMinAmount({
+                  minAmount: minRuneAmountToDeposit,
+                  minAmountInfo: 'TODO: Info text',
+                  asset,
+                  isError: minRuneAmountError
+                })}
+            </div>
+          }
+        />
+
+        <div className="w-full px-20px pt-5px pb-10px">
+          <Slider
+            onAfterChange={onAfterSliderChangeHandler}
+            disabled={disabled}
+            value={percentValueToDeposit}
+            onChange={changePercentHandler}
+            tooltipPlacement="top"
+            withLabel={true}
+          />
+        </div>
+
+        <AssetInput
+          className="w-full"
+          title={intl.formatMessage({ id: 'deposit.add.assetSide' })}
           amount={{ amount: assetAmountToDepositMax1e8, asset }}
           priceAmount={priceAssetAmountToDepositMax1e8}
           assets={poolBasedBalancesAssets}
@@ -1625,61 +1687,53 @@ export const SymDeposit: React.FC<Props> = (props) => {
           }
         />
 
-        <div className="w-full px-20px pt-5px pb-10px">
-          <Slider
-            onAfterChange={onAfterSliderChangeHandler}
-            disabled={disabled}
-            value={percentValueToDeposit}
-            onChange={changePercentHandler}
-            tooltipPlacement="top"
-            withLabel={true}
-          />
-        </div>
+        <div className="flex flex-col items-center justify-between py-20">
+          {renderIsApprovedError}
+          {(walletBalancesLoading || checkIsApproved) && (
+            <LoadingView
+              className="mb-20px"
+              label={
+                // We show only one loading state at time
+                // Order matters: Show states with shortest loading time before others
+                // (approve state takes just a short time to load, but needs to be displayed)
+                checkIsApproved
+                  ? intl.formatMessage({ id: 'common.approve.checking' }, { asset: asset.ticker })
+                  : walletBalancesLoading
+                  ? intl.formatMessage({ id: 'common.balance.loading' })
+                  : undefined
+              }
+            />
+          )}
+          {isApproved ? (
+            <>
+              {renderAssetChainFeeError}
+              {renderThorchainFeeError}
+              <FlatButton className="mb-20px min-w-[200px]" size="large" onClick={onSubmit} disabled={disableSubmit}>
+                {intl.formatMessage({ id: 'common.add' })}
+              </FlatButton>
+              <Fees fees={uiFeesRD} reloadFees={reloadFeesHandler} disabled={disabledForm} />
+            </>
+          ) : (
+            <>
+              {renderApproveFeeError}
+              {renderApproveError}
+              <FlatButton
+                className="mb-20px min-w-[200px]"
+                size="large"
+                color="warning"
+                disabled={disableSubmitApprove}
+                onClick={onApprove}
+                loading={RD.isPending(approveState)}>
+                {intl.formatMessage({ id: 'common.approve' })}
+              </FlatButton>
 
-        <AssetInput
-          className="w-full"
-          title={intl.formatMessage({ id: 'common.rune' })}
-          amount={{ amount: runeAmountToDeposit, asset: AssetRuneNative }}
-          priceAmount={priceRuneAmountToDepositMax1e8}
-          assets={[]}
-          network={network}
-          onChangeAsset={FP.constVoid}
-          onChange={runeAmountChangeHandler}
-          onBlur={inputOnBlur}
-          onFocus={() => setSelectedInput('rune')}
-          showError={minRuneAmountError}
-          useLedger={useRuneLedger}
-          hasLedger={hasRuneLedger}
-          useLedgerHandler={useRuneLedgerHandler}
-          extraContent={
-            <div className="flex flex-col">
-              <MaxBalanceButton
-                className="ml-10px mt-5px"
-                classNameButton="!text-gray2 dark:!text-gray2d"
-                classNameIcon={
-                  // show warn icon if maxAmountToSwapMax <= 0
-                  maxRuneAmountToDeposit.gt(ZERO_BASE_AMOUNT)
-                    ? `text-gray2 dark:text-gray2d`
-                    : 'text-warning0 dark:text-warning0d'
-                }
-                size="medium"
-                balance={{ amount: maxRuneAmountToDeposit, asset: AssetRuneNative }}
-                onClick={() => {
-                  setRuneAmountToDeposit(maxRuneAmountToDeposit)
-                  setPercentValueToDeposit(100)
-                }}
-                maxInfoText={'TODO: Add max info txt'}
-              />
-              {minRuneAmountError &&
-                renderMinAmount({
-                  minAmount: minRuneAmountToDeposit,
-                  minAmountInfo: 'TODO: Info text',
-                  asset,
-                  isError: minRuneAmountError
-                })}
-            </div>
-          }
-        />
+              {!RD.isInitial(uiApproveFeesRD) && <Fees fees={uiApproveFeesRD} reloadFees={reloadApproveFeesHandler} />}
+            </>
+          )}
+        </div>
+        {renderPasswordConfirmationModal}
+        {renderLedgerConfirmationModal}
+        {renderTxModal}
       </div>
       <Styled.CardsRow gutter={{ lg: 32 }}>
         <Col xs={24} xl={12}>
@@ -1760,52 +1814,6 @@ export const SymDeposit: React.FC<Props> = (props) => {
           </>
         </Col>
       </Styled.CardsRow>
-      <Styled.SubmitContainer>
-        {renderIsApprovedError}
-        {(walletBalancesLoading || checkIsApproved) && (
-          <Styled.LoadingView
-            label={
-              // We show only one loading state at time
-              // Order matters: Show states with shortest loading time before others
-              // (approve state takes just a short time to load, but needs to be displayed)
-              checkIsApproved
-                ? intl.formatMessage({ id: 'common.approve.checking' }, { asset: asset.ticker })
-                : walletBalancesLoading
-                ? intl.formatMessage({ id: 'common.balance.loading' })
-                : undefined
-            }
-          />
-        )}
-        {isApproved ? (
-          <>
-            {renderAssetChainFeeError}
-            {renderThorchainFeeError}
-            <FlatButton className="mb-20px min-w-[200px]" size="large" onClick={onSubmit} disabled={disableSubmit}>
-              {intl.formatMessage({ id: 'common.add' })}
-            </FlatButton>
-            <Fees fees={uiFeesRD} reloadFees={reloadFeesHandler} disabled={disabledForm} />
-          </>
-        ) : (
-          <>
-            {renderApproveFeeError}
-            {renderApproveError}
-            <FlatButton
-              className="mb-20px min-w-[200px]"
-              size="large"
-              color="warning"
-              disabled={disableSubmitApprove}
-              onClick={onApprove}
-              loading={RD.isPending(approveState)}>
-              {intl.formatMessage({ id: 'common.approve' })}
-            </FlatButton>
-
-            {!RD.isInitial(uiApproveFeesRD) && <Fees fees={uiApproveFeesRD} reloadFees={reloadApproveFeesHandler} />}
-          </>
-        )}
-      </Styled.SubmitContainer>
-      {renderPasswordConfirmationModal}
-      {renderLedgerConfirmationModal}
-      {renderTxModal}
     </div>
   )
 }

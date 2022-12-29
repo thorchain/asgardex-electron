@@ -203,7 +203,7 @@ export const ActivePools: React.FC<PoolsComponentProps> = ({ haltedChains, mimir
       align: 'center',
       title: (
         <div className="flex flex-col items-center">
-          <div className="text-12 font-main">{intl.formatMessage({ id: 'pools.apy' })}</div>
+          <div className="font-main text-[12px]">{intl.formatMessage({ id: 'pools.apy' })}</div>
           <PoolsPeriodSelector selectedValue={poolsPeriod} onChange={setPoolsPeriod} />
         </div>
       ),
