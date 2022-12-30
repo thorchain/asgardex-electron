@@ -129,7 +129,17 @@ export type Props = {
   getRuneExplorerTxUrl: GetExplorerTxUrl
   getAssetExplorerTxUrl: GetExplorerTxUrl
   validatePassword$: ValidatePasswordHandler
-  onChangeAsset: (asset: Asset) => void
+  assetWalletType: WalletType
+  runeWalletType: WalletType
+  onChangeAsset: ({
+    asset,
+    assetWalletType,
+    runeWalletType
+  }: {
+    asset: Asset
+    assetWalletType: WalletType
+    runeWalletType: WalletType
+  }) => void
   disabled?: boolean
   poolData: PoolData
   deposit$: SymDepositStateHandler
@@ -145,8 +155,6 @@ export type Props = {
   hasAsymAssets: LiquidityProviderHasAsymAssetsRD
   symAssetMismatch: LiquidityProviderAssetMismatchRD
   openAsymDepositTool: FP.Lazy<void>
-  setAssetWalletType: (walletType: WalletType) => void
-  setRuneWalletType: (walletType: WalletType) => void
 }
 
 type SelectedInput = 'asset' | 'rune' | 'none'
@@ -169,6 +177,8 @@ export const SymDeposit: React.FC<Props> = (props) => {
     reloadShares,
     reloadSelectedPoolDetail,
     fees$,
+    assetWalletType,
+    runeWalletType,
     onChangeAsset,
     disabled = false,
     poolData,
@@ -186,17 +196,15 @@ export const SymDeposit: React.FC<Props> = (props) => {
     openRecoveryTool,
     hasAsymAssets: hasAsymAssetsRD,
     symAssetMismatch: symAssetMismatchRD,
-    openAsymDepositTool,
-    setAssetWalletType,
-    setRuneWalletType
+    openAsymDepositTool
   } = props
 
   const intl = useIntl()
 
   const prevAsset = useRef<O.Option<Asset>>(O.none)
 
-  const [useRuneLedger, setRuneLedger] = useState(false)
-  const [useAssetLedger, setUseAssetLedger] = useState(false)
+  const isRuneLedger = isLedgerWallet(runeWalletType)
+  const isAssetLedger = isLedgerWallet(assetWalletType)
 
   const { balances: oWalletBalances, loading: walletBalancesLoading } = walletBalances
 
@@ -218,14 +226,13 @@ export const SymDeposit: React.FC<Props> = (props) => {
   )
 
   const oRuneWB: O.Option<WalletBalance> = useMemo(() => {
-    const walletType = useRuneLedger ? 'ledger' : 'keystore'
     const oWalletBalances = NEA.fromArray(poolBasedBalances)
     return WalletHelper.getWalletBalanceByAssetAndWalletType({
       oWalletBalances,
       asset: AssetRuneNative,
-      walletType
+      walletType: runeWalletType
     })
-  }, [useRuneLedger, poolBasedBalances])
+  }, [runeWalletType, poolBasedBalances])
 
   const runeBalanceLabel = useMemo(
     () =>
@@ -247,14 +254,13 @@ export const SymDeposit: React.FC<Props> = (props) => {
   )
 
   const oAssetWB: O.Option<WalletBalance> = useMemo(() => {
-    const walletType = useAssetLedger ? 'ledger' : 'keystore'
     const oWalletBalances = NEA.fromArray(poolBasedBalances)
     return WalletHelper.getWalletBalanceByAssetAndWalletType({
       oWalletBalances,
       asset,
-      walletType
+      walletType: assetWalletType
     })
-  }, [asset, useAssetLedger, poolBasedBalances])
+  }, [asset, assetWalletType, poolBasedBalances])
 
   const assetBalanceLabel = useMemo(
     () =>
@@ -364,12 +370,15 @@ export const SymDeposit: React.FC<Props> = (props) => {
 
   const oChainAssetBalance: O.Option<BaseAmount> = useMemo(() => {
     const chainAsset = getChainAsset(asset.chain)
-    const walletType = useAssetLedger ? 'ledger' : 'keystore'
     return FP.pipe(
-      WalletHelper.getWalletBalanceByAssetAndWalletType({ oWalletBalances, asset: chainAsset, walletType }),
+      WalletHelper.getWalletBalanceByAssetAndWalletType({
+        oWalletBalances,
+        asset: chainAsset,
+        walletType: assetWalletType
+      }),
       O.map(({ amount }) => amount)
     )
-  }, [asset.chain, oWalletBalances, useAssetLedger])
+  }, [asset.chain, oWalletBalances, assetWalletType])
 
   const chainAssetBalance: BaseAmount = useMemo(
     () =>
@@ -1104,9 +1113,9 @@ export const SymDeposit: React.FC<Props> = (props) => {
 
   const onChangeAssetHandler = useCallback(
     (asset: Asset) => {
-      onChangeAsset(asset)
+      onChangeAsset({ asset, assetWalletType, runeWalletType })
     },
-    [onChangeAsset]
+    [assetWalletType, onChangeAsset, runeWalletType]
   )
 
   const onAfterSliderChangeHandler = useCallback(() => {
@@ -1119,13 +1128,13 @@ export const SymDeposit: React.FC<Props> = (props) => {
   const [showPasswordModal, setShowPasswordModal] = useState<ModalState>('none')
   const [showLedgerModal, setShowLedgerModal] = useState<ModalState>('none')
 
-  const onSubmit = useCallback(() => {
-    if (useAssetLedger || useRuneLedger) {
+  const onSubmit = () => {
+    if (isAssetLedger || isRuneLedger) {
       setShowLedgerModal('deposit')
     } else {
       setShowPasswordModal('deposit')
     }
-  }, [useAssetLedger, useRuneLedger])
+  }
 
   const renderFeeError = useCallback(
     (fee: BaseAmount, amount: BaseAmount, asset: Asset) => {
@@ -1380,12 +1389,12 @@ export const SymDeposit: React.FC<Props> = (props) => {
   } = useSubscriptionState<TxHashRD>(RD.initial)
 
   const onApprove = useCallback(() => {
-    if (useAssetLedger) {
+    if (isAssetLedger) {
       setShowLedgerModal('approve')
     } else {
       setShowPasswordModal('approve')
     }
-  }, [useAssetLedger])
+  }, [isAssetLedger])
 
   const submitApproveTx = useCallback(() => {
     FP.pipe(
@@ -1601,23 +1610,20 @@ export const SymDeposit: React.FC<Props> = (props) => {
   const useRuneLedgerHandler = useCallback(
     (useLedger: boolean) => {
       const walletType: WalletType = useLedger ? 'ledger' : 'keystore'
-      setRuneLedger(() => isLedgerWallet(walletType))
-      setRuneWalletType(walletType)
+      onChangeAsset({ asset, assetWalletType, runeWalletType: walletType })
       resetEnteredAmounts()
     },
 
-    [resetEnteredAmounts, setRuneWalletType]
+    [asset, assetWalletType, onChangeAsset, resetEnteredAmounts]
   )
 
   const useAssetLedgerHandler = useCallback(
     (useLedger: boolean) => {
       const walletType: WalletType = useLedger ? 'ledger' : 'keystore'
-      setUseAssetLedger(() => isLedgerWallet(walletType))
-      setAssetWalletType(walletType)
-
+      onChangeAsset({ asset, assetWalletType: walletType, runeWalletType })
       resetEnteredAmounts()
     },
-    [resetEnteredAmounts, setAssetWalletType]
+    [asset, onChangeAsset, resetEnteredAmounts, runeWalletType]
   )
 
   const renderPasswordConfirmationModal = useMemo(() => {
@@ -1677,8 +1683,8 @@ export const SymDeposit: React.FC<Props> = (props) => {
       sequenceTOption(oIsDeposit, oDepositParams),
       O.chain(([_, { poolAddress, runeSender, assetSender }]) => {
         const recipient = poolAddress.address
-        if (useRuneLedger) return O.some({ recipient, sender: runeSender })
-        if (useAssetLedger) return O.some({ recipient, sender: assetSender })
+        if (isRuneLedger) return O.some({ recipient, sender: runeSender })
+        if (isAssetLedger) return O.some({ recipient, sender: assetSender })
         return O.none
       })
     )
@@ -1688,14 +1694,14 @@ export const SymDeposit: React.FC<Props> = (props) => {
         onSuccess={onSucceess}
         onClose={onClose}
         visible
-        chain={useRuneLedger ? THORChain : asset.chain}
+        chain={isRuneLedger ? THORChain : asset.chain}
         network={network}
         description1={description1}
         description2={description2}
         addresses={addresses}
       />
     )
-  }, [asset, intl, network, oDepositParams, showLedgerModal, submitApproveTx, useAssetLedger, useRuneLedger])
+  }, [asset, intl, isAssetLedger, isRuneLedger, network, oDepositParams, showLedgerModal, submitApproveTx])
 
   useEffect(() => {
     if (!eqOAsset.equals(prevAsset.current, O.some(asset))) {
@@ -1841,7 +1847,7 @@ export const SymDeposit: React.FC<Props> = (props) => {
           onBlur={inputOnBlur}
           onFocus={() => setSelectedInput('rune')}
           showError={minRuneAmountError}
-          useLedger={useRuneLedger}
+          useLedger={isRuneLedger}
           hasLedger={hasRuneLedger}
           useLedgerHandler={useRuneLedgerHandler}
           extraContent={
@@ -1900,7 +1906,7 @@ export const SymDeposit: React.FC<Props> = (props) => {
           onBlur={inputOnBlur}
           onFocus={() => setSelectedInput('asset')}
           showError={minAssetAmountError}
-          useLedger={useAssetLedger}
+          useLedger={isAssetLedger}
           hasLedger={hasAssetLedger}
           useLedgerHandler={useAssetLedgerHandler}
           extraContent={

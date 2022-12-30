@@ -58,7 +58,17 @@ const defaultProps: SymDepositProps = {
   asset: { asset: AssetBNB, decimal: BNB_DECIMAL },
   poolDetails: [],
   pricePool: RUNE_PRICE_POOL,
-  onChangeAsset: (a: Asset) => console.log('change asset', a),
+  assetWalletType: 'keystore',
+  runeWalletType: 'ledger',
+  onChangeAsset: ({
+    asset,
+    assetWalletType,
+    runeWalletType
+  }: {
+    asset: Asset
+    assetWalletType: WalletType
+    runeWalletType: WalletType
+  }) => console.log('change asset', assetToString(asset), assetWalletType, runeWalletType),
   reloadFees: () => console.log('reload fees'),
   fees$: () =>
     Rx.of(
@@ -126,9 +136,7 @@ const defaultProps: SymDepositProps = {
   hasAsymAssets: RD.initial,
   symAssetMismatch: RD.initial,
   openRecoveryTool: () => console.log('openRecoveryTool'),
-  openAsymDepositTool: () => console.log('openAsymDepositTool'),
-  setAssetWalletType: (walletType: WalletType) => console.log('setAssetWalletType', walletType),
-  setRuneWalletType: (walletType: WalletType) => console.log('setRuneWalletType', walletType)
+  openAsymDepositTool: () => console.log('openAsymDepositTool')
 }
 
 export const Default: Story = () => <SymDeposit {...defaultProps} />

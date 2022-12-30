@@ -1,4 +1,4 @@
-import { useCallback, useMemo } from 'react'
+import { useMemo } from 'react'
 
 import { Asset, THORChain } from '@xchainjs/xchain-util'
 import * as FP from 'fp-ts/function'
@@ -11,23 +11,25 @@ import { isLedgerWallet } from '../../shared/utils/guard'
 import { WalletType } from '../../shared/wallet/types'
 import { useChainContext } from '../contexts/ChainContext'
 import { useWalletContext } from '../contexts/WalletContext'
-import { eqSymDepositAddresses } from '../helpers/fp/eq'
 import { INITIAL_SYM_DEPOSIT_ADDRESSES } from '../services/chain/const'
 import { SymDepositAddresses } from '../services/chain/types'
 import { ledgerAddressToWalletAddress } from '../services/wallet/util'
 
 /**
- * Hook to handle wallet addresses needed for sym. deposit
+ * Hook to provide wallet addresses needed for sym. deposit
  *
  * As always: Use it at `view` level only (not in components)
  */
-export const useSymDepositAddresses = (oAsset: O.Option<Asset>) => {
-  const { addressByChain$, symDepositAddresses$, setSymDepositAddresses } = useChainContext()
-
-  const [symDepositAddresses] = useObservableState(
-    () => FP.pipe(symDepositAddresses$, RxOp.distinctUntilChanged(eqSymDepositAddresses.equals)),
-    INITIAL_SYM_DEPOSIT_ADDRESSES
-  )
+export const useSymDepositAddresses = ({
+  asset: oAsset,
+  assetWalletType,
+  runeWalletType
+}: {
+  asset: O.Option<Asset>
+  assetWalletType: WalletType
+  runeWalletType: WalletType
+}) => {
+  const { addressByChain$ } = useChainContext()
 
   const { getLedgerAddress$ } = useWalletContext()
 
@@ -55,12 +57,7 @@ export const useSymDepositAddresses = (oAsset: O.Option<Asset>) => {
               asset,
               rune
             })
-          ),
-          // Since we are always "starting" with `keystore` addresses
-          // update global state once with it
-          RxOp.tap((addresses) => {
-            setSymDepositAddresses(addresses)
-          })
+          )
         ),
       INITIAL_SYM_DEPOSIT_ADDRESSES
     )
@@ -82,33 +79,12 @@ export const useSymDepositAddresses = (oAsset: O.Option<Asset>) => {
     O.none
   )
 
-  const setAssetWalletType = useCallback(
-    (walletType: WalletType) => {
-      // Update global state of addresses
-      // whenever walletType of ASSET side has been changed
-      setSymDepositAddresses({
-        ...symDepositAddresses,
-        asset: isLedgerWallet(walletType) ? assetLedgerAddress : assetKeystoreAddress
-      })
-    },
-    [assetKeystoreAddress, assetLedgerAddress, setSymDepositAddresses, symDepositAddresses]
-  )
-
-  const setRuneWalletType = useCallback(
-    (walletType: WalletType) => {
-      // Update global state of addresses
-      // whenever walletType of RUNE side has been changed
-      setSymDepositAddresses({
-        ...symDepositAddresses,
-        rune: isLedgerWallet(walletType) ? runeLedgerAddress : runeKeystoreAddress
-      })
-    },
-    [runeKeystoreAddress, runeLedgerAddress, setSymDepositAddresses, symDepositAddresses]
-  )
+  const symDepositAddresses = {
+    asset: isLedgerWallet(assetWalletType) ? assetLedgerAddress : assetKeystoreAddress,
+    rune: isLedgerWallet(runeWalletType) ? runeLedgerAddress : runeKeystoreAddress
+  }
 
   return {
-    addresses: symDepositAddresses,
-    setAssetWalletType,
-    setRuneWalletType
+    addresses: symDepositAddresses
   }
 }

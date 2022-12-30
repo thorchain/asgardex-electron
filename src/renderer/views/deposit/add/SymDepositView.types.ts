@@ -1,6 +1,6 @@
-import { Address } from '@xchainjs/xchain-util'
 import { Chain } from '@xchainjs/xchain-util'
 
+import { WalletAddress } from '../../../../shared/wallet/types'
 import { PoolDetailRD } from '../../../services/midgard/types'
 import { MimirHalt } from '../../../services/thorchain/types'
 import { AssetWithDecimal } from '../../../types/asgardex'
@@ -10,6 +10,6 @@ export type Props = {
   poolDetail: PoolDetailRD
   haltedChains: Chain[]
   mimirHalt: MimirHalt
-  runeWalletAddress: Address
-  assetWalletAddress: Address
+  runeWalletAddress: WalletAddress
+  assetWalletAddress: WalletAddress
 }

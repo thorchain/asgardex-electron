@@ -14,7 +14,6 @@ import {
 import * as O from 'fp-ts/lib/Option'
 import * as Rx from 'rxjs'
 
-import { observableState } from '../../helpers/stateHelper'
 import * as BNB from '../binance'
 import * as BTC from '../bitcoin'
 import * as BCH from '../bitcoincash'
@@ -25,8 +24,6 @@ import * as ETH from '../ethereum'
 import * as LTC from '../litecoin'
 import * as THOR from '../thorchain'
 import { client$ } from './client'
-import { INITIAL_SYM_DEPOSIT_ADDRESSES } from './const'
-import { SymDepositAddresses } from './types'
 
 /**
  * Returns keystore addresses by givven chain
@@ -63,11 +60,4 @@ const addressByChain$ = (chain: Chain): WalletAddress$ => {
  */
 const assetAddress$ = (chain: Chain): WalletAddress$ => address$(client$, chain)
 
-/**
- * State of addresses used for sym. deposits
- * It will be set at view level (`DepositView` or `SymDepositView`)
- */
-const { get$: symDepositAddresses$, set: setSymDepositAddresses } =
-  observableState<SymDepositAddresses>(INITIAL_SYM_DEPOSIT_ADDRESSES)
-
-export { assetAddress$, addressByChain$, symDepositAddresses$, setSymDepositAddresses }
+export { assetAddress$, addressByChain$ }

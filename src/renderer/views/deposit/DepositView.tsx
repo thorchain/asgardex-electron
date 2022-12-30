@@ -14,6 +14,7 @@ import * as RxOp from 'rxjs/operators'
 import { Deposit } from '../../components/deposit/Deposit'
 import { ErrorView } from '../../components/shared/error'
 import { BackLinkButton, RefreshButton } from '../../components/uielements/button'
+import { DEFAULT_WALLET_TYPE } from '../../const'
 import { useChainContext } from '../../contexts/ChainContext'
 import { useMidgardContext } from '../../contexts/MidgardContext'
 import { useThorchainContext } from '../../contexts/ThorchainContext'
@@ -39,7 +40,11 @@ export const DepositView: React.FC<Props> = () => {
 
   const { reloadLiquidityProviders } = useThorchainContext()
 
-  const { asset } = useParams<DepositRouteParams>()
+  const {
+    asset: routeAsset,
+    assetWalletType: routeAssetWalletType,
+    runeWalletType: routeRuneWalletType
+  } = useParams<DepositRouteParams>()
   const {
     service: {
       setSelectedPoolAsset,
@@ -55,7 +60,9 @@ export const DepositView: React.FC<Props> = () => {
 
   const { assetWithDecimal$ } = useChainContext()
 
-  const oRouteAsset = useMemo(() => getAssetFromNullableString(asset), [asset])
+  const oRouteAsset = useMemo(() => getAssetFromNullableString(routeAsset), [routeAsset])
+  const assetWalletType = routeAssetWalletType || DEFAULT_WALLET_TYPE
+  const runeWalletType = routeRuneWalletType || DEFAULT_WALLET_TYPE
 
   // Set selected pool asset whenever an asset in route has been changed
   // Needed to get all data for this pool (pool details etc.)
@@ -90,7 +97,11 @@ export const DepositView: React.FC<Props> = () => {
 
   const {
     addresses: { rune: oRuneWalletAddress, asset: oAssetWalletAddress }
-  } = useSymDepositAddresses(oRouteAsset)
+  } = useSymDepositAddresses({
+    asset: oRouteAsset,
+    assetWalletType,
+    runeWalletType
+  })
   /**
    * We have to get a new shares$ stream for every new address
    * @description /src/renderer/services/midgard/shares.ts

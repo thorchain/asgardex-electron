@@ -8,6 +8,7 @@ import { useObservableState } from 'observable-hooks'
 import { useIntl } from 'react-intl'
 import { useNavigate } from 'react-router-dom'
 
+import { WalletType } from '../../../../shared/wallet/types'
 import { SymDeposit } from '../../../components/deposit/add'
 import { Alert } from '../../../components/uielements/alert'
 import { ASYM_DEPOSIT_TOOL_URL, RECOVERY_TOOL_URL, ZERO_POOL_DATA } from '../../../const'
@@ -22,7 +23,6 @@ import { useLiquidityProviders } from '../../../hooks/useLiquidityProviders'
 import { useNetwork } from '../../../hooks/useNetwork'
 import { useOpenExplorerTxUrl } from '../../../hooks/useOpenExplorerTxUrl'
 import { useProtocolLimit } from '../../../hooks/useProtocolLimit'
-import { useSymDepositAddresses } from '../../../hooks/useSymDepositAddresses'
 import * as poolsRoutes from '../../../routes/pools'
 import { PoolAddress, PoolAssetsRD } from '../../../services/midgard/types'
 import { toPoolData } from '../../../services/midgard/utils'
@@ -44,11 +44,19 @@ export const SymDepositView: React.FC<Props> = (props) => {
 
   const { network } = useNetwork()
 
-  const { setAssetWalletType, setRuneWalletType } = useSymDepositAddresses(O.some(asset))
-
   const onChangeAsset = useCallback(
-    (asset: Asset) => {
-      navigate(poolsRoutes.deposit.path({ asset: assetToString(asset) }), { replace: true })
+    ({
+      asset,
+      assetWalletType,
+      runeWalletType
+    }: {
+      asset: Asset
+      assetWalletType: WalletType
+      runeWalletType: WalletType
+    }) => {
+      navigate(poolsRoutes.deposit.path({ asset: assetToString(asset), assetWalletType, runeWalletType }), {
+        replace: true
+      })
     },
     [navigate]
   )
@@ -126,8 +134,8 @@ export const SymDepositView: React.FC<Props> = (props) => {
 
   const { symPendingAssets, hasAsymAssets, symAssetMismatch } = useLiquidityProviders({
     asset,
-    runeAddress: runeWalletAddress,
-    assetAddress: assetWalletAddress
+    runeAddress: runeWalletAddress.address,
+    assetAddress: assetWalletAddress.address
   })
 
   const openRecoveryTool = useCallback(
@@ -181,8 +189,8 @@ export const SymDepositView: React.FC<Props> = (props) => {
           hasAsymAssets={RD.initial}
           symAssetMismatch={RD.initial}
           openAsymDepositTool={openAsymDepositTool}
-          setAssetWalletType={setAssetWalletType}
-          setRuneWalletType={setRuneWalletType}
+          assetWalletType={assetWalletAddress.type}
+          runeWalletType={runeWalletAddress.type}
         />
       </>
     ),
@@ -210,8 +218,8 @@ export const SymDepositView: React.FC<Props> = (props) => {
       protocolLimitReached,
       openRecoveryTool,
       openAsymDepositTool,
-      setAssetWalletType,
-      setRuneWalletType
+      assetWalletAddress.type,
+      runeWalletAddress.type
     ]
   )
 
@@ -261,8 +269,8 @@ export const SymDepositView: React.FC<Props> = (props) => {
               hasAsymAssets={hasAsymAssets}
               symAssetMismatch={symAssetMismatch}
               openAsymDepositTool={openAsymDepositTool}
-              setAssetWalletType={setAssetWalletType}
-              setRuneWalletType={setRuneWalletType}
+              assetWalletType={assetWalletAddress.type}
+              runeWalletType={runeWalletAddress.type}
             />
           </>
         )

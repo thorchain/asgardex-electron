@@ -2,8 +2,6 @@ import React, { createContext, useContext } from 'react'
 
 import {
   addressByChain$,
-  symDepositAddresses$,
-  setSymDepositAddresses,
   clientByChain$,
   symDepositFees$,
   reloadSymDepositFees,
@@ -26,8 +24,6 @@ import {
 
 type ChainContextValue = {
   addressByChain$: typeof addressByChain$
-  symDepositAddresses$: typeof symDepositAddresses$
-  setSymDepositAddresses: typeof setSymDepositAddresses
   clientByChain$: typeof clientByChain$
   symDepositFees$: typeof symDepositFees$
   reloadSymDepositFees: typeof reloadSymDepositFees
@@ -50,8 +46,6 @@ type ChainContextValue = {
 
 const initialContext: ChainContextValue = {
   addressByChain$,
-  symDepositAddresses$,
-  setSymDepositAddresses,
   clientByChain$,
   symDepositFees$,
   reloadSymDepositFees,
