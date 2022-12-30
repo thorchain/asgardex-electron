@@ -8,7 +8,9 @@
 
 ## Update
 
-- [SymDeposit] Redesign
+- [SymDeposit] Redesign [#2503](https://github.com/thorchain/asgardex-electron/issues/2503), [#2502](https://github.com/thorchain/asgardex-electron/pull/2502)
+- [AssetInput] Add Ledger + extraContent [#2505](https://github.com/thorchain/asgardex-electron/pull/2505)
+- Refactor styles for 'warning` components (TW only) [#2504](https://github.com/thorchain/asgardex-electron/pull/2504)
 
 ## Fix
 

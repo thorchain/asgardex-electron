@@ -33,6 +33,7 @@ import { ZERO_ASSET_AMOUNT, ZERO_BASE_AMOUNT } from '../../../const'
 import {
   convertBaseAmountDecimal,
   getEthTokenAddress,
+  isChainAsset,
   isEthAsset,
   isEthTokenAsset,
   isRuneNativeAsset,
@@ -226,6 +227,25 @@ export const SymDeposit: React.FC<Props> = (props) => {
     })
   }, [useRuneLedger, poolBasedBalances])
 
+  const runeBalanceLabel = useMemo(
+    () =>
+      walletBalancesLoading
+        ? loadingString
+        : FP.pipe(
+            oRuneWB,
+            O.map(({ amount, asset }) =>
+              formatAssetAmountCurrency({
+                amount: baseToAsset(amount),
+                asset,
+                decimal: 8,
+                trimZeros: true
+              })
+            ),
+            O.getOrElse(() => noDataString)
+          ),
+    [oRuneWB, walletBalancesLoading]
+  )
+
   const oAssetWB: O.Option<WalletBalance> = useMemo(() => {
     const walletType = useAssetLedger ? 'ledger' : 'keystore'
     const oWalletBalances = NEA.fromArray(poolBasedBalances)
@@ -235,6 +255,25 @@ export const SymDeposit: React.FC<Props> = (props) => {
       walletType
     })
   }, [asset, useAssetLedger, poolBasedBalances])
+
+  const assetBalanceLabel = useMemo(
+    () =>
+      walletBalancesLoading
+        ? loadingString
+        : FP.pipe(
+            oAssetWB,
+            O.map(({ amount, asset }) =>
+              formatAssetAmountCurrency({
+                amount: baseToAsset(amount),
+                asset,
+                decimal: 8,
+                trimZeros: true
+              })
+            ),
+            O.getOrElse(() => noDataString)
+          ),
+    [oAssetWB, walletBalancesLoading]
+  )
 
   const hasAssetLedger = useMemo(
     () => WalletHelper.hasLedgerInBalancesByAsset(asset, poolBasedBalances),
@@ -403,6 +442,47 @@ export const SymDeposit: React.FC<Props> = (props) => {
         O.getOrElse(() => zeroDepositFees)
       ),
     [depositFeesRD, zeroDepositFees]
+  )
+
+  const runeFeeLabel: string = useMemo(
+    () =>
+      FP.pipe(
+        depositFeesRD,
+        RD.fold(
+          () => loadingString,
+          () => loadingString,
+          () => noDataString,
+          ({ rune: { inFee, outFee } }) =>
+            formatAssetAmountCurrency({
+              amount: baseToAsset(inFee.plus(outFee)),
+              asset: AssetRuneNative,
+              decimal: 6,
+              trimZeros: true
+            })
+        )
+      ),
+    [depositFeesRD]
+  )
+
+  const assetFeeLabel: string = useMemo(
+    () =>
+      FP.pipe(
+        depositFeesRD,
+        RD.fold(
+          () => loadingString,
+          () => loadingString,
+          () => noDataString,
+          ({ asset: { inFee, outFee, asset: feeAsset } }) =>
+            formatAssetAmountCurrency({
+              amount: baseToAsset(inFee.plus(outFee)),
+              asset: feeAsset,
+              decimal: isUSDAsset(feeAsset) ? 2 : 6,
+              trimZeros: !isUSDAsset(feeAsset)
+            })
+        )
+      ),
+
+    [depositFeesRD]
   )
 
   // Price of RUNE IN fee
@@ -1061,7 +1141,9 @@ export const SymDeposit: React.FC<Props> = (props) => {
         }
       )
 
-      return <p className="mb-20px p-0 text-center font-main uppercase text-error0 dark:text-error0d">{msg}</p>
+      return (
+        <p className="mb-20px p-0 text-center font-main text-[12px] uppercase text-error0 dark:text-error0d">{msg}</p>
+      )
     },
     [intl]
   )
@@ -1377,7 +1459,7 @@ export const SymDeposit: React.FC<Props> = (props) => {
         () => <></>,
         () => <></>,
         (error) => (
-          <p className="mb-20px p-0 text-center font-main uppercase text-error0 dark:text-error0d">
+          <p className="mb-20px p-0 text-center font-main text-[12px] uppercase text-error0 dark:text-error0d">
             {intl.formatMessage({ id: 'common.approve.error' }, { asset: asset.ticker, error: error.msg })}
           </p>
         ),
@@ -1779,12 +1861,15 @@ export const SymDeposit: React.FC<Props> = (props) => {
                   setRuneAmountToDeposit(maxRuneAmountToDeposit)
                   setPercentValueToDeposit(100)
                 }}
-                maxInfoText={'TODO: Add max info txt'}
+                maxInfoText={intl.formatMessage(
+                  { id: 'deposit.add.max.infoWithFee' },
+                  { balance: runeBalanceLabel, fee: runeFeeLabel }
+                )}
               />
               {minRuneAmountError &&
                 renderMinAmount({
                   minAmount: minRuneAmountToDeposit,
-                  minAmountInfo: 'TODO: Info text',
+                  minAmountInfo: intl.formatMessage({ id: 'deposit.add.min.info' }),
                   asset,
                   isError: minRuneAmountError
                 })}
@@ -1835,12 +1920,19 @@ export const SymDeposit: React.FC<Props> = (props) => {
                   setAssetAmountToDepositMax1e8(maxAssetAmountToDepositMax1e8)
                   setPercentValueToDeposit(100)
                 }}
-                maxInfoText={'TODO: Add max info txt'}
+                maxInfoText={
+                  isChainAsset(asset)
+                    ? intl.formatMessage(
+                        { id: 'deposit.add.max.infoWithFee' },
+                        { balance: assetBalanceLabel, fee: assetFeeLabel }
+                      )
+                    : intl.formatMessage({ id: 'deposit.add.max.info' }, { balance: assetBalanceLabel })
+                }
               />
               {minAssetAmountError &&
                 renderMinAmount({
                   minAmount: minAssetAmountToDepositMax1e8,
-                  minAmountInfo: 'TODO: Info text',
+                  minAmountInfo: intl.formatMessage({ id: 'deposit.add.min.info' }),
                   asset,
                   isError: minAssetAmountError
                 })}
@@ -2017,42 +2109,12 @@ export const SymDeposit: React.FC<Props> = (props) => {
                 {/* rune sender balance */}
                 <div className="flex w-full items-center justify-between pl-10px text-[12px]">
                   <div>{intl.formatMessage({ id: 'common.sender.rune' })}</div>
-                  <div className="truncate pl-20px text-[13px] normal-case leading-normal">
-                    {walletBalancesLoading
-                      ? loadingString
-                      : FP.pipe(
-                          oRuneWB,
-                          O.map(({ amount, asset }) =>
-                            formatAssetAmountCurrency({
-                              amount: baseToAsset(amount),
-                              asset,
-                              decimal: 8,
-                              trimZeros: true
-                            })
-                          ),
-                          O.getOrElse(() => noDataString)
-                        )}
-                  </div>
+                  <div className="truncate pl-20px text-[13px] normal-case leading-normal">{runeBalanceLabel}</div>
                 </div>
                 {/* asset sender balance */}
                 <div className="flex w-full items-center justify-between pl-10px text-[12px]">
                   <div>{intl.formatMessage({ id: 'common.sender.asset' })}</div>
-                  <div className="truncate pl-20px text-[13px] normal-case leading-normal">
-                    {walletBalancesLoading
-                      ? loadingString
-                      : FP.pipe(
-                          oAssetWB,
-                          O.map(({ amount, asset }) =>
-                            formatAssetAmountCurrency({
-                              amount: baseToAsset(amount),
-                              asset,
-                              decimal: 8,
-                              trimZeros: true
-                            })
-                          ),
-                          O.getOrElse(() => noDataString)
-                        )}
-                  </div>
+                  <div className="truncate pl-20px text-[13px] normal-case leading-normal">{assetBalanceLabel}</div>
                 </div>
               </>
             )}

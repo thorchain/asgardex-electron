@@ -121,7 +121,7 @@ export const PoolsPeriodSelector: React.FC<Props> = (props): JSX.Element => {
                       py-[10px] pl-20px pr-10px
                       ${selected && 'text-gray2 dark:text-gray2d'}
                       ${selected ? 'cursor-disabled' : 'cursor-pointer'}
-                      text-12 font-main
+                      font-main text-[12px]
                       text-text0
                       dark:text-text0d
                       ${!selected && 'hover:bg-gray0 hover:text-gray2'}
