@@ -120,7 +120,7 @@ export const SaversOverview: React.FC<Props> = (props): JSX.Element => {
       align: 'center',
       title: (
         <div className="flex flex-col items-center">
-          <div className="text-12 font-main">{intl.formatMessage({ id: 'pools.apr' })}</div>
+          <div className="font-main text-[12px]">{intl.formatMessage({ id: 'pools.apr' })}</div>
           <PoolsPeriodSelector selectedValue={poolsPeriod} onChange={setPoolsPeriod} />
         </div>
       ),

@@ -64,14 +64,14 @@ export const PoolsPeriodSelector: React.FC<Props> = (props): JSX.Element => {
         }}>
         <Listbox.Button
           as="div"
-          className={() => `text-12
-              group
-              flex cursor-pointer
-              items-center
+          className={() => `group
+              flex
+              cursor-pointer items-center
               bg-bg0
               py-5px
               pl-20px
-              pr-10px font-main
+              pr-10px
+              font-main text-[12px]
               text-text0
               transition
               duration-300
@@ -121,7 +121,7 @@ export const PoolsPeriodSelector: React.FC<Props> = (props): JSX.Element => {
                       py-[10px] pl-20px pr-10px
                       ${selected && 'text-gray2 dark:text-gray2d'}
                       ${selected ? 'cursor-disabled' : 'cursor-pointer'}
-                      text-12 font-main
+                      font-main text-[12px]
                       text-text0
                       dark:text-text0d
                       ${!selected && 'hover:bg-gray0 hover:text-gray2'}

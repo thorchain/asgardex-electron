@@ -13,12 +13,12 @@ export const SliderWrapper = styled(Slider)<SliderSingleProps & { error: boolean
   .ant {
     &-slider {
       &-rail {
-        height: 4px;
-        background: palette('gray', 1);
+        height: 2px;
+        background-color: ${palette('gray', 1)} !important;
       }
 
       &-track {
-        background: ${({ error }) => (error ? palette('error', 0) : palette('gradient', 0))};
+        background-color: ${({ error }) => (error ? palette('error', 0) : palette('gradient', 0))};
       }
 
       &-handle {
@@ -27,8 +27,8 @@ export const SliderWrapper = styled(Slider)<SliderSingleProps & { error: boolean
         margin-top: -6px;
         margin-left: -6px;
         border: 3px solid;
-        border-color: ${({ error }) => (error ? palette('error', 0) : palette('success', 0))};
-        background: ${palette('background', 1)};
+        border-color: ${({ error }) => (error ? palette('error', 0) : palette('success', 0))} !important;
+        background-color: ${palette('background', 1)};
       }
 
       &-dot {
@@ -72,5 +72,5 @@ export const SliderLabel = styled.div.attrs({ className: 'sliderLabel' })`
   align-items: center;
   font-family: inherit;
   font-size: 12px;
-  color: ${palette('text', 1)};
+  color: ${palette('text', 2)};
 `

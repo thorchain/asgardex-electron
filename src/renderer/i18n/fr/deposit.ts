@@ -13,8 +13,15 @@ const deposit: DepositMessages = {
   'deposit.share.poolshare': 'Part dans la pool',
   'deposit.redemption.title': 'Valeur actuelle de remboursement',
   'deposit.totalEarnings': 'Vos revenus totaux de la pool',
-  'deposit.add.asym': 'Ajouter {asset}',
   'deposit.add.sym': 'Ajouter',
+  'deposit.add.asym': 'Ajouter {asset}',
+  'deposit.add.runeSide': 'RUNE side - FR',
+  'deposit.add.assetSide': 'Asset side - FR',
+  'deposit.add.min.info': 'Minimum value to deposit to cover all fees for inbound and outbound transactions. - FR',
+  'deposit.add.max.infoWithFee':
+    'Maximum amount to deposit is based on balance ({balance}) minus estimated fees ({fee}) in relation to other asset side. - FR',
+  'deposit.add.max.info':
+    'Maximum amount to deposit is based on balance ({balance}) in relation to other asset side. - FR',
   'deposit.add.state.sending': 'Envoi de la transaction de dépôt',
   'deposit.add.state.checkResults': 'Vérification du résultat du dépôt',
   'deposit.add.state.pending': 'Ajout de liquidité',

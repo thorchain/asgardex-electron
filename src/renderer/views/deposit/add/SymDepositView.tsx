@@ -1,26 +1,23 @@
 import React, { useCallback, useEffect, useMemo } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
-import { Asset, AssetRuneNative, assetToString, bn, Chain, THORChain } from '@xchainjs/xchain-util'
-import BigNumber from 'bignumber.js'
+import { Asset, AssetRuneNative, assetToString, Chain, THORChain } from '@xchainjs/xchain-util'
 import * as FP from 'fp-ts/function'
 import * as O from 'fp-ts/lib/Option'
 import { useObservableState } from 'observable-hooks'
 import { useIntl } from 'react-intl'
 import { useNavigate } from 'react-router-dom'
-import * as RxOp from 'rxjs/operators'
 
 import { SymDeposit } from '../../../components/deposit/add'
 import { Alert } from '../../../components/uielements/alert'
-import { ASYM_DEPOSIT_TOOL_URL, RECOVERY_TOOL_URL, ZERO_BN, ZERO_POOL_DATA } from '../../../const'
+import { ASYM_DEPOSIT_TOOL_URL, RECOVERY_TOOL_URL, ZERO_POOL_DATA } from '../../../const'
 import { useChainContext } from '../../../contexts/ChainContext'
 import { useEthereumContext } from '../../../contexts/EthereumContext'
 import { useMidgardContext } from '../../../contexts/MidgardContext'
 import { useThorchainContext } from '../../../contexts/ThorchainContext'
 import { useWalletContext } from '../../../contexts/WalletContext'
 import { sequenceTRD } from '../../../helpers/fpHelpers'
-import { getAssetPoolPrice } from '../../../helpers/poolHelper'
-import { liveData } from '../../../helpers/rx/liveData'
+import { RUNE_PRICE_POOL } from '../../../helpers/poolHelper'
 import { useLiquidityProviders } from '../../../hooks/useLiquidityProviders'
 import { useNetwork } from '../../../hooks/useNetwork'
 import { useOpenExplorerTxUrl } from '../../../hooks/useOpenExplorerTxUrl'
@@ -60,28 +57,14 @@ export const SymDepositView: React.FC<Props> = (props) => {
 
   const {
     service: {
-      pools: {
-        availableAssets$,
-        priceRatio$,
-        selectedPricePoolAsset$,
-        reloadSelectedPoolDetail,
-        selectedPoolAddress$,
-        poolsState$
-      },
+      pools: { availableAssets$, reloadSelectedPoolDetail, selectedPoolAddress$, poolsState$, selectedPricePool$ },
       shares: { reloadShares }
     }
   } = useMidgardContext()
 
   const { symDepositFees$, symDeposit$, reloadSymDepositFees } = useChainContext()
 
-  const [poolsDataRD] = useObservableState(
-    () =>
-      FP.pipe(
-        poolsState$,
-        liveData.map(({ poolsData }) => poolsData)
-      ),
-    RD.initial
-  )
+  const poolsState = useObservableState(poolsState$, RD.initial)
 
   const oPoolAddress: O.Option<PoolAddress> = useObservableState(selectedPoolAddress$, O.none)
 
@@ -100,8 +83,7 @@ export const SymDepositView: React.FC<Props> = (props) => {
     reloadInboundAddresses()
   }, [reloadInboundAddresses])
 
-  const runPrice = useObservableState(priceRatio$, bn(1))
-  const [selectedPricePoolAsset] = useObservableState(() => FP.pipe(selectedPricePoolAsset$, RxOp.map(O.toUndefined)))
+  const pricePool = useObservableState(selectedPricePool$, RUNE_PRICE_POOL)
 
   const [balancesState] = useObservableState(
     () =>
@@ -123,12 +105,6 @@ export const SymDepositView: React.FC<Props> = (props) => {
   }, [reloadBalances])
 
   const poolAssetsRD: PoolAssetsRD = useObservableState(availableAssets$, RD.initial)
-
-  const assetPriceRD: RD.RemoteData<Error, BigNumber> = FP.pipe(
-    poolDetailRD,
-    // convert from RUNE price to selected pool asset price
-    RD.map(getAssetPoolPrice(runPrice))
-  )
 
   const { openExplorerTxUrl: openAssetExplorerTxUrl, getExplorerTxUrl: getAssetExplorerTxUrl } = useOpenExplorerTxUrl(
     O.some(asset.chain)
@@ -180,14 +156,12 @@ export const SymDepositView: React.FC<Props> = (props) => {
           getAssetExplorerTxUrl={getAssetExplorerTxUrl}
           onChangeAsset={FP.constVoid}
           asset={assetWD}
-          assetPrice={ZERO_BN}
-          runePrice={ZERO_BN}
           walletBalances={balancesState}
           fees$={symDepositFees$}
           reloadFees={FP.constVoid}
           approveFee$={approveFee$}
           reloadApproveFee={FP.constVoid}
-          priceAsset={selectedPricePoolAsset}
+          pricePool={pricePool}
           disabled={true}
           poolAddress={O.none}
           reloadBalances={reloadBalances}
@@ -200,6 +174,7 @@ export const SymDepositView: React.FC<Props> = (props) => {
           isApprovedERC20Token$={isApprovedERC20Token$}
           availableAssets={[]}
           protocolLimitReached={protocolLimitReached}
+          poolDetails={[]}
           poolsData={{}}
           symPendingAssets={RD.initial}
           openRecoveryTool={openRecoveryTool}
@@ -224,7 +199,7 @@ export const SymDepositView: React.FC<Props> = (props) => {
       balancesState,
       symDepositFees$,
       approveFee$,
-      selectedPricePoolAsset,
+      pricePool,
       reloadBalances,
       reloadShares,
       reloadSelectedPoolDetail,
@@ -241,12 +216,12 @@ export const SymDepositView: React.FC<Props> = (props) => {
   )
 
   return FP.pipe(
-    sequenceTRD(assetPriceRD, poolAssetsRD, poolDetailRD, poolsDataRD),
+    sequenceTRD(poolAssetsRD, poolDetailRD, poolsState),
     RD.fold(
       renderDisabledAddDeposit,
       (_) => renderDisabledAddDeposit(),
       (error) => renderDisabledAddDeposit(error),
-      ([assetPrice, poolAssets, poolDetail, poolsData]) => {
+      ([poolAssets, poolDetail, { poolsData, poolDetails }]) => {
         // Since RUNE is not part of pool assets, add it to the list of available assets
         const availableAssets = [AssetRuneNative, ...poolAssets]
 
@@ -263,15 +238,13 @@ export const SymDepositView: React.FC<Props> = (props) => {
               poolData={toPoolData(poolDetail)}
               onChangeAsset={onChangeAsset}
               asset={assetWD}
-              assetPrice={assetPrice}
-              runePrice={runPrice}
               walletBalances={balancesState}
               poolAddress={oPoolAddress}
               fees$={symDepositFees$}
               reloadFees={reloadSymDepositFees}
               approveFee$={approveFee$}
               reloadApproveFee={reloadApproveFee}
-              priceAsset={selectedPricePoolAsset}
+              pricePool={pricePool}
               reloadBalances={reloadBalances}
               reloadShares={reloadShares}
               reloadSelectedPoolDetail={reloadSelectedPoolDetail}
@@ -281,6 +254,7 @@ export const SymDepositView: React.FC<Props> = (props) => {
               approveERC20Token$={approveERC20Token$}
               isApprovedERC20Token$={isApprovedERC20Token$}
               protocolLimitReached={protocolLimitReached}
+              poolDetails={poolDetails}
               poolsData={poolsData}
               symPendingAssets={symPendingAssets}
               openRecoveryTool={openRecoveryTool}

@@ -1,8 +1,16 @@
-# 1.19.0 (2022-12-xx)
+# 1.19.0 (2023-01-xx)
 
 ## Add
 
 - [Savers] UI [#2485](https://github.com/thorchain/asgardex-electron/pull/2485)
+
+# 1.18.6 (2022-12-xx)
+
+## Update
+
+- [SymDeposit] Redesign [#2503](https://github.com/thorchain/asgardex-electron/issues/2503), [#2502](https://github.com/thorchain/asgardex-electron/pull/2502)
+- [AssetInput] Add Ledger + extraContent [#2505](https://github.com/thorchain/asgardex-electron/pull/2505)
+- Refactor styles for 'warning` components (TW only) [#2504](https://github.com/thorchain/asgardex-electron/pull/2504)
 
 ## Fix
 

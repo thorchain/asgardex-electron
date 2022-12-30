@@ -13,8 +13,15 @@ const deposit: DepositMessages = {
   'deposit.share.total': 'Общее значение',
   'deposit.redemption.title': 'Текущая стоимость покупки',
   'deposit.totalEarnings': 'Ваш общий доход от пула',
-  'deposit.add.asym': 'Добавить {asset}',
   'deposit.add.sym': 'Добавить',
+  'deposit.add.asym': 'Добавить {asset}',
+  'deposit.add.runeSide': 'RUNE side - RU',
+  'deposit.add.assetSide': 'Asset side - RU',
+  'deposit.add.min.info': 'Minimum value to deposit to cover all fees for inbound and outbound transactions. - RU',
+  'deposit.add.max.infoWithFee':
+    'Maximum amount to deposit is based on balance ({balance}) minus estimated fees ({fee}) in relation to other asset side. - RU',
+  'deposit.add.max.info':
+    'Maximum amount to deposit is based on balance ({balance}) in relation to other asset side. - RU',
   'deposit.add.state.sending': 'Отправка транзакции для вклада',
   'deposit.add.state.checkResults': 'Проверка статуса вклада',
   'deposit.add.state.pending': 'Добавление вклада',

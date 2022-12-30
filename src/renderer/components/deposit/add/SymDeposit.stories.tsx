@@ -2,7 +2,6 @@ import * as RD from '@devexperts/remote-data-ts'
 import { Story, Meta } from '@storybook/react'
 import { TxHash } from '@xchainjs/xchain-client'
 import {
-  bn,
   assetAmount,
   assetToBase,
   AssetBNB,
@@ -21,6 +20,7 @@ import { mockValidatePassword$ } from '../../../../shared/mock/wallet'
 import { WalletType } from '../../../../shared/wallet/types'
 import { ZERO_BASE_AMOUNT } from '../../../const'
 import { BNB_DECIMAL } from '../../../helpers/assetHelper'
+import { RUNE_PRICE_POOL } from '../../../helpers/poolHelper'
 import { mockWalletBalance } from '../../../helpers/test/testWalletHelper'
 import { INITIAL_SYM_DEPOSIT_STATE } from '../../../services/chain/const'
 import { SymDepositState } from '../../../services/chain/types'
@@ -56,8 +56,8 @@ const defaultProps: SymDepositProps = {
   walletBalances: { balances: O.some([balanceRune, balanceBNB, balanceBTC, balanceTOMO]), loading: false },
   mimirHalt: DEFAULT_MIMIR_HALT,
   asset: { asset: AssetBNB, decimal: BNB_DECIMAL },
-  assetPrice: bn(2),
-  runePrice: bn(1),
+  poolDetails: [],
+  pricePool: RUNE_PRICE_POOL,
   onChangeAsset: (a: Asset) => console.log('change asset', a),
   reloadFees: () => console.log('reload fees'),
   fees$: () =>
@@ -82,7 +82,6 @@ const defaultProps: SymDepositProps = {
     assetBalance: baseAmount('1000'),
     runeBalance: baseAmount('2000')
   },
-  priceAsset: AssetRuneNative,
   poolAddress: O.none,
   reloadBalances: () => console.log('reloadBalances'),
   reloadShares: (delay = 0) => console.log('reloadShares ', delay),

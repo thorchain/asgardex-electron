@@ -1,6 +1,8 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
+import { ArrowPathIcon } from '@heroicons/react/20/solid'
+import { MagnifyingGlassMinusIcon, MagnifyingGlassPlusIcon } from '@heroicons/react/24/outline'
 import { getDepositMemo, PoolData } from '@thorchain/asgardex-util'
 import {
   Address,
@@ -12,9 +14,9 @@ import {
   Chain,
   chainToString,
   formatAssetAmountCurrency,
+  isAssetRuneNative,
   THORChain
 } from '@xchainjs/xchain-util'
-import { Col } from 'antd'
 import BigNumber from 'bignumber.js'
 import * as A from 'fp-ts/lib/Array'
 import * as FP from 'fp-ts/lib/function'
@@ -27,25 +29,29 @@ import * as RxOp from 'rxjs/operators'
 import { Network } from '../../../../shared/api/types'
 import { isLedgerWallet } from '../../../../shared/utils/guard'
 import { WalletType } from '../../../../shared/wallet/types'
-import { SUPPORTED_LEDGER_APPS, ZERO_BASE_AMOUNT } from '../../../const'
+import { ZERO_ASSET_AMOUNT, ZERO_BASE_AMOUNT } from '../../../const'
 import {
   convertBaseAmountDecimal,
   getEthTokenAddress,
+  isChainAsset,
   isEthAsset,
   isEthTokenAsset,
+  isRuneNativeAsset,
+  isUSDAsset,
   max1e8BaseAmount,
-  THORCHAIN_DECIMAL
+  THORCHAIN_DECIMAL,
+  to1e8BaseAmount
 } from '../../../helpers/assetHelper'
 import { getChainAsset, isEthChain } from '../../../helpers/chainHelper'
 import { unionAssets } from '../../../helpers/fp/array'
-import { eqBaseAmount, eqOAsset, eqOApproveParams } from '../../../helpers/fp/eq'
+import { eqBaseAmount, eqOAsset, eqOApproveParams, eqAsset } from '../../../helpers/fp/eq'
 import { sequenceSOption, sequenceTOption } from '../../../helpers/fpHelpers'
 import * as PoolHelpers from '../../../helpers/poolHelper'
 import { liveData, LiveData } from '../../../helpers/rx/liveData'
+import { emptyString, loadingString, noDataString } from '../../../helpers/stringHelper'
 import * as WalletHelper from '../../../helpers/walletHelper'
 import { useSubscriptionState } from '../../../hooks/useSubscriptionState'
 import { INITIAL_SYM_DEPOSIT_STATE } from '../../../services/chain/const'
-import { getZeroSymDepositFees } from '../../../services/chain/fees'
 import {
   SymDepositState,
   SymDepositParams,
@@ -64,7 +70,7 @@ import {
   IsApproveParams,
   LoadApproveFeeHandler
 } from '../../../services/ethereum/types'
-import { PoolAddress, PoolsDataMap } from '../../../services/midgard/types'
+import { PoolAddress, PoolDetails, PoolsDataMap } from '../../../services/midgard/types'
 import {
   LiquidityProviderAssetMismatch,
   LiquidityProviderAssetMismatchRD,
@@ -83,28 +89,34 @@ import {
   WalletBalance,
   WalletBalances
 } from '../../../services/wallet/types'
-import { AssetWithDecimal } from '../../../types/asgardex'
+import { AssetWithAmount, AssetWithDecimal } from '../../../types/asgardex'
+import { PricePool } from '../../../views/pools/Pools.types'
 import { LedgerConfirmationModal } from '../../modal/confirmation'
 import { WalletPasswordConfirmationModal } from '../../modal/confirmation'
 import { TxModal } from '../../modal/tx'
 import { DepositAssets } from '../../modal/tx/extra'
-import { FlatButton, ViewTxButton } from '../../uielements/button'
+import { LoadingView } from '../../shared/loading'
+import { Alert } from '../../uielements/alert'
+import { AssetInput } from '../../uielements/assets/assetInput'
+import { BaseButton, FlatButton, ViewTxButton } from '../../uielements/button'
+import { MaxBalanceButton } from '../../uielements/button/MaxBalanceButton'
+import { Tooltip, TooltipAddress } from '../../uielements/common/Common.styles'
 import { Fees, UIFeesRD } from '../../uielements/fees'
-import { Color as InfoIconColor } from '../../uielements/info/InfoIcon'
+import { InfoIcon } from '../../uielements/info/InfoIcon'
+import { CopyLabel } from '../../uielements/label'
+import { Slider } from '../../uielements/slider'
 import { AssetMissmatchWarning } from './AssetMissmatchWarning'
 import { AsymAssetsWarning } from './AsymAssetsWarning'
 import * as Helper from './Deposit.helper'
-import * as Styled from './Deposit.styles'
 import { PendingAssetsWarning } from './PendingAssetsWarning'
 
 export type Props = {
   asset: AssetWithDecimal
-  assetPrice: BigNumber
   availableAssets: Asset[]
   walletBalances: Pick<BalancesState, 'balances' | 'loading'>
-  runePrice: BigNumber
   poolAddress: O.Option<PoolAddress>
-  priceAsset?: Asset
+  pricePool: PricePool
+  poolDetails: PoolDetails
   reloadFees: ReloadSymDepositFeesHandler
   fees$: SymDepositFeesHandler
   reloadApproveFee: LoadApproveFeeHandler
@@ -139,22 +151,19 @@ export type Props = {
 
 type SelectedInput = 'asset' | 'rune' | 'none'
 
-type WalletTypeTooltip = { text: string; color: InfoIconColor }
-
 export const SymDeposit: React.FC<Props> = (props) => {
   const {
     asset: { asset, decimal: assetDecimal },
-    assetPrice,
     availableAssets,
     walletBalances,
-    runePrice,
     poolAddress: oPoolAddress,
     openAssetExplorerTxUrl,
     openRuneExplorerTxUrl,
     getRuneExplorerTxUrl,
     getAssetExplorerTxUrl,
     validatePassword$,
-    priceAsset,
+    pricePool,
+    poolDetails,
     reloadFees,
     reloadBalances,
     reloadShares,
@@ -218,6 +227,25 @@ export const SymDeposit: React.FC<Props> = (props) => {
     })
   }, [useRuneLedger, poolBasedBalances])
 
+  const runeBalanceLabel = useMemo(
+    () =>
+      walletBalancesLoading
+        ? loadingString
+        : FP.pipe(
+            oRuneWB,
+            O.map(({ amount, asset }) =>
+              formatAssetAmountCurrency({
+                amount: baseToAsset(amount),
+                asset,
+                decimal: 8,
+                trimZeros: true
+              })
+            ),
+            O.getOrElse(() => noDataString)
+          ),
+    [oRuneWB, walletBalancesLoading]
+  )
+
   const oAssetWB: O.Option<WalletBalance> = useMemo(() => {
     const walletType = useAssetLedger ? 'ledger' : 'keystore'
     const oWalletBalances = NEA.fromArray(poolBasedBalances)
@@ -228,6 +256,25 @@ export const SymDeposit: React.FC<Props> = (props) => {
     })
   }, [asset, useAssetLedger, poolBasedBalances])
 
+  const assetBalanceLabel = useMemo(
+    () =>
+      walletBalancesLoading
+        ? loadingString
+        : FP.pipe(
+            oAssetWB,
+            O.map(({ amount, asset }) =>
+              formatAssetAmountCurrency({
+                amount: baseToAsset(amount),
+                asset,
+                decimal: 8,
+                trimZeros: true
+              })
+            ),
+            O.getOrElse(() => noDataString)
+          ),
+    [oAssetWB, walletBalancesLoading]
+  )
+
   const hasAssetLedger = useMemo(
     () => WalletHelper.hasLedgerInBalancesByAsset(asset, poolBasedBalances),
     [asset, poolBasedBalances]
@@ -237,70 +284,6 @@ export const SymDeposit: React.FC<Props> = (props) => {
     () => WalletHelper.hasLedgerInBalancesByAsset(AssetRuneNative, poolBasedBalances),
     [poolBasedBalances]
   )
-
-  const assetWalletTypeTooltip: WalletTypeTooltip = useMemo(() => {
-    // Different tooltips for different situations (order matters):
-    // 1. Check Ledger support for chain
-    // 2. Check if RUNE side is already using Ledger
-    // 3. Check if Ledger is not connected or has no balances
-    if (!SUPPORTED_LEDGER_APPS.includes(asset.chain))
-      return {
-        text: intl.formatMessage(
-          { id: 'ledger.notsupported' },
-          {
-            chain: chainToString(asset.chain)
-          }
-        ),
-        color: 'primary'
-      }
-
-    if (useRuneLedger) return { text: intl.formatMessage({ id: 'ledger.deposit.oneside' }), color: 'primary' }
-
-    if (!hasAssetLedger)
-      return {
-        text: intl.formatMessage(
-          { id: 'ledger.notaddedorzerobalances' },
-          {
-            chain: chainToString(THORChain)
-          }
-        ),
-        color: 'primary'
-      }
-
-    return { text: '', color: 'primary' }
-  }, [asset.chain, hasAssetLedger, intl, useRuneLedger])
-
-  const runeWalletTypeTooltip: WalletTypeTooltip = useMemo(() => {
-    // Different tooltips for different situations (order matters):
-    // 1. Check Ledger support for chain
-    // 2. Check if asset side is already using Ledger
-    // 3. Check if Ledger is not connected or has no balances
-    if (!SUPPORTED_LEDGER_APPS.includes(THORChain))
-      return {
-        text: intl.formatMessage(
-          { id: 'ledger.notsupported' },
-          {
-            chain: chainToString(THORChain)
-          }
-        ),
-        color: 'primary'
-      }
-
-    if (useAssetLedger) return { text: intl.formatMessage({ id: 'ledger.deposit.oneside' }), color: 'primary' }
-
-    if (!hasRuneLedger)
-      return {
-        text: intl.formatMessage(
-          { id: 'ledger.notaddedorzerobalances' },
-          {
-            chain: chainToString(THORChain)
-          }
-        ),
-        color: 'primary'
-      }
-
-    return { text: '', color: 'primary' }
-  }, [hasRuneLedger, intl, useAssetLedger])
 
   /** Asset balance based on original decimal */
   const assetBalance: BaseAmount = useMemo(
@@ -328,6 +311,21 @@ export const SymDeposit: React.FC<Props> = (props) => {
   const initialAssetAmountToDepositMax1e8 = useMemo(
     () => baseAmount(0, assetBalanceMax1e8.decimal),
     [assetBalanceMax1e8.decimal]
+  )
+
+  const priceRuneAmountToDepositMax1e8: AssetWithAmount = useMemo(
+    () =>
+      FP.pipe(
+        PoolHelpers.getPoolPriceValue({
+          balance: { asset: AssetRuneNative, amount: runeAmountToDeposit },
+          poolDetails,
+          pricePool,
+          network
+        }),
+        O.getOrElse(() => ZERO_BASE_AMOUNT),
+        (amount) => ({ asset: pricePool.asset, amount })
+      ),
+    [network, poolDetails, pricePool, runeAmountToDeposit]
   )
 
   const [
@@ -418,7 +416,7 @@ export const SymDeposit: React.FC<Props> = (props) => {
     )
   }, [oPoolAddress, asset, needApprovement, oAssetWB, network])
 
-  const zeroDepositFees: SymDepositFees = useMemo(() => getZeroSymDepositFees(asset), [asset])
+  const zeroDepositFees: SymDepositFees = useMemo(() => Helper.getZeroSymDepositFees(asset), [asset])
 
   const prevDepositFees = useRef<O.Option<SymDepositFees>>(O.none)
 
@@ -446,16 +444,303 @@ export const SymDeposit: React.FC<Props> = (props) => {
     [depositFeesRD, zeroDepositFees]
   )
 
-  const thorchainFee: BaseAmount = useMemo(
+  const runeFeeLabel: string = useMemo(
     () =>
       FP.pipe(
-        Helper.getThorchainFees(depositFeesRD),
-        O.fold(
-          () => zeroDepositFees.rune.inFee,
-          (thorchainFees) => thorchainFees.inFee
+        depositFeesRD,
+        RD.fold(
+          () => loadingString,
+          () => loadingString,
+          () => noDataString,
+          ({ rune: { inFee, outFee } }) =>
+            formatAssetAmountCurrency({
+              amount: baseToAsset(inFee.plus(outFee)),
+              asset: AssetRuneNative,
+              decimal: 6,
+              trimZeros: true
+            })
         )
       ),
-    [depositFeesRD, zeroDepositFees.rune]
+    [depositFeesRD]
+  )
+
+  const assetFeeLabel: string = useMemo(
+    () =>
+      FP.pipe(
+        depositFeesRD,
+        RD.fold(
+          () => loadingString,
+          () => loadingString,
+          () => noDataString,
+          ({ asset: { inFee, outFee, asset: feeAsset } }) =>
+            formatAssetAmountCurrency({
+              amount: baseToAsset(inFee.plus(outFee)),
+              asset: feeAsset,
+              decimal: isUSDAsset(feeAsset) ? 2 : 6,
+              trimZeros: !isUSDAsset(feeAsset)
+            })
+        )
+      ),
+
+    [depositFeesRD]
+  )
+
+  // Price of RUNE IN fee
+  const oPriceRuneInFee: O.Option<AssetWithAmount> = useMemo(() => {
+    const amount = depositFees.rune.inFee
+
+    return FP.pipe(
+      PoolHelpers.getPoolPriceValue({
+        balance: { asset: AssetRuneNative, amount },
+        poolDetails,
+        pricePool,
+        network
+      }),
+      O.map((amount) => ({ amount, asset: pricePool.asset }))
+    )
+  }, [network, poolDetails, pricePool, depositFees])
+
+  const priceRuneInFeeLabel = useMemo(
+    () =>
+      FP.pipe(
+        depositFeesRD,
+        RD.fold(
+          () => loadingString,
+          () => loadingString,
+          () => noDataString,
+          ({ rune: { inFee } }) => {
+            const fee = formatAssetAmountCurrency({
+              amount: baseToAsset(inFee),
+              asset: AssetRuneNative,
+              decimal: 6,
+              trimZeros: true
+            })
+            const price = FP.pipe(
+              oPriceRuneInFee,
+              O.map(({ amount, asset: priceAsset }) =>
+                isAssetRuneNative(priceAsset)
+                  ? emptyString
+                  : formatAssetAmountCurrency({
+                      amount: baseToAsset(amount),
+                      asset: priceAsset,
+                      decimal: isUSDAsset(priceAsset) ? 2 : 6,
+                      trimZeros: !isUSDAsset(priceAsset)
+                    })
+              ),
+              O.getOrElse(() => emptyString)
+            )
+
+            return price ? `${price} (${fee})` : fee
+          }
+        )
+      ),
+
+    [depositFeesRD, oPriceRuneInFee]
+  )
+
+  // Price of RUNE OUT fee
+  const oPriceRuneOutFee: O.Option<AssetWithAmount> = useMemo(() => {
+    const amount = depositFees.rune.outFee
+
+    return FP.pipe(
+      PoolHelpers.getPoolPriceValue({
+        balance: { asset: AssetRuneNative, amount },
+        poolDetails,
+        pricePool,
+        network
+      }),
+      O.map((amount) => ({ asset: pricePool.asset, amount }))
+    )
+  }, [network, poolDetails, pricePool, depositFees])
+
+  const priceRuneOutFeeLabel = useMemo(
+    () =>
+      FP.pipe(
+        depositFeesRD,
+        RD.fold(
+          () => loadingString,
+          () => loadingString,
+          () => noDataString,
+          ({ rune: { outFee } }) => {
+            const fee = formatAssetAmountCurrency({
+              amount: baseToAsset(outFee),
+              asset: AssetRuneNative,
+              decimal: 6,
+              trimZeros: true
+            })
+            const price = FP.pipe(
+              oPriceRuneOutFee,
+              O.map(({ amount, asset: priceAsset }) =>
+                isRuneNativeAsset(priceAsset)
+                  ? emptyString
+                  : formatAssetAmountCurrency({
+                      amount: baseToAsset(amount),
+                      asset: priceAsset,
+                      decimal: isUSDAsset(priceAsset) ? 2 : 6,
+                      trimZeros: !isUSDAsset(priceAsset)
+                    })
+              ),
+              O.getOrElse(() => emptyString)
+            )
+
+            return price ? `${price} (${fee})` : fee
+          }
+        )
+      ),
+
+    [depositFeesRD, oPriceRuneOutFee]
+  )
+
+  // Price of asset IN fee
+  const oPriceAssetInFee: O.Option<AssetWithAmount> = useMemo(() => {
+    const asset = depositFees.asset.asset
+    const amount = depositFees.asset.inFee
+
+    return FP.pipe(
+      PoolHelpers.getPoolPriceValue({
+        balance: { asset, amount },
+        poolDetails,
+        pricePool,
+        network
+      }),
+      O.map((amount) => ({ amount, asset: pricePool.asset }))
+    )
+  }, [network, poolDetails, pricePool, depositFees])
+
+  const priceAssetInFeeLabel = useMemo(
+    () =>
+      FP.pipe(
+        depositFeesRD,
+        RD.fold(
+          () => loadingString,
+          () => loadingString,
+          () => noDataString,
+          ({ asset: { inFee, asset: feeAsset } }) => {
+            const fee = formatAssetAmountCurrency({
+              amount: baseToAsset(inFee),
+              asset: feeAsset,
+              decimal: isUSDAsset(feeAsset) ? 2 : 6,
+              trimZeros: !isUSDAsset(feeAsset)
+            })
+            const price = FP.pipe(
+              oPriceAssetInFee,
+              O.map(({ amount, asset: priceAsset }) =>
+                eqAsset.equals(feeAsset, priceAsset)
+                  ? emptyString
+                  : formatAssetAmountCurrency({
+                      amount: baseToAsset(amount),
+                      asset: priceAsset,
+                      decimal: isUSDAsset(priceAsset) ? 2 : 6,
+                      trimZeros: !isUSDAsset(priceAsset)
+                    })
+              ),
+              O.getOrElse(() => emptyString)
+            )
+
+            return price ? `${price} (${fee})` : fee
+          }
+        )
+      ),
+
+    [depositFeesRD, oPriceAssetInFee]
+  )
+
+  // Price of asset OUT fee
+  const oPriceAssetOutFee: O.Option<AssetWithAmount> = useMemo(() => {
+    const asset = depositFees.asset.asset
+    const amount = depositFees.asset.outFee
+
+    return FP.pipe(
+      PoolHelpers.getPoolPriceValue({
+        balance: { asset, amount },
+        poolDetails,
+        pricePool,
+        network
+      }),
+      O.map((amount) => ({ asset: pricePool.asset, amount }))
+    )
+  }, [network, poolDetails, pricePool, depositFees])
+
+  const priceAssetOutFeeLabel = useMemo(
+    () =>
+      FP.pipe(
+        depositFeesRD,
+        RD.fold(
+          () => loadingString,
+          () => loadingString,
+          () => noDataString,
+          ({ asset: { outFee, asset: feeAsset } }) => {
+            const fee = formatAssetAmountCurrency({
+              amount: baseToAsset(outFee),
+              asset: feeAsset,
+              decimal: isUSDAsset(feeAsset) ? 2 : 6,
+              trimZeros: !isUSDAsset(feeAsset)
+            })
+            const price = FP.pipe(
+              oPriceAssetOutFee,
+              O.map(({ amount, asset: priceAsset }) =>
+                eqAsset.equals(feeAsset, priceAsset)
+                  ? emptyString
+                  : formatAssetAmountCurrency({
+                      amount: baseToAsset(amount),
+                      asset: priceAsset,
+                      decimal: isUSDAsset(priceAsset) ? 2 : 6,
+                      trimZeros: !isUSDAsset(priceAsset)
+                    })
+              ),
+              O.getOrElse(() => emptyString)
+            )
+
+            return price ? `${price} (${fee})` : fee
+          }
+        )
+      ),
+
+    [depositFeesRD, oPriceAssetOutFee]
+  )
+
+  /**
+   * Sum price of deposit fees (IN + OUT)
+   */
+  const oPriceDepositFees1e8: O.Option<AssetWithAmount> = useMemo(
+    () =>
+      FP.pipe(
+        sequenceSOption({
+          priceRuneInFee: oPriceRuneInFee,
+          priceRuneOutFee: oPriceRuneOutFee,
+          priceAssetInFee: oPriceAssetInFee,
+          priceAssetOutFee: oPriceAssetOutFee
+        }),
+        O.map(({ priceRuneInFee, priceRuneOutFee, priceAssetInFee, priceAssetOutFee }) => {
+          const sumRune = priceRuneInFee.amount.plus(priceRuneOutFee.amount)
+          const assetIn1e8 = to1e8BaseAmount(priceAssetInFee.amount)
+          const assetOut1e8 = to1e8BaseAmount(priceAssetOutFee.amount)
+          const sumAsset1e8 = assetIn1e8.plus(assetOut1e8)
+          return { asset: priceAssetInFee.asset, amount: sumRune.plus(sumAsset1e8) }
+        })
+      ),
+    [oPriceAssetInFee, oPriceAssetOutFee, oPriceRuneInFee, oPriceRuneOutFee]
+  )
+
+  const priceDepositFeesLabel = useMemo(
+    () =>
+      FP.pipe(
+        depositFeesRD,
+        RD.fold(
+          () => loadingString,
+          () => loadingString,
+          () => noDataString,
+          (_) =>
+            FP.pipe(
+              oPriceDepositFees1e8,
+              O.map(({ amount, asset }) =>
+                formatAssetAmountCurrency({ amount: baseToAsset(amount), asset, decimal: isUSDAsset(asset) ? 2 : 6 })
+              ),
+              O.getOrElse(() => noDataString)
+            )
+        )
+      ),
+    [depositFeesRD, oPriceDepositFees1e8]
   )
 
   const oDepositParams: O.Option<SymDepositParams> = useMemo(
@@ -592,14 +877,20 @@ export const SymDeposit: React.FC<Props> = (props) => {
   }, [isZeroAmountToDeposit, minRuneAmountToDeposit, runeAmountToDeposit])
 
   const maxRuneAmountToDeposit = useMemo(
-    (): BaseAmount => Helper.maxRuneAmountToDeposit({ poolData, runeBalance, assetBalance, thorchainFee }),
+    (): BaseAmount =>
+      Helper.maxRuneAmountToDeposit({
+        poolData,
+        runeBalance,
+        assetBalance: { asset, amount: assetBalance },
+        fees: depositFees
+      }),
 
-    [assetBalance, poolData, runeBalance, thorchainFee]
+    [asset, assetBalance, depositFees, poolData, runeBalance]
   )
 
   // Update `runeAmountToDeposit` if `maxRuneAmountToDeposit` has been updated
   useEffect(() => {
-    if (maxRuneAmountToDeposit.amount().isLessThan(runeAmountToDeposit.amount())) {
+    if (maxRuneAmountToDeposit.lt(runeAmountToDeposit)) {
       setRuneAmountToDeposit(maxRuneAmountToDeposit)
     }
   }, [maxRuneAmountToDeposit, runeAmountToDeposit])
@@ -609,9 +900,14 @@ export const SymDeposit: React.FC<Props> = (props) => {
    * Note: It's max. 1e8 decimal based
    */
   const maxAssetAmountToDepositMax1e8 = useMemo((): BaseAmount => {
-    const maxAmount = Helper.maxAssetAmountToDeposit({ poolData, runeBalance, assetBalance })
+    const maxAmount = Helper.maxAssetAmountToDeposit({
+      poolData,
+      runeBalance,
+      assetBalance: { asset, amount: assetBalance },
+      fees: depositFees
+    })
     return max1e8BaseAmount(maxAmount)
-  }, [assetBalance, poolData, runeBalance])
+  }, [asset, assetBalance, depositFees, poolData, runeBalance])
 
   const setAssetAmountToDepositMax1e8 = useCallback(
     (amountToDeposit: BaseAmount) => {
@@ -620,7 +916,7 @@ export const SymDeposit: React.FC<Props> = (props) => {
       // dirty check - do nothing if prev. and next amounts are equal
       if (eqBaseAmount.equals(newAmount, assetAmountToDepositMax1e8)) return {}
 
-      const newAmountToDepositMax1e8 = newAmount.amount().isGreaterThan(maxAssetAmountToDepositMax1e8.amount())
+      const newAmountToDepositMax1e8 = newAmount.gt(maxAssetAmountToDepositMax1e8)
         ? maxAssetAmountToDepositMax1e8
         : newAmount
 
@@ -631,13 +927,28 @@ export const SymDeposit: React.FC<Props> = (props) => {
 
   // Update `assetAmountToDeposit` if `maxAssetAmountToDeposit` has been updated
   useEffect(() => {
-    if (maxAssetAmountToDepositMax1e8.amount().isLessThan(assetAmountToDepositMax1e8.amount())) {
+    if (maxAssetAmountToDepositMax1e8.lt(assetAmountToDepositMax1e8)) {
       setAssetAmountToDepositMax1e8(maxAssetAmountToDepositMax1e8)
     }
   }, [assetAmountToDepositMax1e8, maxAssetAmountToDepositMax1e8, setAssetAmountToDepositMax1e8])
 
-  const hasAssetBalance = useMemo(() => assetBalance.amount().isGreaterThan(0), [assetBalance])
-  const hasRuneBalance = useMemo(() => runeBalance.amount().isGreaterThan(0), [runeBalance])
+  const priceAssetAmountToDepositMax1e8: AssetWithAmount = useMemo(
+    () =>
+      FP.pipe(
+        PoolHelpers.getPoolPriceValue({
+          balance: { asset, amount: assetAmountToDepositMax1e8 },
+          poolDetails,
+          pricePool,
+          network
+        }),
+        O.getOrElse(() => baseAmount(0, assetAmountToDepositMax1e8.decimal)),
+        (amount) => ({ asset: pricePool.asset, amount })
+      ),
+    [asset, assetAmountToDepositMax1e8, network, poolDetails, pricePool]
+  )
+
+  const hasAssetBalance = useMemo(() => assetBalance.gt(baseAmount(0, assetBalance.decimal)), [assetBalance])
+  const hasRuneBalance = useMemo(() => runeBalance.gt(ZERO_BASE_AMOUNT), [runeBalance])
 
   const isBalanceError = useMemo(() => !hasAssetBalance && !hasRuneBalance, [hasAssetBalance, hasRuneBalance])
 
@@ -685,7 +996,7 @@ export const SymDeposit: React.FC<Props> = (props) => {
 
     const title = intl.formatMessage({ id: 'deposit.add.error.nobalances' })
 
-    return <Styled.Alert type="warning" message={title} description={msg} />
+    return <Alert className="m-0 w-full xl:mr-20px" type="warning" message={title} description={msg} />
   }, [asset.ticker, hasAssetBalance, hasRuneBalance, intl])
 
   const runeAmountChangeHandler = useCallback(
@@ -693,7 +1004,7 @@ export const SymDeposit: React.FC<Props> = (props) => {
       // Do nothing if we don't entered input for rune
       if (selectedInput !== 'rune') return
 
-      let runeAmount = runeInput.amount().isGreaterThan(maxRuneAmountToDeposit.amount())
+      let runeAmount = runeInput.gt(maxRuneAmountToDeposit)
         ? { ...maxRuneAmountToDeposit } // Use copy to avoid missmatch with values in input fields
         : runeInput
       // assetAmount max. 1e8 decimal
@@ -703,7 +1014,7 @@ export const SymDeposit: React.FC<Props> = (props) => {
         assetDecimal
       })
 
-      if (assetAmountMax1e8.amount().isGreaterThan(maxAssetAmountToDepositMax1e8.amount())) {
+      if (assetAmountMax1e8.gt(maxAssetAmountToDepositMax1e8)) {
         runeAmount = Helper.getRuneAmountToDeposit(maxAssetAmountToDepositMax1e8, poolData)
         setRuneAmountToDeposit(runeAmount)
         setAssetAmountToDepositMax1e8(maxAssetAmountToDepositMax1e8)
@@ -712,8 +1023,8 @@ export const SymDeposit: React.FC<Props> = (props) => {
         setRuneAmountToDeposit(runeAmount)
         setAssetAmountToDepositMax1e8(assetAmountMax1e8)
         // formula: runeQuantity * 100 / maxRuneAmountToDeposit
-        const percentToDeposit = maxRuneAmountToDeposit.amount().isGreaterThan(0)
-          ? runeAmount.amount().multipliedBy(100).dividedBy(maxRuneAmountToDeposit.amount()).toNumber()
+        const percentToDeposit = maxRuneAmountToDeposit.gt(ZERO_BASE_AMOUNT)
+          ? runeAmount.times(100).div(maxRuneAmountToDeposit).amount().toNumber()
           : 0
         setPercentValueToDeposit(percentToDeposit)
       }
@@ -736,12 +1047,12 @@ export const SymDeposit: React.FC<Props> = (props) => {
       // Do nothing if we don't entered input for asset
       if (selectedInput !== 'asset') return
 
-      let assetAmountMax1e8 = newAmountMax1e8.amount().isGreaterThan(maxAssetAmountToDepositMax1e8.amount())
+      let assetAmountMax1e8 = newAmountMax1e8.gt(maxAssetAmountToDepositMax1e8)
         ? { ...maxAssetAmountToDepositMax1e8 } // Use copy to avoid missmatch with values in input fields
         : { ...newAmountMax1e8 }
       const runeAmount = Helper.getRuneAmountToDeposit(assetAmountMax1e8, poolData)
 
-      if (runeAmount.amount().isGreaterThan(maxRuneAmountToDeposit.amount())) {
+      if (runeAmount.gt(maxRuneAmountToDeposit)) {
         assetAmountMax1e8 = Helper.getAssetAmountToDeposit({
           runeAmount,
           poolData,
@@ -754,8 +1065,8 @@ export const SymDeposit: React.FC<Props> = (props) => {
         setRuneAmountToDeposit(runeAmount)
         setAssetAmountToDepositMax1e8(assetAmountMax1e8)
         // assetQuantity * 100 / maxAssetAmountToDeposit
-        const percentToDeposit = maxAssetAmountToDepositMax1e8.amount().isGreaterThan(0)
-          ? assetAmountMax1e8.amount().multipliedBy(100).dividedBy(maxAssetAmountToDepositMax1e8.amount()).toNumber()
+        const percentToDeposit = maxAssetAmountToDepositMax1e8.gt(baseAmount(0, maxAssetAmountToDepositMax1e8.decimal))
+          ? assetAmountMax1e8.times(100).div(maxAssetAmountToDepositMax1e8).amount().toNumber()
           : 0
         setPercentValueToDeposit(percentToDeposit)
       }
@@ -830,7 +1141,9 @@ export const SymDeposit: React.FC<Props> = (props) => {
         }
       )
 
-      return <Styled.ErrorLabel>{msg}</Styled.ErrorLabel>
+      return (
+        <p className="mb-20px p-0 text-center font-main text-[12px] uppercase text-error0 dark:text-error0d">{msg}</p>
+      )
     },
     [intl]
   )
@@ -951,9 +1264,10 @@ export const SymDeposit: React.FC<Props> = (props) => {
     )
 
     const extraResult = (
-      <Styled.ExtraContainer>
+      <div className="flex flex-col items-center justify-between">
         {FP.pipe(symDepositTxs.asset, RD.toOption, (oTxHash) => (
-          <Styled.ViewTxButtonTop
+          <ViewTxButton
+            className="pb-20px"
             txHash={oTxHash}
             onClick={openAssetExplorerTxUrl}
             txUrl={FP.pipe(oTxHash, O.chain(getAssetExplorerTxUrl))}
@@ -968,7 +1282,7 @@ export const SymDeposit: React.FC<Props> = (props) => {
             label={intl.formatMessage({ id: 'common.tx.view' }, { assetTicker: AssetRuneNative.ticker })}
           />
         ))}
-      </Styled.ExtraContainer>
+      </div>
     )
 
     return (
@@ -1015,18 +1329,6 @@ export const SymDeposit: React.FC<Props> = (props) => {
     setSelectedInput('none')
     reloadFeesHandler()
   }, [reloadFeesHandler])
-
-  const uiFeesRD: UIFeesRD = useMemo(
-    () =>
-      FP.pipe(
-        depositFeesRD,
-        RD.map(({ asset: assetFee, rune }) => [
-          { asset: getChainAsset(asset.chain), amount: assetFee.inFee.plus(assetFee.outFee) },
-          { asset: AssetRuneNative, amount: rune.inFee.plus(rune.outFee) }
-        ])
-      ),
-    [depositFeesRD, asset]
-  )
 
   const uiApproveFeesRD: UIFeesRD = useMemo(
     () =>
@@ -1111,7 +1413,9 @@ export const SymDeposit: React.FC<Props> = (props) => {
         RD.fold(
           () => <></>,
           () => <></>,
-          (error) => <Styled.ErrorLabel>{error.msg}</Styled.ErrorLabel>,
+          (error) => (
+            <p className="mb-20px p-0 text-center font-main uppercase text-error0 dark:text-error0d">{error.msg}</p>
+          ),
           () => <></>
         )
       ),
@@ -1155,9 +1459,9 @@ export const SymDeposit: React.FC<Props> = (props) => {
         () => <></>,
         () => <></>,
         (error) => (
-          <Styled.ErrorLabel align="center">
+          <p className="mb-20px p-0 text-center font-main text-[12px] uppercase text-error0 dark:text-error0d">
             {intl.formatMessage({ id: 'common.approve.error' }, { asset: asset.ticker, error: error.msg })}
-          </Styled.ErrorLabel>
+          </p>
         ),
         (_) => <></>
       )
@@ -1192,6 +1496,7 @@ export const SymDeposit: React.FC<Props> = (props) => {
     const render = (pendingAssets: PendingAssets, loading: boolean) =>
       pendingAssets.length && (
         <PendingAssetsWarning
+          className="m-0 w-full xl:mr-20px"
           network={network}
           assets={pendingAssets}
           loading={loading}
@@ -1225,6 +1530,7 @@ export const SymDeposit: React.FC<Props> = (props) => {
       )
       return (
         <AsymAssetsWarning
+          className="m-0 w-full xl:mr-20px"
           network={network}
           assets={assets}
           loading={loading}
@@ -1261,6 +1567,7 @@ export const SymDeposit: React.FC<Props> = (props) => {
           () => <></>,
           ({ runeAddress, assetAddress }) => (
             <AssetMissmatchWarning
+              className="m-0 w-full xl:mr-20px"
               assets={[
                 { asset, address: assetAddress },
                 { asset: AssetRuneNative, address: runeAddress }
@@ -1291,8 +1598,9 @@ export const SymDeposit: React.FC<Props> = (props) => {
     setPercentValueToDeposit(0)
   }, [initialAssetAmountToDepositMax1e8, setAssetAmountToDepositMax1e8])
 
-  const onChangeRuneWalletType = useCallback(
-    (walletType: WalletType) => {
+  const useRuneLedgerHandler = useCallback(
+    (useLedger: boolean) => {
+      const walletType: WalletType = useLedger ? 'ledger' : 'keystore'
       setRuneLedger(() => isLedgerWallet(walletType))
       setRuneWalletType(walletType)
       resetEnteredAmounts()
@@ -1301,8 +1609,9 @@ export const SymDeposit: React.FC<Props> = (props) => {
     [resetEnteredAmounts, setRuneWalletType]
   )
 
-  const onChangeAssetWalletType = useCallback(
-    (walletType: WalletType) => {
+  const useAssetLedgerHandler = useCallback(
+    (useLedger: boolean) => {
+      const walletType: WalletType = useLedger ? 'ledger' : 'keystore'
       setUseAssetLedger(() => isLedgerWallet(walletType))
       setAssetWalletType(walletType)
 
@@ -1476,153 +1785,413 @@ export const SymDeposit: React.FC<Props> = (props) => {
     [checkIsApprovedError, isApproveFeeError, walletBalancesLoading]
   )
 
+  const renderMinAmount = useCallback(
+    ({
+      minAmount,
+      minAmountInfo,
+      asset,
+      isError
+    }: {
+      minAmount: BaseAmount
+      minAmountInfo: string
+      asset: Asset
+      isError: boolean
+    }) => (
+      <div className="flex w-full items-center pl-10px pt-5px">
+        <p
+          className={`m-0 pr-5px font-main text-[12px] uppercase ${
+            isError ? 'dark:error-0d text-error0' : 'text-gray2 dark:text-gray2d'
+          }`}>
+          {`${intl.formatMessage({ id: 'common.min' })}: ${formatAssetAmountCurrency({
+            asset,
+            amount: baseToAsset(minAmount),
+            trimZeros: true
+          })}`}
+        </p>
+        <InfoIcon
+          // override color
+          className={`${isError ? '' : 'text-gray2 dark:text-gray2d'}`}
+          color={isError ? 'error' : 'neutral'}
+          tooltip={minAmountInfo}
+        />
+      </div>
+    ),
+    [intl]
+  )
+
+  const [showDetails, setShowDetails] = useState<boolean>(false)
+
   return (
-    <Styled.Container>
-      {hasPendingAssets && (
-        <Styled.AlertRow>
-          <Col xs={24}>{renderPendingAssets}</Col>
-        </Styled.AlertRow>
-      )}
-      {hasAsymDeposits && (
-        <Styled.AlertRow>
-          <Col xs={24}>{renderAsymDepositWarning}</Col>
-        </Styled.AlertRow>
-      )}
-      {hasAssetMismatch && (
-        <Styled.AlertRow>
-          <Col xs={24}>{renderAssetMismatch}</Col>
-        </Styled.AlertRow>
-      )}
-      {showBalanceError && (
-        <Styled.AlertRow>
-          <Col xs={24}>{renderBalanceError}</Col>
-        </Styled.AlertRow>
-      )}
-      <Styled.CardsRow gutter={{ lg: 32 }}>
-        <Col xs={24} xl={12}>
-          <Styled.AssetCard
-            walletType={Helper.getWalletType(asset.chain, useAssetLedger)}
-            walletTypeTooltip={assetWalletTypeTooltip.text}
-            walletTypeTooltipColor={assetWalletTypeTooltip.color}
-            // Disable ledger selection if RUNE Ledger has been selected
-            walletTypeDisabled={!hasAssetLedger || useRuneLedger}
-            onChangeWalletType={onChangeAssetWalletType}
-            assetBalance={assetBalance}
+    <div className="flex min-h-full w-full flex-col items-center justify-between">
+      {hasPendingAssets && <div className="w-full pb-20px xl:px-20px">{renderPendingAssets}</div>}
+      {hasAsymDeposits && <div className="w-full pb-20px xl:px-20px">{renderAsymDepositWarning}</div>}
+      {hasAssetMismatch && <div className="w-full pb-20px xl:px-20px">{renderAssetMismatch}</div>}
+      {showBalanceError && <div className="w-full pb-20px xl:px-20px">{renderBalanceError}</div>}
+
+      <div className="flex max-w-[500px] flex-col">
+        <AssetInput
+          className="w-full"
+          title={intl.formatMessage({ id: 'deposit.add.runeSide' })}
+          amount={{ amount: runeAmountToDeposit, asset: AssetRuneNative }}
+          priceAmount={priceRuneAmountToDepositMax1e8}
+          assets={[]}
+          network={network}
+          onChangeAsset={FP.constVoid}
+          onChange={runeAmountChangeHandler}
+          onBlur={inputOnBlur}
+          onFocus={() => setSelectedInput('rune')}
+          showError={minRuneAmountError}
+          useLedger={useRuneLedger}
+          hasLedger={hasRuneLedger}
+          useLedgerHandler={useRuneLedgerHandler}
+          extraContent={
+            <div className="flex flex-col">
+              <MaxBalanceButton
+                className="ml-10px mt-5px"
+                classNameButton="!text-gray2 dark:!text-gray2d"
+                classNameIcon={
+                  // show warn icon if maxAmountToSwapMax <= 0
+                  maxRuneAmountToDeposit.gt(ZERO_BASE_AMOUNT)
+                    ? `text-gray2 dark:text-gray2d`
+                    : 'text-warning0 dark:text-warning0d'
+                }
+                size="medium"
+                balance={{ amount: maxRuneAmountToDeposit, asset: AssetRuneNative }}
+                onClick={() => {
+                  setRuneAmountToDeposit(maxRuneAmountToDeposit)
+                  setPercentValueToDeposit(100)
+                }}
+                maxInfoText={intl.formatMessage(
+                  { id: 'deposit.add.max.infoWithFee' },
+                  { balance: runeBalanceLabel, fee: runeFeeLabel }
+                )}
+              />
+              {minRuneAmountError &&
+                renderMinAmount({
+                  minAmount: minRuneAmountToDeposit,
+                  minAmountInfo: intl.formatMessage({ id: 'deposit.add.min.info' }),
+                  asset,
+                  isError: minRuneAmountError
+                })}
+            </div>
+          }
+        />
+
+        <div className="w-full px-20px pt-20px pb-40px">
+          <Slider
+            onAfterChange={onAfterSliderChangeHandler}
             disabled={disabledForm}
-            asset={{
-              asset,
-              address: FP.pipe(
-                oAssetWB,
-                O.map(({ walletAddress }) => walletAddress),
-                O.getOrElse(() => '')
-              )
-            }}
-            selectedAmount={assetAmountToDepositMax1e8}
-            maxAmount={maxAssetAmountToDepositMax1e8}
-            onChangeAssetAmount={assetAmountChangeHandler}
-            inputOnFocusHandler={() => setSelectedInput('asset')}
-            inputOnBlurHandler={inputOnBlur}
-            price={assetPrice}
-            assets={poolBasedBalancesAssets}
-            percentValue={percentValueToDeposit}
-            onChangePercent={changePercentHandler}
-            onChangeAsset={onChangeAssetHandler}
-            priceAsset={priceAsset}
-            network={network}
-            onAfterSliderChange={onAfterSliderChangeHandler}
-            minAmountError={minAssetAmountError}
-            minAmountLabel={`${intl.formatMessage({ id: 'common.min' })}: ${formatAssetAmountCurrency({
-              asset,
-              amount: baseToAsset(minAssetAmountToDepositMax1e8),
-              trimZeros: true
-            })}`}
+            value={percentValueToDeposit}
+            onChange={changePercentHandler}
+            tooltipPlacement="top"
+            withLabel={true}
           />
-        </Col>
+        </div>
 
-        <Col xs={24} xl={12}>
-          <>
-            <Styled.AssetCard
-              walletType={Helper.getWalletType(THORChain, useRuneLedger)}
-              walletTypeTooltip={runeWalletTypeTooltip.text}
-              walletTypeTooltipColor={runeWalletTypeTooltip.color}
-              // Disable ledger checkbox if asset ledger is used
-              walletTypeDisabled={!hasRuneLedger || useAssetLedger}
-              onChangeWalletType={onChangeRuneWalletType}
-              assetBalance={runeBalance}
-              disabled={disabledForm}
-              asset={{
-                asset: AssetRuneNative,
-                address: FP.pipe(
-                  oRuneWB,
-                  O.map(({ walletAddress }) => walletAddress),
-                  O.getOrElse(() => '')
-                )
-              }}
-              selectedAmount={runeAmountToDeposit}
-              maxAmount={maxRuneAmountToDeposit}
-              onChangeAssetAmount={runeAmountChangeHandler}
-              inputOnFocusHandler={() => setSelectedInput('rune')}
-              inputOnBlurHandler={inputOnBlur}
-              price={runePrice}
-              priceAsset={priceAsset}
-              network={network}
-              assets={[]}
-              minAmountError={minRuneAmountError}
-              minAmountLabel={`${intl.formatMessage({ id: 'common.min' })}: ${formatAssetAmountCurrency({
-                asset: AssetRuneNative,
-                amount: baseToAsset(minRuneAmountToDeposit),
-                trimZeros: true
-              })}`}
+        <AssetInput
+          className="w-full"
+          title={intl.formatMessage({ id: 'deposit.add.assetSide' })}
+          amount={{ amount: assetAmountToDepositMax1e8, asset }}
+          priceAmount={priceAssetAmountToDepositMax1e8}
+          assets={poolBasedBalancesAssets}
+          network={network}
+          onChangeAsset={onChangeAssetHandler}
+          onChange={assetAmountChangeHandler}
+          onBlur={inputOnBlur}
+          onFocus={() => setSelectedInput('asset')}
+          showError={minAssetAmountError}
+          useLedger={useAssetLedger}
+          hasLedger={hasAssetLedger}
+          useLedgerHandler={useAssetLedgerHandler}
+          extraContent={
+            <div className="flex flex-col">
+              <MaxBalanceButton
+                className="ml-10px mt-5px"
+                classNameButton="!text-gray2 dark:!text-gray2d"
+                classNameIcon={
+                  // show warn icon if maxAmountToSwapMax <= 0
+                  maxAssetAmountToDepositMax1e8.gt(baseAmount(0, maxAssetAmountToDepositMax1e8.decimal))
+                    ? `text-gray2 dark:text-gray2d`
+                    : 'text-warning0 dark:text-warning0d'
+                }
+                size="medium"
+                balance={{ amount: maxAssetAmountToDepositMax1e8, asset }}
+                onClick={() => {
+                  setAssetAmountToDepositMax1e8(maxAssetAmountToDepositMax1e8)
+                  setPercentValueToDeposit(100)
+                }}
+                maxInfoText={
+                  isChainAsset(asset)
+                    ? intl.formatMessage(
+                        { id: 'deposit.add.max.infoWithFee' },
+                        { balance: assetBalanceLabel, fee: assetFeeLabel }
+                      )
+                    : intl.formatMessage({ id: 'deposit.add.max.info' }, { balance: assetBalanceLabel })
+                }
+              />
+              {minAssetAmountError &&
+                renderMinAmount({
+                  minAmount: minAssetAmountToDepositMax1e8,
+                  minAmountInfo: intl.formatMessage({ id: 'deposit.add.min.info' }),
+                  asset,
+                  isError: minAssetAmountError
+                })}
+            </div>
+          }
+        />
+
+        <div className="flex flex-col items-center justify-between py-30px">
+          {renderIsApprovedError}
+          {(walletBalancesLoading || checkIsApproved) && (
+            <LoadingView
+              className="mb-20px"
+              label={
+                // We show only one loading state at time
+                // Order matters: Show states with shortest loading time before others
+                // (approve state takes just a short time to load, but needs to be displayed)
+                checkIsApproved
+                  ? intl.formatMessage({ id: 'common.approve.checking' }, { asset: asset.ticker })
+                  : walletBalancesLoading
+                  ? intl.formatMessage({ id: 'common.balance.loading' })
+                  : undefined
+              }
             />
-          </>
-        </Col>
-      </Styled.CardsRow>
-      <Styled.SubmitContainer>
-        {renderIsApprovedError}
-        {(walletBalancesLoading || checkIsApproved) && (
-          <Styled.LoadingView
-            label={
-              // We show only one loading state at time
-              // Order matters: Show states with shortest loading time before others
-              // (approve state takes just a short time to load, but needs to be displayed)
-              checkIsApproved
-                ? intl.formatMessage({ id: 'common.approve.checking' }, { asset: asset.ticker })
-                : walletBalancesLoading
-                ? intl.formatMessage({ id: 'common.balance.loading' })
-                : undefined
-            }
-          />
-        )}
-        {isApproved ? (
-          <>
-            {renderAssetChainFeeError}
-            {renderThorchainFeeError}
-            <FlatButton className="mb-20px min-w-[200px]" size="large" onClick={onSubmit} disabled={disableSubmit}>
-              {intl.formatMessage({ id: 'common.add' })}
-            </FlatButton>
-            <Fees fees={uiFeesRD} reloadFees={reloadFeesHandler} disabled={disabledForm} />
-          </>
-        ) : (
-          <>
-            {renderApproveFeeError}
-            {renderApproveError}
-            <FlatButton
-              className="mb-20px min-w-[200px]"
-              size="large"
-              color="warning"
-              disabled={disableSubmitApprove}
-              onClick={onApprove}
-              loading={RD.isPending(approveState)}>
-              {intl.formatMessage({ id: 'common.approve' })}
-            </FlatButton>
+          )}
+          {isApproved ? (
+            <>
+              {renderAssetChainFeeError}
+              {renderThorchainFeeError}
+              <FlatButton className="mb-20px min-w-[200px]" size="large" onClick={onSubmit} disabled={disableSubmit}>
+                {intl.formatMessage({ id: 'common.add' })}
+              </FlatButton>
+            </>
+          ) : (
+            <>
+              {renderApproveFeeError}
+              {renderApproveError}
+              <FlatButton
+                className="mb-20px min-w-[200px]"
+                size="large"
+                color="warning"
+                disabled={disableSubmitApprove}
+                onClick={onApprove}
+                loading={RD.isPending(approveState)}>
+                {intl.formatMessage({ id: 'common.approve' })}
+              </FlatButton>
 
-            {!RD.isInitial(uiApproveFeesRD) && <Fees fees={uiApproveFeesRD} reloadFees={reloadApproveFeesHandler} />}
-          </>
-        )}
-      </Styled.SubmitContainer>
-      {renderPasswordConfirmationModal}
-      {renderLedgerConfirmationModal}
-      {renderTxModal}
-    </Styled.Container>
+              {!RD.isInitial(uiApproveFeesRD) && <Fees fees={uiApproveFeesRD} reloadFees={reloadApproveFeesHandler} />}
+            </>
+          )}
+        </div>
+
+        <div className={`w-full px-10px font-main text-[12px] uppercase dark:border-gray1d`}>
+          <BaseButton
+            className="goup flex w-full justify-between !p-0 font-mainSemiBold text-[16px] text-text2 hover:text-turquoise dark:text-text2d dark:hover:text-turquoise"
+            onClick={() => setShowDetails((current) => !current)}>
+            {intl.formatMessage({ id: 'common.details' })}
+            {showDetails ? (
+              <MagnifyingGlassMinusIcon className="ease h-[20px] w-[20px] text-inherit group-hover:scale-125" />
+            ) : (
+              <MagnifyingGlassPlusIcon className="ease h-[20px] w-[20px] text-inherit group-hover:scale-125 " />
+            )}
+          </BaseButton>
+
+          <div className="pt-10px font-main text-[14px] text-gray2 dark:text-gray2d">
+            {/* fees */}
+            <div className="flex w-full items-center justify-between font-mainBold">
+              <BaseButton
+                disabled={RD.isPending(depositFeesRD) || RD.isInitial(depositFeesRD)}
+                className="group !p-0 !font-mainBold !text-gray2 dark:!text-gray2d"
+                onClick={reloadFeesHandler}>
+                {intl.formatMessage({ id: 'common.fees.estimated' })}
+                <ArrowPathIcon className="ease ml-5px h-[15px] w-[15px] group-hover:rotate-180" />
+              </BaseButton>
+              <div>{priceDepositFeesLabel}</div>
+            </div>
+
+            {showDetails && (
+              <>
+                <div className="flex w-full justify-between pl-10px text-[12px]">
+                  <div>{intl.formatMessage({ id: 'common.fee.inbound.rune' })}</div>
+                  <div>{priceRuneInFeeLabel}</div>
+                </div>
+                <div className="flex w-full justify-between pl-10px text-[12px]">
+                  <div>{intl.formatMessage({ id: 'common.fee.outbound.rune' })}</div>
+                  <div>{priceRuneOutFeeLabel}</div>
+                </div>
+                <div className="flex w-full justify-between pl-10px text-[12px]">
+                  <div>{intl.formatMessage({ id: 'common.fee.inbound.asset' })}</div>
+                  <div>{priceAssetInFeeLabel}</div>
+                </div>
+                <div className="flex w-full justify-between pl-10px text-[12px]">
+                  <div>{intl.formatMessage({ id: 'common.fee.outbound.asset' })}</div>
+                  <div>{priceAssetOutFeeLabel}</div>
+                </div>
+                <div className="flex w-full justify-between pl-10px text-[12px]">
+                  <div>{intl.formatMessage({ id: 'common.fee.affiliate' })}</div>
+                  <div>
+                    {formatAssetAmountCurrency({
+                      amount: ZERO_ASSET_AMOUNT,
+                      asset: pricePool.asset,
+                      decimal: 0
+                    })}
+                  </div>
+                </div>
+              </>
+            )}
+
+            {/* addresses */}
+            {showDetails && (
+              <>
+                <div className={`w-full pt-10px font-mainBold text-[14px]`}>
+                  {intl.formatMessage({ id: 'common.addresses' })}
+                </div>
+                {/* rune sender address */}
+                <div className="flex w-full items-center justify-between pl-10px text-[12px]">
+                  <div>{intl.formatMessage({ id: 'common.rune' })}</div>
+                  <div className="truncate pl-20px text-[13px] normal-case leading-normal">
+                    {FP.pipe(
+                      oRuneWB,
+                      O.map(({ walletAddress: address }) => (
+                        <TooltipAddress title={address} key="tooltip-asset-sender-addr">
+                          {address}
+                        </TooltipAddress>
+                      )),
+                      O.getOrElse(() => <>{noDataString}</>)
+                    )}
+                  </div>
+                </div>
+                {/* asset sender address */}
+                <div className="flex w-full items-center justify-between pl-10px text-[12px]">
+                  <div>{intl.formatMessage({ id: 'common.asset' })}</div>
+                  <div className="truncate pl-20px text-[13px] normal-case leading-normal">
+                    {FP.pipe(
+                      oAssetWB,
+                      O.map(({ walletAddress: address }) => (
+                        <TooltipAddress title={address} key="tooltip-asset-sender-addr">
+                          {address}
+                        </TooltipAddress>
+                      )),
+                      O.getOrElse(() => <>{noDataString}</>)
+                    )}
+                  </div>
+                </div>
+                {/* asset inbound address */}
+                {FP.pipe(
+                  oDepositParams,
+                  O.map(({ poolAddress: { address } }) =>
+                    address ? (
+                      <div className="flex w-full items-center justify-between pl-10px text-[12px]" key="pool-addr">
+                        <div>{intl.formatMessage({ id: 'common.pool.inbound' })}</div>
+                        <TooltipAddress title={address}>
+                          <div className="truncate pl-20px text-[13px] normal-case leading-normal">{address}</div>
+                        </TooltipAddress>
+                      </div>
+                    ) : null
+                  ),
+                  O.toNullable
+                )}
+              </>
+            )}
+
+            {/* balances */}
+            {showDetails && (
+              <>
+                <div className={`w-full pt-10px text-[14px]`}>
+                  <BaseButton
+                    disabled={walletBalancesLoading}
+                    className="group !p-0 !font-mainBold !text-gray2 dark:!text-gray2d"
+                    onClick={reloadBalances}>
+                    {intl.formatMessage({ id: 'common.balances' })}
+                    <ArrowPathIcon className="ease ml-5px h-[15px] w-[15px] group-hover:rotate-180" />
+                  </BaseButton>
+                </div>
+                {/* rune sender balance */}
+                <div className="flex w-full items-center justify-between pl-10px text-[12px]">
+                  <div>{intl.formatMessage({ id: 'common.rune' })}</div>
+                  <div className="truncate pl-20px text-[13px] normal-case leading-normal">{runeBalanceLabel}</div>
+                </div>
+                {/* asset sender balance */}
+                <div className="flex w-full items-center justify-between pl-10px text-[12px]">
+                  <div>{intl.formatMessage({ id: 'common.asset' })}</div>
+                  <div className="truncate pl-20px text-[13px] normal-case leading-normal">{assetBalanceLabel}</div>
+                </div>
+              </>
+            )}
+
+            {/* memo */}
+            {showDetails && (
+              <>
+                <div className={`w-full pt-10px font-mainBold text-[14px]`}>
+                  {intl.formatMessage({ id: 'common.memos' })}
+                </div>
+                <div className="flex w-full items-center justify-between pl-10px text-[12px]">
+                  <div className="">
+                    {FP.pipe(
+                      oDepositParams,
+                      O.map(({ memos: { rune: memo } }) => memo),
+                      O.getOrElse(() => emptyString),
+                      (memo) => (
+                        <CopyLabel
+                          className="whitespace-nowrap pl-0 uppercase text-gray2 dark:text-gray2d"
+                          label={intl.formatMessage({ id: 'common.transaction.short.rune' })}
+                          key="memo-copy"
+                          textToCopy={memo}
+                        />
+                      )
+                    )}
+                  </div>
+
+                  <div className="truncate pl-10px font-main text-[12px]">
+                    {FP.pipe(
+                      oDepositParams,
+                      O.map(({ memos: { rune: memo } }) => (
+                        <Tooltip title={memo} key="tooltip-rune-memo">
+                          {memo}
+                        </Tooltip>
+                      )),
+                      O.toNullable
+                    )}
+                  </div>
+                </div>
+
+                <div className="flex w-full items-center justify-between pl-10px text-[12px]">
+                  <div className="">
+                    {FP.pipe(
+                      oDepositParams,
+                      O.map(({ memos: { asset: memo } }) => memo),
+                      O.getOrElse(() => emptyString),
+                      (memo) => (
+                        <CopyLabel
+                          className="whitespace-nowrap pl-0 uppercase text-gray2 dark:text-gray2d"
+                          label={intl.formatMessage({ id: 'common.transaction.short.asset' })}
+                          key="memo-copy"
+                          textToCopy={memo}
+                        />
+                      )
+                    )}
+                  </div>
+
+                  <div className="truncate pl-10px font-main text-[12px]">
+                    {FP.pipe(
+                      oDepositParams,
+                      O.map(({ memos: { asset: memo } }) => (
+                        <Tooltip title={memo} key="tooltip-asset-memo">
+                          {memo}
+                        </Tooltip>
+                      )),
+                      O.toNullable
+                    )}
+                  </div>
+                </div>
+              </>
+            )}
+          </div>
+        </div>
+        {renderPasswordConfirmationModal}
+        {renderLedgerConfirmationModal}
+        {renderTxModal}
+      </div>
+    </div>
   )
 }

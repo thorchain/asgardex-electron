@@ -16,10 +16,42 @@ import {
   THORCHAIN_DECIMAL,
   to1e8BaseAmount
 } from '../../../helpers/assetHelper'
+import { getChainAsset } from '../../../helpers/chainHelper'
 import { eqChain } from '../../../helpers/fp/eq'
 import { priceFeeAmountForAsset } from '../../../services/chain/fees/utils'
-import { DepositAssetFees, DepositFees, SymDepositFeesRD } from '../../../services/chain/types'
+import { DepositAssetFees, DepositFees, SymDepositFees, SymDepositFeesRD } from '../../../services/chain/types'
 import { PoolsDataMap } from '../../../services/midgard/types'
+import { AssetWithAmount } from '../../../types/asgardex'
+
+/**
+ * Returns zero sym deposit fees
+ * by given paired asset to deposit
+ */
+export const getZeroSymDepositFees = (asset: Asset): SymDepositFees => ({
+  rune: { inFee: ZERO_BASE_AMOUNT, outFee: ZERO_BASE_AMOUNT, refundFee: ZERO_BASE_AMOUNT },
+  asset: {
+    asset: getChainAsset(asset.chain),
+    inFee: ZERO_BASE_AMOUNT,
+    outFee: ZERO_BASE_AMOUNT,
+    refundFee: ZERO_BASE_AMOUNT
+  }
+})
+
+export const maxAssetBalanceToDeposit = (assetBalance: AssetWithAmount, inFee: BaseAmount): BaseAmount => {
+  const { asset, amount } = assetBalance
+
+  // Ignore non-chain assets
+  if (!isChainAsset(asset)) return amount
+
+  const value = amount.minus(inFee)
+  const zero = baseAmount(0, amount.decimal)
+  return value.gt(zero) ? value : zero
+}
+
+export const maxRuneBalanceToDeposit = (runeBalance: BaseAmount, inFee: BaseAmount): BaseAmount => {
+  const value = runeBalance.minus(inFee)
+  return value.gt(ZERO_BASE_AMOUNT) ? value : ZERO_BASE_AMOUNT
+}
 
 /**
  * Calculates max. value of RUNE to deposit
@@ -31,28 +63,28 @@ export const maxRuneAmountToDeposit = ({
   poolData,
   runeBalance,
   assetBalance,
-  thorchainFee
+  fees: { asset: assetFees, rune: runeFees }
 }: {
   poolData: PoolData
   runeBalance: BaseAmount
-  assetBalance: BaseAmount
-  thorchainFee: BaseAmount
+  assetBalance: AssetWithAmount
+  fees: SymDepositFees
 }): BaseAmount => {
   const { runeBalance: poolRuneBalance, assetBalance: poolAssetBalance } = poolData
+  const maxRuneBalance = maxRuneBalanceToDeposit(runeBalance, runeFees.inFee)
+  const maxAssetBalance = maxAssetBalanceToDeposit(assetBalance, assetFees.inFee)
   // asset balance needs to have `1e8` decimal to be in common with pool data (always `1e8`)
-  const assetBalance1e8 = to1e8BaseAmount(assetBalance)
+  const maxAssetBalance1e8 = to1e8BaseAmount(maxAssetBalance)
   const maxRuneAmount = baseAmount(
     poolRuneBalance
       .amount()
       .dividedBy(poolAssetBalance.amount())
-      .multipliedBy(assetBalance1e8.amount())
+      .multipliedBy(maxAssetBalance1e8.amount())
       // don't accept decimal as values for `BaseAmount`
       .toFixed(0, BigNumber.ROUND_DOWN),
     THORCHAIN_DECIMAL
   )
-  return maxRuneAmount.gte(runeBalance) && !runeBalance.eq(ZERO_BASE_AMOUNT)
-    ? runeBalance.minus(thorchainFee)
-    : maxRuneAmount
+  return maxRuneAmount.gte(maxRuneBalance) ? maxRuneBalance : maxRuneAmount
 }
 
 /**
@@ -64,29 +96,34 @@ export const maxRuneAmountToDeposit = ({
 export const maxAssetAmountToDeposit = ({
   poolData,
   runeBalance,
-  assetBalance
+  assetBalance,
+  fees: { asset: assetFees, rune: runeFees }
 }: {
   poolData: PoolData
   runeBalance: BaseAmount
-  assetBalance: BaseAmount
+  assetBalance: AssetWithAmount
+  fees: SymDepositFees
 }): BaseAmount => {
   const { runeBalance: poolRuneBalance, assetBalance: poolAssetBalance } = poolData
+
+  const maxRuneBalance = maxRuneBalanceToDeposit(runeBalance, runeFees.inFee)
+  const maxAssetBalance = maxAssetBalanceToDeposit(assetBalance, assetFees.inFee)
 
   // All amounts of pool data are always 1e8 decimal based
   const maxAssetAmount1e8: BaseAmount = baseAmount(
     poolAssetBalance
       .amount()
       .dividedBy(poolRuneBalance.amount())
-      .multipliedBy(runeBalance.amount())
+      .multipliedBy(maxRuneBalance.amount())
       // don't accept decimal as values for `BaseAmount`
       .toFixed(0, BigNumber.ROUND_DOWN),
     THORCHAIN_DECIMAL
   )
 
   // convert decimal to original decimal of assetBalance
-  const maxAssetAmount = convertBaseAmountDecimal(maxAssetAmount1e8, assetBalance.decimal)
+  const maxAssetAmount = convertBaseAmountDecimal(maxAssetAmount1e8, assetBalance.amount.decimal)
 
-  return maxAssetAmount.amount().isGreaterThan(assetBalance.amount()) ? assetBalance : maxAssetAmount
+  return maxAssetAmount.gt(maxAssetBalance) ? maxAssetBalance : maxAssetAmount
 }
 
 export const getRuneAmountToDeposit = (
