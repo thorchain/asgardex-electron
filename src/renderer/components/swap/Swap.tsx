@@ -100,9 +100,7 @@ import { TxModal } from '../modal/tx'
 import { SwapAssets } from '../modal/tx/extra'
 import { LoadingView } from '../shared/loading'
 import { AssetInput } from '../uielements/assets/assetInput'
-import { ASSET_SELECT_BUTTON_WIDTH } from '../uielements/assets/assetInput/AssetInput'
 import { BaseButton, FlatButton, ViewTxButton } from '../uielements/button'
-import { CheckButton } from '../uielements/button/CheckButton'
 import { MaxBalanceButton } from '../uielements/button/MaxBalanceButton'
 import { Tooltip, TooltipAddress, WalletTypeLabel } from '../uielements/common/Common.styles'
 import { Fees, UIFeesRD } from '../uielements/fees'
@@ -1648,24 +1646,24 @@ export const Swap = ({
   return (
     <div className="my-50px flex w-full max-w-[500px] flex-col justify-between">
       <div>
-        <div className="flex flex-col">
-          {/* Note: Input value is shown as AssetAmount */}
+        {/* Note: Input value is shown as AssetAmount */}
 
-          <AssetInput
-            className="w-full"
-            title={intl.formatMessage({ id: 'swap.input' })}
-            amount={{ amount: amountToSwapMax1e8, asset: sourceAsset }}
-            priceAmount={priceAmountToSwapMax1e8}
-            assets={selectableSourceAssets}
-            network={network}
-            onChangeAsset={setSourceAsset}
-            onChange={setAmountToSwapMax1e8}
-            onBlur={reloadFeesHandler}
-            showError={minAmountError}
-          />
-
-          <div className="flex flex-row">
-            <div className="flex w-full flex-col">
+        <AssetInput
+          className="w-full"
+          title={intl.formatMessage({ id: 'swap.input' })}
+          amount={{ amount: amountToSwapMax1e8, asset: sourceAsset }}
+          priceAmount={priceAmountToSwapMax1e8}
+          assets={selectableSourceAssets}
+          network={network}
+          onChangeAsset={setSourceAsset}
+          onChange={setAmountToSwapMax1e8}
+          onBlur={reloadFeesHandler}
+          showError={minAmountError}
+          hasLedger={hasSourceAssetLedger}
+          useLedger={useSourceAssetLedger}
+          useLedgerHandler={onClickUseSourceAssetLedger}
+          extraContent={
+            <div className="flex flex-col">
               <MaxBalanceButton
                 className="ml-10px mt-5px"
                 classNameButton="!text-gray2 dark:!text-gray2d"
@@ -1682,21 +1680,8 @@ export const Swap = ({
               />
               {minAmountError && renderMinAmount}
             </div>
-            {/* Note: 'items-start' needed to avoid stretch button in height of parent container */}
-            <div className="flex w-full items-start justify-end">
-              <CheckButton
-                size="medium"
-                color="neutral"
-                className={`${ASSET_SELECT_BUTTON_WIDTH} rounded-b-lg bg-gray0 py-5px dark:bg-gray0d ${
-                  !hasSourceAssetLedger ? 'hidden' : ''
-                }`}
-                checked={useSourceAssetLedger}
-                clickHandler={onClickUseSourceAssetLedger}>
-                {intl.formatMessage({ id: 'ledger.title' })}
-              </CheckButton>
-            </div>
-          </div>
-        </div>
+          }
+        />
 
         <div className="mb-20px flex w-full justify-center">
           <BaseButton
@@ -1721,20 +1706,10 @@ export const Swap = ({
             assets={selectableTargetAssets}
             network={network}
             asLabel
+            useLedger={useTargetAssetLedger}
+            useLedgerHandler={onClickUseTargetAssetLedger}
+            hasLedger={hasTargetAssetLedger}
           />
-          {/* Note: 'items-start' needed to avoid stretch button in height of parent container */}
-          <div className="flex w-full items-start justify-end">
-            <CheckButton
-              size="medium"
-              color="neutral"
-              className={`${ASSET_SELECT_BUTTON_WIDTH} rounded-b-lg bg-gray0 py-5px dark:bg-gray0d ${
-                !hasTargetAssetLedger ? 'hidden' : ''
-              }`}
-              checked={useTargetAssetLedger}
-              clickHandler={onClickUseTargetAssetLedger}>
-              {intl.formatMessage({ id: 'ledger.title' })}
-            </CheckButton>
-          </div>
         </div>
         {!lockedWallet &&
           FP.pipe(
@@ -1849,8 +1824,7 @@ export const Swap = ({
                   <div>{rateLabel}</div>
                 </div>
                 {/* fees */}
-                <div
-                  className={`flex w-full items-center justify-between font-mainBold ${showDetails ? 'pt-10px' : ''}`}>
+                <div className="flex w-full items-center justify-between font-mainBold">
                   <BaseButton
                     disabled={RD.isPending(swapFeesRD) || RD.isInitial(swapFeesRD)}
                     className="group !p-0 !font-mainBold !text-gray2 dark:!text-gray2d"
