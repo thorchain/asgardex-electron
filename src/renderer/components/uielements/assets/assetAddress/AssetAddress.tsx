@@ -13,17 +13,18 @@ export type Props = {
   network: Network
   size?: Size
   className?: string
+  classNameAddress?: string
 }
 
 export const AssetAddress: React.FC<Props> = (props): JSX.Element => {
-  const { asset, address, network, size = 'normal', className } = props
+  const { asset, address, network, size = 'normal', className = '', classNameAddress = '' } = props
 
   return (
     <Styled.Wrapper className={className}>
       <AssetIcon asset={asset} size={size} network={network} />
       <Styled.AddressWrapper>
         <Styled.AddressEllipsis
-          className={`${className}-address`}
+          className={`${classNameAddress}`}
           address={address}
           iconSize={size}
           chain={asset.chain}
