@@ -23,7 +23,6 @@ import { AssetWithAmount, AssetWithDecimal } from '../../types/asgardex'
 import { PricePool } from '../../views/pools/Pools.types'
 import { AssetInput } from '../uielements/assets/assetInput'
 import { BaseButton, FlatButton } from '../uielements/button'
-import { CheckButton } from '../uielements/button/CheckButton'
 import { MaxBalanceButton } from '../uielements/button/MaxBalanceButton'
 import { TooltipAddress } from '../uielements/common/Common.styles'
 
@@ -98,40 +97,29 @@ export const AddSavers: React.FC<Props> = (props): JSX.Element => {
             onChange={setAmountToSendMax1e8}
             onBlur={reloadFeesHandler}
             showError={minAmountError}
+            hasLedger={hasLedger}
+            useLedger={useLedger}
+            useLedgerHandler={onClickUseLedger}
+            extraContent={
+              <div className="flex flex-col">
+                <MaxBalanceButton
+                  className="ml-10px mt-5px"
+                  classNameButton="!text-gray2 dark:!text-gray2d"
+                  classNameIcon={
+                    // show warn icon if maxAmountToSwapMax <= 0
+                    maxAmountToSendMax1e8.gt(zeroBaseAmountMax1e8)
+                      ? `text-gray2 dark:text-gray2d`
+                      : 'text-warning0 dark:text-warning0d'
+                  }
+                  size="medium"
+                  balance={{ amount: maxAmountToSendMax1e8, asset }}
+                  onClick={() => setAmountToSendMax1e8(maxAmountToSendMax1e8)}
+                  maxInfoText={maxBalanceInfoTxt}
+                />
+                {minAmountError && renderMinAmount}
+              </div>
+            }
           />
-
-          <div className="flex flex-row">
-            <div className="flex w-full flex-col">
-              <MaxBalanceButton
-                className="ml-10px mt-5px"
-                classNameButton="!text-gray2 dark:!text-gray2d"
-                classNameIcon={
-                  // show warn icon if maxAmountToSwapMax <= 0
-                  maxAmountToSendMax1e8.gt(zeroBaseAmountMax1e8)
-                    ? `text-gray2 dark:text-gray2d`
-                    : 'text-warning0 dark:text-warning0d'
-                }
-                size="medium"
-                balance={{ amount: maxAmountToSendMax1e8, asset }}
-                onClick={() => setAmountToSendMax1e8(maxAmountToSendMax1e8)}
-                maxInfoText={maxBalanceInfoTxt}
-              />
-              {minAmountError && renderMinAmount}
-            </div>
-            {/* Note: 'items-start' needed to avoid stretch button in height of parent container */}
-            <div className="flex w-full items-start justify-end">
-              <CheckButton
-                size="medium"
-                color="neutral"
-                className={`${ASSET_SELECT_BUTTON_WIDTH} rounded-b-lg bg-gray0 py-5px dark:bg-gray0d ${
-                  !hasLedger ? 'hidden' : ''
-                }`}
-                checked={useLedger}
-                clickHandler={onClickUseLedger}>
-                {intl.formatMessage({ id: 'ledger.title' })}
-              </CheckButton>
-            </div>
-          </div>
 
           <div className="flex flex-col items-center justify-center">
             <FlatButton
