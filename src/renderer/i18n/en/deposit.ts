@@ -17,6 +17,10 @@ const deposit: DepositMessages = {
   'deposit.add.asym': 'Add {asset}',
   'deposit.add.runeSide': 'RUNE side',
   'deposit.add.assetSide': 'Asset side',
+  'deposit.add.min.info': 'Minimum value to deposit to cover all fees for inbound and outbound transactions.',
+  'deposit.add.max.info': 'Maximum amount to deposit is based on balance ({balance}) in relation to other asset side.',
+  'deposit.add.max.infoWithFee':
+    'Maximum amount to deposit is based on balance ({balance}) minus estimated fees ({fee}) in relation to other asset side.',
   'deposit.add.state.sending': 'Send deposit transaction',
   'deposit.add.state.checkResults': 'Check deposit result',
   'deposit.add.state.pending': 'Adding liquidity',

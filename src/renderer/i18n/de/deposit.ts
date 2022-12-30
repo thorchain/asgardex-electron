@@ -17,6 +17,11 @@ const deposit: DepositMessages = {
   'deposit.add.asym': '{asset} hinzufügen',
   'deposit.add.runeSide': 'RUNE Seite',
   'deposit.add.assetSide': 'Asset Seite',
+  'deposit.add.min.info': 'Erforderlicher Mindestwert um die Gebühren der Ein- und Auszahlungstransaktionen zu decken.',
+  'deposit.add.max.info':
+    'Der Maximalwert berechnet sich aus dem Gesamtguthaben ({balance}) und dem symmetrischen Verhältnis zur anderen Assetseite',
+  'deposit.add.max.infoWithFee':
+    'Der Maximalwert berechnet sich aus dem Gesamtguthaben ({balance}) abzüglich der voraussichtlichen Depositgebühr ({fee}) und dem symmetrischen Verhältnis zur anderen Assetseite',
   'deposit.add.state.sending': 'Sende Einzahlungs-Transaktion',
   'deposit.add.state.checkResults': 'Überprüfe Resultat der Einzahlung',
   'deposit.add.state.pending': 'Einzahlen',
