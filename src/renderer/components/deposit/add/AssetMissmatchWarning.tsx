@@ -1,19 +1,22 @@
 import React, { useState } from 'react'
 
+import { ChevronRightIcon } from '@heroicons/react/20/solid'
 import { useIntl } from 'react-intl'
 
 import { Network } from '../../../../shared/api/types'
 import { AssetsWithAddress } from '../../../types/asgardex'
-import * as CStyled from './AssetMissmatchWarning.styles'
-import * as Styled from './Deposit.styles'
+import { Alert } from '../../uielements/alert'
+import { AssetAddress } from '../../uielements/assets/assetAddress'
+import { TextButton } from '../../uielements/button'
 
 export type Props = {
   network: Network
   assets: AssetsWithAddress
+  className?: string
 }
 
 export const AssetMissmatchWarning: React.FC<Props> = (props): JSX.Element => {
-  const { assets: assetsWA, network } = props
+  const { assets: assetsWA, network, className = '' } = props
 
   const intl = useIntl()
 
@@ -21,20 +24,23 @@ export const AssetMissmatchWarning: React.FC<Props> = (props): JSX.Element => {
 
   const subContent = (
     <>
-      <Styled.AssetWarningInfoButton selected={collapsed} onClick={() => setCollapsed((v) => !v)}>
-        <Styled.AssetWarningInfoButtonLabel>
-          {intl.formatMessage({ id: 'common.informationMore' })}
-        </Styled.AssetWarningInfoButtonLabel>
-        <Styled.AssetWarningInfoButtonIcon selected={collapsed} />
-      </Styled.AssetWarningInfoButton>
+      <TextButton
+        size="normal"
+        color="neutral"
+        className="mr-10px whitespace-nowrap pl-0 !font-mainBold uppercase"
+        onClick={() => setCollapsed((v) => !v)}>
+        {intl.formatMessage({ id: 'common.informationMore' })}
+        <ChevronRightIcon className={`text-turquoise ${collapsed ? 'rotate-90' : ''} ease h-[20px] w-[20px] `} />
+      </TextButton>
       {collapsed && (
         <>
-          <Styled.AssetWarningDescription>
+          <p className="p-0 pb-10px font-main text-[12px] uppercase leading-[17px]">
             {intl.formatMessage({ id: 'deposit.add.assetMissmatch.description' })}
-          </Styled.AssetWarningDescription>
+          </p>
           <div>
             {assetsWA.map(({ asset, address }, index) => (
-              <CStyled.AssetAddress
+              <AssetAddress
+                className="pt-10px first:pt-0"
                 network={network}
                 asset={asset}
                 size="small"
@@ -49,7 +55,8 @@ export const AssetMissmatchWarning: React.FC<Props> = (props): JSX.Element => {
   )
 
   return (
-    <Styled.Alert
+    <Alert
+      className={className}
       type="warning"
       message={intl.formatMessage({ id: 'deposit.add.assetMissmatch.title' })}
       description={subContent}
