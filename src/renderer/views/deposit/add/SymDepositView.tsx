@@ -8,6 +8,7 @@ import { useObservableState } from 'observable-hooks'
 import { useIntl } from 'react-intl'
 import { useNavigate } from 'react-router-dom'
 
+import { isLedgerWallet } from '../../../../shared/utils/guard'
 import { WalletType } from '../../../../shared/wallet/types'
 import { SymDeposit } from '../../../components/deposit/add'
 import { Alert } from '../../../components/uielements/alert'
@@ -17,8 +18,10 @@ import { useEthereumContext } from '../../../contexts/EthereumContext'
 import { useMidgardContext } from '../../../contexts/MidgardContext'
 import { useThorchainContext } from '../../../contexts/ThorchainContext'
 import { useWalletContext } from '../../../contexts/WalletContext'
+import { hasLedgerAddress } from '../../../helpers/addressHelper'
 import { sequenceTRD } from '../../../helpers/fpHelpers'
 import { RUNE_PRICE_POOL } from '../../../helpers/poolHelper'
+import { useLedgerAddresses } from '../../../hooks/useLedgerAddresses'
 import { useLiquidityProviders } from '../../../hooks/useLiquidityProviders'
 import { useNetwork } from '../../../hooks/useNetwork'
 import { useOpenExplorerTxUrl } from '../../../hooks/useOpenExplorerTxUrl'
@@ -44,23 +47,6 @@ export const SymDepositView: React.FC<Props> = (props) => {
 
   const { network } = useNetwork()
 
-  const onChangeAsset = useCallback(
-    ({
-      asset,
-      assetWalletType,
-      runeWalletType
-    }: {
-      asset: Asset
-      assetWalletType: WalletType
-      runeWalletType: WalletType
-    }) => {
-      navigate(poolsRoutes.deposit.path({ asset: assetToString(asset), assetWalletType, runeWalletType }), {
-        replace: true
-      })
-    },
-    [navigate]
-  )
-
   const { reloadInboundAddresses } = useThorchainContext()
 
   const {
@@ -81,6 +67,8 @@ export const SymDepositView: React.FC<Props> = (props) => {
     keystoreService: { validatePassword$ },
     reloadBalancesByChain
   } = useWalletContext()
+
+  const { ledgerAddresses } = useLedgerAddresses()
 
   const { data: protocolLimitRD } = useProtocolLimit()
 
@@ -106,6 +94,40 @@ export const SymDepositView: React.FC<Props> = (props) => {
     reloadBalancesByChain(assetWD.asset.chain)()
     reloadBalancesByChain(THORChain)()
   }, [assetWD.asset.chain, reloadBalancesByChain])
+
+  const onChangeAsset = useCallback(
+    ({
+      asset,
+      assetWalletType,
+      runeWalletType
+    }: {
+      asset: Asset
+      assetWalletType: WalletType
+      runeWalletType: WalletType
+    }) => {
+      // Check whether ledger is still available
+      // By switching assets in `SymDeposit` there is no information about that at component level
+      // That's why we check it here
+      // So by switching a Ledger asset, Ledger will be still selected for new selected asset in `SymDeposit` component if available
+      const hasRuneLedger = hasLedgerAddress(ledgerAddresses, THORChain)
+      const hasAssetLedger = hasLedgerAddress(ledgerAddresses, asset.chain)
+      // If no Ledger found, use 'keystore'
+      const checkedRuneWalletType = isLedgerWallet(runeWalletType) && hasRuneLedger ? 'ledger' : 'keystore'
+      const checkedAssetWalletType = isLedgerWallet(assetWalletType) && hasAssetLedger ? 'ledger' : 'keystore'
+
+      navigate(
+        poolsRoutes.deposit.path({
+          asset: assetToString(asset),
+          assetWalletType: checkedAssetWalletType,
+          runeWalletType: checkedRuneWalletType
+        }),
+        {
+          replace: true
+        }
+      )
+    },
+    [ledgerAddresses, navigate]
+  )
 
   useEffect(() => {
     // reload balances, whenever sourceAsset and targetAsset have been changed (both are properties of `reloadBalances` )

@@ -21,10 +21,14 @@ import {
   Address
 } from '@xchainjs/xchain-util'
 import { ethers } from 'ethers'
+import * as A from 'fp-ts/lib/Array'
+import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
 
 import { Network } from '../../shared/api/types'
 import { toClientNetwork } from '../../shared/utils/client'
+import { LedgerAddresses } from '../services/wallet/types'
+import { eqChain } from './fp/eq'
 
 export const truncateAddress = (addr: Address, chain: Chain, network: Network): string => {
   const first = addr.substring(0, Math.max(getAddressPrefixLength(chain, network) + 3, 6))
@@ -74,3 +78,11 @@ export const removeAddressPrefix = (address: Address): Address => {
  */
 export const getEthChecksumAddress = (address: Address): O.Option<Address> =>
   O.tryCatch(() => ethers.utils.getAddress(address.toLowerCase()))
+
+export const hasLedgerAddress = (addresses: LedgerAddresses, chain: Chain): boolean =>
+  FP.pipe(
+    addresses,
+    A.findFirst(({ chain: ledgerChain }) => eqChain.equals(chain, ledgerChain)),
+    O.map((_) => true),
+    O.getOrElse(() => false)
+  )

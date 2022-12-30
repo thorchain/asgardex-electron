@@ -3,6 +3,7 @@ import * as FP from 'fp-ts/lib/function'
 import { useObservableState } from 'observable-hooks'
 
 import { useWalletContext } from '../contexts/WalletContext'
+import { INITIAL_LEDGER_ADDRESSES } from '../services/wallet/const'
 import { LedgerAddresses, LedgerAddressesRD } from '../services/wallet/types'
 
 export const useLedgerAddresses = (): {
@@ -13,7 +14,7 @@ export const useLedgerAddresses = (): {
   const { reloadPersistentLedgerAddresses, persistentLedgerAddresses$, ledgerAddresses$ } = useWalletContext()
 
   const ledgerAddressesPersistentRD = useObservableState(persistentLedgerAddresses$, RD.initial)
-  const ledgerAddresses = useObservableState(ledgerAddresses$, [])
+  const ledgerAddresses = useObservableState(ledgerAddresses$, INITIAL_LEDGER_ADDRESSES)
 
   return { ledgerAddressesPersistentRD, ledgerAddresses, reloadPersistentLedgerAddresses }
 }
