@@ -22,6 +22,7 @@ import * as A from 'fp-ts/lib/Array'
 import * as FP from 'fp-ts/lib/function'
 import * as NEA from 'fp-ts/lib/NonEmptyArray'
 import * as O from 'fp-ts/lib/Option'
+import * as P from 'fp-ts/Predicate'
 import { useObservableState } from 'observable-hooks'
 import { useIntl } from 'react-intl'
 import * as RxOp from 'rxjs/operators'
@@ -222,7 +223,9 @@ export const SymDeposit: React.FC<Props> = (props) => {
     poolBasedBalances,
     A.map(({ asset }) => asset),
     // Merge duplications
-    (assets) => unionAssets(assets)(assets)
+    (assets) => unionAssets(assets)(assets),
+    // Filter RUNE out - not selectable on asset side
+    A.filter(P.not(isRuneNativeAsset))
   )
 
   const oRuneWB: O.Option<WalletBalance> = useMemo(() => {
