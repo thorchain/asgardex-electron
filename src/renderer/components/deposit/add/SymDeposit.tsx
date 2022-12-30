@@ -2048,7 +2048,7 @@ export const SymDeposit: React.FC<Props> = (props) => {
                 </div>
                 {/* rune sender address */}
                 <div className="flex w-full items-center justify-between pl-10px text-[12px]">
-                  <div>{intl.formatMessage({ id: 'common.sender.rune' })}</div>
+                  <div>{intl.formatMessage({ id: 'common.rune' })}</div>
                   <div className="truncate pl-20px text-[13px] normal-case leading-normal">
                     {FP.pipe(
                       oRuneWB,
@@ -2063,7 +2063,7 @@ export const SymDeposit: React.FC<Props> = (props) => {
                 </div>
                 {/* asset sender address */}
                 <div className="flex w-full items-center justify-between pl-10px text-[12px]">
-                  <div>{intl.formatMessage({ id: 'common.sender.asset' })}</div>
+                  <div>{intl.formatMessage({ id: 'common.asset' })}</div>
                   <div className="truncate pl-20px text-[13px] normal-case leading-normal">
                     {FP.pipe(
                       oAssetWB,
@@ -2108,12 +2108,12 @@ export const SymDeposit: React.FC<Props> = (props) => {
                 </div>
                 {/* rune sender balance */}
                 <div className="flex w-full items-center justify-between pl-10px text-[12px]">
-                  <div>{intl.formatMessage({ id: 'common.sender.rune' })}</div>
+                  <div>{intl.formatMessage({ id: 'common.rune' })}</div>
                   <div className="truncate pl-20px text-[13px] normal-case leading-normal">{runeBalanceLabel}</div>
                 </div>
                 {/* asset sender balance */}
                 <div className="flex w-full items-center justify-between pl-10px text-[12px]">
-                  <div>{intl.formatMessage({ id: 'common.sender.asset' })}</div>
+                  <div>{intl.formatMessage({ id: 'common.asset' })}</div>
                   <div className="truncate pl-20px text-[13px] normal-case leading-normal">{assetBalanceLabel}</div>
                 </div>
               </>
@@ -2134,7 +2134,7 @@ export const SymDeposit: React.FC<Props> = (props) => {
                       (memo) => (
                         <CopyLabel
                           className="whitespace-nowrap pl-0 uppercase text-gray2 dark:text-gray2d"
-                          label={intl.formatMessage({ id: 'common.sender.rune' })}
+                          label={intl.formatMessage({ id: 'common.transaction.short.rune' })}
                           key="memo-copy"
                           textToCopy={memo}
                         />
@@ -2164,7 +2164,7 @@ export const SymDeposit: React.FC<Props> = (props) => {
                       (memo) => (
                         <CopyLabel
                           className="whitespace-nowrap pl-0 uppercase text-gray2 dark:text-gray2d"
-                          label={intl.formatMessage({ id: 'common.sender.asset' })}
+                          label={intl.formatMessage({ id: 'common.transaction.short.asset' })}
                           key="memo-copy"
                           textToCopy={memo}
                         />
