@@ -26,6 +26,7 @@ import { Action as ActionButtonAction, ActionButton } from '../../components/uie
 import { PoolsPeriodSelector } from '../../components/uielements/pools/PoolsPeriodSelector'
 import { Table } from '../../components/uielements/table'
 // import { DEFAULT_WALLET_TYPE } from '../../const'
+import { DEFAULT_WALLET_TYPE } from '../../const'
 import { useAppContext } from '../../contexts/AppContext'
 import { useMidgardContext } from '../../contexts/MidgardContext'
 import { ordBaseAmount, ordNumber } from '../../helpers/fp/ord'
@@ -106,7 +107,13 @@ export const ActivePools: React.FC<PoolsComponentProps> = ({ haltedChains, mimir
           label: intl.formatMessage({ id: 'common.manage' }),
           disabled: disableAllPoolActions || disablePoolActions || walletLocked,
           callback: () => {
-            navigate(poolsRoutes.deposit.path({ asset: assetToString(asset) }))
+            navigate(
+              poolsRoutes.deposit.path({
+                asset: assetToString(asset),
+                assetWalletType: DEFAULT_WALLET_TYPE,
+                runeWalletType: DEFAULT_WALLET_TYPE
+              })
+            )
           }
         }
         // TODO(@veado) Enable savers

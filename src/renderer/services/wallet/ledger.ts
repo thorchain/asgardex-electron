@@ -14,7 +14,7 @@ import { eqChain, eqKeystoreId, eqNetwork, eqOLedgerAddress } from '../../helper
 import { liveData } from '../../helpers/rx/liveData'
 import { observableState, triggerStream } from '../../helpers/stateHelper'
 import { Network$ } from '../app/types'
-import { INITIAL_KEYSTORE_LEDGER_ADDRESSES as INITIAL_LEDGER_ADDRESSES } from './const'
+import { INITIAL_LEDGER_ADDRESSES } from './const'
 import {
   GetLedgerAddressHandler,
   KeystoreState$,

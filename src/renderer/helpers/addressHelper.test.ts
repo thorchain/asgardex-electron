@@ -1,7 +1,8 @@
-import { BCHChain, BNBChain, BTCChain, CosmosChain, LTCChain, THORChain } from '@xchainjs/xchain-util'
+import { BCHChain, BNBChain, BTCChain, CosmosChain, ETHChain, LTCChain, THORChain } from '@xchainjs/xchain-util'
 import * as O from 'fp-ts/lib/Option'
 
-import { getEthChecksumAddress, removeAddressPrefix, truncateAddress } from './addressHelper'
+import { LedgerAddresses } from '../services/wallet/types'
+import { getEthChecksumAddress, hasLedgerAddress, removeAddressPrefix, truncateAddress } from './addressHelper'
 
 describe('helpers/addressHelper', () => {
   describe('truncateAddress', () => {
@@ -138,6 +139,38 @@ describe('helpers/addressHelper', () => {
     it('empty address', () => {
       const result = getEthChecksumAddress('')
       expect(result).toEqual(O.none)
+    })
+  })
+
+  describe('hasLedgerAddress', () => {
+    const addresses: LedgerAddresses = [
+      {
+        address: 'bnb-address',
+        type: 'ledger',
+        keystoreId: 1,
+        network: 'mainnet',
+        chain: BNBChain,
+        walletIndex: 1,
+        hdMode: 'default'
+      },
+      {
+        address: 'eth-address',
+        type: 'ledger',
+        keystoreId: 1,
+        network: 'mainnet',
+        chain: ETHChain,
+        walletIndex: 1,
+        hdMode: 'default'
+      }
+    ]
+    it('has ledger BNB', () => {
+      expect(hasLedgerAddress(addresses, BNBChain)).toBeTruthy()
+    })
+    it('has ledger ETH', () => {
+      expect(hasLedgerAddress(addresses, BNBChain)).toBeTruthy()
+    })
+    it('has NOT ledger BTC', () => {
+      expect(hasLedgerAddress(addresses, BTCChain)).toBeFalsy()
     })
   })
 })

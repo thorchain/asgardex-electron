@@ -18,7 +18,7 @@ export const SliderWrapper = styled(Slider)<SliderSingleProps & { error: boolean
       }
 
       &-track {
-        background-color: ${({ error }) => (error ? palette('error', 0) : palette('gradient', 0))};
+        background-color: ${({ error }) => (error ? palette('error', 0) : palette('success', 0))} !important;
       }
 
       &-handle {

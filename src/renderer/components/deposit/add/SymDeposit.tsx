@@ -22,6 +22,7 @@ import * as A from 'fp-ts/lib/Array'
 import * as FP from 'fp-ts/lib/function'
 import * as NEA from 'fp-ts/lib/NonEmptyArray'
 import * as O from 'fp-ts/lib/Option'
+import * as P from 'fp-ts/Predicate'
 import { useObservableState } from 'observable-hooks'
 import { useIntl } from 'react-intl'
 import * as RxOp from 'rxjs/operators'
@@ -129,7 +130,17 @@ export type Props = {
   getRuneExplorerTxUrl: GetExplorerTxUrl
   getAssetExplorerTxUrl: GetExplorerTxUrl
   validatePassword$: ValidatePasswordHandler
-  onChangeAsset: (asset: Asset) => void
+  assetWalletType: WalletType
+  runeWalletType: WalletType
+  onChangeAsset: ({
+    asset,
+    assetWalletType,
+    runeWalletType
+  }: {
+    asset: Asset
+    assetWalletType: WalletType
+    runeWalletType: WalletType
+  }) => void
   disabled?: boolean
   poolData: PoolData
   deposit$: SymDepositStateHandler
@@ -145,8 +156,6 @@ export type Props = {
   hasAsymAssets: LiquidityProviderHasAsymAssetsRD
   symAssetMismatch: LiquidityProviderAssetMismatchRD
   openAsymDepositTool: FP.Lazy<void>
-  setAssetWalletType: (walletType: WalletType) => void
-  setRuneWalletType: (walletType: WalletType) => void
 }
 
 type SelectedInput = 'asset' | 'rune' | 'none'
@@ -169,6 +178,8 @@ export const SymDeposit: React.FC<Props> = (props) => {
     reloadShares,
     reloadSelectedPoolDetail,
     fees$,
+    assetWalletType,
+    runeWalletType,
     onChangeAsset,
     disabled = false,
     poolData,
@@ -186,17 +197,15 @@ export const SymDeposit: React.FC<Props> = (props) => {
     openRecoveryTool,
     hasAsymAssets: hasAsymAssetsRD,
     symAssetMismatch: symAssetMismatchRD,
-    openAsymDepositTool,
-    setAssetWalletType,
-    setRuneWalletType
+    openAsymDepositTool
   } = props
 
   const intl = useIntl()
 
   const prevAsset = useRef<O.Option<Asset>>(O.none)
 
-  const [useRuneLedger, setRuneLedger] = useState(false)
-  const [useAssetLedger, setUseAssetLedger] = useState(false)
+  const isRuneLedger = isLedgerWallet(runeWalletType)
+  const isAssetLedger = isLedgerWallet(assetWalletType)
 
   const { balances: oWalletBalances, loading: walletBalancesLoading } = walletBalances
 
@@ -214,18 +223,19 @@ export const SymDeposit: React.FC<Props> = (props) => {
     poolBasedBalances,
     A.map(({ asset }) => asset),
     // Merge duplications
-    (assets) => unionAssets(assets)(assets)
+    (assets) => unionAssets(assets)(assets),
+    // Filter RUNE out - not selectable on asset side
+    A.filter(P.not(isRuneNativeAsset))
   )
 
   const oRuneWB: O.Option<WalletBalance> = useMemo(() => {
-    const walletType = useRuneLedger ? 'ledger' : 'keystore'
     const oWalletBalances = NEA.fromArray(poolBasedBalances)
     return WalletHelper.getWalletBalanceByAssetAndWalletType({
       oWalletBalances,
       asset: AssetRuneNative,
-      walletType
+      walletType: runeWalletType
     })
-  }, [useRuneLedger, poolBasedBalances])
+  }, [runeWalletType, poolBasedBalances])
 
   const runeBalanceLabel = useMemo(
     () =>
@@ -247,14 +257,13 @@ export const SymDeposit: React.FC<Props> = (props) => {
   )
 
   const oAssetWB: O.Option<WalletBalance> = useMemo(() => {
-    const walletType = useAssetLedger ? 'ledger' : 'keystore'
     const oWalletBalances = NEA.fromArray(poolBasedBalances)
     return WalletHelper.getWalletBalanceByAssetAndWalletType({
       oWalletBalances,
       asset,
-      walletType
+      walletType: assetWalletType
     })
-  }, [asset, useAssetLedger, poolBasedBalances])
+  }, [asset, assetWalletType, poolBasedBalances])
 
   const assetBalanceLabel = useMemo(
     () =>
@@ -364,12 +373,15 @@ export const SymDeposit: React.FC<Props> = (props) => {
 
   const oChainAssetBalance: O.Option<BaseAmount> = useMemo(() => {
     const chainAsset = getChainAsset(asset.chain)
-    const walletType = useAssetLedger ? 'ledger' : 'keystore'
     return FP.pipe(
-      WalletHelper.getWalletBalanceByAssetAndWalletType({ oWalletBalances, asset: chainAsset, walletType }),
+      WalletHelper.getWalletBalanceByAssetAndWalletType({
+        oWalletBalances,
+        asset: chainAsset,
+        walletType: assetWalletType
+      }),
       O.map(({ amount }) => amount)
     )
-  }, [asset.chain, oWalletBalances, useAssetLedger])
+  }, [asset.chain, oWalletBalances, assetWalletType])
 
   const chainAssetBalance: BaseAmount = useMemo(
     () =>
@@ -999,17 +1011,14 @@ export const SymDeposit: React.FC<Props> = (props) => {
     return <Alert className="m-0 w-full xl:mr-20px" type="warning" message={title} description={msg} />
   }, [asset.ticker, hasAssetBalance, hasRuneBalance, intl])
 
-  const runeAmountChangeHandler = useCallback(
-    (runeInput: BaseAmount) => {
-      // Do nothing if we don't entered input for rune
-      if (selectedInput !== 'rune') return
-
-      let runeAmount = runeInput.gt(maxRuneAmountToDeposit)
+  const updateRuneAmount = useCallback(
+    (newAmount: BaseAmount) => {
+      let runeAmount = newAmount.gt(maxRuneAmountToDeposit)
         ? { ...maxRuneAmountToDeposit } // Use copy to avoid missmatch with values in input fields
-        : runeInput
+        : newAmount
       // assetAmount max. 1e8 decimal
       const assetAmountMax1e8 = Helper.getAssetAmountToDeposit({
-        runeAmount: runeAmount,
+        runeAmount,
         poolData,
         assetDecimal
       })
@@ -1029,23 +1038,24 @@ export const SymDeposit: React.FC<Props> = (props) => {
         setPercentValueToDeposit(percentToDeposit)
       }
     },
-    [
-      assetDecimal,
-      maxAssetAmountToDepositMax1e8,
-      maxRuneAmountToDeposit,
-      poolData,
-      selectedInput,
-      setAssetAmountToDepositMax1e8
-    ]
+    [assetDecimal, maxAssetAmountToDepositMax1e8, maxRuneAmountToDeposit, poolData, setAssetAmountToDepositMax1e8]
   )
 
-  const assetAmountChangeHandler = useCallback(
-    (assetInput: BaseAmount) => {
+  const runeAmountChangeHandler = useCallback(
+    (amount: BaseAmount) => {
+      // Do nothing if we don't entered input for rune
+      if (selectedInput !== 'rune') return
+
+      updateRuneAmount(amount)
+    },
+    [selectedInput, updateRuneAmount]
+  )
+
+  const updateAssetAmount = useCallback(
+    (newAmount: BaseAmount) => {
       // make sure we use correct decimal based on assetBalanceForThorchain
       // (input's decimal might not be updated yet)
-      const newAmountMax1e8 = convertBaseAmountDecimal(assetInput, assetBalanceMax1e8.decimal)
-      // Do nothing if we don't entered input for asset
-      if (selectedInput !== 'asset') return
+      const newAmountMax1e8 = convertBaseAmountDecimal(newAmount, assetBalanceMax1e8.decimal)
 
       let assetAmountMax1e8 = newAmountMax1e8.gt(maxAssetAmountToDepositMax1e8)
         ? { ...maxAssetAmountToDepositMax1e8 } // Use copy to avoid missmatch with values in input fields
@@ -1077,9 +1087,18 @@ export const SymDeposit: React.FC<Props> = (props) => {
       maxAssetAmountToDepositMax1e8,
       maxRuneAmountToDeposit,
       poolData,
-      selectedInput,
       setAssetAmountToDepositMax1e8
     ]
+  )
+
+  const assetAmountChangeHandler = useCallback(
+    (amount: BaseAmount) => {
+      // Do nothing if we don't entered input for asset
+      if (selectedInput !== 'asset') return
+
+      updateAssetAmount(amount)
+    },
+    [selectedInput, updateAssetAmount]
   )
 
   const changePercentHandler = useCallback(
@@ -1104,9 +1123,9 @@ export const SymDeposit: React.FC<Props> = (props) => {
 
   const onChangeAssetHandler = useCallback(
     (asset: Asset) => {
-      onChangeAsset(asset)
+      onChangeAsset({ asset, assetWalletType, runeWalletType })
     },
-    [onChangeAsset]
+    [assetWalletType, onChangeAsset, runeWalletType]
   )
 
   const onAfterSliderChangeHandler = useCallback(() => {
@@ -1119,13 +1138,13 @@ export const SymDeposit: React.FC<Props> = (props) => {
   const [showPasswordModal, setShowPasswordModal] = useState<ModalState>('none')
   const [showLedgerModal, setShowLedgerModal] = useState<ModalState>('none')
 
-  const onSubmit = useCallback(() => {
-    if (useAssetLedger || useRuneLedger) {
+  const onSubmit = () => {
+    if (isAssetLedger || isRuneLedger) {
       setShowLedgerModal('deposit')
     } else {
       setShowPasswordModal('deposit')
     }
-  }, [useAssetLedger, useRuneLedger])
+  }
 
   const renderFeeError = useCallback(
     (fee: BaseAmount, amount: BaseAmount, asset: Asset) => {
@@ -1380,12 +1399,12 @@ export const SymDeposit: React.FC<Props> = (props) => {
   } = useSubscriptionState<TxHashRD>(RD.initial)
 
   const onApprove = useCallback(() => {
-    if (useAssetLedger) {
+    if (isAssetLedger) {
       setShowLedgerModal('approve')
     } else {
       setShowPasswordModal('approve')
     }
-  }, [useAssetLedger])
+  }, [isAssetLedger])
 
   const submitApproveTx = useCallback(() => {
     FP.pipe(
@@ -1601,23 +1620,20 @@ export const SymDeposit: React.FC<Props> = (props) => {
   const useRuneLedgerHandler = useCallback(
     (useLedger: boolean) => {
       const walletType: WalletType = useLedger ? 'ledger' : 'keystore'
-      setRuneLedger(() => isLedgerWallet(walletType))
-      setRuneWalletType(walletType)
+      onChangeAsset({ asset, assetWalletType, runeWalletType: walletType })
       resetEnteredAmounts()
     },
 
-    [resetEnteredAmounts, setRuneWalletType]
+    [asset, assetWalletType, onChangeAsset, resetEnteredAmounts]
   )
 
   const useAssetLedgerHandler = useCallback(
     (useLedger: boolean) => {
       const walletType: WalletType = useLedger ? 'ledger' : 'keystore'
-      setUseAssetLedger(() => isLedgerWallet(walletType))
-      setAssetWalletType(walletType)
-
+      onChangeAsset({ asset, assetWalletType: walletType, runeWalletType })
       resetEnteredAmounts()
     },
-    [resetEnteredAmounts, setAssetWalletType]
+    [asset, onChangeAsset, resetEnteredAmounts, runeWalletType]
   )
 
   const renderPasswordConfirmationModal = useMemo(() => {
@@ -1677,8 +1693,8 @@ export const SymDeposit: React.FC<Props> = (props) => {
       sequenceTOption(oIsDeposit, oDepositParams),
       O.chain(([_, { poolAddress, runeSender, assetSender }]) => {
         const recipient = poolAddress.address
-        if (useRuneLedger) return O.some({ recipient, sender: runeSender })
-        if (useAssetLedger) return O.some({ recipient, sender: assetSender })
+        if (isRuneLedger) return O.some({ recipient, sender: runeSender })
+        if (isAssetLedger) return O.some({ recipient, sender: assetSender })
         return O.none
       })
     )
@@ -1688,14 +1704,14 @@ export const SymDeposit: React.FC<Props> = (props) => {
         onSuccess={onSucceess}
         onClose={onClose}
         visible
-        chain={useRuneLedger ? THORChain : asset.chain}
+        chain={isRuneLedger ? THORChain : asset.chain}
         network={network}
         description1={description1}
         description2={description2}
         addresses={addresses}
       />
     )
-  }, [asset, intl, network, oDepositParams, showLedgerModal, submitApproveTx, useAssetLedger, useRuneLedger])
+  }, [asset, intl, isAssetLedger, isRuneLedger, network, oDepositParams, showLedgerModal, submitApproveTx])
 
   useEffect(() => {
     if (!eqOAsset.equals(prevAsset.current, O.some(asset))) {
@@ -1819,6 +1835,98 @@ export const SymDeposit: React.FC<Props> = (props) => {
     [intl]
   )
 
+  const extraRuneContent = useMemo(
+    () => (
+      <div className="flex flex-col">
+        <MaxBalanceButton
+          className="ml-10px mt-5px"
+          classNameButton="!text-gray2 dark:!text-gray2d"
+          classNameIcon={
+            // show warn icon if maxAmountToSwapMax <= 0
+            maxRuneAmountToDeposit.gt(ZERO_BASE_AMOUNT)
+              ? `text-gray2 dark:text-gray2d`
+              : 'text-warning0 dark:text-warning0d'
+          }
+          size="medium"
+          balance={{ amount: maxRuneAmountToDeposit, asset: AssetRuneNative }}
+          onClick={() => {
+            updateRuneAmount(maxRuneAmountToDeposit)
+          }}
+          maxInfoText={intl.formatMessage(
+            { id: 'deposit.add.max.infoWithFee' },
+            { balance: runeBalanceLabel, fee: runeFeeLabel }
+          )}
+        />
+        {minRuneAmountError &&
+          renderMinAmount({
+            minAmount: minRuneAmountToDeposit,
+            minAmountInfo: intl.formatMessage({ id: 'deposit.add.min.info' }),
+            asset,
+            isError: minRuneAmountError
+          })}
+      </div>
+    ),
+    [
+      asset,
+      intl,
+      maxRuneAmountToDeposit,
+      minRuneAmountError,
+      minRuneAmountToDeposit,
+      renderMinAmount,
+      runeBalanceLabel,
+      runeFeeLabel,
+      updateRuneAmount
+    ]
+  )
+
+  const extraAssetContent = useMemo(
+    () => (
+      <div className="flex flex-col">
+        <MaxBalanceButton
+          className="ml-10px mt-5px"
+          classNameButton="!text-gray2 dark:!text-gray2d"
+          classNameIcon={
+            // show warn icon if maxAmountToSwapMax <= 0
+            maxAssetAmountToDepositMax1e8.gt(baseAmount(0, maxAssetAmountToDepositMax1e8.decimal))
+              ? `text-gray2 dark:text-gray2d`
+              : 'text-warning0 dark:text-warning0d'
+          }
+          size="medium"
+          balance={{ amount: maxAssetAmountToDepositMax1e8, asset }}
+          onClick={() => {
+            updateAssetAmount(maxAssetAmountToDepositMax1e8)
+          }}
+          maxInfoText={
+            isChainAsset(asset)
+              ? intl.formatMessage(
+                  { id: 'deposit.add.max.infoWithFee' },
+                  { balance: assetBalanceLabel, fee: assetFeeLabel }
+                )
+              : intl.formatMessage({ id: 'deposit.add.max.info' }, { balance: assetBalanceLabel })
+          }
+        />
+        {minAssetAmountError &&
+          renderMinAmount({
+            minAmount: minAssetAmountToDepositMax1e8,
+            minAmountInfo: intl.formatMessage({ id: 'deposit.add.min.info' }),
+            asset,
+            isError: minAssetAmountError
+          })}
+      </div>
+    ),
+    [
+      asset,
+      updateAssetAmount,
+      assetBalanceLabel,
+      assetFeeLabel,
+      intl,
+      maxAssetAmountToDepositMax1e8,
+      minAssetAmountError,
+      minAssetAmountToDepositMax1e8,
+      renderMinAmount
+    ]
+  )
+
   const [showDetails, setShowDetails] = useState<boolean>(false)
 
   return (
@@ -1841,40 +1949,10 @@ export const SymDeposit: React.FC<Props> = (props) => {
           onBlur={inputOnBlur}
           onFocus={() => setSelectedInput('rune')}
           showError={minRuneAmountError}
-          useLedger={useRuneLedger}
+          useLedger={isRuneLedger}
           hasLedger={hasRuneLedger}
           useLedgerHandler={useRuneLedgerHandler}
-          extraContent={
-            <div className="flex flex-col">
-              <MaxBalanceButton
-                className="ml-10px mt-5px"
-                classNameButton="!text-gray2 dark:!text-gray2d"
-                classNameIcon={
-                  // show warn icon if maxAmountToSwapMax <= 0
-                  maxRuneAmountToDeposit.gt(ZERO_BASE_AMOUNT)
-                    ? `text-gray2 dark:text-gray2d`
-                    : 'text-warning0 dark:text-warning0d'
-                }
-                size="medium"
-                balance={{ amount: maxRuneAmountToDeposit, asset: AssetRuneNative }}
-                onClick={() => {
-                  setRuneAmountToDeposit(maxRuneAmountToDeposit)
-                  setPercentValueToDeposit(100)
-                }}
-                maxInfoText={intl.formatMessage(
-                  { id: 'deposit.add.max.infoWithFee' },
-                  { balance: runeBalanceLabel, fee: runeFeeLabel }
-                )}
-              />
-              {minRuneAmountError &&
-                renderMinAmount({
-                  minAmount: minRuneAmountToDeposit,
-                  minAmountInfo: intl.formatMessage({ id: 'deposit.add.min.info' }),
-                  asset,
-                  isError: minRuneAmountError
-                })}
-            </div>
-          }
+          extraContent={extraRuneContent}
         />
 
         <div className="w-full px-20px pt-20px pb-40px">
@@ -1900,44 +1978,10 @@ export const SymDeposit: React.FC<Props> = (props) => {
           onBlur={inputOnBlur}
           onFocus={() => setSelectedInput('asset')}
           showError={minAssetAmountError}
-          useLedger={useAssetLedger}
+          useLedger={isAssetLedger}
           hasLedger={hasAssetLedger}
           useLedgerHandler={useAssetLedgerHandler}
-          extraContent={
-            <div className="flex flex-col">
-              <MaxBalanceButton
-                className="ml-10px mt-5px"
-                classNameButton="!text-gray2 dark:!text-gray2d"
-                classNameIcon={
-                  // show warn icon if maxAmountToSwapMax <= 0
-                  maxAssetAmountToDepositMax1e8.gt(baseAmount(0, maxAssetAmountToDepositMax1e8.decimal))
-                    ? `text-gray2 dark:text-gray2d`
-                    : 'text-warning0 dark:text-warning0d'
-                }
-                size="medium"
-                balance={{ amount: maxAssetAmountToDepositMax1e8, asset }}
-                onClick={() => {
-                  setAssetAmountToDepositMax1e8(maxAssetAmountToDepositMax1e8)
-                  setPercentValueToDeposit(100)
-                }}
-                maxInfoText={
-                  isChainAsset(asset)
-                    ? intl.formatMessage(
-                        { id: 'deposit.add.max.infoWithFee' },
-                        { balance: assetBalanceLabel, fee: assetFeeLabel }
-                      )
-                    : intl.formatMessage({ id: 'deposit.add.max.info' }, { balance: assetBalanceLabel })
-                }
-              />
-              {minAssetAmountError &&
-                renderMinAmount({
-                  minAmount: minAssetAmountToDepositMax1e8,
-                  minAmountInfo: intl.formatMessage({ id: 'deposit.add.min.info' }),
-                  asset,
-                  isError: minAssetAmountError
-                })}
-            </div>
-          }
+          extraContent={extraAssetContent}
         />
 
         <div className="flex flex-col items-center justify-between py-30px">

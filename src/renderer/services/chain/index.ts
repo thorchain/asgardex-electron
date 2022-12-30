@@ -1,4 +1,4 @@
-import { addressByChain$, assetAddress$, symDepositAddresses$, setSymDepositAddresses } from './address'
+import { addressByChain$, assetAddress$ } from './address'
 import { clientByChain$ } from './client'
 import { assetWithDecimal$ } from './decimal'
 import {
@@ -26,8 +26,6 @@ import {
  */
 export {
   addressByChain$,
-  symDepositAddresses$,
-  setSymDepositAddresses,
   clientByChain$,
   reloadSymDepositFees,
   symDepositFees$,

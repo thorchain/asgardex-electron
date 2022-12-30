@@ -144,8 +144,8 @@ export const Deposit: React.FC<Props> = (props) => {
           <SymDepositContent
             poolDetail={poolDetailRD}
             asset={assetWD}
-            runeWalletAddress={runeWalletAddress.address}
-            assetWalletAddress={assetWalletAddress.address}
+            runeWalletAddress={runeWalletAddress}
+            assetWalletAddress={assetWalletAddress}
             haltedChains={haltedChains}
             mimirHalt={mimirHalt}
           />

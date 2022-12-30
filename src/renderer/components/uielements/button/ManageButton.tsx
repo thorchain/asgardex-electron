@@ -5,6 +5,7 @@ import { Asset, assetToString } from '@xchainjs/xchain-util'
 import { useIntl } from 'react-intl'
 import { useNavigate } from 'react-router-dom'
 
+import { DEFAULT_WALLET_TYPE } from '../../../const'
 import * as poolsRoutes from '../../../routes/pools'
 import { BorderButton } from './'
 import type { Props as BorderButtonProps } from './BorderButton'
@@ -22,7 +23,13 @@ export const ManageButton: React.FC<Props> = ({ asset, isTextView, ...otherProps
     (event: React.MouseEvent<HTMLElement, MouseEvent>) => {
       event.preventDefault()
       event.stopPropagation()
-      navigate(poolsRoutes.deposit.path({ asset: assetToString(asset) }))
+      navigate(
+        poolsRoutes.deposit.path({
+          asset: assetToString(asset),
+          assetWalletType: DEFAULT_WALLET_TYPE,
+          runeWalletType: DEFAULT_WALLET_TYPE
+        })
+      )
     },
     [asset, navigate]
   )

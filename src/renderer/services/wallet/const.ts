@@ -37,6 +37,6 @@ export const INITIAL_LOAD_TXS_PROPS: LoadTxsParams = {
 
 export const EMPTY_LOAD_TXS_HANDLER: LoadTxsHandler = (_: LoadTxsParams) => {}
 
-export const INITIAL_KEYSTORE_LEDGER_ADDRESSES: LedgerAddresses = [] // empty by default
+export const INITIAL_LEDGER_ADDRESSES: LedgerAddresses = [] // empty by default
 
 export const MAX_WALLET_NAME_CHARS = 20

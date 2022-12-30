@@ -9,7 +9,7 @@ import { useNavigate } from 'react-router-dom'
 
 import { Network } from '../../../shared/api/types'
 import { Action as ActionButtonAction, ActionButton } from '../../components/uielements/button/ActionButton'
-// import { DEFAULT_WALLET_TYPE } from '../../const'
+import { DEFAULT_WALLET_TYPE } from '../../const'
 import { loadingString } from '../../helpers/stringHelper'
 import * as poolsRoutes from '../../routes/pools'
 // import * as saversRoutes from '../../routes/pools/savers'
@@ -88,7 +88,13 @@ export const PoolTitle: React.FC<Props> = ({
         label: intl.formatMessage({ id: 'common.manage' }),
         disabled: disableAllPoolActions || disablePoolActions || walletLocked,
         callback: () => {
-          navigate(poolsRoutes.deposit.path({ asset: assetToString(asset) }))
+          navigate(
+            poolsRoutes.deposit.path({
+              asset: assetToString(asset),
+              assetWalletType: DEFAULT_WALLET_TYPE,
+              runeWalletType: DEFAULT_WALLET_TYPE
+            })
+          )
         }
       }
       // TODO(@veado) Enable savers
