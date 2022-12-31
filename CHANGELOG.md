@@ -11,12 +11,15 @@
 - [SymDeposit] Redesign [#2503](https://github.com/thorchain/asgardex-electron/issues/2503), [#2502](https://github.com/thorchain/asgardex-electron/pull/2502)
 - [AssetInput] Add Ledger + extraContent [#2505](https://github.com/thorchain/asgardex-electron/pull/2505)
 - Refactor styles for 'warning` components (TW only) [#2504](https://github.com/thorchain/asgardex-electron/pull/2504)
+- [Deposit] Wallet types based on routes [#2506](https://github.com/thorchain/asgardex-electron/pull/2506)
 
 ## Fix
 
 - External links not clickable [#2495](https://github.com/thorchain/asgardex-electron/issues/2495)
 - [Send] Max value can't be negative [#2500](https://github.com/thorchain/asgardex-electron/issues/2500)
 - [Swap] Fees needs to be considered for max value to swap [#2498](https://github.com/thorchain/asgardex-electron/issues/2498)
+- [SymDeposit] RUNE can be selected on asset side [#2507](https://github.com/thorchain/asgardex-electron/issues/2507)
+- [Deposit] Check of asset missmatch failed [#2509](https://github.com/thorchain/asgardex-electron/issues/2509)
 
 # 1.18.5 (2022-12-20)
 
