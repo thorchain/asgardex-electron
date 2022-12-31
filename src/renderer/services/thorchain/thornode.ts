@@ -1,5 +1,14 @@
 import * as RD from '@devexperts/remote-data-ts'
-import { Address, Asset, AssetRuneNative, assetToString, baseAmount, bnOrZero, isChain } from '@xchainjs/xchain-util'
+import {
+  Address,
+  Asset,
+  assetFromString,
+  AssetRuneNative,
+  assetToString,
+  baseAmount,
+  bnOrZero,
+  isChain
+} from '@xchainjs/xchain-util'
 import * as A from 'fp-ts/Array'
 import * as E from 'fp-ts/Either'
 import * as FP from 'fp-ts/function'
@@ -11,18 +20,20 @@ import * as Rx from 'rxjs'
 import * as RxOp from 'rxjs/operators'
 
 import { add9Rheader } from '../../../shared/api/ninerealms'
+import { ZERO_BASE_AMOUNT } from '../../const'
 import { THORCHAIN_DECIMAL } from '../../helpers/assetHelper'
+import { sequenceTOption } from '../../helpers/fpHelpers'
 import { LiveData, liveData } from '../../helpers/rx/liveData'
 import { triggerStream } from '../../helpers/stateHelper'
 import {
   Configuration,
+  LiquidityProvidersApi,
+  LiquidityProviderSummary,
   Middleware,
   MimirApi,
   NetworkApi,
   Node,
   NodesApi,
-  Pool,
-  PoolsApi,
   Saver,
   SaversApi
 } from '../../types/generated/thornode'
@@ -31,7 +42,6 @@ import {
   MimirIO,
   MimirLD,
   ThornodeApiUrlLD,
-  LiquidityProviderIO,
   LiquidityProvidersLD,
   LiquidityProvider,
   NodeInfosLD,
@@ -207,12 +217,14 @@ export const createThornodeService$ = (network$: Network$, clientUrl$: ClientUrl
     RxOp.shareReplay(1)
   )
 
-  const apiGetLiquidityProviders$ = (asset: Asset): LiveData<Error, Pool> =>
+  const apiGetLiquidityProviders$ = (asset: Asset): LiveData<Error, LiquidityProviderSummary[]> =>
     FP.pipe(
       thornodeUrl$,
       liveData.chain((basePath) =>
         FP.pipe(
-          new PoolsApi(getThornodeAPIConfiguration(basePath)).pool({ asset: assetToString(asset) }),
+          new LiquidityProvidersApi(getThornodeAPIConfiguration(basePath)).liquidityProviders({
+            asset: assetToString(asset)
+          }),
           RxOp.map(RD.success),
           RxOp.catchError((e: Error) => Rx.of(RD.failure(e)))
         )
@@ -226,30 +238,33 @@ export const createThornodeService$ = (network$: Network$, clientUrl$: ClientUrl
       reloadLiquidityProviders$,
       RxOp.debounceTime(300),
       RxOp.switchMap((_) => apiGetLiquidityProviders$(asset)),
-      // We can not use something like t.array(LiquidityProviderIO) as in case if one of elements
-      // fails validation the WHOLE array will be processed as failed-validation by io-ts.
-      // So we need to validate each elemnt "by-hands" to avoid losing all data 'cuz of 1 element's fail
-      // First check - check if we have an array itself at the response
-      RxOp.map(t.array(t.unknown).decode),
-      RxOp.map(E.fold(() => [], FP.identity)),
-      // Secondly - check every response's element with LiquidityProviderIO codec and filter out every failed-validation-element
-      RxOp.map(A.filterMap(FP.flow(LiquidityProviderIO.decode, O.fromEither))),
-      RxOp.map(RD.success),
       liveData.map(
-        // transform LiquidityProviderIO -> LiquidityProvider
         A.map((provider): LiquidityProvider => {
-          const pendingRuneAmount = baseAmount(provider.pending_rune, THORCHAIN_DECIMAL)
-          /* 1e8 decimal by default, which is default decimal for ALL accets at THORChain  */
-          const pendingAssetAmount = baseAmount(provider.pending_asset, THORCHAIN_DECIMAL)
+          const oAsset = O.fromNullable(assetFromString(provider.asset))
+          const pendingRune = FP.pipe(
+            /* 1e8 decimal by default at THORChain */
+            baseAmount(bnOrZero(provider.pending_rune), THORCHAIN_DECIMAL),
+            O.fromPredicate((v) => v.gt(ZERO_BASE_AMOUNT)),
+            O.map((amount1e8) => ({
+              asset: AssetRuneNative,
+              amount1e8
+            }))
+          )
+          const oPendingAssetAmount = FP.pipe(
+            /* 1e8 decimal by default at THORChain */
+            baseAmount(bnOrZero(provider.pending_asset), THORCHAIN_DECIMAL),
+            O.fromPredicate((v) => v.gt(ZERO_BASE_AMOUNT))
+          )
+          const pendingAsset = FP.pipe(
+            sequenceTOption(oAsset, oPendingAssetAmount),
+            O.map(([asset, amount1e8]) => ({ asset, amount1e8 }))
+          )
+
           return {
-            runeAddress: provider.rune_address,
-            assetAddress: provider.asset_address,
-            pendingRune: pendingRuneAmount.gt(0)
-              ? O.some({ asset: AssetRuneNative, amount1e8: pendingRuneAmount })
-              : O.none,
-            pendingAsset: pendingAssetAmount.gt(0)
-              ? O.some({ asset: provider.asset, amount1e8: pendingAssetAmount })
-              : O.none
+            runeAddress: O.fromNullable(provider.rune_address),
+            assetAddress: O.fromNullable(provider.asset_address),
+            pendingRune,
+            pendingAsset
           }
         })
       ),

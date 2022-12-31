@@ -4,11 +4,9 @@ import { Address, Asset, BaseAmount, Chain } from '@xchainjs/xchain-util'
 import BigNumber from 'bignumber.js'
 import * as O from 'fp-ts/Option'
 import * as t from 'io-ts'
-import { optionFromNullable } from 'io-ts-types/lib/optionFromNullable'
 import { IntlShape } from 'react-intl'
 import * as Rx from 'rxjs'
 
-import { assetIO } from '../../../shared/api/io'
 import { HDMode, WalletType } from '../../../shared/wallet/types'
 import { LiveData } from '../../helpers/rx/liveData'
 import { AssetsWithAmount1e8, AssetWithAmount1e8 } from '../../types/asgardex'
@@ -225,14 +223,6 @@ export type LiquidityProviderHasAsymAssetsRD = RD.RemoteData<Error, LiquidityPro
 
 export type LiquidityProviderAssetMismatch = O.Option<{ runeAddress: Address; assetAddress: Address }>
 export type LiquidityProviderAssetMismatchRD = RD.RemoteData<Error, LiquidityProviderAssetMismatch>
-
-export const LiquidityProviderIO = t.type({
-  asset: assetIO,
-  rune_address: optionFromNullable(t.string),
-  asset_address: optionFromNullable(t.string),
-  pending_rune: t.string,
-  pending_asset: t.string
-})
 
 export type SaverProvider = {
   address: Address
