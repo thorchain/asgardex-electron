@@ -9,7 +9,6 @@ const bonds: BondsMessages = {
   'bonds.status.standby': 'В ожидании',
   'bonds.status.disabled': 'Отключен',
   'bonds.status.whitelisted': 'В белом списке',
-  'bonds.status.unknown': 'Неизвестен',
   'bonds.nodes.error': 'Ошибка во время загрузки данных узла',
   'bonds.node.add': 'Добавить узел',
   'bonds.node.enterMessage': 'Введите узел для отслеживания',

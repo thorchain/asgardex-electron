@@ -13,12 +13,15 @@ import { useLocation, useNavigate, useParams } from 'react-router-dom'
 import * as RxOp from 'rxjs/operators'
 
 import { Network } from '../../../shared/api/types'
+import { isLedgerWallet, isWalletType } from '../../../shared/utils/guard'
+import { WalletType } from '../../../shared/wallet/types'
 import { ErrorView } from '../../components/shared/error/'
 import { Swap } from '../../components/swap'
 import { SLIP_TOLERANCE_KEY } from '../../components/swap/SelectableSlipTolerance'
 import * as Utils from '../../components/swap/Swap.utils'
 import { BackLinkButton } from '../../components/uielements/button'
 import { Button, RefreshButton } from '../../components/uielements/button'
+import { DEFAULT_WALLET_TYPE } from '../../const'
 import { useAppContext } from '../../contexts/AppContext'
 import { useChainContext } from '../../contexts/ChainContext'
 import { useEthereumContext } from '../../contexts/EthereumContext'
@@ -29,13 +32,14 @@ import { assetInList, getAssetFromNullableString } from '../../helpers/assetHelp
 import { eqChain, eqNetwork } from '../../helpers/fp/eq'
 import { sequenceTOption, sequenceTRD } from '../../helpers/fpHelpers'
 import { RUNE_PRICE_POOL } from '../../helpers/poolHelper'
-import { addressFromOptionalWalletAddress } from '../../helpers/walletHelper'
+import { addressFromOptionalWalletAddress, getWalletAddressFromNullableString } from '../../helpers/walletHelper'
 import { useMimirHalt } from '../../hooks/useMimirHalt'
 import { useNetwork } from '../../hooks/useNetwork'
 import { useOpenAddressUrl } from '../../hooks/useOpenAddressUrl'
 import { useOpenExplorerTxUrl } from '../../hooks/useOpenExplorerTxUrl'
 import { useValidateAddress } from '../../hooks/useValidateAddress'
-import { SwapRouteParams } from '../../routes/pools/swap'
+import { swap } from '../../routes/pools'
+import { SwapRouteTargetWalletType, swapToCustom, SwapToCustomRouteParams } from '../../routes/pools/swap'
 import * as walletRoutes from '../../routes/wallet'
 import { AssetWithDecimalLD, AssetWithDecimalRD } from '../../services/chain/types'
 import { DEFAULT_SLIP_TOLERANCE } from '../../services/const'
@@ -50,9 +54,21 @@ const eqUpdateLedgerAddress = Eq.struct<UpdateLedgerAddress>({
   network: eqNetwork
 })
 
-type Props = { sourceAsset: Asset; targetAsset: Asset }
+type Props = {
+  sourceAsset: Asset
+  targetAsset: Asset
+  sourceWalletType: WalletType
+  targetWalletType: O.Option<WalletType>
+  targetAddress: O.Option<Address>
+}
 
-const SuccessRouteView: React.FC<Props> = ({ sourceAsset, targetAsset }): JSX.Element => {
+const SuccessRouteView: React.FC<Props> = ({
+  sourceAsset,
+  targetAsset,
+  sourceWalletType,
+  targetWalletType: oTargetWalletType,
+  targetAddress: oRouteTargetAddress
+}): JSX.Element => {
   const { chain: sourceChain } = sourceAsset
   const { chain: targetChain } = targetAsset
 
@@ -211,8 +227,40 @@ const SuccessRouteView: React.FC<Props> = ({ sourceAsset, targetAsset }): JSX.El
 
   const slipTolerance = useObservableState<SlipTolerance>(slipTolerance$, getStoredSlipTolerance())
 
-  const onChangePath = useCallback(
-    (path: string) => {
+  const onChangeAssetHandler = useCallback(
+    ({
+      source,
+      sourceWalletType,
+      target,
+      targetWalletType: oTargetWalletType,
+      targetWalletAddress: oTargetWalletAddress
+    }: {
+      source: Asset
+      target: Asset
+      sourceWalletType: WalletType
+      targetWalletType: O.Option<WalletType>
+      targetWalletAddress: O.Option<Address>
+    }) => {
+      const targetWalletType = FP.pipe(
+        oTargetWalletType,
+        O.getOrElse<SwapRouteTargetWalletType>(() => 'unknown')
+      )
+      const targetWalletAddress = FP.pipe(oTargetWalletAddress, O.toUndefined)
+      const path = targetWalletAddress
+        ? swapToCustom.path({
+            source: assetToString(source),
+            sourceWalletType,
+            target: assetToString(target),
+            targetWalletType,
+            targetWalletAddress
+          })
+        : swap.path({
+            source: assetToString(source),
+            sourceWalletType,
+            target: assetToString(target),
+            targetWalletType
+          })
+      console.log('onChangeAssetHandler path:', path)
       navigate(path, { replace: true })
     },
     [navigate]
@@ -264,6 +312,19 @@ const SuccessRouteView: React.FC<Props> = ({ sourceAsset, targetAsset }): JSX.El
     updateSourceLedgerAddress$({ chain: sourceChain, network })
   }, [network, sourceChain, updateSourceLedgerAddress$])
 
+  const isTargetLedger = FP.pipe(
+    oTargetWalletType,
+    O.map(isLedgerWallet),
+    O.getOrElse(() => false)
+  )
+
+  const oTargetAddress: O.Option<Address> = FP.pipe(
+    oRouteTargetAddress,
+    O.fromPredicate(O.isSome),
+    O.flatten,
+    O.alt(() => (isTargetLedger ? oTargetLedgerAddress : oTargetKeystoreAddress))
+  )
+
   const { validateSwapAddress } = useValidateAddress(targetAssetChain)
   const openAddressUrl = useOpenAddressUrl(targetAssetChain)
 
@@ -283,7 +344,7 @@ const SuccessRouteView: React.FC<Props> = ({ sourceAsset, targetAsset }): JSX.El
           RD.fold(
             () => <></>,
             () => (
-              <div className="h-min-full flex items-center justify-center">
+              <div className="flex min-h-[450px] w-full items-center justify-center">
                 <Spin size="large" />
               </div>
             ),
@@ -326,6 +387,8 @@ const SuccessRouteView: React.FC<Props> = ({ sourceAsset, targetAsset }): JSX.El
                   }}
                   sourceWalletAddress={oSourceKeystoreAddress}
                   sourceLedgerAddress={oSourceLedgerAddress}
+                  sourceWalletType={sourceWalletType}
+                  targetWalletType={oTargetWalletType}
                   poolAddress={selectedPoolAddress}
                   poolAssets={poolAssets}
                   poolsData={poolsData}
@@ -338,9 +401,10 @@ const SuccessRouteView: React.FC<Props> = ({ sourceAsset, targetAsset }): JSX.El
                   approveFee$={approveFee$}
                   targetWalletAddress={oTargetKeystoreAddress}
                   targetLedgerAddress={oTargetLedgerAddress}
+                  targetAddress={oTargetAddress}
                   swap$={swap$}
                   reloadBalances={reloadBalances}
-                  onChangePath={onChangePath}
+                  onChangeAsset={onChangeAssetHandler}
                   network={network}
                   slipTolerance={slipTolerance}
                   changeSlipTolerance={changeSlipTolerance}
@@ -360,9 +424,21 @@ const SuccessRouteView: React.FC<Props> = ({ sourceAsset, targetAsset }): JSX.El
 }
 
 export const SwapView: React.FC = (): JSX.Element => {
-  const { source, target } = useParams<SwapRouteParams>()
+  const {
+    source,
+    target,
+    sourceWalletType: routeSourceWalletType,
+    targetWalletType: routeTargetWalletType,
+    targetWalletAddress
+  } = useParams<SwapToCustomRouteParams>()
   const oSourceAsset: O.Option<Asset> = useMemo(() => getAssetFromNullableString(source), [source])
   const oTargetAsset: O.Option<Asset> = useMemo(() => getAssetFromNullableString(target), [target])
+  const oTargetAddress: O.Option<Address> = useMemo(
+    () => getWalletAddressFromNullableString(targetWalletAddress),
+    [targetWalletAddress]
+  )
+  const sourceWalletType = routeSourceWalletType || DEFAULT_WALLET_TYPE
+  const oTargetWalletType = FP.pipe(routeTargetWalletType, O.fromPredicate(isWalletType))
 
   const intl = useIntl()
 
@@ -374,12 +450,20 @@ export const SwapView: React.FC = (): JSX.Element => {
           title={intl.formatMessage(
             { id: 'routes.invalid.params' },
             {
-              params: `source: ${source}, target: ${target} `
+              params: `source: ${source}, target: ${target}`
             }
           )}
         />
       ),
-      ([sourceAsset, targetAsset]) => <SuccessRouteView sourceAsset={sourceAsset} targetAsset={targetAsset} />
+      ([sourceAsset, targetAsset]) => (
+        <SuccessRouteView
+          sourceAsset={sourceAsset}
+          targetAsset={targetAsset}
+          sourceWalletType={sourceWalletType}
+          targetWalletType={oTargetWalletType}
+          targetAddress={oTargetAddress}
+        />
+      )
     )
   )
 }

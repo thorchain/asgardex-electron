@@ -136,6 +136,7 @@ export type CommonMessageKey =
   | 'common.legacy'
   | 'common.ledgerlive'
   | 'common.metamask'
+  | 'common.unknown'
 
 export type CommonMessages = {
   [key in CommonMessageKey]: string
@@ -289,7 +290,6 @@ type BondsMessageKey =
   | 'bonds.status.standby'
   | 'bonds.status.disabled'
   | 'bonds.status.whitelisted'
-  | 'bonds.status.unknown'
   | 'bonds.node.add'
   | 'bonds.nodes.error'
   | 'bonds.node.enterMessage'

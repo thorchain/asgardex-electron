@@ -9,7 +9,6 @@ const bonds: BondsMessages = {
   'bonds.status.standby': 'einsatzbereit',
   'bonds.status.disabled': 'deaktiviert',
   'bonds.status.whitelisted': 'Whitelisted',
-  'bonds.status.unknown': 'Unbekannt',
   'bonds.nodes.error': 'Error beim Laden der Node-Daten',
   'bonds.node.add': 'Node hinzufügen',
   'bonds.node.enterMessage': 'Node Addresse eingeben',

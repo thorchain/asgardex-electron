@@ -60,7 +60,7 @@ export const Status: React.FC<{ data: NodeInfo }> = ({ data }) => {
         return 'bonds.status.whitelisted'
       }
       default: {
-        return 'bonds.status.unknown'
+        return 'common.unknown'
       }
     }
   }

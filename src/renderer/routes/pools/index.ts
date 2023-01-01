@@ -9,5 +9,5 @@ export const pending = baseRoutes.pending
 export const active = baseRoutes.active
 export const deposit = depositRoutes.deposit
 export const savers = saversRoutes.base
-export const swap = swapRoutes.swap
+export const { swap, swapToCustom } = swapRoutes
 export const detail = poolDetailRoutes.poolDetail

@@ -61,16 +61,57 @@ describe('Pools routes', () => {
 
   describe('Swap routes', () => {
     it('template', () => {
-      expect(swap.template).toEqual('/pools/swap/:source|:target')
+      expect(swap.template).toEqual('/pools/swap/:source|:sourceWalletType|:target|:targetWalletType')
     })
-    it('returns path by given source/target parameters', () => {
-      expect(swap.path({ source: 'BNB.BNB', target: 'THOR.RUNE' })).toEqual('/pools/swap/bnb.bnb|thor.rune')
+    it('source keystore / target keystore', () => {
+      expect(
+        swap.path({
+          source: 'BNB.BNB',
+          sourceWalletType: 'keystore',
+          target: 'THOR.RUNE',
+          targetWalletType: 'keystore'
+        })
+      ).toEqual('/pools/swap/bnb.bnb|keystore|thor.rune|keystore')
     })
-    it('redirects to base path if source is empty', () => {
-      expect(swap.path({ source: '', target: 'THOR.RUNE' })).toEqual('/pools/swap')
+    it('source ledger / target keystore', () => {
+      expect(
+        swap.path({
+          source: 'BNB.BNB',
+          sourceWalletType: 'ledger',
+          target: 'THOR.RUNE',
+          targetWalletType: 'keystore'
+        })
+      ).toEqual('/pools/swap/bnb.bnb|ledger|thor.rune|keystore')
     })
-    it('redirects to base path if target is empty', () => {
-      expect(swap.path({ source: 'BNB.BNB', target: '' })).toEqual('/pools/swap')
+    it('source keystore / target ledger', () => {
+      expect(
+        swap.path({
+          source: 'BNB.BNB',
+          sourceWalletType: 'keystore',
+          target: 'THOR.RUNE',
+          targetWalletType: 'ledger'
+        })
+      ).toEqual('/pools/swap/bnb.bnb|keystore|thor.rune|ledger')
+    })
+    it('source ledger / target ledger', () => {
+      expect(
+        swap.path({
+          source: 'BTC.BTC',
+          sourceWalletType: 'ledger',
+          target: 'ETH.ETH',
+          targetWalletType: 'ledger'
+        })
+      ).toEqual('/pools/swap/btc.btc|ledger|eth.eth|ledger')
+    })
+    it('redirects if source is empty', () => {
+      expect(
+        swap.path({ source: '', target: 'THOR.RUNE', sourceWalletType: 'keystore', targetWalletType: 'keystore' })
+      ).toEqual('/pools/swap')
+    })
+    it('redirects if target is empty', () => {
+      expect(
+        swap.path({ source: 'BNB.BNB', target: '', sourceWalletType: 'keystore', targetWalletType: 'keystore' })
+      ).toEqual('/pools/swap')
     })
   })
 

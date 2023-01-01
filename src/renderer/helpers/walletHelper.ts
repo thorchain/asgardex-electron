@@ -4,6 +4,7 @@ import { Chain } from '@xchainjs/xchain-util'
 import * as A from 'fp-ts/Array'
 import * as FP from 'fp-ts/function'
 import * as O from 'fp-ts/Option'
+import { IntlShape } from 'react-intl'
 
 import { Network } from '../../shared/api/types'
 import { optionFromNullableString } from '../../shared/utils/fp'
@@ -180,3 +181,21 @@ export const getWalletNamesFromKeystoreWallets = (wallets: Array<Required<{ name
     wallets,
     A.map(({ name }) => name)
   )
+
+export const getWalletTypeLabel = (oWalletType: O.Option<WalletType>, intl: IntlShape) => {
+  const id = FP.pipe(
+    oWalletType,
+    O.map((walletType) => {
+      switch (walletType) {
+        case 'keystore':
+          return 'common.keystore'
+        case 'ledger':
+          return 'common.ledger'
+        default:
+          return 'common.unknown'
+      }
+    }),
+    O.getOrElse(() => 'common.unknown')
+  )
+  return intl.formatMessage({ id })
+}

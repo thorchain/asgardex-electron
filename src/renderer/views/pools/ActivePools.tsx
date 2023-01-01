@@ -100,7 +100,14 @@ export const ActivePools: React.FC<PoolsComponentProps> = ({ haltedChains, mimir
           label: intl.formatMessage({ id: 'common.swap' }),
           disabled: disableAllPoolActions || disableTradingActions,
           callback: () => {
-            navigate(poolsRoutes.swap.path({ source: assetToString(AssetRuneNative), target: assetToString(asset) }))
+            navigate(
+              poolsRoutes.swap.path({
+                source: assetToString(AssetRuneNative),
+                target: assetToString(asset),
+                sourceWalletType: DEFAULT_WALLET_TYPE,
+                targetWalletType: DEFAULT_WALLET_TYPE
+              })
+            )
           }
         },
         {

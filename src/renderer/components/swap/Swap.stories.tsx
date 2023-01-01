@@ -107,7 +107,11 @@ const defaultProps: SwapProps = {
   sourceLedgerAddress: O.some('source-ledger-address'),
   targetWalletAddress: O.some('target-wallet-address'),
   targetLedgerAddress: O.some('target-ledger-address'),
-  onChangePath: (path) => console.log('change path', path),
+  targetAddress: O.some('target-address'),
+  sourceWalletType: 'ledger',
+  targetWalletType: O.some('keystore'),
+  onChangeAsset: ({ source, target, sourceWalletType, targetWalletType }) =>
+    console.log('change asset', assetToString(source), sourceWalletType, assetToString(target), targetWalletType),
   network: 'testnet',
   slipTolerance: 5,
   changeSlipTolerance: () => console.log('changeSlipTolerance'),
