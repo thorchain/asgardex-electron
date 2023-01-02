@@ -68,7 +68,7 @@
     "@ant-design/icons": "^4.7.0",
     "@binance-chain/javascript-sdk": "^4.2.0",
     "@cosmjs/stargate": "^0.28.10",
-    "@cosmos-client/core": "^0.46.1",
+    "@cosmos-client/core": "https://github.com/veado/cosmos-client-ts.git#patch/v0.45.13",
     "@craco/craco": "^7.0.0",
     "@devexperts/remote-data-ts": "^2.1.1",
     "@devexperts/rx-utils": "^1.0.0-alpha.14",
