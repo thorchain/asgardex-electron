@@ -8,7 +8,6 @@ import * as A from 'fp-ts/lib/Array'
 import * as O from 'fp-ts/Option'
 import { useObservableState } from 'observable-hooks'
 import { useIntl } from 'react-intl'
-import { useLocation } from 'react-router'
 
 import { DEFAULT_LOCALE } from '../../../shared/i18n/const'
 import { envOrDefault } from '../../../shared/utils/env'
@@ -43,8 +42,6 @@ export const AppView: React.FC = (): JSX.Element => {
   const currentLocale = useObservableState(locale$, DEFAULT_LOCALE)
 
   const { isLight } = useTheme()
-
-  const location = useLocation()
 
   // locale
   useEffect(() => {
@@ -317,9 +314,7 @@ export const AppView: React.FC = (): JSX.Element => {
     <Styled.AppWrapper>
       <Styled.AppLayout>
         <AppUpdateView />
-        <div className="p-2">{location.pathname}</div>
         <Header />
-
         <View>
           {renderMidgardError}
           {renderImportKeystoreWalletsError}
