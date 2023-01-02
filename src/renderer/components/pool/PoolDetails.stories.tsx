@@ -42,10 +42,7 @@ const meta: ComponentMeta<typeof Component> = {
     watched: true,
     priceRatio: ONE_BN,
     HistoryView: () => <>Actions History Here</>,
-    ChartView: () => <>Pool Chart Here</>,
-    disableTradingPoolAction: false,
-    disableAllPoolActions: false,
-    disablePoolActions: false
+    ChartView: () => <>Pool Chart Here</>
   }
 }
 

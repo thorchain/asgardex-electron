@@ -22,10 +22,6 @@ export type Props = {
   watch: FP.Lazy<void>
   unwatch: FP.Lazy<void>
   price: RD.RemoteData<Error, { amount: AssetAmount; symbol: string }>
-  disableTradingPoolAction: boolean
-  disableAllPoolActions: boolean
-  disablePoolActions: boolean
-  walletLocked: boolean
   network: Network
   isAvailablePool: boolean
 }
@@ -36,10 +32,6 @@ export const PoolTitle: React.FC<Props> = ({
   watch,
   unwatch,
   price: priceRD,
-  disableTradingPoolAction,
-  disableAllPoolActions,
-  disablePoolActions,
-  walletLocked,
   network,
   isAvailablePool
 }) => {
@@ -79,7 +71,7 @@ export const PoolTitle: React.FC<Props> = ({
     const actions: ActionButtonAction[] = [
       {
         label: intl.formatMessage({ id: 'common.swap' }),
-        disabled: !isAvailablePool || disableAllPoolActions || disableTradingPoolAction,
+        disabled: !isAvailablePool,
         callback: () => {
           navigate(
             poolsRoutes.swap.path({
@@ -93,7 +85,6 @@ export const PoolTitle: React.FC<Props> = ({
       },
       {
         label: intl.formatMessage({ id: 'common.manage' }),
-        disabled: disableAllPoolActions || disablePoolActions || walletLocked,
         callback: () => {
           navigate(
             poolsRoutes.deposit.path({
@@ -115,17 +106,7 @@ export const PoolTitle: React.FC<Props> = ({
     ]
 
     return <ActionButton size={isDesktopView ? 'large' : 'normal'} actions={actions} />
-  }, [
-    intl,
-    isAvailablePool,
-    disableAllPoolActions,
-    disableTradingPoolAction,
-    disablePoolActions,
-    walletLocked,
-    isDesktopView,
-    navigate,
-    asset
-  ])
+  }, [intl, isAvailablePool, isDesktopView, navigate, asset])
 
   return (
     <Styled.Container>

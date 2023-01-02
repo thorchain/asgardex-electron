@@ -1,14 +1,12 @@
 import React, { useCallback, useEffect, useMemo, useRef } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
-import { Chain } from '@xchainjs/xchain-util'
 import * as FP from 'fp-ts/function'
 import * as A from 'fp-ts/lib/Array'
 import * as O from 'fp-ts/Option'
 import { useObservableState } from 'observable-hooks'
 import { useIntl } from 'react-intl'
 import { useParams } from 'react-router-dom'
-import * as RxOp from 'rxjs/operators'
 
 import { PoolDetails, Props as PoolDetailProps } from '../../components/pool/PoolDetails'
 import { ErrorView } from '../../components/shared/error'
@@ -18,10 +16,7 @@ import { useAppContext } from '../../contexts/AppContext'
 import { useMidgardContext } from '../../contexts/MidgardContext'
 import { getAssetFromNullableString } from '../../helpers/assetHelper'
 import { eqAsset } from '../../helpers/fp/eq'
-import * as PoolHelpers from '../../helpers/poolHelper'
-import { useKeystoreState } from '../../hooks/useKeystoreState'
 import { useMidgardHistoryActions } from '../../hooks/useMidgardHistoryActions'
-import { useMimirHalt } from '../../hooks/useMimirHalt'
 import { usePoolWatchlist } from '../../hooks/usePoolWatchlist'
 import { PoolDetailRouteParams } from '../../routes/pools/detail'
 import { DEFAULT_NETWORK } from '../../services/const'
@@ -50,10 +45,6 @@ const defaultDetailsProps: TargetPoolDetailProps = {
   poolStatsDetail: RD.initial,
   priceSymbol: '',
   network: DEFAULT_NETWORK,
-  disableAllPoolActions: false,
-  disableTradingPoolAction: false,
-  disablePoolActions: false,
-  walletLocked: false,
   poolsPeriod: DEFAULT_GET_POOLS_PERIOD
 }
 
@@ -69,7 +60,6 @@ export const PoolDetailsView: React.FC = () => {
         poolStatsDetail$,
         reloadPoolStatsDetail,
         reloadSelectedPoolDetail,
-        haltedChains$,
         poolsPeriod$,
         setPoolsPeriod
       },
@@ -81,29 +71,11 @@ export const PoolDetailsView: React.FC = () => {
 
   const intl = useIntl()
 
-  const { locked: walletLocked } = useKeystoreState()
-
   const { asset } = useParams<PoolDetailRouteParams>()
 
   const { add: addToWatchList, remove: removeFromWatchList, list: watchedList } = usePoolWatchlist()
 
   const poolsPeriod = useObservableState(poolsPeriod$, DEFAULT_GET_POOLS_PERIOD)
-
-  const [haltedChains] = useObservableState(() => FP.pipe(haltedChains$, RxOp.map(RD.getOrElse((): Chain[] => []))), [])
-  const { mimirHalt } = useMimirHalt()
-
-  const getDisableAllPoolActions = useCallback(
-    (chain: Chain) => PoolHelpers.disableAllActions({ chain, haltedChains, mimirHalt }),
-    [haltedChains, mimirHalt]
-  )
-  const getDisableTradingPoolAction = useCallback(
-    (chain: Chain) => PoolHelpers.disableTradingActions({ chain, haltedChains, mimirHalt }),
-    [haltedChains, mimirHalt]
-  )
-  const getDisablePoolActions = useCallback(
-    (chain: Chain) => PoolHelpers.disablePoolActions({ chain, haltedChains, mimirHalt }),
-    [haltedChains, mimirHalt]
-  )
 
   const oRouteAsset = useMemo(() => getAssetFromNullableString(asset), [asset])
 
@@ -166,10 +138,6 @@ export const PoolDetailsView: React.FC = () => {
               priceSymbol,
               HistoryView: PoolHistoryView,
               ChartView: PoolChartView,
-              disableAllPoolActions: getDisableAllPoolActions(asset.chain),
-              disableTradingPoolAction: getDisableTradingPoolAction(asset.chain),
-              disablePoolActions: getDisablePoolActions(asset.chain),
-              walletLocked,
               poolsPeriod
             }
 

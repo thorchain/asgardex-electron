@@ -40,12 +40,12 @@ import * as poolsRoutes from '../../routes/pools'
 import { DEFAULT_NETWORK } from '../../services/const'
 import { PoolsState, DEFAULT_POOL_FILTERS } from '../../services/midgard/types'
 import { GetPoolsPeriodEnum } from '../../types/generated/midgard'
-import { PoolsComponentProps, PoolTableRowData, PoolTableRowsData } from './Pools.types'
+import { PoolTableRowData, PoolTableRowsData } from './Pools.types'
 import { filterTableData } from './Pools.utils'
 import * as Shared from './PoolsOverview.shared'
 import * as Styled from './PoolsOverview.styles'
 
-export const ActivePools: React.FC<PoolsComponentProps> = ({ haltedChains, mimirHalt, walletLocked }): JSX.Element => {
+export const ActivePools: React.FC = (): JSX.Element => {
   const navigate = useNavigate()
   const intl = useIntl()
 
@@ -82,23 +82,9 @@ export const ActivePools: React.FC<PoolsComponentProps> = ({ haltedChains, mimir
 
   const renderBtnPoolsColumn = useCallback(
     (_: string, { asset }: { asset: Asset }) => {
-      const chain = asset.chain
-      const disableAllPoolActions = PoolHelpers.disableAllActions({ chain, haltedChains, mimirHalt })
-      const disableTradingActions = PoolHelpers.disableTradingActions({
-        chain,
-        haltedChains,
-        mimirHalt
-      })
-      const disablePoolActions = PoolHelpers.disablePoolActions({
-        chain,
-        haltedChains,
-        mimirHalt
-      })
-
       const actions: ActionButtonAction[] = [
         {
           label: intl.formatMessage({ id: 'common.swap' }),
-          disabled: disableAllPoolActions || disableTradingActions,
           callback: () => {
             navigate(
               poolsRoutes.swap.path({
@@ -112,7 +98,6 @@ export const ActivePools: React.FC<PoolsComponentProps> = ({ haltedChains, mimir
         },
         {
           label: intl.formatMessage({ id: 'common.manage' }),
-          disabled: disableAllPoolActions || disablePoolActions || walletLocked,
           callback: () => {
             navigate(
               poolsRoutes.deposit.path({
@@ -140,7 +125,7 @@ export const ActivePools: React.FC<PoolsComponentProps> = ({ haltedChains, mimir
       )
     },
 
-    [haltedChains, mimirHalt, intl, walletLocked, navigate]
+    [intl, navigate]
   )
 
   const btnPoolsColumn = useCallback(
