@@ -20,6 +20,7 @@ import { useThorchainContext } from '../../../contexts/ThorchainContext'
 import { useWalletContext } from '../../../contexts/WalletContext'
 import { hasLedgerAddress } from '../../../helpers/addressHelper'
 import { sequenceTRD } from '../../../helpers/fpHelpers'
+import * as PoolHelpers from '../../../helpers/poolHelper'
 import { RUNE_PRICE_POOL } from '../../../helpers/poolHelper'
 import { useLedgerAddresses } from '../../../hooks/useLedgerAddresses'
 import { useLiquidityProviders } from '../../../hooks/useLiquidityProviders'
@@ -177,8 +178,7 @@ export const SymDepositView: React.FC<Props> = (props) => {
           <Alert type="error" message={intl.formatMessage({ id: 'common.error' })} description={error.toString()} />
         )}
         <SymDeposit
-          haltedChains={haltedChains}
-          mimirHalt={mimirHalt}
+          disableDepositAction
           validatePassword$={validatePassword$}
           openRuneExplorerTxUrl={openRuneExplorerTxUrl}
           openAssetExplorerTxUrl={openAssetExplorerTxUrl}
@@ -218,8 +218,6 @@ export const SymDepositView: React.FC<Props> = (props) => {
     ),
     [
       intl,
-      haltedChains,
-      mimirHalt,
       validatePassword$,
       openRuneExplorerTxUrl,
       openAssetExplorerTxUrl,
@@ -255,11 +253,15 @@ export const SymDepositView: React.FC<Props> = (props) => {
         // Since RUNE is not part of pool assets, add it to the list of available assets
         const availableAssets = [AssetRuneNative, ...poolAssets]
 
+        const disableDepositAction =
+          PoolHelpers.disableAllActions({ chain: asset.chain, haltedChains, mimirHalt }) ||
+          PoolHelpers.disableTradingActions({ chain: asset.chain, haltedChains, mimirHalt }) ||
+          PoolHelpers.disablePoolActions({ chain: asset.chain, haltedChains, mimirHalt })
+
         return (
           <>
             <SymDeposit
-              haltedChains={haltedChains}
-              mimirHalt={mimirHalt}
+              disableDepositAction={disableDepositAction}
               validatePassword$={validatePassword$}
               openRuneExplorerTxUrl={openRuneExplorerTxUrl}
               openAssetExplorerTxUrl={openAssetExplorerTxUrl}
