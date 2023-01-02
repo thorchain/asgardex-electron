@@ -31,10 +31,6 @@ export type Props = {
     historyActions: PoolHistoryActions
   }>
   ChartView: React.ComponentType<{ priceRatio: BigNumber }>
-  disableTradingPoolAction: boolean
-  disableAllPoolActions: boolean
-  disablePoolActions: boolean
-  walletLocked: boolean
   network: Network
   poolsPeriod: GetPoolsPeriodEnum
   setPoolsPeriod: (v: GetPoolsPeriodEnum) => void
@@ -54,10 +50,6 @@ export const PoolDetails: React.FC<Props> = ({
   reloadPoolStatsDetail,
   HistoryView,
   ChartView,
-  disableTradingPoolAction,
-  disableAllPoolActions,
-  disablePoolActions,
-  walletLocked,
   network,
   poolsPeriod,
   setPoolsPeriod
@@ -80,10 +72,6 @@ export const PoolDetails: React.FC<Props> = ({
     return (
       <PoolTitle
         network={network}
-        disableAllPoolActions={disableAllPoolActions}
-        disableTradingPoolAction={disableTradingPoolAction}
-        disablePoolActions={disablePoolActions}
-        walletLocked={walletLocked}
         asset={asset}
         watched={watched}
         watch={watch}
@@ -92,20 +80,7 @@ export const PoolDetails: React.FC<Props> = ({
         isAvailablePool={isAvailablePool}
       />
     )
-  }, [
-    asset,
-    disableAllPoolActions,
-    disablePoolActions,
-    disableTradingPoolAction,
-    network,
-    poolDetailRD,
-    priceRatio,
-    priceSymbol,
-    unwatch,
-    walletLocked,
-    watch,
-    watched
-  ])
+  }, [asset, network, poolDetailRD, priceRatio, priceSymbol, unwatch, watch, watched])
 
   const reloadPoolCardsData = useCallback(() => {
     reloadPoolStatsDetail()

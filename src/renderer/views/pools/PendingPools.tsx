@@ -19,7 +19,6 @@ import { Table } from '../../components/uielements/table'
 import { useAppContext } from '../../contexts/AppContext'
 import { useMidgardContext } from '../../contexts/MidgardContext'
 import { useThorchainContext } from '../../contexts/ThorchainContext'
-import * as PoolHelpers from '../../helpers/poolHelper'
 import { getPoolTableRowsData, RUNE_PRICE_POOL } from '../../helpers/poolHelper'
 import { useIncentivePendulum } from '../../hooks/useIncentivePendulum'
 import { usePoolCycle } from '../../hooks/usePoolCycle'
@@ -31,14 +30,14 @@ import { DEFAULT_NETWORK } from '../../services/const'
 import { PendingPoolsState, DEFAULT_POOL_FILTERS } from '../../services/midgard/types'
 import { ThorchainLastblockRD } from '../../services/thorchain/types'
 import { PoolDetail } from '../../types/generated/midgard'
-import { PoolsComponentProps, PoolTableRowData, PoolTableRowsData } from './Pools.types'
+import { PoolTableRowData, PoolTableRowsData } from './Pools.types'
 import { getBlocksLeftForPendingPoolAsString, isEmptyPool } from './Pools.utils'
 import { filterTableData } from './Pools.utils'
 import * as Shared from './PoolsOverview.shared'
 import { TableAction, BlockLeftLabel } from './PoolsOverview.styles'
 import * as Styled from './PoolsOverview.styles'
 
-export const PendingPools: React.FC<PoolsComponentProps> = ({ haltedChains, mimirHalt, walletLocked }): JSX.Element => {
+export const PendingPools: React.FC = (): JSX.Element => {
   const navigate = useNavigate()
   const intl = useIntl()
 
@@ -81,21 +80,13 @@ export const PendingPools: React.FC<PoolsComponentProps> = ({ haltedChains, mimi
 
   const renderBtnPoolsColumn = useCallback(
     (_: string, { asset }: PoolTableRowData) => {
-      const disablePool =
-        PoolHelpers.disableAllActions({ chain: asset.chain, haltedChains, mimirHalt }) ||
-        PoolHelpers.disablePoolActions({ chain: asset.chain, haltedChains, mimirHalt })
       return (
         <TableAction>
-          <ManageButton
-            className="min-w-[120px]"
-            asset={asset}
-            isTextView={isDesktopView}
-            disabled={disablePool || walletLocked}
-          />
+          <ManageButton className="min-w-[120px]" asset={asset} isTextView={isDesktopView} />
         </TableAction>
       )
     },
-    [haltedChains, isDesktopView, mimirHalt, walletLocked]
+    [isDesktopView]
   )
 
   const btnPendingPoolsColumn: ColumnType<PoolTableRowData> = useMemo(

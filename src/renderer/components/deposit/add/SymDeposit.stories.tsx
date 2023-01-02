@@ -24,7 +24,6 @@ import { RUNE_PRICE_POOL } from '../../../helpers/poolHelper'
 import { mockWalletBalance } from '../../../helpers/test/testWalletHelper'
 import { INITIAL_SYM_DEPOSIT_STATE } from '../../../services/chain/const'
 import { SymDepositState } from '../../../services/chain/types'
-import { DEFAULT_MIMIR_HALT } from '../../../services/thorchain/const'
 import { WalletBalance } from '../../../services/wallet/types'
 import { SymDeposit, Props as SymDepositProps } from './SymDeposit'
 
@@ -51,10 +50,9 @@ const balanceTOMO: WalletBalance = mockWalletBalance({
 })
 
 const defaultProps: SymDepositProps = {
-  haltedChains: [],
+  disableDepositAction: false,
   availableAssets: [AssetRuneNative, AssetBNB, AssetBTC],
   walletBalances: { balances: O.some([balanceRune, balanceBNB, balanceBTC, balanceTOMO]), loading: false },
-  mimirHalt: DEFAULT_MIMIR_HALT,
   asset: { asset: AssetBNB, decimal: BNB_DECIMAL },
   poolDetails: [],
   pricePool: RUNE_PRICE_POOL,

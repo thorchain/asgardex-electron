@@ -1,9 +1,8 @@
 import { PoolData } from '@thorchain/asgardex-util'
-import { BaseAmount, Asset, Chain } from '@xchainjs/xchain-util'
+import { BaseAmount, Asset } from '@xchainjs/xchain-util'
 import { NonEmptyArray } from 'fp-ts/lib/NonEmptyArray'
 
 import { Network } from '../../../shared/api/types'
-import { MimirHalt } from '../../services/thorchain/types'
 import { GetPoolsStatusEnum } from '../../types/generated/midgard'
 
 // List of assets used for pricing
@@ -35,9 +34,4 @@ export type PoolTableRowData = {
   watched: boolean
 }
 
-export type PoolsComponentProps = {
-  haltedChains: Chain[]
-  mimirHalt: MimirHalt
-  walletLocked: boolean
-}
 export type PoolTableRowsData = PoolTableRowData[]

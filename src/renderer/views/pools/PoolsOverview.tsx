@@ -68,12 +68,12 @@ export const PoolsOverview: React.FC = (): JSX.Element => {
       {
         index: TAB_INDEX['active'],
         label: intl.formatMessage({ id: 'pools.available' }),
-        content: <ActivePools haltedChains={haltedChains} mimirHalt={mimirHalt} walletLocked={walletLocked} />
+        content: <ActivePools />
       },
       {
         index: TAB_INDEX['pending'],
         label: intl.formatMessage({ id: 'pools.pending' }),
-        content: <PendingPools haltedChains={haltedChains} mimirHalt={mimirHalt} walletLocked={walletLocked} />
+        content: <PendingPools />
       },
       {
         index: TAB_INDEX['savers'],

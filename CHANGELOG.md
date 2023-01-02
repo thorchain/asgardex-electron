@@ -14,6 +14,7 @@
 - [Deposit] Wallet types based on routes [#2506](https://github.com/thorchain/asgardex-electron/pull/2506)
 - [SWAP] Persistant wallet state while reloading or switching asset pair [#2511](https://github.com/thorchain/asgardex-electron/pull/2511)
 - [Wallet] Add `Swap` to `ActionButton` to jump to swap view with one click only [#2512](https://github.com/thorchain/asgardex-electron/pull/2512)
+- [Wallet] Add `Add` to `ActionButton` to jump to LP view with one click only [#2513](https://github.com/thorchain/asgardex-electron/pull/2513)
 
 ## Fix
 
@@ -22,6 +23,10 @@
 - [Swap] Fees needs to be considered for max value to swap [#2498](https://github.com/thorchain/asgardex-electron/issues/2498)
 - [SymDeposit] RUNE can be selected on asset side [#2507](https://github.com/thorchain/asgardex-electron/issues/2507)
 - [Deposit] Check of asset missmatch failed [#2509](https://github.com/thorchain/asgardex-electron/issues/2509)
+
+## Internal
+
+- Relax Mimir checks to have these on Swap / Deposit view level only [#2514](https://github.com/thorchain/asgardex-electron/pull/2514)
 
 # 1.18.5 (2022-12-20)
 

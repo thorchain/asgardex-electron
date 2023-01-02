@@ -11,7 +11,6 @@ import {
   baseAmount,
   BaseAmount,
   baseToAsset,
-  Chain,
   chainToString,
   formatAssetAmountCurrency,
   isAssetRuneNative,
@@ -77,7 +76,6 @@ import {
   LiquidityProviderAssetMismatchRD,
   LiquidityProviderHasAsymAssets,
   LiquidityProviderHasAsymAssetsRD,
-  MimirHalt,
   PendingAssets,
   PendingAssetsRD
 } from '../../../services/thorchain/types'
@@ -149,8 +147,7 @@ export type Props = {
   isApprovedERC20Token$: (params: IsApproveParams) => LiveData<ApiError, boolean>
   protocolLimitReached: boolean
   poolsData: PoolsDataMap
-  haltedChains: Chain[]
-  mimirHalt: MimirHalt
+  disableDepositAction: boolean
   symPendingAssets: PendingAssetsRD
   openRecoveryTool: FP.Lazy<void>
   hasAsymAssets: LiquidityProviderHasAsymAssetsRD
@@ -191,8 +188,7 @@ export const SymDeposit: React.FC<Props> = (props) => {
     approveFee$,
     protocolLimitReached,
     poolsData,
-    haltedChains,
-    mimirHalt,
+    disableDepositAction,
     symPendingAssets: symPendingAssetsRD,
     openRecoveryTool,
     hasAsymAssets: hasAsymAssetsRD,
@@ -303,14 +299,6 @@ export const SymDeposit: React.FC<Props> = (props) => {
         O.getOrElse(() => baseAmount(0, assetDecimal))
       ),
     [assetDecimal, oAssetWB]
-  )
-
-  const disableDepositAction = useMemo(
-    () =>
-      PoolHelpers.disableAllActions({ chain: asset.chain, haltedChains, mimirHalt }) ||
-      PoolHelpers.disableTradingActions({ chain: asset.chain, haltedChains, mimirHalt }) ||
-      PoolHelpers.disablePoolActions({ chain: asset.chain, haltedChains, mimirHalt }),
-    [asset.chain, haltedChains, mimirHalt]
   )
 
   const assetBalanceMax1e8: BaseAmount = useMemo(() => max1e8BaseAmount(assetBalance), [assetBalance])
