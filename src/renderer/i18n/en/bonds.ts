@@ -9,7 +9,6 @@ const bonds: BondsMessages = {
   'bonds.status.standby': 'Standby',
   'bonds.status.disabled': 'Disabled',
   'bonds.status.whitelisted': 'Whitelisted',
-  'bonds.status.unknown': 'Unknown',
   'bonds.nodes.error': 'Error while loading node data',
   'bonds.node.add': 'Add node',
   'bonds.node.enterMessage': 'Enter node to monitor',

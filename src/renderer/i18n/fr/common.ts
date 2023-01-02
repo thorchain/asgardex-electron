@@ -135,7 +135,8 @@ const common: CommonMessages = {
   'common.sender': 'Sender - FR',
   'common.legacy': 'Legacy - FR',
   'common.ledgerlive': 'Ledger Live',
-  'common.metamask': 'MetaMask'
+  'common.metamask': 'MetaMask',
+  'common.unknown': 'Inconnu'
 }
 
 export default common

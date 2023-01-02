@@ -81,7 +81,14 @@ export const PoolTitle: React.FC<Props> = ({
         label: intl.formatMessage({ id: 'common.swap' }),
         disabled: !isAvailablePool || disableAllPoolActions || disableTradingPoolAction,
         callback: () => {
-          navigate(poolsRoutes.swap.path({ source: assetToString(AssetRuneNative), target: assetToString(asset) }))
+          navigate(
+            poolsRoutes.swap.path({
+              source: assetToString(AssetRuneNative),
+              target: assetToString(asset),
+              sourceWalletType: DEFAULT_WALLET_TYPE,
+              targetWalletType: DEFAULT_WALLET_TYPE
+            })
+          )
         }
       },
       {

@@ -9,7 +9,6 @@ const bonds: BondsMessages = {
   'bonds.status.standby': 'En attente',
   'bonds.status.disabled': 'Désactivé',
   'bonds.status.whitelisted': 'Autorisé',
-  'bonds.status.unknown': 'Inconnu',
   'bonds.nodes.error': 'Erreur lors du chargement des données du nœud',
   'bonds.node.add': 'Ajouter un nœud',
   'bonds.node.enterMessage': 'Entrez le nœud à surveiller',
