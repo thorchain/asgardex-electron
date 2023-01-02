@@ -4,10 +4,14 @@ import * as RD from '@devexperts/remote-data-ts'
 import {
   Address,
   Asset,
+  assetFromString,
+  AssetRuneNative,
+  assetToString,
   baseAmount,
   baseToAsset,
   chainToString,
   formatAssetAmountCurrency,
+  isAssetRuneNative,
   isSynthAsset
 } from '@xchainjs/xchain-util'
 import { Col, Collapse, Grid, Row } from 'antd'
@@ -17,15 +21,18 @@ import * as A from 'fp-ts/lib/Array'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
 import { useIntl } from 'react-intl'
+import { useNavigate } from 'react-router'
 
 import { Network } from '../../../../shared/api/types'
 import { isKeystoreWallet } from '../../../../shared/utils/guard'
+import { DEFAULT_WALLET_TYPE } from '../../../const'
 import { disableRuneUpgrade, isNonNativeRuneAsset, isRuneNativeAsset, isUSDAsset } from '../../../helpers/assetHelper'
 import { getChainAsset } from '../../../helpers/chainHelper'
-import { getPoolPriceValue } from '../../../helpers/poolHelper'
+import { getDeepestPool, getPoolPriceValue } from '../../../helpers/poolHelper'
 import { noDataString } from '../../../helpers/stringHelper'
+import * as poolsRoutes from '../../../routes/pools'
 import { WalletBalancesRD } from '../../../services/clients'
-import { PoolDetails } from '../../../services/midgard/types'
+import { PoolDetails, PoolsDataMap } from '../../../services/midgard/types'
 import { MimirHaltRD } from '../../../services/thorchain/types'
 import {
   ApiError,
@@ -51,6 +58,7 @@ type Props = {
   chainBalances: ChainBalances
   pricePool: PricePool
   poolDetails: PoolDetails
+  poolsData: PoolsDataMap
   selectAssetHandler: (asset: SelectedWalletAsset) => void
   assetHandler: (asset: SelectedWalletAsset, action: AssetAction) => void
   network: Network
@@ -62,6 +70,7 @@ export const AssetsTableCollapsable: React.FC<Props> = (props): JSX.Element => {
     chainBalances = [],
     pricePool,
     poolDetails,
+    poolsData,
     selectAssetHandler,
     assetHandler,
     mimirHalt: mimirHaltRD,
@@ -69,6 +78,7 @@ export const AssetsTableCollapsable: React.FC<Props> = (props): JSX.Element => {
   } = props
 
   const intl = useIntl()
+  const navigate = useNavigate()
   const screenMap: ScreenMap = Grid.useBreakpoint()
 
   const [showQRModal, setShowQRModal] = useState<O.Option<{ asset: Asset; address: Address }>>(O.none)
@@ -161,8 +171,53 @@ export const AssetsTableCollapsable: React.FC<Props> = (props): JSX.Element => {
   const renderActionColumn = useCallback(
     ({ asset, walletAddress, walletIndex, walletType, hdMode }: WalletBalance) => {
       const walletAsset: SelectedWalletAsset = { asset, walletAddress, walletIndex, walletType, hdMode }
+      const hasActivePool: boolean = FP.pipe(O.fromNullable(poolsData[assetToString(asset)]), O.isSome)
+      const deepestPoolAsset = FP.pipe(
+        getDeepestPool(poolDetails),
+        O.chain(({ asset }) => O.fromNullable(assetFromString(asset))),
+        O.toNullable
+      )
+
       const actions: ActionButtonAction[] = FP.pipe(
-        [
+        // 'swap' for RUNE
+        isAssetRuneNative(asset) && deepestPoolAsset !== null
+          ? [
+              {
+                label: intl.formatMessage({ id: 'common.swap' }),
+                callback: () => {
+                  navigate(
+                    poolsRoutes.swap.path({
+                      source: assetToString(asset),
+                      target: assetToString(deepestPoolAsset),
+                      sourceWalletType: walletType,
+                      targetWalletType: DEFAULT_WALLET_TYPE
+                    })
+                  )
+                }
+              }
+            ]
+          : [],
+        // 'swap' for assets of active pools only
+        A.concatW<ActionButtonAction>(
+          hasActivePool
+            ? [
+                {
+                  label: intl.formatMessage({ id: 'common.swap' }),
+                  callback: () => {
+                    navigate(
+                      poolsRoutes.swap.path({
+                        source: assetToString(asset),
+                        target: assetToString(AssetRuneNative),
+                        sourceWalletType: walletType,
+                        targetWalletType: DEFAULT_WALLET_TYPE
+                      })
+                    )
+                  }
+                }
+              ]
+            : []
+        ),
+        A.concat([
           {
             label: intl.formatMessage({ id: 'wallet.action.send' }),
             callback: () => {
@@ -175,7 +230,7 @@ export const AssetsTableCollapsable: React.FC<Props> = (props): JSX.Element => {
               setShowQRModal(O.some({ asset: getChainAsset(asset.chain), address: walletAddress }))
             }
           }
-        ],
+        ]),
         // 'deposit'  for RuneNativeAsset only
         A.concatW<ActionButtonAction>(
           isRuneNativeAsset(asset)
@@ -189,7 +244,7 @@ export const AssetsTableCollapsable: React.FC<Props> = (props): JSX.Element => {
               ]
             : []
         ),
-        // 'upgrade'  for non-RuneNativeAsset only
+        // 'upgrade' for non-RuneNativeAsset only
         A.concatW<ActionButtonAction>(
           isNonNativeRuneAsset(asset, network)
             ? [
@@ -212,7 +267,7 @@ export const AssetsTableCollapsable: React.FC<Props> = (props): JSX.Element => {
         </div>
       )
     },
-    [assetHandler, haltBnbChain, haltEthChain, haltThorChain, intl, network]
+    [assetHandler, haltBnbChain, haltEthChain, haltThorChain, intl, navigate, network, poolDetails, poolsData]
   )
 
   const actionColumn: ColumnType<WalletBalance> = useMemo(

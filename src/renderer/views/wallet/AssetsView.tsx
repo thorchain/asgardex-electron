@@ -99,6 +99,7 @@ export const AssetsView: React.FC = (): JSX.Element => {
   )
 
   const poolDetails = RD.toNullable(poolsRD)?.poolDetails ?? []
+  const poolsData = RD.toNullable(poolsRD)?.poolsData ?? {}
 
   const { mimirHaltRD } = useMimirHalt()
 
@@ -125,6 +126,7 @@ export const AssetsView: React.FC = (): JSX.Element => {
         chainBalances={chainBalances}
         pricePool={selectedPricePool}
         poolDetails={poolDetails}
+        poolsData={poolsData}
         selectAssetHandler={selectAssetHandler}
         assetHandler={assetHandler}
         mimirHalt={mimirHaltRD}

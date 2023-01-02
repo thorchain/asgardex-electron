@@ -178,6 +178,7 @@ const Template = (args: Partial<Record<Chain, RDStatus>>) => {
         A.flatten
       )}
       poolDetails={[]}
+      poolsData={{}}
       pricePool={RUNE_PRICE_POOL}
       network="testnet"
       mimirHalt={RD.initial}
