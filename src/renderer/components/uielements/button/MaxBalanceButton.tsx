@@ -4,6 +4,7 @@ import { Balance } from '@xchainjs/xchain-client'
 import { BaseAmount, baseToAsset, formatAssetAmountCurrency } from '@xchainjs/xchain-util'
 import { useIntl } from 'react-intl'
 
+import { hiddenString } from '../../../helpers/stringHelper'
 import { InfoIcon } from '../info'
 import { TextButton, Props as ButtonProps } from './TextButton'
 
@@ -15,6 +16,8 @@ export type ComponentProps = {
   className?: string
   classNameButton?: string
   classNameIcon?: string
+  // TODO (@veado) Make it default (not) optional to handle private data everyhere properly
+  hidePrivateData?: boolean
 }
 
 export type Props = ComponentProps & Omit<ButtonProps, 'onClick'>
@@ -29,7 +32,8 @@ export const MaxBalanceButton: React.FC<Props> = (props): JSX.Element => {
     size = 'normal',
     className = '',
     classNameButton = '',
-    classNameIcon = ''
+    classNameIcon = '',
+    hidePrivateData = false
   } = props
   const { amount, asset } = balance
 
@@ -47,11 +51,13 @@ export const MaxBalanceButton: React.FC<Props> = (props): JSX.Element => {
         className={`mr-5px w-auto !p-0 ${classNameButton} whitespace-nowrap`}>
         <span className="pr-5px underline">{intl.formatMessage({ id: 'common.max' })}:</span>
         &nbsp;
-        {formatAssetAmountCurrency({
-          amount: baseToAsset(amount),
-          asset,
-          trimZeros: true
-        })}
+        {hidePrivateData
+          ? hiddenString
+          : formatAssetAmountCurrency({
+              amount: baseToAsset(amount),
+              asset,
+              trimZeros: true
+            })}
       </TextButton>
 
       {maxInfoText && <InfoIcon tooltip={maxInfoText} className={classNameIcon} />}

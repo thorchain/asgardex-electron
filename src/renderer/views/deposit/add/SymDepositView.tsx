@@ -213,6 +213,8 @@ export const SymDepositView: React.FC<Props> = (props) => {
           openAsymDepositTool={openAsymDepositTool}
           assetWalletType={assetWalletAddress.type}
           runeWalletType={runeWalletAddress.type}
+          // TODO (@veado) Handle private data
+          hidePrivateData={false}
         />
       </>
     ),
@@ -295,6 +297,8 @@ export const SymDepositView: React.FC<Props> = (props) => {
               openAsymDepositTool={openAsymDepositTool}
               assetWalletType={assetWalletAddress.type}
               runeWalletType={runeWalletAddress.type}
+              // TODO (@veado) Handle private data
+              hidePrivateData={false}
             />
           </>
         )

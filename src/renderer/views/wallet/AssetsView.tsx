@@ -121,6 +121,8 @@ export const AssetsView: React.FC = (): JSX.Element => {
         pricePool={selectedPricePool}
         title={intl.formatMessage({ id: 'wallet.balance.total.poolAssets' })}
         info={intl.formatMessage({ id: 'wallet.balance.total.poolAssets.info' })}
+        // TODO (@veado) Handle private data
+        hidePrivateData={false}
       />
       <AssetsTableCollapsable
         chainBalances={chainBalances}
@@ -131,6 +133,8 @@ export const AssetsView: React.FC = (): JSX.Element => {
         assetHandler={assetHandler}
         mimirHalt={mimirHaltRD}
         network={network}
+        // TODO (@veado) Handle private data
+        hidePrivateData={false}
       />
     </>
   )

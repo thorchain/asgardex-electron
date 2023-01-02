@@ -29,7 +29,7 @@ import { DEFAULT_WALLET_TYPE } from '../../../const'
 import { disableRuneUpgrade, isNonNativeRuneAsset, isRuneNativeAsset, isUSDAsset } from '../../../helpers/assetHelper'
 import { getChainAsset } from '../../../helpers/chainHelper'
 import { getDeepestPool, getPoolPriceValue } from '../../../helpers/poolHelper'
-import { noDataString } from '../../../helpers/stringHelper'
+import { hiddenString, noDataString } from '../../../helpers/stringHelper'
 import * as poolsRoutes from '../../../routes/pools'
 import { WalletBalancesRD } from '../../../services/clients'
 import { PoolDetails, PoolsDataMap } from '../../../services/midgard/types'
@@ -63,6 +63,7 @@ type Props = {
   assetHandler: (asset: SelectedWalletAsset, action: AssetAction) => void
   network: Network
   mimirHalt: MimirHaltRD
+  hidePrivateData: boolean
 }
 
 export const AssetsTableCollapsable: React.FC<Props> = (props): JSX.Element => {
@@ -74,7 +75,8 @@ export const AssetsTableCollapsable: React.FC<Props> = (props): JSX.Element => {
     selectAssetHandler,
     assetHandler,
     mimirHalt: mimirHaltRD,
-    network
+    network,
+    hidePrivateData
   } = props
 
   const intl = useIntl()
@@ -159,13 +161,13 @@ export const AssetsTableCollapsable: React.FC<Props> = (props): JSX.Element => {
         )
         return (
           <div className="flex flex-col items-end justify-center font-main">
-            <div className="text-16 text-text0 dark:text-text0d">{balance}</div>
-            <div className="text-14 text-gray2 dark:text-gray2d">{price}</div>
+            <div className="text-16 text-text0 dark:text-text0d">{hidePrivateData ? hiddenString : balance}</div>
+            <div className="text-14 text-gray2 dark:text-gray2d">{hidePrivateData ? hiddenString : price}</div>
           </div>
         )
       }
     }),
-    [network, poolDetails, pricePool]
+    [hidePrivateData, network, poolDetails, pricePool]
   )
 
   const renderActionColumn = useCallback(
@@ -431,7 +433,7 @@ export const AssetsTableCollapsable: React.FC<Props> = (props): JSX.Element => {
           </Col>
           <Col xs={0} md={12} lg={10}>
             <Styled.HeaderAddress>
-              {walletAddress}
+              {hidePrivateData ? hiddenString : walletAddress}
               <Styled.CopyLabelContainer
                 onClick={(event) => {
                   event.preventDefault()
@@ -456,7 +458,7 @@ export const AssetsTableCollapsable: React.FC<Props> = (props): JSX.Element => {
         </Panel>
       )
     },
-    [intl, renderBalances]
+    [hidePrivateData, intl, renderBalances]
   )
 
   // open all panels by default

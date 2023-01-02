@@ -15,7 +15,8 @@ const defaultProps: EditableAddressProps = {
   onChangeAddress: () => console.log('address changed'),
   onChangeEditableAddress: () => console.log('address changed'),
   onChangeEditableMode: () => console.log('edit mode changed'),
-  addressValidator: (address: Address) => Promise.resolve(eqString.equals(address, bnbAddress))
+  addressValidator: (address: Address) => Promise.resolve(eqString.equals(address, bnbAddress)),
+  hidePrivateData: false
 }
 export const Default: StoryFn = () => <Component {...defaultProps} />
 

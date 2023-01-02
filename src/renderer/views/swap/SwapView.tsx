@@ -422,6 +422,8 @@ const SuccessRouteView: React.FC<Props> = ({
                   importWalletHandler={importWalletHandler}
                   clickAddressLinkHandler={openAddressUrl}
                   addressValidator={validateSwapAddress}
+                  // TODO (@veado) Handle private data
+                  hidePrivateData={false}
                 />
               )
             }
