@@ -197,6 +197,25 @@ export const AssetsTableCollapsable: React.FC<Props> = (props): JSX.Element => {
               }
             ]
           : [],
+        // 'add' LP RUNE
+        A.concatW<ActionButtonAction>(
+          isAssetRuneNative(asset) && deepestPoolAsset !== null
+            ? [
+                {
+                  label: intl.formatMessage({ id: 'common.add' }),
+                  callback: () => {
+                    navigate(
+                      poolsRoutes.deposit.path({
+                        asset: assetToString(deepestPoolAsset),
+                        assetWalletType: DEFAULT_WALLET_TYPE,
+                        runeWalletType: walletType
+                      })
+                    )
+                  }
+                }
+              ]
+            : []
+        ),
         // 'swap' for assets of active pools only
         A.concatW<ActionButtonAction>(
           hasActivePool
@@ -210,6 +229,25 @@ export const AssetsTableCollapsable: React.FC<Props> = (props): JSX.Element => {
                         target: assetToString(AssetRuneNative),
                         sourceWalletType: walletType,
                         targetWalletType: DEFAULT_WALLET_TYPE
+                      })
+                    )
+                  }
+                }
+              ]
+            : []
+        ),
+        // 'add' LP for assets of active pools only
+        A.concatW<ActionButtonAction>(
+          hasActivePool
+            ? [
+                {
+                  label: intl.formatMessage({ id: 'common.add' }),
+                  callback: () => {
+                    navigate(
+                      poolsRoutes.deposit.path({
+                        asset: assetToString(asset),
+                        assetWalletType: walletType,
+                        runeWalletType: DEFAULT_WALLET_TYPE
                       })
                     )
                   }
