@@ -193,7 +193,7 @@ export const Swap = ({
   reloadFees,
   reloadBalances = FP.constVoid,
   fees$,
-  sourceWalletAddress: _oInitialSourceWalletAddress,
+  sourceWalletAddress: oInitialSourceWalletAddress,
   sourceLedgerAddress: oSourceLedgerAddress,
   targetWalletAddress: oTargetWalletAddress,
   targetLedgerAddress: oTargetLedgerAddress,
@@ -218,17 +218,8 @@ export const Swap = ({
 
   const lockedWallet: boolean = useMemo(() => isLocked(keystore) || !hasImportedKeystore(keystore), [keystore])
 
-  const oInitialSourceWalletAddress = useMemo(
-    () => (isLedgerWallet(initialSourceWalletType) ? oSourceLedgerAddress : _oInitialSourceWalletAddress),
-    [_oInitialSourceWalletAddress, oSourceLedgerAddress, initialSourceWalletType]
-  )
-  const [oSourceWalletAddress, setSourceWalletAddress] = useState<O.Option<Address>>(oInitialSourceWalletAddress)
-  // Update state needed - initial walletAddress is loaded async and can be different at first run
-  useEffect(() => {
-    setSourceWalletAddress(oInitialSourceWalletAddress)
-  }, [oInitialSourceWalletAddress])
-
   const useSourceAssetLedger = isLedgerWallet(initialSourceWalletType)
+  const oSourceWalletAddress = useSourceAssetLedger ? oSourceLedgerAddress : oInitialSourceWalletAddress
 
   const useTargetAssetLedger = FP.pipe(
     oInitialTargetWalletType,
@@ -238,8 +229,6 @@ export const Swap = ({
 
   const [oTargetWalletType, setTargetWalletType] = useState<O.Option<WalletType>>(oInitialTargetWalletType)
 
-  // const [editableTargetWalletAddress, setEditableTargetWalletAddress] =
-  //   useState<O.Option<Address>>(oInitialTargetWalletAddress)
   // Update state needed - initial target walletAddress is loaded async and can be different at first run
   useEffect(() => {
     setTargetWalletType(oInitialTargetWalletType)
@@ -1598,41 +1587,25 @@ export const Swap = ({
 
   const onClickUseSourceAssetLedger = useCallback(
     (useLedger: boolean) => {
-      const oAddress = useLedger ? oSourceLedgerAddress : oInitialSourceWalletAddress
-      setSourceWalletAddress(oAddress)
-
-      const newSourceWalletType: WalletType = useLedger ? 'ledger' : 'keystore'
-
       onChangeAsset({
         source: sourceAsset,
         target: targetAsset,
-        sourceWalletType: newSourceWalletType,
+        sourceWalletType: useLedger ? 'ledger' : 'keystore',
         targetWalletType: oTargetWalletType,
         targetWalletAddress: oTargetAddress
       })
     },
-    [
-      oInitialSourceWalletAddress,
-      oSourceLedgerAddress,
-      oTargetAddress,
-      oTargetWalletType,
-      onChangeAsset,
-      sourceAsset,
-      targetAsset
-    ]
+    [oTargetAddress, oTargetWalletType, onChangeAsset, sourceAsset, targetAsset]
   )
 
   const onClickUseTargetAssetLedger = useCallback(
     (useLedger: boolean) => {
-      const oAddress = useLedger ? oTargetLedgerAddress : oTargetWalletAddress
-      const walletType: WalletType = useLedger ? 'ledger' : 'keystore'
-
       onChangeAsset({
         source: sourceAsset,
         target: targetAsset,
         sourceWalletType,
-        targetWalletType: O.some(walletType),
-        targetWalletAddress: oAddress
+        targetWalletType: O.some(useLedger ? 'ledger' : 'keystore'),
+        targetWalletAddress: useLedger ? oTargetLedgerAddress : oTargetWalletAddress
       })
     },
     [oTargetLedgerAddress, oTargetWalletAddress, onChangeAsset, sourceAsset, sourceWalletType, targetAsset]

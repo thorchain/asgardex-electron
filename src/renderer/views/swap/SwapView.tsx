@@ -39,7 +39,7 @@ import { useOpenAddressUrl } from '../../hooks/useOpenAddressUrl'
 import { useOpenExplorerTxUrl } from '../../hooks/useOpenExplorerTxUrl'
 import { useValidateAddress } from '../../hooks/useValidateAddress'
 import { swap } from '../../routes/pools'
-import { SwapRouteTargetWalletType, swapToCustom, SwapToCustomRouteParams } from '../../routes/pools/swap'
+import { SwapRouteParams, SwapRouteTargetWalletType } from '../../routes/pools/swap'
 import * as walletRoutes from '../../routes/wallet'
 import { AssetWithDecimalLD, AssetWithDecimalRD } from '../../services/chain/types'
 import { DEFAULT_SLIP_TOLERANCE } from '../../services/const'
@@ -243,24 +243,16 @@ const SuccessRouteView: React.FC<Props> = ({
     }) => {
       const targetWalletType = FP.pipe(
         oTargetWalletType,
-        O.getOrElse<SwapRouteTargetWalletType>(() => 'unknown')
+        O.getOrElse<SwapRouteTargetWalletType>(() => 'custom')
       )
       const targetWalletAddress = FP.pipe(oTargetWalletAddress, O.toUndefined)
-      const path = targetWalletAddress
-        ? swapToCustom.path({
-            source: assetToString(source),
-            sourceWalletType,
-            target: assetToString(target),
-            targetWalletType,
-            targetWalletAddress
-          })
-        : swap.path({
-            source: assetToString(source),
-            sourceWalletType,
-            target: assetToString(target),
-            targetWalletType
-          })
-      console.log('onChangeAssetHandler path:', path)
+      const path = swap.path({
+        source: assetToString(source),
+        sourceWalletType,
+        target: assetToString(target),
+        targetWalletType,
+        targetWalletAddress
+      })
       navigate(path, { replace: true })
     },
     [navigate]
@@ -344,7 +336,7 @@ const SuccessRouteView: React.FC<Props> = ({
           RD.fold(
             () => <></>,
             () => (
-              <div className="flex min-h-[450px] w-full items-center justify-center">
+              <div className="flex min-h-[600px] w-full items-center justify-center">
                 <Spin size="large" />
               </div>
             ),
@@ -430,7 +422,7 @@ export const SwapView: React.FC = (): JSX.Element => {
     sourceWalletType: routeSourceWalletType,
     targetWalletType: routeTargetWalletType,
     targetWalletAddress
-  } = useParams<SwapToCustomRouteParams>()
+  } = useParams<SwapRouteParams>()
   const oSourceAsset: O.Option<Asset> = useMemo(() => getAssetFromNullableString(source), [source])
   const oTargetAsset: O.Option<Asset> = useMemo(() => getAssetFromNullableString(target), [target])
   const oTargetAddress: O.Option<Address> = useMemo(
