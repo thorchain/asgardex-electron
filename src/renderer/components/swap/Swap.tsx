@@ -51,7 +51,7 @@ import { eqAsset, eqBaseAmount, eqOAsset, eqOApproveParams, eqAddress } from '..
 import { sequenceSOption, sequenceTOption } from '../../helpers/fpHelpers'
 import * as PoolHelpers from '../../helpers/poolHelper'
 import { liveData, LiveData } from '../../helpers/rx/liveData'
-import { emptyString, loadingString, noDataString } from '../../helpers/stringHelper'
+import { emptyString, hiddenString, loadingString, noDataString } from '../../helpers/stringHelper'
 import {
   filterWalletBalancesByAssets,
   getWalletBalanceByAssetAndWalletType,
@@ -169,6 +169,7 @@ export type SwapProps = {
   disableSwapAction: boolean
   clickAddressLinkHandler: (address: Address) => void
   addressValidator: AddressValidationAsync
+  hidePrivateData: boolean
 }
 
 export const Swap = ({
@@ -208,7 +209,8 @@ export const Swap = ({
   importWalletHandler,
   disableSwapAction,
   clickAddressLinkHandler,
-  addressValidator
+  addressValidator,
+  hidePrivateData
 }: SwapProps) => {
   const intl = useIntl()
 
@@ -1684,6 +1686,7 @@ export const Swap = ({
                 balance={{ amount: maxAmountToSwapMax1e8, asset: sourceAsset }}
                 onClick={() => setAmountToSwapMax1e8(maxAmountToSwapMax1e8)}
                 maxInfoText={maxBalanceInfoTxt}
+                hidePrivateData={hidePrivateData}
               />
               {minAmountError && renderMinAmount}
             </div>
@@ -1732,6 +1735,7 @@ export const Swap = ({
                   onChangeEditableAddress={onChangeEditableRecipientAddress}
                   onChangeEditableMode={(editModeActive) => setCustomAddressEditActive(editModeActive)}
                   addressValidator={addressValidator}
+                  hidePrivateData={hidePrivateData}
                 />
               </div>
             )),
@@ -1925,7 +1929,7 @@ export const Swap = ({
                           oSourceWalletAddress,
                           O.map((address) => (
                             <TooltipAddress title={address} key="tooltip-sender-addr">
-                              {address}
+                              {hidePrivateData ? hiddenString : address}
                             </TooltipAddress>
                           )),
                           O.getOrElse(() => <>{noDataString}</>)
@@ -1940,7 +1944,7 @@ export const Swap = ({
                           oRecipientAddress,
                           O.map((address) => (
                             <TooltipAddress title={address} key="tooltip-target-addr">
-                              {address}
+                              {hidePrivateData ? hiddenString : address}
                             </TooltipAddress>
                           )),
                           O.getOrElse(() => <>{noDataString}</>)
@@ -1983,6 +1987,8 @@ export const Swap = ({
                       <div className="truncate pl-20px text-[13px] normal-case leading-normal">
                         {walletBalancesLoading
                           ? loadingString
+                          : hidePrivateData
+                          ? hiddenString
                           : formatAssetAmountCurrency({
                               amount: baseToAsset(sourceAssetAmountMax1e8),
                               asset: sourceAsset,
@@ -2006,7 +2012,9 @@ export const Swap = ({
                     <div className="ml-[-2px] flex w-full items-start pt-10px font-mainBold text-[14px]">
                       {memoTitle}
                     </div>
-                    <div className="truncate pl-10px font-main text-[12px]">{memoLabel}</div>
+                    <div className="truncate pl-10px font-main text-[12px]">
+                      {hidePrivateData ? hiddenString : memoLabel}
+                    </div>
                   </>
                 )}
               </div>

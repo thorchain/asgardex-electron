@@ -182,6 +182,7 @@ const Template = (args: Partial<Record<Chain, RDStatus>>) => {
       pricePool={RUNE_PRICE_POOL}
       network="testnet"
       mimirHalt={RD.initial}
+      hidePrivateData={false}
     />
   )
 }

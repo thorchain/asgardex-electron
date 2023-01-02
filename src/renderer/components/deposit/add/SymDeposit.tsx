@@ -48,7 +48,7 @@ import { eqBaseAmount, eqOAsset, eqOApproveParams, eqAsset } from '../../../help
 import { sequenceSOption, sequenceTOption } from '../../../helpers/fpHelpers'
 import * as PoolHelpers from '../../../helpers/poolHelper'
 import { liveData, LiveData } from '../../../helpers/rx/liveData'
-import { emptyString, loadingString, noDataString } from '../../../helpers/stringHelper'
+import { emptyString, hiddenString, loadingString, noDataString } from '../../../helpers/stringHelper'
 import * as WalletHelper from '../../../helpers/walletHelper'
 import { useSubscriptionState } from '../../../hooks/useSubscriptionState'
 import { INITIAL_SYM_DEPOSIT_STATE } from '../../../services/chain/const'
@@ -153,6 +153,7 @@ export type Props = {
   hasAsymAssets: LiquidityProviderHasAsymAssetsRD
   symAssetMismatch: LiquidityProviderAssetMismatchRD
   openAsymDepositTool: FP.Lazy<void>
+  hidePrivateData: boolean
 }
 
 type SelectedInput = 'asset' | 'rune' | 'none'
@@ -193,7 +194,8 @@ export const SymDeposit: React.FC<Props> = (props) => {
     openRecoveryTool,
     hasAsymAssets: hasAsymAssetsRD,
     symAssetMismatch: symAssetMismatchRD,
-    openAsymDepositTool
+    openAsymDepositTool,
+    hidePrivateData
   } = props
 
   const intl = useIntl()
@@ -240,16 +242,18 @@ export const SymDeposit: React.FC<Props> = (props) => {
         : FP.pipe(
             oRuneWB,
             O.map(({ amount, asset }) =>
-              formatAssetAmountCurrency({
-                amount: baseToAsset(amount),
-                asset,
-                decimal: 8,
-                trimZeros: true
-              })
+              hidePrivateData
+                ? hiddenString
+                : formatAssetAmountCurrency({
+                    amount: baseToAsset(amount),
+                    asset,
+                    decimal: 8,
+                    trimZeros: true
+                  })
             ),
             O.getOrElse(() => noDataString)
           ),
-    [oRuneWB, walletBalancesLoading]
+    [hidePrivateData, oRuneWB, walletBalancesLoading]
   )
 
   const oAssetWB: O.Option<WalletBalance> = useMemo(() => {
@@ -268,16 +272,18 @@ export const SymDeposit: React.FC<Props> = (props) => {
         : FP.pipe(
             oAssetWB,
             O.map(({ amount, asset }) =>
-              formatAssetAmountCurrency({
-                amount: baseToAsset(amount),
-                asset,
-                decimal: 8,
-                trimZeros: true
-              })
+              hidePrivateData
+                ? hiddenString
+                : formatAssetAmountCurrency({
+                    amount: baseToAsset(amount),
+                    asset,
+                    decimal: 8,
+                    trimZeros: true
+                  })
             ),
             O.getOrElse(() => noDataString)
           ),
-    [oAssetWB, walletBalancesLoading]
+    [hidePrivateData, oAssetWB, walletBalancesLoading]
   )
 
   const hasAssetLedger = useMemo(
@@ -1844,6 +1850,7 @@ export const SymDeposit: React.FC<Props> = (props) => {
             { id: 'deposit.add.max.infoWithFee' },
             { balance: runeBalanceLabel, fee: runeFeeLabel }
           )}
+          hidePrivateData={hidePrivateData}
         />
         {minRuneAmountError &&
           renderMinAmount({
@@ -1892,6 +1899,7 @@ export const SymDeposit: React.FC<Props> = (props) => {
                 )
               : intl.formatMessage({ id: 'deposit.add.max.info' }, { balance: assetBalanceLabel })
           }
+          hidePrivateData={hidePrivateData}
         />
         {minAssetAmountError &&
           renderMinAmount({
@@ -1903,15 +1911,16 @@ export const SymDeposit: React.FC<Props> = (props) => {
       </div>
     ),
     [
+      maxAssetAmountToDepositMax1e8,
       asset,
-      updateAssetAmount,
+      intl,
       assetBalanceLabel,
       assetFeeLabel,
-      intl,
-      maxAssetAmountToDepositMax1e8,
+      hidePrivateData,
       minAssetAmountError,
+      renderMinAmount,
       minAssetAmountToDepositMax1e8,
-      renderMinAmount
+      updateAssetAmount
     ]
   )
 
@@ -2086,7 +2095,7 @@ export const SymDeposit: React.FC<Props> = (props) => {
                       oRuneWB,
                       O.map(({ walletAddress: address }) => (
                         <TooltipAddress title={address} key="tooltip-asset-sender-addr">
-                          {address}
+                          {hidePrivateData ? hiddenString : address}
                         </TooltipAddress>
                       )),
                       O.getOrElse(() => <>{noDataString}</>)
@@ -2101,7 +2110,7 @@ export const SymDeposit: React.FC<Props> = (props) => {
                       oAssetWB,
                       O.map(({ walletAddress: address }) => (
                         <TooltipAddress title={address} key="tooltip-asset-sender-addr">
-                          {address}
+                          {hidePrivateData ? hiddenString : address}
                         </TooltipAddress>
                       )),
                       O.getOrElse(() => <>{noDataString}</>)
@@ -2179,7 +2188,7 @@ export const SymDeposit: React.FC<Props> = (props) => {
                       oDepositParams,
                       O.map(({ memos: { rune: memo } }) => (
                         <Tooltip title={memo} key="tooltip-rune-memo">
-                          {memo}
+                          {hidePrivateData ? hiddenString : memo}
                         </Tooltip>
                       )),
                       O.toNullable
@@ -2209,7 +2218,7 @@ export const SymDeposit: React.FC<Props> = (props) => {
                       oDepositParams,
                       O.map(({ memos: { asset: memo } }) => (
                         <Tooltip title={memo} key="tooltip-asset-memo">
-                          {memo}
+                          {hidePrivateData ? hiddenString : memo}
                         </Tooltip>
                       )),
                       O.toNullable

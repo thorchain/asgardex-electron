@@ -9,6 +9,7 @@ import { useIntl } from 'react-intl'
 
 import { Network } from '../../../shared/api/types'
 import { truncateAddress } from '../../helpers/addressHelper'
+import { hiddenString } from '../../helpers/stringHelper'
 import { AddressValidationAsync } from '../../services/clients'
 import { InnerForm } from '../shared/form'
 import { BaseButton } from '../uielements/button'
@@ -24,6 +25,7 @@ export type EditableAddressProps = {
   onChangeEditableAddress: (address: Address) => void
   onChangeEditableMode: (editModeActive: boolean) => void
   addressValidator: AddressValidationAsync
+  hidePrivateData: boolean
 }
 export const EditableAddress = ({
   asset,
@@ -33,7 +35,8 @@ export const EditableAddress = ({
   onClickOpenAddress,
   onChangeEditableMode,
   addressValidator,
-  network
+  network,
+  hidePrivateData
 }: EditableAddressProps) => {
   const RECIPIENT_FIELD = 'recipient'
   const intl = useIntl()
@@ -100,7 +103,7 @@ export const EditableAddress = ({
               setEditableAddress(O.fromNullable(address))
               onChangeEditableMode(true)
             }}>
-            {truncatedAddress}
+            {hidePrivateData ? hiddenString : truncatedAddress}
           </BaseButton>
         </Tooltip>
         <div className="flex flex-row items-center">
@@ -119,7 +122,7 @@ export const EditableAddress = ({
         </div>
       </div>
     )
-  }, [address, truncatedAddress, onChangeEditableMode, onClickOpenAddress])
+  }, [address, hidePrivateData, truncatedAddress, onChangeEditableMode, onClickOpenAddress])
 
   const renderEditableAddress = useCallback(
     (editableAddress: Address) => {

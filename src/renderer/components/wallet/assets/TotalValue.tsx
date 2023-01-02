@@ -6,6 +6,7 @@ import * as FP from 'fp-ts/lib/function'
 import { useIntl } from 'react-intl'
 
 import { isUSDAsset } from '../../../helpers/assetHelper'
+import { hiddenString } from '../../../helpers/stringHelper'
 import { BaseAmountRD } from '../../../types'
 import { PricePool } from '../../../views/pools/Pools.types'
 import { InfoIcon } from '../../uielements/info'
@@ -16,10 +17,11 @@ type Props = {
   total: BaseAmountRD
   title: string
   info?: string
+  hidePrivateData: boolean
 }
 
 export const TotalValue: React.FC<Props> = (props): JSX.Element => {
-  const { pricePool, total: totalRD, title, info } = props
+  const { pricePool, total: totalRD, title, info, hidePrivateData } = props
 
   const intl = useIntl()
 
@@ -37,16 +39,18 @@ export const TotalValue: React.FC<Props> = (props): JSX.Element => {
           ),
           (total) => (
             <Styled.BalanceLabel>
-              {formatAssetAmountCurrency({
-                amount: baseToAsset(total),
-                asset: pricePool.asset,
-                decimal: isUSDAsset(pricePool.asset) ? 2 : 4
-              })}
+              {hidePrivateData
+                ? hiddenString
+                : formatAssetAmountCurrency({
+                    amount: baseToAsset(total),
+                    asset: pricePool.asset,
+                    decimal: isUSDAsset(pricePool.asset) ? 2 : 4
+                  })}
             </Styled.BalanceLabel>
           )
         )
       ),
-    [intl, pricePool.asset, totalRD]
+    [hidePrivateData, intl, pricePool.asset, totalRD]
   )
 
   return (

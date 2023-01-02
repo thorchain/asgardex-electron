@@ -177,6 +177,8 @@ export const PoolShareView: React.FC = (): JSX.Element => {
         total={sharesTotalRD}
         pricePool={selectedPricePool}
         title={intl.formatMessage({ id: 'wallet.shares.total' })}
+        // TODO (@veado) Handle private data
+        hidePrivateData={false}
       />
     )
   }, [allSharesRD, intl, poolDetailsRD, pricePoolData, selectedPricePool])
