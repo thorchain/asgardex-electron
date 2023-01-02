@@ -12,7 +12,8 @@
 - [AssetInput] Add Ledger + extraContent [#2505](https://github.com/thorchain/asgardex-electron/pull/2505)
 - Refactor styles for 'warning` components (TW only) [#2504](https://github.com/thorchain/asgardex-electron/pull/2504)
 - [Deposit] Wallet types based on routes [#2506](https://github.com/thorchain/asgardex-electron/pull/2506)
-- [SWAP] Persistant wallet state while reloading or switching asset pair [#2511](https://github.com/thorchain/asgardex-electron/pull/2511/)
+- [SWAP] Persistant wallet state while reloading or switching asset pair [#2511](https://github.com/thorchain/asgardex-electron/pull/2511)
+- [Wallet] Add `Swap` to `ActionButton` to jump to swap view with one click only [#2512](https://github.com/thorchain/asgardex-electron/pull/2512)
 
 ## Fix
 
