@@ -192,10 +192,10 @@ export const getWalletTypeLabel = (oWalletType: O.Option<WalletType>, intl: Intl
         case 'ledger':
           return 'common.ledger'
         default:
-          return 'common.unknown'
+          return 'common.custom'
       }
     }),
-    O.getOrElse(() => 'common.unknown')
+    O.getOrElse(() => 'common.custom')
   )
   return intl.formatMessage({ id })
 }

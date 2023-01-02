@@ -219,7 +219,7 @@ export const Swap = ({
   const lockedWallet: boolean = useMemo(() => isLocked(keystore) || !hasImportedKeystore(keystore), [keystore])
 
   const useSourceAssetLedger = isLedgerWallet(initialSourceWalletType)
-  const oSourceKeystoreAddress = useSourceAssetLedger ? oSourceLedgerAddress : oInitialSourceKeystoreAddress
+  const oSourceWalletAddress = useSourceAssetLedger ? oSourceLedgerAddress : oInitialSourceKeystoreAddress
 
   const useTargetAssetLedger = FP.pipe(
     oInitialTargetWalletType,
@@ -926,12 +926,13 @@ export const Swap = ({
         source: sourceAsset,
         sourceWalletType,
         target: asset,
-        // back to default 'keystore' type + address
+        // back to default 'keystore' type
         targetWalletType: O.some('keystore'),
-        recipientAddress: oTargetKeystoreAddress
+        // Set recipient address to 'none' will lead to use keystore address in `WalletView`
+        recipientAddress: O.none
       })
     },
-    [oTargetKeystoreAddress, onChangeAsset, sourceAsset, sourceWalletType]
+    [onChangeAsset, sourceAsset, sourceWalletType]
   )
 
   const minAmountToSwapMax1e8: BaseAmount = useMemo(
@@ -1515,19 +1516,19 @@ export const Swap = ({
     // delay to avoid render issues while switching
     await delay(100)
 
-    const newSourceWalletType = FP.pipe(
+    const walletType = FP.pipe(
       oTargetWalletType,
       O.getOrElse<WalletType>(() => 'keystore')
     )
 
     onChangeAsset({
       source: targetAsset,
-      sourceWalletType: newSourceWalletType,
+      sourceWalletType: walletType,
       target: sourceAsset,
       targetWalletType: O.some(sourceWalletType),
-      recipientAddress: oSourceKeystoreAddress
+      recipientAddress: oSourceWalletAddress
     })
-  }, [oSourceKeystoreAddress, oTargetWalletType, onChangeAsset, sourceAsset, sourceWalletType, targetAsset])
+  }, [oSourceWalletAddress, oTargetWalletType, onChangeAsset, sourceAsset, sourceWalletType, targetAsset])
 
   const disableSubmit: boolean = useMemo(
     () =>
@@ -1564,7 +1565,7 @@ export const Swap = ({
     [checkIsApprovedError, isApproveFeeError, oApproveParams, walletBalancesLoading]
   )
 
-  const onChangeTargetAddress = useCallback(
+  const onChangeRecipientAddress = useCallback(
     (address: Address) => {
       onChangeAsset({
         source: sourceAsset,
@@ -1577,8 +1578,9 @@ export const Swap = ({
     [getTargetWalletTypeByAddress, onChangeAsset, sourceAsset, targetAsset, sourceWalletType]
   )
 
-  const onChangeEditableTargetAddress = useCallback(
+  const onChangeEditableRecipientAddress = useCallback(
     (address: Address) => {
+      // Check and show wallet type while typing a custom recipient address
       const walletType = getTargetWalletTypeByAddress(address)
       setTargetWalletType(walletType)
     },
@@ -1749,8 +1751,8 @@ export const Swap = ({
                   network={network}
                   address={address}
                   onClickOpenAddress={(address) => clickAddressLinkHandler(address)}
-                  onChangeAddress={onChangeTargetAddress}
-                  onChangeEditableAddress={onChangeEditableTargetAddress}
+                  onChangeAddress={onChangeRecipientAddress}
+                  onChangeEditableAddress={onChangeEditableRecipientAddress}
                   onChangeEditableMode={(editModeActive) => setCustomAddressEditActive(editModeActive)}
                   addressValidator={addressValidator}
                 />
@@ -1943,7 +1945,7 @@ export const Swap = ({
                       <div>{intl.formatMessage({ id: 'common.sender' })}</div>
                       <div className="truncate pl-20px text-[13px] normal-case leading-normal">
                         {FP.pipe(
-                          oSourceKeystoreAddress,
+                          oSourceWalletAddress,
                           O.map((address) => (
                             <TooltipAddress title={address} key="tooltip-sender-addr">
                               {address}
