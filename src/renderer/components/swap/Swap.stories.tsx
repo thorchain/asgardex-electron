@@ -23,7 +23,6 @@ import { THORCHAIN_DECIMAL } from '../../helpers/assetHelper'
 import { RUNE_PRICE_POOL } from '../../helpers/poolHelper'
 import { INITIAL_SWAP_STATE } from '../../services/chain/const'
 import { SwapState } from '../../services/chain/types'
-import { DEFAULT_MIMIR_HALT } from '../../services/thorchain/const'
 import { Swap as Component, SwapProps } from './Swap'
 import { SwapAsset } from './Swap.types'
 
@@ -32,8 +31,7 @@ const targetAsset: SwapAsset = { asset: AssetBTC, decimal: BTC_DECIMAL, price: b
 
 /* Mock all (default) data needed by `Swap` commponent */
 const defaultProps: SwapProps = {
-  haltedChains: [],
-  mimirHalt: DEFAULT_MIMIR_HALT,
+  disableSwapAction: false,
   keystore: O.none,
   poolAssets: [AssetBTC, AssetRuneNative],
   assets: { source: sourceAsset, target: targetAsset },

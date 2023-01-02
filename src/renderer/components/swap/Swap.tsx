@@ -17,7 +17,6 @@ import {
   baseAmount,
   formatAssetAmountCurrency,
   delay,
-  Chain,
   assetToBase,
   assetAmount,
   chainToString,
@@ -82,7 +81,6 @@ import {
   LoadApproveFeeHandler
 } from '../../services/ethereum/types'
 import { PoolAddress, PoolDetails, PoolsDataMap } from '../../services/midgard/types'
-import { MimirHalt } from '../../services/thorchain/types'
 import {
   ApiError,
   KeystoreState,
@@ -168,8 +166,7 @@ export type SwapProps = {
   approveERC20Token$: (params: ApproveParams) => TxHashLD
   isApprovedERC20Token$: (params: IsApproveParams) => LiveData<ApiError, boolean>
   importWalletHandler: FP.Lazy<void>
-  haltedChains: Chain[]
-  mimirHalt: MimirHalt
+  disableSwapAction: boolean
   clickAddressLinkHandler: (address: Address) => void
   addressValidator: AddressValidationAsync
 }
@@ -209,8 +206,7 @@ export const Swap = ({
   reloadApproveFee,
   approveFee$,
   importWalletHandler,
-  haltedChains,
-  mimirHalt,
+  disableSwapAction,
   clickAddressLinkHandler,
   addressValidator
 }: SwapProps) => {
@@ -245,28 +241,7 @@ export const Swap = ({
   const prevSourceAsset = useRef<O.Option<Asset>>(O.none)
   const prevTargetAsset = useRef<O.Option<Asset>>(O.none)
 
-  const disableAllPoolActions = useCallback(
-    (chain: Chain) => PoolHelpers.disableAllActions({ chain, haltedChains, mimirHalt }),
-    [haltedChains, mimirHalt]
-  )
-  const disableTradingPoolActions = useCallback(
-    (chain: Chain) => PoolHelpers.disableTradingActions({ chain, haltedChains, mimirHalt }),
-    [haltedChains, mimirHalt]
-  )
-
   const [customAddressEditActive, setCustomAddressEditActive] = useState(false)
-
-  const disableSwapAction = useMemo(() => {
-    const sourceChain = sourceAsset.chain
-    const targetChain = targetAsset.chain
-    return (
-      disableAllPoolActions(sourceChain) ||
-      disableTradingPoolActions(sourceChain) ||
-      disableAllPoolActions(targetChain) ||
-      disableTradingPoolActions(targetChain) ||
-      customAddressEditActive
-    )
-  }, [customAddressEditActive, disableAllPoolActions, disableTradingPoolActions, sourceAsset.chain, targetAsset.chain])
 
   /**
    * All balances based on available assets to swap
@@ -1542,7 +1517,8 @@ export const Swap = ({
       minAmountError ||
       isCausedSlippage ||
       swapResultAmountMax1e8.lte(zeroTargetBaseAmountMax1e8) ||
-      O.isNone(oRecipientAddress),
+      O.isNone(oRecipientAddress) ||
+      customAddressEditActive,
     [
       disableSwapAction,
       lockedWallet,
@@ -1555,7 +1531,8 @@ export const Swap = ({
       isCausedSlippage,
       swapResultAmountMax1e8,
       zeroTargetBaseAmountMax1e8,
-      oRecipientAddress
+      oRecipientAddress,
+      customAddressEditActive
     ]
   )
 

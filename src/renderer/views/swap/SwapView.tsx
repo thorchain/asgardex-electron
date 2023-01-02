@@ -31,6 +31,7 @@ import { useWalletContext } from '../../contexts/WalletContext'
 import { assetInList, getAssetFromNullableString } from '../../helpers/assetHelper'
 import { eqChain, eqNetwork } from '../../helpers/fp/eq'
 import { sequenceTOption, sequenceTRD } from '../../helpers/fpHelpers'
+import * as PoolHelpers from '../../helpers/poolHelper'
 import { RUNE_PRICE_POOL } from '../../helpers/poolHelper'
 import { addressFromOptionalWalletAddress, getWalletAddressFromNullableString } from '../../helpers/walletHelper'
 import { useMimirHalt } from '../../hooks/useMimirHalt'
@@ -365,10 +366,26 @@ const SuccessRouteView: React.FC<Props> = ({
                 A.map(({ asset }) => asset)
               )
 
+              const disableAllPoolActions = (chain: Chain) =>
+                PoolHelpers.disableAllActions({ chain, haltedChains, mimirHalt })
+
+              const disableTradingPoolActions = (chain: Chain) =>
+                PoolHelpers.disableTradingActions({ chain, haltedChains, mimirHalt })
+
+              const checkDisableSwapAction = () => {
+                const sourceChain = sourceAsset.asset.chain
+                const targetChain = targetAsset.asset.chain
+                return (
+                  disableAllPoolActions(sourceChain) ||
+                  disableTradingPoolActions(sourceChain) ||
+                  disableAllPoolActions(targetChain) ||
+                  disableTradingPoolActions(targetChain)
+                )
+              }
+
               return (
                 <Swap
-                  haltedChains={haltedChains}
-                  mimirHalt={mimirHalt}
+                  disableSwapAction={checkDisableSwapAction()}
                   keystore={keystore}
                   validatePassword$={validatePassword$}
                   goToTransaction={openExplorerTxUrl}
