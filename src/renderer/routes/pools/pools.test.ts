@@ -61,9 +61,7 @@ describe('Pools routes', () => {
 
   describe('Swap routes', () => {
     it('template', () => {
-      expect(swap.template).toEqual(
-        '/pools/swap/:source/:sourceWalletType/:target/:targetWalletType/:targetWalletAddress?'
-      )
+      expect(swap.template).toEqual('/pools/swap/:source/:sourceWalletType/:target/:targetWalletType/:recipient?')
     })
     it('source keystore / target keystore', () => {
       expect(

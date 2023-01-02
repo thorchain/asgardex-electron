@@ -128,7 +128,7 @@ export type SwapProps = {
     source: SwapAsset
     target: SwapAsset
   }
-  sourceWalletAddress: O.Option<Address>
+  sourceKeystoreAddress: O.Option<Address>
   sourceLedgerAddress: O.Option<Address>
   sourceWalletType: WalletType
   targetWalletType: O.Option<WalletType>
@@ -146,21 +146,21 @@ export type SwapProps = {
   fees$: SwapFeesHandler
   reloadApproveFee: LoadApproveFeeHandler
   approveFee$: ApproveFeeHandler
-  targetAddress: O.Option<Address>
-  targetWalletAddress: O.Option<Address>
+  recipientAddress: O.Option<Address>
+  targetKeystoreAddress: O.Option<Address>
   targetLedgerAddress: O.Option<Address>
   onChangeAsset: ({
     source,
     sourceWalletType,
     target,
     targetWalletType,
-    targetWalletAddress
+    recipientAddress
   }: {
     source: Asset
     target: Asset
     sourceWalletType: WalletType
     targetWalletType: O.Option<WalletType>
-    targetWalletAddress: O.Option<Address>
+    recipientAddress: O.Option<Address>
   }) => void
   network: Network
   slipTolerance: SlipTolerance
@@ -193,11 +193,11 @@ export const Swap = ({
   reloadFees,
   reloadBalances = FP.constVoid,
   fees$,
-  sourceWalletAddress: oInitialSourceWalletAddress,
+  sourceKeystoreAddress: oInitialSourceKeystoreAddress,
   sourceLedgerAddress: oSourceLedgerAddress,
-  targetWalletAddress: oTargetWalletAddress,
+  targetKeystoreAddress: oTargetKeystoreAddress,
   targetLedgerAddress: oTargetLedgerAddress,
-  targetAddress: oTargetAddress,
+  recipientAddress: oRecipientAddress,
   sourceWalletType: initialSourceWalletType,
   targetWalletType: oInitialTargetWalletType,
   onChangeAsset,
@@ -219,7 +219,7 @@ export const Swap = ({
   const lockedWallet: boolean = useMemo(() => isLocked(keystore) || !hasImportedKeystore(keystore), [keystore])
 
   const useSourceAssetLedger = isLedgerWallet(initialSourceWalletType)
-  const oSourceWalletAddress = useSourceAssetLedger ? oSourceLedgerAddress : oInitialSourceWalletAddress
+  const oSourceKeystoreAddress = useSourceAssetLedger ? oSourceLedgerAddress : oInitialSourceKeystoreAddress
 
   const useTargetAssetLedger = FP.pipe(
     oInitialTargetWalletType,
@@ -292,7 +292,7 @@ export const Swap = ({
   const getTargetWalletTypeByAddress = useCallback(
     (address: Address): O.Option<WalletType> => {
       const isKeystoreAddress = FP.pipe(
-        oTargetWalletAddress,
+        oTargetKeystoreAddress,
         O.map((keystoreAddress) => eqAddress.equals(keystoreAddress, address)),
         O.getOrElse(() => false)
       )
@@ -304,7 +304,7 @@ export const Swap = ({
 
       return isKeystoreAddress ? O.some('keystore') : isLedgerAddress ? O.some('ledger') : O.none
     },
-    [oTargetLedgerAddress, oTargetWalletAddress]
+    [oTargetLedgerAddress, oTargetKeystoreAddress]
   )
   const sourceWalletType: WalletType = useMemo(
     () => (useSourceAssetLedger ? 'ledger' : 'keystore'),
@@ -704,7 +704,7 @@ export const Swap = ({
   const oSwapParams: O.Option<SwapTxParams> = useMemo(
     () =>
       FP.pipe(
-        sequenceTOption(oPoolAddress, oTargetAddress, oSourceAssetWB),
+        sequenceTOption(oPoolAddress, oRecipientAddress, oSourceAssetWB),
         O.map(([poolAddress, address, { walletType, walletAddress, walletIndex, hdMode }]) => {
           const memo = getSwapMemo({
             asset: targetAsset,
@@ -726,7 +726,7 @@ export const Swap = ({
       ),
     [
       oPoolAddress,
-      oTargetAddress,
+      oRecipientAddress,
       oSourceAssetWB,
       targetAsset,
       swapLimit1e8,
@@ -911,10 +911,10 @@ export const Swap = ({
         sourceWalletType: 'keystore',
         target: targetAsset,
         targetWalletType: oTargetWalletType,
-        targetWalletAddress: oTargetAddress
+        recipientAddress: oRecipientAddress
       })
     },
-    [oTargetAddress, oTargetWalletType, onChangeAsset, targetAsset]
+    [oRecipientAddress, oTargetWalletType, onChangeAsset, targetAsset]
   )
 
   const setTargetAsset = useCallback(
@@ -928,10 +928,10 @@ export const Swap = ({
         target: asset,
         // back to default 'keystore' type + address
         targetWalletType: O.some('keystore'),
-        targetWalletAddress: oTargetWalletAddress
+        recipientAddress: oTargetKeystoreAddress
       })
     },
-    [oTargetWalletAddress, onChangeAsset, sourceAsset, sourceWalletType]
+    [oTargetKeystoreAddress, onChangeAsset, sourceAsset, sourceWalletType]
   )
 
   const minAmountToSwapMax1e8: BaseAmount = useMemo(
@@ -1525,9 +1525,9 @@ export const Swap = ({
       sourceWalletType: newSourceWalletType,
       target: sourceAsset,
       targetWalletType: O.some(sourceWalletType),
-      targetWalletAddress: oSourceWalletAddress
+      recipientAddress: oSourceKeystoreAddress
     })
-  }, [oSourceWalletAddress, oTargetWalletType, onChangeAsset, sourceAsset, sourceWalletType, targetAsset])
+  }, [oSourceKeystoreAddress, oTargetWalletType, onChangeAsset, sourceAsset, sourceWalletType, targetAsset])
 
   const disableSubmit: boolean = useMemo(
     () =>
@@ -1541,7 +1541,7 @@ export const Swap = ({
       minAmountError ||
       isCausedSlippage ||
       swapResultAmountMax1e8.lte(zeroTargetBaseAmountMax1e8) ||
-      O.isNone(oTargetAddress),
+      O.isNone(oRecipientAddress),
     [
       disableSwapAction,
       lockedWallet,
@@ -1554,7 +1554,7 @@ export const Swap = ({
       isCausedSlippage,
       swapResultAmountMax1e8,
       zeroTargetBaseAmountMax1e8,
-      oTargetAddress
+      oRecipientAddress
     ]
   )
 
@@ -1571,7 +1571,7 @@ export const Swap = ({
         target: targetAsset,
         sourceWalletType,
         targetWalletType: getTargetWalletTypeByAddress(address),
-        targetWalletAddress: O.some(address)
+        recipientAddress: O.some(address)
       })
     },
     [getTargetWalletTypeByAddress, onChangeAsset, sourceAsset, targetAsset, sourceWalletType]
@@ -1592,10 +1592,10 @@ export const Swap = ({
         target: targetAsset,
         sourceWalletType: useLedger ? 'ledger' : 'keystore',
         targetWalletType: oTargetWalletType,
-        targetWalletAddress: oTargetAddress
+        recipientAddress: oRecipientAddress
       })
     },
-    [oTargetAddress, oTargetWalletType, onChangeAsset, sourceAsset, targetAsset]
+    [oRecipientAddress, oTargetWalletType, onChangeAsset, sourceAsset, targetAsset]
   )
 
   const onClickUseTargetAssetLedger = useCallback(
@@ -1605,10 +1605,10 @@ export const Swap = ({
         target: targetAsset,
         sourceWalletType,
         targetWalletType: O.some(useLedger ? 'ledger' : 'keystore'),
-        targetWalletAddress: useLedger ? oTargetLedgerAddress : oTargetWalletAddress
+        recipientAddress: useLedger ? oTargetLedgerAddress : oTargetKeystoreAddress
       })
     },
-    [oTargetLedgerAddress, oTargetWalletAddress, onChangeAsset, sourceAsset, sourceWalletType, targetAsset]
+    [oTargetLedgerAddress, oTargetKeystoreAddress, onChangeAsset, sourceAsset, sourceWalletType, targetAsset]
   )
 
   const memoTitle = useMemo(
@@ -1734,7 +1734,7 @@ export const Swap = ({
         </div>
         {!lockedWallet &&
           FP.pipe(
-            oTargetAddress,
+            oRecipientAddress,
             O.map((address) => (
               <div className="mt-20px flex flex-col  px-10px" key="edit-address">
                 <div className="flex items-center">
@@ -1943,7 +1943,7 @@ export const Swap = ({
                       <div>{intl.formatMessage({ id: 'common.sender' })}</div>
                       <div className="truncate pl-20px text-[13px] normal-case leading-normal">
                         {FP.pipe(
-                          oSourceWalletAddress,
+                          oSourceKeystoreAddress,
                           O.map((address) => (
                             <TooltipAddress title={address} key="tooltip-sender-addr">
                               {address}
@@ -1958,7 +1958,7 @@ export const Swap = ({
                       <div>{intl.formatMessage({ id: 'common.recipient' })}</div>
                       <div className="truncate pl-20px text-[13px] normal-case leading-normal">
                         {FP.pipe(
-                          oTargetAddress,
+                          oRecipientAddress,
                           O.map((address) => (
                             <TooltipAddress title={address} key="tooltip-target-addr">
                               {address}

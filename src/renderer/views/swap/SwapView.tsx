@@ -59,7 +59,7 @@ type Props = {
   targetAsset: Asset
   sourceWalletType: WalletType
   targetWalletType: O.Option<WalletType>
-  targetAddress: O.Option<Address>
+  recipientAddress: O.Option<Address>
 }
 
 const SuccessRouteView: React.FC<Props> = ({
@@ -67,7 +67,7 @@ const SuccessRouteView: React.FC<Props> = ({
   targetAsset,
   sourceWalletType,
   targetWalletType: oTargetWalletType,
-  targetAddress: oRouteTargetAddress
+  recipientAddress: oRecipientAddress
 }): JSX.Element => {
   const { chain: sourceChain } = sourceAsset
   const { chain: targetChain } = targetAsset
@@ -233,25 +233,25 @@ const SuccessRouteView: React.FC<Props> = ({
       sourceWalletType,
       target,
       targetWalletType: oTargetWalletType,
-      targetWalletAddress: oTargetWalletAddress
+      recipientAddress: oRecipientAddress
     }: {
       source: Asset
       target: Asset
       sourceWalletType: WalletType
       targetWalletType: O.Option<WalletType>
-      targetWalletAddress: O.Option<Address>
+      recipientAddress: O.Option<Address>
     }) => {
       const targetWalletType = FP.pipe(
         oTargetWalletType,
         O.getOrElse<SwapRouteTargetWalletType>(() => 'custom')
       )
-      const targetWalletAddress = FP.pipe(oTargetWalletAddress, O.toUndefined)
+      const recipient = FP.pipe(oRecipientAddress, O.toUndefined)
       const path = swap.path({
         source: assetToString(source),
         sourceWalletType,
         target: assetToString(target),
         targetWalletType,
-        targetWalletAddress
+        recipient
       })
       navigate(path, { replace: true })
     },
@@ -310,8 +310,8 @@ const SuccessRouteView: React.FC<Props> = ({
     O.getOrElse(() => false)
   )
 
-  const oTargetAddress: O.Option<Address> = FP.pipe(
-    oRouteTargetAddress,
+  const oRecipient: O.Option<Address> = FP.pipe(
+    oRecipientAddress,
     O.fromPredicate(O.isSome),
     O.flatten,
     O.alt(() => (isTargetLedger ? oTargetLedgerAddress : oTargetKeystoreAddress))
@@ -377,7 +377,7 @@ const SuccessRouteView: React.FC<Props> = ({
                     source: { ...sourceAsset, price: sourceAssetDetail.assetPrice },
                     target: { ...targetAsset, price: targetAssetDetail.assetPrice }
                   }}
-                  sourceWalletAddress={oSourceKeystoreAddress}
+                  sourceKeystoreAddress={oSourceKeystoreAddress}
                   sourceLedgerAddress={oSourceLedgerAddress}
                   sourceWalletType={sourceWalletType}
                   targetWalletType={oTargetWalletType}
@@ -391,9 +391,9 @@ const SuccessRouteView: React.FC<Props> = ({
                   fees$={swapFees$}
                   reloadApproveFee={reloadApproveFee}
                   approveFee$={approveFee$}
-                  targetWalletAddress={oTargetKeystoreAddress}
+                  targetKeystoreAddress={oTargetKeystoreAddress}
                   targetLedgerAddress={oTargetLedgerAddress}
-                  targetAddress={oTargetAddress}
+                  recipientAddress={oRecipient}
                   swap$={swap$}
                   reloadBalances={reloadBalances}
                   onChangeAsset={onChangeAssetHandler}
@@ -421,14 +421,11 @@ export const SwapView: React.FC = (): JSX.Element => {
     target,
     sourceWalletType: routeSourceWalletType,
     targetWalletType: routeTargetWalletType,
-    targetWalletAddress
+    recipient
   } = useParams<SwapRouteParams>()
   const oSourceAsset: O.Option<Asset> = useMemo(() => getAssetFromNullableString(source), [source])
   const oTargetAsset: O.Option<Asset> = useMemo(() => getAssetFromNullableString(target), [target])
-  const oTargetAddress: O.Option<Address> = useMemo(
-    () => getWalletAddressFromNullableString(targetWalletAddress),
-    [targetWalletAddress]
-  )
+  const oRecipientAddress: O.Option<Address> = useMemo(() => getWalletAddressFromNullableString(recipient), [recipient])
   const sourceWalletType = routeSourceWalletType || DEFAULT_WALLET_TYPE
   const oTargetWalletType = FP.pipe(routeTargetWalletType, O.fromPredicate(isWalletType))
 
@@ -453,7 +450,7 @@ export const SwapView: React.FC = (): JSX.Element => {
           targetAsset={targetAsset}
           sourceWalletType={sourceWalletType}
           targetWalletType={oTargetWalletType}
-          targetAddress={oTargetAddress}
+          recipientAddress={oRecipientAddress}
         />
       )
     )

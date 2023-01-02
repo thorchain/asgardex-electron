@@ -15,7 +15,7 @@ export type SwapRouteParams = {
   target: string
   sourceWalletType: WalletType
   targetWalletType: SwapRouteTargetWalletType
-  targetWalletAddress?: string
+  recipient?: string // Recipient address
 }
 
 export const swap: Route<SwapRouteParams> = {
@@ -23,14 +23,14 @@ export const swap: Route<SwapRouteParams> = {
    * Use '|' 'cause asset symbols have '-' separator
    * `walletType` - wallet type of the source
    */
-  template: `${base.template}/:source/:sourceWalletType/:target/:targetWalletType/:targetWalletAddress?`,
-  path: ({ source, target, sourceWalletType, targetWalletType, targetWalletAddress }) => {
+  template: `${base.template}/:source/:sourceWalletType/:target/:targetWalletType/:recipient?`,
+  path: ({ source, target, sourceWalletType, targetWalletType, recipient }) => {
     if (!!source && !!target) {
       const basePath = `${
         base.template
       }/${source.toLowerCase()}/${sourceWalletType}/${target.toLowerCase()}/${targetWalletType}`
 
-      return targetWalletAddress ? `${basePath}/${targetWalletAddress}` : basePath
+      return recipient ? `${basePath}/${recipient}` : basePath
     }
     // Redirect to base route if passed params are empty
     return base.path()
