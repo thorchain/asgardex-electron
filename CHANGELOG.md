@@ -4,7 +4,12 @@
 
 - [Savers] UI [#2485](https://github.com/thorchain/asgardex-electron/pull/2485)
 
-# 1.18.6 (2022-01-02)
+## Update
+
+- [Swap] Price slip [#2519](https://github.com/thorchain/asgardex-electron/pull/2519)
+- RU translation for deposit.ts by @TreefeedXavier [#2518](https://github.com/thorchain/asgardex-electron/pull/2518)
+
+# 1.18.6 (2023-01-02)
 
 ## Update
 
@@ -13,6 +18,7 @@
 - Refactor styles for 'warning` components (TW only) [#2504](https://github.com/thorchain/asgardex-electron/pull/2504)
 - [Deposit] Wallet types based on routes [#2506](https://github.com/thorchain/asgardex-electron/pull/2506)
 - [SWAP] Persistant wallet state while reloading or switching asset pair [#2511](https://github.com/thorchain/asgardex-electron/pull/2511)
+- Translation ru20 dec (pt2) by @TreefeedXavier [#2496](https://github.com/thorchain/asgardex-electron/pull/2496)
 - [Wallet] Add `Swap` to `ActionButton` to jump to swap view with one click only [#2512](https://github.com/thorchain/asgardex-electron/pull/2512)
 - [Wallet] Add `Add` to `ActionButton` to jump to LP view with one click only [#2513](https://github.com/thorchain/asgardex-electron/pull/2513)
 
