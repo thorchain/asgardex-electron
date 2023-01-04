@@ -1859,11 +1859,19 @@ export const Swap = ({
                 )}
                 {/* Slippage */}
                 <div
-                  className={`flex w-full justify-between ${showDetails ? 'pt-10px' : ''} font-mainBold text-[14px]${
+                  className={`flex w-full justify-between ${showDetails ? 'pt-10px' : ''} font-mainBold text-[14px] ${
                     isCausedSlippage ? 'text-error0 dark:text-error0d' : ''
                   }`}>
                   <div>{intl.formatMessage({ id: 'swap.slip.title' })}</div>
-                  <div>{swapData.slip.toFixed(2)}%</div>
+                  <div>
+                    {formatAssetAmountCurrency({
+                      amount: baseToAsset(priceAmountToSwapMax1e8.amount.times(swapData.slip.div(100))),
+                      asset: priceAmountToSwapMax1e8.asset,
+                      decimal: isUSDAsset(priceAmountToSwapMax1e8.asset) ? 2 : 6,
+                      trimZeros: !isUSDAsset(priceAmountToSwapMax1e8.asset)
+                    })}{' '}
+                    ({swapData.slip.toFixed(2)}%)
+                  </div>
                 </div>
 
                 {showDetails && (
@@ -1899,10 +1907,7 @@ export const Swap = ({
                         className={`flex items-center ${disableSlippage ? 'text-warning0 dark:text-warning0d' : ''}`}>
                         {intl.formatMessage({ id: 'swap.min.result.protected' })}
                         <InfoIcon
-                          className={`ml-[3px] ${
-                            disableSlippage ? '' : 'text-gray2 dark:text-gray2d'
-                          } h-[15px] w-[15px]`}
-                          color={disableSlippage ? 'warning' : 'neutral'}
+                          className="ml-[3px] h-[15px] w-[15px] text-inherit"
                           tooltip={
                             disableSlippage
                               ? intl.formatMessage({ id: 'swap.slip.tolerance.ledger-disabled.info' })
