@@ -1863,6 +1863,7 @@ export const SymDeposit: React.FC<Props> = (props) => {
     ),
     [
       asset,
+      hidePrivateData,
       intl,
       maxRuneAmountToDeposit,
       minRuneAmountError,
