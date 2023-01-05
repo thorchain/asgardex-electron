@@ -22,6 +22,7 @@ import {
   chainToString,
   Address
 } from '@xchainjs/xchain-util'
+import BigNumber from 'bignumber.js'
 import * as A from 'fp-ts/Array'
 import * as FP from 'fp-ts/function'
 import * as NEA from 'fp-ts/lib/NonEmptyArray'
@@ -105,6 +106,7 @@ import { Tooltip, TooltipAddress, WalletTypeLabel } from '../uielements/common/C
 import { Fees, UIFeesRD } from '../uielements/fees'
 import { InfoIcon } from '../uielements/info'
 import { CopyLabel } from '../uielements/label'
+import { Slider } from '../uielements/slider'
 import { EditableAddress } from './EditableAddress'
 import { SelectableSlipTolerance } from './SelectableSlipTolerance'
 import { SwapAsset, SwapData } from './Swap.types'
@@ -957,7 +959,7 @@ export const Swap = ({
   // Max amount to swap == users balances of source asset
   // Decimal always <= 1e8 based
   const maxAmountToSwapMax1e8: BaseAmount = useMemo(() => {
-    if (lockedWallet) return assetToBase(assetAmount(Number.MAX_SAFE_INTEGER, sourceAssetAmountMax1e8.decimal))
+    if (lockedWallet) return assetToBase(assetAmount(10000, sourceAssetAmountMax1e8.decimal))
 
     return Utils.maxAmountToSwapMax1e8({
       asset: sourceAsset,
@@ -1030,6 +1032,34 @@ export const Swap = ({
   type ModalState = 'swap' | 'approve' | 'none'
   const [showPasswordModal, setShowPasswordModal] = useState<ModalState>('none')
   const [showLedgerModal, setShowLedgerModal] = useState<ModalState>('none')
+
+  const renderSlider = useMemo(() => {
+    const percentage = amountToSwapMax1e8
+      .amount()
+      .dividedBy(maxAmountToSwapMax1e8.amount())
+      .multipliedBy(100)
+      // Remove decimal of `BigNumber`s used within `BaseAmount` and always round down for currencies
+      .decimalPlaces(0, BigNumber.ROUND_DOWN)
+      .toNumber()
+
+    const setAmountToSwapFromPercentValue = (percents: number) => {
+      const amountFromPercentage = maxAmountToSwapMax1e8.amount().multipliedBy(percents / 100)
+      return setAmountToSwapMax1e8(baseAmount(amountFromPercentage, maxAmountToSwapMax1e8.decimal))
+    }
+
+    return (
+      <Slider
+        key={'swap percentage slider'}
+        value={percentage}
+        onChange={setAmountToSwapFromPercentValue}
+        onAfterChange={reloadFeesHandler}
+        tooltipVisible
+        withLabel
+        tooltipPlacement={'top'}
+        disabled={disableSwapAction}
+      />
+    )
+  }, [amountToSwapMax1e8, maxAmountToSwapMax1e8, reloadFeesHandler, disableSwapAction, setAmountToSwapMax1e8])
 
   const submitSwapTx = useCallback(() => {
     FP.pipe(
@@ -1693,9 +1723,12 @@ export const Swap = ({
           }
         />
 
-        <div className="mb-20px flex w-full justify-center">
-          <BaseButton onClick={onSwitchAssets} className="group w-full">
-            <ArrowsUpDownIcon className="ease h-[30px] w-[30px] text-turquoise group-hover:rotate-180" />
+        <div className="w-full px-20px">{renderSlider}</div>
+        <div className="mb-40px flex w-full justify-center">
+          <BaseButton
+            onClick={onSwitchAssets}
+            className="group rounded-full !p-10px hover:rotate-180 hover:shadow-full dark:hover:shadow-fulld">
+            <ArrowsUpDownIcon className="ease h-[40px] w-[40px] text-turquoise " />
           </BaseButton>
         </div>
         <div className="flex flex-col">
