@@ -12,22 +12,27 @@
  */
 
 import {
-    VaultRouter,
+    Coin,
 } from './';
 
 /**
  * @export
- * @interface VaultInfo
+ * @interface TxStatusResponsePlannedOutTxs
  */
-export interface VaultInfo {
+export interface TxStatusResponsePlannedOutTxs {
     /**
      * @type {string}
-     * @memberof VaultInfo
+     * @memberof TxStatusResponsePlannedOutTxs
      */
-    pub_key: string;
+    chain: string;
     /**
-     * @type {Array<VaultRouter>}
-     * @memberof VaultInfo
+     * @type {string}
+     * @memberof TxStatusResponsePlannedOutTxs
      */
-    routers: Array<VaultRouter>;
+    to_address: string;
+    /**
+     * @type {Coin}
+     * @memberof TxStatusResponsePlannedOutTxs
+     */
+    coin: Coin;
 }
