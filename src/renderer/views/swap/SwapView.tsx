@@ -328,7 +328,7 @@ const SuccessRouteView: React.FC<Props> = ({
         <h2 className="m-0 w-full text-center font-mainSemiBold text-16 uppercase text-turquoise">
           {intl.formatMessage({ id: 'common.swap' })}
         </h2>
-        <RefreshButton className="absolute right-0" clickHandler={reloadHandler} />
+        <RefreshButton className="absolute right-0" onClick={reloadHandler} />
       </div>
 
       <div className="flex justify-center bg-bg0 dark:bg-bg0d">

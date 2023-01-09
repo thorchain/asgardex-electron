@@ -48,7 +48,7 @@ export const createTransactionService = (client$: Client$, network$: Network$): 
   const runSendPoolTx$ = (client: EthClient, { ...params }: SendPoolTxParams): TxHashLD => {
     // helper for failures
     const failure$ = (msg: string) =>
-      Rx.of(
+      Rx.of<RD.RemoteData<ApiError, never>>(
         RD.failure({
           errorId: ErrorId.POOL_TX,
           msg

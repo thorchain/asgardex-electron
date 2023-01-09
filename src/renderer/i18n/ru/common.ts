@@ -36,6 +36,7 @@ const common: CommonMessages = {
   'common.copy': 'Копировать',
   'common.loading': 'Загрузка…',
   'common.error': 'Ошибка',
+  'common.error.api.limit': 'API rate limit exceeded - RU',
   'common.test': 'Тест',
   'common.change': 'Сменить',
   'common.wallet': 'Кошелек',

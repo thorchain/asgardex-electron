@@ -113,7 +113,7 @@ export const AssetsView: React.FC = (): JSX.Element => {
   return (
     <>
       <Row justify="end" style={{ marginBottom: '20px' }}>
-        <RefreshButton clickHandler={refreshHandler} disabled={disableRefresh} />
+        <RefreshButton onClick={refreshHandler} disabled={disableRefresh} />
       </Row>
       <AssetsNav />
       <TotalValue

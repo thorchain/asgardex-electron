@@ -185,7 +185,7 @@ const Content: React.FC<Props> = (props): JSX.Element => {
         <h2 className="m-0 w-full text-center font-mainSemiBold text-16 uppercase text-turquoise">
           {intl.formatMessage({ id: 'common.earn' })}
         </h2>
-        <RefreshButton className="absolute right-0" clickHandler={reloadHandler} />
+        <RefreshButton className="absolute right-0" onClick={reloadHandler} />
       </div>
 
       <div className="flex h-screen flex-col items-center justify-center ">

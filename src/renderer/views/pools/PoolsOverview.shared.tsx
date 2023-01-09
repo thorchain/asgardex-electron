@@ -8,8 +8,7 @@ import { Network } from '../../../shared/api/types'
 import { ErrorView } from '../../components/shared/error'
 import { AssetIcon } from '../../components/uielements/assets/assetIcon'
 import { AssetLabel } from '../../components/uielements/assets/assetLabel'
-import { TextButton } from '../../components/uielements/button'
-import { ReloadButton } from '../../components/uielements/reloadButton'
+import { ReloadButton, TextButton } from '../../components/uielements/button'
 import { ordBaseAmount } from '../../helpers/fp/ord'
 import { sortByDepth } from '../../helpers/poolHelper'
 import * as Styled from './PoolsOverview.styles'
@@ -174,6 +173,6 @@ export const renderTableError = (reloadBtnLabel: string, reloadBtnAction: FP.Laz
   (
     <ErrorView
       title={error?.toString() ?? ''}
-      extra={<ReloadButton onClick={reloadBtnAction}>{reloadBtnLabel}</ReloadButton>}
+      extra={<ReloadButton label={reloadBtnLabel} onClick={reloadBtnAction} />}
     />
   )

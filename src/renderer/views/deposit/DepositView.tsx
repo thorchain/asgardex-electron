@@ -166,7 +166,7 @@ export const DepositView: React.FC<Props> = () => {
         <h2 className="m-0 w-full text-center font-mainSemiBold text-16 uppercase text-turquoise">
           {intl.formatMessage({ id: 'common.liquidity' })}
         </h2>
-        <RefreshButton className="absolute right-0" disabled={refreshButtonDisabled} clickHandler={reloadHandler} />
+        <RefreshButton className="absolute right-0" disabled={refreshButtonDisabled} onClick={reloadHandler} />
       </div>
     ),
     [intl, refreshButtonDisabled, reloadHandler]

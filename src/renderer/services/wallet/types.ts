@@ -244,6 +244,7 @@ export type LedgerService = {
 
 export type ApiError = {
   errorId: ErrorId
+  statusCode?: number
   msg: string
 }
 

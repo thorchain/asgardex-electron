@@ -271,7 +271,10 @@ export const symDeposit$ = ({
       return FP.pipe(
         sequenceSOption({ runeTxHash: RD.toOption(runeTxRD), assetTxHash: RD.toOption(assetTxRD) }),
         O.fold(
-          () => Rx.of(RD.failure({ errorId: ErrorId.SEND_TX, msg: 'Something went wrong to send deposit txs' })),
+          () =>
+            Rx.of<RD.RemoteData<ApiError, never>>(
+              RD.failure({ errorId: ErrorId.SEND_TX, msg: 'Something went wrong to send deposit txs' })
+            ),
           // 4. check tx finality
           ({ runeTxHash, assetTxHash }) => {
             const assetAddress: O.Option<Address> =

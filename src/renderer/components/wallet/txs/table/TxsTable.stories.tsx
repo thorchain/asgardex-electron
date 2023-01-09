@@ -28,6 +28,7 @@ export const Default: Story = () => (
     changePaginationHandler={(page: number) => console.log('page:', page)}
     network="testnet"
     chain={BNBChain}
+    reloadHandler={() => console.log('reload ')}
   />
 )
 Default.storyName = 'default'

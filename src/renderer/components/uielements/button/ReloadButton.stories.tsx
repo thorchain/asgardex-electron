@@ -1,23 +1,23 @@
 import { ComponentMeta } from '@storybook/react'
 
 import baseMeta from './BaseButton.stories'
-import textMeta from './FlatButton.stories'
-import { RefreshButton as Component, Props } from './RefreshButton'
+import flatMeta from './FlatButton.stories'
+import { ReloadButton as Component, Props } from './ReloadButton'
 
-export const RefreshButton = (props: Props) => <Component {...props} />
+export const ReloadButton = (props: Props) => <Component {...props} />
 
 const meta: ComponentMeta<typeof Component> = {
   component: Component,
-  title: 'Components/button/RefreshButton',
+  title: 'Components/button/ReloadButton',
   argTypes: {
-    color: textMeta.argTypes?.color ?? {},
+    color: flatMeta.argTypes?.color ?? {},
     size: baseMeta.argTypes?.size ?? {},
     onClick: {
       action: 'onClicked'
     }
   },
   args: {
-    color: 'primary',
+    color: flatMeta.args?.color ?? 'primary',
     size: 'normal',
     label: 'Label',
     disabled: false

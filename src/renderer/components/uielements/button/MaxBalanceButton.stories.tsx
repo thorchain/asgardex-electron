@@ -1,11 +1,10 @@
-import { StoryFn, ComponentMeta } from '@storybook/react'
+import { ComponentMeta } from '@storybook/react'
 import { Balance } from '@xchainjs/xchain-client'
 import { assetAmount, AssetBNB, AssetRuneNative, assetToBase } from '@xchainjs/xchain-util'
 
 import { MaxBalanceButton as Component, ComponentProps } from './MaxBalanceButton'
 
-const Template: StoryFn<ComponentProps> = (args) => <Component {...args} />
-export const Default = Template.bind({})
+export const MaxBalanceButton = (props: ComponentProps) => <Component {...props} />
 
 const bnbBalance: Balance = {
   asset: AssetBNB,
@@ -30,11 +29,12 @@ const meta: ComponentMeta<typeof Component> = {
   },
   args: {
     maxInfoText: 'info text',
-    balance: bnbBalance
+    balance: bnbBalance,
+    hidePrivateData: false
   },
   decorators: [
     (S) => (
-      <div className="flex-column flex">
+      <div className="flex h-screen items-center justify-center bg-white">
         <S />
       </div>
     )

@@ -3,6 +3,12 @@ import React from 'react'
 import { LoadingIcon } from '../../icons'
 import type { Size, Font } from './Button.types'
 
+export const iconSize: Record<Size, string> = {
+  small: 'w-10px h-10px',
+  medium: 'w-[14px] h-[14px]',
+  normal: 'w-[17px] h-[17px]',
+  large: 'w-[17px] h-[17px]'
+}
 export type BaseButtonProps = React.ButtonHTMLAttributes<HTMLButtonElement> & {
   size?: Size
   loading?: boolean
@@ -28,13 +34,6 @@ export const BaseButton: React.FC<BaseButtonProps> = (props): JSX.Element => {
     medium: 'px-[12px] py-[2px] text-[12px]',
     normal: 'px-[15px] py-[3px] text-[14px]',
     large: 'px-[20px] py-[4px] text-[16px]'
-  }
-
-  const iconSize: Record<Size, string> = {
-    small: 'w-10px h-10px',
-    medium: 'w-[11px] h-[11px]',
-    normal: 'w-[14px] h-[14px]',
-    large: 'w-[17px] h-[17px]'
   }
 
   const iconMargin: Record<Size, string> = {

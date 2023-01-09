@@ -123,7 +123,7 @@ export const PoolDetailsView: React.FC = () => {
     <>
       <Styled.ControlsContainer>
         <Styled.BackLink />
-        <RefreshButton clickHandler={onRefreshData} disabled={refreshButtonDisabled} />
+        <RefreshButton onClick={onRefreshData} disabled={refreshButtonDisabled} />
       </Styled.ControlsContainer>
       {FP.pipe(
         oRouteAsset,

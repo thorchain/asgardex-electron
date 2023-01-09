@@ -26,7 +26,8 @@ const config = {
     {
       name: '@storybook/addon-essentials',
       options: {
-        viewport: false
+        viewport: false,
+        docs: false
       }
     }
   ],
