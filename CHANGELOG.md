@@ -10,6 +10,7 @@
 - RU translation for deposit.ts by @TreefeedXavier [#2520](https://github.com/thorchain/asgardex-electron/pull/2520)
 - [Swap] Re-introduce slider [#2522](https://github.com/thorchain/asgardex-electron/pull/2522)
 - [Wallet] Handle Binance API limits (error 429) [#2523](https://github.com/thorchain/asgardex-electron/pull/2523)
+- Upgrade to latest Midgard@2.12.2 [#2524](https://github.com/thorchain/asgardex-electron/pull/2524),
 
 # 1.18.6 (2023-01-02)
 
