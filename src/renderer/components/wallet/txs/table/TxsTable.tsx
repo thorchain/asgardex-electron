@@ -252,6 +252,7 @@ export const TxsTable: React.FC<Props> = (props): JSX.Element => {
               <ReloadButton size="normal" onClick={reloadHandler} label={intl.formatMessage({ id: 'common.retry' })} />
             )
 
+            // Binance returns 429 in case of API rate limits
             if (isBnbChain(chain) && e.statusCode === 429) {
               return (
                 <ErrorView

@@ -9,6 +9,7 @@
 - [Swap] Price slip [#2519](https://github.com/thorchain/asgardex-electron/pull/2519)
 - RU translation for deposit.ts by @TreefeedXavier [#2520](https://github.com/thorchain/asgardex-electron/pull/2520)
 - [Swap] Re-introduce slider [#2522](https://github.com/thorchain/asgardex-electron/pull/2522)
+- [Wallet] Handle Binance API limits (error 429) [#2523](https://github.com/thorchain/asgardex-electron/pull/2523)
 
 # 1.18.6 (2023-01-02)
 

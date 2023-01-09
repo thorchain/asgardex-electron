@@ -66,10 +66,9 @@ const loadBalances$ = <C extends XChainClientOverride>({
               hdMode
             }))
           ),
-          catchError((error: Error) => {
-            console.log('error:', error)
-            return Rx.of(RD.failure<ApiError>({ errorId: ErrorId.GET_BALANCES, msg: error?.message ?? '' }))
-          }),
+          catchError((error: Error) =>
+            Rx.of(RD.failure<ApiError>({ errorId: ErrorId.GET_BALANCES, msg: error?.message ?? '' }))
+          ),
           startWith(RD.pending)
         )
     )
