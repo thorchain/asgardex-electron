@@ -76,7 +76,7 @@ export const BondsView: React.FC = (): JSX.Element => {
   return (
     <>
       <Row justify="end" style={{ marginBottom: '20px' }}>
-        <RefreshButton clickHandler={reloadNodeInfos} disabled={loadingNodeInfos} />
+        <RefreshButton onClick={reloadNodeInfos} disabled={loadingNodeInfos} />
       </Row>
       <AssetsNav />
       <Bonds

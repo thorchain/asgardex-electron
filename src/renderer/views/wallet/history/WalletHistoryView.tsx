@@ -157,7 +157,7 @@ export const WalletHistoryView: React.FC = () => {
   return (
     <>
       <Row justify="end" style={{ marginBottom: '20px' }}>
-        <RefreshButton clickHandler={reloadHistory} disabled={loadingHistory} />
+        <RefreshButton onClick={reloadHistory} disabled={loadingHistory} />
       </Row>
       <AssetsNav />
       <PoolActionsHistory

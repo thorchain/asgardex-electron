@@ -8,7 +8,7 @@
 
 - [Swap] Price slip [#2519](https://github.com/thorchain/asgardex-electron/pull/2519)
 - RU translation for deposit.ts by @TreefeedXavier [#2520](https://github.com/thorchain/asgardex-electron/pull/2520)
-- [Swap] Re-introduce slider [#2521](https://github.com/thorchain/asgardex-electron/pull/2521)
+- [Swap] Re-introduce slider [#2522](https://github.com/thorchain/asgardex-electron/pull/2522)
 
 # 1.18.6 (2023-01-02)
 

@@ -44,9 +44,16 @@ export const loadTxs$ = ({
     })
   ).pipe(
     RxOp.map(RD.success),
-    RxOp.catchError((error) =>
-      Rx.of(RD.failure<ApiError>({ errorId: ErrorId.GET_ASSET_TXS, msg: error?.message ?? error.toString() }))
-    ),
+    RxOp.catchError((error) => {
+      return Rx.of(
+        RD.failure<ApiError>({
+          errorId: ErrorId.GET_ASSET_TXS,
+          msg: error?.message ?? error.toString(),
+          // Error code needs to be parsed this way - NOT accessible via `error?.status`
+          statusCode: JSON.parse(JSON.stringify(error))?.status
+        })
+      )
+    }),
     RxOp.startWith(RD.pending)
   )
 }

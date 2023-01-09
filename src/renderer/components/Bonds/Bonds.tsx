@@ -11,7 +11,7 @@ import { Network } from '../../../shared/api/types'
 import { AddressValidation } from '../../services/clients'
 import { NodeInfos, NodeInfosRD } from '../../services/thorchain/types'
 import { ErrorView } from '../shared/error'
-import { ReloadButton } from '../uielements/reloadButton'
+import { ReloadButton } from '../uielements/button'
 import * as Styled from './Bonds.styles'
 import { BondsTable } from './table'
 
@@ -107,7 +107,7 @@ export const Bonds: React.FC<Props> = ({
           <ErrorView
             title={intl.formatMessage({ id: 'bonds.nodes.error' })}
             subTitle={(error.message || error.toString()).toUpperCase()}
-            extra={<ReloadButton onClick={reloadNodeInfos}>{intl.formatMessage({ id: 'common.reload' })}</ReloadButton>}
+            extra={<ReloadButton onClick={reloadNodeInfos} label={intl.formatMessage({ id: 'common.reload' })} />}
           />
         ),
         (nodes) => {

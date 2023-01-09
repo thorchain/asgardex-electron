@@ -2,7 +2,7 @@ import React, { useMemo, useCallback, useRef } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
 import { Tx, TxsPage } from '@xchainjs/xchain-client'
-import { Address, baseToAsset, Chain, formatAssetAmount } from '@xchainjs/xchain-util'
+import { Address, baseToAsset, Chain, formatAssetAmount, isBnbChain } from '@xchainjs/xchain-util'
 import { Grid, Col, Row } from 'antd'
 import { ColumnsType, ColumnType } from 'antd/lib/table'
 import * as FP from 'fp-ts/lib/function'
@@ -17,6 +17,7 @@ import { ApiError } from '../../../../services/wallet/types'
 import { CustomFormattedDate } from '../../../poolActionsHistory/PoolActionsHistory.helper'
 import { ErrorView } from '../../../shared/error'
 import { AddressEllipsis } from '../../../uielements/addressEllipsis'
+import { ReloadButton } from '../../../uielements/button'
 import * as CommonStyled from '../../../uielements/common/Common.styles'
 import { Pagination } from '../../../uielements/pagination'
 import * as Styled from './TxsTable.styles'
@@ -24,6 +25,7 @@ import * as Styled from './TxsTable.styles'
 type Props = {
   txsPageRD: TxsPageRD
   clickTxLinkHandler: (txHash: string) => void
+  reloadHandler: FP.Lazy<void>
   changePaginationHandler: (page: number) => void
   network: Network
   chain: Chain
@@ -31,7 +33,7 @@ type Props = {
 }
 
 export const TxsTable: React.FC<Props> = (props): JSX.Element => {
-  const { txsPageRD, clickTxLinkHandler, changePaginationHandler, network, chain, walletAddress } = props
+  const { txsPageRD, clickTxLinkHandler, changePaginationHandler, network, chain, walletAddress, reloadHandler } = props
   const intl = useIntl()
   const isDesktopView = Grid.useBreakpoint()?.lg ?? false
 
@@ -245,7 +247,22 @@ export const TxsTable: React.FC<Props> = (props): JSX.Element => {
             )
             return renderTable(data, true)
           },
-          ({ msg }: ApiError) => <ErrorView title={msg} />,
+          (e: ApiError) => {
+            const extra = (
+              <ReloadButton size="normal" onClick={reloadHandler} label={intl.formatMessage({ id: 'common.retry' })} />
+            )
+
+            if (isBnbChain(chain) && e.statusCode === 429) {
+              return (
+                <ErrorView
+                  title={e.msg}
+                  subTitle={intl.formatMessage({ id: 'common.error.api.limit' })}
+                  extra={extra}
+                />
+              )
+            }
+            return <ErrorView title={e.msg} extra={extra} />
+          },
           (data: TxsPage): JSX.Element => {
             previousTxs.current = O.some(data)
             return renderTable(data)
@@ -253,7 +270,7 @@ export const TxsTable: React.FC<Props> = (props): JSX.Element => {
         )(txsPageRD)}
       </>
     ),
-    [txsPageRD, renderTable, emptyTableData]
+    [txsPageRD, renderTable, emptyTableData, reloadHandler, intl, chain]
   )
 
   return renderContent

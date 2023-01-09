@@ -106,7 +106,7 @@ export const NewPhraseGenerate: React.FC<Props> = ({ onSubmit, walletId, walletN
           textToCopy={phrase}
           label={intl.formatMessage({ id: 'wallet.create.copy.phrase' })}
         />
-        <RefreshButton clickHandler={clickRefreshButtonHandler} />
+        <RefreshButton onClick={clickRefreshButtonHandler} />
       </Styled.TitleContainer>
       <Phrase words={phraseWords} readOnly={true} />
       <Form form={form} onFinish={handleFormFinish} labelCol={{ span: 24 }} className="w-full p-30px pt-15px">

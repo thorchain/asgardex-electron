@@ -35,6 +35,7 @@ export type CommonMessageKey =
   | 'common.copy'
   | 'common.loading'
   | 'common.error'
+  | 'common.error.api.limit'
   | 'common.test'
   | 'common.change'
   | 'common.wallet'

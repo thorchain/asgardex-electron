@@ -83,10 +83,14 @@ export const AssetDetails: React.FC<Props> = (props): JSX.Element => {
     navigate(path)
   }, [navigate])
 
-  const refreshHandler = useCallback(() => {
+  const reloadTxs = useCallback(() => {
     loadTxsHandler({ limit: MAX_ITEMS_PER_PAGE, offset: (currentPage - 1) * MAX_ITEMS_PER_PAGE })
+  }, [currentPage, loadTxsHandler])
+
+  const refreshHandler = useCallback(() => {
+    reloadTxs()
     reloadBalancesHandler()
-  }, [currentPage, loadTxsHandler, reloadBalancesHandler])
+  }, [reloadBalancesHandler, reloadTxs])
 
   const onChangePagination = useCallback(
     (pageNo: number) => {
@@ -144,7 +148,7 @@ export const AssetDetails: React.FC<Props> = (props): JSX.Element => {
           <BackLinkButton path={walletRoutes.assets.path()} />
         </Col>
         <Col>
-          <RefreshButton clickHandler={refreshHandler} />
+          <RefreshButton onClick={refreshHandler} />
         </Col>
       </Row>
       <Row>
@@ -251,6 +255,7 @@ export const AssetDetails: React.FC<Props> = (props): JSX.Element => {
               chain={asset.chain}
               network={network}
               walletAddress={walletAddress}
+              reloadHandler={reloadTxs}
             />
           )}
         </Col>
