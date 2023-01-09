@@ -11,23 +11,15 @@
  * Do not edit the class manually.
  */
 
-import {
-    VaultRouter,
-} from './';
-
 /**
  * @export
- * @interface VaultInfo
+ * @interface TxStagesResponseInboundFinalised
  */
-export interface VaultInfo {
+export interface TxStagesResponseInboundFinalised {
     /**
-     * @type {string}
-     * @memberof VaultInfo
+     * returns true if the inbound transaction has been finalised (THORChain agreeing it exists)
+     * @type {boolean}
+     * @memberof TxStagesResponseInboundFinalised
      */
-    pub_key: string;
-    /**
-     * @type {Array<VaultRouter>}
-     * @memberof VaultInfo
-     */
-    routers: Array<VaultRouter>;
+    completed: boolean;
 }

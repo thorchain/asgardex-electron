@@ -11,6 +11,7 @@
 - [Swap] Re-introduce slider [#2522](https://github.com/thorchain/asgardex-electron/pull/2522)
 - [Wallet] Handle Binance API limits (error 429) [#2523](https://github.com/thorchain/asgardex-electron/pull/2523)
 - Upgrade to latest Midgard@2.12.2 [#2524](https://github.com/thorchain/asgardex-electron/pull/2524),
+- Upgrade types / endpoints to latest THORNode@1.102.0 [#2525](https://github.com/thorchain/asgardex-electron/pull/2525)
 
 # 1.18.6 (2023-01-02)
 
