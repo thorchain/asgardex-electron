@@ -1,6 +1,6 @@
-import { BCHChain, BNBChain, BTCChain, CosmosChain, ETHChain, LTCChain, THORChain } from '@xchainjs/xchain-util'
 import * as O from 'fp-ts/lib/Option'
 
+import { BCHChain, BNBChain, BTCChain, CosmosChain, ETHChain, LTCChain, THORChain } from '../../shared/utils/chain'
 import { LedgerAddresses } from '../services/wallet/types'
 import { getEthChecksumAddress, hasLedgerAddress, removeAddressPrefix, truncateAddress } from './addressHelper'
 

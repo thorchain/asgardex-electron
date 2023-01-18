@@ -1,7 +1,7 @@
 import * as Client from '@xchainjs/xchain-client'
-import { isChain, Chain } from '@xchainjs/xchain-util'
 
 import { Network } from '../../shared/api/types'
+import { Chain, isChain } from '../../shared/utils/chain'
 import { envOrDefault } from '../../shared/utils/env'
 import { isNetwork } from '../../shared/utils/guard'
 import { SlipTolerance } from '../types/asgardex'

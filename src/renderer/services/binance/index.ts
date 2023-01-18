@@ -1,5 +1,4 @@
-import { BNBChain } from '@xchainjs/xchain-util'
-
+import { BNBChain } from '../../../shared/utils/chain'
 import { network$ } from '../app/service'
 import { balances$, reloadBalances, reloadBalances$, resetReloadBalances, getBalanceByAddress$ } from './balances'
 import { client$, clientState$, address$, explorerUrl$, addressUI$ } from './common'

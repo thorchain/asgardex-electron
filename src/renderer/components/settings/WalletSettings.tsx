@@ -2,22 +2,7 @@ import React, { useCallback, useEffect, useMemo, useState } from 'react'
 
 import { SearchOutlined } from '@ant-design/icons'
 import * as RD from '@devexperts/remote-data-ts'
-import {
-  Asset,
-  BNBChain,
-  THORChain,
-  ETHChain,
-  BCHChain,
-  BTCChain,
-  LTCChain,
-  CosmosChain,
-  Chain,
-  DOGEChain,
-  TerraChain,
-  chainToString,
-  AVAXChain,
-  Address
-} from '@xchainjs/xchain-util'
+import { Asset, Address } from '@xchainjs/xchain-util'
 import { List, Collapse, RadioChangeEvent } from 'antd'
 import * as FP from 'fp-ts/function'
 import * as A from 'fp-ts/lib/Array'
@@ -28,6 +13,19 @@ import { useNavigate } from 'react-router-dom'
 import { KeystoreId, Network } from '../../../shared/api/types'
 import { getDerivationPath as getEthDerivationPath } from '../../../shared/ethereum/ledger'
 import { EthHDMode } from '../../../shared/ethereum/types'
+import {
+  AvalancheChain,
+  BCHChain,
+  BNBChain,
+  BTCChain,
+  Chain,
+  chainToString,
+  CosmosChain,
+  DOGEChain,
+  ETHChain,
+  LTCChain,
+  THORChain
+} from '../../../shared/utils/chain'
 import { isError } from '../../../shared/utils/guard'
 import { HDMode, WalletAddress } from '../../../shared/wallet/types'
 import { ReactComponent as UnlockOutlined } from '../../assets/svg/icon-unlock-warning.svg'
@@ -166,9 +164,8 @@ export const WalletSettings: React.FC<Props> = (props): JSX.Element => {
     [THORChain]: 0,
     [ETHChain]: 0,
     [CosmosChain]: 0,
-    [AVAXChain]: 0, // not supported in ASGDX yet, but part of xchain-util
-    [DOGEChain]: 0,
-    [TerraChain]: 0 // not supported in ASGDX anymore, but part of xchain-util
+    [AvalancheChain]: 0, // not supported in ASGDX yet, but part of xchain-util
+    [DOGEChain]: 0
   })
 
   const {

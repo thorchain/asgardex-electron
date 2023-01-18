@@ -5,10 +5,11 @@ import { DOGE_DECIMAL } from '@xchainjs/xchain-doge'
 import { ETH_DECIMAL } from '@xchainjs/xchain-ethereum'
 import { LTC_DECIMAL } from '@xchainjs/xchain-litecoin'
 import { DECIMAL as THOR_DECIMAL } from '@xchainjs/xchain-thorchain'
+import { BaseAmount, baseAmount } from '@xchainjs/xchain-util'
+
+import { Network } from '../../../../shared/api/types'
 import {
-  AVAXChain,
-  BaseAmount,
-  baseAmount,
+  AvalancheChain,
   BCHChain,
   BNBChain,
   BTCChain,
@@ -17,11 +18,8 @@ import {
   DOGEChain,
   ETHChain,
   LTCChain,
-  TerraChain,
   THORChain
-} from '@xchainjs/xchain-util'
-
-import { Network } from '../../../../shared/api/types'
+} from '../../../../shared/utils/chain'
 import { BNB_DECIMAL } from '../../../helpers/assetHelper'
 
 /**
@@ -42,7 +40,7 @@ export const smallestAmountToSent = (chain: Chain, _network: Network): BaseAmoun
       return baseAmount(0, ETH_DECIMAL)
     case CosmosChain:
       return baseAmount(1, COSMOS_DECIMAL)
-    case AVAXChain:
+    case AvalancheChain:
       throw Error('AVAX is not supported yet')
     case DOGEChain:
       // 1000 satoshi
@@ -53,7 +51,5 @@ export const smallestAmountToSent = (chain: Chain, _network: Network): BaseAmoun
     case LTCChain:
       // 1000 satoshi
       return baseAmount(1000, LTC_DECIMAL)
-    case TerraChain:
-      throw Error('Terra (Classic) is not supported anymore')
   }
 }

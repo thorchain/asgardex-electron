@@ -5,23 +5,24 @@ import {
   AssetETH,
   AssetRuneNative,
   AssetLTC,
-  Chain,
-  isChain,
   AssetBCH,
-  BCHChain,
-  ETHChain,
-  BNBChain,
-  THORChain,
-  BTCChain,
-  CosmosChain,
-  LTCChain,
-  DOGEChain,
   AssetDOGE,
-  TerraChain,
-  AVAXChain,
   AssetAtom
 } from '@xchainjs/xchain-util'
 
+import {
+  AvalancheChain,
+  BCHChain,
+  BNBChain,
+  BTCChain,
+  Chain,
+  CosmosChain,
+  DOGEChain,
+  ETHChain,
+  isChain,
+  LTCChain,
+  THORChain
+} from '../../shared/utils/chain'
 import { ENABLED_CHAINS } from '../services/const'
 import { eqChain } from './fp/eq'
 
@@ -43,9 +44,7 @@ export const getChainAsset = (chain: Chain): Asset => {
       return AssetLTC
     case DOGEChain:
       return AssetDOGE
-    case TerraChain:
-      throw Error('Terra (Classic) is not supported anymore')
-    case AVAXChain:
+    case AvalancheChain:
       throw Error('AVAX is not supported yet')
   }
 }

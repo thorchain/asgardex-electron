@@ -1,5 +1,6 @@
-import { AssetRuneNative, baseAmount, THORChain } from '@xchainjs/xchain-util'
+import { AssetRuneNative, baseAmount } from '@xchainjs/xchain-util'
 
+import { THORChain } from '../../../shared/utils/chain'
 import { WalletAddress } from '../../../shared/wallet/types'
 import { WalletBalance } from '../../services/wallet/types'
 

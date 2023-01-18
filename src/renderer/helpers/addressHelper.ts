@@ -6,26 +6,25 @@ import { getPrefix as getDogePrefix } from '@xchainjs/xchain-doge'
 import { getPrefix as getEthereumPrefix } from '@xchainjs/xchain-ethereum'
 import { getPrefix as getLitecoinPrefix } from '@xchainjs/xchain-litecoin'
 import { getPrefix as getThorchainPrefix } from '@xchainjs/xchain-thorchain'
-import {
-  Chain,
-  BNBChain,
-  BTCChain,
-  CosmosChain,
-  ETHChain,
-  THORChain,
-  LTCChain,
-  BCHChain,
-  DOGEChain,
-  TerraChain,
-  AVAXChain,
-  Address
-} from '@xchainjs/xchain-util'
+import { Address } from '@xchainjs/xchain-util'
 import { ethers } from 'ethers'
 import * as A from 'fp-ts/lib/Array'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
 
 import { Network } from '../../shared/api/types'
+import {
+  AvalancheChain,
+  BCHChain,
+  BNBChain,
+  BTCChain,
+  Chain,
+  CosmosChain,
+  DOGEChain,
+  ETHChain,
+  LTCChain,
+  THORChain
+} from '../../shared/utils/chain'
 import { toClientNetwork } from '../../shared/utils/client'
 import { LedgerAddresses } from '../services/wallet/types'
 import { eqChain } from './fp/eq'
@@ -55,9 +54,7 @@ export const getAddressPrefixLength = (chain: Chain, network: Network): number =
       return getLitecoinPrefix(clientNetwork).length
     case BCHChain:
       return getBCHPrefix().length
-    case TerraChain:
-      throw Error('Terra (Classic) is not supported anymore')
-    case AVAXChain:
+    case AvalancheChain:
       throw Error('AVAX is not supported yet')
   }
 }

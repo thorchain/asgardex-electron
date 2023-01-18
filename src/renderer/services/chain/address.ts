@@ -1,19 +1,18 @@
+import * as O from 'fp-ts/lib/Option'
+import * as Rx from 'rxjs'
+
 import {
+  AvalancheChain,
+  BCHChain,
   BNBChain,
   BTCChain,
   Chain,
   CosmosChain,
-  ETHChain,
-  THORChain,
-  BCHChain,
-  LTCChain,
   DOGEChain,
-  TerraChain,
-  AVAXChain
-} from '@xchainjs/xchain-util'
-import * as O from 'fp-ts/lib/Option'
-import * as Rx from 'rxjs'
-
+  ETHChain,
+  LTCChain,
+  THORChain
+} from '../../../shared/utils/chain'
 import * as BNB from '../binance'
 import * as BTC from '../bitcoin'
 import * as BCH from '../bitcoincash'
@@ -38,7 +37,7 @@ const addressByChain$ = (chain: Chain): WalletAddress$ => {
       return ETH.address$
     case THORChain:
       return THOR.address$
-    case AVAXChain:
+    case AvalancheChain:
       // not supported yet
       return Rx.of(O.none)
     case CosmosChain:
@@ -49,9 +48,6 @@ const addressByChain$ = (chain: Chain): WalletAddress$ => {
       return LTC.address$
     case DOGEChain:
       return DOGE.address$
-    case TerraChain:
-      // Terra (Classic) is not supported in ASGDX anymore anymore
-      return Rx.of(O.none)
   }
 }
 

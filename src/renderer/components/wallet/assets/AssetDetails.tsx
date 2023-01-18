@@ -1,6 +1,6 @@
 import React, { useCallback, useMemo, useState } from 'react'
 
-import { Address, chainToString } from '@xchainjs/xchain-util'
+import { Address } from '@xchainjs/xchain-util'
 import { Asset, AssetAmount, assetToBase, BaseAmount } from '@xchainjs/xchain-util'
 import { Row, Col } from 'antd'
 import * as FP from 'fp-ts/lib/function'
@@ -9,6 +9,7 @@ import { useIntl } from 'react-intl'
 import { useNavigate } from 'react-router-dom'
 
 import { Network } from '../../../../shared/api/types'
+import { chainToString } from '../../../../shared/utils/chain'
 import { WalletType } from '../../../../shared/wallet/types'
 import * as AssetHelper from '../../../helpers/assetHelper'
 import { isCosmosChain } from '../../../helpers/chainHelper'

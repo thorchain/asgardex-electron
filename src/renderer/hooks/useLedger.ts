@@ -1,12 +1,12 @@
 import { useCallback } from 'react'
 
-import { Chain } from '@xchainjs/xchain-util'
 import * as FP from 'fp-ts/function'
 import * as O from 'fp-ts/lib/Option'
 import { useObservableState } from 'observable-hooks'
 import * as RxOp from 'rxjs/operators'
 
 import { KeystoreId } from '../../shared/api/types'
+import { Chain } from '../../shared/utils/chain'
 import { HDMode, WalletAddress } from '../../shared/wallet/types'
 import { useWalletContext } from '../contexts/WalletContext'
 import { LedgerAddress } from '../services/wallet/types'

@@ -1,6 +1,5 @@
 import { FeeOption } from '@xchainjs/xchain-client'
-import { assetFromString, Asset, BaseAmount, Chain, isValidAsset } from '@xchainjs/xchain-util'
-import * as Util from '@xchainjs/xchain-util'
+import { Asset, assetFromString, BaseAmount, isValidAsset } from '@xchainjs/xchain-util'
 import BigNumber from 'bignumber.js'
 import * as FP from 'fp-ts/lib/function'
 import * as IOG from 'io-ts/Guard'
@@ -8,6 +7,7 @@ import * as IOG from 'io-ts/Guard'
 import { Network } from '../api/types'
 import { EthHDMode } from '../ethereum/types'
 import { HDMode, WalletType } from '../wallet/types'
+import { Chain, isChain as isChain1 } from './chain'
 
 export const nonEmptyStringGuard = FP.pipe(
   IOG.string,
@@ -15,7 +15,7 @@ export const nonEmptyStringGuard = FP.pipe(
 )
 
 const chainGuard: IOG.Guard<unknown, Chain> = {
-  is: (u: unknown): u is Chain => nonEmptyStringGuard.is(u) && Util.isChain(u)
+  is: (u: unknown): u is Chain => nonEmptyStringGuard.is(u) && isChain1(u)
 }
 
 export const isChain = (u: unknown): u is Chain => chainGuard.is(u)

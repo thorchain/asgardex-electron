@@ -8,19 +8,14 @@ import {
   AssetETH,
   AssetRuneNative,
   assetToString,
-  baseAmount,
-  BNBChain,
-  BTCChain,
-  Chain,
-  ETHChain,
-  LTCChain,
-  THORChain
+  baseAmount
 } from '@xchainjs/xchain-util'
 import * as A from 'fp-ts/Array'
 import * as FP from 'fp-ts/function'
 import * as O from 'fp-ts/Option'
 
 import { getMockRDValueFactory, RDStatus } from '../../../../shared/mock/rdByStatus'
+import { BNBChain, BTCChain, Chain, ETHChain, LTCChain, THORChain } from '../../../../shared/utils/chain'
 import { WalletType } from '../../../../shared/wallet/types'
 import { RUNE_PRICE_POOL } from '../../../helpers/poolHelper'
 import { WalletBalances } from '../../../services/clients'

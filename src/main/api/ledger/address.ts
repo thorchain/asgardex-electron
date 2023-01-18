@@ -1,4 +1,7 @@
 import TransportNodeHidSingleton from '@ledgerhq/hw-transport-node-hid-singleton'
+import * as E from 'fp-ts/Either'
+
+import { IPCLedgerAdddressParams, LedgerError, LedgerErrorId } from '../../../shared/api/types'
 import {
   BCHChain,
   BNBChain,
@@ -8,10 +11,7 @@ import {
   ETHChain,
   LTCChain,
   THORChain
-} from '@xchainjs/xchain-util'
-import * as E from 'fp-ts/Either'
-
-import { IPCLedgerAdddressParams, LedgerError, LedgerErrorId } from '../../../shared/api/types'
+} from '../../../shared/utils/chain'
 import { isError, isEthHDMode } from '../../../shared/utils/guard'
 import { WalletAddress } from '../../../shared/wallet/types'
 import { getAddress as getBNBAddress, verifyAddress as verifyBNBAddress } from './binance/address'

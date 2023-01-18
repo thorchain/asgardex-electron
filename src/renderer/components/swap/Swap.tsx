@@ -19,7 +19,6 @@ import {
   delay,
   assetToBase,
   assetAmount,
-  chainToString,
   Address
 } from '@xchainjs/xchain-util'
 import BigNumber from 'bignumber.js'
@@ -32,6 +31,7 @@ import { useIntl } from 'react-intl'
 import * as RxOp from 'rxjs/operators'
 
 import { Network } from '../../../shared/api/types'
+import { chainToString } from '../../../shared/utils/chain'
 import { isLedgerWallet } from '../../../shared/utils/guard'
 import { WalletType } from '../../../shared/wallet/types'
 import { ZERO_BASE_AMOUNT } from '../../const'

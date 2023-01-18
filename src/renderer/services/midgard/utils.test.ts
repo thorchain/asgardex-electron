@@ -12,15 +12,7 @@ import {
   assetToBase,
   assetToString,
   baseAmount,
-  BCHChain,
-  bn,
-  BNBChain,
-  BTCChain,
-  Chain,
-  CosmosChain,
-  ETHChain,
-  LTCChain,
-  THORChain
+  bn
 } from '@xchainjs/xchain-util'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
@@ -32,6 +24,16 @@ import {
   THREE_RUNE_BASE_AMOUNT,
   FOUR_RUNE_BASE_AMOUNT
 } from '../../../shared/mock/amount'
+import {
+  BCHChain,
+  BNBChain,
+  BTCChain,
+  Chain,
+  CosmosChain,
+  ETHChain,
+  LTCChain,
+  THORChain
+} from '../../../shared/utils/chain'
 import { PRICE_POOLS_WHITELIST, AssetBUSDBAF, AssetUSDC, AssetUSDTDAC, AssetBUSD74E } from '../../const'
 import { BNB_DECIMAL } from '../../helpers/assetHelper'
 import { eqAsset, eqPoolShare, eqPoolShares, eqOAssetWithAmount, eqString } from '../../helpers/fp/eq'

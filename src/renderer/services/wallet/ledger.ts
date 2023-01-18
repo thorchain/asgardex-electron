@@ -1,5 +1,4 @@
 import * as RD from '@devexperts/remote-data-ts'
-import { Chain } from '@xchainjs/xchain-util'
 import * as A from 'fp-ts/lib/Array'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
@@ -8,6 +7,7 @@ import * as Rx from 'rxjs'
 import * as RxOp from 'rxjs/operators'
 
 import { KeystoreId, LedgerErrorId } from '../../../shared/api/types'
+import { Chain } from '../../../shared/utils/chain'
 import { isError } from '../../../shared/utils/guard'
 import { WalletAddress } from '../../../shared/wallet/types'
 import { eqChain, eqKeystoreId, eqNetwork, eqOLedgerAddress } from '../../helpers/fp/eq'

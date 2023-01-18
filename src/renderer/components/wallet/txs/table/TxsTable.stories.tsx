@@ -1,8 +1,9 @@
 import * as RD from '@devexperts/remote-data-ts'
 import { Meta, Story } from '@storybook/react'
 import { Tx, TxType } from '@xchainjs/xchain-client'
-import { assetAmount, AssetBNB, assetToBase, BNBChain } from '@xchainjs/xchain-util'
+import { assetAmount, AssetBNB, assetToBase } from '@xchainjs/xchain-util'
 
+import { BNBChain } from '../../../../../shared/utils/chain'
 import { TxsTable } from './TxsTable'
 
 const tx: Tx = {

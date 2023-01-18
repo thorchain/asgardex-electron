@@ -1,9 +1,9 @@
 import * as RD from '@devexperts/remote-data-ts'
 import { ComponentMeta } from '@storybook/react'
-import { Chain } from '@xchainjs/xchain-util'
 import * as Rx from 'rxjs'
 
 import { mockValidatePassword$ } from '../../../../shared/mock/wallet'
+import { Chain } from '../../../../shared/utils/chain'
 import { WalletPasswordConfirmationModal } from './WalletPasswordConfirmationModal'
 
 type ValidatePasswordVariant = 'initial' | 'pending' | 'failure' | 'success' | 'all'

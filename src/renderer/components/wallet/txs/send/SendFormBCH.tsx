@@ -11,7 +11,6 @@ import {
   BaseAmount,
   baseAmount,
   baseToAsset,
-  BCHChain,
   bn,
   formatAssetAmountCurrency
 } from '@xchainjs/xchain-util'
@@ -23,6 +22,7 @@ import * as O from 'fp-ts/lib/Option'
 import { useIntl } from 'react-intl'
 
 import { Network } from '../../../../../shared/api/types'
+import { BCHChain } from '../../../../../shared/utils/chain'
 import { isKeystoreWallet, isLedgerWallet } from '../../../../../shared/utils/guard'
 import { WalletType } from '../../../../../shared/wallet/types'
 import { ZERO_BASE_AMOUNT } from '../../../../const'

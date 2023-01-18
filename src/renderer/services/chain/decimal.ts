@@ -4,23 +4,22 @@ import { BCH_DECIMAL } from '@xchainjs/xchain-bitcoincash'
 import { COSMOS_DECIMAL } from '@xchainjs/xchain-cosmos'
 import { DOGE_DECIMAL } from '@xchainjs/xchain-doge'
 import { LTC_DECIMAL } from '@xchainjs/xchain-litecoin'
-import {
-  BNBChain,
-  CosmosChain,
-  ETHChain,
-  THORChain,
-  BCHChain,
-  LTCChain,
-  Asset,
-  BTCChain,
-  DOGEChain,
-  TerraChain,
-  AVAXChain
-} from '@xchainjs/xchain-util'
+import { Asset } from '@xchainjs/xchain-util'
 import * as Rx from 'rxjs'
 import * as RxOp from 'rxjs/operators'
 
 import { Network } from '../../../shared/api/types'
+import {
+  AvalancheChain,
+  BCHChain,
+  BNBChain,
+  BTCChain,
+  CosmosChain,
+  DOGEChain,
+  ETHChain,
+  LTCChain,
+  THORChain
+} from '../../../shared/utils/chain'
 import { BNB_DECIMAL, THORCHAIN_DECIMAL } from '../../helpers/assetHelper'
 import { getERC20Decimal } from '../ethereum/common'
 import { AssetWithDecimalLD } from './types'
@@ -43,9 +42,7 @@ const getDecimal = (asset: Asset, network: Network): Promise<number> => {
       return Promise.resolve(BCH_DECIMAL)
     case LTCChain:
       return Promise.resolve(LTC_DECIMAL)
-    case TerraChain:
-      return Promise.reject('Terra (Classic) is not supported anymore')
-    case AVAXChain: {
+    case AvalancheChain: {
       return Promise.reject('AVAX is not supported yet')
     }
   }

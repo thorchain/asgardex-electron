@@ -1,6 +1,6 @@
-import { Chain } from '@xchainjs/xchain-util'
 import * as O from 'fp-ts/lib/Option'
 
+import { Chain } from '../../../shared/utils/chain'
 import { LoadTxsParams } from '../clients'
 import { MAX_ITEMS_PER_PAGE } from '../const'
 import { BalancesState, BalancesStateFilter, KeystoreState, LedgerAddresses, LoadTxsHandler } from './types'
@@ -23,11 +23,10 @@ export const DEFAULT_BALANCES_FILTER: BalancesStateFilter = {
   [Chain.BitcoinCash]: 'all',
   [Chain.Ethereum]: 'all',
   [Chain.Cosmos]: 'all',
-  [Chain.Avax]: 'all',
+  [Chain.Avalanche]: 'all',
   [Chain.Litecoin]: 'all',
   [Chain.THORChain]: 'all',
-  [Chain.Doge]: 'all',
-  [Chain.Terra]: 'all'
+  [Chain.Doge]: 'all'
 }
 
 export const INITIAL_LOAD_TXS_PROPS: LoadTxsParams = {

@@ -1,19 +1,5 @@
 import * as RD from '@devexperts/remote-data-ts'
-import {
-  Address,
-  AssetBNB,
-  AVAXChain,
-  BCHChain,
-  BNBChain,
-  BTCChain,
-  Chain,
-  CosmosChain,
-  DOGEChain,
-  ETHChain,
-  LTCChain,
-  TerraChain,
-  THORChain
-} from '@xchainjs/xchain-util'
+import { Address, AssetBNB } from '@xchainjs/xchain-util'
 import * as A from 'fp-ts/lib/Array'
 import * as FP from 'fp-ts/lib/function'
 import * as NEA from 'fp-ts/lib/NonEmptyArray'
@@ -22,6 +8,18 @@ import * as Rx from 'rxjs'
 import * as RxOp from 'rxjs/operators'
 
 import { Network } from '../../../shared/api/types'
+import {
+  AvalancheChain,
+  BCHChain,
+  BNBChain,
+  BTCChain,
+  Chain,
+  CosmosChain,
+  DOGEChain,
+  ETHChain,
+  LTCChain,
+  THORChain
+} from '../../../shared/utils/chain'
 import { HDMode, WalletAddress, WalletBalanceType, WalletType } from '../../../shared/wallet/types'
 import { getBnbRuneAsset } from '../../helpers/assetHelper'
 import { filterEnabledChains } from '../../helpers/chainHelper'
@@ -92,12 +90,9 @@ export const createBalancesService = ({
         return LTC.reloadBalances
       case DOGEChain:
         return DOGE.reloadBalances
-      case TerraChain:
-        // Terra (Classic) is not supported anymore
-        return FP.constVoid
       case CosmosChain:
         return COSMOS.reloadBalances
-      case AVAXChain:
+      case AvalancheChain:
         // AVAX is not supported yet
         return FP.constVoid
     }

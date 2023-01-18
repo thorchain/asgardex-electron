@@ -1,8 +1,9 @@
 import { useCallback, useEffect } from 'react'
 
-import { Address, Chain } from '@xchainjs/xchain-util'
+import { Address } from '@xchainjs/xchain-util'
 
 import { Network } from '../../../../shared/api/types'
+import { Chain } from '../../../../shared/utils/chain'
 import { truncateAddress } from '../../../helpers/addressHelper'
 import * as Styled from './AddressEllipsis.styles'
 
