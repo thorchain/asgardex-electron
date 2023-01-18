@@ -1,4 +1,4 @@
-import { cosmosclient } from '@cosmos-client/core'
+import cosmosclient from '@cosmos-client/core'
 import axios from 'axios'
 
 import { ASGARDEX_IDENTIFIER, NINE_REALMS_CLIENT_HEADER } from '../const'

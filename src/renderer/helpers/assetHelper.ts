@@ -18,7 +18,7 @@ import * as S from 'fp-ts/lib/string'
 
 import { Network } from '../../shared/api/types'
 import {
-  AssetAtom,
+  AssetATOM,
   AssetBCH,
   AssetBNB,
   AssetBTC,
@@ -31,6 +31,7 @@ import {
   AssetRuneERC20Testnet,
   AssetRuneNative
 } from '../../shared/utils/asset'
+import { isChain } from '../../shared/utils/chain'
 import {
   AssetTGTERC20,
   AssetXRune,
@@ -127,7 +128,7 @@ export const isDogeAsset = (asset: Asset): boolean => eqAsset.equals(asset, Asse
 /**
  * Checks whether an asset is a ATOM asset
  */
-export const isAtomAsset = (asset: Asset): boolean => eqAsset.equals(asset, AssetAtom)
+export const isAtomAsset = (asset: Asset): boolean => eqAsset.equals(asset, AssetATOM)
 
 /**
  * Check whether an asset is in a list
@@ -241,7 +242,8 @@ export const isPricePoolAsset = (asset: Asset): asset is PricePoolAsset =>
   // all of PoolAsset except BNB -> see `PricePoolAsset`
   [...DEFAULT_PRICE_ASSETS, ...USD_PRICE_ASSETS].includes(asset)
 
-export const isChainAsset = (asset: Asset): boolean => eqAsset.equals(asset, getChainAsset(asset.chain))
+export const isChainAsset = (asset: Asset): boolean =>
+  isChain(asset.chain) && eqAsset.equals(asset, getChainAsset(asset.chain))
 
 export const isUSDAsset = ({ ticker }: Asset): boolean => ticker.includes('USD') || ticker.includes('UST')
 

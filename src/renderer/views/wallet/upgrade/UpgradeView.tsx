@@ -10,7 +10,7 @@ import * as Rx from 'rxjs'
 import * as RxOp from 'rxjs/operators'
 
 import { Network } from '../../../../shared/api/types'
-import { BNBChain, Chain, ETHChain, THORChain } from '../../../../shared/utils/chain'
+import { BNBChain, Chain, ETHChain, THORChain, unsafeChain, unsafeChainFromAsset } from '../../../../shared/utils/chain'
 import { ErrorView } from '../../../components/shared/error'
 import { LoadingView } from '../../../components/shared/loading'
 import { BackLinkButton } from '../../../components/uielements/button'
@@ -152,7 +152,10 @@ export const UpgradeView: React.FC<Props> = (): JSX.Element => {
             O.fold(
               // No subscription of `poolAddresses$` needed for other assets than [CHAIN].RUNE
               () => Rx.of(RD.initial),
-              (asset) => poolAddressesByChain$(asset.chain)
+              (asset) => {
+                const chain = unsafeChain(asset.chain)
+                return poolAddressesByChain$(chain)
+              }
             )
           )
         )
@@ -191,10 +194,7 @@ export const UpgradeView: React.FC<Props> = (): JSX.Element => {
   }, [])
 
   const { openExplorerTxUrl, getExplorerTxUrl } = useOpenExplorerTxUrl(
-    FP.pipe(
-      oRuneToUpgradeAsset,
-      O.map(({ chain }) => chain)
-    )
+    FP.pipe(oRuneToUpgradeAsset, O.map(unsafeChainFromAsset))
   )
 
   return (
@@ -207,7 +207,7 @@ export const UpgradeView: React.FC<Props> = (): JSX.Element => {
           () => <LoadingView size="large" />,
           renderDataError,
           ([{ asset, walletType, walletAddress, walletIndex, hdMode }, decimal, targetPoolAddress]) => {
-            const runeToUpgradeChain = asset.chain
+            const runeToUpgradeChain = unsafeChain(asset.chain)
             return FP.pipe(
               // Show an error by invalid address
               // All other values should be immediately available by entering the `UpgradeView`

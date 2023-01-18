@@ -18,14 +18,16 @@ import {
   DOGEChain,
   ETHChain,
   LTCChain,
-  THORChain
+  THORChain,
+  unsafeChainFromAsset
 } from '../../../shared/utils/chain'
 import { BNB_DECIMAL, THORCHAIN_DECIMAL } from '../../helpers/assetHelper'
 import { getERC20Decimal } from '../ethereum/common'
 import { AssetWithDecimalLD } from './types'
 
 const getDecimal = (asset: Asset, network: Network): Promise<number> => {
-  switch (asset.chain) {
+  const chain = unsafeChainFromAsset(asset)
+  switch (chain) {
     case BNBChain:
       return Promise.resolve(BNB_DECIMAL)
     case BTCChain:

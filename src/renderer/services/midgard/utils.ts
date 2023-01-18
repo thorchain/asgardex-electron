@@ -23,7 +23,7 @@ import * as NEA from 'fp-ts/lib/NonEmptyArray'
 import * as O from 'fp-ts/lib/Option'
 import * as P from 'fp-ts/lib/Predicate'
 
-import { AssetAtom, AssetBCH, AssetBNB, AssetBTC, AssetDOGE, AssetETH, AssetLTC } from '../../../shared/utils/asset'
+import { AssetATOM, AssetBCH, AssetBNB, AssetBTC, AssetDOGE, AssetETH, AssetLTC } from '../../../shared/utils/asset'
 import {
   AvalancheChain,
   BCHChain,
@@ -262,7 +262,7 @@ export const getOutboundAssetFeeByChain = (
           const amount = convertBaseAmountDecimal(baseAmount(value, THORCHAIN_DECIMAL), COSMOS_DECIMAL)
           return O.some({
             amount,
-            asset: AssetAtom
+            asset: AssetATOM
           })
         }
         // AVAX is not supported yet

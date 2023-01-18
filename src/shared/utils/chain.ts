@@ -1,3 +1,6 @@
+import { Asset } from '@xchainjs/xchain-util'
+import { unsafeCoerce } from 'fp-ts/lib/function'
+
 export const AvalancheChain = 'AVAX'
 export const BCHChain = 'BCH'
 export const BNBChain = 'BNB'
@@ -30,6 +33,9 @@ export type Chain = typeof CHAINS[number]
 export const isChain = (c: string): c is Chain => CHAINS.includes(c as Chain)
 
 export const isEnabledChain = (chain: Chain) => chain.includes(chain)
+
+export const unsafeChain: (s: string) => Chain = unsafeCoerce<string, Chain>
+export const unsafeChainFromAsset = ({ chain }: Asset): Chain => unsafeChain(chain)
 
 /**
  * Convert chain to string.

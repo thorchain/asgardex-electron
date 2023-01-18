@@ -7,7 +7,7 @@ import { useObservableState } from 'observable-hooks'
 import * as Rx from 'rxjs'
 import * as RxOp from 'rxjs/operators'
 
-import { THORChain } from '../../shared/utils/chain'
+import { THORChain, unsafeChainFromAsset } from '../../shared/utils/chain'
 import { isLedgerWallet } from '../../shared/utils/guard'
 import { WalletType } from '../../shared/wallet/types'
 import { useChainContext } from '../contexts/ChainContext'
@@ -40,7 +40,10 @@ export const useSymDepositAddresses = ({
         oAsset,
         O.fold(
           () => Rx.of(O.none),
-          ({ chain }) => addressByChain$(chain)
+          (asset) => {
+            const chain = unsafeChainFromAsset(asset)
+            return addressByChain$(chain)
+          }
         )
       ),
 
@@ -69,7 +72,10 @@ export const useSymDepositAddresses = ({
         oAsset,
         O.fold(
           () => Rx.of(O.none),
-          ({ chain }) => FP.pipe(getLedgerAddress$(chain), RxOp.map(O.map(ledgerAddressToWalletAddress)))
+          (asset) => {
+            const chain = unsafeChainFromAsset(asset)
+            return FP.pipe(getLedgerAddress$(chain), RxOp.map(O.map(ledgerAddressToWalletAddress)))
+          }
         )
       ),
     O.none

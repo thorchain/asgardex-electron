@@ -9,7 +9,7 @@ import { useIntl } from 'react-intl'
 import { useNavigate } from 'react-router-dom'
 
 import { AssetRuneNative } from '../../../../shared/utils/asset'
-import { Chain, THORChain } from '../../../../shared/utils/chain'
+import { BTCChain, THORChain, unsafeChain } from '../../../../shared/utils/chain'
 import { isLedgerWallet } from '../../../../shared/utils/guard'
 import { WalletType } from '../../../../shared/wallet/types'
 import { SymDeposit } from '../../../components/deposit/add'
@@ -88,13 +88,14 @@ export const SymDepositView: React.FC<Props> = (props) => {
     () =>
       balancesState$({
         ...DEFAULT_BALANCES_FILTER,
-        [Chain.Bitcoin]: 'confirmed'
+        [BTCChain]: 'confirmed'
       }),
     INITIAL_BALANCES_STATE
   )
 
   const reloadBalances = useCallback(() => {
-    reloadBalancesByChain(assetWD.asset.chain)()
+    const chain = unsafeChain(assetWD.asset.chain)
+    reloadBalancesByChain(chain)()
     reloadBalancesByChain(THORChain)()
   }, [assetWD.asset.chain, reloadBalancesByChain])
 
@@ -113,7 +114,7 @@ export const SymDepositView: React.FC<Props> = (props) => {
       // That's why we check it here
       // So by switching a Ledger asset, Ledger will be still selected for new selected asset in `SymDeposit` component if available
       const hasRuneLedger = hasLedgerAddress(ledgerAddresses, THORChain)
-      const hasAssetLedger = hasLedgerAddress(ledgerAddresses, asset.chain)
+      const hasAssetLedger = hasLedgerAddress(ledgerAddresses, unsafeChain(asset.chain))
       // If no Ledger found, use 'keystore'
       const checkedRuneWalletType = isLedgerWallet(runeWalletType) && hasRuneLedger ? 'ledger' : 'keystore'
       const checkedAssetWalletType = isLedgerWallet(assetWalletType) && hasAssetLedger ? 'ledger' : 'keystore'
@@ -140,7 +141,7 @@ export const SymDepositView: React.FC<Props> = (props) => {
   const poolAssetsRD: PoolAssetsRD = useObservableState(availableAssets$, RD.initial)
 
   const { openExplorerTxUrl: openAssetExplorerTxUrl, getExplorerTxUrl: getAssetExplorerTxUrl } = useOpenExplorerTxUrl(
-    O.some(asset.chain)
+    O.some(unsafeChain(asset.chain))
   )
 
   const { openExplorerTxUrl: openRuneExplorerTxUrl, getExplorerTxUrl: getRuneExplorerTxUrl } = useOpenExplorerTxUrl(
@@ -256,11 +257,11 @@ export const SymDepositView: React.FC<Props> = (props) => {
       ([poolAssets, poolDetail, { poolsData, poolDetails }]) => {
         // Since RUNE is not part of pool assets, add it to the list of available assets
         const availableAssets = [AssetRuneNative, ...poolAssets]
-
+        const chain = unsafeChain(asset.chain)
         const disableDepositAction =
-          PoolHelpers.disableAllActions({ chain: asset.chain, haltedChains, mimirHalt }) ||
-          PoolHelpers.disableTradingActions({ chain: asset.chain, haltedChains, mimirHalt }) ||
-          PoolHelpers.disablePoolActions({ chain: asset.chain, haltedChains, mimirHalt })
+          PoolHelpers.disableAllActions({ chain, haltedChains, mimirHalt }) ||
+          PoolHelpers.disableTradingActions({ chain, haltedChains, mimirHalt }) ||
+          PoolHelpers.disablePoolActions({ chain, haltedChains, mimirHalt })
 
         return (
           <>

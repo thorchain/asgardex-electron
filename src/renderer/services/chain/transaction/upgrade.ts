@@ -5,6 +5,7 @@ import * as O from 'fp-ts/lib/Option'
 import * as Rx from 'rxjs'
 import * as RxOp from 'rxjs/operators'
 
+import { unsafeChainFromAsset } from '../../../../shared/utils/chain'
 import { getEthAssetAddress, isRuneEthAsset } from '../../../helpers/assetHelper'
 import { liveData } from '../../../helpers/rx/liveData'
 import { observableState } from '../../../helpers/stateHelper'
@@ -40,11 +41,13 @@ export const upgradeRuneToNative$ = ({
     steps: { current: 1, total: 3 }
   })
 
+  const chain = unsafeChainFromAsset(asset)
+
   // All requests will be done in a sequence
   // to update `UpgradeRuneTxState` step by step
   const requests$ = Rx.of(poolAddresses).pipe(
     // 1. validate pool address
-    RxOp.switchMap((poolAddresses) => midgardPoolsService.validatePool$(poolAddresses, asset.chain)),
+    RxOp.switchMap((poolAddresses) => midgardPoolsService.validatePool$(poolAddresses, chain)),
     liveData.chain((_) => {
       // Update steps
       setState({ ...getState(), steps: { current: 2, total: 3 } })
@@ -74,7 +77,7 @@ export const upgradeRuneToNative$ = ({
         O.fromPredicate((asset) => isRuneEthAsset(asset, network)),
         O.chain(getEthAssetAddress)
       )
-      return poolTxStatusByChain$({ txHash, chain: asset.chain, assetAddress })
+      return poolTxStatusByChain$({ txHash, chain, assetAddress })
     }),
     // Update state
     liveData.map(({ hash }) => setState({ ...getState(), status: RD.success(hash) })),

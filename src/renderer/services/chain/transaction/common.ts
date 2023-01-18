@@ -15,7 +15,8 @@ import {
   DOGEChain,
   ETHChain,
   LTCChain,
-  THORChain
+  THORChain,
+  unsafeChainFromAsset
 } from '../../../../shared/utils/chain'
 import { DEFAULT_FEE_OPTION } from '../../../components/wallet/txs/send/Send.const'
 import { LiveData, liveData } from '../../../helpers/rx/liveData'
@@ -50,7 +51,8 @@ export const sendTx$ = ({
   walletIndex,
   hdMode
 }: SendTxParams): TxHashLD => {
-  switch (asset.chain) {
+  const chain = unsafeChainFromAsset(asset)
+  switch (chain) {
     case BNBChain:
       return BNB.sendTx({ walletType, sender, recipient, amount, asset, memo, walletIndex, hdMode })
 
@@ -159,7 +161,9 @@ export const sendPoolTx$ = ({
   memo,
   feeOption = DEFAULT_FEE_OPTION
 }: SendPoolTxParams): TxHashLD => {
-  switch (asset.chain) {
+  const chain = unsafeChainFromAsset(asset)
+
+  switch (chain) {
     case ETHChain:
       return ETH.sendPoolTx$({
         walletType,

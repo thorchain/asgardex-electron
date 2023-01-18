@@ -10,7 +10,7 @@ import { useParams } from 'react-router-dom'
 import * as Rx from 'rxjs'
 import * as RxOp from 'rxjs/operators'
 
-import { Chain, THORChain } from '../../../shared/utils/chain'
+import { Chain, THORChain, unsafeChainFromAsset } from '../../../shared/utils/chain'
 import { Deposit } from '../../components/deposit/Deposit'
 import { ErrorView } from '../../components/shared/error'
 import { BackLinkButton, RefreshButton } from '../../components/uielements/button'
@@ -135,7 +135,8 @@ export const DepositView: React.FC<Props> = () => {
   const reloadChainAndRuneBalances = useCallback(() => {
     FP.pipe(
       oSelectedAssetWithDecimal,
-      O.map(({ asset: { chain } }) => {
+      O.map(({ asset }) => {
+        const chain = unsafeChainFromAsset(asset)
         reloadBalancesByChain(chain)()
         reloadBalancesByChain(THORChain)()
         return true

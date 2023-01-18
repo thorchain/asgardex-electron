@@ -7,7 +7,7 @@ import * as Rx from 'rxjs'
 import * as RxOp from 'rxjs/operators'
 
 import { AssetRuneNative } from '../../../../shared/utils/asset'
-import { THORChain } from '../../../../shared/utils/chain'
+import { THORChain, unsafeChainFromAsset } from '../../../../shared/utils/chain'
 import { getEthAssetAddress, isEthAsset, isRuneNativeAsset } from '../../../helpers/assetHelper'
 import { isEthChain } from '../../../helpers/chainHelper'
 import { sequenceSOption } from '../../../helpers/fpHelpers'
@@ -52,6 +52,8 @@ export const asymDeposit$ = ({
   // total of progress
   const total = O.some(100)
 
+  const chain = unsafeChainFromAsset(asset)
+
   // Observable state of loading process
   // we start with progress of 25%
   const {
@@ -73,7 +75,7 @@ export const asymDeposit$ = ({
         // We don't have a RUNE pool, so we just validate current connected node
         validateNode$(),
         // in other case we have to validate pool address
-        midgardPoolsService.validatePool$(poolAddresses, asset.chain)
+        midgardPoolsService.validatePool$(poolAddresses, chain)
       )
     ),
     liveData.chain((_) => {
@@ -102,8 +104,8 @@ export const asymDeposit$ = ({
       })
       // 3. check tx finality by polling its tx data
       const assetAddress: O.Option<Address> =
-        isEthChain(asset.chain) && !isEthAsset(asset) ? getEthAssetAddress(asset) : O.none
-      return poolTxStatusByChain$({ txHash, chain: asset.chain, assetAddress })
+        isEthChain(chain) && !isEthAsset(asset) ? getEthAssetAddress(asset) : O.none
+      return poolTxStatusByChain$({ txHash, chain, assetAddress })
     }),
     // Update state
     liveData.map((_) => setState({ ...getState(), deposit: RD.success(true) })),
@@ -185,6 +187,8 @@ export const symDeposit$ = ({
   // total of progress
   const total = O.some(100)
 
+  const chain = unsafeChainFromAsset(asset)
+
   // Observable state of to reflect status of all needed steps
   const {
     get$: getState$,
@@ -203,7 +207,7 @@ export const symDeposit$ = ({
     // 1. Validation pool address + node
     RxOp.switchMap((poolAddresses) =>
       liveData.sequenceS({
-        pool: midgardPoolsService.validatePool$(poolAddresses, asset.chain),
+        pool: midgardPoolsService.validatePool$(poolAddresses, chain),
         node: validateNode$()
       })
     ),
@@ -280,10 +284,10 @@ export const symDeposit$ = ({
           // 4. check tx finality
           ({ runeTxHash, assetTxHash }) => {
             const assetAddress: O.Option<Address> =
-              isEthChain(asset.chain) && !isEthAsset(asset) ? getEthAssetAddress(asset) : O.none
+              isEthChain(chain) && !isEthAsset(asset) ? getEthAssetAddress(asset) : O.none
 
             return liveData.sequenceS({
-              asset: poolTxStatusByChain$({ txHash: assetTxHash, chain: asset.chain, assetAddress }),
+              asset: poolTxStatusByChain$({ txHash: assetTxHash, chain, assetAddress }),
               rune: poolTxStatusByChain$({ txHash: runeTxHash, chain: THORChain, assetAddress: O.none })
             })
           }

@@ -31,7 +31,7 @@ import { useIntl } from 'react-intl'
 import * as RxOp from 'rxjs/operators'
 
 import { Network } from '../../../shared/api/types'
-import { chainToString } from '../../../shared/utils/chain'
+import { chainToString, unsafeChainFromAsset } from '../../../shared/utils/chain'
 import { isLedgerWallet } from '../../../shared/utils/guard'
 import { WalletType } from '../../../shared/wallet/types'
 import { ZERO_BASE_AMOUNT } from '../../const'
@@ -216,6 +216,8 @@ export const Swap = ({
 }: SwapProps) => {
   const intl = useIntl()
 
+  const sourceChain = unsafeChainFromAsset(sourceAsset)
+
   const lockedWallet: boolean = useMemo(() => isLocked(keystore) || !hasImportedKeystore(keystore), [keystore])
 
   const useSourceAssetLedger = isLedgerWallet(initialSourceWalletType)
@@ -315,7 +317,7 @@ export const Swap = ({
   const sourceAssetAmountMax1e8: BaseAmount = useMemo(() => max1e8BaseAmount(sourceAssetAmount), [sourceAssetAmount])
 
   // source chain asset
-  const sourceChainAsset: Asset = useMemo(() => getChainAsset(sourceAsset.chain), [sourceAsset])
+  const sourceChainAsset: Asset = useMemo(() => getChainAsset(sourceChain), [sourceChain])
 
   // User balance for source chain asset
   const sourceChainAssetAmount: BaseAmount = useMemo(
@@ -668,10 +670,12 @@ export const Swap = ({
   )
 
   // Disable slippage selection temporary for Ledger/BTC (see https://github.com/thorchain/asgardex-electron/issues/2068)
-  const disableSlippage = useMemo(() => {
-    const chain = sourceAsset.chain
-    return (isBtcChain(chain) || isLtcChain(chain) || isBchChain(chain) || isDogeChain(chain)) && useSourceAssetLedger
-  }, [useSourceAssetLedger, sourceAsset])
+  const disableSlippage = useMemo(
+    () =>
+      (isBtcChain(sourceChain) || isLtcChain(sourceChain) || isBchChain(sourceChain) || isDogeChain(sourceChain)) &&
+      useSourceAssetLedger,
+    [useSourceAssetLedger, sourceChain]
+  )
 
   const swapLimit1e8: O.Option<BaseAmount> = useMemo(() => {
     // Disable slippage protection temporary for Ledger/BTC (see https://github.com/thorchain/asgardex-electron/issues/2068)
@@ -1191,7 +1195,7 @@ export const Swap = ({
       // Note: As long as we link to `viewblock` to open tx details in a browser,
       // `0x` needs to be removed from tx hash in case of ETH
       // @see https://github.com/thorchain/asgardex-electron/issues/1787#issuecomment-931934508
-      O.map((txHash) => (isEthChain(sourceAsset.chain) ? txHash.replace(/0x/i, '') : txHash))
+      O.map((txHash) => (isEthChain(sourceChain) ? txHash.replace(/0x/i, '') : txHash))
     )
 
     return (
@@ -1213,15 +1217,15 @@ export const Swap = ({
       />
     )
   }, [
-    extraTxModalContent,
-    getExplorerTxUrl,
-    goToTransaction,
-    intl,
-    sourceAsset,
-    onFinishTxModal,
+    swapState,
     resetSwapState,
+    onFinishTxModal,
     swapStartTime,
-    swapState
+    goToTransaction,
+    getExplorerTxUrl,
+    extraTxModalContent,
+    intl,
+    sourceChain
   ])
 
   const renderPasswordConfirmationModal = useMemo(() => {
@@ -1258,7 +1262,7 @@ export const Swap = ({
       setShowLedgerModal('none')
     }
 
-    const chainAsString = chainToString(sourceAsset.chain)
+    const chainAsString = chainToString(sourceChain)
     const txtNeedsConnected = intl.formatMessage(
       {
         id: 'ledger.needsconnected'
@@ -1268,7 +1272,7 @@ export const Swap = ({
 
     const description1 =
       // extra info for ERC20 assets only
-      isEthChain(sourceAsset.chain) && !isEthAsset(sourceAsset)
+      isEthChain(sourceChain) && !isEthAsset(sourceAsset)
         ? `${txtNeedsConnected} ${intl.formatMessage(
             {
               id: 'ledger.blindsign'
@@ -1286,7 +1290,7 @@ export const Swap = ({
         onSuccess={onSucceess}
         onClose={onClose}
         visible={visible}
-        chain={sourceAsset.chain}
+        chain={sourceChain}
         description1={description1}
         description2={description2}
         addresses={FP.pipe(
@@ -1299,7 +1303,17 @@ export const Swap = ({
         )}
       />
     )
-  }, [intl, network, sourceAsset, oSwapParams, showLedgerModal, submitApproveTx, submitSwapTx, useSourceAssetLedger])
+  }, [
+    showLedgerModal,
+    sourceChain,
+    intl,
+    sourceAsset,
+    network,
+    oSwapParams,
+    submitSwapTx,
+    submitApproveTx,
+    useSourceAssetLedger
+  ])
 
   const sourceChainFeeError: boolean = useMemo(() => {
     // ignore error check by having zero amounts or min amount errors
@@ -1327,7 +1341,7 @@ export const Swap = ({
           { id: 'swap.errors.amount.balanceShouldCoverChainFee' },
           {
             balance: formatAssetAmountCurrency({
-              asset: getChainAsset(sourceAsset.chain),
+              asset: getChainAsset(sourceChain),
               amount: baseToAsset(sourceChainAssetAmount),
               trimZeros: true
             }),
@@ -1340,7 +1354,7 @@ export const Swap = ({
         )}
       </ErrorLabel>
     )
-  }, [sourceChainFeeError, swapFees, intl, sourceAsset.chain, sourceChainAssetAmount])
+  }, [sourceChainFeeError, swapFees, intl, sourceChain, sourceChainAssetAmount])
 
   // Label: Min amount to swap (<= 1e8)
   const swapMinResultLabel = useMemo(() => {
@@ -1368,9 +1382,9 @@ export const Swap = ({
     () =>
       FP.pipe(
         approveFeeRD,
-        RD.map((approveFee) => [{ asset: getChainAsset(sourceAsset.chain), amount: approveFee }])
+        RD.map((approveFee) => [{ asset: getChainAsset(sourceChain), amount: approveFee }])
       ),
-    [approveFeeRD, sourceAsset.chain]
+    [approveFeeRD, sourceChain]
   )
 
   const isApproveFeeError = useMemo(() => {
@@ -1395,12 +1409,12 @@ export const Swap = ({
           { id: 'swap.errors.amount.balanceShouldCoverChainFee' },
           {
             balance: formatAssetAmountCurrency({
-              asset: getChainAsset(sourceAsset.chain),
+              asset: getChainAsset(sourceChain),
               amount: baseToAsset(sourceChainAssetAmount),
               trimZeros: true
             }),
             fee: formatAssetAmountCurrency({
-              asset: getChainAsset(sourceAsset.chain),
+              asset: getChainAsset(sourceChain),
               trimZeros: true,
               amount: baseToAsset(approveFee)
             })
@@ -1408,7 +1422,7 @@ export const Swap = ({
         )}
       </ErrorLabel>
     )
-  }, [isApproveFeeError, walletBalancesLoading, intl, sourceAsset.chain, sourceChainAssetAmount, approveFee])
+  }, [isApproveFeeError, walletBalancesLoading, intl, sourceChain, sourceChainAssetAmount, approveFee])
 
   const onApprove = useCallback(() => {
     if (useSourceAssetLedger) {

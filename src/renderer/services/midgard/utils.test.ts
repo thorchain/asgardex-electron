@@ -12,7 +12,7 @@ import {
   THREE_RUNE_BASE_AMOUNT,
   FOUR_RUNE_BASE_AMOUNT
 } from '../../../shared/mock/amount'
-import { AssetAtom, AssetBNB, AssetBTC, AssetETH, AssetLTC, AssetRuneNative } from '../../../shared/utils/asset'
+import { AssetATOM, AssetBNB, AssetBTC, AssetETH, AssetLTC, AssetRuneNative } from '../../../shared/utils/asset'
 import {
   BCHChain,
   BNBChain,
@@ -538,7 +538,7 @@ describe('services/midgard/utils/', () => {
           eqOAssetWithAmount.equals(
             result,
             O.some({
-              asset: AssetAtom,
+              asset: AssetATOM,
               // "300" (1e8) in THORChain will be "3" (1e6) at COSMOS
               amount: baseAmount(3, COSMOS_DECIMAL)
             })

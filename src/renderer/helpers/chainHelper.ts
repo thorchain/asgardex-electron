@@ -1,7 +1,7 @@
 import { Asset } from '@xchainjs/xchain-util'
 
 import {
-  AssetAtom,
+  AssetATOM,
   AssetBCH,
   AssetBNB,
   AssetBTC,
@@ -37,7 +37,7 @@ export const getChainAsset = (chain: Chain): Asset => {
     case THORChain:
       return AssetRuneNative
     case CosmosChain:
-      return AssetAtom
+      return AssetATOM
     case BCHChain:
       return AssetBCH
     case LTCChain:
@@ -52,44 +52,44 @@ export const getChainAsset = (chain: Chain): Asset => {
 /**
  * Check whether chain is BTC chain
  */
-export const isBtcChain = (chain: Chain): boolean => eqChain.equals(chain, BTCChain)
+export const isBtcChain = (chain: string): boolean => isChain(chain) && eqChain.equals(chain, BTCChain)
 
 /**
  * Check whether chain is LTC chain
  */
-export const isLtcChain = (chain: Chain): boolean => eqChain.equals(chain, LTCChain)
+export const isLtcChain = (chain: string): boolean => isChain(chain) && eqChain.equals(chain, LTCChain)
 
 /**
  * Check whether chain is THOR chain
  */
-export const isThorChain = (chain: Chain): boolean => eqChain.equals(chain, THORChain)
+export const isThorChain = (chain: string): boolean => isChain(chain) && eqChain.equals(chain, THORChain)
 
 /**
  * Check whether chain is BNB chain
  */
-export const isBnbChain = (chain: Chain): boolean => eqChain.equals(chain, BNBChain)
+export const isBnbChain = (chain: string): boolean => isChain(chain) && eqChain.equals(chain, BNBChain)
 
 /**
  * Check whether chain is ETH chain
  */
-export const isEthChain = (chain: Chain): boolean => eqChain.equals(chain, ETHChain)
+export const isEthChain = (chain: string): boolean => isChain(chain) && eqChain.equals(chain, ETHChain)
 
 /**
  * Check whether chain is BCH chain
  */
-export const isBchChain = (chain: Chain): boolean => eqChain.equals(chain, BCHChain)
+export const isBchChain = (chain: string): boolean => isChain(chain) && eqChain.equals(chain, BCHChain)
 
 /**
  * Check whether chain is DOGE chain
  */
-export const isDogeChain = (chain: Chain): boolean => eqChain.equals(chain, DOGEChain)
+export const isDogeChain = (chain: string): boolean => isChain(chain) && eqChain.equals(chain, DOGEChain)
 
 /**
  * Check whether chain is Cosmos (GAIA) chain
  */
-export const isCosmosChain = (chain: Chain): boolean => eqChain.equals(chain, CosmosChain)
+export const isCosmosChain = (chain: string): boolean => isChain(chain) && eqChain.equals(chain, CosmosChain)
 
-export const isEnabledChain = (chain: Chain) => ENABLED_CHAINS.includes(chain)
+export const isEnabledChain = (chain: string) => isChain(chain) && ENABLED_CHAINS.includes(chain)
 
 type ChainValues<T> = {
   [k in Chain]?: T[]

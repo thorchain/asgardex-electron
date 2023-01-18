@@ -13,7 +13,7 @@ import { useMatch, useNavigate, useParams } from 'react-router-dom'
 import * as RxOp from 'rxjs/operators'
 
 import { Network } from '../../../shared/api/types'
-import { Chain } from '../../../shared/utils/chain'
+import { Chain, unsafeChainFromAsset } from '../../../shared/utils/chain'
 import { isLedgerWallet, isWalletType } from '../../../shared/utils/guard'
 import { WalletType } from '../../../shared/wallet/types'
 import { AddSavers } from '../../components/savers/AddSavers'
@@ -65,6 +65,9 @@ type Props = { asset: Asset; walletType: WalletType }
 
 const Content: React.FC<Props> = (props): JSX.Element => {
   const { asset, walletType } = props
+
+  const chain = unsafeChainFromAsset(asset)
+
   const intl = useIntl()
 
   const navigate = useNavigate()
@@ -100,8 +103,8 @@ const Content: React.FC<Props> = (props): JSX.Element => {
   )
 
   useEffect(() => {
-    updateAddress$({ chain: asset.chain, network, walletType })
-  }, [network, asset.chain, walletType, updateAddress$])
+    updateAddress$({ chain, network, walletType })
+  }, [network, walletType, updateAddress$, chain])
 
   const {
     service: {
@@ -117,9 +120,9 @@ const Content: React.FC<Props> = (props): JSX.Element => {
   const feesRD: BaseAmountRD = RD.success(baseAmount(123000))
 
   const reloadHandler = useCallback(() => {
-    reloadBalancesByChain(asset.chain)
+    reloadBalancesByChain(chain)
     reloadSaverProvider()
-  }, [asset.chain, reloadBalancesByChain, reloadSaverProvider])
+  }, [chain, reloadBalancesByChain, reloadSaverProvider])
 
   const renderError = useCallback(
     (e: Error) => (

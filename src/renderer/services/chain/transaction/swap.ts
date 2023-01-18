@@ -5,6 +5,7 @@ import * as O from 'fp-ts/lib/Option'
 import * as Rx from 'rxjs'
 import * as RxOp from 'rxjs/operators'
 
+import { unsafeChainFromAsset } from '../../../../shared/utils/chain'
 import { getEthAssetAddress, isEthAsset, isRuneNativeAsset } from '../../../helpers/assetHelper'
 import { isEthChain } from '../../../helpers/chainHelper'
 import { liveData } from '../../../helpers/rx/liveData'
@@ -39,6 +40,8 @@ export const swap$ = ({
   // total of progress
   const total = O.some(100)
 
+  const chain = unsafeChainFromAsset(asset)
+
   // Observable state of loading process
   // we start with progress of 25%
   const {
@@ -60,7 +63,7 @@ export const swap$ = ({
         // We don't have a RUNE pool, so we just validate current connected node
         validateNode$(),
         // in other case we have to validate pool address
-        midgardPoolsService.validatePool$(poolAddresses, asset.chain)
+        midgardPoolsService.validatePool$(poolAddresses, chain)
       )
     ),
     liveData.chain((_) => {
@@ -84,8 +87,8 @@ export const swap$ = ({
       setState({ ...getState(), step: 3, swapTx: RD.success(txHash), swap: RD.progress({ loaded: 75, total }) })
       // 3. check tx finality by polling its tx data
       const assetAddress: O.Option<Address> =
-        isEthChain(asset.chain) && !isEthAsset(asset) ? getEthAssetAddress(asset) : O.none
-      return poolTxStatusByChain$({ txHash, chain: asset.chain, assetAddress })
+        isEthChain(chain) && !isEthAsset(asset) ? getEthAssetAddress(asset) : O.none
+      return poolTxStatusByChain$({ txHash, chain, assetAddress })
     }),
     // Update state
     liveData.map((_) => setState({ ...getState(), swap: RD.success(true) })),

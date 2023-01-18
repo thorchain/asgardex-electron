@@ -19,7 +19,7 @@ import { useIntl } from 'react-intl'
 
 import { Network } from '../../../../shared/api/types'
 import { AssetRuneNative } from '../../../../shared/utils/asset'
-import { Chain, THORChain } from '../../../../shared/utils/chain'
+import { Chain, THORChain, unsafeChainFromAsset } from '../../../../shared/utils/chain'
 import { isLedgerWallet } from '../../../../shared/utils/guard'
 import { WalletAddress } from '../../../../shared/wallet/types'
 import { ZERO_BASE_AMOUNT } from '../../../const'
@@ -117,6 +117,8 @@ export const Withdraw: React.FC<Props> = ({
 
   const { asset, decimal: assetDecimal } = assetWD
 
+  const chain = unsafeChainFromAsset(asset)
+
   const {
     type: runeWalletType,
     address: runeAddress,
@@ -128,9 +130,9 @@ export const Withdraw: React.FC<Props> = ({
   // Disable withdraw in case all or pool actions are disabled
   const disableWithdrawAction = useMemo(
     () =>
-      PoolHelpers.disableAllActions({ chain: asset.chain, haltedChains, mimirHalt }) ||
-      PoolHelpers.disablePoolActions({ chain: asset.chain, haltedChains, mimirHalt }),
-    [asset.chain, haltedChains, mimirHalt]
+      PoolHelpers.disableAllActions({ chain, haltedChains, mimirHalt }) ||
+      PoolHelpers.disablePoolActions({ chain, haltedChains, mimirHalt }),
+    [chain, haltedChains, mimirHalt]
   )
 
   const [withdrawPercent, setWithdrawPercent] = useState(disabled ? 0 : 50)

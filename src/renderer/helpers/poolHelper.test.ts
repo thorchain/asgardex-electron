@@ -7,7 +7,16 @@ import * as O from 'fp-ts/lib/Option'
 import { PoolsWatchList } from '../../shared/api/io'
 import { ASSETS_TESTNET } from '../../shared/mock/assets'
 import { AssetBNB, AssetRuneNative } from '../../shared/utils/asset'
-import { BCHChain, BNBChain, BTCChain, CosmosChain, DOGEChain, ETHChain, LTCChain } from '../../shared/utils/chain'
+import {
+  BCHChain,
+  BNBChain,
+  BTCChain,
+  Chain,
+  CosmosChain,
+  DOGEChain,
+  ETHChain,
+  LTCChain
+} from '../../shared/utils/chain'
 import { AssetBUSD74E } from '../const'
 import { PoolDetails } from '../services/midgard/types'
 import { toPoolData } from '../services/midgard/utils'
@@ -179,7 +188,7 @@ describe('helpers/poolHelper/', () => {
   })
 
   describe('disableAllActions', () => {
-    const haltedChains = [ETHChain, BNBChain]
+    const haltedChains: Chain[] = [ETHChain, BNBChain]
     it('true for any chain if THORChain is halted', () => {
       const result = disableAllActions({
         chain: BNBChain,
@@ -239,7 +248,7 @@ describe('helpers/poolHelper/', () => {
   })
 
   describe('disableTradingActions', () => {
-    const haltedChains = [ETHChain, BNBChain]
+    const haltedChains: Chain[] = [ETHChain, BNBChain]
     it('true for any chain if trading is halted', () => {
       const result = disableTradingActions({
         chain: BNBChain,

@@ -7,7 +7,8 @@ import * as IOG from 'io-ts/Guard'
 import { Network } from '../api/types'
 import { EthHDMode } from '../ethereum/types'
 import { HDMode, WalletType } from '../wallet/types'
-import { Chain, isChain as isChain1 } from './chain'
+import type { Chain } from './chain'
+import * as Util from './chain'
 
 export const nonEmptyStringGuard = FP.pipe(
   IOG.string,
@@ -15,7 +16,7 @@ export const nonEmptyStringGuard = FP.pipe(
 )
 
 const chainGuard: IOG.Guard<unknown, Chain> = {
-  is: (u: unknown): u is Chain => nonEmptyStringGuard.is(u) && isChain1(u)
+  is: (u: unknown): u is Chain => nonEmptyStringGuard.is(u) && Util.isChain(u)
 }
 
 export const isChain = (u: unknown): u is Chain => chainGuard.is(u)

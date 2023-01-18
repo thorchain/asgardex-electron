@@ -9,7 +9,7 @@ import * as O from 'fp-ts/Option'
 import * as Rx from 'rxjs'
 import * as RxOp from 'rxjs/operators'
 
-import { Chain } from '../../../shared/utils/chain'
+import { Chain, unsafeChainFromAsset } from '../../../shared/utils/chain'
 import { DEFAULT_GET_POOLS_PERIOD, ONE_BN, PRICE_POOLS_WHITELIST } from '../../const'
 import { validAssetForETH, isPricePoolAsset, midgardAssetFromString } from '../../helpers/assetHelper'
 import { isEnabledChain, isEthChain } from '../../helpers/chainHelper'
@@ -533,7 +533,10 @@ const createPoolsService = ({
         RD.toOption,
         // TODO (@Veado) Will we ingore router for some cases (e.g. by withdrawing something from ETH vault not using router)=
         (oPoolAddresses) => sequenceTOption(oPoolAddresses, oSelectedPoolAsset),
-        O.chain(([addresses, { chain }]) => getPoolAddressesByChain(addresses, chain))
+        O.chain(([addresses, selectedAsset]) => {
+          const chain = unsafeChainFromAsset(selectedAsset)
+          return getPoolAddressesByChain(addresses, chain)
+        })
       )
     })
   )

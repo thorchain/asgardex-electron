@@ -5,7 +5,7 @@ import * as O from 'fp-ts/lib/Option'
 
 import { ERC20_TESTNET } from '../../shared/mock/assets'
 import {
-  AssetAtom,
+  AssetATOM,
   AssetBCH,
   AssetBNB,
   AssetBTC,
@@ -351,7 +351,7 @@ describe('helpers/assetHelper', () => {
       expect(isChainAsset(AssetRuneNative)).toBeTruthy()
     })
     it('ATOM', () => {
-      expect(isChainAsset(AssetAtom)).toBeTruthy()
+      expect(isChainAsset(AssetATOM)).toBeTruthy()
     })
   })
 

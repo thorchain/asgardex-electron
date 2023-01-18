@@ -22,7 +22,7 @@ import { useNavigate } from 'react-router'
 
 import { Network } from '../../../../shared/api/types'
 import { AssetRuneNative } from '../../../../shared/utils/asset'
-import { chainToString } from '../../../../shared/utils/chain'
+import { chainToString, unsafeChainFromAsset } from '../../../../shared/utils/chain'
 import { isKeystoreWallet } from '../../../../shared/utils/guard'
 import { DEFAULT_WALLET_TYPE } from '../../../const'
 import { disableRuneUpgrade, isNonNativeRuneAsset, isRuneNativeAsset, isUSDAsset } from '../../../helpers/assetHelper'
@@ -171,6 +171,7 @@ export const AssetsTableCollapsable: React.FC<Props> = (props): JSX.Element => {
 
   const renderActionColumn = useCallback(
     ({ asset, walletAddress, walletIndex, walletType, hdMode }: WalletBalance) => {
+      const chain = unsafeChainFromAsset(asset)
       const walletAsset: SelectedWalletAsset = { asset, walletAddress, walletIndex, walletType, hdMode }
       const hasActivePool: boolean = FP.pipe(O.fromNullable(poolsData[assetToString(asset)]), O.isSome)
       const deepestPoolAsset = FP.pipe(
@@ -266,7 +267,7 @@ export const AssetsTableCollapsable: React.FC<Props> = (props): JSX.Element => {
           {
             label: intl.formatMessage({ id: 'wallet.action.receive' }),
             callback: () => {
-              setShowQRModal(O.some({ asset: getChainAsset(asset.chain), address: walletAddress }))
+              setShowQRModal(O.some({ asset: getChainAsset(chain), address: walletAddress }))
             }
           }
         ]),

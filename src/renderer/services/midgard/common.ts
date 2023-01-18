@@ -2,6 +2,7 @@ import * as O from 'fp-ts/lib/Option'
 import { Observable } from 'rxjs'
 import * as RxOp from 'rxjs/operators'
 
+import { unsafeChainFromAsset } from '../../../shared/utils/chain'
 import { eqOAsset } from '../../helpers/fp/eq'
 import { observableState } from '../../helpers/stateHelper'
 import { SelectedPoolAsset, SelectedPoolChain } from './types'
@@ -23,6 +24,6 @@ const selectedPoolAsset$: Observable<SelectedPoolAsset> = _selectedPoolAsset$.pi
   RxOp.shareReplay(1)
 )
 
-const selectedPoolChain$: Observable<SelectedPoolChain> = selectedPoolAsset$.pipe(RxOp.map(O.map(({ chain }) => chain)))
+const selectedPoolChain$: Observable<SelectedPoolChain> = selectedPoolAsset$.pipe(RxOp.map(O.map(unsafeChainFromAsset)))
 
 export { selectedPoolAsset$, setSelectedPoolAsset, selectedPoolChain$ }

@@ -6,7 +6,7 @@ import * as Rx from 'rxjs'
 import * as RxOp from 'rxjs/operators'
 
 import { AssetRuneNative } from '../../../../shared/utils/asset'
-import { THORChain } from '../../../../shared/utils/chain'
+import { THORChain, unsafeChainFromAsset } from '../../../../shared/utils/chain'
 import { getEthAssetAddress, isEthAsset, isRuneNativeAsset } from '../../../helpers/assetHelper'
 import { isEthChain } from '../../../helpers/chainHelper'
 import { liveData } from '../../../helpers/rx/liveData'
@@ -147,6 +147,7 @@ export const asymWithdraw$ = ({
 }: AsymWithdrawParams): WithdrawState$ => {
   // total of progress
   const total = O.some(100)
+  const chain = unsafeChainFromAsset(asset)
 
   // Observable state of to reflect status of all needed steps
   const {
@@ -170,7 +171,7 @@ export const asymWithdraw$ = ({
         // We don't have a RUNE pool, so we just validate current connected node
         validateNode$(),
         // in other case we have to validate pool address
-        midgardPoolsService.validatePool$(poolAddresses, asset.chain)
+        midgardPoolsService.validatePool$(poolAddresses, chain)
       )
     ),
     // 2. send RUNE withdraw txs
@@ -182,7 +183,7 @@ export const asymWithdraw$ = ({
         hdMode,
         asset,
         recipient: poolAddress.address, // it will be empty string for RUNE
-        amount: smallestAmountToSent(asset.chain, network),
+        amount: smallestAmountToSent(chain, network),
         memo,
         feeOption: ChainTxFeeOption.WITHDRAW
       })
@@ -198,7 +199,7 @@ export const asymWithdraw$ = ({
       // 3. check tx finality by polling its tx data
       const assetAddress: O.Option<Address> =
         isEthChain(asset.chain) && !isEthAsset(asset) ? getEthAssetAddress(asset) : O.none
-      return poolTxStatusByChain$({ txHash, chain: asset.chain, assetAddress })
+      return poolTxStatusByChain$({ txHash, chain, assetAddress })
     }),
     liveData.map((_) => setState({ ...getState(), withdraw: RD.success(true) })),
     // Add failures to state

@@ -191,6 +191,8 @@ export const SymDeposit: React.FC<Props> = (props) => {
 
   const intl = useIntl()
 
+  const chain = unsafeToChainFromAsset(asset)
+
   const prevAsset = useRef<O.Option<Asset>>(O.none)
 
   const isRuneLedger = isLedgerWallet(runeWalletType)
@@ -357,7 +359,7 @@ export const SymDeposit: React.FC<Props> = (props) => {
   )
 
   const oChainAssetBalance: O.Option<BaseAmount> = useMemo(() => {
-    const chainAsset = getChainAsset(asset.chain)
+    const chainAsset = getChainAsset(chain)
     return FP.pipe(
       WalletHelper.getWalletBalanceByAssetAndWalletType({
         oWalletBalances,
@@ -366,7 +368,7 @@ export const SymDeposit: React.FC<Props> = (props) => {
       }),
       O.map(({ amount }) => amount)
     )
-  }, [asset.chain, oWalletBalances, assetWalletType])
+  }, [chain, oWalletBalances, assetWalletType])
 
   const chainAssetBalance: BaseAmount = useMemo(
     () =>
@@ -379,12 +381,12 @@ export const SymDeposit: React.FC<Props> = (props) => {
 
   const needApprovement = useMemo(() => {
     // Other chains than ETH do not need an approvement
-    if (!isEthChain(asset.chain)) return false
+    if (!isEthChain(chain)) return false
     // ETH does not need to be approved
     if (isEthAsset(asset)) return false
     // ERC20 token does need approvement only
     return isEthTokenAsset(asset)
-  }, [asset])
+  }, [asset, chain])
 
   const oApproveParams: O.Option<ApproveParams> = useMemo(() => {
     const oRouterAddress: O.Option<Address> = FP.pipe(
@@ -1137,7 +1139,7 @@ export const SymDeposit: React.FC<Props> = (props) => {
         { id: 'deposit.add.error.chainFeeNotCovered' },
         {
           fee: formatAssetAmountCurrency({
-            asset: getChainAsset(asset.chain),
+            asset: getChainAsset(chain),
             trimZeros: true,
             amount: baseToAsset(fee)
           }),
@@ -1149,7 +1151,7 @@ export const SymDeposit: React.FC<Props> = (props) => {
         <p className="mb-20px p-0 text-center font-main text-[12px] uppercase text-error0 dark:text-error0d">{msg}</p>
       )
     },
-    [intl]
+    [chain, intl]
   )
 
   const isThorchainFeeError = useMemo(() => {
@@ -1189,8 +1191,8 @@ export const SymDeposit: React.FC<Props> = (props) => {
     if (!isAssetChainFeeError || isBalanceError /* Don't render anything in case of fees or balance errors */)
       return <></>
 
-    return renderFeeError(Helper.minBalanceToDeposit(depositFees.asset), chainAssetBalance, getChainAsset(asset.chain))
-  }, [isAssetChainFeeError, isBalanceError, renderFeeError, depositFees.asset, chainAssetBalance, asset])
+    return renderFeeError(Helper.minBalanceToDeposit(depositFees.asset), chainAssetBalance, getChainAsset(chain))
+  }, [isAssetChainFeeError, isBalanceError, renderFeeError, depositFees.asset, chainAssetBalance, chain])
 
   const txModalExtraContent = useMemo(() => {
     const stepDescriptions = [
@@ -1338,9 +1340,9 @@ export const SymDeposit: React.FC<Props> = (props) => {
     () =>
       FP.pipe(
         approveFeeRD,
-        RD.map((approveFee) => [{ asset: getChainAsset(asset.chain), amount: approveFee }])
+        RD.map((approveFee) => [{ asset: getChainAsset(chain), amount: approveFee }])
       ),
-    [approveFeeRD, asset.chain]
+    [approveFeeRD, chain]
   )
 
   const isApproveFeeError = useMemo(() => {
@@ -1366,7 +1368,7 @@ export const SymDeposit: React.FC<Props> = (props) => {
     )
       return <></>
 
-    return renderFeeError(approveFee, chainAssetBalance, getChainAsset(asset.chain))
+    return renderFeeError(approveFee, chainAssetBalance, getChainAsset(chain))
   }, [
     isApproveFeeError,
     oChainAssetBalance,
@@ -1374,7 +1376,7 @@ export const SymDeposit: React.FC<Props> = (props) => {
     renderFeeError,
     approveFee,
     chainAssetBalance,
-    asset.chain
+    chain
   ])
 
   const {
@@ -1651,7 +1653,7 @@ export const SymDeposit: React.FC<Props> = (props) => {
       setShowLedgerModal('none')
     }
 
-    const chainAsString = chainToString(asset.chain)
+    const chainAsString = chainToString(chain)
     const txtNeedsConnected = intl.formatMessage(
       {
         id: 'ledger.needsconnected'
@@ -1661,7 +1663,7 @@ export const SymDeposit: React.FC<Props> = (props) => {
 
     const description1 =
       // extra info for ERC20 assets only
-      isEthChain(asset.chain) && !isEthAsset(asset)
+      isEthChain(chain) && !isEthAsset(asset)
         ? `${txtNeedsConnected} ${intl.formatMessage(
             {
               id: 'ledger.blindsign'
@@ -1689,14 +1691,14 @@ export const SymDeposit: React.FC<Props> = (props) => {
         onSuccess={onSucceess}
         onClose={onClose}
         visible
-        chain={isRuneLedger ? THORChain : asset.chain}
+        chain={isRuneLedger ? THORChain : chain}
         network={network}
         description1={description1}
         description2={description2}
         addresses={addresses}
       />
     )
-  }, [asset, intl, isAssetLedger, isRuneLedger, network, oDepositParams, showLedgerModal, submitApproveTx])
+  }, [asset, chain, intl, isAssetLedger, isRuneLedger, network, oDepositParams, showLedgerModal, submitApproveTx])
 
   useEffect(() => {
     if (!eqOAsset.equals(prevAsset.current, O.some(asset))) {

@@ -9,6 +9,7 @@ import { useObservableState } from 'observable-hooks'
 import * as Rx from 'rxjs'
 import * as RxOp from 'rxjs/operators'
 
+import { unsafeChain } from '../../../shared/utils/chain'
 import { LoadingView } from '../../components/shared/loading'
 import { AssetDetails } from '../../components/wallet/assets'
 import { useChainContext } from '../../contexts/ChainContext'
@@ -94,7 +95,10 @@ export const AssetDetailsView: React.FC = (): JSX.Element => {
         RxOp.switchMap(
           O.fold(
             () => Rx.of(O.none),
-            ({ asset }) => clientByChain$(asset.chain)
+            ({ asset }) => {
+              const chain = unsafeChain(asset.chain)
+              return clientByChain$(chain)
+            }
           )
         )
       ),
@@ -121,7 +125,7 @@ export const AssetDetailsView: React.FC = (): JSX.Element => {
   const { openExplorerTxUrl } = useOpenExplorerTxUrl(
     FP.pipe(
       oSelectedAsset,
-      O.map(({ asset }) => asset.chain)
+      O.map(({ asset }) => unsafeChain(asset.chain))
     )
   )
 
@@ -136,7 +140,7 @@ export const AssetDetailsView: React.FC = (): JSX.Element => {
           balances={walletBalances}
           asset={asset}
           loadTxsHandler={loadTxs}
-          reloadBalancesHandler={reloadBalancesByChain(asset.chain)}
+          reloadBalancesHandler={reloadBalancesByChain(unsafeChain(asset.chain))}
           openExplorerTxUrl={openExplorerTxUrl}
           openExplorerAddressUrl={openExplorerAddressUrlHandler}
           walletAddress={walletAddress}

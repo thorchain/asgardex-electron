@@ -9,7 +9,7 @@ import { useIntl } from 'react-intl'
 import { useNavigate } from 'react-router-dom'
 
 import { Network } from '../../../../shared/api/types'
-import { chainToString } from '../../../../shared/utils/chain'
+import { chainToString, unsafeChainFromAsset } from '../../../../shared/utils/chain'
 import { WalletType } from '../../../../shared/wallet/types'
 import * as AssetHelper from '../../../helpers/assetHelper'
 import { isCosmosChain } from '../../../helpers/chainHelper'
@@ -59,6 +59,8 @@ export const AssetDetails: React.FC<Props> = (props): JSX.Element => {
   } = props
 
   const [currentPage, setCurrentPage] = useState(1)
+
+  const chain = unsafeChainFromAsset(asset)
 
   const navigate = useNavigate()
   const intl = useIntl()
@@ -235,12 +237,9 @@ export const AssetDetails: React.FC<Props> = (props): JSX.Element => {
             as long as an external API can't provide it - currently `https://lcd-cosmoshub.keplr.app`
             See https://github.com/thorchain/asgardex-electron/pull/2405
            */}
-          {isCosmosChain(asset.chain) ? (
+          {isCosmosChain(chain) ? (
             <WarningView
-              subTitle={intl.formatMessage(
-                { id: 'wallet.txs.history.disabled' },
-                { chain: chainToString(asset.chain) }
-              )}
+              subTitle={intl.formatMessage({ id: 'wallet.txs.history.disabled' }, { chain: chainToString(chain) })}
               extra={
                 <FlatButton size="normal" color="neutral" onClick={openExplorerAddressUrl}>
                   {intl.formatMessage({ id: 'wallet.txs.history' })}
@@ -253,7 +252,7 @@ export const AssetDetails: React.FC<Props> = (props): JSX.Element => {
               txsPageRD={txsPageRD}
               clickTxLinkHandler={openExplorerTxUrl}
               changePaginationHandler={onChangePagination}
-              chain={asset.chain}
+              chain={chain}
               network={network}
               walletAddress={walletAddress}
               reloadHandler={reloadTxs}

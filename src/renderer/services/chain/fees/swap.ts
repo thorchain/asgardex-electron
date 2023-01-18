@@ -3,6 +3,7 @@ import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
 import * as RxOp from 'rxjs/operators'
 
+import { unsafeChainFromAsset } from '../../../../shared/utils/chain'
 import { ZERO_BASE_AMOUNT } from '../../../const'
 import { isRuneNativeAsset } from '../../../helpers/assetHelper'
 import { getChainAsset } from '../../../helpers/chainHelper'
@@ -18,10 +19,14 @@ import { poolOutboundFee$, poolInboundFee$ } from './common'
  * Returns zero swap fees
  * by given `in` / `out` assets of a swap
  */
-export const getZeroSwapFees = ({ inAsset, outAsset }: { inAsset: Asset; outAsset: Asset }): SwapFees => ({
-  inFee: { amount: ZERO_BASE_AMOUNT, asset: getChainAsset(inAsset.chain) },
-  outFee: { amount: ZERO_BASE_AMOUNT, asset: getChainAsset(outAsset.chain) }
-})
+export const getZeroSwapFees = ({ inAsset, outAsset }: { inAsset: Asset; outAsset: Asset }): SwapFees => {
+  const inChain = unsafeChainFromAsset(inAsset)
+  const outChain = unsafeChainFromAsset(outAsset)
+  return {
+    inFee: { amount: ZERO_BASE_AMOUNT, asset: getChainAsset(inChain) },
+    outFee: { amount: ZERO_BASE_AMOUNT, asset: getChainAsset(outChain) }
+  }
+}
 
 // state of `SwapFeesParams` used for reloading swap fees
 const {
