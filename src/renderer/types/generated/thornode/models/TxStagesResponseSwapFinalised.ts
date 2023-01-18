@@ -11,23 +11,15 @@
  * Do not edit the class manually.
  */
 
-import {
-    VaultRouter,
-} from './';
-
 /**
  * @export
- * @interface VaultInfo
+ * @interface TxStagesResponseSwapFinalised
  */
-export interface VaultInfo {
+export interface TxStagesResponseSwapFinalised {
     /**
-     * @type {string}
-     * @memberof VaultInfo
+     * returns true if an inbound transaction\'s swap (successful or refunded) is no longer pending
+     * @type {boolean}
+     * @memberof TxStagesResponseSwapFinalised
      */
-    pub_key: string;
-    /**
-     * @type {Array<VaultRouter>}
-     * @memberof VaultInfo
-     */
-    routers: Array<VaultRouter>;
+    completed: boolean;
 }

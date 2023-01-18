@@ -45,6 +45,7 @@ export * from './TxStagesResponseInboundFinalised';
 export * from './TxStagesResponseInboundObserved';
 export * from './TxStagesResponseOutboundDelay';
 export * from './TxStagesResponseOutboundSigned';
+export * from './TxStagesResponseSwapFinalised';
 export * from './TxStatusResponse';
 export * from './TxStatusResponsePlannedOutTxs';
 export * from './Vault';
