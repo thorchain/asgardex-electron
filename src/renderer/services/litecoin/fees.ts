@@ -1,11 +1,11 @@
 import * as RD from '@devexperts/remote-data-ts'
 import { Client as LTCClient, getDefaultFeesWithRates } from '@xchainjs/xchain-litecoin'
-import { LTCChain } from '@xchainjs/xchain-util'
 import * as FP from 'fp-ts/function'
 import * as O from 'fp-ts/Option'
 import * as Rx from 'rxjs'
 import * as RxOp from 'rxjs/operators'
 
+import { LTCChain } from '../../../shared/utils/chain'
 import { observableState } from '../../helpers/stateHelper'
 import { FeesWithRatesRD } from '../bitcoin/types'
 import { Memo } from '../chain/types'

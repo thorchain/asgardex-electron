@@ -1,9 +1,9 @@
 import * as RD from '@devexperts/remote-data-ts'
 import { Keystore } from '@xchainjs/xchain-crypto'
-import { BTCChain, BCHChain, BNBChain, ETHChain, LTCChain, THORChain } from '@xchainjs/xchain-util'
 import * as Rx from 'rxjs'
 import * as RxOp from 'rxjs/operators'
 
+import { BCHChain, BNBChain, BTCChain, ETHChain, LTCChain, THORChain } from '../utils/chain'
 import { WalletAddresses } from '../wallet/types'
 
 export const mockValidatePassword$ = (password: string) =>

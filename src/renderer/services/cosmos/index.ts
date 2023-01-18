@@ -1,5 +1,4 @@
-import { CosmosChain } from '@xchainjs/xchain-util'
-
+import { CosmosChain } from '../../../shared/utils/chain'
 import { network$ } from '../app/service'
 import { balances$, reloadBalances, getBalanceByAddress$, reloadBalances$, resetReloadBalances } from './balances'
 import { client$, clientState$, address$, addressUI$, explorerUrl$ } from './common'

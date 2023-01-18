@@ -2,18 +2,7 @@ import React, { useMemo } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
 import { XChainClient } from '@xchainjs/xchain-client'
-import {
-  Address,
-  BCHChain,
-  BNBChain,
-  BTCChain,
-  Chain,
-  CosmosChain,
-  DOGEChain,
-  ETHChain,
-  LTCChain,
-  THORChain
-} from '@xchainjs/xchain-util'
+import { Address } from '@xchainjs/xchain-util'
 import * as FP from 'fp-ts/function'
 import * as A from 'fp-ts/lib/Array'
 import * as O from 'fp-ts/lib/Option'
@@ -24,6 +13,17 @@ import * as RxOp from 'rxjs/operators'
 import { LedgerErrorId } from '../../../shared/api/types'
 import { DEFAULT_ETH_HD_MODE } from '../../../shared/ethereum/const'
 import { EthHDMode } from '../../../shared/ethereum/types'
+import {
+  BCHChain,
+  BNBChain,
+  BTCChain,
+  Chain,
+  CosmosChain,
+  DOGEChain,
+  ETHChain,
+  LTCChain,
+  THORChain
+} from '../../../shared/utils/chain'
 import { HDMode } from '../../../shared/wallet/types'
 import { WalletSettings } from '../../components/settings'
 import { useBinanceContext } from '../../contexts/BinanceContext'

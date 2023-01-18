@@ -9,7 +9,6 @@ import {
   assetToBase,
   BaseAmount,
   baseToAsset,
-  chainToString,
   formatAssetAmountCurrency
 } from '@xchainjs/xchain-util'
 import { Form } from 'antd'
@@ -21,6 +20,7 @@ import * as O from 'fp-ts/lib/Option'
 import * as S from 'fp-ts/lib/string'
 import { useIntl } from 'react-intl'
 
+import { chainToString } from '../../../../../shared/utils/chain'
 import { isKeystoreWallet, isLedgerWallet, isWalletType } from '../../../../../shared/utils/guard'
 import { ZERO_BASE_AMOUNT, ZERO_BN } from '../../../../const'
 import { convertBaseAmountDecimal } from '../../../../helpers/assetHelper'

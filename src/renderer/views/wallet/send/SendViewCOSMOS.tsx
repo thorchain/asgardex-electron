@@ -1,11 +1,11 @@
 import React, { useMemo } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
-import { CosmosChain } from '@xchainjs/xchain-util'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/Option'
 import { useObservableState } from 'observable-hooks'
 
+import { CosmosChain } from '../../../../shared/utils/chain'
 import { LoadingView } from '../../../components/shared/loading'
 import { SendFormCOSMOS } from '../../../components/wallet/txs/send'
 import { useChainContext } from '../../../contexts/ChainContext'

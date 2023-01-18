@@ -12,14 +12,13 @@ import {
   AssetRuneERC20,
   AssetRuneERC20Testnet,
   AssetRuneNative,
-  baseAmount,
-  BNBChain,
-  ETHChain
+  baseAmount
 } from '@xchainjs/xchain-util'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
 
 import { ERC20_TESTNET } from '../../shared/mock/assets'
+import { BNBChain, ETHChain } from '../../shared/utils/chain'
 import {
   AssetBUSDBAF,
   AssetBUSDBD1,

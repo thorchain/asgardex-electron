@@ -1,3 +1,7 @@
+import * as O from 'fp-ts/lib/Option'
+import * as Rx from 'rxjs'
+import * as RxOp from 'rxjs/operators'
+
 import {
   BCHChain,
   BNBChain,
@@ -8,11 +12,7 @@ import {
   ETHChain,
   LTCChain,
   THORChain
-} from '@xchainjs/xchain-util'
-import * as O from 'fp-ts/lib/Option'
-import * as Rx from 'rxjs'
-import * as RxOp from 'rxjs/operators'
-
+} from '../../../shared/utils/chain'
 import * as BNC from '../binance'
 import * as BTC from '../bitcoin'
 import * as BCH from '../bitcoincash'

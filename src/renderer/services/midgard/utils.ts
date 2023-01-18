@@ -12,28 +12,17 @@ import {
   baseAmount,
   Asset,
   assetToString,
-  Chain,
   isValidBN,
   bn,
   BaseAmount,
   Address,
   AssetBNB,
-  BNBChain,
-  BTCChain,
   AssetBTC,
-  BCHChain,
   AssetBCH,
-  LTCChain,
   AssetLTC,
-  DOGEChain,
   AssetDOGE,
-  ETHChain,
   AssetETH,
-  CosmosChain,
-  AssetAtom,
-  AVAXChain,
-  TerraChain,
-  THORChain
+  AssetAtom
 } from '@xchainjs/xchain-util'
 import * as A from 'fp-ts/lib/Array'
 import * as FP from 'fp-ts/lib/function'
@@ -41,6 +30,18 @@ import * as NEA from 'fp-ts/lib/NonEmptyArray'
 import * as O from 'fp-ts/lib/Option'
 import * as P from 'fp-ts/lib/Predicate'
 
+import {
+  AvalancheChain,
+  BCHChain,
+  BNBChain,
+  BTCChain,
+  Chain,
+  CosmosChain,
+  DOGEChain,
+  ETHChain,
+  LTCChain,
+  THORChain
+} from '../../../shared/utils/chain'
 import { optionFromNullableString } from '../../../shared/utils/fp'
 import { BNB_DECIMAL, convertBaseAmountDecimal, isUSDAsset, THORCHAIN_DECIMAL } from '../../helpers/assetHelper'
 import { isMiniToken } from '../../helpers/binanceHelper'
@@ -271,10 +272,7 @@ export const getOutboundAssetFeeByChain = (
           })
         }
         // AVAX is not supported yet
-        case AVAXChain:
-          return O.none
-        // 'Terra (Classic) is not supported anymore'
-        case TerraChain:
+        case AvalancheChain:
           return O.none
         // 'THORChain can be ignored - fees for asset side only
         case THORChain:

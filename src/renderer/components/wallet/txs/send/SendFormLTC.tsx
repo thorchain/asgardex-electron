@@ -12,8 +12,7 @@ import {
   baseAmount,
   baseToAsset,
   bn,
-  formatAssetAmountCurrency,
-  LTCChain
+  formatAssetAmountCurrency
 } from '@xchainjs/xchain-util'
 import { Row, Form } from 'antd'
 import { RadioChangeEvent } from 'antd/lib/radio'
@@ -23,6 +22,7 @@ import * as O from 'fp-ts/lib/Option'
 import { useIntl } from 'react-intl'
 
 import { Network } from '../../../../../shared/api/types'
+import { LTCChain } from '../../../../../shared/utils/chain'
 import { isKeystoreWallet, isLedgerWallet } from '../../../../../shared/utils/guard'
 import { WalletType } from '../../../../../shared/wallet/types'
 import { ZERO_BASE_AMOUNT } from '../../../../const'

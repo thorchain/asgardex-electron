@@ -1,5 +1,4 @@
-import { Chain } from '@xchainjs/xchain-util'
-
+import { Chain } from '../../../../shared/utils/chain'
 import { WalletAddress } from '../../../../shared/wallet/types'
 import { PoolDetailRD } from '../../../services/midgard/types'
 import { MimirHalt } from '../../../services/thorchain/types'

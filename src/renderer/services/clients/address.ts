@@ -1,8 +1,9 @@
-import { Address, Chain } from '@xchainjs/xchain-util'
+import { Address } from '@xchainjs/xchain-util'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
 import * as RxOp from 'rxjs/operators'
 
+import { Chain } from '../../../shared/utils/chain'
 import { WalletAddress } from '../../../shared/wallet/types'
 import { removeAddressPrefix } from '../../helpers/addressHelper'
 import { eqOString } from '../../helpers/fp/eq'

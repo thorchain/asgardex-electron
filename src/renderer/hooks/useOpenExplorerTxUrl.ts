@@ -1,13 +1,13 @@
 import { useCallback, useEffect } from 'react'
 
 import { TxHash, XChainClient } from '@xchainjs/xchain-client'
-import { Chain } from '@xchainjs/xchain-util'
 import * as FP from 'fp-ts/function'
 import * as O from 'fp-ts/Option'
 import { useObservableState } from 'observable-hooks'
 import * as Rx from 'rxjs'
 import * as RxOp from 'rxjs/operators'
 
+import { Chain } from '../../shared/utils/chain'
 import { useChainContext } from '../contexts/ChainContext'
 import { eqOChain } from '../helpers/fp/eq'
 import { GetExplorerTxUrl, OpenExplorerTxUrl } from '../services/clients'

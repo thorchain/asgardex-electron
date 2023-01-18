@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useMemo } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
-import { Address, Asset, assetToString, BNBChain, Chain, ETHChain, THORChain } from '@xchainjs/xchain-util'
+import { Address, Asset, assetToString } from '@xchainjs/xchain-util'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/Option'
 import { useObservableState } from 'observable-hooks'
@@ -10,6 +10,7 @@ import * as Rx from 'rxjs'
 import * as RxOp from 'rxjs/operators'
 
 import { Network } from '../../../../shared/api/types'
+import { BNBChain, Chain, ETHChain, THORChain } from '../../../../shared/utils/chain'
 import { ErrorView } from '../../../components/shared/error'
 import { LoadingView } from '../../../components/shared/loading'
 import { BackLinkButton } from '../../../components/uielements/button'

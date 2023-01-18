@@ -1,12 +1,12 @@
 import { useCallback } from 'react'
 
 import { XChainClient } from '@xchainjs/xchain-client'
-import { Chain } from '@xchainjs/xchain-util'
 import * as FP from 'fp-ts/function'
 import * as A from 'fp-ts/lib/Array'
 import * as O from 'fp-ts/Option'
 import { useObservableState } from 'observable-hooks'
 
+import { Chain } from '../../shared/utils/chain'
 import { useChainContext } from '../contexts/ChainContext'
 import { OpenAddressUrl } from '../services/clients'
 

@@ -9,13 +9,12 @@ import {
   assetToBase,
   assetToString,
   baseAmount,
-  bn,
-  BTCChain,
-  THORChain
+  bn
 } from '@xchainjs/xchain-util'
 import * as O from 'fp-ts/lib/Option'
 
 import { ASSETS_TESTNET } from '../../../shared/mock/assets'
+import { BTCChain, THORChain } from '../../../shared/utils/chain'
 import { AssetBUSD74E, AssetBUSDBAF, AssetUSDTERC20Testnet, ZERO_BASE_AMOUNT } from '../../const'
 import { BNB_DECIMAL, THORCHAIN_DECIMAL } from '../../helpers/assetHelper'
 import { eqAsset, eqBaseAmount } from '../../helpers/fp/eq'

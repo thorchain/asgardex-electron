@@ -1,8 +1,6 @@
+import { AssetBNB, AssetBTC, AssetETH, AssetRuneNative } from '@xchainjs/xchain-util'
+
 import {
-  AssetBNB,
-  AssetBTC,
-  AssetETH,
-  AssetRuneNative,
   BCHChain,
   BNBChain,
   BTCChain,
@@ -11,8 +9,7 @@ import {
   ETHChain,
   LTCChain,
   THORChain
-} from '@xchainjs/xchain-util'
-
+} from '../../shared/utils/chain'
 import {
   getChainAsset,
   isBchChain,

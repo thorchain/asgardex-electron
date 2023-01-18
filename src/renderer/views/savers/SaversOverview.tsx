@@ -7,7 +7,6 @@ import {
   assetToString,
   BaseAmount,
   baseToAsset,
-  Chain,
   formatAssetAmountCurrency,
   formatBN
 } from '@xchainjs/xchain-util'
@@ -21,6 +20,7 @@ import { useObservableState } from 'observable-hooks'
 import { useIntl } from 'react-intl'
 import { useNavigate } from 'react-router-dom'
 
+import { Chain } from '../../../shared/utils/chain'
 import { FlatButton } from '../../components/uielements/button'
 import { PoolsPeriodSelector } from '../../components/uielements/pools/PoolsPeriodSelector'
 import { Table } from '../../components/uielements/table'

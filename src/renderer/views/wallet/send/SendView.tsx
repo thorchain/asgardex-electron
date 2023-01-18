@@ -1,5 +1,10 @@
 import React, { useCallback } from 'react'
 
+import * as FP from 'fp-ts/lib/function'
+import * as O from 'fp-ts/Option'
+import { useObservableState } from 'observable-hooks'
+import { useIntl } from 'react-intl'
+
 import {
   BCHChain,
   BNBChain,
@@ -9,12 +14,7 @@ import {
   ETHChain,
   LTCChain,
   THORChain
-} from '@xchainjs/xchain-util'
-import * as FP from 'fp-ts/lib/function'
-import * as O from 'fp-ts/Option'
-import { useObservableState } from 'observable-hooks'
-import { useIntl } from 'react-intl'
-
+} from '../../../../shared/utils/chain'
 import { LoadingView } from '../../../components/shared/loading'
 import { BackLinkButton } from '../../../components/uielements/button'
 import { useWalletContext } from '../../../contexts/WalletContext'

@@ -1,8 +1,8 @@
 import { ComponentMeta } from '@storybook/react'
-import { BNBChain } from '@xchainjs/xchain-util'
 
 import { Network } from '../../../../shared/api/types'
 import { BNB_ADDRESS_MAINNET, BNB_ADDRESS_TESTNET } from '../../../../shared/mock/address'
+import { BNBChain } from '../../../../shared/utils/chain'
 import * as AT from '../../../storybook/argTypes'
 import { AddressEllipsis as Component } from './index'
 

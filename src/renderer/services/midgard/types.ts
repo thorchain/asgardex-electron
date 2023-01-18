@@ -1,13 +1,14 @@
 import * as RD from '@devexperts/remote-data-ts'
 import { PoolData } from '@thorchain/asgardex-util'
 import { TxHash } from '@xchainjs/xchain-client'
-import { Address, Asset, BaseAmount, Chain } from '@xchainjs/xchain-util'
+import { Address, Asset, BaseAmount } from '@xchainjs/xchain-util'
 import BigNumber from 'bignumber.js'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
 import { IntlShape } from 'react-intl'
 import * as Rx from 'rxjs'
 
+import { Chain } from '../../../shared/utils/chain'
 import { LiveData } from '../../helpers/rx/liveData'
 import { AssetWithAmount, DepositType } from '../../types/asgardex'
 import {

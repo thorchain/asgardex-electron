@@ -8,22 +8,23 @@ import {
   assetToString,
   baseAmount,
   AssetRuneNative,
-  ETHChain,
-  BNBChain,
   AssetRune67C,
-  THORChain,
-  BTCChain,
-  LTCChain,
-  BCHChain,
-  Chain,
-  CosmosChain,
-  DOGEChain,
-  TerraChain,
-  AssetRuneERC20Testnet,
-  AVAXChain
+  AssetRuneERC20Testnet
 } from '@xchainjs/xchain-util'
 
 import { Network } from '../shared/api/types'
+import {
+  AvalancheChain,
+  BCHChain,
+  BNBChain,
+  BTCChain,
+  Chain,
+  CosmosChain,
+  DOGEChain,
+  ETHChain,
+  LTCChain,
+  THORChain
+} from '../shared/utils/chain'
 import { WalletType } from '../shared/wallet/types'
 import { GetPoolsPeriodEnum } from './types/generated/midgard'
 import { PricePoolCurrencyWeights, PricePoolAssets } from './views/pools/Pools.types'
@@ -152,8 +153,7 @@ export const CHAIN_WEIGHTS: Record<Chain, number> = {
   [BNBChain]: 5,
   [CosmosChain]: 6,
   [DOGEChain]: 7,
-  [TerraChain]: 8, // not supported in ASGDX anymore, but part of xchain-util
-  [AVAXChain]: 9 // not supported in ASGDX yet
+  [AvalancheChain]: 8 // not supported in ASGDX yet
 }
 
 // Weight of currencies needed for pricing

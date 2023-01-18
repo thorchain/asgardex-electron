@@ -1,9 +1,9 @@
 import AppBTC from '@ledgerhq/hw-app-btc'
 import type Transport from '@ledgerhq/hw-transport'
-import { BCHChain } from '@xchainjs/xchain-util'
 import * as E from 'fp-ts/Either'
 
 import { LedgerError, LedgerErrorId, Network } from '../../../../shared/api/types'
+import { BCHChain } from '../../../../shared/utils/chain'
 import { toClientNetwork } from '../../../../shared/utils/client'
 import { isError } from '../../../../shared/utils/guard'
 import { WalletAddress } from '../../../../shared/wallet/types'

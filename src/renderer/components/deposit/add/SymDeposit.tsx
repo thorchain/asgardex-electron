@@ -11,10 +11,8 @@ import {
   baseAmount,
   BaseAmount,
   baseToAsset,
-  chainToString,
   formatAssetAmountCurrency,
-  isAssetRuneNative,
-  THORChain
+  isAssetRuneNative
 } from '@xchainjs/xchain-util'
 import BigNumber from 'bignumber.js'
 import * as A from 'fp-ts/lib/Array'
@@ -27,6 +25,7 @@ import { useIntl } from 'react-intl'
 import * as RxOp from 'rxjs/operators'
 
 import { Network } from '../../../../shared/api/types'
+import { chainToString, THORChain } from '../../../../shared/utils/chain'
 import { isLedgerWallet } from '../../../../shared/utils/guard'
 import { WalletType } from '../../../../shared/wallet/types'
 import { ZERO_ASSET_AMOUNT, ZERO_BASE_AMOUNT } from '../../../const'

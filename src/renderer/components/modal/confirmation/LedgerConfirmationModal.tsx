@@ -1,12 +1,13 @@
 import { useCallback, useState } from 'react'
 
 import { isCashAddress, toCashAddress, toLegacyAddress } from '@xchainjs/xchain-bitcoincash'
-import { Address, Chain, chainToString } from '@xchainjs/xchain-util'
+import { Address } from '@xchainjs/xchain-util'
 import * as FP from 'fp-ts/function'
 import * as O from 'fp-ts/lib/Option'
 import { useIntl } from 'react-intl'
 
 import { Network } from '../../../../shared/api/types'
+import { Chain, chainToString } from '../../../../shared/utils/chain'
 import { getChainAsset, isBchChain } from '../../../helpers/chainHelper'
 import { AttentionIcon } from '../../icons'
 import { AddressEllipsis } from '../../uielements/addressEllipsis'

@@ -1,8 +1,12 @@
 import * as RD from '@devexperts/remote-data-ts'
 import { TxHash } from '@xchainjs/xchain-client'
+import { Address } from '@xchainjs/xchain-util'
+import * as FP from 'fp-ts/lib/function'
+import * as O from 'fp-ts/lib/Option'
+import * as Rx from 'rxjs'
+
 import {
-  Address,
-  AVAXChain,
+  AvalancheChain,
   BCHChain,
   BNBChain,
   BTCChain,
@@ -11,13 +15,8 @@ import {
   DOGEChain,
   ETHChain,
   LTCChain,
-  TerraChain,
   THORChain
-} from '@xchainjs/xchain-util'
-import * as FP from 'fp-ts/lib/function'
-import * as O from 'fp-ts/lib/Option'
-import * as Rx from 'rxjs'
-
+} from '../../../../shared/utils/chain'
 import { DEFAULT_FEE_OPTION } from '../../../components/wallet/txs/send/Send.const'
 import { LiveData, liveData } from '../../../helpers/rx/liveData'
 import * as BNB from '../../binance'
@@ -97,12 +96,9 @@ export const sendTx$ = ({
         )
       )
 
-    case AVAXChain:
+    case AvalancheChain:
       // not available yet
       return txFailure$(`sendTx$ has not been implemented for AVAX yet`)
-
-    case TerraChain:
-      return txFailure$(`Terra (Classic) is not supported anymore - sendTx$ has been removed`)
 
     case DOGEChain:
       return FP.pipe(
@@ -206,10 +202,8 @@ export const txStatusByChain$ = ({ txHash, chain }: { txHash: TxHash; chain: Cha
       return THOR.txStatus$(txHash, O.none)
     case CosmosChain:
       return COSMOS.txStatus$(txHash, O.none)
-    case AVAXChain:
+    case AvalancheChain:
       return txStatusFailure$(`txStatusByChain$ has not been implemented for AVAX`)
-    case TerraChain:
-      return txStatusFailure$(`txStatusByChain$ has been removed - Terra (Classic) is not supported anymore`)
     case DOGEChain:
       return DOGE.txStatus$(txHash, O.none)
     case BCHChain:

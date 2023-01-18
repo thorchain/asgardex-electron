@@ -1,11 +1,12 @@
 import * as RD from '@devexperts/remote-data-ts'
 import { Address } from '@xchainjs/xchain-util'
-import { AssetRuneNative, THORChain } from '@xchainjs/xchain-util'
+import { AssetRuneNative } from '@xchainjs/xchain-util'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
 import * as Rx from 'rxjs'
 import * as RxOp from 'rxjs/operators'
 
+import { THORChain } from '../../../../shared/utils/chain'
 import { getEthAssetAddress, isEthAsset, isRuneNativeAsset } from '../../../helpers/assetHelper'
 import { isEthChain } from '../../../helpers/chainHelper'
 import { liveData } from '../../../helpers/rx/liveData'

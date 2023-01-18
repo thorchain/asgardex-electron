@@ -1,5 +1,9 @@
 import TransportNodeHidSingleton from '@ledgerhq/hw-transport-node-hid-singleton'
 import { TxHash } from '@xchainjs/xchain-client'
+import * as E from 'fp-ts/Either'
+
+import { IPCLedgerDepositTxParams, IPCLedgerSendTxParams } from '../../../shared/api/io'
+import { LedgerError, LedgerErrorId } from '../../../shared/api/types'
 import {
   BCHChain,
   BNBChain,
@@ -10,11 +14,7 @@ import {
   ETHChain,
   LTCChain,
   THORChain
-} from '@xchainjs/xchain-util'
-import * as E from 'fp-ts/Either'
-
-import { IPCLedgerDepositTxParams, IPCLedgerSendTxParams } from '../../../shared/api/io'
-import { LedgerError, LedgerErrorId } from '../../../shared/api/types'
+} from '../../../shared/utils/chain'
 import { isError, isEthHDMode } from '../../../shared/utils/guard'
 import * as BNB from './binance/transaction'
 import * as BTC from './bitcoin/transaction'

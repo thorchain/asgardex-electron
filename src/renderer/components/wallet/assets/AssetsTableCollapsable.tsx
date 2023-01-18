@@ -9,7 +9,6 @@ import {
   assetToString,
   baseAmount,
   baseToAsset,
-  chainToString,
   formatAssetAmountCurrency,
   isAssetRuneNative,
   isSynthAsset
@@ -24,6 +23,7 @@ import { useIntl } from 'react-intl'
 import { useNavigate } from 'react-router'
 
 import { Network } from '../../../../shared/api/types'
+import { chainToString } from '../../../../shared/utils/chain'
 import { isKeystoreWallet } from '../../../../shared/utils/guard'
 import { DEFAULT_WALLET_TYPE } from '../../../const'
 import { disableRuneUpgrade, isNonNativeRuneAsset, isRuneNativeAsset, isUSDAsset } from '../../../helpers/assetHelper'

@@ -9,8 +9,7 @@ import {
   assetToBase,
   assetToString,
   baseAmount,
-  bn,
-  BNBChain
+  bn
 } from '@xchainjs/xchain-util'
 import * as O from 'fp-ts/lib/Option'
 import * as Rx from 'rxjs'
@@ -18,6 +17,7 @@ import * as RxOp from 'rxjs/operators'
 
 import { BNB_ADDRESS_TESTNET } from '../../../../shared/mock/address'
 import { mockValidatePassword$ } from '../../../../shared/mock/wallet'
+import { BNBChain } from '../../../../shared/utils/chain'
 import { BNB_DECIMAL, THORCHAIN_DECIMAL } from '../../../helpers/assetHelper'
 import { mockWalletAddress } from '../../../helpers/test/testWalletHelper'
 import { INITIAL_WITHDRAW_STATE } from '../../../services/chain/const'

@@ -5,7 +5,6 @@ import {
   AssetRuneNative,
   baseAmount,
   baseToAsset,
-  Chain,
   formatAssetAmountCurrency,
   formatBN
 } from '@xchainjs/xchain-util'
@@ -15,6 +14,7 @@ import * as FP from 'fp-ts/lib/function'
 import { useIntl } from 'react-intl'
 
 import { Network } from '../../../shared/api/types'
+import { Chain } from '../../../shared/utils/chain'
 import * as PoolHelpers from '../../helpers/poolHelper'
 import { MimirHalt } from '../../services/thorchain/types'
 import { AssetLabel } from '../uielements/assets/assetLabel'

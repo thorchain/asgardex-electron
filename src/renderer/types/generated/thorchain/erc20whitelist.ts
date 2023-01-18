@@ -6,7 +6,8 @@
  */
 
 import * as O from "fp-ts/lib/Option";
-import { Asset, ETHChain } from "@xchainjs/xchain-util";
+import { Asset } from "@xchainjs/xchain-util";
+import { ETHChain } from "../../../../shared/utils/chain";
 
 export const ERC20_WHITELIST: { asset: Asset; iconUrl: O.Option<string> }[] = [
   {

@@ -1,22 +1,10 @@
-import {
-  assetToBase,
-  AssetRuneNative,
-  AssetBNB,
-  AssetLTC,
-  assetAmount,
-  LTCChain,
-  THORChain,
-  BTCChain,
-  BNBChain,
-  BCHChain,
-  DOGEChain,
-  CosmosChain
-} from '@xchainjs/xchain-util'
+import { assetToBase, AssetRuneNative, AssetBNB, AssetLTC, assetAmount } from '@xchainjs/xchain-util'
 import * as FP from 'fp-ts/lib/function'
 import * as NEA from 'fp-ts/lib/NonEmptyArray'
 import * as O from 'fp-ts/lib/Option'
 
 import { ASSETS_TESTNET } from '../../shared/mock/assets'
+import { BCHChain, BNBChain, BTCChain, CosmosChain, DOGEChain, LTCChain, THORChain } from '../../shared/utils/chain'
 import { AssetBUSD74E } from '../const'
 import { NonEmptyWalletBalances, WalletBalance, WalletBalances } from '../services/wallet/types'
 import { isRuneNativeAsset } from './assetHelper'

@@ -9,9 +9,7 @@ import {
   BaseAmount,
   baseToAsset,
   formatAssetAmount,
-  Chain,
-  formatAssetAmountCurrency,
-  THORChain
+  formatAssetAmountCurrency
 } from '@xchainjs/xchain-util'
 import { Col } from 'antd'
 import BigNumber from 'bignumber.js'
@@ -21,6 +19,7 @@ import { useObservableState } from 'observable-hooks'
 import { useIntl } from 'react-intl'
 
 import { Network } from '../../../../shared/api/types'
+import { Chain, THORChain } from '../../../../shared/utils/chain'
 import { isLedgerWallet } from '../../../../shared/utils/guard'
 import { WalletAddress } from '../../../../shared/wallet/types'
 import { ZERO_BASE_AMOUNT } from '../../../const'

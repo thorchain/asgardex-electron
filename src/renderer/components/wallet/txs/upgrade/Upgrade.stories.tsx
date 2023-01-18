@@ -1,15 +1,7 @@
 import * as RD from '@devexperts/remote-data-ts'
 import { ComponentMeta } from '@storybook/react'
 import { TxHash, TxParams } from '@xchainjs/xchain-client'
-import {
-  assetAmount,
-  AssetBNB,
-  AssetRune67C,
-  assetToBase,
-  BaseAmount,
-  baseAmount,
-  BNBChain
-} from '@xchainjs/xchain-util'
+import { assetAmount, AssetBNB, AssetRune67C, assetToBase, BaseAmount, baseAmount } from '@xchainjs/xchain-util'
 import * as FP from 'fp-ts/lib/function'
 import * as NEA from 'fp-ts/lib/NonEmptyArray'
 import * as O from 'fp-ts/lib/Option'
@@ -18,6 +10,7 @@ import * as RxOp from 'rxjs/operators'
 
 import { getMockRDValueFactory, RDStatus } from '../../../../../shared/mock/rdByStatus'
 import { mockValidatePassword$ } from '../../../../../shared/mock/wallet'
+import { BNBChain } from '../../../../../shared/utils/chain'
 import { WalletType } from '../../../../../shared/wallet/types'
 import { BNB_DECIMAL } from '../../../../helpers/assetHelper'
 import { mockWalletBalance } from '../../../../helpers/test/testWalletHelper'

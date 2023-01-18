@@ -12,8 +12,6 @@ import {
   baseAmount,
   assetToBase,
   assetAmount,
-  ETHChain,
-  chainToString,
   Address
 } from '@xchainjs/xchain-util'
 import { Row, Form } from 'antd'
@@ -24,6 +22,7 @@ import * as O from 'fp-ts/lib/Option'
 import { useIntl } from 'react-intl'
 
 import { Network } from '../../../../../shared/api/types'
+import { chainToString, ETHChain } from '../../../../../shared/utils/chain'
 import { isKeystoreWallet, isLedgerWallet } from '../../../../../shared/utils/guard'
 import { WalletType } from '../../../../../shared/wallet/types'
 import { ZERO_BASE_AMOUNT, ZERO_BN } from '../../../../const'

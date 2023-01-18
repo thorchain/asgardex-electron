@@ -1,5 +1,4 @@
-import { Chain } from '@xchainjs/xchain-util'
-
+import { Chain } from '../../../shared/utils/chain'
 import * as C from '../clients'
 import { Client$, FeesService } from './types'
 

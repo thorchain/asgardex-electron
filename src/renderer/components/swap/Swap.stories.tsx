@@ -10,14 +10,14 @@ import {
   assetToBase,
   assetToString,
   baseAmount,
-  bn,
-  BNBChain
+  bn
 } from '@xchainjs/xchain-util'
 import * as O from 'fp-ts/lib/Option'
 import * as Rx from 'rxjs'
 import * as RxOp from 'rxjs/operators'
 
 import { mockValidatePassword$ } from '../../../shared/mock/wallet'
+import { BNBChain } from '../../../shared/utils/chain'
 import { ONE_BN } from '../../const'
 import { THORCHAIN_DECIMAL } from '../../helpers/assetHelper'
 import { RUNE_PRICE_POOL } from '../../helpers/poolHelper'
