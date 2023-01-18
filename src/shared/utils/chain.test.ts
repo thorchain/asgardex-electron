@@ -1,4 +1,16 @@
-import { Chain, chainToString, isChain } from './chain'
+import {
+  AvalancheChain,
+  BCHChain,
+  BNBChain,
+  BTCChain,
+  chainToString,
+  CosmosChain,
+  DOGEChain,
+  ETHChain,
+  isChain,
+  LTCChain,
+  THORChain
+} from './chain'
 
 describe('chain', () => {
   it('isChain', () => {
@@ -9,39 +21,39 @@ describe('chain', () => {
     expect(isChain('THOR')).toBeTruthy()
     expect(isChain('GAIA')).toBeTruthy()
     expect(isChain('LTC')).toBeTruthy()
-    expect(isChain('LTC')).toBeTruthy()
     expect(isChain('GAIA')).toBeTruthy()
     expect(isChain('AVAX')).toBeTruthy()
     expect(isChain('invalid')).toBeFalsy()
+    expect(isChain('')).toBeFalsy()
   })
 
   describe('chainToString', () => {
     it('THORChain', () => {
-      expect(chainToString(Chain.THORChain)).toEqual('THORChain')
+      expect(chainToString(THORChain)).toEqual('THORChain')
     })
     it('BTC', () => {
-      expect(chainToString(Chain.Bitcoin)).toEqual('Bitcoin')
+      expect(chainToString(BTCChain)).toEqual('Bitcoin')
     })
     it('BCH', () => {
-      expect(chainToString(Chain.BitcoinCash)).toEqual('Bitcoin Cash')
+      expect(chainToString(BCHChain)).toEqual('Bitcoin Cash')
     })
     it('ETH', () => {
-      expect(chainToString(Chain.Ethereum)).toEqual('Ethereum')
+      expect(chainToString(ETHChain)).toEqual('Ethereum')
     })
     it('BNB', () => {
-      expect(chainToString(Chain.Binance)).toEqual('Binance Chain')
+      expect(chainToString(BNBChain)).toEqual('Binance Chain')
     })
     it('GAIA', () => {
-      expect(chainToString(Chain.Cosmos)).toEqual('Cosmos')
+      expect(chainToString(CosmosChain)).toEqual('Cosmos')
     })
     it('LTC', () => {
-      expect(chainToString(Chain.Litecoin)).toEqual('Litecoin')
+      expect(chainToString(LTCChain)).toEqual('Litecoin')
     })
     it('DOGE', () => {
-      expect(chainToString(Chain.Doge)).toEqual('Dogecoin')
+      expect(chainToString(DOGEChain)).toEqual('Dogecoin')
     })
     it('Avalanche', () => {
-      expect(chainToString(Chain.Avalanche)).toEqual('Avalanche')
+      expect(chainToString(AvalancheChain)).toEqual('Avalanche')
     })
   })
 })
