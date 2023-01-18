@@ -1,8 +1,8 @@
-import { AssetRuneNative } from '@xchainjs/xchain-util'
 import * as A from 'antd'
 import styled from 'styled-components'
 import { palette } from 'styled-theme'
 
+import { AssetRuneNative } from '../../../../../shared/utils/asset'
 import { media } from '../../../../helpers/styleHelper'
 import { InnerForm } from '../../../shared/form'
 import { AssetIcon as UIAssetIcon } from '../../../uielements/assets/assetIcon'

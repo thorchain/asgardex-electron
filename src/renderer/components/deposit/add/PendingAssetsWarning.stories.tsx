@@ -1,8 +1,9 @@
 import { ComponentMeta } from '@storybook/react'
-import { assetAmount, assetToBase, AssetBNB, AssetBTC } from '@xchainjs/xchain-util'
+import { assetAmount, assetToBase } from '@xchainjs/xchain-util'
 import * as FP from 'fp-ts/lib/function'
 
 import { Network } from '../../../../shared/api/types'
+import { AssetBNB, AssetBTC } from '../../../../shared/utils/asset'
 import * as AT from '../../../storybook/argTypes'
 import { AssetWithAmount1e8, AssetsWithAmount1e8 } from '../../../types/asgardex'
 import { PendingAssetsWarning as Component } from './PendingAssetsWarning'

@@ -1,13 +1,14 @@
 import React, { useMemo } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
-import { Asset, AssetAmount, AssetRuneNative, assetToString, formatAssetAmount } from '@xchainjs/xchain-util'
+import { Asset, AssetAmount, assetToString, formatAssetAmount } from '@xchainjs/xchain-util'
 import { Grid } from 'antd'
 import * as FP from 'fp-ts/lib/function'
 import { useIntl } from 'react-intl'
 import { useNavigate } from 'react-router-dom'
 
 import { Network } from '../../../shared/api/types'
+import { AssetRuneNative } from '../../../shared/utils/asset'
 import { Action as ActionButtonAction, ActionButton } from '../../components/uielements/button/ActionButton'
 import { DEFAULT_WALLET_TYPE } from '../../const'
 import { loadingString } from '../../helpers/stringHelper'

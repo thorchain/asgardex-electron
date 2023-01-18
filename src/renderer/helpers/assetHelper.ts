@@ -4,19 +4,7 @@ import {
   Asset,
   assetAmount,
   AssetAmount,
-  AssetAtom,
-  AssetBCH,
-  AssetBNB,
-  AssetBTC,
-  AssetDOGE,
-  AssetETH,
   assetFromString,
-  AssetLTC,
-  AssetRune67C,
-  AssetRuneB1A,
-  AssetRuneERC20,
-  AssetRuneERC20Testnet,
-  AssetRuneNative,
   baseAmount,
   BaseAmount,
   bn
@@ -29,6 +17,20 @@ import * as P from 'fp-ts/lib/Predicate'
 import * as S from 'fp-ts/lib/string'
 
 import { Network } from '../../shared/api/types'
+import {
+  AssetAtom,
+  AssetBCH,
+  AssetBNB,
+  AssetBTC,
+  AssetDOGE,
+  AssetETH,
+  AssetLTC,
+  AssetRune67C,
+  AssetRuneB1A,
+  AssetRuneERC20,
+  AssetRuneERC20Testnet,
+  AssetRuneNative
+} from '../../shared/utils/asset'
 import {
   AssetTGTERC20,
   AssetXRune,

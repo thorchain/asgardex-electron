@@ -1,18 +1,8 @@
 import { PoolData } from '@thorchain/asgardex-util'
-import {
-  assetAmount,
-  bn,
-  AssetBTC,
-  AssetETH,
-  Asset,
-  assetToString,
-  baseAmount,
-  AssetRuneNative,
-  AssetRune67C,
-  AssetRuneERC20Testnet
-} from '@xchainjs/xchain-util'
+import { assetAmount, bn, Asset, assetToString, baseAmount } from '@xchainjs/xchain-util'
 
 import { Network } from '../shared/api/types'
+import { AssetBTC, AssetETH, AssetRune67C, AssetRuneERC20Testnet, AssetRuneNative } from '../shared/utils/asset'
 import {
   AvalancheChain,
   BCHChain,

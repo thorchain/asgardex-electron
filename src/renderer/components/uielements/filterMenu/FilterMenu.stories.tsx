@@ -1,8 +1,9 @@
 import { ComponentMeta, StoryFn } from '@storybook/react'
-import { assetAmount, AssetBNB, AssetRuneNative, assetToBase } from '@xchainjs/xchain-util'
+import { assetAmount, assetToBase } from '@xchainjs/xchain-util'
 
 import { ONE_RUNE_BASE_AMOUNT } from '../../../../shared/mock/amount'
 import { ASSETS_MAINNET } from '../../../../shared/mock/assets'
+import { AssetBNB, AssetRuneNative } from '../../../../shared/utils/asset'
 import { AssetWithAmount } from '../../../types/asgardex'
 import { AssetData } from '../assets/assetData'
 import { FilterMenu as Component, Props as ComponentProps } from './FilterMenu'

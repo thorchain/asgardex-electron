@@ -1,13 +1,5 @@
 import * as RD from '@devexperts/remote-data-ts'
-import {
-  Address,
-  Asset,
-  assetFromString,
-  AssetRuneNative,
-  assetToString,
-  baseAmount,
-  bnOrZero
-} from '@xchainjs/xchain-util'
+import { Address, Asset, assetFromString, assetToString, baseAmount, bnOrZero } from '@xchainjs/xchain-util'
 import * as A from 'fp-ts/Array'
 import * as E from 'fp-ts/Either'
 import * as FP from 'fp-ts/function'
@@ -19,6 +11,7 @@ import * as Rx from 'rxjs'
 import * as RxOp from 'rxjs/operators'
 
 import { add9Rheader } from '../../../shared/api/ninerealms'
+import { AssetRuneNative } from '../../../shared/utils/asset'
 import { isChain } from '../../../shared/utils/chain'
 import { ZERO_BASE_AMOUNT } from '../../const'
 import { THORCHAIN_DECIMAL } from '../../helpers/assetHelper'

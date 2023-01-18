@@ -1,20 +1,12 @@
 import * as RD from '@devexperts/remote-data-ts'
 import { ComponentMeta } from '@storybook/react'
-import {
-  AssetBNB,
-  AssetBTC,
-  AssetLTC,
-  AssetRune67C,
-  AssetETH,
-  AssetRuneNative,
-  assetToString,
-  baseAmount
-} from '@xchainjs/xchain-util'
+import { assetToString, baseAmount } from '@xchainjs/xchain-util'
 import * as A from 'fp-ts/Array'
 import * as FP from 'fp-ts/function'
 import * as O from 'fp-ts/Option'
 
 import { getMockRDValueFactory, RDStatus } from '../../../../shared/mock/rdByStatus'
+import { AssetBNB, AssetBTC, AssetETH, AssetLTC, AssetRune67C, AssetRuneNative } from '../../../../shared/utils/asset'
 import { BNBChain, BTCChain, Chain, ETHChain, LTCChain, THORChain } from '../../../../shared/utils/chain'
 import { WalletType } from '../../../../shared/wallet/types'
 import { RUNE_PRICE_POOL } from '../../../helpers/poolHelper'

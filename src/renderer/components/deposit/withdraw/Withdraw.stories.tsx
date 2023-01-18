@@ -1,22 +1,14 @@
 import * as RD from '@devexperts/remote-data-ts'
 import { Story, Meta } from '@storybook/react'
 import { TxHash } from '@xchainjs/xchain-client'
-import {
-  Asset,
-  assetAmount,
-  AssetBNB,
-  AssetRuneNative,
-  assetToBase,
-  assetToString,
-  baseAmount,
-  bn
-} from '@xchainjs/xchain-util'
+import { Asset, assetAmount, assetToBase, assetToString, baseAmount, bn } from '@xchainjs/xchain-util'
 import * as O from 'fp-ts/lib/Option'
 import * as Rx from 'rxjs'
 import * as RxOp from 'rxjs/operators'
 
 import { BNB_ADDRESS_TESTNET } from '../../../../shared/mock/address'
 import { mockValidatePassword$ } from '../../../../shared/mock/wallet'
+import { AssetBNB, AssetRuneNative } from '../../../../shared/utils/asset'
 import { BNBChain } from '../../../../shared/utils/chain'
 import { BNB_DECIMAL, THORCHAIN_DECIMAL } from '../../../helpers/assetHelper'
 import { mockWalletAddress } from '../../../helpers/test/testWalletHelper'

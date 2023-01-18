@@ -1,11 +1,12 @@
 import { PoolData } from '@thorchain/asgardex-util'
 import { Balance } from '@xchainjs/xchain-client'
-import { assetAmount, assetToBase, assetToString, baseAmount, AssetRuneNative, AssetBNB } from '@xchainjs/xchain-util'
+import { assetAmount, assetToBase, assetToString, baseAmount } from '@xchainjs/xchain-util'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
 
 import { PoolsWatchList } from '../../shared/api/io'
 import { ASSETS_TESTNET } from '../../shared/mock/assets'
+import { AssetBNB, AssetRuneNative } from '../../shared/utils/asset'
 import { BCHChain, BNBChain, BTCChain, CosmosChain, DOGEChain, ETHChain, LTCChain } from '../../shared/utils/chain'
 import { AssetBUSD74E } from '../const'
 import { PoolDetails } from '../services/midgard/types'

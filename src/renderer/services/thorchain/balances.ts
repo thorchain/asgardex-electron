@@ -1,5 +1,4 @@
-import { AssetRuneNative } from '@xchainjs/xchain-util'
-
+import { AssetRuneNative } from '../../../shared/utils/asset'
 import { HDMode, WalletType } from '../../../shared/wallet/types'
 import { observableState } from '../../helpers/stateHelper'
 import * as C from '../clients'

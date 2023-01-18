@@ -6,7 +6,6 @@ import { LTC_DECIMAL } from '@xchainjs/xchain-litecoin'
 import {
   Address,
   assetAmount,
-  AssetLTC,
   assetToBase,
   BaseAmount,
   baseAmount,
@@ -22,6 +21,7 @@ import * as O from 'fp-ts/lib/Option'
 import { useIntl } from 'react-intl'
 
 import { Network } from '../../../../../shared/api/types'
+import { AssetLTC } from '../../../../../shared/utils/asset'
 import { LTCChain } from '../../../../../shared/utils/chain'
 import { isKeystoreWallet, isLedgerWallet } from '../../../../../shared/utils/guard'
 import { WalletType } from '../../../../../shared/wallet/types'

@@ -1,10 +1,11 @@
 import { Balance } from '@xchainjs/xchain-client'
-import { assetAmount, AssetBNB, AssetBTC, AssetRuneNative, baseAmount, bn } from '@xchainjs/xchain-util'
+import { assetAmount, baseAmount, bn } from '@xchainjs/xchain-util'
 import * as O from 'fp-ts/lib/Option'
 
 import { ApiUrls } from '../../../shared/api/types'
 import { BNB_ADDRESS_TESTNET, RUNE_ADDRESS_TESTNET } from '../../../shared/mock/address'
 import { ASSETS_TESTNET } from '../../../shared/mock/assets'
+import { AssetBNB, AssetBTC, AssetRuneNative } from '../../../shared/utils/asset'
 import { BCHChain, BNBChain, Chain, THORChain } from '../../../shared/utils/chain'
 import { WalletAddress } from '../../../shared/wallet/types'
 import { SymDepositAddresses } from '../../services/chain/types'

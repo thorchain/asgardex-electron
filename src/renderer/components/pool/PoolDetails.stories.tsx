@@ -1,8 +1,8 @@
 import * as RD from '@devexperts/remote-data-ts'
 import { ComponentMeta, StoryFn } from '@storybook/react'
-import { AssetETH } from '@xchainjs/xchain-util'
 import * as O from 'fp-ts/Option'
 
+import { AssetETH } from '../../../shared/utils/asset'
 import { ONE_BN } from '../../const'
 import * as AT from '../../storybook/argTypes'
 import { PoolHistoryActions } from '../../views/pool/PoolHistoryView.types'

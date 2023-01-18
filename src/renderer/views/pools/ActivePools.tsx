@@ -3,7 +3,6 @@ import React, { useCallback, useMemo, useRef } from 'react'
 import * as RD from '@devexperts/remote-data-ts'
 import {
   Asset,
-  AssetRuneNative,
   assetToString,
   BaseAmount,
   baseToAsset,
@@ -21,6 +20,7 @@ import { useIntl } from 'react-intl'
 import { useNavigate } from 'react-router-dom'
 
 import { Network } from '../../../shared/api/types'
+import { AssetRuneNative } from '../../../shared/utils/asset'
 import { ProtocolLimit, IncentivePendulum } from '../../components/pool'
 import { Action as ActionButtonAction, ActionButton } from '../../components/uielements/button/ActionButton'
 import { PoolsPeriodSelector } from '../../components/uielements/pools/PoolsPeriodSelector'

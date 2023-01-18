@@ -1,5 +1,4 @@
-import { AssetBNB, AssetBTC, AssetETH, AssetRuneNative } from '@xchainjs/xchain-util'
-
+import { AssetBNB, AssetBTC, AssetETH, AssetRuneNative } from '../../shared/utils/asset'
 import {
   BCHChain,
   BNBChain,

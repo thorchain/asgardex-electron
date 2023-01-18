@@ -1,9 +1,10 @@
 import * as RD from '@devexperts/remote-data-ts'
 import { BaseStory } from '@storybook/addons'
 import { TxHash } from '@xchainjs/xchain-client'
-import { assetAmount, AssetBNB, AssetRune67C, assetToBase } from '@xchainjs/xchain-util'
+import { assetAmount, assetToBase } from '@xchainjs/xchain-util'
 import * as NEA from 'fp-ts/lib/NonEmptyArray'
 
+import { AssetBNB, AssetRune67C } from '../../../../shared/utils/asset'
 import { ZERO_BASE_AMOUNT } from '../../../const'
 import { mockWalletBalance } from '../../../helpers/test/testWalletHelper'
 import { OpenExplorerTxUrl } from '../../../services/clients'

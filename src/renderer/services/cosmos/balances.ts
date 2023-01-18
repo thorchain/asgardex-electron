@@ -1,5 +1,4 @@
-import { AssetAtom } from '@xchainjs/xchain-util'
-
+import { AssetAtom } from '../../../shared/utils/asset'
 import { HDMode, WalletType } from '../../../shared/wallet/types'
 import { observableState } from '../../helpers/stateHelper'
 import * as C from '../clients'

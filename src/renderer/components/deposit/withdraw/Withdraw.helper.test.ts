@@ -1,6 +1,7 @@
 import { ETH_DECIMAL } from '@xchainjs/xchain-ethereum'
-import { assetAmount, AssetBNB, AssetETH, assetToBase, baseAmount } from '@xchainjs/xchain-util'
+import { assetAmount, assetToBase, baseAmount } from '@xchainjs/xchain-util'
 
+import { AssetBNB, AssetETH } from '../../../../shared/utils/asset'
 import { AssetBUSD74E, AssetUSDTERC20Testnet, ZERO_BASE_AMOUNT } from '../../../const'
 import { BNB_DECIMAL, THORCHAIN_DECIMAL } from '../../../helpers/assetHelper'
 import { eqBaseAmount } from '../../../helpers/fp/eq'

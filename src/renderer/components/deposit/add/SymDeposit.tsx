@@ -4,16 +4,7 @@ import * as RD from '@devexperts/remote-data-ts'
 import { ArrowPathIcon } from '@heroicons/react/20/solid'
 import { MagnifyingGlassMinusIcon, MagnifyingGlassPlusIcon } from '@heroicons/react/24/outline'
 import { getDepositMemo, PoolData } from '@thorchain/asgardex-util'
-import {
-  Address,
-  Asset,
-  AssetRuneNative,
-  baseAmount,
-  BaseAmount,
-  baseToAsset,
-  formatAssetAmountCurrency,
-  isAssetRuneNative
-} from '@xchainjs/xchain-util'
+import { Address, Asset, baseAmount, BaseAmount, baseToAsset, formatAssetAmountCurrency } from '@xchainjs/xchain-util'
 import BigNumber from 'bignumber.js'
 import * as A from 'fp-ts/lib/Array'
 import * as FP from 'fp-ts/lib/function'
@@ -25,6 +16,7 @@ import { useIntl } from 'react-intl'
 import * as RxOp from 'rxjs/operators'
 
 import { Network } from '../../../../shared/api/types'
+import { AssetRuneNative } from '../../../../shared/utils/asset'
 import { chainToString, THORChain } from '../../../../shared/utils/chain'
 import { isLedgerWallet } from '../../../../shared/utils/guard'
 import { WalletType } from '../../../../shared/wallet/types'
@@ -523,7 +515,7 @@ export const SymDeposit: React.FC<Props> = (props) => {
             const price = FP.pipe(
               oPriceRuneInFee,
               O.map(({ amount, asset: priceAsset }) =>
-                isAssetRuneNative(priceAsset)
+                isRuneNativeAsset(priceAsset)
                   ? emptyString
                   : formatAssetAmountCurrency({
                       amount: baseToAsset(amount),

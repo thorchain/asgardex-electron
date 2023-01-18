@@ -2,10 +2,11 @@ import LedgerApp from '@binance-chain/javascript-sdk/lib/ledger/ledger-app'
 import Transport from '@ledgerhq/hw-transport'
 import { Client, getDerivePath, getPrefix } from '@xchainjs/xchain-binance'
 import { TxHash } from '@xchainjs/xchain-client'
-import { Address, Asset, AssetBNB, BaseAmount, baseToAsset } from '@xchainjs/xchain-util'
+import { Address, Asset, BaseAmount, baseToAsset } from '@xchainjs/xchain-util'
 import * as E from 'fp-ts/lib/Either'
 
 import { LedgerError, LedgerErrorId, Network } from '../../../../shared/api/types'
+import { AssetBNB } from '../../../../shared/utils/asset'
 import { toClientNetwork } from '../../../../shared/utils/client'
 import { isError } from '../../../../shared/utils/guard'
 

@@ -1,15 +1,15 @@
+import { Asset } from '@xchainjs/xchain-util'
+
 import {
-  Asset,
+  AssetAtom,
+  AssetBCH,
   AssetBNB,
   AssetBTC,
-  AssetETH,
-  AssetRuneNative,
-  AssetLTC,
-  AssetBCH,
   AssetDOGE,
-  AssetAtom
-} from '@xchainjs/xchain-util'
-
+  AssetETH,
+  AssetLTC,
+  AssetRuneNative
+} from '../../shared/utils/asset'
 import {
   AvalancheChain,
   BCHChain,

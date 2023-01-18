@@ -1,7 +1,7 @@
 import React, { useCallback, useMemo } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
-import { Asset, AssetRuneNative, BaseAmount, bn } from '@xchainjs/xchain-util'
+import { Asset, BaseAmount, bn, BTCChain } from '@xchainjs/xchain-util'
 import BigNumber from 'bignumber.js'
 import * as FP from 'fp-ts/function'
 import * as O from 'fp-ts/lib/Option'
@@ -10,7 +10,8 @@ import { map } from 'rxjs/operators'
 import * as RxOp from 'rxjs/operators'
 
 import { Network } from '../../../../shared/api/types'
-import { Chain, THORChain } from '../../../../shared/utils/chain'
+import { AssetRuneNative } from '../../../../shared/utils/asset'
+import { THORChain } from '../../../../shared/utils/chain'
 import { Withdraw } from '../../../components/deposit/withdraw'
 import { ZERO_BASE_AMOUNT, ZERO_BN } from '../../../const'
 import { useAppContext } from '../../../contexts/AppContext'
@@ -86,7 +87,7 @@ export const WithdrawDepositView: React.FC<Props> = (props): JSX.Element => {
       FP.pipe(
         balancesState$({
           ...DEFAULT_BALANCES_FILTER,
-          [Chain.Bitcoin]: 'confirmed'
+          [BTCChain]: 'confirmed'
         }),
         RxOp.map((state) => state.balances)
       ),

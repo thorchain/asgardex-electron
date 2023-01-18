@@ -1,7 +1,8 @@
 import { PoolData } from '@thorchain/asgardex-util'
-import { bn, baseAmount, AssetBTC, AssetRuneNative, AssetBNB, AssetETH } from '@xchainjs/xchain-util'
+import { bn, baseAmount } from '@xchainjs/xchain-util'
 
 import { ASSETS_TESTNET } from '../../../shared/mock/assets'
+import { AssetBNB, AssetBTC, AssetETH, AssetRuneNative } from '../../../shared/utils/asset'
 import { AssetUSDC, ZERO_BASE_AMOUNT } from '../../const'
 import { WalletBalance } from '../../services/wallet/types'
 import { PricePool } from '../../views/pools/Pools.types'

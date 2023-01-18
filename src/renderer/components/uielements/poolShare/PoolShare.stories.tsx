@@ -1,8 +1,9 @@
 import { ComponentMeta, StoryFn } from '@storybook/react'
-import { bn, assetToBase, assetAmount, AssetBNB, AssetRuneNative } from '@xchainjs/xchain-util'
+import { bn, assetToBase, assetAmount } from '@xchainjs/xchain-util'
 import * as O from 'fp-ts/lib/Option'
 
 import { BNB_ADDRESS_TESTNET, RUNE_ADDRESS_TESTNET } from '../../../../shared/mock/address'
+import { AssetBNB, AssetRuneNative } from '../../../../shared/utils/asset'
 import { BNB_DECIMAL } from '../../../helpers/assetHelper'
 import { PoolShare as Component, Props } from './PoolShare'
 

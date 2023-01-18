@@ -6,7 +6,6 @@ import { FeeOption, FeesWithRates } from '@xchainjs/xchain-client'
 import {
   Address,
   assetAmount,
-  AssetBTC,
   assetToBase,
   BaseAmount,
   baseAmount,
@@ -22,6 +21,7 @@ import * as O from 'fp-ts/lib/Option'
 import { useIntl } from 'react-intl'
 
 import { Network } from '../../../../../shared/api/types'
+import { AssetBTC } from '../../../../../shared/utils/asset'
 import { BTCChain } from '../../../../../shared/utils/chain'
 import { isKeystoreWallet, isLedgerWallet } from '../../../../../shared/utils/guard'
 import { WalletType } from '../../../../../shared/wallet/types'

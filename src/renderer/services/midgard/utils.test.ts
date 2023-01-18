@@ -1,19 +1,7 @@
 import * as RD from '@devexperts/remote-data-ts'
 import { COSMOS_DECIMAL } from '@xchainjs/xchain-cosmos'
 import { ETH_DECIMAL } from '@xchainjs/xchain-ethereum'
-import {
-  assetAmount,
-  AssetAtom,
-  AssetBNB,
-  AssetBTC,
-  AssetETH,
-  AssetLTC,
-  AssetRuneNative,
-  assetToBase,
-  assetToString,
-  baseAmount,
-  bn
-} from '@xchainjs/xchain-util'
+import { assetAmount, assetToBase, assetToString, baseAmount, bn } from '@xchainjs/xchain-util'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
 
@@ -24,6 +12,7 @@ import {
   THREE_RUNE_BASE_AMOUNT,
   FOUR_RUNE_BASE_AMOUNT
 } from '../../../shared/mock/amount'
+import { AssetAtom, AssetBNB, AssetBTC, AssetETH, AssetLTC, AssetRuneNative } from '../../../shared/utils/asset'
 import {
   BCHChain,
   BNBChain,

@@ -1,6 +1,6 @@
 import { ComponentMeta } from '@storybook/react'
-import { AssetRuneNative } from '@xchainjs/xchain-util'
 
+import { AssetRuneNative } from '../../../../shared/utils/asset'
 import { ManageButton as Component, Props } from './ManageButton'
 
 export const ManageButton = (args: Props) => <Component {...args} />

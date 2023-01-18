@@ -1,18 +1,10 @@
 import { ComponentMeta } from '@storybook/react'
-import {
-  assetAmount,
-  AssetBCH,
-  AssetBNB,
-  AssetBTC,
-  assetFromString,
-  AssetRuneNative,
-  assetToBase,
-  assetToString
-} from '@xchainjs/xchain-util'
+import { assetAmount, assetFromString, assetToBase, assetToString } from '@xchainjs/xchain-util'
 import * as A from 'fp-ts/Array'
 import * as FP from 'fp-ts/function'
 import * as O from 'fp-ts/Option'
 
+import { AssetBCH, AssetBNB, AssetBTC, AssetRuneNative } from '../../../../shared/utils/asset'
 import { TxDetail } from './TxDetail'
 
 const getValues = (firstAsset: string, secondAsset: string, firstValue: number, secondValue: number) => {

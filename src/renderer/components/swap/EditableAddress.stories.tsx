@@ -1,7 +1,8 @@
 import { ComponentMeta, StoryFn } from '@storybook/react'
-import { Address, AssetBNB } from '@xchainjs/xchain-util'
+import { Address } from '@xchainjs/xchain-util'
 
 import { BNB_ADDRESS_TESTNET } from '../../../shared/mock/address'
+import { AssetBNB } from '../../../shared/utils/asset'
 import { eqString } from '../../helpers/fp/eq'
 import { EditableAddress as Component, EditableAddressProps } from './EditableAddress'
 

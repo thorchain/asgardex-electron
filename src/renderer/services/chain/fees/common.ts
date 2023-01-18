@@ -1,6 +1,7 @@
-import { Asset, AssetRuneNative } from '@xchainjs/xchain-util'
+import { Asset } from '@xchainjs/xchain-util'
 import * as FP from 'fp-ts/lib/function'
 
+import { AssetRuneNative } from '../../../../shared/utils/asset'
 import { isRuneNativeAsset } from '../../../helpers/assetHelper'
 import { liveData } from '../../../helpers/rx/liveData'
 import { service as midgardService } from '../../midgard/service'

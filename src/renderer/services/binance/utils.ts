@@ -1,10 +1,11 @@
 import { Balance as BinanceBalance } from '@xchainjs/xchain-binance'
 import { Balance } from '@xchainjs/xchain-client'
-import { assetAmount, bnOrZero, assetFromString, Asset, assetToBase, AssetBNB } from '@xchainjs/xchain-util'
+import { assetAmount, bnOrZero, assetFromString, Asset, assetToBase } from '@xchainjs/xchain-util'
 import * as A from 'fp-ts/lib/Array'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
 
+import { AssetBNB } from '../../../shared/utils/asset'
 import { BNB_DECIMAL } from '../../helpers/assetHelper'
 
 /**

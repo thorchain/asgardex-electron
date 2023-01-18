@@ -1,6 +1,7 @@
 import { FeeOption } from '@xchainjs/xchain-client'
-import { AssetRuneNative, baseAmount, bn } from '@xchainjs/xchain-util'
+import { baseAmount, bn } from '@xchainjs/xchain-util'
 
+import { AssetRuneNative } from './asset'
 import {
   isAsset,
   isBaseAmount,

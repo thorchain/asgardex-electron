@@ -4,7 +4,6 @@ import * as RD from '@devexperts/remote-data-ts'
 import { getWithdrawMemo } from '@thorchain/asgardex-util'
 import {
   Asset,
-  AssetRuneNative,
   baseAmount,
   BaseAmount,
   baseToAsset,
@@ -19,6 +18,7 @@ import { useObservableState } from 'observable-hooks'
 import { useIntl } from 'react-intl'
 
 import { Network } from '../../../../shared/api/types'
+import { AssetRuneNative } from '../../../../shared/utils/asset'
 import { Chain, THORChain } from '../../../../shared/utils/chain'
 import { isLedgerWallet } from '../../../../shared/utils/guard'
 import { WalletAddress } from '../../../../shared/wallet/types'

@@ -1,6 +1,7 @@
-import { AssetBNB, AssetBTC, AssetRuneNative, baseAmount } from '@xchainjs/xchain-util'
+import { baseAmount } from '@xchainjs/xchain-util'
 import * as O from 'fp-ts/Option'
 
+import { AssetBNB, AssetBTC, AssetRuneNative } from '../../../shared/utils/asset'
 import { eqAssetsWithAmount } from '../../helpers/fp/eq'
 import { Action, Tx } from '../../services/midgard/types'
 import { getTxId, getValues, getRowKey, historyFilterToViewblockFilter } from './PoolActionsHistory.helper'

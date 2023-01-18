@@ -1,7 +1,8 @@
 import { ComponentMeta } from '@storybook/react'
-import { assetAmount, AssetBNB, AssetRuneNative, assetToBase } from '@xchainjs/xchain-util'
+import { assetAmount, assetToBase } from '@xchainjs/xchain-util'
 
 import { Network } from '../../../../../shared/api/types'
+import { AssetBNB, AssetRuneNative } from '../../../../../shared/utils/asset'
 import { WalletType } from '../../../../../shared/wallet/types'
 import * as AT from '../../../../storybook/argTypes'
 import { AssetData } from './AssetData'

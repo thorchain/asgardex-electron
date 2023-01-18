@@ -1,6 +1,7 @@
 import { Meta, StoryFn } from '@storybook/react'
-import { assetAmount, AssetBNB, AssetRuneNative, assetToBase } from '@xchainjs/xchain-util'
+import { assetAmount, assetToBase } from '@xchainjs/xchain-util'
 
+import { AssetBNB, AssetRuneNative } from '../../../../../shared/utils/asset'
 import { SwapAssets, Props } from './SwapAssets'
 
 const defaultProps: Props = {

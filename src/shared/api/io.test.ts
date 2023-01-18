@@ -1,13 +1,14 @@
 import { fail } from 'assert'
 
 import { FeeOption } from '@xchainjs/xchain-client'
-import { AssetBNB, AssetRuneNative, baseAmount } from '@xchainjs/xchain-util'
+import { baseAmount } from '@xchainjs/xchain-util'
 import * as E from 'fp-ts/lib/Either'
 import * as FP from 'fp-ts/lib/function'
 
 import { ZERO_BASE_AMOUNT } from '../../renderer/const'
 import { eqBaseAmount } from '../../renderer/helpers/fp/eq'
 import { MOCK_KEYSTORE } from '../mock/wallet'
+import { AssetBNB, AssetRuneNative } from '../utils/asset'
 import { BNBChain, ETHChain } from '../utils/chain'
 import { mapIOErrors } from '../utils/fp'
 import {

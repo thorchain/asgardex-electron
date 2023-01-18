@@ -1,7 +1,7 @@
 import { ComponentMeta, StoryFn } from '@storybook/react'
-import { AssetBNB, AssetRuneNative } from '@xchainjs/xchain-util'
 
 import { BNB_ADDRESS_TESTNET, RUNE_ADDRESS_TESTNET } from '../../../../shared/mock/address'
+import { AssetBNB, AssetRuneNative } from '../../../../shared/utils/asset'
 import * as AT from '../../../storybook/argTypes'
 import { AssetWithAddress } from '../../../types/asgardex'
 import { AssetMissmatchWarning as Component, Props } from './AssetMissmatchWarning'

@@ -15,14 +15,7 @@ import {
   isValidBN,
   bn,
   BaseAmount,
-  Address,
-  AssetBNB,
-  AssetBTC,
-  AssetBCH,
-  AssetLTC,
-  AssetDOGE,
-  AssetETH,
-  AssetAtom
+  Address
 } from '@xchainjs/xchain-util'
 import * as A from 'fp-ts/lib/Array'
 import * as FP from 'fp-ts/lib/function'
@@ -30,6 +23,7 @@ import * as NEA from 'fp-ts/lib/NonEmptyArray'
 import * as O from 'fp-ts/lib/Option'
 import * as P from 'fp-ts/lib/Predicate'
 
+import { AssetAtom, AssetBCH, AssetBNB, AssetBTC, AssetDOGE, AssetETH, AssetLTC } from '../../../shared/utils/asset'
 import {
   AvalancheChain,
   BCHChain,
