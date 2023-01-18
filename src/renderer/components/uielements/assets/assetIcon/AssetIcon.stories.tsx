@@ -1,6 +1,6 @@
 import { ComponentMeta, StoryFn } from '@storybook/react'
-import { AssetBCH, AssetBNB, AssetBTC, AssetETH, AssetRuneNative } from '@xchainjs/xchain-util'
 
+import { AssetBCH, AssetBNB, AssetBTC, AssetETH, AssetRuneNative } from '../../../../../shared/utils/asset'
 import * as AT from '../../../../storybook/argTypes'
 import { AssetIcon as Component, ComponentProps } from './AssetIcon'
 

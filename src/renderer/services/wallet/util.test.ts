@@ -1,7 +1,8 @@
-import { AssetBNB, AssetBTC, AssetETH, AssetRuneNative, baseAmount } from '@xchainjs/xchain-util'
+import { baseAmount } from '@xchainjs/xchain-util'
 import * as O from 'fp-ts/lib/Option'
 
 import { ASSETS_TESTNET } from '../../../shared/mock/assets'
+import { AssetBNB, AssetBTC, AssetETH, AssetRuneNative } from '../../../shared/utils/asset'
 import { eqOWalletBalance, eqWalletBalances } from '../../helpers/fp/eq'
 import { WalletBalances } from '../clients'
 import { KeystoreState } from './types'

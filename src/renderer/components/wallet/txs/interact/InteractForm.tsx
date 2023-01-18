@@ -2,15 +2,7 @@ import React, { useCallback, useEffect, useMemo, useState } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
 import { getBondMemo, getLeaveMemo, getUnbondMemo } from '@thorchain/asgardex-util'
-import {
-  assetAmount,
-  AssetRuneNative,
-  assetToBase,
-  BaseAmount,
-  baseToAsset,
-  bn,
-  formatAssetAmountCurrency
-} from '@xchainjs/xchain-util'
+import { assetAmount, assetToBase, BaseAmount, baseToAsset, bn, formatAssetAmountCurrency } from '@xchainjs/xchain-util'
 import { Form } from 'antd'
 import BigNumber from 'bignumber.js'
 import * as E from 'fp-ts/Either'
@@ -19,6 +11,7 @@ import * as O from 'fp-ts/lib/Option'
 import { useIntl } from 'react-intl'
 
 import { Network } from '../../../../../shared/api/types'
+import { AssetRuneNative } from '../../../../../shared/utils/asset'
 import { THORChain } from '../../../../../shared/utils/chain'
 import { isKeystoreWallet, isLedgerWallet } from '../../../../../shared/utils/guard'
 import { HDMode, WalletType } from '../../../../../shared/wallet/types'

@@ -1,7 +1,8 @@
 import { Meta, StoryFn } from '@storybook/react'
-import { assetAmount, AssetBNB, AssetRuneNative, assetToBase } from '@xchainjs/xchain-util'
+import { assetAmount, assetToBase } from '@xchainjs/xchain-util'
 import * as O from 'fp-ts/lib/Option'
 
+import { AssetBNB, AssetRuneNative } from '../../../../../shared/utils/asset'
 import { DepositAssets, Props as DepositAssetsProps } from './DepositAssets'
 
 const defaultProps: DepositAssetsProps = {

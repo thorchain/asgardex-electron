@@ -1,6 +1,7 @@
 import { Meta, StoryFn } from '@storybook/react'
-import { assetAmount, AssetBNB, AssetBTC, assetToBase, bn } from '@xchainjs/xchain-util'
+import { assetAmount, assetToBase, bn } from '@xchainjs/xchain-util'
 
+import { AssetBNB, AssetBTC } from '../../../shared/utils/asset'
 import { ZERO_BASE_AMOUNT } from '../../const'
 import { DEFAULT_MIMIR_HALT } from '../../services/thorchain/const'
 import { PoolShares as Component, Props as ComponentProps } from './PoolShares'

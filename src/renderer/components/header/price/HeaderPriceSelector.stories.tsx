@@ -1,7 +1,7 @@
 import { ComponentMeta, StoryFn } from '@storybook/react'
-import { AssetBTC, AssetETH, AssetRuneNative } from '@xchainjs/xchain-util'
 import * as O from 'fp-ts/lib/Option'
 
+import { AssetBTC, AssetETH, AssetRuneNative } from '../../../../shared/utils/asset'
 import { AssetBUSDBAF } from '../../../const'
 import { HeaderPriceSelector as Component, Props } from './HeaderPriceSelector'
 

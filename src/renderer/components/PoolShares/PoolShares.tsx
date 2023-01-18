@@ -1,19 +1,13 @@
 import React, { useMemo } from 'react'
 
-import {
-  Asset,
-  AssetRuneNative,
-  baseAmount,
-  baseToAsset,
-  formatAssetAmountCurrency,
-  formatBN
-} from '@xchainjs/xchain-util'
+import { Asset, baseAmount, baseToAsset, formatAssetAmountCurrency, formatBN } from '@xchainjs/xchain-util'
 import { Grid, Row } from 'antd'
 import { ColumnsType, ColumnType } from 'antd/lib/table'
 import * as FP from 'fp-ts/lib/function'
 import { useIntl } from 'react-intl'
 
 import { Network } from '../../../shared/api/types'
+import { AssetRuneNative } from '../../../shared/utils/asset'
 import { Chain } from '../../../shared/utils/chain'
 import * as PoolHelpers from '../../helpers/poolHelper'
 import { MimirHalt } from '../../services/thorchain/types'

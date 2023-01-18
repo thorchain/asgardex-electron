@@ -2,21 +2,13 @@ import * as RD from '@devexperts/remote-data-ts'
 import { ComponentMeta, StoryFn } from '@storybook/react'
 import { BTC_DECIMAL } from '@xchainjs/xchain-bitcoin'
 import { TxHash } from '@xchainjs/xchain-client'
-import {
-  assetAmount,
-  AssetBNB,
-  AssetBTC,
-  AssetRuneNative,
-  assetToBase,
-  assetToString,
-  baseAmount,
-  bn
-} from '@xchainjs/xchain-util'
+import { assetAmount, assetToBase, assetToString, baseAmount, bn } from '@xchainjs/xchain-util'
 import * as O from 'fp-ts/lib/Option'
 import * as Rx from 'rxjs'
 import * as RxOp from 'rxjs/operators'
 
 import { mockValidatePassword$ } from '../../../shared/mock/wallet'
+import { AssetBNB, AssetBTC, AssetRuneNative } from '../../../shared/utils/asset'
 import { BNBChain } from '../../../shared/utils/chain'
 import { ONE_BN } from '../../const'
 import { THORCHAIN_DECIMAL } from '../../helpers/assetHelper'

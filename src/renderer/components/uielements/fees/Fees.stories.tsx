@@ -1,7 +1,8 @@
 import * as RD from '@devexperts/remote-data-ts'
 import { ComponentMeta, StoryFn } from '@storybook/react'
-import { baseAmount, AssetBTC, AssetRuneNative } from '@xchainjs/xchain-util'
+import { baseAmount } from '@xchainjs/xchain-util'
 
+import { AssetBTC, AssetRuneNative } from '../../../../shared/utils/asset'
 import { Fees, Props as FeesProps } from './Fees'
 
 const baseFee = {

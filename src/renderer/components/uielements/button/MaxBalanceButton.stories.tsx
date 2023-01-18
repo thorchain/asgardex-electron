@@ -1,7 +1,8 @@
 import { ComponentMeta } from '@storybook/react'
 import { Balance } from '@xchainjs/xchain-client'
-import { assetAmount, AssetBNB, AssetRuneNative, assetToBase } from '@xchainjs/xchain-util'
+import { assetAmount, assetToBase } from '@xchainjs/xchain-util'
 
+import { AssetBNB, AssetRuneNative } from '../../../../shared/utils/asset'
 import { MaxBalanceButton as Component, ComponentProps } from './MaxBalanceButton'
 
 export const MaxBalanceButton = (props: ComponentProps) => <Component {...props} />

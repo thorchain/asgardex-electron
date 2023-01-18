@@ -7,7 +7,6 @@ import {
   assetAmount,
   bn,
   baseToAsset,
-  AssetBNB,
   assetToBase,
   BaseAmount,
   baseAmount
@@ -19,6 +18,7 @@ import * as O from 'fp-ts/lib/Option'
 import { useIntl } from 'react-intl'
 
 import { Network } from '../../../../../shared/api/types'
+import { AssetBNB } from '../../../../../shared/utils/asset'
 import { BNBChain } from '../../../../../shared/utils/chain'
 import { isKeystoreWallet, isLedgerWallet } from '../../../../../shared/utils/guard'
 import { WalletType } from '../../../../../shared/wallet/types'

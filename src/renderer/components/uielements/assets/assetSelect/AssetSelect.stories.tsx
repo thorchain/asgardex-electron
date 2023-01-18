@@ -1,8 +1,10 @@
 import { useState } from 'react'
 
 import { ComponentMeta } from '@storybook/react'
+import { Asset } from '@xchainjs/xchain-util'
+
+import { Network } from '../../../../../shared/api/types'
 import {
-  Asset,
   AssetBCH,
   AssetBNB,
   AssetBTC,
@@ -10,9 +12,7 @@ import {
   AssetETH,
   AssetLTC,
   AssetRuneNative
-} from '@xchainjs/xchain-util'
-
-import { Network } from '../../../../../shared/api/types'
+} from '../../../../../shared/utils/asset'
 import { AssetBUSDBD1 } from '../../../../const'
 import * as AT from '../../../../storybook/argTypes'
 import { AssetSelect as Component } from './AssetSelect'

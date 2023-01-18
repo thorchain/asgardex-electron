@@ -1,7 +1,8 @@
 import { ComponentMeta, StoryFn } from '@storybook/react'
-import { assetAmount, AssetBNB, assetToBase, assetToString } from '@xchainjs/xchain-util'
+import { assetAmount, assetToBase, assetToString } from '@xchainjs/xchain-util'
 
 import { ASSETS_MAINNET } from '../../../../shared/mock/assets'
+import { AssetBNB } from '../../../../shared/utils/asset'
 import { mockWalletBalance } from '../../../helpers/test/testWalletHelper'
 import { WalletBalances } from '../../../services/clients'
 import { WalletBalance } from '../../../services/wallet/types'

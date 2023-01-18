@@ -1,11 +1,12 @@
 import * as RD from '@devexperts/remote-data-ts'
 import { DepositParam } from '@xchainjs/xchain-thorchain'
-import { Address, AssetRuneNative } from '@xchainjs/xchain-util'
+import { Address } from '@xchainjs/xchain-util'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
 import * as Rx from 'rxjs'
 import * as RxOp from 'rxjs/operators'
 
+import { AssetRuneNative } from '../../../shared/utils/asset'
 import { HDMode, WalletType } from '../../../shared/wallet/types'
 import { liveData } from '../../helpers/rx/liveData'
 import { LiveData } from '../../helpers/rx/liveData'

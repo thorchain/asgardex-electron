@@ -7,7 +7,6 @@ import {
   formatAssetAmountCurrency,
   bn,
   baseToAsset,
-  AssetETH,
   BaseAmount,
   baseAmount,
   assetToBase,
@@ -22,6 +21,7 @@ import * as O from 'fp-ts/lib/Option'
 import { useIntl } from 'react-intl'
 
 import { Network } from '../../../../../shared/api/types'
+import { AssetETH } from '../../../../../shared/utils/asset'
 import { chainToString, ETHChain } from '../../../../../shared/utils/chain'
 import { isKeystoreWallet, isLedgerWallet } from '../../../../../shared/utils/guard'
 import { WalletType } from '../../../../../shared/wallet/types'

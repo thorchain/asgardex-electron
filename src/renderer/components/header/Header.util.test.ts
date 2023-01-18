@@ -1,6 +1,6 @@
-import { AssetBTC, AssetETH, AssetRuneNative } from '@xchainjs/xchain-util'
 import * as O from 'fp-ts/lib/Option'
 
+import { AssetBTC, AssetETH, AssetRuneNative } from '../../../shared/utils/asset'
 import { AssetBUSDBAF, AssetBUSDBD1 } from '../../const'
 import { OnlineStatus } from '../../services/app/types'
 import {

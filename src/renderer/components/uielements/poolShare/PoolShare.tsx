@@ -8,7 +8,6 @@ import {
   baseToAsset,
   formatAssetAmountCurrency,
   baseAmount,
-  AssetRuneNative,
   formatAssetAmount
 } from '@xchainjs/xchain-util'
 import { Col } from 'antd'
@@ -17,6 +16,7 @@ import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
 import { useIntl } from 'react-intl'
 
+import { AssetRuneNative } from '../../../../shared/utils/asset'
 import { THORCHAIN_DECIMAL } from '../../../helpers/assetHelper'
 import { AssetWithDecimal } from '../../../types/asgardex'
 import { TooltipAddress } from '../common/Common.styles'

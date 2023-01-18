@@ -1,8 +1,9 @@
 import { ComponentMeta } from '@storybook/react'
-import { AssetRuneNative, assetToBase, assetAmount } from '@xchainjs/xchain-util'
+import { assetToBase, assetAmount } from '@xchainjs/xchain-util'
 import * as FP from 'fp-ts/function'
 import * as O from 'fp-ts/Option'
 
+import { AssetRuneNative } from '../../../../../shared/utils/asset'
 import { mockWalletBalance } from '../../../../helpers/test/testWalletHelper'
 import { AssetInfo } from './AssetInfo'
 

@@ -1,19 +1,10 @@
 import { BTC_DECIMAL } from '@xchainjs/xchain-bitcoin'
 import { ETH_DECIMAL } from '@xchainjs/xchain-ethereum'
-import {
-  assetAmount,
-  AssetBNB,
-  AssetBTC,
-  AssetETH,
-  AssetRuneNative,
-  assetToBase,
-  assetToString,
-  baseAmount,
-  bn
-} from '@xchainjs/xchain-util'
+import { assetAmount, assetToBase, assetToString, baseAmount, bn } from '@xchainjs/xchain-util'
 import * as O from 'fp-ts/lib/Option'
 
 import { ASSETS_TESTNET } from '../../../shared/mock/assets'
+import { AssetBNB, AssetBTC, AssetETH, AssetRuneNative } from '../../../shared/utils/asset'
 import { BTCChain, THORChain } from '../../../shared/utils/chain'
 import { AssetBUSD74E, AssetBUSDBAF, AssetUSDTERC20Testnet, ZERO_BASE_AMOUNT } from '../../const'
 import { BNB_DECIMAL, THORCHAIN_DECIMAL } from '../../helpers/assetHelper'

@@ -1,9 +1,9 @@
 import { ComponentMeta } from '@storybook/react'
-import { AssetBNB } from '@xchainjs/xchain-util'
 import * as FP from 'fp-ts/lib/function'
 
 import { Network } from '../../../../shared/api/types'
 import { BNB_ADDRESS_MAINNET, BNB_ADDRESS_TESTNET } from '../../../../shared/mock/address'
+import { AssetBNB } from '../../../../shared/utils/asset'
 import * as AT from '../../../storybook/argTypes'
 import { QRCodeModal as Component } from './QRCodeModal'
 

@@ -5,12 +5,10 @@ import {
   Address,
   Asset,
   assetFromString,
-  AssetRuneNative,
   assetToString,
   baseAmount,
   baseToAsset,
   formatAssetAmountCurrency,
-  isAssetRuneNative,
   isSynthAsset
 } from '@xchainjs/xchain-util'
 import { Col, Collapse, Grid, Row } from 'antd'
@@ -23,6 +21,7 @@ import { useIntl } from 'react-intl'
 import { useNavigate } from 'react-router'
 
 import { Network } from '../../../../shared/api/types'
+import { AssetRuneNative } from '../../../../shared/utils/asset'
 import { chainToString } from '../../../../shared/utils/chain'
 import { isKeystoreWallet } from '../../../../shared/utils/guard'
 import { DEFAULT_WALLET_TYPE } from '../../../const'
@@ -182,7 +181,7 @@ export const AssetsTableCollapsable: React.FC<Props> = (props): JSX.Element => {
 
       const actions: ActionButtonAction[] = FP.pipe(
         // 'swap' for RUNE
-        isAssetRuneNative(asset) && deepestPoolAsset !== null
+        isRuneNativeAsset(asset) && deepestPoolAsset !== null
           ? [
               {
                 label: intl.formatMessage({ id: 'common.swap' }),
@@ -201,7 +200,7 @@ export const AssetsTableCollapsable: React.FC<Props> = (props): JSX.Element => {
           : [],
         // 'add' LP RUNE
         A.concatW<ActionButtonAction>(
-          isAssetRuneNative(asset) && deepestPoolAsset !== null
+          isRuneNativeAsset(asset) && deepestPoolAsset !== null
             ? [
                 {
                   label: intl.formatMessage({ id: 'common.add' }),

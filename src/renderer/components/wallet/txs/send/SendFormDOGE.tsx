@@ -6,7 +6,6 @@ import { DOGE_DECIMAL } from '@xchainjs/xchain-doge'
 import {
   Address,
   assetAmount,
-  AssetDOGE,
   assetToBase,
   BaseAmount,
   baseAmount,
@@ -22,6 +21,7 @@ import * as O from 'fp-ts/lib/Option'
 import { useIntl } from 'react-intl'
 
 import { Network } from '../../../../../shared/api/types'
+import { AssetDOGE } from '../../../../../shared/utils/asset'
 import { DOGEChain } from '../../../../../shared/utils/chain'
 import { isKeystoreWallet, isLedgerWallet } from '../../../../../shared/utils/guard'
 import { WalletType } from '../../../../../shared/wallet/types'

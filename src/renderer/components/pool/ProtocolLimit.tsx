@@ -1,10 +1,11 @@
 import React, { useMemo } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
-import { AssetRuneNative, baseToAsset, formatAssetAmountCurrency } from '@xchainjs/xchain-util'
+import { baseToAsset, formatAssetAmountCurrency } from '@xchainjs/xchain-util'
 import * as FP from 'fp-ts/lib/function'
 import { useIntl } from 'react-intl'
 
+import { AssetRuneNative } from '../../../shared/utils/asset'
 import { LimitRD } from '../../hooks/useProtocolLimit'
 import * as Styled from './ProtocolLimit.styles'
 

@@ -1,7 +1,7 @@
 import { ComponentMeta } from '@storybook/react'
-import { AssetBNB } from '@xchainjs/xchain-util'
 
 import { BNB_ADDRESS_TESTNET } from '../../../../../shared/mock/address'
+import { AssetBNB } from '../../../../../shared/utils/asset'
 import { Size } from '../assetIcon'
 import { AssetAddress as Component } from './AssetAddress'
 

@@ -1,8 +1,9 @@
 import { useState } from 'react'
 
 import { ComponentMeta } from '@storybook/react'
+import { Asset } from '@xchainjs/xchain-util'
+
 import {
-  Asset,
   AssetBCH,
   AssetBNB,
   AssetBTC,
@@ -10,8 +11,7 @@ import {
   AssetETH,
   AssetLTC,
   AssetRuneNative
-} from '@xchainjs/xchain-util'
-
+} from '../../../../../shared/utils/asset'
 import { AssetBUSDBD1 } from '../../../../const'
 import * as AT from '../../../../storybook/argTypes'
 import { AssetMenu as Component, Props } from './AssetMenu'

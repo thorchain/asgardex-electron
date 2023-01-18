@@ -1,6 +1,7 @@
-import { AssetRuneNative, assetToString, baseAmount } from '@xchainjs/xchain-util'
+import { assetToString, baseAmount } from '@xchainjs/xchain-util'
 import * as O from 'fp-ts/Option'
 
+import { AssetRuneNative } from '../../../shared/utils/asset'
 import { eqAssetsWithAmount, eqOAssetWithAmount } from '../../helpers/fp/eq'
 import { Coin, Transaction } from '../../types/generated/midgard/models'
 import { getRequestType, getTxType, mapCoin, mapTransaction } from './action.utils'

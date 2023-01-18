@@ -1,6 +1,7 @@
 import { Meta, StoryFn } from '@storybook/react'
-import { assetAmount, AssetBNB, assetToBase } from '@xchainjs/xchain-util'
+import { assetAmount, assetToBase } from '@xchainjs/xchain-util'
 
+import { AssetBNB } from '../../../../../shared/utils/asset'
 import { AssetBUSD74E } from '../../../../const'
 import { AssetInput as Component, Props } from './AssetInput'
 

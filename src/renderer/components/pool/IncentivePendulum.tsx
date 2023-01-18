@@ -1,10 +1,11 @@
 import React from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
-import { AssetRuneNative, baseToAsset, formatAssetAmountCurrency } from '@xchainjs/xchain-util'
+import { baseToAsset, formatAssetAmountCurrency } from '@xchainjs/xchain-util'
 import * as FP from 'fp-ts/lib/function'
 import { useIntl } from 'react-intl'
 
+import { AssetRuneNative } from '../../../shared/utils/asset'
 import { IncentivePendulumRD } from '../../hooks/useIncentivePendulum'
 import type { AlertIconColor } from '../uielements/alert/'
 import { Tooltip } from '../uielements/common/Common.styles'

@@ -1,8 +1,8 @@
 import * as RD from '@devexperts/remote-data-ts'
 import { ComponentMeta, StoryFn } from '@storybook/react'
-import { AssetRuneNative } from '@xchainjs/xchain-util'
 import * as O from 'fp-ts/lib/Option'
 
+import { AssetRuneNative } from '../../../shared/utils/asset'
 import * as AT from '../../storybook/argTypes'
 import { HeaderComponent as Component, Props } from './HeaderComponent'
 
