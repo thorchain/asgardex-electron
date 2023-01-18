@@ -40,7 +40,7 @@ export const isEnabledChain = (chain: Chain) => chain.includes(chain)
 export const chainToString = (chain: Chain): string => {
   switch (chain) {
     case AvalancheChain:
-      return 'Avalance'
+      return 'Avalanche'
     case BCHChain:
       return 'Bitcoin Cash'
     case BNBChain:
