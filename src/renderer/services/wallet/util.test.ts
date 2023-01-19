@@ -1,6 +1,5 @@
 import { baseAmount } from '@xchainjs/xchain-util'
 import * as O from 'fp-ts/lib/Option'
-import { describe } from 'node:test'
 
 import { ASSETS_TESTNET } from '../../../shared/mock/assets'
 import { AssetBNB, AssetBTC, AssetETH, AssetRuneNative } from '../../../shared/utils/asset'

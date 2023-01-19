@@ -12,8 +12,8 @@ import * as E from 'fp-ts/Either'
 
 import { IPCLedgerDepositTxParams, IPCLedgerSendTxParams } from '../../../shared/api/io'
 import { LedgerError, LedgerErrorId } from '../../../shared/api/types'
-import { chainToString } from '../../../shared/utils/chain'
-import { enabledChainGuard, isError, isEthHDMode } from '../../../shared/utils/guard'
+import { chainToString, isEnabledChain } from '../../../shared/utils/chain'
+import { isError, isEthHDMode } from '../../../shared/utils/guard'
 import * as BNB from './binance/transaction'
 import * as BTC from './bitcoin/transaction'
 import * as BCH from './bitcoincash/transaction'
@@ -42,7 +42,7 @@ export const sendTx = async ({
     const transport = await TransportNodeHidSingleton.open()
     let res: E.Either<LedgerError, string>
 
-    if (!enabledChainGuard.is(chain)) {
+    if (!isEnabledChain(chain)) {
       res = E.left({
         errorId: LedgerErrorId.NOT_IMPLEMENTED,
         msg: `${chain} is not supported for 'sendTx'`
@@ -204,7 +204,7 @@ export const deposit = async ({
       errorId: LedgerErrorId.NOT_IMPLEMENTED,
       msg: `${chain} is not supported for 'deposit'`
     })
-    if (!enabledChainGuard.is(chain)) {
+    if (!isEnabledChain(chain)) {
       res = notSupportedError
     } else {
       switch (chain) {

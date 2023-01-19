@@ -136,8 +136,7 @@ export const DepositView: React.FC<Props> = () => {
   const reloadChainAndRuneBalances = useCallback(() => {
     FP.pipe(
       oSelectedAssetWithDecimal,
-      O.map(({ asset }) => {
-        const { chain } = asset
+      O.map(({ asset: { chain } }) => {
         reloadBalancesByChain(chain)()
         reloadBalancesByChain(THORChain)()
         return true

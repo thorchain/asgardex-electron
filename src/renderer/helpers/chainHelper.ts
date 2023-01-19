@@ -23,6 +23,8 @@ import { eqChain } from './fp/eq'
 
 // TODO (@veado) Return Maybe<Asset> instead of throwing an error
 export const getChainAsset = (chain: Chain): Asset => {
+  if (!isEnabledChain(chain)) throw Error(`${chain} is not supported for 'getChainAsset'`)
+
   switch (chain) {
     case BNBChain:
       return AssetBNB
@@ -40,50 +42,48 @@ export const getChainAsset = (chain: Chain): Asset => {
       return AssetLTC
     case DOGEChain:
       return AssetDOGE
-    default:
-      throw Error(`${chain} is not supported for 'getChainAsset'`)
   }
 }
 
 /**
  * Check whether chain is BTC chain
  */
-export const isBtcChain = (chain: string): boolean => eqChain.equals(chain, BTCChain)
+export const isBtcChain = (chain: Chain): boolean => eqChain.equals(chain, BTCChain)
 
 /**
  * Check whether chain is LTC chain
  */
-export const isLtcChain = (chain: string): boolean => eqChain.equals(chain, LTCChain)
+export const isLtcChain = (chain: Chain): boolean => eqChain.equals(chain, LTCChain)
 
 /**
  * Check whether chain is THOR chain
  */
-export const isThorChain = (chain: string): boolean => eqChain.equals(chain, THORChain)
+export const isThorChain = (chain: Chain): boolean => eqChain.equals(chain, THORChain)
 
 /**
  * Check whether chain is BNB chain
  */
-export const isBnbChain = (chain: string): boolean => eqChain.equals(chain, BNBChain)
+export const isBnbChain = (chain: Chain): boolean => eqChain.equals(chain, BNBChain)
 
 /**
  * Check whether chain is ETH chain
  */
-export const isEthChain = (chain: string): boolean => eqChain.equals(chain, ETHChain)
+export const isEthChain = (chain: Chain): boolean => eqChain.equals(chain, ETHChain)
 
 /**
  * Check whether chain is BCH chain
  */
-export const isBchChain = (chain: string): boolean => eqChain.equals(chain, BCHChain)
+export const isBchChain = (chain: Chain): boolean => eqChain.equals(chain, BCHChain)
 
 /**
  * Check whether chain is DOGE chain
  */
-export const isDogeChain = (chain: string): boolean => eqChain.equals(chain, DOGEChain)
+export const isDogeChain = (chain: Chain): boolean => eqChain.equals(chain, DOGEChain)
 
 /**
  * Check whether chain is Cosmos (GAIA) chain
  */
-export const isCosmosChain = (chain: string): boolean => eqChain.equals(chain, GAIAChain)
+export const isCosmosChain = (chain: Chain): boolean => eqChain.equals(chain, GAIAChain)
 
 type ChainValues<T> = {
   [k in Chain]?: T[]

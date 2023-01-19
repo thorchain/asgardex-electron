@@ -310,7 +310,7 @@ const createPoolsService = ({
       apiGetPoolsAll$,
       // Filter out all unknown / invalid assets created from asset strings
       liveData.map(A.filterMap(({ asset }) => FP.pipe(asset, assetFromString, O.fromNullable))),
-      // Filter pools by using enabled chains only (defined via ENV)
+      // Filter pools by using enabled chains only
       liveData.map(A.filter(({ chain }) => isEnabledChain(chain))),
       RxOp.shareReplay(1)
     )
@@ -345,7 +345,7 @@ const createPoolsService = ({
             pools,
             // Filter out all unknown / invalid assets created from asset strings
             RD.map(A.filterMap(({ asset }) => FP.pipe(asset, assetFromString, O.fromNullable))),
-            // Filter pools by using enabled chains only (defined via ENV)
+            // Filter pools by using enabled chains only
             RD.map(A.filter(({ chain }) => isEnabledChain(chain))),
             // Filter pools based on ERC20Whitelist (mainnet + ETHChain only)
             RD.map(A.filter((asset) => !isEthChain(asset.chain) || validAssetForETH(asset, network)))
@@ -417,7 +417,7 @@ const createPoolsService = ({
             pools,
             // Filter out all unknown / invalid assets created from asset strings
             RD.map(A.filterMap(({ asset }) => FP.pipe(asset, assetFromString, O.fromNullable))),
-            // Filter pools by using enabled chains only (defined via ENV)
+            // Filter pools by using enabled chains only
             RD.map(A.filter(({ chain }) => isEnabledChain(chain))),
             // Filter pools based on ERC20Whitelist (mainnet + ETH only)
             RD.map(A.filter((asset) => !isEthChain(asset.chain) || validAssetForETH(asset, network)))
@@ -533,10 +533,7 @@ const createPoolsService = ({
         RD.toOption,
         // TODO (@Veado) Will we ingore router for some cases (e.g. by withdrawing something from ETH vault not using router)=
         (oPoolAddresses) => sequenceTOption(oPoolAddresses, oSelectedPoolAsset),
-        O.chain(([addresses, selectedAsset]) => {
-          const { chain } = selectedAsset
-          return getPoolAddressesByChain(addresses, chain)
-        })
+        O.chain(([addresses, { chain }]) => getPoolAddressesByChain(addresses, chain))
       )
     })
   )

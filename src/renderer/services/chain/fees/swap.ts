@@ -18,14 +18,10 @@ import { poolOutboundFee$, poolInboundFee$ } from './common'
  * Returns zero swap fees
  * by given `in` / `out` assets of a swap
  */
-export const getZeroSwapFees = ({ inAsset, outAsset }: { inAsset: Asset; outAsset: Asset }): SwapFees => {
-  const { chain: inChain } = inAsset
-  const { chain: outChain } = outAsset
-  return {
-    inFee: { amount: ZERO_BASE_AMOUNT, asset: getChainAsset(inChain) },
-    outFee: { amount: ZERO_BASE_AMOUNT, asset: getChainAsset(outChain) }
-  }
-}
+export const getZeroSwapFees = ({ inAsset, outAsset }: { inAsset: Asset; outAsset: Asset }): SwapFees => ({
+  inFee: { amount: ZERO_BASE_AMOUNT, asset: getChainAsset(inAsset.chain) },
+  outFee: { amount: ZERO_BASE_AMOUNT, asset: getChainAsset(outAsset.chain) }
+})
 
 // state of `SwapFeesParams` used for reloading swap fees
 const {

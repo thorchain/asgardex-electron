@@ -95,12 +95,9 @@ export const SymDepositView: React.FC<Props> = (props) => {
   )
 
   const reloadBalances = useCallback(() => {
-    const {
-      asset: { chain }
-    } = assetWD
-    reloadBalancesByChain(chain)()
+    reloadBalancesByChain(assetWD.asset.chain)()
     reloadBalancesByChain(THORChain)()
-  }, [assetWD, reloadBalancesByChain])
+  }, [assetWD.asset.chain, reloadBalancesByChain])
 
   const onChangeAsset = useCallback(
     ({

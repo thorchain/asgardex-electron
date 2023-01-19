@@ -40,10 +40,7 @@ export const useSymDepositAddresses = ({
         oAsset,
         O.fold(
           () => Rx.of(O.none),
-          (asset) => {
-            const { chain } = asset
-            return addressByChain$(chain)
-          }
+          ({ chain }) => addressByChain$(chain)
         )
       ),
 
@@ -72,10 +69,7 @@ export const useSymDepositAddresses = ({
         oAsset,
         O.fold(
           () => Rx.of(O.none),
-          (asset) => {
-            const { chain } = asset
-            return FP.pipe(getLedgerAddress$(chain), RxOp.map(O.map(ledgerAddressToWalletAddress)))
-          }
+          ({ chain }) => FP.pipe(getLedgerAddress$(chain), RxOp.map(O.map(ledgerAddressToWalletAddress)))
         )
       ),
     O.none

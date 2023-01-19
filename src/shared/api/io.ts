@@ -58,6 +58,7 @@ export const baseAmountIO = new t.Type(
 
 export const chainIO = new t.Type(
   'ChainIO',
+  // Note: We do accept enabled chains only
   enabledChainGuard.is,
   (u, c) => {
     if (enabledChainGuard.is(u)) return t.success(u)
