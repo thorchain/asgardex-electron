@@ -6779,21 +6779,21 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@xchainjs/xchain-binance@npm:^5.6.6":
-  version: 5.6.6
-  resolution: "@xchainjs/xchain-binance@npm:5.6.6"
+"@xchainjs/xchain-binance@npm:^5.6.7":
+  version: 5.6.7
+  resolution: "@xchainjs/xchain-binance@npm:5.6.7"
   peerDependencies:
     "@binance-chain/javascript-sdk": ^4.2.0
     "@xchainjs/xchain-client": ^0.13.5
     "@xchainjs/xchain-crypto": ^0.2.6
     "@xchainjs/xchain-util": ^0.12.0
-  checksum: 7521c9b4a21fa8e9cf6b1356d9e58413cd564156146530cb3cd496df44aabe6e053d0fc4b0eb176a38104fa67544098521fc8adc2d9732b3328ad1e770a7c5c6
+  checksum: 4358e979de13df668019150598511706bc7cbe2d86f2455051a049e2d2de4e340175c859fbeb607e800534dba32f17b741a1eeef2170b3afbf1f2c5b32ab0494
   languageName: node
   linkType: hard
 
-"@xchainjs/xchain-bitcoin@npm:^0.20.7":
-  version: 0.20.7
-  resolution: "@xchainjs/xchain-bitcoin@npm:0.20.7"
+"@xchainjs/xchain-bitcoin@npm:^0.20.8":
+  version: 0.20.8
+  resolution: "@xchainjs/xchain-bitcoin@npm:0.20.8"
   peerDependencies:
     "@xchainjs/xchain-client": ^0.13.5
     "@xchainjs/xchain-crypto": ^0.2.6
@@ -6802,13 +6802,13 @@ __metadata:
     bitcoinjs-lib: ^5.2.0
     coinselect: ^3.1.12
     wif: ^2.0.6
-  checksum: ebd78353314a219bbce39b50162c210b40e5f87b5357e4ab021f0181111ca20a803603ac316a545af1eb783455e7ccff50423ef21ce936a6adb1b2e0ee8e90e6
+  checksum: 0e8771cfe705ca0c8fdf7c019eac3caf8e30bdc419d9918583c12e911ebe67f63f96c5e94f5e0a9557d271f744d85c0a573a72b975adb311a187f1fdb9afb63b
   languageName: node
   linkType: hard
 
-"@xchainjs/xchain-bitcoincash@npm:^0.15.6":
-  version: 0.15.6
-  resolution: "@xchainjs/xchain-bitcoincash@npm:0.15.6"
+"@xchainjs/xchain-bitcoincash@npm:^0.15.7":
+  version: 0.15.7
+  resolution: "@xchainjs/xchain-bitcoincash@npm:0.15.7"
   dependencies:
     uniqid: ^5.4.0
   peerDependencies:
@@ -6819,7 +6819,7 @@ __metadata:
     axios: ^0.25.0
     bchaddrjs: ^0.5.2
     coinselect: 3.1.12
-  checksum: 21b3450ea865cbef8e2d1e8d91d4dff9a366401522abf1bf239018a66f7f1531b6adffe2448d08888c081b17050fb2143f25b42be26f7195c649b6f8c0052682
+  checksum: 9301c693bdfcd868da4b4050affde6437922257d4c16cb099953823a9f065593fc3d19cff3308c4216c7264b3fafe50fad2fa76524ef2e9e77409dc0de69f3eb
   languageName: node
   linkType: hard
 
@@ -6834,16 +6834,16 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@xchainjs/xchain-cosmos@npm:0.20.6":
-  version: 0.20.6
-  resolution: "@xchainjs/xchain-cosmos@npm:0.20.6"
+"@xchainjs/xchain-cosmos@npm:0.20.7":
+  version: 0.20.7
+  resolution: "@xchainjs/xchain-cosmos@npm:0.20.7"
   peerDependencies:
     "@cosmos-client/core": 0.46.1
     "@xchainjs/xchain-client": ^0.13.5
     "@xchainjs/xchain-crypto": ^0.2.6
     "@xchainjs/xchain-util": ^0.12.0
     axios: ^0.25.0
-  checksum: f3ca9756121b5f54b0bf9f6e9cff7a84ba1d7573ba3887acb8d8a7c9e9aecc3585ab753847ea8e3ce9a9f2bcb7e5666f91c82e0fe26fb0e41690d634bb937656
+  checksum: 3d393230e12404325dd9cc30ce85efdebc728cfd5325c4ada35911b129f758b0fe908c76e8f810ee23fd5fa47373c9e35044cd027dccae843308f7dceacd4bef
   languageName: node
   linkType: hard
 
@@ -6861,9 +6861,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@xchainjs/xchain-doge@npm:^0.5.6":
-  version: 0.5.6
-  resolution: "@xchainjs/xchain-doge@npm:0.5.6"
+"@xchainjs/xchain-doge@npm:^0.5.7":
+  version: 0.5.7
+  resolution: "@xchainjs/xchain-doge@npm:0.5.7"
   peerDependencies:
     "@xchainjs/xchain-client": ^0.13.5
     "@xchainjs/xchain-crypto": ^0.2.6
@@ -6873,26 +6873,26 @@ __metadata:
     coininfo: 5.1.0
     coinselect: 3.1.12
     wif: ^2.0.6
-  checksum: 3d17e65611d1fb2da6fe4b2a3601c7e96d935ee2baf30c4b3f4fe0026cf7779f4afc0836b8da6c7d1647e067f230e6aa609d2ad2e891d0c27fb671822808ef74
+  checksum: becb6631620520884cd1c72b8c68927ea4d636949bf3f834e7d1099065a15f08b803828b63ca73d34c27e939ffe6fc8d6fa06d58a8a082f40a9a8d1128e24532
   languageName: node
   linkType: hard
 
-"@xchainjs/xchain-ethereum@npm:^0.27.6":
-  version: 0.27.6
-  resolution: "@xchainjs/xchain-ethereum@npm:0.27.6"
+"@xchainjs/xchain-ethereum@npm:^0.27.7":
+  version: 0.27.7
+  resolution: "@xchainjs/xchain-ethereum@npm:0.27.7"
   peerDependencies:
     "@xchainjs/xchain-client": ^0.13.5
     "@xchainjs/xchain-crypto": ^0.2.6
     "@xchainjs/xchain-util": ^0.12.0
     axios: ^0.25.0
     ethers: ^5.6.6
-  checksum: 2310054e539522af5c1306fa8834c71c0d4b857c7c39c35a1c9baccb99ccfc56986b6539fb51a70f53b6e9e80c34e393a98cacde78298d969671395d6e7d0ae1
+  checksum: 11efb76f879c4f0f5864e1feeb2ac99bef9972ab3e48bf39e655c2f3aa2bb92cc89f95a18cc243808c383f27060bd2d652f6ef19e840fa0815225fcb3d01d220
   languageName: node
   linkType: hard
 
-"@xchainjs/xchain-litecoin@npm:^0.10.8":
-  version: 0.10.8
-  resolution: "@xchainjs/xchain-litecoin@npm:0.10.8"
+"@xchainjs/xchain-litecoin@npm:^0.10.9":
+  version: 0.10.9
+  resolution: "@xchainjs/xchain-litecoin@npm:0.10.9"
   peerDependencies:
     "@xchainjs/xchain-client": ^0.13.5
     "@xchainjs/xchain-crypto": ^0.2.6
@@ -6902,13 +6902,13 @@ __metadata:
     coininfo: ^5.1.0
     coinselect: 3.1.12
     wif: ^2.0.6
-  checksum: bffcfb0c6e0ce1a6ec702c4a9ff34e04185fa59502e09445c62d894eb910217cbbf91c45e43b1e7b4f12d45ce0706dcc90e2b38b89e4394394ed49401943c7c3
+  checksum: d3bca1e02e22bd0954e036db38f50ee9d503448e44b1bab26a14e9ddbf3d0aa914e42e3acef51f4b58c6fbca124df5b52fa9ebcb3d81bfabd8b1f4151d1c8a3b
   languageName: node
   linkType: hard
 
-"@xchainjs/xchain-thorchain@npm:^0.27.7":
-  version: 0.27.7
-  resolution: "@xchainjs/xchain-thorchain@npm:0.27.7"
+"@xchainjs/xchain-thorchain@npm:^0.27.8":
+  version: 0.27.8
+  resolution: "@xchainjs/xchain-thorchain@npm:0.27.8"
   peerDependencies:
     "@cosmos-client/core": 0.46.1
     "@xchainjs/xchain-client": ^0.13.5
@@ -6917,7 +6917,7 @@ __metadata:
     "@xchainjs/xchain-util": ^0.12.0
     axios: ^0.25.0
     bech32-buffer: ^0.2.0
-  checksum: 2ade8b7ab4926da5b170171ae63a5ffcb8342d570540d16f229fe355a20cded110909ec651b91c7fd5b490b57b5328b879de88b720bc5ef642734ccf9b242d3a
+  checksum: bc11f4853076f853395aace41819c8dbcbcc09770066c37f1fecef61310f2ef33895c36fa66fc0d971b1bda1890f41c7cda0f080a7f0a8e4ed1e4f1637b2f7a9
   languageName: node
   linkType: hard
 
@@ -7716,16 +7716,16 @@ __metadata:
     "@types/react-intl": ^3.0.0
     "@types/secp256k1": ^4.0.3
     "@types/styled-components": ^5.1.25
-    "@xchainjs/xchain-binance": ^5.6.6
-    "@xchainjs/xchain-bitcoin": ^0.20.7
-    "@xchainjs/xchain-bitcoincash": ^0.15.6
+    "@xchainjs/xchain-binance": ^5.6.7
+    "@xchainjs/xchain-bitcoin": ^0.20.8
+    "@xchainjs/xchain-bitcoincash": ^0.15.7
     "@xchainjs/xchain-client": ^0.13.5
-    "@xchainjs/xchain-cosmos": 0.20.6
+    "@xchainjs/xchain-cosmos": 0.20.7
     "@xchainjs/xchain-crypto": ^0.2.6
-    "@xchainjs/xchain-doge": ^0.5.6
-    "@xchainjs/xchain-ethereum": ^0.27.6
-    "@xchainjs/xchain-litecoin": ^0.10.8
-    "@xchainjs/xchain-thorchain": ^0.27.7
+    "@xchainjs/xchain-doge": ^0.5.7
+    "@xchainjs/xchain-ethereum": ^0.27.7
+    "@xchainjs/xchain-litecoin": ^0.10.9
+    "@xchainjs/xchain-thorchain": ^0.27.8
     "@xchainjs/xchain-util": ^0.12.0
     ansis: ^1.5.5
     antd: ^4.20.7

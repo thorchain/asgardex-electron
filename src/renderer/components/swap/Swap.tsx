@@ -31,7 +31,7 @@ import { useIntl } from 'react-intl'
 import * as RxOp from 'rxjs/operators'
 
 import { Network } from '../../../shared/api/types'
-import { chainToString, unsafeChainFromAsset } from '../../../shared/utils/chain'
+import { chainToString } from '../../../shared/utils/chain'
 import { isLedgerWallet } from '../../../shared/utils/guard'
 import { WalletType } from '../../../shared/wallet/types'
 import { ZERO_BASE_AMOUNT } from '../../const'
@@ -216,7 +216,7 @@ export const Swap = ({
 }: SwapProps) => {
   const intl = useIntl()
 
-  const sourceChain = unsafeChainFromAsset(sourceAsset)
+  const { chain: sourceChain } = sourceAsset
 
   const lockedWallet: boolean = useMemo(() => isLocked(keystore) || !hasImportedKeystore(keystore), [keystore])
 

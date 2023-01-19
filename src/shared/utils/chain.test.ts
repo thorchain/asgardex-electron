@@ -1,30 +1,26 @@
-import {
-  AvalancheChain,
-  BCHChain,
-  BNBChain,
-  BTCChain,
-  chainToString,
-  CosmosChain,
-  DOGEChain,
-  ETHChain,
-  isChain,
-  LTCChain,
-  THORChain
-} from './chain'
+import { BNBChain } from '@xchainjs/xchain-binance'
+import { BTCChain } from '@xchainjs/xchain-bitcoin'
+import { BCHChain } from '@xchainjs/xchain-bitcoincash'
+import { GAIAChain } from '@xchainjs/xchain-cosmos'
+import { DOGEChain } from '@xchainjs/xchain-doge'
+import { ETHChain } from '@xchainjs/xchain-ethereum'
+import { LTCChain } from '@xchainjs/xchain-litecoin'
+import { THORChain } from '@xchainjs/xchain-thorchain'
+
+import { chainToString, isEnabledChain } from './chain'
 
 describe('chain', () => {
-  it('isChain', () => {
-    expect(isChain('BNB')).toBeTruthy()
-    expect(isChain('BTC')).toBeTruthy()
-    expect(isChain('BCH')).toBeTruthy()
-    expect(isChain('ETH')).toBeTruthy()
-    expect(isChain('THOR')).toBeTruthy()
-    expect(isChain('GAIA')).toBeTruthy()
-    expect(isChain('LTC')).toBeTruthy()
-    expect(isChain('GAIA')).toBeTruthy()
-    expect(isChain('AVAX')).toBeTruthy()
-    expect(isChain('invalid')).toBeFalsy()
-    expect(isChain('')).toBeFalsy()
+  it('isEnabledChain', () => {
+    expect(isEnabledChain('BNB')).toBeTruthy()
+    expect(isEnabledChain('BTC')).toBeTruthy()
+    expect(isEnabledChain('BCH')).toBeTruthy()
+    expect(isEnabledChain('ETH')).toBeTruthy()
+    expect(isEnabledChain('THOR')).toBeTruthy()
+    expect(isEnabledChain('GAIA')).toBeTruthy()
+    expect(isEnabledChain('LTC')).toBeTruthy()
+    expect(isEnabledChain('GAIA')).toBeTruthy()
+    expect(isEnabledChain('invalid')).toBeFalsy()
+    expect(isEnabledChain('')).toBeFalsy()
   })
 
   describe('chainToString', () => {
@@ -44,16 +40,13 @@ describe('chain', () => {
       expect(chainToString(BNBChain)).toEqual('Binance Chain')
     })
     it('GAIA', () => {
-      expect(chainToString(CosmosChain)).toEqual('Cosmos')
+      expect(chainToString(GAIAChain)).toEqual('Cosmos')
     })
     it('LTC', () => {
       expect(chainToString(LTCChain)).toEqual('Litecoin')
     })
     it('DOGE', () => {
       expect(chainToString(DOGEChain)).toEqual('Dogecoin')
-    })
-    it('Avalanche', () => {
-      expect(chainToString(AvalancheChain)).toEqual('Avalanche')
     })
   })
 })

@@ -3,7 +3,6 @@ import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
 import * as RxOp from 'rxjs/operators'
 
-import { unsafeChainFromAsset } from '../../../../shared/utils/chain'
 import { ZERO_BASE_AMOUNT } from '../../../const'
 import { isRuneNativeAsset } from '../../../helpers/assetHelper'
 import { getChainAsset } from '../../../helpers/chainHelper'
@@ -20,8 +19,8 @@ import { poolOutboundFee$, poolInboundFee$ } from './common'
  * by given `in` / `out` assets of a swap
  */
 export const getZeroSwapFees = ({ inAsset, outAsset }: { inAsset: Asset; outAsset: Asset }): SwapFees => {
-  const inChain = unsafeChainFromAsset(inAsset)
-  const outChain = unsafeChainFromAsset(outAsset)
+  const { chain: inChain } = inAsset
+  const { chain: outChain } = outAsset
   return {
     inFee: { amount: ZERO_BASE_AMOUNT, asset: getChainAsset(inChain) },
     outFee: { amount: ZERO_BASE_AMOUNT, asset: getChainAsset(outChain) }

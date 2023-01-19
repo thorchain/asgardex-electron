@@ -31,7 +31,7 @@ import {
   AssetRuneERC20Testnet,
   AssetRuneNative
 } from '../../shared/utils/asset'
-import { isChain } from '../../shared/utils/chain'
+import { isEnabledChain } from '../../shared/utils/chain'
 import {
   AssetTGTERC20,
   AssetXRune,
@@ -243,7 +243,7 @@ export const isPricePoolAsset = (asset: Asset): asset is PricePoolAsset =>
   [...DEFAULT_PRICE_ASSETS, ...USD_PRICE_ASSETS].includes(asset)
 
 export const isChainAsset = (asset: Asset): boolean =>
-  isChain(asset.chain) && eqAsset.equals(asset, getChainAsset(asset.chain))
+  isEnabledChain(asset.chain) && eqAsset.equals(asset, getChainAsset(asset.chain))
 
 export const isUSDAsset = ({ ticker }: Asset): boolean => ticker.includes('USD') || ticker.includes('UST')
 

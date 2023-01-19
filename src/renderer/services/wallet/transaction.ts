@@ -1,19 +1,18 @@
 import * as RD from '@devexperts/remote-data-ts'
+import { BNBChain } from '@xchainjs/xchain-binance'
+import { BTCChain } from '@xchainjs/xchain-bitcoin'
+import { BCHChain } from '@xchainjs/xchain-bitcoincash'
+import { GAIAChain } from '@xchainjs/xchain-cosmos'
+import { DOGEChain } from '@xchainjs/xchain-doge'
+import { ETHChain } from '@xchainjs/xchain-ethereum'
+import { LTCChain } from '@xchainjs/xchain-litecoin'
+import { THORChain } from '@xchainjs/xchain-thorchain'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
 import * as Rx from 'rxjs'
 import * as RxOp from 'rxjs/operators'
 
-import {
-  BCHChain,
-  BNBChain,
-  BTCChain,
-  CosmosChain,
-  DOGEChain,
-  ETHChain,
-  LTCChain,
-  THORChain
-} from '../../../shared/utils/chain'
+import { isEnabledChain } from '../../../shared/utils/chain'
 import { observableState } from '../../helpers/stateHelper'
 import * as BNB from '../binance'
 import * as BTC from '../bitcoin'
@@ -56,7 +55,13 @@ export const getTxs$: (walletAddress: O.Option<string>, walletIndex: number) => 
         O.fold(
           () => Rx.of(RD.initial),
           ({ asset }) => {
-            switch (asset.chain) {
+            const { chain } = asset
+            if (!isEnabledChain(chain))
+              return Rx.of(
+                RD.failure<ApiError>({ errorId: ErrorId.GET_ASSET_TXS, msg: `Unsupported chain ${asset.chain}` })
+              )
+
+            switch (chain) {
               case BNBChain:
                 return BNB.txs$({ asset: O.some(asset), limit, offset, walletAddress, walletIndex })
               case BTCChain:
@@ -71,12 +76,8 @@ export const getTxs$: (walletAddress: O.Option<string>, walletIndex: number) => 
                 return BCH.txs$({ asset: O.none, limit, offset, walletAddress, walletIndex })
               case DOGEChain:
                 return DOGE.txs$({ asset: O.none, limit, offset, walletAddress, walletIndex })
-              case CosmosChain:
+              case GAIAChain:
                 return COSMOS.txs$({ asset: O.some(asset), limit, offset, walletAddress, walletIndex })
-              default:
-                return Rx.of(
-                  RD.failure<ApiError>({ errorId: ErrorId.GET_ASSET_TXS, msg: `Unsupported chain ${asset.chain}` })
-                )
             }
           }
         )

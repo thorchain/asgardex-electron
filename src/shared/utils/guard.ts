@@ -1,5 +1,5 @@
 import { FeeOption } from '@xchainjs/xchain-client'
-import { Asset, assetFromString, BaseAmount, isValidAsset } from '@xchainjs/xchain-util'
+import { Asset, assetFromString, BaseAmount, Chain, isValidAsset } from '@xchainjs/xchain-util'
 import BigNumber from 'bignumber.js'
 import * as FP from 'fp-ts/lib/function'
 import * as IOG from 'io-ts/Guard'
@@ -7,19 +7,23 @@ import * as IOG from 'io-ts/Guard'
 import { Network } from '../api/types'
 import { EthHDMode } from '../ethereum/types'
 import { HDMode, WalletType } from '../wallet/types'
-import type { Chain } from './chain'
-import * as Util from './chain'
+import { EnabledChain, isEnabledChain } from './chain'
 
 export const nonEmptyStringGuard = FP.pipe(
   IOG.string,
   IOG.refine((s): s is string => s.length > 0)
 )
 
-const chainGuard: IOG.Guard<unknown, Chain> = {
-  is: (u: unknown): u is Chain => nonEmptyStringGuard.is(u) && Util.isChain(u)
+export const enabledChainGuard: IOG.Guard<unknown, EnabledChain> = {
+  is: (u: unknown): u is EnabledChain => nonEmptyStringGuard.is(u) && isEnabledChain(u)
 }
 
-export const isChain = (u: unknown): u is Chain => chainGuard.is(u)
+const chainGuard: IOG.Guard<unknown, Chain> = {
+  is: (u: unknown): u is Chain =>
+    nonEmptyStringGuard.is(u) &&
+    // we do support assets of enabled chains only
+    isEnabledChain(u)
+}
 
 export const isNetwork = (u: unknown): u is Network => u === 'mainnet' || u === 'stagenet' || u === 'testnet'
 

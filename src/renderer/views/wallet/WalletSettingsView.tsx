@@ -1,8 +1,16 @@
 import React, { useMemo } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
+import { BNBChain } from '@xchainjs/xchain-binance'
+import { BTCChain } from '@xchainjs/xchain-bitcoin'
+import { BCHChain } from '@xchainjs/xchain-bitcoincash'
 import { XChainClient } from '@xchainjs/xchain-client'
-import { Address } from '@xchainjs/xchain-util'
+import { GAIAChain } from '@xchainjs/xchain-cosmos'
+import { DOGEChain } from '@xchainjs/xchain-doge'
+import { ETHChain } from '@xchainjs/xchain-ethereum'
+import { LTCChain } from '@xchainjs/xchain-litecoin'
+import { THORChain } from '@xchainjs/xchain-thorchain'
+import { Address, Chain } from '@xchainjs/xchain-util'
 import * as FP from 'fp-ts/function'
 import * as A from 'fp-ts/lib/Array'
 import * as O from 'fp-ts/lib/Option'
@@ -13,17 +21,7 @@ import * as RxOp from 'rxjs/operators'
 import { LedgerErrorId } from '../../../shared/api/types'
 import { DEFAULT_ETH_HD_MODE } from '../../../shared/ethereum/const'
 import { EthHDMode } from '../../../shared/ethereum/types'
-import {
-  BCHChain,
-  BNBChain,
-  BTCChain,
-  Chain,
-  CosmosChain,
-  DOGEChain,
-  ETHChain,
-  LTCChain,
-  THORChain
-} from '../../../shared/utils/chain'
+import { isEnabledChain } from '../../../shared/utils/chain'
 import { HDMode } from '../../../shared/wallet/types'
 import { WalletSettings } from '../../components/settings'
 import { useBinanceContext } from '../../contexts/BinanceContext'
@@ -140,7 +138,7 @@ export const WalletSettingsView: React.FC<Props> = ({ keystoreUnlocked }): JSX.E
     verifyAddress: verifyLedgerCosmosAddress,
     address: oCosmosLedgerWalletAddress,
     removeAddress: removeLedgerCosmosAddress
-  } = useLedger(CosmosChain, keystoreId)
+  } = useLedger(GAIAChain, keystoreId)
 
   const addLedgerAddressHandler = ({
     chain,
@@ -211,12 +209,16 @@ export const WalletSettingsView: React.FC<Props> = ({ keystoreUnlocked }): JSX.E
   const oTHORClient = useObservableState(clientByChain$(THORChain), O.none)
   const oLTCClient = useObservableState(clientByChain$(LTCChain), O.none)
   const oDOGEClient = useObservableState(clientByChain$(DOGEChain), O.none)
-  const oCosmosClient = useObservableState(clientByChain$(CosmosChain), O.none)
+  const oCosmosClient = useObservableState(clientByChain$(GAIAChain), O.none)
 
   const clickAddressLinkHandler = (chain: Chain, address: Address) => {
     const openExplorerAddressUrl = (client: XChainClient) => {
       const url = client.getExplorerAddressUrl(address)
       window.apiUrl.openExternal(url)
+    }
+
+    if (!isEnabledChain(chain)) {
+      console.warn(`${chain} is not supported for 'clickAddressLinkHandler'`)
     }
 
     switch (chain) {
@@ -241,11 +243,9 @@ export const WalletSettingsView: React.FC<Props> = ({ keystoreUnlocked }): JSX.E
       case DOGEChain:
         FP.pipe(oDOGEClient, O.map(openExplorerAddressUrl))
         break
-      case CosmosChain:
+      case GAIAChain:
         FP.pipe(oCosmosClient, O.map(openExplorerAddressUrl))
         break
-      default:
-        console.warn(`Chain ${chain} has not been implemented`)
     }
   }
 
@@ -288,7 +288,7 @@ export const WalletSettingsView: React.FC<Props> = ({ keystoreUnlocked }): JSX.E
     const cosmosWalletAccount$ = walletAccount$({
       addressUI$: cosmosAddressUI$,
       ledgerAddress: oCosmosLedgerWalletAddress,
-      chain: CosmosChain
+      chain: GAIAChain
     })
 
     return FP.pipe(

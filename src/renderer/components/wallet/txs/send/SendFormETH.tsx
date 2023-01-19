@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
 import { FeeOption, Fees, TxParams } from '@xchainjs/xchain-client'
-import { validateAddress } from '@xchainjs/xchain-ethereum'
+import { ETHChain, validateAddress } from '@xchainjs/xchain-ethereum'
 import {
   formatAssetAmountCurrency,
   bn,
@@ -22,7 +22,7 @@ import { useIntl } from 'react-intl'
 
 import { Network } from '../../../../../shared/api/types'
 import { AssetETH } from '../../../../../shared/utils/asset'
-import { chainToString, ETHChain } from '../../../../../shared/utils/chain'
+import { chainToString } from '../../../../../shared/utils/chain'
 import { isKeystoreWallet, isLedgerWallet } from '../../../../../shared/utils/guard'
 import { WalletType } from '../../../../../shared/wallet/types'
 import { ZERO_BASE_AMOUNT, ZERO_BN } from '../../../../const'

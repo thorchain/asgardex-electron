@@ -1,13 +1,12 @@
 import * as RD from '@devexperts/remote-data-ts'
-import { Client } from '@xchainjs/xchain-litecoin'
+import { Client, LTCChain } from '@xchainjs/xchain-litecoin'
 import * as FP from 'fp-ts/function'
 import * as O from 'fp-ts/Option'
 import * as Rx from 'rxjs'
 import * as RxOp from 'rxjs/operators'
 
-import { getLTCNodeAuth, getLTCNodeUrl } from '../../../shared/api/litecoin'
+import { getLTCNodeAuth, getLTCNodeUrls } from '../../../shared/api/litecoin'
 import { getSochainUrl } from '../../../shared/api/sochain'
-import { LTCChain } from '../../../shared/utils/chain'
 import { isError } from '../../../shared/utils/guard'
 import { clientNetwork$ } from '../app/service'
 import * as C from '../clients'
@@ -34,7 +33,7 @@ const clientState$: ClientState$ = FP.pipe(
               const client = new Client({
                 network,
                 phrase,
-                nodeUrl: getLTCNodeUrl(network),
+                nodeUrls: getLTCNodeUrls(),
                 nodeAuth: getLTCNodeAuth(),
                 sochainUrl: getSochainUrl()
               })

@@ -1,16 +1,13 @@
+import { BNBChain } from '@xchainjs/xchain-binance'
+import { BTCChain } from '@xchainjs/xchain-bitcoin'
+import { BCHChain } from '@xchainjs/xchain-bitcoincash'
+import { GAIAChain } from '@xchainjs/xchain-cosmos'
+import { DOGEChain } from '@xchainjs/xchain-doge'
+import { ETHChain } from '@xchainjs/xchain-ethereum'
+import { LTCChain } from '@xchainjs/xchain-litecoin'
+import { THORChain } from '@xchainjs/xchain-thorchain'
 import * as O from 'fp-ts/lib/Option'
 
-import {
-  AvalancheChain,
-  BCHChain,
-  BNBChain,
-  BTCChain,
-  CosmosChain,
-  DOGEChain,
-  ETHChain,
-  LTCChain,
-  THORChain
-} from '../../../shared/utils/chain'
 import { LoadTxsParams } from '../clients'
 import { MAX_ITEMS_PER_PAGE } from '../const'
 import { BalancesState, BalancesStateFilter, KeystoreState, LedgerAddresses, LoadTxsHandler } from './types'
@@ -28,11 +25,10 @@ export const INITIAL_BALANCES_STATE: BalancesState = {
 }
 
 export const DEFAULT_BALANCES_FILTER: BalancesStateFilter = {
-  [AvalancheChain]: 'all',
   [BNBChain]: 'all',
   [BCHChain]: 'all',
   [BTCChain]: 'all',
-  [CosmosChain]: 'all',
+  [GAIAChain]: 'all',
   [DOGEChain]: 'all',
   [ETHChain]: 'all',
   [LTCChain]: 'all',

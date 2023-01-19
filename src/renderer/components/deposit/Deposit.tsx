@@ -1,12 +1,12 @@
 import React, { useMemo } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
+import { Chain } from '@xchainjs/xchain-util'
 import { Grid } from 'antd'
 import * as FP from 'fp-ts/function'
 import * as O from 'fp-ts/Option'
 import { useIntl } from 'react-intl'
 
-import { Chain } from '../../../shared/utils/chain'
 import { WalletAddress } from '../../../shared/wallet/types'
 import { eqAddress, eqOAddress } from '../../helpers/fp/eq'
 import { PoolDetailRD, PoolShareRD, PoolSharesRD } from '../../services/midgard/types'

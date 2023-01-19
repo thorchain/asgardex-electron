@@ -1,22 +1,20 @@
 import { PoolData } from '@thorchain/asgardex-util'
+import { BNBChain } from '@xchainjs/xchain-binance'
+import { BTCChain } from '@xchainjs/xchain-bitcoin'
+import { BCHChain } from '@xchainjs/xchain-bitcoincash'
 import { Balance } from '@xchainjs/xchain-client'
+import { GAIAChain } from '@xchainjs/xchain-cosmos'
+import { DOGEChain } from '@xchainjs/xchain-doge'
+import { ETHChain } from '@xchainjs/xchain-ethereum'
+import { LTCChain } from '@xchainjs/xchain-litecoin'
 import { assetAmount, assetToBase, assetToString, baseAmount } from '@xchainjs/xchain-util'
+import { Chain } from '@xchainjs/xchain-util'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
 
 import { PoolsWatchList } from '../../shared/api/io'
 import { ASSETS_TESTNET } from '../../shared/mock/assets'
 import { AssetBNB, AssetRuneNative } from '../../shared/utils/asset'
-import {
-  BCHChain,
-  BNBChain,
-  BTCChain,
-  Chain,
-  CosmosChain,
-  DOGEChain,
-  ETHChain,
-  LTCChain
-} from '../../shared/utils/chain'
 import { AssetBUSD74E } from '../const'
 import { PoolDetails } from '../services/midgard/types'
 import { toPoolData } from '../services/midgard/utils'
@@ -341,7 +339,7 @@ describe('helpers/poolHelper/', () => {
 
     it('true for Cosmos if Cosmos trading is halted', () => {
       const result = disableTradingActions({
-        chain: CosmosChain,
+        chain: GAIAChain,
         haltedChains,
         mimirHalt: {
           ...DEFAULT_MIMIR_HALT,
@@ -514,7 +512,7 @@ describe('helpers/poolHelper/', () => {
     })
     it('true if Cosmos chain is not in halted list, but paused', () => {
       const result = disablePoolActions({
-        chain: CosmosChain,
+        chain: GAIAChain,
         haltedChains: [],
         mimirHalt: { ...DEFAULT_MIMIR_HALT, pauseLpCosmos: true }
       })
@@ -522,7 +520,7 @@ describe('helpers/poolHelper/', () => {
     })
     it('true if Cosmos chain is not in halted list, but LP paused', () => {
       const result = disablePoolActions({
-        chain: CosmosChain,
+        chain: GAIAChain,
         haltedChains: [],
         mimirHalt: { ...DEFAULT_MIMIR_HALT, pauseLp: true }
       })

@@ -1,17 +1,16 @@
 import TransportNodeHidSingleton from '@ledgerhq/hw-transport-node-hid-singleton'
+import { BNBChain } from '@xchainjs/xchain-binance'
+import { BTCChain } from '@xchainjs/xchain-bitcoin'
+import { BCHChain } from '@xchainjs/xchain-bitcoincash'
+import { GAIAChain } from '@xchainjs/xchain-cosmos'
+import { DOGEChain } from '@xchainjs/xchain-doge'
+import { ETHChain } from '@xchainjs/xchain-ethereum'
+import { LTCChain } from '@xchainjs/xchain-litecoin'
+import { THORChain } from '@xchainjs/xchain-thorchain'
 import * as E from 'fp-ts/Either'
 
 import { IPCLedgerAdddressParams, LedgerError, LedgerErrorId } from '../../../shared/api/types'
-import {
-  BCHChain,
-  BNBChain,
-  BTCChain,
-  CosmosChain,
-  DOGEChain,
-  ETHChain,
-  LTCChain,
-  THORChain
-} from '../../../shared/utils/chain'
+import { isEnabledChain } from '../../../shared/utils/chain'
 import { isError, isEthHDMode } from '../../../shared/utils/guard'
 import { WalletAddress } from '../../../shared/wallet/types'
 import { getAddress as getBNBAddress, verifyAddress as verifyBNBAddress } from './binance/address'
@@ -32,44 +31,47 @@ export const getAddress = async ({
   try {
     let res: E.Either<LedgerError, WalletAddress>
     const transport = await TransportNodeHidSingleton.open()
-    switch (chain) {
-      case THORChain:
-        res = await getTHORAddress(transport, network, walletIndex)
-        break
-      case BNBChain:
-        res = await getBNBAddress(transport, network, walletIndex)
-        break
-      case BTCChain:
-        res = await getBTCAddress(transport, network, walletIndex)
-        break
-      case LTCChain:
-        res = await getLTCAddress(transport, network, walletIndex)
-        break
-      case BCHChain:
-        res = await getBCHAddress(transport, network, walletIndex)
-        break
-      case DOGEChain:
-        res = await getDOGEAddress(transport, network, walletIndex)
-        break
-      case ETHChain: {
-        if (!isEthHDMode(hdMode)) {
-          res = E.left({
-            errorId: LedgerErrorId.INVALID_ETH_DERIVATION_MODE,
-            msg: `Invaid 'EthHDMode' - needed for ETH to get Ledger address`
-          })
-        } else {
-          res = await getETHAddress({ transport, walletIndex, ethHdMode: hdMode })
+
+    if (!isEnabledChain(chain)) {
+      res = E.left({
+        errorId: LedgerErrorId.NOT_IMPLEMENTED,
+        msg: `${chain} is not supported for 'getAddress'`
+      })
+    } else {
+      switch (chain) {
+        case THORChain:
+          res = await getTHORAddress(transport, network, walletIndex)
+          break
+        case BNBChain:
+          res = await getBNBAddress(transport, network, walletIndex)
+          break
+        case BTCChain:
+          res = await getBTCAddress(transport, network, walletIndex)
+          break
+        case LTCChain:
+          res = await getLTCAddress(transport, network, walletIndex)
+          break
+        case BCHChain:
+          res = await getBCHAddress(transport, network, walletIndex)
+          break
+        case DOGEChain:
+          res = await getDOGEAddress(transport, network, walletIndex)
+          break
+        case ETHChain: {
+          if (!isEthHDMode(hdMode)) {
+            res = E.left({
+              errorId: LedgerErrorId.INVALID_ETH_DERIVATION_MODE,
+              msg: `Invaid 'EthHDMode' - needed for ETH to get Ledger address`
+            })
+          } else {
+            res = await getETHAddress({ transport, walletIndex, ethHdMode: hdMode })
+          }
+          break
         }
-        break
+        case GAIAChain:
+          res = await getCOSMOSAddress(transport, walletIndex)
+          break
       }
-      case CosmosChain:
-        res = await getCOSMOSAddress(transport, walletIndex)
-        break
-      default:
-        res = E.left({
-          errorId: LedgerErrorId.NOT_IMPLEMENTED,
-          msg: `getAddress for ${chain} has not been implemented`
-        })
     }
     await transport.close()
     return res
@@ -84,6 +86,9 @@ export const getAddress = async ({
 export const verifyLedgerAddress = async ({ chain, network, walletIndex, hdMode }: IPCLedgerAdddressParams) => {
   const transport = await TransportNodeHidSingleton.open()
   let result = false
+
+  if (!isEnabledChain(chain)) throw Error(`${chain} is not supported for 'verifyAddress'`)
+
   switch (chain) {
     case THORChain:
       result = await verifyTHORAddress({ transport, network, walletIndex })
@@ -108,11 +113,9 @@ export const verifyLedgerAddress = async ({ chain, network, walletIndex, hdMode 
       result = await verifyETHAddress({ transport, walletIndex, ethHdMode: hdMode })
       break
     }
-    case CosmosChain:
+    case GAIAChain:
       result = await verifyCOSMOSAddress(transport, walletIndex)
       break
-    default:
-      throw Error(`verifyAddress for ${chain} has not been implemented`)
   }
   await transport.close()
 

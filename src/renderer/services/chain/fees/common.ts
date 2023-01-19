@@ -2,7 +2,6 @@ import { Asset } from '@xchainjs/xchain-util'
 import * as FP from 'fp-ts/lib/function'
 
 import { AssetRuneNative } from '../../../../shared/utils/asset'
-import { unsafeChainFromAsset } from '../../../../shared/utils/chain'
 import { isRuneNativeAsset } from '../../../helpers/assetHelper'
 import { liveData } from '../../../helpers/rx/liveData'
 import { service as midgardService } from '../../midgard/service'
@@ -24,7 +23,7 @@ export const poolOutboundFee$ = (asset: Asset): PoolFeeLD => {
       liveData.map((fees) => ({ amount: fees.fast.times(3), asset: AssetRuneNative }))
     )
   } else {
-    const chain = unsafeChainFromAsset(asset)
+    const { chain } = asset
     return outboundAssetFeeByChain$(chain)
   }
 }

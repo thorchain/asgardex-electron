@@ -2,7 +2,6 @@ import * as O from 'fp-ts/lib/Option'
 import * as RxOp from 'rxjs/operators'
 import { distinctUntilChanged } from 'rxjs/operators'
 
-import { unsafeChain } from '../../../shared/utils/chain'
 import { eqOChain, eqOSelectedWalletAsset } from '../../helpers/fp/eq'
 import { observableState } from '../../helpers/stateHelper'
 import { getClientByChain$ } from '../chain/client'
@@ -17,7 +16,7 @@ const selectedAsset$ = getSelectedAsset$.pipe(distinctUntilChanged(eqOSelectedWa
  * Selected chain depending on selected asset
  */
 const selectedChain$ = selectedAsset$.pipe(
-  RxOp.map(O.map(({ asset }) => unsafeChain(asset.chain))),
+  RxOp.map(O.map(({ asset }) => asset.chain)),
   distinctUntilChanged(eqOChain.equals)
 )
 

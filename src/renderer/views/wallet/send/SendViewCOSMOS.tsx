@@ -1,11 +1,11 @@
 import React, { useMemo } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
+import { GAIAChain } from '@xchainjs/xchain-cosmos'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/Option'
 import { useObservableState } from 'observable-hooks'
 
-import { CosmosChain } from '../../../../shared/utils/chain'
 import { LoadingView } from '../../../components/shared/loading'
 import { SendFormCOSMOS } from '../../../components/wallet/txs/send'
 import { useChainContext } from '../../../contexts/ChainContext'
@@ -39,7 +39,7 @@ export const SendViewCOSMOS: React.FC<Props> = (props): JSX.Element => {
     INITIAL_BALANCES_STATE
   )
 
-  const { openExplorerTxUrl, getExplorerTxUrl } = useOpenExplorerTxUrl(O.some(CosmosChain))
+  const { openExplorerTxUrl, getExplorerTxUrl } = useOpenExplorerTxUrl(O.some(GAIAChain))
 
   const oWalletBalance = useMemo(
     () =>
@@ -63,7 +63,7 @@ export const SendViewCOSMOS: React.FC<Props> = (props): JSX.Element => {
     RD.initial
   )
 
-  const { validateAddress } = useValidateAddress(CosmosChain)
+  const { validateAddress } = useValidateAddress(GAIAChain)
 
   return FP.pipe(
     oWalletBalance,

@@ -1,6 +1,6 @@
+import { BNBChain } from '@xchainjs/xchain-binance'
+import { ETHChain } from '@xchainjs/xchain-ethereum'
 import { Asset } from '@xchainjs/xchain-util'
-
-import { BNBChain, ETHChain } from '../utils/chain'
 
 type Assets = 'FTM' | 'TOMO' | 'BOLT' | 'USDT' | 'BUSD'
 

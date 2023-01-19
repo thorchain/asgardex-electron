@@ -9,7 +9,7 @@ import { useIntl } from 'react-intl'
 import { useNavigate } from 'react-router-dom'
 
 import { Network } from '../../../../shared/api/types'
-import { chainToString, unsafeChainFromAsset } from '../../../../shared/utils/chain'
+import { chainToString } from '../../../../shared/utils/chain'
 import { WalletType } from '../../../../shared/wallet/types'
 import * as AssetHelper from '../../../helpers/assetHelper'
 import { isCosmosChain } from '../../../helpers/chainHelper'
@@ -60,7 +60,7 @@ export const AssetDetails: React.FC<Props> = (props): JSX.Element => {
 
   const [currentPage, setCurrentPage] = useState(1)
 
-  const chain = unsafeChainFromAsset(asset)
+  const { chain } = asset
 
   const navigate = useNavigate()
   const intl = useIntl()

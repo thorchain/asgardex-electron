@@ -1,5 +1,6 @@
 import { useMemo } from 'react'
 
+import { THORChain } from '@xchainjs/xchain-thorchain'
 import { Asset } from '@xchainjs/xchain-util'
 import * as FP from 'fp-ts/function'
 import * as O from 'fp-ts/lib/Option'
@@ -7,7 +8,6 @@ import { useObservableState } from 'observable-hooks'
 import * as Rx from 'rxjs'
 import * as RxOp from 'rxjs/operators'
 
-import { THORChain, unsafeChainFromAsset } from '../../shared/utils/chain'
 import { isLedgerWallet } from '../../shared/utils/guard'
 import { WalletType } from '../../shared/wallet/types'
 import { useChainContext } from '../contexts/ChainContext'
@@ -41,7 +41,7 @@ export const useSymDepositAddresses = ({
         O.fold(
           () => Rx.of(O.none),
           (asset) => {
-            const chain = unsafeChainFromAsset(asset)
+            const { chain } = asset
             return addressByChain$(chain)
           }
         )
@@ -73,7 +73,7 @@ export const useSymDepositAddresses = ({
         O.fold(
           () => Rx.of(O.none),
           (asset) => {
-            const chain = unsafeChainFromAsset(asset)
+            const { chain } = asset
             return FP.pipe(getLedgerAddress$(chain), RxOp.map(O.map(ledgerAddressToWalletAddress)))
           }
         )

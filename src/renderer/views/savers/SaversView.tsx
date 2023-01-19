@@ -2,7 +2,7 @@ import { Fragment, useCallback, useEffect, useMemo } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
 import { Tab } from '@headlessui/react'
-import { Address, Asset, assetToString, baseAmount } from '@xchainjs/xchain-util'
+import { Address, Asset, assetToString, baseAmount, Chain } from '@xchainjs/xchain-util'
 import * as A from 'fp-ts/lib/Array'
 import * as Eq from 'fp-ts/lib/Eq'
 import * as FP from 'fp-ts/lib/function'
@@ -13,7 +13,6 @@ import { useMatch, useNavigate, useParams } from 'react-router-dom'
 import * as RxOp from 'rxjs/operators'
 
 import { Network } from '../../../shared/api/types'
-import { Chain, unsafeChainFromAsset } from '../../../shared/utils/chain'
 import { isLedgerWallet, isWalletType } from '../../../shared/utils/guard'
 import { WalletType } from '../../../shared/wallet/types'
 import { AddSavers } from '../../components/savers/AddSavers'
@@ -66,7 +65,7 @@ type Props = { asset: Asset; walletType: WalletType }
 const Content: React.FC<Props> = (props): JSX.Element => {
   const { asset, walletType } = props
 
-  const chain = unsafeChainFromAsset(asset)
+  const { chain } = asset
 
   const intl = useIntl()
 

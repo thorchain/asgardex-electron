@@ -1,7 +1,15 @@
 import * as RD from '@devexperts/remote-data-ts'
+import { BNBChain } from '@xchainjs/xchain-binance'
+import { BTCChain } from '@xchainjs/xchain-bitcoin'
+import { BCHChain } from '@xchainjs/xchain-bitcoincash'
 import { COSMOS_DECIMAL } from '@xchainjs/xchain-cosmos'
+import { GAIAChain } from '@xchainjs/xchain-cosmos'
 import { ETH_DECIMAL } from '@xchainjs/xchain-ethereum'
+import { ETHChain } from '@xchainjs/xchain-ethereum'
+import { LTCChain } from '@xchainjs/xchain-litecoin'
+import { THORChain } from '@xchainjs/xchain-thorchain'
 import { assetAmount, assetToBase, assetToString, baseAmount, bn } from '@xchainjs/xchain-util'
+import { Chain } from '@xchainjs/xchain-util'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
 
@@ -13,16 +21,6 @@ import {
   FOUR_RUNE_BASE_AMOUNT
 } from '../../../shared/mock/amount'
 import { AssetATOM, AssetBNB, AssetBTC, AssetETH, AssetLTC, AssetRuneNative } from '../../../shared/utils/asset'
-import {
-  BCHChain,
-  BNBChain,
-  BTCChain,
-  Chain,
-  CosmosChain,
-  ETHChain,
-  LTCChain,
-  THORChain
-} from '../../../shared/utils/chain'
 import { PRICE_POOLS_WHITELIST, AssetBUSDBAF, AssetUSDC, AssetUSDTDAC, AssetBUSD74E } from '../../const'
 import { BNB_DECIMAL } from '../../helpers/assetHelper'
 import { eqAsset, eqPoolShare, eqPoolShares, eqOAssetWithAmount, eqString } from '../../helpers/fp/eq'
@@ -502,7 +500,7 @@ describe('services/midgard/utils/', () => {
       const data: { chain: Chain; outbound_fee?: string }[] = [
         { chain: BNBChain, outbound_fee: '1' },
         { chain: ETHChain, outbound_fee: '2' },
-        { chain: CosmosChain, outbound_fee: '300' },
+        { chain: GAIAChain, outbound_fee: '300' },
         { chain: LTCChain }, // no value
         { chain: BCHChain, outbound_fee: 'invalid' } // invalid value
       ]
@@ -533,7 +531,7 @@ describe('services/midgard/utils/', () => {
         ).toBeTruthy()
       })
       it('Cosmos', () => {
-        const result = getOutboundAssetFeeByChain(data, CosmosChain)
+        const result = getOutboundAssetFeeByChain(data, GAIAChain)
         expect(
           eqOAssetWithAmount.equals(
             result,

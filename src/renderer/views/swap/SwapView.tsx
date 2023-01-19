@@ -1,7 +1,9 @@
 import React, { useCallback, useEffect, useMemo } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
-import { Address, Asset, assetToString, bn } from '@xchainjs/xchain-util'
+import { BTCChain } from '@xchainjs/xchain-bitcoin'
+import { THORChain } from '@xchainjs/xchain-thorchain'
+import { Address, Asset, assetToString, bn, Chain } from '@xchainjs/xchain-util'
 import { Spin } from 'antd'
 import * as FP from 'fp-ts/function'
 import * as A from 'fp-ts/lib/Array'
@@ -14,7 +16,6 @@ import * as RxOp from 'rxjs/operators'
 
 import { Network } from '../../../shared/api/types'
 import { AssetRuneNative } from '../../../shared/utils/asset'
-import { BTCChain, Chain, THORChain, unsafeChainFromAsset } from '../../../shared/utils/chain'
 import { isLedgerWallet, isWalletType } from '../../../shared/utils/guard'
 import { WalletType } from '../../../shared/wallet/types'
 import { ErrorView } from '../../components/shared/error/'
@@ -72,8 +73,8 @@ const SuccessRouteView: React.FC<Props> = ({
   targetWalletType: oTargetWalletType,
   recipientAddress: oRecipientAddress
 }): JSX.Element => {
-  const sourceChain = unsafeChainFromAsset(sourceAsset)
-  const targetChain = unsafeChainFromAsset(targetAsset)
+  const { chain: sourceChain } = sourceAsset
+  const { chain: targetChain } = targetAsset
 
   const intl = useIntl()
   const navigate = useNavigate()

@@ -2,11 +2,13 @@ import React, { useState, useMemo, useCallback, useRef, useEffect } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
 import { getWithdrawMemo } from '@thorchain/asgardex-util'
+import { THORChain } from '@xchainjs/xchain-thorchain'
 import {
   Asset,
   baseAmount,
   BaseAmount,
   baseToAsset,
+  Chain,
   formatAssetAmount,
   formatAssetAmountCurrency
 } from '@xchainjs/xchain-util'
@@ -19,7 +21,6 @@ import { useIntl } from 'react-intl'
 
 import { Network } from '../../../../shared/api/types'
 import { AssetRuneNative } from '../../../../shared/utils/asset'
-import { Chain, THORChain, unsafeChainFromAsset } from '../../../../shared/utils/chain'
 import { isLedgerWallet } from '../../../../shared/utils/guard'
 import { WalletAddress } from '../../../../shared/wallet/types'
 import { ZERO_BASE_AMOUNT } from '../../../const'
@@ -116,8 +117,7 @@ export const Withdraw: React.FC<Props> = ({
   const intl = useIntl()
 
   const { asset, decimal: assetDecimal } = assetWD
-
-  const chain = unsafeChainFromAsset(asset)
+  const { chain } = asset
 
   const {
     type: runeWalletType,

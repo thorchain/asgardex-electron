@@ -20,7 +20,7 @@ import * as O from 'fp-ts/lib/Option'
 import * as S from 'fp-ts/lib/string'
 import { useIntl } from 'react-intl'
 
-import { chainToString, unsafeChainFromAsset } from '../../../../../shared/utils/chain'
+import { chainToString } from '../../../../../shared/utils/chain'
 import { isKeystoreWallet, isLedgerWallet, isWalletType } from '../../../../../shared/utils/guard'
 import { ZERO_BASE_AMOUNT, ZERO_BN } from '../../../../const'
 import { convertBaseAmountDecimal } from '../../../../helpers/assetHelper'
@@ -84,7 +84,7 @@ export const Upgrade: React.FC<Props> = (props): JSX.Element => {
 
   const [form] = Form.useForm<FormValues>()
 
-  const chain = unsafeChainFromAsset(asset)
+  const { chain } = asset
 
   const [amountToUpgrade, setAmountToUpgrade] = useState<BaseAmount>(ZERO_BASE_AMOUNT)
 

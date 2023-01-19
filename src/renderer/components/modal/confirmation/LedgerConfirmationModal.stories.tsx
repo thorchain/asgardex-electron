@@ -1,7 +1,7 @@
 import { ComponentMeta } from '@storybook/react'
+import { Chain } from '@xchainjs/xchain-util'
 import * as O from 'fp-ts/lib/Option'
 
-import { Chain } from '../../../../shared/utils/chain'
 import { LedgerConfirmationModal } from './'
 
 type Args = {

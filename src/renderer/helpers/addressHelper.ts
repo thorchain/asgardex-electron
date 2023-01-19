@@ -1,30 +1,27 @@
 import { getPrefix as getBinancePrefix } from '@xchainjs/xchain-binance'
+import { BNBChain } from '@xchainjs/xchain-binance'
 import { getPrefix as getBitcoinPrefix } from '@xchainjs/xchain-bitcoin'
+import { BTCChain } from '@xchainjs/xchain-bitcoin'
 import { getPrefix as getBCHPrefix } from '@xchainjs/xchain-bitcoincash'
+import { BCHChain } from '@xchainjs/xchain-bitcoincash'
 import { getPrefix as getCosmosPrefix } from '@xchainjs/xchain-cosmos'
+import { GAIAChain } from '@xchainjs/xchain-cosmos'
 import { getPrefix as getDogePrefix } from '@xchainjs/xchain-doge'
+import { DOGEChain } from '@xchainjs/xchain-doge'
 import { getPrefix as getEthereumPrefix } from '@xchainjs/xchain-ethereum'
+import { ETHChain } from '@xchainjs/xchain-ethereum'
 import { getPrefix as getLitecoinPrefix } from '@xchainjs/xchain-litecoin'
+import { LTCChain } from '@xchainjs/xchain-litecoin'
 import { getPrefix as getThorchainPrefix } from '@xchainjs/xchain-thorchain'
-import { Address } from '@xchainjs/xchain-util'
+import { THORChain } from '@xchainjs/xchain-thorchain'
+import { Address, Chain } from '@xchainjs/xchain-util'
 import { ethers } from 'ethers'
 import * as A from 'fp-ts/lib/Array'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
 
 import { Network } from '../../shared/api/types'
-import {
-  AvalancheChain,
-  BCHChain,
-  BNBChain,
-  BTCChain,
-  Chain,
-  CosmosChain,
-  DOGEChain,
-  ETHChain,
-  LTCChain,
-  THORChain
-} from '../../shared/utils/chain'
+import { isEnabledChain } from '../../shared/utils/chain'
 import { toClientNetwork } from '../../shared/utils/client'
 import { LedgerAddresses } from '../services/wallet/types'
 import { eqChain } from './fp/eq'
@@ -37,12 +34,14 @@ export const truncateAddress = (addr: Address, chain: Chain, network: Network): 
 
 export const getAddressPrefixLength = (chain: Chain, network: Network): number => {
   const clientNetwork = toClientNetwork(network)
+  if (!isEnabledChain(chain)) throw Error(`${chain} is not supported for 'getAddressPrefixLength'`)
+
   switch (chain) {
     case BNBChain:
       return getBinancePrefix(clientNetwork).length
     case BTCChain:
       return getBitcoinPrefix(clientNetwork).length
-    case CosmosChain:
+    case GAIAChain:
       return getCosmosPrefix().length
     case ETHChain:
       return getEthereumPrefix().length
@@ -54,8 +53,6 @@ export const getAddressPrefixLength = (chain: Chain, network: Network): number =
       return getLitecoinPrefix(clientNetwork).length
     case BCHChain:
       return getBCHPrefix().length
-    case AvalancheChain:
-      throw Error('AVAX is not supported yet')
   }
 }
 

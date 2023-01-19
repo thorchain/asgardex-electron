@@ -1,6 +1,7 @@
 import React, { useCallback, useMemo } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
+import { THORChain } from '@xchainjs/xchain-thorchain'
 import { Col, Row } from 'antd'
 import * as FP from 'fp-ts/function'
 import * as O from 'fp-ts/Option'
@@ -8,7 +9,6 @@ import { useObservableState } from 'observable-hooks'
 import { useNavigate, useParams } from 'react-router-dom'
 import * as RxOp from 'rxjs/operators'
 
-import { THORChain } from '../../../../shared/utils/chain'
 import { ErrorView } from '../../../components/shared/error'
 import { LoadingView } from '../../../components/shared/loading'
 import { BackLinkButton } from '../../../components/uielements/button'

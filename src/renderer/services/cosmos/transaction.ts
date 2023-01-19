@@ -1,6 +1,6 @@
 import * as RD from '@devexperts/remote-data-ts'
 import { TxHash } from '@xchainjs/xchain-client'
-import { Client } from '@xchainjs/xchain-cosmos'
+import { Client, GAIAChain } from '@xchainjs/xchain-cosmos'
 import * as E from 'fp-ts/lib/Either'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
@@ -9,7 +9,6 @@ import * as RxOp from 'rxjs/operators'
 
 import { IPCLedgerSendTxParams, ipcLedgerSendTxParamsIO } from '../../../shared/api/io'
 import { LedgerError, Network } from '../../../shared/api/types'
-import { CosmosChain } from '../../../shared/utils/chain'
 import { isLedgerWallet } from '../../../shared/utils/guard'
 import { Network$ } from '../app/types'
 import * as C from '../clients'
@@ -44,7 +43,7 @@ export const createTransactionService = (client$: Client$, network$: Network$): 
     const { asset, sender, amount, recipient, memo, walletIndex, feeAmount } = params
 
     const sendLedgerTxParams: IPCLedgerSendTxParams = {
-      chain: CosmosChain,
+      chain: GAIAChain,
       network,
       asset,
       feeAsset: undefined,

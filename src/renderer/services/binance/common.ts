@@ -1,11 +1,11 @@
 import * as RD from '@devexperts/remote-data-ts'
 import { Client } from '@xchainjs/xchain-binance'
+import { BNBChain } from '@xchainjs/xchain-binance'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
 import * as Rx from 'rxjs'
 import * as RxOp from 'rxjs/operators'
 
-import { BNBChain } from '../../../shared/utils/chain'
 import { isError } from '../../../shared/utils/guard'
 import { clientNetwork$ } from '../app/service'
 import * as C from '../clients'

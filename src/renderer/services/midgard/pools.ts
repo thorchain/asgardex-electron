@@ -1,5 +1,5 @@
 import * as RD from '@devexperts/remote-data-ts'
-import { Asset, assetFromString, assetToString, bn, currencySymbolByAsset } from '@xchainjs/xchain-util'
+import { Asset, assetFromString, assetToString, bn, Chain, currencySymbolByAsset } from '@xchainjs/xchain-util'
 import BigNumber from 'bignumber.js'
 import * as A from 'fp-ts/Array'
 import * as FP from 'fp-ts/lib/function'
@@ -9,10 +9,10 @@ import * as O from 'fp-ts/Option'
 import * as Rx from 'rxjs'
 import * as RxOp from 'rxjs/operators'
 
-import { Chain, unsafeChainFromAsset } from '../../../shared/utils/chain'
+import { isEnabledChain } from '../../../shared/utils/chain'
 import { DEFAULT_GET_POOLS_PERIOD, ONE_BN, PRICE_POOLS_WHITELIST } from '../../const'
 import { validAssetForETH, isPricePoolAsset, midgardAssetFromString } from '../../helpers/assetHelper'
-import { isEnabledChain, isEthChain } from '../../helpers/chainHelper'
+import { isEthChain } from '../../helpers/chainHelper'
 import { eqAsset, eqOAsset, eqOPoolAddresses, eqHaltedChain } from '../../helpers/fp/eq'
 import { sequenceTOption } from '../../helpers/fpHelpers'
 import { LiveData, liveData } from '../../helpers/rx/liveData'
@@ -138,7 +138,7 @@ const createPoolsService = ({
         FP.pipe(
           api.getPools({ ...request, period }),
           RxOp.map(RD.success),
-          // Filter `PoolDetails`by using enabled chains only (defined via ENV)
+          // Filter `PoolDetails`by using enabled chains only
           liveData.map(
             A.filter(({ asset }) =>
               FP.pipe(
@@ -534,7 +534,7 @@ const createPoolsService = ({
         // TODO (@Veado) Will we ingore router for some cases (e.g. by withdrawing something from ETH vault not using router)=
         (oPoolAddresses) => sequenceTOption(oPoolAddresses, oSelectedPoolAsset),
         O.chain(([addresses, selectedAsset]) => {
-          const chain = unsafeChainFromAsset(selectedAsset)
+          const { chain } = selectedAsset
           return getPoolAddressesByChain(addresses, chain)
         })
       )

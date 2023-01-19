@@ -1,11 +1,11 @@
 import React, { useMemo } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
+import { BCHChain } from '@xchainjs/xchain-bitcoincash'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/Option'
 import { useObservableState } from 'observable-hooks'
 
-import { BCHChain } from '../../../../shared/utils/chain'
 import { LoadingView } from '../../../components/shared/loading'
 import { SendFormBCH } from '../../../components/wallet/txs/send'
 import { useBitcoinCashContext } from '../../../contexts/BitcoinCashContext'

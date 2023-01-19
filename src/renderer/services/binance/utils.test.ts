@@ -1,9 +1,8 @@
-import { Balance } from '@xchainjs/xchain-binance'
+import { Balance, BNBChain } from '@xchainjs/xchain-binance'
 import { Asset, assetToBase, assetAmount } from '@xchainjs/xchain-util'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
 
-import { BNBChain } from '../../../shared/utils/chain'
 import { bncSymbolToAsset, bncSymbolToAssetString, getWalletBalances } from './utils'
 
 describe('services/binance/utils/', () => {

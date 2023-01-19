@@ -1,4 +1,5 @@
 import * as RD from '@devexperts/remote-data-ts'
+import { THORChain } from '@xchainjs/xchain-thorchain'
 import { Address } from '@xchainjs/xchain-util'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
@@ -6,7 +7,6 @@ import * as Rx from 'rxjs'
 import * as RxOp from 'rxjs/operators'
 
 import { AssetRuneNative } from '../../../../shared/utils/asset'
-import { THORChain, unsafeChainFromAsset } from '../../../../shared/utils/chain'
 import { getEthAssetAddress, isEthAsset, isRuneNativeAsset } from '../../../helpers/assetHelper'
 import { isEthChain } from '../../../helpers/chainHelper'
 import { liveData } from '../../../helpers/rx/liveData'
@@ -147,7 +147,7 @@ export const asymWithdraw$ = ({
 }: AsymWithdrawParams): WithdrawState$ => {
   // total of progress
   const total = O.some(100)
-  const chain = unsafeChainFromAsset(asset)
+  const { chain } = asset
 
   // Observable state of to reflect status of all needed steps
   const {

@@ -1,11 +1,10 @@
 import * as RD from '@devexperts/remote-data-ts'
-import { Client as DogeClient, getDefaultFeesWithRates } from '@xchainjs/xchain-doge'
+import { Client as DogeClient, DOGEChain, getDefaultFeesWithRates } from '@xchainjs/xchain-doge'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
 import * as Rx from 'rxjs'
 import * as RxOp from 'rxjs/operators'
 
-import { DOGEChain } from '../../../shared/utils/chain'
 import { observableState } from '../../helpers/stateHelper'
 import { Memo } from '../chain/types'
 import * as C from '../clients'

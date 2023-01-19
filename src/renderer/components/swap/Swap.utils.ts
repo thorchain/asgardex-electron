@@ -1,5 +1,5 @@
 import { getDoubleSwapOutput, getDoubleSwapSlip, getSwapOutput, getSwapSlip } from '@thorchain/asgardex-util'
-import { Asset, assetToString, bn, BaseAmount, baseAmount } from '@xchainjs/xchain-util'
+import { Asset, assetToString, bn, BaseAmount, baseAmount, Chain } from '@xchainjs/xchain-util'
 import BigNumber from 'bignumber.js'
 import * as A from 'fp-ts/Array'
 import * as E from 'fp-ts/Either'
@@ -7,7 +7,6 @@ import * as FP from 'fp-ts/function'
 import * as O from 'fp-ts/Option'
 
 import { ASGARDEX_IDENTIFIER } from '../../../shared/const'
-import { Chain } from '../../../shared/utils/chain'
 import { isLedgerWallet } from '../../../shared/utils/guard'
 import { ZERO_BASE_AMOUNT } from '../../const'
 import {

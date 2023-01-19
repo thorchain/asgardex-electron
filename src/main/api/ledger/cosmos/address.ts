@@ -1,9 +1,9 @@
 import CosmosApp from '@ledgerhq/hw-app-cosmos'
 import type Transport from '@ledgerhq/hw-transport'
+import { GAIAChain } from '@xchainjs/xchain-cosmos'
 import * as E from 'fp-ts/Either'
 
 import { LedgerError, LedgerErrorId } from '../../../../shared/api/types'
-import { CosmosChain } from '../../../../shared/utils/chain'
 import { isError } from '../../../../shared/utils/guard'
 import { WalletAddress } from '../../../../shared/wallet/types'
 import { getDerivationPath } from './common'
@@ -24,7 +24,7 @@ export const getAddress = async (
         msg: `Getting 'address' from Ledger's Cosmos app failed`
       })
     }
-    return E.right({ address, chain: CosmosChain, type: 'ledger', walletIndex, hdMode: 'default' })
+    return E.right({ address, chain: GAIAChain, type: 'ledger', walletIndex, hdMode: 'default' })
   } catch (error) {
     return E.left({
       errorId: LedgerErrorId.GET_ADDRESS_FAILED,

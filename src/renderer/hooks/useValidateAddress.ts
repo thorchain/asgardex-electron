@@ -1,13 +1,12 @@
 import { useCallback, useEffect } from 'react'
 
 import { XChainClient } from '@xchainjs/xchain-client'
-import { Address } from '@xchainjs/xchain-util'
+import { Address, Chain } from '@xchainjs/xchain-util'
 import * as FP from 'fp-ts/function'
 import * as O from 'fp-ts/Option'
 import { useObservableState } from 'observable-hooks'
 import * as RxOp from 'rxjs/operators'
 
-import { Chain } from '../../shared/utils/chain'
 import { useChainContext } from '../contexts/ChainContext'
 import { isBnbClient } from '../helpers/clientHelper'
 import { eqChain } from '../helpers/fp/eq'

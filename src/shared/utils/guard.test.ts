@@ -5,7 +5,6 @@ import { AssetRuneNative } from './asset'
 import {
   isAsset,
   isBaseAmount,
-  isChain,
   isError,
   isEthHDMode,
   isFeeOption,
@@ -28,18 +27,6 @@ describe('shared/utils/guard', () => {
     })
     it('false for invalid string ', () => {
       expect(isAsset('invalid')).toBeFalsy()
-    })
-  })
-
-  describe('isChain', () => {
-    it('true for "THOR"', () => {
-      expect(isChain('THOR')).toBeTruthy()
-    })
-    it('true for ETH', () => {
-      expect(isChain('ETH')).toBeTruthy()
-    })
-    it('false for invalid chain ', () => {
-      expect(isChain('INVALID')).toBeFalsy()
     })
   })
 

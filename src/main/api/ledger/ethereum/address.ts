@@ -1,11 +1,11 @@
 import EthApp from '@ledgerhq/hw-app-eth'
 import type Transport from '@ledgerhq/hw-transport'
+import { ETHChain } from '@xchainjs/xchain-ethereum'
 import * as E from 'fp-ts/Either'
 
 import { LedgerError, LedgerErrorId } from '../../../../shared/api/types'
 import { getDerivationPath } from '../../../../shared/ethereum/ledger'
 import { EthHDMode } from '../../../../shared/ethereum/types'
-import { ETHChain } from '../../../../shared/utils/chain'
 import { isError } from '../../../../shared/utils/guard'
 import { WalletAddress } from '../../../../shared/wallet/types'
 

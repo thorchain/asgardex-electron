@@ -1,7 +1,15 @@
 import React, { useCallback, useEffect, useMemo } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
-import { Address, Asset, assetToString } from '@xchainjs/xchain-util'
+import { BNBChain } from '@xchainjs/xchain-binance'
+import { BTCChain } from '@xchainjs/xchain-bitcoin'
+import { BCHChain } from '@xchainjs/xchain-bitcoincash'
+import { GAIAChain } from '@xchainjs/xchain-cosmos'
+import { DOGEChain } from '@xchainjs/xchain-doge'
+import { ETHChain } from '@xchainjs/xchain-ethereum'
+import { LTCChain } from '@xchainjs/xchain-litecoin'
+import { THORChain } from '@xchainjs/xchain-thorchain'
+import { Address, Asset, assetToString, Chain } from '@xchainjs/xchain-util'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/Option'
 import { useObservableState } from 'observable-hooks'
@@ -10,7 +18,7 @@ import * as Rx from 'rxjs'
 import * as RxOp from 'rxjs/operators'
 
 import { Network } from '../../../../shared/api/types'
-import { BNBChain, Chain, ETHChain, THORChain, unsafeChain, unsafeChainFromAsset } from '../../../../shared/utils/chain'
+import { isEnabledChain } from '../../../../shared/utils/chain'
 import { ErrorView } from '../../../components/shared/error'
 import { LoadingView } from '../../../components/shared/loading'
 import { BackLinkButton } from '../../../components/uielements/button'
@@ -152,8 +160,7 @@ export const UpgradeView: React.FC<Props> = (): JSX.Element => {
             O.fold(
               // No subscription of `poolAddresses$` needed for other assets than [CHAIN].RUNE
               () => Rx.of(RD.initial),
-              (asset) => {
-                const chain = unsafeChain(asset.chain)
+              ({ chain }) => {
                 return poolAddressesByChain$(chain)
               }
             )
@@ -181,20 +188,28 @@ export const UpgradeView: React.FC<Props> = (): JSX.Element => {
   )
 
   const renderUpgradeComponent = useCallback((chain: Chain, props: CommonUpgradeProps) => {
+    if (!isEnabledChain(chain)) return null
+
     switch (chain) {
-      case BNBChain: {
+      case BNBChain:
         return <UpgradeBNB {...props} />
-      }
-      case ETHChain: {
+      case ETHChain:
         return <UpgradeETH {...props} />
-      }
-      default:
+      case BCHChain:
+      case BTCChain:
+      case THORChain:
+      case LTCChain:
+      case DOGEChain:
+      case GAIAChain:
         return null
     }
   }, [])
 
   const { openExplorerTxUrl, getExplorerTxUrl } = useOpenExplorerTxUrl(
-    FP.pipe(oRuneToUpgradeAsset, O.map(unsafeChainFromAsset))
+    FP.pipe(
+      oRuneToUpgradeAsset,
+      O.map(({ chain }) => chain)
+    )
   )
 
   return (
@@ -207,7 +222,6 @@ export const UpgradeView: React.FC<Props> = (): JSX.Element => {
           () => <LoadingView size="large" />,
           renderDataError,
           ([{ asset, walletType, walletAddress, walletIndex, hdMode }, decimal, targetPoolAddress]) => {
-            const runeToUpgradeChain = unsafeChain(asset.chain)
             return FP.pipe(
               // Show an error by invalid address
               // All other values should be immediately available by entering the `UpgradeView`
@@ -215,7 +229,7 @@ export const UpgradeView: React.FC<Props> = (): JSX.Element => {
               O.fold(
                 () => renderDataError(Error('Could not get address from asset')),
                 (runeNativeAddress) => {
-                  return renderUpgradeComponent(runeToUpgradeChain, {
+                  return renderUpgradeComponent(asset.chain, {
                     addressValidation: validateAddress,
                     assetData: {
                       asset,
@@ -233,7 +247,7 @@ export const UpgradeView: React.FC<Props> = (): JSX.Element => {
                     balances: oBalances,
                     openExplorerTxUrl,
                     getExplorerTxUrl,
-                    reloadBalancesHandler: reloadBalancesByChain(runeToUpgradeChain),
+                    reloadBalancesHandler: reloadBalancesByChain(asset.chain),
                     network
                   })
                 }

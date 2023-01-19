@@ -1,4 +1,4 @@
-import { Address } from '@xchainjs/xchain-util'
+import { Address, Chain } from '@xchainjs/xchain-util'
 import { Asset, AssetAmount, baseToAsset } from '@xchainjs/xchain-util'
 import * as A from 'fp-ts/Array'
 import * as FP from 'fp-ts/function'
@@ -6,7 +6,6 @@ import * as O from 'fp-ts/Option'
 import { IntlShape } from 'react-intl'
 
 import { Network } from '../../shared/api/types'
-import { Chain } from '../../shared/utils/chain'
 import { optionFromNullableString } from '../../shared/utils/fp'
 import { isLedgerWallet, isWalletType } from '../../shared/utils/guard'
 import { WalletAddress, WalletType } from '../../shared/wallet/types'

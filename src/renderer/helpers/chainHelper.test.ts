@@ -1,14 +1,13 @@
+import { BNBChain } from '@xchainjs/xchain-binance'
+import { BTCChain } from '@xchainjs/xchain-bitcoin'
+import { BCHChain } from '@xchainjs/xchain-bitcoincash'
+import { GAIAChain } from '@xchainjs/xchain-cosmos'
+import { DOGEChain } from '@xchainjs/xchain-doge'
+import { ETHChain } from '@xchainjs/xchain-ethereum'
+import { LTCChain } from '@xchainjs/xchain-litecoin'
+import { THORChain } from '@xchainjs/xchain-thorchain'
+
 import { AssetBNB, AssetBTC, AssetETH, AssetRuneNative } from '../../shared/utils/asset'
-import {
-  BCHChain,
-  BNBChain,
-  BTCChain,
-  CosmosChain,
-  DOGEChain,
-  ETHChain,
-  LTCChain,
-  THORChain
-} from '../../shared/utils/chain'
 import {
   getChainAsset,
   isBchChain,
@@ -87,7 +86,7 @@ describe('helpers/chainHelper', () => {
     })
 
     it('CosmosChain -> true', () => {
-      expect(isCosmosChain(CosmosChain)).toBeTruthy()
+      expect(isCosmosChain(GAIAChain)).toBeTruthy()
     })
     it('CosmosChain -> false', () => {
       expect(isCosmosChain(ETHChain)).toBeFalsy()

@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
-import { COSMOS_DECIMAL } from '@xchainjs/xchain-cosmos'
+import { COSMOS_DECIMAL, GAIAChain } from '@xchainjs/xchain-cosmos'
 import { Address, baseAmount } from '@xchainjs/xchain-util'
 import { formatAssetAmountCurrency, assetAmount, bn, assetToBase, BaseAmount, baseToAsset } from '@xchainjs/xchain-util'
 import { Row, Form } from 'antd'
@@ -12,7 +12,6 @@ import { useIntl } from 'react-intl'
 
 import { Network } from '../../../../../shared/api/types'
 import { AssetRuneNative } from '../../../../../shared/utils/asset'
-import { CosmosChain } from '../../../../../shared/utils/chain'
 import { isKeystoreWallet, isLedgerWallet } from '../../../../../shared/utils/guard'
 import { WalletType } from '../../../../../shared/wallet/types'
 import { ZERO_BASE_AMOUNT } from '../../../../const'
@@ -216,7 +215,7 @@ export const SendFormCOSMOS: React.FC<Props> = (props): JSX.Element => {
           onSuccess={onSuccessHandler}
           onClose={onCloseHandler}
           visible={showConfirmationModal}
-          chain={CosmosChain}
+          chain={GAIAChain}
           description2={intl.formatMessage({ id: 'ledger.sign' })}
           addresses={O.none}
         />

@@ -1,18 +1,16 @@
+import { BNBChain } from '@xchainjs/xchain-binance'
+import { BTCChain } from '@xchainjs/xchain-bitcoin'
+import { BCHChain } from '@xchainjs/xchain-bitcoincash'
+import { GAIAChain } from '@xchainjs/xchain-cosmos'
+import { DOGEChain } from '@xchainjs/xchain-doge'
+import { ETHChain } from '@xchainjs/xchain-ethereum'
+import { LTCChain } from '@xchainjs/xchain-litecoin'
+import { THORChain } from '@xchainjs/xchain-thorchain'
+import { Chain } from '@xchainjs/xchain-util'
 import * as O from 'fp-ts/lib/Option'
 import * as Rx from 'rxjs'
 
-import {
-  AvalancheChain,
-  BCHChain,
-  BNBChain,
-  BTCChain,
-  Chain,
-  CosmosChain,
-  DOGEChain,
-  ETHChain,
-  LTCChain,
-  THORChain
-} from '../../../shared/utils/chain'
+import { isEnabledChain } from '../../../shared/utils/chain'
 import * as BNB from '../binance'
 import * as BTC from '../bitcoin'
 import * as BCH from '../bitcoincash'
@@ -28,6 +26,8 @@ import { client$ } from './client'
  * Returns keystore addresses by givven chain
  */
 const addressByChain$ = (chain: Chain): WalletAddress$ => {
+  if (!isEnabledChain(chain)) return Rx.of(O.none)
+
   switch (chain) {
     case BNBChain:
       return BNB.address$
@@ -37,10 +37,7 @@ const addressByChain$ = (chain: Chain): WalletAddress$ => {
       return ETH.address$
     case THORChain:
       return THOR.address$
-    case AvalancheChain:
-      // not supported yet
-      return Rx.of(O.none)
-    case CosmosChain:
+    case GAIAChain:
       return COSMOS.address$
     case BCHChain:
       return BCH.address$

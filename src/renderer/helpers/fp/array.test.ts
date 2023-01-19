@@ -1,5 +1,10 @@
+import { BNBChain } from '@xchainjs/xchain-binance'
+import { BTCChain } from '@xchainjs/xchain-bitcoin'
+import { ETHChain } from '@xchainjs/xchain-ethereum'
+import { LTCChain } from '@xchainjs/xchain-litecoin'
+import { Chain } from '@xchainjs/xchain-util'
+
 import { AssetBNB, AssetBTC, AssetETH, AssetLTC } from '../../../shared/utils/asset'
-import { BNBChain, BTCChain, Chain, ETHChain, LTCChain } from '../../../shared/utils/chain'
 import { unionAssets, unionChains } from './array'
 
 describe('helpers/fp/array', () => {

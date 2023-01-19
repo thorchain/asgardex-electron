@@ -1,20 +1,19 @@
 import React, { useCallback } from 'react'
 
+import { BNBChain } from '@xchainjs/xchain-binance'
+import { BTCChain } from '@xchainjs/xchain-bitcoin'
+import { BCHChain } from '@xchainjs/xchain-bitcoincash'
+import { GAIAChain } from '@xchainjs/xchain-cosmos'
+import { DOGEChain } from '@xchainjs/xchain-doge'
+import { ETHChain } from '@xchainjs/xchain-ethereum'
+import { LTCChain } from '@xchainjs/xchain-litecoin'
+import { THORChain } from '@xchainjs/xchain-thorchain'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/Option'
 import { useObservableState } from 'observable-hooks'
 import { useIntl } from 'react-intl'
 
-import {
-  BCHChain,
-  BNBChain,
-  BTCChain,
-  CosmosChain,
-  DOGEChain,
-  ETHChain,
-  LTCChain,
-  THORChain
-} from '../../../../shared/utils/chain'
+import { isEnabledChain } from '../../../../shared/utils/chain'
 import { LoadingView } from '../../../components/shared/loading'
 import { BackLinkButton } from '../../../components/uielements/button'
 import { useWalletContext } from '../../../contexts/WalletContext'
@@ -44,6 +43,20 @@ export const SendView: React.FC<Props> = (): JSX.Element => {
       const {
         asset: { chain }
       } = asset
+
+      if (!isEnabledChain(chain)) {
+        return (
+          <h1>
+            {intl.formatMessage(
+              { id: 'wallet.errors.invalidChain' },
+              {
+                chain
+              }
+            )}
+          </h1>
+        )
+      }
+
       switch (chain) {
         case BNBChain:
           return <SendViewBNB asset={asset} />
@@ -59,19 +72,8 @@ export const SendView: React.FC<Props> = (): JSX.Element => {
           return <SendViewLTC asset={asset} />
         case DOGEChain:
           return <SendViewDOGE asset={asset} />
-        case CosmosChain:
+        case GAIAChain:
           return <SendViewCOSMOS asset={asset} />
-        default:
-          return (
-            <h1>
-              {intl.formatMessage(
-                { id: 'wallet.errors.invalidChain' },
-                {
-                  chain
-                }
-              )}
-            </h1>
-          )
       }
     },
     [intl]

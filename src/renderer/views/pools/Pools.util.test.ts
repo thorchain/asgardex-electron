@@ -1,11 +1,11 @@
 import { PoolData } from '@thorchain/asgardex-util'
+import { BNBChain } from '@xchainjs/xchain-binance'
 import { assetAmount, assetToBase } from '@xchainjs/xchain-util'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
 
 import { ASSETS_TESTNET, ERC20_TESTNET } from '../../../shared/mock/assets'
 import { AssetBCH, AssetBNB, AssetBTC, AssetETH, AssetLTC, AssetRuneNative } from '../../../shared/utils/asset'
-import { BNBChain } from '../../../shared/utils/chain'
 import { AssetUSDTERC20Testnet } from '../../const'
 import { eqBaseAmount } from '../../helpers/fp/eq'
 import { LastblockItems } from '../../services/thorchain/types'

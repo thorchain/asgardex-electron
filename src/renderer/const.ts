@@ -1,20 +1,17 @@
 import { PoolData } from '@thorchain/asgardex-util'
-import { assetAmount, bn, Asset, assetToString, baseAmount } from '@xchainjs/xchain-util'
+import { BNBChain } from '@xchainjs/xchain-binance'
+import { BTCChain } from '@xchainjs/xchain-bitcoin'
+import { BCHChain } from '@xchainjs/xchain-bitcoincash'
+import { GAIAChain } from '@xchainjs/xchain-cosmos'
+import { DOGEChain } from '@xchainjs/xchain-doge'
+import { ETHChain } from '@xchainjs/xchain-ethereum'
+import { LTCChain } from '@xchainjs/xchain-litecoin'
+import { THORChain } from '@xchainjs/xchain-thorchain'
+import { assetAmount, bn, Asset, assetToString, baseAmount, Chain } from '@xchainjs/xchain-util'
 
 import { Network } from '../shared/api/types'
 import { AssetBTC, AssetETH, AssetRune67C, AssetRuneERC20Testnet, AssetRuneNative } from '../shared/utils/asset'
-import {
-  AvalancheChain,
-  BCHChain,
-  BNBChain,
-  BTCChain,
-  Chain,
-  CosmosChain,
-  DOGEChain,
-  ETHChain,
-  LTCChain,
-  THORChain
-} from '../shared/utils/chain'
+import { EnabledChain } from '../shared/utils/chain'
 import { WalletType } from '../shared/wallet/types'
 import { GetPoolsPeriodEnum } from './types/generated/midgard'
 import { PricePoolCurrencyWeights, PricePoolAssets } from './views/pools/Pools.types'
@@ -134,16 +131,15 @@ export const USD_PRICE_ASSETS: PricePoolAssets = [
 // Weight of chains
 // Needed for ordering chain related things (wallets, balances etc.)
 // The higher the value the higher the weight
-export const CHAIN_WEIGHTS: Record<Chain, number> = {
+export const CHAIN_WEIGHTS: Record<EnabledChain, number> = {
   [THORChain]: 0,
   [BTCChain]: 1,
   [BCHChain]: 2,
   [LTCChain]: 3,
   [ETHChain]: 4,
   [BNBChain]: 5,
-  [CosmosChain]: 6,
-  [DOGEChain]: 7,
-  [AvalancheChain]: 8 // not supported in ASGDX yet
+  [GAIAChain]: 6,
+  [DOGEChain]: 7
 }
 
 // Weight of currencies needed for pricing
@@ -196,7 +192,7 @@ export const SUPPORTED_LEDGER_APPS: Chain[] = [
   DOGEChain,
   BCHChain,
   ETHChain,
-  CosmosChain
+  GAIAChain
 ]
 
 export const DEFAULT_GET_POOLS_PERIOD = GetPoolsPeriodEnum._30d

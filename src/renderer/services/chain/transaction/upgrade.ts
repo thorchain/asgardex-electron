@@ -5,7 +5,6 @@ import * as O from 'fp-ts/lib/Option'
 import * as Rx from 'rxjs'
 import * as RxOp from 'rxjs/operators'
 
-import { unsafeChainFromAsset } from '../../../../shared/utils/chain'
 import { getEthAssetAddress, isRuneEthAsset } from '../../../helpers/assetHelper'
 import { liveData } from '../../../helpers/rx/liveData'
 import { observableState } from '../../../helpers/stateHelper'
@@ -41,7 +40,7 @@ export const upgradeRuneToNative$ = ({
     steps: { current: 1, total: 3 }
   })
 
-  const chain = unsafeChainFromAsset(asset)
+  const { chain } = asset
 
   // All requests will be done in a sequence
   // to update `UpgradeRuneTxState` step by step

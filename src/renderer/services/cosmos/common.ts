@@ -1,5 +1,5 @@
 import * as RD from '@devexperts/remote-data-ts'
-import { Client } from '@xchainjs/xchain-cosmos'
+import { Client, GAIAChain } from '@xchainjs/xchain-cosmos'
 import * as E from 'fp-ts/lib/Either'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
@@ -8,7 +8,6 @@ import * as RxOp from 'rxjs/operators'
 
 import { getChainId } from '../../../shared/api/cosmos'
 import { getClientUrls, INITIAL_CHAIN_IDS } from '../../../shared/cosmos/client'
-import { CosmosChain } from '../../../shared/utils/chain'
 import { isError } from '../../../shared/utils/guard'
 import { clientNetwork$ } from '../app/service'
 import * as C from '../clients'
@@ -76,12 +75,12 @@ const client$: Client$ = clientState$.pipe(RxOp.map(RD.toOption), RxOp.shareRepl
 /**
  * `Address`
  */
-const address$: C.WalletAddress$ = C.address$(client$, CosmosChain)
+const address$: C.WalletAddress$ = C.address$(client$, GAIAChain)
 
 /**
  * `Address`
  */
-const addressUI$: C.WalletAddress$ = C.addressUI$(client$, CosmosChain)
+const addressUI$: C.WalletAddress$ = C.addressUI$(client$, GAIAChain)
 
 /**
  * Explorer url depending on selected network

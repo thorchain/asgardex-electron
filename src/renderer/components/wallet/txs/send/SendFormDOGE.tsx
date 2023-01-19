@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
 import { FeeOption, FeesWithRates } from '@xchainjs/xchain-client'
-import { DOGE_DECIMAL } from '@xchainjs/xchain-doge'
+import { DOGEChain, DOGE_DECIMAL } from '@xchainjs/xchain-doge'
 import {
   Address,
   assetAmount,
@@ -22,7 +22,6 @@ import { useIntl } from 'react-intl'
 
 import { Network } from '../../../../../shared/api/types'
 import { AssetDOGE } from '../../../../../shared/utils/asset'
-import { DOGEChain } from '../../../../../shared/utils/chain'
 import { isKeystoreWallet, isLedgerWallet } from '../../../../../shared/utils/guard'
 import { WalletType } from '../../../../../shared/wallet/types'
 import { ZERO_BASE_AMOUNT } from '../../../../const'

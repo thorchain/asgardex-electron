@@ -5,7 +5,6 @@ import * as O from 'fp-ts/lib/Option'
 import * as Rx from 'rxjs'
 import * as RxOp from 'rxjs/operators'
 
-import { unsafeChainFromAsset } from '../../../../shared/utils/chain'
 import { getEthAssetAddress, isEthAsset, isRuneNativeAsset } from '../../../helpers/assetHelper'
 import { isEthChain } from '../../../helpers/chainHelper'
 import { liveData } from '../../../helpers/rx/liveData'
@@ -40,7 +39,7 @@ export const swap$ = ({
   // total of progress
   const total = O.some(100)
 
-  const chain = unsafeChainFromAsset(asset)
+  const { chain } = asset
 
   // Observable state of loading process
   // we start with progress of 25%

@@ -1,10 +1,10 @@
 import * as RD from '@devexperts/remote-data-ts'
+import { Chain } from '@xchainjs/xchain-util'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/Option'
 import * as Rx from 'rxjs'
 import * as RxOp from 'rxjs/operators'
 
-import { Chain } from '../../../shared/utils/chain'
 import { triggerStream } from '../../helpers/stateHelper'
 import { FeesLD, XChainClient$, FeesService } from './types'
 

@@ -6,7 +6,7 @@ import * as t from 'io-ts'
 import * as IOD from 'io-ts/Decoder'
 import * as IOG from 'io-ts/Guard'
 
-import { isAsset, isBaseAmount, isChain, isEthHDMode, isFeeOption, isHDMode, isNetwork } from '../utils/guard'
+import { enabledChainGuard, isAsset, isBaseAmount, isEthHDMode, isFeeOption, isHDMode, isNetwork } from '../utils/guard'
 
 const assetDecoder: IOD.Decoder<unknown, Asset> = FP.pipe(
   IOD.string,
@@ -58,9 +58,9 @@ export const baseAmountIO = new t.Type(
 
 export const chainIO = new t.Type(
   'ChainIO',
-  isChain,
+  enabledChainGuard.is,
   (u, c) => {
-    if (isChain(u)) return t.success(u)
+    if (enabledChainGuard.is(u)) return t.success(u)
     return t.failure(u, c, `Can't decode Chain from ${u}`)
   },
   t.identity

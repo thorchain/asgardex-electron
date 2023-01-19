@@ -1,59 +1,55 @@
-import { Asset } from '@xchainjs/xchain-util'
-import { unsafeCoerce } from 'fp-ts/lib/function'
+import { BNBChain } from '@xchainjs/xchain-binance'
+import { BTCChain } from '@xchainjs/xchain-bitcoin'
+import { BCHChain } from '@xchainjs/xchain-bitcoincash'
+import { GAIAChain } from '@xchainjs/xchain-cosmos'
+import { DOGEChain } from '@xchainjs/xchain-doge'
+import { ETHChain } from '@xchainjs/xchain-ethereum'
+import { LTCChain } from '@xchainjs/xchain-litecoin'
+import { THORChain } from '@xchainjs/xchain-thorchain'
+import { Chain } from '@xchainjs/xchain-util'
 
-export const AvalancheChain = 'AVAX'
-export const BCHChain = 'BCH'
-export const BNBChain = 'BNB'
-export const BTCChain = 'BTC'
-export const CosmosChain = 'GAIA'
-export const DOGEChain = 'DOGE'
-export const ETHChain = 'ETH'
-export const LTCChain = 'LTC'
-export const THORChain = 'THOR'
-
-const CHAINS = [
-  AvalancheChain,
+/**
+ * All chains are currently supported by ASGDX
+ * Whenever you want to support another chain, here is the first place to add it
+ */
+export const ENABLED_CHAINS = [
   BCHChain,
   BNBChain,
   BTCChain,
-  CosmosChain,
+  GAIAChain,
   DOGEChain,
   ETHChain,
   LTCChain,
   THORChain
 ] as const
 
-export type Chain = typeof CHAINS[number]
+export type EnabledChain = typeof ENABLED_CHAINS[number]
 
 /**
- * Type guard to check whether string  is based on type `Chain`
- * @param {string} c The chain string.
- * @returns {boolean} `true` or `false`
+ * Type guard
+ * whether `Chain` is `EnableChain`
  */
-export const isChain = (c: string): c is Chain => CHAINS.includes(c as Chain)
-
-export const isEnabledChain = (chain: Chain) => chain.includes(chain)
-
-export const unsafeChain: (s: string) => Chain = unsafeCoerce<string, Chain>
-export const unsafeChainFromAsset = ({ chain }: Asset): Chain => unsafeChain(chain)
+export const isEnabledChain = (u: string): u is EnabledChain => ENABLED_CHAINS.includes(u as EnabledChain)
 
 /**
  * Convert chain to string.
  *
  * @param {Chain} chain.
  * @returns {string} The string based on the given chain type.
+ *
+ * TODO (@veado) Return `Maybe<string>` instead of throwing an error
  */
 export const chainToString = (chain: Chain): string => {
+  if (!isEnabledChain(chain)) return `unknown chain ${chain}`
+
   switch (chain) {
-    case AvalancheChain:
-      return 'Avalanche'
     case BCHChain:
       return 'Bitcoin Cash'
     case BNBChain:
       return 'Binance Chain'
     case BTCChain:
       return 'Bitcoin'
-    case CosmosChain:
+    case GAIAChain:
       return 'Cosmos'
     case DOGEChain:
       return 'Dogecoin'

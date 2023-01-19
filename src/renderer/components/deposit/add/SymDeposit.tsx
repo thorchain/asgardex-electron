@@ -4,6 +4,7 @@ import * as RD from '@devexperts/remote-data-ts'
 import { ArrowPathIcon } from '@heroicons/react/20/solid'
 import { MagnifyingGlassMinusIcon, MagnifyingGlassPlusIcon } from '@heroicons/react/24/outline'
 import { getDepositMemo, PoolData } from '@thorchain/asgardex-util'
+import { THORChain } from '@xchainjs/xchain-thorchain'
 import { Address, Asset, baseAmount, BaseAmount, baseToAsset, formatAssetAmountCurrency } from '@xchainjs/xchain-util'
 import BigNumber from 'bignumber.js'
 import * as A from 'fp-ts/lib/Array'
@@ -17,7 +18,7 @@ import * as RxOp from 'rxjs/operators'
 
 import { Network } from '../../../../shared/api/types'
 import { AssetRuneNative } from '../../../../shared/utils/asset'
-import { chainToString, THORChain } from '../../../../shared/utils/chain'
+import { chainToString } from '../../../../shared/utils/chain'
 import { isLedgerWallet } from '../../../../shared/utils/guard'
 import { WalletType } from '../../../../shared/wallet/types'
 import { ZERO_ASSET_AMOUNT, ZERO_BASE_AMOUNT } from '../../../const'
@@ -191,7 +192,7 @@ export const SymDeposit: React.FC<Props> = (props) => {
 
   const intl = useIntl()
 
-  const chain = unsafeToChainFromAsset(asset)
+  const { chain } = asset
 
   const prevAsset = useRef<O.Option<Asset>>(O.none)
 
