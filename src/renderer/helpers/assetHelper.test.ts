@@ -1,11 +1,12 @@
-import { ETHAddress } from '@xchainjs/xchain-ethereum'
+import { BNBChain } from '@xchainjs/xchain-binance'
+import { ETHAddress, ETHChain } from '@xchainjs/xchain-ethereum'
 import { assetAmount, baseAmount } from '@xchainjs/xchain-util'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
 
 import { ERC20_TESTNET } from '../../shared/mock/assets'
 import {
-  AssetAtom,
+  AssetATOM,
   AssetBCH,
   AssetBNB,
   AssetBTC,
@@ -17,7 +18,6 @@ import {
   AssetRuneERC20Testnet,
   AssetRuneNative
 } from '../../shared/utils/asset'
-import { BNBChain, ETHChain } from '../../shared/utils/chain'
 import {
   AssetBUSDBAF,
   AssetBUSDBD1,
@@ -351,7 +351,7 @@ describe('helpers/assetHelper', () => {
       expect(isChainAsset(AssetRuneNative)).toBeTruthy()
     })
     it('ATOM', () => {
-      expect(isChainAsset(AssetAtom)).toBeTruthy()
+      expect(isChainAsset(AssetATOM)).toBeTruthy()
     })
   })
 

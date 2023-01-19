@@ -1,13 +1,12 @@
 import * as RD from '@devexperts/remote-data-ts'
 import { TxHash, XChainClient } from '@xchainjs/xchain-client'
-import { getTokenAddress } from '@xchainjs/xchain-ethereum'
+import { ETHChain, getTokenAddress } from '@xchainjs/xchain-ethereum'
 import { Address } from '@xchainjs/xchain-util'
 import * as FP from 'fp-ts/function'
 import * as O from 'fp-ts/Option'
 import * as Rx from 'rxjs'
 import * as RxOp from 'rxjs/operators'
 
-import { ETHChain } from '../../../../shared/utils/chain'
 import { ApiError, ErrorId, TxLD } from '../../wallet/types'
 import { TxsPageLD, TxsParams } from '../types'
 

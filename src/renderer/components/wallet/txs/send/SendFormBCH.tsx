@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
-import { BCH_DECIMAL } from '@xchainjs/xchain-bitcoincash'
+import { BCHChain, BCH_DECIMAL } from '@xchainjs/xchain-bitcoincash'
 import { FeeOption, FeesWithRates } from '@xchainjs/xchain-client'
 import {
   Address,
@@ -22,7 +22,6 @@ import { useIntl } from 'react-intl'
 
 import { Network } from '../../../../../shared/api/types'
 import { AssetBCH } from '../../../../../shared/utils/asset'
-import { BCHChain } from '../../../../../shared/utils/chain'
 import { isKeystoreWallet, isLedgerWallet } from '../../../../../shared/utils/guard'
 import { WalletType } from '../../../../../shared/wallet/types'
 import { ZERO_BASE_AMOUNT } from '../../../../const'

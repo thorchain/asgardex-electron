@@ -1,10 +1,10 @@
 import * as RD from '@devexperts/remote-data-ts'
 import { Meta, Story } from '@storybook/react'
+import { BNBChain } from '@xchainjs/xchain-binance'
 import { Tx, TxType } from '@xchainjs/xchain-client'
 import { assetAmount, assetToBase } from '@xchainjs/xchain-util'
 
 import { AssetBNB } from '../../../../../shared/utils/asset'
-import { BNBChain } from '../../../../../shared/utils/chain'
 import { TxsTable } from './TxsTable'
 
 const tx: Tx = {

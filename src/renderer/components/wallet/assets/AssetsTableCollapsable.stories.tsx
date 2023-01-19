@@ -1,5 +1,10 @@
 import * as RD from '@devexperts/remote-data-ts'
 import { ComponentMeta } from '@storybook/react'
+import { BNBChain } from '@xchainjs/xchain-binance'
+import { BTCChain } from '@xchainjs/xchain-bitcoin'
+import { ETHChain } from '@xchainjs/xchain-ethereum'
+import { LTCChain } from '@xchainjs/xchain-litecoin'
+import { THORChain } from '@xchainjs/xchain-thorchain'
 import { assetToString, baseAmount } from '@xchainjs/xchain-util'
 import * as A from 'fp-ts/Array'
 import * as FP from 'fp-ts/function'
@@ -7,7 +12,7 @@ import * as O from 'fp-ts/Option'
 
 import { getMockRDValueFactory, RDStatus } from '../../../../shared/mock/rdByStatus'
 import { AssetBNB, AssetBTC, AssetETH, AssetLTC, AssetRune67C, AssetRuneNative } from '../../../../shared/utils/asset'
-import { BNBChain, BTCChain, Chain, ETHChain, LTCChain, THORChain } from '../../../../shared/utils/chain'
+import { EnabledChain, isEnabledChain } from '../../../../shared/utils/chain'
 import { WalletType } from '../../../../shared/wallet/types'
 import { RUNE_PRICE_POOL } from '../../../helpers/poolHelper'
 import { WalletBalances } from '../../../services/clients'
@@ -22,7 +27,7 @@ const selectAssetHandler = ({ asset, walletType, walletAddress }: SelectedWallet
 const assetHandler = ({ asset, walletType, walletAddress }: SelectedWalletAsset) =>
   console.log('assetHandler params ', assetToString(asset), walletType, walletAddress)
 
-const balances: Partial<Record<Chain, ChainBalances>> = {
+const balances: Partial<Record<EnabledChain, ChainBalances>> = {
   [BNBChain]: [
     {
       walletType: 'keystore',
@@ -132,7 +137,7 @@ const argTypes = Object.keys(balances).reduce(
   {}
 )
 
-const getBalance = (chain: Chain, status: RDStatus | undefined, walletType: WalletType) =>
+const getBalance = (chain: EnabledChain, status: RDStatus | undefined, walletType: WalletType) =>
   getMockRDValueFactory(
     () =>
       FP.pipe(
@@ -146,7 +151,7 @@ const getBalance = (chain: Chain, status: RDStatus | undefined, walletType: Wall
     () => ({ ...apiError, msg: `${chain} error` })
   )(status)
 
-const Template = (args: Partial<Record<Chain, RDStatus>>) => {
+const Template = (args: Partial<Record<EnabledChain, RDStatus>>) => {
   return (
     <AssetsTableCollapsable
       selectAssetHandler={selectAssetHandler}
@@ -158,7 +163,9 @@ const Template = (args: Partial<Record<Chain, RDStatus>>) => {
             chainBalances || [],
             A.map((chainBalance) => ({
               ...chainBalance,
-              balances: getBalance(chain as Chain, args[chain as Chain], chainBalance.walletType)
+              balances: isEnabledChain(chain)
+                ? getBalance(chain, args[chain], chainBalance.walletType)
+                : RD.failure<ApiError>({ errorId: ErrorId.GET_BALANCES, msg: `${chain} not supported` })
             }))
           )
         ),

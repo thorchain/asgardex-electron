@@ -1,6 +1,7 @@
 import React, { useMemo, useCallback } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
+import { THORChain } from '@xchainjs/xchain-thorchain'
 import { Row } from 'antd'
 import * as A from 'fp-ts/Array'
 import * as FP from 'fp-ts/lib/function'
@@ -9,7 +10,7 @@ import { useObservableState } from 'observable-hooks'
 import * as Rx from 'rxjs'
 import * as RxOp from 'rxjs/operators'
 
-import { THORChain } from '../../../../shared/utils/chain'
+import { ENABLED_CHAINS } from '../../../../shared/utils/chain'
 import { WalletAddress, WalletAddresses } from '../../../../shared/wallet/types'
 import { PoolActionsHistory } from '../../../components/poolActionsHistory'
 import { historyFilterToViewblockFilter } from '../../../components/poolActionsHistory/PoolActionsHistory.helper'
@@ -25,7 +26,6 @@ import { useMidgardHistoryActions } from '../../../hooks/useMidgardHistoryAction
 import { useNetwork } from '../../../hooks/useNetwork'
 import { useOpenAddressUrl } from '../../../hooks/useOpenAddressUrl'
 import { useOpenExplorerTxUrl } from '../../../hooks/useOpenExplorerTxUrl'
-import { ENABLED_CHAINS } from '../../../services/const'
 import { ledgerAddressToWalletAddress } from '../../../services/wallet/util'
 
 const HISTORY_FILTERS: Filter[] = ['ALL', 'SWITCH', 'DEPOSIT', 'SWAP', 'WITHDRAW', 'DONATE', 'REFUND']
@@ -52,7 +52,7 @@ export const WalletHistoryView: React.FC = () => {
   const keystoreAddresses$ = useMemo<Rx.Observable<WalletAddresses>>(
     () =>
       FP.pipe(
-        ENABLED_CHAINS,
+        [...ENABLED_CHAINS],
         A.map(addressByChain$),
         (addresses) => Rx.combineLatest(addresses),
         RxOp.map(A.filterMap(FP.identity))
@@ -65,7 +65,7 @@ export const WalletHistoryView: React.FC = () => {
   const ledgerAddresses$ = useMemo<Rx.Observable<WalletAddresses>>(
     () =>
       FP.pipe(
-        ENABLED_CHAINS,
+        [...ENABLED_CHAINS],
         A.map((chain) => getLedgerAddress$(chain)),
         (addresses) => Rx.combineLatest(addresses),
         // Accept `successfully` added addresses only

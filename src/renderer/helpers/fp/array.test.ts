@@ -1,12 +1,17 @@
+import { BNBChain } from '@xchainjs/xchain-binance'
+import { BTCChain } from '@xchainjs/xchain-bitcoin'
+import { ETHChain } from '@xchainjs/xchain-ethereum'
+import { LTCChain } from '@xchainjs/xchain-litecoin'
+import { Chain } from '@xchainjs/xchain-util'
+
 import { AssetBNB, AssetBTC, AssetETH, AssetLTC } from '../../../shared/utils/asset'
-import { BNBChain, BTCChain, ETHChain, LTCChain } from '../../../shared/utils/chain'
 import { unionAssets, unionChains } from './array'
 
 describe('helpers/fp/array', () => {
   describe('unionChains', () => {
     it('merges two lists of chains and removes duplicates', () => {
-      const chainsA = [BNBChain, ETHChain, BTCChain]
-      const chainsB = [BNBChain, BTCChain, LTCChain]
+      const chainsA: Chain[] = [BNBChain, ETHChain, BTCChain]
+      const chainsB: Chain[] = [BNBChain, BTCChain, LTCChain]
       expect(unionChains(chainsA)(chainsB)).toEqual([BNBChain, BTCChain, LTCChain, ETHChain])
     })
   })

@@ -1,6 +1,8 @@
 import React, { useCallback, useEffect, useMemo } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
+import { BTCChain } from '@xchainjs/xchain-bitcoin'
+import { THORChain } from '@xchainjs/xchain-thorchain'
 import { Asset, assetToString } from '@xchainjs/xchain-util'
 import * as FP from 'fp-ts/function'
 import * as O from 'fp-ts/lib/Option'
@@ -9,7 +11,6 @@ import { useIntl } from 'react-intl'
 import { useNavigate } from 'react-router-dom'
 
 import { AssetRuneNative } from '../../../../shared/utils/asset'
-import { Chain, THORChain } from '../../../../shared/utils/chain'
 import { isLedgerWallet } from '../../../../shared/utils/guard'
 import { WalletType } from '../../../../shared/wallet/types'
 import { SymDeposit } from '../../../components/deposit/add'
@@ -88,7 +89,7 @@ export const SymDepositView: React.FC<Props> = (props) => {
     () =>
       balancesState$({
         ...DEFAULT_BALANCES_FILTER,
-        [Chain.Bitcoin]: 'confirmed'
+        [BTCChain]: 'confirmed'
       }),
     INITIAL_BALANCES_STATE
   )
@@ -256,11 +257,11 @@ export const SymDepositView: React.FC<Props> = (props) => {
       ([poolAssets, poolDetail, { poolsData, poolDetails }]) => {
         // Since RUNE is not part of pool assets, add it to the list of available assets
         const availableAssets = [AssetRuneNative, ...poolAssets]
-
+        const { chain } = asset
         const disableDepositAction =
-          PoolHelpers.disableAllActions({ chain: asset.chain, haltedChains, mimirHalt }) ||
-          PoolHelpers.disableTradingActions({ chain: asset.chain, haltedChains, mimirHalt }) ||
-          PoolHelpers.disablePoolActions({ chain: asset.chain, haltedChains, mimirHalt })
+          PoolHelpers.disableAllActions({ chain, haltedChains, mimirHalt }) ||
+          PoolHelpers.disableTradingActions({ chain, haltedChains, mimirHalt }) ||
+          PoolHelpers.disablePoolActions({ chain, haltedChains, mimirHalt })
 
         return (
           <>

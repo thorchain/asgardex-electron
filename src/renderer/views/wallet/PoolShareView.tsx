@@ -2,7 +2,8 @@ import React, { useCallback, useMemo, useRef, useEffect } from 'react'
 
 import { SyncOutlined } from '@ant-design/icons'
 import * as RD from '@devexperts/remote-data-ts'
-import { Address, Asset } from '@xchainjs/xchain-util'
+import { THORChain } from '@xchainjs/xchain-thorchain'
+import { Address, Asset, Chain } from '@xchainjs/xchain-util'
 import { Row } from 'antd'
 import * as A from 'fp-ts/Array'
 import * as FP from 'fp-ts/function'
@@ -13,7 +14,7 @@ import * as Rx from 'rxjs'
 import * as RxOp from 'rxjs/operators'
 
 import { Network } from '../../../shared/api/types'
-import { Chain, THORChain } from '../../../shared/utils/chain'
+import { ENABLED_CHAINS } from '../../../shared/utils/chain'
 import { PoolShares as PoolSharesTable } from '../../components/PoolShares'
 import { PoolShareTableRowData } from '../../components/PoolShares/PoolShares.types'
 import { ErrorView } from '../../components/shared/error'
@@ -29,7 +30,6 @@ import { addressFromOptionalWalletAddress, addressFromWalletAddress } from '../.
 import { useMimirHalt } from '../../hooks/useMimirHalt'
 import { useNetwork } from '../../hooks/useNetwork'
 import { WalletAddress$ } from '../../services/clients/types'
-import { ENABLED_CHAINS } from '../../services/const'
 import { PoolSharesRD } from '../../services/midgard/types'
 import { ledgerAddressToWalletAddress } from '../../services/wallet/util'
 import { BaseAmountRD } from '../../types'
@@ -76,7 +76,7 @@ export const PoolShareView: React.FC = (): JSX.Element => {
   const [allSharesRD] = useObservableState<PoolSharesRD, Network>(() => {
     // keystore addresses
     const addresses$: WalletAddress$[] = FP.pipe(
-      ENABLED_CHAINS,
+      [...ENABLED_CHAINS],
       A.filter((chain) => !isThorChain(chain)),
       A.map(addressByChain$)
     )
@@ -84,7 +84,7 @@ export const PoolShareView: React.FC = (): JSX.Element => {
     // ledger addresses
     const ledgerAddresses$ = (): WalletAddress$[] =>
       FP.pipe(
-        ENABLED_CHAINS,
+        [...ENABLED_CHAINS],
         A.filter((chain) => !isThorChain(chain)),
         A.map((chain) => getLedgerAddress$(chain)),
         A.map(RxOp.map(FP.flow(O.map(ledgerAddressToWalletAddress))))

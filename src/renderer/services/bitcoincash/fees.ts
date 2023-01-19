@@ -1,11 +1,10 @@
 import * as RD from '@devexperts/remote-data-ts'
-import { Client as BitcoinCashClient, getDefaultFeesWithRates } from '@xchainjs/xchain-bitcoincash'
+import { BCHChain, Client as BitcoinCashClient, getDefaultFeesWithRates } from '@xchainjs/xchain-bitcoincash'
 import * as FP from 'fp-ts/function'
 import * as O from 'fp-ts/Option'
 import * as Rx from 'rxjs'
 import * as RxOp from 'rxjs/operators'
 
-import { BCHChain } from '../../../shared/utils/chain'
 import { observableState } from '../../helpers/stateHelper'
 import { FeesWithRatesRD } from '../bitcoin/types'
 import { Memo } from '../chain/types'

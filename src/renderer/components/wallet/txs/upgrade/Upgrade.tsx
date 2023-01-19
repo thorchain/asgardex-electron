@@ -84,6 +84,8 @@ export const Upgrade: React.FC<Props> = (props): JSX.Element => {
 
   const [form] = Form.useForm<FormValues>()
 
+  const { chain } = asset
+
   const [amountToUpgrade, setAmountToUpgrade] = useState<BaseAmount>(ZERO_BASE_AMOUNT)
 
   const [targetAddress, _setTargetAddress] = useState<O.Option<Address>>(O.some(initialRuneNativeAddress))
@@ -139,7 +141,7 @@ export const Upgrade: React.FC<Props> = (props): JSX.Element => {
     [asset, walletAddress]
   )
 
-  const chainBaseAsset = useMemo(() => getChainAsset(asset.chain), [asset])
+  const chainBaseAsset = useMemo(() => getChainAsset(chain), [chain])
 
   const getBaseAssetBalance = useMemo(
     () =>
@@ -401,7 +403,6 @@ export const Upgrade: React.FC<Props> = (props): JSX.Element => {
       )
     }
 
-    const { chain } = asset
     const chainAsString = chainToString(chain)
     const txtNeedsConnected = intl.formatMessage(
       {
@@ -438,7 +439,7 @@ export const Upgrade: React.FC<Props> = (props): JSX.Element => {
       )
     }
     return null
-  }, [asset, intl, network, showConfirmationModal, submitTx, validatePassword$, walletType])
+  }, [chain, intl, network, showConfirmationModal, submitTx, validatePassword$, walletType])
 
   const renderTxModal = useMemo(() => {
     const { status } = upgradeTxState

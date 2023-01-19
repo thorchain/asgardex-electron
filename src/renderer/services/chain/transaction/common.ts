@@ -1,22 +1,20 @@
 import * as RD from '@devexperts/remote-data-ts'
+import { BNBChain } from '@xchainjs/xchain-binance'
+import { BTCChain } from '@xchainjs/xchain-bitcoin'
+import { BCHChain } from '@xchainjs/xchain-bitcoincash'
 import { TxHash } from '@xchainjs/xchain-client'
+import { GAIAChain } from '@xchainjs/xchain-cosmos'
+import { DOGEChain } from '@xchainjs/xchain-doge'
+import { ETHChain } from '@xchainjs/xchain-ethereum'
+import { LTCChain } from '@xchainjs/xchain-litecoin'
+import { THORChain } from '@xchainjs/xchain-thorchain'
 import { Address } from '@xchainjs/xchain-util'
+import { Chain } from '@xchainjs/xchain-util'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
 import * as Rx from 'rxjs'
 
-import {
-  AvalancheChain,
-  BCHChain,
-  BNBChain,
-  BTCChain,
-  Chain,
-  CosmosChain,
-  DOGEChain,
-  ETHChain,
-  LTCChain,
-  THORChain
-} from '../../../../shared/utils/chain'
+import { isEnabledChain } from '../../../../shared/utils/chain'
 import { DEFAULT_FEE_OPTION } from '../../../components/wallet/txs/send/Send.const'
 import { LiveData, liveData } from '../../../helpers/rx/liveData'
 import * as BNB from '../../binance'
@@ -50,7 +48,11 @@ export const sendTx$ = ({
   walletIndex,
   hdMode
 }: SendTxParams): TxHashLD => {
-  switch (asset.chain) {
+  const { chain } = asset
+
+  if (!isEnabledChain(chain)) return txFailure$(`${chain} is not supported for 'sendTx$'`)
+
+  switch (chain) {
     case BNBChain:
       return BNB.sendTx({ walletType, sender, recipient, amount, asset, memo, walletIndex, hdMode })
 
@@ -72,7 +74,7 @@ export const sendTx$ = ({
     case THORChain:
       return THOR.sendTx({ walletType, amount, asset, memo, recipient, walletIndex, hdMode })
 
-    case CosmosChain:
+    case GAIAChain:
       return FP.pipe(
         COSMOS.fees$(),
         liveData.mapLeft((error) => ({
@@ -95,10 +97,6 @@ export const sendTx$ = ({
           })
         )
       )
-
-    case AvalancheChain:
-      // not available yet
-      return txFailure$(`sendTx$ has not been implemented for AVAX yet`)
 
     case DOGEChain:
       return FP.pipe(
@@ -159,7 +157,10 @@ export const sendPoolTx$ = ({
   memo,
   feeOption = DEFAULT_FEE_OPTION
 }: SendPoolTxParams): TxHashLD => {
-  switch (asset.chain) {
+  const { chain } = asset
+  if (!isEnabledChain(chain)) return txFailure$(`${chain} is not supported for 'sendPoolTx$'`)
+
+  switch (chain) {
     case ETHChain:
       return ETH.sendPoolTx$({
         walletType,
@@ -176,21 +177,26 @@ export const sendPoolTx$ = ({
     case THORChain:
       return THOR.sendPoolTx$({ walletType, amount, asset, memo, walletIndex, hdMode })
 
-    default:
+    case BNBChain:
+    case BTCChain:
+    case BCHChain:
+    case DOGEChain:
+    case LTCChain:
+    case GAIAChain:
       return sendTx$({ sender, walletType, asset, recipient, amount, memo, feeOption, walletIndex, hdMode })
   }
 }
 
-// helper to create `RemoteData<ApiError, never>` observable
-const txStatusFailure$ = (msg: string): LiveData<ApiError, never> =>
-  Rx.of(
-    RD.failure({
-      errorId: ErrorId.GET_TX,
-      msg
-    })
-  )
-
 export const txStatusByChain$ = ({ txHash, chain }: { txHash: TxHash; chain: Chain }): TxLD => {
+  if (!isEnabledChain(chain)) {
+    return Rx.of(
+      RD.failure({
+        errorId: ErrorId.GET_TX,
+        msg: `${chain} is not supported for 'txStatusByChain$'`
+      })
+    )
+  }
+
   switch (chain) {
     case BNBChain:
       return BNB.txStatus$(txHash, O.none)
@@ -200,10 +206,8 @@ export const txStatusByChain$ = ({ txHash, chain }: { txHash: TxHash; chain: Cha
       return ETH.txStatus$(txHash, O.none)
     case THORChain:
       return THOR.txStatus$(txHash, O.none)
-    case CosmosChain:
+    case GAIAChain:
       return COSMOS.txStatus$(txHash, O.none)
-    case AvalancheChain:
-      return txStatusFailure$(`txStatusByChain$ has not been implemented for AVAX`)
     case DOGEChain:
       return DOGE.txStatus$(txHash, O.none)
     case BCHChain:
@@ -222,10 +226,25 @@ export const poolTxStatusByChain$ = ({
   chain: Chain
   assetAddress: O.Option<Address>
 }): TxLD => {
+  if (!isEnabledChain(chain)) {
+    return Rx.of(
+      RD.failure({
+        errorId: ErrorId.GET_TX,
+        msg: `${chain} is not supported for 'poolTxStatusByChain$'`
+      })
+    )
+  }
+
   switch (chain) {
     case ETHChain:
       return ETH.txStatus$(txHash, oAssetAddress)
-    default:
+    case BNBChain:
+    case BTCChain:
+    case THORChain:
+    case GAIAChain:
+    case DOGEChain:
+    case BCHChain:
+    case LTCChain:
       return txStatusByChain$({ txHash, chain })
   }
 }

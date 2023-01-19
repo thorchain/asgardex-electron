@@ -2,7 +2,15 @@ import React, { useCallback, useEffect, useMemo, useState } from 'react'
 
 import { SearchOutlined } from '@ant-design/icons'
 import * as RD from '@devexperts/remote-data-ts'
-import { Asset, Address } from '@xchainjs/xchain-util'
+import { BNBChain } from '@xchainjs/xchain-binance'
+import { BTCChain } from '@xchainjs/xchain-bitcoin'
+import { BCHChain } from '@xchainjs/xchain-bitcoincash'
+import { GAIAChain } from '@xchainjs/xchain-cosmos'
+import { DOGEChain } from '@xchainjs/xchain-doge'
+import { ETHChain } from '@xchainjs/xchain-ethereum'
+import { LTCChain } from '@xchainjs/xchain-litecoin'
+import { THORChain } from '@xchainjs/xchain-thorchain'
+import { Asset, Address, Chain } from '@xchainjs/xchain-util'
 import { List, Collapse, RadioChangeEvent } from 'antd'
 import * as FP from 'fp-ts/function'
 import * as A from 'fp-ts/lib/Array'
@@ -13,19 +21,7 @@ import { useNavigate } from 'react-router-dom'
 import { KeystoreId, Network } from '../../../shared/api/types'
 import { getDerivationPath as getEthDerivationPath } from '../../../shared/ethereum/ledger'
 import { EthHDMode } from '../../../shared/ethereum/types'
-import {
-  AvalancheChain,
-  BCHChain,
-  BNBChain,
-  BTCChain,
-  Chain,
-  chainToString,
-  CosmosChain,
-  DOGEChain,
-  ETHChain,
-  LTCChain,
-  THORChain
-} from '../../../shared/utils/chain'
+import { chainToString, EnabledChain, isEnabledChain } from '../../../shared/utils/chain'
 import { isError } from '../../../shared/utils/guard'
 import { HDMode, WalletAddress } from '../../../shared/wallet/types'
 import { ReactComponent as UnlockOutlined } from '../../assets/svg/icon-unlock-warning.svg'
@@ -156,15 +152,14 @@ export const WalletSettings: React.FC<Props> = (props): JSX.Element => {
     )
   }, [showQRModal, network, closeQrModal])
 
-  const [walletIndexMap, setWalletIndexMap] = useState<Record<Chain, number>>({
+  const [walletIndexMap, setWalletIndexMap] = useState<Record<EnabledChain, number>>({
     [BNBChain]: 0,
     [BTCChain]: 0,
     [BCHChain]: 0,
     [LTCChain]: 0,
     [THORChain]: 0,
     [ETHChain]: 0,
-    [CosmosChain]: 0,
-    [AvalancheChain]: 0, // not supported in ASGDX yet, but part of xchain-util
+    [GAIAChain]: 0,
     [DOGEChain]: 0
   })
 
@@ -239,7 +234,7 @@ export const WalletSettings: React.FC<Props> = (props): JSX.Element => {
   )
 
   const renderLedgerAddress = useCallback(
-    (chain: Chain, oAddress: O.Option<WalletAddress>) => {
+    (chain: EnabledChain, oAddress: O.Option<WalletAddress>) => {
       const renderAddAddress = () => {
         const onChangeEthDerivationMode = (e: RadioChangeEvent) => {
           updateEthHDMode(e.target.value as EthHDMode)
@@ -503,7 +498,9 @@ export const WalletSettings: React.FC<Props> = (props): JSX.Element => {
                   {/* keystore */}
                   {renderKeystoreAddress(chain, keystore)}
                   {/* ledger */}
-                  {isEnabledLedger(chain, network) ? renderLedgerAddress(chain, oLedger) : renderLedgerNotSupported}
+                  {isEnabledLedger(chain, network) && isEnabledChain(chain)
+                    ? renderLedgerAddress(chain, oLedger)
+                    : renderLedgerNotSupported}
                 </div>
               </Styled.ListItem>
             )}

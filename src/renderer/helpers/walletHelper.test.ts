@@ -1,3 +1,10 @@
+import { BNBChain } from '@xchainjs/xchain-binance'
+import { BTCChain } from '@xchainjs/xchain-bitcoin'
+import { BCHChain } from '@xchainjs/xchain-bitcoincash'
+import { GAIAChain } from '@xchainjs/xchain-cosmos'
+import { DOGEChain } from '@xchainjs/xchain-doge'
+import { LTCChain } from '@xchainjs/xchain-litecoin'
+import { THORChain } from '@xchainjs/xchain-thorchain'
 import { assetToBase, assetAmount } from '@xchainjs/xchain-util'
 import * as FP from 'fp-ts/lib/function'
 import * as NEA from 'fp-ts/lib/NonEmptyArray'
@@ -5,7 +12,6 @@ import * as O from 'fp-ts/lib/Option'
 
 import { ASSETS_TESTNET } from '../../shared/mock/assets'
 import { AssetBNB, AssetLTC, AssetRuneNative } from '../../shared/utils/asset'
-import { BCHChain, BNBChain, BTCChain, CosmosChain, DOGEChain, LTCChain, THORChain } from '../../shared/utils/chain'
 import { AssetBUSD74E } from '../const'
 import { NonEmptyWalletBalances, WalletBalance, WalletBalances } from '../services/wallet/types'
 import { isRuneNativeAsset } from './assetHelper'
@@ -231,9 +237,9 @@ describe('walletHelper', () => {
     })
 
     it('Cosmos ledger mainnet/stagenet/testnet -> true', () => {
-      expect(isEnabledLedger(CosmosChain, 'testnet')).toBeTruthy()
-      expect(isEnabledLedger(CosmosChain, 'mainnet')).toBeTruthy()
-      expect(isEnabledLedger(CosmosChain, 'stagenet')).toBeTruthy()
+      expect(isEnabledLedger(GAIAChain, 'testnet')).toBeTruthy()
+      expect(isEnabledLedger(GAIAChain, 'mainnet')).toBeTruthy()
+      expect(isEnabledLedger(GAIAChain, 'stagenet')).toBeTruthy()
     })
   })
 

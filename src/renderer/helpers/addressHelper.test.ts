@@ -1,6 +1,13 @@
+import { BNBChain } from '@xchainjs/xchain-binance'
+import { BTCChain } from '@xchainjs/xchain-bitcoin'
+import { BCHChain } from '@xchainjs/xchain-bitcoincash'
+import { GAIAChain } from '@xchainjs/xchain-cosmos'
+import { DOGEChain } from '@xchainjs/xchain-doge'
+import { ETHChain } from '@xchainjs/xchain-ethereum'
+import { LTCChain } from '@xchainjs/xchain-litecoin'
+import { THORChain } from '@xchainjs/xchain-thorchain'
 import * as O from 'fp-ts/lib/Option'
 
-import { BCHChain, BNBChain, BTCChain, CosmosChain, ETHChain, LTCChain, THORChain } from '../../shared/utils/chain'
 import { LedgerAddresses } from '../services/wallet/types'
 import { getEthChecksumAddress, hasLedgerAddress, removeAddressPrefix, truncateAddress } from './addressHelper'
 
@@ -56,9 +63,14 @@ describe('helpers/addressHelper', () => {
       expect(result).toEqual('ltc1qte...ctk')
     })
 
-    it('cosmos', () => {
-      const result = truncateAddress('cosmos1av54qcmavhjkqsd67cf6f4cedqjrdeh7ed86fc', CosmosChain, 'mainnet')
+    it('cosmos mainnet', () => {
+      const result = truncateAddress('cosmos1av54qcmavhjkqsd67cf6f4cedqjrdeh7ed86fc', GAIAChain, 'mainnet')
       expect(result).toEqual('cosmos1av...6fc')
+    })
+
+    it('DOGE mainnet', () => {
+      const result = truncateAddress('DT5SRCKHexHYzGanDkSPpaHW87KJ7yUBac', DOGEChain, 'mainnet')
+      expect(result).toEqual('DT5SRC...Bac')
     })
   })
 

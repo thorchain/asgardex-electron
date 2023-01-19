@@ -1,6 +1,6 @@
 import * as RD from '@devexperts/remote-data-ts'
 import { TxHash } from '@xchainjs/xchain-client'
-import { ClientUrl, DepositParam } from '@xchainjs/xchain-thorchain'
+import { ClientUrl, DepositParam, THORChain } from '@xchainjs/xchain-thorchain'
 import * as E from 'fp-ts/lib/Either'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/Option'
@@ -14,7 +14,6 @@ import {
   ipcLedgerSendTxParamsIO
 } from '../../../shared/api/io'
 import { LedgerError, Network } from '../../../shared/api/types'
-import { THORChain } from '../../../shared/utils/chain'
 import { isLedgerWallet } from '../../../shared/utils/guard'
 import { HDMode, WalletType } from '../../../shared/wallet/types'
 import { retryRequest } from '../../helpers/rx/retryRequest'

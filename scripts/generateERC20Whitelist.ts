@@ -1,3 +1,4 @@
+import { ETHChain } from '@xchainjs/xchain-ethereum'
 import { Asset, assetFromString } from '@xchainjs/xchain-util'
 import ansis from 'ansis'
 import axios from 'axios'
@@ -15,7 +16,6 @@ import prettier from 'prettier'
 
 import { writeFile, readFile } from '../src/main/utils/file'
 import { ERC20Whitelist, erc20WhitelistIO } from '../src/renderer/services/thorchain/types'
-import { ETHChain } from '../src/shared/utils/chain'
 
 const WHITELIST_URL =
   'https://gitlab.com/thorchain/thornode/-/raw/release-1.97.2/common/tokenlist/ethtokens/eth_mainnet_V97.json'

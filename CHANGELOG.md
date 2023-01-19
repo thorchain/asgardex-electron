@@ -14,6 +14,10 @@
 - Upgrade types / endpoints to latest THORNode@1.102.0 [#2525](https://github.com/thorchain/asgardex-electron/pull/2525)
 - Upgrade types / endpoints to latest THORNode@1.103.0 [#2526](https://github.com/thorchain/asgardex-electron/pull/2526)
 
+## Internal
+
+- Misc. updates/refactor to support latest xchain-\* [#2527](https://github.com/thorchain/asgardex-electron/pull/2527), [#2528](https://github.com/thorchain/asgardex-electron/pull/2528), [#2529](https://github.com/thorchain/asgardex-electron/pull/2529)
+
 # 1.18.6 (2023-01-02)
 
 ## Update

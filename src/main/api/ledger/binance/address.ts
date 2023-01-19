@@ -1,11 +1,10 @@
 import { crypto } from '@binance-chain/javascript-sdk'
 import AppBNB from '@binance-chain/javascript-sdk/lib/ledger/ledger-app'
 import type Transport from '@ledgerhq/hw-transport'
-import { getDerivePath, getPrefix } from '@xchainjs/xchain-binance'
+import { BNBChain, getDerivePath, getPrefix } from '@xchainjs/xchain-binance'
 import * as E from 'fp-ts/Either'
 
 import { LedgerError, LedgerErrorId, Network } from '../../../../shared/api/types'
-import { BNBChain } from '../../../../shared/utils/chain'
 import { toClientNetwork } from '../../../../shared/utils/client'
 import { isError } from '../../../../shared/utils/guard'
 import { WalletAddress } from '../../../../shared/wallet/types'

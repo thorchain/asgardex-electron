@@ -23,7 +23,8 @@ export const poolOutboundFee$ = (asset: Asset): PoolFeeLD => {
       liveData.map((fees) => ({ amount: fees.fast.times(3), asset: AssetRuneNative }))
     )
   } else {
-    return outboundAssetFeeByChain$(asset.chain)
+    const { chain } = asset
+    return outboundAssetFeeByChain$(chain)
   }
 }
 /**

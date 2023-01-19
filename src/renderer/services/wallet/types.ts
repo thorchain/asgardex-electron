@@ -1,7 +1,7 @@
 import * as RD from '@devexperts/remote-data-ts'
 import { Balance, Tx, TxHash } from '@xchainjs/xchain-client'
 import { Keystore } from '@xchainjs/xchain-crypto'
-import { Address, Asset } from '@xchainjs/xchain-util'
+import { Address, Asset, Chain } from '@xchainjs/xchain-util'
 import { getMonoid } from 'fp-ts/Array'
 import * as FP from 'fp-ts/lib/function'
 import { NonEmptyArray } from 'fp-ts/lib/NonEmptyArray'
@@ -10,7 +10,7 @@ import * as Rx from 'rxjs'
 
 import { KeystoreWallet, KeystoreWallets } from '../../../shared/api/io'
 import { KeystoreId, LedgerError, Network } from '../../../shared/api/types'
-import { Chain } from '../../../shared/utils/chain'
+import { EnabledChain } from '../../../shared/utils/chain'
 import { HDMode, WalletAddress, WalletBalanceType, WalletType } from '../../../shared/wallet/types'
 import { LiveData } from '../../helpers/rx/liveData'
 import { LoadTxsParams, WalletBalancesLD, WalletBalancesRD } from '../clients'
@@ -149,7 +149,7 @@ export type BalancesState = {
   loading: boolean
 }
 
-export type BalancesStateFilter = Record<Chain, WalletBalanceType>
+export type BalancesStateFilter = Record<EnabledChain, WalletBalanceType>
 export type BalancesState$ = (filter: BalancesStateFilter) => Rx.Observable<BalancesState>
 
 export type LoadTxsHandler = (props: LoadTxsParams) => void

@@ -1,7 +1,6 @@
-import { Address } from '@xchainjs/xchain-util'
+import { Address, Chain } from '@xchainjs/xchain-util'
 
 import { EthHDMode } from '../ethereum/types'
-import { Chain } from '../utils/chain'
 
 export type WalletType = 'keystore' | 'ledger'
 

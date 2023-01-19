@@ -2,6 +2,14 @@ import React, { useEffect, useMemo, useRef } from 'react'
 
 import { SyncOutlined } from '@ant-design/icons'
 import * as RD from '@devexperts/remote-data-ts'
+import { BNBChain } from '@xchainjs/xchain-binance'
+import { BTCChain } from '@xchainjs/xchain-bitcoin'
+import { BCHChain } from '@xchainjs/xchain-bitcoincash'
+import { GAIAChain } from '@xchainjs/xchain-cosmos'
+import { DOGEChain } from '@xchainjs/xchain-doge'
+import { ETHChain } from '@xchainjs/xchain-ethereum'
+import { LTCChain } from '@xchainjs/xchain-litecoin'
+import { Chain } from '@xchainjs/xchain-util'
 import * as FP from 'fp-ts/function'
 import * as A from 'fp-ts/lib/Array'
 import * as O from 'fp-ts/Option'
@@ -9,7 +17,6 @@ import { useObservableState } from 'observable-hooks'
 import { useIntl } from 'react-intl'
 
 import { DEFAULT_LOCALE } from '../../../shared/i18n/const'
-import { BCHChain, BNBChain, BTCChain, Chain, CosmosChain, ETHChain, LTCChain } from '../../../shared/utils/chain'
 import { envOrDefault } from '../../../shared/utils/env'
 import { Footer } from '../../components/footer'
 import { Header } from '../../components/header'
@@ -118,7 +125,10 @@ export const AppView: React.FC = (): JSX.Element => {
               pauseLpLtc,
               haltCosmosChain,
               haltCosmosTrading,
-              pauseLpCosmos
+              pauseLpCosmos,
+              haltDogeChain,
+              haltDogeTrading,
+              pauseLpDoge
             }
           }) => {
             let msg = ''
@@ -158,10 +168,16 @@ export const AppView: React.FC = (): JSX.Element => {
                   pausedLP: pauseLpBnb
                 },
                 {
-                  chain: CosmosChain,
+                  chain: GAIAChain,
                   haltedChain: haltCosmosChain,
                   haltedTrading: haltCosmosTrading,
                   pausedLP: pauseLpCosmos
+                },
+                {
+                  chain: DOGEChain,
+                  haltedChain: haltDogeChain,
+                  haltedTrading: haltDogeTrading,
+                  pausedLP: pauseLpDoge
                 }
               ]
 

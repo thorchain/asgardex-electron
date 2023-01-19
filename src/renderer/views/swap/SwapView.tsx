@@ -1,7 +1,9 @@
 import React, { useCallback, useEffect, useMemo } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
-import { Address, Asset, assetToString, bn } from '@xchainjs/xchain-util'
+import { BTCChain } from '@xchainjs/xchain-bitcoin'
+import { THORChain } from '@xchainjs/xchain-thorchain'
+import { Address, Asset, assetToString, bn, Chain } from '@xchainjs/xchain-util'
 import { Spin } from 'antd'
 import * as FP from 'fp-ts/function'
 import * as A from 'fp-ts/lib/Array'
@@ -14,7 +16,6 @@ import * as RxOp from 'rxjs/operators'
 
 import { Network } from '../../../shared/api/types'
 import { AssetRuneNative } from '../../../shared/utils/asset'
-import { Chain, THORChain } from '../../../shared/utils/chain'
 import { isLedgerWallet, isWalletType } from '../../../shared/utils/guard'
 import { WalletType } from '../../../shared/wallet/types'
 import { ErrorView } from '../../components/shared/error/'
@@ -145,7 +146,7 @@ const SuccessRouteView: React.FC<Props> = ({
     () =>
       balancesState$({
         ...DEFAULT_BALANCES_FILTER,
-        [Chain.Bitcoin]: 'confirmed'
+        [BTCChain]: 'confirmed'
       }),
     INITIAL_BALANCES_STATE
   )
@@ -265,16 +266,6 @@ const SuccessRouteView: React.FC<Props> = ({
     navigate(walletRoutes.base.path(location.pathname))
   }, [location.pathname, navigate])
 
-  const targetAssetChain = useMemo(
-    () =>
-      FP.pipe(
-        targetAssetRD,
-        RD.map(({ asset }) => asset.chain),
-        RD.getOrElse(() => THORChain)
-      ),
-    [targetAssetRD]
-  )
-
   const [oTargetLedgerAddress, updateTargetLedgerAddress$] = useObservableState<O.Option<Address>, UpdateLedgerAddress>(
     (targetLedgerAddressChain$) =>
       FP.pipe(
@@ -320,8 +311,8 @@ const SuccessRouteView: React.FC<Props> = ({
     O.alt(() => (isTargetLedger ? oTargetLedgerAddress : oTargetKeystoreAddress))
   )
 
-  const { validateSwapAddress } = useValidateAddress(targetAssetChain)
-  const openAddressUrl = useOpenAddressUrl(targetAssetChain)
+  const { validateSwapAddress } = useValidateAddress(targetChain)
+  const openAddressUrl = useOpenAddressUrl(targetChain)
 
   return (
     <>
@@ -375,8 +366,6 @@ const SuccessRouteView: React.FC<Props> = ({
                 PoolHelpers.disableTradingActions({ chain, haltedChains, mimirHalt })
 
               const checkDisableSwapAction = () => {
-                const sourceChain = sourceAsset.asset.chain
-                const targetChain = targetAsset.asset.chain
                 return (
                   disableAllPoolActions(sourceChain) ||
                   disableTradingPoolActions(sourceChain) ||

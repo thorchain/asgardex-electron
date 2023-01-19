@@ -1,5 +1,13 @@
 import * as RD from '@devexperts/remote-data-ts'
-import { Address } from '@xchainjs/xchain-util'
+import { BNBChain } from '@xchainjs/xchain-binance'
+import { BTCChain } from '@xchainjs/xchain-bitcoin'
+import { BCHChain } from '@xchainjs/xchain-bitcoincash'
+import { GAIAChain } from '@xchainjs/xchain-cosmos'
+import { DOGEChain } from '@xchainjs/xchain-doge'
+import { ETHChain } from '@xchainjs/xchain-ethereum'
+import { LTCChain } from '@xchainjs/xchain-litecoin'
+import { THORChain } from '@xchainjs/xchain-thorchain'
+import { Address, Chain } from '@xchainjs/xchain-util'
 import * as A from 'fp-ts/lib/Array'
 import * as FP from 'fp-ts/lib/function'
 import * as NEA from 'fp-ts/lib/NonEmptyArray'
@@ -9,18 +17,7 @@ import * as RxOp from 'rxjs/operators'
 
 import { Network } from '../../../shared/api/types'
 import { AssetBNB } from '../../../shared/utils/asset'
-import {
-  AvalancheChain,
-  BCHChain,
-  BNBChain,
-  BTCChain,
-  Chain,
-  CosmosChain,
-  DOGEChain,
-  ETHChain,
-  LTCChain,
-  THORChain
-} from '../../../shared/utils/chain'
+import { isEnabledChain } from '../../../shared/utils/chain'
 import { HDMode, WalletAddress, WalletBalanceType, WalletType } from '../../../shared/wallet/types'
 import { getBnbRuneAsset } from '../../helpers/assetHelper'
 import { filterEnabledChains } from '../../helpers/chainHelper'
@@ -76,6 +73,8 @@ export const createBalancesService = ({
 
   // Returns lazy functions to reload balances by given chain
   const reloadBalancesByChain = (chain: Chain) => {
+    if (!isEnabledChain(chain)) return FP.constVoid
+
     switch (chain) {
       case BNBChain:
         return BNB.reloadBalances
@@ -91,11 +90,8 @@ export const createBalancesService = ({
         return LTC.reloadBalances
       case DOGEChain:
         return DOGE.reloadBalances
-      case CosmosChain:
+      case GAIAChain:
         return COSMOS.reloadBalances
-      case AvalancheChain:
-        // AVAX is not supported yet
-        return FP.constVoid
     }
   }
 
@@ -112,6 +108,15 @@ export const createBalancesService = ({
     hdMode: HDMode
     walletBalanceType: WalletBalanceType
   }): ChainBalancesService => {
+    if (!isEnabledChain(chain)) {
+      return {
+        reloadBalances: FP.constVoid,
+        resetReloadBalances: FP.constVoid,
+        balances$: Rx.EMPTY,
+        reloadBalances$: Rx.EMPTY
+      }
+    }
+
     switch (chain) {
       case BNBChain:
         return {
@@ -168,19 +173,12 @@ export const createBalancesService = ({
           balances$: DOGE.balances$({ walletType, walletIndex, hdMode }),
           reloadBalances$: DOGE.reloadBalances$
         }
-      case CosmosChain:
+      case GAIAChain:
         return {
           reloadBalances: COSMOS.reloadBalances,
           resetReloadBalances: COSMOS.resetReloadBalances,
           balances$: COSMOS.balances$({ walletType, walletIndex, hdMode }),
           reloadBalances$: COSMOS.reloadBalances$
-        }
-      default:
-        return {
-          reloadBalances: FP.constVoid,
-          resetReloadBalances: FP.constVoid,
-          balances$: Rx.EMPTY,
-          reloadBalances$: Rx.EMPTY
         }
     }
   }
@@ -572,7 +570,7 @@ export const createBalancesService = ({
   const cosmosChainBalance$: ChainBalance$ = Rx.combineLatest([
     COSMOS.addressUI$,
     getChainBalance$({
-      chain: CosmosChain,
+      chain: GAIAChain,
       walletType: 'keystore',
       walletIndex: 0, // walletIndex=0 (as long as we don't support HD wallets for keystore)
       hdMode: 'default',
@@ -581,7 +579,7 @@ export const createBalancesService = ({
   ]).pipe(
     RxOp.map<[O.Option<WalletAddress>, WalletBalancesRD], ChainBalance>(([oWalletAddress, balances]) => ({
       walletType: 'keystore',
-      chain: CosmosChain,
+      chain: GAIAChain,
       walletAddress: addressFromOptionalWalletAddress(oWalletAddress),
       walletIndex: 0, // Always 0 as long as we don't support HD wallets for keystore
       balances,
@@ -593,7 +591,7 @@ export const createBalancesService = ({
    * Cosmos Ledger balances
    */
   const cosmosLedgerChainBalance$: ChainBalance$ = ledgerChainBalance$({
-    chain: CosmosChain,
+    chain: GAIAChain,
     walletBalanceType: 'all',
     getBalanceByAddress$: COSMOS.getBalanceByAddress$
   })
@@ -655,7 +653,7 @@ export const createBalancesService = ({
           chainBalances,
           // filter balances by given `filter`
           A.filter(({ balancesType, chain }) => {
-            if (filter[chain]) return balancesType === filter[chain]
+            if (isEnabledChain(chain) && filter[chain]) return balancesType === filter[chain]
 
             return true
           }),

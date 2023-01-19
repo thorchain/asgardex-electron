@@ -12,7 +12,7 @@ import * as RxOp from 'rxjs/operators'
 
 import { add9Rheader } from '../../../shared/api/ninerealms'
 import { AssetRuneNative } from '../../../shared/utils/asset'
-import { isChain } from '../../../shared/utils/chain'
+import { isEnabledChain } from '../../../shared/utils/chain'
 import { ZERO_BASE_AMOUNT } from '../../const'
 import { THORCHAIN_DECIMAL } from '../../helpers/assetHelper'
 import { sequenceTOption } from '../../helpers/fpHelpers'
@@ -89,7 +89,7 @@ export const createThornodeService$ = (network$: Network$, clientUrl$: ClientUrl
               A.filterMap(({ chain, address, ...rest }) =>
                 // validate chain
                 chain !== undefined &&
-                isChain(chain) &&
+                isEnabledChain(chain) &&
                 // address is required
                 !!address
                   ? O.some({ chain, address, ...rest })

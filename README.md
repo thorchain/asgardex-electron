@@ -185,16 +185,6 @@ REACT_APP_WALLET_PASSWORD=password yarn dev
 
 Or add to `REACT_APP_WALLET_PASSWORD=password` to `.env` file and run `yarn dev`
 
-### How to enable (more) chains for development
-
-Add chains you want to have for development to `REACT_APP_CHAINS_ENABLED`, for example
-
-```bash
-REACT_APP_CHAINS_ENABLED=THOR,BNB,BTC,LTC,BCH,ETH,DOGE,GAIA
-```
-
-Note: String of chains have to be as same as [definitions in xchain-util](https://github.com/xchainjs/xchainjs-lib/blob/master/packages/xchain-util/src/chain.const.ts)
-
 ## Tests
 
 ### `unit`

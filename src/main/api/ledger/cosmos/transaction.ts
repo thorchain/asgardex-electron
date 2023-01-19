@@ -1,5 +1,5 @@
 import { AminoMsgSend, AminoTypes, Coin } from '@cosmjs/stargate'
-import { cosmosclient, proto, rest } from '@cosmos-client/core'
+import cosmosclient from '@cosmos-client/core'
 import CosmosApp from '@ledgerhq/hw-app-cosmos'
 import type Transport from '@ledgerhq/hw-transport'
 import { TxHash } from '@xchainjs/xchain-client'
@@ -29,7 +29,11 @@ const aminoTypes = new AminoTypes({
   // `AminoConverter` for `MsgSend` needed only as we don't handle other Msg here
   '/cosmos.bank.v1beta1.MsgSend': {
     aminoType: 'cosmos-sdk/MsgSend',
-    toAmino: ({ from_address, to_address, amount }: proto.cosmos.bank.v1beta1.MsgSend): AminoMsgSend['value'] => ({
+    toAmino: ({
+      from_address,
+      to_address,
+      amount
+    }: cosmosclient.proto.cosmos.bank.v1beta1.MsgSend): AminoMsgSend['value'] => ({
       from_address,
       to_address,
       amount:
@@ -153,14 +157,14 @@ export const send = async ({
 
     const txBody = protoTxBody({ from: sender, to: recipient, amount, denom, memo })
 
-    const secPubKey = new proto.cosmos.crypto.secp256k1.PubKey()
+    const secPubKey = new cosmosclient.proto.cosmos.crypto.secp256k1.PubKey()
     secPubKey.key = new Uint8Array(Buffer.from(publicKey, 'hex'))
 
     const authInfo = protoAuthInfo({
       pubKey: secPubKey,
       sequence,
       fee,
-      mode: proto.cosmos.tx.signing.v1beta1.SignMode.SIGN_MODE_LEGACY_AMINO_JSON
+      mode: cosmosclient.proto.cosmos.tx.signing.v1beta1.SignMode.SIGN_MODE_LEGACY_AMINO_JSON
     })
 
     const secpSignature = secp256k1.signatureImport(new Uint8Array(sigResult.signature))
@@ -168,9 +172,9 @@ export const send = async ({
     const txBuilder = new cosmosclient.TxBuilder(sdk.sdk, txBody, authInfo)
     txBuilder.addSignature(secpSignature)
 
-    const res = await rest.tx.broadcastTx(sdk.sdk, {
+    const res = await cosmosclient.rest.tx.broadcastTx(sdk.sdk, {
       tx_bytes: txBuilder.txBytes(),
-      mode: rest.tx.BroadcastTxMode.Sync
+      mode: cosmosclient.rest.tx.BroadcastTxMode.Sync
     })
 
     if (res?.data?.tx_response?.code !== 0) {

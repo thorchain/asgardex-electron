@@ -1,11 +1,19 @@
 import * as RD from '@devexperts/remote-data-ts'
 import { PoolData } from '@thorchain/asgardex-util'
+import { BNBChain } from '@xchainjs/xchain-binance'
 import { BTC_DECIMAL } from '@xchainjs/xchain-bitcoin'
+import { BTCChain } from '@xchainjs/xchain-bitcoin'
 import { BCH_DECIMAL } from '@xchainjs/xchain-bitcoincash'
+import { BCHChain } from '@xchainjs/xchain-bitcoincash'
 import { COSMOS_DECIMAL } from '@xchainjs/xchain-cosmos'
+import { GAIAChain } from '@xchainjs/xchain-cosmos'
 import { DOGE_DECIMAL } from '@xchainjs/xchain-doge'
+import { DOGEChain } from '@xchainjs/xchain-doge'
 import { ETH_DECIMAL } from '@xchainjs/xchain-ethereum'
+import { ETHChain } from '@xchainjs/xchain-ethereum'
 import { LTC_DECIMAL } from '@xchainjs/xchain-litecoin'
+import { LTCChain } from '@xchainjs/xchain-litecoin'
+import { THORChain } from '@xchainjs/xchain-thorchain'
 import {
   assetFromString,
   bnOrZero,
@@ -17,25 +25,15 @@ import {
   BaseAmount,
   Address
 } from '@xchainjs/xchain-util'
+import { Chain } from '@xchainjs/xchain-util'
 import * as A from 'fp-ts/lib/Array'
 import * as FP from 'fp-ts/lib/function'
 import * as NEA from 'fp-ts/lib/NonEmptyArray'
 import * as O from 'fp-ts/lib/Option'
 import * as P from 'fp-ts/lib/Predicate'
 
-import { AssetAtom, AssetBCH, AssetBNB, AssetBTC, AssetDOGE, AssetETH, AssetLTC } from '../../../shared/utils/asset'
-import {
-  AvalancheChain,
-  BCHChain,
-  BNBChain,
-  BTCChain,
-  Chain,
-  CosmosChain,
-  DOGEChain,
-  ETHChain,
-  LTCChain,
-  THORChain
-} from '../../../shared/utils/chain'
+import { AssetATOM, AssetBCH, AssetBNB, AssetBTC, AssetDOGE, AssetETH, AssetLTC } from '../../../shared/utils/asset'
+import { isEnabledChain } from '../../../shared/utils/chain'
 import { optionFromNullableString } from '../../../shared/utils/fp'
 import { BNB_DECIMAL, convertBaseAmountDecimal, isUSDAsset, THORCHAIN_DECIMAL } from '../../helpers/assetHelper'
 import { isMiniToken } from '../../helpers/binanceHelper'
@@ -224,6 +222,8 @@ export const getOutboundAssetFeeByChain = (
     O.chain(O.fromPredicate(isValidBN)),
     // Convert fee values to `BaseAmount` to put into `AssetWithAmount`
     O.chain((value) => {
+      if (!isEnabledChain(chain)) return O.none
+
       switch (chain) {
         case BNBChain:
           return O.some({
@@ -257,17 +257,14 @@ export const getOutboundAssetFeeByChain = (
             asset: AssetETH
           })
         }
-        case CosmosChain: {
+        case GAIAChain: {
           // Convertion of decimal needed: 1e8 (by default in THORChain) -> 1e6 (COSMOS)
           const amount = convertBaseAmountDecimal(baseAmount(value, THORCHAIN_DECIMAL), COSMOS_DECIMAL)
           return O.some({
             amount,
-            asset: AssetAtom
+            asset: AssetATOM
           })
         }
-        // AVAX is not supported yet
-        case AvalancheChain:
-          return O.none
         // 'THORChain can be ignored - fees for asset side only
         case THORChain:
           return O.none

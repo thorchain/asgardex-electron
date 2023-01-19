@@ -1,31 +1,32 @@
 import * as RD from '@devexperts/remote-data-ts'
+import { BNBChain } from '@xchainjs/xchain-binance'
 import { BTC_DECIMAL } from '@xchainjs/xchain-bitcoin'
+import { BTCChain } from '@xchainjs/xchain-bitcoin'
 import { BCH_DECIMAL } from '@xchainjs/xchain-bitcoincash'
+import { BCHChain } from '@xchainjs/xchain-bitcoincash'
 import { COSMOS_DECIMAL } from '@xchainjs/xchain-cosmos'
+import { GAIAChain } from '@xchainjs/xchain-cosmos'
 import { DOGE_DECIMAL } from '@xchainjs/xchain-doge'
+import { DOGEChain } from '@xchainjs/xchain-doge'
+import { ETHChain } from '@xchainjs/xchain-ethereum'
 import { LTC_DECIMAL } from '@xchainjs/xchain-litecoin'
+import { LTCChain } from '@xchainjs/xchain-litecoin'
+import { THORChain } from '@xchainjs/xchain-thorchain'
 import { Asset } from '@xchainjs/xchain-util'
 import * as Rx from 'rxjs'
 import * as RxOp from 'rxjs/operators'
 
 import { Network } from '../../../shared/api/types'
-import {
-  AvalancheChain,
-  BCHChain,
-  BNBChain,
-  BTCChain,
-  CosmosChain,
-  DOGEChain,
-  ETHChain,
-  LTCChain,
-  THORChain
-} from '../../../shared/utils/chain'
+import { isEnabledChain } from '../../../shared/utils/chain'
 import { BNB_DECIMAL, THORCHAIN_DECIMAL } from '../../helpers/assetHelper'
 import { getERC20Decimal } from '../ethereum/common'
 import { AssetWithDecimalLD } from './types'
 
 const getDecimal = (asset: Asset, network: Network): Promise<number> => {
-  switch (asset.chain) {
+  const { chain } = asset
+  if (!isEnabledChain(chain)) return Promise.reject(`${chain} is not supported for 'getDecimal'`)
+
+  switch (chain) {
     case BNBChain:
       return Promise.resolve(BNB_DECIMAL)
     case BTCChain:
@@ -36,15 +37,12 @@ const getDecimal = (asset: Asset, network: Network): Promise<number> => {
       return Promise.resolve(THORCHAIN_DECIMAL)
     case DOGEChain:
       return Promise.resolve(DOGE_DECIMAL)
-    case CosmosChain:
+    case GAIAChain:
       return Promise.resolve(COSMOS_DECIMAL)
     case BCHChain:
       return Promise.resolve(BCH_DECIMAL)
     case LTCChain:
       return Promise.resolve(LTC_DECIMAL)
-    case AvalancheChain: {
-      return Promise.reject('AVAX is not supported yet')
-    }
   }
 }
 

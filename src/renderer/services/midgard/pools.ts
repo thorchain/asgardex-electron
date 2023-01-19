@@ -1,5 +1,5 @@
 import * as RD from '@devexperts/remote-data-ts'
-import { Asset, assetFromString, assetToString, bn, currencySymbolByAsset } from '@xchainjs/xchain-util'
+import { Asset, assetFromString, assetToString, bn, Chain, currencySymbolByAsset } from '@xchainjs/xchain-util'
 import BigNumber from 'bignumber.js'
 import * as A from 'fp-ts/Array'
 import * as FP from 'fp-ts/lib/function'
@@ -9,10 +9,10 @@ import * as O from 'fp-ts/Option'
 import * as Rx from 'rxjs'
 import * as RxOp from 'rxjs/operators'
 
-import { Chain } from '../../../shared/utils/chain'
+import { isEnabledChain } from '../../../shared/utils/chain'
 import { DEFAULT_GET_POOLS_PERIOD, ONE_BN, PRICE_POOLS_WHITELIST } from '../../const'
 import { validAssetForETH, isPricePoolAsset, midgardAssetFromString } from '../../helpers/assetHelper'
-import { isEnabledChain, isEthChain } from '../../helpers/chainHelper'
+import { isEthChain } from '../../helpers/chainHelper'
 import { eqAsset, eqOAsset, eqOPoolAddresses, eqHaltedChain } from '../../helpers/fp/eq'
 import { sequenceTOption } from '../../helpers/fpHelpers'
 import { LiveData, liveData } from '../../helpers/rx/liveData'
@@ -138,7 +138,7 @@ const createPoolsService = ({
         FP.pipe(
           api.getPools({ ...request, period }),
           RxOp.map(RD.success),
-          // Filter `PoolDetails`by using enabled chains only (defined via ENV)
+          // Filter `PoolDetails`by using enabled chains only
           liveData.map(
             A.filter(({ asset }) =>
               FP.pipe(
@@ -310,7 +310,7 @@ const createPoolsService = ({
       apiGetPoolsAll$,
       // Filter out all unknown / invalid assets created from asset strings
       liveData.map(A.filterMap(({ asset }) => FP.pipe(asset, assetFromString, O.fromNullable))),
-      // Filter pools by using enabled chains only (defined via ENV)
+      // Filter pools by using enabled chains only
       liveData.map(A.filter(({ chain }) => isEnabledChain(chain))),
       RxOp.shareReplay(1)
     )
@@ -345,7 +345,7 @@ const createPoolsService = ({
             pools,
             // Filter out all unknown / invalid assets created from asset strings
             RD.map(A.filterMap(({ asset }) => FP.pipe(asset, assetFromString, O.fromNullable))),
-            // Filter pools by using enabled chains only (defined via ENV)
+            // Filter pools by using enabled chains only
             RD.map(A.filter(({ chain }) => isEnabledChain(chain))),
             // Filter pools based on ERC20Whitelist (mainnet + ETHChain only)
             RD.map(A.filter((asset) => !isEthChain(asset.chain) || validAssetForETH(asset, network)))
@@ -417,7 +417,7 @@ const createPoolsService = ({
             pools,
             // Filter out all unknown / invalid assets created from asset strings
             RD.map(A.filterMap(({ asset }) => FP.pipe(asset, assetFromString, O.fromNullable))),
-            // Filter pools by using enabled chains only (defined via ENV)
+            // Filter pools by using enabled chains only
             RD.map(A.filter(({ chain }) => isEnabledChain(chain))),
             // Filter pools based on ERC20Whitelist (mainnet + ETH only)
             RD.map(A.filter((asset) => !isEthChain(asset.chain) || validAssetForETH(asset, network)))

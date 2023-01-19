@@ -1,10 +1,10 @@
-import { Asset, assetToString, BaseAmount } from '@xchainjs/xchain-util'
+import { Asset, assetToString, BaseAmount, Chain } from '@xchainjs/xchain-util'
 import BigNumber from 'bignumber.js'
 import * as N from 'fp-ts/lib/number'
 import * as Ord from 'fp-ts/lib/Ord'
 import * as S from 'fp-ts/lib/string'
 
-import { Chain } from '../../../shared/utils/chain'
+import { isEnabledChain } from '../../../shared/utils/chain'
 import { WalletAddress } from '../../../shared/wallet/types'
 import { CURRENCY_WEIGHTS, CHAIN_WEIGHTS } from '../../const'
 import { WalletBalance } from '../../services/wallet/types'
@@ -56,7 +56,11 @@ export const ordWalletBalanceByAsset: Ord.Ord<WalletBalance> = {
 export const ordWalletAddressByChain: Ord.Ord<WalletAddress> = {
   equals: (x, y) => eqChain.equals(x.chain, y.chain),
   // comparing chains by its weights
-  compare: (x, y) => ordNumber.compare(CHAIN_WEIGHTS[x.chain] || 0, CHAIN_WEIGHTS[y.chain] || 0)
+  compare: (x, y) =>
+    ordNumber.compare(
+      isEnabledChain(x.chain) ? CHAIN_WEIGHTS[x.chain] : 0,
+      isEnabledChain(y.chain) ? CHAIN_WEIGHTS[y.chain] : 0
+    )
 }
 
 /**

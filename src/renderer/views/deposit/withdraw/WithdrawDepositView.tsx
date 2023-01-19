@@ -1,7 +1,9 @@
 import React, { useCallback, useMemo } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
-import { Asset, BaseAmount, bn, BTCChain } from '@xchainjs/xchain-util'
+import { BTCChain } from '@xchainjs/xchain-bitcoin'
+import { THORChain } from '@xchainjs/xchain-thorchain'
+import { Asset, BaseAmount, bn } from '@xchainjs/xchain-util'
 import BigNumber from 'bignumber.js'
 import * as FP from 'fp-ts/function'
 import * as O from 'fp-ts/lib/Option'
@@ -11,7 +13,6 @@ import * as RxOp from 'rxjs/operators'
 
 import { Network } from '../../../../shared/api/types'
 import { AssetRuneNative } from '../../../../shared/utils/asset'
-import { THORChain } from '../../../../shared/utils/chain'
 import { Withdraw } from '../../../components/deposit/withdraw'
 import { ZERO_BASE_AMOUNT, ZERO_BN } from '../../../const'
 import { useAppContext } from '../../../contexts/AppContext'

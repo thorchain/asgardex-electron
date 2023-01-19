@@ -60,6 +60,8 @@ export const AssetDetails: React.FC<Props> = (props): JSX.Element => {
 
   const [currentPage, setCurrentPage] = useState(1)
 
+  const { chain } = asset
+
   const navigate = useNavigate()
   const intl = useIntl()
 
@@ -235,12 +237,9 @@ export const AssetDetails: React.FC<Props> = (props): JSX.Element => {
             as long as an external API can't provide it - currently `https://lcd-cosmoshub.keplr.app`
             See https://github.com/thorchain/asgardex-electron/pull/2405
            */}
-          {isCosmosChain(asset.chain) ? (
+          {isCosmosChain(chain) ? (
             <WarningView
-              subTitle={intl.formatMessage(
-                { id: 'wallet.txs.history.disabled' },
-                { chain: chainToString(asset.chain) }
-              )}
+              subTitle={intl.formatMessage({ id: 'wallet.txs.history.disabled' }, { chain: chainToString(chain) })}
               extra={
                 <FlatButton size="normal" color="neutral" onClick={openExplorerAddressUrl}>
                   {intl.formatMessage({ id: 'wallet.txs.history' })}
@@ -253,7 +252,7 @@ export const AssetDetails: React.FC<Props> = (props): JSX.Element => {
               txsPageRD={txsPageRD}
               clickTxLinkHandler={openExplorerTxUrl}
               changePaginationHandler={onChangePagination}
-              chain={asset.chain}
+              chain={chain}
               network={network}
               walletAddress={walletAddress}
               reloadHandler={reloadTxs}
