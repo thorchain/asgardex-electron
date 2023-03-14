@@ -33,6 +33,7 @@ const clientState$: ClientState$ = FP.pipe(
               const client = new Client({
                 network,
                 phrase,
+                sochainApiKey: ``,
                 nodeUrls: getLTCNodeUrls(),
                 nodeAuth: getLTCNodeAuth(),
                 sochainUrl: getSochainUrl()

@@ -4,6 +4,8 @@ import { Client as BtcClient } from '@xchainjs/xchain-bitcoin'
 import { MOCK_PHRASE } from '../../shared/mock/wallet'
 import { isBnbClient } from './clientHelper'
 
+const sochainApiKey = ''
+
 describe('helpers/clientHelper', () => {
   describe('isBnbClient', () => {
     it('returns true for BNB client', () => {
@@ -11,7 +13,7 @@ describe('helpers/clientHelper', () => {
       expect(isBnbClient(client)).toBeTruthy()
     })
     it('returns false for BTC client', () => {
-      const client = new BtcClient({ phrase: MOCK_PHRASE })
+      const client = new BtcClient({ phrase: MOCK_PHRASE, sochainApiKey: sochainApiKey })
       expect(isBnbClient(client)).toBeFalsy()
     })
   })

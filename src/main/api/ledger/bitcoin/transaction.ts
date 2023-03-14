@@ -64,8 +64,9 @@ export const send = async ({
     const spendPendingUTXO = !memo
 
     const haskoinUrl = getHaskoinBTCApiUrl()[network]
-
+    const apiKey = '' //
     const { psbt, utxos } = await buildTx({
+      apiKey,
       amount,
       recipient,
       memo,
@@ -74,8 +75,7 @@ export const send = async ({
       network: clientNetwork,
       sochainUrl: getSochainUrl(),
       haskoinUrl,
-      spendPendingUTXO,
-      withTxHex: true
+      spendPendingUTXO
     })
 
     const inputs: Array<[Transaction, number, string | null, number | null]> = utxos.map(({ txHex, hash, index }) => {

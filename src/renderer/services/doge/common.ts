@@ -33,6 +33,7 @@ const clientState$: ClientState$ = FP.pipe(
             try {
               const client = new DogeClient({
                 sochainUrl: getSochainUrl(),
+                sochainApiKey: '',
                 blockcypherUrl: getBlockcypherUrl(),
                 network,
                 phrase

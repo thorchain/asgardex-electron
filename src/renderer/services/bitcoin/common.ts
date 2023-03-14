@@ -34,6 +34,7 @@ const clientState$: ClientState$ = FP.pipe(
               const client = new BitcoinClient({
                 network,
                 phrase,
+                sochainApiKey: '',
                 haskoinUrl: getHaskoinBTCApiUrl(),
                 sochainUrl: getSochainUrl()
               })

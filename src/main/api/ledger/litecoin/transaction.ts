@@ -54,16 +54,16 @@ export const send = async ({
     const app = new AppBTC({ transport, currency: 'litecoin' })
     const clientNetwork = toClientNetwork(network)
     const derivePath = getDerivationPath(walletIndex, clientNetwork)
-
+    const apiKey = ''
     const { psbt, utxos } = await buildTx({
+      apiKey,
       amount,
       recipient,
       memo,
       feeRate,
       sender,
       network: clientNetwork,
-      sochainUrl: getSochainUrl(),
-      withTxHex: true
+      sochainUrl: getSochainUrl()
     })
 
     const inputs: Array<[Transaction, number, string | null, number | null]> = utxos.map(({ txHex, hash, index }) => {
