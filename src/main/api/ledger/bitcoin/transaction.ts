@@ -1,9 +1,10 @@
 import AppBTC from '@ledgerhq/hw-app-btc'
 import { Transaction } from '@ledgerhq/hw-app-btc/lib/types'
 import Transport from '@ledgerhq/hw-transport'
-import { broadcastTx, buildTx, LOWER_FEE_BOUND, UPPER_FEE_BOUND } from '@xchainjs/xchain-bitcoin'
+import { buildTx, LOWER_FEE_BOUND, UPPER_FEE_BOUND } from '@xchainjs/xchain-bitcoin'
 import { checkFeeBounds, FeeRate, TxHash } from '@xchainjs/xchain-client'
 import { Address, BaseAmount } from '@xchainjs/xchain-util'
+import { broadcastTx } from '@xchainjs/xchain-utxo-providers'
 import * as Bitcoin from 'bitcoinjs-lib'
 import * as E from 'fp-ts/lib/Either'
 
@@ -64,9 +65,8 @@ export const send = async ({
     const spendPendingUTXO = !memo
 
     const haskoinUrl = getHaskoinBTCApiUrl()[network]
-    const apiKey = '' //
+
     const { psbt, utxos } = await buildTx({
-      apiKey,
       amount,
       recipient,
       memo,
@@ -102,7 +102,7 @@ export const send = async ({
       useTrustedInputForSegwit: true,
       additionals: ['bech32']
     })
-    const txHash = await broadcastTx({ txHex, haskoinUrl })
+    const txHash = await broadcastTx({ txHex, haskoinUrl, haskoinNetwork })
 
     if (!txHash) {
       return E.left({
