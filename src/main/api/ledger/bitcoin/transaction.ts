@@ -1,17 +1,15 @@
 import AppBTC from '@ledgerhq/hw-app-btc'
 import { Transaction } from '@ledgerhq/hw-app-btc/lib/types'
 import Transport from '@ledgerhq/hw-transport'
-import { buildTx, LOWER_FEE_BOUND, UPPER_FEE_BOUND } from '@xchainjs/xchain-bitcoin'
-import { checkFeeBounds, FeeRate, TxHash } from '@xchainjs/xchain-client'
+import { AssetBTC, BTCChain, Client, LOWER_FEE_BOUND, UPPER_FEE_BOUND } from '@xchainjs/xchain-bitcoin'
+import { checkFeeBounds, FeeRate, TxHash, Network } from '@xchainjs/xchain-client'
 import { Address, BaseAmount } from '@xchainjs/xchain-util'
-import { broadcastTx } from '@xchainjs/xchain-utxo-providers'
+import { HaskoinProvider, HaskoinNetwork } from '@xchainjs/xchain-utxo-providers'
 import * as Bitcoin from 'bitcoinjs-lib'
 import * as E from 'fp-ts/lib/Either'
 
 import { getHaskoinBTCApiUrl } from '../../../../shared/api/haskoin'
-import { getSochainUrl } from '../../../../shared/api/sochain'
-import { LedgerError, LedgerErrorId, Network } from '../../../../shared/api/types'
-import { toClientNetwork } from '../../../../shared/utils/client'
+import { LedgerError, LedgerErrorId } from '../../../../shared/api/types'
 import { isError } from '../../../../shared/utils/guard'
 import { getDerivationPath } from './common'
 
@@ -53,7 +51,7 @@ export const send = async ({
     // Example https://github.com/LedgerHQ/ledger-live/blob/37c0771329dd5a40dfe3430101bbfb100330f6bd/libs/ledger-live-common/src/families/bitcoin/hw-getAddress.ts#L17
     // BTC -> `bitcoin` https://github.com/LedgerHQ/ledger-live/blob/37c0771329dd5a40dfe3430101bbfb100330f6bd/libs/ledgerjs/packages/cryptoassets/src/currencies.ts#L287
     const app = new AppBTC({ transport, currency: 'bitcoin' })
-    const clientNetwork = toClientNetwork(network)
+    const clientNetwork = network
     const derivePath = getDerivationPath(walletIndex, clientNetwork)
 
     /**
@@ -64,17 +62,15 @@ export const send = async ({
      */
     const spendPendingUTXO = !memo
 
-    const haskoinUrl = getHaskoinBTCApiUrl()[network]
+    const btcClient = new Client()
+    btcClient.setNetwork(network)
 
-    const { psbt, utxos } = await buildTx({
+    const { psbt, utxos } = await btcClient.buildTx({
       amount,
       recipient,
       memo,
       feeRate,
       sender,
-      network: clientNetwork,
-      sochainUrl: getSochainUrl(),
-      haskoinUrl,
       spendPendingUTXO
     })
 
@@ -102,7 +98,11 @@ export const send = async ({
       useTrustedInputForSegwit: true,
       additionals: ['bech32']
     })
-    const txHash = await broadcastTx({ txHex, haskoinUrl, haskoinNetwork })
+
+    const haskoinUrl = getHaskoinBTCApiUrl()[network] //https://haskoin.ninerealms.com
+    const haskoinProvider = new HaskoinProvider(haskoinUrl, BTCChain, AssetBTC, 8, HaskoinNetwork.BTC)
+
+    const txHash = await haskoinProvider.broadcastTx(txHex)
 
     if (!txHash) {
       return E.left({

@@ -54,9 +54,8 @@ export const send = async ({
     const app = new AppBTC({ transport, currency: 'litecoin' })
     const clientNetwork = toClientNetwork(network)
     const derivePath = getDerivationPath(walletIndex, clientNetwork)
-    const apiKey = ''
     const { psbt, utxos } = await buildTx({
-      apiKey,
+      apiKey: '',
       amount,
       recipient,
       memo,
