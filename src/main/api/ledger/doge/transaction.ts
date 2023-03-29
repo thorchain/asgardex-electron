@@ -1,14 +1,15 @@
 import AppBTC from '@ledgerhq/hw-app-btc'
 import { Transaction } from '@ledgerhq/hw-app-btc/lib/types'
 import Transport from '@ledgerhq/hw-transport'
-import { checkFeeBounds, FeeRate, TxHash, Network } from '@xchainjs/xchain-client'
+import { checkFeeBounds, FeeRate, TxHash } from '@xchainjs/xchain-client'
 import { AssetDOGE, Client, DOGEChain, getSendTxUrl, LOWER_FEE_BOUND, UPPER_FEE_BOUND } from '@xchainjs/xchain-doge'
 import { Address, BaseAmount } from '@xchainjs/xchain-util'
 import { BlockcypherProvider, BlockcypherNetwork } from '@xchainjs/xchain-utxo-providers'
 import * as E from 'fp-ts/lib/Either'
 
 import { getBlockcypherUrl } from '../../../../shared/api/blockcypher'
-import { LedgerError, LedgerErrorId } from '../../../../shared/api/types'
+import { LedgerError, LedgerErrorId, Network } from '../../../../shared/api/types'
+import { toClientNetwork } from '../../../../shared/utils/client'
 import { isError } from '../../../../shared/utils/guard'
 import { getDerivationPath } from './common'
 
@@ -50,11 +51,11 @@ export const send = async ({
     // Example https://github.com/LedgerHQ/ledger-live/blob/37c0771329dd5a40dfe3430101bbfb100330f6bd/libs/ledger-live-common/src/families/bitcoin/hw-getAddress.ts#L17
     // DOGE -> `dogecoin` https://github.com/LedgerHQ/ledger-live/blob/37c0771329dd5a40dfe3430101bbfb100330f6bd/libs/ledgerjs/packages/cryptoassets/src/currencies.ts#L834
     const app = new AppBTC({ transport, currency: 'dogecoin' })
-    const clientNetwork = network
+    const clientNetwork = toClientNetwork(network)
     const derivePath = getDerivationPath(walletIndex, clientNetwork)
 
     const dogeClient = new Client()
-    dogeClient.setNetwork(network)
+    dogeClient.setNetwork(clientNetwork)
 
     const { psbt, utxos } = await dogeClient.buildTx({
       amount,

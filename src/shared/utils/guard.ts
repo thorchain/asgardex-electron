@@ -1,9 +1,10 @@
-import { FeeOption, Network } from '@xchainjs/xchain-client'
+import { FeeOption } from '@xchainjs/xchain-client'
 import { Asset, assetFromString, BaseAmount, Chain, isValidAsset } from '@xchainjs/xchain-util'
 import BigNumber from 'bignumber.js'
 import * as FP from 'fp-ts/lib/function'
 import * as IOG from 'io-ts/Guard'
 
+import { Network } from '../api/types'
 import { EthHDMode } from '../ethereum/types'
 import { HDMode, WalletType } from '../wallet/types'
 import { EnabledChain, isEnabledChain } from './chain'

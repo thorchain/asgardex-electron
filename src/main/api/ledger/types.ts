@@ -1,5 +1,6 @@
 import Transport from '@ledgerhq/hw-transport'
-import { Network } from '@xchainjs/xchain-client'
+
+import { Network } from '../../../shared/api/types'
 
 export type VerifyAddressHandler = (params: {
   transport: Transport

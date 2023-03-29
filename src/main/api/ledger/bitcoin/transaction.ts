@@ -2,14 +2,15 @@ import AppBTC from '@ledgerhq/hw-app-btc'
 import { Transaction } from '@ledgerhq/hw-app-btc/lib/types'
 import Transport from '@ledgerhq/hw-transport'
 import { AssetBTC, BTCChain, Client, LOWER_FEE_BOUND, UPPER_FEE_BOUND } from '@xchainjs/xchain-bitcoin'
-import { checkFeeBounds, FeeRate, TxHash, Network } from '@xchainjs/xchain-client'
+import { checkFeeBounds, FeeRate, TxHash } from '@xchainjs/xchain-client'
 import { Address, BaseAmount } from '@xchainjs/xchain-util'
 import { HaskoinProvider, HaskoinNetwork } from '@xchainjs/xchain-utxo-providers'
 import * as Bitcoin from 'bitcoinjs-lib'
 import * as E from 'fp-ts/lib/Either'
 
 import { getHaskoinBTCApiUrl } from '../../../../shared/api/haskoin'
-import { LedgerError, LedgerErrorId } from '../../../../shared/api/types'
+import { LedgerError, LedgerErrorId, Network } from '../../../../shared/api/types'
+import { toClientNetwork } from '../../../../shared/utils/client'
 import { isError } from '../../../../shared/utils/guard'
 import { getDerivationPath } from './common'
 
@@ -51,7 +52,7 @@ export const send = async ({
     // Example https://github.com/LedgerHQ/ledger-live/blob/37c0771329dd5a40dfe3430101bbfb100330f6bd/libs/ledger-live-common/src/families/bitcoin/hw-getAddress.ts#L17
     // BTC -> `bitcoin` https://github.com/LedgerHQ/ledger-live/blob/37c0771329dd5a40dfe3430101bbfb100330f6bd/libs/ledgerjs/packages/cryptoassets/src/currencies.ts#L287
     const app = new AppBTC({ transport, currency: 'bitcoin' })
-    const clientNetwork = network
+    const clientNetwork = toClientNetwork(network)
     const derivePath = getDerivationPath(walletIndex, clientNetwork)
 
     /**
@@ -63,7 +64,7 @@ export const send = async ({
     const spendPendingUTXO = !memo
 
     const btcClient = new Client()
-    btcClient.setNetwork(network)
+    btcClient.setNetwork(clientNetwork)
 
     const { psbt, utxos } = await btcClient.buildTx({
       amount,

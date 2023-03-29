@@ -1,5 +1,6 @@
 import * as RD from '@devexperts/remote-data-ts'
-import { BTCChain, Client as BitcoinClient } from '@xchainjs/xchain-bitcoin'
+import { AssetBTC, BTCChain, BTC_DECIMAL, Client as BitcoinClient, defaultBTCParams } from '@xchainjs/xchain-bitcoin'
+import { HaskoinNetwork, HaskoinProvider } from '@xchainjs/xchain-utxo-providers'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
 import * as Rx from 'rxjs'
@@ -7,7 +8,6 @@ import { Observable } from 'rxjs'
 import * as RxOp from 'rxjs/operators'
 
 import { getHaskoinBTCApiUrl } from '../../../shared/api/haskoin'
-import { getSochainUrl } from '../../../shared/api/sochain'
 import { isError } from '../../../shared/utils/guard'
 import { clientNetwork$ } from '../app/service'
 import * as C from '../clients'
@@ -31,13 +31,19 @@ const clientState$: ClientState$ = FP.pipe(
           getPhrase(keystore),
           O.map<string, ClientState>((phrase) => {
             try {
-              const client = new BitcoinClient({
-                network,
-                phrase,
-                sochainApiKey: '',
-                haskoinUrl: getHaskoinBTCApiUrl(),
-                sochainUrl: getSochainUrl()
-              })
+              const btcInitParams = {
+                ...defaultBTCParams,
+                phrase: phrase,
+                network: network,
+                haskoinProvider: new HaskoinProvider(
+                  getHaskoinBTCApiUrl()[network],
+                  BTCChain,
+                  AssetBTC,
+                  BTC_DECIMAL,
+                  HaskoinNetwork.BTC
+                )
+              }
+              const client = new BitcoinClient(btcInitParams)
               return RD.success(client)
             } catch (error) {
               console.error('Failed to create BTC client', error)

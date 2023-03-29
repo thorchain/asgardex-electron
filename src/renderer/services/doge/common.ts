@@ -1,13 +1,11 @@
 import * as RD from '@devexperts/remote-data-ts'
-import { Client as DogeClient, DOGEChain } from '@xchainjs/xchain-doge'
+import { Client as DogeClient, defaultDogeParams, DOGEChain } from '@xchainjs/xchain-doge'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
 import * as Rx from 'rxjs'
 import { Observable } from 'rxjs'
 import * as RxOp from 'rxjs/operators'
 
-import { getBlockcypherUrl } from '../../../shared/api/blockcypher'
-import { getSochainUrl } from '../../../shared/api/sochain'
 import { isError } from '../../../shared/utils/guard'
 import { clientNetwork$ } from '../app/service'
 import * as C from '../clients'
@@ -31,13 +29,12 @@ const clientState$: ClientState$ = FP.pipe(
           getPhrase(keystore),
           O.map<string, ClientState>((phrase) => {
             try {
-              const client = new DogeClient({
-                sochainUrl: getSochainUrl(),
-                sochainApiKey: '',
-                blockcypherUrl: getBlockcypherUrl(),
-                network,
-                phrase
-              })
+              const dogeInitParams = {
+                ...defaultDogeParams,
+                network: network,
+                phrase: phrase
+              }
+              const client = new DogeClient(dogeInitParams)
               return RD.success(client)
             } catch (error) {
               console.error('Failed to create DOGE client', error)

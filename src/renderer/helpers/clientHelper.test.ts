@@ -11,7 +11,11 @@ describe('helpers/clientHelper', () => {
       expect(isBnbClient(client)).toBeTruthy()
     })
     it('returns false for BTC client', () => {
-      const client = new BtcClient(MOCK_PHRASE)
+      const btcInitParams = {
+        ...defaultBTCParams,
+        phrase: MOCK_PHRASE
+      }
+      const client = new BtcClient(btcInitParams)
       expect(isBnbClient(client)).toBeFalsy()
     })
   })
