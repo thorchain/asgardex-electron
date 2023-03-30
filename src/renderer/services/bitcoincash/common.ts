@@ -1,6 +1,5 @@
 import * as RD from '@devexperts/remote-data-ts'
-import { BCHChain, Client as BitcoinCashClient } from '@xchainjs/xchain-bitcoincash'
-import { defaultLTCParams } from '@xchainjs/xchain-litecoin'
+import { BCHChain, Client as BitcoinCashClient, defaultBCHParams } from '@xchainjs/xchain-bitcoincash'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
 import * as Rx from 'rxjs'
@@ -32,7 +31,7 @@ const clientState$: ClientState$ = FP.pipe(
           O.map<string, ClientState>((phrase) => {
             try {
               const bchInitParams = {
-                ...defaultLTCParams,
+                ...defaultBCHParams,
                 phrase: phrase,
                 network: network
               }
