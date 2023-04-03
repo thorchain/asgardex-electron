@@ -1,7 +1,14 @@
 import AppBTC from '@ledgerhq/hw-app-btc'
 import { Transaction } from '@ledgerhq/hw-app-btc/lib/types'
 import Transport from '@ledgerhq/hw-transport'
-import { AssetBTC, BTCChain, Client, LOWER_FEE_BOUND, UPPER_FEE_BOUND } from '@xchainjs/xchain-bitcoin'
+import {
+  AssetBTC,
+  BTCChain,
+  Client,
+  defaultBTCParams,
+  LOWER_FEE_BOUND,
+  UPPER_FEE_BOUND
+} from '@xchainjs/xchain-bitcoin'
 import { checkFeeBounds, FeeRate, TxHash } from '@xchainjs/xchain-client'
 import { Address, BaseAmount } from '@xchainjs/xchain-util'
 import { HaskoinProvider, HaskoinNetwork } from '@xchainjs/xchain-utxo-providers'
@@ -63,8 +70,11 @@ export const send = async ({
      */
     const spendPendingUTXO = !memo
 
-    const btcClient = new Client()
-    btcClient.setNetwork(clientNetwork)
+    const btcInitParams = {
+      ...defaultBTCParams,
+      network: clientNetwork
+    }
+    const btcClient = new Client(btcInitParams)
 
     const { psbt, utxos } = await btcClient.buildTx({
       amount,

@@ -1,7 +1,14 @@
 import AppBTC from '@ledgerhq/hw-app-btc'
 import { Transaction } from '@ledgerhq/hw-app-btc/lib/types'
 import Transport from '@ledgerhq/hw-transport'
-import { AssetBCH, BCHChain, Client, LOWER_FEE_BOUND, UPPER_FEE_BOUND } from '@xchainjs/xchain-bitcoincash'
+import {
+  AssetBCH,
+  BCHChain,
+  Client,
+  defaultBCHParams,
+  LOWER_FEE_BOUND,
+  UPPER_FEE_BOUND
+} from '@xchainjs/xchain-bitcoincash'
 import { checkFeeBounds, FeeRate, TxHash } from '@xchainjs/xchain-client'
 import { Address, BaseAmount } from '@xchainjs/xchain-util'
 import { HaskoinProvider, HaskoinNetwork } from '@xchainjs/xchain-utxo-providers'
@@ -57,17 +64,13 @@ export const send = async ({
 
     const haskoinUrl = getHaskoinBCHApiUrl()[network]
     const haskoinProvider = new HaskoinProvider(haskoinUrl, BCHChain, AssetBCH, 8, HaskoinNetwork.BCH)
-    /**
-    const es = new ExplorerProviders()
 
     const bchInitParams = {
       ...defaultBCHParams,
-      dataProviders: [HaskoinProvider],
       network: clientNetwork
     }
-    */
-    const bchClient = new Client()
-    bchClient.setNetwork(clientNetwork)
+
+    const bchClient = new Client(bchInitParams)
 
     const { builder, inputs: txInputs } = await bchClient.buildTx({
       amount,

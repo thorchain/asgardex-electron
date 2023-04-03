@@ -2,7 +2,15 @@ import AppBTC from '@ledgerhq/hw-app-btc'
 import { Transaction } from '@ledgerhq/hw-app-btc/lib/types'
 import Transport from '@ledgerhq/hw-transport'
 import { checkFeeBounds, FeeRate, TxHash } from '@xchainjs/xchain-client'
-import { AssetDOGE, Client, DOGEChain, getSendTxUrl, LOWER_FEE_BOUND, UPPER_FEE_BOUND } from '@xchainjs/xchain-doge'
+import {
+  AssetDOGE,
+  Client,
+  DOGEChain,
+  getSendTxUrl,
+  LOWER_FEE_BOUND,
+  UPPER_FEE_BOUND,
+  defaultDogeParams
+} from '@xchainjs/xchain-doge'
 import { Address, BaseAmount } from '@xchainjs/xchain-util'
 import { BlockcypherProvider, BlockcypherNetwork } from '@xchainjs/xchain-utxo-providers'
 import * as E from 'fp-ts/lib/Either'
@@ -54,8 +62,12 @@ export const send = async ({
     const clientNetwork = toClientNetwork(network)
     const derivePath = getDerivationPath(walletIndex, clientNetwork)
 
-    const dogeClient = new Client()
-    dogeClient.setNetwork(clientNetwork)
+    const dogeInitParams = {
+      ...defaultDogeParams,
+      network: clientNetwork
+    }
+
+    const dogeClient = new Client(dogeInitParams)
 
     const { psbt, utxos } = await dogeClient.buildTx({
       amount,

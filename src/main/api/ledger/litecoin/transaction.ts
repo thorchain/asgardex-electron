@@ -1,14 +1,13 @@
 import AppBTC from '@ledgerhq/hw-app-btc'
 import { Transaction } from '@ledgerhq/hw-app-btc/lib/types'
 import Transport from '@ledgerhq/hw-transport'
-import { checkFeeBounds, FeeRate, TxHash } from '@xchainjs/xchain-client'
-import { broadcastTx, buildTx, LOWER_FEE_BOUND, UPPER_FEE_BOUND } from '@xchainjs/xchain-litecoin'
+import { checkFeeBounds, FeeRate, defaultTCCParams, TxHash } from '@xchainjs/xchain-client'
+import { broadcastTx, Client, LOWER_FEE_BOUND, UPPER_FEE_BOUND } from '@xchainjs/xchain-litecoin'
 import { Address, BaseAmount } from '@xchainjs/xchain-util'
 import * as Bitcoin from 'bitcoinjs-lib'
 import * as E from 'fp-ts/lib/Either'
 
 import { getLTCNodeAuth, getLTCNodeUrl } from '../../../../shared/api/litecoin'
-import { getSochainUrl } from '../../../../shared/api/sochain'
 import { LedgerError, LedgerErrorId, Network } from '../../../../shared/api/types'
 import { toClientNetwork } from '../../../../shared/utils/client'
 import { isError } from '../../../../shared/utils/guard'
@@ -54,15 +53,19 @@ export const send = async ({
     const app = new AppBTC({ transport, currency: 'litecoin' })
     const clientNetwork = toClientNetwork(network)
     const derivePath = getDerivationPath(walletIndex, clientNetwork)
-    const { psbt, utxos } = await buildTx({
-      apiKey: '',
+
+    const ltcInitParams = {
+      ...defaultTCCParams,
+      network: clientNetwork
+    }
+    const ltcClient = new Client(ltcInitParams)
+
+    const { psbt, utxos } = await ltcClient.buildTx({
       amount,
       recipient,
       memo,
       feeRate,
-      sender,
-      network: clientNetwork,
-      sochainUrl: getSochainUrl()
+      sender
     })
 
     const inputs: Array<[Transaction, number, string | null, number | null]> = utxos.map(({ txHex, hash, index }) => {
