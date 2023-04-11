@@ -1,3 +1,9 @@
+# 1.19.1 (2023-04-XX)
+
+# Internal
+
+-Updates/refactor to support latest xchain updates for UTXO support. Keystore clients and ledger code updated.
+
 # 1.19.0 (2023-01-xx)
 
 ## Add

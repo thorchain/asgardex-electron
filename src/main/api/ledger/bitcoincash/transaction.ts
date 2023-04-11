@@ -1,9 +1,17 @@
 import AppBTC from '@ledgerhq/hw-app-btc'
 import { Transaction } from '@ledgerhq/hw-app-btc/lib/types'
 import Transport from '@ledgerhq/hw-transport'
-import { broadcastTx, buildTx, LOWER_FEE_BOUND, UPPER_FEE_BOUND } from '@xchainjs/xchain-bitcoincash'
+import {
+  AssetBCH,
+  BCHChain,
+  Client,
+  defaultBCHParams,
+  LOWER_FEE_BOUND,
+  UPPER_FEE_BOUND
+} from '@xchainjs/xchain-bitcoincash'
 import { checkFeeBounds, FeeRate, TxHash } from '@xchainjs/xchain-client'
 import { Address, BaseAmount } from '@xchainjs/xchain-util'
+import { HaskoinProvider, HaskoinNetwork } from '@xchainjs/xchain-utxo-providers'
 import * as Bitcoin from 'bitcoinjs-lib'
 import * as E from 'fp-ts/lib/Either'
 
@@ -55,15 +63,21 @@ export const send = async ({
     const derivePath = getDerivationPath(walletIndex, clientNetwork)
 
     const haskoinUrl = getHaskoinBCHApiUrl()[network]
+    const haskoinProvider = new HaskoinProvider(haskoinUrl, BCHChain, AssetBCH, 8, HaskoinNetwork.BCH)
 
-    const { builder, inputs: txInputs } = await buildTx({
+    const bchInitParams = {
+      ...defaultBCHParams,
+      network: clientNetwork
+    }
+
+    const bchClient = new Client(bchInitParams)
+
+    const { builder, inputs: txInputs } = await bchClient.buildTx({
       amount,
       recipient,
       memo,
       feeRate,
-      sender,
-      network: clientNetwork,
-      haskoinUrl
+      sender
     })
 
     const inputs: Array<[Transaction, number, string | null, number | null]> = txInputs.map(
@@ -95,7 +109,7 @@ export const send = async ({
       sigHashType: 0x41 // If not set, Ledger will throw LEDGER DEVICE: INVALID DATA RECEIVED (0X6A80)
     })
 
-    const txHash = await broadcastTx({ txHex, haskoinUrl })
+    const txHash = await haskoinProvider.broadcastTx(txHex)
 
     if (!txHash) {
       return E.left({

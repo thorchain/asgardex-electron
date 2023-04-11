@@ -1,12 +1,10 @@
 import * as RD from '@devexperts/remote-data-ts'
-import { Client, LTCChain } from '@xchainjs/xchain-litecoin'
+import { Client, LTCChain, defaultLTCParams } from '@xchainjs/xchain-litecoin'
 import * as FP from 'fp-ts/function'
 import * as O from 'fp-ts/Option'
 import * as Rx from 'rxjs'
 import * as RxOp from 'rxjs/operators'
 
-import { getLTCNodeAuth, getLTCNodeUrls } from '../../../shared/api/litecoin'
-import { getSochainUrl } from '../../../shared/api/sochain'
 import { isError } from '../../../shared/utils/guard'
 import { clientNetwork$ } from '../app/service'
 import * as C from '../clients'
@@ -30,13 +28,12 @@ const clientState$: ClientState$ = FP.pipe(
           getPhrase(keystore),
           O.map<string, ClientState>((phrase) => {
             try {
-              const client = new Client({
-                network,
-                phrase,
-                nodeUrls: getLTCNodeUrls(),
-                nodeAuth: getLTCNodeAuth(),
-                sochainUrl: getSochainUrl()
-              })
+              const ltcInitParams = {
+                ...defaultLTCParams,
+                phrase: phrase,
+                network: network
+              }
+              const client = new Client(ltcInitParams)
               return RD.success(client)
             } catch (error) {
               return RD.failure<Error>(isError(error) ? error : new Error('Failed to create LTC client'))

@@ -2,12 +2,20 @@ import AppBTC from '@ledgerhq/hw-app-btc'
 import { Transaction } from '@ledgerhq/hw-app-btc/lib/types'
 import Transport from '@ledgerhq/hw-transport'
 import { checkFeeBounds, FeeRate, TxHash } from '@xchainjs/xchain-client'
-import { broadcastTx, buildTx, getSendTxUrl, LOWER_FEE_BOUND, UPPER_FEE_BOUND } from '@xchainjs/xchain-doge'
+import {
+  AssetDOGE,
+  Client,
+  DOGEChain,
+  getSendTxUrl,
+  LOWER_FEE_BOUND,
+  UPPER_FEE_BOUND,
+  defaultDogeParams
+} from '@xchainjs/xchain-doge'
 import { Address, BaseAmount } from '@xchainjs/xchain-util'
+import { BlockcypherProvider, BlockcypherNetwork } from '@xchainjs/xchain-utxo-providers'
 import * as E from 'fp-ts/lib/Either'
 
 import { getBlockcypherUrl } from '../../../../shared/api/blockcypher'
-import { getSochainUrl } from '../../../../shared/api/sochain'
 import { LedgerError, LedgerErrorId, Network } from '../../../../shared/api/types'
 import { toClientNetwork } from '../../../../shared/utils/client'
 import { isError } from '../../../../shared/utils/guard'
@@ -54,15 +62,19 @@ export const send = async ({
     const clientNetwork = toClientNetwork(network)
     const derivePath = getDerivationPath(walletIndex, clientNetwork)
 
-    const { psbt, utxos } = await buildTx({
+    const dogeInitParams = {
+      ...defaultDogeParams,
+      network: clientNetwork
+    }
+
+    const dogeClient = new Client(dogeInitParams)
+
+    const { psbt, utxos } = await dogeClient.buildTx({
       amount,
       recipient,
       memo,
       feeRate,
-      sender,
-      network: clientNetwork,
-      sochainUrl: getSochainUrl(),
-      withTxHex: true
+      sender
     })
 
     const inputs: Array<[Transaction, number, string | null, number | null]> = utxos.map(({ txHex, hash, index }) => {
@@ -90,8 +102,9 @@ export const send = async ({
 
     // Note: DOGE Ledger is not supported on `testnet` - all txs will be broadcasted to Blockcypher
     const nodeUrl = getSendTxUrl({ network: clientNetwork, blockcypherUrl: getBlockcypherUrl() })
+    const blockcypherProvider = new BlockcypherProvider(nodeUrl, DOGEChain, AssetDOGE, 8, BlockcypherNetwork.DOGE)
 
-    const txHash = await broadcastTx({ network: clientNetwork, txHex, nodeUrl })
+    const txHash = await blockcypherProvider.broadcastTx(txHex)
 
     if (!txHash) {
       return E.left({

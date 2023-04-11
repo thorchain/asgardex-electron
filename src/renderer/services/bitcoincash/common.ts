@@ -1,5 +1,5 @@
 import * as RD from '@devexperts/remote-data-ts'
-import { BCHChain, Client as BitcoinCashClient } from '@xchainjs/xchain-bitcoincash'
+import { BCHChain, Client as BitcoinCashClient, defaultBCHParams } from '@xchainjs/xchain-bitcoincash'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
 import * as Rx from 'rxjs'
@@ -7,7 +7,6 @@ import { Observable } from 'rxjs'
 import * as RxOp from 'rxjs/operators'
 import { map, shareReplay } from 'rxjs/operators'
 
-import { getHaskoinBCHApiUrl } from '../../../shared/api/haskoin'
 import { isError } from '../../../shared/utils/guard'
 import { clientNetwork$ } from '../app/service'
 import * as C from '../clients'
@@ -31,11 +30,12 @@ const clientState$: ClientState$ = FP.pipe(
           getPhrase(keystore),
           O.map<string, ClientState>((phrase) => {
             try {
-              const client = new BitcoinCashClient({
-                network,
-                haskoinUrl: getHaskoinBCHApiUrl(),
-                phrase
-              })
+              const bchInitParams = {
+                ...defaultBCHParams,
+                phrase: phrase,
+                network: network
+              }
+              const client = new BitcoinCashClient(bchInitParams)
               return RD.success(client)
             } catch (error) {
               return RD.failure<Error>(isError(error) ? error : new Error('Failed to create BCH client'))
