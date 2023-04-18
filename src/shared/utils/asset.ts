@@ -1,10 +1,12 @@
 import { AssetBNB } from '@xchainjs/xchain-binance'
 import { AssetBTC } from '@xchainjs/xchain-bitcoin'
 import { AssetBCH } from '@xchainjs/xchain-bitcoincash'
+import { AssetBSC } from '@xchainjs/xchain-bsc'
 import { AssetATOM } from '@xchainjs/xchain-cosmos'
 import { AssetDOGE } from '@xchainjs/xchain-doge'
 import { AssetETH } from '@xchainjs/xchain-ethereum'
 import { AssetLTC } from '@xchainjs/xchain-litecoin'
+import { AssetCacao } from '@xchainjs/xchain-mayachain'
 import {
   AssetRune67C,
   AssetRuneB1A,
@@ -26,5 +28,7 @@ export {
   AssetRuneB1A,
   AssetRuneNative,
   AssetRuneERC20,
-  AssetRuneERC20Testnet
+  AssetRuneERC20Testnet,
+  AssetCacao,
+  AssetBSC
 }

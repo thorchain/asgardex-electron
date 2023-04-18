@@ -13,6 +13,7 @@ import { ETH_DECIMAL } from '@xchainjs/xchain-ethereum'
 import { ETHChain } from '@xchainjs/xchain-ethereum'
 import { LTC_DECIMAL } from '@xchainjs/xchain-litecoin'
 import { LTCChain } from '@xchainjs/xchain-litecoin'
+import { AssetCacao, MAYAChain } from '@xchainjs/xchain-mayachain'
 import { THORChain } from '@xchainjs/xchain-thorchain'
 import {
   assetFromString,
@@ -265,8 +266,15 @@ export const getOutboundAssetFeeByChain = (
             asset: AssetATOM
           })
         }
+        case MAYAChain: {
+          return O.some({
+            amount: baseAmount(value, THORCHAIN_DECIMAL),
+            asset: AssetCacao
+          })
+        }
         // 'THORChain can be ignored - fees for asset side only
         case THORChain:
+        default:
           return O.none
       }
     })

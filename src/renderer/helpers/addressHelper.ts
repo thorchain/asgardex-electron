@@ -2,8 +2,7 @@ import { getPrefix as getBinancePrefix } from '@xchainjs/xchain-binance'
 import { BNBChain } from '@xchainjs/xchain-binance'
 import { getPrefix as getBitcoinPrefix } from '@xchainjs/xchain-bitcoin'
 import { BTCChain } from '@xchainjs/xchain-bitcoin'
-import { getPrefix as getBCHPrefix } from '@xchainjs/xchain-bitcoincash'
-import { BCHChain } from '@xchainjs/xchain-bitcoincash'
+import { BSCChain } from '@xchainjs/xchain-bsc'
 import { getPrefix as getCosmosPrefix } from '@xchainjs/xchain-cosmos'
 import { GAIAChain } from '@xchainjs/xchain-cosmos'
 import { getPrefix as getDogePrefix } from '@xchainjs/xchain-doge'
@@ -12,6 +11,7 @@ import { getPrefix as getEthereumPrefix } from '@xchainjs/xchain-ethereum'
 import { ETHChain } from '@xchainjs/xchain-ethereum'
 import { getPrefix as getLitecoinPrefix } from '@xchainjs/xchain-litecoin'
 import { LTCChain } from '@xchainjs/xchain-litecoin'
+import { MAYAChain, getPrefix as getMayaPrefix } from '@xchainjs/xchain-mayachain'
 import { getPrefix as getThorchainPrefix } from '@xchainjs/xchain-thorchain'
 import { THORChain } from '@xchainjs/xchain-thorchain'
 import { Address, Chain } from '@xchainjs/xchain-util'
@@ -51,8 +51,12 @@ export const getAddressPrefixLength = (chain: Chain, network: Network): number =
       return getThorchainPrefix(clientNetwork).length
     case LTCChain:
       return getLitecoinPrefix(clientNetwork).length
-    case BCHChain:
-      return getBCHPrefix().length
+    case MAYAChain:
+      return getMayaPrefix(clientNetwork).length
+    case BSCChain:
+      return getBinancePrefix(clientNetwork).length
+    default:
+      return 0
   }
 }
 

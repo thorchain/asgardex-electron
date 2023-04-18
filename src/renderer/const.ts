@@ -2,10 +2,12 @@ import { PoolData } from '@thorchain/asgardex-util'
 import { BNBChain } from '@xchainjs/xchain-binance'
 import { BTCChain } from '@xchainjs/xchain-bitcoin'
 import { BCHChain } from '@xchainjs/xchain-bitcoincash'
+import { BSCChain } from '@xchainjs/xchain-bsc'
 import { GAIAChain } from '@xchainjs/xchain-cosmos'
 import { DOGEChain } from '@xchainjs/xchain-doge'
 import { ETHChain } from '@xchainjs/xchain-ethereum'
 import { LTCChain } from '@xchainjs/xchain-litecoin'
+import { MAYAChain } from '@xchainjs/xchain-mayachain'
 import { THORChain } from '@xchainjs/xchain-thorchain'
 import { assetAmount, bn, Asset, assetToString, baseAmount, Chain } from '@xchainjs/xchain-util'
 
@@ -139,7 +141,9 @@ export const CHAIN_WEIGHTS: Record<EnabledChain, number> = {
   [ETHChain]: 4,
   [BNBChain]: 5,
   [GAIAChain]: 6,
-  [DOGEChain]: 7
+  [DOGEChain]: 7,
+  [MAYAChain]: 8,
+  [BSCChain]: 9
 }
 
 // Weight of currencies needed for pricing

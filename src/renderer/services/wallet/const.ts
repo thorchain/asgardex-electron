@@ -1,10 +1,12 @@
 import { BNBChain } from '@xchainjs/xchain-binance'
 import { BTCChain } from '@xchainjs/xchain-bitcoin'
 import { BCHChain } from '@xchainjs/xchain-bitcoincash'
+import { BSCChain } from '@xchainjs/xchain-bsc'
 import { GAIAChain } from '@xchainjs/xchain-cosmos'
 import { DOGEChain } from '@xchainjs/xchain-doge'
 import { ETHChain } from '@xchainjs/xchain-ethereum'
 import { LTCChain } from '@xchainjs/xchain-litecoin'
+import { MAYAChain } from '@xchainjs/xchain-mayachain'
 import { THORChain } from '@xchainjs/xchain-thorchain'
 import * as O from 'fp-ts/lib/Option'
 
@@ -32,7 +34,9 @@ export const DEFAULT_BALANCES_FILTER: BalancesStateFilter = {
   [DOGEChain]: 'all',
   [ETHChain]: 'all',
   [LTCChain]: 'all',
-  [THORChain]: 'all'
+  [THORChain]: 'all',
+  [MAYAChain]: 'all',
+  [BSCChain]: 'all'
 }
 
 export const INITIAL_LOAD_TXS_PROPS: LoadTxsParams = {

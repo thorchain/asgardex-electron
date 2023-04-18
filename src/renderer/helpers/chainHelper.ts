@@ -1,10 +1,12 @@
 import { BNBChain } from '@xchainjs/xchain-binance'
 import { BTCChain } from '@xchainjs/xchain-bitcoin'
 import { BCHChain } from '@xchainjs/xchain-bitcoincash'
+import { BSCChain } from '@xchainjs/xchain-bsc'
 import { GAIAChain } from '@xchainjs/xchain-cosmos'
 import { DOGEChain } from '@xchainjs/xchain-doge'
 import { ETHChain } from '@xchainjs/xchain-ethereum'
 import { LTCChain } from '@xchainjs/xchain-litecoin'
+import { MAYAChain } from '@xchainjs/xchain-mayachain'
 import { THORChain } from '@xchainjs/xchain-thorchain'
 import { Asset, Chain } from '@xchainjs/xchain-util'
 
@@ -16,7 +18,9 @@ import {
   AssetDOGE,
   AssetETH,
   AssetLTC,
-  AssetRuneNative
+  AssetRuneNative,
+  AssetCacao,
+  AssetBSC
 } from '../../shared/utils/asset'
 import { isEnabledChain } from '../../shared/utils/chain'
 import { eqChain } from './fp/eq'
@@ -42,6 +46,10 @@ export const getChainAsset = (chain: Chain): Asset => {
       return AssetLTC
     case DOGEChain:
       return AssetDOGE
+    case MAYAChain:
+      return AssetCacao
+    case BSCChain:
+      return AssetBSC
   }
 }
 
@@ -84,6 +92,16 @@ export const isDogeChain = (chain: Chain): boolean => eqChain.equals(chain, DOGE
  * Check whether chain is Cosmos (GAIA) chain
  */
 export const isCosmosChain = (chain: Chain): boolean => eqChain.equals(chain, GAIAChain)
+
+/**
+ * Check whether chain is MAYA chain
+ */
+export const isMayaChain = (chain: Chain): boolean => eqChain.equals(chain, MAYAChain)
+
+/**
+ * Check whether chain is BSC chain
+ */
+export const isBSChain = (chain: Chain): boolean => eqChain.equals(chain, BSCChain)
 
 type ChainValues<T> = {
   [k in Chain]?: T[]

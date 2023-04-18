@@ -6,6 +6,7 @@ import { GAIAChain } from '@xchainjs/xchain-cosmos'
 import { DOGEChain } from '@xchainjs/xchain-doge'
 import { ETHChain } from '@xchainjs/xchain-ethereum'
 import { LTCChain } from '@xchainjs/xchain-litecoin'
+import { MAYAChain } from '@xchainjs/xchain-mayachain'
 import { THORChain } from '@xchainjs/xchain-thorchain'
 import { Address, Chain } from '@xchainjs/xchain-util'
 import * as A from 'fp-ts/lib/Array'
@@ -34,6 +35,7 @@ import * as COSMOS from '../cosmos'
 import * as DOGE from '../doge'
 import * as ETH from '../ethereum'
 import * as LTC from '../litecoin'
+import * as MAYA from '../maya'
 import * as THOR from '../thorchain'
 import { INITIAL_BALANCES_STATE } from './const'
 import {
@@ -69,6 +71,7 @@ export const createBalancesService = ({
     LTC.reloadBalances()
     DOGE.reloadBalances()
     COSMOS.reloadBalances()
+    MAYA.reloadBalances()
   }
 
   // Returns lazy functions to reload balances by given chain
@@ -92,6 +95,11 @@ export const createBalancesService = ({
         return DOGE.reloadBalances
       case GAIAChain:
         return COSMOS.reloadBalances
+      case MAYAChain:
+        return MAYA.reloadBalances
+      // have to create a BSC Service
+      default:
+        return FP.constVoid
     }
   }
 
@@ -179,6 +187,20 @@ export const createBalancesService = ({
           resetReloadBalances: COSMOS.resetReloadBalances,
           balances$: COSMOS.balances$({ walletType, walletIndex, hdMode }),
           reloadBalances$: COSMOS.reloadBalances$
+        }
+      case MAYAChain:
+        return {
+          reloadBalances: MAYA.reloadBalances,
+          resetReloadBalances: MAYA.resetReloadBalances,
+          balances$: MAYA.balances$({ walletType, walletIndex, hdMode }),
+          reloadBalances$: MAYA.reloadBalances$
+        }
+      default:
+        return {
+          reloadBalances: FP.constVoid,
+          resetReloadBalances: FP.constVoid,
+          balances$: Rx.EMPTY,
+          reloadBalances$: Rx.EMPTY
         }
     }
   }
@@ -588,6 +610,29 @@ export const createBalancesService = ({
   )
 
   /**
+   * Transforms COSMOS balances into `ChainBalance`
+   */
+  const mayaChainBalance$: ChainBalance$ = Rx.combineLatest([
+    COSMOS.addressUI$,
+    getChainBalance$({
+      chain: MAYAChain,
+      walletType: 'keystore',
+      walletIndex: 0, // walletIndex=0 (as long as we don't support HD wallets for keystore)
+      hdMode: 'default',
+      walletBalanceType: 'all'
+    })
+  ]).pipe(
+    RxOp.map<[O.Option<WalletAddress>, WalletBalancesRD], ChainBalance>(([oWalletAddress, balances]) => ({
+      walletType: 'keystore',
+      chain: MAYAChain,
+      walletAddress: addressFromOptionalWalletAddress(oWalletAddress),
+      walletIndex: 0, // Always 0 as long as we don't support HD wallets for keystore
+      balances,
+      balancesType: 'all'
+    }))
+  )
+
+  /**
    * Cosmos Ledger balances
    */
   const cosmosLedgerChainBalance$: ChainBalance$ = ledgerChainBalance$({
@@ -627,7 +672,8 @@ export const createBalancesService = ({
         BNB: [bnbChainBalance$, bnbLedgerChainBalance$],
         LTC: [ltcBalance$, ltcLedgerChainBalance$],
         DOGE: [dogeChainBalance$, dogeLedgerChainBalance$],
-        GAIA: [cosmosChainBalance$, cosmosLedgerChainBalance$]
+        GAIA: [cosmosChainBalance$, cosmosLedgerChainBalance$],
+        MAYA: [mayaChainBalance$]
       })
     ),
     // we ignore all `ChainBalances` with state of `initial` balances

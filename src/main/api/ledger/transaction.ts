@@ -2,11 +2,13 @@ import TransportNodeHidSingleton from '@ledgerhq/hw-transport-node-hid-singleton
 import { BNBChain } from '@xchainjs/xchain-binance'
 import { BTCChain } from '@xchainjs/xchain-bitcoin'
 import { BCHChain } from '@xchainjs/xchain-bitcoincash'
+import { BSCChain } from '@xchainjs/xchain-bsc'
 import { TxHash } from '@xchainjs/xchain-client'
 import { GAIAChain } from '@xchainjs/xchain-cosmos'
 import { DOGEChain } from '@xchainjs/xchain-doge'
 import { ETHChain } from '@xchainjs/xchain-ethereum'
 import { LTCChain } from '@xchainjs/xchain-litecoin'
+import { MAYAChain } from '@xchainjs/xchain-mayachain'
 import { THORChain } from '@xchainjs/xchain-thorchain'
 import * as E from 'fp-ts/Either'
 
@@ -172,6 +174,11 @@ export const sendTx = async ({
             })
           }
           break
+        default:
+          res = E.left({
+            errorId: LedgerErrorId.NOT_IMPLEMENTED,
+            msg: `${chain} is not supported for 'sendTx'`
+          })
       }
     }
     await transport.close()
@@ -264,9 +271,13 @@ export const deposit = async ({
         case LTCChain:
         case BCHChain:
         case DOGEChain:
+        case BSCChain:
+        case MAYAChain:
         case GAIAChain:
           res = notSupportedError
           break
+        default:
+          res = notSupportedError
       }
     }
     await transport.close()

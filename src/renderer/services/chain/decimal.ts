@@ -11,6 +11,7 @@ import { DOGEChain } from '@xchainjs/xchain-doge'
 import { ETHChain } from '@xchainjs/xchain-ethereum'
 import { LTC_DECIMAL } from '@xchainjs/xchain-litecoin'
 import { LTCChain } from '@xchainjs/xchain-litecoin'
+import { MAYAChain } from '@xchainjs/xchain-mayachain'
 import { THORChain } from '@xchainjs/xchain-thorchain'
 import { Asset } from '@xchainjs/xchain-util'
 import * as Rx from 'rxjs'
@@ -34,6 +35,7 @@ const getDecimal = (asset: Asset, network: Network): Promise<number> => {
     case ETHChain:
       return getERC20Decimal(asset, network)
     case THORChain:
+    case MAYAChain:
       return Promise.resolve(THORCHAIN_DECIMAL)
     case DOGEChain:
       return Promise.resolve(DOGE_DECIMAL)
@@ -43,6 +45,8 @@ const getDecimal = (asset: Asset, network: Network): Promise<number> => {
       return Promise.resolve(BCH_DECIMAL)
     case LTCChain:
       return Promise.resolve(LTC_DECIMAL)
+    default:
+      return Promise.reject(`${chain} is not supported for 'getDecimal'`)
   }
 }
 

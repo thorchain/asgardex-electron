@@ -71,6 +71,11 @@ export const getAddress = async ({
         case GAIAChain:
           res = await getCOSMOSAddress(transport, walletIndex)
           break
+        default:
+          return (res = E.left({
+            errorId: LedgerErrorId.NOT_IMPLEMENTED,
+            msg: `${E.chain} is not supported for 'getAddress'`
+          }))
       }
     }
     await transport.close()
