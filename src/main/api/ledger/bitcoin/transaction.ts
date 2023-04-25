@@ -1,14 +1,21 @@
 import AppBTC from '@ledgerhq/hw-app-btc'
 import { Transaction } from '@ledgerhq/hw-app-btc/lib/types'
 import Transport from '@ledgerhq/hw-transport'
-import { broadcastTx, buildTx, LOWER_FEE_BOUND, UPPER_FEE_BOUND } from '@xchainjs/xchain-bitcoin'
+import {
+  AssetBTC,
+  BTCChain,
+  Client,
+  defaultBTCParams,
+  LOWER_FEE_BOUND,
+  UPPER_FEE_BOUND
+} from '@xchainjs/xchain-bitcoin'
 import { checkFeeBounds, FeeRate, TxHash } from '@xchainjs/xchain-client'
 import { Address, BaseAmount } from '@xchainjs/xchain-util'
+import { HaskoinProvider, HaskoinNetwork } from '@xchainjs/xchain-utxo-providers'
 import * as Bitcoin from 'bitcoinjs-lib'
 import * as E from 'fp-ts/lib/Either'
 
 import { getHaskoinBTCApiUrl } from '../../../../shared/api/haskoin'
-import { getSochainUrl } from '../../../../shared/api/sochain'
 import { LedgerError, LedgerErrorId, Network } from '../../../../shared/api/types'
 import { toClientNetwork } from '../../../../shared/utils/client'
 import { isError } from '../../../../shared/utils/guard'
@@ -63,19 +70,19 @@ export const send = async ({
      */
     const spendPendingUTXO = !memo
 
-    const haskoinUrl = getHaskoinBTCApiUrl()[network]
+    const btcInitParams = {
+      ...defaultBTCParams,
+      network: clientNetwork
+    }
+    const btcClient = new Client(btcInitParams)
 
-    const { psbt, utxos } = await buildTx({
+    const { psbt, utxos } = await btcClient.buildTx({
       amount,
       recipient,
       memo,
       feeRate,
       sender,
-      network: clientNetwork,
-      sochainUrl: getSochainUrl(),
-      haskoinUrl,
-      spendPendingUTXO,
-      withTxHex: true
+      spendPendingUTXO
     })
 
     const inputs: Array<[Transaction, number, string | null, number | null]> = utxos.map(({ txHex, hash, index }) => {
@@ -102,7 +109,11 @@ export const send = async ({
       useTrustedInputForSegwit: true,
       additionals: ['bech32']
     })
-    const txHash = await broadcastTx({ txHex, haskoinUrl })
+
+    const haskoinUrl = getHaskoinBTCApiUrl()[network] //https://haskoin.ninerealms.com
+    const haskoinProvider = new HaskoinProvider(haskoinUrl, BTCChain, AssetBTC, 8, HaskoinNetwork.BTC)
+
+    const txHash = await haskoinProvider.broadcastTx(txHex)
 
     if (!txHash) {
       return E.left({

@@ -1,5 +1,5 @@
 import { Client as BnbClient } from '@xchainjs/xchain-binance'
-import { Client as BtcClient } from '@xchainjs/xchain-bitcoin'
+import { Client as BtcClient, defaultBTCParams } from '@xchainjs/xchain-bitcoin'
 
 import { MOCK_PHRASE } from '../../shared/mock/wallet'
 import { isBnbClient } from './clientHelper'
@@ -11,7 +11,11 @@ describe('helpers/clientHelper', () => {
       expect(isBnbClient(client)).toBeTruthy()
     })
     it('returns false for BTC client', () => {
-      const client = new BtcClient({ phrase: MOCK_PHRASE })
+      const btcInitParams = {
+        ...defaultBTCParams,
+        phrase: MOCK_PHRASE
+      }
+      const client = new BtcClient(btcInitParams)
       expect(isBnbClient(client)).toBeFalsy()
     })
   })

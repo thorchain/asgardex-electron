@@ -31,5 +31,8 @@ yarn-error.log*
 # don't share .env, but .env.sample
 .env
 
+# don't need to share yarn.lock
+yarn.lock
+
 dev-app-update.yml
 /.idea/
