@@ -17,8 +17,10 @@ const deposit: DepositMessages = {
   'deposit.add.asym': 'Ajouter {asset}',
   'deposit.add.runeSide': 'RUNE côté',
   'deposit.add.assetSide': 'Actif côté',
-  'deposit.add.min.info': 'Valeur minimale à déposer pour couvrir tous les frais des transactions entrantes et sortantes.',
-  'deposit.add.max.infoWithFee': "Le montant maximum à déposer est basé sur le solde ({balance}) moins les frais estimés ({fee})par rapport à l'autre côté de l'actif.",
+  'deposit.add.min.info':
+    'Valeur minimale à déposer pour couvrir tous les frais des transactions entrantes et sortantes.',
+  'deposit.add.max.infoWithFee':
+    "Le montant maximum à déposer est basé sur le solde ({balance}) moins les frais estimés ({fee})par rapport à l'autre côté de l'actif.",
   'deposit.add.max.info':
     "Le montant maximum à déposer est basé sur le solde ({balance}) par rapport à l'autre côté de l'actif.",
   'deposit.add.state.sending': 'Envoi de la transaction de dépôt',
