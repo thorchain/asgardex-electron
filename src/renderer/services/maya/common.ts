@@ -1,4 +1,5 @@
 import * as RD from '@devexperts/remote-data-ts'
+import { Network as ClientNetwork } from '@xchainjs/xchain-client'
 import { Client, MAYAChain } from '@xchainjs/xchain-mayachain'
 import * as E from 'fp-ts/lib/Either'
 import * as FP from 'fp-ts/lib/function'
@@ -7,13 +8,17 @@ import * as Rx from 'rxjs'
 import * as RxOp from 'rxjs/operators'
 
 import { getChainId } from '../../../shared/api/maya'
-import { getClientUrls, INITIAL_CHAIN_IDS } from '../../../shared/maya/client'
+import { DEFAULT_CLIENT_URL, INITIAL_CHAIN_IDS } from '../../../shared/maya/client'
 import { isError } from '../../../shared/utils/guard'
+import { triggerStream } from '../../helpers/stateHelper'
 import { clientNetwork$ } from '../app/service'
 import * as C from '../clients'
+import { getStorageState$ } from '../storage/common'
 import { keystoreService } from '../wallet/keystore'
 import { getPhrase } from '../wallet/util'
-import type { Client$, ClientState, ClientState$ } from './types'
+import type { Client$, ClientState, ClientState$, ClientUrl$ } from './types'
+
+const { stream$: reloadClientUrl$ } = triggerStream()
 
 /**
  * Stream to create an observable `CosmosClient` depending on existing phrase in keystore
@@ -23,14 +28,38 @@ import type { Client$, ClientState, ClientState$ } from './types'
  * A `CosmosClient` will never be created as long as no phrase is available
  */
 
+const clientUrl$: ClientUrl$ = FP.pipe(
+  Rx.combineLatest([getStorageState$, reloadClientUrl$]),
+  RxOp.map(([storage]) =>
+    FP.pipe(
+      storage,
+      O.map(({ thornodeApi, thornodeRpc }) => ({
+        [ClientNetwork.Testnet]: {
+          node: thornodeApi.testnet,
+          rpc: thornodeRpc.testnet
+        },
+        [ClientNetwork.Stagenet]: {
+          node: thornodeApi.stagenet,
+          rpc: thornodeRpc.stagenet
+        },
+        [ClientNetwork.Mainnet]: {
+          node: thornodeApi.mainnet,
+          rpc: thornodeRpc.mainnet
+        }
+      })),
+      O.getOrElse(() => DEFAULT_CLIENT_URL)
+    )
+  )
+)
+
 // const rpcURL = 'https://api.cosmos.network'
 const clientState$: ClientState$ = FP.pipe(
-  Rx.combineLatest([keystoreService.keystoreState$, clientNetwork$, Rx.of(getClientUrls())]),
+  Rx.combineLatest([keystoreService.keystoreState$, clientNetwork$, clientUrl$]),
   RxOp.switchMap(
-    ([keystore, network, clientUrls]): ClientState$ =>
+    ([keystore, network, clientUrl]): ClientState$ =>
       FP.pipe(
         // request chain id whenever network or keystore have been changed
-        Rx.from(getChainId(clientUrls[network])()),
+        Rx.from(getChainId(clientUrl[network].node)()),
         // Rx.from(getChainId(rpcURL)()),
         RxOp.switchMap((eChainId) =>
           FP.pipe(
@@ -44,18 +73,12 @@ const clientState$: ClientState$ = FP.pipe(
                     getPhrase(keystore),
                     O.map<string, ClientState>((phrase) => {
                       try {
-                        const settings = {
+                        const client = new Client({
+                          clientUrl: clientUrl,
                           phrase: phrase,
                           network: network,
                           chainIds: { ...INITIAL_CHAIN_IDS, [network]: chainId }
-                        }
-
-                        const client = new Client(
-                          settings
-
-                          // clientUrls: getClientUrls(),
-                          // clientUrls: { ...getClientUrls(), [network]: rpcURL },
-                        )
+                        })
                         return RD.success(client)
                       } catch (error) {
                         return RD.failure<Error>(isError(error) ? error : new Error('Failed to create Maya client'))
