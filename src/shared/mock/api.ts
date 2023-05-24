@@ -54,6 +54,16 @@ const commonStorageData: CommonStorage = {
     stagenet: 'thornode-api-stagenet',
     testnet: 'thornode-api-testnet'
   },
+  mayanodeRpc: {
+    mainnet: 'mayanode-rpc-mainnet',
+    stagenet: 'mayanode-rpc-stagenet',
+    testnet: 'mayanode-rpc-testnet'
+  },
+  mayanodeApi: {
+    mainnet: 'mayanode-api-mainnet',
+    stagenet: 'mayanode-api-stagenet',
+    testnet: 'mayanode-api-testnet'
+  },
   version: '1'
 }
 

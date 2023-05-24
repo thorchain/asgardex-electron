@@ -24,6 +24,8 @@ export type CommonStorage = Readonly<
     midgard: ApiUrls
     thornodeRpc: ApiUrls
     thornodeApi: ApiUrls
+    mayanodeRpc: ApiUrls
+    mayanodeApi: ApiUrls
   } & StorageVersion
 >
 

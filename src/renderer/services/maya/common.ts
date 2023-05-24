@@ -33,20 +33,22 @@ const clientUrl$: ClientUrl$ = FP.pipe(
   RxOp.map(([storage]) =>
     FP.pipe(
       storage,
-      O.map(({ thornodeApi, thornodeRpc }) => ({
-        [ClientNetwork.Testnet]: {
-          node: thornodeApi.testnet,
-          rpc: thornodeRpc.testnet
-        },
-        [ClientNetwork.Stagenet]: {
-          node: thornodeApi.stagenet,
-          rpc: thornodeRpc.stagenet
-        },
-        [ClientNetwork.Mainnet]: {
-          node: thornodeApi.mainnet,
-          rpc: thornodeRpc.mainnet
+      O.map(({ mayanodeApi, mayanodeRpc }) => {
+        return {
+          [ClientNetwork.Testnet]: {
+            node: mayanodeApi.testnet,
+            rpc: mayanodeRpc.testnet
+          },
+          [ClientNetwork.Stagenet]: {
+            node: mayanodeApi.stagenet,
+            rpc: mayanodeRpc.stagenet
+          },
+          [ClientNetwork.Mainnet]: {
+            node: mayanodeApi.mainnet,
+            rpc: mayanodeRpc.mainnet
+          }
         }
-      })),
+      }),
       O.getOrElse(() => DEFAULT_CLIENT_URL)
     )
   )

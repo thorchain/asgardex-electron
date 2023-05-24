@@ -613,7 +613,7 @@ export const createBalancesService = ({
    * Transforms COSMOS balances into `ChainBalance`
    */
   const mayaChainBalance$: ChainBalance$ = Rx.combineLatest([
-    COSMOS.addressUI$,
+    MAYA.addressUI$,
     getChainBalance$({
       chain: MAYAChain,
       walletType: 'keystore',

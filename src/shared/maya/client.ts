@@ -10,13 +10,13 @@ require('dotenv').config()
 export const DEFAULT_MAYA_RPC_URLS: ApiUrls = {
   mainnet: envOrDefault(process.env.REACT_APP_MAINNET_MAYA_RPC, 'https://tendermint.mayachain.info'),
   stagenet: envOrDefault(process.env.REACT_APP_STAGENET_MAYAE_RPC, 'https://stagenet.tendermint.mayachain.info'),
-  testnet: envOrDefault(process.env.REACT_APP_TESTNET_MAYA_RPC, 'deprecated')
+  testnet: envOrDefault(process.env.REACT_APP_TESTNET_MAYA_RPC, 'https://stagenet.tendermint.mayachain.info')
 }
 
 export const DEFAULT_MAYA_API_URLS: ApiUrls = {
   mainnet: envOrDefault(process.env.REACT_APP_MAINNET_MAYA_API, 'https://mayanode.mayachain.info'),
-  stagenet: envOrDefault(process.env.REACT_APP_STAGENET_MAYA_API, 'https://stagenet-thornode.ninerealms.com'),
-  testnet: envOrDefault(process.env.REACT_APP_TESTNET_MAYA_API, 'deprecated')
+  stagenet: envOrDefault(process.env.REACT_APP_STAGENET_MAYA_API, 'https://stagenet.mayanode.mayachain.info'),
+  testnet: envOrDefault(process.env.REACT_APP_TESTNET_MAYA_API, 'https://stagenet.mayanode.mayachain.info')
 }
 
 export const INITIAL_CHAIN_IDS: ChainIds = {

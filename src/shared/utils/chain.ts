@@ -66,7 +66,7 @@ export const chainToString = (chain: Chain): string => {
     case BSCChain:
       return 'Binance Smart Chain'
     case MAYAChain:
-      return 'Maya Chain'
+      return 'MayaChain'
     default:
       return ''
   }
