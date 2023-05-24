@@ -22,6 +22,7 @@ import {
   AssetBCH,
   AssetBNB,
   AssetBTC,
+  AssetCacao,
   AssetDOGE,
   AssetETH,
   AssetLTC,
@@ -58,6 +59,8 @@ import { sequenceTOption } from './fpHelpers'
  * */
 export const THORCHAIN_DECIMAL = 8
 
+export const MAYACHAIN_DECIMAL = 10
+
 /**
  * Number of decimals for Binance chain assets
  * Example:
@@ -83,6 +86,11 @@ export const isNonNativeRuneAsset = (asset: Asset, network: Network): boolean =>
  * Checks whether an asset is an RuneNative asset
  */
 export const isRuneNativeAsset = (asset: Asset): boolean => eqAsset.equals(asset, AssetRuneNative)
+
+/**
+ * Checks whether an asset is a CacaoNative asset
+ */
+export const isCacaoAsset = (asset: Asset): boolean => eqAsset.equals(asset, AssetCacao)
 
 /**
  * Checks whether an asset is a Rune (native or non-native) asset

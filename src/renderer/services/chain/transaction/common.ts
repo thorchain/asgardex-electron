@@ -155,7 +155,7 @@ export const sendTx$ = ({
         liveData.chain((fees) =>
           // fees for COSMOS are FLAT fees for now - different `feeOption` based still on same fee amount
           // If needed, we can change it later to have fee options (similar to Keplr wallet - search for `gasPriceStep` there)
-          COSMOS.sendTx({
+          MAYA.sendTx({
             walletType,
             sender,
             recipient,
