@@ -20,7 +20,8 @@ import {
   isRuneNativeAsset,
   isTgtERC20Asset,
   isXRuneAsset,
-  isAtomAsset
+  isAtomAsset,
+  isCacaoAsset
 } from '../../../../helpers/assetHelper'
 import { isBnbChain, isEthChain } from '../../../../helpers/chainHelper'
 import { getIntFromName, rainbowStop } from '../../../../helpers/colorHelpers'
@@ -29,6 +30,7 @@ import {
   atomIcon,
   bnbIcon,
   btcIcon,
+  cacaoIcon,
   dogeIcon,
   ethIcon,
   runeIcon,
@@ -96,6 +98,10 @@ export const AssetIcon: React.FC<Props> = ({ asset, size = 'normal', className =
     // Atom
     if (isAtomAsset(asset)) {
       return atomIcon
+    }
+
+    if (isCacaoAsset(asset)) {
+      return cacaoIcon
     }
 
     if (network !== 'testnet') {
