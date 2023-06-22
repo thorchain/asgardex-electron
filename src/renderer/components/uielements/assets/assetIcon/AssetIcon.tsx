@@ -21,7 +21,8 @@ import {
   isTgtERC20Asset,
   isXRuneAsset,
   isAtomAsset,
-  isCacaoAsset
+  isCacaoAsset,
+  isMayaAsset
 } from '../../../../helpers/assetHelper'
 import { isBnbChain, isEthChain } from '../../../../helpers/chainHelper'
 import { getIntFromName, rainbowStop } from '../../../../helpers/colorHelpers'
@@ -36,7 +37,8 @@ import {
   runeIcon,
   bnbRuneIcon,
   xRuneIcon,
-  tgtIcon
+  tgtIcon,
+  mayaIcon
 } from '../../../icons'
 import * as Styled from './AssetIcon.styles'
 import { Size } from './AssetIcon.types'
@@ -102,6 +104,10 @@ export const AssetIcon: React.FC<Props> = ({ asset, size = 'normal', className =
 
     if (isCacaoAsset(asset)) {
       return cacaoIcon
+    }
+
+    if (isMayaAsset(asset)) {
+      return mayaIcon
     }
 
     if (network !== 'testnet') {

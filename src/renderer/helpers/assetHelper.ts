@@ -1,4 +1,5 @@
 import { ETHAddress, getTokenAddress } from '@xchainjs/xchain-ethereum'
+import { AssetMaya } from '@xchainjs/xchain-mayachain'
 import {
   Address,
   Asset,
@@ -59,8 +60,6 @@ import { sequenceTOption } from './fpHelpers'
  * */
 export const THORCHAIN_DECIMAL = 8
 
-export const MAYACHAIN_DECIMAL = 10
-
 /**
  * Number of decimals for Binance chain assets
  * Example:
@@ -88,9 +87,14 @@ export const isNonNativeRuneAsset = (asset: Asset, network: Network): boolean =>
 export const isRuneNativeAsset = (asset: Asset): boolean => eqAsset.equals(asset, AssetRuneNative)
 
 /**
- * Checks whether an asset is a CacaoNative asset
+ * Checks whether an asset is a Cacao asset
  */
 export const isCacaoAsset = (asset: Asset): boolean => eqAsset.equals(asset, AssetCacao)
+
+/**
+ * Checks whether an asset is a Maya asset
+ */
+export const isMayaAsset = (asset: Asset): boolean => eqAsset.equals(asset, AssetMaya)
 
 /**
  * Checks whether an asset is a Rune (native or non-native) asset

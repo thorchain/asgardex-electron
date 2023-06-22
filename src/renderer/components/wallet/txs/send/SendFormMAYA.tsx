@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
-import { AssetCacao, MAYAChain } from '@xchainjs/xchain-mayachain'
+import { AssetCacao, MAYAChain, CACAO_DECIMAL } from '@xchainjs/xchain-mayachain'
 import { Address, baseAmount } from '@xchainjs/xchain-util'
 import { formatAssetAmountCurrency, assetAmount, bn, assetToBase, BaseAmount, baseToAsset } from '@xchainjs/xchain-util'
 import { Row, Form } from 'antd'
@@ -15,7 +15,7 @@ import { AssetRuneNative } from '../../../../../shared/utils/asset'
 import { isKeystoreWallet, isLedgerWallet } from '../../../../../shared/utils/guard'
 import { WalletType } from '../../../../../shared/wallet/types'
 import { ZERO_BASE_AMOUNT } from '../../../../const'
-import { isCacaoAsset, isRuneNativeAsset, MAYACHAIN_DECIMAL } from '../../../../helpers/assetHelper'
+import { isCacaoAsset, isRuneNativeAsset } from '../../../../helpers/assetHelper'
 import { sequenceTOption } from '../../../../helpers/fpHelpers'
 import { getRuneNativeAmountFromBalances } from '../../../../helpers/walletHelper'
 import { useSubscriptionState } from '../../../../hooks/useSubscriptionState'
@@ -279,7 +279,7 @@ export const SendFormMAYA: React.FC<Props> = (props): JSX.Element => {
       // we have to validate input before storing into the state
       amountValidator(undefined, value)
         .then(() => {
-          setAmountToSend(assetToBase(assetAmount(value, MAYACHAIN_DECIMAL)))
+          setAmountToSend(assetToBase(assetAmount(value, CACAO_DECIMAL)))
         })
         .catch(() => {}) // do nothing, Ant' form does the job for us to show an error message
     },
@@ -324,7 +324,7 @@ export const SendFormMAYA: React.FC<Props> = (props): JSX.Element => {
                   min={0}
                   size="large"
                   disabled={isLoading}
-                  decimal={MAYACHAIN_DECIMAL}
+                  decimal={CACAO_DECIMAL}
                   onChange={onChangeInput}
                 />
               </Styled.FormItem>

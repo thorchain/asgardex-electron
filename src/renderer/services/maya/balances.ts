@@ -1,4 +1,5 @@
-import { AssetCacao } from '../../../shared/utils/asset'
+import { AssetCacao, AssetMaya } from '@xchainjs/xchain-mayachain'
+
 import { HDMode, WalletType } from '../../../shared/wallet/types'
 import { observableState } from '../../helpers/stateHelper'
 import * as C from '../clients'
@@ -37,7 +38,7 @@ const balances$ = ({
     hdMode,
     walletBalanceType: 'all',
     // ATOM only - no IBC assets etc.
-    assets: [AssetCacao]
+    assets: [AssetCacao, AssetMaya]
   })
 
 // State of balances loaded by Client and Address
@@ -46,7 +47,7 @@ const getBalanceByAddress$ = C.balancesByAddress$({
   trigger$: reloadBalances$,
   walletBalanceType: 'all',
   // ATOM only - no IBC assets etc.
-  assets: [AssetCacao]
+  assets: [AssetCacao, AssetMaya]
 })
 
 export { balances$, reloadBalances, getBalanceByAddress$, reloadBalances$, resetReloadBalances }
