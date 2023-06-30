@@ -1,3 +1,9 @@
+# 1.19.2 (2023-06-30)
+
+# Internal
+
+-Updates xchain-thorchain package due to gas issue.
+
 # 1.19.1 (2023-04-XX)
 
 # Internal
