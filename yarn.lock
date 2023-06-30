@@ -6924,18 +6924,18 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@xchainjs/xchain-thorchain@npm:^0.27.9":
-  version: 0.27.9
-  resolution: "@xchainjs/xchain-thorchain@npm:0.27.9"
+"@xchainjs/xchain-thorchain@npm:^0.28.3":
+  version: 0.28.3
+  resolution: "@xchainjs/xchain-thorchain@npm:0.28.3"
   peerDependencies:
     "@cosmos-client/core": 0.46.1
-    "@xchainjs/xchain-client": ^0.13.5
-    "@xchainjs/xchain-cosmos": ^0.20.8
-    "@xchainjs/xchain-crypto": ^0.2.6
-    "@xchainjs/xchain-util": ^0.12.0
-    axios: ^0.25.0
+    "@xchainjs/xchain-client": ^0.14.1
+    "@xchainjs/xchain-cosmos": ^0.21.1
+    "@xchainjs/xchain-crypto": ^0.3.0
+    "@xchainjs/xchain-util": ^0.13.0
+    axios: ^1.3.6
     bech32-buffer: ^0.2.0
-  checksum: 090d6993f2370da1a1d9c37c6fc25e88a55a8df4187c75b1260b9c6e751bb4e6e5aa105f5c6e1753b53266bd2fdad7401ff559c8b35bda5b76fd059e137b1862
+  checksum: 3e46cf04c9c7bf07cc017aaf72ba795cf23730f5ac4302187db1ea8fd9d955b1a9cf666eefbbb768482ab526abcea1ea024635163b09e734ef8889b32fdae44d
   languageName: node
   linkType: hard
 
@@ -7757,7 +7757,7 @@ __metadata:
     "@xchainjs/xchain-doge": ^0.5.10
     "@xchainjs/xchain-ethereum": ^0.27.7
     "@xchainjs/xchain-litecoin": ^0.11.1
-    "@xchainjs/xchain-thorchain": ^0.27.9
+    "@xchainjs/xchain-thorchain": ^0.28.3
     "@xchainjs/xchain-util": ^0.12.0
     "@xchainjs/xchain-utxo-providers": ^0.1.1
     ansis: ^1.5.5
