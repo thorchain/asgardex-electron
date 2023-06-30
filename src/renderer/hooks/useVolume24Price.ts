@@ -1,5 +1,6 @@
 import * as RD from '@devexperts/remote-data-ts'
 import { getValueOfRuneInAsset } from '@thorchain/asgardex-util'
+// import { LiquidityHistoryIntervals, SwapHistoryIntervals } from '@xchainjs/xchain-midgard'
 import { baseAmount, bnOrZero } from '@xchainjs/xchain-util'
 import * as FP from 'fp-ts/lib/function'
 import { useObservableState } from 'observable-hooks'
@@ -11,7 +12,6 @@ import { sequenceTRD } from '../helpers/fpHelpers'
 import { triggerStream } from '../helpers/stateHelper'
 import { PriceRD } from '../services/midgard/types'
 import { AssetWithAmount } from '../types/asgardex'
-import { GetLiquidityHistoryIntervalEnum, GetSwapHistoryIntervalEnum } from '../types/generated/midgard'
 
 const { stream$: reloadHistory$, trigger: reloadHistory } = triggerStream()
 
@@ -25,13 +25,13 @@ export const useVolume24Price = () => {
   const swapHistory$ = () =>
     FP.pipe(
       reloadHistory$,
-      RxOp.switchMap((_) => apiGetSwapHistory$({ interval: GetSwapHistoryIntervalEnum.Day, count: 2 }))
+      RxOp.switchMap((_) => apiGetSwapHistory$({ interval: 'Day', count: 2 }))
     )
 
   const liquidityHistory$ = () =>
     FP.pipe(
       reloadHistory$,
-      RxOp.switchMap((_) => apiGetLiquidityHistory$({ interval: GetLiquidityHistoryIntervalEnum.Day, count: 2 }))
+      RxOp.switchMap((_) => apiGetLiquidityHistory$({ interval: 'Day', count: 2 }))
     )
 
   const reloadVolume24Price = () => {

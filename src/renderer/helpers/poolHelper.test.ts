@@ -7,6 +7,7 @@ import { GAIAChain } from '@xchainjs/xchain-cosmos'
 import { DOGEChain } from '@xchainjs/xchain-doge'
 import { ETHChain } from '@xchainjs/xchain-ethereum'
 import { LTCChain } from '@xchainjs/xchain-litecoin'
+import { PoolDetail } from '@xchainjs/xchain-midgard'
 import { assetAmount, assetToBase, assetToString, baseAmount } from '@xchainjs/xchain-util'
 import { Chain } from '@xchainjs/xchain-util'
 import * as FP from 'fp-ts/lib/function'
@@ -19,7 +20,6 @@ import { AssetBUSD74E } from '../const'
 import { PoolDetails } from '../services/midgard/types'
 import { toPoolData } from '../services/midgard/utils'
 import { DEFAULT_MIMIR_HALT } from '../services/thorchain/const'
-import { GetPoolsStatusEnum, PoolDetail } from '../types/generated/midgard'
 import { PricePool } from '../views/pools/Pools.types'
 import {
   disableAllActions,
@@ -38,7 +38,7 @@ describe('helpers/poolHelper/', () => {
     assetPriceUSD: '0',
     poolAPY: '0',
     runeDepth: '0',
-    status: GetPoolsStatusEnum.Staged,
+    status: 'Staged',
     units: '0',
     volume24h: '0',
     liquidityUnits: '0',
@@ -50,10 +50,10 @@ describe('helpers/poolHelper/', () => {
     saversUnits: '0',
     saversAPR: '0'
   }
-  const pool1: PoolDetail = { ...mockPoolDetail, status: GetPoolsStatusEnum.Staged, runeDepth: '1000' }
-  const pool2: PoolDetail = { ...mockPoolDetail, status: GetPoolsStatusEnum.Available, runeDepth: '2000' }
-  const pool3: PoolDetail = { ...mockPoolDetail, status: GetPoolsStatusEnum.Suspended, runeDepth: '0' }
-  const pool4: PoolDetail = { ...mockPoolDetail, status: GetPoolsStatusEnum.Staged, runeDepth: '4000' }
+  const pool1: PoolDetail = { ...mockPoolDetail, status: 'Staged', runeDepth: '1000' }
+  const pool2: PoolDetail = { ...mockPoolDetail, status: 'Available', runeDepth: '2000' }
+  const pool3: PoolDetail = { ...mockPoolDetail, status: 'Suspended', runeDepth: '0' }
+  const pool4: PoolDetail = { ...mockPoolDetail, status: 'Staged', runeDepth: '4000' }
 
   const watchlist: PoolsWatchList = [AssetBNB]
 
@@ -73,12 +73,12 @@ describe('helpers/poolHelper/', () => {
 
   describe('getPoolTableRowsData', () => {
     const poolDetails: PoolDetails = [
-      { ...mockPoolDetail, asset: assetToString(ASSETS_TESTNET.TOMO), status: GetPoolsStatusEnum.Available },
-      { ...mockPoolDetail, asset: assetToString(ASSETS_TESTNET.FTM), status: GetPoolsStatusEnum.Available }
+      { ...mockPoolDetail, asset: assetToString(ASSETS_TESTNET.TOMO), status: 'Available' },
+      { ...mockPoolDetail, asset: assetToString(ASSETS_TESTNET.FTM), status: 'Available' }
     ]
     const pendingPoolDetails: PoolDetails = [
-      { ...mockPoolDetail, asset: assetToString(ASSETS_TESTNET.BOLT), status: GetPoolsStatusEnum.Staged },
-      { ...mockPoolDetail, asset: assetToString(ASSETS_TESTNET.FTM), status: GetPoolsStatusEnum.Staged }
+      { ...mockPoolDetail, asset: assetToString(ASSETS_TESTNET.BOLT), status: 'Staged' },
+      { ...mockPoolDetail, asset: assetToString(ASSETS_TESTNET.FTM), status: 'Staged' }
     ]
 
     const pricePoolData: PoolData = {

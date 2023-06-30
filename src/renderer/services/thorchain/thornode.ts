@@ -1,4 +1,16 @@
 import * as RD from '@devexperts/remote-data-ts'
+import {
+  Configuration,
+  LiquidityProvidersApi,
+  LiquidityProviderSummary,
+  Middleware,
+  MimirApi,
+  NetworkApi,
+  Node,
+  NodesApi,
+  Saver,
+  SaversApi
+} from '@xchainjs/xchain-thornode'
 import { Address, Asset, assetFromString, assetToString, baseAmount, bnOrZero } from '@xchainjs/xchain-util'
 import * as A from 'fp-ts/Array'
 import * as E from 'fp-ts/Either'
@@ -18,18 +30,6 @@ import { THORCHAIN_DECIMAL } from '../../helpers/assetHelper'
 import { sequenceTOption } from '../../helpers/fpHelpers'
 import { LiveData, liveData } from '../../helpers/rx/liveData'
 import { triggerStream } from '../../helpers/stateHelper'
-import {
-  Configuration,
-  LiquidityProvidersApi,
-  LiquidityProviderSummary,
-  Middleware,
-  MimirApi,
-  NetworkApi,
-  Node,
-  NodesApi,
-  Saver,
-  SaversApi
-} from '../../types/generated/thornode'
 import { Network$ } from '../app/types'
 import {
   MimirIO,
@@ -128,7 +128,7 @@ export const createThornodeService$ = (network$: Network$, clientUrl$: ClientUrl
     thornodeUrl$,
     liveData.chain((basePath) =>
       FP.pipe(
-        new NetworkApi(getThornodeAPIConfiguration(basePath)).constants({}),
+        new NetworkApi(getThornodeAPIConfiguration(basePath)).constants(),
         RxOp.map(RD.success),
         RxOp.catchError((e: Error) => Rx.of(RD.failure(e)))
       )
@@ -156,7 +156,7 @@ export const createThornodeService$ = (network$: Network$, clientUrl$: ClientUrl
     thornodeUrl$,
     liveData.chain((basePath) =>
       FP.pipe(
-        new NetworkApi(getThornodeAPIConfiguration(basePath)).lastblock({}),
+        new NetworkApi(getThornodeAPIConfiguration(basePath)).lastblock(),
         RxOp.map(RD.success),
         RxOp.catchError((e: Error) => Rx.of(RD.failure(e)))
       )
@@ -215,9 +215,7 @@ export const createThornodeService$ = (network$: Network$, clientUrl$: ClientUrl
       thornodeUrl$,
       liveData.chain((basePath) =>
         FP.pipe(
-          new LiquidityProvidersApi(getThornodeAPIConfiguration(basePath)).liquidityProviders({
-            asset: assetToString(asset)
-          }),
+          new LiquidityProvidersApi(getThornodeAPIConfiguration(basePath)).liquidityProviders(assetToString(asset)),
           RxOp.map(RD.success),
           RxOp.catchError((e: Error) => Rx.of(RD.failure(e)))
         )
@@ -300,10 +298,7 @@ export const createThornodeService$ = (network$: Network$, clientUrl$: ClientUrl
       thornodeUrl$,
       liveData.chain((basePath) =>
         FP.pipe(
-          new SaversApi(getThornodeAPIConfiguration(basePath)).saver({
-            asset: assetToString(asset),
-            address
-          }),
+          new SaversApi(getThornodeAPIConfiguration(basePath)).saver(assetToString(asset), address),
           RxOp.map(RD.success),
           RxOp.catchError((e: Error) => Rx.of(RD.failure(e)))
         )

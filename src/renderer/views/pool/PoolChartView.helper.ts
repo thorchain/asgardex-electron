@@ -1,12 +1,11 @@
+import { DepthHistoryItem, LiquidityHistoryItem, SwapHistoryItem } from '@xchainjs/xchain-midgard'
 import { baseAmount, baseToAsset, bnOrZero } from '@xchainjs/xchain-util'
 import * as A from 'fp-ts/lib/Array'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
 
 import { ChartDataType, ChartDetails, ChartTimeFrame } from '../../components/uielements/chart/PoolDetailsChart.types'
-import { GetDepthHistoryParams } from '../../services/midgard/types'
-import { DepthHistoryItem, LiquidityHistoryItem, SwapHistoryItem } from '../../types/generated/midgard'
-import { GetDepthHistoryIntervalEnum } from '../../types/generated/midgard'
+// import { GetDepthHistoryParams } from '../../services/midgard/types'
 import { CachedChartData } from './PoolChartView.types'
 
 type PartialDepthHistoryItem = Pick<DepthHistoryItem, 'startTime' | 'runeDepth'>
@@ -87,18 +86,3 @@ export const updateCachedChartData = ({
   ...cache,
   [dataType]: { ...cache[dataType], [timeFrame]: oData }
 })
-
-export const getDepthHistoryParams = (t: ChartTimeFrame): GetDepthHistoryParams => {
-  switch (t) {
-    case 'week':
-      return { interval: GetDepthHistoryIntervalEnum.Day, count: 7 }
-    case 'month':
-      return { interval: GetDepthHistoryIntervalEnum.Day, count: 30 }
-    case 'threeMonths':
-      return { interval: GetDepthHistoryIntervalEnum.Day, count: 90 }
-    case 'year':
-      return { interval: GetDepthHistoryIntervalEnum.Day, count: 356 }
-    case 'all':
-      return { interval: GetDepthHistoryIntervalEnum.Day }
-  }
-}

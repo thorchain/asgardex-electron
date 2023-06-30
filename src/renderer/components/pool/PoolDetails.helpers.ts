@@ -1,7 +1,6 @@
+import { PoolDetail, PoolStatsDetail } from '@xchainjs/xchain-midgard'
 import { AssetAmount, assetAmount, baseAmount, baseToAsset, bn, bnOrZero } from '@xchainjs/xchain-util'
 import BigNumber from 'bignumber.js'
-
-import { PoolDetail, PoolStatsDetail } from '../../types/generated/midgard'
 
 export const getLiquidity = (
   { runeDepth }: Pick<PoolDetail, 'runeDepth'>,

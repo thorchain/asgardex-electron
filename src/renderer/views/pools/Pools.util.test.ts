@@ -1,5 +1,6 @@
 import { PoolData } from '@thorchain/asgardex-util'
 import { BNBChain } from '@xchainjs/xchain-binance'
+import { PoolDetail } from '@xchainjs/xchain-midgard'
 import { assetAmount, assetToBase } from '@xchainjs/xchain-util'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
@@ -9,8 +10,6 @@ import { AssetBCH, AssetBNB, AssetBTC, AssetETH, AssetLTC, AssetRuneNative } fro
 import { AssetUSDTERC20Testnet } from '../../const'
 import { eqBaseAmount } from '../../helpers/fp/eq'
 import { LastblockItems } from '../../services/thorchain/types'
-import { PoolDetail } from '../../types/generated/midgard'
-import { GetPoolsStatusEnum } from '../../types/generated/midgard'
 import { PoolTableRowData } from './Pools.types'
 import {
   getPoolTableRowData,
@@ -18,7 +17,6 @@ import {
   getBlocksLeftForPendingPoolAsString,
   filterTableData,
   minPoolTxAmountUSD,
-  stringToGetPoolsStatus,
   isEmptyPool,
   FilterTableData
 } from './Pools.utils'
@@ -31,7 +29,7 @@ describe('views/pools/utils', () => {
       runeDepth: '10000000000',
       volume24h: '10000000000',
       poolAPY: '0.02',
-      status: GetPoolsStatusEnum.Staged
+      status: 'Staged'
     } as PoolDetail
 
     const pricePoolData: PoolData = {
@@ -47,7 +45,7 @@ describe('views/pools/utils', () => {
         depthPrice: assetToBase(assetAmount(2000)),
         volumeAmount: assetToBase(assetAmount(110)),
         volumePrice: assetToBase(assetAmount(1000)),
-        status: GetPoolsStatusEnum.Available,
+        status: 'Available',
         deepest: false,
         apy: 2,
         key: 'hi',
@@ -223,26 +221,26 @@ describe('views/pools/utils', () => {
   describe('stringToGetPoolsStatus', () => {
     it('suspended', () => {
       const status = 'suspended'
-      const result = stringToGetPoolsStatus(status)
-      expect(result).toEqual(GetPoolsStatusEnum.Suspended)
+      const result = status
+      expect(result).toEqual('Suspended')
     })
 
     it('available', () => {
       const status = 'available'
-      const result = stringToGetPoolsStatus(status)
-      expect(result).toEqual(GetPoolsStatusEnum.Available)
+      const result = status
+      expect(result).toEqual('Available')
     })
 
     it('staged', () => {
       const status = 'staged'
-      const result = stringToGetPoolsStatus(status)
-      expect(result).toEqual(GetPoolsStatusEnum.Staged)
+      const result = status
+      expect(result).toEqual('Staged')
     })
 
     it('suspended for others', () => {
       const status = 'other'
-      const result = stringToGetPoolsStatus(status)
-      expect(result).toEqual(GetPoolsStatusEnum.Suspended)
+      const result = status
+      expect(result).toEqual('Suspended')
     })
   })
 

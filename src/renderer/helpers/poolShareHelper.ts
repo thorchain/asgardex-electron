@@ -1,8 +1,8 @@
+import { PoolDetail } from '@xchainjs/xchain-midgard'
 import { baseAmount, BaseAmount, bn, bnOrZero } from '@xchainjs/xchain-util'
 import BigNumber from 'bignumber.js'
 
 import { ZERO_BN } from '../const'
-import { PoolDetail } from '../types/generated/midgard'
 import { convertBaseAmountDecimal, THORCHAIN_DECIMAL } from './assetHelper'
 
 /**

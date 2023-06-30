@@ -1,4 +1,14 @@
 import * as RD from '@devexperts/remote-data-ts'
+import {
+  DefaultApi,
+  GetEarningsHistoryRequest,
+  GetLiquidityHistoryRequest,
+  GetPoolsPeriodEnum,
+  GetPoolsRequest,
+  GetPoolsStatusEnum,
+  GetPoolStatsPeriodEnum,
+  GetPoolStatsRequest
+} from '@xchainjs/xchain-midgard'
 import { Asset, assetFromString, assetToString, bn, Chain, currencySymbolByAsset } from '@xchainjs/xchain-util'
 import BigNumber from 'bignumber.js'
 import * as A from 'fp-ts/Array'
@@ -18,16 +28,6 @@ import { sequenceTOption } from '../../helpers/fpHelpers'
 import { LiveData, liveData } from '../../helpers/rx/liveData'
 import { observableState, triggerStream, TriggerStream$ } from '../../helpers/stateHelper'
 import { roundUnixTimestampToMinutes } from '../../helpers/timeHelper'
-import {
-  DefaultApi,
-  GetEarningsHistoryRequest,
-  GetLiquidityHistoryRequest,
-  GetPoolsPeriodEnum,
-  GetPoolsRequest,
-  GetPoolsStatusEnum,
-  GetPoolStatsPeriodEnum,
-  GetPoolStatsRequest
-} from '../../types/generated/midgard/apis'
 import { PricePool, PricePoolAsset, PricePools } from '../../views/pools/Pools.types'
 import { network$ } from '../app/service'
 import { PoolFeeLD } from '../chain/types'

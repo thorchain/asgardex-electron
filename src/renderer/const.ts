@@ -8,6 +8,7 @@ import { DOGEChain } from '@xchainjs/xchain-doge'
 import { ETHChain } from '@xchainjs/xchain-ethereum'
 import { LTCChain } from '@xchainjs/xchain-litecoin'
 import { MAYAChain } from '@xchainjs/xchain-mayachain'
+// import { GetPoolsPeriodEnum } from '@xchainjs/xchain-midgard'
 import { THORChain } from '@xchainjs/xchain-thorchain'
 import { assetAmount, bn, Asset, assetToString, baseAmount, Chain } from '@xchainjs/xchain-util'
 
@@ -15,7 +16,6 @@ import { Network } from '../shared/api/types'
 import { AssetBTC, AssetETH, AssetRune67C, AssetRuneERC20Testnet, AssetRuneNative } from '../shared/utils/asset'
 import { EnabledChain } from '../shared/utils/chain'
 import { WalletType } from '../shared/wallet/types'
-import { GetPoolsPeriodEnum } from './types/generated/midgard'
 import { PricePoolCurrencyWeights, PricePoolAssets } from './views/pools/Pools.types'
 
 //
@@ -199,6 +199,6 @@ export const SUPPORTED_LEDGER_APPS: Chain[] = [
   GAIAChain
 ]
 
-export const DEFAULT_GET_POOLS_PERIOD = GetPoolsPeriodEnum._30d
+export const DEFAULT_GET_POOLS_PERIOD = '30d'
 
 export const DEFAULT_WALLET_TYPE: WalletType = 'keystore'

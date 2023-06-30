@@ -1,4 +1,5 @@
 import { PoolData, getValueOfAsset1InAsset2, getValueOfRuneInAsset } from '@thorchain/asgardex-util'
+import { PoolDetail } from '@xchainjs/xchain-midgard'
 import {
   baseAmount,
   assetFromString,
@@ -23,22 +24,7 @@ import { sequenceTOption } from '../../helpers/fpHelpers'
 import { PoolFilter } from '../../services/midgard/types'
 import { toPoolData } from '../../services/midgard/utils'
 import { LastblockItem } from '../../services/thorchain/types'
-import { GetPoolsStatusEnum, type PoolDetail } from '../../types/generated/midgard'
 import { PoolTableRowData } from './Pools.types'
-
-export const stringToGetPoolsStatus = (status: string): GetPoolsStatusEnum => {
-  switch (status) {
-    case GetPoolsStatusEnum.Suspended: {
-      return GetPoolsStatusEnum.Suspended
-    }
-    case GetPoolsStatusEnum.Available:
-      return GetPoolsStatusEnum.Available
-    case GetPoolsStatusEnum.Staged:
-      return GetPoolsStatusEnum.Staged
-    default:
-      return GetPoolsStatusEnum.Suspended
-  }
-}
 
 export const getPoolTableRowData = ({
   poolDetail,
@@ -71,7 +57,7 @@ export const getPoolTableRowData = ({
       const volumePrice = getValueOfRuneInAsset(volumeAmount, pricePoolData)
       const volumeAmountInAsset = getValueOfRuneInAsset(volumeAmount, poolData)
 
-      const status = stringToGetPoolsStatus(poolDetail.status)
+      const status = poolDetail.status
 
       const watched: boolean = FP.pipe(
         watchlist,

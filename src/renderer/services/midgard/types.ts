@@ -1,6 +1,19 @@
 import * as RD from '@devexperts/remote-data-ts'
 import { PoolData } from '@thorchain/asgardex-util'
 import { TxHash } from '@xchainjs/xchain-client'
+import {
+  Network as NetworkInfo,
+  PoolDetail,
+  Health,
+  PoolStatsDetail,
+  LiquidityHistory,
+  SwapHistory,
+  EarningsHistory,
+  EarningsHistoryItemPool,
+  DepthHistory,
+  DepthHistoryItem,
+  SwapHistoryItem
+} from '@xchainjs/xchain-midgard'
 import { Address, Asset, BaseAmount, Chain } from '@xchainjs/xchain-util'
 import BigNumber from 'bignumber.js'
 import * as FP from 'fp-ts/lib/function'
@@ -10,24 +23,6 @@ import * as Rx from 'rxjs'
 
 import { LiveData } from '../../helpers/rx/liveData'
 import { AssetWithAmount, DepositType } from '../../types/asgardex'
-import {
-  Network as NetworkInfo,
-  PoolDetail,
-  Health,
-  PoolStatsDetail,
-  LiquidityHistory,
-  GetLiquidityHistoryIntervalEnum,
-  SwapHistory,
-  GetSwapHistoryRequest,
-  EarningsHistory,
-  EarningsHistoryItemPool,
-  GetDepthHistoryRequest,
-  DepthHistory,
-  DepthHistoryItem,
-  SwapHistoryItem,
-  GetLiquidityHistoryRequest,
-  GetPoolsPeriodEnum
-} from '../../types/generated/midgard'
 import { PricePools, PricePoolAsset, PricePool } from '../../views/pools/Pools.types'
 import { Memo, PoolFeeLD } from '../chain/types'
 import { ApiError } from '../wallet/types'
@@ -128,7 +123,7 @@ export type PoolEarningHistoryRD = RD.RemoteData<Error, O.Option<EarningsHistory
 export type PoolEarningHistoryLD = LiveData<Error, O.Option<EarningsHistoryItemPool>>
 
 export type PoolLiquidityHistoryParams = {
-  interval?: GetLiquidityHistoryIntervalEnum
+  interval?: any
   count?: number
   to?: number
   from?: number

@@ -2,6 +2,7 @@ import { useEffect } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
 import { NodeUrl } from '@xchainjs/xchain-thorchain'
+import { HealthApi } from '@xchainjs/xchain-thornode'
 import * as FP from 'fp-ts/lib/function'
 import { useObservableState } from 'observable-hooks'
 import { useIntl } from 'react-intl'
@@ -14,7 +15,6 @@ import { useThorchainContext } from '../contexts/ThorchainContext'
 import { LiveData } from '../helpers/rx/liveData'
 import { DEFAULT_CLIENT_URL } from '../services/thorchain/const'
 import { getThornodeAPIConfiguration } from '../services/thorchain/thornode'
-import { HealthApi } from '../types/generated/thornode'
 import { useNetwork } from './useNetwork'
 
 export const useThorchainClientUrl = (): {

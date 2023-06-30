@@ -1,10 +1,10 @@
+import { Action as ActionAPI, Coin, Transaction } from '@xchainjs/xchain-midgard'
 import { assetFromString, baseAmount } from '@xchainjs/xchain-util'
 import * as A from 'fp-ts/Array'
 import * as FP from 'fp-ts/function'
 import * as O from 'fp-ts/Option'
 
 import { AssetWithAmount } from '../../types/asgardex'
-import { Action as ActionAPI, Coin, Transaction } from '../../types/generated/midgard/models'
 import { Action, Tx, TxType } from './types'
 
 export const getTxType = (apiString: string): TxType => {

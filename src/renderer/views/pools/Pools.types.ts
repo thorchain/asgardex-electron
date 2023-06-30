@@ -3,7 +3,6 @@ import { BaseAmount, Asset } from '@xchainjs/xchain-util'
 import { NonEmptyArray } from 'fp-ts/lib/NonEmptyArray'
 
 import { Network } from '../../../shared/api/types'
-import { GetPoolsStatusEnum } from '../../types/generated/midgard'
 
 // List of assets used for pricing
 export type PricePoolAsset = Asset
@@ -27,7 +26,7 @@ export type PoolTableRowData = {
   volumePrice: BaseAmount
   poolPrice: BaseAmount
   apy: number
-  status: GetPoolsStatusEnum
+  status: string
   deepest?: boolean
   key: string
   network: Network

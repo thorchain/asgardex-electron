@@ -1,12 +1,11 @@
 import * as RD from '@devexperts/remote-data-ts'
+import { DefaultApi } from '@xchainjs/xchain-midgard'
 import * as A from 'fp-ts/Array'
 import * as FP from 'fp-ts/function'
 import * as Rx from 'rxjs'
 import * as RxOp from 'rxjs/operators'
 
 import { liveData } from '../../helpers/rx/liveData'
-import { DefaultApi } from '../../types/generated/midgard/apis'
-import { InlineResponse200 } from '../../types/generated/midgard/models'
 import { ErrorId } from '../wallet/types'
 import { getRequestType, mapAction } from './action.utils'
 import { LoadActionsParams, ActionsPageLD, MidgardUrlLD } from './types'
