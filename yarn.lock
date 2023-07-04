@@ -6861,23 +6861,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@xchainjs/xchain-bsc@npm:^0.1.3":
-  version: 0.1.3
-  resolution: "@xchainjs/xchain-bsc@npm:0.1.3"
-  peerDependencies:
-    "@xchainjs/xchain-client": ^0.13.7
-    "@xchainjs/xchain-crypto": ^0.2.6
-    "@xchainjs/xchain-evm": ^0.1.0
-    "@xchainjs/xchain-util": ^0.12.0
-    axios: ^0.25.0
-    ethers: ^5.6.6
-  checksum: fe4991037043dc3d78e1784e45fa7dc6fe42aef84764b6c3856ded88f149d9cd43e28db98160d7f5412d4d1205871b67e42e0388bed5ceabf5536efb20916bf0
-  languageName: node
-  linkType: hard
-
-"@xchainjs/xchain-client@npm:^0.13.6":
-  version: 0.13.6
-  resolution: "@xchainjs/xchain-client@npm:0.13.6"
+"@xchainjs/xchain-bsc@npm:^0.2.2":
+  version: 0.2.2
+  resolution: "@xchainjs/xchain-bsc@npm:0.2.2"
   peerDependencies:
     "@xchainjs/xchain-client": ^0.14.1
     "@xchainjs/xchain-crypto": ^0.3.0
@@ -6958,22 +6944,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@xchainjs/xchain-evm@npm:^0.1.5":
-  version: 0.1.5
-  resolution: "@xchainjs/xchain-evm@npm:0.1.5"
-  peerDependencies:
-    "@xchainjs/xchain-client": ^0.13.7
-    "@xchainjs/xchain-crypto": ^0.2.6
-    "@xchainjs/xchain-util": ^0.12.0
-    axios: ^0.25.0
-    ethers: ^5.6.6
-  checksum: 54c04433faf69b5a0d2e2b525a6260d6afdbbfa5c64a3bf0f25dbf91f3f8d5051ac0b6a78b46e9532c88dae813643188ebc3cc01e74f84fe683a6f79293fb507
-  languageName: node
-  linkType: hard
-
-"@xchainjs/xchain-litecoin@npm:^0.11.1":
-  version: 0.11.1
-  resolution: "@xchainjs/xchain-litecoin@npm:0.11.1"
+"@xchainjs/xchain-evm@npm:^0.2.2":
+  version: 0.2.2
+  resolution: "@xchainjs/xchain-evm@npm:0.2.2"
   peerDependencies:
     "@xchainjs/xchain-client": ^0.14.1
     "@xchainjs/xchain-crypto": ^0.3.0
@@ -7001,24 +6974,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@xchainjs/xchain-mayachain@npm:0.2.3":
+"@xchainjs/xchain-mayachain@npm:^0.2.3":
   version: 0.2.3
   resolution: "@xchainjs/xchain-mayachain@npm:0.2.3"
-  peerDependencies:
-    "@cosmos-client/core": 0.46.1
-    "@xchainjs/xchain-client": ^0.14.1
-    "@xchainjs/xchain-cosmos": ^0.21.1
-    "@xchainjs/xchain-crypto": ^0.3.0
-    "@xchainjs/xchain-util": ^0.13.0
-    axios: ^1.3.6
-    bech32-buffer: ^0.2.0
-  checksum: d3470ba2b8d2be65eadf53af102c15d240ef0b4e6e90d759372517707902e130425e9494e31ce4180dfc43dec268e31f2c349d361502cf089919f0fbf288fe67
-  languageName: node
-  linkType: hard
-
-"@xchainjs/xchain-thorchain@npm:^0.27.9":
-  version: 0.27.9
-  resolution: "@xchainjs/xchain-thorchain@npm:0.27.9"
   peerDependencies:
     "@cosmos-client/core": 0.46.1
     "@xchainjs/xchain-client": ^0.14.1
@@ -7873,21 +7831,23 @@ __metadata:
     "@types/react-intl": ^3.0.0
     "@types/secp256k1": ^4.0.3
     "@types/styled-components": ^5.1.25
-    "@xchainjs/xchain-binance": ^5.6.7
-    "@xchainjs/xchain-bitcoin": ^0.21.1
-    "@xchainjs/xchain-bitcoincash": ^0.15.9
-    "@xchainjs/xchain-bsc": ^0.1.3
-    "@xchainjs/xchain-client": ^0.13.6
-    "@xchainjs/xchain-cosmos": 0.20.8
-    "@xchainjs/xchain-crypto": ^0.2.7
-    "@xchainjs/xchain-doge": ^0.5.10
-    "@xchainjs/xchain-ethereum": ^0.27.7
-    "@xchainjs/xchain-evm": ^0.1.5
-    "@xchainjs/xchain-litecoin": ^0.11.1
-    "@xchainjs/xchain-mayachain": 0.2.3
-    "@xchainjs/xchain-thorchain": ^0.27.9
-    "@xchainjs/xchain-util": ^0.12.0
-    "@xchainjs/xchain-utxo-providers": ^0.1.1
+    "@xchainjs/xchain-binance": ^5.7.1
+    "@xchainjs/xchain-bitcoin": ^0.22.1
+    "@xchainjs/xchain-bitcoincash": ^0.16.2
+    "@xchainjs/xchain-bsc": ^0.2.2
+    "@xchainjs/xchain-client": ^0.14.1
+    "@xchainjs/xchain-cosmos": 0.21.1
+    "@xchainjs/xchain-crypto": ^0.3.0
+    "@xchainjs/xchain-doge": ^0.6.1
+    "@xchainjs/xchain-ethereum": ^0.29.0
+    "@xchainjs/xchain-evm": ^0.2.2
+    "@xchainjs/xchain-litecoin": ^0.12.1
+    "@xchainjs/xchain-mayachain": ^0.2.3
+    "@xchainjs/xchain-midgard": ^0.5.0
+    "@xchainjs/xchain-thorchain": ^0.28.2
+    "@xchainjs/xchain-thornode": ^0.3.3
+    "@xchainjs/xchain-util": ^0.13.0
+    "@xchainjs/xchain-utxo-providers": ^0.2.2
     ansis: ^1.5.5
     antd: ^4.20.7
     assert: ^2.0.0

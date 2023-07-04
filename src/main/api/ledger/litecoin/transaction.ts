@@ -2,7 +2,7 @@ import AppBTC from '@ledgerhq/hw-app-btc'
 import { Transaction } from '@ledgerhq/hw-app-btc/lib/types'
 import Transport from '@ledgerhq/hw-transport'
 import { checkFeeBounds, FeeRate, TxHash } from '@xchainjs/xchain-client'
-import { broadcastTx, Client, defaultLTCParams, LOWER_FEE_BOUND, UPPER_FEE_BOUND } from '@xchainjs/xchain-litecoin'
+import { broadcastTx, Client, defaultLtcParams, LOWER_FEE_BOUND, UPPER_FEE_BOUND } from '@xchainjs/xchain-litecoin'
 import { Address, BaseAmount } from '@xchainjs/xchain-util'
 import * as Bitcoin from 'bitcoinjs-lib'
 import * as E from 'fp-ts/lib/Either'
@@ -55,7 +55,7 @@ export const send = async ({
     const derivePath = getDerivationPath(walletIndex, clientNetwork)
 
     const ltcInitParams = {
-      ...defaultLTCParams,
+      ...defaultLtcParams,
       network: clientNetwork
     }
     const ltcClient = new Client(ltcInitParams)

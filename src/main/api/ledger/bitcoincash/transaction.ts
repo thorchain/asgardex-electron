@@ -5,7 +5,7 @@ import {
   AssetBCH,
   BCHChain,
   Client,
-  defaultBCHParams,
+  defaultBchParams,
   LOWER_FEE_BOUND,
   UPPER_FEE_BOUND
 } from '@xchainjs/xchain-bitcoincash'
@@ -66,7 +66,7 @@ export const send = async ({
     const haskoinProvider = new HaskoinProvider(haskoinUrl, BCHChain, AssetBCH, 8, HaskoinNetwork.BCH)
 
     const bchInitParams = {
-      ...defaultBCHParams,
+      ...defaultBchParams,
       network: clientNetwork
     }
 
