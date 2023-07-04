@@ -7,15 +7,13 @@ import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
 import { useIntl } from 'react-intl'
 
-import { GetPoolsPeriodEnum } from '../../../types/generated/midgard'
+type PeriodItem = { value: string; label: string }
 
-type PeriodItem = { value: GetPoolsPeriodEnum; label: string }
-
-const DEFAULT_ITEM: PeriodItem = { value: GetPoolsPeriodEnum._30d, label: '30 days' }
+const DEFAULT_ITEM: PeriodItem = { value: '30d', label: '30 days' }
 
 export type Props = {
-  selectedValue: GetPoolsPeriodEnum
-  onChange: (value: GetPoolsPeriodEnum) => void
+  selectedValue: string
+  onChange: (value: string) => void
   className?: string
   disabled?: boolean
 }
@@ -26,17 +24,17 @@ export const PoolsPeriodSelector: React.FC<Props> = (props): JSX.Element => {
   const intl = useIntl()
 
   const defaultItem: PeriodItem = useMemo(
-    () => ({ value: GetPoolsPeriodEnum._30d, label: intl.formatMessage({ id: 'common.time.days' }, { days: '30' }) }),
+    () => ({ value: '30d', label: intl.formatMessage({ id: 'common.time.days' }, { days: '30' }) }),
     [intl]
   )
 
   const listItems: PeriodItem[] = useMemo(
     () => [
-      { value: GetPoolsPeriodEnum._7d, label: intl.formatMessage({ id: 'common.time.days' }, { days: '7' }) },
+      { value: '7d', label: intl.formatMessage({ id: 'common.time.days' }, { days: '7' }) },
       defaultItem, // 30 days
-      { value: GetPoolsPeriodEnum._90d, label: intl.formatMessage({ id: 'common.time.days' }, { days: '90' }) },
-      { value: GetPoolsPeriodEnum._180d, label: intl.formatMessage({ id: 'common.time.days' }, { days: '180' }) },
-      { value: GetPoolsPeriodEnum._365d, label: intl.formatMessage({ id: 'common.time.days' }, { days: '365' }) }
+      { value: '90d', label: intl.formatMessage({ id: 'common.time.days' }, { days: '90' }) },
+      { value: '180d', label: intl.formatMessage({ id: 'common.time.days' }, { days: '180' }) },
+      { value: '365d', label: intl.formatMessage({ id: 'common.time.days' }, { days: '365' }) }
     ],
     [defaultItem, intl]
   )

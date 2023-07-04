@@ -2,6 +2,7 @@ import React, { useCallback, useMemo } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
 import { BTCChain } from '@xchainjs/xchain-bitcoin'
+import { PoolDetail } from '@xchainjs/xchain-midgard'
 import { THORChain } from '@xchainjs/xchain-thorchain'
 import { Asset, BaseAmount, bn } from '@xchainjs/xchain-util'
 import BigNumber from 'bignumber.js'
@@ -27,7 +28,6 @@ import { DEFAULT_NETWORK } from '../../../services/const'
 import { PoolShare, PoolsDataMap } from '../../../services/midgard/types'
 import { DEFAULT_BALANCES_FILTER } from '../../../services/wallet/const'
 import { getBalanceByAsset } from '../../../services/wallet/util'
-import { PoolDetail } from '../../../types/generated/midgard'
 import { Props } from './WithdrawDepositView.types'
 
 export const WithdrawDepositView: React.FC<Props> = (props): JSX.Element => {

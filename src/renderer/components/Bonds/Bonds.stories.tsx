@@ -4,13 +4,12 @@ import { ComponentMeta, StoryFn } from '@storybook/react'
 import { Address, baseAmount } from '@xchainjs/xchain-util'
 
 import { AddressValidation } from '../../services/clients'
-import { NodeStatusEnum } from '../../types/generated/thornode'
 import { Bonds as Component } from './Bonds'
 
 const mockNodeInfo = (address: Address) => ({
   bond: baseAmount(100000000 * 40000000),
   award: baseAmount(100000000 * 400000),
-  status: NodeStatusEnum.Active,
+  status: 'Active',
   address
 })
 const addressValidation: AddressValidation = (_) => true

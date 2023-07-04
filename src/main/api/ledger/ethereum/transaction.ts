@@ -6,12 +6,12 @@ import { Address, Asset, assetToString, BaseAmount } from '@xchainjs/xchain-util
 import BigNumber from 'bignumber.js'
 import * as E from 'fp-ts/Either'
 
-import { getEtherscanApiKey } from '../../../../shared/api/etherscan'
-import { getEthplorerCreds } from '../../../../shared/api/ethplorer'
-import { getInfuraCreds } from '../../../../shared/api/infura'
+// import { getEtherscanApiKey } from '../../../../shared/api/etherscan'
+// import { getEthplorerCreds } from '../../../../shared/api/ethplorer'
+// import { getInfuraCreds } from '../../../../shared/api/infura'
 import { LedgerError, LedgerErrorId, Network } from '../../../../shared/api/types'
 import { ROUTER_ABI } from '../../../../shared/ethereum/abi'
-import { DEPOSIT_EXPIRATION_OFFSET, FEE_BOUNDS } from '../../../../shared/ethereum/const'
+import { DEPOSIT_EXPIRATION_OFFSET } from '../../../../shared/ethereum/const'
 import { getDerivationPath } from '../../../../shared/ethereum/ledger'
 import { getBlocktime } from '../../../../shared/ethereum/provider'
 import { EthHDMode } from '../../../../shared/ethereum/types'
@@ -44,19 +44,15 @@ export const send = async ({
   ethHDMode: EthHDMode
 }): Promise<E.Either<LedgerError, TxHash>> => {
   try {
-    const { ethplorerApiKey, ethplorerUrl } = getEthplorerCreds()
+    // const { ethplorerApiKey, ethplorerUrl } = getEthplorerCreds()
 
-    const infuraCreds = getInfuraCreds()
+    // const infuraCreds = getInfuraCreds()
     const clientNetwork = toClientNetwork(network)
-    const etherscanApiKey = getEtherscanApiKey()
+    // const etherscanApiKey = getEtherscanApiKey()
 
     const client = new ETH.Client({
-      network: clientNetwork,
-      etherscanApiKey,
-      ethplorerApiKey,
-      ethplorerUrl,
-      infuraCreds,
-      feeBounds: FEE_BOUNDS[clientNetwork]
+      ...ETH.defaultEthParams,
+      network: clientNetwork
     })
 
     const app = new EthApp(transport)
@@ -127,19 +123,15 @@ export const deposit = async ({
 
     const isETHAddress = address === ETH.ETHAddress
 
-    const { ethplorerApiKey, ethplorerUrl } = getEthplorerCreds()
+    // const { ethplorerApiKey, ethplorerUrl } = getEthplorerCreds()
 
-    const infuraCreds = getInfuraCreds()
+    // const infuraCreds = getInfuraCreds()
     const clientNetwork = toClientNetwork(network)
-    const etherscanApiKey = getEtherscanApiKey()
+    // const etherscanApiKey = getEtherscanApiKey()
 
     const client = new ETH.Client({
-      network: clientNetwork,
-      etherscanApiKey,
-      ethplorerApiKey,
-      ethplorerUrl,
-      infuraCreds,
-      feeBounds: FEE_BOUNDS[clientNetwork]
+      ...ETH.defaultEthParams,
+      network: clientNetwork
     })
 
     const app = new EthApp(transport)

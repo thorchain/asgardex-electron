@@ -9,7 +9,6 @@ import { useIntl } from 'react-intl'
 import { Network } from '../../../../shared/api/types'
 import { AssetRuneNative } from '../../../../shared/utils/asset'
 import { NodeInfo } from '../../../services/thorchain/types'
-import { NodeStatusEnum } from '../../../types/generated/thornode'
 import * as Styled from './BondsTable.styles'
 
 export const NodeAddress: React.FC<{ address: Address; network: Network }> = ({ address, network }) => (
@@ -47,18 +46,18 @@ export const AwardValue: React.FC<{ data: NodeInfo }> = ({ data }) => (
 export const Status: React.FC<{ data: NodeInfo }> = ({ data }) => {
   const intl = useIntl()
 
-  const getStatusMessageId = (status: NodeStatusEnum) => {
+  const getStatusMessageId = (status: string) => {
     switch (status) {
-      case NodeStatusEnum.Active: {
+      case 'Active': {
         return 'bonds.status.active'
       }
-      case NodeStatusEnum.Standby: {
+      case 'Standby': {
         return 'bonds.status.standby'
       }
-      case NodeStatusEnum.Disabled: {
+      case 'Disabled': {
         return 'bonds.status.disabled'
       }
-      case NodeStatusEnum.Whitelisted: {
+      case 'Whitelisted': {
         return 'bonds.status.whitelisted'
       }
       default: {

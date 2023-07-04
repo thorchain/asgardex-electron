@@ -5,7 +5,7 @@ import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
 
 import { ChartDataType, ChartDetails, ChartTimeFrame } from '../../components/uielements/chart/PoolDetailsChart.types'
-// import { GetDepthHistoryParams } from '../../services/midgard/types'
+import { GetDepthHistoryParams } from '../../services/midgard/types'
 import { CachedChartData } from './PoolChartView.types'
 
 type PartialDepthHistoryItem = Pick<DepthHistoryItem, 'startTime' | 'runeDepth'>
@@ -86,3 +86,18 @@ export const updateCachedChartData = ({
   ...cache,
   [dataType]: { ...cache[dataType], [timeFrame]: oData }
 })
+
+export const getDepthHistoryParams = (t: ChartTimeFrame): GetDepthHistoryParams => {
+  switch (t) {
+    case 'week':
+      return { interval: 'Day', count: 7 }
+    case 'month':
+      return { interval: 'Day', count: 30 }
+    case 'threeMonths':
+      return { interval: 'Day', count: 90 }
+    case 'year':
+      return { interval: 'Day', count: 356 }
+    case 'all':
+      return { interval: 'Day' }
+  }
+}

@@ -10,7 +10,6 @@ import { ZERO_ASSET_AMOUNT, ZERO_BN } from '../../const'
 import { sequenceTRD } from '../../helpers/fpHelpers'
 import { abbreviateNumber } from '../../helpers/numberHelper'
 import { PoolDetailRD, PoolStatsDetailRD } from '../../services/midgard/types'
-import { GetPoolsPeriodEnum } from '../../types/generated/midgard'
 import { ErrorView } from '../shared/error'
 import { Button } from '../uielements/button'
 import { PoolsPeriodSelector } from '../uielements/pools/PoolsPeriodSelector'
@@ -24,8 +23,8 @@ export type Props = {
   reloadData: FP.Lazy<void>
   priceSymbol: string
   priceRatio: BigNumber
-  poolsPeriod: GetPoolsPeriodEnum
-  setPoolsPeriod: (v: GetPoolsPeriodEnum) => void
+  poolsPeriod: string
+  setPoolsPeriod: (v: string) => void
 }
 
 export const PoolCards: React.FC<Props> = (props) => {

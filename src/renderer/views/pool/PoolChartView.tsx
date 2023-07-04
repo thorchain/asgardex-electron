@@ -15,7 +15,6 @@ import { ChartDataType, ChartDetailsRD, ChartTimeFrame } from '../../components/
 import { useMidgardContext } from '../../contexts/MidgardContext'
 import { liveData } from '../../helpers/rx/liveData'
 import { SelectedPricePoolAsset } from '../../services/midgard/types'
-import { GetLiquidityHistoryIntervalEnum, GetSwapHistoryIntervalEnum } from '../../types/generated/midgard'
 import {
   getCachedChartData,
   getDepthHistoryParams,
@@ -92,11 +91,11 @@ export const PoolChartView: React.FC<Props> = ({ priceRatio }) => {
                     liveData.sequenceS({
                       swapHistory: getSelectedPoolSwapHistory$({
                         ...requestParams,
-                        interval: GetSwapHistoryIntervalEnum.Day
+                        interval: 'Day'
                       }),
                       liquidityHistory: getPoolLiquidityHistory$({
                         ...requestParams,
-                        interval: GetLiquidityHistoryIntervalEnum.Day
+                        interval: 'Day'
                       })
                     }),
                     liveData.map(({ swapHistory, liquidityHistory }) =>

@@ -38,7 +38,6 @@ import * as poolsRoutes from '../../routes/pools'
 import * as saversRoutes from '../../routes/pools/savers'
 import { PoolDetails, PoolsState } from '../../services/midgard/types'
 import type { MimirHalt } from '../../services/thorchain/types'
-import { GetPoolsPeriodEnum } from '../../types/generated/midgard'
 import * as Shared from '../pools/PoolsOverview.shared'
 import type { SaversTableRowData, SaversTableRowsData } from './Savers.types'
 
@@ -112,10 +111,7 @@ export const SaversOverview: React.FC<Props> = (props): JSX.Element => {
   )
 
   const aprColumn = useCallback(
-    <T extends { apr: BigNumber }>(
-      poolsPeriod: GetPoolsPeriodEnum,
-      setPoolsPeriod: (v: GetPoolsPeriodEnum) => void
-    ): ColumnType<T> => ({
+    <T extends { apr: BigNumber }>(poolsPeriod: string, setPoolsPeriod: (v: string) => void): ColumnType<T> => ({
       key: 'apr',
       align: 'center',
       title: (

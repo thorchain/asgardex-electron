@@ -112,7 +112,7 @@ export type NodeInfo = {
   address: Address
   bond: BaseAmount
   award: BaseAmount
-  status: TN.NodeStatusEnum
+  status: string
 }
 
 export type NodeInfoLD = LiveData<Error, NodeInfo>

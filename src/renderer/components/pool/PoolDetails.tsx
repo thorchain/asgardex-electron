@@ -8,7 +8,6 @@ import * as FP from 'fp-ts/lib/function'
 
 import { Network } from '../../../shared/api/types'
 import { PoolDetailRD, PoolStatsDetailRD } from '../../services/midgard/types'
-import { GetPoolsPeriodEnum, GetPoolsStatusEnum } from '../../types/generated/midgard'
 import { PoolHistoryActions } from '../../views/pool/PoolHistoryView.types'
 import { PoolCards } from './PoolCards'
 import * as H from './PoolDetails.helpers'
@@ -32,8 +31,8 @@ export type Props = {
   }>
   ChartView: React.ComponentType<{ priceRatio: BigNumber }>
   network: Network
-  poolsPeriod: GetPoolsPeriodEnum
-  setPoolsPeriod: (v: GetPoolsPeriodEnum) => void
+  poolsPeriod: string
+  setPoolsPeriod: (v: string) => void
 }
 
 export const PoolDetails: React.FC<Props> = ({
@@ -65,7 +64,7 @@ export const PoolDetails: React.FC<Props> = ({
 
     const isAvailablePool = FP.pipe(
       poolDetailRD,
-      RD.map(({ status }) => status === GetPoolsStatusEnum.Available),
+      RD.map(({ status }) => status === 'Available'),
       RD.getOrElse(() => false)
     )
 

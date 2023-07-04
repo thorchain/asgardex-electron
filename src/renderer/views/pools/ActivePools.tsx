@@ -39,7 +39,6 @@ import * as poolsRoutes from '../../routes/pools'
 // import * as saversRoutes from '../../routes/pools/savers'
 import { DEFAULT_NETWORK } from '../../services/const'
 import { PoolsState, DEFAULT_POOL_FILTERS } from '../../services/midgard/types'
-import { GetPoolsPeriodEnum } from '../../types/generated/midgard'
 import { PoolTableRowData, PoolTableRowsData } from './Pools.types'
 import { filterTableData } from './Pools.utils'
 import * as Shared from './PoolsOverview.shared'
@@ -60,7 +59,7 @@ export const ActivePools: React.FC = (): JSX.Element => {
   const { reload: reloadLimit, data: limitRD } = useProtocolLimit()
   const { data: incentivePendulumRD } = useIncentivePendulum()
 
-  const poolsPeriod = useObservableState(poolsPeriod$, GetPoolsPeriodEnum._30d)
+  const poolsPeriod = useObservableState(poolsPeriod$, '30d')
 
   const { setFilter: setPoolFilter, filter: poolFilter } = usePoolFilter('active')
   const { add: addPoolToWatchlist, remove: removePoolFromWatchlist, list: poolWatchList } = usePoolWatchlist()
@@ -194,10 +193,7 @@ export const ActivePools: React.FC = (): JSX.Element => {
 
   const sortAPYColumn = useCallback((a: { apy: number }, b: { apy: number }) => ordNumber.compare(a.apy, b.apy), [])
   const apyColumn = useCallback(
-    <T extends { apy: number }>(
-      poolsPeriod: GetPoolsPeriodEnum,
-      setPoolsPeriod: (v: GetPoolsPeriodEnum) => void
-    ): ColumnType<T> => ({
+    <T extends { apy: number }>(poolsPeriod: string, setPoolsPeriod: (v: string) => void): ColumnType<T> => ({
       key: 'apy',
       align: 'center',
       title: (

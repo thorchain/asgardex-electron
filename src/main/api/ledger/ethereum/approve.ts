@@ -3,11 +3,11 @@ import TransportNodeHidSingleton from '@ledgerhq/hw-transport-node-hid-singleton
 import { FeeOption, TxHash } from '@xchainjs/xchain-client'
 import * as ETH from '@xchainjs/xchain-ethereum'
 
-import { getEtherscanApiKey } from '../../../../shared/api/etherscan'
-import { getEthplorerCreds } from '../../../../shared/api/ethplorer'
-import { getInfuraCreds } from '../../../../shared/api/infura'
+// import { getEtherscanApiKey } from '../../../../shared/api/etherscan'
+// import { getEthplorerCreds } from '../../../../shared/api/ethplorer'
+// import { getInfuraCreds } from '../../../../shared/api/infura'
 import { IPCLedgerApproveERC20TokenParams } from '../../../../shared/api/io'
-import { DEFAULT_APPROVE_GAS_LIMIT_FALLBACK, FEE_BOUNDS } from '../../../../shared/ethereum/const'
+// import { DEFAULT_APPROVE_GAS_LIMIT_FALLBACK, FEE_BOUNDS } from '../../../../shared/ethereum/const'
 import { getDerivationPath } from '../../../../shared/ethereum/ledger'
 import { toClientNetwork } from '../../../../shared/utils/client'
 import { LedgerSigner } from './LedgerSigner'
@@ -19,18 +19,16 @@ export const approveLedgerERC20Token = async ({
   walletIndex,
   ethHdMode
 }: IPCLedgerApproveERC20TokenParams): Promise<TxHash> => {
-  const { ethplorerApiKey, ethplorerUrl } = getEthplorerCreds()
+  // const { ethplorerApiKey, ethplorerUrl } = getEthplorerCreds()
 
-  const infuraCreds = getInfuraCreds()
+  // const infuraCreds = getInfuraCreds()
   const clientNetwork = toClientNetwork(network)
 
   const client = new ETH.Client({
-    network: clientNetwork,
-    etherscanApiKey: getEtherscanApiKey(),
-    ethplorerApiKey,
-    ethplorerUrl,
-    infuraCreds,
-    feeBounds: FEE_BOUNDS[clientNetwork]
+    ...ETH.defaultEthParams,
+    network: clientNetwork
+    // etherscanApiKey: getEtherscanApiKey(),
+    // feeBounds: FEE_BOUNDS[clientNetwork]
   })
 
   const transport = await TransportNodeHidSingleton.open()
@@ -43,8 +41,8 @@ export const approveLedgerERC20Token = async ({
     signer,
     contractAddress,
     spenderAddress,
-    feeOption: FeeOption.Fast, // ChainTxFeeOption.APPROVE
-    gasLimitFallback: DEFAULT_APPROVE_GAS_LIMIT_FALLBACK
+    feeOption: FeeOption.Fast // ChainTxFeeOption.APPROVE
+    // gasLimitFallback: DEFAULT_APPROVE_GAS_LIMIT_FALLBACK
   })
 
   // wait until the transaction has been mined
