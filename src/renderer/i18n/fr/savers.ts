@@ -1,11 +1,11 @@
 import { SaversMessages } from '../types'
 
 const savers: SaversMessages = {
-  'savers.noSavings': "You don't have savings - FR",
-  'savers.detail.title': 'Your savings - FR',
-  'savers.detail.current.title': 'Deposit value - FR',
-  'savers.detail.redeem.title': 'Redeem value - FR',
-  'savers.detail.percent': 'Growth - FR'
+  'savers.noSavings': "Vous n'avez pas d'économies",
+  'savers.detail.title': 'Vos économies',
+  'savers.detail.current.title': 'Valeur du dépôt',
+  'savers.detail.redeem.title': 'Valeur de rachat',
+  'savers.detail.percent': 'Croissance'
 }
 
 export default savers
