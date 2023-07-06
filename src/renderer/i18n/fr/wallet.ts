@@ -48,7 +48,7 @@ const wallet: WalletMessages = {
   'wallet.phrase.error.import': "Erreur lors de l'importation de la phrase de récupération",
   'wallet.imports.error.phrase.empty': 'Importez un portefeuille existant contenant des fonds',
   'wallet.txs.history': 'Historique des transactions',
-  'wallet.txs.history.disabled': 'Transaction history for {chain} has been disabled temporarily - FR',
+  'wallet.txs.history.disabled': "L'historique des transactions pour {chain} a été désactivé temporairement.",
   'wallet.create.copy.phrase': 'Copiez la phrase ci-dessous',
   'wallet.create.error.phrase.empty': "Créez un nouveau portefeuille, et l'alimenter en fonds",
   'wallet.add.another': 'Ajouter un autre portefeuille',

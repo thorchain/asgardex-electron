@@ -6999,8 +6999,8 @@ __metadata:
   linkType: hard
 
 "@xchainjs/xchain-thorchain@npm:^0.28.2":
-  version: 0.28.2
-  resolution: "@xchainjs/xchain-thorchain@npm:0.28.2"
+  version: 0.28.3
+  resolution: "@xchainjs/xchain-thorchain@npm:0.28.3"
   peerDependencies:
     "@cosmos-client/core": 0.46.1
     "@xchainjs/xchain-client": ^0.14.1
@@ -7009,7 +7009,7 @@ __metadata:
     "@xchainjs/xchain-util": ^0.13.0
     axios: ^1.3.6
     bech32-buffer: ^0.2.0
-  checksum: 731382ebbbd228af1b3b0df335ebde351e61f0611b9c432fe392c8927d20bd3f410140455b37e5e1b6467676432b9045f439312daadac7b249a01376d5a8f45f
+  checksum: 3e46cf04c9c7bf07cc017aaf72ba795cf23730f5ac4302187db1ea8fd9d955b1a9cf666eefbbb768482ab526abcea1ea024635163b09e734ef8889b32fdae44d
   languageName: node
   linkType: hard
 

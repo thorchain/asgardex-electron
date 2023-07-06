@@ -15,13 +15,14 @@ const deposit: DepositMessages = {
   'deposit.totalEarnings': 'Vos revenus totaux de la pool',
   'deposit.add.sym': 'Ajouter',
   'deposit.add.asym': 'Ajouter {asset}',
-  'deposit.add.runeSide': 'RUNE side - FR',
-  'deposit.add.assetSide': 'Asset side - FR',
-  'deposit.add.min.info': 'Minimum value to deposit to cover all fees for inbound and outbound transactions. - FR',
+  'deposit.add.runeSide': 'RUNE côté',
+  'deposit.add.assetSide': 'Actif côté',
+  'deposit.add.min.info':
+    'Valeur minimale à déposer pour couvrir tous les frais des transactions entrantes et sortantes.',
   'deposit.add.max.infoWithFee':
-    'Maximum amount to deposit is based on balance ({balance}) minus estimated fees ({fee}) in relation to other asset side. - FR',
+    "Le montant maximum à déposer est basé sur le solde ({balance}) moins les frais estimés ({fee})par rapport à l'autre côté de l'actif.",
   'deposit.add.max.info':
-    'Maximum amount to deposit is based on balance ({balance}) in relation to other asset side. - FR',
+    "Le montant maximum à déposer est basé sur le solde ({balance}) par rapport à l'autre côté de l'actif.",
   'deposit.add.state.sending': 'Envoi de la transaction de dépôt',
   'deposit.add.state.checkResults': 'Vérification du résultat du dépôt',
   'deposit.add.state.pending': 'Ajout de liquidité',
