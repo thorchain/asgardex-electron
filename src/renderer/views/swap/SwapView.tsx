@@ -433,6 +433,7 @@ export const SwapView: React.FC = (): JSX.Element => {
     targetWalletType: routeTargetWalletType,
     recipient
   } = useParams<SwapRouteParams>()
+  console.log(source)
   const oSourceAsset: O.Option<Asset> = useMemo(() => getAssetFromNullableString(source), [source])
   const oTargetAsset: O.Option<Asset> = useMemo(() => getAssetFromNullableString(target), [target])
   const oRecipientAddress: O.Option<Address> = useMemo(() => getWalletAddressFromNullableString(recipient), [recipient])

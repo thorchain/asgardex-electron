@@ -173,6 +173,7 @@ export const AssetsTableCollapsable: React.FC<Props> = (props): JSX.Element => {
     ({ asset, walletAddress, walletIndex, walletType, hdMode }: WalletBalance) => {
       const { chain } = asset
       const walletAsset: SelectedWalletAsset = { asset, walletAddress, walletIndex, walletType, hdMode }
+
       const hasActivePool: boolean = FP.pipe(O.fromNullable(poolsData[assetToString(asset)]), O.isSome)
       const deepestPoolAsset = FP.pipe(
         getDeepestPool(poolDetails),
@@ -211,6 +212,26 @@ export const AssetsTableCollapsable: React.FC<Props> = (props): JSX.Element => {
                         asset: assetToString(deepestPoolAsset),
                         assetWalletType: DEFAULT_WALLET_TYPE,
                         runeWalletType: walletType
+                      })
+                    )
+                  }
+                }
+              ]
+            : []
+        ),
+        // 'swap' for synths assets of active pools only
+        A.concatW<ActionButtonAction>(
+          isSynthAsset(asset)
+            ? [
+                {
+                  label: intl.formatMessage({ id: 'common.swap' }),
+                  callback: () => {
+                    navigate(
+                      poolsRoutes.swap.path({
+                        source: `${asset.chain}/${asset.ticker}`,
+                        target: assetToString(AssetRuneNative),
+                        sourceWalletType: walletType,
+                        targetWalletType: DEFAULT_WALLET_TYPE
                       })
                     )
                   }

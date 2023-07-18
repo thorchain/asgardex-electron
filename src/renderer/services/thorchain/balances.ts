@@ -1,4 +1,4 @@
-import { AssetRuneNative } from '../../../shared/utils/asset'
+//import { AssetRuneNative } from '../../../shared/utils/asset'
 import { HDMode, WalletType } from '../../../shared/wallet/types'
 import { observableState } from '../../helpers/stateHelper'
 import * as C from '../clients'
@@ -21,6 +21,7 @@ const reloadBalances = () => {
 
 // State of balances loaded by Client
 // TODO (@veado) Remove `assets` list to enable synths - currently we support `AssetRuneNative` only
+// Removed this list
 const balances$ = ({
   walletType,
   walletIndex,
@@ -36,7 +37,6 @@ const balances$ = ({
     walletType,
     walletIndex,
     hdMode,
-    assets: [AssetRuneNative],
     walletBalanceType: 'all'
   })
 

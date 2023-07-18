@@ -11,7 +11,7 @@ import * as RxOp from 'rxjs/operators'
 
 import { LoadingView } from '../../components/shared/loading'
 import { AssetDetails } from '../../components/wallet/assets'
-import { useChainContext } from '../../contexts/ChainContext'
+//import { useChainContext } from '../../contexts/ChainContext'
 import { useWalletContext } from '../../contexts/WalletContext'
 import { disableRuneUpgrade, isRuneNativeAsset } from '../../helpers/assetHelper'
 import { isCosmosChain } from '../../helpers/chainHelper'
@@ -20,12 +20,13 @@ import { sequenceTOption } from '../../helpers/fpHelpers'
 import { useMimirHalt } from '../../hooks/useMimirHalt'
 import { useNetwork } from '../../hooks/useNetwork'
 import { useOpenExplorerTxUrl } from '../../hooks/useOpenExplorerTxUrl'
+import { clientByAsset$ } from '../../services/chain/client'
 import { TxsPageRD } from '../../services/clients'
 import { DEFAULT_BALANCES_FILTER, INITIAL_BALANCES_STATE } from '../../services/wallet/const'
 import { SelectedWalletAsset } from '../../services/wallet/types'
 
 export const AssetDetailsView: React.FC = (): JSX.Element => {
-  const { clientByChain$ } = useChainContext()
+  //const { clientByChain$ } = useChainContext()
 
   const {
     mimirHalt: { haltThorChain, haltEthChain, haltBnbChain }
@@ -94,7 +95,7 @@ export const AssetDetailsView: React.FC = (): JSX.Element => {
         RxOp.switchMap(
           O.fold(
             () => Rx.of(O.none),
-            ({ asset }) => clientByChain$(asset.chain)
+            ({ asset }) => clientByAsset$(asset)
           )
         )
       ),

@@ -6,7 +6,7 @@ import { palette } from 'styled-theme'
 import { Label as UILabel } from '../../../../components/uielements/label'
 import { media } from '../../../../helpers/styleHelper'
 import { AddressEllipsis as UIAddressEllipsis } from '../../addressEllipsis'
-import { WalletTypeLabel as WalletTypeLabelUI } from '../../common/Common.styles'
+import { WalletTypeLabel as WalletTypeLabelUI, AssetSynthLabel as AssetSynthLabelUI } from '../../common/Common.styles'
 
 export const Card = styled(A.Card)`
   .ant-card-body {
@@ -114,4 +114,15 @@ export const AssetPrice = styled.p`
 
 export const WalletTypeLabel = styled(WalletTypeLabelUI)`
   margin-left: 10px;
+`
+export const AssetSynthLabel = styled(AssetSynthLabelUI)`
+  margin-top: 2px;
+  padding: 1 4px;
+  font-size: 12px;
+  line-height: 12px;
+  width: 52px;
+`
+export const ChainLabelWrapper = styled.div`
+  display: flex;
+  align-items: center;
 `

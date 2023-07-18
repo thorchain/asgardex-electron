@@ -58,7 +58,10 @@ export const getTxs$: (walletAddress: O.Option<string>, walletIndex: number) => 
             const { chain } = asset
             if (!isEnabledChain(chain))
               return Rx.of(RD.failure<ApiError>({ errorId: ErrorId.GET_ASSET_TXS, msg: `Unsupported chain ${chain}` }))
-
+            // If the asset is synthetic, use the THOR client
+            if (asset && asset.synth) {
+              return THOR.txs$({ asset: O.none, limit, offset, walletAddress, walletIndex })
+            }
             switch (chain) {
               case BNBChain:
                 return BNB.txs$({ asset: O.some(asset), limit, offset, walletAddress, walletIndex })

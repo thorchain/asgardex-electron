@@ -24,7 +24,6 @@ import { eqChain } from './fp/eq'
 // TODO (@veado) Return Maybe<Asset> instead of throwing an error
 export const getChainAsset = (chain: Chain): Asset => {
   if (!isEnabledChain(chain)) throw Error(`${chain} is not supported for 'getChainAsset'`)
-
   switch (chain) {
     case BNBChain:
       return AssetBNB

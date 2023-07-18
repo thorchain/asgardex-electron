@@ -160,7 +160,7 @@ export const AssetInfo: React.FC<Props> = (props): JSX.Element => {
         <Styled.AssetSubtitle>
           {FP.pipe(
             oAsset,
-            O.map(({ chain }) => chain),
+            O.map(({ chain, synth }) => (synth ? 'synth' : chain)),
             O.getOrElse(() => loadingString)
           )}
         </Styled.AssetSubtitle>

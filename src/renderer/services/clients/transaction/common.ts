@@ -28,23 +28,23 @@ export const loadTxs$ = ({
     O.map((asset) => (asset.chain === ETHChain ? getTokenAddress(asset) || undefined : asset.symbol)),
     O.toUndefined
   )
-
   const address = FP.pipe(
     walletAddress,
     /* TODO (@asgdx-team) Make sure we use correct index by introducing HD wallets in the future */
     O.getOrElse(() => client.getAddress(walletIndex))
   )
-
   return Rx.from(
     client.getTransactions({
-      asset: txAsset,
       address,
+      asset: txAsset,
       limit,
       offset
     })
   ).pipe(
+    // Use the tap operator to log the response
     RxOp.map(RD.success),
     RxOp.catchError((error) => {
+      console.error('getTransactions error:', error) // Also log the error
       return Rx.of(
         RD.failure<ApiError>({
           errorId: ErrorId.GET_ASSET_TXS,

@@ -59,7 +59,6 @@ export const IconBG = styled.div<IconProps>`
 export const IconFallback = styled.div<IconProps>`
   width: ${({ size, isSynth }) => `${sizes[size] - (isSynth ? 2 : 0) * borders[size]}px`};
   height: ${({ size, isSynth }) => `${sizes[size] - (isSynth ? 2 : 0) * borders[size]}px`};
-  position: absolute;
   left: 0;
   top: 0;
   border-radius: 50%;
@@ -72,8 +71,8 @@ export const IconFallback = styled.div<IconProps>`
 
 export const Icon = styled.img<IconProps>`
   position: absolute;
-  left: ${({ size, isSynth }) => `${isSynth ? borders[size] : 0}px`};
-  top: ${({ size, isSynth }) => `${isSynth ? borders[size] : 0}px`};
+  left: ${({ isSynth }) => `${isSynth ? borders : 0}px`}; // adjusted calculation
+  top: ${({ isSynth }) => `${isSynth ? borders : 0}px`}; // adjusted calculation
   width: ${({ size, isSynth }) => `${sizes[size] - (isSynth ? 2 : 0) * borders[size]}px`};
   height: ${({ size, isSynth }) => `${sizes[size] - (isSynth ? 2 : 0) * borders[size]}px`};
   border-radius: 50%;

@@ -6850,16 +6850,16 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@xchainjs/xchain-cosmos@npm:0.20.8":
-  version: 0.20.8
-  resolution: "@xchainjs/xchain-cosmos@npm:0.20.8"
+"@xchainjs/xchain-cosmos@npm:0.21.2":
+  version: 0.21.2
+  resolution: "@xchainjs/xchain-cosmos@npm:0.21.2"
   peerDependencies:
     "@cosmos-client/core": 0.46.1
-    "@xchainjs/xchain-client": ^0.13.5
-    "@xchainjs/xchain-crypto": ^0.2.6
-    "@xchainjs/xchain-util": ^0.12.0
-    axios: ^0.25.0
-  checksum: 612beb8f040835595dff0d0c2615bc6025f377d9a4b86286a246a7b43ffc975bd5f50bf5f0f4961a9f4753259990d0c1b73ec72e69a6d641e383ea5762cf3c20
+    "@xchainjs/xchain-client": ^0.14.1
+    "@xchainjs/xchain-crypto": ^0.3.0
+    "@xchainjs/xchain-util": ^0.13.0
+    axios: ^1.3.6
+  checksum: 86863638a48d12d4ae11ca63a1d9a2f5f098a939f16e0b5ba5c6acad0588a943b11c79149cb2a486211bd98a7cdbcafbd050995de3b207fafea9490365ec7449
   languageName: node
   linkType: hard
 
@@ -6924,18 +6924,18 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@xchainjs/xchain-thorchain@npm:^0.28.3":
-  version: 0.28.3
-  resolution: "@xchainjs/xchain-thorchain@npm:0.28.3"
+"@xchainjs/xchain-thorchain@npm:^0.28.5":
+  version: 0.28.5
+  resolution: "@xchainjs/xchain-thorchain@npm:0.28.5"
   peerDependencies:
     "@cosmos-client/core": 0.46.1
     "@xchainjs/xchain-client": ^0.14.1
-    "@xchainjs/xchain-cosmos": ^0.21.1
+    "@xchainjs/xchain-cosmos": ^0.21.2
     "@xchainjs/xchain-crypto": ^0.3.0
     "@xchainjs/xchain-util": ^0.13.0
     axios: ^1.3.6
     bech32-buffer: ^0.2.0
-  checksum: 3e46cf04c9c7bf07cc017aaf72ba795cf23730f5ac4302187db1ea8fd9d955b1a9cf666eefbbb768482ab526abcea1ea024635163b09e734ef8889b32fdae44d
+  checksum: bb034432cdd4ddac3a20db5aa4001f3b956f48e2ecb1fc97b7e9c8e5068c177967abd35cf4a9f1595fb5709a3ce42640910bc492f676b41684021b512ae14fd0
   languageName: node
   linkType: hard
 
@@ -7752,12 +7752,12 @@ __metadata:
     "@xchainjs/xchain-bitcoin": ^0.21.1
     "@xchainjs/xchain-bitcoincash": ^0.15.9
     "@xchainjs/xchain-client": ^0.13.6
-    "@xchainjs/xchain-cosmos": 0.20.8
+    "@xchainjs/xchain-cosmos": 0.21.2
     "@xchainjs/xchain-crypto": ^0.2.7
     "@xchainjs/xchain-doge": ^0.5.10
     "@xchainjs/xchain-ethereum": ^0.27.7
     "@xchainjs/xchain-litecoin": ^0.11.1
-    "@xchainjs/xchain-thorchain": ^0.28.3
+    "@xchainjs/xchain-thorchain": ^0.28.5
     "@xchainjs/xchain-util": ^0.12.0
     "@xchainjs/xchain-utxo-providers": ^0.1.1
     ansis: ^1.5.5

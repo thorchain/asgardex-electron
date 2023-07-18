@@ -11,7 +11,6 @@ import {
   iconUrlInERC20Whitelist,
   isBchAsset,
   isBnbAsset,
-  isBnbAssetSynth,
   isBtcAsset,
   isDogeAsset,
   isEthAsset,
@@ -20,7 +19,8 @@ import {
   isRuneNativeAsset,
   isTgtERC20Asset,
   isXRuneAsset,
-  isAtomAsset
+  isAtomAsset,
+  isBnbAssetSynth
 } from '../../../../helpers/assetHelper'
 import { isBnbChain, isEthChain } from '../../../../helpers/chainHelper'
 import { getIntFromName, rainbowStop } from '../../../../helpers/colorHelpers'
@@ -47,7 +47,7 @@ export type ComponentProps = {
 
 type Props = ComponentProps & React.HTMLAttributes<HTMLDivElement>
 
-export const AssetIcon: React.FC<Props> = ({ asset, size = 'normal', className = '', network }): JSX.Element => {
+export const AssetIcon: React.FC<Props> = ({ asset, size = 'small', className = '', network }): JSX.Element => {
   const imgUrl = useMemo(() => {
     // BTC
     if (isBtcAsset(asset)) {
@@ -66,7 +66,7 @@ export const AssetIcon: React.FC<Props> = ({ asset, size = 'normal', className =
       return bnbRuneIcon
     }
     // BNB
-    if (isBnbAsset(asset) || isBnbAssetSynth(asset)) {
+    if (isBnbAsset(asset) && !isBnbAssetSynth(asset)) {
       // Since BNB is blacklisted at TrustWallet's asset, we have to use "our" own BNB icon
       // (see https://github.com/trustwallet/assets/blob/master/blockchains/binance/denylist.json
       return bnbIcon
@@ -134,7 +134,7 @@ export const AssetIcon: React.FC<Props> = ({ asset, size = 'normal', className =
   const renderIcon = useCallback(
     (src: string) => (
       <Styled.IconWrapper size={size} isSynth={isSynth} className={className}>
-        <Styled.Icon src={src} isSynth={isSynth} size={size} />{' '}
+        <Styled.Icon src={src} isSynth={isSynth} size={size} />
       </Styled.IconWrapper>
     ),
     [className, isSynth, size]
@@ -162,5 +162,7 @@ export const AssetIcon: React.FC<Props> = ({ asset, size = 'normal', className =
     )
   }, [asset, isSynth, className, size])
 
-  return RD.fold(() => <></>, renderPendingIcon, renderFallbackIcon, renderIcon)(remoteIconImage)
+  return isSynth
+    ? renderFallbackIcon()
+    : RD.fold(() => <></>, renderPendingIcon, renderFallbackIcon, renderIcon)(remoteIconImage)
 }

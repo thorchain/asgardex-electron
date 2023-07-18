@@ -6,7 +6,7 @@ import { DOGEChain } from '@xchainjs/xchain-doge'
 import { ETHChain } from '@xchainjs/xchain-ethereum'
 import { LTCChain } from '@xchainjs/xchain-litecoin'
 import { THORChain } from '@xchainjs/xchain-thorchain'
-import { Chain } from '@xchainjs/xchain-util'
+import { Asset, Chain } from '@xchainjs/xchain-util'
 import * as O from 'fp-ts/lib/Option'
 import * as Rx from 'rxjs'
 import * as RxOp from 'rxjs/operators'
@@ -43,6 +43,28 @@ export const clientByChain$ = (chain: Chain): XChainClient$ => {
       return DOGE.client$
     case GAIAChain:
       return COSMOS.client$
+  }
+}
+export const clientByAsset$ = (asset: Asset): XChainClient$ => {
+  const chain = asset.chain
+  if (!isEnabledChain(chain)) return Rx.of(O.none)
+  switch (chain) {
+    case BNBChain:
+      return asset.synth ? THOR.client$ : BNC.client$
+    case BTCChain:
+      return asset.synth ? THOR.client$ : BTC.client$
+    case BCHChain:
+      return asset.synth ? THOR.client$ : BCH.client$
+    case ETHChain:
+      return asset.synth ? THOR.client$ : ETH.client$
+    case THORChain:
+      return THOR.client$
+    case LTCChain:
+      return asset.synth ? THOR.client$ : LTC.client$
+    case DOGEChain:
+      return asset.synth ? THOR.client$ : DOGE.client$
+    case GAIAChain:
+      return asset.synth ? THOR.client$ : COSMOS.client$
   }
 }
 
