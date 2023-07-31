@@ -151,6 +151,7 @@ export const pricePoolSelectorFromRD = (
 /**
  * Gets a `PoolDetail by given Asset
  * It returns `None` if no `PoolDetail` has been found
+ * Adjusted to handle synth assets
  */
 export const getPoolDetail = (details: PoolDetails, asset: Asset): O.Option<PoolDetail> =>
   FP.pipe(
@@ -159,7 +160,12 @@ export const getPoolDetail = (details: PoolDetails, asset: Asset): O.Option<Pool
         detail.asset,
         assetFromString,
         O.fromNullable,
-        O.map((detailAsset) => eqAsset.equals(detailAsset, asset)),
+        O.map(
+          (detailAsset) =>
+            detailAsset.chain === asset.chain &&
+            detailAsset.symbol === asset.symbol &&
+            detailAsset.ticker === asset.ticker
+        ),
         O.getOrElse(() => false)
       )
     ),

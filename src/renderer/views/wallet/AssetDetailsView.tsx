@@ -2,6 +2,7 @@ import React, { useCallback, useEffect, useMemo } from 'react'
 
 import * as RD from '@devexperts/remote-data-ts'
 import { XChainClient } from '@xchainjs/xchain-client'
+import { THORChain } from '@xchainjs/xchain-thorchain'
 import * as FP from 'fp-ts/function'
 import * as O from 'fp-ts/lib/Option'
 import * as NEA from 'fp-ts/NonEmptyArray'
@@ -122,7 +123,7 @@ export const AssetDetailsView: React.FC = (): JSX.Element => {
   const { openExplorerTxUrl } = useOpenExplorerTxUrl(
     FP.pipe(
       oSelectedAsset,
-      O.map(({ asset }) => asset.chain)
+      O.map(({ asset }) => (asset.synth ? THORChain : asset.chain))
     )
   )
 
@@ -137,7 +138,7 @@ export const AssetDetailsView: React.FC = (): JSX.Element => {
           balances={walletBalances}
           asset={asset}
           loadTxsHandler={loadTxs}
-          reloadBalancesHandler={reloadBalancesByChain(asset.chain)}
+          reloadBalancesHandler={reloadBalancesByChain(asset.synth ? THORChain : asset.chain)}
           openExplorerTxUrl={openExplorerTxUrl}
           openExplorerAddressUrl={openExplorerAddressUrlHandler}
           walletAddress={walletAddress}

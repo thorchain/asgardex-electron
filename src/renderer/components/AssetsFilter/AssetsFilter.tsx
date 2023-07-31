@@ -27,7 +27,8 @@ export const AssetsFilter: React.FC<Props> = ({ poolFilters, className, activeFi
       __base__: intl.formatMessage({ id: 'common.asset.base' }),
       __usd__: 'usd',
       __erc20__: 'erc20',
-      __bep2__: 'bep2'
+      __bep2__: 'bep2',
+      __synth__: 'synth'
     }),
     [intl]
   )

@@ -20,7 +20,8 @@ import {
   isTgtERC20Asset,
   isXRuneAsset,
   isAtomAsset,
-  isBnbAssetSynth
+  isBnbAssetSynth,
+  isBtcAssetSynth
 } from '../../../../helpers/assetHelper'
 import { isBnbChain, isEthChain } from '../../../../helpers/chainHelper'
 import { getIntFromName, rainbowStop } from '../../../../helpers/colorHelpers'
@@ -50,7 +51,7 @@ type Props = ComponentProps & React.HTMLAttributes<HTMLDivElement>
 export const AssetIcon: React.FC<Props> = ({ asset, size = 'small', className = '', network }): JSX.Element => {
   const imgUrl = useMemo(() => {
     // BTC
-    if (isBtcAsset(asset)) {
+    if (isBtcAsset(asset) || isBtcAssetSynth(asset)) {
       return btcIcon
     }
     // ETH
@@ -66,7 +67,7 @@ export const AssetIcon: React.FC<Props> = ({ asset, size = 'small', className = 
       return bnbRuneIcon
     }
     // BNB
-    if (isBnbAsset(asset) && !isBnbAssetSynth(asset)) {
+    if (isBnbAsset(asset) || isBnbAssetSynth(asset)) {
       // Since BNB is blacklisted at TrustWallet's asset, we have to use "our" own BNB icon
       // (see https://github.com/trustwallet/assets/blob/master/blockchains/binance/denylist.json
       return bnbIcon

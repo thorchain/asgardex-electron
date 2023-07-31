@@ -17,7 +17,7 @@ const {
  */
 export const poolOutboundFee$ = (asset: Asset): PoolFeeLD => {
   // special case for RUNE - not provided in `inbound_addresses` endpoint
-  if (isRuneNativeAsset(asset)) {
+  if (isRuneNativeAsset(asset) || asset.synth) {
     return FP.pipe(
       THOR.fees$(),
       liveData.map((fees) => ({ amount: fees.fast.times(3), asset: AssetRuneNative }))

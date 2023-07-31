@@ -8,6 +8,7 @@ import { DOGEChain } from '@xchainjs/xchain-doge'
 import { ETHChain } from '@xchainjs/xchain-ethereum'
 import { LTCChain } from '@xchainjs/xchain-litecoin'
 import { THORChain } from '@xchainjs/xchain-thorchain'
+import { AssetRuneNative } from '@xchainjs/xchain-thorchain-query'
 import { Address } from '@xchainjs/xchain-util'
 import { Chain } from '@xchainjs/xchain-util'
 import * as FP from 'fp-ts/lib/function'
@@ -157,7 +158,8 @@ export const sendPoolTx$ = ({
   memo,
   feeOption = DEFAULT_FEE_OPTION
 }: SendPoolTxParams): TxHashLD => {
-  const { chain } = asset
+  console.log(asset)
+  const { chain } = asset.synth ? AssetRuneNative : asset
   if (!isEnabledChain(chain)) return txFailure$(`${chain} is not supported for 'sendPoolTx$'`)
 
   switch (chain) {

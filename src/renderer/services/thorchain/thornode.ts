@@ -210,6 +210,18 @@ export const createThornodeService$ = (network$: Network$, clientUrl$: ClientUrl
     RxOp.shareReplay(1)
   )
 
+  // const apiGetSwapQuote$ = (quoteSwapParams: QuoteSwapParams): LiveData<Error, QuoteSwapResponse> =>
+  //   FP.pipe(
+  //     thornodeUrl$,
+  //     liveData.chain((basePath) =>
+  //     FP.pipe(
+  //       new QuoteApi(getThornodeAPIConfiguration(basePath)).quoteswap({})),
+  //       RxOp.map(RD.success),
+  //       RxOp.catchError((e: Error) => Rx.of(RD.failure(e)))
+  //       )
+  //     )
+  //   )
+
   const apiGetLiquidityProviders$ = (asset: Asset): LiveData<Error, LiquidityProviderSummary[]> =>
     FP.pipe(
       thornodeUrl$,

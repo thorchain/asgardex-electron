@@ -73,8 +73,8 @@ const SuccessRouteView: React.FC<Props> = ({
   targetWalletType: oTargetWalletType,
   recipientAddress: oRecipientAddress
 }): JSX.Element => {
-  const { chain: sourceChain } = sourceAsset
-  const { chain: targetChain } = targetAsset
+  const { chain: sourceChain } = sourceAsset.synth ? AssetRuneNative : sourceAsset
+  const { chain: targetChain } = targetAsset.synth ? AssetRuneNative : targetAsset
 
   const intl = useIntl()
   const navigate = useNavigate()
@@ -433,9 +433,16 @@ export const SwapView: React.FC = (): JSX.Element => {
     targetWalletType: routeTargetWalletType,
     recipient
   } = useParams<SwapRouteParams>()
-  console.log(source)
-  const oSourceAsset: O.Option<Asset> = useMemo(() => getAssetFromNullableString(source), [source])
-  const oTargetAsset: O.Option<Asset> = useMemo(() => getAssetFromNullableString(target), [target])
+  const sourceAssetString = source && source.match('_synth_') ? source.replace('_synth_', '/') : source
+  const targetAssetString = target && target.match('_synth_') ? target.replace('_synth_', '/') : target
+  const oSourceAsset: O.Option<Asset> = useMemo(
+    () => getAssetFromNullableString(sourceAssetString),
+    [sourceAssetString]
+  )
+  const oTargetAsset: O.Option<Asset> = useMemo(
+    () => getAssetFromNullableString(targetAssetString),
+    [targetAssetString]
+  )
   const oRecipientAddress: O.Option<Address> = useMemo(() => getWalletAddressFromNullableString(recipient), [recipient])
   const sourceWalletType = routeSourceWalletType || DEFAULT_WALLET_TYPE
   const oTargetWalletType = FP.pipe(routeTargetWalletType, O.fromPredicate(isWalletType))

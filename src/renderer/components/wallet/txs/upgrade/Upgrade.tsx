@@ -84,7 +84,7 @@ export const Upgrade: React.FC<Props> = (props): JSX.Element => {
 
   const [form] = Form.useForm<FormValues>()
 
-  const { chain } = asset
+  const chainAsset = getChainAsset(asset.chain)
 
   const [amountToUpgrade, setAmountToUpgrade] = useState<BaseAmount>(ZERO_BASE_AMOUNT)
 
@@ -141,7 +141,7 @@ export const Upgrade: React.FC<Props> = (props): JSX.Element => {
     [asset, walletAddress]
   )
 
-  const chainBaseAsset = useMemo(() => getChainAsset(chain), [chain])
+  const chainBaseAsset = useMemo(() => getChainAsset(asset.chain), [asset])
 
   const getBaseAssetBalance = useMemo(
     () =>
@@ -403,7 +403,7 @@ export const Upgrade: React.FC<Props> = (props): JSX.Element => {
       )
     }
 
-    const chainAsString = chainToString(chain)
+    const chainAsString = chainToString(chainAsset.chain)
     const txtNeedsConnected = intl.formatMessage(
       {
         id: 'ledger.needsconnected'
@@ -413,7 +413,7 @@ export const Upgrade: React.FC<Props> = (props): JSX.Element => {
 
     const description1 =
       // extra info for ETH.RUNE only
-      isEthChain(chain)
+      isEthChain(chainAsset.chain)
         ? `${txtNeedsConnected} ${intl.formatMessage(
             {
               id: 'ledger.blindsign'
@@ -431,7 +431,7 @@ export const Upgrade: React.FC<Props> = (props): JSX.Element => {
           onSuccess={onSuccessHandler}
           onClose={onCloseHandler}
           visible={showConfirmationModal}
-          chain={chain}
+          chain={chainAsset.chain}
           description1={description1}
           description2={description2}
           addresses={O.none}
@@ -439,7 +439,7 @@ export const Upgrade: React.FC<Props> = (props): JSX.Element => {
       )
     }
     return null
-  }, [chain, intl, network, showConfirmationModal, submitTx, validatePassword$, walletType])
+  }, [chainAsset, intl, network, showConfirmationModal, submitTx, validatePassword$, walletType])
 
   const renderTxModal = useMemo(() => {
     const { status } = upgradeTxState

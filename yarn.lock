@@ -1657,6 +1657,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@babel/runtime@npm:^7.15.4":
+  version: 7.22.6
+  resolution: "@babel/runtime@npm:7.22.6"
+  dependencies:
+    regenerator-runtime: ^0.13.11
+  checksum: e585338287c4514a713babf4fdb8fc2a67adcebab3e7723a739fc62c79cfda875b314c90fd25f827afb150d781af97bc16c85bfdbfa2889f06053879a1ddb597
+  languageName: node
+  linkType: hard
+
 "@babel/template@npm:^7.12.7, @babel/template@npm:^7.18.10, @babel/template@npm:^7.18.6, @babel/template@npm:^7.3.3":
   version: 7.18.10
   resolution: "@babel/template@npm:7.18.10"
@@ -6924,6 +6933,30 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@xchainjs/xchain-midgard@npm:0.5.0":
+  version: 0.5.0
+  resolution: "@xchainjs/xchain-midgard@npm:0.5.0"
+  peerDependencies:
+    axios: ^1.3.6
+  checksum: a3dcd21bcc4dcf9ddd4333ad1fe494bcabcb1844d1e09b7decd4a63729368d66663997a3db5e31f4aaf74fffc1df537a72b1344f884c057155cab0b7b8c13f85
+  languageName: node
+  linkType: hard
+
+"@xchainjs/xchain-thorchain-query@npm:0.4.6":
+  version: 0.4.6
+  resolution: "@xchainjs/xchain-thorchain-query@npm:0.4.6"
+  peerDependencies:
+    "@xchainjs/xchain-client": ^0.14.1
+    "@xchainjs/xchain-midgard": ^0.5.0
+    "@xchainjs/xchain-thornode": ^0.3.4
+    "@xchainjs/xchain-util": ^0.13.0
+    axios: ^1.3.6
+    axios-retry: ^3.2.5
+    bignumber.js: ^9.0.0
+  checksum: 7e718851093fd51ea4112c2351ad3219d7af6af491a319cf0bfe205261917d3037ddb19b18bfc4ef0ff5220872e2432e8f147aa7375439cdf98af11252a5f8b8
+  languageName: node
+  linkType: hard
+
 "@xchainjs/xchain-thorchain@npm:^0.28.5":
   version: 0.28.5
   resolution: "@xchainjs/xchain-thorchain@npm:0.28.5"
@@ -6936,6 +6969,15 @@ __metadata:
     axios: ^1.3.6
     bech32-buffer: ^0.2.0
   checksum: bb034432cdd4ddac3a20db5aa4001f3b956f48e2ecb1fc97b7e9c8e5068c177967abd35cf4a9f1595fb5709a3ce42640910bc492f676b41684021b512ae14fd0
+  languageName: node
+  linkType: hard
+
+"@xchainjs/xchain-thornode@npm:0.3.4":
+  version: 0.3.4
+  resolution: "@xchainjs/xchain-thornode@npm:0.3.4"
+  peerDependencies:
+    axios: ^1.3.6
+  checksum: 6c6232656945f1c3b741860def3d8d2330d12a20e6cfd39fa037b9b452b6f4a3bbf1802ac460428f5c82e2ed7e4734323a1d5dd37b46e313e9b16a6903317bec
   languageName: node
   linkType: hard
 
@@ -7757,7 +7799,10 @@ __metadata:
     "@xchainjs/xchain-doge": ^0.5.10
     "@xchainjs/xchain-ethereum": ^0.27.7
     "@xchainjs/xchain-litecoin": ^0.11.1
+    "@xchainjs/xchain-midgard": 0.5.0
     "@xchainjs/xchain-thorchain": ^0.28.5
+    "@xchainjs/xchain-thorchain-query": 0.4.6
+    "@xchainjs/xchain-thornode": 0.3.4
     "@xchainjs/xchain-util": ^0.12.0
     "@xchainjs/xchain-utxo-providers": ^0.1.1
     ansis: ^1.5.5
@@ -7765,6 +7810,7 @@ __metadata:
     assert: ^2.0.0
     autoprefixer: ^10.4.8
     axios: ^0.25.0
+    axios-retry: ^3.2.5
     bchaddrjs: ^0.5.2
     bech32-buffer: ^0.2.0
     bignumber.js: ^9.0.2
@@ -8040,6 +8086,16 @@ __metadata:
   version: 4.4.3
   resolution: "axe-core@npm:4.4.3"
   checksum: c3ea000d9ace3ba0bc747c8feafc24b0de62a0f7d93021d0f77b19c73fca15341843510f6170da563d51535d6cfb7a46c5fc0ea36170549dbb44b170208450a2
+  languageName: node
+  linkType: hard
+
+"axios-retry@npm:^3.2.5":
+  version: 3.5.1
+  resolution: "axios-retry@npm:3.5.1"
+  dependencies:
+    "@babel/runtime": ^7.15.4
+    is-retry-allowed: ^2.2.0
+  checksum: ff1690a635c74b45a0ff60b2608d36bae82ea23660a2571dea918c79242fd88cc0332ba9757810bfac398c947a950299078cef2bc2b08807c27c6ffe069aad4a
   languageName: node
   linkType: hard
 
@@ -15875,6 +15931,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"is-retry-allowed@npm:^2.2.0":
+  version: 2.2.0
+  resolution: "is-retry-allowed@npm:2.2.0"
+  checksum: 3d1103a9290b5d03626756a41054844633eac78bc5d3e3a95b13afeae94fa3cfbcf7f0b5520d83f75f48a25ce7b142fdbac4217dc4b0630f3ea55e866ec3a029
+  languageName: node
+  linkType: hard
+
 "is-root@npm:^2.1.0":
   version: 2.1.0
   resolution: "is-root@npm:2.1.0"
@@ -22868,6 +22931,13 @@ __metadata:
   version: 0.11.1
   resolution: "regenerator-runtime@npm:0.11.1"
   checksum: 3c97bd2c7b2b3247e6f8e2147a002eb78c995323732dad5dc70fac8d8d0b758d0295e7015b90d3d444446ae77cbd24b9f9123ec3a77018e81d8999818301b4f4
+  languageName: node
+  linkType: hard
+
+"regenerator-runtime@npm:^0.13.11":
+  version: 0.13.11
+  resolution: "regenerator-runtime@npm:0.13.11"
+  checksum: 27481628d22a1c4e3ff551096a683b424242a216fee44685467307f14d58020af1e19660bf2e26064de946bad7eff28950eae9f8209d55723e2d9351e632bbb4
   languageName: node
   linkType: hard
 

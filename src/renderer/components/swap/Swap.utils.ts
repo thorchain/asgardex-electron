@@ -161,7 +161,12 @@ export const getSwapLimit1e8 = (swapResultAmountMax1e8: BaseAmount, slipToleranc
 export const pickPoolAsset = (assets: PoolAssetDetails, asset: Asset): O.Option<PoolAssetDetail> =>
   FP.pipe(
     assets,
-    A.findFirst(({ asset: availableAsset }) => eqAsset.equals(availableAsset, asset)),
+    A.findFirst(
+      ({ asset: availableAsset }) =>
+        availableAsset.chain === asset.chain &&
+        availableAsset.symbol === asset.symbol &&
+        availableAsset.ticker === asset.ticker
+    ),
     O.alt(() => FP.pipe(assets, A.head))
   )
 

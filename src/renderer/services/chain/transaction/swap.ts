@@ -1,5 +1,6 @@
 import * as RD from '@devexperts/remote-data-ts'
-import { Address } from '@xchainjs/xchain-util'
+import { AssetRuneNative } from '@xchainjs/xchain-thorchain'
+import { Address, isSynthAsset } from '@xchainjs/xchain-util'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
 import * as Rx from 'rxjs'
@@ -38,8 +39,7 @@ export const swap$ = ({
 }: SwapTxParams): SwapState$ => {
   // total of progress
   const total = O.some(100)
-
-  const { chain } = asset
+  const { chain } = asset.synth ? AssetRuneNative : asset
 
   // Observable state of loading process
   // we start with progress of 25%
@@ -58,7 +58,7 @@ export const swap$ = ({
     // 1. validate pool address or node (for `RuneNative` only)
     RxOp.switchMap((poolAddresses) =>
       Rx.iif(
-        () => isRuneNativeAsset(asset),
+        () => isRuneNativeAsset(asset) || isSynthAsset(asset),
         // We don't have a RUNE pool, so we just validate current connected node
         validateNode$(),
         // in other case we have to validate pool address

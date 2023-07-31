@@ -60,12 +60,16 @@ export const AssetMenu: React.FC<Props> = (props): JSX.Element => {
       FP.pipe(
         assets,
         A.filter((asset) =>
-          // filter assets depending on search input
-          searchValue ? assetToString(asset).toLowerCase().includes(searchValue.toLowerCase()) : true
+          searchValue
+            ? searchValue.toLowerCase() === 'synth?'
+              ? asset.synth
+              : assetToString(asset).toLowerCase().includes(searchValue.toLowerCase())
+            : true
         )
       ),
     [assets, searchValue]
   )
+
   const renderAssets = useMemo(
     () =>
       FP.pipe(

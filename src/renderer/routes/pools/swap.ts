@@ -22,6 +22,7 @@ export const swap: Route<SwapRouteParams> = {
   /**
    * Use '|' 'cause asset symbols have '-' separator and / for synths.
    * `walletType` - wallet type of the source
+   * check to see if asset string from source or target matches a synth, if true replace with a more route friendly string
    */
   template: `${base.template}/:source/:sourceWalletType/:target/:targetWalletType/:recipient?`,
   path: ({ source, target, sourceWalletType, targetWalletType, recipient }) => {
@@ -29,20 +30,12 @@ export const swap: Route<SwapRouteParams> = {
       // Convert source and target to lowercase
       source = source.toLowerCase()
       target = target.toLowerCase()
-
-      // Check if source includes a slash
-      if (source.includes('/')) {
-        // Handle sources with a slash (TODO: implement this)
-        // source is synth soo give it a thorchain wallet type source no equals target
-        const basePath = `${base.template}/${target}/${sourceWalletType}/${target}/${targetWalletType}`
-        return recipient ? `${basePath}/${recipient}` : basePath
-      } else {
-        // Handle sources without a slash
-        const basePath = `${base.template}/${source}/${sourceWalletType}/${target}/${targetWalletType}`
-        return recipient ? `${basePath}/${recipient}` : basePath
-      }
+      const sourceString = source.match('/') ? source.replace('/', '_synth_') : source
+      const targetString = target.match('/') ? target.replace('/', '_synth_') : target
+      // Handle sources without a slash (non-synthetic assets)
+      const basePath = `${base.template}/${sourceString}/${sourceWalletType}/${targetString}/${targetWalletType}`
+      return recipient ? `${basePath}/${recipient}` : basePath
     }
-
     // Redirect to base route if passed params are empty
     return base.path()
   }

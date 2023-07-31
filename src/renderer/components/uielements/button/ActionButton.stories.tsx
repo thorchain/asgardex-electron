@@ -36,7 +36,7 @@ const meta: ComponentMeta<typeof Component> = {
         callback: () => {
           console.log('savers')
         },
-        disabled: true
+        disabled: false
       },
       {
         label: 'send',

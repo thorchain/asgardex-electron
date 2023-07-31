@@ -1,4 +1,5 @@
-import { Asset } from '@xchainjs/xchain-util'
+import { THORChain } from '@xchainjs/xchain-thorchain'
+import { Asset, isSynthAsset } from '@xchainjs/xchain-util'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/lib/Option'
 import * as RxOp from 'rxjs/operators'
@@ -19,8 +20,8 @@ import { poolOutboundFee$, poolInboundFee$ } from './common'
  * by given `in` / `out` assets of a swap
  */
 export const getZeroSwapFees = ({ inAsset, outAsset }: { inAsset: Asset; outAsset: Asset }): SwapFees => ({
-  inFee: { amount: ZERO_BASE_AMOUNT, asset: getChainAsset(inAsset.chain) },
-  outFee: { amount: ZERO_BASE_AMOUNT, asset: getChainAsset(outAsset.chain) }
+  inFee: { amount: ZERO_BASE_AMOUNT, asset: getChainAsset(inAsset.synth ? THORChain : inAsset.chain) },
+  outFee: { amount: ZERO_BASE_AMOUNT, asset: getChainAsset(outAsset.synth ? THORChain : outAsset.chain) }
 })
 
 // state of `SwapFeesParams` used for reloading swap fees
@@ -33,14 +34,13 @@ const {
 // To trigger reload of swap fees
 const reloadSwapFees = (params: SwapFeesParams) => {
   const { inAsset, outAsset } = params
-
   // if prev. vs. new states are different, update params
   if (!eqOSwapFeesParams.equals(O.some(params), updateSwapFeesParamsState())) {
     updateSwapFeesParams(O.some(params))
   }
 
   // (1) Check reload of fees for RUNE
-  if (isRuneNativeAsset(inAsset) || isRuneNativeAsset(outAsset)) {
+  if (isRuneNativeAsset(inAsset) || isRuneNativeAsset(outAsset) || isSynthAsset(inAsset) || isSynthAsset(outAsset)) {
     THOR.reloadFees()
   }
 

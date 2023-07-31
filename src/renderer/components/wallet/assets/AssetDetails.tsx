@@ -164,7 +164,7 @@ export const AssetDetails: React.FC<Props> = (props): JSX.Element => {
             })}
             asset={O.some(asset)}
             assetsWB={oBalances}
-            network={'stagenet'}
+            network={network}
           />
         </Col>
 
