@@ -1,12 +1,36 @@
+# 1.20.0 (2023-08-10)
+
+## Add
+
+- [Synths Support] [#2545](https://github.com/thorchain/asgardex-electron/issues/2545)
+
+## Update
+
+- Quotes now taken from Quote 9R Endpoint using xchainjs query package
+- Upgrade to latest thorchain and cmosmos xchain client packages and  updated axios-retry dependency
+- Added Synths in asset list
+- Added Slip tolerance to quote for price protection
+- Enable [Savers UI] [#2485](https://github.com/thorchain/asgardex-electron/pull/2485) - ready only
+
+## Internal
+
+- Added xchain-thornode to use the latest THORNode version (v116). Remove AsgardEx THORNode Swap Quote call
+- Update routing to support synths - `replace('/', '_synth_')`
+- Update routing to support synths required for [Savers] [#2431](https://github.com/thorchain/asgardex-electron/issues/2431)
+- Add xchain-thorchain-query and related dependencies to query from quote endpoint
+- Updated and activated Savers Routing for Earn and Withdrawal
+- Adjusted Asgard Midgard to understand Synths
+- Enable [Savers UI] [#2485](https://github.com/thorchain/asgardex-electron/pull/2485)
+
 # 1.19.2 (2023-06-30)
 
-# Internal
+## Internal
 
 -Updates xchain-thorchain package due to gas issue.
 
-# 1.19.1 (2023-04-XX)
+# 1.19.1 (2023-04-11)
 
-# Internal
+## Internal
 
 -Updates/refactor to support latest xchain updates for UTXO support. Keystore clients and ledger code updated.
 
