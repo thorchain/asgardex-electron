@@ -11,7 +11,7 @@ import { DOGEChain } from '@xchainjs/xchain-doge'
 import { ETHChain } from '@xchainjs/xchain-ethereum'
 import { LTC_DECIMAL } from '@xchainjs/xchain-litecoin'
 import { LTCChain } from '@xchainjs/xchain-litecoin'
-import { THORChain } from '@xchainjs/xchain-thorchain'
+import { AssetRuneNative, THORChain } from '@xchainjs/xchain-thorchain'
 import { Asset } from '@xchainjs/xchain-util'
 import * as Rx from 'rxjs'
 import * as RxOp from 'rxjs/operators'
@@ -23,7 +23,8 @@ import { getERC20Decimal } from '../ethereum/common'
 import { AssetWithDecimalLD } from './types'
 
 const getDecimal = (asset: Asset, network: Network): Promise<number> => {
-  const { chain } = asset
+  const { chain } = asset.synth ? AssetRuneNative : asset
+
   if (!isEnabledChain(chain)) return Promise.reject(`${chain} is not supported for 'getDecimal'`)
 
   switch (chain) {

@@ -250,6 +250,7 @@ const SuccessRouteView: React.FC<Props> = ({
         O.getOrElse<SwapRouteTargetWalletType>(() => 'custom')
       )
       const recipient = FP.pipe(oRecipientAddress, O.toUndefined)
+
       const path = swap.path({
         source: assetToString(source),
         sourceWalletType,
@@ -358,7 +359,6 @@ const SuccessRouteView: React.FC<Props> = ({
                 assetDetails,
                 A.map(({ asset }) => asset)
               )
-
               const disableAllPoolActions = (chain: Chain) =>
                 PoolHelpers.disableAllActions({ chain, haltedChains, mimirHalt })
 
@@ -435,14 +435,16 @@ export const SwapView: React.FC = (): JSX.Element => {
   } = useParams<SwapRouteParams>()
   const sourceAssetString = source && source.match('_synth_') ? source.replace('_synth_', '/') : source
   const targetAssetString = target && target.match('_synth_') ? target.replace('_synth_', '/') : target
+
   const oSourceAsset: O.Option<Asset> = useMemo(
     () => getAssetFromNullableString(sourceAssetString),
     [sourceAssetString]
   )
-  const oTargetAsset: O.Option<Asset> = useMemo(
-    () => getAssetFromNullableString(targetAssetString),
-    [targetAssetString]
-  )
+  const oTargetAsset: O.Option<Asset> = useMemo(() => {
+    const asset = getAssetFromNullableString(targetAssetString)
+    return asset
+  }, [targetAssetString])
+
   const oRecipientAddress: O.Option<Address> = useMemo(() => getWalletAddressFromNullableString(recipient), [recipient])
   const sourceWalletType = routeSourceWalletType || DEFAULT_WALLET_TYPE
   const oTargetWalletType = FP.pipe(routeTargetWalletType, O.fromPredicate(isWalletType))

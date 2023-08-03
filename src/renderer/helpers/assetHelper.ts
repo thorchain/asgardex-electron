@@ -32,7 +32,8 @@ import {
   AssetRuneNative,
   AssetSynthBnb,
   AssetSynthBtc,
-  AssetSynthBusd
+  AssetSynthBusd,
+  AssetSynthEth
 } from '../../shared/utils/asset'
 import { isEnabledChain } from '../../shared/utils/chain'
 import {
@@ -131,6 +132,11 @@ export const isBusdAssetSynth = (asset: Asset): boolean => eqAsset.equals(asset,
  * Checks whether an asset is an ETH asset
  */
 export const isEthAsset = (asset: Asset): boolean => eqAsset.equals(asset, AssetETH)
+
+/**
+ * Checks whether an asset is an ETH synthetic
+ */
+export const isEthSynthAsset = (asset: Asset): boolean => eqAsset.equals(asset, AssetSynthEth)
 
 /**
  * Checks whether an asset is a DOGE asset

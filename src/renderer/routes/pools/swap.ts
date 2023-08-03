@@ -30,6 +30,7 @@ export const swap: Route<SwapRouteParams> = {
       // Convert source and target to lowercase
       source = source.toLowerCase()
       target = target.toLowerCase()
+
       const sourceString = source.match('/') ? source.replace('/', '_synth_') : source
       const targetString = target.match('/') ? target.replace('/', '_synth_') : target
       // Handle sources without a slash (non-synthetic assets)

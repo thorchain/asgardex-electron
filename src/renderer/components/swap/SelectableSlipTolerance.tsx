@@ -9,7 +9,7 @@ import { ChangeSlipToleranceHandler } from '../../services/app/types'
 import { SlipTolerance } from '../../types/asgardex'
 import { BaseButton } from '../uielements/button'
 
-export const SLIP_PERCENTAGES: SlipTolerance[] = [0.5, 1, 3, 5, 10]
+export const SLIP_PERCENTAGES: SlipTolerance[] = [0.5, 1, 3, 5, 10, 15, 20]
 export const SLIP_TOLERANCE_KEY = 'asgdx-slip-tolerance'
 
 export type Props = {

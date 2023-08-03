@@ -111,7 +111,7 @@ import { CopyLabel } from '../uielements/label'
 import { Slider } from '../uielements/slider'
 import { EditableAddress } from './EditableAddress'
 import { SelectableSlipTolerance } from './SelectableSlipTolerance'
-import { SwapAsset, SwapData } from './Swap.types'
+import { SwapAsset } from './Swap.types'
 import * as Utils from './Swap.utils'
 
 const ErrorLabel: React.FC<{
@@ -185,7 +185,6 @@ export const Swap = ({
   },
   poolAddress: oPoolAddress,
   swap$,
-  poolsData,
   poolDetails,
   pricePool,
   walletBalances,
@@ -668,16 +667,18 @@ export const Swap = ({
           const amount = new CryptoAmount(amountToSwapMax1e8, sourceAsset)
           const address = destinationAddress
           const walletAddress = sourceAddress
+          const toleranceBps = slipTolerance * 100 // convert to basis points
           return {
             fromAsset: fromAsset,
             destinationAsset: destinationAsset,
             amount: amount,
             destinationAddress: address,
-            fromAddress: walletAddress
+            fromAddress: fromAsset.synth ? walletAddress : undefined,
+            toleranceBps: toleranceBps
           }
         })
       ),
-    [sourceAsset, targetAsset, amountToSwapMax1e8, oRecipientAddress, oSourceWalletAddress]
+    [sourceAsset, targetAsset, amountToSwapMax1e8, oRecipientAddress, oSourceWalletAddress, slipTolerance]
   )
 
   useEffect(() => {
@@ -709,15 +710,29 @@ export const Swap = ({
     }
   }, [oQuoteSwapData])
 
-  const swapData: SwapData = useMemo(
+  // Swap boolean for use later
+  const canSwap: boolean = useMemo(
     () =>
-      Utils.getSwapData({
-        amountToSwap: amountToSwapMax1e8,
-        sourceAsset: sourceAsset,
-        targetAsset: targetAsset,
-        poolsData
-      }),
-    [sourceAsset, amountToSwapMax1e8, targetAsset, poolsData]
+      FP.pipe(
+        oQuote,
+        O.fold(
+          () => false, // default value if oQuote is None
+          (txDetails) => txDetails.txEstimate.canSwap
+        )
+      ),
+    [oQuote]
+  )
+  // Reccommend amount in for use later
+  const reccommendedAmountIn: CryptoAmount = useMemo(
+    () =>
+      FP.pipe(
+        oQuote,
+        O.fold(
+          () => new CryptoAmount(baseAmount(0), sourceAsset), // default value if oQuote is None
+          (txDetails) => new CryptoAmount(baseAmount(txDetails.txEstimate.recommendedMinAmountIn), sourceAsset)
+        )
+      ),
+    [oQuote, sourceAsset]
   )
 
   // const swapResultAmountMax1e8: BaseAmount = useMemo(() => {
@@ -769,13 +784,18 @@ export const Swap = ({
       useSourceAssetLedger,
     [useSourceAssetLedger, sourceChain]
   )
-
+  // not sure how accurate this is
   const swapLimit1e8: O.Option<BaseAmount> = useMemo(() => {
-    // Disable slippage protection temporary for Ledger/BTC (see https://github.com/thorchain/asgardex-electron/issues/2068)
-    return !disableSlippage && swapResultAmountMax.baseAmount.gt(zeroTargetBaseAmountMax1e8)
-      ? O.some(Utils.getSwapLimit1e8(swapResultAmountMax.baseAmount, slipTolerance))
-      : O.none
-  }, [disableSlippage, slipTolerance, swapResultAmountMax, zeroTargetBaseAmountMax1e8])
+    return FP.pipe(
+      oQuote,
+      O.chain((txDetails) => {
+        // Disable slippage protection temporary for Ledger/BTC (see https://github.com/thorchain/asgardex-electron/issues/2068)
+        return !disableSlippage && swapResultAmountMax.baseAmount.gt(zeroTargetBaseAmountMax1e8)
+          ? O.some(Utils.getSwapLimit1e8(txDetails.memo))
+          : O.none
+      })
+    )
+  }, [oQuote, disableSlippage, swapResultAmountMax, zeroTargetBaseAmountMax1e8])
 
   const oSwapParams: O.Option<SwapTxParams> = useMemo(
     () =>
@@ -798,7 +818,28 @@ export const Swap = ({
     [oPoolAddress, oSourceAssetWB, sourceAsset, amountToSwapMax1e8, sourceAssetDecimal, oQuote]
   )
 
-  const isCausedSlippage = useMemo(() => swapData.slip.toNumber() > slipTolerance, [swapData.slip, slipTolerance])
+  // Swap slip calculated from expected amount out and swaplimit
+  const swapSlip: number = useMemo(
+    () =>
+      FP.pipe(
+        swapLimit1e8,
+        O.fold(
+          () => 0, // default value if swapLimit1e8 is None
+          (swapLimitValue) => {
+            const swapResultAmountMaxBase = swapResultAmountMax.baseAmount
+            const swaplimitNumber = swapLimitValue.amount().toNumber()
+            const swapResultNumber = swapResultAmountMaxBase.amount().toNumber()
+            return ((swapResultNumber - swaplimitNumber) / swapResultNumber) * 100
+          }
+        )
+      ),
+    [swapLimit1e8, swapResultAmountMax]
+  )
+  // Check to see slippage greater than tolerance
+  const isCausedSlippage = useMemo(() => {
+    const result = swapSlip > slipTolerance
+    return result
+  }, [swapSlip, slipTolerance])
 
   type RateDirection = 'fromSource' | 'fromTarget'
   const [rateDirection, setRateDirection] = useState<RateDirection>('fromSource')
@@ -818,7 +859,6 @@ export const Swap = ({
           trimZeros: true
         })}`
       case 'fromTarget':
-        console.log(targetAsset)
         return `${formatAssetAmountCurrency({
           asset: targetAsset,
           decimal: isUSDAsset(targetAsset) ? 2 : 6,
@@ -984,7 +1024,6 @@ export const Swap = ({
     async (asset: Asset) => {
       // delay to avoid render issues while switching
       await delay(100)
-
       onChangeAsset({
         source: sourceAsset,
         sourceWalletType,
@@ -997,24 +1036,24 @@ export const Swap = ({
     },
     [onChangeAsset, sourceAsset, sourceWalletType]
   )
-  // @st0rmzy use reccommended minamountin
-  const minAmountToSwapMax1e8: BaseAmount = useMemo(
-    () =>
-      Utils.minAmountToSwapMax1e8({
-        swapFees,
-        inAsset: sourceAsset,
-        inAssetDecimal: sourceAssetDecimal,
-        outAsset: targetAsset,
-        poolsData
-      }),
-    [poolsData, sourceAssetDecimal, sourceAsset, swapFees, targetAsset]
-  )
+  // // @st0rmzy use reccommended minamountin
+  // const minAmountToSwapMax1e8: BaseAmount = useMemo(
+  //   () =>
+  //     Utils.minAmountToSwapMax1e8({
+  //       swapFees,
+  //       inAsset: sourceAsset,
+  //       inAssetDecimal: sourceAssetDecimal,
+  //       outAsset: targetAsset,
+  //       poolsData
+  //     }),
+  //   [poolsData, sourceAssetDecimal, sourceAsset, swapFees, targetAsset]
+  // )
 
   const minAmountError = useMemo(() => {
     if (isZeroAmountToSwap) return false
 
-    return amountToSwapMax1e8.lt(minAmountToSwapMax1e8)
-  }, [amountToSwapMax1e8, isZeroAmountToSwap, minAmountToSwapMax1e8])
+    return amountToSwapMax1e8.lt(reccommendedAmountIn.baseAmount)
+  }, [amountToSwapMax1e8, isZeroAmountToSwap, reccommendedAmountIn])
 
   const renderMinAmount = useMemo(
     () => (
@@ -1025,7 +1064,7 @@ export const Swap = ({
           }`}>
           {`${intl.formatMessage({ id: 'common.min' })}: ${formatAssetAmountCurrency({
             asset: sourceAsset,
-            amount: baseToAsset(minAmountToSwapMax1e8),
+            amount: reccommendedAmountIn.assetAmount,
             trimZeros: true
           })}`}
         </p>
@@ -1037,7 +1076,7 @@ export const Swap = ({
         />
       </div>
     ),
-    [intl, minAmountError, minAmountToSwapMax1e8, sourceAsset]
+    [intl, minAmountError, sourceAsset, reccommendedAmountIn]
   )
 
   // Max amount to swap == users balances of source asset
@@ -1656,6 +1695,7 @@ export const Swap = ({
       isCausedSlippage ||
       swapResultAmountMax.baseAmount.lte(zeroTargetBaseAmountMax1e8) ||
       O.isNone(oRecipientAddress) ||
+      !canSwap ||
       customAddressEditActive,
     [
       disableSwapAction,
@@ -1670,6 +1710,7 @@ export const Swap = ({
       swapResultAmountMax,
       zeroTargetBaseAmountMax1e8,
       oRecipientAddress,
+      canSwap,
       customAddressEditActive
     ]
   )
@@ -2004,12 +2045,12 @@ export const Swap = ({
                   <div>{intl.formatMessage({ id: 'swap.slip.title' })}</div>
                   <div>
                     {formatAssetAmountCurrency({
-                      amount: baseToAsset(priceAmountToSwapMax1e8.amount.times(swapData.slip.div(100))),
+                      amount: baseToAsset(priceAmountToSwapMax1e8.amount.times(swapSlip / 100)),
                       asset: priceAmountToSwapMax1e8.asset,
                       decimal: isUSDAsset(priceAmountToSwapMax1e8.asset) ? 2 : 6,
                       trimZeros: !isUSDAsset(priceAmountToSwapMax1e8.asset)
                     })}{' '}
-                    ({swapData.slip.toFixed(2)}%)
+                    ({swapSlip.toFixed(2)}%)
                   </div>
                 </div>
 
