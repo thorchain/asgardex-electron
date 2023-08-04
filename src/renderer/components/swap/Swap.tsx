@@ -27,6 +27,7 @@ import * as A from 'fp-ts/Array'
 import * as FP from 'fp-ts/function'
 import * as NEA from 'fp-ts/lib/NonEmptyArray'
 import * as O from 'fp-ts/Option'
+import debounce from 'lodash/debounce'
 import { useObservableState } from 'observable-hooks'
 import { useIntl } from 'react-intl'
 import * as RxOp from 'rxjs/operators'
@@ -681,32 +682,39 @@ export const Swap = ({
     [sourceAsset, targetAsset, amountToSwapMax1e8, oRecipientAddress, oSourceWalletAddress, slipTolerance]
   )
 
-  useEffect(() => {
-    if (!O.isNone(oQuoteSwapData)) {
-      // only run the effect if oQuoteSwapData is not None
+  const debouncedEffect = useRef(
+    debounce((quoteSwapData) => {
       const thorchainQuery = new ThorchainQuery()
 
-      FP.pipe(
-        oQuoteSwapData,
-        O.fold(
-          () => {
-            console.log('No quoteSwapData available')
-          },
-          (quoteSwapData) => {
-            thorchainQuery
-              .quoteSwap(quoteSwapData)
-              .then((quote) => {
-                // Store the quote in the component's state
-                console.log(quote)
-                setQuote(O.some(quote))
-              })
-              .catch((error) => {
-                // Handle any errors
-                console.error('Failed to get quote:', error)
-              })
-          }
-        )
+      thorchainQuery
+        .quoteSwap(quoteSwapData)
+        .then((quote) => {
+          // Store the quote in the component's state
+          console.log(quote)
+          setQuote(O.some(quote))
+        })
+        .catch((error) => {
+          // Handle any errors
+          console.error('Failed to get quote:', error)
+        })
+    }, 500)
+  ) // Adjust this value to change the debounce time
+
+  useEffect(() => {
+    FP.pipe(
+      oQuoteSwapData,
+      O.fold(
+        () => {
+          console.log('No quoteSwapData available')
+        },
+        (quoteSwapData) => {
+          debouncedEffect.current(quoteSwapData)
+        }
       )
+    )
+    // Clean up the debounced function
+    return () => {
+      debouncedEffect.current.cancel()
     }
   }, [oQuoteSwapData])
 
