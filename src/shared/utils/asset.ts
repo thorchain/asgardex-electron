@@ -16,7 +16,7 @@ import { assetFromStringEx } from '@xchainjs/xchain-util'
 
 const AssetSynthBtc = assetFromStringEx('BTC/BTC')
 const AssetSynthBnb = assetFromStringEx('BNB/BNB')
-const AssetSynthBusd = assetFromStringEx('BNB/BNB-BUSD-BD1')
+const AssetSynthBusd = assetFromStringEx('BNB/BUSD-BD1')
 const AssetSynthEth = assetFromStringEx('ETH/ETH')
 
 // Re-export to have asset definition at one place only to handle xchain-* changes easily in the future

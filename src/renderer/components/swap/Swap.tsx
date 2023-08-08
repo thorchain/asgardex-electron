@@ -701,6 +701,8 @@ export const Swap = ({
   ) // Adjust this value to change the debounce time
 
   useEffect(() => {
+    const currentDebouncedEffect = debouncedEffect.current
+
     FP.pipe(
       oQuoteSwapData,
       O.fold(
@@ -708,13 +710,13 @@ export const Swap = ({
           console.log('No quoteSwapData available')
         },
         (quoteSwapData) => {
-          debouncedEffect.current(quoteSwapData)
+          currentDebouncedEffect(quoteSwapData)
         }
       )
     )
     // Clean up the debounced function
     return () => {
-      debouncedEffect.current.cancel()
+      currentDebouncedEffect.cancel()
     }
   }, [oQuoteSwapData])
 
