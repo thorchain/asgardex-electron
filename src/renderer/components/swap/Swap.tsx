@@ -1467,6 +1467,49 @@ export const Swap = ({
     return inFeeAmount.gt(sourceChainAssetAmount)
   }, [isZeroAmountToSwap, minAmountError, swapFees, sourceChainAssetAmount])
 
+  const quoteError: JSX.Element = useMemo(() => {
+    if (
+      !O.isSome(oQuote) ||
+      !oQuote.value.txEstimate ||
+      !oQuote.value.txEstimate.errors ||
+      oQuote.value.txEstimate.errors.length === 0
+    ) {
+      return <></>
+    }
+
+    // Extract numbers from the error message
+    const error = oQuote.value.txEstimate.errors[0]
+    const regex = /(\d+)\/(\d+)/
+    const match = error.match(regex)
+
+    if (!match) {
+      return <></> // Return an empty JSX fragment if the numbers can't be extracted
+    }
+
+    // Convert the extracted strings to numbers
+    const attemptedAmount = Number(match[1])
+    const requiredAmount = Number(match[2])
+    return (
+      <ErrorLabel>
+        {intl.formatMessage(
+          { id: 'swap.errors.amount.SwapAmountDoesNotCoverSlip' },
+          {
+            attemptedAmount: formatAssetAmountCurrency({
+              asset: sourceChainAsset,
+              amount: baseToAsset(baseAmount(attemptedAmount)),
+              trimZeros: true
+            }),
+            requiredAmount: formatAssetAmountCurrency({
+              asset: sourceChainAsset,
+              trimZeros: true,
+              amount: baseToAsset(baseAmount(requiredAmount))
+            })
+          }
+        )}
+      </ErrorLabel>
+    )
+  }, [oQuote, intl, sourceChainAsset])
+
   const sourceChainFeeErrorLabel: JSX.Element = useMemo(() => {
     if (!sourceChainFeeError) {
       return <></>
@@ -1962,6 +2005,7 @@ export const Swap = ({
                   {intl.formatMessage({ id: 'common.swap' })}
                 </FlatButton>
                 {sourceChainFeeErrorLabel}
+                {quoteError}
               </>
             ) : (
               <>
