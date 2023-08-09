@@ -87,7 +87,7 @@ export const getWalletBalanceByAddressAndAsset = ({
     balances,
     A.findFirst(
       ({ walletAddress: addressInList, asset: assetInList }) =>
-        eqAddress.equals(addressInList, address) && eqAddress.equals(assetInList.ticker, asset.ticker)
+        eqAddress.equals(addressInList, address) && eqAddress.equals(assetInList.symbol, asset.symbol)
     )
   )
 

@@ -7,7 +7,7 @@ import { GAIAChain } from '@xchainjs/xchain-cosmos'
 import { DOGEChain } from '@xchainjs/xchain-doge'
 import { ETHChain } from '@xchainjs/xchain-ethereum'
 import { LTCChain } from '@xchainjs/xchain-litecoin'
-import { THORChain } from '@xchainjs/xchain-thorchain'
+import { AssetRuneNative, THORChain } from '@xchainjs/xchain-thorchain'
 import * as FP from 'fp-ts/lib/function'
 import * as O from 'fp-ts/Option'
 import { useObservableState } from 'observable-hooks'
@@ -40,10 +40,7 @@ export const SendView: React.FC<Props> = (): JSX.Element => {
 
   const renderSendView = useCallback(
     (asset: SelectedWalletAsset) => {
-      const {
-        asset: { chain }
-      } = asset
-
+      const chain = asset.asset.synth ? AssetRuneNative.chain : asset.asset.chain
       if (!isEnabledChain(chain)) {
         return (
           <h1>

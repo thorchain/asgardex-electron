@@ -12,7 +12,7 @@ import { useChainContext } from '../../../contexts/ChainContext'
 import { useThorchainContext } from '../../../contexts/ThorchainContext'
 import { useWalletContext } from '../../../contexts/WalletContext'
 import { liveData } from '../../../helpers/rx/liveData'
-import { getWalletBalanceByAddress } from '../../../helpers/walletHelper'
+import { getWalletBalanceByAddressAndAsset } from '../../../helpers/walletHelper'
 import { useNetwork } from '../../../hooks/useNetwork'
 import { useOpenExplorerTxUrl } from '../../../hooks/useOpenExplorerTxUrl'
 import { useValidateAddress } from '../../../hooks/useValidateAddress'
@@ -45,9 +45,11 @@ export const SendViewTHOR: React.FC<Props> = (props): JSX.Element => {
     () =>
       FP.pipe(
         oBalances,
-        O.chain((balances) => getWalletBalanceByAddress(balances, asset.walletAddress))
+        O.chain((balances) =>
+          getWalletBalanceByAddressAndAsset({ balances, address: asset.walletAddress, asset: asset.asset })
+        )
       ),
-    [asset.walletAddress, oBalances]
+    [asset, oBalances]
   )
 
   const { transfer$ } = useChainContext()

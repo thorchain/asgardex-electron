@@ -8,10 +8,11 @@ import { useObservableState } from 'observable-hooks'
 import * as Rx from 'rxjs'
 import * as RxOp from 'rxjs/operators'
 
+import { ENABLED_CHAINS } from '../../shared/utils/chain'
 import { useThorchainContext } from '../contexts/ThorchainContext'
 import { sequenceTRD } from '../helpers/fpHelpers'
 import { DEFAULT_MIMIR_HALT } from '../services/thorchain/const'
-import { MimirHaltRD, MimirHalt } from '../services/thorchain/types'
+import { MimirHaltRD, MimirHalt, Mimir, MimirHaltTradingGlobal, MimirHaltLpGlobal } from '../services/thorchain/types'
 
 /**
  * Helper to check Mimir status by given Mimir value and last height
@@ -34,6 +35,13 @@ export const getMimirStatus = (mimir = 0, lastHeight = 0) => {
 export const useMimirHalt = (): { mimirHaltRD: MimirHaltRD; mimirHalt: MimirHalt } => {
   const { mimir$, thorchainLastblockState$ } = useThorchainContext()
 
+  const createMimirGroup = (keys: string[], mimir: Mimir, lastHeight?: number) => {
+    return keys.reduce((acc, key) => {
+      acc[key] = getMimirStatus(mimir[key], lastHeight)
+      return acc
+    }, {} as Record<string, boolean>)
+  }
+
   const [mimirHaltRD] = useObservableState<MimirHaltRD>(
     () =>
       FP.pipe(
@@ -42,44 +50,31 @@ export const useMimirHalt = (): { mimirHaltRD: MimirHaltRD; mimirHalt: MimirHalt
           FP.pipe(
             sequenceTRD(mimirRD, thorchainLastblockRD),
             RD.map(([mimir, lastblockItems]) => {
-              const lastHeight: number | undefined = FP.pipe(
+              const lastHeight = FP.pipe(
                 lastblockItems,
                 A.findFirst(({ thorchain }) => thorchain > 0),
                 O.map(({ thorchain }) => thorchain),
                 O.toUndefined
               )
+              const mapChainToKey = (prefix: string, chain: string) => `${prefix}${chain}Chain`
 
-              const halt: MimirHalt = {
-                // `HALT{chain}CHAIN` flags
-                haltBnbChain: getMimirStatus(mimir.HALTBNBCHAIN, lastHeight),
-                haltBchChain: getMimirStatus(mimir.HALTBCHCHAIN, lastHeight),
-                haltBtcChain: getMimirStatus(mimir.HALTBTCCHAIN, lastHeight),
-                haltEthChain: getMimirStatus(mimir.HALTETHCHAIN, lastHeight),
-                haltLtcChain: getMimirStatus(mimir.HALTLTCCHAIN, lastHeight),
-                haltThorChain: getMimirStatus(mimir.HALTTHORCHAIN, lastHeight),
-                haltDogeChain: getMimirStatus(mimir.HALTDOGECHAIN, lastHeight),
-                haltCosmosChain: getMimirStatus(mimir.HALTGAIACHAIN, lastHeight),
-                // `HALT{chain}TRADING` flags
-                haltTrading: getMimirStatus(mimir.HALTTRADING, lastHeight),
-                haltBnbTrading: getMimirStatus(mimir.HALTBNBTRADING, lastHeight),
-                haltBchTrading: getMimirStatus(mimir.HALTBCHTRADING, lastHeight),
-                haltBtcTrading: getMimirStatus(mimir.HALTBTCTRADING, lastHeight),
-                haltEthTrading: getMimirStatus(mimir.HALTETHTRADING, lastHeight),
-                haltLtcTrading: getMimirStatus(mimir.HALTLTCTRADING, lastHeight),
-                haltDogeTrading: getMimirStatus(mimir.HALTDOGETRADING, lastHeight),
-                haltCosmosTrading: getMimirStatus(mimir.HALTGAIATRADING, lastHeight),
-                // `PAUSELP{chain}` flags
-                pauseLp: getMimirStatus(mimir.PAUSELP, lastHeight),
-                pauseLpBnb: getMimirStatus(mimir.PAUSELPBNB, lastHeight),
-                pauseLpBch: getMimirStatus(mimir.PAUSELPBCH, lastHeight),
-                pauseLpBtc: getMimirStatus(mimir.PAUSELPBTC, lastHeight),
-                pauseLpEth: getMimirStatus(mimir.PAUSELPETH, lastHeight),
-                pauseLpLtc: getMimirStatus(mimir.PAUSELPLTC, lastHeight),
-                pauseLpDoge: getMimirStatus(mimir.PAUSELPDOGE, lastHeight),
-                pauseLpCosmos: getMimirStatus(mimir.PAUSELPGAIA, lastHeight)
+              const haltChainKeys = ENABLED_CHAINS.map((chain) => mapChainToKey('halt', chain))
+              const haltTradingKeys = ENABLED_CHAINS.map((chain) => mapChainToKey('halt', chain) + 'Trading')
+              const pauseLPKeys = ENABLED_CHAINS.map((chain) => mapChainToKey('pauseLp', chain))
+
+              const haltChain = createMimirGroup(haltChainKeys, mimir, lastHeight)
+              const haltTrading = createMimirGroup(haltTradingKeys, mimir, lastHeight)
+              const pauseLP = createMimirGroup(pauseLPKeys, mimir, lastHeight)
+
+              // Include global values separately
+              const haltTradingGlobal: MimirHaltTradingGlobal = {
+                haltTrading: getMimirStatus(mimir.HALTTRADING, lastHeight)
               }
 
-              return halt
+              const pauseLpGlobal: MimirHaltLpGlobal = {
+                pauseLp: getMimirStatus(mimir.PAUSELP, lastHeight)
+              }
+              return { ...haltChain, ...haltTrading, ...pauseLP, ...haltTradingGlobal, ...pauseLpGlobal } as MimirHalt
             })
           )
         ),

@@ -17,8 +17,7 @@ const swap: SwapMessages = {
     'Transaction fee {fee} needs to be covered by your balance (currently {balance}).',
   'swap.errors.amount.outputShouldCoverChainFee':
     'Outbounding fee of {fee} needs to be covered by receiving amount (currently {amount}).',
-  'swap.errors.amount.SwapAmountDoesNotCoverSlip':
-    'Thornode quote error, input amount does not cover swap slip or fees',
+  'swap.errors.amount.thornodeQuoteError': '{error}',
   'swap.note.lockedWallet': 'You need to unlock your wallet to swap',
   'swap.note.nowallet': 'Create or import a wallet to swap',
   'swap.errors.asset.missingSourceAsset': 'Missing source asset',

@@ -1,12 +1,12 @@
 import * as RD from '@devexperts/remote-data-ts'
 import { Address, Asset, assetFromString, assetToString, baseAmount, bnOrZero } from '@xchainjs/xchain-util'
 import * as A from 'fp-ts/Array'
-import * as E from 'fp-ts/Either'
+// import * as E from 'fp-ts/Either'
 import * as FP from 'fp-ts/function'
 import * as N from 'fp-ts/lib/number'
 import * as O from 'fp-ts/Option'
-import * as t from 'io-ts'
-import { PathReporter } from 'io-ts/lib/PathReporter'
+// import * as t from 'io-ts'
+// import { PathReporter } from 'io-ts/lib/PathReporter'
 import * as Rx from 'rxjs'
 import * as RxOp from 'rxjs/operators'
 
@@ -32,7 +32,7 @@ import {
 } from '../../types/generated/thornode'
 import { Network$ } from '../app/types'
 import {
-  MimirIO,
+  Mimir,
   MimirLD,
   ThornodeApiUrlLD,
   LiquidityProvidersLD,
@@ -285,12 +285,17 @@ export const createThornodeService$ = (network$: Network$, clientUrl$: ClientUrl
       FP.pipe(
         new MimirApi(getThornodeAPIConfiguration(basePath)).mimir({ height: undefined }),
         RxOp.catchError((e) => Rx.of(RD.failure(Error(`Failed loading mimir: ${JSON.stringify(e)}`)))),
-        RxOp.map((response) => MimirIO.decode(response)),
-        RxOp.map((result) =>
-          // Errors -> Error
-          E.mapLeft((_: t.Errors) => Error(`Failed loading mimir ${PathReporter.report(result)}`))(result)
-        ),
-        RxOp.map(RD.fromEither)
+        RxOp.map((response) => {
+          if (typeof response === 'object' && response !== null) {
+            const result: Mimir = {}
+            for (const [key, value] of Object.entries(response)) {
+              result[key] = Number(value)
+            }
+            return RD.success(result as Mimir)
+          } else {
+            return RD.failure(new Error('Unexpected response format'))
+          }
+        })
       )
     )
   )

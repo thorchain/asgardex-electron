@@ -392,7 +392,7 @@ type SwapMessageKey =
   | 'swap.errors.asset.missingTargetAsset'
   | 'swap.errors.amount.balanceShouldCoverChainFee'
   | 'swap.errors.amount.outputShouldCoverChainFee'
-  | 'swap.errors.amount.SwapAmountDoesNotCoverSlip'
+  | 'swap.errors.amount.thornodeQuoteError'
   | 'swap.note.lockedWallet'
   | 'swap.note.nowallet'
   | 'swap.min.amount.info'

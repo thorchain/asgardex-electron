@@ -25,7 +25,7 @@ import { AssetRuneNative } from '../../../../shared/utils/asset'
 import { chainToString } from '../../../../shared/utils/chain'
 import { isKeystoreWallet } from '../../../../shared/utils/guard'
 import { DEFAULT_WALLET_TYPE } from '../../../const'
-import { disableRuneUpgrade, isNonNativeRuneAsset, isRuneNativeAsset, isUSDAsset } from '../../../helpers/assetHelper'
+import { isRuneNativeAsset, isUSDAsset } from '../../../helpers/assetHelper'
 import { getChainAsset } from '../../../helpers/chainHelper'
 import { getDeepestPool, getPoolPriceValue } from '../../../helpers/poolHelper'
 import { hiddenString, noDataString } from '../../../helpers/stringHelper'
@@ -73,7 +73,6 @@ export const AssetsTableCollapsable: React.FC<Props> = (props): JSX.Element => {
     poolsData,
     selectAssetHandler,
     assetHandler,
-    mimirHalt: mimirHaltRD,
     network,
     hidePrivateData
   } = props
@@ -92,15 +91,15 @@ export const AssetsTableCollapsable: React.FC<Props> = (props): JSX.Element => {
   // store previous data of asset data to render these while reloading
   const previousAssetsTableData = useRef<WalletBalances[]>([])
 
-  // get halt status from Mimir
-  const { haltThorChain, haltEthChain, haltBnbChain } = useMemo(
-    () =>
-      FP.pipe(
-        mimirHaltRD,
-        RD.getOrElse(() => ({ haltThorChain: true, haltEthChain: true, haltBnbChain: true }))
-      ),
-    [mimirHaltRD]
-  )
+  // // get halt status from Mimir
+  // const { haltTHORChain, haltETHChain, haltBNGChain } = useMemo(
+  //   () =>
+  //     FP.pipe(
+  //       mimirHaltRD,
+  //       RD.getOrElse(() => ({ haltTHORChain: true, haltETHChain: true, haltBNBChain: true }))
+  //     ),
+  //   [mimirHaltRD]
+  // )
 
   const onRowHandler = useCallback(
     ({ asset, walletAddress, walletType, walletIndex, hdMode }: WalletBalance) => ({
@@ -173,7 +172,6 @@ export const AssetsTableCollapsable: React.FC<Props> = (props): JSX.Element => {
     ({ asset, walletAddress, walletIndex, walletType, hdMode }: WalletBalance) => {
       const { chain } = asset
       const walletAsset: SelectedWalletAsset = { asset, walletAddress, walletIndex, walletType, hdMode }
-
       const hasActivePool: boolean = FP.pipe(O.fromNullable(poolsData[assetToString(asset)]), O.isSome)
       const deepestPoolAsset = FP.pipe(
         getDeepestPool(poolDetails),
@@ -304,22 +302,22 @@ export const AssetsTableCollapsable: React.FC<Props> = (props): JSX.Element => {
                 }
               ]
             : []
-        ),
-        // 'upgrade' for non-RuneNativeAsset only
-        A.concatW<ActionButtonAction>(
-          isNonNativeRuneAsset(asset, network)
-            ? [
-                {
-                  label: intl.formatMessage({ id: 'wallet.action.upgrade' }),
-                  // Disable UPGRADE button if needed
-                  disabled: disableRuneUpgrade({ asset, haltThorChain, haltEthChain, haltBnbChain, network }),
-                  callback: () => {
-                    assetHandler(walletAsset, 'upgrade')
-                  }
-                }
-              ]
-            : []
         )
+        // // 'upgrade' for non-RuneNativeAsset only
+        // A.concatW<ActionButtonAction>(
+        //   isNonNativeRuneAsset(asset, network)
+        //     ? [
+        //         {
+        //           label: intl.formatMessage({ id: 'wallet.action.upgrade' }),
+        //           // Disable UPGRADE button if needed
+        //           disabled: disableRuneUpgrade({ asset, haltThorChain, haltEthChain, haltBnbChain, network }),
+        //           callback: () => {
+        //             assetHandler(walletAsset, 'upgrade')
+        //           }
+        //         }
+        //       ]
+        //     : []
+        // )
       )
 
       return (
@@ -328,7 +326,7 @@ export const AssetsTableCollapsable: React.FC<Props> = (props): JSX.Element => {
         </div>
       )
     },
-    [assetHandler, haltBnbChain, haltEthChain, haltThorChain, intl, navigate, network, poolDetails, poolsData]
+    [assetHandler, intl, navigate, poolDetails, poolsData]
   )
 
   const actionColumn: ColumnType<WalletBalance> = useMemo(

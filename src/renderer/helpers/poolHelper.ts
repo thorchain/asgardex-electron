@@ -14,12 +14,11 @@ import { ONE_RUNE_BASE_AMOUNT } from '../../shared/mock/amount'
 import { AssetRuneNative } from '../../shared/utils/asset'
 import { PoolAddress, PoolDetails } from '../services/midgard/types'
 import { getPoolDetail, toPoolData } from '../services/midgard/utils'
-import { MimirHaltChain, MimirHaltTrading, MimirPauseLP } from '../services/thorchain/types'
+import { MimirHalt } from '../services/thorchain/types'
 import { PoolDetail } from '../types/generated/midgard'
 import { PoolTableRowData, PoolTableRowsData, PricePool } from '../views/pools/Pools.types'
 import { getPoolTableRowData } from '../views/pools/Pools.utils'
 import { convertBaseAmountDecimal, to1e8BaseAmount, isRuneAsset } from './assetHelper'
-import { isBchChain, isBnbChain, isBtcChain, isCosmosChain, isDogeChain, isEthChain, isLtcChain } from './chainHelper'
 import { eqAsset, eqChain, eqString } from './fp/eq'
 import { ordBaseAmount } from './fp/ord'
 import { sequenceTOption, sequenceTOptionFromArray } from './fpHelpers'
@@ -192,49 +191,22 @@ const isChainElem = A.elem(eqChain)
 export const disableAllActions = ({
   chain,
   haltedChains,
-  mimirHalt: {
-    haltThorChain,
-    haltEthChain,
-    haltBnbChain,
-    haltLtcChain,
-    haltBtcChain,
-    haltBchChain,
-    haltDogeChain,
-    haltCosmosChain
-  }
+  mimirHalt
 }: {
   chain: Chain
   haltedChains: Chain[]
-  mimirHalt: MimirHaltChain
+  mimirHalt: MimirHalt
 }) => {
-  // Check `haltThorChain` (provided by `mimir` endpoint) to disable all actions for all pools
-  if (haltThorChain) return true
+  // Check `haltTHORChain` (provided by `mimir` endpoint) to disable all actions for all pools
+  if (mimirHalt.haltTHORChain) return true
 
-  // Check `haltBnbChain` (provided by `mimir` endpoint) to disable all actions for BNB pools
-  if (isBnbChain(chain) && haltBnbChain) return true
-
-  // Check `haltBtcChain` (provided by `mimir` endpoint) to disable all actions for BTC pools
-  if (isBtcChain(chain) && haltBtcChain) return true
-
-  // Check `haltBchChain` (provided by `mimir` endpoint) to disable all actions for BCH pools
-  if (isBchChain(chain) && haltBchChain) return true
-
-  // Check `haltLtcChain` (provided by `mimir` endpoint) to disable all actions for LTC pools
-  if (isLtcChain(chain) && haltLtcChain) return true
-
-  // Check `haltEthChain` (provided by `mimir` endpoint) to disable all actions for ETH pools
-  if (isEthChain(chain) && haltEthChain) return true
-
-  // Check `haltDogeChain` (provided by `mimir` endpoint) to disable all actions for DOGE pools
-  if (isDogeChain(chain) && haltDogeChain) return true
-
-  // Check `haltCosmosChain` (provided by `mimir` endpoint) to disable all actions for GAIA pools
-  if (isCosmosChain(chain) && haltCosmosChain) return true
+  // Dynamic check for the specific chain halt status
+  const haltChainKey = `halt${chain}Chain` as keyof MimirHalt
+  if (mimirHalt[haltChainKey]) return true
 
   // Check `chain` is included in `haltedChains` (provided by `inbound_addresses` endpoint)
   return FP.pipe(haltedChains, isChainElem(chain))
 }
-
 /**
  * Helper to check if pool trading actions (`SWAP`, `ADD`) have to be disabled
  *
@@ -246,32 +218,18 @@ export const disableAllActions = ({
 export const disableTradingActions = ({
   chain,
   haltedChains,
-  mimirHalt: {
-    haltTrading,
-    haltBtcTrading,
-    haltEthTrading,
-    haltBchTrading,
-    haltLtcTrading,
-    haltBnbTrading,
-    haltDogeTrading,
-    haltCosmosTrading
-  }
+  mimirHalt
 }: {
   chain: Chain
   haltedChains: Chain[]
-  mimirHalt: MimirHaltTrading
+  mimirHalt: MimirHalt
 }) => {
   // 1. Check `haltTrading` (provided by `mimir` endpoint) to disable all actions for all pools
-  if (haltTrading) return true
+  if (mimirHalt.haltTrading) return true
 
-  // 2. Check if trading is disabled for chain to disable all actions for pool
-  if (isBtcChain(chain) && haltBtcTrading) return true
-  if (isEthChain(chain) && haltEthTrading) return true
-  if (isBchChain(chain) && haltBchTrading) return true
-  if (isLtcChain(chain) && haltLtcTrading) return true
-  if (isBnbChain(chain) && haltBnbTrading) return true
-  if (isDogeChain(chain) && haltDogeTrading) return true
-  if (isCosmosChain(chain) && haltCosmosTrading) return true
+  // 2. Dynamic check for the specific chain trading halt status
+  const haltTradingKey = `halt${chain}Trading` as keyof MimirHalt
+  if (mimirHalt[haltTradingKey]) return true
 
   // 3. Check `chain` is included in `haltedChains` (provided by `inbound_addresses` endpoint)
   return FP.pipe(haltedChains, isChainElem(chain))
@@ -288,21 +246,17 @@ export const disableTradingActions = ({
 export const disablePoolActions = ({
   chain,
   haltedChains,
-  mimirHalt: { pauseLp, pauseLpBnb, pauseLpBch, pauseLpBtc, pauseLpEth, pauseLpLtc, pauseLpDoge, pauseLpCosmos }
+  mimirHalt
 }: {
   chain: Chain
   haltedChains: Chain[]
-  mimirHalt: MimirPauseLP
+  mimirHalt: MimirHalt
 }) => {
   // Check all `pauseLp{chain}` values (provided by `mimir` endpoint) to disable pool actions
-  if (pauseLp) return true
-  if (isBnbChain(chain) && pauseLpBnb) return true
-  if (isBchChain(chain) && pauseLpBch) return true
-  if (isBtcChain(chain) && pauseLpBtc) return true
-  if (isEthChain(chain) && pauseLpEth) return true
-  if (isLtcChain(chain) && pauseLpLtc) return true
-  if (isDogeChain(chain) && pauseLpDoge) return true
-  if (isCosmosChain(chain) && pauseLpCosmos) return true
+  if (mimirHalt.pauseLp) return true
+  // 2. Dynamic check for the specific chain trading halt status
+  const haltTradingKey = `pauseLp${chain}` as keyof MimirHalt
+  if (mimirHalt[haltTradingKey]) return true
 
   // Check `chain` is included in `haltedChains` (provided by `inbound_addresses` endpoint)
   return FP.pipe(haltedChains, isChainElem(chain))

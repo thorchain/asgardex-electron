@@ -191,7 +191,7 @@ describe('helpers/poolHelper/', () => {
       const result = disableAllActions({
         chain: BNBChain,
         haltedChains,
-        mimirHalt: { ...DEFAULT_MIMIR_HALT, haltThorChain: true }
+        mimirHalt: { ...DEFAULT_MIMIR_HALT, haltTHORChain: true }
       })
       expect(result).toBeTruthy()
     })
@@ -199,7 +199,7 @@ describe('helpers/poolHelper/', () => {
       const result = disableAllActions({
         chain: LTCChain,
         haltedChains,
-        mimirHalt: { ...DEFAULT_MIMIR_HALT, haltThorChain: true }
+        mimirHalt: { ...DEFAULT_MIMIR_HALT, haltTHORChain: true }
       })
       expect(result).toBeTruthy()
     })
@@ -207,7 +207,7 @@ describe('helpers/poolHelper/', () => {
       const result = disableAllActions({
         chain: ETHChain,
         haltedChains,
-        mimirHalt: { ...DEFAULT_MIMIR_HALT, haltEthChain: true }
+        mimirHalt: { ...DEFAULT_MIMIR_HALT, haltETHChain: true }
       })
       expect(result).toBeTruthy()
     })
@@ -215,7 +215,7 @@ describe('helpers/poolHelper/', () => {
       const result = disableAllActions({
         chain: LTCChain,
         haltedChains,
-        mimirHalt: { ...DEFAULT_MIMIR_HALT, haltEthChain: true }
+        mimirHalt: { ...DEFAULT_MIMIR_HALT, haltETHChain: true }
       })
       expect(result).toBeFalsy()
     })
@@ -275,7 +275,7 @@ describe('helpers/poolHelper/', () => {
         haltedChains,
         mimirHalt: {
           ...DEFAULT_MIMIR_HALT,
-          haltBtcTrading: true
+          haltBTCTrading: true
         }
       })
       expect(result).toBeTruthy()
@@ -286,7 +286,7 @@ describe('helpers/poolHelper/', () => {
         haltedChains,
         mimirHalt: {
           ...DEFAULT_MIMIR_HALT,
-          haltEthTrading: true
+          haltETHTrading: true
         }
       })
       expect(result).toBeTruthy()
@@ -297,7 +297,7 @@ describe('helpers/poolHelper/', () => {
         haltedChains,
         mimirHalt: {
           ...DEFAULT_MIMIR_HALT,
-          haltBchTrading: true
+          haltBCHTrading: true
         }
       })
       expect(result).toBeTruthy()
@@ -308,7 +308,7 @@ describe('helpers/poolHelper/', () => {
         haltedChains,
         mimirHalt: {
           ...DEFAULT_MIMIR_HALT,
-          haltLtcTrading: true
+          haltLTCTrading: true
         }
       })
       expect(result).toBeTruthy()
@@ -319,7 +319,7 @@ describe('helpers/poolHelper/', () => {
         haltedChains,
         mimirHalt: {
           ...DEFAULT_MIMIR_HALT,
-          haltDogeTrading: true
+          haltDOGETrading: true
         }
       })
       expect(result).toBeTruthy()
@@ -331,7 +331,7 @@ describe('helpers/poolHelper/', () => {
         haltedChains,
         mimirHalt: {
           ...DEFAULT_MIMIR_HALT,
-          haltBnbTrading: true
+          haltBNBTrading: true
         }
       })
       expect(result).toBeTruthy()
@@ -343,7 +343,7 @@ describe('helpers/poolHelper/', () => {
         haltedChains,
         mimirHalt: {
           ...DEFAULT_MIMIR_HALT,
-          haltCosmosTrading: true
+          haltGAIATrading: true
         }
       })
       expect(result).toBeTruthy()
@@ -354,11 +354,11 @@ describe('helpers/poolHelper/', () => {
         haltedChains,
         mimirHalt: {
           ...DEFAULT_MIMIR_HALT,
-          haltBtcTrading: true,
-          haltEthTrading: true,
-          haltBchTrading: true,
-          haltBnbTrading: true,
-          haltCosmosTrading: true
+          haltBTCTrading: true,
+          haltETHTrading: true,
+          haltBCHTrading: true,
+          haltBNBTrading: true,
+          haltGAIATrading: true
         }
       })
       expect(result).toBeFalsy()
@@ -389,7 +389,7 @@ describe('helpers/poolHelper/', () => {
         haltedChains,
         mimirHalt: {
           ...DEFAULT_MIMIR_HALT,
-          haltEthTrading: true
+          haltETHTrading: true
         }
       })
       expect(result).toBeFalsy()
@@ -418,7 +418,7 @@ describe('helpers/poolHelper/', () => {
       const result = disablePoolActions({
         chain: BNBChain,
         haltedChains: [],
-        mimirHalt: { ...DEFAULT_MIMIR_HALT, pauseLpBnb: true }
+        mimirHalt: { ...DEFAULT_MIMIR_HALT, pauseLpBNB: true }
       })
       expect(result).toBeTruthy()
     })
@@ -434,7 +434,7 @@ describe('helpers/poolHelper/', () => {
       const result = disablePoolActions({
         chain: BTCChain,
         haltedChains: [],
-        mimirHalt: { ...DEFAULT_MIMIR_HALT, pauseLpBtc: true }
+        mimirHalt: { ...DEFAULT_MIMIR_HALT, pauseLpBTC: true }
       })
       expect(result).toBeTruthy()
     })
@@ -450,7 +450,7 @@ describe('helpers/poolHelper/', () => {
       const result = disablePoolActions({
         chain: BCHChain,
         haltedChains: [],
-        mimirHalt: { ...DEFAULT_MIMIR_HALT, pauseLpBch: true }
+        mimirHalt: { ...DEFAULT_MIMIR_HALT, pauseLpBCH: true }
       })
       expect(result).toBeTruthy()
     })
@@ -466,7 +466,7 @@ describe('helpers/poolHelper/', () => {
       const result = disablePoolActions({
         chain: ETHChain,
         haltedChains: [],
-        mimirHalt: { ...DEFAULT_MIMIR_HALT, pauseLpEth: true }
+        mimirHalt: { ...DEFAULT_MIMIR_HALT, pauseLpETH: true }
       })
       expect(result).toBeTruthy()
     })
@@ -482,7 +482,7 @@ describe('helpers/poolHelper/', () => {
       const result = disablePoolActions({
         chain: LTCChain,
         haltedChains: [],
-        mimirHalt: { ...DEFAULT_MIMIR_HALT, pauseLpLtc: true }
+        mimirHalt: { ...DEFAULT_MIMIR_HALT, pauseLpLTC: true }
       })
       expect(result).toBeTruthy()
     })
@@ -498,7 +498,7 @@ describe('helpers/poolHelper/', () => {
       const result = disablePoolActions({
         chain: DOGEChain,
         haltedChains: [],
-        mimirHalt: { ...DEFAULT_MIMIR_HALT, pauseLpDoge: true }
+        mimirHalt: { ...DEFAULT_MIMIR_HALT, pauseLpDOGE: true }
       })
       expect(result).toBeTruthy()
     })
@@ -514,7 +514,7 @@ describe('helpers/poolHelper/', () => {
       const result = disablePoolActions({
         chain: GAIAChain,
         haltedChains: [],
-        mimirHalt: { ...DEFAULT_MIMIR_HALT, pauseLpCosmos: true }
+        mimirHalt: { ...DEFAULT_MIMIR_HALT, pauseLpGAIA: true }
       })
       expect(result).toBeTruthy()
     })

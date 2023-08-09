@@ -7,6 +7,7 @@ import * as t from 'io-ts'
 import { IntlShape } from 'react-intl'
 import * as Rx from 'rxjs'
 
+import { EnabledChain } from '../../../shared/utils/chain'
 import { HDMode, WalletType } from '../../../shared/wallet/types'
 import { LiveData } from '../../helpers/rx/liveData'
 import { AssetsWithAmount1e8, AssetWithAmount1e8 } from '../../types/asgardex'
@@ -125,79 +126,28 @@ export type NodeInfosRD = RD.RemoteData<Error, NodeInfos>
 export type ThornodeApiUrlLD = LiveData<Error, string>
 export type ThornodeApiUrlRD = RD.RemoteData<Error, string>
 
-/**
- * IO type for mimir endpoints:
- * mainnet: https://thornode.ninerealms.com/thorchain/mimir
- * testnet: https://testnet.thornode.thorchain.info/thorchain/mimir
- */
-export const MimirIO = t.type({
-  MAXIMUMLIQUIDITYRUNE: t.union([t.number, t.undefined]),
-  POOLCYCLE: t.union([t.number, t.undefined]),
-  MAXSYNTHPERPOOLDEPTH: t.union([t.number, t.undefined]),
-  HALTTRADING: t.union([t.number, t.undefined]),
-  HALTTHORCHAIN: t.union([t.number, t.undefined]),
-  HALTETHCHAIN: t.union([t.number, t.undefined]),
-  HALTETHTRADING: t.union([t.number, t.undefined]),
-  HALTBTCCHAIN: t.union([t.number, t.undefined]),
-  HALTBTCTRADING: t.union([t.number, t.undefined]),
-  HALTBCHCHAIN: t.union([t.number, t.undefined]),
-  HALTBCHTRADING: t.union([t.number, t.undefined]),
-  HALTLTCCHAIN: t.union([t.number, t.undefined]),
-  HALTLTCTRADING: t.union([t.number, t.undefined]),
-  HALTBNBCHAIN: t.union([t.number, t.undefined]),
-  HALTBNBTRADING: t.union([t.number, t.undefined]),
-  HALTDOGECHAIN: t.union([t.number, t.undefined]),
-  HALTDOGETRADING: t.union([t.number, t.undefined]),
-  HALTGAIACHAIN: t.union([t.number, t.undefined]),
-  HALTGAIATRADING: t.union([t.number, t.undefined]),
-  PAUSELP: t.union([t.number, t.undefined]),
-  PAUSELPBNB: t.union([t.number, t.undefined]),
-  PAUSELPBCH: t.union([t.number, t.undefined]),
-  PAUSELPBTC: t.union([t.number, t.undefined]),
-  PAUSELPETH: t.union([t.number, t.undefined]),
-  PAUSELPLTC: t.union([t.number, t.undefined]),
-  PAUSELPDOGE: t.union([t.number, t.undefined]),
-  PAUSELPGAIA: t.union([t.number, t.undefined])
-})
-
-export type Mimir = t.TypeOf<typeof MimirIO>
+export type Mimir = {
+  [key: string]: number
+}
 
 export type MimirLD = LiveData<Error, Mimir>
 export type MimirRD = RD.RemoteData<Error, Mimir>
 
-export type MimirHaltChain = {
-  haltThorChain: boolean
-  haltBtcChain: boolean
-  haltEthChain: boolean
-  haltBchChain: boolean
-  haltLtcChain: boolean
-  haltBnbChain: boolean
-  haltDogeChain: boolean
-  haltCosmosChain: boolean
-}
-export type MimirHaltTrading = {
+export type MimirHaltChain = Record<`halt${EnabledChain}Chain`, boolean>
+
+export type MimirHaltTrading = Record<`halt${EnabledChain}Trading`, boolean>
+
+export type MimirPauseLP = Record<`pauseLp${EnabledChain}`, boolean>
+
+export type MimirHaltTradingGlobal = {
   haltTrading: boolean
-  haltBtcTrading: boolean
-  haltEthTrading: boolean
-  haltBchTrading: boolean
-  haltLtcTrading: boolean
-  haltBnbTrading: boolean
-  haltDogeTrading: boolean
-  haltCosmosTrading: boolean
 }
 
-export type MimirPauseLP = {
+export type MimirHaltLpGlobal = {
   pauseLp: boolean
-  pauseLpBnb: boolean
-  pauseLpBch: boolean
-  pauseLpBtc: boolean
-  pauseLpEth: boolean
-  pauseLpLtc: boolean
-  pauseLpDoge: boolean
-  pauseLpCosmos: boolean
 }
 
-export type MimirHalt = MimirHaltChain & MimirHaltTrading & MimirPauseLP
+export type MimirHalt = MimirHaltChain & MimirHaltTrading & MimirPauseLP & MimirHaltTradingGlobal & MimirHaltLpGlobal
 
 export type MimirHaltRD = RD.RemoteData<Error, MimirHalt>
 

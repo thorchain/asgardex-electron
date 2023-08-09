@@ -14,7 +14,7 @@ import { LoadingView } from '../../components/shared/loading'
 import { AssetDetails } from '../../components/wallet/assets'
 //import { useChainContext } from '../../contexts/ChainContext'
 import { useWalletContext } from '../../contexts/WalletContext'
-import { disableRuneUpgrade, isRuneNativeAsset } from '../../helpers/assetHelper'
+import { isRuneNativeAsset } from '../../helpers/assetHelper'
 import { isCosmosChain } from '../../helpers/chainHelper'
 import { eqOSelectedWalletAsset } from '../../helpers/fp/eq'
 import { sequenceTOption } from '../../helpers/fpHelpers'
@@ -30,7 +30,7 @@ export const AssetDetailsView: React.FC = (): JSX.Element => {
   //const { clientByChain$ } = useChainContext()
 
   const {
-    mimirHalt: { haltThorChain, haltEthChain, haltBnbChain }
+    mimirHalt: { haltTHORChain }
   } = useMimirHalt()
 
   const { getTxs$, balancesState$, loadTxs, reloadBalancesByChain, selectedAsset$, resetTxsPage } = useWalletContext()
@@ -142,14 +142,8 @@ export const AssetDetailsView: React.FC = (): JSX.Element => {
           openExplorerTxUrl={openExplorerTxUrl}
           openExplorerAddressUrl={openExplorerAddressUrlHandler}
           walletAddress={walletAddress}
-          disableSend={isRuneNativeAsset(asset) && haltThorChain}
-          disableUpgrade={disableRuneUpgrade({
-            asset,
-            haltThorChain,
-            haltEthChain,
-            haltBnbChain,
-            network
-          })}
+          disableSend={isRuneNativeAsset(asset) && haltTHORChain}
+          disableUpgrade={true}
           network={network}
         />
       )

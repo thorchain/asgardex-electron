@@ -18,8 +18,7 @@ const swap: SwapMessages = {
     'Комиссия транзакции {fee} должна покрываться вашим балансом (сейчас {balance}).',
   'swap.errors.amount.outputShouldCoverChainFee':
     'Исходящая комиссия {fee} должна покрываться получаемым количеством (сейчас {amount}).',
-  'swap.errors.amount.SwapAmountDoesNotCoverSlip':
-    'Ошибка в котировке Thornode, введенная сумма не покрывает скользящую комиссию за обмен или сборы.',
+  'swap.errors.amount.thornodeQuoteError': '{error}',
   'swap.note.lockedWallet': 'Для обмена необходимо разблокировать кошелек',
   'swap.note.nowallet': 'Для обмена создайте или импортируйте кошелек',
   'swap.errors.asset.missingSourceAsset': 'Исходный актив не поддерживается',

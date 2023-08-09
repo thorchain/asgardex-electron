@@ -710,7 +710,7 @@ export const Swap = ({
           console.log('No quoteSwapData available')
         },
         (quoteSwapData) => {
-          currentDebouncedEffect(quoteSwapData)
+          if (!quoteSwapData.amount.baseAmount.eq(baseAmount(0))) currentDebouncedEffect(quoteSwapData)
         }
       )
     )
@@ -1479,36 +1479,22 @@ export const Swap = ({
 
     // Extract numbers from the error message
     const error = oQuote.value.txEstimate.errors[0]
-    const regex = /(\d+)\/(\d+)/
-    const match = error.match(regex)
+    // const regex = /(\d+)\/(\d+)/
+    // const match = error.match(regex)
 
-    if (!match) {
-      return <></> // Return an empty JSX fragment if the numbers can't be extracted
-    }
+    // if (!match) {
+    //   return (
+    //     <ErrorLabel>{intl.formatMessage({ id: 'swap.errors.amount.thornodeQuoteError' }, { error: error })}</ErrorLabel>
+    //   ) // Return an empty JSX fragment if the numbers can't be extracted
+    // }
 
-    // Convert the extracted strings to numbers
-    const attemptedAmount = Number(match[1])
-    const requiredAmount = Number(match[2])
+    // // Convert the extracted strings to numbers
+    // const attemptedAmount = Number(match[1])
+    // const requiredAmount = Number(match[2])
     return (
-      <ErrorLabel>
-        {intl.formatMessage(
-          { id: 'swap.errors.amount.SwapAmountDoesNotCoverSlip' },
-          {
-            attemptedAmount: formatAssetAmountCurrency({
-              asset: sourceChainAsset,
-              amount: baseToAsset(baseAmount(attemptedAmount)),
-              trimZeros: true
-            }),
-            requiredAmount: formatAssetAmountCurrency({
-              asset: sourceChainAsset,
-              trimZeros: true,
-              amount: baseToAsset(baseAmount(requiredAmount))
-            })
-          }
-        )}
-      </ErrorLabel>
+      <ErrorLabel>{intl.formatMessage({ id: 'swap.errors.amount.thornodeQuoteError' }, { error: error })}</ErrorLabel>
     )
-  }, [oQuote, intl, sourceChainAsset])
+  }, [oQuote, intl])
 
   const sourceChainFeeErrorLabel: JSX.Element = useMemo(() => {
     if (!sourceChainFeeError) {

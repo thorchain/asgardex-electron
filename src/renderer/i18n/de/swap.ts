@@ -18,8 +18,7 @@ const swap: SwapMessages = {
     'Transaktionsgebühr in Höhe von {fee} ist nicht über Dein Guthaben {balance} gedeckt.',
   'swap.errors.amount.outputShouldCoverChainFee':
     'Auszahlungsgebühr in Höhe von {fee} ist nicht über den zu erwartenen Auszahlungsbetrag (momentan {amount}) gedeckt',
-  'swap.errors.amount.SwapAmountDoesNotCoverSlip':
-    'Fout in Thornode offerte, invoerbedrag dekt geen swap slip of kosten.',
+  'swap.errors.amount.thornodeQuoteError': '{error}',
   'swap.note.lockedWallet': 'Entsperre Deine Wallet, um zu tauschen',
   'swap.note.nowallet': 'Erstelle oder importiere eine Wallet um zu Swappen',
   'swap.errors.asset.missingSourceAsset': 'Ursprungs-Asset nicht vorhanden',
