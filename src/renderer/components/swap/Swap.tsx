@@ -508,10 +508,11 @@ export const Swap = ({
   )
   // get outbound fee from quote response
   const oSwapOutFee: CryptoAmount = useMemo(() => {
+    const amount = swapFees.outFee.amount
     const result = FP.pipe(
       sequenceTOption(oQuote),
       O.fold(
-        () => new CryptoAmount(baseAmount(0, targetAssetDecimal), targetAsset),
+        () => new CryptoAmount(baseAmount(amount.amount(), targetAssetDecimal), targetAsset),
         ([txDetails]) => {
           const txOutFee = txDetails.txEstimate.totalFees.outboundFee
           return txOutFee
@@ -519,7 +520,7 @@ export const Swap = ({
       )
     )
     return result
-  }, [oQuote, targetAsset, targetAssetDecimal])
+  }, [oQuote, swapFees.outFee.amount, targetAsset, targetAssetDecimal])
 
   // Price of swap OUT fee from oQuote // get poolPrice value and return
   const oPriceSwapOutFee: CryptoAmount = useMemo(() => {
@@ -1477,22 +1478,12 @@ export const Swap = ({
       return <></>
     }
 
-    // Extract numbers from the error message
-    const error = oQuote.value.txEstimate.errors[0]
-    // const regex = /(\d+)\/(\d+)/
-    // const match = error.match(regex)
-
-    // if (!match) {
-    //   return (
-    //     <ErrorLabel>{intl.formatMessage({ id: 'swap.errors.amount.thornodeQuoteError' }, { error: error })}</ErrorLabel>
-    //   ) // Return an empty JSX fragment if the numbers can't be extracted
-    // }
-
-    // // Convert the extracted strings to numbers
-    // const attemptedAmount = Number(match[1])
-    // const requiredAmount = Number(match[2])
+    // Select first error
+    const error = oQuote.value.txEstimate.errors[0].split(':')
     return (
-      <ErrorLabel>{intl.formatMessage({ id: 'swap.errors.amount.thornodeQuoteError' }, { error: error })}</ErrorLabel>
+      <ErrorLabel>
+        {intl.formatMessage({ id: 'swap.errors.amount.thornodeQuoteError' }, { error: error[1] })}
+      </ErrorLabel>
     )
   }, [oQuote, intl])
 

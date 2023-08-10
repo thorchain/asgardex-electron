@@ -18,7 +18,7 @@ const swap: SwapMessages = {
     'Комиссия транзакции {fee} должна покрываться вашим балансом (сейчас {balance}).',
   'swap.errors.amount.outputShouldCoverChainFee':
     'Исходящая комиссия {fee} должна покрываться получаемым количеством (сейчас {amount}).',
-  'swap.errors.amount.thornodeQuoteError': '{error}',
+  'swap.errors.amount.thornodeQuoteError': '{error} : Настроить чек или ввести сумму',
   'swap.note.lockedWallet': 'Для обмена необходимо разблокировать кошелек',
   'swap.note.nowallet': 'Для обмена создайте или импортируйте кошелек',
   'swap.errors.asset.missingSourceAsset': 'Исходный актив не поддерживается',
