@@ -747,7 +747,7 @@ export const Swap = ({
       ),
     [oQuote, sourceAsset]
   )
-  // Affiliate fee
+  // Affiliate fee from quote swap
   const affiliateFee: CryptoAmount = useMemo(
     () =>
       FP.pipe(
