@@ -33,6 +33,7 @@ import { useIntl } from 'react-intl'
 import * as RxOp from 'rxjs/operators'
 
 import { Network } from '../../../shared/api/types'
+import { ASGARDEX_AFFILIATE_FEE, ASGARDEX_THORNAME } from '../../../shared/const'
 import { chainToString } from '../../../shared/utils/chain'
 import { isLedgerWallet } from '../../../shared/utils/guard'
 import { WalletType } from '../../../shared/wallet/types'
@@ -676,7 +677,9 @@ export const Swap = ({
             amount: amount,
             destinationAddress: address,
             fromAddress: fromAsset.synth ? walletAddress : undefined,
-            toleranceBps: toleranceBps
+            toleranceBps: toleranceBps,
+            affiliateAddress: ASGARDEX_THORNAME,
+            affiliateBps: ASGARDEX_AFFILIATE_FEE
           }
         })
       ),
@@ -691,7 +694,6 @@ export const Swap = ({
         .quoteSwap(quoteSwapData)
         .then((quote) => {
           // Store the quote in the component's state
-          console.log(quote)
           setQuote(O.some(quote))
         })
         .catch((error) => {
@@ -745,7 +747,18 @@ export const Swap = ({
       ),
     [oQuote, sourceAsset]
   )
-
+  // Affiliate fee
+  const affiliateFee: CryptoAmount = useMemo(
+    () =>
+      FP.pipe(
+        oQuote,
+        O.fold(
+          () => new CryptoAmount(baseAmount(0), AssetRuneNative), // default affiliate fee asset amount
+          (txDetails) => txDetails.txEstimate.totalFees.affiliateFee
+        )
+      ),
+    [oQuote]
+  )
   // const swapResultAmountMax1e8: BaseAmount = useMemo(() => {
   //   // 1. Convert `swapResult` (1e8) to original decimal of target asset (original decimal might be < 1e8)
   //   const swapResultAmount = convertBaseAmountDecimal(swapData.swapResult, targetAssetDecimal)
@@ -2060,9 +2073,9 @@ export const Swap = ({
                       <div>{intl.formatMessage({ id: 'common.fee.affiliate' })}</div>
                       <div>
                         {formatAssetAmountCurrency({
-                          amount: assetAmount(0),
-                          asset: pricePool.asset,
-                          decimal: 0
+                          amount: affiliateFee.assetAmount,
+                          asset: affiliateFee.asset,
+                          decimal: 4
                         })}
                       </div>
                     </div>

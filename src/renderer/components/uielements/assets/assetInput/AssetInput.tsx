@@ -155,7 +155,7 @@ export const AssetInput: React.FC<Props> = (props): JSX.Element => {
             {formatAssetAmountCurrency({
               amount: baseToAsset(priceAmount),
               asset: priceAsset,
-              decimal: isUSDAsset(priceAsset) ? 2 : 6,
+              decimal: isUSDAsset(priceAsset) ? 4 : 6,
               trimZeros: true
             })}
           </p>

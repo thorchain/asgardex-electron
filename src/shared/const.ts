@@ -7,6 +7,12 @@ import { DEFAULT_THORNODE_API_URLS, DEFAULT_THORNODE_RPC_URLS } from './thorchai
 
 export const ASGARDEX_IDENTIFIER = 999
 
+// Thorname for affialiate address
+export const ASGARDEX_THORNAME = 'dx'
+
+// Affilaite Fee in basis points
+export const ASGARDEX_AFFILIATE_FEE = 30
+
 // Header key for 9R endpoints
 export const NINE_REALMS_CLIENT_HEADER = 'x-client-id'
 
